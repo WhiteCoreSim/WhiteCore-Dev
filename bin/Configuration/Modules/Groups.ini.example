@@ -1,0 +1,44 @@
+[Groups]
+    Enabled = true
+
+    ;; This module can use a PHP XmlRpc server from the Flotsam project at http://code.google.com/p/flotsam/
+    ;; or from the SimianGrid project at http://code.google.com/p/openmetaverse
+    Module = GroupsModule
+
+    ;; Service connectors to the Groups Service. 
+    ;; Specify which messaging module to use for groups messaging and if it's enabled 
+    ;; 
+    MessagingEnabled = true
+    MessagingModule = GroupsMessagingModule
+
+    ;; Enable Group Notices
+    NoticesEnabled = true
+
+    ;; This makes the Groups modules very chatty on the console.
+    DebugEnabled = false
+
+    ;; This will find the users last logged in date or if they are logged in and display it in the group panel
+    FindUserOnlineStatus = true
+
+    ;; WhiteCore Generic Data back-end groups service
+    ;; No setup required
+    ServicesConnectorModule = WhiteCoreDataGroupsServicesConnectorModule
+
+    ;;
+    ;; Services Setup (ONLY REQUIRED IF YOU DO NOT WISH TO USE THE BUILT-IN VERSION)
+    ;;
+
+    ;; Flotsam XmlRpc Service for Groups ROBUST or Other, will not support all group features
+    ;ServicesConnectorModule = XmlRpcGroupsServicesConnector
+	;; The path to your webserver where the FloatSam PHP web server parts are
+    ;GroupsServerURI = "http://127.0.0.1/xmlrpc.php"
+
+    ;; XmlRpc Security settings.  These must match those set on your back-end groups service.
+    ;XmlRpcServiceReadKey = 1234
+    ;XmlRpcServiceWriteKey = 1234
+
+    ;; Disables HTTP Keep-Alive for XmlRpcGroupsServicesConnector HTTP Requests,
+    ;; this is a work around for a problem discovered on some Windows based region servers.
+    ;; Only disable keep alive if you see a large number (dozens) of the following Exceptions:
+    ;; System.Net.WebException: The request was aborted: The request was cancelled.
+    ;XmlRpcDisableKeepAlive = true

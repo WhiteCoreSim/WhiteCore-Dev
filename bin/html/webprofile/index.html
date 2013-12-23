@@ -1,0 +1,159 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>{SystemName}: {UserProfileFor}: {UserName}</title>
+	<meta name="keywords" content="{SystemName}" />
+	<meta name="description" content="{SystemName}"/>
+	<link rel="shortcut icon" href="../images/icons/favicon.ico" />
+	
+	<script src="{SystemURL}/javascripts/jquery.min.js"></script>
+
+	<!-- StyleSwitch -->
+	<script src="{SystemURL}/javascripts/styleswitch.js"></script>
+	<link href="{SystemURL}/css/styles1.css" rel="stylesheet" type="text/css" media="screen" title="styles1" />
+	<link href="{SystemURL}/css/styles2.css" rel="alternate stylesheet" type="text/css" title="styles2" media="screen" />
+	<link href="{SystemURL}/css/styles3.css" rel="alternate stylesheet" type="text/css" title="styles3" media="screen" />
+	<link href="{SystemURL}/css/styles4.css" rel="alternate stylesheet" type="text/css" title="styles4" media="screen" />
+	<link href="{SystemURL}/css/styles5.css" rel="alternate stylesheet" type="text/css" title="styles5" media="screen" />
+	
+	<!-- date time -->
+	<script src="{SystemURL}/javascripts/jquery.jclock.js"></script>
+	<script type="text/javascript">
+		$(function($) {var options1 = {format: '%A %B %d, %Y %I:%M:%S %p'} // 12-hour
+		$('#jclock1').jclock(options1);
+		var options2 = {format: '%a %b %d, %Y %H:%M:%S'} // 24-hour
+		$('#jclock2').jclock(options2);
+		var options3 = {format: '%Y-%m-%d %H:%M:%S'} // 24-hour
+		$('#jclock3').jclock(options3);
+		var options4 = {format: '%Y-%m-%d'}
+		$('#jclock4').jclock(options4);
+		var options5 = {format: '%m/%d/%y'}
+		$('#jclock5').jclock(options5);});
+	</script>
+	
+	<!-- Tooltips -->
+	<script src="{SystemURL}/javascripts/jquery.tooltip.js"></script>
+	<script>$(function() {$('#container *').tooltip({showURL: false});});</script>
+
+	<script src="{SystemURL}/javascripts/menu.profile.js"></script>
+	<script>
+	  $(document).ready(function() 
+	  {
+		$( '#container' ).fadeIn("slow");
+		var result = {};
+		// var sections = $("#menu li");
+		var loading = $("#loading");
+		var content = $("#content");
+
+		if (window.location.search)
+		{
+			// split up the query string and store in an associative array
+			var params = window.location.search.slice(1).split("&");
+			for (var i = 0; i < params.length; i++)
+			{
+				var tmp = params[i].split("=");
+				result[tmp[0]] = unescape(tmp[1]);
+			}
+		}
+		//load selected section
+		var pageName = result["page"];
+		var found = new Boolean(0);
+		switch(pageName){
+			case "base":
+				content.load("base.html" + window.location.search);
+				found = new Boolean(1);
+				break;
+			case "groups":
+				content.load("groups.html" + window.location.search);
+				found = new Boolean(1);
+				break;
+			case "picks":
+				content.load("picks.html" + window.location.search);
+				found = new Boolean(1);
+				break;
+		}
+		if(found == 0)
+			content.load("base.html" + window.location.search);
+	});
+    </script>
+	
+	<!-- Carousel -->
+	<script src="../javascripts/jquery.jcarousel.min.js"></script>
+
+</head>
+
+<body>
+<div id="container">
+
+<div id="topprofile">
+	<ul id="menuprofile">
+		<li id="base" class="fade active" alt="{TooltipsMenuHome}" title="{TooltipsMenuHome}">{MenuProfileTitle}</li>
+		<li id="groups" class="fade" alt="{TooltipsMenuLogin}" title="{TooltipsMenuLogin}">{MenuGroupTitle}</li>
+		<li id="picks" class="fade" alt="{TooltipsMenuRegister}" title="{TooltipsMenuRegister}">{MenuPicksTitle}</li>
+	</ul>
+</div>
+<span class="clear"></span>
+
+<!-- <p class=jclock1><span id=jclock1></span></p> -->
+<!-- <div id="loading"><img src="../images/icons/loading.gif" alt="Loading..." /></div> -->	
+<div id="content"></div>
+<span class="clear"></span>
+
+<div id="footer">
+{IfShowLanguageTranslatorBarBegin}
+	  <div class=languageswitch>
+	    <ul>
+		{StyleSwitcherLanguagesText}:
+		  <li><a href="?language=en" rel="en" class="languageswitch" alt="{en}" title="<img src='../images/flags/flag-en.png' alt='en' /> {en}">en</a></li>
+		  <li><a href="?language=fr" rel="fr" class="languageswitch" alt="{fr}" title="<img src='../images/flags/flag-fr.png' alt='fr' /> {fr}">fr</a></li>
+		  <li><a href="?language=de" rel="de" class="languageswitch" alt="{de}" title="<img src='../images/flags/flag-de.png' alt='de' /> {de}">de</a></li>
+		  <li><a href="?language=it" rel="it" class="languageswitch" alt="{it}" title="<img src='../images/flags/flag-it.png' alt='it' /> {it}">it</a></li>
+		  <li><a href="?language=es" rel="es" class="languageswitch" alt="{es}" title="<img src='../images/flags/flag-es.png' alt='es' /> {es}">es</a></li>
+		{StyleSwitcherChoiceText}: <span id="lg1">en</span><span id="lg2">fr</span><span id="lg3">de</span><span id="lg4">it</span><span id="lg5">es</span>  
+		</ul>
+	  </div>
+{IfShowLanguageTranslatorBarEnd}
+
+{IfShowStyleBarBegin}
+	  <div class=styleswitch>
+	    <ul>
+		{StyleSwitcherStylesText}:
+		  <li><a href="serversideSwitch.html?style=style1" rel="styles1" class="styleswitch" alt="{styles1}" title="{styles1}">1</a></li>
+		  <li><a href="serversideSwitch.html?style=style2" rel="styles2" class="styleswitch" alt="{styles2}" title="{styles2}">2</a></li>
+		  <li><a href="serversideSwitch.html?style=style3" rel="styles3" class="styleswitch" alt="{styles3}" title="{styles3}">3</a></li>
+		  <li><a href="serversideSwitch.html?style=style4" rel="styles4" class="styleswitch" alt="{styles4}" title="{styles4}">4</a></li>
+		  <li><a href="serversideSwitch.html?style=style5" rel="styles5" class="styleswitch" alt="{styles5}" title="{styles5}">5</a></li>
+		{StyleSwitcherChoiceText}: <span id="st1">1</span><span id="st2">2</span><span id="st3">3</span><span id="st4">4</span><span id="st5">5</span>| Copyright&nbsp;<a class='copyright' href="/" alt="{SystemName}" title="{SystemName}">{SystemName}</a>&nbsp;2011&nbsp;&copy;&nbsp;2012  
+		</ul>
+	  </div>
+{IfShowStyleBarEnd}
+	  <span class="clear"></span>
+	</div>
+</div>
+
+<script>
+	// fade class
+	$("li.fade, a.fade").hover(function(){$(this).fadeOut(150);$(this).fadeIn(150);});
+	$("a.languageswitch, a.styleswitch").hover(function(){$(this).fadeOut(150);$(this).fadeIn(150);});
+	$("a.webprofile, a.copyright").hover(function(){$(this).fadeOut(150);$(this).fadeIn(150);});
+</script>
+
+</body>
+</html>
+
+<!-- params to replace
+{SystemURL}
+{SystemName}
+{UserName}         
+{UserBorn}       
+{UserType}       
+{UserPartner}     
+{UserAboutMe}     
+{UserPictureURL}       
+{UserProfileFor}   User Profile For
+{ResidentSince}    Resident Since
+{AccountType}      Account Type
+{PartnersName}     Partner's Name
+{AboutMe}          About Me
+-->

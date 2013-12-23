@@ -1,0 +1,39 @@
+<!-- params to replace
+{SystemURL}
+{SystemName}
+{News}                     News
+{NewsItemTitle}            News Item Title
+{NewsItemText}             News Item Text
+{NewsTitle}                
+{NewsText}             
+{NewsID}             
+-->
+
+<h2>{SystemName}: {News}</h2>
+<table id="login">
+  <caption></caption>
+  
+  <thead>
+    <tr>
+      <th class="login_left"></th>
+      <th class="login_right"></th>
+    </tr>
+  </thead>
+  
+  <tfoot>
+    <tr>
+      <th class="login_left"></th>
+      <th class="login_right"></th>
+    </tr>
+  </tfoot>
+
+  <tbody>
+  <tr>       
+	<td>
+	  <h4>{NewsItemTitle}: {NewsTitle}</h4>
+	  <p>{NewsText}</p>
+	</td>
+  </tr>
+  </tbody>
+</table>
+{IsAdminAuthenticatedEnd}

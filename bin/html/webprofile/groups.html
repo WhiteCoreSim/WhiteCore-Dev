@@ -1,0 +1,44 @@
+<!-- Caption -->
+<script>
+	/* <![CDATA[ */
+		jQuery(document).ready(function($) {
+			$('div.group_profile_picture').each(function(i) {
+				var img_ = $('img', this);			
+				var img_height = img_.attr('height');
+				var p_height = $('p', this).outerHeight();
+				$(this).height(img_height);
+				$(this).hover(function() {
+					img_.animate({marginTop : -p_height-10}, 500);
+				}, function() {
+					img_.animate({marginTop : '0'}, 500);
+				});
+			});		
+		});
+	/* ]]> */
+</script>
+
+<script>
+// jQuery(document).ready(function() {jQuery('#avatarcarousel').jcarousel();});
+jQuery(document).ready(function() {jQuery('#avatarcarousel').jcarousel({wrap: 'circular'});});
+</script>
+
+<h2>{SystemName}: {UsersGroupsText} by {UserName} ({GroupsJoined})</h2>
+<div id="group_profile_container">
+ <center>
+  <ul id="avatarcarousel" class="jcarousel-skin-aurora-bigsize jcarousel-bigsize">
+{GroupsArrayBegin}
+	<li>
+	    <div class="group_profile_picture">
+	    <a href="#">
+	    <img height="256"
+		     src="{GroupPictureURL}" 
+		     alt="{GroupNameText}: {GroupName}"
+			 title="{GroupNameText}: {GroupName}" /></a>
+		<p class="group_profile_picture_text">{GroupNameText}: {GroupName}</p>
+		</div>
+	</li>
+{GroupsArrayEnd}
+  </ul>
+  </center>
+<span class="clear"></span>
+</div>

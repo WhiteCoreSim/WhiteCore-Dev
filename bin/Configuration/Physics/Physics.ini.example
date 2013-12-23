@@ -1,0 +1,12 @@
+[Physics]
+    ;;
+    ;; Choose one of the physics engines below
+
+    ;; WhiteCoreOpenDynamicsEngine is by some distance the most developed physics engine and is the main supported physics engine of WhiteCore
+	;; This is the slower, OpenSim and old WhiteCore-Sim style movement configuration, the next option enables faster avatar movement, which feels more like Second Life
+    ;Include-WhiteCoreOpenDynamicsEngine = Configuration/Physics/WhiteCoreOpenDynamicsEngine.ini 
+	;; Makes WhiteCoreOpenDynamicsEngine avatars feel like they are in Second Life
+    Include-SLWhiteCoreOpenDynamicsEngine = Configuration/Physics/SecondLifeFeelingWhiteCoreOpenDynamicsEngine.ini 
+
+    ;; The most basic of all BasicPhysics
+    ;DefaultPhysicsEngine = basicphysics

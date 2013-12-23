@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!-- 
+    //[0] - Minimum supported release #
+    //[1] - Minimum supported release date
+    //[2] - Newest version #
+    //[3] - Date released
+    //[4] - Release notes
+    //[5] - Download link
+-->
+<Updater>
+	<MinSupReleaseVersion>0.9.1</MinSupReleaseVersion>
+	<MinSupReleaseDate>December 16, 2013</MinSupReleaseDate>
+	<NewReleaseVersion>0.9.1</NewReleaseVersion>
+	<NewReleaseDate>December 16, 2013</NewReleaseDate>
+	<ReleaseNotes>http://whitecore-sim.org/index.php?page=news</ReleaseNotes>
+	<DownloadLink>https://github.com/downloads/whitecore-sim/WhitecoreRelease.zip</DownloadLink>
+</Updater>

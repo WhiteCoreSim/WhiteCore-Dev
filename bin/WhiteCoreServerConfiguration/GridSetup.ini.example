@@ -1,0 +1,17 @@
+[Configuration]
+	;; If you have the WhiteCore.*Server.exe applications running over multiple
+	;;  servers, change the ServersHostname line below to your external IP or DNS name
+	;;  and uncommment it
+    ;Define-ServersHostname = 
+    ServerURI = "http://ServersHostname:8003/server/"                    ; WhiteCore.Server
+    MapAPIService = http://ServersHostname:8012/MapAPI/                  ; WhiteCore.GridServer
+    MapService = http://ServersHostname:8012/MapService/                 ; WhiteCore.GridServer
+    SSAService = http://ServersHostname:8011/                            ; WhiteCore.AvatarServer
+    CurrencyServerURI = http://ServersHostname:8003/currency/            ; WhiteCore.Server
+    InstantMessageServerURI = http://ServersHostname:8003/im/            ; WhiteCore.Server
+    SyncMessageServerURI = http://ServersHostname:8003/syncmessage/      ; WhiteCore.Server
+    UserAccountServerURI = http://ServersHostname:8003/user/             ; WhiteCore.Server
+    AssetServerURI = http://ServersHostname:8010/asset/                  ; WhiteCore.AssetServer
+    GridServerURI = http://ServersHostname:8012/grid/                    ; WhiteCore.GridServer
+    InventoryServerURI = http://ServersHostname:8013/inventory/          ; WhiteCore.InventoryServer
+    AvatarServerURI = http://ServersHostname:8011/avatar/                ; WhiteCore.AvatarServer

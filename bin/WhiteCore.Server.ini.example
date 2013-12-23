@@ -1,0 +1,132 @@
+[Network]
+    ;; Advanced configs
+    http_listener_port = 8003
+	
+	;; HTTPS configs (See HTTPS.txt in WhiteCoreDocs/)
+	use_https = false
+	
+	;; The number of threads to concurrently process incoming http requests
+	;; 5 is the recommended, but more can be set if the http server is being
+	;; overloaded, or you could run more servers instead
+	HttpThreadCount = 5
+
+    ;; Only change this if you are having issues with connecting clients
+    ;; The default is your external IP
+    ;HostName = http://127.0.0.1
+
+[Console]
+    ;; Setting for which console log will be used
+    ;; Values are:
+    ;; LocalConsole = Color console that is enabled by default
+    ;; RemoteConsole = Remote access enabled console
+    ;; CommandConsole = Default black and white console
+    ;; GUIConsole = Special interface to allow i/o redirection to work for GUI applications.
+    Console = LocalConsole
+
+    ;; These are the settings for the remote console, unneeded if not using the remote console
+    ;RemoteConsoleUser =
+    ;RemoteConsolePass =
+    ;remote_console_port = 0
+	
+[Startup]
+    ;; Set this to true if you want to log crashes to disk
+    ;; this can be useful when submitting bug reports.
+    save_crashes = false
+
+    ;; Directory to save crashes to if above is enabled
+    ;; (default is /bin/crashes/*.txt or C:\bin\crashes\*.txt)
+    crash_dir = ./crashes
+
+    ;; Place to create a PID file
+    ;PIDFile = /tmp/my.pid
+
+    ;; Commands to be run on startup are in the given file
+    startup_console_commands_file = startup_commands.txt
+
+    ;; Commands to be run on shutdown are in the given file
+    shutdown_console_commands_file = shutdown_commands.txt
+
+    ;; To run a script every X minutes, set the script filename here
+    ;timer_Script = filename
+    ;; Time between each timer to run (in minutes)
+    ;timer_time = 20
+
+    ;; Should we restart WhiteCore if the sim crashes?
+    AutoRestartOnCrash = false
+	
+[GridServerInfoService]
+	Enabled = true
+	DoRemote = false
+	;; The number of services that will register with the 
+	;;     grid service
+	;; Leave this alone unless you know what you're doing
+	;DefaultURICount = 11
+	
+[Handlers]
+    LLLoginHandlerPort = 8002
+
+    SyncMessagePosterServiceOpenServerHandler = true
+    SyncMessagePosterServiceServerHandlerPort = 8003
+	SyncMessagePosterServiceDoRemote = true
+
+    InstantMessagingServiceOpenServerHandler = true
+    InstantMessagingServiceServerHandlerPort = 8003
+	
+    UserAccountServiceOpenServerHandler = true
+    UserAccountServiceServerHandlerPort = 8003
+	
+	;; Stuff to set up WhiteCore-Server to run all of the services
+	;; Just uncomment this line to have everything run in WhiteCore.Server
+	;;  such that you don't have to run any of the other server.exe files.
+    ;Include-Single = WhiteCoreServerConfiguration/SingleServerInstance.ini
+
+[ExternalCaps]
+	
+[WhiteCoreConnectors]
+    AbuseReportsConnector = LocalConnector
+    AssetConnector = LocalConnector
+    AvatarArchiverConnector = LocalConnector
+    SimMapDataConnector = LocalConnector
+    ScriptDataConnector = LocalConnector
+    RegionInfoConnector = LocalConnector
+    AgentConnector = LocalConnector
+    RegionConnector = LocalConnector
+    ProfileConnector = LocalConnector
+    EstateConnector = LocalConnector
+    OfflineMessagesConnector = LocalConnector
+    DirectoryServiceConnector = LocalConnector
+    MuteListConnector = LocalConnector
+    ParcelConnector = LocalConnector
+    EmailConnector = LocalConnector
+
+    ;; Max non-group chat messages that the server will store per user
+    MaxOfflineMessages = 20
+
+    ;; Whether we should save any group chat messages for users
+    SaveOfflineGroupChatMessages = true
+
+    ;; The maximum number of group chat messages that the server will store per user
+    MaxGroupOfflineMessages = 50
+
+    DoRemoteCalls = False
+    CapsServiceDoRemoteCalls = False
+    AllowRemoteCalls = True
+
+[ApplicationPlugins]
+    ServicesLoader = ServicesLoader
+    StatsHandler = StatsHandler
+
+[VoiceIncludes]
+    ;; If you would like to set up voice for the entire grid, select one of these includes depending on which voice module you wish to set up
+    ;Include-Murmur = WhiteCoreServerConfiguration/Murmur.ini
+    ;Include-FreeSwitch = WhiteCoreServerConfiguration/FreeSwitch.ini
+    
+[Includes]
+    ;;Other .ini files to add...
+    Include-Login = WhiteCoreServerConfiguration/Login.ini
+    Include-GridInfoService = WhiteCoreServerConfiguration/GridInfoService.ini
+    Include-Data = WhiteCoreServerConfiguration/Data/Data.ini
+	Include-Protection = WhiteCoreServerConfiguration/Protection.ini
+	Include-Services = WhiteCoreServerConfiguration/Services.ini
+    Include-Setup = WhiteCoreServerConfiguration/GridSetup.ini
+	Include-Modules = WhiteCoreServerConfiguration/Modules/*.ini

@@ -1,0 +1,23 @@
+[DataFile]
+    ;;
+    ;; Select the Database System you wish to use, then edit the appropriate ini file to set connection strings accordingly
+	;; (Note: you only need to set up a database here if you are running in standalone mode. If you are running in grid mode,
+	;;        the region doesn't require a database, only WhiteCore.Server does (so set it up in WhiteCoreServerConfiguration/Data
+	;;        if you are running WhiteCore.Server.exe))
+    ;;
+	
+    ;; If you want to use SQLite, select this file.
+    Include-SQLite = Configuration/Data/SQLite.ini
+
+    ;; If you want to use MySQL, select this file.
+    ;Include-MySQL = Configuration/Data/MySQL.ini
+	
+	
+    ;; If you remove this, you will have no way to save region information, including prims
+	;; Do not disable unless you know what you are doing
+    Include-FileBased = Configuration/Data/FileBased.ini
+
+[WhiteCoreConnectors]
+    ;; If you want to disable the verification and backup of tables before running migrations, set this to false
+    ;; Default is true
+    ValidateTables = true;

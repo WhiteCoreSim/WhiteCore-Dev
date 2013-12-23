@@ -1,0 +1,65 @@
+<!-- params to replace
+{SystemURL}
+{SystemName}
+{ErrorMessage}     Error message handling
+{Login}            Login
+{UserNameText}     User Name
+{PasswordText}     Password
+{ForgotPassword}   Forgot Password?
+{Submit}           Submit
+
+-->
+
+<h2>{SystemName}: {Login}</h2>
+<div id="error_message" class="error_message"><h3>{ErrorMessage}</h3></div>
+<form action="login.html" id="login_form" method="POST">
+<table id="login">
+  <caption></caption>
+  
+  <thead>
+    <tr>
+      <th class="login_left"></th>
+      <th class="login_right"></th>
+    </tr>
+  </thead>
+  
+  <tfoot>
+    <tr>
+      <th class="login_left"></th>
+      <th class="login_right"></th>
+    </tr>
+  </tfoot>
+
+  <tbody>
+    <tr>
+      <td class="login_left"><p id="logname_label">{UserNameText}*</p></td>
+      <td class="login_right"><input require="true" label="username" id="login_input" name="username" type="text"/></td>
+    </tr>
+    <tr>
+      <td class="login_left"><p id="password_label">{PasswordText}*</p></td>
+      <td class="login_right"><input require="true" label="password" id="login_input" type="password" name="password" /></td>
+    </tr>
+    <tr>
+      <td class="login_left"><a href="index.html?page=forgot_pass"><p>{ForgotPassword}</p></a></td>
+      <td class="login_right"><button id="login_bouton" type="Submit" name="Submit" value="Submit">{Submit}</button></td>
+    </tr>
+  </tbody>
+</table>
+</form>
+<script>
+  /* attach a submit handler to the form */
+  $("#login_form").submit(function(event) {
+
+    /* stop form from submitting normally */
+    event.preventDefault(); 
+    /* get some values from elements on the page: */
+    var $form = $( this ),
+        url = $form.attr( 'action' );
+    /* Send the data using post and put the results in a div */
+    $.post( url, $form.serialize(),
+      function( data ) {
+		$("#error_message").empty().append(data);
+      }
+    );
+  });
+</script>

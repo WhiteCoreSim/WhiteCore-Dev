@@ -1,0 +1,39 @@
+=== Building WhiteCore ===
+
+=== Building on Windows ===
+
+Steps:
+ * runprebuild.bat
+
+=== If you have Visual Studio ===
+
+ * Load WhiteCore.sln into Visual Studio and build the solution.
+
+=== If you do not have Visual Studio ===
+
+ * run compile.bat
+
+=== Both ===
+
+ * cd bin 
+ * WhiteCore.exe
+
+=== Building on Linux ===
+
+Prereqs:
+ * Mono >= 2.10.8
+ * XBuild
+ * On some Linux distributions you may need to install additional packages.  
+    See http://opensimulator.org/wiki/Dependencies for more information.
+
+From the distribution type:
+ * ./runprebuild.sh
+ * xbuild WhiteCore.sln
+ * cd bin 
+ * mono WhiteCore.exe --gc=sgen
+
+=== References ===
+ 
+Helpful resources:
+* http://opensimulator.org/wiki/Build_Instructions
+

@@ -1,0 +1,86 @@
+<!-- params to replace
+
+{SystemURL}
+{SystemName}
+{GridCenterX}
+{GridCenterY}
+{SettingsManager}               Settings Manager
+{GridCenterXText}               Grid Center Location X
+{GridCenterYText}               Grid Center Location Y
+{GoogleMapAPIKeyText}           Google Maps API Key
+{GoogleMapAPIKeyHelpText}       Google Maps API Key
+{ChangesSavedSuccessfully}      Changes saved successfully
+{Save}                          Save
+-->
+
+<h2>{SystemName}: {SettingsManager}</h2>
+<form id="settings_manager_form" action="admin/settings_manager.html" method="post">
+<div id="error_message" class="error"><h3></h3></div>
+<table id="settings_manager">
+  <caption></caption>
+  
+  <thead>
+    <tr>
+      <th class="settings_manager_left"></th>
+      <th class="settings_manager_right"></th>
+    </tr>
+  </thead>
+
+  <tfoot>
+    <tr>
+      <th class="settings_manager_left"></th>
+      <th class="settings_manager_right"></th>
+    </tr>
+  </tfoot>
+
+  <tbody>
+    <tr>
+      <td class="settings_manager_left"><p id="gridcenterx_label">{GridCenterXText}</p></td>
+      <td class="settings_manager_right"><input name="GridCenterX" type="text" id="GridCenterX" size="119" value="{GridCenterX}" /></td>
+    </tr>
+    <tr>
+      <td class="settings_manager_left"><p id="gridcentery_label">{GridCenterYText}</p></td>
+      <td class="settings_manager_right"><input name="GridCenterY" type="text" id="GridCenterY" size="119" value="{GridCenterY}" /></td>
+    </tr>
+    <tr>
+      <td class="settings_manager_left"><p id="gridcentery_label">{HideLanguageBarText}</p></td>
+      <td class="settings_manager_right">
+	    <select name="HideLanguageBar" id="HideLanguageBar">
+		  <option value="0" style="background-color:#FF0000" {HideLanguageBarNo}>{No}</option>
+		  <option value="1" style="background-color:#00FF00" {HideLanguageBarYes}>{Yes}</option>
+	    </select>
+	  </td>
+    </tr>
+    <tr>
+      <td class="settings_manager_left"><p id="gridcentery_label">{HideStyleBarText}</p></td>
+      <td class="settings_manager_right">
+	    <select name="HideStyleBar" id="HideStylesBar">
+		  <option value="0" style="background-color:#FF0000" {HideStyleBarNo}>{No}</option>
+		  <option value="1" style="background-color:#00FF00" {HideStyleBarYes}>{Yes}</option>
+	    </select>
+	  </td>
+    </tr>
+    <tr>
+	  <input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
+      <td class="settings_manager_right"><button id="Submit" type="Submit" name="Submit">{Save}</button></td>
+    </tr>
+  </tbody>
+</table>
+</form>
+<script>
+  /* attach a submit handler to the form */
+  $("#settings_manager_form").submit(function(event) {
+
+    /* stop form from submitting normally */
+    event.preventDefault(); 
+    /* get some values from elements on the page: */
+    var $form = $( this ),
+        url = $form.attr( 'action' );
+    /* Send the data using post and put the results in a div */
+    $.post( url, $form.serialize(),
+      function( data ) {
+		$("#error_message").empty().append("<h3>" + data + "</h3>");
+      }
+    );
+  });
+</script>
