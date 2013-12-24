@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Contributors, http://aurora-sim.org/
+ * Copyright (c) Contributors, http://WHiteCore-sim.org/
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -9,7 +9,7 @@
  *     * Redistributions in binary form must reproduce the above copyright
  *       notice, this list of conditions and the following disclaimer in the
  *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Aurora-Sim Project nor the
+ *     * Neither the name of the WhiteCore-Sim Project nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
  *
@@ -26,11 +26,11 @@
  */
 
 using System.IO;
-using Aurora.DataManager.Repositories;
+using WhiteCore.DataManager.Repositories;
 using NUnit.Framework;
 using OpenMetaverse;
 
-namespace Aurora.DataManager.Tests
+namespace WhiteCore.DataManager.Tests
 {
     public class DataModelTests
     {

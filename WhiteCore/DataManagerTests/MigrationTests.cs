@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Contributors, http://aurora-sim.org/
+ * Copyright (c) Contributors, http://WhiteCore-sim.org/
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -9,7 +9,7 @@
  *     * Redistributions in binary form must reproduce the above copyright
  *       notice, this list of conditions and the following disclaimer in the
  *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Aurora-Sim Project nor the
+ *     * Neither the name of the WhiteCore-Sim Project nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
  *
@@ -28,14 +28,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Aurora.DataManager.Migration;
-using Aurora.DataManager.Migration.Migrators;
-using Aurora.DataManager.MySQL;
-using Aurora.DataManager.SQLite;
+using WhiteCore.DataManager.Migration;
+using WhiteCore.DataManager.Migration.Migrators;
+using WhiteCore.DataManager.MySQL;
+using WhiteCore.DataManager.SQLite;
 using NUnit.Framework;
-using Aurora.Framework;
+using WhiteCore.Framework;
 
-namespace Aurora.DataManager.Tests
+namespace WhiteCore.DataManager.Tests
 {
     public class MigrationTests 
     {
@@ -103,7 +103,7 @@ namespace Aurora.DataManager.Tests
             var technology = DataManagerTechnology.SQLite;
             //var technology = DataManagerTechnology.MySql;
 
-            var mysqlconnectionstring = "Data Source=localhost;Database=auroratest;User ID=auroratest;Password=test;";
+            var mysqlconnectionstring = "Data Source=localhost;Database=WhiteCoretest;User ID=WhiteCoretest;Password=test;";
             var sqliteconnectionstring = string.Format("URI=file:{0},version=3", dbFileName);
             string connectionString = (technology==DataManagerTechnology.SQLite)?sqliteconnectionstring:mysqlconnectionstring;
 
@@ -130,7 +130,7 @@ namespace Aurora.DataManager.Tests
             try
             {
                 migrationManager.ExecuteOperation();
-                Assert.AreEqual(testMigrator0.Version, genericData.GetAuroraVersion(), "Version of settings is updated");
+                Assert.AreEqual(testMigrator0.Version, genericData.GetWhiteCoreVersion(), "Version of settings is updated");
             }
             catch(MigrationOperationException)
             {
