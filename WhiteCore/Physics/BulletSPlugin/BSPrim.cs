@@ -1482,7 +1482,7 @@ public class BSPrim : BSPhysObject
             entprop.Acceleration = _acceleration;
         }
 
-        OMV.Vector3 direction = OMV.Vector3.UnitX * _orientation;   // DEBUG DEBUG DEBUG
+// 20131224 not used        OMV.Vector3 direction = OMV.Vector3.UnitX * _orientation;   // DEBUG DEBUG DEBUG
         //DetailLog("{0},BSPrim.UpdateProperties,call,entProp={1},dir={2}", LocalID, entprop, direction);
 
         // remember the current and last set values

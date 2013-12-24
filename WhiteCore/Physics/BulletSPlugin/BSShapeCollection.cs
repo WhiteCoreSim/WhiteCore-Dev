@@ -736,7 +736,7 @@ public sealed class BSShapeCollection : IDisposable
     {
 
         BulletShape newShape = new BulletShape();
-        IntPtr hullPtr = IntPtr.Zero;
+// 20131224 not used        IntPtr hullPtr = IntPtr.Zero;
 
         HullDesc hullDesc;
         if (Hulls.TryGetValue(newHullKey, out hullDesc))

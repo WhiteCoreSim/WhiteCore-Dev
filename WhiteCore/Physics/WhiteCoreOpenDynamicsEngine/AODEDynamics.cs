@@ -926,7 +926,7 @@ namespace WhiteCore.Physics.WhiteCoreOpenDynamicsEngine
 
             if (m_bankingEfficiency != 0)
             {
-                Vector3 dir = Vector3.One*rotq;
+// 20131224 not used                Vector3 dir = Vector3.One*rotq;
                 float mult = (m_bankingMix*m_bankingMix)*-1*(m_bankingMix < 0 ? -1 : 1);
                 //Changes which way it banks in and out of turns
 

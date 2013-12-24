@@ -3,6 +3,15 @@ WhiteCore-Sim (Dev)
 Rowan D <greythane@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Dec 24th, 2013
+Commented out multiple variables that have been declared but not used (No code changes)
+	- multiple files, identified with comment > // 20131224 not used
+    - see alos  ## TODO ## as some code needs to be re-checked for functionality
+    >> build warnings reduced from 82 to 45  
+    	- remaing warnings are mainly private field definitions that are not used.... 
+    	mainly in WhiteCoreOpenDynamicsEngine - AODEApi.cs & AODEDynamics.cs  and
+    	the Physics.BulletSPlugin code (Opensim)
+
 Dec 23rd, 2013
 Merged patched applied to Aurora(Master)
 
@@ -16,9 +25,7 @@ mdickson - Removed uneeded LINUX conditional around LSLFload operators It causes
 	(Corrected this myself prior to this commit :) )
 	- WhiteCore(Aurora)/WhiteCoreDotNetEngine(AuroraDotNetEngine)/APIs/LSL_Types.cs
 
-
-
-
+greythane updates as shown below have already been applied..
 
 
 Dec 17th, 2013

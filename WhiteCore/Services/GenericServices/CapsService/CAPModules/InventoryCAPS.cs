@@ -563,9 +563,9 @@ namespace WhiteCore.Services
                             Vector3 scale = inner_instance_list["scale"].AsVector3();
                             Quaternion rotation = inner_instance_list["rotation"].AsQuaternion();
 
-                            int physicsShapeType = inner_instance_list["physics_shape_type"].AsInteger();
-                            int material = inner_instance_list["material"].AsInteger();
-                            int mesh = inner_instance_list["mesh"].AsInteger();
+							int physicsShapeType = inner_instance_list["physics_shape_type"].AsInteger();
+// 20131224 not used                            int material = inner_instance_list["material"].AsInteger();
+// 20131224 not used                            int mesh = inner_instance_list["mesh"].AsInteger();
 
                             SceneObjectPart prim = new SceneObjectPart(m_agentID, pbs, position, Quaternion.Identity,
                                                                        Vector3.Zero, assetName)

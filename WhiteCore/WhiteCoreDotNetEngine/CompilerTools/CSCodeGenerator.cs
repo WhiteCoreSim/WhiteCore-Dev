@@ -875,7 +875,9 @@ public class ScriptClass : WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.Runtime.
         /// <returns>String containing C# code for GlobalVariableDeclaration gv.</returns>
         private string GenerateGlobalVariableDeclaration(GlobalVariableDeclaration gv)
         {
-            StringBuilder retVal = new StringBuilder();
+			// ## TO DO ##  
+			// Does this do anything as some of the assignments are never used??
+			StringBuilder retVal = new StringBuilder();
 
             foreach (SYMBOL s in gv.kids)
             {
@@ -909,7 +911,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.Runtime.
                             SYMBOL assignmentChild = (SYMBOL) a.kids[0];
                             if (assignmentChild is IdentExpression)
                             {
-                                IdentExpression identEx = (IdentExpression) assignmentChild;
+// 20131224 not used                                IdentExpression identEx = (IdentExpression) assignmentChild;
                             }
                             else if (assignmentChild is ListConstant)
                             {
@@ -927,7 +929,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.Runtime.
                                             p[i] = objChild;
                                             if (objChild is IdentExpression)
                                             {
-                                                IdentExpression identEx = (IdentExpression) objChild;
+// 20131224 not used                                                IdentExpression identEx = (IdentExpression) objChild;
                                             }
                                             i++;
                                         }
@@ -1345,7 +1347,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.Runtime.
                                     }
                                     else if (assignmentChild is IdentExpression)
                                     {
-                                        IdentExpression identEx = (IdentExpression) assignmentChild;
+// 20131224 not used                                        IdentExpression identEx = (IdentExpression) assignmentChild;
                                     }
                                     else if (assignmentChild is ListConstant)
                                     {
@@ -1363,7 +1365,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.Runtime.
                                                     p[i] = objChild;
                                                     if (objChild is IdentExpression)
                                                     {
-                                                        IdentExpression identEx = (IdentExpression) objChild;
+// 20131224 not used                                                        IdentExpression identEx = (IdentExpression) objChild;
                                                     }
                                                     i++;
                                                 }

@@ -172,11 +172,11 @@ namespace OpenSim.Region.Physics.ConvexDecompositionDotNet
             // ok... here we recursively call
             if (ifront.Count > 0)
             {
-                int vcount = vfront.GetSize();
+// 20131224 not used                int vcount = vfront.GetSize();
                 List<float3> vertices2 = vfront.GetVertices();
                 for (int i = 0; i < vertices2.Count; i++)
                     vertices2[i] = new float3(vertices2[i]);
-                int tcount = ifront.Count / 3;
+// 20131224 not used                int tcount = ifront.Count / 3;
 
                 calcConvexDecomposition(vertices2, ifront, callback, masterVolume, depth + 1, maxDepth, concavePercent, mergePercent);
             }
@@ -186,9 +186,9 @@ namespace OpenSim.Region.Physics.ConvexDecompositionDotNet
 
             if (iback.Count > 0)
             {
-                int vcount = vback.GetSize();
+// 20131224 not used                int vcount = vback.GetSize();
                 List<float3> vertices2 = vback.GetVertices();
-                int tcount = iback.Count / 3;
+// 20131224 not used                int tcount = iback.Count / 3;
 
                 calcConvexDecomposition(vertices2, iback, callback, masterVolume, depth + 1, maxDepth, concavePercent, mergePercent);
             }

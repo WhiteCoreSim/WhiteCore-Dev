@@ -13208,7 +13208,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 float fuzz = 2;
                 Vector3 offset = Vector3.Zero;
                 bool requireLOS = false;
-                bool intercept = false; //Not implemented
+// 20131224 not used				bool intercept;  = false; //Not implemented
                 for (int i = 0; i < options.Length; i += 2)
                 {
                     LSL_Types.LSLInteger opt = options.GetLSLIntegerItem(i);
@@ -13218,8 +13218,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                         offset = options.GetVector3Item(i + 1).ToVector3();
                     if (opt == ScriptBaseClass.REQUIRE_LINE_OF_SIGHT)
                         requireLOS = options.GetLSLIntegerItem(i + 1) == 1;
-                    if (opt == ScriptBaseClass.PURSUIT_INTERCEPT)
-                        intercept = options.GetLSLIntegerItem(i + 1) == 1;
+// 20131224 not used                    if (opt == ScriptBaseClass.PURSUIT_INTERCEPT)
+// 20131224 not used                        intercept = options.GetLSLIntegerItem(i + 1) == 1;
                 }
                 botManager.FollowAvatar(m_host.ParentEntity.UUID, target.m_string, fuzz, fuzz, requireLOS, offset,
                                         m_host.ParentEntity.OwnerID);
@@ -13551,7 +13551,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         private void JsonSetSpecific(OSD o, LSL_List specifiers, int i, LSL_String val)
         {
             object spec = specifiers.Data[i];
-            object specNext = i+1 == specifiers.Data.Length ? null : specifiers.Data[i+1];
+// 20131224 not used            object specNext = i+1 == specifiers.Data.Length ? null : specifiers.Data[i+1];
             OSD nextVal = null;
             if (o is OSDArray)
             {
@@ -13591,7 +13591,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         private OSD JsonBuildRestOfSpec(LSL_List specifiers, int i, LSL_String val)
         {
             object spec =  i >= specifiers.Data.Length ? null : specifiers.Data[i];
-            object specNext = i+1 >= specifiers.Data.Length ? null : specifiers.Data[i+1];
+// 20131224 not used            object specNext = i+1 >= specifiers.Data.Length ? null : specifiers.Data[i+1];
 
             if (spec == null)
                 return OSD.FromString(val);

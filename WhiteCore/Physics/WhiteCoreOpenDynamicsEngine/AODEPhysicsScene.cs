@@ -533,7 +533,7 @@ namespace WhiteCore.Physics.WhiteCoreOpenDynamicsEngine
 
             ContactPoint maxDepthContact = new ContactPoint();
             d.ContactGeom curContact = new d.ContactGeom();
-            d.ContactGeom maxContact = new d.ContactGeom();
+// 20131224 not used            d.ContactGeom maxContact = new d.ContactGeom();
 
             int NotSkipedCount = 0;
 
@@ -556,7 +556,7 @@ namespace WhiteCore.Physics.WhiteCoreOpenDynamicsEngine
                     maxDepthContact.SurfaceNormal.X = curContact.normal.X;
                     maxDepthContact.SurfaceNormal.Y = curContact.normal.Y;
                     maxDepthContact.SurfaceNormal.Z = curContact.normal.Z;
-                    maxContact = curContact;
+// 20131224 not used                    maxContact = curContact;
                 }
             }
             if (p1 is WhiteCoreODECharacter || p2 is WhiteCoreODECharacter)

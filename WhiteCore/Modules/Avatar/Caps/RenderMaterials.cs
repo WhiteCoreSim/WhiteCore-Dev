@@ -233,7 +233,8 @@ namespace WhiteCore.Modules.Caps
                                                                 MainConsole.Instance.Debug("[MaterialsDemoModule]: te.DefaultTexture is null");
                                                             else
                                                             {
-// we should always have an ID                                                               if (te.DefaultTexture.MaterialID == null)
+//## FixMe ##
+// comparison always results in 'False'                                   if (te.DefaultTexture.MaterialID == null)
 //                                                                    MainConsole.Instance.Debug("[MaterialsDemoModule]: te.DefaultTexture.MaterialID is null");
 //                                                                else
 //                                                                {

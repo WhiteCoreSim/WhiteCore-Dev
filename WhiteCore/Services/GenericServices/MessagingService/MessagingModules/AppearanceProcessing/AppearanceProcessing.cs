@@ -88,7 +88,7 @@ namespace WhiteCore.Services
                         IScenePresence sp = scene.GetScenePresence(appearance.Owner);
                         if (sp != null && !sp.IsChildAgent)
                         {
-                            IAvatarFactory factory = scene.RequestModuleInterface<IAvatarFactory>();
+// 20131224 not used                            IAvatarFactory factory = scene.RequestModuleInterface<IAvatarFactory>();
                             sp.RequestModuleInterface<IAvatarAppearanceModule>().Appearance = appearance;
                             sp.RequestModuleInterface<IAvatarAppearanceModule>().SendAppearanceToAgent(sp);
                             sp.RequestModuleInterface<IAvatarAppearanceModule>().SendAppearanceToAllOtherAgents();

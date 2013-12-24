@@ -571,7 +571,7 @@ private sealed class BulletConstraintXNA : BulletConstraint
         IndexedMatrix frame1 = IndexedMatrix.CreateFromQuaternion(frame1rot);
         frame1._origin = frame1v;
 
-        IndexedVector3 frame2v = new IndexedVector3(pframe2.X, pframe2.Y, pframe2.Z);
+// 20131224 not used        IndexedVector3 frame2v = new IndexedVector3(pframe2.X, pframe2.Y, pframe2.Z);
         IndexedQuaternion frame2rot = new IndexedQuaternion(pframe2rot.X, pframe2rot.Y, pframe2rot.Z, pframe2rot.W);
         IndexedMatrix frame2 = IndexedMatrix.CreateFromQuaternion(frame2rot);
         frame2._origin = frame1v;
@@ -641,7 +641,7 @@ private sealed class BulletConstraintXNA : BulletConstraint
         IndexedMatrix frame1 = IndexedMatrix.CreateFromQuaternion(frame1rot);
         frame1._origin = frame1v;
 
-        IndexedVector3 frame2v = new IndexedVector3(pframe2.X, pframe2.Y, pframe2.Z);
+// 20131224 not used        IndexedVector3 frame2v = new IndexedVector3(pframe2.X, pframe2.Y, pframe2.Z);
         IndexedQuaternion frame2rot = new IndexedQuaternion(pframe2rot.X, pframe2rot.Y, pframe2rot.Z, pframe2rot.W);
         IndexedMatrix frame2 = IndexedMatrix.CreateFromQuaternion(frame2rot);
         frame2._origin = frame1v;
@@ -959,7 +959,7 @@ private sealed class BulletConstraintXNA : BulletConstraint
                
     public override BulletBody CreateBodyFromShape(BulletWorld pWorld, BulletShape pShape, uint pLocalID, Vector3 pRawPosition, Quaternion pRawOrientation)
     {
-        CollisionWorld world = (pWorld as BulletWorldXNA).world;
+// 20131224 not used        CollisionWorld world = (pWorld as BulletWorldXNA).world;
         IndexedMatrix mat =
             IndexedMatrix.CreateFromQuaternion(new IndexedQuaternion(pRawOrientation.X, pRawOrientation.Y,
                                                                      pRawOrientation.Z, pRawOrientation.W));
@@ -969,10 +969,10 @@ private sealed class BulletConstraintXNA : BulletConstraint
         // TODO: Feed Update array into null
         SimMotionState motionState = new SimMotionState(this, pLocalID, mat, null);
         RigidBody body = new RigidBody(0,motionState,shape,IndexedVector3.Zero);
-        RigidBodyConstructionInfo constructionInfo = new RigidBodyConstructionInfo(0, motionState, shape, IndexedVector3.Zero)
-                                                         {
-                                                             m_mass = 0
-                                                         };
+// 20131224 not used        RigidBodyConstructionInfo constructionInfo = new RigidBodyConstructionInfo(0, motionState, shape, IndexedVector3.Zero)
+// 20131224 not used                                                         {
+// 20131224 not used                                                             m_mass = 0
+// 20131224 not used                                                         };
         /*
             m_mass = mass;
 			m_motionState =motionState;
@@ -1158,7 +1158,7 @@ private sealed class BulletConstraintXNA : BulletConstraint
         p.linkConstraintCFM = BSParam.LinkConstraintCFM;
         p.linkConstraintSolverIterations = BSParam.LinkConstraintSolverIterations;
         p.physicsLoggingFrames = o[0].physicsLoggingFrames;
-        DefaultCollisionConstructionInfo ccci = new DefaultCollisionConstructionInfo();
+// 20131224 not used        DefaultCollisionConstructionInfo ccci = new DefaultCollisionConstructionInfo();
         
         DefaultCollisionConfiguration cci = new DefaultCollisionConfiguration();
         CollisionDispatcher m_dispatcher = new CollisionDispatcher(cci);
@@ -1343,7 +1343,7 @@ private sealed class BulletConstraintXNA : BulletConstraint
     //sim.ptr, shape.ptr,prim.LocalID, prim.RawPosition, prim.RawOrientation
     public override BulletBody CreateGhostFromShape(BulletWorld pWorld, BulletShape pShape, uint pLocalID, Vector3 pRawPosition, Quaternion pRawOrientation)
     {
-        DiscreteDynamicsWorld world = (pWorld as BulletWorldXNA).world;
+// 20131224 not used        DiscreteDynamicsWorld world = (pWorld as BulletWorldXNA).world;
         IndexedMatrix bodyTransform = new IndexedMatrix();
         bodyTransform._origin = new IndexedVector3(pRawPosition.X, pRawPosition.Y, pRawPosition.Z);
         bodyTransform.SetRotation(new IndexedQuaternion(pRawOrientation.X,pRawOrientation.Y,pRawOrientation.Z,pRawOrientation.W));
@@ -1364,7 +1364,7 @@ private sealed class BulletConstraintXNA : BulletConstraint
 
     public override void SetCollisionShape(BulletWorld pWorld, BulletBody pCollisionObject, BulletShape pShape)
     {
-        DiscreteDynamicsWorld world = (pWorld as BulletWorldXNA).world;
+// 20131224 not used        DiscreteDynamicsWorld world = (pWorld as BulletWorldXNA).world;
         CollisionObject collisionObject = (pCollisionObject as BulletBodyXNA).body;
         if (pShape == null)
         {
@@ -1613,7 +1613,7 @@ private sealed class BulletConstraintXNA : BulletConstraint
             IndexedMatrix frame1 = IndexedMatrix.CreateFromQuaternion(frame1rot);
             frame1._origin = frame1v;
 
-            IndexedVector3 frame2v = new IndexedVector3(pframe2.X, pframe2.Y, pframe2.Z);
+// 20131224 not used            IndexedVector3 frame2v = new IndexedVector3(pframe2.X, pframe2.Y, pframe2.Z);
             IndexedQuaternion frame2rot = new IndexedQuaternion(pframe2rot.X, pframe2rot.Y, pframe2rot.Z, pframe2rot.W);
             IndexedMatrix frame2 = IndexedMatrix.CreateFromQuaternion(frame2rot);
             frame2._origin = frame1v;
@@ -1663,7 +1663,7 @@ private sealed class BulletConstraintXNA : BulletConstraint
             IndexedMatrix frame1 = IndexedMatrix.CreateFromQuaternion(frame1rot);
             frame1._origin = frame1v;
 
-            IndexedVector3 frame2v = new IndexedVector3(pframe2.X, pframe2.Y, pframe2.Z);
+// 20131224 not used            IndexedVector3 frame2v = new IndexedVector3(pframe2.X, pframe2.Y, pframe2.Z);
             IndexedQuaternion frame2rot = new IndexedQuaternion(pframe2rot.X, pframe2rot.Y, pframe2rot.Z, pframe2rot.W);
             IndexedMatrix frame2 = IndexedMatrix.CreateFromQuaternion(frame2rot);
             frame2._origin = frame1v;
@@ -1690,7 +1690,7 @@ private sealed class BulletConstraintXNA : BulletConstraint
             IndexedMatrix frame1 = IndexedMatrix.CreateFromQuaternion(frame1rot);
             frame1._origin = frame1v;
 
-            IndexedVector3 frame2v = new IndexedVector3(pframe2.X, pframe2.Y, pframe2.Z);
+// 20131224 not used            IndexedVector3 frame2v = new IndexedVector3(pframe2.X, pframe2.Y, pframe2.Z);
             IndexedQuaternion frame2rot = new IndexedQuaternion(pframe2rot.X, pframe2rot.Y, pframe2rot.Z, pframe2rot.W);
             IndexedMatrix frame2 = IndexedMatrix.CreateFromQuaternion(frame2rot);
             frame2._origin = frame1v;
@@ -2126,7 +2126,7 @@ private sealed class BulletConstraintXNA : BulletConstraint
     private static EntityProperties GetDebugProperties(BulletWorld pWorld, BulletBody pCollisionObject)
     {
         EntityProperties ent = new EntityProperties();
-        DiscreteDynamicsWorld world = (pWorld as BulletWorldXNA).world;
+// 20131224 not used        DiscreteDynamicsWorld world = (pWorld as BulletWorldXNA).world;
         CollisionObject collisionObject = (pCollisionObject as BulletBodyXNA).rigidBody;
         IndexedMatrix transform = collisionObject.GetWorldTransform();
         IndexedVector3 LinearVelocity = collisionObject.GetInterpolationLinearVelocity();
@@ -2170,7 +2170,7 @@ private sealed class BulletConstraintXNA : BulletConstraint
                     world.RayTest(ref rOrigin, ref rEnd, rayCallback);
                     if (rayCallback.HasHit())
                     {
-                        IndexedVector3 hitLocation = rayCallback.m_hitPointWorld;
+// 20131224 not used                        IndexedVector3 hitLocation = rayCallback.m_hitPointWorld;
                     }
                     return rayCallback.HasHit();
                 }

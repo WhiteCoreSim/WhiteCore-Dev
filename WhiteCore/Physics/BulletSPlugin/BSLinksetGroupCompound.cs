@@ -472,7 +472,7 @@ public sealed class BSLinksetGroupCompound : BSLinkset
                 //Update the AABB so that things will collide properly
                 PhysicsScene.PE.UpdateSingleAabb(PhysicsScene.World, LinksetRoot.PhysBody);
 
-                OMV.Quaternion invRootOrientation = OMV.Quaternion.Inverse(LinksetRoot.RawOrientation);
+// 20131224 not used                OMV.Quaternion invRootOrientation = OMV.Quaternion.Inverse(LinksetRoot.RawOrientation);
                 
                 // This causes the physical position of the root prim to be offset to accomodate for the displacements
                 LinksetRoot.ForcePosition = LinksetRoot.RawPosition;
@@ -482,8 +482,8 @@ public sealed class BSLinksetGroupCompound : BSLinkset
                 {
                     foreach (BSPrimLinkable cPrim in m_children)
                     {
-                        OMV.Vector3 offsetPos = (cPrim.RawPosition - LinksetRoot.RawPosition) * invRootOrientation;
-                        OMV.Quaternion offsetRot = cPrim.RawOrientation * invRootOrientation;
+// 20131224 not used                        OMV.Vector3 offsetPos = (cPrim.RawPosition - LinksetRoot.RawPosition) * invRootOrientation;
+// 20131224 not used                        OMV.Quaternion offsetRot = cPrim.RawOrientation * invRootOrientation;
 
                         // Build a simple shape for this child prim (given that we aren't allowing it to be dynamic
                         cPrim.ForceBodyShapeRebuild(true);

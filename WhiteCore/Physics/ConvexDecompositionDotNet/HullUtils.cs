@@ -671,8 +671,8 @@ namespace OpenSim.Region.Physics.ConvexDecompositionDotNet
             int i;
             int vertcountunder = 0;
             int vertcountover = 0;
-            List<int> vertscoplanar = new List<int>(); // existing vertex members of convex that are coplanar
-            List<int> edgesplit = new List<int>(); // existing edges that members of convex that cross the splitplane
+// 20131224 not used            List<int> vertscoplanar = new List<int>(); // existing vertex members of convex that are coplanar
+// 20131224 not used            List<int> edgesplit = new List<int>(); // existing edges that members of convex that cross the splitplane
 
             Debug.Assert(convex.edges.Count < 480);
 
@@ -1250,7 +1250,7 @@ namespace OpenSim.Region.Physics.ConvexDecompositionDotNet
             vlimit -= 4;
             while (vlimit > 0 && (te = extrudable(epsilon, tris)) != null)
             {
-                int3 ti = te;
+// 20131224 not used                int3 ti = te;
                 int v = te.vmax;
                 Debug.Assert(isextreme[v] == 0); // wtf we've already done this vertex
                 isextreme[v] = 1;
