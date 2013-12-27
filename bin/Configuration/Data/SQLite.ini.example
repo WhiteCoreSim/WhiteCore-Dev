@@ -1,7 +1,7 @@
 ;; These are the initialization settings for running WhiteCore with a SQLite database
 ;;
 [WhiteCoreData]
-    ConnectionString = "Data Source=file://Aurora.db"
+    ConnectionString = "Data Source=file://WhiteCore.db"
     StorageProvider = SQLite
 
 [IAvatarData]

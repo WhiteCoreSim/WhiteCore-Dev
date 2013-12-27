@@ -11,4 +11,4 @@
 	CapsHandlers = AssetCAPS
 
 [Includes]
-	Include-Base = Aurora.ServersBase.ini
+	Include-Base = WhiteCore.ServersBase.ini
