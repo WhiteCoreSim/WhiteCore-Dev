@@ -57,8 +57,7 @@ namespace WhiteCore.Services.DataService
                 GD = GenericData;
 
                 string connectionString = (source.Configs[Name] != null)
-                                              ? connectionString =
-                                                source.Configs[Name].GetString("ConnectionString",
+                                              ? source.Configs[Name].GetString("ConnectionString",
                                                                                defaultConnectionString)
                                               : defaultConnectionString;
 

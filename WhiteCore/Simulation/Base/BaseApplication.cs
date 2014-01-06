@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Contributors, http://WhiteCore-sim.org/
+ * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -133,25 +133,26 @@ namespace WhiteCore.Simulation.Base
 
         public static void Configure(bool requested)
         {
-            bool WhiteCore_log = (File.Exists(Path.Combine(Util.configDir(), "WhiteCore.log")));
-            bool WhiteCore_Server_log = (File.Exists(Path.Combine(Util.configDir(), "WhiteCore.Server.log")));
+			bool WhiteCore_log = (File.Exists(Path.Combine(Util.configDir(), "WhiteCore.log")));
+			bool WhiteCore_Server_log = (File.Exists(Path.Combine(Util.configDir(), "WhiteCore.Server.log")));
+			bool WhiteCore_mono_log = (File.Exists(Path.Combine(Util.configDir(), "mono-sgen.log")));
             bool isWhiteCoreExe = System.AppDomain.CurrentDomain.FriendlyName == "WhiteCore.exe" ||
                                System.AppDomain.CurrentDomain.FriendlyName == "WhiteCore.vshost.exe";
 
-            if (requested || !(isWhiteCoreExe
-                                   ? WhiteCore_log
-                                   : WhiteCore_Server_log))
+			if ( requested ||
+				 !(WhiteCore_mono_log) ||
+				 !(isWhiteCoreExe ? WhiteCore_log : WhiteCore_Server_log) )
             {
                 string resp = "no";
                 if (!requested)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("\n\n*************Required Configuration files not found.*************");
+					Console.WriteLine("\n\n************* WhiteCore initial run. *************");
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine(
-                        "\n\n   This is your first time running WhiteCore, if not and you already configured your " +
+						"\n\n   This appears to be your first time running WhiteCore, if not and you already configured your " +
                         "*ini.example files, please ignore this warning and press enter; " +
-                        "Otherwise type yes and WhiteCore will guide you trough configuration files.\n\nRemember, " +
+						"Otherwise type yes and WhiteCore will guide you through the configuration process.\n\nRemember, " +
                         "these file names are Case Sensitive in Linux and Proper Cased.\n1. ./WhiteCore.ini\nand\n2. " +
                         "./Configuration/Standalone/StandaloneCommon.ini \nor\n3. ./Configuration/Grid/GridCommon.ini\n" +
                         "\nAlso, you will want to examine these files in great detail because only the basic system will " +

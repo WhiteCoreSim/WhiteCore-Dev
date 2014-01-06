@@ -103,7 +103,9 @@ namespace WhiteCore.Services.SQLServices.GridService
 	
 				return hash;
 			}
+
         }
+
         private class NeighborLocationEqualityComparer : IEqualityComparer<NeighborLocation>
         {
             public bool Equals(NeighborLocation b1, NeighborLocation b2)
@@ -395,7 +397,7 @@ namespace WhiteCore.Services.SQLServices.GridService
             {
                 rr = (RegisterRegion) remoteValue;
                 if (rr == null)
-                    rr = new RegisterRegion {Error = "Could not reach grid service."};
+					rr = new RegisterRegion {Error = "Could not reach the grid service."};
                 return rr;
             }
 
@@ -913,11 +915,11 @@ namespace WhiteCore.Services.SQLServices.GridService
                 MainConsole.Instance.Info("Region UUID: " + r.RegionID);
                 MainConsole.Instance.Info("Region ScopeID: " + r.ScopeID);
                 MainConsole.Instance.Info("Region Location: " + String.Format("{0},{1}", r.RegionLocX, r.RegionLocY));
-				MainConsole.Instance.Info("Region Siza: " + String.Format("{0} x {1}", r.RegionSizeX, r.RegionSizeY));
+								MainConsole.Instance.Info("Region Siza: " + String.Format("{0} x {1}", r.RegionSizeX, r.RegionSizeY));
                 MainConsole.Instance.Info("Region URI: " + r.RegionURI);			
                 MainConsole.Instance.Info("Region Owner: " + r.EstateOwner);
                 MainConsole.Instance.Info("Region Flags: " + flags);
-				MainConsole.Instance.Info("Gridserver URI: " + r.ServerURI);				
+								MainConsole.Instance.Info("Gridserver URI: " + r.ServerURI);				
                 MainConsole.Instance.Info(
                     "-------------------------------------------------------------------------------");
             }

@@ -89,7 +89,7 @@ namespace WhiteCore.Modules.Startup
                                                               ProtocolVersion.MINOR_PROTOCOL_VERSION);
             if (error.Error == String.Empty)
             {
-                //If it registered ok, we save the sessionID to the database and tlel the neighbor service about it
+				//If it registered ok, we save the sessionID to the database and tell the neighbor service about it
                 scene.RegionInfo.GridSecureSessionID = error.SessionID;
                 //Update our local copy of what our region flags are
                 scene.RegionInfo.RegionFlags = error.RegionFlags;
