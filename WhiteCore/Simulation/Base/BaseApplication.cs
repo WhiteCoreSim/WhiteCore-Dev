@@ -171,9 +171,9 @@ namespace WhiteCore.Simulation.Base
                 if (resp == "yes")
                 {
                     string dbSource = "localhost";
-                    string dbPasswd = "WhiteCore";
-                    string dbSchema = "WhiteCore";
-                    string dbUser = "WhiteCore";
+					string dbPasswd = "whitecore";
+					string dbSchema = "whitecore";
+					string dbUser = "whitecore";
                     string gridIPAddress = Utilities.GetExternalIp();
                     bool isStandalone = true;
                     string dbType = "1";
@@ -298,12 +298,12 @@ namespace WhiteCore.Simulation.Base
                     if (isWhiteCoreExe)
                     {
                         MakeSureExists("WhiteCore.ini");
-                        IniConfigSource WhiteCore_ini = new IniConfigSource("WhiteCore.ini", Nini.Ini.IniFileType.AuroraStyle);
-                        IniConfigSource WhiteCore_ini_example = new IniConfigSource("WhiteCore.ini.example", Nini.Ini.IniFileType.AuroraStyle);
+						IniConfigSource whitecore_ini = new IniConfigSource("WhiteCore.ini", Nini.Ini.IniFileType.AuroraStyle);
+						IniConfigSource whitecore_ini_example = new IniConfigSource("WhiteCore.ini.example", Nini.Ini.IniFileType.AuroraStyle);
 
-                        foreach (IConfig config in WhiteCore_ini_example.Configs)
+						foreach (IConfig config in whitecore_ini_example.Configs)
                         {
-                            IConfig newConfig = WhiteCore_ini.AddConfig(config.Name);
+							IConfig newConfig = whitecore_ini.AddConfig(config.Name);
                             foreach (string key in config.GetKeys())
                             {
                                 if (key == "http_listener_port")
@@ -313,7 +313,7 @@ namespace WhiteCore.Simulation.Base
                             }
                         }
 
-                        WhiteCore_ini.Save();
+						whitecore_ini.Save();
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine("Your WhiteCore.ini has been successfully configured");
                         Console.ResetColor();

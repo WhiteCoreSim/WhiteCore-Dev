@@ -59,10 +59,10 @@ namespace WhiteCore.Modules.Selection
 
         public void Initialise(IConfigSource source)
         {
-            IConfig WhiteCorestartupConfig = source.Configs["WhiteCoreStartup"];
-            if (WhiteCorestartupConfig != null)
+			IConfig whitecorestartupConfig = source.Configs["WhiteCoreStartup"];
+			if (whitecorestartupConfig != null)
             {
-                m_UseSelectionParticles = WhiteCorestartupConfig.GetBoolean("UseSelectionParticles", true);
+				m_UseSelectionParticles = whitecorestartupConfig.GetBoolean("UseSelectionParticles", true);
             }
         }
 

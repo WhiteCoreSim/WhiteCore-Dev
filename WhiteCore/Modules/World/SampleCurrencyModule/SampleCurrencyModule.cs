@@ -237,7 +237,7 @@ namespace WhiteCore.Modules.SampleCurrencyModule
 
             quoteResponse.Add("success", false);
             quoteResponse.Add("errorMessage", "Invalid parameters passed to the quote box");
-            quoteResponse.Add("errorURI", "http://WhiteCore-sim.org/wiki");
+			quoteResponse.Add("errorURI", "http://whitecore-sim.org/wiki");
             returnval.Value = quoteResponse;
             return returnval;
         }

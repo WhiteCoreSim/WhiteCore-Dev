@@ -977,12 +977,12 @@ namespace WhiteCore.Physics.WhiteCoreOpenDynamicsEngine
                                   chr.CAPSULE_LENGTH*2), true, chr.LocalID, chr.UUID);
         }
 
-        internal void BadPrim(WhiteCoreODEPrim WhiteCoreODEPrim)
+		internal void BadPrim(WhiteCoreODEPrim whitecoreODEPrim)
         {
-            DeletePrim(WhiteCoreODEPrim);
+			DeletePrim(whitecoreODEPrim);
             //Can't really do this here... as it will be readded before the delete gets called, which is wrong...
             //So... leave the prim out there for now
-            //AddPrimShape(WhiteCoreODEPrim.ParentEntity);
+			//AddPrimShape(whitecoreODEPrim.ParentEntity);
         }
 
         public override PhysicsActor AddPrimShape(UUID primID, uint localID, string name, byte physicsType, PrimitiveBaseShape shape, Vector3 position,

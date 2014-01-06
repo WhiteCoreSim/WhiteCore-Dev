@@ -40,7 +40,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Asset
 
             schema = new List<SchemaDefinition>();
 
-            AddSchema("WhiteCoreassets_A", ColDefs(
+			AddSchema("whitecoreassets_A", ColDefs(
                 ColDef("id", ColumnTypes.String36),
                 ColDef("hash_code", ColumnTypes.String64),
                 ColDef("parent_id", ColumnTypes.String36),
@@ -58,7 +58,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Asset
                                                          IndexType.Primary)
                                                    ));
 
-            AddSchema("WhiteCoreassets_B", ColDefs(
+			AddSchema("whitecoreassets_B", ColDefs(
                 ColDef("id", ColumnTypes.String36),
                 ColDef("hash_code", ColumnTypes.String64),
                 ColDef("parent_id", ColumnTypes.String36),
@@ -76,7 +76,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Asset
                                                          IndexType.Primary)
                                                    ));
 
-            AddSchema("WhiteCoreassets_C", ColDefs(
+			AddSchema("whitecoreassets_C", ColDefs(
                 ColDef("id", ColumnTypes.String36),
                 ColDef("hash_code", ColumnTypes.String64),
                 ColDef("parent_id", ColumnTypes.String36),
@@ -94,7 +94,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Asset
                                                          IndexType.Primary)
                                                    ));
 
-            AddSchema("WhiteCoreassets_D", ColDefs(
+			AddSchema("whitecoreassets_D", ColDefs(
                 ColDef("id", ColumnTypes.String36),
                 ColDef("hash_code", ColumnTypes.String64),
                 ColDef("parent_id", ColumnTypes.String36),
@@ -112,7 +112,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Asset
                                                          IndexType.Primary)
                                                    ));
 
-            AddSchema("WhiteCoreassets_E", ColDefs(
+			AddSchema("whitecoreassets_E", ColDefs(
                 ColDef("id", ColumnTypes.String36),
                 ColDef("hash_code", ColumnTypes.String64),
                 ColDef("parent_id", ColumnTypes.String36),
@@ -130,7 +130,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Asset
                                                          IndexType.Primary)
                                                    ));
 
-            AddSchema("WhiteCoreassets_F", ColDefs(
+			AddSchema("whitecoreassets_F", ColDefs(
                 ColDef("id", ColumnTypes.String36),
                 ColDef("hash_code", ColumnTypes.String64),
                 ColDef("parent_id", ColumnTypes.String36),
@@ -148,7 +148,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Asset
                                                          IndexType.Primary)
                                                    ));
 
-            AddSchema("WhiteCoreassets_0", ColDefs(
+			AddSchema("whitecoreassets_0", ColDefs(
                 ColDef("id", ColumnTypes.String36),
                 ColDef("hash_code", ColumnTypes.String64),
                 ColDef("parent_id", ColumnTypes.String36),
@@ -166,7 +166,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Asset
                                                          IndexType.Primary)
                                                    ));
 
-            AddSchema("WhiteCoreassets_1", ColDefs(
+			AddSchema("whitecoreassets_1", ColDefs(
                 ColDef("id", ColumnTypes.String36),
                 ColDef("hash_code", ColumnTypes.String64),
                 ColDef("parent_id", ColumnTypes.String36),
@@ -184,7 +184,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Asset
                                                          IndexType.Primary)
                                                    ));
 
-            AddSchema("WhiteCoreassets_2", ColDefs(
+			AddSchema("whitecoreassets_2", ColDefs(
                 ColDef("id", ColumnTypes.String36),
                 ColDef("hash_code", ColumnTypes.String64),
                 ColDef("parent_id", ColumnTypes.String36),
@@ -202,7 +202,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Asset
                                                          IndexType.Primary)
                                                    ));
 
-            AddSchema("WhiteCoreassets_3", ColDefs(
+			AddSchema("whitecoreassets_3", ColDefs(
                 ColDef("id", ColumnTypes.String36),
                 ColDef("hash_code", ColumnTypes.String64),
                 ColDef("parent_id", ColumnTypes.String36),
@@ -220,7 +220,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Asset
                                                          IndexType.Primary)
                                                    ));
 
-            AddSchema("WhiteCoreassets_4", ColDefs(
+			AddSchema("whitecoreassets_4", ColDefs(
                 ColDef("id", ColumnTypes.String36),
                 ColDef("hash_code", ColumnTypes.String64),
                 ColDef("parent_id", ColumnTypes.String36),
@@ -238,7 +238,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Asset
                                                          IndexType.Primary)
                                                    ));
 
-            AddSchema("WhiteCoreassets_5", ColDefs(
+			AddSchema("whitecoreassets_5", ColDefs(
                 ColDef("id", ColumnTypes.String36),
                 ColDef("hash_code", ColumnTypes.String64),
                 ColDef("parent_id", ColumnTypes.String36),
@@ -256,7 +256,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Asset
                                                          IndexType.Primary)
                                                    ));
 
-            AddSchema("WhiteCoreassets_6", ColDefs(
+			AddSchema("whitecoreassets_6", ColDefs(
                 ColDef("id", ColumnTypes.String36),
                 ColDef("hash_code", ColumnTypes.String64),
                 ColDef("parent_id", ColumnTypes.String36),
@@ -274,7 +274,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Asset
                                                          IndexType.Primary)
                                                    ));
 
-            AddSchema("WhiteCoreassets_7", ColDefs(
+			AddSchema("whitecoreassets_7", ColDefs(
                 ColDef("id", ColumnTypes.String36),
                 ColDef("hash_code", ColumnTypes.String64),
                 ColDef("parent_id", ColumnTypes.String36),
@@ -292,7 +292,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Asset
                                                          IndexType.Primary)
                                                    ));
 
-            AddSchema("WhiteCoreassets_8", ColDefs(
+			AddSchema("whitecoreassets_8", ColDefs(
                 ColDef("id", ColumnTypes.String36),
                 ColDef("hash_code", ColumnTypes.String64),
                 ColDef("parent_id", ColumnTypes.String36),
@@ -310,7 +310,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Asset
                                                          IndexType.Primary)
                                                    ));
 
-            AddSchema("WhiteCoreassets_9", ColDefs(
+			AddSchema("whitecoreassets_9", ColDefs(
                 ColDef("id", ColumnTypes.String36),
                 ColDef("hash_code", ColumnTypes.String64),
                 ColDef("name", ColumnTypes.String64),
@@ -328,7 +328,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Asset
                                                          IndexType.Primary)
                                                    ));
 
-            AddSchema("WhiteCoreassets_old", ColDefs(
+			AddSchema("whitecoreassets_old", ColDefs(
                 ColDef("id", ColumnTypes.String36),
                 ColDef("hash_code", ColumnTypes.String64),
                 ColDef("parent_id", ColumnTypes.String36),
@@ -347,7 +347,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Asset
                                                       IndexType.Primary)
                                                      ));
 
-            AddSchema("WhiteCoreassets_tasks", ColDefs(
+			AddSchema("whitecoreassets_tasks", ColDefs(
                 ColDef("id", ColumnTypes.String36),
                 ColDef("task_type", ColumnTypes.String64),
                 ColDef("task_values", ColumnTypes.String255)
@@ -355,7 +355,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Asset
                                                     IndexDef(new string[1] {"id"}, IndexType.Primary)
                                                        ));
 
-            AddSchema("WhiteCoreassets_temp", ColDefs(
+			AddSchema("whitecoreassets_temp", ColDefs(
                 ColDef("id", ColumnTypes.String36),
                 ColDef("hash_code", ColumnTypes.String64),
                 ColDef("creator_id", ColumnTypes.String36)

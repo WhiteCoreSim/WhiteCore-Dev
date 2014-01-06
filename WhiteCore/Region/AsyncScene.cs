@@ -305,12 +305,12 @@ namespace WhiteCore.Region
 
             #region Region Config
 
-            IConfig WhiteCorestartupConfig = m_config.Configs["WhiteCoreStartup"];
-            if (WhiteCorestartupConfig != null)
+			IConfig whitecorestartupConfig = m_config.Configs["WhiteCoreStartup"];
+			if (whitecorestartupConfig != null)
             {
                 //Region specific is still honored here, the RegionInfo checks for it, and if it is 0, it didn't set it
                 if (RegionInfo.ObjectCapacity == 0)
-                    RegionInfo.ObjectCapacity = WhiteCorestartupConfig.GetInt("ObjectCapacity", 80000);
+					RegionInfo.ObjectCapacity = whitecorestartupConfig.GetInt("ObjectCapacity", 80000);
             }
 
             IConfig packetConfig = m_config.Configs["PacketPool"];

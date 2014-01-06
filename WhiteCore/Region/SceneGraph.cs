@@ -95,11 +95,11 @@ namespace WhiteCore.Region
             m_parentScene.EventManager.OnNewClient += SubscribeToClientEvents;
             m_parentScene.EventManager.OnClosingClient += UnSubscribeToClientEvents;
 
-            IConfig WhiteCorestartupConfig = parent.Config.Configs["WhiteCoreStartup"];
-            if (WhiteCorestartupConfig != null)
+			IConfig whitecorestartupConfig = parent.Config.Configs["WhiteCoreStartup"];
+			if (whitecorestartupConfig != null)
             {
-                m_DefaultObjectName = WhiteCorestartupConfig.GetString("DefaultObjectName", m_DefaultObjectName);
-                EnableFakeRaycasting = WhiteCorestartupConfig.GetBoolean("EnableFakeRaycasting", false);
+				m_DefaultObjectName = whitecorestartupConfig.GetString("DefaultObjectName", m_DefaultObjectName);
+				EnableFakeRaycasting = whitecorestartupConfig.GetBoolean("EnableFakeRaycasting", false);
             }
         }
 
