@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) Contributors, http://WhiteCore-sim.org/
+ * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
  * Redistribution and use in source and binary forms, with or without
