@@ -140,8 +140,9 @@ namespace WhiteCore.Simulation.Base
                                System.AppDomain.CurrentDomain.FriendlyName == "WhiteCore.vshost.exe";
 
 			if ( requested ||
-				 !(WhiteCore_mono_log) ||
+				( !(WhiteCore_mono_log) &&
 				 !(isWhiteCoreExe ? WhiteCore_log : WhiteCore_Server_log) )
+				)
             {
                 string resp = "no";
                 if (!requested)
@@ -184,7 +185,7 @@ namespace WhiteCore.Simulation.Base
                     uint port = 9000;
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine("====================================================================");
-                    Console.WriteLine("========================= WhiteCore CONFIGURATOR ======================");
+					Console.WriteLine("======================= WhiteCore CONFIGURATOR =====================");
                     Console.WriteLine("====================================================================");
                     Console.ResetColor();
 
