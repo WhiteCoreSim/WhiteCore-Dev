@@ -3,6 +3,18 @@ WhiteCore-Sim (Dev)
 Rowan D <greythane@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Feb 3rd 2014
+* SceneManager - Add checks for operation when the 'root' scene is selected
+   - load OAR - Add info message and prompt to continue.
+   - save OAR - Require change to a named region
+   - reset, remove, restart (runCommand) - Add info message and prompt to continue
+     
+* Rework LSL_Types operator ==(Vector3 lhs, Vector3 rhs) and Equals(object o) to return an intelligent equaltiy state
+   - Currently set to be equal if like values differ by less than 0.00001 (This may need to be revised)
+* Rework LSL_Type operator LSLFloat operators ==, != as per above
+
+
+---------------------------------
 Dec 24th, 2013
 Commented out multiple variables that have been declared but not used (No code changes)
 	- multiple files, identified with comment > // 20131224 not used

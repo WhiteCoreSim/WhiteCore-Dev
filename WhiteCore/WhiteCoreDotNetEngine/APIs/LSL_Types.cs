@@ -37,6 +37,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine
     public partial class LSL_Types
     {
         // Types are kept is separate .dll to avoid having to add whatever .dll it is in it to script AppDomain
+        // Define the tolerance for variation in their values 
+        const double DoubleDifference = .00001;
 
         public struct Vector3
         {
@@ -128,7 +130,13 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine
 
             public static bool operator ==(Vector3 lhs, Vector3 rhs)
             {
-				return ((float)lhs.x == (float)rhs.x && (float)lhs.y == (float)rhs.y && (float)lhs.z == (float)rhs.z);
+
+                // compare like values for equality withing the difference range
+                bool xEq = ( Math.Abs(lhs.x) - Math.Abs(rhs.x) ) <= DoubleDifference;
+                bool yEq = ( Math.Abs(lhs.y) - Math.Abs(rhs.y) ) <= DoubleDifference;
+                bool zEq = ( Math.Abs(lhs.z) - Math.Abs(rhs.z) ) <= DoubleDifference;
+
+                return (xEq && yEq && zEq);
             }
 
             public static bool operator !=(Vector3 lhs, Vector3 rhs)
@@ -145,9 +153,14 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine
             {
                 if (!(o is Vector3)) return false;
 
-                Vector3 vector = (Vector3) o;
+                var vector = (Vector3) o;
 
-				return (x == (float)vector.x && y == (float)vector.y && z == (float)vector.z);
+                // compare like values for equality withing the difference range
+                bool xEq = ( Math.Abs(x) - Math.Abs(vector.x) ) <= DoubleDifference;
+                bool yEq = ( Math.Abs(y) - Math.Abs(vector.y) ) <= DoubleDifference;
+                bool zEq = ( Math.Abs(z) - Math.Abs(vector.z) ) <= DoubleDifference;
+
+                return (xEq && yEq && zEq);
             }
 
             public static Vector3 operator -(Vector3 vector)
@@ -1979,7 +1992,9 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine
 
             public static implicit operator Boolean(LSLFloat f)
             {
-                if (f.value == 0.0)
+
+                //if (f.value == 0.0)
+                if (Math.Abs(f.value) <= DoubleDifference)
                 {
                     return false;
                 }
@@ -2024,12 +2039,15 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine
  
             public static bool operator ==(LSLFloat f1, LSLFloat f2)
             {
-                return f1.value == f2.value;
+                // compare like values for equality withing the difference range
+                return ( Math.Abs(f1.value) - Math.Abs(f2.value) ) <= DoubleDifference;
+                //return f1.value == f2.value;
             }
 
             public static bool operator !=(LSLFloat f1, LSLFloat f2)
             {
-                return f1.value != f2.value;
+                return !(f1 == f2);
+                //return f1.value != f2.value;
             }
 
 
