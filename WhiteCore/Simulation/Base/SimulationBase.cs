@@ -206,7 +206,7 @@ namespace WhiteCore.Simulation.Base
         {
             MainConsole.Instance.Warn("====================================================================");
             MainConsole.Instance.Warn(
-                string.Format("==================== STARTING WhiteCore ({0}) =====================",
+				        string.Format("==================== STARTING WhiteCore ({0}) ======================",
                               (IntPtr.Size == 4 ? "x86" : "x64")));
             MainConsole.Instance.Warn("====================================================================");
             MainConsole.Instance.Warn("[WhiteCoreStartup]: Version: " + Version + "\n");
