@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
 using System;
 using System.Collections;
 using System.Globalization;
@@ -38,7 +37,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine
     {
         // Types are kept is separate .dll to avoid having to add whatever .dll it is in it to script AppDomain
         // Define the tolerance for variation in their values 
-        const double DoubleDifference = .00001;
+        const double DoubleDifference = .000000001;
 
         public struct Vector3
         {

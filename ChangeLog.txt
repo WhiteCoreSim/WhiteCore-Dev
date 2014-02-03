@@ -18,6 +18,12 @@ Feb 3rd 2014
      
 * Rework LSL_Types operator ==(Vector3 lhs, Vector3 rhs) and Equals(object o) to return an intelligent equaltiy state
    - Currently set to be equal if like values differ by less than 0.00001 (This may need to be revised)
+   - Changed to 0.000000001 as investigation of some assets revealed values down to 8 figures 
+   eg. 	<OffsetPosition>
+   			<X>0.01147739</X>
+			<Y>-0.1792226</Y>
+			<Z>0.3589401</Z>
+		</OffsetPosition> 
 * Rework LSL_Type operator LSLFloat operators Boolean, ==, != as per above
 
 
