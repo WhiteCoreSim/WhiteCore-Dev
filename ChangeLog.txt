@@ -4,6 +4,13 @@ Rowan D <greythane@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Feb 3rd 2014
+* Treepopulator 
+    - correct HandleTreeConfigure() for invalid commandline option being passed
+    - update Configure & Update to correctly handle the 'quit' abort entry
+    - Provide an option to start tree growth when reload(ing) copse definitions after restart
+
+* Added console info output if entered command has not been recognised
+* Changed a bunch of destructive command prompts to default to 'no' instead of 'yes'
 * SceneManager - Add checks for operation when the 'root' scene is selected
    - load OAR - Add info message and prompt to continue.
    - save OAR - Require change to a named region
@@ -11,7 +18,7 @@ Feb 3rd 2014
      
 * Rework LSL_Types operator ==(Vector3 lhs, Vector3 rhs) and Equals(object o) to return an intelligent equaltiy state
    - Currently set to be equal if like values differ by less than 0.00001 (This may need to be revised)
-* Rework LSL_Type operator LSLFloat operators ==, != as per above
+* Rework LSL_Type operator LSLFloat operators Boolean, ==, != as per above
 
 
 ---------------------------------

@@ -155,7 +155,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
 
         private void ClearDefaultInventory(IScene scene, string[] cmd)
         {
-            string sure = MainConsole.Instance.Prompt("Are you sure you want to delete the default inventory?", "yes");
+            string sure = MainConsole.Instance.Prompt("Are you sure you want to delete the default inventory? (yes/no)", "no");
             if (!sure.Equals("yes", StringComparison.CurrentCultureIgnoreCase))
                 return;
             ClearDefaultInventory();

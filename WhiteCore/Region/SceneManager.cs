@@ -649,10 +649,10 @@ namespace WhiteCore.Region
         /// <param name="cmdparams">Additional arguments passed to the command</param>
         private void RunCommand(IScene scene, string[] cmdparams)
         {
-            if ( scene == null )
+            if (MainConsole.Instance.ConsoleScene == null) 
             {
                 MainConsole.Instance.Info ("[SceneManager]: Operating on the 'root' scene will run this command for all regions");
-                if (MainConsole.Instance.Prompt ("Are you sure you want to do this?", "yes") != "yes")
+                if (MainConsole.Instance.Prompt ("Are you sure you want to do this? (yes/no)", "no") != "yes")
                     return;
             }
 
@@ -671,7 +671,7 @@ namespace WhiteCore.Region
                     if (cmdparams.Length > 0)
                         if (cmdparams[0] == "region")
                         {
-                            if (MainConsole.Instance.Prompt("Are you sure you want to reset the region?", "yes") !=
+                    if (MainConsole.Instance.Prompt("Are you sure you want to reset the region? (yes/no)", "no") !=
                                 "yes")
                                 return;
                             ResetRegion(scene);
@@ -681,7 +681,7 @@ namespace WhiteCore.Region
                     if (cmdparams.Length > 0)
                         if (cmdparams[0] == "region")
                         {
-                            if (MainConsole.Instance.Prompt("Are you sure you want to remove the region?", "yes") !=
+                    if (MainConsole.Instance.Prompt("Are you sure you want to remove the region? (yes/no)", "no") !=
                                 "yes")
                                 return;
                             RemoveRegion(scene);
@@ -879,11 +879,10 @@ namespace WhiteCore.Region
         /// <param name="cmdparams"></param>
         protected void LoadOar(IScene scene, string[] cmdparams)
         {
-            //if (MainConsole.Instance.ConsoleScene == null) {
-            if ( scene == null )
+            if (MainConsole.Instance.ConsoleScene == null) 
             {
                 MainConsole.Instance.Info ("[SceneManager]: Operating on the 'root' will load the OAR into all regions");
-                if (MainConsole.Instance.Prompt ("Are you sure you want to do this?", "yes") != "yes")
+                if (MainConsole.Instance.Prompt ("Are you sure you want to do this? (yes/no)", "no") != "yes")
                     return;
             }
 
@@ -905,7 +904,7 @@ namespace WhiteCore.Region
         /// <param name="cmdparams"></param>
         protected void SaveOar(IScene scene, string[] cmdparams)
         {
-            if ( scene == null )
+            if (MainConsole.Instance.ConsoleScene == null) 
             {
                 MainConsole.Instance.Info ("[SceneManager]: This command reguries a region to be selected\n          Please change to a region first");
                 return;
