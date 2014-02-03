@@ -906,7 +906,7 @@ namespace WhiteCore.Region
         {
             if (MainConsole.Instance.ConsoleScene == null) 
             {
-                MainConsole.Instance.Info ("[SceneManager]: This command reguries a region to be selected\n          Please change to a region first");
+                MainConsole.Instance.Info ("[SceneManager]: This command requires a region to be selected\n          Please change to a region first");
                 return;
             }
 

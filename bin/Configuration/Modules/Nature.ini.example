@@ -54,8 +54,12 @@
     cloud_update_rate = 1000
 
 [Trees]
+    ;; Enable this to include access to the TreeGenerator module (if installed)
+    ;; default is false
+    enabled = false
+	
     ;; Enable this to allow the tree module to manage your sim trees, including growing, reproducing and dying
-    ;; Reference: REFERENCE: Tree Module Tutorial + (October 2010) http://forums.osgrid.org/viewtopic.php?f=9&t=2865&start=0
+    ;; Reference: See the guide in the examples folder of the module
     ;; default is false
     active_trees = false
 
