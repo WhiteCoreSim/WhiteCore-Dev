@@ -74,6 +74,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
     /// </summary>
     public class LSL_Api : MarshalByRefObject, IScriptApi
     {
+        const double DoubleDifference = .000000001;
+
         protected IScriptModulePlugin m_ScriptEngine;
         protected ISceneChildEntity m_host;
         protected uint m_localID;
@@ -761,7 +763,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     (up.x + fwd.z)*s,
                     (left.z - up.y)*s);
             }
-            if (max == left.y)
+            if ( ( Math.Abs( max ) -  Math.Abs( left.y ) ) <=  DoubleDifference )
             {
                 s = Math.Sqrt(left.y - (up.z + fwd.x) + 1.0);
                 double y = s*0.5;
