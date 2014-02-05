@@ -315,17 +315,21 @@ namespace WhiteCore.Framework.ConsoleFramework
                                 return cmd.Value.ExecuteCommand(cmdList.ToArray());
                             }
 
-                            if (commands.ContainsKey(cmdToExecute))
+                            if (commands.ContainsKey (cmdToExecute))
                             {
                                 foreach (CommandDelegate fn in commands[cmdToExecute].fn.Where(fn => fn != null))
                                 {
-                                    cmdList = new List<string>(commandPath);
-                                    cmdList.AddRange(commandOptions);
-                                    foreach(IScene scene in GetScenes(commands[cmdToExecute]))
-                                        fn(scene, cmdList.ToArray());
+                                    cmdList = new List<string> (commandPath);
+                                    cmdList.AddRange (commandOptions);
+                                    foreach (IScene scene in GetScenes(commands[cmdToExecute]))
+                                        fn (scene, cmdList.ToArray ());
                                 }
                                 return new string[0];
+                            } else
+                            {
+                                MainConsole.Instance.Info (" Sorry.. missed that...");
                             }
+
                         }
                     }
                 }

@@ -150,7 +150,7 @@ namespace WhiteCore.DataManager
             if (!TableExists(tableName))
             {
                 MainConsole.Instance.Warn("[DataMigrator]: Issue finding table " + tableName +
-                                          " when verifing tables exist!");
+                    " when verifing tables exist!"); 
                 return false;
             }
 

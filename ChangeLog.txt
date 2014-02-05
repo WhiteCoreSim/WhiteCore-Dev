@@ -3,6 +3,31 @@ WhiteCore-Sim (Dev)
 Rowan D <greythane@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Feb 3rd 2014
+* Treepopulator 
+    - correct HandleTreeConfigure() for invalid commandline option being passed
+    - update Configure & Update to correctly handle the 'quit' abort entry
+    - Provide an option to start tree growth when reload(ing) copse definitions after restart
+
+* Added console info output if entered command has not been recognised
+* Changed a bunch of destructive command prompts to default to 'no' instead of 'yes'
+* SceneManager - Add checks for operation when the 'root' scene is selected
+   - load OAR - Add info message and prompt to continue.
+   - save OAR - Require change to a named region
+   - reset, remove, restart (runCommand) - Add info message and prompt to continue
+     
+* Rework LSL_Types operator ==(Vector3 lhs, Vector3 rhs) and Equals(object o) to return an intelligent equaltiy state
+   - Currently set to be equal if like values differ by less than 0.00001 (This may need to be revised)
+   - Changed to 0.000000001 as investigation of some assets revealed values down to 8 figures 
+   eg. 	<OffsetPosition>
+   			<X>0.01147739</X>
+			<Y>-0.1792226</Y>
+			<Z>0.3589401</Z>
+		</OffsetPosition> 
+* Rework LSL_Type operator LSLFloat operators Boolean, ==, != as per above
+
+
+---------------------------------
 Dec 24th, 2013
 Commented out multiple variables that have been declared but not used (No code changes)
 	- multiple files, identified with comment > // 20131224 not used
