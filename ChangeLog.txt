@@ -1,7 +1,12 @@
 
 WhiteCore-Sim (Dev) 
 Rowan D <greythane@gmail.com>
+Fly-Man- <fly.man.opensim@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Feb 6th 2014
+* LSL Functions
+	- Cleaned up the old Deprecated, ShoutError and NotImplemented and redid them as Opensim has them now
 
 Feb 3rd 2014
 * Treepopulator 
