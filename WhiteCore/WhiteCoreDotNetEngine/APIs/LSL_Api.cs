@@ -180,7 +180,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
         public override Object InitializeLifetimeService()
         {
-            ILease lease = (ILease) base.InitializeLifetimeService();
+            ILease lease = (ILease)base.InitializeLifetimeService();
 
             if (lease != null && lease.CurrentState == LeaseState.Initial)
             {
@@ -193,7 +193,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
         protected virtual void ScriptSleep(int delay)
         {
-            delay = (int) (delay*m_ScriptDelayFactor);
+            delay = (int)(delay * m_ScriptDelayFactor);
             if (delay == 0)
                 return;
 
@@ -207,7 +207,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         /// <returns></returns>
         protected DateTime PScriptSleep(int delay)
         {
-            double dly = (delay*m_ScriptDelayFactor);
+            double dly = (delay * m_ScriptDelayFactor);
             if (dly == 0.0)
                 return DateTime.Now;
 
@@ -249,7 +249,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if ((item = ScriptByName(name)) != UUID.Zero)
                 m_ScriptEngine.ResetScript(m_host.UUID, item, false);
             else
-                ShoutError("llResetOtherScript: script " + name + " not found");
+                Error("llResetOtherScript", "Can't find script '" + name + "'");
         }
 
 
@@ -265,7 +265,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 return m_ScriptEngine.GetScriptRunningState(item) ? 1 : 0;
             }
 
-            ShoutError("llGetScriptState: script " + name + " not found");
+            Error("llGetScriptState", "Can't find script '" + name + "'");
 
             // If we didn't find it, then it's safe to
             // assume it is not running.
@@ -296,13 +296,13 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             }
             else
             {
-                ShoutError("llSetScriptState: script " + name + " not found");
+                Error("llSetScriptState", "Can't find script '" + name + "'");
             }
         }
 
         public List<ISceneChildEntity> GetLinkParts(int linkType)
         {
-            List<ISceneChildEntity> ret = new List<ISceneChildEntity> {m_host};
+            List<ISceneChildEntity> ret = new List<ISceneChildEntity> { m_host };
 
             if (linkType == ScriptBaseClass.LINK_SET)
             {
@@ -315,7 +315,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             {
                 if (m_host.ParentEntity != null)
                 {
-                    ret = new List<ISceneChildEntity> {m_host.ParentEntity.RootChild};
+                    ret = new List<ISceneChildEntity> { m_host.ParentEntity.RootChild };
                     return ret;
                 }
                 return ret;
@@ -351,7 +351,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             IEntity target = m_host.ParentEntity.GetLinkNumPart(linkType);
             if (target is ISceneChildEntity)
             {
-                ret = new List<ISceneChildEntity> {target as ISceneChildEntity};
+                ret = new List<ISceneChildEntity> { target as ISceneChildEntity };
             }
             //No allowing scene presences to be found here
             return ret;
@@ -359,14 +359,14 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
         public List<IEntity> GetLinkPartsAndEntities(int linkType)
         {
-            List<IEntity> ret = new List<IEntity> {m_host};
+            List<IEntity> ret = new List<IEntity> { m_host };
 
             if (linkType == ScriptBaseClass.LINK_SET)
             {
                 if (m_host.ParentEntity != null)
                 {
                     List<ISceneChildEntity> parts = new List<ISceneChildEntity>(m_host.ParentEntity.ChildrenEntities());
-                    return parts.ConvertAll(part => (IEntity) part);
+                    return parts.ConvertAll(part => (IEntity)part);
                 }
                 return ret;
             }
@@ -375,7 +375,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             {
                 if (m_host.ParentEntity != null)
                 {
-                    ret = new List<IEntity> {m_host.ParentEntity.RootChild};
+                    ret = new List<IEntity> { m_host.ParentEntity.RootChild };
                     return ret;
                 }
                 return ret;
@@ -388,7 +388,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 List<ISceneChildEntity> sceneobjectparts =
                     new List<ISceneChildEntity>(m_host.ParentEntity.ChildrenEntities());
 
-                ret = sceneobjectparts.ConvertAll(part => (IEntity) part);
+                ret = sceneobjectparts.ConvertAll(part => (IEntity)part);
 
                 if (ret.Contains(m_host))
                     ret.Remove(m_host);
@@ -401,7 +401,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     return new List<IEntity>();
                 List<ISceneChildEntity> children = new List<ISceneChildEntity>(m_host.ParentEntity.ChildrenEntities());
 
-                ret = children.ConvertAll(part => (IEntity) part);
+                ret = children.ConvertAll(part => (IEntity)part);
 
                 if (ret.Contains(m_host.ParentEntity.RootChild))
                     ret.Remove(m_host.ParentEntity.RootChild);
@@ -418,7 +418,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             IEntity target = m_host.ParentEntity.GetLinkNumPart(linkType);
             if (target == null)
                 return new List<IEntity>();
-            ret = new List<IEntity> {target};
+            ret = new List<IEntity> { target };
 
             return ret;
         }
@@ -486,9 +486,9 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 TaskInventoryItem itm;
                 lock (m_host.TaskInventory)
                     m_host.TaskInventory.TryGetValue(key, out itm);
-                if(itm != null && itm.Type == (int)type)
+                if (itm != null && itm.Type == (int)type)
                     return key;
-                else if(itm == null)
+                else if (itm == null)
                     return key;
                 //The item was not of the right type
             }
@@ -500,7 +500,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         // convert a LSL_Rotation to a Quaternion
         protected Quaternion Rot2Quaternion(LSL_Rotation r)
         {
-            Quaternion q = new Quaternion((float) r.x, (float) r.y, (float) r.z, (float) r.s);
+            Quaternion q = new Quaternion((float)r.x, (float)r.y, (float)r.z, (float)r.s);
             q.Normalize();
             return q;
         }
@@ -580,7 +580,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
             lock (Util.RandomClass)
             {
-                return Util.RandomClass.NextDouble()*mag;
+                return Util.RandomClass.NextDouble() * mag;
             }
         }
 
@@ -589,7 +589,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return new LSL_Integer();
 
-            return (int) Math.Floor(f);
+            return (int)Math.Floor(f);
         }
 
         public LSL_Integer llCeil(double f)
@@ -597,7 +597,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return new LSL_Integer();
 
-            return (int) Math.Ceiling(f);
+            return (int)Math.Ceiling(f);
         }
 
         // Xantor 01/May/2008 fixed midpointrounding (2.5 becomes 3.0 instead of 2.0, default = ToEven)
@@ -615,7 +615,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     RoundedNumber += 1;
                 }
             }
-            return (int) RoundedNumber;
+            return (int)RoundedNumber;
         }
 
         //This next group are vector operations involving squaring and square root. ckrinke
@@ -642,7 +642,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             double dx = a.x - b.x;
             double dy = a.y - b.y;
             double dz = a.z - b.z;
-            return Math.Sqrt(dx*dx + dy*dy + dz*dz);
+            return Math.Sqrt(dx * dx + dy * dy + dz * dz);
         }
 
         //Now we start getting into quaternions which means sin/cos, matrices and vectors. ckrinke
@@ -653,18 +653,18 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         public LSL_Vector llRot2Euler(LSL_Rotation r)
         {
             //This implementation is from http://lslwiki.net/lslwiki/wakka.php?wakka=LibraryRotationFunctions. ckrinke
-            LSL_Rotation t = new LSL_Rotation(r.x*r.x, r.y*r.y, r.z*r.z, r.s*r.s);
+            LSL_Rotation t = new LSL_Rotation(r.x * r.x, r.y * r.y, r.z * r.z, r.s * r.s);
             double m = (t.x + t.y + t.z + t.s);
             if (m == 0) return new LSL_Vector();
-            double n = 2*(r.y*r.s + r.x*r.z);
-            double p = m*m - n*n;
+            double n = 2 * (r.y * r.s + r.x * r.z);
+            double p = m * m - n * n;
             if (p > 0)
-                return new LSL_Vector(Math.Atan2(2.0*(r.x*r.s - r.y*r.z), (-t.x - t.y + t.z + t.s)),
+                return new LSL_Vector(Math.Atan2(2.0 * (r.x * r.s - r.y * r.z), (-t.x - t.y + t.z + t.s)),
                                       Math.Atan2(n, Math.Sqrt(p)),
-                                      Math.Atan2(2.0*(r.z*r.s - r.x*r.y), (t.x - t.y - t.z + t.s)));
+                                      Math.Atan2(2.0 * (r.z * r.s - r.x * r.y), (t.x - t.y - t.z + t.s)));
             if (n > 0)
-                return new LSL_Vector(0.0, Math.PI*0.5, Math.Atan2((r.z*r.s + r.x*r.y), 0.5 - t.x - t.z));
-            return new LSL_Vector(0.0, -Math.PI*0.5, Math.Atan2((r.z*r.s + r.x*r.y), 0.5 - t.x - t.z));
+                return new LSL_Vector(0.0, Math.PI * 0.5, Math.Atan2((r.z * r.s + r.x * r.y), 0.5 - t.x - t.z));
+            return new LSL_Vector(0.0, -Math.PI * 0.5, Math.Atan2((r.z * r.s + r.x * r.y), 0.5 - t.x - t.z));
         }
 
         /* From wiki:
@@ -718,17 +718,17 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 return new LSL_Rotation();
 
 
-            double c1 = Math.Cos(v.x*0.5);
-            double c2 = Math.Cos(v.y*0.5);
-            double c3 = Math.Cos(v.z*0.5);
-            double s1 = Math.Sin(v.x*0.5);
-            double s2 = Math.Sin(v.y*0.5);
-            double s3 = Math.Sin(v.z*0.5);
+            double c1 = Math.Cos(v.x * 0.5);
+            double c2 = Math.Cos(v.y * 0.5);
+            double c3 = Math.Cos(v.z * 0.5);
+            double s1 = Math.Sin(v.x * 0.5);
+            double s2 = Math.Sin(v.y * 0.5);
+            double s3 = Math.Sin(v.z * 0.5);
 
-            double x = s1*c2*c3 + c1*s2*s3;
-            double y = c1*s2*c3 - s1*c2*s3;
-            double z = s1*s2*c3 + c1*c2*s3;
-            double s = c1*c2*c3 - s1*s2*s3;
+            double x = s1 * c2 * c3 + c1 * s2 * s3;
+            double y = c1 * s2 * c3 - s1 * c2 * s3;
+            double z = s1 * s2 * c3 + c1 * c2 * s3;
+            double s = c1 * c2 * c3 - s1 * s2 * s3;
 
             return new LSL_Rotation(x, y, z, s);
         }
@@ -743,45 +743,45 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
             if (tr >= 1.0)
             {
-                s = 0.5/Math.Sqrt(tr);
+                s = 0.5 / Math.Sqrt(tr);
                 return new LSL_Rotation(
-                    (left.z - up.y)*s,
-                    (up.x - fwd.z)*s,
-                    (fwd.y - left.x)*s,
-                    0.25/s);
+                    (left.z - up.y) * s,
+                    (up.x - fwd.z) * s,
+                    (fwd.y - left.x) * s,
+                    0.25 / s);
             }
             double max = (left.y > up.z) ? left.y : up.z;
 
             if (max < fwd.x)
             {
                 s = Math.Sqrt(fwd.x - (left.y + up.z) + 1.0);
-                double x = s*0.5;
-                s = 0.5/s;
+                double x = s * 0.5;
+                s = 0.5 / s;
                 return new LSL_Rotation(
                     x,
-                    (fwd.y + left.x)*s,
-                    (up.x + fwd.z)*s,
-                    (left.z - up.y)*s);
+                    (fwd.y + left.x) * s,
+                    (up.x + fwd.z) * s,
+                    (left.z - up.y) * s);
             }
-            if ( ( Math.Abs( max ) -  Math.Abs( left.y ) ) <=  DoubleDifference )
+            if ((Math.Abs(max) - Math.Abs(left.y)) <= DoubleDifference)
             {
                 s = Math.Sqrt(left.y - (up.z + fwd.x) + 1.0);
-                double y = s*0.5;
-                s = 0.5/s;
+                double y = s * 0.5;
+                s = 0.5 / s;
                 return new LSL_Rotation(
-                    (fwd.y + left.x)*s,
+                    (fwd.y + left.x) * s,
                     y,
-                    (left.z + up.y)*s,
-                    (up.x - fwd.z)*s);
+                    (left.z + up.y) * s,
+                    (up.x - fwd.z) * s);
             }
             s = Math.Sqrt(up.z - (fwd.x + left.y) + 1.0);
-            double z = s*0.5;
-            s = 0.5/s;
+            double z = s * 0.5;
+            s = 0.5 / s;
             return new LSL_Rotation(
-                (up.x + fwd.z)*s,
-                (left.z + up.y)*s,
+                (up.x + fwd.z) * s,
+                (left.z + up.y) * s,
                 z,
-                (fwd.y - left.x)*s);
+                (fwd.y - left.x) * s);
         }
 
         public LSL_Vector llRot2Fwd(LSL_Rotation r)
@@ -790,12 +790,12 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 return new LSL_Vector();
 
 
-            double m = r.x*r.x + r.y*r.y + r.z*r.z + r.s*r.s;
+            double m = r.x * r.x + r.y * r.y + r.z * r.z + r.s * r.s;
             // m is always greater than zero
             // if m is not equal to 1 then Rotation needs to be normalized
             if (Math.Abs(1.0 - m) > 0.000001) // allow a little slop here for calculation precision
             {
-                m = 1.0/Math.Sqrt(m);
+                m = 1.0 / Math.Sqrt(m);
                 r.x *= m;
                 r.y *= m;
                 r.z *= m;
@@ -803,9 +803,9 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             }
 
             // Fast Algebric Calculations instead of Vectors & Quaternions Product
-            double x = r.x*r.x - r.y*r.y - r.z*r.z + r.s*r.s;
-            double y = 2*(r.x*r.y + r.z*r.s);
-            double z = 2*(r.x*r.z - r.y*r.s);
+            double x = r.x * r.x - r.y * r.y - r.z * r.z + r.s * r.s;
+            double y = 2 * (r.x * r.y + r.z * r.s);
+            double z = 2 * (r.x * r.z - r.y * r.s);
             return (new LSL_Vector(x, y, z));
         }
 
@@ -815,12 +815,12 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 return new LSL_Vector();
 
 
-            double m = r.x*r.x + r.y*r.y + r.z*r.z + r.s*r.s;
+            double m = r.x * r.x + r.y * r.y + r.z * r.z + r.s * r.s;
             // m is always greater than zero
             // if m is not equal to 1 then Rotation needs to be normalized
             if (Math.Abs(1.0 - m) > 0.000001) // allow a little slop here for calculation precision
             {
-                m = 1.0/Math.Sqrt(m);
+                m = 1.0 / Math.Sqrt(m);
                 r.x *= m;
                 r.y *= m;
                 r.z *= m;
@@ -828,9 +828,9 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             }
 
             // Fast Algebric Calculations instead of Vectors & Quaternions Product
-            double x = 2*(r.x*r.y - r.z*r.s);
-            double y = -r.x*r.x + r.y*r.y - r.z*r.z + r.s*r.s;
-            double z = 2*(r.x*r.s + r.y*r.z);
+            double x = 2 * (r.x * r.y - r.z * r.s);
+            double y = -r.x * r.x + r.y * r.y - r.z * r.z + r.s * r.s;
+            double z = 2 * (r.x * r.s + r.y * r.z);
             return (new LSL_Vector(x, y, z));
         }
 
@@ -839,12 +839,12 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return new LSL_Vector();
 
-            double m = r.x*r.x + r.y*r.y + r.z*r.z + r.s*r.s;
+            double m = r.x * r.x + r.y * r.y + r.z * r.z + r.s * r.s;
             // m is always greater than zero
             // if m is not equal to 1 then Rotation needs to be normalized
             if (Math.Abs(1.0 - m) > 0.000001) // allow a little slop here for calculation precision
             {
-                m = 1.0/Math.Sqrt(m);
+                m = 1.0 / Math.Sqrt(m);
                 r.x *= m;
                 r.y *= m;
                 r.z *= m;
@@ -852,9 +852,9 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             }
 
             // Fast Algebric Calculations instead of Vectors & Quaternions Product
-            double x = 2*(r.x*r.z + r.y*r.s);
-            double y = 2*(-r.x*r.s + r.y*r.z);
-            double z = -r.x*r.x - r.y*r.y + r.z*r.z + r.s*r.s;
+            double x = 2 * (r.x * r.z + r.y * r.s);
+            double y = 2 * (-r.x * r.s + r.y * r.z);
+            double z = -r.x * r.x - r.y * r.y + r.z * r.z + r.s * r.s;
             return (new LSL_Vector(x, y, z));
         }
 
@@ -885,15 +885,15 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 {
                     // First assume X axis is orthogonal to the vectors.
                     LSL_Vector orthoVector = new LSL_Vector(1.0f, 0.0f, 0.0f);
-                    orthoVector = orthoVector - a*(a.x/LSL_Vector.Dot(a, a));
+                    orthoVector = orthoVector - a * (a.x / LSL_Vector.Dot(a, a));
                     // Check for near zero vector. A very small non-zero number here will create
                     // a rotation in an undesired direction.
                     rotBetween = LSL_Vector.Mag(orthoVector) > 0.0001
                                      ? new LSL_Rotation(orthoVector.x, orthoVector.y, orthoVector.z, 0.0f)
                                      : new LSL_Rotation(0.0f, 0.0f, 1.0f, 0.0f);
                 }
-                    // Check for parallel vectors.
-                    // A dot product of 1 would mean the angle between vectors is 0 degrees.
+                // Check for parallel vectors.
+                // A dot product of 1 would mean the angle between vectors is 0 degrees.
                 else if (dotProduct > 0.9999999f)
                 {
                     // Set zero rotation.
@@ -912,10 +912,10 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     // non-zero because we already know if we're here, then the dotProduct is not -1 so
                     // qs will not be zero. Also, we've already handled the input vectors being zero so the
                     // crossProduct vector should also not be zero.
-                    rotBetween.x = rotBetween.x/mag;
-                    rotBetween.y = rotBetween.y/mag;
-                    rotBetween.z = rotBetween.z/mag;
-                    rotBetween.s = rotBetween.s/mag;
+                    rotBetween.x = rotBetween.x / mag;
+                    rotBetween.y = rotBetween.y / mag;
+                    rotBetween.z = rotBetween.z / mag;
+                    rotBetween.s = rotBetween.s / mag;
                     // Check for undefined values and set zero rotation if any found. This code might not actually be required
                     // any longer since zero vectors are checked for at the top.
                     if (Double.IsNaN(rotBetween.x) || Double.IsNaN(rotBetween.y) || Double.IsNaN(rotBetween.z) ||
@@ -1066,7 +1066,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
             UUID keyID = UUID.Zero;
             UUID.TryParse(id, out keyID);
-            SensorRepeatPlugin sensorPlugin = (SensorRepeatPlugin) m_ScriptEngine.GetScriptPlugin("SensorRepeat");
+            SensorRepeatPlugin sensorPlugin = (SensorRepeatPlugin)m_ScriptEngine.GetScriptPlugin("SensorRepeat");
             sensorPlugin.SenseOnce(m_host.UUID, m_itemID, name, keyID, type, range, arc, m_host);
         }
 
@@ -1077,7 +1077,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             UUID keyID = UUID.Zero;
             UUID.TryParse(id, out keyID);
 
-            SensorRepeatPlugin sensorPlugin = (SensorRepeatPlugin) m_ScriptEngine.GetScriptPlugin("SensorRepeat");
+            SensorRepeatPlugin sensorPlugin = (SensorRepeatPlugin)m_ScriptEngine.GetScriptPlugin("SensorRepeat");
             sensorPlugin.SetSenseRepeatEvent(m_host.UUID, m_itemID, name, keyID, type, range, arc, rate, m_host);
         }
 
@@ -1085,7 +1085,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
 
-            SensorRepeatPlugin sensorPlugin = (SensorRepeatPlugin) m_ScriptEngine.GetScriptPlugin("SensorRepeat");
+            SensorRepeatPlugin sensorPlugin = (SensorRepeatPlugin)m_ScriptEngine.GetScriptPlugin("SensorRepeat");
             sensorPlugin.RemoveScript(m_host.UUID, m_itemID);
         }
 
@@ -1327,9 +1327,9 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return new LSL_Float();
 
-            Vector3 pos = m_host.GetWorldPosition() + new Vector3((float) offset.x,
-                                                                  (float) offset.y,
-                                                                  (float) offset.z);
+            Vector3 pos = m_host.GetWorldPosition() + new Vector3((float)offset.x,
+                                                                  (float)offset.y,
+                                                                  (float)offset.z);
 
             //Get the slope normal.  This gives us the equation of the plane tangent to the slope.
             LSL_Vector vsn = llGroundNormal(offset);
@@ -1345,15 +1345,15 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 pos.Y = heightmap.Height - 1;
 
             //Get the height for the integer coordinates from the Heightmap
-            float baseheight = heightmap[(int) pos.X, (int) pos.Y];
+            float baseheight = heightmap[(int)pos.X, (int)pos.Y];
 
             //Calculate the difference between the actual coordinates and the integer coordinates
-            float xdiff = pos.X - (int) pos.X;
-            float ydiff = pos.Y - (int) pos.Y;
+            float xdiff = pos.X - (int)pos.X;
+            float ydiff = pos.Y - (int)pos.Y;
 
             //Use the equation of the tangent plane to adjust the height to account for slope
 
-            return (((vsn.x*xdiff) + (vsn.y*ydiff))/(-1*vsn.z)) + baseheight;
+            return (((vsn.x * xdiff) + (vsn.y * ydiff)) / (-1 * vsn.z)) + baseheight;
         }
 
         public LSL_Float llCloud(LSL_Vector offset)
@@ -1366,8 +1366,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (module != null)
             {
                 Vector3 pos = m_host.GetWorldPosition();
-                int x = (int) (pos.X + offset.x);
-                int y = (int) (pos.Y + offset.y);
+                int x = (int)(pos.X + offset.x);
+                int y = (int)(pos.Y + offset.y);
 
                 cloudCover = module.CloudCover(x, y, 0);
             }
@@ -1384,8 +1384,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (module != null)
             {
                 Vector3 pos = m_host.GetWorldPosition();
-                int x = (int) (pos.X + offset.x);
-                int y = (int) (pos.Y + offset.y);
+                int x = (int)(pos.X + offset.x);
+                int y = (int)(pos.Y + offset.y);
 
                 Vector3 windSpeed = module.WindSpeed(x, y, 0);
 
@@ -1492,21 +1492,21 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
             if (status == ScriptBaseClass.STATUS_PHYSICS)
             {
-                return (m_host.GetEffectiveObjectFlags() & (uint) PrimFlags.Physics) == (uint) PrimFlags.Physics
+                return (m_host.GetEffectiveObjectFlags() & (uint)PrimFlags.Physics) == (uint)PrimFlags.Physics
                            ? new LSL_Integer(1)
                            : new LSL_Integer(0);
             }
 
             if (status == ScriptBaseClass.STATUS_PHANTOM)
             {
-                return (m_host.GetEffectiveObjectFlags() & (uint) PrimFlags.Phantom) == (uint) PrimFlags.Phantom
+                return (m_host.GetEffectiveObjectFlags() & (uint)PrimFlags.Phantom) == (uint)PrimFlags.Phantom
                            ? new LSL_Integer(1)
                            : new LSL_Integer(0);
             }
 
             if (status == ScriptBaseClass.STATUS_CAST_SHADOWS)
             {
-                if ((m_host.GetEffectiveObjectFlags() & (uint) PrimFlags.CastShadows) == (uint) PrimFlags.CastShadows)
+                if ((m_host.GetEffectiveObjectFlags() & (uint)PrimFlags.CastShadows) == (uint)PrimFlags.CastShadows)
                     return new LSL_Integer(1);
                 return new LSL_Integer(0);
             }
@@ -1601,9 +1601,9 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             }
 
             Vector3 tmp = part.Scale;
-            tmp.X = (float) scale.x;
-            tmp.Y = (float) scale.y;
-            tmp.Z = (float) scale.z;
+            tmp.X = (float)scale.x;
+            tmp.Y = (float)scale.y;
+            tmp.Z = (float)scale.z;
             part.Scale = tmp;
             part.ScheduleUpdate(PrimUpdateFlags.FindBest);
         }
@@ -1620,7 +1620,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
 
-            m_host.ClickAction = (byte) action;
+            m_host.ClickAction = (byte)action;
             m_host.ScheduleUpdate(PrimUpdateFlags.FindBest);
         }
 
@@ -1628,19 +1628,19 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
 
-            m_host.SetFaceColor(new Vector3((float) color.x, (float) color.y, (float) color.z), face);
+            m_host.SetFaceColor(new Vector3((float)color.x, (float)color.y, (float)color.z), face);
         }
 
         public void SetTexGen(ISceneChildEntity part, int face, int style)
         {
             Primitive.TextureEntry tex = part.Shape.Textures;
             MappingType textype = MappingType.Default;
-            if (style == (int) ScriptBaseClass.PRIM_TEXGEN_PLANAR)
+            if (style == (int)ScriptBaseClass.PRIM_TEXGEN_PLANAR)
                 textype = MappingType.Planar;
 
             if (face >= 0 && face < GetNumberOfSides(part))
             {
-                tex.CreateFace((uint) face);
+                tex.CreateFace((uint)face);
                 tex.FaceTextures[face].TexMapType = textype;
                 part.UpdateTexture(tex, false);
                 return;
@@ -1664,7 +1664,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             Primitive.TextureEntry tex = part.Shape.Textures;
             if (face >= 0 && face < GetNumberOfSides(part))
             {
-                tex.CreateFace((uint) face);
+                tex.CreateFace((uint)face);
                 tex.FaceTextures[face].Glow = glow;
                 part.UpdateTexture(tex, false);
                 return;
@@ -1709,7 +1709,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             Primitive.TextureEntry tex = part.Shape.Textures;
             if (face >= 0 && face < GetNumberOfSides(part))
             {
-                tex.CreateFace((uint) face);
+                tex.CreateFace((uint)face);
                 tex.FaceTextures[face].Shiny = sval;
                 tex.FaceTextures[face].Bump = bump;
                 part.UpdateTexture(tex, false);
@@ -1736,7 +1736,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             Primitive.TextureEntry tex = part.Shape.Textures;
             if (face >= 0 && face < GetNumberOfSides(part))
             {
-                tex.CreateFace((uint) face);
+                tex.CreateFace((uint)face);
                 tex.FaceTextures[face].Fullbright = bright;
                 part.UpdateTexture(tex, false);
                 return;
@@ -1772,12 +1772,12 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 int i;
                 double sum = 0.0;
                 for (i = 0; i < GetNumberOfSides(part); i++)
-                    sum += tex.GetFace((uint) i).RGBA.A;
+                    sum += tex.GetFace((uint)i).RGBA.A;
                 return sum;
             }
             if (face >= 0 && face < GetNumberOfSides(part))
             {
-                return tex.GetFace((uint) face).RGBA.A;
+                return tex.GetFace((uint)face).RGBA.A;
             }
             return 0.0;
         }
@@ -1808,10 +1808,10 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             bool changed = false;
             if (face >= 0 && face < GetNumberOfSides(part))
             {
-                texcolor = tex.CreateFace((uint) face).RGBA;
+                texcolor = tex.CreateFace((uint)face).RGBA;
                 if (texcolor.A != alpha)
                     changed = true;
-                texcolor.A = Util.Clip((float) alpha, 0.0f, 1.0f);
+                texcolor.A = Util.Clip((float)alpha, 0.0f, 1.0f);
                 tex.FaceTextures[face].RGBA = texcolor;
                 if (changed)
                     part.UpdateTexture(tex, false);
@@ -1825,14 +1825,14 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                         texcolor = tex.FaceTextures[i].RGBA;
                         if (texcolor.A != alpha)
                             changed = true;
-                        texcolor.A = Util.Clip((float) alpha, 0.0f, 1.0f);
+                        texcolor.A = Util.Clip((float)alpha, 0.0f, 1.0f);
                         tex.FaceTextures[i].RGBA = texcolor;
                     }
                 }
                 texcolor = tex.DefaultTexture.RGBA;
                 if (texcolor.A != alpha)
                     changed = true;
-                texcolor.A = Util.Clip((float) alpha, 0.0f, 1.0f);
+                texcolor.A = Util.Clip((float)alpha, 0.0f, 1.0f);
                 tex.DefaultTexture.RGBA = texcolor;
                 if (changed)
                     part.UpdateTexture(tex, false);
@@ -1860,7 +1860,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
             if (flexi)
             {
-                part.Shape.PathCurve |= (byte) Extrusion.Flexible;
+                part.Shape.PathCurve |= (byte)Extrusion.Flexible;
                 part.Shape.FlexiEntry = true; // this setting flexi true isn't working, but the below parameters do
                 // work once the prim is already flexi
                 part.Shape.FlexiSoftness = softness;
@@ -1868,16 +1868,16 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 part.Shape.FlexiDrag = friction;
                 part.Shape.FlexiWind = wind;
                 part.Shape.FlexiTension = tension;
-                part.Shape.FlexiForceX = (float) Force.x;
-                part.Shape.FlexiForceY = (float) Force.y;
-                part.Shape.FlexiForceZ = (float) Force.z;
+                part.Shape.FlexiForceX = (float)Force.x;
+                part.Shape.FlexiForceY = (float)Force.y;
+                part.Shape.FlexiForceZ = (float)Force.z;
                 part.Shape.PathCurve = 0x80;
             }
             else
             {
                 int curve = part.Shape.PathCurve;
-                curve &= (int) (~(Extrusion.Flexible));
-                part.Shape.PathCurve = (byte) curve;
+                curve &= (int)(~(Extrusion.Flexible));
+                part.Shape.PathCurve = (byte)curve;
                 part.Shape.FlexiEntry = false;
             }
 
@@ -1908,15 +1908,15 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 if (part.Shape.LightEntry != true)
                     same = false;
                 part.Shape.LightEntry = true;
-                if (part.Shape.LightColorR != Util.Clip((float) color.x, 0.0f, 1.0f))
+                if (part.Shape.LightColorR != Util.Clip((float)color.x, 0.0f, 1.0f))
                     same = false;
-                part.Shape.LightColorR = Util.Clip((float) color.x, 0.0f, 1.0f);
-                if (part.Shape.LightColorG != Util.Clip((float) color.y, 0.0f, 1.0f))
+                part.Shape.LightColorR = Util.Clip((float)color.x, 0.0f, 1.0f);
+                if (part.Shape.LightColorG != Util.Clip((float)color.y, 0.0f, 1.0f))
                     same = false;
-                part.Shape.LightColorG = Util.Clip((float) color.y, 0.0f, 1.0f);
-                if (part.Shape.LightColorB != Util.Clip((float) color.z, 0.0f, 1.0f))
+                part.Shape.LightColorG = Util.Clip((float)color.y, 0.0f, 1.0f);
+                if (part.Shape.LightColorB != Util.Clip((float)color.z, 0.0f, 1.0f))
                     same = false;
-                part.Shape.LightColorB = Util.Clip((float) color.z, 0.0f, 1.0f);
+                part.Shape.LightColorB = Util.Clip((float)color.z, 0.0f, 1.0f);
                 if (part.Shape.LightIntensity != intensity)
                     same = false;
                 part.Shape.LightIntensity = intensity;
@@ -1961,13 +1961,13 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
                 for (i = 0; i < ns; i++)
                 {
-                    texcolor = tex.GetFace((uint) i).RGBA;
+                    texcolor = tex.GetFace((uint)i).RGBA;
                     rgb.x += texcolor.R;
                     rgb.y += texcolor.G;
                     rgb.z += texcolor.B;
                 }
 
-                float tmp = 1f/ns;
+                float tmp = 1f / ns;
                 rgb.x *= tmp;
                 rgb.y *= tmp;
                 rgb.z *= tmp;
@@ -1976,7 +1976,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             }
             if (face >= 0 && face < ns)
             {
-                texcolor = tex.GetFace((uint) face).RGBA;
+                texcolor = tex.GetFace((uint)face).RGBA;
                 rgb.x = texcolor.R;
                 rgb.y = texcolor.G;
                 rgb.z = texcolor.B;
@@ -2021,7 +2021,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
             if (face >= 0 && face < ns)
             {
-                Primitive.TextureEntryFace texface = tex.CreateFace((uint) face);
+                Primitive.TextureEntryFace texface = tex.CreateFace((uint)face);
                 texface.TextureID = textureID;
                 tex.FaceTextures[face] = texface;
                 part.UpdateTexture(tex, false);
@@ -2057,9 +2057,9 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             int ns = GetNumberOfSides(part);
             if (face >= 0 && face < ns)
             {
-                Primitive.TextureEntryFace texface = tex.CreateFace((uint) face);
-                texface.RepeatU = (float) u;
-                texface.RepeatV = (float) v;
+                Primitive.TextureEntryFace texface = tex.CreateFace((uint)face);
+                texface.RepeatU = (float)u;
+                texface.RepeatV = (float)v;
                 tex.FaceTextures[face] = texface;
                 part.UpdateTexture(tex, false);
                 return;
@@ -2070,12 +2070,12 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 {
                     if (tex.FaceTextures[i] != null)
                     {
-                        tex.FaceTextures[i].RepeatU = (float) u;
-                        tex.FaceTextures[i].RepeatV = (float) v;
+                        tex.FaceTextures[i].RepeatU = (float)u;
+                        tex.FaceTextures[i].RepeatV = (float)v;
                     }
                 }
-                tex.DefaultTexture.RepeatU = (float) u;
-                tex.DefaultTexture.RepeatV = (float) v;
+                tex.DefaultTexture.RepeatU = (float)u;
+                tex.DefaultTexture.RepeatV = (float)v;
                 part.UpdateTexture(tex, false);
             }
         }
@@ -2095,9 +2095,9 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             int ns = GetNumberOfSides(part);
             if (face >= 0 && face < ns)
             {
-                Primitive.TextureEntryFace texface = tex.CreateFace((uint) face);
-                texface.OffsetU = (float) u;
-                texface.OffsetV = (float) v;
+                Primitive.TextureEntryFace texface = tex.CreateFace((uint)face);
+                texface.OffsetU = (float)u;
+                texface.OffsetV = (float)v;
                 tex.FaceTextures[face] = texface;
                 part.UpdateTexture(tex, false);
                 return;
@@ -2108,12 +2108,12 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 {
                     if (tex.FaceTextures[i] != null)
                     {
-                        tex.FaceTextures[i].OffsetU = (float) u;
-                        tex.FaceTextures[i].OffsetV = (float) v;
+                        tex.FaceTextures[i].OffsetU = (float)u;
+                        tex.FaceTextures[i].OffsetV = (float)v;
                     }
                 }
-                tex.DefaultTexture.OffsetU = (float) u;
-                tex.DefaultTexture.OffsetV = (float) v;
+                tex.DefaultTexture.OffsetU = (float)u;
+                tex.DefaultTexture.OffsetV = (float)v;
                 part.UpdateTexture(tex, false);
             }
         }
@@ -2133,8 +2133,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             int ns = GetNumberOfSides(part);
             if (face >= 0 && face < ns)
             {
-                Primitive.TextureEntryFace texface = tex.CreateFace((uint) face);
-                texface.Rotation = (float) rotation;
+                Primitive.TextureEntryFace texface = tex.CreateFace((uint)face);
+                texface.Rotation = (float)rotation;
                 tex.FaceTextures[face] = texface;
                 part.UpdateTexture(tex, false);
                 return;
@@ -2145,10 +2145,10 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 {
                     if (tex.FaceTextures[i] != null)
                     {
-                        tex.FaceTextures[i].Rotation = (float) rotation;
+                        tex.FaceTextures[i].Rotation = (float)rotation;
                     }
                 }
-                tex.DefaultTexture.Rotation = (float) rotation;
+                tex.DefaultTexture.Rotation = (float)rotation;
                 part.UpdateTexture(tex, false);
                 return;
             }
@@ -2172,7 +2172,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             }
             if (face >= 0 && face < GetNumberOfSides(part))
             {
-                Primitive.TextureEntryFace texface = tex.GetFace((uint) face);
+                Primitive.TextureEntryFace texface = tex.GetFace((uint)face);
                 TaskInventoryItem item = null;
                 m_host.TaskInventory.TryGetValue(texface.TextureID, out item);
                 if (item != null)
@@ -2208,8 +2208,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         // note linked setpos is capped "differently"
         private LSL_Vector SetPosAdjust(LSL_Vector start, LSL_Vector end)
         {
-            if (llVecDist(start, end) > 10.0f*m_ScriptDistanceFactor)
-                return start + m_ScriptDistanceFactor*10.0f*llVecNorm(end - start);
+            if (llVecDist(start, end) > 10.0f * m_ScriptDistanceFactor)
+                return start + m_ScriptDistanceFactor * 10.0f * llVecNorm(end - start);
             return end;
         }
 
@@ -2222,7 +2222,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
             ITerrainChannel heightmap = World.RequestModuleInterface<ITerrainChannel>();
             if (heightmap != null)
-                ground = heightmap.GetNormalizedGroundHeight((int) (float) targetPos.x, (int) (float) targetPos.y);
+                ground = heightmap.GetNormalizedGroundHeight((int)(float)targetPos.x, (int)(float)targetPos.y);
             if (part.ParentEntity == null)
                 return;
             if (part.ParentEntity.RootChild == part)
@@ -2234,12 +2234,12 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                         targetPos.z = ground;
                 }
                 LSL_Vector real_vec = checkPos ? SetPosAdjust(currentPos, targetPos) : targetPos;
-                parent.UpdateGroupPosition(new Vector3((float) real_vec.x, (float) real_vec.y, (float) real_vec.z), true);
+                parent.UpdateGroupPosition(new Vector3((float)real_vec.x, (float)real_vec.y, (float)real_vec.z), true);
             }
             else
             {
                 LSL_Vector rel_vec = checkPos ? SetPosAdjust(currentPos, targetPos) : targetPos;
-                part.FixOffsetPosition((new Vector3((float) rel_vec.x, (float) rel_vec.y, (float) rel_vec.z)), true);
+                part.FixOffsetPosition((new Vector3((float)rel_vec.x, (float)rel_vec.y, (float)rel_vec.z)), true);
             }
         }
 
@@ -2325,7 +2325,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     ISceneChildEntity rootPart = group.RootChild;
                     if (rootPart != null) // again, better safe than sorry
                     {
-                        SetRot(obj, rootPart.GetRotationOffset()*Rot2Quaternion(rot));
+                        SetRot(obj, rootPart.GetRotationOffset() * Rot2Quaternion(rot));
                     }
                 }
             }
@@ -2390,7 +2390,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     IScenePresence avatar = World.GetScenePresence(part.AttachedAvatar);
                     if (avatar != null)
                     {
-                        q = (avatar.AgentControlFlags & (uint) AgentManager.ControlFlags.AGENT_CONTROL_MOUSELOOK) != 0
+                        q = (avatar.AgentControlFlags & (uint)AgentManager.ControlFlags.AGENT_CONTROL_MOUSELOOK) != 0
                                 ? avatar.CameraRotation
                                 : avatar.Rotation;
                     }
@@ -2426,7 +2426,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     if (local != 0)
                         force *= llGetRot();
 
-                    m_host.ParentEntity.RootChild.SetForce(new Vector3((float) force.x, (float) force.y, (float) force.z));
+                    m_host.ParentEntity.RootChild.SetForce(new Vector3((float)force.x, (float)force.y, (float)force.z));
                 }
             }
         }
@@ -2457,7 +2457,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return 0;
 
             return m_host.registerTargetWaypoint(
-                new Vector3((float) position.x, (float) position.y, (float) position.z), (float) range);
+                new Vector3((float)position.x, (float)position.y, (float)position.z), (float)range);
         }
 
         public void llTargetRemove(int number)
@@ -2473,7 +2473,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
             return
                 m_host.registerRotTargetWaypoint(
-                    new Quaternion((float) rot.x, (float) rot.y, (float) rot.z, (float) rot.s), (float) error);
+                    new Quaternion((float)rot.x, (float)rot.y, (float)rot.z, (float)rot.s), (float)error);
         }
 
         public void llRotTargetRemove(int number)
@@ -2487,7 +2487,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
 
-            m_host.MoveToTarget(new Vector3((float) target.x, (float) target.y, (float) target.z), (float) tau);
+            m_host.MoveToTarget(new Vector3((float)target.x, (float)target.y, (float)target.z), (float)tau);
         }
 
         public void llStopMoveToTarget()
@@ -2502,12 +2502,12 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
 
             //No energy force yet
-            Vector3 v = new Vector3((float) force.x, (float) force.y, (float) force.z);
+            Vector3 v = new Vector3((float)force.x, (float)force.y, (float)force.z);
             float len = v.Length();
             if (len > 20000.0f)
             {
                 //                v.Normalize();
-                v = v*20000.0f/len;
+                v = v * 20000.0f / len;
             }
             m_host.ApplyImpulse(v, local != 0);
         }
@@ -2516,14 +2516,14 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
 
-            m_host.ApplyAngularImpulse(new Vector3((float) force.x, (float) force.y, (float) force.z), local != 0);
+            m_host.ApplyAngularImpulse(new Vector3((float)force.x, (float)force.y, (float)force.z), local != 0);
         }
 
         public void llSetTorque(LSL_Vector torque, int local)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
 
-            m_host.SetAngularImpulse(new Vector3((float) torque.x, (float) torque.y, (float) torque.z), local != 0);
+            m_host.SetAngularImpulse(new Vector3((float)torque.x, (float)torque.y, (float)torque.z), local != 0);
         }
 
         public LSL_Vector llGetTorque()
@@ -2556,13 +2556,13 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         public void llSetVelocity(LSL_Vector force, LSL_Integer local)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
-            Vector3 velocity = new Vector3((float) force.x, (float) force.y, (float) force.z);
+            Vector3 velocity = new Vector3((float)force.x, (float)force.y, (float)force.z);
             if (local == 1)
             {
                 Quaternion grot = m_host.GetWorldRotation();
                 Quaternion AXgrot = grot;
                 Vector3 AXimpulsei = velocity;
-                Vector3 newimpulse = AXimpulsei*AXgrot;
+                Vector3 newimpulse = AXimpulsei * AXgrot;
                 velocity = newimpulse;
             }
 
@@ -2573,13 +2573,13 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         public void llSetAngularVelocity(LSL_Vector force, LSL_Integer local)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
-            Vector3 rotvelocity = new Vector3((float) force.x, (float) force.y, (float) force.z);
+            Vector3 rotvelocity = new Vector3((float)force.x, (float)force.y, (float)force.z);
             if (local == 1)
             {
                 Quaternion grot = m_host.GetWorldRotation();
                 Quaternion AXgrot = grot;
                 Vector3 AXimpulsei = rotvelocity;
-                Vector3 newimpulse = AXimpulsei*AXgrot;
+                Vector3 newimpulse = AXimpulsei * AXgrot;
                 rotvelocity = newimpulse;
             }
 
@@ -2608,7 +2608,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return new LSL_Float();
 
-            return (DateTime.Now.TimeOfDay.TotalMilliseconds/1000)%(3600*4);
+            return (DateTime.Now.TimeOfDay.TotalMilliseconds / 1000) % (3600 * 4);
         }
 
         public LSL_Float llGetWallclock()
@@ -2625,7 +2625,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 return new LSL_Float();
 
             TimeSpan ScriptTime = DateTime.Now - m_timer;
-            return ScriptTime.TotalMilliseconds/1000;
+            return ScriptTime.TotalMilliseconds / 1000;
         }
 
         public void llResetTime()
@@ -2642,7 +2642,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
             TimeSpan ScriptTime = DateTime.Now - m_timer;
             m_timer = DateTime.Now;
-            return ScriptTime.TotalMilliseconds/1000;
+            return ScriptTime.TotalMilliseconds / 1000;
         }
 
         public void llSound(string sound, double volume, int queue, int loop)
@@ -2651,7 +2651,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
             // This function has been deprecated
             // see http://www.lslwiki.net/lslwiki/wakka.php?wakka=llSound
-            Deprecated("llSound");
+            Deprecated("llSound", "Use llPlaySound instead");
             if (loop == 1)
                 llLoopSound(sound, volume);
             else
@@ -2690,7 +2690,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
             m_host.Sound = KeyOrName(sound, AssetType.Sound, true);
             m_host.SoundGain = volume;
-            m_host.SoundFlags = (byte) SoundFlags.Loop; // looping
+            m_host.SoundFlags = (byte)SoundFlags.Loop; // looping
             if (m_host.SoundRadius == 0)
                 m_host.SoundRadius = 20; // Magic number, 20 seems reasonable. Make configurable?
 
@@ -2725,7 +2725,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             m_host.AdjustSoundGain(volume);
             m_host.Sound = KeyOrName(sound, AssetType.Sound, true);
             m_host.SoundGain = volume;
-            m_host.SoundFlags = (byte) SoundFlags.Loop; // looping
+            m_host.SoundFlags = (byte)SoundFlags.Loop; // looping
             if (m_host.SoundRadius == 0)
                 m_host.SoundRadius = 20; // Magic number, 20 seems reasonable. Make configurable?
 
@@ -2738,7 +2738,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
             lock (m_host.ParentEntity.LoopSoundSlavePrims)
             {
-                if(m_host.UUID != m_host.ParentEntity.LoopSoundMasterPrim &&
+                if (m_host.UUID != m_host.ParentEntity.LoopSoundMasterPrim &&
                     !m_host.ParentEntity.LoopSoundSlavePrims.Contains(m_host.UUID))//Can't set the master as a slave
                     m_host.ParentEntity.LoopSoundSlavePrims.Add(m_host.UUID);
             }
@@ -3057,7 +3057,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
             if ((item.PermsMask & ScriptBaseClass.PERMISSION_DEBIT) == 0)
             {
-                LSLError("No permissions to give money");
+                Error("llGiveMoney", "No permissions to give money");
                 return 0;
             }
 
@@ -3065,7 +3065,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
             if (!UUID.TryParse(destination, out toID))
             {
-                LSLError("Bad key in llGiveMoney");
+                Error("llGiveMoney", "Bad key in llGiveMoney");
                 return 0;
             }
 
@@ -3092,78 +3092,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return DateTime.Now;
 
-
-            /*llParticleSystem([
-        PSYS_PART_FLAGS,            PSYS_PART_INTERP_COLOR_MASK | PSYS_PART_INTERP_SCALE_MASK | PSYS_PART_EMISSIVE_MASK | PSYS_PART_WIND_MASK,
-        PSYS_SRC_PATTERN,           PSYS_SRC_PATTERN_ANGLE_CONE,
-        PSYS_PART_START_COLOR,      <1.0, 1.0, 1.0>,
-        PSYS_PART_END_COLOR,        <1.0, 1.0, 1.0>,
-        PSYS_PART_START_ALPHA,      0.50,
-        PSYS_PART_END_ALPHA,        0.25,
-        PSYS_PART_START_SCALE,      <particle_scale, particle_scale, 0.0>,
-        PSYS_PART_END_SCALE,        <particle_scale * 2 + particle_lifetime, particle_scale * 2 + particle_lifetime, 0.0>,
-        PSYS_PART_MAX_AGE,          particle_lifetime,
-        PSYS_SRC_ACCEL,             <0.0, 0.0, 0.0>,
-        PSYS_SRC_TEXTURE,           source_texture_id,
-        PSYS_SRC_BURST_RATE,        1.0,
-        PSYS_SRC_ANGLE_BEGIN,       0.0,
-        PSYS_SRC_ANGLE_END,         source_cone * PI,
-        PSYS_SRC_BURST_PART_COUNT,  particle_count / 2,
-        PSYS_SRC_BURST_RADIUS,      0.0,
-        PSYS_SRC_BURST_SPEED_MIN,   particle_speed / 3,
-        PSYS_SRC_BURST_SPEED_MAX,   particle_speed * 2/3,
-        PSYS_SRC_MAX_AGE,           particle_lifetime / 2,
-        PSYS_SRC_OMEGA,             <0.0, 0.0, 0.0>
-        ]);*/
-
-            List<object> list = new List<object>
-                                    {
-                                        ScriptBaseClass.PSYS_PART_FLAGS,
-                                        ScriptBaseClass.PSYS_PART_INTERP_COLOR_MASK |
-                                        ScriptBaseClass.PSYS_PART_INTERP_SCALE_MASK |
-                                        ScriptBaseClass.PSYS_PART_EMISSIVE_MASK | ScriptBaseClass.PSYS_PART_WIND_MASK,
-                                        ScriptBaseClass.PSYS_SRC_PATTERN,
-                                        ScriptBaseClass.PSYS_SRC_PATTERN_ANGLE_CONE,
-                                        ScriptBaseClass.PSYS_PART_START_COLOR,
-                                        new LSL_Vector(1, 1, 1),
-                                        ScriptBaseClass.PSYS_PART_END_COLOR,
-                                        new LSL_Vector(1, 1, 1),
-                                        ScriptBaseClass.PSYS_PART_START_ALPHA,
-                                        new LSL_Float(0.50),
-                                        ScriptBaseClass.PSYS_PART_END_ALPHA,
-                                        new LSL_Float(0.25),
-                                        ScriptBaseClass.PSYS_PART_START_SCALE,
-                                        new LSL_Vector(scale, scale, 0),
-                                        ScriptBaseClass.PSYS_PART_END_SCALE,
-                                        new LSL_Vector(scale*2 + lifetime, scale*2 + lifetime, 0),
-                                        ScriptBaseClass.PSYS_PART_MAX_AGE,
-                                        new LSL_Float(lifetime),
-                                        ScriptBaseClass.PSYS_SRC_ACCEL,
-                                        new LSL_Vector(0, 0, 0),
-                                        ScriptBaseClass.PSYS_SRC_TEXTURE,
-                                        new LSL_String(texture),
-                                        ScriptBaseClass.PSYS_SRC_BURST_RATE,
-                                        new LSL_Float(1),
-                                        ScriptBaseClass.PSYS_SRC_ANGLE_BEGIN,
-                                        new LSL_Float(0.0),
-                                        ScriptBaseClass.PSYS_SRC_ANGLE_END,
-                                        new LSL_Float(arc*Math.PI),
-                                        ScriptBaseClass.PSYS_SRC_BURST_PART_COUNT,
-                                        new LSL_Integer(particles/2),
-                                        ScriptBaseClass.PSYS_SRC_BURST_RADIUS,
-                                        new LSL_Float(0.0),
-                                        ScriptBaseClass.PSYS_SRC_BURST_SPEED_MIN,
-                                        new LSL_Float(vel/3),
-                                        ScriptBaseClass.PSYS_SRC_BURST_SPEED_MAX,
-                                        new LSL_Float(vel*2/3),
-                                        ScriptBaseClass.PSYS_SRC_MAX_AGE,
-                                        new LSL_Float(lifetime/2),
-                                        ScriptBaseClass.PSYS_SRC_OMEGA,
-                                        new LSL_Vector(0, 0, 0)
-                                    };
-
-            llParticleSystem(new LSL_Types.list(list.ToArray()));
-
+            Deprecated("llMakeExplosion", "Use llParticleSystem instead");
             return PScriptSleep(100);
         }
 
@@ -3173,79 +3102,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return DateTime.Now;
 
-
-            /*llParticleSystem([
-        PSYS_PART_FLAGS,            PSYS_PART_INTERP_COLOR_MASK | PSYS_PART_INTERP_SCALE_MASK | PSYS_PART_WIND_MASK | PSYS_PART_BOUNCE_MASK | PSYS_PART_EMISSIVE_MASK,
-        PSYS_SRC_PATTERN,           PSYS_SRC_PATTERN_ANGLE_CONE,
-        PSYS_PART_START_COLOR,      <1.0, 1.0, 1.0>,
-        PSYS_PART_END_COLOR,        <1.0, 1.0, 1.0>,
-        PSYS_PART_START_ALPHA,      0.50,
-        PSYS_PART_END_ALPHA,        0.25,
-        PSYS_PART_START_SCALE,      <particle_scale/1.5, particle_scale/1.5, 0.0>,
-        PSYS_PART_END_SCALE,        <0.0, 0.0, 0.0>,
-        PSYS_PART_MAX_AGE,          3.0,
-        PSYS_SRC_ACCEL,             <1.0, 0.0, -4>,
-        PSYS_SRC_TEXTURE,           source_texture_id,
-        PSYS_SRC_BURST_RATE,        5/particle_count,
-        PSYS_SRC_ANGLE_BEGIN,       0.0,
-        PSYS_SRC_ANGLE_END,         source_cone*PI,
-        PSYS_SRC_BURST_PART_COUNT,  1,
-        PSYS_SRC_BURST_RADIUS,      0.0,
-        PSYS_SRC_BURST_SPEED_MIN,   particle_speed,
-        PSYS_SRC_BURST_SPEED_MAX,   particle_speed,
-        PSYS_SRC_MAX_AGE,           particle_lifetime/2,
-        PSYS_SRC_OMEGA,             <0.0, 0.0, 0.0>
-    ]);*/
-
-            List<object> list = new List<object>
-                                    {
-                                        ScriptBaseClass.PSYS_PART_FLAGS,
-                                        ScriptBaseClass.PSYS_PART_INTERP_COLOR_MASK |
-                                        ScriptBaseClass.PSYS_PART_INTERP_SCALE_MASK |
-                                        ScriptBaseClass.PSYS_PART_WIND_MASK |
-                                        ScriptBaseClass.PSYS_PART_BOUNCE_MASK | ScriptBaseClass.PSYS_PART_EMISSIVE_MASK,
-                                        ScriptBaseClass.PSYS_SRC_PATTERN,
-                                        ScriptBaseClass.PSYS_SRC_PATTERN_ANGLE_CONE,
-                                        ScriptBaseClass.PSYS_PART_START_COLOR,
-                                        new LSL_Vector(1, 1, 1),
-                                        ScriptBaseClass.PSYS_PART_END_COLOR,
-                                        new LSL_Vector(1, 1, 1),
-                                        ScriptBaseClass.PSYS_PART_START_ALPHA,
-                                        new LSL_Float(0.50),
-                                        ScriptBaseClass.PSYS_PART_END_ALPHA,
-                                        new LSL_Float(0.25),
-                                        ScriptBaseClass.PSYS_PART_START_SCALE,
-                                        new LSL_Vector(scale/1.5, scale/1.5, 0),
-                                        ScriptBaseClass.PSYS_PART_END_SCALE,
-                                        new LSL_Vector(0, 0, 0),
-                                        ScriptBaseClass.PSYS_PART_MAX_AGE,
-                                        new LSL_Float(3),
-                                        ScriptBaseClass.PSYS_SRC_ACCEL,
-                                        new LSL_Vector(1, 0, -4),
-                                        ScriptBaseClass.PSYS_SRC_TEXTURE,
-                                        new LSL_String(texture),
-                                        ScriptBaseClass.PSYS_SRC_BURST_RATE,
-                                        new LSL_Float(5/particles),
-                                        ScriptBaseClass.PSYS_SRC_ANGLE_BEGIN,
-                                        new LSL_Float(0.0),
-                                        ScriptBaseClass.PSYS_SRC_ANGLE_END,
-                                        new LSL_Float(arc*Math.PI),
-                                        ScriptBaseClass.PSYS_SRC_BURST_PART_COUNT,
-                                        new LSL_Integer(1),
-                                        ScriptBaseClass.PSYS_SRC_BURST_RADIUS,
-                                        new LSL_Float(0.0),
-                                        ScriptBaseClass.PSYS_SRC_BURST_SPEED_MIN,
-                                        new LSL_Float(vel),
-                                        ScriptBaseClass.PSYS_SRC_BURST_SPEED_MAX,
-                                        new LSL_Float(vel),
-                                        ScriptBaseClass.PSYS_SRC_MAX_AGE,
-                                        new LSL_Float(lifetime/2),
-                                        ScriptBaseClass.PSYS_SRC_OMEGA,
-                                        new LSL_Vector(0, 0, 0)
-                                    };
-
-            llParticleSystem(new LSL_Types.list(list.ToArray()));
-
+            Deprecated("llMakeFountain", "Use llParticleSystem instead");
             return PScriptSleep(100);
         }
 
@@ -3255,75 +3112,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return DateTime.Now;
 
-            /*llParticleSystem([
-       PSYS_PART_FLAGS,            PSYS_PART_INTERP_COLOR_MASK | PSYS_PART_INTERP_SCALE_MASK | PSYS_PART_EMISSIVE_MASK | PSYS_PART_WIND_MASK,
-       PSYS_SRC_PATTERN,           PSYS_SRC_PATTERN_ANGLE_CONE,
-       PSYS_PART_START_COLOR,      <1.0, 1.0, 1.0>,
-       PSYS_PART_END_COLOR,        <1.0, 1.0, 1.0>,
-       PSYS_PART_START_ALPHA,      1.00,
-       PSYS_PART_END_ALPHA,        0.05,
-       PSYS_PART_START_SCALE,      <particle_scale, particle_scale, 0.0>,
-       PSYS_PART_END_SCALE,        <10, 10, 0.0>,
-       PSYS_PART_MAX_AGE,          3.0,
-       PSYS_SRC_ACCEL,             <0.0, 0.0, 0.0>,
-       PSYS_SRC_TEXTURE,           source_texture_id,
-       PSYS_SRC_BURST_RATE,        10.0 / particle_count,
-       PSYS_SRC_ANGLE_BEGIN,       0.0,
-       PSYS_SRC_ANGLE_END,         source_cone * PI,
-       PSYS_SRC_BURST_PART_COUNT,  1,
-       PSYS_SRC_BURST_RADIUS,      0.0,
-       PSYS_SRC_BURST_SPEED_MIN,   particle_speed,
-       PSYS_SRC_BURST_SPEED_MAX,   particle_speed,
-       PSYS_SRC_MAX_AGE,           particle_lifetime / 2,
-       PSYS_SRC_OMEGA,             <0.0, 0.0, 0.0>
-       ]);*/
-            List<object> list = new List<object>
-                                    {
-                                        ScriptBaseClass.PSYS_PART_FLAGS,
-                                        ScriptBaseClass.PSYS_PART_INTERP_COLOR_MASK |
-                                        ScriptBaseClass.PSYS_PART_INTERP_SCALE_MASK |
-                                        ScriptBaseClass.PSYS_PART_EMISSIVE_MASK | ScriptBaseClass.PSYS_PART_WIND_MASK,
-                                        ScriptBaseClass.PSYS_SRC_PATTERN,
-                                        ScriptBaseClass.PSYS_SRC_PATTERN_ANGLE_CONE,
-                                        ScriptBaseClass.PSYS_PART_START_COLOR,
-                                        new LSL_Vector(1, 1, 1),
-                                        ScriptBaseClass.PSYS_PART_END_COLOR,
-                                        new LSL_Vector(1, 1, 1),
-                                        ScriptBaseClass.PSYS_PART_START_ALPHA,
-                                        new LSL_Float(1),
-                                        ScriptBaseClass.PSYS_PART_END_ALPHA,
-                                        new LSL_Float(0.05),
-                                        ScriptBaseClass.PSYS_PART_START_SCALE,
-                                        new LSL_Vector(scale, scale, 0),
-                                        ScriptBaseClass.PSYS_PART_END_SCALE,
-                                        new LSL_Vector(10, 10, 0),
-                                        ScriptBaseClass.PSYS_PART_MAX_AGE,
-                                        new LSL_Float(3),
-                                        ScriptBaseClass.PSYS_SRC_ACCEL,
-                                        new LSL_Vector(0, 0, 0),
-                                        ScriptBaseClass.PSYS_SRC_TEXTURE,
-                                        new LSL_String(texture),
-                                        ScriptBaseClass.PSYS_SRC_BURST_RATE,
-                                        new LSL_Float(10/particles),
-                                        ScriptBaseClass.PSYS_SRC_ANGLE_BEGIN,
-                                        new LSL_Float(0.0),
-                                        ScriptBaseClass.PSYS_SRC_ANGLE_END,
-                                        new LSL_Float(arc*Math.PI),
-                                        ScriptBaseClass.PSYS_SRC_BURST_PART_COUNT,
-                                        new LSL_Integer(1),
-                                        ScriptBaseClass.PSYS_SRC_BURST_RADIUS,
-                                        new LSL_Float(0.0),
-                                        ScriptBaseClass.PSYS_SRC_BURST_SPEED_MIN,
-                                        new LSL_Float(vel),
-                                        ScriptBaseClass.PSYS_SRC_BURST_SPEED_MAX,
-                                        new LSL_Float(vel),
-                                        ScriptBaseClass.PSYS_SRC_MAX_AGE,
-                                        new LSL_Float(lifetime/2),
-                                        ScriptBaseClass.PSYS_SRC_OMEGA,
-                                        new LSL_Vector(0, 0, 0)
-                                    };
-
-            llParticleSystem(new LSL_Types.list(list.ToArray()));
+            Deprecated("llMakeSmoke", "Use llParticleSystem instead");
             return PScriptSleep(100);
         }
 
@@ -3333,77 +3122,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return DateTime.Now;
 
-
-            /*llParticleSystem([
-        PSYS_PART_FLAGS,            PSYS_PART_INTERP_COLOR_MASK | PSYS_PART_INTERP_SCALE_MASK | PSYS_PART_EMISSIVE_MASK | PSYS_PART_WIND_MASK,
-        PSYS_SRC_PATTERN,           PSYS_SRC_PATTERN_ANGLE_CONE,
-        PSYS_PART_START_COLOR,      <1.0, 1.0, 1.0>,
-        PSYS_PART_END_COLOR,        <1.0, 1.0, 1.0>,
-        PSYS_PART_START_ALPHA,      0.50,
-        PSYS_PART_END_ALPHA,        0.10,
-        PSYS_PART_START_SCALE,      <particle_scale/2, particle_scale/2, 0.0>,
-        PSYS_PART_END_SCALE,        <particle_scale, particle_scale, 0.0>,
-        PSYS_PART_MAX_AGE,          0.5,
-        PSYS_SRC_ACCEL,             <0.0, 0.0, 0.0>,
-        PSYS_SRC_TEXTURE,           source_texture_id,
-        PSYS_SRC_BURST_RATE,        5 / particle_count,
-        PSYS_SRC_ANGLE_BEGIN,       0.0,
-        PSYS_SRC_ANGLE_END,         source_cone * PI,
-        PSYS_SRC_BURST_PART_COUNT,  1,
-        PSYS_SRC_BURST_RADIUS,      0.0,
-        PSYS_SRC_BURST_SPEED_MIN,   particle_speed,
-        PSYS_SRC_BURST_SPEED_MAX,   particle_speed,
-        PSYS_SRC_MAX_AGE,           particle_lifetime / 2,
-        PSYS_SRC_OMEGA,             <0.0, 0.0, 0.0>
-        ]);*/
-
-            List<object> list = new List<object>
-                                    {
-                                        ScriptBaseClass.PSYS_PART_FLAGS,
-                                        ScriptBaseClass.PSYS_PART_INTERP_COLOR_MASK |
-                                        ScriptBaseClass.PSYS_PART_INTERP_SCALE_MASK |
-                                        ScriptBaseClass.PSYS_PART_EMISSIVE_MASK | ScriptBaseClass.PSYS_PART_WIND_MASK,
-                                        ScriptBaseClass.PSYS_SRC_PATTERN,
-                                        ScriptBaseClass.PSYS_SRC_PATTERN_ANGLE_CONE,
-                                        ScriptBaseClass.PSYS_PART_START_COLOR,
-                                        new LSL_Vector(1, 1, 1),
-                                        ScriptBaseClass.PSYS_PART_END_COLOR,
-                                        new LSL_Vector(1, 1, 1),
-                                        ScriptBaseClass.PSYS_PART_START_ALPHA,
-                                        new LSL_Float(0.50),
-                                        ScriptBaseClass.PSYS_PART_END_ALPHA,
-                                        new LSL_Float(0.10),
-                                        ScriptBaseClass.PSYS_PART_START_SCALE,
-                                        new LSL_Vector(scale/2, scale/2, 0),
-                                        ScriptBaseClass.PSYS_PART_END_SCALE,
-                                        new LSL_Vector(scale, scale, 0),
-                                        ScriptBaseClass.PSYS_PART_MAX_AGE,
-                                        new LSL_Float(0.50),
-                                        ScriptBaseClass.PSYS_SRC_ACCEL,
-                                        new LSL_Vector(0, 0, 0),
-                                        ScriptBaseClass.PSYS_SRC_TEXTURE,
-                                        new LSL_String(texture),
-                                        ScriptBaseClass.PSYS_SRC_BURST_RATE,
-                                        new LSL_Float(5/particles),
-                                        ScriptBaseClass.PSYS_SRC_ANGLE_BEGIN,
-                                        new LSL_Float(0.0),
-                                        ScriptBaseClass.PSYS_SRC_ANGLE_END,
-                                        new LSL_Float(arc*Math.PI),
-                                        ScriptBaseClass.PSYS_SRC_BURST_PART_COUNT,
-                                        new LSL_Integer(1),
-                                        ScriptBaseClass.PSYS_SRC_BURST_RADIUS,
-                                        new LSL_Float(0.0),
-                                        ScriptBaseClass.PSYS_SRC_BURST_SPEED_MIN,
-                                        new LSL_Float(vel),
-                                        ScriptBaseClass.PSYS_SRC_BURST_SPEED_MAX,
-                                        new LSL_Float(vel),
-                                        ScriptBaseClass.PSYS_SRC_MAX_AGE,
-                                        new LSL_Float(lifetime/2),
-                                        ScriptBaseClass.PSYS_SRC_OMEGA,
-                                        new LSL_Vector(0, 0, 0)
-                                    };
-
-            llParticleSystem(new LSL_Types.list(list.ToArray()));
+            Deprecated("llMakeFire", "Use llParticleSystem instead");
             return PScriptSleep(100);
         }
 
@@ -3457,27 +3176,27 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     return DateTime.Now;
                 if (CheckPos)
                 {
-                    float dist = (float) llVecDist(llGetPos(), pos);
+                    float dist = (float)llVecDist(llGetPos(), pos);
 
-                    if (dist > m_ScriptDistanceFactor*10.0f)
+                    if (dist > m_ScriptDistanceFactor * 10.0f)
                         return DateTime.Now;
                 }
 
-                TaskInventoryDictionary partInventory = (TaskInventoryDictionary) m_host.TaskInventory.Clone();
+                TaskInventoryDictionary partInventory = (TaskInventoryDictionary)m_host.TaskInventory.Clone();
 
                 foreach (KeyValuePair<UUID, TaskInventoryItem> inv in partInventory)
                 {
                     if (inv.Value.Name == inventory)
                     {
                         // make sure we're an object.
-                        if (inv.Value.InvType != (int) InventoryType.Object)
+                        if (inv.Value.InvType != (int)InventoryType.Object)
                         {
                             llSay(0, "Unable to create requested object. Object is missing from database.");
                             return DateTime.Now;
                         }
 
-                        Vector3 llpos = new Vector3((float) pos.x, (float) pos.y, (float) pos.z);
-                        Vector3 llvel = new Vector3((float) vel.x, (float) vel.y, (float) vel.z);
+                        Vector3 llpos = new Vector3((float)pos.x, (float)pos.y, (float)pos.z);
+                        Vector3 llvel = new Vector3((float)vel.x, (float)vel.y, (float)vel.z);
 
                         ISceneEntity new_group = RezObject(m_host, inv.Value, llpos, Rot2Quaternion(rot), llvel, param,
                                                            m_host.UUID, isRezAtRoot);
@@ -3501,7 +3220,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                                                                                           if (SP != null)
                                                                                           {
                                                                                               //Push the av backwards (For every action, there is an equal, but opposite reaction)
-                                                                                              Vector3 impulse = llvel*
+                                                                                              Vector3 impulse = llvel *
                                                                                                                 groupmass;
                                                                                               impulse.X = impulse.X < 1
                                                                                                               ? impulse
@@ -3656,7 +3375,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
                     rootPart.TrimPermissions();
 
-                    if (group.RootChild.Shape.PCode == (byte) PCode.Prim)
+                    if (group.RootChild.Shape.PCode == (byte)PCode.Prim)
                     {
                         group.ClearPartAttachmentData();
                     }
@@ -3678,14 +3397,14 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                                                                                              //    This means SET the velocity to X, not just temperarily add it!
                                                                                              //   -- Revolution Smythe
                                                                                              llSetForce(
-                                                                                                 new LSL_Vector(vel*
+                                                                                                 new LSL_Vector(vel *
                                                                                                                 groupmass),
                                                                                                  0);
                                                                                              group.RootChild.PhysActor
-                                                                                                  .ForceSetVelocity(vel*
+                                                                                                  .ForceSetVelocity(vel *
                                                                                                                     groupmass);
                                                                                              group.RootChild.PhysActor
-                                                                                                  .Velocity = vel*
+                                                                                                  .Velocity = vel *
                                                                                                               groupmass;
                                                                                          };
                     }
@@ -3694,7 +3413,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
                     if (!World.Permissions.BypassPermissions())
                     {
-                        if ((item.CurrentPermissions & (uint) PermissionMask.Copy) == 0)
+                        if ((item.CurrentPermissions & (uint)PermissionMask.Copy) == 0)
                             sourcePart.Inventory.RemoveInventoryItem(item.ItemID);
                     }
 
@@ -3739,7 +3458,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             LSL_Vector angle = new LSL_Vector(0, 0, 0)
                                    {
                                        x = llAtan2(delta.z, delta.y) - ScriptBaseClass.PI_BY_TWO,
-                                       y = llAtan2(delta.x, llSqrt((delta.y*delta.y) + (delta.z*delta.z)))
+                                       y = llAtan2(delta.x, llSqrt((delta.y * delta.y) + (delta.z * delta.z)))
                                    };
 
             // Calculate the yaw
@@ -3755,26 +3474,26 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (strength == 0 || obj.PhysActor == null || !obj.PhysActor.IsPhysical)
                 SetLinkRot(obj, rot);
             else
-                obj.startLookAt(Rot2Quaternion(rot), (float) strength, (float) damping);
+                obj.startLookAt(Rot2Quaternion(rot), (float)strength, (float)damping);
         }
 
         public void llRotLookAt(LSL_Rotation target, double strength, double damping)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
 
-            Quaternion rot = new Quaternion((float) target.x, (float) target.y, (float) target.z, (float) target.s);
-            m_host.RotLookAt(rot, (float) strength, (float) damping);
+            Quaternion rot = new Quaternion((float)target.x, (float)target.y, (float)target.z, (float)target.s);
+            m_host.RotLookAt(rot, (float)strength, (float)damping);
         }
 
         public void llLinkRotLookAt(LSL_Integer link, LSL_Rotation target, double strength, double damping)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
 
-            Quaternion rot = new Quaternion((float) target.x, (float) target.y, (float) target.z, (float) target.s);
+            Quaternion rot = new Quaternion((float)target.x, (float)target.y, (float)target.z, (float)target.s);
             List<ISceneChildEntity> parts = GetLinkParts(link);
 
             foreach (ISceneChildEntity part in parts)
-                part.RotLookAt(rot, (float) strength, (float) damping);
+                part.RotLookAt(rot, (float)strength, (float)damping);
         }
 
         public void llStopLookAt()
@@ -3791,7 +3510,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 sec = m_MinTimerInterval;
 
             // Setting timer repeat
-            TimerPlugin timerPlugin = (TimerPlugin) m_ScriptEngine.GetScriptPlugin("Timer");
+            TimerPlugin timerPlugin = (TimerPlugin)m_ScriptEngine.GetScriptPlugin("Timer");
             timerPlugin.SetTimerEvent(m_host.UUID, m_itemID, sec);
         }
 
@@ -3800,7 +3519,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return DateTime.Now;
 
-            return PScriptSleep((int) (sec*1000));
+            return PScriptSleep((int)(sec * 1000));
         }
 
         public LSL_Float llGetObjectMass(string id)
@@ -3836,7 +3555,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
         public LSL_Float llGetMassMKS()
         {
-            return llGetMass()*100;
+            return llGetMass() * 100;
         }
 
         public LSL_Float llGetMass()
@@ -3955,7 +3674,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
         private void DetachWrapper(object o)
         {
-            ISceneEntity grp = ((ISceneChildEntity) o).ParentEntity;
+            ISceneEntity grp = ((ISceneChildEntity)o).ParentEntity;
             IScenePresence presence = World.GetScenePresence(grp.OwnerID);
             IAttachmentsModule attachmentsModule = World.RequestModuleInterface<IAttachmentsModule>();
             if (attachmentsModule != null)
@@ -3981,9 +3700,9 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (item.PermsGranter != m_host.OwnerID)
                 return;
 
-            if ((item.NextPermissions & (uint) PermissionMask.Transfer) != (uint) PermissionMask.Transfer)
+            if ((item.NextPermissions & (uint)PermissionMask.Transfer) != (uint)PermissionMask.Transfer)
             {
-                ShoutError("No permission to transfer");
+                Error("llAttachToAvatarTemp", "No permission to transfer");
                 return;
             }
 
@@ -4046,15 +3765,14 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
 
-            Deprecated("llTakeCamera");
+            Deprecated("llTakeCamera", "Use llSetCameraParams instead");
         }
 
         public void llReleaseCamera(string avatar)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
 
-            Deprecated("llReleaseCamera");
-            llClearCameraParams();
+            Deprecated("llReleaseCamera", "Use llClearCameraParams instead");
         }
 
         public LSL_String llGetOwner()
@@ -4096,7 +3814,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             else
                 msg.Message = message;
 
-            msg.Dialog = (byte) InstantMessageDialog.MessageFromObject;
+            msg.Dialog = (byte)InstantMessageDialog.MessageFromObject;
             msg.FromGroup = false;
             msg.Offline = 0;
             msg.ParentEstateID = 0;
@@ -4106,9 +3824,9 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 = Util.StringToBytes256(
                     "{0}/{1}/{2}/{3}",
                     World.RegionInfo.RegionName,
-                    (int) Math.Floor(m_host.AbsolutePosition.X),
-                    (int) Math.Floor(m_host.AbsolutePosition.Y),
-                    (int) Math.Floor(m_host.AbsolutePosition.Z));
+                    (int)Math.Floor(m_host.AbsolutePosition.X),
+                    (int)Math.Floor(m_host.AbsolutePosition.Y),
+                    (int)Math.Floor(m_host.AbsolutePosition.Z));
 
             if (m_TransferModule != null)
             {
@@ -4124,7 +3842,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             IEmailModule emailModule = World.RequestModuleInterface<IEmailModule>();
             if (emailModule == null)
             {
-                ShoutError("llEmail: email module not configured");
+                Error("llEmail", "Email module not configured");
                 return DateTime.Now;
             }
 
@@ -4139,7 +3857,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             IEmailModule emailModule = World.RequestModuleInterface<IEmailModule>();
             if (emailModule == null)
             {
-                ShoutError("llGetNextEmail: email module not configured");
+                Error("llGetNextEmail", "Email module not configured");
                 return;
             }
 
@@ -4181,7 +3899,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             {
                 if (!m_host.ParentEntity.IsDeleted)
                 {
-                    m_host.ParentEntity.RootChild.SetBuoyancy((float) buoyancy);
+                    m_host.ParentEntity.RootChild.SetBuoyancy((float)buoyancy);
                 }
             }
         }
@@ -4204,7 +3922,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     hoverType = PIDHoverType.GroundAndWater;
                 }
 
-                m_host.SetHoverHeight((float) height, hoverType, (float) tau);
+                m_host.SetHoverHeight((float)height, hoverType, (float)tau);
             }
         }
 
@@ -4232,6 +3950,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         public void llSoundPreload(string sound)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
+            Deprecated("llSoundPreload", "Use llPreloadSound instead");
         }
 
         public LSL_Integer llStringLength(string str)
@@ -4361,7 +4080,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
 
-            m_host.OmegaAxis = new Vector3((float) axis.x, (float) axis.y, (float) axis.z);
+            m_host.OmegaAxis = new Vector3((float)axis.x, (float)axis.y, (float)axis.z);
             m_host.OmegaGain = gain;
             m_host.OmegaSpinRate = spinrate;
 
@@ -4410,13 +4129,13 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
                     // if attachment we set it's asset id so object updates can reflect that
                     // if not, we set it's position in world.
-                    group.AbsolutePosition = new Vector3((float) pos.x, (float) pos.y, (float) pos.z);
+                    group.AbsolutePosition = new Vector3((float)pos.x, (float)pos.y, (float)pos.z);
 
                     IScenePresence SP = World.GetScenePresence(m_host.OwnerID);
                     if (SP != null)
                         group.SetGroup(m_host.GroupID, SP.UUID, false);
 
-                    if (group.RootChild.Shape.PCode == (byte) PCode.Prim)
+                    if (group.RootChild.Shape.PCode == (byte)PCode.Prim)
                         group.ClearPartAttachmentData();
 
                     // Fire on_rez
@@ -4468,7 +4187,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 llReleaseControls();
 
 
-            if (m_host.ParentEntity.IsAttachment && (UUID) agent == m_host.ParentEntity.RootChild.AttachedAvatar)
+            if (m_host.ParentEntity.IsAttachment && (UUID)agent == m_host.ParentEntity.RootChild.AttachedAvatar)
             {
                 // When attached, certain permissions are implicit if requested from owner
                 int implicitPerms = ScriptBaseClass.PERMISSION_TAKE_CONTROLS |
@@ -4651,7 +4370,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             List<ISceneChildEntity> parts = GetLinkParts(linknumber);
 
             foreach (ISceneChildEntity part in parts)
-                part.SetFaceColor(new Vector3((float) color.x, (float) color.y, (float) color.z), face);
+                part.SetFaceColor(new Vector3((float)color.x, (float)color.y, (float)color.z), face);
         }
 
         public DateTime llCreateLink(string target, int parent)
@@ -4674,7 +4393,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if ((item.PermsMask & ScriptBaseClass.PERMISSION_CHANGE_LINKS) == 0
                 && !m_automaticLinkPermission)
             {
-                ShoutError("Script trying to link but PERMISSION_CHANGE_LINKS permission not set!");
+                Error("llCreateLink", "PERMISSION_CHANGE_LINKS permission not set");
                 return DateTime.Now;
             }
 
@@ -4726,7 +4445,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 if ((m_host.TaskInventory[invItemID].PermsMask & ScriptBaseClass.PERMISSION_CHANGE_LINKS) == 0
                     && !m_automaticLinkPermission)
                 {
-                    ShoutError("Script trying to link but PERMISSION_CHANGE_LINKS permission not set!");
+                    Error("llBreakLink", "PERMISSION_CHANGE_LINKS permission not set");
                     return;
                 }
             }
@@ -4927,7 +4646,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             keys.Sort();
             if (keys.Count > number)
             {
-                return (string) keys[number];
+                return (string)keys[number];
             }
             return String.Empty;
         }
@@ -4953,7 +4672,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
             if (!UUID.TryParse(destination, out destId))
             {
-                llSay(0, "Could not parse key " + destination);
+                Error("llGiveInventory", "Could not parse key " + destination);
                 return DateTime.Now;
             }
 
@@ -4975,8 +4694,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
             if (!found)
             {
-                llSay(0, String.Format("Could not find object '{0}'", inventory));
-                throw new Exception(String.Format("The inventory object '{0}' could not be found", inventory));
+                Error("llGiveInventory", "Can't find inventory object '" + inventory + "'");
             }
 
             // check if destination is an avatar
@@ -4995,7 +4713,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     return DateTime.Now;
 
                 byte[] bucket = new byte[17];
-                bucket[0] = (byte) assetType;
+                bucket[0] = (byte)assetType;
                 byte[] objBytes = agentItem.ID.GetBytes();
                 Array.Copy(objBytes, 0, bucket, 1, 16);
 
@@ -5053,10 +4771,10 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
 
-            Vector3 av3 = new Vector3(Util.Clip((float) color.x, 0.0f, 1.0f),
-                                      Util.Clip((float) color.y, 0.0f, 1.0f),
-                                      Util.Clip((float) color.z, 0.0f, 1.0f));
-            m_host.SetText(text.Length > 254 ? text.Remove(254) : text, av3, Util.Clip((float) alpha, 0.0f, 1.0f));
+            Vector3 av3 = new Vector3(Util.Clip((float)color.x, 0.0f, 1.0f),
+                                      Util.Clip((float)color.y, 0.0f, 1.0f),
+                                      Util.Clip((float)color.z, 0.0f, 1.0f));
+            m_host.SetText(text.Length > 254 ? text.Remove(254) : text, av3, Util.Clip((float)alpha, 0.0f, 1.0f));
             //m_host.ParentGroup.HasGroupChanged = true;
             //m_host.ParentGroup.ScheduleGroupForFullUpdate();
         }
@@ -5080,7 +4798,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return "";
 
-            UUID uuid = (UUID) id;
+            UUID uuid = (UUID)id;
             UserInfo pinfo = null;
             UserAccount account;
 
@@ -5094,7 +4812,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     return UUID.Zero.ToString();
                 }
 
-                ce = new UserInfoCacheEntry {time = Util.EnvironmentTickCount(), account = account};
+                ce = new UserInfoCacheEntry { time = Util.EnvironmentTickCount(), account = account };
                 pinfo = World.RequestModuleInterface<IAgentInfoService>().GetUserInfo(uuid.ToString());
                 ce.pinfo = pinfo;
                 m_userInfoCache[uuid] = ce;
@@ -5151,7 +4869,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
             UUID rq = UUID.Random();
 
-            DataserverPlugin dataserverPlugin = (DataserverPlugin) m_ScriptEngine.GetScriptPlugin("Dataserver");
+            DataserverPlugin dataserverPlugin = (DataserverPlugin)m_ScriptEngine.GetScriptPlugin("Dataserver");
             UUID tid = dataserverPlugin.RegisterRequest(m_host.UUID,
                                                         m_itemID, rq.ToString());
 
@@ -5166,14 +4884,14 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return "";
 
 
-            TaskInventoryDictionary itemDictionary = (TaskInventoryDictionary) m_host.TaskInventory.Clone();
+            TaskInventoryDictionary itemDictionary = (TaskInventoryDictionary)m_host.TaskInventory.Clone();
 
             foreach (TaskInventoryItem item in itemDictionary.Values)
             {
                 if (item.Type == 3 && item.Name == name)
                 {
                     UUID rq = UUID.Random();
-                    DataserverPlugin dataserverPlugin = (DataserverPlugin) m_ScriptEngine.GetScriptPlugin("Dataserver");
+                    DataserverPlugin dataserverPlugin = (DataserverPlugin)m_ScriptEngine.GetScriptPlugin("Dataserver");
 
                     UUID tid = dataserverPlugin.RegisterRequest(m_host.UUID,
                                                                 m_itemID, rq.ToString());
@@ -5185,17 +4903,17 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
                     World.AssetService.Get(item.AssetID.ToString(), this,
                                            delegate(string i, object sender, AssetBase a)
-                                               {
-                                                   AssetLandmark lm = new AssetLandmark(a);
+                                           {
+                                               AssetLandmark lm = new AssetLandmark(a);
 
-                                                   float rx = (uint) (lm.RegionHandle >> 32);
-                                                   float ry = (uint) lm.RegionHandle;
-                                                   region = lm.Position + new Vector3(rx, ry, 0) - region;
+                                               float rx = (uint)(lm.RegionHandle >> 32);
+                                               float ry = (uint)lm.RegionHandle;
+                                               region = lm.Position + new Vector3(rx, ry, 0) - region;
 
-                                                   string reply = region.ToString();
-                                                   dataserverPlugin.AddReply(rq.ToString(),
-                                                                             reply, 1000);
-                                               });
+                                               string reply = region.ToString();
+                                               dataserverPlugin.AddReply(rq.ToString(),
+                                                                         reply, 1000);
+                                           });
 
                     ScriptSleep(1000);
                     return tid.ToString();
@@ -5209,7 +4927,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
 
-            m_host.ParentEntity.Damage = (float) damage;
+            m_host.ParentEntity.Damage = (float)damage;
 
             ICombatModule combatModule = World.RequestModuleInterface<ICombatModule>();
             if (combatModule != null)
@@ -5242,7 +4960,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     }
 
                     //Send disable cancel so that the agent cannot attempt to stay in the region
-                    presence.ControllingClient.SendTeleportStart((uint) TeleportFlags.DisableCancel);
+                    presence.ControllingClient.SendTeleportStart((uint)TeleportFlags.DisableCancel);
                     IEntityTransferModule transferModule = World.RequestModuleInterface<IEntityTransferModule>();
                     if (transferModule != null)
                         transferModule.TeleportHome(agentId, presence.ControllingClient);
@@ -5266,7 +4984,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             UUID av = new UUID();
             if (!UUID.TryParse(agent, out av))
             {
-                LSLError("First parameter to llDialog needs to be a key");
+                Error("llDialog", "First parameter must be a key");
                 return DateTime.Now;
             }
 
@@ -5284,7 +5002,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             ITerrainModule tm = World.RequestModuleInterface<ITerrainModule>();
             if (tm != null)
             {
-                tm.ModifyTerrain(m_host.OwnerID, m_host.AbsolutePosition, (byte) brush, (byte) action, m_host.OwnerID);
+                tm.ModifyTerrain(m_host.OwnerID, m_host.AbsolutePosition, (byte)brush, (byte)action, m_host.OwnerID);
             }
         }
 
@@ -5293,7 +5011,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
 
             m_host.CollisionSound = KeyOrName(impact_sound, AssetType.Sound, true);
-            m_host.CollisionSoundVolume = (float) impact_volume;
+            m_host.CollisionSoundVolume = (float)impact_volume;
         }
 
         public void llCollisionSprite(string impact_sprite)
@@ -5309,7 +5027,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             // This should only return a value if the avatar is in the same region
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return "";
 
-            UUID avatar = (UUID) id;
+            UUID avatar = (UUID)id;
             IScenePresence presence = World.GetScenePresence(avatar);
             if (presence == null)
                 return "";
@@ -5424,8 +5142,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                         else
                         {
                             // Parcel push restriction
-                            pushAllowed = (targetlandObj.LandData.Flags & (uint) ParcelFlags.RestrictPushObject) !=
-                                          (uint) ParcelFlags.RestrictPushObject ||
+                            pushAllowed = (targetlandObj.LandData.Flags & (uint)ParcelFlags.RestrictPushObject) !=
+                                          (uint)ParcelFlags.RestrictPushObject ||
                                           m_host.ParentEntity.Scene.Permissions.CanPushObject(m_host.OwnerID,
                                                                                               targetlandObj);
                         }
@@ -5436,7 +5154,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (pushAllowed)
             {
                 float distance = (PusheePos - m_host.AbsolutePosition).Length();
-                float distance_term = distance*distance*distance; // Script Energy
+                float distance_term = distance * distance * distance; // Script Energy
                 float pusher_mass = m_host.GetMass();
 
                 const float PUSH_ATTENUATION_DISTANCE = 17f;
@@ -5444,15 +5162,15 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 float distance_attenuation = 1f;
                 if (distance > PUSH_ATTENUATION_DISTANCE)
                 {
-                    float normalized_units = 1f + (distance - PUSH_ATTENUATION_DISTANCE)/PUSH_ATTENUATION_SCALE;
-                    distance_attenuation = 1f/normalized_units;
+                    float normalized_units = 1f + (distance - PUSH_ATTENUATION_DISTANCE) / PUSH_ATTENUATION_SCALE;
+                    distance_attenuation = 1f / normalized_units;
                 }
 
-                Vector3 applied_linear_impulse = new Vector3((float) impulse.x, (float) impulse.y, (float) impulse.z);
+                Vector3 applied_linear_impulse = new Vector3((float)impulse.x, (float)impulse.y, (float)impulse.z);
                 {
                     float impulse_length = applied_linear_impulse.Length();
 
-                    float desired_energy = impulse_length*pusher_mass;
+                    float desired_energy = impulse_length * pusher_mass;
                     if (desired_energy > 0f)
                         desired_energy += distance_term;
 
@@ -5473,7 +5191,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                                 applied_linear_impulse *= m_host.GetWorldRotation();
                             }
                             //Put a limit on it...
-                            int MaxPush = (int) pusheeav.PhysicsActor.Mass*25;
+                            int MaxPush = (int)pusheeav.PhysicsActor.Mass * 25;
 
                             if (applied_linear_impulse.X > 0 &&
                                 Math.Abs(applied_linear_impulse.X) > MaxPush)
@@ -5593,11 +5311,11 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 return new LSL_Rotation();
 
 
-            double s = Math.Cos(angle*0.5);
-            double t = Math.Sin(angle*0.5);
-            double x = axis.x*t;
-            double y = axis.y*t;
-            double z = axis.z*t;
+            double s = Math.Cos(angle * 0.5);
+            double t = Math.Sin(angle * 0.5);
+            double x = axis.x * t;
+            double y = axis.y * t;
+            double z = axis.z * t;
 
             return new LSL_Rotation(x, y, z, s);
         }
@@ -5614,11 +5332,11 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
             if (rot.s > 1) // normalization needed
             {
-                double length = Math.Sqrt(rot.x*rot.x + rot.y*rot.y +
-                                          rot.z*rot.z + rot.s*rot.s);
+                double length = Math.Sqrt(rot.x * rot.x + rot.y * rot.y +
+                                          rot.z * rot.z + rot.s * rot.s);
                 if (length == 0)
                     return new LSL_Vector(0, 0, 0);
-                length = 1/length;
+                length = 1 / length;
                 rot.x *= length;
                 rot.y *= length;
                 rot.z *= length;
@@ -5626,7 +5344,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             }
 
             // double angle = 2 * Math.Acos(rot.s);
-            double s = Math.Sqrt(1 - rot.s*rot.s);
+            double s = Math.Sqrt(1 - rot.s * rot.s);
             if (s < 0.001)
             {
                 x = 1;
@@ -5634,10 +5352,10 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             }
             else
             {
-                s = 1/s;
-                x = rot.x*s; // normalise axis
-                y = rot.y*s;
-                z = rot.z*s;
+                s = 1 / s;
+                x = rot.x * s; // normalise axis
+                y = rot.y * s;
+                z = rot.z * s;
             }
 
             return new LSL_Vector(x, y, z);
@@ -5653,8 +5371,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
             if (rot.s > 1) // normalization needed
             {
-                double length = Math.Sqrt(rot.x*rot.x + rot.y*rot.y +
-                                          rot.z*rot.z + rot.s*rot.s);
+                double length = Math.Sqrt(rot.x * rot.x + rot.y * rot.y +
+                                          rot.z * rot.z + rot.s * rot.s);
 
                 if (length == 0)
                     return 0;
@@ -5664,7 +5382,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 rot.s /= length;
             }
 
-            double angle = 2*Math.Acos(rot.s);
+            double angle = 2 * Math.Acos(rot.s);
 
             return angle;
         }
@@ -5691,14 +5409,14 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 return new LSL_Float();
 
 
-            double aa = (a.x*a.x + a.y*a.y + a.z*a.z + a.s*a.s);
-            double bb = (b.x*b.x + b.y*b.y + b.z*b.z + b.s*b.s);
-            double aa_bb = aa*bb;
+            double aa = (a.x * a.x + a.y * a.y + a.z * a.z + a.s * a.s);
+            double bb = (b.x * b.x + b.y * b.y + b.z * b.z + b.s * b.s);
+            double aa_bb = aa * bb;
             if (aa_bb == 0) return 0.0;
-            double ab = (a.x*b.x + a.y*b.y + a.z*b.z + a.s*b.s);
-            double quotient = (ab*ab)/aa_bb;
+            double ab = (a.x * b.x + a.y * b.y + a.z * b.z + a.s * b.s);
+            double quotient = (ab * ab) / aa_bb;
             if (quotient >= 1.0) return 0.0;
-            return Math.Acos(2*quotient - 1);
+            return Math.Acos(2 * quotient - 1);
         }
 
         public LSL_String llGetInventoryKey(string name)
@@ -5714,8 +5432,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     if (inv.Value.Name == name)
                     {
                         return (inv.Value.CurrentPermissions &
-                                (uint) (PermissionMask.Copy | PermissionMask.Transfer | PermissionMask.Modify)) ==
-                               (uint) (PermissionMask.Copy | PermissionMask.Transfer | PermissionMask.Modify)
+                                (uint)(PermissionMask.Copy | PermissionMask.Transfer | PermissionMask.Modify)) ==
+                               (uint)(PermissionMask.Copy | PermissionMask.Transfer | PermissionMask.Modify)
                                    ? inv.Value.AssetID.ToString()
                                    : UUID.Zero.ToString();
                     }
@@ -5771,8 +5489,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             }
             if (face >= 0 && face < GetNumberOfSides(part))
             {
-                offset.x = tex.GetFace((uint) face).OffsetU;
-                offset.y = tex.GetFace((uint) face).OffsetV;
+                offset.x = tex.GetFace((uint)face).OffsetU;
+                offset.y = tex.GetFace((uint)face).OffsetV;
                 offset.z = 0.0;
                 return offset;
             }
@@ -5790,8 +5508,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             {
                 side = 0;
             }
-            scale.x = tex.GetFace((uint) side).RepeatU;
-            scale.y = tex.GetFace((uint) side).RepeatV;
+            scale.x = tex.GetFace((uint)side).RepeatU;
+            scale.y = tex.GetFace((uint)side).RepeatV;
             scale.z = 0.0;
             return scale;
         }
@@ -5813,7 +5531,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             }
             if (face >= 0 && face < GetNumberOfSides(part))
             {
-                return tex.GetFace((uint) face).Rotation;
+                return tex.GetFace((uint)face).Rotation;
             }
             return 0.0;
         }
@@ -5896,9 +5614,9 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             try
             {
                 if (src.Data[index] is LSL_Integer)
-                    return (LSL_Integer) src.Data[index];
+                    return (LSL_Integer)src.Data[index];
                 if (src.Data[index] is LSL_Float)
-                    return Convert.ToInt32(((LSL_Float) src.Data[index]).value);
+                    return Convert.ToInt32(((LSL_Float)src.Data[index]).value);
                 return new LSL_Integer(src.Data[index].ToString());
             }
             catch (FormatException)
@@ -5927,11 +5645,11 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             try
             {
                 if (src.Data[index] is LSL_Integer)
-                    return Convert.ToDouble(((LSL_Integer) src.Data[index]).value);
+                    return Convert.ToDouble(((LSL_Integer)src.Data[index]).value);
                 if (src.Data[index] is LSL_Float)
-                    return Convert.ToDouble(((LSL_Float) src.Data[index]).value);
+                    return Convert.ToDouble(((LSL_Float)src.Data[index]).value);
                 if (src.Data[index] is LSL_String)
-                    return Convert.ToDouble(((LSL_String) src.Data[index]).m_string);
+                    return Convert.ToDouble(((LSL_String)src.Data[index]).m_string);
                 return Convert.ToDouble(src.Data[index]);
             }
             catch (FormatException)
@@ -5989,7 +5707,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             }
             if (src.Data[index] is LSL_Vector)
             {
-                return (LSL_Vector) src.Data[index];
+                return (LSL_Vector)src.Data[index];
             }
             return new LSL_Vector(src.Data[index].ToString());
         }
@@ -6009,7 +5727,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             }
             if (src.Data[index] is LSL_Rotation)
             {
-                return (LSL_Rotation) src.Data[index];
+                return (LSL_Rotation)src.Data[index];
             }
             return new LSL_Rotation(src.Data[index].ToString());
         }
@@ -6170,9 +5888,9 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             // If not, then return the src list. This also
             // traps those cases where stride > length.
 
-            if (src.Length != stride && src.Length%stride == 0)
+            if (src.Length != stride && src.Length % stride == 0)
             {
-                int chunkk = src.Length/stride;
+                int chunkk = src.Length / stride;
 
                 int[] chunks = new int[chunkk];
 
@@ -6199,7 +5917,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 {
                     for (int j = 0; j < stride; j++)
                     {
-                        result.Add(src.Data[chunks[i]*stride + j]);
+                        result.Add(src.Data[chunks[i] * stride + j]);
                     }
                 }
             }
@@ -6298,7 +6016,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             }
             else
             {
-                if (start%stride == 0)
+                if (start % stride == 0)
                 {
                     result.Add(src.Data[start]);
                 }
@@ -6444,34 +6162,34 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     return 0;
                 }
                 // Y is the only valid direction
-                edge.y = dir.y/Math.Abs(dir.y);
+                edge.y = dir.y / Math.Abs(dir.y);
             }
             else
             {
                 LSL_Float mag;
                 if (dir.x > 0)
                 {
-                    mag = (World.RegionInfo.RegionSizeX - pos.x)/dir.x;
+                    mag = (World.RegionInfo.RegionSizeX - pos.x) / dir.x;
                 }
                 else
                 {
-                    mag = (pos.x/dir.x);
+                    mag = (pos.x / dir.x);
                 }
 
                 mag = Math.Abs(mag);
 
-                edge.y = pos.y + (dir.y*mag);
+                edge.y = pos.y + (dir.y * mag);
 
                 if (edge.y > World.RegionInfo.RegionSizeY || edge.y < 0)
                 {
                     // Y goes out of bounds first
-                    edge.y = dir.y/Math.Abs(dir.y);
+                    edge.y = dir.y / Math.Abs(dir.y);
                 }
                 else
                 {
                     // X goes out of bounds first or its a corner exit
                     edge.y = 0;
-                    edge.x = dir.x/Math.Abs(dir.x);
+                    edge.x = dir.x / Math.Abs(dir.x);
                 }
             }
             IGridRegisterModule service = World.RequestModuleInterface<IGridRegisterModule>();
@@ -6479,8 +6197,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (service != null)
                 neighbors = service.GetNeighbors(World);
 
-            int neighborX = World.RegionInfo.RegionLocX + (int) dir.x;
-            int neighborY = World.RegionInfo.RegionLocY + (int) dir.y;
+            int neighborX = World.RegionInfo.RegionLocX + (int)dir.x;
+            int neighborY = World.RegionInfo.RegionLocY + (int)dir.y;
 
             if (neighbors.Any(neighbor => neighbor.RegionLocX == neighborX && neighbor.RegionLocY == neighborY))
             {
@@ -6534,25 +6252,25 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 }
             }
 
-            if ((agent.AgentControlFlags & (uint) AgentManager.ControlFlags.AGENT_CONTROL_FLY) != 0)
+            if ((agent.AgentControlFlags & (uint)AgentManager.ControlFlags.AGENT_CONTROL_FLY) != 0)
             {
                 flags |= ScriptBaseClass.AGENT_FLYING;
                 flags |= ScriptBaseClass.AGENT_IN_AIR;
-                    // flying always implies in-air, even if colliding with e.g. a wall
+                // flying always implies in-air, even if colliding with e.g. a wall
             }
 
-            if ((agent.AgentControlFlags & (uint) AgentManager.ControlFlags.AGENT_CONTROL_AWAY) != 0)
+            if ((agent.AgentControlFlags & (uint)AgentManager.ControlFlags.AGENT_CONTROL_AWAY) != 0)
             {
                 flags |= ScriptBaseClass.AGENT_AWAY;
             }
 
             // seems to get unset, even if in mouselook, when avatar is sitting on a prim???
-            if ((agent.AgentControlFlags & (uint) AgentManager.ControlFlags.AGENT_CONTROL_MOUSELOOK) != 0)
+            if ((agent.AgentControlFlags & (uint)AgentManager.ControlFlags.AGENT_CONTROL_MOUSELOOK) != 0)
             {
                 flags |= ScriptBaseClass.AGENT_MOUSELOOK;
             }
 
-            if ((agent.State & (byte) AgentState.Typing) != 0)
+            if ((agent.State & (byte)AgentState.Typing) != 0)
             {
                 flags |= ScriptBaseClass.AGENT_TYPING;
             }
@@ -6819,12 +6537,12 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (face == ScriptBaseClass.ALL_SIDES)
                 face = 255;
 
-            pTexAnim.Face = (uint) face;
-            pTexAnim.Length = (float) length;
-            pTexAnim.Rate = (float) rate;
-            pTexAnim.SizeX = (uint) sizex;
-            pTexAnim.SizeY = (uint) sizey;
-            pTexAnim.Start = (float) start;
+            pTexAnim.Face = (uint)face;
+            pTexAnim.Length = (float)length;
+            pTexAnim.Rate = (float)rate;
+            pTexAnim.SizeX = (uint)sizex;
+            pTexAnim.SizeY = (uint)sizey;
+            pTexAnim.Start = (float)start;
 
             part.AddTextureAnimation(pTexAnim);
             part.ScheduleUpdate(PrimUpdateFlags.FindBest);
@@ -6835,8 +6553,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
 
-            double radius1 = (float) llVecDist(llGetPos(), top_north_east);
-            double radius2 = (float) llVecDist(llGetPos(), bottom_south_west);
+            double radius1 = (float)llVecDist(llGetPos(), top_north_east);
+            double radius2 = (float)llVecDist(llGetPos(), bottom_south_west);
             double radius = Math.Abs(radius1 - radius2);
             m_host.SendSound(KeyOrName(sound, AssetType.Sound, true).ToString(), volume, true, 0, (float)radius);
         }
@@ -6916,7 +6634,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule>();
             if (parcelManagement != null)
             {
-                ILandObject land = parcelManagement.GetLandObject((float) pos.x, (float) pos.y);
+                ILandObject land = parcelManagement.GetLandObject((float)pos.x, (float)pos.y);
                 if (land != null)
                     return land.LandData.OwnerID.ToString();
             }
@@ -6933,7 +6651,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return new LSL_Vector();
 
-            IScenePresence avatar = World.GetScenePresence((UUID) id);
+            IScenePresence avatar = World.GetScenePresence((UUID)id);
             LSL_Vector agentSize;
             if (avatar == null || avatar.IsChildAgent) // Fail if not in the same region
             {
@@ -7026,9 +6744,9 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             //the height of that point on the plane.  The resulting vector gives the slope.
             Vector3 vsl = new Vector3
                               {
-                                  X = (float) vsn.x,
-                                  Y = (float) vsn.y,
-                                  Z = (float) (((vsn.x*vsn.x) + (vsn.y*vsn.y))/(-1*vsn.z))
+                                  X = (float)vsn.x,
+                                  Y = (float)vsn.y,
+                                  Z = (float)(((vsn.x * vsn.x) + (vsn.y * vsn.y)) / (-1 * vsn.z))
                               };
             vsl.Normalize();
             //Normalization might be overkill here
@@ -7041,9 +6759,9 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return new LSL_Vector();
 
-            Vector3 pos = m_host.GetWorldPosition() + new Vector3((float) offset.x,
-                                                                  (float) offset.y,
-                                                                  (float) offset.z);
+            Vector3 pos = m_host.GetWorldPosition() + new Vector3((float)offset.x,
+                                                                  (float)offset.y,
+                                                                  (float)offset.z);
             ITerrainChannel heightmap = World.RequestModuleInterface<ITerrainChannel>();
             // Clamp to valid position
             if (pos.X < 0)
@@ -7057,21 +6775,21 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
             //Find two points in addition to the position to define a plane
             Vector3 p0 = new Vector3(pos.X, pos.Y,
-                                     heightmap[(int) pos.X, (int) pos.Y]);
+                                     heightmap[(int)pos.X, (int)pos.Y]);
             Vector3 p1 = new Vector3();
             Vector3 p2 = new Vector3();
             if ((pos.X + 1.0f) >= heightmap.Width)
                 p1 = new Vector3(pos.X + 1.0f, pos.Y,
-                                 heightmap[(int) pos.X, (int) pos.Y]);
+                                 heightmap[(int)pos.X, (int)pos.Y]);
             else
                 p1 = new Vector3(pos.X + 1.0f, pos.Y,
-                                 heightmap[(int) (pos.X + 1.0f), (int) pos.Y]);
+                                 heightmap[(int)(pos.X + 1.0f), (int)pos.Y]);
             if ((pos.Y + 1.0f) >= heightmap.Height)
                 p2 = new Vector3(pos.X, pos.Y + 1.0f,
-                                 heightmap[(int) pos.X, (int) pos.Y]);
+                                 heightmap[(int)pos.X, (int)pos.Y]);
             else
                 p2 = new Vector3(pos.X, pos.Y + 1.0f,
-                                 heightmap[(int) pos.X, (int) (pos.Y + 1.0f)]);
+                                 heightmap[(int)pos.X, (int)(pos.Y + 1.0f)]);
 
             //Find normalized vectors from p0 to p1 and p0 to p2
             Vector3 v0 = new Vector3(p1.X - p0.X, p1.Y - p0.Y, p1.Z - p0.Z);
@@ -7082,9 +6800,9 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             //Find the cross product of the vectors (the slope normal).
             Vector3 vsn = new Vector3
                               {
-                                  X = (v0.Y*v1.Z) - (v0.Z*v1.Y),
-                                  Y = (v0.Z*v1.X) - (v0.X*v1.Z),
-                                  Z = (v0.X*v1.Y) - (v0.Y*v1.X)
+                                  X = (v0.Y * v1.Z) - (v0.Z * v1.Y),
+                                  Y = (v0.Z * v1.X) - (v0.X * v1.Z),
+                                  Z = (v0.X * v1.Y) - (v0.Y * v1.X)
                               };
             vsn.Normalize();
             //I believe the crossproduct of two normalized vectors is a normalized vector so
@@ -7108,7 +6826,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return new LSL_Integer();
 
-            return (int) m_host.ParentEntity.RootChild.AttachmentPoint;
+            return (int)m_host.ParentEntity.RootChild.AttachmentPoint;
         }
 
         public LSL_Integer llGetFreeMemory()
@@ -7294,160 +7012,160 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 for (int i = 0; i < rules.Length; i += 2)
                 {
                     LSL_Integer rule = rules.GetLSLIntegerItem(i);
-                    if (rule == (int) ScriptBaseClass.PSYS_PART_FLAGS)
+                    if (rule == (int)ScriptBaseClass.PSYS_PART_FLAGS)
                     {
                         prules.PartDataFlags =
-                            (Primitive.ParticleSystem.ParticleDataFlags) (uint) rules.GetLSLIntegerItem(i + 1);
+                            (Primitive.ParticleSystem.ParticleDataFlags)(uint)rules.GetLSLIntegerItem(i + 1);
                     }
 
-                    else if (rule == (int) ScriptBaseClass.PSYS_PART_START_COLOR)
+                    else if (rule == (int)ScriptBaseClass.PSYS_PART_START_COLOR)
                     {
                         tempv = rules.GetVector3Item(i + 1);
-                        prules.PartStartColor.R = (float) tempv.x;
-                        prules.PartStartColor.G = (float) tempv.y;
-                        prules.PartStartColor.B = (float) tempv.z;
+                        prules.PartStartColor.R = (float)tempv.x;
+                        prules.PartStartColor.G = (float)tempv.y;
+                        prules.PartStartColor.B = (float)tempv.z;
                     }
 
                     else
                     {
                         float tempf = 0;
-                        if (rule == (int) ScriptBaseClass.PSYS_PART_START_ALPHA)
+                        if (rule == (int)ScriptBaseClass.PSYS_PART_START_ALPHA)
                         {
-                            tempf = (float) rules.GetLSLFloatItem(i + 1);
+                            tempf = (float)rules.GetLSLFloatItem(i + 1);
                             prules.PartStartColor.A = tempf;
                         }
 
-                        else if (rule == (int) ScriptBaseClass.PSYS_PART_END_COLOR)
+                        else if (rule == (int)ScriptBaseClass.PSYS_PART_END_COLOR)
                         {
                             tempv = rules.GetVector3Item(i + 1);
-                            prules.PartEndColor.R = (float) tempv.x;
-                            prules.PartEndColor.G = (float) tempv.y;
-                            prules.PartEndColor.B = (float) tempv.z;
+                            prules.PartEndColor.R = (float)tempv.x;
+                            prules.PartEndColor.G = (float)tempv.y;
+                            prules.PartEndColor.B = (float)tempv.z;
                         }
 
-                        else if (rule == (int) ScriptBaseClass.PSYS_PART_END_ALPHA)
+                        else if (rule == (int)ScriptBaseClass.PSYS_PART_END_ALPHA)
                         {
-                            tempf = (float) rules.GetLSLFloatItem(i + 1);
+                            tempf = (float)rules.GetLSLFloatItem(i + 1);
                             prules.PartEndColor.A = tempf;
                         }
 
-                        else if (rule == (int) ScriptBaseClass.PSYS_PART_START_SCALE)
+                        else if (rule == (int)ScriptBaseClass.PSYS_PART_START_SCALE)
                         {
                             tempv = rules.GetVector3Item(i + 1);
-                            prules.PartStartScaleX = (float) tempv.x;
-                            prules.PartStartScaleY = (float) tempv.y;
+                            prules.PartStartScaleX = (float)tempv.x;
+                            prules.PartStartScaleY = (float)tempv.y;
                         }
 
-                        else if (rule == (int) ScriptBaseClass.PSYS_PART_END_SCALE)
+                        else if (rule == (int)ScriptBaseClass.PSYS_PART_END_SCALE)
                         {
                             tempv = rules.GetVector3Item(i + 1);
-                            prules.PartEndScaleX = (float) tempv.x;
-                            prules.PartEndScaleY = (float) tempv.y;
+                            prules.PartEndScaleX = (float)tempv.x;
+                            prules.PartEndScaleY = (float)tempv.y;
                         }
 
-                        else if (rule == (int) ScriptBaseClass.PSYS_PART_MAX_AGE)
+                        else if (rule == (int)ScriptBaseClass.PSYS_PART_MAX_AGE)
                         {
-                            tempf = (float) rules.GetLSLFloatItem(i + 1);
+                            tempf = (float)rules.GetLSLFloatItem(i + 1);
                             prules.PartMaxAge = tempf;
                         }
 
-                        else if (rule == (int) ScriptBaseClass.PSYS_SRC_ACCEL)
+                        else if (rule == (int)ScriptBaseClass.PSYS_SRC_ACCEL)
                         {
                             tempv = rules.GetVector3Item(i + 1);
-                            prules.PartAcceleration.X = (float) tempv.x;
-                            prules.PartAcceleration.Y = (float) tempv.y;
-                            prules.PartAcceleration.Z = (float) tempv.z;
+                            prules.PartAcceleration.X = (float)tempv.x;
+                            prules.PartAcceleration.Y = (float)tempv.y;
+                            prules.PartAcceleration.Z = (float)tempv.z;
                         }
 
-                        else if (rule == (int) ScriptBaseClass.PSYS_SRC_PATTERN)
+                        else if (rule == (int)ScriptBaseClass.PSYS_SRC_PATTERN)
                         {
                             int tmpi = rules.GetLSLIntegerItem(i + 1);
-                            prules.Pattern = (Primitive.ParticleSystem.SourcePattern) tmpi;
+                            prules.Pattern = (Primitive.ParticleSystem.SourcePattern)tmpi;
                         }
 
                             // PSYS_SRC_INNERANGLE and PSYS_SRC_ANGLE_BEGIN use the same variables. The
-                            // PSYS_SRC_OUTERANGLE and PSYS_SRC_ANGLE_END also use the same variable. The
-                            // client tells the difference between the two by looking at the 0x02 bit in
-                            // the PartFlags variable.
-                        else if (rule == (int) ScriptBaseClass.PSYS_SRC_INNERANGLE)
+                        // PSYS_SRC_OUTERANGLE and PSYS_SRC_ANGLE_END also use the same variable. The
+                        // client tells the difference between the two by looking at the 0x02 bit in
+                        // the PartFlags variable.
+                        else if (rule == (int)ScriptBaseClass.PSYS_SRC_INNERANGLE)
                         {
-                            tempf = (float) rules.GetLSLFloatItem(i + 1);
+                            tempf = (float)rules.GetLSLFloatItem(i + 1);
                             prules.InnerAngle = tempf;
                             prules.PartFlags &= 0xFFFFFFFD; // Make sure new angle format is off.
                         }
 
-                        else if (rule == (int) ScriptBaseClass.PSYS_SRC_OUTERANGLE)
+                        else if (rule == (int)ScriptBaseClass.PSYS_SRC_OUTERANGLE)
                         {
-                            tempf = (float) rules.GetLSLFloatItem(i + 1);
+                            tempf = (float)rules.GetLSLFloatItem(i + 1);
                             prules.OuterAngle = tempf;
                             prules.PartFlags &= 0xFFFFFFFD; // Make sure new angle format is off.
                         }
 
-                        else if (rule == (int) ScriptBaseClass.PSYS_SRC_TEXTURE)
+                        else if (rule == (int)ScriptBaseClass.PSYS_SRC_TEXTURE)
                         {
                             prules.Texture = KeyOrName(rules.GetLSLStringItem(i + 1), AssetType.Texture, false);
                         }
 
-                        else if (rule == (int) ScriptBaseClass.PSYS_SRC_BURST_RATE)
+                        else if (rule == (int)ScriptBaseClass.PSYS_SRC_BURST_RATE)
                         {
-                            tempf = (float) rules.GetLSLFloatItem(i + 1);
+                            tempf = (float)rules.GetLSLFloatItem(i + 1);
                             prules.BurstRate = tempf;
                         }
 
-                        else if (rule == (int) ScriptBaseClass.PSYS_SRC_BURST_PART_COUNT)
+                        else if (rule == (int)ScriptBaseClass.PSYS_SRC_BURST_PART_COUNT)
                         {
-                            prules.BurstPartCount = (byte) (int) rules.GetLSLIntegerItem(i + 1);
+                            prules.BurstPartCount = (byte)(int)rules.GetLSLIntegerItem(i + 1);
                         }
 
-                        else if (rule == (int) ScriptBaseClass.PSYS_SRC_BURST_RADIUS)
+                        else if (rule == (int)ScriptBaseClass.PSYS_SRC_BURST_RADIUS)
                         {
-                            tempf = (float) rules.GetLSLFloatItem(i + 1);
+                            tempf = (float)rules.GetLSLFloatItem(i + 1);
                             prules.BurstRadius = tempf;
                         }
 
-                        else if (rule == (int) ScriptBaseClass.PSYS_SRC_BURST_SPEED_MIN)
+                        else if (rule == (int)ScriptBaseClass.PSYS_SRC_BURST_SPEED_MIN)
                         {
-                            tempf = (float) rules.GetLSLFloatItem(i + 1);
+                            tempf = (float)rules.GetLSLFloatItem(i + 1);
                             prules.BurstSpeedMin = tempf;
                         }
 
-                        else if (rule == (int) ScriptBaseClass.PSYS_SRC_BURST_SPEED_MAX)
+                        else if (rule == (int)ScriptBaseClass.PSYS_SRC_BURST_SPEED_MAX)
                         {
-                            tempf = (float) rules.GetLSLFloatItem(i + 1);
+                            tempf = (float)rules.GetLSLFloatItem(i + 1);
                             prules.BurstSpeedMax = tempf;
                         }
 
-                        else if (rule == (int) ScriptBaseClass.PSYS_SRC_MAX_AGE)
+                        else if (rule == (int)ScriptBaseClass.PSYS_SRC_MAX_AGE)
                         {
-                            tempf = (float) rules.GetLSLFloatItem(i + 1);
+                            tempf = (float)rules.GetLSLFloatItem(i + 1);
                             prules.MaxAge = tempf;
                         }
 
-                        else if (rule == (int) ScriptBaseClass.PSYS_SRC_TARGET_KEY)
+                        else if (rule == (int)ScriptBaseClass.PSYS_SRC_TARGET_KEY)
                         {
                             UUID key = UUID.Zero;
                             prules.Target = UUID.TryParse(rules.Data[i + 1].ToString(), out key) ? key : part.UUID;
                         }
 
-                        else if (rule == (int) ScriptBaseClass.PSYS_SRC_OMEGA)
+                        else if (rule == (int)ScriptBaseClass.PSYS_SRC_OMEGA)
                         {
                             // AL: This is an assumption, since it is the only thing that would match.
                             tempv = rules.GetVector3Item(i + 1);
-                            prules.AngularVelocity.X = (float) tempv.x;
-                            prules.AngularVelocity.Y = (float) tempv.y;
-                            prules.AngularVelocity.Z = (float) tempv.z;
+                            prules.AngularVelocity.X = (float)tempv.x;
+                            prules.AngularVelocity.Y = (float)tempv.y;
+                            prules.AngularVelocity.Z = (float)tempv.z;
                         }
 
-                        else if (rule == (int) ScriptBaseClass.PSYS_SRC_ANGLE_BEGIN)
+                        else if (rule == (int)ScriptBaseClass.PSYS_SRC_ANGLE_BEGIN)
                         {
-                            tempf = (float) rules.GetLSLFloatItem(i + 1);
+                            tempf = (float)rules.GetLSLFloatItem(i + 1);
                             prules.InnerAngle = tempf;
                             prules.PartFlags |= 0x02; // Set new angle format.
                         }
 
-                        else if (rule == (int) ScriptBaseClass.PSYS_SRC_ANGLE_END)
+                        else if (rule == (int)ScriptBaseClass.PSYS_SRC_ANGLE_END)
                         {
-                            tempf = (float) rules.GetLSLFloatItem(i + 1);
+                            tempf = (float)rules.GetLSLFloatItem(i + 1);
                             prules.OuterAngle = tempf;
                             prules.PartFlags |= 0x02; // Set new angle format.
                         }
@@ -7466,8 +7184,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
             if (m_host.PhysActor != null)
             {
-                float ground = (float) llGround(new LSL_Types.Vector3(0, 0, 0));
-                float waterLevel = (float) llWater(new LSL_Types.Vector3(0, 0, 0));
+                float ground = (float)llGround(new LSL_Types.Vector3(0, 0, 0));
+                float waterLevel = (float)llWater(new LSL_Types.Vector3(0, 0, 0));
                 PIDHoverType hoverType = PIDHoverType.Ground;
                 if (water != 0)
                 {
@@ -7482,7 +7200,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     height += ground;
                 }
 
-                m_host.SetHoverHeight((float) height, hoverType, (float) tau);
+                m_host.SetHoverHeight((float)height, hoverType, (float)tau);
             }
         }
 
@@ -7537,10 +7255,10 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 return;
 
             byte[] bucket = new byte[17];
-            bucket[0] = (byte) AssetType.Folder;
+            bucket[0] = (byte)AssetType.Folder;
             byte[] objBytes = folderID.GetBytes();
             Array.Copy(objBytes, 0, bucket, 1, 16);
-            
+
             GridInstantMessage msg = new GridInstantMessage()
                 {
                     FromAgentID = m_host.UUID,
@@ -7583,7 +7301,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             {
                 if (!m_host.ParentEntity.IsDeleted)
                 {
-                    m_host.ParentEntity.RootChild.SetVehicleFloatParam(param, (float) value);
+                    m_host.ParentEntity.RootChild.SetVehicleFloatParam(param, (float)value);
                 }
             }
         }
@@ -7597,8 +7315,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 if (!m_host.ParentEntity.IsDeleted)
                 {
                     m_host.ParentEntity.RootChild.SetVehicleVectorParam(param,
-                                                                        new Vector3((float) vec.x, (float) vec.y,
-                                                                                    (float) vec.z));
+                                                                        new Vector3((float)vec.x, (float)vec.y,
+                                                                                    (float)vec.z));
                 }
             }
         }
@@ -7651,7 +7369,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (rot.s == 0 && rot.x == 0 && rot.y == 0 && rot.z == 0)
                 rot.z = 1; // ZERO_ROTATION = 0,0,0,1
 
-            m_host.SitTargetPosition = new Vector3((float) offset.x, (float) offset.y, (float) offset.z);
+            m_host.SitTargetPosition = new Vector3((float)offset.x, (float)offset.y, (float)offset.z);
             m_host.SitTargetOrientation = Rot2Quaternion(rot);
         }
 
@@ -7667,7 +7385,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (entities.Count == 0)
                 return;
 
-            entities[0].SitTargetPosition = new Vector3((float) offset.x, (float) offset.y, (float) offset.z);
+            entities[0].SitTargetPosition = new Vector3((float)offset.x, (float)offset.y, (float)offset.z);
             entities[0].SitTargetOrientation = Rot2Quaternion(rot);
         }
 
@@ -7737,8 +7455,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             List<ISceneChildEntity> entities = GetLinkParts(link);
             if (entities.Count > 0)
             {
-                entities[0].CameraEyeOffset = new Vector3((float) eye.x, (float) eye.y, (float) eye.z);
-                entities[0].CameraAtOffset = new Vector3((float) at.x, (float) at.y, (float) at.z);
+                entities[0].CameraEyeOffset = new Vector3((float)eye.x, (float)eye.y, (float)eye.z);
+                entities[0].CameraAtOffset = new Vector3((float)at.x, (float)at.y, (float)at.z);
             }
         }
 
@@ -7746,14 +7464,14 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
 
-            m_host.CameraEyeOffset = new Vector3((float) offset.x, (float) offset.y, (float) offset.z);
+            m_host.CameraEyeOffset = new Vector3((float)offset.x, (float)offset.y, (float)offset.z);
         }
 
         public void llSetCameraAtOffset(LSL_Vector offset)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
 
-            m_host.CameraAtOffset = new Vector3((float) offset.x, (float) offset.y, (float) offset.z);
+            m_host.CameraAtOffset = new Vector3((float)offset.x, (float)offset.y, (float)offset.z);
         }
 
         public LSL_String llDumpList2String(LSL_List src, string seperator)
@@ -7776,7 +7494,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return 0;
 
             bool result = m_ScriptEngine.PipeEventsForScript(m_host,
-                                                             new Vector3((float) pos.x, (float) pos.y, (float) pos.z));
+                                                             new Vector3((float)pos.x, (float)pos.y, (float)pos.z));
             if (result)
             {
                 return 1;
@@ -7803,7 +7521,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             }
             if (buttons.Length > 12)
             {
-                LSLError("No more than 12 buttons can be shown");
+                Error("llDialog", "No more than 12 buttons can be shown");
                 return DateTime.Now;
             }
             string[] buts = new string[buttons.Length];
@@ -7811,18 +7529,18 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             {
                 if (buttons.Data[i].ToString() == String.Empty)
                 {
-                    LSLError("button label cannot be blank");
+                    Error("llDialog", "Button label cannot be blank");
                     return DateTime.Now;
                 }
                 if (buttons.Data[i].ToString().Length > 24)
                 {
-                    LSLError("button label cannot be longer than 24 characters");
+                    Error("llDialog", "Button label cannot be longer than 24 characters");
                     return DateTime.Now;
                 }
                 buts[i] = buttons.Data[i].ToString();
             }
             if (buts.Length == 0)
-                buts = new[] {"OK"};
+                buts = new[] { "OK" };
 
             dm.SendDialogToUser(
                 av, m_host.Name, m_host.UUID, m_host.OwnerID,
@@ -7854,7 +7572,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 return DateTime.Now;
 
             // Report an error as it does in SL
-            ShoutError("Deprecated. Please use llRemoteLoadScriptPin instead.");
+            Deprecated("llRemoteLoadScript", "Use llRemoteLoadScriptPin instead");
             return PScriptSleep(3000);
         }
 
@@ -7876,7 +7594,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
             if (!UUID.TryParse(target, out destId))
             {
-                llSay(0, "Could not parse key " + target);
+                Error("llRemoteLoadScriptPin", "Can't parse key '" + target + "'");
                 return DateTime.Now;
             }
 
@@ -7906,7 +7624,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
             if (!found)
             {
-                llSay(0, "Could not find script " + name);
+                Error("llRemoteLoadScriptPin", "Can't find script '" + name + "'");
                 return DateTime.Now;
             }
 
@@ -8002,14 +7720,14 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         {
             ObjectShapePacket.ObjectDataBlock shapeBlock = new ObjectShapePacket.ObjectDataBlock();
 
-            if (holeshape != (int) ScriptBaseClass.PRIM_HOLE_DEFAULT &&
-                holeshape != (int) ScriptBaseClass.PRIM_HOLE_CIRCLE &&
-                holeshape != (int) ScriptBaseClass.PRIM_HOLE_SQUARE &&
-                holeshape != (int) ScriptBaseClass.PRIM_HOLE_TRIANGLE)
+            if (holeshape != (int)ScriptBaseClass.PRIM_HOLE_DEFAULT &&
+                holeshape != (int)ScriptBaseClass.PRIM_HOLE_CIRCLE &&
+                holeshape != (int)ScriptBaseClass.PRIM_HOLE_SQUARE &&
+                holeshape != (int)ScriptBaseClass.PRIM_HOLE_TRIANGLE)
             {
                 holeshape = ScriptBaseClass.PRIM_HOLE_DEFAULT;
             }
-            shapeBlock.ProfileCurve = (byte) holeshape;
+            shapeBlock.ProfileCurve = (byte)holeshape;
             if (cut.x < 0f)
             {
                 cut.x = 0f;
@@ -8035,8 +7753,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     cut.y = 0.05f;
                 }
             }
-            shapeBlock.ProfileBegin = (ushort) (50000*cut.x);
-            shapeBlock.ProfileEnd = (ushort) (50000*(1 - cut.y));
+            shapeBlock.ProfileBegin = (ushort)(50000 * cut.x);
+            shapeBlock.ProfileEnd = (ushort)(50000 * (1 - cut.y));
             if (hollow < 0f)
             {
                 hollow = 0f;
@@ -8045,7 +7763,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             {
                 hollow = 0.95f;
             }
-            shapeBlock.ProfileHollow = (ushort) (50000*hollow);
+            shapeBlock.ProfileHollow = (ushort)(50000 * hollow);
             if (twist.x < -1.0f)
             {
                 twist.x = -1.0f;
@@ -8072,10 +7790,10 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             // sbyte, works for both .Net and Mono. These types of
             // assignments occur in SetPrimtiveBlockShapeParams and
             // SetPrimitiveShapeParams in support of llSetPrimitiveParams.
-            float tempFloat = (float) (100.0d*twist.x);
-            shapeBlock.PathTwistBegin = (sbyte) tempFloat;
-            tempFloat = (float) (100.0d*twist.y);
-            shapeBlock.PathTwist = (sbyte) tempFloat;
+            float tempFloat = (float)(100.0d * twist.x);
+            shapeBlock.PathTwistBegin = (sbyte)tempFloat;
+            tempFloat = (float)(100.0d * twist.y);
+            shapeBlock.PathTwist = (sbyte)tempFloat;
 
             shapeBlock.ObjectLocalID = part.LocalId;
 
@@ -8110,10 +7828,10 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             {
                 taper_b.y = 2f;
             }
-            float tempFloat = (float) (100.0d*(2.0d - taper_b.x));
-            shapeBlock.PathScaleX = (byte) tempFloat;
-            tempFloat = (float) (100.0d*(2.0d - taper_b.y));
-            shapeBlock.PathScaleY = (byte) tempFloat;
+            float tempFloat = (float)(100.0d * (2.0d - taper_b.x));
+            shapeBlock.PathScaleX = (byte)tempFloat;
+            tempFloat = (float)(100.0d * (2.0d - taper_b.y));
+            shapeBlock.PathScaleY = (byte)tempFloat;
             if (topshear.x < -0.5f)
             {
                 topshear.x = -0.5f;
@@ -8130,10 +7848,10 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             {
                 topshear.y = 0.5f;
             }
-            tempFloat = (float) (100.0d*topshear.x);
-            shapeBlock.PathShearX = (byte) tempFloat;
-            tempFloat = (float) (100.0d*topshear.y);
-            shapeBlock.PathShearY = (byte) tempFloat;
+            tempFloat = (float)(100.0d * topshear.x);
+            shapeBlock.PathShearX = (byte)tempFloat;
+            tempFloat = (float)(100.0d * topshear.y);
+            shapeBlock.PathShearY = (byte)tempFloat;
 
             part.Shape.SculptEntry = false;
             part.UpdateShape(shapeBlock);
@@ -8174,8 +7892,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             {
                 dimple.x = cut.y - 0.05f;
             }
-            shapeBlock.ProfileBegin = (ushort) (50000*dimple.x);
-            shapeBlock.ProfileEnd = (ushort) (50000*(1 - dimple.y));
+            shapeBlock.ProfileBegin = (ushort)(50000 * dimple.x);
+            shapeBlock.ProfileEnd = (ushort)(50000 * (1 - dimple.y));
 
             part.Shape.SculptEntry = false;
             part.UpdateShape(shapeBlock);
@@ -8211,10 +7929,10 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             {
                 holesize.y = 0.5f;
             }
-            float tempFloat = (float) (100.0d*(2.0d - holesize.x));
-            shapeBlock.PathScaleX = (byte) tempFloat;
-            tempFloat = (float) (100.0d*(2.0d - holesize.y));
-            shapeBlock.PathScaleY = (byte) tempFloat;
+            float tempFloat = (float)(100.0d * (2.0d - holesize.x));
+            shapeBlock.PathScaleX = (byte)tempFloat;
+            tempFloat = (float)(100.0d * (2.0d - holesize.y));
+            shapeBlock.PathScaleY = (byte)tempFloat;
             if (topshear.x < -0.5f)
             {
                 topshear.x = -0.5f;
@@ -8231,10 +7949,10 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             {
                 topshear.y = 0.5f;
             }
-            tempFloat = (float) (100.0d*topshear.x);
-            shapeBlock.PathShearX = (byte) tempFloat;
-            tempFloat = (float) (100.0d*topshear.y);
-            shapeBlock.PathShearY = (byte) tempFloat;
+            tempFloat = (float)(100.0d * topshear.x);
+            shapeBlock.PathShearX = (byte)tempFloat;
+            tempFloat = (float)(100.0d * topshear.y);
+            shapeBlock.PathShearY = (byte)tempFloat;
             if (profilecut.x < 0f)
             {
                 profilecut.x = 0f;
@@ -8260,8 +7978,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     profilecut.y = 0.05f;
                 }
             }
-            shapeBlock.ProfileBegin = (ushort) (50000*profilecut.x);
-            shapeBlock.ProfileEnd = (ushort) (50000*(1 - profilecut.y));
+            shapeBlock.ProfileBegin = (ushort)(50000 * profilecut.x);
+            shapeBlock.ProfileEnd = (ushort)(50000 * (1 - profilecut.y));
             if (taper_a.x < -1f)
             {
                 taper_a.x = -1f;
@@ -8278,10 +7996,10 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             {
                 taper_a.y = 1f;
             }
-            tempFloat = (float) (100.0d*taper_a.x);
-            shapeBlock.PathTaperX = (sbyte) tempFloat;
-            tempFloat = (float) (100.0d*taper_a.y);
-            shapeBlock.PathTaperY = (sbyte) tempFloat;
+            tempFloat = (float)(100.0d * taper_a.x);
+            shapeBlock.PathTaperX = (sbyte)tempFloat;
+            tempFloat = (float)(100.0d * taper_a.y);
+            shapeBlock.PathTaperY = (sbyte)tempFloat;
             if (revolutions < 1f)
             {
                 revolutions = 1f;
@@ -8290,8 +8008,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             {
                 revolutions = 4f;
             }
-            tempFloat = 66.66667f*(revolutions - 1.0f);
-            shapeBlock.PathRevolutions = (byte) tempFloat;
+            tempFloat = 66.66667f * (revolutions - 1.0f);
+            shapeBlock.PathRevolutions = (byte)tempFloat;
             // limits on radiusoffset depend on revolutions and hole size (how?) seems like the maximum range is 0 to 1
             if (radiusoffset < 0f)
             {
@@ -8301,8 +8019,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             {
                 radiusoffset = 1f;
             }
-            tempFloat = 100.0f*radiusoffset;
-            shapeBlock.PathRadiusOffset = (sbyte) tempFloat;
+            tempFloat = 100.0f * radiusoffset;
+            shapeBlock.PathRadiusOffset = (sbyte)tempFloat;
             if (skew < -0.95f)
             {
                 skew = -0.95f;
@@ -8311,8 +8029,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             {
                 skew = 0.95f;
             }
-            tempFloat = 100.0f*skew;
-            shapeBlock.PathSkew = (sbyte) tempFloat;
+            tempFloat = 100.0f * skew;
+            shapeBlock.PathSkew = (sbyte)tempFloat;
 
             part.Shape.SculptEntry = false;
             part.UpdateShape(shapeBlock);
@@ -8331,12 +8049,12 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             shapeBlock.PathScaleY = 150;
 
             int onlytype = (type & (ScriptBaseClass.PRIM_SCULPT_FLAG_INVERT | ScriptBaseClass.PRIM_SCULPT_FLAG_MIRROR));
-                //Removes the sculpt flags according to libOMV
-            if (onlytype != (int) ScriptBaseClass.PRIM_SCULPT_TYPE_CYLINDER &&
-                onlytype != (int) ScriptBaseClass.PRIM_SCULPT_TYPE_PLANE &&
-                onlytype != (int) ScriptBaseClass.PRIM_SCULPT_TYPE_SPHERE &&
-                onlytype != (int) ScriptBaseClass.PRIM_SCULPT_TYPE_TORUS &&
-                onlytype != (int) ScriptBaseClass.PRIM_SCULPT_TYPE_MESH)
+            //Removes the sculpt flags according to libOMV
+            if (onlytype != (int)ScriptBaseClass.PRIM_SCULPT_TYPE_CYLINDER &&
+                onlytype != (int)ScriptBaseClass.PRIM_SCULPT_TYPE_PLANE &&
+                onlytype != (int)ScriptBaseClass.PRIM_SCULPT_TYPE_SPHERE &&
+                onlytype != (int)ScriptBaseClass.PRIM_SCULPT_TYPE_TORUS &&
+                onlytype != (int)ScriptBaseClass.PRIM_SCULPT_TYPE_MESH)
             {
                 // default
                 type |= ScriptBaseClass.PRIM_SCULPT_TYPE_SPHERE;
@@ -8345,7 +8063,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             // retain pathcurve
             shapeBlock.PathCurve = part.Shape.PathCurve;
             bool changedTextureID = part.Shape.SculptTexture != sculptId;
-            part.Shape.SetSculptProperties((byte) type, sculptId);
+            part.Shape.SetSculptProperties((byte)type, sculptId);
             part.Shape.SculptEntry = true;
             part.UpdateShape(shapeBlock, changedTextureID);
         }
@@ -8396,7 +8114,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 int face;
                 LSL_Vector v;
 
-                if (code == (int) ScriptBaseClass.PRIM_NAME)
+                if (code == (int)ScriptBaseClass.PRIM_NAME)
                 {
                     if (remain < 1)
                         return;
@@ -8406,7 +8124,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                         (part as ISceneChildEntity).Name = name;
                 }
 
-                else if (code == (int) ScriptBaseClass.PRIM_DESC)
+                else if (code == (int)ScriptBaseClass.PRIM_DESC)
                 {
                     if (remain < 1)
                         return;
@@ -8416,7 +8134,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                         (part as ISceneChildEntity).Description = desc;
                 }
 
-                else if (code == (int) ScriptBaseClass.PRIM_ROT_LOCAL)
+                else if (code == (int)ScriptBaseClass.PRIM_ROT_LOCAL)
                 {
                     if (remain < 1)
                         return;
@@ -8425,7 +8143,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                         SetRot((part as ISceneChildEntity), Rot2Quaternion(lr));
                 }
 
-                else if (code == (int) ScriptBaseClass.PRIM_POSITION)
+                else if (code == (int)ScriptBaseClass.PRIM_POSITION)
                 {
                     if (remain < 1)
                         return;
@@ -8435,11 +8153,11 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                         SetPos(part as ISceneChildEntity, GetPartLocalPos(part as ISceneChildEntity) + v, true);
                     else if (part is IScenePresence)
                     {
-                        (part as IScenePresence).OffsetPosition = new Vector3((float) v.x, (float) v.y, (float) v.z);
+                        (part as IScenePresence).OffsetPosition = new Vector3((float)v.x, (float)v.y, (float)v.z);
                         (part as IScenePresence).SendTerseUpdateToAllClients();
                     }
                 }
-                else if (code == (int) ScriptBaseClass.PRIM_POS_LOCAL)
+                else if (code == (int)ScriptBaseClass.PRIM_POS_LOCAL)
                 {
                     if (remain < 1)
                         return;
@@ -8447,19 +8165,19 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     v = rules.GetVector3Item(idx++);
                     if (part is ISceneChildEntity)
                     {
-                        if (((ISceneChildEntity) part).ParentID != 0)
-                            ((ISceneChildEntity) part).OffsetPosition = new Vector3((float) v.x, (float) v.y,
-                                                                                    (float) v.z);
+                        if (((ISceneChildEntity)part).ParentID != 0)
+                            ((ISceneChildEntity)part).OffsetPosition = new Vector3((float)v.x, (float)v.y,
+                                                                                    (float)v.z);
                         else
-                            part.AbsolutePosition = new Vector3((float) v.x, (float) v.y, (float) v.z);
+                            part.AbsolutePosition = new Vector3((float)v.x, (float)v.y, (float)v.z);
                     }
                     else if (part is IScenePresence)
                     {
-                        (part as IScenePresence).OffsetPosition = new Vector3((float) v.x, (float) v.y, (float) v.z);
+                        (part as IScenePresence).OffsetPosition = new Vector3((float)v.x, (float)v.y, (float)v.z);
                         (part as IScenePresence).SendTerseUpdateToAllClients();
                     }
                 }
-                else if (code == (int) ScriptBaseClass.PRIM_SIZE)
+                else if (code == (int)ScriptBaseClass.PRIM_SIZE)
                 {
                     if (remain < 1)
                         return;
@@ -8469,7 +8187,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     if (part is ISceneChildEntity)
                         SetScale(part as ISceneChildEntity, v);
                 }
-                else if (code == (int) ScriptBaseClass.PRIM_ROTATION)
+                else if (code == (int)ScriptBaseClass.PRIM_ROTATION)
                 {
                     if (remain < 1)
                         return;
@@ -8492,24 +8210,24 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                                 ISceneChildEntity rootPart = group.RootChild;
                                 if (rootPart != null) // again, better safe than sorry
                                 {
-                                    SetRot((part as ISceneChildEntity), rootPart.GetRotationOffset()*Rot2Quaternion(q));
+                                    SetRot((part as ISceneChildEntity), rootPart.GetRotationOffset() * Rot2Quaternion(q));
                                 }
                             }
                         }
                     }
                     else if (part is IScenePresence)
                     {
-                        IScenePresence sp = (IScenePresence) part;
+                        IScenePresence sp = (IScenePresence)part;
                         ISceneChildEntity childObj = sp.Scene.GetSceneObjectPart(sp.SittingOnUUID);
                         if (childObj != null)
                         {
-                            sp.Rotation = childObj.ParentEntity.GroupRotation*Rot2Quaternion(q);
+                            sp.Rotation = childObj.ParentEntity.GroupRotation * Rot2Quaternion(q);
                             sp.SendTerseUpdateToAllClients();
                         }
                     }
                 }
 
-                else if (code == (int) ScriptBaseClass.PRIM_TYPE)
+                else if (code == (int)ScriptBaseClass.PRIM_TYPE)
                 {
                     if (remain < 3)
                         return;
@@ -8533,149 +8251,149 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     LSL_Vector holesize;
                     LSL_Vector profilecut;
 
-                    if (code == (int) ScriptBaseClass.PRIM_TYPE_BOX)
+                    if (code == (int)ScriptBaseClass.PRIM_TYPE_BOX)
                     {
                         if (remain < 6)
                             return;
 
                         face = rules.GetLSLIntegerItem(idx++);
                         v = rules.GetVector3Item(idx++); // cut
-                        hollow = (float) rules.GetLSLFloatItem(idx++);
+                        hollow = (float)rules.GetLSLFloatItem(idx++);
                         twist = rules.GetVector3Item(idx++);
                         taper_b = rules.GetVector3Item(idx++);
                         topshear = rules.GetVector3Item(idx++);
 
-                        (part as ISceneChildEntity).Shape.PathCurve = (byte) Extrusion.Straight;
+                        (part as ISceneChildEntity).Shape.PathCurve = (byte)Extrusion.Straight;
                         SetPrimitiveShapeParams((part as ISceneChildEntity), face, v, hollow, twist, taper_b, topshear,
                                                 1);
                     }
 
-                    else if (code == (int) ScriptBaseClass.PRIM_TYPE_CYLINDER)
+                    else if (code == (int)ScriptBaseClass.PRIM_TYPE_CYLINDER)
                     {
                         if (remain < 6)
                             return;
 
                         face = rules.GetLSLIntegerItem(idx++); // holeshape
                         v = rules.GetVector3Item(idx++); // cut
-                        hollow = (float) rules.GetLSLFloatItem(idx++);
+                        hollow = (float)rules.GetLSLFloatItem(idx++);
                         twist = rules.GetVector3Item(idx++);
                         taper_b = rules.GetVector3Item(idx++);
                         topshear = rules.GetVector3Item(idx++);
                         (part as ISceneChildEntity).Shape.ProfileShape = ProfileShape.Circle;
-                        (part as ISceneChildEntity).Shape.PathCurve = (byte) Extrusion.Straight;
+                        (part as ISceneChildEntity).Shape.PathCurve = (byte)Extrusion.Straight;
                         SetPrimitiveShapeParams((part as ISceneChildEntity), face, v, hollow, twist, taper_b, topshear,
                                                 0);
                     }
 
-                    else if (code == (int) ScriptBaseClass.PRIM_TYPE_PRISM)
+                    else if (code == (int)ScriptBaseClass.PRIM_TYPE_PRISM)
                     {
                         if (remain < 6)
                             return;
 
                         face = rules.GetLSLIntegerItem(idx++); // holeshape
                         v = rules.GetVector3Item(idx++); //cut
-                        hollow = (float) rules.GetLSLFloatItem(idx++);
+                        hollow = (float)rules.GetLSLFloatItem(idx++);
                         twist = rules.GetVector3Item(idx++);
                         taper_b = rules.GetVector3Item(idx++);
                         topshear = rules.GetVector3Item(idx++);
-                        (part as ISceneChildEntity).Shape.PathCurve = (byte) Extrusion.Straight;
+                        (part as ISceneChildEntity).Shape.PathCurve = (byte)Extrusion.Straight;
                         SetPrimitiveShapeParams((part as ISceneChildEntity), face, v, hollow, twist, taper_b, topshear,
                                                 3);
                     }
 
-                    else if (code == (int) ScriptBaseClass.PRIM_TYPE_SPHERE)
+                    else if (code == (int)ScriptBaseClass.PRIM_TYPE_SPHERE)
                     {
                         if (remain < 5)
                             return;
 
                         face = rules.GetLSLIntegerItem(idx++); // holeshape
                         v = rules.GetVector3Item(idx++); // cut
-                        hollow = (float) rules.GetLSLFloatItem(idx++);
+                        hollow = (float)rules.GetLSLFloatItem(idx++);
                         twist = rules.GetVector3Item(idx++);
                         taper_b = rules.GetVector3Item(idx++); // dimple
-                        (part as ISceneChildEntity).Shape.PathCurve = (byte) Extrusion.Curve1;
+                        (part as ISceneChildEntity).Shape.PathCurve = (byte)Extrusion.Curve1;
                         SetPrimitiveShapeParams((part as ISceneChildEntity), face, v, hollow, twist, taper_b, 5);
                     }
 
-                    else if (code == (int) ScriptBaseClass.PRIM_TYPE_TORUS)
+                    else if (code == (int)ScriptBaseClass.PRIM_TYPE_TORUS)
                     {
                         if (remain < 11)
                             return;
 
                         face = rules.GetLSLIntegerItem(idx++); // holeshape
                         v = rules.GetVector3Item(idx++); //cut
-                        hollow = (float) rules.GetLSLFloatItem(idx++);
+                        hollow = (float)rules.GetLSLFloatItem(idx++);
                         twist = rules.GetVector3Item(idx++);
                         holesize = rules.GetVector3Item(idx++);
                         topshear = rules.GetVector3Item(idx++);
                         profilecut = rules.GetVector3Item(idx++);
                         taper_b = rules.GetVector3Item(idx++); // taper_a
-                        revolutions = (float) rules.GetLSLFloatItem(idx++);
-                        radiusoffset = (float) rules.GetLSLFloatItem(idx++);
-                        skew = (float) rules.GetLSLFloatItem(idx++);
-                        (part as ISceneChildEntity).Shape.PathCurve = (byte) Extrusion.Curve1;
+                        revolutions = (float)rules.GetLSLFloatItem(idx++);
+                        radiusoffset = (float)rules.GetLSLFloatItem(idx++);
+                        skew = (float)rules.GetLSLFloatItem(idx++);
+                        (part as ISceneChildEntity).Shape.PathCurve = (byte)Extrusion.Curve1;
                         SetPrimitiveShapeParams((part as ISceneChildEntity), face, v, hollow, twist, holesize, topshear,
                                                 profilecut, taper_b,
                                                 revolutions, radiusoffset, skew, 0);
                     }
 
-                    else if (code == (int) ScriptBaseClass.PRIM_TYPE_TUBE)
+                    else if (code == (int)ScriptBaseClass.PRIM_TYPE_TUBE)
                     {
                         if (remain < 11)
                             return;
 
                         face = rules.GetLSLIntegerItem(idx++); // holeshape
                         v = rules.GetVector3Item(idx++); //cut
-                        hollow = (float) rules.GetLSLFloatItem(idx++);
+                        hollow = (float)rules.GetLSLFloatItem(idx++);
                         twist = rules.GetVector3Item(idx++);
                         holesize = rules.GetVector3Item(idx++);
                         topshear = rules.GetVector3Item(idx++);
                         profilecut = rules.GetVector3Item(idx++);
                         taper_b = rules.GetVector3Item(idx++); // taper_a
-                        revolutions = (float) rules.GetLSLFloatItem(idx++);
-                        radiusoffset = (float) rules.GetLSLFloatItem(idx++);
-                        skew = (float) rules.GetLSLFloatItem(idx++);
-                        (part as ISceneChildEntity).Shape.PathCurve = (byte) Extrusion.Curve1;
+                        revolutions = (float)rules.GetLSLFloatItem(idx++);
+                        radiusoffset = (float)rules.GetLSLFloatItem(idx++);
+                        skew = (float)rules.GetLSLFloatItem(idx++);
+                        (part as ISceneChildEntity).Shape.PathCurve = (byte)Extrusion.Curve1;
                         SetPrimitiveShapeParams((part as ISceneChildEntity), face, v, hollow, twist, holesize, topshear,
                                                 profilecut, taper_b,
                                                 revolutions, radiusoffset, skew, 1);
                     }
 
-                    else if (code == (int) ScriptBaseClass.PRIM_TYPE_RING)
+                    else if (code == (int)ScriptBaseClass.PRIM_TYPE_RING)
                     {
                         if (remain < 11)
                             return;
 
                         face = rules.GetLSLIntegerItem(idx++); // holeshape
                         v = rules.GetVector3Item(idx++); //cut
-                        hollow = (float) rules.GetLSLFloatItem(idx++);
+                        hollow = (float)rules.GetLSLFloatItem(idx++);
                         twist = rules.GetVector3Item(idx++);
                         holesize = rules.GetVector3Item(idx++);
                         topshear = rules.GetVector3Item(idx++);
                         profilecut = rules.GetVector3Item(idx++);
                         taper_b = rules.GetVector3Item(idx++); // taper_a
-                        revolutions = (float) rules.GetLSLFloatItem(idx++);
-                        radiusoffset = (float) rules.GetLSLFloatItem(idx++);
-                        skew = (float) rules.GetLSLFloatItem(idx++);
-                        (part as ISceneChildEntity).Shape.PathCurve = (byte) Extrusion.Curve1;
+                        revolutions = (float)rules.GetLSLFloatItem(idx++);
+                        radiusoffset = (float)rules.GetLSLFloatItem(idx++);
+                        skew = (float)rules.GetLSLFloatItem(idx++);
+                        (part as ISceneChildEntity).Shape.PathCurve = (byte)Extrusion.Curve1;
                         SetPrimitiveShapeParams((part as ISceneChildEntity), face, v, hollow, twist, holesize, topshear,
                                                 profilecut, taper_b,
                                                 revolutions, radiusoffset, skew, 3);
                     }
 
-                    else if (code == (int) ScriptBaseClass.PRIM_TYPE_SCULPT)
+                    else if (code == (int)ScriptBaseClass.PRIM_TYPE_SCULPT)
                     {
                         if (remain < 2)
                             return;
 
                         string map = rules.Data[idx++].ToString();
                         face = rules.GetLSLIntegerItem(idx++); // type
-                        (part as ISceneChildEntity).Shape.PathCurve = (byte) Extrusion.Curve1;
+                        (part as ISceneChildEntity).Shape.PathCurve = (byte)Extrusion.Curve1;
                         SetPrimitiveShapeParams((part as ISceneChildEntity), map, face);
                     }
                 }
 
-                else if (code == (int) ScriptBaseClass.PRIM_TEXTURE)
+                else if (code == (int)ScriptBaseClass.PRIM_TEXTURE)
                 {
                     if (remain < 5)
                         return;
@@ -8696,7 +8414,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     RotateTexture((part as ISceneChildEntity), rotation, face);
                 }
 
-                else if (code == (int) ScriptBaseClass.PRIM_COLOR)
+                else if (code == (int)ScriptBaseClass.PRIM_COLOR)
                 {
                     if (remain < 3)
                         return;
@@ -8710,11 +8428,11 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     double alpha = rules.GetLSLFloatItem(idx++);
 
                     (part as ISceneChildEntity).SetFaceColor(
-                        new Vector3((float) color.x, (float) color.y, (float) color.z), face);
+                        new Vector3((float)color.x, (float)color.y, (float)color.z), face);
                     SetAlpha((part as ISceneChildEntity), alpha, face);
                 }
 
-                else if (code == (int) ScriptBaseClass.PRIM_FLEXIBLE)
+                else if (code == (int)ScriptBaseClass.PRIM_FLEXIBLE)
                 {
                     if (remain < 7)
                         return;
@@ -8722,15 +8440,15 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                         return;
                     bool flexi = rules.GetLSLIntegerItem(idx++);
                     int softness = rules.GetLSLIntegerItem(idx++);
-                    float gravity = (float) rules.GetLSLFloatItem(idx++);
-                    float friction = (float) rules.GetLSLFloatItem(idx++);
-                    float wind = (float) rules.GetLSLFloatItem(idx++);
-                    float tension = (float) rules.GetLSLFloatItem(idx++);
+                    float gravity = (float)rules.GetLSLFloatItem(idx++);
+                    float friction = (float)rules.GetLSLFloatItem(idx++);
+                    float wind = (float)rules.GetLSLFloatItem(idx++);
+                    float tension = (float)rules.GetLSLFloatItem(idx++);
                     LSL_Vector force = rules.GetVector3Item(idx++);
 
                     SetFlexi((part as ISceneChildEntity), flexi, softness, gravity, friction, wind, tension, force);
                 }
-                else if (code == (int) ScriptBaseClass.PRIM_POINT_LIGHT)
+                else if (code == (int)ScriptBaseClass.PRIM_POINT_LIGHT)
                 {
                     if (remain < 5)
                         return;
@@ -8738,25 +8456,25 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                         return;
                     bool light = rules.GetLSLIntegerItem(idx++);
                     LSL_Vector lightcolor = rules.GetVector3Item(idx++);
-                    float intensity = (float) rules.GetLSLFloatItem(idx++);
-                    float radius = (float) rules.GetLSLFloatItem(idx++);
-                    float falloff = (float) rules.GetLSLFloatItem(idx++);
+                    float intensity = (float)rules.GetLSLFloatItem(idx++);
+                    float radius = (float)rules.GetLSLFloatItem(idx++);
+                    float falloff = (float)rules.GetLSLFloatItem(idx++);
 
                     SetPointLight((part as ISceneChildEntity), light, lightcolor, intensity, radius, falloff);
                 }
 
-                else if (code == (int) ScriptBaseClass.PRIM_GLOW)
+                else if (code == (int)ScriptBaseClass.PRIM_GLOW)
                 {
                     if (remain < 2)
                         return;
                     if (!(part is ISceneChildEntity))
                         return;
                     face = rules.GetLSLIntegerItem(idx++);
-                    float glow = (float) rules.GetLSLFloatItem(idx++);
+                    float glow = (float)rules.GetLSLFloatItem(idx++);
 
                     SetGlow((part as ISceneChildEntity), face, glow);
                 }
-                else if (code == (int) ScriptBaseClass.PRIM_BUMP_SHINY)
+                else if (code == (int)ScriptBaseClass.PRIM_BUMP_SHINY)
                 {
                     if (remain < 3)
                         return;
@@ -8764,11 +8482,11 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                         return;
                     face = rules.GetLSLIntegerItem(idx++);
                     int shiny = rules.GetLSLIntegerItem(idx++);
-                    Bumpiness bump = (Bumpiness) Convert.ToByte((int) rules.GetLSLIntegerItem(idx++));
+                    Bumpiness bump = (Bumpiness)Convert.ToByte((int)rules.GetLSLIntegerItem(idx++));
 
                     SetShiny(part as ISceneChildEntity, face, shiny, bump);
                 }
-                else if (code == (int) ScriptBaseClass.PRIM_FULLBRIGHT)
+                else if (code == (int)ScriptBaseClass.PRIM_FULLBRIGHT)
                 {
                     if (remain < 2)
                         return;
@@ -8779,7 +8497,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     SetFullBright(part as ISceneChildEntity, face, st);
                 }
 
-                else if (code == (int) ScriptBaseClass.PRIM_MATERIAL)
+                else if (code == (int)ScriptBaseClass.PRIM_MATERIAL)
                 {
                     if (remain < 1)
                         return;
@@ -8791,7 +8509,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
                     (part as ISceneChildEntity).UpdateMaterial(mat);
                 }
-                else if (code == (int) ScriptBaseClass.PRIM_PHANTOM)
+                else if (code == (int)ScriptBaseClass.PRIM_PHANTOM)
                 {
                     if (remain < 1)
                         return;
@@ -8803,7 +8521,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
                     (part as ISceneChildEntity).ScriptSetPhantomStatus(phantom);
                 }
-                else if (code == (int) ScriptBaseClass.PRIM_PHYSICS)
+                else if (code == (int)ScriptBaseClass.PRIM_PHYSICS)
                 {
                     if (remain < 1)
                         return;
@@ -8813,7 +8531,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
                     m_host.ParentEntity.ScriptSetPhysicsStatus(phy.Equals("1"));
                 }
-                else if (code == (int) ScriptBaseClass.PRIM_TEMP_ON_REZ)
+                else if (code == (int)ScriptBaseClass.PRIM_TEMP_ON_REZ)
                 {
                     if (remain < 1)
                         return;
@@ -8825,7 +8543,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
                     (part as ISceneChildEntity).ScriptSetTemporaryStatus(tempOnRez);
                 }
-                else if (code == (int) ScriptBaseClass.PRIM_TEXGEN)
+                else if (code == (int)ScriptBaseClass.PRIM_TEXGEN)
                 {
                     if (remain < 2)
                         return;
@@ -8836,7 +8554,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     int style = rules.GetLSLIntegerItem(idx++);
                     SetTexGen((part as ISceneChildEntity), face, style);
                 }
-                else if (code == (int) ScriptBaseClass.PRIM_TEXT)
+                else if (code == (int)ScriptBaseClass.PRIM_TEXT)
                 {
                     if (remain < 3)
                         return;
@@ -8845,12 +8563,12 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     string primText = rules.GetLSLStringItem(idx++);
                     LSL_Vector primTextColor = rules.GetVector3Item(idx++);
                     LSL_Float primTextAlpha = rules.GetLSLFloatItem(idx++);
-                    Vector3 av3 = new Vector3(Util.Clip((float) primTextColor.x, 0.0f, 1.0f),
-                                              Util.Clip((float) primTextColor.y, 0.0f, 1.0f),
-                                              Util.Clip((float) primTextColor.z, 0.0f, 1.0f));
-                    (part as ISceneChildEntity).SetText(primText, av3, Util.Clip((float) primTextAlpha, 0.0f, 1.0f));
+                    Vector3 av3 = new Vector3(Util.Clip((float)primTextColor.x, 0.0f, 1.0f),
+                                              Util.Clip((float)primTextColor.y, 0.0f, 1.0f),
+                                              Util.Clip((float)primTextColor.z, 0.0f, 1.0f));
+                    (part as ISceneChildEntity).SetText(primText, av3, Util.Clip((float)primTextAlpha, 0.0f, 1.0f));
                 }
-                else if (code == (int) ScriptBaseClass.PRIM_OMEGA)
+                else if (code == (int)ScriptBaseClass.PRIM_OMEGA)
                 {
                     if (remain < 3)
                         return;
@@ -8860,7 +8578,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     if (part is ISceneChildEntity)
                         llTargetOmega(direction, spinrate, gain);
                 }
-                else if (code == (int) ScriptBaseClass.PRIM_PHYSICS_SHAPE_TYPE)
+                else if (code == (int)ScriptBaseClass.PRIM_PHYSICS_SHAPE_TYPE)
                 {
                     bool UsePhysics = ((m_host.Flags & PrimFlags.Physics) != 0);
                     bool IsTemporary = ((m_host.Flags & PrimFlags.TemporaryOnRez) != 0);
@@ -8875,18 +8593,18 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                                     };
                     LSL_Integer shapeType = rules.GetLSLIntegerItem(idx++);
                     if (shapeType == ScriptBaseClass.PRIM_PHYSICS_SHAPE_PRIM)
-                        blocks[0].PhysicsShapeType = (byte) shapeType.value;
+                        blocks[0].PhysicsShapeType = (byte)shapeType.value;
                     else if (shapeType == ScriptBaseClass.PRIM_PHYSICS_SHAPE_NONE)
-                        blocks[0].PhysicsShapeType = (byte) shapeType.value;
+                        blocks[0].PhysicsShapeType = (byte)shapeType.value;
                     else //if(shapeType == ScriptBaseClass.PRIM_PHYSICS_SHAPE_CONVEX)
-                        blocks[0].PhysicsShapeType = (byte) shapeType.value;
+                        blocks[0].PhysicsShapeType = (byte)shapeType.value;
                     blocks[0].Restitution = m_host.Restitution;
                     if (part is ISceneChildEntity)
                         if ((part as ISceneChildEntity).UpdatePrimFlags(UsePhysics,
                                                                         IsTemporary, IsPhantom, IsVolumeDetect, blocks))
                             (part as ISceneChildEntity).ParentEntity.RebuildPhysicalRepresentation(true, null);
                 }
-                else if (code == (int) ScriptBaseClass.PRIM_LINK_TARGET)
+                else if (code == (int)ScriptBaseClass.PRIM_LINK_TARGET)
                 {
                     if (remain < 1)
                         return;
@@ -8949,9 +8667,10 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 string encodedData = Convert.ToBase64String(encData_byte);
                 return encodedData;
             }
-            catch (Exception e)
+            catch
             {
-                throw new Exception("Error in base64Encode" + e);
+                Error("llBase64ToString", "Error encoding string");
+                return String.Empty;
             }
         }
 
@@ -8963,9 +8682,10 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             {
                 return Util.Base64ToString(str);
             }
-            catch (Exception e)
+            catch
             {
-                throw new Exception("Error in base64Decode" + e);
+                Error("llBase64ToString", "Error decoding string");
+                return String.Empty;
             }
         }
 
@@ -8973,7 +8693,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return "";
 
-            Deprecated("llXorBase64Strings");
+            Deprecated("llXorBase64Strings", "Use llXorBase64 instead");
             ScriptSleep(300);
             return String.Empty;
         }
@@ -8982,7 +8702,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
 
-            Deprecated("llRemoteDataSetRegion");
+            Deprecated("llRemoteDataSetRegion", "Use llOpenRemoteDataChannel instead");
         }
 
         public LSL_Float llLog10(double val)
@@ -9008,7 +8728,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
 
             LSL_List l = new LSL_List();
-            IScenePresence av = World.GetScenePresence((UUID) id);
+            IScenePresence av = World.GetScenePresence((UUID)id);
             if (av == null || av.IsChildAgent) // only if in the region
                 return l;
             UUID[] anims = av.Animator.GetAnimationArray();
@@ -9067,7 +8787,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             {
                 IScenePresence avatar = World.GetScenePresence(m_host.AttachedAvatar);
                 if (avatar != null)
-                    q = (avatar.AgentControlFlags & (uint) AgentManager.ControlFlags.AGENT_CONTROL_MOUSELOOK) != 0
+                    q = (avatar.AgentControlFlags & (uint)AgentManager.ControlFlags.AGENT_CONTROL_MOUSELOOK) != 0
                             ? avatar.CameraRotation
                             : avatar.Rotation;
                 else
@@ -9149,8 +8869,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                         IAvatarAppearanceModule appearance = presence.RequestModuleInterface<IAvatarAppearanceModule>();
                         if (appearance != null)
                         {
-                            float height = appearance.Appearance.AvatarHeight/2.66666667f;
-                            lower = new LSL_Vector(-0.3375f, -0.45f, height*-1.0f);
+                            float height = appearance.Appearance.AvatarHeight / 2.66666667f;
+                            lower = new LSL_Vector(-0.3375f, -0.45f, height * -1.0f);
                             upper = new LSL_Vector(0.3375f, 0.45f, 0.0f);
                         }
                     }
@@ -9160,8 +8880,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                         IAvatarAppearanceModule appearance = presence.RequestModuleInterface<IAvatarAppearanceModule>();
                         if (appearance != null)
                         {
-                            float height = appearance.Appearance.AvatarHeight/2.0f;
-                            lower = new LSL_Vector(-0.225f, -0.3f, height*-1.0f);
+                            float height = appearance.Appearance.AvatarHeight / 2.0f;
+                            lower = new LSL_Vector(-0.225f, -0.3f, height * -1.0f);
                             upper = new LSL_Vector(0.225f, 0.3f, height + 0.05f);
                         }
                     }
@@ -9180,8 +8900,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             // Currently only works for single prims without a sitting avatar
             if (part != null)
             {
-                Vector3 halfSize = part.Scale*0.5f;
-                LSL_Vector lower = new LSL_Vector(halfSize.X*-1.0f, halfSize.Y*-1.0f, halfSize.Z*-1.0f);
+                Vector3 halfSize = part.Scale * 0.5f;
+                LSL_Vector lower = new LSL_Vector(halfSize.X * -1.0f, halfSize.Y * -1.0f, halfSize.Z * -1.0f);
                 LSL_Vector upper = new LSL_Vector(halfSize.X, halfSize.Y, halfSize.Z);
                 result.Add(lower);
                 result.Add(upper);
@@ -9218,7 +8938,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 if (tmp.Z > MaxPos.Z)
                     MaxPos.Z = tmp.Z;
             }
-            Vector3 GroupAvg = ((MaxPos + MinPos)/2);
+            Vector3 GroupAvg = ((MaxPos + MinPos) / 2);
             return new LSL_Vector(GroupAvg.X, GroupAvg.Y, GroupAvg.Z);
 
             //Just plain wrong!
@@ -9258,43 +8978,43 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 Primitive.TextureEntry tex = part.Shape.Textures;
                 int face = 0;
 
-                if (code == (int) ScriptBaseClass.PRIM_NAME)
+                if (code == (int)ScriptBaseClass.PRIM_NAME)
                 {
                     res.Add(new LSL_String(part.Name));
                 }
 
-                else if (code == (int) ScriptBaseClass.PRIM_DESC)
+                else if (code == (int)ScriptBaseClass.PRIM_DESC)
                 {
                     res.Add(new LSL_String(part.Description));
                 }
 
-                else if (code == (int) ScriptBaseClass.PRIM_MATERIAL)
+                else if (code == (int)ScriptBaseClass.PRIM_MATERIAL)
                 {
                     res.Add(new LSL_Integer(part.Material));
                 }
 
-                else if (code == (int) ScriptBaseClass.PRIM_PHYSICS)
+                else if (code == (int)ScriptBaseClass.PRIM_PHYSICS)
                 {
-                    res.Add((part.GetEffectiveObjectFlags() & (uint) PrimFlags.Physics) != 0
+                    res.Add((part.GetEffectiveObjectFlags() & (uint)PrimFlags.Physics) != 0
                                 ? new LSL_Integer(1)
                                 : new LSL_Integer(0));
                 }
 
-                else if (code == (int) ScriptBaseClass.PRIM_TEMP_ON_REZ)
+                else if (code == (int)ScriptBaseClass.PRIM_TEMP_ON_REZ)
                 {
-                    res.Add((part.GetEffectiveObjectFlags() & (uint) PrimFlags.TemporaryOnRez) != 0
+                    res.Add((part.GetEffectiveObjectFlags() & (uint)PrimFlags.TemporaryOnRez) != 0
                                 ? new LSL_Integer(1)
                                 : new LSL_Integer(0));
                 }
 
-                else if (code == (int) ScriptBaseClass.PRIM_PHANTOM)
+                else if (code == (int)ScriptBaseClass.PRIM_PHANTOM)
                 {
-                    res.Add((part.GetEffectiveObjectFlags() & (uint) PrimFlags.Phantom) != 0
+                    res.Add((part.GetEffectiveObjectFlags() & (uint)PrimFlags.Phantom) != 0
                                 ? new LSL_Integer(1)
                                 : new LSL_Integer(0));
                 }
 
-                else if (code == (int) ScriptBaseClass.PRIM_POSITION)
+                else if (code == (int)ScriptBaseClass.PRIM_POSITION)
                 {
                     Vector3 tmp = part.AbsolutePosition;
                     LSL_Vector v = new LSL_Vector(tmp.X,
@@ -9309,15 +9029,15 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     {
                         LSL_Rotation rtmp = llGetRootRotation();
                         LSL_Vector rpos = llGetRootPosition();
-                        v = ((v - rpos)*rtmp) + rpos;
+                        v = ((v - rpos) * rtmp) + rpos;
                     }
                     res.Add(v);
                 }
-                else if (code == (int) ScriptBaseClass.PRIM_POS_LOCAL)
+                else if (code == (int)ScriptBaseClass.PRIM_POS_LOCAL)
                 {
                     res.Add(GetLocalPos(part));
                 }
-                else if (code == (int) ScriptBaseClass.PRIM_SIZE)
+                else if (code == (int)ScriptBaseClass.PRIM_SIZE)
                 {
                     Vector3 tmp = part.Scale;
                     res.Add(new LSL_Vector(tmp.X,
@@ -9325,38 +9045,38 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                                            tmp.Z));
                 }
 
-                else if (code == (int) ScriptBaseClass.PRIM_ROTATION)
+                else if (code == (int)ScriptBaseClass.PRIM_ROTATION)
                 {
                     res.Add(GetPartRot(part));
                 }
 
-                else if (code == (int) ScriptBaseClass.PRIM_TYPE)
+                else if (code == (int)ScriptBaseClass.PRIM_TYPE)
                 {
                     // implementing box
                     PrimitiveBaseShape Shape = part.Shape;
-                    int primType = (int) part.GetPrimType();
+                    int primType = (int)part.GetPrimType();
                     res.Add(new LSL_Integer(primType));
-                    double topshearx = (sbyte) Shape.PathShearX/100.0; // Fix negative values for PathShearX
-                    double topsheary = (sbyte) Shape.PathShearY/100.0; // and PathShearY.
+                    double topshearx = (sbyte)Shape.PathShearX / 100.0; // Fix negative values for PathShearX
+                    double topsheary = (sbyte)Shape.PathShearY / 100.0; // and PathShearY.
                     if (primType == ScriptBaseClass.PRIM_TYPE_BOX ||
                         primType == ScriptBaseClass.PRIM_TYPE_CYLINDER ||
                         primType == ScriptBaseClass.PRIM_TYPE_PRISM)
                     {
                         res.Add(new LSL_Integer(Shape.ProfileCurve));
-                        res.Add(new LSL_Vector(Shape.ProfileBegin/50000.0, 1 - Shape.ProfileEnd/50000.0, 0));
-                        res.Add(new LSL_Float(Shape.ProfileHollow/50000.0));
-                        res.Add(new LSL_Vector(Shape.PathTwistBegin/100.0, Shape.PathTwist/100.0, 0));
-                        res.Add(new LSL_Vector(1 - (Shape.PathScaleX/100.0 - 1), 1 - (Shape.PathScaleY/100.0 - 1), 0));
+                        res.Add(new LSL_Vector(Shape.ProfileBegin / 50000.0, 1 - Shape.ProfileEnd / 50000.0, 0));
+                        res.Add(new LSL_Float(Shape.ProfileHollow / 50000.0));
+                        res.Add(new LSL_Vector(Shape.PathTwistBegin / 100.0, Shape.PathTwist / 100.0, 0));
+                        res.Add(new LSL_Vector(1 - (Shape.PathScaleX / 100.0 - 1), 1 - (Shape.PathScaleY / 100.0 - 1), 0));
                         res.Add(new LSL_Vector(topshearx, topsheary, 0));
                     }
 
                     if (primType == ScriptBaseClass.PRIM_TYPE_SPHERE)
                     {
                         res.Add(new LSL_Integer(Shape.ProfileCurve));
-                        res.Add(new LSL_Vector(Shape.PathBegin/50000.0, 1 - Shape.PathEnd/50000.0, 0));
-                        res.Add(new LSL_Float(Shape.ProfileHollow/50000.0));
-                        res.Add(new LSL_Vector(Shape.PathTwistBegin/100.0, Shape.PathTwist/100.0, 0));
-                        res.Add(new LSL_Vector(Shape.ProfileBegin/50000.0, 1 - Shape.ProfileEnd/50000.0, 0));
+                        res.Add(new LSL_Vector(Shape.PathBegin / 50000.0, 1 - Shape.PathEnd / 50000.0, 0));
+                        res.Add(new LSL_Float(Shape.ProfileHollow / 50000.0));
+                        res.Add(new LSL_Vector(Shape.PathTwistBegin / 100.0, Shape.PathTwist / 100.0, 0));
+                        res.Add(new LSL_Vector(Shape.ProfileBegin / 50000.0, 1 - Shape.ProfileEnd / 50000.0, 0));
                     }
 
                     if (primType == ScriptBaseClass.PRIM_TYPE_SCULPT)
@@ -9372,29 +9092,29 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                         res.Add(new LSL_Integer(Shape.ProfileCurve));
 
                         // cut
-                        res.Add(new LSL_Vector(Shape.PathBegin/50000.0, 1 - Shape.PathEnd/50000.0, 0));
+                        res.Add(new LSL_Vector(Shape.PathBegin / 50000.0, 1 - Shape.PathEnd / 50000.0, 0));
 
                         // hollow
-                        res.Add(new LSL_Float(Shape.ProfileHollow/50000.0));
+                        res.Add(new LSL_Float(Shape.ProfileHollow / 50000.0));
 
                         // twist
-                        res.Add(new LSL_Vector(Shape.PathTwistBegin/100.0, Shape.PathTwist/100.0, 0));
+                        res.Add(new LSL_Vector(Shape.PathTwistBegin / 100.0, Shape.PathTwist / 100.0, 0));
 
                         // vector holesize
-                        res.Add(new LSL_Vector(1 - (Shape.PathScaleX/100.0 - 1), 1 - (Shape.PathScaleY/100.0 - 1), 0));
+                        res.Add(new LSL_Vector(1 - (Shape.PathScaleX / 100.0 - 1), 1 - (Shape.PathScaleY / 100.0 - 1), 0));
 
                         // vector topshear
                         res.Add(new LSL_Vector(topshearx, topsheary, 0));
 
                         // vector profilecut
-                        res.Add(new LSL_Vector(Shape.ProfileBegin/50000.0, 1 - Shape.ProfileEnd/50000.0, 0));
+                        res.Add(new LSL_Vector(Shape.ProfileBegin / 50000.0, 1 - Shape.ProfileEnd / 50000.0, 0));
 
                         // vector tapera
-                        res.Add(new LSL_Vector(Shape.PathTaperX/100.0, Shape.PathTaperY/100.0, 0));
+                        res.Add(new LSL_Vector(Shape.PathTaperX / 100.0, Shape.PathTaperY / 100.0, 0));
 
                         // float revolutions
                         res.Add(
-                            new LSL_Float(Math.Round(Shape.PathRevolutions*0.015d, 2, MidpointRounding.AwayFromZero)) +
+                            new LSL_Float(Math.Round(Shape.PathRevolutions * 0.015d, 2, MidpointRounding.AwayFromZero)) +
                             1.0d);
                         // Slightly inaccurate, because an unsigned byte is being used to represent
                         // the entire range of floating-point values from 1.0 through 4.0 (which is how
@@ -9411,14 +9131,14 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                         // than only storing the encoded value.
 
                         // float radiusoffset
-                        res.Add(new LSL_Float(Shape.PathRadiusOffset/100.0));
+                        res.Add(new LSL_Float(Shape.PathRadiusOffset / 100.0));
 
                         // float skew
-                        res.Add(new LSL_Float(Shape.PathSkew/100.0));
+                        res.Add(new LSL_Float(Shape.PathSkew / 100.0));
                     }
                 }
 
-                else if (code == (int) ScriptBaseClass.PRIM_TEXTURE)
+                else if (code == (int)ScriptBaseClass.PRIM_TEXTURE)
                 {
                     if (remain < 1)
                         return res;
@@ -9427,7 +9147,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     {
                         for (face = 0; face < GetNumberOfSides(part); face++)
                         {
-                            Primitive.TextureEntryFace texface = tex.GetFace((uint) face);
+                            Primitive.TextureEntryFace texface = tex.GetFace((uint)face);
 
                             res.Add(new LSL_String(texface.TextureID.ToString()));
                             res.Add(new LSL_Vector(texface.RepeatU,
@@ -9443,7 +9163,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     {
                         if (face >= 0 && face < GetNumberOfSides(part))
                         {
-                            Primitive.TextureEntryFace texface = tex.GetFace((uint) face);
+                            Primitive.TextureEntryFace texface = tex.GetFace((uint)face);
 
                             res.Add(new LSL_String(texface.TextureID.ToString()));
                             res.Add(new LSL_Vector(texface.RepeatU,
@@ -9457,7 +9177,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     }
                 }
 
-                else if (code == (int) ScriptBaseClass.PRIM_COLOR)
+                else if (code == (int)ScriptBaseClass.PRIM_COLOR)
                 {
                     if (remain < 1)
                         return res;
@@ -9468,7 +9188,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     {
                         for (face = 0; face < GetNumberOfSides(part); face++)
                         {
-                            texcolor = tex.GetFace((uint) face).RGBA;
+                            texcolor = tex.GetFace((uint)face).RGBA;
                             res.Add(new LSL_Vector(texcolor.R,
                                                    texcolor.G,
                                                    texcolor.B));
@@ -9477,7 +9197,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     }
                     else
                     {
-                        texcolor = tex.GetFace((uint) face).RGBA;
+                        texcolor = tex.GetFace((uint)face).RGBA;
                         res.Add(new LSL_Vector(texcolor.R,
                                                texcolor.G,
                                                texcolor.B));
@@ -9485,7 +9205,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     }
                 }
 
-                else if (code == (int) ScriptBaseClass.PRIM_BUMP_SHINY)
+                else if (code == (int)ScriptBaseClass.PRIM_BUMP_SHINY)
                 {
                     if (remain < 1)
                         return res;
@@ -9496,27 +9216,27 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     {
                         for (face = 0; face < GetNumberOfSides(part); face++)
                         {
-                            Primitive.TextureEntryFace texface = tex.GetFace((uint) face);
+                            Primitive.TextureEntryFace texface = tex.GetFace((uint)face);
                             // Convert Shininess to PRIM_SHINY_*
-                            res.Add(new LSL_Integer((uint) texface.Shiny >> 6));
+                            res.Add(new LSL_Integer((uint)texface.Shiny >> 6));
                             // PRIM_BUMP_*
-                            res.Add(new LSL_Integer((int) texface.Bump));
+                            res.Add(new LSL_Integer((int)texface.Bump));
                         }
                     }
                     else
                     {
                         if (face >= 0 && face < GetNumberOfSides(part))
                         {
-                            Primitive.TextureEntryFace texface = tex.GetFace((uint) face);
+                            Primitive.TextureEntryFace texface = tex.GetFace((uint)face);
                             // Convert Shininess to PRIM_SHINY_*
-                            res.Add(new LSL_Integer((uint) texface.Shiny >> 6));
+                            res.Add(new LSL_Integer((uint)texface.Shiny >> 6));
                             // PRIM_BUMP_*
-                            res.Add(new LSL_Integer((int) texface.Bump));
+                            res.Add(new LSL_Integer((int)texface.Bump));
                         }
                     }
                 }
 
-                else if (code == (int) ScriptBaseClass.PRIM_FULLBRIGHT)
+                else if (code == (int)ScriptBaseClass.PRIM_FULLBRIGHT)
                 {
                     if (remain < 1)
                         return res;
@@ -9527,7 +9247,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     {
                         for (face = 0; face < GetNumberOfSides(part); face++)
                         {
-                            Primitive.TextureEntryFace texface = tex.GetFace((uint) face);
+                            Primitive.TextureEntryFace texface = tex.GetFace((uint)face);
                             res.Add(new LSL_Integer(texface.Fullbright ? 1 : 0));
                         }
                     }
@@ -9535,13 +9255,13 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     {
                         if (face >= 0 && face < GetNumberOfSides(part))
                         {
-                            Primitive.TextureEntryFace texface = tex.GetFace((uint) face);
+                            Primitive.TextureEntryFace texface = tex.GetFace((uint)face);
                             res.Add(new LSL_Integer(texface.Fullbright ? 1 : 0));
                         }
                     }
                 }
 
-                else if (code == (int) ScriptBaseClass.PRIM_FLEXIBLE)
+                else if (code == (int)ScriptBaseClass.PRIM_FLEXIBLE)
                 {
                     PrimitiveBaseShape shape = part.Shape;
 
@@ -9556,7 +9276,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                                            shape.FlexiForceZ));
                 }
 
-                else if (code == (int) ScriptBaseClass.PRIM_TEXGEN)
+                else if (code == (int)ScriptBaseClass.PRIM_TEXGEN)
                 {
                     if (remain < 1)
                         return res;
@@ -9566,22 +9286,22 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     {
                         for (face = 0; face < GetNumberOfSides(part); face++)
                         {
-                            MappingType texgen = tex.GetFace((uint) face).TexMapType;
+                            MappingType texgen = tex.GetFace((uint)face).TexMapType;
                             // Convert MappingType to PRIM_TEXGEN_DEFAULT, PRIM_TEXGEN_PLANAR etc.
-                            res.Add(new LSL_Integer((uint) texgen >> 1));
+                            res.Add(new LSL_Integer((uint)texgen >> 1));
                         }
                     }
                     else
                     {
                         if (face >= 0 && face < GetNumberOfSides(part))
                         {
-                            MappingType texgen = tex.GetFace((uint) face).TexMapType;
-                            res.Add(new LSL_Integer((uint) texgen >> 1));
+                            MappingType texgen = tex.GetFace((uint)face).TexMapType;
+                            res.Add(new LSL_Integer((uint)texgen >> 1));
                         }
                     }
                 }
 
-                else if (code == (int) ScriptBaseClass.PRIM_POINT_LIGHT)
+                else if (code == (int)ScriptBaseClass.PRIM_POINT_LIGHT)
                 {
                     PrimitiveBaseShape shape = part.Shape;
 
@@ -9594,7 +9314,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     res.Add(new LSL_Float(shape.LightFalloff)); // falloff
                 }
 
-                else if (code == (int) ScriptBaseClass.PRIM_GLOW)
+                else if (code == (int)ScriptBaseClass.PRIM_GLOW)
                 {
                     if (remain < 1)
                         return res;
@@ -9604,7 +9324,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     {
                         for (face = 0; face < GetNumberOfSides(part); face++)
                         {
-                            Primitive.TextureEntryFace texface = tex.GetFace((uint) face);
+                            Primitive.TextureEntryFace texface = tex.GetFace((uint)face);
                             res.Add(new LSL_Float(texface.Glow));
                         }
                     }
@@ -9612,13 +9332,13 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     {
                         if (face >= 0 && face < GetNumberOfSides(part))
                         {
-                            Primitive.TextureEntryFace texface = tex.GetFace((uint) face);
+                            Primitive.TextureEntryFace texface = tex.GetFace((uint)face);
                             res.Add(new LSL_Float(texface.Glow));
                         }
                     }
                 }
 
-                else if (code == (int) ScriptBaseClass.PRIM_TEXT)
+                else if (code == (int)ScriptBaseClass.PRIM_TEXT)
                 {
                     Color4 textColor = part.GetTextColor();
                     res.Add(new LSL_String(part.Text));
@@ -9627,12 +9347,12 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                                            textColor.B));
                     res.Add(new LSL_Float(textColor.A));
                 }
-                else if (code == (int) ScriptBaseClass.PRIM_ROT_LOCAL)
+                else if (code == (int)ScriptBaseClass.PRIM_ROT_LOCAL)
                 {
                     Quaternion rtmp = part.GetRotationOffset();
                     res.Add(new LSL_Rotation(rtmp.X, rtmp.Y, rtmp.Z, rtmp.W));
                 }
-                else if (code == (int) ScriptBaseClass.PRIM_OMEGA)
+                else if (code == (int)ScriptBaseClass.PRIM_OMEGA)
                 {
                     Vector3 axis = part.OmegaAxis;
                     LSL_Float spinRate = part.OmegaSpinRate;
@@ -9641,7 +9361,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     res.Add(spinRate);
                     res.Add(gain);
                 }
-                else if (code == (int) ScriptBaseClass.PRIM_PHYSICS_SHAPE_TYPE)
+                else if (code == (int)ScriptBaseClass.PRIM_PHYSICS_SHAPE_TYPE)
                 {
                     res.Add(new LSL_Integer(part.PhysicsType));
                 }
@@ -9692,22 +9412,22 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             ObjectFlagUpdatePacket.ExtraPhysicsBlock[] blocks = new ObjectFlagUpdatePacket.ExtraPhysicsBlock[1];
             blocks[0] = new ObjectFlagUpdatePacket.ExtraPhysicsBlock();
             if ((bits & ScriptBaseClass.DENSITY) == ScriptBaseClass.DENSITY)
-                m_host.Density = (float) density;
+                m_host.Density = (float)density;
             else
                 blocks[0].Density = m_host.Density;
 
             if ((bits & ScriptBaseClass.FRICTION) == ScriptBaseClass.FRICTION)
-                m_host.Friction = (float) friction;
+                m_host.Friction = (float)friction;
             else
                 blocks[0].Friction = m_host.Friction;
 
             if ((bits & ScriptBaseClass.RESTITUTION) == ScriptBaseClass.RESTITUTION)
-                m_host.Restitution = (float) restitution;
+                m_host.Restitution = (float)restitution;
             else
                 blocks[0].Restitution = m_host.Restitution;
 
             if ((bits & ScriptBaseClass.GRAVITY_MULTIPLIER) == ScriptBaseClass.GRAVITY_MULTIPLIER)
-                m_host.GravityMultiplier = (float) gravityMultiplier;
+                m_host.GravityMultiplier = (float)gravityMultiplier;
             else
                 blocks[0].GravityMultiplier = m_host.GravityMultiplier;
 
@@ -10203,27 +9923,27 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
             if (mask == ScriptBaseClass.MASK_BASE) //0
             {
-                permmask = (int) m_host.BaseMask;
+                permmask = (int)m_host.BaseMask;
             }
 
             else if (mask == ScriptBaseClass.MASK_OWNER) //1
             {
-                permmask = (int) m_host.OwnerMask;
+                permmask = (int)m_host.OwnerMask;
             }
 
             else if (mask == ScriptBaseClass.MASK_GROUP) //2
             {
-                permmask = (int) m_host.GroupMask;
+                permmask = (int)m_host.GroupMask;
             }
 
             else if (mask == ScriptBaseClass.MASK_EVERYONE) //3
             {
-                permmask = (int) m_host.EveryoneMask;
+                permmask = (int)m_host.EveryoneMask;
             }
 
             else if (mask == ScriptBaseClass.MASK_NEXT) //4
             {
-                permmask = (int) m_host.NextOwnerMask;
+                permmask = (int)m_host.NextOwnerMask;
             }
 
             return permmask;
@@ -10240,27 +9960,27 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 {
                     if (mask == ScriptBaseClass.MASK_BASE) //0
                     {
-                        m_host.BaseMask = (uint) value;
+                        m_host.BaseMask = (uint)value;
                     }
 
                     else if (mask == ScriptBaseClass.MASK_OWNER) //1
                     {
-                        m_host.OwnerMask = (uint) value;
+                        m_host.OwnerMask = (uint)value;
                     }
 
                     else if (mask == ScriptBaseClass.MASK_GROUP) //2
                     {
-                        m_host.GroupMask = (uint) value;
+                        m_host.GroupMask = (uint)value;
                     }
 
                     else if (mask == ScriptBaseClass.MASK_EVERYONE) //3
                     {
-                        m_host.EveryoneMask = (uint) value;
+                        m_host.EveryoneMask = (uint)value;
                     }
 
                     else if (mask == ScriptBaseClass.MASK_NEXT) //4
                     {
-                        m_host.NextOwnerMask = (uint) value;
+                        m_host.NextOwnerMask = (uint)value;
                     }
                 }
             }
@@ -10280,15 +10000,15 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                         switch (mask)
                         {
                             case 0:
-                                return (int) inv.Value.BasePermissions;
+                                return (int)inv.Value.BasePermissions;
                             case 1:
-                                return (int) inv.Value.CurrentPermissions;
+                                return (int)inv.Value.CurrentPermissions;
                             case 2:
-                                return (int) inv.Value.GroupPermissions;
+                                return (int)inv.Value.GroupPermissions;
                             case 3:
-                                return (int) inv.Value.EveryonePermissions;
+                                return (int)inv.Value.EveryonePermissions;
                             case 4:
-                                return (int) inv.Value.NextPermissions;
+                                return (int)inv.Value.NextPermissions;
                         }
                     }
                 }
@@ -10314,19 +10034,19 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                                 switch (mask)
                                 {
                                     case 0:
-                                        inv.Value.BasePermissions = (uint) value;
+                                        inv.Value.BasePermissions = (uint)value;
                                         break;
                                     case 1:
-                                        inv.Value.CurrentPermissions = (uint) value;
+                                        inv.Value.CurrentPermissions = (uint)value;
                                         break;
                                     case 2:
-                                        inv.Value.GroupPermissions = (uint) value;
+                                        inv.Value.GroupPermissions = (uint)value;
                                         break;
                                     case 3:
-                                        inv.Value.EveryonePermissions = (uint) value;
+                                        inv.Value.EveryonePermissions = (uint)value;
                                         break;
                                     case 4:
-                                        inv.Value.NextPermissions = (uint) value;
+                                        inv.Value.NextPermissions = (uint)value;
                                         break;
                                 }
                             }
@@ -10352,7 +10072,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 }
             }
 
-            llSay(0, "No item name '" + item + "'");
+            Error("llGetInventoryCreator", "Can't find item '" + item + "'");
 
             return String.Empty;
         }
@@ -10406,13 +10126,13 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             {
                 if (m_host.TaskInventory[invItemID].PermsGranter == UUID.Zero)
                 {
-                    ShoutError("No permissions to teleport the agent");
+                    Error("llTeleportAgent", "No permissions to teleport the agent");
                     return;
                 }
 
                 if ((m_host.TaskInventory[invItemID].PermsMask & ScriptBaseClass.PERMISSION_TELEPORT) == 0)
                 {
-                    ShoutError("No permissions to teleport the agent");
+                    Error("llTeleportAgent", "No permissions to teleport the agent");
                     return;
                 }
             }
@@ -10437,13 +10157,13 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 {
                     if (landmark == "")
                         module.Teleport(presence, World.RegionInfo.RegionHandle,
-                                        position.ToVector3(), look_at.ToVector3(), (uint) TeleportFlags.ViaLocation);
+                                        position.ToVector3(), look_at.ToVector3(), (uint)TeleportFlags.ViaLocation);
                     else
                     {
                         AssetLandmark lm = new AssetLandmark(
                             World.AssetService.Get(item.AssetID.ToString()));
                         module.Teleport(presence, lm.RegionHandle, lm.Position,
-                                        look_at.ToVector3(), (uint) TeleportFlags.ViaLocation);
+                                        look_at.ToVector3(), (uint)TeleportFlags.ViaLocation);
                     }
                 }
             }
@@ -10463,13 +10183,13 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             {
                 if (m_host.TaskInventory[invItemID].PermsGranter == UUID.Zero)
                 {
-                    ShoutError("No permissions to teleport the agent");
+                    Error("llTeleportAgentGlobalCoords", "No permissions to teleport the agent");
                     return;
                 }
 
                 if ((m_host.TaskInventory[invItemID].PermsMask & ScriptBaseClass.PERMISSION_TELEPORT) == 0)
                 {
-                    ShoutError("No permissions to teleport the agent");
+                    Error("llTeleportAgentGlobalCoords", "No permissions to teleport the agent");
                     return;
                 }
             }
@@ -10481,9 +10201,9 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 if (module != null)
                 {
                     module.Teleport(presence,
-                                    Utils.UIntsToLong((uint) global_coordinates.x, (uint) global_coordinates.y),
+                                    Utils.UIntsToLong((uint)global_coordinates.x, (uint)global_coordinates.y),
                                     region_coordinates.ToVector3(), look_at.ToVector3(),
-                                    (uint) TeleportFlags.ViaLocation);
+                                    (uint)TeleportFlags.ViaLocation);
                 }
             }
         }
@@ -10517,11 +10237,11 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     case 6: // DATA_SIM_STATUS
                         if (info != null)
                         {
-                            reply = (info.Flags & (int) RegionFlags.RegionOnline) != 0 ? "up" : "down";
+                            reply = (info.Flags & (int)RegionFlags.RegionOnline) != 0 ? "up" : "down";
                         }
-                            //if() starting
-                            //if() stopping
-                            //if() crashed
+                        //if() starting
+                        //if() stopping
+                        //if() crashed
                         else
                             reply = "unknown";
                         break;
@@ -10557,7 +10277,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 {
                     UUID rq = UUID.Random();
 
-                    DataserverPlugin dataserverPlugin = (DataserverPlugin) m_ScriptEngine.GetScriptPlugin("Dataserver");
+                    DataserverPlugin dataserverPlugin = (DataserverPlugin)m_ScriptEngine.GetScriptPlugin("Dataserver");
 
                     tid = dataserverPlugin.RegisterRequest(m_host.UUID, m_itemID, rq.ToString());
 
@@ -10569,7 +10289,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             }
 
             ScriptSleep(1000);
-            return (LSL_Key) tid.ToString();
+            return (LSL_Key)tid.ToString();
         }
 
         public LSL_String llRequestURL()
@@ -10710,8 +10430,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
                 for (int i = 0; i < commandList.Data.Length; i++)
                 {
-                    int tmp = ((LSL_Integer) commandList.Data[i]).value;
-                    ParcelMediaCommandEnum command = (ParcelMediaCommandEnum) tmp;
+                    int tmp = ((LSL_Integer)commandList.Data[i]).value;
+                    ParcelMediaCommandEnum command = (ParcelMediaCommandEnum)tmp;
                     switch (command)
                     {
                         case ParcelMediaCommandEnum.Agent:
@@ -10721,12 +10441,12 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                                 if (commandList.Data[i + 1] is LSL_String)
                                 {
                                     UUID agentID;
-                                    if (UUID.TryParse((LSL_String) commandList.Data[i + 1], out agentID))
+                                    if (UUID.TryParse((LSL_String)commandList.Data[i + 1], out agentID))
                                     {
                                         presence = World.GetScenePresence(agentID);
                                     }
                                 }
-                                else ShoutError("The argument of PARCEL_MEDIA_COMMAND_AGENT must be a key");
+                                else Error("llParcelMediaCommandList", "The argument of PARCEL_MEDIA_COMMAND_AGENT must be a key");
                                 ++i;
                             }
                             break;
@@ -10742,9 +10462,9 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                             {
                                 if (commandList.Data[i + 1] is LSL_Float)
                                 {
-                                    mediaLoopSet = (float) ((LSL_Float) commandList.Data[i + 1]).value;
+                                    mediaLoopSet = (float)((LSL_Float)commandList.Data[i + 1]).value;
                                 }
-                                else ShoutError("The argument of PARCEL_MEDIA_COMMAND_LOOP_SET must be a float");
+                                else Error("llParcelMediaCommandList", "The argument of PARCEL_MEDIA_COMMAND_LOOP_SET must be a float");
                                 ++i;
                             }
                             commandToSend = command;
@@ -10767,10 +10487,10 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                             {
                                 if (commandList.Data[i + 1] is LSL_String)
                                 {
-                                    url = (LSL_String) commandList.Data[i + 1];
+                                    url = (LSL_String)commandList.Data[i + 1];
                                     update = true;
                                 }
-                                else ShoutError("The argument of PARCEL_MEDIA_COMMAND_URL must be a string.");
+                                else Error("llParcelMediaCommandList", "The argument of PARCEL_MEDIA_COMMAND_URL must be a string.");
                                 ++i;
                             }
                             break;
@@ -10780,11 +10500,11 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                             {
                                 if (commandList.Data[i + 1] is LSL_String)
                                 {
-                                    texture = (LSL_String) commandList.Data[i + 1];
+                                    texture = (LSL_String)commandList.Data[i + 1];
                                     update = true;
                                 }
                                 else
-                                    ShoutError("The argument of PARCEL_MEDIA_COMMAND_TEXTURE must be a string or key.");
+                                    Error("llParcelMediaCommandList", "The argument of PARCEL_MEDIA_COMMAND_TEXTURE must be a string or key.");
                                 ++i;
                             }
                             break;
@@ -10794,9 +10514,9 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                             {
                                 if (commandList.Data[i + 1] is LSL_Float)
                                 {
-                                    time = (float) (LSL_Float) commandList.Data[i + 1];
+                                    time = (float)(LSL_Float)commandList.Data[i + 1];
                                 }
-                                else ShoutError("The argument of PARCEL_MEDIA_COMMAND_TIME must be a float.");
+                                else Error("llParcelMediaCommandList", "The argument of PARCEL_MEDIA_COMMAND_TIME must be a float.");
                                 ++i;
                             }
                             commandToSend = command;
@@ -10807,11 +10527,11 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                             {
                                 if (commandList.Data[i + 1] is LSL_Integer)
                                 {
-                                    autoAlign = (LSL_Integer) commandList.Data[i + 1];
+                                    autoAlign = (LSL_Integer)commandList.Data[i + 1];
                                     update = true;
                                 }
 
-                                else ShoutError("The argument of PARCEL_MEDIA_COMMAND_AUTO_ALIGN must be an integer.");
+                                else Error("llParcelMediaCommandList", "The argument of PARCEL_MEDIA_COMMAND_AUTO_ALIGN must be an integer.");
                                 ++i;
                             }
                             break;
@@ -10821,10 +10541,10 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                             {
                                 if (commandList.Data[i + 1] is LSL_String)
                                 {
-                                    mediaType = (LSL_String) commandList.Data[i + 1];
+                                    mediaType = (LSL_String)commandList.Data[i + 1];
                                     update = true;
                                 }
-                                else ShoutError("The argument of PARCEL_MEDIA_COMMAND_TYPE must be a string.");
+                                else Error("llParcelMediaCommandList", "The argument of PARCEL_MEDIA_COMMAND_TYPE must be a string.");
                                 ++i;
                             }
                             break;
@@ -10834,10 +10554,10 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                             {
                                 if (commandList.Data[i + 1] is LSL_String)
                                 {
-                                    description = (LSL_String) commandList.Data[i + 1];
+                                    description = (LSL_String)commandList.Data[i + 1];
                                     update = true;
                                 }
-                                else ShoutError("The argument of PARCEL_MEDIA_COMMAND_DESC must be a string.");
+                                else Error("llParcelMediaCommandList", "The argument of PARCEL_MEDIA_COMMAND_DESC must be a string.");
                                 ++i;
                             }
                             break;
@@ -10848,22 +10568,21 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                                 {
                                     if (commandList.Data[i + 2] is LSL_Integer)
                                     {
-                                        width = (LSL_Integer) commandList.Data[i + 1];
-                                        height = (LSL_Integer) commandList.Data[i + 2];
+                                        width = (LSL_Integer)commandList.Data[i + 1];
+                                        height = (LSL_Integer)commandList.Data[i + 2];
                                         update = true;
                                     }
                                     else
-                                        ShoutError(
-                                            "The second argument of PARCEL_MEDIA_COMMAND_SIZE must be an integer.");
+                                        Error("llParcelMediaCommandList", "The second argument of PARCEL_MEDIA_COMMAND_SIZE must be an integer.");
                                 }
-                                else ShoutError("The first argument of PARCEL_MEDIA_COMMAND_SIZE must be an integer.");
+                                else Error("llParcelMediaCommandList", "The first argument of PARCEL_MEDIA_COMMAND_SIZE must be an integer.");
                                 i += 2;
                             }
                             break;
 
                         default:
-                            NotImplemented("llParcelMediaCommandList parameter not supported yet: " +
-                                           Enum.Parse(typeof (ParcelMediaCommandEnum), commandList.Data[i].ToString()));
+                            NotImplemented("llParcelMediaCommandList", "Parameter not supported yet: " +
+                                           Enum.Parse(typeof(ParcelMediaCommandEnum), commandList.Data[i].ToString()));
                             break;
                     } //end switch
                 } //end for
@@ -10878,7 +10597,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     {
                         // we send to all
                         landData.MediaID = new UUID(texture);
-                        landData.MediaAutoScale = autoAlign ? (byte) 1 : (byte) 0;
+                        landData.MediaAutoScale = autoAlign ? (byte)1 : (byte)0;
                         landData.MediaWidth = width;
                         landData.MediaHeight = height;
                         landData.MediaType = mediaType;
@@ -10911,7 +10630,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                         // we only send to one (root) agent
                         presence.ControllingClient.SendParcelMediaUpdate(url,
                                                                          new UUID(texture),
-                                                                         autoAlign ? (byte) 1 : (byte) 0,
+                                                                         autoAlign ? (byte)1 : (byte)0,
                                                                          mediaType,
                                                                          description,
                                                                          width, height,
@@ -10922,7 +10641,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 if (commandToSend != null)
                 {
                     float ParamToSend = time;
-                    if ((ParcelMediaCommandEnum) commandToSend == ParcelMediaCommandEnum.LoopSet)
+                    if ((ParcelMediaCommandEnum)commandToSend == ParcelMediaCommandEnum.LoopSet)
                         ParamToSend = mediaLoopSet;
 
                     // the commandList contained a start/stop/... command, too
@@ -10935,7 +10654,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                                                            {
                                                                sp.ControllingClient.SendParcelMediaCommand(
                                                                    landData.Flags,
-                                                                   (ParcelMediaCommandEnum) commandToSend,
+                                                                   (ParcelMediaCommandEnum)commandToSend,
                                                                    ParamToSend);
                                                            }
                                                        });
@@ -10943,7 +10662,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     else if (!presence.IsChildAgent)
                     {
                         presence.ControllingClient.SendParcelMediaCommand(landData.Flags,
-                                                                          (ParcelMediaCommandEnum) commandToSend,
+                                                                          (ParcelMediaCommandEnum)commandToSend,
                                                                           ParamToSend);
                     }
                 }
@@ -10964,8 +10683,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule>();
                     if (parcelManagement != null)
                     {
-                        LSL_Integer tmp = (LSL_Integer) t;
-                        switch ((ParcelMediaCommandEnum) tmp.value)
+                        LSL_Integer tmp = (LSL_Integer)t;
+                        switch ((ParcelMediaCommandEnum)tmp.value)
                         {
                             case ParcelMediaCommandEnum.Url:
                                 list.Add(
@@ -11019,7 +10738,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                                 break;
                             default:
                                 const ParcelMediaCommandEnum mediaCommandEnum = ParcelMediaCommandEnum.Url;
-                                NotImplemented("llParcelMediaQuery parameter do not supported yet: " +
+                                NotImplemented("llParcelMediaQuery", "Parameter not supported yet: " +
                                                Enum.Parse(mediaCommandEnum.GetType(), t.ToString()));
                                 break;
                         }
@@ -11075,7 +10794,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
             for (int i = 0; i < rules.Length; i++)
             {
-                int code = (int) rules.GetLSLIntegerItem(i);
+                int code = (int)rules.GetLSLIntegerItem(i);
 
                 if (code == ScriptBaseClass.PRIM_MEDIA_ALT_IMAGE_ENABLE)
                 {
@@ -11131,7 +10850,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 }
                 else if (code == ScriptBaseClass.PRIM_MEDIA_WHITELIST)
                 {
-                    string[] urls = (string[]) me.WhiteList.Clone();
+                    string[] urls = (string[])me.WhiteList.Clone();
 
                     for (int j = 0; j < urls.Length; j++)
                         urls[j] = Uri.EscapeDataString(urls[j]);
@@ -11140,11 +10859,11 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 }
                 else if (code == ScriptBaseClass.PRIM_MEDIA_PERMS_INTERACT)
                 {
-                    res.Add(new LSL_Integer((int) me.InteractPermissions));
+                    res.Add(new LSL_Integer((int)me.InteractPermissions));
                 }
                 else if (code == ScriptBaseClass.PRIM_MEDIA_PERMS_CONTROL)
                 {
-                    res.Add(new LSL_Integer((int) me.ControlPermissions));
+                    res.Add(new LSL_Integer((int)me.ControlPermissions));
                 }
             }
 
@@ -11285,7 +11004,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 }
                 else if (code == ScriptBaseClass.PRIM_MEDIA_WHITELIST)
                 {
-                    string[] rawWhiteListUrls = rules.GetLSLStringItem(i++).ToString().Split(new[] {','});
+                    string[] rawWhiteListUrls = rules.GetLSLStringItem(i++).ToString().Split(new[] { ',' });
                     List<string> whiteListUrls = new List<string>();
 
                     Array.ForEach(
@@ -11295,11 +11014,11 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 }
                 else if (code == ScriptBaseClass.PRIM_MEDIA_PERMS_INTERACT)
                 {
-                    me.InteractPermissions = (MediaPermission) (byte) (int) rules.GetLSLIntegerItem(i++);
+                    me.InteractPermissions = (MediaPermission)(byte)(int)rules.GetLSLIntegerItem(i++);
                 }
                 else if (code == ScriptBaseClass.PRIM_MEDIA_PERMS_CONTROL)
                 {
-                    me.ControlPermissions = (MediaPermission) (byte) (int) rules.GetLSLIntegerItem(i++);
+                    me.ControlPermissions = (MediaPermission)(byte)(int)rules.GetLSLIntegerItem(i++);
                 }
             }
 
@@ -11343,21 +11062,21 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             m_host.ParentEntity.RootChild.PayPrice[0] = price;
 
             if (quick_pay_buttons.Data.Length > 0)
-                m_host.ParentEntity.RootChild.PayPrice[1] = (LSL_Integer) quick_pay_buttons.Data[0];
+                m_host.ParentEntity.RootChild.PayPrice[1] = (LSL_Integer)quick_pay_buttons.Data[0];
             else
-                m_host.ParentEntity.RootChild.PayPrice[1] = (LSL_Integer) (-2);
+                m_host.ParentEntity.RootChild.PayPrice[1] = (LSL_Integer)(-2);
             if (quick_pay_buttons.Data.Length > 1)
-                m_host.ParentEntity.RootChild.PayPrice[2] = (LSL_Integer) quick_pay_buttons.Data[1];
+                m_host.ParentEntity.RootChild.PayPrice[2] = (LSL_Integer)quick_pay_buttons.Data[1];
             else
-                m_host.ParentEntity.RootChild.PayPrice[2] = (LSL_Integer) (-2);
+                m_host.ParentEntity.RootChild.PayPrice[2] = (LSL_Integer)(-2);
             if (quick_pay_buttons.Data.Length > 2)
-                m_host.ParentEntity.RootChild.PayPrice[3] = (LSL_Integer) quick_pay_buttons.Data[2];
+                m_host.ParentEntity.RootChild.PayPrice[3] = (LSL_Integer)quick_pay_buttons.Data[2];
             else
-                m_host.ParentEntity.RootChild.PayPrice[3] = (LSL_Integer) (-2);
+                m_host.ParentEntity.RootChild.PayPrice[3] = (LSL_Integer)(-2);
             if (quick_pay_buttons.Data.Length > 3)
-                m_host.ParentEntity.RootChild.PayPrice[4] = (LSL_Integer) quick_pay_buttons.Data[3];
+                m_host.ParentEntity.RootChild.PayPrice[4] = (LSL_Integer)quick_pay_buttons.Data[3];
             else
-                m_host.ParentEntity.RootChild.PayPrice[4] = (LSL_Integer) (-2);
+                m_host.ParentEntity.RootChild.PayPrice[4] = (LSL_Integer)(-2);
         }
 
         public LSL_Vector llGetCameraPos()
@@ -11377,7 +11096,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
                 if ((m_host.TaskInventory[invItemID].PermsMask & ScriptBaseClass.PERMISSION_TRACK_CAMERA) == 0)
                 {
-                    ShoutError("No permissions to track the camera");
+                    Error("llGetCameraPos", "No permissions to track the camera");
                     return new LSL_Vector();
                 }
             }
@@ -11408,7 +11127,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
                 if ((m_host.TaskInventory[invItemID].PermsMask & ScriptBaseClass.PERMISSION_TRACK_CAMERA) == 0)
                 {
-                    ShoutError("No permissions to track the camera");
+                    Error("llGetCameraRot", "No permissions to track the camera");
                     return new LSL_Rotation();
                 }
             }
@@ -11431,7 +11150,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return DateTime.Now;
-
+            Deprecated("llSetPrimURL", "Use llSetPrimMediaParams instead");
             return PScriptSleep(2000);
         }
 
@@ -11504,10 +11223,10 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     }
                 }
                 avatar.ControllingClient.SendScriptTeleportRequest(m_host.Name, simname,
-                                                                   new Vector3((float) pos.x, (float) pos.y,
-                                                                               (float) pos.z),
-                                                                   new Vector3((float) lookAt.x, (float) lookAt.y,
-                                                                               (float) lookAt.z));
+                                                                   new Vector3((float)pos.x, (float)pos.y,
+                                                                               (float)pos.z),
+                                                                   new Vector3((float)lookAt.x, (float)lookAt.y,
+                                                                               (float)lookAt.z));
             }
             return PScriptSleep(1000);
         }
@@ -11637,17 +11356,17 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     type == ScriptBaseClass.CAMERA_FOCUS_OFFSET ||
                     type == ScriptBaseClass.CAMERA_POSITION)
                 {
-                    LSL_Vector v = (LSL_Vector) data[i];
-                    parameters.Add(type + 1, (float) v.x);
-                    parameters.Add(type + 2, (float) v.y);
-                    parameters.Add(type + 3, (float) v.z);
+                    LSL_Vector v = (LSL_Vector)data[i];
+                    parameters.Add(type + 1, (float)v.x);
+                    parameters.Add(type + 2, (float)v.y);
+                    parameters.Add(type + 3, (float)v.z);
                 }
                 else
                 {
                     if (data[i] is LSL_Float)
-                        parameters.Add(type, (float) ((LSL_Float) data[i]).value);
+                        parameters.Add(type, (float)((LSL_Float)data[i]).value);
                     else if (data[i] is LSL_Integer)
-                        parameters.Add(type, ((LSL_Integer) data[i]).value);
+                        parameters.Add(type, ((LSL_Integer)data[i]).value);
                     else parameters.Add(type, Convert.ToSingle(data[i]));
                 }
             }
@@ -11729,7 +11448,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule>();
             if (parcelManagement != null)
             {
-                return (int) parcelManagement.GetLandObject((float) pos.x, (float) pos.y).LandData.Flags;
+                return (int)parcelManagement.GetLandObject((float)pos.x, (float)pos.y).LandData.Flags;
             }
             return 0;
         }
@@ -11741,7 +11460,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             IEstateModule estate = World.RequestModuleInterface<IEstateModule>();
             if (estate == null)
                 return 67108864;
-            return (int) estate.GetRegionFlags();
+            return (int)estate.GetRegionFlags();
         }
 
         public LSL_String llXorBase64StringsCorrect(string str1, string str2)
@@ -11754,7 +11473,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             int c = 0;
             foreach (char t in src1)
             {
-                ret += (char) (t ^ src2[c]);
+                ret += (char)(t ^ src2[c]);
 
                 c++;
                 if (c >= src2.Length)
@@ -11846,7 +11565,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         public void llSetContentType(LSL_Key id, LSL_Integer type)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
-            
+
             string content_type = "text/plain";
 
             if (type == ScriptBaseClass.CONTENT_TYPE_HTML)
@@ -11939,7 +11658,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule>();
             if (parcelManagement != null)
             {
-                LandData land = parcelManagement.GetLandObject((float) pos.x, (float) pos.y).LandData;
+                LandData land = parcelManagement.GetLandObject((float)pos.x, (float)pos.y).LandData;
 
                 if (land == null)
                 {
@@ -11986,7 +11705,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             LSL_List ret = new LSL_List();
             if (parcelManagement != null)
             {
-                ILandObject land = parcelManagement.GetLandObject((float) pos.x, (float) pos.y);
+                ILandObject land = parcelManagement.GetLandObject((float)pos.x, (float)pos.y);
                 if (land != null)
                 {
                     IPrimCountModule primCountModule = World.RequestModuleInterface<IPrimCountModule>();
@@ -12025,7 +11744,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (parcelManagement != null)
             {
                 IPrimCountModule primCount = World.RequestModuleInterface<IPrimCountModule>();
-                ILandObject land = parcelManagement.GetLandObject((float) pos.x, (float) pos.y);
+                ILandObject land = parcelManagement.GetLandObject((float)pos.x, (float)pos.y);
                 return primCount.GetParcelMaxPrimCount(land);
             }
             return 0;
@@ -12040,26 +11759,26 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             LSL_List ret = new LSL_List();
             if (parcelManagement != null)
             {
-                LandData land = parcelManagement.GetLandObject((float) pos.x, (float) pos.y).LandData;
+                LandData land = parcelManagement.GetLandObject((float)pos.x, (float)pos.y).LandData;
                 if (land == null)
                 {
                     return new LSL_List(0);
                 }
                 foreach (object o in param.Data)
                 {
-                    if ((LSL_Integer) o == ScriptBaseClass.PARCEL_DETAILS_NAME)
+                    if ((LSL_Integer)o == ScriptBaseClass.PARCEL_DETAILS_NAME)
                         ret.Add(new LSL_String(land.Name));
-                    else if ((LSL_Integer) o == ScriptBaseClass.PARCEL_DETAILS_DESC)
+                    else if ((LSL_Integer)o == ScriptBaseClass.PARCEL_DETAILS_DESC)
                         ret.Add(new LSL_String(land.Description));
-                    else if ((LSL_Integer) o == ScriptBaseClass.PARCEL_DETAILS_OWNER)
+                    else if ((LSL_Integer)o == ScriptBaseClass.PARCEL_DETAILS_OWNER)
                         ret.Add(new LSL_Key(land.OwnerID.ToString()));
-                    else if ((LSL_Integer) o == ScriptBaseClass.PARCEL_DETAILS_GROUP)
+                    else if ((LSL_Integer)o == ScriptBaseClass.PARCEL_DETAILS_GROUP)
                         ret.Add(new LSL_Key(land.GroupID.ToString()));
-                    else if ((LSL_Integer) o == ScriptBaseClass.PARCEL_DETAILS_AREA)
+                    else if ((LSL_Integer)o == ScriptBaseClass.PARCEL_DETAILS_AREA)
                         ret.Add(new LSL_Integer(land.Area));
-                    else if ((LSL_Integer) o == ScriptBaseClass.PARCEL_DETAILS_ID)
+                    else if ((LSL_Integer)o == ScriptBaseClass.PARCEL_DETAILS_ID)
                         ret.Add(new LSL_Key(land.GlobalID.ToString()));
-                    else if ((LSL_Integer) o == ScriptBaseClass.PARCEL_DETAILS_PRIVACY)
+                    else if ((LSL_Integer)o == ScriptBaseClass.PARCEL_DETAILS_PRIVACY)
                         ret.Add(new LSL_Integer(land.Private ? 1 : 0));
                     else
                         ret.Add(new LSL_Integer(0));
@@ -12072,15 +11791,15 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return "";
 
-            if (type == (int) ScriptBaseClass.STRING_TRIM_HEAD)
+            if (type == (int)ScriptBaseClass.STRING_TRIM_HEAD)
             {
                 return src.TrimStart();
             }
-            if (type == (int) ScriptBaseClass.STRING_TRIM_TAIL)
+            if (type == (int)ScriptBaseClass.STRING_TRIM_TAIL)
             {
                 return src.TrimEnd();
             }
-            if (type == (int) ScriptBaseClass.STRING_TRIM)
+            if (type == (int)ScriptBaseClass.STRING_TRIM)
             {
                 return src.Trim();
             }
@@ -12102,92 +11821,92 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 {
                     foreach (object o in args.Data)
                     {
-                        if ((LSL_Integer) o == ScriptBaseClass.OBJECT_NAME)
+                        if ((LSL_Integer)o == ScriptBaseClass.OBJECT_NAME)
                         {
                             ret.Add(new LSL_String(av.Name));
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_DESC)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_DESC)
                         {
                             ret.Add(new LSL_String(""));
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_POS)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_POS)
                         {
                             Vector3 tmp = av.AbsolutePosition;
                             ret.Add(new LSL_Vector(tmp.X, tmp.Y, tmp.Z));
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_ROT)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_ROT)
                         {
                             Quaternion rtmp = av.Rotation;
                             ret.Add(new LSL_Rotation(rtmp.X, rtmp.Y, rtmp.Z, rtmp.W));
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_VELOCITY)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_VELOCITY)
                         {
                             Vector3 tmp = av.Velocity;
                             ret.Add(new LSL_Vector(tmp.X, tmp.Y, tmp.Z));
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_OWNER)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_OWNER)
                         {
                             ret.Add(id);
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_GROUP)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_GROUP)
                         {
                             ret.Add(UUID.Zero.ToString());
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_CREATOR)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_CREATOR)
                         {
                             ret.Add(UUID.Zero.ToString());
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_RUNNING_SCRIPT_COUNT)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_RUNNING_SCRIPT_COUNT)
                         {
                             IScriptModule[] modules = World.RequestModuleInterfaces<IScriptModule>();
                             int activeScripts = modules.Sum(mod => mod.GetActiveScripts(av));
                             ret.Add(activeScripts);
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_TOTAL_SCRIPT_COUNT)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_TOTAL_SCRIPT_COUNT)
                         {
                             IScriptModule[] modules = World.RequestModuleInterfaces<IScriptModule>();
                             int totalScripts = modules.Sum(mod => mod.GetTotalScripts(av));
                             ret.Add(totalScripts);
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_SCRIPT_MEMORY)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_SCRIPT_MEMORY)
                         {
                             ret.Add(0);
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_SCRIPT_TIME)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_SCRIPT_TIME)
                         {
                             IScriptModule[] modules = World.RequestModuleInterfaces<IScriptModule>();
                             int scriptTime = modules.Sum(mod => mod.GetScriptTime(m_itemID));
                             ret.Add(scriptTime);
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_PRIM_EQUIVALENCE)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_PRIM_EQUIVALENCE)
                         {
                             ret.Add(0);
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_SERVER_COST)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_SERVER_COST)
                         {
                             ret.Add(0);
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_STREAMING_COST)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_STREAMING_COST)
                         {
                             ret.Add(0);
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_PHYSICS_COST)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_PHYSICS_COST)
                         {
                             ret.Add(0);
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_CHARACTER_TIME)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_CHARACTER_TIME)
                         {
                             ret.Add(0);
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_ROOT)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_ROOT)
                         {
                             ret.Add(av.Sitting ? av.SittingOnUUID : av.UUID);
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_ATTACHED_POINT)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_ATTACHED_POINT)
                         {
                             ret.Add(0);
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_PATHFINDING_TYPE)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_PATHFINDING_TYPE)
                         {
                             ret.Add(0);
                         }
@@ -12203,70 +11922,70 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 {
                     foreach (object o in args.Data)
                     {
-                        if ((LSL_Integer) o == ScriptBaseClass.OBJECT_NAME)
+                        if ((LSL_Integer)o == ScriptBaseClass.OBJECT_NAME)
                         {
                             ret.Add(new LSL_String(obj.Name));
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_DESC)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_DESC)
                         {
                             ret.Add(new LSL_String(obj.Description));
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_POS)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_POS)
                         {
                             Vector3 tmp = obj.AbsolutePosition;
                             ret.Add(new LSL_Vector(tmp.X, tmp.Y, tmp.Z));
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_ROT)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_ROT)
                         {
                             Quaternion rtmp = obj.GetRotationOffset();
                             ret.Add(new LSL_Rotation(rtmp.X, rtmp.Y, rtmp.Z, rtmp.W));
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_VELOCITY)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_VELOCITY)
                         {
                             Vector3 tmp = obj.Velocity;
                             ret.Add(new LSL_Vector(tmp.X, tmp.Y, tmp.Z));
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_OWNER)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_OWNER)
                         {
                             ret.Add(new LSL_Key(obj.OwnerID.ToString()));
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_GROUP)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_GROUP)
                         {
                             ret.Add(new LSL_Key(obj.GroupID.ToString()));
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_CREATOR)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_CREATOR)
                         {
                             ret.Add(new LSL_Key(obj.CreatorID.ToString()));
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_RUNNING_SCRIPT_COUNT)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_RUNNING_SCRIPT_COUNT)
                         {
                             IScriptModule[] modules = World.RequestModuleInterfaces<IScriptModule>();
                             int activeScripts = modules.Sum(mod => mod.GetActiveScripts(obj));
                             ret.Add(new LSL_Integer(activeScripts));
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_TOTAL_SCRIPT_COUNT)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_TOTAL_SCRIPT_COUNT)
                         {
                             IScriptModule[] modules = World.RequestModuleInterfaces<IScriptModule>();
                             int totalScripts = modules.Sum(mod => mod.GetTotalScripts(obj));
                             ret.Add(new LSL_Integer(totalScripts));
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_SCRIPT_MEMORY)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_SCRIPT_MEMORY)
                         {
                             ret.Add(new LSL_Integer(0));
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_CHARACTER_TIME)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_CHARACTER_TIME)
                         {
                             ret.Add(0);
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_ROOT)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_ROOT)
                         {
                             ret.Add(obj.ParentEntity.RootChild.UUID);
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_ATTACHED_POINT)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_ATTACHED_POINT)
                         {
                             ret.Add(obj.ParentEntity.RootChild.AttachmentPoint);
                         }
-                        else if ((LSL_Integer) o == ScriptBaseClass.OBJECT_PATHFINDING_TYPE)
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_PATHFINDING_TYPE)
                         {
                             ret.Add(0);
                         }
@@ -12295,26 +12014,69 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             return UUID.Zero;
         }
 
-        internal void ShoutError(string msg)
+        /// <summary>
+        /// Reports the script error in the viewer's Script Warning/Error dialog and shouts it on the debug channel.
+        /// </summary>
+        /// <param name="command">The name of the command that generated the error.</param>
+        /// <param name="message">The error message to report to the user.</param>
+        internal void Error(string command, string message)
         {
-            llShout(ScriptBaseClass.DEBUG_CHANNEL, msg);
+            string text = command + ": " + message;
+            if (text.Length > 1023)
+            {
+                text = text.Substring(0, 1023);
+            }
+
+            IWorldComm wComm = World.RequestModuleInterface<IWorldComm>();
+            if (wComm != null)
+            {
+                wComm.DeliverMessage(ChatTypeEnum.Shout, ScriptBaseClass.DEBUG_CHANNEL, m_host.Name, m_host.UUID, text);
+            }
         }
 
-        internal void NotImplemented(string command)
+        /// <summary>
+        /// Reports that the command is not implemented as a script error.
+        /// </summary>
+        /// <param name="command">The name of the command that is not implemented.</param>
+        /// <param name="message">Additional information to report to the user. (Optional)</param>
+        internal void NotImplemented(string command, string message = "")
         {
             if (throwErrorOnNotImplemented)
-                throw new NotImplementedException("Command not implemented: " + command);
+            {
+
+                if (message != "")
+                {
+                    message = " - " + message;
+                }
+
+                throw new NotImplementedException("Command not implemented: " + command + message);
+            }
+            else
+            {
+                string text = "Command not implemented";
+                if (message != "")
+                {
+                    text = text + " - " + message;
+                }
+
+                Error(command, text);
+            }
         }
 
-        internal void Deprecated(string command)
+        /// <summary>
+        /// Reports that the command is deprecated as a script error.
+        /// </summary>
+        /// <param name="command">The name of the command that is deprecated.</param>
+        /// <param name="message">Additional information to report to the user. (Optional)</param>
+        internal void Deprecated(string command, string message = "")
         {
-            ShoutError("Command deprecated: " + command);
-            //throw new Exception("Command deprecated: " + command);
-        }
+            string text = "Command deprecated";
+            if (message != "")
+            {
+                text = text + " - " + message;
+            }
 
-        internal void LSLError(string msg)
-        {
-            throw new Exception("LSL Runtime Error: " + msg);
+            Error(command, text);
         }
 
         public delegate void AssetRequestCallback(UUID assetID, AssetBase asset);
@@ -12323,11 +12085,11 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         {
             World.AssetService.Get(assetID.ToString(), this,
                                    delegate(string i, object sender, AssetBase a)
-                                       {
-                                           UUID uuid = UUID.Zero;
-                                           UUID.TryParse(i, out uuid);
-                                           cb(uuid, a);
-                                       });
+                                   {
+                                       UUID uuid = UUID.Zero;
+                                       UUID.TryParse(i, out uuid);
+                                       cb(uuid, a);
+                                   });
         }
 
         public LSL_List llCastRay(LSL_Vector start, LSL_Vector end, LSL_List options)
@@ -12364,7 +12126,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 count = 16;
             else if (count <= 0)
             {
-                LSLError("You must request at least one result from llCastRay.");
+                Error("llCastRay", "You must request at least one result from llCastRay.");
                 return new LSL_List();
             }
 
@@ -12385,7 +12147,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
             if (checkPhysical || checkNonPhysical || detectPhantom)
             {
-                ContactResult[] objectHits = ObjectIntersection(rayStart, rayEnd, checkPhysical, checkNonPhysical, detectPhantom, count+2);
+                ContactResult[] objectHits = ObjectIntersection(rayStart, rayEnd, checkPhysical, checkNonPhysical, detectPhantom, count + 2);
                 for (int iter = 0; iter < objectHits.Length; iter++)
                 {
                     // Redistance the Depth because the Scene RayCaster returns distance from center to make the rezzing code simpler.
@@ -12534,7 +12296,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             for (int i = 0; i < contacts.Count; i++)
             {
                 ISceneEntity grp = World.GetGroupByPrim(contacts[i].ConsumerID);
-                if(grp == null || (!includePhysical && grp.RootChild.PhysActor.IsPhysical) || 
+                if (grp == null || (!includePhysical && grp.RootChild.PhysActor.IsPhysical) ||
                     (!includeNonPhysical && !grp.RootChild.PhysActor.IsPhysical))
                     contacts.RemoveAt(i--);
             }
@@ -12767,7 +12529,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return "";
 
 
-            TaskInventoryDictionary itemsDictionary = (TaskInventoryDictionary) m_host.TaskInventory.Clone();
+            TaskInventoryDictionary itemsDictionary = (TaskInventoryDictionary)m_host.TaskInventory.Clone();
 
             UUID assetID = UUID.Zero;
 
@@ -12786,14 +12548,14 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (assetID == UUID.Zero)
             {
                 // => complain loudly, as specified by the LSL docs
-                ShoutError("Notecard '" + name + "' could not be found.");
+                Error("llGetNumberOfNotecardLines", "Can't find notecard '" + name + "'");
 
                 return UUID.Zero.ToString();
             }
 
             // was: UUID tid = tid = m_ScriptEngine.
             UUID rq = UUID.Random();
-            DataserverPlugin dataserverPlugin = (DataserverPlugin) m_ScriptEngine.GetScriptPlugin("Dataserver");
+            DataserverPlugin dataserverPlugin = (DataserverPlugin)m_ScriptEngine.GetScriptPlugin("Dataserver");
             UUID tid = dataserverPlugin.RegisterRequest(m_host.UUID, m_itemID, rq.ToString());
 
             if (NotecardCache.IsCached(assetID))
@@ -12808,7 +12570,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                                       {
                                           if (a == null || a.Type != 7)
                                           {
-                                              ShoutError("Notecard '" + name + "' could not be found.");
+                                              Error("llGetNumberOfNotecardLines", "Can't find notecard '" + name + "'");
                                               tid = UUID.Zero;
                                           }
                                           else
@@ -12833,12 +12595,12 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (!UUID.TryParse(uuid, out userID))
             {
                 // => complain loudly, as specified by the LSL docs
-                ShoutError("Failed to parse uuid for avatar.");
+                Error("llRequestUsername", "Failed to parse uuid for avatar.");
 
                 return UUID.Zero.ToString();
             }
 
-            DataserverPlugin dataserverPlugin = (DataserverPlugin) m_ScriptEngine.GetScriptPlugin("Dataserver");
+            DataserverPlugin dataserverPlugin = (DataserverPlugin)m_ScriptEngine.GetScriptPlugin("Dataserver");
             UUID tid = dataserverPlugin.RegisterRequest(m_host.UUID, m_itemID, uuid.ToString());
 
             Util.FireAndForget(delegate
@@ -12863,12 +12625,12 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (!UUID.TryParse(uuid, out userID))
             {
                 // => complain loudly, as specified by the LSL docs
-                ShoutError("Failed to parse uuid for avatar.");
+                Error("llRequestDisplayName", "Failed to parse uuid for avatar.");
 
                 return UUID.Zero.ToString();
             }
 
-            DataserverPlugin dataserverPlugin = (DataserverPlugin) m_ScriptEngine.GetScriptPlugin("Dataserver");
+            DataserverPlugin dataserverPlugin = (DataserverPlugin)m_ScriptEngine.GetScriptPlugin("Dataserver");
             UUID tid = dataserverPlugin.RegisterRequest(m_host.UUID, m_itemID, uuid.ToString());
 
             Util.FireAndForget(delegate
@@ -12895,7 +12657,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return "";
 
 
-            TaskInventoryDictionary itemsDictionary = (TaskInventoryDictionary) m_host.TaskInventory.Clone();
+            TaskInventoryDictionary itemsDictionary = (TaskInventoryDictionary)m_host.TaskInventory.Clone();
 
             UUID assetID = UUID.Zero;
 
@@ -12914,14 +12676,14 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (assetID == UUID.Zero)
             {
                 // => complain loudly, as specified by the LSL docs
-                ShoutError("Notecard '" + name + "' could not be found.");
+                Error("llGetNotecardLine", "Notecard '" + name + "' could not be found.");
 
                 return UUID.Zero.ToString();
             }
 
             // was: UUID tid = tid = m_ScriptEngine.
             UUID rq = UUID.Random();
-            DataserverPlugin dataserverPlugin = (DataserverPlugin) m_ScriptEngine.GetScriptPlugin("Dataserver");
+            DataserverPlugin dataserverPlugin = (DataserverPlugin)m_ScriptEngine.GetScriptPlugin("Dataserver");
             UUID tid = dataserverPlugin.RegisterRequest(m_host.UUID, m_itemID, rq.ToString());
 
             if (NotecardCache.IsCached(assetID))
@@ -12936,7 +12698,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                                       {
                                           if (a == null || a.Type != 7)
                                           {
-                                              ShoutError("Notecard '" + name + "' could not be found.");
+                                              Error("llGetNotecardLine", "Notecard '" + name + "' could not be found.");
                                           }
                                           else
                                           {
@@ -13020,7 +12782,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 return LSL_Integer.TRUE;
             }
             else
-                ShoutError("llManageEstateAccess object owner must manage estate.");
+                Error("llManageEstateAccess", "llManageEstateAccess object owner must manage estate.");
             return LSL_Integer.FALSE;
         }
 
@@ -13029,7 +12791,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
             if (!m_host.IsRoot)
             {
-                ShoutError("Must be used in the root object!");
+                Error("llSetKeyframedMotion", "Must be used in the root object!");
                 return;
             }
             KeyframeAnimation.Data dataType = KeyframeAnimation.Data.Both;
@@ -13040,16 +12802,16 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 LSL_Integer value = options.GetLSLIntegerItem(i + 1);
                 if (option == ScriptBaseClass.KFM_COMMAND)
                 {
-                    m_host.ParentEntity.AddKeyframedMotion(null, (KeyframeAnimation.Commands) value.value);
+                    m_host.ParentEntity.AddKeyframedMotion(null, (KeyframeAnimation.Commands)value.value);
                     break; //Its supposed to be the only option in the list
                 }
                 if (option == ScriptBaseClass.KFM_MODE)
                 {
-                    currentMode = (KeyframeAnimation.Modes) value.value;
+                    currentMode = (KeyframeAnimation.Modes)value.value;
                 }
                 else if (option == ScriptBaseClass.KFM_DATA)
                 {
-                    dataType = (KeyframeAnimation.Data) value.value;
+                    dataType = (KeyframeAnimation.Data)value.value;
                 }
             }
             List<Vector3> positions = new List<Vector3>();
@@ -13157,7 +12919,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     LSL_Types.LSLInteger opt = options.GetLSLIntegerItem(i);
                     LSL_Types.LSLFloat value = options.GetLSLFloatItem(i + 1);
                     if (opt == ScriptBaseClass.CHARACTER_DESIRED_SPEED)
-                        controller.SetSpeedModifier((float) value.value);
+                        controller.SetSpeedModifier((float)value.value);
                     else if (opt == ScriptBaseClass.CHARACTER_RADIUS)
                     {
                     }
@@ -13210,18 +12972,18 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 float fuzz = 2;
                 Vector3 offset = Vector3.Zero;
                 bool requireLOS = false;
-// 20131224 not used				bool intercept;  = false; //Not implemented
+                // 20131224 not used				bool intercept;  = false; //Not implemented
                 for (int i = 0; i < options.Length; i += 2)
                 {
                     LSL_Types.LSLInteger opt = options.GetLSLIntegerItem(i);
                     if (opt == ScriptBaseClass.PURSUIT_FUZZ_FACTOR)
-                        fuzz = (float) options.GetLSLFloatItem(i + 1).value;
+                        fuzz = (float)options.GetLSLFloatItem(i + 1).value;
                     if (opt == ScriptBaseClass.PURSUIT_OFFSET)
                         offset = options.GetVector3Item(i + 1).ToVector3();
                     if (opt == ScriptBaseClass.REQUIRE_LINE_OF_SIGHT)
                         requireLOS = options.GetLSLIntegerItem(i + 1) == 1;
-// 20131224 not used                    if (opt == ScriptBaseClass.PURSUIT_INTERCEPT)
-// 20131224 not used                        intercept = options.GetLSLIntegerItem(i + 1) == 1;
+                    // 20131224 not used                    if (opt == ScriptBaseClass.PURSUIT_INTERCEPT)
+                    // 20131224 not used                        intercept = options.GetLSLIntegerItem(i + 1) == 1;
                 }
                 botManager.FollowAvatar(m_host.ParentEntity.UUID, target.m_string, fuzz, fuzz, requireLOS, offset,
                                         m_host.ParentEntity.OwnerID);
@@ -13246,7 +13008,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             {
                 if (!(pos is LSL_Vector))
                     continue;
-                LSL_Vector p = (LSL_Vector) pos;
+                LSL_Vector p = (LSL_Vector)pos;
                 positions.Add(p.ToVector3());
                 travelMode.Add(TravelMode.Walk);
             }
@@ -13257,8 +13019,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
         public void llNavigateTo(LSL_Vector point, LSL_List options)
         {
-            List<Vector3> positions = new List<Vector3>() {point.ToVector3()};
-            List<TravelMode> travelMode = new List<TravelMode>() {TravelMode.Walk};
+            List<Vector3> positions = new List<Vector3>() { point.ToVector3() };
+            List<TravelMode> travelMode = new List<TravelMode>() { TravelMode.Walk };
             IBotManager botManager = World.RequestModuleInterface<IBotManager>();
             int flags = 0;
             if (options.Length > 0)
@@ -13274,7 +13036,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
         public LSL_List llGetClosestNavPoint(LSL_Vector point, LSL_List options)
         {
-            Vector3 diff = new Vector3(0, 0, 0.1f)*
+            Vector3 diff = new Vector3(0, 0, 0.1f) *
                            (Vector3.RotationBetween(m_host.ParentEntity.AbsolutePosition, point.ToVector3()));
             return new LSL_List(new LSL_Vector((m_host.ParentEntity.AbsolutePosition + diff)));
         }
@@ -13341,7 +13103,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         public void llResetAnimationOverride(LSL_String anim_state)
         {
             //anim_state - animation state to be reset
-            
+
             UUID invItemID = InventorySelf();
             if (invItemID == UUID.Zero)
                 return;
@@ -13475,7 +13237,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     {
                         if (!(values.Data[i] is LSL_String))
                             return ScriptBaseClass.JSON_INVALID;
-                        map.Add(((LSL_String)values.Data[i]).m_string, ListToJson(values.Data[i+1]));
+                        map.Add(((LSL_String)values.Data[i]).m_string, ListToJson(values.Data[i + 1]));
                     }
                     return OSDParser.SerializeJsonString(map);
                 }
@@ -13553,7 +13315,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
         private void JsonSetSpecific(OSD o, LSL_List specifiers, int i, LSL_String val)
         {
             object spec = specifiers.Data[i];
-// 20131224 not used            object specNext = i+1 == specifiers.Data.Length ? null : specifiers.Data[i+1];
+            // 20131224 not used            object specNext = i+1 == specifiers.Data.Length ? null : specifiers.Data[i+1];
             OSD nextVal = null;
             if (o is OSDArray)
             {
@@ -13561,13 +13323,13 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 if (spec is LSL_Integer)
                 {
                     int v = ((LSL_Integer)spec).value;
-                    if(v >= array.Count)
-                        array.Add(JsonBuildRestOfSpec(specifiers, i+1, val));
+                    if (v >= array.Count)
+                        array.Add(JsonBuildRestOfSpec(specifiers, i + 1, val));
                     else
                         nextVal = ((OSDArray)o)[v];
                 }
                 else if (spec is LSL_String && ((LSL_String)spec) == ScriptBaseClass.JSON_APPEND)
-                    array.Add(JsonBuildRestOfSpec(specifiers, i+1, val));
+                    array.Add(JsonBuildRestOfSpec(specifiers, i + 1, val));
             }
             if (o is OSDMap)
             {
@@ -13577,7 +13339,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                     if (map.ContainsKey(((LSL_String)spec).m_string))
                         nextVal = map[((LSL_String)spec).m_string];
                     else
-                        map.Add(((LSL_String)spec).m_string, JsonBuildRestOfSpec(specifiers, i+1, val));
+                        map.Add(((LSL_String)spec).m_string, JsonBuildRestOfSpec(specifiers, i + 1, val));
                 }
             }
             if (nextVal != null)
@@ -13592,23 +13354,23 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
         private OSD JsonBuildRestOfSpec(LSL_List specifiers, int i, LSL_String val)
         {
-            object spec =  i >= specifiers.Data.Length ? null : specifiers.Data[i];
-// 20131224 not used            object specNext = i+1 >= specifiers.Data.Length ? null : specifiers.Data[i+1];
+            object spec = i >= specifiers.Data.Length ? null : specifiers.Data[i];
+            // 20131224 not used            object specNext = i+1 >= specifiers.Data.Length ? null : specifiers.Data[i+1];
 
             if (spec == null)
                 return OSD.FromString(val);
 
-            if (spec is LSL_Integer || 
+            if (spec is LSL_Integer ||
                 (spec is LSL_String && ((LSL_String)spec) == ScriptBaseClass.JSON_APPEND))
             {
                 OSDArray array = new OSDArray();
-                array.Add(JsonBuildRestOfSpec(specifiers, i+1, val));
+                array.Add(JsonBuildRestOfSpec(specifiers, i + 1, val));
                 return array;
             }
             else if (spec is LSL_String)
             {
                 OSDMap map = new OSDMap();
-                map.Add((LSL_String)spec, JsonBuildRestOfSpec(specifiers, i+1, val));
+                map.Add((LSL_String)spec, JsonBuildRestOfSpec(specifiers, i + 1, val));
                 return map;
             }
             return new OSD();
@@ -13661,7 +13423,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 if (m_Notecards.ContainsKey(assetID))
                     return;
 
-                Notecard nc = new Notecard {lastRef = DateTime.Now, text = SLUtil.ParseNotecardToList(text).ToArray()};
+                Notecard nc = new Notecard { lastRef = DateTime.Now, text = SLUtil.ParseNotecardToList(text).ToArray() };
                 m_Notecards[assetID] = nc;
             }
         }
