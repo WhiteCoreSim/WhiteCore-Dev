@@ -1,8 +1,14 @@
 
 WhiteCore-Sim (Dev) 
 Rowan D <greythane@gmail.com>
+Fly-Man- <fly.man.opensim@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Feb 9th 2014
+* LSL Functions
+	- Cleaned up the old Deprecated, ShoutError and NotImplemented
+	- Updated the LSL_Api.cs file with all the remaining functions and set those as NotImplemented for this moment
+---------------------------------
 Feb 3rd 2014
 * Treepopulator 
     - correct HandleTreeConfigure() for invalid commandline option being passed
@@ -25,7 +31,6 @@ Feb 3rd 2014
 			<Z>0.3589401</Z>
 		</OffsetPosition> 
 * Rework LSL_Type operator LSLFloat operators Boolean, ==, != as per above
-
 
 ---------------------------------
 Dec 24th, 2013
