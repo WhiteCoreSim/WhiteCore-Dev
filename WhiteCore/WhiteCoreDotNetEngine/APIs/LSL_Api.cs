@@ -3438,6 +3438,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             LookAt(target, strength, damping, m_host);
         }
 
+        // Fly - Function unknown on the SL Wiki
         public void llLinkLookAt(LSL_Integer link, LSL_Vector target, double strength, double damping)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
@@ -3485,6 +3486,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             m_host.RotLookAt(rot, (float)strength, (float)damping);
         }
 
+        // Fly - Function unknown on the SL Wiki
         public void llLinkRotLookAt(LSL_Integer link, LSL_Rotation target, double strength, double damping)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
@@ -6835,6 +6837,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 return new LSL_Integer();
 
             // Make scripts designed for LSO happy
+            // Fly - Why do we set this to 16K as each script now uses Mono anyways
             return 16384;
         }
 
@@ -6844,6 +6847,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 return new LSL_Integer();
 
             // Make scripts designed for LSO happy
+            // Fly - Why do we set this to 16K as each script now uses Mono anyways
             return 16384;
         }
 
@@ -6853,6 +6857,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
                 return new LSL_Integer();
 
             // Make scripts designed for LSO happy
+            // Fly - Why do we set this to 16K as each script now uses Mono anyways
             return 16384;
         }
 
@@ -13401,6 +13406,51 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
             }
             return ScriptBaseClass.JSON_INVALID;
         }
+        #region Added functions
+
+        public LSL_Float llGetMaxScaleFactor()
+        {
+            NotImplemented("llGetMaxScaleFactor", "Not implemented at this moment");
+            return 1.0f;
+        }
+
+        public LSL_Float llGetMinScaleFactor()
+        {
+            NotImplemented("llGetMinScaleFactor", "Not implemented at this moment");
+            return 1.0f;
+        }
+
+        public LSL_List llGetStaticPath(LSL_Vector start, LSL_Vector end, LSL_Float radius, LSL_List parameters)
+        {
+            NotImplemented("llGetStaticPath", "Not implemented at this moment");
+            LSL_List empty = new LSL_List();
+            return empty;
+        }
+
+        public LSL_Integer llReturnObjectsByID(LSL_List objects)
+        {
+            NotImplemented("llReturnObjectsByID", "Not implemented at this moment");
+            return 0;
+        }
+
+        public LSL_Integer llReturnObjectsByOwner(LSL_Key owner, LSL_Integer scope)
+        {
+            NotImplemented("llReturnObjectsByOwner", "Not implemented at this moment");
+            return 0;
+        }
+
+        public LSL_Integer llScaleByFactor(LSL_Float scaling_factor)
+        {
+            NotImplemented("llScaleByFactor", "Not implemented at this moment");
+            return 0;
+        }
+
+        public LSL_String llXorBase64(LSL_String str1, LSL_String str2)
+        {
+            NotImplemented("llXorBase64", "Not implemented at this moment");
+            return String.Empty;
+        }
+        #endregion
     }
 
     public class NotecardCache
