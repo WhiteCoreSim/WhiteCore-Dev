@@ -4,6 +4,10 @@ Rowan D <greythane@gmail.com>
 Fly-Man- <fly.man.opensim@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Feb 11th 2014
+* DatabaseManager
+    - Removed 'whitecore' from migration version table name.  >> 'migrator_version'
+
 Feb 10th 2014
 * Treepopulator - addon module
 	- set default state to 'disabled' if config not found (Nature.ini)

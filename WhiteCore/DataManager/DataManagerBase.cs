@@ -38,7 +38,7 @@ namespace WhiteCore.DataManager
 {
     public abstract class DataManagerBase : IDataConnector
     {
-		private const string VERSION_TABLE_NAME = "whitecore_migrator_version";
+		private const string VERSION_TABLE_NAME = "migrator_version";
         private const string COLUMN_NAME = "name";
         private const string COLUMN_VERSION = "version";
 
