@@ -2,8 +2,18 @@
 WhiteCore-Sim (Dev) 
 Rowan D <greythane@gmail.com>
 Fly-Man- <fly.man.opensim@gmail.com>
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Feb 10th 2014
+* Treepopulator - addon module
+	- set default state to 'disabled' if config not found (Nature.ini)
+* Scenemanager ( Load & save oar)
+* AppearanceArchiver (load & save avatar archive)
+* InventoryArchiver (load , save & save withoutassets iar file)
+	- added some sanity checkes for missing, invalid and existing filenames.
+* Rename WhiteCore/Modules/Region/AuroraArchiver.cs > .../WhiteCoreArchiver.cs
+	(old format .abackup processing)
+	 
 Feb 9th 2014
 * LSL Functions
 	- Cleaned up the old Deprecated, ShoutError and NotImplemented

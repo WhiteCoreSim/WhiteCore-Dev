@@ -150,6 +150,18 @@ namespace WhiteCore.Modules.Archivers
             string fileName = MainConsole.Instance.Prompt("What file name should we load?",
                                                           scene.RegionInfo.RegionName + ".abackup");
 
+            // a couple of sanity checkes
+            string extension = Path.GetExtension (fileName);
+
+            if (extension == string.Empty)
+            {
+                fileName = fileName + ".abackup";
+            }
+
+            if (!File.Exists(fileName)) {
+                MainConsole.Instance.Info ("[Archiver]: Region archive file '"+fileName+"' not found.");
+                return;
+            }
 
             var stream = ArchiveHelpers.GetStream(fileName);
             if (stream == null)
@@ -168,6 +180,29 @@ namespace WhiteCore.Modules.Archivers
         {
             string fileName = MainConsole.Instance.Prompt("What file name will this be saved as?",
                                                           scene.RegionInfo.RegionName + ".abackup");
+
+            //some file sanity checks
+            string extension = Path.GetExtension (fileName);
+
+            if (extension == string.Empty)
+            {
+                fileName = fileName + ".abackup";
+            }
+
+            string fileDir = Path.GetDirectoryName(fileName);
+            if (fileDir == "") { fileDir = "./"; }
+            if (!Directory.Exists(fileDir))
+            {
+                MainConsole.Instance.Info ( "[Archiver]: The file path specified, '" + fileDir + "' does not exist!" );
+                return;
+            }
+
+            if (File.Exists(fileName)) {
+                if (MainConsole.Instance.Prompt ("[Archiver]: The Region archive file '" + fileName + "' already exists. Overwrite?", "yes" ) != "yes")
+                    return;
+
+                File.Delete (fileName);
+            }
 
             GZipStream m_saveStream = new GZipStream(new FileStream(fileName, FileMode.Create), CompressionMode.Compress);
             TarArchiveWriter writer = new TarArchiveWriter(m_saveStream);
