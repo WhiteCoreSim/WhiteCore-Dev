@@ -192,37 +192,96 @@ namespace WhiteCore.Modules.Archivers
 
         #region Console Commands
 
+        /// <summary>
+        /// Handles loading of an avatar archive.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmdparams">Cmdparams.</param>
         protected void HandleLoadAvatarArchive(IScene scene, string[] cmdparams)
         {
-            if (cmdparams.Length != 6)
+            if (cmdparams.Length < 6)
             {
-                MainConsole.Instance.Info("[AvatarArchive]: Not enough parameters!");
+                MainConsole.Instance.Info("[AvatarArchive]: Not enough parameters!\n" +
+                    "usage is: load avatar archive <First> <Last> <Filename>");
                 return;
             }
-            UserAccount account = UserAccountService.GetUserAccount(null, cmdparams[3] + " " + cmdparams[4]);
+
+            string userName = cmdparams [3] + " " + cmdparams [4];
+            UserAccount account = UserAccountService.GetUserAccount(null, userName);
             if (account == null)
             {
-                MainConsole.Instance.Info("[AvatarArchive]: No such account found!");
+                MainConsole.Instance.Info("[AvatarArchive]: No account found for " + userName +"!");
                 return;
             }
-            AvatarArchive archive = LoadAvatarArchive(cmdparams[5], account.PrincipalID);
+
+            //some file sanity checks
+            string fileName = cmdparams[5];
+            string extension = Path.GetExtension (fileName);
+
+            if (extension == string.Empty)
+            {
+                fileName = fileName + ".aa";
+                cmdparams [5] = fileName;
+            }
+
+            if (!File.Exists(fileName)) {
+                MainConsole.Instance.Info ("[AvatarArchive]: Avatar archive file '" + fileName + "' not found.");
+                return;
+            }
+
+            AvatarArchive archive = LoadAvatarArchive(fileName, account.PrincipalID);
             if (archive != null)
                 AvatarService.SetAppearance(account.PrincipalID, archive.Appearance);
         }
 
+        /// <summary>
+        /// Handles saveing of an avatar archive.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmdparams">Cmdparams.</param>
         protected void HandleSaveAvatarArchive(IScene scene, string[] cmdparams)
         {
             if (cmdparams.Length < 7)
             {
-                MainConsole.Instance.Info("[AvatarArchive]: Not enough parameters!");
+                MainConsole.Instance.Info("[AvatarArchive]: Not enough parameters!\n" +
+                    "usage is: save avatar archive <First> <Last> <Filename> <FolderNameToSaveInto> (--snapshot <UUID>) (--private)");
                 return;
             }
-            UserAccount account = UserAccountService.GetUserAccount(null, cmdparams[3] + " " + cmdparams[4]);
+
+            string userName = cmdparams [3] + " " + cmdparams [4];
+            UserAccount account = UserAccountService.GetUserAccount(null, userName);
             if (account == null)
             {
-                MainConsole.Instance.Error("[AvatarArchive]: User not found!");
+                MainConsole.Instance.Error("[AvatarArchive]: User '" + userName + "' not found!");
                 return;
             }
+
+            //some file sanity checks
+            string fileName = cmdparams[5];
+            string extension = Path.GetExtension (fileName);
+
+            if (extension == string.Empty)
+            {
+                fileName = fileName + ".aa";
+                cmdparams [5] = fileName;
+            }
+
+            string fileDir = Path.GetDirectoryName(fileName);
+            if (fileDir == "") { fileDir = "./"; }
+            if (!Directory.Exists(fileDir))
+            {
+                MainConsole.Instance.Info ( "[AvatarArchive]: The file path specified, '" + fileDir + "' does not exist!" );
+                return;
+            }
+
+            if (File.Exists(fileName)) {
+                if (MainConsole.Instance.Prompt ("[AvatarArchive]: The Avatar archive file '"+fileName+"' already exists. Overwrite?", "yes" ) != "yes")
+                    return;
+
+                File.Delete (fileName);
+            }
+
+            // check switch options
             string foldername = "/";
             UUID snapshotUUID = UUID.Zero;
             bool isPublic = true;
@@ -247,7 +306,7 @@ namespace WhiteCore.Modules.Archivers
                 }
             }
 
-            SaveAvatarArchive(cmdparams[5], account.PrincipalID, foldername, snapshotUUID, isPublic);
+            SaveAvatarArchive(fileName, account.PrincipalID, foldername, snapshotUUID, isPublic);
         }
 
         #endregion

@@ -41,6 +41,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Timer = System.Timers.Timer;
+using System.IO;
 
 namespace WhiteCore.Region
 {
@@ -886,6 +887,28 @@ namespace WhiteCore.Region
                     return;
             }
 
+            // a couple of sanity checkes
+            if (cmdparams.Count() < 3)
+            {
+                MainConsole.Instance.Info(
+                    "You need to specify a filename to load.");
+                return;
+            }
+
+            string fileName = cmdparams[2];
+            string extension = Path.GetExtension (fileName);
+
+            if (extension == string.Empty)
+            {
+                fileName = fileName + ".oar";
+                cmdparams [2] = fileName;
+            }
+
+            if (!File.Exists(fileName)) {
+                MainConsole.Instance.Info ("OAR archive file '"+fileName+"' not found.");
+                return;
+            }
+
             try
             {
                 IRegionArchiverModule archiver = scene.RequestModuleInterface<IRegionArchiverModule>();
@@ -910,6 +933,38 @@ namespace WhiteCore.Region
                 return;
             }
 
+            // a couple of sanity checkes
+            if (cmdparams.Count() < 3)
+            {
+                MainConsole.Instance.Info("You need to specify a filename for the save operation.");
+                return;
+            }
+
+            string fileName = cmdparams[2];
+            string extension = Path.GetExtension (fileName);
+
+            if (extension == string.Empty)
+            {
+                fileName = fileName + ".oar";
+                cmdparams [2] = fileName;
+            }
+
+            string fileDir = Path.GetDirectoryName(fileName);
+            if (fileDir == "") { fileDir = "./"; }
+            if (!Directory.Exists(fileDir))
+            {
+                MainConsole.Instance.Info ( "[SceneManager]: The folder specified, '" + fileDir + "' does not exist!" );
+                return;
+            }
+
+            if (File.Exists(fileName)) {
+                if (MainConsole.Instance.Prompt ("[SceneManager]: The OAR archive file '"+fileName+"' already exists. Overwrite?", "yes" ) != "yes")
+                    return;
+
+                File.Delete (fileName);
+            }
+
+            // should be good to go...
             IRegionArchiverModule archiver = scene.RequestModuleInterface<IRegionArchiverModule>();
             if (archiver != null)
                 archiver.HandleSaveOarConsoleCommand(cmdparams);
