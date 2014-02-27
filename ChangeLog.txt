@@ -4,6 +4,11 @@ Rowan D <greythane@gmail.com>
 Fly-Man- <fly.man.opensim@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Feb 18th 2014
+* TerrainChannel
+    - updated default height setting for Island creation. (was tending to create submerged islands)
+* setupversioninfo.bat (bin) - revamped to use std git commit hashcode
+
 Feb 11th 2014
 * DatabaseManager
     - Removed 'whitecore' from migration version table name.  >> 'migrator_version'
