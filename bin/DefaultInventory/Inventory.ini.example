@@ -19,3 +19,10 @@
 [DefaultXMLAssetLoader]
     AssetLoaderArgs = assets\AssetSets.xml
     PreviouslyLoaded = true
+
+[DefaultAssetsIARCreator]
+    ;; Enable saving of the current default inventory
+    Enabled = false
+    
+    ;;Name of the IAR file that will be created
+    NameOfIAR = "DefaultInventory.iar"

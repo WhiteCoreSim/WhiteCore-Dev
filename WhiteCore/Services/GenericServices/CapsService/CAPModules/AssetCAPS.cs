@@ -25,8 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
-using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Servers;
@@ -34,14 +32,10 @@ using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Assets;
-using WhiteCore.Framework.Services.ClassHelpers.Inventory;
 using WhiteCore.Framework.Utilities;
 using OpenMetaverse;
-using OpenMetaverse.Assets;
-using OpenMetaverse.Imaging;
 using OpenMetaverse.StructuredData;
 using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -55,6 +49,9 @@ namespace WhiteCore.Services
 {
     public class AssetCAPS : IExternalCapsRequestHandler
     {
+		//const string missingTextureID = "aab281ce-a342-11e3-be40-425861b86ab6";		
+        const string MISSING_TEXTURE_ID = "41fcdbb9-0896-495d-8889-1eb6fad88da3";       // texture to use when all else fails...
+
         protected IAssetService m_assetService;
         protected IJ2KDecoder m_j2kDecoder;
         protected UUID m_AgentID;
@@ -76,9 +73,11 @@ namespace WhiteCore.Services
             m_getTextureURI = "/CAPS/GetTexture/" + UUID.Random() + "/";
             capURLs["GetTexture"] = MainServer.Instance.ServerURI + m_getTextureURI;
             MainServer.Instance.AddStreamHandler(new GenericStreamHandler("GET", m_getTextureURI, ProcessGetTexture));
+
             m_bakedTextureURI = "/CAPS/UploadBakedTexture/" + UUID.Random() + "/";
             capURLs["UploadBakedTexture"] = MainServer.Instance.ServerURI + m_bakedTextureURI;
             MainServer.Instance.AddStreamHandler(new GenericStreamHandler("POST", m_bakedTextureURI, UploadBakedTexture));
+
             m_getMeshURI = "/CAPS/GetMesh/" + UUID.Random() + "/";
             capURLs["GetMesh"] = MainServer.Instance.ServerURI + m_getMeshURI;
             MainServer.Instance.AddStreamHandler(new GenericStreamHandler("GET", m_getMeshURI, ProcessGetMesh));
@@ -194,36 +193,52 @@ namespace WhiteCore.Services
                     // Fetch locally or remotely. Misses return a 404
                     texture = m_assetService.Get(textureID.ToString());
 
-                    if (texture != null)
-                    {
-                        if (texture.Type != (sbyte) AssetType.Texture && texture.Type != (sbyte) AssetType.Unknown &&
-                            texture.Type != (sbyte) AssetType.Simstate)
-                        {
-                            httpResponse.StatusCode = (int) System.Net.HttpStatusCode.NotFound;
-                            response = MainServer.BlankResponse;
-                            return true;
-                        }
-                        if (format == DefaultFormat)
-                        {
-                            response = WriteTextureData(httpRequest, httpResponse, texture, format);
-                            texture = null;
-                            return true;
-                        }
-                        AssetBase newTexture = new AssetBase(texture.ID + "-" + format, texture.Name, AssetType.Texture,
-                                                             texture.CreatorID)
-                                                   {Data = ConvertTextureData(texture, format)};
-                        if (newTexture.Data.Length == 0)
-                        {
-                            response = MainServer.BlankResponse;
-                            return false; // !!! Caller try another codec, please!
-                        }
+					if (texture != null)
+					{
+						if (texture.Type != (sbyte)AssetType.Texture && texture.Type != (sbyte)AssetType.Unknown &&
+						                      texture.Type != (sbyte)AssetType.Simstate)
+						{
+							httpResponse.StatusCode = (int)System.Net.HttpStatusCode.NotFound;
+							response = MainServer.BlankResponse;
+							return true;
+						}
+						if (format == DefaultFormat)
+						{
+							response = WriteTextureData (httpRequest, httpResponse, texture, format);
+							texture = null;
+							return true;
+						}
+						AssetBase newTexture = new AssetBase (texture.ID + "-" + format, texture.Name, AssetType.Texture,
+							                                         texture.CreatorID)
+                                                   { Data = ConvertTextureData (texture, format) };
+						if (newTexture.Data.Length == 0)
+						{
+							response = MainServer.BlankResponse;
+							return false; // !!! Caller try another codec, please!
+						}
 
-                        newTexture.Flags = AssetFlags.Collectable | AssetFlags.Temporary;
-                        newTexture.ID = m_assetService.Store(newTexture);
-                        response = WriteTextureData(httpRequest, httpResponse, newTexture, format);
-                        newTexture = null;
-                        return true;
-                    }
+						newTexture.Flags = AssetFlags.Collectable | AssetFlags.Temporary;
+						newTexture.ID = m_assetService.Store (newTexture);
+						response = WriteTextureData (httpRequest, httpResponse, newTexture, format);
+						newTexture = null;
+						return true;
+					} else
+					{
+						// nothing found... replace with the 'missing_texture" texture
+						// try the cache
+						texture = m_assetService.GetCached(MISSING_TEXTURE_ID);
+
+						if (texture == null)
+							texture = m_assetService.Get (MISSING_TEXTURE_ID);		// not in local cache...
+
+						if ((texture != null) && (format == DefaultFormat))
+						{
+							MainConsole.Instance.Warn("[GETTEXTURE]: Texture " + textureID + " replaced with default 'missing' texture");
+							response = WriteTextureData (httpRequest, httpResponse, texture, format);
+							texture = null;
+							return true;
+						}
+					}
                 }
                 else // it was on the cache
                 {
@@ -239,6 +254,7 @@ namespace WhiteCore.Services
                     texture = null;
                     return true;
                 }
+
             }
 
             // not found
