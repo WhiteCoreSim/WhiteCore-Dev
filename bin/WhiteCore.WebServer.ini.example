@@ -69,9 +69,9 @@
     GridInfoInHandlerPort = 80
     
 [Includes]
-    Include-Data = WhiteCoreServerConfiguration/Data/Data.ini
-    Include-GridSetup = WhiteCoreServerConfiguration/GridSetup.ini
-    Include-GridInfoService = WhiteCoreServerConfiguration/GridInfoService.ini
-    Include-Login = WhiteCoreServerConfiguration/Login.ini
-    Include-Main = WhiteCoreWebServerConfiguration/Main.ini
-	Include-WebInterface = WhiteCoreWebServerConfiguration/WebInterface.ini
+    Include-Data = ServerConfiguration/Data/Data.ini
+    Include-GridSetup = ServerConfiguration/GridSetup.ini
+    Include-GridInfoService = ServerConfiguration/GridInfoService.ini
+    Include-Login = ServerConfiguration/Login.ini
+    Include-Main = WebServerConfiguration/Main.ini
+	Include-WebInterface = WebServerConfiguration/WebInterface.ini

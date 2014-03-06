@@ -248,7 +248,7 @@ namespace WhiteCore.Simulation.Base
                     //Data.ini setup
                     if (isStandalone)
                     {
-                        string folder = isWhiteCoreExe ? "Configuration/" : "WhiteCoreServerConfiguration/";
+                        string folder = isWhiteCoreExe ? "Configuration/" : "ServerConfiguration/";
                         MakeSureExists(folder + "Data/Data.ini");
                         IniConfigSource data_ini = new IniConfigSource(folder + "Data/Data.ini",
                                                                        Nini.Ini.IniFileType.AuroraStyle);
@@ -393,11 +393,11 @@ namespace WhiteCore.Simulation.Base
                     }
                     if (!isWhiteCoreExe)
                     {
-                        MakeSureExists("WhiteCoreServerConfiguration/Login.ini");
-                        IniConfigSource login_ini = new IniConfigSource("WhiteCoreServerConfiguration/Login.ini",
+                        MakeSureExists("ServerConfiguration/Login.ini");
+                        IniConfigSource login_ini = new IniConfigSource("ServerConfiguration/Login.ini",
                                                                         Nini.Ini.IniFileType.AuroraStyle);
                         IniConfigSource login_ini_example =
-                            new IniConfigSource("WhiteCoreServerConfiguration/Login.ini.example",
+                            new IniConfigSource("ServerConfiguration/Login.ini.example",
                                                 Nini.Ini.IniFileType.AuroraStyle);
                         foreach (IConfig config in login_ini_example.Configs)
                         {
@@ -417,9 +417,9 @@ namespace WhiteCore.Simulation.Base
                         Console.WriteLine("Your Login.ini has been successfully configured");
                         Console.ResetColor();
 
-                        MakeSureExists("WhiteCoreServerConfiguration/GridInfoService.ini");
+                        MakeSureExists("ServerConfiguration/GridInfoService.ini");
                         IniConfigSource grid_info_ini =
-                            new IniConfigSource("WhiteCoreServerConfiguration/GridInfoService.ini",
+                            new IniConfigSource("ServerConfiguration/GridInfoService.ini",
                                                 Nini.Ini.IniFileType.AuroraStyle);
                         IConfig conf = grid_info_ini.AddConfig("GridInfoService");
                         conf.Set("GridInfoInHandlerPort", 8002);

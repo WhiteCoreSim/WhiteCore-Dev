@@ -4,6 +4,10 @@ Rowan D <greythane@gmail.com>
 Fly-Man- <fly.man.opensim@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Mar 6th 2014
+* Moved the WhiteCoreWebServerConfiguration to WebServerConfiguration
+* Moved the WhiteCoreServerConfiguration to ServerConfiguration
+
 Mar 5th 2014: #0006
 * Implemented a 'Missing Texture' texture tile for substitution when a requested tecture is not found.
 * Re-implemented addon module DefaultInventoryToIARConverter to assist in creation of an updated

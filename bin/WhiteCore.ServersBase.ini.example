@@ -57,10 +57,10 @@
 	
 [Includes]
     ;;Other .ini files to add...
-    Include-Login = WhiteCoreServerConfiguration/Login.ini
-    Include-GridInfoService = WhiteCoreServerConfiguration/GridInfoService.ini
-    Include-Data = WhiteCoreServerConfiguration/Data/Data.ini
-	Include-Protection = WhiteCoreServerConfiguration/Protection.ini
-	Include-Services = WhiteCoreServerConfiguration/Services.ini
-    Include-Setup = WhiteCoreServerConfiguration/GridSetup.ini
-	Include-Modules = WhiteCoreServerConfiguration/Modules/*.ini
+    Include-Login = ServerConfiguration/Login.ini
+    Include-GridInfoService = ServerConfiguration/GridInfoService.ini
+    Include-Data = ServerConfiguration/Data/Data.ini
+	Include-Protection = ServerConfiguration/Protection.ini
+	Include-Services = ServerConfiguration/Services.ini
+    Include-Setup = ServerConfiguration/GridSetup.ini
+	Include-Modules = ServerConfiguration/Modules/*.ini
