@@ -25,7 +25,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
+
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.ModuleLoader;
 using WhiteCore.Framework.Modules;
@@ -35,7 +35,6 @@ using WhiteCore.Framework.SceneInfo.Entities;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
 using Nini.Config;
-using OpenMetaverse;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -795,12 +794,13 @@ namespace WhiteCore.Region
         {
             if (cmd.Length <= 2) 
             {
-                MainConsole.Instance.Warn("Wrong number of parameters, needs a region name specified");
+                MainConsole.Instance.Warn("You need to specify a region name.");
                 return;
             }
-            string regionName = Util.CombineParams(cmd, 2);
+            string regionName = Util.CombineParams(cmd, 2); // in case of spaces in the name eg Steam Island
+            regionName = regionName.ToLower();
 
-            MainConsole.Instance.ConsoleScene = m_scenes.Find((s) => s.RegionInfo.RegionName == regionName);
+            MainConsole.Instance.ConsoleScene = m_scenes.Find((s) => s.RegionInfo.RegionName.ToLower() == regionName);
 	
             MainConsole.Instance.InfoFormat("[SceneManager]: Changed to region {0}",
                 MainConsole.Instance.ConsoleScene == null ? "root" : MainConsole.Instance.ConsoleScene.RegionInfo.RegionName);
@@ -850,9 +850,29 @@ namespace WhiteCore.Region
             MainConsole.Instance.Info(String.Empty);
         }
 
+        /// <summary>
+        /// Display the current scene (region) details.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmd">Cmd.</param>
         private void HandleShowRegions(IScene scene, string[] cmd)
         {
-            MainConsole.Instance.Info(scene.ToString());
+            //  MainConsole.Instance.Info(scene.ToString());
+
+            string sceneInfo;
+            var regInfo = scene.RegionInfo;
+            UserAccount EstateOwner;
+            EstateOwner = scene.UserAccountService.GetUserAccount (null, regInfo.EstateSettings.EstateOwner);
+
+            // todo ... change hardcoded filed sizes to public constants
+            sceneInfo =  String.Format ("{0, -20}", regInfo.RegionName);
+            sceneInfo += String.Format ("{0, -16}", regInfo.RegionLocX / Constants.RegionSize + "," + regInfo.RegionLocY / Constants.RegionSize);
+            sceneInfo += String.Format ("{0, -12}", regInfo.RegionSizeX + "," + regInfo.RegionSizeY);
+            sceneInfo += String.Format ("{0, -16}", regInfo.EstateSettings.EstateName);
+            sceneInfo += String.Format ("{0, -20}", EstateOwner.Name);
+
+            MainConsole.Instance.Info(sceneInfo);
+
         }
 
         private void HandleShowMaturity(IScene scene, string[] cmd)

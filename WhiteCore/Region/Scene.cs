@@ -25,8 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
-using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Physics;
@@ -231,7 +229,7 @@ namespace WhiteCore.Region
                    m_regInfo.RegionSizeX + "," +
                    m_regInfo.RegionSizeY;
         }
-
+            
         #region Services
 
         public IAssetService AssetService
