@@ -231,17 +231,17 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine
             {
                 if (MainConsole.Instance != null)
                 {
-                    MainConsole.Instance.Commands.AddCommand("ADNE restart", "ADNE restart",
+                    MainConsole.Instance.Commands.AddCommand("WDNE restart", "WDNE restart",
                                                              "Restarts all scripts and clears all script caches",
                                                              WhiteCoreDotNetRestart, false, false);
-                    MainConsole.Instance.Commands.AddCommand("ADNE stop", "ADNE stop", "Stops all scripts",
+                    MainConsole.Instance.Commands.AddCommand("WDNE stop", "WDNE stop", "Stops all scripts",
                                                              WhiteCoreDotNetStop, false, false);
-                    MainConsole.Instance.Commands.AddCommand("ADNE stats", "ADNE stats",
+                    MainConsole.Instance.Commands.AddCommand("WDNE stats", "WDNE stats",
                                                              "Tells stats about the script engine", WhiteCoreDotNetStats, false, false);
-                    MainConsole.Instance.Commands.AddCommand("ADNE disable", "ADNE disable",
+                    MainConsole.Instance.Commands.AddCommand("WDNE disable", "WDNE disable",
                                                              "Disables the script engine temperarily",
                                                              WhiteCoreDotNetDisable, false, false);
-                    MainConsole.Instance.Commands.AddCommand("ADNE enable", "ADNE enable", "Reenables the script engine",
+                    MainConsole.Instance.Commands.AddCommand("WDNE enable", "WDNE enable", "Reenables the script engine",
                                                              WhiteCoreDotNetEnable, false, false);
                 }
 
@@ -429,7 +429,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine
                 MaintenanceThread.StartScripts(
                     scripts.Select(ID => new LUStruct {Action = LUType.Load, ID = ID}).ToArray());
 
-                MainConsole.Instance.Warn("[ADNE]: All scripts have been restarted.");
+                MainConsole.Instance.Warn("[WDNE]: All scripts have been restarted.");
             }
             else
             {
@@ -444,7 +444,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine
             {
                 StopAllScripts();
                 MaintenanceThread.Stop();
-                MainConsole.Instance.Warn("[ADNE]: All scripts have been stopped.");
+                MainConsole.Instance.Warn("[WDNE]: All scripts have been stopped.");
             }
             else
             {
@@ -475,14 +475,14 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine
         protected void WhiteCoreDotNetDisable(IScene scene, string[] cmdparams)
         {
             ConsoleDisabled = true;
-            MainConsole.Instance.Warn("[ADNE]: ADNE has been disabled.");
+            MainConsole.Instance.Warn("[WDNE]: WDNE has been disabled.");
         }
 
         protected void WhiteCoreDotNetEnable(IScene scene, string[] cmdparams)
         {
             ConsoleDisabled = false;
             MaintenanceThread.Started = true;
-            MainConsole.Instance.Warn("[ADNE]: ADNE has been enabled.");
+            MainConsole.Instance.Warn("[WDNE]: WDNE has been enabled.");
         }
 
         #endregion

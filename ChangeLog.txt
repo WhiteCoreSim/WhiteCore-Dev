@@ -4,6 +4,20 @@ Rowan D <greythane@gmail.com>
 Fly-Man- <fly.man.opensim@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Mar 5th 2014: #0006
+* Implemented a 'Missing Texture' texture tile for substitution when a requested tecture is not found.
+* Re-implemented addon module DefaultInventoryToIARConverter to assist in creation of an updated
+    DefaultInventory.iar that includes the additional texture
+
+Feb 26th 2014
+* More renaming of missed subdirs & files
+* Rename ADNE command to WDNE
+
+Feb 18th 2014
+* TerrainChannel
+    - updated default height setting for Island creation. (was tending to create submerged islands)
+* setupversioninfo.bat (bin) - revamped to use std git commit hashcode
+
 Feb 11th 2014
 * DatabaseManager
     - Removed 'whitecore' from migration version table name.  >> 'migrator_version'

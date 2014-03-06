@@ -349,7 +349,7 @@ namespace WhiteCore.Framework.SceneInfo
 		private void CreateIslandTerrain()
 		{
 			float minHeight = (float) m_scene.RegionInfo.RegionSettings.WaterHeight - 5;
-			float maxHeight = minHeight + 3;
+            float maxHeight = minHeight + 15;
 
 			CreateIslandTerrain (minHeight, maxHeight,2);
 		}

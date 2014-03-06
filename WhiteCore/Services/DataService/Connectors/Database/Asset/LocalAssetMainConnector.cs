@@ -64,7 +64,7 @@ namespace WhiteCore.Services.DataService.Connectors.Database.Asset
                     return LoadAssetFromDataRead(dr.DataReader);
                 }
                 if (MainConsole.Instance != null)
-                    MainConsole.Instance.WarnFormat("[LocalAssetDatabase] GetMeta({0}) - Asset was not found.", uuid);
+					MainConsole.Instance.WarnFormat("[LocalAssetDatabase] GetMeta({0}) - Asset UUID was not found.", uuid);
             }
             catch (Exception e)
             {
@@ -214,7 +214,7 @@ namespace WhiteCore.Services.DataService.Connectors.Database.Asset
                     return LoadAssetFromDataRead(dr.DataReader);
                 }
                 if (displaywarning && MainConsole.Instance != null)
-                    MainConsole.Instance.WarnFormat("[LocalAssetDatabase] GetAsset({0}) - Asset was not found.", uuid);
+					MainConsole.Instance.WarnFormat("[LocalAssetDatabase] GetAsset({0}) - Asset UUID(w) was not found.", uuid);
             }
             catch (Exception e)
             {
@@ -237,7 +237,7 @@ namespace WhiteCore.Services.DataService.Connectors.Database.Asset
                 if (dr != null)
                     return (byte[]) dr.DataReader["data"];
                 if (MainConsole.Instance != null)
-                    MainConsole.Instance.WarnFormat("[LocalAssetDatabase] GetData({0}) - Asset was not found.", uuid);
+					MainConsole.Instance.WarnFormat("[LocalAssetDatabase] GetData({0}) - Asset (UUID data) was not found.", uuid);
             }
             catch (Exception e)
             {
