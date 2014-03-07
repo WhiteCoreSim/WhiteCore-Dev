@@ -57,10 +57,10 @@ bin/.version
 bin/addin-db-*
 bin/assetcache
 bin/WhiteCore.version
-bin/WhiteCoreServerConfiguration/*.ini
-bin/WhiteCoreServerConfiguration/*.ini.old
-bin/WhiteCoreServerConfiguration/*/*.ini
-bin/WhiteCoreServerConfiguration/*/*.ini.old
+bin/ServerConfiguration/*.ini
+bin/ServerConfiguration/*.ini.old
+bin/CoreServerConfiguration/*/*.ini
+bin/ServerConfiguration/*/*.ini.old
 bin/Backups
 bin/Configuration/*.ini
 bin/Configuration/*.ini.old
