@@ -908,18 +908,22 @@ namespace WhiteCore.Services.SQLServices.GridService
 
             foreach (GridRegion r in regions)
             {
+                RegionFlags flags = (RegionFlags) Convert.ToInt32(r.Flags);
+                int RegionPosX = r.RegionLocX / 256;
+                int RegionPosY = r.RegionLocY / 256;
+                UserAccount account = scene.UserAccountService.GetUserAccount(null,r.EstateOwner);
+
                 MainConsole.Instance.Info(
                     "-------------------------------------------------------------------------------");
-                RegionFlags flags = (RegionFlags) Convert.ToInt32(r.Flags);
-                MainConsole.Instance.Info("Region Name: " + r.RegionName);
-                MainConsole.Instance.Info("Region UUID: " + r.RegionID);
-                MainConsole.Instance.Info("Region ScopeID: " + r.ScopeID);
-                MainConsole.Instance.Info("Region Location: " + String.Format("{0},{1}", r.RegionLocX, r.RegionLocY));
-								MainConsole.Instance.Info("Region Siza: " + String.Format("{0} x {1}", r.RegionSizeX, r.RegionSizeY));
-                MainConsole.Instance.Info("Region URI: " + r.RegionURI);			
-                MainConsole.Instance.Info("Region Owner: " + r.EstateOwner);
-                MainConsole.Instance.Info("Region Flags: " + flags);
-								MainConsole.Instance.Info("Gridserver URI: " + r.ServerURI);				
+                MainConsole.Instance.Info("Region Name    : " + r.RegionName);
+                MainConsole.Instance.Info("Region UUID    : " + r.RegionID);
+                MainConsole.Instance.Info("Region ScopeID : " + r.ScopeID);
+                MainConsole.Instance.Info("Region Location: " + String.Format("{0},{1}", RegionPosX, RegionPosY));
+                MainConsole.Instance.Info("Region Size    : " + String.Format("{0} x {1}", r.RegionSizeX, r.RegionSizeY));
+                MainConsole.Instance.Info("Region URI     : " + r.RegionURI);			
+                MainConsole.Instance.Info("Region Owner   : " + account.Name + " [" + r.EstateOwner + "]");
+                MainConsole.Instance.Info("Region Flags   : " + flags);
+                MainConsole.Instance.Info("Gridserver URI : " + r.ServerURI);				
                 MainConsole.Instance.Info(
                     "-------------------------------------------------------------------------------");
             }

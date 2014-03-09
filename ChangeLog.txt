@@ -1,12 +1,16 @@
-
 WhiteCore-Sim (Dev) 
+
 Rowan D <greythane@gmail.com>
 Fly-Man- <fly.man.opensim@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Mar 6th 2014
-* Moved the WhiteCoreWebServerConfiguration to WebServerConfiguration
-* Moved the WhiteCoreServerConfiguration to ServerConfiguration
+* Update GridService.HandleShowRegion() to provide a cleaner format for display of info
+* SceneManager.HandleChangeRegion()
+  - revised to be case insensitive when specifying the selection region name.
+* SceneManager.HandleShowRegions()
+  - updated and formatted displayed scene(region) info
+  - added estate name and owner details
 
 Mar 5th 2014: #0006
 * Implemented a 'Missing Texture' texture tile for substitution when a requested tecture is not found.
@@ -157,7 +161,3 @@ Dec 6th, 2013
 	Modify existing error messages to be a bit more helpful       
 * FileBasesSimulationData.cs -  FindRegionInfos()
 	Correct to use configured (if any) StoreBackupDirectory rather than assume the current directory "."
-  
-  
-  
-
