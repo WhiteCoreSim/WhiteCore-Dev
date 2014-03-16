@@ -42,6 +42,7 @@ using System.Linq;
 using Timer = System.Timers.Timer;
 using System.IO;
 
+
 namespace WhiteCore.Region
 {
     /// <summary>
@@ -463,7 +464,7 @@ namespace WhiteCore.Region
                                                      "--OffsetX will change where the X location of the oar is loaded, and the same for Y and Z.  \n" +
                                                      "--FlipX flips the region on the X axis.  \n" +
                                                      "--FlipY flips the region on the Y axis.  \n" +
-                                                     "--UseParcelOwnership changes who the default owner of objects whose owner cannot be found from the Estate Owner to the parcel owner on which the object is found.  \n" +
+				                                     "--UseParcelOwnership changes who the default owner of objects whose owner cannot be found from the Estate Owner to the parcel owner on which the object is found.  \n" +
                                                      "--CheckOwnership asks for each UUID that is not found on the grid what user it should be changed to (useful for changing UUIDs from other grids, but very long with many users).  ",
                                                      LoadOar, true, false);
 
@@ -907,15 +908,21 @@ namespace WhiteCore.Region
                     return;
             }
 
-            // a couple of sanity checkes
-            if (cmdparams.Count() < 3)
+            // a couple of sanity checks
+			if (cmdparams.Count() < 3)
             {
                 MainConsole.Instance.Info(
                     "You need to specify a filename to load.");
                 return;
             }
 
-            string fileName = cmdparams[2];
+			string fileName = cmdparams[2];
+			if (fileName.StartsWith("--", StringComparison.CurrentCultureIgnoreCase))
+			{
+				MainConsole.Instance.Info("[Error] Command format is 'load oar Filename [optional switches]'");
+				return;
+			}
+
             string extension = Path.GetExtension (fileName);
 
             if (extension == string.Empty)
