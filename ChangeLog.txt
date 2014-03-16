@@ -5,6 +5,7 @@ Fly-Man- <fly.man.opensim@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 greythane
+* BulletSim files - Rename into WhiteCore name space in preparation for further updates
 * MapImageModule - correct 'update map' command to actually do all regions instead of the first one
   - if root is selected, all region maps are updated
   - if a region is selected, only updates the map for that region

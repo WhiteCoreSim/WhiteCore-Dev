@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) Contributors, http://opensimulator.org/
+ * Copyright (c) Contributors, http://opensimulator.org/, http://whitecore-sim.org
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,10 +26,8 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Text;
-using OpenMetaverse;
 
-namespace OpenSim.Region.Physics.BulletSPlugin
+namespace WhiteCore.Region.Physics.BulletSPlugin
 {
 
 public sealed class BSConstraintCollection : IDisposable
@@ -40,13 +38,14 @@ public sealed class BSConstraintCollection : IDisposable
     delegate bool ConstraintAction(BSConstraint constrain);
 
     private List<BSConstraint> m_constraints;
-    private BulletWorld m_world;
+	private BulletWorld m_world;
 
     public BSConstraintCollection(BulletWorld world)
     {
         m_world = world;
         m_constraints = new List<BSConstraint>();
     }
+	
 
     public void Dispose()
     {

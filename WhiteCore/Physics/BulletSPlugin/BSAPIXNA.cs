@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Contributors, http://opensimulator.org/
+ * Copyright (c) Contributors, http://opensimulator.org/, http://whitecore-sim.org
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,19 +27,15 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
-using System.Text;
-
 using OpenMetaverse;
-
 using BulletXNA;
 using BulletXNA.LinearMath;
 using BulletXNA.BulletCollision;
 using BulletXNA.BulletDynamics;
-using BulletXNA.BulletCollision.CollisionDispatch;
+//using BulletXNA.BulletCollision.CollisionDispatch;
 using WhiteCore.Framework.Utilities;
 
-namespace OpenSim.Region.Physics.BulletSPlugin
+namespace WhiteCore.Region.Physics.BulletSPlugin
 {
 public sealed class BSAPIXNA : BSAPITemplate
 {

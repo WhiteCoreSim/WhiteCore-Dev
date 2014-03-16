@@ -1,6 +1,5 @@
-﻿using WhiteCore.Framework.ConsoleFramework;
-/*
- * Copyright (c) Contributors, http://opensimulator.org/
+﻿/*
+ * Copyright (c) Contributors, http://opensimulator.org/, http://whitecore-sim.org
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,10 +26,10 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Text;
 using OMV = OpenMetaverse;
+using WhiteCore.Framework.ConsoleFramework;
 
-namespace OpenSim.Region.Physics.BulletSPlugin
+namespace WhiteCore.Region.Physics.BulletSPlugin
 {
 
 // A BSPrim can get individual information about its linkedness attached

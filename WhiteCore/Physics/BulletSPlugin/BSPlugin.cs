@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) Contributors, http://opensimulator.org/
+ * Copyright (c) Contributors, http://opensimulator.org/, http://whitecore-sim.org
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,12 +24,10 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using System;
-using System.Collections.Generic;
-using OpenMetaverse;
+
 using WhiteCore.Framework.Physics;
 
-namespace OpenSim.Region.Physics.BulletSPlugin
+namespace WhiteCore.Region.Physics.BulletSPlugin
 {
     /// <summary>
     /// Entry for a port of Bullet (http://bulletphysics.org/) to OpenSim.

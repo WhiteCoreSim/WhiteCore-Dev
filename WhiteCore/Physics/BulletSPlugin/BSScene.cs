@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) Contributors, http://opensimulator.org/
+ * Copyright (c) Contributors, http://opensimulator.org/, http://whitecore-sim.org
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,10 +27,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
 using Nini.Config;
 using OpenMetaverse;
 using WhiteCore.Framework.Physics;
@@ -39,7 +35,7 @@ using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Utilities;
 using WhiteCore.Framework.SceneInfo;
 
-namespace OpenSim.Region.Physics.BulletSPlugin
+namespace WhiteCore.Region.Physics.BulletSPlugin
 {
 public sealed class BSScene : PhysicsScene
 {
