@@ -1,8 +1,17 @@
-WhiteCore-Sim (Dev) 
 
+WhiteCore-Sim (Dev) 
 Rowan D <greythane@gmail.com>
 Fly-Man- <fly.man.opensim@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+greythane
+* MapImageModule - correct 'update map' command to actually do all regions instead of the first one
+  - if root is selected, all region maps are updated
+  - if a region is selected, only updates the map for that region
+
+* ScriptData - Updated 'BROKEN SAVE STATE...' message to something a bit more intuitive
+* MaintenanceThread - Updated 'BAD VERSION ID...' message to something a bit more intuitive
+
 
 Mar 6th 2014 - Greythane
 * Update GridService.HandleShowRegion() to provide a cleaner format for display of info
@@ -165,3 +174,7 @@ Dec 6th, 2013
 	Modify existing error messages to be a bit more helpful       
 * FileBasesSimulationData.cs -  FindRegionInfos()
 	Correct to use configured (if any) StoreBackupDirectory rather than assume the current directory "."
+  
+  
+  
+

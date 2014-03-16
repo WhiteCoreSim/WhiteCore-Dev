@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
@@ -73,8 +72,8 @@ namespace WhiteCore.Modules.WorldMap
         private IMapTileTerrainRenderer terrainRenderer;
         private double minutes = 60*24;
         private const double oneminute = 60000;
-        private System.Timers.Timer UpdateMapImage;
-        private System.Timers.Timer UpdateOnlineStatus;
+        private Timer UpdateMapImage;
+        private Timer UpdateOnlineStatus;
         private bool m_generateMapTiles = true;
         private UUID staticMapTileUUID = UUID.Zero;
         private UUID regionMapTileUUID = UUID.Zero;
@@ -84,6 +83,7 @@ namespace WhiteCore.Modules.WorldMap
 
         public void CreateMapTile(out Bitmap terrainBMP, out Bitmap mapBMP)
         {
+
             int start = Environment.TickCount;
             bool drawPrimVolume = true;
             string tileRenderer = "WarpTileRenderer";
@@ -130,8 +130,14 @@ namespace WhiteCore.Modules.WorldMap
                 SaveCache();
                 m_mapping.Clear();
             }
-            MainConsole.Instance.InfoFormat("[MapTileGenerator]: Generating Maptile using {0} took {1} ms", tileRenderer, (Environment.TickCount - start));
+
+            terrainRenderer = null;
+
+            MainConsole.Instance.InfoFormat("[MapTileGenerator]: Generating Maptile for {0}, using {1}, took {2} ms",
+                m_scene.RegionInfo.RegionName, tileRenderer, (Environment.TickCount - start));
+
         }
+
 
         public void CreateMapTile(out byte[] terrain, out byte[] map)
         {
@@ -150,6 +156,7 @@ namespace WhiteCore.Modules.WorldMap
                 map = OpenJPEG.EncodeFromImage(mapBMP, true);
                 mapBMP.Dispose();
             }
+                
         }
 
         public Bitmap CreateViewImage(Vector3 camPos, Vector3 camDir, float fov, int width, int height, bool useTextures)
@@ -258,11 +265,11 @@ namespace WhiteCore.Modules.WorldMap
         {
             if (m_generateMapTiles)
             {
-                UpdateMapImage = new System.Timers.Timer(oneminute*minutes);
+                UpdateMapImage = new Timer(oneminute*minutes);
                 UpdateMapImage.Elapsed += OnTimedCreateNewMapImage;
                 UpdateMapImage.Enabled = true;
             }
-            UpdateOnlineStatus = new System.Timers.Timer(oneminute*60);
+            UpdateOnlineStatus = new Timer(oneminute*60);
             UpdateOnlineStatus.Elapsed += OnUpdateRegion;
             UpdateOnlineStatus.Enabled = true;
         }
@@ -272,6 +279,8 @@ namespace WhiteCore.Modules.WorldMap
         /// </summary>
         public void HandleUpdateWorldMapConsoleCommand(IScene scene, string[] cmdparams)
         {
+            m_scene = scene;
+     
             CreateTerrainTexture(true);
         }
 
@@ -319,14 +328,15 @@ namespace WhiteCore.Modules.WorldMap
                     m_scene.RegionInfo.RegionSettings.TerrainImageID = staticMapTileUUID;
                 }
                 m_scene.RegionInfo.RegionSettings.TerrainMapLastRegenerated = DateTime.Now;
+
                 return;
             }
 
             // Cannot create a map for a nonexistant heightmap.
             ITerrainChannel heightmap = m_scene.RequestModuleInterface<ITerrainChannel>();
             if (heightmap == null)
-                return;
-
+                 return;
+ 
             if (!m_asyncMapTileCreation)
             {
                 CreateMapTileAsync(null);
@@ -335,6 +345,7 @@ namespace WhiteCore.Modules.WorldMap
             {
                 Util.FireAndForget(CreateMapTileAsync);
             }
+                
         }
 
         #region Async map tile
@@ -357,9 +368,10 @@ namespace WhiteCore.Modules.WorldMap
 
             if (terrain == null)
                 return;
-
+                
             byte[] terraindata, mapdata;
             terrain.CreateMapTile(out terraindata, out mapdata);
+
             if (terraindata != null)
             {
                 if (m_scene.RegionInfo.RegionSettings.TerrainMapImageID != UUID.Zero)
@@ -409,6 +421,7 @@ namespace WhiteCore.Modules.WorldMap
             }
 
             byte[] overlay = GenerateOverlay();
+
             if (overlay != null)
             {
                 if (m_scene.RegionInfo.RegionSettings.ParcelMapImageID != UUID.Zero)
@@ -419,7 +432,7 @@ namespace WhiteCore.Modules.WorldMap
                 {
                     AssetBase Parcelasset = new AssetBase(
                         UUID.Random(),
-                        "terrainMapImage_" + m_scene.RegionInfo.RegionID.ToString(),
+                        "terrainMapImage_" + m_scene.RegionInfo.RegionID,
                         AssetType.Simstate,
                         m_scene.RegionInfo.RegionID)
                                                 {
@@ -441,8 +454,19 @@ namespace WhiteCore.Modules.WorldMap
             IGridRegisterModule gridRegModule = m_scene.RequestModuleInterface<IGridRegisterModule>();
             if (gridRegModule != null)
                 gridRegModule.UpdateGridRegion(m_scene);
-        }
 
+            // clear out... these are all redundant?
+            //terraindata = null;
+            //mapdata = null;
+            //overlay = null;
+            //terrain = null;
+
+         }
+
+        /// <summary>
+        /// Generates the overlay.
+        /// </summary>
+        /// <returns>The overlay.</returns>
         private Byte[] GenerateOverlay()
         {
             Bitmap overlay = new Bitmap(m_scene.RegionInfo.RegionSizeX, m_scene.RegionInfo.RegionSizeY);
