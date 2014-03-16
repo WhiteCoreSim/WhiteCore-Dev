@@ -176,7 +176,3 @@ Dec 6th, 2013
 	Modify existing error messages to be a bit more helpful       
 * FileBasesSimulationData.cs -  FindRegionInfos()
 	Correct to use configured (if any) StoreBackupDirectory rather than assume the current directory "."
-  
-  
-  
-
