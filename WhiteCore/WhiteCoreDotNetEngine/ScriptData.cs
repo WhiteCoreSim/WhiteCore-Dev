@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
@@ -772,8 +771,10 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine
                 if (string.IsNullOrEmpty(this.State) && DefaultState != this.State)
                     //Sometimes, "" is a valid state for other script languages
                 {
-                    MainConsole.Instance.Warn("BROKEN STATE SAVE!!! - " + this.Part.Name + " @ " +
+                    MainConsole.Instance.Warn("Resetting broken script save state - " + InventoryItem.Name+":"+this.Part.Name + " @ " +
                                               this.Part.AbsolutePosition);
+                    MainConsole.Instance.Warn ("        in region " + Part.ParentEntity.Scene.RegionInfo.RegionName);
+
                     this.State = DefaultState;
                     m_ScriptEngine.StateSave.DeleteFrom(Part, LastStateSave.ItemID);
                     m_ScriptEngine.StateSave.SaveStateTo(this, true);

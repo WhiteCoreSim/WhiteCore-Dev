@@ -31,7 +31,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
-using WhiteCore.Framework;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo.Entities;
@@ -675,15 +674,17 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine
             if (QIS.functionName != "link_message" &&
                 QIS.VersionID != Interlocked.Read(ref QIS.ID.VersionID))
             {
-                MainConsole.Instance.WarnFormat("FOUND BAD VERSION ID, OLD {0}, NEW {1}, FUNCTION NAME {2}",
-                                                QIS.VersionID,
-                                                Interlocked.Read(ref QIS.ID.VersionID), QIS.functionName);
+				MainConsole.Instance.WarnFormat("[WDNE]: Found bad version ID in queue, resetting, {0} to {1}",
+                                                QIS.VersionID, Interlocked.Read(ref QIS.ID.VersionID));
+				MainConsole.Instance.WarnFormat("[WDNE]:     Function: '{0}' in region {1}",
+					QIS.functionName == "" ? QIS.functionName : "unknown",
+                    QIS.ID.Part.ParentEntity.Scene.RegionInfo.RegionName);
                 //return;
             }
 
             if(MainConsole.Instance.IsTraceEnabled)
                 MainConsole.Instance.TraceFormat("[WDNE]: Running Event {0} in object {1} in region {2}",
-                                           QIS.functionName, QIS.ID.Part.ToString(),
+                                           QIS.functionName, QIS.ID.Part,
                                            QIS.ID.Part.ParentEntity.Scene.RegionInfo.RegionName);
             if (!EventSchProcessQIS(ref QIS)) //Execute the event
             {
