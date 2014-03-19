@@ -206,8 +206,8 @@ namespace WhiteCore.Modules.Estate
                 else if (ES.EstateID == 0)
                 {
                     //It found the estate service, but found no estates for this region, make a new one
-                    MainConsole.Instance.Warn("[EstateInitializer]: Your region " + scene.RegionInfo.RegionName +
-                                              " is not part of an estate.");
+                    MainConsole.Instance.Warn("[EstateInitializer]: Your region '" + scene.RegionInfo.RegionName +
+                        "' is not part of an estate.");
 
                     ES = CreateEstateInfo(scene);
                 }

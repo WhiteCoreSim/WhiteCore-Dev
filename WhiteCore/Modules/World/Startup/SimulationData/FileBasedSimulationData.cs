@@ -25,12 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.SceneInfo.Entities;
-using WhiteCore.Framework.Servers;
+using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
 using WhiteCore.Region;
 using Nini.Config;
@@ -137,13 +136,63 @@ namespace WhiteCore.Modules
             return _regionData.RegionInfo;
         }
 
+        private static Dictionary<string, int> FindCurrentRegionInfo()
+        {
+            var rInfo = new Dictionary<string, int >();
+
+            rInfo["minX"] = 0;
+            rInfo["minY"] = 0;
+            rInfo["port"] = 0;
+
+            var regionData = Framework.Utilities.DataManager.RequestPlugin<IRegionData>();
+            var count = regionData.Count((WhiteCore.Framework.Services.RegionFlags) 0,
+                WhiteCore.Framework.Services.RegionFlags.Hyperlink |
+                WhiteCore.Framework.Services.RegionFlags.Foreign | 
+                WhiteCore.Framework.Services.RegionFlags.Hidden);
+
+            var regions = regionData.Get((WhiteCore.Framework.Services.RegionFlags) 0,
+                WhiteCore.Framework.Services.RegionFlags.Hyperlink |
+                WhiteCore.Framework.Services.RegionFlags.Foreign |
+                WhiteCore.Framework.Services.RegionFlags.Hidden,
+                0,
+                count,
+                null);
+
+            int regX, regY;
+            foreach (var region in regions)
+            {
+                regX = region.RegionLocX;
+                if ( rInfo["minX"] <= regX )
+                    rInfo["minX"] = regX + region.RegionSizeX;
+
+                regY = region.RegionLocY;
+                if ( rInfo["minY"] < regY )
+                    rInfo["minY"] = regY+ region.RegionSizeY;
+
+                if ( rInfo["port"] < region.InternalPort )
+                    rInfo["port"] = region.InternalPort;
+            }
+
+            return rInfo;
+        }
+       
         private RegionInfo CreateRegionFromConsole(RegionInfo info)
         {
+            // get some current details
+            var currentInfo = FindCurrentRegionInfo ();
+
             if (info == null)
             {
                 info = new RegionInfo();
                 info.RegionID = UUID.Random();
-				info.RegionPort = 9000;
+                info.RegionPort = 9000;
+
+                info.RegionLocX = currentInfo["minX"];
+                info.RegionLocY = currentInfo ["minY"];
+
+                if (currentInfo["port"] > 0)
+                    info.RegionPort = currentInfo["port"]+1;
+
             }
             info.RegionName = MainConsole.Instance.Prompt("Region Name: ", info.RegionName);
             
@@ -589,8 +638,10 @@ namespace WhiteCore.Modules
 
         protected virtual void ReadBackup(string fileName)
         {
-            MainConsole.Instance.Info("[FileBasedSimulationData]: Restoring sim backup...");
             m_fileName = fileName;
+            string simName = Path.GetFileName(fileName); 
+            MainConsole.Instance.Info("[FileBasedSimulationData]: Restoring sim backup for region " + simName + "...");
+
             _regionData = _regionLoader.LoadBackup(BuildSaveFileName());
             if (_regionData == null)
                 _regionData = _oldRegionLoader.LoadBackup(Path.ChangeExtension(BuildSaveFileName(), 

@@ -5,7 +5,6 @@ Fly-Man- <fly.man.opensim@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 greythane
-* Additional check for incorrect position of command line switches in 'load oar' command
 * BulletSim files - Rename into WhiteCore name space in preparation for further updates
 * MapImageModule - correct 'update map' command to actually do all regions instead of the first one
   - if root is selected, all region maps are updated
@@ -176,3 +175,7 @@ Dec 6th, 2013
 	Modify existing error messages to be a bit more helpful       
 * FileBasesSimulationData.cs -  FindRegionInfos()
 	Correct to use configured (if any) StoreBackupDirectory rather than assume the current directory "."
+  
+  
+  
+
