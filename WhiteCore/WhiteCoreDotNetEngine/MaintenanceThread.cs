@@ -42,6 +42,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine
     public class MaintenanceThread
     {
         #region Declares
+        private EventWaitHandle wh = new AutoResetEvent(false);
 
         private const int EMPTY_WORK_KILL_THREAD_TIME = 250;
         private readonly EventManager EventManager;
@@ -341,9 +342,11 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine
             {
                 if (t != null)
                 {
-                    t.Suspend();
+                    //t.Suspend();
+                    wh.WaitOne();
                     System.Diagnostics.StackTrace trace = new System.Diagnostics.StackTrace(t, true);
-                    t.Resume();
+                    //t.Resume();
+                    wh.Set ();
                     MainConsole.Instance.Debug("Thread " + t.Name);
                     MainConsole.Instance.Debug(trace.GetFrames());
                 }
@@ -352,9 +355,11 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine
             {
                 if (t != null)
                 {
-                    t.Suspend();
+                    //t.Suspend();
+                    wh.WaitOne ();
                     System.Diagnostics.StackTrace trace = new System.Diagnostics.StackTrace(t, true);
-                    t.Resume();
+                    //t.Resume();
+                    wh.Set ();
                     MainConsole.Instance.Debug("Thread " + t.Name);
                     MainConsole.Instance.Debug(trace.GetFrames());
                 }
@@ -363,9 +368,11 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine
             {
                 if (t != null)
                 {
-                    t.Suspend();
+                    //t.Suspend();
+                    wh.WaitOne();
                     System.Diagnostics.StackTrace trace = new System.Diagnostics.StackTrace(t, true);
-                    t.Resume();
+                    //t.Resume();
+                    wh.Set();
                     MainConsole.Instance.Debug("Thread " + t.Name);
                     MainConsole.Instance.Debug(trace.GetFrames());
                 }
@@ -389,6 +396,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine
                 cmdThreadpool.QueueEvent(CmdHandlerQueue, 2);
             }
         }
+
 
         /// <summary>
         ///     Makes sure that all the threads that need to be running are running and starts them if they need to be running
