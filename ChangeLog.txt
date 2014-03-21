@@ -4,7 +4,50 @@ Rowan D <greythane@gmail.com>
 Fly-Man- <fly.man.opensim@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-greythane
+Mar 21st - Greythane
+* CommandConsole
+  - Add 'missed that..' response for multi word commands
+* Update prebuild.xml version # to 0.9
+* PathHelpers
+  - Add VerifyReadFile to shortcut a heap of file checks (reading config, xml etc)
+* SceneManger
+  - Correct/update/rework CreateNewRegion when a region name and/or a config file is specified
+
+
+Mar 20th - Greythane
+* CommandConsole
+  - Add a warning message if a valid command requires a scene and none is selected
+* SceneManager
+  - SavePrimsXml2 - revamp command and simplify code
+  - SaveXML2 - revamp and simplify code
+* PathHelpers
+  - Add VerifySaveFile to shortcut a heap of file checks (saving config, xml etc)
+
+
+Mar 19th - Greythane
+* SceneManager
+  - Additional options for the 'create region' command
+	- Specify a region name as part of the command
+	- specify a configuration file, containing the region details, to load
+  - New command "save region config <filename>" used to save existing configurations to an xml file
+ 
+   
+Mar 18th - Greythane
+* SceneManager -  additional XML2 commands
+	- load xml2 - load an xlm2 format file
+	- save xml2 - save current region as an xml2 file
+	- save prims xml2 - save a named prim as an xml2 file
+* FileBasedSimulationData - Add some 'smarts' when creating a new region. 
+    Scan existing regions and suggest available X/Y location and port rather than use defaults
+
+
+Mar 17th, 2014 - Greythane
+* MaintenanceThread - Remove obsolete suspend/resume operation and replace with EventWaitHandle processing 
+    (Ongoing verification necessary to ensure that no other issues arise but only use is in show stats command)
+* FileBasedSimulationData - Add Sim name to 'Loading sim..' startup info message
+ 
+Mar 16th, 2014 - Greythane
+* Additional check for incorrect position of command line switches in 'load oar' command
 * BulletSim files - Rename into WhiteCore name space in preparation for further updates
 * MapImageModule - correct 'update map' command to actually do all regions instead of the first one
   - if root is selected, all region maps are updated
@@ -175,7 +218,3 @@ Dec 6th, 2013
 	Modify existing error messages to be a bit more helpful       
 * FileBasesSimulationData.cs -  FindRegionInfos()
 	Correct to use configured (if any) StoreBackupDirectory rather than assume the current directory "."
-  
-  
-  
-

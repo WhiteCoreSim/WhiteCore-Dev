@@ -121,11 +121,59 @@ namespace WhiteCore.Modules
             ReadConfig(simBase);
             _regionData = new RegionData();
             _regionData.Init();
-            RegionInfo info = CreateRegionFromConsole(null);
+            RegionInfo info = CreateRegionFromConsole(null, true);
             if (info == null)
                 return CreateNewRegion(simBase);
             m_fileName = info.RegionName;
             return info;
+        }
+
+        public virtual RegionInfo CreateNewRegion(ISimulationBase simBase, string regionName)
+        {
+            ReadConfig(simBase);
+            _regionData = new RegionData();
+            _regionData.Init();
+            RegionInfo info = new RegionInfo();
+            info.RegionName = regionName;
+            info.NewRegion = true;
+
+            info = CreateRegionFromConsole(info, true);
+            if (info == null)
+                return CreateNewRegion(simBase, info);
+            m_fileName = info.RegionName;
+            return info;
+        }
+
+		/// <summary>
+		/// Initializes a new region using the pass regionsinfo
+		/// </summary>
+		/// <returns></returns>
+		/// <param name="simBase">Sim base.</param>
+		/// <param name="regionInfo">Region info.</param>
+        public virtual RegionInfo CreateNewRegion(ISimulationBase simBase, RegionInfo regionInfo)
+        {
+            ReadConfig(simBase);
+            _regionData = new RegionData();
+            _regionData.Init();
+			//RegionInfo info = CreateRegionFromConsole(regionInfo, false);
+            if (regionInfo == null)
+				return CreateNewRegion(simBase, regionInfo );		// something wrong, prompt for details
+            
+			m_fileName = regionInfo.RegionName;
+            
+			if (m_scene != null)
+			{
+				IGridRegisterModule gridRegister = m_scene.RequestModuleInterface<IGridRegisterModule>();
+				//Re-register so that if the position has changed, we get the new neighbors
+				gridRegister.RegisterRegionWithGrid(m_scene, true, false, null);
+
+				ForceBackup();
+
+				MainConsole.Instance.Info("[FileBasedSimulationData]: Save completed.");
+			}
+
+			return regionInfo;
+
         }
 
         public virtual RegionInfo LoadRegionInfo(string fileName, ISimulationBase simBase)
@@ -176,14 +224,16 @@ namespace WhiteCore.Modules
             return rInfo;
         }
        
-        private RegionInfo CreateRegionFromConsole(RegionInfo info)
+        private RegionInfo CreateRegionFromConsole(RegionInfo info, Boolean prompt)
         {
             // get some current details
             var currentInfo = FindCurrentRegionInfo ();
 
-            if (info == null)
+            if (info == null || info.NewRegion)
             {
-                info = new RegionInfo();
+                if (info == null)
+                    info = new RegionInfo();
+
                 info.RegionID = UUID.Random();
                 info.RegionPort = 9000;
 
@@ -192,43 +242,53 @@ namespace WhiteCore.Modules
 
                 if (currentInfo["port"] > 0)
                     info.RegionPort = currentInfo["port"]+1;
-
+               
+                prompt = true;
             }
-            info.RegionName = MainConsole.Instance.Prompt("Region Name: ", info.RegionName);
-            
-            info.RegionLocX =
-                int.Parse(MainConsole.Instance.Prompt("Region Location X: ",
-                ((info.RegionLocX == 0 ? 1000 : info.RegionLocX/Constants.RegionSize)).ToString()))*Constants.RegionSize;
-            info.RegionLocY =
-                int.Parse(MainConsole.Instance.Prompt("Region location Y: ",
-                                                      ((info.RegionLocY == 0 ? 1000 : info.RegionLocY/Constants.RegionSize)).ToString()))*
-                Constants.RegionSize;
-            
-            info.RegionSizeX = int.Parse(MainConsole.Instance.Prompt("Region size X: ", info.RegionSizeX.ToString()));
-            info.RegionSizeY = int.Parse(MainConsole.Instance.Prompt("Region size Y: ", info.RegionSizeY.ToString()));
-            
-            info.RegionPort = int.Parse(MainConsole.Instance.Prompt("Region Port: ", info.RegionPort.ToString()));
-            
-            info.RegionType = MainConsole.Instance.Prompt("Region Type: ",
-                                                          (info.RegionType == "" ? "Flatland" : info.RegionType));
 
-            info.SeeIntoThisSimFromNeighbor =
-                bool.Parse(
-                    MainConsole.Instance.Prompt("See into this sim from neighbors: ",
-                                                info.SeeIntoThisSimFromNeighbor.ToString().ToLower(),
-                                                new List<string>() { "true", "false" }).ToLower());
-            info.InfiniteRegion =
-                bool.Parse(
-                    MainConsole.Instance.Prompt("Make an infinite region: ",
-                                                info.InfiniteRegion.ToString().ToLower(),
-                                                new List<string>() { "true", "false" }).ToLower());
+            // prompt for user input
+            if (prompt)
+            {
+                info.RegionName = MainConsole.Instance.Prompt ("Region Name: ", info.RegionName);
             
-            info.ObjectCapacity =
-                int.Parse(MainConsole.Instance.Prompt("Object capacity: ",
-                                                      info.ObjectCapacity == 0
-                                                          ? "50000"
-                                                          : info.ObjectCapacity.ToString()));
+                info.RegionLocX =
+                    int.Parse (MainConsole.Instance.Prompt ("Region Location X: ",
+                    ((info.RegionLocX == 0 
+                            ? 1000 
+                            : info.RegionLocX / Constants.RegionSize)).ToString ())) * Constants.RegionSize;
+
+                info.RegionLocY =
+                    int.Parse (MainConsole.Instance.Prompt ("Region location Y: ",
+                    ((info.RegionLocY == 0 
+                            ? 1000 
+                            : info.RegionLocY / Constants.RegionSize)).ToString ())) * Constants.RegionSize;
             
+                info.RegionSizeX = int.Parse (MainConsole.Instance.Prompt ("Region size X: ", info.RegionSizeX.ToString ()));
+                info.RegionSizeY = int.Parse (MainConsole.Instance.Prompt ("Region size Y: ", info.RegionSizeY.ToString ()));
+            
+                info.RegionPort = int.Parse (MainConsole.Instance.Prompt ("Region Port: ", info.RegionPort.ToString ()));
+            
+                info.RegionType = MainConsole.Instance.Prompt ("Region Type: ",
+                    (info.RegionType == "" ? "Flatland" : info.RegionType));
+
+                info.SeeIntoThisSimFromNeighbor =
+                    bool.Parse (
+                    MainConsole.Instance.Prompt ("See into this sim from neighbors: ",
+                        info.SeeIntoThisSimFromNeighbor.ToString ().ToLower (),
+                        new List<string> () { "true", "false" }).ToLower ());
+                info.InfiniteRegion =
+                    bool.Parse (
+                    MainConsole.Instance.Prompt ("Make an infinite region: ",
+                        info.InfiniteRegion.ToString ().ToLower (),
+                        new List<string> () { "true", "false" }).ToLower ());
+            
+                info.ObjectCapacity =
+                    int.Parse (MainConsole.Instance.Prompt ("Object capacity: ",
+                    info.ObjectCapacity == 0
+                                                              ? "50000"
+                                                              : info.ObjectCapacity.ToString ()));
+            }
+
             if (m_scene != null)
             {
                 IGridRegisterModule gridRegister = m_scene.RequestModuleInterface<IGridRegisterModule>();
@@ -257,7 +317,7 @@ namespace WhiteCore.Modules
         public void UpdateRegionInfo(IScene scene, string[] info)
         {
             if (MainConsole.Instance.ConsoleScene != null)
-                MainConsole.Instance.ConsoleScene.RegionInfo = CreateRegionFromConsole(MainConsole.Instance.ConsoleScene.RegionInfo);
+                MainConsole.Instance.ConsoleScene.RegionInfo = CreateRegionFromConsole(MainConsole.Instance.ConsoleScene.RegionInfo, true);
         }
 
         public virtual List<ISceneEntity> LoadObjects()

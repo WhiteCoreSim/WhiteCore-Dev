@@ -27,6 +27,8 @@
 
 using System;
 using System.Text.RegularExpressions;
+using System.IO;
+using WhiteCore.Framework.ConsoleFramework;
 
 namespace WhiteCore.Framework.Utilities
 {
@@ -78,5 +80,86 @@ namespace WhiteCore.Framework.Utilities
         {
             return PathHomeDrive(PathUsername(Path));
         }
+
+        public static string VerifySaveFile(string fileName, string defaultExt, string defaultDir)
+        {
+            // some file sanity checks when saving 
+            string extension = Path.GetExtension (fileName);
+
+            if (extension == string.Empty)
+            {
+                fileName = fileName + defaultExt;
+            }
+
+            // verify path details
+            if (!Path.IsPathRooted (fileName))
+            {
+                if ( defaultDir == String.Empty )
+                    defaultDir = "./";
+
+                if (!Directory.Exists (defaultDir))
+                {
+                    MainConsole.Instance.Info ("[Error]: The folder specified, '" + defaultDir + "' does not exist!");
+                    return "";
+                }
+                fileName = Path.Combine (defaultDir, fileName);
+ 
+            }
+
+            // last check...
+            if (File.Exists (fileName))
+            {
+                if (MainConsole.Instance.Prompt ("[Warning]: The file '" + fileName + "' exists. Overwrite?", "yes") != "yes")
+                    return "";
+
+                File.Delete (fileName);
+            }
+
+            return fileName;
+        }
+
+        public static string VerifyReadFile(string fileName, string defaultExt, string defaultDir)
+        {
+            // some sanity checks...
+            string extension = Path.GetExtension(fileName).ToLower();
+            bool extOK = extension.Equals(defaultExt);
+
+            if (!extOK)
+            {
+                if ( extension == string.Empty)
+                {
+                    fileName = fileName + defaultExt;
+                }
+                else
+                {
+                    MainConsole.Instance.Info("Usage: the filename should be a '" + defaultExt +"' file");
+                    return "";
+                }
+            }
+
+            if (!Path.IsPathRooted (fileName))
+            {
+                if (defaultDir == String.Empty)
+                    defaultDir = "./";
+
+                if (!Directory.Exists (defaultDir))
+                {
+                    MainConsole.Instance.Info ("[Error]: The folder specified, '" + defaultDir + "' does not exist!");
+                    return "";
+                }
+                fileName = Path.Combine (defaultDir, fileName);
+            }
+             
+            // last check...
+            if ( !File.Exists( fileName ) )
+            {
+                MainConsole.Instance.Info ( "[Error]: The file '" + fileName + "' cannot be found." );
+                return "";
+            }
+
+            return fileName;
+
+        }
+
     }
 }

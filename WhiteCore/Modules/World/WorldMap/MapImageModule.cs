@@ -279,9 +279,11 @@ namespace WhiteCore.Modules.WorldMap
         /// </summary>
         public void HandleUpdateWorldMapConsoleCommand(IScene scene, string[] cmdparams)
         {
-            m_scene = scene;
-     
-            CreateTerrainTexture(true);
+            if (scene != null)
+            {
+                m_scene = scene;
+                CreateTerrainTexture (true);
+            }
         }
 
         private void OnUpdateRegion(object source, ElapsedEventArgs e)
