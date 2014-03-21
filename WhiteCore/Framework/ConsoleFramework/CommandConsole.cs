@@ -274,7 +274,7 @@ namespace WhiteCore.Framework.ConsoleFramework
                                                 if (fn != null)
                                                 {
                                                     foreach (IScene scene in GetScenes(cmd.Value))
-                                                        fn(scene, commandPath);
+                                                        fn (scene, commandPath);
                                                 }
                                             }
                                             return new string[0];
@@ -283,6 +283,8 @@ namespace WhiteCore.Framework.ConsoleFramework
                                 }
                             }
                         }
+                        // unable to determine multi word command
+                        MainConsole.Instance.Info (" Sorry.. missed that...");
                     }
                     else if(commandPath.Length > 0)
                     {
@@ -346,11 +348,13 @@ namespace WhiteCore.Framework.ConsoleFramework
                         if (cmd.fireOnceForAllScenes)
                         {
                             if (MainConsole.Instance.ConsoleScenes.Count == 1)
-                                return new List<IScene> { MainConsole.Instance.ConsoleScenes[0] };
+                                return new List<IScene> { MainConsole.Instance.ConsoleScenes [0] };
                             else
-                                return new List<IScene>();
-                        }
-                        else
+                            {
+                                MainConsole.Instance.Warn ("[Warning] This command requires a selected region");
+                                return new List<IScene> ();
+                            }
+                        } else
                             return MainConsole.Instance.ConsoleScenes;
                     }
                     else
