@@ -235,13 +235,9 @@ namespace WhiteCore.Modules
                     info = new RegionInfo();
 
                 info.RegionID = UUID.Random();
-                info.RegionPort = 9000;
-
-                info.RegionLocX = currentInfo["minX"];
-                info.RegionLocY = currentInfo ["minY"];
-
-                if (currentInfo["port"] > 0)
-                    info.RegionPort = currentInfo["port"]+1;
+                info.RegionLocX = currentInfo ["minX"] > 0 ? currentInfo ["minX"] : 1000 * Constants.RegionSize;
+                info.RegionLocY = currentInfo ["minY"] > 0 ? currentInfo ["minY"] : 1000 * Constants.RegionSize;
+                info.RegionPort = currentInfo ["port"] > 0 ? currentInfo ["port"]+1 : 9000;
                
                 prompt = true;
             }
