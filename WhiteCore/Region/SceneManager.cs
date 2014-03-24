@@ -42,7 +42,6 @@ using System.Linq;
 using Timer = System.Timers.Timer;
 using System.IO;
 
-
 namespace WhiteCore.Region
 {
     /// <summary>
@@ -505,19 +504,166 @@ namespace WhiteCore.Region
             MainConsole.Instance.Commands.AddCommand("modules unload", "modules unload [module]",
                                                      "Unload the given simulator module", HandleModulesUnload, true, false);
             
-            MainConsole.Instance.Commands.AddCommand("create region", "create region",
-                                                         "Creates a new region to start",
+            MainConsole.Instance.Commands.AddCommand("create region", "create region <Region Name>  <--config=filename>",
+                "Creates a new region to start\n"+
+                "<Region Name> - Use this name for the new region\n"+
+                "--config='filename' - Use this file for region configuration",
                                                          CreateNewRegion, false, true);
+			
+            MainConsole.Instance.Commands.AddCommand("save region config", "save region config <filename>",
+                "Saves the configuration of the region\n"+
+                "<filename> - Use this name for the region configuration",
+                SaveRegionConfig, true, false);
+                
         }
 
         private void CreateNewRegion(IScene scene, string[] cmd)
         {
-            ISimulationDataStore store = m_selectedDataService.Copy();
-            StartRegion(store, store.CreateNewRegion(m_OpenSimBase));
+
+            if (cmd.Length > 2)
+            {
+                CreateNewRegionExtended(scene, cmd);
+            }
+            else
+            {
+                // original 'no paramters' command
+                ISimulationDataStore store = m_selectedDataService.Copy ();
+                StartRegion (store, store.CreateNewRegion (m_OpenSimBase));
+
+                foreach (ISimulationDataStore st in m_simulationDataServices)
+                    st.ForceBackup ();
+            }
+        }
+
+        private void CreateNewRegion( string regionName)
+        {
+            // modified to pass a region name to use
+            ISimulationDataStore store = m_selectedDataService.Copy ();
+            StartRegion (store, store.CreateNewRegion (m_OpenSimBase, regionName));
 
             foreach (ISimulationDataStore st in m_simulationDataServices)
-                st.ForceBackup();
+                st.ForceBackup ();
         }
+
+        /// <summary>
+        /// Creates the new region using addition options.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmd">Cmd.</param>
+        private void CreateNewRegionExtended(IScene scene, string[] cmd)
+        {
+
+            string defaultDir = "";
+            string defaultExt = ".xml";
+            string regionName = "";
+            string regionFile = "";
+
+            List<string> newParams = new List<string>(cmd);
+            foreach (string param in cmd)
+            {
+                if (param.StartsWith("--config", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    regionFile = param.Remove(0, 9);
+                    newParams.Remove(param);
+                }
+            }
+
+            if (newParams.Count == 3)
+            {
+                regionName = newParams [2];
+            }
+
+            if (regionFile == "" )
+            {
+                CreateNewRegion (regionName);
+                return;
+            }
+
+            // we have a config file and possibly a region name
+            IConfig config = m_config.Configs["FileBasedSimulationData"];
+            if (config != null)
+                defaultDir = PathHelpers.ComputeFullPath (config.GetString ("StoreBackupDirectory", "Regions"));
+
+            regionFile = PathHelpers.VerifyReadFile (regionFile, defaultExt, defaultDir);
+            if (regionFile == "")
+                return;
+
+            // let's do it...
+            MainConsole.Instance.Info ( "[SceneManager]: Loading region definition...." );
+            RegionInfo newRegion = new RegionInfo ();
+            newRegion.LoadRegionConfig( regionFile );
+
+            if (newRegion.RegionName != regionName)
+            {
+                if ( MainConsole.Instance.Prompt("You have specified a different name than what is specified in the configuration file\n"+
+                    "Do you wish to rename the region to '" + regionName +"'? (yes/no): ") == "yes" )
+                {
+                    newRegion.RegionName = regionName;
+                }
+            }
+
+            //check for an existing Scene
+            IScene region = m_scenes.Find((s) => s.RegionInfo.RegionName.ToLower() == regionName);
+            if (region != null)
+            {
+                MainConsole.Instance.InfoFormat(
+                    "ERROR: The region '{0}' already exists, please retry", regionName);
+                return;
+            }
+
+            // indicate this is a new region
+            newRegion.NewRegion = true;
+
+            // let's do it
+            ISimulationDataStore store = m_selectedDataService.Copy ();
+            StartRegion (store, store.CreateNewRegion (m_OpenSimBase, newRegion));
+
+            // backup all our work
+            foreach (ISimulationDataStore st in m_simulationDataServices)
+                st.ForceBackup ();
+
+        }
+
+        /// <summary>
+        /// Saves the region configuration.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmd">Cmd.</param>
+        private void SaveRegionConfig(IScene scene, string[] cmd)
+        {
+ 
+            if (scene == null)
+                return;
+
+            string regionFile = "";
+            string regionsDir = "";
+
+            // get region config path in case...
+            IConfig config = m_config.Configs["FileBasedSimulationData"];
+            if (config != null)
+                regionsDir = PathHelpers.ComputeFullPath (config.GetString ("StoreBackupDirectory", "Regions"));
+                 
+            if (cmd.Count () > 4)
+            {
+                regionFile = cmd [3];
+
+                if (PathHelpers.VerifySaveFile (regionFile, ".xml", regionsDir) == "")        // filename is not kocher
+                  return;
+
+                // verify path details
+                if (!Path.IsPathRooted (regionFile))
+                    regionFile = Path.Combine (regionsDir, regionFile);
+            }
+
+            // let's do it
+            if (regionFile == "")
+                regionFile = Path.Combine( regionsDir, scene.RegionInfo.RegionName + ".xml");
+
+            MainConsole.Instance.InfoFormat("[SceneManager]: Saving region configuration for {0} to {1} ...", 
+                                                scene.RegionInfo.RegionName, regionFile);
+            scene.RegionInfo.SaveRegionConfig( regionFile );
+
+         }
 
         /// <summary>
         ///     Kicks users off the region
@@ -865,10 +1011,11 @@ namespace WhiteCore.Region
             UserAccount EstateOwner;
             EstateOwner = scene.UserAccountService.GetUserAccount (null, regInfo.EstateSettings.EstateOwner);
 
-            // todo ... change hardcoded filed sizes to public constants
+            // todo ... change hardcoded field sizes to public constants
             sceneInfo =  String.Format ("{0, -20}", regInfo.RegionName);
             sceneInfo += String.Format ("{0, -16}", regInfo.RegionLocX / Constants.RegionSize + "," + regInfo.RegionLocY / Constants.RegionSize);
-            sceneInfo += String.Format ("{0, -12}", regInfo.RegionSizeX + "," + regInfo.RegionSizeY);
+            sceneInfo += String.Format ("{0, -12}", regInfo.RegionSizeX + "x" + regInfo.RegionSizeY);
+            sceneInfo += String.Format ("{0, -8}", regInfo.RegionPort);
             sceneInfo += String.Format ("{0, -16}", regInfo.EstateSettings.EstateName);
             sceneInfo += String.Format ("{0, -20}", EstateOwner.Name);
 
@@ -996,7 +1143,7 @@ namespace WhiteCore.Region
             if (archiver != null)
                 archiver.HandleSaveOarConsoleCommand(cmdparams);
         }
-
+            
         #endregion
     }
 }

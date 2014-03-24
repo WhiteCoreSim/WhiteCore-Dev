@@ -4,6 +4,22 @@ Rowan D <greythane@gmail.com>
 Fly-Man- <fly.man.opensim@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Mar 24 - Greythane
+* Dropped Xml2 commands after further investigation, OAR's are a better alternative and it does not
+    appear that the XML2 format is in common use with OpenSim anyway
+* SceneManager 
+    - Re-synced new Region commmads after a stuff up in doing so previously
+    - Add port to 'Show regions' command
+* FileBasedSimulationData
+    - Correct some problems in the 'update region info' command
+
+
+Mar 24 - Fly-Man
+* Correction to server configuration files
+
+Mar 22nd - Greythane
+*  Corrected setting of default values when no regions exist at startup
+
 Mar 21st - Greythane
 * CommandConsole
   - Add 'missed that..' response for multi word commands

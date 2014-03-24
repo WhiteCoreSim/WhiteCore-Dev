@@ -291,6 +291,11 @@ namespace WhiteCore.Modules
                 //Re-register so that if the position has changed, we get the new neighbors
                 gridRegister.RegisterRegionWithGrid(m_scene, true, false, null);
 
+                // Tell clients about changes
+                IEstateModule es = m_scene.RequestModuleInterface<IEstateModule> ();
+                if (es != null)
+                    es.sendRegionHandshakeToAll ();
+
                 ForceBackup();
 
                 MainConsole.Instance.Info("[FileBasedSimulationData]: Save completed.");
@@ -306,14 +311,17 @@ namespace WhiteCore.Modules
 
             if (!MainConsole.Instance.Commands.ContainsCommand("update region info"))
                 MainConsole.Instance.Commands.AddCommand("update region info", "update region info",
-                                                         "Updates a region's info (and the resulting .ini file)",
-                                                         UpdateRegionInfo, true, false);
+                    "Updates the region settings",
+                    UpdateRegionInfo, true, true);
         }
 
         public void UpdateRegionInfo(IScene scene, string[] info)
         {
             if (MainConsole.Instance.ConsoleScene != null)
+            {
+                m_scene = scene;
                 MainConsole.Instance.ConsoleScene.RegionInfo = CreateRegionFromConsole(MainConsole.Instance.ConsoleScene.RegionInfo, true);
+            }
         }
 
         public virtual List<ISceneEntity> LoadObjects()

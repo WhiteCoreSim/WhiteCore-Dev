@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
@@ -72,6 +71,8 @@ namespace WhiteCore.Modules.WorldMap
 
         public Bitmap TerrainToBitmap(Bitmap mapbmp)
         {
+            //var startMemory  = GC.GetTotalMemory (true);
+
             List<string> renderers = RenderingLoader.ListRenderers(Util.ExecutingDirectory());
             if (renderers.Count > 0)
             {
@@ -144,15 +145,19 @@ namespace WhiteCore.Modules.WorldMap
             renderer.Scene.addLight("Light1", new warp_Light(new warp_Vector(1.0f, 0.5f, 1f), 0xffffff, 0, 320, 40));
             renderer.Scene.addLight("Light2", new warp_Light(new warp_Vector(-1f, -1f, 1f), 0xffffff, 0, 100, 40));
 
+
             try
             {
                 CreateWater(renderer);
+
                 terrainObj = CreateTerrain(renderer, textureTerrain);
+
                 if (drawPrimVolume && m_primMesher != null)
                 {
                     foreach (ISceneChildEntity part in m_scene.Entities.GetEntities().SelectMany(ent => ent.ChildrenEntities()))
                         CreatePrim(renderer, part);
                 }
+
             }
             catch (Exception ex)
             {
@@ -168,19 +173,26 @@ namespace WhiteCore.Modules.WorldMap
                 obj.vertexData = null;
                 obj.triangleData = null;
             }
-            renderer.Scene.removeAllObjects();
-            renderer = null;
-            viewport = null;
+
+            renderer.Reset ();
+            //renderer.Scene.removeAllObjects();
+            // renderer = null;
+            // viewport = null;
             m_primMesher = null;
             terrainObj.fastvertex = null;
             terrainObj.fasttriangle = null;
-            terrainObj = null;
+            // terrainObj = null;
             SaveCache();
             m_colors.Clear();
+
 
             //Force GC to try to clean this mess up
             GC.Collect();
 
+            //var endMemory = GC.GetTotalMemory (true);
+            //MainConsole.Instance.InfoFormat ("[Warp3D]:Render:  Memory Start: {0}, end: {1}, Diff: {2}", startMemory, endMemory, (endMemory-startMemory));
+
+ 
             return bitmap;
         }
 
@@ -343,6 +355,7 @@ namespace WhiteCore.Modules.WorldMap
                                 sculpt.Dispose();
                             }
                         }
+                        sculptAsset = null;
                     }
                 }
                 else // Prim
@@ -417,6 +430,8 @@ namespace WhiteCore.Modules.WorldMap
                     renderer.Scene.addObject(meshName, faceObj);
 
                     renderer.SetObjectMaterial(meshName, materialName);
+
+                    faceObj = null;
                 }
                 renderMesh.Faces.Clear();
                 renderMesh = null;
