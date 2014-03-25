@@ -225,7 +225,7 @@ namespace WhiteCore.Region
             if (newRegion)
             {
                 ISimulationDataStore store = m_selectedDataService.Copy();
-                regions.Add(new KeyValuePair<ISimulationDataStore, RegionInfo>(store, store.CreateNewRegion(m_OpenSimBase)));
+                regions.Add(new KeyValuePair<ISimulationDataStore, RegionInfo>(store, store.CreateNewRegion(m_OpenSimBase, null)));
             }
             else
             {
@@ -517,8 +517,36 @@ namespace WhiteCore.Region
                 
         }
 
+        private Dictionary<string, int> FindCurrentRegionInfo()
+        {
+            var rInfo = new Dictionary<string, int >();
+
+            rInfo["minX"] = 0;
+            rInfo["minY"] = 0;
+            rInfo["port"] = 0;
+
+            int regX, regY;
+            foreach (IScene scene in Scenes)
+            {
+                regX = scene.RegionInfo.RegionLocX;
+                if (rInfo ["minX"] <= regX)
+                    rInfo ["minX"] = regX + scene.RegionInfo.RegionSizeX;
+
+                regY = scene.RegionInfo.RegionLocY;
+                if (rInfo ["minY"] < regY)
+                    rInfo ["minY"] = regY + scene.RegionInfo.RegionSizeY;
+
+                if (rInfo ["port"] < scene.RegionInfo.RegionPort)
+                    rInfo ["port"] = scene.RegionInfo.RegionPort;
+                }
+            return rInfo;
+        }
+
+
         private void CreateNewRegion(IScene scene, string[] cmd)
         {
+            // get some current details
+            var currentInfo = FindCurrentRegionInfo ();
 
             if (cmd.Length > 2)
             {
@@ -526,23 +554,37 @@ namespace WhiteCore.Region
             }
             else
             {
-                // original 'no paramters' command
                 ISimulationDataStore store = m_selectedDataService.Copy ();
-                StartRegion (store, store.CreateNewRegion (m_OpenSimBase));
+                var newRegion = store.CreateNewRegion (m_OpenSimBase, currentInfo);
 
-                foreach (ISimulationDataStore st in m_simulationDataServices)
-                    st.ForceBackup ();
+                if (newRegion.RegionName != "abort")
+                {
+                    //                    StartRegion (store, store.CreateNewRegion (m_OpenSimBase, currentInfo));
+                    StartRegion (store, newRegion);
+
+                    foreach (ISimulationDataStore st in m_simulationDataServices)
+                        st.ForceBackup ();
+                }
             }
         }
 
         private void CreateNewRegion( string regionName)
         {
+            // get some current details
+            var currentInfo = FindCurrentRegionInfo ();
+
             // modified to pass a region name to use
             ISimulationDataStore store = m_selectedDataService.Copy ();
-            StartRegion (store, store.CreateNewRegion (m_OpenSimBase, regionName));
+            //StartRegion (store, store.CreateNewRegion (m_OpenSimBase, regionName, currentInfo));
 
-            foreach (ISimulationDataStore st in m_simulationDataServices)
-                st.ForceBackup ();
+            var newRegion = store.CreateNewRegion (m_OpenSimBase, regionName, currentInfo);
+            if (newRegion.RegionName != "abort")
+            {
+                StartRegion (store, newRegion);
+
+                foreach (ISimulationDataStore st in m_simulationDataServices)
+                    st.ForceBackup ();
+            }
         }
 
         /// <summary>
@@ -590,15 +632,15 @@ namespace WhiteCore.Region
 
             // let's do it...
             MainConsole.Instance.Info ( "[SceneManager]: Loading region definition...." );
-            RegionInfo newRegion = new RegionInfo ();
-            newRegion.LoadRegionConfig( regionFile );
+            RegionInfo loadRegion = new RegionInfo ();
+            loadRegion.LoadRegionConfig( regionFile );
 
-            if (newRegion.RegionName != regionName)
+            if (loadRegion.RegionName != regionName)
             {
                 if ( MainConsole.Instance.Prompt("You have specified a different name than what is specified in the configuration file\n"+
                     "Do you wish to rename the region to '" + regionName +"'? (yes/no): ") == "yes" )
                 {
-                    newRegion.RegionName = regionName;
+                    loadRegion.RegionName = regionName;
                 }
             }
 
@@ -612,15 +654,24 @@ namespace WhiteCore.Region
             }
 
             // indicate this is a new region
-            newRegion.NewRegion = true;
+            loadRegion.NewRegion = true;
+
+            // get some current details
+            var currentInfo = FindCurrentRegionInfo ();
 
             // let's do it
             ISimulationDataStore store = m_selectedDataService.Copy ();
-            StartRegion (store, store.CreateNewRegion (m_OpenSimBase, newRegion));
+            //StartRegion (store, store.CreateNewRegion (m_OpenSimBase, newRegion, currentInfo));
 
-            // backup all our work
-            foreach (ISimulationDataStore st in m_simulationDataServices)
-                st.ForceBackup ();
+            var newRegion = store.CreateNewRegion (m_OpenSimBase, loadRegion, currentInfo);
+            if (newRegion.RegionName != "abort")
+            {
+                StartRegion (store, newRegion);
+
+                // backup all our work
+                foreach (ISimulationDataStore st in m_simulationDataServices)
+                    st.ForceBackup ();
+            }
 
         }
 

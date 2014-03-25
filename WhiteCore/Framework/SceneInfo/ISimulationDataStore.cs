@@ -115,19 +115,19 @@ namespace WhiteCore.Framework.SceneInfo
         /// Creates a new region
         /// </summary>
         /// <returns></returns>
-        RegionInfo CreateNewRegion(ISimulationBase simBase);
+        RegionInfo CreateNewRegion(ISimulationBase simBase, Dictionary<string, int> currentInfo);
 
         /// <summary>
         /// Creates a new region with the passed name
         /// </summary>
         /// <returns></returns>
-        RegionInfo CreateNewRegion(ISimulationBase simBase, string regionName);
+        RegionInfo CreateNewRegion(ISimulationBase simBase, string regionName, Dictionary<string, int> currentInfo);
 
         /// <summary>
         /// Creates a new region using the passed regInfo object
         /// </summary>
         /// <returns></returns>
-        RegionInfo CreateNewRegion(ISimulationBase simBase, RegionInfo regionInfo);
+        RegionInfo CreateNewRegion(ISimulationBase simBase, RegionInfo regionInfo, Dictionary<string, int> currentInfo);
 
         /// <summary>
         ///     Load all region infos available

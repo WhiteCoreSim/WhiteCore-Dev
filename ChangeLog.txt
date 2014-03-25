@@ -4,6 +4,16 @@ Rowan D <greythane@gmail.com>
 Fly-Man- <fly.man.opensim@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Mar 25 - Greythane
+* Scenemanager / FileBasedSimulationData
+  - Re-work and correct new region creation as the current mods crash for grid mode operations.
+  - add a final yes/no to proceed with the creation of the new region
+* EstateInitializer
+  - small change to prompt wording when creating a new estate
+* Gridservice
+  - Correct 'show region <name>' processing when used in grid mode
+      
+
 Mar 24 - Greythane
 * Dropped Xml2 commands after further investigation, OAR's are a better alternative and it does not
     appear that the XML2 format is in common use with OpenSim anyway

@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
@@ -906,12 +905,15 @@ namespace WhiteCore.Services.SQLServices.GridService
                 return;
             }
 
+            IUserAccountService accountService = m_registry.RequestModuleInterface<IUserAccountService>();
+
             foreach (GridRegion r in regions)
             {
                 RegionFlags flags = (RegionFlags) Convert.ToInt32(r.Flags);
                 int RegionPosX = r.RegionLocX / 256;
                 int RegionPosY = r.RegionLocY / 256;
-                UserAccount account = scene.UserAccountService.GetUserAccount(null,r.EstateOwner);
+
+                UserAccount account = accountService.GetUserAccount(null,r.EstateOwner);
 
                 MainConsole.Instance.Info(
                     "-------------------------------------------------------------------------------");

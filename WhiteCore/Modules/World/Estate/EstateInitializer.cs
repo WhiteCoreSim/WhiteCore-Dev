@@ -101,8 +101,12 @@ namespace WhiteCore.Modules.Estate
                     }
                     response =
                         MainConsole.Instance.Prompt(
-                            "Do you wish to join one of these existing estates? (Options are {yes, no, cancel})",
-                            response, new List<string> {"yes", "no", "cancel"});
+                            "Do you wish to join one of these existing estates? (yes/no/cancel)",
+                            response);
+                    //response =
+                    //    MainConsole.Instance.Prompt(
+                    //        "Do you wish to join one of these existing estates? (yes/no/cancel)",
+                    //        response, new List<string> {"yes", "no", "cancel"});
                 }
                 else
                 {

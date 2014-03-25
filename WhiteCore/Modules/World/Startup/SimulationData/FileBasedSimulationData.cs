@@ -29,7 +29,6 @@ using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.SceneInfo.Entities;
-using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
 using WhiteCore.Region;
 using Nini.Config;
@@ -116,19 +115,20 @@ namespace WhiteCore.Modules
             return retVals;
         }
 
-        public virtual RegionInfo CreateNewRegion(ISimulationBase simBase)
+        public virtual RegionInfo CreateNewRegion(ISimulationBase simBase, Dictionary<string, int> currentInfo)
         {
             ReadConfig(simBase);
             _regionData = new RegionData();
             _regionData.Init();
-            RegionInfo info = CreateRegionFromConsole(null, true);
+            RegionInfo info = CreateRegionFromConsole(null, true, currentInfo);
             if (info == null)
-                return CreateNewRegion(simBase);
+                return CreateNewRegion(simBase,currentInfo);
+
             m_fileName = info.RegionName;
             return info;
         }
 
-        public virtual RegionInfo CreateNewRegion(ISimulationBase simBase, string regionName)
+        public virtual RegionInfo CreateNewRegion(ISimulationBase simBase, string regionName, Dictionary<string, int> currentInfo)
         {
             ReadConfig(simBase);
             _regionData = new RegionData();
@@ -137,9 +137,10 @@ namespace WhiteCore.Modules
             info.RegionName = regionName;
             info.NewRegion = true;
 
-            info = CreateRegionFromConsole(info, true);
+            info = CreateRegionFromConsole(info, true, currentInfo);
             if (info == null)
-                return CreateNewRegion(simBase, info);
+                return CreateNewRegion(simBase, info, currentInfo);
+        
             m_fileName = info.RegionName;
             return info;
         }
@@ -150,14 +151,16 @@ namespace WhiteCore.Modules
 		/// <returns></returns>
 		/// <param name="simBase">Sim base.</param>
 		/// <param name="regionInfo">Region info.</param>
-        public virtual RegionInfo CreateNewRegion(ISimulationBase simBase, RegionInfo regionInfo)
+        /// <param name="currentInfo">Current region info.</param>
+        public virtual RegionInfo CreateNewRegion(ISimulationBase simBase, RegionInfo regionInfo, Dictionary<string, int> currentInfo)
         {
             ReadConfig(simBase);
             _regionData = new RegionData();
             _regionData.Init();
-			//RegionInfo info = CreateRegionFromConsole(regionInfo, false);
+			
+            // something wrong here, prompt for details
             if (regionInfo == null)
-				return CreateNewRegion(simBase, regionInfo );		// something wrong, prompt for details
+                return CreateNewRegion(simBase, currentInfo );		
             
 			m_fileName = regionInfo.RegionName;
             
@@ -184,50 +187,8 @@ namespace WhiteCore.Modules
             return _regionData.RegionInfo;
         }
 
-        private static Dictionary<string, int> FindCurrentRegionInfo()
+         private RegionInfo CreateRegionFromConsole(RegionInfo info, Boolean prompt, Dictionary<string, int> currentInfo)
         {
-            var rInfo = new Dictionary<string, int >();
-
-            rInfo["minX"] = 0;
-            rInfo["minY"] = 0;
-            rInfo["port"] = 0;
-
-            var regionData = Framework.Utilities.DataManager.RequestPlugin<IRegionData>();
-            var count = regionData.Count((WhiteCore.Framework.Services.RegionFlags) 0,
-                WhiteCore.Framework.Services.RegionFlags.Hyperlink |
-                WhiteCore.Framework.Services.RegionFlags.Foreign | 
-                WhiteCore.Framework.Services.RegionFlags.Hidden);
-
-            var regions = regionData.Get((WhiteCore.Framework.Services.RegionFlags) 0,
-                WhiteCore.Framework.Services.RegionFlags.Hyperlink |
-                WhiteCore.Framework.Services.RegionFlags.Foreign |
-                WhiteCore.Framework.Services.RegionFlags.Hidden,
-                0,
-                count,
-                null);
-
-            int regX, regY;
-            foreach (var region in regions)
-            {
-                regX = region.RegionLocX;
-                if ( rInfo["minX"] <= regX )
-                    rInfo["minX"] = regX + region.RegionSizeX;
-
-                regY = region.RegionLocY;
-                if ( rInfo["minY"] < regY )
-                    rInfo["minY"] = regY+ region.RegionSizeY;
-
-                if ( rInfo["port"] < region.InternalPort )
-                    rInfo["port"] = region.InternalPort;
-            }
-
-            return rInfo;
-        }
-       
-        private RegionInfo CreateRegionFromConsole(RegionInfo info, Boolean prompt)
-        {
-            // get some current details
-            var currentInfo = FindCurrentRegionInfo ();
 
             if (info == null || info.NewRegion)
             {
@@ -245,46 +206,45 @@ namespace WhiteCore.Modules
             // prompt for user input
             if (prompt)
             {
-                info.RegionName = MainConsole.Instance.Prompt ("Region Name: ", info.RegionName);
-            
+                info.RegionName = MainConsole.Instance.Prompt ("Region Name", info.RegionName);
+
                 info.RegionLocX =
-                    int.Parse (MainConsole.Instance.Prompt ("Region Location X: ",
+                    int.Parse (MainConsole.Instance.Prompt ("Region Location X",
                     ((info.RegionLocX == 0 
                             ? 1000 
                             : info.RegionLocX / Constants.RegionSize)).ToString ())) * Constants.RegionSize;
 
                 info.RegionLocY =
-                    int.Parse (MainConsole.Instance.Prompt ("Region location Y: ",
+                    int.Parse (MainConsole.Instance.Prompt ("Region location Y",
                     ((info.RegionLocY == 0 
                             ? 1000 
                             : info.RegionLocY / Constants.RegionSize)).ToString ())) * Constants.RegionSize;
             
-                info.RegionSizeX = int.Parse (MainConsole.Instance.Prompt ("Region size X: ", info.RegionSizeX.ToString ()));
-                info.RegionSizeY = int.Parse (MainConsole.Instance.Prompt ("Region size Y: ", info.RegionSizeY.ToString ()));
+                info.RegionSizeX = int.Parse (MainConsole.Instance.Prompt ("Region size X", info.RegionSizeX.ToString ()));
+                info.RegionSizeY = int.Parse (MainConsole.Instance.Prompt ("Region size Y", info.RegionSizeY.ToString ()));
             
-                info.RegionPort = int.Parse (MainConsole.Instance.Prompt ("Region Port: ", info.RegionPort.ToString ()));
+                info.RegionPort = int.Parse (MainConsole.Instance.Prompt ("Region Port", info.RegionPort.ToString ()));
             
-                info.RegionType = MainConsole.Instance.Prompt ("Region Type: ",
+                info.RegionType = MainConsole.Instance.Prompt ("Region Type (Flatland/Mainland/Island)",
                     (info.RegionType == "" ? "Flatland" : info.RegionType));
+                    
+                info.SeeIntoThisSimFromNeighbor =  MainConsole.Instance.Prompt (
+                    "See into this sim from neighbors (yes/no)",
+                    info.SeeIntoThisSimFromNeighbor ? "yes" : "no").ToLower() == "yes";
 
-                info.SeeIntoThisSimFromNeighbor =
-                    bool.Parse (
-                    MainConsole.Instance.Prompt ("See into this sim from neighbors: ",
-                        info.SeeIntoThisSimFromNeighbor.ToString ().ToLower (),
-                        new List<string> () { "true", "false" }).ToLower ());
-                info.InfiniteRegion =
-                    bool.Parse (
-                    MainConsole.Instance.Prompt ("Make an infinite region: ",
-                        info.InfiniteRegion.ToString ().ToLower (),
-                        new List<string> () { "true", "false" }).ToLower ());
+                info.InfiniteRegion = MainConsole.Instance.Prompt (
+                    "Make an infinite region (yes/no)",
+                    info.InfiniteRegion ? "yes" : "no").ToLower () == "yes";
             
                 info.ObjectCapacity =
-                    int.Parse (MainConsole.Instance.Prompt ("Object capacity: ",
+                    int.Parse (MainConsole.Instance.Prompt ("Object capacity",
                     info.ObjectCapacity == 0
-                                                              ? "50000"
-                                                              : info.ObjectCapacity.ToString ()));
+                                           ? "50000"
+                                           : info.ObjectCapacity.ToString ()));
+
             }
 
+            // are we updating or adding??
             if (m_scene != null)
             {
                 IGridRegisterModule gridRegister = m_scene.RequestModuleInterface<IGridRegisterModule>();
@@ -299,6 +259,18 @@ namespace WhiteCore.Modules
                 ForceBackup();
 
                 MainConsole.Instance.Info("[FileBasedSimulationData]: Save completed.");
+            }
+            else {
+                // last chance to abort
+                bool createOK = MainConsole.Instance.Prompt (
+                    "Create a new region: " +
+                    info.RegionName + ", " +
+                    info.RegionSizeX + " x " + info.RegionSizeY +
+                    " at " + info.RegionLocX/Constants.RegionSize + "," + info.RegionLocY/Constants.RegionSize +
+                    " (yes/no) ", "no").ToLower () == "yes";
+                if (!createOK)
+                  info.RegionName = "abort";
+                
             }
 
             return info;
@@ -320,7 +292,7 @@ namespace WhiteCore.Modules
             if (MainConsole.Instance.ConsoleScene != null)
             {
                 m_scene = scene;
-                MainConsole.Instance.ConsoleScene.RegionInfo = CreateRegionFromConsole(MainConsole.Instance.ConsoleScene.RegionInfo, true);
+                MainConsole.Instance.ConsoleScene.RegionInfo = CreateRegionFromConsole(MainConsole.Instance.ConsoleScene.RegionInfo, true, null);
             }
         }
 
