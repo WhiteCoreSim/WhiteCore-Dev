@@ -196,10 +196,19 @@ namespace WhiteCore.Modules
                     info = new RegionInfo();
 
                 info.RegionID = UUID.Random();
-                info.RegionLocX = currentInfo ["minX"] > 0 ? currentInfo ["minX"] : 1000 * Constants.RegionSize;
-                info.RegionLocY = currentInfo ["minY"] > 0 ? currentInfo ["minY"] : 1000 * Constants.RegionSize;
-                info.RegionPort = currentInfo ["port"] > 0 ? currentInfo ["port"]+1 : 9000;
-               
+
+                if (currentInfo != null)
+                {
+                    info.RegionLocX = currentInfo ["minX"] > 0 ? currentInfo ["minX"] : 1000 * Constants.RegionSize;
+                    info.RegionLocY = currentInfo ["minY"] > 0 ? currentInfo ["minY"] : 1000 * Constants.RegionSize;
+                    info.RegionPort = currentInfo ["port"] > 0 ? currentInfo ["port"] + 1 : 9000;
+                } else
+                {
+                    info.RegionLocX = 1000 * Constants.RegionSize;
+                    info.RegionLocY = 1000 * Constants.RegionSize;
+                    info.RegionPort = 9000;
+
+                }
                 prompt = true;
             }
 
@@ -259,18 +268,6 @@ namespace WhiteCore.Modules
                 ForceBackup();
 
                 MainConsole.Instance.Info("[FileBasedSimulationData]: Save completed.");
-            }
-            else {
-                // last chance to abort
-                bool createOK = MainConsole.Instance.Prompt (
-                    "Create a new region: " +
-                    info.RegionName + ", " +
-                    info.RegionSizeX + " x " + info.RegionSizeY +
-                    " at " + info.RegionLocX/Constants.RegionSize + "," + info.RegionLocY/Constants.RegionSize +
-                    " (yes/no) ", "no").ToLower () == "yes";
-                if (!createOK)
-                  info.RegionName = "abort";
-                
             }
 
             return info;

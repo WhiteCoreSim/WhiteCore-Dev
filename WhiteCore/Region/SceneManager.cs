@@ -224,8 +224,10 @@ namespace WhiteCore.Region
             List<string> regionFiles = m_selectedDataService.FindRegionInfos(out newRegion, m_OpenSimBase);
             if (newRegion)
             {
+                var currentInfo = FindCurrentRegionInfo ();
+
                 ISimulationDataStore store = m_selectedDataService.Copy();
-                regions.Add(new KeyValuePair<ISimulationDataStore, RegionInfo>(store, store.CreateNewRegion(m_OpenSimBase, null)));
+                regions.Add(new KeyValuePair<ISimulationDataStore, RegionInfo>(store, store.CreateNewRegion(m_OpenSimBase, currentInfo)));
             }
             else
             {
@@ -271,6 +273,7 @@ namespace WhiteCore.Region
             //Tell the scene that the startup is complete 
             // Note: this event is added in the scene constructor
             scene.FinishedStartup("Startup", new List<string>());
+
         }
 
         #endregion
@@ -524,6 +527,7 @@ namespace WhiteCore.Region
             rInfo["minX"] = 0;
             rInfo["minY"] = 0;
             rInfo["port"] = 0;
+            rInfo ["regions"] = 0;
 
             int regX, regY;
             foreach (IScene scene in Scenes)
@@ -538,6 +542,8 @@ namespace WhiteCore.Region
 
                 if (rInfo ["port"] < scene.RegionInfo.RegionPort)
                     rInfo ["port"] = scene.RegionInfo.RegionPort;
+
+                rInfo ["regions"]++;
                 }
             return rInfo;
         }
@@ -1028,10 +1034,14 @@ namespace WhiteCore.Region
             if (showParams.Length == 1 || showParams[1] != "full")
                 agents.RemoveAll(sp => sp.IsChildAgent);
 
-            MainConsole.Instance.Info(String.Format("\nAgents connected: {0}\n", agents.Count));
+            MainConsole.Instance.Info(String.Format("\n" + scene.RegionInfo.RegionName +": "+
+                (agents.Count == 0 ? "No": agents.Count.ToString()) + " Agents connected\n"));
+            if (agents.Count == 0)
+                return;
 
-            MainConsole.Instance.Info(String.Format("{0,-16}{1,-16}{2,-37}{3,-11}{4,-16}{5,-30}", "Firstname",
-                                                    "Lastname", "Agent ID", "Root/Child", "Region", "Position"));
+            // we have some details to show...
+            MainConsole.Instance.CleanInfo(String.Format("{0,-16}{1,-37}{2,-14}{3,-20}{4,-30}", 
+                "Username", "Agent ID", "Root/Child", "Region", "Position"));
 
             foreach (IScenePresence presence in agents)
             {
@@ -1039,13 +1049,13 @@ namespace WhiteCore.Region
 
                 string regionName = regionInfo == null ? "Unresolvable" : regionInfo.RegionName;
 
-                MainConsole.Instance.Info(String.Format("{0,-16}{1,-37}{2,-11}{3,-16}{4,-30}", presence.Name,
+                    MainConsole.Instance.CleanInfo(String.Format("{0,-16}{1,-37}{2,-14}{3,-20}{4,-30}", presence.Name,
                                                         presence.UUID, presence.IsChildAgent ? "Child" : "Root",
                                                         regionName, presence.AbsolutePosition.ToString()));
             }
 
-            MainConsole.Instance.Info(String.Empty);
-            MainConsole.Instance.Info(String.Empty);
+            MainConsole.Instance.CleanInfo(String.Empty);
+            MainConsole.Instance.CleanInfo(String.Empty);
         }
 
         /// <summary>

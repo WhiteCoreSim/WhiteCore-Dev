@@ -228,6 +228,10 @@ namespace WhiteCore.Framework.ConsoleFramework
         {
         }
 
+        public virtual void OutputNoTime(string text, Level level)
+        {
+        }
+
         public virtual void LockOutput()
         {
         }
@@ -375,6 +379,11 @@ namespace WhiteCore.Framework.ConsoleFramework
         public void Info(object message)
         {
             Output(message.ToString(), Level.Info);
+        }
+
+        public void CleanInfo(object message)
+        {
+            OutputNoTime(message.ToString(), Level.Info);
         }
 
         public void InfoFormat(string format, params object[] args)

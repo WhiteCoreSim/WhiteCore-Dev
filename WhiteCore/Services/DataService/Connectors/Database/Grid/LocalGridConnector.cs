@@ -62,10 +62,12 @@ namespace WhiteCore.Services.DataService
                                               : defaultConnectionString;
 
                 if (GD != null)
-                    GD.ConnectToDatabase(connectionString, "GridRegions",
-                                         source.Configs["WhiteCoreConnectors"].GetBoolean("ValidateTables", true));
+                {
+                    GD.ConnectToDatabase (connectionString, "GridRegions",
+                        source.Configs ["WhiteCoreConnectors"].GetBoolean ("ValidateTables", true));
 
-                Framework.Utilities.DataManager.RegisterPlugin(this);
+                    Framework.Utilities.DataManager.RegisterPlugin (this);
+                }
 
                 if (MainConsole.Instance != null)
                 {

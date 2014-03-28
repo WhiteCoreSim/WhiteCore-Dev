@@ -164,6 +164,7 @@ namespace WhiteCore.Framework.Modules
         void FatalFormat(string format, params object[] args);
         void Format(Level level, string format, params object[] args);
         void Info(object message);
+        void CleanInfo(object message);
         void InfoFormat(string format, params object[] args);
         void Log(Level level, object message);
         void Trace(object message);

@@ -723,6 +723,25 @@ namespace WhiteCore.Framework.ConsoleFramework
             }
         }
 
+        public virtual void OutputNoTime(string text, Level level)
+        {
+            if (Threshold <= level)
+            {
+                MainConsole.TriggerLog(level.ToString(), text);
+                //text = string.Format("{0}:{1}:{2}: {3}",
+                //    (DateTime.Now.Hour < 10 ? "0" + DateTime.Now.Hour : DateTime.Now.Hour.ToString()),
+                //    (DateTime.Now.Minute < 10 ? "0" + DateTime.Now.Minute : DateTime.Now.Minute.ToString()),
+                //    (DateTime.Now.Second < 10 ? "0" + DateTime.Now.Second : DateTime.Now.Second.ToString()), text);
+
+                Console.WriteLine(text);
+                if (m_logFile != null)
+                {
+                    m_logFile.WriteLine(text);
+                    m_logFile.Flush();
+                }
+            }
+        }
+
         public virtual void LockOutput()
         {
         }
@@ -862,6 +881,11 @@ namespace WhiteCore.Framework.ConsoleFramework
         public void Info(object message)
         {
             Output(message.ToString(), Level.Info);
+        }
+
+        public void CleanInfo(object message)
+        {
+            OutputNoTime(message.ToString(), Level.Info);
         }
 
         public void InfoFormat(string format, params object[] args)

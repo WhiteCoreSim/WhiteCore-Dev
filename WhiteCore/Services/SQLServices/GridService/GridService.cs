@@ -898,7 +898,9 @@ namespace WhiteCore.Services.SQLServices.GridService
                     regionname += " " + cmd[ii];
                 }
             }
-            List<GridRegion> regions = m_Database.Get(regionname, null, null, null);
+
+
+            List<GridRegion> regions = GetRegionsByName(null, regionname, null,null);
             if (regions == null || regions.Count < 1)
             {
                 MainConsole.Instance.Info("Region not found");
@@ -922,12 +924,14 @@ namespace WhiteCore.Services.SQLServices.GridService
                 MainConsole.Instance.Info("Region ScopeID : " + r.ScopeID);
                 MainConsole.Instance.Info("Region Location: " + String.Format("{0},{1}", RegionPosX, RegionPosY));
                 MainConsole.Instance.Info("Region Size    : " + String.Format("{0} x {1}", r.RegionSizeX, r.RegionSizeY));
-                MainConsole.Instance.Info("Region URI     : " + r.RegionURI);			
+                MainConsole.Instance.Info("Region URI     : " + r.RegionURI);	
+                MainConsole.Instance.Info("Map tile UUID  : " + r.TerrainMapImage);
                 MainConsole.Instance.Info("Region Owner   : " + account.Name + " [" + r.EstateOwner + "]");
                 MainConsole.Instance.Info("Region Flags   : " + flags);
-                MainConsole.Instance.Info("Gridserver URI : " + r.ServerURI);				
+                //MainConsole.Instance.Info("Gridserver URI : " + r.ServerURI);				
                 MainConsole.Instance.Info(
                     "-------------------------------------------------------------------------------");
+                MainConsole.Instance.CleanInfo (string.Empty);
             }
         }
 
