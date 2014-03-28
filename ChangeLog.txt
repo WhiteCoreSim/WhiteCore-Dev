@@ -4,6 +4,22 @@ Rowan D <greythane@gmail.com>
 Fly-Man- <fly.man.opensim@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Mar 26 - Greythane
+* LocalGridConnector
+  - if no valid data source is available, dont register the local service 
+  	( causes null references if called from the sim console when in grid mode )
+* SceneManager - Show region <name> command
+  - correct call to get region list so that is operates correctly in both standalone and grid mode
+  - Update formatting of displayed 'show users' command
+
+* CommandConsole
+  - Add 'cleaninfo' format to provide for nicer console messages if/when needed
+
+* WarpTileRenderer
+  - Rebuild with some optimisations and using customised Warp3D library (WhiteCore.Warp3D)
+  	(requires new Warp3D.dll in bin folder)
+
+
 Mar 25 - Greythane
 * Scenemanager / FileBasedSimulationData
   - Re-work and correct new region creation as the current mods crash for grid mode operations.

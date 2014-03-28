@@ -36,7 +36,8 @@ using OpenMetaverse;
 using OpenMetaverse.Assets;
 using OpenMetaverse.Rendering;
 using OpenMetaverse.StructuredData;
-using Rednettle.Warp3D;
+using WhiteCore.Warp3D;
+//using Rednettle.Warp3D;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -45,7 +46,8 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using RegionSettings = WhiteCore.Framework.SceneInfo.RegionSettings;
-using WarpRenderer = Warp3D.Warp3D;
+//using WarpRenderer = Warp3D.Warp3D;
+using WarpRenderer = WhiteCore.Warp3D.Warp3D;
 
 namespace WhiteCore.Modules.WorldMap
 {
@@ -69,9 +71,12 @@ namespace WhiteCore.Modules.WorldMap
             ReadCacheMap();
         }
 
-        public Bitmap TerrainToBitmap(Bitmap mapbmp)
+        public Bitmap TerrainToBitmap(Bitmap mapBmp)
         {
-            //var startMemory  = GC.GetTotalMemory (true);
+            mapBmp = null;
+            // debug
+            //var currentProcess = System.Diagnostics.Process.GetCurrentProcess();
+            //long startMemory = currentProcess.WorkingSet64;
 
             List<string> renderers = RenderingLoader.ListRenderers(Util.ExecutingDirectory());
             if (renderers.Count > 0)
@@ -112,8 +117,9 @@ namespace WhiteCore.Modules.WorldMap
             int width = viewport.Width;
             int height = viewport.Height;
 
+
             WarpRenderer renderer = new WarpRenderer();
-            warp_Object terrainObj = null;
+            //warp_Object terrainObj;
             renderer.CreateScene(width, height);
             renderer.Scene.autoCalcNormals = false;
 
@@ -150,8 +156,8 @@ namespace WhiteCore.Modules.WorldMap
             {
                 CreateWater(renderer);
 
-                terrainObj = CreateTerrain(renderer, textureTerrain);
-
+                CreateTerrain(renderer, textureTerrain);
+             
                 if (drawPrimVolume && m_primMesher != null)
                 {
                     foreach (ISceneChildEntity part in m_scene.Entities.GetEntities().SelectMany(ent => ent.ChildrenEntities()))
@@ -174,14 +180,16 @@ namespace WhiteCore.Modules.WorldMap
                 obj.triangleData = null;
             }
 
+
+
             renderer.Reset ();
             //renderer.Scene.removeAllObjects();
             // renderer = null;
             // viewport = null;
             m_primMesher = null;
-            terrainObj.fastvertex = null;
-            terrainObj.fasttriangle = null;
-            // terrainObj = null;
+            ///terrainObj.fastvertex = null;
+            ///terrainObj.fasttriangle = null;
+            ///terrainObj = null;
             SaveCache();
             m_colors.Clear();
 
@@ -189,10 +197,11 @@ namespace WhiteCore.Modules.WorldMap
             //Force GC to try to clean this mess up
             GC.Collect();
 
-            //var endMemory = GC.GetTotalMemory (true);
+            // debug
+            //currentProcess = System.Diagnostics.Process.GetCurrentProcess();
+            //var endMemory = currentProcess.WorkingSet64;
             //MainConsole.Instance.InfoFormat ("[Warp3D]:Render:  Memory Start: {0}, end: {1}, Diff: {2}", startMemory, endMemory, (endMemory-startMemory));
 
- 
             return bitmap;
         }
 
