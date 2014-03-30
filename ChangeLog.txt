@@ -4,6 +4,12 @@ Rowan D <greythane@gmail.com>
 Fly-Man- <fly.man.opensim@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Mar 28 - Greythane
+* LSL-Api /LSL-Types
+	- increase float equality difference to "0.0000005" as LSL_Float types are only to six decimal places
+	- SetPrimParams - Correct PRIM_POSITION postion update to remove incorrect additional offset 
+	   (originally reported by Eamon Mayo who also supplied a correction (Aurora))
+	 
 Mar 26 - Greythane
 * LocalGridConnector
   - if no valid data source is available, dont register the local service 

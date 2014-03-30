@@ -26,7 +26,6 @@
  */
 
 
-using WhiteCore.Framework;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.DatabaseInterfaces;
@@ -74,7 +73,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
     /// </summary>
     public class LSL_Api : MarshalByRefObject, IScriptApi
     {
-        const double DoubleDifference = .000000001;
+        const double DoubleDifference = .0000005;
 
         protected IScriptModulePlugin m_ScriptEngine;
         protected ISceneChildEntity m_host;
@@ -8155,7 +8154,8 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.APIs
 
                     v = rules.GetVector3Item(idx++);
                     if (part is ISceneChildEntity)
-                        SetPos(part as ISceneChildEntity, GetPartLocalPos(part as ISceneChildEntity) + v, true);
+                        //SetPos(part as ISceneChildEntity, GetPartLocalPos(part as ISceneChildEntity) + v, true);
+                        SetPos(part as ISceneChildEntity, v, true);
                     else if (part is IScenePresence)
                     {
                         (part as IScenePresence).OffsetPosition = new Vector3((float)v.x, (float)v.y, (float)v.z);

@@ -37,7 +37,7 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine
     {
         // Types are kept is separate .dll to avoid having to add whatever .dll it is in it to script AppDomain
         // Define the tolerance for variation in their values 
-        const double DoubleDifference = .000000001;
+        const double DoubleDifference = .0000005;
 
         public struct Vector3
         {
@@ -78,11 +78,11 @@ namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine
                     x = y = z = 0;
                     return;
                 }
-                bool res;
+                //bool res;
                 double xx, yy, zz;
-                res = Double.TryParse(tmps[0], NumberStyles.Float, Culture.NumberFormatInfo, out xx);
-                res = res & Double.TryParse(tmps[1], NumberStyles.Float, Culture.NumberFormatInfo, out yy);
-                res = res & Double.TryParse(tmps[2], NumberStyles.Float, Culture.NumberFormatInfo, out zz);
+                Double.TryParse(tmps[0], NumberStyles.Float, Culture.NumberFormatInfo, out xx);
+                Double.TryParse(tmps[1], NumberStyles.Float, Culture.NumberFormatInfo, out yy);
+                Double.TryParse(tmps[2], NumberStyles.Float, Culture.NumberFormatInfo, out zz);
                 x = new LSLFloat(xx);
                 y = new LSLFloat(yy);
                 z = new LSLFloat(zz);
