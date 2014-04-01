@@ -41,6 +41,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Timer = System.Timers.Timer;
 using System.IO;
+using OpenMetaverse;
 
 namespace WhiteCore.Region
 {
@@ -296,6 +297,14 @@ namespace WhiteCore.Region
             MainConsole.Instance.Warn("Region " + scene.RegionInfo.RegionName + " was reset");
         }
 
+        public void ClearRegion(IScene scene)
+        {
+            IBackupModule backup = scene.RequestModuleInterface<IBackupModule>();
+            if (backup != null)
+                backup.DeleteAllSceneObjects(); //Remove all the objects from the region
+            MainConsole.Instance.Warn("Region " + scene.RegionInfo.RegionName + " has been cleared");
+        }
+
         public void RemoveRegion(IScene scene)
         {
             scene.SimulationDataService.RemoveRegion();
@@ -434,89 +443,152 @@ namespace WhiteCore.Region
         {
             if (MainConsole.Instance == null)
                 return;
-            MainConsole.Instance.Commands.AddCommand("show users", "show users [full]",
-                                                     "Shows users in the given region (if full is added, child agents are shown as well)",
-                                                     HandleShowUsers, true, false);
-            MainConsole.Instance.Commands.AddCommand("change region", "change region [region name]",
-                                                     "Changes the region that commands will run on (or root for the commands to run on all regions)",
-                                                     HandleChangeRegion, false, true);
-            MainConsole.Instance.Commands.AddCommand("show regions", "show regions",
-                                                     "Show information about all regions in this instance",
-                                                     HandleShowRegions, true, false);
-            MainConsole.Instance.Commands.AddCommand("show maturity", "show maturity",
-                                                     "Show all region's maturity levels", HandleShowMaturity, true, false);
+            MainConsole.Instance.Commands.AddCommand("show users",
+                "show users [full]",
+                "Shows users in the given region (if full is added, child agents are shown as well)",
+                HandleShowUsers, true, false);
 
-            MainConsole.Instance.Commands.AddCommand("force update", "force update",
-                                                     "Force the update of all objects on clients", HandleForceUpdate, true, false);
+            MainConsole.Instance.Commands.AddCommand("show maturity",
+                "show maturity",
+                "Show all region's maturity levels",
+                HandleShowMaturity, true, false);
 
-            MainConsole.Instance.Commands.AddCommand("debug packet level", "debug packet level [level]", "Turn on packet debugging",
-                                                     Debug, true, false);
-            MainConsole.Instance.Commands.AddCommand("debug packet name", "debug packet name [packetname]", "Turn on packet debugging for a specific packet",
-                                                     Debug, true, false);
-            MainConsole.Instance.Commands.AddCommand("debug packet name remove", "debug packet name [packetname]", "Turn off packet debugging for a specific packet",
-                                                     Debug, true, false);
-            MainConsole.Instance.Commands.AddCommand("debug scene", "debug scene [scripting] [collisions] [physics]",
-                                                     "Turn on scene debugging", Debug, true, false);
+            MainConsole.Instance.Commands.AddCommand("force update",
+                "force update",
+                "Force the update of all objects on clients",
+                HandleForceUpdate, true, false);
+
+            MainConsole.Instance.Commands.AddCommand("debug packet level", 
+                "debug packet level [level]",
+                "Turn on packet debugging",
+                Debug, true, false);
+
+            MainConsole.Instance.Commands.AddCommand("debug packet name",
+                "debug packet name [packetname]",
+                "Turn on packet debugging for a specific packet",
+                Debug, true, false);
+
+            MainConsole.Instance.Commands.AddCommand("debug packet name remove",
+                "debug packet name [packetname]",
+                "Turn off packet debugging for a specific packet",
+                Debug, true, false);
+
+            MainConsole.Instance.Commands.AddCommand("debug scene",
+                "debug scene [scripting] [collisions] [physics]",
+                "Turn on scene debugging",
+                Debug, true, false);
 
             MainConsole.Instance.Commands.AddCommand("load oar",
-                                                     "load oar [oar name] [--merge] [--skip-assets] [--OffsetX=#] [--OffsetY=#] [--OffsetZ=#] [--FlipX] [--FlipY] [--UseParcelOwnership] [--CheckOwnership]",
-                                                     "Load a region's data from OAR archive.  \n" +
-                                                     "--merge will merge the oar with the existing scene (including parcels).  \n" +
-                                                     "--skip-assets will load the oar but ignore the assets it contains. \n" +
-                                                     "--OffsetX will change where the X location of the oar is loaded, and the same for Y and Z.  \n" +
-                                                     "--FlipX flips the region on the X axis.  \n" +
-                                                     "--FlipY flips the region on the Y axis.  \n" +
-				                                     "--UseParcelOwnership changes who the default owner of objects whose owner cannot be found from the Estate Owner to the parcel owner on which the object is found.  \n" +
-                                                     "--CheckOwnership asks for each UUID that is not found on the grid what user it should be changed to (useful for changing UUIDs from other grids, but very long with many users).  ",
-                                                     LoadOar, true, false);
+                "load oar [oar name] [--merge] [--skip-assets] [--OffsetX=#] [--OffsetY=#] [--OffsetZ=#] [--FlipX] [--FlipY] [--UseParcelOwnership] [--CheckOwnership]",
+                "Load a region's data from OAR archive.  \n" +
+                "--merge will merge the oar with the existing scene (including parcels).  \n" +
+                "--skip-assets will load the oar but ignore the assets it contains. \n" +
+                "--OffsetX will change where the X location of the oar is loaded, and the same for Y and Z.  \n" +
+                "--FlipX flips the region on the X axis.  \n" +
+                "--FlipY flips the region on the Y axis.  \n" +
+                "--UseParcelOwnership changes who the default owner of objects whose owner cannot be found from\n" + 
+                "      the Estate Owner to the parcel owner on which the object is found.  \n" +
+                "--CheckOwnership asks for each UUID that is not found on the grid what user it should be changed\n" +
+                "      to (useful for changing UUIDs from other grids, but very long with many users).  ",
+                LoadOar, true, false);
 
-            MainConsole.Instance.Commands.AddCommand("save oar", "save oar [<OAR path>] [--perm=<permissions>] ",
-                                                     "Save a region's data to an OAR archive" + Environment.NewLine
-                                                     + "<OAR path> The OAR path must be a filesystem path."
-                                                     +
-                                                     "  If this is not given then the oar is saved to region.oar in the current directory." +
-                                                     Environment.NewLine
-                                                     +
-                                                     "--perm stops objects with insufficient permissions from being saved to the OAR." +
-                                                     Environment.NewLine
-                                                     +
-                                                     "  <permissions> can contain one or more of these characters: \"C\" = Copy, \"T\" = Transfer" +
-                                                     Environment.NewLine, SaveOar, true, false);
+            MainConsole.Instance.Commands.AddCommand("save oar",
+                "save oar [<OAR path>] [--perm=<permissions>] ",
+                "Save a region's data to an OAR archive" + Environment.NewLine +
+                "<OAR path> The OAR path must be a filesystem path." +
+                "  If this is not given then the oar is saved to region.oar in the current directory." + Environment.NewLine +
+                "--perm stops objects with insufficient permissions from being saved to the OAR." + Environment.NewLine +
+                "  <permissions> can contain one or more of these characters: \"C\" = Copy, \"T\" = Transfer" + Environment.NewLine,
+                SaveOar, true, false);
 
-            MainConsole.Instance.Commands.AddCommand("kick user", "kick user [all]",
-                                                     "Kick a user off the simulator", KickUserCommand, true, false);
+            MainConsole.Instance.Commands.AddCommand("kick user", 
+                "kick user [all]",
+                "Kick a user off the simulator",
+                KickUserCommand, true, false);
 
-            MainConsole.Instance.Commands.AddCommand("reset region", "reset region",
-                                                     "Reset region to the default terrain, wipe all prims, etc.",
-                                                     RunCommand, true, false);
+            MainConsole.Instance.Commands.AddCommand("restart-instance",
+                "restart-instance",
+                "Restarts the instance (as if you closed and re-opened WhiteCore)",
+                RunCommand, true, false);
 
-            MainConsole.Instance.Commands.AddCommand("remove region", "remove region",
-                                                     "Remove region from the grid, and delete all info associated with it",
-                                                     RunCommand, true, false);
+            MainConsole.Instance.Commands.AddCommand("command-script",
+                "command-script [script]",
+                "Run a command script from file",
+                RunCommand, false, false);
 
-            MainConsole.Instance.Commands.AddCommand("restart-instance", "restart-instance",
-                                                     "Restarts the instance (as if you closed and re-opened WhiteCore)",
-                                                     RunCommand, true, false);
+            MainConsole.Instance.Commands.AddCommand("modules list",
+                "modules list",
+                "Lists all simulator modules",
+                HandleModulesList, true, false);
 
-            MainConsole.Instance.Commands.AddCommand("command-script", "command-script [script]",
-                                                     "Run a command script from file", RunCommand, false, false);
-
-            MainConsole.Instance.Commands.AddCommand("modules list", "modules list", "Lists all simulator modules",
-                                                     HandleModulesList, true, false);
-
-            MainConsole.Instance.Commands.AddCommand("modules unload", "modules unload [module]",
-                                                     "Unload the given simulator module", HandleModulesUnload, true, false);
+            MainConsole.Instance.Commands.AddCommand("modules unload",
+                "modules unload [module]",
+                "Unload the given simulator module",
+                HandleModulesUnload, true, false);
             
-            MainConsole.Instance.Commands.AddCommand("create region", "create region <Region Name>  <--config=filename>",
+            MainConsole.Instance.Commands.AddCommand("change region",
+                "change region [region name]",
+                "Changes the region that commands will run on (or root for the commands to run on all regions)",
+                HandleChangeRegion, false, true);
+
+            MainConsole.Instance.Commands.AddCommand("show regions",
+                "show regions",
+                "Show information about all regions in this instance",
+                HandleShowRegions, true, false);
+
+            MainConsole.Instance.Commands.AddCommand("reset region",
+                "reset region",
+                "Reset region to the default terrain, wipe all prims, etc.",
+                RunCommand, true, false);
+
+            MainConsole.Instance.Commands.AddCommand("clear region",
+                "clear region",
+                "Clear region of all objects leaving the current terrain.",
+                RunCommand, true, true);
+
+            MainConsole.Instance.Commands.AddCommand("remove region", 
+                "remove region",
+                "Remove region from the grid, and delete all info associated with it",
+                RunCommand, true, false);
+
+            MainConsole.Instance.Commands.AddCommand("create region", 
+                "create region <Region Name>  <--config=filename>",
                 "Creates a new region to start\n"+
                 "<Region Name> - Use this name for the new region\n"+
                 "--config='filename' - Use this file for region configuration",
-                                                         CreateNewRegion, false, true);
+                CreateNewRegion, false, true);
 			
-            MainConsole.Instance.Commands.AddCommand("save region config", "save region config <filename>",
+            MainConsole.Instance.Commands.AddCommand("save region config",
+                "save region config <filename>",
                 "Saves the configuration of the region\n"+
-                "<filename> - Use this name for the region configuration",
+                "<filename> - Use this name for the region configuration (default is region name)",
                 SaveRegionConfig, true, false);
+
+            MainConsole.Instance.Commands.AddCommand("resize object",
+                "resize object <name> <x> <y> <z>",
+                "Change the scale of a named object by x,y,z", 
+                HandleResizeObject, true, true);
+
+            MainConsole.Instance.Commands.AddCommand("show objects",
+                "show object [name]",
+                "shows region objects or if object name is supplied, object info", 
+                HandleShowObjects, true, true);
+
+            MainConsole.Instance.Commands.AddCommand("rotate region",
+                "rotate region <degrees> [centerX] [centerY]",
+                "Rotates all region objects around centerX, centerY (default center of region)\n" +
+                "Rotation is +ve to the right, -ve to the left. (Have you backed up your region?)",
+                HandleRotateScene, true, true);
+
+            MainConsole.Instance.Commands.AddCommand("scale region",
+                "scale region <factor>",
+                "Scales all region objects by the specified amount (please back up your region before using)",
+                HandleScaleScene, true, true);
+
+            MainConsole.Instance.Commands.AddCommand("reposition region",
+                "reposition region <xOffset> <yOffset> <zOffset>",
+                "Move region objects by the specified amounts (Have you backed up your region?)",
+                HandleTranslateScene, true, true);
                 
         }
 
@@ -881,6 +953,16 @@ namespace WhiteCore.Region
                             ResetRegion(scene);
                         }
                     break;
+                case "clear":
+                    if (cmdparams.Length > 0)
+                    if (cmdparams[0] == "region")
+                    {
+                    if (MainConsole.Instance.Prompt("Are you sure you want to clear all region objects? (yes/no)", "no") !=
+                            "yes")
+                            return;
+                        ClearRegion(scene);
+                    }
+                break;
                 case "remove":
                     if (cmdparams.Length > 0)
                         if (cmdparams[0] == "region")
@@ -1203,6 +1285,255 @@ namespace WhiteCore.Region
             IRegionArchiverModule archiver = scene.RequestModuleInterface<IRegionArchiverModule>();
             if (archiver != null)
                 archiver.HandleSaveOarConsoleCommand(cmdparams);
+        }
+
+        /// <summary>
+        /// Resizes the scale of a primative/object with the name specified
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmdparams">Cmdparams.</param>
+        private void HandleResizeObject(IScene scene, string[] cmdparams)
+        {
+            if (cmdparams.Length < 4)
+            {
+                MainConsole.Instance.Info("usage: resize object <prim name> <x> <y> <z>");
+                return;
+            }
+
+            var primName = cmdparams [2];
+
+            // assume overall scaling factor initially
+            var xScale = Convert.ToSingle (cmdparams [3]);
+            var yScale = xScale;
+            var zScale = xScale;
+
+            // individual axis scaling?
+            if (cmdparams.Length > 4)
+                yScale = Convert.ToSingle (cmdparams [4]);
+            if (cmdparams.Length > 5)
+                zScale = Convert.ToSingle (cmdparams [5]);
+
+            var newScale = new Vector3 (xScale, yScale, zScale);
+
+            //MainConsole.Instance.DebugFormat("Searching for Object: '{0}'", primName);
+
+            ISceneEntity[] entityList = scene.Entities.GetEntities ();
+            foreach (ISceneEntity ent in entityList)
+            {
+                if (ent is SceneObjectGroup && (ent.Name == primName))
+                {
+                    MainConsole.Instance.InfoFormat("Object: " + primName + " found, resizing..." );
+                    var entParts = ent.ChildrenEntities ();
+                    foreach (ISceneChildEntity enp in entParts)
+                    {
+                        if ( enp != null  )
+                        {
+                            enp.Resize( enp.Scale * newScale);
+
+                            var curOffset = enp.OffsetPosition;
+                            enp.OffsetPosition = (curOffset * newScale);
+
+                            //MainConsole.Instance.Info("    Edited scale of child part: " +  enp.Name);
+                        }
+                    }
+                    MainConsole.Instance.InfoFormat("Object: {0} has been resized", primName);
+                    return;          // no need to continue searching as we have done it.
+                }
+            }
+            MainConsole.Instance.InfoFormat("Sorry.. could not find '{0}'", primName);
+       
+        }
+
+        /// <summary>
+        /// Handles object info displays.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmdparams">Cmdparams.</param>
+        private void HandleShowObjects(IScene scene, string[] cmdparams)
+        {
+            string objectName = null;
+            bool found = false;
+
+            if (cmdparams.Length > 2)
+            {
+                objectName = Util.CombineParams(cmdparams, 2); // in case of spaces in the name eg Steam Island
+            }
+
+            ISceneEntity[] entityList = scene.Entities.GetEntities ();
+            foreach (ISceneEntity ent in entityList)
+            {
+                if (ent is SceneObjectGroup)
+                {
+                    if ( objectName == null || (ent.Name.Substring(0,objectName.Length) == objectName))
+                    {
+                        found = true;
+
+                        var entParts = ent.ChildrenEntities ();
+                        MainConsole.Instance.Info("Object: " + ent.Name + " at position " + ent.AbsolutePosition + ", comprised of " +entParts.Count + " parts" );
+
+                        // specific object requested?
+                        if (objectName != null)
+                        {
+                            foreach (ISceneChildEntity enp in entParts)
+                            {
+                                if (enp != null)
+                                {
+                                    MainConsole.Instance.Info ("    " + enp.Name + (enp.IsRoot ? "  [ Root prim ]" : "") );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (!found)
+                if (objectName == null)
+                    MainConsole.Instance.Info (" There does not appear to be any objects in this region");
+                else
+                    MainConsole.Instance.InfoFormat("Sorry.. could not find '{0}'", objectName);
+
+        }
+
+        /// <summary>
+        /// Handles rotating an entire scene.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmdparams">Cmdparams.</param>
+        private void HandleRotateScene(IScene scene, string[] cmdparams)
+        {
+            var usage = "Usage: rotate scene <angle in degrees> [centerX centerY]\n"+
+                "(centerX and centerY are optional and default to the center of the region";
+
+            if (cmdparams.Length < 3)
+            {
+                MainConsole.Instance.Info(usage);
+                return;
+            }
+
+            var centerX = scene.RegionInfo.RegionSizeX * 0.5f;
+            var centerY = scene.RegionInfo.RegionSizeY * 0.5f;
+
+            var degrees = Convert.ToSingle(cmdparams[2]);
+            var angle = (float) (degrees * (Math.PI/180));
+
+            // normalize rotation angle  -ve, anticlockwise, +ve clockwise
+            angle *= -1f;
+
+            Quaternion rot = Quaternion.CreateFromAxisAngle(0, 0, 1, angle);
+
+            // center supplied?
+            if (cmdparams.Length > 3)
+                centerX = Convert.ToSingle(cmdparams[3]);
+            if (cmdparams.Length > 4)
+                centerY = Convert.ToSingle(cmdparams[4]);
+
+            var center = new Vector3(centerX, centerY, 0.0f);
+            ISceneEntity[] entitlList = scene.Entities.GetEntities ();
+
+            foreach (ISceneEntity ent in entitlList)
+            {
+                if (!ent.IsAttachment)
+                {
+                    ent.UpdateGroupRotationR (rot * ent.GroupRotation);
+                    Vector3 offset = ent.AbsolutePosition - center;
+                    offset *= rot;
+                    ent.UpdateGroupPosition (center + offset, true);
+                }
+            }
+            MainConsole.Instance.Info("    Rotation of region objects completed");
+
+        }
+
+        /// <summary>
+        /// Handles scaling of a scene.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmdparams">Cmdparams.</param>
+        private void HandleScaleScene(IScene scene, string[] cmdparams)
+        {
+            string usage = "Usage: scale region <factor>";
+
+            if (cmdparams.Length < 3)
+            {
+                MainConsole.Instance.Info(usage);
+                return;
+            }
+
+            float factor = Convert.ToSingle(cmdparams[2]);
+            var centerX = scene.RegionInfo.RegionSizeX * 0.5f;
+            var centerY = scene.RegionInfo.RegionSizeY * 0.5f;
+
+            // center supplied?
+            if (cmdparams.Length > 3)
+                centerX = Convert.ToSingle(cmdparams[3]);
+            if (cmdparams.Length > 4)
+                centerY = Convert.ToSingle(cmdparams[4]);
+
+            var center = new Vector3(centerX, centerY, 0.0f);
+            ITerrainChannel heightmap = scene.RequestModuleInterface<ITerrainChannel>();
+            ISceneEntity[] entitlList = scene.Entities.GetEntities ();
+
+            // let' do some resizing
+            foreach (ISceneEntity ent in entitlList)
+            {
+                if (!ent.IsAttachment)
+                {
+                    Vector3 offsetPos = ent.AbsolutePosition - center;
+                    // offset above/below the current land height
+                    var offsetZ = ent.AbsolutePosition.Z - heightmap.GetNormalizedGroundHeight( (int)ent.AbsolutePosition.X, (int)ent.AbsolutePosition.Y );
+
+                    offsetPos.Z = offsetZ;          // only scale theheight offset 
+                    offsetPos *= factor;    
+
+                    var entParts = ent.ChildrenEntities ();
+                    foreach (ISceneChildEntity enp in entParts)
+                    {
+                        enp.Resize( enp.Scale * factor);
+
+                        var curOffset = enp.OffsetPosition;
+                        enp.OffsetPosition = (curOffset * factor);
+
+                    }
+
+                    // account for terrain height and reposition
+                    var newPos = offsetPos + center;
+                    newPos.Z += heightmap.GetNormalizedGroundHeight((int)newPos.X, (int)newPos.Y);
+                    ent.UpdateGroupPosition (newPos, true);
+                }
+            }
+            MainConsole.Instance.Info("    Rescaling of region objects completed");
+
+        }
+
+
+
+        /// <summary>
+        /// Handles moving all scene objects.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmdparams">Cmdparams.</param>
+        private void HandleTranslateScene(IScene scene, string[] cmdparams)
+        {
+             if (cmdparams.Length < 5)
+            {
+                MainConsole.Instance.Info("Usage: translate scene <xOffset> <yOffset> <zOffset>");
+                return;
+            }
+
+            var xOffset = Convert.ToSingle(cmdparams[2]);
+            var yOffset = Convert.ToSingle(cmdparams[3]);
+            var zOffset = Convert.ToSingle(cmdparams[4]);
+
+            var offset = new Vector3(xOffset, yOffset, zOffset);
+            ISceneEntity[] entitlList = scene.Entities.GetEntities ();
+
+            foreach (ISceneEntity ent in entitlList)
+            {
+                if (!ent.IsAttachment)
+                {
+                    ent.UpdateGroupPosition (ent.AbsolutePosition + offset, true);
+                }
+            }
+            MainConsole.Instance.Info("Region objects have been offset");
         }
             
         #endregion

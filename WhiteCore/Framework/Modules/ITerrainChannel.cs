@@ -53,7 +53,25 @@ namespace WhiteCore.Framework.Modules
         /// <param name="y"></param>
         /// <returns></returns>
         float GetNormalizedGroundHeight(int x, int y);
-		void GenerateTerrain(String landType, float min, float max, int smoothing, IScene scene);
+
+        /// <summary>
+        /// Gets the average height of land above the waterline at the specified point.
+        /// </summary>
+        /// <returns>The normalized land height.</returns>
+        /// <param name="x">The x coordinate.</param>
+        /// <param name="y">The y coordinate.</param>
+        float GetNormalizedLandHeight (int x, int y);
+
+        /// <summary>
+        /// Generates  new terrain based upon supplied parameters.
+        /// </summary>
+        /// <param name="landType">Land type.</param>
+        /// <param name="min">Minimum.</param>
+        /// <param name="max">Max.</param>
+        /// <param name="smoothing">Smoothing.</param>
+        /// <param name="scene">Scene.</param>
+
+        void GenerateTerrain(String landType, float min, float max, int smoothing, IScene scene);
 
     }
 }

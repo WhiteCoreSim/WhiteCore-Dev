@@ -241,6 +241,32 @@ namespace WhiteCore.Framework.SceneInfo
             return ((vsn.X + vsn.Y)/(-1*vsn.Z)) + p0.Z;
         }
 
+        /// <summary>
+        /// Gets the average height of land above the waterline at the specified point.
+        /// </summary>
+        /// <returns>The normalized land height.</returns>
+        /// <param name="x">The x coordinate.</param>
+        /// <param name="y">The y coordinate.</param>
+        public float GetNormalizedLandHeight(int x, int y)
+        {
+            var groundHeight = GetNormalizedGroundHeight (x, y);
+            var waterHeight = m_scene.RegionInfo.RegionSettings.WaterHeight;
+
+            //var landHeight = (groundHeight < waterHeight) ? 0f : groundHeight - waterHeight;
+            var landHeight = groundHeight - waterHeight;
+
+            // this is the height above/below the waterline
+            return (float) landHeight;
+        }
+
+        /// <summary>
+        /// Generates  new terrain based upon supplied parameters.
+        /// </summary>
+        /// <param name="landType">Land type.</param>
+        /// <param name="min">Minimum.</param>
+        /// <param name="max">Max.</param>
+        /// <param name="smoothing">Smoothing.</param>
+        /// <param name="scene">Scene.</param>
 		public void GenerateTerrain(String landType, float min, float max, int smoothing,  IScene scene)
 		{
 			m_scene = scene;

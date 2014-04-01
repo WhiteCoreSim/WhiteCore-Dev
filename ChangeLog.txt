@@ -4,6 +4,17 @@ Rowan D <greythane@gmail.com>
 Fly-Man- <fly.man.opensim@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Mar 31 / Apr 1st - Greythane
+* SceneManager - additional commands
+	- "show objects" - Display a list of objects in the currently selected scene
+	- "resize object" - Change the scale of a named object 
+	- "rotate region" - Rotates ( 2D, x,y only) all region objects around a center point (default center of region)
+    - "scale region" - Scales all region objects by the specified amount
+    - "reposition region" - Move region objects by the specified amounts (x,y,z) (Alternative to 'offset region prims')
+    - "clear region" - Clear the region of objects leaving the current terrain
+* TerrainChannel
+    - Additional helper functions
+
 Mar 28 - Greythane
 * LSL-Api /LSL-Types
 	- increase float equality difference to "0.0000005" as LSL_Float types are only to six decimal places
