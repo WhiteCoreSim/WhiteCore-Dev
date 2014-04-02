@@ -7,6 +7,9 @@ Fly-Man- <fly.man.opensim@gmail.com>
 Apr 2 - Fly-Man
 * Cleaned up the remaining INI files that still had the old WhiteCoreServerConfiguration in them
 
+* Framework.ConsoleFramework
+	- Added Date to the log files so you can see which date something occurred.
+
 Mar 31 / Apr 1st - Greythane
 * SceneManager - additional commands
 	- "show objects" - Display a list of objects in the currently selected scene
@@ -23,7 +26,7 @@ Mar 28 - Greythane
 	- increase float equality difference to "0.0000005" as LSL_Float types are only to six decimal places
 	- SetPrimParams - Correct PRIM_POSITION postion update to remove incorrect additional offset 
 	   (originally reported by Eamon Mayo who also supplied a correction (Aurora))
-	 
+
 Mar 26 - Greythane
 * LocalGridConnector
   - if no valid data source is available, dont register the local service 
@@ -39,7 +42,6 @@ Mar 26 - Greythane
   - Rebuild with some optimisations and using customised Warp3D library (WhiteCore.Warp3D)
   	(requires new Warp3D.dll in bin folder)
 
-
 Mar 25 - Greythane
 * Scenemanager / FileBasedSimulationData
   - Re-work and correct new region creation as the current mods crash for grid mode operations.
@@ -49,7 +51,6 @@ Mar 25 - Greythane
 * Gridservice
   - Correct 'show region <name>' processing when used in grid mode
       
-
 Mar 24 - Greythane
 * Dropped Xml2 commands after further investigation, OAR's are a better alternative and it does not
     appear that the XML2 format is in common use with OpenSim anyway
@@ -58,7 +59,6 @@ Mar 24 - Greythane
     - Add port to 'Show regions' command
 * FileBasedSimulationData
     - Correct some problems in the 'update region info' command
-
 
 Mar 24 - Fly-Man
 * Correction to server configuration files
@@ -75,7 +75,6 @@ Mar 21st - Greythane
 * SceneManger
   - Correct/update/rework CreateNewRegion when a region name and/or a config file is specified
 
-
 Mar 20th - Greythane
 * CommandConsole
   - Add a warning message if a valid command requires a scene and none is selected
@@ -85,14 +84,12 @@ Mar 20th - Greythane
 * PathHelpers
   - Add VerifySaveFile to shortcut a heap of file checks (saving config, xml etc)
 
-
 Mar 19th - Greythane
 * SceneManager
   - Additional options for the 'create region' command
 	- Specify a region name as part of the command
 	- specify a configuration file, containing the region details, to load
   - New command "save region config <filename>" used to save existing configurations to an xml file
- 
    
 Mar 18th - Greythane
 * SceneManager -  additional XML2 commands
@@ -101,7 +98,6 @@ Mar 18th - Greythane
 	- save prims xml2 - save a named prim as an xml2 file
 * FileBasedSimulationData - Add some 'smarts' when creating a new region. 
     Scan existing regions and suggest available X/Y location and port rather than use defaults
-
 
 Mar 17th, 2014 - Greythane
 * MaintenanceThread - Remove obsolete suspend/resume operation and replace with EventWaitHandle processing 
@@ -117,7 +113,6 @@ Mar 16th, 2014 - Greythane
 
 * ScriptData - Updated 'BROKEN SAVE STATE...' message to something a bit more intuitive
 * MaintenanceThread - Updated 'BAD VERSION ID...' message to something a bit more intuitive
-
 
 Mar 6th 2014 - Greythane
 * Update GridService.HandleShowRegion() to provide a cleaner format for display of info
@@ -211,7 +206,6 @@ mdickson - Removed uneeded LINUX conditional around LSLFload operators It causes
 	- WhiteCore(Aurora)/WhiteCoreDotNetEngine(AuroraDotNetEngine)/APIs/LSL_Types.cs
 
 greythane updates as shown below have already been applied..
-
 
 Dec 17th, 2013
 Refactored Main Aurora-Sim code to WhiteCore to allow continued development

@@ -709,7 +709,10 @@ namespace WhiteCore.Framework.ConsoleFramework
             if (Threshold <= level)
             {
                 MainConsole.TriggerLog(level.ToString(), text);
-                text = string.Format("{0}:{1}:{2}: {3}",
+                text = string.Format("[{0}-{1}-{2}] {3}:{4}:{5}: {6}",
+                    (DateTime.Now.Day < 10 ? "0" + DateTime.Now.Day : DateTime.Now.Date.ToString()),
+                    (DateTime.Now.Month < 10 ? "0" + DateTime.Now.Month : DateTime.Now.Month.ToString()),
+                    (DateTime.Now.Year.ToString()),
                     (DateTime.Now.Hour < 10 ? "0" + DateTime.Now.Hour : DateTime.Now.Hour.ToString()),
                     (DateTime.Now.Minute < 10 ? "0" + DateTime.Now.Minute : DateTime.Now.Minute.ToString()),
                     (DateTime.Now.Second < 10 ? "0" + DateTime.Now.Second : DateTime.Now.Second.ToString()), text);
