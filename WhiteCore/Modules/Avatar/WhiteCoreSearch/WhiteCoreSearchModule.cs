@@ -117,13 +117,19 @@ namespace WhiteCore.Modules.Search
                                       int queryStart)
         {
             List<DirPlacesReplyData> ReturnValues =
-                DirectoryService.FindLand(queryText, category.ToString(), queryStart,
+                DirectoryService.FindLand(queryText.Trim(), category.ToString(), queryStart,
                                           (uint) queryFlags, remoteClient.ScopeID);
 
             SplitPackets(ReturnValues,
                          data => remoteClient.SendDirPlacesReply(queryID, data));
         }
-
+        
+        /// <summary>
+        ///     Popular places based on traffic
+        /// </summary>
+        /// <param name="remoteClient"></param>
+        /// <param name="queryID"></param>
+        /// <param name="queryFlags"></param>
         public void DirPopularQuery(IClientAPI remoteClient, UUID queryID, uint queryFlags)
         {
             List<DirPopularReplyData> ReturnValues =
@@ -182,7 +188,7 @@ namespace WhiteCore.Modules.Search
         {
             //Find the user accounts
             List<UserAccount> accounts = m_Scene.UserAccountService.GetUserAccounts(remoteClient.AllScopeIDs,
-                                                                                    queryText);
+                                                                                    queryText.Trim());
             List<DirPeopleReplyData> ReturnValues =
                 new List<DirPeopleReplyData>();
 
@@ -251,21 +257,38 @@ namespace WhiteCore.Modules.Search
                          data => remoteClient.SendDirPeopleReply(queryID, data));
         }
 
+        /// <summary>
+        ///     Find Events
+        /// </summary>
+        /// <param name="remoteClient"></param>
+        /// <param name="queryID"></param>
+        /// <param name="queryText"></param>
+        /// <param name="queryFlags"></param>
+        /// <param name="queryStart"></param>
         public void DirEventsQuery(IClientAPI remoteClient, UUID queryID, string queryText, uint queryFlags,
                                    int queryStart)
         {
             List<DirEventsReplyData> ReturnValues =
-                new List<DirEventsReplyData>(DirectoryService.FindEvents(queryText, queryFlags, queryStart,
+                new List<DirEventsReplyData>(DirectoryService.FindEvents(queryText.Trim(), queryFlags, queryStart,
                                                                          remoteClient.ScopeID));
 
             SplitPackets(ReturnValues, data => remoteClient.SendDirEventsReply(queryID, data));
         }
-
+        
+        /// <summary>
+        ///     Find Classifieds
+        /// </summary>
+        /// <param name="remoteClient"></param>
+        /// <param name="queryID"></param>
+        /// <param name="queryText"></param>
+        /// <param name="queryFlags"></param>
+        /// <param name="category"></param>
+        /// <param name="queryStart"></param>
         public void DirClassifiedQuery(IClientAPI remoteClient, UUID queryID, string queryText, uint queryFlags,
                                        uint category, int queryStart)
         {
             List<DirClassifiedReplyData> ReturnValues =
-                new List<DirClassifiedReplyData>(DirectoryService.FindClassifieds(queryText, category.ToString(),
+                new List<DirClassifiedReplyData>(DirectoryService.FindClassifieds(queryText.Trim(), category.ToString(),
                                                                                   queryFlags, queryStart,
                                                                                   remoteClient.ScopeID));
 
@@ -293,7 +316,7 @@ namespace WhiteCore.Modules.Search
         }
 
         /// <summary>
-        ///     Tell the client about X event
+        ///     Tell the client about Event X
         /// </summary>
         /// <param name="remoteClient"></param>
         /// <param name="queryEventID">ID of the event</param>
