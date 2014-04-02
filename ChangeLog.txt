@@ -4,6 +4,9 @@ Rowan D <greythane@gmail.com>
 Fly-Man- <fly.man.opensim@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Apr 2 - Fly-Man
+* Cleaned up the remaining INI files that still had the old WhiteCoreServerConfiguration in them
+
 Mar 31 / Apr 1st - Greythane
 * SceneManager - additional commands
 	- "show objects" - Display a list of objects in the currently selected scene
