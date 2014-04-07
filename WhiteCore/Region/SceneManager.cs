@@ -364,6 +364,43 @@ namespace WhiteCore.Region
 
         #endregion
 
+        #region Create Region
+        /// <summary>
+        /// Creates and adds a region from supplied regioninfo.
+        /// </summary>
+        /// <param name="regionInfo">Region info.</param>
+        public void CreateRegion (RegionInfo regionInfo)
+        {
+            if (regionInfo == null)
+                return;
+
+            if (RegionNameExists(regionInfo.RegionName))
+            {
+                MainConsole.Instance.InfoFormat ("[SceneManager]: A region already exists with the name '{0}'",
+                    regionInfo.RegionName);
+                return;
+            }
+
+            //if ( RegionAtLocation(regionInfo.RegionLocX, regionInfo.RegionLocY))
+            //{
+            //MainConsole.Instance.InfoFormat ("[SceneManager]: A region at @ {0},{1} already exists",
+            //    regionInfo.RegionLocX / Constants.RegionSize, regionInfo.RegionLocY / Constants.RegionSize);
+            //}
+
+            // we should be ok..
+            MainConsole.Instance.InfoFormat ("[SceneManager]: Creating new region \"{0}\" at @ {1},{2}",
+                regionInfo.RegionName, regionInfo.RegionLocX / Constants.RegionSize, regionInfo.RegionLocY / Constants.RegionSize);
+
+            var currentInfo = FindCurrentRegionInfo ();
+            var regions = new List<KeyValuePair<ISimulationDataStore, RegionInfo>> ();
+            ISimulationDataStore store = m_selectedDataService.Copy ();
+
+            regions.Add (new KeyValuePair<ISimulationDataStore, RegionInfo> (store, store.CreateNewRegion (m_OpenSimBase, regionInfo, currentInfo)));
+            StartRegion (store, regionInfo);
+
+        }
+        #endregion
+
         #region ISharedRegionStartupModule plugins
 
         protected List<ISharedRegionStartupModule> m_startupPlugins = new List<ISharedRegionStartupModule>();
@@ -592,7 +629,33 @@ namespace WhiteCore.Region
                 
         }
 
-        private Dictionary<string, int> FindCurrentRegionInfo()
+        /// <summary>
+        /// Checks if a Region name already exists.
+        /// </summary>
+        /// <returns><c>true</c>, if region name exists, <c>false</c> otherwise.</returns>
+        /// <param name="regionName">Region name to check.</param>
+        public bool RegionNameExists(string regionName)
+        {
+            bool retVal = false;
+            var rName = regionName.ToLower ();
+            foreach (IScene scene in Scenes)
+            {
+                if (scene.RegionInfo.RegionName.ToLower() == rName)
+                {
+                    retVal = true;
+                    break;
+                }
+            }
+
+            return retVal;
+        }
+
+
+        /// <summary>
+        /// Finds the current region info.
+        /// </summary>
+        /// <returns>The current region info.</returns>
+        public Dictionary<string, int> FindCurrentRegionInfo()
         {
             var rInfo = new Dictionary<string, int >();
 

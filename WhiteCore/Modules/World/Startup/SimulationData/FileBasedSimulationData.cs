@@ -187,7 +187,14 @@ namespace WhiteCore.Modules
             return _regionData.RegionInfo;
         }
 
-         private RegionInfo CreateRegionFromConsole(RegionInfo info, Boolean prompt, Dictionary<string, int> currentInfo)
+        /// <summary>
+        /// Creates/updates a region from console.
+        /// </summary>
+        /// <returns>The region from console.</returns>
+        /// <param name="info">Info.</param>
+        /// <param name="prompt">If set to <c>true</c> prompt.</param>
+        /// <param name="currentInfo">Current info.</param>
+        private RegionInfo CreateRegionFromConsole(RegionInfo info, Boolean prompt, Dictionary<string, int> currentInfo)
         {
 
             if (info == null || info.NewRegion)
