@@ -4,6 +4,16 @@ Rowan D <greythane@gmail.com>
 Fly-Man- <fly.man.opensim@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Apr 8 - Fly-Man
+* Updated Library file with origin of some of the files.
+
+Apr 7 - Greythane
+* SceneManager
+  - Add public CreateRegion() to allow creation of region programatically.
+* FileBasedSimulation
+  - Minor documentary updates
+* Add bin/libraries.version detailing current version details of libraries
+
 Apr 2 - Fly-Man
 * Cleaned up the remaining INI files that still had the old WhiteCoreServerConfiguration in them
 
@@ -24,12 +34,12 @@ Mar 31 / Apr 1st - Greythane
 Mar 28 - Greythane
 * LSL-Api /LSL-Types
 	- increase float equality difference to "0.0000005" as LSL_Float types are only to six decimal places
-	- SetPrimParams - Correct PRIM_POSITION postion update to remove incorrect additional offset 
+	- SetPrimParams - Correct PRIM_POSITION position update to remove incorrect additional offset 
 	   (originally reported by Eamon Mayo who also supplied a correction (Aurora))
 
 Mar 26 - Greythane
 * LocalGridConnector
-  - if no valid data source is available, dont register the local service 
+  - if no valid data source is available, don't register the local service 
   	( causes null references if called from the sim console when in grid mode )
 * SceneManager - Show region <name> command
   - correct call to get region list so that is operates correctly in both standalone and grid mode
@@ -55,7 +65,7 @@ Mar 24 - Greythane
 * Dropped Xml2 commands after further investigation, OAR's are a better alternative and it does not
     appear that the XML2 format is in common use with OpenSim anyway
 * SceneManager 
-    - Re-synced new Region commmads after a stuff up in doing so previously
+    - Re-synced new Region commands after a stuff up in doing so previously
     - Add port to 'Show regions' command
 * FileBasedSimulationData
     - Correct some problems in the 'update region info' command
@@ -127,7 +137,7 @@ Mar 6th 2014 - Fly-Man-
  * Moved the WhiteCoreServerConfiguration to ServerConfiguration
 
 Mar 5th 2014: #0006
-* Implemented a 'Missing Texture' texture tile for substitution when a requested tecture is not found.
+* Implemented a 'Missing Texture' texture tile for substitution when a requested texture is not found.
 * Re-implemented addon module DefaultInventoryToIARConverter to assist in creation of an updated
     DefaultInventory.iar that includes the additional texture
 
@@ -149,7 +159,7 @@ Feb 10th 2014
 	- set default state to 'disabled' if config not found (Nature.ini)
 * Scenemanager ( Load & save oar)
 * AppearanceArchiver (load & save avatar archive)
-* InventoryArchiver (load , save & save withoutassets iar file)
+* InventoryArchiver (load , save & save without assets iar file)
 	- added some sanity checkes for missing, invalid and existing filenames.
 * Rename WhiteCore/Modules/Region/AuroraArchiver.cs > .../WhiteCoreArchiver.cs
 	(old format .abackup processing)
@@ -188,7 +198,7 @@ Commented out multiple variables that have been declared but not used (No code c
 	- multiple files, identified with comment > // 20131224 not used
     - see alos  ## TODO ## as some code needs to be re-checked for functionality
     >> build warnings reduced from 82 to 45  
-    	- remaing warnings are mainly private field definitions that are not used.... 
+    	- remaining warnings are mainly private field definitions that are not used.... 
     	mainly in WhiteCoreOpenDynamicsEngine - AODEApi.cs & AODEDynamics.cs  and
     	the Physics.BulletSPlugin code (Opensim)
 
@@ -201,7 +211,7 @@ hand with trash data.
 	- Whitecore(Aurora)/Modules/Avatar/Currency/Simple.CurrencyConnector.cs
 mdickson - Updated Texture Fetching to handle bytes=start- and bytes=-end which the newer viewers will send.
 	- WhiteCore(Aurora)/Services/GenericServices/CapsService/CAPModules/AssetCAPS.cs
-mdickson - Removed uneeded LINUX conditional around LSLFload operators It causes errors on Mono compiles.
+mdickson - Removed unneeded LINUX conditional around LSLFload operators It causes errors on Mono compiles.
 	(Corrected this myself prior to this commit :) )
 	- WhiteCore(Aurora)/WhiteCoreDotNetEngine(AuroraDotNetEngine)/APIs/LSL_Types.cs
 
@@ -224,7 +234,7 @@ Dec 6th, 2013
 * Aurora.Framework.SceneInfo - TerrainChannel.cs
 	Added additional perlinNoise generation code - TerrainPerlin.cs
 	Modified CreateDefaultTerrain() to pass the landtype entered during console region creation
-	Added additional and overide creation procedures for Flatland, Mainland and Island 
+	Added additional and override creation procedures for Flatland, Mainland and Island 
 	Added GenerateTerrain() to allow user generation of terrain from a console command
 * Aurora.Modules.World.Terrain - TerrainModule.cs  
 	Added InterfaceGenerateTerrain() for user access to terrain generation
@@ -236,7 +246,7 @@ Dec 6th, 2013
 * Aurora.Modules.Terrain - TerrainModule.cs
 	Remove added debug commands 
 * Aurora.Framework.Sceneinfo - TerrainChannel.cs
-	Correct problem when creating/loading a terrainchannel if the source image is not the same as the region size.	
+	Correct problem when creating/loading a terrain channel if the source image is not the same as the region size.	
 
   Oct 1st, 2013
 * Aurora.Modules.Terrain - TerrainModule.cs
