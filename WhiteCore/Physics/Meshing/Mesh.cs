@@ -29,6 +29,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using WhiteCore.Framework.Physics;
 using OpenMetaverse;
@@ -39,6 +40,9 @@ using PrimMesher;
 #else
 using WhiteCore.Physics.PrimMesher;
 #endif
+
+[assembly: AssemblyVersion("0.9.1")]
+[assembly: AssemblyFileVersion("0.9.1")]
 
 namespace WhiteCore.Physics.Meshing
 {

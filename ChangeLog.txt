@@ -4,6 +4,9 @@ Rowan D <greythane@gmail.com>
 Fly-Man- <fly.man.opensim@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Apr 10 - Fly-Man
+* More assembly signing
+
 Apr 8 - Fly-Man
 * Updated Library file with origin of some of the files.
 

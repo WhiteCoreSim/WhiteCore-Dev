@@ -45,9 +45,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Threading;
 using System.Xml;
 using RegionFlags = OpenMetaverse.RegionFlags;
+
+[assembly: AssemblyVersion("0.9.1")]
+[assembly: AssemblyFileVersion("0.9.1")]
 
 namespace WhiteCore.ClientStack
 {

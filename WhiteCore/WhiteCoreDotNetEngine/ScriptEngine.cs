@@ -46,6 +46,9 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 
+[assembly: AssemblyVersion("0.9.1")]
+[assembly: AssemblyFileVersion("0.9.1")]
+
 namespace WhiteCore.ScriptEngine.WhiteCoreDotNetEngine
 {
     public class ScriptEngine : INonSharedRegionModule, IScriptModulePlugin

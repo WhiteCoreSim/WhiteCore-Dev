@@ -28,11 +28,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using WhiteCore.DataManager.Migration;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
+
+[assembly: AssemblyVersion("0.9.1")]
+[assembly: AssemblyFileVersion("0.9.1")]
 
 namespace WhiteCore.DataManager
 {
