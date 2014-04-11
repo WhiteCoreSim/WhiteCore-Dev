@@ -4,6 +4,23 @@ Rowan D <greythane@gmail.com>
 Fly-Man- <fly.man.opensim@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Apr 11 - Greythane
+* Skip call to get an external IP address if one is already specified in the [NETWORK] configuration
+	or the IP address has already been determined previously
+	( This will also considerably speed up startup )
+  - Utilities: add public static string HostName that is set when the configuration is read
+  - SimulationBase & MinimaSimulationBase
+  	- only get an external IP address (dyndns call) is no configuration has been specified
+
+* Add a length specifier to the MySql table index definition so that long fields can be have indexes
+    defined as not using the full field length 
+    ( Issue #13 - passwordHash causing a crash when creating auth table)
+  - MySQLDataManager.CreatTable - added processing for the additional IndexSize specification
+  - Migrator - Added additional override to allow for size specification of index field
+  - IDataConnector - Added additional IndexSize parameter to the index definition
+  - AuthMigrator_5 - added a 255 length specifier to the "passwordHash" index
+  - AgentMigrator_4 - added a 255 length specifier to the "keyword" index
+
 Apr 10 - Fly-Man
 * More assembly signing
 

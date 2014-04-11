@@ -366,6 +366,7 @@ namespace WhiteCore.Framework.Utilities
     {
         public string[] Fields { get; set; }
         public IndexType Type { get; set; }
+        public int IndexSize { get; set; }
 
         public override bool Equals(object obj)
         {

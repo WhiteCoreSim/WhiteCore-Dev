@@ -267,6 +267,11 @@ namespace WhiteCore.DataManager.Migration
             return new IndexDefinition {Fields = fields, Type = indexType};
         }
 
+        protected IndexDefinition IndexDef(string[] fields, IndexType indexType, int indexSize)
+        {
+            return new IndexDefinition {Fields = fields, Type = indexType, IndexSize = indexSize};
+        }
+
         protected void AddSchema(string table, ColumnDefinition[] definitions)
         {
             AddSchema(table, definitions, new IndexDefinition[0]);

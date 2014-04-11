@@ -638,7 +638,12 @@ namespace WhiteCore.DataManager.MySQL
                         type = "KEY";
                         break;
                 }
-                indicesQuery.Add(string.Format("{0}( {1} )", type, "`" + string.Join("`, `", index.Fields) + "`"));
+
+                if (index.IndexSize == 0)
+                    indicesQuery.Add(string.Format("{0}( {1} )", type, "`" + string.Join("`, `", index.Fields) + "`"));
+                else
+                    indicesQuery.Add(string.Format("{0}( {1} )", type, "`" + string.Join("`, `", index.Fields) + "`"+"("+index.IndexSize+")"));
+
             }
 
             string query = string.Format("create table " + table + " ( {0} {1}) ",
