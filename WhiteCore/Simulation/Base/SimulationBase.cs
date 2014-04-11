@@ -253,15 +253,34 @@ namespace WhiteCore.Simulation.Base
             if (m_Servers.TryGetValue(port, out server) && server.Secure == useHTTPS)
                 return server;
 
-            string hostName =
-                m_config.Configs["Network"].GetString("HostName",
-                                                      "http" + (useHTTPS ? "s" : "") + "://" + Utilities.GetExternalIp());
             uint threadCount = m_config.Configs["Network"].GetUInt("HttpThreadCount", 5);
-            //Clean it up a bit
-            if (hostName.StartsWith("http://") || hostName.StartsWith("https://"))
-                hostName = hostName.Replace("https://", "").Replace("http://", "");
-            if (hostName.EndsWith("/"))
-                hostName = hostName.Remove(hostName.Length - 1, 1);
+
+            // find out where we live
+            string hostName;
+
+            // been here before?
+            if (Utilities.HostName == "")
+            {
+                hostName = m_config.Configs ["Network"].GetString ("HostName", "0.0.0.0");
+
+                // nothing set in the config.. try for an external network address then
+                if ((hostName == "") || (hostName == "0.0.0.0"))
+                {
+                    MainConsole.Instance.Info ("[Network]: Retrieving the external IP address");
+                    hostName = "http" + (useHTTPS ? "s" : "") + "://" + Utilities.GetExternalIp ();
+                }
+
+                //Clean it up a bit
+                if (hostName.StartsWith ("http://") || hostName.StartsWith ("https://"))
+                    hostName = hostName.Replace ("https://", "").Replace ("http://", "");
+                if (hostName.EndsWith ("/"))
+                    hostName = hostName.Remove (hostName.Length - 1, 1);
+
+                // save this for posterity in case it is needed
+                MainConsole.Instance.Info ("[Network]: Simulator IP address has been set to " + hostName);
+                Utilities.HostName = hostName;
+            } else
+                hostName = Utilities.HostName;
 
             server = new BaseHttpServer(port, hostName, useHTTPS, threadCount);
 

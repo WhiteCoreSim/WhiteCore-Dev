@@ -48,6 +48,7 @@ namespace WhiteCore.Framework.Utilities
         private static int EncryptIterations = 2;
         private static int KeySize = 256;
         private static string CachedExternalIP = "";
+        public static string HostName = "";
 
         /// <summary>
         ///     Get the URL to the release notes for the current version of WhiteCore
@@ -79,7 +80,7 @@ namespace WhiteCore.Framework.Utilities
         /// <returns></returns>
         public static string WhiteCoreServerVersion()
         {
-            return "1.0";
+            return "0.9.1";
         }
 
         public static void SetEncryptorType(string type)
@@ -302,7 +303,7 @@ namespace WhiteCore.Framework.Utilities
             // Return decrypted string.   
             return plainText;
         }
-
+            
         /// <summary>
         ///     Get OUR external IP
         /// </summary>
