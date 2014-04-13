@@ -423,6 +423,11 @@ namespace WhiteCore.Modules
                     PathHelpers.ComputeFullPath(config.GetString("PreviousBackupDirectory", m_oldSaveDirectory));
                 m_storeDirectory =
                     PathHelpers.ComputeFullPath(config.GetString("StoreBackupDirectory", m_storeDirectory));
+                // we tend to use absolute paths here and previously the(root /) directory in the past actually
+                // refers to the current (bin) directory, The default is now an empty dir... set to a correct path.
+                if (m_storeDirectory == "")
+                    m_storeDirectory = "./";
+
                 m_saveBackupChanges = config.GetBoolean("SaveTimedPreviousBackup", m_keepOldSave);
                 m_timeBetweenBackupSaves = config.GetInt("TimeBetweenBackupSaves", m_timeBetweenBackupSaves);
             }
@@ -658,7 +663,10 @@ namespace WhiteCore.Modules
 
         private string BuildSaveFileName()
         {
-            return (m_storeDirectory == "" || m_storeDirectory == "/")
+            //return (m_storeDirectory == "" || m_storeDirectory == "/")
+            // the'/' diretcory is valid an someone might use it to store backups so don't
+            // fudge it to mean './' ... as it previously was...
+            return (m_storeDirectory == "")
                        ? m_fileName + ".sim"
                        : Path.Combine(m_storeDirectory, m_fileName + ".sim");
         }

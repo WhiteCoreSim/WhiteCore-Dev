@@ -4,6 +4,19 @@ Rowan D <greythane@gmail.com>
 Fly-Man- <fly.man.opensim@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Apr 13 - Greythane
+* FilebasedSimData (Issue # 14)
+	We tend to use absolute paths here and the(root /) directory in the past actually
+    referred to the exexutable (bin) directory, so...
+    ... ensure the store directory is set to a valid/correct path.
+  - ReadConfig()
+     - if no store directory is specifically ensure that an empty entry refers to the current directory
+  - bin/configuration/data/FileBased.ini (FileBased.ini.example) change to specify the StoreBackupDirectory = ""
+  - BuildSaveFileName()
+      The '/' directory, as specified in the current config file, is valid and someone might use
+       it to store backups so don't fudge it to mean './' ... as it previously was... (save in the bin dir)
+
+
 Apr 11 - Greythane
 * Skip call to get an external IP address if one is already specified in the [NETWORK] configuration
 	or the IP address has already been determined previously
