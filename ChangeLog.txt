@@ -4,6 +4,11 @@ Rowan D <greythane@gmail.com>
 Fly-Man- <fly.man.opensim@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Apr 17 - Greythane
+* AgentMigrator (Issue # 14)
+  - add the "keyword" index length restriction to the correct file (_5) and remove the addition from 
+    the previous version (_4)  :)
+
 Apr 13 - Greythane
 * FilebasedSimData (Issue # 14)
 	We tend to use absolute paths here and the(root /) directory in the past actually

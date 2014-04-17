@@ -89,7 +89,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Agent
                                                  IndexDef(new string[1] {"ClassifiedUUID"}, IndexType.Primary),
                                                  IndexDef(new string[2] {"Name", "Category"}, IndexType.Index),
                                                  IndexDef(new string[1] {"OwnerUUID"}, IndexType.Index),
-                                                 IndexDef(new string[1] {"Keyword"}, IndexType.Index)
+                                                 IndexDef(new string[1] {"Keyword"}, IndexType.Index, 255)
                                                     ));
 
             AddSchema("userpicks", ColDefs(
