@@ -66,6 +66,9 @@ namespace WhiteCore.Framework.Modules
         // Group Transactions
         GroupLiability 	= 6003,
         GroupDividend  	= 6004,
+        // Event Transactions
+        EventFee        = 9003,
+        EventPrize      = 9004,
         // Stipend Credits
         StipendPayment 	= 10000
     }
