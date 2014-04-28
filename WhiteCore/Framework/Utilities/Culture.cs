@@ -52,5 +52,26 @@ namespace WhiteCore.Framework.Utilities
         {
             Thread.CurrentThread.CurrentCulture = m_cultureInfo;
         }
+
+        /// <summary>
+        /// The base system culture info before it is locked to "en_US".
+        ///   Used for log date/time formatting
+        /// </summary>
+        public static CultureInfo SystemCultureInfo
+        { get; set; }
+
+        /// <summary>
+        /// Returns a formatted date string depending upon the system Locale.
+        /// </summary>
+        /// <returns>Local date string.</returns>
+        public static string LocaleDate()
+        {
+            string df = Culture.SystemCultureInfo.DateTimeFormat.ShortDatePattern;
+            //string dt = DateTime.Now.ToString ("dd-MMM-yyyy",Culture.SystemCultureInfo);
+            string dt = DateTime.Now.ToString (df);
+            return dt;
+        }
+
+
     }
 }

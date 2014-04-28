@@ -52,6 +52,7 @@ namespace WhiteCore.Simulation.Base
     /// </summary>
     public class BaseApplication
     {
+
         /// <summary>
         ///     Save Crashes in the bin/crashes folder.  Configurable with m_crashDir
         /// </summary>
@@ -97,6 +98,7 @@ namespace WhiteCore.Simulation.Base
             BinMigratorService service = new BinMigratorService();
             service.MigrateBin();
             // Configure nIni aliases and localles
+            Culture.SystemCultureInfo = CultureInfo.CurrentCulture;
             Culture.SetCurrentCulture();
             configSource.Alias.AddAlias("On", true);
             configSource.Alias.AddAlias("Off", false);
