@@ -364,14 +364,6 @@ namespace WhiteCore.Framework.ConsoleFramework
             Console.WriteLine();
         }
 
-        public string LocaleDate()
-        {
-			string df = Culture.SystemCultureInfo.DateTimeFormat.ShortDatePattern;
-			//string dt = DateTime.Now.ToString ("dd-MMM-yyyy",Culture.SystemCultureInfo);
-			string dt = DateTime.Now.ToString (df);
-            return dt;
-        }
-
         public override void Output(string text, Level level)
         {
             if (Threshold <= level)
