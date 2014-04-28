@@ -44,7 +44,7 @@ using Timer = System.Timers.Timer;
 namespace WhiteCore.Modules
 {
     /// <summary>
-    ///     FileBased DataStore, do not store anything in any databases, instead save .abackup files for it
+    ///     FileBased DataStore, do not store anything in any databases, instead save .sim files for it
     /// </summary>
     public class FileBasedSimulationData : ISimulationDataStore, IDisposable
     {
@@ -99,7 +99,7 @@ namespace WhiteCore.Modules
 
         public void Initialise() { }
 
-		public virtual List<string> FindRegionInfos(out bool newRegion, ISimulationBase simBase)
+        public virtual List<string> FindRegionInfos(out bool newRegion, ISimulationBase simBase)
         {
 //			List<string> regions = new List<string>(Directory.GetFiles(".", "*.sim", SearchOption.TopDirectoryOnly));
 			ReadConfig(simBase);
@@ -146,7 +146,7 @@ namespace WhiteCore.Modules
         }
 
 		/// <summary>
-		/// Initializes a new region using the pass regionsinfo
+        /// Initializes a new region using the passed regioninfo
 		/// </summary>
 		/// <returns></returns>
 		/// <param name="simBase">Sim base.</param>
@@ -184,6 +184,23 @@ namespace WhiteCore.Modules
             ReadConfig(simBase);
             ReadBackup(fileName);
             m_fileName = fileName;
+            return _regionData.RegionInfo;
+        }
+
+        public virtual RegionInfo LoadRegionNameInfo(string regionName, ISimulationBase simBase)
+        {
+            ReadConfig(simBase);
+            _regionData = new RegionData();
+            _regionData.Init();
+
+            string regionFile = m_storeDirectory + regionName + ".sim";
+            if (File.Exists(regionFile))
+            {
+                regionFile = Path.GetFileNameWithoutExtension (regionFile);
+                ReadBackup (regionFile);
+                m_fileName = regionFile;
+            }
+
             return _regionData.RegionInfo;
         }
 
@@ -589,27 +606,12 @@ namespace WhiteCore.Modules
             }
 
             ISceneEntity[] entities = m_scene.Entities.GetEntities();
-            regiondata.Groups = new List<SceneObjectGroup>(entities.Cast<SceneObjectGroup>().Where((entity) =>
-                                                                                                       {
-                                                                                                           return
-                                                                                                               !(entity
-                                                                                                                     .IsAttachment ||
-                                                                                                                 ((entity
-                                                                                                                       .RootChild
-                                                                                                                       .Flags &
-                                                                                                                   PrimFlags
-                                                                                                                       .Temporary) ==
-                                                                                                                  PrimFlags
-                                                                                                                      .Temporary)
-                                                                                                                 ||
-                                                                                                                 ((entity
-                                                                                                                       .RootChild
-                                                                                                                       .Flags &
-                                                                                                                   PrimFlags
-                                                                                                                       .TemporaryOnRez) ==
-                                                                                                                  PrimFlags
-                                                                                                                      .TemporaryOnRez));
-                                                                                                       }));
+            regiondata.Groups = new List<SceneObjectGroup>(
+                entities.Cast<SceneObjectGroup>().Where(
+                    (entity) => {return !( entity.IsAttachment ||
+                        ((entity.RootChild.Flags & PrimFlags.Temporary) == PrimFlags.Temporary) ||
+                        ((entity.RootChild.Flags & PrimFlags.TemporaryOnRez) == PrimFlags.TemporaryOnRez));
+                }));
             try
             {
                 foreach (ISceneEntity entity in regiondata.Groups.Where(ent => ent.HasGroupChanged))

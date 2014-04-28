@@ -4,6 +4,20 @@ Rowan D <greythane@gmail.com>
 Fly-Man- <fly.man.opensim@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Apr 28 - Greythane
+* LocalConsole, CommandConsole, Culture
+ - Modify date processing for console logging to use the users system locale shortdate foramt
+* RestartModule
+  - Modify region restart commands to correctly process, close and restart the selected region.
+    - region restart (abort)
+* SceneManager
+  - correct processing RestartRegion and RemoveRegion - (RestartModule commands & restart-instance)
+  - Add 'delete region' as as alternative to the existing 'remove region' command
+  - Update command processing for destructive commands that allow execution from the root (scene)
+
+Apr 26 - FlyMan
+* Updated the iMoneyModule with the Event Fee and Prize that is now in the Viewer 2/3 code
+
 Apr 17 - Greythane
 * AgentMigrator (Issue # 14)
   - add the "keyword" index length restriction to the correct file (_5) and remove the addition from 

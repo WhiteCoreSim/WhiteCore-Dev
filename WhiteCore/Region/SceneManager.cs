@@ -307,12 +307,25 @@ namespace WhiteCore.Region
 
         public void RemoveRegion(IScene scene)
         {
+            // change back to the root as we are going to trash this one
+            MainConsole.Instance.ConsoleScene = null;
+            MainConsole.Instance.DefaultPrompt = "Region [root]";
+
+            m_scenes.Remove (scene);
+            MainConsole.Instance.ConsoleScenes = m_scenes;
+
             scene.SimulationDataService.RemoveRegion();
             IGridRegisterModule gridRegisterModule = scene.RequestModuleInterface<IGridRegisterModule>();
             gridRegisterModule.DeleteRegion(scene);
-            MainConsole.Instance.Warn("Region " + scene.RegionInfo.RegionName + " was removed, restarting the instance in 10 seconds");
-            System.Threading.Thread.Sleep(10000);
-            Environment.Exit(0);
+
+            MainConsole.Instance.Warn("[SceneManager]: Region " + scene.RegionInfo.RegionName + " was removed\n"+
+                "To ensure all data is correct, you should consider restarting the simulator");
+
+            if (MainConsole.Instance.Prompt ("[SceneManager]: Do you wish to restart? (yes/no)", "no") == "yes")
+            {
+                System.Threading.Thread.Sleep (10000);
+                Environment.Exit (0);
+            }
         }
 
         #endregion
@@ -321,11 +334,27 @@ namespace WhiteCore.Region
 
         public void RestartRegion(IScene scene)
         {
-            CloseRegion(scene, ShutdownType.Immediate, 0);
+            // save current info for later
+            string regionName = scene.RegionInfo.RegionName;
 
+            // change back to the root as we are going to trash this one
+            MainConsole.Instance.ConsoleScene = null;
+            MainConsole.Instance.DefaultPrompt = "Region [root]";
+
+            // close and clean up a bit
+            CloseRegion(scene, ShutdownType.Immediate, 0);
+            MainConsole.Instance.ConsoleScenes = m_scenes;
+
+            // restart or die?
             IConfig startupConfig = m_config.Configs["Startup"];
-            if (startupConfig == null || !startupConfig.GetBoolean("RegionRestartCausesShutdown", false))
-                StartRegion(scene.SimulationDataService, scene.RegionInfo);
+            if (startupConfig == null || !startupConfig.GetBoolean ("RegionRestartCausesShutdown", false))
+            {
+                RegionInfo region = m_selectedDataService.LoadRegionNameInfo (regionName, m_OpenSimBase);
+
+                //StartRegion(scene.SimulationDataService, scene.RegionInfo);
+                StartRegion (m_selectedDataService, region);
+                MainConsole.Instance.Info ("[SceneManager]: " + regionName + "has been restarted");
+            }
             else
             {
                 //Kill us now
@@ -545,7 +574,7 @@ namespace WhiteCore.Region
 
             MainConsole.Instance.Commands.AddCommand("restart-instance",
                 "restart-instance",
-                "Restarts the instance (as if you closed and re-opened WhiteCore)",
+                "Restarts the region(s) (as if you closed and re-opened WhiteCore)",
                 RunCommand, true, false);
 
             MainConsole.Instance.Commands.AddCommand("command-script",
@@ -585,6 +614,11 @@ namespace WhiteCore.Region
 
             MainConsole.Instance.Commands.AddCommand("remove region", 
                 "remove region",
+                "Remove region from the grid, and delete all info associated with it",
+                RunCommand, true, false);
+
+            MainConsole.Instance.Commands.AddCommand("delete region", 
+                "delete region (alias for 'remove region')",
                 "Remove region from the grid, and delete all info associated with it",
                 RunCommand, true, false);
 
@@ -988,13 +1022,15 @@ namespace WhiteCore.Region
         /// <param name="cmdparams">Additional arguments passed to the command</param>
         private void RunCommand(IScene scene, string[] cmdparams)
         {
-            if (MainConsole.Instance.ConsoleScene == null) 
+            if ( (MainConsole.Instance.ConsoleScene == null) &&
+                (m_scenes.IndexOf(scene) == 0) )
             {
                 MainConsole.Instance.Info ("[SceneManager]: Operating on the 'root' scene will run this command for all regions");
-                if (MainConsole.Instance.Prompt ("Are you sure you want to do this? (yes/no)", "no") != "yes")
-                    return;
+                //    if (MainConsole.Instance.Prompt ("Are you sure you want to do this? (yes/no)", "no") != "yes")
+                //    return;
             }
-
+           
+            var regionName = scene.RegionInfo.RegionName;
             List<string> args = new List<string>(cmdparams);
             if (args.Count < 1)
                 return;
@@ -1010,7 +1046,7 @@ namespace WhiteCore.Region
                     if (cmdparams.Length > 0)
                         if (cmdparams[0] == "region")
                         {
-                    if (MainConsole.Instance.Prompt("Are you sure you want to reset the region? (yes/no)", "no") !=
+                    if (MainConsole.Instance.Prompt("Are you sure you want to reset " + regionName +"? (yes/no)", "no") !=
                                 "yes")
                                 return;
                             ResetRegion(scene);
@@ -1020,17 +1056,17 @@ namespace WhiteCore.Region
                     if (cmdparams.Length > 0)
                     if (cmdparams[0] == "region")
                     {
-                    if (MainConsole.Instance.Prompt("Are you sure you want to clear all region objects? (yes/no)", "no") !=
+                    if (MainConsole.Instance.Prompt("Are you sure you want to clear all " + regionName +" objects? (yes/no)", "no") !=
                             "yes")
                             return;
                         ClearRegion(scene);
                     }
                 break;
-                case "remove":
+            case "remove": case "delete":
                     if (cmdparams.Length > 0)
                         if (cmdparams[0] == "region")
                         {
-                    if (MainConsole.Instance.Prompt("Are you sure you want to remove the region? (yes/no)", "no") !=
+                    if (MainConsole.Instance.Prompt("Are you sure you want to remove " + regionName +"? (yes/no)", "no") !=
                                 "yes")
                                 return;
                             RemoveRegion(scene);
@@ -1158,7 +1194,7 @@ namespace WhiteCore.Region
 			if (MainConsole.Instance.ConsoleScene == null) {
 				if (regionName.ToLower() != "root")
 				{
-					MainConsole.Instance.Info(String.Format(regionName+" not found? (Case is important)"));
+					MainConsole.Instance.Info(String.Format(regionName+" not found?"));
 				}
 				rName = "root";
 			} else {
@@ -1254,13 +1290,6 @@ namespace WhiteCore.Region
         /// <param name="cmdparams"></param>
         protected void LoadOar(IScene scene, string[] cmdparams)
         {
-            if (MainConsole.Instance.ConsoleScene == null) 
-            {
-                MainConsole.Instance.Info ("[SceneManager]: Operating on the 'root' will load the OAR into all regions");
-                if (MainConsole.Instance.Prompt ("Are you sure you want to do this? (yes/no)", "no") != "yes")
-                    return;
-            }
-
             // a couple of sanity checks
 			if (cmdparams.Count() < 3)
             {
@@ -1287,6 +1316,16 @@ namespace WhiteCore.Region
             if (!File.Exists(fileName)) {
                 MainConsole.Instance.Info ("OAR archive file '"+fileName+"' not found.");
                 return;
+            }
+
+            // should be good to go...
+            string regionName = scene.RegionInfo.RegionName;
+            if (MainConsole.Instance.ConsoleScene == null)
+            {
+                if ( m_scenes.IndexOf(scene) == 0 )
+                    MainConsole.Instance.Info ("[SceneManager]: Operating on the 'root' will load the OAR into all regions");
+                if (MainConsole.Instance.Prompt ("[SceneManager]: Do you wish to load this OAR into " + regionName + "? (yes/no)", "no") != "yes")
+                    return;
             }
 
             try

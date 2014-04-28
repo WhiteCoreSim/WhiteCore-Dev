@@ -699,11 +699,11 @@ namespace WhiteCore.Services.SQLServices.GridService
                 return false;
             }
 
-            MainConsole.Instance.DebugFormat("[GRID SERVICE]: Region {0} deregistered", region.RegionID);
+            MainConsole.Instance.DebugFormat("[GRID SERVICE]: Region {0} deregistered", gregion.RegionID);
 
-            FixNeighbors(region, GetNeighbors(null, region), true);
+            FixNeighbors(region, GetNeighbors(null, gregion), true);
 
-            return m_Database.Delete(region.RegionID);
+            return m_Database.Delete(gregion.RegionID);
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]

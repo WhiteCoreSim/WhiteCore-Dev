@@ -191,7 +191,7 @@ namespace WhiteCore.Modules.Startup
                 MainConsole.Instance.Error(
                     "This means that this region has failed to connect to the grid server and needs removed from it before it can connect again.");
                 MainConsole.Instance.Error(
-                    "If you are running the WhiteCore.Server instance this region is connecting to, type \"clear grid region <RegionName>\" and then press enter on this console and it will work");
+                    "If you are running the WhiteCore.Server instance this region is connecting to, type \"grid clear region <RegionName>\" and then press enter on this console and it will work");
                 MainConsole.Instance.Error(
                     "If you are not running the WhiteCore.Server instance this region is connecting to, please contact your grid operator so that he can fix it");
 

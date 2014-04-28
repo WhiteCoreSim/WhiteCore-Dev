@@ -138,6 +138,14 @@ namespace WhiteCore.Framework.SceneInfo
         RegionInfo LoadRegionInfo(string fileName, ISimulationBase simBase);
 
         /// <summary>
+        ///     Load the region info for a specified region
+        /// </summary>
+        /// <param name="simBase"></param>
+        /// <param name="newRegion"></param>
+        /// <returns></returns>
+        RegionInfo LoadRegionNameInfo(string regionName, ISimulationBase simBase);
+
+        /// <summary>
         ///     Set the region ref
         /// </summary>
         /// <param name="scene"></param>
