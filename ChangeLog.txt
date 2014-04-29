@@ -4,6 +4,20 @@ Rowan D <greythane@gmail.com>
 Fly-Man- <fly.man.opensim@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Apr 29 - Greythane
+* WorldView module
+  - rebuilt for WhiteCore - interface needs to be implemented to fully test
+* update html code
+  - copyright notices to 2014
+  - removed the 'forkme' label from the main index page
+* LocalConsole & CommandConsole
+  - remove redundant code (missed in the locale date update)
+* Slmapapi
+  - correct initial setup for MapService URL details required for the webpage world map (now working correctly)
+* ConfigurationLoader
+  - small addition to show the configuration path and file details in the event of an error
+     (assist configuration problems)
+       
 Apr 28 - Greythane
 * LocalConsole, CommandConsole, Culture
  - Modify date processing for console logging to use the users system locale shortdate foramt
