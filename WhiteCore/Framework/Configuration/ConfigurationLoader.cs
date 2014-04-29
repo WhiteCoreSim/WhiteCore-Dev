@@ -281,6 +281,7 @@ namespace WhiteCore.Framework.Configuration
             {
                 Console.WriteLine(string.Format("[CONFIG]: Could not load any configuration"));
 				Console.WriteLine(string.Format("[CONFIG]: Configuration possibly exists, but there was an error loading it!"));
+                Console.WriteLine(string.Format("[CONFIG]: Configuration : " + mainIniDirectory+", "+mainIniFileName));
                 throw new NotSupportedException();
             }
             // Make sure command line options take precedence
