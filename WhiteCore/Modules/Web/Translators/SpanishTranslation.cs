@@ -382,16 +382,18 @@
                     return "Help Viewers Configuration";
                 case "AngstormViewer":
                     return "Angstorm Viewer";
-                case "VoodooViewer":
-                    return "Voodoo Viewer";
                 case "AstraViewer":
                     return "Astra Viewer";
+                case "FirestormViewer":
+                    return "Firestorm Viewer";
                 case "ImprudenceViewer":
                     return "Imprudence Viewer";
                 case "PhoenixViewer":
                     return "Phoenix Viewer";
                 case "SingularityViewer":
                     return "Singularity Viewer";
+                case "VoodooViewer":
+                    return "Voodoo Viewer";
                 case "ZenViewer":
                     return "Zen Viewer";
 

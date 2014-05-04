@@ -382,19 +382,21 @@
                 case "HelpViewersConfigText":
                     return "Aide pour la configuration des Viewers (Clients)";
                 case "AngstormViewer":
-                    return "Angstorm Viewer (Client)";
-                case "VoodooViewer":
-                    return "Voodoo Viewer (Client)";
+                    return "Angstorm Viewer";
                 case "AstraViewer":
-                    return "Astra Viewer (Client)";
+                    return "Astra Viewer";
+                case "FirestormViewer":
+                    return "Firestorm Viewer";
                 case "ImprudenceViewer":
-                    return "Imprudence Viewer (Client)";
+                    return "Imprudence Viewer";
                 case "PhoenixViewer":
-                    return "Phoenix Viewer (Client)";
+                    return "Phoenix Viewer";
                 case "SingularityViewer":
-                    return "Singularity Viewer (Client)";
+                    return "Singularity Viewer";
+                case "VoodooViewer":
+                    return "Voodoo Viewer";
                 case "ZenViewer":
-                    return "Zen Viewer (Client)";
+                    return "Zen Viewer";
 
                     //Logout page
                 case "LoggedOutSuccessfullyText":
