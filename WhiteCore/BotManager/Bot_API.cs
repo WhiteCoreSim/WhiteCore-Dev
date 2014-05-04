@@ -30,21 +30,21 @@ using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
-using WhiteCore.ScriptEngine.WhiteCoreDotNetEngine;
+using WhiteCore.ScriptEngine.DotNetEngine;
 using OpenMetaverse;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Remoting.Lifetime;
-using LSL_Float = WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.LSL_Types.LSLFloat;
-using LSL_Integer = WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.LSL_Types.LSLInteger;
-using LSL_Key = WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.LSL_Types.LSLString;
-using LSL_List = WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.LSL_Types.list;
-using LSL_Rotation = WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.LSL_Types.Quaternion;
-using LSL_String = WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.LSL_Types.LSLString;
-using LSL_Vector = WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.LSL_Types.Vector3;
-using ThreatLevel = WhiteCore.ScriptEngine.WhiteCoreDotNetEngine.ThreatLevel;
+using LSL_Float = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLFloat;
+using LSL_Integer = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLInteger;
+using LSL_Key = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
+using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.list;
+using LSL_Rotation = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Quaternion;
+using LSL_String = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
+using LSL_Vector = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Vector3;
+using ThreatLevel = WhiteCore.ScriptEngine.DotNetEngine.ThreatLevel;
 
 namespace WhiteCore.BotManager
 {

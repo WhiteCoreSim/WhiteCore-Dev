@@ -4,7 +4,20 @@ Rowan D <greythane@gmail.com>
 Fly-Man- <fly.man.opensim@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Apr 30 - Greythane
+* Renamed WhiteCoreOpenDynamicsEngine to OpenDynamicsEngine (WhiteCore.Physics)
+  - Revised all project files and folders
+  - Revised referring configuration items
+  - Revised main prebuild.xml
+* Renamed WhiteCoreDotNetEngine to DotNetEngine (WhiteCore.Scripting)
+  NOTE: This change requires deleting existing script dlls in bin/ScriptEngines
+  - Revised all project files and folders
+  - Revised referring configuration items
+  - Revised main prebuild.xml
+
 Apr 29 - Greythane
+* Concierge Module
+  - rebuilt for WhiteCore - to be fully tested
 * WorldView module
   - rebuilt for WhiteCore - interface needs to be implemented to fully test
 * update html code

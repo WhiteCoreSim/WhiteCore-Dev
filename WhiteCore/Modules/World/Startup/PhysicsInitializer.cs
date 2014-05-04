@@ -49,7 +49,7 @@ namespace WhiteCore.Modules.Startup
             if (PhysConfig != null)
             {
                 Path = PhysConfig.GetString("PathToPhysicsAssemblies", Path);
-                engine = PhysConfig.GetString("DefaultPhysicsEngine", "WhiteCoreOpenDynamicsEngine");
+                engine = PhysConfig.GetString("DefaultPhysicsEngine", "OpenDynamicsEngine");
                 meshEngine = MeshingConfig.GetString("DefaultMeshingEngine", "Meshmerizer");
                 string regionName = scene.RegionInfo.RegionName.Trim().Replace(' ', '_');
                 string RegionPhysicsEngine = PhysConfig.GetString("Region_" + regionName + "_PhysicsEngine",
@@ -64,7 +64,7 @@ namespace WhiteCore.Modules.Startup
             else
             {
                 //Load Sane defaults
-                engine = "WhiteCoreOpenDynamicsEngine";
+                engine = "OpenDynamicsEngine";
                 meshEngine = "Meshmerizer";
             }
             PhysicsPluginManager physicsPluginManager = new PhysicsPluginManager();

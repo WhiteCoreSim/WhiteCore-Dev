@@ -1,7 +1,7 @@
 [ScriptEngines]
     ;;
-    ;; If you want to run WhiteCoreDotNetEngine as your default engine, uncomment this
-    Include-ADNE = Configuration/Scripting/WhiteCoreDotNetEngine.ini
+    ;; If you want to run DotNetEngine as your default engine, uncomment this
+    Include-ADNE = Configuration/Scripting/DotNetEngine.ini
     ;;
     ;; If you would like to use MRM, uncomment this and edit its config file
     Include-MRM = Configuration/Scripting/MRM.ini

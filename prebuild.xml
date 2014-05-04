@@ -1346,7 +1346,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="WhiteCore.Physics.WhiteCoreOpenDynamicsEngine" path="WhiteCore/Physics/WhiteCoreOpenDynamicsEngine" type="Library">
+    <Project frameworkVersion="v4_0" name="WhiteCore.Physics.OpenDynamicsEngine" path="WhiteCore/Physics/OpenDynamicsEngine" type="Library">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../../bin/Physics/</OutputPath>
@@ -1394,7 +1394,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="WhiteCore.ScriptEngine.WhiteCoreDotNetEngine" path="WhiteCore/WhiteCoreDotNetEngine" type="Library">
+    <Project frameworkVersion="v4_0" name="WhiteCore.ScriptEngine.DotNetEngine" path="WhiteCore/DotNetEngine" type="Library">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../bin/</OutputPath>
@@ -1494,7 +1494,7 @@
 
       <Reference name="WhiteCore.DataManager"/>
       <Reference name="WhiteCore.Framework"/>
-      <Reference name="WhiteCore.ScriptEngine.WhiteCoreDotNetEngine"/>
+      <Reference name="WhiteCore.ScriptEngine.DotNetEngine"/>
       
       <Reference name="Nini" path="../../bin/"/>
       <Reference name="OpenMetaverse" path="../../bin/"/>
