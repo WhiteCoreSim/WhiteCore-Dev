@@ -17,7 +17,6 @@ If you are using the master build, you will need to compile WhiteCore-Sim before
   If you want to run more than one sim and allow remote sim connections, you want to run grid
       mode, and should jump to the grid section of this file.
 	  
-	  
 ##
 ## Standalone Mode
 ##
@@ -27,15 +26,10 @@ If you are using the master build, you will need to compile WhiteCore-Sim before
 ##
 ## Grid Mode
 ##
-  To run WhiteCore-Sim in grid mode, first run WhiteCore.Server.exe, and enter yes to allow it to
-      configure itself with the inputs from you. This sets up the server that deals with 
-	  viewer connections (mainly logins).
-  Next, you'll want to run the following secondary servers,
-      WhiteCore.AssetServer.exe
-	  WhiteCore.AvatarServer.exe
-	  WhiteCore.GridServer.exe
-	  WhiteCore.InventoryServer.exe
-  These do what the names suggest they do, and help balance the load of the regions on your grid.
+  To run WhiteCore-Sim in grid mode, Uncomment "Include-Single = WhiteCoreServerConfiguration/SingleServerInstance.ini" 
+	  in the WhiteCore.Server.ini file, setup the files under WhiteCoreServerConfiguration and then run WhiteCore.Server.exe, 
+	  and enter yes to allow it to configure itself with the inputs from you
+	  
   Next, you'll start WhiteCore.exe, and enter yes to allow it to configure itself (make sure to set it
       up in grid mode!) with the inputs from you. 
   Your grid is now fully configured, and to restart it, just start the same .exe files as above (without
@@ -45,19 +39,6 @@ If you are using the master build, you will need to compile WhiteCore-Sim before
 ## ADVANCED OPTIONS BELOW
 ##
 
-##
-## Running all servers just in WhiteCore.Server.exe (like WhiteCore was before, or Robust)
-##
-
-  To combine all of the WhiteCore.*Server.exe back into WhiteCore.Server.exe, open
-    WhiteCore.Server.ini
-    and look for [Handlers] and go to the bottom of that config.
-	You'll see an area that is commented out that says that it is the area to
-	set up WhiteCore.Server to run all of the services. 
-	Uncomment 
-	Include-Single = WhiteCoreServerConfiguration/SingleServerInstance.ini
-	Now you only have to run WhiteCore.Server.exe.
-	
 ##
 ## Setting up standalone to allow remote connections
 ##
@@ -124,4 +105,3 @@ This too is possible, and if you can do it, congratulations, just like above.
 1: Disable remote services for WhiteCore.exe in grid mode
     EG. Disabling the remote asset connector, and just have it directly
 	    access the database, so that WhiteCore.Server isn't as necessary.
-2. I'll think of more things I've done later...

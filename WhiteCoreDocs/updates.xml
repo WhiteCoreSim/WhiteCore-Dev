@@ -5,13 +5,17 @@
     //[2] - Newest version #
     //[3] - Date released
     //[4] - Release notes
-    //[5] - Download link
+    //[5] - Download link for Windows .Net
+	//[6] - Download link for Mono 32 Bit
+	//[7] - Download link for Mono 64 Bit
 -->
 <Updater>
-	<MinSupReleaseVersion>0.9.1</MinSupReleaseVersion>
-	<MinSupReleaseDate>December 16, 2013</MinSupReleaseDate>
+	<MinSupReleaseVersion>0.8</MinSupReleaseVersion>
+	<MinSupReleaseDate>April 16, 2011</MinSupReleaseDate>
 	<NewReleaseVersion>0.9.1</NewReleaseVersion>
-	<NewReleaseDate>December 16, 2013</NewReleaseDate>
-	<ReleaseNotes>http://whitecore-sim.org/index.php?page=news</ReleaseNotes>
-	<DownloadLink>https://github.com/downloads/whitecore-sim/WhitecoreRelease.zip</DownloadLink>
+	<NewReleaseDate>May 1, 2013</NewReleaseDate>
+	<ReleaseNotes>https://github.com/WhiteCoreSim/WhiteCore-Dev/releases/tag/0.9.1</ReleaseNotes>
+	<DownloadWinLink></DownloadWinLink>
+	<DownloadMono32Link></DownloadMono32Link>
+	<DownloadMono64Link></DownloadMono64Link>
 </Updater>
