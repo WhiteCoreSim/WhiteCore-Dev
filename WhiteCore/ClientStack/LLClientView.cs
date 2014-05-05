@@ -5964,7 +5964,7 @@ namespace WhiteCore.ClientStack
                     catch (Exception e)
                     {
                         MainConsole.Instance.ErrorFormat(
-                            "[LLCLIENTVIEW]: Exeception when handling generic message {0}{1}", e.Message, e.StackTrace);
+                            "[LLCLIENTVIEW]: Exception when handling generic message {0}{1}", e.Message, e.StackTrace);
                     }
                 }
             }

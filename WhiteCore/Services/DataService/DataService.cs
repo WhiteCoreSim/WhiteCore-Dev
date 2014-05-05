@@ -96,7 +96,7 @@ namespace WhiteCore.Services.DataService
                 catch (Exception ex)
                 {
                     if (MainConsole.Instance != null)
-                        MainConsole.Instance.Warn("[DataService]: Exeception occured starting data plugin " +
+                        MainConsole.Instance.Warn("[DataService]: Exception occured starting data plugin " +
                                                   plugin.Name + ", " + ex.ToString());
                 }
             }
@@ -151,7 +151,7 @@ namespace WhiteCore.Services.DataService
                     catch (Exception ex)
                     {
                         if (MainConsole.Instance != null)
-                            MainConsole.Instance.Warn("[DataService]: Exeception occured starting data plugin " +
+                            MainConsole.Instance.Warn("[DataService]: Exception occured starting data plugin " +
                                                       plugin.Name + ", " + ex.ToString());
                     }
                 }
