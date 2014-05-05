@@ -29,7 +29,6 @@ using WhiteCore.DataManager.Migration;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using Community.CsharpSqlite.SQLiteClient;
 using OpenMetaverse;
 using System;
 using System.Collections.Generic;
@@ -37,6 +36,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Community.CsharpSqlite.SQLiteClient;
 
 namespace WhiteCore.DataManager.SQLite
 {
@@ -66,17 +66,34 @@ namespace WhiteCore.DataManager.SQLite
 
         public override void ConnectToDatabase(string connectionString, string migratorName, bool validateTables)
         {
+        
+            // connection string in the format...
+            // Data Source=File:<db_filename>
             _connectionString = connectionString;
-            string[] s1 = _connectionString.Split(new[] {"Data Source=", ","}, StringSplitOptions.RemoveEmptyEntries);
+            string[] s1 = _connectionString.Split(new[] {"Data Source=", ";", ","}, StringSplitOptions.RemoveEmptyEntries);
 
-            s1[0] = s1[0].Remove(0, 7);
+            // first element should be file:<db_filename>
+            s1[0] = s1[0].Remove(0, 5);
+            _fileName = s1 [0];
 
-            _fileName = Path.GetFileName(s1[0]);
-            if (_fileName == s1[0]) //Only add this if we arn't an absolute path already
-                _connectionString = string.Format("Data Source=file://{0}", Path.Combine(Util.BasePathCombine(""), _fileName));
+            // some sanity checks
+            string filePath = Path.GetDirectoryName (s1[0]);
+            string fileName = Path.GetFileName (s1[0]);
+
+            if (filePath == "") //Only add this if we arn't an absolute path already
+            {
+                filePath = Util.BasePathCombine ("");
+                _connectionString = string.Format ("Data Source=file://{0}", Path.Combine (Util.BasePathCombine (""), fileName));
+            }
+
+            if (!Directory.Exists (filePath))
+                Directory.CreateDirectory (filePath);           // directory does not exist!
+            if (!File.Exists(_fileName))
+                File.Create(_fileName).Dispose();               // database file does not exist, create an empty one to use     
 
             SqliteConnection connection = new SqliteConnection(_connectionString);
-            connection.Open();
+
+            connection.Open ();
             var migrationManager = new MigrationManager(this, migratorName, validateTables);
             migrationManager.DetermineOperation();
             migrationManager.ExecuteOperation();
@@ -703,21 +720,29 @@ namespace WhiteCore.DataManager.SQLite
 
         public override bool TableExists(string tableName)
         {
+            // NOTE: SQLite ExecuteReader barfs if the database file(s) do not exists
             var cmd = PrepReader("SELECT name FROM Sqlite_master WHERE name='" + tableName + "'");
             lock (GetLock())
             {
-                using (IDataReader rdr = cmd.ExecuteReader())
+                try
                 {
-                    if (rdr.Read())
+                    using (IDataReader rdr = cmd.ExecuteReader())
                     {
-                        CloseReaderCommand(cmd);
-                        return true;
+                        if (rdr.Read())
+                        {
+                            CloseReaderCommand(cmd);
+                            return true;
+                        }
+                        else
+                        {
+                            CloseReaderCommand(cmd);
+                            return false;
+                        }
                     }
-                    else
-                    {
-                        CloseReaderCommand(cmd);
-                        return false;
-                    }
+                }
+                catch
+                {
+                    return false;
                 }
             }
         }
