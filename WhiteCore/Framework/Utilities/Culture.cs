@@ -67,11 +67,21 @@ namespace WhiteCore.Framework.Utilities
         public static string LocaleDate()
         {
             string df = Culture.SystemCultureInfo.DateTimeFormat.ShortDatePattern;
-            //string dt = DateTime.Now.ToString ("dd-MMM-yyyy",Culture.SystemCultureInfo);
-            string dt = DateTime.Now.ToString (df);
+            string dt = DateTime.Now.ToString ("dd-MMM-yy",Culture.SystemCultureInfo);
+            //string dt = DateTime.Now.ToString (df);
             return dt;
         }
 
+        /// <summary>
+        /// Returns a formatted date time string depending upon the system Locale.
+        /// Used for logging
+        /// </summary>
+        /// <returns>Local date time string.</returns>
+        public static string LocaleLogStamp()
+        {
+            string ts = DateTime.Now.ToString ("MMM dd hh:mm:ss",Culture.SystemCultureInfo);
+            return ts;
+        }
 
     }
 }

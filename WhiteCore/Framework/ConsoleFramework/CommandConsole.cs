@@ -248,7 +248,7 @@ namespace WhiteCore.Framework.ConsoleFramework
 
                                 foreach (string s in help)
                                 {
-                                    MainConsole.Instance.Format(Level.Off, s);
+                                    MainConsole.Instance.FormatNoTime(Level.Off, s);
                                 }
                                 return new string[0];
                             }
@@ -284,7 +284,7 @@ namespace WhiteCore.Framework.ConsoleFramework
                             }
                         }
                         // unable to determine multi word command
-                        MainConsole.Instance.Info (" Sorry.. missed that...");
+                        MainConsole.Instance.Warn (" Sorry.. missed that...");
                     }
                     else if(commandPath.Length > 0)
                     {
@@ -329,7 +329,7 @@ namespace WhiteCore.Framework.ConsoleFramework
                                 return new string[0];
                             } else
                             {
-                                MainConsole.Instance.Info (" Sorry.. missed that...");
+                                MainConsole.Instance.Warn (" Sorry.. missed that...");
                             }
 
                         }
@@ -396,7 +396,8 @@ namespace WhiteCore.Framework.ConsoleFramework
                             string cmdToExecute = commandPath[0];
                             if (cmdToExecute == "help")
                             {
-                                cmdToExecute = commandPath[1];
+                                if (commandPath.Length > 1)
+                                    cmdToExecute = commandPath[1];
                             }
                             if (!_ConsoleIsCaseSensitive)
                             {
@@ -454,7 +455,7 @@ namespace WhiteCore.Framework.ConsoleFramework
 
             public List<string> GetHelp(List<string> options)
             {
-                MainConsole.Instance.Info("HTML mode: " + options.Contains("--html"));
+                MainConsole.Instance.Debug("HTML mode: " + options.Contains("--html"));
                 List<string> help = new List<string>();
                 if (commandsets.Count != 0)
                 {
@@ -471,16 +472,20 @@ namespace WhiteCore.Framework.ConsoleFramework
                 {
                     help.Add("");
                     help.Add("------- Help options -------");
-                    help.Add("");
                 }
                 paths.Clear();
 
                 paths.AddRange(
+                    //    commands.Values.Select(
+                    //    command =>
+                    //    string.Format("-- {0}  [{1}]:   {2}", command.command, command.commandHelp, command.info)));
                     commands.Values.Select(
                         command =>
-                        string.Format("-- {0}  [{1}]:   {2}", command.command, command.commandHelp, command.info)));
+                        string.Format("-- {0}:\n      {1}", command.commandHelp, command.info.Replace("\n","\n        "))));
 
+                help.Add("");
                 help.AddRange(StringUtils.AlphanumericSort(paths));
+                help.Add("");
                 return help;
             }
         }
@@ -563,7 +568,7 @@ namespace WhiteCore.Framework.ConsoleFramework
             List<string> help = m_Commands.GetHelp(cmd);
 
             foreach (string s in help)
-                Output(s, Level.Off);
+                OutputNoTime(s, Level.Off);
         }
 
         /// <summary>
@@ -709,10 +714,7 @@ namespace WhiteCore.Framework.ConsoleFramework
             if (Threshold <= level)
             {
                 MainConsole.TriggerLog(level.ToString(), text);
-                text = string.Format ("[{0}] {1}: {2}",
-                    Culture.LocaleDate (),
-                    DateTime.Now.ToString ("hh:mm:ss"),
-                    text);
+                text = string.Format ("{0} ; {1}", Culture.LocaleLogStamp (), text);
 
                 Console.WriteLine(text);
                 if (m_logFile != null)
@@ -871,6 +873,11 @@ namespace WhiteCore.Framework.ConsoleFramework
         public void Format(Level level, string format, params object[] args)
         {
             Output(string.Format(format, args), level);
+        }
+
+        public void FormatNoTime(Level level, string format, params object[] args)
+        {
+            OutputNoTime(string.Format(format, args), level);
         }
 
         public void Info(object message)

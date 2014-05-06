@@ -1323,7 +1323,7 @@ namespace WhiteCore.Region
             if (MainConsole.Instance.ConsoleScene == null)
             {
                 if ( m_scenes.IndexOf(scene) == 0 )
-                    MainConsole.Instance.Info ("[SceneManager]: Operating on the 'root' will load the OAR into all regions");
+                    MainConsole.Instance.Warn ("[SceneManager]: Operating on the 'root' will load the OAR into all regions");
                 if (MainConsole.Instance.Prompt ("[SceneManager]: Do you wish to load this OAR into " + regionName + "? (yes/no)", "no") != "yes")
                     return;
             }
@@ -1442,7 +1442,7 @@ namespace WhiteCore.Region
                     return;          // no need to continue searching as we have done it.
                 }
             }
-            MainConsole.Instance.InfoFormat("Sorry.. could not find '{0}'", primName);
+            MainConsole.Instance.WarnFormat("Sorry.. could not find '{0}'", primName);
        
         }
 
@@ -1489,9 +1489,9 @@ namespace WhiteCore.Region
             }
             if (!found)
                 if (objectName == null)
-                    MainConsole.Instance.Info (" There does not appear to be any objects in this region");
+                MainConsole.Instance.Warn (" There does not appear to be any objects in this region");
                 else
-                    MainConsole.Instance.InfoFormat("Sorry.. could not find '{0}'", objectName);
+                MainConsole.Instance.WarnFormat("Sorry.. could not find '{0}'", objectName);
 
         }
 

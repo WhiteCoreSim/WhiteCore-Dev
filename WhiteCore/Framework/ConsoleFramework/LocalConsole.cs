@@ -369,20 +369,19 @@ namespace WhiteCore.Framework.ConsoleFramework
             if (Threshold <= level)
             {
                 MainConsole.TriggerLog(level.ToString(), text);
-                text = string.Format ("[{0}] {1}: {2}",
-                    Culture.LocaleDate (),
-                    DateTime.Now.ToString ("hh:mm:ss"),
-                    text);
-                MainConsole.TriggerLog(level.ToString(), text);
+                string ts = Culture.LocaleLogStamp () + " - ";
+                string fullText = string.Format ("{0} {1}", ts, text);
+                MainConsole.TriggerLog(level.ToString(), fullText);
                 if (m_logFile != null)
                 {
-                    m_logFile.WriteLine(text);
+                    m_logFile.WriteLine(fullText);
                     m_logFile.Flush();
                 }
                 lock (cmdline)
                 {
                     if (y == -1)
                     {
+                        WriteColorText(ConsoleColor.DarkCyan, ts);
                         WriteLocalText(text, level);
 
                         return;
@@ -399,6 +398,7 @@ namespace WhiteCore.Framework.ConsoleFramework
                     y = SetCursorTop(y);
                     SetCursorLeft(0);
 
+                    WriteColorText(ConsoleColor.DarkCyan, ts);
                     WriteLocalText(text, level);
 
                     y = Console.CursorTop;
@@ -422,11 +422,11 @@ namespace WhiteCore.Framework.ConsoleFramework
             string[] opts = Commands.FindNextOption(words);
 
             if (opts.Length == 0)
-                Output("No options.", Threshold);
+                OutputNoTime("\n  No options.", Threshold);
             else if (opts[0].StartsWith("Command help:"))
-                Output(opts[0], Threshold);
+                OutputNoTime("\n  " + opts[0], Threshold);
             else
-                Output(String.Format("Options: {0}", String.Join("\n         ", opts)), Threshold);
+                OutputNoTime(String.Format("\n  Options: {0}", String.Join("\n           ", opts)), Threshold);
 
             return true;
         }

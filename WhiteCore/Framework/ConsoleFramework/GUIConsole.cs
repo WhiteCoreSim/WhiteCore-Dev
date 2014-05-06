@@ -376,6 +376,10 @@ namespace WhiteCore.Framework.ConsoleFramework
             Output(string.Format(format, args), level);
         }
 
+        public void FormatNoTime(Level level, string format, params object[] args)
+        {
+            OutputNoTime(string.Format(format, args), level);
+        }
         public void Info(object message)
         {
             Output(message.ToString(), Level.Info);

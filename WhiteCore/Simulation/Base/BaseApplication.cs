@@ -185,7 +185,7 @@ namespace WhiteCore.Simulation.Base
                     string welcomeMessage = "";
                     string allowAnonLogin = "true";
                     uint port = 9000;
-                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("====================================================================");
 					Console.WriteLine("======================= WhiteCore CONFIGURATOR =====================");
                     Console.WriteLine("====================================================================");

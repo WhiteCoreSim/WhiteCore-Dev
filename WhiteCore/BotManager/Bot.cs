@@ -735,7 +735,7 @@ namespace WhiteCore.BotManager
             List<Vector3> waypoints = new List<Vector3>();
             if (points.Contains("no_path"))
             {
-                MainConsole.Instance.Debug("I'm sorry I could not find a solution to that path. Teleporting instead");
+                MainConsole.Instance.Warn("I'm sorry I could not find a solution to that path. Teleporting instead");
                 return waypoints;
             }
 
