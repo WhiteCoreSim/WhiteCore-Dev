@@ -22,7 +22,7 @@ In Configuration/Modules/VoiceModules.ini, you will find a section
 ## Grid setup
 ##
 
-In WhiteCoreServerConfiguration/Modules/VoiceModules.ini, you will find a section
+In ServerConfiguration/Modules/VoiceModules.ini, you will find a section
   with [Voice], you will need to comment (put a ;) in front of 
     Module = GenericVoice
 

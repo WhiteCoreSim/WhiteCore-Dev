@@ -26,8 +26,8 @@ If you are using the master build, you will need to compile WhiteCore-Sim before
 ##
 ## Grid Mode
 ##
-  To run WhiteCore-Sim in grid mode, Uncomment "Include-Single = WhiteCoreServerConfiguration/SingleServerInstance.ini" 
-	  in the WhiteCore.Server.ini file, setup the files under WhiteCoreServerConfiguration and then run WhiteCore.Server.exe, 
+  To run WhiteCore-Sim in grid mode, Uncomment "Include-Single = ServerConfiguration/SingleServerInstance.ini" 
+	  in the WhiteCore.Server.ini file, setup the files under ServerConfiguration and then run WhiteCore.Server.exe, 
 	  and enter yes to allow it to configure itself with the inputs from you
 	  
   Next, you'll start WhiteCore.exe, and enter yes to allow it to configure itself (make sure to set it

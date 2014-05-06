@@ -13,7 +13,7 @@ How to enable for regions:
    
 Additional setup for grids:
 
-   1. Open WhiteCoreServerConfiguration/Modules/Economy.ini.example
+   1. Open ServerConfiguration/Modules/Economy.ini.example
    2. Make sure that you read the WARNING in Economy.ini before running this module!
    3. Comment the line "Module = BaseCurrency"
    4. Uncomment the line "Module = SimpleCurrency"
