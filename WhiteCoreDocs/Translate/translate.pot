@@ -64,10 +64,16 @@ msgstr ""
 msgid "Login"
 msgstr ""
 
-msgid "UserName\"UserNameText"
+msgid "UserName"
 msgstr ""
 
-msgid "Password\"PasswordText"
+msgid "UserNameText"
+msgstr ""
+
+msgid "Password"
+msgstr ""
+
+msgid "PasswordText"
 msgstr ""
 
 msgid "PasswordConfirmation"
@@ -145,7 +151,6 @@ msgstr ""
 msgid "Accept"
 msgstr ""
 
-#. news
 msgid "OpenNewsManager"
 msgstr ""
 
@@ -236,7 +241,6 @@ msgstr ""
 msgid "ParcelOwnerText"
 msgstr ""
 
-#. Region Page
 msgid "RegionInfoText"
 msgstr ""
 
@@ -291,7 +295,6 @@ msgstr ""
 msgid "NumberOfUsersInRegionText"
 msgstr ""
 
-#. Menu Buttons
 msgid "MenuHome"
 msgstr ""
 
@@ -370,7 +373,6 @@ msgstr ""
 msgid "MenuManager"
 msgstr ""
 
-#. Tooltips Menu Buttons
 msgid "TooltipsMenuHome"
 msgstr ""
 
@@ -443,7 +445,6 @@ msgstr ""
 msgid "TooltipsMenuManager"
 msgstr ""
 
-#. Menu Region
 msgid "MenuRegionTitle"
 msgstr ""
 
@@ -453,7 +454,6 @@ msgstr ""
 msgid "MenuOwnerTitle"
 msgstr ""
 
-#. Menu Profile
 msgid "MenuProfileTitle"
 msgstr ""
 
@@ -463,18 +463,15 @@ msgstr ""
 msgid "MenuPicksTitle"
 msgstr ""
 
-#. Urls
 msgid "WelcomeScreen"
 msgstr ""
 
-#. Tooltips Urls
 msgid "TooltipsWelcomeScreen"
 msgstr ""
 
 msgid "TooltipsWorldMap"
 msgstr ""
 
-#. Style Switcher
 msgid "styles1"
 msgstr ""
 
@@ -499,7 +496,6 @@ msgstr ""
 msgid "StyleSwitcherChoiceText"
 msgstr ""
 
-#. Language Switcher Tooltips
 msgid "en"
 msgstr ""
 
@@ -515,7 +511,6 @@ msgstr ""
 msgid "es"
 msgstr ""
 
-#. Index Page
 msgid "HomeText"
 msgstr ""
 
@@ -528,18 +523,15 @@ msgstr ""
 msgid "WelcomeToText"
 msgstr ""
 
-#. World Map Page
 msgid "WorldMap"
 msgstr ""
 
 msgid "WorldMapText"
 msgstr ""
 
-#. Chat Page
 msgid "ChatText"
 msgstr ""
 
-#. Help Page
 msgid "HelpText"
 msgstr ""
 
@@ -549,10 +541,10 @@ msgstr ""
 msgid "AngstormViewer"
 msgstr ""
 
-msgid "VoodooViewer"
+msgid "AstraViewer"
 msgstr ""
 
-msgid "AstraViewer"
+msgid "FirestormViewer"
 msgstr ""
 
 msgid "ImprudenceViewer"
@@ -562,6 +554,9 @@ msgid "PhoenixViewer"
 msgstr ""
 
 msgid "SingularityViewer"
+msgstr ""
+
+msgid "VoodooViewer"
 msgstr ""
 
 msgid "ZenViewer"
@@ -597,10 +592,10 @@ msgstr ""
 msgid "DeleteText"
 msgstr ""
 
-msgid ""
-"DeleteUserInfoText\"This will remove all information about you in the grid and "
-"remove your access to this service. If you wish to continue, enter your name "
-"and password and click Delete.\"EditText"
+msgid "DeleteUserInfoText"
+msgstr ""
+
+msgid "EditText"
 msgstr ""
 
 msgid "EditUserAccountText"
@@ -687,10 +682,10 @@ msgstr ""
 msgid "AdminLoginInAsUserText"
 msgstr ""
 
-msgid ""
-"AdminLoginInAsUserInfoText\"You will be logged out of your admin account, and "
-"logged in as this user, and will see everything as they see it."
-"\"TimeUntilUnbannedText"
+msgid "AdminLoginInAsUserInfoText"
+msgstr ""
+
+msgid "TimeUntilUnbannedText"
 msgstr ""
 
 msgid "DaysText"
@@ -747,9 +742,10 @@ msgstr ""
 msgid "Pages"
 msgstr ""
 
-msgid ""
-"DefaultsUpdated\"defaults updated, go to Factory Reset to update or Settings "
-"Manager to disable this warning.\"PageManager"
+msgid "DefaultsUpdated"
+msgstr ""
+
+msgid "PageManager"
 msgstr ""
 
 msgid "SaveMenuItemChanges"

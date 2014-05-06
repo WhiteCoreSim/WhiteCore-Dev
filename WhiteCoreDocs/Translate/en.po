@@ -108,8 +108,6 @@ msgid "TermsOfServiceAccept"
 msgstr "Do you accept the Terms of Service as detailed above?"
 msgid "Accept"
 msgstr "Accept"
-
-// news
 msgid "OpenNewsManager"
 msgstr "Open the news manager"
 msgid "NewsManager"
@@ -172,7 +170,6 @@ msgstr "Parcel Name"
 msgid "ParcelOwnerText"
 msgstr "Parcel Owner's Name"
 
-// Region Page
 msgid "RegionInfoText"
 msgstr "Region Info"
 msgid "RegionListText"
@@ -210,7 +207,6 @@ msgstr "Region Status"
 msgid "NumberOfUsersInRegionText"
 msgstr "Number of Users in region"
 
-// Menu Buttons
 msgid "MenuHome"
 msgstr "Home"
 msgid "MenuLogin"
@@ -264,7 +260,6 @@ msgstr "Settings Manager"
 msgid "MenuManager"
 msgstr "Admin"
 
-// Tooltips Menu Buttons
 msgid "TooltipsMenuHome"
 msgstr "Home"
 msgid "TooltipsMenuLogin"
@@ -314,7 +309,6 @@ msgstr "Settings Manager"
 msgid "TooltipsMenuManager"
 msgstr "Admin Management"
 
-// Menu Region
 msgid "MenuRegionTitle"
 msgstr "Region"
 msgid "MenuParcelTitle"
@@ -322,7 +316,6 @@ msgstr "Parcel"
 msgid "MenuOwnerTitle"
 msgstr "Owner"
 
-// Menu Profile
 msgid "MenuProfileTitle"
 msgstr "Profile"
 msgid "MenuGroupTitle"
@@ -330,17 +323,14 @@ msgstr "Group"
 msgid "MenuPicksTitle"
 msgstr "Picks"
 
-// Urls
 msgid "WelcomeScreen"
 msgstr "Welcome Screen"
 
-// Tooltips Urls
 msgid "TooltipsWelcomeScreen"
 msgstr "Welcome Screen"
 msgid "TooltipsWorldMap"
 msgstr "World Map"
 
-// Style Switcher
 msgid "styles1"
 msgstr "Default Minimalist"
 msgid "styles2"
@@ -359,7 +349,6 @@ msgstr "Languages"
 msgid "StyleSwitcherChoiceText"
 msgstr "Choice"
 
-// Language Switcher Tooltips
 msgid "en"
 msgstr "English"
 msgid "fr"
@@ -371,7 +360,6 @@ msgstr "Italian"
 msgid "es"
 msgstr "Spanish"
 
-// Index Page
 msgid "HomeText"
 msgstr "Home"
 msgid "HomeTextWelcome"
@@ -381,17 +369,14 @@ msgstr "New presentations"
 msgid "WelcomeToText"
 msgstr "Welcome to"
 
-// World Map Page
 msgid "WorldMap"
 msgstr "World Map"
 msgid "WorldMapText"
 msgstr "Full Screen"
 
-// Chat Page
 msgid "ChatText"
 msgstr "Chat Support"
 
-// Help Page
 msgid "HelpText"
 msgstr "Help"
 msgid "HelpViewersConfigText"
@@ -413,13 +398,11 @@ msgstr "Voodoo Viewer"
 msgid "ZenViewer"
 msgstr "Zen Viewer"
 
-//Logout page
 msgid "Logout"
 msgstr "Logout"
 msgid "LoggedOutSuccessfullyText"
 msgstr "You have been logged out successfully."
 
-//Change user information page
 msgid "ChangeUserInformationText"
 msgstr "Change User Information"
 msgid "ChangePasswordText"
@@ -444,13 +427,11 @@ msgstr "Edit"
 msgid "EditUserAccountText"
 msgstr "Edit User Account"
 
-//Maintenance page
 msgid "WebsiteDownInfoText"
 msgstr "Website is currently down, please try again soon."
 msgid "WebsiteDownText"
 msgstr "Website offline"
 
-//http_404 page
 msgid "Error404Text"
 msgstr "Error code"
 msgid "Error404InfoText"
@@ -458,7 +439,6 @@ msgstr "404 Page Not Found"
 msgid "HomePage404Text"
 msgstr "home page"
 
-//http_505 page
 msgid "Error505Text"
 msgstr "Error code"
 msgid "Error505InfoText"
@@ -466,7 +446,6 @@ msgstr "505 Internal Server Error"
 msgid "HomePage505Text"
 msgstr "home page"
 
-//user_search page
 msgid "Search"
 msgstr "Search"
 msgid "SearchText"
@@ -478,7 +457,6 @@ msgstr "User Search"
 msgid "SearchResultForUserText"
 msgstr "Search Result For User"
 
-//region_search page
 msgid "SearchForRegionText"
 msgstr "Search For A Region"
 msgid "RegionSearchText"
@@ -486,7 +464,6 @@ msgstr "Region Search"
 msgid "SearchResultForRegionText"
 msgstr "Search Result For Region"
 
-//Edit user page
 msgid "AdminDeleteUserText"
 msgstr "Delete User"
 msgid "AdminDeleteUserInfoText"
@@ -539,7 +516,6 @@ msgstr "Sends a user a blue-box message (will arrive within 30 seconds)"
 msgid "MessageUserText"
 msgstr "Message User"
 
-//factory_reset
 msgid "FactoryReset"
 msgstr "Factory Reset"
 msgid "ResetMenuText"
@@ -556,7 +532,6 @@ msgid "DefaultsUpdated"
 msgstr
 "defaults updated, go to Factory Reset to update or Settings Manager to disable this warning."
 
-//page_manager
 msgid "PageManager"
 msgstr "Page Manager"
 msgid "SaveMenuItemChanges"
@@ -590,7 +565,6 @@ msgstr "Requires Admin To View"
 msgid "RequiresAdminLevelText"
 msgstr "Required Admin Level To View"
 
-//settings manager page
 msgid "Save"
 msgstr "Save"
 msgid "GridCenterXText"
@@ -604,7 +578,6 @@ msgstr "Ignore pages update warning until next update"
 msgid "IgnoreSettingsUpdatesText"
 msgstr "Ignore settings update warning until next update"
 
-//Times
 msgid "Sun"
 msgstr "Sun"
 msgid "Mon"
@@ -684,7 +657,6 @@ msgstr "November"
 msgid "December"
 msgstr "December"
 
-// ColorBox
 msgid "ColorBoxImageText"
 msgstr "Image"
 msgid "ColorBoxOfText"
@@ -701,7 +673,6 @@ msgid "ColorBoxStopSlideshowText"
 msgstr "Stop Slide Show"
 
 
-// English only so far
 msgid "NoAccountFound"
 msgstr "No account found"
 msgid "DisplayInMenu"
