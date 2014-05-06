@@ -1,0 +1,972 @@
+#. Loco Gettext template
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: translate.pot conversion\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: Tue May 06 2014 20:22:41 GMT+0200\n"
+"POT-Revision-Date: Tue May 06 2014 20:23:04 GMT+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: \n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Loco-Source-Locale: nl_NL\n"
+"X-Loco-Parser: loco_parse_po\n"
+"X-Generator: Loco - https://localise.biz/"
+
+msgid "GridStatus"
+msgstr ""
+
+msgid "Online"
+msgstr ""
+
+msgid "Offline"
+msgstr ""
+
+msgid "TotalUserCount"
+msgstr ""
+
+msgid "TotalRegionCount"
+msgstr ""
+
+msgid "UniqueVisitors"
+msgstr ""
+
+msgid "OnlineNow"
+msgstr ""
+
+msgid "HyperGrid"
+msgstr ""
+
+msgid "Voice"
+msgstr ""
+
+msgid "Currency"
+msgstr ""
+
+msgid "Disabled"
+msgstr ""
+
+msgid "Enabled"
+msgstr ""
+
+msgid "News"
+msgstr ""
+
+msgid "Region"
+msgstr ""
+
+msgid "Login"
+msgstr ""
+
+msgid "UserName\"UserNameText"
+msgstr ""
+
+msgid "Password\"PasswordText"
+msgstr ""
+
+msgid "PasswordConfirmation"
+msgstr ""
+
+msgid "ForgotPassword"
+msgstr ""
+
+msgid "Submit"
+msgstr ""
+
+msgid "TypeUserNameToConfirm"
+msgstr ""
+
+msgid "SpecialWindowTitleText"
+msgstr ""
+
+msgid "SpecialWindowTextText"
+msgstr ""
+
+msgid "SpecialWindowColorText"
+msgstr ""
+
+msgid "SpecialWindowStatusText"
+msgstr ""
+
+msgid "WelcomeScreenManagerFor"
+msgstr ""
+
+msgid "ChangesSavedSuccessfully"
+msgstr ""
+
+msgid "AvatarNameText"
+msgstr ""
+
+msgid "AvatarScopeText"
+msgstr ""
+
+msgid "FirstNameText"
+msgstr ""
+
+msgid "LastNameText"
+msgstr ""
+
+msgid "UserAddressText"
+msgstr ""
+
+msgid "UserZipText"
+msgstr ""
+
+msgid "UserCityText"
+msgstr ""
+
+msgid "UserCountryText"
+msgstr ""
+
+msgid "UserDOBText"
+msgstr ""
+
+msgid "UserEmailText"
+msgstr ""
+
+msgid "RegistrationText"
+msgstr ""
+
+msgid "RegistrationsDisabled"
+msgstr ""
+
+msgid "TermsOfServiceText"
+msgstr ""
+
+msgid "TermsOfServiceAccept"
+msgstr ""
+
+msgid "Accept"
+msgstr ""
+
+#. news
+msgid "OpenNewsManager"
+msgstr ""
+
+msgid "NewsManager"
+msgstr ""
+
+msgid "EditNewsItem"
+msgstr ""
+
+msgid "AddNewsItem"
+msgstr ""
+
+msgid "DeleteNewsItem"
+msgstr ""
+
+msgid "NewsDateText"
+msgstr ""
+
+msgid "NewsTitleText"
+msgstr ""
+
+msgid "NewsItemTitle"
+msgstr ""
+
+msgid "NewsItemText"
+msgstr ""
+
+msgid "AddNewsText"
+msgstr ""
+
+msgid "DeleteNewsText"
+msgstr ""
+
+msgid "EditNewsText"
+msgstr ""
+
+msgid "UserProfileFor"
+msgstr ""
+
+msgid "UsersGroupsText"
+msgstr ""
+
+msgid "UsersPicksText"
+msgstr ""
+
+msgid "ResidentSince"
+msgstr ""
+
+msgid "AccountType"
+msgstr ""
+
+msgid "PartnersName"
+msgstr ""
+
+msgid "AboutMe"
+msgstr ""
+
+msgid "IsOnlineText"
+msgstr ""
+
+msgid "OnlineLocationText"
+msgstr ""
+
+msgid "RegionInformationText"
+msgstr ""
+
+msgid "OwnerNameText"
+msgstr ""
+
+msgid "RegionLocationText"
+msgstr ""
+
+msgid "RegionSizeText"
+msgstr ""
+
+msgid "RegionNameText"
+msgstr ""
+
+msgid "RegionTypeText"
+msgstr ""
+
+msgid "ParcelsInRegionText"
+msgstr ""
+
+msgid "ParcelNameText"
+msgstr ""
+
+msgid "ParcelOwnerText"
+msgstr ""
+
+#. Region Page
+msgid "RegionInfoText"
+msgstr ""
+
+msgid "RegionListText"
+msgstr ""
+
+msgid "RegionLocXText"
+msgstr ""
+
+msgid "RegionLocYText"
+msgstr ""
+
+msgid "SortByLocX"
+msgstr ""
+
+msgid "SortByLocY"
+msgstr ""
+
+msgid "SortByName"
+msgstr ""
+
+msgid "RegionMoreInfo"
+msgstr ""
+
+msgid "RegionMoreInfoTooltips"
+msgstr ""
+
+msgid "FirstText"
+msgstr ""
+
+msgid "BackText"
+msgstr ""
+
+msgid "NextText"
+msgstr ""
+
+msgid "LastText"
+msgstr ""
+
+msgid "CurrentPageText"
+msgstr ""
+
+msgid "MoreInfoText"
+msgstr ""
+
+msgid "OnlineUsersText"
+msgstr ""
+
+msgid "RegionOnlineText"
+msgstr ""
+
+msgid "NumberOfUsersInRegionText"
+msgstr ""
+
+#. Menu Buttons
+msgid "MenuHome"
+msgstr ""
+
+msgid "MenuLogin"
+msgstr ""
+
+msgid "MenuLogout"
+msgstr ""
+
+msgid "MenuRegister"
+msgstr ""
+
+msgid "MenuForgotPass"
+msgstr ""
+
+msgid "MenuNews"
+msgstr ""
+
+msgid "MenuWorld"
+msgstr ""
+
+msgid "MenuWorldMap"
+msgstr ""
+
+msgid "MenuRegion"
+msgstr ""
+
+msgid "MenuUser"
+msgstr ""
+
+msgid "MenuOnlineUsers"
+msgstr ""
+
+msgid "MenuUserSearch"
+msgstr ""
+
+msgid "MenuRegionSearch"
+msgstr ""
+
+msgid "MenuChat"
+msgstr ""
+
+msgid "MenuHelp"
+msgstr ""
+
+msgid "MenuViewerHelp"
+msgstr ""
+
+msgid "MenuChangeUserInformation"
+msgstr ""
+
+msgid "MenuWelcomeScreenManager"
+msgstr ""
+
+msgid "MenuNewsManager"
+msgstr ""
+
+msgid "MenuUserManager"
+msgstr ""
+
+msgid "MenuFactoryReset"
+msgstr ""
+
+msgid "ResetMenuInfoText"
+msgstr ""
+
+msgid "ResetSettingsInfoText"
+msgstr ""
+
+msgid "MenuPageManager"
+msgstr ""
+
+msgid "MenuSettingsManager"
+msgstr ""
+
+msgid "MenuManager"
+msgstr ""
+
+#. Tooltips Menu Buttons
+msgid "TooltipsMenuHome"
+msgstr ""
+
+msgid "TooltipsMenuLogin"
+msgstr ""
+
+msgid "TooltipsMenuLogout"
+msgstr ""
+
+msgid "TooltipsMenuRegister"
+msgstr ""
+
+msgid "TooltipsMenuForgotPass"
+msgstr ""
+
+msgid "TooltipsMenuNews"
+msgstr ""
+
+msgid "TooltipsMenuWorld"
+msgstr ""
+
+msgid "TooltipsMenuWorldMap"
+msgstr ""
+
+msgid "TooltipsMenuRegion"
+msgstr ""
+
+msgid "TooltipsMenuUser"
+msgstr ""
+
+msgid "TooltipsMenuOnlineUsers"
+msgstr ""
+
+msgid "TooltipsMenuUserSearch"
+msgstr ""
+
+msgid "TooltipsMenuRegionSearch"
+msgstr ""
+
+msgid "TooltipsMenuChat"
+msgstr ""
+
+msgid "TooltipsMenuViewerHelp"
+msgstr ""
+
+msgid "TooltipsMenuHelp"
+msgstr ""
+
+msgid "TooltipsMenuChangeUserInformation"
+msgstr ""
+
+msgid "TooltipsMenuWelcomeScreenManager"
+msgstr ""
+
+msgid "TooltipsMenuNewsManager"
+msgstr ""
+
+msgid "TooltipsMenuUserManager"
+msgstr ""
+
+msgid "TooltipsMenuFactoryReset"
+msgstr ""
+
+msgid "TooltipsMenuPageManager"
+msgstr ""
+
+msgid "TooltipsMenuSettingsManager"
+msgstr ""
+
+msgid "TooltipsMenuManager"
+msgstr ""
+
+#. Menu Region
+msgid "MenuRegionTitle"
+msgstr ""
+
+msgid "MenuParcelTitle"
+msgstr ""
+
+msgid "MenuOwnerTitle"
+msgstr ""
+
+#. Menu Profile
+msgid "MenuProfileTitle"
+msgstr ""
+
+msgid "MenuGroupTitle"
+msgstr ""
+
+msgid "MenuPicksTitle"
+msgstr ""
+
+#. Urls
+msgid "WelcomeScreen"
+msgstr ""
+
+#. Tooltips Urls
+msgid "TooltipsWelcomeScreen"
+msgstr ""
+
+msgid "TooltipsWorldMap"
+msgstr ""
+
+#. Style Switcher
+msgid "styles1"
+msgstr ""
+
+msgid "styles2"
+msgstr ""
+
+msgid "styles3"
+msgstr ""
+
+msgid "styles4"
+msgstr ""
+
+msgid "styles5"
+msgstr ""
+
+msgid "StyleSwitcherStylesText"
+msgstr ""
+
+msgid "StyleSwitcherLanguagesText"
+msgstr ""
+
+msgid "StyleSwitcherChoiceText"
+msgstr ""
+
+#. Language Switcher Tooltips
+msgid "en"
+msgstr ""
+
+msgid "fr"
+msgstr ""
+
+msgid "de"
+msgstr ""
+
+msgid "it"
+msgstr ""
+
+msgid "es"
+msgstr ""
+
+#. Index Page
+msgid "HomeText"
+msgstr ""
+
+msgid "HomeTextWelcome"
+msgstr ""
+
+msgid "HomeTextTips"
+msgstr ""
+
+msgid "WelcomeToText"
+msgstr ""
+
+#. World Map Page
+msgid "WorldMap"
+msgstr ""
+
+msgid "WorldMapText"
+msgstr ""
+
+#. Chat Page
+msgid "ChatText"
+msgstr ""
+
+#. Help Page
+msgid "HelpText"
+msgstr ""
+
+msgid "HelpViewersConfigText"
+msgstr ""
+
+msgid "AngstormViewer"
+msgstr ""
+
+msgid "VoodooViewer"
+msgstr ""
+
+msgid "AstraViewer"
+msgstr ""
+
+msgid "ImprudenceViewer"
+msgstr ""
+
+msgid "PhoenixViewer"
+msgstr ""
+
+msgid "SingularityViewer"
+msgstr ""
+
+msgid "ZenViewer"
+msgstr ""
+
+msgid "Logout"
+msgstr ""
+
+msgid "LoggedOutSuccessfullyText"
+msgstr ""
+
+msgid "ChangeUserInformationText"
+msgstr ""
+
+msgid "ChangePasswordText"
+msgstr ""
+
+msgid "NewPasswordText"
+msgstr ""
+
+msgid "NewPasswordConfirmationText"
+msgstr ""
+
+msgid "ChangeEmailText"
+msgstr ""
+
+msgid "NewEmailText"
+msgstr ""
+
+msgid "DeleteUserText"
+msgstr ""
+
+msgid "DeleteText"
+msgstr ""
+
+msgid ""
+"DeleteUserInfoText\"This will remove all information about you in the grid and "
+"remove your access to this service. If you wish to continue, enter your name "
+"and password and click Delete.\"EditText"
+msgstr ""
+
+msgid "EditUserAccountText"
+msgstr ""
+
+msgid "WebsiteDownInfoText"
+msgstr ""
+
+msgid "WebsiteDownText"
+msgstr ""
+
+msgid "Error404Text"
+msgstr ""
+
+msgid "Error404InfoText"
+msgstr ""
+
+msgid "HomePage404Text"
+msgstr ""
+
+msgid "Error505Text"
+msgstr ""
+
+msgid "Error505InfoText"
+msgstr ""
+
+msgid "HomePage505Text"
+msgstr ""
+
+msgid "Search"
+msgstr ""
+
+msgid "SearchText"
+msgstr ""
+
+msgid "SearchForUserText"
+msgstr ""
+
+msgid "UserSearchText"
+msgstr ""
+
+msgid "SearchResultForUserText"
+msgstr ""
+
+msgid "SearchForRegionText"
+msgstr ""
+
+msgid "RegionSearchText"
+msgstr ""
+
+msgid "SearchResultForRegionText"
+msgstr ""
+
+msgid "AdminDeleteUserText"
+msgstr ""
+
+msgid "AdminDeleteUserInfoText"
+msgstr ""
+
+msgid "BanText"
+msgstr ""
+
+msgid "UnbanText"
+msgstr ""
+
+msgid "AdminTempBanUserText"
+msgstr ""
+
+msgid "AdminTempBanUserInfoText"
+msgstr ""
+
+msgid "AdminBanUserText"
+msgstr ""
+
+msgid "AdminBanUserInfoText"
+msgstr ""
+
+msgid "AdminUnbanUserText"
+msgstr ""
+
+msgid "AdminUnbanUserInfoText"
+msgstr ""
+
+msgid "AdminLoginInAsUserText"
+msgstr ""
+
+msgid ""
+"AdminLoginInAsUserInfoText\"You will be logged out of your admin account, and "
+"logged in as this user, and will see everything as they see it."
+"\"TimeUntilUnbannedText"
+msgstr ""
+
+msgid "DaysText"
+msgstr ""
+
+msgid "HoursText"
+msgstr ""
+
+msgid "MinutesText"
+msgstr ""
+
+msgid "EdittingText"
+msgstr ""
+
+msgid "BannedUntilText"
+msgstr ""
+
+msgid "KickAUserText"
+msgstr ""
+
+msgid "KickAUserInfoText"
+msgstr ""
+
+msgid "KickMessageText"
+msgstr ""
+
+msgid "KickUserText"
+msgstr ""
+
+msgid "MessageAUserText"
+msgstr ""
+
+msgid "MessageAUserInfoText"
+msgstr ""
+
+msgid "MessageUserText"
+msgstr ""
+
+msgid "FactoryReset"
+msgstr ""
+
+msgid "ResetMenuText"
+msgstr ""
+
+msgid "ResetSettingsText"
+msgstr ""
+
+msgid "Reset"
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "Pages"
+msgstr ""
+
+msgid ""
+"DefaultsUpdated\"defaults updated, go to Factory Reset to update or Settings "
+"Manager to disable this warning.\"PageManager"
+msgstr ""
+
+msgid "SaveMenuItemChanges"
+msgstr ""
+
+msgid "SelectItem"
+msgstr ""
+
+msgid "DeleteItem"
+msgstr ""
+
+msgid "AddItem"
+msgstr ""
+
+msgid "PageLocationText"
+msgstr ""
+
+msgid "PageIDText"
+msgstr ""
+
+msgid "PagePositionText"
+msgstr ""
+
+msgid "PageTooltipText"
+msgstr ""
+
+msgid "PageTitleText"
+msgstr ""
+
+msgid "No"
+msgstr ""
+
+msgid "Yes"
+msgstr ""
+
+msgid "RequiresLoginText"
+msgstr ""
+
+msgid "RequiresLogoutText"
+msgstr ""
+
+msgid "RequiresAdminText"
+msgstr ""
+
+msgid "RequiresAdminLevelText"
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
+msgid "GridCenterXText"
+msgstr ""
+
+msgid "GridCenterYText"
+msgstr ""
+
+msgid "SettingsManager"
+msgstr ""
+
+msgid "IgnorePagesUpdatesText"
+msgstr ""
+
+msgid "IgnoreSettingsUpdatesText"
+msgstr ""
+
+msgid "Sun"
+msgstr ""
+
+msgid "Mon"
+msgstr ""
+
+msgid "Tue"
+msgstr ""
+
+msgid "Wed"
+msgstr ""
+
+msgid "Thu"
+msgstr ""
+
+msgid "Fri"
+msgstr ""
+
+msgid "Sat"
+msgstr ""
+
+msgid "Sunday"
+msgstr ""
+
+msgid "Monday"
+msgstr ""
+
+msgid "Tuesday"
+msgstr ""
+
+msgid "Wednesday"
+msgstr ""
+
+msgid "Thursday"
+msgstr ""
+
+msgid "Friday"
+msgstr ""
+
+msgid "Saturday"
+msgstr ""
+
+msgid "Jan_Short"
+msgstr ""
+
+msgid "Feb_Short"
+msgstr ""
+
+msgid "Mar_Short"
+msgstr ""
+
+msgid "Apr_Short"
+msgstr ""
+
+msgid "May_Short"
+msgstr ""
+
+msgid "Jun_Short"
+msgstr ""
+
+msgid "Jul_Short"
+msgstr ""
+
+msgid "Aug_Short"
+msgstr ""
+
+msgid "Sep_Short"
+msgstr ""
+
+msgid "Oct_Short"
+msgstr ""
+
+msgid "Nov_Short"
+msgstr ""
+
+msgid "Dec_Short"
+msgstr ""
+
+msgid "January"
+msgstr ""
+
+msgid "February"
+msgstr ""
+
+msgid "March"
+msgstr ""
+
+msgid "April"
+msgstr ""
+
+msgid "May"
+msgstr ""
+
+msgid "June"
+msgstr ""
+
+msgid "July"
+msgstr ""
+
+msgid "August"
+msgstr ""
+
+msgid "September"
+msgstr ""
+
+msgid "October"
+msgstr ""
+
+msgid "November"
+msgstr ""
+
+msgid "December"
+msgstr ""
+
+msgid "ColorBoxImageText"
+msgstr ""
+
+msgid "ColorBoxOfText"
+msgstr ""
+
+msgid "ColorBoxPreviousText"
+msgstr ""
+
+msgid "ColorBoxNextText"
+msgstr ""
+
+msgid "ColorBoxCloseText"
+msgstr ""
+
+msgid "ColorBoxStartSlideshowText"
+msgstr ""
+
+msgid "ColorBoxStopSlideshowText"
+msgstr ""
+
+msgid "NoAccountFound"
+msgstr ""
+
+msgid "DisplayInMenu"
+msgstr ""
+
+msgid "ParentText"
+msgstr ""
+
+msgid "CannotSetParentToChild"
+msgstr ""
+
+msgid "TopLevel"
+msgstr ""
+
+msgid "HideLanguageBarText"
+msgstr ""
+
+msgid "HideStyleBarText"
+msgstr ""
