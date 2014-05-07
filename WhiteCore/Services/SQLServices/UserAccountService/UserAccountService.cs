@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
@@ -75,30 +74,64 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     MainConsole.Instance.Commands.AddCommand(
                         "create user",
                         "create user [<first> [<last> [<pass> [<email>]]]]",
-                        "Create a new user", HandleCreateUser, false, true);
+                        "Create a new user",
+                        HandleCreateUser, false, true);
+
+                    MainConsole.Instance.Commands.AddCommand(
+                        "add user",
+                        "add user [<first> [<last> [<pass> [<email>]]]]",
+                        "Add (Create) a new user",
+                        HandleCreateUser, false, true);
+
                     MainConsole.Instance.Commands.AddCommand(
                         "delete user",
-                        "delete user",
-                        "Deletes an existing user", HandleDeleteUser, false, true);
-                    MainConsole.Instance.Commands.AddCommand("reset user password",
-                                                             "reset user password [<first> [<last> [<password>]]]",
-                                                             "Reset a user password", HandleResetUserPassword, false, true);
+                        "delete user  [<first> [<last>]] ",
+                        "Deletes an existing user",
+                        HandleDeleteUser, false, true);
+
+                    MainConsole.Instance.Commands.AddCommand(
+                        "disable user",
+                        "disable user  [<first> [<last>]] ",
+                        "Disable an existing user",
+                        HandleDisableUser, false, true);
+
+                    MainConsole.Instance.Commands.AddCommand(
+                        "enable user",
+                        "enable user  [<first> [<last>]] ",
+                        "Enables an existing user that was previously disabled",
+                        HandleEnableUser, false, true);
+
+                    MainConsole.Instance.Commands.AddCommand(
+                        "reset user password",
+                        "reset user password [<first> [<last> [<password>]]]",
+                        "Reset a user password",
+                        HandleResetUserPassword, false, true);
+
                     MainConsole.Instance.Commands.AddCommand(
                         "show account",
-                        "show account <first> <last>",
-                        "Show account details for the given user", HandleShowAccount, false, true);
+                        "show account [<first> [<last>]]",
+                        "Show account details for the given user",
+                        HandleShowAccount, false, true);
+
+                    MainConsole.Instance.Commands.AddCommand(
+                        "show user account",
+                        "show user account [<first> [<last>]]",
+                        "Show account details for the given user",
+                        HandleShowUserAccount, false, true);
+
                     MainConsole.Instance.Commands.AddCommand(
                         "set user level",
                         "set user level [<first> [<last> [<level>]]]",
-                        "Set user level. If the user's level is > 0, "
-                        + "this account will be treated as god-moded. "
-                        + "It will also affect the 'login level' command. ",
+                        "Set user level. If the user's level is > 0, this account will be treated as god-moded.\n" +
+                        "It will also affect the 'login level' command. ",
                         HandleSetUserLevel, false, true);
+
                     MainConsole.Instance.Commands.AddCommand(
                         "set user profile title",
                         "set user profile title [<first> [<last> [<Title>]]]",
                         "Sets the title (Normally resident) in a user's title to some custom value.",
                         HandleSetTitle, false, true);
+
                     MainConsole.Instance.Commands.AddCommand(
                         "set partner",
                         "set partner",
@@ -339,7 +372,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
 
             UserAccount account = GetUserAccount(null, newAccount.PrincipalID);
             UserAccount nameaccount = GetUserAccount(null, newAccount.Name);
-            if (null == account && nameaccount == null)
+            if (account == null && nameaccount == null)
             {
                 if (StoreUserAccount(newAccount))
                 {
@@ -364,19 +397,15 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                               .EventManager.FireGenericEventHandler("CreateUserInformation", newAccount.PrincipalID);
                     return "";
                 }
-                else
-                {
-                    MainConsole.Instance.ErrorFormat("[USER ACCOUNT SERVICE]: Account creation failed for account {0}",
-                                                     newAccount.Name);
-                    return "Unable to save account";
-                }
+
+                MainConsole.Instance.ErrorFormat("[USER ACCOUNT SERVICE]: Account creation failed for account {0}", newAccount.Name);
+                return "Unable to save account";
+
             }
-            else
-            {
-                MainConsole.Instance.ErrorFormat("[USER ACCOUNT SERVICE]: A user with the name {0} already exists!",
-                                                 newAccount.Name);
-                return "A user with the same name already exists";
-            }
+
+            MainConsole.Instance.ErrorFormat("[USER ACCOUNT SERVICE]: A user with the name {0} already exists!", newAccount.Name);
+            return "A user with the same name already exists";
+
         }
 
         public void DeleteUser(UUID userID, string name, string password, bool archiveInformation, bool wipeFromDatabase)
@@ -384,10 +413,19 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             //if (password != "" && m_AuthenticationService.Authenticate(userID, "UserAccount", password, 0) == "")
             //    return; //Not authed
 
+            // ensure the main libray owner is left alone!
+            ILibraryService lib_service = m_registry.RequestModuleInterface<ILibraryService>();
+            if (lib_service.LibraryOwner == userID)
+            {
+                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Deleting the Library owner is not a good idea!");
+                return;
+            }
+
+
             if (!m_Database.DeleteAccount(userID, archiveInformation))
             {
                 MainConsole.Instance.WarnFormat(
-                    "Failed to remove the account for {0}, please check that the database is valid after this operation!",
+                    "[USER ACCOUNT SERVICE]: Failed to remove the account for {0}, please check that the database is valid after this operation!",
                     userID);
                 return;
             }
@@ -402,10 +440,15 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
 
         #region Console commands
 
+        /// <summary>
+        /// Handles the set partner command.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmdParams">Cmd parameters.</param>
         protected void HandleSetPartner(IScene scene, string[] cmdParams)
         {
-            string first = MainConsole.Instance.Prompt("First User's name");
-            string second = MainConsole.Instance.Prompt("Second User's name");
+            string first = MainConsole.Instance.Prompt("First User's name (<first> <last>)");
+            string second = MainConsole.Instance.Prompt("Second User's name (<first> <last>)");
 
             if (m_profileConnector != null)
             {
@@ -414,16 +457,27 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 IUserProfileInfo secondProfile =
                     m_profileConnector.GetUserProfile(GetUserAccount(null, second).PrincipalID);
 
+                if (firstProfile == null || secondProfile == null)
+                {
+                    MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: At least one of these users does not have a profile?");
+                    return;
+                }
+
                 firstProfile.Partner = secondProfile.PrincipalID;
                 secondProfile.Partner = firstProfile.PrincipalID;
 
                 m_profileConnector.UpdateUserProfile(firstProfile);
                 m_profileConnector.UpdateUserProfile(secondProfile);
 
-                MainConsole.Instance.Warn("Partner information updated. ");
+                MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: Partner information updated. ");
             }
         }
 
+        /// <summary>
+        /// Handles the user set title command.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmdparams">Cmdparams.</param>
         protected void HandleSetTitle(IScene scene, string[] cmdparams)
         {
             string firstName;
@@ -431,32 +485,49 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             string title;
 
             firstName = cmdparams.Length < 5 ? MainConsole.Instance.Prompt("First name") : cmdparams[4];
+            if (firstName == "")
+                return;
 
             lastName = cmdparams.Length < 6 ? MainConsole.Instance.Prompt("Last name") : cmdparams[5];
+            if (lastName == "")
+                return;
 
             UserAccount account = GetUserAccount(null, firstName, lastName);
             if (account == null)
             {
-                MainConsole.Instance.Info("No such user");
+                    MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: No such user");
                 return;
             }
             title = cmdparams.Length < 7 ? MainConsole.Instance.Prompt("User Title") : Util.CombineParams(cmdparams, 6);
             if (m_profileConnector != null)
             {
                 IUserProfileInfo profile = m_profileConnector.GetUserProfile(account.PrincipalID);
-                profile.MembershipGroup = title;
-                profile.CustomType = title;
-                m_profileConnector.UpdateUserProfile(profile);
+                if (profile != null)
+                {
+                    profile.MembershipGroup = title;
+                    profile.CustomType = title;
+                    m_profileConnector.UpdateUserProfile (profile);
+                }
+                else {
+                        MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: There does not appear to be a profile for this user?");
+                    return;
+                }
+
             }
             bool success = StoreUserAccount(account);
             if (!success)
-                MainConsole.Instance.InfoFormat("Unable to set user profile title for account {0} {1}.", firstName,
+                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Unable to set user profile title for account {0} {1}.", firstName,
                                                 lastName);
             else
-                MainConsole.Instance.InfoFormat("User profile title set for user {0} {1} to {2}", firstName, lastName,
+                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: User profile title set for user {0} {1} to {2}", firstName, lastName,
                                                 title);
         }
 
+        /// <summary>
+        /// Handles the set user level command.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmdparams">Cmdparams.</param>
         protected void HandleSetUserLevel(IScene scene, string[] cmdparams)
         {
             string firstName;
@@ -465,21 +536,34 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             int level;
 
             firstName = cmdparams.Length < 4 ? MainConsole.Instance.Prompt("First name") : cmdparams[3];
+            if (firstName == "")
+                return;
 
             lastName = cmdparams.Length < 5 ? MainConsole.Instance.Prompt("Last name") : cmdparams[4];
+            if (lastName == "")
+                return;
 
             UserAccount account = GetUserAccount(null, firstName, lastName);
             if (account == null)
             {
-                MainConsole.Instance.Info("No such user");
+                MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: Unable to locate this user");
+                return;
+            }
+
+            // ensure the main libray owner is left alone!
+            ILibraryService lib_service = m_registry.RequestModuleInterface<ILibraryService>();
+            if (lib_service.LibraryOwner == account.PrincipalID)
+            {
+                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Changing the Library owner is not a good idea!");
                 return;
             }
 
             rawLevel = cmdparams.Length < 6 ? MainConsole.Instance.Prompt("User level") : cmdparams[5];
+            int.TryParse (rawLevel, out level);
 
-            if (int.TryParse(rawLevel, out level) == false)
+            if (level > 255 || level < 0)
             {
-                MainConsole.Instance.Info("Invalid user level");
+                MainConsole.Instance.Warn("Invalid user level");
                 return;
             }
 
@@ -487,101 +571,293 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
 
             bool success = StoreUserAccount(account);
             if (!success)
-                MainConsole.Instance.InfoFormat("Unable to set user level for account {0} {1}.", firstName, lastName);
+                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Unable to set user level for account {0} {1}.", firstName, lastName);
             else
-                MainConsole.Instance.InfoFormat("User level set for user {0} {1} to {2}", firstName, lastName, level);
+                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: User level set for user {0} {1} to {2}", firstName, lastName, level);
         }
 
-        protected void HandleShowAccount(IScene scene, string[] cmdparams)
+        protected void HandleShowUserAccount(IScene scene, string[] cmd)
         {
-            if (cmdparams.Length != 4)
-            {
-                MainConsole.Instance.Format(Level.Off, "Usage: show account <first-name> <last-name>");
-                return;
-            }
+            // remove 'user' from the cmd 
+            var cmdparams = new List<string>(cmd);
+            cmdparams.RemoveAt (1);
+            cmd = cmdparams.ToArray();
 
-            string firstName = cmdparams[2];
-            string lastName = cmdparams[3];
+            HandleShowAccount(scene, cmd);
 
-            UserAccount ua = GetUserAccount(null, firstName, lastName);
-
-            if (ua == null)
-            {
-                MainConsole.Instance.InfoFormat("No user named {0} {1}", firstName, lastName);
-                return;
-            }
-
-            MainConsole.Instance.InfoFormat("Name:    {0}", ua.Name);
-            MainConsole.Instance.InfoFormat("ID:      {0}", ua.PrincipalID);
-            MainConsole.Instance.InfoFormat("E-mail:  {0}", ua.Email);
-            MainConsole.Instance.InfoFormat("Created: {0}", Utils.UnixTimeToDateTime(ua.Created));
-            MainConsole.Instance.InfoFormat("Level:   {0}", ua.UserLevel);
-            MainConsole.Instance.InfoFormat("Flags:   {0}", ua.UserFlags);
         }
 
         /// <summary>
-        ///     Handle the create user command from the console.
+        /// Handles the show account command.
         /// </summary>
-        /// <param name="cmdparams">string array with parameters: firstname, lastname, password, locationX, locationY, email</param>
-        protected void HandleCreateUser(IScene scene, string[] cmdparams)
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmdparams">Cmdparams.</param>
+        protected void HandleShowAccount(IScene scene, string[] cmdparams)
         {
-            string name, password, email, uuid, scopeID;
+            string firstName;
+            string lastName;
 
-            name = MainConsole.Instance.Prompt("Name", "Default User");
-
-            password = MainConsole.Instance.PasswordPrompt("Password");
-
-            email = MainConsole.Instance.Prompt("Email", "");
-
-            uuid = MainConsole.Instance.Prompt("UUID (Don't change unless you have a reason)", UUID.Random().ToString());
-
-            scopeID = MainConsole.Instance.Prompt("Scope (Don't change unless you know what this is)",
-                                                  UUID.Zero.ToString());
-
-            CreateUser(UUID.Parse(uuid), UUID.Parse(scopeID), name, Util.Md5Hash(password), email);
-        }
-
-        protected void HandleDeleteUser(IScene scene, string[] cmd)
-        {
-            string name = MainConsole.Instance.Prompt("Name", "");
-            if (name == "")
+            firstName = cmdparams.Length < 3 ? MainConsole.Instance.Prompt("First name") : cmdparams[2];
+            if (firstName == "")
                 return;
-            string pass = MainConsole.Instance.Prompt("Password", "");
-            if (pass == "")
+
+            lastName = cmdparams.Length < 4 ? MainConsole.Instance.Prompt("Last name") : cmdparams[3];
+            if (lastName == "")
                 return;
-            UserAccount account = GetUserAccount(null, name);
-            if (account == null)
+
+            UserAccount ua = GetUserAccount(null, firstName, lastName);
+            if (ua == null)
             {
-                MainConsole.Instance.Warn("No user with that name!");
+                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Unable to find user '{0} {1}'", firstName, lastName);
                 return;
             }
-            bool archive = MainConsole.Instance.Prompt("Archive Information (just disable their login, but keep their information)", "false").ToLower() == "true";
-            bool all = MainConsole.Instance.Prompt("Remove all user information", "false").ToLower() == "true";
 
-            DeleteUser(account.PrincipalID, account.Name, pass, archive, all);
+            MainConsole.Instance.CleanInfo("  Name   : " + ua.Name);
+            MainConsole.Instance.CleanInfo("  ID     : " + ua.PrincipalID);
+            MainConsole.Instance.CleanInfo("  E-mail : " + ua.Email);
+            MainConsole.Instance.CleanInfo("  Created: " + Utils.UnixTimeToDateTime(ua.Created));
+            MainConsole.Instance.CleanInfo("  Level  : " + (ua.UserLevel < 0 ? "Disabled" : ua.UserLevel.ToString ()) );
+            MainConsole.Instance.CleanInfo("  Flags  : " + ua.UserFlags);
         }
 
-        protected void HandleResetUserPassword(IScene scene, string[] cmdparams)
+        /// <summary>
+        ///     Handle the create (add) user command from the console.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmd">string array with parameters: firstname, lastname, password, email</param>
+        protected void HandleCreateUser(IScene scene, string[] cmd)
         {
-            string name;
+            string firstName = "Default";
+            string lastName = "User";
+            string password, email, uuid, scopeID;
+            bool sysFlag = false;
+
+            List<string> cmdparams = new List<string>(cmd);
+            foreach (string param in cmd)
+            {
+                if (param.StartsWith("--system"))
+                {
+                    sysFlag = true;
+                    cmdparams.Remove(param);
+                }
+            }
+
+            // check for passed username
+            firstName = cmdparams.Count < 3 ? MainConsole.Instance.Prompt("First name") : cmdparams[2];
+            if (firstName == "")
+                return;
+
+            lastName = cmdparams.Count < 4 ? MainConsole.Instance.Prompt("Last name") : cmdparams[3];
+            if (lastName == "")
+                return;
+
+            // password as well?
+            password = cmdparams.Count < 5 ? MainConsole.Instance.PasswordPrompt("Password") : cmdparams[4];
+
+            // maybe even an email?
+            if (cmdparams.Count < 6 )
+            { 
+                email = MainConsole.Instance.Prompt ("Email");
+            }
+            else
+                email = cmdparams[5];
+            //if (!email.Contains ("@"))
+            // {
+            //    MainConsole.Instance.Warn ("This does not look like a vaild email address. Please re-enter");
+            //    email = MainConsole.Instance.Prompt ("Email", email);
+            // }
+
+            // these really should not be altered
+            uuid = UUID.Random().ToString();
+            scopeID = UUID.Zero.ToString ();
+
+            if (sysFlag)
+            {
+                uuid = MainConsole.Instance.Prompt("UUID (Don't change unless you have a reason)", uuid);
+                scopeID = MainConsole.Instance.Prompt("Scope (Don't change unless you know what this is)", scopeID);
+            }
+
+            // check to make sure
+            UserAccount ua = GetUserAccount(null, firstName, lastName);
+            if (ua != null)
+            {
+                MainConsole.Instance.WarnFormat("[USER ACCOUNT SERVICE]: This user, '{0} {1}' already exists!", firstName, lastName);
+                return;
+            }
+
+            string name = firstName + " " + lastName;
+            CreateUser(UUID.Parse(uuid), UUID.Parse(scopeID), name, Util.Md5Hash(password), email);
+            // CreateUser will tell us success or problem
+            //MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: User '{0}' created", name);
+        }
+
+        /// <summary>
+        /// Handles the delete user command.
+        /// Delete or disable a user account
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmd">string array with parameters: firstname, lastname, password</param>
+        protected void HandleDeleteUser(IScene scene, string[] cmd)
+        {
+            string firstName, lastName, password;
+
+            // check for passed username
+            firstName = cmd.Length < 3 ? MainConsole.Instance.Prompt("First name") : cmd[2];
+            if (firstName == "")
+                return;
+            lastName = cmd.Length < 4 ? MainConsole.Instance.Prompt("Last name") : cmd[3];
+            if (lastName == "")
+                return;
+
+            // password as well?
+            password = cmd.Length < 5 ? MainConsole.Instance.PasswordPrompt("Password") : cmd[4];
+
+            UserAccount account = GetUserAccount(null, firstName, lastName);
+            if (account == null)
+            {
+                MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: No user with that name!");
+                return;
+            }
+
+            // ensure the main libray owner is left alone!
+            ILibraryService lib_service = m_registry.RequestModuleInterface<ILibraryService>();
+            if (lib_service.LibraryOwner == account.PrincipalID)
+            {
+                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Naughty!! You cannot delete the Library owner!");
+                return;
+            }
+
+            bool archive;
+            bool all = false;
+
+            archive = MainConsole.Instance.Prompt("Archive Information (just disable their login, but keep their information): (yes/no)", "yes").ToLower() == "yes";
+            if (!archive)
+                all = MainConsole.Instance.Prompt("Remove all user information (yes/no)", "yes").ToLower() == "yes";
+
+            if (archive || all)
+            {
+                DeleteUser (account.PrincipalID, account.Name, password, archive, all);
+                if (all)
+                    MainConsole.Instance.InfoFormat ("[USER ACCOUNT SERVICE]: User account '{0}' deleted", account.Name);
+                else
+                    MainConsole.Instance.InfoFormat ("[USER ACCOUNT SERVICE]: User account '{0}' disabled", account.Name);
+            }
+        }
+
+        /// <summary>
+        /// Handles the disable user command.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmd">string array with parameters: firstname, lastname.</param>
+        protected void HandleDisableUser(IScene scene, string[] cmd)
+        {
+            string firstName, lastName;
+
+            // check for passed username
+            firstName = cmd.Length < 3 ? MainConsole.Instance.Prompt("First name") : cmd[2];
+            if (firstName == "")
+                return;
+            lastName = cmd.Length < 4 ? MainConsole.Instance.Prompt("Last name") : cmd[3];
+            if (lastName == "")
+                return;
+
+            UserAccount account = GetUserAccount(null, firstName, lastName);
+            if (account == null)
+            {
+                MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: Unable to locate this user!");
+                return;
+            }
+
+            // if the user is disabled details will exist with a level set @ -2
+            if (account.UserLevel < 0)
+            {
+                MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: User is already diabled!");
+                return;
+            }
+
+            account.UserLevel = -2;
+            bool success = StoreUserAccount(account);
+            if (!success)
+                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Unable to disable account {0} {1}.", firstName, lastName);
+            else
+                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: User account {0} {1} disabled.", firstName, lastName);
+        }
+
+        /// <summary>
+        /// Handles the enable user command.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmd">string array with parameters: firstname, lastname.</param>
+        protected void HandleEnableUser(IScene scene, string[] cmd)
+        {
+            string firstName, lastName;
+
+            // check for passed username
+            firstName = cmd.Length < 3 ? MainConsole.Instance.Prompt("First name") : cmd[2];
+            if (firstName == "")
+                return;
+            lastName = cmd.Length < 4 ? MainConsole.Instance.Prompt("Last name") : cmd[3];
+            if (lastName == "")
+                return;
+             
+            UserAccount account = GetUserAccount(null, firstName, lastName);
+            if (account == null)
+            {
+                MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: Unable to locate this user!");
+                return;
+            }
+
+            // if the user is disabled details will exist with a level set @ -2
+            account.UserLevel = 0;
+
+            bool success = StoreUserAccount(account);
+            if (!success)
+                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Unable to enable account {0} {1}.", firstName, lastName);
+            else
+                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: User account {0} {1} enabled.", firstName, lastName);
+        }
+
+        /// <summary>
+        /// Handles the reset user password command.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmd">string array with parameters: firstname, lastname, newpassword,</param>
+        protected void HandleResetUserPassword(IScene scene, string[] cmd)
+        {
+            string firstName, lastName;
             string newPassword;
 
-            name = MainConsole.Instance.Prompt("Name");
+            // check for passed username
+            firstName = cmd.Length < 4 ? MainConsole.Instance.Prompt("First name") : cmd[3];
+            if (firstName == "")
+                return;
+            lastName = cmd.Length < 5 ? MainConsole.Instance.Prompt("Last name") : cmd[4];
+            if (lastName == "")
+                return;
 
-            newPassword = MainConsole.Instance.PasswordPrompt("New password");
+            // password as well?
+            newPassword = cmd.Length < 6 ? MainConsole.Instance.PasswordPrompt("New Password") : cmd[5];
 
-            UserAccount account = GetUserAccount(null, name);
+            UserAccount account = GetUserAccount(null, firstName, lastName);
             if (account == null)
-                MainConsole.Instance.ErrorFormat("[USER ACCOUNT SERVICE]: No such user");
+                MainConsole.Instance.ErrorFormat("[USER ACCOUNT SERVICE]: Unable to locate this user");
+
+            // ensure the main libray owner is left alone!
+            ILibraryService lib_service = m_registry.RequestModuleInterface<ILibraryService>();
+            if (lib_service.LibraryOwner == account.PrincipalID)
+            {
+                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Changing the Library owner is not a good idea!");
+                return;
+            }
 
             bool success = false;
             if (m_AuthenticationService != null)
                 success = m_AuthenticationService.SetPassword(account.PrincipalID, "UserAccount", newPassword);
             if (!success)
-                MainConsole.Instance.ErrorFormat("[USER ACCOUNT SERVICE]: Unable to reset password for account {0}.",
-                                                 name);
+                MainConsole.Instance.ErrorFormat(
+                    "[USER ACCOUNT SERVICE]: Unable to reset password for account '{0} {1}.", firstName, lastName);
             else
-                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Password reset for user {0}", name);
+                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Password reset for user '{0} {1}", firstName, lastName);
         }
 
         #endregion
