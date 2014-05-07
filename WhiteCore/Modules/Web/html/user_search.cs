@@ -3,6 +3,8 @@ using WhiteCore.Framework.Servers.HttpServer;
 using System.Collections.Generic;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
+using WhiteCore.Framework.Utilities;
+using OpenMetaverse;
 
 namespace WhiteCore.Modules.Web
 {
@@ -42,6 +44,8 @@ namespace WhiteCore.Modules.Web
             if (requestParameters.ContainsKey("Submit"))
             {
                 IUserAccountService accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService>();
+                var libraryOwner = new UUID(Constants.LibraryOwner);
+
                 string username = requestParameters["username"].ToString();
                 int start = httpRequest.Query.ContainsKey("Start")
                                 ? int.Parse(httpRequest.Query["Start"].ToString())
@@ -59,6 +63,9 @@ namespace WhiteCore.Modules.Web
                 var users = accountService.GetUserAccounts(null, username, (uint) start, amountPerQuery);
                 foreach (var user in users)
                 {
+                    if (user.PrincipalID == libraryOwner)
+                        continue;
+
                     usersList.Add(new Dictionary<string, object>
                                       {
                                           {"UserName", user.Name},

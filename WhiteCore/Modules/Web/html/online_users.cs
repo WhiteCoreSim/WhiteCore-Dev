@@ -4,6 +4,7 @@ using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
 using OpenMetaverse;
 using System.Collections.Generic;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.Web
 {
@@ -55,8 +56,14 @@ namespace WhiteCore.Modules.Web
                                                    amountPerQuery);
             IUserAccountService accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService>();
             IGridService gridService = webInterface.Registry.RequestModuleInterface<IGridService>();
+            var libraryOwner = new UUID(Constants.LibraryOwner);
+
             foreach (var user in users)
             {
+                var userID = UUID.Parse (user.UserID);
+                if (userID == libraryOwner)
+                    continue;
+
                 var region = gridService.GetRegionByUUID(null, user.CurrentRegionID);
                 var account = accountService.GetUserAccount(region.AllScopeIDs, UUID.Parse(user.UserID));
                 if (account != null && region != null)
