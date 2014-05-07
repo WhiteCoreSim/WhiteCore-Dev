@@ -315,7 +315,7 @@ namespace WhiteCore.Modules.Land
                                 {
                                     //Flag is set
                                     if (!scheduledMoneyModule.Charge(remote_client.AgentId, moneyModule.DirectoryFeeCharge, "Parcel Show in Search Fee - " + LandData.GlobalID,
-                                        7, TransactionType.ParcelDirFee, "ShowInDirectory" + LandData.GlobalID.ToString(), true))
+                                        7, TransactionType.ParcelDirFee, "ShowInDirectory" + LandData.GlobalID.ToString(), false))// was true
                                     {
                                         remote_client.SendAlertMessage(
                                             "You don't have enough money to set this parcel in search.");
