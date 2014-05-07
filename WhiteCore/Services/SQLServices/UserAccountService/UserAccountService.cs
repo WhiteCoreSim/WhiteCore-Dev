@@ -414,8 +414,8 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             //    return; //Not authed
 
             // ensure the main libray owner is left alone!
-            ILibraryService lib_service = m_registry.RequestModuleInterface<ILibraryService>();
-            if (lib_service.LibraryOwner == userID)
+            var libraryOwner = new UUID (Constants.LibraryOwner);
+            if (userID == libraryOwner)
             {
                 MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Deleting the Library owner is not a good idea!");
                 return;
@@ -551,8 +551,8 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             }
 
             // ensure the main libray owner is left alone!
-            ILibraryService lib_service = m_registry.RequestModuleInterface<ILibraryService>();
-            if (lib_service.LibraryOwner == account.PrincipalID)
+            var libraryOwner = new UUID (Constants.LibraryOwner);
+            if (account.PrincipalID == libraryOwner)
             {
                 MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Changing the Library owner is not a good idea!");
                 return;
@@ -720,8 +720,8 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             }
 
             // ensure the main libray owner is left alone!
-            ILibraryService lib_service = m_registry.RequestModuleInterface<ILibraryService>();
-            if (lib_service.LibraryOwner == account.PrincipalID)
+            var libraryOwner = new UUID (Constants.LibraryOwner);
+            if (account.PrincipalID == libraryOwner)
             {
                 MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Naughty!! You cannot delete the Library owner!");
                 return;
@@ -843,8 +843,8 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 MainConsole.Instance.ErrorFormat("[USER ACCOUNT SERVICE]: Unable to locate this user");
 
             // ensure the main libray owner is left alone!
-            ILibraryService lib_service = m_registry.RequestModuleInterface<ILibraryService>();
-            if (lib_service.LibraryOwner == account.PrincipalID)
+            var libraryOwner = new UUID (Constants.LibraryOwner);
+            if (account.PrincipalID == libraryOwner)
             {
                 MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Changing the Library owner is not a good idea!");
                 return;

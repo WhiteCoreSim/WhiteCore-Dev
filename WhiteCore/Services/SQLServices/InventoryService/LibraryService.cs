@@ -38,6 +38,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using WhiteCore.Framework.SceneInfo;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Services.SQLServices.InventoryService
 {
@@ -47,11 +48,15 @@ namespace WhiteCore.Services.SQLServices.InventoryService
     /// </summary>
     public class LibraryService : ILibraryService, IService
     {
-        private readonly UUID libOwner = new UUID("11111111-1111-0000-0000-000100bba000");
+        // moved to Constants to allow for easier comparision from the WebUI
+        //private readonly UUID libOwner = new UUID("11111111-1111-0000-0000-000100bba000");
+        private readonly UUID libOwner = new UUID (Constants.LibraryOwner);
 
         public UUID LibraryRootFolderID
         {
-            get { return new UUID("00000112-000f-0000-0000-000100bba000"); }
+            // similarly placed in Constants
+            //get { return new UUID("00000112-000f-0000-0000-000100bba000"); }
+            get { return new UUID(Constants.LibraryRootFolderID); }
         }
 
         private string libOwnerName = "Library Owner";
