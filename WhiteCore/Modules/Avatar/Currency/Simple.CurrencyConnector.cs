@@ -170,7 +170,7 @@ namespace Simple.Currency
             if (amount == 0)
                 return false;
             UserCurrencyTransfer(agentID, UUID.Zero, amount,
-                                             "Inworld purchase", TransactionType.SystemGenerated, UUID.Zero);
+                                             "Currency Exchange", TransactionType.SystemGenerated, UUID.Zero);
 
             //Log to the database
             List<object> values = new List<object>
@@ -259,7 +259,7 @@ namespace Simple.Currency
             toCurrency.Amount += amount;
             UserCurrencyUpdate(toCurrency, true);
 
-            //Must send out noficiations to the users involved so that they get the updates
+            //Must send out notifications to the users involved so that they get the updates
             if (m_syncMessagePoster == null)
             {
                 m_syncMessagePoster = m_registry.RequestModuleInterface<ISyncMessagePosterService>();
