@@ -1,5 +1,5 @@
 Startup CommandLine Switches for WhiteCore
-You can use these switches with either WhiteCore.exe, WhiteCore.32BitLaunch.exe, and WhiteCore.Server.exe
+You can use these switches with either WhiteCore.exe and WhiteCore.Server.exe
 
 ;; Change the sim.sim file name (For WhiteCore.exe only)
 WhiteCore.exe -RegionDataFileName=test.sim
@@ -60,4 +60,4 @@ WhiteCore.exe -oldoptions=true -inimaster=MyIniMaster.ini
 WhiteCore.exe -oldoptions=true -inidirectory=c:\MyConfigs
 
 Example CommandLine
-WhiteCore.32bitlaunch.exe -oldoptions=true -inimaster=C:\Grid\configs\MyIniMaster.ini -inifile=C:\Grid\configs\MyIniOveride.ini
+WhiteCore.exe -oldoptions=true -inimaster=C:\Grid\configs\MyIniMaster.ini -inifile=C:\Grid\configs\MyIniOveride.ini

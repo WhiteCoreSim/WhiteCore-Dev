@@ -15,10 +15,10 @@ How-To Patch EXE
 Method 1)  
 
     If you have Visual Studio 2008/2010 and/or C++ Express
-    COPY your WhiteCore.exe / WhiteCore.32BitLaunch.exe to a safe place (backup)
+    COPY your WhiteCore.exe to a safe place (backup)
     Copy again to a separate Working Directory (the ones you will patch)
     Open a Command Prompt (CMD) and change directory to that working dir
-    run Following Command:  WhiteCore.32BitLaunch.exe
+    run Following Command:  WhiteCore.exe
 
     REFERENCE for EDITBIN
     http://msdn.microsoft.com/en-us/library/xd3shwhf.aspx
