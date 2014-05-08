@@ -3,7 +3,41 @@ WhiteCore-Sim (Dev)
 Rowan D <greythane@gmail.com>
 Fly-Man- <fly.man.opensim@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+May 8 - Greythane
+* WebUI
+  - Updated the graphics and CSS for the Viewer Help page
+ 
+May 7 - Fly-Man
+* SimpleCurrency Module
+ - Changed the naming for Currency buying inside the viewer
+ - ShowInDirectory fee is now set in the Scheduler
 
+May 6 - Fly-Man
+* Started Translation project
+  - Translations for the languages for the WebUI are now externally done
+
+May 6 - Greythane
+* SQLiteDataManager
+  - Additional checking to ensure required database files exists 
+  before trying to access
+* Updated Community.Csharp.Sqllite
+
+May 5 - Greythane
+* Removed redundant 'WhiteCore' in the following namespaces
+  - WhiteCoreOpenDynamicsEngine >> OpenDynamicsEngine
+  - WhiteCoreDotNetEngine >> DotNetEngine
+  - Updated relevant configuration files
+
+May 4 - Fly-Man
+* WebUI
+  - Updates to the WebUI namespace
+  - Added Firestorm to the Viewer Help page
+  - Updated the translations
+  
+May 1 - Fly-Man
+* Release 0.9.1
+  - Released version 0.9.1
+  
 Apr 30 - Greythane
 * Renamed WhiteCoreOpenDynamicsEngine to OpenDynamicsEngine (WhiteCore.Physics)
   - Revised all project files and folders
@@ -42,7 +76,7 @@ Apr 28 - Greythane
   - Add 'delete region' as as alternative to the existing 'remove region' command
   - Update command processing for destructive commands that allow execution from the root (scene)
 
-Apr 26 - FlyMan
+Apr 26 - Fly-Man
 * Updated the iMoneyModule with the Event Fee and Prize that is now in the Viewer 2/3 code
 
 Apr 17 - Greythane
