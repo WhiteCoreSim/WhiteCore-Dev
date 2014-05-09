@@ -556,7 +556,7 @@ namespace WhiteCore.Region
                 "      the Estate Owner to the parcel owner on which the object is found.  \n" +
                 "--CheckOwnership asks for each UUID that is not found on the grid what user it should be changed\n" +
                 "      to (useful for changing UUIDs from other grids, but very long with many users).  ",
-                LoadOar, true, false);
+                HandleLoadOar, true, false);
 
             MainConsole.Instance.Commands.AddCommand("save oar",
                 "save oar [<OAR path>] [--perm=<permissions>] ",
@@ -565,7 +565,7 @@ namespace WhiteCore.Region
                 "  If this is not given then the oar is saved to region.oar in the current directory." + Environment.NewLine +
                 "--perm stops objects with insufficient permissions from being saved to the OAR." + Environment.NewLine +
                 "  <permissions> can contain one or more of these characters: \"C\" = Copy, \"T\" = Transfer" + Environment.NewLine,
-                SaveOar, true, false);
+                HandleSaveOar, true, false);
 
             MainConsole.Instance.Commands.AddCommand("kick user", 
                 "kick user [all]",
@@ -627,13 +627,13 @@ namespace WhiteCore.Region
                 "Creates a new region to start\n"+
                 "<Region Name> - Use this name for the new region\n"+
                 "--config='filename' - Use this file for region configuration",
-                CreateNewRegion, false, true);
+                HandleCreateNewRegion, false, true);
 			
             MainConsole.Instance.Commands.AddCommand("save region config",
                 "save region config <filename>",
                 "Saves the configuration of the region\n"+
                 "<filename> - Use this name for the region configuration (default is region name)",
-                SaveRegionConfig, true, false);
+                HandleSaveRegionConfig, true, false);
 
             MainConsole.Instance.Commands.AddCommand("resize object",
                 "resize object <name> <x> <y> <z>",
@@ -663,6 +663,7 @@ namespace WhiteCore.Region
                 
         }
 
+        #region helpers
         /// <summary>
         /// Checks if a Region name already exists.
         /// </summary>
@@ -717,8 +718,12 @@ namespace WhiteCore.Region
             return rInfo;
         }
 
-
-        private void CreateNewRegion(IScene scene, string[] cmd)
+        /// <summary>
+        /// Handles the create new region command.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmd">Cmd.</param>
+        private void HandleCreateNewRegion(IScene scene, string[] cmd)
         {
             // get some current details
             var currentInfo = FindCurrentRegionInfo ();
@@ -743,6 +748,10 @@ namespace WhiteCore.Region
             }
         }
 
+        /// <summary>
+        /// Creates the new region.
+        /// </summary>
+        /// <param name="regionName">Region name.</param>
         private void CreateNewRegion( string regionName)
         {
             // get some current details
@@ -761,6 +770,8 @@ namespace WhiteCore.Region
                     st.ForceBackup ();
             }
         }
+
+        #endregion
 
         /// <summary>
         /// Creates the new region using addition options.
@@ -855,7 +866,7 @@ namespace WhiteCore.Region
         /// </summary>
         /// <param name="scene">Scene.</param>
         /// <param name="cmd">Cmd.</param>
-        private void SaveRegionConfig(IScene scene, string[] cmd)
+        private void HandleSaveRegionConfig(IScene scene, string[] cmd)
         {
  
             if (scene == null)
@@ -1288,7 +1299,7 @@ namespace WhiteCore.Region
         ///     Load a whole region from an opensimulator archive.
         /// </summary>
         /// <param name="cmdparams"></param>
-        protected void LoadOar(IScene scene, string[] cmdparams)
+        protected void HandleLoadOar(IScene scene, string[] cmdparams)
         {
             // a couple of sanity checks
 			if (cmdparams.Count() < 3)
@@ -1344,7 +1355,7 @@ namespace WhiteCore.Region
         ///     Save a region to a file, including all the assets needed to restore it.
         /// </summary>
         /// <param name="cmdparams"></param>
-        protected void SaveOar(IScene scene, string[] cmdparams)
+        protected void HandleSaveOar(IScene scene, string[] cmdparams)
         {
             if (MainConsole.Instance.ConsoleScene == null) 
             {
