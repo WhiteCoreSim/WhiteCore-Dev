@@ -53,27 +53,32 @@
 <table id="online_users">
   <caption></caption>
   
-  <thead>
+  <thead  style="border-bottom:solid 1px;">
     <tr>
       <th class="online_users_left"><a class="fade" href="index.html?page=online_users&Order=UserName" title="{UserNameText}"><p>{UserNameText}</p></a></th>
       <th class="online_users_right"><a class="fade" href="index.html?page=online_users&Order=RegionName" title="{RegionNameText}"><p>{RegionNameText}</p></a></th>
+      <th class="online_users_left" style="padding-left:10px;"><p>{OnlineLocationText}</p></th>
     </tr>
   </thead>
   
-  <tfoot>
-    <tr>
+  <tfoot style="border-top: solid 1px;">
+    <tr style= align:bottom;">
       <th class="online_users_left"><a class="fade" href="index.html?page=online_users&Order=UserName" title="{UserNameText}"><p>{UserNameText}</p></a></th>
       <th class="online_users_right"><a class="fade" href="index.html?page=online_users&Order=RegionName" title="{RegionNameText}"><p>{RegionNameText}</p></a></th>
+      <th class="online_users_left" style="padding-left:10px;"><p>{OnlineLocationText}</p></th>
     </tr>
   </tfoot>
 
   <tbody>
+  <tr style="line-height:6px;"><td>&nbsp;</td></tr>
 {UsersOnlineListArrayBegin}
     <tr>
       <td class="online_users_left"><a target="_blank" class='agentinfo' href="webprofile/?userid={UserID}">{UserName}</a></td>
       <td class="online_users_right"><a target="_blank" class='regioninfo' href="region_info.html?regionid={UserRegionID}">{UserRegion}</a></td>
+      <td class="online_users_left" style="padding-left:10px;">{UserLocation}</a></td>
     </tr>
 {UsersOnlineListArrayEnd}
+  <tr style="line-height:10px;"><td>&nbsp;</td></tr>
   </tbody>
 </table>
 

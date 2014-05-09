@@ -337,7 +337,8 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             if (remoteValue != null || m_doRemoteOnly)
                 return (uint) remoteValue;
 
-            return m_Database.NumberOfUsers(scopeIDs, query);
+            var userCount = m_Database.NumberOfUsers(scopeIDs, query);
+            return userCount - Constants.SystemUserCount;
         }
 
         public void CreateUser(string name, string password, string email)

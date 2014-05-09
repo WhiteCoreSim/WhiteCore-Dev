@@ -1,5 +1,30 @@
-﻿using WhiteCore.Framework;
-using WhiteCore.Framework.Servers.HttpServer;
+﻿/*
+ * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org
+ * See CONTRIBUTORS.TXT for a full list of copyright holders.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the WhiteCore-Sim Project nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ``AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
 using OpenMetaverse;
@@ -38,6 +63,7 @@ namespace WhiteCore.Modules.Web
             response = null;
             var vars = new Dictionary<string, object>();
             var usersList = new List<Dictionary<string, object>>();
+            var libraryOwner = new UUID(Constants.LibraryOwner);
 
             uint amountPerQuery = 10;
             int start = httpRequest.Query.ContainsKey("Start") ? int.Parse(httpRequest.Query["Start"].ToString()) : 0;
@@ -51,30 +77,45 @@ namespace WhiteCore.Modules.Web
             vars.Add("NextOne", start + 1 > maxPages ? start : start + 1);
             vars.Add("BackOne", start - 1 < 0 ? 0 : start - 1);
 
-            var users = Framework.Utilities.DataManager.RequestPlugin<IAgentInfoConnector>()
+             var activeUsers = Framework.Utilities.DataManager.RequestPlugin<IAgentInfoConnector>()
                                    .RecentlyOnline(5*60, true, new Dictionary<string, bool>(), (uint) start,
                                                    amountPerQuery);
-            IUserAccountService accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService>();
-            IGridService gridService = webInterface.Registry.RequestModuleInterface<IGridService>();
-            var libraryOwner = new UUID(Constants.LibraryOwner);
-
-            foreach (var user in users)
+            if (activeUsers.Count > 0)
             {
-                var userID = UUID.Parse (user.UserID);
-                if (userID == libraryOwner)
-                    continue;
+                IUserAccountService accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
+                IGridService gridService = webInterface.Registry.RequestModuleInterface<IGridService> ();
+                foreach (var user in activeUsers)
+                {
+                    if (UUID.Parse (user.UserID) == libraryOwner)
+                        continue;
 
-                var region = gridService.GetRegionByUUID(null, user.CurrentRegionID);
-                var account = accountService.GetUserAccount(region.AllScopeIDs, UUID.Parse(user.UserID));
-                if (account != null && region != null)
-                    usersList.Add(new Dictionary<string, object>
-                                      {
-                                          {"UserName", account.Name},
-                                          {"UserRegion", region.RegionName},
-                                          {"UserID", user.UserID},
-                                          {"UserRegionID", region.RegionID}
-                                      });
+                    var region = gridService.GetRegionByUUID (null, user.CurrentRegionID);
+                    var account = accountService.GetUserAccount (region.AllScopeIDs, UUID.Parse (user.UserID));
+                    if (account != null && region != null)
+                    {
+                        usersList.Add (new Dictionary<string, object> {
+                            { "UserName", account.Name },
+                            { "UserRegion", region.RegionName },
+                            { "UserLocation",  user.CurrentPosition },
+                            { "UserID", user.UserID },
+                            { "UserRegionID", region.RegionID }
+                        });
+                    }
+                }
             }
+            else
+            {
+                usersList.Add(
+                    new Dictionary<string, object>
+                {
+                    {"UserName", ""},
+                    {"UserRegion", ""},
+                    {"UserLocation", "No users are currently logged in"},
+                    {"UserID", ""},
+                    {"UserRegionID", ""}
+                });
+            }
+
             if (requestParameters.ContainsKey("Order"))
             {
                 if (requestParameters["Order"].ToString() == "RegionName")
@@ -87,6 +128,7 @@ namespace WhiteCore.Modules.Web
             vars.Add("UsersOnlineList", usersList);
             vars.Add("OnlineUsersText", translator.GetTranslatedString("OnlineUsersText"));
             vars.Add("UserNameText", translator.GetTranslatedString("UserNameText"));
+            vars.Add("OnlineLocationText", translator.GetTranslatedString("OnlineLocationText"));
             vars.Add("RegionNameText", translator.GetTranslatedString("RegionNameText"));
             vars.Add("MoreInfoText", translator.GetTranslatedString("MoreInfoText"));
 

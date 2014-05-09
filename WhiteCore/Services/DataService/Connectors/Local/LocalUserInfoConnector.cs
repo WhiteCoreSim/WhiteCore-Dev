@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Services;
@@ -224,7 +223,8 @@ namespace WhiteCore.Services.DataService
 
         public uint RecentlyOnline(uint secondsAgo, bool stillOnline)
         {
-            int now = (int) Utils.DateTimeToUnixTime(DateTime.Now) - (int) secondsAgo;
+             //Beware!! login times are UTC!
+            int now = (int) Util.ToUnixTime(DateTime.Now.ToUniversalTime()) - (int) secondsAgo;
 
             QueryFilter filter = new QueryFilter();
             filter.orGreaterThanEqFilters["LastLogin"] = now;
@@ -235,13 +235,15 @@ namespace WhiteCore.Services.DataService
                 filter.andFilters["IsOnline"] = "1";
             }
 
-            return uint.Parse(GD.Query(new string[1] {"COUNT(UserID)"}, m_realm, filter, null, null, null)[0]);
+            List<string>  userCount = GD.Query(new string[1] {"COUNT(UserID)"}, m_realm, filter, null, null, null);
+            return uint.Parse (userCount[0]);
         }
 
         public List<UserInfo> RecentlyOnline(uint secondsAgo, bool stillOnline, Dictionary<string, bool> sort,
                                              uint start, uint count)
         {
-            int now = (int) Utils.DateTimeToUnixTime(DateTime.Now) - (int) secondsAgo;
+            //Beware!! login times are UTC!
+            int now = (int) Util.ToUnixTime(DateTime.Now.ToUniversalTime()) - (int) secondsAgo;
 
             QueryFilter filter = new QueryFilter();
             filter.orGreaterThanEqFilters["LastLogin"] = now;
