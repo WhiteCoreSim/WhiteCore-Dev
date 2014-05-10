@@ -46,8 +46,11 @@ namespace WhiteCore.Modules.Web
 
             if (requestParameters.ContainsKey("Submit"))
             {
+                // TODO: When submitting, make sure there's no empty AvatarName and AvatarPassword
                 string AvatarName = requestParameters["AvatarName"].ToString();
+                if (AvatarName == "") return null;
                 string AvatarPassword = requestParameters["AvatarPassword"].ToString();
+                if (AvatarPassword == "") return null;
                 string FirstName = requestParameters["FirstName"].ToString();
                 string LastName = requestParameters["LastName"].ToString();
                 string UserAddress = requestParameters["UserAddress"].ToString();
