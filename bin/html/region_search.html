@@ -6,6 +6,8 @@
 
 {RegionSearchText}    Region Search
 {RegionNameText}      Region Name
+{RegionLocXText}      Region X
+{RegionLocYText}      Region Y
 {SearchForRegionText} Search for a region
 {Search}              Search
 -->
@@ -76,27 +78,6 @@
 	  <th><a class="fade" href="index.html?page=region_search&Start=-1" target="_self" title="{LastText}"><p class="nav">>&nbsp;|</p></a></th>
     </tr>
   </thead>
-<!--  
-  <tfoot>
-    <tr>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </tfoot>
-  
-  <tbody>
-    <tr>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-  </tbody>
--->
 </table>
 <table id="user_search_result">
   <caption></caption>
@@ -104,12 +85,16 @@
   <thead>
     <tr>
       <th class="user_search_result_left"><p>{RegionNameText}</p></th>
+      <th class="user_search_result_right"><p>{RegionLocXText}</p></a></th>
+      <th class="user_search_result_right"><p>{RegionLocYText}</p></a></th>
       <th class="user_search_result_right"><p>{RegionMoreInfo}</p></th>
     </tr>
   </thead>
   <tfoot>
     <tr>
       <th class="user_search_result_left"><p>{RegionNameText}</p></th>
+      <th class="user_search_result_right"><p>{RegionLocXText}</p></a></th>
+      <th class="user_search_result_right"><p>{RegionLocYText}</p></a></th>
       <th class="user_search_result_right"><p>{RegionMoreInfo}</p></th>
     </tr>
   </tfoot>
@@ -118,6 +103,8 @@
 {RegionsListArrayBegin}
     <tr>
       <td class="user_search_result_left"><p>{RegionName}</p></td>
+      <td class="user_search_result_right"><p>{RegionLocX}</p></td>
+	  <td class="user_search_result_right"><p>{RegionLocY}</p></td>
       <td class="user_search_result_right"><a target="_blank" class='regioninfo' href="region_info.html?regionid={RegionID}"><p>{MoreInfoText}</p></a></td>
     </tr>
 {RegionsListArrayEnd}
@@ -136,27 +123,6 @@
 	  <th><a class="fade" href="index.html?page=region_search&Start=-1" target="_self" title="{LastText}"><p class="nav">>&nbsp;|</p></a></th>
     </tr>
   </thead>
-<!--  
-  <tfoot>
-    <tr>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </tfoot>
-  
-  <tbody>
-    <tr>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-  </tbody>
--->
 </table>
 <script>$("li.fade, a.fade, a.regioninfo").hover(function(){$(this).fadeOut(150);$(this).fadeIn(150);});</script>
 </div>

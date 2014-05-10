@@ -3,6 +3,7 @@ using WhiteCore.Framework.Servers.HttpServer;
 using System.Collections.Generic;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.Web
 {
@@ -64,6 +65,8 @@ namespace WhiteCore.Modules.Web
                         regionslist.Add(new Dictionary<string, object>
                                             {
                                                 {"RegionName", region.RegionName},
+                                                {"RegionLocX", region.RegionLocX/Constants.RegionSize},
+                                                {"RegionLocY", region.RegionLocY/Constants.RegionSize},
                                                 {"RegionID", region.RegionID}
                                             });
                     }
@@ -80,6 +83,8 @@ namespace WhiteCore.Modules.Web
             vars.Add("RegionSearchText", translator.GetTranslatedString("RegionSearchText"));
             vars.Add("SearchForRegionText", translator.GetTranslatedString("SearchForRegionText"));
             vars.Add("RegionNameText", translator.GetTranslatedString("RegionNameText"));
+            vars.Add("RegionLocXText", translator.GetTranslatedString("RegionLocXText"));
+            vars.Add("RegionLocYText", translator.GetTranslatedString("RegionLocYText"));
             vars.Add("Search", translator.GetTranslatedString("Search"));
 
             vars.Add("FirstText", translator.GetTranslatedString("FirstText"));
