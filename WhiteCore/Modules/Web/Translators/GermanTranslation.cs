@@ -99,6 +99,12 @@
                     return "Terms of Service";
                 case "TermsOfServiceAccept":
                     return "Do you accept the Terms of Service as detailed above?";
+                case "AvatarNameError":
+                    return "Sie haben nicht einen Avatar-Namen!";
+                case "AvatarPasswordError":
+                    return "Passwort leer ist oder nicht passend!";
+                case "AvatarEmailError":
+                    return "Eine E-Mail-Adresse wird für Passwort-Wiederherstellung erforderlich!";
 
                     // news
                 case "OpenNewsManager":

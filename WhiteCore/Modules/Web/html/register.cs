@@ -128,11 +128,9 @@ namespace WhiteCore.Modules.Web
 
             if (requestParameters.ContainsKey("Submit"))
             {
-                // TODO: When submitting, make sure there's no empty AvatarName and AvatarPassword
                 string AvatarName = requestParameters["AvatarName"].ToString();
-                if (AvatarName == "") return null;
                 string AvatarPassword = requestParameters["AvatarPassword"].ToString();
-                if (AvatarPassword == "") return null;
+                string AvatarPasswordCheck = requestParameters["AvatarPassword2"].ToString();
                 string FirstName = requestParameters["FirstName"].ToString();
                 string LastName = requestParameters["LastName"].ToString();
                 //removed - greythane - deemed not used
@@ -150,11 +148,25 @@ namespace WhiteCore.Modules.Web
                                  requestParameters["ToSAccept"].ToString() == "Accepted";
 
                 // revise UserDOBMonth to a number
-                UserDOBMonth = ShortMonthToNumber(UserDOBMonth)
-                    ;
-               //IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector>();
-                //var settings = generics.GetGeneric<GridSettings>(UUID.Zero, "WebSettings", "Settings");
-
+                UserDOBMonth = ShortMonthToNumber(UserDOBMonth);
+ 
+                // a bit of idiot proofing
+                if (AvatarName == "")  {
+                    response = "<h3>" + translator.GetTranslatedString ("AvatarNameError") + "</h3>";   
+                    return null;
+                }
+                if ( (AvatarPassword == "") || (AvatarPassword != AvatarPasswordCheck) )
+                {
+                    response = "<h3>" + translator.GetTranslatedString ("AvatarPasswordError") + "</h3>";   
+                    return null;
+                } 
+                if (UserEmail == "")
+                {
+                    response = "<h3>" + translator.GetTranslatedString ("AvatarEmailError") + "</h3>";   
+                    return null;
+                }
+            
+                // so far so good...
                 if (ToSAccept)
                 {
                     AvatarPassword = Util.Md5Hash(AvatarPassword);

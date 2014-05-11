@@ -100,8 +100,14 @@
                     return "Do you accept the Terms of Service as detailed above?";
                 case "Accept":
                     return "Accept";
+                case "AvatarNameError":
+                    return "You did not enter an avatar name!";
+                case "AvatarPasswordError":
+                    return "Password is empty or not matching!";
+                case "AvatarEmailError":
+                    return "An email address is required for password recovery!";
 
-                    // news
+               // news
                 case "OpenNewsManager":
                     return "Open the news manager";
                 case "NewsManager":

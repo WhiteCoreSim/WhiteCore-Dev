@@ -100,6 +100,12 @@ namespace WhiteCore.Modules.Web.Translators
                     return "Accepteer u deze Terms of Service zoals boven beschreven?";
                 case "Accept":
                     return "Accepteren";
+                case "AvatarNameError":
+                    return "Je hebt een avatar naam invoeren!";
+                case "AvatarPasswordError":
+                    return "Wachtwoord is leeg of niet overeenkomen met!";
+                case "AvatarEmailError":
+                    return "Een e-mailadres is vereist voor wachtwoord herstel!";
 
                     // news
                 case "OpenNewsManager":

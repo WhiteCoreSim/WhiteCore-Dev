@@ -98,6 +98,12 @@
                     return "Termini di Servizio";
                 case "TermsOfServiceAccept":
                     return "Accetti i Termini di Servizio descritti qui sopra?";
+                case "AvatarNameError":
+                    return "Non è stato immesso un nome di avatar!";
+                case "AvatarPasswordError":
+                    return "La password è vuota o non corrispondenti!";
+                case "AvatarEmailError":
+                    return "L'indirizzo email è necessario per il ripristino della password!";
 
                     // news
                 case "OpenNewsManager":

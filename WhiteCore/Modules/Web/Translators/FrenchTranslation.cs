@@ -100,6 +100,12 @@
                     return "Conditions d'utilisation";
                 case "TermsOfServiceAccept":
                     return "Acceptez-vous les Conditions d'utilisation détaillés ci-dessus?";
+                case "AvatarNameError":
+                    return "Vous n'avez pas saisi un nom d'avatar!";
+                case "AvatarPasswordError":
+                    return "Mot de passe est vide ou ne correspondant pas!";
+                case "AvatarEmailError":
+                    return "Une adresse e-mail est nécessaire pour la récupération de mot de passe!";
 
                     // news
                 case "OpenNewsManager":
