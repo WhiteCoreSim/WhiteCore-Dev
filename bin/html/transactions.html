@@ -1,0 +1,67 @@
+<div id="fullPage">
+<h2>{SystemName}: {TransactionsText}</h2>
+<form id="transactions_search_form" action="transactions.html" method="POST">
+	<fieldset class="form-fieldset-range">
+		<legend>Select a date range</legend>
+			<p class="from-to">
+				<label class="from" for="date_start">From:</label>
+					<select name="date_start" id="date_start">
+					{30days past}
+					</select>
+				<label class="to" for="date_end">&nbsp;-&nbsp;To:</label>
+			  		<select name="date_end" id="date_end">
+					{30days past}
+					</select>
+			<input type="submit" name="submit" value="View  (up to 500)" class="button" style="float:right;" name="view" />
+			</p>
+	</fieldset>
+</form>
+<div class="center notice" style="text-align:center;margin:10px 0;">No transactions found for this time period. </div>
+<script>
+  /* attach a submit handler to the form */
+  $("#transactions_search_form").submit(function(event) {
+
+    /* stop form from submitting normally */
+    event.preventDefault(); 
+    /* get some values from elements on the page: */
+    var $form = $( this ),
+        url = $form.attr( 'action' );
+    /* Send the data using post and put the results in a div */
+    $.post( url, $form.serialize(),
+      function( data ) {
+		$("#fullPage").empty().append(data);
+      }
+    );
+  });
+</script>
+<table id="transactions_search_result_navigation_top">
+  <caption></caption>			
+  <thead>
+    <tr>
+      <th class="user_search_result_left"><p>Date</p></th>
+      <th class="user_search_result_right"><p>Time</p></th>
+      <th class="user_search_result_right"><p>ID Prefix</p></th>
+      <th class="user_search_result_right"><p>Detail</p></th>
+      <th class="user_search_result_right"><p>Debit</p></th>
+      <th class="user_search_result_right"><p>Credit</p></th>
+      <th class="user_search_result_right"><p>Balance</p></th>
+    </tr>
+  </thead>
+</table>
+<table id="transactions_search_result">
+  <tbody>
+	{RegionsListArrayBegin}
+    <tr>
+      <td class="user_search_result_left"><p>{Date}</p></td>
+      <td class="user_search_result_right"><p>{Time}</p></td>
+      <td class="user_search_result_right"><p>{IDPrefix}</p></td>
+      <td class="user_search_result_right"><p>{Detail}</p></td>
+      <td class="user_search_result_right"><p>{Debit}</p></td>
+      <td class="user_search_result_right"><p>{Credit}</p></td>
+      <td class="user_search_result_right"><p>{Balance}</p></td>
+    </tr>
+	{RegionsListArrayEnd}
+  </tbody>
+</table>
+</div>
+ 
