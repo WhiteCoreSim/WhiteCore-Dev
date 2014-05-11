@@ -36,7 +36,7 @@ using Nini.Config;
 using OpenMetaverse;
 using System;
 using System.Collections.Generic;
-using WhiteCore.Services;
+
 
 namespace WhiteCore.Modules.Web
 {
