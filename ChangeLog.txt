@@ -3,6 +3,21 @@ WhiteCore-Sim (Dev)
 Rowan D <greythane@gmail.com>
 Fly-Man- <fly.man.opensim@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+May 9/10 - Greythane
+* WebUI - online_users, grid status
+  - Update html code for additional formatting and readability
+* UserInfoConector
+  - Correct RecentlyOnline queries to convert local times to UTC that is used for logging avatar presence
+* UserAccountService
+  - Ignore system users in retrieved user count
+* SceneManager 
+ - Updated command functions to conform with the 'Handle<command>' format
+* WebUI registrations & admin
+ - add setting to admin to enable/disable web registrations
+ - additional translation updates for new text
+ - registration page updates and additions
+ - reformatting of registration page
+ 
 May 8 - Greythane
 * WebUI
   - Updated the graphics and CSS for the Viewer Help page

@@ -145,6 +145,7 @@ table#register th {}
 table#register td {}
 .register_left {text-align: left;}
 .register_right {text-align: left;}
+.register_dob select{width: 65px;}
 
 .avatar_archive_screenshot {
     float: left;
@@ -942,7 +943,7 @@ div.languageswitch {float:left; text-align: left;display: inline;}
 div.styleswitch {float:right; text-align: right;display: inline;}
 
 /* Pretty Message */
-.message, .info, .alert, .download {
+.message, .info, .alert, .error, .download {
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
 	-khtml-border-radius: 5px;
@@ -972,6 +973,15 @@ div.styleswitch {float:right; text-align: right;display: inline;}
 .alert {
   background-color: #ffdfdf;
   border: 1px solid #ffbaba;
+  padding: 5px;
+  float: left;
+  width:98.75%;
+}
+
+.error {
+  /*background-color: #ffdfdf;
+  border: 1px solid #ffbaba;*/
+  color: #C5130D;
   padding: 5px;
   float: left;
   width:98.75%;

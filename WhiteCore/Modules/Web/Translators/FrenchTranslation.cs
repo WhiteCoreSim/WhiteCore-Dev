@@ -568,6 +568,8 @@
                     //settings manager page
                 case "Save":
                     return "Sauver";
+                case "WebRegistrationText":
+                    return "Enregistrements Web autorisés";
                 case "GridCenterXText":
                     return "Grille Location Centrer X";
                 case "GridCenterYText":

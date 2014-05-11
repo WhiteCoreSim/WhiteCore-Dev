@@ -567,6 +567,8 @@
                     //settings manager page
                 case "Save":
                     return "Save";
+                case "WebRegistrationText":
+                    return "Registros Web permitidas";
                 case "GridCenterXText":
                     return "Grid Center Location X";
                 case "GridCenterYText":

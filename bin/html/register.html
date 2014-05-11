@@ -1,11 +1,17 @@
 <script type="text/javascript">
 jQuery(document).ready(function() {jQuery('#avatarcarousel').jcarousel({wrap: 'circular'});});
 </script>
+
+{IfNoRegistrationsBegin}
+<!--#include file="/noregistrations.html" --> 
+{IfNoRegistrationsEnd}
   
+{IfRegistrationsBegin}
 <h2>{SystemName}: {RegistrationText}</h2>
 <div id="error_message" class="error">{ErrorMessage}</div>
+
 <form id="region_form" action="{SubmitURL}" method="POST">
-<table>
+<div style ="display: inline-block;"><table>
   <caption></caption>
   
   <thead>
@@ -18,7 +24,7 @@ jQuery(document).ready(function() {jQuery('#avatarcarousel').jcarousel({wrap: 'c
   <tfoot>
     <tr>
       <th class="register_left"></th>
-      <th class="register_right" colspan="3"></th>
+      <th class="register_right" colspan="2"></th>
     </tr>
   </tfoot>
 
@@ -50,6 +56,7 @@ jQuery(document).ready(function() {jQuery('#avatarcarousel').jcarousel({wrap: 'c
       <td class="register_left"><p>{LastNameText}</p></td>
       <td class="register_right" colspan="3"><input label="LastName" id="LastName" name="LastName" type="text" size="25" maxlength="15" value=""></td>
     </tr>	
+<!-- greythane - removed as the address details are not really relevant now
     <tr>
       <td class="register_left"><p>{UserAddressText}</p></td>
       <td class="register_right" colspan="3"><input label="UserAddress" id="UserAddress" name="UserAddress" type="text" size="50" maxlength="50" value=""></td>
@@ -58,27 +65,28 @@ jQuery(document).ready(function() {jQuery('#avatarcarousel').jcarousel({wrap: 'c
       <td class="register_left"><p>{UserZipText}</p></td>
       <td class="register_right" colspan="3"><input label="UserZip" id="UserZip" name="UserZip" type="text" size="25" maxlength="15" value=""></td>
     </tr>
+-->
     <tr>
       <td class="register_left"><p>{UserCityText}</p></td>
       <td class="register_right" colspan="3"><input label="UserCity" id="UserCity" name="UserCity" type="text" size="25" maxlength="15" value=""></td>
     </tr>
     <tr>
       <td class="register_left"><p>{UserDOBText}</p></td>
-      <td class="register_right">
+      <td class="register_dob">
 	    <select id="UserDOBMonth" require="true" name='UserDOBMonth'>			
 {MonthsArrayBegin}
 		  <option value="{Value}">{Value}</option>
 {MonthsArrayEnd}
 		</select>
 	  </td>
-      <td class="register_right">
+      <td class="register_dob">
 		<select id="UserDOBDay" require="true" name='UserDOBDay'>					
 {DaysArrayBegin}
 		  <option value="{Value}">{Value}</option>
 {DaysArrayEnd}
 		</select>
 	  </td>
-      <td class="register_right">
+      <td class="register_dob">
 		<select id="UserDOBYear" require="true" name='UserDOBYear'>										
 {YearsArrayBegin}
 		  <option value="{Value}">{Value}</option>
@@ -87,7 +95,7 @@ jQuery(document).ready(function() {jQuery('#avatarcarousel').jcarousel({wrap: 'c
 	  </td>
     </tr>
     <tr>
-      <td class="register_left"><p>{UserEmailText}</p></td>
+      <td class="register_left"><p>{UserEmailText}*</p></td>
       <td class="register_right" colspan="3"><input label="UserEmail" id="UserEmail" name="UserEmail" type="text" size="40" maxlength="40" value=""></td>
     </tr>
     <tr>
@@ -120,8 +128,9 @@ jQuery(document).ready(function() {jQuery('#avatarcarousel').jcarousel({wrap: 'c
       <td class="register_right" colspan="3"><input type="hidden" name="action" value="check"><button id="Submit" name="Submit" type="Submit">{Submit}</button></input></td>
     </tr>
   </tbody>
-</table>
+</table></div>
 </form>
+
 <script>
   /* attach a submit handler to the form */
   $("#region_form").submit(function(event) {
@@ -139,3 +148,4 @@ jQuery(document).ready(function() {jQuery('#avatarcarousel').jcarousel({wrap: 'c
     );
   });
 </script>
+{IfRegistrationsEnd}

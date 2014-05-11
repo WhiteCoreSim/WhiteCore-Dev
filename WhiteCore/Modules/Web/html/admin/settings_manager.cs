@@ -41,6 +41,7 @@ namespace WhiteCore.Modules.Web
 
             if (requestParameters.ContainsKey("Submit"))
             {
+                settings.WebRegistration = requestParameters["WebRegistration"].ToString() == "1";
                 settings.MapCenter.X = int.Parse(requestParameters["GridCenterX"].ToString());
                 settings.MapCenter.Y = int.Parse(requestParameters["GridCenterY"].ToString());
                 settings.HideLanguageTranslatorBar = requestParameters["HideLanguageBar"].ToString() == "1";
@@ -61,6 +62,8 @@ namespace WhiteCore.Modules.Web
                 settings.LastSettingsVersionUpdateIgnored = PagesMigrator.CurrentVersion;
                 connector.AddGeneric(UUID.Zero, "WebSettings", "Settings", settings.ToOSD());
             }
+            vars.Add("WebRegistrationNo", !settings.WebRegistration ? "selected=\"selected\"" : "");
+            vars.Add("WebRegistrationYes", settings.WebRegistration ? "selected=\"selected\"" : "");
             vars.Add("GridCenterX", settings.MapCenter.X);
             vars.Add("GridCenterY", settings.MapCenter.Y);
             vars.Add("HideLanguageBarNo", !settings.HideLanguageTranslatorBar ? "selected=\"selected\"" : "");
@@ -77,6 +80,7 @@ namespace WhiteCore.Modules.Web
             vars.Add("SettingsManager", translator.GetTranslatedString("SettingsManager"));
             vars.Add("IgnorePagesUpdatesText", translator.GetTranslatedString("IgnorePagesUpdatesText"));
             vars.Add("IgnoreSettingsUpdatesText", translator.GetTranslatedString("IgnoreSettingsUpdatesText"));
+            vars.Add("WebRegistrationText", translator.GetTranslatedString("WebRegistrationText"));
             vars.Add("GridCenterXText", translator.GetTranslatedString("GridCenterXText"));
             vars.Add("GridCenterYText", translator.GetTranslatedString("GridCenterYText"));
             vars.Add("HideLanguageBarText", translator.GetTranslatedString("HideLanguageBarText"));

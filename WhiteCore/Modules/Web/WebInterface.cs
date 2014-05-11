@@ -854,6 +854,7 @@ namespace WhiteCore.Modules.Web
         public bool HideLanguageTranslatorBar = false;
         public bool HideStyleBar = false;
         public UUID DefaultScopeID = UUID.Zero;
+        public bool WebRegistration = false;
 
         public GridSettings()
         {
@@ -872,6 +873,7 @@ namespace WhiteCore.Modules.Web
             HideLanguageTranslatorBar = map["HideLanguageTranslatorBar"];
             HideStyleBar = map["HideStyleBar"];
             DefaultScopeID = map["DefaultScopeID"];
+            WebRegistration = map["WebRegistration"];
         }
 
         public override OSDMap ToOSD()
@@ -884,6 +886,7 @@ namespace WhiteCore.Modules.Web
             map["HideLanguageTranslatorBar"] = HideLanguageTranslatorBar;
             map["HideStyleBar"] = HideStyleBar;
             map["DefaultScopeID"] = DefaultScopeID;
+            map["WebRegistration"] = WebRegistration;
 
             return map;
         }

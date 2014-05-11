@@ -2,6 +2,7 @@
 
 {SystemURL}
 {SystemName}
+{WebRegistrationText}
 {GridCenterX}
 {GridCenterY}
 {SettingsManager}               Settings Manager
@@ -34,6 +35,15 @@
   </tfoot>
 
   <tbody>
+    <tr>
+      <td class="settings_manager_left"><p id="gridcentery_label">{WebRegistrationText}</p></td>
+      <td class="settings_manager_right">
+	    <select name="WebRegistration" id="WebRegistration">
+		  <option value="0" style="background-color:#FF0000" {WebRegistrationNo}>{No}</option>
+		  <option value="1" style="background-color:#00FF00" {WebRegistrationYes}>{Yes}</option>
+	    </select>
+	  </td>
+    </tr>
     <tr>
       <td class="settings_manager_left"><p id="gridcenterx_label">{GridCenterXText}</p></td>
       <td class="settings_manager_right"><input name="GridCenterX" type="text" id="GridCenterX" size="119" value="{GridCenterX}" /></td>

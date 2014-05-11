@@ -566,6 +566,8 @@
                     //settings manager page
                 case "Save":
                     return "Salva";
+                case "WebRegistrationText":
+                    return "Immatricolazioni Web consentiti";
                 case "GridCenterXText":
                     return "Centro della Grid Coordinate X";
                 case "GridCenterYText":

@@ -513,7 +513,7 @@
                 case "MinutesText":
                     return "Minutes";
                 case "EdittingText":
-                    return "Editting";
+                    return "Editing";
                 case "BannedUntilText":
                     return "User banned until:";
                 case "KickAUserText":
@@ -585,6 +585,8 @@
                     //settings manager page
                 case "Save":
                     return "Save";
+                case "WebRegistrationText":
+                    return "Web registrations allowed";
                 case "GridCenterXText":
                     return "Grid Center Location X";
                 case "GridCenterYText":

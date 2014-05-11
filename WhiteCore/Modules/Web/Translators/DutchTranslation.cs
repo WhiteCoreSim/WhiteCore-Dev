@@ -585,6 +585,8 @@ namespace WhiteCore.Modules.Web.Translators
                     //settings manager page
                 case "Save":
                     return "Save";
+                case "WebRegistrationText":
+                    return "Webregistraties toegestaan";
                 case "GridCenterXText":
                     return "Grid Center Location X";
                 case "GridCenterYText":
