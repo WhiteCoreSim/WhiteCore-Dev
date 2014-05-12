@@ -25,10 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Profile;
@@ -190,6 +188,7 @@ namespace WhiteCore.Modules.Web
             vars.Add("de", translator.GetTranslatedString("de"));
             vars.Add("it", translator.GetTranslatedString("it"));
             vars.Add("es", translator.GetTranslatedString("es"));
+            vars.Add("nl", translator.GetTranslatedString("nl"));
 
             IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector>();
             var settings = generics.GetGeneric<GridSettings>(UUID.Zero, "WebSettings", "Settings");

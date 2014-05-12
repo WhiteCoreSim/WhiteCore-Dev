@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.Servers.HttpServer;
 using System.Collections.Generic;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 
@@ -78,6 +77,7 @@ namespace WhiteCore.Modules.Web
             vars.Add("de", translator.GetTranslatedString("de"));
             vars.Add("it", translator.GetTranslatedString("it"));
             vars.Add("es", translator.GetTranslatedString("es"));
+            vars.Add("nl", translator.GetTranslatedString("nl"));
 
             return vars;
         }

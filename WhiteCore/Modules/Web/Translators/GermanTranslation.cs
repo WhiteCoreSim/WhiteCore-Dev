@@ -349,16 +349,18 @@
                     return "Choice";
 
                     // Language Switcher Tooltips
-                case "en":
-                    return "English";
-                case "fr":
-                    return "French";
-                case "de":
-                    return "German";
-                case "it":
-                    return "Italian";
-                case "es":
-                    return "Spanish";
+            case "en": 
+                return "Englisch";
+            case "fr": 
+                return "Französisch";
+            case "de": 
+                return "Deutsch";
+            case "it": 
+                return "Italienisch";
+            case "es": 
+                return "Spanisch";
+            case "nl": 
+                return "Holländisch";
 
                     // Index Page
                 case "HomeText":

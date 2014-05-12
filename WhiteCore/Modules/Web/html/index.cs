@@ -25,9 +25,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
 using WhiteCore.Framework.DatabaseInterfaces;
-using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using OpenMetaverse;
 using System.Collections.Generic;
@@ -155,6 +153,7 @@ namespace WhiteCore.Modules.Web
             vars.Add("de", translator.GetTranslatedString("de"));
             vars.Add("it", translator.GetTranslatedString("it"));
             vars.Add("es", translator.GetTranslatedString("es"));
+            vars.Add("nl", translator.GetTranslatedString("nl"));
 
             // Index Page
             vars.Add("HomeText", translator.GetTranslatedString("HomeText"));

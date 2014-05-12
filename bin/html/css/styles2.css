@@ -34,8 +34,9 @@ body  {
 #lg3 {{DisplayLG3}color: #FF0000;}
 #lg4 {{DisplayLG4}color: #FF0000;}
 #lg5 {{DisplayLG5}color: #FF0000;}
+#lg6 {{DisplayLG6}color: #FF0000;}
 
-#st1, #st2, #st3, #st4, #st5, #lg1, #lg2, #lg3, #lg4, #lg5, a.styleswitch, a.languageswitch {
+#st1, #st2, #st3, #st4, #st5, #lg1, #lg2, #lg3, #lg4, #lg5, lg6, a.styleswitch, a.languageswitch {
 	background: #FFF;
 	margin-right: 5px;
 	padding-left: 6px;
@@ -121,6 +122,18 @@ table#news_manager th {}
 table#news_manager td {}
 .news_managerh_left {text-align: left;}
 .news_manager_right {text-align: right;}
+
+/* list headers and footers */
+.listhead {
+	background-color: #bbc;
+	color: #333;
+	border-top: solid 1px;
+}
+.listfoot {
+	background-color: #bbc;
+	color: #333;
+	border-bottom: solid 1px;
+}
 
 /* region_list */
 table#region_list_navigation_top, table#region_list_navigation_bottom {width: 30%;}
@@ -989,9 +1002,9 @@ div.styleswitch {float:right; text-align: right;display: inline;}
 #maintenance {text-align: center;}
 
 .error404, .error505 {
-	margin-top: 200px;
+	margin-top: 50px;
 	color: #eee;
-	font-size: 256px;
+	font-size: 56px;
 	text-shadow: 1px 1px #fff, -1px -1px #444;
 }
 

@@ -6,12 +6,50 @@
 {Error404InfoText}    404 Page Not Found
 {HomePage404Text}     home page
 -->
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>{SystemName}: Welcome Screen</title>
+	<meta name="keywords" content="{SystemName}" />
+	<meta name="description" content="{SystemName}"/>
+	<link rel="shortcut icon" href="../images/icons/favicon.ico" />
 
-<div id="content">
-	<div id="ContentHeaderCenter"><h2>{SystemName}</h2></div>
-	<div id="maintenance">
-		<p class="error404">404</p>
+	<!-- Javascript -->
+	<script src="../javascripts/jquery.min.js" type="text/javascript" language="javascript"></script>
+	
+	<!-- StyleSwitch TODO -->
+	<script src="../javascripts/styleswitch.js" type="text/javascript" ></script>
+	<link href="../css/styles1.css" rel="stylesheet" type="text/css" media="screen" title="styles1" />
+	<link href="../css/styles2.css" rel="alternate stylesheet" type="text/css" title="styles2" media="screen" />
+	<link href="../css/styles3.css" rel="alternate stylesheet" type="text/css" title="styles3" media="screen" />
+	<link href="../css/styles4.css" rel="alternate stylesheet" type="text/css" title="styles4" media="screen" />
+	<link href="../css/styles5.css" rel="alternate stylesheet" type="text/css" title="styles5" media="screen" />
+
+</head>
+
+<body class="maintenance">
+  <div id="container">
+    <div id=top_image>
+      <a class="logofade" href="SystemURL" alt="{SystemName}" title="{SystemName}">
+		<img class="logofade" src="../images/logo1.png" alt="{SystemName}" title="{SystemName}" />
+	  </a>
+    </div>
+
+    <div id="content">
+	  <div style="text-align: center;" id="ContentHeaderCenter">
+	    <h2>{SystemName}</h2>
+	  </div>
+	  <div id="error404" align="center">
+		<p class="error404">Looks like we lost something!</p>
 		<h4>{Error404Text}: {Error404InfoText}</h4>
-		<a href="{SystemURL}">{SystemName} {HomePage404Text}</a>
-	</div>
-</div>
+		<div class="error404">
+		<a href="{SystemURL}">
+		    <img src="images/lost.jpg" alt="{Error404InfoText}" title="Go home..." /><br />
+		</a>
+		</div>
+	  </div>
+    </div>
+  </div>
+</body>
+</html>

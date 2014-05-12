@@ -94,7 +94,7 @@ For regionprofil:
 <table id="region_info">
   <caption></caption>
 
-  <thead>
+  <thead  style="border-bottom:solid 1px;">
     <tr>
       <th class="region_info_left"></th>
       <th class="region_info_right"></th>
@@ -103,8 +103,8 @@ For regionprofil:
     </tr>
   </thead>
   
-  <tfoot>
-    <tr>
+  <tfoot style="border-top: solid 1px;">
+    <tr style= align:bottom;">
       <th class="region_info_left"></th>
       <th class="region_info_right"></th>
 	  <th class="region_info_right"></th>
@@ -115,7 +115,7 @@ For regionprofil:
   <tbody>
     <tr>
       <td class="region_info_picture" rowspan="10">
-	    <div class="region_info_picture">
+	    <div class="region_info_picture" style="height:256px;">
 	      <a class="regionslurl" 
 		     onclick="document.location.href='hop://{RegionName}/128/128/50'" 
 		     alt="{RegionNameText}: {RegionName}"
@@ -177,8 +177,9 @@ For regionprofil:
   </tbody>
 </table>
 </div>
+<!--  greythane - These dont't work here as the calling links are not present. Actually do not need them anyway
 	<div id="footer">
-<!-- {IfShowLanguageTranslatorBarBegin} -->
+{IfShowLanguageTranslatorBarBegin}
 	  <div class=languageswitch>
 	    <ul>
 		{StyleSwitcherLanguagesText}:
@@ -187,12 +188,13 @@ For regionprofil:
 		  <li><a href="?language=de" rel="de" class="languageswitch" alt="{de}" title="<img src='images/flags/flag-de.png' alt='de' /> {de}">de</a></li>
 		  <li><a href="?language=it" rel="it" class="languageswitch" alt="{it}" title="<img src='images/flags/flag-it.png' alt='it' /> {it}">it</a></li>
 		  <li><a href="?language=es" rel="es" class="languageswitch" alt="{es}" title="<img src='images/flags/flag-es.png' alt='es' /> {es}">es</a></li>
-		{StyleSwitcherChoiceText}: <span id="lg1">en</span><span id="lg2">fr</span><span id="lg3">de</span><span id="lg4">it</span><span id="lg5">es</span>  
+		  <li><a href="?language=nl" rel="nl" class="languageswitch" alt="{nl}" title="<img src='images/flags/flag-nl.png' alt='nl' /> {nl}">nl</a></li>
+		{StyleSwitcherChoiceText}: <span id="lg1">en</span><span id="lg2">fr</span><span id="lg3">de</span><span id="lg4">it</span><span id="lg5">es</span> <span id="lg6">nl</span> 
 		</ul>
 	  </div>
-<!-- {IfShowLanguageTranslatorBarEnd} -->
+{IfShowLanguageTranslatorBarEnd}
 
-<!-- {IfShowStyleBarBegin} -->
+{IfShowStyleBarBegin}
 	  <div class=styleswitch>
 	    <ul>
 		{StyleSwitcherStylesText}:
@@ -204,9 +206,11 @@ For regionprofil:
 		{StyleSwitcherChoiceText}: <span id="st1">1</span><span id="st2">2</span><span id="st3">3</span><span id="st4">4</span><span id="st5">5</span>| Copyright&nbsp;&copy;&nbsp;<a class='copyright' href="/" alt="{SystemName}" title="{SystemName}">{SystemName}</a>&nbsp;2014  
 		</ul>
 	  </div>
-<!-- {IfShowStyleBarEnd} -->
+{IfShowStyleBarEnd}
+
 	  <span class="clear"></span>
 	</div>
+-->
 </div>
 <script type="text/javascript">
 	// fade class
