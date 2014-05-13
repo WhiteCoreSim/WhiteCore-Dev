@@ -347,7 +347,6 @@
       <Reference name="WhiteCore.DataManager"/>
       <Reference name="WhiteCore.Framework"/>
       
-      <Reference name="DotNetOpenMail" path="../../bin/"/>
       <Reference name="Nini" path="../../bin/"/>
       <Reference name="OpenMetaverse" path="../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../bin/"/>

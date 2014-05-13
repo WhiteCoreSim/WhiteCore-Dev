@@ -29,18 +29,21 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text.RegularExpressions;
-using WhiteCore.Framework;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Utilities;
-using DotNetOpenMail;
-using DotNetOpenMail.SmtpAuth;
 using Nini.Config;
 using OpenMetaverse;
+using System.Net;
+using System.Net.Mail;
+#if LINUX
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
+#endif
+using System.Threading;
 
 namespace WhiteCore.Modules.Scripting
 {
@@ -61,7 +64,8 @@ namespace WhiteCore.Modules.Scripting
         private string SMTP_SERVER_HOSTNAME = string.Empty;
         private string SMTP_SERVER_LOGIN = string.Empty;
         private string SMTP_SERVER_PASSWORD = string.Empty;
-        private int SMTP_SERVER_PORT = 25;
+        private bool SMTP_SERVER_MONO_CERT = false;
+        private int SMTP_SERVER_PORT = 587;
         private IConfigSource m_Config;
 
         private bool m_Enabled;
@@ -73,6 +77,15 @@ namespace WhiteCore.Modules.Scripting
 
         #region IEmailModule Members
 
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="WhiteCore.Modules.Scripting.EmailModule"/> local only.
+        /// </summary>
+        /// <value><c>true</c> if local only; otherwise, <c>false</c>.</value>
+        public virtual bool LocalOnly()
+        {
+            return m_localOnly;
+        }
+            
         /// <summary>
         ///     SendMail function utilized by llEMail
         /// </summary>
@@ -87,14 +100,17 @@ namespace WhiteCore.Modules.Scripting
             if (address == string.Empty)
                 return;
 
-            //FIXED:Check the email is correct form in REGEX
-            const string EMailpatternStrict = @"^(([^<>()[\]\\.,;:\s@\""]+"
-                                              + @"(\.[^<>()[\]\\.,;:\s@\""]+)*)|(\"".+\""))@"
-                                              + @"((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}"
-                                              + @"\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+"
-                                              + @"[a-zA-Z]{2,}))$";
-            Regex EMailreStrict = new Regex(EMailpatternStrict);
-            bool isEMailStrictMatch = EMailreStrict.IsMatch(address);
+            /*
+             * //FIXED:Check the email is correct form in REGEX
+            //const string EMailpatternStrict = @"^(([^<>()[\]\\.,;:\s@\""]+"
+            //                                  + @"(\.[^<>()[\]\\.,;:\s@\""]+)*)|(\"".+\""))@"
+            //                                  + @"((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}"
+            //                                  + @"\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+"
+            //                                  + @"[a-zA-Z]{2,}))$";
+            */
+            //Regex EMailreStrict = new Regex(EMailpatternStrict);
+            //bool isEMailStrictMatch = EMailreStrict.IsMatch(address);
+            bool isEMailStrictMatch = Utilities.IsValidEmail(address);
             if (!isEMailStrictMatch)
             {
                 MainConsole.Instance.Error("[EMAIL] REGEX Problem in EMail Address: " + address);
@@ -121,62 +137,90 @@ namespace WhiteCore.Modules.Scripting
                 if (!m_localOnly)
                 {
                     // regular email, send it out
-                    try
-                    {
-                        //Creation EmailMessage
-
-                        string fromEmailAddress;
-
-                        if (scene != null && objectID != UUID.Zero)
-                            fromEmailAddress = objectID.ToString() + "@" + m_HostName;
-                        else
-                            fromEmailAddress = "no-reply@" + m_HostName;
-
-                        EmailMessage emailMessage = new EmailMessage
-                                                        {
-                                                            FromAddress =
-                                                                new EmailAddress(fromEmailAddress),
-                                                            Subject = subject
-                                                        };
-
-                        //To - Only One
-                        emailMessage.AddToAddress(new EmailAddress(address));
-                        //Text
-                        emailMessage.BodyText = body;
-                        if (scene != null)
+                    Thread threadSendMail;
+                    threadSendMail = new Thread (delegate() 
                         {
-                            // If Object Null Dont Include Object Info Headers (Offline IMs)
-                            if(objectID != UUID.Zero)
-                                emailMessage.BodyText = "Object-Name: " + LastObjectName +
-                                                        "\nRegion: " + LastObjectRegionName + "\nLocal-Position: " +
-                                                        LastObjectPosition + "\n\n";
+                            try
+                            {
+                                //Creation EmailMessage
 
-                            emailMessage.BodyText += emailMessage.BodyText;
-                        }
+                                string fromEmailAddress;
 
-                        
+                                if (scene != null && objectID != UUID.Zero)
+                                    fromEmailAddress = objectID.ToString () + "@" + m_HostName;
+                                else
+                                    fromEmailAddress = "no-reply@" + m_HostName;
 
-                        //Config SMTP Server
-                        //Set SMTP SERVER config
-                        SmtpServer smtpServer = new SmtpServer(SMTP_SERVER_HOSTNAME, SMTP_SERVER_PORT);
-                        // Add authentication only when requested
-                        if (SMTP_SERVER_LOGIN != String.Empty && SMTP_SERVER_PASSWORD != String.Empty)
-                            smtpServer.SmtpAuthToken = new SmtpAuthToken(SMTP_SERVER_LOGIN, SMTP_SERVER_PASSWORD);
-                        //Add timeout of 15 seconds
-                        smtpServer.ServerTimeout = 15000;
-                        //Send Email Message
-                        didError = !emailMessage.Send(smtpServer);
+                                var fromAddress = new MailAddress (fromEmailAddress);
+                                var toAddress = new MailAddress (address);
 
-                        //Log
-                        if (!didError)
-                            MainConsole.Instance.Info("[EMAIL] EMail sent to: " + address + " from object: " +
-                                                      fromEmailAddress);
-                    }
-                    catch (Exception e)
-                    {
-                        MainConsole.Instance.Error("[EMAIL] DefaultEmailModule Exception: " + e.Message);
-                        didError = true;
-                    }
+                                if (scene != null)
+                                {
+                                    // If Object Null Dont Include Object Info Headers (Offline IMs)
+                                    if (objectID != UUID.Zero)
+                                        body = body + "\nObject-Name: " + LastObjectName +
+                                        "\nRegion: " + LastObjectRegionName + "\nLocal-Position: " +
+                                        LastObjectPosition + "\n\n";
+                                }
+
+                                //Config SMTP Server
+                                var smtpServer = new SmtpClient();
+                                smtpServer.Host = SMTP_SERVER_HOSTNAME;
+                                smtpServer.Port = SMTP_SERVER_PORT;
+                                smtpServer.EnableSsl = SMTP_SERVER_PORT == 587 ? true: false;
+                                smtpServer.DeliveryMethod = SmtpDeliveryMethod.Network;
+                                smtpServer.UseDefaultCredentials = false;
+                                smtpServer.Credentials = new NetworkCredential (SMTP_SERVER_LOGIN, SMTP_SERVER_PASSWORD);
+                                smtpServer.Timeout = 15000;
+                               
+                                // Beware !! This effectively ignores the ssl validation and assumes that all is correct 
+                                // For Mono, reguires importation of the Google smtpd certificate (see SMTPEmail.ini.example)
+                                // Possibly not needed for Windows
+                                //ServicePointManager.ServerCertificateValidationCallback = 
+                                //    delegate(object sim, X509Certificate certificate, X509Chain chain SslPolicyErrors sslPolicyErrors)
+                                //{ return true; };
+
+                                // if ((!SMTP_SERVER_MONO_CERT) && (Utilities.IsLinuxOs))
+                                    ServicePointManager.ServerCertificateValidationCallback = delegate {
+                                        return true;
+                                    };
+
+                                // create the message
+                                var emailMessage = new MailMessage (fromAddress, toAddress);
+                                emailMessage.Subject = subject;
+                                emailMessage.Body = body;
+
+                                // sample for adding attachements is needed sometime :)
+                                //if File(Exist(fullFileName))
+                                //{
+                                //    var mailAttactment = new Attachment(fullFileName);
+                                //    emailMessage.Attachments.Add(mailAttactment);
+                                //}
+
+                                // send the message
+                                try
+                                {
+                                    smtpServer.Send (emailMessage);
+                                } catch (SmtpException ex)
+                                {
+                                    SmtpStatusCode status = ex.StatusCode;
+                                    if (status == SmtpStatusCode.Ok)
+                                        MainConsole.Instance.Info ("[EMAIL] EMail sent to: " + address + " from object: " +
+                                        fromEmailAddress);
+                                    else
+                                        MainConsole.Instance.Info ("[EMAIL] EMail error sending to: " + address + " from object: " +
+                                        fromEmailAddress + " status: " + ex.Message);
+                                }
+                            } catch (Exception e)
+                            {
+                                MainConsole.Instance.Error ("[EMAIL] DefaultEmailModule Exception: " + e.Message);
+                                didError = true;
+                            }
+                        });
+
+                    threadSendMail.IsBackground = true;
+                    threadSendMail.Start ();
+
                 }
                 if (((didError) || (m_localOnly)) && (scene != null))
                 {
@@ -237,6 +281,7 @@ namespace WhiteCore.Modules.Scripting
                 }
             }
         }
+            
 
         /// <summary>
         ///     Gets any emails that a prim may have asyncronously
@@ -465,6 +510,7 @@ namespace WhiteCore.Modules.Scripting
                 SMTP_SERVER_PORT = SMTPConfig.GetInt("SMTP_SERVER_PORT", SMTP_SERVER_PORT);
                 SMTP_SERVER_LOGIN = SMTPConfig.GetString("SMTP_SERVER_LOGIN", SMTP_SERVER_LOGIN);
                 SMTP_SERVER_PASSWORD = SMTPConfig.GetString("SMTP_SERVER_PASSWORD", SMTP_SERVER_PASSWORD);
+                SMTP_SERVER_MONO_CERT = SMTPConfig.GetBoolean("SMTP_SERVER_MONO_CERT", SMTP_SERVER_MONO_CERT);
                 m_MaxEmailSize = SMTPConfig.GetInt("email_max_size", m_MaxEmailSize);
 
                 registry.RegisterModuleInterface<IEmailModule>(this);

@@ -13,10 +13,22 @@
     ;; Settings for the maximum total size of email in bytes.
     ;email_max_size = 4096
 
-    ;; Settings for connecting to your SMTP server (Email server)
+    ;; Settings for connecting to your local SMTP server (Email server)
     ;host_domain_header_from=127.0.0.1
     ;SMTP_SERVER_HOSTNAME=127.0.0.1
     ;SMTP_SERVER_PORT=25
-    ;SMTP_SERVER_LOGIN=foo
-    ;SMTP_SERVER_PASSWORD=bar
+    ;SMTP_SERVER_LOGIN=< your account >
+    ;SMTP_SERVER_PASSWORD=< your password >
     
+    ;; Settings for connecting and sending email via the Google SMTP server (GMail)
+    ;host_domain_header_from=<Your site hostname>
+    ;SMTP_SERVER_HOSTNAME=smtp.gmail.com
+    ;SMTP_SERVER_PORT=587
+    ;SMTP_SERVER_LOGIN=<your account>@gmail.com
+    ;SMTP_SERVER_PASSWORD=<your email password>
+    
+    ;; To use mono (Linux etc) you should import Google's certificate by executing the following commands
+    ;; mozroots --import --ask-remove
+    ;; certmgr -ssl smtps://smtp.gmail.com:465
+    ;; change to true if you have imported the certificate
+    SMTP_SERVER_MONO_CERT=false
