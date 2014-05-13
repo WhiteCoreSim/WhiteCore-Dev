@@ -39,10 +39,10 @@ using Nini.Config;
 using OpenMetaverse;
 using System.Net;
 using System.Net.Mail;
-#if LINUX
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
-#endif
+//#if LINUX
+//using System.Net.Security;
+//using System.Security.Cryptography.X509Certificates;
+//#endif
 using System.Threading;
 
 namespace WhiteCore.Modules.Scripting
