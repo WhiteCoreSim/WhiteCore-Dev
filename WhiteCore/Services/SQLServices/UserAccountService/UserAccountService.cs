@@ -662,19 +662,21 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             }
             else
                 email = cmdparams[5];
-            //if (!email.Contains ("@"))
-            // {
-            //    MainConsole.Instance.Warn ("This does not look like a vaild email address. Please re-enter");
-            //    email = MainConsole.Instance.Prompt ("Email", email);
-            // }
 
-            // these really should not be altered
+            if (!Utilities.IsValidEmail(email))
+            {
+                MainConsole.Instance.Warn ("This does not look like a vaild email address. Please re-enter");
+                email = MainConsole.Instance.Prompt ("Email", email);
+            }
+
+            // Allow the user to modify the UUID  - for matching with other Grids etc eg SL
             uuid = UUID.Random().ToString();
-            scopeID = UUID.Zero.ToString ();
+            uuid = MainConsole.Instance.Prompt("UUID (Don't change unless you have a reason)", uuid);
 
+            // this really should not be altered so hide it normally
+            scopeID = UUID.Zero.ToString ();
             if (sysFlag)
             {
-                uuid = MainConsole.Instance.Prompt("UUID (Don't change unless you have a reason)", uuid);
                 scopeID = MainConsole.Instance.Prompt("Scope (Don't change unless you know what this is)", scopeID);
             }
 
