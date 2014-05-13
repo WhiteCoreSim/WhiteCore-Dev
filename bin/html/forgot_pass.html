@@ -9,13 +9,70 @@
 {Submit}           Submit
 
 -->
-
+<div id="ContentHeaderCenter">
+  <h2>{SystemName}: {ForgotPassword}</h2>
+</div>
+<div id="error_message" class="error_message"><h3>{ErrorMessage}</h3></div>
 <script language="javascript" type="text/javascript">
 	addEvent(window, "load", function() { document.getElementById("login_input").focus(); } );
 </script>
-<div id="content">
-    <div id="ContentHeaderCenter"><h2>{SystemName}: {ForgotPassword}</h2></div>
-    <div id="forgotpass">
-		Coming soon...
-    </div>
-</div>
+
+<form action="forgot_pass.html" id="forgotpass_form" method="POST">
+<table id="login">
+  <caption>Request a new password</caption>
+  
+  <thead>
+    <tr>
+      <th class="login_left"></th>
+      <th class="login_right"></th>
+    </tr>
+  </thead>
+  
+  <tfoot>
+    <tr>
+      <th class="login_left"></th>
+      <th class="login_right"></th>
+    </tr>
+  </tfoot>
+
+  <tbody>
+    <tr>
+    	<td colspan="2"> Please enter you account name</td>
+    </tr>
+    <tr>
+      <td class="login_left"><p id="logname_label">{UserNameText}*</p></td>
+      <td class="login_right"><input require="true" label="username" id="login_input" name="username" type="text"/></td>
+    </tr>
+    <tr>
+      <td class="login_left"><p>{UserEmailText}*</p></td>
+      <td class="login_right" colspan="3"><input label="UserEmail" id="UserEmail" name="UserEmail" type="text" size="40" maxlength="40" value=""></td>
+    </tr>
+    <tr>
+      <td class="login_left"></td>
+      <td class="login_right">
+		<input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
+        <button id="login_button" type="Submit" name="Submit" value="Submit">{Submit}</button>
+    </td>
+    </tr>
+  </tbody>
+</table>
+</form>
+
+<script>
+  /* attach a submit handler to the form */
+  $("#forgotpass_form").submit(function(event) {
+
+    /* stop form from submitting normally */
+    event.preventDefault(); 
+    /* get some values from elements on the page: */
+    var $form = $( this ),
+        url = $form.attr( 'action' );
+    /* Send the data using post and put the results in a div */
+    $.post( url, $form.serialize(),
+      function( data ) {
+		$("#error_message").empty().append(data);
+      }
+    );
+  });
+</script>
+

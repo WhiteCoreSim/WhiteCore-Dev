@@ -125,7 +125,8 @@ namespace WhiteCore.Modules.Web
                                   {"ChildrenMenuItems", childPages},
                                   {"MenuItemLocation", page.Location},
                                   {"MenuItemTitleHelp", GetTranslatedString(translator, page.MenuToolTip, page, true)},
-                                  {"MenuItemTitle", GetTranslatedString(translator, page.MenuTitle, page, false)}
+                        {"MenuItemTitle", GetTranslatedString(translator, page.MenuTitle, page, false)},
+                        {"MenuItemToolTip", GetTranslatedString(translator, page.MenuToolTip, page, true)}
                               });
             }
             vars.Add("MenuItems", pages);

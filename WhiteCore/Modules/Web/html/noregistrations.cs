@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *

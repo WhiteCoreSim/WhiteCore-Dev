@@ -76,7 +76,7 @@ namespace WhiteCore.Modules.Web
                                        {
                                            ShowInMenu = true,
                                            MenuID = "users",
-                                           Location = "users.html",
+                                           Location = "user_search.html",
                                            MenuPosition = 3,
                                            MenuTitle = "MenuUser",
                                            MenuToolTip = "TooltipsMenuUser",
@@ -214,6 +214,16 @@ namespace WhiteCore.Modules.Web
                                                                       MenuPosition = 8,
                                                                       MenuTitle = "MenuUserManager",
                                                                       MenuToolTip = "TooltipsMenuUserManager"
+                                                                  },
+                                                               new GridPage
+                                                                  {
+                                                                      ShowInMenu = true,
+                                                                      AdminRequired = true,
+                                                                      MenuID = "new_user",
+                                                                      Location = "register.html",
+                                                                      MenuPosition = 8,
+                                                                      MenuTitle = "MenuRegister",
+                                                                      MenuToolTip = "TooltipsMenuRegister"
                                                                   },
                                                               new GridPage
                                                                   {
