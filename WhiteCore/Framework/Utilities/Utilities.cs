@@ -39,6 +39,7 @@ using System.Text;
 using System.Windows.Forms;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Servers;
+using System.Text.RegularExpressions;
 
 namespace WhiteCore.Framework.Utilities
 {
@@ -80,7 +81,7 @@ namespace WhiteCore.Framework.Utilities
         /// <returns></returns>
         public static string WhiteCoreServerVersion()
         {
-            return "0.9.1";
+            return "0.9.2";
         }
 
         public static void SetEncryptorType(string type)
@@ -537,6 +538,126 @@ namespace WhiteCore.Framework.Utilities
 
             DialogResult dialogResult = form.ShowDialog();
             return dialogResult;
+        }
+
+        /// <summary>
+        /// Determines whether a string is a valid email address.
+        /// </summary>
+        /// <returns><c>true</c> if the string is a valid email address; otherwise, <c>false</c>.</returns>
+        /// <param name="address">Address.</param>
+        public static bool IsValidEmail(string address)
+        {
+            const string EMailpatternStrict = @"^(([^<>()[\]\\.,;:\s@\""]+"
+                                              + @"(\.[^<>()[\]\\.,;:\s@\""]+)*)|(\"".+\""))@"
+                                              + @"((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}"
+                                              + @"\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+"
+                                              + @"[a-zA-Z]{2,}))$";
+            Regex EMailreStrict = new Regex(EMailpatternStrict);
+            return EMailreStrict.IsMatch(address);
+        }
+
+        public static bool IsLinuxOs
+        {
+            get
+            {
+                int p = (int)Environment.OSVersion.Platform;
+                return (p == 4) || (p == 6) || (p == 128);
+            }
+        }
+
+        public static bool Is64BitOs
+        {
+            get
+            {
+                return Environment.Is64BitOperatingSystem;
+            }
+        }
+
+        public static class RandomPassword
+        {
+            private static Random rand = new Random();
+
+            private static readonly char[] VOWELS = new char[] { 'a', 'e', 'i', 'o', 'u' };
+            private static readonly char[] CONSONANTS = new char[] { 'b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'y', 'z' };
+            private static readonly char[] SYMBOLS = new char[] { '*', '?', '/', '\\', '%', '$', '#', '@', '!', '~' };
+            private static readonly char[] NUMBERS = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+
+            /// <summary>
+            /// Generates a random, human-readable password.
+            ///
+            /// </summary>
+            /// <param name=înumSyllablesî>Number of syllables the password will contain</param>
+            /// <param name=înumNumericî>Number of numbers the password will contain</param>
+            /// <param name=înumSymbolsî>Number of symbols the password will contain</param>
+            /// <returns></returns>
+            public static string Generate(int numSyllables, int numNumeric, int numSymbols)
+            {
+                StringBuilder pw = new StringBuilder();
+                for (int i = 0; i < numSyllables; i++)
+                {
+                    pw.Append(MakeSyllable());
+
+                    if (numNumeric > 0 && ((rand.Next() % 2) == 0))
+                    {
+                        pw.Append(MakeNumeric());
+                        numNumeric--;
+                    }
+
+                    if (numSymbols > 0 && ((rand.Next() % 2) == 0))
+                    {
+                        pw.Append(MakeSymbol());
+                        numSymbols--;
+                    }
+                }
+
+                while (numNumeric > 0)
+                {
+                    pw.Append(MakeNumeric());
+                    numNumeric--;
+                }
+
+                while (numSymbols > 0)
+                {
+                    pw.Append(MakeSymbol());
+                    numSymbols--;
+                }
+
+                return pw.ToString();
+            }
+
+            private static char MakeSymbol()
+            {
+                return SYMBOLS[rand.Next(SYMBOLS.Length)];
+            }
+
+            private static char MakeNumeric()
+            {
+                return NUMBERS[rand.Next(NUMBERS.Length)];
+            }
+
+            private static string MakeSyllable()
+            {
+                int len = rand.Next(3, 5); // will return either 3 or 4
+
+                StringBuilder syl = new StringBuilder();
+                for (int i = 0; i < len; i++)
+                {
+                    char c;
+                    if (i == 1) // the second should be a vowel, all else a consonant
+                        c = VOWELS[rand.Next(VOWELS.Length)];
+                    else
+                        c = CONSONANTS[rand.Next(CONSONANTS.Length)];
+
+                    // only first character can be uppercase
+                    if (i == 0 && (rand.Next() % 2) == 0)
+                        c = Char.ToUpper(c);
+
+                    // append
+                    syl.Append(c);
+                }
+
+                return syl.ToString();
+            }
         }
     }
 }
