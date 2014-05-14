@@ -41,5 +41,16 @@ namespace WhiteCore.Framework.Utilities
         public const string LibraryRootFolderID = "00000112-000f-0000-0000-000100bba000"; 
 
 
+        // user levels
+        public const int USER_DISABLED = -2;
+        public const int USER_BANNED = -1;
+        public const int USER_NORMAL = 0;
+        public const int USER_GOD_LIKE = 1;     //?? bit low, are some other levels needed??
+        public const int USER_GOD_CUSTOMER_SERVICE = 100;
+        public const int USER_GOD_LIASON = 150;
+        public const int USER_GOD_FULL = 200;
+        public const int USER_GOD_MAINTENANCE = 250;
+
+
     }
 }

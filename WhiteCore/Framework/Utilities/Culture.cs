@@ -64,11 +64,30 @@ namespace WhiteCore.Framework.Utilities
         /// Returns a formatted date string depending upon the system Locale.
         /// </summary>
         /// <returns>Local date string.</returns>
-        public static string LocaleDate()
+        public static string LocaleDate(DateTime userDateTime)
         {
-            string df = Culture.SystemCultureInfo.DateTimeFormat.ShortDatePattern;
-            string dt = DateTime.Now.ToString ("dd-MMM-yy",Culture.SystemCultureInfo);
+            return LocaleDate (userDateTime, null);
+        }
+
+        /// <summary>
+        /// Returns a formatted date string depending upon the system Locale.
+        /// </summary>
+        /// <returns>The localised date.</returns>
+        /// <param name="userDateTime">User date time.</param>
+        /// <param name="dtFormat">DateTime format if required.</param>
+        public static string LocaleDate(DateTime userDateTime, string dtFormat )
+        {
+            const string defFormat = "MMM dd, yyyy";
+            //string dt = Culture.SystemCultureInfo.DateTimeFormat.ShortDatePattern;
             //string dt = DateTime.Now.ToString (df);
+            if (dtFormat == null)
+                dtFormat = defFormat;
+
+            string dt;
+            if (userDateTime > DateTime.MinValue)
+                dt = userDateTime.ToString (dtFormat,Culture.SystemCultureInfo);
+            else
+                dt = DateTime.Now.ToString (dtFormat,Culture.SystemCultureInfo);
             return dt;
         }
 
@@ -78,7 +97,7 @@ namespace WhiteCore.Framework.Utilities
         /// <returns>Local time & date string.</returns>
         public static string LocaleTimeDate()
         {
-            string df = Culture.SystemCultureInfo.DateTimeFormat.ShortDatePattern;
+            //string dt = Culture.SystemCultureInfo.DateTimeFormat.ShortDatePattern;
             string dt = DateTime.Now.ToString ("hh:mm:ss MMM dd",Culture.SystemCultureInfo);
             return dt;
         }

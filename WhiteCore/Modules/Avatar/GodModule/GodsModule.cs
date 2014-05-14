@@ -64,7 +64,7 @@ namespace WhiteCore.Modules.Gods
                 if (godLike == false)
                 {
                     //Unconditionally remove god levels
-                    sp.GodLevel = 0;
+                    sp.GodLevel = Constants.USER_NORMAL;
                     sp.ControllingClient.SendAdminResponse(token, (uint) sp.GodLevel);
                     return;
                 }
@@ -73,8 +73,8 @@ namespace WhiteCore.Modules.Gods
                 if (m_scene.Permissions.IsAdministrator(sp.UUID))
                 {
                     sp.GodLevel = sp.UserLevel;
-                    if (sp.GodLevel == 0)
-                        sp.GodLevel = 250;
+                    if (sp.GodLevel == Constants.USER_NORMAL)
+                        sp.GodLevel = Constants.USER_GOD_MAINTENANCE;
 
                     MainConsole.Instance.Info("[GODS]: God level set for " + sp.Name + ", level " +
                                               sp.GodLevel.ToString());
