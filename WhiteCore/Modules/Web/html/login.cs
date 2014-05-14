@@ -103,7 +103,7 @@ namespace WhiteCore.Modules.Web
             vars.Add("UserNameText", translator.GetTranslatedString("UserName"));
             vars.Add("PasswordText", translator.GetTranslatedString("Password"));
             vars.Add("ForgotPassword", translator.GetTranslatedString("ForgotPassword"));
-            vars.Add("Submit", translator.GetTranslatedString("Submit"));
+            vars.Add("Submit", translator.GetTranslatedString("Login"));
 
             return vars;
         }

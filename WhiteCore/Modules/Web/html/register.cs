@@ -106,17 +106,16 @@ namespace WhiteCore.Modules.Web
 
             IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector>();
             var settings = generics.GetGeneric<GridSettings>(UUID.Zero, "WebSettings", "Settings");
-            bool allowRegistration = true;
 
-            // AllowAnonymousLogin ?
-            allowRegistration = settings.WebRegistration;
+            bool adminUser = Authenticator.CheckAdminAuthentication(httpRequest, Constants.USER_GOD_CUSTOMER_SERVICE);
+            bool allowRegistration = settings.WebRegistration;
 
             // allow configuration to override the web settings?
             //IConfig config = webInterface.Registry.RequestModuleInterface<ISimulationBase>().ConfigSource.Configs ["LoginService"];
             //if (config != null)
             //    allowRegistration = config.GetBoolean ("AllowAnonymousLogin", false);
 
-            if (!allowRegistration)
+            if (!adminUser && !allowRegistration)
             {
                 vars.Add("ErrorMessage", "");
                 vars.Add("RegistrationText", translator.GetTranslatedString("RegistrationText"));

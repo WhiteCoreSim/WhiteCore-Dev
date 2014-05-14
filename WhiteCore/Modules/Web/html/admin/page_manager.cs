@@ -158,7 +158,8 @@ namespace WhiteCore.Modules.Web
                 }
                 vars.Add("ParentPagesList", pages);
             }
-            else
+
+            if (requestParameters.ContainsKey("AddItem"))
             {
                 vars.Add("PageTitle", "");
                 vars.Add("PageTooltip", "");
@@ -195,6 +196,7 @@ namespace WhiteCore.Modules.Web
                 }
                 vars.Add("ParentPagesList", pages);
             }
+
             if (requestParameters.ContainsKey("SaveMenuItem"))
             {
                 string edittingPageID = requestParameters["EdittingPageID"].ToString();

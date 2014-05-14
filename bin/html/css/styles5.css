@@ -72,7 +72,7 @@ table {border-collapse: collapse; width: 100%;}
 th, td{font-weight:normal;}
 
 /* news_list */
-table#news_list_navigation_top, table#news_list_navigation_bottom {width: 30%;}
+table#news_list_navigation_top, table#news_list_navigation_bottom {width: 30%; margin-top: 2px;}
 table#news_list_navigation_top th, table#news_list_navigation_bottom th {text-align: center;}
 
 table#news_list  {width: 100%;}
@@ -89,7 +89,7 @@ table#add_news td {}
 .add_news_right {text-align: left;}
 
 /* online_users */
-table#online_users_navigation_top, table#online_users_navigation_bottom {width: 30%;}
+table#online_users_navigation_top, table#online_users_navigation_bottom {width: 30%; margin-top: 2px;}
 table#online_users_navigation_top th, table#online_users_navigation_bottom th {text-align: center;}
 
 table#online_users  {width: 100%;}
@@ -106,7 +106,7 @@ table#user_search td {}
 .user_search_right {text-align: left;}
 
 /* user_search_result */
-table#user_search_result_navigation_top, table#user_search_result_navigation_bottom {width: 30%;}
+table#user_search_result_navigation_top, table#user_search_result_navigation_bottom {width: 30%; margin-top: 2px;}
 table#user_search_result_navigation_top th, table#user_search_result_navigation_bottom th {text-align: center;}
 
 table#user_search_result  {width: 100%;}
@@ -135,7 +135,7 @@ table#news_manager td {}
 }
 
 /* region_list */
-table#region_list_navigation_top, table#region_list_navigation_bottom {width: 30%;}
+table#region_list_navigation_top, table#region_list_navigation_bottom {width: 30%; margin-top: 2px;}
 table#region_lists_navigation_top th, table#region_list_navigation_bottom th {text-align: center;}
 
 table#region_list  {width: 100%;}
