@@ -80,9 +80,10 @@ namespace WhiteCore.Modules.Web
                     IAuthenticationService authService =
                         webInterface.Registry.RequestModuleInterface<IAuthenticationService>();
                     if (authService != null)
-                        error = authService.SetPassword(user.PrincipalID, "UserAccount", password)
-                                    ? ""
-                                    : "Failed to set your password, try again later";
+                        response = authService.SetPassword(user.PrincipalID, "UserAccount", password)
+                            ? "Your password has been updated"
+                            : "Failed to set your password, try again later";
+
                     else
                         response = "No authentication service was available to change your password";
                 }
