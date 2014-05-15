@@ -3,6 +3,10 @@ WhiteCore-Sim (Dev)
 Rowan D <greythane@gmail.com>
 Fly-Man- <fly.man.opensim@gmail.com>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+May 15 - Fly-Man
+* Release 0.9.1.1
+  - Released version 0.9.1.1 (Post Fixes for 0.9.1)
+
 May 9/10 - Greythane
 * WebUI - online_users, grid status
   - Update html code for additional formatting and readability
