@@ -35,8 +35,8 @@ using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
 
-[assembly: AssemblyVersion("0.9.1")]
-[assembly: AssemblyFileVersion("0.9.1")]
+[assembly: AssemblyVersion("0.9.1.1")]
+[assembly: AssemblyFileVersion("0.9.1.1")]
 
 namespace WhiteCore.DataManager
 {

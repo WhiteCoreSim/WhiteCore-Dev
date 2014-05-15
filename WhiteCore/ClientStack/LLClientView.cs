@@ -50,8 +50,8 @@ using System.Threading;
 using System.Xml;
 using RegionFlags = OpenMetaverse.RegionFlags;
 
-[assembly: AssemblyVersion("0.9.1")]
-[assembly: AssemblyFileVersion("0.9.1")]
+[assembly: AssemblyVersion("0.9.1.1")]
+[assembly: AssemblyFileVersion("0.9.1.1")]
 
 namespace WhiteCore.ClientStack
 {
