@@ -25,30 +25,30 @@
   
   <thead>
     <tr>
-      <th class="change_user_information_left"></th>
-      <th class="change_user_information_right"></th>
+      <th class="change_user_password_left"></th>
+      <th class="change_user_password_right"></th>
     </tr>
   </thead>
   
   <tfoot>
     <tr>
-      <th class="change_user_information_left"></th>
-      <th class="change_user_information_right"></th>
+      <th class="change_user_password_left"></th>
+      <th class="change_user_password_right"></th>
     </tr>
   </tfoot>
 
   <tbody>
     <tr>
-      <td class="change_user_information_left"><p id="password_label">{NewPasswordText}*</p></td>
-      <td class="change_user_information_right"><input require="true" label="password" id="login_input" type="password" name="password" /></td>
+      <td class="change_user_password_left"><p id="password_label">{NewPasswordText}*</p></td>
+      <td class="change_user_password_right"><input require="true" label="password" id="login_input" type="password" name="password" /></td>
     </tr>
     <tr>
-      <td class="change_user_information_left"><p id="newpasswordconfirm_label">{NewPasswordConfirmationText}*</p></td>
-      <td class="change_user_information_right"><input require="true" label="passwordconf" id="login_input" type="password" name="passwordconf" /></td>
+      <td class="change_user_password_left"><p id="newpasswordconfirm_label">{NewPasswordConfirmationText}*</p></td>
+      <td class="change_user_password_right"><input require="true" label="passwordconf" id="login_input" type="password" name="passwordconf" /></td>
     </tr>
     <tr>
-      <td class="change_user_information_left"></td><input type="hidden" hidden label="Submit" id="Submit" name="Submit" value="SubmitPasswordChange" />
-      <td class="change_user_information_right"><button id="login_bouton" type="Submit" name="Submit" value="SubmitPasswordChange">{Submit}</button></td>
+      <td class="change_user_password_left"></td><input type="hidden" hidden label="Submit" id="Submit" name="Submit" value="SubmitPasswordChange" />
+      <td class="change_user_password_right"><button id="login_bouton" type="Submit" name="Submit" value="SubmitPasswordChange">{ChangePasswordText}</button></td>
     </tr>
   </tbody>
 </table>
@@ -81,14 +81,16 @@
     </tr>
     <tr>
       <td class="change_user_email_adress_left"></td><input type="hidden" hidden label="Submit" id="Submit" name="Submit" value="SubmitEmailChange" />
-      <td class="change_user_email_adress_right"><button id="login_bouton" type="Submit" name="Submit" value="SubmitEmailChange">{Submit}</button></td>
+      <td class="change_user_email_adress_right"><button id="login_bouton" type="Submit" name="Submit" value="SubmitEmailChange">{ChangeEmailText}</button></td>
     </tr>
   </tbody>
 </table>
 </form>
 
 <h3>{DeleteUserText}</h3>
-<p class="alert">{DeleteUserInfoText}</p>
+<div>
+	<p class="alert">{DeleteUserInfoText}</p>
+</div>
 <form action="change_user_information.html" id="delete_my_account" method="post">
 <div id="delete_error_message" class="error_message"><h3>{ErrorMessage}</h3></div>
 <table id="delete_my_account">
@@ -119,7 +121,7 @@
     </tr>
     <tr>
       <td class="delete_my_account_left"></td><input type="hidden" hidden label="Submit" id="Submit" name="Submit" value="SubmitDeleteUser" />
-      <td class="delete_my_account_right"><button id="login_bouton" type="Submit" name="Submit" value="SubmitDeleteUser">{DeleteText}</button></td>
+      <td class="delete_my_account_right"><button id="login_bouton" type="Submit" name="Submit" value="SubmitDeleteUser">{DeleteUserText}</button></td>
     </tr>
   </tbody>
 </table>

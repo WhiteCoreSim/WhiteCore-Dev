@@ -225,21 +225,21 @@ table#page_manager td {}
 /* change_user_password */
 table#change_user_password  {width: 100%;}
 table#change_user_password th {}
-table#change_user_password td {}
+table#change_user_password td {width: 192px;}
 .change_user_password_left {text-align: left;}
 .change_user_password_right {text-align: left;}
 
 /* change_user_email_adress */
 table#change_user_email_adress  {width: 100%;}
 table#change_user_email_adress th {}
-table#change_user_email_adress td {}
+table#change_user_email_adress td {width: 192px;}
 .change_user_email_adress_left {text-align: left;}
 .change_user_email_adress_right {text-align: left;}
 
 /* delete_my_account */
-table#delete_my_account  {width: 100%;}
+table#delete_my_account  {width: 100%; display: inline;}
 table#delete_my_account th {}
-table#delete_my_account td {}
+table#delete_my_account td {width: 192px;}
 .delete_my_account_left {text-align: left;}
 .delete_my_account_right {text-align: left;}
 
