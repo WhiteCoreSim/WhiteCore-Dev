@@ -1118,48 +1118,48 @@
       </Files>
     </Project>
 	
-    <Project frameworkVersion="v4_0" name="WhiteCore.WebServer" path="WhiteCore/WebServer" type="Exe" appmanifest="app.manifest">
+    <Project frameworkVersion="v4_0" name="WhiteCore.WebServer" path="WhiteCore/Servers/WebServer" type="Exe" appmanifest="app.manifest">
       <Configuration name="Debug" platform="x86">
         <Options>
-          <OutputPath>../../bin/</OutputPath>
+          <OutputPath>../../../bin/</OutputPath>
         </Options>
       </Configuration>
       <Configuration name="Release" platform="x86">
         <Options>
-          <OutputPath>../../bin/</OutputPath>
+          <OutputPath>../../../bin/</OutputPath>
         </Options>
       </Configuration>
       <Configuration name="Debug" platform="x64">
         <Options>
-          <OutputPath>../../bin/</OutputPath>
+          <OutputPath>../../../bin/</OutputPath>
         </Options>
       </Configuration>
       <Configuration name="Release" platform="x64">
         <Options>
-          <OutputPath>../../bin/</OutputPath>
+          <OutputPath>../../../bin/</OutputPath>
         </Options>
       </Configuration>
       <Configuration name="Debug" platform="AnyCPU">
         <Options>
-          <OutputPath>../../bin/</OutputPath>
+          <OutputPath>../../../bin/</OutputPath>
         </Options>
       </Configuration>
       <Configuration name="Release" platform="AnyCPU">
         <Options>
-          <OutputPath>../../bin/</OutputPath>
+          <OutputPath>../../../bin/</OutputPath>
         </Options>
       </Configuration>
 
-      <ReferencePath>../../bin/</ReferencePath>
+      <ReferencePath>../../../bin/</ReferencePath>
       <Reference name="System"/>
 
       <Reference name="WhiteCore.Framework"/>
 	  <Reference name="WhiteCore.Simulation.Base"/>
 
-      <Reference name="Nini" path="../../bin/"/>
-      <Reference name="OpenMetaverse" path="../../bin/"/>
-      <Reference name="OpenMetaverse.StructuredData" path="../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../bin/"/>
+      <Reference name="Nini" path="../../../bin/"/>
+      <Reference name="OpenMetaverse" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
+      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
 
       <Files>
         <Match pattern="*.cs" recurse="true">
