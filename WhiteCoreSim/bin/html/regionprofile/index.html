@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>{SystemName}: {RegionInfoText}</title>
+	<meta name="keywords" content="{SystemName}" />
+	<meta name="description" content="{SystemName}"/>
+	<link rel="shortcut icon" href="../images/icons/favicon.ico" />
+
+	<script src="{SystemURL}/javascripts/jquery.min.js"></script>
+
+	<!-- StyleSwitch -->
+	<script src="{SystemURL}/javascripts/styleswitch.js"></script>
+	<link href="{SystemURL}/css/styles1.css" rel="stylesheet" type="text/css" media="screen" title="styles1" />
+	<link href="{SystemURL}/css/styles2.css" rel="alternate stylesheet" type="text/css" title="styles2" media="screen" />
+	<link href="{SystemURL}/css/styles3.css" rel="alternate stylesheet" type="text/css" title="styles3" media="screen" />
+	<link href="{SystemURL}/css/styles4.css" rel="alternate stylesheet" type="text/css" title="styles4" media="screen" />
+	<link href="{SystemURL}/css/styles5.css" rel="alternate stylesheet" type="text/css" title="styles5" media="screen" />
+
+	<!-- date time -->
+<!--	<script src="{SystemURL}/javascripts/jquery.jclock.js" language="javascript"></script>
+	<script type="text/javascript">
+		$(function($) {var options1 = {format: '%A %B %d, %Y %I:%M:%S %p'} // 12-hour
+		$('#jclock1').jclock(options1);
+		var options2 = {format: '%a %b %d, %Y %H:%M:%S'} // 24-hour
+		$('#jclock2').jclock(options2);
+		var options3 = {format: '%Y-%m-%d %H:%M:%S'} // 24-hour
+		$('#jclock3').jclock(options3);
+		var options4 = {format: '%Y-%m-%d'}
+		$('#jclock4').jclock(options4);
+		var options5 = {format: '%m/%d/%y'}
+		$('#jclock5').jclock(options5);});
+	</script>
+-->
+	
+	<!-- Tooltips -->
+	<script src="{SystemURL}/javascripts/jquery.tooltip.js"></script>
+	<script type="text/javascript">$(function() {$('#container *').tooltip({showURL: false});});</script>
+
+	<script src="{SystemURL}/javascripts/menu.profile.js"></script>
+	<script>
+	  $(document).ready(function() 
+	  {
+		$( '#container' ).fadeIn("slow");
+		var result = {};
+		// var sections = $("#menu li");
+		var loading = $("#loading");
+		var content = $("#content");
+
+		if (window.location.search)
+		{
+			// split up the query string and store in an associative array
+			var params = window.location.search.slice(1).split("&");
+			for (var i = 0; i < params.length; i++)
+			{
+				var tmp = params[i].split("=");
+				result[tmp[0]] = unescape(tmp[1]);
+			}
+		}
+		//load selected section
+		var pageName = result["page"];
+		var found = new Boolean(0);
+		switch(pageName){
+			case "base":
+				content.load("base.html" + window.location.search);
+				found = new Boolean(1);
+				break;
+			case "groups":
+				content.load("parcels.html" + window.location.search);
+				found = new Boolean(1);
+				break;
+			case "picks":
+				content.load("owner.html" + window.location.search);
+				found = new Boolean(1);
+				break;
+		}
+		if(found == 0)
+			content.load("base.html" + window.location.search);
+	});
+    </script>
+
+</head>
+
+<body>
+<div id="container"> 
+
+	<script src="{SystemURL}/javascripts/menu.region.js"></script>
+	<div id="topregion">
+		<ul id="menuregion">
+			<li id="region" class="fade active" alt="{TooltipsMenuRegion}" title="{TooltipsMenuRegion}">{MenuRegionTitle}</li>
+			<li id="parcel" class="fade " alt="{TooltipsMenuParcel}" title="{TooltipsMenuParcel}">{MenuParcelTitle}</li>
+			<li id="owner" class="fade" alt="{TooltipsMenuOwner}" title="{TooltipsMenuOwner}">{MenuOwnerTitle}</li>
+		</ul>
+		<span class="clear"></span>
+	</div>
+
+	<div id="content"></div>
+	<span class="clear"></span>
+
+	<script type="text/javascript">
+		// fade class
+		$("li.fade, a.fade").hover(function(){$(this).fadeOut(150);$(this).fadeIn(150);});
+		$("a.languageswitch, a.styleswitch, a.webprofile").hover(function(){$(this).fadeOut(150);$(this).fadeIn(150);});
+		$("a.welcomescreen, a.world_map, a.copyright").hover(function(){$(this).fadeOut(150);$(this).fadeIn(150);});
+	</script>
+</div> 
+</body>
+</html>

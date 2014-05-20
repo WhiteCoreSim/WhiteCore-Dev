@@ -25,8 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
-using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Servers;
 using WhiteCore.Framework.Servers.HttpServer;
@@ -35,8 +33,6 @@ using WhiteCore.Framework.Servers.HttpServer.Interfaces;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
 using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.Imaging;
 using ProtoBuf;
 using System;
 using System.Collections.Generic;
@@ -57,6 +53,7 @@ namespace WhiteCore.Services
         private bool m_cacheEnabled = true;
         private float m_cacheExpires = 24;
         private IAssetService m_assetService;
+        private string m_assetCacheDir = Constants.DEFAULT_ASSETCACHE_DIR;
         private IGridService m_gridService;
         private IJ2KDecoder m_j2kDecoder;
         private static Bitmap m_blankRegionTile = null;
@@ -78,7 +75,10 @@ namespace WhiteCore.Services
                 return;
 
             if (m_cacheEnabled)
-                CreateCacheDirectories();
+            {
+                m_assetCacheDir = config.Configs ["AssetCache"].GetString ("CacheDirectory",m_assetCacheDir);
+                CreateCacheDirectories (m_assetCacheDir);
+            }
 
             m_server = registry.RequestModuleInterface<ISimulationBase>().GetHttpServer(m_port);
             m_server.AddStreamHandler(new GenericStreamHandler("GET", "/MapService/", MapRequest));
@@ -103,12 +103,12 @@ namespace WhiteCore.Services
             }*/
         }
 
-        private void CreateCacheDirectories()
+        private void CreateCacheDirectories(string cacheDir)
         {
-            if (!Directory.Exists("assetcache"))
-                Directory.CreateDirectory("assetcache");
-            if (!Directory.Exists("assetcache/mapzoomlevels"))
-                Directory.CreateDirectory("assetcache/mapzoomlevels");
+            if (!Directory.Exists(cacheDir))
+                Directory.CreateDirectory(cacheDir);
+            if (!Directory.Exists(cacheDir+"/mapzoomlevels"))
+                Directory.CreateDirectory(cacheDir+"/mapzoomlevels");
         }
 
         public void Start(IConfigSource config, IRegistryCore registry)

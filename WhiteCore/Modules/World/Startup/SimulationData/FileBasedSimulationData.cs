@@ -52,7 +52,7 @@ namespace WhiteCore.Modules
 
         protected string m_fileName = "";
         protected bool m_keepOldSave = true;
-        protected string m_oldSaveDirectory = "Backups";
+        protected string m_oldSaveDirectory = "";
         protected bool m_oldSaveHasBeenSaved;
         protected bool m_requiresSave = true;
         protected bool m_displayNotSavingNotice = true;
@@ -436,14 +436,24 @@ namespace WhiteCore.Modules
                 m_saveChanges = config.GetBoolean("SaveChanges", m_saveChanges);
                 m_timeBetweenSaves = config.GetInt("TimeBetweenSaves", m_timeBetweenSaves);
                 m_keepOldSave = config.GetBoolean("SavePreviousBackup", m_keepOldSave);
+
+                // directories are referneces from the bin directory
+                // As of V0.9.2 the data is saved relative to the bin dirs
                 m_oldSaveDirectory =
                     PathHelpers.ComputeFullPath(config.GetString("PreviousBackupDirectory", m_oldSaveDirectory));
                 m_storeDirectory =
                     PathHelpers.ComputeFullPath(config.GetString("StoreBackupDirectory", m_storeDirectory));
-                // we tend to use absolute paths here and previously the(root /) directory in the past actually
-                // refers to the current (bin) directory, The default is now an empty dir... set to a correct path.
-                if (m_storeDirectory == "")
-                    m_storeDirectory = "./";
+                 if (m_storeDirectory == "")
+                    m_storeDirectory = Constants.DEFAULT_DATA_DIR + "/Region";
+                if (m_oldSaveDirectory == "")
+                    m_oldSaveDirectory = Constants.DEFAULT_DATA_DIR + "/RegionBak";
+
+                // verify the necessary paths exist
+                if (!Directory.Exists(m_storeDirectory))
+                    Directory.CreateDirectory(m_storeDirectory);
+                if (!Directory.Exists(m_oldSaveDirectory))
+                    Directory.CreateDirectory(m_oldSaveDirectory);
+
 
                 m_saveBackupChanges = config.GetBoolean("SaveTimedPreviousBackup", m_keepOldSave);
                 m_timeBetweenBackupSaves = config.GetInt("TimeBetweenBackupSaves", m_timeBetweenBackupSaves);

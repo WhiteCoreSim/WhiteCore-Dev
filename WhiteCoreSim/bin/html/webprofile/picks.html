@@ -1,0 +1,52 @@
+<!-- Caption -->
+<script>
+	/* <![CDATA[ */
+		jQuery(document).ready(function($) {
+			$('div.picks_profile_picture').each(function(i) {
+				var img_ = $('img', this);			
+				var img_height = img_.attr('height');
+				var p_height = $('p', this).outerHeight();
+				$(this).height(img_height);
+				$(this).hover(function() {
+					img_.animate({marginTop : -p_height-5}, 500);
+				}, function() {
+					img_.animate({marginTop : '0'}, 500);
+				});
+			});		
+		});
+	/* ]]> */
+</script>
+
+<script>
+// jQuery(document).ready(function() {jQuery('#avatarcarousel').jcarousel();});
+jQuery(document).ready(function() {jQuery('#avatarcarousel').jcarousel({wrap: 'circular'});});
+</script>
+
+<h2>{SystemName}: {UsersPicksText} {UserName}</h2>
+<div id="picks_profile_container">
+  <center>
+  <ul id="avatarcarousel" class="jcarousel-skin-aurora-bigsize jcarousel-bigsize">
+{PicksArrayBegin}
+    <li>
+      <div class="picks_profile_picture">
+	    <a href="#">
+	    <img height="256"
+		     src="{PickSnapshotURL}" 
+		     alt="{PickNameText}: {PickName}"
+			 title="{PickNameText}: {PickName}" /></a>
+	    <p class="picks_profile_picture_text">
+	    {UsersPicksText}:&nbsp;<img height="16" width="16"
+									   src="{UserPictureURL}"
+									   alt="{UserProfileFor}: {UserName}"
+									   title="{UserProfileFor}: {UserName}" />&nbsp;{UserName}<br />
+		{PickNameText}: {PickName}<br />
+		{PickSimText}: {PickSim}<br />
+		@&nbsp;{PickLocation}	
+		</p>
+	  </div>
+	</li>
+{PicksArrayEnd}
+  </ul>
+  </center>
+<span class="clear"></span>
+</div>

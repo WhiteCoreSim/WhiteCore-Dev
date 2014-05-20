@@ -1,0 +1,255 @@
+[DotNetEngine]
+
+    ;; Enabled true / false
+    Enabled = true
+
+    ;; The max amount of time the script engine sleeps before executing loops. The higher, the slower script loading; the lower, the more CPU wasted.
+    ;; Default is 100
+    SleepTime = 100
+	
+    ;; The amount of threads to run simultaneously for script events
+    ;; Default is 1
+    Threads = 1
+
+    ;; Should all script errors be shown on the console
+    ;; Default is false.
+    DisplayErrorsOnConsole = true
+
+    ;; Should all script compile errors be sent to the Debug Channel in-world
+    ;; Default is true.
+    ChatCompileErrorsToDebugChannel = true
+
+    ;; AppDomains are used for two things:
+    ;; * Security: Scripts inside AppDomains are limited in permissions.
+    ;; * Script unloading: When a script is deactivated it can not be unloaded. Only whole AppDomains can be unloaded.
+    ;;             AppDomains are therefore only unloaded once ALL active scripts inside it has been deactivated (removed from prims).
+    ;; Each AppDomain has some memory overhead. But leaving dead scripts in memory also has memory overhead.
+    ;; Default is 7.
+    ScriptsPerAppDomain = 7
+
+    ;; Bypasses the above option ('ScriptsPerAppDomain') and loads all scripts into one app domain. This is not very safe and should not be used unless you are only using LSL.
+    ;; Default is False
+    LoadAllScriptsIntoCurrentAppDomain = true
+
+    ;; The level of permissions to use. Recommended: Internet
+    ;; Valid values are:
+    ;; *  FullTrust
+    ;; *  SkipVerification
+    ;; *  Execution
+    ;; *  Nothing
+    ;; *  LocalIntranet
+    ;; *  Internet
+    ;; *  Everything
+    ;; Default is Internet
+    AppDomainPermissions = "FullTrust"
+
+    ;; Path to the script binaries (this must be the full path, not just from /bin!)
+    ;; Default is commented out (use predefined setting of "../Data/ScriptEngines"
+    ; PathToLoadScriptsFrom = ""
+
+    ;; Time before the script engine will stop looking for script errors.
+    ;; Default is 5 seconds.
+    ScriptErrorFindingTimeOut = 5;
+
+    ;; When script is compiled, a copy of the script source will be put in the ScriptEngine folder
+    ;; Default is false.
+    WriteScriptSourceToDebugFile = false
+
+    ;; Specify default script compiler
+    ;; If you do not specify //cs, //vb, //js //yp, //ascript or //lsl tag as the first characters of your script then the default compiler will be chosen
+    ;; Valid languages are: lsl, cs, js, yp, and vb, ascript
+    ;; Default is lsl.
+    DefaultCompileLanguage = lsl
+
+    ;; Specify what compilers are allowed to be used
+    ;; Note vb only works on Windows for now (Mono lacks VB compile support)
+    ;; Valid languages are: lsl, cs, js, yp, ascript, and vb
+    ;; *warning*, non lsl languages have access to static methods such as System.IO.File. As long as the 'AppDomainPermissions' option is set properly (Internet or higher), this should not be very risky, but still enable at your own risk.
+    ;; Default is lsl.
+    AllowedCompilers = lsl, lsl2
+
+    ;; Compile scripts with debugging
+    ;; Probably a thousand times slower, but gives you a line number when something goes wrong.
+    ;; Default is true.
+    CompileWithDebugInformation = true
+
+    ;; Script Specific Config, Includes: Timer, OSSL, Script Delays, Sensor reading, notecard line maximum.
+    ;; Default is 0.001.
+    MinTimerInterval = 0.001
+
+    ;; Sets the multiplier for the scripting delays.
+    ;; Default is 1.0.
+    ScriptDelayFactor = 1.0
+
+    ;; The factor the 10 m distances limits are multiplied by.
+    ;; Default is 1.0.
+    ScriptDistanceLimitFactor = 1.0
+
+    ;; Maximum length of notecard line read
+    ;; Increasing this to large values potentially opens
+    ;; up the system to malicious scripters.
+    ;; Default is 255.
+    ; NotecardLineReadCharsMax = 255
+
+    ;; Sensor settings.
+    ;; Max range for llSensor and family
+    ;; Default is 96.
+    SensorMaxRange = 96.0
+
+    ;; Should we have a max range for the sensor?
+    UseSensorMaxRange = true
+
+    ;; Max Results for the sensor event
+    ;; Default is 16.
+    SensorMaxResults = 16
+
+    ;; Should we check for how many events to return?
+    UseSensorMaxResults = true
+
+    ;; Allow for llCreateLink and llBreakLink to work without asking for permission
+    ;; only enable this in a trusted environment otherwise you may be subject to hijacking
+    ;; Default is false.
+    ; AutomaticLinkPermission = false
+	
+    ; Allow for llSetPrimitiveParams and related functions to use OpenSim
+    ; params via OS_* constants.
+    ;AllowOpenSimParamsInLLFunctions = false
+
+    ;; Disable underground movement of prims set to
+    ;; false to allow script controlled underground positioning of
+    ;; prims
+    ;; Default is true.
+    ; DisableUndergroundMovement = true
+
+    ;; Change to false if you would like to block llRezObject (for griefing purposes, this might be a good idea)
+    ;; Default is true.
+    AllowllRezObject = true
+
+    ;; Allow scripts to be pulled from online by #IncludeHTML [URL HERE]
+    ;; Default is true.
+    AllowHTMLLinking = true
+
+    ;; Should scripts run in attachments?
+    ;; Default: false
+    AllowRunningOfScriptsInAttachments = false
+
+    ;; This sets the APIs that are allowed.
+    ;; Values:
+    ;;   aa: WhiteCore functions
+    ;;   ossl: OSSL functions
+    ;;   mod: MOD Api functions
+    ;;   ll: LSL functions
+    ;;   ls: LightShare functions
+    ;;   bot: Bot functions
+    ;; Default is aa,os,ll,ls,bot
+    AllowedAPIs = aa,os,ll,ls,bot
+
+    ;; Highest Threat level to allow if os functions are enabled
+    ;; One of None, Nuisance, VeryLow, Low, Moderate, High, VeryHigh, Severe
+    ;; Default is Moderate.
+    FunctionThreatLevel = Moderate
+	
+	;; Allow groups to be added as well as Avatar UUIDs in the allowing of functions and function groups
+	;; Default is false (as it will make scripts slightly slower (will not be noticeable in normal execution))
+	AllowGroupThreatPermissionCheck = false
+	
+	;; Users to allow to use the given Threat Level
+	;; This bypasses other security functions and allows the avatar or group to run any functions on the given threat level
+	;; This function is set in the following ways
+        ;; = UUID allows that Individual Avatar/Group Access to osFunction
+        ;;   UUID,UUID,UUID would allow the 3 different avatars/groups to access the threat level
+	Allow_None = ""
+	Allow_Nuisance = ""
+	Allow_VeryLow = ""
+	Allow_Low = ""
+	Allow_Moderate = ""
+	Allow_High = ""
+	Allow_VeryHigh = ""
+	Allow_Severe = ""
+	;; Note: This function allows the given users access to run any script functions they wish, including Severe functions
+	;; BE CAREFUL WHO YOU GIVE THIS TO
+	;; It is set as above
+	Allow_All = ""
+	
+	;; The given settings allow you to set groups of users that can use each script threat level unconditionally
+	;; The settings that are available are
+	;; None - no user groups will be excluded from the permission checks
+	;; Administrators - Administrators will be able to use any script functions in the given set unconditionally
+	;; ParcelOwners - Parcel owners will be able to use any script functions in the given set unconditionally
+	;; All - All users will be able to use any script functions in the given set unconditionally
+	;; Defaults are None, which allows no users to bypass the other security functions
+	NoneUserSet = None
+	NuisanceUserSet = None
+	VeryLowUserSet = None
+	LowUserSet = None
+	ModerateUserSet = None
+	HighUserSet = None
+	VeryHighUserSet = None
+	SevereUserSet = None
+
+	;; Function limiting
+    ;; Functions below the threat level set above are automatically allowed
+	;; To allow certain (or all) users to use higher level functions, you will set them below
+    ;; If a Higher Threat Level Function is set to TRUE This will operate OVER the above define default level
+    ;;
+    ;; Allow_function_name = true   allows the use of the function unconditionally
+    ;; Allow_function_name = false  completely disallows regardless
+    ;; Allow_function_name = UUID allows that Individual Avatar/Group Access to osFunction
+    ;; Allow_function_name = UUID,UUID,UUID would allow the 3 different avatars/group to access function
+    ;;
+	;; Example:
+	;; 
+	;; Disabling llRezObject for all users
+	;; Allow_llRezObject = false
+	;; Enable llRezObject for all users
+	;; Allow_llRezObject = true
+	
+	
+    ;;
+    ;; Limits Section
+    ;;
+    
+    ;; Enables function limiting if enabled
+    AllowFunctionLimiting = false
+
+    ;; Examples for how to use the limiting functions
+    ;;  In these configs, you can put a function name, such as 'llRezObject', or an API name, such as 'lsl' or 'aa'
+    ;; You must add this line for each function you wish to limit so that the script engine checks for it
+    ;llRezObject_Limit = true
+    ;lsl_Limit = true
+    ;; There are several ways to limit functions, this setting changes which way we limit it
+    ;;  None - Does no limiting at all for the given function
+    ;;  Script - Limits functions in the given script (limits per script)
+    ;;  Owner - Limits functions by limiting how many times a user can use the function (in all sims in the instance)
+    ;;  Group - Limits functions by limiting how many times an entire linkset can call a function
+    ;;  Prim - Limits how many times one single prim can call a function
+    ;llRezObject_LimitType = Script
+    ;; There are several alerts that can be called when a function is limited
+    ;;  None - Does nothing
+    ;;  Console - Displays an alert on the console about the limitation
+    ;;  Inworld - Displays an alert inworld for the user
+    ;;  ConsoleAndInworld - Does both Console and Inworld
+    ;llRezObject_LimitAlert = ConsoleAndInworld
+    ;; What to do with events when they are going to be limited
+    ;;  None - Does nothing, just fires the alert
+    ;;  Drop - Doesn't allow the function to run, and allows the event to continue executing
+    ;;  TerminateScript - Terminates the script and stops it from Running any scripts (can be re-enabled by checking Running in the script editor GUI in the viewer)
+    ;;  TerminateEvent - Terminates (stops) the event that called the function, but still allows for other events to be called
+    ;llRezObject_LimitAction = Drop
+    ;; How many times a given function can be called before it is limited
+    ;; In the example, the function can be called 10 times before it is limited
+    ;llRezObject_LimitMaxNumberOfTimes = 10
+    ;; How long the function has to wait before it can fire again (in milliseconds)
+    ;; In the example, the function can only be called once every 10ms
+    ;llRezObject_LimitTimeScale = 10
+    ;; How many times functions can be called in the time scale set above
+    ;; In our example so far, if we set this setting to 10, the function can be called 10 times every 10 milliseconds
+    ;llRezObject_LimitFunctionsOverTimeScale = 10
+	
+    ;; Set the following to true to allow administrator owned scripts to execute console commands from LSL
+    ;; Default is false.
+    Allow_osConsoleCommand = false
+
+    ;; Allows god mode functions, like llGodLikeRezObject, etc
+    ;; Default is true.
+    AllowGodFunctions = true

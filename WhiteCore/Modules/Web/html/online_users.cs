@@ -64,6 +64,7 @@ namespace WhiteCore.Modules.Web
             var vars = new Dictionary<string, object>();
             var usersList = new List<Dictionary<string, object>>();
             var libraryOwner = new UUID(Constants.LibraryOwner);
+			var realestateOwner = new UUID(Constants.RealEstateOwnerUUID);
 
             uint amountPerQuery = 10;
             int start = httpRequest.Query.ContainsKey("Start") ? int.Parse(httpRequest.Query["Start"].ToString()) : 0;
@@ -86,7 +87,9 @@ namespace WhiteCore.Modules.Web
                 IGridService gridService = webInterface.Registry.RequestModuleInterface<IGridService> ();
                 foreach (var user in activeUsers)
                 {
-                    if (UUID.Parse (user.UserID) == libraryOwner)
+					if ( (UUID.Parse (user.UserID) == libraryOwner) ||
+						 (UUID.Parse (user.UserID) == realestateOwner) 
+					    )
                         continue;
 
                     var region = gridService.GetRegionByUUID (null, user.CurrentRegionID);

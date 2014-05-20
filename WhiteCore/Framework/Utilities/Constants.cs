@@ -30,15 +30,28 @@ namespace WhiteCore.Framework.Utilities
 {
     public class Constants
     {
+
+        // some predefined folders
+        public const string DEFAULT_CONFIG_DIR = "../Config";
+        public const string DEFAULT_DATA_DIR = "../Data";
+        public const string DEFAULT_ASSETCACHE_DIR = DEFAULT_DATA_DIR+"/AssetCache";
+        public const string DEFAULT_SCRIPTENGINE_DIR = DEFAULT_DATA_DIR+"/ScriptEngines";
+
         public const int RegionSize = 256;
         public const int RegionHeight = 10000;
         public const byte TerrainPatchSize = 16;
         public const float TerrainCompression = 100.0f;
         public const int MinRegionSize = 16;
 
-        public const int SystemUserCount = 1;
+		public const int SystemUserCount = 2;
         public const string LibraryOwner = "11111111-1111-0000-0000-000100bba000";
         public const string LibraryRootFolderID = "00000112-000f-0000-0000-000100bba000"; 
+
+		public const string RealEstateOwnerUUID = "3d6181b0-6a4b-97ef-18d8-722652995cf1";
+		public const string RealEstateOwnerName = "RealEstate Owner";
+
+		public const string RealEstateGroupUUID = "dc7b21cd-3c89-fcaa-31c8-25f9ffd224cd";
+		public const string RealEstateGroupName = "Maintenance";
 
 
         // user levels

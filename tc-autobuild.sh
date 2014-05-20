@@ -1,8 +1,8 @@
 #!/bin/bash
 
-mono bin/Prebuild.exe /target vs2010 /targetframework v4_0 /conditionals "LINUX;NET_4_0"
+mono ./Prebuild.exe /target vs2010 /targetframework v4_0 /conditionals "LINUX;NET_4_0"
 
-if [ -d ".git" ]; then git log --pretty=format:"WhiteCore (%cd.%h)" --date=short -n 1 > bin/.version; fi
+if [ -d ".git" ]; then git log --pretty=format:"WhiteCore (%cd.%h)" --date=short -n 1 > WhiteCoreSim/bin/.version; fi
 
 unset makebuild
 unset makedist
@@ -27,6 +27,6 @@ if [ "$makebuild" = "yes" ]; then
 
     if [ "$makedist" = "yes" ]; then
 	rm -f WhiteCore-autobuild.tar.bz2
-	tar cjf WhiteCore-autobuild.tar.bz2 bin
+	tar cjf WhiteCore-autobuild.tar.bz2 WhiteCoreSim/bin
     fi
 fi

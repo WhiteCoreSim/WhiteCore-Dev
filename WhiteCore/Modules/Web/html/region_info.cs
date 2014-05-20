@@ -38,7 +38,7 @@ using RegionFlags = WhiteCore.Framework.Services.RegionFlags;
 
 namespace WhiteCore.Modules.Web
 {
-    public class RegionInfoPage : IWebInterfacePage
+    public class RegionInfoOldPage : IWebInterfacePage
     {
         public string[] FilePath
         {

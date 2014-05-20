@@ -78,12 +78,46 @@ namespace WhiteCore.Services.DataService
                 Framework.Utilities.DataManager.RegisterPlugin(this);
             }
             Init(simBase, Name);
+
+            // verify that the RealEstate group exists
+            CheckRealEstateGroupInfo ();
         }
 
         public string Name
         {
             get { return "IGroupsServiceConnector"; }
         }
+
+        /// <summary>
+        /// Checks and creates the real estate owner group info.
+        /// </summary>
+        private void CheckRealEstateGroupInfo()
+        {
+            if (GetGroupRecord (UUID.Zero, UUID.Zero, "Maintenance") == null)
+            {
+                CreateRealEstateGroup ();
+            }
+        }
+
+        /// <summary>
+        /// Creates the real estate 'Maintenance' group.
+        /// </summary>
+        /// <returns><c>true</c>, if real estate group was created, <c>false</c> otherwise.</returns>
+        private bool CreateRealEstateGroup()
+        {
+            MainConsole.Instance.Warn("Creating System Group " + Constants.RealEstateGroupName);
+
+            CreateGroup(
+                (UUID)Constants.RealEstateGroupUUID,                // UUID
+                "Maintenance",                                      // Name
+                "This group is for RealEstate Maintenance",         // Charter
+                false,                                              // Show in list
+                UUID.Zero, 0, false, false, true,                   // Insignia UUID, Mmebership fee, Open Enrolement, Allow publishing, Mature
+                (UUID)Constants.RealEstateGroupUUID,                // founder UUID
+                UUID.Random());                                     // owner role UUID ??
+            return true;
+        }
+
 
         #endregion
 

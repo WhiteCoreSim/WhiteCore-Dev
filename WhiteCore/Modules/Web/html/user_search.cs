@@ -72,6 +72,7 @@ namespace WhiteCore.Modules.Web
             {
                 IUserAccountService accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService>();
                 var libraryOwner = new UUID(Constants.LibraryOwner);
+                var realestateOwner = new UUID(Constants.RealEstateOwnerUUID);
 
                 string username = requestParameters["username"].ToString();
                 int start = httpRequest.Query.ContainsKey("Start")
@@ -91,6 +92,8 @@ namespace WhiteCore.Modules.Web
                 foreach (var user in users)
                 {
                     if (user.PrincipalID == libraryOwner)
+                        continue;
+                    if (user.PrincipalID == realestateOwner)
                         continue;
 
                     usersList.Add(new Dictionary<string, object>

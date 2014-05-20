@@ -78,6 +78,7 @@ namespace WhiteCore.Modules.WorldMap
         private UUID staticMapTileUUID = UUID.Zero;
         private UUID regionMapTileUUID = UUID.Zero;
         private bool m_asyncMapTileCreation = false;
+        private string m_assetCacheDir = Constants.DEFAULT_ASSETCACHE_DIR;
 
         #region IMapImageGenerator Members
 
@@ -199,6 +200,9 @@ namespace WhiteCore.Modules.WorldMap
                 UUID.TryParse(m_config.Configs["MapModule"].GetString("MaptileStaticUUID", UUID.Zero.ToString()),
                               out staticMapTileUUID);
             }
+
+            // get cache dir
+            m_assetCacheDir = m_config.Configs ["AssetCache"].GetString ("CacheDirectory",m_assetCacheDir);
 
             m_scene.RegisterModuleInterface<IMapImageGenerator>(this);
 
@@ -926,14 +930,14 @@ namespace WhiteCore.Modules.WorldMap
 
         private void ReadCacheMap()
         {
-            if (!Directory.Exists("assetcache"))
-                Directory.CreateDirectory("assetcache");
-            if (!Directory.Exists(Path.Combine("assetcache", "mapTileTextureCache")))
-                Directory.CreateDirectory(Path.Combine("assetcache", "mapTileTextureCache"));
+            if (!Directory.Exists(m_assetCacheDir))
+                Directory.CreateDirectory(m_assetCacheDir);
+            if (!Directory.Exists(Path.Combine(m_assetCacheDir, "mapTileTextureCache")))
+                Directory.CreateDirectory(Path.Combine(m_assetCacheDir, "mapTileTextureCache"));
 
             FileStream stream =
                 new FileStream(
-                    Path.Combine(Path.Combine("assetcache", "mapTileTextureCache"),
+                    Path.Combine(Path.Combine(m_assetCacheDir, "mapTileTextureCache"),
                                  m_scene.RegionInfo.RegionName + ".tc"), FileMode.OpenOrCreate);
             StreamReader m_streamReader = new StreamReader(stream);
             string file = m_streamReader.ReadToEnd();
@@ -947,7 +951,7 @@ namespace WhiteCore.Modules.WorldMap
                     //Something went wrong, delete the file
                     try
                     {
-                        File.Delete(Path.Combine(Path.Combine("assetcache", "mapTileTextureCache"),
+                        File.Delete(Path.Combine(Path.Combine(m_assetCacheDir, "mapTileTextureCache"),
                                                  m_scene.RegionInfo.RegionName + ".tc"));
                     }
                     catch

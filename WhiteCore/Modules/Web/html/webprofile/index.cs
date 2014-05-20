@@ -96,9 +96,12 @@ namespace WhiteCore.Modules.Web
 
             if (account == null)
                 return vars;
-            var libraryOwner = new UUID(Constants.LibraryOwner);
-            if (account.PrincipalID == libraryOwner)
-                return vars;
+
+			var libraryOwner = new UUID(Constants.LibraryOwner);
+			var realestateOwner = new UUID(Constants.RealEstateOwnerUUID);
+
+            if ( (account.PrincipalID == libraryOwner) || (account.PrincipalID == realestateOwner) )
+				return vars;
 
             vars.Add("UserName", account.Name);
             //vars.Add("UserBorn", Util.ToDateTime(account.Created).ToShortDateString());

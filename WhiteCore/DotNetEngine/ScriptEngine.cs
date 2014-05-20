@@ -44,6 +44,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using WhiteCore.Framework.Utilities;
 
 [assembly: AssemblyVersion("0.9.1.1")]
 [assembly: AssemblyFileVersion("0.9.1.1")]
@@ -100,7 +101,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         /// <summary>
         ///     Path to the script binaries.
         /// </summary>
-        public string ScriptEnginesPath = "ScriptEngines";
+        public string ScriptEnginesPath = Constants.DEFAULT_SCRIPTENGINE_DIR;
 
         /// <summary>
         ///     Errors of scripts that have failed in this run of the Maintenance Thread

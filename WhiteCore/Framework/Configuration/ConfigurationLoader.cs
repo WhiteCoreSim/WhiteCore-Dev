@@ -67,9 +67,10 @@ namespace WhiteCore.Framework.Configuration
             bool iniFileExists = false;
             bool oldoptions = false;
 
-            string mainIniDirectory = "";
+            string mainIniDirectory = Constants.DEFAULT_CONFIG_DIR;
             string mainIniFileName = defaultIniFile;
             string secondaryIniFileName = "";
+            string worldIniFileName = "MyWorld.ini";
 
             List<string> sources = new List<string>();
             string basePath = Util.configDir();
@@ -106,7 +107,9 @@ namespace WhiteCore.Framework.Configuration
                     //Be mindful of these when modifying...
                     //1) When file A includes file B, if the same directive is found in both, that the value in file B wins.
                     //2) That inifile may be used with or without inimaster being used.
-                    //3) That any values for directives pulled in via inifile (Config Set 2) override directives of the same name found in the directive set (Config Set 1) created by reading in bin/WhiteCore.ini and its subsequently included files or that created by reading in whatever file inimaster points to and its subsequently included files.
+                    //3) That any values for directives pulled in via inifile (Config Set 2) override directives of the same name found in 
+                    //    the directive set (Config Set 1) created by reading in bin/WhiteCore.ini and its subsequently included files
+                    //    or that created by reading in whatever file inimaster points to and its subsequently included files.
 
                     if (IsUri(masterFileName))
                     {
@@ -194,9 +197,9 @@ namespace WhiteCore.Framework.Configuration
                 }
                 else
                 {
-                    mainIniDirectory = startupConfig.GetString("mainIniDirectory", "");
+                    mainIniDirectory = startupConfig.GetString("mainIniDirectory", mainIniDirectory);
                     mainIniFileName = startupConfig.GetString("mainIniFileName", defaultIniFile);
-                    secondaryIniFileName = startupConfig.GetString("secondaryIniFileName", "");
+                    secondaryIniFileName = startupConfig.GetString("secondaryIniFileName", secondaryIniFileName);
                 }
             }
 
@@ -275,12 +278,17 @@ namespace WhiteCore.Framework.Configuration
                     ReadConfig(sources[i] + ".example", i, m_config);
             }
 
+            // add override paramteres if they exist
+            string  worldIniFilePath = Path.Combine(mainIniDirectory, worldIniFileName);
+            if (File.Exists(worldIniFilePath))
+                ReadConfig(worldIniFilePath, 0, m_config);
+
             FixDefines(ref m_config);
 
             if (!iniFileExists)
             {
                 Console.WriteLine(string.Format("[CONFIG]: Could not load any configuration"));
-				Console.WriteLine(string.Format("[CONFIG]: Configuration possibly exists, but there was an error loading it!"));
+                Console.WriteLine(string.Format("[CONFIG]: .. or Configuration possibly exists, but there was an error loading it!"));
                 Console.WriteLine(string.Format("[CONFIG]: Configuration : " + mainIniDirectory+", "+mainIniFileName));
                 throw new NotSupportedException();
             }

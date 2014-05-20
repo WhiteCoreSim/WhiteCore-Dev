@@ -135,7 +135,8 @@ namespace WhiteCore.Simulation.Base
 
         public static void Configure(bool requested)
         {
-			bool WhiteCore_log = (File.Exists(Path.Combine(Util.configDir(), "WhiteCore.log")));
+            string WhiteCore_ConfigDir = Constants.DEFAULT_CONFIG_DIR;
+            bool WhiteCore_log = (File.Exists(Path.Combine(Util.configDir(), "WhiteCore.log")));
 			bool WhiteCore_Server_log = (File.Exists(Path.Combine(Util.configDir(), "WhiteCore.Server.log")));
 			bool WhiteCore_mono_log = (File.Exists(Path.Combine(Util.configDir(), "mono-sgen.log")));
             bool isWhiteCoreExe = System.AppDomain.CurrentDomain.FriendlyName == "WhiteCore.exe" ||
@@ -153,11 +154,13 @@ namespace WhiteCore.Simulation.Base
 					Console.WriteLine("\n\n************* WhiteCore initial run. *************");
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine(
-						"\n\n   This appears to be your first time running WhiteCore, if not and you already configured your " +
-                        "*ini.example files, please ignore this warning and press enter; " +
-						"Otherwise type yes and WhiteCore will guide you through the configuration process.\n\nRemember, " +
-                        "these file names are Case Sensitive in Linux and Proper Cased.\n1. ./WhiteCore.ini\nand\n2. " +
-                        "./Configuration/Standalone/StandaloneCommon.ini \nor\n3. ./Configuration/Grid/GridCommon.ini\n" +
+                        "\n\n   This appears to be your first time running WhiteCore.\n"+
+                        "If you have already configured your *ini.example files, please ignore this warning and press enter;\n" +
+                        "Otherwise type 'yes' and WhiteCore will guide you through the configuration process.\n\n"+
+                        "Remember, these file names are Case Sensitive in Linux and Proper Cased.\n"+
+                        "1. " + WhiteCore_ConfigDir + "/WhiteCore.ini\nand\n" +
+                        "2. " + WhiteCore_ConfigDir + "/Sim/Standalone/StandaloneCommon.ini \nor\n" +
+                        "3. " + WhiteCore_ConfigDir + "/Grid/GridCommon.ini\n" +
                         "\nAlso, you will want to examine these files in great detail because only the basic system will " +
                         "load by default. WhiteCore can do a LOT more if you spend a little time going through these files.\n\n");
                     Console.ForegroundColor = ConsoleColor.Red;
@@ -178,6 +181,7 @@ namespace WhiteCore.Simulation.Base
 					string dbPasswd = "whitecore";
 					string dbSchema = "whitecore";
 					string dbUser = "whitecore";
+                    string dbPort = "3306";
                     string gridIPAddress = Utilities.GetExternalIp();
                     bool isStandalone = true;
                     string dbType = "1";
@@ -218,10 +222,11 @@ namespace WhiteCore.Simulation.Base
                         {
                             Console.WriteLine(
                                 "Note: this setup does not automatically create a MySQL installation for you.\n" +
-                                "You must install MySQL on your own");
+                                " This will configure the WhiteCore setting but you must install MySQL as well");
 
-                            dbSchema = ReadLine("MySQL database name for your region", dbSchema);
                             dbSource = ReadLine("MySQL database IP", dbSource);
+                            dbPort = ReadLine("MySQL database port (if not default)", dbPort);
+                            dbSchema = ReadLine("MySQL database name for your region", dbSchema);
                             dbUser = ReadLine("MySQL database user account", dbUser);
 
                             Console.Write("MySQL database password for that account: ");
@@ -234,12 +239,13 @@ namespace WhiteCore.Simulation.Base
                         gridName = ReadLine("Name of your WhiteCore-Sim Grid", gridName);
 
                         welcomeMessage = "Welcome to " + gridName + ", <USERNAME>!";
-                        welcomeMessage = ReadLine("Welcome Message to show during login (putting <USERNAME> into the " +
-                                                  "welcome message will insert the user's name)", welcomeMessage);
+                        welcomeMessage = ReadLine("Welcome Message to show during login\n" +
+                            "  (putting <USERNAME> into the welcome message will insert the user's name)", welcomeMessage);
 
-                        allowAnonLogin = ReadLine("Create accounts automatically when users log in " +
-                                                  "(you don't have to create all accounts manually or have a web interface then)",
-                                                  allowAnonLogin);
+                        allowAnonLogin = ReadLine("Create accounts automatically when users log in\n" +
+                            "  (This means you don't have to create all accounts manually\n" +
+                            "   using the console or web interface): ",
+                            allowAnonLogin);
                     }
 
                     if (!isStandalone)
@@ -250,7 +256,7 @@ namespace WhiteCore.Simulation.Base
                     //Data.ini setup
                     if (isStandalone)
                     {
-                        string folder = isWhiteCoreExe ? "Configuration/" : "ServerConfiguration/";
+                        string folder = isWhiteCoreExe ? WhiteCore_ConfigDir + "/Sim/" : WhiteCore_ConfigDir + "/Grid/ServerConfiguration/";
                         MakeSureExists(folder + "Data/Data.ini");
                         IniConfigSource data_ini = new IniConfigSource(folder + "Data/Data.ini",
                                                                        Nini.Ini.IniFileType.AuroraStyle);
@@ -261,7 +267,7 @@ namespace WhiteCore.Simulation.Base
                             conf.Set("Include-MySQL", folder + "Data/MySQL.ini");
 
                         if (isWhiteCoreExe)
-                            conf.Set("Include-FileBased", "Configuration/Data/FileBased.ini");
+                            conf.Set("Include-FileBased", "Sim/Data/FileBased.ini");
 
                         conf = data_ini.AddConfig("WhiteCoreConnectors");
                         conf.Set("ValidateTables", true);
@@ -286,8 +292,8 @@ namespace WhiteCore.Simulation.Base
                                     if (key == "ConnectionString")
                                         newConfig.Set(key,
                                                       string.Format(
-                                                          "\"Data Source={0};Port=3306;Database={1};User ID={2};Password={3};\"",
-                                                          dbSource, dbSchema, dbUser, dbPasswd));
+                                                "\"Data Source={0};Port={1};Database={2};User ID={3};Password={4};\"",
+                                                dbSource, dbPort, dbSchema, dbUser, dbPasswd));
                                     else
                                         newConfig.Set(key, config.Get(key));
                                 }
@@ -322,16 +328,16 @@ namespace WhiteCore.Simulation.Base
                         Console.WriteLine("Your WhiteCore.ini has been successfully configured");
                         Console.ResetColor();
 
-                        MakeSureExists("Configuration/Main.ini");
-                        IniConfigSource main_ini = new IniConfigSource("Configuration/Main.ini",
+                        MakeSureExists("Sim/Main.ini");
+                        IniConfigSource main_ini = new IniConfigSource("Sim/Main.ini",
                                                                        Nini.Ini.IniFileType.AuroraStyle);
 
                         IConfig conf = main_ini.AddConfig("Architecture");
                         if (isStandalone)
-                            conf.Set("Include-Standalone", "Configuration/Standalone/StandaloneCommon.ini");
+                            conf.Set("Include-Standalone", "Sim/Standalone/StandaloneCommon.ini");
                         else
-                            conf.Set("Include-Grid", "Configuration/Grid/WhiteCoreGridCommon.ini");
-                        conf.Set("Include-Includes", "Configuration/Includes.ini");
+                            conf.Set("Include-Grid", "Sim/Grid/WhiteCoreGridCommon.ini");
+                        conf.Set("Include-Includes", "Sim/Includes.ini");
 
                         main_ini.Save();
                         Console.ForegroundColor = ConsoleColor.Green;
@@ -340,12 +346,12 @@ namespace WhiteCore.Simulation.Base
 
                         if (isStandalone)
                         {
-                            MakeSureExists("Configuration/Standalone/StandaloneCommon.ini");
+                            MakeSureExists("Sim/Standalone/StandaloneCommon.ini");
                             IniConfigSource standalone_ini =
-                                new IniConfigSource("Configuration/Standalone/StandaloneCommon.ini",
+                                new IniConfigSource("Sim/Standalone/StandaloneCommon.ini",
                                                     Nini.Ini.IniFileType.AuroraStyle);
                             IniConfigSource standalone_ini_example =
-                                new IniConfigSource("Configuration/Standalone/StandaloneCommon.ini.example",
+                                new IniConfigSource("Sim/Standalone/StandaloneCommon.ini.example",
                                                     Nini.Ini.IniFileType.AuroraStyle);
                             foreach (IConfig config in standalone_ini_example.Configs)
                             {
@@ -378,12 +384,12 @@ namespace WhiteCore.Simulation.Base
                         }
                         else
                         {
-                            MakeSureExists("Configuration/Grid/WhiteCoreGridCommon.ini");
-                            IniConfigSource grid_ini = new IniConfigSource("Configuration/Grid/WhiteCoreGridCommon.ini",
+                            MakeSureExists("Sim/Grid/WhiteCoreGridCommon.ini");
+                            IniConfigSource grid_ini = new IniConfigSource("Sim/Grid/WhiteCoreGridCommon.ini",
                                                                            Nini.Ini.IniFileType.AuroraStyle);
 
                             conf = grid_ini.AddConfig("Includes");
-                            conf.Set("Include-Grid", "Configuration/Grid/Grid.ini");
+                            conf.Set("Include-Grid", "Sim/Grid/Grid.ini");
                             conf = grid_ini.AddConfig("Configuration");
                             conf.Set("GridServerURI", "http://" + gridIPAddress + ":8012/grid/");
 
@@ -395,11 +401,11 @@ namespace WhiteCore.Simulation.Base
                     }
                     if (!isWhiteCoreExe)
                     {
-                        MakeSureExists("ServerConfiguration/Login.ini");
-                        IniConfigSource login_ini = new IniConfigSource("ServerConfiguration/Login.ini",
+                        MakeSureExists("Grid/ServerConfiguration/Login.ini");
+                        IniConfigSource login_ini = new IniConfigSource("Grid/ServerConfiguration/Login.ini",
                                                                         Nini.Ini.IniFileType.AuroraStyle);
                         IniConfigSource login_ini_example =
-                            new IniConfigSource("ServerConfiguration/Login.ini.example",
+                            new IniConfigSource("Grid/ServerConfiguration/Login.ini.example",
                                                 Nini.Ini.IniFileType.AuroraStyle);
                         foreach (IConfig config in login_ini_example.Configs)
                         {
@@ -419,9 +425,9 @@ namespace WhiteCore.Simulation.Base
                         Console.WriteLine("Your Login.ini has been successfully configured");
                         Console.ResetColor();
 
-                        MakeSureExists("ServerConfiguration/GridInfoService.ini");
+                        MakeSureExists("Grid/ServerConfiguration/GridInfoService.ini");
                         IniConfigSource grid_info_ini =
-                            new IniConfigSource("ServerConfiguration/GridInfoService.ini",
+                            new IniConfigSource("Grid/ServerConfiguration/GridInfoService.ini",
                                                 Nini.Ini.IniFileType.AuroraStyle);
                         IConfig conf = grid_info_ini.AddConfig("GridInfoService");
                         conf.Set("GridInfoInHandlerPort", 8002);

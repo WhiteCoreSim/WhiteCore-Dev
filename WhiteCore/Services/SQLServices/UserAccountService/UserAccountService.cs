@@ -151,7 +151,34 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
 
         public void FinishedStartup()
         {
+            // check and/or create default RealEstate user & group
+            CheckRealEstateUserInfo ();
+
         }
+
+        /// <summary>
+        /// Checks and creates the real estate user.
+        /// </summary>
+        private void CheckRealEstateUserInfo()
+        {
+            IUserAccountService accountService = m_registry.RequestModuleInterface<IUserAccountService> ();
+            UserAccount uinfo = accountService.GetUserAccount(null, UUID.Parse(Constants.RealEstateOwnerUUID));
+
+            if (uinfo == null)
+            {
+                MainConsole.Instance.Warn ("Creating System User " + Constants.RealEstateOwnerName);
+                accountService.CreateUser (
+                    (UUID)Constants.RealEstateOwnerUUID,    // UUID
+                    UUID.Zero,                              // ScopeID
+                    Constants.RealEstateOwnerName,          // Name
+                    "", "");                                // password , email
+
+
+                IInventoryService inventoryService = m_registry.RequestModuleInterface<IInventoryService> ();
+                inventoryService.CreateUserInventory ((UUID)Constants.RealEstateOwnerUUID, true);
+
+            }
+         }
 
         #endregion
 
@@ -414,11 +441,13 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             //if (password != "" && m_AuthenticationService.Authenticate(userID, "UserAccount", password, 0) == "")
             //    return; //Not authed
 
-            // ensure the main libray owner is left alone!
+            // ensure the main library/realestate owner is left alone!
             var libraryOwner = new UUID (Constants.LibraryOwner);
-            if (userID == libraryOwner)
+            var realestateOwner = new UUID(Constants.RealEstateOwnerUUID);
+
+            if ( (userID == libraryOwner) || (userID == realestateOwner) )
             {
-                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Deleting the Library owner is not a good idea!");
+                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Deleting a system user account is not a good idea!");
                 return;
             }
 
@@ -551,11 +580,12 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 return;
             }
 
-            // ensure the main libray owner is left alone!
+            // ensure the main library/realestate owner is left alone!
             var libraryOwner = new UUID (Constants.LibraryOwner);
-            if (account.PrincipalID == libraryOwner)
+            var realestateOwner = new UUID(Constants.RealEstateOwnerUUID);
+            if ( (account.PrincipalID == libraryOwner) || (account.PrincipalID == realestateOwner) )
             {
-                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Changing the Library owner is not a good idea!");
+                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Changing system users is not a good idea!");
                 return;
             }
 
@@ -722,11 +752,12 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 return;
             }
 
-            // ensure the main libray owner is left alone!
+            // ensure the main library/realestate owner is left alone!
             var libraryOwner = new UUID (Constants.LibraryOwner);
-            if (account.PrincipalID == libraryOwner)
+            var realestateOwner = new UUID(Constants.RealEstateOwnerUUID);
+            if ( (account.PrincipalID == libraryOwner) || (account.PrincipalID == realestateOwner) )
             {
-                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Naughty!! You cannot delete the Library owner!");
+                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Naughty!! You cannot delete system users!");
                 return;
             }
 
@@ -845,11 +876,12 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             if (account == null)
                 MainConsole.Instance.ErrorFormat("[USER ACCOUNT SERVICE]: Unable to locate this user");
 
-            // ensure the main libray owner is left alone!
+            // ensure the main library/realestate owner is left alone!
             var libraryOwner = new UUID (Constants.LibraryOwner);
-            if (account.PrincipalID == libraryOwner)
+            var realestateOwner = new UUID(Constants.RealEstateOwnerUUID);
+            if ( (account.PrincipalID == libraryOwner) || (account.PrincipalID == realestateOwner) )
             {
-                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Changing the Library owner is not a good idea!");
+                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Changing system users is not a good idea!");
                 return;
             }
 

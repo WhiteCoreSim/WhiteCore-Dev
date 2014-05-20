@@ -66,7 +66,7 @@ if exist Compile.*.bat (
 )
 
 echo Calling Prebuild for target %vstudio% with framework %framework%...
-bin\Prebuild.exe /target vs2010 /targetframework v%framework% /conditionals ISWIN;NET_%framework%
+Prebuild.exe /target vs2010 /targetframework v%framework% /conditionals ISWIN;NET_%framework%
 
 echo.
 echo Creating compile batch file for your convinence...

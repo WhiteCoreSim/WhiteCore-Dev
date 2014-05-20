@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
@@ -139,6 +138,8 @@ namespace WhiteCore.Modules.WorldMap
         //   This could be considered a memory-leak, but it's *hopefully* taken care of after the terrain is generated
         private Dictionary<UUID, Color> m_mapping;
         private IScene m_scene;
+        private string m_assetCacheDir = Constants.DEFAULT_ASSETCACHE_DIR;
+
 
         #region IMapTileTerrainRenderer Members
 
@@ -146,6 +147,10 @@ namespace WhiteCore.Modules.WorldMap
         {
             m_scene = scene;
             // m_config = source; // not used currently
+
+            // get cache dir
+            m_assetCacheDir = source.Configs ["AssetCache"].GetString ("CacheDirectory",m_assetCacheDir);
+
             m_mapping = new Dictionary<UUID, Color>
                             {
                                 {defaultTerrainTexture1, defaultColor1},
@@ -271,14 +276,14 @@ namespace WhiteCore.Modules.WorldMap
 
         private void ReadCacheMap()
         {
-            if (!Directory.Exists("assetcache"))
-                Directory.CreateDirectory("assetcache");
-            if (!Directory.Exists(Path.Combine("assetcache", "mapTileTextureCache")))
-                Directory.CreateDirectory(Path.Combine("assetcache", "mapTileTextureCache"));
+            if (!Directory.Exists(m_assetCacheDir))
+                Directory.CreateDirectory(m_assetCacheDir);
+            if (!Directory.Exists(Path.Combine(m_assetCacheDir, "mapTileTextureCache")))
+                Directory.CreateDirectory(Path.Combine(m_assetCacheDir, "mapTileTextureCache"));
 
             FileStream stream =
                 new FileStream(
-                    Path.Combine(Path.Combine("assetcache", "mapTileTextureCache"),
+                    Path.Combine(Path.Combine(m_assetCacheDir, "mapTileTextureCache"),
                                  m_scene.RegionInfo.RegionName + ".tc"), FileMode.OpenOrCreate);
             StreamReader m_streamReader = new StreamReader(stream);
             string file = m_streamReader.ReadToEnd();
@@ -292,7 +297,7 @@ namespace WhiteCore.Modules.WorldMap
                     //Something went wrong, delete the file
                     try
                     {
-                        File.Delete(Path.Combine(Path.Combine("assetcache", "mapTileTextureCache"),
+                        File.Delete(Path.Combine(Path.Combine(m_assetCacheDir, "mapTileTextureCache"),
                                                  m_scene.RegionInfo.RegionName + ".tc"));
                     }
                     catch
@@ -325,7 +330,7 @@ namespace WhiteCore.Modules.WorldMap
             OSDMap map = SerializeCache();
             FileStream stream =
                 new FileStream(
-                    Path.Combine(Path.Combine("assetcache", "mapTileTextureCache"),
+                    Path.Combine(Path.Combine(m_assetCacheDir, "mapTileTextureCache"),
                                  m_scene.RegionInfo.RegionName + ".tc"), FileMode.Create);
             StreamWriter writer = new StreamWriter(stream);
             writer.WriteLine(OSDParser.SerializeJsonString(map));
