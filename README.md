@@ -1,4 +1,11 @@
-# WhiteCore
+# WhiteCore Sim
+
+*NOTE: 
+ As of Version 0.9.2, the WhiteCore repository format has changed.  
+ The WhiteCore-Optional-Modules repository has also been updated for the new structure.
+ To ensure correct compiling, use the latest commits of the WhiteCore-Dev or a release version >= 0.9.2*
+
+*Please see the "Migration to 0.9.2.txt" file for details on files and configurations that will need to be modified*
 
 The WhiteCore Development Team has begun the continuation of Aurora virtual world server.
 

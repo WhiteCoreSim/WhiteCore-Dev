@@ -33,6 +33,11 @@ Answer 'No' if asked to re-configure at startup.
 
 Checkout the ReadMe.txt file for the rest
 
+Questions?
+==========
+Checkout the #whitecore-support irc channel on freenode,
+
+
 Rowan
 <greythane@gmail.com>
 May 2014
