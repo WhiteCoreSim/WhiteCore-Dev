@@ -19,4 +19,4 @@
 	CapsHandlers = AppearanceCAPS
 
 [Includes]
-	Include-Base = WhiteCore.ServersBase.ini
+	Include-Base = Grid/WhiteCore.ServersBase.ini

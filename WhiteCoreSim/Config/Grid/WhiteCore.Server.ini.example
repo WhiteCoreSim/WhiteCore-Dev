@@ -78,7 +78,7 @@
 	;; Stuff to set up WhiteCore-Server to run all of the services
 	;; Just uncomment this line to have everything run in WhiteCore.Server
 	;;  such that you don't have to run any of the other server.exe files.
-    ;Include-Single = ServerConfiguration/SingleServerInstance.ini
+	Include-Single = Grid/ServerConfiguration/SingleServerInstance.ini
 
 [ExternalCaps]
 	
@@ -118,15 +118,15 @@
 
 [VoiceIncludes]
     ;; If you would like to set up voice for the entire grid, select one of these includes depending on which voice module you wish to set up
-    ;Include-Murmur = ServerConfiguration/Murmur.ini
-    ;Include-FreeSwitch = ServerConfiguration/FreeSwitch.ini
+    ;Include-Murmur = Grid/ServerConfiguration/Murmur.ini
+    ;Include-FreeSwitch = Grid/ServerConfiguration/FreeSwitch.ini
     
 [Includes]
     ;;Other .ini files to add...
-    Include-Login = ServerConfiguration/Login.ini
-    Include-GridInfoService = ServerConfiguration/GridInfoService.ini
-    Include-Data = ServerConfiguration/Data/Data.ini
-	Include-Protection = ServerConfiguration/Protection.ini
-	Include-Services = ServerConfiguration/Services.ini
-    Include-Setup = ServerConfiguration/GridSetup.ini
-	Include-Modules = ServerConfiguration/Modules/*.ini
+    Include-Login = Grid/ServerConfiguration/Login.ini
+    Include-GridInfoService = Grid/ServerConfiguration/GridInfoService.ini
+    Include-Data = Grid/ServerConfiguration/Data/Data.ini
+	Include-Protection = Grid/ServerConfiguration/Protection.ini
+	Include-Services = Grid/ServerConfiguration/Services.ini
+    Include-Setup = Grid/ServerConfiguration/GridSetup.ini
+	Include-Modules = Grid/ServerConfiguration/Modules/*.ini

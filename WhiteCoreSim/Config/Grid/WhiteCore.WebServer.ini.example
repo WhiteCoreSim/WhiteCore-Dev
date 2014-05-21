@@ -69,9 +69,9 @@
     GridInfoInHandlerPort = 80
     
 [Includes]
-    Include-Data = ServerConfiguration/Data/Data.ini
-    Include-GridSetup = ServerConfiguration/GridSetup.ini
-    Include-GridInfoService = ServerConfiguration/GridInfoService.ini
-    Include-Login = ServerConfiguration/Login.ini
-    Include-Main = WebServerConfiguration/Main.ini
-	Include-WebInterface = WebServerConfiguration/WebInterface.ini
+    Include-Data = Grid/ServerConfiguration/Data/Data.ini
+    Include-GridSetup = Grid/ServerConfiguration/GridSetup.ini
+    Include-GridInfoService = Grid/ServerConfiguration/GridInfoService.ini
+    Include-Login = Grid/ServerConfiguration/Login.ini
+    Include-Main = Grid/WebServerConfiguration/Main.ini
+	Include-WebInterface = Grid/WebServerConfiguration/WebInterface.ini

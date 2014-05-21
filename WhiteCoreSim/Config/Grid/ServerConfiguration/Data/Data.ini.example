@@ -2,10 +2,10 @@
     ;; Select the Database System you wish to use, then edit the appropriate ini file to set connection strings accordingly
     ;;
     ;; If you want to use SQLite, select this file.
-    Include-SQLite = ServerConfiguration/Data/SQLite.ini
+    Include-SQLite = Grid/ServerConfiguration/Data/SQLite.ini
     
     ;; If you want to use MySQL, select this file.
-    ;Include-MySQL = ServerConfiguration/Data/MySQL.ini
+    ;Include-MySQL = Grid/ServerConfiguration/Data/MySQL.ini
 
 [RedisConnection]
 	;; If you're running this on the same computer as WhiteCore.Server, 

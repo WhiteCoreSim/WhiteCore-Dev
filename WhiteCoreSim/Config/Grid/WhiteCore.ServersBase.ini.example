@@ -57,10 +57,10 @@
 	
 [Includes]
     ;;Other .ini files to add...
-    Include-Login = ServerConfiguration/Login.ini
-    Include-GridInfoService = ServerConfiguration/GridInfoService.ini
-    Include-Data = ServerConfiguration/Data/Data.ini
-	Include-Protection = ServerConfiguration/Protection.ini
-	Include-Services = ServerConfiguration/Services.ini
-    Include-Setup = ServerConfiguration/GridSetup.ini
-	Include-Modules = ServerConfiguration/Modules/*.ini
+    Include-Login = Grid/ServerConfiguration/Login.ini
+    Include-GridInfoService = Grid/ServerConfiguration/GridInfoService.ini
+    Include-Data = Grid/ServerConfiguration/Data/Data.ini
+	Include-Protection = Grid/ServerConfiguration/Protection.ini
+	Include-Services = Grid/ServerConfiguration/Services.ini
+    Include-Setup = Grid/ServerConfiguration/GridSetup.ini
+	Include-Modules = Grid/ServerConfiguration/Modules/*.ini
