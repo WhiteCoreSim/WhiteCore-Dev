@@ -173,7 +173,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     Constants.RealEstateOwnerName,          // Name
                     "", "");                                // password , email
 
-
+                // Create Standard Inventory
                 IInventoryService inventoryService = m_registry.RequestModuleInterface<IInventoryService> ();
                 inventoryService.CreateUserInventory ((UUID)Constants.RealEstateOwnerUUID, true);
 

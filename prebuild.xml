@@ -914,7 +914,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="WhiteCore.AssetServer" path="WhiteCore/Servers/AssetServer" type="Exe" appmanifest="app.manifest">
+    <Project frameworkVersion="v4_0" name="WhiteCore.Server.AssetServer" path="WhiteCore/Servers/AssetServer" type="Exe" appmanifest="app.manifest">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
@@ -965,7 +965,7 @@
       </Files>
     </Project>
 	
-    <Project frameworkVersion="v4_0" name="WhiteCore.AvatarServer" path="WhiteCore/Servers/AvatarServer" type="Exe" appmanifest="app.manifest">
+    <Project frameworkVersion="v4_0" name="WhiteCore.Server.AvatarServer" path="WhiteCore/Servers/AvatarServer" type="Exe" appmanifest="app.manifest">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
@@ -1016,7 +1016,7 @@
       </Files>
     </Project>
 	
-    <Project frameworkVersion="v4_0" name="WhiteCore.GridServer" path="WhiteCore/Servers/GridServer" type="Exe" appmanifest="app.manifest">
+    <Project frameworkVersion="v4_0" name="WhiteCore.Server.GridServer" path="WhiteCore/Servers/GridServer" type="Exe" appmanifest="app.manifest">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
@@ -1067,7 +1067,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="WhiteCore.InventoryServer" path="WhiteCore/Servers/InventoryServer" type="Exe" appmanifest="app.manifest">
+    <Project frameworkVersion="v4_0" name="WhiteCore.Server.InventoryServer" path="WhiteCore/Servers/InventoryServer" type="Exe" appmanifest="app.manifest">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
@@ -1118,7 +1118,7 @@
       </Files>
     </Project>
 	
-    <Project frameworkVersion="v4_0" name="WhiteCore.WebServer" path="WhiteCore/Servers/WebServer" type="Exe" appmanifest="app.manifest">
+    <Project frameworkVersion="v4_0" name="WhiteCore.Server.WebServer" path="WhiteCore/Servers/WebServer" type="Exe" appmanifest="app.manifest">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>

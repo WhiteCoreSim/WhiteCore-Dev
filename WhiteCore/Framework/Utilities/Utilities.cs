@@ -59,8 +59,6 @@ namespace WhiteCore.Framework.Utilities
         {
 			return (MainServer.Instance.Secure ? "https://" : "http://") + MainServer.Instance.HostName +
                    ":" + MainServer.Instance.Port.ToString() + "/WhiteCoreServerRelease" + WhiteCoreServerVersion() + ".html";
-			//			return (MainServer.Instance.Secure ? "https://" : "http://") + GetExternalIp() +
-			//	":" + MainServer.Instance.Port.ToString() + "/WhiteCoreServerRelease" + WhiteCoreServerVersion() + ".html";
         }
 
         /// <summary>
@@ -71,8 +69,6 @@ namespace WhiteCore.Framework.Utilities
         {
 			return (MainServer.Instance.Secure ? "https://" : "http://") + MainServer.Instance.HostName + ":" +
                    MainServer.Instance.Port.ToString();
-			//			return (MainServer.Instance.Secure ? "https://" : "http://") + GetExternalIp() + ":" +
-			//	MainServer.Instance.Port.ToString();
         }
 
         /// <summary>
@@ -81,7 +77,7 @@ namespace WhiteCore.Framework.Utilities
         /// <returns></returns>
         public static string WhiteCoreServerVersion()
         {
-            return "0.9.2";
+            return VersionInfo.VERSION_NUMBER;
         }
 
         public static void SetEncryptorType(string type)
