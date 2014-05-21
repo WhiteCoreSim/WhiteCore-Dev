@@ -21,7 +21,7 @@ namespace WhiteCore.FileBasedServices.AssetService
 
         protected bool m_doConversion = false;
         protected IAssetDataPlugin m_assetService;
-        protected string m_assetsDirectory = "C://assets/";
+        protected string m_assetsDirectory = "";
         protected bool m_enabled = false;
 
         #endregion
@@ -46,7 +46,8 @@ namespace WhiteCore.FileBasedServices.AssetService
             if (fileConfig != null)
             {
                 if (fileConfig.GetString("AssetFolderPath", "") == "")
-                    SetUpFileBase(Path.Combine(Path.GetPathRoot(Environment.CurrentDirectory), "assets"));
+                    //SetUpFileBase(Path.Combine(Path.GetPathRoot(Environment.CurrentDirectory), "assets"));
+                    SetUpFileBase(Constants.DEFAULT_FILEASSETS_DIR);
                 else
                     SetUpFileBase(fileConfig.GetString("AssetFolderPath"));
             }
