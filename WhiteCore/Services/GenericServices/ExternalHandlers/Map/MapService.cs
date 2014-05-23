@@ -54,6 +54,7 @@ namespace WhiteCore.Services
         private float m_cacheExpires = 24;
         private IAssetService m_assetService;
         private string m_assetCacheDir = Constants.DEFAULT_ASSETCACHE_DIR;
+        private string m_assetMapCacheDir;
         private IGridService m_gridService;
         private IJ2KDecoder m_j2kDecoder;
         private static Bitmap m_blankRegionTile = null;
@@ -107,8 +108,12 @@ namespace WhiteCore.Services
         {
             if (!Directory.Exists(cacheDir))
                 Directory.CreateDirectory(cacheDir);
-            if (!Directory.Exists(cacheDir+"/mapzoomlevels"))
-                Directory.CreateDirectory(cacheDir+"/mapzoomlevels");
+
+            if (!Directory.Exists (cacheDir + "/mapzoomlevels")) 
+            {
+                m_assetMapCacheDir = cacheDir + "/mapzoomlevels";
+                Directory.CreateDirectory (m_assetMapCacheDir);
+            }
         }
 
         public void Start(IConfigSource config, IRegistryCore registry)
@@ -488,7 +493,8 @@ namespace WhiteCore.Services
             if (!m_cacheEnabled)
                 return new byte[0];
 
-            string fullPath = Path.Combine("assetcache", Path.Combine("mapzoomlevels", name));
+                //string fullPath = Path.Combine("assetcache", Path.Combine("mapzoomlevels", name));
+            string fullPath = Path.Combine(m_assetMapCacheDir, name);
             if (File.Exists(fullPath))
             {
                 //Make sure the time is ok
@@ -517,7 +523,8 @@ namespace WhiteCore.Services
             }
 
             string name = string.Format("map-{0}-{1}-{2}-objects.jpg", maplayer, regionX, regionY);
-            string fullPath = Path.Combine("assetcache", Path.Combine("mapzoomlevels", name));
+                //string fullPath = Path.Combine("assetcache", Path.Combine("mapzoomlevels", name));
+            string fullPath = Path.Combine(m_assetMapCacheDir, name);
             if (File.Exists(fullPath))
             {
                 //Make sure the time is ok
@@ -560,7 +567,8 @@ namespace WhiteCore.Services
                 return;
 
             string name = string.Format("map-{0}-{1}-{2}-objects.jpg", maplayer, regionX, regionY);
-            string fullPath = Path.Combine("assetcache", Path.Combine("mapzoomlevels", name));
+            //string fullPath = Path.Combine("assetcache", Path.Combine("mapzoomlevels", name));
+            string fullPath = Path.Combine(m_assetMapCacheDir, name);
             File.WriteAllBytes(fullPath, data);
         }
     }
