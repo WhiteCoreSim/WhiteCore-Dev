@@ -285,7 +285,7 @@ namespace WhiteCore.Simulation.Base
                     hostName = hostName.Remove (hostName.Length - 1, 1);
                 
                 // save this for posterity in case it is needed
-                MainConsole.Instance.Info ("[Network]: Simulator IP address has been set to " + hostName);
+                MainConsole.Instance.Info ("[Network]: Network IP address has been set to " + hostName);
                 Utilities.HostName = hostName;
             } else
                 hostName = Utilities.HostName;
