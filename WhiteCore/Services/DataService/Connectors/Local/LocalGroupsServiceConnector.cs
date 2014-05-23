@@ -80,7 +80,8 @@ namespace WhiteCore.Services.DataService
             Init(simBase, Name);
 
             // verify that the RealEstate group exists
-            CheckRealEstateGroupInfo ();
+            if (!m_doRemoteCalls)
+                CheckRealEstateGroupInfo ();
         }
 
         public string Name
