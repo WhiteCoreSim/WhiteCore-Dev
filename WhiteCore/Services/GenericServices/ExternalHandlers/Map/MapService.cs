@@ -109,11 +109,9 @@ namespace WhiteCore.Services
             if (!Directory.Exists(cacheDir))
                 Directory.CreateDirectory(cacheDir);
 
-            if (!Directory.Exists (cacheDir + "/mapzoomlevels")) 
-            {
-                m_assetMapCacheDir = cacheDir + "/mapzoomlevels";
+            m_assetMapCacheDir = cacheDir + "/mapzoomlevels";
+            if (!Directory.Exists (m_assetMapCacheDir))
                 Directory.CreateDirectory (m_assetMapCacheDir);
-            }
         }
 
         public void Start(IConfigSource config, IRegistryCore registry)
