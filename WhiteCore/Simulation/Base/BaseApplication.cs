@@ -307,9 +307,13 @@ namespace WhiteCore.Simulation.Base
 
                     if (isWhiteCoreExe)
                     {
-                        MakeSureExists("WhiteCore.ini");
-						IniConfigSource whitecore_ini = new IniConfigSource("WhiteCore.ini", Nini.Ini.IniFileType.AuroraStyle);
-						IniConfigSource whitecore_ini_example = new IniConfigSource("WhiteCore.ini.example", Nini.Ini.IniFileType.AuroraStyle);
+						string folder = WhiteCore_ConfigDir;
+						MakeSureExists(folder + "/WhiteCore.ini");
+
+						IniConfigSource whitecore_ini = new IniConfigSource(folder 
+							+ "/WhiteCore.ini", Nini.Ini.IniFileType.AuroraStyle);
+						IniConfigSource whitecore_ini_example = new IniConfigSource(folder 
+							+ "/WhiteCore.ini.example", Nini.Ini.IniFileType.AuroraStyle);
 
 						foreach (IConfig config in whitecore_ini_example.Configs)
                         {
@@ -328,9 +332,12 @@ namespace WhiteCore.Simulation.Base
                         Console.WriteLine("Your WhiteCore.ini has been successfully configured");
                         Console.ResetColor();
 
-                        MakeSureExists("Sim/Main.ini");
-                        IniConfigSource main_ini = new IniConfigSource("Sim/Main.ini",
-                                                                       Nini.Ini.IniFileType.AuroraStyle);
+						MakeSureExists(folder + "/Sim/Main.ini");
+
+						IniConfigSource main_ini = new IniConfigSource(folder + "/Sim/Main.ini", 
+							Nini.Ini.IniFileType.AuroraStyle);
+						//IniConfigSource main_ini_example = new IniConfigSource(folder 
+						//	+ "/Sim/Main.ini.example", Nini.Ini.IniFileType.AuroraStyle);
 
                         IConfig conf = main_ini.AddConfig("Architecture");
                         if (isStandalone)
@@ -346,13 +353,13 @@ namespace WhiteCore.Simulation.Base
 
                         if (isStandalone)
                         {
-                            MakeSureExists("Sim/Standalone/StandaloneCommon.ini");
-                            IniConfigSource standalone_ini =
-                                new IniConfigSource("Sim/Standalone/StandaloneCommon.ini",
-                                                    Nini.Ini.IniFileType.AuroraStyle);
-                            IniConfigSource standalone_ini_example =
-                                new IniConfigSource("Sim/Standalone/StandaloneCommon.ini.example",
-                                                    Nini.Ini.IniFileType.AuroraStyle);
+							MakeSureExists(folder + "/Sim/Standalone/StandaloneCommon.ini");
+
+							IniConfigSource standalone_ini = new IniConfigSource(folder 
+								+ "/Sim/Standalone/StandaloneCommon.ini", Nini.Ini.IniFileType.AuroraStyle);
+							IniConfigSource standalone_ini_example = new IniConfigSource(folder 
+								+ "/Sim/Standalone/StandaloneCommon.ini.example", Nini.Ini.IniFileType.AuroraStyle);
+
                             foreach (IConfig config in standalone_ini_example.Configs)
                             {
                                 IConfig newConfig = standalone_ini.AddConfig(config.Name);
