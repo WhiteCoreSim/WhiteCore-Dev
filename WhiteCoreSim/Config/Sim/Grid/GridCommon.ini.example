@@ -6,9 +6,11 @@
     Include-Grid = Sim/Grid/Grid.ini
 
 [Configuration]
-    ;; Grid server URI if different than the default
-    ;; GridServerURI = "http://127.0.0.1:8012/grid/"
-    GridServerURI = ""
+    ;; URL of the Grid server info service if different to the current hostname
+    ;; e.g. GridServerURI = "http://127.0.0.1:8012/grid/"
+    ;; Default is to use the currently determined HostName URL 
+    ;;   This assume that the Grid servers (if any) are located on the same IP Address
+    GridServerURI = "http://ServersHostname:8012/grid/"
 	
 	;; If regions should be marked as offline on the map
 	;;  instead of being removed on shutdown.
