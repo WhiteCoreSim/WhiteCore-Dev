@@ -35,7 +35,29 @@ any problem or prevent operation of the servers.
 
 When completed the 'WhiteCoreSim/bin' subdirectory will contain the newly compiled WhiteCore files.
 
-Copy this 'bin' subdirectory to your existing WhiteCore installation, replacing the 'bin' directory there.
+Running for the first time
+--------
+If you are not running this for the first time and already have a configured WhiteCore installation, skip
+to the next section.
+
+Create a WhiteCore installation direction, for example with the following on Un*x systems (inc. Mac OS X):
+
+    mkdir ../WhiteCode-Install
+
+Copy the 'bin','Config', and 'Data' subdirectories into this new directory, for example with the following
+on Un*x systems (inc. Mac OS X):
+
+    cp -r WhiteCoreSim/bin ../WhiteCore-Install/
+    cp -r WhiteCoreSim/Config ../WhiteCore-Install/
+    cp -r WhiteCoreSim/Data ../WhiteCore-Install/
+
+Change to the 'bin' subdirectory under the WhiteCore installation directory, and start WhiteCore.
+
+Answer yes when asked if you want to auto-configure.
+
+Updating an existing WhiteCode installation
+---------
+Copy the 'bin' subdirectory to your existing WhiteCore installation, replacing the 'bin' directory there.
 
 Restart as per normal using the appropriate script file.
 Answer 'No' if asked to re-configure at startup.
