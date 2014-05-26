@@ -7,7 +7,7 @@
     Include-Standalone = Sim/Standalone/StandaloneCommon.ini
 
     ;;If you would like to use WhiteCore in grid mode, select this file.
-    ;Include-Grid = Sim/Grid/WhiteCoreGridCommon.ini
+    ;Include-Grid = Sim/Grid/GridCommon.ini
 	
     ;; Don't touch this, look above
     Include-Includes = Sim/Includes.ini
