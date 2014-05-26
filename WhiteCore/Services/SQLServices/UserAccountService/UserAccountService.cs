@@ -173,16 +173,28 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             if (uinfo == null)
             {
                 MainConsole.Instance.Warn ("Creating System User " + Constants.RealEstateOwnerName);
+                var newPassword = Utilities.RandomPassword.Generate (2, 1, 0);
+
                 accountService.CreateUser (
                     (UUID)Constants.RealEstateOwnerUUID,    // UUID
                     UUID.Zero,                              // ScopeID
                     Constants.RealEstateOwnerName,          // Name
-                    "", "");                                // password , email
+                    newPassword, "");                                // password , email
+
+                MainConsole.Instance.Info (" The password for the RealEstate user is : " + newPassword);
 
                 // Create Standard Inventory
                 IInventoryService inventoryService = m_registry.RequestModuleInterface<IInventoryService> ();
                 inventoryService.CreateUserInventory ((UUID)Constants.RealEstateOwnerUUID, true);
 
+                //set as "Maintenace" level
+                var account = accountService.GetUserAccount(null, UUID.Parse(Constants.RealEstateOwnerUUID));
+                account.UserLevel = 250;
+                bool success = StoreUserAccount(account);
+
+                if (success)
+                    MainConsole.Instance.Info (" The RealEstate user has been elevated to 'Maintenance' level");
+                    
             }
          }
 
