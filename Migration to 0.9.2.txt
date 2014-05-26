@@ -34,13 +34,20 @@ All necessary files for running an instance of WhiteCore are contained in the
 
 The configuration files are the same as for previous version of WhiteCore, just that they
  are now in a different location.  
+ Note: There are some significant differences in the "Includes" directive and these should
+ not be altered.
  
  You can find all the configuration files in  "WhiteCoreSim/Config"
  - The Sim directory is for a Standalone configuration
  - The Grid directory if for a Grid server configuration
  
- To move your configuration to the new structure, edit, copy or paste your existing "*.ini"
- files into the same location in either the Sim or Grid directories.
+ To move your configuration to the new structure you will need to transfer your current
+ customized settings over to the same "ini" file in the new locations for both the "Grid"
+ and "Sim" directories.
+ i.e Copy your old "WhiteCore.ini" settings to the new "WhiteCore.ini" file, remembering
+ that you only need to copy across your modifications.
+ The old "configuration" directory correspondes to the new "Sim" directory.
+ The old "ServerConfiguration" directory is now in the new "Grid" directory
  
  The only exception to this is the main "ini" file for a standalone (region) or grid setup 
  with the main configuration files in the "WhiteCoreSim/Config" directory. 
