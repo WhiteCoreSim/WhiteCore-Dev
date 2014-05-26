@@ -41,10 +41,10 @@
     ;PIDFile = /tmp/my.pid
 
     ;; Commands to be run on startup are in the given file
-    startup_console_commands_file = startup_commands.txt
+    ;startup_console_commands_file = ../Config/startup_commands.txt
 
     ;; Commands to be run on shutdown are in the given file
-    shutdown_console_commands_file = shutdown_commands.txt
+    ;shutdown_console_commands_file = ../Config/shutdown_commands.txt
 
     ;; To run a script every X minutes, set the script filename here
     ;timer_Script = filename

@@ -441,7 +441,8 @@ namespace WhiteCore.Simulation.Base
                     string currentCommand;
                     while ((currentCommand = readFile.ReadLine()) != null)
                     {
-                        if (currentCommand != String.Empty)
+                        if ( (currentCommand != String.Empty) &&
+                            (!currentCommand.StartsWith(";")) )
                         {
                             commands.Add(currentCommand);
                         }
