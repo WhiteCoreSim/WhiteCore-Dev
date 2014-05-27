@@ -113,7 +113,7 @@ namespace WhiteCore.Services.DataService
                 "Maintenance",                                      // Name
                 "This group is for RealEstate Maintenance",         // Charter
                 false,                                              // Show in list
-                UUID.Zero, 0, false, false, true,                   // Insignia UUID, Mmebership fee, Open Enrolement, Allow publishing, Mature
+                UUID.Zero, 0, false, false, true,                   // Insignia UUID, Membership fee, Open Enrolement, Allow publishing, Mature
                 (UUID)Constants.RealEstateOwnerUUID,                // founder UUID
                 UUID.Random());                                     // owner role UUID ??
             return true;
