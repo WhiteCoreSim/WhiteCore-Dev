@@ -638,7 +638,8 @@ namespace WhiteCore.Modules.Web
         {
             Dictionary<string, object> dictionary = new Dictionary<string, object>();
 
-            dictionary.Add("NewsDate", Time.ToShortDateString());
+            //dictionary.Add("NewsDate", Time.ToShortDateString());
+            dictionary.Add("NewsDate", Culture.LocaleDate(Time));
             dictionary.Add("NewsTitle", Title);
             dictionary.Add("NewsText", Text);
             dictionary.Add("NewsID", ID);
