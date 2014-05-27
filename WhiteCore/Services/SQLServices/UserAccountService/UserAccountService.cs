@@ -64,10 +64,6 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             Configure(config, registry);
             Init(registry, Name, serverPath: "/user/", serverHandlerName: "UserAccountServerURI");
  
-            // check and/or create default RealEstate user
-            if (!m_doRemoteCalls)
-                CheckRealEstateUserInfo ();
-
         }
 
         public void Configure(IConfigSource config, IRegistryCore registry)
@@ -156,7 +152,10 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
 
         public void FinishedStartup()
         {
- 
+            // check and/or create default RealEstate user
+            if (!m_doRemoteCalls)
+                CheckRealEstateUserInfo ();
+
         }
 
         /// <summary>
