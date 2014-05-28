@@ -43,7 +43,7 @@ namespace WhiteCore.Modules.Estate
     public class EstateInitializer : ISharedRegionStartupModule, IWhiteCoreBackupModule
     {
         private string LastEstateName = "";
-        private string LastEstateOwner = "Test User";
+        private string LastEstateOwner = Constants.RealEstateOwnerName;
 
         public void Initialise(IScene scene, IConfigSource source, ISimulationBase openSimBase)
         {
@@ -103,10 +103,6 @@ namespace WhiteCore.Modules.Estate
                         MainConsole.Instance.Prompt(
                             "Do you wish to join one of these existing estates? (yes/no/cancel)",
                             response);
-                    //response =
-                    //    MainConsole.Instance.Prompt(
-                    //        "Do you wish to join one of these existing estates? (yes/no/cancel)",
-                    //        response, new List<string> {"yes", "no", "cancel"});
                 }
                 else
                 {
