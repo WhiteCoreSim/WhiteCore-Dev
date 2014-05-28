@@ -102,7 +102,6 @@ namespace WhiteCore.Modules.Web
                 return vars;
 
             vars.Add("UserName", account.Name);
-            //vars.Add("UserBorn", Util.ToDateTime(account.Created).ToShortDateString());
             vars.Add("UserBorn", Culture.LocaleDate(Util.ToDateTime(account.Created)));
 
             IUserProfileInfo profile = Framework.Utilities.DataManager.RequestPlugin<IProfileConnector>().
