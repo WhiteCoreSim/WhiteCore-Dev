@@ -138,6 +138,12 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                         "set partner",
                         "Sets the partner in a user's profile.",
                         HandleSetPartner, false, true);
+                    
+                    MainConsole.Instance.Commands.AddCommand(
+                        "reset partner",
+                        "reset partner",
+                        "Resets the partner in a user's profile.",
+                        HandleResetPartner, false, true);
                 }
             }
             registry.RegisterModuleInterface<IUserAccountService>(this);
@@ -504,6 +510,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             if (second == first)
             {
                 MainConsole.Instance.Error("[USER ACCOUNT SERVICE]: You are not able to set yourself as your partner");
+                return;
             }
             else
             {
@@ -528,6 +535,40 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
 
                     MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: Partner information updated. ");
                 }
+            }
+        }
+
+        /// <summary>
+        /// Handles the reset partner command.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmdParams">Cmd parameters.</param>
+        protected void HandleResetPartner(IScene scene, string[] cmdParams)
+        {
+            string first = MainConsole.Instance.Prompt("First User's name (<first> <last>)");
+
+            if (m_profileConnector != null)
+            {
+                IUserProfileInfo firstProfile =
+                    m_profileConnector.GetUserProfile(GetUserAccount(null, first).PrincipalID);
+
+                // Find the second partner through the first user details
+                if (firstProfile.Partner == UUID.Zero)
+                {
+                    MainConsole.Instance.Error("[USER ACCOUNT SERVICE]: This user doesn't have a partner");
+                    return;
+                }
+
+                IUserProfileInfo secondProfile =
+                        m_profileConnector.GetUserProfile(GetUserAccount(null, firstProfile.Partner).PrincipalID);
+
+                firstProfile.Partner = UUID.Zero;
+                secondProfile.Partner = UUID.Zero;
+
+                m_profileConnector.UpdateUserProfile(firstProfile);
+                m_profileConnector.UpdateUserProfile(secondProfile);
+
+                MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: Partner information updated. ");
             }
         }
 
