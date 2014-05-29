@@ -682,9 +682,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             if (QIS.functionName != "link_message" &&
                 QIS.VersionID != Interlocked.Read(ref QIS.ID.VersionID))
             {
-				MainConsole.Instance.WarnFormat("[WDNE]: Found bad version ID in queue, resetting, {0} to {1}",
+                MainConsole.Instance.DebugFormat("[WDNE]: Found bad version ID in queue, resetting, {0} to {1}",
                                                 QIS.VersionID, Interlocked.Read(ref QIS.ID.VersionID));
-				MainConsole.Instance.WarnFormat("[WDNE]:     Function: '{0}' in region {1}",
+                MainConsole.Instance.DebugFormat("[WDNE]:     Function: '{0}' in region {1}",
 					QIS.functionName == "" ? QIS.functionName : "unknown",
                     QIS.ID.Part.ParentEntity.Scene.RegionInfo.RegionName);
                 //return;

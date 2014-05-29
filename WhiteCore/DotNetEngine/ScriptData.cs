@@ -771,9 +771,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 if (string.IsNullOrEmpty(this.State) && DefaultState != this.State)
                     //Sometimes, "" is a valid state for other script languages
                 {
-                    MainConsole.Instance.Warn("Resetting broken script save state - " + InventoryItem.Name+":"+this.Part.Name + " @ " +
-                                              this.Part.AbsolutePosition);
-                    MainConsole.Instance.Warn ("        in region " + Part.ParentEntity.Scene.RegionInfo.RegionName);
+                    MainConsole.Instance.Warn("Resetting broken script save state\n" +
+                        "                :  "+InventoryItem.Name+":"+this.Part.Name + " @ " +Part.AbsolutePosition +
+                    "\n                     in region " + Part.ParentEntity.Scene.RegionInfo.RegionName);
 
                     this.State = DefaultState;
                     m_ScriptEngine.StateSave.DeleteFrom(Part, LastStateSave.ItemID);
