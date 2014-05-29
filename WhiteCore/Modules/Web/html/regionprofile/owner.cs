@@ -102,7 +102,11 @@ namespace WhiteCore.Modules.Web
                 return vars;
 
             vars.Add("UserName", account.Name);
-            vars.Add("UserBorn", Culture.LocaleDate(Util.ToDateTime(account.Created)));
+            //  TODO: User Profile inworld shows this as the standard mm/dd/yyyy
+            //  Do we want this to be localised into the users Localisation or keep it as standard ?
+            //
+            //  vars.Add("UserBorn", Culture.LocaleDate(Util.ToDateTime(account.Created)));
+            vars.Add("UserBorn", Util.ToDateTime(account.Created).ToShortDateString());
 
             IUserProfileInfo profile = Framework.Utilities.DataManager.RequestPlugin<IProfileConnector>().
                                               GetUserProfile(account.PrincipalID);
