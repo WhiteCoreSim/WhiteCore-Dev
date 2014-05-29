@@ -558,17 +558,25 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     MainConsole.Instance.Error("[USER ACCOUNT SERVICE]: This user doesn't have a partner");
                     return;
                 }
+                else if (firstProfile.Partner == firstProfile.PrincipalID)
+                {
+                    MainConsole.Instance.Error("[USER ACCOUNT SERVICE]: Deadlock situation avoided, this avatar is his own partner");
+                    firstProfile.Partner = UUID.Zero;
+                    m_profileConnector.UpdateUserProfile(firstProfile);
+                }
+                else
+                {
+                    IUserProfileInfo secondProfile =
+                            m_profileConnector.GetUserProfile(GetUserAccount(null, firstProfile.Partner).PrincipalID);
 
-                IUserProfileInfo secondProfile =
-                        m_profileConnector.GetUserProfile(GetUserAccount(null, firstProfile.Partner).PrincipalID);
+                    firstProfile.Partner = UUID.Zero;
+                    secondProfile.Partner = UUID.Zero;
 
-                firstProfile.Partner = UUID.Zero;
-                secondProfile.Partner = UUID.Zero;
+                    m_profileConnector.UpdateUserProfile(firstProfile);
+                    m_profileConnector.UpdateUserProfile(secondProfile);
 
-                m_profileConnector.UpdateUserProfile(firstProfile);
-                m_profileConnector.UpdateUserProfile(secondProfile);
-
-                MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: Partner information updated. ");
+                    MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: Partner information updated. ");
+                }
             }
         }
 
