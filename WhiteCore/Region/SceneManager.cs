@@ -1266,6 +1266,7 @@ namespace WhiteCore.Region
 
             // todo ... change hardcoded field sizes to public constants
             sceneInfo =  String.Format ("{0, -20}", regInfo.RegionName);
+            sceneInfo += String.Format ("{0, -20}", regInfo.Startup);
             sceneInfo += String.Format ("{0, -16}", regInfo.RegionLocX / Constants.RegionSize + "," + regInfo.RegionLocY / Constants.RegionSize);
             sceneInfo += String.Format ("{0, -12}", regInfo.RegionSizeX + "x" + regInfo.RegionSizeY);
             sceneInfo += String.Format ("{0, -8}", regInfo.RegionPort);
