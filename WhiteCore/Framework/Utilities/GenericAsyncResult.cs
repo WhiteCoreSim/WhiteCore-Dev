@@ -147,7 +147,7 @@ namespace WhiteCore.Framework.Utilities
                 m_waitHandle = null; // Allow early GC
             }
 
-            // Operation is done: if an exception occured, throw it
+            // Operation is done: if an exception occurred, throw it
             if (m_exception != null) throw m_exception;
         }
 

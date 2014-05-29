@@ -403,7 +403,7 @@ namespace WhiteCore.Framework.Services
             }
             catch (Exception ex)
             {
-                MainConsole.Instance.Warn("[ServerHandler]: Error occured: " + ex.ToString());
+                MainConsole.Instance.Warn("[ServerHandler]: Error occurred: " + ex.ToString());
             }
             return MainServer.BadRequest;
         }
@@ -445,7 +445,7 @@ namespace WhiteCore.Framework.Services
                 }
                 catch (Exception ex)
                 {
-                    MainConsole.Instance.WarnFormat("[ServerHandler]: Error occured for method {0}: {1}", method,
+                    MainConsole.Instance.WarnFormat("[ServerHandler]: Error occurred for method {0}: {1}", method,
                                                     ex.ToString());
                 }
             }

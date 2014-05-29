@@ -466,7 +466,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         #region Start Script
 
         /// <summary>
-        ///     Fires the events after the compiling has occured
+        ///     Fires the events after the compiling has occurred
         /// </summary>
         public void FireEvents()
         {

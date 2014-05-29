@@ -90,7 +90,7 @@ namespace WhiteCore.Framework.Servers.HttpServer
             }
             catch (Exception ex)
             {
-                MainConsole.Instance.ErrorFormat("[HttpListenerManager]: Exception occured: {0}", ex.ToString());
+                MainConsole.Instance.ErrorFormat("[HttpListenerManager]: Exception occurred: {0}", ex.ToString());
                 return;
             }
             finally
@@ -151,7 +151,7 @@ namespace WhiteCore.Framework.Servers.HttpServer
                 }
                 catch (Exception e)
                 {
-                    MainConsole.Instance.ErrorFormat("[HttpListenerManager]: Exception occured: {0}", e.ToString());
+                    MainConsole.Instance.ErrorFormat("[HttpListenerManager]: Exception occurred: {0}", e.ToString());
                 }
             }
         }

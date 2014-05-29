@@ -687,8 +687,8 @@ namespace WhiteCore.Services
             }
             catch (Exception ex)
             {
-                MainConsole.Instance.WarnFormat("[AgentProcessing]: Exception occured during agent teleport, {0}", ex);
-                reason = "Exception occured.";
+                MainConsole.Instance.WarnFormat("[AgentProcessing]: Exception occurred during agent teleport, {0}", ex);
+                reason = "Exception occurred.";
                 if (SimulationService != null)
                     SimulationService.FailedToTeleportAgent(regionCaps.Region, destination.RegionID,
                                                             AgentID, reason, false);
@@ -993,10 +993,10 @@ namespace WhiteCore.Services
                 MainConsole.Instance.WarnFormat("[AgentProcessing]: Failed to cross an agent into a new region. {0}", ex);
                 if (SimulationService != null)
                     SimulationService.FailedToTeleportAgent(requestingRegionCaps.Region, crossingRegion.RegionID,
-                                                            AgentID, "Exception occured", true);
+                        AgentID, "Exception occurred", true);
             }
             ResetFromTransit(AgentID);
-            reason = "Exception occured";
+            reason = "Exception occurred";
             return false;
         }
 

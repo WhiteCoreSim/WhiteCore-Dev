@@ -241,7 +241,7 @@ namespace WhiteCore.Modules.Groups
                 catch
                 {
                     remoteClient.SendCreateGroupReply(UUID.Zero, false,
-                                                      "A money related exception occured, please contact your grid administrator.");
+                        "A money related exception occurred, please contact your grid administrator.");
                     return UUID.Zero;
                 }
             }

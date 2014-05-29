@@ -786,8 +786,8 @@ namespace WhiteCore.Region
                 }
                 catch (Exception ex)
                 {
-                    MainConsole.Instance.Warn("[SceneViewer]: Exception occured in sending initial prims, " + ex);
-                    //An exception occured, don't fail to send all the prims to the client
+                    MainConsole.Instance.Warn("[SceneViewer]: Exception occurred in sending initial prims, " + ex);
+                    //An exception occurred, don't fail to send all the prims to the client
                     m_SentInitialObjects = false;
                 }
             }

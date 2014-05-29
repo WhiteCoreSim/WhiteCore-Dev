@@ -130,7 +130,7 @@ namespace WhiteCore.Framework.Modules
                       TransactionType type);
 
         /// <summary>
-        ///     Get a list of transactions that have occured over the given interval (0 is this period of interval days, positive #s go back previous sets)
+        ///     Get a list of transactions that have occurred over the given interval (0 is this period of interval days, positive #s go back previous sets)
         /// </summary>
         /// <param name="groupID"></param>
         /// <param name="agentID">Requesting agentID (must be checked whether they can call this)</param>
