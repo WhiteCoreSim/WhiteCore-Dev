@@ -501,27 +501,33 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
         {
             string first = MainConsole.Instance.Prompt("First User's name (<first> <last>)");
             string second = MainConsole.Instance.Prompt("Second User's name (<first> <last>)");
-
-            if (m_profileConnector != null)
+            if (second == first)
             {
-                IUserProfileInfo firstProfile =
-                    m_profileConnector.GetUserProfile(GetUserAccount(null, first).PrincipalID);
-                IUserProfileInfo secondProfile =
-                    m_profileConnector.GetUserProfile(GetUserAccount(null, second).PrincipalID);
-
-                if (firstProfile == null || secondProfile == null)
+                MainConsole.Instance.Error("[USER ACCOUNT SERVICE]: You are not able to set yourself as your partner");
+            }
+            else
+            {
+                if (m_profileConnector != null)
                 {
-                    MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: At least one of these users does not have a profile?");
-                    return;
+                    IUserProfileInfo firstProfile =
+                        m_profileConnector.GetUserProfile(GetUserAccount(null, first).PrincipalID);
+                    IUserProfileInfo secondProfile =
+                        m_profileConnector.GetUserProfile(GetUserAccount(null, second).PrincipalID);
+
+                    if (firstProfile == null || secondProfile == null)
+                    {
+                        MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: At least one of these users does not have a profile?");
+                        return;
+                    }
+
+                    firstProfile.Partner = secondProfile.PrincipalID;
+                    secondProfile.Partner = firstProfile.PrincipalID;
+
+                    m_profileConnector.UpdateUserProfile(firstProfile);
+                    m_profileConnector.UpdateUserProfile(secondProfile);
+
+                    MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: Partner information updated. ");
                 }
-
-                firstProfile.Partner = secondProfile.PrincipalID;
-                secondProfile.Partner = firstProfile.PrincipalID;
-
-                m_profileConnector.UpdateUserProfile(firstProfile);
-                m_profileConnector.UpdateUserProfile(secondProfile);
-
-                MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: Partner information updated. ");
             }
         }
 
