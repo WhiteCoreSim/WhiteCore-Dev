@@ -853,24 +853,30 @@ namespace WhiteCore.Modules.Monitoring
         /// </summary>
         public string GetThreadsReport()
         {
+            if (Util.IsLinux)
+                MainConsole.Instance.Info ("Thread process statistics may not be fully implemented with Mono");
+
             StringBuilder sb = new StringBuilder();
 
             ProcessThreadCollection threads = GetThreads();
             if (threads == null)
             {
-                sb.Append("OpenSim thread tracking is only enabled in DEBUG mode.");
+                sb.Append("WhiteCore thread tracking is only enabled in DEBUG mode.");
             }
             else
             {
                 sb.Append(threads.Count + " threads are being tracked:" + Environment.NewLine);
                 foreach (ProcessThread t in threads)
                 {
-                    sb.Append("ID: " + t.Id + ", TotalProcessorTime: " + t.TotalProcessorTime + ", TimeRunning: " +
-                              (DateTime.Now - t.StartTime) + ", Pri: " + t.CurrentPriority + ", State: " + t.ThreadState);
-                    if (t.ThreadState == ThreadState.Wait)
-                        sb.Append(", Reason: " + t.WaitReason + Environment.NewLine);
-                    else
-                        sb.Append(Environment.NewLine);
+                    if (t != null)
+                    {
+                        sb.Append ("ID: " + t.Id + ", TotalProcessorTime: " + t.TotalProcessorTime + ", TimeRunning: " +
+                            (DateTime.Now - t.StartTime) + ", Pri: " + t.CurrentPriority + ", State: " + t.ThreadState);
+                        if (t.ThreadState == ThreadState.Wait)
+                            sb.Append (", Reason: " + t.WaitReason + Environment.NewLine);
+                        else
+                            sb.Append (Environment.NewLine);
+                    }
                 }
             }
             int workers = 0, ports = 0, maxWorkers = 0, maxPorts = 0;
