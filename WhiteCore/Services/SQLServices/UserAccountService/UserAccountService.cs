@@ -167,35 +167,40 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             if (accountService == null)
                 return;
 
-            UserAccount uinfo = accountService.GetUserAccount(null, UUID.Parse(Constants.RealEstateOwnerUUID));
+            UserAccount uinfo = accountService.GetUserAccount (null, UUID.Parse (Constants.RealEstateOwnerUUID));
 
             if (uinfo == null)
             {
-                MainConsole.Instance.Warn ("Creating System User " + Constants.RealEstateOwnerName);
+                MainConsole.Instance.Warn ("Creating System User '" + Constants.RealEstateOwnerName + "'");
                 var newPassword = Utilities.RandomPassword.Generate (2, 1, 0);
 
-                accountService.CreateUser (
-                    (UUID)Constants.RealEstateOwnerUUID,    // UUID
-                    UUID.Zero,                              // ScopeID
-                    Constants.RealEstateOwnerName,          // Name
-                    newPassword, "");                                // password , email
+                var error = CreateUser (
+                                (UUID)Constants.RealEstateOwnerUUID,    // UUID
+                                UUID.Zero,                              // ScopeID
+                                Constants.RealEstateOwnerName,          // Name
+                                Util.Md5Hash (newPassword),             // password
+                                "");                                    // email
+                    
+                if (error == "")
+                {
+                    MainConsole.Instance.Info (" The password for '" + Constants.RealEstateOwnerName + "' is : " + newPassword);
 
-                MainConsole.Instance.Info (" The password for the RealEstate user is : " + newPassword);
-
-                // Create Standard Inventory
-                IInventoryService inventoryService = m_registry.RequestModuleInterface<IInventoryService> ();
-                inventoryService.CreateUserInventory ((UUID)Constants.RealEstateOwnerUUID, true);
-
+                } else
+                {
+                    MainConsole.Instance.Warn (" Unable to create user : " + error);
+                    return;
+                }
+                    
                 //set as "Maintenace" level
-                var account = accountService.GetUserAccount(null, UUID.Parse(Constants.RealEstateOwnerUUID));
+                var account = accountService.GetUserAccount (null, UUID.Parse (Constants.RealEstateOwnerUUID));
                 account.UserLevel = 250;
-                bool success = StoreUserAccount(account);
+                bool success = StoreUserAccount (account);
 
                 if (success)
                     MainConsole.Instance.Info (" The RealEstate user has been elevated to 'Maintenance' level");
                     
             }
-         }
+        }
 
         #endregion
 
