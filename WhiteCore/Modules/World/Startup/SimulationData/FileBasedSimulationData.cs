@@ -241,6 +241,18 @@ namespace WhiteCore.Modules
             {
                 info.RegionName = MainConsole.Instance.Prompt ("Region Name", info.RegionName);
 
+                // TODO: Make this prettier
+                string question;
+                question = MainConsole.Instance.Prompt ("Region Startup (Medium / Normal)");
+                if (question == "Normal")
+                {
+                    info.Startup = StartupType.Normal;
+                }
+                else
+                {
+                    info.Startup = StartupType.Medium;
+                }                
+                // END TODO
                 info.RegionLocX =
                     int.Parse (MainConsole.Instance.Prompt ("Region Location X",
                     ((info.RegionLocX == 0 
