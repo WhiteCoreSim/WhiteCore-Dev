@@ -3,14 +3,6 @@ Rowan Deppeler <greythane@gmail.com>
 May 2014
 ===============================================
 
-Updating
-=========
-Checkout the 'Build Your Own.txt' file for details.
-
-Delete the existing 'WhiteCoreSim/bin' subdirectory.
-Re-compile and copy/paste the new 'WhiteCoreSim/bin' subdirectory from your build environment.
-re-start..
-
 
 ** The scripts provided **
 ==========================
@@ -50,6 +42,28 @@ Comment the "Include-Standalone =" line.
 Uncomment the "Include-Grid =" line.
 
 Save and re-start.
+
+Updating
+=========
+Checkout the 'Build Your Own.txt' file for details if you want to build from source.
+Re-compile and copy/paste the new 'WhiteCoreSim/bin' subdirectory from your build environment.
+
+Weekly 'Development' build snapshots are available at the following address's..
+
+Windows
+https://drive.google.com/file/d/0B2u55gI751a8VXJBckZJWU5rZ1E/edit?usp=sharing
+
+Mono 32 bit  (linux/Mac)
+https://drive.google.com/file/d/0B2u55gI751a8OEgtV0Q0Yk4wWEE/edit?usp=sharing
+
+Mono 64bit
+https://drive.google.com/file/d/0B2u55gI751a8ZmV1OEE4ZDE4Nm8/edit?usp=sharing
+
+Download your desired update snapshot.
+Delete or backup the existing 'WhiteCoreSim/bin' subdirectory.
+Extract the update package and copy the resulting 'bin' folder to your 'WhiteCoreSim' folder.
+re-start..
+
 
 
 Questions?

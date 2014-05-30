@@ -67,31 +67,33 @@
     BannedUserNames = "Linden"
 	
 [Handlers]
-    ;; Add any handlers here that you want to use
-
-    FreeswitchInHandler = FreeswitchServerConnector
-    GridInfoInHandler = GridInfoServerInConnector
-    GridInHandler = GridServiceConnector
-    LLLoginHandler = LLLoginServiceInConnector
-    EventQueueInHandler = EventQueueHandler
-
-    AgentInfoHandler = AgentInfoService
     ;; Possible choices for asset services:
     ;;  AssetService - basic SQL service, slower, but works
     ;;  RedisAssetService - Redis database, fast, but memory hog
-    ;;  FileBasedAssetService - Uses the file system to store assets, recommended choice
+    ;;  FileBasedAssetService - Uses the file system to store assets, fastest
     AssetHandler = AssetService
     AssetHandlerUseCache = false
+
+	;; Optional handlers
+	;; If the do not exist in your configuration they will not be used :)
+    FreeswitchInHandler = FreeswitchServerConnector
+    FreeSwitchHandler = FreeswitchService
+
+    ;; Standard handlers
+    AgentInfoHandler = AgentInfoService
     AuthenticationHandler = PasswordAuthenticationService
     AvatarHandler = AvatarService
     CapsHandler = CapsService
     ConfigurationHandler = ConfigurationService
     EventQueueHandler = EventQueueService
-    FreeSwitchHandler = FreeswitchService
+    EventQueueInHandler = EventQueueHandler
     FriendsHandler = FriendsService
     GridHandler = GridService
+    GridInfoInHandler = GridInfoServerInConnector
+    GridInHandler = GridServiceConnector
     GridWideMessage = GridWideMessageModule
     InventoryHandler = InventoryService
+    LLLoginHandler = LLLoginServiceInConnector
     LoginHandler = LLLoginService
     SimulationHandler = SimulationServiceConnector
     SyncMessagePosterServiceHandler = SyncMessagePosterService
@@ -99,20 +101,20 @@
 
 [WhiteCoreConnectors]
     AbuseReportsConnector = LocalConnector
+    AgentConnector = LocalConnector
     AssetConnector = LocalConnector
     AvatarArchiverConnector = LocalConnector
+    DirectoryServiceConnector = LocalConnector
+    EmailConnector = LocalConnector
+    EstateConnector = LocalConnector
+    MuteListConnector = LocalConnector
+    OfflineMessagesConnector = LocalConnector
+    ProfileConnector = LocalConnector
+    ParcelConnector = LocalConnector
+    RegionInfoConnector = LocalConnector
+    RegionConnector = LocalConnector
     SimMapDataConnector = LocalConnector
     ScriptDataConnector = LocalConnector
-    RegionInfoConnector = LocalConnector
-    AgentConnector = LocalConnector
-    RegionConnector = LocalConnector
-    ProfileConnector = LocalConnector
-    EstateConnector = LocalConnector
-    OfflineMessagesConnector = LocalConnector
-    DirectoryServiceConnector = LocalConnector
-    MuteListConnector = LocalConnector
-    ParcelConnector = LocalConnector
-    EmailConnector = LocalConnector
 
     ;; Max non-group chat messages that the server will store per user
     MaxOfflineMessages = 20
