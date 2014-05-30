@@ -270,8 +270,8 @@ namespace WhiteCore.Modules
                 else
                 {
                     info.Startup = StartupType.Medium;
-                }                
-                // END TODO
+                }
+                
                 info.RegionLocX =
                     int.Parse (MainConsole.Instance.Prompt ("Region Location X",
                     ((info.RegionLocX == 0 
