@@ -38,6 +38,12 @@
 	;; Default is ""  (the Data/RegionBak directory)
 	PreviousBackupDirectory = ""
 	
+	;; If you enabled SavePreviousBackup, 
+	;; remove backup files older than 'ArchiveDays' number of days. 
+	;; "0" will disable deletion of backup files
+	;; Default is 30 days
+	ArchiveDays = 30
+	
 	;; The normal file name to load from for each region is "<Region Name Here>.abackup"
 	;; If you wish to change that, you can add this so that it becomes
 	;; "<Region Name Here><This config option setting>.abackup"

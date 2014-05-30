@@ -58,6 +58,7 @@ namespace WhiteCore.Modules
         protected bool m_displayNotSavingNotice = true;
         protected bool m_saveBackupChanges = true;
         protected bool m_saveBackups;
+        protected int m_removeArchiveDays = 30;
         protected bool m_saveChanges = true;
         protected string m_storeDirectory = "";
         protected Timer m_saveTimer;
@@ -113,6 +114,24 @@ namespace WhiteCore.Modules
 					retVals.Add (Path.GetFileNameWithoutExtension (r));
 				}
             return retVals;
+        }
+
+        public virtual List<string> FindBackupRegionFiles()
+        {
+            if (m_oldSaveDirectory == "")
+                return null;
+
+            MainConsole.Instance.Info("Looking for sim backups in: "+ m_oldSaveDirectory);
+            List<string> archives = new List<string>(Directory.GetFiles(m_oldSaveDirectory, "*.sim", SearchOption.TopDirectoryOnly));
+            //List<string> retVals = new List<string>();
+            //foreach (string r in regions)
+            //    if (Path.GetExtension (r) == ".sim") {
+            //        MainConsole.Instance.Debug ("Found: " + Path.GetFileNameWithoutExtension (r));
+            //        retVals.Add (Path.GetFileNameWithoutExtension (r));
+            //    }
+            //return retVals;
+            MainConsole.Instance.InfoFormat ("Found {0} archive files", archives.Count);
+            return archives;
         }
 
         public virtual RegionInfo CreateNewRegion(ISimulationBase simBase, Dictionary<string, int> currentInfo)
@@ -241,10 +260,10 @@ namespace WhiteCore.Modules
             {
                 info.RegionName = MainConsole.Instance.Prompt ("Region Name", info.RegionName);
 
-                // TODO: Make this prettier
-                string question;
-                question = MainConsole.Instance.Prompt ("Region Startup (Medium / Normal)");
-                if (question == "Normal")
+                // Startup mode
+                string scriptStart = MainConsole.Instance.Prompt (
+                    "Region Startup - Normal or Delay script startup (normal/delay) : ","normal").ToLower();
+                if (scriptStart.StartsWith("n"))
                 {
                     info.Startup = StartupType.Normal;
                 }
@@ -318,15 +337,46 @@ namespace WhiteCore.Modules
                 MainConsole.Instance.Commands.AddCommand("update region info", "update region info",
                     "Updates the region settings",
                     UpdateRegionInfo, true, true);
+            if (!MainConsole.Instance.Commands.ContainsCommand("delete sim backups"))
+                MainConsole.Instance.Commands.AddCommand(
+                    "delete sim backups",
+                    "delete sim backups [days]",
+                    "Removes old region backup files older than [days] (default: " + m_removeArchiveDays + " days)",
+                    CleanupRegionBackups,
+                    false, true);
+
         }
 
-        public void UpdateRegionInfo(IScene scene, string[] info)
+        /// <summary>
+        /// Updates the region info, allowing for changes etc.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmds">Cmds.</param>
+        public void UpdateRegionInfo(IScene scene, string[] cmds)
         {
             if (MainConsole.Instance.ConsoleScene != null)
             {
                 m_scene = scene;
                 MainConsole.Instance.ConsoleScene.RegionInfo = CreateRegionFromConsole(MainConsole.Instance.ConsoleScene.RegionInfo, true, null);
             }
+        }
+
+        /// <summary>
+        /// Cleanups the old region backups.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmds">Cmds.</param>
+        public void CleanupRegionBackups(IScene scene, string[] cmds)
+        {
+            int daysOld = m_removeArchiveDays;
+            if (cmds.Count () > 3)
+            {
+                if (!int.TryParse (cmds [3], out daysOld))
+                    daysOld = m_removeArchiveDays;
+            }
+
+            DeleteUpOldArchives(daysOld);
+
         }
 
         public virtual List<ISceneEntity> LoadObjects()
@@ -455,10 +505,13 @@ namespace WhiteCore.Modules
                     PathHelpers.ComputeFullPath(config.GetString("PreviousBackupDirectory", m_oldSaveDirectory));
                 m_storeDirectory =
                     PathHelpers.ComputeFullPath(config.GetString("StoreBackupDirectory", m_storeDirectory));
-                 if (m_storeDirectory == "")
+                if (m_storeDirectory == "")
                     m_storeDirectory = Constants.DEFAULT_DATA_DIR + "/Region";
                 if (m_oldSaveDirectory == "")
                     m_oldSaveDirectory = Constants.DEFAULT_DATA_DIR + "/RegionBak";
+
+                m_removeArchiveDays = config.GetInt("ArchiveDays", m_removeArchiveDays);
+                               
 
                 // verify the necessary paths exist
                 if (!Directory.Exists(m_storeDirectory))
@@ -551,6 +604,7 @@ namespace WhiteCore.Modules
                     if (!m_shutdown)
                     {
                         SaveBackup(true);
+                        DeleteUpOldArchives(m_removeArchiveDays);
                     }
                 }
             }
@@ -558,6 +612,34 @@ namespace WhiteCore.Modules
             {
                 MainConsole.Instance.Error("[FileBasedSimulationData]: Failed to save backup, exception occurred " + ex);
             }
+        }
+
+        public void DeleteUpOldArchives(int daysOld)
+        {
+
+            if (daysOld < 0)
+                return;
+
+            var regionArchives = FindBackupRegionFiles();
+            if (regionArchives.Count == 0)
+                return;
+
+            int removed = 0;
+            DateTime archiveDate = DateTime.Today.AddDays(-daysOld);
+
+            foreach (string fileName in regionArchives)
+            {
+                if (File.Exists (fileName))
+                { 
+                    DateTime fileDate = File.GetCreationTime (fileName);
+                    if (DateTime.Compare(fileDate, archiveDate) < 0)
+                    {
+                        File.Delete (fileName);
+                        removed++;
+                    }
+                }
+            }
+            MainConsole.Instance.InfoFormat (" Removed {0} archive files", removed);
         }
 
         /// <summary>
