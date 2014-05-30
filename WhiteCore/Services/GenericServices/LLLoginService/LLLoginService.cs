@@ -335,9 +335,25 @@ namespace WhiteCore.Services
             UUID session = UUID.Random();
             UUID secureSession = UUID.Zero;
 
+            // TODO: Make this check better
+            //
+            // Some TPV's now send their name in Channel instead of clientVersion 
+            // while others send a Channel and a clientVersion.
+
+            string realViewer = "";
+
+            if (channel != "")
+            {
+                realViewer = channel + " " + clientVersion;
+            }
+            else
+            {
+                realViewer = clientVersion;
+            }
+
             MainConsole.Instance.InfoFormat(
                 "[LLOGIN SERVICE]: Login request for {0} from {1} with user agent {2} starting in {3}",
-                Name, clientIP.Address, clientVersion, startLocation);
+                Name, clientIP.Address, realViewer, startLocation);
 
             UserAccount account = AgentID != UUID.Zero
                                       ? m_UserAccountService.GetUserAccount(null, AgentID)

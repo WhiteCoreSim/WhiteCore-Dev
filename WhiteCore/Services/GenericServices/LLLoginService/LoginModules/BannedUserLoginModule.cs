@@ -61,9 +61,10 @@ namespace WhiteCore.Services
                 return new LLFailedLoginResponse(LoginResponseEnum.Indeterminant, data.ToString(), false);
             }
 
-            /*string channel = "Unknown";
+            // TODO: Some TPV's now send their version in the Channel
+            string channel = "Unknown";
             if (request.Contains("channel") && request["channel"] != null)
-                channel = request["channel"].ToString();*/
+                channel = request["channel"].ToString();
 
             bool AcceptedNewTOS = false;
             //This gets if the viewer has accepted the new TOS
