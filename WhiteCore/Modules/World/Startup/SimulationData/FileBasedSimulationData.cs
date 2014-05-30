@@ -262,7 +262,7 @@ namespace WhiteCore.Modules
 
                 // Startup mode
                 string scriptStart = MainConsole.Instance.Prompt (
-                    "Region Startup - Normal or Delay script startup (normal/delay) : ","normal").ToLower();
+                    "Region Startup - Normal or Delayed startup (normal/delay) : ","normal").ToLower();
                 if (scriptStart.StartsWith("n"))
                 {
                     info.Startup = StartupType.Normal;
