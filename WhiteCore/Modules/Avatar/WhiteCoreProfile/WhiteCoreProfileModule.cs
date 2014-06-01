@@ -471,7 +471,7 @@ namespace WhiteCore.Modules.Profiles
         {
             if (!(sender is IClientAPI))
             {
-                MainConsole.Instance.Debug("sender isnt IClientAPI");
+                MainConsole.Instance.Debug("sender isn't IClientAPI");
                 return;
             }
 
