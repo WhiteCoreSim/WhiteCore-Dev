@@ -70,7 +70,7 @@ namespace WhiteCore.Modules.Scripting
 
         private bool m_Enabled;
         private string m_HostName = string.Empty;
-        private string m_InterObjectHostname = "lsl.opensim.local";
+        private string m_InterObjectHostname = "lsl.whitecore.local";
         private const int m_MaxQueueSize = 50; // maximum size of an object mail queue
         private bool m_localOnly = true;
         private int m_MaxEmailSize = 4096; // largest email allowed by default, as per lsl docs.
@@ -156,7 +156,7 @@ namespace WhiteCore.Modules.Scripting
 
                                 if (scene != null)
                                 {
-                                    // If Object Null Dont Include Object Info Headers (Offline IMs)
+                                    // If Object Null Don't Include Object Info Headers (Offline IMs)
                                     if (objectID != UUID.Zero)
                                         body = body + "\nObject-Name: " + LastObjectName +
                                         "\nRegion: " + LastObjectRegionName + "\nLocal-Position: " +
@@ -174,7 +174,7 @@ namespace WhiteCore.Modules.Scripting
                                 smtpServer.Timeout = 15000;
                                
                                 // Beware !! This effectively ignores the ssl validation and assumes that all is correct 
-                                // For Mono, reguires importation of the Google smtpd certificate (see SMTPEmail.ini.example)
+                                // For Mono, requires importation of the Google smtpd certificate (see SMTPEmail.ini.example)
                                 // Possibly not needed for Windows
                                 //ServicePointManager.ServerCertificateValidationCallback = 
                                 //    delegate(object sim, X509Certificate certificate, X509Chain chain SslPolicyErrors sslPolicyErrors)
@@ -190,7 +190,7 @@ namespace WhiteCore.Modules.Scripting
                                 emailMessage.Subject = subject;
                                 emailMessage.Body = body;
 
-                                // sample for adding attachements is needed sometime :)
+                                // sample for adding attachments is needed sometime :)
                                 //if File(Exist(fullFileName))
                                 //{
                                 //    var mailAttactment = new Attachment(fullFileName);
@@ -284,7 +284,7 @@ namespace WhiteCore.Modules.Scripting
             
 
         /// <summary>
-        ///     Gets any emails that a prim may have asyncronously
+        ///     Gets any emails that a prim may have asynchronously
         /// </summary>
         /// <param name="objectID"></param>
         /// <param name="sender"></param>
