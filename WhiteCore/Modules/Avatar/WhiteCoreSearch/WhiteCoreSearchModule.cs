@@ -518,7 +518,7 @@ namespace WhiteCore.Modules.Search
                                          ? (int) DirectoryManager.EventFlags.Mature
                                          : (int) DirectoryManager.EventFlags.Adult;
 
-                //Gets all the events occuring in the given region by maturity level
+                //Gets all the events occurring in the given region by maturity level
                 List<DirEventsReplyData> Eventdata = DirectoryService.FindAllEventsInRegion(GR.RegionName, maturity);
 
                 foreach (DirEventsReplyData eventData in Eventdata)
