@@ -6,7 +6,7 @@
 # greythane @ gmail.com
 #
 
-cd ../bin
+cd ./bin
 wait
 echo Starting Standalone Region Simulator...
 screen -S Sim -d -m mono WhiteCore.exe -skipconfig

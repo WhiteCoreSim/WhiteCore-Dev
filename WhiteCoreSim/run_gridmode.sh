@@ -2,15 +2,15 @@
 # Startup script for WhiteCore-Sim in full Grid mode
 # Versions 0.9.2+
 #
-# May 2014
+# June 2014
 # greythane @ gmail.com
 #
 
-cd ../bin
+cd ./bin
 wait
 echo Starting WhiteCore GridServer...
 screen -S Grid -d -m mono WhiteCore.Server.exe -skipconfig
-wait
+sleep 3
 echo Starting WhiteCore Region Simulator...
 screen -S Sim -d -m mono WhiteCore.exe -skipconfig
 sleep 3
