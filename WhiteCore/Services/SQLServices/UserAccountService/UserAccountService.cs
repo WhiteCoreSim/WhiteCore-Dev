@@ -109,6 +109,12 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                         HandleResetUserPassword, false, true);
 
                     MainConsole.Instance.Commands.AddCommand(
+                        "reset realestate password",
+                        "reset realestate password",
+                        "Resets the password of the RealEstate Owner in case you lost it",
+                        HandleResetRealEstatePassword, false, true);
+
+                    MainConsole.Instance.Commands.AddCommand(
                         "show account",
                         "show account [<first> [<last>]]",
                         "Show account details for the given user",
@@ -972,6 +978,28 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Password reset for user '{0} {1}", firstName, lastName);
         }
 
+        protected void HandleResetRealEstatePassword(IScene scene, string[] cmd)
+        {
+            string question;
+
+            question = MainConsole.Instance.Prompt("Are you really sure that you want to reset the RealEstate User password ? (yes/no)");
+
+            if (question.StartsWith("y"))
+            {
+                var newPassword = Utilities.RandomPassword.Generate(2, 1, 0);
+
+                UserAccount account = GetUserAccount(null, "RealEstate", "Owner");
+                bool success = false;
+
+                if (m_AuthenticationService != null)
+                    success = m_AuthenticationService.SetPassword(account.PrincipalID, "UserAccount", newPassword);
+
+                if (!success)
+                    MainConsole.Instance.ErrorFormat("[USER ACCOUNT SERVICE]: Unable to reset password for RealEstate Owner");
+                else
+                    MainConsole.Instance.Info("[USER ACCOUNT SERVICE]: The new password for '" + Constants.RealEstateOwnerName + "' is : " + newPassword);
+            }
+        }
         #endregion
     }
 }
