@@ -2471,7 +2471,7 @@ namespace WhiteCore.ClientStack
         public void SendSunPos(Vector3 Position, Vector3 Velocity, ulong currentTime, uint secondsPerSunCycle,
                                uint secondsPerYear, float orbitalPosition)
         {
-            // Viewers based on the Linden viwer code, do wacky things for oribital positions from Midnight to Sunrise
+            // Viewers based on the Linden viewer code, do wacky things for orbital positions from Midnight to Sunrise
             // So adjust for that
             // Contributed by: Godfrey
 

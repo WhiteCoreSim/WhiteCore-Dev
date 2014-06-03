@@ -55,7 +55,7 @@ namespace WhiteCore.Modules.Sun
         private ulong PosTime;
         private Vector3 Position = Vector3.Zero;
         private double SeasonSpeed; // Rate of change for seasonal effects
-        private double SeasonalOffset; // Seaonal variation of tilt
+        private double SeasonalOffset; // Seasonal variation of tilt
 
         //
         //    Per Region Values
@@ -75,7 +75,7 @@ namespace WhiteCore.Modules.Sun
         private double d_day_length = 4; // A VW day is 4 RW hours long
 
         private double d_day_night = 0.5;
-        // axis offset: Default Hoizon shift to try and closely match the sun model in LL Viewer
+        // axis offset: Default Horizon shift to try and closely match the sun model in LL Viewer
 
         private int d_frame_mod = 25; // Every 2 seconds (actually less)
         private string d_mode = "SL";
@@ -433,7 +433,7 @@ namespace WhiteCore.Modules.Sun
                 // Because our day length is probably not 24hrs {LL is 6} we need to do a bit of math
 
                 // Determine the current "day" from current time, so we can use "today"
-                // to determine Seasonal Tilt and what'not
+                // to determine Seasonal Tilt and whatnot
 
                 // Integer math rounded is on purpose to drop fractional day, determines number 
                 // of virtual days since Epoch
@@ -562,7 +562,7 @@ namespace WhiteCore.Modules.Sun
                                                         },
                                                         {
                                                             "day_time_sun_hour_scale",
-                                                            "scales day light vs nite hours to change day/night ratio"
+                                                            "scales day light vs night hours to change day/night ratio"
                                                         }
                                                     };
 
