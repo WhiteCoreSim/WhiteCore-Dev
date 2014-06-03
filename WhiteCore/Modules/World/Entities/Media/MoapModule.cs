@@ -160,7 +160,7 @@ namespace WhiteCore.Modules.Entities.Media
             if (config != null && !config.GetBoolean("Enabled", false))
                 m_isEnabled = false;
 //            else
-//                MainConsole.Instance.Debug("[MOAP]: Initialised module.")l
+//                MainConsole.Instance.Debug("[MOAP]: Initialized module.")l
         }
 
         public void AddRegion(IScene scene)

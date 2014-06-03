@@ -538,7 +538,7 @@ namespace WhiteCore.Modules.Monitoring
                     sb[15].StatValue = totalScriptMonitor.ActiveScripts;
 
                     sb[16].StatID = (uint) Stats.LSLIPS;
-                    sb[16].StatValue = 0; //This isn't used anymore, and has been superseeded by LSLEPS
+                    sb[16].StatValue = 0; //This isn't used anymore, and has been superseded by LSLEPS
 
                     sb[17].StatID = (uint) Stats.InPPS;
                     sb[17].StatValue = (networkMonitor.InPacketsPerSecond/statsUpdateFactor);
@@ -627,7 +627,7 @@ namespace WhiteCore.Modules.Monitoring
                         agent.ControllingClient.SendSimStats(simStats);
                     }
 
-                    //Now fix any values that require reseting
+                    //Now fix any values that require resetting
                     ResetValues();
                 }
                 m_report.Start();

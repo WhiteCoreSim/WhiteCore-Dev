@@ -308,7 +308,7 @@ namespace WhiteCore.Modules.Entities.BuySell
             if (part.SalePrice != salePrice)
             {
                 remoteClient.SendAgentAlertMessage(
-                    "Cannot buy at this price. Buy Failed. If you continue to get this relog.", false);
+                    "Cannot buy at this price. Buy Failed. If you continue to get this error, please restart your viewer.", false);
                 return;
             }
 
@@ -316,7 +316,7 @@ namespace WhiteCore.Modules.Entities.BuySell
             if (part.ObjectSaleType != saleType)
             {
                 remoteClient.SendAgentAlertMessage(
-                    "Cannot buy this way. Buy Failed. If you continue to get this relog.", false);
+                    "Cannot buy this way. Buy Failed. If you continue to get this this error, please restart your viewer", false);
                 return;
             }
 
