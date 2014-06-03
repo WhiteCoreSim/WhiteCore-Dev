@@ -189,7 +189,7 @@ namespace WhiteCore.Modules.Estate
                 {
                     //It could not find the estate service, wait until it can find it
                     MainConsole.Instance.Warn(
-                        "We could not find the estate service for this sim. Please make sure that your URLs are correct in grid mode.");
+                        "We could not find the estate service for this region. Please make sure that your URLs are correct in grid mode.");
                     while (true)
                     {
                         MainConsole.Instance.Prompt("Press enter to try again.");

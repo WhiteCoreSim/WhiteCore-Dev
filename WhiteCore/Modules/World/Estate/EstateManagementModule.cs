@@ -930,7 +930,7 @@ namespace WhiteCore.Modules.Estate
             }
             else
             {
-                client.SendAlertMessage("You do not have permissions to return objects in this sim.");
+                client.SendAlertMessage("You do not have permissions to return objects in this region.");
             }
         }
 

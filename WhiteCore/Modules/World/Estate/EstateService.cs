@@ -98,7 +98,7 @@ namespace WhiteCore.Modules.Estate
                     LoginsDisabled = true;
                     break;
                 case "status":
-                    MainConsole.Instance.Warn("Logins are " + (LoginsDisabled ? "dis" : "en") + "abled.");
+                    MainConsole.Instance.Warn("Logins are currently " + (LoginsDisabled ? "dis" : "en") + "abled.");
                     break;
                 default:
                     MainConsole.Instance.Info("Syntax: login enable|disable|status");
@@ -676,7 +676,7 @@ namespace WhiteCore.Modules.Estate
 
             if (LoginsDisabled)
             {
-                reason = "Logins Disabled";
+                reason = "Logins are currently Disabled";
                 return false;
             }
 
