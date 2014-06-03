@@ -412,7 +412,7 @@ namespace WhiteCore.Services
                         tmp = gridInfo.GetString("login", String.Empty);
                         if (tmp != String.Empty) responseData["loginuri"] = tmp;
 
-                        // alternate keys of the same thing. (note careful not to overwrite responsdata["welcome"]
+                        // alternate keys of the same thing. (note careful not to overwrite responsedata["welcome"]
                         tmp = gridInfo.GetString("loginpage", String.Empty);
                         if (tmp != String.Empty) responseData["loginpage"] = tmp;
                         tmp = gridInfo.GetString("welcome", String.Empty);
@@ -423,6 +423,13 @@ namespace WhiteCore.Services
                         if (tmp != String.Empty) responseData["economy"] = tmp;
                         tmp = gridInfo.GetString("helperuri", String.Empty);
                         if (tmp != String.Empty) responseData["helperuri"] = tmp;
+                        
+                        // TODO: Some viewers recognize these values already
+                        // but broadcasting them won't make older viewer crash
+                        tmp = gridInfo.GetString("destination", String.Empty);
+                        if (tmp != String.Empty) responseData["destination"] = tmp;
+                        tmp = gridInfo.GetString("marketplace", String.Empty);
+                        if (tmp != String.Empty) responseData["marketplace"] = tmp;
 
                         tmp = gridInfo.GetString("about", String.Empty);
                         if (tmp != String.Empty) responseData["about"] = tmp;
