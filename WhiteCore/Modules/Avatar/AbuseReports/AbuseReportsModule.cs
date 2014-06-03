@@ -58,8 +58,8 @@ namespace WhiteCore.Modules.AbuseReports
         {
             m_registry = registry;
             if (MainConsole.Instance != null)
-                MainConsole.Instance.Commands.AddCommand("open abusereportsGUI",
-                                                         "open abusereportsGUI",
+                MainConsole.Instance.Commands.AddCommand("GUI abuse reports",
+                                                         "GUI abuse reports",
                                                          "Opens the abuse reports GUI", OpenGUI, false, true);
         }
 

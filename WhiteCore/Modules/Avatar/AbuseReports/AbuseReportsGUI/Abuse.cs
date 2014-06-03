@@ -61,7 +61,7 @@ namespace WhiteCore.Modules.AbuseReportsGUI
             SetGUI(AbuseReportsConnector.GetAbuseReport(formNumber, Password));
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Previous_Click(object sender, EventArgs e)
         {
             formNumber -= 1;
             if (formNumber == 0)
@@ -70,7 +70,7 @@ namespace WhiteCore.Modules.AbuseReportsGUI
             SetGUI(AbuseReportsConnector.GetAbuseReport(formNumber, Password));
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void Next_Click(object sender, EventArgs e)
         {
             formNumber += 1;
             SetGUI(AbuseReportsConnector.GetAbuseReport(formNumber, Password));

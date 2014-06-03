@@ -146,7 +146,7 @@ namespace WhiteCore.Modules.AbuseReportsGUI
             this.Previous.TabIndex = 5;
             this.Previous.Text = "Previous";
             this.Previous.UseVisualStyleBackColor = true;
-            this.Previous.Click += new System.EventHandler(this.button1_Click);
+            this.Previous.Click += new System.EventHandler(this.Previous_Click);
             // 
             // Next
             // 
@@ -157,7 +157,7 @@ namespace WhiteCore.Modules.AbuseReportsGUI
             this.Next.TabIndex = 6;
             this.Next.Text = "Next";
             this.Next.UseVisualStyleBackColor = true;
-            this.Next.Click += new System.EventHandler(this.button2_Click);
+            this.Next.Click += new System.EventHandler(this.Next_Click);
             // 
             // label4
             // 
@@ -236,10 +236,10 @@ namespace WhiteCore.Modules.AbuseReportsGUI
             this.Abusername.Size = new System.Drawing.Size(260, 20);
             this.Abusername.TabIndex = 14;
             // 
-            // Location
+            // AbuseLocation
             // 
             this.AbuseLocation.Location = new System.Drawing.Point(178, 174);
-            this.AbuseLocation.Name = "Location";
+            this.AbuseLocation.Name = "AbuseLocation";
             this.AbuseLocation.Size = new System.Drawing.Size(260, 20);
             this.AbuseLocation.TabIndex = 15;
             // 
