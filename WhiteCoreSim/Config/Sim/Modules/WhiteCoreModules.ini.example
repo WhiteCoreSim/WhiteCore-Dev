@@ -102,6 +102,13 @@
     ;; Default is 20
     MapViewLength = 20
 
+[WorldViewModule]
+    ;; WorldView Module Settings
+    ;; To use this feature you will need to install the 'WorldView' addon module
+    ;; from https://github.com/WhiteCoreSim/WhiteCore-Optional-Modules
+    ;; Default enabled = false
+    Enabled = false
+
 [GodModule]
     GodModule = WhiteCoreGodModModule
 

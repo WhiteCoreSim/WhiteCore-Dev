@@ -1,21 +1,21 @@
 [DataFile]
     ;;
     ;; Select the Database System you wish to use, then edit the appropriate ini file to set connection strings accordingly
-	;; (Note: you only need to set up a database here if you are running in standalone mode. If you are running in grid mode,
-	;;        the region doesn't require a database, only WhiteCore.Server does (so set it up in WhiteCoreServerConfiguration/Data
-	;;        if you are running WhiteCore.Server.exe))
+    ;; (Note: you only need to set up a database here if you are running in standalone mode. If you are running in grid mode,
+    ;;        the region doesn't require a database, only WhiteCore.Server does (so set it up in Grid/ServerConfiguration/Data
+    ;;        if you are running WhiteCore.Server.exe))
     ;;
-	
+    
     ;; If you want to use SQLite, select this file.
     Include-SQLite = Sim/Data/SQLite.ini
 
     ;; If you want to use MySQL, select this file.
     ;Include-MySQL = Sim/Data/MySQL.ini
-	
-	
+    
+    
     ;; This specifies how the "*.sim" region data files will handled
     ;; If you remove this, you will have no way to save region information, including prims
-	;; Do not disable unless you know what you are doing
+    ;; Do not disable unless you know what you are doing
     Include-FileBased = Sim/Data/FileBased.ini
 
 [WhiteCoreConnectors]

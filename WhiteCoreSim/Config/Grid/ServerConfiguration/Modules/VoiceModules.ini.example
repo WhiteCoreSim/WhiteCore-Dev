@@ -10,15 +10,16 @@
 	;Module = VivoxVoice
     
     ;; Should FreeSwitch be used? (requires it to be downloaded and compiled from 
-	;;   https://github.com/WhiteCore-sim/WhiteCore-Sim-Optional-Modules
+	;;   https://github.com/WhiteCoreSim/WhiteCore-Optional-Modules
     ;Module = FreeSwitchVoice
     
     ;; You must have a Mumble server already set up to use Murmur
     ;; New, incompatible voice daemon which will do speaker indication,
     ;; positional voice, and high quality audio codec. Host voice on the
     ;; same server, or use Glacier2 to proxy the insecure ICE protocol.
-	;; Must be downloaded and compile from https://github.com/WhiteCore-sim/whisper_server
-    ;Module = MurmurVoice;
+	;; The addon module, 'Whisper', needs to be downloaded and compiled from 
+	;; https://github.com/WhiteCoreSim/WhiteCore-Optional-Modules
+	;Module = MurmurVoice;
 	
 [VivoxVoice]
     ; The VivoxVoice module will allow you to provide voice on your
