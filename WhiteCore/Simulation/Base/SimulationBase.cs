@@ -171,9 +171,8 @@ namespace WhiteCore.Simulation.Base
 
             if (startupConfig != null)
             {
-                m_startupCommandsFile = startupConfig.GetString("startup_console_commands_file", "../Config/startup_commands.txt");
-                m_shutdownCommandsFile = startupConfig.GetString("shutdown_console_commands_file",
-                    "../Config/shutdown_commands.txt");
+                m_startupCommandsFile = startupConfig.GetString("startup_console_commands_file", "");
+                m_shutdownCommandsFile = startupConfig.GetString("shutdown_console_commands_file", "");
 
                 m_TimerScriptFileName = startupConfig.GetString("timer_Script", "disabled");
                 m_TimerScriptTime = startupConfig.GetInt("timer_time", m_TimerScriptTime);
