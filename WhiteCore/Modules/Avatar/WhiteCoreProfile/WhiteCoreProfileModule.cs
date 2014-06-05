@@ -229,7 +229,7 @@ namespace WhiteCore.Modules.Profiles
                                                  classified.PriceForListing);
         }
 
-        public void ClassifiedInfoUpdate(UUID queryclassifiedID, uint queryCategory, string queryName,
+        public void ClassifiedInfoUpdate(UUID queryClassifiedID, uint queryCategory, string queryName,
                                          string queryDescription, UUID queryParcelID,
                                          uint queryParentEstate, UUID querySnapshotID, Vector3 queryGlobalPos,
                                          byte queryclassifiedFlags,
@@ -242,7 +242,7 @@ namespace WhiteCore.Modules.Profiles
             
             IScheduledMoneyModule scheduledMoneyModule = p.Scene.RequestModuleInterface<IScheduledMoneyModule>();
             IMoneyModule moneyModule = p.Scene.RequestModuleInterface<IMoneyModule>();
-            Classified classcheck = ProfileFrontend.GetClassified(queryclassifiedID);
+            Classified classcheck = ProfileFrontend.GetClassified(queryClassifiedID);
             if (((queryclassifiedFlags & 32) != 32) && moneyModule != null)
             {
                 //Single week
@@ -256,10 +256,10 @@ namespace WhiteCore.Modules.Profiles
             {
                 //Auto-renew
                 if (classcheck != null)
-                    scheduledMoneyModule.RemoveFromScheduledCharge("Classified" + queryclassifiedID);
+                    scheduledMoneyModule.RemoveFromScheduledCharge("[Classified: " + queryClassifiedID + "]");
 
-                if (!scheduledMoneyModule.Charge(remoteClient.AgentId, queryclassifiedPrice, "Add Classified (" + queryclassifiedID +")",
-                    7, TransactionType.ClassifiedCharge, "Classified" + queryclassifiedID, true))
+                if (!scheduledMoneyModule.Charge(remoteClient.AgentId, queryclassifiedPrice, "Add Reoccurring Classified (" + queryClassifiedID + ")",
+                    7, TransactionType.ClassifiedCharge, "[Classified: " + queryClassifiedID + "]", true))
                 {
                     remoteClient.SendAlertMessage("You do not have enough money to create this classified.");
                     return;
@@ -267,7 +267,7 @@ namespace WhiteCore.Modules.Profiles
             }
 
             UUID creatorUUID = remoteClient.AgentId;
-            UUID classifiedUUID = queryclassifiedID;
+            UUID classifiedUUID = queryClassifiedID;
             uint category = queryCategory;
             string name = queryName;
             string description = queryDescription;
@@ -329,7 +329,7 @@ namespace WhiteCore.Modules.Profiles
                 if (scheduledMoneyModule != null && classcheck != null && ((classcheck.ClassifiedFlags & 32) == 32))
                 {
                     //Remove auto-renew
-                    scheduledMoneyModule.RemoveFromScheduledCharge("Classified" + queryClassifiedID);
+                    scheduledMoneyModule.RemoveFromScheduledCharge("[Classified: " + queryClassifiedID + "]");
                 }
             }
         }
@@ -344,7 +344,7 @@ namespace WhiteCore.Modules.Profiles
                 if (scheduledMoneyModule != null && classcheck != null && ((classcheck.ClassifiedFlags & 32) == 32))
                 {
                     //Remove auto-renew
-                    scheduledMoneyModule.RemoveFromScheduledCharge("Classified" + classcheck.ClassifiedUUID);
+                    scheduledMoneyModule.RemoveFromScheduledCharge("[Classified: " + classcheck.ClassifiedUUID + "]");
                 }
             }
         }
@@ -359,7 +359,7 @@ namespace WhiteCore.Modules.Profiles
                 if (scheduledMoneyModule != null && classcheck != null && ((classcheck.ClassifiedFlags & 32) == 32))
                 {
                     //Remove auto-renew
-                    scheduledMoneyModule.RemoveFromScheduledCharge("Classified" + queryClassifiedID);
+                    scheduledMoneyModule.RemoveFromScheduledCharge("[Classified: " + queryClassifiedID + "]");
                 }
             }
         }

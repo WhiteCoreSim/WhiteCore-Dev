@@ -150,7 +150,7 @@ namespace WhiteCore.Framework.Modules
         event UserDidNotPay OnUserDidNotPay;
         event CheckWhetherUserShouldPay OnCheckWhetherUserShouldPay;
         bool Charge(UUID agentID, int amount, string text, int daysUntilNextCharge, TransactionType type, string identifier, bool chargeImmediately);
-        void RemoveFromScheduledCharge(string identifer);
+        void RemoveFromScheduledCharge(string identifier);
     }
 
     public interface ISimpleCurrencyConnector : IWhiteCoreDataPlugin

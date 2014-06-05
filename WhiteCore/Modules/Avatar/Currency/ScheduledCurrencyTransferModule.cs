@@ -65,7 +65,7 @@ namespace WhiteCore.Modules.Avatar.Currency
                     itemInfo.Add("Amount", amount);
                     itemInfo.Add("Text", text);
                     itemInfo.Add("Type", (int)type);
-                    SchedulerItem item = new SchedulerItem("ScheduledPayment" + identifer,
+                    SchedulerItem item = new SchedulerItem("ScheduledPayment " + identifer,
                                                            OSDParser.SerializeJsonString(itemInfo), false,
                                                            DateTime.UtcNow, daysUntilNextCharge, RepeatType.days, agentID);
                     itemInfo.Add("SchedulerID", item.id);
@@ -75,11 +75,11 @@ namespace WhiteCore.Modules.Avatar.Currency
             return true;
         }
 
-        public void RemoveFromScheduledCharge(string identifer)
+        public void RemoveFromScheduledCharge(string identifier)
         {
             IScheduleService scheduler = m_registry.RequestModuleInterface<IScheduleService>();
             if (scheduler != null)
-                scheduler.Remove("ScheduledPayment" + identifer);
+                scheduler.Remove("ScheduledPayment " + identifier);
         }
 
         private object ChargeNext(string functionName, object parameters)
@@ -99,7 +99,7 @@ namespace WhiteCore.Modules.Avatar.Currency
                     if (!success)
                     {
                         if (OnUserDidNotPay != null)
-                            OnUserDidNotPay(agentID, functionName.Replace("ScheduledPayment", ""), text);
+                            OnUserDidNotPay(agentID, functionName.Replace("ScheduledPayment ", ""), text);
                     }
                 }
                 else
