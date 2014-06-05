@@ -93,12 +93,13 @@ namespace WhiteCore.Modules.Web
                                                                                    amountPerQuery, sortBy);
             foreach (var region in regions)
                 RegionListVars.Add(new Dictionary<string, object>
-                                       {
-                                           {"RegionLocX", region.RegionLocX/Constants.RegionSize},
-                                           {"RegionLocY", region.RegionLocY/Constants.RegionSize},
-                                           {"RegionName", region.RegionName},
-                                           {"RegionID", region.RegionID}
-                                       });
+                    {
+                        {"RegionLocX", region.RegionLocX/Constants.RegionSize},
+                        {"RegionLocY", region.RegionLocY/Constants.RegionSize},
+                        {"RegionName", region.RegionName},
+                        {"RegionID", region.RegionID},
+                        {"RegionURI", region.RegionURI}
+                    });
 
             vars.Add("RegionList", RegionListVars);
             vars.Add("RegionText", translator.GetTranslatedString("Region"));
@@ -118,6 +119,7 @@ namespace WhiteCore.Modules.Web
             vars.Add("CurrentPageText", translator.GetTranslatedString("CurrentPageText"));
             vars.Add("MoreInfoText", translator.GetTranslatedString("MoreInfoText"));
             vars.Add("RegionMoreInfo", translator.GetTranslatedString("RegionMoreInfo"));
+            vars.Add ("MainServerURL", webInterface.GridURL);
 
             return vars;
         }

@@ -148,7 +148,8 @@ namespace WhiteCore.Services
             byte[] response = MainServer.BlankResponse;
 
             string var = httpRequest.Query["var"].ToString();
-            if (path == "/MapAPI/get-region-coords-by-name")
+            string requestType = path.Substring (0, path.IndexOf ("?"));
+            if (requestType == "/MapAPI/get-region-coords-by-name")
             {
                 string resp = "var {0} = {\"x\":{1},\"y\":{2}};";
                 string sim_name = httpRequest.Query["sim_name"].ToString();
@@ -160,7 +161,7 @@ namespace WhiteCore.Services
                 response = System.Text.Encoding.UTF8.GetBytes(resp);
                 httpResponse.ContentType = "text/javascript";
             }
-            else if (path == "/MapAPI/get-region-name-by-coords")
+            else if (requestType == "/MapAPI/get-region-name-by-coords")
             {
                 string resp = "var {0} = \"{1}\";";
                 int grid_x = int.Parse(httpRequest.Query["grid_x"].ToString());

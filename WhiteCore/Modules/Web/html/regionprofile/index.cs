@@ -172,6 +172,7 @@ namespace WhiteCore.Modules.Web
                 vars.Add("RegionOnlineText", translator.GetTranslatedString("RegionOnlineText"));
                 vars.Add("NumberOfUsersInRegionText", translator.GetTranslatedString("NumberOfUsersInRegionText"));
                 vars.Add("ParcelsInRegionText", translator.GetTranslatedString("ParcelsInRegionText"));
+                vars.Add ("MainServerURL", webInterface.GridURL);
 
              }
 

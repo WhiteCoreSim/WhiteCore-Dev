@@ -84,6 +84,11 @@ namespace WhiteCore.Modules.Web
             get { return MainServer.Instance.FullHostName + ":" + _port + "/register.html"; }
         }
 
+        public string GridURL
+        {
+            get { return MainServer.Instance.HostName + ":" + _port; }
+        }
+
         #endregion
 
         #region IService Members

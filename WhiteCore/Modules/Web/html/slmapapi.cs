@@ -68,6 +68,7 @@ namespace WhiteCore.Modules.Web
 
                 vars.Add ("WorldMapServiceURL", mapUrl.Remove (mapUrl.Length - 1));
                 vars.Add ("WorldMapAPIServiceURL", mapAPIUrl.Remove (mapAPIUrl.Length - 1));
+                vars.Add ("MainServerURL", webInterface.GridURL);
             }
 
             return vars;

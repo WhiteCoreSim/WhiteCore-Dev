@@ -3,6 +3,7 @@
 *
 * Copyright (c) 2010 Linden Research, Inc.
 * Copyright (c) 2011 SignpostMarv
+* Hacked around by Greythane for WhitcoreSim, June 2014
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -101,7 +102,7 @@ var SLURL = {
 	mouseHoverDelay            : 1000,
 
 // Do we want to display hover information for the map?
-	showHoverTips              : false,
+	showHoverTips              : true,
 
 // color when no region tile available
 	backgroundColor            : '#1D475F',
@@ -120,7 +121,7 @@ var SLURL = {
 	getRegionCoordsByName      : function(region, onLoadHandler, variable){
 		variable = variable || 'slRegionPos_result'; // if no variable is specified, assign a default
 		SLURL.loadScript(
-			'{WorldMapServiceAPIURL}/get-region-coords-by-name?var=' + encodeURIComponent(variable) + '&sim_name=' + encodeURIComponent(region),
+			'{WorldMapAPIServiceURL}/get-region-coords-by-name?var=' + encodeURIComponent(variable) + '&sim_name=' + encodeURIComponent(region),
 			function(){
 				onLoadHandler(window[variable]);
 			}
@@ -148,7 +149,7 @@ var SLURL = {
 		}
 		function mapWindow(regionName, gridX, gridY){
 			var
-				url       = ['secondlife://' + encodeURIComponent(regionName), (gridX % 1) * 256, (gridY % 1) * 256].join('/'),
+				url       = ['hop://{MainServerURL}/' + encodeURIComponent(regionName), (gridX % 1) * 256, (gridY % 1) * 256].join('/'),
 				debugInfo = SLURL.debugMode ? ' x: ' + Math.floor(gridX) + ' y: ' + Math.floor(gridY) : '';
 			;
 			slMap.addMapWindow( new SLURL.MapWindow('<b>' + regionName + '</b><br>' + debugInfo + '<a href="' + url + '" class="teleport-button">Teleport Now</a>'), new SLURL.XYPoint(gridX, gridY));
@@ -158,7 +159,7 @@ var SLURL = {
 				if(typeof result == 'string'){
 					mapWindow(result, x, y);
 				}else if((result == null || result.error) && SLURL.debugMode){
-					alert('The coordinates of the SLURL (' + x + ', ' + y + ') were not recognised as being in a SecondLife region.');
+					alert('The coordinates of the SLURL (' + x + ', ' + y + ') were not recognised as being in a WhiteCore region.');
 				}
 			}, SLURL.getRegionCoordsByNameVar());
 		}else{
@@ -197,7 +198,7 @@ var SLURL = {
 		document.body.appendChild(script);
 	},
 
-//  This Function returns the appropriate image tile from the S3 storage site corresponding to the
+//  This Function returns the appropriate image tile from the map storage site corresponding to the
 //  input location and zoom level on the google map.
 	getTileUrl                 : function(pos, zoom){
 		var sl_zoom = SLURL.convertZoom(zoom);
@@ -232,7 +233,7 @@ var SLURL = {
 				"{WorldMapServiceURL}",
 				"{WorldMapServiceURL}"
 			][((x / regions_per_tile_edge) % 2)] //  Pick a server
-			+ ["/map", sl_zoom, x, y, "objects.jpg"].join("-") //  Get image tiles from Amazon S3
+			+ ["/map", sl_zoom, x, y, "objects.jpg"].join("-") //  Get image tiles
 		);
 	},
 
@@ -464,7 +465,7 @@ var SLURL = {
 		}else{
 			// Browser does not support Google Maps
 			this.GMap = null;
-			throw 'Your browser is not supported';
+			throw 'Sorry, your browser is not supported';
 		}
 	},
 
@@ -693,23 +694,45 @@ SLURL.Map.prototype.mousehoverHandler = function(){
 	var tileX = Math.floor(tilePos.x);
 	var tileY = Math.floor(tilePos.y);
 
-	this.showTileToolTip();
+//	this.showTileToolTip(tileX, tileY);
+	this.showTileNameToolTip(this, tileX, tileY);
 }
 
-SLURL.Map.prototype.getRegionName = function(){
-	var text = "Test Region Name";
+SLURL.Map.prototype.getRegionName = function(tileX, tileY){
+	var text = "Region Name";
 	return text;
 }
 
-SLURL.Map.prototype.showTileToolTip = function(){
+SLURL.Map.prototype.showTileToolTip = function(tileX, tileY){
 	var
 		map       = this,
-		HoverText = this.getRegionName()
-	;
+		hoverText = this.getRegionName(tileX, tileY)
+		;
 
 	map.ID = null;
-	map.GMap.openInfoWindowHtml(map.hoverPos, HoverText, { onCloseFn: function() { map.hoverWindowCloseHandler(); }});
+	map.GMap.openInfoWindowHtml(map.hoverPos, hoverText, { onCloseFn: function() { map.hoverWindowCloseHandler(); }});
 	map.showingHoverWindow = true;
+}
+
+SLURL.Map.prototype.showTileNameToolTip = function(slMap, tileX, tileY){
+	function nameTip(regionName){
+		var
+			map       = slMap,
+			hoverText = regionName
+			;
+		
+		map.ID = null;
+		map.GMap.openInfoWindowHtml(map.hoverPos, hoverText, { onCloseFn: function() { map.hoverWindowCloseHandler(); }});
+		map.showingHoverWindow = true;
+	}
+
+	SLURL.getRegionNameByCoords(tileX, tileY, function(result){
+				if(typeof result == 'string'){
+					nameTip(result);
+				} else if((result == null || result.error) && SLURL.debugMode){
+					alert('The coordinates of the SLURL (' + x + ', ' + y + ') were not recognised as being in a WhiteCore region.');
+				}
+			}, SLURL.getRegionNameByCoordsVar());
 }
 
 SLURL.Map.prototype.hoverWindowCloseHandler = function(){
@@ -721,7 +744,7 @@ SLURL.Map.prototype.hoverWindowCloseHandler = function(){
 SLURL.Map.prototype.CreateMapTypes = function(){
 	var mapTypes = [];
 	
-		var copyCollection = new GCopyrightCollection('SecondLife');
+		var copyCollection = new GCopyrightCollection('WhiteCore');
 		var copyright = new GCopyright(1, new GLatLngBounds(new GLatLng(0, 0), new GLatLng(-90, 90)), 0, "(C) 2007 - " + (new Date).getFullYear() + " Linden Lab");
 		copyCollection.addCopyright(copyright);
 
@@ -757,13 +780,6 @@ SLURL.Map.prototype.CreateMapDiv = function(mainDiv){
 			formButton    = document.createElement("input"),
 			clickHandler  = function(){
 				if(formText){
-					SLURL.getRegionCoordsByName(formText.value, function(pos){
-						if(pos.x && pos.y){
-							SLMap.panOrRecenterToSLCoord(
-								new SLURL.XYPoint(pos.x, pos.y)
-							);
-						}
-					});
 					SLMap.gotoRegion(formText.value); 
 				}else{
 					alert("Can't find textField!");
@@ -777,7 +793,8 @@ SLURL.Map.prototype.CreateMapDiv = function(mainDiv){
 			'width:270px',
 			'margin-left:auto',
 			'margin-right:auto',
-			'background-color:#fff'
+			'background-color:#1D475F',
+			'color:#aaa',
 		].join(';'));
 		form.onsubmit = clickHandler;
 
@@ -786,7 +803,7 @@ SLURL.Map.prototype.CreateMapDiv = function(mainDiv){
 		formLabelSpan.appendChild(formLabel);
 
 		// Text field for the region name
-		formText.value = "Ahern";
+		formText.value = "WhiteCore";
 		formText.size = 15;
 
 		// Button to activate 'go to region'
@@ -809,13 +826,18 @@ SLURL.Map.prototype.CreateMapDiv = function(mainDiv){
 
 SLURL.Map.prototype.gotoRegion = function(regionName){
 	var SLMap = this;
-	SLURL.getRegionCoordsByName(regionName, function(pos){
-		if(pos.x && pos.y){
+	SLURL.getRegionCoordsByName(regionName, function(result){
+		if(result.x && result.y){
+			var	x = (result.x / 256);
+			var y = (result.y / 256);
+
 			SLMap.panOrRecenterToSLCoord(
-				new SLURL.XYPoint(pos.x, pos.y)
+				new SLURL.XYPoint(x, y)
 			);
+		} else {
+			alert('No coordinates could be found for region "' + regionName + '"');
 		}
-	});
+	}, SLURL.getRegionCoordsByNameVar());
 }
 
 SLURL.Map.prototype.centerAndZoomAtSLCoord = function(pos, zoom){
@@ -851,6 +873,49 @@ SLURL.Map.prototype.getMapCenter = function(){
 		var center  = new SLURL.XYPoint();
 		center._SetFromGLatLng(this.GMap.getCenter());
 		return center;
+	}
+}
+
+SLURL.Map.prototype.addTextMarker = function(marker, mapWindow){
+	if (this.GMap){
+		var
+			markerImg    = marker.icons[0],
+			width        = markerImg.mainImg.width,
+			height       = markerImg.mainImg.height,
+			locX     	 = width / 2,
+			locY         = height / 2,
+			point        = marker.slCoord.GetGLatLng(),
+			isClickable  = false,
+			markerZIndex = (marker.options.zLayer) ? marker.options.zLayer : 0
+		;
+
+		// Work out hotspot of marker
+//		if(marker.options.horizontalAlign == "left"){
+//			hotspotX = 0;  //locX = 0;
+//		}else if(marker.options.horizontalAlign == "right"){
+//			hotspotX = gicon.iconSize.width;
+//		}
+//		if(marker.options.verticalAlign == "top"){
+//			hotspotY = 0;
+//		}else if(marker.options.verticalAlign == "bottom"){
+//			hotspotY = gicon.iconSize.height;
+//		}
+
+
+		// The SL marker 'owns' the GMarker
+		marker.gmarker          = new MarkerWithLabel({
+			position: point,
+			draggable: false,
+			raiseOnDrag: false,
+			map: this.GMap,
+			labelContent: "RegionName",
+			labelAnchor: new SLURL.XYPoint(locX, locY),
+			labelClass: "maplabels",				// css class for the label
+			icon: {}
+		});
+		marker.gmarker.slMarker = marker;
+
+		this.GMap.addOverlay(marker.gmarker); // Add the GMarker to the map
 	}
 }
 
