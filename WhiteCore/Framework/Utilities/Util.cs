@@ -427,7 +427,7 @@ namespace WhiteCore.Framework.Utilities
 
         public static string BuildYMDDateString(DateTime time)
         {
-            return time.Year + "-" + time.Month + "-" + time.Day;
+            return time.ToString("yyyy-MM-dd");
         }
 
         /// <summary>
