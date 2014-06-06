@@ -82,6 +82,8 @@ namespace WhiteCore.FileBasedServices.AssetService
                 MainConsole.Instance.Commands.AddCommand("get asset",
                                                          "get asset <ID>",
                                                          "Gets info about asset from database", HandleGetAsset, false, true);
+
+                MainConsole.Instance.Info("[FILE ASSET SERVICE]: File based asset service enabled");
             }
         }
 
