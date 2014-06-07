@@ -46,7 +46,7 @@ namespace WhiteCore.Modules.Gods
 
         //private static readonly ILog MainConsole.Instance = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private bool m_Enabled = true;
-        private string m_oar_directory = "";
+        private string m_savestate_oar_directory = "";
 
         #endregion
 
@@ -63,7 +63,9 @@ namespace WhiteCore.Modules.Gods
                     m_Enabled = false;
                     return;
                 }
-                m_oar_directory = source.Configs["GodModule"].GetString("DirectoryToSaveOARs", m_oar_directory);
+                m_savestate_oar_directory = source.Configs["GodModule"].GetString("DirectoryForSaveStateOARs", m_savestate_oar_directory);
+                if (m_savestate_oar_directory == "")
+                    m_savestate_oar_directory = Constants.DEFAULT_DATA_DIR + "/Region/SaveStates/";
             }
         }
 
@@ -155,7 +157,7 @@ namespace WhiteCore.Modules.Gods
             {
                 IScene scene = MainConsole.Instance.ConsoleScene; //Switch back later
                 MainConsole.Instance.RunCommand("change region " + client.Scene.RegionInfo.RegionName);
-                MainConsole.Instance.RunCommand("save oar " + m_oar_directory + client.Scene.RegionInfo.RegionName +
+                MainConsole.Instance.RunCommand("save oar " + m_savestate_oar_directory + client.Scene.RegionInfo.RegionName +
                                                 Util.UnixTimeSinceEpoch().ToString() + ".statesave.oar");
                 if (scene == null)
                     MainConsole.Instance.RunCommand("change region root");
@@ -165,7 +167,7 @@ namespace WhiteCore.Modules.Gods
         }
 
         /// <summary>
-        ///     The god has requested that we update something in the region configs
+        ///     The god has requested that we update something in the region configuration
         /// </summary>
         /// <param name="client"></param>
         /// <param name="BillableFactor"></param>

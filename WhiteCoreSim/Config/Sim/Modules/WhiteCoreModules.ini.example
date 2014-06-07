@@ -112,11 +112,11 @@
 [GodModule]
     GodModule = WhiteCoreGodModModule
 
-    ;; Where should OARs be saved when the client requests an OAR backup?
+    ;; Where should save-state OARs be saved when the client requests an OAR backup as a Grid God?
     ;; Note: leave blank to save in the /bin folder
     ;; Note: this must end with / if not blank
     ;; Default is "" which is the bin folder
-    DirectoryToSaveOARs = "";
+    DirectoryForSaveStateOARs = "";
 
 [CombatModule]
     ;; Combat Module Settings
