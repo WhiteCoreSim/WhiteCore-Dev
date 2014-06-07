@@ -180,7 +180,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
             allowHTMLLinking = config.GetBoolean("AllowHTMLLinking", true);
 
-            #region Limitation configs
+            #region Limitation configuration
 
             m_allowFunctionLimiting = config.GetBoolean("AllowFunctionLimiting", false);
 

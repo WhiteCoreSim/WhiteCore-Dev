@@ -481,7 +481,7 @@ namespace WhiteCore.Simulation.Base
 
         public virtual void HandleConfigRefresh(IScene scene, string[] cmd)
         {
-            //Rebuild the configs
+            //Rebuild the configuration
             m_config = m_configurationLoader.LoadConfigSettings(m_original_config);
             foreach (IApplicationPlugin plugin in m_applicationPlugins)
                 plugin.ReloadConfiguration(m_config);

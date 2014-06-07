@@ -96,7 +96,7 @@ namespace WhiteCore.Framework.Modules
         ISimulationBase Copy();
 
         /// <summary>
-        ///     Start the base with the given parametsr
+        ///     Start the base with the given parameters
         /// </summary>
         /// <param name="originalConfigSource">The settings parsed from the command line</param>
         /// <param name="configSource">The .ini config</param>

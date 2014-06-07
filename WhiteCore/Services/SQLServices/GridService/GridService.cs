@@ -558,7 +558,7 @@ namespace WhiteCore.Services.SQLServices.GridService
             {
                 //Regions do not get to set flags, so wipe them
                 regionInfos.Flags = 0;
-                //See if we are in the configs anywhere and have flags set
+                //See if we are in the configuration anywhere and have flags set
 
                 IConfig gridConfig = m_config.Configs["GridService"];
                 if ((gridConfig != null) && regionInfos.RegionName != string.Empty)

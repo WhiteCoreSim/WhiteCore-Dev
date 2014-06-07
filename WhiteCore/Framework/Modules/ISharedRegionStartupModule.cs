@@ -33,7 +33,7 @@ namespace WhiteCore.Framework.Modules
     public interface ISharedRegionStartupModule
     {
         /// <summary>
-        ///     Initialise and load the configs of the module
+        ///     Initialise and load the configuration of the module
         ///     This is used by IServices, DO NOT USE ANYTHING THAT REQUIRES IService here!
         /// </summary>
         /// <param name="scene"></param>

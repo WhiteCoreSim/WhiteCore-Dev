@@ -52,7 +52,7 @@ namespace WhiteCore.Framework.Modules
         bool Default { get; }
 
         /// <summary>
-        ///     Starts up the module and loads configs
+        ///     Starts up the module and loads configuration
         /// </summary>
         /// <param name="configSource"></param>
         /// <param name="openSim"></param>
