@@ -40,8 +40,7 @@ namespace WhiteCore.Framework.SceneInfo
     [Serializable, ProtoContract(UseProtoMembersOnly = false)]
     public class EstateSettings : IDataTransferable
     {
-        // private static readonly ILog MainConsole.Instance = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
+ 
         #region Delegates
 
         public delegate void SaveDelegate(EstateSettings rs);
@@ -59,8 +58,8 @@ namespace WhiteCore.Framework.SceneInfo
         private bool m_AllowSetHome = true;
         private bool m_AllowVoice = true;
 
-        private string m_EstateName = "My Estate";
-        private UUID m_EstateOwner = UUID.Zero;
+        private string m_EstateName = Constants.SystemEstateName;
+        private UUID m_EstateOwner = (UUID)Constants.RealEstateOwnerUUID;
 
         private uint m_ParentEstateID = 1;
         private int m_PricePerMeter = 1;
