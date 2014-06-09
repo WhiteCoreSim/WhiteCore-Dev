@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
@@ -45,6 +44,10 @@ namespace WhiteCore.Services.DataService
         private string m_estateRegionsTable = "estateregions";
 
         #region IEstateConnector Members
+        public bool RemoteCalls()
+        {
+            return m_doRemoteCalls; 
+        }
 
         public void Initialize(IGenericData GenericData, IConfigSource source, IRegistryCore registry,
                                string defaultConnectionString)
@@ -101,7 +104,36 @@ namespace WhiteCore.Services.DataService
         {
             QueryFilter filter = new QueryFilter();
             filter.andFilters["EstateName"] = name;
-            return GetEstate(int.Parse(GD.Query(new string[1] {"EstateID"}, "estatesettings", filter, null, null, null)[0]));
+            //            var EstateID = int.Parse (GD.Query (new string[1] { "EstateID" }, "estatesettings", filter, null, null, null) [0]);
+            List<string> estate = GD.Query (new string[1] { "EstateID" }, "estatesettings", filter, null, null, null);
+
+            if (estate.Count == 0)              // not found!!
+                return null;
+
+            int EstateID;
+            if (!int.TryParse (estate[0], out EstateID))
+                return null;
+            else
+                return GetEstate (EstateID);
+        }
+
+        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
+        public int CreateNewEstate(EstateSettings es)
+        {
+            object remoteValue = DoRemote(es.ToOSD());
+            if (remoteValue != null || m_doRemoteOnly)
+                return (int) remoteValue;
+
+
+            int estateID = GetEstate(es.EstateOwner, es.EstateName);
+            if (estateID > 0)
+            {
+                return estateID;
+            }
+
+            es.EstateID = GetNewEstateID();
+            SaveEstateSettings(es, true);
+            return (int) es.EstateID;
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
@@ -124,6 +156,7 @@ namespace WhiteCore.Services.DataService
             LinkRegion(RegionID, (int) es.EstateID);
             return (int) es.EstateID;
         }
+
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public void SaveEstateSettings(EstateSettings es)
@@ -179,6 +212,36 @@ namespace WhiteCore.Services.DataService
             return true;
         }
 
+        [CanBeReflected(ThreatLevel = ThreatLevel.High)]
+        public bool EstateExists(string name)
+        {
+            object remoteValue = DoRemote(name);
+            if (remoteValue != null || m_doRemoteOnly)
+                return remoteValue == null ? false : (bool) remoteValue;
+
+            QueryFilter filter = new QueryFilter();
+            filter.andFilters["EstateName"] = name;
+            List<string> retVal = GD.Query(new string[1] {"EstateID"}, "estatesettings", filter, null, null, null);
+
+            return retVal.Count > 0;
+        }
+
+        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
+        public int GetEstateID(string name)
+        {
+            object remoteValue = DoRemote(name);
+            if (remoteValue != null || m_doRemoteOnly)
+                return (int) remoteValue;
+
+            QueryFilter filter = new QueryFilter();
+            filter.andFilters["EstateName"] = name;
+            List<string> retVal = GD.Query(new string[1] {"EstateID"}, "estatesettings", filter, null, null, null);
+
+            if (retVal.Count > 0)
+                return int.Parse(retVal[0]);        // return the EstateID
+            return 0;
+        }
+
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public int GetEstate(UUID ownerID, string name)
         {
@@ -209,6 +272,13 @@ namespace WhiteCore.Services.DataService
             return
                 GD.Query(new string[1] {"RegionID"}, m_estateRegionsTable, filter, null, null, null)
                   .ConvertAll(x => UUID.Parse(x));
+        }
+
+        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
+        public List<string> GetEstates()
+        {
+            List<string> estates = GD.Query(new string[1] {"EstateName"}, m_estateTable, null, null, null, null);
+            return estates;
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]

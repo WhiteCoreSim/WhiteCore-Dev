@@ -35,6 +35,11 @@ namespace WhiteCore.Framework.DatabaseInterfaces
     public interface IEstateConnector : IWhiteCoreDataPlugin
     {
         /// <summary>
+        /// Are we doing local or remote calls.
+        /// </summary>
+        bool RemoteCalls();
+
+        /// <summary>
         ///     Loads the estate data for the given region
         /// </summary>
         /// <param name="regionID"></param>
@@ -56,7 +61,14 @@ namespace WhiteCore.Framework.DatabaseInterfaces
         EstateSettings GetEstateSettings(string name);
 
         /// <summary>
-        ///     Creates a new estate from the given info, returns the updated info
+        /// Creates new estate.
+        /// </summary>
+        /// <returns>The the estateID</returns>
+        /// <param name="es">Es.</param>
+        int CreateNewEstate (EstateSettings es);
+
+        /// <summary>
+        ///     Creates a new estate from the given info, and link to a region
         /// </summary>
         /// <param name="ES"></param>
         /// <param name="regionID"></param>
@@ -68,6 +80,13 @@ namespace WhiteCore.Framework.DatabaseInterfaces
         /// </summary>
         /// <param name="es"></param>
         void SaveEstateSettings(EstateSettings es);
+
+        /// <summary>
+        ///     Gets the estateID for the given name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns>The EstateID</returns>
+        int GetEstateID(string name);
 
         /// <summary>
         ///     Gets the estates that have the given name and owner
@@ -83,6 +102,12 @@ namespace WhiteCore.Framework.DatabaseInterfaces
         /// <param name="estateID"></param>
         /// <returns></returns>
         List<UUID> GetRegions(int estateID);
+
+        /// <summary>
+        ///     Gets all available estates
+        /// </summary>
+        /// <returns>List of estates</returns>
+        List<string> GetEstates();
 
         /// <summary>
         ///     Gets the estates that have the given owner
@@ -127,5 +152,12 @@ namespace WhiteCore.Framework.DatabaseInterfaces
         /// <param name="estateID"></param>
         /// <returns></returns>
         bool DeleteEstate(int estateID);
+
+        /// <summary>
+        ///  Check to see if Estate exists.
+        /// </summary>
+        /// <returns><c>true</c>, if exists, <c>false</c> otherwise.</returns>
+        /// <param name="name">Name.</param>
+        bool EstateExists (string name);
     }
 }
