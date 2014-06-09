@@ -1264,16 +1264,32 @@ namespace WhiteCore.Region
             UserAccount EstateOwner;
             EstateOwner = scene.UserAccountService.GetUserAccount (null, regInfo.EstateSettings.EstateOwner);
 
+            if ((MainConsole.Instance.ConsoleScene == null) &&
+                (m_scenes.IndexOf (scene) == 0))
+            {
+                sceneInfo =  String.Format ("{0, -20}", "Region");
+                sceneInfo += String.Format ("{0, -14}", "Startup");
+                sceneInfo += String.Format ("{0, -16}", "Location");
+                sceneInfo += String.Format ("{0, -12}", "Size");
+                sceneInfo += String.Format ("{0, -8}", "Port");
+                sceneInfo += String.Format ("{0, -20}", "Estate");
+                sceneInfo += String.Format ("{0, -20}", "Estate Owner");
+
+                MainConsole.Instance.CleanInfo(sceneInfo);
+                MainConsole.Instance.CleanInfo("--------------------------------------------------------------------------------------------------------");
+
+            }
+
             // todo ... change hardcoded field sizes to public constants
             sceneInfo =  String.Format ("{0, -20}", regInfo.RegionName);
-            sceneInfo += String.Format ("{0, -20}", regInfo.Startup);
+            sceneInfo += String.Format ("{0, -14}", regInfo.Startup);
             sceneInfo += String.Format ("{0, -16}", regInfo.RegionLocX / Constants.RegionSize + "," + regInfo.RegionLocY / Constants.RegionSize);
             sceneInfo += String.Format ("{0, -12}", regInfo.RegionSizeX + "x" + regInfo.RegionSizeY);
             sceneInfo += String.Format ("{0, -8}", regInfo.RegionPort);
-            sceneInfo += String.Format ("{0, -16}", regInfo.EstateSettings.EstateName);
+            sceneInfo += String.Format ("{0, -20}", regInfo.EstateSettings.EstateName);
             sceneInfo += String.Format ("{0, -20}", EstateOwner.Name);
 
-            MainConsole.Instance.Info(sceneInfo);
+            MainConsole.Instance.CleanInfo(sceneInfo);
 
         }
 
