@@ -53,6 +53,7 @@ WhiteCoreSim/Data/ScriptEngines/*-*-*-*-*
 WhiteCoreSim/Data/ScriptEngines/*.dll
 WhiteCoreSim/Data/ScriptEngines/*/*.dll
 WhiteCoreSim/Data/ScriptEngines/*/*.state
+WhiteCoreSim/Data/RealEstateUser.txt
 
 WhiteCoreSim/bin/*.log
 WhiteCoreSim/bin/WhiteCore.exe

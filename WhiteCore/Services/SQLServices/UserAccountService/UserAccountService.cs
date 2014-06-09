@@ -35,6 +35,7 @@ using WhiteCore.Framework.Utilities;
 using Nini.Config;
 using OpenMetaverse;
 using System.Collections.Generic;
+using System.IO;
 
 namespace WhiteCore.Services.SQLServices.UserAccountService
 {
@@ -67,6 +68,29 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
         }
 
         public void Configure(IConfigSource config, IRegistryCore registry)
+        {
+            registry.RegisterModuleInterface<IUserAccountService>(this);
+        }
+
+        public void Start(IConfigSource config, IRegistryCore registry)
+        {
+            m_AuthenticationService = registry.RequestModuleInterface<IAuthenticationService>();
+            m_Database = Framework.Utilities.DataManager.RequestPlugin<IUserAccountData>();
+            m_profileConnector = Framework.Utilities.DataManager.RequestPlugin<IProfileConnector>();
+        }
+
+        public void FinishedStartup()
+        {
+            // these are only valid if we are local
+            if (!m_doRemoteCalls)
+            {
+                // check and/or create default RealEstate user
+                CheckRealEstateUserInfo ();
+                AddCommands ();
+            }
+        }
+
+        private void AddCommands()
         {
             if (MainConsole.Instance != null)
             {
@@ -144,7 +168,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                         "set partner",
                         "Sets the partner in a user's profile.",
                         HandleSetPartner, false, true);
-                    
+
                     MainConsole.Instance.Commands.AddCommand(
                         "reset partner",
                         "reset partner",
@@ -152,23 +176,8 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                         HandleResetPartner, false, true);
                 }
             }
-            registry.RegisterModuleInterface<IUserAccountService>(this);
         }
 
-        public void Start(IConfigSource config, IRegistryCore registry)
-        {
-            m_AuthenticationService = registry.RequestModuleInterface<IAuthenticationService>();
-            m_Database = Framework.Utilities.DataManager.RequestPlugin<IUserAccountData>();
-            m_profileConnector = Framework.Utilities.DataManager.RequestPlugin<IProfileConnector>();
-        }
-
-        public void FinishedStartup()
-        {
-            // check and/or create default RealEstate user
-            if (!m_doRemoteCalls)
-                CheckRealEstateUserInfo ();
-
-        }
 
         /// <summary>
         /// Checks and creates the real estate user.
@@ -195,6 +204,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     
                 if (error == "")
                 {
+                    SaveRealEstatePassword (newPassword);
                     MainConsole.Instance.Info (" The password for '" + Constants.RealEstateOwnerName + "' is : " + newPassword);
 
                 } else
@@ -211,6 +221,16 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 if (success)
                     MainConsole.Instance.Info (" The RealEstate user has been elevated to 'Maintenance' level");
                     
+            }
+        }
+
+        private void SaveRealEstatePassword(string password)
+        {
+            var configDir = Constants.DEFAULT_DATA_DIR;
+            using (StreamWriter pwFile = new StreamWriter(configDir + "/RealEstateUser.txt"))
+            {
+                pwFile.WriteLine("System user : '" + Constants.RealEstateOwnerName + "' was created: " + Culture.LocaleLogStamp());
+                pwFile.WriteLine("Password    : " + password);
             }
         }
 
@@ -995,9 +1015,12 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     success = m_AuthenticationService.SetPassword(account.PrincipalID, "UserAccount", newPassword);
 
                 if (!success)
-                    MainConsole.Instance.ErrorFormat("[USER ACCOUNT SERVICE]: Unable to reset password for RealEstate Owner");
+                    MainConsole.Instance.ErrorFormat ("[USER ACCOUNT SERVICE]: Unable to reset password for RealEstate Owner");
                 else
-                    MainConsole.Instance.Info("[USER ACCOUNT SERVICE]: The new password for '" + Constants.RealEstateOwnerName + "' is : " + newPassword);
+                {
+                    SaveRealEstatePassword (newPassword);
+                    MainConsole.Instance.Info ("[USER ACCOUNT SERVICE]: The new password for '" + Constants.RealEstateOwnerName + "' is : " + newPassword);
+                }
             }
         }
         #endregion
