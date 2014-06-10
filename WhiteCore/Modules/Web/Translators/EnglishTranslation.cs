@@ -686,6 +686,23 @@
                 case "December":
                     return "December";
 
+            // User types
+            case "UserTypeText":
+                return "User type";
+            case "AdminUserTypeInfoText":
+                return "The type of user (Currently used for periodical stipend payments).";
+            case "Guest":
+                return "Guest";
+            case  "Resident":
+                return "Resident";
+            case "Member":
+                return "Member";
+            case "Contractor":
+                return "Contractor";
+            case "Charter_Member":
+                return "Charter Member";
+
+
                     // ColorBox
                 case "ColorBoxImageText":
                     return "Image";
@@ -703,7 +720,7 @@
                     return "Stop Slide Show";
 
 
-                    // English only so far
+                // Maintenance
                 case "NoAccountFound":
                     return "No account found";
                 case "DisplayInMenu":

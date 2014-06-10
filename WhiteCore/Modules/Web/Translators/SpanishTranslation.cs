@@ -672,7 +672,23 @@
                 case "December":
                     return "December";
 
-                    // ColorBox
+                // User types
+            case "UserTypeText":
+                return "Tipo de usuario";
+            case "AdminUserTypeInfoText":
+                return "El tipo de usuario (en la actualidad se utiliza para el pago de estipendios periódicos).";
+            case "Guest":
+                return "Invitado";
+            case  "Resident":
+                return "Residente";
+            case "Member":
+                return "Miembro";
+            case "Contractor":
+                return "Contratista";
+            case "Charter_Member":
+                return "Miembro fundador";
+
+                // ColorBox
                 case "ColorBoxImageText":
                     return "Image";
                 case "ColorBoxOfText":
@@ -687,6 +703,23 @@
                     return "Start Slide Show";
                 case "ColorBoxStopSlideshowText":
                     return "Stop Slide Show";
+               
+                // Maintenance
+            case "NoAccountFound":
+                return "No se han encontrado cuenta";
+            case "DisplayInMenu":
+                return "Pantalla en el menú";
+            case "ParentText":
+                return "Menú principalt";
+            case "CannotSetParentToChild":
+                return "No se puede establecer elemento de menú como un niño a sí mismo.";
+            case "TopLevel":
+                return "Nivel superior";
+            case "HideLanguageBarText":
+                return "Barra de selección de idioma Ocultar";
+            case "HideStyleBarText":
+                return "Ocultar barra de selección de estilo";
+
             }
             return "UNKNOWN CHARACTER";
         }

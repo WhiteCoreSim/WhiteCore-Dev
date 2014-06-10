@@ -671,6 +671,22 @@
                 case "December":
                     return "Dezember";
 
+                // User types
+            case "UserTypeText":
+                return "Benutzertyp";
+            case "AdminUserTypeInfoText":
+                return "Der Typ des Benutzers (Derzeit für die regelmäßige Stipendium Zahlungen verwendet wird).";
+            case "Guest":
+                return "Gast";
+            case  "Resident":
+                return "Einwohner";
+            case "Member":
+                return "Mitglied";
+            case "Contractor":
+                return "Auftragnehmer";
+            case "Charter_Member":
+                return "Charter-Mitglied";
+
                     // ColorBox
                 case "ColorBoxImageText":
                     return "Image";
@@ -686,6 +702,23 @@
                     return "Starte Slide Show";
                 case "ColorBoxStopSlideshowText":
                     return "Stope Slide Show";
+
+                // Maintenance
+            case "NoAccountFound":
+                return "Kein Konto gefunden";
+            case "DisplayInMenu":
+                return "Anzeige im Menü";
+            case "ParentText":
+                return "Menü Mutter";
+            case "CannotSetParentToChild":
+                return "Kann nicht Menüpunkt als Kind selbst festgelegt.";
+            case "TopLevel":
+                return "Erste Ebene";
+            case "HideLanguageBarText":
+                return "Sprachauswahlleiste ausblenden";
+            case "HideStyleBarText":
+                return "Stil Auswahlleiste ausblenden";
+
             }
             return "UNKNOWN CHARACTER";
         }

@@ -66,6 +66,15 @@ namespace WhiteCore.Framework.Utilities
         public const int USER_GOD_FULL = 200;
         public const int USER_GOD_MAINTENANCE = 250;
 
+        // user flags (account types)
+        public const int USER_FLAG_GUEST      = 0;         // Temporary: (Default) No payment info on account    
+        public const int USER_FLAG_RESIDENT   = 200;        // Resident: Payment info on account
+        public const int USER_FLAG_PAY        = 300;        // Testing: Payment info on account
+        public const int USER_FLAG_NOPAY      = 400;        // Testing: No Payment info on account
+        public const int USER_FLAG_MEMBER     = 600;        // Member Estatute: Payment info on account
+        public const int USER_FLAG_CONTRACTOR = 800;        // Contracted
+        public const int USER_FLAG_CHARTERMEMBER = 3840;    // Charter memebe
+
 
     }
 }

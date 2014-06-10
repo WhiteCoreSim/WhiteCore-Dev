@@ -163,6 +163,12 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                         HandleSetUserLevel, false, true);
 
                     MainConsole.Instance.Commands.AddCommand(
+                        "set user type",
+                        "set user type [<first> [<last> [<type>]]]",
+                        "Set the user account type. I.e. Guest, Resident, Member etc (Used for stipend payments)",
+                        HandleSetUserType, false, true);
+
+                    MainConsole.Instance.Commands.AddCommand(
                         "set user profile title",
                         "set user profile title [<first> [<last> [<Title>]]]",
                         "Sets the title (Normally resident) in a user's title to some custom value.",
@@ -715,6 +721,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: User level set for user {0} {1} to {2}", firstName, lastName, level);
         }
 
+
         protected void HandleShowUserAccount(IScene scene, string[] cmd)
         {
             // remove 'user' from the cmd 
@@ -759,6 +766,73 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             MainConsole.Instance.CleanInfo("  Flags  : " + ua.UserFlags);
         }
 
+        private int UserTypeToUserFlags(string userType)
+        {
+            switch (userType)
+            {
+            case "Guest":
+                return Constants.USER_FLAG_GUEST;
+            case "Resident":
+                return Constants.USER_FLAG_RESIDENT;
+            case "Member":
+                return Constants.USER_FLAG_MEMBER;
+            case "Contractor":
+                return Constants.USER_FLAG_CONTRACTOR;
+            case "Charter_Member":
+                return Constants.USER_FLAG_CHARTERMEMBER;
+            default:
+                return Constants.USER_FLAG_GUEST;
+            }
+        }
+
+        /// <summary>
+        /// Handles the set user level command.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmdparams">Cmdparams.</param>
+        protected void HandleSetUserType(IScene scene, string[] cmdparams)
+        {
+            string firstName;
+            string lastName;
+            List <string> userTypes = new List<string>(new [] {"Guest", "Resident", "Member", "Contractor", "Charter_Member"});
+            int userFlags;
+
+            firstName = cmdparams.Length < 4 ? MainConsole.Instance.Prompt("First name") : cmdparams[3];
+            if (firstName == "")
+                return;
+
+            lastName = cmdparams.Length < 5 ? MainConsole.Instance.Prompt("Last name") : cmdparams[4];
+            if (lastName == "")
+                return;
+
+            UserAccount account = GetUserAccount(null, firstName, lastName);
+            if (account == null)
+            {
+                MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: Unable to locate this user");
+                return;
+            }
+
+            // ensure the main library/realestate owner is left alone!
+            var libraryOwner = new UUID (Constants.LibraryOwner);
+            var realestateOwner = new UUID(Constants.RealEstateOwnerUUID);
+            if ( (account.PrincipalID == libraryOwner) || (account.PrincipalID == realestateOwner) )
+            {
+                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Changing system users is not a good idea!");
+            }
+
+            // Get user type (for payments etc)
+            var userType = MainConsole.Instance.Prompt("User type", "Resident", userTypes);
+            userFlags = UserTypeToUserFlags (userType);
+
+            account.UserFlags = userFlags;
+
+            bool success = StoreUserAccount(account);
+            if (!success)
+                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Unable to set user type for account '{0} {1}'.", firstName, lastName);
+            else
+                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: User '{0} {1}' set to {2}", firstName, lastName, userType);
+        }
+
         /// <summary>
         ///     Handle the create (add) user command from the console.
         /// </summary>
@@ -770,6 +844,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             string lastName = "User";
             string password, email, uuid, scopeID;
             bool sysFlag = false;
+            List <string> userTypes = new List<string>(new [] {"Guest", "Resident", "Member", "Contractor", "Charter_Member"});
 
             List<string> cmdparams = new List<string>(cmd);
             foreach (string param in cmd)
@@ -807,7 +882,10 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 email = MainConsole.Instance.Prompt ("Email", email);
             }
 
-            // Allow the user to modify the UUID  - for matching with other Grids etc eg SL
+            // Get user type (for payments etc)
+            var userType = MainConsole.Instance.Prompt("User type", "Resident", userTypes);
+ 
+            // Allow the modifcation the UUID  - for matching user UUID with other Grids etc eg SL
             uuid = UUID.Random().ToString();
             uuid = MainConsole.Instance.Prompt("UUID (Don't change unless you have a reason)", uuid);
 
@@ -830,6 +908,14 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             CreateUser(UUID.Parse(uuid), UUID.Parse(scopeID), name, Util.Md5Hash(password), email);
             // CreateUser will tell us success or problem
             //MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: User '{0}' created", name);
+
+            UserAccount account = GetUserAccount(null, firstName, lastName);
+            if (account != null)
+            {
+                account.UserFlags = UserTypeToUserFlags (userType);
+                StoreUserAccount(account);
+            }
+
         }
 
         /// <summary>

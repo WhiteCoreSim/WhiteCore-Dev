@@ -38,8 +38,8 @@ namespace WhiteCore.Framework.Services
         public string Email;
         public string Name { get; set; }
         public UUID PrincipalID { get; set; }
-        public int UserFlags;
-        public int UserLevel;
+        public int UserFlags = Constants.USER_FLAG_GUEST;
+        public int UserLevel = Constants.USER_NORMAL;
 
         public UserAccount()
         {

@@ -49,7 +49,7 @@ namespace Simple.Currency
             IUserAccountService userService = m_registry.RequestModuleInterface<IUserAccountService>();
             UserAccount user = userService.GetUserAccount(null, userid);
             if (user == null) return null;
-            if ((m_options.StipendsPremiumOnly) && ((user.UserFlags & 600) != 600)) return null;
+            if ((m_options.StipendsPremiumOnly) && ((user.UserFlags & Constants.USER_FLAG_MEMBER) != Constants.USER_FLAG_MEMBER)) return null;
 
             SchedulerItem i = m_scheduler.Get(user.PrincipalID.ToString(), "StipendsPayout");
             if (i != null) return null;
@@ -80,7 +80,7 @@ namespace Simple.Currency
             si.FromOSD((OSDMap)OSDParser.DeserializeJson(parameters.ToString()));
             IUserAccountService userService = m_registry.RequestModuleInterface<IUserAccountService>();
             UserAccount ua = userService.GetUserAccount(null, si.AgentID);
-            if ((ua != null) && (ua.UserFlags >= 0) && ((!m_options.StipendsPremiumOnly) || ((ua.UserLevel & 600) == 600)))
+            if ((ua != null) && (ua.UserFlags >= 0) && ((!m_options.StipendsPremiumOnly) || ((ua.UserLevel & Constants.USER_FLAG_MEMBER) == Constants.USER_FLAG_MEMBER)))
             {
                 if (m_options.GiveStipendsOnlyWhenLoggedIn)
                 {

@@ -25,9 +25,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
 using WhiteCore.Framework.DatabaseInterfaces;
-using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Profile;
@@ -61,6 +59,25 @@ namespace WhiteCore.Modules.Web
             get { return true; }
         }
 
+        int UserTypeToUserFlags(string userType)
+        {
+            switch (userType)
+            {
+            case "Guest":
+                return Constants.USER_FLAG_GUEST;
+            case "Resident":
+                return Constants.USER_FLAG_RESIDENT;
+            case "Member":
+                return Constants.USER_FLAG_MEMBER;
+            case "Contractor":
+                return Constants.USER_FLAG_CONTRACTOR;
+            case "Charter_Member":
+                return Constants.USER_FLAG_CHARTERMEMBER;
+            default:
+                return Constants.USER_FLAG_GUEST;
+            }
+        }
+
         public Dictionary<string, object> Fill(WebInterface webInterface, string filename, OSHttpRequest httpRequest,
                                                OSHttpResponse httpResponse, Dictionary<string, object> requestParameters,
                                                ITranslator translator, out string response)
@@ -77,6 +94,27 @@ namespace WhiteCore.Modules.Web
             var agentService = Framework.Utilities.DataManager.RequestPlugin<IAgentConnector>();
             UserAccount account = userService.GetUserAccount(null, user);
             IAgentInfo agent = agentService.GetAgent(user);
+
+            if (agent == null)
+                error = "No agent information is available";
+
+            if (requestParameters.ContainsKey("Submit") &&
+                requestParameters["Submit"].ToString() == "SubmitSetUserType")
+            {
+
+                string UserType = requestParameters ["UserType"].ToString ();
+                int UserFlags = UserTypeToUserFlags (UserType);
+
+                if (agent != null)
+                {
+                    agent.OtherAgentInformation ["UserFlags"] = UserFlags;
+                    agentService.UpdateAgent (agent);
+                    response = "User has been updated.";
+                } else
+                    response = "Agent information is not available! Has the user logged in yet?";
+                return null;
+            }
+
             if (requestParameters.ContainsKey("Submit") &&
                 requestParameters["Submit"].ToString() == "SubmitPasswordChange")
             {
@@ -130,27 +168,47 @@ namespace WhiteCore.Modules.Web
                 int timeDays = int.Parse(requestParameters["TimeDays"].ToString());
                 int timeHours = int.Parse(requestParameters["TimeHours"].ToString());
                 int timeMinutes = int.Parse(requestParameters["TimeMinutes"].ToString());
-                agent.Flags |= IAgentFlags.TempBan;
-                DateTime until = DateTime.Now.AddDays(timeDays).AddHours(timeHours).AddMinutes(timeMinutes);
-                agent.OtherAgentInformation["TemperaryBanInfo"] = until;
-                agentService.UpdateAgent(agent);
-                error = "User has been banned.";
+
+                if (agent != null)
+                {
+                    agent.Flags |= IAgentFlags.TempBan;
+                    DateTime until = DateTime.Now.AddDays (timeDays).AddHours (timeHours).AddMinutes (timeMinutes);
+                    agent.OtherAgentInformation ["TemperaryBanInfo"] = until;
+                    agentService.UpdateAgent (agent);
+                    response = "User has been banned.";
+                } else
+                    response = "Agent information is not available! Has the user logged in yet?";
+
+                return null;
             }
             if (requestParameters.ContainsKey("Submit") &&
                 requestParameters["Submit"].ToString() == "SubmitBanUser")
             {
-                agent.Flags |= IAgentFlags.PermBan;
-                agentService.UpdateAgent(agent);
-                error = "User has been banned.";
+                if( agent != null)
+                {
+                    agent.Flags |= IAgentFlags.PermBan;
+                    agentService.UpdateAgent(agent);
+                    response = "User has been banned.";
+                } else
+                    response = "Agent information is not available! Has the user logged in yet?";
+
+                return null;
             }
             if (requestParameters.ContainsKey("Submit") &&
                 requestParameters["Submit"].ToString() == "SubmitUnbanUser")
             {
-                agent.Flags &= ~IAgentFlags.TempBan;
-                agent.Flags &= ~IAgentFlags.PermBan;
-                agent.OtherAgentInformation.Remove("TemperaryBanInfo");
-                agentService.UpdateAgent(agent);
-                error = "User has been unbanned.";
+
+                if (agent != null)
+                {
+                    agent.Flags &= ~IAgentFlags.TempBan;
+                    agent.Flags &= ~IAgentFlags.PermBan;
+                    agent.OtherAgentInformation.Remove("TemperaryBanInfo");
+                    agentService.UpdateAgent(agent);
+                    response = "User has been unbanned.";
+                } else
+                    response = "Agent information is not available! Has the user logged in yet?";
+
+                return null;
             }
             if (requestParameters.ContainsKey("Submit") &&
                 requestParameters["Submit"].ToString() == "SubmitLoginAsUser")
@@ -236,6 +294,9 @@ namespace WhiteCore.Modules.Web
             vars.Add("Login", translator.GetTranslatedString("Login"));
             vars.Add("TypeUserNameToConfirm", translator.GetTranslatedString("TypeUserNameToConfirm"));
 
+            vars.Add("AdminUserTypeInfoText",translator.GetTranslatedString("AdminUserTypeInfoText"));
+            vars.Add("AdminSetUserTypeText", translator.GetTranslatedString("UserTypeText"));
+
             vars.Add("AdminLoginInAsUserText", translator.GetTranslatedString("AdminLoginInAsUserText"));
             vars.Add("AdminLoginInAsUserInfoText", translator.GetTranslatedString("AdminLoginInAsUserInfoText"));
             vars.Add("AdminDeleteUserText", translator.GetTranslatedString("AdminDeleteUserText"));
@@ -278,6 +339,15 @@ namespace WhiteCore.Modules.Web
             vars.Add("DaysText", translator.GetTranslatedString("DaysText"));
             vars.Add("HoursText", translator.GetTranslatedString("HoursText"));
             vars.Add("MinutesText", translator.GetTranslatedString("MinutesText"));
+
+            List<Dictionary<string, object>> userTypeArgs = new List<Dictionary<string, object>>();
+            userTypeArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Guest")}});
+            userTypeArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Resident")}});
+            userTypeArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Member")}});
+            userTypeArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Contractor")}});
+            userTypeArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Charter_Member")}});
+
+            vars.Add("UserType", userTypeArgs);
 
             return vars;
         }

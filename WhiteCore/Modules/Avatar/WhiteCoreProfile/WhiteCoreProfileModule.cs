@@ -561,7 +561,7 @@ namespace WhiteCore.Modules.Profiles
                 {
                     charterMember = new Byte[1];
                     if (TargetAccount != null)
-                        charterMember[0] = (Byte) ((TargetAccount.UserFlags & 0xf00) >> 8);
+                        charterMember[0] = (Byte) ((TargetAccount.UserFlags & Constants.USER_FLAG_CHARTERMEMBER) >> 8);     // CharterMember == 0xf00
                 }
                 else
                 {
@@ -615,7 +615,7 @@ namespace WhiteCore.Modules.Profiles
             {
                 charterMember = new Byte[1];
                 if (account != null)
-                    charterMember[0] = (Byte) ((account.UserFlags & 0xf00) >> 8);
+                    charterMember[0] = (Byte) ((account.UserFlags & Constants.USER_FLAG_CHARTERMEMBER) >> 8);   // CharterMember == 0xf00
             }
             else
                 charterMember = Utils.StringToBytes(Profile.MembershipGroup);

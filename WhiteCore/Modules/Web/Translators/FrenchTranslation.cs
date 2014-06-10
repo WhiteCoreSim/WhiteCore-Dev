@@ -673,6 +673,22 @@
                 case "December":
                     return "Decembre";
 
+            // User types
+            case "UserTypeText":
+                return "Type d'utilisateur";
+            case "AdminUserTypeInfoText":
+                return "Le type d'utilisateur (Actuellement utilisé pour les paiements allocations de formation périodiques).";
+            case "Guest":
+                return "Invité";
+            case  "Resident":
+                return "Résident";
+            case "Member":
+                return "Membre";
+            case "Contractor":
+                return "Entrepreneur";
+            case "Charter_Member":
+                return "Membre de la Charte";
+
                     // ColorBox
                 case "ColorBoxImageText":
                     return "Image";
@@ -688,6 +704,23 @@
                     return "Démarrer Slide Show";
                 case "ColorBoxStopSlideshowText":
                     return "Arrêter Slide Show";
+
+            // Maintenance
+            case "NoAccountFound":
+                return "Aucun compte trouvé";
+            case "DisplayInMenu":
+                return "Affichage dans le menu";
+            case "ParentText":
+                return "Menu Parent";
+            case "CannotSetParentToChild":
+                return "Vous ne pouvez pas définir de menu comme un enfant à se.";
+            case "TopLevel":
+                return "Haut niveau";
+            case "HideLanguageBarText":
+                return "Masquer la barre de sélection de la langue";
+            case "HideStyleBarText":
+                return "Masquer la barre de sélection de style";
+
             }
             return "UNKNOWN CHARACTER";
         }

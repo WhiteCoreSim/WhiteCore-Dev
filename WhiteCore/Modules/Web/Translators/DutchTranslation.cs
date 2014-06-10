@@ -685,6 +685,22 @@ namespace WhiteCore.Modules.Web.Translators
                     return "November";
                 case "December":
                     return "December";
+            
+                // User types
+            case "UserTypeText":
+                return "Soort gebruiker";
+            case "AdminUserTypeInfoText":
+                return "Het type gebruiker (momenteel gebruikt voor periodieke betalingen stipendium).";
+            case "Guest":
+                return "Gast";
+            case  "Resident":
+                return "Ingezetene";
+            case "Member":
+                return "Lid";
+            case "Contractor":
+                return "Aannemer";
+            case "Charter_Member":
+                return "Mede-oprichter";
 
                     // ColorBox
                 case "ColorBoxImageText":
@@ -703,21 +719,21 @@ namespace WhiteCore.Modules.Web.Translators
                     return "Stop Slide Show";
 
 
-                    // English only so far
-                case "NoAccountFound":
-                    return "No account found";
-                case "DisplayInMenu":
-                    return "Display In Menu";
-                case "ParentText":
-                    return "Menu Parent";
-                case "CannotSetParentToChild":
-                    return "Cannot set menu item as a child to itself.";
-                case "TopLevel":
-                    return "Top Level";
-                case "HideLanguageBarText":
-                    return "Hide Language Selection Bar";
-                case "HideStyleBarText":
-                    return "Hide Style Selection Bar";
+            // Maintenance
+            case "NoAccountFound":
+                return "Nog geen account gevonden";
+            case "DisplayInMenu":
+                return "Display in het menu";
+            case "ParentText":
+                return "Menu ouder";
+            case "CannotSetParentToChild":
+                return "Kan geen menu-item als een kind naar zichzelf.";
+            case "TopLevel":
+                return "Top Level";
+            case "HideLanguageBarText":
+                return "Verbergen taalkeuzemenu";
+            case "HideStyleBarText":
+                return "Verbergen stijl keuzebalk";
             }
             return "UNKNOWN CHARACTER";
         }

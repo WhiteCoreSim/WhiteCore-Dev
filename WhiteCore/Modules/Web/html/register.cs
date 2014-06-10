@@ -97,6 +97,25 @@ namespace WhiteCore.Modules.Web
             }
         }
 
+        int UserTypeToUserFlags(string userType)
+        {
+            switch (userType)
+            {
+            case "Guest":
+                return Constants.USER_FLAG_GUEST;
+            case "Resident":
+                return Constants.USER_FLAG_RESIDENT;
+            case "Member":
+                return Constants.USER_FLAG_MEMBER;
+            case "Contractor":
+                return Constants.USER_FLAG_CONTRACTOR;
+            case "Charter_Member":
+                return Constants.USER_FLAG_CHARTERMEMBER;
+            default:
+                return Constants.USER_FLAG_GUEST;
+            }
+        }
+
         public Dictionary<string, object> Fill(WebInterface webInterface, string filename, OSHttpRequest httpRequest,
                                                OSHttpResponse httpResponse, Dictionary<string, object> requestParameters,
                                                ITranslator translator, out string response)
@@ -140,6 +159,7 @@ namespace WhiteCore.Modules.Web
                 string UserDOBMonth = requestParameters["UserDOBMonth"].ToString();
                 string UserDOBDay = requestParameters["UserDOBDay"].ToString();
                 string UserDOBYear = requestParameters["UserDOBYear"].ToString();
+                string UserType = requestParameters ["UserType"].ToString ();
                 string AvatarArchive = requestParameters.ContainsKey("AvatarArchive")
                                            ? requestParameters["AvatarArchive"].ToString()
                                            : "";
@@ -148,7 +168,10 @@ namespace WhiteCore.Modules.Web
 
                 // revise UserDOBMonth to a number
                 UserDOBMonth = ShortMonthToNumber(UserDOBMonth);
- 
+
+                // revise Type flags
+                int UserFlags = UserTypeToUserFlags (UserType);
+
                 // a bit of idiot proofing
                 if (AvatarName == "")  {
                     response = "<h3>" + translator.GetTranslatedString ("AvatarNameError") + "</h3>";   
@@ -188,6 +211,7 @@ namespace WhiteCore.Modules.Web
                         agent.OtherAgentInformation["UserDOBMonth"] = UserDOBMonth;
                         agent.OtherAgentInformation["UserDOBDay"] = UserDOBDay;
                         agent.OtherAgentInformation["UserDOBYear"] = UserDOBYear;
+                        agent.OtherAgentInformation ["UserFlags"] = UserFlags;
                         /*if (activationRequired)
                         {
                             UUID activationToken = UUID.Random();
@@ -251,6 +275,16 @@ namespace WhiteCore.Modules.Web
             vars.Add("Days", daysArgs);
             vars.Add("Months", monthsArgs);
             vars.Add("Years", yearsArgs);
+
+            List<Dictionary<string, object>> userTypeArgs = new List<Dictionary<string, object>>();
+            userTypeArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Guest")}});
+            userTypeArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Resident")}});
+            userTypeArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Member")}});
+            userTypeArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Contractor")}});
+            userTypeArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Charter_Member")}});
+
+            vars.Add("UserTypeText", translator.GetTranslatedString("UserTypeText"));
+            vars.Add("UserType", userTypeArgs);
 
             List<AvatarArchive> archives = webInterface.Registry.RequestModuleInterface<IAvatarAppearanceArchiver>().GetAvatarArchives();
 

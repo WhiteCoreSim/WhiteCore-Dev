@@ -25,6 +25,30 @@
 <div id="content">
     <div id="ContentHeaderCenter"><h2>{SystemName}: {EdittingText} {UserName}</h2></div>
 	<div id="info_message"><h3>{ErrorMessage}</h3></div>
+	<h3>{AdminSetUserTypeText}</h3>
+	<p class="info">{AdminUserTypeInfoText}</p>
+	<form id="set_user_type_form" action="admin/edit_user.html" method="post">
+		<table id="login">
+  			<tbody>
+    			<tr>
+      				<td class="register_left"><p>{AdminSetUserTypeText}</p></td>
+      				<td class="register_dob">
+	    				<select id="UserType" name="UserType">			
+{UserTypeArrayBegin}
+		  					<option value="{Value}">{Value}</option>
+{UserTypeArrayEnd}
+						</select>
+	  				</td>
+					<td>
+						<input hidden="true" label="userid" id="userid" name="userid" value="{UserID}"/>
+						<input type="hidden" label="Submit" id="Submit" name="Submit" value="SubmitSetUserType" />
+						<button id="settype_bouton" type="Submit" name="Submit" value="SubmitSetUserType">{Submit}</button>
+					</td>
+    			</tr>
+			</tbody>
+		</table>
+	</form>
+
 	<h3>{AdminLoginInAsUserText}</h3>
 	<p class="info">{AdminLoginInAsUserInfoText}</p>
 	<form id="login_as_user_form" action="admin/edit_user.html" method="post">
@@ -153,6 +177,22 @@
 {IfUserOnlineEnd}
 </div>
 <script>
+  /* attach a submit handler to the form */
+  $("#set_user_type_form").submit(function(event) {
+
+    /* stop form from submitting normally */
+    event.preventDefault(); 
+    /* get some values from elements on the page: */
+    var $form = $( this ),
+        url = $form.attr( 'action' );
+    /* Send the data using post and put the results in a div */
+    $.post( url, $form.serialize(),
+      function( data ) {
+		$("#info_message").empty().append("<h3>" + data + "</h3>");
+      }
+    );
+  });
+
   /* attach a submit handler to the form */
   $("#login_as_user_form").submit(function(event) {
 
