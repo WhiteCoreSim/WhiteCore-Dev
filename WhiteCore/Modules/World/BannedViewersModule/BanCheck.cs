@@ -165,7 +165,15 @@ namespace WhiteCore.Modules.Ban
             presenceInfo = Framework.Utilities.DataManager.RequestPlugin<IPresenceInfo>();
             m_accountService = UserAccountService;
 
+            if (!m_accountService.RemoteCalls())
+                AddCommands ();                     // only add if we are local
+        }
+
+        private void AddCommands()
+        {
+        
             if (MainConsole.Instance != null)
+
             {
                 MainConsole.Instance.Commands.AddCommand(
                     "show user info", "show user info", "Info on a given user", UserInfo, false, true);
@@ -180,6 +188,7 @@ namespace WhiteCore.Modules.Ban
                 MainConsole.Instance.Commands.AddCommand(
                     "unban user", "unban user", "Removes the block for logging in on a given user", UnBlockUser, false, true);
             }
+
         }
 
         #endregion

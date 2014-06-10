@@ -124,6 +124,11 @@ namespace WhiteCore.Framework.Services
 
     public interface IUserAccountService
     {
+        /// <summary>
+        /// Returns true if the service is remote.
+        /// </summary>
+        bool RemoteCalls();
+
         IUserAccountService InnerService { get; }
 
         /// <summary>

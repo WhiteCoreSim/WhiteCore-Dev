@@ -50,6 +50,11 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
 
         #endregion
 
+        public bool RemoteCalls()
+        {
+            return m_doRemoteCalls;
+        }
+
         #region IService Members
 
         public virtual string Name
