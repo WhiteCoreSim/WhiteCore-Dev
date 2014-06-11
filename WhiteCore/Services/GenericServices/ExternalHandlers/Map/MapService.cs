@@ -95,7 +95,7 @@ namespace WhiteCore.Services
                 g.FillRectangle(sea, 0, 0, 256, 256);
             }
             m_blankRegionTileData = CacheMapTexture(1, 0, 0, m_blankRegionTile, true);
-            /*string path = Path.Combine("assetcache", Path.Combine("mapzoomlevels", "blankMap.index"));
+            /*string path = Path.Combine(m_assetCacheDir, Path.Combine("mapzoomlevels", "blankMap.index"));
             if(File.Exists(path))
             {
                 FileStream stream = File.OpenRead(path);
@@ -492,7 +492,7 @@ namespace WhiteCore.Services
             if (!m_cacheEnabled)
                 return new byte[0];
 
-                //string fullPath = Path.Combine("assetcache", Path.Combine("mapzoomlevels", name));
+            //string fullPath = Path.Combine(m_assetCacheDir, Path.Combine("mapzoomlevels", name));
             string fullPath = Path.Combine(m_assetMapCacheDir, name);
             if (File.Exists(fullPath))
             {
@@ -522,7 +522,7 @@ namespace WhiteCore.Services
             }
 
             string name = string.Format("map-{0}-{1}-{2}-objects.jpg", maplayer, regionX, regionY);
-                //string fullPath = Path.Combine("assetcache", Path.Combine("mapzoomlevels", name));
+            //string fullPath = Path.Combine(m_assetCacheDir, Path.Combine("mapzoomlevels", name));
             string fullPath = Path.Combine(m_assetMapCacheDir, name);
             if (File.Exists(fullPath))
             {
@@ -566,7 +566,7 @@ namespace WhiteCore.Services
                 return;
 
             string name = string.Format("map-{0}-{1}-{2}-objects.jpg", maplayer, regionX, regionY);
-            //string fullPath = Path.Combine("assetcache", Path.Combine("mapzoomlevels", name));
+            //string fullPath = Path.Combine(m_assetCacheDir, Path.Combine("mapzoomlevels", name));
             string fullPath = Path.Combine(m_assetMapCacheDir, name);
             File.WriteAllBytes(fullPath, data);
         }

@@ -984,7 +984,7 @@ namespace WhiteCore.Modules.WorldMap
             OSDMap map = SerializeCache();
             FileStream stream =
                 new FileStream(
-                    Path.Combine(Path.Combine("assetcache", "mapTileTextureCache"),
+                    Path.Combine(Path.Combine(m_assetCacheDir, "mapTileTextureCache"),
                                  m_scene.RegionInfo.RegionName + ".tc"), FileMode.Create);
             StreamWriter writer = new StreamWriter(stream);
             writer.WriteLine(OSDParser.SerializeJsonString(map));
