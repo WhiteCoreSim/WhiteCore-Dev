@@ -8,7 +8,7 @@
 cd ./bin
 sleep 1
 echo Starting Standalone Region Simulator...
-mono WhiteCore.exe-skipconfig
+mono WhiteCore.exe -skipconfig
 wait
 exit
 
