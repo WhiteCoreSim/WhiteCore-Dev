@@ -29,11 +29,13 @@ using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
-using WhiteCore.Framework.Services.ClassHelpers.Profile;
 using OpenMetaverse;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using WhiteCore.Framework.SceneInfo;
+using WhiteCore.Framework.Utilities;
+using GridRegion = WhiteCore.Framework.Services.GridRegion;
+using RegionFlags = WhiteCore.Framework.Services.RegionFlags;
 
 namespace WhiteCore.Modules.Web
 {
@@ -65,102 +67,105 @@ namespace WhiteCore.Modules.Web
                                                ITranslator translator, out string response)
         {
             // under development
-            response = "<h3>Sorry! This feature is not available yet<</h3><br /> Redirecting to main page" +
-                "<script language=\"javascript\">" +
-                "setTimeout(function() {window.location.href = \"index.html\";}, 3000);" +
-                "</script>";
-            return null;
+            //response = "<h3>Sorry! This feature is not available yet<</h3><br /> Redirecting to main page" +
+            //    "<script language=\"javascript\">" +
+            //    "setTimeout(function() {window.location.href = \"index.html\";}, 3000);" +
+            //    "</script>";
+            //return null;
             
-            // TODO: Write the correct code
+            response = null;
+            var vars = new Dictionary<string, object>();
+            if (httpRequest.Query.ContainsKey("regionid"))
+            {
+                var regionService = webInterface.Registry.RequestModuleInterface<IGridService> ();
+                var region = regionService.GetRegionByUUID(null, UUID.Parse(httpRequest.Query["regionid"].ToString()));
 
-            //response = null;
-            //var vars = new Dictionary<string, object>();
+                IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector>();
+                EstateSettings estate = estateConnector.GetEstateSettings(region.RegionID);
 
-            //string username = filename.Split('/').LastOrDefault();
-            //UserAccount account = null;
-            //if (httpRequest.Query.ContainsKey("userid"))
-            //{
-            //    string userid = httpRequest.Query["userid"].ToString();
+                vars.Add("RegionName", region.RegionName);
+                vars.Add("OwnerUUID", estate.EstateOwner);
+                var estateOwnerAccount = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
+                    GetUserAccount(null, estate.EstateOwner);
+                vars.Add("OwnerName", estateOwnerAccount == null ? "No account found" : estateOwnerAccount.Name);
+                vars.Add("RegionLocX", region.RegionLocX/Constants.RegionSize);
+                vars.Add("RegionLocY", region.RegionLocY/Constants.RegionSize);
+                vars.Add("RegionSizeX", region.RegionSizeX);
+                vars.Add("RegionSizeY", region.RegionSizeY);
+                vars.Add("RegionType", region.RegionType);
+                vars.Add("RegionOnline",
+                    (region.Flags & (int) RegionFlags.RegionOnline) ==
+                    (int) RegionFlags.RegionOnline
+                    ? translator.GetTranslatedString("Online")
+                    : translator.GetTranslatedString("Offline"));
 
-            //    account = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
-            //                           GetUserAccount(null, UUID.Parse(userid));
-            //}
-            //else if (httpRequest.Query.ContainsKey("name") || username.Contains('.'))
-            //{
-            //    string name = httpRequest.Query.ContainsKey("name") ? httpRequest.Query["name"].ToString() : username;
-            //    name = name.Replace('.', ' ');
-            //    account = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
-            //                           GetUserAccount(null, name);
-            //}
-            //else
-            //{
-            //    username = username.Replace("%20", " ");
-            //    account = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
-            //                           GetUserAccount(null, username);
-            //}
+                IDirectoryServiceConnector directoryConnector =
+                    Framework.Utilities.DataManager.RequestPlugin<IDirectoryServiceConnector>();
+                if (directoryConnector != null)
+                {
+                    List<LandData> data = directoryConnector.GetParcelsByRegion(0, 10, region.RegionID, UUID.Zero,
+                        ParcelFlags.None, ParcelCategory.Any);
+                    List<Dictionary<string, object>> parcels = new List<Dictionary<string, object>>();
+                    string url = "../images/icons/no_parcel.jpg";
 
-            //if (account == null)
-            //    return vars;
+                    foreach (var p in data)
+                    {
+                        Dictionary<string, object> parcel = new Dictionary<string, object>();
+                        parcel.Add("ParcelNameText", translator.GetTranslatedString("ParcelNameText"));
+                        parcel.Add("ParcelOwnerText", translator.GetTranslatedString("ParcelOwnerText"));
+                        parcel.Add("ParcelUUID", p.GlobalID);
+                        parcel.Add("ParcelName", p.Name);
+                        parcel.Add("ParcelOwnerUUID", p.OwnerID);
+                        parcel.Add ("ParcelSnapshotURL", url);
+                        IUserAccountService accountService =
+                            webInterface.Registry.RequestModuleInterface<IUserAccountService>();
+                        if (accountService != null)
+                        {
+                            var account = accountService.GetUserAccount(null, p.OwnerID);
+                            if (account == null)
+                                parcel.Add("ParcelOwnerName", translator.GetTranslatedString("NoAccountFound"));
+                            else
+                                parcel.Add("ParcelOwnerName", account.Name);
+                        }
+                        parcels.Add(parcel);
+                    }
+                    vars.Add("ParcelInRegion", parcels);
+                    vars.Add("NumberOfParcelsInRegion", parcels.Count);
+                }
+                IWebHttpTextureService webTextureService = webInterface.Registry.
+                    RequestModuleInterface<IWebHttpTextureService>();
+                if (webTextureService != null && region.TerrainMapImage != UUID.Zero)
+                    vars.Add("RegionImageURL", webTextureService.GetTextureURL(region.TerrainMapImage));
+                else
+                    vars.Add("RegionImageURL", "images/icons/no_picture.jpg");
 
-            //vars.Add("UserName", account.Name);
+                // Menu Region
+                vars.Add("MenuRegionTitle", translator.GetTranslatedString("MenuRegionTitle"));
+                vars.Add("MenuParcelTitle", translator.GetTranslatedString("MenuParcelTitle"));
+                vars.Add("MenuOwnerTitle", translator.GetTranslatedString("MenuOwnerTitle"));
 
-            //IUserProfileInfo profile = Framework.Utilities.DataManager.RequestPlugin<IProfileConnector>().
-            //                                  GetUserProfile(account.PrincipalID);
-            //vars.Add("UserType", profile.MembershipGroup == "" ? "Resident" : profile.MembershipGroup);
-            //IWebHttpTextureService webhttpService =
-            //    webInterface.Registry.RequestModuleInterface<IWebHttpTextureService>();
-            //if (profile != null)
-            //{
-            //    if (profile.Partner != UUID.Zero)
-            //    {
-            //        account = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
-            //                               GetUserAccount(null, profile.Partner);
-            //        vars.Add("UserPartner", account.Name);
-            //    }
-            //    else
-            //        vars.Add("UserPartner", "No partner");
-            //    vars.Add("UserAboutMe", profile.AboutText == "" ? "Nothing here" : profile.AboutText);
-            //    string url = "../images/icons/no_picture.jpg";
-            //    if (webhttpService != null && profile.Image != UUID.Zero)
-            //        url = webhttpService.GetTextureURL(profile.Image);
-            //    vars.Add("UserPictureURL", url);
-            //}
+                vars.Add("RegionInformationText", translator.GetTranslatedString("RegionInformationText"));
+                vars.Add("OwnerNameText", translator.GetTranslatedString("OwnerNameText"));
+                vars.Add("RegionLocationText", translator.GetTranslatedString("RegionLocationText"));
+                vars.Add("RegionSizeText", translator.GetTranslatedString("RegionSizeText"));
+                vars.Add("RegionNameText", translator.GetTranslatedString("RegionNameText"));
+                vars.Add("RegionTypeText", translator.GetTranslatedString("RegionTypeText"));
+                vars.Add("RegionInfoText", translator.GetTranslatedString("RegionInfoText"));
+                vars.Add("RegionOnlineText", translator.GetTranslatedString("RegionOnlineText"));
+                vars.Add("NumberOfUsersInRegionText", translator.GetTranslatedString("NumberOfUsersInRegionText"));
+                vars.Add("ParcelsInRegionText", translator.GetTranslatedString("ParcelsInRegionText"));
+                vars.Add ("MainServerURL", webInterface.GridURL);
 
-            //vars.Add("UsersGroupsText", translator.GetTranslatedString("UsersGroupsText"));
+            }
 
-            //IGroupsServiceConnector groupsConnector =
-            //    Framework.Utilities.DataManager.RequestPlugin<IGroupsServiceConnector>();
-            //if (groupsConnector != null)
-            //{
-            //    List<Dictionary<string, object>> groups = new List<Dictionary<string, object>>();
-            //    foreach (var grp in groupsConnector.GetAgentGroupMemberships(account.PrincipalID, account.PrincipalID))
-            //    {
-            //        var grpData = groupsConnector.GetGroupProfile(account.PrincipalID, grp.GroupID);
-            //        string url = "../images/icons/no_picture.jpg";
-            //        if (webhttpService != null && grpData.InsigniaID != UUID.Zero)
-            //            url = webhttpService.GetTextureURL(grpData.InsigniaID);
-            //        groups.Add(new Dictionary<string, object>
-            //                       {
-            //                           {"GroupPictureURL", url},
-            //                           {"GroupName", grp.GroupName}
-            //                       });
-            //    }
-            //    vars.Add("Groups", groups);
-            //    vars.Add("GroupsJoined", groups.Count);
-            //}
+            return vars;
 
-            //// Menu Region
-            //vars.Add("MenuRegionTitle", translator.GetTranslatedString("MenuRegionTitle"));
-            //vars.Add("MenuParcelTitle", translator.GetTranslatedString("MenuParcelTitle"));
-            //vars.Add("MenuOwnerTitle", translator.GetTranslatedString("MenuOwnerTitle"));
-
-            //return vars;
         }
 
         public bool AttemptFindPage(string filename, ref OSHttpResponse httpResponse, out string text)
         {
             httpResponse.ContentType = "text/html";
-            text = File.ReadAllText("html/regionprofile/index.html");
+            text = File.ReadAllText("html/regionprofile/parcels.html");
             return true;
         }
     }

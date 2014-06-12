@@ -124,11 +124,11 @@ namespace WhiteCore.Modules.Web
                     Framework.Utilities.DataManager.RequestPlugin<IDirectoryServiceConnector>();
                 if (directoryConnector != null)
                 {
-                    List<LandData> data = directoryConnector.GetParcelsByRegion(0, 10, region.RegionID, UUID.Zero,
+                    List<LandData> parcelData = directoryConnector.GetParcelsByRegion(0, 10, region.RegionID, UUID.Zero,
                         ParcelFlags.None, ParcelCategory.Any);
-                    List<Dictionary<string, object>> parcels = new List<Dictionary<string, object>>();
-                    foreach (var p in data)
-                    {
+                    /*List<Dictionary<string, object>> parcels = new List<Dictionary<string, object>>();
+                    foreach (var p in parcelData)
+                     {
                         Dictionary<string, object> parcel = new Dictionary<string, object>();
                         parcel.Add("ParcelNameText", translator.GetTranslatedString("ParcelNameText"));
                         parcel.Add("ParcelOwnerText", translator.GetTranslatedString("ParcelOwnerText"));
@@ -147,8 +147,10 @@ namespace WhiteCore.Modules.Web
                         }
                         parcels.Add(parcel);
                     }
+
                     vars.Add("ParcelInRegion", parcels);
-                    vars.Add("NumberOfParcelsInRegion", parcels.Count);
+*/
+                    vars.Add("NumberOfParcelsInRegion", parcelData.Count);
                 }
                 IWebHttpTextureService webTextureService = webInterface.Registry.
                     RequestModuleInterface<IWebHttpTextureService>();

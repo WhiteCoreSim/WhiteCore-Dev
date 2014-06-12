@@ -65,11 +65,11 @@
 				content.load("base.html" + window.location.search);
 				found = new Boolean(1);
 				break;
-			case "groups":
+			case "parcels":
 				content.load("parcels.html" + window.location.search);
 				found = new Boolean(1);
 				break;
-			case "picks":
+			case "owner":
 				content.load("owner.html" + window.location.search);
 				found = new Boolean(1);
 				break;
@@ -78,6 +78,8 @@
 			content.load("base.html" + window.location.search);
 	});
     </script>
+	<!-- Carousel -->
+	<script src="../javascripts/jquery.jcarousel.min.js"></script>
 
 </head>
 
@@ -88,7 +90,7 @@
 	<div id="topregion">
 		<ul id="menuregion">
 			<li id="region" class="fade active" alt="{TooltipsMenuRegion}" title="{TooltipsMenuRegion}">{MenuRegionTitle}</li>
-			<li id="parcel" class="fade " alt="{TooltipsMenuParcel}" title="{TooltipsMenuParcel}">{MenuParcelTitle}</li>
+			<li id="parcels" class="fade " alt="{TooltipsMenuParcel}" title="{TooltipsMenuParcel}">{MenuParcelTitle}</li>
 			<li id="owner" class="fade" alt="{TooltipsMenuOwner}" title="{TooltipsMenuOwner}">{MenuOwnerTitle}</li>
 		</ul>
 		<span class="clear"></span>
