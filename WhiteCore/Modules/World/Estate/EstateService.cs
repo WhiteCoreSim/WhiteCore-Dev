@@ -1044,9 +1044,6 @@ namespace WhiteCore.Modules.Estate
 
         public void FinishStartup(IScene scene, IConfigSource source, ISimulationBase openSimBase)
         {
-            IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector>();
-            if (!estateConnector.RemoteCalls())
-                CheckSystemEstateInfo();
         }
 
         public void PostFinishStartup(IScene scene, IConfigSource source, ISimulationBase openSimBase)
@@ -1077,33 +1074,7 @@ namespace WhiteCore.Modules.Estate
                 LoginsDisabled = false;
             }
         }
-
-        private void CheckSystemEstateInfo()
-        {
-            IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector>();
-            if (estateConnector == null)
-                return;
-
-            if (estateConnector.EstateExists (Constants.SystemEstateName))
-                return;
-
-            // Create a new estate
-            EstateSettings ES = new EstateSettings();
-            ES.EstateName = Constants.SystemEstateName;
-            ES.EstateOwner = (UUID) Constants.RealEstateOwnerUUID;
-
-            ES.EstateID = (uint) estateConnector.CreateNewEstate(ES);
-            if (ES.EstateID == 0)
-            {
-                MainConsole.Instance.Warn("There was an error in creating the system estate: " + ES.EstateName);
-                //EstateName holds the error. See LocalEstateConnector for more info.
-
-            } else {
-                MainConsole.Instance.InfoFormat("[EstateService]: The estate '{0}' owned by '{1}' has been created.", 
-                    Constants.SystemEstateName, Constants.RealEstateOwnerName);
-            }
-        }
-
+            
         #endregion
     }
 }

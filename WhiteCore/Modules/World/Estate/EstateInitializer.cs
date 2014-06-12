@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
@@ -187,6 +186,8 @@ namespace WhiteCore.Modules.Estate
         public void FinishStartup(IScene scene, IConfigSource source, ISimulationBase openSimBase)
         {
             IEstateConnector EstateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector>();
+            CheckSystemEstateInfo (EstateConnector);
+
             if (EstateConnector != null)
             {
                 EstateSettings ES = EstateConnector.GetEstateSettings(scene.RegionInfo.RegionID);
@@ -280,6 +281,35 @@ namespace WhiteCore.Modules.Estate
 
         public void DeleteRegion(IScene scene)
         {
+        }
+
+        private void CheckSystemEstateInfo(IEstateConnector estateConnector)
+        {
+            // these should have already been checked but just make sure...
+            if (estateConnector == null)
+                return;
+
+            if (estateConnector.RemoteCalls ())
+                return;
+
+            if (estateConnector.EstateExists (Constants.SystemEstateName))
+                return;
+
+            // Create a new estate
+            EstateSettings ES = new EstateSettings();
+            ES.EstateName = Constants.SystemEstateName;
+            ES.EstateOwner = (UUID) Constants.RealEstateOwnerUUID;
+
+            ES.EstateID = (uint) estateConnector.CreateNewEstate(ES);
+            if (ES.EstateID == 0)
+            {
+                MainConsole.Instance.Warn("There was an error in creating the system estate: " + ES.EstateName);
+                //EstateName holds the error. See LocalEstateConnector for more info.
+
+            } else {
+                MainConsole.Instance.InfoFormat("[EstateService]: The estate '{0}' owned by '{1}' has been created.", 
+                    Constants.SystemEstateName, Constants.RealEstateOwnerName);
+            }
         }
 
         protected void ChangeEstate(IScene scene, string[] cmd)
