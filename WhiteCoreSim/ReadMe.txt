@@ -4,11 +4,39 @@ June 2014
 ===============================================
 
 
-** Simplified startup scripts provided **
-=========================================
-Easy to use startup scripts can be found in the 'WhiteCoreDocs/StartupScripts' folder.
-These are provided to simplify running WhiteCore in your OS.
-Choose the appropriate one(s) and copy to the top level folder for ease of use.
+** Simplified startup scripts **
+================================
+Easy to use startup scripts are provided to simplify running WhiteCore.
+Choose the appropriate one(s) for your system and configuration.
+
+ *nix flavours (including Mac)
+-------------------------------
+All these scripts are intended to be executed from a terminal window.
+
+The following are the general startup scripts for use in testing, maintenance etc...
+sim_console.sh       			: Start only the WhiteCore standalone server
+grid_console.sh      			: Start only the WhiteCore grid server
+
+
+Note:
+ These 'background' modes require the 'screen' program installed on your system.
+   Linux (ubuntu variations) >> apt-get install screen;
+   Mac >> already available
+  
+run_standalonemode.sh       	: Run WhiteCore standalone mode in background
+run_gridmode.sh             	: Run WhiteCore grid mode in background
+
+
+GUI scripts for Windows and Mac
+
+-------------------------------
+
+The same commands are available as gui scripts, <double_click> to execute
+
+sim_console.command				: Mac
+sim_console.bat					: Windows
+grid_console.command			: Mac
+grid_console.bat				: Windows
 
 
 ** The default configuration **
@@ -42,7 +70,8 @@ Note:  You will need to use both the 'grid' and 'sim' startup scripts.
 
 ** Updating **
 ==============
-Checkout the 'Build Your Own.txt' file for details if you want to build from source.
+Checkout the 'Build Your Own.txt' file in the 'WhiteCoreDocs' folder for details
+ if you want to build from source.
 Re-compile and copy/paste the new 'WhiteCoreSim/bin' subdirectory from your build environment.
 
 Weekly 'Development' build snapshots are available at the following address's..
