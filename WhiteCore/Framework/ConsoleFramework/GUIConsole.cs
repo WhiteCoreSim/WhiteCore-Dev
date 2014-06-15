@@ -48,6 +48,12 @@ namespace WhiteCore.Framework.ConsoleFramework
         public List<string> m_promptOptions = new List<string>();
         public bool HasProcessedCurrentCommand { get; set; }
 
+        public string LogPath
+        {
+            get{ return MainConsole.Instance.LogPath; }
+            set{ MainConsole.Instance.LogPath = value;}
+        }
+
         public virtual void Initialize(IConfigSource source, ISimulationBase baseOpenSim)
         {
             if (source.Configs["Console"] == null ||

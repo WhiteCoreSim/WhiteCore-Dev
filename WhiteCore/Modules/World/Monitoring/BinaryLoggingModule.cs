@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
@@ -41,7 +40,7 @@ namespace WhiteCore.Modules.Monitoring
     {
         private static StatLogger m_statLog;
         private static TimeSpan m_statLogPeriod = TimeSpan.FromSeconds(300);
-        private static string m_statsDir = String.Empty;
+        private static string m_statsDir = MainConsole.Instance.LogPath;
         private static readonly Object m_statLockObject = new Object();
 
         protected bool m_collectStats;

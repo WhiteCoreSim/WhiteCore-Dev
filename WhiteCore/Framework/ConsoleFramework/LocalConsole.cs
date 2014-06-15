@@ -40,9 +40,6 @@ namespace WhiteCore.Framework.ConsoleFramework
     /// </summary>
     public class LocalConsole : CommandConsole
     {
-//        private static readonly ILog MainConsole.Instance = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
-        // private readonly object m_syncRoot = new object();
 
         private static readonly ConsoleColor[] Colors =
             {
@@ -93,9 +90,13 @@ namespace WhiteCore.Framework.ConsoleFramework
                                   "Get a general command list", base.Help, false, true);
 
             string logName = "";
-            if (source.Configs["Console"] != null)
-                logName = source.Configs["Console"].GetString("LogAppendName", "");
-            InitializeLog(logName);
+            string logPath = Constants.DEFAULT_DATA_DIR;
+            if (source.Configs ["Console"] != null) {
+                logName = source.Configs ["Console"].GetString ("LogAppendName", logName);
+                logPath = source.Configs ["Console"].GetString ("LogPath", logPath);
+            }
+
+            InitializeLog(logPath, logName);
         }
 
         private static ConsoleColor DeriveColor(string input)

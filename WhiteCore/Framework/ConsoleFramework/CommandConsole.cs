@@ -532,8 +532,16 @@ namespace WhiteCore.Framework.ConsoleFramework
     {
         public bool m_isPrompting;
         public int m_lastSetPromptOption;
-        protected System.IO.TextWriter m_logFile;
+        protected TextWriter m_logFile;
+        protected string m_logPath = Constants.DEFAULT_DATA_DIR;
+
         public List<string> m_promptOptions = new List<string>();
+
+        public string LogPath
+        {
+            get{ return m_logPath; }
+            set{ m_logPath = value;}
+        }
 
         public virtual void Initialize(IConfigSource source, ISimulationBase baseOpenSim)
         {
@@ -548,14 +556,25 @@ namespace WhiteCore.Framework.ConsoleFramework
 
             m_Commands.AddCommand("help", "help", "Get a general command list", Help, false, true);
             string logName = "";
-            if (source.Configs["Console"] != null)
-                logName = source.Configs["Console"].GetString("LogAppendName", "");
-            InitializeLog(logName);
+            string logPath = LogPath;
+            if (source.Configs ["Console"] != null) {
+                logName = source.Configs ["Console"].GetString ("LogAppendName", logName);
+                logPath = source.Configs ["Console"].GetString ("LogPath", logPath);
+            }
+
+            InitializeLog(logPath, logName);
         }
 
-        protected void InitializeLog(string filename)
+        protected void InitializeLog(string logPath, string appendName)
         {
-            m_logFile = StreamWriter.Synchronized(new StreamWriter(System.IO.Path.GetFileNameWithoutExtension(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName) + filename + ".log", true));
+            // check the logPath to ensure correct format
+            if (!logPath.EndsWith ("/")) 
+                logPath = logPath + "/";
+            m_logPath = logPath;
+
+            string runFilename = System.Diagnostics.Process.GetCurrentProcess ().MainModule.FileName;
+            string runProcess = Path.GetFileNameWithoutExtension(runFilename);
+            m_logFile = StreamWriter.Synchronized(new StreamWriter(logPath + runProcess + appendName + ".log", true));
         }
 
         public void Dispose()

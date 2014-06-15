@@ -46,6 +46,12 @@ namespace WhiteCore.Framework.Modules
         string Name { get; }
 
         /// <summary>
+        /// Gets or sets the log path.
+        /// </summary>
+        /// <value>The log path.</value>
+        string LogPath { get; set; }
+
+        /// <summary>
         ///     All commands that are enabled on this console
         /// </summary>
         Commands Commands { get; set; }

@@ -27,7 +27,6 @@
 
 //#define BlockUnsupportedVersions
 
-using WhiteCore.Framework;
 using WhiteCore.Framework.Configuration;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
@@ -42,8 +41,8 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Reflection;
 
-[assembly: AssemblyVersion("0.9.1.1")]
-[assembly: AssemblyFileVersion("0.9.1.1")]
+[assembly: AssemblyVersion("0.9.2.1")]
+[assembly: AssemblyFileVersion("0.9.2.1")]
 
 namespace WhiteCore.Simulation.Base
 {
@@ -119,6 +118,7 @@ namespace WhiteCore.Simulation.Base
             configSource.AddSwitch("Startup", "RegionDataFileName");
             configSource.AddSwitch("Console", "Console");
             configSource.AddSwitch("Console", "LogAppendName");
+            configSource.AddSwitch("Console", "LogPath");
             configSource.AddSwitch("Network", "http_listener_port");
 
             IConfigSource m_configSource = Configuration(configSource, defaultIniFile);
@@ -136,16 +136,16 @@ namespace WhiteCore.Simulation.Base
         public static void Configure(bool requested)
         {
             string WhiteCore_ConfigDir = Constants.DEFAULT_CONFIG_DIR;
-            bool WhiteCore_log = (File.Exists(Path.Combine(Util.configDir(), "WhiteCore.log")));
-			bool WhiteCore_Server_log = (File.Exists(Path.Combine(Util.configDir(), "WhiteCore.Server.log")));
-			bool WhiteCore_mono_log = (File.Exists(Path.Combine(Util.configDir(), "mono-sgen.log")));
-            bool isWhiteCoreExe = System.AppDomain.CurrentDomain.FriendlyName == "WhiteCore.exe" ||
-                               System.AppDomain.CurrentDomain.FriendlyName == "WhiteCore.vshost.exe";
+            bool isWhiteCoreExe = AppDomain.CurrentDomain.FriendlyName == "WhiteCore.exe" ||
+                               AppDomain.CurrentDomain.FriendlyName == "WhiteCore.vshost.exe";
 
-			if ( requested ||
-				( !(WhiteCore_mono_log) &&
-				 !(isWhiteCoreExe ? WhiteCore_log : WhiteCore_Server_log) )
-				)
+             bool existingConfig = (
+                File.Exists(Path.Combine(WhiteCore_ConfigDir,"MyWorld.ini")) ||
+                File.Exists(Path.Combine(WhiteCore_ConfigDir,"WhiteCore.ini")) ||
+                File.Exists(Path.Combine(WhiteCore_ConfigDir,"WhiteCore.Server.ini"))
+                );
+
+            if ( requested || !existingConfig )
             {
                 string resp = "no";
                 if (!requested)

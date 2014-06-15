@@ -33,7 +33,7 @@ using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using Nini.Config;
 using OpenMetaverse;
-using WhiteCore.Framework;
+using WhiteCore.Framework.ConsoleFramework;
 
 namespace WhiteCore.Modules.VisitorLogger
 {
@@ -95,6 +95,7 @@ namespace WhiteCore.Modules.VisitorLogger
 
         private void EventManager_OnClosingClient(IClientAPI client)
         {
+            string logPath = MainConsole.Instance.LogPath;
             IScenePresence presence;
             if (client.Scene.TryGetScenePresence(client.AgentId, out presence) && !presence.IsChildAgent &&
                 m_timesOfUsers.ContainsKey(client.AgentId))
@@ -102,7 +103,7 @@ namespace WhiteCore.Modules.VisitorLogger
                 try
                 {
                     //Add the user
-                    FileStream stream = new FileStream(m_fileName, FileMode.OpenOrCreate);
+                    FileStream stream = new FileStream(logPath + m_fileName, FileMode.OpenOrCreate);
                     StreamWriter m_streamWriter = new StreamWriter(stream);
                     m_streamWriter.BaseStream.Position += m_streamWriter.BaseStream.Length;
 

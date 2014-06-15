@@ -23,6 +23,10 @@
     ;; GUIConsole = Special interface to allow i/o redirection to work for GUI applications.
     Console = LocalConsole
 
+    ;; If you want to save your log file to a specific location, set your desired path
+    ;; Default is commented out >> Logfile are saved in the 'Data' folder
+    ;LogPath = 
+
     ;; These are the settings for the remote console, unneeded if not using the remote console
     ;RemoteConsoleUser =
     ;RemoteConsolePass =
