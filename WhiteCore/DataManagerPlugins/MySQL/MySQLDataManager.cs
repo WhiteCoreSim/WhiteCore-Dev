@@ -36,9 +36,6 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 
-[assembly: AssemblyVersion("0.9.1.1")]
-[assembly: AssemblyFileVersion("0.9.1.1")]
-
 namespace WhiteCore.DataManager.MySQL
 {
     public class MySQLDataLoader : DataManagerBase

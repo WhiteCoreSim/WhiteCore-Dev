@@ -41,9 +41,6 @@ using PrimMesher;
 using WhiteCore.Physics.PrimMesher;
 #endif
 
-[assembly: AssemblyVersion("0.9.1.1")]
-[assembly: AssemblyFileVersion("0.9.1.1")]
-
 namespace WhiteCore.Physics.Meshing
 {
     public class Mesh : IMesh

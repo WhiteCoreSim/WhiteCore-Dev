@@ -41,9 +41,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Reflection;
 
-[assembly: AssemblyVersion("0.9.1.1")]
-[assembly: AssemblyFileVersion("0.9.1.1")]
-
 namespace WhiteCore.BotManager
 {
     public class BotManager : INonSharedRegionModule, IBotManager
