@@ -27,14 +27,13 @@
 
 using System;
 using System.Collections.Generic;
-using WhiteCore.Framework;
 using WhiteCore.Framework.Services;
 using WhiteCore.Simulation.Base;
 using WhiteCore.Framework.Modules;
 using System.Reflection;
 
-[assembly: AssemblyVersion("0.9.1.1")]
-[assembly: AssemblyFileVersion("0.9.1.1")]
+[assembly: AssemblyVersion("0.9.2.1")]
+[assembly: AssemblyFileVersion("0.9.2.1")]
 
 namespace WhiteCore.Servers.AssetServer
 {
