@@ -3,7 +3,7 @@
     
 [FileBasedSimulationData]
     ;;
-    ;; This plugin loads the region information (such as terrain and objects) from an WhiteCore Backup file 
+    ;; This plug-in loads the region information (such as terrain and objects) from an WhiteCore Backup file 
 	;; rather than from a normal database. This is much faster than a normal database and can be used to
 	;; automatically save backups of regions as well. This is the default option in WhiteCore
 	;;

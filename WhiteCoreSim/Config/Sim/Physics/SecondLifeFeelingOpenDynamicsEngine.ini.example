@@ -32,7 +32,7 @@
     ;; Should there be a small delay before jumping?
     UsePreJump = true
     
-    ;; The time to wait before jumping (for prejump) in frames
+    ;; The time to wait before jumping (for pre-jump) in frames
     PreJumpTime = 15
     
     ;; The amount to multiply the jump by (can have a decimal point)

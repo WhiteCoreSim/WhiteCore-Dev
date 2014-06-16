@@ -59,7 +59,7 @@
 	;; Allow people in god mode to force tp others
 	AllowGodTeleports = true
     
-    ;; Control whether offline IMs should be sent to the user's email as well
+    ;; Control whether off-line IMs should be sent to the user's email as well
     ;; Default is false
     ;SendOfflineMessagesToEmail = false
 
@@ -104,7 +104,7 @@
 
 [WorldViewModule]
     ;; WorldView Module Settings
-    ;; To use this feature you will need to install the 'WorldView' addon module
+    ;; To use this feature you will need to install the 'WorldView' add-on module
     ;; from https://github.com/WhiteCoreSim/WhiteCore-Optional-Modules
     ;; Default enabled = false
     Enabled = false
@@ -150,10 +150,10 @@
     ;; Should all avatars be moved to a central location after they die?
     ShouldRespawn = false
 
-    ;; How many seconds should the player be disabled before returning after a respawn?
+    ;; How many seconds should the player be disabled before returning after a re-spawn?
     SecondsBeforeRespawn = 5
 
-    ;; Respawn position in the sim
+    ;; Re-spawn position in the sim
     RespawnPositionX = 128
     RespawnPositionY = 128
     RespawnPositionZ = 128
@@ -175,7 +175,7 @@
     SearchModule = WhiteCoreSearchModule
 
 [Dialog]
-    ;; This module just adds mute list features to dialogs
+    ;; This module just adds mute list features to dialogues
     DialogModule = WhiteCoreDialogModule
 
 [CallingCardModule]
@@ -269,13 +269,13 @@
 	;; ## Teen/PG Settings
 	;; ##
         
-        ;; Should all users be forced to wear underwear and undershirts?
+        ;; Should all users be forced to wear underwear and under-shirts?
         ;EnableTeenMode = false
         
         ;; ItemID of the default avatar underpants
         ;DefaultUnderpants = 00000000-0000-0000-0000-000000000000
         
-        ;; ItemID of the default avatar undershirt
+        ;; ItemID of the default avatar under-shirt
         ;DefaultUndershirt = 00000000-0000-0000-0000-000000000000
     
     ;; What time zone should the viewer use? 

@@ -96,7 +96,7 @@
 	;; Default is false
 	StipendsPremiumOnly = false
 	;; Amount of time before stipends are given out
-	;; Valid values are: second,minute,hours,days,weeks,months,years,decades,centuries,millennium,Kilenniums,Centrenniums,Megaannum
+	;; Valid values are: second,minute,hours,days,weeks,months,years,decades,centuries,millennium
 	;; Default is weeks
 	StipendsEveryType = weeks
 	;; Number of type (set above) before a stipend is given out

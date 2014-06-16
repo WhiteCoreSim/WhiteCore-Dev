@@ -18,7 +18,7 @@
     ; BulletEngine = "bulletxna"
 
     ; Terrain Implementation {1|0} 0 for HeightField, 1 for Mesh terrain.  If you're using the bulletxna engine, 
-    ;  you will want to switch to the heightfield option
+    ;  you will want to switch to the height-field option
     TerrainImplementation = 0
 
     Gravity = -9.80665
@@ -44,7 +44,7 @@
     ; Linkset implementation
     LinksetImplementation = 3      ; 0=constraint, 1=compound, 3=groupcompound
 
-    ; Whether to mesh sculpties
+    ; Whether to mesh sculpts
     MeshSculptedPrim = true
 
     ; If 'true', force simple prims (box and sphere) to be meshed

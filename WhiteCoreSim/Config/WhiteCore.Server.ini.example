@@ -17,7 +17,7 @@
 [Console]
     ;; Setting for which console log will be used
     ;; Values are:
-    ;; LocalConsole = Color console that is enabled by default
+    ;; LocalConsole = Colour console that is enabled by default
     ;; RemoteConsole = Remote access enabled console
     ;; CommandConsole = Default black and white console
     ;; GUIConsole = Special interface to allow i/o redirection to work for GUI applications.
@@ -103,7 +103,7 @@
     ParcelConnector = LocalConnector
     EmailConnector = LocalConnector
 
-    ;; Max non-group chat messages that the server will store per user
+    ;; Maximum non-group chat messages that the server will store per user
     MaxOfflineMessages = 20
 
     ;; Whether we should save any group chat messages for users

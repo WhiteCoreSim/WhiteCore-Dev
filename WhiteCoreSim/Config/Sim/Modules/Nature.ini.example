@@ -18,13 +18,13 @@
     ;; How often should wind be updated, as a function of world frames.  Approximately 50 frames a second
     wind_update_rate = 150
 
-    ;; The Default Wind Plugin to load (Comment out if using ConfigurableWind)
+    ;; The Default Wind Plug-in to load (Comment out if using ConfigurableWind)
     wind_plugin = SimpleRandomWind
-    ;; This setting is specific to the SimpleRandomWind plugin (Comment out if using ConfigurableWind)
+    ;; This setting is specific to the SimpleRandomWind plug-in (Comment out if using ConfigurableWind)
     ;; Adjusts wind strength. 0.0 = no wind, 1.0 = normal wind.  Default is 1.0
     strength = 1.0
 
-    ;; These settings are specific to the ConfigurableWind plugin   (Optimally for variable winds more realistic)
+    ;; These settings are specific to the ConfigurableWind plug-in   (Optimally for variable winds more realistic)
     ;; To use ConfigurableWind as the default, simply change wind_plugin to ConfigurableWind and uncomment the following.
     ; wind_plugin = ConfigurableWind
     ; avg_strength = 5.0

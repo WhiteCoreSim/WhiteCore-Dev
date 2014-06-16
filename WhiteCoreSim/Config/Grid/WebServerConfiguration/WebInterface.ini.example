@@ -1,7 +1,7 @@
 [WebInterface]
 
 	;; The web interface to use
-	;; BuiltIn gives you a loginscreen automatically
+	;; BuiltIn gives you a login-screen automatically
 	;; Default is BuiltIn
 	Module = BuiltIn
 	
@@ -9,7 +9,7 @@
 	;; All following options are for the built in web interface only
 	;;
 	
-	;; The default langugae for the interface to be in
+	;; The default language for the interface to be in
 	;; Valid options are
 	;; en, fr, de, es, it
 	DefaultLanguage = en

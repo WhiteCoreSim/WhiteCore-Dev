@@ -17,7 +17,7 @@
     ;; New, incompatible voice daemon which will do speaker indication,
     ;; positional voice, and high quality audio codec. Host voice on the
     ;; same server, or use Glacier2 to proxy the insecure ICE protocol.
-	;; The addon module, 'Whisper', needs to be downloaded and compiled from 
+	;; The add-on module, 'Whisper', needs to be downloaded and compiled from 
 	;; https://github.com/WhiteCoreSim/WhiteCore-Optional-Modules
 	;Module = MurmurVoice;
 	

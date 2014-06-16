@@ -4,7 +4,7 @@
     LibraryOwnerName = "Library Owner"
     
 [GridService]
-    ;; Next, we can specify properties of regions, including default and fallback regions
+    ;; Next, we can specify properties of regions, including default and fall-back regions
     ;; The syntax is: Region_<RegionName> = "<flags>"
     ;; or:            Region_<RegionID> = "<flags>"
     ;; where <flags> can be DefaultRegion, FallbackRegion, NoDirectLogin, Persistent, LockedOut,Reservation,NoMove,Authenticate
@@ -16,7 +16,7 @@
     AllowDuplicateNames = false
     
     ;; Disable the checking of session ID's in the Grid Service
-    ;; This disables the security behind the Grid Service and allows regions to be registered and deregistered without verifying their identity.
+    ;; This disables the security behind the Grid Service and allows regions to be registered and de-registered without verifying their identity.
     DisableSessionID = false;
     
     ;; The maximum size a region can be
@@ -62,8 +62,8 @@
     ;; This allows for display names to be used
     Enabled = true
 
-    ;; Blocks all user names in this list from being used as display names. Names are NOT case sensitive. Seperate names by commas.
-    ;; Example "Linden,Admin"
+    ;; Blocks all user names in this list from being used as display names. Names are NOT case sensitive. Separate names by commas.
+    ;; Example "Linden, Admin"
     BannedUserNames = "Linden"
 	
 [Handlers]
@@ -116,7 +116,7 @@
     SimMapDataConnector = LocalConnector
     ScriptDataConnector = LocalConnector
 
-    ;; Max non-group chat messages that the server will store per user
+    ;; Maximum non-group chat messages that the server will store per user
     MaxOfflineMessages = 20
 
     ;; Whether we should save any group chat messages for users

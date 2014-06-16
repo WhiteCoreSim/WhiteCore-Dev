@@ -14,7 +14,7 @@
     ;; Region_Region_Name_PhysicsEngine = OpenDynamicsEngine
     ;; Region_Region_Name_MeshingEngine = Meshmerizer
 
-    ;; Path to decoded sculpty maps
+    ;; Path to decoded sculpt maps
     ;; Defaults to "j2kDecodeCache
     ;DecodedSculptMapPath = "j2kDecodeCache"
 

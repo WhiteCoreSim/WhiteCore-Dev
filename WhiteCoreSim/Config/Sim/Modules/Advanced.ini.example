@@ -32,14 +32,14 @@
     ;; which is about 2 4k-sized UDP datagrams. On mono this is
     ;; whatever the underlying operating system has as default; for
     ;; example, ubuntu 8.04 or SLES11 have about 111k, which is about
-    ;; 27 4k-sized UDP datagrams (on linux platforms you can [as root]
+    ;; 27 4k-sized UDP datagrams (on Linux platforms you can [as root]
     ;; do "sysctl net.core.rmem_default" to find out what your system
     ;; uses a default socket receive buffer size.
     ;;
     ;; client_socket_rcvbuf_size allows you to specify the receive
     ;; buffer size LLUDPServer should use. NOTE: this will be limited
     ;; by the system's settings for the maximum client receive buffer
-    ;; size (on linux systems you can set that with "sysctl -w
+    ;; size (on Linux systems you can set that with "sysctl -w
     ;; net.core.rmem_max=X")
     ;;
     ;client_socket_rcvbuf_size = 8388608

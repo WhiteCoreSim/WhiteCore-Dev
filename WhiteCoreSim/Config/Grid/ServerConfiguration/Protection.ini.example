@@ -54,7 +54,7 @@
 
     ;; If UseAllowListInsteadOfBanList is not used, add all banned viewers here
     ;; Other viewers to ban from your sims.
-    ;; Note: Seperate banned viewers by ','
+    ;; Note: Separate banned viewers by ','
     ;; Ex.  ViewersToBan = "Phoenix,LGG Proxy"
     ;; See http://viewertags.com/client_list.php for a full list of clients
     ;; Default is ""
