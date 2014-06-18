@@ -1577,6 +1577,10 @@ namespace WhiteCore.ClientStack
         public void SendPlacesQuery(ExtendedLandData[] LandData, UUID queryID, UUID transactionID)
         {
             PlacesReplyPacket PlacesReply = new PlacesReplyPacket();
+            
+            // Since we don't have Membership we should send an empty QueryData block 
+            // here to keep the viewer happy
+            
             PlacesReplyPacket.QueryDataBlock[] Query = new PlacesReplyPacket.QueryDataBlock[LandData.Length];
             //Note: Nothing is ever done with this?????
             int totalarea = 0;
