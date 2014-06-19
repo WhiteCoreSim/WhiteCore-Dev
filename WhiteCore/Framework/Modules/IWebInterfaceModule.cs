@@ -7,6 +7,9 @@ namespace WhiteCore.Framework.Modules
         string LoginScreenURL { get; }
         string WebProfileURL { get; }
         string RegistrationScreenURL { get; }
+        string ForgotPasswordScreenURL { get; }
+        string HelpScreenURL { get; }
+
     }
 
     public interface IWebHttpTextureService

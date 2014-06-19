@@ -25,11 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Servers;
-using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
 using Nini.Config;
@@ -97,67 +95,84 @@ namespace WhiteCore.Services
                 IMoneyModule moneyModule = m_registry.RequestModuleInterface<IMoneyModule>();
                 IGridServerInfoService serverInfoService = m_registry.RequestModuleInterface<IGridServerInfoService>();
 
+                // economy
                 GridEconomyURI = GetConfig(m_config, "economy");
                 if (GridEconomyURI == "")
                 {
+                    GridEconomyURI = MainServer.Instance.ServerURI + "/";           // assume default... 
+
                     if (moneyModule != null)
                     {
                         int port = moneyModule.ClientPort;
                         if (port == 0)
-                            port = (int)MainServer.Instance.Port;
+                            port = (int) MainServer.Instance.Port;
+
                         GridEconomyURI = MainServer.Instance.FullHostName + ":" + port + "/";
                     }
-                    else
-                        GridEconomyURI = MainServer.Instance.FullHostName + ":" + 9000 + "/"; //Fallback... we dunno
                 }
+
                 if (GridEconomyURI != "" && !GridEconomyURI.EndsWith("/"))
                     GridEconomyURI += "/";
                 _info["economy"] = _info["helperuri"] = GridEconomyURI;
 
+                // login
                 GridLoginURI = GetConfig(m_config, "login");
                 if (GridLoginURI == "")
                 {
+                    GridLoginURI = MainServer.Instance.ServerURI + "/";
+
                     if (configCfg != null && configCfg.GetString("LLLoginHandlerPort", "") != "")
                     {
                         var port = configCfg.GetString("LLLoginHandlerPort", "");
                         if (port == "" || port == "0")
                             port = MainServer.Instance.Port.ToString();
-                        GridLoginURI = MainServer.Instance.FullHostName +
-                                       ":" + port + "/";
-                    }
-                    else
-                    {
-                        GridLoginURI = MainServer.Instance.ServerURI + "/";
+                        GridLoginURI = MainServer.Instance.FullHostName + ":" + port + "/";
                     }
                 }
                 else if (!GridLoginURI.EndsWith("/"))
                     GridLoginURI += "/";
                 _info["login"] = GridLoginURI;
 
+                // welcome
                 _info["welcome"] = GridWelcomeURI = GetConfig(m_config, "welcome");
                 if (GridWelcomeURI == "" && webInterface != null)
                     _info["welcome"] = GridWelcomeURI = webInterface.LoginScreenURL;
 
+                // registration
                 _info["register"] = GridRegisterURI = GetConfig(m_config, "register");
                 if (GridRegisterURI == "" && webInterface != null)
                     _info["register"] = GridRegisterURI = webInterface.RegistrationScreenURL;
 
+                // grid details
                 _info["gridname"] = GridName = GetConfig(m_config, "gridname");
                 _info["gridnick"] = GridNick = GetConfig(m_config, "gridnick");
 
                 _info["about"] = GridAboutURI = GetConfig(m_config, "about");
-                _info["help"] = GridHelpURI = GetConfig(m_config, "help");
-                _info["password"] = GridForgotPasswordURI = GetConfig(m_config, "forgottenpassword");
-                GridMapTileURI = GetConfig(m_config, "map");
 
+                _info["help"] = GridHelpURI = GetConfig(m_config, "help");
+                if (GridHelpURI == "" && webInterface != null)
+                    GridHelpURI = webInterface.HelpScreenURL;
+
+                _info["password"] = GridForgotPasswordURI = GetConfig(m_config, "forgottenpassword");
+                if (GridForgotPasswordURI == "" && webInterface != null)
+                    GridForgotPasswordURI = webInterface.ForgotPasswordScreenURL;
+
+                // mapping
+                GridMapTileURI = GetConfig(m_config, "map");
                 if (GridMapTileURI == "" && serverInfoService != null)
                     GridMapTileURI = serverInfoService.GetGridURI("MapService");
+
+                // Agent
                 AgentAppearanceURI = GetConfig(m_config, "AgentAppearanceURI");
                 if (AgentAppearanceURI == "" && serverInfoService != null)
                     AgentAppearanceURI = serverInfoService.GetGridURI("SSAService");
+
+                // profile
                 GridWebProfileURI = GetConfig(m_config, "webprofile");
                 if (GridWebProfileURI == "" && webInterface != null)
                     GridWebProfileURI = webInterface.WebProfileURL;
+
+                // misc.. these must be set to be used
                 GridSearchURI = GetConfig(m_config, "search");
                 GridDestinationURI = GetConfig(m_config, "destination");
                 GridMarketplaceURI = GetConfig(m_config, "marketplace");

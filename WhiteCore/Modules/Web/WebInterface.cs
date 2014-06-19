@@ -54,8 +54,8 @@ namespace WhiteCore.Modules.Web
     {
         #region Declares
 
-        protected const int CLIENT_CACHE_TIME = 86400; //1 day
-        protected uint _port = 8002;
+        protected const int CLIENT_CACHE_TIME = 86400;  // 1 day
+        protected uint _port = 8002;                    // assuming grid mode here
         protected bool _enabled = true;
         protected Dictionary<string, IWebInterfacePage> _pages = new Dictionary<string, IWebInterfacePage>();
         protected List<ITranslator> _translators = new List<ITranslator>();
@@ -82,6 +82,16 @@ namespace WhiteCore.Modules.Web
         public string RegistrationScreenURL
         {
             get { return MainServer.Instance.FullHostName + ":" + _port + "/register.html"; }
+        }
+
+        public string ForgotPasswordScreenURL
+        {
+            get { return MainServer.Instance.FullHostName + ":" + _port + "/forgot_pass.html"; }
+        }
+
+        public string HelpScreenURL
+        {
+            get { return MainServer.Instance.FullHostName + ":" + _port + "/help.html"; }
         }
 
         public string GridURL
@@ -116,7 +126,13 @@ namespace WhiteCore.Modules.Web
             if (con != null)
             {
                 _enabled = con.GetString("Module", "BuiltIn") == "BuiltIn";
-                _port = con.GetUInt("Port", _port);
+
+                var webPort = con.GetUInt("Port", 0);
+                if (webPort == 0)                               // use default
+                    _port = MainServer.Instance.Port;
+                else
+                    _port = webPort;                            // user defined
+
                 string defaultLanguage = con.GetString("DefaultLanguage", "en");
                 _defaultTranslator = _translators.FirstOrDefault(t => t.LanguageName == defaultLanguage);
                 if (_defaultTranslator == null)

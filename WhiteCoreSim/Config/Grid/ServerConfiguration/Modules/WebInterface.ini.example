@@ -11,11 +11,12 @@
 	
 	;; The default language for the interface to be in
 	;; Valid options are
-	;; en, fr, de, es, it
+	;; en, fr, de, es, it, nl
 	DefaultLanguage = en
 	
 	;; The port to run the web interface on
-	;; Recommended is 8002, but if you want it to look like a normal website, use 80
+	;; The default is to use the main server GridInfoHandler port (8002)
+	;; If you want the WebUI to look like a normal website, use 80, to override the default
 	Port = 8002
 	
 	;;

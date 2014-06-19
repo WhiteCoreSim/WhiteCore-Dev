@@ -17,7 +17,7 @@
 
     ;; login uri: for grid this is the login server URI
     ;; It will find the correct IP and port automatically if this is not set manually
-    ;login = http://127.0.0.1:9000/
+    ;login = http://127.0.0.1:8002/
 
     ;; login page: alternative to built-in page: if it exists it will be used to tell the client to use
     ;;                       this as splash page
@@ -25,7 +25,7 @@
 
     ;; helper uri: optional: if it exists if will be used to tell the client to use
     ;;                       this for all economy related things
-    ;;economy = http://127.0.0.1:9000/
+    ;;economy = http://127.0.0.1:8002/
 
     ;; web page of grid: alternative to built-in page: page providing further information about your grid
     ;;about = http://127.0.0.1/about/

@@ -15,8 +15,9 @@
 	DefaultLanguage = en
 	
 	;; The port to run the web interface on
-	;; Recommended is 80
-	Port = 80
+	;; The default is to use the main server port (8002)
+	;; If you want the WebUI to look like a normal website, use 80, to override the default
+	;Port = 80
 	
 	;;
 	;; Main Web Interface

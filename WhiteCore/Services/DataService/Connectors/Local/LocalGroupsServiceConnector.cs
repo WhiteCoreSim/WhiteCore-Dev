@@ -68,20 +68,21 @@ namespace WhiteCore.Services.DataService
             }
 
             if (data != null)
-                data.ConnectToDatabase(defaultConnectionString, "Groups",
-                                       source.Configs["WhiteCoreConnectors"].GetBoolean("ValidateTables", true));
+                data.ConnectToDatabase (defaultConnectionString, "Groups",
+                    source.Configs ["WhiteCoreConnectors"].GetBoolean ("ValidateTables", true));
 
-            Framework.Utilities.DataManager.RegisterPlugin(Name + "Local", this);
+            Framework.Utilities.DataManager.RegisterPlugin (Name + "Local", this);
 
-            if (source.Configs["WhiteCoreConnectors"].GetString("GroupsConnector", "LocalConnector") == "LocalConnector")
+            if (source.Configs ["WhiteCoreConnectors"].GetString ("GroupsConnector", "LocalConnector") == "LocalConnector")
             {
-                Framework.Utilities.DataManager.RegisterPlugin(this);
+                Framework.Utilities.DataManager.RegisterPlugin (this);
             }
-            Init(simBase, Name);
+            Init (simBase, Name);
 
             // verify that the RealEstate group exists
             if (!m_doRemoteCalls)
                 CheckRealEstateGroupInfo ();
+
         }
 
         public string Name

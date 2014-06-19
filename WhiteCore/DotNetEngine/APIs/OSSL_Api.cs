@@ -35,7 +35,6 @@ using System.Net;
 using System.Runtime.Remoting.Lifetime;
 using System.Text;
 using System.Text.RegularExpressions;
-using WhiteCore.Framework;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
@@ -2127,7 +2126,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "osGetGridLoginURI", m_host, "OSSL", m_itemID))
                 return "";
 
-            string loginURI = "http://127.0.0.1:9000/";
+            string loginURI = MainServer.Instance.ServerURI + "/";              // Assume main server... 
             IConfigSource config = m_ScriptEngine.ConfigSource;
             if (config.Configs["GridInfo"] != null)
                 loginURI = config.Configs["GridInfo"].GetString("login", loginURI);
