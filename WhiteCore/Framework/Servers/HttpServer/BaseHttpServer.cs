@@ -26,18 +26,14 @@
  */
 
 using WhiteCore.Framework.ConsoleFramework;
-using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Servers.HttpServer.Interfaces;
 using Nwc.XmlRpc;
-using OpenMetaverse.StructuredData;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Sockets;
 using System.Text;
 using System.Xml;
 
@@ -69,6 +65,10 @@ namespace WhiteCore.Framework.Servers.HttpServer
             get { return m_PollServiceManager; }
         }
 
+        /// <summary>
+        /// Gets the server port.
+        /// </summary>
+        /// <value>The port.</value>
         public uint Port
         {
             get { return m_port; }
@@ -79,18 +79,30 @@ namespace WhiteCore.Framework.Servers.HttpServer
             get { return m_isSecure; }
         }
 
-        public IPAddress ListenIPAddress
+        /// <summary>
+        /// Gets or sets the listen IP address.
+        /// </summary>
+        /// <value>The listen IP address.</value>
+        private IPAddress ListenIPAddress
         {
             get { return m_listenIPAddress; }
             set { m_listenIPAddress = value; }
         }
 
+        /// <summary>
+        /// The hostname (external IP or dns name) that this server is on (without http(s)://)
+        /// </summary>
+        /// <value>The name of the host.</value>
         public string HostName
         {
             get { return m_hostName; }
             set { m_hostName = value; }
         }
 
+        /// <summary>
+        /// The hostname (external IP or dns name) that this server is on (with http(s)://)
+        /// </summary>
+        /// <value>The full name of the host.</value>
         public string FullHostName
         {
             get
@@ -112,7 +124,7 @@ namespace WhiteCore.Framework.Servers.HttpServer
                 string protocol = "http://";
                 if (Secure)
                     protocol = "https://";
-                return protocol + m_hostName + ":" + m_port.ToString();
+                return protocol + m_hostName + ":" + m_port;
             }
         }
 
