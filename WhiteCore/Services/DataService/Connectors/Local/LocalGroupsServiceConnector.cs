@@ -210,13 +210,13 @@ namespace WhiteCore.Services.DataService
             AddRoleToGroup(founderID, groupID, UUID.Zero, "Everyone", "Everyone in the group is in the everyone role.",
                            "Member of " + name, EveryonePowers);
 
-            const ulong groupPowers = 436506116225230;
+            const ulong OfficersPowers = 436506116225230;
 
             UUID officersRole = UUID.Random();
             //Add officers role to group
             AddRoleToGroup(founderID, groupID, officersRole, "Officers",
                            "The officers of the group, with more powers than regular members.", "Officer of " + name,
-                           groupPowers);
+                           OfficersPowers);
 
             const ulong OwnerPowers = 18446744073709551615;
             //Add owner role to group
