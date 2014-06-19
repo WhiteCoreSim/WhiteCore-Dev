@@ -51,8 +51,9 @@ namespace WhiteCore.Modules
         protected Timer m_backupSaveTimer;
 
         protected string m_fileName = "";
+        protected string m_storeDirectory = Constants.DEFAULT_DATA_DIR + "/Region";
         protected bool m_keepOldSave = true;
-        protected string m_oldSaveDirectory = "";
+        protected string m_oldSaveDirectory = Constants.DEFAULT_DATA_DIR + "/RegionBak";
         protected bool m_oldSaveHasBeenSaved;
         protected bool m_requiresSave = true;
         protected bool m_displayNotSavingNotice = true;
@@ -60,7 +61,6 @@ namespace WhiteCore.Modules
         protected bool m_saveBackups;
         protected int m_removeArchiveDays = 30;
         protected bool m_saveChanges = true;
-        protected string m_storeDirectory = "";
         protected Timer m_saveTimer;
         protected IScene m_scene;
         protected int m_timeBetweenBackupSaves = 1440; //One day
