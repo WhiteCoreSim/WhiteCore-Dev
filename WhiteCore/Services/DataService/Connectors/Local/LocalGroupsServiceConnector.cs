@@ -136,59 +136,59 @@ namespace WhiteCore.Services.DataService
                 return;
 
             // Would this be cleaner as (GroupPowers)ulong.MaxValue;
-            ulong OwnerPowers = (ulong) (GroupPowers.Accountable
-                                         | GroupPowers.AllowEditLand
-                                         | GroupPowers.AllowFly
-                                         | GroupPowers.AllowLandmark
-                                         | GroupPowers.AllowRez
-                                         | GroupPowers.AllowSetHome
-                                         | GroupPowers.AllowVoiceChat
-                                         | GroupPowers.AssignMember
-                                         | GroupPowers.AssignMemberLimited
-                                         | GroupPowers.ChangeActions
-                                         | GroupPowers.ChangeIdentity
-                                         | GroupPowers.ChangeMedia
-                                         | GroupPowers.ChangeOptions
-                                         | GroupPowers.CreateRole
-                                         | GroupPowers.DeedObject
-                                         | GroupPowers.DeleteRole
-                                         | GroupPowers.Eject
-                                         | GroupPowers.FindPlaces
-                                         | GroupPowers.Invite
-                                         | GroupPowers.JoinChat
-                                         | GroupPowers.LandChangeIdentity
-                                         | GroupPowers.LandDeed
-                                         | GroupPowers.LandDivideJoin
-                                         | GroupPowers.LandEdit
-                                         | GroupPowers.LandEjectAndFreeze
-                                         | GroupPowers.LandGardening
-                                         | GroupPowers.LandManageAllowed
-                                         | GroupPowers.LandManageBanned
-                                         | GroupPowers.LandManagePasses
-                                         | GroupPowers.LandOptions
-                                         | GroupPowers.LandRelease
-                                         | GroupPowers.LandSetSale
-                                         | GroupPowers.ModerateChat
-                                         | GroupPowers.ObjectManipulate
-                                         | GroupPowers.ObjectSetForSale
-                                         | GroupPowers.ReceiveNotices
-                                         | GroupPowers.RemoveMember
-                                         | GroupPowers.ReturnGroupOwned
-                                         | GroupPowers.ReturnGroupSet
-                                         | GroupPowers.ReturnNonGroup
-                                         | GroupPowers.RoleProperties
-                                         | GroupPowers.SendNotices
-                                         | GroupPowers.SetLandingPoint
-                                         | GroupPowers.StartProposal
-                                         | GroupPowers.VoteOnProposal);
+            //ulong OwnerPowers = (ulong) (GroupPowers.Accountable
+            //                             | GroupPowers.AllowEditLand
+            //                             | GroupPowers.AllowFly
+            //                             | GroupPowers.AllowLandmark
+            //                             | GroupPowers.AllowRez
+            //                             | GroupPowers.AllowSetHome
+            //                             | GroupPowers.AllowVoiceChat
+            //                             | GroupPowers.AssignMember
+            //                             | GroupPowers.AssignMemberLimited
+            //                             | GroupPowers.ChangeActions
+            //                             | GroupPowers.ChangeIdentity
+            //                             | GroupPowers.ChangeMedia
+            //                             | GroupPowers.ChangeOptions
+            //                             | GroupPowers.CreateRole
+            //                             | GroupPowers.DeedObject
+            //                             | GroupPowers.DeleteRole
+            //                             | GroupPowers.Eject
+            //                             | GroupPowers.FindPlaces
+            //                             | GroupPowers.Invite
+            //                             | GroupPowers.JoinChat
+            //                             | GroupPowers.LandChangeIdentity
+            //                             | GroupPowers.LandDeed
+            //                             | GroupPowers.LandDivideJoin
+            //                             | GroupPowers.LandEdit
+            //                             | GroupPowers.LandEjectAndFreeze
+            //                             | GroupPowers.LandGardening
+            //                             | GroupPowers.LandManageAllowed
+            //                             | GroupPowers.LandManageBanned
+            //                             | GroupPowers.LandManagePasses
+            //                             | GroupPowers.LandOptions
+            //                             | GroupPowers.LandRelease
+            //                             | GroupPowers.LandSetSale
+            //                             | GroupPowers.ModerateChat
+            //                             | GroupPowers.ObjectManipulate
+            //                             | GroupPowers.ObjectSetForSale
+            //                             | GroupPowers.ReceiveNotices
+            //                             | GroupPowers.RemoveMember
+            //                             | GroupPowers.ReturnGroupOwned
+            //                             | GroupPowers.ReturnGroupSet
+            //                             | GroupPowers.ReturnNonGroup
+            //                             | GroupPowers.RoleProperties
+            //                             | GroupPowers.SendNotices
+            //                             | GroupPowers.SetLandingPoint
+            //                             | GroupPowers.StartProposal
+            //                             | GroupPowers.VoteOnProposal);
 
-            ulong EveryonePowers = (ulong) (GroupPowers.AllowSetHome |
-                                            GroupPowers.Accountable |
-                                            GroupPowers.JoinChat |
-                                            GroupPowers.AllowVoiceChat |
-                                            GroupPowers.ReceiveNotices |
-                                            GroupPowers.StartProposal |
-                                            GroupPowers.VoteOnProposal);
+            //ulong EveryonePowers = (ulong) (GroupPowers.AllowSetHome |
+            //                                GroupPowers.Accountable |
+            //                                GroupPowers.JoinChat |
+            //                                GroupPowers.AllowVoiceChat |
+            //                                GroupPowers.ReceiveNotices |
+            //                                GroupPowers.StartProposal |
+            //                                GroupPowers.VoteOnProposal);
 
             Dictionary<string, object> row = new Dictionary<string, object>(11);
             row["GroupID"] = groupID;
@@ -205,11 +205,12 @@ namespace WhiteCore.Services.DataService
 
             data.Insert("osgroup", row);
 
+            const ulong EveryonePowers = 8796495740928;
             //Add everyone role to group
             AddRoleToGroup(founderID, groupID, UUID.Zero, "Everyone", "Everyone in the group is in the everyone role.",
                            "Member of " + name, EveryonePowers);
 
-            const ulong groupPowers = 296868139497678;
+            const ulong groupPowers = 436506116225230;
 
             UUID officersRole = UUID.Random();
             //Add officers role to group
@@ -217,6 +218,7 @@ namespace WhiteCore.Services.DataService
                            "The officers of the group, with more powers than regular members.", "Officer of " + name,
                            groupPowers);
 
+            const ulong OwnerPowers = 18446744073709551615;
             //Add owner role to group
             AddRoleToGroup(founderID, groupID, OwnerRoleID, "Owners", "Owners of " + name, "Owner of " + name,
                            OwnerPowers);
