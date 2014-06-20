@@ -31,12 +31,8 @@ using WhiteCore.Framework.Services;
 using WhiteCore.Simulation.Base;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 
-[assembly: AssemblyVersion("0.9.2.1")]
-[assembly: AssemblyFileVersion("0.9.2.1")]
-
-namespace WhiteCore.Servers.AssetServer
+namespace WhiteCore.Servers.GridServer
 {
     /// <summary>
     ///     Starting class for the WhiteCore Server

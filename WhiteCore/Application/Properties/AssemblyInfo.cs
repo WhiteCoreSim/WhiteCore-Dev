@@ -27,6 +27,7 @@
 
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Resources;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
@@ -64,3 +65,4 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyVersion("0.9.2.1")]
 [assembly: AssemblyFileVersion("0.9.2.1")]
+[assembly: NeutralResourcesLanguageAttribute("en")]
