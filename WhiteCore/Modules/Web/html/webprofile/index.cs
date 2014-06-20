@@ -112,24 +112,33 @@ namespace WhiteCore.Modules.Web
 
             IUserProfileInfo profile = Framework.Utilities.DataManager.RequestPlugin<IProfileConnector>().
                                               GetUserProfile(account.PrincipalID);
-            vars.Add("UserType", profile.MembershipGroup == "" ? "Resident" : profile.MembershipGroup);
             if (profile != null)
             {
+                vars.Add ("UserType", profile.MembershipGroup == "" ? "Guest" : profile.MembershipGroup);
+
                 if (profile.Partner != UUID.Zero)
                 {
-                    account = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
-                                           GetUserAccount(null, profile.Partner);
-                    vars.Add("UserPartner", account.Name);
-                }
-                else
-                    vars.Add("UserPartner", "No partner");
-                vars.Add("UserAboutMe", profile.AboutText == "" ? "Nothing here" : profile.AboutText);
+                    account = webInterface.Registry.RequestModuleInterface<IUserAccountService> ().
+                                           GetUserAccount (null, profile.Partner);
+                    vars.Add ("UserPartner", account.Name);
+                } else
+                    vars.Add ("UserPartner", "No partner");
+                vars.Add ("UserAboutMe", profile.AboutText == "" ? "Nothing here" : profile.AboutText);
                 string url = "../images/icons/no_picture.jpg";
                 IWebHttpTextureService webhttpService =
-                    webInterface.Registry.RequestModuleInterface<IWebHttpTextureService>();
+                    webInterface.Registry.RequestModuleInterface<IWebHttpTextureService> ();
                 if (webhttpService != null && profile.Image != UUID.Zero)
-                    url = webhttpService.GetTextureURL(profile.Image);
-                vars.Add("UserPictureURL", url);
+                    url = webhttpService.GetTextureURL (profile.Image);
+                vars.Add ("UserPictureURL", url);
+            } else
+            {
+                // no profile yet
+                vars.Add ("UserType", "Guest");
+                vars.Add ("UserPartner", "Not specified yet");
+                vars.Add ("UserAboutMe", "Nothing here yet");
+                string url = "../images/icons/no_picture.jpg";
+                vars.Add ("UserPictureURL", url);
+
             }
             UserAccount ourAccount = Authenticator.GetAuthentication(httpRequest);
             if (ourAccount != null)

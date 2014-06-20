@@ -63,15 +63,15 @@ namespace WhiteCore.Modules.Web
         {
             switch (userType)
             {
-            case "Guest":
+            case "0":
                 return Constants.USER_FLAG_GUEST;
-            case "Resident":
+            case "1":
                 return Constants.USER_FLAG_RESIDENT;
-            case "Member":
+            case "2":
                 return Constants.USER_FLAG_MEMBER;
-            case "Contractor":
+            case "3":
                 return Constants.USER_FLAG_CONTRACTOR;
-            case "Charter_Member":
+            case "4":
                 return Constants.USER_FLAG_CHARTERMEMBER;
             default:
                 return Constants.USER_FLAG_GUEST;
@@ -341,11 +341,11 @@ namespace WhiteCore.Modules.Web
             vars.Add("MinutesText", translator.GetTranslatedString("MinutesText"));
 
             List<Dictionary<string, object>> userTypeArgs = new List<Dictionary<string, object>>();
-            userTypeArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Guest")}});
-            userTypeArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Resident")}});
-            userTypeArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Member")}});
-            userTypeArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Contractor")}});
-            userTypeArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Charter_Member")}});
+            userTypeArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Guest")},{"Index","0"}});
+            userTypeArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Resident")},{"Index","1"}});
+            userTypeArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Member")},{"Index","2"}});
+            userTypeArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Contractor")},{"Index","3"}});
+            userTypeArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Charter_Member")},{"Index","4"}});
 
             vars.Add("UserType", userTypeArgs);
 
