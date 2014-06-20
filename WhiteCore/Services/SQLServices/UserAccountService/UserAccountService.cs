@@ -488,6 +488,20 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     CacheAccount(newAccount);
                     m_registry.RequestModuleInterface<ISimulationBase>()
                               .EventManager.FireGenericEventHandler("CreateUserInformation", newAccount.PrincipalID);
+
+                    // create a profile for the new user as well
+                    if (m_profileConnector != null)
+                    {
+                        m_profileConnector.CreateNewProfile (newAccount.PrincipalID);
+                        IUserProfileInfo profile = m_profileConnector.GetUserProfile (newAccount.PrincipalID);
+
+                        // if (AvatarArchive != "")
+                        //    profile.AArchiveName = AvatarArchive;
+                        profile.MembershipGroup = "Resident";
+                        profile.IsNewUser = true;
+                        m_profileConnector.UpdateUserProfile (profile);
+                    }
+
                     return "";
                 }
 
@@ -648,7 +662,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 IUserProfileInfo profile = m_profileConnector.GetUserProfile(account.PrincipalID);
                 if (profile != null)
                 {
-                    profile.MembershipGroup = title;
+                    // this is not right is it?  >> profile.MembershipGroup = title;
                     profile.CustomType = title;
                     m_profileConnector.UpdateUserProfile (profile);
                 }
@@ -721,6 +735,44 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: User level set for user {0} {1} to {2}", firstName, lastName, level);
         }
 
+        private int UserTypeToUserFlags(string userType)
+        {
+            switch (userType)
+            {
+            case "Guest":
+                return Constants.USER_FLAG_GUEST;
+            case "Resident":
+                return Constants.USER_FLAG_RESIDENT;
+            case "Member":
+                return Constants.USER_FLAG_MEMBER;
+            case "Contractor":
+                return Constants.USER_FLAG_CONTRACTOR;
+            case "Charter_Member":
+                return Constants.USER_FLAG_CHARTERMEMBER;
+            default:
+                return Constants.USER_FLAG_GUEST;
+            }
+        }
+
+        private string UserFlagToType(int userFlags)
+        {
+            switch (userFlags)
+            {
+            case Constants.USER_FLAG_GUEST:
+                return "Guest";
+            case Constants.USER_FLAG_RESIDENT:
+                return "Resident";
+            case Constants.USER_FLAG_MEMBER:
+                return "Member";
+            case Constants.USER_FLAG_CONTRACTOR:
+                return "Contractor";
+            case Constants.USER_FLAG_CHARTERMEMBER:
+                return "Charter_Member";
+            default:
+                return "Guest";
+            }
+        }
+
 
         protected void HandleShowUserAccount(IScene scene, string[] cmd)
         {
@@ -763,28 +815,9 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             MainConsole.Instance.CleanInfo("  E-mail : " + ua.Email);
             MainConsole.Instance.CleanInfo("  Created: " + Utils.UnixTimeToDateTime(ua.Created));
             MainConsole.Instance.CleanInfo("  Level  : " + (ua.UserLevel < 0 ? "Disabled" : ua.UserLevel.ToString ()) );
-            MainConsole.Instance.CleanInfo("  Flags  : " + ua.UserFlags);
+            MainConsole.Instance.CleanInfo("  Type   : " + UserFlagToType(ua.UserFlags));
         }
-
-        private int UserTypeToUserFlags(string userType)
-        {
-            switch (userType)
-            {
-            case "Guest":
-                return Constants.USER_FLAG_GUEST;
-            case "Resident":
-                return Constants.USER_FLAG_RESIDENT;
-            case "Member":
-                return Constants.USER_FLAG_MEMBER;
-            case "Contractor":
-                return Constants.USER_FLAG_CONTRACTOR;
-            case "Charter_Member":
-                return Constants.USER_FLAG_CHARTERMEMBER;
-            default:
-                return Constants.USER_FLAG_GUEST;
-            }
-        }
-
+            
         /// <summary>
         /// Handles the set user level command.
         /// </summary>
@@ -827,10 +860,30 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             account.UserFlags = userFlags;
 
             bool success = StoreUserAccount(account);
-            if (!success)
-                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Unable to set user type for account '{0} {1}'.", firstName, lastName);
+            if (success)
+            {
+                MainConsole.Instance.InfoFormat ("[USER ACCOUNT SERVICE]: User '{0} {1}' set to {2}", firstName, lastName, userType);
+
+                // update profile for the user as well
+                if (m_profileConnector != null)
+                {
+                    IUserProfileInfo profile = m_profileConnector.GetUserProfile (account.PrincipalID);
+                    if (profile == null)
+                    {
+                        m_profileConnector.CreateNewProfile (account.PrincipalID);          // create a profile for the user
+                        profile = m_profileConnector.GetUserProfile (account.PrincipalID);
+                    }
+
+                    // if (AvatarArchive != "")
+                    //    profile.AArchiveName = AvatarArchive;
+                    profile.MembershipGroup = UserFlagToType(account.UserFlags);
+                    profile.IsNewUser = true;
+                    m_profileConnector.UpdateUserProfile (profile);
+                }
+            }
             else
-                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: User '{0} {1}' set to {2}", firstName, lastName, userType);
+                MainConsole.Instance.InfoFormat ("[USER ACCOUNT SERVICE]: Unable to set user type for account '{0} {1}'.", firstName, lastName);
+
         }
 
         /// <summary>

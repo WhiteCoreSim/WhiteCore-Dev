@@ -114,7 +114,7 @@ namespace WhiteCore.Modules.Web
                                               GetUserProfile(account.PrincipalID);
             if (profile != null)
             {
-                vars.Add ("UserType", profile.MembershipGroup == "" ? "Guest" : profile.MembershipGroup);
+                vars.Add ("UserType", profile.MembershipGroup == "" ? "Resident" : profile.MembershipGroup);
 
                 if (profile.Partner != UUID.Zero)
                 {

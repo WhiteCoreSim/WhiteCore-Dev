@@ -59,24 +59,6 @@ namespace WhiteCore.Modules.Web
             get { return true; }
         }
 
-        int UserTypeToUserFlags(string userType)
-        {
-            switch (userType)
-            {
-            case "0":
-                return Constants.USER_FLAG_GUEST;
-            case "1":
-                return Constants.USER_FLAG_RESIDENT;
-            case "2":
-                return Constants.USER_FLAG_MEMBER;
-            case "3":
-                return Constants.USER_FLAG_CONTRACTOR;
-            case "4":
-                return Constants.USER_FLAG_CHARTERMEMBER;
-            default:
-                return Constants.USER_FLAG_GUEST;
-            }
-        }
 
         public Dictionary<string, object> Fill(WebInterface webInterface, string filename, OSHttpRequest httpRequest,
                                                OSHttpResponse httpResponse, Dictionary<string, object> requestParameters,
@@ -86,24 +68,29 @@ namespace WhiteCore.Modules.Web
             var vars = new Dictionary<string, object>();
 
             string error = "";
-            UUID user = httpRequest.Query.ContainsKey("userid")
+            UUID userID = httpRequest.Query.ContainsKey("userid")
                             ? UUID.Parse(httpRequest.Query["userid"].ToString())
                             : UUID.Parse(requestParameters["userid"].ToString());
 
             IUserAccountService userService = webInterface.Registry.RequestModuleInterface<IUserAccountService>();
             var agentService = Framework.Utilities.DataManager.RequestPlugin<IAgentConnector>();
-            UserAccount account = userService.GetUserAccount(null, user);
-            IAgentInfo agent = agentService.GetAgent(user);
+            UserAccount account = userService.GetUserAccount(null, userID);
+            IAgentInfo agent = agentService.GetAgent(userID);
 
             if (agent == null)
                 error = "No agent information is available";
 
+            // Set user type
             if (requestParameters.ContainsKey("Submit") &&
                 requestParameters["Submit"].ToString() == "SubmitSetUserType")
             {
 
                 string UserType = requestParameters ["UserType"].ToString ();
-                int UserFlags = UserTypeToUserFlags (UserType);
+                int UserFlags = webInterface.UserTypeToUserFlags (UserType);
+
+                // set the user account type
+                account.UserFlags = UserFlags;
+                userService.StoreUserAccount (account);
 
                 if (agent != null)
                 {
@@ -112,9 +99,27 @@ namespace WhiteCore.Modules.Web
                     response = "User has been updated.";
                 } else
                     response = "Agent information is not available! Has the user logged in yet?";
+
+                IProfileConnector profileData =
+                    Framework.Utilities.DataManager.RequestPlugin<IProfileConnector>();
+                if (profileData != null)
+                {
+                    IUserProfileInfo profile = profileData.GetUserProfile (userID);
+                    if (profile == null)
+                    {
+                        profileData.CreateNewProfile (userID);
+                        profile = profileData.GetUserProfile (userID);
+                    }
+
+                    profile.MembershipGroup = webInterface.UserFlagToType (UserFlags, webInterface.EnglishTranslator);    // membership is english
+                    profileData.UpdateUserProfile (profile);
+                }
+
+                response = "User has been updated.";
                 return null;
             }
 
+            // Password change
             if (requestParameters.ContainsKey("Submit") &&
                 requestParameters["Submit"].ToString() == "SubmitPasswordChange")
             {
@@ -128,7 +133,7 @@ namespace WhiteCore.Modules.Web
                     IAuthenticationService authService =
                         webInterface.Registry.RequestModuleInterface<IAuthenticationService>();
                     if (authService != null)
-                        response = authService.SetPassword(user, "UserAccount", password)
+                        response = authService.SetPassword(userID, "UserAccount", password)
                                        ? "Successfully set password"
                                        : "Failed to set your password, try again later";
                     else
@@ -136,7 +141,9 @@ namespace WhiteCore.Modules.Web
                 }
                 return null;
             }
-            else if (requestParameters.ContainsKey("Submit") &&
+
+            // Email change
+            if (requestParameters.ContainsKey("Submit") &&
                      requestParameters["Submit"].ToString() == "SubmitEmailChange")
             {
                 string email = requestParameters["email"].ToString();
@@ -151,7 +158,9 @@ namespace WhiteCore.Modules.Web
                     response = "No authentication service was available to change your password";
                 return null;
             }
-            else if (requestParameters.ContainsKey("Submit") &&
+
+            // Delete user
+            if (requestParameters.ContainsKey("Submit") &&
                      requestParameters["Submit"].ToString() == "SubmitDeleteUser")
             {
                 string username = requestParameters["username"].ToString();
@@ -162,6 +171,8 @@ namespace WhiteCore.Modules.Web
                     response = "The user name did not match";
                 return null;
             }
+
+            // Temp Ban user
             if (requestParameters.ContainsKey("Submit") &&
                 requestParameters["Submit"].ToString() == "SubmitTempBanUser")
             {
@@ -181,6 +192,8 @@ namespace WhiteCore.Modules.Web
 
                 return null;
             }
+
+            // Ban user
             if (requestParameters.ContainsKey("Submit") &&
                 requestParameters["Submit"].ToString() == "SubmitBanUser")
             {
@@ -194,6 +207,8 @@ namespace WhiteCore.Modules.Web
 
                 return null;
             }
+
+            //UnBan user
             if (requestParameters.ContainsKey("Submit") &&
                 requestParameters["Submit"].ToString() == "SubmitUnbanUser")
             {
@@ -210,6 +225,8 @@ namespace WhiteCore.Modules.Web
 
                 return null;
             }
+
+            // Login as user
             if (requestParameters.ContainsKey("Submit") &&
                 requestParameters["Submit"].ToString() == "SubmitLoginAsUser")
             {
@@ -217,6 +234,8 @@ namespace WhiteCore.Modules.Web
                 webInterface.Redirect(httpResponse, "/");
                 return vars;
             }
+
+            // Kick user
             if (requestParameters.ContainsKey("Submit") &&
                 requestParameters["Submit"].ToString() == "SubmitKickUser")
             {
@@ -228,6 +247,8 @@ namespace WhiteCore.Modules.Web
                 response = "User has been kicked.";
                 return null;
             }
+
+            // Message user
             if (requestParameters.ContainsKey("Submit") &&
                 requestParameters["Submit"].ToString() == "SubmitMessageUser")
             {
@@ -239,6 +260,8 @@ namespace WhiteCore.Modules.Web
                 response = "User has been sent the message.";
                 return null;
             }
+
+            // page variables
             string bannedUntil = "";
             bool userBanned = agent == null
                                   ? false
@@ -340,14 +363,7 @@ namespace WhiteCore.Modules.Web
             vars.Add("HoursText", translator.GetTranslatedString("HoursText"));
             vars.Add("MinutesText", translator.GetTranslatedString("MinutesText"));
 
-            List<Dictionary<string, object>> userTypeArgs = new List<Dictionary<string, object>>();
-            userTypeArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Guest")},{"Index","0"}});
-            userTypeArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Resident")},{"Index","1"}});
-            userTypeArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Member")},{"Index","2"}});
-            userTypeArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Contractor")},{"Index","3"}});
-            userTypeArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Charter_Member")},{"Index","4"}});
-
-            vars.Add("UserType", userTypeArgs);
+            vars.Add("UserType", webInterface.UserTypeArgs(translator));
 
             return vars;
         }

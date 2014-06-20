@@ -25,8 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
-using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
 using OpenMetaverse;
@@ -67,6 +65,7 @@ namespace WhiteCore.Modules.Web
             string error = "";
             UserAccount user = Authenticator.GetAuthentication(httpRequest);
 
+            // password change
             if (requestParameters.ContainsKey("Submit") &&
                 requestParameters["Submit"].ToString() == "SubmitPasswordChange")
             {
@@ -89,7 +88,9 @@ namespace WhiteCore.Modules.Web
                 }
                 return null;
             }
-            else if (requestParameters.ContainsKey("Submit") &&
+
+            // email change
+            if (requestParameters.ContainsKey("Submit") &&
                      requestParameters["Submit"].ToString() == "SubmitEmailChange")
             {
                 string email = requestParameters["email"].ToString();
@@ -105,7 +106,9 @@ namespace WhiteCore.Modules.Web
                     response = "No authentication service was available to change your password";
                 return null;
             }
-            else if (requestParameters.ContainsKey("Submit") &&
+
+            // Delete User
+            if (requestParameters.ContainsKey("Submit") &&
                      requestParameters["Submit"].ToString() == "SubmitDeleteUser")
             {
                 string username = requestParameters["username"].ToString();
@@ -128,6 +131,8 @@ namespace WhiteCore.Modules.Web
                     response = "Wrong username or password";
                 return null;
             }
+
+            // Page variables
             vars.Add("ErrorMessage", error);
             vars.Add("ChangeUserInformationText", translator.GetTranslatedString("ChangeUserInformationText"));
             vars.Add("ChangePasswordText", translator.GetTranslatedString("ChangePasswordText"));

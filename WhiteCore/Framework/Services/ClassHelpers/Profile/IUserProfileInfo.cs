@@ -212,7 +212,7 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Profile
         /// <summary>
         ///     The group that the user is assigned to, ex: Premium
         /// </summary>
-        public string MembershipGroup = String.Empty;
+        public string MembershipGroup = "Guest";
 
         /// <summary>
         ///     All of the notes of the user

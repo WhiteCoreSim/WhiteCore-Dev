@@ -99,6 +99,11 @@ namespace WhiteCore.Modules.Web
             get { return MainServer.Instance.HostName + ":" + _port; }
         }
 
+        public ITranslator EnglishTranslator
+        {
+            get { return _translators.FirstOrDefault (t => t.LanguageName == "en"); }
+        }
+
         #endregion
 
         #region IService Members
@@ -610,6 +615,79 @@ namespace WhiteCore.Modules.Web
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Webpage UL type arguments.
+        /// </summary>
+        /// <returns>The type arguments.</returns>
+        /// <param name="translator">Translator.</param>
+        public List<Dictionary<string, object>> UserTypeArgs(ITranslator translator)
+        { 
+            var args = new List<Dictionary<string, object>>();
+            args.Add(new Dictionary<string, object> {
+                {"Value", translator.GetTranslatedString("Guest")}, {"Index","0"} });
+            args.Add(new Dictionary<string, object> {
+                {"Value", translator.GetTranslatedString("Resident")}, {"Index","1"} });
+            args.Add(new Dictionary<string, object> {
+                {"Value", translator.GetTranslatedString("Member")}, {"Index","2"} });
+            args.Add(new Dictionary<string, object> {
+                {"Value", translator.GetTranslatedString("Contractor")}, {"Index","3"} });
+            args.Add(new Dictionary<string, object> {
+                {"Value", translator.GetTranslatedString("Charter_Member")}, {"Index","4"} });
+            return args;
+        }
+
+        /// <summary>
+        /// Convert to to user flags.
+        /// </summary>
+        /// <returns>The type to user flags.</returns>
+        /// <param name="userType">User type Index.</param>
+        public int UserTypeToUserFlags(string userType)
+        {
+            switch (userType)
+            {
+            case "0":
+                return Constants.USER_FLAG_GUEST;
+            case "1":
+                return Constants.USER_FLAG_RESIDENT;
+            case "2":
+                return Constants.USER_FLAG_MEMBER;
+            case "3":
+                return Constants.USER_FLAG_CONTRACTOR;
+            case "4":
+                return Constants.USER_FLAG_CHARTERMEMBER;
+            default:
+                return Constants.USER_FLAG_GUEST;
+            }
+        }
+
+        /// <summary>
+        /// User flags to type string.
+        /// </summary>
+        /// <returns>The flag to type.</returns>
+        /// <param name="userFlags">User flags.</param>
+        /// <param name = "translator"></param>
+        public  string UserFlagToType(int userFlags, ITranslator translator)
+        {
+            if (translator == null)
+                translator = EnglishTranslator;
+
+            switch (userFlags)
+            {
+            case Constants.USER_FLAG_GUEST:
+                return translator.GetTranslatedString("Guest");
+            case Constants.USER_FLAG_RESIDENT:
+                return translator.GetTranslatedString("Resident");
+            case Constants.USER_FLAG_MEMBER:
+                return translator.GetTranslatedString("Member");
+            case Constants.USER_FLAG_CONTRACTOR:
+                return translator.GetTranslatedString("Contractor");
+            case Constants.USER_FLAG_CHARTERMEMBER:
+                return translator.GetTranslatedString("Charter_Member");
+            default:
+                return translator.GetTranslatedString("Guest");
+            }
         }
 
         #endregion
