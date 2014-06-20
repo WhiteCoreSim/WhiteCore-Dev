@@ -105,7 +105,7 @@
                 case "AvatarPasswordError":
                     return "Contraseña está vacío o que no coincida con!";
                 case "AvatarEmailError":
-                    return "Se requiere una dirección de correo electrónico para recuperar la contraseña!";
+                return "Se requiere una dirección de correo electrónico para recuperar la contraseña! ('none' si no se conoce)";
 
                     // news
                 case "OpenNewsManager":

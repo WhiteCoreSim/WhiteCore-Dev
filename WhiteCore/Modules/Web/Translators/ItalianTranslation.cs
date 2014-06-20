@@ -103,7 +103,7 @@
                 case "AvatarPasswordError":
                     return "La password è vuota o non corrispondenti!";
                 case "AvatarEmailError":
-                    return "L'indirizzo email è necessario per il ripristino della password!";
+                return "L'indirizzo email è necessario per il ripristino della password! ('none' se sconosciuta)";
 
                     // news
                 case "OpenNewsManager":

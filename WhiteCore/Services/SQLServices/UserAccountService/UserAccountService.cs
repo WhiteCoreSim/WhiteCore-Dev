@@ -773,6 +773,31 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             }
         }
 
+        string UserGodLevel(int level)
+        {
+            switch (level)
+            {
+            case Constants.USER_DISABLED:
+                return "Disabled";
+            case Constants.USER_BANNED:
+                return "Banned";
+            case Constants.USER_NORMAL:
+                return "User";
+            case Constants.USER_GOD_LIKE:
+                return "Elevated user";
+            case Constants.USER_GOD_CUSTOMER_SERVICE:
+                return "Customer service";
+            case Constants.USER_GOD_LIASON:
+                return "Liason";
+            case Constants.USER_GOD_FULL:
+                return "A God";
+            case Constants.USER_GOD_MAINTENANCE:
+                return"Super God";
+            default:
+                return "User";
+            }
+        }
+
 
         protected void HandleShowUserAccount(IScene scene, string[] cmd)
         {
@@ -814,7 +839,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             MainConsole.Instance.CleanInfo("  ID     : " + ua.PrincipalID);
             MainConsole.Instance.CleanInfo("  E-mail : " + ua.Email);
             MainConsole.Instance.CleanInfo("  Created: " + Utils.UnixTimeToDateTime(ua.Created));
-            MainConsole.Instance.CleanInfo("  Level  : " + (ua.UserLevel < 0 ? "Disabled" : ua.UserLevel.ToString ()) );
+            MainConsole.Instance.CleanInfo("  Level  : " + UserGodLevel(ua.UserLevel));
             MainConsole.Instance.CleanInfo("  Type   : " + UserFlagToType(ua.UserFlags));
         }
             
@@ -924,14 +949,14 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             // maybe even an email?
             if (cmdparams.Count < 6 )
             { 
-                email = MainConsole.Instance.Prompt ("Email");
+                email = MainConsole.Instance.Prompt ("Email for password recovery. ('none' if unknown)");
             }
             else
                 email = cmdparams[5];
 
-            if (!Utilities.IsValidEmail(email))
+            if ((email.ToLower() != "none") && !Utilities.IsValidEmail(email))
             {
-                MainConsole.Instance.Warn ("This does not look like a vaild email address. Please re-enter");
+                MainConsole.Instance.Warn ("This does not look like a vaild email address. ('none' if unknown)");
                 email = MainConsole.Instance.Prompt ("Email", email);
             }
 
@@ -967,8 +992,24 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             {
                 account.UserFlags = UserTypeToUserFlags (userType);
                 StoreUserAccount(account);
-            }
 
+                // update profile for the user as well
+                if (m_profileConnector != null)
+                {
+                    IUserProfileInfo profile = m_profileConnector.GetUserProfile (account.PrincipalID);
+                    if (profile == null)
+                    {
+                        m_profileConnector.CreateNewProfile (account.PrincipalID);          // create a profile for the user
+                        profile = m_profileConnector.GetUserProfile (account.PrincipalID);
+                    }
+
+                    // if (AvatarArchive != "")
+                    //    profile.AArchiveName = AvatarArchive;
+                    profile.MembershipGroup = UserFlagToType(account.UserFlags);
+                    profile.IsNewUser = true;
+                    m_profileConnector.UpdateUserProfile (profile);
+                }
+            }
         }
 
         /// <summary>

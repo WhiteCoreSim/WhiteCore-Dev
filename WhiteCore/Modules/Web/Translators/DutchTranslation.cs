@@ -105,7 +105,7 @@ namespace WhiteCore.Modules.Web.Translators
                 case "AvatarPasswordError":
                     return "Wachtwoord is leeg of niet overeenkomen met!";
                 case "AvatarEmailError":
-                    return "Een e-mailadres is vereist voor wachtwoord herstel!";
+                return "Een e-mailadres is vereist voor wachtwoord herstel! ('none' indien niet bekend)";
 
                     // news
                 case "OpenNewsManager":
