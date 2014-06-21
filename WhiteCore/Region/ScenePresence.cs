@@ -162,12 +162,12 @@ namespace WhiteCore.Region
         protected readonly Vector3[] Dir_Vectors = new Vector3[12];
 
         /// <summary>
-        ///     Position of agent's camera in world (region cordinates)
+        ///     Position of agent's camera in world (region coordinates)
         /// </summary>
         protected Vector3 m_CameraCenter;
 
         /// <summary>
-        ///     Used for trigging signficant camera movement
+        ///     Used for trigging significant camera movement
         /// </summary>
         protected Vector3 m_lastCameraCenter;
 
@@ -944,7 +944,7 @@ namespace WhiteCore.Region
         /// <summary>
         ///     Applies a roll accumulator to the avatar's angular velocity for the avatar fly roll effect.
         /// </summary>
-        /// <param name="amount">Postive or negative roll amount in radians</param>
+        /// <param name="amount">Positive or negative roll amount in radians</param>
         /// <param name="PressingUp"></param>
         /// <param name="PressingDown"></param>
         private void ApplyFlyingRoll(float amount, bool PressingUp, bool PressingDown)
@@ -2175,7 +2175,7 @@ namespace WhiteCore.Region
         }
 
         /// <summary>
-        ///     Send a location/velocity/accelleration update to all agents in scene
+        ///     Send a location/velocity/acceleration update to all agents in scene
         /// </summary>
         public virtual void SendTerseUpdateToAllClients()
         {
@@ -2794,7 +2794,7 @@ namespace WhiteCore.Region
         }
 
         /// <summary>
-        ///     Sets avatar height in the phyiscs plugin
+        ///     Sets avatar height in the physics plugin
         /// </summary>
         public virtual void SetHeight(float height)
         {

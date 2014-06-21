@@ -186,7 +186,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         }
 
         /// <summary>
-        ///     This closes the scrpit, removes it from any known spots, and disposes of itself.
+        ///     This closes the script, removes it from any known spots, and disposes of itself.
         /// </summary>
         /// <param name="shouldbackup">Should we back up this script and fire state_exit?</param>
         public void CloseAndDispose(bool shouldbackup)

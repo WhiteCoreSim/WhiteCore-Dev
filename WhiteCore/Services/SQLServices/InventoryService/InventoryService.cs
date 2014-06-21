@@ -1074,7 +1074,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         /// <param name="senderId">ID of the sender of the item</param>
         /// <param name="folderId"></param>
         /// <param name="recipientParentFolderId">
-        ///     The id of the receipient folder in which the send folder should be placed.  If UUID.Zero then the
+        ///     The id of the recipient folder in which the send folder should be placed.  If UUID.Zero then the
         ///     recipient folder is the root folder
         /// </param>
         /// <param name="success"></param>

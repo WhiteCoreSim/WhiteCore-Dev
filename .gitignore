@@ -97,5 +97,5 @@ Prebuild/Prebuild.sln
 TAGS
 TestResult.xml
 *StyleCop.Cache
+*.StyleCop
 debug/*
-

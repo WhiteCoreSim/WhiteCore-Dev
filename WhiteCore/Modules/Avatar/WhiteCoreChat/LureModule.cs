@@ -39,7 +39,7 @@ using System;
 namespace WhiteCore.Modules.Chat
 {
     /// <summary>
-    ///     This just supports god TP's and thats about it
+    ///     This just supports god TP's and that's about it
     /// </summary>
     public class LureModule : INonSharedRegionModule
     {

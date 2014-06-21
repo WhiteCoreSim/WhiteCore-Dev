@@ -632,7 +632,7 @@ namespace WhiteCore.Modules
         ///     Once again, there a multitude of options possible. In the simplest case
         ///     we specify only the name and get a non-persistent cannel in return. Non
         ///     persistent means that the channel gets deleted if no-one uses it for
-        ///     5 hours. To accomodate future requirements, it may be a good idea to
+        ///     5 hours. To accommodate future requirements, it may be a good idea to
         ///     initially create channels under the umbrella of a parent ID based upon
         ///     the region name. That way we have a context for side channels, if those
         ///     are required in a later phase.
@@ -704,7 +704,7 @@ namespace WhiteCore.Modules
         ///     Once again, there a multitude of options possible. In the simplest case
         ///     we specify only the name and get a non-persistent cannel in return. Non
         ///     persistent means that the channel gets deleted if no-one uses it for
-        ///     5 hours. To accomodate future requirements, it may be a good idea to
+        ///     5 hours. To accommodate future requirements, it may be a good idea to
         ///     initially create channels under the umbrella of a parent ID based upon
         ///     the region name. That way we have a context for side channels, if those
         ///     are required in a later phase.
@@ -861,7 +861,7 @@ namespace WhiteCore.Modules
         ///     Once again, there a multitude of options possible. In the simplest case
         ///     we specify only the name and get a non-persistent cannel in return. Non
         ///     persistent means that the channel gets deleted if no-one uses it for
-        ///     5 hours. To accomodate future requirements, it may be a good idea to
+        ///     5 hours. To accommodate future requirements, it may be a good idea to
         ///     initially create channels under the umbrella of a parent ID based upon
         ///     the region name. That way we have a context for side channels, if those
         ///     are required in a later phase.
@@ -925,7 +925,7 @@ namespace WhiteCore.Modules
 
         /// <summary>
         ///     This method handles the WEB side of making a request over the
-        ///     Vivox interface. The returned values are tansferred to a has
+        ///     Vivox interface. The returned values are transferred to a hash
         ///     table which is returned as the result.
         ///     The outcome of the call can be determined by examining the
         ///     status value in the hash table.
@@ -1063,7 +1063,7 @@ namespace WhiteCore.Modules
         ///     the name hierarchy passed in the 'tag' parameter.
         ///     If the whole hierarchy is resolved, the InnerText
         ///     value at that point is returned. Note that this
-        ///     may itself be a subhierarchy of the entire
+        ///     may itself be a sub-hierarchy of the entire
         ///     document. The function returns a boolean indicator
         ///     of the search's success. The search is performed
         ///     by the recursive Search method.

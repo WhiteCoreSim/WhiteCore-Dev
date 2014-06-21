@@ -301,7 +301,7 @@ namespace WhiteCore.Modules.WorldMap
         }
 
         /// <summary>
-        ///     Requests map blocks in area of minX, maxX, minY, MaxY in world cordinates
+        ///     Requests map blocks in area of minX, maxX, minY, MaxY in world coordinates
         /// </summary>
         /// <param name="remoteClient"></param>
         /// <param name="minX"></param>

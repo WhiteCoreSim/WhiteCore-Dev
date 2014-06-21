@@ -331,7 +331,7 @@ namespace WhiteCore.Region
 
         /// <summary>
         ///     Request the scene presence by name.
-        ///     NOTE: Depricated, use the ScenePresence GetScenePresence (string Name) instead!
+        ///     NOTE: Deprecated, use the ScenePresence GetScenePresence (string Name) instead!
         /// </summary>
         /// <param name="firstName"></param>
         /// <param name="lastName"></param>
@@ -1916,7 +1916,7 @@ namespace WhiteCore.Region
         }
 
         /// <summary>
-        ///     Dupliate the entity and add it to the Scene
+        ///     Duplicate the entity and add it to the Scene
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>

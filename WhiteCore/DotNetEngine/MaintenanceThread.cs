@@ -143,7 +143,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         #region Loops
 
         /// <summary>
-        ///     This loop deals with starting and stoping scripts
+        ///     This loop deals with starting and stopping scripts
         /// </summary>
         /// <returns></returns>
         public void ScriptChangeQueue()

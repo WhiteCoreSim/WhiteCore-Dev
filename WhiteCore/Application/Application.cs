@@ -26,7 +26,6 @@
  */
 
 using WhiteCore.Simulation.Base;
-using System.Reflection;
 
 namespace WhiteCore
 {

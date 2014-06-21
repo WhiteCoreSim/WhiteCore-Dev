@@ -88,7 +88,7 @@ namespace WhiteCore.Region
         }
 
         /// <summary>
-        ///     Generic manager to send and recieve events. Used mainly by region modules
+        ///     Generic manager to send and receive events. Used mainly by region modules
         /// </summary>
         public WhiteCoreEventManager WhiteCoreEventManager
         {

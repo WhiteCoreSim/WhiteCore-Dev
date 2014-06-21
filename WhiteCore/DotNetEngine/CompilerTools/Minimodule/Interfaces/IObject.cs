@@ -73,7 +73,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
         ///     }
         /// </example>
         /// <remarks>
-        ///     Objects should be near-guarunteed to exist for any event which
+        ///     Objects should be near-guaranteed to exist for any event which
         ///     passes them as an argument. Storing an object for a longer period
         ///     of time however will limit their reliability.
         ///     It is a good practice to use Try/Catch blocks handling for
@@ -184,7 +184,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
 
         /// <summary>
         ///     Causes the object to speak to its surroundings,
-        ///     equivilent to LSL/OSSL llSay
+        ///     equivalent to LSL/OSSL llSay
         /// </summary>
         /// <param name="msg">The message to send to the user</param>
         void Say(string msg);
@@ -199,11 +199,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
 
         /// <summary>
         ///     Opens a Dialog Panel in the Users Viewer,
-        ///     equivilent to LSL/OSSL llDialog
+        ///     equivalent to LSL/OSSL llDialog
         /// </summary>
         /// <param name="avatar">The UUID of the Avatar to which the Dialog should be send</param>
         /// <param name="message">The Message to display at the top of the Dialog</param>
-        /// <param name="buttons">The Strings that act as label/value of the Bottons in the Dialog</param>
+        /// <param name="buttons">The Strings that act as label/value of the Buttons in the Dialog</param>
         /// <param name="chat_channel">The channel on which to send the response</param>
         void Dialog(UUID avatar, string message, string[] buttons, int chat_channel);
 

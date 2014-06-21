@@ -40,7 +40,7 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
     ///     A virtual class designed to have methods overloaded,
     ///     this class provides an interface for a generic image
     ///     saving and loading mechanism, but does not specify the
-    ///     format. It should not be insubstantiated directly.
+    ///     format. It should not be unsubstantiated directly.
     /// </summary>
     public class GenericSystemDrawing : ITerrainLoader
     {

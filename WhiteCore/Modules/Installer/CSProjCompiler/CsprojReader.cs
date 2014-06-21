@@ -13,7 +13,7 @@ namespace RunTimeCompiler
     ///     AllCsprojReader (the only class used currently to process .csproj files)
     ///     support .csproj files created with Visual Studio 2005+.
     ///     Visual Studio 2010 is the most recent version of Visual Studio, and the
-    ///     .csproj files it genererates are processed ok by AllCsprojReader.
+    ///     .csproj files it generates are processed ok by AllCsprojReader.
     ///     I do not know if .csproj files created with Visual Studio 2001-2003 can
     ///     be processed successfully.
     /// </summary>
@@ -38,7 +38,7 @@ namespace RunTimeCompiler
 
         /// <summary>
         ///     Defined in IProjectReader.
-        ///     It is used to retriece all the data needed for UI and compilation.
+        ///     It is used to retrieve all the data needed for UI and compilation.
         /// </summary>
         /// <param name="filename">The name (and path) of the C# project file.</param>
         /// <returns></returns>

@@ -191,7 +191,7 @@ namespace WhiteCore.Modules.Restart
         }
 
         /// <summary>
-        ///     This causes the region to restart immediatley.
+        ///     This causes the region to restart immediately.
         /// </summary>
         public void RestartScene()
         {

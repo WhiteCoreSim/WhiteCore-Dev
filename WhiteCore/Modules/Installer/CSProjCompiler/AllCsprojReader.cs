@@ -13,9 +13,9 @@ namespace RunTimeCompiler
     /// <summary>
     ///     This class should be able to process all (almost) kinds of .csproj files
     ///     and retrieve the data needed for UI and compilation.
-    ///     It should succesfully process .csproj files comming from Visual Studio
+    ///     It should successfully process .csproj files coming from Visual Studio
     ///     2005+.
-    ///     It proccesses ok files from Visual Studio 2010 (this is the most recent
+    ///     It processes ok files from Visual Studio 2010 (this is the most recent
     ///     version), but the structure of the .csproj may change in future versions
     ///     of Visual Studio, and therefore the class may not be able to process that
     ///     .csproj files.
@@ -50,7 +50,7 @@ namespace RunTimeCompiler
         }
 
         /// <summary>
-        ///     It is used to get the node that contains the configuraiton-specific settings
+        ///     It is used to get the node that contains the configuration-specific settings
         ///     for the Configuration and Platform specified.
         ///     Currently it looks for the section with the "Condition" attribute like:
         ///     '$(Configuration)|$(Platform)' == '[Configuration]|[Platform]'
@@ -119,7 +119,7 @@ namespace RunTimeCompiler
         ///     Content files are found in:
         ///     &lt; project &gt; &lt; ItemGroup &gt; &lt; Content &gt;
         ///     Then:
-        ///     get name from the atribute "Include",
+        ///     get name from the attribute "Include",
         ///     get CopyToOutputDirectory from child element "CopyToOutputDirectory"
         /// </summary>
         /// <param name="doc"></param>
@@ -161,7 +161,7 @@ namespace RunTimeCompiler
         ///     Source files are found in:
         ///     &lt; project &gt; &lt; ItemGroup &gt; &lt; Compile &gt;
         ///     Then:
-        ///     get name from the atribute "Include",
+        ///     get name from the attribute "Include",
         ///     get DependentUpon from child element "DependentUpon",
         ///     get CopyToOutputDirectory from child element "CopyToOutputDirectory"
         /// </summary>
@@ -209,7 +209,7 @@ namespace RunTimeCompiler
         ///     Resource files are found in:
         ///     &lt; project &gt; &lt; ItemGroup &gt; &lt; EmbeddedResource &gt;
         ///     Then:
-        ///     get name from the atribute "Include",
+        ///     get name from the attribute "Include",
         ///     get DependentUpon from child element "DependentUpon",
         ///     get CopyToOutputDirectory from child element "CopyToOutputDirectory"
         /// </summary>
@@ -257,7 +257,7 @@ namespace RunTimeCompiler
         ///     Config files are found in:
         ///     &lt; project &gt; &lt; ItemGroup &gt; &lt; None &gt;
         ///     Then:
-        ///     get name from the atribute "Include",
+        ///     get name from the attribute "Include",
         ///     get CopyToOutputDirectory from child element "CopyToOutputDirectory"
         /// </summary>
         /// <param name="doc"></param>
@@ -296,16 +296,16 @@ namespace RunTimeCompiler
 
         /// <summary>
         ///     It is used to read the project settings.
-        ///     It reads general settings (framework version, proect type
+        ///     It reads general settings (framework version, project type
         ///     winexe/dll/console...,assembly name etc) and the settings
         ///     for the active configuration (debug/release...) (output folder,
         ///     warning level etc).
         ///     Notes!
-        ///     1. Form the genereal section it gets the Configuration and Platform
-        ///     (aka Debug/Relese, AnyCPU) and the searches for the section having the
+        ///     1. Form the general section it gets the Configuration and Platform
+        ///     (aka Debug/Release, AnyCPU) and the searches for the section having the
         ///     condition:
         ///     '$(Configuration)|$(Platform)' == '[Configuration]|[Platform]'
-        ///     That section is used to get configuraiton-specific settings.
+        ///     That section is used to get configuration-specific settings.
         ///     2. Some important settings like .Net framework version and file alignment
         ///     were added after .Net 2.0. So when these nodes are missing the values "v2.0"
         ///     and "512" are used.
@@ -357,7 +357,7 @@ namespace RunTimeCompiler
         ///     It loads the project file as an XML and then get the value of the
         ///     relevant nodes.
         ///     Note!
-        ///     It does not get every information availbale in .csproj. It only retrieves
+        ///     It does not get every information available in .csproj. It only retrieves
         ///     the information considered relevant for UI and compilation.
         ///     Attention!
         ///     There may be information in .csproj that are important for the compilation

@@ -79,7 +79,7 @@ namespace WhiteCore.ClientStack
         ///     Marks a packet as acknowledged
         ///     This method is used when an acknowledgement is received from the network for a previously
         ///     sent packet. Effects of removal this way are to update unacked byte count, adjust RTT
-        ///     and increase throttle to the coresponding client.
+        ///     and increase throttle to the corresponding client.
         /// </summary>
         /// <param name="sequenceNumber">
         ///     Sequence number of the packet to

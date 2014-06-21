@@ -603,7 +603,7 @@ namespace WhiteCore.Region
         }
 
         /// <summary>
-        ///     This is idential to the Flags property, except that the returned value is uint rather than PrimFlags
+        ///     This is identical to the Flags property, except that the returned value is uint rather than PrimFlags
         /// </summary>
         [Obsolete("Use Flags property instead")]
         public uint ObjectFlags
@@ -3236,8 +3236,8 @@ namespace WhiteCore.Region
 
         /// <summary>
         ///     Having this function because I found when scripts updated the shape.. over and over, it would fill up the memory
-        ///     Having the extra paramater updatePhysics can prevent physics updates on the changes
-        ///     The onlyplace this effects is if a script changes the shape
+        ///     Having the extra parameter updatePhysics can prevent physics updates on the changes
+        ///     The only place this effects is if a script changes the shape
         ///     If the LocklessQueue gets updated this can be removed
         /// </summary>
         /// <param name="shapeBlock"></param>

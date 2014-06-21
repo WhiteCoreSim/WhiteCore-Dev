@@ -3650,7 +3650,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         /// <summary>
         ///     Attach the object containing this script to the avatar that owns it.
         /// </summary>
-        /// <returns>true if the attach suceeded, false if it did not</returns>
+        /// <returns>true if the attach succeeded, false if it did not</returns>
         public bool AttachToAvatar(int attachmentPoint, bool temp)
         {
             IScenePresence presence = World.GetScenePresence(m_host.OwnerID);
@@ -7567,7 +7567,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         }
 
         /// <summary>
-        ///     This is a depecated function so this just replicates the result of
+        ///     This is a deprecated function so this just replicates the result of
         ///     invoking it in SL
         /// </summary>
         public DateTime llRemoteLoadScript(string target, string name, int running, int start_param)

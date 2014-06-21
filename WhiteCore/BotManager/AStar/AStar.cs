@@ -51,7 +51,7 @@ namespace Games.Pathfinding
         /// <summary>
         ///     The accumulative cost of the path until now.
         /// </summary>
-        public double Cost { set; get; }
+        public double Cost { get; set; }
 
         /// <summary>
         ///     The estimated cost to the goal from here.
@@ -109,7 +109,7 @@ namespace Games.Pathfinding
         #region Public Methods
 
         /// <summary>
-        ///     Determines wheather the current node is the goal.
+        ///     Determines whether the current node is the goal.
         /// </summary>
         /// <returns>Returns true if current node is the goal</returns>
         public bool IsGoal()
@@ -122,7 +122,7 @@ namespace Games.Pathfinding
         #region Virtual Methods
 
         /// <summary>
-        ///     Determines wheather the current node is the same state as the on passed.
+        ///     Determines whether the current node is the same state as the on passed.
         /// </summary>
         /// <param name="ANode">AStarNode to compare the current node to</param>
         /// <returns>Returns true if they are the same state</returns>

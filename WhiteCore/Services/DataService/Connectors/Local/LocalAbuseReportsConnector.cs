@@ -206,7 +206,7 @@ namespace WhiteCore.Services.DataService
         }
 
         /// <summary>
-        ///     Updates an abuse reprot without authentication
+        ///     Updates an abuse report without authentication
         /// </summary>
         /// <param name="report"></param>
         public void UpdateAbuseReport(AbuseReport report)

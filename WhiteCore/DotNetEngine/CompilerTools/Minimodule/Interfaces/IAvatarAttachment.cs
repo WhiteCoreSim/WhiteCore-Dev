@@ -35,7 +35,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
         int Location { get; }
 
         /// <value>
-        ///     Accessor to the rez'ed asset, representing the attachment
+        ///     Accessor to the rezzed asset, representing the attachment
         /// </value>
         IObject Asset { get; }
     }

@@ -310,7 +310,7 @@ namespace WhiteCore.Modules.Wind
 
         /// <summary>
         ///     Retrieve the wind speed at the given region coordinate.  This
-        ///     implimentation ignores Z.
+        ///     implementation ignores Z.
         /// </summary>
         /// <param name="x">0...255</param>
         /// <param name="y">0...255</param>

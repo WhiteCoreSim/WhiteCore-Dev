@@ -94,7 +94,7 @@ namespace WhiteCore.BotManager
         /// <param name="firstName"></param>
         /// <param name="lastName"></param>
         /// <param name="scene"></param>
-        /// <param name="cloneAppearanceFrom">UUID of the avatar whos appearance will be copied to give this bot an appearance</param>
+        /// <param name="cloneAppearanceFrom">UUID of the avatar who's appearance will be copied to give this bot an appearance</param>
         /// <param name="creatorID"></param>
         /// <param name="startPos"></param>
         /// <returns>ID of the bot</returns>
@@ -225,7 +225,7 @@ namespace WhiteCore.BotManager
         /// </summary>
         /// <param name="botID">ID of the bot</param>
         /// <param name="positions">List of positions the bot will move to</param>
-        /// <param name="mode">List of what the bot should be doing inbetween the positions</param>
+        /// <param name="mode">List of what the bot should be doing in between the positions</param>
         /// <param name="flags"></param>
         /// <param name="userAttempting"></param>
         public void SetBotMap(UUID botID, List<Vector3> positions, List<TravelMode> mode, int flags, UUID userAttempting)

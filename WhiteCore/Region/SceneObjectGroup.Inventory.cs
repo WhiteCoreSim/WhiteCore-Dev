@@ -185,7 +185,7 @@ namespace WhiteCore.Region
         ///     The updated item.  An item with the same id must already exist
         ///     in this prim's inventory
         /// </param>
-        /// <returns>false if the item did not exist, true if the update occurred succesfully</returns>
+        /// <returns>false if the item did not exist, true if the update occurred successfully</returns>
         public bool UpdateInventoryItem(TaskInventoryItem item)
         {
             SceneObjectPart part = (SceneObjectPart) GetChildPart(item.ParentPartID);

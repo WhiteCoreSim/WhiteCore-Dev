@@ -41,7 +41,7 @@ namespace WhiteCore.Modules.WorldMap.Warp3DMap
         /// <param name="v10">Third, or bottom left value</param>
         /// <param name="v11">Fourth, or bottom right value</param>
         /// <param name="xPercent">Interpolation value on the X axis, between 0.0 and 1.0</param>
-        /// <param name="yPercent">Interpolation value on fht Y axis, between 0.0 and 1.0</param>
+        /// <param name="yPercent">Interpolation value on the Y axis, between 0.0 and 1.0</param>
         /// <returns>The bilinearly interpolated result</returns>
         public static float Bilinear(float v00, float v01, float v10, float v11, float xPercent, float yPercent)
         {

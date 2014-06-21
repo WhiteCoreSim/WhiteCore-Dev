@@ -46,7 +46,7 @@ using OpenMetaverse;
 namespace WhiteCore.Region
 {
     /// <summary>
-    ///     Manager for adding, closing, reseting, and restarting scenes.
+    ///     Manager for adding, closing, resetting, and restarting scenes.
     /// </summary>
     public class SceneManager : ISceneManager, IApplicationPlugin
     {

@@ -58,7 +58,7 @@ using System.Linq;
 namespace WhiteCore.GoogleAPIs
 {
     /// <summary>
-    ///     Languanges for translate API.
+    ///     Languages for translate API.
     /// </summary>
     public sealed class Language
     {

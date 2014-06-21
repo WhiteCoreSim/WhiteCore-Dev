@@ -330,7 +330,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
         //
         /// <summary>
-        ///     Uses the capped cyllinder volume formula to calculate the avatar's mass.
+        ///     Uses the capped cylinder volume formula to calculate the avatar's mass.
         ///     This may be used in calculations in the scene/scenepresence
         /// </summary>
         public override float Mass

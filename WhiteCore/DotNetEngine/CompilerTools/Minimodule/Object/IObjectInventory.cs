@@ -31,7 +31,7 @@ using OpenMetaverse;
 namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
 {
     /// <summary>
-    ///     This implements the methods neccesary to operate on the inventory of an object
+    ///     This implements the methods necessary to operate on the inventory of an object
     /// </summary>
     public interface IObjectInventory : IDictionary<UUID, IInventoryItem>
     {

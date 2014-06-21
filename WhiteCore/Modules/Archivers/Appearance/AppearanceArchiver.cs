@@ -235,7 +235,7 @@ namespace WhiteCore.Modules.Archivers
         }
 
         /// <summary>
-        /// Handles saveing of an avatar archive.
+        /// Handles saving of an avatar archive.
         /// </summary>
         /// <param name="scene">Scene.</param>
         /// <param name="cmdparams">Cmdparams.</param>

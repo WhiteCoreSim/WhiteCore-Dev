@@ -79,7 +79,7 @@ namespace WhiteCore.Physics.PrimMesher
 #endif
 
         /// <summary>
-        ///     ** Experimental ** May disappear from future versions ** not recommeneded for use in applications
+        ///     ** Experimental ** May disappear from future versions ** not recommended for use in applications
         ///     Construct a sculpt mesh from a 2D array of floats
         /// </summary>
         /// <param name="zMap"></param>

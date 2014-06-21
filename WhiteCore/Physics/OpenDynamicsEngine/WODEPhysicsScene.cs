@@ -228,7 +228,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         #region Constructor/Initialization
 
         /// <summary>
-        ///     Initiailizes the scene
+        ///     Initializes the scene
         ///     Sets many properties that ODE requires to be stable
         ///     These settings need to be tweaked 'exactly' right or weird stuff happens.
         /// </summary>

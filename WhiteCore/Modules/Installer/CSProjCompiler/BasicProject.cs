@@ -25,8 +25,8 @@ namespace RunTimeCompiler
 
         /// <summary>
         ///     The list of content files included.
-        ///     Conted files are files (usually documents) that are included
-        ///     in the project, and usually copied to the output folder afted build.
+        ///     Content files are files (usually documents) that are included
+        ///     in the project, and usually copied to the output folder after build.
         ///     Common file types are .txt, .pdf, .html, but there is no restriction;
         ///     these can even be some source code files.
         /// </summary>
@@ -47,7 +47,7 @@ namespace RunTimeCompiler
 
         /// <summary>
         ///     All project settings including general settings (framework version,
-        ///     proect type winexe/dll/console...,assembly name etc) and the settings
+        ///     project type winexe/dll/console...,assembly name etc) and the settings
         ///     for the active configuration (debug/release...) (output folder, warning
         ///     level etc).
         /// </summary>
@@ -62,7 +62,7 @@ namespace RunTimeCompiler
     /// <summary>
     ///     This class contains all important setting that are retrieved while
     ///     parsing the project file.
-    ///     It includes general settings (framework version, proect type
+    ///     It includes general settings (framework version, project type
     ///     winexe/dll/console...,assembly name etc) and the settings
     ///     for the active configuration (debug/release...) (output folder,
     ///     warning level etc).

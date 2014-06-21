@@ -942,7 +942,7 @@ namespace WhiteCore.Modules.Land
         /// <summary>
         ///     Removes a land object from the list. Will not remove if local_id is still owning an area in landIDList
         /// </summary>
-        /// <param name="local_id">Land.localID of the peice of land to remove.</param>
+        /// <param name="local_id">Land.localID of the piece of land to remove.</param>
         public void removeLandObject(int local_id)
         {
             lock (m_landListLock)
@@ -1191,8 +1191,8 @@ namespace WhiteCore.Modules.Land
         /// </summary>
         /// <param name="start_x">x value in first piece of land</param>
         /// <param name="start_y">y value in first piece of land</param>
-        /// <param name="end_x">x value in second peice of land</param>
-        /// <param name="end_y">y value in second peice of land</param>
+        /// <param name="end_x">x value in second piece of land</param>
+        /// <param name="end_y">y value in second piece of land</param>
         /// <param name="attempting_user_id">UUID of the avatar trying to join the land objects</param>
         /// <returns>Returns true if successful</returns>
         private void join(int start_x, int start_y, int end_x, int end_y, UUID attempting_user_id)

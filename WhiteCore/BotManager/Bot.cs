@@ -262,7 +262,7 @@ namespace WhiteCore.BotManager
 
         /// <summary>
         ///     There are several events added so far,
-        ///     Update - called every 0.1s, allows for updating of the position of where the avatar is supposed to be goign
+        ///     Update - called every 0.1s, allows for updating of the position of where the avatar is supposed to be going
         ///     Move - called every 10ms, allows for subtle changes and fast callbacks before the avatar moves toward its next location
         ///     ToAvatar - a following event, called when the bot is within range of the avatar (range = m_followCloseToPoint)
         ///     LostAvatar - a following event, called when the bot is out of the maximum range to look for its avatar (range = m_followLoseAvatarDistance)

@@ -76,7 +76,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
         }
 
         /// <summary>
-        ///     Pass the new CodeTranformer an abstract syntax tree.
+        ///     Pass the new CodeTransformer an abstract syntax tree.
         /// </summary>
         /// <param name="astRoot">The root node of the AST.</param>
         /// <param name="originalScript">The original script that we are converting</param>
@@ -699,7 +699,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
         /// </param>
         /// <param name="constantType">String describing the datatype.</param>
         /// <returns>
-        ///     A SYMBOL node conaining the appropriate structure for intializing a
+        ///     A SYMBOL node containing the appropriate structure for initializing a
         ///     constantType.
         /// </returns>
         private SYMBOL GetZeroConstant(Parser p, string constantType)

@@ -70,7 +70,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
 
         /// <summary>
         ///     Schedule an event callback to fire
-        ///     every "time". Equivilent to a repeating
+        ///     every "time". Equivalent to a repeating
         ///     timer.
         /// </summary>
         /// <param name="time">The period to wait between executions</param>

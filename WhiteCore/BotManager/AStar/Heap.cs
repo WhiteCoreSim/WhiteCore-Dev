@@ -164,7 +164,7 @@ namespace Tanis.Collections
         /// </summary>
         /// <param name="O">The object to add.</param>
         /// <returns>The index where the object has been added.</returns>
-        /// <exception cref="ArgumentException">The Heap is set to use object's IComparable interface, and the specifed object does not implement this interface.</exception>
+        /// <exception cref="ArgumentException">The Heap is set to use object's IComparable interface, and the specified object does not implement this interface.</exception>
         public int Add(object O)
         {
             int Return = -1;
@@ -325,7 +325,7 @@ namespace Tanis.Collections
         ///     Object.ToString() override.
         ///     Build a string to represent the list.
         /// </summary>
-        /// <returns>The string refecting the list.</returns>
+        /// <returns>The string reflecting the list.</returns>
         public override string ToString()
         {
             string OutString = "{";
@@ -407,7 +407,7 @@ namespace Tanis.Collections
         /// </summary>
         /// <param name="C">The object to add.</param>
         /// <returns>The index where the object has been added.</returns>
-        /// <exception cref="ArgumentException">The Heap is set to use object's IComparable interface, and the specifed object does not implement this interface.</exception>
+        /// <exception cref="ArgumentException">The Heap is set to use object's IComparable interface, and the specified object does not implement this interface.</exception>
         public void AddRange(ICollection C)
         {
             foreach (object Object in C)

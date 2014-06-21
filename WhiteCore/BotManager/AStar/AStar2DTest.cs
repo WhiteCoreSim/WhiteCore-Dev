@@ -114,7 +114,7 @@ namespace Games.Pathfinding.AStar2DTest
         #region Overidden Methods
 
         /// <summary>
-        ///     Determines wheather the current node is the same state as the on passed.
+        ///     Determines whether the current node is the same state as the on passed.
         /// </summary>
         /// <param name="ANode">AStarNode to compare the current node to</param>
         /// <returns>Returns true if they are the same state</returns>
@@ -197,7 +197,7 @@ namespace Games.Pathfinding.AStar2DTest
 
         /// <summary>
         ///     Entry and Exit from BotMe is StartPath.Path
-        ///     CurrenMap is the map read from the file in ReadMap
+        ///     CurrentMap is the map read from the file in ReadMap
         /// </summary>
         public static int[,] Map
         {
@@ -251,7 +251,7 @@ namespace Games.Pathfinding.AStar2DTest
         /// <summary>
         ///     The main entry point for the pathfinding routines.
         ///     AstarNode2D is derived from AStar then the StarPath class creates an instance of AStar and uses AstarNode2D
-        ///     to override the methds in AStar.cs.
+        ///     to override the methods in AStar.cs.
         ///     Using Path method as an entry and return point from/to BotMe. Also StartPath is used to make maps and check limits
         ///     as well as print the map out in a console if we use console apps.
         /// </summary>

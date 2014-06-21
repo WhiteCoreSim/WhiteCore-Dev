@@ -123,7 +123,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         private bool m_enabled;
 
         /// <summary>
-        ///     Disabled from the command line, takes presidence over normal Disabled
+        ///     Disabled from the command line, takes precedence over normal Disabled
         /// </summary>
         public bool ConsoleDisabled
         {
@@ -142,7 +142,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         }
 
         /// <summary>
-        ///     Temperary disable by things like OAR loading so that we don't kill loading
+        ///     Temporary disable by things like OAR loading so that we don't kill loading
         /// </summary>
         public bool Disabled
         {

@@ -51,7 +51,7 @@ namespace WhiteCore.Modules.Terrain
         #region StandardTerrainEffects enum
 
         /// <summary>
-        ///     A standard set of terrain brushes and effects recognised by viewers
+        ///     A standard set of terrain brushes and effects recognized by viewers
         /// </summary>
         public enum StandardTerrainEffects : byte
         {

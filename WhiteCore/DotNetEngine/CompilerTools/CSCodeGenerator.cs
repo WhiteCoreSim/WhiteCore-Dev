@@ -2524,7 +2524,7 @@ default
 
         /// <summary>
         ///     Returns the passed name with an underscore prepended if that name is a reserved word in C#
-        ///     and not resevered in LSL otherwise it just returns the passed name.
+        ///     and not reserved in LSL otherwise it just returns the passed name.
         ///     This makes no attempt to cache the results to minimise future lookups. For a non trivial
         ///     scripts the number of unique identifiers could easily grow to the size of the reserved word
         ///     list so maintaining a list or dictionary and doing the lookup there firstwould probably not

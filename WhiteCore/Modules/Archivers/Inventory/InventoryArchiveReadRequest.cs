@@ -274,7 +274,7 @@ namespace WhiteCore.Modules.Archivers
         /// path.  We also pass in a list of previously resolved folders in case we've found this one previously.
         /// <param name="archivePath">
         ///     The item archive path to resolve.  The portion of the path passed back is that
-        ///     which corresponds to the resolved desintation folder.
+        ///     which corresponds to the resolved destination folder.
         /// </param>
         /// <param name="rootDestFolder">
         ///     The root folder for the inventory load

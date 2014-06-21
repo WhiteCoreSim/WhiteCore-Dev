@@ -1052,7 +1052,7 @@ namespace WhiteCore.Services.DataService
         }
 
         /// <summary>
-        ///     Retrives all events in the given region by their maturity level
+        ///     Retrieves all events in the given region by their maturity level
         /// </summary>
         /// <param name="regionName"></param>
         /// <param name="maturity">Uses DirectoryManager.EventFlags to determine the maturity requested</param>

@@ -517,7 +517,7 @@ namespace WhiteCore.Simulation.Base
         #endregion
 
         /// <summary>
-        ///     Should be overriden and referenced by descendents if they need to perform extra shutdown processing
+        ///     Should be overridden and referenced by descendents if they need to perform extra shutdown processing
         ///     Performs any last-minute sanity checking and shuts down the region server
         /// </summary>
         public virtual void Shutdown(bool close)

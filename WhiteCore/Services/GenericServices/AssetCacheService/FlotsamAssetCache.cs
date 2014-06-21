@@ -719,7 +719,7 @@ namespace WhiteCore.Services
         }
 
         /// <summary>
-        ///     Writes a file to the file cache, creating any nessesary
+        ///     Writes a file to the file cache, creating any necessary
         ///     tier directories along the way
         /// </summary>
         /// <param name="filename"></param>
@@ -778,7 +778,7 @@ namespace WhiteCore.Services
         }
 
         /// <summary>
-        ///     Writes a file to the file cache, creating any nessesary
+        ///     Writes a file to the file cache, creating any necessary
         ///     tier directories along the way
         /// </summary>
         /// <param name="filename"></param>

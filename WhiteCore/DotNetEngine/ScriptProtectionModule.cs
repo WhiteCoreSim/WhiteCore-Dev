@@ -111,7 +111,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             public LimitAction Action = LimitAction.None;
 
             /// <summary>
-            ///     What alert will be triggered by the limitor if it does limit
+            ///     What alert will be triggered by the limiter if it does limit
             /// </summary>
             public LimitAlert Alert = LimitAlert.None;
 
