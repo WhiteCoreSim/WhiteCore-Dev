@@ -1318,15 +1318,17 @@ namespace WhiteCore.Region
         /// <param name="cmdparams"></param>
         protected void HandleLoadOar(IScene scene, string[] cmdparams)
         {
+            string fileName;
+
             // a couple of sanity checks
 			if (cmdparams.Count() < 3)
             {
-                MainConsole.Instance.Info(
-                    "You need to specify a filename to load.");
-                return;
-            }
+                fileName = MainConsole.Instance.Prompt("OAR to load (filename)");
+                if (fileName == "")
+                    return;
+            } else
+                fileName = cmdparams[2];
 
-			string fileName = cmdparams[2];
 			if (fileName.StartsWith("--", StringComparison.CurrentCultureIgnoreCase))
 			{
 				MainConsole.Instance.Info("[Error] Command format is 'load oar Filename [optional switches]'");
