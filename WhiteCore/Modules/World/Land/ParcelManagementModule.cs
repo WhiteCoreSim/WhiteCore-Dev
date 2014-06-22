@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.DatabaseInterfaces;
@@ -157,7 +156,8 @@ namespace WhiteCore.Modules.Land
                 m_UpdateDirectoryTimer.Start();
             }
 
-            UUID godParcelOwner = UUID.Zero;
+            //UUID godParcelOwner = UUID.Zero;
+            UUID godParcelOwner = (UUID)Constants.RealEstateOwnerUUID;
             if (_godParcelOwner != "")
             {
                 UserAccount acc = m_scene.UserAccountService.GetUserAccount(null, _godParcelOwner);
@@ -1717,9 +1717,9 @@ namespace WhiteCore.Modules.Land
         {
             if (!merge || data.Count == 0) //Serious fallback
                 ResetSimLandObjects();
-            foreach (LandData t in data)
+            foreach (LandData land in data)
             {
-                int oldRegionSize = (int)Math.Sqrt(t.Bitmap.Length * 8);
+                int oldRegionSize = (int)Math.Sqrt(land.Bitmap.Length * 8);
                 int offset_x = (int)(parcelOffset.X > 0 ? (parcelOffset.X / 4f) : 0),
                     offset_y = (int)(parcelOffset.Y > 0 ? (parcelOffset.Y / 4f) : 0),
                     i = 0, bitNum = 0;
@@ -1727,17 +1727,17 @@ namespace WhiteCore.Modules.Land
                 lock (m_landListLock)
                 {
                     //Update the localID
-                    t.LocalID = ++m_lastLandLocalID;
+                    land.LocalID = ++m_lastLandLocalID;
                 }
                 int x = 0, y = 0;
-                for (i = 0; i < t.Bitmap.Length; i++)
+                for (i = 0; i < land.Bitmap.Length; i++)
                 {
-                    tempByte = t.Bitmap[i];
+                    tempByte = land.Bitmap[i];
                     for (bitNum = 0; bitNum < 8; bitNum++)
                     {
                         bool bit = Convert.ToBoolean(Convert.ToByte(tempByte >> bitNum) & (byte)1);
                         if (bit)
-                            m_landIDList[offset_x + x, offset_y + y] = t.LocalID;
+                            m_landIDList[offset_x + x, offset_y + y] = land.LocalID;
                         x++;
                         if (x > oldRegionSize - 1)
                         {
@@ -1746,8 +1746,18 @@ namespace WhiteCore.Modules.Land
                         }
                     }
                 }
-                ILandObject new_land = new LandObject(t.OwnerID, t.IsGroupOwned, m_scene);
-                new_land.LandData = t;
+
+                // verify that the owner exists
+                UserAccount account = m_scene.UserAccountService.GetUserAccount(m_scene.RegionInfo.AllScopeIDs, land.OwnerID);
+                if (account == null)
+                {
+                    // incomming owner is invalid so re-assign
+                    land.OwnerID = (UUID)Constants.RealEstateOwnerUUID;
+                    land.IsGroupOwned = false;
+                }
+
+                ILandObject new_land = new LandObject(land.OwnerID, land.IsGroupOwned, m_scene);
+                new_land.LandData = land;
                 new_land.ForceUpdateLandInfo();
                 lock (m_landListLock)
                 {
