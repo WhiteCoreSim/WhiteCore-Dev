@@ -345,10 +345,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger PRIM_FLEXIBLE = 21;
         public static readonly LSL_Types.LSLInteger PRIM_TEXGEN = 22;
         public static readonly LSL_Types.LSLInteger PRIM_POINT_LIGHT = 23;
-
         public static readonly LSL_Types.LSLInteger PRIM_CAST_SHADOWS = 24;
-        // Not implemented, here for completeness sake
-
         public static readonly LSL_Types.LSLInteger PRIM_GLOW = 25;
         public static readonly LSL_Types.LSLInteger PRIM_TEXT = 26;
         public static readonly LSL_Types.LSLInteger PRIM_NAME = 27;
@@ -358,6 +355,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger PRIM_POS_LOCAL = 33;
         public static readonly LSL_Types.LSLInteger PRIM_LINK_TARGET = 34;
         public static readonly LSL_Types.LSLInteger PRIM_PHYSICS_SHAPE_TYPE = 35;
+        public static readonly LSL_Types.LSLInteger PRIM_SPECULAR = 36;
+        public static readonly LSL_Types.LSLInteger PRIM_NORMAL = 37;
 
         public static readonly LSL_Types.LSLInteger OS_PRIM_VELOCITY = 65032;
         public static readonly LSL_Types.LSLInteger OS_PRIM_ACCELERATION = 65033;
