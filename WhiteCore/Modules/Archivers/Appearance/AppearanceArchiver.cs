@@ -90,6 +90,14 @@ namespace WhiteCore.Modules.Archivers
                                                                                      InventoryType.Wearable,
                                                                                      AssetType.Clothing);
 
+            if (AppearanceFolder == null)
+            {
+                AppearanceFolder = new InventoryFolderBase (); // does not exist so...
+                AppearanceFolder.Owner = account.PrincipalID;
+                AppearanceFolder.ID = UUID.Random ();  
+                AppearanceFolder.Type = InventoryType.Wearable;
+            }
+
             List<InventoryItemBase> items = new List<InventoryItemBase>();
 
             InventoryFolderBase folderForAppearance
