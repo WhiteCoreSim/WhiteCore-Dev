@@ -551,7 +551,7 @@ namespace WhiteCore.Modules.Permissions
 
         public void HandleTransferOwnership(IScene scene, string[] args)
         {
-            string name = MainConsole.Instance.Prompt("Name of user: ", "");
+            string name = MainConsole.Instance.Prompt("Name of the new owner: ", "");
             if (name == "")
             {
                 MainConsole.Instance.InfoFormat("[PERMISSIONS]: No user selected.");
@@ -561,7 +561,7 @@ namespace WhiteCore.Modules.Permissions
             UserAccount acc = m_scene.UserAccountService.GetUserAccount(null, name);
             if (acc == null)
             {
-                MainConsole.Instance.InfoFormat("[PERMISSIONS]: No user found.");
+                MainConsole.Instance.InfoFormat("[PERMISSIONS]: Sorry, user '{0}' was not found.", name);
                 return;
             }
 
@@ -584,7 +584,7 @@ namespace WhiteCore.Modules.Permissions
 
         public void HandleTransferLandOwnership(IScene scene, string[] args)
         {
-            string name = MainConsole.Instance.Prompt("Name of user: ", "");
+            string name = MainConsole.Instance.Prompt("Name of the new owner: ", "");
             if (name == "")
             {
                 MainConsole.Instance.InfoFormat("[PERMISSIONS]: No user selected.");
@@ -594,7 +594,7 @@ namespace WhiteCore.Modules.Permissions
             UserAccount acc = m_scene.UserAccountService.GetUserAccount(null, name);
             if (acc == null)
             {
-                MainConsole.Instance.InfoFormat("[PERMISSIONS]: No user found.");
+                MainConsole.Instance.InfoFormat("[PERMISSIONS]: Sorry, user '{0}' was not found.", name);
                 return;
             }
 
@@ -617,7 +617,7 @@ namespace WhiteCore.Modules.Permissions
             UserAccount acc = m_scene.UserAccountService.GetUserAccount(null, name);
             if (acc == null)
             {
-                MainConsole.Instance.InfoFormat("[PERMISSIONS]: No user found.");
+                MainConsole.Instance.InfoFormat("[PERMISSIONS]: Sorry, user '{0}' was not found.", name);
                 return;
             }
 
