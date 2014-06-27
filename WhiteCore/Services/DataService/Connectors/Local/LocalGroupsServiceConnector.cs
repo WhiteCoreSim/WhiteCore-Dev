@@ -136,7 +136,8 @@ namespace WhiteCore.Services.DataService
                 return;
 
             // Would this be cleaner as (GroupPowers)ulong.MaxValue;
-            ulong OwnerPowers = (ulong)(GroupPowers.Accountable
+            // replaced by const definition below... this list does not appear to be all cases?
+            /* ulong OwnerPowers = (ulong)(GroupPowers.Accountable
                                          | GroupPowers.AllowEditLand
                                          | GroupPowers.AllowFly
                                          | GroupPowers.AllowLandmark
@@ -181,7 +182,7 @@ namespace WhiteCore.Services.DataService
                                          | GroupPowers.SetLandingPoint
                                          | GroupPowers.StartProposal
                                          | GroupPowers.VoteOnProposal);
-
+            */
             //ulong EveryonePowers = (ulong) (GroupPowers.AllowSetHome |
             //                                GroupPowers.Accountable |
             //                                GroupPowers.JoinChat |
@@ -189,6 +190,8 @@ namespace WhiteCore.Services.DataService
             //                                GroupPowers.ReceiveNotices |
             //                                GroupPowers.StartProposal |
             //                                GroupPowers.VoteOnProposal);
+
+
 
             Dictionary<string, object> row = new Dictionary<string, object>(11);
             row["GroupID"] = groupID;
@@ -205,12 +208,12 @@ namespace WhiteCore.Services.DataService
 
             data.Insert("osgroup", row);
 
-            const ulong EveryonePowers = 8796495740928;
+            const ulong EveryonePowers = 8796495740928;             // >> 0x80018010000
             //Add everyone role to group
             AddRoleToGroup(founderID, groupID, UUID.Zero, "Everyone", "Everyone in the group is in the everyone role.",
                            "Member of " + name, EveryonePowers);
 
-            const ulong OfficersPowers = 436506116225230;
+            const ulong OfficersPowers = 436506116225230;           // >> 0x 18cfffffff8ce
 
             UUID officersRole = UUID.Random();
             //Add officers role to group
@@ -218,9 +221,10 @@ namespace WhiteCore.Services.DataService
                            "The officers of the group, with more powers than regular members.", "Officer of " + name,
                            OfficersPowers);
 
-            // TODO: Need to find out why this crashed the AddRoleToGroup part
-            //const ulong OwnerPowers = 18446744073709551615;
-            
+            const ulong OwnerPowers = 18446744073709551615;
+            // this is the uint maxvalue
+            // the default above is : 349644697632766 >>  0x13dfffffffffe
+           
             //Add owner role to group
             AddRoleToGroup(founderID, groupID, OwnerRoleID, "Owners", "Owners of " + name, "Owner of " + name,
                            OwnerPowers);
@@ -549,7 +553,7 @@ namespace WhiteCore.Services.DataService
                 row["Name"] = NameOf;
                 row["Description"] = Description != null ? Description : "";
                 row["Title"] = Title;
-                row["Powers"] = (long) Powers;
+                row["Powers"] = (ulong) Powers;
                 data.Insert("osrole", row);
             }
         }
