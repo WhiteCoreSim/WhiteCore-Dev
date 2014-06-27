@@ -278,10 +278,13 @@ namespace WhiteCore.Framework.Configuration
                     ReadConfig(sources[i] + ".example", i, m_config);
             }
 
-            // add override paramteres if they exist
-            string  worldIniFilePath = Path.Combine(mainIniDirectory, worldIniFileName);
-            if (File.Exists(worldIniFilePath))
-                ReadConfig(worldIniFilePath, 0, m_config);
+            // add override paramteres if they exist ONLY for standalone operation
+            if (! mainIniFileName.Contains("GridServer"))
+            {
+                string  worldIniFilePath = Path.Combine(mainIniDirectory, worldIniFileName);
+                if (File.Exists(worldIniFilePath))
+                    ReadConfig(worldIniFilePath, 0, m_config);
+            }
 
             FixDefines(ref m_config);
 
