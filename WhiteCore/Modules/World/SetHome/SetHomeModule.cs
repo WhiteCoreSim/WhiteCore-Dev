@@ -104,13 +104,6 @@ namespace WhiteCore.Modules.SetHome
         public OSDMap RegisterCaps(UUID agentID, IHttpServer server)
         {
             OSDMap retVal = new OSDMap();
-            retVal["ServerReleaseNotes"] = CapsUtil.CreateCAPS("ServerReleaseNotes", "");
-
-            server.AddStreamHandler(new GenericStreamHandler("POST", retVal["ServerReleaseNotes"],
-                                                             delegate(string path, Stream request,
-                                                                      OSHttpRequest httpRequest,
-                                                                      OSHttpResponse httpResponse)
-                                                                 { return ProcessServerReleaseNotes(agentID); }));
 
             retVal["CopyInventoryFromNotecard"] = CapsUtil.CreateCAPS("CopyInventoryFromNotecard", "");
 
@@ -120,12 +113,6 @@ namespace WhiteCore.Modules.SetHome
                                                                       OSHttpResponse httpResponse)
                                                                  { return CopyInventoryFromNotecard(request, agentID); }));
             return retVal;
-        }
-
-        private byte[] ProcessServerReleaseNotes(UUID agentID)
-        {
-            OSDMap osd = new OSDMap {{"ServerReleaseNotes", new OSDString(Utilities.GetServerReleaseNotesURL())}};
-            return OSDParser.SerializeLLSDXmlBytes(osd);
         }
 
         private byte[] CopyInventoryFromNotecard(Stream request, UUID agentID)
