@@ -357,6 +357,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger PRIM_PHYSICS_SHAPE_TYPE = 35;
         public static readonly LSL_Types.LSLInteger PRIM_SPECULAR = 36;
         public static readonly LSL_Types.LSLInteger PRIM_NORMAL = 37;
+        public static readonly LSL_Types.LSLInteger PRIM_ALPHA_MODE = 38;
 
         public static readonly LSL_Types.LSLInteger OS_PRIM_VELOCITY = 65032;
         public static readonly LSL_Types.LSLInteger OS_PRIM_ACCELERATION = 65033;
