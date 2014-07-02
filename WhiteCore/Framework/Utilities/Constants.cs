@@ -37,6 +37,7 @@ namespace WhiteCore.Framework.Utilities
         public const string DEFAULT_ASSETCACHE_DIR = DEFAULT_DATA_DIR+"/AssetCache";
         public const string DEFAULT_SCRIPTENGINE_DIR = DEFAULT_DATA_DIR+"/ScriptEngines";
         public const string DEFAULT_FILEASSETS_DIR = DEFAULT_DATA_DIR+"/FileAssets";
+        public const string DEFAULT_AVATARARCHIVE_DIR = DEFAULT_DATA_DIR+"/AvatarArchives";
 
         public const int RegionSize = 256;
         public const int RegionHeight = 10000;
