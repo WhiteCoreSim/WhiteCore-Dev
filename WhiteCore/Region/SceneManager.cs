@@ -545,10 +545,11 @@ namespace WhiteCore.Region
                 Debug, true, false);
 
             MainConsole.Instance.Commands.AddCommand("load oar",
-                "load oar [oar name] [--merge] [--skip-assets] [--OffsetX=#] [--OffsetY=#] [--OffsetZ=#] [--FlipX] [--FlipY] [--UseParcelOwnership] [--CheckOwnership]",
+                "load oar [oar name] [--merge] [--skip-assets] [--skip-terrain] [--OffsetX=#] [--OffsetY=#] [--OffsetZ=#] [--FlipX] [--FlipY] [--UseParcelOwnership] [--CheckOwnership]",
                 "Load a region's data from OAR archive.  \n" +
                 "--merge will merge the oar with the existing scene (including parcels).  \n" +
                 "--skip-assets will load the oar but ignore the assets it contains. \n" +
+                "--skip-terrain will skip loading the oar terrain. \n" +
                 "--OffsetX will change where the X location of the oar is loaded, and the same for Y and Z.  \n" +
                 "--FlipX flips the region on the X axis.  \n" +
                 "--FlipY flips the region on the Y axis.  \n" +
@@ -556,21 +557,21 @@ namespace WhiteCore.Region
                 "      the Estate Owner to the parcel owner on which the object is found.  \n" +
                 "--CheckOwnership asks for each UUID that is not found on the grid what user it should be changed\n" +
                 "      to (useful for changing UUIDs from other grids, but very long with many users).  ",
-                HandleLoadOar, true, false);
+                HandleLoadOar, true, true);
 
             MainConsole.Instance.Commands.AddCommand("save oar",
                 "save oar [<OAR path>] [--perm=<permissions>] ",
                 "Save a region's data to an OAR archive" + Environment.NewLine +
                 "<OAR path> The OAR path must be a filesystem path." +
-                "  If this is not given then the oar is saved to region.oar in the current directory." + Environment.NewLine +
+                "  If this is not given then the oar is saved to the 'region name' in the 'Data/Region/OarFiles' folder." + Environment.NewLine +
                 "--perm stops objects with insufficient permissions from being saved to the OAR." + Environment.NewLine +
                 "  <permissions> can contain one or more of these characters: \"C\" = Copy, \"T\" = Transfer" + Environment.NewLine,
-                HandleSaveOar, true, false);
+                HandleSaveOar, true, true);
 
             MainConsole.Instance.Commands.AddCommand("kick user", 
                 "kick user [all]",
                 "Kick a user off the simulator",
-                KickUserCommand, true, false);
+                KickUserCommand, true, true);
 
             MainConsole.Instance.Commands.AddCommand("restart-instance",
                 "restart-instance",
@@ -1257,7 +1258,6 @@ namespace WhiteCore.Region
         /// <param name="cmd">Cmd.</param>
         private void HandleShowRegions(IScene scene, string[] cmd)
         {
-            //  MainConsole.Instance.Info(scene.ToString());
 
             string sceneInfo;
             var regInfo = scene.RegionInfo;
@@ -1280,7 +1280,7 @@ namespace WhiteCore.Region
 
             }
 
-            // todo ... change hardcoded field sizes to public constants
+            // TODO ... change hardcoded field sizes to public constants
             sceneInfo =  String.Format ("{0, -20}", regInfo.RegionName);
             sceneInfo += String.Format ("{0, -14}", regInfo.Startup);
             sceneInfo += String.Format ("{0, -16}", regInfo.RegionLocX / Constants.RegionSize + "," + regInfo.RegionLocY / Constants.RegionSize);
@@ -1312,6 +1312,16 @@ namespace WhiteCore.Region
                                                     rating));
         }
 
+        public List<string> GetOARFilenames()
+        {
+            var archives = new List<string>( Directory.GetFiles (Constants.DEFAULT_OARARCHIVE_DIR, "*.oar"));
+            var retVals = new List<string>();
+            foreach (string file in archives)
+                retVals.Add (Path.GetFileNameWithoutExtension (file));
+
+            return retVals;
+        }
+
         /// <summary>
         ///     Load a whole region from an opensimulator archive.
         /// </summary>
@@ -1323,9 +1333,26 @@ namespace WhiteCore.Region
             // a couple of sanity checks
 			if (cmdparams.Count() < 3)
             {
-                fileName = MainConsole.Instance.Prompt("OAR to load (filename)");
+                do
+                {
+                    fileName = MainConsole.Instance.Prompt("OAR to load (? for list)", "");
+                    if (fileName == "?")
+                    {
+                        var archives = GetOARFilenames();
+                        MainConsole.Instance.CleanInfo (" Available archives are : ");
+                        foreach (string file in archives)
+                            MainConsole.Instance.CleanInfo ("   " + file);
+                    }
+                } while (fileName == "?");
+
                 if (fileName == "")
                     return;
+
+                // need to add this filename to the cmdparams
+                var newParams = new List<string>(cmdparams);
+                newParams.Add(fileName);
+                cmdparams = newParams.ToArray();
+
             } else
                 fileName = cmdparams[2];
 
@@ -1334,6 +1361,14 @@ namespace WhiteCore.Region
 				MainConsole.Instance.Info("[Error] Command format is 'load oar Filename [optional switches]'");
 				return;
 			}
+
+            string filePath = Path.GetDirectoryName(fileName);
+            if (filePath == "")
+            {
+                filePath = Constants.DEFAULT_OARARCHIVE_DIR + "/";
+                fileName = filePath + fileName;
+                cmdparams [2] = fileName;
+            }
 
             string extension = Path.GetExtension (fileName);
 
@@ -1376,20 +1411,29 @@ namespace WhiteCore.Region
         /// <param name="cmdparams"></param>
         protected void HandleSaveOar(IScene scene, string[] cmdparams)
         {
+            string fileName;
+
             if (MainConsole.Instance.ConsoleScene == null) 
             {
                 MainConsole.Instance.Info ("[SceneManager]: This command requires a region to be selected\n          Please change to a region first");
                 return;
             }
 
-            // a couple of sanity checkes
-            if (cmdparams.Count() < 3)
+            // a couple of sanity checks
+            if (cmdparams.Count () < 3)
             {
-                MainConsole.Instance.Info("You need to specify a filename for the save operation.");
-                return;
-            }
+                fileName = MainConsole.Instance.Prompt ("Filename for the save OAR operation.", scene.RegionInfo.RegionName);
+                if (fileName == "")
+                    return;
 
-            string fileName = cmdparams[2];
+                // need to add this to the cmdparams
+                var newParams = new List<string>(cmdparams);
+                newParams.Add(fileName);
+                cmdparams = newParams.ToArray();
+            }
+            else
+                fileName = cmdparams[2];
+
             string extension = Path.GetExtension (fileName);
 
             if (extension == string.Empty)
@@ -1398,11 +1442,19 @@ namespace WhiteCore.Region
                 cmdparams [2] = fileName;
             }
 
-            string fileDir = Path.GetDirectoryName(fileName);
-            if (fileDir == "") { fileDir = "./"; }
-            if (!Directory.Exists(fileDir))
+            string filePath = Path.GetDirectoryName(fileName);
+            if (filePath == "")
             {
-                MainConsole.Instance.Info ( "[SceneManager]: The folder specified, '" + fileDir + "' does not exist!" );
+                filePath = Constants.DEFAULT_OARARCHIVE_DIR + "/";
+                if (!Directory.Exists (filePath))
+                    Directory.CreateDirectory (filePath);
+                cmdparams [2] = filePath + fileName;
+
+            }
+
+            if (!Directory.Exists(filePath))
+            {
+                MainConsole.Instance.Info ( "[SceneManager]: The folder specified, '" + filePath + "' does not exist!" );
                 return;
             }
 

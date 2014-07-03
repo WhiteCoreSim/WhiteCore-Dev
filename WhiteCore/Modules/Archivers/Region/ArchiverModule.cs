@@ -97,6 +97,7 @@ namespace WhiteCore.Modules.Archivers
         {
             bool mergeOar = false;
             bool skipAssets = false;
+            bool skipTerrain = false;
             int offsetX = 0;
             int offsetY = 0;
             int offsetZ = 0;
@@ -112,6 +113,11 @@ namespace WhiteCore.Modules.Archivers
                 if (param.StartsWith("--skip-assets", StringComparison.CurrentCultureIgnoreCase))
                 {
                     skipAssets = true;
+                    newParams.Remove(param);
+                }
+                if (param.StartsWith("--skip-terrain", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    skipTerrain = true;
                     newParams.Remove(param);
                 }
                 if (param.StartsWith("--merge", StringComparison.CurrentCultureIgnoreCase))
@@ -161,7 +167,7 @@ namespace WhiteCore.Modules.Archivers
             }
 
             DearchiveRegion(newParams.Count > 2 ? newParams[2] : DEFAULT_OAR_BACKUP_FILENAME, mergeOar, skipAssets,
-                            offsetX, offsetY, offsetZ, flipX, flipY,
+                            skipTerrain, offsetX, offsetY, offsetZ, flipX, flipY,
                             useParcelOwnership, checkOwnership);
         }
 
@@ -212,30 +218,30 @@ namespace WhiteCore.Modules.Archivers
 
         public void DearchiveRegion(string loadPath)
         {
-            DearchiveRegion(loadPath, false, false, 0, 0, 0, false, false, false, false);
+            DearchiveRegion(loadPath, false, false, false, 0, 0, 0, false, false, false, false);
         }
 
-        public void DearchiveRegion(string loadPath, bool merge,
-                                    bool skipAssets, int offsetX, int offsetY, int offsetZ, bool flipX, bool flipY,
+        public void DearchiveRegion(string loadPath, bool merge, bool skipAssets, bool skipTerrain,
+                                    int offsetX, int offsetY, int offsetZ, bool flipX, bool flipY,
                                     bool useParcelOwnership, bool checkOwnership)
         {
             MainConsole.Instance.InfoFormat(
                 "[ARCHIVER]: Loading archive to region {0} from {1}", m_scene.RegionInfo.RegionName, loadPath);
 
-            new ArchiveReadRequest(m_scene, loadPath, merge, skipAssets, offsetX,
+            new ArchiveReadRequest(m_scene, loadPath, merge, skipAssets, skipTerrain, offsetX,
                                    offsetY, offsetZ, flipX, flipY, useParcelOwnership, checkOwnership).DearchiveRegion();
         }
 
         public void DearchiveRegion(Stream loadStream)
         {
-            DearchiveRegion(loadStream, false, false, 0, 0, 0, false, false, false, false);
+            DearchiveRegion(loadStream, false, false, false, 0, 0, 0, false, false, false, false);
         }
 
-        public void DearchiveRegion(Stream loadStream, bool merge, bool skipAssets, int offsetX, int offsetY,
-                                    int offsetZ,
+        public void DearchiveRegion(Stream loadStream, bool merge, bool skipAssets, bool skipTerrain,
+                                    int offsetX, int offsetY, int offsetZ,
                                     bool flipX, bool flipY, bool useParcelOwnership, bool checkOwnership)
         {
-            new ArchiveReadRequest(m_scene, loadStream, merge, skipAssets, offsetX, offsetY, offsetZ, flipX, flipY,
+            new ArchiveReadRequest(m_scene, loadStream, merge, skipAssets, skipTerrain, offsetX, offsetY, offsetZ, flipX, flipY,
                                    useParcelOwnership, checkOwnership).DearchiveRegion();
         }
 
