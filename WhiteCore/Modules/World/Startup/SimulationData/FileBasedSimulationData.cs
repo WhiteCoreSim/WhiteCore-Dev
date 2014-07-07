@@ -289,6 +289,16 @@ namespace WhiteCore.Modules
             
                 info.RegionPort = int.Parse (MainConsole.Instance.Prompt ("Region Port", info.RegionPort.ToString ()));
             
+                // TODO: Change this into real Region Types:
+                //
+                // * Mainland / Full Region
+                // * Mainland / Homestead
+                // * Mainland / Openspace
+                //
+                // * Estate / Full Region
+                //
+                // The parts that are mentioned here are the land type, what the region should look like
+                // and are used in the TerrainChannel to generate the land.
                 info.RegionType = MainConsole.Instance.Prompt ("Region Type (Flatland/Mainland/Island)",
                     (info.RegionType == "" ? "Flatland" : info.RegionType));
                     
@@ -499,7 +509,7 @@ namespace WhiteCore.Modules
                 m_timeBetweenSaves = config.GetInt("TimeBetweenSaves", m_timeBetweenSaves);
                 m_keepOldSave = config.GetBoolean("SavePreviousBackup", m_keepOldSave);
 
-                // directories are referneces from the bin directory
+                // directories are references from the bin directory
                 // As of V0.9.2 the data is saved relative to the bin dirs
                 m_oldSaveDirectory =
                     PathHelpers.ComputeFullPath(config.GetString("PreviousBackupDirectory", m_oldSaveDirectory));
