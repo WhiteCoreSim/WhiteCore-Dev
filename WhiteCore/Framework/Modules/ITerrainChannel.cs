@@ -71,7 +71,7 @@ namespace WhiteCore.Framework.Modules
         /// <param name="smoothing">Smoothing.</param>
         /// <param name="scene">Scene.</param>
 
-        void GenerateTerrain(String landType, float min, float max, int smoothing, IScene scene);
+        void GenerateTerrain(string terrainType, float min, float max, int smoothing, IScene scene);
 
     }
 }

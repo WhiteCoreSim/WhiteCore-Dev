@@ -561,6 +561,7 @@ namespace WhiteCore.Modules.WorldMap
                 {
                     // Save to bitmap
                     mapTexture = new Bitmap(image);
+                    mapTexture = OverlayBitmapText(mapTexture,"Region");
 
                     EncoderParameters myEncoderParameters = new EncoderParameters();
                     myEncoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 95L);
@@ -596,6 +597,16 @@ namespace WhiteCore.Modules.WorldMap
                 if (t.MimeType == mimeType) return t;
             }
             return null;
+        }
+
+        private Bitmap OverlayBitmapText(Image bMap, string overlayText)
+        {
+            Bitmap newMap = new Bitmap(bMap);
+            Graphics temp = Graphics.FromImage(newMap);
+            temp.DrawString(overlayText, new Font("Arial", 8, FontStyle.Regular),
+                new SolidBrush(Color.FromArgb(90, 255, 255, 255)), new Point(2, 2));     // top left corner
+
+            return newMap;
         }
 
         #endregion

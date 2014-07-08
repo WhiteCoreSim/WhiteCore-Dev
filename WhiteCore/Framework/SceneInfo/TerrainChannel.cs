@@ -26,7 +26,6 @@
  */
 
 using System;
-using System.Drawing;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Utilities;
 using OpenMetaverse;
@@ -52,10 +51,10 @@ namespace WhiteCore.Framework.SceneInfo
         {
             m_scene = scene;
             m_Width = m_scene.RegionInfo.RegionSizeX;
-			CreateDefaultTerrain(m_scene.RegionInfo.RegionType);
+			CreateDefaultTerrain(m_scene.RegionInfo.RegionTerrain);
         }
 
-		public TerrainChannel(String landType, IScene scene)
+		public TerrainChannel(string terrainType, IScene scene)
 		{
 			m_scene = scene;
 			m_Width = Constants.RegionSize;
@@ -64,7 +63,7 @@ namespace WhiteCore.Framework.SceneInfo
 				m_Width = scene.RegionInfo.RegionSizeX;
 			}
 
-			CreateDefaultTerrain(landType);
+            CreateDefaultTerrain(terrainType);
 		}
 
 		public TerrainChannel(short[] import, IScene scene)
@@ -79,7 +78,7 @@ namespace WhiteCore.Framework.SceneInfo
                 (scene.RegionInfo.RegionSizeY != int.MaxValue))
             {
                 //We need to fix the map then
-				CreateDefaultTerrain(m_scene.RegionInfo.RegionType);
+				CreateDefaultTerrain(m_scene.RegionInfo.RegionTerrain);
             }
         }
 
@@ -267,7 +266,7 @@ namespace WhiteCore.Framework.SceneInfo
         /// <param name="max">Max.</param>
         /// <param name="smoothing">Smoothing.</param>
         /// <param name="scene">Scene.</param>
-		public void GenerateTerrain(String landType, float min, float max, int smoothing,  IScene scene)
+        public void GenerateTerrain(string terrainType, float min, float max, int smoothing,  IScene scene)
 		{
 			m_scene = scene;
 			m_Width = Constants.RegionSize;
@@ -276,17 +275,17 @@ namespace WhiteCore.Framework.SceneInfo
 				m_Width = scene.RegionInfo.RegionSizeX;
 			}
 
-			if (landType == null)
+            if (terrainType == null)
 			{
 				CreateFlatlandTerrain ();
 				return;
 			}
 
 			// try for the land type
-			landType = landType.ToLower ();
-			if (landType.Equals ("mainland"))
+            terrainType = terrainType.ToLower ();
+            if (terrainType.Equals ("mainland"))
 				CreateMainlandTerrain (min, max, smoothing);
-			else if (landType.Equals ("island"))
+            else if (terrainType.Equals ("island"))
 				CreateIslandTerrain (min, max, smoothing);
 			else
 				CreateFlatlandTerrain ();

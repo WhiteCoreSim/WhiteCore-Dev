@@ -163,6 +163,8 @@ namespace WhiteCore.Modules.Web.Translators
                     return "Region Naam";
                 case "RegionTypeText":
                     return "Region Type";
+            case "RegionTerrainText":
+                return "Region Terrain";
                 case "ParcelsInRegionText":
                     return "Parcels In Region";
                 case "ParcelNameText":

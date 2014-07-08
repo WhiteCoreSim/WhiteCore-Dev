@@ -61,6 +61,34 @@ namespace WhiteCore.Modules.Estate
             {
                 IEstateConnector EstateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector>();
 
+                // check for regionType to determine if this is 'Mainland' or an 'Estate'
+                string regType = scene.RegionInfo.RegionType.ToLower ();
+                if (regType.StartsWith ("m"))
+                {
+                    // region is Mainland... assign to RealEstateOwner & System Estate
+                    ES.EstateOwner = (UUID) Constants.RealEstateOwnerUUID;
+                    ES.EstateName = Constants.SystemEstateName;
+                    ES.EstateID = (uint) EstateConnector.GetEstate(ES.EstateOwner, ES.EstateName);
+
+                    // link region to the 'Mainland'
+                    if (EstateConnector.LinkRegion(scene.RegionInfo.RegionID, (int) ES.EstateID))
+                    {
+                        if ((ES = EstateConnector.GetEstateSettings(scene.RegionInfo.RegionID)) == null ||
+                            ES.EstateID == 0)
+                        {
+                            MainConsole.Instance.Warn("Unable to link region to the 'Mainland'!\nPossibly a problem with the server connection, please link this region later.");
+                            break;
+                        }
+                        MainConsole.Instance.Warn("Successfully joined the 'Mainland'!");
+                        break;
+                    }
+
+                    MainConsole.Instance.Warn("Joining the 'Mainland' failed. Please link this region later.");
+                    break;
+
+                }
+
+                // This is and 'Estate' so get some details....
                 string name = MainConsole.Instance.Prompt("Estate owner name", LastEstateOwner);
                 UserAccount account = scene.UserAccountService.GetUserAccount(scene.RegionInfo.AllScopeIDs, name);
 
@@ -76,6 +104,7 @@ namespace WhiteCore.Modules.Estate
                         string password = MainConsole.Instance.PasswordPrompt(name + "'s password");
                         string email = MainConsole.Instance.Prompt(name + "'s email", "");
 
+                        //TODO: This breaks if we are running in Grid mode as the local connector is not able to create a user.
                         scene.UserAccountService.CreateUser(name, Util.Md5Hash(password), email);
                         account = scene.UserAccountService.GetUserAccount(scene.RegionInfo.AllScopeIDs, name);
 
@@ -283,6 +312,10 @@ namespace WhiteCore.Modules.Estate
         {
         }
 
+        /// <summary>
+        /// Checks for a valid system estate. Adds or corrects if required
+        /// </summary>
+        /// <param name="estateConnector">Estate connector.</param>
         private void CheckSystemEstateInfo(IEstateConnector estateConnector)
         {
             // these should have already been checked but just make sure...
@@ -292,25 +325,60 @@ namespace WhiteCore.Modules.Estate
             if (estateConnector.RemoteCalls ())
                 return;
 
-            if (estateConnector.EstateExists (Constants.SystemEstateName))
+            EstateSettings ES;
+            ES = estateConnector.GetEstateSettings (Constants.SystemEstateName);
+            if (ES != null)
+            {   
+                if (ES.EstateID != Constants.SystemEstateID)
+                    UpdateSystemEstates (estateConnector, ES);
+                
                 return;
+            }
 
             // Create a new estate
-            EstateSettings ES = new EstateSettings();
+            ES = new EstateSettings();
             ES.EstateName = Constants.SystemEstateName;
             ES.EstateOwner = (UUID) Constants.RealEstateOwnerUUID;
 
             ES.EstateID = (uint) estateConnector.CreateNewEstate(ES);
             if (ES.EstateID == 0)
             {
-                MainConsole.Instance.Warn("There was an error in creating the system estate: " + ES.EstateName);
+                MainConsole.Instance.Warn ("There was an error in creating the system estate: " + ES.EstateName);
                 //EstateName holds the error. See LocalEstateConnector for more info.
 
-            } else {
+            } else 
+            {
                 MainConsole.Instance.InfoFormat("[EstateService]: The estate '{0}' owned by '{1}' has been created.", 
                     Constants.SystemEstateName, Constants.RealEstateOwnerName);
             }
         }
+
+        /// <summary>
+        /// Correct the system estate ID and update any linked regions.
+        /// </summary>
+        /// <param name="ES">EstateSettings</param>
+        private void  UpdateSystemEstates(IEstateConnector estateConnector, EstateSettings ES)
+        {
+            uint oldEstateID = ES.EstateID;
+
+            MainConsole.Instance.Info ("System estate present but the ID was corrected.");
+
+            // get existing linked regions
+            var regions = estateConnector.GetRegions ((int) oldEstateID);
+
+            // recreate the correct estate
+            estateConnector.DeleteEstate ((int) oldEstateID);
+            int newEstateID = estateConnector.CreateNewEstate (ES);
+
+            // re-link regions
+            foreach ( UUID regID in regions)
+            {
+                estateConnector.LinkRegion(regID, newEstateID);
+            }
+            if (regions.Count > 0)
+                MainConsole.Instance.InfoFormat("Relinked {0} regions",regions.Count);
+        }
+
 
         protected void ChangeEstate(IScene scene, string[] cmd)
         {

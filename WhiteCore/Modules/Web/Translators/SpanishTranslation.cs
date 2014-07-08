@@ -159,6 +159,8 @@
                     return "Region Name";
                 case "RegionTypeText":
                     return "Region Type";
+            case "RegionTerrainText":
+                return "Región Terreno";
                 case "ParcelsInRegionText":
                     return "Parcels In Region";
                 case "ParcelNameText":

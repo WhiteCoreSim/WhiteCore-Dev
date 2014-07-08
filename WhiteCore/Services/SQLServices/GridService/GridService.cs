@@ -665,6 +665,7 @@ namespace WhiteCore.Services.SQLServices.GridService
                 region.HttpPort = gregion.HttpPort;
                 region.RegionName = gregion.RegionName;
                 region.RegionType = gregion.RegionType;
+                region.RegionTerrain = gregion.RegionTerrain;
 
                 try
                 {

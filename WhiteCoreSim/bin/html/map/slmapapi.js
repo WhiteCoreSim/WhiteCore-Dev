@@ -102,7 +102,7 @@ var SLURL = {
 	mouseHoverDelay            : 1000,
 
 // Do we want to display hover information for the map?
-	showHoverTips              : true,
+	showHoverTips              : false,
 
 // color when no region tile available
 	backgroundColor            : '#1D475F',

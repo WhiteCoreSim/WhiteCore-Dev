@@ -286,6 +286,8 @@ namespace WhiteCore.Modules.Gods
             args.waterHeight = (float) m_scene.RegionInfo.RegionSettings.WaterHeight;
             args.simName = m_scene.RegionInfo.RegionName;
             args.regionType = m_scene.RegionInfo.RegionType;
+            args.regionType = m_scene.RegionInfo.RegionType;
+            //args.regionTerrain = m_scene.RegionInfo.RegionTerrain;
 
             remote_client.SendRegionInfoToEstateMenu(args);
         }

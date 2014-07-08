@@ -56,6 +56,7 @@ namespace WhiteCore.Framework.SceneInfo
         protected int m_regionLocY;
         protected int m_regionLocZ;
         protected int m_regionPort;
+        protected string m_regionTerrain = "Flatland";
         private UUID m_GridSecureSessionID = UUID.Zero;
         private bool m_seeIntoThisSimFromNeighbor = true;
 
@@ -191,6 +192,13 @@ namespace WhiteCore.Framework.SceneInfo
             set { m_regionPort = value; }
         }
 
+        [ProtoMember(25)]
+        public string RegionTerrain
+        {
+            get { return m_regionTerrain; }
+            set { m_regionTerrain = value; }
+        }
+
         public ulong RegionHandle
         {
             get { return Utils.UIntsToLong((uint) RegionLocX, (uint) RegionLocY); }
@@ -221,6 +229,8 @@ namespace WhiteCore.Framework.SceneInfo
             if (EnvironmentSettings != null)
                 args["EnvironmentSettings"] = EnvironmentSettings;
             args["OpenRegionSettings"] = OpenRegionSettings.ToOSD();
+            if (RegionTerrain != String.Empty)
+                args["region_terrain"] = OSD.FromString(RegionTerrain);
             return args;
         }
 
@@ -285,6 +295,9 @@ namespace WhiteCore.Framework.SceneInfo
                 OpenRegionSettings = new OpenRegionSettings();
             if (args.ContainsKey("EnvironmentSettings"))
                 EnvironmentSettings = args["EnvironmentSettings"];
+            if (args.ContainsKey("region_terrain"))
+                m_regionTerrain = args["region_terrain"].AsString();
+
         }
 
         public override void FromOSD(OSDMap map)
@@ -326,6 +339,7 @@ namespace WhiteCore.Framework.SceneInfo
             //GridSecureSessionID = ri.GridSecureSessionID;
             //OpenRegionSettings = ri.OpenRegionSettings;
             //EnvironmentSettings =  ri.EnvironmentSettings;
+            RegionTerrain = ri.RegionTerrain;
 
         }
 

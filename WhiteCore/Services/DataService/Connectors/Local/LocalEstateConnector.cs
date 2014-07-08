@@ -131,7 +131,14 @@ namespace WhiteCore.Services.DataService
                 return estateID;
             }
 
-            es.EstateID = GetNewEstateID();
+            // check for system user/estate
+            if ( (es.EstateOwner == (UUID) Constants.RealEstateOwnerUUID) &&           // probably don't need to check both :)
+                (es.EstateName == Constants.SystemEstateName) )
+            {
+                es.EstateID = (uint) Constants.SystemEstateID;                         // Default Mainland estate  # 
+            } else
+                es.EstateID = GetNewEstateID();
+
             SaveEstateSettings(es, true);
             return (int) es.EstateID;
         }
@@ -248,7 +255,7 @@ namespace WhiteCore.Services.DataService
             object remoteValue = DoRemote(ownerID, name);
             if (remoteValue != null || m_doRemoteOnly)
                 return (int) remoteValue;
-
+                
             QueryFilter filter = new QueryFilter();
             filter.andFilters["EstateName"] = name;
             filter.andFilters["EstateOwner"] = ownerID;

@@ -1865,9 +1865,9 @@ namespace WhiteCore.Modules.Terrain
 				return;
 			}
 
-			string landType = cmd[2];
-			landType = landType.ToLower();
-			if ((landType != "flatland") && (cmd.Count() < 5))
+            string terrainType = cmd[2];
+            terrainType = terrainType.ToLower();
+            if ((terrainType != "flatland") && (cmd.Count() < 5))
 			{
 				MainConsole.Instance.Info(
 					"You need to specify some heights to use <min> <max>.");
@@ -1892,7 +1892,7 @@ namespace WhiteCore.Modules.Terrain
 			foreach (TerrainModule tmodule in m)
 			{
 				// try for the land type
-				tmodule.m_channel.GenerateTerrain (landType, minHeight, maxHeight, smoothing, scene);
+                tmodule.m_channel.GenerateTerrain (terrainType, minHeight, maxHeight, smoothing, scene);
 				tmodule.CheckForTerrainUpdates ();
 
 				MainConsole.Instance.Info("New terrain generated.");

@@ -158,6 +158,8 @@
                     return "Region Name";
                 case "RegionTypeText":
                     return "Region Art";
+            case "RegionTerrainText":
+                return "Region Terrain";
                 case "ParcelsInRegionText":
                     return "Parzellen In der Region";
                 case "ParcelNameText":

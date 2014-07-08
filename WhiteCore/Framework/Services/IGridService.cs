@@ -335,6 +335,8 @@ namespace WhiteCore.Framework.Services
         public string ExternalHostName { get; set; }
         [ProtoMember(22)]
         public int InternalPort { get; set; }
+        [ProtoMember(23)]
+        public string RegionTerrain { get; set; }
 
         public bool IsOnline
         {
@@ -395,6 +397,7 @@ namespace WhiteCore.Framework.Services
             AllScopeIDs = ConvertFrom.AllScopeIDs;
             SessionID = ConvertFrom.GridSecureSessionID;
             Flags |= (int) RegionFlags.RegionOnline;
+            RegionTerrain = ConvertFrom.RegionTerrain;
         }
 
         #region Definition of equality
@@ -490,6 +493,7 @@ namespace WhiteCore.Framework.Services
             map["AllScopeIDs"] = AllScopeIDs.ToOSDArray();
             map["Flags"] = Flags;
             map["EstateOwner"] = EstateOwner;
+            map["regionTerrain"] = RegionTerrain;
 
             // We send it along too so that it doesn't need resolved on the other end
             if (ExternalEndPoint != null)
@@ -579,6 +583,9 @@ namespace WhiteCore.Framework.Services
                 int port = map["remoteEndPointPort"].AsInteger();
                 m_remoteEndPoint = new IPEndPoint(add, port);
             }
+            if (map.ContainsKey("regionTerrain"))
+                RegionTerrain = map["regionTerrain"].AsString();
+
         }
 
         #endregion

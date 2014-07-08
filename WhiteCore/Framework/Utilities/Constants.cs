@@ -53,6 +53,7 @@ namespace WhiteCore.Framework.Utilities
 		public const string RealEstateOwnerUUID = "3d6181b0-6a4b-97ef-18d8-722652995cf1";
 		public const string RealEstateOwnerName = "RealEstate Owner";
         public const string SystemEstateName = "WhiteCore Estate";
+        public const int SystemEstateID = 1;
 
 		public const string RealEstateGroupUUID = "dc7b21cd-3c89-fcaa-31c8-25f9ffd224cd";
 		public const string RealEstateGroupName = "Maintenance";

@@ -781,7 +781,8 @@ namespace WhiteCore.Modules.Estate
                                                        waterHeight =
                                                            (float) m_scene.RegionInfo.RegionSettings.WaterHeight,
                                                        simName = m_scene.RegionInfo.RegionName,
-                                                       regionType = m_scene.RegionInfo.RegionType
+                                                       regionType = m_scene.RegionInfo.RegionType,
+                                                       //regionTerrain = m_scene.RegionInfo.RegionTerrain
                                                    };
 
             remote_client.SendRegionInfoToEstateMenu(args);
@@ -979,6 +980,7 @@ namespace WhiteCore.Modules.Estate
             args.terrainDetail2 = m_scene.RegionInfo.RegionSettings.TerrainTexture3;
             args.terrainDetail3 = m_scene.RegionInfo.RegionSettings.TerrainTexture4;
             args.RegionType = Utils.StringToBytes(m_scene.RegionInfo.RegionType);
+            //args.RegionTerrain = Utils.StringToBytes(m_scene.RegionInfo.RegionTerrain);
 
             remoteClient.SendRegionHandshake(m_scene.RegionInfo, args);
         }

@@ -93,6 +93,7 @@ namespace WhiteCore.Modules.Web
                 vars.Add("RegionSizeX", region.RegionSizeX);
                 vars.Add("RegionSizeY", region.RegionSizeY);
                 vars.Add("RegionType", region.RegionType);
+                vars.Add("RegionTerrain", region.RegionTerrain);
                 vars.Add("RegionOnline",
                     (region.Flags & (int) RegionFlags.RegionOnline) ==
                     (int) RegionFlags.RegionOnline
@@ -150,6 +151,7 @@ namespace WhiteCore.Modules.Web
                 vars.Add("RegionSizeText", translator.GetTranslatedString("RegionSizeText"));
                 vars.Add("RegionNameText", translator.GetTranslatedString("RegionNameText"));
                 vars.Add("RegionTypeText", translator.GetTranslatedString("RegionTypeText"));
+                vars.Add("RegionTerrainText", translator.GetTranslatedString("RegionTerrainText"));
                 vars.Add("RegionInfoText", translator.GetTranslatedString("RegionInfoText"));
                 vars.Add("RegionOnlineText", translator.GetTranslatedString("RegionOnlineText"));
                 vars.Add("NumberOfUsersInRegionText", translator.GetTranslatedString("NumberOfUsersInRegionText"));
