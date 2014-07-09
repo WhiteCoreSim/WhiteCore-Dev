@@ -213,20 +213,23 @@ namespace WhiteCore.Modules.Archivers
         {
             var archives = new List<AvatarArchive>();
 
-            //foreach (string file in Directory.GetFiles(Environment.CurrentDirectory, "*.aa"))
-            foreach (string file in Directory.GetFiles(m_storeDirectory, "*.aa"))
+            if (Directory.Exists(m_storeDirectory))
             {
-                try
+                foreach (string file in Directory.GetFiles(m_storeDirectory, "*.aa"))
                 {
-                    AvatarArchive archive = new AvatarArchive();
-                    archive.FromOSD((OSDMap)OSDParser.DeserializeLLSDXml(File.ReadAllText(file)));
-                    if (archive.IsPublic)
-                        archives.Add(archive);
-                }
-                catch
-                {
+                    try
+                    {
+                        AvatarArchive archive = new AvatarArchive();
+                        archive.FromOSD((OSDMap)OSDParser.DeserializeLLSDXml(File.ReadAllText(file)));
+                        if (archive.IsPublic)
+                            archives.Add(archive);
+                    }
+                    catch
+                    {
+                    }
                 }
             }
+
             return archives;
         }
 

@@ -110,11 +110,15 @@ namespace WhiteCore.Modules.Web
 
             bool adminUser = Authenticator.CheckAdminAuthentication(httpRequest, Constants.USER_GOD_CUSTOMER_SERVICE);
             bool allowRegistration = settings.WebRegistration;
+            bool anonymousLogins;
 
-            // allow configuration to override the web settings?
-            //IConfig config = webInterface.Registry.RequestModuleInterface<ISimulationBase>().ConfigSource.Configs ["LoginService"];
-            //if (config != null)
-            //    allowRegistration = config.GetBoolean ("AllowAnonymousLogin", false);
+            // allow configuration to override the web settings
+            IConfig config = webInterface.Registry.RequestModuleInterface<ISimulationBase>().ConfigSource.Configs ["LoginService"];
+            if (config != null)
+            {
+                anonymousLogins = config.GetBoolean ("AllowAnonymousLogin", allowRegistration);
+                allowRegistration = (allowRegistration || anonymousLogins);
+            }
 
             if (!adminUser && !allowRegistration)
             {
