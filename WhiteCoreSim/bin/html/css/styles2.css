@@ -903,10 +903,10 @@ p.minitext {font: 14px/1 Ubuntu, sans-serif;color: #4d4d4d;}
 }
 
 /* Help */
-/* .angstormimage, .voodooimage, .astraimage, .imprudenceimage, 
-.phoeniximage, .singularityimage, .zenimage {;} */
-img.angstormimage, img.voodooimage, img.astraimage, img.imprudenceimage, 
-img.firestormimage, img.phoeniximage, img.singularityimage, img.zenimage {
+/*removed 20140709 - greythane
+img.imprudenceimage, img.phoeniximage, img.zenimage */
+img.angstromimage, img.voodooimage, img.astraimage, img.kokuaimage,  
+img.firestormimage, img.singularityimage {
     cursor: pointer;
     width: 120px;
     height: 100px;

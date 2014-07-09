@@ -4,45 +4,77 @@
 {HelpViewersConfigText}  Help Viewers Configuration
 -->
 
-<h2>{SystemName}: {HelpText}</h2>
+<h2>
+	{SystemName}: {HelpText}
+</h2>
+<p>
+	Login URI: {SystemURL}/
+</p>
+<p>
+	<br>
+</p>
 <div id="help">
-  <a class="colorbox" href="images/viewers/angstorm_01.jpg">
-    <img class="angstormimage" src="images/viewers/angstorm_thumb_01.jpg" alt="{AngstormViewer}" title="{AngstormViewer}">
-  </a>
-  <a class="colorbox" href="images/viewers/astra_01.jpg">
-    <img class="astraimage" src="images/viewers/astra_thumb_01.jpg" alt="{AstraViewer}" title="{AstraViewer}">
-  </a>
-  <a class="colorbox" href="images/viewers/firestorm_01.jpg">
-    <img class="firestormimage" src="images/viewers/firestorm_thumb_01.jpg" alt="{FirestormViewer}" title="{FirestormViewer}">
-  </a>
-  <a class="colorbox" href="images/viewers/imprudence_01.jpg">
-    <img class="imprudenceimage" src="images/viewers/imprudence_thumb_01.jpg" alt="{ImprudenceViewer}" title="{ImprudenceViewer}">
-  </a>
-  <p>
-  <a class="colorbox" href="images/viewers/phoenix_01.jpg">
-    <img class="phoeniximage" src="images/viewers/phoenix_thumb_01.jpg" alt="{PhoenixViewer}" title="{PhoenixViewer}">
-  </a>
-  <a class="colorbox" href="images/viewers/singularity_01.jpg">
-    <img class="singularityimage" src="images/viewers/singularity_thumb_01.jpg" alt="{SingularityViewer}" title="{SingularityViewer}">
-  </a>
-  <a class="colorbox" href="images/viewers/voodoo_01.jpg">
-    <img class="voodooimage" src="images/viewers/voodoo_thumb_01.jpg" alt="{VoodooViewer}" title="{VoodooViewer}">
-  </a>
-  <a class="colorbox" href="images/viewers/zen_01.jpg">
-    <img class="zenimage" src="images/viewers/zen_thumb_01.jpg" alt="{ZenViewer}" title="{ZenViewer}">
-  </a>
-  <h3>{SystemName}: {HelpViewersConfigText}</h3>
-  <p>Login URI: {SystemURL}/</p>
+	<table>
+		<tr>
+			<td colspan="6">
+				<h3>
+					{HelpViewersConfigText}
+				</h3>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<a class="colorbox" href="images/viewers/angstrom_01.jpg"><img class="angstromimage" src="images/viewers/angstrom_thumb_01.jpg" alt="{AngstromViewer}" title="{AngstromViewer}"></a>
+			</td>
+			<td>
+				<a class="colorbox" href="images/viewers/astra_01.jpg"><img class="astraimage" src="images/viewers/astra_thumb_01.jpg" alt="{AstraViewer}" title="{AstraViewer}"></a>
+			</td>
+			<td>
+				<a class="colorbox" href="images/viewers/firestorm_01.jpg"><img class="firestormimage" src="images/viewers/firestorm_thumb_01.jpg" alt="{FirestormViewer}" title="{FirestormViewer}"></a>
+			</td>
+			<td>
+				<a class="colorbox" href="images/viewers/kokua_01.jpg"><img class="kokuaimage" src="images/viewers/kokua_thumb_01.jpg" alt="{KokuaViewer}" title="{KokuaViewer}"></a>
+			</td>
+			<td>
+				<a class="colorbox" href="images/viewers/singularity_01.jpg"><img class="singularityimage" src="images/viewers/singularity_thumb_01.jpg" alt="{SingularityViewer}" title="{SingularityViewer}"></a>
+			</td>
+			<td>
+				<a class="colorbox" href="images/viewers/voodoo_01.jpg"><img class="voodooimage" src="images/viewers/voodoo_thumb_01.jpg" alt="{VoodooViewer}" title="{VoodooViewer}"></a>
+			</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>
+				<a href="https://bitbucket.org/nhede/angstrom2/downloads">{AngstromViewer}</a>
+			</td>
+			<td>
+				<a href="https://github.com/aurora-sim/AstraViewer/downloads">{AstraViewer}</a>
+			</td>
+			<td>
+				<a href="http://www.firestormviewer.org">{FirestormViewer}</a>
+			</td>
+			<td>
+				<a href="http://kokuaviewer.org">{KokuaViewer}</a>
+			</td>
+			<td>
+				<a href="http://www.singularityviewer.org">{SingularityViewer}</a>
+			</td>
+			<td>
+				<!-- <a href="images/viewers/voodoo_01.jpg">{VoodooViewer} </a> -->
+				{VoodooViewer}
+			</td>
+		</tr>
+	</table>
 </div>
 
 <script type="text/javascript">
   $(document).ready(function(){$("a.colorbox").colorbox({rel:'a.colorbox'});});
   
-  $('img.angstormimage, img.astraimage, img.firestormimage, img.imprudenceimage, img.phoeniximage, img.singularityimage, img.voodooimage, img.zenimage').css('opacity', 0.3);
-  $('img.angstormimage, img.astraimage, img.firestormimage, img.imprudenceimage, img.phoeniximage, img.singularityimage, img.voodooimage, img.zenimage').hover(
-    function() {
-      $(this).stop().animate({"opacity": "1.0"}, "0.5");},
+  $('img.angstromimage, img.astraimage, img.firestormimage, img.kokuaimage, img.singularityimage, img.voodooimage').css('opacity', 0.3);
+  $('img.angstromimage, img.astraimage, img.firestormimage, img.kokuaimage, img.singularityimage, img.voodooimage').hover(
+	function() {
+	  $(this).stop().animate({"opacity": "1.0"}, "0.5");},
 	function() {
 	  $(this).stop().animate({"opacity": "0.3"}, "0.5");
   });
- </script>
+</script>

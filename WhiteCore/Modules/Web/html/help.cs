@@ -62,14 +62,15 @@ namespace WhiteCore.Modules.Web
             var vars = new Dictionary<string, object>();
             vars.Add("HelpText", translator.GetTranslatedString("HelpText"));
             vars.Add("HelpViewersConfigText", translator.GetTranslatedString("HelpViewersConfigText"));
-            vars.Add("AngstormViewer", translator.GetTranslatedString("AngstormViewer"));
+            vars.Add("AngstromViewer", translator.GetTranslatedString("AngstromViewer"));
             vars.Add("AstraViewer", translator.GetTranslatedString("AstraViewer"));
             vars.Add("FirestormViewer", translator.GetTranslatedString("FirestormViewer"));
-            vars.Add("ImprudenceViewer", translator.GetTranslatedString("ImprudenceViewer"));
-            vars.Add("PhoenixViewer", translator.GetTranslatedString("PhoenixViewer"));
+            vars.Add("KokuaViewer", translator.GetTranslatedString("KokuaViewer"));
+            //vars.Add("ImpurdenceViewer", translator.GetTranslatedString("ImprudenceViewer"));
+            //vars.Add("PhoenixViewer", translator.GetTranslatedString("PhoenixViewer"));
             vars.Add("SingularityViewer", translator.GetTranslatedString("SingularityViewer"));
             vars.Add("VoodooViewer", translator.GetTranslatedString("VoodooViewer"));
-            vars.Add("ZenViewer", translator.GetTranslatedString("ZenViewer"));
+            //vars.Add("ZenViewer", translator.GetTranslatedString("ZenViewer"));
 
             return vars;
         }

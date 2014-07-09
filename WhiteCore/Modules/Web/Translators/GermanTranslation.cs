@@ -388,13 +388,15 @@
                 case "HelpText":
                     return "Hilfe";
                 case "HelpViewersConfigText":
-                    return "Hilfe bei der Viewers Konfiguration";
-                case "AngstormViewer":
-                    return "Angstorm Viewer";
+                    return "Viewer Konfiguration";
+                case "AngstromViewer":
+                    return "Angstrom Viewer";
                 case "AstraViewer":
                     return "Astra Viewer";
                 case "FirestormViewer":
                     return "Firestorm Viewer";
+                case "KokuaViewer":
+                    return "Kokua Viewer";
                 case "ImprudenceViewer":
                     return "Imprudence Viewer";
                 case "PhoenixViewer":
