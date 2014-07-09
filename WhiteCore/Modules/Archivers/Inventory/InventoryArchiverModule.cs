@@ -35,6 +35,7 @@ using OpenMetaverse;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.Archivers
 {
@@ -43,6 +44,11 @@ namespace WhiteCore.Modules.Archivers
     /// </summary>
     public class InventoryArchiverModule : IService, IInventoryArchiverModule
     {
+        /// <summary>
+        /// The default save/load archive directory.
+        /// </summary>
+        private string m_archiveDirectory = Constants.DEFAULT_USERINVENTORY_DIR;
+
         /// <summary>
         ///     The file to load and save inventory if no filename has been specified
         /// </summary>
@@ -128,7 +134,7 @@ namespace WhiteCore.Modules.Archivers
                 {
                     MainConsole.Instance.Commands.AddCommand(
                         "load iar",
-                        "load iar <first> <last> <inventory path> [<IAR path>]",
+                        "load iar <first> <last> [<inventory path> [<IAR path>]]",
                         //"load iar [--merge] <first> <last> <inventory path> <password> [<IAR path>]",
                         "Load user inventory archive (IAR). "
                         +
@@ -139,26 +145,25 @@ namespace WhiteCore.Modules.Archivers
                         Environment.NewLine
                         + "<IAR path> is the filesystem path or URI from which to load the IAR."
                         +
-                        string.Format("  If this is not given then the filename {0} in the current directory is used",
-                                      DEFAULT_INV_BACKUP_FILENAME),
+                        string.Format("  If this is not given then the 'User' archive in the {0} directory is used",
+                            m_archiveDirectory),
                         HandleLoadInvConsoleCommand, false, true);
 
                     MainConsole.Instance.Commands.AddCommand(
                         "save iar",
-                        "save iar <first> <last> <inventory path> [<IAR path>]",
+                        "save iar <first> <last> [<inventory path> [<IAR path>]]",
                         "Save user inventory archive (IAR). <first> is the user's first name." + Environment.NewLine
                         + "<last> is the user's last name." + Environment.NewLine
                         + "<inventory path> is the path inside the user's inventory for the folder/item to be saved." +
                         Environment.NewLine
                         + "<IAR path> is the filesystem path at which to save the IAR."
                         +
-                        string.Format("  If this is not given then the filename {0} in the current directory is used",
-                                      DEFAULT_INV_BACKUP_FILENAME),
+                        string.Format("  If this is not given then the archive will be saved in " + m_archiveDirectory),
                         HandleSaveInvConsoleCommand, false, true);
 
                     MainConsole.Instance.Commands.AddCommand(
                         "save iar withoutassets",
-                        "save iar withoutassets <first> <last> <inventory path> [<IAR path>]",
+                        "save iar withoutassets <first> <last> [<inventory path> [<IAR path>]]",
                         "Save user inventory archive (IAR) withOUT assets. This version will NOT load on another grid/standalone other than the current grid/standalone! " +
                         "<first> is the user's first name." + Environment.NewLine
                         + "<last> is the user's last name." + Environment.NewLine
@@ -166,8 +171,7 @@ namespace WhiteCore.Modules.Archivers
                         Environment.NewLine
                         + "<IAR path> is the filesystem path at which to save the IAR."
                         +
-                        string.Format("  If this is not given then the filename {0} in the current directory is used",
-                                      DEFAULT_INV_BACKUP_FILENAME),
+                        string.Format("  If this is not given then the archive will be saved in" + m_archiveDirectory),
                         HandleSaveInvWOAssetsConsoleCommand, false, true);
                 }
             }
@@ -293,39 +297,40 @@ namespace WhiteCore.Modules.Archivers
                     }
                 }
 
-                if (newParams.Count < 5)
+                if (newParams.Count < 4)
                 {
                     MainConsole.Instance.Error(
-                        "[Inventory Archiver]: usage is: load iar [--merge] <first name> <last name> <inventory path> [<load file path>]");
+                        "[Inventory Archiver]: usage is: load iar <first name> <last name> [<inventory path> [<load file path>]] [--merge]");
                     return;
                 }
 
                 string firstName = newParams[2];
                 string lastName = newParams[3];
-                string invPath = newParams[4];
-                string loadPath = (newParams.Count > 5 ? newParams[5] : DEFAULT_INV_BACKUP_FILENAME);
+                string archiveFileName = firstName+"_"+lastName+".iar";
+               
+                // optional...
+                string invPath = "/";
+                if (cmdparams.Length > 4)
+                    invPath = newParams[4];
+                if (invPath == "/")
+                    options["merge"] = true;                // always merge if using the root folder
+
+                string loadPath = (newParams.Count > 5 ? newParams[5] : m_archiveDirectory+"/" + archiveFileName);
 
                 //some file sanity checks
-                string extension = Path.GetExtension (loadPath);
+                loadPath = PathHelpers.VerifyReadFile(loadPath, ".iar", m_archiveDirectory);
 
-                if (extension == string.Empty)
+                if (loadPath != "")
                 {
-                    loadPath = loadPath + ".iar";
-                }
-
-                if (!File.Exists(loadPath)) {
-                    MainConsole.Instance.Info ("[Inventory Archiver]: Inventory archive file '" + loadPath + "' not found.");
-                    return;
-                }
-
-                MainConsole.Instance.InfoFormat(
-                    "[Inventory Archiver]: Loading archive {0} to inventory path {1} for {2} {3}",
-                    loadPath, invPath, firstName, lastName);
-
-                if (DearchiveInventory(firstName, lastName, invPath, loadPath, options))
                     MainConsole.Instance.InfoFormat(
-                        "[Inventory Archiver]: Loaded archive {0} for {1} {2}",
-                        loadPath, firstName, lastName);
+                        "[Inventory Archiver]: Loading archive {0} to inventory path {1} for {2} {3}",
+                        loadPath, invPath, firstName, lastName);
+
+                    if (DearchiveInventory(firstName, lastName, invPath, loadPath, options))
+                        MainConsole.Instance.InfoFormat(
+                            "[Inventory Archiver]: Loaded archive {0} for {1} {2}",
+                            loadPath, firstName, lastName);
+                }
             }
             catch (InventoryArchiverException e)
             {
@@ -339,10 +344,10 @@ namespace WhiteCore.Modules.Archivers
         /// <param name="cmdparams"></param>
         protected void HandleSaveInvWOAssetsConsoleCommand(IScene scene, string[] cmdparams)
         {
-            if (cmdparams.Length < 7)
+            if (cmdparams.Length < 5)
             {
                 MainConsole.Instance.Error(
-                    "[Inventory Archiver]: usage is: save iar withoutassets <first name> <last name> <inventory path> [<save file path>]");
+                    "[Inventory Archiver]: usage is: save iar withoutassets <first name> <last name> [<inventory path> [<save file path>]]");
                 return;
             }
 
@@ -351,31 +356,17 @@ namespace WhiteCore.Modules.Archivers
 
             string firstName = cmdparams[3];
             string lastName = cmdparams[4];
-            string invPath = cmdparams[5];
-            string savePath = (cmdparams.Length > 6 ? cmdparams[6] : DEFAULT_INV_BACKUP_FILENAME);
+            string archiveFileName = firstName+"_"+lastName+".iar";
+
+            // optional...
+            string invPath = "*";
+            if (cmdparams.Length > 5)
+                invPath = cmdparams[5];
+
+            string savePath = (cmdparams.Length > 6 ? cmdparams[6] : m_archiveDirectory + "/" + archiveFileName);
 
             //some file sanity checks
-            string extension = Path.GetExtension (savePath);
-
-            if (extension == string.Empty)
-            {
-                savePath = savePath + ".iar";
-            }
-
-            string fileDir = Path.GetDirectoryName(savePath);
-            if (fileDir == "") { fileDir = "./"; }
-            if (!Directory.Exists(fileDir))
-            {
-                MainConsole.Instance.Info ( "[Inventory Archiver]: The file path specified, '" + fileDir + "' does not exist!" );
-                return;
-            }
-
-            if (File.Exists(savePath)) {
-                if (MainConsole.Instance.Prompt ("[Inventory Archiver]: The Inventory archive file '" + savePath + "' already exists. Overwrite?", "yes" ) != "yes")
-                    return;
-
-                File.Delete (savePath);
-            }
+            savePath = PathHelpers.VerifyWriteFile (savePath, ".iar", m_archiveDirectory, true);
 
             MainConsole.Instance.InfoFormat(
                 "[Inventory Archiver]: Saving archive {0} using inventory path {1} for {2} {3} without assets",
@@ -395,45 +386,31 @@ namespace WhiteCore.Modules.Archivers
         /// <param name="cmdparams"></param>
         protected void HandleSaveInvConsoleCommand(IScene scene, string[] cmdparams)
         {
-            if (cmdparams.Length < 6)
+            if (cmdparams.Length < 4)
             {
                 MainConsole.Instance.Error(
-                    "[Inventory Archiver]: usage is: save iar <first name> <last name> <inventory path> [<save file path>]");
+                    "[Inventory Archiver]: usage is: save iar <first name> <last name> [<inventory path> [<save file path>]]");
                 return;
             }
 
             try
             {
-                MainConsole.Instance.Info(
-                    "[Inventory Archiver]: PLEASE NOTE THAT THIS FACILITY IS EXPERIMENTAL.  BUG REPORTS WELCOME.");
+                //MainConsole.Instance.Info(
+                //    "[Inventory Archiver]: PLEASE NOTE THAT THIS FACILITY IS EXPERIMENTAL.  BUG REPORTS WELCOME.");
 
                 string firstName = cmdparams[2];
                 string lastName = cmdparams[3];
-                string invPath = cmdparams[4];
-                string savePath = (cmdparams.Length > 5 ? cmdparams[5] : DEFAULT_INV_BACKUP_FILENAME);
+                string archiveFileName = firstName+"_"+lastName+".iar";
+
+                // optional...
+                string invPath = "/*";
+                if (cmdparams.Length > 4)
+                    invPath = cmdparams[4];
+
+                string savePath = (cmdparams.Length > 5 ? cmdparams[5] : m_archiveDirectory + "/" + archiveFileName);
 
                 //some file sanity checks
-                string extension = Path.GetExtension (savePath);
-
-                if (extension == string.Empty)
-                {
-                    savePath = savePath + ".iar";
-                }
-
-                string fileDir = Path.GetDirectoryName(savePath);
-                if (fileDir == "") { fileDir = "./"; }
-                if (!Directory.Exists(fileDir))
-                {
-                    MainConsole.Instance.Info ( "[Inventory Archiver]: The file path specified, '" + fileDir + "' does not exist!" );
-                    return;
-                }
-
-                if (File.Exists(savePath)) {
-                    if (MainConsole.Instance.Prompt ("[Inventory Archiver]: The IAR file '" + savePath + "' already exists. Overwrite?", "yes" ) != "yes")
-                        return;
-
-                    File.Delete (savePath);
-                }
+                savePath = PathHelpers.VerifyWriteFile (savePath, ".iar", m_archiveDirectory, true);
 
                 MainConsole.Instance.InfoFormat(
                     "[Inventory Archiver]: Saving archive {0} using inventory path {1} for {2} {3}",

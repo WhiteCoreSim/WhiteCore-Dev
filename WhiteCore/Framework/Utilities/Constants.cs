@@ -39,6 +39,7 @@ namespace WhiteCore.Framework.Utilities
         public const string DEFAULT_FILEASSETS_DIR = DEFAULT_DATA_DIR+"/FileAssets";
         public const string DEFAULT_AVATARARCHIVE_DIR = DEFAULT_DATA_DIR+"/AvatarArchives";
         public const string DEFAULT_OARARCHIVE_DIR = DEFAULT_DATA_DIR + "/Region/OarFiles";
+        public const string DEFAULT_USERINVENTORY_DIR = DEFAULT_DATA_DIR+"/UserArchives";
 
         public const int RegionSize = 256;
         public const int RegionHeight = 10000;

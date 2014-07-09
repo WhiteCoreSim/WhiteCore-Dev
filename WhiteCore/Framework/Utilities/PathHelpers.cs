@@ -81,7 +81,7 @@ namespace WhiteCore.Framework.Utilities
             return PathHomeDrive(PathUsername(Path));
         }
 
-        public static string VerifySaveFile(string fileName, string defaultExt, string defaultDir)
+        public static string VerifyWriteFile(string fileName, string defaultExt, string defaultDir, bool createPath)
         {
             // some file sanity checks when saving 
             string extension = Path.GetExtension (fileName);
@@ -92,15 +92,21 @@ namespace WhiteCore.Framework.Utilities
             }
 
             // verify path details
-            if (!Path.IsPathRooted (fileName))
+            string filePath = Path.GetDirectoryName (fileName);
+            if (filePath == "")
             {
                 if ( defaultDir == String.Empty )
                     defaultDir = "./";
 
                 if (!Directory.Exists (defaultDir))
                 {
-                    MainConsole.Instance.Info ("[Error]: The folder specified, '" + defaultDir + "' does not exist!");
-                    return "";
+                    if (createPath)
+                        Directory.CreateDirectory (defaultDir);
+                    else
+                    {
+                        MainConsole.Instance.Info ("[Error]: The folder specified, '" + defaultDir + "' does not exist!");
+                        return "";
+                    }
                 }
                 fileName = Path.Combine (defaultDir, fileName);
  
@@ -137,7 +143,8 @@ namespace WhiteCore.Framework.Utilities
                 }
             }
 
-            if (!Path.IsPathRooted (fileName))
+            string filePath = Path.GetDirectoryName (fileName);
+            if (filePath == "")
             {
                 if (defaultDir == String.Empty)
                     defaultDir = "./";

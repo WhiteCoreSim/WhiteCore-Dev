@@ -884,22 +884,18 @@ namespace WhiteCore.Region
             if (cmd.Count () > 4)
             {
                 regionFile = cmd [3];
-
-                if (PathHelpers.VerifySaveFile (regionFile, ".xml", regionsDir) == "")        // filename is not kocher
-                  return;
-
-                // verify path details
-                if (!Path.IsPathRooted (regionFile))
-                    regionFile = Path.Combine (regionsDir, regionFile);
+                regionFile = PathHelpers.VerifyWriteFile (regionFile, ".xml", regionsDir, false);
             }
 
             // let's do it
-            if (regionFile == "")
-                regionFile = Path.Combine( regionsDir, scene.RegionInfo.RegionName + ".xml");
+            if (regionFile != "")
+            {
+//                regionFile = Path.Combine( regionsDir, scene.RegionInfo.RegionName + ".xml");
 
-            MainConsole.Instance.InfoFormat("[SceneManager]: Saving region configuration for {0} to {1} ...", 
-                                                scene.RegionInfo.RegionName, regionFile);
-            scene.RegionInfo.SaveRegionConfig( regionFile );
+                MainConsole.Instance.InfoFormat ("[SceneManager]: Saving region configuration for {0} to {1} ...", 
+                    scene.RegionInfo.RegionName, regionFile);
+                scene.RegionInfo.SaveRegionConfig (regionFile);
+            }
 
          }
 
