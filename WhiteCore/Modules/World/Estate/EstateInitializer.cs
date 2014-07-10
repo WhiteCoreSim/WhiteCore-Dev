@@ -111,7 +111,7 @@ namespace WhiteCore.Modules.Estate
                         if (account == null)
                         {
                             MainConsole.Instance.ErrorFormat(
-                                "[EstateService]: Unable to store account. If this simulator is connected to a grid, you must create the estate owner account first at the grid level.");
+                                "[EstateService]: Unable to store account. If this simulator is connected to a grid,\n you must create the estate owner account first at the grid level.");
                             continue;
                         }
                     }

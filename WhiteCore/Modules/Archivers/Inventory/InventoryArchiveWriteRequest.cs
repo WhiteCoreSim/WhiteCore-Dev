@@ -176,6 +176,11 @@ namespace WhiteCore.Modules.Archivers
         /// <param name="saveThisFolderItself">If true, save this folder itself.  If false, only saves contents</param>
         protected void SaveInvFolder(InventoryFolderBase inventoryFolder, string path, bool saveThisFolderItself)
         {
+            // ignore viewer folders (special folders?)
+            if (inventoryFolder.Name.StartsWith ("#"))
+                return;
+
+
             if (saveThisFolderItself)
             {
                 path += CreateArchiveFolderName(inventoryFolder);

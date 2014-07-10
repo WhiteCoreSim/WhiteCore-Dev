@@ -73,11 +73,10 @@ namespace WhiteCore.Modules.Archivers
 
             if (rootFolder == null)
             {
-                // don't appear to have any inventory setup yet
-                inventoryService.CreateUserInventory (userId, true);
+                // we don't appear to have any inventory setup yet
+                if (!inventoryService.CreateUserInventory (userId, true))
+                    return new List<InventoryFolderBase> ();
             }
-            //if (null == rootFolder)
-            //    return new List<InventoryFolderBase>();
 
             return FindFolderByPath(inventoryService, rootFolder, path);
         }
@@ -164,9 +163,12 @@ namespace WhiteCore.Modules.Archivers
         {
             InventoryFolderBase rootFolder = inventoryService.GetRootFolder(userId);
 
-            if (null == rootFolder)
-                return null;
-
+            if (rootFolder == null)
+            {
+                // we don't appear to have any inventory setup yet
+                if (!inventoryService.CreateUserInventory (userId, true))
+                    return null;                                                // something really wrong
+            }
             return FindItemByPath(inventoryService, rootFolder, path);
         }
 
