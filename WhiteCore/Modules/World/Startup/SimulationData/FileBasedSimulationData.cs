@@ -260,18 +260,6 @@ namespace WhiteCore.Modules
             {
                 info.RegionName = MainConsole.Instance.Prompt ("Region Name", info.RegionName);
 
-                // Startup mode
-                string scriptStart = MainConsole.Instance.Prompt (
-                    "Region Startup - Normal or Delayed startup (normal/delay) : ","normal").ToLower();
-                if (scriptStart.StartsWith("n"))
-                {
-                    info.Startup = StartupType.Normal;
-                }
-                else
-                {
-                    info.Startup = StartupType.Medium;
-                }
-                
                 info.RegionLocX =
                     int.Parse (MainConsole.Instance.Prompt ("Region Location X",
                     ((info.RegionLocX == 0 
@@ -286,35 +274,106 @@ namespace WhiteCore.Modules
             
                 info.RegionSizeX = int.Parse (MainConsole.Instance.Prompt ("Region size X", info.RegionSizeX.ToString ()));
                 info.RegionSizeY = int.Parse (MainConsole.Instance.Prompt ("Region size Y", info.RegionSizeY.ToString ()));
-            
-                info.RegionPort = int.Parse (MainConsole.Instance.Prompt ("Region Port", info.RegionPort.ToString ()));
-            
-                // TODO: Change this into real Region Types:
-                //
-                // * Mainland / Full Region
+ 
+                // * Mainland / Full Region (Private)
                 // * Mainland / Homestead
                 // * Mainland / Openspace
                 //
-                // * Estate / Full Region
+                // * Estate / Full Region   (Private)
                 //
-                // The parts that are mentioned here are the land type, what the region should look like
-                // and are used in the TerrainChannel to generate the land.
-                info.RegionType = MainConsole.Instance.Prompt ("Region Type (Flatland/Mainland/Island)",
-                    (info.RegionType == "" ? "Flatland" : info.RegionType));
-                    
-                info.SeeIntoThisSimFromNeighbor =  MainConsole.Instance.Prompt (
-                    "See into this sim from neighbors (yes/no)",
-                    info.SeeIntoThisSimFromNeighbor ? "yes" : "no").ToLower() == "yes";
+                info.RegionType = MainConsole.Instance.Prompt ("Region Type (Mainland/Estate)",
+                    (info.RegionType == "" ? "Mainland" : info.RegionType));
 
-                info.InfiniteRegion = MainConsole.Instance.Prompt (
-                    "Make an infinite region (yes/no)",
-                    info.InfiniteRegion ? "yes" : "no").ToLower () == "yes";
-            
-                info.ObjectCapacity =
-                    int.Parse (MainConsole.Instance.Prompt ("Object capacity",
-                    info.ObjectCapacity == 0
-                                           ? "50000"
-                                           : info.ObjectCapacity.ToString ()));
+                // Region presets or advanced setup
+                string setupMode = "whitecore";                             // TODO: WhiteCore 'standard' setup, rename??
+                var responses = new List<string>();
+                if (info.RegionType.ToLower().StartsWith("m"))
+                {
+                    // Mainland regions
+                    responses.Add("Private");
+                    responses.Add("Homestead");
+                    responses.Add ("Openspace");
+                    responses.Add ("Whitecore");                            // TODO: remove?
+                    responses.Add ("Custom");                               // TODO: remove?
+                    setupMode = MainConsole.Instance.Prompt("Mainland region type?", "Private", responses).ToLower ();
+                } else
+                {
+                    // Estate regions
+                    responses.Add("Private");
+                    responses.Add ("Whitecore");
+                    responses.Add ("Custom");
+                    setupMode = MainConsole.Instance.Prompt("Estate region type?","Private", responses).ToLower();
+                }
+
+                if (setupMode.StartsWith("c"))
+                {
+                    info.RegionPort = int.Parse (MainConsole.Instance.Prompt ("Region Port", info.RegionPort.ToString ()));
+                
+                    info.RegionTerrain = MainConsole.Instance.Prompt ("Terrain Type (Flatland/Mainland/Island)",
+                        (info.RegionTerrain == "" ? "Flatland" : info.RegionTerrain));
+
+                    // Startup mode
+                    string scriptStart = MainConsole.Instance.Prompt (
+                        "Region Startup - Normal or Delayed startup (normal/delay) : ","normal").ToLower();
+                    info.Startup = scriptStart.StartsWith ("n") ? StartupType.Normal : StartupType.Medium;
+                              
+                    info.SeeIntoThisSimFromNeighbor =  MainConsole.Instance.Prompt (
+                        "See into this sim from neighbors (yes/no)",
+                        info.SeeIntoThisSimFromNeighbor ? "yes" : "no").ToLower() == "yes";
+
+                    info.InfiniteRegion = MainConsole.Instance.Prompt (
+                        "Make an infinite region (yes/no)",
+                        info.InfiniteRegion ? "yes" : "no").ToLower () == "yes";
+                
+                    info.ObjectCapacity =
+                        int.Parse (MainConsole.Instance.Prompt ("Object capacity",
+                        info.ObjectCapacity == 0
+                                               ? "50000"
+                                               : info.ObjectCapacity.ToString ()));
+                } 
+
+                if (setupMode.StartsWith("w"))
+                {
+                    // 'standard' setup
+                    //info.RegionPort;            // use auto assigned port
+                    info.RegionTerrain = "Flatland";
+                    info.Startup = StartupType.Normal;
+                    info.SeeIntoThisSimFromNeighbor = true;
+                    info.InfiniteRegion = false;
+                    info.ObjectCapacity = 50000;
+
+                }
+                if (setupMode.StartsWith("o"))       
+                {
+                    // 'Openspace' setup
+                    //info.RegionPort;            // use auto assigned port
+                    info.RegionTerrain = "Openspace";
+                    info.Startup = StartupType.Medium;
+                    info.SeeIntoThisSimFromNeighbor = true;
+                    info.InfiniteRegion = false;
+                    info.ObjectCapacity = 750;
+                }
+                if (setupMode.StartsWith("h"))       
+                {
+                    // 'Openspace' setup
+                    //info.RegionPort;            // use auto assigned port
+                    info.RegionTerrain = "Homestead";
+                    info.Startup = StartupType.Medium;
+                    info.SeeIntoThisSimFromNeighbor = true;
+                    info.InfiniteRegion = false;
+                    info.ObjectCapacity = 3750;
+                }
+
+                if (setupMode.StartsWith("p"))       
+                {
+                    // 'Private' setup
+                    //info.RegionPort;            // use auto assigned port
+                    info.RegionTerrain = "Private";
+                    info.Startup = StartupType.Normal;
+                    info.SeeIntoThisSimFromNeighbor = true;
+                    info.InfiniteRegion = false;
+                    info.ObjectCapacity = 15000;
+                }
 
             }
 

@@ -282,10 +282,10 @@ namespace WhiteCore.Framework.SceneInfo
 			}
 
 			// try for the land type
-            terrainType = terrainType.ToLower ();
-            if (terrainType.Equals ("mainland"))
+            string tType = terrainType.ToLower ();
+            if (tType.StartsWith("m"))
 				CreateMainlandTerrain (min, max, smoothing);
-            else if (terrainType.Equals ("island"))
+            else if (tType.StartsWith("i"))
 				CreateIslandTerrain (min, max, smoothing);
 			else
 				CreateFlatlandTerrain ();
@@ -304,13 +304,19 @@ namespace WhiteCore.Framework.SceneInfo
 			}
 
 			// try for the land type
-			landType = landType.ToLower ();
-			if (landType.Equals ("mainland"))
-				CreateMainlandTerrain ();
-			else if (landType.Equals ("island"))
+			var lT = landType.ToLower ();
+            if (lT.StartsWith("m"))                 // Mainland
+				CreateMainlandTerrain (4);
+            else if (lT.StartsWith("p"))            // Private
+                CreateMainlandTerrain (2);
+            else if (lT.StartsWith("H"))            // Homestead
+                CreateMainlandTerrain (3);
+            else if (lT.StartsWith("o"))            // Openspace
+                CreateFlatlandTerrain ();
+			else if (lT.StartsWith("i"))            // Island
 				CreateIslandTerrain ();
 			else
-				CreateFlatlandTerrain ();
+				CreateFlatlandTerrain ();           // we need something
 		}
 
 		private void CreateFlatlandTerrain()
@@ -336,12 +342,12 @@ namespace WhiteCore.Framework.SceneInfo
         }
 
 
-		private void CreateMainlandTerrain()
+        private void CreateMainlandTerrain(int smoothing)
 		{
 			float minHeight = (float) m_scene.RegionInfo.RegionSettings.WaterHeight - 5;
 			float maxHeight = 30;
 
-			CreateMainlandTerrain (minHeight, maxHeight,2);
+			CreateMainlandTerrain (minHeight, maxHeight,smoothing);
 		}
 
 		private void CreateMainlandTerrain (float minHeight, float maxHeight, int smoothing)
@@ -356,17 +362,21 @@ namespace WhiteCore.Framework.SceneInfo
 			int rWidth = m_scene.RegionInfo.RegionSizeX;
 			int rHeight = m_scene.RegionInfo.RegionSizeY;
 			m_Width = rWidth; 
+            float waterHeight = (float) m_scene.RegionInfo.RegionSettings.WaterHeight;
 
 			int octaveCount = 8;
 			float[][] heightMap = PerlinNoise.GenerateHeightMap(rWidth, rHeight, octaveCount, minHeight, maxHeight, smoothing);
+            // float[][] blendMap = PerlinNoise.EdgeBlendMainlandMap (heightMap, waterHeight);
 
-			int x;
-			for (x = 0; x < rWidth; x++)
+            // set the terrain heightmap
+            int x;
+            int y;
+            for (x = 0; x < rWidth; x++)
 			{
-				int y;
 				for (y = 0; y < rHeight; y++)
 				{
 					this[x, y] = heightMap[x][y];
+//                    this[x, y] = blendMap[x][y];
 				}
 			}
 		}
