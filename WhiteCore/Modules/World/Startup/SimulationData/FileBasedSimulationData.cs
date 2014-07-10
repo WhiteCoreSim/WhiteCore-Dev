@@ -260,6 +260,18 @@ namespace WhiteCore.Modules
             {
                 info.RegionName = MainConsole.Instance.Prompt ("Region Name", info.RegionName);
 
+                // Startup mode
+                string scriptStart = MainConsole.Instance.Prompt (
+                    "Region Startup - Normal or Delayed startup (normal/delay) : ","normal").ToLower();
+                if (scriptStart.StartsWith("n"))
+                {
+                    info.Startup = StartupType.Normal;
+                }
+                else
+                {
+                    info.Startup = StartupType.Medium;
+                }
+                
                 info.RegionLocX =
                     int.Parse (MainConsole.Instance.Prompt ("Region Location X",
                     ((info.RegionLocX == 0 
@@ -274,47 +286,36 @@ namespace WhiteCore.Modules
             
                 info.RegionSizeX = int.Parse (MainConsole.Instance.Prompt ("Region size X", info.RegionSizeX.ToString ()));
                 info.RegionSizeY = int.Parse (MainConsole.Instance.Prompt ("Region size Y", info.RegionSizeY.ToString ()));
- 
-                info.RegionType = MainConsole.Instance.Prompt ("Region Type (Mainland/Estate)",
-                    (info.RegionType == "" ? "Mainland" : info.RegionType));
+            
+                info.RegionPort = int.Parse (MainConsole.Instance.Prompt ("Region Port", info.RegionPort.ToString ()));
+            
+                // TODO: Change this into real Region Types:
+                //
+                // * Mainland / Full Region
+                // * Mainland / Homestead
+                // * Mainland / Openspace
+                //
+                // * Estate / Full Region
+                //
+                // The parts that are mentioned here are the land type, what the region should look like
+                // and are used in the TerrainChannel to generate the land.
+                info.RegionType = MainConsole.Instance.Prompt ("Region Type (Flatland/Mainland/Island)",
+                    (info.RegionType == "" ? "Flatland" : info.RegionType));
+                    
+                info.SeeIntoThisSimFromNeighbor =  MainConsole.Instance.Prompt (
+                    "See into this sim from neighbors (yes/no)",
+                    info.SeeIntoThisSimFromNeighbor ? "yes" : "no").ToLower() == "yes";
 
-                // Standard or advanced setup
-                string setupMode = MainConsole.Instance.Prompt("Standard or Advanced setup ?","Standard").ToLower();
-                if (setupMode.StartsWith("a"))
-                {
-                    info.RegionPort = int.Parse (MainConsole.Instance.Prompt ("Region Port", info.RegionPort.ToString ()));
-                
-                    info.RegionTerrain = MainConsole.Instance.Prompt ("Terrain Type (Flatland/Mainland/Island)",
-                        (info.RegionTerrain == "" ? "Flatland" : info.RegionTerrain));
+                info.InfiniteRegion = MainConsole.Instance.Prompt (
+                    "Make an infinite region (yes/no)",
+                    info.InfiniteRegion ? "yes" : "no").ToLower () == "yes";
+            
+                info.ObjectCapacity =
+                    int.Parse (MainConsole.Instance.Prompt ("Object capacity",
+                    info.ObjectCapacity == 0
+                                           ? "50000"
+                                           : info.ObjectCapacity.ToString ()));
 
-                    // Startup mode
-                    string scriptStart = MainConsole.Instance.Prompt (
-                        "Region Startup - Normal or Delayed startup (normal/delay) : ","normal").ToLower();
-                    info.Startup = scriptStart.StartsWith ("n") ? StartupType.Normal : StartupType.Medium;
-                              
-                    info.SeeIntoThisSimFromNeighbor =  MainConsole.Instance.Prompt (
-                        "See into this sim from neighbors (yes/no)",
-                        info.SeeIntoThisSimFromNeighbor ? "yes" : "no").ToLower() == "yes";
-
-                    info.InfiniteRegion = MainConsole.Instance.Prompt (
-                        "Make an infinite region (yes/no)",
-                        info.InfiniteRegion ? "yes" : "no").ToLower () == "yes";
-                
-                    info.ObjectCapacity =
-                        int.Parse (MainConsole.Instance.Prompt ("Object capacity",
-                        info.ObjectCapacity == 0
-                                               ? "50000"
-                                               : info.ObjectCapacity.ToString ()));
-                } else
-                {
-                    // 'standard' setup
-                    //info.RegionPort;            // use auto assigned port
-                    info.RegionTerrain = "Flatland";
-                    info.Startup = StartupType.Normal;
-                    info.SeeIntoThisSimFromNeighbor = true;
-                    info.InfiniteRegion = false;
-                    info.ObjectCapacity = 50000;
-                }
             }
 
             // are we updating or adding??
@@ -508,7 +509,7 @@ namespace WhiteCore.Modules
                 m_timeBetweenSaves = config.GetInt("TimeBetweenSaves", m_timeBetweenSaves);
                 m_keepOldSave = config.GetBoolean("SavePreviousBackup", m_keepOldSave);
 
-                // directories are referneces from the bin directory
+                // directories are references from the bin directory
                 // As of V0.9.2 the data is saved relative to the bin dirs
                 m_oldSaveDirectory =
                     PathHelpers.ComputeFullPath(config.GetString("PreviousBackupDirectory", m_oldSaveDirectory));

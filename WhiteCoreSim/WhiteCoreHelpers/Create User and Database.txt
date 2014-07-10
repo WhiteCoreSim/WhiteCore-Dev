@@ -1,0 +1,13 @@
+Change the <insert password here> into a long password, preferable 8 chars or longer
+
+Then open up you favorite MySQL editor (phpMyAdmin, MySQLAdmin or another tool) and run the following commands:
+
+================================================================================================================
+
+CREATE USER 'whitecore'@'%' IDENTIFIED BY '<insert password here>';
+
+CREATE DATABASE IF NOT EXISTS `whitecore` ;
+
+GRANT ALL PRIVILEGES ON `whitecore` . * TO 'whitecore'@'%';
+
+================================================================================================================
