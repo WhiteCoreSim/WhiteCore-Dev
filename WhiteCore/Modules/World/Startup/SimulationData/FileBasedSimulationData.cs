@@ -285,32 +285,55 @@ namespace WhiteCore.Modules
                     (info.RegionType == "" ? "Mainland" : info.RegionType));
 
                 // Region presets or advanced setup
-                string setupMode = "whitecore";                             // TODO: WhiteCore 'standard' setup, rename??
+                string setupMode;                             
+                string terrainWater = "Aquatic";                             
+                string terrainFull = "Grassland";
                 var responses = new List<string>();
                 if (info.RegionType.ToLower().StartsWith("m"))
                 {
                     // Mainland regions
-                    responses.Add("Private");
+                    info.RegionType = "Mainland / ";                   
+                    responses.Add("Full Region");
                     responses.Add("Homestead");
                     responses.Add ("Openspace");
                     responses.Add ("Whitecore");                            // TODO: remove?
                     responses.Add ("Custom");                               // TODO: remove?
-                    setupMode = MainConsole.Instance.Prompt("Mainland region type?", "Private", responses).ToLower ();
+                    setupMode = MainConsole.Instance.Prompt("Mainland region type?", "Full Region", responses).ToLower ();
+
+                    // allow specifying terrain for Openspace
+                    if (setupMode.StartsWith("o"))
+                        terrainWater = MainConsole.Instance.Prompt("Openspace terrain (Aquatic / Land)?","Aquatic").ToLower();
+
                 } else
                 {
                     // Estate regions
-                    responses.Add("Private");
-                    responses.Add ("Whitecore");
+                    info.RegionType = "Estate / ";                   
+                    responses.Add("Full Region");
+                    responses.Add ("Whitecore");                            // TODO: WhiteCore 'standard' setup, rename??
                     responses.Add ("Custom");
-                    setupMode = MainConsole.Instance.Prompt("Estate region type?","Private", responses).ToLower();
+                    setupMode = MainConsole.Instance.Prompt("Estate region type?","Full Region", responses).ToLower();
+                }
+
+                // terrain can be specified for Full regions
+                if (setupMode.StartsWith ("f") || setupMode.StartsWith ("c"))
+                {
+                    var tresp = new List<string>();
+                    tresp.Add ("Flatland");
+                    tresp.Add ("Grassland");
+                    tresp.Add ("Island");
+                    tresp.Add ("Aquatic");
+                    string tscape = MainConsole.Instance.Prompt ("Terrain Type?", terrainFull,tresp);
+                    terrainFull = tscape;
+                    // TODO: This would be where we allow selection of preset terrain files
                 }
 
                 if (setupMode.StartsWith("c"))
                 {
                     info.RegionPort = int.Parse (MainConsole.Instance.Prompt ("Region Port", info.RegionPort.ToString ()));
                 
-                    info.RegionTerrain = MainConsole.Instance.Prompt ("Terrain Type (Flatland/Mainland/Island)",
-                        (info.RegionTerrain == "" ? "Flatland" : info.RegionTerrain));
+                    //info.RegionTerrain = MainConsole.Instance.Prompt ("Terrain Type (Flatland/Grassland/Island/Aquatic)",
+                    //    (info.RegionTerrain == "" ? "Flatland" : info.RegionTerrain));
+                    info.RegionTerrain = terrainFull;
 
                     // Startup mode
                     string scriptStart = MainConsole.Instance.Prompt (
@@ -335,6 +358,7 @@ namespace WhiteCore.Modules
                 if (setupMode.StartsWith("w"))
                 {
                     // 'standard' setup
+                    info.RegionType = info.RegionType + "Whitecore";                   
                     //info.RegionPort;            // use auto assigned port
                     info.RegionTerrain = "Flatland";
                     info.Startup = StartupType.Normal;
@@ -346,33 +370,51 @@ namespace WhiteCore.Modules
                 if (setupMode.StartsWith("o"))       
                 {
                     // 'Openspace' setup
+                    info.RegionType = info.RegionType + "Openspace";                   
                     //info.RegionPort;            // use auto assigned port
-                    info.RegionTerrain = "Openspace";
+                    if (terrainWater.StartsWith("a"))
+                        info.RegionTerrain = "Aquatic";
+                    else
+                        info.RegionTerrain = "Grassland";
                     info.Startup = StartupType.Medium;
                     info.SeeIntoThisSimFromNeighbor = true;
                     info.InfiniteRegion = false;
                     info.ObjectCapacity = 750;
-                }
+                    info.RegionSettings.AgentLimit = 10;
+                    info.RegionSettings.AllowLandJoinDivide = false;
+                    info.RegionSettings.AllowLandResell = false;
+                                   }
                 if (setupMode.StartsWith("h"))       
                 {
-                    // 'Openspace' setup
+                    // 'Homestead' setup
+                    info.RegionType = info.RegionType + "Homestead";                   
                     //info.RegionPort;            // use auto assigned port
                     info.RegionTerrain = "Homestead";
                     info.Startup = StartupType.Medium;
                     info.SeeIntoThisSimFromNeighbor = true;
                     info.InfiniteRegion = false;
                     info.ObjectCapacity = 3750;
+                    info.RegionSettings.AgentLimit = 20;
+                    info.RegionSettings.AllowLandJoinDivide = false;
+                    info.RegionSettings.AllowLandResell = false;
                 }
 
-                if (setupMode.StartsWith("p"))       
+                if (setupMode.StartsWith("f"))       
                 {
-                    // 'Private' setup
+                    // 'Full Region' setup
+                    info.RegionType = info.RegionType + "Full Region";                   
                     //info.RegionPort;            // use auto assigned port
-                    info.RegionTerrain = "Private";
+                    info.RegionTerrain = terrainFull;
                     info.Startup = StartupType.Normal;
                     info.SeeIntoThisSimFromNeighbor = true;
                     info.InfiniteRegion = false;
                     info.ObjectCapacity = 15000;
+                    info.RegionSettings.AgentLimit = 100;
+                    if (info.RegionType.StartsWith ("M"))                           // defaults are 'true'
+                    {
+                        info.RegionSettings.AllowLandJoinDivide = false;
+                        info.RegionSettings.AllowLandResell = false;
+                    }
                 }
 
             }

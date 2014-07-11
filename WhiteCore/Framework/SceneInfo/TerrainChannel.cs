@@ -283,10 +283,12 @@ namespace WhiteCore.Framework.SceneInfo
 
 			// try for the land type
             string tType = terrainType.ToLower ();
-            if (tType.StartsWith("m"))
+            if (tType.StartsWith("m") || tType.StartsWith("g"))
 				CreateMainlandTerrain (min, max, smoothing);
             else if (tType.StartsWith("i"))
 				CreateIslandTerrain (min, max, smoothing);
+            else if (tType.StartsWith("a"))                             
+                CreateIslandTerrain (min, max, smoothing);                      // TODO: fully sort this one out
 			else
 				CreateFlatlandTerrain ();
 		}
@@ -307,7 +309,9 @@ namespace WhiteCore.Framework.SceneInfo
 			var lT = landType.ToLower ();
             if (lT.StartsWith("m"))                 // Mainland
 				CreateMainlandTerrain (4);
-            else if (lT.StartsWith("p"))            // Private
+            else if (lT.StartsWith("f"))            // Full Region
+                CreateMainlandTerrain (2);
+            else if (lT.StartsWith("g"))            // Grassland
                 CreateMainlandTerrain (2);
             else if (lT.StartsWith("H"))            // Homestead
                 CreateMainlandTerrain (3);
@@ -315,6 +319,8 @@ namespace WhiteCore.Framework.SceneInfo
                 CreateFlatlandTerrain ();
 			else if (lT.StartsWith("i"))            // Island
 				CreateIslandTerrain ();
+            else if (lT.StartsWith("a"))            // Aquatic
+                CreateIslandTerrain (0, 15, 3);     // TODO: fully sort this one out
 			else
 				CreateFlatlandTerrain ();           // we need something
 		}
@@ -366,7 +372,7 @@ namespace WhiteCore.Framework.SceneInfo
 
 			int octaveCount = 8;
 			float[][] heightMap = PerlinNoise.GenerateHeightMap(rWidth, rHeight, octaveCount, minHeight, maxHeight, smoothing);
-            // float[][] blendMap = PerlinNoise.EdgeBlendMainlandMap (heightMap, waterHeight);
+            float[][] blendMap = PerlinNoise.EdgeBlendMainlandMap (heightMap, waterHeight);
 
             // set the terrain heightmap
             int x;
@@ -375,8 +381,8 @@ namespace WhiteCore.Framework.SceneInfo
 			{
 				for (y = 0; y < rHeight; y++)
 				{
-					this[x, y] = heightMap[x][y];
-//                    this[x, y] = blendMap[x][y];
+//					this[x, y] = heightMap[x][y];
+                    this[x, y] = blendMap[x][y];
 				}
 			}
 		}

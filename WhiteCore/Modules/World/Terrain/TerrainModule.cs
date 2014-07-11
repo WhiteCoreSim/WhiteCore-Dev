@@ -1858,33 +1858,36 @@ namespace WhiteCore.Modules.Terrain
 		/// <param name="cmd">Cmd.</param>
 		private void InterfaceGenerateTerrain(IScene scene, string[] cmd)
 		{
-			if (cmd.Count() < 3)
-			{
-				MainConsole.Instance.Info(
-					"You need to specify what terrain type to use, Flatland, Mainland or Island.");
-				return;
-			}
+            string terrainType;
+            //assume flatland paramters
+            float minHeight = (float) m_scene.RegionInfo.RegionSettings.WaterHeight + 1;
+            float maxHeight = minHeight;
+            int smoothing = 1;
 
-            string terrainType = cmd[2];
+            if (cmd.Count() < 3)
+			{
+				terrainType = MainConsole.Instance.Prompt("What terrain type to use, Flatland, Mainland, Island or Aquatic?","Flatland");
+            } else
+                terrainType = cmd[2];
             terrainType = terrainType.ToLower();
-            if ((terrainType != "flatland") && (cmd.Count() < 5))
-			{
-				MainConsole.Instance.Info(
-					"You need to specify some heights to use <min> <max>.");
-				return;
-			}
 
-			//assume flatland paramters
-			float minHeight = (float) m_scene.RegionInfo.RegionSettings.WaterHeight + 1;
-			float maxHeight = minHeight;
-			int smoothing = 1;
-
-			if (cmd.Count () >= 5)
+            // have heights?
+            if (!((terrainType.StartsWith ("f")) || (terrainType.StartsWith ("a"))) && (cmd.Count () < 5))
+            {
+                minHeight = int.Parse (MainConsole.Instance.Prompt ("Minimum height", minHeight.ToString ()));
+                maxHeight = int.Parse (MainConsole.Instance.Prompt ("Maximum height", maxHeight.ToString ()));
+            } else if (terrainType.StartsWith ("a"))
+            {
+                minHeight = 0;
+                maxHeight = 15;
+                smoothing = 4;
+            } else
 			{
 				minHeight = float.Parse (cmd [3]);
 				maxHeight = float.Parse (cmd [4]);
 			}
 
+            //have smoothing?
 			if (cmd.Count () == 6)
 				smoothing = int.Parse (cmd [5]);
 
@@ -2002,7 +2005,7 @@ namespace WhiteCore.Modules.Terrain
                 "\n Max: max terrain height after rescaling");
 			MainConsole.Instance.Info(
 				"terrain generate <type> <Min> <Max> [smoothing]- Genrate new terrain to fit between the given min and max heights" +
-				"\n Type: Flatland, Mainland, Island" +
+				"\n Type: Flatland, Mainland, Island, Aquatic" +
 				"\n Min: min terrain height after rescaling" +
 				"\n Max: max terrain height after rescaling"+
 				"\n Smoothing: [Optional] number of smoothing passes");
@@ -2095,7 +2098,7 @@ namespace WhiteCore.Modules.Terrain
 				MainConsole.Instance.Commands.AddCommand("terrain generate",
 				                                         "terrain generate <type> <min> <max> [smoothing]",
 				                                         "Generate new terrain to fit between the given min and max heights" +
-				                                         "\n Type: Flatland, Mainland, Island" +
+				                                         "\n Type: Flatland, Mainland, Island, Aquatic" +
 				                                         "\n Min: min terrain height after rescaling" +
 				                                         "\n Max: max terrain height after rescaling"+
 				                                         "\n Smoothing: [Optional - default 2] number of smoothing passes to perform",

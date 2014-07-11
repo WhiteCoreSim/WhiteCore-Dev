@@ -33,11 +33,8 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Text;
-using WhiteCore.Framework.Modules;
 
 using WhiteCore.Framework.ConsoleFramework;
 
@@ -488,46 +485,96 @@ namespace WhiteCore.Framework.SceneInfo
 
 
 		/// <summary>
-		/// Generates a gradient map than can be used as a mask.
+		/// Generates a map with the edges blended to the edgeLevel.
 		/// </summary>
-		/// <returns>The gradient map.</returns>
-		/// <param name="width">Width.</param>
-		/// <param name="height">Height.</param>
-		public static float[][]  GenerateGradientMap(int width, int height)
+		/// <returns>The blended map.</returns>
+		/// <param name="map">The heightmap to be blended.</param>
+		/// <param name="edgeLevel">Value at the edgel of the map.</param>
+        public static float[][] EdgeBlendMainlandMap(float[][] map, float edgeLevel)
 		{
-			int wVar = (int)(width * .13);
-			int hVar = (int)(height * .11);
+            int width = map.Length;
+            int height = map[0].Length;
+            int wVar = (int)(width * .13);
+            int hVar = (int)(height * .11);
 
-			float cx = (width / 2) + random.Next(-1*wVar, wVar);
-			float cy = (height / 2) + random.Next(-1*hVar, hVar);
-			float minRad = (float) Math.Sqrt((cx*cx)+(cy*cy))* 0.55f;
-			float maxRad = minRad * 1.33f;
+            float cx = (width-1) / 2;     // + random.Next(-1*wVar, wVar);
+            float cy = (height-1)/ 2;    // + random.Next(-1*hVar, hVar);
 	
-			float [][] gradient_map = GetEmptyArray<float>(width, height);
-			for (int x = 0; x < width; x++)
+			float [][] blend_map = GetEmptyArray<float>(width, height);
+
+            for (int x = 0; x < width; x++)
 			{
 				for (int y = 0; y < height; y++)
 				{
-					float rx = cx - x;
-					float ry = cy - y;
-					float rad = (float) Math.Sqrt(Math.Pow(rx,2) + Math.Pow(ry,2));
-					float tRad = minRad * (float) (.47 + (random.NextDouble ()/1.3));
+                    float rx = cx - Math.Abs(cx - x);           // 0 - cx - 0
+                    float ry = cy - Math.Abs(cy - y);           // 0 - cy - 0
 
-					float edgeDistance = maxRad - rad; 
-					if( edgeDistance >=  tRad ) {
-						gradient_map[x][y] = 1;
-					} else if( edgeDistance <= 1 ) {
-						gradient_map[x][y] = 0.001f;
-					} else {
-						float factor = (minRad/ (random.Next(3,9)*(edgeDistance)+minRad));
-						gradient_map[x][y] = 1 - factor;
+                    float edgeDistance;
+                    edgeDistance = rx < ry ? rx : ry;           // closest edge 
+                    edgeDistance = rx == ry ? (float)(1.4 * rx) : edgeDistance;
+
+                    if ((rx < 1) || (ry < 1))
+                    {
+                        blend_map [x][y] = edgeLevel;
+                    }
+                    else if( (rx > (wVar + random.Next(-2, 2))) && (ry > (hVar+ random.Next(-2,2))) ) 
+                    {
+                        blend_map[x][y] = map[x][y];            // inside the borderlands... leave alone
+                    } else {
+                        float factor = (2*edgeDistance)/(wVar+edgeDistance);
+                        //float factorY = (1- (1/(1+ry)));
+
+                        blend_map[x][y] = edgeLevel + ((map[x][y] - edgeLevel) * factor);
+                        //MainConsole.Instance.InfoFormat ("cx: {0}, cy: {1}, rx: {2}, ry: {3}. edge: {4}, factor: {5}, height: {6}",
+                        //    cx, cy, rx, ry, edgeDistance, factor, map [x] [y]);
 					}
 				}
 			}
 
-			return gradient_map;
+
+			return blend_map;
 		}
 
+        /// <summary>
+        /// Generates a gradient map than can be used as a mask for an island.
+        /// </summary>
+        /// <returns>The gradient map.</returns>
+        /// <param name="width">Width.</param>
+        /// <param name="height">Height.</param>
+        public static float[][]  GenerateIslandGradientMap(int width, int height)
+        {
+            int wVar = (int)(width * .13);
+            int hVar = (int)(height * .11);
+
+            float cx = (width / 2) + random.Next(-1*wVar, wVar);
+            float cy = (height / 2) + random.Next(-1*hVar, hVar);
+            float minRad = (float) Math.Sqrt((cx*cx)+(cy*cy))* 0.55f;
+            float maxRad = minRad * 1.33f;
+
+            float [][] gradient_map = GetEmptyArray<float>(width, height);
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    float rx = cx - x;
+                    float ry = cy - y;
+                    float rad = (float) Math.Sqrt(Math.Pow(rx,2) + Math.Pow(ry,2));
+                    float tRad = minRad * (float) (.47 + (random.NextDouble ()/1.3));
+
+                    float edgeDistance = maxRad - rad; 
+                    if( edgeDistance >=  tRad ) {
+                        gradient_map[x][y] = 1;
+                    } else if( edgeDistance <= 1 ) {
+                        gradient_map[x][y] = 0.001f;
+                    } else {
+                        float factor = (minRad/ (random.Next(3,9)*(edgeDistance)+minRad));
+                        gradient_map[x][y] = 1 - factor;
+                    }
+                }
+            }
+
+            return gradient_map;
+        }
 
 
 		/// <summary>
@@ -558,7 +605,7 @@ namespace WhiteCore.Framework.SceneInfo
 
 
 			// mask the edges to an 'Island' shape
-			float[][] map_mask = GenerateGradientMap(width, height);
+			float[][] map_mask = GenerateIslandGradientMap(width, height);
 			int x;
 			int y;
 			for (x=0; x < width; x++)
@@ -609,7 +656,8 @@ namespace WhiteCore.Framework.SceneInfo
 			perlinNoiseMap = AdjustLevels (perlinNoiseMap, 0.2f, 0.8f);
 			float [][] perlinMap = MapToGreyScale (perlinNoiseMap);
 
-			for (int x=0; x < smoothing; x++)
+
+            for (int x=0; x < smoothing; x++)
 			{
 				perlinMap = SmoothHeightMap (perlinMap);
 			}
