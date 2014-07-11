@@ -88,7 +88,7 @@ namespace WhiteCore.Modules.Estate
 
                 }
 
-                // This is and 'Estate' so get some details....
+                // This is an 'Estate' so get some details....
                 string name = MainConsole.Instance.Prompt("Estate owner name", LastEstateOwner);
                 UserAccount account = scene.UserAccountService.GetUserAccount(scene.RegionInfo.AllScopeIDs, name);
 

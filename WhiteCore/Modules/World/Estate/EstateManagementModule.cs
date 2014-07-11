@@ -1310,7 +1310,18 @@ namespace WhiteCore.Modules.Estate
 
 
             // Omitted
-            //
+            // update - greythane -July 2014
+            //TaxFree = 32,
+            //ExternallyVisible = 32768,
+            //MainlandVisible = 65536,
+            //PublicAllowed = 131072,
+            //AllowDirectTeleport = 1048576,
+            //EstateSkipScripts = 2097152,
+            //DenyAnonymous = 8388608,
+            //DenyIdentified = 16777216,
+            //DenyTransacted = 33554432,
+            //AbuseEmailToEstateOwner = 134217728,
+            //DenyAgeUnverified = 1073741824
             // Omitted: SkipUpdateInterestList  Region does not update agent prim interest lists. Internal debugging option.
             // Omitted: NullLayer Unknown: Related to the availability of an overview world map tile.(Think mainland images when zoomed out.)
             // Omitted: SkipAgentAction Unknown: Related to region debug flags. Possibly to skip processing of agent interaction with world.

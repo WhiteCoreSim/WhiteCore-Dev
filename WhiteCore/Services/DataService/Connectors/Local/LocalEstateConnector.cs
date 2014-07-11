@@ -370,7 +370,13 @@ namespace WhiteCore.Services.DataService
                                                          "COUNT(EstateID)",
                                                          "MAX(EstateID)"
                                                      }, m_estateTable, null, null, null, null);
-            return (uint.Parse(QueryResults[0]) > 0) ? uint.Parse(QueryResults[1]) + 1 : 100;
+            if (uint.Parse (QueryResults [0]) > 0)
+            {
+                uint esID = uint.Parse (QueryResults [1]);
+                if (esID > 100)                                 // system estate is #1
+                    return esID + 1;
+            }
+            return 100;
         }
 
         protected void SaveEstateSettings(EstateSettings es, bool doInsert)
