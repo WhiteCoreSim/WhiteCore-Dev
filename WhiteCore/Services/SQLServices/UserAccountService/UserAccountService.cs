@@ -185,6 +185,18 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                         "reset partner",
                         "Resets the partner in a user's profile.",
                         HandleResetPartner, false, true);
+
+                    MainConsole.Instance.Commands.AddCommand(
+                        "load users",
+                        "load user [<CSV file>]",
+                        "Loads users from a CSV file into WhiteCore",
+                        HandleLoadUsers, false, true);
+
+                    MainConsole.Instance.Commands.AddCommand(
+                        "save users",
+                        "save users [<CSV file>]",
+                        "Saves all users from WhiteCore into a CSV file",
+                        HandleSaveUsers, false, true);
                 }
             }
         }
@@ -1206,6 +1218,34 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     SaveRealEstatePassword (newPassword);
                     MainConsole.Instance.Info ("[USER ACCOUNT SERVICE]: The new password for '" + Constants.RealEstateOwnerName + "' is : " + newPassword);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Handles the load users command.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmdparams">Cmdparams.</param>
+        protected void HandleLoadUsers(IScene scene, string[] cmdParams)
+        {
+            if (cmdParams.Length < 3)
+            {
+                MainConsole.Instance.Error("You haven't given a filename for the CSV file to load users from");
+                return;
+            }
+        }
+        
+        /// <summary>
+        /// Handles the save users command.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmdparams">Cmdparams.</param>
+        protected void HandleSaveUsers(IScene scene, string[] cmdParams)
+        {
+            if (cmdParams.Length < 3)
+            {
+                MainConsole.Instance.Error("You haven't given a filename for the CSV file to save users to");
+                return;
             }
         }
         #endregion
