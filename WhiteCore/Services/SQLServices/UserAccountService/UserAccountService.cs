@@ -239,6 +239,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 //set as "Maintenace" level
                 var account = accountService.GetUserAccount (null, UUID.Parse (Constants.RealEstateOwnerUUID));
                 account.UserLevel = 250;
+                account.UserFlags = Constants.USER_FLAG_CHARTERMEMBER;
                 bool success = StoreUserAccount (account);
 
                 if (success)

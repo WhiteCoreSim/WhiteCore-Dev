@@ -95,7 +95,7 @@ namespace WhiteCore.Services.DataService
         /// </summary>
         private void CheckRealEstateGroupInfo()
         {
-            if (GetGroupRecord (UUID.Zero, UUID.Zero, "Maintenance") == null)
+            if (GetGroupRecord (UUID.Zero, (UUID) Constants.RealEstateGroupUUID, Constants.RealEstateGroupName) == null)
             {
                 CreateRealEstateGroup ();
             }
@@ -111,7 +111,7 @@ namespace WhiteCore.Services.DataService
 
             CreateGroup(
                 (UUID)Constants.RealEstateGroupUUID,                // UUID
-                "Maintenance",                                      // Name
+                Constants.RealEstateGroupName,                      // Name
                 "This group is for RealEstate Maintenance",         // Charter
                 false,                                              // Show in list
                 UUID.Zero, 0, false, false, true,                   // Insignia UUID, Membership fee, Open Enrolement, Allow publishing, Mature
@@ -553,7 +553,7 @@ namespace WhiteCore.Services.DataService
                 row["Name"] = NameOf;
                 row["Description"] = Description != null ? Description : "";
                 row["Title"] = Title;
-                row["Powers"] = (ulong) Powers;
+                row["Powers"] = Powers.ToString();
                 data.Insert("osrole", row);
             }
         }
