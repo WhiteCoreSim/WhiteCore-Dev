@@ -259,6 +259,8 @@ namespace WhiteCore.DataManager.SQLite
                 cmd.Parameters.Add(key, value.ToString());
             else if (value is byte[] && convertByteString)
                 cmd.Parameters.Add(key, Utils.BytesToString((byte[]) value));
+            else if (value is ulong)                                                
+                cmd.Parameters.Add(key, value.ToString());
             else
                 cmd.Parameters.Add(key, value);
         }
