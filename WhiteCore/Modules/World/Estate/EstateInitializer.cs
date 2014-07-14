@@ -73,8 +73,8 @@ namespace WhiteCore.Modules.Estate
                     // link region to the 'Mainland'
                     if (EstateConnector.LinkRegion(scene.RegionInfo.RegionID, (int) ES.EstateID))
                     {
-                        if ((ES = EstateConnector.GetEstateSettings(scene.RegionInfo.RegionID)) == null ||
-                            ES.EstateID == 0)
+                        ES = EstateConnector.GetEstateSettings (scene.RegionInfo.RegionID);     // refresh to check linking
+                        if ( (ES == null) || (ES.EstateID == 0) )
                         {
                             MainConsole.Instance.Warn("Unable to link region to the 'Mainland'!\nPossibly a problem with the server connection, please link this region later.");
                             break;
