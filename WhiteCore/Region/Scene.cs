@@ -733,12 +733,14 @@ namespace WhiteCore.Region
         /// <returns>null if the presence was not found</returns>
         public IScenePresence GetScenePresence(UUID agentID)
         {
-            return m_sceneGraph.GetScenePresence(agentID);
+            IScenePresence agentPresence = m_sceneGraph.GetScenePresence(agentID);
+            return agentPresence;
         }
 
         public IScenePresence GetScenePresence(uint agentID)
         {
-            return m_sceneGraph.GetScenePresence(agentID);
+            IScenePresence agentPresence = m_sceneGraph.GetScenePresence(agentID);
+            return agentPresence;
         }
 
         /// <summary>
@@ -755,12 +757,14 @@ namespace WhiteCore.Region
 
         public List<IScenePresence> GetScenePresences()
         {
-            return m_sceneGraph.GetScenePresences();
+            List<IScenePresence> agents = m_sceneGraph.GetScenePresences ();
+            return agents;
         }
 
         public int GetScenePresenceCount()
         {
-            return Entities.GetPresenceCount();
+            int agents = Entities.GetPresenceCount ();
+            return agents;
         }
 
         /// <summary>

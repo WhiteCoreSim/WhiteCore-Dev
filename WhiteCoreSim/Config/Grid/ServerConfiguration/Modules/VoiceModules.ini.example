@@ -5,22 +5,30 @@
     ;; If you do not wish to use voice, use the GenericVoice module so that the client is happy.
     ;; If you want higher quality voice, use MurmurVoice
     Module = GenericVoice;
-	
-	;; Enable Vivox voice
-	;Module = VivoxVoice
+
+    ;; ** NOTE: You should disable GenericVoice below if you are using another voice module **
+    
+    ;; Enable Vivox voice 
+    ;Module = VivoxVoice
     
     ;; Should FreeSwitch be used? (requires it to be downloaded and compiled from 
-	;;   https://github.com/WhiteCoreSim/WhiteCore-Optional-Modules
+    ;;   https://github.com/WhiteCoreSim/WhiteCore-Sim-Optional-Modules
     ;Module = FreeSwitchVoice
     
     ;; You must have a Mumble server already set up to use Murmur
     ;; New, incompatible voice daemon which will do speaker indication,
     ;; positional voice, and high quality audio codec. Host voice on the
     ;; same server, or use Glacier2 to proxy the insecure ICE protocol.
-	;; The add-on module, 'Whisper', needs to be downloaded and compiled from 
-	;; https://github.com/WhiteCoreSim/WhiteCore-Optional-Modules
-	;Module = MurmurVoice;
-	
+    ;; The add-on module, 'Whisper', needs to be downloaded and compiled from 
+    ;; https://github.com/WhiteCoreSim/WhiteCore-Optional-Modules
+    ;Module = MurmurVoice;
+
+[GenericVoice]
+    ;; This needs to be disabled if another voice module is being used!
+    Enabled = true
+    ;; This is what the viewer is told the voice module is
+    ModuleToSend = "SLVoice"
+
 [VivoxVoice]
     ; The VivoxVoice module will allow you to provide voice on your
     ; region(s). It uses the same voice technology as the LL grid and
@@ -77,12 +85,6 @@
     ; - a value between 0 and 160, default is 10
     ;vivox_channel_clamping_distance = 10
 
-[GenericVoice]
-    ;; This needs to be disabled if another voice module is being used!
-    Enabled = true
-    ;; This is what the viewer is told the voice module is
-    ModuleToSend = "SLVoice"
-
 [MurmurService]
     
     ;; If you are in standalone, or in grid mode, but the grid does not have a grid-wide Murmur service set up, use the following option
@@ -95,7 +97,7 @@
     murmur_ice_cb = tcp -h 127.0.0.1 -p 6503
     
     ;;
-    ;; NOTE: The following config options are for standalone or grid users that do not have a grid-wide Mumur service set up!
+    ;; NOTE: The following config options are for standalone or grid users that do not have a grid-wide Murmur service set up!
     ;;
     
     ;; Hostname to the public Murmur server

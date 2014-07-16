@@ -205,13 +205,15 @@ namespace WhiteCore.Framework.SceneInfo.Entities
         {
             lock (m_presenceEntitiesLock)
             {
-                return m_presenceEntities.TryGetValue(key, out presence);
+                bool success = m_presenceEntities.TryGetValue (key, out presence);
+                return success;
             }
         }
 
         public virtual bool TryGetValue(UUID key, out IEntity obj)
         {
-            return InternalTryGetValue(key, true, out obj);
+            bool success = InternalTryGetValue(key, true, out obj);
+            return success;
         }
 
         protected virtual bool InternalTryGetValue(UUID key, bool checkRecursive, out IEntity obj)
@@ -246,7 +248,8 @@ namespace WhiteCore.Framework.SceneInfo.Entities
 
         public virtual bool TryGetValue(uint key, out IEntity obj)
         {
-            return InternalTryGetValue(key, true, out obj);
+            bool success =  InternalTryGetValue(key, true, out obj);
+            return success;
         }
 
         protected virtual bool InternalTryGetValue(uint key, bool checkRecursive, out IEntity obj)

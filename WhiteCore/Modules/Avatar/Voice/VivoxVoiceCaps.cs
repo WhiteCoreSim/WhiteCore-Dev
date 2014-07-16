@@ -113,7 +113,7 @@ namespace WhiteCore.Modules
 
             IConfig vivoxConfig = config.Configs["VivoxVoice"];
 
-            if (null == vivoxConfig)
+            if (vivoxConfig == null)
                 return;
 
             try
@@ -366,6 +366,7 @@ namespace WhiteCore.Modules
             if (success)
                 channel_uri = RegionGetOrCreateChannel(user.CurrentRegionID, regionClient.Region.RegionName, parcelID,
                                                        parcelName, localID, parcelFlags, ParentID);
+
         }
 
         public void GetParcelChannelInfo(UUID avatarID, WhiteCore.Framework.Services.GridRegion region, string URL,
@@ -379,16 +380,27 @@ namespace WhiteCore.Modules
             OSDMap response = null;
             syncPoster.Get(URL, request, resp => { response = resp; });
             while (response == null)
-                Thread.Sleep(5);
+                Thread.Sleep (5);
 
             success = response["Success"];
-            if (response["NoAgent"])
-                throw new NotSupportedException();
-            parcelID = response["ParcelID"];
-            parcelName = response["ParcelName"];
-            localID = response["LocalID"];
-            parcelFlags = response["ParcelFlags"];
-            ParentID = GetParentIDForRegion(region);
+            bool noAgents = response ["NoAgent"];
+            if (!success || noAgents)
+            {
+                // parcel is not voice enabled or there are no agents here
+                parcelID = UUID.Zero;
+                parcelName = "";
+                localID = 0;
+                parcelFlags = 0;
+                ParentID = "";
+            } else
+            {
+                // set parcel details
+                parcelID = response ["ParcelID"];
+                parcelName = response ["ParcelName"];
+                localID = response ["LocalID"];
+                parcelFlags = response ["ParcelFlags"];
+                ParentID = GetParentIDForRegion (region);
+            }
         }
 
         private string GetParentIDForRegion(WhiteCore.Framework.Services.GridRegion region)
@@ -499,7 +511,7 @@ namespace WhiteCore.Modules
                 if (VivoxTryGetChannel(voiceParentID, landUUID, out channelId, out channelUri))
                     MainConsole.Instance.DebugFormat("[VivoxVoice] Found existing channel at " + channelUri);
                 else if (VivoxTryCreateChannel(voiceParentID, landUUID, landName, out channelUri))
-                    MainConsole.Instance.DebugFormat("[VivoxVoice] Created new channel at " + channelUri);
+                    MainConsole.Instance.InfoFormat("[VivoxVoice] Created new channel at {0} for {1}", channelUri, regionName);
                 else
                     throw new Exception("vivox channel uri not available");
 

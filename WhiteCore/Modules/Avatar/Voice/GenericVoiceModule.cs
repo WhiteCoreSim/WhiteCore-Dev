@@ -62,7 +62,7 @@ namespace WhiteCore.Modules.Voice
             m_enabled = true;
             IConfig m_config = config.Configs["GenericVoice"];
 
-            if (null == m_config)
+            if (m_config == null)
                 return;
 
             configToSend = m_config.GetString("ModuleToSend", configToSend);
@@ -182,7 +182,7 @@ namespace WhiteCore.Modules.Voice
             {
                 IScenePresence avatar = m_scene.GetScenePresence(message["AvatarID"].AsUUID());
 
-                bool success = false;
+                bool success = true;
                 bool noAgent = false;
                 // get channel_uri: check first whether estate
                 // settings allow voice, then whether parcel allows
@@ -191,19 +191,18 @@ namespace WhiteCore.Modules.Voice
                 if (!m_scene.RegionInfo.EstateSettings.AllowVoice)
                 {
                     MainConsole.Instance.DebugFormat(
-                        "[GenericVoice]: region \"{0}\": voice not enabled in estate settings",
+                        "[Voice]: region \"{0}\": voice not enabled in estate settings",
                         m_scene.RegionInfo.RegionName);
                     success = false;
                 }
-                else if (avatar == null || avatar.CurrentParcel == null)
+                if (avatar == null || avatar.CurrentParcel == null)
                 {
                     noAgent = true;
                     success = false;
-                }
-                else if ((avatar.CurrentParcel.LandData.Flags & (uint)ParcelFlags.AllowVoiceChat) == 0)
+                } else if ((avatar.CurrentParcel.LandData.Flags & (uint)ParcelFlags.AllowVoiceChat) == 0)
                 {
                     MainConsole.Instance.DebugFormat(
-                        "[GenericVoice]: region \"{0}\": Parcel \"{1}\" ({2}): avatar \"{3}\": voice not enabled for parcel",
+                       "[Voice]: region \"{0}\": Parcel \"{1}\" ({2}): avatar \"{3}\": voice not enabled for parcel",
                         m_scene.RegionInfo.RegionName, avatar.CurrentParcel.LandData.Name,
                         avatar.CurrentParcel.LandData.LocalID, avatar.Name);
                     success = false;
@@ -211,11 +210,14 @@ namespace WhiteCore.Modules.Voice
                 else
                 {
                     MainConsole.Instance.DebugFormat(
-                        "[GenericVoice]: region \"{0}\": voice enabled in estate settings, creating parcel voice",
+                        "[Voice]: region \"{0}\": voice enabled in estate settings, creating parcel voice",
                         m_scene.RegionInfo.RegionName);
-                    success = true;
+                    //success = true;
                 }
+
+
                 OSDMap map = new OSDMap();
+                map ["Method"] = method;
                 map["Success"] = success;
                 map["NoAgent"] = noAgent;
                 if (success)
@@ -224,8 +226,8 @@ namespace WhiteCore.Modules.Voice
                     map["ParcelName"] = avatar.CurrentParcel.LandData.Name;
                     map["LocalID"] = avatar.CurrentParcel.LandData.LocalID;
                     map["ParcelFlags"] = avatar.CurrentParcel.LandData.Flags;
+                    return map;
                 }
-                return map;
             }
             return null;
         }

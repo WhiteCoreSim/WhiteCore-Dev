@@ -700,8 +700,8 @@ namespace WhiteCore.Modules.Land
         {
             if (avatar.CurrentParcel != null)
             {
-                //Tell the clint about it
-                avatar.CurrentParcel.SendLandUpdateToClient(avatar.ControllingClient);
+                //Tell the client about it
+                avatar.CurrentParcel.SendLandUpdateToClient (avatar.ControllingClient);
 
                 //Gotta kill all avatars outside the parcel
                 foreach (
@@ -715,22 +715,21 @@ namespace WhiteCore.Modules.Land
                         if (avatar.CurrentParcel.LandData.Private || (oldParcel != null && oldParcel.LandData.Private))
                             //Either one, we gotta send an update
                         {
-                            sp.SceneViewer.RemoveAvatarFromView(avatar);
-                            avatar.SceneViewer.RemoveAvatarFromView(sp);
-                            sp.SceneViewer.QueuePresenceForFullUpdate(avatar, true);
-                            avatar.SceneViewer.QueuePresenceForFullUpdate(sp, true);
+                            sp.SceneViewer.RemoveAvatarFromView (avatar);
+                            avatar.SceneViewer.RemoveAvatarFromView (sp);
+                            sp.SceneViewer.QueuePresenceForFullUpdate (avatar, true);
+                            avatar.SceneViewer.QueuePresenceForFullUpdate (sp, true);
                         }
-                    }
-                    else //Kill those outside the parcel
+                    } else //Kill those outside the parcel
                     {
                         if (sp.CurrentParcel.LandData.Private || avatar.CurrentParcel.LandData.Private)
                         {
-                            sp.ControllingClient.SendKillObject(sp.Scene.RegionInfo.RegionHandle,
-                                                                new IEntity[1] {avatar});
-                            avatar.ControllingClient.SendKillObject(sp.Scene.RegionInfo.RegionHandle,
-                                                                    new IEntity[1] {sp});
-                            sp.SceneViewer.RemoveAvatarFromView(avatar);
-                            avatar.SceneViewer.RemoveAvatarFromView(sp);
+                            sp.ControllingClient.SendKillObject (sp.Scene.RegionInfo.RegionHandle,
+                                new IEntity[1] { avatar });
+                            avatar.ControllingClient.SendKillObject (sp.Scene.RegionInfo.RegionHandle,
+                                new IEntity[1] { sp });
+                            sp.SceneViewer.RemoveAvatarFromView (avatar);
+                            avatar.SceneViewer.RemoveAvatarFromView (sp);
                         }
                     }
                 }
@@ -739,22 +738,21 @@ namespace WhiteCore.Modules.Land
                     avatar.CurrentParcel.LandData.Dwell += 1;
                 if (avatar.AbsolutePosition.Z < BAN_LINE_SAFETY_HEIGHT)
                 {
-                    if (avatar.CurrentParcel.IsBannedFromLand(avatar.UUID))
+                    if (avatar.CurrentParcel.IsBannedFromLand (avatar.UUID))
                     {
-                        SendYouAreBannedNotice(avatar);
-                        Vector3 pos = GetNearestAllowedPosition(avatar);
+                        SendYouAreBannedNotice (avatar);
+                        Vector3 pos = GetNearestAllowedPosition (avatar);
                         pos.Z -= avatar.PhysicsActor.Size.Z;
-                        avatar.Teleport(pos);
-                    }
-                    else if (avatar.CurrentParcel.IsRestrictedFromLand(avatar.UUID))
+                        avatar.Teleport (pos);
+                    } else if (avatar.CurrentParcel.IsRestrictedFromLand (avatar.UUID))
                     {
-                        SendYouAreRestrictedNotice(avatar);
-                        Vector3 pos = GetNearestAllowedPosition(avatar);
+                        SendYouAreRestrictedNotice (avatar);
+                        Vector3 pos = GetNearestAllowedPosition (avatar);
                         pos.Z -= avatar.PhysicsActor.Size.Z;
-                        avatar.Teleport(pos);
+                        avatar.Teleport (pos);
                     }
                 }
-            }
+            } 
         }
 
         private void SendOutNearestBanLine(IScenePresence sp, ILandObject ourLandObject)

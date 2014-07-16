@@ -8,26 +8,68 @@ Jump to the section below that corresponds to your setup.
 ## Standalone Setup
 ##
 
-In Configuration/Modules/VoiceModules.ini, you will find a section
+In Config/Sim/Modules/VoiceModules.ini, you will find a section
   with [Voice], you will need to comment (put a ;) in front of 
     Module = GenericVoice
 
   and remove the comment (the ;) in front of 
     Module = VivoxVoice
+
+  Disable the GenericVoice module 
+  [GenericVoice]
+    ;; This needs to be disabled if another voice module is being used!
+    Enabled = false
 
   then, you will go to the section [VivoxVoice], and you will put
   in the server information you have received from Vivox.
   
+  [VivoxVoice]
+    ; vivox voice server
+    vivox_server = www.foobar.vivox.com
+
+    ; vivox SIP URI
+    vivox_sip_uri = foobar.vivox.com
+
+    ; vivox admin user name
+    vivox_admin_user = DeepThroat
+
+    ; vivox admin password
+    vivox_admin_password = VoiceG4te
+
+
+
+
+
+
 ##
 ## Grid setup
 ##
 
-In ServerConfiguration/Modules/VoiceModules.ini, you will find a section
+In Config/Grid/ServerConfiguration/Modules/VoiceModules.ini, you will find a section
   with [Voice], you will need to comment (put a ;) in front of 
     Module = GenericVoice
 
   and remove the comment (the ;) in front of 
     Module = VivoxVoice
 
+  Disable the GenericVoice module 
+  [GenericVoice]
+    ;; This needs to be disabled if another voice module is being used!
+    Enabled = false
+
   then, you will go to the section [VivoxVoice], and you will put
   in the server information you have received from Vivox.
+
+  [VivoxVoice]
+    ; vivox voice server
+    vivox_server = www.foobar.vivox.com
+
+    ; vivox SIP URI
+    vivox_sip_uri = foobar.vivox.com
+
+    ; vivox admin user name
+    vivox_admin_user = DeepThroat
+
+    ; vivox admin password
+    vivox_admin_password = VoiceG4te
+
