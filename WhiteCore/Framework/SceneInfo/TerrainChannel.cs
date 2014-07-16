@@ -269,17 +269,12 @@ namespace WhiteCore.Framework.SceneInfo
         public void GenerateTerrain(string terrainType, float min, float max, int smoothing,  IScene scene)
 		{
 			m_scene = scene;
-			m_Width = Constants.RegionSize;
+            m_Width = Constants.RegionSize;
 			if (scene != null)
-			{
-				m_Width = scene.RegionInfo.RegionSizeX;
-			}
-
+			    m_Width = scene.RegionInfo.RegionSizeX;                 // use the region size
+			
             if (terrainType == null)
-			{
-				CreateFlatlandTerrain ();
-				return;
-			}
+			    terrainType = "x";                                      // Flatland then
 
 			// try for the land type
             string tType = terrainType.ToLower ();
@@ -291,7 +286,15 @@ namespace WhiteCore.Framework.SceneInfo
                 CreateIslandTerrain (min, max, smoothing);                      // TODO: fully sort this one out
 			else
 				CreateFlatlandTerrain ();
+
+            CalcLandArea ();
 		}
+
+        public void ReCalcLandArea()
+        {
+            CalcLandArea();
+        }
+
         #endregion
 
         /// <summary>
@@ -299,12 +302,9 @@ namespace WhiteCore.Framework.SceneInfo
         /// </summary>
 		private void CreateDefaultTerrain(string landType)
 		{
-			if (landType == null)
-			{
-				CreateFlatlandTerrain ();
-				return;
-			}
-
+            if (landType == null)
+                landType = "o";                     // Flatland
+			
 			// try for the land type
 			var lT = landType.ToLower ();
             if (lT.StartsWith("m"))                 // Mainland
@@ -312,7 +312,7 @@ namespace WhiteCore.Framework.SceneInfo
             else if (lT.StartsWith("f"))            // Full Region
                 CreateMainlandTerrain (2);
             else if (lT.StartsWith("g"))            // Grassland
-                CreateMainlandTerrain (2);
+                CreateMainlandTerrain (5);
             else if (lT.StartsWith("H"))            // Homestead
                 CreateMainlandTerrain (3);
             else if (lT.StartsWith("o"))            // Openspace
@@ -323,6 +323,8 @@ namespace WhiteCore.Framework.SceneInfo
                 CreateIslandTerrain (0, 15, 3);     // TODO: fully sort this one out
 			else
 				CreateFlatlandTerrain ();           // we need something
+
+            CalcLandArea ();
 		}
 
 		private void CreateFlatlandTerrain()
@@ -342,7 +344,7 @@ namespace WhiteCore.Framework.SceneInfo
                 int y;
                 for (y = 0; y < m_scene.RegionInfo.RegionSizeY; y++)
                 {
-                    this[x, y] = (float) m_scene.RegionInfo.RegionSettings.WaterHeight + 1;
+                    this[x, y] = (float) m_scene.RegionInfo.RegionSettings.WaterHeight + .1f;
                 }
             }
         }
@@ -451,6 +453,28 @@ namespace WhiteCore.Framework.SceneInfo
 				}
 			}
 		}
+
+        /// <summary>
+        /// Calculates the land area.
+        /// </summary>
+        private void CalcLandArea()
+        {
+            uint regionArea = 0;
+
+            int x;
+            for (x = 0; x < m_scene.RegionInfo.RegionSizeX; x++)
+            {
+                int y;
+                for (y = 0; y < m_scene.RegionInfo.RegionSizeY; y++)
+                {
+                    if (this [x, y] > m_scene.RegionInfo.RegionSettings.WaterHeight)
+                        regionArea++;
+                                
+                }
+            }
+
+           m_scene.RegionInfo.RegionArea = regionArea;
+        }
 
 	}
 }

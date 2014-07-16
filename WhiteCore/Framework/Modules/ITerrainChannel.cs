@@ -70,8 +70,12 @@ namespace WhiteCore.Framework.Modules
         /// <param name="max">Max.</param>
         /// <param name="smoothing">Smoothing.</param>
         /// <param name="scene">Scene.</param>
-
         void GenerateTerrain(string terrainType, float min, float max, int smoothing, IScene scene);
+
+        /// <summary>
+        /// Recalculates land area.
+        /// </summary>
+        void ReCalcLandArea ();
 
     }
 }

@@ -1859,14 +1859,14 @@ namespace WhiteCore.Modules.Terrain
 		private void InterfaceGenerateTerrain(IScene scene, string[] cmd)
 		{
             string terrainType;
-            //assume flatland paramters
-            float minHeight = (float) m_scene.RegionInfo.RegionSettings.WaterHeight + 1;
-            float maxHeight = minHeight;
+            //assume grassland paramters
+            float minHeight = (float) m_scene.RegionInfo.RegionSettings.WaterHeight - 5f;
+            float maxHeight = minHeight + 10f;
             int smoothing = 1;
 
             if (cmd.Count() < 3)
 			{
-				terrainType = MainConsole.Instance.Prompt("What terrain type to use, Flatland, Mainland, Island or Aquatic?","Flatland");
+				terrainType = MainConsole.Instance.Prompt("What terrain type to use, Flatland, Grassland, Island or Aquatic?","Flatland");
             } else
                 terrainType = cmd[2];
             terrainType = terrainType.ToLower();
@@ -1874,13 +1874,26 @@ namespace WhiteCore.Modules.Terrain
             // have heights?
             if (!((terrainType.StartsWith ("f")) || (terrainType.StartsWith ("a"))) && (cmd.Count () < 5))
             {
-                minHeight = int.Parse (MainConsole.Instance.Prompt ("Minimum height", minHeight.ToString ()));
-                maxHeight = int.Parse (MainConsole.Instance.Prompt ("Maximum height", maxHeight.ToString ()));
+                if (terrainType.StartsWith ("i"))
+                {
+                    minHeight = 15;                                      // Aquatic
+                    maxHeight = 30;
+                    smoothing = 2;
+                }
+
+                // prompt for heights...
+                minHeight = float.Parse (MainConsole.Instance.Prompt ("Minimum height", minHeight.ToString ()));
+                maxHeight = float.Parse (MainConsole.Instance.Prompt ("Maximum height", maxHeight.ToString ()));
+
             } else if (terrainType.StartsWith ("a"))
             {
-                minHeight = 0;
+                minHeight = 0;                                      // Aquatic
                 maxHeight = 15;
                 smoothing = 4;
+            } else if (terrainType.StartsWith ("f"))
+            {
+                minHeight = 0.1f;                                   // Flatland
+                maxHeight = 0.2f;
             } else
 			{
 				minHeight = float.Parse (cmd [3]);
@@ -1891,17 +1904,51 @@ namespace WhiteCore.Modules.Terrain
 			if (cmd.Count () == 6)
 				smoothing = int.Parse (cmd [5]);
 
-			List<TerrainModule> m = FindModuleForScene(MainConsole.Instance.ConsoleScene);
+			List<TerrainModule> m = FindModuleForScene(scene);
 			foreach (TerrainModule tmodule in m)
 			{
 				// try for the land type
                 tmodule.m_channel.GenerateTerrain (terrainType, minHeight, maxHeight, smoothing, scene);
 				tmodule.CheckForTerrainUpdates ();
 
-				MainConsole.Instance.Info("New terrain generated.");
+                uint regionArea = scene.RegionInfo.RegionArea;
+                string rArea = regionArea < 1000000? regionArea + " m2": (regionArea/1000000) + " km2";
+                MainConsole.Instance.InfoFormat("New terrain  of {0} generated.", rArea);
 
 			}
 		}
+
+        private void InterfaceCalcArea(IScene scene, string[] cmd)
+        {
+
+            uint regionArea = CalcLandArea(scene);
+
+            string rArea = regionArea < 1000000? regionArea + " m2": (regionArea/1000000) + " km2";
+            MainConsole.Instance.InfoFormat("Land area for {0} is {1}", scene.RegionInfo.RegionName, rArea );
+        }
+
+        /// <summary>
+        /// Calculates the land area.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        public uint CalcLandArea(IScene scene)
+        {
+
+            //We need to update the grid server as well
+            IGridRegisterModule gridRegisterModule = scene.RequestModuleInterface<IGridRegisterModule>();
+            uint regionArea = 0;
+
+            List<TerrainModule> m = FindModuleForScene(scene);
+            foreach (TerrainModule tmodule in m)
+            {
+                TerrainMap.ReCalcLandArea ();
+            }
+
+            if (gridRegisterModule != null)
+                gridRegisterModule.UpdateGridRegion(scene);
+
+            return regionArea;
+        }
 
 		private void InterfaceShowDebugStats(IScene scene, string[] cmd)
         {
@@ -2009,6 +2056,9 @@ namespace WhiteCore.Modules.Terrain
 				"\n Min: min terrain height after rescaling" +
 				"\n Max: max terrain height after rescaling"+
 				"\n Smoothing: [Optional] number of smoothing passes");
+            MainConsole.Instance.Info(
+                "terrain calc area - Calulates the region land area. ");
+
         }
 
 		/// <summary>
@@ -2106,6 +2156,12 @@ namespace WhiteCore.Modules.Terrain
                 MainConsole.Instance.Commands.AddCommand("terrain help",
                                                          "terrain help", "Gives help about the terrain module.",
                                                          InterfaceHelp, true, false);
+                MainConsole.Instance.Commands.AddCommand(
+                    "terrain calc area",
+                    "terrain calc area",
+                    "Calcualates the rgion land area above the water line",
+                    InterfaceCalcArea, true, false);
+
             }
         }
 

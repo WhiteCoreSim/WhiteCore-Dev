@@ -337,16 +337,42 @@ namespace WhiteCore.Framework.Services
         public int InternalPort { get; set; }
         [ProtoMember(23)]
         public string RegionTerrain { get; set; }
+        [ProtoMember(24)]
+        public uint RegionArea { get; set; }
 
         public bool IsOnline
         {
-            get { return (Flags & (int) RegionFlags.RegionOnline) == 1; }
+            get { return (Flags & (int) RegionFlags.RegionOnline) != 0; }
             set
             {
                 if (value)
                     Flags |= (int) RegionFlags.RegionOnline;
                 else
                     Flags &= (int) RegionFlags.RegionOnline;
+            }
+        }
+
+        public bool IsHgRegion
+        {
+            get { return (Flags & (int) RegionFlags.Hyperlink) != 0; }
+            set
+            {
+                if (value)
+                    Flags |= (int) RegionFlags.Hyperlink;
+                else
+                    Flags &= (int) RegionFlags.Hyperlink;
+            }
+        }
+
+        public bool IsForeign   // TODO: used for IWC connection?? maybe add new
+        {
+            get { return (Flags & (int) RegionFlags.Foreign) != 0; }
+            set
+            {
+                if (value)
+                    Flags |= (int) RegionFlags.Foreign;
+                else
+                    Flags &= (int) RegionFlags.Foreign;
             }
         }
 
@@ -396,8 +422,10 @@ namespace WhiteCore.Framework.Services
             ScopeID = ConvertFrom.ScopeID;
             AllScopeIDs = ConvertFrom.AllScopeIDs;
             SessionID = ConvertFrom.GridSecureSessionID;
-            Flags |= (int) RegionFlags.RegionOnline;
+//            Flags |= (int) RegionFlags.RegionOnline;
+            Flags |= ConvertFrom.RegionFlags;                           // not sure why we don't pass all the flags??
             RegionTerrain = ConvertFrom.RegionTerrain;
+            RegionArea = ConvertFrom.RegionArea;
         }
 
         #region Definition of equality
@@ -494,6 +522,7 @@ namespace WhiteCore.Framework.Services
             map["Flags"] = Flags;
             map["EstateOwner"] = EstateOwner;
             map["regionTerrain"] = RegionTerrain;
+            map["regionArea"] = RegionArea;
 
             // We send it along too so that it doesn't need resolved on the other end
             if (ExternalEndPoint != null)
@@ -585,6 +614,8 @@ namespace WhiteCore.Framework.Services
             }
             if (map.ContainsKey("regionTerrain"))
                 RegionTerrain = map["regionTerrain"].AsString();
+            if (map.ContainsKey("regionArea"))
+                RegionArea = (uint) map["regionArea"].AsInteger();
 
         }
 

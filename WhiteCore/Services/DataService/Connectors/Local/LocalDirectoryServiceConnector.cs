@@ -351,6 +351,7 @@ namespace WhiteCore.Services.DataService
                                    LandData = land,
                                    RegionType = region.RegionType,
                                    RegionTerrain = region.RegionTerrain,
+                                   RegionArea = region.RegionArea,
                                    RegionName = region.RegionName,
                                    GlobalPosX = region.RegionLocX + land.UserLocation.X,
                                    GlobalPosY = region.RegionLocY + land.UserLocation.Y

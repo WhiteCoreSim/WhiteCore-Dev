@@ -39,6 +39,7 @@ namespace WhiteCore.Framework.ClientInterfaces
         public string RegionName;
         public string RegionType;
         public string RegionTerrain;
+        public uint RegionArea;
 
         public override void FromOSD(OpenMetaverse.StructuredData.OSDMap map)
         {
@@ -49,6 +50,7 @@ namespace WhiteCore.Framework.ClientInterfaces
             RegionName = map["RegionName"];
             RegionType = map["RegionType"];
             RegionTerrain = map["RegionTerrain"];
+            RegionArea = map["RegionArea"];
         }
 
         public override OSDMap ToOSD()
@@ -60,6 +62,7 @@ namespace WhiteCore.Framework.ClientInterfaces
             map["RegionName"] = RegionName;
             map["RegionType"] = RegionType;
             map["RegionTerrain"] = RegionTerrain;
+            map["RegionArea"] = RegionArea;
             return map;
         }
     }

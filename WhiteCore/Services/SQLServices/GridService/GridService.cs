@@ -192,6 +192,13 @@ namespace WhiteCore.Services.SQLServices.GridService
                                                          "grid disable region registration",
                                                          "Disallows new regions to be registered with the grid",
                                                          HandleRegionRegistration, false, true);
+
+                MainConsole.Instance.Commands.AddCommand(
+                    "show grid",
+                    "show grid",
+                    "Show details of the grid regions",
+                    HandleShowGrid, false, true);
+
             }
             registry.RegisterModuleInterface<IGridService>(this);
             Init(registry, Name, serverPath: "/grid/", serverHandlerName: "GridServerURI");
@@ -666,6 +673,8 @@ namespace WhiteCore.Services.SQLServices.GridService
                 region.RegionName = gregion.RegionName;
                 region.RegionType = gregion.RegionType;
                 region.RegionTerrain = gregion.RegionTerrain;
+                region.RegionArea = gregion.RegionArea;
+
 
                 try
                 {
@@ -934,6 +943,88 @@ namespace WhiteCore.Services.SQLServices.GridService
                     "-------------------------------------------------------------------------------");
                 MainConsole.Instance.CleanInfo (string.Empty);
             }
+        }
+
+
+        private void HandleShowGrid(IScene scene, string[] cmd)
+        {
+
+            List<GridRegion> regions = GetRegionsByName(null, "", null,null);
+            if (regions == null || regions.Count < 1)
+            {
+                MainConsole.Instance.Info("Ther does not appear to be any registered regions?");
+                return;
+            }
+
+            int mainland = 0;
+            float mainlandArea = 0;
+            int estates = 0;
+            float estateArea = 0;
+            int iwcRegions = 0;
+            int hgRegions = 0;
+            int offLine = 0;
+
+            string regionInfo;
+
+            regionInfo =  String.Format ("{0, -20}", "Region");
+            regionInfo += String.Format ("{0, -12}", "Location");
+            regionInfo += String.Format ("{0, -14}", "Size");
+            regionInfo += String.Format ("{0, -12}", "Area");
+            regionInfo += String.Format ("{0, -26}", "Type");
+            regionInfo += String.Format ("{0, -10}", "Online");
+            regionInfo += String.Format ("{0, -6}", "IWC/HG");
+
+            MainConsole.Instance.CleanInfo(regionInfo);
+
+            MainConsole.Instance.CleanInfo(
+                "----------------------------------------------------------------------------------------------------");
+
+
+            foreach (GridRegion region in regions)
+            {
+                string rType = region.RegionType;
+                if (rType.StartsWith ("M"))
+                {
+                    mainland++;
+                    mainlandArea = mainlandArea + region.RegionArea;
+                }
+
+                if (rType.StartsWith ("E"))
+                {
+                    estates++;
+                    estateArea = estateArea + region.RegionArea;
+                }
+
+                if (!region.IsOnline)
+                    offLine++;
+                if (region.IsHgRegion)
+                    hgRegions++;
+                if (region.IsForeign)
+                    iwcRegions++;
+
+                // TODO ... change hardcoded field sizes to public constants
+                regionInfo =  String.Format ("{0, -20}", region.RegionName);
+                regionInfo += String.Format ("{0, -12}", region.RegionLocX / Constants.RegionSize + "," + region.RegionLocY / Constants.RegionSize);
+                regionInfo += String.Format ("{0, -14}", region.RegionSizeX + "x" + region.RegionSizeY);
+                regionInfo += String.Format ("{0, -12}", region.RegionArea < 1000000? region.RegionArea + " m2": (region.RegionArea/1000000) + " km2");
+                regionInfo += String.Format ("{0, -26}", region.RegionType);
+                regionInfo += String.Format ("{0, -10}", region.IsOnline?"yes":"no");
+                regionInfo += String.Format ("{0, -6}", (region.IsHgRegion || region.IsForeign)? "yes":"no");
+
+                MainConsole.Instance.CleanInfo(regionInfo);
+            }
+            MainConsole.Instance.CleanInfo ("");
+            MainConsole.Instance.CleanInfo(
+                    "----------------------------------------------------------------------------------------------------");
+            MainConsole.Instance.CleanInfo ("Mainland: " + mainland + " regions with an area of " + (mainlandArea / 1000000) + " km2");
+            MainConsole.Instance.CleanInfo ("Estates : " + estates + " regions with an area of " + (estateArea / 1000000) + " km2");
+            MainConsole.Instance.CleanInfo ("Total   : " + (mainland+estates) + " regions with an area of " + ((mainlandArea + estateArea)/ 1000000) + " km2");
+            MainConsole.Instance.CleanInfo ("Offline : " + offLine);
+            MainConsole.Instance.CleanInfo ("IWC/HG  : " + (hgRegions + iwcRegions));
+            MainConsole.Instance.CleanInfo (string.Empty);
+            MainConsole.Instance.CleanInfo(
+                    "----------------------------------------------------------------------------------------------------");
+
         }
 
         private int ParseFlags(int prev, string flags)

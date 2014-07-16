@@ -57,6 +57,7 @@ namespace WhiteCore.Framework.SceneInfo
         protected int m_regionLocZ;
         protected int m_regionPort;
         protected string m_regionTerrain = "Flatland";
+        protected uint m_regionArea;
         private UUID m_GridSecureSessionID = UUID.Zero;
         private bool m_seeIntoThisSimFromNeighbor = true;
 
@@ -199,6 +200,13 @@ namespace WhiteCore.Framework.SceneInfo
             set { m_regionTerrain = value; }
         }
 
+        [ProtoMember(26)]
+        public uint RegionArea
+        {
+            get { return m_regionArea; }
+            set { m_regionArea = value; }
+        }
+
         public ulong RegionHandle
         {
             get { return Utils.UIntsToLong((uint) RegionLocX, (uint) RegionLocY); }
@@ -231,6 +239,8 @@ namespace WhiteCore.Framework.SceneInfo
             args["OpenRegionSettings"] = OpenRegionSettings.ToOSD();
             if (RegionTerrain != String.Empty)
                 args["region_terrain"] = OSD.FromString(RegionTerrain);
+            args["region_area"] = OSD.FromInteger(RegionArea);
+
             return args;
         }
 
@@ -297,6 +307,8 @@ namespace WhiteCore.Framework.SceneInfo
                 EnvironmentSettings = args["EnvironmentSettings"];
             if (args.ContainsKey("region_terrain"))
                 m_regionTerrain = args["region_terrain"].AsString();
+            if (args.ContainsKey("region_area"))
+                RegionArea = (uint) args["region_area"].AsInteger();
 
         }
 
@@ -340,6 +352,7 @@ namespace WhiteCore.Framework.SceneInfo
             //OpenRegionSettings = ri.OpenRegionSettings;
             //EnvironmentSettings =  ri.EnvironmentSettings;
             RegionTerrain = ri.RegionTerrain;
+            RegionArea = ri.RegionArea;
 
         }
 
