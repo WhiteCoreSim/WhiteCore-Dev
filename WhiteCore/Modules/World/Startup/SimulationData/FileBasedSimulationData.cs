@@ -785,7 +785,7 @@ namespace WhiteCore.Modules
                 MainConsole.Instance.WarnFormat("[Backup]: Exception caught: {0}", ex);
             }
 
-            MainConsole.Instance.Info("[FileBasedSimulationData]: Saving backup for region " +
+            MainConsole.Instance.Info("[FileBasedSimulationData]: Backing up " +
                                       m_scene.RegionInfo.RegionName);
 
             RegionData regiondata = new RegionData();
@@ -862,7 +862,14 @@ namespace WhiteCore.Modules
                     m_oldSaveHasBeenSaved = true;
                     if (!Directory.Exists(m_oldSaveDirectory))
                         Directory.CreateDirectory(m_oldSaveDirectory);
-                    File.Copy(filename, BuildOldSaveFileName());
+
+                    // need to check if backup file already exists as well (eg. save within the minute timeframe)
+                    string oldfileName = BuildOldSaveFileName ();
+                    if (File.Exists(oldfileName))
+                        File.Delete(oldfileName);
+                     
+                    // now we can copy it over...
+                    File.Copy(filename, oldfileName );
                 }
             }
             regiondata.Dispose();
