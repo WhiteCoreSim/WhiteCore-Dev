@@ -1234,6 +1234,31 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 MainConsole.Instance.Error("You haven't given a filename for the CSV file to load users from");
                 return;
             }
+
+            string FirstName;
+            string LastName;
+            string Password;
+            string Email;
+            UUID UserUUID;
+
+            using (var rd = new StreamReader(Constants.DEFAULT_DATA_DIR + "/" + cmdParams[3]))
+            {
+                while (!rd.EndOfStream)
+                {
+                    var splits = rd.ReadLine().Split(';');
+                    UserUUID = (UUID) splits[0];
+                    FirstName = splits[1];
+                    LastName = splits[2];
+                    Password = splits[3];
+                    Email = splits[4];
+                    string check = CreateUser(UserUUID, UUID.Zero, FirstName + " " + LastName, Password, Email);
+                    if (check != "")
+                    {
+                        MainConsole.Instance.Error("Couldn't create the user. Reason: " + check);
+                    }
+                }
+                MainConsole.Instance.Info("File: "+ cmdParams[3] + " has been loaded.");
+            }
         }
         
         /// <summary>
