@@ -1241,9 +1241,10 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             string Email;
             UUID UserUUID;
 
-            if(File.Exists(Constants.DEFAULT_DATA_DIR + "/" + cmdParams[3]))
+            string filename = PathHelpers.VerifyReadFile(cmdParams[3],"csv", Constants.DEFAULT_DATA_DIR);
+            if(filename != "")
             {
-                using (var rd = new StreamReader(Constants.DEFAULT_DATA_DIR + "/" + cmdParams[3]))
+                using (var rd = new StreamReader(filename))
                 {
                     while (!rd.EndOfStream)
                     {
