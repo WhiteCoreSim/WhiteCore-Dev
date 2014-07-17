@@ -1241,23 +1241,32 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             string Email;
             UUID UserUUID;
 
-            using (var rd = new StreamReader(Constants.DEFAULT_DATA_DIR + "/" + cmdParams[3]))
+            if(File.Exists(Constants.DEFAULT_DATA_DIR + "/" + cmdParams[3]))
             {
-                while (!rd.EndOfStream)
+                using (var rd = new StreamReader(Constants.DEFAULT_DATA_DIR + "/" + cmdParams[3]))
                 {
-                    var splits = rd.ReadLine().Split(';');
-                    UserUUID = (UUID) splits[0];
-                    FirstName = splits[1];
-                    LastName = splits[2];
-                    Password = splits[3];
-                    Email = splits[4];
-                    string check = CreateUser(UserUUID, UUID.Zero, FirstName + " " + LastName, Password, Email);
-                    if (check != "")
+                    while (!rd.EndOfStream)
                     {
-                        MainConsole.Instance.Error("Couldn't create the user. Reason: " + check);
+                        var splits = rd.ReadLine().Split(';');
+                        UserUUID = (UUID) splits[0];
+                        FirstName = splits[1];
+                        LastName = splits[2];
+                        Password = splits[3];
+                        Email = splits[4];
+                        string check = CreateUser(UserUUID, UUID.Zero, FirstName + " " + LastName, Password, Email);
+                        if (check != "")
+                        {
+                            MainConsole.Instance.Error("Couldn't create the user. Reason: " + check);
+                        }
                     }
+                    MainConsole.Instance.Info("File: "+ cmdParams[3] + " has been loaded.");
+                    return;
                 }
-                MainConsole.Instance.Info("File: "+ cmdParams[3] + " has been loaded.");
+            }
+            else
+            {
+                MainConsole.Instance.Error("The file " + cmdParams[3] + " does not exist. Please check the filename");
+                return;
             }
         }
         
