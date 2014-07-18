@@ -88,11 +88,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
         {
             // these are only valid if we are local
             if (!m_doRemoteCalls)
-            {
-                // check and/or create default RealEstate user
-                CheckRealEstateUserInfo ();
                 AddCommands ();
-            }
         }
 
         private void AddCommands()
@@ -136,13 +132,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                         "reset user password [<first> [<last> [<password>]]]",
                         "Reset a user password",
                         HandleResetUserPassword, false, true);
-
-                    MainConsole.Instance.Commands.AddCommand(
-                        "reset realestate password",
-                        "reset realestate password",
-                        "Resets the password of the RealEstate Owner in case you lost it",
-                        HandleResetRealEstatePassword, false, true);
-
+                        
                     MainConsole.Instance.Commands.AddCommand(
                         "show account",
                         "show account [<first> [<last>]]",
@@ -198,63 +188,6 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                         "Saves all users from WhiteCore into a CSV file",
                         HandleSaveUsers, false, true);
                 }
-            }
-        }
-
-
-        /// <summary>
-        /// Checks and creates the real estate user.
-        /// </summary>
-        private void CheckRealEstateUserInfo()
-        {
-            IUserAccountService accountService = m_registry.RequestModuleInterface<IUserAccountService> ();
-            if (accountService == null)
-                return;
-
-            UserAccount uinfo = accountService.GetUserAccount (null, UUID.Parse (Constants.RealEstateOwnerUUID));
-
-            if (uinfo == null)
-            {
-                MainConsole.Instance.Warn ("Creating System User '" + Constants.RealEstateOwnerName + "'");
-                var newPassword = Utilities.RandomPassword.Generate (2, 1, 0);
-
-                var error = CreateUser (
-                                (UUID)Constants.RealEstateOwnerUUID,    // UUID
-                                UUID.Zero,                              // ScopeID
-                                Constants.RealEstateOwnerName,          // Name
-                                Util.Md5Hash (newPassword),             // password
-                                "");                                    // email
-                    
-                if (error == "")
-                {
-                    SaveRealEstatePassword (newPassword);
-                    MainConsole.Instance.Info (" The password for '" + Constants.RealEstateOwnerName + "' is : " + newPassword);
-
-                } else
-                {
-                    MainConsole.Instance.Warn (" Unable to create user : " + error);
-                    return;
-                }
-                    
-                //set as "Maintenace" level
-                var account = accountService.GetUserAccount (null, UUID.Parse (Constants.RealEstateOwnerUUID));
-                account.UserLevel = 250;
-                account.UserFlags = Constants.USER_FLAG_CHARTERMEMBER;
-                bool success = StoreUserAccount (account);
-
-                if (success)
-                    MainConsole.Instance.Info (" The RealEstate user has been elevated to 'Maintenance' level");
-                    
-            }
-        }
-
-        private void SaveRealEstatePassword(string password)
-        {
-            var configDir = Constants.DEFAULT_DATA_DIR;
-            using (StreamWriter pwFile = new StreamWriter(configDir + "/RealEstateUser.txt"))
-            {
-                pwFile.WriteLine("System user : '" + Constants.RealEstateOwnerName + "' was created: " + Culture.LocaleLogStamp());
-                pwFile.WriteLine("Password    : " + password);
             }
         }
 
@@ -1196,32 +1129,6 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Password reset for user '{0} {1}", firstName, lastName);
         }
 
-        protected void HandleResetRealEstatePassword(IScene scene, string[] cmd)
-        {
-            string question;
-
-            question = MainConsole.Instance.Prompt("Are you really sure that you want to reset the RealEstate User password ? (yes/no)");
-
-            if (question.StartsWith("y"))
-            {
-                var newPassword = Utilities.RandomPassword.Generate(2, 1, 0);
-
-                UserAccount account = GetUserAccount(null, "RealEstate", "Owner");
-                bool success = false;
-
-                if (m_AuthenticationService != null)
-                    success = m_AuthenticationService.SetPassword(account.PrincipalID, "UserAccount", newPassword);
-
-                if (!success)
-                    MainConsole.Instance.ErrorFormat ("[USER ACCOUNT SERVICE]: Unable to reset password for RealEstate Owner");
-                else
-                {
-                    SaveRealEstatePassword (newPassword);
-                    MainConsole.Instance.Info ("[USER ACCOUNT SERVICE]: The new password for '" + Constants.RealEstateOwnerName + "' is : " + newPassword);
-                }
-            }
-        }
-
         /// <summary>
         /// Handles the load users command.
         /// </summary>
@@ -1229,46 +1136,66 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
         /// <param name="cmdparams">Cmdparams.</param>
         protected void HandleLoadUsers(IScene scene, string[] cmdParams)
         {
+            string fileName = "users.csv";
             if (cmdParams.Length < 3)
             {
-                MainConsole.Instance.Error("You haven't given a filename for the CSV file to load users from");
-                return;
-            }
+                fileName = MainConsole.Instance.Prompt ("Please enter the user CSV file to load", fileName);
+                if (fileName == "")
+                    return;
+            } else
+                fileName = cmdParams [2];
 
+            int userNo = 0;
             string FirstName;
             string LastName;
             string Password;
             string Email;
             UUID UserUUID;
 
-            string filename = PathHelpers.VerifyReadFile(cmdParams[3],"csv", Constants.DEFAULT_DATA_DIR);
-            if(filename != "")
+            fileName = PathHelpers.VerifyReadFile(fileName,"csv", Constants.DEFAULT_DATA_DIR+"/Updates");
+            if(fileName == "")
             {
-                using (var rd = new StreamReader(filename))
-                {
-                    while (!rd.EndOfStream)
-                    {
-                        var splits = rd.ReadLine().Split(';');
-                        UserUUID = (UUID) splits[0];
-                        FirstName = splits[1];
-                        LastName = splits[2];
-                        Password = splits[3];
-                        Email = splits[4];
-                        string check = CreateUser(UserUUID, UUID.Zero, FirstName + " " + LastName, Password, Email);
-                        if (check != "")
-                        {
-                            MainConsole.Instance.Error("Couldn't create the user. Reason: " + check);
-                        }
-                    }
-                    MainConsole.Instance.Info("File: "+ cmdParams[3] + " has been loaded.");
-                    return;
-                }
-            }
-            else
-            {
-                MainConsole.Instance.Error("The file " + cmdParams[3] + " does not exist. Please check the filename");
+                MainConsole.Instance.Error("The file " + fileName + " does not exist. Please check and retry");
                 return;
             }
+
+            // good to go...
+            using (var rd = new StreamReader (fileName))
+            {
+                while (!rd.EndOfStream)
+                {
+                    var userInfo = rd.ReadLine ().Split (',');
+                    if (userInfo.Length < 4)
+                    {
+                        MainConsole.Instance.Error ("[User Load]: Insufficient details; Skipping " + userInfo);
+                        continue;
+                    }
+
+                    UserUUID = (UUID)userInfo [0];
+                    FirstName = userInfo [1];
+                    LastName = userInfo [2];
+                    Password = userInfo [3];
+                    Email = userInfo.Length < 6 ? userInfo [4] : "";
+
+                    string check = CreateUser (UserUUID, UUID.Zero, FirstName + " " + LastName, Util.Md5Hash(Password), Email);
+                    if (check != "")
+                    {
+                        MainConsole.Instance.Error ("Couldn't create the user. Reason: " + check);
+                        continue;
+                    }
+
+                    //set user levels and status  (if needed)
+                    var account = GetUserAccount (null, UserUUID);
+                    //account.UserLevel = 0;
+                    account.UserFlags = Constants.USER_FLAG_RESIDENT;
+                    StoreUserAccount (account);
+
+                    userNo++;
+
+                }
+                MainConsole.Instance.InfoFormat ("File: {0} loaded,  {1} users added", Path.GetFileName(fileName), userNo);
+            }
+
         }
         
         /// <summary>
@@ -1278,11 +1205,50 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
         /// <param name="cmdparams">Cmdparams.</param>
         protected void HandleSaveUsers(IScene scene, string[] cmdParams)
         {
+            var libraryOwner = new UUID(Constants.LibraryOwner);
+            var realestateOwner = new UUID(Constants.RealEstateOwnerUUID);
+
+            string fileName = "users.csv";
             if (cmdParams.Length < 3)
             {
-                MainConsole.Instance.Error("You haven't given a filename for the CSV file to save users to");
+                fileName = MainConsole.Instance.Prompt ("Please enter the user CSV file to save", fileName);
+                if (fileName == "")
+                    return;
+            } else
+                fileName = cmdParams [2];
+
+            int userNo = 0;
+
+            fileName = PathHelpers.VerifyWriteFile(fileName,"csv", Constants.DEFAULT_DATA_DIR+"/Updates", true);
+            if(fileName == "")
                 return;
+    
+            // good to go...
+            var accounts = GetUserAccounts(null,"*");
+
+
+            //Add the user
+            FileStream stream = new FileStream(fileName, FileMode.Create);          // always start fresh
+            StreamWriter streamWriter = new StreamWriter(stream);
+            streamWriter.BaseStream.Position += streamWriter.BaseStream.Length;
+
+            foreach (UserAccount user in accounts)
+            {
+                if ( (user.PrincipalID == libraryOwner) || (user.PrincipalID == realestateOwner) )
+                    continue;
+
+                // TODO: user accounts do not have a clear password so we need to save the salt and password hashes instead
+                // This will mean changes to the csv format
+                string LineToWrite = user.PrincipalID + "," + user.FirstName + "," + user.LastName + ",," + user.Email;
+                streamWriter.WriteLine (LineToWrite);
+
+                userNo++;
             }
+            streamWriter.Flush();
+            streamWriter.Close();
+
+            MainConsole.Instance.InfoFormat ("File: {0} saved with {1} users", Path.GetFileName(fileName), userNo);
+
         }
         #endregion
     }

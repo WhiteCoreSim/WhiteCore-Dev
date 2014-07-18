@@ -85,6 +85,8 @@ namespace WhiteCore.Framework.Utilities
         {
             // some file sanity checks when saving 
             string extension = Path.GetExtension (fileName);
+            if (!defaultExt.StartsWith ("."))
+                defaultExt = "." + defaultExt;
 
             if (extension == string.Empty)
             {
@@ -128,6 +130,8 @@ namespace WhiteCore.Framework.Utilities
         {
             // some sanity checks...
             string extension = Path.GetExtension(fileName).ToLower();
+            if (!defaultExt.StartsWith ("."))
+                defaultExt = "." + defaultExt;
             bool extOK = extension.Equals(defaultExt);
 
             if (!extOK)

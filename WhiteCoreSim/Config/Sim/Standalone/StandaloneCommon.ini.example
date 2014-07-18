@@ -44,6 +44,11 @@
     LibraryName = "WhiteCore Library"
     LibraryOwnerName = "Library Owner"
 
+[EstateService]
+    ;;  Set these if you want to change the name of the WhiteCore system Estate owner & name
+    SystemEstateOwnerName = "Governor White"
+    SystemEstateName = "Whitecore Estate"
+
 [LoginService]
 
     ;; This sets the message when a user logs in.

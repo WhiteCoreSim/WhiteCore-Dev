@@ -56,6 +56,7 @@ namespace WhiteCore.Modules.Estate
 
         private EstateSettings CreateEstateInfo(IScene scene)
         {
+            ISystemEstateService sysEstateInfo = m_registry.RequestModuleInterface<ISystemEstateService>();
             EstateSettings ES = new EstateSettings();
             while (true)
             {
@@ -67,7 +68,8 @@ namespace WhiteCore.Modules.Estate
                 {
                     // region is Mainland... assign to RealEstateOwner & System Estate
                     ES.EstateOwner = (UUID) Constants.RealEstateOwnerUUID;
-                    ES.EstateName = Constants.SystemEstateName;
+                    ES.EstateName = sysEstateInfo.SystemEstateName;
+                    //ES.EstateName = Constants.SystemEstateName;
                     ES.EstateID = (uint) EstateConnector.GetEstate(ES.EstateOwner, ES.EstateName);
 
                     // link region to the 'Mainland'
@@ -325,8 +327,10 @@ namespace WhiteCore.Modules.Estate
             if (estateConnector.RemoteCalls ())
                 return;
 
+            ISystemEstateService sysEstateInfo = m_registry.RequestModuleInterface<ISystemEstateService>();
             EstateSettings ES;
-            ES = estateConnector.GetEstateSettings (Constants.SystemEstateName);
+//            ES = estateConnector.GetEstateSettings (Constants.SystemEstateName);
+            ES = estateConnector.GetEstateSettings (sysEstateInfo.SystemEstateName);
             if (ES != null)
             {   
                 if (ES.EstateID != Constants.SystemEstateID)
@@ -337,7 +341,7 @@ namespace WhiteCore.Modules.Estate
 
             // Create a new estate
             ES = new EstateSettings();
-            ES.EstateName = Constants.SystemEstateName;
+            ES.EstateName = sysEstateInfo.SystemEstateName;
             ES.EstateOwner = (UUID) Constants.RealEstateOwnerUUID;
 
             ES.EstateID = (uint) estateConnector.CreateNewEstate(ES);
@@ -349,7 +353,7 @@ namespace WhiteCore.Modules.Estate
             } else 
             {
                 MainConsole.Instance.InfoFormat("[EstateService]: The estate '{0}' owned by '{1}' has been created.", 
-                    Constants.SystemEstateName, Constants.RealEstateOwnerName);
+                    sysEstateInfo.SystemEstateName, sysEstateInfo.SystemEstateOwnerName);
             }
         }
 
@@ -408,9 +412,10 @@ namespace WhiteCore.Modules.Estate
         {
             IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector>();
             IUserAccountService accountService = m_registry.RequestModuleInterface<IUserAccountService>();
- 
+            ISystemEstateService sysEstateInfo = m_registry.RequestModuleInterface<ISystemEstateService>();
+
             string estateName = "";
-            string estateOwner = Constants.RealEstateOwnerName;
+            string estateOwner = sysEstateInfo.SystemEstateOwnerName;
 
             // check for passed estate name
             estateName = (cmd.Length < 3) 
@@ -439,22 +444,33 @@ namespace WhiteCore.Modules.Estate
              if (account == null)
             {
                 MainConsole.Instance.WarnFormat("[USER ACCOUNT SERVICE]: The user, '{0}' was not found!", estateOwner);
-                string createUser = MainConsole.Instance.Prompt("Do you wish to create this user?  (yes/no)","yes").ToLower();
-                if (!createUser.StartsWith("y"))
-                   return;
 
-                // Create a new account
-                string password = MainConsole.Instance.PasswordPrompt(estateOwner + "'s password");
-                string email = MainConsole.Instance.Prompt(estateOwner + "'s email", "");
-
-                accountService.CreateUser(estateOwner, Util.Md5Hash(password), email);
-                // CreateUser will tell us success or problem
-                account = accountService.GetUserAccount(null, estateOwner);
-
-                if (account == null)
+                // tempory fix until remote user creation can be corrected
+                if (!accountService.RemoteCalls ())
                 {
-                    MainConsole.Instance.ErrorFormat(
-                        "[EstateService]: Unable to store account details.\n   If this simulator is connected to a grid, create the estate owner account first at the grid level.");
+                    string createUser = MainConsole.Instance.Prompt ("Do you wish to create this user?  (yes/no)", "yes").ToLower ();
+                    if (!createUser.StartsWith ("y"))
+                        return;
+
+                    // Create a new account
+                    string password = MainConsole.Instance.PasswordPrompt (estateOwner + "'s password");
+                    string email = MainConsole.Instance.Prompt (estateOwner + "'s email", "");
+
+                    accountService.CreateUser (estateOwner, Util.Md5Hash (password), email);
+                    // CreateUser will tell us success or problem
+                    account = accountService.GetUserAccount (null, estateOwner);
+
+                    if (account == null)
+                    {
+                        MainConsole.Instance.ErrorFormat (
+                            "[EstateService]: Unable to store account details.\n   If this simulator is connected to a grid, create the estate owner account first at the grid level.");
+                        return;
+                    }
+                } else
+                {
+                    MainConsole.Instance.WarnFormat("[USER ACCOUNT SERVICE]: The user must be created on the Grid before assigning an estate!");
+                    MainConsole.Instance.WarnFormat("[USER ACCOUNT SERVICE]: Regions should be assigned to the system user estate until this can be corrected");
+
                     return;
                 }
             }
@@ -671,11 +687,12 @@ namespace WhiteCore.Modules.Estate
             //MainConsole.Instance.InfoFormat ("Region '{0}' has been removed from estate '{1}'", regionName, estateName);
 
             //We really need to attach it to another estate though... 
-            ES = estateConnector.GetEstateSettings (Constants.SystemEstateName);
+            ISystemEstateService sysEstateInfo = m_registry.RequestModuleInterface<ISystemEstateService>();
+            ES = estateConnector.GetEstateSettings (sysEstateInfo.SystemEstateName);
             if (ES != null)
                 if (estateConnector.LinkRegion (region.RegionID, (int) ES.EstateID))
                     MainConsole.Instance.Warn ("'" + regionName + "' has been placed in the '" +
-                    Constants.SystemEstateName + "' estate until re-assigned");
+                    sysEstateInfo.SystemEstateName + "' estate until re-assigned");
                     
         }
 

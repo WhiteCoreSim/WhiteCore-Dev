@@ -132,10 +132,10 @@ namespace WhiteCore.Services.DataService
             }
 
             // check for system user/estate
-            if ( (es.EstateOwner == (UUID) Constants.RealEstateOwnerUUID) &&           // probably don't need to check both :)
-                (es.EstateName == Constants.SystemEstateName) )
+            if ( (es.EstateOwner == (UUID) Constants.RealEstateOwnerUUID) )           // probably don't need to check both :)
+//                (es.EstateName == Constants.SystemEstateName) )                     // maybe if the system user can have muktiple estates??
             {
-                es.EstateID = (uint) Constants.SystemEstateID;                         // Default Mainland estate  # 
+                es.EstateID = (uint) Constants.SystemEstateID;                        // Default Mainland estate  # 
             } else
                 es.EstateID = GetNewEstateID();
 
