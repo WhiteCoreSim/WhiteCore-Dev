@@ -794,8 +794,12 @@ namespace WhiteCore.Services
             get
             {
                 string retVal = (string) LLLoginResponseRegister.GetValue("Message");
-                if (retVal.Contains("<USERNAME>"))
-                    retVal = retVal.Replace("<USERNAME>", firstname + " " + lastname);
+                if (retVal.Contains ("<USERNAME>"))
+                {
+                    retVal = DisplayName != "" 
+                        ? retVal.Replace ("<USERNAME>", DisplayName) 
+                        : retVal.Replace ("<USERNAME>", firstname + " " + lastname);
+                }
                 return retVal;
             }
         }
