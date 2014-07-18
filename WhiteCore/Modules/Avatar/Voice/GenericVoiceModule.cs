@@ -182,6 +182,12 @@ namespace WhiteCore.Modules.Voice
             {
                 IScenePresence avatar = m_scene.GetScenePresence(message["AvatarID"].AsUUID());
 
+                string regionName = message ["RegionName"];
+
+                if (m_scene.RegionInfo.RegionName != regionName)
+                    return null;                                            // not for the required region!!
+
+
                 bool success = true;
                 bool noAgent = false;
                 // get channel_uri: check first whether estate
@@ -226,8 +232,8 @@ namespace WhiteCore.Modules.Voice
                     map["ParcelName"] = avatar.CurrentParcel.LandData.Name;
                     map["LocalID"] = avatar.CurrentParcel.LandData.LocalID;
                     map["ParcelFlags"] = avatar.CurrentParcel.LandData.Flags;
-                    return map;
                 }
+                return map;
             }
             return null;
         }

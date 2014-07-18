@@ -377,6 +377,7 @@ namespace WhiteCore.Modules
             OSDMap request = new OSDMap();
             request["AvatarID"] = avatarID;
             request["Method"] = "GetParcelChannelInfo";
+            request ["RegionName"] = region.RegionName;
             OSDMap response = null;
             syncPoster.Get(URL, request, resp => { response = resp; });
             while (response == null)
