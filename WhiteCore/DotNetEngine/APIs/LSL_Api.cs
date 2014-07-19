@@ -576,11 +576,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return new LSL_Float();
-
-            lock (Util.RandomClass)
-            {
-                return Util.RandomClass.NextDouble() * mag;
-            }
+            
+            return Util.RandomClass.NextDouble() * mag;
         }
 
         public LSL_Integer llFloor(double f)

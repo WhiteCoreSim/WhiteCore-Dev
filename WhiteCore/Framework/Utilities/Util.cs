@@ -85,7 +85,7 @@ namespace WhiteCore.Framework.Utilities
     public class Util
     {
         private static uint nextXferID = 5000;
-        private static readonly Random randomClass = new Random();
+        private static readonly Random randomClass = new ThreadSafeRandom();
         // Get a list of invalid file characters (OS dependent)
         private static readonly string regexInvalidFileChars = "[" + new String(Path.GetInvalidFileNameChars()) + "]";
         private static readonly string regexInvalidPathChars = "[" + new String(Path.GetInvalidPathChars()) + "]";
