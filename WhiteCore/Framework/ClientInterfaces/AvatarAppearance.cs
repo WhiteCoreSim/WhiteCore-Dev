@@ -434,6 +434,14 @@ namespace WhiteCore.Framework.ClientInterfaces
             {
                 if (!m_attachments.ContainsKey(attach.AttachPoint))
                     m_attachments[attach.AttachPoint] = new List<AvatarAttachment>();
+
+                // 21/07/2014 Added to prevent Attachments to be added more then once
+                foreach (AvatarAttachment prev in m_attachments[attach.AttachPoint])
+                {
+                    if (prev.ItemID == attach.ItemID)
+                        return;
+                }
+
                 m_attachments[attach.AttachPoint].Add(attach);
             }
         }
