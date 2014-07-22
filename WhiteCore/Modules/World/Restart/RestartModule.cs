@@ -97,11 +97,15 @@ namespace WhiteCore.Modules.Restart
         private void HandleHelp( IScene scene, string[] cmd )
         {
             MainConsole.Instance.Info (
-                "region restart  <time (in seconds)> <message>\n" +
-                "  Restart the currently selected region in <secs> displaying the <message> to users");
+                "restart all regions  [<time (in seconds)> [<message>]]\n" +
+                "  Restart all simulator regions.\n Optionally delay <secs> displaying the <message> to users");
 
             MainConsole.Instance.Info (
-                "region abort <message>\n" +
+                "restart region  [<time (in seconds)> [<message>]]\n" +
+                "  Restart the currently selected region.\n Optionally delay <secs> displaying the <message> to users");
+
+            MainConsole.Instance.Info (
+                "restart region abort <message>\n" +
                 "  Aborts a scheduled restart displaying the <message> to users");
 
         }
@@ -114,20 +118,26 @@ namespace WhiteCore.Modules.Restart
             if (MainConsole.Instance != null)
             {
                 MainConsole.Instance.Commands.AddCommand (
-                    "region restart",
-                    "region restart  <time (in seconds)> [message]",
+                    "restart all regions",
+                    "restart all regions [<time (in seconds)> [message]]",
+                    "Restart all simulator regions ",
+                    HandleRegionRestart, false, true);
+
+                MainConsole.Instance.Commands.AddCommand (
+                    "restart region",
+                    "restart region  [<time (in seconds)> [message]]",
                     "Restart the region",
                     HandleRegionRestart, true, true);
 
                 MainConsole.Instance.Commands.AddCommand (
-                    "region restart abort",
-                    "region restart abort [message]",
-                    "Restart the region",
+                    "restart region abort",
+                    "restart region abort [message]",
+                    "Abort the region restart",
                     HandleRegionRestartAbort, true, true);
 
                 MainConsole.Instance.Commands.AddCommand (
-                    "region restart help",
-                    "region restart help",
+                    "restart region help",
+                    "restart region help",
                     "Help about the region restart command.",
                     HandleHelp, false, true);
 
@@ -148,7 +158,7 @@ namespace WhiteCore.Modules.Restart
 
             if (m_CountdownTimer != null)
             {
-                MainConsole.Instance.Warn("[Region]: Reseting the restart timer for new settings.");
+                MainConsole.Instance.Warn("[Region Restart]: Resetting the restart timer for new settings.");
                 m_CountdownTimer.Stop();
                 m_CountdownTimer = null;
             }
@@ -186,7 +196,7 @@ namespace WhiteCore.Modules.Restart
                 if (m_DialogModule != null && message != String.Empty)
                     m_DialogModule.SendGeneralAlert(message);
 
-                MainConsole.Instance.Warn("[Region]: Region restart aborted");
+                MainConsole.Instance.Warn("[Region Restart]: Region restart aborted");
             }
         }
 
@@ -195,7 +205,8 @@ namespace WhiteCore.Modules.Restart
         /// </summary>
         public void RestartScene()
         {
-            MainConsole.Instance.Error("[Region]: Restarting Now");
+
+            MainConsole.Instance.Error("[Region Restart]: Restarting " + m_scene.RegionInfo.RegionName);
             m_scene.RequestModuleInterface<ISceneManager>().RestartRegion(m_scene);
         }
 
@@ -253,7 +264,8 @@ namespace WhiteCore.Modules.Restart
                     m_DialogModule.SendGeneralAlert(msg);
                 else
                     m_DialogModule.SendNotificationToUsersInRegion(m_Initiator, "System", msg);
-                MainConsole.Instance.Warn("[Region]: Region will restart in " + currentAlertString);
+                MainConsole.Instance.WarnFormat("[Region Restart]: {0} will restart in {1}",
+                    m_scene.RegionInfo.RegionName, currentAlertString);
             }
 
             return currentAlert - nextAlert;
@@ -282,47 +294,99 @@ namespace WhiteCore.Modules.Restart
         /// <param name="args">Arguments.</param>
         private void HandleRegionRestart(IScene scene, string[] args)
         {
- 
-            IRestartModule restartModule = scene.RequestModuleInterface<IRestartModule>();
-            if (restartModule == null)
+            bool allRegions = false;
+            int seconds = 0;
+            string message = " will restart in {0}";
+            string scnName = "";
+            if (scene != null)
+                scnName = scene.RegionInfo.RegionName;
+
+            // check if this for all scenes
+            if ((args.Length > 1) && (args [1].ToLower () == "all"))
             {
-                MainConsole.Instance.Error ("[Region]: Unable to locate restart module for this scene");
-                return;
+                allRegions = true;
+                var newargs = new List<string> (args);
+                newargs.RemoveAt (1);
+                args = newargs.ToArray ();
+                scnName = "all regions";
             }
 
             if (args.Length < 3)
             {
-                if (MainConsole.Instance.Prompt ("[Region]: Do you wish to restart immediately? (yes/no)", "no") != "yes")
+               
+                if (MainConsole.Instance.Prompt ("[Region Restart]: Do you wish to restart " + scnName +
+                    " immediately? (yes/no)", "no") != "yes")
                 {
                     MainConsole.Instance.Info ("usage: region restart <time> [message]");
                     return;
                 }
             }
 
-            int seconds = 0;
+            // do we have a time?   
             if (args.Length > 2)
             {
-                if (int.TryParse(args[2], out seconds))
+                if (!int.TryParse (args [2], out seconds))
                 {
-                    List<int> times = new List<int>();
-                    while (seconds > 0)
-                    {
-                        times.Add(seconds);
-                        if (seconds > 300)
-                            seconds -= 120;
-                        else if (seconds > 30)
-                            seconds -= 30;
-                        else
-                            seconds -= 15;
-                    }
-                    string msg = "Region will restart in {0}";
-
-                    if (args.Length > 3)
-                        msg = Util.CombineParams (args, 4);   // assume everything else is the message
-
-                    restartModule.ScheduleRestart(UUID.Zero, msg, times.ToArray(), true);
+                    MainConsole.Instance.Error ("[Region Restart]: Unable to determine restart delay!");
+                    return;
                 }
             }
+
+            // build message interval list
+            List<int> times = new List<int>();
+            while (seconds > 0)
+            {
+                times.Add (seconds);
+                if (seconds > 300)
+                    seconds -= 120;
+                else if (seconds > 30)
+                    seconds -= 30;
+                else
+                    seconds -= 15;
+            }
+            times.Add (0);              // we should always have a 'zero' for the immediate request
+
+            // have a message?
+            if (args.Length > 3)
+                message = Util.CombineParams (args, 4);   // assume everything else is the message
+
+            if (!allRegions)
+            {
+                // we have a specified region
+                IRestartModule restartModule = scene.RequestModuleInterface<IRestartModule> ();
+                if (restartModule == null)
+                {
+                    MainConsole.Instance.Error ("[Region Restart]: Unable to locate restart module for "+ scnName );
+                    return;
+                }
+                restartModule.ScheduleRestart (UUID.Zero, scnName + message, times.ToArray (), true);
+            }
+            else
+            {
+                int offset = 0;
+                // check for immediate restart
+                if ((times.Count == 1) && (times[0] == 0))
+                    times [0] = 2;                              // delay initial restart by 2 seconds
+
+                foreach (IScene scn in MainConsole.Instance.ConsoleScenes)
+                {
+                    for (int i = 0; i < times.Count; i++) {
+                        times [i] = times[i] + 5;               // stagger each alert/restart by 5 seconds    
+                    }   
+ 
+                    scnName = scn.RegionInfo.RegionName;
+
+                    IRestartModule sceneRestart = scn.RequestModuleInterface<IRestartModule> ();
+                    if (sceneRestart == null)
+                        MainConsole.Instance.Error ("[Region Restart]: Unable to locate restart module for " + scnName);
+                    else
+                    {
+                        sceneRestart.ScheduleRestart (UUID.Zero, scnName + message, times.ToArray (), true);
+                        offset++;
+                    }
+                }
+            }
+          
         }
 
         /// <summary>
@@ -335,7 +399,7 @@ namespace WhiteCore.Modules.Restart
             IRestartModule restartModule = scene.RequestModuleInterface<IRestartModule>();
             if (restartModule == null)
             {
-                MainConsole.Instance.Error ("[Region]: Unable to locate restart module for this scene");
+                MainConsole.Instance.Error ("[Region Restart]: Unable to locate restart module for this scene");
                 return;
             }
 
@@ -347,7 +411,7 @@ namespace WhiteCore.Modules.Restart
             if (m_Alerts != null)
                 AbortRestart (msg);
             else
-                MainConsole.Instance.Info ("[Region]: Abort ignored as no restart is in progress");
+                MainConsole.Instance.Info ("[Region Restart]: Abort ignored as no restart is in progress");
 
         }
 

@@ -66,7 +66,7 @@ namespace WhiteCore.Region
         public event NewScene OnAddedScene;
         public event NewScene OnFinishedAddingScene;
 
-        protected ISimulationBase m_OpenSimBase;
+        protected ISimulationBase m_SimBase;
         protected List<IScene> m_scenes = new List<IScene>();
 
         public List<IScene> Scenes { get { return m_scenes; } }
@@ -75,6 +75,7 @@ namespace WhiteCore.Region
         protected ISimulationDataStore m_selectedDataService;
 
         private IConfigSource m_config = null;
+        private DateTime m_startupTime;
 
         public IConfigSource ConfigSource
         {
@@ -87,7 +88,8 @@ namespace WhiteCore.Region
 
         public void PreStartup(ISimulationBase simBase)
         {
-            m_OpenSimBase = simBase;
+            m_SimBase = simBase;
+            m_startupTime = simBase.StartupTime;
 
             IConfig handlerConfig = simBase.ConfigSource.Configs["ApplicationPlugins"];
             if (handlerConfig.GetString("SceneManager", "") != Name)
@@ -95,7 +97,7 @@ namespace WhiteCore.Region
 
             m_config = simBase.ConfigSource;
             //Register us!
-            m_OpenSimBase.ApplicationRegistry.RegisterModuleInterface<ISceneManager>(this);
+            m_SimBase.ApplicationRegistry.RegisterModuleInterface<ISceneManager>(this);
         }
 
         public void Initialize(ISimulationBase simBase)
@@ -200,13 +202,19 @@ namespace WhiteCore.Region
         {
             //Tell modules about it 
             StartupCompleteModules();
-            m_OpenSimBase.RunStartupCommands();
+            m_SimBase.RunStartupCommands();
 
-            TimeSpan timeTaken = DateTime.Now - m_OpenSimBase.StartupTime;
+            TimeSpan timeTaken;
+            if (m_startupTime == m_SimBase.StartupTime)
+               timeTaken = DateTime.Now - m_SimBase.StartupTime;    // this is the time since the sim started
+            else
+               timeTaken = DateTime.Now - m_startupTime;            // time for a restart etc
 
             MainConsole.Instance.InfoFormat(
                 "[SceneManager]: Startup Complete. This took {0}m {1}.{2}s",
                 timeTaken.Minutes, timeTaken.Seconds, timeTaken.Milliseconds);
+
+            m_startupTime = m_SimBase.StartupTime;                  // finished this timing period
 
             WhiteCoreModuleLoader.ClearCache();
             // In 99.9% of cases it is a bad idea to manually force garbage collection. However,
@@ -222,13 +230,13 @@ namespace WhiteCore.Region
         public void StartRegions(out bool newRegion)
         {
             List<KeyValuePair<ISimulationDataStore, RegionInfo>> regions = new List<KeyValuePair<ISimulationDataStore, RegionInfo>>();
-            List<string> regionFiles = m_selectedDataService.FindRegionInfos(out newRegion, m_OpenSimBase);
+            List<string> regionFiles = m_selectedDataService.FindRegionInfos(out newRegion, m_SimBase);
             if (newRegion)
             {
                 var currentInfo = FindCurrentRegionInfo ();
 
                 ISimulationDataStore store = m_selectedDataService.Copy();
-                regions.Add(new KeyValuePair<ISimulationDataStore, RegionInfo>(store, store.CreateNewRegion(m_OpenSimBase, currentInfo)));
+                regions.Add(new KeyValuePair<ISimulationDataStore, RegionInfo>(store, store.CreateNewRegion(m_SimBase, currentInfo)));
             }
             else
             {
@@ -236,7 +244,7 @@ namespace WhiteCore.Region
                 {
                     ISimulationDataStore store = m_selectedDataService.Copy();
                     regions.Add(new KeyValuePair<ISimulationDataStore, RegionInfo>(store, 
-                        store.LoadRegionInfo(fileName, m_OpenSimBase)));
+                        store.LoadRegionInfo(fileName, m_SimBase)));
                 }
             }
 
@@ -249,7 +257,7 @@ namespace WhiteCore.Region
             MainConsole.Instance.InfoFormat("[SceneManager]: Starting region \"{0}\" at @ {1},{2}",
                                             regionInfo.RegionName,
                                             regionInfo.RegionLocX/256, regionInfo.RegionLocY/256);
-            ISceneLoader sceneLoader = m_OpenSimBase.ApplicationRegistry.RequestModuleInterface<ISceneLoader>();
+            ISceneLoader sceneLoader = m_SimBase.ApplicationRegistry.RequestModuleInterface<ISceneLoader>();
             if (sceneLoader == null)
                 throw new Exception("No Scene Loader Interface!");
 
@@ -321,9 +329,10 @@ namespace WhiteCore.Region
             MainConsole.Instance.Warn("[SceneManager]: Region " + scene.RegionInfo.RegionName + " was removed\n"+
                 "To ensure all data is correct, you should consider restarting the simulator");
 
-            if (MainConsole.Instance.Prompt ("[SceneManager]: Do you wish to restart? (yes/no)", "no") == "yes")
+            if (MainConsole.Instance.Prompt ("[SceneManager]: Do you wish to restart the systemn? (yes/no)", "no") == "yes")
             {
-                System.Threading.Thread.Sleep (10000);
+                MainConsole.Instance.Warn ("[SceneManager]: Shutting down in 5 seconds");
+                System.Threading.Thread.Sleep (5000);
                 Environment.Exit (0);
             }
         }
@@ -334,8 +343,8 @@ namespace WhiteCore.Region
 
         public void RestartRegion(IScene scene)
         {
-            // save current info for later
-            string regionName = scene.RegionInfo.RegionName;
+            m_startupTime = DateTime.Now;                           // for more meaningful strtup times
+            string regionName = scene.RegionInfo.RegionName;        // save current info for later
 
             // change back to the root as we are going to trash this one
             MainConsole.Instance.ConsoleScene = null;
@@ -349,16 +358,16 @@ namespace WhiteCore.Region
             IConfig startupConfig = m_config.Configs["Startup"];
             if (startupConfig == null || !startupConfig.GetBoolean ("RegionRestartCausesShutdown", false))
             {
-                RegionInfo region = m_selectedDataService.LoadRegionNameInfo (regionName, m_OpenSimBase);
+                RegionInfo region = m_selectedDataService.LoadRegionNameInfo (regionName, m_SimBase);
 
-                //StartRegion(scene.SimulationDataService, scene.RegionInfo);
                 StartRegion (m_selectedDataService, region);
-                MainConsole.Instance.Info ("[SceneManager]: " + regionName + "has been restarted");
+                MainConsole.Instance.Info ("[SceneManager]: " + regionName + " has been restarted");
             }
             else
             {
                 //Kill us now
-                m_OpenSimBase.Shutdown(true);
+                MainConsole.Instance.Warn ("[SceneManager]: Shutting down as per [Startup] configuration");
+                m_SimBase.Shutdown(true);
             }
         }
 
@@ -424,7 +433,7 @@ namespace WhiteCore.Region
             var regions = new List<KeyValuePair<ISimulationDataStore, RegionInfo>> ();
             ISimulationDataStore store = m_selectedDataService.Copy ();
 
-            regions.Add (new KeyValuePair<ISimulationDataStore, RegionInfo> (store, store.CreateNewRegion (m_OpenSimBase, regionInfo, currentInfo)));
+            regions.Add (new KeyValuePair<ISimulationDataStore, RegionInfo> (store, store.CreateNewRegion (m_SimBase, regionInfo, currentInfo)));
             StartRegion (store, regionInfo);
 
         }
@@ -440,12 +449,12 @@ namespace WhiteCore.Region
             //First, Initialize the SharedRegionStartupModule
             foreach (ISharedRegionStartupModule module in m_startupPlugins)
             {
-                module.Initialise(scene, m_config, m_OpenSimBase);
+                module.Initialise(scene, m_config, m_SimBase);
             }
             //Then do the ISharedRegionModule and INonSharedRegionModules
             MainConsole.Instance.Debug("[Modules]: Loading region modules");
             IRegionModulesController controller;
-            if (m_OpenSimBase.ApplicationRegistry.TryRequestModuleInterface(out controller))
+            if (m_SimBase.ApplicationRegistry.TryRequestModuleInterface(out controller))
             {
                 controller.AddRegionToModules(scene);
             }
@@ -454,15 +463,15 @@ namespace WhiteCore.Region
             //Then finish the rest of the SharedRegionStartupModules
             foreach (ISharedRegionStartupModule module in m_startupPlugins)
             {
-                module.PostInitialise(scene, m_config, m_OpenSimBase);
+                module.PostInitialise(scene, m_config, m_SimBase);
             }
             foreach (ISharedRegionStartupModule module in m_startupPlugins)
             {
-                module.FinishStartup(scene, m_config, m_OpenSimBase);
+                module.FinishStartup(scene, m_config, m_SimBase);
             }
             foreach (ISharedRegionStartupModule module in m_startupPlugins)
             {
-                module.PostFinishStartup(scene, m_config, m_OpenSimBase);
+                module.PostFinishStartup(scene, m_config, m_SimBase);
             }
         }
 
@@ -484,7 +493,7 @@ namespace WhiteCore.Region
         protected void CloseModules(IScene scene)
         {
             IRegionModulesController controller;
-            if (m_OpenSimBase.ApplicationRegistry.TryRequestModuleInterface(out controller))
+            if (m_SimBase.ApplicationRegistry.TryRequestModuleInterface(out controller))
                 controller.RemoveRegionFromModules(scene);
 
             foreach (ISharedRegionStartupModule module in m_startupPlugins)
@@ -736,7 +745,7 @@ namespace WhiteCore.Region
             else
             {
                 ISimulationDataStore store = m_selectedDataService.Copy ();
-                var newRegion = store.CreateNewRegion (m_OpenSimBase, currentInfo);
+                var newRegion = store.CreateNewRegion (m_SimBase, currentInfo);
 
                 if (newRegion.RegionName != "abort")
                 {
@@ -760,9 +769,9 @@ namespace WhiteCore.Region
 
             // modified to pass a region name to use
             ISimulationDataStore store = m_selectedDataService.Copy ();
-            //StartRegion (store, store.CreateNewRegion (m_OpenSimBase, regionName, currentInfo));
+            //StartRegion (store, store.CreateNewRegion (m_SimBase, regionName, currentInfo));
 
-            var newRegion = store.CreateNewRegion (m_OpenSimBase, regionName, currentInfo);
+            var newRegion = store.CreateNewRegion (m_SimBase, regionName, currentInfo);
             if (newRegion.RegionName != "abort")
             {
                 StartRegion (store, newRegion);
@@ -850,7 +859,7 @@ namespace WhiteCore.Region
             ISimulationDataStore store = m_selectedDataService.Copy ();
             //StartRegion (store, store.CreateNewRegion (m_OpenSimBase, newRegion, currentInfo));
 
-            var newRegion = store.CreateNewRegion (m_OpenSimBase, loadRegion, currentInfo);
+            var newRegion = store.CreateNewRegion (m_SimBase, loadRegion, currentInfo);
             if (newRegion.RegionName != "abort")
             {
                 StartRegion (store, newRegion);
@@ -988,7 +997,7 @@ namespace WhiteCore.Region
             string[] cmdparams = args.ToArray();
 
             IRegionModulesController controller =
-                m_OpenSimBase.ApplicationRegistry.RequestModuleInterface<IRegionModulesController>();
+                m_SimBase.ApplicationRegistry.RequestModuleInterface<IRegionModulesController>();
             if (cmdparams.Length > 1)
             {
                 foreach (IRegionModuleBase irm in controller.AllModules)
@@ -1013,7 +1022,7 @@ namespace WhiteCore.Region
             args.RemoveAt(0);
 
             IRegionModulesController controller =
-                m_OpenSimBase.ApplicationRegistry.RequestModuleInterface<IRegionModulesController>();
+                m_SimBase.ApplicationRegistry.RequestModuleInterface<IRegionModulesController>();
             foreach (IRegionModuleBase irm in controller.AllModules)
             {
                 if (irm is INonSharedRegionModule)
@@ -1083,7 +1092,7 @@ namespace WhiteCore.Region
                 case "command-script":
                     if (cmdparams.Length > 0)
                     {
-                        m_OpenSimBase.RunCommandScript(cmdparams[0]);
+                        m_SimBase.RunCommandScript(cmdparams[0]);
                     }
                     break;
 
