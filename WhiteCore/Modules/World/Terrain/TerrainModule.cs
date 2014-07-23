@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.ModuleLoader;
 using WhiteCore.Framework.Modules;
@@ -344,6 +343,28 @@ namespace WhiteCore.Modules.Terrain
         }
 
         /// <summary>
+        /// Gets the terrain loader.
+        /// </summary>
+        /// <returns>The terrain loader.</returns>
+        /// <param name="fileName">File name of the terrain heightmap.</param>
+        private ITerrainLoader GetTerrainLoader(string fileName)
+        {
+            ITerrainLoader loader = null;
+
+            // find the loader to use..
+            var fileExt = Path.GetExtension(fileName.ToLower());
+            foreach (KeyValuePair<string, ITerrainLoader> floader in m_loaders)
+            {
+                if (fileExt != floader.Key)
+                    continue;
+            
+                loader = floader.Value;
+            }
+            return loader;
+        }
+
+
+        /// <summary>
         ///     Loads a terrain file from disk and installs it in the scene.
         /// </summary>
         /// <param name="filename">Filename to terrain file. Type is determined by extension.</param>
@@ -351,88 +372,83 @@ namespace WhiteCore.Modules.Terrain
         /// <param name="offsetY"></param>
         public void LoadFromFile(string filename, int offsetX, int offsetY)
         {
-            foreach (
-                KeyValuePair<string, ITerrainLoader> loader in m_loaders.Where(loader => Path.GetExtension(filename.ToLower()) == loader.Key))
+
+            var loader = GetTerrainLoader (filename);
+            if (loader != null)
             {
                 lock (m_scene)
                 {
                     try
                     {
-					   MainConsole.Instance.Info("[TERRAIN]: Loading "+filename+" to "+m_scene.RegionInfo.RegionName);
-                       ITerrainChannel channel = loader.Value.LoadFile(filename, m_scene);
+                        MainConsole.Instance.Info ("[TERRAIN]: Loading " + filename + " to " + m_scene.RegionInfo.RegionName);
+                        ITerrainChannel channel = loader.LoadFile (filename, m_scene);
                         channel.Scene = m_scene;
                         if (m_scene.RegionInfo.RegionSizeY == channel.Height &&
                             m_scene.RegionInfo.RegionSizeX == channel.Width)
                         {
                             m_channel = channel;
-                            m_scene.RegisterModuleInterface(m_channel);
-                            MainConsole.Instance.DebugFormat("[TERRAIN]: Loaded terrain, wd/ht: {0}/{1}", channel.Width,
-                                                             channel.Height);
-                        }
-                        else
+                            m_scene.RegisterModuleInterface (m_channel);
+                            MainConsole.Instance.DebugFormat ("[TERRAIN]: Loaded terrain, wd/ht: {0}/{1}", channel.Width,
+                                channel.Height);
+                        } else
                         {
                             //Make sure it is in bounds
                             if ((offsetX + channel.Width) > m_channel.Width ||
                                 (offsetY + channel.Height) > m_channel.Height)
                             {
-                                MainConsole.Instance.Error(
+                                MainConsole.Instance.Error (
                                     "[TERRAIN]: Unable to load heightmap, the terrain you have given is larger than the current region.");
                                 return;
-                            }
-                            else
+                            } else
                             {
                                 //Merge the terrains together at the specified offset
                                 for (int x = offsetX; x < offsetX + channel.Width; x++)
                                 {
                                     for (int y = offsetY; y < offsetY + channel.Height; y++)
                                     {
-                                        m_channel[x, y] = channel[x - offsetX, y - offsetY];
+                                        m_channel [x, y] = channel [x - offsetX, y - offsetY];
                                     }
                                 }
-                                MainConsole.Instance.DebugFormat("[TERRAIN]: Loaded terrain, wd/ht: {0}/{1}",
-                                                                 channel.Width,
-                                                                 channel.Height);
+                                MainConsole.Instance.DebugFormat ("[TERRAIN]: Loaded terrain, wd/ht: {0}/{1}",
+                                    channel.Width,
+                                    channel.Height);
                             }
                         }
-                        UpdateRevertMap();
-                    }
-                    catch (NotImplementedException)
+                        UpdateRevertMap ();
+                    } catch (NotImplementedException)
                     {
-                        MainConsole.Instance.Error("[TERRAIN]: Unable to load heightmap, the " + loader.Value +
-                                                   " parser does not support file loading. (May be save only)");
-                        throw new TerrainException(
-                            String.Format("unable to load heightmap: parser {0} does not support loading",
-                                          loader.Value));
-                    }
-                    catch (FileNotFoundException)
+                        MainConsole.Instance.Error ("[TERRAIN]: Unable to load heightmap, the " + loader +
+                        " parser does not support file loading. (May be save only)");
+//                        throw new TerrainException (
+//                            String.Format ("unable to load heightmap: parser {0} does not support loading",
+//                                loader));
+                    } catch (FileNotFoundException)
                     {
-                        MainConsole.Instance.Error(
-                            "[TERRAIN]: Unable to load heightmap, file not found. (A directory permissions error may also cause this)");
-                        throw new TerrainException(
-                            String.Format(
-                                "unable to load heightmap: file {0} not found (or permissions do not allow access",
-                                filename));
-                    }
-                    catch (ArgumentException e)
+                        MainConsole.Instance.ErrorFormat (
+                            "[TERRAIN]: Unable to load heightmap, file {0} not found. (or directory permissions error may also cause this)", filename);
+//                        throw new TerrainException (
+//                            String.Format (
+//                                "unable to load heightmap: file {0} not found (or permissions do not allow access",
+//                                filename));
+                    } catch (ArgumentException e)
                     {
-                        MainConsole.Instance.ErrorFormat("[TERRAIN]: Unable to load heightmap: {0}", e.Message);
-                        throw new TerrainException(
-                            String.Format("Unable to load heightmap: {0}", e.Message));
+                        MainConsole.Instance.ErrorFormat ("[TERRAIN]: Unable to load heightmap: {0}", e.Message);
+//                        throw new TerrainException (
+//                            String.Format ("Unable to load heightmap: {0}", e.Message));
+                    } catch (Exception e)
+                    {
+                        MainConsole.Instance.ErrorFormat ("[TERRAIN]: Something crashed during load. {0} Exception.", e);
                     }
-					catch (Exception e)
-					{
-						MainConsole.Instance.Error(String.Format("[TERRAIN]: Something crashed during load. {0} Exception.", e));
-					}
-
                 }
+
                 CheckForTerrainUpdates();
                 MainConsole.Instance.Info("[TERRAIN]: File (" + filename + ") loaded successfully");
                 return;
             }
 
-            MainConsole.Instance.Error("[TERRAIN]: Unable to load heightmap, no file loader available for that format.");
-            throw new TerrainException(
-                String.Format("unable to load heightmap from file {0}: no loader available for that format", filename));
+            MainConsole.Instance.Error("[TERRAIN]: Unable to load heightmap, Unable to locate a file loader for " + filename);
+            //throw new TerrainException(
+            //    String.Format("unable to load heightmap from file {0}: no loader available for that format", filename));
         }
 
 
@@ -452,11 +468,15 @@ namespace WhiteCore.Modules.Terrain
 
             try
             {
-                foreach (
-                    KeyValuePair<string, ITerrainLoader> loader in
-                        m_loaders.Where(loader => Path.GetExtension(filename.ToLower()) == loader.Key))
+                //foreach (
+                //    KeyValuePair<string, ITerrainLoader> loader in
+                //        m_loaders.Where(loader => Path.GetExtension(filename.ToLower()) == loader.Key))
+                //{
+                var loader = GetTerrainLoader (filename);
+                if (loader != null)
                 {
-                    loader.Value.SaveFile(filename, m_channel);
+
+                    loader.SaveFile(filename, m_channel);
                     return;
                 }
             }
@@ -464,13 +484,13 @@ namespace WhiteCore.Modules.Terrain
             {
                 MainConsole.Instance.Error("Unable to save to " + filename +
                                            ", saving of this file format has not been implemented.");
-                throw new TerrainException(
-                    String.Format("Unable to save heightmap: saving of this file format not implemented"));
+//                throw new TerrainException(
+//                    String.Format("Unable to save heightmap: saving of this file format not implemented"));
             }
             catch (IOException ioe)
             {
-                MainConsole.Instance.Error(String.Format("[TERRAIN]: Unable to save to {0}, {1}", filename, ioe.Message));
-                throw new TerrainException(String.Format("Unable to save heightmap: {0}", ioe.Message));
+                MainConsole.Instance.ErrorFormat("[TERRAIN]: Unable to save to {0}, {1}", filename, ioe.Message);
+//                throw new TerrainException(String.Format("Unable to save heightmap: {0}", ioe.Message));
             }
 			catch (Exception e)
 			{
@@ -495,14 +515,14 @@ namespace WhiteCore.Modules.Terrain
         /// <param name="stream"></param>
         public void LoadFromStream(string filename, Stream stream)
         {
-            foreach (
-                KeyValuePair<string, ITerrainLoader> loader in m_loaders.Where(loader => Path.GetExtension(filename.ToLower()) == loader.Key))
+            var loader = GetTerrainLoader (filename);
+            if (loader != null)
             {
                 lock (m_scene)
                 {
                     try
                     {
-                        ITerrainChannel channel = loader.Value.LoadStream(stream, m_scene);
+                        ITerrainChannel channel = loader.LoadStream(stream, m_scene);
                         if (channel != null)
                         {
                             channel.Scene = m_scene;
@@ -548,11 +568,11 @@ namespace WhiteCore.Modules.Terrain
                     }
                     catch (NotImplementedException)
                     {
-                        MainConsole.Instance.Error("[TERRAIN]: Unable to load heightmap, the " + loader.Value +
+                        MainConsole.Instance.Error("[TERRAIN]: Unable to load heightmap, the " + loader +
                                                    " parser does not support file loading. (May be save only)");
-                        throw new TerrainException(
-                            String.Format("unable to load heightmap: parser {0} does not support loading",
-                                          loader.Value));
+//                        throw new TerrainException(
+//                            String.Format("unable to load heightmap: parser {0} does not support loading",
+//                                          loader));
                     }
                 }
 
@@ -561,9 +581,9 @@ namespace WhiteCore.Modules.Terrain
                 return;
             }
 
-            MainConsole.Instance.Error("[TERRAIN]: Unable to load heightmap, no file loader available for that format.");
-            throw new TerrainException(
-                String.Format("unable to load heightmap from file {0}: no loader available for that format", filename));
+            MainConsole.Instance.ErrorFormat("[TERRAIN]: Unable to load heightmap from {0}, no file loader available for that format.", filename);
+//            throw new TerrainException(
+ //               String.Format("unable to load heightmap from file {0}: no loader available for that format", filename));
         }
 
         /// <summary>
@@ -649,11 +669,15 @@ namespace WhiteCore.Modules.Terrain
         {
             try
             {
-                foreach (
-                    KeyValuePair<string, ITerrainLoader> loader in
-                        m_loaders.Where(loader => Path.GetExtension(filename.ToLower()) == loader.Key))
+                //foreach (
+                //    KeyValuePair<string, ITerrainLoader> loader in
+                //        m_loaders.Where(loader => Path.GetExtension(filename.ToLower()) == loader.Key))
+                //{
+                var loader = GetTerrainLoader (filename);
+                if (loader != null)
                 {
-                    loader.Value.SaveStream(stream, channel);
+
+                    loader.SaveStream(stream, channel);
                     return;
                 }
             }
@@ -661,8 +685,8 @@ namespace WhiteCore.Modules.Terrain
             {
                 MainConsole.Instance.Error("Unable to save to " + filename +
                                            ", saving of this file format has not been implemented.");
-                throw new TerrainException(
-                    String.Format("Unable to save heightmap: saving of this file format not implemented"));
+//                throw new TerrainException(
+//                   String.Format("Unable to save heightmap: saving of this file format not implemented"));
             }
         }
 
@@ -1071,14 +1095,23 @@ namespace WhiteCore.Modules.Terrain
         {
             ITerrainChannel channel = null;
 
-            foreach (
-                KeyValuePair<string, ITerrainLoader> loader in m_loaders.Where(loader => Path.GetExtension(filename.ToLower()) == loader.Key))
+			// find the loader to use..
+			//var fileExt = Path.GetExtension(filename.ToLower());
+            //foreach (KeyValuePair<string, ITerrainLoader> floader in m_loaders)
+           // {
+			//	if (fileExt != floader.Key)
+			//		continue;
+            //
+			//	ITerrainLoader loader = floader.Value;
+            //{
+            var loader = GetTerrainLoader (filename);
+            if (loader != null)
             {
                 lock (m_scene)
                 {
                     try
                     {
-                        channel = loader.Value.LoadStream(stream, m_scene);
+                        channel = loader.LoadStream(stream, m_scene);
                         if (channel != null)
                         {
                             channel.Scene = m_scene;
@@ -1131,11 +1164,11 @@ namespace WhiteCore.Modules.Terrain
                     }
                     catch (NotImplementedException)
                     {
-                        MainConsole.Instance.Error("[TERRAIN]: Unable to load heightmap, the " + loader.Value +
+                        MainConsole.Instance.Error("[TERRAIN]: Unable to load heightmap, the " + loader +
                                                    " parser does not support file loading. (May be save only)");
-                        throw new TerrainException(
-                            String.Format("unable to load heightmap: parser {0} does not support loading",
-                                          loader.Value));
+//                        throw new TerrainException(
+//                            String.Format("unable to load heightmap: parser {0} does not support loading",
+//                                          loader));
                     }
                 }
 
@@ -1143,9 +1176,10 @@ namespace WhiteCore.Modules.Terrain
                 return channel;
             }
 
-            MainConsole.Instance.Error("[TERRAIN]: Unable to load heightmap, no file loader available for that format.");
-            throw new TerrainException(
-                String.Format("unable to load heightmap from file {0}: no loader available for that format", filename));
+            MainConsole.Instance.ErrorFormat("[TERRAIN]: Unable to load heightmap from {0}, no file loader available for that format.", filename);
+//            throw new TerrainException(
+//                String.Format("unable to load heightmap from file {0}: no loader available for that format", filename));
+            return channel;
         }
 
         private static Stream URIFetch(Uri uri)
@@ -1161,7 +1195,11 @@ namespace WhiteCore.Modules.Terrain
             Stream file = response.GetResponseStream();
 
             if (response.ContentLength == 0)
-                throw new Exception(String.Format("{0} returned an empty file", uri));
+            {
+                MainConsole.Instance.ErrorFormat("{0} returned an empty file", uri);
+                return new BufferedStream(file,0);
+            }
+//                throw new Exception(String.Format("{0} returned an empty file", uri));
 
             // return new BufferedStream(file, (int) response.ContentLength);
             return new BufferedStream(file, 1000000);
@@ -1239,14 +1277,18 @@ namespace WhiteCore.Modules.Terrain
             if (offsetX >= 0 && offsetX < fileWidth && offsetY >= 0 && offsetY < fileHeight)
             {
                 // this region is included in the tile request
-                foreach (
-                    KeyValuePair<string, ITerrainLoader> loader in
-                        m_loaders.Where(loader => Path.GetExtension(filename.ToLower()) == loader.Key))
+                //foreach (
+                //    KeyValuePair<string, ITerrainLoader> loader in
+                //        m_loaders.Where(loader => Path.GetExtension(filename.ToLower()) == loader.Key))
+                //{
+                //{
+                var loader = GetTerrainLoader (filename);
+                if (loader != null)
                 {
                     lock (m_scene)
                     {
 						MainConsole.Instance.Info("[TERRAIN]: Loading "+filename+" to "+m_scene.RegionInfo.RegionName);
-                        ITerrainChannel channel = loader.Value.LoadFile(filename, offsetX, offsetY,
+                        ITerrainChannel channel = loader.LoadFile(filename, offsetX, offsetY,
                                                                         fileWidth, fileHeight,
                                                                         m_scene.RegionInfo.RegionSizeX,
                                                                         m_scene.RegionInfo.RegionSizeY);
@@ -1546,7 +1588,7 @@ namespace WhiteCore.Modules.Terrain
 
         private void InterfaceLoadFile(IScene scene, string[] cmd)
         {
-			if (cmd.Count() < 3)
+            if (cmd.Length < 3)
 			{
 				MainConsole.Instance.Info(
 					"You need to specify a filename to load [opt: xoffset  and/or yoffset].");
@@ -1587,7 +1629,7 @@ namespace WhiteCore.Modules.Terrain
 
         private void InterfaceLoadTileFile(IScene scene, string[] cmd)
         {
-			if (cmd.Count() < 7)
+			if (cmd.Length < 7)
 			{
 				MainConsole.Instance.Info(
 					"You do not have enough parameters. Please look at 'terrain help' for more info.");
@@ -1612,7 +1654,7 @@ namespace WhiteCore.Modules.Terrain
 
         private void InterfaceSaveFile(IScene scene, string[] cmd)
         {
-			if (cmd.Count() < 3)
+			if (cmd.Length < 3)
 			{
 				MainConsole.Instance.Info("You need to specify a filename.");
 				return;
@@ -1659,7 +1701,7 @@ namespace WhiteCore.Modules.Terrain
 
         private void InterfaceFlipTerrain(IScene scene, string[] cmd)
         {
-			if (cmd.Count() < 3)
+			if (cmd.Length < 3)
 			{
 				MainConsole.Instance.Info(
 					"You need to specify a direction x or y.");
@@ -1710,7 +1752,7 @@ namespace WhiteCore.Modules.Terrain
 
         private void InterfaceRescaleTerrain(IScene scene, string[] cmd)
         {
-            if (cmd.Count() < 4)
+            if (cmd.Length < 4)
             {
                 MainConsole.Instance.Info(
                     "You need to specify both <min> and <max> height.");
@@ -1772,7 +1814,7 @@ namespace WhiteCore.Modules.Terrain
 
         private void InterfaceElevateTerrain(IScene scene, string[] cmd)
         {
-            if (cmd.Count() < 3)
+            if (cmd.Length < 3)
             {
                 MainConsole.Instance.Info(
                     "You need to specify how much height to add.");
@@ -1792,7 +1834,7 @@ namespace WhiteCore.Modules.Terrain
 
         private void InterfaceMultiplyTerrain(IScene scene, string[] cmd)
         {
-            if (cmd.Count() < 3)
+            if (cmd.Length < 3)
             {
                 MainConsole.Instance.Info(
                     "You need to specify how much to multiply existing terrain by.");
@@ -1812,7 +1854,7 @@ namespace WhiteCore.Modules.Terrain
 
         private void InterfaceLowerTerrain(IScene scene, string[] cmd)
         {
-            if (cmd.Count() < 3)
+            if (cmd.Length < 3)
             {
                 MainConsole.Instance.Info(
                     "You need to specify how much height to subtract.");
@@ -1832,7 +1874,7 @@ namespace WhiteCore.Modules.Terrain
 
         private void InterfaceFillTerrain(IScene scene, string[] cmd)
         {
-            if (cmd.Count() < 3)
+            if (cmd.Length < 3)
             {
                 MainConsole.Instance.Info(
                     "You need to specify the height of the terrain.");
@@ -1864,7 +1906,7 @@ namespace WhiteCore.Modules.Terrain
             float maxHeight = minHeight + 10f;
             int smoothing = 1;
 
-            if (cmd.Count() < 3)
+            if (cmd.Length < 3)
 			{
 				terrainType = MainConsole.Instance.Prompt("What terrain type to use, Flatland, Grassland, Island or Aquatic?","Flatland");
             } else
@@ -1872,7 +1914,7 @@ namespace WhiteCore.Modules.Terrain
             terrainType = terrainType.ToLower();
 
             // have heights?
-            if (!((terrainType.StartsWith ("f")) || (terrainType.StartsWith ("a"))) && (cmd.Count () < 5))
+            if (!((terrainType.StartsWith ("f")) || (terrainType.StartsWith ("a"))) && (cmd.Length < 5))
             {
                 if (terrainType.StartsWith ("i"))
                 {
@@ -1901,7 +1943,7 @@ namespace WhiteCore.Modules.Terrain
 			}
 
             //have smoothing?
-			if (cmd.Count () == 6)
+			if (cmd.Length == 6)
 				smoothing = int.Parse (cmd [5]);
 
 			List<TerrainModule> m = FindModuleForScene(scene);
