@@ -57,6 +57,11 @@ namespace WhiteCore.Framework.Serialization
         public const string OBJECTS_PATH = "objects/";
 
         /// <value>
+        /// Path for regions in a multi-region archive
+        /// </value>
+        public const string REGIONS_PATH = "regions/";
+
+        /// <value>
         ///     Path for terrains.  Technically these may be assets, but I think it's quite nice to split them out.
         /// </value>
         public const string TERRAINS_PATH = "terrains/";
@@ -96,8 +101,7 @@ namespace WhiteCore.Framework.Serialization
         /// </value>
         public static readonly IDictionary<int, string> ASSET_TYPE_TO_EXTENSION = new Dictionary<int, string>();
 
-        public static readonly IDictionary<string, AssetType> EXTENSION_TO_ASSET_TYPE =
-            new Dictionary<string, AssetType>();
+        public static readonly IDictionary<string, AssetType> EXTENSION_TO_ASSET_TYPE = new Dictionary<string, AssetType>();
 
         static ArchiveConstants()
         {
@@ -111,8 +115,7 @@ namespace WhiteCore.Framework.Serialization
             ASSET_TYPE_TO_EXTENSION[(int) AssetType.ImageJPEG] = ASSET_EXTENSION_SEPARATOR + "image.jpg";
             ASSET_TYPE_TO_EXTENSION[(int) AssetType.ImageTGA] = ASSET_EXTENSION_SEPARATOR + "image.tga";
             ASSET_TYPE_TO_EXTENSION[(int) AssetType.Landmark] = ASSET_EXTENSION_SEPARATOR + "landmark.txt";
-            ASSET_TYPE_TO_EXTENSION[(int) AssetType.LostAndFoundFolder] = ASSET_EXTENSION_SEPARATOR +
-                                                                          "lostandfoundfolder.txt";
+            ASSET_TYPE_TO_EXTENSION[(int) AssetType.LostAndFoundFolder] = ASSET_EXTENSION_SEPARATOR + "lostandfoundfolder.txt";
             // Not sure if we'll ever see this
             ASSET_TYPE_TO_EXTENSION[(int) AssetType.LSLBytecode] = ASSET_EXTENSION_SEPARATOR + "bytecode.lso";
             ASSET_TYPE_TO_EXTENSION[(int) AssetType.LSLText] = ASSET_EXTENSION_SEPARATOR + "script.lsl";
@@ -207,5 +210,6 @@ namespace WhiteCore.Framework.Serialization
 
             return string.Join("/", plainDirs.ToArray());
         }
+
     }
 }

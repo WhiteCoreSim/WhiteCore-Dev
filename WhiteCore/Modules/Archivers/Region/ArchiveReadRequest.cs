@@ -212,6 +212,7 @@ namespace WhiteCore.Modules.Archivers
             List<byte[]> seneObjectGroups = new List<byte[]>();
             Dictionary<UUID, UUID> assetBinaryChangeRecord = new Dictionary<UUID, UUID>();
             Queue<UUID> assets2Save = new Queue<UUID>();
+
             try
             {
                 byte[] data;
@@ -220,6 +221,13 @@ namespace WhiteCore.Modules.Archivers
                 {
                     if (TarArchiveReader.TarEntryType.TYPE_DIRECTORY == entryType)
                         continue;
+
+                    if (TarArchiveReader.TarEntryType.TYPE_NORMAL_FILE == entryType)
+                    {
+                        var fName = Path.GetFileName (filePath);
+                        if (fName.StartsWith ("."))                 // ignore hidden files
+                            continue;
+                    }
 
                     if (filePath.StartsWith(ArchiveConstants.OBJECTS_PATH))
                     {
@@ -279,6 +287,8 @@ namespace WhiteCore.Modules.Archivers
                         LoadControlFile(data);
                     }
                 }
+
+
                 // Save Assets
                 int savingAssetsCount = 0;
                 while (assets2Save.Count > 0)
@@ -709,8 +719,7 @@ namespace WhiteCore.Modules.Archivers
             // Create the XmlParserContext.
             XmlParserContext context = new XmlParserContext(null, nsmgr, null, XmlSpace.None);
 
-            XmlTextReader xtr
-                = new XmlTextReader(m_asciiEncoding.GetString(data), XmlNodeType.Document, context);
+            XmlTextReader xtr = new XmlTextReader(m_asciiEncoding.GetString(data), XmlNodeType.Document, context);
 
             RegionSettings currentRegionSettings = m_scene.RegionInfo.RegionSettings;
 

@@ -49,6 +49,7 @@ WhiteCoreSim/Data/AssetCache/*
 WhiteCoreSim/Data/Region/*.sim
 WhiteCoreSim/Data/RegionBak/*.sim
 WhiteCoreSim/Data/SQLite/*.db
+WhiteCoreSim/Data/OarFiles/*
 
 WhiteCoreSim/Data/ScriptEngines/*-*-*-*-*
 WhiteCoreSim/Data/ScriptEngines/*.dll

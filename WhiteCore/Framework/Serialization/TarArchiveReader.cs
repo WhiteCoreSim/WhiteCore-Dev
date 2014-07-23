@@ -28,6 +28,7 @@
 using System;
 using System.IO;
 using System.Text;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Framework.Serialization
 {
@@ -98,7 +99,8 @@ namespace WhiteCore.Framework.Serialization
 
             entryType = header.EntryType;
             filePath = header.FilePath;
-            return ReadData(header.FileSize);
+
+           return ReadData(header.FileSize);
         }
 
         /// <summary>
