@@ -396,6 +396,11 @@ namespace WhiteCore.Framework.ConsoleFramework
             OutputNoTime(message.ToString(), Level.Info);
         }
 
+        public void Ticker()
+        {
+            Console.Write(".");
+        }
+
         public void InfoFormat(string format, params object[] args)
         {
             Output(string.Format(format, args), Level.Info);
