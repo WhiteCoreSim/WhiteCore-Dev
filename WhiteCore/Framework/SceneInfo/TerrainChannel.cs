@@ -278,7 +278,7 @@ namespace WhiteCore.Framework.SceneInfo
 
 			// try for the land type
             string tType = terrainType.ToLower ();
-            if (tType.StartsWith("m") || tType.StartsWith("g"))
+            if (tType.StartsWith("m") || tType.StartsWith("g") || tType.StartsWith("h"))
 				CreateMainlandTerrain (min, max, smoothing);
             else if (tType.StartsWith("i"))
 				CreateIslandTerrain (min, max, smoothing);
@@ -298,10 +298,12 @@ namespace WhiteCore.Framework.SceneInfo
         #endregion
 
         /// <summary>
-        /// Creates the default terrain, currently 'Flatland'
+        /// Creates the default terrain, default is 'Flatland'
         /// </summary>
 		private void CreateDefaultTerrain(string landType)
 		{
+            float waterHeight = (float) m_scene.RegionInfo.RegionSettings.WaterHeight;
+
             if (landType == null)
                 landType = "o";                     // Flatland
 			
@@ -312,7 +314,7 @@ namespace WhiteCore.Framework.SceneInfo
             else if (lT.StartsWith("f"))            // Full Region
                 CreateMainlandTerrain (2);
             else if (lT.StartsWith("g"))            // Grassland
-                CreateMainlandTerrain (5);
+                CreateMainlandTerrain (waterHeight-1, waterHeight+2,5);
             else if (lT.StartsWith("H"))            // Homestead
                 CreateMainlandTerrain (3);
             else if (lT.StartsWith("o"))            // Openspace

@@ -419,22 +419,13 @@ namespace WhiteCore.Modules.Terrain
                     {
                         MainConsole.Instance.Error ("[TERRAIN]: Unable to load heightmap, the " + loader +
                         " parser does not support file loading. (May be save only)");
-//                        throw new TerrainException (
-//                            String.Format ("unable to load heightmap: parser {0} does not support loading",
-//                                loader));
                     } catch (FileNotFoundException)
                     {
                         MainConsole.Instance.ErrorFormat (
                             "[TERRAIN]: Unable to load heightmap, file {0} not found. (or directory permissions error may also cause this)", filename);
-//                        throw new TerrainException (
-//                            String.Format (
-//                                "unable to load heightmap: file {0} not found (or permissions do not allow access",
-//                                filename));
                     } catch (ArgumentException e)
                     {
                         MainConsole.Instance.ErrorFormat ("[TERRAIN]: Unable to load heightmap: {0}", e.Message);
-//                        throw new TerrainException (
-//                            String.Format ("Unable to load heightmap: {0}", e.Message));
                     } catch (Exception e)
                     {
                         MainConsole.Instance.ErrorFormat ("[TERRAIN]: Something crashed during load. {0} Exception.", e);
@@ -447,8 +438,6 @@ namespace WhiteCore.Modules.Terrain
             }
 
             MainConsole.Instance.Error("[TERRAIN]: Unable to load heightmap, Unable to locate a file loader for " + filename);
-            //throw new TerrainException(
-            //    String.Format("unable to load heightmap from file {0}: no loader available for that format", filename));
         }
 
 
@@ -468,10 +457,6 @@ namespace WhiteCore.Modules.Terrain
 
             try
             {
-                //foreach (
-                //    KeyValuePair<string, ITerrainLoader> loader in
-                //        m_loaders.Where(loader => Path.GetExtension(filename.ToLower()) == loader.Key))
-                //{
                 var loader = GetTerrainLoader (filename);
                 if (loader != null)
                 {
@@ -484,13 +469,10 @@ namespace WhiteCore.Modules.Terrain
             {
                 MainConsole.Instance.Error("Unable to save to " + filename +
                                            ", saving of this file format has not been implemented.");
-//                throw new TerrainException(
-//                    String.Format("Unable to save heightmap: saving of this file format not implemented"));
             }
             catch (IOException ioe)
             {
                 MainConsole.Instance.ErrorFormat("[TERRAIN]: Unable to save to {0}, {1}", filename, ioe.Message);
-//                throw new TerrainException(String.Format("Unable to save heightmap: {0}", ioe.Message));
             }
 			catch (Exception e)
 			{
@@ -570,9 +552,6 @@ namespace WhiteCore.Modules.Terrain
                     {
                         MainConsole.Instance.Error("[TERRAIN]: Unable to load heightmap, the " + loader +
                                                    " parser does not support file loading. (May be save only)");
-//                        throw new TerrainException(
-//                            String.Format("unable to load heightmap: parser {0} does not support loading",
-//                                          loader));
                     }
                 }
 
@@ -582,8 +561,6 @@ namespace WhiteCore.Modules.Terrain
             }
 
             MainConsole.Instance.ErrorFormat("[TERRAIN]: Unable to load heightmap from {0}, no file loader available for that format.", filename);
-//            throw new TerrainException(
- //               String.Format("unable to load heightmap from file {0}: no loader available for that format", filename));
         }
 
         /// <summary>
@@ -685,8 +662,6 @@ namespace WhiteCore.Modules.Terrain
             {
                 MainConsole.Instance.Error("Unable to save to " + filename +
                                            ", saving of this file format has not been implemented.");
-//                throw new TerrainException(
-//                   String.Format("Unable to save heightmap: saving of this file format not implemented"));
             }
         }
 
@@ -1166,9 +1141,6 @@ namespace WhiteCore.Modules.Terrain
                     {
                         MainConsole.Instance.Error("[TERRAIN]: Unable to load heightmap, the " + loader +
                                                    " parser does not support file loading. (May be save only)");
-//                        throw new TerrainException(
-//                            String.Format("unable to load heightmap: parser {0} does not support loading",
-//                                          loader));
                     }
                 }
 
@@ -1177,8 +1149,6 @@ namespace WhiteCore.Modules.Terrain
             }
 
             MainConsole.Instance.ErrorFormat("[TERRAIN]: Unable to load heightmap from {0}, no file loader available for that format.", filename);
-//            throw new TerrainException(
-//                String.Format("unable to load heightmap from file {0}: no loader available for that format", filename));
             return channel;
         }
 
@@ -1199,7 +1169,6 @@ namespace WhiteCore.Modules.Terrain
                 MainConsole.Instance.ErrorFormat("{0} returned an empty file", uri);
                 return new BufferedStream(file,0);
             }
-//                throw new Exception(String.Format("{0} returned an empty file", uri));
 
             // return new BufferedStream(file, (int) response.ContentLength);
             return new BufferedStream(file, 1000000);
@@ -1902,40 +1871,47 @@ namespace WhiteCore.Modules.Terrain
 		{
             string terrainType;
             //assume grassland paramters
-            float minHeight = (float) m_scene.RegionInfo.RegionSettings.WaterHeight - 5f;
+            float waterHeight = (float) m_scene.RegionInfo.RegionSettings.WaterHeight;
+            float minHeight = waterHeight - 5f;
             float maxHeight = minHeight + 10f;
             int smoothing = 1;
 
             if (cmd.Length < 3)
 			{
-				terrainType = MainConsole.Instance.Prompt("What terrain type to use, Flatland, Grassland, Island or Aquatic?","Flatland");
+				terrainType = MainConsole.Instance.Prompt("What terrain type to use, Flatland, Grassland, Hills, Island or Aquatic?","Flatland");
             } else
                 terrainType = cmd[2];
             terrainType = terrainType.ToLower();
 
             // have heights?
-            if (!((terrainType.StartsWith ("f")) || (terrainType.StartsWith ("a"))) && (cmd.Length < 5))
+            bool presets = ( terrainType.StartsWith ("f") || terrainType.StartsWith ("a") );
+            if (!presets && (cmd.Length < 5))
             {
                 if (terrainType.StartsWith ("i"))
                 {
-                    minHeight = 15;                                      // Aquatic
+                    minHeight = waterHeight - 5f;                                     
                     maxHeight = 30;
+                    smoothing = 3;
+                } else if (terrainType.StartsWith("h"))
+                {       
+                    minHeight = waterHeight;                                     
+                    maxHeight = 40;
                     smoothing = 2;
                 }
 
                 // prompt for heights...
-                minHeight = float.Parse (MainConsole.Instance.Prompt ("Minimum height", minHeight.ToString ()));
-                maxHeight = float.Parse (MainConsole.Instance.Prompt ("Maximum height", maxHeight.ToString ()));
+                minHeight = float.Parse (MainConsole.Instance.Prompt ("Minimum land height", minHeight.ToString ()));
+                maxHeight = float.Parse (MainConsole.Instance.Prompt ("Maximum land height", maxHeight.ToString ()));
 
             } else if (terrainType.StartsWith ("a"))
             {
                 minHeight = 0;                                      // Aquatic
-                maxHeight = 15;
+                maxHeight = waterHeight - 5f;
                 smoothing = 4;
             } else if (terrainType.StartsWith ("f"))
             {
-                minHeight = 0.1f;                                   // Flatland
-                maxHeight = 0.2f;
+                minHeight = 0.01f;                                  // Flatland
+                maxHeight = 0.012f;
             } else
 			{
 				minHeight = float.Parse (cmd [3]);
@@ -2059,45 +2035,65 @@ namespace WhiteCore.Modules.Terrain
 				"\n FileName: The file you wish to load from, the file extension determines the loader to be used."+
 				"\n Supported extensions include: " +
                 supportedFileExtensions);
+
             MainConsole.Instance.Info(
                 "terrain save <FileName> - Saves the current heightmap to a specified file. "+
 				"\n FileName: The destination filename for your heightmap, the file extension determines the format to save in. "+
 				"\n Supported extensions include: " +
                 supportedFileExtensions);
+
             MainConsole.Instance.Info(
                 "terrain load-tile <file width> <file height> <minimum X tile> <minimum Y tile> - Loads a terrain from a section of a larger file. " +
                 "\n file width: The width of the file in tiles" +
                 "\n file height: The height of the file in tiles" +
                 "\n minimum X tile: The X region coordinate of the first section on the file" +
                 "\n minimum Y tile: The Y region coordinate of the first section on the file");
-            MainConsole.Instance.Info("terrain fill <value> - Fills the current heightmap with a specified value." +
-                                      "\n value: The numeric value of the height you wish to set your region to.");
+
+            MainConsole.Instance.Info(
+                "terrain fill <value> - Fills the current heightmap with a specified value." +
+                "\n value: The numeric value of the height you wish to set your region to.");
+
             MainConsole.Instance.Info(
                 "terrain elevate <value> - Raises the current heightmap by the specified amount." +
                 "\n amount: The amount of height to remove from the terrain in meters.");
-            MainConsole.Instance.Info("terrain lower <value> - Lowers the current heightmap by the specified amount." +
-                                      "\n amount: The amount of height to remove from the terrain in meters.");
-            MainConsole.Instance.Info("terrain multiply <value> - Multiplies the heightmap by the value specified." +
-                                      "\n value: The value to multiply the heightmap by.");
-            MainConsole.Instance.Info("terrain bake - Saves the current terrain into the regions revert map.");
-            MainConsole.Instance.Info("terrain revert - Loads the revert map terrain into the regions heightmap.");
+
+            MainConsole.Instance.Info(
+                "terrain lower <value> - Lowers the current heightmap by the specified amount." +
+                "\n amount: The amount of height to remove from the terrain in meters.");
+
+            MainConsole.Instance.Info(
+                "terrain multiply <value> - Multiplies the heightmap by the value specified." +
+                "\n value: The value to multiply the heightmap by.");
+
+            MainConsole.Instance.Info(
+                "terrain bake - Saves the current terrain into the regions revert map.");
+
+            MainConsole.Instance.Info(
+                "terrain revert - Loads the revert map terrain into the regions heightmap.");
+
             MainConsole.Instance.Info(
                 "terrain stats - Shows some information about the regions heightmap for debugging purposes.");
+
             MainConsole.Instance.Info(
                 "terrain newbrushes <enabled> - Enables experimental brushes which replace the standard terrain brushes." +
                 "\n enabled: true / false - Enable new brushes");
-            MainConsole.Instance.Info("terrain flip <direction> - Flips the current terrain about the X or Y axis" +
-                                      "\n direction: [x|y] the direction to flip the terrain in");
+
+            MainConsole.Instance.Info(
+                "terrain flip <direction> - Flips the current terrain about the X or Y axis" +
+                "\n direction: [x|y] the direction to flip the terrain in");
+
             MainConsole.Instance.Info(
                 "terrain rescale <min> <max> - Rescales the current terrain to fit between the given min and max heights" +
                 "\n Min: min terrain height after rescaling" +
                 "\n Max: max terrain height after rescaling");
+
 			MainConsole.Instance.Info(
 				"terrain generate <type> <Min> <Max> [smoothing]- Genrate new terrain to fit between the given min and max heights" +
 				"\n Type: Flatland, Mainland, Island, Aquatic" +
 				"\n Min: min terrain height after rescaling" +
 				"\n Max: max terrain height after rescaling"+
 				"\n Smoothing: [Optional] number of smoothing passes");
+
             MainConsole.Instance.Info(
                 "terrain calc area - Calulates the region land area. ");
 
@@ -2116,88 +2112,118 @@ namespace WhiteCore.Modules.Terrain
 
             if (MainConsole.Instance != null)
             {
-                MainConsole.Instance.Commands.AddCommand("terrain save",
-                                                         "terrain save <FileName>",
-                                                         "Saves the current heightmap to a specified file. FileName: The destination filename for your heightmap, the file extension determines the format to save in. Supported extensions include: " +
-                                                         supportedFileExtensions, InterfaceSaveFile, true, false);
+                MainConsole.Instance.Commands.AddCommand(
+                    "terrain save",
+                    "terrain save <FileName>",
+                    "Saves the current heightmap to a specified file. FileName: The destination filename for your heightmap,\n" +
+                    "the file extension determines the format to save in. Supported extensions include: " +
+                    supportedFileExtensions, InterfaceSaveFile, true, false);
 
-                MainConsole.Instance.Commands.AddCommand("terrain physics update",
-                                                         "terrain physics update", "Update the physics map",
-                                                         InterfaceSavePhysics, true, false);
+                MainConsole.Instance.Commands.AddCommand(
+                    "terrain physics update",
+                    "terrain physics update", "Update the physics map",
+                    InterfaceSavePhysics, true, false);
 
-                MainConsole.Instance.Commands.AddCommand("terrain load",
-                                                         "terrain load <FileName> <OffsetX=> <OffsetY=>",
-                                                         "Loads a terrain from a specified file. FileName: The file you wish to load from, the file extension determines the loader to be used. Supported extensions include: " +
-                                                         supportedFileExtensions, InterfaceLoadFile, true, false);
-                MainConsole.Instance.Commands.AddCommand("terrain load-tile",
-                                                         "terrain load-tile <file width> <file height> <minimum X tile> <minimum Y tile>",
-                                                         "Loads a terrain from a section of a larger file. " +
-                                                         "\n file width: The width of the file in tiles" +
-                                                         "\n file height: The height of the file in tiles" +
-                                                         "\n minimum X tile: The X region coordinate of the first section on the file" +
-                                                         "\n minimum Y tile: The Y region coordinate of the first section on the file",
-                                                         InterfaceLoadTileFile, true, false);
+                MainConsole.Instance.Commands.AddCommand(
+                    "terrain load",
+                    "terrain load <FileName> <OffsetX=> <OffsetY=>",
+                    "Loads a terrain from a specified file. FileName: The file you wish to load from. Supported extensions include: " +
+                    supportedFileExtensions,
+                    InterfaceLoadFile, true, false);
 
-                MainConsole.Instance.Commands.AddCommand("terrain fill",
-                                                         "terrain fill <value> ",
-                                                         "Fills the current heightmap with a specified value." +
-                                                         "\n value: The numeric value of the height you wish to set your region to.",
-                                                         InterfaceFillTerrain, true, false);
-                MainConsole.Instance.Commands.AddCommand("terrain elevate",
-                                                         "terrain elevate <amount> ",
-                                                         "Raises the current heightmap by the specified amount." +
-                                                         "\n amount: The amount of height to remove from the terrain in meters.",
-                                                         InterfaceElevateTerrain, true, false);
-                MainConsole.Instance.Commands.AddCommand("terrain lower",
-                                                         "terrain lower <amount> ",
-                                                         "Lowers the current heightmap by the specified amount." +
-                                                         "\n amount: The amount of height to remove from the terrain in meters.",
-                                                         InterfaceLowerTerrain, true, false);
-                MainConsole.Instance.Commands.AddCommand("terrain multiply",
-                                                         "terrain multiply <value> ",
-                                                         "Multiplies the heightmap by the value specified." +
-                                                         "\n value: The value to multiply the heightmap by.",
-                                                         InterfaceMultiplyTerrain, true, false);
+                MainConsole.Instance.Commands.AddCommand (
+                    "terrain load-tile",
+                    "terrain load-tile <file width> <file height> <minimum X tile> <minimum Y tile>",
+                    "Loads a terrain from a section of a larger file. " +
+                    "\n file width: The width of the file in tiles" +
+                    "\n file height: The height of the file in tiles" +
+                    "\n minimum X tile: The X region coordinate of the first section on the file" +
+                    "\n minimum Y tile: The Y region coordinate of the first section on the file",
+                    InterfaceLoadTileFile, true, false);
 
-                MainConsole.Instance.Commands.AddCommand("terrain bake",
-                                                         "terrain bake",
-                                                         "Saves the current terrain into the regions revert map.",
-                                                         InterfaceBakeTerrain, true, false);
-                MainConsole.Instance.Commands.AddCommand("terrain revert",
-                                                         "terrain revert",
-                                                         "Loads the revert map terrain into the regions heightmap.",
-                                                         InterfaceRevertTerrain, true, false);
-                MainConsole.Instance.Commands.AddCommand("terrain stats",
-                                                         "terrain stats",
-                                                         "Shows some information about the regions heightmap for debugging purposes.",
-                                                         InterfaceShowDebugStats, true, false);
-                MainConsole.Instance.Commands.AddCommand("terrain newbrushes",
-                                                         "terrain newbrushes <enabled> ",
-                                                         "Enables experimental brushes which replace the standard terrain brushes." +
-                                                         "\n enabled: true / false - Enable new brushes",
-                                                         InterfaceEnableExperimentalBrushes, true, false);
-                MainConsole.Instance.Commands.AddCommand("terrain flip",
-                                                         "terrain flip <direction> ",
-                                                         "Flips the current terrain about the X or Y axis" +
-                                                         "\n direction: [x|y] the direction to flip the terrain in",
-                                                         InterfaceFlipTerrain, true, false);
-                MainConsole.Instance.Commands.AddCommand("terrain rescale",
-                                                         "terrain rescale <min> <max>",
-                                                         "Rescales the current terrain to fit between the given min and max heights" +
-                                                         "\n Min: min terrain height after rescaling" +
-                                                         "\n Max: max terrain height after rescaling",
-                                                         InterfaceRescaleTerrain, true, false);
-				MainConsole.Instance.Commands.AddCommand("terrain generate",
-				                                         "terrain generate <type> <min> <max> [smoothing]",
-				                                         "Generate new terrain to fit between the given min and max heights" +
-				                                         "\n Type: Flatland, Mainland, Island, Aquatic" +
-				                                         "\n Min: min terrain height after rescaling" +
-				                                         "\n Max: max terrain height after rescaling"+
-				                                         "\n Smoothing: [Optional - default 2] number of smoothing passes to perform",
-				                                         InterfaceGenerateTerrain, true, false);
-                MainConsole.Instance.Commands.AddCommand("terrain help",
-                                                         "terrain help", "Gives help about the terrain module.",
-                                                         InterfaceHelp, true, false);
+                MainConsole.Instance.Commands.AddCommand(
+                    "terrain fill",
+                    "terrain fill <value> ",
+                    "Fills the current heightmap with a specified value." +
+                    "\n value: The numeric value of the height you wish to set your region to.",
+                    InterfaceFillTerrain, true, false);
+
+                MainConsole.Instance.Commands.AddCommand(
+                    "terrain elevate",
+                    "terrain elevate <amount> ",
+                    "Raises the current heightmap by the specified amount." +
+                    "\n amount: The amount of height to remove from the terrain in meters.",
+                    InterfaceElevateTerrain, true, false);
+
+                MainConsole.Instance.Commands.AddCommand(
+                    "terrain lower",
+                    "terrain lower <amount> ",
+                    "Lowers the current heightmap by the specified amount." +
+                    "\n amount: The amount of height to remove from the terrain in meters.",
+                    InterfaceLowerTerrain, true, false);
+
+                MainConsole.Instance.Commands.AddCommand (
+                    "terrain multiply",
+                    "terrain multiply <value> ",
+                    "Multiplies the heightmap by the value specified." +
+                    "\n value: The value to multiply the heightmap by.",
+                    InterfaceMultiplyTerrain, true, false);
+
+                MainConsole.Instance.Commands.AddCommand (
+                    "terrain bake",
+                    "terrain bake",
+                    "Saves the current terrain into the regions revert map.",
+                    InterfaceBakeTerrain, true, false);
+
+                MainConsole.Instance.Commands.AddCommand (
+                    "terrain revert",
+                    "terrain revert",
+                    "Loads the revert map terrain into the regions heightmap.",
+                    InterfaceRevertTerrain, true, false);
+
+                MainConsole.Instance.Commands.AddCommand(
+                    "terrain stats",
+                    "terrain stats",
+                    "Shows some information about the regions heightmap for debugging purposes.",
+                    InterfaceShowDebugStats, true, false);
+
+                MainConsole.Instance.Commands.AddCommand (
+                    "terrain newbrushes",
+                    "terrain newbrushes <enabled> ",
+                    "Enables experimental brushes which replace the standard terrain brushes." +
+                    "\n enabled: true / false - Enable new brushes",
+                    InterfaceEnableExperimentalBrushes, true, false);
+
+                MainConsole.Instance.Commands.AddCommand (
+                    "terrain flip",
+                    "terrain flip <direction> ",
+                    "Flips the current terrain about the X or Y axis" +
+                    "\n direction: [x|y] the direction to flip the terrain in",
+                    InterfaceFlipTerrain, true, false);
+
+                MainConsole.Instance.Commands.AddCommand (
+                    "terrain rescale",
+                    "terrain rescale <min> <max>",
+                    "Rescales the current terrain to fit between the given min and max heights" +
+                    "\n Min: min terrain height after rescaling" +
+                    "\n Max: max terrain height after rescaling",
+                    InterfaceRescaleTerrain, true, false);
+
+				MainConsole.Instance.Commands.AddCommand(
+                    "terrain generate",
+                    "terrain generate <type> <min> <max> [smoothing]",
+                    "Generate new terrain to fit between the given min and max heights" +
+                    "\n Type: Flatland, Mainland, Island, Aquatic" +
+                    "\n Min: min terrain height after rescaling" +
+                    "\n Max: max terrain height after rescaling" +
+                    "\n Smoothing: [Optional - default 2] number of smoothing passes to perform",
+                    InterfaceGenerateTerrain, true, false);
+
+                MainConsole.Instance.Commands.AddCommand(
+                    "terrain help",
+                    "terrain help", "Gives help about the terrain module.",
+                    InterfaceHelp, true, false);
+
                 MainConsole.Instance.Commands.AddCommand(
                     "terrain calc area",
                     "terrain calc area",
