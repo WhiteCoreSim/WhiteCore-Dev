@@ -1524,7 +1524,8 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                                                    if (RegionTerrain != IntPtr.Zero)
                                                    {
                                                        d.GeomHeightfieldDataDestroy(RegionTerrain);
-                                                       d.SpaceRemove(space, RegionTerrain);
+                                                       if(space != IntPtr.Zero)
+                                                           d.SpaceRemove(space, RegionTerrain);
                                                        //d.GeomDestroy(RegionTerrain);
                                                        GC.RemoveMemoryPressure(_heightmap.Length);
                                                    }
