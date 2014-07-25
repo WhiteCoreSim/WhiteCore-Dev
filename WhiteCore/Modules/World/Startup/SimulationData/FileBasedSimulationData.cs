@@ -116,6 +116,26 @@ namespace WhiteCore.Modules
             return retVals;
         }
 
+        public virtual List<string> FindRegionBackupFiles(string regionName)
+        {
+            if ( (m_oldSaveDirectory == "") || (regionName == null) )
+                return null;
+
+            List<string> allBackups = FindBackupRegionFiles();
+
+            List<string> regionBaks = new List<string>();
+            regionName += "--";                                 // name & timestamp delimiter
+            foreach (string regBak in allBackups)
+            {
+                if (Path.GetFileName (regBak).StartsWith(regionName)) 
+                {
+                    //        MainConsole.Instance.Debug ("Found: " + Path.GetFileNameWithoutExtension (regBak));
+                    regionBaks.Add ( regBak);
+                }
+            }
+            return regionBaks;
+        }
+
         public virtual List<string> FindBackupRegionFiles()
         {
             if (m_oldSaveDirectory == "")
@@ -123,14 +143,8 @@ namespace WhiteCore.Modules
 
             MainConsole.Instance.Info("Looking for sim backups in: "+ m_oldSaveDirectory);
             List<string> archives = new List<string>(Directory.GetFiles(m_oldSaveDirectory, "*.sim", SearchOption.TopDirectoryOnly));
-            //List<string> retVals = new List<string>();
-            //foreach (string r in regions)
-            //    if (Path.GetExtension (r) == ".sim") {
-            //        MainConsole.Instance.Debug ("Found: " + Path.GetFileNameWithoutExtension (r));
-            //        retVals.Add (Path.GetFileNameWithoutExtension (r));
-            //    }
-            //return retVals;
             MainConsole.Instance.InfoFormat ("Found {0} archive files", archives.Count);
+
             return archives;
         }
 
@@ -490,6 +504,46 @@ namespace WhiteCore.Modules
 
         }
 
+        /// <summary>
+        /// Restores the last backup.
+        /// </summary>
+        /// <returns><c>true</c>, if last backup was restored, <c>false</c> otherwise.</returns>
+        /// <param name="regionName">Region name.</param>
+        public bool RestoreLastBackup(string regionName)
+        {
+            List<string> backups = FindRegionBackupFiles(regionName);
+            if (backups == null)
+                return false;
+
+            // we have backups.. find the last one...
+            DateTime mostRecent = DateTime.Now.AddDays( -7);
+
+            string lastBackFile = "";
+            foreach(string bak in backups)
+            {
+                if (File.GetLastWriteTime(bak) > mostRecent)
+                    lastBackFile = bak;
+            }
+             
+            if ( lastBackFile != "")
+            {
+                string regionFile = (m_storeDirectory == null) 
+                    ? regionName + ".sim"
+                    : Path.Combine(m_storeDirectory, regionName + ".sim");
+
+                if (File.Exists(regionFile))
+                    File.Delete(regionFile);
+
+                // now we can copy it over...
+                File.Copy(lastBackFile, regionFile);
+
+                return true; 
+
+            }
+
+            return false;
+        }
+            
         public virtual List<ISceneEntity> LoadObjects()
         {
             return _regionData.Groups.ConvertAll<ISceneEntity>(o => o);

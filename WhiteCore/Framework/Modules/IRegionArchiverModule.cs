@@ -35,7 +35,7 @@ namespace WhiteCore.Framework.Modules
     /// </summary>
     public interface IRegionArchiverModule
     {
-        void HandleLoadOarConsoleCommand(string[] cmdparams);
+        bool HandleLoadOarConsoleCommand(string[] cmdparams);
         void HandleSaveOarConsoleCommand(string[] cmdparams);
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace WhiteCore.Framework.Modules
         /// </summary>
         /// If you want notification of when it has completed then subscribe to the EventManager.OnOarFileLoaded event.
         /// <param name="loadPath"></param>
-        void DearchiveRegion(string loadPath);
+        bool DearchiveRegion(string loadPath);
 
         /// <summary>
         ///     Dearchive the given region archive.  This replaces the existing scene.
@@ -96,7 +96,7 @@ namespace WhiteCore.Framework.Modules
         /// <param name="flipY"></param>
         /// <param name="useParcelOwnership"></param>
         /// <param name="checkOwnership"></param>
-        void DearchiveRegion(string loadPath, bool merge, bool skipAssets, bool skipTerrain, 
+        bool DearchiveRegion(string loadPath, bool merge, bool skipAssets, bool skipTerrain, 
                              int offsetX, int offsetY, int offsetZ,
                              bool flipX, bool flipY, bool useParcelOwnership, bool checkOwnership);
 
@@ -105,7 +105,7 @@ namespace WhiteCore.Framework.Modules
         /// </summary>
         /// If you want notification of when it has completed then subscribe to the EventManager.OnOarFileLoaded event.
         /// <param name="loadStream"></param>
-        void DearchiveRegion(Stream loadStream);
+        bool DearchiveRegion(Stream loadStream);
 
         /// <summary>
         ///     Dearchive a region from a stream.  This replaces the existing scene.
@@ -131,7 +131,7 @@ namespace WhiteCore.Framework.Modules
         /// <param name="flipY"></param>
         /// <param name="useParcelOwnership"></param>
         /// <param name="checkOwnership"></param>
-        void DearchiveRegion(Stream loadStream, bool merge, bool skipAssets, bool skipTerrain,
+        bool DearchiveRegion(Stream loadStream, bool merge, bool skipAssets, bool skipTerrain,
                              int offsetX, int offsetY, int offsetZ,
                              bool flipX, bool flipY, bool useParcelOwnership, bool checkOwnership);
     }

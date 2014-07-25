@@ -343,7 +343,7 @@ namespace WhiteCore.Region
 
         public void RestartRegion(IScene scene)
         {
-            m_startupTime = DateTime.Now;                           // for more meaningful strtup times
+            m_startupTime = DateTime.Now;                           // for more meaningful startup times
             string regionName = scene.RegionInfo.RegionName;        // save current info for later
 
             // change back to the root as we are going to trash this one
@@ -1039,6 +1039,7 @@ namespace WhiteCore.Region
         /// <param name="cmdparams">Additional arguments passed to the command</param>
         private void RunCommand(IScene scene, string[] cmdparams)
         {
+            // TODO: Fix this so that additional commandline details can be passed
             if ( (MainConsole.Instance.ConsoleScene == null) &&
                 (m_scenes.IndexOf(scene) == 0) )
             {
@@ -1402,7 +1403,21 @@ namespace WhiteCore.Region
             {
                 IRegionArchiverModule archiver = scene.RequestModuleInterface<IRegionArchiverModule>();
                 if (archiver != null)
-                    archiver.HandleLoadOarConsoleCommand(cmdparams);
+                {
+                    var success = archiver.HandleLoadOarConsoleCommand(cmdparams);
+                    if (!success)
+                    {
+                        ResetRegion(scene);
+
+                        ISimulationDataStore simStore = scene.SimulationDataService;
+                        success = simStore.RestoreLastBackup (scene.RegionInfo.RegionName);
+                        if(success)
+                        {
+                            scene.RegionInfo = m_selectedDataService.LoadRegionNameInfo (regionName, m_SimBase);
+                            MainConsole.Instance.Warn ("[SceneManager]: Region has been reloaded from the previous backup");
+                        }
+                    }
+                }
             }
             catch (Exception e)
             {

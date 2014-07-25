@@ -153,16 +153,17 @@ namespace WhiteCore.Modules.Archivers
         /// <summary>
         ///     Dearchive the region embodied in this request.
         /// </summary>
-        public void DearchiveRegion()
+        public bool DearchiveRegion()
         {
             // The same code can handle dearchiving 0.1 and 0.2 OpenSim Archive versions
-            DearchiveRegion0DotStar();
+            return DearchiveRegion0DotStar();
         }
 
-        private void DearchiveRegion0DotStar()
+        private bool DearchiveRegion0DotStar()
         {
             if (m_loadStream == null)
-                return;
+                return false;
+
             int successfulAssetRestores = 0;
             int failedAssetRestores = 0;
             string filePath = "NONE";
@@ -213,6 +214,8 @@ namespace WhiteCore.Modules.Archivers
             Dictionary<UUID, UUID> assetBinaryChangeRecord = new Dictionary<UUID, UUID>();
             Queue<UUID> assets2Save = new Queue<UUID>();
 
+            MainConsole.Instance.Info("[ARCHIVER]: Commencing load from archive");
+            int ticker = 0;
             try
             {
                 byte[] data;
@@ -228,6 +231,10 @@ namespace WhiteCore.Modules.Archivers
                         if (fName.StartsWith ("."))                 // ignore hidden files
                             continue;
                     }
+
+                    ticker ++;
+                    if (ticker % 10 == 0)
+                        MainConsole.Instance.Ticker();
 
                     if (filePath.StartsWith(ArchiveConstants.OBJECTS_PATH))
                     {
@@ -288,11 +295,18 @@ namespace WhiteCore.Modules.Archivers
                     }
                 }
 
+                MainConsole.Instance.CleanInfo("");
+                MainConsole.Instance.Info("[ARCHIVER]: Saving loaded assets");
+                ticker = 0;
 
                 // Save Assets
                 int savingAssetsCount = 0;
                 while (assets2Save.Count > 0)
                 {
+                    ticker++;
+                    if (ticker % 10 == 0)
+                        MainConsole.Instance.Ticker();
+
                     try
                     {
                         UUID assetid = assets2Save.Dequeue();
@@ -307,8 +321,15 @@ namespace WhiteCore.Modules.Archivers
                     }
                 }
 
+                MainConsole.Instance.CleanInfo("");
+                MainConsole.Instance.Info("[ARCHIVER]: Saving loaded objects");
+                ticker = 0;
                 foreach (byte[] data2 in seneObjectGroups)
                 {
+                    ticker++;
+                    if (ticker % 10 == 0)
+                        MainConsole.Instance.Ticker();
+
                     byte[] data3 = data2;
 
                     string stringData = Utils.BytesToString(data3);
@@ -407,7 +428,7 @@ namespace WhiteCore.Modules.Archivers
                     "[ARCHIVER]: Aborting load with error in archive file {0}.  {1}", filePath, e);
                 m_errorMessage += e.ToString();
                 m_scene.EventManager.TriggerOarFileLoaded(UUID.Zero.Guid, m_errorMessage);
-                return;
+                return false;
             }
             finally
             {
@@ -424,6 +445,9 @@ namespace WhiteCore.Modules.Archivers
                 if (backup != null)
                     backup.LoadingPrims = false;
             }
+
+            // finished with the ticker
+            MainConsole.Instance.CleanInfo("");
 
             //Now back up the prims
             foreach (ISceneEntity grp in groupsToBackup)
@@ -468,6 +492,8 @@ namespace WhiteCore.Modules.Archivers
 
             m_validUserUuids.Clear();
             m_scene.EventManager.TriggerOarFileLoaded(UUID.Zero.Guid, m_errorMessage);
+
+            return true;    // all good
         }
 
         private AssetBase SaveNonBinaryAssets(UUID key, AssetBase asset, Dictionary<UUID, UUID> assetBinaryChangeRecord)

@@ -157,6 +157,13 @@ namespace WhiteCore.Framework.SceneInfo
         void ForceBackup();
 
         /// <summary>
+        /// Restores the last backup.
+        /// </summary>
+        /// <returns><c>true</c>, if last backup was restored, <c>false</c> otherwise.</returns>
+        /// <param name="regionName">Region name.</param>
+        bool RestoreLastBackup (string regionName);
+
+        /// <summary>
         /// Copies the instance
         /// </summary>
         /// <returns></returns>
