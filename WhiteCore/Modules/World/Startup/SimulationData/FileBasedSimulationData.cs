@@ -148,6 +148,25 @@ namespace WhiteCore.Modules
             return archives;
         }
 
+        public string GetLastBackupFileName(string regionName)
+        {
+            List<string> backups = FindRegionBackupFiles(regionName);
+            if (backups == null)
+                return "";
+
+            // we have backups.. find the last one...
+            DateTime mostRecent = DateTime.Now.AddDays( -7);
+
+            string lastBackFile = "";
+            foreach(string bak in backups)
+            {
+                if (File.GetLastWriteTime(bak) > mostRecent)
+                    lastBackFile = bak;
+            }
+
+            return lastBackFile;
+        }
+
         public virtual RegionInfo CreateNewRegion(ISimulationBase simBase, Dictionary<string, int> currentInfo)
         {
             ReadConfig(simBase);
@@ -511,20 +530,7 @@ namespace WhiteCore.Modules
         /// <param name="regionName">Region name.</param>
         public bool RestoreLastBackup(string regionName)
         {
-            List<string> backups = FindRegionBackupFiles(regionName);
-            if (backups == null)
-                return false;
-
-            // we have backups.. find the last one...
-            DateTime mostRecent = DateTime.Now.AddDays( -7);
-
-            string lastBackFile = "";
-            foreach(string bak in backups)
-            {
-                if (File.GetLastWriteTime(bak) > mostRecent)
-                    lastBackFile = bak;
-            }
-             
+            string lastBackFile = GetLastBackupFileName (regionName);
             if ( lastBackFile != "")
             {
                 string regionFile = (m_storeDirectory == null) 
@@ -538,11 +544,32 @@ namespace WhiteCore.Modules
                 File.Copy(lastBackFile, regionFile);
 
                 return true; 
+            }
+
+            return false;
+        }
+
+        public bool RestoreBackupFile(string fileName, string regionName)
+        {
+            if ( fileName != "")
+            {
+                string regionFile = (m_storeDirectory == null) 
+                    ? regionName + ".sim"
+                    : Path.Combine(m_storeDirectory, regionName + ".sim");
+
+                if (File.Exists(regionFile))
+                    File.Delete(regionFile);
+
+                // now we can copy it over...
+                File.Copy(fileName, regionFile);
+
+                return true; 
 
             }
 
             return false;
         }
+
             
         public virtual List<ISceneEntity> LoadObjects()
         {

@@ -329,7 +329,7 @@ namespace WhiteCore.Region
             MainConsole.Instance.Warn("[SceneManager]: Region " + scene.RegionInfo.RegionName + " was removed\n"+
                 "To ensure all data is correct, you should consider restarting the simulator");
 
-            if (MainConsole.Instance.Prompt ("[SceneManager]: Do you wish to restart the systemn? (yes/no)", "no") == "yes")
+            if (MainConsole.Instance.Prompt ("[SceneManager]: Do you wish to shutdown the systemn? (yes/no)", "no") == "yes")
             {
                 MainConsole.Instance.Warn ("[SceneManager]: Shutting down in 5 seconds");
                 System.Threading.Thread.Sleep (5000);
@@ -613,24 +613,24 @@ namespace WhiteCore.Region
                 HandleShowRegions, true, false);
 
             MainConsole.Instance.Commands.AddCommand("reset region",
-                "reset region",
+                "reset region [RegionName]",
                 "Reset region to the default terrain, wipe all prims, etc.",
-                RunCommand, true, false);
-
-            MainConsole.Instance.Commands.AddCommand("clear region",
-                "clear region",
-                "Clear region of all objects leaving the current terrain.",
-                RunCommand, true, true);
+                HandleResetRegion, false, true);
 
             MainConsole.Instance.Commands.AddCommand("remove region", 
-                "remove region",
+                "remove region [RegionName]",
                 "Remove region from the grid, and delete all info associated with it",
-                RunCommand, true, false);
+                HandleDeleteRegion, false, true);
+
+            MainConsole.Instance.Commands.AddCommand("load region backup", 
+                "load region backup [FileName]",
+                "load a region from a previous backup file",
+                HandleReloadRegion, false, true);
 
             MainConsole.Instance.Commands.AddCommand("delete region", 
-                "delete region (alias for 'remove region')",
+                "delete region  [RegionName] (alias for 'remove region')",
                 "Remove region from the grid, and delete all info associated with it",
-                RunCommand, true, false);
+                HandleDeleteRegion, false, true);
 
             MainConsole.Instance.Commands.AddCommand("create region", 
                 "create region <Region Name>  <--config=filename>",
@@ -1195,12 +1195,15 @@ namespace WhiteCore.Region
 
         private void HandleChangeRegion(IScene scene, string[] cmd)
         {
-            if (cmd.Length <= 2) 
+            string regionName;
+            if (cmd.Length < 2) 
             {
-                MainConsole.Instance.Warn("You need to specify a region name.");
-                return;
-            }
-            string regionName = Util.CombineParams(cmd, 2); // in case of spaces in the name eg Steam Island
+                regionName = MainConsole.Instance.Prompt("Region to change to?","");
+                if (regionName == "")
+                    return;
+            } else
+                regionName = Util.CombineParams(cmd, 2); // in case of spaces in the name eg Steam Island
+
             regionName = regionName.ToLower();
 
             MainConsole.Instance.ConsoleScene = m_scenes.Find((s) => s.RegionInfo.RegionName.ToLower() == regionName);
@@ -1740,6 +1743,189 @@ namespace WhiteCore.Region
             MainConsole.Instance.Info("Region objects have been offset");
         }
             
+        private string GetCmdRegionName(string prompt)
+        {
+            string regionName;
+            regionName = MainConsole.Instance.Prompt (prompt, "");
+            if (regionName == "")
+                return "";
+
+            regionName = regionName.ToLower();
+            return regionName;
+        }
+
+        private void HandleDeleteRegion(IScene scene, string[] cmd)
+        {
+            // command is delete/remove region [regionname]
+            string regionName;
+            if (cmd.Length < 3)
+            {
+                regionName = MainConsole.Instance.Prompt ("Region to delete?", "");
+                if (regionName == "")
+                    return;
+            } else
+                regionName = Util.CombineParams(cmd, 2); // in case of spaces in the name eg Steam Island
+
+            regionName = regionName.ToLower();
+            IScene delScene = m_scenes.Find((s) => s.RegionInfo.RegionName.ToLower() == regionName);
+
+            if (delScene == null)
+            {
+                MainConsole.Instance.WarnFormat ("[SceneManager]: Sorry, {0} was not found", regionName);
+                return;
+            }
+
+            // last chance
+            if (MainConsole.Instance.Prompt("Are you sure you want to remove " + regionName +"? (yes/no)", "no") != "yes")
+                return;
+
+            RemoveRegion(delScene);
+            if(delScene != scene)
+                MainConsole.Instance.ConsoleScene = scene;
+        }
+
+        private void HandleResetRegion(IScene scene, string[] cmd)
+        {
+            string regionName;
+            if (cmd.Length < 3)
+            {
+                regionName = MainConsole.Instance.Prompt ("Region to reset?", "");
+                if (regionName == "")
+                    return;
+            } else
+                regionName = Util.CombineParams(cmd, 2); // in case of spaces in the name eg Steam Island
+
+            regionName = regionName.ToLower();
+            IScene resetScene = m_scenes.Find((s) => s.RegionInfo.RegionName.ToLower() == regionName);
+
+            if (resetScene == null)
+            {
+                MainConsole.Instance.WarnFormat ("[SceneManager]: Sorry, {0} was not found", regionName);
+                return;
+            }
+
+            // last chance
+            if (MainConsole.Instance.Prompt("Are you sure you want to reset " + regionName +"? (yes/no)", "no") != "yes")
+                return;
+
+            ResetRegion(resetScene);
+
+        }
+
+        private void HandleClearRegion(IScene scene, string[] cmd)
+        {
+            string regionName;
+            if (cmd.Length < 3)
+            {
+                regionName = MainConsole.Instance.Prompt ("Region to clear?", "");
+                if (regionName == "")
+                    return;
+            } else
+                regionName = Util.CombineParams(cmd, 2); // in case of spaces in the name eg Steam Island
+
+            regionName = regionName.ToLower();
+            IScene clearScene = m_scenes.Find((s) => s.RegionInfo.RegionName.ToLower() == regionName);
+
+            if (clearScene == null)
+            {
+                MainConsole.Instance.WarnFormat ("[SceneManager]: Sorry, {0} was not found", regionName);
+                return;
+            }
+
+            // last chance
+            if (MainConsole.Instance.Prompt("Are you sure you want to clear all " + regionName +" objects? (yes/no)", "no") != "yes")
+                return;
+
+            IBackupModule backup = clearScene.RequestModuleInterface<IBackupModule>();
+
+            if (backup != null)
+            {
+                if (MainConsole.Instance.Prompt ("Would you like to backup before clearing? (yes/no)", "yes") == "yes")
+                    clearScene.SimulationDataService.ForceBackup ();
+
+                backup.DeleteAllSceneObjects (); //Remove all the objects from the region
+                MainConsole.Instance.Warn (regionName + " has been cleared of objects");
+            } else
+                MainConsole.Instance.Error ("Unable to locate the backup module for "+ regionName + ". Clear aborted");
+
+        }
+            
+
+        private void HandleReloadRegion(IScene scene, string[] cmd)
+        {
+            IScene loadScene = scene;
+            string regionName;
+
+            if (MainConsole.Instance.ConsoleScene == null)
+            {
+                regionName = MainConsole.Instance.Prompt ("Region to load from backup?", "");
+                if (regionName == "")
+                    return;
+
+                regionName = regionName.ToLower ();
+                loadScene = m_scenes.Find ((s) => s.RegionInfo.RegionName.ToLower () == regionName);
+
+                if (loadScene == null)
+                {
+                    MainConsole.Instance.WarnFormat ("[SceneManager]: Sorry, {0} was not found", regionName);
+                    return;
+                }
+
+            } else
+                regionName = scene.RegionInfo.RegionName;
+
+
+            // we have the correct scene
+            string backupFileName;
+            if (cmd.Length < 4)
+            {
+                backupFileName = MainConsole.Instance.Prompt ("Backup file to load? (Previous / FileName to load)", "Previous");
+                if (backupFileName == "")
+                    return;
+            } else
+                backupFileName = cmd [3];
+
+            if (backupFileName == "Previous")
+            {
+                ISimulationDataStore simStore = loadScene.SimulationDataService;
+                backupFileName = simStore.GetLastBackupFileName (regionName);
+                if (backupFileName == "")
+                {
+                    MainConsole.Instance.Warn ("[SceneManager]: Sorry, unable to find any backups for " + regionName);
+                    return;
+                }
+            } else
+            {
+                if (!backupFileName.ToLower ().StartsWith (regionName))
+                {
+                    MainConsole.Instance.Warn ("[SceneManager]: Only backups from the same region should be restored!");
+                    return;
+                }
+            }
+
+            backupFileName = PathHelpers.VerifyReadFile (backupFileName, ".sim", "");
+            if (backupFileName == "")
+                return;
+
+            //we have verified what we need so... last chance
+            if (MainConsole.Instance.Prompt("Are you sure you want load " + regionName +
+                " from "+ Path.GetFileName(backupFileName) + "? (yes/no)", "no") != "yes")
+                return;
+
+            // let's do it.. 
+            if (loadScene.SimulationDataService.RestoreBackupFile(backupFileName, regionName))
+            {
+                loadScene.RegionInfo = m_selectedDataService.LoadRegionNameInfo (regionName, m_SimBase);
+                CloseRegion(loadScene, ShutdownType.Immediate, 0);
+                MainConsole.Instance.ConsoleScenes = m_scenes;
+
+                RegionInfo region = m_selectedDataService.LoadRegionNameInfo (regionName, m_SimBase);
+
+                StartRegion (m_selectedDataService, region);
+                MainConsole.Instance.WarnFormat ("[SceneManager]: {0} has been reloaded from the backup", regionName);
+            }
+        }
+
         #endregion
     }
 }
