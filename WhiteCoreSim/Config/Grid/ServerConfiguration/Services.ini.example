@@ -17,7 +17,7 @@
     ;; Region_Welcome_Area = "DefaultRegion, FallbackRegion"
     ;; (replacing spaces with underscores)
     ;Region_RegionName = "DefaultRegion, FallbackRegion"
-	
+    
     AllowDuplicateNames = false
     
     ;; Disable the checking of session ID's in the Grid Service
@@ -28,29 +28,29 @@
     ;; Note: 0 disables this check
     ;; Default is 0
     MaxRegionSize = 0;
-	
-	;; How many regions away should we allow child agents
+    
+    ;; How many regions away should we allow child agents
     ;; This sets the number of regions in any direction we can see. 
-	;; The default is to be able to see in any direction 1 region. 
-	;; You can set this number to 2 or greater so that you can see X regions in every direction from the sim the agent is in. 
-	;; For example, if you have a 4 by 4 region setup, and you wish to be able to see into all of them, 
-	;; you would set the setting to 4 so that you can see across all of your regions. 
-	;; This is figured by the region in the southwest corner region position's X - the max region position's X, which in our test case is 4.
+    ;; The default is to be able to see in any direction 1 region. 
+    ;; You can set this number to 2 or greater so that you can see X regions in every direction from the sim the agent is in. 
+    ;; For example, if you have a 4 by 4 region setup, and you wish to be able to see into all of them, 
+    ;; you would set the setting to 4 so that you can see across all of your regions. 
+    ;; This is figured by the region in the southwest corner region position's X - the max region position's X, which in our test case is 4.
     ;; Default: 1
     RegionSightSize = 1
 
     ;; Should registration of new regions (existing regions can still connect) be allowed currently?
     AllowNewRegistrations = true
-	
-	;; You can allow a region to register with the grid passing a password that must match
-	AllowNewRegistrationsWithPass = false
-	RegisterRegionPassword = 
+    
+    ;; You can allow a region to register with the grid passing a password that must match
+    AllowNewRegistrationsWithPass = false
+    RegisterRegionPassword = 
     
     ;; Should any registrations be allowed currently?
     DisableRegistrations = false
-	
+    
 [AgentProcessing]
-	;; Changes how many regions the agent can see into by letting the distance that they can see be based on how far the Draw Distance is set in the viewer.
+    ;; Changes how many regions the agent can see into by letting the distance that they can see be based on how far the Draw Distance is set in the viewer.
     ;; This option will allow you to see into any regions nearby within your draw distance (configurable per user).
     ;; Default: false
     UseVariableRegionSightDistance = false
@@ -70,7 +70,7 @@
     ;; Blocks all user names in this list from being used as display names. Names are NOT case sensitive. Separate names by commas.
     ;; Example "Linden, Admin"
     BannedUserNames = "Linden"
-	
+    
 [Handlers]
     ;; Possible choices for asset services:
     ;;  AssetService - basic SQL service, slower, but works
@@ -79,8 +79,8 @@
     AssetHandler = AssetService
     AssetHandlerUseCache = false
 
-	;; Optional handlers
-	;; If the do not exist in your configuration they will not be used :)
+    ;; Optional handlers
+    ;; If the do not exist in your configuration they will not be used :)
     FreeswitchInHandler = FreeswitchServerConnector
     FreeSwitchHandler = FreeswitchService
 

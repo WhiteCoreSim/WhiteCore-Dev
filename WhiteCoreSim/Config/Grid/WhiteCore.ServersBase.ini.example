@@ -1,11 +1,11 @@
 [Network]
-	;; HTTPS configs (See HTTPS.txt in WhiteCoreDocs/)
-	use_https = false
-	
-	;; The number of threads to concurrently process incoming http requests
-	;; 5 is the recommended, but more can be set if the http server is being
-	;; overloaded, or you could run more servers instead
-	HttpThreadCount = 5
+    ;; HTTPS configs (See HTTPS.txt in WhiteCoreDocs/)
+    use_https = false
+    
+    ;; The number of threads to concurrently process incoming http requests
+    ;; 5 is the recommended, but more can be set if the http server is being
+    ;; overloaded, or you could run more servers instead
+    HttpThreadCount = 5
 
     ;; Only change this if you are having issues with connecting clients
     ;; The default is your external IP
@@ -50,17 +50,17 @@
 
     ;; Should we restart WhiteCore if the sim crashes?
     AutoRestartOnCrash = false
-	
+    
 [GridServerInfoService]
-	Enabled = true
-	DoRemote = true
-	
+    Enabled = true
+    DoRemote = true
+    
 [Includes]
     ;;Other .ini files to add...
     Include-Login = Grid/ServerConfiguration/Login.ini
     Include-GridInfoService = Grid/ServerConfiguration/GridInfoService.ini
     Include-Data = Grid/ServerConfiguration/Data/Data.ini
-	Include-Protection = Grid/ServerConfiguration/Protection.ini
-	Include-Services = Grid/ServerConfiguration/Services.ini
+    Include-Protection = Grid/ServerConfiguration/Protection.ini
+    Include-Services = Grid/ServerConfiguration/Services.ini
     Include-Setup = Grid/ServerConfiguration/GridSetup.ini
-	Include-Modules = Grid/ServerConfiguration/Modules/*.ini
+    Include-Modules = Grid/ServerConfiguration/Modules/*.ini

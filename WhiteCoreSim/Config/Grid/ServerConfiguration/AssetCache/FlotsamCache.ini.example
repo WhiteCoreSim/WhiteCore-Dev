@@ -10,7 +10,7 @@
     ;; Default >> CacheDirectory = ../Data/AssetCache
     CacheDirectory = ../Data/AssetCache
     ; Other examples:
-    ;CacheDirectory = /directory/writeable/by/OpenSim/instance
+    ;CacheDirectory = /directory/writeable/by/WhiteCoreSim/instance
 
     ; Log level
     ; 0 - (Error) Errors only

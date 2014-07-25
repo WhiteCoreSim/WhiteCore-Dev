@@ -10,7 +10,7 @@
 
     ;; This is the core asset cache. It is EXTREMELY NOT recommended to use this cache, and can slow down your sim!
     ;AssetCaching = CoreAssetCache;
-	
+    
 [ImageDecoding]
     ;; Use CSJ2K for layer boundary decoding if true, OpenJPEG is used if false
     ;; Default is false

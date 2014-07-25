@@ -1,6 +1,6 @@
 [ApplicationPlugins]
     ServicesLoader = ServicesLoader
-	
+    
 [WhiteCoreConnectors]
     AbuseReportsConnector = LocalConnector
     AssetConnector = LocalConnector
@@ -17,15 +17,15 @@
     MuteListConnector = LocalConnector
     ParcelConnector = LocalConnector
     EmailConnector = LocalConnector
-	
-	CapsServiceDoRemoteCalls = True
+    
+    CapsServiceDoRemoteCalls = True
 
 [Handlers]
     ;; Add any handlers here that you want to use
 
     AgentInfoHandler = AgentInfoService
     AssetHandler = AssetService
-	AssetHandlerUseCache = false
+    AssetHandlerUseCache = false
     AuthenticationHandler = PasswordAuthenticationService
     AvatarHandler = AvatarService
     CapsHandler = CapsService
@@ -37,12 +37,12 @@
     GridInfoInHandler = GridInfoServerInConnector
     GridWideMessage = GridWideMessageModule
     InventoryHandler = InventoryService
-	LoginHandler = LLLoginService
+    LoginHandler = LLLoginService
     SimulationHandler = SimulationServiceConnector
     UserAccountHandler = UserAccountService
 
     LLLoginHandlerPort = 80
-	
+    
 [MapService]
     ;; This controls options about the v2 MapService, which allows v2 viewers to see the map
     ;; Should we allow the use of this service?
@@ -55,7 +55,7 @@
     CacheEnabled = true
     ;; The time for cached images to expire (in hours)
     CacheExpires = 24
-	
+    
 [GridInfoService]
     ;; The port this service will run on
     GridInfoInHandlerPort = 80

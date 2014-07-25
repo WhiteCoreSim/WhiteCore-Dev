@@ -1,7 +1,7 @@
 [Network]
     ;; Advanced configs
     http_listener_port = 80
-	
+    
     ;; HTTPS configs
     use_https = false
     ;; Path to your HTTPS certificate
@@ -60,11 +60,11 @@
 
     ;; Should we restart WhiteCore if the sim crashes?
     AutoRestartOnCrash = false
-	
+    
 [GridServerInfoService]
-	Enabled = true
-	DoRemote = false
-	
+    Enabled = true
+    DoRemote = false
+    
 [GridInfoService]
     GridInfoInHandlerPort = 80
     
@@ -74,4 +74,4 @@
     Include-GridInfoService = Grid/ServerConfiguration/GridInfoService.ini
     Include-Login = Grid/ServerConfiguration/Login.ini
     Include-Main = Grid/WebServerConfiguration/Main.ini
-	Include-WebInterface = Grid/WebServerConfiguration/WebInterface.ini
+    Include-WebInterface = Grid/WebServerConfiguration/WebInterface.ini

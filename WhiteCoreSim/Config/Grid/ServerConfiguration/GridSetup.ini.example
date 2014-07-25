@@ -1,7 +1,7 @@
 [Configuration]
-	;; If you have the WhiteCore.*Server.exe applications running over multiple
-	;;  servers, change the ServersHostname line below to your external IP or DNS name
-	;;  and uncomment it
+    ;; If you have the WhiteCore.*Server.exe applications running over multiple
+    ;;  servers, change the ServersHostname line below to your external IP or DNS name
+    ;;  and uncomment it
     ;Define-ServersHostname = 
     ServerURI = "http://ServersHostname:8003/server/"                    ; WhiteCore.Server
     MapAPIService = http://ServersHostname:8012/MapAPI/                  ; WhiteCore.GridServer

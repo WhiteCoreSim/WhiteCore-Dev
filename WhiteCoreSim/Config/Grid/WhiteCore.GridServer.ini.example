@@ -2,11 +2,11 @@
     GridServiceOpenServerHandler = true
     GridServiceServerHandlerPort = 8012
 
-	SyncMessagePosterServiceHandler = SyncMessagePosterService
+    SyncMessagePosterServiceHandler = SyncMessagePosterService
     SyncMessagePosterServiceOpenServerHandler = true
     SyncMessagePosterServiceServerHandlerPort = 8012
-	SyncMessagePosterServiceDoRemote = true
-	
+    SyncMessagePosterServiceDoRemote = true
+    
 [MapService]
     ;; This controls options about the v2 MapService, which allows v2 viewers to see the map
     ;; Should we allow the use of this service?
@@ -19,9 +19,9 @@
     CacheEnabled = true
     ;; The time for cached images to expire (in hours)
     CacheExpires = 24
-	
+    
 [ExternalCaps]
-	CapsHandlers = MapCAPS
+    CapsHandlers = MapCAPS
 
 [Includes]
-	Include-Base = Grid/WhiteCore.ServersBase.ini
+    Include-Base = Grid/WhiteCore.ServersBase.ini

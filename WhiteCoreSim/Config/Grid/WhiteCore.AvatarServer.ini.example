@@ -2,11 +2,11 @@
     AvatarServiceOpenServerHandler = true
     AvatarServiceServerHandlerPort = 8011
 
-	SyncMessagePosterServiceHandler = SyncMessagePosterService
+    SyncMessagePosterServiceHandler = SyncMessagePosterService
     SyncMessagePosterServiceOpenServerHandler = true
     SyncMessagePosterServiceServerHandlerPort = 8011
-	SyncMessagePosterServiceDoRemote = true
-	
+    SyncMessagePosterServiceDoRemote = true
+    
 [SSAService]
     ;; This controls options about the v3 Server Side Appearance, which allows v3 viewers to have an appearance
     ;; Should we allow the use of this service?
@@ -14,9 +14,9 @@
     ;; The port to run the SSAService on
     ;; Default is 8011
     Port = 8011
-	
+    
 [ExternalCaps]
-	CapsHandlers = AppearanceCAPS
+    CapsHandlers = AppearanceCAPS
 
 [Includes]
-	Include-Base = Grid/WhiteCore.ServersBase.ini
+    Include-Base = Grid/WhiteCore.ServersBase.ini
