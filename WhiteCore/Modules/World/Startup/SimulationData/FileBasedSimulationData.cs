@@ -245,7 +245,7 @@ namespace WhiteCore.Modules
             _regionData = new RegionData();
             _regionData.Init();
 
-            string regionFile = m_storeDirectory + regionName + ".sim";
+            string regionFile = Path.Combine(m_storeDirectory, regionName + ".sim");
             if (File.Exists(regionFile))
             {
                 regionFile = Path.GetFileNameWithoutExtension (regionFile);
