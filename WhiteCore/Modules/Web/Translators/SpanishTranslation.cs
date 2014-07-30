@@ -102,6 +102,8 @@
                     return "Do you accept the Terms of Service as detailed above?";
                 case "AvatarNameError":
                     return "No ha introducido el nombre de avatar!";
+                case "StaffAvatarNameError":
+                    return "You can not use staff avatar last name!";
                 case "AvatarPasswordError":
                     return "Contraseña está vacío o que no coincida con!";
                 case "AvatarEmailError":
