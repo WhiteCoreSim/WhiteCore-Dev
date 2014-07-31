@@ -162,14 +162,8 @@ namespace WhiteCore.Modules.Web
                 int UserFlags = webInterface.UserTypeToUserFlags (UserType);
 
                 // a bit of idiot proofing
-                if (AvatarName == "")
-                {
-                    response = "<h3>" + translator.GetTranslatedString("AvatarNameError") + "</h3>";
-                    return null;
-                }
-                if (AvatarName.EndsWith("empire", System.StringComparison.CurrentCultureIgnoreCase))
-                {
-                    response = "<h3>" + translator.GetTranslatedString("StaffAvatarNameError") + "</h3>";
+                if (AvatarName == "")  {
+                    response = "<h3>" + translator.GetTranslatedString ("AvatarNameError") + "</h3>";   
                     return null;
                 }
                 if ( (AvatarPassword == "") || (AvatarPassword != AvatarPasswordCheck) )
