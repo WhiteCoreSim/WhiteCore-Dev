@@ -28,3 +28,5 @@
     ;; You can access this at 
     ;; http://your server IP:port/welcomescreen/
     ;;
+
+    StaffAvatarName = ""

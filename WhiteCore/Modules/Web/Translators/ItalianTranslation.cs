@@ -100,6 +100,8 @@
                     return "Accetti i Termini di Servizio descritti qui sopra?";
                 case "AvatarNameError":
                     return "Non è stato immesso un nome di avatar!";
+                case "StaffAvatarNameError":
+                    return "You can not use the staff avatar last name!";
                 case "AvatarPasswordError":
                     return "La password è vuota o non corrispondenti!";
                 case "AvatarEmailError":
