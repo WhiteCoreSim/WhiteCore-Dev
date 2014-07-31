@@ -65,8 +65,6 @@ namespace WhiteCore.Modules.Web
 
         #region Public Properties
 
-        public string StaffAvatarName { get; private set; }
-
         public IRegistryCore Registry { get; protected set; }
 
         public string GridName { get; private set; }
@@ -133,7 +131,6 @@ namespace WhiteCore.Modules.Web
             if (con != null)
             {
                 _enabled = con.GetString("Module", "BuiltIn") == "BuiltIn";
-                StaffAvatarName = con.GetString("StaffAvatarName", "");
 
                 var webPort = con.GetUInt("Port", 0);
                 if (webPort == 0)                               // use default
@@ -701,7 +698,6 @@ namespace WhiteCore.Modules.Web
             httpResponse.AddHeader("Location", url);
             httpResponse.KeepAlive = false;
         }
-
     }
 
     internal class GridNewsItem : IDataTransferable
@@ -1029,7 +1025,5 @@ namespace WhiteCore.Modules.Web
 
             return map;
         }
-
-        //public string StaffAvatarName { get; private set; }
     }
 }
