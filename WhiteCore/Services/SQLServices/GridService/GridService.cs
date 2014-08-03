@@ -952,7 +952,7 @@ namespace WhiteCore.Services.SQLServices.GridService
             List<GridRegion> regions = GetRegionsByName(null, "", null,null);
             if (regions == null || regions.Count < 1)
             {
-                MainConsole.Instance.Info("Ther does not appear to be any registered regions?");
+                MainConsole.Instance.Info("There does not appear to be any registered regions?");
                 return;
             }
 
@@ -1024,7 +1024,7 @@ namespace WhiteCore.Services.SQLServices.GridService
             MainConsole.Instance.CleanInfo (string.Empty);
             MainConsole.Instance.CleanInfo(
                     "----------------------------------------------------------------------------------------------------");
-
+            MainConsole.Instance.CleanInfo ("");
         }
 
         private int ParseFlags(int prev, string flags)
