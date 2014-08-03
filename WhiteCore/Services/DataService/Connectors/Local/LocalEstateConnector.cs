@@ -373,7 +373,7 @@ namespace WhiteCore.Services.DataService
             if (uint.Parse (QueryResults [0]) > 0)
             {
                 uint esID = uint.Parse (QueryResults [1]);
-                if (esID > 100)                                 // system estate is #1
+                if (esID > 99)                                 // system estate is #1, user estates start at 100
                     return esID + 1;
             }
             return 100;
