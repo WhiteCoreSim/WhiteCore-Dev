@@ -33,4 +33,8 @@
 	;; Default is blank ( disabled )
 	StaffAvatarName = 
 
+    ;; External URL to "POST" the registration information if you need to link with another application/server.
+    ;; Default is blank ( disabled )
+    ExternalAvatarRegURL = 
+
 	
