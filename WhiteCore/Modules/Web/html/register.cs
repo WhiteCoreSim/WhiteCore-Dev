@@ -187,7 +187,7 @@ namespace WhiteCore.Modules.Web
                 }
 
                 // Only one space is allowed in the name to seperate First and Last of the avatar name
-                if(2 != AvatarName.Split(" ").Length){
+                if(2 != AvatarName.Split(' ').Length){
                     response = "<h3>" + translator.GetTranslatedString("AvatarNameSpacingError") + "</h3>";
                     return null;
                 }
