@@ -108,6 +108,8 @@ namespace WhiteCore.Modules.Web.Translators
                     return "Een e-mailadres is vereist voor wachtwoord herstel! ('none' indien niet bekend)";
                 case "StaffAvatarNameError":
                     return "U kunt een staf avatar naam niet te maken!";
+                case "AvatarNameSpacingError":
+                    return "U kunt alleen gebruik maken van twee namen in je avatar naam!";
 
                     // news
                 case "OpenNewsManager":

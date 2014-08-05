@@ -185,6 +185,12 @@ namespace WhiteCore.Modules.Web
                     response = "<h3>" + translator.GetTranslatedString ("AvatarEmailError") + "</h3>";   
                     return null;
                 }
+
+                // Only one space is allowed in the name to seperate First and Last of the avatar name
+                if(2 != AvatarName.Split(" ").Length){
+                    response = "<h3>" + translator.GetTranslatedString("AvatarNameSpacingError") + "</h3>";
+                    return null;
+                }
             
                 // so far so good...
                 if (ToSAccept)
@@ -245,8 +251,9 @@ namespace WhiteCore.Modules.Web
                         if(ExternalAvatarRegURL.Length>3){
                             using (var regPost = new WebClient()){
                                 var pData = new NameValueCollection();
-                                pData["FirstName"]  = FirstName;
-                                pData["LastName"]   = LastName;
+                                pData["AvatarName"] = AvatarName;
+                                pData["RLFirstName"]  = FirstName;
+                                pData["RLLastName"]   = LastName;
                                 pData["EMail"]      = UserEmail;
                                 pData["Password"]   = AvatarPassword;
 

@@ -108,6 +108,8 @@
                     return "Une adresse e-mail est nécessaire pour la récupération de mot de passe! ('none' si inconnu";
                 case "StaffAvatarNameError":
                     return "Vous ne pouvez pas créer un nom personnel avatar!";
+                case "AvatarNameSpacingError":
+                    return "Vous ne pouvez utiliser deux noms dans le nom de votre avatar!";
 
                     // news
                 case "OpenNewsManager":

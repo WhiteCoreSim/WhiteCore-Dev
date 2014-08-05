@@ -106,6 +106,8 @@
                     return "L'indirizzo email è necessario per il ripristino della password! ('none' se sconosciuta)";
                 case "StaffAvatarNameError":
                     return "Non è possibile creare un nome personale avatar!";
+                case "AvatarNameSpacingError":
+                    return "È possibile utilizzare solo due nomi a tuo nome avatar!";
 
                     // news
                 case "OpenNewsManager":
