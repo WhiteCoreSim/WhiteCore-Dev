@@ -101,7 +101,7 @@
                 case "AvatarNameError":
                     return "Non è stato immesso un nome di avatar!";
                 case "StaffAvatarNameError":
-                    return "Non è possibile utilizzare il cognome personale avatar!";
+                    return "You can not use the staff avatar last name!";
                 case "AvatarPasswordError":
                     return "La password è vuota o non corrispondenti!";
                 case "AvatarEmailError":

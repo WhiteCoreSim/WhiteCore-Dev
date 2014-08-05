@@ -103,7 +103,7 @@ namespace WhiteCore.Modules.Web.Translators
                 case "AvatarNameError":
                     return "Je hebt een avatar naam invoeren!";
                 case "StaffAvatarNameError":
-                    return "U kunt het personeel avatar laatste naam niet gebruiken!";
+                    return "You can not use the staff avatar last name!";
                 case "AvatarPasswordError":
                     return "Wachtwoord is leeg of niet overeenkomen met!";
                 case "AvatarEmailError":
