@@ -105,7 +105,9 @@
                 case "AvatarPasswordError":
                     return "Password is empty or not matching!";
                 case "AvatarEmailError":
-                return "An email address is required for password recovery! ('none' if unknown)";
+                    return "An email address is required for password recovery! ('none' if unknown)";
+                case "StaffAvatarNameError":
+                    return "You can not create a staff avatar name!";
 
                // news
                 case "OpenNewsManager":

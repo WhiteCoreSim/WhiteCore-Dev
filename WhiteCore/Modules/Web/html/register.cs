@@ -112,6 +112,8 @@ namespace WhiteCore.Modules.Web
             bool allowRegistration = settings.WebRegistration;
             bool anonymousLogins;
 
+            string StaffAvatarName = webInterface.StaffAvatarName;
+
             // allow configuration to override the web settings
             IConfig config = webInterface.Registry.RequestModuleInterface<ISimulationBase>().ConfigSource.Configs ["LoginService"];
             if (config != null)
@@ -164,6 +166,10 @@ namespace WhiteCore.Modules.Web
                 // a bit of idiot proofing
                 if (AvatarName == "")  {
                     response = "<h3>" + translator.GetTranslatedString ("AvatarNameError") + "</h3>";   
+                    return null;
+                }
+                if(AvatarName.EndsWith(StaffAvatarName,System.StringComparison.CurrentCultureIgnoreCase) && StaffAvatarName.Length>2){
+                    response = "<h4>" + translator.GetTranslatedString("StaffAvatarNameError") + "</h4>";
                     return null;
                 }
                 if ( (AvatarPassword == "") || (AvatarPassword != AvatarPasswordCheck) )

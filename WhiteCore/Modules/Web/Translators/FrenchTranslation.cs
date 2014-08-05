@@ -105,7 +105,9 @@
                 case "AvatarPasswordError":
                     return "Mot de passe est vide ou ne correspondant pas!";
                 case "AvatarEmailError":
-                return "Une adresse e-mail est nécessaire pour la récupération de mot de passe! ('none' si inconnu";
+                    return "Une adresse e-mail est nécessaire pour la récupération de mot de passe! ('none' si inconnu";
+                case "StaffAvatarNameError":
+                    return "Vous ne pouvez pas créer un nom personnel avatar!";
 
                     // news
                 case "OpenNewsManager":

@@ -28,3 +28,9 @@
 	;; You can access this at 
 	;; http://your server IP:port/welcomescreen/
 	;;
+
+	;; Reserver a last name for the staff accounts / users.
+	;; Default is blank ( disabled )
+	StaffAvatarName = 
+
+	

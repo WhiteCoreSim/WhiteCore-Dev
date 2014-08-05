@@ -103,7 +103,9 @@
                 case "AvatarPasswordError":
                     return "La password è vuota o non corrispondenti!";
                 case "AvatarEmailError":
-                return "L'indirizzo email è necessario per il ripristino della password! ('none' se sconosciuta)";
+                    return "L'indirizzo email è necessario per il ripristino della password! ('none' se sconosciuta)";
+                case "StaffAvatarNameError":
+                    return "Non è possibile creare un nome personale avatar!";
 
                     // news
                 case "OpenNewsManager":
