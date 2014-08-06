@@ -95,25 +95,6 @@ namespace WhiteCore.Services
                 IMoneyModule moneyModule = m_registry.RequestModuleInterface<IMoneyModule>();
                 IGridServerInfoService serverInfoService = m_registry.RequestModuleInterface<IGridServerInfoService>();
 
-                // economy
-                GridEconomyURI = GetConfig(m_config, "economy");
-                if (GridEconomyURI == "")
-                {
-                    GridEconomyURI = MainServer.Instance.ServerURI + "/";           // assume default... 
-
-                    if (moneyModule != null)
-                    {
-                        int port = moneyModule.ClientPort;
-                        if (port == 0)
-                            port = (int) MainServer.Instance.Port;
-
-                        GridEconomyURI = MainServer.Instance.FullHostName + ":" + port + "/";
-                    }
-                }
-
-                if (GridEconomyURI != "" && !GridEconomyURI.EndsWith("/"))
-                    GridEconomyURI += "/";
-                _info["economy"] = _info["helperuri"] = GridEconomyURI;
 
                 // login
                 GridLoginURI = GetConfig(m_config, "login");
@@ -171,6 +152,27 @@ namespace WhiteCore.Services
                 GridWebProfileURI = GetConfig(m_config, "webprofile");
                 if (GridWebProfileURI == "" && webInterface != null)
                     GridWebProfileURI = webInterface.WebProfileURL;
+
+                // economy
+                GridEconomyURI = GetConfig(m_config, "economy");
+                if (GridEconomyURI == "")
+                {
+                    GridEconomyURI = MainServer.Instance.ServerURI + "/";           // assume default... 
+
+                    if (moneyModule != null)
+                    {
+                        int port = moneyModule.ClientPort;
+                        if (port == 0)
+                            port = (int) MainServer.Instance.Port;
+
+                        GridEconomyURI = MainServer.Instance.FullHostName + ":" + port + "/";
+                    }
+                }
+
+                if (GridEconomyURI != "" && !GridEconomyURI.EndsWith("/"))
+                    GridEconomyURI += "/";
+                _info["economy"] = _info["helperuri"] = GridEconomyURI;
+
 
                 // misc.. these must be set to be used
                 GridSearchURI = GetConfig(m_config, "search");

@@ -1,14 +1,11 @@
-﻿using WhiteCore.Framework;
-using WhiteCore.Framework.Modules;
+﻿using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
-using WhiteCore.Framework.Servers;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
 using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
-using System;
 using System.Collections.Generic;
 
 namespace Simple.Currency
@@ -37,8 +34,7 @@ namespace Simple.Currency
 
             m_registry = registry;
             m_connector = DataManager.RequestPlugin<ISimpleCurrencyConnector>() as SimpleCurrencyConnector;
-
-            registry.RegisterModuleInterface<IMoneyModule>(this);
+            //registry.RegisterModuleInterface<IMoneyModule>(this);
         }
 
         public void Start(IConfigSource config, IRegistryCore registry)
@@ -55,6 +51,9 @@ namespace Simple.Currency
         {
             if (m_registry == null)
                 return;
+
+            m_registry.RegisterModuleInterface<IMoneyModule>(this);
+
             ISceneManager manager = m_registry.RequestModuleInterface<ISceneManager>();
             if (manager != null)
             {
@@ -77,6 +76,7 @@ namespace Simple.Currency
                                                 m_scenes.Remove(scene);
                                             };
             }
+
 
             if (!m_connector.DoRemoteCalls)
             {
