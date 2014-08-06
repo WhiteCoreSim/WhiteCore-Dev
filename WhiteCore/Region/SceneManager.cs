@@ -169,7 +169,7 @@ namespace WhiteCore.Region
 
             bool newRegion = false;
             StartRegions(out newRegion);
-            MainConsole.Instance.DefaultPrompt = "Region [root]";
+            SetRegionPrompt("root");
             if (newRegion) //Save the new info
             {
                 foreach (ISimulationDataStore store in m_simulationDataServices)
@@ -192,6 +192,11 @@ namespace WhiteCore.Region
                 return;
             foreach(IScene scene in new List<IScene>(m_scenes))
                 CloseRegion(scene, ShutdownType.Immediate, 0);
+        }
+
+        public void SetRegionPrompt(string region)
+        {
+            MainConsole.Instance.DefaultPrompt = region+ ": ";
         }
 
         #endregion
@@ -317,7 +322,7 @@ namespace WhiteCore.Region
         {
             // change back to the root as we are going to trash this one
             MainConsole.Instance.ConsoleScene = null;
-            MainConsole.Instance.DefaultPrompt = "Region [root]";
+            SetRegionPrompt("root");
 
             m_scenes.Remove (scene);
             MainConsole.Instance.ConsoleScenes = m_scenes;
@@ -348,7 +353,7 @@ namespace WhiteCore.Region
 
             // change back to the root as we are going to trash this one
             MainConsole.Instance.ConsoleScene = null;
-            MainConsole.Instance.DefaultPrompt = "Region [root]";
+            SetRegionPrompt("root");
 
             // close and clean up a bit
             CloseRegion(scene, ShutdownType.Immediate, 0);
@@ -554,7 +559,7 @@ namespace WhiteCore.Region
                 Debug, true, false);
 
             MainConsole.Instance.Commands.AddCommand("load oar",
-                "load oar [oar name] [--merge] [--skip-assets] [--skip-terrain] [--OffsetX=#] [--OffsetY=#] [--OffsetZ=#] [--FlipX] [--FlipY] [--UseParcelOwnership] [--CheckOwnership]",
+                "load oar [OAR filename] [--merge] [--skip-assets] [--skip-terrain] [--OffsetX=#] [--OffsetY=#] [--OffsetZ=#] [--FlipX] [--FlipY] [--UseParcelOwnership] [--CheckOwnership]",
                 "Load a region's data from OAR archive.  \n" +
                 "--merge will merge the oar with the existing scene (including parcels).  \n" +
                 "--skip-assets will load the oar but ignore the assets it contains. \n" +
@@ -569,9 +574,9 @@ namespace WhiteCore.Region
                 HandleLoadOar, true, true);
 
             MainConsole.Instance.Commands.AddCommand("save oar",
-                "save oar [<OAR path>] [--perm=<permissions>] ",
+                "save oar [<OAR filename>] [--perm=<permissions>] ",
                 "Save a region's data to an OAR archive" + Environment.NewLine +
-                "<OAR path> The OAR path must be a filesystem path." +
+                "<OAR filename> The file name (and optional path) to use when saveing the archive." +
                 "  If this is not given then the oar is saved to the 'region name' in the 'Data/Region/OarFiles' folder." + Environment.NewLine +
                 "--perm stops objects with insufficient permissions from being saved to the OAR." + Environment.NewLine +
                 "  <permissions> can contain one or more of these characters: \"C\" = Copy, \"T\" = Transfer" + Environment.NewLine,
@@ -1221,7 +1226,7 @@ namespace WhiteCore.Region
 			} else {
 				rName = MainConsole.Instance.ConsoleScene.RegionInfo.RegionName;
 			}
-			MainConsole.Instance.DefaultPrompt = "Region ["+rName+"]";
+            SetRegionPrompt(rName);
 
         }
 
@@ -1371,26 +1376,10 @@ namespace WhiteCore.Region
 				return;
 			}
 
-            string filePath = Path.GetDirectoryName(fileName);
-            if (filePath == "")
-            {
-                filePath = Constants.DEFAULT_OARARCHIVE_DIR + "/";
-                fileName = filePath + fileName;
-                cmdparams [2] = fileName;
-            }
-
-            string extension = Path.GetExtension (fileName);
-
-            if (extension == string.Empty)
-            {
-                fileName = fileName + ".oar";
-                cmdparams [2] = fileName;
-            }
-
-            if (!File.Exists(fileName)) {
-                MainConsole.Instance.Info ("OAR archive file '"+fileName+"' not found.");
+            fileName = PathHelpers.VerifyReadFile (fileName, ".oar", Constants.DEFAULT_OARARCHIVE_DIR);
+            if (fileName == "")                 // something wrong...
                 return;
-            }
+            cmdparams [2] = fileName;           // reset passed filename
 
             // should be good to go...
             string regionName = scene.RegionInfo.RegionName;
@@ -1457,36 +1446,10 @@ namespace WhiteCore.Region
             else
                 fileName = cmdparams[2];
 
-            string extension = Path.GetExtension (fileName);
-
-            if (extension == string.Empty)
-            {
-                fileName = fileName + ".oar";
-                cmdparams [2] = fileName;
-            }
-
-            string filePath = Path.GetDirectoryName(fileName);
-            if (filePath == "")
-            {
-                filePath = Constants.DEFAULT_OARARCHIVE_DIR + "/";
-                if (!Directory.Exists (filePath))
-                    Directory.CreateDirectory (filePath);
-                cmdparams [2] = filePath + fileName;
-
-            }
-
-            if (!Directory.Exists(filePath))
-            {
-                MainConsole.Instance.Info ( "[SceneManager]: The folder specified, '" + filePath + "' does not exist!" );
+            fileName = PathHelpers.VerifyWriteFile (fileName, ".oar", Constants.DEFAULT_OARARCHIVE_DIR, true);
+            if (fileName == "")                 // something wrong...
                 return;
-            }
-
-            if (File.Exists(fileName)) {
-                if (MainConsole.Instance.Prompt ("[SceneManager]: The OAR archive file '"+fileName+"' already exists. Overwrite?", "yes" ) != "yes")
-                    return;
-
-                File.Delete (fileName);
-            }
+            cmdparams [2] = fileName;           // reset passed filename
 
             // should be good to go...
             IRegionArchiverModule archiver = scene.RequestModuleInterface<IRegionArchiverModule>();
