@@ -32,6 +32,10 @@ using System;
 using WhiteCore.Framework.Modules;
 using OpenMetaverse;
 using WhiteCore.Framework.Utilities;
+using System.Text;
+using System.Net;
+using System.Collections.Specialized;
+using WhiteCore.Framework.ConsoleFramework;
 
 namespace WhiteCore.Modules.Web
 {
@@ -71,6 +75,8 @@ namespace WhiteCore.Modules.Web
                 string username = requestParameters ["username"].ToString ();
                 string UserEmail = requestParameters["UserEmail"].ToString();
 
+                string ExternalResetPasswordURL = webInterface.ExternalResetPasswordURL;
+
                 UserAccount account =
                     webInterface.Registry.RequestModuleInterface<IUserAccountService> ()
                         .GetUserAccount (null, username);
@@ -84,10 +90,7 @@ namespace WhiteCore.Modules.Web
                 // email user etc here...
                 if (account.Email == "")
                 {
-                    response = "<h3>Sorry! Your account has no email details. Please contact the administrator to correct</h3>"+
-                        "<script language=\"javascript\">" +
-                        "setTimeout(function() {window.location.href = \"index.html\";}, 5000);" +
-                        "</script>";
+                    response = "<h3>Sorry! Your account has no email details. Please contact the administrator to correct</h3>";
                         
                     return null;
                 }
@@ -95,17 +98,14 @@ namespace WhiteCore.Modules.Web
                 var emailAddress = account.Email;
                 if (UserEmail != emailAddress)
                 {
-                    response = "<h3>Sorry! Unable to authenticate your account. Please contact the administrator to correct</h3>"+
-                        "<script language=\"javascript\">" +
-                        "setTimeout(function() {window.location.href = \"index.html\";}, 5000);" +
-                        "</script>";
+                    response = "<h3>Sorry! Unable to authenticate your account. Please contact the administrator to correct</h3>";
 
                     return null;
                 }
 
                 IEmailModule Email = webInterface.Registry.RequestModuleInterface<IEmailModule>();
                 if ((Email != null) && (!Email.LocalOnly ()))
-                {
+                {               
                     var newPassword = Utilities.RandomPassword.Generate (2, 1, 0);
                     var authService = webInterface.Registry.RequestModuleInterface<IAuthenticationService> ();
                     var gridName = webInterface.Registry.RequestModuleInterface<IGridInfo> ().GridName;
@@ -116,6 +116,23 @@ namespace WhiteCore.Modules.Web
 
                     if (success)
                     {
+
+                        // Post password reset data to "ExternalAvatarRegURL"
+                        // WARNING !! Make sure this is secure !!
+                        if (ExternalResetPasswordURL.Length > 3)
+                        {
+                            string AvatarPassword = Util.Md5Hash(newPassword);
+                            using (var regPost = new WebClient())
+                            {
+                                regPost.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
+                                var pData = new NameValueCollection();
+                                pData["AvatarName"] = account.Name;
+                                pData["Password"] = AvatarPassword;
+
+                                var pResponse = regPost.UploadValues(ExternalResetPasswordURL, "POST", pData);
+                                MainConsole.Instance.Info("[Website]" + regPost.Encoding.GetString(pResponse));
+                            }
+                        }
                         Email.SendEmail (
                             UUID.Zero,
                             emailAddress,
@@ -131,11 +148,6 @@ namespace WhiteCore.Modules.Web
                 else
                     response = "<h3>The email functions are local to the grid or have not yet been set up<h3>Please contact the administrator directly<br>Redirecting to main page</h3>";
 
-
-                response = response +
-                    "<script language=\"javascript\">" +
-                    "setTimeout(function() {window.location.href = \"index.html\";}, 5000);" +
-                        "</script>";
 
                 return null;
             }

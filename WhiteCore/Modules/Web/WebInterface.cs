@@ -73,6 +73,8 @@ namespace WhiteCore.Modules.Web
 
         public string ExternalAvatarRegURL { get; private set; }
 
+        public string ExternalResetPasswordURL { get; private set; }
+
         public string LoginScreenURL
         {
             get { return MainServer.Instance.FullHostName + ":" + _port + "/welcomescreen/"; }
@@ -138,6 +140,7 @@ namespace WhiteCore.Modules.Web
                 
                 StaffAvatarName = con.GetString("StaffAvatarName", "");
                 ExternalAvatarRegURL = con.GetString("ExternalAvatarRegURL", "");
+                ExternalResetPasswordURL = con.GetString("ExternalResetPasswordURL", "");
 
                 var webPort = con.GetUInt("Port", 0);
                 if (webPort == 0)                               // use default
