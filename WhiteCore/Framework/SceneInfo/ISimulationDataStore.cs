@@ -49,6 +49,12 @@ namespace WhiteCore.Framework.SceneInfo
         bool SaveBackups { get; set; }
 
         /// <summary>
+        /// Gets or sets the backup filename.
+        /// </summary>
+        /// <value>The backup file.</value>
+        string BackupFile { get; set; }
+
+        /// <summary>
         ///     Initialises the data storage engine
         /// </summary>
         void Initialise();
