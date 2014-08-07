@@ -271,10 +271,12 @@ namespace WhiteCore.Framework.ConsoleFramework
                                         {
                                             foreach (CommandDelegate fn in cmd.Value.fn)
                                             {
+                                                cmdList = new List<string> (commandPath);
+                                                cmdList.AddRange (commandOptions);
                                                 if (fn != null)
                                                 {
                                                     foreach (IScene scene in GetScenes(cmd.Value))
-                                                        fn (scene, commandPath);
+                                                        fn (scene, cmdList.ToArray());
                                                 }
                                             }
                                             return new string[0];
