@@ -102,6 +102,8 @@
                     return "Accept";
                 case "AvatarNameError":
                     return "You did not enter an avatar name!";
+                case "StaffAvatarNameError":
+                    return "You can not use the staff avatar last name!";
                 case "AvatarPasswordError":
                     return "Password is empty or not matching!";
                 case "AvatarEmailError":

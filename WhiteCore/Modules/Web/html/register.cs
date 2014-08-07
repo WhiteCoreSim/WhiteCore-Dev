@@ -160,10 +160,17 @@ namespace WhiteCore.Modules.Web
 
                 // revise Type flags
                 int UserFlags = webInterface.UserTypeToUserFlags (UserType);
+                string StaffAvatarName = webInterface.StaffAvatarName;
 
                 // a bit of idiot proofing
-                if (AvatarName == "")  {
-                    response = "<h3>" + translator.GetTranslatedString ("AvatarNameError") + "</h3>";   
+                if (AvatarName == "")
+                {
+                    response = "<h3>" + translator.GetTranslatedString("AvatarNameError") + "</h3>";
+                    return null;
+                }
+                if (AvatarName.EndsWith(StaffAvatarName, System.StringComparison.CurrentCultureIgnoreCase) && StaffAvatarName.Length>2)
+                {
+                    response = "<h3>" + translator.GetTranslatedString("StaffAvatarNameError") + "</h3>";
                     return null;
                 }
                 if ( (AvatarPassword == "") || (AvatarPassword != AvatarPasswordCheck) )

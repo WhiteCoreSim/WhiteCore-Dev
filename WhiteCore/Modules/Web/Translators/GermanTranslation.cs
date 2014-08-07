@@ -101,6 +101,8 @@
                     return "akzeptieren Sie die Nutzungsbedinungen, wie oben beschrieben?";
                 case "AvatarNameError":
                     return "Sie haben keinen Avatar Namen!";
+                case "StaffAvatarNameError":
+                    return "You can not use the staff avatar last name!";
                 case "AvatarPasswordError":
                     return "Passwort darf nicht leer sein!";
                 case "AvatarEmailError":
