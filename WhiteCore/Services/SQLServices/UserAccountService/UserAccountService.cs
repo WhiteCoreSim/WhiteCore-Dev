@@ -36,6 +36,7 @@ using Nini.Config;
 using OpenMetaverse;
 using System.Collections.Generic;
 using System.IO;
+using WhiteCore.Framework.ClientInterfaces;
 
 namespace WhiteCore.Services.SQLServices.UserAccountService
 {
@@ -47,6 +48,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
         protected IAuthenticationService m_AuthenticationService;
         protected IUserAccountData m_Database;
         protected GenericAccountCache<UserAccount> m_cache = new GenericAccountCache<UserAccount>();
+        protected string[] m_userNameSeed;
 
         #endregion
 
@@ -70,6 +72,15 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             Configure(config, registry);
             Init(registry, Name, serverPath: "/user/", serverHandlerName: "UserAccountServerURI");
  
+            // check for user name seed
+            IConfig loginConfig = config.Configs ["LoginService"];
+            if (loginConfig != null)
+            {
+                string userNameSeed = loginConfig.GetString ("UserNameSeed", "");
+                if (userNameSeed != "")
+                    m_userNameSeed = userNameSeed.Split (',');
+            }
+
         }
 
         public void Configure(IConfigSource config, IRegistryCore registry)
@@ -99,14 +110,18 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 {
                     MainConsole.Instance.Commands.AddCommand(
                         "create user",
-                        "create user [<first> [<last> [<pass> [<email>]]]]",
-                        "Create a new user",
+                        "create user [<first> [<last> [<pass> [<email>]]]] [--system] [--uuid]",
+                        "Create a new user. If optional parameters are not supplied required details will be prompted\n"+
+                        "  --system : Enter user scope UUID\n"+
+                        "  --uuid : Enter a specific UUID for the user",
                         HandleCreateUser, false, true);
 
                     MainConsole.Instance.Commands.AddCommand(
                         "add user",
-                        "add user [<first> [<last> [<pass> [<email>]]]]",
-                        "Add (Create) a new user",
+                        "add user [<first> [<last> [<pass> [<email>]]]] [--system] [--uuid]",
+                        "Add (Create) a new user.  If optional parameters are not supplied required details will be prompted\n"+
+                        "  --system : Enter user scope UUID\n"+
+                        "  --uuid : Enter a specific UUID for the user",
                         HandleCreateUser, false, true);
 
                     MainConsole.Instance.Commands.AddCommand(
@@ -857,6 +872,15 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
 
         }
 
+        public List<string> GetAvatarArchivesFiles()
+        {
+            IAvatarAppearanceArchiver avieArchiver = m_registry.RequestModuleInterface<IAvatarAppearanceArchiver>();
+            List<string> archives =  avieArchiver.GetAvatarArchiveFilenames();
+
+            return archives;
+
+        }
+
         /// <summary>
         ///     Handle the create (add) user command from the console.
         /// </summary>
@@ -864,10 +888,12 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
         /// <param name="cmd">string array with parameters: firstname, lastname, password, email</param>
         protected void HandleCreateUser(IScene scene, string[] cmd)
         {
-            string firstName = "Default";
-            string lastName = "User";
+            //string firstName = "Default";
+            //string lastName = "User";
+            string userName = "";
             string password, email, uuid, scopeID;
             bool sysFlag = false;
+            bool uuidFlag = false;
             List <string> userTypes = new List<string>(new [] {"Guest", "Resident", "Member", "Contractor", "Charter_Member"});
 
             List<string> cmdparams = new List<string>(cmd);
@@ -878,16 +904,44 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     sysFlag = true;
                     cmdparams.Remove(param);
                 }
+                if (param.StartsWith("--uuid"))
+                {
+                    uuidFlag = true;
+                    cmdparams.Remove(param);
+                }
+
             }
 
-            // check for passed username
-            firstName = cmdparams.Count < 3 ? MainConsole.Instance.Prompt("First name") : cmdparams[2];
-            if (firstName == "")
-                return;
+            // check for provided user name
+            if (cmdparams.Count >= 4)
+            {
+                userName = cmdparams [2] + " " + cmdparams [3];
+            } else
+            {
+                Utilities.MarkovNameGenerator ufNames = new Utilities.MarkovNameGenerator ();
+                Utilities.MarkovNameGenerator ulNames = new Utilities.MarkovNameGenerator ();
+                string[] nameSeed = m_userNameSeed == null ? Utilities.UserNames : m_userNameSeed;
 
-            lastName = cmdparams.Count < 4 ? MainConsole.Instance.Prompt("Last name") : cmdparams[3];
-            if (lastName == "")
-                return;
+                string firstName = ufNames.FirstName (nameSeed, 3, 4);
+                string lastName = ulNames.FirstName (nameSeed, 5, 6);
+                string enteredName = firstName + " " + lastName;
+                if (userName != "")
+                    enteredName = userName;
+
+                do
+                {
+                    userName = MainConsole.Instance.Prompt ("User Name (? for suggestion)", enteredName);
+                    if (userName == "" || userName == "?")
+                    {
+                        enteredName = ufNames.NextName + " " + ulNames.NextName;
+                        userName = "";
+                        continue;
+                    }
+                } while (userName == "");
+                ufNames.Reset ();
+                ulNames.Reset ();
+            }
+
 
             // password as well?
             password = cmdparams.Count < 5 ? MainConsole.Instance.PasswordPrompt("Password") : cmdparams[4];
@@ -895,7 +949,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             // maybe even an email?
             if (cmdparams.Count < 6 )
             { 
-                email = MainConsole.Instance.Prompt ("Email for password recovery. ('none' if unknown)");
+                email = MainConsole.Instance.Prompt ("Email for password recovery. ('none' if unknown)","none");
             }
             else
                 email = cmdparams[5];
@@ -908,10 +962,30 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
 
             // Get user type (for payments etc)
             var userType = MainConsole.Instance.Prompt("User type", "Resident", userTypes);
- 
-            // Allow the modifcation the UUID  - for matching user UUID with other Grids etc eg SL
+
+            // Get available user avatar acrchives
+            var userAvatarArchive = "";
+            var avatarArchives = GetAvatarArchivesFiles ();
+            if (avatarArchives.Count > 0)
+            {
+                avatarArchives.Add("None");
+                userAvatarArchive = MainConsole.Instance.Prompt("Avatar archive to use", "None", avatarArchives);
+                if (userAvatarArchive == "None")
+                    userAvatarArchive = "";
+            }
+
+            // Allow the modifcation the UUID if required - for matching user UUID with other Grids etc eg SL
             uuid = UUID.Random().ToString();
-            uuid = MainConsole.Instance.Prompt("UUID (Don't change unless you have a reason)", uuid);
+            if (uuidFlag)
+                while (true)
+                {
+                    uuid = MainConsole.Instance.Prompt("UUID (Required avatar UUID)", uuid);
+                    UUID test;
+                    if (UUID.TryParse(uuid, out test))
+                        break;
+
+                    MainConsole.Instance.Error("There was a problem verifying this UUID. Please retry.");
+                }
 
             // this really should not be altered so hide it normally
             scopeID = UUID.Zero.ToString ();
@@ -921,19 +995,18 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             }
 
             // check to make sure
-            UserAccount ua = GetUserAccount(null, firstName, lastName);
+            UserAccount ua = GetUserAccount(null, userName);
             if (ua != null)
             {
-                MainConsole.Instance.WarnFormat("[USER ACCOUNT SERVICE]: This user, '{0} {1}' already exists!", firstName, lastName);
+                MainConsole.Instance.WarnFormat("[USER ACCOUNT SERVICE]: This user, '{0}' already exists!", userName);
                 return;
             }
 
-            string name = firstName + " " + lastName;
-            CreateUser(UUID.Parse(uuid), UUID.Parse(scopeID), name, Util.Md5Hash(password), email);
+            CreateUser(UUID.Parse(uuid), UUID.Parse(scopeID), userName, Util.Md5Hash(password), email);
             // CreateUser will tell us success or problem
             //MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: User '{0}' created", name);
 
-            UserAccount account = GetUserAccount(null, firstName, lastName);
+            UserAccount account = GetUserAccount(null, userName);
             if (account != null)
             {
                 account.UserFlags = UserTypeToUserFlags (userType);
@@ -949,8 +1022,8 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                         profile = m_profileConnector.GetUserProfile (account.PrincipalID);
                     }
 
-                    // if (AvatarArchive != "")
-                    //    profile.AArchiveName = AvatarArchive;
+                    if (userAvatarArchive != "")
+                        profile.AArchiveName = userAvatarArchive+".aa";
                     profile.MembershipGroup = UserFlagToType(account.UserFlags);
                     profile.IsNewUser = true;
                     m_profileConnector.UpdateUserProfile (profile);
