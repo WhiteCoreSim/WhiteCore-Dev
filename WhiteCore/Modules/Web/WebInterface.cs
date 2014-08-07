@@ -69,6 +69,12 @@ namespace WhiteCore.Modules.Web
 
         public string GridName { get; private set; }
 
+        public string StaffAvatarName { get; private set; }
+
+        public string ExternalAvatarRegURL { get; private set; }
+
+        public string ExternalResetPasswordURL { get; private set; }
+
         public string LoginScreenURL
         {
             get { return MainServer.Instance.FullHostName + ":" + _port + "/welcomescreen/"; }
@@ -131,6 +137,10 @@ namespace WhiteCore.Modules.Web
             if (con != null)
             {
                 _enabled = con.GetString("Module", "BuiltIn") == "BuiltIn";
+                
+                StaffAvatarName = con.GetString("StaffAvatarName", "");
+                ExternalAvatarRegURL = con.GetString("ExternalAvatarRegURL", "");
+                ExternalResetPasswordURL = con.GetString("ExternalResetPasswordURL", "");
 
                 var webPort = con.GetUInt("Port", 0);
                 if (webPort == 0)                               // use default

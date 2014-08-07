@@ -36,6 +36,9 @@ using Nini.Config;
 using OpenMetaverse;
 using System;
 using System.Collections.Generic;
+using System.Text;
+using System.Net;
+using System.Collections.Specialized;
 
 
 namespace WhiteCore.Modules.Web
@@ -112,6 +115,9 @@ namespace WhiteCore.Modules.Web
             bool allowRegistration = settings.WebRegistration;
             bool anonymousLogins;
 
+            string StaffAvatarName = webInterface.StaffAvatarName;
+            string ExternalAvatarRegURL = webInterface.ExternalAvatarRegURL;
+
             // allow configuration to override the web settings
             IConfig config = webInterface.Registry.RequestModuleInterface<ISimulationBase>().ConfigSource.Configs ["LoginService"];
             if (config != null)
@@ -166,6 +172,10 @@ namespace WhiteCore.Modules.Web
                     response = "<h3>" + translator.GetTranslatedString ("AvatarNameError") + "</h3>";   
                     return null;
                 }
+                if(AvatarName.EndsWith(StaffAvatarName,System.StringComparison.CurrentCultureIgnoreCase) && StaffAvatarName.Length>2){
+                    response = "<h4>" + translator.GetTranslatedString("StaffAvatarNameError") + "</h4>";
+                    return null;
+                }
                 if ( (AvatarPassword == "") || (AvatarPassword != AvatarPasswordCheck) )
                 {
                     response = "<h3>" + translator.GetTranslatedString ("AvatarPasswordError") + "</h3>";   
@@ -174,6 +184,12 @@ namespace WhiteCore.Modules.Web
                 if (UserEmail == "")
                 {
                     response = "<h3>" + translator.GetTranslatedString ("AvatarEmailError") + "</h3>";   
+                    return null;
+                }
+
+                // Only one space is allowed in the name to seperate First and Last of the avatar name
+                if(2 != AvatarName.Split(' ').Length){
+                    response = "<h3>" + translator.GetTranslatedString("AvatarNameSpacingError") + "</h3>";
                     return null;
                 }
             
@@ -231,10 +247,24 @@ namespace WhiteCore.Modules.Web
                             profileData.UpdateUserProfile (profile);
                         }
 
-                        response = "<h3>Successfully created account, redirecting to main page</h3>" +
-                                   "<script language=\"javascript\">" +
-                                   "setTimeout(function() {window.location.href = \"index.html\";}, 3000);" +
-                                   "</script>";
+                        // Post registration data to "ExternalAvatarRegURL"
+                        // WARNING !! Make sure this is secure !!
+                        if(ExternalAvatarRegURL.Length>3){
+                            using (var regPost = new WebClient()){
+                                regPost.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
+                                var pData = new NameValueCollection();
+                                pData["AvatarName"] = AvatarName;
+                                pData["RLFirstName"] = FirstName;
+                                pData["RLLastName"] = LastName;
+                                pData["Email"] = UserEmail;
+                                pData["Password"] = AvatarPassword;
+
+                                var pResponse = regPost.UploadValues(ExternalAvatarRegURL, "POST", pData);
+                                WhiteCore.Framework.ConsoleFramework.MainConsole.Instance.Info("[Website]: " + regPost.Encoding.GetString(pResponse).ToString());
+                            }
+                        }
+
+                        response = "<h3>Successfully created account " + AvatarName + ".</h3>";
                     }
                     else
                         response = "<h3>" + error + "</h3>";

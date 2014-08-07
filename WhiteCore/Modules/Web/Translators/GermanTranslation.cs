@@ -104,7 +104,11 @@
                 case "AvatarPasswordError":
                     return "Passwort darf nicht leer sein!";
                 case "AvatarEmailError":
-                return "Eine E-Mail Adresse ist für die Passwort Wiederherstellung erforderlich! ('none', wenn unbekannt)";
+                    return "Eine E-Mail Adresse ist für die Passwort Wiederherstellung erforderlich! ('none', wenn unbekannt)";
+                case "StaffAvatarNameError":
+                    return "Sie können einen Mitarbeiter Avatar-Namen nicht zu schaffen!";
+                case "AvatarNameSpacingError":
+                    return "Sie können nur zwei Namen in Ihrem Avatar-Namen!";
 
                     // news
                 case "OpenNewsManager":
