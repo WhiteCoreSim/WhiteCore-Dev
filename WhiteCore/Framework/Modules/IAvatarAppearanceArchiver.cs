@@ -42,5 +42,18 @@ namespace WhiteCore.Framework.Modules
         /// </summary>
         /// <returns></returns>
         List<AvatarArchive> GetAvatarArchives();
+
+        /// <summary>
+        /// Gets the avatar archive filenames.
+        /// </summary>
+        /// <returns>The avatar archive filenames without extension.</returns>
+        List<string> GetAvatarArchiveFilenames ();
+
+        /// <summary>
+        /// Gets the avatar archive filenames.
+        /// </summary>
+        /// <returns>The avatar archive filenames.</returns>
+        List<string> GetAvatarArchiveFilenames (bool fullName);
+
     }
 }

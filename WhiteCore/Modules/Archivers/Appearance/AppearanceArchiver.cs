@@ -74,6 +74,8 @@ namespace WhiteCore.Modules.Archivers
                 return null;
             }
 
+            // need to be smart here...
+            fileName = PathHelpers.VerifyReadFile (fileName, ".aa", m_storeDirectory);
             if (!File.Exists(fileName))
             {
                 MainConsole.Instance.Error("[AvatarArchive]: Unable to load from file: file does not exist!");
@@ -236,15 +238,28 @@ namespace WhiteCore.Modules.Archivers
         /// <summary>
         /// Gets the avatar archive filenames.
         /// </summary>
+        /// <returns>The avatar archive filenames without extension.</returns>
+        public List<string> GetAvatarArchiveFilenames ()
+        {
+            return GetAvatarArchiveFilenames (false);
+        }
+
+        /// <summary>
+        /// Gets the avatar archive filenames.
+        /// </summary>
         /// <returns>The avatar archive filenames.</returns>
-        public List<string> GetAvatarArchiveFilenames()
+        public List<string> GetAvatarArchiveFilenames(bool fullName)
         {
             var archives = new List<string>( Directory.GetFiles (m_storeDirectory, "*.aa"));
-            var retVals = new List<string>();
-            foreach (string file in archives)
-                retVals.Add (Path.GetFileNameWithoutExtension (file));
+            if (!fullName)
+            {
+                var archiveNames = new List<string> ();
+                foreach (string file in archives)
+                    archiveNames.Add (Path.GetFileNameWithoutExtension (file));
              
-            return retVals;
+                return archiveNames;
+            } else
+                return archives;
         }
 
         /// <summary>
@@ -316,27 +331,9 @@ namespace WhiteCore.Modules.Archivers
             
 
             //some file sanity checks
-            string extension = Path.GetExtension (fileName);
-            if (extension == string.Empty)
-            {
-                fileName = fileName + ".aa";
-            }
-
-            string filePath = Path.GetDirectoryName(fileName);
-            if (filePath == "")
-            { 
-                filePath = m_storeDirectory;
-                fileName = filePath + '/' + fileName;
-            } else if (!Directory.Exists(filePath))
-            {
-                MainConsole.Instance.Info ( "[AvatarArchive]: The file path specified, '" + filePath + "' does not exist!" );
+            fileName = PathHelpers.VerifyReadFile (fileName, ".aa", m_storeDirectory);
+            if (fileName == "")
                 return;
-            }
-
-            if (!File.Exists(fileName)) {
-                MainConsole.Instance.Info ("[AvatarArchive]: Avatar archive file '" + fileName + "' not found.");
-                return;
-            }
 
             AvatarArchive archive = LoadAvatarArchive(fileName, account.PrincipalID);
             if (archive != null)
@@ -406,33 +403,9 @@ namespace WhiteCore.Modules.Archivers
             }
 
             //some file sanity checks
-            string extension = Path.GetExtension (fileName);
-            if (extension == string.Empty)
-            {
-                fileName = fileName + ".aa";
-            }
-
-            string filePath = Path.GetDirectoryName(fileName);
-            if (filePath == "")
-            { 
-                filePath = m_storeDirectory;
-                fileName = filePath + '/' + fileName;
-
-                if (!Directory.Exists(filePath))
-                    Directory.CreateDirectory(filePath);
-
-            } else if (!Directory.Exists(filePath))
-            {
-                MainConsole.Instance.Info ( "[AvatarArchive]: The file path specified, '" + filePath + "' does not exist!" );
+            fileName = PathHelpers.VerifyWriteFile (fileName, ".aa", m_storeDirectory, true);
+            if (fileName == "")
                 return;
-            }
-
-            if (File.Exists(fileName)) {
-                if (MainConsole.Instance.Prompt ("[AvatarArchive]: The Avatar archive file '"+fileName+"' already exists. Overwrite?", "yes" ) != "yes")
-                    return;
-
-                File.Delete (fileName);
-            }
 
             // check options
             foldername =  (Path.GetFileNameWithoutExtension (fileName));             // use the filename as the default folder
@@ -749,7 +722,7 @@ namespace WhiteCore.Modules.Archivers
         public void Initialize(IConfigSource config, IRegistryCore registry)
         {
             IConfig avatarConfig = config.Configs["FileBasedSimulationData"];
-            if (config != null)
+            if (avatarConfig != null)
             {
                 m_storeDirectory =
                     PathHelpers.ComputeFullPath (avatarConfig.GetString ("AvatarArchiveDirectory", m_storeDirectory));
@@ -757,6 +730,7 @@ namespace WhiteCore.Modules.Archivers
                     m_storeDirectory = Constants.DEFAULT_AVATARARCHIVE_DIR;
             }
 
+            //TODO:  Lock out if remote    
             if (MainConsole.Instance != null)
             {
                 MainConsole.Instance.Commands.AddCommand(
