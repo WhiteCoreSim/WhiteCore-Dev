@@ -151,7 +151,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         {
             if (!(Shell == IntPtr.Zero && Body == IntPtr.Zero))
             {
-                MainConsole.Instance.Warn("[PHYSICS]: re-creating the following avatar ODE data, even though it already exists - "
+                MainConsole.Instance.Debug("[PHYSICS]: re-creating the following avatar ODE data, even though it already exists - "
                                           + (Shell != IntPtr.Zero ? "Shell " : "")
                                           + (Body != IntPtr.Zero ? "Body " : ""));
             }
