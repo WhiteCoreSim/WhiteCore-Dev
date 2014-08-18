@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
@@ -33,6 +32,7 @@ using WhiteCore.Framework.Servers;
 using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Interfaces;
 using WhiteCore.Framework.Utilities;
+using WhiteCore.Framework.Services;
 using Nini.Config;
 using Nwc.XmlRpc;
 using OpenMetaverse;
@@ -78,7 +78,7 @@ using System.Threading;
 
 namespace WhiteCore.Modules.Scripting
 {
-    public class XMLRPCModule : INonSharedRegionModule, IXMLRPC
+    public class XMLRPCModule : IService, INonSharedRegionModule, IXMLRPC
     {
         private readonly object XMLRPCListLock = new object();
         private int RemoteReplyScriptTimeout = 9000;
@@ -96,26 +96,55 @@ namespace WhiteCore.Modules.Scripting
         private Dictionary<UUID, RPCRequestInfo> m_rpcPendingResponses;
         private IScriptModule m_scriptModule;
 
+        #region IService Members
+        public void Initialize(IConfigSource config, IRegistryCore registry)
+        {
+             if (config.Configs ["XMLRPC"] != null)
+                m_remoteDataPort = config.Configs ["XMLRPC"].GetInt ("XmlRpcPort", m_remoteDataPort);
+        }
+
+        public void Start(IConfigSource config, IRegistryCore registry)
+        {
+        }
+
+        public void FinishedStartup()
+        {
+            if (IsEnabled () && ! ServerStarted())
+            {
+                m_httpServerStarted = true;
+                // Start http server
+                // Attach xmlrpc handlers
+                MainConsole.Instance.Info ("[XMLRPC MODULE]: " +
+                    "Starting up XMLRPC Server on port " + m_remoteDataPort +
+                    " for llRemoteData commands.");
+                IHttpServer httpServer = new BaseHttpServer ((uint)m_remoteDataPort, MainServer.Instance.HostName,
+                    false, 1);
+                httpServer.AddXmlRPCHandler ("llRemoteData", XmlRpcRemoteData);
+                httpServer.Start ();
+            }
+        }
+
+        #endregion
+
         #region INonSharedRegionModule Members
 
         public void Initialise(IConfigSource config)
         {
+
             // We need to create these early because the scripts might be calling
             // But since this gets called for every region, we need to make sure they
             // get called only one time (or we lose any open channels)
-            if (null == m_openChannels)
+            if (m_openChannels == null)
             {
                 m_openChannels = new Dictionary<UUID, RPCChannelInfo>();
                 m_rpcPending = new Dictionary<UUID, RPCRequestInfo>();
                 m_rpcPendingResponses = new Dictionary<UUID, RPCRequestInfo>();
                 m_pendingSRDResponses = new Dictionary<UUID, SendRemoteDataRequest>();
 
-                if (config.Configs["XMLRPC"] != null)
-                    m_remoteDataPort = config.Configs["XMLRPC"].GetInt("XmlRpcPort", m_remoteDataPort);
             }
         }
 
-        public void AddRegion(IScene scene)
+        public void AddRegion (IScene scene)
         {
             scene.RegisterModuleInterface<IXMLRPC>(this);
         }
@@ -127,19 +156,6 @@ namespace WhiteCore.Modules.Scripting
 
         public void RegionLoaded(IScene scene)
         {
-            if (IsEnabled() && !m_httpServerStarted)
-            {
-                m_httpServerStarted = true;
-                // Start http server
-                // Attach xmlrpc handlers
-                MainConsole.Instance.Info("[XMLRPC MODULE]: " +
-                                          "Starting up XMLRPC Server on port " + m_remoteDataPort +
-                                          " for llRemoteData commands.");
-                IHttpServer httpServer = new BaseHttpServer((uint) m_remoteDataPort, MainServer.Instance.HostName,
-                                                            false, 1);
-                httpServer.AddXmlRPCHandler("llRemoteData", XmlRpcRemoteData);
-                httpServer.Start();
-            }
             m_scriptModule = scene.RequestModuleInterface<IScriptModule>();
         }
 
@@ -169,6 +185,11 @@ namespace WhiteCore.Modules.Scripting
         public bool IsEnabled()
         {
             return (m_remoteDataPort > 0);
+        }
+
+        public bool ServerStarted()
+        {
+            return m_httpServerStarted;
         }
 
         /**********************************************

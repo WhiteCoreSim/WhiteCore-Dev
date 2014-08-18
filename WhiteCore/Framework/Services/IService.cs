@@ -31,7 +31,7 @@ using Nini.Config;
 namespace WhiteCore.Framework.Services
 {
     /// <summary>
-    ///     IService is a module that loads up by default and is loaded on every startup by either OpenSim.exe or WhiteCore.Server.exe
+    ///     IService is a module that loads up by default and is loaded on every startup by either WhiteCore.exe or WhiteCore.Server.exe
     ///     It loads modules including IAssetService and others
     /// </summary>
     public interface IService
