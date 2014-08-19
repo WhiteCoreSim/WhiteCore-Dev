@@ -643,7 +643,7 @@ namespace WhiteCore.DataManager.MySQL
 
             }
 
-            string query = string.Format("create table " + table + " ( {0} {1}) ",
+            string query = string.Format("create table " + table + " ( {0} {1}) DEFAULT CHARSET=utf8 COLLATE=utf8_bin",
                                          string.Join(", ", columnDefinition.ToArray()),
                                          indicesQuery.Count > 0
                                              ? ", " + string.Join(", ", indicesQuery.ToArray())
