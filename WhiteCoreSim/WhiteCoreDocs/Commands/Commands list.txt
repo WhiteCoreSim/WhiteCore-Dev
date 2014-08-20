@@ -1,0 +1,17 @@
+[load users]
+
+This command will allow you to load a predefined CSV file into your WhiteCore system. 
+
+The CSV file needs to be in the Data/Updates folder and can have any name but suggested name is users.csv
+
+File build up:
+
+UUID,First Name, Last Name, Password, Emailaddress
+
+Make sure when there's no Emailaddress that you put none in that field
+
+[save users]
+
+This command will allow you to save ALL the users to a predefined CSV file from your WhiteCore system. 
+
+The CSV file will be in the Data/Updates folder and passwords are not being saved with them (as of this moment)
