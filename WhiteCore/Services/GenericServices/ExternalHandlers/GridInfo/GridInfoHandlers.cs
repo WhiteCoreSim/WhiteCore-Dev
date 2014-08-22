@@ -95,6 +95,9 @@ namespace WhiteCore.Services
                 IMoneyModule moneyModule = m_registry.RequestModuleInterface<IMoneyModule>();
                 IGridServerInfoService serverInfoService = m_registry.RequestModuleInterface<IGridServerInfoService>();
 
+                // grid details
+                _info["gridname"] = GridName = GetConfig(m_config, "gridname");
+                _info["gridnick"] = GridNick = GetConfig(m_config, "gridnick");
 
                 // login
                 GridLoginURI = GetConfig(m_config, "login");
@@ -110,33 +113,34 @@ namespace WhiteCore.Services
                         GridLoginURI = MainServer.Instance.FullHostName + ":" + port + "/";
                     }
                 }
-                else if (!GridLoginURI.EndsWith("/"))
-                    GridLoginURI += "/";
-                _info["login"] = GridLoginURI;
+                _info["login"] = CheckURI(GridLoginURI);
 
                 // welcome
-                _info["welcome"] = GridWelcomeURI = GetConfig(m_config, "welcome");
+                GridWelcomeURI = GetConfig(m_config, "welcome");
                 if (GridWelcomeURI == "" && webInterface != null)
-                    _info["welcome"] = GridWelcomeURI = webInterface.LoginScreenURL;
+                    GridWelcomeURI = webInterface.LoginScreenURL;
+                _info["welcome"] = CheckURI(GridWelcomeURI);
 
                 // registration
-                _info["register"] = GridRegisterURI = GetConfig(m_config, "register");
+                GridRegisterURI = GetConfig(m_config, "register");
                 if (GridRegisterURI == "" && webInterface != null)
-                    _info["register"] = GridRegisterURI = webInterface.RegistrationScreenURL;
+                    GridRegisterURI = webInterface.RegistrationScreenURL;
+                _info["register"] = CheckURI(GridRegisterURI);
 
-                // grid details
-                _info["gridname"] = GridName = GetConfig(m_config, "gridname");
-                _info["gridnick"] = GridNick = GetConfig(m_config, "gridnick");
+                GridAboutURI = GetConfig(m_config, "about");
+                if (GridAboutURI == "" && webInterface != null)
+                    GridAboutURI = webInterface.HomeScreenURL;
+                _info["about"] = CheckURI(GridAboutURI);
 
-                _info["about"] = GridAboutURI = GetConfig(m_config, "about");
-
-                _info["help"] = GridHelpURI = GetConfig(m_config, "help");
+                GridHelpURI = GetConfig(m_config, "help");
                 if (GridHelpURI == "" && webInterface != null)
                     GridHelpURI = webInterface.HelpScreenURL;
+                _info["help"] = CheckURI(GridHelpURI);
 
-                _info["password"] = GridForgotPasswordURI = GetConfig(m_config, "forgottenpassword");
+                GridForgotPasswordURI = GetConfig(m_config, "forgottenpassword");
                 if (GridForgotPasswordURI == "" && webInterface != null)
                     GridForgotPasswordURI = webInterface.ForgotPasswordScreenURL;
+                _info["password"] = CheckURI(GridForgotPasswordURI);
 
                 // mapping
                 GridMapTileURI = GetConfig(m_config, "map");
@@ -157,6 +161,7 @@ namespace WhiteCore.Services
                 GridEconomyURI = GetConfig(m_config, "economy");
                 if (GridEconomyURI == "")
                 {
+
                     GridEconomyURI = MainServer.Instance.ServerURI + "/";           // assume default... 
 
                     if (moneyModule != null)
@@ -168,10 +173,7 @@ namespace WhiteCore.Services
                         GridEconomyURI = MainServer.Instance.FullHostName + ":" + port + "/";
                     }
                 }
-
-                if (GridEconomyURI != "" && !GridEconomyURI.EndsWith("/"))
-                    GridEconomyURI += "/";
-                _info["economy"] = _info["helperuri"] = GridEconomyURI;
+                _info["economy"] = _info["helperuri"] = CheckURI(GridEconomyURI);
 
 
                 // misc.. these must be set to be used
@@ -207,6 +209,13 @@ namespace WhiteCore.Services
             {
                 MainConsole.Instance.WarnFormat("[GRID INFO SERVICE]: {0}: {1}", k, _info[k]);
             }
+        }
+        
+        private string CheckURI(string uri)
+        {
+            if (!uri.EndsWith("/"))
+                uri += "/";
+            return uri;
         }
 
         public XmlRpcResponse XmlRpcGridInfoMethod(XmlRpcRequest request, IPEndPoint remoteClient)

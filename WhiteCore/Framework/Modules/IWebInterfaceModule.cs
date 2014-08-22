@@ -4,6 +4,7 @@ namespace WhiteCore.Framework.Modules
 {
     public interface IWebInterfaceModule
     {
+        string HomeScreenURL { get; }
         string LoginScreenURL { get; }
         string WebProfileURL { get; }
         string RegistrationScreenURL { get; }

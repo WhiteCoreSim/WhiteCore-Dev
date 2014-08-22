@@ -69,6 +69,11 @@ namespace WhiteCore.Modules.Web
 
         public string GridName { get; private set; }
 
+        public string HomeScreenURL
+        {
+            get { return MainServer.Instance.FullHostName + ":" + _port + "/"; }
+        }
+
         public string LoginScreenURL
         {
             get { return MainServer.Instance.FullHostName + ":" + _port + "/welcomescreen/"; }
@@ -557,7 +562,10 @@ namespace WhiteCore.Modules.Web
                     file = _pages["html/" + query["page"].ToString() + ".html"].FilePath[0];
                 }
                 if (!File.Exists(file))
+                {
+                    MainConsole.Instance.DebugFormat("WebInterface]: Unknown page request, {0}", file);
                     return "html/http_404.html";
+                }
 
                 return file;
             }
