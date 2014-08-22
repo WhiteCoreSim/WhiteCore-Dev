@@ -250,7 +250,12 @@ namespace WhiteCore.Modules.Archivers
         /// <returns>The avatar archive filenames.</returns>
         public List<string> GetAvatarArchiveFilenames(bool fullName)
         {
-            var archives = new List<string>( Directory.GetFiles (m_storeDirectory, "*.aa"));
+            var archives = new List <string> ();
+            if (Directory.Exists (m_storeDirectory))
+                archives = new List<string> (Directory.GetFiles (m_storeDirectory, "*.aa"));
+            else
+                return archives;
+
             if (!fullName)
             {
                 var archiveNames = new List<string> ();
