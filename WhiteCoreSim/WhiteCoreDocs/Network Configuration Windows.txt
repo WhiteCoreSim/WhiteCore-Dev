@@ -1,0 +1,106 @@
+##
+## Readme
+##
+
+Some people will find it very easy to run WhiteCore-Sim.  It is easy for the most part.
+While running WHiteCore-Sim and configuring it is simple for some the network and port forwarding
+is harder.  THis tutorial will help you learn how to make sure your network is forwarding the proper
+ports both in your firewall and your gateway (router/ modem).  The methods in this tutorial have been
+tested and fully work.  If you follow this guide you should be up and going in no tiem at all.
+  To setup WhiteCore-Sim please see the Setting up WhiteCore.txt 
+  If you are using development code and need to compile first please follow the instructions 
+in Compiling.txt for your system before continuing on with configuring WhiteCore-Sim.
+
+
+##
+## Opening Ports in WIndows FIrewall
+##
+  In order to get your viewer and your consoles communicating you need to open ports in your 
+Windows firewall first.  For most Windows users this will be pretty quick and simple.
+  Follow these steps for your WIndows firewall:
+      1. Click Start -> Control Panel.
+      2. Click on Windows Firewall.
+      3. In the Windows Firewall click on Advanced Settings.
+      4. In Advanced settings you will see Inbound Ports and Outbound Ports.
+      5. First click on Inbound Ports.
+      6. Now click on New Rule
+      7. A wizard will open up. Select Ports
+      8. Select TCP and enter 8002-8013 and click next.
+      9. Next you will be given the option to allow connection.  Make sure this is checked.
+      10. Next you will get an option to set this rule for Domain, Public, and Private. Check all 3.
+      11. Last you will be asked to name the rule.  It is easiest to use Incoming Ports 8002-8013TCP.
+      12. Also in the description it is helpful to add what the ports are for. such as grid ports.
+      13. Click Finish.
+   Now repeat these steps for the region ports beginning at port 9000TCP.  Also repeat this step for
+the Inbound UDP ports.
+   TO set the Outbound TCP and UDP ports its the same process as above.  Once this is done your firewall
+is set for Windows Firewall.  On to the Gateway stuff.......
+   NOTE for Windows Server 2008 and Windows Server 2008 R2 users.  You have to put the ports in as follows:
+   8002, 8003, 8004, 8005, 8006, 8007, 8008, 8009, 8010, 8011, 8012, 8013
+   This will make sure the firewall accepts the rule in Windows 2008 Server and Windows 2008 Server R2.
+	  
+##
+## Port forwarding in your Network Gateway (modem/ router)
+##
+  For many people today the new internet modems given by your Internet Service Provider (ISP) also will act 
+  as a Network Gateway and firewall to block ports.  So you must also ensure the ports used for WhiteCore are
+  unblocked here as well.  Because there are so many different routers and modems out there here I will encourage
+  you to consult your router/ modem user manual on how to forward the ports.  Remember even if your doing a 
+  local grid only if you have followed the instructions in Opening ports in Windows Firewall and you still
+  cannot connect,, this most likely will be the culprit.  To bind the ports to your machine's interrnal IP address
+  in your local network it is best to use a static IP.  Please see setting up static IP below to learn how to
+  accomplish this.
+	  
+##
+## Changing your Internal IP to Static
+##
+  When many people here the term Static IP they think you have to purchase this from your ISP.  
+  For your external IP address to be static this is true.  However you can get a FQDN for this at
+  DynDNS.com.  They will give you one FQDN subdomain such as you.dyndns.org for free. 
+	  
+  To establish and give your machine a static ip address on your local network on Windows is very simple.
+  To do this follow these steps.
+      1. Go to http://www.portforward.com and click Static IP on the page.
+      2. You will be asked if you want to download and or run application.  Select Download (run in Explorer).
+      3. Install the application.  You will be asked for a registration key.  No need to panic here, Just select
+      trial and you will be ok and click next.
+      4. After installed right click the PF icon on your desk top and select Run as Administrator (for Windows Vista,
+      Windows 7, Windows 8, Windows 2008 Server, Windows Server 2008 R2, and Windows Server 2012.
+      NOTE: If your server is being hosted in a Datacenter you do not need an internal static IP as this is already done.
+      5. It will show the current IPs and available Ips on your local network.  Click Make Static.
+      6. You will be asked if you want to apply the change.  Click APply Change.
+      7. Thats it your done.  When it has configured the static IP on your NIC card you will be given your new internal IP.
+      In most cases it will be the first Static IP on the network.  If so it will either be: 
+      192.168.0.1 or 192.168.1.1 depending on the gateway (router/ modem).
+
+  That is it.  Now if you have followed these instructions and the instructions for port forwarding in your gateway's user
+  manual, your WhiteCore-Sim should not have any trouble at all connecting to your viewer or WhiteCore.exe having trouble
+  connecting to WhiteCore.Server.exe. 
+	  
+##
+## FAQ
+##
+  Q: I don't have a Network Gateway and my Modem does not do port forwarding, what do I do?
+  A: If this is the case then if you follow the steps for giving your tower a static IP and opening the ports
+     in Windows Firewall you should not have any issues.
+
+  Q: I followed these instructions and the instructions in my modem's user manual but it still doesnt connect, Why?
+  A: First double check you didnt mistype something or get the wrong setting.  If this does not work you can ask
+     for assistance.  I am happy to help.  Just email your issue to secondgalaxy2013@gmail.com or you can often 
+     find me in #whitecore-support on Freenode.
+
+##
+## About this tutorial
+##
+  This tutorial was written by Emperor Starfinder for helping users of WhiteCore-Sim at the request of Greythane.
+  I am not a member of the WhiteCore-Sim development team.  You can find out more about WhiteCore-Sim at 
+  http://www.whitecore-sim.org
+	
+##
+## Legal Stuff
+##
+
+  The name WhiteCore-Sim, whitecore-sim.org, and the WhiteCore-Sim logos and marks, are the property of their respective
+  creators. Namely Greythane or Fly-Man.
+  Third party software and code contributed to WhiteCore-Sim is done so under an opensource license.  For more information
+  please see LICENSE.txt in WhiteCoreSim/WhiteCoreDocs/LICENSE.txt.
