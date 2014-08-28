@@ -6,7 +6,8 @@ html, body {height: 100%;}
 body {
 	line-height: 14px;
 	font-size: 14px;
-	background: #1C537E url(../images/bg1.jpg) no-repeat scroll top;
+	background: #11344E;
+	/*background: #1C537E url(../images/bg1.jpg) no-repeat scroll top;*/
 	/* old browsers */
 	/* background: -moz-linear-gradient(top, #0A375A 0%, #1F76B9 100%);
 	/* firefox */
@@ -1103,6 +1104,8 @@ img#mainImage {
 	position: fixed;
 	top: 0px;
 	height: 100%;
+	opacity: 0.5;
+	z-index: -1;
 }
 
 /* Logo */

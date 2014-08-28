@@ -4,13 +4,20 @@ function bgImgRotate()
   "../images/screenshots/welcome1.jpg",
   "../images/screenshots/welcome2.jpg",
   "../images/screenshots/welcome3.jpg",
-  "../images/screenshots/welcome4.jpg");
+  "../images/screenshots/welcome4.jpg",
+  "../images/screenshots/welcome5.jpg",
+  "../images/screenshots/welcome6.jpg",
+  "../images/screenshots/welcome7.jpg",
+  "../images/screenshots/welcome8.jpg",
+  "../images/screenshots/welcome9.jpg",
+  "../images/screenshots/welcome10.jpg"
+  );
 	
-var l = images.length;
+  var len = images.length;
+  var img_no = Math.floor(Math.random());
+  img_no = Math.floor(Math.random()*len);
 
-var rnd_no = Math.floor(l*Math.random());
-
-	document.getElementById('mainImage').src = images[rnd_no]; 
+	document.getElementById('mainImage').src = images[img_no]; 
 } 
 
 function closeSurvey(div_id)
@@ -47,3 +54,5 @@ function CheckFieldsNotEmpty(){
 		myButton.className = "pressed";
 	}
 }
+
+window.onload=bgImgRotate;

@@ -1026,6 +1026,8 @@ img#mainImage {
 	position: fixed;
 	top: 0px;
 	height: 100%;
+	opacity: 0.5;
+	z-index: -1;
 }
 
 /* Logo */
