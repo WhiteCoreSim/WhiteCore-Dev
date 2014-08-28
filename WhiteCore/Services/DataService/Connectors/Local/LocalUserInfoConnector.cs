@@ -239,6 +239,26 @@ namespace WhiteCore.Services.DataService
             return uint.Parse (userCount[0]);
         }
 
+        public uint OnlineUsers(uint secondsAgo)
+        {
+            QueryFilter filter = new QueryFilter();
+            if (secondsAgo > 0)
+            {
+                //Beware!! login times are UTC!
+                int now = (int) Util.ToUnixTime(DateTime.Now.ToUniversalTime()) - (int) secondsAgo;
+
+                filter.orGreaterThanEqFilters ["LastLogin"] = now;
+                filter.orGreaterThanEqFilters ["LastSeen"] = now;
+                //                filter.andGreaterThanFilters["LastLogout"] = now;
+            }
+
+            filter.andFilters["IsOnline"] = "1";
+
+
+            List<string>  userCount = GD.Query(new string[1] {"COUNT(UserID)"}, m_realm, filter, null, null, null);
+            return uint.Parse (userCount[0]);
+        }
+
         public List<UserInfo> RecentlyOnline(uint secondsAgo, bool stillOnline, Dictionary<string, bool> sort,
                                              uint start, uint count)
         {
@@ -253,6 +273,30 @@ namespace WhiteCore.Services.DataService
 //                filter.andGreaterThanFilters["LastLogout"] = now;
                 filter.andFilters["IsOnline"] = "1";
             }
+
+            List<string> query = GD.Query(new string[] {"*"}, m_realm, filter, sort, start, count);
+
+            return ParseQuery(query);
+        }
+
+        public List<UserInfo> CurrentlyOnline(uint secondsAgo, Dictionary<string, bool> sort, uint start,
+            uint count)
+        {
+
+            QueryFilter filter = new QueryFilter();
+            if (secondsAgo > 0)
+            {
+                //Beware!! login times are UTC!
+                int now = (int)Util.ToUnixTime (DateTime.Now.ToUniversalTime ());
+                now -= (int) secondsAgo;
+
+                filter.orGreaterThanEqFilters["LastLogin"] = now;
+                filter.orGreaterThanEqFilters["LastSeen"] = now;
+            }
+
+            // online only please...
+            filter.andFilters["IsOnline"] = "1";
+
 
             List<string> query = GD.Query(new string[] {"*"}, m_realm, filter, sort, start, count);
 

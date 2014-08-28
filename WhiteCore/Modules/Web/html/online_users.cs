@@ -65,10 +65,12 @@ namespace WhiteCore.Modules.Web
             var usersList = new List<Dictionary<string, object>>();
             var libraryOwner = new UUID(Constants.LibraryOwner);
 			var realestateOwner = new UUID(Constants.RealEstateOwnerUUID);
+            var agentInfo = Framework.Utilities.DataManager.RequestPlugin<IAgentInfoConnector> ();
 
             uint amountPerQuery = 10;
             int start = httpRequest.Query.ContainsKey("Start") ? int.Parse(httpRequest.Query["Start"].ToString()) : 0;
-            uint count = Framework.Utilities.DataManager.RequestPlugin<IAgentInfoConnector>().RecentlyOnline(5*60, true);
+            //uint count = agentInfo.RecentlyOnline(15*60, true);
+            uint count = agentInfo.OnlineUsers(0);
             int maxPages = (int) (count/amountPerQuery) - 1;
 
             if (start == -1)
@@ -78,9 +80,9 @@ namespace WhiteCore.Modules.Web
             vars.Add("NextOne", start + 1 > maxPages ? start : start + 1);
             vars.Add("BackOne", start - 1 < 0 ? 0 : start - 1);
 
-             var activeUsers = Framework.Utilities.DataManager.RequestPlugin<IAgentInfoConnector>()
-                                   .RecentlyOnline(5*60, true, new Dictionary<string, bool>(), (uint) start,
-                                                   amountPerQuery);
+            //var activeUsers = agentInfo.RecentlyOnline(15*60, true, new Dictionary<string, bool>(), (uint) start, amountPerQuery);
+            var activeUsers = agentInfo.CurrentlyOnline(0, new Dictionary<string, bool>(), (uint) start, amountPerQuery);
+
             if (activeUsers.Count > 0)
             {
                 IUserAccountService accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService> ();

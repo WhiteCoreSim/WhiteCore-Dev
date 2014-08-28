@@ -204,9 +204,11 @@ namespace WhiteCore.Framework.Services
         UserInfo Get(string userID, bool checkOnlineStatus, out bool onlineStatusChanged);
 
         uint RecentlyOnline(uint secondsAgo, bool stillOnline);
+        uint OnlineUsers (uint secondsAgo);
 
         List<UserInfo> RecentlyOnline(uint secondsAgo, bool stillOnline, Dictionary<string, bool> sort, uint start,
                                       uint count);
+        List<UserInfo> CurrentlyOnline(uint secondsAgo, Dictionary<string, bool> sort, uint start, uint count);
 
         List<UserInfo> GetByCurrentRegion(string regionID);
     }
