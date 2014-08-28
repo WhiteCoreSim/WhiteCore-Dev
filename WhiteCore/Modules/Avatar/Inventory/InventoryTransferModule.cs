@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
@@ -165,61 +164,32 @@ namespace WhiteCore.Modules.Inventory
                                                          "into agent {1}'s inventory",
                                                          folderID, im.ToAgentID);
 
-                        m_Scene.InventoryService.GiveInventoryFolderAsync(receipientID, client.AgentId,
-                                                                          folderID, UUID.Zero, (folder) =>
-                                                                                                   {
-                                                                                                       if (folder ==
-                                                                                                           null)
-                                                                                                       {
-                                                                                                           client
-                                                                                                               .SendAgentAlertMessage
-                                                                                                               ("Can't find folder to give. Nothing given.",
-                                                                                                                false);
-                                                                                                           return;
-                                                                                                       }
+                        m_Scene.InventoryService.GiveInventoryFolderAsync(
+                            receipientID,
+                            client.AgentId,
+                            folderID,
+                            UUID.Zero,
+                            (folder) => {
+                                if (folder == null)
+                                {
+                                    client.SendAgentAlertMessage ("Can't find folder to give. Nothing given.", false);
+                                    return;
+                                }
 
-                                                                                                       // The outgoing binary bucket should contain only the byte which signals an asset folder is
-                                                                                                       // being copied and the following bytes for the copied folder's UUID
-                                                                                                       copyID =
-                                                                                                           folder.ID;
-                                                                                                       byte[]
-                                                                                                           copyIDBytes =
-                                                                                                               copyID
-                                                                                                                   .GetBytes
-                                                                                                                   ();
-                                                                                                       im.BinaryBucket =
-                                                                                                           new byte[
-                                                                                                               1 +
-                                                                                                               copyIDBytes
-                                                                                                                   .Length
-                                                                                                               ];
-                                                                                                       im.BinaryBucket[0
-                                                                                                           ] =
-                                                                                                           (byte)
-                                                                                                           AssetType
-                                                                                                               .Folder;
-                                                                                                       Array.Copy(
-                                                                                                           copyIDBytes,
-                                                                                                           0,
-                                                                                                           im
-                                                                                                               .BinaryBucket,
-                                                                                                           1,
-                                                                                                           copyIDBytes
-                                                                                                               .Length);
+                                // The outgoing binary bucket should contain only the byte which signals an asset folder is
+                                // being copied and the following bytes for the copied folder's UUID
+                                copyID = folder.ID;
+                                byte[] copyIDBytes = copyID.GetBytes ();
+                                im.BinaryBucket = new byte[ 1 + copyIDBytes.Length ];
+                                im.BinaryBucket [0] = (byte) AssetType.Folder;
+                                Array.Copy (copyIDBytes, 0, im.BinaryBucket, 1, copyIDBytes.Length);
 
-                                                                                                       if (user != null)
-                                                                                                           user
-                                                                                                               .ControllingClient
-                                                                                                               .SendBulkUpdateInventory
-                                                                                                               (folder);
+                                if (user != null)
+                                    user.ControllingClient.SendBulkUpdateInventory(folder);
 
-                                                                                                       im.SessionID =
-                                                                                                           copyID;
-                                                                                                       user
-                                                                                                           .ControllingClient
-                                                                                                           .SendInstantMessage
-                                                                                                           (im);
-                                                                                                   });
+                                im.SessionID = copyID;
+                                user.ControllingClient.SendInstantMessage(im);
+                            });
                     }
                     else
                     {
@@ -234,30 +204,28 @@ namespace WhiteCore.Modules.Inventory
 
                         m_Scene.InventoryService.GiveInventoryItemAsync(
                             im.ToAgentID,
-                            im.FromAgentID, itemID, UUID.Zero, false, (itemCopy) =>
-                                                                          {
-                                                                              if (itemCopy == null)
-                                                                              {
-                                                                                  client.SendAgentAlertMessage(
-                                                                                      "Can't find item to give. Nothing given.",
-                                                                                      false);
-                                                                                  return;
-                                                                              }
+                            im.FromAgentID,
+                            itemID,
+                            UUID.Zero,
+                            false,
+                            (itemCopy) => {
+                                if (itemCopy == null)
+                                {
+                                    client.SendAgentAlertMessage("Can't find item to give. Nothing given.", false);
+                                    return;
+                                }
 
-                                                                              copyID = itemCopy.ID;
-                                                                              Array.Copy(copyID.GetBytes(), 0,
-                                                                                         im.BinaryBucket, 1, 16);
+                                copyID = itemCopy.ID;
+                                Array.Copy(copyID.GetBytes(), 0, im.BinaryBucket, 1, 16);
 
-                                                                              if (user != null)
-                                                                              {
-                                                                                  user.ControllingClient
-                                                                                      .SendBulkUpdateInventory(itemCopy);
-                                                                              }
+                                if (user != null)
+                                {
+                                    user.ControllingClient.SendBulkUpdateInventory(itemCopy);
+                                }
 
-                                                                              im.SessionID = itemCopy.ID;
-                                                                              user.ControllingClient.SendInstantMessage(
-                                                                                  im);
-                                                                          });
+                                im.SessionID = itemCopy.ID;
+                                user.ControllingClient.SendInstantMessage(im);
+                            });
                     }
                 }
                 else
