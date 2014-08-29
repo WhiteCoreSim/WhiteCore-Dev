@@ -31,11 +31,13 @@ jQuery(document).ready(function() {jQuery('#avatarcarousel').jcarousel({wrap: 'c
   <tbody>
     <tr>
       <td class="register_left"><p id="regname_label">{AvatarNameText}*</p></td>
-      <td class="register_right" colspan="3"><input minlength="3" id="AvatarName" require="true" label="AvatarName" name="AvatarName" type="text" size="25" maxlength="30" value=""></td>
+      <td class="register_right" colspan="2"><input minlength="3" id="AvatarName" require="true" label="AvatarName" name="AvatarName" type="text" size="25" maxlength="30" value="{AvatarName}"></td>
+	  <td class="register_left"> Enter your avatar name</td>
     </tr>
     <tr>
       <td class="register_left"><p id="password_label">{AvatarPasswordText}*</p></td>
-      <td class="register_right" colspan="3"><input minlength="6" compare="AvatarPassword2" require="true" label="AvatarPassword" id="AvatarPassword" name="AvatarPassword" type="password" size="30" maxlength="15"></td>
+      <td class="register_right" colspan="2"><input minlength="6" compare="AvatarPassword2" require="true" label="AvatarPassword" id="AvatarPassword" name="AvatarPassword" type="password" size="30" maxlength="15"></td>
+	  <td class="register_left"> Your login password</td>
     </tr>
     <tr>
       <td class="register_left"><p>{AvatarPasswordConfirmationText}*</p></td>
@@ -96,7 +98,8 @@ jQuery(document).ready(function() {jQuery('#avatarcarousel').jcarousel({wrap: 'c
     </tr>
     <tr>
       <td class="register_left"><p>{UserEmailText}*</p></td>
-      <td class="register_right" colspan="3"><input label="UserEmail" id="UserEmail" name="UserEmail" type="text" size="40" maxlength="40" value=""></td>
+      <td class="register_right" colspan="2"><input label="UserEmail" id="UserEmail" name="UserEmail" type="text" size="40" maxlength="40" value=""></td>
+	  <td class="register_left"> (For password recovery only)</td>
     </tr>
 {IsAdminAuthenticatedBegin}
 <!-- Only admins can set membership types -->

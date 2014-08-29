@@ -220,8 +220,9 @@ namespace WhiteCore.Modules.Web
                                 Framework.Utilities.DataManager.RequestPlugin<IProfileConnector>();
                         if (profileData != null)
                         {
-                            profileData.CreateNewProfile (userID);
                             IUserProfileInfo profile = profileData.GetUserProfile (userID);
+                            if (profile == null)
+                                profileData.CreateNewProfile (userID);
 
                             if (AvatarArchive != "")
                                 profile.AArchiveName = AvatarArchive;
@@ -311,6 +312,25 @@ namespace WhiteCore.Modules.Web
                 ToS = reader.ReadToEnd();
                 reader.Close();
             }
+
+            // check for user name seed
+            string[] m_userNameSeed = null;
+            if (loginServerConfig != null)
+            {
+                string userNameSeed = loginServerConfig.GetString ("UserNameSeed", "");
+                if (userNameSeed != "")
+                    m_userNameSeed = userNameSeed.Split (',');
+            }
+
+            Utilities.MarkovNameGenerator ufNames = new Utilities.MarkovNameGenerator ();
+            Utilities.MarkovNameGenerator ulNames = new Utilities.MarkovNameGenerator ();
+            string[] nameSeed = m_userNameSeed == null ? Utilities.UserNames : m_userNameSeed;
+
+            string firstName = ufNames.FirstName (nameSeed, 3, 4);
+            string lastName = ulNames.FirstName (nameSeed, 5, 6);
+            string enteredName = firstName + " " + lastName;
+
+            vars.Add("AvatarName",enteredName);
             vars.Add("ToSMessage", ToS);
             vars.Add("TermsOfServiceAccept", translator.GetTranslatedString("TermsOfServiceAccept"));
             vars.Add("TermsOfServiceText", translator.GetTranslatedString("TermsOfServiceText"));
