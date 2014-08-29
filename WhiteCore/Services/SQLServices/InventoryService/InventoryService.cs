@@ -835,10 +835,19 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                 InventoryFolderBase folder = GetFolder(new InventoryFolderBase(item.Folder));
 
                 if (folder == null || folder.Owner != item.Owner)
+                {
+                    MainConsole.Instance.DebugFormat ("[InventoryService]: Aborting adding item as folder {0} does not exist or is not the owner's",folder);
                     return false;
+                }
             }
             m_Database.IncrementFolder(item.Folder);
-            return m_Database.StoreItem(item);
+            bool success = m_Database.StoreItem(item);
+            if (!success)
+                MainConsole.Instance.DebugFormat ("[InventoryService]: Failed to save item {0} in folder {1}",item.Name,item.Folder);
+            else
+                MainConsole.Instance.DebugFormat ("[InventoryService]: Saved item {0} in folder {1}",item.Name,item.Folder);
+
+            return success;
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
@@ -1292,6 +1301,8 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                     // the recipient will not have the group this is
                     // set to
                     itemCopy.GroupPermissions = 0;
+
+                    MainConsole.Instance.Debug ("[InventoryService]: Updated item permissions for new user");
                 }
                 else
                 {
@@ -1320,8 +1331,12 @@ namespace WhiteCore.Services.SQLServices.InventoryService
 
                 AddItem(itemCopy);
 
-                if ((item.CurrentPermissions & (uint) PermissionMask.Copy) == 0)
-                    DeleteItems(senderId, new List<UUID> {item.ID});
+                if ((item.CurrentPermissions & (uint)PermissionMask.Copy) == 0)
+                {
+                    DeleteItems (senderId, new List<UUID> { item.ID });
+                    MainConsole.Instance.Debug ("[InventoryService]: Deleting new item as permissions prevent copying");
+                }
+
 
                 return itemCopy;
             }

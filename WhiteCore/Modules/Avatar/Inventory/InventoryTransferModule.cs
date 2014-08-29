@@ -41,7 +41,8 @@ namespace WhiteCore.Modules.Inventory
 {
     public class InventoryTransferModule : INonSharedRegionModule
     {
-        private IScene m_Scene;
+        //private IScene m_Scene;
+        private readonly List<IScene> m_Scenelist = new List<IScene>();
 
         private bool m_Enabled = true;
         private IMessageTransferModule m_TransferModule;
@@ -69,7 +70,8 @@ namespace WhiteCore.Modules.Inventory
             if (!m_Enabled)
                 return;
 
-            m_Scene = scene;
+            //m_Scene = scene;
+            m_Scenelist.Add(scene);
 
             scene.RegisterModuleInterface(this);
 
@@ -82,14 +84,16 @@ namespace WhiteCore.Modules.Inventory
         {
             if (m_TransferModule == null)
             {
-                m_TransferModule = m_Scene.RequestModuleInterface<IMessageTransferModule>();
+                m_TransferModule = m_Scenelist[0].RequestModuleInterface<IMessageTransferModule>();
+//                m_TransferModule = m_Scene.RequestModuleInterface<IMessageTransferModule>();
                 if (m_TransferModule == null)
                 {
                     MainConsole.Instance.Error(
                         "[INVENTORY TRANSFER]: No Message transfer module found, transfers will be local only");
                     m_Enabled = false;
 
-                    m_Scene = null;
+                    //m_Scene = null;
+                    m_Scenelist.Clear();
                     scene.EventManager.OnNewClient -= OnNewClient;
                     scene.EventManager.OnClosingClient -= OnClosingClient;
                     scene.EventManager.OnIncomingInstantMessage -= OnGridInstantMessage;
@@ -99,10 +103,12 @@ namespace WhiteCore.Modules.Inventory
 
         public void RemoveRegion(IScene scene)
         {
-            m_Scene = null;
+            //m_Scene = null;
+
             scene.EventManager.OnNewClient -= OnNewClient;
             scene.EventManager.OnClosingClient -= OnClosingClient;
             scene.EventManager.OnIncomingInstantMessage -= OnGridInstantMessage;
+            m_Scenelist.Remove(scene);
         }
 
         public void Close()
@@ -132,9 +138,29 @@ namespace WhiteCore.Modules.Inventory
             client.OnInstantMessage -= OnInstantMessage;
         }
 
+        private IScene FindClientScene(UUID agentId)
+        {
+            lock (m_Scenelist)
+            {
+                foreach (IScene scene in m_Scenelist)
+                {
+                    var presence = scene.GetScenePresence (agentId);
+                    if (presence != null)
+                        return scene;
+                }
+            }
+            return null;
+        }
+
         private void OnInstantMessage(IClientAPI client, GridInstantMessage im)
         {
             //MainConsole.Instance.InfoFormat("[INVENTORY TRANSFER]: OnInstantMessage {0}", im.dialog);
+            IScene clientScene = FindClientScene(client.AgentId);
+            if (clientScene == null) // Something seriously wrong here.
+            {
+                MainConsole.Instance.DebugFormat ("[INVENTORY TRANSFER]: Cannot find originating user scene");
+                return;
+            }
 
             if (im.Dialog == (byte) InstantMessageDialog.InventoryOffered)
             {
@@ -144,32 +170,34 @@ namespace WhiteCore.Modules.Inventory
                     return;
 
                 UUID receipientID = im.ToAgentID;
-                IScenePresence user = m_Scene.GetScenePresence(receipientID);
+                IScenePresence recipientUser = null;
+                IScene recipientUserScene = FindClientScene(client.AgentId);
+                if (recipientUserScene != null)
+                    recipientUser = recipientUserScene.GetScenePresence(receipientID);
                 UUID copyID;
 
-                // Send the IM to the recipient. The item is already
-                // in their inventory, so it will not be lost if
-                // they are offline.
-                //
-                if (user != null)
+                // user is online now...
+                if (recipientUser != null)
                 {
+
                     // First byte is the asset type
-                    AssetType assetType = (AssetType) im.BinaryBucket[0];
+                    AssetType assetType = (AssetType)im.BinaryBucket [0];
 
                     if (AssetType.Folder == assetType)
                     {
-                        UUID folderID = new UUID(im.BinaryBucket, 1);
+                        UUID folderID = new UUID (im.BinaryBucket, 1);
 
-                        MainConsole.Instance.DebugFormat("[INVENTORY TRANSFER]: Inserting original folder {0} " +
-                                                         "into agent {1}'s inventory",
-                                                         folderID, im.ToAgentID);
+                        MainConsole.Instance.DebugFormat ("[INVENTORY TRANSFER]: Inserting original folder {0} " +
+                        "into agent {1}'s inventory",
+                            folderID, im.ToAgentID);
 
-                        m_Scene.InventoryService.GiveInventoryFolderAsync(
+                        clientScene.InventoryService.GiveInventoryFolderAsync (
                             receipientID,
                             client.AgentId,
                             folderID,
                             UUID.Zero,
-                            (folder) => {
+                            (folder) =>
+                            {
                                 if (folder == null)
                                 {
                                     client.SendAgentAlertMessage ("Can't find folder to give. Nothing given.", false);
@@ -181,62 +209,67 @@ namespace WhiteCore.Modules.Inventory
                                 copyID = folder.ID;
                                 byte[] copyIDBytes = copyID.GetBytes ();
                                 im.BinaryBucket = new byte[ 1 + copyIDBytes.Length ];
-                                im.BinaryBucket [0] = (byte) AssetType.Folder;
+                                im.BinaryBucket [0] = (byte)AssetType.Folder;
                                 Array.Copy (copyIDBytes, 0, im.BinaryBucket, 1, copyIDBytes.Length);
 
-                                if (user != null)
-                                    user.ControllingClient.SendBulkUpdateInventory(folder);
-
-                                im.SessionID = copyID;
-                                user.ControllingClient.SendInstantMessage(im);
+                                if (recipientUser != null)
+                                {
+                                    recipientUser.ControllingClient.SendBulkUpdateInventory (folder);
+                                    im.SessionID = copyID;
+                                    recipientUser.ControllingClient.SendInstantMessage (im);
+                                }
                             });
-                    }
-                    else
+                    } else
                     {
                         // First byte of the array is probably the item type
                         // Next 16 bytes are the UUID
 
-                        UUID itemID = new UUID(im.BinaryBucket, 1);
+                        UUID itemID = new UUID (im.BinaryBucket, 1);
 
-                        MainConsole.Instance.DebugFormat("[INVENTORY TRANSFER]: (giving) Inserting item {0} " +
-                                                         "into agent {1}'s inventory",
-                                                         itemID, im.ToAgentID);
+                        MainConsole.Instance.DebugFormat ("[INVENTORY TRANSFER]: (giving) Inserting item {0} " +
+                        "into agent {1}'s inventory",
+                            itemID, im.ToAgentID);
 
-                        m_Scene.InventoryService.GiveInventoryItemAsync(
+                        clientScene.InventoryService.GiveInventoryItemAsync (
                             im.ToAgentID,
                             im.FromAgentID,
                             itemID,
                             UUID.Zero,
                             false,
-                            (itemCopy) => {
+                            (itemCopy) =>
+                            {
                                 if (itemCopy == null)
                                 {
-                                    client.SendAgentAlertMessage("Can't find item to give. Nothing given.", false);
+                                    client.SendAgentAlertMessage ("Can't find item to give. Nothing given.", false);
                                     return;
                                 }
 
                                 copyID = itemCopy.ID;
-                                Array.Copy(copyID.GetBytes(), 0, im.BinaryBucket, 1, 16);
+                                Array.Copy (copyID.GetBytes (), 0, im.BinaryBucket, 1, 16);
 
-                                if (user != null)
+                                if (recipientUser != null)
                                 {
-                                    user.ControllingClient.SendBulkUpdateInventory(itemCopy);
+                                    recipientUser.ControllingClient.SendBulkUpdateInventory (itemCopy);
+                                    im.SessionID = itemCopy.ID;
+                                    recipientUser.ControllingClient.SendInstantMessage (im);
                                 }
-
-                                im.SessionID = itemCopy.ID;
-                                user.ControllingClient.SendInstantMessage(im);
                             });
                     }
-                }
-                else
+                }  else
                 {
-                    if (m_TransferModule != null)
+                    // recipient is offline.
+                    // Send the IM to the recipient. The item is already
+                    // in their inventory, so it will not be lost if
+                    // they are offline.
+                    //
+                     if (m_TransferModule != null)
                         m_TransferModule.SendInstantMessage(im);
                 }
             }
             else if (im.Dialog == (byte) InstantMessageDialog.InventoryAccepted)
             {
-                IScenePresence user = m_Scene.GetScenePresence(im.ToAgentID);
+                IScenePresence user = clientScene.GetScenePresence(im.ToAgentID);
+                MainConsole.Instance.DebugFormat ("[INVENTORY TRANSFER]: Acceptance message received");
 
                 if (user != null) // Local
                 {
@@ -254,7 +287,8 @@ namespace WhiteCore.Modules.Inventory
                 // inventory is loaded. Courtesy of the above bulk update,
                 // It will have been pushed to the client, too
                 //
-                IInventoryService invService = m_Scene.InventoryService;
+                IInventoryService invService = clientScene.InventoryService;
+                MainConsole.Instance.DebugFormat ("[INVENTORY TRANSFER]: Declined message received");
 
                 InventoryFolderBase trashFolder =
                     invService.GetFolderForType(client.AgentId, InventoryType.Unknown, AssetType.TrashFolder);
@@ -303,7 +337,7 @@ namespace WhiteCore.Modules.Inventory
                                                  "received inventory" + reason, false);
                 }
 
-                IScenePresence user = m_Scene.GetScenePresence(im.ToAgentID);
+                IScenePresence user = clientScene.GetScenePresence(im.ToAgentID);
 
                 if (user != null) // Local
                 {
@@ -322,9 +356,18 @@ namespace WhiteCore.Modules.Inventory
         /// <param name="msg"></param>
         private void OnGridInstantMessage(GridInstantMessage msg)
         {
+            // Check if this is ours to handle
+            //
+            IScene userScene = FindClientScene(msg.ToAgentID);
+            if (userScene == null)
+            {
+                MainConsole.Instance.DebugFormat ("[INVENTORY TRANSFER]: Cannot find user scene for instant message");
+                return;
+            }
+
             // Find agent to deliver to
             //
-            IScenePresence user = m_Scene.GetScenePresence(msg.ToAgentID);
+            IScenePresence user = userScene.GetScenePresence(msg.ToAgentID);
 
             // Just forward to local handling
             OnInstantMessage(user.ControllingClient, msg);

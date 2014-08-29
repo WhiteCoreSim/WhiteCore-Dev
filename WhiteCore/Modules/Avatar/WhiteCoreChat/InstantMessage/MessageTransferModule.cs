@@ -437,7 +437,7 @@ namespace WhiteCore.Modules.Chat
                         //Remove them so we keep testing against the db
                         IMUsersCache.Remove(toAgentID);
                     }
-                    MainConsole.Instance.Info("[GRID INSTANT MESSAGE]: Unable to deliver an instant message");
+                    MainConsole.Instance.Debug("[GRID INSTANT MESSAGE]: Unable to deliver an instant message as user is not online");
                     HandleUndeliveredMessage(im, "User is not set as online by presence service.");
                     return;
                 }
