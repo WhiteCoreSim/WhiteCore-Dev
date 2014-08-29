@@ -152,7 +152,7 @@ namespace WhiteCore.Simulation.Base
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine(
                         "\n\n   This appears to be your first time running WhiteCore.\n"+
-                        "If you have already configured your *ini.example files, please ignore this warning and press enter;\n" +
+                        "If you have already configured your *.ini files, please ignore this warning and press enter;\n" +
                         "Otherwise type 'yes' and WhiteCore will guide you through the configuration process.\n\n"+
                         "Remember, these file names are Case Sensitive in Linux and Proper Cased.\n"+
                         "1. " + WhiteCore_ConfigDir + "/WhiteCore.ini\nand\n" +
@@ -405,11 +405,12 @@ namespace WhiteCore.Simulation.Base
                     }
                     if (!isWhiteCoreExe)
                     {
-                        MakeSureExists("Grid/ServerConfiguration/Login.ini");
-                        IniConfigSource login_ini = new IniConfigSource("Grid/ServerConfiguration/Login.ini",
+                        string folder = WhiteCore_ConfigDir;
+                        MakeSureExists(folder + "Grid/ServerConfiguration/Login.ini");
+                        IniConfigSource login_ini = new IniConfigSource(folder + "Grid/ServerConfiguration/Login.ini",
                                                                         Nini.Ini.IniFileType.AuroraStyle);
                         IniConfigSource login_ini_example =
-                            new IniConfigSource("Grid/ServerConfiguration/Login.ini.example",
+                            new IniConfigSource(folder + "Grid/ServerConfiguration/Login.ini.example",
                                                 Nini.Ini.IniFileType.AuroraStyle);
                         foreach (IConfig config in login_ini_example.Configs)
                         {
@@ -429,9 +430,9 @@ namespace WhiteCore.Simulation.Base
                         Console.WriteLine("Your Login.ini has been successfully configured");
                         Console.ResetColor();
 
-                        MakeSureExists("Grid/ServerConfiguration/GridInfoService.ini");
+                        MakeSureExists(folder + "Grid/ServerConfiguration/GridInfoService.ini");
                         IniConfigSource grid_info_ini =
-                            new IniConfigSource("Grid/ServerConfiguration/GridInfoService.ini",
+                            new IniConfigSource(folder + "Grid/ServerConfiguration/GridInfoService.ini",
                                                 Nini.Ini.IniFileType.AuroraStyle);
                         IConfig conf = grid_info_ini.AddConfig("GridInfoService");
                         conf.Set("GridInfoInHandlerPort", 8002);
