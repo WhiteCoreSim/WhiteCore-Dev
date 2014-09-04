@@ -68,23 +68,8 @@ namespace WhiteCore.Services
                 IHttpServer server = m_registry.RequestModuleInterface<ISimulationBase>().GetHttpServer(port);
 
                 server.AddStreamHandler(new ServerHandler("/server/", m_registry, null));
-                //AddUDPConector(8008);
             }
         }
-
-        /*private void AddUDPConector(int port)
-        {
-            Thread thread = new Thread(delegate()
-                {
-                    UdpClient server = new UdpClient("127.0.0.1", port);
-                    IPEndPoint sender = new IPEndPoint(IPAddress.Any, 0);
-                    byte[] data = server.Receive(ref sender);
-                    OSDMap map = (OSDMap)OSDParser.DeserializeJson(new MemoryStream(data));
-                    ServerHandler handler = new ServerHandler("", "", m_registry);
-                    byte[] Data = handler.HandleMap(map);
-                });
-        }*/
-
         #endregion
     }
 }
