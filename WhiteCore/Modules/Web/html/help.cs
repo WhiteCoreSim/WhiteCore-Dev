@@ -66,12 +66,8 @@ namespace WhiteCore.Modules.Web
             vars.Add("AstraViewer", translator.GetTranslatedString("AstraViewer"));
             vars.Add("FirestormViewer", translator.GetTranslatedString("FirestormViewer"));
             vars.Add("KokuaViewer", translator.GetTranslatedString("KokuaViewer"));
-            //vars.Add("ImpurdenceViewer", translator.GetTranslatedString("ImprudenceViewer"));
-            //vars.Add("PhoenixViewer", translator.GetTranslatedString("PhoenixViewer"));
             vars.Add("SingularityViewer", translator.GetTranslatedString("SingularityViewer"));
             vars.Add("VoodooViewer", translator.GetTranslatedString("VoodooViewer"));
-            //vars.Add("ZenViewer", translator.GetTranslatedString("ZenViewer"));
-
             return vars;
         }
 

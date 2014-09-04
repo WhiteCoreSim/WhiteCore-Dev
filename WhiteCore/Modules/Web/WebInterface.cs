@@ -264,6 +264,7 @@ namespace WhiteCore.Modules.Web
         {
             if (vars != null)
             {
+                vars.Add("LoginURL", MainServer.Instance.FullHostName + ":" + MainServer.Instance.Port);
                 vars.Add("SystemURL", MainServer.Instance.FullHostName + ":" + _port);
                 vars.Add("SystemName", GridName);
             }

@@ -75,9 +75,9 @@ namespace WhiteCore.Framework.Utilities
         public const int USER_FLAG_RESIDENT   = 200;        // Resident: Payment info on account
         public const int USER_FLAG_PAY        = 300;        // Testing: Payment info on account
         public const int USER_FLAG_NOPAY      = 400;        // Testing: No Payment info on account
-        public const int USER_FLAG_MEMBER     = 600;        // Member Estatute: Payment info on account
+        public const int USER_FLAG_MEMBER     = 600;        // Member Estate: Payment info on account
         public const int USER_FLAG_CONTRACTOR = 800;        // Contracted
-        public const int USER_FLAG_CHARTERMEMBER = 3840;    // Charter memebe
+        public const int USER_FLAG_CHARTERMEMBER = 3840;    // Charter member
 
 
     }
