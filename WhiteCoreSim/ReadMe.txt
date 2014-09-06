@@ -51,7 +51,7 @@ your first user.
 You can quickly set a few options to customise your WhiteCore installation.
 To do this, modify the commented out settings in 'MyWorld.ini' located in the
  'Config' folder.  This will allow you to set the name of your Sim, configure your default
-  region and specify an addrees to use if you do not want to use your external IP.
+  region and specify an address to use if you do not want to use your external IP.
 
 
 ** Grid mode **
@@ -74,12 +74,12 @@ Checkout the 'Build Your Own.txt' file in the 'WhiteCoreDocs' folder for details
  if you want to build from source.
 Re-compile and copy/paste the new 'WhiteCoreSim/bin' subdirectory from your build environment.
 
-Weekly 'Development' build snapshots are available at the following address's..
+Weekly 'Development' build snapshots are available at the following links:
 
 Windows
 https://drive.google.com/file/d/0B2u55gI751a8VXJBckZJWU5rZ1E/edit?usp=sharing
 
-Mono 32 bit  (linux/Mac)
+Mono 32 bit  (Linux / Mac)
 https://drive.google.com/file/d/0B2u55gI751a8OEgtV0Q0Yk4wWEE/edit?usp=sharing
 
 Mono 64bit

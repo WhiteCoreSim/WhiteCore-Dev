@@ -29,7 +29,7 @@ with the option to build at the end.
 
 A large amount of compile information will be shown but when completed, 
 no errors should be indicated.
-NOTE:  Some warnings may be shown (36 at last count) but these do not present 
+NOTE:  Some warnings may be shown (37 at last count) but these do not present 
 any problem or prevent operation of the servers. 
 (These will be corrected and removed as time permits)
 
