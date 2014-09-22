@@ -1,4 +1,30 @@
-﻿using WhiteCore.Framework;
+﻿/*
+ * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org, http://opensimulator.org/
+ * See CONTRIBUTORS.TXT for a full list of copyright holders.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the WhiteCore-Sim Project nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ``AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.ModuleLoader;
 using WhiteCore.Framework.Modules;
@@ -30,10 +56,11 @@ namespace WhiteCore.Modules.Installer
 
         public void Start(IConfigSource config, IRegistryCore registry)
         {
-            MainConsole.Instance.Commands.AddCommand("compile module",
-                                                     "compile module <gui>",
-                                                     "Compiles and adds a given addon-module to WhiteCore, adding the gui parameter opens a file picker in Windows",
-                                                     consoleCommand, false, true);
+            MainConsole.Instance.Commands.AddCommand(
+                "compile module",
+                "compile module [module name] [--gui]",
+                "Compiles and adds a given addon-module to WhiteCore, adding the gui parameter opens a file picker in Windows",
+                consoleCommand, false, true);
         }
 
         public void FinishedStartup()
@@ -44,7 +71,29 @@ namespace WhiteCore.Modules.Installer
 
         private void consoleCommand(IScene scene, string[] commands)
         {
-            if (commands[2] == "gui")
+            bool useGUI = false;
+            string moduleName = "";
+
+            List<string> cmdparams = new List<string>(commands);
+            foreach (string param in commands)
+            {
+                if (param.StartsWith("--gui"))
+                {
+                    useGUI = true;
+                    cmdparams.Remove(param);
+                }
+            }
+
+            // check for provided user name
+            if (cmdparams.Count < 3)
+            {
+                MainConsole.Instance.Prompt ("Module to compile", moduleName);
+                if (moduleName == "")
+                    return;
+            }
+
+
+            if (useGUI)
             {
                 bool finished = false;
                 OpenFileDialog dialog = new OpenFileDialog
@@ -54,8 +103,7 @@ namespace WhiteCore.Modules.Installer
                                             };
                 System.Threading.Thread t = new System.Threading.Thread(delegate()
                                                                             {
-                                                                                if (dialog.ShowDialog() ==
-                                                                                    DialogResult.OK)
+                                                                                if (dialog.ShowDialog() == DialogResult.OK)
                                                                                 {
                                                                                     finished = true;
                                                                                 }
@@ -67,11 +115,23 @@ namespace WhiteCore.Modules.Installer
                 CompileModule(dialog.FileName);
             }
             else
-                CompileModule(commands[2]);
+               CompileModule(moduleName);
         }
 
         public void CompileModule(string fileName)
         {
+            // check for details
+            var modulePath = Path.GetDirectoryName (fileName);
+            if (!Directory.Exists (modulePath))
+            {
+                MainConsole.Instance.Error ("Invalid module path: " + modulePath);
+                return;
+            } else if (!File.Exists (fileName))
+            {
+                MainConsole.Instance.Error ("Unable to find the module " + fileName);
+                return;
+            }
+
             if (Path.GetExtension(fileName) == ".am")
                 ReadAMBuildFile(fileName);
             else if (Path.GetExtension(fileName) == ".dll")
@@ -81,6 +141,11 @@ namespace WhiteCore.Modules.Installer
             {
                 string tmpFile = Path.Combine(Path.GetDirectoryName(fileName),
                                               Path.GetFileNameWithoutExtension(fileName) + ".tmp.xml");
+                if (!File.Exists (tmpFile))
+                {
+                    MainConsole.Instance.Error ("Unable to find the module prebuild information: " + tmpFile);
+                    return;
+                }
                 ReadFileAndCreatePrebuildFile(tmpFile, fileName);
                 BuildCSProj(tmpFile);
                 CreateAndCompileCSProj(tmpFile, fileName, null);
