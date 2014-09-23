@@ -1,5 +1,5 @@
 ## Version details of libraries
-# Last updated:  April 8th 2014
+# Last updated:  September 15th 2014
 # Greythane / Fly-Man-
 
 Library															Version					Last updated			Origin
@@ -12,10 +12,10 @@ Community.CsharpSqlite.SQLiteClient.dll							3.7.7.1					08 Apr 2013
 Community.CsharpSqlite.dll										1.0.0.0					08 Apr 2013
 CookComputing.XmlRpcV2.dll										0.0.0.0					08 Apr 2013
 DotNetOpenId.dll												2.6.0.8354				10 Dec 2012
-DotNetOpenMail.dll												1.0.2335.38471			10 Dec 2012	(supposedly 0.5.8b)
+DotNetOpenMail.dll												1.0.2335.38471			10 Dec 2012				(Supposedly 0.5.8b)
 GlynnTucker.Cache.dll											1.0.0.0					10 Dec 2012
 Google.ProtocolBuffers.dll										1.0.0.0					10 Dec 2012
-MySql.Data.dll													6.3.6.0					10 Dec 2012
+MySql.Data.dll													6.5.4.0					08 Apr 2014
 Nini.dll														1.1.0.0					10 Dec 2012
 OpenMetaverse.Rendering.Meshmerizer.dll							0.0.0.0					24 Jun 2013				LibOMV
 OpenMetaverse.StructuredData.dll								0.0.0.0					24 Jun 2103				LibOMV
