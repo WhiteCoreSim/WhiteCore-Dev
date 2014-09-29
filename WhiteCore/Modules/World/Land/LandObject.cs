@@ -705,7 +705,8 @@ namespace WhiteCore.Modules.Land
             int ty = min_y*4;
             if (ty > (m_scene.RegionInfo.RegionSizeY - 1))
                 ty = (m_scene.RegionInfo.RegionSizeY - 1);
-            float min = heightmap != null ? heightmap[tx, ty] : 0;
+            float min;
+            min = heightmap == null ? 0 : heightmap [tx, ty];
             LandData.AABBMin =
                 new Vector3((min_x*4), (min_y*4),
                             min);
@@ -716,7 +717,7 @@ namespace WhiteCore.Modules.Land
             ty = max_y*4;
             if (ty > (m_scene.RegionInfo.RegionSizeY - 1))
                 ty = (m_scene.RegionInfo.RegionSizeY - 1);
-            min = heightmap != null ? heightmap[tx, ty] : 0;
+            min = heightmap == null ? 0 : heightmap[tx, ty];
             LandData.AABBMax =
                 new Vector3((max_x*4), (max_y*4),
                             min);
