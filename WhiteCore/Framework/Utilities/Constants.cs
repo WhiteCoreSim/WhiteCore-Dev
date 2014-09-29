@@ -41,6 +41,8 @@ namespace WhiteCore.Framework.Utilities
         public const string DEFAULT_OARARCHIVE_DIR = DEFAULT_DATA_DIR + "/OarFiles";
         public const string DEFAULT_USERINVENTORY_DIR = DEFAULT_DATA_DIR+"/UserArchives";
 
+        public const string DEFAULT_USERHTML_DIR = DEFAULT_DATA_DIR+"/html/";
+
         public const int RegionSize = 256;
         public const int RegionHeight = 10000;
         public const byte TerrainPatchSize = 16;

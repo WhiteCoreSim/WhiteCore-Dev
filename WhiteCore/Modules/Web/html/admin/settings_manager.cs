@@ -25,9 +25,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
 using WhiteCore.Framework.DatabaseInterfaces;
-using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using OpenMetaverse;
 using System.Collections.Generic;
@@ -71,6 +69,10 @@ namespace WhiteCore.Modules.Web
                 settings.WebRegistration = requestParameters["WebRegistration"].ToString() == "1";
                 settings.MapCenter.X = int.Parse(requestParameters["GridCenterX"].ToString());
                 settings.MapCenter.Y = int.Parse(requestParameters["GridCenterY"].ToString());
+                settings.LocalFrontPage = requestParameters["LocalFrontPage"].ToString();
+                if (settings.LocalFrontPage != "")
+                    settings.LocalFrontPage = "local/" + settings.LocalFrontPage;
+                settings.HideSlideshowBar = requestParameters["HideSlideshowBar"].ToString() == "1";
                 settings.HideLanguageTranslatorBar = requestParameters["HideLanguageBar"].ToString() == "1";
                 settings.HideStyleBar = requestParameters["HideStyleBar"].ToString() == "1";
                 connector.AddGeneric(UUID.Zero, "WebSettings", "Settings", settings.ToOSD());
@@ -93,6 +95,13 @@ namespace WhiteCore.Modules.Web
             vars.Add("WebRegistrationYes", settings.WebRegistration ? "selected=\"selected\"" : "");
             vars.Add("GridCenterX", settings.MapCenter.X);
             vars.Add("GridCenterY", settings.MapCenter.Y);
+            if (settings.LocalFrontPage.StartsWith("local/"))
+                vars.Add("LocalFrontPage", settings.LocalFrontPage.Remove(0,6));                // remove 'local/' prefix
+            else
+                vars.Add("LocalFrontPage", settings.LocalFrontPage);
+
+            vars.Add("HideSlideshowBarNo", !settings.HideSlideshowBar ? "selected=\"selected\"" : "");
+            vars.Add("HideSlideshowBarYes", settings.HideSlideshowBar ? "selected=\"selected\"" : "");
             vars.Add("HideLanguageBarNo", !settings.HideLanguageTranslatorBar ? "selected=\"selected\"" : "");
             vars.Add("HideLanguageBarYes", settings.HideLanguageTranslatorBar ? "selected=\"selected\"" : "");
             vars.Add("HideStyleBarNo", !settings.HideStyleBar ? "selected=\"selected\"" : "");
@@ -110,6 +119,8 @@ namespace WhiteCore.Modules.Web
             vars.Add("WebRegistrationText", translator.GetTranslatedString("WebRegistrationText"));
             vars.Add("GridCenterXText", translator.GetTranslatedString("GridCenterXText"));
             vars.Add("GridCenterYText", translator.GetTranslatedString("GridCenterYText"));
+            vars.Add("LocalFrontPageText", translator.GetTranslatedString("LocalFrontPageText"));
+            vars.Add("HideSlideshowBarText", translator.GetTranslatedString("HideSlideshowBarText"));
             vars.Add("HideLanguageBarText", translator.GetTranslatedString("HideLanguageBarText"));
             vars.Add("HideStyleBarText", translator.GetTranslatedString("HideStyleBarText"));
             vars.Add("Save", translator.GetTranslatedString("Save"));

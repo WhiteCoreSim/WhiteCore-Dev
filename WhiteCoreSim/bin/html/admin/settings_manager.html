@@ -53,6 +53,15 @@
       <td class="settings_manager_right"><input name="GridCenterY" type="text" id="GridCenterY" size="119" value="{GridCenterY}" /></td>
     </tr>
     <tr>
+      <td class="settings_manager_left"><p id="gridcentery_label">{HideSlideshowBarText}</p></td>
+      <td class="settings_manager_right">
+	    <select name="HideSlideshowBar" id="HideSlideshowBar">
+		  <option value="0" style="background-color:#FF0000" {HideSlideshowBarNo}>{No}</option>
+		  <option value="1" style="background-color:#00FF00" {HideSlideshowBarYes}>{Yes}</option>
+	    </select>
+	  </td>
+    </tr>
+    <tr>
       <td class="settings_manager_left"><p id="gridcentery_label">{HideLanguageBarText}</p></td>
       <td class="settings_manager_right">
 	    <select name="HideLanguageBar" id="HideLanguageBar">
@@ -71,8 +80,12 @@
 	  </td>
     </tr>
     <tr>
+      <td class="settings_manager_left"><p id="gridcenterx_label">{LocalFrontPageText}</p></td>
+      <td class="settings_manager_right"><input name="LocalFrontPage" type="text" id="LocalFrontPage" size="119" value="{LocalFrontPage}" /></td>
+    </tr>
+    <tr>
 	  <input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
-      <td class="settings_manager_right"><button id="Submit" type="Submit" name="Submit">{Save}</button></td>
+      <td class="settings_manager_right"><button id="Submit" type="Submit" name="Submit" style="width:100px;">{Save}</button></td>
     </tr>
   </tbody>
 </table>

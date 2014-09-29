@@ -969,6 +969,78 @@ position: relative;
 
 p.minitext {font: 14px/1 Ubuntu, sans-serif;color: #a6ac14;}
 
+/* Homescreen news */
+.homenews {
+	width: 300px%;
+	font-size: 12px;
+	background: transparent; /*url(../images/icons/bg_white_01.png); */
+	border: 1px solid transparent;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	-webkit-box-shadow: #1c557f 0 0 .5em;
+    -moz-box-shadow: #1c557f 0 0 .5em;
+    box-shadow: #1c557f 0 0 .5em;
+	float: right;
+}
+.localnews {
+	width: 65%;
+	font-size: 12px;
+	background: transparent url(../images/icons/bg_white_01.png); 
+	border: 1px solid transparent;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	-webkit-box-shadow: #1c557f 0 0 .5em;
+    -moz-box-shadow: #1c557f 0 0 .5em;
+    box-shadow: #1c557f 0 0 .5em;
+	/*padding: 10px;*/
+	height: 500px;	
+	float: left;
+}
+
+/* Homescreen sidebar */
+.homesidebar {
+	width: 300px;
+	font-size: 12px;
+	float: right;
+}
+
+/* Homescreen gridinfo */
+.homegrid {
+	width: 300px;
+	font-size: 12px;
+	background: transparent; /*url(../images/icons/bg_white_01.png); */
+	border: 1px solid transparent;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	-webkit-box-shadow: #1c557f 0 0 .5em;
+    -moz-box-shadow: #1c557f 0 0 .5em;
+    box-shadow: #1c557f 0 0 .5em;
+	/*padding: 10px;*/	
+	float: right;
+}
+
+/* Homescreen login */
+.homelogin {
+	width: 280px; 
+	font-size: 12px;
+	background: transparent; /*url(../images/icons/bg_white_01.png); */
+	border: 1px solid transparent;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	-webkit-box-shadow: #1c557f 0 0 .5em;
+    -moz-box-shadow: #1c557f 0 0 .5em;
+    box-shadow: #1c557f 0 0 .5em;
+	padding: 10px;	
+	float: right;
+}
+input#homelogin_input {
+	width: 160px;
+
+}
 /* World */
 #worldmap iframe.level1  {
 	border: 0px;
@@ -1165,6 +1237,7 @@ img#mainImage {
 	left: 10px; 
 	z-index: 1;
 }
+
 
 iframe.regionbox {width: 350px; height: 245px;}
 iframe.infobox {width: 350px; height: 105px;}

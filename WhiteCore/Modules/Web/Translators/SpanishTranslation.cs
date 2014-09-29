@@ -723,6 +723,10 @@
                 return "Barra de selección de idioma Ocultar";
             case "HideStyleBarText":
                 return "Ocultar barra de selección de estilo";
+            case "HideSlideshowBarText":
+                return "Bar diapositivas Ocultar";
+            case "LocalFrontPageText":
+                return "Primera página Local";
 
             }
             return "UNKNOWN CHARACTER";

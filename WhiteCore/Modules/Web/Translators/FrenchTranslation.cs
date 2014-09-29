@@ -724,7 +724,10 @@
                 return "Masquer la barre de sélection de la langue";
             case "HideStyleBarText":
                 return "Masquer la barre de sélection de style";
-
+            case "HideSlideshowBarText":
+                return "Masquer diaporama bar";
+            case "LocalFrontPageText":
+                return "Page d'accueil locale";
             }
             return "UNKNOWN CHARACTER";
         }

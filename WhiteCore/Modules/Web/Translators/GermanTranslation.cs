@@ -722,7 +722,10 @@
                 return "Sprachauswahlleiste ausblenden";
             case "HideStyleBarText":
                 return "Stil Auswahlleiste ausblenden";
-
+            case "HideSlideshowBarText":
+                return "Ausblenden Diashow bar";
+            case "LocalFrontPageText":
+                return "Lokale Titelseite";
             }
             return "UNKNOWN CHARACTER";
         }

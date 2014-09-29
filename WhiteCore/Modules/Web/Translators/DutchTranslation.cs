@@ -738,6 +738,10 @@ namespace WhiteCore.Modules.Web.Translators
                 return "Verbergen taalkeuzemenu";
             case "HideStyleBarText":
                 return "Verbergen stijl keuzebalk";
+            case "HideSlideshowBarText":
+                return "Verbergen slideshow bar";
+            case "LocalFrontPageText":
+                return "Lokale voorpagina";
             }
             return "UNKNOWN CHARACTER";
         }

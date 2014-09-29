@@ -25,12 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
 using WhiteCore.Framework.DatabaseInterfaces;
-using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using OpenMetaverse;
 using System.Collections.Generic;
+using WhiteCore.Framework.Services;
+using System;
 
 namespace WhiteCore.Modules.Web
 {
@@ -64,6 +64,39 @@ namespace WhiteCore.Modules.Web
             response = null;
             var vars = new Dictionary<string, object>();
 
+            // homescreen login
+            string error = "";
+            if (requestParameters.ContainsKey("username") && requestParameters.ContainsKey("password"))
+            {
+                string username = requestParameters["username"].ToString();
+                string password = requestParameters["password"].ToString();
+
+                ILoginService loginService = webInterface.Registry.RequestModuleInterface<ILoginService>();
+                if (loginService.VerifyClient(UUID.Zero, username, "UserAccount", password))
+                {
+                    UUID sessionID = UUID.Random();
+                    UserAccount account =
+                        webInterface.Registry.RequestModuleInterface<IUserAccountService>()
+                            .GetUserAccount(null, username);
+                    Authenticator.AddAuthentication(sessionID, account);
+                    if (account.UserLevel > 0)
+                        Authenticator.AddAdminAuthentication(sessionID, account);
+                    httpResponse.AddCookie(new System.Web.HttpCookie("SessionID", sessionID.ToString())
+                    {
+                        Expires = DateTime.MinValue,
+                        Path = ""
+                    });
+
+                    response = "<h3>Successfully logged in</h3>" +
+                        "<script language=\"javascript\">" +
+                        "setTimeout(function() {window.location.href = \"index.html\";}, 0);" +
+                        "</script>";
+                }
+                else
+                    response = "<h3>Failed to verify user name and password</h3>";
+                return null;
+            }
+
             // Tooltips Urls
             vars.Add("TooltipsWelcomeScreen", translator.GetTranslatedString("TooltipsWelcomeScreen"));
             vars.Add("TooltipsWorldMap", translator.GetTranslatedString("TooltipsWorldMap"));
@@ -74,6 +107,15 @@ namespace WhiteCore.Modules.Web
             vars.Add("HomeTextTips", translator.GetTranslatedString("HomeTextTips"));
             vars.Add("WelcomeScreen", translator.GetTranslatedString("WelcomeScreen"));
             vars.Add("WelcomeToText", translator.GetTranslatedString("WelcomeToText"));
+
+            // login
+            vars.Add("UserLogin", !Authenticator.CheckAuthentication(httpRequest));
+            vars.Add("ErrorMessage", error);
+            vars.Add("Login", translator.GetTranslatedString("Login"));
+            vars.Add("UserNameText", translator.GetTranslatedString("UserName"));
+            vars.Add("PasswordText", translator.GetTranslatedString("Password"));
+            vars.Add("ForgotPassword", translator.GetTranslatedString("ForgotPassword"));
+            vars.Add("Submit", translator.GetTranslatedString("Login"));
 
             IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector>();
             var settings = generics.GetGeneric<GridSettings>(UUID.Zero, "WebSettings", "Settings");
@@ -91,6 +133,21 @@ namespace WhiteCore.Modules.Web
                          translator.GetTranslatedString("DefaultsUpdated"));
             else
                 vars.Add("SettingsUpdateRequired", "");
+
+            vars.Add("ShowSlideshowBar", !settings.HideSlideshowBar);
+
+            // user setup news inclusion
+            if (settings.LocalFrontPage == "")
+            {
+                vars.Add ("LocalPage", false);
+                vars.Add ("LocalFrontPage", "");
+            }
+            else
+            {
+                vars.Add ("LocalPage", true);
+                vars.Add ("LocalFrontPage", settings.LocalFrontPage);
+            }
+
             return vars;
         }
 

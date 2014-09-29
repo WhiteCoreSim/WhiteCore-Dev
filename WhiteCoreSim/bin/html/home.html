@@ -30,45 +30,129 @@ $(function() {
 <a target="_blank" class='welcomescreen' href="welcomescreen/" alt="{TooltipsWelcomeScreen}" title="{TooltipsWelcomeScreen}">{WelcomeScreen}</a> |
 <a target="_blank" class='world_map' href="world_map.html" alt="{TooltipsWorldMap}" title="{TooltipsWorldMap}">{TooltipsWorldMap}</a></p>
 -->
+<!-- breadcrumbs -->
 <h2>{SystemName} &rarr; {HomeText}</h2> <!-- &rArr; -->
+<!-- Slideshow -->
+{IfShowSlideshowBarBegin}
 <div class="slideshow1">
 <div id="slide01" class="slide">
 	<img src="images/screenshots/welcome1.jpg" alt="test" />
 	<div class="text">
-	<p class=minitext>{WelcomeToText} {SystemName}</p>
-		<h1>WhiteCore-Sim<br />Web Interface</h1>
-		<p>driven by WhiteCore</p>
+		<p class=minitext>{WelcomeToText}</p>
+		<h1> {SystemName}</h1>
+		<p>powered by WhiteCore</p>
 	</div>
 </div>
 
 <div id="slide01" class="slide">
 	<img src="images/screenshots/welcome2.jpg" alt="test" />
 	<div class="text">
-	<p class=minitext>{WelcomeToText} {SystemName}</p>
-
-		<h1>WhiteCore-Sim<br />Web Interface</h1>
-	
-<p class="minitext">{HomeTextWelcome}</p>
+		<p class=minitext>{WelcomeToText} {SystemName}</p>
+		<h1>WhiteCore-Sim<br />Virtual Worlds</h1>
+		<p class="minitext">{HomeTextWelcome}</p>
 	</div>
 </div>
 
 <div id="slide01" class="slide">
-	<img src="images/screenshots/welcome3.jpg" alt="test" />
+	<img src="images/screenshots/welcomescreen.jpg" alt="test" />
 	<div class="text">
-	<p class=minitext>{WelcomeToText} {SystemName}</p>
-
-		<h1>WhiteCore-Sim<br />Web Interface</h1>
-	<p>{HomeTextTips}: <a target="_blank" class='welcomescreen' href="welcomescreen/" alt="{TooltipsWelcomeScreen}" title="{TooltipsWelcomeScreen}">{WelcomeScreen}</a></p>
+		<p class=minitext>{WelcomeToText} {SystemName}</p>
+		<h1>WhiteCore-Sim</h1><br/>
+		<p>Viewer Welcome Screen</p>
+		<!--
+		<p>{HomeTextTips}: <a target="_top" class='welcomescreen' href="welcomescreen/" alt="{TooltipsWelcomeScreen}" title="{TooltipsWelcomeScreen}">{WelcomeScreen}</a></p>
+		-->
 	</div>
 </div>
 
 <div id="slide01" class="slide">
-	<img src="images/screenshots/welcome4.jpg" alt="test" />
+	<img src="images/screenshots/worldmap.jpg" alt="worldmap" />
 	<div class="text">
-	<p class=minitext>{WelcomeToText} {SystemName}</p>
-
-		<h1>WhiteCore-Sim<br />Web Interface</h1>
-	<p>{HomeTextTips}: <a target="_blank" class='world_map' href="world_map.html" alt="{TooltipsWorldMap}" title="{TooltipsWorldMap}">{TooltipsWorldMap}</a></p>
+		<p class=minitext>{WelcomeToText} {SystemName}</p>
+		<h1>World Map</h1><br />
+		<!--
+		<p>{HomeTextTips}: <a target="_top" class='world_map' href="world_map.html" alt="{TooltipsWorldMap}" title="{TooltipsWorldMap}">{TooltipsWorldMap}</a></p>
+		-->
 	</div>
 </div>
 </div>
+{IfShowSlideshowBarEnd}
+
+<!-- news or user info -->
+
+{IfLocalPageBegin}
+<div class="localnews">
+	<iframe  src={LocalFrontPage} style="height:100%;width:100%;display:inline-block;"></iframe>
+</div>
+{IfLocalPageEnd}
+
+
+
+<div class="homesidebar">
+<!-- user login form -->
+{IfUserLoginBegin}
+  <div class=homelogin>
+    <div id="error_message" class="error_message"><h3>{ErrorMessage}</h3></div>
+	<form action="login.html" id="login_form" method="POST">
+	<table id="login">
+  		<caption></caption>
+  
+  		<thead>
+    		<tr>
+      			<th class="login_left"></th>
+      			<th><h2>User Login</h2></th>
+    		</tr>
+  		</thead>
+  
+  		<tfoot>
+    		<tr>
+      			<th class="login_left"></th>
+      			<th class="login_right"></th>
+    		</tr>
+  		</tfoot>
+
+  		<tbody>
+    		<tr>
+      			<td class="login_left"><p id="logname_label">{UserNameText}*</p></td>
+      			<td class="login_right"><input require="true" label="username" id="homelogin_input" name="username" type="text"/></td>
+    		</tr>
+    		<tr>
+      			<td class="login_left"><p id="password_label">{PasswordText}*</p></td>
+      			<td class="login_right"><input require="true" label="password" id="homelogin_input" type="password" name="password" /></td>
+    		</tr>
+    		<tr>
+      			<td class="login_left"><a href="index.html?page=forgot_pass"><p>{ForgotPassword}</p></a></td>
+      			<td class="login_right"><button id="login_bouton" type="Submit" name="Submit" value="Submit">{Submit}</button></td>
+    		</tr>
+  		</tbody>
+	</table>
+	</form>
+	<script>
+  		/* attach a submit handler to the form */
+  		$("#login_form").submit(function(event) {
+
+    	/* stop form from submitting normally */
+    	event.preventDefault(); 
+    	/* get some values from elements on the page: */
+    	var $form = $( this ),
+        	url = $form.attr( 'action' );
+    	/* Send the data using post and put the results in a div */
+    	$.post( url, $form.serialize(),
+      		function( data ) {
+				$("#error_message").empty().append(data);
+      		}
+    	);
+  		});
+	</script>
+	</div>
+{IfUserLoginEnd}
+
+
+	<!-- grid info -->
+	<div class=homegrid>
+		<iframe class="gridstatus" src="welcomescreen/gridstatus.html" scrolling="no" style="overflow:hidden;width:300px;float:right;"></iframe>
+	</div>
+	<div class=homenews>
+		<iframe class="news" src="welcomescreen/news.html" scrolling="no" style="overflow:hidden;width:300px;"></iframe>
+	</div>
+<div>

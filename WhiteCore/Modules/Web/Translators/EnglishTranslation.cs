@@ -739,6 +739,10 @@
                     return "Hide Language Selection Bar";
                 case "HideStyleBarText":
                     return "Hide Style Selection Bar";
+            case "HideSlideshowBarText":
+                return "Hide Slideshow Bar";
+            case "LocalFrontPageText":
+                return "Local front page";
             }
             return "UNKNOWN CHARACTER";
         }

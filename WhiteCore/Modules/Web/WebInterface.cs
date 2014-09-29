@@ -550,17 +550,25 @@ namespace WhiteCore.Modules.Web
                 if (filePath[filePath.Length - 1] == '/')
                     filePath = filePath + "index.html";
 
-                string file = Path.Combine("html/", filePath);
-                if (!Path.GetFullPath(file).StartsWith(Path.GetFullPath("html/")))
+                string file;
+                if (filePath.StartsWith("local/"))                      // local included files 
                 {
-                    return "html/index.html";
+                    file = Constants.DEFAULT_USERHTML_DIR+filePath.Remove(0,6);
                 }
-                if (Path.GetFileName(file) == "")
-                    file = Path.Combine(file, "index.html");
-
-                if (query.ContainsKey("page") && _pages.ContainsKey("html/" + query["page"].ToString() + ".html"))
+                else                                                    // 'normal' page processing
                 {
-                    file = _pages["html/" + query["page"].ToString() + ".html"].FilePath[0];
+                    file = Path.Combine("html/", filePath);
+                    if (!Path.GetFullPath(file).StartsWith(Path.GetFullPath("html/")))
+                    {
+                        return "html/index.html";
+                    }
+                    if (Path.GetFileName(file) == "")
+                        file = Path.Combine(file, "index.html");
+
+                    if (query.ContainsKey("page") && _pages.ContainsKey("html/" + query["page"].ToString() + ".html"))
+                    {
+                        file = _pages["html/" + query["page"].ToString() + ".html"].FilePath[0];
+                    }
                 }
                 if (!File.Exists(file))
                 {
@@ -999,6 +1007,8 @@ namespace WhiteCore.Modules.Web
         public bool HideStyleBar = false;
         public UUID DefaultScopeID = UUID.Zero;
         public bool WebRegistration = false;
+        public bool HideSlideshowBar = false;
+        public string LocalFrontPage = "local/frontpage.html";
 
         public GridSettings()
         {
@@ -1018,6 +1028,8 @@ namespace WhiteCore.Modules.Web
             HideStyleBar = map["HideStyleBar"];
             DefaultScopeID = map["DefaultScopeID"];
             WebRegistration = map["WebRegistration"];
+            HideSlideshowBar = map["HideSlideshowBar"];
+            LocalFrontPage = map["LocalFrontPage"];
         }
 
         public override OSDMap ToOSD()
@@ -1031,6 +1043,8 @@ namespace WhiteCore.Modules.Web
             map["HideStyleBar"] = HideStyleBar;
             map["DefaultScopeID"] = DefaultScopeID;
             map["WebRegistration"] = WebRegistration;
+            map["HideSlideshowBar"] = HideSlideshowBar;
+            map["LocalFrontPage"] = LocalFrontPage;
 
             return map;
         }
