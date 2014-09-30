@@ -80,7 +80,7 @@
     AssetHandlerUseCache = false
 
     ;; Optional handlers
-    ;; If the do not exist in your configuration they will not be used :)
+    ;; If these do not exist in your configuration they will not be used :)
     FreeswitchInHandler = FreeswitchServerConnector
     FreeSwitchHandler = FreeswitchService
 
