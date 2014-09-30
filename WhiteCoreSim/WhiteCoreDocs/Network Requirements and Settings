@@ -1,0 +1,96 @@
+
+#
+# Introduction
+#
+These are the ports that WhiteCore must have access to for correct operation.
+If public access is required then the external IP address of the host installation, and the ports specified below, must be accessible through a firewall or router. A separate document "Network Configuration Windows.txt" has details of what is required.
+NOTE: In some cases these ports may already be used by an existing service. If this is so, you will have problems running and connecting to your WhiteCore simulator.
+
+
+#
+# Regions  (Standalone & Grid)
+#
+The usual port for the first region is 9000, with each region requiring its own port (usually then 9001, 9002, etc.). However, any other set of ports can also be configured.
+The region simulator HTTP port needs to be available for viewer <-> simulator communication mechanisms (e.g. capabilities).
+
+##  TCP ports  ##
+TCP/9000 - Default region starting port (Shared with messaging services)
+TCP/9xxx - Suggested ports for additional regions (eg 9001, 9002 etc)
+
+##  UDP Ports ##
+UDP/9000-9xxx
+Each configured region also uses the corresponding UPD port to the configured TCP port for the region.
+This UDP port needs to be accessible for UDP traffic from the viewer (to exchange movement data, object information, etc.).  
+
+
+#
+# Standalone Operation
+#
+# WhiteCore Standalone mode - Networking (Version 0.9.2)
+
+##  IP Address  ##
+The base IP address is specified by the "HostName" entry in the [Network] section of WhiteCore.ini. If 'commented out', then a search for the external IP address of the host system will be carried out and used.  If configured, i.e. HostName=127.0.0.1, this will be used instead of the the external IP address.
+
+##  TCP Ports  ##
+TCP/9000 - All Standalone messaging, Asset, Inventory, Grid services
+TCP/9xxx - Default region ports ( Port 9000 is shared with messaging services)
+TCP/3306 - Default port for the MySql server (If used)
+
+## TCP/9000 (Default)  ##
+The http_listener_port configured in the [Network] section of WhiteCore.ini needs to be accessible by your intended viewer clients. If access from systems other than the install system is required, this must be externally accessable. 
+In standalone mode this provides
+ - HTTP access to the simulator (needed for the capabilities protocol, amongst other things.
+ - HTTP access to public services, such as as login.
+In standalone mode, no private service port is exposed since all simulator to service communication occurs internally within the WhiteCore.exe process.
+
+#
+# Grid Operation
+#
+# WhiteCore Grid - Ports for Grid Services (Version 0.9.2)
+
+##  IP Address  ##
+The base IP address is specified by the "HostName" entry in the [Network] section of WhiteCore.Server.ini. If 'commented out', then a search for the external IP address of the host system will be carried out and used.  If configured, i.e. HostName=127.0.0.1, this will be used instead of the the external IP address.
+
+##  TCP Ports  ##  (Note: Unallocated ports may be used for additional services in the future)
+TCP/8002 - Information, Login and WebUI Services
+TCP/8003 - Messaging services
+TCP/8004 - Freeswitch Voice Services (Proposed)
+TCP/8005 -     [ Not used - Reserved (Apache Tomcat shutdown port) ]
+TCP/8006 - HyperGrid services (When implemented)
+TCP/8007 - HyperGrid Instant Messaging services (When implemented)
+TCP/8008 - RegAPI service (If used)
+TCP/8009 - Currency services
+TCP/8010 - Asset Services
+TCP/8011 - Avatar services
+TCP/8012 - Grid Server (Maps)
+TCP/8013 - Inventory Services
+TCP/3306 - Default port for the MySql server (If used)
+
+## TCP/8002 ##
+The main http_listener port providing the main information and login services are all served on the public port 8002. 
+These needs to be accessible by external viewers.
+Additional private services, asset, inventory, etc., listen on separate ports which, by default, should not need to be made accessible to viewers (i.e. they should be blocked by the firewall from external access).
+
+#
+# Optional and Add-on Module Specific Ports
+#
+
+## FreeSWITCH Voice  ##
+
+ TCP/UDP  5060 - SIP Ports (5060 for default call profile)
+ TCP/UDP 50505 - Echo service
+ TCP/UDP  1720 - H.323 ports for call setup
+More details on the Freeswitch ports used and firewall configuration details are at:
+Freeswitch Module#Firewall Config
+http://wiki.freeswitch.org/wiki/Firewall
+
+
+##  Mumble/Murmur Voice  ##
+
+ TCP/6502 - SIP Ports
+ TCP/6503 - ICE Ports
+
+##  XMLPRC  ##
+If you have XMLRPC active for in-world scripts (http://wiki.secondlife.com/wiki/Category:LSL_XML-RPC) (not active by default), then you will also need to make the XmlRpcPort configured in the [XMLRPC] section of Scripting.ini (Config/Sim/Scripting) accessible by external systems. 
+TCP/20800 - XMLRPC in-world script access
+

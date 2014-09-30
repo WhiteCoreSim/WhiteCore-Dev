@@ -1,11 +1,24 @@
-I wanted my grid to run locally on my internal network ip address. To do this…
+To run WhiteCore in Grid mode on your local, internal network ip address, you need to specify the HostName address for both the Grid and region server.
 
-Using 10.0.1.5 as the example local IP, but you should change it to your own, if it's different.
+Using 10.0.1.5 as the example local IP, but you should change it to your own, if it's different (e.g 192.168.0.100 etc.).
 
-Grid Mode:
+#
+# Grid Configuration:
+#
 
-Make sure it says HostName = 10.0.1.5 under [Network] section in the WhiteCore.Server.ini, WhiteCore.ServerBase.ini and WhiteCore.ini files.
+Set the HostName under the [Network] section in the WhiteCore.Server.ini, removing the 'comment' character if necessary.
+e.g. HostName = 10.0.1.5
 
-Local Grid only: 
+#
+# Local Region server only: 
+#
 
-Make sure it says HostName = 10.0.1.5 under [Network] section in the WhiteCore.ini file.
+Set the HostName under the [Network] section in WhiteCore.ini, removing the 'comment' character if necessary.
+e.g. HostName = 10.0.1.5
+
+Specify grid mode operation in Config/Sim/Main.ini by commenting the Includes-Standalone and uncommenting the Includes-Grid lines
+
+e.g.
+    ;Include-Standalone = Sim/Standalone/StandaloneCommon.ini
+
+    Include-Grid = Sim/Grid/GridCommon.ini

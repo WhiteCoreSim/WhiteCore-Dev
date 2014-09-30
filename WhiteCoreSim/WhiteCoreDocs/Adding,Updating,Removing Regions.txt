@@ -1,5 +1,10 @@
 Adding, Updating, and Removing Regions
 
+Additional regions may be configured on the region server (Whitecore.exe) using the "create region" command.
+  This will create and add a new region using the resources currently available.
+  
+If you wish to keep the region resources separate, you can add another region 'instance'.
+ 
 How to add another region in grid mode:
 
     To add another region, you'll have to copy the bin folder to another location, making sure to remove the
