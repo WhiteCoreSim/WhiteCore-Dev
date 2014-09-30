@@ -90,5 +90,5 @@ if ${BUILD:=true} ; then
   xbuild /property:Configuration="$CONFIG" /property:Platform="$ARCH"
   echo Finished Building WhiteCore
   echo Thank you for choosing WhiteCore-Sim
-  echo Please report any errors to our Mantis Bug Tracker http://mantis.WhiteCore-sim.org/
+  echo Please report any errors to our Github Issue Tracker https://github.com/WhiteCoreSim/WhiteCore-Dev/issues
 fi
