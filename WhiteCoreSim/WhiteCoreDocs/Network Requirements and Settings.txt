@@ -34,6 +34,7 @@ The base IP address is specified by the "HostName" entry in the [Network] sectio
 ##  TCP Ports  ##
 TCP/9000 - All Standalone messaging, Asset, Inventory, Grid services
 TCP/9xxx - Default region ports ( Port 9000 is shared with messaging services)
+TCP/8012 - Map server
 TCP/3306 - Default port for the MySql server (If used)
 
 ## TCP/9000 (Default)  ##

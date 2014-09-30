@@ -46,7 +46,7 @@ namespace WhiteCore.Services
 {
     public class MapService : IService, IMapService
     {
-        private uint m_port = 8005;
+        private uint m_port = 8012;
         private IHttpServer m_server;
         private IRegistryCore m_registry;
         private bool m_enabled = false;
