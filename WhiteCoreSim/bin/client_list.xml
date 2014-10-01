@@ -121,5 +121,4 @@
 <key>e46e7c2b-1de3-5347-db43-42ee4e1f5bf2</key><map><key>name</key><string>Vos</string><key>color</key><array><real>0.70588235294118</real><real>0.70588235294118</real><real>0.70588235294118</real><real>1</real></array></map>
 <key>697e702f-29e2-2a31-8dcd-b53f5c25a27c</key><map><key>name</key><string>Milkshake</string><key>color</key><array><real>0.74509803921569</real><real>0.63137254901961</real><real>0.52549019607843</real><real>1</real></array></map>
 <key>209749b0-58dc-11e0-80e3-0800200c9a66</key><map><key>name</key><string>Second Life: The Movie</string><key>color</key><array><real>0</real><real>0.3921568627451</real><real>0.3921568627451</real><real>1</real></array></map>
-
 <key>isComplete</key><boolean>true</boolean></map></llsd>
