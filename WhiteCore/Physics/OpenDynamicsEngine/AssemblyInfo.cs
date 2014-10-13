@@ -55,4 +55,3 @@ using System.Runtime.InteropServices;
 // numbers with the '*' character (the default):
 
 [assembly: AssemblyVersion("0.9.3.*")]
-[assembly: AssemblyFileVersion("0.9.3.*")]
