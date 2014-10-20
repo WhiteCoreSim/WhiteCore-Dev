@@ -74,7 +74,8 @@ namespace Simple.Currency
             UserAccount user = userService.GetUserAccount(null, userid);
             if (user == null) return null;
             if ((m_options.StipendsPremiumOnly) && ((user.UserFlags & Constants.USER_FLAG_MEMBER) != Constants.USER_FLAG_MEMBER)) return null;
-
+            // Don't set a StipendPayment for System Users
+            if (user.PrincipalID == (UUID) Constants.RealEstateOwnerUUID || user.PrincipalID == (UUID)Constants.LibraryOwner) return null;
             SchedulerItem i = m_scheduler.Get(user.PrincipalID.ToString(), "StipendsPayout");
             if (i != null) return null;
             RepeatType runevertype = (RepeatType)Enum.Parse(typeof(RepeatType), m_options.StipendsEveryType);
