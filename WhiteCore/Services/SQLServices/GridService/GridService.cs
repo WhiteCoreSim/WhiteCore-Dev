@@ -193,11 +193,10 @@ namespace WhiteCore.Services.SQLServices.GridService
                                                          "Disallows new regions to be registered with the grid",
                                                          HandleRegionRegistration, false, true);
 
-                MainConsole.Instance.Commands.AddCommand(
-                    "show grid",
-                    "show grid",
-                    "Show details of the grid regions",
-                    HandleShowGrid, false, true);
+                MainConsole.Instance.Commands.AddCommand("show full grid",
+            	                                         "show full grid",
+            	                                         "Show details of the grid regions",
+            	                                         HandleShowFullGrid, false, true);
 
             }
             registry.RegisterModuleInterface<IGridService>(this);
@@ -946,7 +945,7 @@ namespace WhiteCore.Services.SQLServices.GridService
         }
 
 
-        private void HandleShowGrid(IScene scene, string[] cmd)
+        private void HandleShowFullGrid(IScene scene, string[] cmd)
         {
 
             List<GridRegion> regions = GetRegionsByName(null, "", null,null);
