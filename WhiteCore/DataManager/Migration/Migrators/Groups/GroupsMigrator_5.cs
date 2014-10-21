@@ -44,7 +44,96 @@ namespace WhiteCore.DataManager.Migration.Migrators.Groups
             MigrationName = "Groups";
             
             schema = new List<SchemaDefinition>();
-            
+
+            // existing tables
+            AddSchema("group_agent", ColDefs(
+                ColDef("AgentID", ColumnTypes.String50),
+                ColDef("ActiveGroupID", ColumnTypes.String50)
+            ), IndexDefs(
+                IndexDef(new string[1] {"AgentID"}, IndexType.Primary)
+            ));
+
+            AddSchema("group_data", ColDefs(
+                ColDef("GroupID", ColumnTypes.String50),
+                ColDef("Name", ColumnTypes.String50),
+                ColDef("Charter", ColumnTypes.Text),
+                ColDef("InsigniaID", ColumnTypes.String50),
+                ColDef("FounderID", ColumnTypes.String50),
+                ColDef("MembershipFee", ColumnTypes.String50),
+                ColDef("OpenEnrollment", ColumnTypes.String50),
+                ColDef("ShowInList", ColumnTypes.String50),
+                ColDef("AllowPublish", ColumnTypes.String50),
+                ColDef("MaturePublish", ColumnTypes.String50),
+                ColDef("OwnerRoleID", ColumnTypes.String50)
+            ), IndexDefs(
+                IndexDef(new string[1] {"GroupID"}, IndexType.Primary),
+                IndexDef(new string[1] {"Name"}, IndexType.Unique)
+            ));
+
+            AddSchema("group_invite", ColDefs(
+                ColDef("InviteID", ColumnTypes.String50),
+                ColDef("GroupID", ColumnTypes.String50),
+                ColDef("RoleID", ColumnTypes.String50),
+                ColDef("AgentID", ColumnTypes.String50),
+                ColDef("TMStamp", ColumnTypes.String50),
+                ColDef("FromAgentName", ColumnTypes.String50)
+            ), IndexDefs(
+                IndexDef(new string[4] {"InviteID", "GroupID", "RoleID", "AgentID"},
+                    IndexType.Primary),
+                IndexDef(new string[2] {"AgentID", "InviteID"}, IndexType.Index)
+            ));
+
+            AddSchema("group_membership", ColDefs(
+                ColDef("GroupID", ColumnTypes.String50),
+                ColDef("AgentID", ColumnTypes.String50),
+                ColDef("SelectedRoleID", ColumnTypes.String50),
+                ColDef("Contribution", ColumnTypes.String45),
+                ColDef("ListInProfile", ColumnTypes.String45),
+                ColDef("AcceptNotices", ColumnTypes.String45)
+            ), IndexDefs(
+                IndexDef(new string[2] {"GroupID", "AgentID"}, IndexType.Primary),
+                IndexDef(new string[1] {"AgentID"}, IndexType.Index)
+            ));
+
+            AddSchema("group_notice", ColDefs(
+                ColDef("GroupID", ColumnTypes.String50),
+                ColDef("NoticeID", ColumnTypes.String50),
+                ColDef("Timestamp", ColumnTypes.String50),
+                ColDef("FromName", ColumnTypes.String255),
+                ColDef("Subject", ColumnTypes.String255),
+                ColDef("Message", ColumnTypes.Text),
+                ColDef("HasAttachment", ColumnTypes.String50),
+                ColDef("ItemID", ColumnTypes.String50),
+                ColDef("AssetType", ColumnTypes.String50),
+                ColDef("ItemName", ColumnTypes.String50)
+            ), IndexDefs(
+                IndexDef(new string[3] {"GroupID", "NoticeID", "Timestamp"},
+                    IndexType.Primary)
+            ));
+
+            AddSchema("group_role_membership", ColDefs(
+                ColDef("GroupID", ColumnTypes.String50),
+                ColDef("RoleID", ColumnTypes.String50),
+                ColDef("AgentID", ColumnTypes.String50)
+            ), IndexDefs(
+                IndexDef(new string[3] {"GroupID", "RoleID", "AgentID"},
+                    IndexType.Primary),
+                IndexDef(new string[2] {"AgentID", "GroupID"}, IndexType.Index)
+            ));
+
+            AddSchema("group_roles", ColDefs(
+                ColDef("GroupID", ColumnTypes.String50),
+                ColDef("RoleID", ColumnTypes.String50),
+                ColDef("Name", ColumnTypes.String255),
+                ColDef("Description", ColumnTypes.String255),
+                ColDef("Title", ColumnTypes.String255),
+                ColDef("Powers", ColumnTypes.String50)
+            ), IndexDefs(
+                IndexDef(new string[2] {"GroupID", "RoleID"}, IndexType.Primary),
+                IndexDef(new string[1] {"RoleID"}, IndexType.Index)
+            ));
+
+            // new tables
             AddSchema("group_proposals", ColDefs(
             	ColDef("GroupID", ColumnTypes.String50),
             	ColDef("Duration", ColumnTypes.Integer11),
