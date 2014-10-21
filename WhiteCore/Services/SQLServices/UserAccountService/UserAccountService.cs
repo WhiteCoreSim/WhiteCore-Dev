@@ -238,6 +238,28 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                                new[] {"FirstName", "LastName"},
                                new[] {firstName, lastName});
 
+            //try for different capitalization if needed
+            if (d.Length < 1)
+            {
+               // try first character capitals
+                firstName = char.ToUpper (firstName [0]) + firstName.Substring(1);
+
+                d = m_Database.Get (scopeIDs,
+                    new[] {"FirstName", "LastName"},
+                    new[] {firstName, lastName});
+
+                if (d.Length < 1)
+                {
+                    // try last name as well
+                    lastName = char.ToUpper (lastName [0]) + lastName.Substring (1);
+
+                    d = m_Database.Get (scopeIDs,
+                        new[] {"FirstName", "LastName"},
+                        new[] {firstName, lastName});
+                }
+
+            }
+
             if (d.Length < 1)
                 return null;
 
@@ -276,6 +298,32 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             d = m_Database.Get(scopeIDs,
                                new[] {"Name"},
                                new[] {name});
+
+            //try for different capitalization if needed
+            if (d.Length < 1)
+            {
+                var newName = name.Split (' ');
+                var fName = newName [0];
+                var lName = newName [1];
+  
+                // try first character capitals
+                fName = char.ToUpper (fName [0]) + fName.Substring(1);
+
+                d = m_Database.Get (scopeIDs,
+                    new[] { "Name" },
+                    new[] { fName + " " + lName });
+
+                if (d.Length < 1)
+                {
+                    // try last name as well
+                    lName = char.ToUpper (lName [0]) + lName.Substring (1);
+
+                    d = m_Database.Get (scopeIDs,
+                        new[] { "Name" },
+                        new[] { fName + " " + lName });
+                }
+
+            }
 
             if (d.Length < 1)
             {
@@ -942,6 +990,13 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 ulNames.Reset ();
             }
 
+            // we have the name so check to make sure it is allowed
+            UserAccount ua = GetUserAccount(null, userName);
+            if (ua != null)
+            {
+                MainConsole.Instance.WarnFormat("[USER ACCOUNT SERVICE]: This user, '{0}' already exists!", userName);
+                return;
+            }
 
             // password as well?
             password = cmdparams.Count < 5 ? MainConsole.Instance.PasswordPrompt("Password") : cmdparams[4];
@@ -994,18 +1049,12 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 scopeID = MainConsole.Instance.Prompt("Scope (Don't change unless you know what this is)", scopeID);
             }
 
-            // check to make sure
-            UserAccount ua = GetUserAccount(null, userName);
-            if (ua != null)
-            {
-                MainConsole.Instance.WarnFormat("[USER ACCOUNT SERVICE]: This user, '{0}' already exists!", userName);
-                return;
-            }
-
+            // we should be good to go
             CreateUser(UUID.Parse(uuid), UUID.Parse(scopeID), userName, Util.Md5Hash(password), email);
             // CreateUser will tell us success or problem
             //MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: User '{0}' created", name);
 
+            // check for success
             UserAccount account = GetUserAccount(null, userName);
             if (account != null)
             {
@@ -1028,7 +1077,9 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     profile.IsNewUser = true;
                     m_profileConnector.UpdateUserProfile (profile);
                 }
-            }
+            } else
+                MainConsole.Instance.WarnFormat("[USER ACCOUNT SERVICE]: There was a problem creating the account for '{0}'", userName);
+
         }
 
         /// <summary>
