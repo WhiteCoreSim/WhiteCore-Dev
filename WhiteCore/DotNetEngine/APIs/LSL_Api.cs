@@ -10112,6 +10112,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 return new LSL_String("1");
             if (name == "dynamic_pathfinding")
                 return new LSL_String("disabled");
+            if (name == "estate_id")
+                return new LSL_String(World.RegionInfo.EstateSettings.EstateID.ToString());
             return "";
         }
 
