@@ -1257,7 +1257,7 @@ namespace WhiteCore.Modules.Terrain
                     lock (m_scene)
                     {
 						MainConsole.Instance.Info("[TERRAIN]: Loading "+filename+" to "+m_scene.RegionInfo.RegionName);
-                        ITerrainChannel channel = loader.LoadFile(filename, offsetX, offsetY,
+                        ITerrainChannel channel = loader.LoadFile(filename, m_scene, offsetX, offsetY,
                                                                         fileWidth, fileHeight,
                                                                         m_scene.RegionInfo.RegionSizeX,
                                                                         m_scene.RegionInfo.RegionSizeY);
@@ -1598,7 +1598,8 @@ namespace WhiteCore.Modules.Terrain
 
         private void InterfaceLoadTileFile(IScene scene, string[] cmd)
         {
-			if (cmd.Length < 7)
+
+            if (cmd.Length < 7)
 			{
 				MainConsole.Instance.Info(
 					"You do not have enough parameters. Please look at 'terrain help' for more info.");
@@ -1609,16 +1610,31 @@ namespace WhiteCore.Modules.Terrain
 				return;
 			}
 
-			List<TerrainModule> m = FindModuleForScene(MainConsole.Instance.ConsoleScene);
+            var fileWidth = int.Parse (cmd [3]);
+            var fileHeight = int.Parse (cmd [4]);
+            var xOffset = int.Parse (cmd [5]);
+            var yOffset = int.Parse (cmd [6]);
+
+            if ((fileWidth < scene.RegionInfo.RegionSizeX) ||
+                (fileHeight < scene.RegionInfo.RegionSizeY))
+            {
+                MainConsole.Instance.Info ("The region is larger than the image size!");
+                return;
+            }
+
+            if ( ((fileWidth+xOffset)  < scene.RegionInfo.RegionSizeX) ||
+                 ((fileHeight+yOffset) < scene.RegionInfo.RegionSizeY) )
+            {
+                MainConsole.Instance.Info ("The region will not fit into the image given the offsets provided!");
+                return;
+            }
+
+            List<TerrainModule> m = FindModuleForScene(MainConsole.Instance.ConsoleScene);
 			foreach (TerrainModule tmodule in m)
             {
 				MainConsole.Instance.Info("[TERRAIN]: Loading "+cmd[2]+" tile to scene "+tmodule.m_scene.RegionInfo.RegionName);
-            	tmodule.LoadFromFile(cmd[2],
-                                    int.Parse(cmd[3]),
-                                    int.Parse(cmd[4]),
-                                    int.Parse(cmd[5]),
-                                    int.Parse(cmd[6]));
-					}
+                tmodule.LoadFromFile (cmd [2], fileWidth, fileHeight, xOffset, yOffset);
+			}
         }
 
         private void InterfaceSaveFile(IScene scene, string[] cmd)
@@ -2043,9 +2059,10 @@ namespace WhiteCore.Modules.Terrain
                 supportedFileExtensions);
 
             MainConsole.Instance.Info(
-                "terrain load-tile <file width> <file height> <minimum X tile> <minimum Y tile> - Loads a terrain from a section of a larger file. " +
-                "\n file width: The width of the file in tiles" +
-                "\n file height: The height of the file in tiles" +
+                "terrain load-tile <file width> <file height> <minimum X tile> <minimum Y tile>\n" +
+                "     - Loads a terrain from a section of a larger file.\n" +
+                "\n file width: The width of the file image" +
+                "\n file height: The height of the file image" +
                 "\n minimum X tile: The X region coordinate of the first section on the file" +
                 "\n minimum Y tile: The Y region coordinate of the first section on the file");
 
@@ -2134,9 +2151,9 @@ namespace WhiteCore.Modules.Terrain
                 MainConsole.Instance.Commands.AddCommand (
                     "terrain load-tile",
                     "terrain load-tile <file width> <file height> <minimum X tile> <minimum Y tile>",
-                    "Loads a terrain from a section of a larger file. " +
-                    "\n file width: The width of the file in tiles" +
-                    "\n file height: The height of the file in tiles" +
+                    "Loads a terrain from a section of a larger file." +
+                    "\n file width: The width of the file image" +
+                    "\n file height: The height of the file image" +
                     "\n minimum X tile: The X region coordinate of the first section on the file" +
                     "\n minimum Y tile: The Y region coordinate of the first section on the file",
                     InterfaceLoadTileFile, true, false);

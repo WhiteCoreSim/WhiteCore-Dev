@@ -62,10 +62,10 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
         /// <returns>A terrain channel generated from the image.</returns>
         public virtual ITerrainChannel LoadFile(string filename, IScene scene)
         {
-            return LoadBitmap(new Bitmap(filename));
+            return LoadBitmap(new Bitmap(filename), scene);
         }
 
-        public ITerrainChannel LoadFile(string filename, int x, int y, int fileWidth, int fileHeight, int w, int h)
+        public ITerrainChannel LoadFile(string filename,  IScene scene, int x, int y, int fileWidth, int fileHeight, int w, int h)
         {
             // [[THEMAJOR]] Some work on tile loading..
             // terrain load-tile Tile.png 5 5 10000 10050
@@ -77,9 +77,9 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
             int xoffset = w*x;
             int yoffset = h*(fileHeight - y);
 
-            //MainConsole.Instance.DebugFormat(
-            //    "[TERRAIN]: Loading tile {0},{1} (offset {2},{3}) from tilemap size of {4},{5}",
-            //    x, y, xoffset, yoffset, fileWidth, fileHeight);
+            MainConsole.Instance.DebugFormat(
+                "[TERRAIN]: Loading tile {0},{1} (offset {2},{3}) from tilemap size of {4},{5}",
+                x, y, xoffset, yoffset, fileWidth, fileHeight);
 
             Rectangle tileRect = new Rectangle(xoffset, yoffset, w, h);
             PixelFormat format = tilemap.PixelFormat;
@@ -102,12 +102,12 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
                 tilemap.Dispose();
             }
 
-            return LoadBitmap(cloneBitmap);
+            return LoadBitmap(cloneBitmap, scene);
         }
 
         public virtual ITerrainChannel LoadStream(Stream stream, IScene scene)
         {
-            return LoadBitmap(new Bitmap(stream));
+            return LoadBitmap(new Bitmap(stream), scene);
         }
 
         /// <summary>
@@ -136,9 +136,9 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
 
         #endregion
 
-        protected virtual ITerrainChannel LoadBitmap(Bitmap bitmap)
+        protected virtual ITerrainChannel LoadBitmap(Bitmap bitmap, IScene scene)
         {
-            ITerrainChannel retval = new TerrainChannel(bitmap.Width, bitmap.Height, null);
+            ITerrainChannel retval = new TerrainChannel(bitmap.Width, bitmap.Height, scene);
 
 			int x;
 			int y;
@@ -146,9 +146,7 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
 			for (x = 0; x < bitmap.Width; x++)
             {
             	for (y = 0; y < bitmap.Height; y++)
-                {
-					retval[x, y] = bitmap.GetPixel(x, bitmap.Height - y - 1).GetBrightness()*128;
-                }
+                    retval[x, y] = bitmap.GetPixel(x, bitmap.Height - y - 1).GetBrightness()*128;
             }
 
             return retval;

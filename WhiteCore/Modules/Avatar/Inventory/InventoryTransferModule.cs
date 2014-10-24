@@ -46,6 +46,7 @@ namespace WhiteCore.Modules.Inventory
 
         private bool m_Enabled = true;
         private IMessageTransferModule m_TransferModule;
+        private IMoneyModule moneyService;
 
         #region INonSharedRegionModule Members
 
@@ -62,6 +63,7 @@ namespace WhiteCore.Modules.Inventory
                     m_Enabled = false;
                     return;
                 }
+                //m_currencyService = Framework.Utilities.DataManager.RequestPlugin<ISimpleCurrencyConnector>() as SimpleCurrencyConnector;
             }
         }
 
@@ -78,6 +80,9 @@ namespace WhiteCore.Modules.Inventory
             scene.EventManager.OnNewClient += OnNewClient;
             scene.EventManager.OnClosingClient += OnClosingClient;
             scene.EventManager.OnIncomingInstantMessage += OnGridInstantMessage;
+
+            moneyService =  scene.RequestModuleInterface<IMoneyModule>();
+
         }
 
         public void RegionLoaded(IScene scene)
@@ -167,7 +172,11 @@ namespace WhiteCore.Modules.Inventory
                 //MainConsole.Instance.DebugFormat("Asset type {0}", ((AssetType)im.binaryBucket[0]));
 
                 if (im.BinaryBucket.Length < 17) // Invalid
+                {
+                    MainConsole.Instance.DebugFormat ("[INVENTORY TRANSFER]: Invalid length {0} for asset type {1}",
+                        im.BinaryBucket.Length, ((AssetType)im.BinaryBucket[0]));
                     return;
+                }
 
                 UUID receipientID = im.ToAgentID;
                 IScenePresence recipientUser = null;
@@ -183,13 +192,14 @@ namespace WhiteCore.Modules.Inventory
                     // First byte is the asset type
                     AssetType assetType = (AssetType)im.BinaryBucket [0];
 
-                    if (AssetType.Folder == assetType)
+                    if (assetType == AssetType.Folder)
                     {
                         UUID folderID = new UUID (im.BinaryBucket, 1);
 
-                        MainConsole.Instance.DebugFormat ("[INVENTORY TRANSFER]: Inserting original folder {0} " +
-                        "into agent {1}'s inventory",
+                        MainConsole.Instance.DebugFormat (
+                            "[INVENTORY TRANSFER]: Inserting original folder {0} into agent {1}'s inventory",
                             folderID, im.ToAgentID);
+
 
                         clientScene.InventoryService.GiveInventoryFolderAsync (
                             receipientID,
@@ -212,6 +222,12 @@ namespace WhiteCore.Modules.Inventory
                                 im.BinaryBucket [0] = (byte)AssetType.Folder;
                                 Array.Copy (copyIDBytes, 0, im.BinaryBucket, 1, copyIDBytes.Length);
 
+//                                m_currencyService.UserCurrencyTransfer(im.FromAgentID, im.ToAgentID, 0,
+//                                    "Inworld inventory folder transfer", TransactionType.GiveInventory, UUID.Zero);
+                            if (moneyService != null)
+                                moneyService.Transfer(im.ToAgentID, im.FromAgentID, 0,
+                                "Inworld inventory folder transfer", TransactionType.GiveInventory);
+
                                 if (recipientUser != null)
                                 {
                                     recipientUser.ControllingClient.SendBulkUpdateInventory (folder);
@@ -219,6 +235,7 @@ namespace WhiteCore.Modules.Inventory
                                     recipientUser.ControllingClient.SendInstantMessage (im);
                                 }
                             });
+
                     } else
                     {
                         // First byte of the array is probably the item type
@@ -226,8 +243,8 @@ namespace WhiteCore.Modules.Inventory
 
                         UUID itemID = new UUID (im.BinaryBucket, 1);
 
-                        MainConsole.Instance.DebugFormat ("[INVENTORY TRANSFER]: (giving) Inserting item {0} " +
-                        "into agent {1}'s inventory",
+                        MainConsole.Instance.DebugFormat (
+                            "[INVENTORY TRANSFER]: (giving) Inserting item {0} into agent {1}'s inventory",
                             itemID, im.ToAgentID);
 
                         clientScene.InventoryService.GiveInventoryItemAsync (
@@ -240,12 +257,19 @@ namespace WhiteCore.Modules.Inventory
                             {
                                 if (itemCopy == null)
                                 {
+                                    MainConsole.Instance.DebugFormat (
+                                        "[INVENTORY TRANSFER]: (giving) Unable to find item {0} to give to agent {1}'s inventory",
+                                        itemID, im.ToAgentID);
                                     client.SendAgentAlertMessage ("Can't find item to give. Nothing given.", false);
                                     return;
                                 }
 
                                 copyID = itemCopy.ID;
                                 Array.Copy (copyID.GetBytes (), 0, im.BinaryBucket, 1, 16);
+                                
+                               if (moneyService != null)
+                                  moneyService.Transfer(im.ToAgentID, im.FromAgentID, 0,
+                                          "Inworld inventory item transfer", TransactionType.GiveInventory);
 
                                 if (recipientUser != null)
                                 {
@@ -254,6 +278,8 @@ namespace WhiteCore.Modules.Inventory
                                     recipientUser.ControllingClient.SendInstantMessage (im);
                                 }
                             });
+  
+                    
                     }
                 }  else
                 {
@@ -336,6 +362,12 @@ namespace WhiteCore.Modules.Inventory
                     client.SendAgentAlertMessage("Unable to delete " +
                                                  "received inventory" + reason, false);
                 }
+
+                //m_currencyService.UserCurrencyTransfer(im.FromAgentID, im.ToAgentID, 0,
+                //    "Inworld inventory transfer declined", TransactionType.GiveInventory, UUID.Zero);
+                if (moneyService != null)
+                    moneyService.Transfer(im.ToAgentID, im.FromAgentID, 0,
+                        "Inworld inventory transfer declined", TransactionType.GiveInventory);
 
                 IScenePresence user = clientScene.GetScenePresence(im.ToAgentID);
 

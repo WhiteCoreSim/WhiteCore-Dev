@@ -29,9 +29,9 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using WhiteCore.Framework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
+using WhiteCore.Framework.ConsoleFramework;
 
 namespace WhiteCore.Modules.Terrain.FileLoaders
 {
@@ -46,17 +46,55 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
 
         public ITerrainChannel LoadFile(string filename, IScene scene)
         {
-            throw new NotImplementedException();
-        }
+            return LoadBitmap(new Bitmap(filename), scene);
+            }
 
-        public ITerrainChannel LoadFile(string filename, int x, int y, int fileWidth, int fileHeight, int w, int h)
+        public ITerrainChannel LoadFile(string filename, IScene scene, int x, int y, int fileWidth, int fileHeight, int w, int h)
         {
-            throw new NotImplementedException();
+            // [[THEMAJOR]] Some work on tile loading..
+            // terrain load-tile Tile.png 5 5 10000 10050
+            Bitmap tilemap = new Bitmap(filename);
+
+            // Prevents off-by-one issue
+            fileHeight--;
+
+            int xoffset = w*x;
+            int yoffset = h*(fileHeight - y);
+
+            MainConsole.Instance.DebugFormat(
+                "[TERRAIN]: Loading tile {0},{1} (offset {2},{3}) from tilemap size of {4},{5}",
+                x, y, xoffset, yoffset, fileWidth, fileHeight);
+
+            Rectangle tileRect = new Rectangle(xoffset, yoffset, w, h);
+            PixelFormat format = tilemap.PixelFormat;
+            Bitmap cloneBitmap = null;
+            try
+            {
+                cloneBitmap = tilemap.Clone(tileRect, format);
+            }
+            catch (OutOfMemoryException e)
+            {
+                // This error WILL appear if the number of Y tiles is too high because of how it works from the bottom up
+                // However, this still spits out ugly unreferenced object errors on the console
+                MainConsole.Instance.ErrorFormat(
+                    "[TERRAIN]: Couldn't load tile {0},{1} (from bitmap coordinates {2},{3}). Number of specified Y tiles may be too high: {4}",
+                    x, y, xoffset, yoffset, e);
+            }
+            finally
+            {
+                // Some attempt at keeping a clean memory
+                tilemap.Dispose();
+            }
+
+            return LoadBitmap(cloneBitmap, scene);
+
         }
 
         public ITerrainChannel LoadStream(Stream stream, IScene scene)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            return LoadBitmap(new Bitmap(stream), scene);
+
         }
 
         public void SaveFile(string filename, ITerrainChannel map)
@@ -79,6 +117,22 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
         }
 
         #endregion
+
+        protected virtual ITerrainChannel LoadBitmap(Bitmap bitmap, IScene scene)
+        {
+            ITerrainChannel retval = new TerrainChannel(bitmap.Width, bitmap.Height, scene);
+
+            int x;
+            int y;
+
+            for (x = 0; x < bitmap.Width; x++)
+            {
+                for (y = 0; y < bitmap.Height; y++)
+                    retval[x, y] = bitmap.GetPixel(x, bitmap.Height - y - 1).GetBrightness()*128;
+            }
+
+            return retval;
+        }
 
         public override string ToString()
         {

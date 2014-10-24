@@ -37,7 +37,7 @@ namespace WhiteCore.Modules.Terrain
         string FileExtension { get; }
         ITerrainChannel LoadFile(string filename, IScene scene);
 
-        ITerrainChannel LoadFile(string filename, int fileStartX, int fileStartY, int fileWidth, int fileHeight,
+        ITerrainChannel LoadFile(string filename, IScene scene, int fileStartX, int fileStartY, int fileWidth, int fileHeight,
                                  int sectionWidth, int sectionHeight);
 
         ITerrainChannel LoadStream(Stream stream, IScene scene);

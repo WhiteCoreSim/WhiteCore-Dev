@@ -30,6 +30,7 @@ namespace WhiteCore.Framework.Utilities
 {
     public class Constants
     {
+        public const double FloatDifference = .0000005;
 
         // some predefined folders
         public const string DEFAULT_CONFIG_DIR = "../Config";

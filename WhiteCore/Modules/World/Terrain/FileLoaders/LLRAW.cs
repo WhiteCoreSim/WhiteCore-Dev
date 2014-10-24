@@ -53,7 +53,7 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
             return retval;
         }
 
-        public ITerrainChannel LoadFile(string filename, int offsetX, int offsetY, int fileWidth, int fileHeight,
+        public ITerrainChannel LoadFile(string filename, IScene scene, int offsetX, int offsetY, int fileWidth, int fileHeight,
                                         int sectionWidth, int sectionHeight)
         {
             TerrainChannel retval = new TerrainChannel(sectionWidth, sectionHeight, null);
