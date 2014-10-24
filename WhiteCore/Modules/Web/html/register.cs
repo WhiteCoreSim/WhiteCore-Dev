@@ -331,7 +331,7 @@ namespace WhiteCore.Modules.Web
             foreach (var archive in archives)
                 avatarArchives.Add(new Dictionary<string, object>
                                        {
-                                           {"AvatarArchiveName", archive.FileName },
+                                           {"AvatarArchiveName", archive.FolderName },
                                            {"AvatarArchiveSnapshotID", archive.Snapshot},
                                            {
                                                "AvatarArchiveSnapshotURL",
