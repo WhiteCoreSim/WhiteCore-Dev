@@ -7,7 +7,7 @@
 	<meta name="description" content="{SystemName}"/>
 	<link rel="shortcut icon" href="../images/icons/favicon.ico" />
 	
-	<script src="{SystemURL}/javascripts/jquery.min.js"></script>
+	<script src="{SystemURL}/javascripts/jquery-1.11.1.js" type="text/javascript"></script> 
 
 	<!-- StyleSwitch -->
 	<script src="{SystemURL}/javascripts/styleswitch.js"></script>
@@ -72,15 +72,16 @@
 				content.load("picks.html" + window.location.search);
 				found = new Boolean(1);
 				break;
+            case "regions":
+				content.load("regions.html" + window.location.search);
+				found = new Boolean(1);
+				break;
 		}
 		if(found == 0)
 			content.load("base.html" + window.location.search);
 	});
     </script>
 	
-	<!-- Carousel -->
-	<script src="../javascripts/jquery.jcarousel.min.js"></script>
-
 </head>
 
 <body>
@@ -88,9 +89,10 @@
 
 <div id="topprofile">
 	<ul id="menuprofile">
-		<li id="base" class="fade active" alt="{TooltipsMenuHome}" title="{TooltipsMenuHome}">{MenuProfileTitle}</li>
-		<li id="groups" class="fade" alt="{TooltipsMenuLogin}" title="{TooltipsMenuLogin}">{MenuGroupTitle}</li>
-		<li id="picks" class="fade" alt="{TooltipsMenuRegister}" title="{TooltipsMenuRegister}">{MenuPicksTitle}</li>
+		<li id="base" class="fade active" alt="{TooltipsMenuProfile}" title="{TooltipsMenuProfile}">{MenuProfileTitle}</li>
+		<li id="groups" class="fade" alt="{TooltipsMenuGroups}" title="{TooltipsMenuGroups}">{MenuGroupTitle}</li>
+		<li id="picks" class="fade" alt="{TooltipsMenuPicks}" title="{TooltipsMenuPicks}">{MenuPicksTitle}</li>
+		<li id="regions" class="fade" alt="{TooltipsMenuRegions}" title="{TooltipsMenuRegions}">{MenuRegionsTitle}</li>
 	</ul>
 </div>
 <span class="clear"></span>

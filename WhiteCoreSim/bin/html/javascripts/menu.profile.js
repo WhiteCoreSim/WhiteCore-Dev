@@ -28,6 +28,12 @@ $(document).ready(function(){
 				content.slideDown();
 				});
 				break;
+			case "regions":
+				content.slideUp(  function() {
+				content.load("regions.html" + window.location.search, hideLoading);
+				content.slideDown();
+				});
+				break;
 			default:
 				//hide loading bar if there is no selected section
 				hideLoading();

@@ -25,20 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using WhiteCore.Framework;
-using WhiteCore.Framework.Servers.HttpServer;
+using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
-using WhiteCore.Framework.Services;
-using WhiteCore.Framework.Utilities;
-using WhiteCore.Framework.Modules;
+using OpenMetaverse;
+using System.Collections.Generic;
 
 namespace WhiteCore.Modules.Web
 {
-    class TransactionsPage : IWebInterfacePage
+    class SkeletonPage : IWebInterfacePage
     {
         public string[] FilePath
         {
@@ -46,7 +40,7 @@ namespace WhiteCore.Modules.Web
             {
                 return new[]
                            {
-                               "html/transactions.html"
+                               "html/skeleton.html"
                            };
             }
         }
@@ -61,7 +55,8 @@ namespace WhiteCore.Modules.Web
             get { return false; }
         }
 
-        public Dictionary<string, object> Fill(WebInterface webInterface, string filename, Framework.Servers.HttpServer.Implementation.OSHttpRequest request, Framework.Servers.HttpServer.Implementation.OSHttpResponse httpResponse, Dictionary<string, object> requestParameters, ITranslator translation, out string response)
+        public Dictionary<string, object> Fill(WebInterface webInterface, string filename, OSHttpRequest request, 
+            OSHttpResponse httpResponse, Dictionary<string, object> requestParameters, ITranslator translation, out string response)
         {
             response = null;
             var vars = new Dictionary<string, object>();

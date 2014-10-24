@@ -1,4 +1,33 @@
 <!-- Caption -->
+	<!-- Carousel -->
+<script src="../javascripts/jquery.jcarousellite.js"></script>
+
+<script>
+		jQuery(document).ready(function($) {
+			$('div.parcel_picture').each(function(i) {
+				var img_ = $('img', this);			
+				var img_height = img_.attr('height');
+				var p_height = $('p', this).outerHeight();
+				$(this).height(img_height);
+				$(this).hover(function() {
+					img_.animate({marginTop : -p_height-5}, 500);
+				}, function() {
+					img_.animate({marginTop : '0'}, 500);
+				});
+			});		
+		});
+</script>
+<script>
+$(function() {
+    $('.parcelscarousel').jCarouselLite({
+        btnNext: '.next-horiz',
+        btnPrev: '.prev-horiz',
+        visible: 6
+    });
+});
+
+</script>
+
 <h2>{SystemName}: {RegionInfoText}</h2>
 <div id="region_info_container">
 	<table id="region_info">
@@ -24,6 +53,15 @@
 
 	  <tbody>
 	    <tr>
+		  <td class="region_parcel_info" rowspan="4">
+			<div class="parcel_picture" >
+			  <a class="regionslurl" 
+				 onclick="document.location.href='hop://{MainServerURL}/{RegionName}/128/128/50'" 
+				 alt="{RegionNameText}: {RegionName}"
+				 title="{RegionNameText}: {RegionName}<br />hop://{MainServerURL}/{RegionName}/128/128/50">
+			  <img height="128" width="128" src="{RegionImageURL}" alt="{RegionNameText}: {RegionName}" title="{RegionNameText}: {RegionName}" /></a>
+			</div>
+		  </td>
 	      <td class="region_info_left_size"><p>{RegionNameText}:</p></td>
 		  <td class="region_info_right" colspan="2"><p>{RegionName}</p></td>
         </tr>
@@ -70,50 +108,29 @@
 
 
 
-<script>
-	/* <![CDATA[ */
-		jQuery(document).ready(function($) {
-			$('div.parcel_picture').each(function(i) {
-				var img_ = $('img', this);			
-				var img_height = img_.attr('height');
-				var p_height = $('p', this).outerHeight();
-				$(this).height(img_height);
-				$(this).hover(function() {
-					img_.animate({marginTop : -p_height-5}, 500);
-				}, function() {
-					img_.animate({marginTop : '0'}, 500);
-				});
-			});		
-		});
-	/* ]]> */
-</script>
-
-<script>
-
-jQuery(document).ready(function() {jQuery('#parcelcarousel').jcarousel({wrap: 'circular'});});
-</script>
-
-
 <div id="parcel_picture_container">
-	<center>
-  <ul id="parcelcarousel" class="jcarousel-skin-aurora">
+    <div class="prev-horiz">◄</div>
+    <div class="next-horiz">►</div> 
+    <div class="parcelscarousel"  style="height:152px; width: 900px;">
+	  <ul id="parcelcarousel" class="jcarousel-skin-aurora">
 {ParcelInRegionArrayBegin}
-    <li>
-      <div class="parcel_picture">
-	    <a href="#">
-	    <img height="128"
-	    	 src="{ParcelSnapshotURL}" 
-		     alt="{ParcelNameText}: {ParcelName}"
-			 title="{ParcelNameText}: {ParcelName}" /></a>
-	    <p class="parcel_picture_text">
-		{ParcelNameText}: {ParcelName}<br />
-		@&nbsp;{ParcelLocation}	
-		</p>
-	  </div>
-	</li>
+    	<li>
+      		<div class="parcel_picture">
+	    		<a href="#">
+	    		<img height="128"
+	    	 		width="128"
+	    	 		src="{ParcelSnapshotURL}" 
+		     		alt="{ParcelNameText}: {ParcelName}"
+			 		title="{ParcelNameText}: {ParcelName}" /></a>
+	    		<p class="parcel_picture_text">
+				    {ParcelNameText}: {ParcelName}<br />
+				    @&nbsp;{ParcelLocation}	
+				</p>
+	  		</div>
+		</li>
 {ParcelInRegionArrayEnd}
-  </ul>
-  </center>
-<span class="clear"></span>
+  	</ul>
+  </div>
+  <span class="clear"></span>
 </div>
 

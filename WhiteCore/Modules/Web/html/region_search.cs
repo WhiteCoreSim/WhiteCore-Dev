@@ -25,8 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
-using WhiteCore.Framework.Servers.HttpServer;
 using System.Collections.Generic;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
@@ -66,9 +64,11 @@ namespace WhiteCore.Modules.Web
             var regionslist = new List<Dictionary<string, object>>();
 
             uint amountPerQuery = 10;
+            string noDetails = translator.GetTranslatedString ("NoDetailsText");
 
             if (requestParameters.ContainsKey("Submit"))
             {
+
                 IGridService gridService = webInterface.Registry.RequestModuleInterface<IGridService>();
                 string regionname = requestParameters["regionname"].ToString();
                 int start = httpRequest.Query.ContainsKey("Start")
@@ -87,17 +87,25 @@ namespace WhiteCore.Modules.Web
                 var regions = gridService.GetRegionsByName(null, regionname, (uint) start, amountPerQuery);
                 if (regions != null)
                 {
+                    noDetails = "";
+
                     foreach (var region in regions)
                     {
-                        regionslist.Add(new Dictionary<string, object>
-                                            {
-                                                {"RegionName", region.RegionName},
-                                                {"RegionLocX", region.RegionLocX/Constants.RegionSize},
-                                                {"RegionLocY", region.RegionLocY/Constants.RegionSize},
-                                                {"RegionID", region.RegionID}
-                                            });
+                        string info;
+                        info = (region.RegionArea < 1000000) ? region.RegionArea + " m2" : (region.RegionArea / 1000000) + " km2";
+                        info = info + ", " + region.RegionTerrain;
+
+                        regionslist.Add (new Dictionary<string, object> {
+                            { "RegionName", region.RegionName },
+                            { "RegionLocX", region.RegionLocX / Constants.RegionSize },
+                            { "RegionLocY", region.RegionLocY / Constants.RegionSize },
+                            { "RegionInfo", info },
+                            { "RegionStatus", region.IsOnline ? "yes" : "no" },
+                            { "RegionID", region.RegionID }
+                        });
                     }
                 }
+
             }
             else
             {
@@ -106,23 +114,26 @@ namespace WhiteCore.Modules.Web
                 vars.Add("BackOne", 0);
             }
 
-            vars.Add("RegionsList", regionslist);
-            vars.Add("RegionSearchText", translator.GetTranslatedString("RegionSearchText"));
-            vars.Add("SearchForRegionText", translator.GetTranslatedString("SearchForRegionText"));
-            vars.Add("RegionNameText", translator.GetTranslatedString("RegionNameText"));
-            vars.Add("RegionLocXText", translator.GetTranslatedString("RegionLocXText"));
-            vars.Add("RegionLocYText", translator.GetTranslatedString("RegionLocYText"));
-            vars.Add("Search", translator.GetTranslatedString("Search"));
+            vars.Add("NoDetailsText", noDetails);
+            vars.Add ("RegionsList", regionslist);
+            vars.Add ("RegionSearchText", translator.GetTranslatedString ("RegionSearchText"));
+            vars.Add ("SearchForRegionText", translator.GetTranslatedString ("SearchForRegionText"));
+            vars.Add ("RegionNameText", translator.GetTranslatedString ("RegionNameText"));
+            vars.Add ("RegionLocXText", translator.GetTranslatedString ("RegionLocXText"));
+            vars.Add ("RegionLocYText", translator.GetTranslatedString ("RegionLocYText"));
+            vars.Add ("RegionOnlineText", translator.GetTranslatedString ("Online"));
 
-            vars.Add("FirstText", translator.GetTranslatedString("FirstText"));
-            vars.Add("BackText", translator.GetTranslatedString("BackText"));
-            vars.Add("NextText", translator.GetTranslatedString("NextText"));
-            vars.Add("LastText", translator.GetTranslatedString("LastText"));
-            vars.Add("CurrentPageText", translator.GetTranslatedString("CurrentPageText"));
+            vars.Add ("Search", translator.GetTranslatedString ("Search"));
 
-            vars.Add("SearchResultForRegionText", translator.GetTranslatedString("SearchResultForRegionText"));
-            vars.Add("RegionMoreInfo", translator.GetTranslatedString("RegionMoreInfo"));
-            vars.Add("MoreInfoText", translator.GetTranslatedString("MoreInfoText"));
+            vars.Add ("FirstText", translator.GetTranslatedString ("FirstText"));
+            vars.Add ("BackText", translator.GetTranslatedString ("BackText"));
+            vars.Add ("NextText", translator.GetTranslatedString ("NextText"));
+            vars.Add ("LastText", translator.GetTranslatedString ("LastText"));
+            vars.Add ("CurrentPageText", translator.GetTranslatedString ("CurrentPageText"));
+
+            vars.Add ("SearchResultForRegionText", translator.GetTranslatedString ("SearchResultForRegionText"));
+            vars.Add ("RegionMoreInfo", translator.GetTranslatedString ("RegionMoreInfo"));
+            vars.Add ("MoreInfoText", translator.GetTranslatedString ("MoreInfoText"));
 
             return vars;
         }

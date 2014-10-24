@@ -707,6 +707,47 @@ namespace WhiteCore.Modules.Web
             }
         }
 
+
+        public List<Dictionary<string, object>> RegionTypeArgs(ITranslator translator)
+        { 
+            var args = new List<Dictionary<string, object>>();
+            args.Add(new Dictionary<string, object> {
+                {"Value", translator.GetTranslatedString("Mainland")}, {"Index","0"} });
+            args.Add(new Dictionary<string, object> {
+                {"Value", translator.GetTranslatedString("Estate")}, {"Index","1"} });
+            return args;
+        }
+
+        public List<Dictionary<string, object>> RegionPresetArgs(ITranslator translator)
+        { 
+            var args = new List<Dictionary<string, object>>();
+            args.Add(new Dictionary<string, object> {
+                {"Value", translator.GetTranslatedString("FullRegion")}, {"Index","0"} });
+            args.Add(new Dictionary<string, object> {
+                {"Value", translator.GetTranslatedString("Homestead")}, {"Index","1"} });
+            args.Add(new Dictionary<string, object> {
+                {"Value", translator.GetTranslatedString("Openspace")}, {"Index","2"} });
+            args.Add(new Dictionary<string, object> {
+                {"Value", translator.GetTranslatedString("Custom")}, {"Index","3"} });
+            return args;
+        }
+
+        public List<Dictionary<string, object>> RegionTerrainArgs(ITranslator translator)
+        { 
+            var args = new List<Dictionary<string, object>>();
+            args.Add(new Dictionary<string, object> {
+                {"Value", translator.GetTranslatedString("Flatland")}, {"Index","0"} });
+            args.Add(new Dictionary<string, object> {
+                {"Value", translator.GetTranslatedString("Grassland")}, {"Index","1"} });
+            args.Add(new Dictionary<string, object> {
+                {"Value", translator.GetTranslatedString("Island")}, {"Index","2"} });
+            args.Add(new Dictionary<string, object> {
+                {"Value", translator.GetTranslatedString("Aquatic")}, {"Index","3"} });
+            args.Add(new Dictionary<string, object> {
+                {"Value", translator.GetTranslatedString("Custom")}, {"Index","4"} });
+            return args;
+        }
+
         #endregion
 
         internal void Redirect(OSHttpResponse httpResponse, string url)
@@ -1009,6 +1050,7 @@ namespace WhiteCore.Modules.Web
         public bool WebRegistration = false;
         public bool HideSlideshowBar = false;
         public string LocalFrontPage = "local/frontpage.html";
+        public string LocalCSS = "local/";
 
         public GridSettings()
         {
@@ -1030,6 +1072,7 @@ namespace WhiteCore.Modules.Web
             WebRegistration = map["WebRegistration"];
             HideSlideshowBar = map["HideSlideshowBar"];
             LocalFrontPage = map["LocalFrontPage"];
+            LocalCSS = map["LocalCSS"];
         }
 
         public override OSDMap ToOSD()
@@ -1045,6 +1088,7 @@ namespace WhiteCore.Modules.Web
             map["WebRegistration"] = WebRegistration;
             map["HideSlideshowBar"] = HideSlideshowBar;
             map["LocalFrontPage"] = LocalFrontPage;
+            map["LocalCSS"] = LocalCSS;
 
             return map;
         }

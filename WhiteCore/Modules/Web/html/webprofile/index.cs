@@ -112,6 +112,7 @@ namespace WhiteCore.Modules.Web
 
             IUserProfileInfo profile = Framework.Utilities.DataManager.RequestPlugin<IProfileConnector>().
                                               GetUserProfile(account.PrincipalID);
+            string picUrl = "../images/icons/no_avatar.jpg";
             if (profile != null)
             {
                 vars.Add ("UserType", profile.MembershipGroup == "" ? "Resident" : profile.MembershipGroup);
@@ -124,22 +125,21 @@ namespace WhiteCore.Modules.Web
                 } else
                     vars.Add ("UserPartner", "No partner");
                 vars.Add ("UserAboutMe", profile.AboutText == "" ? "Nothing here" : profile.AboutText);
-                string url = "../images/icons/no_picture.jpg";
                 IWebHttpTextureService webhttpService =
                     webInterface.Registry.RequestModuleInterface<IWebHttpTextureService> ();
                 if (webhttpService != null && profile.Image != UUID.Zero)
-                    url = webhttpService.GetTextureURL (profile.Image);
-                vars.Add ("UserPictureURL", url);
+                    picUrl = webhttpService.GetTextureURL (profile.Image);
             } else
             {
                 // no profile yet
                 vars.Add ("UserType", "Guest");
                 vars.Add ("UserPartner", "Not specified yet");
                 vars.Add ("UserAboutMe", "Nothing here yet");
-                string url = "../images/icons/no_picture.jpg";
-                vars.Add ("UserPictureURL", url);
 
             }
+            vars.Add ("UserPictureURL", picUrl);
+
+            // TODO:  This is only showing online status if you are logged in ??
             UserAccount ourAccount = Authenticator.GetAuthentication(httpRequest);
             if (ourAccount != null)
             {
@@ -174,11 +174,17 @@ namespace WhiteCore.Modules.Web
                 vars.Add("IsOnline", translator.GetTranslatedString("Offline"));
             }
 
-            // Menu Profile
+            // Menus
             vars.Add("MenuProfileTitle", translator.GetTranslatedString("MenuProfileTitle"));
+            vars.Add("TooltipsMenuProfile", translator.GetTranslatedString("TooltipsMenuProfile"));
             vars.Add("MenuGroupTitle", translator.GetTranslatedString("MenuGroupTitle"));
+            vars.Add("TooltipsMenuGroups", translator.GetTranslatedString("TooltipsMenuGroups"));
             vars.Add("MenuPicksTitle", translator.GetTranslatedString("MenuPicksTitle"));
+            vars.Add("TooltipsMenuPicks", translator.GetTranslatedString("TooltipsMenuPicks"));
+            vars.Add("MenuRegionsTitle", translator.GetTranslatedString("MenuRegionsTitle"));
+            vars.Add("TooltipsMenuRegions", translator.GetTranslatedString("TooltipsMenuRegions"));
 
+            // User data
             vars.Add("UserProfileFor", translator.GetTranslatedString("UserProfileFor"));
             vars.Add("ResidentSince", translator.GetTranslatedString("ResidentSince"));
             vars.Add("AccountType", translator.GetTranslatedString("AccountType"));

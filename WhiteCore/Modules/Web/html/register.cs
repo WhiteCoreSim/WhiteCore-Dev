@@ -36,6 +36,7 @@ using Nini.Config;
 using OpenMetaverse;
 using System;
 using System.Collections.Generic;
+using RegionFlags = WhiteCore.Framework.Services.RegionFlags;
 
 
 namespace WhiteCore.Modules.Web
@@ -142,6 +143,7 @@ namespace WhiteCore.Modules.Web
                 //string UserZip = requestParameters["UserZip"].ToString();
                 string UserCity = requestParameters["UserCity"].ToString();
                 string UserEmail = requestParameters["UserEmail"].ToString();
+                string UserHomeRegion = requestParameters["UserHomeRegion"].ToString();
                 string UserDOBMonth = requestParameters["UserDOBMonth"].ToString();
                 string UserDOBDay = requestParameters["UserDOBDay"].ToString();
                 string UserDOBYear = requestParameters["UserDOBYear"].ToString();
@@ -176,7 +178,14 @@ namespace WhiteCore.Modules.Web
                     response = "<h3>" + translator.GetTranslatedString ("AvatarEmailError") + "</h3>";   
                     return null;
                 }
-            
+
+                // Thish -  Only one space is allowed in the name to seperate First and Last of the avatar name
+                if (AvatarName.Split (' ').Length != 2)
+                {
+                    response = "<h3>" + translator.GetTranslatedString("AvatarNameSpacingError") + "</h3>";
+                    return null;
+                }
+
                 // so far so good...
                 if (ToSAccept)
                 {
@@ -187,17 +196,17 @@ namespace WhiteCore.Modules.Web
                     UUID userID = UUID.Random();
                     string error = accountService.CreateUser(userID, settings.DefaultScopeID, AvatarName, AvatarPassword,
                                                              UserEmail);
-                     if (error == "")
+                    if (error == "")
                     {
                         // set the user account type
-                        UserAccount account = accountService.GetUserAccount(null, userID);
+                        UserAccount account = accountService.GetUserAccount (null, userID);
                         account.UserFlags = UserFlags;
                         accountService.StoreUserAccount (account);
 
                         // create and save agent info
-                        IAgentConnector con = Framework.Utilities.DataManager.RequestPlugin<IAgentConnector>();
-                        con.CreateNewAgent(userID);
-                        IAgentInfo agent = con.GetAgent(userID);
+                        IAgentConnector con = Framework.Utilities.DataManager.RequestPlugin<IAgentConnector> ();
+                        con.CreateNewAgent (userID);
+                        IAgentInfo agent = con.GetAgent (userID);
                         agent.OtherAgentInformation ["RLFirstName"] = FirstName;
                         agent.OtherAgentInformation ["RLLastName"] = LastName;
                         //agent.OtherAgentInformation ["RLAddress"] = UserAddress;
@@ -213,16 +222,19 @@ namespace WhiteCore.Modules.Web
                             agent.OtherAgentInformation["WebUIActivationToken"] = Util.Md5Hash(activationToken.ToString() + ":" + PasswordHash);
                             resp["WebUIActivationToken"] = activationToken;
                         }*/
-                        con.UpdateAgent(agent);
+                        con.UpdateAgent (agent);
 
                         // create user profile details
                         IProfileConnector profileData =
-                                Framework.Utilities.DataManager.RequestPlugin<IProfileConnector>();
+                            Framework.Utilities.DataManager.RequestPlugin<IProfileConnector> ();
                         if (profileData != null)
                         {
                             IUserProfileInfo profile = profileData.GetUserProfile (userID);
                             if (profile == null)
+                            {
                                 profileData.CreateNewProfile (userID);
+                                profile = profileData.GetUserProfile (userID);
+                            }
 
                             if (AvatarArchive != "")
                                 profile.AArchiveName = AvatarArchive;
@@ -232,13 +244,23 @@ namespace WhiteCore.Modules.Web
                             profileData.UpdateUserProfile (profile);
                         }
 
+                        IAgentInfoService agentInfoService = webInterface.Registry.RequestModuleInterface<IAgentInfoService> ();
+                        Vector3 position = new Vector3 (128, 128, 25);
+                        Vector3 lookAt = new Vector3 (0, 0, 22);
+
+                        if (agentInfoService != null)
+                            agentInfoService.SetHomePosition (userID.ToString (), (UUID)UserHomeRegion, position, lookAt);
+
+                        vars.Add ("ErrorMessage", "Successfully created account, redirecting to main page");
                         response = "<h3>Successfully created account, redirecting to main page</h3>" +
-                                   "<script language=\"javascript\">" +
-                                   "setTimeout(function() {window.location.href = \"index.html\";}, 3000);" +
-                                   "</script>";
-                    }
-                    else
+                        "<script language=\"javascript\">" +
+                        "setTimeout(function() {window.location.href = \"index.html\";}, 3000);" +
+                        "</script>";
+                    } else
+                    {
+                        vars.Add ("ErrorMessage", "<h3>" + error + "</h3>");
                         response = "<h3>" + error + "</h3>";
+                    }
                 }
                 else
                     response = "<h3>You did not accept the Terms of Service agreement.</h3>";
@@ -275,6 +297,28 @@ namespace WhiteCore.Modules.Web
             vars.Add("Days", daysArgs);
             vars.Add("Months", monthsArgs);
             vars.Add("Years", yearsArgs);
+
+            var sortBy = new Dictionary<string, bool>();
+            sortBy.Add("RegionName", true);
+
+            var RegionListVars = new List<Dictionary<string, object>>();
+            var regions = Framework.Utilities.DataManager.RequestPlugin<IRegionData>().Get((RegionFlags) 0,
+                RegionFlags.Hyperlink |
+                RegionFlags.Foreign |
+                RegionFlags.Hidden,
+                null, null, sortBy);
+            foreach (var region in regions)
+            {
+
+                RegionListVars.Add (new Dictionary<string, object> {
+                    { "RegionName", region.RegionName },
+                    { "RegionUUID", region.RegionID }
+                });
+            }
+
+            vars.Add("RegionList", RegionListVars);
+            vars.Add("UserHomeRegionText", translator.GetTranslatedString("UserHomeRegionText"));
+
 
             vars.Add("UserTypeText", translator.GetTranslatedString("UserTypeText"));
             vars.Add("UserType", webInterface.UserTypeArgs(translator)) ;

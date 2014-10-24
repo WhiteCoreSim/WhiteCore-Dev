@@ -11,258 +11,175 @@ namespace WhiteCore.Modules.Web.Translators
         {
             switch (key)
             {
-                case "GridStatus":
-                    return "Grid Status";
-                case "Online":
-                    return "Online";
-                case "Offline":
-                    return "Offline";
-                case "TotalUserCount":
-                    return "Totale Gebruikers";
-                case "TotalRegionCount":
-                    return "Totale Regios";
-                case "UniqueVisitors":
-                    return "Unieke Bezeoeker per 30 dagen";
-                case "OnlineNow":
-                    return "Nu online";
-                case "HyperGrid":
-                    return "HyperGrid (HG)";
-                case "Voice":
-                    return "Voice";
-                case "Currency":
-                    return "Currency";
-                case "Disabled":
-                    return "Uitgeschakeld";
-                case "Enabled":
-                    return "Ingeschakeld";
-                case "News":
-                    return "Nieuws";
-                case "Region":
-                    return "Regio";
-                case "Login":
-                    return "Login";
-                case "UserName":
-                case "UserNameText":
-                    return "Gebruikersnaam";
-                case "Password":
-                case "PasswordText":
-                    return "Wachtwoord";
-                case "PasswordConfirmation":
-                    return "Wachtwoord Bevestiging";
-                case "ForgotPassword":
-                    return "Wachtwoord vergeten?";
-                case "Submit":
-                    return "Verzenden";
-                case "TypeUserNameToConfirm":
-                    return "Geef de gebruikersnaam van dit account in om te bevestigen dat je dit account wilt verwijderen";
+            // Generic
+            case "No":                          return "No";
+            case "Yes":                         return "Yes";
+            case "Submit":                      return "Verzenden";
+            case "Accept":                      return "Accepteren";
+            case "Save":                        return "Save";
+            case "FirstText":                   return "Eerste";
+            case "BackText":                    return "Terug";
+            case "NextText":                    return "Volgende";
+            case "LastText":                    return "Laatste";
+            case "CurrentPageText":             return "Current Page";
+            case "MoreInfoText":                return "Meer Info";
+            case "NoDetailsText":               return "Geen gegevens gevonden...";
 
-                case "SpecialWindowTitleText":
-                    return "Special Info Window Titel";
-                case "SpecialWindowTextText":
-                    return "Special Info Window Tekst";
-                case "SpecialWindowColorText":
-                    return "Special Info Window Kleur";
-                case "SpecialWindowStatusText":
-                    return "Special Info Window Status";
-                case "WelcomeScreenManagerFor":
-                    return "Welkoms Scherm Manager voor";
-                case "ChangesSavedSuccessfully":
-                    return "Wijzigingen succesvol opgeslagen";
+            // Status information
+            case "GridStatus":                  return "Grid Status";
+            case "Online":                      return "Online";
+            case "Offline":                     return "Offline";
+            case "TotalUserCount":              return "Totale Gebruikers";
+            case "TotalRegionCount":            return "Totale Regios";
+            case "UniqueVisitors":              return "Unieke Bezeoeker per 30 dagen";
+            case "OnlineNow":                   return "Nu online";
+            case "HyperGrid":                   return "HyperGrid (HG)";
+            case "Voice":                       return "Voice";
+            case "Currency":                    return "Currency";
+            case "Disabled":                    return "Uitgeschakeld";
+            case "Enabled":                     return "Ingeschakeld";
+            case "News":                        return "Nieuws";
+            case "Region":                      return "Regio";
+            
+            // User login
+            case "Login":                       return "Login";
+            case "UserName": 
+            case "UserNameText":                return "Gebruikersnaam";  
+            case "Password":
+            case "PasswordText":                return "Wachtwoord";
+            case "PasswordConfirmation":        return "Wachtwoord Bevestiging";
+            case "ForgotPassword":              return "Wachtwoord vergeten?";
+            case "TypeUserNameToConfirm":       return "Geef de gebruikersnaam van dit account in om te bevestigen dat je dit account wilt verwijderen";
 
+            // Special window
+            case "SpecialWindowTitleText":      return "Special Info Window Titel";
+            case "SpecialWindowTextText":       return "Special Info Window Tekst";
+            case "SpecialWindowColorText":      return "Special Info Window Kleur";
+            case "SpecialWindowStatusText":     return "Special Info Window Status";
+            case "WelcomeScreenManagerFor":     return "Welkoms Scherm Manager voor";
+            case "ChangesSavedSuccessfully":    return "Wijzigingen succesvol opgeslagen";
 
-                case "AvatarNameText":
-                    return "Avatar Naam";
-                case "AvatarScopeText":
-                    return "Avatar Scope ID";
-                case "FirstNameText":
-                    return "Uw Voornaam";
-                case "LastNameText":
-                    return "Uw Achternaam";
-                case "UserAddressText":
-                    return "Uw Adres";
-                case "UserZipText":
-                    return "Uw Postcode";
-                case "UserCityText":
-                    return "Uw Stad";
-                case "UserCountryText":
-                    return "Uw Land";
-                case "UserDOBText":
-                    return "Uw Geboortedatum (Maand Dag Jaar)";
-                case "UserEmailText":
-                    return "Uw Email";
-                case "RegistrationText":
-                    return "Avatar registratie";
-                case "RegistrationsDisabled":
-                    return "Registraties zijn op dit moment gesloten, probeert u het later nog eens.";
-                case "TermsOfServiceText":
-                    return "Terms of Service";
-                case "TermsOfServiceAccept":
-                    return "Accepteer u deze Terms of Service zoals boven beschreven?";
-                case "Accept":
-                    return "Accepteren";
-                case "AvatarNameError":
-                    return "Je hebt een avatar naam invoeren!";
-                case "AvatarPasswordError":
-                    return "Wachtwoord is leeg of niet overeenkomen met!";
-                case "AvatarEmailError":
-                return "Een e-mailadres is vereist voor wachtwoord herstel! ('none' indien niet bekend)";
+            // User registration
+            case "AvatarNameText":              return "Avatar Naam";
+            case "AvatarScopeText":             return "Avatar Scope ID";
+            case "FirstNameText":               return "Uw Voornaam";
+            case "LastNameText":                return "Uw Achternaam";
+            case "UserAddressText":             return "Uw Adres";
+            case "UserZipText":                 return "Uw Postcode";
+            case "UserCityText":                return "Uw Stad";
+            case "UserCountryText":             return "Uw Land";
+            case "UserDOBText":                 return "Uw Geboortedatum (Maand Dag Jaar)";
+            case "UserEmailText":               return "Uw Email";
+            case "UserHomeRegionText":          return "Regione Home";
+            case "RegistrationText":            return "Avatar registratie";
+            case "RegistrationsDisabled":       return "Registraties zijn op dit moment gesloten, probeert u het later nog eens.";
+            case "TermsOfServiceText":          return "Terms of Service";
+            case "TermsOfServiceAccept":        return "Accepteer u deze Terms of Service zoals boven beschreven?";
+            case "AvatarNameError":             return "Je hebt een avatar naam invoeren!";
+            case "AvatarPasswordError":         return "Wachtwoord is leeg of niet overeenkomen met!";
+            case "AvatarEmailError":            return "Een e-mailadres is vereist voor wachtwoord herstel! ('none' indien niet bekend)";
+            case "AvatarNameSpacingError":      return "Je avatar naam moet 'Voornaam Achternaam'!";
 
-                    // news
-                case "OpenNewsManager":
-                    return "Open de Nieuws manager";
-                case "NewsManager":
-                    return "Nieuws Manager";
-                case "EditNewsItem":
-                    return "Bewerk nieuws";
-                case "AddNewsItem":
-                    return "Voeg nieuw nieuws bericht toe";
-                case "DeleteNewsItem":
-                    return "Verwijder nieuws item";
-                case "NewsDateText":
-                    return "Nieuws Datum";
-                case "NewsTitleText":
-                    return "Nieuws Titel";
-                case "NewsItemTitle":
-                    return "Nieuws Item Titel";
-                case "NewsItemText":
-                    return "Nieuws Item Tekst";
-                case "AddNewsText":
-                    return "Nieuws toevoegen";
-                case "DeleteNewsText":
-                    return "Verwijder Nieuws";
-                case "EditNewsText":
-                    return "Bewerk Nieuws";
-                case "UserProfileFor":
-                    return "User Profiel Voor";
-                case "UsersGroupsText":
-                    return "Groepen";
-                case "UsersPicksText":
-                    return "Picks for";
-                case "ResidentSince":
-                    return "Resident Since";
-                case "AccountType":
-                    return "Account Type";
-                case "PartnersName":
-                    return "Partner's Naam";
-                case "AboutMe":
-                    return "Over Mij";
-                case "IsOnlineText":
-                    return "User Status";
-                case "OnlineLocationText":
-                    return "User Locatie";
+            // news
+            case "OpenNewsManager":             return "Open de Nieuws manager";
+            case "NewsManager":                 return "Nieuws Manager";
+            case "EditNewsItem":                return "Bewerk nieuws";
+            case "AddNewsItem":                 return "Voeg nieuw nieuws bericht toe";
+            case "DeleteNewsItem":              return "Verwijder nieuws item";
+            case "NewsDateText":                return "Nieuws Datum";
+            case "NewsTitleText":               return "Nieuws Titel";
+            case "NewsItemTitle":               return "Nieuws Item Titel";
+            case "NewsItemText":                return "Nieuws Item Tekst";
+            case "AddNewsText":                 return "Nieuws toevoegen";
+            case "DeleteNewsText":              return "Verwijder Nieuws";
+            case "EditNewsText":                return "Bewerk Nieuws";
 
-                case "RegionInformationText":
-                    return "Region Informatie";
-                case "OwnerNameText":
-                    return "Owner Naam";
-                case "RegionLocationText":
-                    return "Region Locatie";
-                case "RegionSizeText":
-                    return "Region Grootte";
-                case "RegionNameText":
-                    return "Region Naam";
-                case "RegionTypeText":
-                    return "Region Type";
-            case "RegionTerrainText":
-                return "Region Terrain";
-                case "ParcelsInRegionText":
-                    return "Parcels In Region";
-                case "ParcelNameText":
-                    return "Parcel Naam";
-                case "ParcelOwnerText":
-                    return "Parcel Owner's Naam";
+            // users
+            case "UserProfileFor":              return "User Profiel Voor";
+            case "GroupNameText":               return "Groep";
+            case "UsersGroupsText":             return "Groepen";
+            case "UsersPicksText":              return "Picks for";
+            case "ResidentSince":               return "Resident Since";
+            case "AccountType":                 return "Account Type";
+            case "PartnersName":                return "Partner's Naam";
+            case "AboutMe":                     return "Over Mij";
+            case "IsOnlineText":                return "User Status";
+            case "OnlineLocationText":          return "User Locatie";
 
-                    // Region Page
-                case "RegionInfoText":
-                    return "Region Info";
-                case "RegionListText":
-                    return "Region List";
-                case "RegionLocXText":
-                    return "Region X";
-                case "RegionLocYText":
-                    return "Region Y";
-                case "SortByLocX":
-                    return "Sort By Region X";
-                case "SortByLocY":
-                    return "Sort By Region Y";
-                case "SortByName":
-                    return "Sort By Region Name";
-                case "RegionMoreInfo":
-                    return "More Informatie";
-                case "RegionMoreInfoTooltips":
-                    return "More info over";
-                case "FirstText":
-                    return "Eerste";
-                case "BackText":
-                    return "Terug";
-                case "NextText":
-                    return "Volgende";
-                case "LastText":
-                    return "Laatste";
-                case "CurrentPageText":
-                    return "Current Page";
-                case "MoreInfoText":
-                    return "Meer Info";
-                case "OnlineUsersText":
-                    return "Online Users";
-                case "RegionOnlineText":
-                    return "Region Status";
-                case "NumberOfUsersInRegionText":
-                    return "Number of Users in region";
+                // Region information
+            case "RegionInformationText":       return "Region Informatie";
+            case "OwnerNameText":               return "Owner Naam";
+            case "RegionLocationText":          return "Region Locatie";
+            case "RegionSizeText":              return "Region Grootte";
+            case "RegionNameText":              return "Region Naam";
+            case "RegionTypeText":              return "Region Type";
+            case "RegionTerrainText":           return "Region Terrain";
+            case "ParcelsInRegionText":         return "Parcels In Region";
+            case "ParcelNameText":              return "Parcel Naam";
+            case "ParcelOwnerText":             return "Parcel Owner's Naam";
 
-                    // Menu Buttons
-                case "MenuHome":
-                    return "Home";
-                case "MenuLogin":
-                    return "Login";
-                case "MenuLogout":
-                    return "Logout";
-                case "MenuRegister":
-                    return "Registeer";
-                case "MenuForgotPass":
-                    return "Wachtwoord vergeten";
-                case "MenuNews":
-                    return "Nieuws";
-                case "MenuWorld":
-                    return "Wereld";
-                case "MenuWorldMap":
-                    return "Wereld Map";
-                case "MenuRegion":
-                    return "Region List";
-                case "MenuUser":
-                    return "Gebruiker";
-                case "MenuOnlineUsers":
-                    return "Online Gebruikers";
-                case "MenuUserSearch":
-                    return "Zoek Gebruiker";
-                case "MenuRegionSearch":
-                    return "Region Search";
-                case "MenuChat":
-                    return "Chat";
-                case "MenuHelp":
-                    return "Help";
-                case "MenuViewerHelp":
-                    return "Viewer Help";
-                case "MenuChangeUserInformation":
-                    return "Wijzig User Informatie";
-                case "MenuWelcomeScreenManager":
-                    return "Welcome Screen Manager";
-                case "MenuNewsManager":
-                    return "Nieuws Manager";
-                case "MenuUserManager":
-                    return "User Manager";
-                case "MenuFactoryReset":
-                    return "Factory Reset";
-                case "ResetMenuInfoText":
-                    return "Reset de menu items terug naar de default waardes";
-                case "ResetSettingsInfoText":
-                    return "Reset de Web Interface terug naar de default waardes";
-                case "MenuPageManager":
-                    return "Page Manager";
-                case "MenuSettingsManager":
-                    return "Settings Manager";
-                case "MenuManager":
-                    return "Admin";
+                // Region Page
+            case "RegionInfoText":              return "Region Info";
+            case "RegionListText":              return "Region List";
+            case "RegionLocXText":              return "Region X";
+            case "RegionLocYText":              return "Region Y";
+            case "SortByLocX":                  return "Sort By Region X";
+            case "SortByLocY":                  return "Sort By Region Y";
+            case "SortByName":                  return "Sort By Region Name";
+            case "RegionMoreInfo":              return "More Informatie";
+            case "RegionMoreInfoTooltips":      return "More info over";
+            case "OnlineUsersText":             return "Online Users";
+            case "RegionOnlineText":            return "Region Status";
+            case "NumberOfUsersInRegionText":   return "Number of Users in region";
+
+            // Region manager
+            case "Mainland":                    return "Vasteland";
+            case "Estate":                      return "Estate";
+            case "FullRegion":                  return "Volledige Regio";
+            case "Homestead":                   return "Homestead";
+            case "Openspace":                   return "Openspace";
+            case "Flatland":                    return "Flatland";
+            case "Grassland":                   return "Grasland";
+            case "Island":                      return "Island";
+            case "Aquatic":                     return "Aquatische";
+            case "Custom":                      return "Custom";
+            case "RegionPortText":              return "Regio-poort";
+            case "RegionVisibilityText":        return "Zichtbaar voor buren";
+            case "RegionInfiniteText":          return "Infinite Regio";
+            case "RegionCapacityText":          return "Regio object capaciteit";
+
+                // Menu Buttons
+            case "MenuHome":                    return "Home";
+            case "MenuLogin":                   return "Login";
+            case "MenuLogout":                  return "Logout";
+            case "MenuRegister":                return "Registeer";
+            case "MenuForgotPass":              return "Wachtwoord vergeten";
+            case "MenuNews":                    return "Nieuws";
+            case "MenuWorld":                   return "Wereld";
+            case "MenuWorldMap":                return "Wereld Map";
+            case "MenuRegion":                  return "Region List";
+            case "MenuUser":                    return "Gebruiker";
+            case "MenuOnlineUsers":             return "Online Gebruikers";
+            case "MenuUserSearch":              return "Zoek Gebruiker";
+            case "MenuRegionSearch":            return "Region Search";
+            case "MenuChat":                    return "Chat";
+            case "MenuHelp":                    return "Help";
+            case "MenuViewerHelp":              return "Viewer Help";
+            case "MenuChangeUserInformation":   return "Wijzig User Informatie";
+            case "MenuWelcomeScreenManager":    return "Welcome Screen Manager";
+            case "MenuNewsManager":             return "Nieuws Manager";
+            case "MenuUserManager":             return "User Manager";
+            case "MenuFactoryReset":            return "Factory Reset";
+            case "ResetMenuInfoText":           return "Reset de menu items terug naar de default waardes";
+            case "ResetSettingsInfoText":       return "Reset de Web Interface terug naar de default waardes";
+            case "MenuPageManager":             return "Page Manager";
+            case "MenuSettingsManager":         return "Settings Manager";
+            case "MenuManager":                 return "Admin";
+            case "MenuSettings":                return "Instellingen";
+            case "MenuRegionManager":           return "Regio Manager";
+            case "MenuManagerSimConsole":       return "Sim console";
+            case "MenuPurchases":               return "Gebruiker Aankopen";
+            case "MenuTransactions":            return "Gebruiker Transacties";
 
                     // Tooltips Menu Buttons
                 case "TooltipsMenuHome":
@@ -281,9 +198,7 @@ namespace WhiteCore.Modules.Web.Translators
                     return "Wereld";
                 case "TooltipsMenuWorldMap":
                     return "Wereld Map";
-                case "TooltipsMenuRegion":
-                    return "Region List";
-                case "TooltipsMenuUser":
+                              case "TooltipsMenuUser":
                     return "User";
                 case "TooltipsMenuOnlineUsers":
                     return "Online Users";
@@ -313,22 +228,36 @@ namespace WhiteCore.Modules.Web.Translators
                     return "Settings Manager";
                 case "TooltipsMenuManager":
                     return "Admin Management";
+            case "TooltipsMenuSettings":
+                return "WebUI Instellingen";
+            case  "TooltipsMenuRegionManager":
+                return "Regio maken / bewerken";
+            case "TooltipsMenuManagerSimConsole":
+                return "Online simulator console";
+            case "TooltipsMenuPurchases":               return "Aankoop informatie";
+            case "TooltipsMenuTransactions":
+                return "Transactie-informatie";
 
                     // Menu Region
-                case "MenuRegionTitle":
-                    return "Region";
-                case "MenuParcelTitle":
-                    return "Parcel";
-                case "MenuOwnerTitle":
-                    return "Owner";
+            case "MenuRegionTitle":                return "Region";
+            case "MenuParcelTitle":                return "Parcel";
+            case "MenuOwnerTitle":                return "Owner";
+            case "TooltipsMenuRegion":                return "Regio informatie";
+            case "TooltipsMenuParcel":          return "Regio Parcels";
+            case "TooltipsMenuOwner":           return "Estate Owner";
 
                     // Menu Profile
-                case "MenuProfileTitle":
-                    return "Profile";
-                case "MenuGroupTitle":
-                    return "Group";
-                case "MenuPicksTitle":
-                    return "Picks";
+            case "MenuProfileTitle":                    return "Profile";
+            case "MenuGroupTitle":                    return "Group";
+            case "MenuPicksTitle":                    return "Picks";
+            case "MenuRegionsTitle":            return "Regions";
+            case "TooltipsMenuProfile":         return "Gebruiker Profile";
+            case "TooltipsMenuGroups":          return "Gebruikersgroepen";
+            case "TooltipsMenuPicks":           return "Gebruiker Picks";
+            case "TooltipsMenuRegions":         return "Gebruiker regio";
+            case "UserGroupNameText":               return "Gebruikersgroep";
+            case "PickNameText":                return "Pick naam";
+            case "PickRegionText":              return "Locatie";
 
                     // Urls
                 case "WelcomeScreen":
@@ -581,10 +510,6 @@ namespace WhiteCore.Modules.Web.Translators
                     return "Page Tooltip";
                 case "PageTitleText":
                     return "Page Title";
-                case "No":
-                    return "No";
-                case "Yes":
-                    return "Yes";
                 case "RequiresLoginText":
                     return "Requires Login To View";
                 case "RequiresLogoutText":
@@ -595,9 +520,7 @@ namespace WhiteCore.Modules.Web.Translators
                     return "Required Admin Level To View";
 
                     //settings manager page
-                case "Save":
-                    return "Save";
-                case "WebRegistrationText":
+                 case "WebRegistrationText":
                     return "Webregistraties toegestaan";
                 case "GridCenterXText":
                     return "Grid Center Location X";
@@ -610,7 +533,26 @@ namespace WhiteCore.Modules.Web.Translators
                 case "IgnoreSettingsUpdatesText":
                     return "Ignore settings update warning until next update";
 
-                    //Times
+                // Transactions
+            case "TransactionsText":            return "Transacties";
+            case "DateInfoText":                return "Selecteer een datumbereik";
+            case "DateStartText":               return "Ingangsdatum";
+            case "DateEndText":                 return "Eind";
+            case "30daysPastText":              return "Vorige 30 dagen";
+            case "TransactionDateText":         return "Datum";
+            case "TransactionDetailText":       return "Beschrijving";
+            case "TransactionAmountText":       return "Bedrag";
+            case "TransactionBalanceText":      return "Balance";
+            case "NoTransactionsText":          return "Geen transacties gevonden...";
+            case "PurchasesText":               return "Aankopen";
+            case "LoggedIPText":                return "Gelogde IP-adres";
+            case "NoPurchasesText":             return "Geen aankopen gevonden...";
+
+                // Sim Console
+            case "SimConsoleText":              return "Sim Command Console";
+            case "SimCommandText":              return "Command";
+
+                //Times
                 case "Sun":
                     return "Sun";
                 case "Mon":
@@ -742,6 +684,8 @@ namespace WhiteCore.Modules.Web.Translators
                 return "Verbergen slideshow bar";
             case "LocalFrontPageText":
                 return "Lokale voorpagina";
+            case "LocalCSSText":
+                return "Lokale CSS stylesheet";
             }
             return "UNKNOWN CHARACTER";
         }

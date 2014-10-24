@@ -25,8 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
-using WhiteCore.Framework.Servers.HttpServer;
 using System.Collections.Generic;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
@@ -50,7 +48,7 @@ namespace WhiteCore.Modules.Web
 
         public bool RequiresAuthentication
         {
-            get { return false; }
+            get { return true; }
         }
 
         public bool RequiresAdminAuthentication
@@ -67,50 +65,102 @@ namespace WhiteCore.Modules.Web
             var usersList = new List<Dictionary<string, object>>();
 
             uint amountPerQuery = 10;
+            string noDetails = translator.GetTranslatedString ("NoDetailsText");
 
             if (requestParameters.ContainsKey("Submit"))
             {
                 IUserAccountService accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService>();
                 var libraryOwner = new UUID(Constants.LibraryOwner);
                 var realestateOwner = new UUID(Constants.RealEstateOwnerUUID);
+                var IsAdmin = Authenticator.CheckAdminAuthentication (httpRequest);
 
-                string username = requestParameters["username"].ToString();
-                int start = httpRequest.Query.ContainsKey("Start")
-                                ? int.Parse(httpRequest.Query["Start"].ToString())
-                                : 0;
-                uint count = accountService.NumberOfUserAccounts(null, username);
-                int maxPages = (int) (count/amountPerQuery) - 1;
+                string userName = requestParameters["username"].ToString();
+                // allow '*' wildcards
+                var username = userName.Replace ('*', '%');
+
+                int start = httpRequest.Query.ContainsKey ("Start")
+                    ? int.Parse (httpRequest.Query ["Start"].ToString ())
+                    : 0;
+                uint count = accountService.NumberOfUserAccounts (null, username);
+                int maxPages = (int)(count / amountPerQuery) - 1;
 
                 if (start == -1)
-                    start = (int) (maxPages < 0 ? 0 : maxPages);
+                    start = (int)(maxPages < 0 ? 0 : maxPages);
 
-                vars.Add("CurrentPage", start);
-                vars.Add("NextOne", start + 1 > maxPages ? start : start + 1);
-                vars.Add("BackOne", start - 1 < 0 ? 0 : start - 1);
+                vars.Add ("CurrentPage", start);
+                vars.Add ("NextOne", start + 1 > maxPages ? start : start + 1);
+                vars.Add ("BackOne", start - 1 < 0 ? 0 : start - 1);
 
-                var users = accountService.GetUserAccounts(null, username, (uint) start, amountPerQuery);
-                foreach (var user in users)
+                // check for admin wildcard search
+                if ((username.Trim ().Length > 0) || IsAdmin)
                 {
-                    if (user.PrincipalID == libraryOwner)
-                        continue;
-                    if (user.PrincipalID == realestateOwner)
-                        continue;
+                    var users = accountService.GetUserAccounts (null, username, (uint)start, amountPerQuery);
+                    var searchUsersList = new List<UUID>();
 
-                    usersList.Add(new Dictionary<string, object>
-                                      {
-                                          {"UserName", user.Name},
-                                          {"UserID", user.PrincipalID},
-                                          {"CanEdit", Authenticator.CheckAdminAuthentication(httpRequest)}
-                                      });
+                    if (IsAdmin)        // display all users
+                    {
+                        foreach (var user in users)
+                        {
+                            searchUsersList.Add (user.PrincipalID);
+                        }
+
+                    } else             // only show the users friends
+                    {
+
+                        UserAccount ourAccount = Authenticator.GetAuthentication (httpRequest);
+                        if (ourAccount != null)
+                        {
+                            IFriendsService friendsService = webInterface.Registry.RequestModuleInterface<IFriendsService> ();
+                            var friends = friendsService.GetFriends (ourAccount.PrincipalID);
+                            foreach (var friend in friends)
+                            {
+                                UUID friendID = UUID.Zero;
+                                UUID.TryParse (friend.Friend, out friendID);
+
+                                if (friendID != UUID.Zero) 
+                                    searchUsersList.Add (friendID);
+                            }
+                        }
+                    }
+                    if (searchUsersList.Count > 0)
+                    {
+                       noDetails = "";
+
+                        foreach (var user in users)
+                        {
+                            if ( ! searchUsersList.Contains(user.PrincipalID))
+                                continue;
+
+                            if (user.PrincipalID == libraryOwner)
+                                continue;
+                            if (user.PrincipalID == realestateOwner)
+                                continue;
+
+                            usersList.Add (new Dictionary<string, object> {
+                                { "UserName", user.Name },
+                                { "UserID", user.PrincipalID },
+                                { "CanEdit", IsAdmin }
+                            });
+                        }
+                    }
+
+                    if (usersList.Count == 0)
+                    {
+                        usersList.Add (new Dictionary<string, object> {
+                            { "UserName", translator.GetTranslatedString ("NoDetailsText") },
+                            { "UserID", "" },
+                            { "CanEdit", false }
+                        });
+                    }
                 }
-            }
-            else
+            } else
             {
                 vars.Add("CurrentPage", 0);
                 vars.Add("NextOne", 0);
                 vars.Add("BackOne", 0);
             }
 
+            vars.Add("NoDetailsText", noDetails);
             vars.Add("UsersList", usersList);
             vars.Add("UserSearchText", translator.GetTranslatedString("UserSearchText"));
             vars.Add("SearchForUserText", translator.GetTranslatedString("SearchForUserText"));

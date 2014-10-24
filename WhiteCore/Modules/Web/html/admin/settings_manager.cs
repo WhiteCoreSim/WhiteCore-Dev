@@ -72,9 +72,16 @@ namespace WhiteCore.Modules.Web
                 settings.LocalFrontPage = requestParameters["LocalFrontPage"].ToString();
                 if (settings.LocalFrontPage != "")
                     settings.LocalFrontPage = "local/" + settings.LocalFrontPage;
-                settings.HideSlideshowBar = requestParameters["HideSlideshowBar"].ToString() == "1";
+                settings.LocalCSS = requestParameters["LocalCSS"].ToString();
+                 settings.HideSlideshowBar = requestParameters["HideSlideshowBar"].ToString() == "1";
                 settings.HideLanguageTranslatorBar = requestParameters["HideLanguageBar"].ToString() == "1";
                 settings.HideStyleBar = requestParameters["HideStyleBar"].ToString() == "1";
+                if (settings.LocalCSS != "")
+                {
+                    settings.LocalCSS = "local/" + settings.LocalCSS;
+                    settings.HideStyleBar = true;                               // not needed if a local style is used
+                }
+
                 connector.AddGeneric(UUID.Zero, "WebSettings", "Settings", settings.ToOSD());
 
                 response = "Successfully updated settings.";
@@ -100,6 +107,11 @@ namespace WhiteCore.Modules.Web
             else
                 vars.Add("LocalFrontPage", settings.LocalFrontPage);
 
+            if (settings.LocalCSS.StartsWith("local/"))
+                vars.Add("LocalCSS", settings.LocalCSS.Remove(0,6));                            // remove 'local/' prefix
+            else
+                vars.Add("LocalCSS", settings.LocalCSS);
+
             vars.Add("HideSlideshowBarNo", !settings.HideSlideshowBar ? "selected=\"selected\"" : "");
             vars.Add("HideSlideshowBarYes", settings.HideSlideshowBar ? "selected=\"selected\"" : "");
             vars.Add("HideLanguageBarNo", !settings.HideLanguageTranslatorBar ? "selected=\"selected\"" : "");
@@ -120,6 +132,7 @@ namespace WhiteCore.Modules.Web
             vars.Add("GridCenterXText", translator.GetTranslatedString("GridCenterXText"));
             vars.Add("GridCenterYText", translator.GetTranslatedString("GridCenterYText"));
             vars.Add("LocalFrontPageText", translator.GetTranslatedString("LocalFrontPageText"));
+            vars.Add("LocalCSSText", translator.GetTranslatedString("LocalCSSText"));
             vars.Add("HideSlideshowBarText", translator.GetTranslatedString("HideSlideshowBarText"));
             vars.Add("HideLanguageBarText", translator.GetTranslatedString("HideLanguageBarText"));
             vars.Add("HideStyleBarText", translator.GetTranslatedString("HideStyleBarText"));

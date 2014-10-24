@@ -41,258 +41,300 @@ namespace WhiteCore.Modules.Web
         {
             _rootPage = new GridPage();
 
-            _rootPage.Children.Add(new GridPage
-                                       {
-                                           ShowInMenu = true,
-                                           MenuID = "home",
-                                           Location = "home.html",
-                                           MenuPosition = 0,
-                                           MenuTitle = "MenuHome",
-                                           MenuToolTip = "TooltipsMenuHome"
-                                       });
-            _rootPage.Children.Add(new GridPage
-                                       {
-                                           ShowInMenu = true,
-                                           MenuID = "news",
-                                           Location = "news_list.html",
-                                           MenuPosition = 1,
-                                           MenuTitle = "MenuNews",
-                                           MenuToolTip = "TooltipsMenuNews"
-                                       });
-            _rootPage.Children.Add(new GridPage
-                                       {
-                                           ShowInMenu = true,
-                                           MenuID = "world",
-                                           Location = "world.html",
-                                           MenuPosition = 2,
-                                           MenuTitle = "MenuWorld",
-                                           MenuToolTip = "TooltipsMenuWorld",
-                                           Children = new List<GridPage>
-                                                          {
-                                                              new GridPage
-                                                                  {
-                                                                      ShowInMenu = true,
-                                                                      MenuID = "world",
-                                                                      Location = "world.html",
-                                                                      MenuPosition = 2,
-                                                                      MenuTitle = "MenuWorldMap",
-                                                                      MenuToolTip = "TooltipsMenuWorldMap"
-                                                                  },
-                                                              new GridPage
-                                                                  {
-                                                                      ShowInMenu = true,
-                                                                      MenuID = "region_search",
-                                                                      Location = "region_search.html",
-                                                                      MenuPosition = 2,
-                                                                      MenuTitle = "MenuRegionSearch",
-                                                                      MenuToolTip = "TooltipsMenuRegionSearch"
-                                                                  },
-                                                              new GridPage
-                                                                  {
-                                                                      ShowInMenu = true,
-                                                                      MenuID = "region_list",
-                                                                      Location = "region_list.html",
-                                                                      MenuPosition = 2,
-                                                                      MenuTitle = "MenuRegion",
-                                                                      MenuToolTip = "TooltipsMenuRegion"
-                                                                  }
-                                                          }
-                                       });
-            _rootPage.Children.Add(new GridPage
-                                       {
-                                           ShowInMenu = true,
-                                           MenuID = "users",
-                                           Location = "online_users.html",
-                                           MenuPosition = 3,
-                                           MenuTitle = "MenuUser",
-                                           MenuToolTip = "TooltipsMenuUser",
-                                           Children = new List<GridPage>
-                                                          {
-                                                              new GridPage
-                                                                  {
-                                                                      ShowInMenu = true,
-                                                                      LoggedInRequired = true,
-                                                                      MenuID = "change_user_information",
-                                                                      Location = "change_user_information.html",
-                                                                      MenuPosition = 1,
-                                                                      MenuTitle = "MenuChangeUserInformation",
-                                                                      MenuToolTip = "TooltipsMenuChangeUserInformation"
-                                                                  },
-                                                              new GridPage
-                                                                  {
-                                                                      ShowInMenu = true,
-                                                                      MenuID = "online_users",
-                                                                      Location = "online_users.html",
-                                                                      MenuPosition = 2,
-                                                                      MenuTitle = "MenuOnlineUsers",
-                                                                      MenuToolTip = "TooltipsMenuOnlineUsers"
-                                                                  },
-                                                              new GridPage
-                                                                  {
-                                                                      ShowInMenu = true,
-                                                                      MenuID = "user_search",
-                                                                      Location = "user_search.html",
-                                                                      MenuPosition = 3,
-                                                                      MenuTitle = "MenuUserSearch",
-                                                                      MenuToolTip = "TooltipsMenuUserSearch"
-                                                                  }
-                                                          }
-                                       });
-            _rootPage.Children.Add(new GridPage
-                                       {
-                                           ShowInMenu = true,
-                                           MenuID = "help",
-                                           Location = "help.html",
-                                           MenuPosition = 5,
-                                           MenuTitle = "MenuHelp",
-                                           MenuToolTip = "TooltipsMenuHelp",
-                                           Children = new List<GridPage>
-                                                          {
-                                                              new GridPage
-                                                                  {
-                                                                      ShowInMenu = true,
-                                                                      MenuID = "help",
-                                                                      Location = "help.html",
-                                                                      MenuPosition = 1,
-                                                                      MenuTitle = "MenuViewerHelp",
-                                                                      MenuToolTip = "TooltipsMenuViewerHelp"
-                                                                  },
-                                                              new GridPage
-                                                                  {
-                                                                      ShowInMenu = true,
-                                                                      MenuID = "chat",
-                                                                      Location = "chat.html",
-                                                                      MenuPosition = 2,
-                                                                      MenuTitle = "MenuChat",
-                                                                      MenuToolTip = "TooltipsMenuChat"
-                                                                  }
-                                                          }
-                                       });
-            _rootPage.Children.Add(new GridPage
-                                       {
-                                           ShowInMenu = true,
-                                           LoggedInRequired = true,
-                                           MenuID = "logout",
-                                           Location = "logout.html",
-                                           MenuPosition = 7,
-                                           MenuTitle = "MenuLogout",
-                                           MenuToolTip = "TooltipsMenuLogout"
-                                       });
-            _rootPage.Children.Add(new GridPage
-                                       {
-                                           ShowInMenu = true,
-                                           LoggedOutRequired = true,
-                                           MenuID = "register",
-                                           Location = "register.html",
-                                           MenuPosition = 7,
-                                           MenuTitle = "MenuRegister",
-                                           MenuToolTip = "TooltipsMenuRegister"
-                                       });
-            _rootPage.Children.Add(new GridPage
-                                       {
-                                           ShowInMenu = true,
-                                           LoggedOutRequired = true,
-                                           MenuID = "login",
-                                           Location = "login.html",
-                                           MenuPosition = 8,
-                                           MenuTitle = "MenuLogin",
-                                           MenuToolTip = "TooltipsMenuLogin",
-                                           Children = new List<GridPage>
-                                                          {
-                                                              new GridPage
-                                                                  {
-                                                                      ShowInMenu = true,
-                                                                      MenuID = "forgot_pass",
-                                                                      Location = "forgot_pass.html",
-                                                                      MenuPosition = 1,
-                                                                      MenuTitle = "MenuForgotPass",
-                                                                      MenuToolTip = "TooltipsMenuForgotPass"
-                                                                  }
-                                                          }
-                                       });
-            _rootPage.Children.Add(new GridPage
-                                       {
-                                           ShowInMenu = true,
-                                           AdminRequired = true,
-                                           MenuID = "manager",
-                                           Location = "admin/manager.html",
-                                           MenuPosition = 9,
-                                           MenuTitle = "MenuManager",
-                                           MenuToolTip = "TooltipsMenuManager",
-                                           Children = new List<GridPage>
-                                                          {
-                                                              new GridPage
-                                                                  {
-                                                                      ShowInMenu = true,
-                                                                      AdminRequired = true,
-                                                                      MenuID = "news_manager",
-                                                                      Location = "admin/news_manager.html",
-                                                                      MenuPosition = 8,
-                                                                      MenuTitle = "MenuNewsManager",
-                                                                      MenuToolTip = "TooltipsMenuNewsManager"
-                                                                  },
-                                                              new GridPage
-                                                                  {
-                                                                      ShowInMenu = true,
-                                                                      AdminRequired = true,
-                                                                      MenuID = "user_search",
-                                                                      Location = "user_search.html",
-                                                                      MenuPosition = 8,
-                                                                      MenuTitle = "MenuUserManager",
-                                                                      MenuToolTip = "TooltipsMenuUserManager"
-                                                                  },
-                                                               new GridPage
-                                                                  {
-                                                                      ShowInMenu = true,
-                                                                      AdminRequired = true,
-                                                                      MenuID = "new_user",
-                                                                      Location = "register.html",
-                                                                      MenuPosition = 8,
-                                                                      MenuTitle = "MenuRegister",
-                                                                      MenuToolTip = "TooltipsMenuRegister"
-                                                                  },
-                                                              new GridPage
-                                                                  {
-                                                                      ShowInMenu = true,
-                                                                      AdminRequired = true,
-                                                                      MenuID = "factory_reset",
-                                                                      Location = "admin/factory_reset.html",
-                                                                      MenuPosition = 8,
-                                                                      MenuTitle = "MenuFactoryReset",
-                                                                      MenuToolTip = "TooltipsMenuFactoryReset"
-                                                                  },
-                                                              new GridPage
-                                                                  {
-                                                                      ShowInMenu = true,
-                                                                      AdminRequired = true,
-                                                                      MenuID = "page_manager",
-                                                                      Location = "admin/page_manager.html",
-                                                                      MenuPosition = 8,
-                                                                      MenuTitle = "MenuPageManager",
-                                                                      MenuToolTip = "TooltipsMenuPageManager"
-                                                                  },
-                                                              new GridPage
-                                                                  {
-                                                                      ShowInMenu = true,
-                                                                      AdminRequired = true,
-                                                                      MenuID = "settings_manager",
-                                                                      Location = "admin/settings_manager.html",
-                                                                      MenuPosition = 8,
-                                                                      MenuTitle = "MenuSettingsManager",
-                                                                      MenuToolTip = "TooltipsMenuSettingsManager"
-                                                                  },
-                                                              new GridPage
-                                                                  {
-                                                                      ShowInMenu = true,
-                                                                      AdminRequired = true,
-                                                                      MenuID = "welcomescreen_manager",
-                                                                      Location = "admin/welcomescreen_manager.html",
-                                                                      MenuPosition = 8,
-                                                                      MenuTitle = "MenuWelcomeScreenManager",
-                                                                      MenuToolTip = "TooltipsMenuWelcomeScreenManager"
-                                                                  }
-                                                          }
-                                       });
+            // home
+            _rootPage.Children.Add (new GridPage {
+                ShowInMenu = true,
+                MenuID = "home",
+                Location = "home.html",
+                MenuPosition = 0,
+                MenuTitle = "MenuHome",
+                MenuToolTip = "TooltipsMenuHome"
+            });
+
+            // news
+            _rootPage.Children.Add (new GridPage {
+                ShowInMenu = true,
+                MenuID = "news",
+                Location = "news_list.html",
+                MenuPosition = 1,
+                MenuTitle = "MenuNews",
+                MenuToolTip = "TooltipsMenuNews"
+            });
+
+            // world map
+            _rootPage.Children.Add (new GridPage {
+                ShowInMenu = true,
+                MenuID = "world",
+                Location = "world.html",
+                MenuPosition = 2,
+                MenuTitle = "MenuWorld",
+                MenuToolTip = "TooltipsMenuWorld",
+                Children = new List<GridPage> {
+                    new GridPage {
+                        ShowInMenu = true,
+                        MenuID = "world",
+                        Location = "world.html",
+                        MenuPosition = 0,
+                        MenuTitle = "MenuWorldMap",
+                        MenuToolTip = "TooltipsMenuWorldMap"
+                    },
+                    new GridPage {
+                        ShowInMenu = true,
+                        MenuID = "region_search",
+                        Location = "region_search.html",
+                        MenuPosition = 1,
+                        MenuTitle = "MenuRegionSearch",
+                        MenuToolTip = "TooltipsMenuRegionSearch"
+                    },
+                    new GridPage {
+                        ShowInMenu = true,
+                        MenuID = "region_list",
+                        Location = "region_list.html",
+                        MenuPosition = 2,
+                        MenuTitle = "MenuRegion",
+                        MenuToolTip = "TooltipsMenuRegion"
+                    }
+                }
+            });
+
+            // users
+            _rootPage.Children.Add (new GridPage {
+                ShowInMenu = true,
+                LoggedInRequired = true,
+                MenuID = "users",
+                Location = "online_users.html",
+                MenuPosition = 3,
+                MenuTitle = "MenuUser",
+                MenuToolTip = "TooltipsMenuUser",
+                Children = new List<GridPage> {
+                    new GridPage {
+                        ShowInMenu = true,
+                        LoggedInRequired = true,
+                        MenuID = "online_users",
+                        Location = "online_users.html",
+                        MenuPosition = 0,
+                        MenuTitle = "MenuOnlineUsers",
+                        MenuToolTip = "TooltipsMenuOnlineUsers"
+                    },
+                    new GridPage {
+                        ShowInMenu = true,
+                        LoggedInRequired = true,
+                        MenuID = "user_search",
+                        Location = "user_search.html",
+                        MenuPosition = 1,
+                        MenuTitle = "MenuUserSearch",
+                        MenuToolTip = "TooltipsMenuUserSearch"
+                    },
+                    new GridPage {
+                        ShowInMenu = true,
+                        LoggedInRequired = true,
+                        MenuID = "change_user_information",
+                        Location = "change_user_information.html",
+                        MenuPosition = 2,
+                        MenuTitle = "MenuChangeUserInformation",
+                        MenuToolTip = "TooltipsMenuChangeUserInformation"
+                    }
+                }
+            });
+
+            // help
+            _rootPage.Children.Add (new GridPage {
+                ShowInMenu = true,
+                MenuID = "help",
+                Location = "help.html",
+                MenuPosition = 5,
+                MenuTitle = "MenuHelp",
+                MenuToolTip = "TooltipsMenuHelp",
+                Children = new List<GridPage> {
+                    new GridPage {
+                        ShowInMenu = true,
+                        MenuID = "help",
+                        Location = "help.html",
+                        MenuPosition = 1,
+                        MenuTitle = "MenuViewerHelp",
+                        MenuToolTip = "TooltipsMenuViewerHelp"
+                    },
+                    new GridPage {
+                        ShowInMenu = true,
+                        MenuID = "chat",
+                        Location = "chat.html",
+                        MenuPosition = 2,
+                        MenuTitle = "MenuChat",
+                        MenuToolTip = "TooltipsMenuChat"
+                    }
+                }
+            });
+
+            // register
+            _rootPage.Children.Add (new GridPage {
+                ShowInMenu = true,
+                LoggedInRequired = true,
+                MenuID = "logout",
+                Location = "logout.html",
+                MenuPosition = 6,
+                MenuTitle = "MenuLogout",
+                MenuToolTip = "TooltipsMenuLogout"
+            });
+
+            // login
+            _rootPage.Children.Add (new GridPage {
+                ShowInMenu = true,
+                LoggedOutRequired = true,
+                MenuID = "register",
+                Location = "register.html",
+                MenuPosition = 6,
+                MenuTitle = "MenuRegister",
+                MenuToolTip = "TooltipsMenuRegister"
+            });
+
+            // Logout
+            _rootPage.Children.Add (new GridPage {
+                ShowInMenu = true,
+                LoggedOutRequired = true,
+                MenuID = "login",
+                Location = "login.html",
+                MenuPosition = 7,
+                MenuTitle = "MenuLogin",
+                MenuToolTip = "TooltipsMenuLogin",
+                Children = new List<GridPage> {
+                    new GridPage {
+                        ShowInMenu = true,
+                        MenuID = "forgot_pass",
+                        Location = "forgot_pass.html",
+                        MenuPosition = 1,
+                        MenuTitle = "MenuForgotPass",
+                        MenuToolTip = "TooltipsMenuForgotPass"
+                    }
+                }
+            });
+
+            // Management
+            _rootPage.Children.Add (new GridPage {
+                ShowInMenu = true,
+                AdminRequired = true,
+                MenuID = "manager",
+                Location = "admin/manager.html",
+                MenuPosition = 8,
+                MenuTitle = "MenuManager",
+                MenuToolTip = "TooltipsMenuManager",
+                Children = new List<GridPage> {
+                    new GridPage {
+                        ShowInMenu = true,
+                        AdminRequired = true,
+                        MenuID = "news_manager",
+                        Location = "admin/news_manager.html",
+                        MenuPosition = 2,
+                        MenuTitle = "MenuNewsManager",
+                        MenuToolTip = "TooltipsMenuNewsManager"
+                    },
+                    new GridPage {
+                        ShowInMenu = true,
+                        AdminRequired = true,
+                        MenuID = "user_search",
+                        Location = "user_search.html",
+                        MenuPosition = 1,
+                        MenuTitle = "MenuUserManager",
+                        MenuToolTip = "TooltipsMenuUserManager"
+                    },
+                    new GridPage {
+                        ShowInMenu = true,
+                        AdminRequired = true,
+                        MenuID = "new_user",
+                        Location = "register.html",
+                        MenuPosition = 0,
+                        MenuTitle = "MenuRegister",
+                        MenuToolTip = "TooltipsMenuRegister"
+                    },
+                    new GridPage {
+                        ShowInMenu = false,
+                        AdminRequired = true,
+                        MenuID = "new_region",
+                        Location = "admin/region_manager.html",
+                        MenuPosition = 3,
+                        MenuTitle = "MenuRegionManager",
+                        MenuToolTip = "TooltipsMenuRegionManager"
+                    },
+                    new GridPage {
+                        ShowInMenu = false,
+                        AdminRequired = true,
+                        MenuID = "sim_console",
+                        Location = "admin/sim_console.html",
+                        MenuPosition = 4,
+                        MenuTitle = "MenuManagerSimConsole",
+                        MenuToolTip = "TooltipsMenuManagerSimConsole"
+
+                    },
+                    new GridPage {
+                        ShowInMenu = true,
+                        AdminRequired = true,
+                        MenuID = "purchases",
+                        Location = "admin/purchases.html",
+                        MenuPosition = 5,
+                        MenuTitle = "MenuPurchases",
+                        MenuToolTip = "TooltipsMenuPurchases"
+
+                    },
+                    new GridPage {
+                        ShowInMenu = true,
+                        AdminRequired = true,
+                        MenuID = "Transactions",
+                        Location = "admin/transactions.html",
+                        MenuPosition = 6,
+                        MenuTitle = "MenuTransactions",
+                        MenuToolTip = "TooltipsMenuTransactions"
+                    }
+                }
+            });
+
+            // admin settings
+            _rootPage.Children.Add (new GridPage {
+                ShowInMenu = true,
+                AdminRequired = true,
+                MenuID = "manager",
+                Location = "admin/settings.html",
+                MenuPosition = 9,
+                MenuTitle = "MenuSettings",
+                MenuToolTip = "TooltipsMenuSettings",
+                Children = new List<GridPage> {
+                    new GridPage {
+                        ShowInMenu = true,
+                        AdminRequired = true,
+                        MenuID = "factory_reset",
+                        Location = "admin/factory_reset.html",
+                        MenuPosition = 3,
+                        MenuTitle = "MenuFactoryReset",
+                        MenuToolTip = "TooltipsMenuFactoryReset"
+                    },
+                    new GridPage {
+                        ShowInMenu = true,
+                        AdminRequired = true,
+                        MenuID = "page_manager",
+                        Location = "admin/page_manager.html",
+                        MenuPosition = 1,
+                        MenuTitle = "MenuPageManager",
+                        MenuToolTip = "TooltipsMenuPageManager"
+                    },
+                    new GridPage {
+                        ShowInMenu = true,
+                        AdminRequired = true,
+                        MenuID = "settings_manager",
+                        Location = "admin/settings_manager.html",
+                        MenuPosition = 0,
+                        MenuTitle = "MenuSettingsManager",
+                        MenuToolTip = "TooltipsMenuSettingsManager"
+                    },
+                    new GridPage {
+                        ShowInMenu = true,
+                        AdminRequired = true,
+                        MenuID = "welcomescreen_manager",
+                        Location = "admin/welcomescreen_manager.html",
+                        MenuPosition = 2,
+                        MenuTitle = "MenuWelcomeScreenManager",
+                        MenuToolTip = "TooltipsMenuWelcomeScreenManager"
+                                                                
+                    }
+                }
+            });
 
 
             _rootPage.Children.Add(new GridPage

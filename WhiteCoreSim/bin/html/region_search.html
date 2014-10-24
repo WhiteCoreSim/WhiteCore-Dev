@@ -84,28 +84,42 @@
   
   <thead  class="listhead">
     <tr>
-      <th class="user_search_result_left"><p>{RegionNameText}</p></th>
-      <th class="user_search_result_right"><p>{RegionLocXText}</p></a></th>
-      <th class="user_search_result_right"><p>{RegionLocYText}</p></a></th>
-      <th class="user_search_result_right"><p>{RegionMoreInfo}</p></th>
+      <th class="user_search_result_left" style="width:200px"><p>{RegionNameText}</p></th>
+      <th class="user_search_result_left" style="width:100px"><p>{RegionLocXText}</p></th>
+      <th class="user_search_result_left" style="width:100px"><p>{RegionLocYText}</p></th>
+      <th class="user_search_result_left"></th>
+      <th class="user_search_result_right" style="width:50px"><p>{RegionOnlineText}</p></th>
+      <th class="user_search_result_right" style="width:150px"><p>{RegionMoreInfo}</p></th>
     </tr>
   </thead>
   <tfoot class="listfoot">
     <tr style= align:bottom;">
       <th class="user_search_result_left"><p>{RegionNameText}</p></th>
-      <th class="user_search_result_right"><p>{RegionLocXText}</p></a></th>
-      <th class="user_search_result_right"><p>{RegionLocYText}</p></a></th>
+      <th class="user_search_result_left"><p>{RegionLocXText}</p></th>
+      <th class="user_search_result_left"><p>{RegionLocYText}</p></th>
+      <th class="user_search_result_left"></th>
+      <th class="user_search_result_right"><p>{RegionOnlineText}</p></th>
       <th class="user_search_result_right"><p>{RegionMoreInfo}</p></th>
     </tr>
   </tfoot>
   <tbody>
 
+  <tr>
+  	<td colspan="5">
+  	  <div id="error_message" class="error_message">
+  	    <h3>{NoDetailsText}</h3>
+  	  </div>
+  	</td>
+  </tr>
+
 {RegionsListArrayBegin}
     <tr>
       <td class="user_search_result_left"><p>{RegionName}</p></td>
-      <td class="user_search_result_right"><p>{RegionLocX}</p></td>
-	  <td class="user_search_result_right"><p>{RegionLocY}</p></td>
-      <td class="user_search_result_right"><a target="_blank" class='regioninfo' href="region_info.html?regionid={RegionID}"><p>{MoreInfoText}</p></a></td>
+      <td class="user_search_result_left"><p>{RegionLocX}</p></td>
+	  <td class="user_search_result_left"><p>{RegionLocY}</p></td>
+ 	  <td class="user_search_result_left"><p>{RegionInfo}</p></td>
+	  <td class="user_search_result_right"><p>{RegionStatus}</p></td>
+     <td class="user_search_result_right"><a target="_self" class='regioninfo' href="regionprofile/?regionid={RegionID}"><p>{MoreInfoText}</p></a></td>
     </tr>
 {RegionsListArrayEnd}
 

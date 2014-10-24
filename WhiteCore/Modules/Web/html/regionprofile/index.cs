@@ -158,12 +158,16 @@ namespace WhiteCore.Modules.Web
                 if (webTextureService != null && region.TerrainMapImage != UUID.Zero)
                     vars.Add("RegionImageURL", webTextureService.GetTextureURL(region.TerrainMapImage));
                 else
-                    vars.Add("RegionImageURL", "images/icons/no_picture.jpg");
+                    vars.Add("RegionImageURL", "../images/icons/no_terrain.jpg");
 
                 // Menu Region
                 vars.Add("MenuRegionTitle", translator.GetTranslatedString("MenuRegionTitle"));
+                vars.Add("TooltipsMenuRegion", translator.GetTranslatedString("TooltipsMenuRegion"));
                 vars.Add("MenuParcelTitle", translator.GetTranslatedString("MenuParcelTitle"));
+                vars.Add("TooltipsMenuParcel", translator.GetTranslatedString("TooltipsMenuParcel"));
                 vars.Add("MenuOwnerTitle", translator.GetTranslatedString("MenuOwnerTitle"));
+                vars.Add("TooltipsMenuOwner", translator.GetTranslatedString("TooltipsMenuOwner"));
+
 
                 vars.Add("RegionInformationText", translator.GetTranslatedString("RegionInformationText"));
                 vars.Add("OwnerNameText", translator.GetTranslatedString("OwnerNameText"));

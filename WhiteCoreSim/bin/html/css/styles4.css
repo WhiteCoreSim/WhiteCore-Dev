@@ -401,7 +401,7 @@ table#parcel_profile td {padding: 5px;}
 .parcel_profile_left {text-align: left;}
 .parcel_profile_left_size {text-align: left; width: 350px;}
 .parcel_profile_right {text-align: left;}
-.parcel_profile_picture {text-align: left; width: 256px; height:256px;float: left;}
+.parcel_picture {text-align: left; width: 128px; height: 128px; float: left;}
 
 /* region parcels_profile Caption */
 .parcel_picture img {
@@ -467,7 +467,7 @@ table#group_profile td {padding: 5px;}
 .group_profile_left {text-align: left;}
 .group_profile_left_size {text-align: left; width: 350px;}
 .group_profile_right {text-align: left;}
-.group_profile_picture {text-align: left; width: 256px; height:256px;}
+.group_profile_picture {text-align: left; width: 256px; height: 256px; float: left;}
 
 /* group_profile Caption */
 .group_profile_picture img {
@@ -804,7 +804,7 @@ label {display:inline-block;}
 	margin: 6px 0 0 0;
 }
 
-#menuregion {;}
+/*#menuregion {;}*/
 
 #topregion #menuregion li {
 	float: left;
@@ -832,14 +832,14 @@ label {display:inline-block;}
 	behavior: url(../../css/pie.htc); */
 }
 
-/* Menu Profil */
+/* Menu Profile */
 #topprofile  {
 	float: right;
 	list-style-type: none;
 	margin: 6px 0 0 0;
 }
 
-#menuprofile {;}
+/*#menuprofile {;}*/
 
 #topprofile #menuprofile li {
 	float: left;
@@ -1374,6 +1374,29 @@ div#regionbox:hover, div#infobox:hover, div#news:hover, div#gridstatus:hover {
 	behavior: url(../../css/pie.htc);
 }
 
+.next-horiz {
+    position: relative;
+	float: right;
+    top: 80px;
+    right: -6px;
+    width: 22px;
+    height: 20px;
+	padding: 2px;
+    cursor: pointer;
+	font-size: 20px;
+	color: #6EA6FB;
+	background: #444444;
+	border: 0px solid #545454;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	-khtml-border-radius: 5px;
+	border-radius: 5px;
+	-webkit-box-shadow: #333 0 0 .25em;
+    -moz-box-shadow: #333 0 0 .25em;
+    box-shadow: #333 0 0 .25em;
+	behavior: url(../../css/pie.htc);
+}
+
 .jcarousel-skin-aurora .jcarousel-direction-rtl .jcarousel-next-horizontal {
 	left: 5px; right: auto; color: #fcfcfc;
 }
@@ -1397,6 +1420,29 @@ div#regionbox:hover, div#infobox:hover, div#news:hover, div#gridstatus:hover {
 	padding: 2px;
     cursor: pointer;
 	font-size: 10px;
+	color: #6EA6FB;
+	background: #444444;
+	border: 0px solid #545454;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	-khtml-border-radius: 5px;
+	border-radius: 5px;
+	-webkit-box-shadow: #333 0 0 .25em;
+    -moz-box-shadow: #333 0 0 .25em;
+    box-shadow: #333 0 0 .25em;
+	behavior: url(../../css/pie.htc);
+}
+
+.prev-horiz {
+    position: relative;
+	float: left;
+    top: 80px;
+    left: -6px;
+    width: 22px;
+    height: 20px;
+	padding: 2px;
+    cursor: pointer;
+	font-size: 20px;
 	color: #6EA6FB;
 	background: #444444;
 	border: 0px solid #545454;
@@ -1462,6 +1508,29 @@ div#regionbox:hover, div#infobox:hover, div#news:hover, div#gridstatus:hover {
 	behavior: url(../../css/pie.htc);
 }
 
+.next-horiz-big {
+    position: relative;
+	float: right;
+    top: 128px;
+    right: -6px;
+    width: 22px;
+    height: 20px;
+	padding: 2px;
+    cursor: pointer;
+	font-size: 20px;
+	color: #6EA6FB;
+	background: #444444;
+	border: 0px solid #CCC;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	-khtml-border-radius: 5px;
+	border-radius: 5px;
+	-webkit-box-shadow: #CCC 0 0 .25em;
+    -moz-box-shadow: #CCC 0 0 .25em;
+    box-shadow: #CCC 0 0 .25em;
+	behavior: url(../../css/pie.htc);
+}
+
 .jcarousel-skin-aurora-bigsize .jcarousel-direction-rtl .jcarousel-next-horizontal {
 	left: 5px; right: auto; color: #fcfcfc;
 }
@@ -1485,6 +1554,29 @@ div#regionbox:hover, div#infobox:hover, div#news:hover, div#gridstatus:hover {
 	padding: 2px;
     cursor: pointer;
 	font-size: 10px;
+	color: #6EA6FB;
+	background: #444444;
+	border: 0px solid #CCC;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	-khtml-border-radius: 5px;
+	border-radius: 5px;
+	-webkit-box-shadow: #CCC 0 0 .25em;
+    -moz-box-shadow: #CCC 0 0 .25em;
+    box-shadow: #CCC 0 0 .25em;
+	behavior: url(../../css/pie.htc);
+}
+
+.prev-horiz-big {
+    position: relative;
+	float: left;
+    top: 128px;
+    left: -6px;
+    width: 22px;
+    height: 20px;
+	padding: 2px;
+    cursor: pointer;
+	font-size: 20px;
 	color: #6EA6FB;
 	background: #444444;
 	border: 0px solid #CCC;

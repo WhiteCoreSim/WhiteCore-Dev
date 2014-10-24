@@ -48,7 +48,7 @@ namespace WhiteCore.Modules.Web
 
         public bool RequiresAuthentication
         {
-            get { return false; }
+            get { return true; }
         }
 
         public bool RequiresAdminAuthentication
@@ -80,31 +80,68 @@ namespace WhiteCore.Modules.Web
             vars.Add("NextOne", start + 1 > maxPages ? start : start + 1);
             vars.Add("BackOne", start - 1 < 0 ? 0 : start - 1);
 
+            var IsAdmin = Authenticator.CheckAdminAuthentication (httpRequest);
+
             //var activeUsers = agentInfo.RecentlyOnline(15*60, true, new Dictionary<string, bool>(), (uint) start, amountPerQuery);
             var activeUsers = agentInfo.CurrentlyOnline(0, new Dictionary<string, bool>(), (uint) start, amountPerQuery);
 
             if (activeUsers.Count > 0)
             {
-                IUserAccountService accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
-                IGridService gridService = webInterface.Registry.RequestModuleInterface<IGridService> ();
-                foreach (var user in activeUsers)
-                {
-					if ( (UUID.Parse (user.UserID) == libraryOwner) ||
-						 (UUID.Parse (user.UserID) == realestateOwner) 
-					    )
-                        continue;
+                var activeUsersList = new List<UUID>();
 
-                    var region = gridService.GetRegionByUUID (null, user.CurrentRegionID);
-                    var account = accountService.GetUserAccount (region.AllScopeIDs, UUID.Parse (user.UserID));
-                    if (account != null && region != null)
+                if (IsAdmin)        // display all online users
+                {
+                    foreach (var user in activeUsers)
                     {
-                        usersList.Add (new Dictionary<string, object> {
-                            { "UserName", account.Name },
-                            { "UserRegion", region.RegionName },
-                            { "UserLocation",  user.CurrentPosition },
-                            { "UserID", user.UserID },
-                            { "UserRegionID", region.RegionID }
-                        });
+                        activeUsersList.Add ((UUID) user.UserID);
+                    }
+
+                } else             // only show the users online friends
+                {
+
+                    UserAccount ourAccount = Authenticator.GetAuthentication (httpRequest);
+                    if (ourAccount != null)
+                    {
+                        IFriendsService friendsService = webInterface.Registry.RequestModuleInterface<IFriendsService> ();
+                        var friends = friendsService.GetFriends (ourAccount.PrincipalID);
+                        foreach (var friend in friends)
+                        {
+                            UUID friendID = UUID.Zero;
+                            UUID.TryParse (friend.Friend, out friendID);
+
+                            if (friendID != UUID.Zero) 
+//                            if ( (friendID != UUID.Zero) && (friendID == ourAccount.PrincipalID))
+                                activeUsersList.Add (friendID);
+                        }
+                    }
+                }
+
+                if (activeUsersList.Count > 0)
+                {
+                    IUserAccountService accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
+                    IGridService gridService = webInterface.Registry.RequestModuleInterface<IGridService> ();
+                    
+                    foreach (var user in activeUsers)
+                    {
+                        if ((UUID.Parse (user.UserID) == libraryOwner) ||
+                        (UUID.Parse (user.UserID) == realestateOwner))
+                            continue;
+                        
+                        if ( ! activeUsersList.Contains((UUID) user.UserID))
+                            continue;
+
+                        var region = gridService.GetRegionByUUID (null, user.CurrentRegionID);
+                        var account = accountService.GetUserAccount (region.AllScopeIDs, UUID.Parse (user.UserID));
+                        if (account != null && region != null)
+                        {
+                            usersList.Add (new Dictionary<string, object> {
+                                { "UserName", account.Name },
+                                { "UserRegion", region.RegionName },
+                                { "UserLocation",  user.CurrentPosition },
+                                { "UserID", user.UserID },
+                                { "UserRegionID", region.RegionID }
+                            });
+                        }
                     }
                 }
             }

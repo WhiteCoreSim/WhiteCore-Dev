@@ -25,10 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Profile;
@@ -95,16 +93,18 @@ namespace WhiteCore.Modules.Web
             if (account == null)
                 return vars;
 
+            // User found...
             vars.Add("UserName", account.Name);
 
             IUserProfileInfo profile = Framework.Utilities.DataManager.RequestPlugin<IProfileConnector>().
                                               GetUserProfile(account.PrincipalID);
-            vars.Add("UserType", profile.MembershipGroup == "" ? "Resident" : profile.MembershipGroup);
             IWebHttpTextureService webhttpService =
                 webInterface.Registry.RequestModuleInterface<IWebHttpTextureService>();
+
             if (profile != null)
             {
-                if (profile.Partner != UUID.Zero)
+                vars.Add("UserType", profile.MembershipGroup == "" ? "Resident" : profile.MembershipGroup);
+                               if (profile.Partner != UUID.Zero)
                 {
                     account = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
                                            GetUserAccount(null, profile.Partner);
@@ -113,34 +113,55 @@ namespace WhiteCore.Modules.Web
                 else
                     vars.Add("UserPartner", "No partner");
                 vars.Add("UserAboutMe", profile.AboutText == "" ? "Nothing here" : profile.AboutText);
-                string url = "../images/icons/no_picture.jpg";
+                string url = "../images/icons/no_avatar.jpg";
                 if (webhttpService != null && profile.Image != UUID.Zero)
                     url = webhttpService.GetTextureURL(profile.Image);
                 vars.Add("UserPictureURL", url);
+            } else
+            {
+                // no profile yet
+                vars.Add ("UserType", "Guest");
+                vars.Add ("UserPartner", "Not specified yet");
+                vars.Add ("UserAboutMe", "Nothing here yet");
+                vars.Add("UserPictureURL", "../images/icons/no_avatar.jpg");
+
             }
 
             vars.Add("UsersGroupsText", translator.GetTranslatedString("UsersGroupsText"));
 
             IGroupsServiceConnector groupsConnector =
                 Framework.Utilities.DataManager.RequestPlugin<IGroupsServiceConnector>();
+            List<Dictionary<string, object>> groups = new List<Dictionary<string, object>> ();
+
             if (groupsConnector != null)
             {
-                List<Dictionary<string, object>> groups = new List<Dictionary<string, object>>();
                 foreach (var grp in groupsConnector.GetAgentGroupMemberships(account.PrincipalID, account.PrincipalID))
                 {
-                    var grpData = groupsConnector.GetGroupProfile(account.PrincipalID, grp.GroupID);
-                    string url = "../images/icons/no_picture.jpg";
+                    var grpData = groupsConnector.GetGroupProfile (account.PrincipalID, grp.GroupID);
+                    string url = "../images/icons/no_groups.jpg";
                     if (webhttpService != null && grpData.InsigniaID != UUID.Zero)
-                        url = webhttpService.GetTextureURL(grpData.InsigniaID);
-                    groups.Add(new Dictionary<string, object>
-                                   {
-                                       {"GroupPictureURL", url},
-                                       {"GroupName", grp.GroupName}
-                                   });
+                        url = webhttpService.GetTextureURL (grpData.InsigniaID);
+                    groups.Add (new Dictionary<string, object> {
+                        { "GroupPictureURL", url },
+                        { "GroupName", grp.GroupName }
+                    });
+
                 }
-                vars.Add("Groups", groups);
-                vars.Add("GroupsJoined", groups.Count);
+
+                if (groups.Count == 0)
+                {
+                    groups.Add (new Dictionary<string, object> {
+                        { "GroupPictureURL", "../images/icons/no_groups.jpg" },
+                        { "GroupName", "None yet" }
+                    });
+
+                }
+
             }
+
+            vars.Add("GroupNameText", translator.GetTranslatedString("GroupNameText"));
+            vars.Add ("Groups", groups);
+            vars.Add ("GroupsJoined", groups.Count);
 
             return vars;
         }

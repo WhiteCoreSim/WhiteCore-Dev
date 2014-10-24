@@ -117,7 +117,7 @@ table#user_search_result td {}
 .user_search_result_left {text-align: left;}
 .user_search_result_right {text-align: right;}
 
-/* user_search */
+/* news manager */
 table#news_manager  {width: 100%;}
 table#news_manager th {}
 table#news_manager td {}
@@ -256,6 +256,16 @@ table#delete_my_account td {width: 192px;}
 .delete_my_account_left {text-align: left;}
 .delete_my_account_right {text-align: left;}
 
+/* transactions */
+table#transactions_search_result_navigation_top, table#transactions_search_result_navigation_bottom {width: 100%; margin-top: 2px;}
+table#transactions_search_result  {width: 100%; display: inline;}
+table#transactions_search_result th {}
+/*table#transactions_search_result td {width: 110px;}*/
+.transactions_left {width: 150px; text-align: left;}
+.transactions_right {width:150px; text-align: right;}
+.transactions_user {width: 180px; text-align: left;}
+.transactions_description {width: 250px; text-align: left;}
+.transactions_value {width: 100px; text-align: right;}
 
 
 
@@ -349,6 +359,7 @@ table#region_info td {padding: 5px;}
 .region_info_left_size {text-align: left;width: 350px;}
 .region_info_right {text-align: left;}
 .region_info_picture {text-align: left; width: 256px; height:256px;}
+.region_parcel_info {text-align: left; width: 128px; height: 128px;}
 
 /* region_info Caption */
 .region_info_picture img {
@@ -407,7 +418,7 @@ table#parcel_profile td {padding: 5px;}
 .parcel_profile_left {text-align: left;}
 .parcel_profile_left_size {text-align: left; width: 350px;}
 .parcel_profile_right {text-align: left;}
-.parcel_profile_picture {text-align: left; width: 256px; height:256px;float: left;}
+.parcel_picture {text-align: left; width: 128px; height:128px; float: left;}
 
 /* region parcels_profile Caption */
 .parcel_picture img {
@@ -473,7 +484,7 @@ table#group_profile td {padding: 5px;}
 .group_profile_left {text-align: left;}
 .group_profile_left_size {text-align: left; width: 350px;}
 .group_profile_right {text-align: left;}
-.group_profile_picture {text-align: left; width: 256px; height:256px;}
+.group_profile_picture {text-align: left; width: 256px; height:256px; float: left;}
 
 /* group_profile Caption */
 .group_profile_picture img {
@@ -485,8 +496,8 @@ table#group_profile td {padding: 5px;}
 	behavior: url(../../css/pie.htc);
 }
 
-div.group_profile_picture  {
-    position: relative;
+div.group_profile_picture {
+	position: relative;
     margin: 5px;
     padding: 5px;
     overflow: hidden;
@@ -816,7 +827,7 @@ label {display:inline-block;}
 	margin: 6px 0 0 0;
 }
 
-#menuregion {;}
+/*#menuregion {;}*/
 
 #topregion #menuregion li {
 	float: left;
@@ -844,14 +855,14 @@ label {display:inline-block;}
 	behavior: url(../../css/pie.htc); */
 }
 
-/* Menu Profil */
+/* Menu Profile */
 #topprofile  {
 	float: right;
 	list-style-type: none;
 	margin: 6px 0 0 0;
 }
 
-#menuprofile {;}
+/*#menuprofile {;}*/
 
 #topprofile #menuprofile li {
 	float: left;
@@ -1122,16 +1133,17 @@ div.styleswitch {float:right; text-align: right;display: inline;}
 }
 
 .message {
-  background-color: #e6eefe;
+  background-color: #2a6f84;   /*#e6eefe; */
   border: 1px solid #b5d1fd;
   padding: 5px;
   float: left;
   width:98.75%;
 }
-
+ 
 .info {
   background-color:#fffcd3;
   border: 1px solid #ffed8e;
+  color: #657CF7;
   padding: 5px;
   float: left;
   width:98.75%;
@@ -1157,6 +1169,7 @@ div.styleswitch {float:right; text-align: right;display: inline;}
 .download {
   background-color: #d3f2d9;
   border: 1px solid #90de96;
+  color: #657CF7;
   padding: 5px;
   float: left;
   width:98.75%;
@@ -1385,8 +1398,32 @@ div#regionbox:hover, div#infobox:hover, div#news:hover, div#gridstatus:hover {
 	behavior: url(../../css/pie.htc);
 }
 
+.next-horiz {
+    position: relative;
+	float: right;
+    top: 80px;
+    right: -6px;
+    width: 22px;
+    height: 20px;
+	padding: 2px;
+    cursor: pointer;
+	font-size: 20px;
+	color: #abe0e0 ;
+	background: #406580;
+	border: 0px solid #111;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	-khtml-border-radius: 5px;
+	border-radius: 5px;
+	-webkit-box-shadow: #111 0 0 .25em;
+    -moz-box-shadow: #111 0 0 .25em;
+    box-shadow: #111 0 0 .25em;
+	behavior: url(../../css/pie.htc);
+
+}
+
 .jcarousel-skin-aurora .jcarousel-direction-rtl .jcarousel-next-horizontal {
-	left: 5px; right: auto; color: #406580;
+	left: 25px; right: auto; color: #406580;
 }
 
 .jcarousel-skin-aurora .jcarousel-next-horizontal:hover,
@@ -1421,6 +1458,28 @@ div#regionbox:hover, div#infobox:hover, div#news:hover, div#gridstatus:hover {
 	behavior: url(../../css/pie.htc);
 }
 
+.prev-horiz {
+    position: relative;
+	float: left;
+    top: 80px;
+    left: -6px;
+    width: 22px;
+    height: 20px;
+	padding: 2px;
+    cursor: pointer;
+	font-size: 20px;
+	color: #abe0e0 ;
+	background: #406580;
+	border: 0px solid #111;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	-khtml-border-radius: 5px;
+	border-radius: 5px;
+	-webkit-box-shadow: #111 0 0 .25em;
+    -moz-box-shadow: #111 0 0 .25em;
+    box-shadow: #111 0 0 .25em;
+	behavior: url(../../css/pie.htc);
+}
 .jcarousel-skin-aurora .jcarousel-direction-rtl .jcarousel-prev-horizontal {
     left: auto; right: 5px; color: #406580;
 }
@@ -1450,11 +1509,34 @@ div#regionbox:hover, div#infobox:hover, div#news:hover, div#gridstatus:hover {
 .jcarousel-skin-aurora-bigsize .jcarousel-direction-rtl .jcarousel-item-horizontal {margin-left: 0px; margin-right: 0px;}
 .jcarousel-skin-aurora-bigsize .jcarousel-item-placeholder {background: #111;  color: #aaa;}
 
-/* Profiles Carousel Buttons */
+/* Profiles Carousel Buttons - Groups, Picks*/
 .jcarousel-skin-aurora-bigsize .jcarousel-next-horizontal {
     position: absolute;
     top: 128px;
     right: -13px;
+    width: 16px;
+    height: 18px;
+	padding: 2px;
+    cursor: pointer;
+	font-size: 10px;
+	color: #abe0e0 ;
+	background: #406580;
+	border: 0px solid #111;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	-khtml-border-radius: 5px;
+	border-radius: 5px;
+	-webkit-box-shadow: #111 0 0 .25em;
+    -moz-box-shadow: #111 0 0 .25em;
+    box-shadow: #111 0 0 .25em;
+	behavior: url(../../css/pie.htc);
+}
+
+.next-horiz-big {
+    position: relative;
+	float: right;
+    top: 128px;
+    right: -6px;
     width: 16px;
     height: 18px;
 	padding: 2px;
@@ -1491,6 +1573,29 @@ div#regionbox:hover, div#infobox:hover, div#news:hover, div#gridstatus:hover {
     position: absolute;
     top: 128px;
     left: -15px;
+    width: 16px;
+    height: 18px;
+	padding: 2px;
+    cursor: pointer;
+	font-size: 10px;
+	color: #abe0e0 ;
+	background: #406580;
+	border: 0px solid #111;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	-khtml-border-radius: 5px;
+	border-radius: 5px;
+	-webkit-box-shadow: #111 0 0 .25em;
+    -moz-box-shadow: #111 0 0 .25em;
+    box-shadow: #111 0 0 .25em;
+	behavior: url(../../css/pie.htc);
+}
+
+.prev-horiz-big {
+    position: relative;
+	float: left;
+    top: 128px;
+    left: -6px;
     width: 16px;
     height: 18px;
 	padding: 2px;

@@ -82,9 +82,7 @@ namespace WhiteCore.Modules.Web
                         Authenticator.AddAdminAuthentication(sessionID, account);
                     httpResponse.AddCookie(new System.Web.HttpCookie("SessionID", sessionID.ToString())
                                                {
-                                                   Expires =
-                                                       DateTime
-                                                       .MinValue,
+                                                   Expires = DateTime.MinValue,
                                                    Path = ""
                                                });
 

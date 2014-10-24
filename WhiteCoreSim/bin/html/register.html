@@ -1,5 +1,11 @@
 <script type="text/javascript">
-jQuery(document).ready(function() {jQuery('#avatarcarousel').jcarousel({wrap: 'circular'});});
+$(function() {
+    $(".avatararchivecarousel").jCarouselLite({
+        btnNext: ".next-horiz",
+        btnPrev: ".prev-horiz"
+    });
+});
+
 </script>
 
 {IfNoRegistrationsBegin}
@@ -10,7 +16,7 @@ jQuery(document).ready(function() {jQuery('#avatarcarousel').jcarousel({wrap: 'c
 <h2>{SystemName}: {RegistrationText}</h2>
 <div id="error_message" class="error">{ErrorMessage}</div>
 
-<form id="region_form" action="{SubmitURL}" method="POST">
+<form id="register_form" action="{SubmitURL}" method="POST">
 <div style ="display: inline-block;"><table>
   <caption></caption>
   
@@ -24,19 +30,19 @@ jQuery(document).ready(function() {jQuery('#avatarcarousel').jcarousel({wrap: 'c
   <tfoot>
     <tr>
       <th class="register_left"></th>
-      <th class="register_right" colspan="2"></th>
+      <th class="register_right" colspan="3"></th>
     </tr>
   </tfoot>
 
   <tbody>
     <tr>
       <td class="register_left"><p id="regname_label">{AvatarNameText}*</p></td>
-      <td class="register_right" colspan="2"><input minlength="3" id="AvatarName" require="true" label="AvatarName" name="AvatarName" type="text" size="25" maxlength="30" value="{AvatarName}"></td>
+      <td class="register_right" colspan="3"><input minlength="3" id="AvatarName" require="true" label="AvatarName" name="AvatarName" type="text" size="25" maxlength="30" value="{AvatarName}"></td>
 	  <td class="register_left"> Enter your avatar name</td>
     </tr>
     <tr>
       <td class="register_left"><p id="password_label">{AvatarPasswordText}*</p></td>
-      <td class="register_right" colspan="2"><input minlength="6" compare="AvatarPassword2" require="true" label="AvatarPassword" id="AvatarPassword" name="AvatarPassword" type="password" size="30" maxlength="15"></td>
+      <td class="register_right" colspan="3"><input minlength="6" compare="AvatarPassword2" require="true" label="AvatarPassword" id="AvatarPassword" name="AvatarPassword" type="password" size="30" maxlength="15"></td>
 	  <td class="register_left"> Your login password</td>
     </tr>
     <tr>
@@ -98,9 +104,20 @@ jQuery(document).ready(function() {jQuery('#avatarcarousel').jcarousel({wrap: 'c
     </tr>
     <tr>
       <td class="register_left"><p>{UserEmailText}*</p></td>
-      <td class="register_right" colspan="2"><input label="UserEmail" id="UserEmail" name="UserEmail" type="text" size="40" maxlength="40" value=""></td>
+      <td class="register_right" colspan="3"><input label="UserEmail" id="UserEmail" name="UserEmail" type="text" size="40" maxlength="40" value=""></td>
 	  <td class="register_left"> (For password recovery only)</td>
     </tr>
+    <tr>
+      <td class="register_left"><p>{UserHomeRegionText}*</p></td>
+      <td class="register_dob">
+	    <select id="UserHomeRegion" require="true" name="UserHomeRegion" style="width:120px;">			
+{RegionListArrayBegin}
+		  <option value="{RegionUUID}">{RegionName}</option>
+{RegionListArrayEnd}
+		</select>
+	  </td>
+    </tr>
+
 {IsAdminAuthenticatedBegin}
 <!-- Only admins can set membership types -->
     <tr>
@@ -116,20 +133,25 @@ jQuery(document).ready(function() {jQuery('#avatarcarousel').jcarousel({wrap: 'c
 {IsAdminAuthenticatedEnd}
 
     <tr>
-      <td class="register_left" colspan="4" valign="top">
-      <center>
-      <ul id="avatarcarousel" class="jcarousel-skin-aurora">
+      <td class="register_left">Avatar Selection</td>	
+      <td class="register_left" colspan="5" valign="top">
+	    <div class="carousel">	
+         <div class="prev-horiz">◄</div>
+		 <div class="next-horiz">►</div> 
+         <div class= "avatararchivecarousel" style="height: 190px;">
+           <ul id="avatarcarousel" class="jcarousel-skin-aurora">
 {AvatarArchiveArrayBegin}
-	    <li>
-		  <div class="avatar_archive_screenshot">
-		    <label for="{AvatarArchiveName}" alt="{SystemName}: {AvatarArchiveName}" title="{SystemName}: {AvatarArchiveName}">{AvatarArchiveName}</label>
-			<input type="radio" id="{AvatarArchiveName}" name="AvatarArchive" value="{AvatarArchiveName}" alt="{SystemName}: {AvatarArchiveName}" title="{SystemName}: {AvatarArchiveName}">
-			<img src="{AvatarArchiveSnapshotURL}" alt="{SystemName}: {AvatarArchiveName}" title="{SystemName}: {AvatarArchiveName}" />
-		  </div>
-	    </li>
+	       <li>
+		     <div class="avatar_archive_screenshot">
+		       <label for="{AvatarArchiveName}" alt="{SystemName}: {AvatarArchiveName}" title="{SystemName}: {AvatarArchiveName}">{AvatarArchiveName}</label>
+			   <input type="radio" id="{AvatarArchiveName}" name="AvatarArchive" value="{AvatarArchiveName}" alt="{SystemName}: {AvatarArchiveName}" title="{SystemName}: {AvatarArchiveName}">
+			   <img src="{AvatarArchiveSnapshotURL}" alt="{SystemName}: {AvatarArchiveName}" title="{SystemName}: {AvatarArchiveName}" />
+		     </div>
+	       </li>
 {AvatarArchiveArrayEnd}
-      </ul>
-      </center>
+         </ul>
+		</div>
+		</div>
 	  </td>
     </tr>
     <tr>
@@ -150,7 +172,7 @@ jQuery(document).ready(function() {jQuery('#avatarcarousel').jcarousel({wrap: 'c
 
 <script>
   /* attach a submit handler to the form */
-  $("#region_form").submit(function(event) {
+  $("#register_form").submit(function(event) {
 
     /* stop form from submitting normally */
     event.preventDefault(); 

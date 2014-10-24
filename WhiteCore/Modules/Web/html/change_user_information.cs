@@ -64,6 +64,7 @@ namespace WhiteCore.Modules.Web
 
             string error = "";
             UserAccount user = Authenticator.GetAuthentication(httpRequest);
+            vars.Add ("UserName", user.Name);
 
             // password change
             if (requestParameters.ContainsKey("Submit") &&

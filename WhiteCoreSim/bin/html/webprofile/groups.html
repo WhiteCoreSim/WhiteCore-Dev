@@ -1,6 +1,6 @@
-<!-- Caption -->
+<!-- Carousel -->
+<script src="../javascripts/jquery.jcarousellite.js"></script>
 <script>
-	/* <![CDATA[ */
 		jQuery(document).ready(function($) {
 			$('div.group_profile_picture').each(function(i) {
 				var img_ = $('img', this);			
@@ -8,24 +8,32 @@
 				var p_height = $('p', this).outerHeight();
 				$(this).height(img_height);
 				$(this).hover(function() {
-					img_.animate({marginTop : -p_height-10}, 500);
+					img_.animate({marginTop : -p_height-5}, 500);
 				}, function() {
 					img_.animate({marginTop : '0'}, 500);
 				});
 			});		
 		});
-	/* ]]> */
+
 </script>
 
 <script>
-// jQuery(document).ready(function() {jQuery('#avatarcarousel').jcarousel();});
-jQuery(document).ready(function() {jQuery('#avatarcarousel').jcarousel({wrap: 'circular'});});
+	$(function() {
+    	$('.groupscarousel').jCarouselLite({
+        	btnNext: '.next-horiz-big',
+        	btnPrev: '.prev-horiz-big',
+        	visible: 3
+   		});
+	});
 </script>
 
 <h2>{SystemName}: {UsersGroupsText} by {UserName} ({GroupsJoined})</h2>
 <div id="group_profile_container">
- <center>
-  <ul id="avatarcarousel" class="jcarousel-skin-aurora-bigsize jcarousel-bigsize">
+    <div class="prev-horiz-big">◄</div>
+    <div class="next-horiz-big">►</div> 
+    <center>
+    <div class="groupscarousel">
+    <ul id="groupcarousel" class="jcarousel-skin-aurora-bigsize jcarousel-bigsize">
 {GroupsArrayBegin}
 	<li>
 	    <div class="group_profile_picture">
@@ -39,6 +47,7 @@ jQuery(document).ready(function() {jQuery('#avatarcarousel').jcarousel({wrap: 'c
 	</li>
 {GroupsArrayEnd}
   </ul>
+  </div>
   </center>
 <span class="clear"></span>
 </div>

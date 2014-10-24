@@ -7,10 +7,18 @@
 {RegionNameText}        Region Name
 {RegionLocXText}        Region X
 {RegionLocYText}        Region Y
+{RegionOnlineText}		Online/Offline status
 {SortByLocX}            Sort By Region X
 {SortByLocY}            Sort By Region Y
+{SortByStatus}			Sort by online status
 {SortByName}            Sort By Name
 {RegionListText}        Region List
+{RegionList}        
+  {RegionName}        
+  {RegionLocX}        
+  {RegionLocY}        
+  {RegionInfo}
+  {RegionStatus}
 {FirstText}             First
 {BackText}              Back
 {NextText}              Next
@@ -64,18 +72,22 @@
   
   <thead class="listhead">
     <tr>
-      <th class="region_list_left"><a class="fade" href="index.html?page=region_list&Order=RegionName" title="{SortByName}"><p>{RegionText}</p></a></th>
-      <th class="region_list_right"><a class="fade" href="index.html?page=region_list&Order=LocX" title="{SortByLocX}"><p>{RegionLocXText}</p></a></th>
-      <th class="region_list_right"><a class="fade" href="index.html?page=region_list&Order=LocY" title="{SortByLocY}"><p>{RegionLocYText}</p></a></th>
-      <th class="region_list_right"><p>{RegionMoreInfo}</p></th>
+      <th class="region_list_left" style="width:200px"><a class="fade" href="index.html?page=region_list&Order=RegionName" title="{SortByName}"><p>{RegionText}</p></a></th>
+      <th class="region_list_left" style="width:100px"><a class="fade" href="index.html?page=region_list&Order=LocX" title="{SortByLocX}"><p>{RegionLocXText}</p></a></th>
+      <th class="region_list_left"  style="width:100px"><a class="fade" href="index.html?page=region_list&Order=LocY" title="{SortByLocY}"><p>{RegionLocYText}</p></a></th>
+      <th class="region_list_right" ></th>
+      <th class="region_list_right" style="width:50px"><p>{RegionOnlineText}</p></th>
+      <th class="region_list_right" style="width:150px"><p>{RegionMoreInfo}</p></th>
     </tr>
   </thead>
   
   <tfoot class="listfoot">
     <tr style= align:bottom;">
       <th class="region_list_left"><a class="fade" href="index.html?page=region_list&Order=RegionName" title="{SortByName}"><p>{RegionText}</p></a></th>
-      <th class="region_list_right"><a class="fade" href="index.html?page=region_list&Order=LocX" title="{SortByLocX}"><p>{RegionLocXText}</p></a></th>
-      <th class="region_list_right"><a class="fade" href="index.html?page=region_list&Order=LocY" title="{SortByLocY}"><p>{RegionLocYText}</p></a></th>
+      <th class="region_list_left"><a class="fade" href="index.html?page=region_list&Order=LocX" title="{SortByLocX}"><p>{RegionLocXText}</p></a></th>
+      <th class="region_list_left"><a class="fade" href="index.html?page=region_list&Order=LocY" title="{SortByLocY}"><p>{RegionLocYText}</p></a></th>
+      <th class="region_list_right"></th>
+      <th class="region_list_right"><p>{RegionOnlineText}</p></th>
       <th class="region_list_right"><p>{RegionMoreInfo}</p></th>
     </tr>
   </tfoot>
@@ -84,9 +96,11 @@
 {RegionListArrayBegin}
     <tr>
       <td class="region_list_left"><p>{RegionName}</p></td>
-      <td class="region_list_right"><p>{RegionLocX}</p></td>
-	  <td class="region_list_right"><p>{RegionLocY}</p></td>
-	  <td class="region_list_right"><p><a target="_blank" class='regioninfo' href="regionprofile/?regionid={RegionID}">{MoreInfoText}</a></p></td>
+      <td class="region_list_left"><p>{RegionLocX}</p></td>
+	  <td class="region_list_left"><p>{RegionLocY}</p></td>
+	  <td class="region_list_left"><p>{RegionInfo}</p></td>
+	  <td class="region_list_right"><p>{RegionStatus}</p></td>
+	  <td class="region_list_right"><p><a target="_self" class='regioninfo' href="regionprofile/?regionid={RegionID}">{MoreInfoText}</a></p></td>
     </tr>
 {RegionListArrayEnd}
   </tbody>

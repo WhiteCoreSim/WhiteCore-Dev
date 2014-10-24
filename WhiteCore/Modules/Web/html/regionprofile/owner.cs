@@ -68,45 +68,37 @@ namespace WhiteCore.Modules.Web
             response = null;
             var vars = new Dictionary<string, object>();
 
-            string username = filename.Split('/').LastOrDefault();
             UserAccount account = null;
-            if (httpRequest.Query.ContainsKey("userid"))
+            if (httpRequest.Query.ContainsKey ("regionid"))
             {
-                string userid = httpRequest.Query["userid"].ToString();
+                var regionService = webInterface.Registry.RequestModuleInterface<IGridService> ();
+                var region = regionService.GetRegionByUUID (null, UUID.Parse (httpRequest.Query ["regionid"].ToString ()));
+
+                UUID userid = region.EstateOwner;
 
                 account = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
-                                       GetUserAccount(null, UUID.Parse(userid));
-            }
-            else if (httpRequest.Query.ContainsKey("name"))
-            {
-                string name = httpRequest.Query.ContainsKey("name") ? httpRequest.Query["name"].ToString() : username;
-                name = name.Replace('.', ' ');
-                name = name.Replace("%20", " ");
-                account = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
-                                       GetUserAccount(null, name);
-            }
-            else
-            {
-                username = username.Replace("%20", " ");
-                webInterface.Redirect(httpResponse, "/regionprofile/?name=" + username);
-                return vars;
-            }
+                    GetUserAccount(null, userid);
 
+                //IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
+                //EstateSettings estate = estateConnector.GetEstateSettings (region.RegionID);
+            }
             if (account == null)
                 return vars;
 
-            var libraryOwner = new UUID(Constants.LibraryOwner);
-            var realestateOwner = new UUID(Constants.RealEstateOwnerUUID);
+            // There is no harm in showing the system users here ??
+            //var libraryOwner = new UUID(Constants.LibraryOwner);
+            //var realestateOwner = new UUID(Constants.RealEstateOwnerUUID);
 
-            if ( (account.PrincipalID == libraryOwner) || (account.PrincipalID == realestateOwner) )
-                return vars;
+            //if ( (account.PrincipalID == libraryOwner) || (account.PrincipalID == realestateOwner) )
+            //    return vars;
 
             vars.Add("UserName", account.Name);
             //  TODO: User Profile inworld shows this as the standard mm/dd/yyyy
             //  Do we want this to be localised into the users Localisation or keep it as standard ?
             //
+            // greythane, Oct 2014 - Not sure why we need to keep the US format here?  A lot of us don't live there :)  
             //  vars.Add("UserBorn", Culture.LocaleDate(Util.ToDateTime(account.Created)));
-            vars.Add("UserBorn", Util.ToDateTime(account.Created).ToShortDateString());
+            vars.Add("UserBorn", Util.ToDateTime(account.Created).ToShortDateString());  
 
             IUserProfileInfo profile = Framework.Utilities.DataManager.RequestPlugin<IProfileConnector>().
                                               GetUserProfile(account.PrincipalID);
@@ -122,7 +114,8 @@ namespace WhiteCore.Modules.Web
                 else
                     vars.Add("UserPartner", "No partner");
                 vars.Add("UserAboutMe", profile.AboutText == "" ? "Nothing here" : profile.AboutText);
-                string url = "../images/icons/no_picture.jpg";
+
+                string url = "../images/icons/no_avatar.jpg";
                 IWebHttpTextureService webhttpService =
                     webInterface.Registry.RequestModuleInterface<IWebHttpTextureService>();
                 if (webhttpService != null && profile.Image != UUID.Zero)
@@ -163,10 +156,6 @@ namespace WhiteCore.Modules.Web
                 vars.Add("IsOnline", translator.GetTranslatedString("Offline"));
             }
 
-            // Menu Region
-            vars.Add("MenuRegionTitle", translator.GetTranslatedString("MenuRegionTitle"));
-            vars.Add("MenuParcelTitle", translator.GetTranslatedString("MenuParcelTitle"));
-            vars.Add("MenuOwnerTitle", translator.GetTranslatedString("MenuOwnerTitle"));
 
             vars.Add("UserProfileFor", translator.GetTranslatedString("UserProfileFor"));
             vars.Add("ResidentSince", translator.GetTranslatedString("ResidentSince"));

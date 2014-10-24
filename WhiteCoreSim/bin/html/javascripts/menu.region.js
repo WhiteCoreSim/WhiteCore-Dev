@@ -24,7 +24,7 @@ $(document).ready(function(){
 				break;
 			case "owner":
 				content.slideUp( function() {
-				content.load("owner.html", hideLoading);
+				content.load("owner.html" + window.location.search, hideLoading);
 				content.slideDown();
 				});
 				break;

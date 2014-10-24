@@ -24,7 +24,9 @@
 		// timeout id for delayed tooltips
 		tID,
 		// IE 5.5 or 6
-		IE = $.browser.msie && /MSIE\s(5\.5|6\.)/.test(navigator.userAgent),
+		//IE = $.browser.msie && /MSIE\s(5\.5|6\.)/.test(navigator.userAgent),
+		// Assume IE 5 and 6 are dead - greythane -20141014
+		IE = false
 		// flag for mouse tracking
 		track = false;
 	

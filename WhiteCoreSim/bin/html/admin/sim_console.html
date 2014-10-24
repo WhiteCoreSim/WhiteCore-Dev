@@ -1,0 +1,128 @@
+<!-- params to replace
+{SystemURL}
+{SystemName}
+{SimConsoleText}
+{UserNameText}
+{PasswordText}
+{Login}
+{CammandText}
+{Submit}                   Submit
+
+-->
+
+{IsAdminAuthenticatedBegin}
+<h2>{SystemName}: {SimConsoleText}</h2>
+<div id="info_message" class="error_message"></div>
+<div>
+
+    <!-- This JavaScript code is published by Marck (c) 2010 under a -->
+    <!-- Creative Commons Attribution 3.0 Germany License            -->
+    <!-- http://creativecommons.org/licenses/by/3.0/de/              -->
+    <script type="text/javascript">
+
+      var sessionId;
+      var hostUrl;
+
+      function StartSession(url, user, password) {
+        hostUrl = url;
+        var response = SendRequest("/StartSession/", "USER=" + user + "&PASS=" + password);
+        sessionId = response.getElementsByTagName("SessionID")[0].firstChild.nodeValue;
+      };
+
+      function ReadResponses() {
+        var response = this.SendRequest("/ReadResponses/" + sessionId + "/", '');
+        var lines = response.getElementsByTagName("Line");
+        for (var i = 0; i < lines.length; ++i) {
+          var element = document.createElement("div");
+          element.appendChild(document.createTextNode(lines[i].firstChild.nodeValue));
+          document.getElementById("output").appendChild(element);
+        };
+        document.getElementById("output").scrollTop = document.getElementById("output").scrollHeight;
+      };
+
+      function Command(cmd) {
+        void SendRequest("/SessionCommand/", "ID=" + sessionId + "&COMMAND=" + cmd);
+      };
+
+      function CloseSession() {
+        void SendRequest("/CloseSession/", "ID=" + sessionId);
+      };
+
+      function SendRequest(path, data) {
+        var request = new XMLHttpRequest();
+        request.open("POST", hostUrl + path, false);
+        request.send(data);
+        return request.responseXML;
+      };
+
+      window.onunload = CloseSession;
+
+    </script>
+ 
+ 
+	<form id="sim_console_login" action="admin/sim_console.html" method="post" onsubmit="
+        StartSession(this.address.value, this.user.value, this.password.value);
+        ReadResponses();
+        return false">
+        <table>
+        	<tr>
+        		<td>{SimAddressText}</td>
+        		<td colspan="2">
+        			<input name="address" type="text" value="{SystemURL}" />
+        		</td>
+        		<td><button type="submit" value="login">{Login}</button></td>
+        	</tr>
+        	<tr>
+        		<td>{UserNameText}</td>
+        		<td><input name="user" type="text" size="15" value="ConsoleUser" /></td>
+        		<td>{PasswordText}</td>
+        		<td><input name="password" type="text" size="15" value="ConsolePass" /></td>
+        	</tr>
+        </table>
+    </form>
+
+    <div id="output" style="height:15em; border:thin solid; overflow:auto;"></div>
+
+    <form id="sim_console_form" action="admin/sim_console.html" method="post"  onsubmit="
+        Command(this.command.value);
+        ReadResponses();
+        return false">
+      <input type="text" name="command" value="Enter command here" size="60"/>
+      <button type="submit" width="20" value="Send Command">{SendCommandText}</button>
+    </form>
+
+ <script>
+  /* attach a submit handler to the login form */
+  $("#sim_console_login").submit(function(event) {
+
+    /* stop form from submitting normally */
+    event.preventDefault(); 
+    /* get some values from elements on the page: */
+    var $form = $( this ),
+        url = $form.attr( 'action' );
+    /* Send the data using post and put the results in a div */
+    $.post( url, $form.serialize(),
+      function( data ) {
+		$("#info_message").empty().append("<h3>" + data + "</h3>");
+      }
+    );
+  });
+  
+  /* attach a submit handler to the command form */
+  $("#sim_console_form").submit(function(event) {
+
+    /* stop form from submitting normally */
+    event.preventDefault(); 
+    /* get some values from elements on the page: */
+    var $form = $( this ),
+        url = $form.attr( 'action' );
+    /* Send the data using post and put the results in a div */
+    $.post( url, $form.serialize(),
+      function( data ) {
+		$("#output").empty().append(data);
+      }
+    );
+  });
+</script>
+</div>
+{IsAdminAuthenticatedEnd}

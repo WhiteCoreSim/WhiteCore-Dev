@@ -92,14 +92,21 @@ namespace WhiteCore.Modules.Web
                                                                                    (uint) (start*amountPerQuery),
                                                                                    amountPerQuery, sortBy);
             foreach (var region in regions)
-                RegionListVars.Add(new Dictionary<string, object>
-                    {
-                        {"RegionLocX", region.RegionLocX/Constants.RegionSize},
-                        {"RegionLocY", region.RegionLocY/Constants.RegionSize},
-                        {"RegionName", region.RegionName},
-                        {"RegionID", region.RegionID},
-                        {"RegionURI", region.RegionURI}
-                    });
+            {
+                string info;
+                info = (region.RegionArea < 1000000) ? region.RegionArea + " m2" : (region.RegionArea / 1000000) + " km2";
+                info = info + ", " +region.RegionTerrain;
+
+                RegionListVars.Add (new Dictionary<string, object> {
+                    { "RegionLocX", region.RegionLocX / Constants.RegionSize },
+                    { "RegionLocY", region.RegionLocY / Constants.RegionSize },
+                    { "RegionName", region.RegionName },
+                    { "RegionInfo", info},
+                    { "RegionStatus", region.IsOnline ? "yes" : "no"},
+                    { "RegionID", region.RegionID },
+                    { "RegionURI", region.RegionURI }
+                });
+            }
 
             vars.Add("RegionList", RegionListVars);
             vars.Add("RegionText", translator.GetTranslatedString("Region"));
@@ -108,6 +115,7 @@ namespace WhiteCore.Modules.Web
             vars.Add("RegionNameText", translator.GetTranslatedString("RegionNameText"));
             vars.Add("RegionLocXText", translator.GetTranslatedString("RegionLocXText"));
             vars.Add("RegionLocYText", translator.GetTranslatedString("RegionLocYText"));
+            vars.Add ("RegionOnlineText", translator.GetTranslatedString ("Online"));
             vars.Add("SortByLocX", translator.GetTranslatedString("SortByLocX"));
             vars.Add("SortByLocY", translator.GetTranslatedString("SortByLocY"));
             vars.Add("SortByName", translator.GetTranslatedString("SortByName"));

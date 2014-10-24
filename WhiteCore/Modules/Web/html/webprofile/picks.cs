@@ -95,17 +95,21 @@ namespace WhiteCore.Modules.Web
             if (account == null)
                 return vars;
 
+            // User found....
             vars.Add("UserName", account.Name);
 
             IProfileConnector profileConnector = Framework.Utilities.DataManager.RequestPlugin<IProfileConnector>();
             IUserProfileInfo profile = profileConnector == null
                                            ? null
                                            : profileConnector.GetUserProfile(account.PrincipalID);
-            vars.Add("UserType", profile.MembershipGroup == "" ? "Resident" : profile.MembershipGroup);
             IWebHttpTextureService webhttpService =
                 webInterface.Registry.RequestModuleInterface<IWebHttpTextureService>();
+
+            List<Dictionary<string, object>> picks = new List<Dictionary<string, object>>();
             if (profile != null)
             {
+                vars.Add("UserType", profile.MembershipGroup == "" ? "Resident" : profile.MembershipGroup);
+
                 if (profile.Partner != UUID.Zero)
                 {
                     account = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
@@ -115,29 +119,46 @@ namespace WhiteCore.Modules.Web
                 else
                     vars.Add("UserPartner", "No partner");
                 vars.Add("UserAboutMe", profile.AboutText == "" ? "Nothing here" : profile.AboutText);
-                string url = "../images/icons/no_picture.jpg";
+                string url = "../images/icons/no_avatar.jpg";
                 if (webhttpService != null && profile.Image != UUID.Zero)
                     url = webhttpService.GetTextureURL(profile.Image);
                 vars.Add("UserPictureURL", url);
 
-                List<Dictionary<string, object>> picks = new List<Dictionary<string, object>>();
                 foreach (var pick in profileConnector.GetPicks(profile.PrincipalID))
                 {
-                    url = "../images/icons/no_picture.jpg";
+                    url = "../images/icons/no_picks.png";
                     if (webhttpService != null && pick.SnapshotUUID != UUID.Zero)
                         url = webhttpService.GetTextureURL(pick.SnapshotUUID);
+
+                    Vector3 pickLoc = pick.GlobalPos;
+                    pickLoc.X /= WhiteCore.Framework.Utilities.Constants.RegionSize;
+                    pickLoc.Y /= WhiteCore.Framework.Utilities.Constants.RegionSize;
+
                     picks.Add(new Dictionary<string, object>
                                   {
                                       {"PickSnapshotURL", url},
                                       {"PickName", pick.OriginalName},
-                                      {"PickSim", pick.SimName},
-                                      {"PickLocation", pick.GlobalPos}
+                                      {"PickRegion", pick.SimName},
+                                      {"PickLocation", pickLoc}
                                   });
                 }
-                vars.Add("Picks", picks);
+
             }
 
+            if (picks.Count == 0)
+            {
+                picks.Add(new Dictionary<string, object>
+                {
+                    {"PickSnapshotURL", "../images/icons/no_picks.png"},
+                    {"PickName", "None yet"},
+                    {"PickRegion", ""},
+                    {"PickLocation", ""}
+                });
+            }
             vars.Add("UsersPicksText", translator.GetTranslatedString("UsersPicksText"));
+            vars.Add("PickNameText", translator.GetTranslatedString("PickNameText"));
+            vars.Add("PickRegionText", translator.GetTranslatedString("PickRegionText"));
+            vars.Add("Picks", picks);
 
             return vars;
         }

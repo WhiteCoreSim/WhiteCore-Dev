@@ -1,6 +1,7 @@
-<!-- Caption -->
+<!-- Carousel -->
+<script src="../javascripts/jquery.jcarousellite.js"></script>
+
 <script>
-	/* <![CDATA[ */
 		jQuery(document).ready(function($) {
 			$('div.picks_profile_picture').each(function(i) {
 				var img_ = $('img', this);			
@@ -14,18 +15,26 @@
 				});
 			});		
 		});
-	/* ]]> */
+
 </script>
 
 <script>
-// jQuery(document).ready(function() {jQuery('#avatarcarousel').jcarousel();});
-jQuery(document).ready(function() {jQuery('#avatarcarousel').jcarousel({wrap: 'circular'});});
+	$(function() {
+    	$('.pickscarousel').jCarouselLite({
+        	btnNext: '.next-horiz-big',
+        	btnPrev: '.prev-horiz-big',
+        	visible: 3
+   		});
+	});
 </script>
 
 <h2>{SystemName}: {UsersPicksText} {UserName}</h2>
 <div id="picks_profile_container">
-  <center>
-  <ul id="avatarcarousel" class="jcarousel-skin-aurora-bigsize jcarousel-bigsize">
+    <div class="prev-horiz-big">◄</div>
+    <div class="next-horiz-big">►</div> 
+    <center>
+    <div class="pickscarousel">
+    <ul id="pickcarousel" class="jcarousel-skin-aurora-bigsize jcarousel-bigsize">
 {PicksArrayBegin}
     <li>
       <div class="picks_profile_picture">
@@ -40,13 +49,14 @@ jQuery(document).ready(function() {jQuery('#avatarcarousel').jcarousel({wrap: 'c
 									   alt="{UserProfileFor}: {UserName}"
 									   title="{UserProfileFor}: {UserName}" />&nbsp;{UserName}<br />
 		{PickNameText}: {PickName}<br />
-		{PickSimText}: {PickSim}<br />
+		{PickRegionText}: {PickRegion}<br />
 		@&nbsp;{PickLocation}	
 		</p>
 	  </div>
 	</li>
 {PicksArrayEnd}
   </ul>
+  </div>
   </center>
-<span class="clear"></span>
+  <span class="clear"></span>
 </div>
