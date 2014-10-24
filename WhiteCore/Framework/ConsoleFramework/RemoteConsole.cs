@@ -72,14 +72,16 @@ namespace WhiteCore.Framework.ConsoleFramework
             get { return "RemoteConsole"; }
         }
 
-        public override void Initialize(IConfigSource source, ISimulationBase baseOpenSim)
+        public override void Initialize(IConfigSource source, ISimulationBase simbase)
         {
             uint m_consolePort = 0;
 
             if (source.Configs["Console"] != null)
             {
-                if (source.Configs["Console"].GetString("Console", String.Empty) != Name)
-                    return;
+                //if (source.Configs["Console"].GetString("RemoteConsole", String.Empty) != "enable")
+                    if (source.Configs["Console"].GetString("Console", String.Empty) != Name)
+                        return;
+
                 m_consolePort = (uint) source.Configs["Console"].GetInt("remote_console_port", 0);
                 m_UserName = source.Configs["Console"].GetString("RemoteConsoleUser", String.Empty);
                 m_Password = source.Configs["Console"].GetString("RemoteConsolePass", String.Empty);
@@ -87,10 +89,10 @@ namespace WhiteCore.Framework.ConsoleFramework
             else
                 return;
 
-            baseOpenSim.ApplicationRegistry.RegisterModuleInterface<ICommandConsole>(this);
+            simbase.ApplicationRegistry.RegisterModuleInterface<ICommandConsole>(this);
             MainConsole.Instance = this;
 
-            SetServer(m_consolePort == 0 ? MainServer.Instance : baseOpenSim.GetHttpServer(m_consolePort));
+            SetServer(m_consolePort == 0 ? MainServer.Instance : simbase.GetHttpServer(m_consolePort));
 
             m_Commands.AddCommand("help", "help", "Get a general command list", base.Help, false, true);
         }
