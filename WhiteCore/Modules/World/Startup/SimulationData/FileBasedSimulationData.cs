@@ -328,9 +328,14 @@ namespace WhiteCore.Modules
                             ? 1000 
                             : info.RegionLocY / Constants.RegionSize)).ToString ())) * Constants.RegionSize;
             
-                info.RegionSizeX = int.Parse (MainConsole.Instance.Prompt ("Region size X", info.RegionSizeX.ToString ()));
-                info.RegionSizeY = int.Parse (MainConsole.Instance.Prompt ("Region size Y", info.RegionSizeY.ToString ()));
- 
+                // TODO: Implement non square regions??
+                // info.RegionSizeX = int.Parse (MainConsole.Instance.Prompt ("Region size X", info.RegionSizeX.ToString ()));
+                // info.RegionSizeY = int.Parse (MainConsole.Instance.Prompt ("Region size Y", info.RegionSizeY.ToString ()));
+
+                // only allow square regions as this is the assumption for now - 20141022 - greythane -
+                info.RegionSizeX = int.Parse (MainConsole.Instance.Prompt ("Region size", info.RegionSizeX.ToString ()));
+                info.RegionSizeY = info.RegionSizeX;
+
                 // * Mainland / Full Region (Private)
                 // * Mainland / Homestead
                 // * Mainland / Openspace
