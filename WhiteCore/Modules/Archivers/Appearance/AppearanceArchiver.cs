@@ -374,9 +374,11 @@ namespace WhiteCore.Modules.Archivers
                 {
                     MainConsole.Instance.WarnFormat ("Unknown parameter: " + cmdparams [i]);
                     i++;
+                } else
+                {
+                    parms.Add (cmdparams [i]);
+                    i++;
                 }
-                else
-                    parms.Add(cmdparams[i]);
             }
 
             if (parms.Count == 0)
@@ -735,27 +737,37 @@ namespace WhiteCore.Modules.Archivers
                     m_storeDirectory = Constants.DEFAULT_AVATARARCHIVE_DIR;
             }
 
-            //TODO:  Lock out if remote    
-            if (MainConsole.Instance != null)
-            {
-                MainConsole.Instance.Commands.AddCommand(
-                    "save avatar archive",
-                    "save avatar archive {<First> <Last> [<Filename>]] [FolderNameToSaveInto] (--snapshot <UUID>) (--private)",
-                    "Saves appearance to an avatar archive (.aa is the recommended file extension)\n" +
-                    " Note: Put \"\" around the FolderName if you need more than one word. \n" +
-                    //"  Put all attachments in BodyParts folder before saving the archive) \n" +
-                    "  Both --snapshot and --private are optional. " +
-                    "   --snapshot sets a picture to display on the web interface if this archive is being used as a default avatar." +
-                    "   --private tells any web interfaces that they cannot display this as a default avatar.",
-                    HandleSaveAvatarArchive, false, true);
+            bool remoteCalls = false;
+            IConfig connectorConfig = config.Configs ["WhiteCoreConnectors"];
+            if ((connectorConfig != null) && connectorConfig.Contains ("DoRemoteCalls"))
+                remoteCalls = connectorConfig.GetBoolean ("DoRemoteCalls", false);
 
-                MainConsole.Instance.Commands.AddCommand(
-                    "load avatar archive",
-                    "load avatar archive [<First> <Last> [<Filename>]]",
-                    "Loads appearance from an avatar archive",
-                    HandleLoadAvatarArchive, false, true);
+            // Lock out if remote 
+            if (!remoteCalls)
+            {
+                if (MainConsole.Instance != null)
+                {
+                    MainConsole.Instance.Commands.AddCommand (
+                        "save avatar archive",
+                        "save avatar archive [<First> <Last> [<Filename>]] [FileNameToSaveInto] (--snapshot <UUID>) (--private)",
+                        "Saves appearance to an avatar archive (.aa is the recommended file extension)\n" +
+                        " Note: Put \"\" around the FolderName if you have spaces. \n" +
+                        "     : eg \"../Data/MyAvatars/Male Avatar.aa\" \n" +
+                    //"  Put all attachments in BodyParts folder before saving the archive) \n" +
+                        "  Both --snapshot and --private are optional.\n" +
+                        "   --snapshot sets a picture to display on the web interface if this archive is being used as a default avatar.\n" +
+                        "   --private tells any web interfaces that they cannot display this as a default avatar.",
+                        HandleSaveAvatarArchive, false, true);
+
+                    MainConsole.Instance.Commands.AddCommand (
+                        "load avatar archive",
+                        "load avatar archive [<First> <Last> [<Filename>]]",
+                        "Loads appearance from an avatar archive",
+                        HandleLoadAvatarArchive, false, true);
+                }
             }
         }
+
 
         public void Start(IConfigSource config, IRegistryCore registry)
         {

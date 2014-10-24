@@ -112,10 +112,17 @@ namespace WhiteCore.Modules.Archivers
         {
             if (MainConsole.Instance != null)
             {
-                MainConsole.Instance.Commands.AddCommand("save archive", "save archive", "Saves an WhiteCore Archive",
-                                                         SaveWhiteCoreArchive, true, false);
-                MainConsole.Instance.Commands.AddCommand("load archive", "load archive", "Loads an WhiteCore Archive",
-                                                         LoadWhiteCoreArchive, true, false);
+                MainConsole.Instance.Commands.AddCommand(
+                    "save archive",
+                    "save archive",
+                    "Saves a WhiteCore '.abackup' archive (deprecated)",
+                    SaveWhiteCoreArchive, true, false);
+
+                MainConsole.Instance.Commands.AddCommand(
+                    "load archive",
+                    "load archive",
+                    "Loads a WhiteCore '.abackupArchive",
+                    LoadWhiteCoreArchive, true, false);
             }
             //Register the extention
             const string ext = ".abackup";
