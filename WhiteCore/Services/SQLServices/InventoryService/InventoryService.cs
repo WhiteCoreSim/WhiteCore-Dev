@@ -1184,7 +1184,12 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                 if (checkTransferPermission)
                 {
                     if ((item.CurrentPermissions & (uint)PermissionMask.Transfer) == 0)
+                    {
+                        MainConsole.Instance.WarnFormat (
+                            "[InventoryService]: Inventory copy of {0} aborted due to permissions: Sender {1}, recipient {2}",
+                            item.AssetID, senderId, recipient);
                         return null;
+                    }
                 }
 
                 // Insert a copy of the item into the recipient
@@ -1329,7 +1334,9 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                 itemCopy.SalePrice = item.SalePrice;
                 itemCopy.SaleType = item.SaleType;
 
-                AddItem(itemCopy);
+                if (! AddItem(itemCopy))
+                    MainConsole.Instance.Warn ("[InventoryService]: Failed to insert inventory item copyinto database");
+
 
                 if ((item.CurrentPermissions & (uint)PermissionMask.Copy) == 0)
                 {
