@@ -83,14 +83,35 @@ namespace Simple.Currency
 
             if (!m_doRemoteCalls)
             {
-                MainConsole.Instance.Commands.AddCommand("money add", "money add", "Adds money to a user's account.",
-                                                         AddMoney, false, true);
-                MainConsole.Instance.Commands.AddCommand("money set", "money set",
-                                                         "Sets the amount of money a user has.",
-                                                         SetMoney, false, true);
-                MainConsole.Instance.Commands.AddCommand("money get", "money get",
-                                                         "Gets the amount of money a user has.",
-                                                         GetMoney, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "money add",
+                    "money add",
+                    "Adds money to a user's account.",
+                    AddMoney, false, true);
+
+                MainConsole.Instance.Commands.AddCommand(
+                    "money set",
+                    "money set",
+                    "Sets the amount of money a user has.",
+                    SetMoney, false, true);
+
+                MainConsole.Instance.Commands.AddCommand(
+                    "money get",
+                    "money get",
+                    "Gets the amount of money a user has.",
+                    GetMoney, false, true);
+
+                MainConsole.Instance.Commands.AddCommand(
+                    "show user transactions",
+                    "show user transactionst",
+                    "Display user transactions for a period.",
+                    HandleShowTransactions, false, true);
+
+                MainConsole.Instance.Commands.AddCommand(
+                    "show user purchases",
+                    "show user purchases",
+                    "Display user purchases for a period.",
+                    HandleShowPurchases, false, true);
             }
         }
 
@@ -212,7 +233,7 @@ namespace Simple.Currency
             return true;
         }
 
-        private List<uint> GetAgentRecentTransactions(UUID agentID)
+        public List<uint> GetAgentRecentTransactions(UUID agentID)
         {
             QueryFilter filter = new QueryFilter();
             filter.andFilters["PrincipalID"] = agentID;
@@ -250,6 +271,117 @@ namespace Simple.Currency
             return query.ConvertAll<uint>(s=>uint.Parse(s));
         }
 
+        // transactions...
+        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
+        public List<AgentTransfer> GetTransactionHistory(UUID toAgentID, UUID fromAgentID, DateTime dateStart, DateTime dateEnd, uint start, uint count)
+        {
+            object remoteValue = DoRemoteByURL("CurrencyServerURI", dateStart, dateEnd, start, count);
+            if (remoteValue != null || m_doRemoteOnly)
+                return (List<AgentTransfer>) remoteValue;
+
+            QueryFilter filter = new QueryFilter();
+
+            if (toAgentID != UUID.Zero)
+                filter.andFilters["ToPrincipalID"] = toAgentID;
+            if (fromAgentID != UUID.Zero)
+                filter.andFilters["FromPrincipalID"] = fromAgentID;
+
+            filter.andGreaterThanEqFilters["Created"] = Utils.DateTimeToUnixTime(dateStart);    // from...
+            filter.andLessThanEqFilters["Created"] = Utils.DateTimeToUnixTime(dateEnd);         //...to
+
+            Dictionary<string, bool> sort = new Dictionary<string, bool>(2);
+            sort["ToName"] = true;
+            sort["FromName"] = true;
+
+            List<string> query = m_gd.Query(new string[] {"*"}, "simple_currency_history", filter, sort, start, count);
+
+            return ParseTransferQuery(query);
+        }
+
+        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
+        public List<AgentTransfer> GetTransactionHistory(UUID toAgentID, UUID fromAgentID, int period, string periodType)
+        {
+            var dateStart = StartTransactionPeriod(period, periodType);
+            var dateEnd = DateTime.Today;
+
+            return GetTransactionHistory (toAgentID, fromAgentID, dateStart, dateEnd, 0, 0);
+        }
+
+        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
+        public List<AgentTransfer> GetTransactionHistory(UUID toAgentID, int period, string periodType)
+        {
+            return GetTransactionHistory (toAgentID, UUID.Zero, period, periodType);
+        }
+
+        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
+        public List<AgentTransfer> GetTransactionHistory(DateTime dateStart, DateTime dateEnd, uint start, uint count)
+        {
+            return GetTransactionHistory (UUID.Zero, UUID.Zero, dateStart, dateEnd, start, count);
+        }
+
+        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
+        public List<AgentTransfer> GetTransactionHistory(int period, string periodType, uint start, uint count)
+        {
+            var dateStart = StartTransactionPeriod(period, periodType);
+            var dateEnd = DateTime.Today;
+
+            return GetTransactionHistory (dateStart, dateEnd, start, count);
+        }
+
+
+
+
+        // Purchases...
+        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
+        public List<AgentPurchase> GetPurchaseHistory(UUID UserID, DateTime dateStart, DateTime dateEnd, uint start, uint count)
+        {
+            object remoteValue = DoRemoteByURL("CurrencyServerURI", dateStart, dateEnd, start, count);
+            if (remoteValue != null || m_doRemoteOnly)
+                return (List<AgentPurchase>) remoteValue;
+
+            QueryFilter filter = new QueryFilter();
+
+            if (UserID != UUID.Zero)
+                filter.andFilters["PrincipalID"] = UserID;
+
+            filter.andGreaterThanEqFilters["Created"] = Utils.DateTimeToUnixTime(dateStart);    // from...
+            filter.andLessThanEqFilters["Created"] = Utils.DateTimeToUnixTime(dateEnd);         //...to
+
+            Dictionary<string, bool> sort = new Dictionary<string, bool>(2);
+            sort["PrincipalID"] = true;
+            sort["Created"] = true;
+
+            List<string> query = m_gd.Query(new string[] {"*"}, "simple_purchased", filter, sort, start, count);
+
+            return ParsePurchaseQuery(query);
+        }
+
+        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
+        public List<AgentPurchase> GetPurchaseHistory(UUID toAgentID, int period, string periodType)
+        {
+            var dateStart = StartTransactionPeriod(period, periodType);
+            var dateEnd = DateTime.Today;
+
+            return GetPurchaseHistory (toAgentID, dateStart, dateEnd, 0, 0);
+        }
+
+        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
+        public List<AgentPurchase> GetPurchaseHistory(DateTime dateStart, DateTime dateEnd, uint start, uint count)
+        {
+            return GetPurchaseHistory (UUID.Zero, dateStart, dateEnd, start, count);
+        }
+
+        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
+        public List<AgentPurchase> GetPurchaseHistory(int period, string periodType, uint start, uint count)
+        {
+            var dateStart = StartTransactionPeriod(period, periodType);
+            var dateEnd = DateTime.Today;
+
+            return GetPurchaseHistory (UUID.Zero, dateStart, dateEnd, start, count);
+        }
+
+
+            
         public bool UserCurrencyTransfer(UUID toID, UUID fromID, uint amount,
                                          string description, TransactionType type, UUID transactionID)
         {
@@ -408,6 +540,132 @@ namespace Simple.Currency
             m_gd.Insert(_REALM, new object[] {groupID.ToString(), 0, 0, 0, 1, 0});
         }
 
+        private DateTime StartTransactionPeriod( int period, string periodType)
+        {
+            DateTime then = DateTime.Now;
+            switch (periodType)
+            {
+            case "sec":
+                then = then.AddSeconds(-period);
+                break;
+            case "min":
+                then = then.AddMinutes(-period);
+                break;
+            case "hour":
+                then = then.AddHours(-period);
+                break;
+            case "day":
+                then = then.AddDays(-period);
+                break;
+            case "week":
+                then = then.AddDays(-period * 7);
+                break;
+            case "month":
+                then = then.AddMonths(-period);
+                break;
+            case "year":
+                then = then.AddYears(-period);
+                break;
+            }
+
+            return then;
+        }
+
+        private static List<AgentTransfer> ParseTransferQuery(List<string> query)
+        {
+           var transferList = new List<AgentTransfer>();
+
+            for (int i = 0; i < query.Count; i += 14)
+            {
+                AgentTransfer transfer = new AgentTransfer ();
+
+                transfer.ID = UUID.Parse(query[i + 0]);
+                transfer.Description = query[i + 1];
+                transfer.FromAgent = UUID.Parse(query[i + 2]);
+                transfer.FromAgentName = query[i + 3];
+                transfer.ToAgent = UUID.Parse(query[i + 4]);
+                transfer.ToAgentName = query[i + 5];
+                transfer.Amount = Int32.Parse(query[i + 6]);
+                transfer.TransferType = (TransactionType) Int32.Parse(query[i + 7]);
+                transfer.TransferDate = Utils.UnixTimeToDateTime((uint) Int32.Parse(query[i + 8]));
+                transfer.ToBalance = Int32.Parse(query[i + 9]);
+                transfer.FromBalance = Int32.Parse(query[i + 10]);
+                transfer.FromObjectName = query[i + 11];
+                transfer.ToObjectName = query[i + 12];
+                transfer.RegionName = query[i + 13];
+
+                transferList.Add(transfer);
+            }
+
+            return transferList;
+        }
+
+
+        private static List<AgentPurchase> ParsePurchaseQuery(List<string> query)
+        {
+            var purchaseList = new List<AgentPurchase>();
+
+            for (int i = 0; i < query.Count; i += 14)
+            {
+                AgentPurchase purchase = new AgentPurchase ();
+
+                purchase.ID = UUID.Parse(query[i + 0]);
+                purchase.AgentID = UUID.Parse(query[i + 1]);
+                purchase.IP = query[i + 2];
+                purchase.Amount = Int32.Parse(query[i + 3]);
+                purchase.RealAmount = Int32.Parse(query[i + 4]);
+                purchase.PurchaseDate = Utils.UnixTimeToDateTime((uint) Int32.Parse(query[i + 5]));
+                purchase.UpdateDate = Utils.UnixTimeToDateTime((uint) Int32.Parse(query[i + 6]));
+
+                purchaseList.Add(purchase);
+            }
+
+            return purchaseList;
+        }
+            
+
+        public string TransactionTypeInfo(TransactionType transType)
+        {
+            switch (transType)
+            {
+            // One-Time Charges
+            case TransactionType.GroupCreate:       return "Group creation fee";
+            case TransactionType.GroupJoin:         return "Group joining fee";
+            case TransactionType.UploadCharge:      return "Upload charge";
+            case TransactionType.LandAuction:       return "Land auction fee";
+            case TransactionType.ClassifiedCharge:  return "Classified advert fee";
+                // Recurrent Charges
+            case TransactionType.ParcelDirFee:      return "Parcel directory fee";
+            case TransactionType.ClassifiedRenew:   return "Classified renewal";
+            case TransactionType.ScheduledFee:      return "Scheduled fee";
+                // Inventory Transactions
+            case TransactionType.GiveInventory:     return "Give inventory";
+                // Transfers Between Users
+            case TransactionType.ObjectSale:        return "Object sale";
+            case TransactionType.Gift:              return "Gift";
+            case TransactionType.LandSale:          return "Land sale";
+            case TransactionType.ReferBonus:        return "Refer bonus";
+            case TransactionType.InvntorySale:      return "Inventory sale";
+            case TransactionType.RefundPurchase:    return "Purchase refund";
+            case TransactionType.LandPassSale:      return "Land parcel sale";
+            case TransactionType.DwellBonus:        return "Dwell bonus";
+            case TransactionType.PayObject:         return "Pay object";
+            case TransactionType.ObjectPays:        return "Object pays";
+            case TransactionType.BuyMoney:          return "Money purchase";
+            case TransactionType.MoveMoney:         return "Move money";
+                // Group Transactions
+            case TransactionType.GroupLiability:    return "Group liability";
+            case TransactionType.GroupDividend:     return "Group dividend";
+                // Event Transactions
+            case TransactionType.EventFee:          return "Event fee";
+            case TransactionType.EventPrize:        return "Event prize";
+                // Stipend Credits
+            case TransactionType.StipendPayment:    return "Stipend payment";
+
+            default:                                return "System Generated";
+            }
+        }
+
         #endregion
 
         #region Console Methods
@@ -428,13 +686,12 @@ namespace Simple.Currency
                 return;
             }
             var currency = GetUserCurrency(account.PrincipalID);
-            m_gd.Update(_REALM,
-                        new Dictionary<string, object>
-                            {
-                                {
-                                    "Amount", currency.Amount + amount
-                                }
-                            }, null, new QueryFilter()
+            m_gd.Update(_REALM, new Dictionary<string, object>
+                {
+                    {
+                        "Amount", currency.Amount + amount
+                    }
+                }, null, new QueryFilter()
                                          {
                                              andFilters =
                                                  new Dictionary<string, object> {{"PrincipalID", account.PrincipalID}}
@@ -452,6 +709,10 @@ namespace Simple.Currency
                 if (toUserInfo != null && toUserInfo.IsOnline)
                     SendUpdateMoneyBalanceToClient(account.PrincipalID, UUID.Zero, toUserInfo.CurrentRegionURI, (currency.Amount + amount), "");
             }
+
+            // log the transfer
+            UserCurrencyTransfer(account.PrincipalID, UUID.Zero, amount, "Money transfer", TransactionType.SystemGenerated, UUID.Zero);
+
         }
 
         public void SetMoney(IScene scene, string[] cmd)
@@ -493,6 +754,10 @@ namespace Simple.Currency
                 if (toUserInfo != null && toUserInfo.IsOnline)
                     SendUpdateMoneyBalanceToClient(account.PrincipalID, UUID.Zero, toUserInfo.CurrentRegionURI, amount, "");
             }
+
+            // log the transfer
+            UserCurrencyTransfer(account.PrincipalID, UUID.Zero, amount, "Set user money", TransactionType.SystemGenerated, UUID.Zero);
+
         }
 
         public void GetMoney(IScene scene, string[] cmd)
@@ -515,6 +780,105 @@ namespace Simple.Currency
             MainConsole.Instance.Info(account.Name + " has $" + currency.Amount);
         }
 
+ 
+        public void HandleShowTransactions(IScene scene, string [] cmd)
+        {
+                string name = MainConsole.Instance.Prompt("User Name: ");
+                UserAccount account =
+                    m_registry.RequestModuleInterface<IUserAccountService>()
+                        .GetUserAccount(new List<UUID> {UUID.Zero}, name);
+                if (account == null)
+                {
+                    MainConsole.Instance.Info("No account found");
+                    return;
+                }
+
+                int period;
+                while (!int.TryParse(MainConsole.Instance.Prompt("Number of days to display: ", "7"), out period))
+                    MainConsole.Instance.Info("Bad input, must be a number > 0");
+
+                string transInfo;
+
+                transInfo =  String.Format ("{0, -24}", "Date");
+                transInfo += String.Format ("{0, -25}", "From");
+                transInfo += String.Format ("{0, -30}", "Description");
+                transInfo += String.Format ("{0, -20}", "Type");
+                transInfo += String.Format ("{0, -12}", "Amount");
+                transInfo += String.Format ("{0, -12}", "Balance");
+
+                MainConsole.Instance.CleanInfo(transInfo);
+
+                MainConsole.Instance.CleanInfo(
+                    "-------------------------------------------------------------------------------------------------------------------------");
+
+                List<AgentTransfer> transactions =  GetTransactionHistory(account.PrincipalID, period, "day");
+
+                foreach (AgentTransfer transfer in transactions)
+                {
+                    transInfo =  String.Format ("{0, -24}", transfer.TransferDate);   
+                    transInfo += String.Format ("{0, -25}", transfer.FromAgentName);   
+                    transInfo += String.Format ("{0, -30}", transfer.Description);
+                    transInfo += String.Format ("{0, -20}", TransactionTypeInfo(transfer.TransferType));
+                    transInfo += String.Format ("{0, -12}", transfer.Amount);
+                    transInfo += String.Format ("{0, -12}", transfer.ToBalance);
+
+                    MainConsole.Instance.CleanInfo(transInfo);
+
+                }
+
+        }
+
+        public void HandleShowPurchases(IScene scene, string [] cmd)
+        {
+            string name = MainConsole.Instance.Prompt ("User Name: ");
+            UserAccount account =
+                m_registry.RequestModuleInterface<IUserAccountService> ()
+                    .GetUserAccount (new List<UUID> { UUID.Zero }, name);
+            if (account == null)
+            {
+                MainConsole.Instance.Info ("No account found");
+                return;
+            }
+
+            int period;
+            while (!int.TryParse (MainConsole.Instance.Prompt ("Number of days to display: ", "7"), out period))
+                MainConsole.Instance.Info ("Bad input, must be a number > 0");
+            /*
+            { "ID", purchase.ID },
+            { "AgentID", purchase.AgentID },
+            { "AgentName", AgentName },
+            { "LoggedIP", purchase.IP },
+            { "Description", "Purchase" },
+            { "Amount",purchase.Amount },
+            { "RealAmount",purchase.RealAmount },
+            { "PurchaseDate", Culture.LocaleDate (purchase.PurchaseDate, "MMM dd, hh:mm:ss") },
+            { "UpdateDate", Culture.LocaleDate (purchase.UpdateDate, "MMM dd, hh:mm:ss") }
+*/
+            string transInfo;
+
+            transInfo = String.Format ("{0, -24}", "Date");
+            transInfo += String.Format ("{0, -30}", "Description");
+            transInfo += String.Format ("{0, -20}", "InWorld Amount");
+            transInfo += String.Format ("{0, -12}", "Cost");
+
+            MainConsole.Instance.CleanInfo (transInfo);
+
+            MainConsole.Instance.CleanInfo (
+                "--------------------------------------------------------------------------------------------");
+
+            List<AgentPurchase> purchases = GetPurchaseHistory (account.PrincipalID, period, "day");
+
+            foreach (AgentPurchase purchase in purchases)
+            {
+                transInfo = String.Format ("{0, -24}", purchase.PurchaseDate);   
+                transInfo += String.Format ("{0, -30}", "Purchase");
+                transInfo += String.Format ("{0, -20}", purchase.Amount);
+                transInfo += String.Format ("{0, -12}", purchase.RealAmount);
+
+                MainConsole.Instance.CleanInfo (transInfo);
+
+            }
+        }
         #endregion
     }
 }

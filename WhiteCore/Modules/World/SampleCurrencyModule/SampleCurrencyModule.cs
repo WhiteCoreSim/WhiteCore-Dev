@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
@@ -335,5 +334,51 @@ namespace WhiteCore.Modules.SampleCurrencyModule
         {
             return new GroupBalance() {StartingDate = DateTime.Now.AddDays(-4)};
         }
+
+        public List<AgentTransfer> GetTransactionHistory(UUID UserID, UUID fromAgentID, DateTime dateStart, DateTime dateEnd, uint start, uint count)
+        {
+            return new List<AgentTransfer> ();
+        }
+
+        public List<AgentTransfer> GetTransactionHistory(UUID toAgentID, UUID fromAgentID, int period, string periodType)
+        {
+            return new List<AgentTransfer> ();
+        }
+
+        public List<AgentTransfer> GetTransactionHistory(UUID toAgentID, int period, string periodType)
+        {
+            return new List<AgentTransfer> ();
+        }
+            
+        public List<AgentTransfer> GetTransactionHistory(DateTime dateStart, DateTime dateEnd, uint start, uint count)
+        {
+            return new List<AgentTransfer> ();
+        }
+
+        public List<AgentTransfer> GetTransactionHistory(int period, string periodType, uint start, uint count)
+        {
+            return new List<AgentTransfer> ();
+        }
+
+        public List<AgentPurchase> GetPurchaseHistory(UUID UserID, DateTime dateStart, DateTime dateEnd, uint start, uint count)
+        {
+            return new List<AgentPurchase> ();
+        }
+
+        public List<AgentPurchase> GetPurchaseHistory (UUID toAgentID, int period, string periodType)
+        {
+            return new List<AgentPurchase> ();
+        }
+
+        public List<AgentPurchase> GetPurchaseHistory(DateTime dateStart, DateTime dateEnd, uint start, uint count)
+        {
+            return new List<AgentPurchase> ();
+        }
+
+        public List<AgentPurchase> GetPurchaseHistory (int period, string periodType, uint start, uint count)
+        {
+            return new List<AgentPurchase> ();
+        }
+
     }
 }
