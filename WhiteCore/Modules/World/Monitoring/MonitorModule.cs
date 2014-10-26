@@ -745,6 +745,9 @@ namespace WhiteCore.Modules.Monitoring
 
         protected void HandleShowThreads(IScene scene, string[] cmd)
         {
+            if (Util.IsLinux)
+                MainConsole.Instance.Warn ("Thread process statistics may not be fully implemented with Mono");
+
             MainConsole.Instance.Info(GetThreadsReport());
         }
 
@@ -853,9 +856,6 @@ namespace WhiteCore.Modules.Monitoring
         /// </summary>
         public string GetThreadsReport()
         {
-            if (Util.IsLinux)
-                MainConsole.Instance.Info ("Thread process statistics may not be fully implemented with Mono");
-
             StringBuilder sb = new StringBuilder();
 
             ProcessThreadCollection threads = GetThreads();
