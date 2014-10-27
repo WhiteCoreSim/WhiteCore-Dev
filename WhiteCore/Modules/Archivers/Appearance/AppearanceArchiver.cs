@@ -386,9 +386,13 @@ namespace WhiteCore.Modules.Archivers
                 userName = MainConsole.Instance.Prompt (" Avatar appearence to save (<first> <last>)");
                 if (userName == "")
                     return;
-            } else
+            } else if (parms.Count > 1)
             {
                 userName = parms [0] + " " + parms [1];
+            } else
+            {
+                MainConsole.Instance.Info ("Error in command format.");
+                return;
             }
 
             UserAccount account = UserAccountService.GetUserAccount(null, userName);
@@ -418,7 +422,7 @@ namespace WhiteCore.Modules.Archivers
             foldername =  (Path.GetFileNameWithoutExtension (fileName));             // use the filename as the default folder
             if (parms.Count > 3)
                 foldername = OSD.FromString(cmdparams[3]);
-                
+            foldername = foldername.Replace (' ', '_');    
 
             SaveAvatarArchive(fileName, account.PrincipalID, foldername, snapshotUUID, isPublic);
         }
@@ -749,7 +753,7 @@ namespace WhiteCore.Modules.Archivers
                 {
                     MainConsole.Instance.Commands.AddCommand (
                         "save avatar archive",
-                        "save avatar archive [<First> <Last> [<Filename>]] [FileNameToSaveInto] (--snapshot <UUID>) (--private)",
+                        "save avatar archive [<First> <Last> [<Filename>]] [FolderNameToSaveInto] (--snapshot <UUID>) (--private)",
                         "Saves appearance to an avatar archive (.aa is the recommended file extension)\n" +
                         " Note: Put \"\" around the FolderName if you have spaces. \n" +
                         "     : eg \"../Data/MyAvatars/Male Avatar.aa\" \n" +

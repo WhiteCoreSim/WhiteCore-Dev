@@ -237,8 +237,18 @@ namespace WhiteCore.Modules.Web
                             }
 
                             if (AvatarArchive != "")
+                            {
                                 profile.AArchiveName = AvatarArchive;
 
+                                List<AvatarArchive> avarchives = webInterface.Registry.RequestModuleInterface<IAvatarAppearanceArchiver>().GetAvatarArchives();
+                                UUID snapshotUUID = UUID.Zero;
+                                foreach (var archive in avarchives)
+                                    if (archive.FolderName == AvatarArchive)
+                                        snapshotUUID = archive.Snapshot;
+
+                                if (snapshotUUID != UUID.Zero)
+                                    profile.Image = snapshotUUID;
+                            }
                             profile.MembershipGroup = webInterface.UserFlagToType (UserFlags, webInterface.EnglishTranslator);    // membership is english
                             profile.IsNewUser = true;
                             profileData.UpdateUserProfile (profile);
@@ -249,7 +259,7 @@ namespace WhiteCore.Modules.Web
                         Vector3 lookAt = new Vector3 (0, 0, 22);
 
                         if (agentInfoService != null)
-                            agentInfoService.SetHomePosition (userID.ToString (), (UUID)UserHomeRegion, position, lookAt);
+                            agentInfoService.SetHomePosition (userID.ToString (), (UUID) UserHomeRegion, position, lookAt);
 
                         vars.Add ("ErrorMessage", "Successfully created account, redirecting to main page");
                         response = "<h3>Successfully created account, redirecting to main page</h3>" +
