@@ -115,36 +115,50 @@ namespace WhiteCore.Services
             IUserStatsDataConnector dc = Framework.Utilities.DataManager.RequestPlugin<IUserStatsDataConnector>();
             if (dc != null)
             {
-                MainConsole.Instance.Info(
+                MainConsole.Instance.Info ("");
+                var client_viewers = dc.ViewerUsage();
+                MainConsole.Instance.Info ("Viewer usage:");
+                foreach (var vclient in client_viewers)
+                    MainConsole.Instance.CleanInfo (vclient.Key + ": " + vclient.Value);
+
+
+                MainConsole.Instance.CleanInfo ("");
+                MainConsole.Instance.CleanInfo ("Graphics cards:");
+                MainConsole.Instance.CleanInfo(
                     string.Format(
                         "Graphic cards: {0} logins have used ATI, {1} logins have used NVIDIA, {2} logins have used Intel graphics",
                         dc.GetCount("s_gpuvendor", new KeyValuePair<string, object>("s_gpuvendor", "ATI")),
                         dc.GetCount("s_gpuvendor", new KeyValuePair<string, object>("s_gpuvendor", "NVIDIA")),
                         dc.GetCount("s_gpuvendor", new KeyValuePair<string, object>("s_gpuvendor", "Intel"))));
 
+                MainConsole.Instance.CleanInfo ("");
+                MainConsole.Instance.CleanInfo ("Performance:");
                 List<float> fps = dc.Get("fps").ConvertAll<float>((s) => float.Parse(s));
                 if (fps.Count > 0)
-                    MainConsole.Instance.Info(string.Format("Average fps: {0}", fps.Average()));
+                    MainConsole.Instance.CleanInfo(string.Format("Average fps: {0}", fps.Average()));
 
                 List<float> run_time = dc.Get("run_time").ConvertAll<float>((s) => float.Parse(s));
                 if (run_time.Count > 0)
-                    MainConsole.Instance.Info(string.Format("Average viewer run time: {0}", run_time.Average()));
+                    MainConsole.Instance.CleanInfo(string.Format("Average viewer run time: {0}", run_time.Average()));
 
                 List<int> regions_visited = dc.Get("regions_visited").ConvertAll<int>((s) => int.Parse(s));
                 if (regions_visited.Count > 0)
-                    MainConsole.Instance.Info(string.Format("Average regions visited: {0}", regions_visited.Average()));
+                    MainConsole.Instance.CleanInfo(string.Format("Average regions visited: {0}", regions_visited.Average()));
 
                 List<int> mem_use = dc.Get("mem_use").ConvertAll<int>((s) => int.Parse(s));
                 if (mem_use.Count > 0)
-                    MainConsole.Instance.Info(string.Format("Average viewer memory use: {0} mb", mem_use.Average()/1000));
+                    MainConsole.Instance.CleanInfo(string.Format("Average viewer memory use: {0} mb", mem_use.Average()/1000));
 
                 List<float> ping = dc.Get("ping").ConvertAll<float>((s) => float.Parse(s));
                 if (ping.Count > 0)
-                    MainConsole.Instance.Info(string.Format("Average ping: {0}", ping.Average()));
+                    MainConsole.Instance.CleanInfo(string.Format("Average ping: {0}", ping.Average()));
 
                 List<int> agents_in_view = dc.Get("agents_in_view").ConvertAll<int>((s) => int.Parse(s));
                 if (agents_in_view.Count > 0)
-                    MainConsole.Instance.Info(string.Format("Average agents in view: {0}", agents_in_view.Average()));
+                    MainConsole.Instance.CleanInfo(string.Format("Average agents in view: {0}", agents_in_view.Average()));
+
+                MainConsole.Instance.CleanInfo ("");
+
             }
         }
     }

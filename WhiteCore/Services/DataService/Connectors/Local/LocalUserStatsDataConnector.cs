@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Services;
@@ -142,6 +141,23 @@ namespace WhiteCore.Services.DataService
         public void RemoveAllSessions()
         {
             GD.Delete(m_realm, null);
+        }
+
+        public Dictionary<string,int> ViewerUsage()
+        {
+            QueryFilter filter = new QueryFilter();
+            List<string> client_viewers = GD.Query(new string[1] {"client_version"}, m_realm, filter, null, null, null);
+            client_viewers.Sort ();
+
+            //List<string> client_viewers = Get ("client_version");
+            Dictionary<string, int> viewers = new Dictionary<string, int>();
+            foreach( var cli in client_viewers)
+                if (viewers.ContainsKey(cli))
+                    viewers[cli]++;
+                else
+                    viewers.Add (cli, 1);
+
+            return viewers;
         }
 
         private ViewerStatsMessage BuildSession(List<string> results, int start)

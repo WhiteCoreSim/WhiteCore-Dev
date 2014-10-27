@@ -68,5 +68,11 @@ namespace WhiteCore.Framework.DatabaseInterfaces
         ///     Remove all sessions from the database
         /// </summary>
         void RemoveAllSessions();
+
+        /// <summary>
+        /// connecting Viewer usage count.
+        /// </summary>
+        /// <returns>The count of each type of viewer.</returns>
+        Dictionary<string,int> ViewerUsage ();
     }
 }
