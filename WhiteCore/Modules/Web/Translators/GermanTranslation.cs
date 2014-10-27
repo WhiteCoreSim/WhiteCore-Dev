@@ -220,16 +220,13 @@
                     return "Seitenmanager";
                 case "MenuSettingsManager":
                     return "Einstellungsmanager";
-                case "MenuManager":
-                    return "Admin";
-            case "MenuSettings":
-                return "Einstellungen";
-            case "MenuRegionManager":
-                return "Region-Manager";
-            case "MenuManagerSimConsole": return "Simulator-Konsole";
+                case "MenuManager":             return "Management";
+            case "MenuSettings":                return "Einstellungen";
+            case "MenuRegionManager":           return "Region-Manager";
+            case "MenuManagerSimConsole":       return "Simulator-Konsole";
             case "MenuPurchases":               return "Benutzer Einkäufe";
-            case "MenuTransactions":
-                return "Benutzertransaktionen";
+            case "MenuTransactions":            return "Benutzertransaktionen";
+            case "MenuStatistics":              return "Viewer-Statistiken";
 
                     // Tooltips Menu Buttons
                 case "TooltipsMenuHome":
@@ -285,6 +282,7 @@
             case "TooltipsMenuPurchases":               return "Kaufinformationen";
             case "TooltipsMenuTransactions":
                 return "Transaktionsinformationen";
+            case "TooltipsMenuStatistics":              return "Viewer-Statistiken";
 
             // Menu Region
             case "MenuRegionTitle":                    return "Regionen";
@@ -594,7 +592,20 @@
             case "SimConsoleText":              return "Sim Command Console";
             case "SimCommandText":              return "Command";
 
-                    //Times
+                // statistics
+            case "StatisticsText":              return "Viewer-Statistiken";
+            case "ViewersText":                 return "Viewer-Nutzung";
+            case "GPUText":                     return "Grafikkarten";
+            case "PerformanceText":             return "Leistungsmittelwerte";
+            case "FPSText":                     return "Bilder / s";
+            case "RunTimeText":                 return "Laufzeit";
+            case "RegionsVisitedText":          return "Regionen besucht";
+            case "MemoryUseageText":            return "Speichernutzung";
+            case "PingTimeText":                return "Ping-Zeit";
+            case "AgentsInViewText":            return "Agents im Blick";
+            case "ClearStatsText":              return "Klare Statistiken über";
+
+                //Times
                 case "Sun":
                     return "Son";
                 case "Mon":

@@ -183,6 +183,7 @@
             case "MenuManagerSimConsole":       return "Simulator console";
             case "MenuPurchases":               return "User Purchases";
             case "MenuTransactions":            return "User Transactions";
+            case "MenuStatistics":              return "Viewer Statistics";
 
             // Main Menu Tooltips
             case "TooltipsMenuHome":            return "Home";
@@ -209,10 +210,11 @@
             case "TooltipsMenuSettingsManager":         return "Settings Manager";
             case "TooltipsMenuManager":                 return "Admin Management";
             case "TooltipsMenuSettings":                return "WebUI Settings";
-            case  "TooltipsMenuRegionManager":          return "Region create/edit";
+            case "TooltipsMenuRegionManager":           return "Region create/edit";
             case "TooltipsMenuManagerSimConsole":       return "Online simulator console";
             case "TooltipsMenuPurchases":               return "Purchase information";
             case "TooltipsMenuTransactions":            return "Transaction information";
+            case "TooltipsMenuStatistics":              return "Viewer Statistics";
 
             // Menu Region box
             case "MenuRegionTitle":             return "Region";
@@ -417,6 +419,21 @@
             case "HideSlideshowBarText":        return "Hide Slideshow Bar";
             case "LocalFrontPageText":          return "Local front page";
             case "LocalCSSText":                return "Local CSS stylesheet";
+
+            // statistics
+            case "StatisticsText":              return "Viewer statistics";
+            case "ViewersText":                 return "Viewer usage";
+            case "GPUText":                     return "Graphics cards";
+            case "PerformanceText":             return "Performance averages";
+            case "FPSText":                     return "Frames / second";
+            case "RunTimeText":                 return "Run time";
+            case "RegionsVisitedText":          return "Regions visited";
+            case "MemoryUseageText":            return "Memory use";
+            case "PingTimeText":                return "Ping time";
+            case "AgentsInViewText":            return "Agents in view";
+            case "ClearStatsText":              return "Clear statistics data";
+
+
 
                     //Times
                 case "Sun":

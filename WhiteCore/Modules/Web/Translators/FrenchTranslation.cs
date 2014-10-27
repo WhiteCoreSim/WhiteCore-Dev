@@ -172,65 +172,37 @@
                     return "Nombre d'Utilisateurs dans la Région";
 
                     // Menu Buttons
-                case "MenuHome":
-                    return "Accueil";
-                case "MenuLogin":
-                    return "Connection";
-                case "MenuLogout":
-                    return "Déconnexion";
-                case "MenuRegister":
-                    return "Inscription";
-                case "MenuForgotPass":
-                    return "Mot de Passe Oublié";
-                case "MenuNews":
-                    return "News";
-                case "MenuWorld":
-                    return "Monde";
-                case "MenuWorldMap":
-                    return "Carte de Monde";
-                case "MenuRegion":
-                    return "Liste des Régions";
-                case "MenuUser":
-                    return "Utilisateurs";
-                case "MenuOnlineUsers":
-                    return "Utilisateurs en Ligne";
-                case "MenuUserSearch":
-                    return "Rechercher Utilisateur";
-                case "MenuRegionSearch":
-                    return "Rechercher Région";
-                case "MenuChat":
-                    return "Chat";
-                case "MenuHelp":
-                    return "Aide";
-                case "MenuChangeUserInformation":
-                    return "Modifier Infos Utilisateur";
-                case "MenuWelcomeScreenManager":
-                    return "Gestion Ecran Bienvenue";
-                case "MenuNewsManager":
-                    return "Gestion des News";
-                case "MenuUserManager":
-                    return "Gestion Utilisateurs";
-                case "MenuFactoryReset":
-                    return "Réinitialiser";
-                case "ResetMenuInfoText":
-                    return "Réinitialise les éléments de menu aux valeurs par défaut les plus à jour";
-                case "ResetSettingsInfoText":
-                    return "Réinitialise les réglages de l'interface Web aux valeurs par défaut les plus à jour";
-                case "MenuPageManager":
-                    return "Gestion des Pages";
-                case "MenuSettingsManager":
-                    return "Gestion des paramètres";
-                case "MenuManager":
-                    return "Admin";
-            case "MenuSettings":
-                return "Paramètres";
-            case "MenuRegionManager":
-                return "Manager Région";
-            case "MenuManagerSimConsole": return "simulateur Console";
+                case "MenuHome":                    return "Accueil";
+                case "MenuLogin":                    return "Connection";
+                case "MenuLogout":                    return "Déconnexion";
+                case "MenuRegister":                    return "Inscription";
+                case "MenuForgotPass":                    return "Mot de Passe Oublié";
+                case "MenuNews":                    return "News";
+                case "MenuWorld":                   return "Monde";
+                case "MenuWorldMap":                    return "Carte de Monde";
+                case "MenuRegion":                    return "Liste des Régions";
+                case "MenuUser":                    return "Utilisateurs";
+                case "MenuOnlineUsers":                    return "Utilisateurs en Ligne";
+                case "MenuUserSearch":                    return "Rechercher Utilisateur";
+                case "MenuRegionSearch":                    return "Rechercher Région";
+                case "MenuChat":                   return "Chat";
+                case "MenuHelp":                    return "Aide";
+                case "MenuChangeUserInformation":                    return "Modifier Infos Utilisateur";
+                case "MenuWelcomeScreenManager":                    return "Gestion Ecran Bienvenue";
+                case "MenuNewsManager":                    return "Gestion des News";
+                case "MenuUserManager":                    return "Gestion Utilisateurs";
+                case "MenuFactoryReset":                    return "Réinitialiser";
+                case "ResetMenuInfoText":                    return "Réinitialise les éléments de menu aux valeurs par défaut les plus à jour";
+                case "ResetSettingsInfoText":                    return "Réinitialise les réglages de l'interface Web aux valeurs par défaut les plus à jour";
+                case "MenuPageManager":                    return "Gestion des Pages";
+                case "MenuSettingsManager":                    return "Gestion des paramètres";
+            case "MenuManager":                    return "Gestion";
+            case "MenuSettings":                return "Paramètres";
+            case "MenuRegionManager":                return "Manager Région";
+            case "MenuManagerSimConsole":           return "simulateur Console";
             case "MenuPurchases":               return "Achats de l'utilisateur";
-            case "MenuTransactions":
-                return "Transactions de l'utilisateur";
-
+            case "MenuTransactions":                return "Transactions de l'utilisateur";
+            case "MenuStatistics":               return "Statistiques Viewer";
 
                     // Tooltips Menu Buttons
                 case "TooltipsMenuHome":
@@ -286,6 +258,7 @@
             case "TooltipsMenuPurchases":               return "Informations d'achat";
             case "TooltipsMenuTransactions":
                 return "Informations sur la transaction";
+            case "TooltipsMenuStatistics":               return "Statistiques Viewer";
 
                     // Menu Region
             case "MenuRegionTitle":                    return "Région";
@@ -596,7 +569,20 @@
             case "SimConsoleText":              return "Sim Command Console";
             case "SimCommandText":              return "Command";
 
-                    //Times
+                // statistics
+            case "StatisticsText":              return "Statistiques Viewer";
+            case "ViewersText":                 return "Utilisation Viewer";
+            case "GPUText":                     return "Les cartes graphiques";
+            case "PerformanceText":             return "Moyennes de performance";
+            case "FPSText":                     return "Images / seconde";
+            case "RunTimeText":                 return "Durée";
+            case "RegionsVisitedText":          return "Régions visitées";
+            case "MemoryUseageText":            return "Utilisation de la mémoire";
+            case "PingTimeText":                return "Ping temps";
+            case "AgentsInViewText":            return "Agents en vue";
+            case "ClearStatsText":              return "Effacer les statistiques sur";
+
+                //Times
                 case "Sun":
                     return "Dim";
                 case "Mon":

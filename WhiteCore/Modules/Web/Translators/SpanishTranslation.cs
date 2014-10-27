@@ -212,16 +212,15 @@
                     return "Page Manager";
                 case "MenuSettingsManager":
                     return "Settings Manager";
-                case "MenuManager":
-                    return "Admin";
+                case "MenuManager":                return "Manejo";
             case "MenuSettings":
                 return "Ajustes";
             case "MenuRegionManager":
                 return "Gerente de Región";
             case "MenuManagerSimConsole": return "Simulador de consola";
             case "MenuPurchases":               return "Usuario compra";
-            case "MenuTransactions":
-                return "Transacciones de usuario";
+            case "MenuTransactions":                return "Transacciones de usuario";
+            case "MenuStatistics":              return "Visor de estadísticas";
 
                     // Tooltips Menu Buttons
                 case "TooltipsMenuHome":                return "Inicio";
@@ -267,8 +266,8 @@
             case "TooltipsMenuManagerSimConsole":
                 return "Consola Simulador Online";
             case "TooltipsMenuPurchases":               return "Información Realizar compra";
-            case "TooltipsMenuTransactions":
-                return "La información de transacciones";
+            case "TooltipsMenuTransactions":                return "La información de transacciones";
+            case "TooltipsMenuStatistics":              return "Visor de estadísticas";
 
                     // Menu Region
             case "MenuRegionTitle":                    return "Región";
@@ -578,7 +577,19 @@
             case "SimConsoleText":              return "Sim Command Console";
             case "SimCommandText":              return "Command";
 
-                    //Times
+                // statistics
+            case "StatisticsText":              return "Visor de estadísticas";
+            case "ViewersText":                 return "Uso del Visor";
+            case "GPUText":                     return "Tarjetas gráficas";
+            case "PerformanceText":             return "Promedios de rendimiento ";
+            case "FPSText":                     return "Cuadros / segundo";
+            case "RunTimeText":                 return "El tiempo de ejecución";
+            case "RegionsVisitedText":          return "Regiones visitadas";
+            case "MemoryUseageText":            return "Uso de la memoria";
+            case "PingTimeText":                return "Tiempo Ping";
+            case "AgentsInViewText":            return "Agentes de vista";
+            case "ClearStatsText":              return "Borrar datos estadísticas";
+                           //Times
                 case "Sun":
                     return "Sun";
                 case "Mon":

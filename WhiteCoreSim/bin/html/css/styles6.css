@@ -211,6 +211,16 @@ table#settings_manager td {}
 .settings_manager_left {text-align: left;}
 .settings_manager_right {text-align: left;}
 
+/* statistics */
+table#statistics  {
+	width: 100%;
+	display: inline-table;
+}
+table#statistics th {}
+table#statistics td {}
+.statistics_left {text-align: left;}
+.statistics_right {text-align: right; padding-right:10px;}
+
 /* page_manager_select */
 table#page_manager_select  {width: 100%;}
 table#page_manager_select th {}

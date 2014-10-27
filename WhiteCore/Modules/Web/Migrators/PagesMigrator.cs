@@ -282,6 +282,15 @@ namespace WhiteCore.Modules.Web
                         MenuPosition = 6,
                         MenuTitle = "MenuTransactions",
                         MenuToolTip = "TooltipsMenuTransactions"
+                    },
+                    new GridPage {
+                        ShowInMenu = true,
+                        AdminRequired = true,
+                        MenuID = "Statistics",
+                        Location = "admin/statistics.html",
+                        MenuPosition = 6,
+                        MenuTitle = "MenuStatistics",
+                        MenuToolTip = "TooltipsMenuStatistics"
                     }
                 }
             });

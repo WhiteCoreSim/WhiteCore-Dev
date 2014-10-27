@@ -1,0 +1,86 @@
+<!-- params to replace
+
+{SystemURL}
+{SystemName}
+{WebRegistrationText}
+{GridCenterX}
+{GridCenterY}
+{SettingsManager}               Settings Manager
+{GridCenterXText}               Grid Center Location X
+{GridCenterYText}               Grid Center Location Y
+{GoogleMapAPIKeyText}           Google Maps API Key
+{GoogleMapAPIKeyHelpText}       Google Maps API Key
+{ChangesSavedSuccessfully}      Changes saved successfully
+{Save}                          Save
+-->
+
+<h2>{SystemName}: {StatisticsText}</h2>
+<form id="statistics_form" action="admin/statistics.html" method="post">
+<div id="error_message" class="error"><h3></h3></div>
+<table id="statistics">
+  <tbody>
+    <tr>
+    <td colspan = "5"></td>
+	  <input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
+      <td class="settings_manager_right"><button id="Submit" type="Submit" name="Submit" style="width:160px;">{ClearStatsText}</button></td>
+    </tr>
+    <tr>
+  	  <td colspan="2"><h3>{ViewersText}</h3></td>
+  	</tr>
+	{ViewersListArrayBegin}
+    <tr>
+      <td class="statistics_left"><p>{ViewerName}</p></td>
+      <td class="statistics_left"><p>{ViewerCount}</p></td>
+    </tr>
+	{ViewersListArrayEnd}
+
+    <tr>
+  	  <td colspan="2"><h3>{GPUText}</h3></td>
+  	</tr>
+	{GPUListArrayBegin}
+    <tr>
+      <td class="statistics_left"><p>{GPUType}</p></td>
+      <td class="statistics_left"><p>{GPUCount}</p></td>
+    </tr>
+	{GPUListArrayEnd}
+
+    <tr>
+  	  <td colspan="2"><h3>{PerformanceText}</h3></td>
+  	</tr>
+    <tr>
+      <td class="statistics_right"><p>{FPSText}:</p></td>
+      <td class="statistics_left"><p>{FPS}</p></td>
+      <td class="statistics_right"><p>{RegionsVisitedText}:</p></td>
+      <td class="statistics_left"><p>{RegionsVisited}</p></td>
+      <td class="statistics_right"><p>{AgentsInViewText}:</p></td>
+      <td class="statistics_left"><p>{AgentsInView}</p></td>
+    </tr>
+    <tr>
+      <td class="statistics_right"><p>{RunTimeText}:</p></td>
+      <td class="statistics_left"><p>{RunTime}</p></td>
+      <td class="statistics_right"><p>{MemoryUseageText}:</p></td>
+      <td class="statistics_left"><p>{MemoryUseage}&nbsp;Mb</p></td>
+      <td class="statistics_right"><p>{PingTimeText}:</p></td>
+      <td class="statistics_left"><p>{PingTime}&nbsp;ms</p></td>
+    </tr>
+
+  </tbody>
+</table>
+</form>
+<script>
+  /* attach a submit handler to the form */
+  $("#statistics_form").submit(function(event) {
+
+    /* stop form from submitting normally */
+    event.preventDefault(); 
+    /* get some values from elements on the page: */
+    var $form = $( this ),
+        url = $form.attr( 'action' );
+    /* Send the data using post and put the results in a div */
+    $.post( url, $form.serialize(),
+      function( data ) {
+		$("#error_message").empty().append("<h3>" + data + "</h3>");
+      }
+    );
+  });
+</script>

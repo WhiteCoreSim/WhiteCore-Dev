@@ -174,71 +174,46 @@ namespace WhiteCore.Modules.Web.Translators
             case "ResetSettingsInfoText":       return "Reset de Web Interface terug naar de default waardes";
             case "MenuPageManager":             return "Page Manager";
             case "MenuSettingsManager":         return "Settings Manager";
-            case "MenuManager":                 return "Admin";
+            case "MenuManager":                 return "Beheer";
             case "MenuSettings":                return "Instellingen";
             case "MenuRegionManager":           return "Regio Manager";
             case "MenuManagerSimConsole":       return "Sim console";
             case "MenuPurchases":               return "Gebruiker Aankopen";
             case "MenuTransactions":            return "Gebruiker Transacties";
+            case "MenuStatistics":              return "Viewer statistieken";
 
-                    // Tooltips Menu Buttons
-                case "TooltipsMenuHome":
-                    return "Home";
-                case "TooltipsMenuLogin":
-                    return "Login";
-                case "TooltipsMenuLogout":
-                    return "Logout";
-                case "TooltipsMenuRegister":
-                    return "Registeer";
-                case "TooltipsMenuForgotPass":
-                    return "Wachtwoord vergeten";
-                case "TooltipsMenuNews":
-                    return "Nieuws";
-                case "TooltipsMenuWorld":
-                    return "Wereld";
-                case "TooltipsMenuWorldMap":
-                    return "Wereld Map";
-                              case "TooltipsMenuUser":
-                    return "User";
-                case "TooltipsMenuOnlineUsers":
-                    return "Online Users";
-                case "TooltipsMenuUserSearch":
-                    return "User Search";
-                case "TooltipsMenuRegionSearch":
-                    return "Region Search";
-                case "TooltipsMenuChat":
-                    return "Chat";
-                case "TooltipsMenuViewerHelp":
-                    return "Viewer Help";
-                case "TooltipsMenuHelp":
-                    return "Help";
-                case "TooltipsMenuChangeUserInformation":
-                    return "Change User Information";
-                case "TooltipsMenuWelcomeScreenManager":
-                    return "Welcome Screen Manager";
-                case "TooltipsMenuNewsManager":
-                    return "Nieuws Manager";
-                case "TooltipsMenuUserManager":
-                    return "User Manager";
-                case "TooltipsMenuFactoryReset":
-                    return "Factory Reset";
-                case "TooltipsMenuPageManager":
-                    return "Page Manager";
-                case "TooltipsMenuSettingsManager":
-                    return "Settings Manager";
-                case "TooltipsMenuManager":
-                    return "Admin Management";
-            case "TooltipsMenuSettings":
-                return "WebUI Instellingen";
-            case  "TooltipsMenuRegionManager":
-                return "Regio maken / bewerken";
-            case "TooltipsMenuManagerSimConsole":
-                return "Online simulator console";
+            // Tooltips Menu Buttons
+            case "TooltipsMenuHome":                    return "Home";
+            case "TooltipsMenuLogin":                   return "Login";
+            case "TooltipsMenuLogout":                  return "Logout";
+            case "TooltipsMenuRegister":                return "Registeer";
+            case "TooltipsMenuForgotPass":              return "Wachtwoord vergeten";
+            case "TooltipsMenuNews":                    return "Nieuws";
+            case "TooltipsMenuWorld":                   return "Wereld";
+            case "TooltipsMenuWorldMap":                return "Wereld Map";
+            case "TooltipsMenuUser":                    return "User";
+            case "TooltipsMenuOnlineUsers":             return "Online Users";
+            case "TooltipsMenuUserSearch":              return "User Search";
+            case "TooltipsMenuRegionSearch":            return "Region Search";
+            case "TooltipsMenuChat":                    return "Chat";
+            case "TooltipsMenuViewerHelp":              return "Viewer Help";
+            case "TooltipsMenuHelp":                    return "Help";
+            case "TooltipsMenuChangeUserInformation":   return "Change User Information";
+            case "TooltipsMenuWelcomeScreenManager":    return "Welcome Screen Manager";
+            case "TooltipsMenuNewsManager":             return "Nieuws Manager";
+            case "TooltipsMenuUserManager":             return "User Manager";
+            case "TooltipsMenuFactoryReset":            return "Factory Reset";
+            case "TooltipsMenuPageManager":             return "Page Manager";
+            case "TooltipsMenuSettingsManager":         return "Settings Manager";
+            case "TooltipsMenuManager":                 return "Admin Management";
+            case "TooltipsMenuSettings":                return "WebUI Instellingen";
+            case "TooltipsMenuRegionManager":           return "Regio maken / bewerken";
+            case "TooltipsMenuManagerSimConsole":       return "Online simulator console";
             case "TooltipsMenuPurchases":               return "Aankoop informatie";
-            case "TooltipsMenuTransactions":
-                return "Transactie-informatie";
+            case "TooltipsMenuTransactions":            return "Transactie-informatie";
+            case "TooltipsMenuStatistics":              return "Viewer statistieken";
 
-                    // Menu Region
+            // Menu Region
             case "MenuRegionTitle":                return "Region";
             case "MenuParcelTitle":                return "Parcel";
             case "MenuOwnerTitle":                return "Owner";
@@ -552,7 +527,19 @@ namespace WhiteCore.Modules.Web.Translators
             case "SimConsoleText":              return "Sim Command Console";
             case "SimCommandText":              return "Command";
 
-                //Times
+                // statistics
+            case "StatisticsText":              return "Viewer statistieken";
+            case "ViewersText":                 return "Viewer gebruik";
+            case "GPUText":                     return "Grafische kaarten";
+            case "PerformanceText":             return "Gemiddelden prestaties";
+            case "FPSText":                     return "Frames / seconde";
+            case "RunTimeText":                 return "Looptijd";
+            case "RegionsVisitedText":          return "Bezochte regio's";
+            case "MemoryUseageText":            return "Geheugen gebruik";
+            case "PingTimeText":                return "Ping tijd";
+            case "AgentsInViewText":            return "Agenten in het oog";
+            case "ClearStatsText":              return "Duidelijke statistieken over";
+                               //Times
                 case "Sun":
                     return "Sun";
                 case "Mon":
