@@ -56,6 +56,7 @@ WhiteCoreSim/Data/ScriptEngines/*.dll
 WhiteCoreSim/Data/ScriptEngines/*/*.dll
 WhiteCoreSim/Data/ScriptEngines/*/*.state
 WhiteCoreSim/Data/RealEstateUser.txt
+WhiteCoreSim/Data/AvatarArchives/*
 
 WhiteCoreSim/bin/*.log
 WhiteCoreSim/bin/WhiteCore.exe
@@ -100,3 +101,4 @@ TestResult.xml
 *StyleCop.Cache
 *.StyleCop
 debug/*
+

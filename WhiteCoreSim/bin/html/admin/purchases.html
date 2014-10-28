@@ -71,7 +71,7 @@ $(function() {
 </script>
 
 <!--
-<div class="center notice" style="text-align:center;margin:10px 0;">{NoTransactionsText}</div>
+<div class="center notice" style="text-align:center;margin:10px 0;">{NoPurchasesText}</div>
 -->
 
 <table id="transactions_search_result_navigation_top">
@@ -95,18 +95,20 @@ $(function() {
 		  <th class="transactions_user"><p>{LoggedIPText}</p></th>
 		  <th class="transactions_description"><p>{PurchaseDetailText}</p></th>
 		  <th class="transactions_value"><p>{PurchaseAmountText}</p></th>
+		  <th class="transactions_value"><p>{PurchaseRealAmountText}</p></th>
 		</tr>
 	  </thead>
 
-	{TransactionsListArrayBegin}
+	{PurchasesListArrayBegin}
     <tr>
-      <td class="transactions_left"><p>{Date}</p></td>
+      <td class="transactions_left"><p>{PurchaseDate}</p></td>
       <td class="transactions_user"><p>{AgentName}</p></td>
       <td class="transactions_user"><p>{LoggedIP}</p></td>
       <td class="transactions_description"><p>{Description}</p></td>
       <td class="transactions_value"><p>{Amount}</p></td>
+      <td class="transactions_value"><p>{RealAmount}</p></td>
     </tr>
-	{TransactionsListArrayEnd}
+	{PurchasesListArrayEnd}
   </tbody>
 </table>
 </div>

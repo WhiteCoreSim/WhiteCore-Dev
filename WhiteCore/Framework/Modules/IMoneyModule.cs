@@ -235,16 +235,20 @@ namespace WhiteCore.Framework.Modules
 
         GroupBalance GetGroupBalance(UUID groupID);
 
-        List<AgentTransfer> GetTransactionHistory (UUID toAgentID, UUID fromAgentID, DateTime dateStart, DateTime dateEnd, uint start, uint count);
+        uint NumberOfTransactions(UUID toAgent, UUID fromAgent);
+
+        List<AgentTransfer> GetTransactionHistory (UUID toAgentID, UUID fromAgentID, DateTime dateStart, DateTime dateEnd, uint? start, uint? count);
         List<AgentTransfer> GetTransactionHistory (UUID toAgentID, UUID fromAgentID, int period, string periodType);
         List<AgentTransfer> GetTransactionHistory (UUID toAgentID, int period, string periodType);
-        List<AgentTransfer> GetTransactionHistory (DateTime dateStart, DateTime dateEnd, uint start, uint count);
-        List<AgentTransfer> GetTransactionHistory (int period, string periodType, uint start, uint count);
+        List<AgentTransfer> GetTransactionHistory (DateTime dateStart, DateTime dateEnd, uint? start, uint? count);
+        List<AgentTransfer> GetTransactionHistory (int period, string periodType, uint? start, uint? count);
 
-        List<AgentPurchase> GetPurchaseHistory (UUID UserID, DateTime dateStart, DateTime dateEnd, uint start, uint count);
+        uint NumberOfPurchases(UUID UserID);
+
+        List<AgentPurchase> GetPurchaseHistory (UUID UserID, DateTime dateStart, DateTime dateEnd, uint? start, uint? count);
         List<AgentPurchase> GetPurchaseHistory (UUID toAgentID, int period, string periodType);
-        List<AgentPurchase> GetPurchaseHistory (DateTime dateStart, DateTime dateEnd, uint start, uint count);
-        List<AgentPurchase> GetPurchaseHistory (int period, string periodType, uint start, uint count);
+        List<AgentPurchase> GetPurchaseHistory (DateTime dateStart, DateTime dateEnd, uint? start, uint? count);
+        List<AgentPurchase> GetPurchaseHistory (int period, string periodType, uint? start, uint? count);
 
     }
 

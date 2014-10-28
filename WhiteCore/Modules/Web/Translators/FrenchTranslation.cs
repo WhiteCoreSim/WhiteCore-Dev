@@ -564,6 +564,7 @@
             case "PurchasesText":               return "Achats";
             case "LoggedIPText":                return "Adresse IP enregistrée";
             case "NoPurchasesText":             return "Aucun achat trouvés...";
+            case "PurchaseCostText":            return "Coût";
 
                 // Sim Console
             case "SimConsoleText":              return "Sim Command Console";

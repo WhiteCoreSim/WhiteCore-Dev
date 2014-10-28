@@ -67,7 +67,7 @@ namespace WhiteCore.Modules.Web
             var regionslist = new List<Dictionary<string, object>>();
             UserAccount account = null;
 
-            uint amountPerQuery = 10;
+            // future use // uint amountPerQuery = 10;
             string noDetails = translator.GetTranslatedString ("NoDetailsText");
 
             if (httpRequest.Query.ContainsKey("userid"))

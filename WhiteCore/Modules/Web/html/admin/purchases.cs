@@ -32,6 +32,7 @@ using WhiteCore.Framework.Utilities;
 using System;
 using WhiteCore.Framework.Services;
 using OpenMetaverse;
+using Nini.Config;
 
 namespace WhiteCore.Modules.Web
 {
@@ -63,10 +64,14 @@ namespace WhiteCore.Modules.Web
                                                 ITranslator translator, out string response)
         {
             response = null;
+            IConfig gridInfo = webInterface.Registry.RequestModuleInterface<ISimulationBase>().ConfigSource.Configs ["GridInfoService"];
+            var InWorldCurrency = gridInfo.GetString("CurrencySymbol", String.Empty) + " ";
+            var RealCurrency = gridInfo.GetString("RealCurrencySymbol", String.Empty) + " ";
+
             var vars = new Dictionary<string, object>();
             var purchasesList = new List<Dictionary<string, object>>();
 
-            int amountPerQuery = 500;
+            uint amountPerQuery = 25;
             var today = DateTime.Today;
             var thirtyDays = today.AddDays (-30);
             string DateStart = thirtyDays.ToShortDateString();
@@ -86,12 +91,27 @@ namespace WhiteCore.Modules.Web
                     DateEnd = requestParameters ["date_end"].ToString ();
                 if (requestParameters.ContainsKey ("user_name"))
                     UserName = requestParameters ["user_name"].ToString ();
+                             
+                IUserAccountService accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
 
+                if (UserName != "")
+                {
+                    // TODO: Work out a better way to catch this
+                    UserID = (UUID) Constants.LibraryOwner;         // This user should hopefully never have transactions
 
+                    if (UserName.Split (' ').Length == 2)
+                    {
+                        var userAccount = accountService.GetUserAccount (null, UserName);
+                        if (userAccount != null)
+                            UserID = userAccount.PrincipalID;
+                    }
+                }
+
+                // pagination
                 int start = httpRequest.Query.ContainsKey ("Start")
                     ? int.Parse (httpRequest.Query ["Start"].ToString ())
                     : 0;
-                int count = 10;
+                int count = (int) moneyModule.NumberOfPurchases(UserID);
                 int maxPages = (int)(count / amountPerQuery) - 1;
 
                 if (start == -1)
@@ -101,26 +121,16 @@ namespace WhiteCore.Modules.Web
                 vars.Add ("NextOne", start + 1 > maxPages ? start : start + 1);
                 vars.Add ("BackOne", start - 1 < 0 ? 0 : start - 1);
 
-                IUserAccountService accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
-  
-                if (UserName != "")
-                {
-                    var userAccount = accountService.GetUserAccount (null, UserName);
-                    if (userAccount != null)
-                        UserID = userAccount.PrincipalID;
-                    else
-                        // TODO: Work out a better way to catch this
-                        UserID = (UUID) Constants.LibraryOwner;         // This should hopefully never have transactions
-
-                }
-
                 // Purchases Logs
                 List<AgentPurchase> purchases;
                 if (UserID != UUID.Zero)
-                    purchases = moneyModule.GetPurchaseHistory (UserID, DateTime.Parse (DateStart), DateTime.Parse (DateEnd), (uint)start, (uint)count);
+                    purchases = moneyModule.GetPurchaseHistory (UserID, DateTime.Parse (DateStart), DateTime.Parse (DateEnd), (uint)start, amountPerQuery);
                 else
-                    purchases = moneyModule.GetPurchaseHistory (DateTime.Parse (DateStart), DateTime.Parse (DateEnd), (uint)start, (uint)count);
+                    purchases = moneyModule.GetPurchaseHistory (DateTime.Parse (DateStart), DateTime.Parse (DateEnd), (uint)start, amountPerQuery);
 
+
+
+                // data
                 if (purchases.Count > 0)
                 {
                     noDetails = "";
@@ -139,7 +149,7 @@ namespace WhiteCore.Modules.Web
                             { "LoggedIP", purchase.IP },
                             { "Description", "Purchase" },
                             { "Amount",purchase.Amount },
-                            { "RealAmount",purchase.RealAmount },
+                            { "RealAmount",((float) purchase.RealAmount/100).ToString("0.00") },
                             { "PurchaseDate", Culture.LocaleDate (purchase.PurchaseDate, "MMM dd, hh:mm:ss") },
                             { "UpdateDate", Culture.LocaleDate (purchase.UpdateDate, "MMM dd, hh:mm:ss") }
 
@@ -164,9 +174,9 @@ namespace WhiteCore.Modules.Web
                     {"AgentID", ""},
                     {"AgentName", ""},
                     {"LoggedIP", ""},
-                    {"Description", ""},
-                    {"Amount",0},
-                    {"RealAmount",0},
+                    {"Description",  translator.GetTranslatedString ("NoPurchasesText")},
+                    {"Amount",""},
+                    {"RealAmount",""},
                     {"PurchaseDate",""},
                     {"UpdateDate", ""},
 
@@ -193,8 +203,8 @@ namespace WhiteCore.Modules.Web
             //vars.Add("PurchaseTimeText", translator.GetTranslatedString("Time"));
             vars.Add("PurchaseDetailText", translator.GetTranslatedString("TransactionDetailText"));
             vars.Add("LoggedIPText", translator.GetTranslatedString("LoggedIPText"));
-            vars.Add("PurchaseAmountText", translator.GetTranslatedString("TransactionAmountText"));
-            vars.Add("PurchaseRealAmountText", translator.GetTranslatedString("TransactionAmountText"));
+            vars.Add("PurchaseAmountText", InWorldCurrency + translator.GetTranslatedString("TransactionAmountText"));
+            vars.Add("PurchaseRealAmountText", RealCurrency + translator.GetTranslatedString("PurchaseCostText"));
  
             vars.Add("FirstText", translator.GetTranslatedString("FirstText"));
             vars.Add("BackText", translator.GetTranslatedString("BackText"));

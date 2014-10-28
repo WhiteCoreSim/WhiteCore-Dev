@@ -335,7 +335,12 @@ namespace WhiteCore.Modules.SampleCurrencyModule
             return new GroupBalance() {StartingDate = DateTime.Now.AddDays(-4)};
         }
 
-        public List<AgentTransfer> GetTransactionHistory(UUID UserID, UUID fromAgentID, DateTime dateStart, DateTime dateEnd, uint start, uint count)
+        public uint NumberOfTransactions(UUID toAgent, UUID fromAgent)
+        {
+            return 0;
+        }
+
+        public List<AgentTransfer> GetTransactionHistory(UUID UserID, UUID fromAgentID, DateTime dateStart, DateTime dateEnd, uint? start, uint? count)
         {
             return new List<AgentTransfer> ();
         }
@@ -350,17 +355,22 @@ namespace WhiteCore.Modules.SampleCurrencyModule
             return new List<AgentTransfer> ();
         }
             
-        public List<AgentTransfer> GetTransactionHistory(DateTime dateStart, DateTime dateEnd, uint start, uint count)
+        public List<AgentTransfer> GetTransactionHistory(DateTime dateStart, DateTime dateEnd, uint? start, uint? count)
         {
             return new List<AgentTransfer> ();
         }
 
-        public List<AgentTransfer> GetTransactionHistory(int period, string periodType, uint start, uint count)
+        public List<AgentTransfer> GetTransactionHistory(int period, string periodType, uint? start, uint? count)
         {
             return new List<AgentTransfer> ();
         }
 
-        public List<AgentPurchase> GetPurchaseHistory(UUID UserID, DateTime dateStart, DateTime dateEnd, uint start, uint count)
+        public uint NumberOfPurchases(UUID UserID)
+        {
+            return 0;
+        }
+
+        public List<AgentPurchase> GetPurchaseHistory(UUID UserID, DateTime dateStart, DateTime dateEnd, uint? start, uint? count)
         {
             return new List<AgentPurchase> ();
         }
@@ -370,12 +380,12 @@ namespace WhiteCore.Modules.SampleCurrencyModule
             return new List<AgentPurchase> ();
         }
 
-        public List<AgentPurchase> GetPurchaseHistory(DateTime dateStart, DateTime dateEnd, uint start, uint count)
+        public List<AgentPurchase> GetPurchaseHistory(DateTime dateStart, DateTime dateEnd, uint? start, uint? count)
         {
             return new List<AgentPurchase> ();
         }
 
-        public List<AgentPurchase> GetPurchaseHistory (int period, string periodType, uint start, uint count)
+        public List<AgentPurchase> GetPurchaseHistory (int period, string periodType, uint? start, uint? count)
         {
             return new List<AgentPurchase> ();
         }

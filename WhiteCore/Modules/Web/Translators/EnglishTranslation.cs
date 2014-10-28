@@ -377,6 +377,7 @@
             case "PurchasesText":               return "Purchases";
             case "LoggedIPText":                return "Logged IP address";
             case "NoPurchasesText":             return "No purchases found...";
+            case "PurchaseCostText":            return "Cost";
 
             // Sim Console
             case "SimConsoleText":              return "Sim Command Console";

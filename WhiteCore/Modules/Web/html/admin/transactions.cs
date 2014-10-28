@@ -66,7 +66,7 @@ namespace WhiteCore.Modules.Web
             var vars = new Dictionary<string, object>();
             var transactionsList = new List<Dictionary<string, object>>();
 
-            int amountPerQuery = 500;
+            uint amountPerQuery = 25;
             var today = DateTime.Today;
             var thirtyDays = today.AddDays (-30);
             string DateStart = thirtyDays.ToShortDateString();
@@ -87,11 +87,25 @@ namespace WhiteCore.Modules.Web
                 if (requestParameters.ContainsKey ("user_name"))
                     UserName = requestParameters ["user_name"].ToString ();
 
+                if (UserName != "")
+                {
+                    // TODO: Work out a better way to catch this
+                    UserID = (UUID)Constants.LibraryOwner;         // This user should hopefully never have transactions
 
+                    if (UserName.Split (' ').Length == 2)
+                    {
+                        IUserAccountService accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
+                        var userAccount = accountService.GetUserAccount (null, UserName);
+                        if (userAccount != null)
+                            UserID = userAccount.PrincipalID;
+                    }
+                }
+
+                // paginations
                 int start = httpRequest.Query.ContainsKey ("Start")
                     ? int.Parse (httpRequest.Query ["Start"].ToString ())
                     : 0;
-                int count = 10;
+                int count = (int) moneyModule.NumberOfTransactions(UserID, UUID.Zero);
                 int maxPages = (int)(count / amountPerQuery) - 1;
 
                 if (start == -1)
@@ -101,25 +115,16 @@ namespace WhiteCore.Modules.Web
                 vars.Add ("NextOne", start + 1 > maxPages ? start : start + 1);
                 vars.Add ("BackOne", start - 1 < 0 ? 0 : start - 1);
 
-  
-                if (UserName != "")
-                {
-                    IUserAccountService accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
-                    var userAccount = accountService.GetUserAccount (null, UserName);
-                    if (userAccount != null)
-                        UserID = userAccount.PrincipalID;
-                    else
-                        // TODO: Work out a better way to catch this
-                        UserID = (UUID) Constants.LibraryOwner;         // This should hopefully never have transactions
-                }
 
                 // Transaction Logs
                 List<AgentTransfer> transactions;
                 if (UserID != UUID.Zero)
-                    transactions = moneyModule.GetTransactionHistory (UserID, UUID.Zero, DateTime.Parse (DateStart), DateTime.Parse (DateEnd), (uint)start, (uint)count);
+                    transactions = moneyModule.GetTransactionHistory (UserID, UUID.Zero, DateTime.Parse (DateStart), DateTime.Parse (DateEnd), (uint)start, amountPerQuery);
                 else
-                    transactions = moneyModule.GetTransactionHistory (DateTime.Parse (DateStart), DateTime.Parse (DateEnd), (uint)start, (uint)count);
+                    transactions = moneyModule.GetTransactionHistory (DateTime.Parse (DateStart), DateTime.Parse (DateEnd), (uint)start, amountPerQuery);
 
+
+                // data
                 if (transactions.Count > 0)
                 {
                     noDetails = "";

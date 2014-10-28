@@ -44,13 +44,17 @@ namespace Simple.Currency
     public class SimpleCurrencyConnector : ConnectorBase, ISimpleCurrencyConnector
     {
         #region Declares
+        private const string _REALM = "simple_currency";
+        private const string _REALMHISTORY = "simple_currency_history";
+        private const string _REALMPURCHASE = "simple_purchased";
 
         private IGenericData m_gd;
         private SimpleCurrencyConfig m_config;
         private ISyncMessagePosterService m_syncMessagePoster;
         private IAgentInfoService m_userInfoService;
-        private const string _REALM = "simple_currency";
-
+        private string InWorldCurrency = "";
+        private string RealCurrency = "";
+        
         #endregion
 
         #region IWhiteCoreDataPlugin Members
@@ -69,6 +73,11 @@ namespace Simple.Currency
             IConfig config = source.Configs["Currency"];
             if (config == null || source.Configs["Currency"].GetString("Module", "") != "SimpleCurrency")
                 return;
+
+            IConfig gridInfo = source.Configs["GridInfoService"];
+            InWorldCurrency = gridInfo.GetString("CurrencySymbol", String.Empty) + " ";
+            RealCurrency = gridInfo.GetString("RealCurrencySymbol", String.Empty) + " ";
+
 
             if (source.Configs[Name] != null)
                 defaultConnectionString = source.Configs[Name].GetString("ConnectionString", defaultConnectionString);
@@ -229,7 +238,7 @@ namespace Simple.Currency
                 Utils.GetUnixTime(),                   // Created
                 Utils.GetUnixTime()                    // Updated
             };
-            m_gd.Insert("simple_purchased", values.ToArray());
+            m_gd.Insert(_REALMPURCHASE, values.ToArray());
             return true;
         }
 
@@ -265,7 +274,7 @@ namespace Simple.Currency
             }
             filter.andGreaterThanEqFilters["Created"] = Utils.DateTimeToUnixTime(now);//Greater than the time that we are checking against
             filter.andLessThanEqFilters["Created"] = Utils.GetUnixTime();//Less than now
-            List<string> query = m_gd.Query(new string[1] { "Amount" }, "simple_purchased", filter, null, null, null);
+            List<string> query = m_gd.Query(new string[1] { "Amount" }, _REALMPURCHASE, filter, null, null, null);
             if (query == null)
                 return new List<uint>();
             return query.ConvertAll<uint>(s=>uint.Parse(s));
@@ -273,7 +282,24 @@ namespace Simple.Currency
 
         // transactions...
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<AgentTransfer> GetTransactionHistory(UUID toAgentID, UUID fromAgentID, DateTime dateStart, DateTime dateEnd, uint start, uint count)
+        public uint NumberOfTransactions(UUID toAgentID, UUID fromAgentID)
+        {
+            QueryFilter filter = new QueryFilter();
+            if (toAgentID != UUID.Zero)
+                filter.andFilters["ToPrincipalID"] = toAgentID;
+            if (fromAgentID != UUID.Zero)
+                filter.andFilters["FromPrincipalID"] = fromAgentID;
+
+   
+            var transactions = m_gd.Query (new string[1] {"count(*)"}, _REALMHISTORY, filter, null, null, null);
+            if (transactions.Count == 0)
+                return 0;
+            else
+                return (uint)int.Parse (transactions[0]);
+        }
+
+        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
+        public List<AgentTransfer> GetTransactionHistory(UUID toAgentID, UUID fromAgentID, DateTime dateStart, DateTime dateEnd, uint? start, uint? count)
         {
             object remoteValue = DoRemoteByURL("CurrencyServerURI", dateStart, dateEnd, start, count);
             if (remoteValue != null || m_doRemoteOnly)
@@ -293,7 +319,7 @@ namespace Simple.Currency
             sort["ToName"] = true;
             sort["FromName"] = true;
 
-            List<string> query = m_gd.Query(new string[] {"*"}, "simple_currency_history", filter, sort, start, count);
+            List<string> query = m_gd.Query(new string[] {"*"}, _REALMHISTORY, filter, sort, start, count);
 
             return ParseTransferQuery(query);
         }
@@ -304,7 +330,7 @@ namespace Simple.Currency
             var dateStart = StartTransactionPeriod(period, periodType);
             var dateEnd = DateTime.Today;
 
-            return GetTransactionHistory (toAgentID, fromAgentID, dateStart, dateEnd, 0, 0);
+            return GetTransactionHistory (toAgentID, fromAgentID, dateStart, dateEnd, null, null);
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
@@ -314,13 +340,13 @@ namespace Simple.Currency
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<AgentTransfer> GetTransactionHistory(DateTime dateStart, DateTime dateEnd, uint start, uint count)
+        public List<AgentTransfer> GetTransactionHistory(DateTime dateStart, DateTime dateEnd, uint? start, uint? count)
         {
             return GetTransactionHistory (UUID.Zero, UUID.Zero, dateStart, dateEnd, start, count);
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<AgentTransfer> GetTransactionHistory(int period, string periodType, uint start, uint count)
+        public List<AgentTransfer> GetTransactionHistory(int period, string periodType, uint? start, uint? count)
         {
             var dateStart = StartTransactionPeriod(period, periodType);
             var dateEnd = DateTime.Today;
@@ -333,7 +359,21 @@ namespace Simple.Currency
 
         // Purchases...
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<AgentPurchase> GetPurchaseHistory(UUID UserID, DateTime dateStart, DateTime dateEnd, uint start, uint count)
+        public uint NumberOfPurchases(UUID UserID)
+        {
+            QueryFilter filter = new QueryFilter();
+            if (UserID != UUID.Zero)
+                filter.andFilters["PrincipalID"] = UserID;
+
+            var purchases = m_gd.Query (new string[1] { "count(*)" }, _REALMPURCHASE, filter, null, null, null);
+            if (purchases.Count == 0)
+                return 0;
+            else
+                return (uint)int.Parse (purchases [0]);
+        }
+
+        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
+        public List<AgentPurchase> GetPurchaseHistory(UUID UserID, DateTime dateStart, DateTime dateEnd, uint? start, uint? count)
         {
             object remoteValue = DoRemoteByURL("CurrencyServerURI", dateStart, dateEnd, start, count);
             if (remoteValue != null || m_doRemoteOnly)
@@ -351,7 +391,7 @@ namespace Simple.Currency
             sort["PrincipalID"] = true;
             sort["Created"] = true;
 
-            List<string> query = m_gd.Query(new string[] {"*"}, "simple_purchased", filter, sort, start, count);
+            List<string> query = m_gd.Query(new string[] {"*"}, _REALMPURCHASE, filter, sort, start, count);
 
             return ParsePurchaseQuery(query);
         }
@@ -362,17 +402,17 @@ namespace Simple.Currency
             var dateStart = StartTransactionPeriod(period, periodType);
             var dateEnd = DateTime.Today;
 
-            return GetPurchaseHistory (toAgentID, dateStart, dateEnd, 0, 0);
+            return GetPurchaseHistory (toAgentID, dateStart, dateEnd, null, null);
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<AgentPurchase> GetPurchaseHistory(DateTime dateStart, DateTime dateEnd, uint start, uint count)
+        public List<AgentPurchase> GetPurchaseHistory(DateTime dateStart, DateTime dateEnd, uint? start, uint? count)
         {
             return GetPurchaseHistory (UUID.Zero, dateStart, dateEnd, start, count);
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<AgentPurchase> GetPurchaseHistory(int period, string periodType, uint start, uint count)
+        public List<AgentPurchase> GetPurchaseHistory(int period, string periodType, uint? start, uint? count)
         {
             var dateStart = StartTransactionPeriod(period, periodType);
             var dateEnd = DateTime.Today;
@@ -476,9 +516,20 @@ namespace Simple.Currency
             TransactionType TransType, uint ToBalance, uint FromBalance, string ToName, string FromName, string toObjectName, string fromObjectName, UUID regionID)
         {
             if(Amount > m_config.MaxAmountBeforeLogging)
-                m_gd.Insert("simple_currency_history", new object[] { TransID, (Description == null ? "" : Description),
-                    FromID.ToString(), FromName, ToID.ToString(), ToName, Amount, (int)TransType, Util.UnixTimeSinceEpoch(), ToBalance, FromBalance,
-                    toObjectName == null ? "" : toObjectName, fromObjectName == null ? "" : fromObjectName, regionID });
+                m_gd.Insert(_REALMHISTORY, new object[] {
+                    TransID,
+                    (Description == null ? "" : Description),
+                    FromID.ToString(),
+                    FromName,
+                    ToID.ToString(),
+                    ToName,
+                    Amount,
+                    (int)TransType,
+                    Util.UnixTimeSinceEpoch(),
+                    ToBalance,
+                    FromBalance,
+                    toObjectName == null ? "" : toObjectName, fromObjectName == null ? "" : fromObjectName, regionID 
+                });
         }
 
         #endregion
@@ -872,8 +923,8 @@ namespace Simple.Currency
             {
                 transInfo = String.Format ("{0, -24}", purchase.PurchaseDate);   
                 transInfo += String.Format ("{0, -30}", "Purchase");
-                transInfo += String.Format ("{0, -20}", purchase.Amount);
-                transInfo += String.Format ("{0, -12}", purchase.RealAmount);
+                transInfo += String.Format ("{0, -20}", InWorldCurrency + purchase.Amount);
+                transInfo += String.Format ("{0, -12}", RealCurrency + ((float) purchase.RealAmount/100).ToString("0.00"));
 
                 MainConsole.Instance.CleanInfo (transInfo);
 

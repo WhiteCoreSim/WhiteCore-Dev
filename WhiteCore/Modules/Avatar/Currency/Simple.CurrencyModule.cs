@@ -237,7 +237,12 @@ namespace Simple.Currency
             return m_connector.GetGroupBalance(groupID);
         }
 
-        public List<AgentTransfer> GetTransactionHistory(UUID toAgentID, UUID fromAgentID, DateTime dateStart, DateTime dateEnd, uint start, uint count)
+        public uint NumberOfTransactions(UUID toAgent, UUID fromAgent)
+        {
+            return m_connector.NumberOfTransactions(toAgent, fromAgent);
+        }
+
+        public List<AgentTransfer> GetTransactionHistory(UUID toAgentID, UUID fromAgentID, DateTime dateStart, DateTime dateEnd, uint? start, uint? count)
         {
             return m_connector.GetTransactionHistory(toAgentID, fromAgentID, dateStart, dateEnd, start, count);
         }
@@ -252,18 +257,23 @@ namespace Simple.Currency
             return m_connector.GetTransactionHistory(toAgentID, period, periodType);
         }
 
-        public List<AgentTransfer> GetTransactionHistory(DateTime dateStart, DateTime dateEnd, uint start, uint count)
+        public List<AgentTransfer> GetTransactionHistory(DateTime dateStart, DateTime dateEnd, uint? start, uint? count)
         {
             return m_connector.GetTransactionHistory(dateStart, dateEnd, start, count);
         }
 
-        public List<AgentTransfer> GetTransactionHistory(int period, string periodType, uint start, uint count)
+        public List<AgentTransfer> GetTransactionHistory(int period, string periodType, uint? start, uint? count)
         {
             return m_connector.GetTransactionHistory(period, periodType, start, count);
         }
  
 
-        public List<AgentPurchase> GetPurchaseHistory(UUID userID, DateTime dateStart, DateTime dateEnd, uint start, uint count)
+        public uint NumberOfPurchases(UUID UserID)
+        {
+            return m_connector.NumberOfPurchases(UserID);
+        }
+
+        public List<AgentPurchase> GetPurchaseHistory(UUID userID, DateTime dateStart, DateTime dateEnd, uint? start, uint? count)
         {
             return m_connector.GetPurchaseHistory(userID, dateStart, dateEnd, start, count);
         }
@@ -273,12 +283,12 @@ namespace Simple.Currency
             return m_connector.GetPurchaseHistory(toAgentID, period, periodType);
         }
 
-        public List<AgentPurchase> GetPurchaseHistory(DateTime dateStart, DateTime dateEnd, uint start, uint count)
+        public List<AgentPurchase> GetPurchaseHistory(DateTime dateStart, DateTime dateEnd, uint? start, uint? count)
         {
             return m_connector.GetPurchaseHistory(dateStart, dateEnd, start, count);
         }
 
-        public List<AgentPurchase> GetPurchaseHistory (int period, string periodType, uint start, uint count)
+        public List<AgentPurchase> GetPurchaseHistory (int period, string periodType, uint? start, uint? count)
         {
             return m_connector.GetPurchaseHistory(period, periodType, start, count);
         }

@@ -522,6 +522,7 @@ namespace WhiteCore.Modules.Web.Translators
             case "PurchasesText":               return "Aankopen";
             case "LoggedIPText":                return "Gelogde IP-adres";
             case "NoPurchasesText":             return "Geen aankopen gevonden...";
+            case "PurchaseCostText":            return "Kosten";
 
                 // Sim Console
             case "SimConsoleText":              return "Sim Command Console";
