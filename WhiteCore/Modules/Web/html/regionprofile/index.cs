@@ -105,7 +105,7 @@ namespace WhiteCore.Modules.Web
                     List<Dictionary<string, object>> users = new List<Dictionary<string, object>>();
                     foreach (var client in usersInRegion)
                     {
-                        UserAccount account = userService.GetUserAccount(null, client.UserID);
+                        UserAccount account = userService.GetUserAccount(null, (UUID) client.UserID);
                         if (account == null)
                             continue;
                         Dictionary<string, object> user = new Dictionary<string, object>();

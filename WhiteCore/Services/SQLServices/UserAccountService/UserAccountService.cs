@@ -303,24 +303,27 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             if (d.Length < 1)
             {
                 var newName = name.Split (' ');
-                var fName = newName [0];
-                var lName = newName [1];
-  
-                // try first character capitals
-                fName = char.ToUpper (fName [0]) + fName.Substring(1);
-
-                d = m_Database.Get (scopeIDs,
-                    new[] { "Name" },
-                    new[] { fName + " " + lName });
-
-                if (d.Length < 1)
+                if (newName.Length == 2)                    // in case of a bogus names
                 {
-                    // try last name as well
-                    lName = char.ToUpper (lName [0]) + lName.Substring (1);
+                    var fName = newName [0];
+                    var lName = newName [1];
+  
+                    // try first character capitals
+                    fName = char.ToUpper (fName [0]) + fName.Substring (1);
 
                     d = m_Database.Get (scopeIDs,
                         new[] { "Name" },
                         new[] { fName + " " + lName });
+
+                    if (d.Length < 1)
+                    {
+                        // try last name as well
+                        lName = char.ToUpper (lName [0]) + lName.Substring (1);
+
+                        d = m_Database.Get (scopeIDs,
+                            new[] { "Name" },
+                            new[] { fName + " " + lName });
+                    }
                 }
 
             }
