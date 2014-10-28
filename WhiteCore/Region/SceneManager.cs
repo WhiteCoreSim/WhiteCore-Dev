@@ -679,6 +679,20 @@ namespace WhiteCore.Region
         }
 
         #region helpers
+
+        /// <summary>
+        /// Gets the available region names.
+        /// </summary>
+        /// <returns>The region names.</returns>
+        public List<string> GetRegionNames()
+        {
+            var retVals = new List<string>();
+            foreach (IScene scene in m_scenes)
+                retVals.Add (scene.RegionInfo.RegionName);
+
+            return retVals;
+        }
+
         /// <summary>
         /// Checks if a Region name already exists.
         /// </summary>
@@ -1201,33 +1215,49 @@ namespace WhiteCore.Region
         private void HandleChangeRegion(IScene scene, string[] cmd)
         {
             string regionName;
-            if (cmd.Length < 2) 
+            if (cmd.Length < 3) 
             {
-                regionName = MainConsole.Instance.Prompt("Region to change to?","");
+                do
+                {
+                    regionName = MainConsole.Instance.Prompt("Region to change to? (? for list)","");
+                    if (regionName == "?")
+                    {
+                        var regions = GetRegionNames();
+                        MainConsole.Instance.CleanInfo (" Available regions are : ");
+                        foreach (string name in regions)
+                            MainConsole.Instance.CleanInfo ("   " + name);
+                    }
+                } while (regionName == "?");
+
                 if (regionName == "")
                     return;
             } else
                 regionName = Util.CombineParams(cmd, 2); // in case of spaces in the name eg Steam Island
 
+            string rName;
             regionName = regionName.ToLower();
-
-            MainConsole.Instance.ConsoleScene = m_scenes.Find((s) => s.RegionInfo.RegionName.ToLower() == regionName);
-	
-            MainConsole.Instance.InfoFormat("[SceneManager]: Changed to region {0}",
-                MainConsole.Instance.ConsoleScene == null ? "root" : MainConsole.Instance.ConsoleScene.RegionInfo.RegionName);
-
-			string rName;
-			if (MainConsole.Instance.ConsoleScene == null) {
-				if (regionName.ToLower() != "root")
-				{
-					MainConsole.Instance.Info(String.Format(regionName+" not found?"));
-				}
-				rName = "root";
-			} else {
-				rName = MainConsole.Instance.ConsoleScene.RegionInfo.RegionName;
-			}
+            if (regionName.ToLower () == "root")
+            {
+                MainConsole.Instance.ConsoleScene = null;
+                rName = "root";
+            } else
+            {
+                var newScene = m_scenes.Find ((s) => s.RegionInfo.RegionName.ToLower () == regionName);
+                if (newScene == null)
+                {
+                    MainConsole.Instance.Info (String.Format ("Region '"+ regionName + "' not found?"));
+                    if ( MainConsole.Instance.ConsoleScene != null)
+                        rName = MainConsole.Instance.ConsoleScene.RegionInfo.RegionName;
+                    else
+                        rName = "root";
+                } else
+                {
+                    MainConsole.Instance.ConsoleScene = newScene;
+                    rName = newScene.RegionInfo.RegionName;
+                    MainConsole.Instance.Info ("[SceneManager]: Changed to region " + rName);
+                }
+            }
             SetRegionPrompt(rName);
-
         }
 
         private void HandleShowUsers(IScene scene, string[] cmd)
