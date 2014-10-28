@@ -105,7 +105,27 @@ namespace WhiteCore.Modules
             _regionLoader = new ProtobufRegionDataLoader();
         }
 
-        public void Initialise() { }
+        public void Initialise()
+        { 
+            MainConsole.Instance.Commands.AddCommand (
+                "update region info", "update region info",
+                "Updates the region settings",
+                UpdateRegionInfo, true, true);
+
+            MainConsole.Instance.Commands.AddCommand (
+                "update region prims",
+                "update region prims [amount]",
+                "Update the region prim capacity",
+                UpdateRegionPrims, true, true);
+
+            MainConsole.Instance.Commands.AddCommand (
+                "delete sim backups",
+                "delete sim backups [days]",
+                "Removes old region backup files older than [days] (default: " + m_removeArchiveDays + " days)",
+                CleanupRegionBackups,
+                false, true);
+
+        }
 
         public virtual List<string> FindRegionInfos(out bool newRegion, ISimulationBase simBase)
         {
@@ -510,20 +530,6 @@ namespace WhiteCore.Modules
         {
             scene.WhiteCoreEventManager.RegisterEventHandler("Backup", WhiteCoreEventManager_OnGenericEvent);
             m_scene = scene;
-
-            if (!MainConsole.Instance.Commands.ContainsCommand("update region info"))
-                MainConsole.Instance.Commands.AddCommand("update region info", "update region info",
-                    "Updates the region settings",
-                    UpdateRegionInfo, true, true);
-
-            if (!MainConsole.Instance.Commands.ContainsCommand("delete sim backups"))
-                MainConsole.Instance.Commands.AddCommand(
-                    "delete sim backups",
-                    "delete sim backups [days]",
-                    "Removes old region backup files older than [days] (default: " + m_removeArchiveDays + " days)",
-                    CleanupRegionBackups,
-                    false, true);
-
         }
 
         /// <summary>
@@ -540,6 +546,32 @@ namespace WhiteCore.Modules
                 MainConsole.Instance.ConsoleScene.RegionInfo = CreateRegionFromConsole(currentInfo, true, null);
                 MainConsole.Instance.DefaultPrompt = MainConsole.Instance.ConsoleScene.RegionInfo.RegionName+": ";
             }
+        }
+
+
+        /// <summary>
+        /// Sets the region prim capacity.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmds">Cmds.</param>
+        public void UpdateRegionPrims(IScene scene, string[] cmds)
+        {
+            if (MainConsole.Instance.ConsoleScene == null)
+                return;
+
+            m_scene = scene;
+            var primCount = scene.RegionInfo.ObjectCapacity;
+
+            if (cmds.Length > 3)
+                primCount = int.Parse (cmds [3]);
+            else
+                while (!int.TryParse(MainConsole.Instance.Prompt("Region prim capacity: ", primCount.ToString()), out primCount))
+                    MainConsole.Instance.Info("Bad input, must be a number > 0");
+           
+            scene.RegionInfo.ObjectCapacity = primCount;
+            MainConsole.Instance.InfoFormat(" The region capacity has been set to {0} prims", primCount);
+
+            scene.SimulationDataService.ForceBackup ();
         }
 
         /// <summary>
