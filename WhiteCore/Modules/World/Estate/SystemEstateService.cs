@@ -241,8 +241,12 @@ namespace WhiteCore.Modules.Estate
 
         private void SaveRealEstatePassword(string password)
         {
-            var configDir = Constants.DEFAULT_DATA_DIR;
-            using (StreamWriter pwFile = new StreamWriter(configDir + "/SystemEstate.txt"))
+            const string passFile = Constants.DEFAULT_DATA_DIR + "/SystemEstate.txt";
+
+            if (File.Exists (passFile))
+                File.Delete (passFile);
+
+            using (var pwFile = new StreamWriter(passFile))
             {
                 pwFile.WriteLine("System user : '" + SystemEstateOwnerName + "' was created: " + Culture.LocaleLogStamp());
                 pwFile.WriteLine("Password    : " + password);
