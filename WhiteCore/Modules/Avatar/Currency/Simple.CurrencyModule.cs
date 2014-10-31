@@ -115,10 +115,10 @@ namespace Simple.Currency
 
         private bool EventManager_OnValidateBuyLand(EventManager.LandBuyArgs e)
         {
-            IParcelManagementModule parcelMangaement = GetSceneFor(e.agentId).RequestModuleInterface<IParcelManagementModule>();
-            if (parcelMangaement == null)
+            IParcelManagementModule parcelManagement = GetSceneFor(e.agentId).RequestModuleInterface<IParcelManagementModule>();
+            if (parcelManagement == null)
                 return false;
-            ILandObject lob = parcelMangaement.GetLandObject(e.parcelLocalID);
+            ILandObject lob = parcelManagement.GetLandObject(e.parcelLocalID);
 
             if (lob != null)
             {

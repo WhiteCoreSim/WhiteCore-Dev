@@ -67,7 +67,7 @@ namespace WhiteCore.Modules.Web
             var transactionsList = new List<Dictionary<string, object>>();
 
             uint amountPerQuery = 25;
-            var today = DateTime.Today;
+            var today = DateTime.Now;
             var thirtyDays = today.AddDays (-30);
             string DateStart = thirtyDays.ToShortDateString();
             string DateEnd = today.ToShortDateString();
@@ -117,11 +117,15 @@ namespace WhiteCore.Modules.Web
 
 
                 // Transaction Logs
+                var timeNow = DateTime.Now.ToString ("HH:mm:ss");
+                var dateFrom = DateTime.Parse (DateStart + " " + timeNow);
+                var dateTo = DateTime.Parse (DateEnd + " " + timeNow);
+
                 List<AgentTransfer> transactions;
                 if (UserID != UUID.Zero)
-                    transactions = moneyModule.GetTransactionHistory (UserID, UUID.Zero, DateTime.Parse (DateStart), DateTime.Parse (DateEnd), (uint)start, amountPerQuery);
+                    transactions = moneyModule.GetTransactionHistory (UserID, UUID.Zero, dateFrom, dateTo, (uint)start, amountPerQuery);
                 else
-                    transactions = moneyModule.GetTransactionHistory (DateTime.Parse (DateStart), DateTime.Parse (DateEnd), (uint)start, amountPerQuery);
+                    transactions = moneyModule.GetTransactionHistory (dateFrom, dateTo, (uint)start, amountPerQuery);
 
 
                 // data
@@ -132,7 +136,7 @@ namespace WhiteCore.Modules.Web
                     foreach (var transaction in transactions)
                     {
                         transactionsList.Add (new Dictionary<string, object> {
-                            { "Date", Culture.LocaleDate (transaction.TransferDate, "MMM dd, hh:mm:ss") },
+                            { "Date", Culture.LocaleDate (transaction.TransferDate.ToLocalTime(), "MMM dd, hh:mm:ss tt") },
                             { "ToAgent", transaction.ToAgentName },
                             { "FromAgent", transaction.FromAgentName },
                             { "Description", transaction.Description },

@@ -312,6 +312,10 @@ namespace Simple.Currency
             if (fromAgentID != UUID.Zero)
                 filter.andFilters["FromPrincipalID"] = fromAgentID;
 
+            // back to utc please...
+            dateStart = dateStart.ToUniversalTime ();
+            dateEnd = dateEnd.ToUniversalTime ();
+
             filter.andGreaterThanEqFilters["Created"] = Utils.DateTimeToUnixTime(dateStart);    // from...
             filter.andLessThanEqFilters["Created"] = Utils.DateTimeToUnixTime(dateEnd);         //...to
 
@@ -328,7 +332,7 @@ namespace Simple.Currency
         public List<AgentTransfer> GetTransactionHistory(UUID toAgentID, UUID fromAgentID, int period, string periodType)
         {
             var dateStart = StartTransactionPeriod(period, periodType);
-            var dateEnd = DateTime.Today;
+            var dateEnd = DateTime.Now;
 
             return GetTransactionHistory (toAgentID, fromAgentID, dateStart, dateEnd, null, null);
         }
@@ -349,13 +353,10 @@ namespace Simple.Currency
         public List<AgentTransfer> GetTransactionHistory(int period, string periodType, uint? start, uint? count)
         {
             var dateStart = StartTransactionPeriod(period, periodType);
-            var dateEnd = DateTime.Today;
+            var dateEnd = DateTime.Now;
 
             return GetTransactionHistory (dateStart, dateEnd, start, count);
         }
-
-
-
 
         // Purchases...
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
@@ -384,8 +385,13 @@ namespace Simple.Currency
             if (UserID != UUID.Zero)
                 filter.andFilters["PrincipalID"] = UserID;
 
+            // back to utc please...
+            dateStart = dateStart.ToUniversalTime ();
+            dateEnd = dateEnd.ToUniversalTime ();
+
             filter.andGreaterThanEqFilters["Created"] = Utils.DateTimeToUnixTime(dateStart);    // from...
             filter.andLessThanEqFilters["Created"] = Utils.DateTimeToUnixTime(dateEnd);         //...to
+
 
             Dictionary<string, bool> sort = new Dictionary<string, bool>(2);
             sort["PrincipalID"] = true;
@@ -400,7 +406,7 @@ namespace Simple.Currency
         public List<AgentPurchase> GetPurchaseHistory(UUID toAgentID, int period, string periodType)
         {
             var dateStart = StartTransactionPeriod(period, periodType);
-            var dateEnd = DateTime.Today;
+            var dateEnd = DateTime.Now;
 
             return GetPurchaseHistory (toAgentID, dateStart, dateEnd, null, null);
         }
@@ -415,7 +421,7 @@ namespace Simple.Currency
         public List<AgentPurchase> GetPurchaseHistory(int period, string periodType, uint? start, uint? count)
         {
             var dateStart = StartTransactionPeriod(period, periodType);
-            var dateEnd = DateTime.Today;
+            var dateEnd = DateTime.Now;
 
             return GetPurchaseHistory (UUID.Zero, dateStart, dateEnd, start, count);
         }
@@ -866,7 +872,7 @@ namespace Simple.Currency
 
                 foreach (AgentTransfer transfer in transactions)
                 {
-                    transInfo =  String.Format ("{0, -24}", transfer.TransferDate);   
+                    transInfo =  String.Format ("{0, -24}", transfer.TransferDate.ToLocalTime());   
                     transInfo += String.Format ("{0, -25}", transfer.FromAgentName);   
                     transInfo += String.Format ("{0, -30}", transfer.Description);
                     transInfo += String.Format ("{0, -20}", TransactionTypeInfo(transfer.TransferType));
@@ -894,18 +900,7 @@ namespace Simple.Currency
             int period;
             while (!int.TryParse (MainConsole.Instance.Prompt ("Number of days to display: ", "7"), out period))
                 MainConsole.Instance.Info ("Bad input, must be a number > 0");
-            /*
-            { "ID", purchase.ID },
-            { "AgentID", purchase.AgentID },
-            { "AgentName", AgentName },
-            { "LoggedIP", purchase.IP },
-            { "Description", "Purchase" },
-            { "Amount",purchase.Amount },
-            { "RealAmount",purchase.RealAmount },
-            { "PurchaseDate", Culture.LocaleDate (purchase.PurchaseDate, "MMM dd, hh:mm:ss") },
-            { "UpdateDate", Culture.LocaleDate (purchase.UpdateDate, "MMM dd, hh:mm:ss") }
-*/
-            string transInfo;
+             string transInfo;
 
             transInfo = String.Format ("{0, -24}", "Date");
             transInfo += String.Format ("{0, -30}", "Description");
@@ -921,7 +916,7 @@ namespace Simple.Currency
 
             foreach (AgentPurchase purchase in purchases)
             {
-                transInfo = String.Format ("{0, -24}", purchase.PurchaseDate);   
+                transInfo = String.Format ("{0, -24}", purchase.PurchaseDate.ToLocalTime());   
                 transInfo += String.Format ("{0, -30}", "Purchase");
                 transInfo += String.Format ("{0, -20}", InWorldCurrency + purchase.Amount);
                 transInfo += String.Format ("{0, -12}", RealCurrency + ((float) purchase.RealAmount/100).ToString("0.00"));

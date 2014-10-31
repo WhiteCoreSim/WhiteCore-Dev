@@ -72,7 +72,7 @@ namespace WhiteCore.Modules.Web
             var purchasesList = new List<Dictionary<string, object>>();
 
             uint amountPerQuery = 25;
-            var today = DateTime.Today;
+            var today = DateTime.Now;
             var thirtyDays = today.AddDays (-30);
             string DateStart = thirtyDays.ToShortDateString();
             string DateEnd = today.ToShortDateString();
@@ -122,11 +122,14 @@ namespace WhiteCore.Modules.Web
                 vars.Add ("BackOne", start - 1 < 0 ? 0 : start - 1);
 
                 // Purchases Logs
+                var timeNow = DateTime.Now.ToString ("HH:mm:ss");
+                var dateFrom = DateTime.Parse (DateStart + " " + timeNow);
+                var dateTo = DateTime.Parse (DateEnd + " " + timeNow);
                 List<AgentPurchase> purchases;
                 if (UserID != UUID.Zero)
-                    purchases = moneyModule.GetPurchaseHistory (UserID, DateTime.Parse (DateStart), DateTime.Parse (DateEnd), (uint)start, amountPerQuery);
+                    purchases = moneyModule.GetPurchaseHistory (UserID, dateFrom, dateTo, (uint)start, amountPerQuery);
                 else
-                    purchases = moneyModule.GetPurchaseHistory (DateTime.Parse (DateStart), DateTime.Parse (DateEnd), (uint)start, amountPerQuery);
+                    purchases = moneyModule.GetPurchaseHistory (dateFrom, dateTo, (uint)start, amountPerQuery);
 
 
 
@@ -150,8 +153,8 @@ namespace WhiteCore.Modules.Web
                             { "Description", "Purchase" },
                             { "Amount",purchase.Amount },
                             { "RealAmount",((float) purchase.RealAmount/100).ToString("0.00") },
-                            { "PurchaseDate", Culture.LocaleDate (purchase.PurchaseDate, "MMM dd, hh:mm:ss") },
-                            { "UpdateDate", Culture.LocaleDate (purchase.UpdateDate, "MMM dd, hh:mm:ss") }
+                            { "PurchaseDate", Culture.LocaleDate (purchase.PurchaseDate.ToLocalTime(), "MMM dd, hh:mm:ss tt") },
+                            { "UpdateDate", Culture.LocaleDate (purchase.UpdateDate.ToLocalTime(), "MMM dd, hh:mm:ss tt") }
 
                         });
                     }
