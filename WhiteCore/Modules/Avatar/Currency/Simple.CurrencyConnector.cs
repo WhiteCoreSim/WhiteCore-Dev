@@ -75,9 +75,11 @@ namespace Simple.Currency
                 return;
 
             IConfig gridInfo = source.Configs["GridInfoService"];
-            InWorldCurrency = gridInfo.GetString("CurrencySymbol", String.Empty) + " ";
-            RealCurrency = gridInfo.GetString("RealCurrencySymbol", String.Empty) + " ";
-
+            if (gridInfo != null)
+            {
+                InWorldCurrency = gridInfo.GetString ("CurrencySymbol", String.Empty) + " ";
+                RealCurrency = gridInfo.GetString ("RealCurrencySymbol", String.Empty) + " ";
+            }
 
             if (source.Configs[Name] != null)
                 defaultConnectionString = source.Configs[Name].GetString("ConnectionString", defaultConnectionString);
