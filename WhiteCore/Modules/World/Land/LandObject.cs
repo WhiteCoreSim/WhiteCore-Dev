@@ -354,7 +354,7 @@ namespace WhiteCore.Modules.Land
                         LandData.PassHours = args.PassHours;
                         LandData.PassPrice = args.PassPrice;
                     }
-
+                    // 141031 Greythane, this is an example of where the check needs to go
                     LandData.Status = LandData.OwnerID == m_parcelManagementModule.GodParcelOwner
                                           ? ParcelStatus.Abandoned
                                           : LandData.AuthBuyerID != UUID.Zero
