@@ -66,7 +66,14 @@ namespace Simple.Currency
             if (config.Configs["Currency"] == null ||
                 config.Configs["Currency"].GetString("Module", "") != "SimpleCurrency")
                 return;
-            if (!config.Configs["Currency"].GetBoolean("RunServer", false))
+
+            // we only want this if we are local..
+            bool remoteCalls = false;
+            IConfig connectorConfig = config.Configs ["WhiteCoreConnectors"];
+            if ((connectorConfig != null) && connectorConfig.Contains ("DoRemoteCalls"))
+                remoteCalls = connectorConfig.GetBoolean ("DoRemoteCalls", false);
+
+            if (remoteCalls)
                 return;
 
             m_connector = DataManager.RequestPlugin<ISimpleCurrencyConnector>() as SimpleCurrencyConnector;
