@@ -43,9 +43,9 @@ using System.IO;
 using System.Text;
 
 
-namespace WhiteCore.Modules.Avatar.Caps
+namespace WhiteCore.Modules.Caps
 {
-    public class ServerReleaseNotes : INonSharedRegionModule
+    public class ResourceCostSelected : INonSharedRegionModule
     {
         private IScene m_scene;
 
@@ -63,6 +63,7 @@ namespace WhiteCore.Modules.Avatar.Caps
 
         public void RemoveRegion(IScene scene)
         {
+            m_scene.EventManager.OnRegisterCaps -= RegisterCaps;
         }
 
         public void RegionLoaded(IScene scene)
@@ -80,7 +81,7 @@ namespace WhiteCore.Modules.Avatar.Caps
 
         public string Name
         {
-            get { return "ServerReleaseNotesModule"; }
+            get { return "ResourceCostSelected"; }
         }
 
         #endregion
@@ -88,21 +89,45 @@ namespace WhiteCore.Modules.Avatar.Caps
         public OSDMap RegisterCaps(UUID agentID, IHttpServer server)
         {
             OSDMap retVal = new OSDMap();
-            retVal["ServerReleaseNotes"] = CapsUtil.CreateCAPS("ServerReleaseNotes", "");
+            retVal["ResourceCostSelected"] = CapsUtil.CreateCAPS("ResourceCostSelected", "");
 
-            server.AddStreamHandler(new GenericStreamHandler("POST", retVal["ServerReleaseNotes"],
+            server.AddStreamHandler(new GenericStreamHandler("POST", retVal["ResourceCostSelected"],
                                                              delegate(string path, Stream request,
                                                                       OSHttpRequest httpRequest,
                                                                       OSHttpResponse httpResponse)
-                                                             { return ProcessServerReleaseNotes(agentID); }));
-
+                                                             { return ProcessResourceCostSelected(request, agentID); }));
             return retVal;
         }
-        
-        private byte[] ProcessServerReleaseNotes(UUID agentID)
+
+        public byte[] ProcessResourceCostSelected(Stream request, UUID AgentId)
         {
-            OSDMap osd = new OSDMap { { "ServerReleaseNotes", new OSDString(Utilities.GetServerReleaseNotesURL()) } };
-            return OSDParser.SerializeLLSDXmlBytes(osd);
+            IScenePresence avatar;
+
+            if (!m_scene.TryGetScenePresence(AgentId, out avatar))
+                return MainServer.BadRequest;
+            
+            OSD r = OSDParser.DeserializeLLSDXml(HttpServerHandlerHelpers.ReadFully(request));
+
+            if (r.Type != OSDType.Map) // not a proper request
+                return MainServer.BadRequest;
+
+            OSDMap rm = (OSDMap) r;
+
+			// This module gets the root of the prim(set)
+			// What needs to be done is to check how many prims there are selected (multiple selected_roots)
+			// and if they are part of a link-set
+			//
+			// Each prim has a standard amount of details
+			//
+			// physics = 0.1 x amount of prims
+			// prim_equiv = 1 x amount of prims
+			// simulation = 0.5 x amount of prims
+			// streaming = 0.06 x amount of prims
+			//
+			// These values need to be returned with the return that's underneath here
+
+            OSDMap map = new OSDMap();
+            return OSDParser.SerializeLLSDXmlBytes(map);
         }
     }
 }
