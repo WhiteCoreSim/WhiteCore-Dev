@@ -151,7 +151,7 @@ namespace WhiteCore.Simulation.Base
         {
             m_commandLineParameters = cmdParams;
             m_StartupTime = DateTime.Now;
-            m_version = VersionInfo.Version + " (" + Util.GetRuntimeInformation() + ")";
+            m_version = VersionInfo.Version;
             m_original_config = originalConfig;
             m_config = configSource;
             m_configurationLoader = configLoader;
