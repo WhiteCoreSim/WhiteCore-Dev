@@ -52,10 +52,14 @@ namespace WhiteCore.Framework.Utilities
 
 		public const int SystemUserCount = 2;
         public const string LibraryOwner = "11111111-1111-0000-0000-000100bba000";
-        public const string LibraryRootFolderID = "00000112-000f-0000-0000-000100bba000"; 
+        public const string LibraryRootFolderID = "00000112-000f-0000-0000-000100bba000";
 
-		public const string RealEstateOwnerUUID = "3d6181b0-6a4b-97ef-18d8-722652995cf1";
+        public const string RealEstateOwnerUUID = "bbb55499-7938-4752-ab7c-f7136e36cced";
 		public const string RealEstateOwnerName = "RealEstate Owner";
+
+        public const string GovernorOwnerUUID = "3d6181b0-6a4b-97ef-18d8-722652995cf1";
+        public const string GovernorOwnerName = "Governor White";
+        
         public const string SystemEstateName = "WhiteCore Estate";
         public const int SystemEstateID = 1;
 
