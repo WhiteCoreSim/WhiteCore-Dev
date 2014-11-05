@@ -46,12 +46,23 @@ namespace WhiteCore.Modules.Estate
         IUserAccountService m_accountService;
         IEstateConnector m_estateConnector;
 
+        string governorName = Constants.GovernorName;
         string realEstateOwnerName = Constants.RealEstateOwnerName;
         string systemEstateName = Constants.SystemEstateName;
 
         private IRegistryCore m_registry;
 
         #region ISystemEstateService Members
+
+        public UUID GovernorUUID
+        {
+            get { return (UUID) Constants.GovernorUUID; }
+        }
+
+        public string GovernorName
+        {
+            get { return governorName; }
+        }
 
         public UUID SystemEstateOwnerUUID
         {
@@ -79,6 +90,7 @@ namespace WhiteCore.Modules.Estate
             IConfig estConfig = config.Configs["EstateService"];
             if (estConfig != null)
             {
+                governorName = estConfig.GetString("GovernorName", governorName);
                 realEstateOwnerName = estConfig.GetString("SystemEstateOwnerName", realEstateOwnerName);
                 systemEstateName = estConfig.GetString("SystemEstateName", systemEstateName);
             }
@@ -100,7 +112,7 @@ namespace WhiteCore.Modules.Estate
             if (!m_accountService.RemoteCalls())
             {
                 // check and/or create default RealEstate user
-                CheckRealEstateUserInfo ();
+                CheckSystemUserInfo ();
                 CheckSystemEstateInfo ();
 
                 AddCommands ();
@@ -114,6 +126,12 @@ namespace WhiteCore.Modules.Estate
         {
             if (MainConsole.Instance != null)
             {
+                MainConsole.Instance.Commands.AddCommand (
+                    "reset governor password",
+                    "reset governor password",
+                    "Resets the password of the system Governor in case you lost it",
+                    HandleResetGovernorPassword, false, true);
+
                 MainConsole.Instance.Commands.AddCommand (
                     "reset realestate password",
                     "reset realestate password",
@@ -176,15 +194,84 @@ namespace WhiteCore.Modules.Estate
         /// <summary>
         /// Checks and creates the real estate user.
         /// </summary>
-        private void CheckRealEstateUserInfo()
+        private void CheckSystemUserInfo()
         {
             if (m_accountService == null)
                 return;
 
-            UserAccount uinfo = m_accountService.GetUserAccount (null, UUID.Parse (Constants.RealEstateOwnerUUID));
-            var newPassword = Utilities.RandomPassword.Generate (2, 1, 0);
+            CheckGovernorUserInfo ();
+            CheckRealEstateUserInfo ();
 
-            if (uinfo == null)
+        }
+
+        private void CheckGovernorUserInfo()
+        {
+
+            UserAccount govInfo = m_accountService.GetUserAccount (null, UUID.Parse (Constants.GovernorUUID));
+            var govPassword = Utilities.RandomPassword.Generate (2, 1, 0);
+
+            if (govInfo == null)
+            {
+                MainConsole.Instance.Warn ("Creating the Governor user '" + GovernorName + "'");
+
+                var error = m_accountService.CreateUser (
+                    (UUID)Constants.GovernorUUID,           // UUID
+                    UUID.Zero,                              // ScopeID
+                    GovernorName,                           // Name
+                    Util.Md5Hash (govPassword),             // password
+                    "");                                    // email
+
+                if (error == "")
+                {
+                    SaveGovernorPassword (govPassword);
+                    MainConsole.Instance.Info (" The password for '" + GovernorName + "' is : " + govPassword);
+
+                } else
+                {
+                    MainConsole.Instance.Warn (" Unable to create the Governor user : " + error);
+                    return;
+                }
+
+                //set as "Maintenace" level
+                var account = m_accountService.GetUserAccount (null, UUID.Parse (Constants.GovernorUUID));
+                account.UserLevel = 250;
+                account.UserFlags = Constants.USER_FLAG_CHARTERMEMBER;
+                bool success = m_accountService.StoreUserAccount (account);
+
+                if (success)
+                    MainConsole.Instance.Info (" The Governor user has been elevated to 'Maintenance' level");
+
+                return;
+
+            }
+
+            // we already have the Governor account.. verify details in case of a configuration change
+            if (govInfo.Name != GovernorName)
+            {
+                IAuthenticationService authService = m_registry.RequestModuleInterface<IAuthenticationService> ();
+
+                govInfo.Name = GovernorName;
+                bool updatePass = authService.SetPassword(govInfo.PrincipalID, "UserAccount", govPassword);
+                bool updateAcct = m_accountService.StoreUserAccount (govInfo);
+
+                if (updatePass && updateAcct)
+                {
+                    SaveGovernorPassword (govPassword);
+                    MainConsole.Instance.InfoFormat (" The Governor user has been updated to '{0}'", GovernorName);
+                }
+                else
+                    MainConsole.Instance.Warn (" There was a problem updating the Governor user");
+            }
+
+        }
+
+        private void CheckRealEstateUserInfo()
+        {
+
+            UserAccount reInfo = m_accountService.GetUserAccount (null, UUID.Parse (Constants.RealEstateOwnerUUID));
+            var rePassword = Utilities.RandomPassword.Generate (2, 1, 0);
+
+            if (reInfo == null)
             {
                 MainConsole.Instance.Warn ("Creating system real estate user '" + SystemEstateOwnerName + "'");
 
@@ -192,51 +279,65 @@ namespace WhiteCore.Modules.Estate
                     (UUID)Constants.RealEstateOwnerUUID,    // UUID
                     UUID.Zero,                              // ScopeID
                     SystemEstateOwnerName,                  // Name
-                    Util.Md5Hash (newPassword),             // password
+                    Util.Md5Hash (rePassword),              // password
                     "");                                    // email
 
                 if (error == "")
                 {
-                    SaveRealEstatePassword (newPassword);
-                    MainConsole.Instance.Info (" The password for '" + SystemEstateOwnerName + "' is : " + newPassword);
+                    SaveRealEstatePassword (rePassword);
+                    MainConsole.Instance.Info (" The password for '" + SystemEstateOwnerName + "' is : " + rePassword);
 
                 } else
                 {
-                    MainConsole.Instance.Warn (" Unable to create user : " + error);
+                    MainConsole.Instance.Warn (" Unable to create the RealEstate user : " + error);
                     return;
                 }
 
                 //set as "Maintenace" level
                 var account = m_accountService.GetUserAccount (null, UUID.Parse (Constants.RealEstateOwnerUUID));
-                account.UserLevel = 250;
+                account.UserLevel = 150;
                 account.UserFlags = Constants.USER_FLAG_CHARTERMEMBER;
                 bool success = m_accountService.StoreUserAccount (account);
 
                 if (success)
-                    MainConsole.Instance.Info (" The system real estate user has been elevated to 'Maintenance' level");
+                    MainConsole.Instance.Info (" The system real estate user has been elevated to 'Liason' level");
 
                 return;
 
             }
 
             // we alreay have an account.. verify details in case of a configuration change
-            if (uinfo.Name != SystemEstateOwnerName)
+            if (reInfo.Name != SystemEstateOwnerName)
             {
                 IAuthenticationService authService = m_registry.RequestModuleInterface<IAuthenticationService> ();
 
-                uinfo.Name = SystemEstateOwnerName;
-                bool updatePass = authService.SetPassword(uinfo.PrincipalID, "UserAccount", newPassword);
-                bool updateAcct = m_accountService.StoreUserAccount (uinfo);
+                reInfo.Name = SystemEstateOwnerName;
+                bool updatePass = authService.SetPassword(reInfo.PrincipalID, "UserAccount", rePassword);
+                bool updateAcct = m_accountService.StoreUserAccount (reInfo);
 
                 if (updatePass && updateAcct)
                 {
-                    SaveRealEstatePassword (newPassword);
+                    SaveRealEstatePassword (rePassword);
                     MainConsole.Instance.InfoFormat (" The system real estate user has been updated to '{0}'", SystemEstateOwnerName);
                 }
                 else
                     MainConsole.Instance.Warn (" There was a problem updating the system real estate user");
             }
 
+        }
+
+        private void SaveGovernorPassword(string password)
+        {
+            const string passFile = Constants.DEFAULT_DATA_DIR + "/Governor.txt";
+
+            if (File.Exists (passFile))
+                File.Delete (passFile);
+
+            using (var pwFile = new StreamWriter(passFile))
+            {
+                 pwFile.WriteLine ("Governor user   : '" + GovernorName + "' was created: " + Culture.LocaleLogStamp ());
+                pwFile.WriteLine ("Password        : " + password);
+            }
         }
 
         private void SaveRealEstatePassword(string password)
@@ -248,8 +349,8 @@ namespace WhiteCore.Modules.Estate
 
             using (var pwFile = new StreamWriter(passFile))
             {
-                pwFile.WriteLine("System user : '" + SystemEstateOwnerName + "' was created: " + Culture.LocaleLogStamp());
-                pwFile.WriteLine("Password    : " + password);
+                pwFile.WriteLine ("RealEstate user : '" + SystemEstateOwnerName + "' was created: " + Culture.LocaleLogStamp ());
+                pwFile.WriteLine ("Password        : " + password);
             }
         }
 
@@ -338,6 +439,33 @@ namespace WhiteCore.Modules.Estate
         #endregion
 
         #region Commands
+        protected void HandleResetGovernorPassword(IScene scene, string[] cmd)
+        {
+            string question;
+
+            question = MainConsole.Instance.Prompt("Are you really sure that you want to reset the Governor User password ? (yes/no)");
+
+            if (question.StartsWith("y"))
+            {
+                IAuthenticationService authService = m_registry.RequestModuleInterface<IAuthenticationService> ();
+                var newPassword = Utilities.RandomPassword.Generate(2, 1, 0);
+
+                UserAccount account = m_accountService.GetUserAccount(null, GovernorName);
+                bool success = false;
+
+                if (authService != null)
+                    success = authService.SetPassword(account.PrincipalID, "UserAccount", newPassword);
+
+                if (!success)
+                    MainConsole.Instance.ErrorFormat ("[USER ACCOUNT SERVICE]: Unable to reset password for the Governor");
+                else
+                {
+                    SaveGovernorPassword (newPassword);
+                    MainConsole.Instance.Info ("[USER ACCOUNT SERVICE]: The new password for '" + GovernorName + "' is : " + newPassword);
+                }
+            }
+        }
+
         protected void HandleResetRealEstatePassword(IScene scene, string[] cmd)
         {
             string question;

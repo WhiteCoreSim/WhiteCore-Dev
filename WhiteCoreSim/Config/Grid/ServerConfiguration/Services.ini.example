@@ -4,6 +4,9 @@
     LibraryOwnerName = "Library Owner"
 
 [EstateService]
+    ;;  Set this if you want to change the name of the WhiteCore system Governor
+    GovernorName = "Governor White"
+
     ;;  Set these if you want to change the name of the WhiteCore system Estate owner & name
     SystemEstateOwnerName = "RealEstate Owner"
     SystemEstateName = "Whitecore Estate"

@@ -102,3 +102,7 @@ TestResult.xml
 *.StyleCop
 debug/*
 
+
+WhiteCoreSim/Data/Governor.txt
+
+WhiteCoreSim/Data/SystemEstate.txt
