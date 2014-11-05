@@ -159,7 +159,7 @@ namespace WhiteCore.Modules.Land
 
             UUID godParcelOwner;
             var regionType = scene.RegionInfo.RegionType.ToLower ();
-            if ( regionType.StartsWith('m') )
+            if ( regionType.StartsWith("m") )
                 godParcelOwner = (UUID)Constants.GovernorUUID;              // Mainland reverts to the 'Guv'
             else
                 godParcelOwner = (UUID)Constants.RealEstateOwnerUUID;       // Estates revert to the RealEstate Owner

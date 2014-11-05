@@ -524,6 +524,7 @@
       <Reference name="WhiteCore.DataManager"/>
       <Reference name="WhiteCore.Framework"/>
       <Reference name="WhiteCore.Region"/>
+      <Reference name="WhiteCore.Modules"/>
       <Reference name="WhiteCore.Services.DataService"/>
 
       <Reference name="DotNetOpenId" path="../../../WhiteCoreSim/bin/"/>
