@@ -227,7 +227,7 @@ namespace WhiteCore.Modules.WorldMap
             bool textureTerrain = true;
             m_texturePrims = true;
 
-            int scaledRemovalFactor = m_scene.RegionInfo.RegionSizeX/(Constants.RegionSize/2);
+            //int scaledRemovalFactor = m_scene.RegionInfo.RegionSizeX/(Constants.RegionSize/2);
 
             //Vector3 camPos = new Vector3(m_scene.RegionInfo.RegionSizeX/2 - 0.5f,
             //    m_scene.RegionInfo.RegionSizeY/2 - 0.5f, 221.7025033688163f);

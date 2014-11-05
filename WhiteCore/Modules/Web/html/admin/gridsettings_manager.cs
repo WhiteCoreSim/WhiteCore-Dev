@@ -61,7 +61,6 @@ namespace WhiteCore.Modules.Web
         {
             response = null;
             var vars = new Dictionary<string, object>();
-            IGenericsConnector connector = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector>();
             var settings = webInterface.GetGridSettings();
 
             if (requestParameters.ContainsKey("Submit"))

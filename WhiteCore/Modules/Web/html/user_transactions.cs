@@ -71,7 +71,6 @@ namespace WhiteCore.Modules.Web
             var thirtyDays = today.AddDays (-7);
             string DateStart = thirtyDays.ToShortDateString();
             string DateEnd = today.ToShortDateString();
-            string UserName = "";
             UUID UserID = UUID.Zero;
             int start = 0;
 

@@ -164,7 +164,7 @@ namespace WhiteCore.Modules.WorldMap
         {
             int start = Environment.TickCount;
             var renderer = new WarpTileRenderer();
-            var drawPrimVolume = false;
+           // var drawPrimVolume = false;
         
 
             renderer.Initialise(m_scene, m_config);
