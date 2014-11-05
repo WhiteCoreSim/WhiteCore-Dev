@@ -176,14 +176,17 @@
             case "ResetMenuInfoText":           return "Resets the menu items back to the most updated defaults";
             case "ResetSettingsInfoText":       return "Resets the Web Interface settings back to the most updated defaults";
             case "MenuPageManager":             return "Page Manager"; 
-            case "MenuSettingsManager":         return "Settings Manager";
+            case "MenuSettingsManager":         return "WebUI Settings";
             case "MenuManager":                 return "Management";
             case "MenuSettings":                return "Settings";
             case "MenuRegionManager":           return "Region Manager";
             case "MenuManagerSimConsole":       return "Simulator console";
             case "MenuPurchases":               return "User Purchases";
+            case "MenuMyPurchases":             return "My Purchases";
             case "MenuTransactions":            return "User Transactions";
+            case "MenuMyTransactions":          return "My Transactions";
             case "MenuStatistics":              return "Viewer Statistics";
+            case "MenuGridSettings":            return "Grid Settings";
 
             // Main Menu Tooltips
             case "TooltipsMenuHome":            return "Home";
@@ -215,6 +218,7 @@
             case "TooltipsMenuPurchases":               return "Purchase information";
             case "TooltipsMenuTransactions":            return "Transaction information";
             case "TooltipsMenuStatistics":              return "Viewer Statistics";
+            case "TooltipsMenuGridSettings":            return "Grid settings";
 
             // Menu Region box
             case "MenuRegionTitle":             return "Region";
@@ -408,7 +412,15 @@
             case "RequiresAdminText":           return "Requires Admin To View";
             case "RequiresAdminLevelText":      return "Required Admin Level To View";
 
-                //settings manager page
+            // grid settings
+            case "GridSettingsManager":         return "Grid Settings Manager";
+            case "GridnameText":                return "Grid name";
+            case "GridnickText":                return "Grid nickname";
+            case "WelcomeMessageText":          return "Login welcome message";
+            case "SystemEstateNameText":        return "System estate name";
+            case "SystemEstateOwnerText":       return "System estate owner name";
+
+            //settings manager page
             case "WebRegistrationText":         return "Web registrations allowed";
             case "GridCenterXText":             return "Grid Center Location X";
             case "GridCenterYText":             return "Grid Center Location Y";

@@ -179,8 +179,11 @@ namespace WhiteCore.Modules.Web.Translators
             case "MenuRegionManager":           return "Regio Manager";
             case "MenuManagerSimConsole":       return "Sim console";
             case "MenuPurchases":               return "Gebruiker Aankopen";
+            case "MenuMyPurchases":             return "Mijn aankopen ";
             case "MenuTransactions":            return "Gebruiker Transacties";
+            case "MenuMyTransactions":          return "Mijn Transacties";
             case "MenuStatistics":              return "Viewer statistieken";
+            case "MenuGridSettings":            return "Grid instellingen";
 
             // Tooltips Menu Buttons
             case "TooltipsMenuHome":                    return "Home";
@@ -212,6 +215,7 @@ namespace WhiteCore.Modules.Web.Translators
             case "TooltipsMenuPurchases":               return "Aankoop informatie";
             case "TooltipsMenuTransactions":            return "Transactie-informatie";
             case "TooltipsMenuStatistics":              return "Viewer statistieken";
+            case "TooltipsMenuGridSettings":            return "Grid instellingen";
 
             // Menu Region
             case "MenuRegionTitle":                return "Region";
@@ -493,6 +497,14 @@ namespace WhiteCore.Modules.Web.Translators
                     return "Requires Admin To View";
                 case "RequiresAdminLevelText":
                     return "Required Admin Level To View";
+
+            // grid settings
+            case "GridSettingsManager":         return "Grid Settings Manager";
+            case "GridnameText":                return "Grid naam";
+            case "GridnickText":                return "Grid bijnaam";
+            case "WelcomeMessageText":          return "Login welkomstbericht ";
+            case "SystemEstateNameText":        return "Naam Estate systeem ";
+            case "SystemEstateOwnerText":       return "Systeem goed ownername";
 
                     //settings manager page
                  case "WebRegistrationText":

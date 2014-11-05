@@ -35,7 +35,7 @@ using WhiteCore.Framework.Services;
 
 namespace WhiteCore.Modules.Web
 {
-    public class AdminUserTransactionsPage : IWebInterfacePage
+    public class UserTransactionsPage : IWebInterfacePage
     {
         public string[] FilePath
         {
@@ -43,7 +43,7 @@ namespace WhiteCore.Modules.Web
             {
                 return new[]
                            {
-                               "html/admin/transactions.html"
+                               "html/user_transactions.html"
                            };
             }
         }
@@ -55,7 +55,7 @@ namespace WhiteCore.Modules.Web
 
         public bool RequiresAdminAuthentication
         {
-            get { return true; }
+            get { return false; }
         }
 
         public Dictionary<string, object> Fill(WebInterface webInterface, string filename, OSHttpRequest httpRequest,
@@ -68,11 +68,12 @@ namespace WhiteCore.Modules.Web
 
             uint amountPerQuery = 25;
             var today = DateTime.Now;
-            var thirtyDays = today.AddDays (-30);
+            var thirtyDays = today.AddDays (-7);
             string DateStart = thirtyDays.ToShortDateString();
             string DateEnd = today.ToShortDateString();
             string UserName = "";
             UUID UserID = UUID.Zero;
+            int start = 0;
 
             IMoneyModule moneyModule = webInterface.Registry.RequestModuleInterface<IMoneyModule>();
             string noDetails = translator.GetTranslatedString ("NoTransactionsText");
@@ -84,73 +85,56 @@ namespace WhiteCore.Modules.Web
                     DateStart = requestParameters ["date_start"].ToString ();
                 if (requestParameters.ContainsKey ("date_end"))
                     DateEnd = requestParameters ["date_end"].ToString ();
-                if (requestParameters.ContainsKey ("user_name"))
-                    UserName = requestParameters ["user_name"].ToString ();
 
-                if (UserName != "")
-                {
-                    // TODO: Work out a better way to catch this
-                    UserID = (UUID)Constants.LibraryOwner;         // This user should hopefully never have transactions
-
-                    if (UserName.Split (' ').Length == 2)
-                    {
-                        IUserAccountService accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
-                        var userAccount = accountService.GetUserAccount (null, UserName);
-                        if (userAccount != null)
-                            UserID = userAccount.PrincipalID;
-                    }
-                }
-
-                // paginations
-                int start = httpRequest.Query.ContainsKey ("Start")
+                 // paginations
+                start = httpRequest.Query.ContainsKey ("Start")
                     ? int.Parse (httpRequest.Query ["Start"].ToString ())
                     : 0;
                 int count = (int) moneyModule.NumberOfTransactions(UserID, UUID.Zero);
                 int maxPages = (int)(count / amountPerQuery) - 1;
 
                 if (start == -1)
-                    start = (int)(maxPages < 0 ? 0 : maxPages);
+                    start = (maxPages < 0 ? 0 : maxPages);
 
                 vars.Add ("CurrentPage", start);
                 vars.Add ("NextOne", start + 1 > maxPages ? start : start + 1);
                 vars.Add ("BackOne", start - 1 < 0 ? 0 : start - 1);
 
-
-                // Transaction Logs
-                var timeNow = DateTime.Now.ToString ("HH:mm:ss");
-                var dateFrom = DateTime.Parse (DateStart + " " + timeNow);
-                var dateTo = DateTime.Parse (DateEnd + " " + timeNow);
-
-                List<AgentTransfer> transactions;
-                if (UserID != UUID.Zero)
-                    transactions = moneyModule.GetTransactionHistory (UserID, UUID.Zero, dateFrom, dateTo, (uint)start, amountPerQuery);
-                else
-                    transactions = moneyModule.GetTransactionHistory (dateFrom, dateTo, (uint)start, amountPerQuery);
-
-
-                // data
-                if (transactions.Count > 0)
-                {
-                    noDetails = "";
-
-                    foreach (var transaction in transactions)
-                    {
-                        transactionsList.Add (new Dictionary<string, object> {
-                            { "Date", Culture.LocaleDate (transaction.TransferDate.ToLocalTime(), "MMM dd, hh:mm:ss tt") },
-                            { "ToAgent", transaction.ToAgentName },
-                            { "FromAgent", transaction.FromAgentName },
-                            { "Description", transaction.Description },
-                            { "Amount",transaction.Amount },
-                            { "ToBalance",transaction.ToBalance }
-
-                        });
-                    }
-                }
             } else
             {
                 vars.Add ("CurrentPage", 0 );
                 vars.Add ("NextOne", 0);
                 vars.Add ("BackOne", 0);
+            }
+
+            UserAccount user = Authenticator.GetAuthentication(httpRequest);
+
+            // Transaction Logs
+            var timeNow = DateTime.Now.ToString ("HH:mm:ss");
+            var dateFrom = DateTime.Parse (DateStart + " " + timeNow);
+            var dateTo = DateTime.Parse (DateEnd + " " + timeNow);
+            TimeSpan period = dateTo.Subtract (dateFrom);
+
+            List<AgentTransfer> transactions;
+            transactions = moneyModule.GetTransactionHistory (user.PrincipalID, UUID.Zero, dateFrom, dateTo, (uint)start, amountPerQuery);
+
+                // data
+            if (transactions.Count > 0)
+            {
+                noDetails = "";
+
+                foreach (var transaction in transactions)
+                {
+                    transactionsList.Add (new Dictionary<string, object> {
+                        { "Date", Culture.LocaleDate (transaction.TransferDate.ToLocalTime(), "MMM dd, hh:mm:ss tt") },
+                        { "ToAgent", transaction.ToAgentName },
+                        { "FromAgent", transaction.FromAgentName },
+                        { "Description", transaction.Description },
+                        { "Amount",transaction.Amount },
+                        { "ToBalance",transaction.ToBalance }
+
+                    });
+                }
             }
 
             if (transactionsList.Count == 0)
@@ -169,7 +153,7 @@ namespace WhiteCore.Modules.Web
             // always required data
             vars.Add("DateStart", DateStart );
             vars.Add ("DateEnd", DateEnd );
-            vars.Add ("SearchUser", UserName);
+            vars.Add ("Period",  period.TotalDays + " " + translator.GetTranslatedString("DaysText"));
             vars.Add("TransactionsList",transactionsList);
             vars.Add ("NoTransactionsText", noDetails);
 
@@ -178,7 +162,6 @@ namespace WhiteCore.Modules.Web
             vars.Add("DateInfoText", translator.GetTranslatedString("DateInfoText"));
             vars.Add("DateStartText", translator.GetTranslatedString("DateStartText"));
             vars.Add("DateEndText", translator.GetTranslatedString("DateEndText"));
-            vars.Add("SearchUserText", translator.GetTranslatedString("AvatarNameText"));
 
             vars.Add("TransactionDateText", translator.GetTranslatedString("TransactionDateText"));
             vars.Add("TransactionToAgentText", translator.GetTranslatedString("TransactionToAgentText"));

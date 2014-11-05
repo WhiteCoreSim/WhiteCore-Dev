@@ -215,7 +215,7 @@ namespace WhiteCore.Modules.Web
 
                 var scenemanager = webInterface.Registry.RequestModuleInterface<ISceneManager> ();
                 var gconnector = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector>();
-                var settings = gconnector.GetGeneric<GridSettings>(UUID.Zero, "WebSettings", "Settings");
+                var settings = gconnector.GetGeneric<WebUISettings>(UUID.Zero, "WebUISettings", "Settings");
 
                 // get some current details
                 //List<GridRegion> regions = gridService.GetRegionsByName(null, "", null,null);

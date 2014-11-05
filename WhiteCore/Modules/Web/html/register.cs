@@ -105,9 +105,7 @@ namespace WhiteCore.Modules.Web
         {
             response = null;
             var vars = new Dictionary<string, object>();
-
-            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector>();
-            var settings = generics.GetGeneric<GridSettings>(UUID.Zero, "WebSettings", "Settings");
+            var settings = webInterface.GetWebUISettings();
 
             bool adminUser = Authenticator.CheckAdminAuthentication(httpRequest, Constants.USER_GOD_CUSTOMER_SERVICE);
             bool allowRegistration = settings.WebRegistration;

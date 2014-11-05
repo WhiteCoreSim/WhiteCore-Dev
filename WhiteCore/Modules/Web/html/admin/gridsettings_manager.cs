@@ -25,12 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
+using OpenMetaverse;
 using System.Collections.Generic;
 
 namespace WhiteCore.Modules.Web
 {
-    public class WorldMapPage : IWebInterfacePage
+    public class GridSettingsManagerPage : IWebInterfacePage
     {
         public string[] FilePath
         {
@@ -38,19 +40,19 @@ namespace WhiteCore.Modules.Web
             {
                 return new[]
                            {
-                               "html/world_map.html"
+                               "html/admin/gridsettings_manager.html"
                            };
             }
         }
 
         public bool RequiresAuthentication
         {
-            get { return false; }
+            get { return true; }
         }
 
         public bool RequiresAdminAuthentication
         {
-            get { return false; }
+            get { return true; }
         }
 
         public Dictionary<string, object> Fill(WebInterface webInterface, string filename, OSHttpRequest httpRequest,
@@ -59,12 +61,48 @@ namespace WhiteCore.Modules.Web
         {
             response = null;
             var vars = new Dictionary<string, object>();
+            IGenericsConnector connector = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector>();
+            var settings = webInterface.GetGridSettings();
 
-            vars.Add("WorldMap", translator.GetTranslatedString("WorldMap"));
+            if (requestParameters.ContainsKey("Submit"))
+            {
+                settings.Gridname = requestParameters["Gridname"].ToString();
+                settings.Gridnick = requestParameters["Gridnick"].ToString();
+                settings.WelcomeMessage = requestParameters["WelcomeMessage"].ToString();
+                settings.SystemEstateOwnerName = requestParameters["SystemEstateOwnerName"].ToString();
+                settings.SystemEstateName = requestParameters["SystemEstateName"].ToString();
 
-            var settings = webInterface.GetWebUISettings();
-            vars.Add("GridCenterX", settings.MapCenter.X);
-            vars.Add("GridCenterY", settings.MapCenter.Y);
+
+
+
+                // update main grid setup
+                webInterface.SaveGridSettings (settings);
+                response = "Successfully updated grid settings.";
+
+                return null;
+            }
+
+            vars.Add("Gridname", settings.Gridname);
+            vars.Add("Gridnick", settings.Gridnick);
+            vars.Add("WelcomeMessage", settings.WelcomeMessage);
+            vars.Add("SystemEstateOwnerName", settings.SystemEstateOwnerName);
+            vars.Add("SystemEstateName", settings.SystemEstateName);
+
+
+ 
+
+            vars.Add("GridSettingsManager", translator.GetTranslatedString("GridSettingsManager"));
+            vars.Add("GridnameText", translator.GetTranslatedString("GridnameText"));
+            vars.Add("GridnickText", translator.GetTranslatedString("GridnickText"));
+            vars.Add("WelcomeMessageText", translator.GetTranslatedString("WelcomeMessageText"));
+            vars.Add("SystemEstateNameText", translator.GetTranslatedString("SystemEstateNameText"));
+            vars.Add("SystemEstateOwnerText", translator.GetTranslatedString("SystemEstateOwnerText"));
+
+
+
+            vars.Add("Save", translator.GetTranslatedString("Save"));
+            vars.Add("No", translator.GetTranslatedString("No"));
+            vars.Add("Yes", translator.GetTranslatedString("Yes"));
 
             return vars;
         }

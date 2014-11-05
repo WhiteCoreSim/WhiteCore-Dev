@@ -35,7 +35,7 @@ namespace WhiteCore.Modules.Web
     {
         public static readonly string Schema = "WebPages";
         private static GridPage _rootPage;
-        public static readonly uint CurrentVersion = 9;
+        public static readonly uint CurrentVersion = 10;
 
         private static void InitializeDefaults()
         {
@@ -102,7 +102,7 @@ namespace WhiteCore.Modules.Web
                 ShowInMenu = true,
                 LoggedInRequired = true,
                 MenuID = "users",
-                Location = "online_users.html",
+                Location = "user_profile.html",
                 MenuPosition = 3,
                 MenuTitle = "MenuUser",
                 MenuToolTip = "TooltipsMenuUser",
@@ -128,9 +128,28 @@ namespace WhiteCore.Modules.Web
                     new GridPage {
                         ShowInMenu = true,
                         LoggedInRequired = true,
+                        MenuID = "purchases",
+                        Location = "user_purchases.html",
+                        MenuPosition = 2,
+                        MenuTitle = "MenuMyPurchases",
+                        MenuToolTip = "TooltipsMenuPurchases"
+
+                    },
+                    new GridPage {
+                        ShowInMenu = true,
+                        LoggedInRequired = true,
+                        MenuID = "Transactions",
+                        Location = "user_transactions.html",
+                        MenuPosition = 3,
+                        MenuTitle = "MenuMyTransactions",
+                        MenuToolTip = "TooltipsMenuTransactions"
+                    },
+                    new GridPage {
+                        ShowInMenu = true,
+                        LoggedInRequired = true,
                         MenuID = "change_user_information",
                         Location = "change_user_information.html",
-                        MenuPosition = 2,
+                        MenuPosition = 4,
                         MenuTitle = "MenuChangeUserInformation",
                         MenuToolTip = "TooltipsMenuChangeUserInformation"
                     }
@@ -267,7 +286,7 @@ namespace WhiteCore.Modules.Web
                     new GridPage {
                         ShowInMenu = true,
                         AdminRequired = true,
-                        MenuID = "purchases",
+                        MenuID = "Purchases_admin",
                         Location = "admin/purchases.html",
                         MenuPosition = 5,
                         MenuTitle = "MenuPurchases",
@@ -277,7 +296,7 @@ namespace WhiteCore.Modules.Web
                     new GridPage {
                         ShowInMenu = true,
                         AdminRequired = true,
-                        MenuID = "Transactions",
+                        MenuID = "Transactions_admin",
                         Location = "admin/transactions.html",
                         MenuPosition = 6,
                         MenuTitle = "MenuTransactions",
@@ -303,14 +322,14 @@ namespace WhiteCore.Modules.Web
                 Location = "admin/settings.html",
                 MenuPosition = 9,
                 MenuTitle = "MenuSettings",
-                MenuToolTip = "TooltipsMenuSettings",
+                MenuToolTip = "TooltipsMenuSettingsManager",
                 Children = new List<GridPage> {
                     new GridPage {
                         ShowInMenu = true,
                         AdminRequired = true,
                         MenuID = "factory_reset",
                         Location = "admin/factory_reset.html",
-                        MenuPosition = 3,
+                        MenuPosition = 4,
                         MenuTitle = "MenuFactoryReset",
                         MenuToolTip = "TooltipsMenuFactoryReset"
                     },
@@ -319,7 +338,7 @@ namespace WhiteCore.Modules.Web
                         AdminRequired = true,
                         MenuID = "page_manager",
                         Location = "admin/page_manager.html",
-                        MenuPosition = 1,
+                        MenuPosition = 2,
                         MenuTitle = "MenuPageManager",
                         MenuToolTip = "TooltipsMenuPageManager"
                     },
@@ -328,16 +347,25 @@ namespace WhiteCore.Modules.Web
                         AdminRequired = true,
                         MenuID = "settings_manager",
                         Location = "admin/settings_manager.html",
-                        MenuPosition = 0,
+                        MenuPosition = 1,
                         MenuTitle = "MenuSettingsManager",
                         MenuToolTip = "TooltipsMenuSettingsManager"
                     },
                     new GridPage {
                         ShowInMenu = true,
                         AdminRequired = true,
+                        MenuID = "gridsettings_manager",
+                        Location = "admin/gridsettings_manager.html",
+                        MenuPosition = 0,
+                        MenuTitle = "MenuGridSettings",
+                        MenuToolTip = "TooltipsMenuGridSettings"
+                    },
+                    new GridPage {
+                        ShowInMenu = true,
+                        AdminRequired = true,
                         MenuID = "welcomescreen_manager",
                         Location = "admin/welcomescreen_manager.html",
-                        MenuPosition = 2,
+                        MenuPosition = 3,
                         MenuTitle = "MenuWelcomeScreenManager",
                         MenuToolTip = "TooltipsMenuWelcomeScreenManager"
                                                                 

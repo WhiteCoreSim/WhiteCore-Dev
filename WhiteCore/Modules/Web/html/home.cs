@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using OpenMetaverse;
 using System.Collections.Generic;
@@ -117,8 +116,8 @@ namespace WhiteCore.Modules.Web
             vars.Add("ForgotPassword", translator.GetTranslatedString("ForgotPassword"));
             vars.Add("Submit", translator.GetTranslatedString("Login"));
 
-            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector>();
-            var settings = generics.GetGeneric<GridSettings>(UUID.Zero, "WebSettings", "Settings");
+            var settings = webInterface.GetWebUISettings();
+
             if (PagesMigrator.RequiresUpdate() &&
                 PagesMigrator.CheckWhetherIgnoredVersionUpdate(settings.LastPagesVersionUpdateIgnored))
                 vars.Add("PagesUpdateRequired",

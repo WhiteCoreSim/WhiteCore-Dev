@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.DatabaseInterfaces;
@@ -47,6 +46,7 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using FriendInfo = WhiteCore.Framework.Services.FriendInfo;
 using GridRegion = WhiteCore.Framework.Services.GridRegion;
+using WhiteCore.Modules.Web;
 
 namespace WhiteCore.Services
 {
@@ -97,6 +97,11 @@ namespace WhiteCore.Services
             get { return m_MinLoginLevel; }
         }
 
+        public string WelcomeMessage
+        {
+            get { return m_WelcomeMessage; }
+            set { m_WelcomeMessage = value; }
+        }
         public void Initialize(IConfigSource config, IRegistryCore registry)
         {
             m_config = config;
@@ -143,6 +148,12 @@ namespace WhiteCore.Services
                 WebClient client = new WebClient();
                 m_WelcomeMessage = client.DownloadString(m_WelcomeMessageURL);
             }
+            // load web settings overrides (if any)
+            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
+            var settings = generics.GetGeneric<GridSettings> (UUID.Zero, "GridSettings", "Settings");
+            if (settings != null)
+                m_WelcomeMessage = settings.WelcomeMessage;
+
             LLLoginResponseRegister.RegisterValue("Message", m_WelcomeMessage);
             m_RequireInventory = m_loginServerConfig.GetBoolean("RequireInventory", true);
             m_AllowRemoteSetLoginLevel = m_loginServerConfig.GetBoolean("AllowRemoteSetLoginLevel", false);
@@ -152,6 +163,8 @@ namespace WhiteCore.Services
                                                   m_loginServerConfig.GetString("MoonTexture", moonTexture));
             LLLoginResponseRegister.RegisterValue("CloudTexture",
                                                   m_loginServerConfig.GetString("CloudTexture", cloudTexture));
+
+
             registry.RegisterModuleInterface<ILoginService>(this);
             m_registry = registry;
         }

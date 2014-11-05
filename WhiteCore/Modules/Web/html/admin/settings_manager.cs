@@ -25,9 +25,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
-using OpenMetaverse;
 using System.Collections.Generic;
 
 namespace WhiteCore.Modules.Web
@@ -61,8 +59,7 @@ namespace WhiteCore.Modules.Web
         {
             response = null;
             var vars = new Dictionary<string, object>();
-            IGenericsConnector connector = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector>();
-            var settings = connector.GetGeneric<GridSettings>(UUID.Zero, "WebSettings", "Settings");
+            var settings = webInterface.GetWebUISettings();
 
             if (requestParameters.ContainsKey("Submit"))
             {
@@ -82,21 +79,21 @@ namespace WhiteCore.Modules.Web
                     settings.HideStyleBar = true;                               // not needed if a local style is used
                 }
 
-                connector.AddGeneric(UUID.Zero, "WebSettings", "Settings", settings.ToOSD());
+                webInterface.SaveWebUISettings (settings);
 
-                response = "Successfully updated settings.";
+                response = "Successfully updated WebUI settings.";
 
                 return null;
             }
             else if (requestParameters.ContainsKey("IgnorePagesUpdates"))
             {
                 settings.LastPagesVersionUpdateIgnored = PagesMigrator.CurrentVersion;
-                connector.AddGeneric(UUID.Zero, "WebSettings", "Settings", settings.ToOSD());
+                webInterface.SaveWebUISettings (settings);
             }
             else if (requestParameters.ContainsKey("IgnoreSettingsUpdates"))
             {
                 settings.LastSettingsVersionUpdateIgnored = PagesMigrator.CurrentVersion;
-                connector.AddGeneric(UUID.Zero, "WebSettings", "Settings", settings.ToOSD());
+                webInterface.SaveWebUISettings (settings);
             }
             vars.Add("WebRegistrationNo", !settings.WebRegistration ? "selected=\"selected\"" : "");
             vars.Add("WebRegistrationYes", settings.WebRegistration ? "selected=\"selected\"" : "");
@@ -133,6 +130,7 @@ namespace WhiteCore.Modules.Web
             vars.Add("GridCenterYText", translator.GetTranslatedString("GridCenterYText"));
             vars.Add("LocalFrontPageText", translator.GetTranslatedString("LocalFrontPageText"));
             vars.Add("LocalCSSText", translator.GetTranslatedString("LocalCSSText"));
+            vars.Add("WelcomeMessageText", translator.GetTranslatedString("WelcomeMessageText"));
             vars.Add("HideSlideshowBarText", translator.GetTranslatedString("HideSlideshowBarText"));
             vars.Add("HideLanguageBarText", translator.GetTranslatedString("HideLanguageBarText"));
             vars.Add("HideStyleBarText", translator.GetTranslatedString("HideStyleBarText"));

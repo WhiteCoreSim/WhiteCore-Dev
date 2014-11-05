@@ -16,7 +16,7 @@
 
 <h2>{SystemName}: {SettingsManager}</h2>
 <form id="settings_manager_form" action="admin/settings_manager.html" method="post">
-<div id="error_message" class="error"><h3></h3></div>
+<div id="info_message" class="info"><h3></h3></div>
 <table id="settings_manager">
   <caption></caption>
   
@@ -108,7 +108,7 @@
     /* Send the data using post and put the results in a div */
     $.post( url, $form.serialize(),
       function( data ) {
-		$("#error_message").empty().append("<h3>" + data + "</h3>");
+		$("#info_message").empty().append("<p>" + data + "</p>");
       }
     );
   });

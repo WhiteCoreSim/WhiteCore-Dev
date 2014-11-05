@@ -1,0 +1,138 @@
+
+
+<script type="text/javascript" rel="javasript">
+	/* <![CDATA[ */
+		jQuery(document).ready(function($) {
+			$('div.user_agent_profile_picture').each(function(i) {
+				var img_ = $('img', this);			
+				var img_height = img_.attr('height');
+				var p_height = $('p', this).outerHeight();
+				$(this).height(img_height);
+				$(this).hover(function() {
+					img_.animate({marginTop : -p_height-10}, 500);
+				}, function() {
+					img_.animate({marginTop : '0'}, 500);
+				});
+			});		
+		});
+	/* ]]> */
+</script>
+
+<h2>{SystemName}: {UserProfileFor} {UserName}</h2>
+<div id="user_agent_profile_container">
+<table id="user_agent_profile">
+  <caption></caption>
+  
+  <thead>
+    <tr>
+      <th class="user_agent_profile_left"></th>
+      <th class="user_agent_profile_right"></th>
+	  <th class="user_agent_profile_right"></th>
+    </tr>
+  </thead>
+  
+  <tfoot>
+    <tr>
+      <th class="user_agent_profile_left"></th>
+      <th class="user_agent_profile_right"></th>
+	  <th class="user_agent_profile_right"></th>
+    </tr>
+  </tfoot>
+
+  <tbody>
+    <tr>
+      <td class="user_agent_profile_picture" rowspan="6"> <!-- we need a variable for rowspan -->
+	    <div class="user_agent_profile_picture">
+	    <a href="#">
+	    <img height="256"
+		     src="{UserPictureURL}" 
+		     alt="{UserProfileFor}: {UserName} ({UserType})"
+			 title="{UserProfileFor}: {UserName} ({UserType})" /></a>
+	    <p class="user_agent_profile_picture_text">{UserProfileFor}: {UserName} ({UserType})</p></div>
+	  </td>
+      <td class="user_agent_profile_left_size"><p>{UserProfileFor}:</p></td>
+	  <td class="user_agent_profile_right"><p>{UserName}</p></td>
+    </tr>
+    <tr>
+      <td class="user_agent_profile_left"><p>{IsOnlineText}:</p></td>
+      <td class="user_agent_profile_right"><p>{IsOnline}</p></td>
+    </tr>
+{IfUserIsOnlineBegin}
+    <tr>
+      <td class="user_agent_profile_left"><p>{OnlineLocationText}:</p></td>
+      <td class="user_agent_profile_right"><p>{OnlineLocation}</p></td>
+    </tr>
+{IfUserIsOnlineEnd}
+    <tr>
+      <td class="user_agent_profile_left"><p>{ResidentSince}:</p></td>
+      <td class="user_agent_profile_right"><p>{UserBorn}</p></td>
+    </tr>
+    <tr>
+      <td class="user_agent_profile_left"><p>{AccountType}:</p></td>
+      <td class="user_agent_profile_right"><p>{UserType}</p></td>
+    </tr>
+    <tr>
+      <td class="user_agent_profile_left"><p>{PartnersName}:</p></td>
+      <td class="user_agent_profile_right"><p>{UserPartner}</p></td>
+    </tr>
+    <tr>
+      <td class="user_agent_profile_left"><p>{AboutMe}:</p></td>
+      <td class="user_agent_profile_right"><p>{UserAboutMe}</p></td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<!-- Group Carousel -->
+<script src="../javascripts/jquery.jcarousellite.js"></script>
+<script>
+		jQuery(document).ready(function($) {
+			$('div.group_profile_picture').each(function(i) {
+				var img_ = $('img', this);			
+				var img_height = img_.attr('height');
+				var p_height = $('p', this).outerHeight();
+				$(this).height(img_height);
+				$(this).hover(function() {
+					img_.animate({marginTop : -p_height-5}, 500);
+				}, function() {
+					img_.animate({marginTop : '0'}, 500);
+				});
+			});		
+		});
+
+</script>
+
+<script>
+	$(function() {
+    	$('.groupscarousel').jCarouselLite({
+        	btnNext: '.next-horiz-big',
+        	btnPrev: '.prev-horiz-big',
+        	visible: 3
+   		});
+	});
+</script>
+
+<h2>{SystemName}: {UsersGroupsText} by {UserName} ({GroupsJoined})</h2>
+<div id="group_profile_container">
+    <div class="prev-horiz-big">◄</div>
+    <div class="next-horiz-big">►</div> 
+    <center>
+    <div class="groupscarousel">
+    <ul id="groupcarousel" class="jcarousel-skin-aurora-bigsize jcarousel-bigsize">
+{GroupsArrayBegin}
+	<li>
+	    <div class="group_profile_picture">
+	    <a href="#">
+	    <img height="256"
+		     src="{GroupPictureURL}" 
+		     alt="{GroupNameText}: {GroupName}"
+			 title="{GroupNameText}: {GroupName}" /></a>
+		<p class="group_profile_picture_text">{GroupNameText}: {GroupName}</p>
+		</div>
+	</li>
+{GroupsArrayEnd}
+  </ul>
+  </div>
+  </center>
+<span class="clear"></span>
+</div>

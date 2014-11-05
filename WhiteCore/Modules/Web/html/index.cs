@@ -25,9 +25,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
-using OpenMetaverse;
 using System.Collections.Generic;
 
 namespace WhiteCore.Modules.Web
@@ -67,9 +65,9 @@ namespace WhiteCore.Modules.Web
 
             List<Dictionary<string, object>> pages = new List<Dictionary<string, object>>();
 
-            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector>();
-            var settings = generics.GetGeneric<GridSettings>(UUID.Zero, "WebSettings", "Settings");
-            GridPage rootPage = generics.GetGeneric<GridPage>(UUID.Zero, "WebPages", "Root");
+            var settings = webInterface.GetWebUISettings();
+            var rootPage = webInterface.GetGridPages();
+
             rootPage.Children.Sort((a, b) => a.MenuPosition.CompareTo(b.MenuPosition));
 
             foreach (GridPage page in rootPage.Children)

@@ -171,139 +171,93 @@
                 case "NumberOfUsersInRegionText":
                     return "Anzahl der Benutzer in Region";
 
-                    // Menu Buttons
-                case "MenuHome":
-                    return "Home";
-                case "MenuLogin":
-                    return "Login";
-                case "MenuLogout":
-                    return "Logout";
-                case "MenuRegister":
-                    return "Registrieren";
-                case "MenuForgotPass":
-                    return "Passwort vergessen";
-                case "MenuNews":
-                    return "Nachrichten";
-                case "MenuWorld":
-                    return "Welt";
-                case "MenuWorldMap":
-                    return "Weltkarte";
-                case "MenuRegion":
-                    return "Regionsliste";
-                case "MenuUser":
-                    return "Benutzer";
-                case "MenuOnlineUsers":
-                    return "Benutzer online";
-                case "MenuUserSearch":
-                    return "Benutzersuche";
-                case "MenuRegionSearch":
-                    return "Regionssuche";
-                case "MenuChat":
-                    return "Chat";
-                case "MenuHelp":
-                    return "Hilfe";
-                case "MenuChangeUserInformation":
-                    return "Ändere Benutzer Informationen";
-                case "MenuWelcomeScreenManager":
-                    return "Willkommen Screen Manager";
-                case "MenuNewsManager":
-                    return "Nachrichten Manager";
-                case "MenuUserManager":
-                    return "Benutzer Manager";
-                case "MenuFactoryReset":
-                    return "Zurücksetzen";
-                case "ResetMenuInfoText":
-                    return "Setzt das Menü auf die meist üblichen Standardwerte zurück";
-                case "ResetSettingsInfoText":
-                    return "Setzt die Webinterface Einstellungen auf die meist üblichen Standardwerte zurück";
-                case "MenuPageManager":
-                    return "Seitenmanager";
-                case "MenuSettingsManager":
-                    return "Einstellungsmanager";
-                case "MenuManager":             return "Management";
-            case "MenuSettings":                return "Einstellungen";
-            case "MenuRegionManager":           return "Region-Manager";
-            case "MenuManagerSimConsole":       return "Simulator-Konsole";
-            case "MenuPurchases":               return "Benutzer Einkäufe";
-            case "MenuTransactions":            return "Benutzertransaktionen";
-            case "MenuStatistics":              return "Viewer-Statistiken";
+                // Menu Buttons
+            case "MenuHome":                            return "Home";
+            case "MenuLogin":                           return "Login";
+            case "MenuLogout":                          return "Logout";
+            case "MenuRegister":                        return "Registrieren";
+            case "MenuForgotPass":                      return "Passwort vergessen";
+            case "MenuNews":                            return "Nachrichten";
+            case "MenuWorld":                           return "Welt";
+            case "MenuWorldMap":                        return "Weltkarte";
+            case "MenuRegion":                          return "Regionsliste";
+            case "MenuUser":                            return "Benutzer";
+            case "MenuOnlineUsers":                     return "Benutzer online";
+            case "MenuUserSearch":                      return "Benutzersuche";
+            case "MenuRegionSearch":                    return "Regionssuche";
+            case "MenuChat":                            return "Chat";
+            case "MenuHelp":                            return "Hilfe";
+            case "MenuChangeUserInformation":           return "Ändere Benutzer Informationen";
+            case "MenuWelcomeScreenManager":            return "Willkommen Screen Manager";
+            case "MenuNewsManager":                     return "Nachrichten Manager";
+            case "MenuUserManager":                     return "Benutzer Manager";
+            case "MenuFactoryReset":                    return "Zurücksetzen";
+            case "ResetMenuInfoText":                   return "Setzt das Menü auf die meist üblichen Standardwerte zurück";
+            case "ResetSettingsInfoText":               return "Setzt die Webinterface Einstellungen auf die meist üblichen Standardwerte zurück";
+            case "MenuPageManager":                     return "Seitenmanager";
+            case "MenuSettingsManager":                 return "Einstellungsmanager";
+            case "MenuManager":                         return "Management";
+            case "MenuSettings":                        return "Einstellungen";
+            case "MenuRegionManager":                   return "Region-Manager";
+            case "MenuManagerSimConsole":               return "Simulator-Konsole";
+            case "MenuPurchases":                       return "Benutzer Einkäufe";
+            case "MenuMyPurchases":                     return "Meine Käufe";
+            case "MenuTransactions":                    return "Benutzertransaktionen";
+            case "MenuMyTransactions":                  return "Meine Vorgänge";
+            case "MenuStatistics":                      return "Viewer-Statistiken";
+            case "MenuGridSettings":                    return "Grid-Einstellungen";
 
-                    // Tooltips Menu Buttons
-                case "TooltipsMenuHome":
-                    return "Home";
-                case "TooltipsMenuLogin":
-                    return "Login";
-                case "TooltipsMenuLogout":
-                    return "Logout";
-                case "TooltipsMenuRegister":
-                    return "Register";
-                case "TooltipsMenuForgotPass":
-                    return "Passwort vergessen";
-                case "TooltipsMenuNews":
-                    return "Nachrichten";
-                case "TooltipsMenuWorld":
-                    return "Welt";
-                case "TooltipsMenuWorldMap":
-                    return "Weltkarte";
-                case "TooltipsMenuUser":
-                    return "Benutzer";
-                case "TooltipsMenuOnlineUsers":
-                    return "Benutzer Online";
-                case "TooltipsMenuUserSearch":
-                    return "Benutzersuche";
-                case "TooltipsMenuRegionSearch":
-                    return "Regionssuche";
-                case "TooltipsMenuChat":
-                    return "Chat";
-                case "TooltipsMenuHelp":
-                    return "Hilfe";
-                case "TooltipsMenuChangeUserInformation":
-                    return "Benutzerinformationen ändern";
-                case "TooltipsMenuWelcomeScreenManager":
-                    return "Willkommen Screen Manager";
-                case "TooltipsMenuNewsManager":
-                    return "Nachrichten Manager";
-                case "TooltipsMenuUserManager":
-                    return "Benutzermanager";
-                case "TooltipsMenuFactoryReset":
-                    return "Zurücksetzen";
-                case "TooltipsMenuPageManager":
-                    return "Seitenmanager";
-                case "TooltipsMenuSettingsManager":
-                    return "Einstellungsmanager";
-                case "TooltipsMenuManager":
-                    return "Admin Management";
-            case "TooltipsMenuSettings":
-                return "WebUI Einstellungen";
-            case  "TooltipsMenuRegionManager":
-                return "Region erstellen / bearbeiten";
-            case "TooltipsMenuManagerSimConsole":
-                return "Online-Simulator-Konsole";
+                // Tooltips Menu Buttons
+            case "TooltipsMenuHome":                    return "Home";
+            case "TooltipsMenuLogin":                   return "Login";
+            case "TooltipsMenuLogout":                  return "Logout";
+            case "TooltipsMenuRegister":                return "Register";
+            case "TooltipsMenuForgotPass":              return "Passwort vergessen";
+            case "TooltipsMenuNews":                    return "Nachrichten";
+            case "TooltipsMenuWorld":                   return "Welt";
+            case "TooltipsMenuWorldMap":                return "Weltkarte";
+            case "TooltipsMenuUser":                    return "Benutzer";
+            case "TooltipsMenuOnlineUsers":             return "Benutzer Online";
+            case "TooltipsMenuUserSearch":              return "Benutzersuche";
+            case "TooltipsMenuRegionSearch":            return "Regionssuche";
+            case "TooltipsMenuChat":                    return "Chat";
+            case "TooltipsMenuHelp":                    return "Hilfe";
+            case "TooltipsMenuChangeUserInformation":   return "Benutzerinformationen ändern";
+            case "TooltipsMenuWelcomeScreenManager":    return "Willkommen Screen Manager";
+            case "TooltipsMenuNewsManager":             return "Nachrichten Manager";
+            case "TooltipsMenuUserManager":             return "Benutzermanager";
+            case "TooltipsMenuFactoryReset":            return "Zurücksetzen";
+            case "TooltipsMenuPageManager":             return "Seitenmanager";
+            case "TooltipsMenuSettingsManager":         return "Einstellungsmanager";
+            case "TooltipsMenuManager":                 return "Admin Management";
+            case "TooltipsMenuSettings":                return "WebUI Einstellungen";
+            case "TooltipsMenuRegionManager":           return "Region erstellen / bearbeiten";
+            case "TooltipsMenuManagerSimConsole":       return "Online-Simulator-Konsole";
             case "TooltipsMenuPurchases":               return "Kaufinformationen";
-            case "TooltipsMenuTransactions":
-                return "Transaktionsinformationen";
+            case "TooltipsMenuTransactions":            return "Transaktionsinformationen";
             case "TooltipsMenuStatistics":              return "Viewer-Statistiken";
+            case "TooltipsMenuGridSettings":            return "Grid-Einstellungen";
 
             // Menu Region
-            case "MenuRegionTitle":                    return "Regionen";
-            case "MenuParcelTitle":                    return "Parzelle";
-            case "MenuOwnerTitle":                    return "Owner";
-            case "TooltipsMenuRegion":                return "Regions Liste";
-            case "TooltipsMenuParcel":          return "Region Pakete";
-            case "TooltipsMenuOwner":           return "Immobilienbesitzer";
+            case "MenuRegionTitle":                     return "Regionen";
+            case "MenuParcelTitle":                     return "Parzelle";
+            case "MenuOwnerTitle":                      return "Owner";
+            case "TooltipsMenuRegion":                  return "Regions Liste";
+            case "TooltipsMenuParcel":                  return "Region Pakete";
+            case "TooltipsMenuOwner":                   return "Immobilienbesitzer";
 
             // Menu Profile
             case "MenuProfileTitle":                    return "Profil";
-            case "MenuGroupTitle":                    return "Gruppe";
-            case "MenuPicksTitle":                    return "Auswahl";
-            case "MenuRegionsTitle":            return "Regionen";
-            case "TooltipsMenuProfile":         return "Benutzerprofil";
-            case "TooltipsMenuGroups":          return "Benutzergruppen";
-            case "TooltipsMenuPicks":           return "Benutzer Picks";
-            case "TooltipsMenuRegions":         return "Benutzer Regionen";
-            case "UserGroupNameText":               return "Benutzergruppe";
-            case "PickNameText":                return "Wählen Sie Namen";
-            case "PickRegionText":              return "Lage";
+            case "MenuGroupTitle":                      return "Gruppe";
+            case "MenuPicksTitle":                      return "Auswahl";
+            case "MenuRegionsTitle":                    return "Regionen";
+            case "TooltipsMenuProfile":                 return "Benutzerprofil";
+            case "TooltipsMenuGroups":                  return "Benutzergruppen";
+            case "TooltipsMenuPicks":                   return "Benutzer Picks";
+            case "TooltipsMenuRegions":                 return "Benutzer Regionen";
+            case "UserGroupNameText":                   return "Benutzergruppe";
+            case "PickNameText":                        return "Wählen Sie Namen";
+            case "PickRegionText":                      return "Lage";
 
                     // Urls
                 case "WelcomeScreen":
@@ -554,6 +508,14 @@
                     return "Benötigt Abmeldung für Anzeige";
                 case "RequiresAdminText":
                     return "Benötigt Adminrechte für Anzeige";
+
+            // grid settings
+            case "GridSettingsManager":         return "Grid Settings Manager";
+            case "GridnameText":                return "Grid Namen ";
+            case "GridnickText":                return "Grid Spitznamen ";
+            case "WelcomeMessageText":          return "Login Willkommen Nachrichten ";
+            case "SystemEstateNameText":        return "System Immobilienname ";
+            case "SystemEstateOwnerText":       return "System Gutsbesitzer Namen";
 
                     //settings manager page
                 case "WebRegistrationText":

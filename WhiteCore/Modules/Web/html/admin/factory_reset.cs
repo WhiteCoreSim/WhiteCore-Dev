@@ -64,13 +64,13 @@ namespace WhiteCore.Modules.Web
             if (requestParameters.ContainsKey("ResetMenu"))
             {
                 PagesMigrator.ResetToDefaults();
-                response = translator.GetTranslatedString("ChangesSavedSuccessfully");
+                response = "Menu: "+ translator.GetTranslatedString("ChangesSavedSuccessfully");
                 return null;
             }
             if (requestParameters.ContainsKey("ResetSettings"))
             {
-                SettingsMigrator.ResetToDefaults();
-                response = translator.GetTranslatedString("ChangesSavedSuccessfully");
+                SettingsMigrator.ResetToDefaults(webInterface);
+                response = "WebUI: "+ translator.GetTranslatedString("ChangesSavedSuccessfully");
                 return null;
             }
 

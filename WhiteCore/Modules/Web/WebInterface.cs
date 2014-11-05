@@ -47,6 +47,7 @@ using System.Text.RegularExpressions;
 using System.Web;
 using System.Xml;
 using System.Xml.Xsl;
+using WhiteCore.Framework.DatabaseInterfaces;
 
 namespace WhiteCore.Modules.Web
 {
@@ -60,6 +61,12 @@ namespace WhiteCore.Modules.Web
         protected Dictionary<string, IWebInterfacePage> _pages = new Dictionary<string, IWebInterfacePage>();
         protected List<ITranslator> _translators = new List<ITranslator>();
         protected ITranslator _defaultTranslator;
+
+        // webpages and settings cacheing
+        internal GridPage webPages;
+        internal WebUISettings webUISettings;
+        public GridSettings gridSettings;
+
 
         #endregion
 
@@ -167,7 +174,7 @@ namespace WhiteCore.Modules.Web
                 if (PagesMigrator.RequiresInitialUpdate())
                     PagesMigrator.ResetToDefaults();
                 if (SettingsMigrator.RequiresInitialUpdate())
-                    SettingsMigrator.ResetToDefaults();
+                    SettingsMigrator.ResetToDefaults(this);
             }
         }
 
@@ -748,6 +755,73 @@ namespace WhiteCore.Modules.Web
             return args;
         }
 
+        internal GridPage GetGridPages()
+        {
+            if (webPages == null)
+            {
+                IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
+                GridPage rootPage = generics.GetGeneric<GridPage> (UUID.Zero, "WebPages", "Root");
+                if (rootPage == null)
+                    rootPage = new GridPage ();
+            
+                return rootPage;
+            } 
+
+            return webPages;
+        }
+
+        internal WebUISettings GetWebUISettings()
+        {
+            if (webUISettings == null)
+            {
+                IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
+                var settings = generics.GetGeneric<WebUISettings> (UUID.Zero, "WebUISettings", "Settings");
+                if (settings == null)
+                    settings = new WebUISettings ();
+
+                return settings;
+            }
+
+            return webUISettings;
+        }
+
+        internal void SaveWebUISettings(WebUISettings settings)
+        {
+            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
+            generics.AddGeneric(UUID.Zero, "WebUISettings", "Settings", settings.ToOSD());
+
+            webUISettings = settings;;
+        }
+
+        public GridSettings GetGridSettings()
+        {
+            if (gridSettings == null)
+            {
+                IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
+                var settings = generics.GetGeneric<GridSettings> (UUID.Zero, "GridSettings", "Settings");
+                if (settings == null)
+                    settings = new GridSettings ();
+
+                return settings;
+            }
+
+            return gridSettings;
+        }
+
+        public void SaveGridSettings(GridSettings settings)
+        {
+            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
+            generics.AddGeneric(UUID.Zero, "GridSettings", "Settings", settings.ToOSD());
+
+            gridSettings = settings;
+
+            // change what's appropriate...
+            ILoginService loginService = Registry.RequestModuleInterface<ILoginService>();
+            loginService.WelcomeMessage = settings.WelcomeMessage;
+
+        }
+
+
         #endregion
 
         internal void Redirect(OSHttpResponse httpResponse, string url)
@@ -1039,7 +1113,47 @@ namespace WhiteCore.Modules.Web
         }
     }
 
-    internal class GridSettings : IDataTransferable
+    public class GridSettings : IDataTransferable
+    {
+        public string Gridname = "WhiteCore Grid";
+        public string Gridnick = "WhiteCore";
+        public string WelcomeMessage = "Welcome to WhiteCore, <USERNAME>!";
+        public string SystemEstateOwnerName = "Governor White";
+        public string SystemEstateName = "Whitecore Estate";
+
+        public GridSettings()
+        {
+        }
+
+        public GridSettings(OSD map)
+        {
+            FromOSD(map as OSDMap);
+        }
+
+        public override void FromOSD(OSDMap map)
+        {
+            Gridname = map["Gridname"];
+            Gridnick = map["Gridnick"];
+            WelcomeMessage = map["WelcomeMessage"];
+            SystemEstateOwnerName = map["SystemEstateOwnerName"];
+            SystemEstateName = map["SystemEstateName"];
+        }
+
+        public override OSDMap ToOSD()
+        {
+            OSDMap map = new OSDMap();
+
+            map["Gridname"] = Gridname;
+            map["Gridnick"] = Gridnick;
+            map["WelcomeMessage"] = WelcomeMessage;
+            map["SystemEstateOwnerName"] = SystemEstateOwnerName;
+            map["SystemEstateName"] = SystemEstateName;
+
+            return map;
+        }
+    }
+
+    internal class WebUISettings : IDataTransferable
     {
         public Vector2 MapCenter = Vector2.Zero;
         public uint LastPagesVersionUpdateIgnored = 0;
@@ -1052,11 +1166,11 @@ namespace WhiteCore.Modules.Web
         public string LocalFrontPage = "local/frontpage.html";
         public string LocalCSS = "local/";
 
-        public GridSettings()
+        public WebUISettings()
         {
         }
 
-        public GridSettings(OSD map)
+        public WebUISettings(OSD map)
         {
             FromOSD(map as OSDMap);
         }
@@ -1093,4 +1207,5 @@ namespace WhiteCore.Modules.Web
             return map;
         }
     }
+
 }

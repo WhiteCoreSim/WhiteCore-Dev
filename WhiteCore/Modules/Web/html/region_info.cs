@@ -190,9 +190,7 @@ namespace WhiteCore.Modules.Web
                 vars.Add("es", translator.GetTranslatedString("es"));
                 vars.Add("nl", translator.GetTranslatedString("nl"));
 
-                IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector>();
-                var settings = generics.GetGeneric<GridSettings>(UUID.Zero, "WebSettings", "Settings");
-
+                var settings = webInterface.GetWebUISettings();
                 vars.Add("ShowLanguageTranslatorBar", !settings.HideLanguageTranslatorBar);
                 vars.Add("ShowStyleBar", !settings.HideStyleBar);
 

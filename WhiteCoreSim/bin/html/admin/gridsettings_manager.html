@@ -1,0 +1,82 @@
+<!-- params to replace
+
+{SystemURL}
+{SystemName}
+{WebRegistrationText}
+{GridCenterX}
+{GridCenterY}
+{SettingsManager}               Settings Manager
+{GridCenterXText}               Grid Center Location X
+{GridCenterYText}               Grid Center Location Y
+{GoogleMapAPIKeyText}           Google Maps API Key
+{GoogleMapAPIKeyHelpText}       Google Maps API Key
+{ChangesSavedSuccessfully}      Changes saved successfully
+{Save}                          Save
+-->
+
+<h2>{SystemName}: {GridSettingsManager}</h2>
+<form id="gridsettings_manager_form" action="admin/gridsettings_manager.html" method="post">
+<div id="info_message" class="info"></div>
+<table id="settings_manager">
+  <caption></caption>
+  
+  <thead>
+    <tr>
+      <th class="settings_manager_left"></th>
+      <th class="settings_manager_right"></th>
+    </tr>
+  </thead>
+
+  <tfoot>
+    <tr>
+      <th class="settings_manager_left"></th>
+      <th class="settings_manager_right"></th>
+    </tr>
+  </tfoot>
+
+  <tbody>
+    <tr>
+      <td class="settings_manager_left"><p>{GridnameText}</p></td>
+      <td class="settings_manager_right"><input name="Gridname" type="text" id="Gridname" size="119" value="{Gridname}" /></td>
+      <td class="settings_manager_left"><p>{GridnickText}</p></td>
+      <td class="settings_manager_right"><input name="Gridnick" type="text" id="Gridnick" size="119" value="{Gridnick}" /></td>
+    </tr>
+    <tr>
+      <td class="settings_manager_left"><p>{SystemEstateOwnerText}</p></td>
+      <td class="settings_manager_right"><input name="SystemEstateOwnerName" type="text" id="SystemEstateOwnerName" size="119" value="{SystemEstateOwnerName}" /></td>
+      <td class="settings_manager_left"><p>{SystemEstateNameText}</p></td>
+      <td class="settings_manager_right"><input name="SystemEstateName" type="text" id="SystemEstateName" size="119" value="{SystemEstateName}" /></td>
+    </tr>
+    <tr>
+      <td class="settings_manager_left"><p>{WelcomeMessageText}</p></td>
+      <td class="settings_manager_right"><input name="WelcomeMessage" type="text" id="WelcomeMessage" size="119" value="{WelcomeMessage}" /></td>
+      <td class="settings_manager_left"></td>
+      <td class="settings_manager_right"></td>
+    </tr>
+    <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+	  <input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
+      <td class="settings_manager_right"><button id="Submit" type="Submit" name="Submit" style="width:100px;">{Save}</button></td>
+    </tr>
+  </tbody>
+</table>
+</form>
+<script>
+  /* attach a submit handler to the form */
+  $("#gridsettings_manager_form").submit(function(event) {
+
+    /* stop form from submitting normally */
+    event.preventDefault(); 
+    /* get some values from elements on the page: */
+    var $form = $( this ),
+        url = $form.attr( 'action' );
+    /* Send the data using post and put the results in a div */
+    $.post( url, $form.serialize(),
+      function( data ) {
+		$("#info_message").empty().append("<p>" + data + "</p>");
+      }
+    );
+  });
+</script>

@@ -36,7 +36,7 @@ using Nini.Config;
 
 namespace WhiteCore.Modules.Web
 {
-    public class AdminUserPurchasesPage : IWebInterfacePage
+    public class UserPurchasesPage : IWebInterfacePage
     {
         public string[] FilePath
         {
@@ -44,7 +44,7 @@ namespace WhiteCore.Modules.Web
             {
                 return new[]
                            {
-                               "html/admin/purchases.html"
+                               "html/user_purchases.html"
                            };
             }
         }
@@ -56,7 +56,7 @@ namespace WhiteCore.Modules.Web
 
         public bool RequiresAdminAuthentication
         {
-            get { return true; }
+            get { return false; }
         }
 
         public Dictionary<string, object> Fill(WebInterface webInterface, string filename, OSHttpRequest httpRequest,
@@ -73,11 +73,13 @@ namespace WhiteCore.Modules.Web
 
             uint amountPerQuery = 25;
             var today = DateTime.Now;
-            var thirtyDays = today.AddDays (-30);
+            var thirtyDays = today.AddDays (-7);
             string DateStart = thirtyDays.ToShortDateString();
             string DateEnd = today.ToShortDateString();
             string UserName = "";
             UUID UserID = UUID.Zero;
+            int start = 0;
+ 
 
             IMoneyModule moneyModule = webInterface.Registry.RequestModuleInterface<IMoneyModule>();
             string noDetails = translator.GetTranslatedString ("NoPurchasesText");
@@ -89,26 +91,9 @@ namespace WhiteCore.Modules.Web
                     DateStart = requestParameters ["date_start"].ToString ();
                 if (requestParameters.ContainsKey ("date_end"))
                     DateEnd = requestParameters ["date_end"].ToString ();
-                if (requestParameters.ContainsKey ("user_name"))
-                    UserName = requestParameters ["user_name"].ToString ();
-                             
-                IUserAccountService accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
-
-                if (UserName != "")
-                {
-                    // TODO: Work out a better way to catch this
-                    UserID = (UUID) Constants.LibraryOwner;         // This user should hopefully never have transactions
-
-                    if (UserName.Split (' ').Length == 2)
-                    {
-                        var userAccount = accountService.GetUserAccount (null, UserName);
-                        if (userAccount != null)
-                            UserID = userAccount.PrincipalID;
-                    }
-                }
 
                 // pagination
-                int start = httpRequest.Query.ContainsKey ("Start")
+                start = httpRequest.Query.ContainsKey ("Start")
                     ? int.Parse (httpRequest.Query ["Start"].ToString ())
                     : 0;
                 int count = (int) moneyModule.NumberOfPurchases(UserID);
@@ -120,45 +105,6 @@ namespace WhiteCore.Modules.Web
                 vars.Add ("CurrentPage", start);
                 vars.Add ("NextOne", start + 1 > maxPages ? start : start + 1);
                 vars.Add ("BackOne", start - 1 < 0 ? 0 : start - 1);
-
-                // Purchases Logs
-                var timeNow = DateTime.Now.ToString ("HH:mm:ss");
-                var dateFrom = DateTime.Parse (DateStart + " " + timeNow);
-                var dateTo = DateTime.Parse (DateEnd + " " + timeNow);
-                List<AgentPurchase> purchases;
-                if (UserID != UUID.Zero)
-                    purchases = moneyModule.GetPurchaseHistory (UserID, dateFrom, dateTo, (uint)start, amountPerQuery);
-                else
-                    purchases = moneyModule.GetPurchaseHistory (dateFrom, dateTo, (uint)start, amountPerQuery);
-
-
-
-                // data
-                if (purchases.Count > 0)
-                {
-                    noDetails = "";
-
-                    foreach (var purchase in purchases)
-                    {
-                        var account = accountService.GetUserAccount (null, purchase.AgentID);
-                        string AgentName = "";
-                        if (account != null)
-                            AgentName = account.Name;
-
-                        purchasesList.Add (new Dictionary<string, object> {
-                            { "ID", purchase.ID },
-                            { "AgentID", purchase.AgentID },
-                            { "AgentName", AgentName },
-                            { "LoggedIP", purchase.IP },
-                            { "Description", "Purchase" },
-                            { "Amount",purchase.Amount },
-                            { "RealAmount",((float) purchase.RealAmount/100).ToString("0.00") },
-                            { "PurchaseDate", Culture.LocaleDate (purchase.PurchaseDate.ToLocalTime(), "MMM dd, hh:mm:ss tt") },
-                            { "UpdateDate", Culture.LocaleDate (purchase.UpdateDate.ToLocalTime(), "MMM dd, hh:mm:ss tt") }
-
-                        });
-                    }
-                }
             } else
             {
                 vars.Add ("CurrentPage", 0);
@@ -167,11 +113,42 @@ namespace WhiteCore.Modules.Web
 
             }
 
+            UserAccount user = Authenticator.GetAuthentication(httpRequest);
+
+            // Purchases Logs
+            var timeNow = DateTime.Now.ToString ("HH:mm:ss");
+            var dateFrom = DateTime.Parse (DateStart + " " + timeNow);
+            var dateTo = DateTime.Parse (DateEnd + " " + timeNow);
+            TimeSpan period = dateTo.Subtract (dateFrom);
+
+            List<AgentPurchase> purchases;
+            purchases = moneyModule.GetPurchaseHistory (user.PrincipalID, dateFrom, dateTo, (uint)start, amountPerQuery);
+
+            // data
+            if (purchases.Count > 0)
+            {
+                noDetails = "";
+
+                foreach (var purchase in purchases)
+                {
+                    purchasesList.Add (new Dictionary<string, object> {
+                        { "ID", purchase.ID },
+                        { "AgentID", purchase.AgentID },
+                        { "AgentName", user.Name },
+                        { "LoggedIP", purchase.IP },
+                        { "Description", "Purchase" },
+                        { "Amount",purchase.Amount },
+                        { "RealAmount",((float) purchase.RealAmount/100).ToString("0.00") },
+                        { "PurchaseDate", Culture.LocaleDate (purchase.PurchaseDate.ToLocalTime(), "MMM dd, hh:mm:ss tt") },
+                        { "UpdateDate", Culture.LocaleDate (purchase.UpdateDate.ToLocalTime(), "MMM dd, hh:mm:ss tt") }
+
+                    });
+                }
+            }
+
             if (purchasesList.Count == 0)
             {
-                //start =  0;
-                //maxpages = 0;
-
+ 
                 purchasesList.Add(new Dictionary<string, object> {
                     {"ID", ""},
                     {"AgentID", ""},
@@ -189,7 +166,7 @@ namespace WhiteCore.Modules.Web
             // always required data
             vars.Add("DateStart", DateStart );
             vars.Add ("DateEnd", DateEnd );
-            vars.Add ("SearchUser", UserName);
+            vars.Add ("Period",  period.TotalDays + " " + translator.GetTranslatedString("DaysText"));
             vars.Add("PurchasesList",purchasesList);
             vars.Add ("NoPurchasesText", noDetails);
 

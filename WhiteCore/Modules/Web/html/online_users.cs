@@ -131,21 +131,25 @@ namespace WhiteCore.Modules.Web
                             continue;
 
                         var region = gridService.GetRegionByUUID (null, user.CurrentRegionID);
-                        var account = accountService.GetUserAccount (region.AllScopeIDs, UUID.Parse (user.UserID));
-                        if (account != null && region != null)
+                        if (region != null)
                         {
-                            usersList.Add (new Dictionary<string, object> {
-                                { "UserName", account.Name },
-                                { "UserRegion", region.RegionName },
-                                { "UserLocation",  user.CurrentPosition },
-                                { "UserID", user.UserID },
-                                { "UserRegionID", region.RegionID }
-                            });
+                            var account = accountService.GetUserAccount (region.AllScopeIDs, UUID.Parse (user.UserID));
+                            if (account != null)
+                            {
+                                usersList.Add (new Dictionary<string, object> {
+                                    { "UserName", account.Name },
+                                    { "UserRegion", region.RegionName },
+                                    { "UserLocation",  user.CurrentPosition },
+                                    { "UserID", user.UserID },
+                                    { "UserRegionID", region.RegionID }
+                                });
+                            }
                         }
                     }
                 }
             }
-            else
+
+            if (usersList.Count == 0)
             {
                 usersList.Add(
                     new Dictionary<string, object>

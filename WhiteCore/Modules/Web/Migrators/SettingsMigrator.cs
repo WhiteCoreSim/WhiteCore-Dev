@@ -27,23 +27,32 @@
 
 using WhiteCore.Framework.DatabaseInterfaces;
 using OpenMetaverse;
+using Nini.Config;
+using WhiteCore.Framework.Modules;
 
 namespace WhiteCore.Modules.Web
 {
     internal class SettingsMigrator
     {
         public static readonly string Schema = "WebSettings";
-        public static uint CurrentVersion = 1;
-        public static GridSettings _settings;
+        public static uint CurrentVersion = 2;
+        public static GridSettings _settingsGrid;
+        public static WebUISettings _settingsWebUI;
 
-        public static void InitializeDefaults()
+        public static void InitializeWebUIDefaults(WebInterface webinterface)
         {
-            _settings = new GridSettings
-                            {
-                                MapCenter = new Vector2(1000, 1000),
-                                LastSettingsVersionUpdateIgnored = CurrentVersion,
-                                LastPagesVersionUpdateIgnored = PagesMigrator.GetVersion()
-                            };
+            _settingsWebUI = new WebUISettings ();
+
+            _settingsWebUI.LastSettingsVersionUpdateIgnored = CurrentVersion;
+            _settingsWebUI.LastPagesVersionUpdateIgnored = PagesMigrator.GetVersion ();
+            _settingsWebUI.MapCenter = new Vector2 (1000, 1000);
+                         
+            var configSrc = webinterface.Registry.RequestModuleInterface<ISimulationBase> ().ConfigSource;
+            var loginConfig =  configSrc.Configs ["LoginService"];
+            if (loginConfig != null)
+            {
+                _settingsWebUI.WebRegistration = loginConfig.GetBoolean ("AllowAnonymousLogin", true);
+            }
         }
 
         public static bool RequiresUpdate()
@@ -70,17 +79,60 @@ namespace WhiteCore.Modules.Web
             return version == null || version.Info.AsInteger() < 1;
         }
 
-        public static void ResetToDefaults()
+        public static void GetGridConfigSettings(WebInterface webinterface)
         {
-            InitializeDefaults();
+            var configSrc = webinterface.Registry.RequestModuleInterface<ISimulationBase> ().ConfigSource;
+            IConfig config;
+            _settingsGrid = new GridSettings ();
+
+            // login
+            config =  configSrc.Configs ["LoginService"];
+            if (config != null)
+            {
+                _settingsGrid.WelcomeMessage = config.GetString("WelcomeMessage", _settingsGrid.WelcomeMessage);
+            }
+
+            // gridinfo
+            config =  configSrc.Configs ["GridInfoService"];
+            if (config != null)
+            {
+                _settingsGrid.Gridname = config.GetString("gridname", _settingsGrid.Gridname);
+                _settingsGrid.Gridnick = config.GetString("gridnick", _settingsGrid.Gridnick);
+            }
+
+            // Library
+//            config =  configSrc.Configs ["LibraryService"];
+//            if (config != null)
+//            {
+//                _settingsGrid.LibraryName = config.GetString("LibraryName", _settingsGrid.LibraryName);
+//                _settingsGrid.LibraryOwnerName = config.GetString("LibraryOwnerName", _settingsGrid.LibraryOwnerName);
+//            }
+            // RealEstate
+            config =  configSrc.Configs ["EstateService"];
+            if (config != null)
+            {
+                _settingsGrid.SystemEstateOwnerName = config.GetString("SystemEstateOwnerName", _settingsGrid.SystemEstateOwnerName);
+                _settingsGrid.SystemEstateName = config.GetString("SystemEstateName", _settingsGrid.SystemEstateName);
+            }
+
+
+        }
+
+        public static void ResetToDefaults(WebInterface webinterface)
+        {
+            InitializeWebUIDefaults(webinterface);
+            GetGridConfigSettings (webinterface);
 
             IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector>();
 
             //Remove all pages
-            generics.RemoveGeneric(UUID.Zero, Schema);
+            generics.RemoveGeneric(UUID.Zero, "WebUISettings");
+            generics.RemoveGeneric(UUID.Zero, "GridSettings");
+            generics.RemoveGeneric(UUID.Zero, "WebSettingsVersion");
 
-            generics.AddGeneric(UUID.Zero, Schema, "Settings", _settings.ToOSD());
-            generics.AddGeneric(UUID.Zero, Schema + "Version", "", new OSDWrapper {Info = CurrentVersion}.ToOSD());
+            generics.AddGeneric(UUID.Zero, "WebUISettings", "Settings", _settingsWebUI.ToOSD());
+            generics.AddGeneric(UUID.Zero, "GridSettings", "Settings",_settingsGrid.ToOSD());
+            generics.AddGeneric(UUID.Zero, "WebSettingsVersion", "", new OSDWrapper {Info = CurrentVersion}.ToOSD());
         }
 
         public static bool CheckWhetherIgnoredVersionUpdate(uint version)

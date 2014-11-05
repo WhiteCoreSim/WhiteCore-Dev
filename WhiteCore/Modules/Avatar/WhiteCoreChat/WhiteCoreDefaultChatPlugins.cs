@@ -27,12 +27,13 @@
 
 using System;
 using System.Collections.Generic;
-using WhiteCore.Framework;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using OpenMetaverse;
+using WhiteCore.Framework.DatabaseInterfaces;
+using WhiteCore.Modules.Web;
 
 namespace WhiteCore.Modules.Chat
 {
@@ -161,6 +162,12 @@ namespace WhiteCore.Modules.Chat
         private bool m_useWelcomeMessage;
         private string m_welcomeMessage;
 
+        public string WelcomeMessage
+        {
+            get { return m_welcomeMessage; }
+            set { m_welcomeMessage = value; }
+        }
+
         #region IChatPlugin Members
 
         public void Initialize(IChatModule module)
@@ -171,6 +178,7 @@ namespace WhiteCore.Modules.Chat
             //Send incoming users a message
             m_useWelcomeMessage = module.Config.GetBoolean("useWelcomeMessage", true);
             m_welcomeMessage = module.Config.GetString("welcomeMessage", "");
+
             //Tell all users about an incoming or outgoing agent
             m_announceNewAgents = module.Config.GetBoolean("announceNewAgents", true);
             m_announceClosedAgents = module.Config.GetBoolean("announceClosingAgents", true);
@@ -178,6 +186,13 @@ namespace WhiteCore.Modules.Chat
             chatModule = module;
             module.RegisterChatPlugin("Chat", this);
             module.RegisterChatPlugin("all", this);
+
+            // load web settings overrides (if any)
+            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
+            var settings = generics.GetGeneric<GridSettings> (UUID.Zero, "GridSettings", "Settings");
+            if (settings != null)
+                WelcomeMessage = settings.WelcomeMessage;
+
         }
 
         public bool OnNewChatMessageFromWorld(OSChatMessage c, out OSChatMessage newc)

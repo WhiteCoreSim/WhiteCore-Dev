@@ -25,20 +25,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.DatabaseInterfaces;
-using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
-using WhiteCore.Framework.Services.ClassHelpers.Profile;
-using WhiteCore.Framework.Utilities;
-using OpenMetaverse;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using OpenMetaverse;
+using WhiteCore.Framework.Utilities;
+using WhiteCore.Framework.Services.ClassHelpers.Profile;
+using WhiteCore.Framework.DatabaseInterfaces;
+using WhiteCore.Framework.Modules;
 
 namespace WhiteCore.Modules.Web
 {
-    public class AgentInfoPage : IWebInterfacePage
+    public class UserProfilePage : IWebInterfacePage
     {
         public string[] FilePath
         {
@@ -46,16 +45,14 @@ namespace WhiteCore.Modules.Web
             {
                 return new[]
                            {
-                               "html/webprofile/index.html",
-                               "html/webprofile/base.html",
-                               "html/webprofile/"
+                               "html/user_profile.html"
                            };
             }
         }
 
         public bool RequiresAuthentication
         {
-            get { return false; }
+            get { return true; }
         }
 
         public bool RequiresAdminAuthentication
@@ -64,45 +61,26 @@ namespace WhiteCore.Modules.Web
         }
 
         public Dictionary<string, object> Fill(WebInterface webInterface, string filename, OSHttpRequest httpRequest,
-                                               OSHttpResponse httpResponse, Dictionary<string, object> requestParameters,
-                                               ITranslator translator, out string response)
+            OSHttpResponse httpResponse, Dictionary<string, object> requestParameters,
+            ITranslator translator, out string response)
         {
             response = null;
             var vars = new Dictionary<string, object>();
 
-            string username = filename.Split('/').LastOrDefault();
-            UserAccount account = null;
-            if (httpRequest.Query.ContainsKey("userid"))
-            {
-                string userid = httpRequest.Query["userid"].ToString();
+            IWebHttpTextureService webhttpService =
+                webInterface.Registry.RequestModuleInterface<IWebHttpTextureService> ();
 
-                account = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
-                                       GetUserAccount(null, UUID.Parse(userid));
-            }
-            else if (httpRequest.Query.ContainsKey("name"))
-            {
-                string name = httpRequest.Query.ContainsKey("name") ? httpRequest.Query["name"].ToString() : username;
-                name = name.Replace('.', ' ');
-                name = name.Replace("%20", " ");
-                account = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
-                                       GetUserAccount(null, name);
-            }
-            else
-            {
-                username = username.Replace("%20", " ");
-                webInterface.Redirect(httpResponse, "/webprofile/?name=" + username);
-                return vars;
-            }
-
+            //string username = filename.Split('/').LastOrDefault();
+            UserAccount account = Authenticator.GetAuthentication(httpRequest);
             if (account == null)
                 return vars;
 
-			/* Allow access to the system user info - needed for Estate owner Profiles of regions
+            /* Allow access to the syatem user info - needed for Estate owner Profiles of regions
              var libraryOwner = new UUID(Constants.LibraryOwner);
-			var realestateOwner = new UUID(Constants.RealEstateOwnerUUID);
+            var realestateOwner = new UUID(Constants.RealEstateOwnerUUID);
 
             if ( (account.PrincipalID == libraryOwner) || (account.PrincipalID == realestateOwner) )
-				return vars;
+                return vars;
             */
 
             vars.Add("UserName", account.Name);
@@ -113,7 +91,7 @@ namespace WhiteCore.Modules.Web
             vars.Add("UserBorn", Util.ToDateTime(account.Created).ToShortDateString());
 
             IUserProfileInfo profile = Framework.Utilities.DataManager.RequestPlugin<IProfileConnector>().
-                                              GetUserProfile(account.PrincipalID);
+                GetUserProfile(account.PrincipalID);
             string picUrl = "../images/icons/no_avatar.jpg";
             if (profile != null)
             {
@@ -122,13 +100,11 @@ namespace WhiteCore.Modules.Web
                 if (profile.Partner != UUID.Zero)
                 {
                     account = webInterface.Registry.RequestModuleInterface<IUserAccountService> ().
-                                           GetUserAccount (null, profile.Partner);
+                        GetUserAccount (null, profile.Partner);
                     vars.Add ("UserPartner", account.Name);
                 } else
                     vars.Add ("UserPartner", "No partner");
                 vars.Add ("UserAboutMe", profile.AboutText == "" ? "Nothing here" : profile.AboutText);
-                IWebHttpTextureService webhttpService =
-                    webInterface.Registry.RequestModuleInterface<IWebHttpTextureService> ();
                 if (webhttpService != null && profile.Image != UUID.Zero)
                     picUrl = webhttpService.GetTextureURL (profile.Image);
             } else
@@ -158,9 +134,9 @@ namespace WhiteCore.Modules.Web
                         vars.Add("OnlineLocation", gridService.GetRegionByUUID(null, ourInfo.CurrentRegionID).RegionName);
                     vars.Add("UserIsOnline", ourInfo != null && ourInfo.IsOnline);
                     vars.Add("IsOnline",
-                             ourInfo != null && ourInfo.IsOnline
-                                 ? translator.GetTranslatedString("Online")
-                                 : translator.GetTranslatedString("Offline"));
+                        ourInfo != null && ourInfo.IsOnline
+                        ? translator.GetTranslatedString("Online")
+                        : translator.GetTranslatedString("Offline"));
                 }
                 else
                 {
@@ -175,6 +151,42 @@ namespace WhiteCore.Modules.Web
                 vars.Add("UserIsOnline", false);
                 vars.Add("IsOnline", translator.GetTranslatedString("Offline"));
             }
+
+            vars.Add("UsersGroupsText", translator.GetTranslatedString("UsersGroupsText"));
+
+            IGroupsServiceConnector groupsConnector =
+                Framework.Utilities.DataManager.RequestPlugin<IGroupsServiceConnector>();
+            List<Dictionary<string, object>> groups = new List<Dictionary<string, object>> ();
+
+            if (groupsConnector != null)
+            {
+                foreach (var grp in groupsConnector.GetAgentGroupMemberships(account.PrincipalID, account.PrincipalID))
+                {
+                    var grpData = groupsConnector.GetGroupProfile (account.PrincipalID, grp.GroupID);
+                    string url = "../images/icons/no_groups.jpg";
+                    if (webhttpService != null && grpData.InsigniaID != UUID.Zero)
+                        url = webhttpService.GetTextureURL (grpData.InsigniaID);
+                    groups.Add (new Dictionary<string, object> {
+                        { "GroupPictureURL", url },
+                        { "GroupName", grp.GroupName }
+                    });
+
+                }
+
+                if (groups.Count == 0)
+                {
+                    groups.Add (new Dictionary<string, object> {
+                        { "GroupPictureURL", "../images/icons/no_groups.jpg" },
+                        { "GroupName", "None yet" }
+                    });
+
+                }
+
+            }
+
+            vars.Add("GroupNameText", translator.GetTranslatedString("GroupNameText"));
+            vars.Add ("Groups", groups);
+            vars.Add ("GroupsJoined", groups.Count);
 
             // Menus
             vars.Add("MenuProfileTitle", translator.GetTranslatedString("MenuProfileTitle"));
@@ -223,9 +235,8 @@ namespace WhiteCore.Modules.Web
 
         public bool AttemptFindPage(string filename, ref OSHttpResponse httpResponse, out string text)
         {
-            httpResponse.ContentType = "text/html";
-            text = File.ReadAllText("html/webprofile/index.html");
-            return true;
+            text = "";
+            return false;
         }
     }
 }

@@ -136,6 +136,7 @@ namespace WhiteCore.Framework.Services
     public interface ILoginService
     {
         int MinLoginLevel { get; }
+        string WelcomeMessage { get; set; }
 
         bool VerifyClient(UUID AgentID, string name, string authType, string passwd);
 
