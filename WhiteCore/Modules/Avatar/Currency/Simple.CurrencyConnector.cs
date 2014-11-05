@@ -321,9 +321,9 @@ namespace Simple.Currency
             filter.andGreaterThanEqFilters["Created"] = Utils.DateTimeToUnixTime(dateStart);    // from...
             filter.andLessThanEqFilters["Created"] = Utils.DateTimeToUnixTime(dateEnd);         //...to
 
-            Dictionary<string, bool> sort = new Dictionary<string, bool>(2);
-            sort["ToName"] = true;
-            sort["FromName"] = true;
+            Dictionary<string, bool> sort = new Dictionary<string, bool>(1);
+            sort["Created"] = false;        // descending order
+            //sort["FromName"] = true;
 
             List<string> query = m_gd.Query(new string[] {"*"}, _REALMHISTORY, filter, sort, start, count);
 
@@ -395,9 +395,9 @@ namespace Simple.Currency
             filter.andLessThanEqFilters["Created"] = Utils.DateTimeToUnixTime(dateEnd);         //...to
 
 
-            Dictionary<string, bool> sort = new Dictionary<string, bool>(2);
-            sort["PrincipalID"] = true;
-            sort["Created"] = true;
+            Dictionary<string, bool> sort = new Dictionary<string, bool>(1);
+            //sort["PrincipalID"] = true;
+            sort["Created"] = false;        // descending order
 
             List<string> query = m_gd.Query(new string[] {"*"}, _REALMPURCHASE, filter, sort, start, count);
 
@@ -744,18 +744,12 @@ namespace Simple.Currency
                 MainConsole.Instance.Info("No account found");
                 return;
             }
+           
+            // log the transfer
+            UserCurrencyTransfer(account.PrincipalID, UUID.Zero, amount, "Money transfer", TransactionType.SystemGenerated, UUID.Zero);
+           
             var currency = GetUserCurrency(account.PrincipalID);
-            m_gd.Update(_REALM, new Dictionary<string, object>
-                {
-                    {
-                        "Amount", currency.Amount + amount
-                    }
-                }, null, new QueryFilter()
-                                         {
-                                             andFilters =
-                                                 new Dictionary<string, object> {{"PrincipalID", account.PrincipalID}}
-                                         }, null, null);
-            MainConsole.Instance.Info(account.Name + " now has $" + (currency.Amount + amount));
+            MainConsole.Instance.Info(account.Name + " now has $" + (currency.Amount));
 
             if (m_syncMessagePoster == null)
             {
@@ -769,8 +763,6 @@ namespace Simple.Currency
                     SendUpdateMoneyBalanceToClient(account.PrincipalID, UUID.Zero, toUserInfo.CurrentRegionURI, (currency.Amount + amount), "");
             }
 
-            // log the transfer
-            UserCurrencyTransfer(account.PrincipalID, UUID.Zero, amount, "Money transfer", TransactionType.SystemGenerated, UUID.Zero);
 
         }
 
@@ -789,18 +781,12 @@ namespace Simple.Currency
                 MainConsole.Instance.Info("No account found");
                 return;
             }
-            m_gd.Update(_REALM,
-                        new Dictionary<string, object>
-                            {
-                                {
-                                    "Amount", amount
-                                }
-                            }, null, new QueryFilter()
-                                         {
-                                             andFilters =
-                                                 new Dictionary<string, object> {{"PrincipalID", account.PrincipalID}}
-                                         }, null, null);
-            MainConsole.Instance.Info(account.Name + " now has $" + amount);
+
+            // log the transfer
+            UserCurrencyTransfer(account.PrincipalID, UUID.Zero, amount, "Set user money", TransactionType.SystemGenerated, UUID.Zero);
+
+            var currency = GetUserCurrency(account.PrincipalID);
+            MainConsole.Instance.Info(account.Name + " now has $" + currency.Amount);
 
             if (m_syncMessagePoster == null)
             {
@@ -814,9 +800,7 @@ namespace Simple.Currency
                     SendUpdateMoneyBalanceToClient(account.PrincipalID, UUID.Zero, toUserInfo.CurrentRegionURI, amount, "");
             }
 
-            // log the transfer
-            UserCurrencyTransfer(account.PrincipalID, UUID.Zero, amount, "Set user money", TransactionType.SystemGenerated, UUID.Zero);
-
+ 
         }
 
         public void GetMoney(IScene scene, string[] cmd)
