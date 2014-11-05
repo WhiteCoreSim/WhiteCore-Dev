@@ -99,6 +99,7 @@ namespace WhiteCore.Modules.Land
         private bool m_UpdateDirectoryOnTimer = true;
         private bool m_UpdateDirectoryOnUpdate;
         private Timer m_UpdateDirectoryTimer = new Timer();
+
         public UUID GodParcelOwner { get; set; }
         private string _godParcelOwner = "";
 
@@ -156,14 +157,21 @@ namespace WhiteCore.Modules.Land
                 m_UpdateDirectoryTimer.Start();
             }
 
-            //UUID godParcelOwner = UUID.Zero;
-            UUID godParcelOwner = (UUID)Constants.RealEstateOwnerUUID;
+            UUID godParcelOwner;
+            var regionType = scene.RegionInfo.RegionType.ToLower ();
+            if ( regionType.StartsWith('m') )
+                godParcelOwner = (UUID)Constants.GovernorUUID;              // Mainland reverts to the 'Guv'
+            else
+                godParcelOwner = (UUID)Constants.RealEstateOwnerUUID;       // Estates revert to the RealEstate Owner
+
+            // This is an override to the default GodOwner and allows specifying a specific user
             if (_godParcelOwner != "")
             {
                 UserAccount acc = m_scene.UserAccountService.GetUserAccount(null, _godParcelOwner);
                 if (acc != null)
                     godParcelOwner = acc.PrincipalID;
             }
+
             GodParcelOwner = godParcelOwner;
 
             m_scene.EventManager.OnAvatarEnteringNewParcel += EventManagerOnAvatarEnteringNewParcel;
