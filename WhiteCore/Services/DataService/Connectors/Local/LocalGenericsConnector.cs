@@ -64,10 +64,12 @@ namespace WhiteCore.Services.DataService
                     defaultConnectionString = source.Configs[Name].GetString("ConnectionString", defaultConnectionString);
 
                 if (GD != null)
-                    GD.ConnectToDatabase(defaultConnectionString, "Generics",
-                                         source.Configs["WhiteCoreConnectors"].GetBoolean("ValidateTables", true));
+                {
+                    GD.ConnectToDatabase (defaultConnectionString, "Generics",
+                        source.Configs ["WhiteCoreConnectors"].GetBoolean ("ValidateTables", true));
 
-                Framework.Utilities.DataManager.RegisterPlugin(this);
+                    Framework.Utilities.DataManager.RegisterPlugin (this);
+                }
             }
         }
 

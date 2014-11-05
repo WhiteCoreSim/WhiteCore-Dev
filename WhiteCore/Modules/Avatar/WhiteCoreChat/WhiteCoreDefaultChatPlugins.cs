@@ -33,7 +33,7 @@ using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using OpenMetaverse;
 using WhiteCore.Framework.DatabaseInterfaces;
-using WhiteCore.Modules.Web;
+
 
 namespace WhiteCore.Modules.Chat
 {
@@ -189,10 +189,12 @@ namespace WhiteCore.Modules.Chat
 
             // load web settings overrides (if any)
             IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
-            var settings = generics.GetGeneric<GridSettings> (UUID.Zero, "GridSettings", "Settings");
-            if (settings != null)
-                WelcomeMessage = settings.WelcomeMessage;
-
+            if (generics != null)
+            {
+                var settings = generics.GetGeneric<WhiteCore.Modules.Web.GridSettings> (UUID.Zero, "GridSettings", "Settings");
+                if (settings != null)
+                    WelcomeMessage = settings.WelcomeMessage;
+            }
         }
 
         public bool OnNewChatMessageFromWorld(OSChatMessage c, out OSChatMessage newc)
