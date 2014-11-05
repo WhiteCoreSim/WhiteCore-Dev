@@ -208,6 +208,119 @@ namespace WhiteCore.Modules.WorldMap
             return bitmap;
         }
 
+
+        public Bitmap TerrainViewToBitmap(Vector3 camPos, Vector3 camDir, float fov, int width, int height, bool useTextures)
+        {
+
+            List<string> renderers = RenderingLoader.ListRenderers(Util.ExecutingDirectory());
+            if (renderers.Count > 0)
+            {
+                m_primMesher = RenderingLoader.LoadRenderer(renderers[0]);
+                MainConsole.Instance.Debug("[MAPTILE]: Loaded prim mesher " + m_primMesher);
+            }
+            else
+            {
+                MainConsole.Instance.Info("[MAPTILE]: No prim mesher loaded, prim rendering will be disabled");
+            }
+
+            bool drawPrimVolume = true;
+            bool textureTerrain = true;
+            m_texturePrims = true;
+
+            int scaledRemovalFactor = m_scene.RegionInfo.RegionSizeX/(Constants.RegionSize/2);
+
+            //Vector3 camPos = new Vector3(m_scene.RegionInfo.RegionSizeX/2 - 0.5f,
+            //    m_scene.RegionInfo.RegionSizeY/2 - 0.5f, 221.7025033688163f);
+
+            Viewport viewport = new Viewport(
+                camPos,
+                camDir,
+                1024f,
+                0.1f,
+                width,
+                height,
+                width,
+                height);
+
+            //int width = viewport.Width;
+            //int height = viewport.Height;
+
+
+            WarpRenderer renderer = new WarpRenderer();
+            //warp_Object terrainObj;
+            renderer.CreateScene(width, height);
+            renderer.Scene.autoCalcNormals = false;
+
+            #region Camera
+
+            warp_Vector pos = ConvertVector(viewport.Position);
+            pos.z -= 0.001f; // Works around an issue with the Warp3D camera
+            warp_Vector lookat = warp_Vector.add(ConvertVector(viewport.Position), ConvertVector(viewport.LookDirection));
+
+            renderer.Scene.defaultCamera.setPos(pos);
+            renderer.Scene.defaultCamera.lookAt(lookat);
+
+            if (viewport.Orthographic)
+            {
+                renderer.Scene.defaultCamera.isOrthographic = true;
+                renderer.Scene.defaultCamera.orthoViewWidth = viewport.OrthoWindowWidth;
+                renderer.Scene.defaultCamera.orthoViewHeight = viewport.OrthoWindowHeight;
+            }
+            else
+            {
+                viewport.Orthographic = false;
+                //fov = 256;
+                //fov *= 1.75f; // FIXME: ???
+                renderer.Scene.defaultCamera.setFov(fov);
+            }
+
+            #endregion Camera
+
+            renderer.Scene.addLight("Light1", new warp_Light(new warp_Vector(1.0f, 0.5f, 1f), 0xffffff, 0, 320, 40));
+            renderer.Scene.addLight("Light2", new warp_Light(new warp_Vector(-1f, -1f, 1f), 0xffffff, 0, 100, 40));
+
+
+            try
+            {
+                CreateWater(renderer);
+
+                CreateTerrain(renderer, textureTerrain);
+
+                if (drawPrimVolume && m_primMesher != null)
+                {
+                    foreach (ISceneChildEntity part in m_scene.Entities.GetEntities().SelectMany(ent => ent.ChildrenEntities()))
+                        CreatePrim(renderer, part);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                MainConsole.Instance.Warn("[Warp3D]: Exception in the worldview generation, " + ex);
+            }
+
+            renderer.Render();
+            Bitmap bitmap = renderer.Scene.getImage();
+            bitmap = ImageUtils.ResizeImage(bitmap, width, height);
+            foreach (var o in renderer.Scene.objectData.Values)
+            {
+                warp_Object obj = (warp_Object) o;
+                obj.vertexData = null;
+                obj.triangleData = null;
+            }
+
+            renderer.Reset ();
+            m_primMesher = null;
+            SaveCache();
+            m_colors.Clear();
+
+            //Force GC to try to clean this mess up
+            GC.Collect();
+
+            return bitmap;
+        }
+
+
+
         #endregion
 
         #region Rendering Methods

@@ -2216,7 +2216,7 @@ namespace WhiteCore.Modules.Terrain
                     "terrain flip <direction> ",
                     "Flips the current terrain about the X or Y axis" +
                     "\n direction: [x|y] the direction to flip the terrain in",
-                    InterfaceFlipTerrain, true, false);
+                    InterfaceFlipTerrain, true, true);
 
                 MainConsole.Instance.Commands.AddCommand (
                     "terrain rescale",
@@ -2224,7 +2224,7 @@ namespace WhiteCore.Modules.Terrain
                     "Rescales the current terrain to fit between the given min and max heights" +
                     "\n Min: min terrain height after rescaling" +
                     "\n Max: max terrain height after rescaling",
-                    InterfaceRescaleTerrain, true, false);
+                    InterfaceRescaleTerrain, true, true);
 
 				MainConsole.Instance.Commands.AddCommand(
                     "terrain generate",
@@ -2234,12 +2234,12 @@ namespace WhiteCore.Modules.Terrain
                     "\n Min: min terrain height after rescaling" +
                     "\n Max: max terrain height after rescaling" +
                     "\n Smoothing: [Optional - default 2] number of smoothing passes to perform",
-                    InterfaceGenerateTerrain, true, false);
+                    InterfaceGenerateTerrain, true, true);
 
                 MainConsole.Instance.Commands.AddCommand(
                     "terrain help",
                     "terrain help", "Gives help about the terrain module.",
-                    InterfaceHelp, true, false);
+                    InterfaceHelp, false, true);
 
                 MainConsole.Instance.Commands.AddCommand(
                     "terrain calc area",

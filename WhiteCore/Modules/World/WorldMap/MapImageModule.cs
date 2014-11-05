@@ -162,7 +162,38 @@ namespace WhiteCore.Modules.WorldMap
 
         public Bitmap CreateViewImage(Vector3 camPos, Vector3 camDir, float fov, int width, int height, bool useTextures)
         {
-            return null;
+            int start = Environment.TickCount;
+            var renderer = new WarpTileRenderer();
+            var drawPrimVolume = false;
+        
+
+            renderer.Initialise(m_scene, m_config);
+            Bitmap worldView = renderer.TerrainViewToBitmap(camPos, camDir, fov, width, height, useTextures);
+
+            /*
+            Bitmap terrainBMP, mapBMP;
+
+            mapBMP = null;
+            terrainBMP = new Bitmap(width, height, PixelFormat.Format24bppRgb);
+            terrainBMP = renderer.TerrainToBitmap(terrainBMP);
+
+            if (drawPrimVolume && terrainBMP != null)
+            {
+                mapBMP = new Bitmap(terrainBMP);
+                mapBMP = DrawObjectVolume(m_scene, mapBMP);
+            }
+            else
+            {
+                if (terrainBMP != null) mapBMP = new Bitmap(terrainBMP);
+            }
+
+            terrainRenderer = null;
+*/
+            MainConsole.Instance.InfoFormat("[MapTileGenerator]: Generating worldview for {0} took {1} ms",
+                m_scene.RegionInfo.RegionName, (Environment.TickCount - start));
+
+            return worldView;
+            //return null;
         }
 
         #endregion
@@ -208,10 +239,11 @@ namespace WhiteCore.Modules.WorldMap
 
             if (MainConsole.Instance != null)
             {
-                MainConsole.Instance.Commands.AddCommand("update map",
-                                                         "update map",
-                                                         "Updates the image of the world map",
-                                                         HandleUpdateWorldMapConsoleCommand, true, false);
+                MainConsole.Instance.Commands.AddCommand(
+                    "update map",
+                    "update map",
+                    "Updates the image of the world map",
+                    HandleUpdateWorldMapConsoleCommand, true, false);
             }
 
             scene.EventManager.OnStartupComplete += StartupComplete;

@@ -279,6 +279,8 @@ namespace WhiteCore.Framework.SceneInfo
 				CreateIslandTerrain (min, max, smoothing);
             else if (tType.StartsWith("a"))                             
                 CreateIslandTerrain (min, max, smoothing);                      // TODO: fully sort this one out
+            else if (tType.StartsWith("n"))                             
+                CreateNullSpaceTerrain ();   
 			else
 				CreateFlatlandTerrain ();
 
@@ -324,7 +326,33 @@ namespace WhiteCore.Framework.SceneInfo
             CalcLandArea ();
 		}
 
-		private void CreateFlatlandTerrain()
+        private void CreateNullSpaceTerrain()
+        {
+
+            m_map = null;
+            taint = null;
+            m_map = new short[m_scene.RegionInfo.RegionSizeX*m_scene.RegionInfo.RegionSizeX];
+            taint =
+                new bool[m_scene.RegionInfo.RegionSizeX/Constants.TerrainPatchSize,
+                    m_scene.RegionInfo.RegionSizeY/Constants.TerrainPatchSize];
+            m_Width = m_scene.RegionInfo.RegionSizeX;
+
+           /* int x;
+            for (x = 0; x < m_scene.RegionInfo.RegionSizeX; x++)
+            {
+                int y;
+                for (y = 0; y < m_scene.RegionInfo.RegionSizeY; y++)
+                {
+//                    this[x, y] = (float) m_scene.RegionInfo.RegionSettings.WaterHeight + .1f;
+                    this[x, y] = 0.0f;
+                }
+            }
+            */
+            //m_scene.RegionInfo.RegionSettings.WaterHeight = 0.0f;
+            //m_scene.RegionInfo.RegionSettings.TerrainTexture1 = UUID.Zero;
+        }
+
+        private void CreateFlatlandTerrain()
 		{
 
 			m_map = null;
