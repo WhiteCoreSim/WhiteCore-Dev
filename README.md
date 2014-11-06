@@ -1,5 +1,8 @@
 # WhiteCore Sim
 
+*NOTE:
+ As of Version 0.9.3, it's advised to *nix users to use a Mono version higher then 3.2.8, following a report about  GC.Collect() not cleaning up memory correctly. The most current version of Mono is 3.10 (Released 4th November 2014)
+
 *NOTE: 
  As of Version 0.9.2, the WhiteCore repository format has changed.  
  The WhiteCore-Optional-Modules repository has also been updated for the new structure.
