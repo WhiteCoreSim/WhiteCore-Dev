@@ -1419,13 +1419,16 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             // Get difference between the 2 dates
             TimeSpan parsedDate = (newDate - new DateTime(1970, 1, 1, 0, 0, 0));
             // Return Unix Timestamp
-            account.Created = (int)parsedDate.TotalSeconds;
-            
-            bool success = StoreUserAccount(account);
-            if (!success)
-                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Unable to change rezday {0} {1}.", firstName, lastName);
-            else
-                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: User account {0} {1} has a new rezday.", firstName, lastName);
+            if (m_profileConnector != null)
+            {
+            	IUserProfileInfo profile = m_profileConnector.GetUserProfile (account.PrincipalID);
+            	profile.Created = (int)parsedDate.TotalSeconds;
+            	bool success = m_profileConnector.UpdateUserProfile (profile);
+            	if (!success)
+            		MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Unable to change rezday for {0} {1}.", firstName, lastName);
+            	else
+            		MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: User account {0} {1} has a new rezday.", firstName, lastName);
+            }
         }
         #endregion
     }
