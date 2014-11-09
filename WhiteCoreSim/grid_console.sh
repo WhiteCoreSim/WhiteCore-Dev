@@ -7,6 +7,6 @@
 
 cd ./bin
 wait
-echo Starting WhiteCore Grid Serer...
+echo Starting WhiteCore Grid Server...
 mono WhiteCore.Server.exe -skipconfig
 

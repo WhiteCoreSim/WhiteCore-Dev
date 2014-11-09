@@ -10,7 +10,7 @@ cd $WOASDIR
 echo $WOASDIR
 
 cd ./bin
-echo Starting WhiteCore Grid Simulator...
+echo Starting WhiteCore Grid server...
 mono WhiteCore.Server.exe -skipconfig
 wait
 
