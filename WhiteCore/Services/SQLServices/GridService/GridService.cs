@@ -742,6 +742,10 @@ namespace WhiteCore.Services.SQLServices.GridService
             if (remoteValue != null || m_doRemoteOnly)
                 return (GridRegion) remoteValue;
 
+            // viewers send # as a wildcard
+            if (regionName.EndsWith("#"))
+                regionName = regionName.TrimEnd('#');
+
             List<GridRegion> rdatas = m_Database.Get(regionName + "%", scopeIDs, 0, 1);
             if ((rdatas != null) && (rdatas.Count > 0))
             {
@@ -762,6 +766,10 @@ namespace WhiteCore.Services.SQLServices.GridService
             if (remoteValue != null || m_doRemoteOnly)
                 return (List<GridRegion>) remoteValue;
 
+            // viewers send # as a wildcard
+            if (name.EndsWith("#"))
+                name = name.TrimEnd('#');
+
             List<GridRegion> rdatas = m_Database.Get(name + "%", scopeIDs, start, count);
 
             if (rdatas != null)
@@ -781,6 +789,10 @@ namespace WhiteCore.Services.SQLServices.GridService
             object remoteValue = DoRemoteByURL("GridServerURI", scopeIDs, name);
             if (remoteValue != null || m_doRemoteOnly)
                 return (uint) remoteValue;
+
+            // viewers send # as a wildcard
+            if (name.EndsWith("#"))
+                name = name.TrimEnd('#');
 
             return m_Database.GetCount(name + "%", scopeIDs);
         }
