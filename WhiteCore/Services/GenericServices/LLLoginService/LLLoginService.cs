@@ -46,7 +46,7 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using FriendInfo = WhiteCore.Framework.Services.FriendInfo;
 using GridRegion = WhiteCore.Framework.Services.GridRegion;
-using WhiteCore.Modules.Web;
+using GridSettings = WhiteCore.Modules.Web.GridSettings;
 
 namespace WhiteCore.Services
 {

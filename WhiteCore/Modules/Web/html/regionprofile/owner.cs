@@ -85,11 +85,8 @@ namespace WhiteCore.Modules.Web
             if (account == null)
                 return vars;
 
-            // There is no harm in showing the system users here ??
-            //var libraryOwner = new UUID(Constants.LibraryOwner);
-            //var realestateOwner = new UUID(Constants.RealEstateOwnerUUID);
-
-            //if ( (account.PrincipalID == libraryOwner) || (account.PrincipalID == realestateOwner) )
+            // There is no harm in showing the system users here, actually it is required
+            //if ( Utilities.IsSytemUser(account.PrincipalID))
             //    return vars;
 
             vars.Add("UserName", account.Name);

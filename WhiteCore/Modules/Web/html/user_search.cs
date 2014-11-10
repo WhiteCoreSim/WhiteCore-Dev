@@ -70,9 +70,6 @@ namespace WhiteCore.Modules.Web
             if (requestParameters.ContainsKey("Submit"))
             {
                 IUserAccountService accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService>();
-                var libraryOwner = new UUID(Constants.LibraryOwner);
-                var realestateOwner = new UUID(Constants.RealEstateOwnerUUID);
-                var governorOwner = new UUID(Constants.GovernorUUID);
                 var IsAdmin = Authenticator.CheckAdminAuthentication (httpRequest);
 
                 string userName = requestParameters["username"].ToString();
@@ -132,11 +129,7 @@ namespace WhiteCore.Modules.Web
                             if ( ! searchUsersList.Contains(user.PrincipalID))
                                 continue;
 
-                            if (user.PrincipalID == libraryOwner)
-                                continue;
-                            if (user.PrincipalID == realestateOwner)
-                                continue;
-                            if (user.PrincipalID == governorOwner)
+                            if (Utilities.IsSystemUser (user.PrincipalID))
                                 continue;
 
                             usersList.Add (new Dictionary<string, object> {

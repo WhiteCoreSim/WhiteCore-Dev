@@ -540,12 +540,8 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             //if (password != "" && m_AuthenticationService.Authenticate(userID, "UserAccount", password, 0) == "")
             //    return; //Not authed
 
-            // ensure the main library/realestate owner is left alone!
-            var libraryOwner = new UUID (Constants.LibraryOwner);
-            var realestateOwner = new UUID(Constants.RealEstateOwnerUUID);
-            var governorOwner = new UUID(Constants.GovernorUUID);
-
-            if ((userID == libraryOwner) || (userID == realestateOwner) || (userID == governorOwner))
+            // ensure the system users are left alone!
+            if (Utilities.IsSystemUser(userID))
             {
                 MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Deleting a system user account is not a good idea!");
                 return;
@@ -729,11 +725,8 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 return;
             }
 
-            // ensure the protected Library / Realestate / Governor are left alone!
-            var libraryOwner = new UUID (Constants.LibraryOwner);
-            var realestateOwner = new UUID(Constants.RealEstateOwnerUUID);
-            var governorOwner = new UUID(Constants.GovernorUUID);
-            if ((account.PrincipalID == libraryOwner) || (account.PrincipalID == realestateOwner) || (account.PrincipalID == governorOwner))
+            // ensure the protected system users are left alone!
+            if (Utilities.IsSystemUser(account.PrincipalID))
             {
                 MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Changing system users is not a good idea!");
                 return;
@@ -892,11 +885,8 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 return;
             }
 
-            // ensure the main library/realestate owner is left alone!
-            var libraryOwner = new UUID (Constants.LibraryOwner);
-            var realestateOwner = new UUID(Constants.RealEstateOwnerUUID);
-            var governorOwner = new UUID(Constants.GovernorUUID);
-            if ((account.PrincipalID == libraryOwner) || (account.PrincipalID == realestateOwner) || (account.PrincipalID == governorOwner))
+            // ensure the system users are left alone!
+            if (Utilities.IsSystemUser(account.PrincipalID))
             {
                 MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Changing system users is not a good idea!");
             }
@@ -1124,11 +1114,8 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 return;
             }
 
-            // ensure the main library/realestate owner is left alone!
-            var libraryOwner = new UUID (Constants.LibraryOwner);
-            var realestateOwner = new UUID(Constants.RealEstateOwnerUUID);
-            var governorOwner = new UUID(Constants.GovernorUUID);
-            if ((account.PrincipalID == libraryOwner) || (account.PrincipalID == realestateOwner) || (account.PrincipalID == governorOwner))
+            // ensure the system users are left alone!
+            if (Utilities.IsSystemUser(account.PrincipalID))
             {
                 MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Naughty!! You cannot delete system users!");
                 return;
@@ -1249,11 +1236,8 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             if (account == null)
                 MainConsole.Instance.ErrorFormat("[USER ACCOUNT SERVICE]: Unable to locate this user");
 
-            // ensure the main library/realestate owner is left alone!
-            var libraryOwner = new UUID (Constants.LibraryOwner);
-            var realestateOwner = new UUID(Constants.RealEstateOwnerUUID);
-            var governorOwner = new UUID(Constants.GovernorUUID);
-            if ((account.PrincipalID == libraryOwner) || (account.PrincipalID == realestateOwner) || (account.PrincipalID == governorOwner))
+            // ensure the system users are left alone!
+            if (Utilities.IsSystemUser(account.PrincipalID))
             {
                 MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Changing system users is not a good idea!");
                 return;
@@ -1345,9 +1329,6 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
         /// <param name="cmdparams">Cmdparams.</param>
         protected void HandleSaveUsers(IScene scene, string[] cmdParams)
         {
-            var libraryOwner = new UUID(Constants.LibraryOwner);
-            var realestateOwner = new UUID(Constants.RealEstateOwnerUUID);
-            var governorOwner = new UUID(Constants.GovernorUUID);
             string fileName = "users.csv";
             if (cmdParams.Length < 3)
             {
@@ -1374,9 +1355,9 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
 
             foreach (UserAccount user in accounts)
             {
-                if ((user.PrincipalID == libraryOwner) || (user.PrincipalID == realestateOwner) || (user.PrincipalID == governorOwner))
+                if (Utilities.IsSystemUser (user.PrincipalID))
                     continue;
-
+  
                 // TODO: user accounts do not have a clear password so we need to save the salt and password hashes instead
                 // This will mean changes to the csv format
                 string LineToWrite = user.PrincipalID + "," + user.FirstName + "," + user.LastName + ",," + user.Email;

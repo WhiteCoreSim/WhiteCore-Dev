@@ -63,9 +63,6 @@ namespace WhiteCore.Modules.Web
             response = null;
             var vars = new Dictionary<string, object>();
             var usersList = new List<Dictionary<string, object>>();
-            var libraryOwner = new UUID(Constants.LibraryOwner);
-			var realestateOwner = new UUID(Constants.RealEstateOwnerUUID);
-            var governorOwner = new UUID(Constants.GovernorUUID);
             var agentInfo = Framework.Utilities.DataManager.RequestPlugin<IAgentInfoConnector> ();
 
             uint amountPerQuery = 10;
@@ -124,11 +121,8 @@ namespace WhiteCore.Modules.Web
                     
                     foreach (var user in activeUsers)
                     {
-                        if ((UUID.Parse (user.UserID) == libraryOwner) ||
-                            (UUID.Parse (user.UserID) == realestateOwner) ||
-                            (UUID.Parse(user.UserID) == governorOwner))
+                        if (Utilities.IsSystemUser ((UUID) user.UserID))
                             continue;
-                        
                         if ( ! activeUsersList.Contains((UUID) user.UserID))
                             continue;
 

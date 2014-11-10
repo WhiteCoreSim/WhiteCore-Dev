@@ -630,6 +630,13 @@ namespace WhiteCore.Modules.Estate
                 }
             }
 
+            // check for bogies...
+            if (Utilities.IsSystemUser (account.PrincipalID))
+            {
+                MainConsole.Instance.Info ("[EstateService]: Tsk, tsk.  System users should not be used as estate managers!");
+                return;
+            }
+
             // we have an estate name and a user
             // Create a new estate
             EstateSettings ES = new EstateSettings();
@@ -688,6 +695,13 @@ namespace WhiteCore.Modules.Estate
             if (ownerAccount == null)
             {
                 MainConsole.Instance.WarnFormat ("[User Account Service]: The user, '{0}' was not found!", estateOwner);
+                return;
+            }
+
+            // check for bogies...
+            if (Utilities.IsSystemUser (ownerAccount.PrincipalID))
+            {
+                MainConsole.Instance.Info ("[EstateService]: Tsk, tsk.  System users should not be used as estate managers!");
                 return;
             }
 

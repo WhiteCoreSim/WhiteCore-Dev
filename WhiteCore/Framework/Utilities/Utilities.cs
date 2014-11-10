@@ -552,10 +552,14 @@ namespace WhiteCore.Framework.Utilities
             Regex EMailreStrict = new Regex(EMailpatternStrict);
             return EMailreStrict.IsMatch(address);
         }
-        
-        public static bool IsSystemUser(string user)
+
+        public static bool IsSystemUser(OpenMetaverse.UUID userID)
         {
-        	return true;
+            var userId = userID.ToString();
+            return ( userId == Constants.GovernorUUID || 
+                     userId == Constants.RealEstateOwnerUUID ||
+                     userId == Constants.LibraryOwner
+            );
         }
 
         public static bool IsLinuxOs

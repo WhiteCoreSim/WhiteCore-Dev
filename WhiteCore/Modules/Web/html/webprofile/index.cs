@@ -98,10 +98,7 @@ namespace WhiteCore.Modules.Web
                 return vars;
 
 			/* Allow access to the system user info - needed for Estate owner Profiles of regions
-             var libraryOwner = new UUID(Constants.LibraryOwner);
-			var realestateOwner = new UUID(Constants.RealEstateOwnerUUID);
-
-            if ( (account.PrincipalID == libraryOwner) || (account.PrincipalID == realestateOwner) )
+            if ( Utilities.IsSystemUser(account.PrincipalID) )
 				return vars;
             */
 
