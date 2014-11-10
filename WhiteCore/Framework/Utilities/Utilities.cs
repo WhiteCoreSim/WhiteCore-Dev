@@ -555,7 +555,7 @@ namespace WhiteCore.Framework.Utilities
         
         public static bool IsSystemUser(string user)
         {
-        	
+        	return true;
         }
 
         public static bool IsLinuxOs
