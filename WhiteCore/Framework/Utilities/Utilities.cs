@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
@@ -551,6 +551,11 @@ namespace WhiteCore.Framework.Utilities
                                               + @"[a-zA-Z]{2,}))$";
             Regex EMailreStrict = new Regex(EMailpatternStrict);
             return EMailreStrict.IsMatch(address);
+        }
+        
+        public static bool IsSystemUser(string user)
+        {
+        	
         }
 
         public static bool IsLinuxOs
