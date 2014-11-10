@@ -1,0 +1,20 @@
+# Travis-CI Build for WhiteCore
+# see travis-ci.org for details
+
+language: c
+
+# Make sure CMake and Mono are installed
+install: 
+ - apt-key adv --keyserver pgp.mit.edu --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+ - echo "deb http://download.mono-project.com/repo/debian wheezy main" > /etc/apt/sources.list.d/mono-xamarin.list
+ - apt-get update
+ - apt-get install mono-complete
+
+# Build WhiteCore
+script:
+ - ./tc-autobuild.sh build dist
+
+# Notify of build changes
+notifications:
+ irc: 
+  "chat.freenode.net#whitecore-support"
