@@ -1458,9 +1458,8 @@ namespace WhiteCore.Modules.Inventory
             if (srcTaskItem == null)
             {
                 MainConsole.Instance.ErrorFormat(
-                    "[PRIM INVENTORY]: Tried to retrieve item ID {0} from prim {1}, {2} for rezzing a script but the "
-                    + " item does not exist in this inventory",
-                    srcId, srcPart.Name, srcPart.UUID);
+                    "[PRIM INVENTORY]: Could not find part {0} to insert script item {1} from {2} {3} in {4}",
+                    destId, srcId, srcPart.Name, srcPart.UUID, Name);
                 return;
             }
 
@@ -1489,7 +1488,7 @@ namespace WhiteCore.Modules.Inventory
                     return;
             }
 
-            if (destPart.ScriptAccessPin != pin)
+            if (destPart.ScriptAccessPin == 0 || destPart.ScriptAccessPin != pin)
             {
                 MainConsole.Instance.WarnFormat(
                     "[PRIM INVENTORY]: " +
