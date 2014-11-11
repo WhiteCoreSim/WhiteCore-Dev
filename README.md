@@ -17,6 +17,11 @@ increased technology focus, heavy emphasis on working with other developers,
 whether it be viewer based developers or server based developers, 
 and a set of features around stability and simplified usability for users.
 
+## Build Status
+
+Windows .Net 4.5 [![Build status](https://ci.appveyor.com/api/projects/status/tj3pr2xb4rg6ospe?svg=true)](https://ci.appveyor.com/project/fly-man-/whitecore-dev)
+
+
 ## Compiling WhiteCore
 
 *To compile WhiteCore, look at the Compiling.txt in the WhiteCoreDocs folder for more information*
