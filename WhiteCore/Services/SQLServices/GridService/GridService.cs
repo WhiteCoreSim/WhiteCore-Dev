@@ -778,9 +778,11 @@ namespace WhiteCore.Services.SQLServices.GridService
                 rdatas.Sort(new RegionDataComparison(name));
                 //Results are backwards... so it needs reversed
                 rdatas.Reverse();
+                return rdatas;
             }
 
-            return rdatas;
+            // nothing found here
+            return new List<GridRegion>();
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
