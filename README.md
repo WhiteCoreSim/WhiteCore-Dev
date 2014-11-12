@@ -21,8 +21,7 @@ and a set of features around stability and simplified usability for users.
 
 ## Build Status
 
-Windows .Net 4.5 [![Build status](https://ci.appveyor.com/api/projects/status/tj3pr2xb4rg6ospe?svg=true)](https://ci.appveyor.com/project/fly-man-/whitecore-dev)
-
+Windows .Net 4.5 [![Build status](https://ci.appveyor.com/api/projects/status/tj3pr2xb4rg6ospe/branch/master?svg=true)](https://ci.appveyor.com/project/fly-man-/whitecore-dev/branch/master)
 
 ## Compiling WhiteCore
 
