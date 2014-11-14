@@ -29,43 +29,42 @@ using System;
 using System.Collections.Generic;
 using WhiteCore.Framework.Utilities;
 
-namespace WhiteCore.DataManager.Migration.Migrators.UserInfo
+namespace WhiteCore.DataManager.Migration.Migrators.Estate
 {
-    public class UserInfoMigrator_4 : Migrator
+    public class EstateMigrator_4 : Migrator
     {
-        public UserInfoMigrator_4()
+        public EstateMigrator_4()
         {
             Version = new Version(0, 0, 4);
-            MigrationName = "UserInfo";
+            MigrationName = "Estate";
 
             schema = new List<SchemaDefinition>();
 
-            //
-            // Change summery:
-            //
-            //   Add the new UserInfo table that replaces the GridUser and Presence tables
-            //
-            RenameSchema("userinfo", "user_info");
-            RemoveSchema("userinfo");
-            
-            AddSchema("user_info", ColDefs(
-                ColDef("UserID", ColumnTypes.String50),
-                ColDef("RegionID", ColumnTypes.String50),
-                ColDef("LastSeen", ColumnTypes.Integer30),
-                ColDef("IsOnline", ColumnTypes.String36),
-                ColDef("LastLogin", ColumnTypes.String50),
-                ColDef("LastLogout", ColumnTypes.String50),
-                ColDef("Info", ColumnTypes.String512),
-                ColDef("CurrentRegionID", ColumnTypes.Char36),
-                ColDef("CurrentPosition", ColumnTypes.String36),
-                ColDef("CurrentLookat", ColumnTypes.String36),
-                ColDef("HomeRegionID", ColumnTypes.Char36),
-                ColDef("HomePosition", ColumnTypes.String36),
-                ColDef("HomeLookat", ColumnTypes.String36),
-                ColDef("CurrentRegionURI", ColumnTypes.String255)
-                                      ), IndexDefs(
-                                          IndexDef(new string[1] {"UserID"}, IndexType.Primary)
-                                             ));
+            RenameSchema("estateregions", "estate_regions");
+            RemoveSchema("estateregions");
+
+            AddSchema("estate_regions", ColDefs(
+                ColDef("RegionID", ColumnTypes.String36),
+                ColDef("EstateID", ColumnTypes.Integer11)
+                                           ), IndexDefs(
+                                               IndexDef(new string[1] {"RegionID"}, IndexType.Primary),
+                                               IndexDef(new string[1] {"EstateID"}, IndexType.Index)
+                                                  ));
+
+            RenameSchema("estatesettings", "estate_settings");
+            RemoveSchema("estatesettings");
+
+            AddSchema("estate_settings", ColDefs(
+                ColDef("EstateID", ColumnTypes.Integer11),
+                ColDef("EstateName", ColumnTypes.String100),
+                ColDef("EstateOwner", ColumnTypes.String36),
+                ColDef("ParentEstateID", ColumnTypes.Integer11),
+                ColDef("Settings", ColumnTypes.Text)
+                                            ), IndexDefs(
+                                                IndexDef(new string[1] {"EstateID"}, IndexType.Primary),
+                                                IndexDef(new string[1] {"EstateOwner"}, IndexType.Index),
+                                                IndexDef(new string[2] {"EstateName", "EstateOwner"}, IndexType.Index)
+                                                   ));
         }
 
         protected override void DoCreateDefaults(IDataConnector genericData)

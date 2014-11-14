@@ -46,8 +46,8 @@ namespace WhiteCore.Services.DataService
     {
         protected IGenericData GD;
         protected IRegistryCore m_registry;
-        protected string m_foldersrealm = "inventoryfolders";
-        protected string m_itemsrealm = "inventoryitems";
+        protected string m_foldersrealm = "inventory_folders";
+        protected string m_itemsrealm = "inventory_items";
 
         #region IInventoryData Members
 

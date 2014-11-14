@@ -48,6 +48,10 @@ namespace WhiteCore.Services.DataService
     public class LocalDirectoryServiceConnector : ConnectorBase, IDirectoryServiceConnector
     {
         private IGenericData GD;
+        private string m_userClassifiedsTable = "user_classifieds";
+        private string m_eventInfoTable = "event_information";
+        private string m_eventNotificationTable = "event_notifications";
+        private string m_SearchParcelTable = "search_parcel";
 
         #region IDirectoryServiceConnector Members
 
@@ -105,7 +109,7 @@ namespace WhiteCore.Services.DataService
             {
                 var OrFilters = new Dictionary<string, object>();
                 OrFilters.Add("ParcelID", parcel.GlobalID);
-                GD.Delete("searchparcel", new QueryFilter {orFilters = OrFilters});
+                GD.Delete(m_SearchParcelTable, new QueryFilter { orFilters = OrFilters });
             }
 
             List<object[]> insertValues = parcels.Select(args => new List<object>
@@ -142,7 +146,7 @@ namespace WhiteCore.Services.DataService
                                                                          args.ScopeID
                                                                      }).Select(Values => Values.ToArray()).ToList();
 
-            GD.InsertMultiple("searchparcel", insertValues);
+            GD.InsertMultiple(m_SearchParcelTable, insertValues);
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
@@ -154,7 +158,7 @@ namespace WhiteCore.Services.DataService
 
             QueryFilter filter = new QueryFilter();
             filter.andFilters["RegionID"] = regionID;
-            GD.Delete("searchparcel", filter);
+            GD.Delete(m_SearchParcelTable, filter);
         }
 
         #endregion
@@ -218,7 +222,7 @@ namespace WhiteCore.Services.DataService
 
             QueryFilter filter = new QueryFilter();
             filter.andFilters["ParcelID"] = globalID;
-            List<string> Query = GD.Query(new[] { "*" }, "searchparcel", filter, null, null, null);
+            List<string> Query = GD.Query(new[] { "*" }, m_SearchParcelTable, filter, null, null, null);
             //Cant find it, return
             if (Query.Count == 0)
             {
@@ -263,7 +267,7 @@ namespace WhiteCore.Services.DataService
 
             QueryFilter filter = new QueryFilter();
             filter.andFilters["RegionID"] = regionID;
-            List<string> Query = GD.Query(new[] { "*" }, "searchparcel", filter, null, null, null);
+            List<string> Query = GD.Query(new[] { "*" }, m_SearchParcelTable, filter, null, null, null);
             //Cant find it, return
             if (Query.Count == 0)
                 return null;
@@ -310,7 +314,7 @@ namespace WhiteCore.Services.DataService
                     filter.andFilters["RegionID"] = RegionID;
                     filter.andFilters["Name"] = ParcelName;
 
-                    List<string> query = GD.Query(new[] { "ParcelID" }, "searchparcel", filter, null, 0, 1);
+                    List<string> query = GD.Query(new[] { "ParcelID" }, m_SearchParcelTable, filter, null, 0, 1);
 
                     if (query.Count >= 1 && UUID.TryParse(query[0], out parcelInfoID))
                     {
@@ -336,7 +340,7 @@ namespace WhiteCore.Services.DataService
                 return (List<ExtendedLandData>) remoteValue;
             QueryFilter filter = new QueryFilter();
             filter.andFilters["OwnerID"] = OwnerID;
-            List<string> Query = GD.Query(new[] {"*"}, "searchparcel", filter, null, null, null);
+            List<string> Query = GD.Query(new[] { "*" }, m_SearchParcelTable, filter, null, null, null);
 
             return (Query.Count == 0) ? new List<ExtendedLandData>() : LandDataToExtendedLandData(Query2LandData(Query));
         }
@@ -405,7 +409,7 @@ namespace WhiteCore.Services.DataService
                     QueryFilter filter = GetParcelsByRegionWhereClause(RegionID, owner, flags, category);
                     Dictionary<string, bool> sort = new Dictionary<string, bool>(1);
                     sort["OwnerID"] = false;
-                    return Query2LandData(GD.Query(new[] {"*"}, "searchparcel", filter, sort, start, count));
+                    return Query2LandData(GD.Query(new[] { "*" }, m_SearchParcelTable, filter, sort, start, count));
                 }
             }
             return resp;
@@ -425,7 +429,7 @@ namespace WhiteCore.Services.DataService
                 if (region != null)
                 {
                     QueryFilter filter = GetParcelsByRegionWhereClause(RegionID, owner, flags, category);
-                    return uint.Parse(GD.Query(new[] {"COUNT(ParcelID)"}, "searchparcel", filter, null, null, null)[0]);
+                    return uint.Parse(GD.Query(new[] { "COUNT(ParcelID)" }, m_SearchParcelTable, filter, null, null, null)[0]);
                 }
             }
             return 0;
@@ -457,7 +461,7 @@ namespace WhiteCore.Services.DataService
                     Dictionary<string, bool> sort = new Dictionary<string, bool>(1);
                     sort["OwnerID"] = false;
 
-                    return Query2LandData(GD.Query(new[] {"*"}, "searchparcel", filter, sort, start, count));
+                    return Query2LandData(GD.Query(new[] { "*" }, m_SearchParcelTable, filter, sort, start, count));
                 }
             }
 
@@ -481,7 +485,7 @@ namespace WhiteCore.Services.DataService
                     filter.andFilters["RegionID"] = RegionID;
                     filter.andFilters["Name"] = name;
 
-                    return uint.Parse(GD.Query(new[] {"COUNT(ParcelID)"}, "searchparcel", filter, null, null, null)[0]);
+                    return uint.Parse(GD.Query(new[] { "COUNT(ParcelID)" }, m_SearchParcelTable, filter, null, null, null)[0]);
                 }
             }
             return 0;
@@ -534,7 +538,7 @@ namespace WhiteCore.Services.DataService
                                                    "Auction",
                                                    "Dwell",
                                                    "Flags"
-                                               }, "searchparcel", filter, sort, (uint) StartQuery, 50);
+                                               }, m_SearchParcelTable, filter, sort, (uint)StartQuery, 50);
 
             if (retVal.Count == 0)
             {
@@ -616,7 +620,7 @@ namespace WhiteCore.Services.DataService
                                                    "SalePrice",
                                                    "Area",
                                                    "Flags"
-                                               }, "searchparcel", filter, sort, (uint) StartQuery, 50);
+                                               }, m_SearchParcelTable, filter, sort, (uint)StartQuery, 50);
 
             //if there are none, return
             if (retVal.Count == 0)
@@ -712,7 +716,7 @@ namespace WhiteCore.Services.DataService
                                                    "SalePrice",
                                                    "Area",
                                                    "Flags"
-                                               }, "searchparcel", filter, sort, (uint) StartQuery, 50);
+                                               }, m_SearchParcelTable, filter, sort, (uint)StartQuery, 50);
 
             //if there are none, return
             if (retVal.Count == 0)
@@ -790,7 +794,7 @@ namespace WhiteCore.Services.DataService
                                                    "Name",
                                                    "Dwell",
                                                    "Flags"
-                                               }, "searchparcel", filter, null, 0, 25);
+                                               }, m_SearchParcelTable, filter, null, 0, 25);
 
             //if there are none, return
             if (retVal.Count == 0)
@@ -872,7 +876,7 @@ namespace WhiteCore.Services.DataService
             if (scopeID != UUID.Zero)
                 filter.andFilters["ScopeID"] = scopeID;
 
-            List<string> retVal = GD.Query(new[] {"*"}, "userclassifieds", filter, null, (uint) StartQuery, 50);
+            List<string> retVal = GD.Query(new[] {"*"}, m_userClassifiedsTable, filter, null, (uint) StartQuery, 50);
             if (retVal.Count == 0)
                 return new List<DirClassifiedReplyData>();
 
@@ -921,7 +925,7 @@ namespace WhiteCore.Services.DataService
 
             QueryFilter filter = new QueryFilter();
             filter.andFilters["SimName"] = regionName;
-            List<string> retVal = GD.Query(new[] {"*"}, "userclassifieds", filter, null, null, null);
+            List<string> retVal = GD.Query(new[] { "*" }, m_userClassifiedsTable, filter, null, null, null);
 
             if (retVal.Count == 0)
             {
@@ -955,7 +959,7 @@ namespace WhiteCore.Services.DataService
             Dictionary<string, object> where = new Dictionary<string, object>(1);
             where.Add("ClassifiedUUID", id);
             filter.andFilters = where;
-            List<string> retVal = GD.Query(new[] {"*"}, "userclassifieds", filter, null, null, null);
+            List<string> retVal = GD.Query(new[] { "*" }, m_userClassifiedsTable, filter, null, null, null);
             if ((retVal == null) || (retVal.Count == 0)) return null;
             Classified classified = new Classified();
             classified.FromOSD((OSDMap) OSDParser.DeserializeJson(retVal[6]));
@@ -1020,7 +1024,7 @@ namespace WhiteCore.Services.DataService
                                                    "maturity",
                                                    "flags",
                                                    "name"
-                                               }, "asevents", filter, null, (uint) StartQuery, 50);
+                                               }, m_eventInfoTable, filter, null, (uint)StartQuery, 50);
 
             if (retVal.Count > 0)
             {
@@ -1086,7 +1090,7 @@ namespace WhiteCore.Services.DataService
                                                            "maturity",
                                                            "flags",
                                                            "name"
-                                                       }, "asevents", filter, null, null, null);
+                                                       }, m_eventInfoTable, filter, null, null, null);
 
                     if (retVal.Count > 0)
                     {
@@ -1181,7 +1185,7 @@ namespace WhiteCore.Services.DataService
 
             QueryFilter filter = new QueryFilter();
             filter.andFilters["EID"] = EventID;
-            List<string> RetVal = GD.Query(new[] {"*"}, "asevents", filter, null, null, null);
+            List<string> RetVal = GD.Query(new[] { "*" }, m_eventInfoTable, filter, null, null, null);
             return (RetVal.Count == 0) ? null : Query2EventData(RetVal)[0];
         }
 
@@ -1247,7 +1251,7 @@ namespace WhiteCore.Services.DataService
             row["description"] = description;
             row["category"] = category;
 
-            GD.Insert("asevents", row);
+            GD.Insert(m_eventInfoTable, row);
 
             return eventData;
         }
@@ -1257,7 +1261,7 @@ namespace WhiteCore.Services.DataService
         {
             return (count == 0)
                        ? new List<EventData>(0)
-                       : Query2EventData(GD.Query(new[] {"*"}, "asevents", new QueryFilter
+                       : Query2EventData(GD.Query(new[] { "*" }, m_eventInfoTable, new QueryFilter
                                                                                {
                                                                                    andFilters = filter
                                                                                }, sort, start, count));
@@ -1268,7 +1272,7 @@ namespace WhiteCore.Services.DataService
             return uint.Parse(GD.Query(new[]
                                            {
                                                "COUNT(EID)"
-                                           }, "asevents", new QueryFilter
+                                           }, m_eventInfoTable, new QueryFilter
                                                               {
                                                                   andFilters = filter
                                                               }, null, null, null)[0]);
@@ -1280,7 +1284,7 @@ namespace WhiteCore.Services.DataService
             {
                 return 0;
             }
-            return uint.Parse(GD.Query(new[] {"MAX(EID)"}, "asevents", null, null, null, null)[0]);
+            return uint.Parse(GD.Query(new[] { "MAX(EID)" }, m_eventInfoTable, null, null, null, null)[0]);
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
@@ -1292,7 +1296,7 @@ namespace WhiteCore.Services.DataService
                 return;
             }
 
-            GD.Insert("event_notifications", new object[2] {user.ToString(), EventID});
+            GD.Insert(m_eventNotificationTable, new object[2] { user.ToString(), EventID });
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
@@ -1307,7 +1311,7 @@ namespace WhiteCore.Services.DataService
             QueryFilter filter = new QueryFilter();
             filter.andFilters.Add("UserID", user.ToString());
             filter.andFilters.Add("EventID", EventID);
-            GD.Delete("event_notifications", filter);
+            GD.Delete(m_eventNotificationTable, filter);
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
@@ -1319,7 +1323,7 @@ namespace WhiteCore.Services.DataService
 
             QueryFilter filter = new QueryFilter();
             filter.andFilters.Add("UserID", user.ToString());
-            List<string> data = GD.Query(new string[1] {"EventID"}, "event_notifications", filter, null, null, null);
+            List<string> data = GD.Query(new string[1] { "EventID" }, m_eventNotificationTable, filter, null, null, null);
             List<EventData> events = new List<EventData>();
             if (data.Count == 0)
                 return events;

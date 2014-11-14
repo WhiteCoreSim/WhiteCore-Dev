@@ -42,7 +42,7 @@ namespace WhiteCore.Services.DataService
         private IGenericData GD;
         protected bool m_allowDuplicatePresences = true;
         protected bool m_checkLastSeen = true;
-        private string m_realm = "userinfo";
+        private string m_userInfoTable = "user_info";
 
         #region IAgentInfoConnector Members
 
@@ -99,8 +99,8 @@ namespace WhiteCore.Services.DataService
 
             QueryFilter filter = new QueryFilter();
             filter.andFilters["UserID"] = info.UserID;
-            GD.Delete(m_realm, filter);
-            return GD.Insert(m_realm, values);
+            GD.Delete(m_userInfoTable, filter);
+            return GD.Insert(m_userInfoTable, values);
         }
 
         public void Update(string userID, Dictionary<string, object> values)
@@ -108,7 +108,7 @@ namespace WhiteCore.Services.DataService
             QueryFilter filter = new QueryFilter();
             filter.andFilters["UserID"] = userID;
 
-            GD.Update(m_realm, values, null, filter, null, null);
+            GD.Update(m_userInfoTable, values, null, filter, null, null);
         }
 
         public void SetLastPosition(string userID, UUID regionID, string regionURI, Vector3 lastPosition,
@@ -182,7 +182,7 @@ namespace WhiteCore.Services.DataService
             QueryFilter filter = new QueryFilter();
             filter.andFilters["CurrentRegionID"] = regionID;
             filter.andFilters["IsOnline"] = "1";
-            List<string> query = GD.Query(new string[1] {"*"}, m_realm, filter, null, null, null);
+            List<string> query = GD.Query(new string[1] { "*" }, m_userInfoTable, filter, null, null, null);
 
             if (query.Count == 0)
                 return new List<UserInfo>();
@@ -196,7 +196,7 @@ namespace WhiteCore.Services.DataService
 
             QueryFilter filter = new QueryFilter();
             filter.andFilters["UserID"] = userID;
-            List<string> query = GD.Query(new string[1] {"*"}, m_realm, filter, null, null, null);
+            List<string> query = GD.Query(new string[1] { "*" }, m_userInfoTable, filter, null, null, null);
 
             if (query.Count == 0)
             {
@@ -235,7 +235,7 @@ namespace WhiteCore.Services.DataService
                 filter.andFilters["IsOnline"] = "1";
             }
 
-            List<string>  userCount = GD.Query(new string[1] {"COUNT(UserID)"}, m_realm, filter, null, null, null);
+            List<string> userCount = GD.Query(new string[1] { "COUNT(UserID)" }, m_userInfoTable, filter, null, null, null);
             return uint.Parse (userCount[0]);
         }
 
@@ -255,7 +255,7 @@ namespace WhiteCore.Services.DataService
             filter.andFilters["IsOnline"] = "1";
 
 
-            List<string>  userCount = GD.Query(new string[1] {"COUNT(UserID)"}, m_realm, filter, null, null, null);
+            List<string> userCount = GD.Query(new string[1] { "COUNT(UserID)" }, m_userInfoTable, filter, null, null, null);
             return uint.Parse (userCount[0]);
         }
 
@@ -274,7 +274,7 @@ namespace WhiteCore.Services.DataService
                 filter.andFilters["IsOnline"] = "1";
             }
 
-            List<string> query = GD.Query(new string[] {"*"}, m_realm, filter, sort, start, count);
+            List<string> query = GD.Query(new string[] { "*" }, m_userInfoTable, filter, sort, start, count);
 
             return ParseQuery(query);
         }
@@ -298,7 +298,7 @@ namespace WhiteCore.Services.DataService
             filter.andFilters["IsOnline"] = "1";
 
 
-            List<string> query = GD.Query(new string[] {"*"}, m_realm, filter, sort, start, count);
+            List<string> query = GD.Query(new string[] { "*" }, m_userInfoTable, filter, sort, start, count);
 
             return ParseQuery(query);
         }

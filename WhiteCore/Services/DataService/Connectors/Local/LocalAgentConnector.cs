@@ -42,6 +42,7 @@ namespace WhiteCore.Services.DataService
     {
         private IGenericData GD;
         private GenericAccountCache<IAgentInfo> m_cache = new GenericAccountCache<IAgentInfo>();
+        private string m_userProfileTable = "user_profile";
 
         #region IAgentConnector Members
 
@@ -98,7 +99,7 @@ namespace WhiteCore.Services.DataService
                 QueryFilter filter = new QueryFilter();
                 filter.andFilters["ID"] = agentID;
                 filter.andFilters["`Key`"] = "AgentInfo";
-                query = GD.Query(new string[1] {"`Value`"}, "userdata", filter, null, null, null);
+                query = GD.Query(new string[1] {"`Value`"}, m_userProfileTable, filter, null, null, null);
             }
             catch
             {
@@ -138,7 +139,7 @@ namespace WhiteCore.Services.DataService
             filter.andFilters["ID"] = agent.PrincipalID;
             filter.andFilters["`Key`"] = "AgentInfo";
 
-            GD.Update("userdata", values, null, filter, null, null);
+            GD.Update(m_userProfileTable, values, null, filter, null, null);
         }
 
         public void CacheAgent(IAgentInfo agent)
@@ -156,7 +157,7 @@ namespace WhiteCore.Services.DataService
             List<object> values = new List<object> {agentID, "AgentInfo"};
             IAgentInfo info = new IAgentInfo {PrincipalID = agentID};
             values.Add(OSDParser.SerializeLLSDXmlString(info.ToOSD())); //Value which is a default Profile
-            GD.Insert("userdata", values.ToArray());
+            GD.Insert(m_userProfileTable, values.ToArray());
         }
 
         #endregion

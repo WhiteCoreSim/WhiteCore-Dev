@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
@@ -29,43 +29,26 @@ using System;
 using System.Collections.Generic;
 using WhiteCore.Framework.Utilities;
 
-namespace WhiteCore.DataManager.Migration.Migrators.UserInfo
+namespace WhiteCore.DataManager.Migration.Migrators.Avatars
 {
-    public class UserInfoMigrator_4 : Migrator
+    public class AvatarsMigrator_2 : Migrator
     {
-        public UserInfoMigrator_4()
+        public AvatarsMigrator_2()
         {
-            Version = new Version(0, 0, 4);
-            MigrationName = "UserInfo";
+            Version = new Version(0, 0, 2);
+            MigrationName = "Avatars";
 
             schema = new List<SchemaDefinition>();
-
-            //
-            // Change summery:
-            //
-            //   Add the new UserInfo table that replaces the GridUser and Presence tables
-            //
-            RenameSchema("userinfo", "user_info");
-            RemoveSchema("userinfo");
             
-            AddSchema("user_info", ColDefs(
-                ColDef("UserID", ColumnTypes.String50),
-                ColDef("RegionID", ColumnTypes.String50),
-                ColDef("LastSeen", ColumnTypes.Integer30),
-                ColDef("IsOnline", ColumnTypes.String36),
-                ColDef("LastLogin", ColumnTypes.String50),
-                ColDef("LastLogout", ColumnTypes.String50),
-                ColDef("Info", ColumnTypes.String512),
-                ColDef("CurrentRegionID", ColumnTypes.Char36),
-                ColDef("CurrentPosition", ColumnTypes.String36),
-                ColDef("CurrentLookat", ColumnTypes.String36),
-                ColDef("HomeRegionID", ColumnTypes.Char36),
-                ColDef("HomePosition", ColumnTypes.String36),
-                ColDef("HomeLookat", ColumnTypes.String36),
-                ColDef("CurrentRegionURI", ColumnTypes.String255)
-                                      ), IndexDefs(
-                                          IndexDef(new string[1] {"UserID"}, IndexType.Primary)
-                                             ));
+            RenameSchema("appearance", "user_appearance");
+            RemoveSchema("appearance");
+
+            AddSchema("user_appearance", ColDefs(
+                ColDef("PrincipalID", ColumnTypes.Char36),
+                ColDef("Appearance", ColumnTypes.Text)
+                                        ), IndexDefs(
+                                            IndexDef(new string[1] {"PrincipalID"}, IndexType.Primary)
+                                               ));
         }
 
         protected override void DoCreateDefaults(IDataConnector genericData)

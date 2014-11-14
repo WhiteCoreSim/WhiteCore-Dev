@@ -39,7 +39,7 @@ namespace WhiteCore.Services.DataService
     public class LocalAvatarConnector : IAvatarData
     {
         private IGenericData GD;
-        private string m_realm = "appearance";
+        private string m_realm = "user_appearance";
         private object m_lock = new object();
 
         #region IAvatarData Members

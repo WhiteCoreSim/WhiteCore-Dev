@@ -39,11 +39,11 @@ namespace WhiteCore.Services.DataService
     public class LocalUserAccountConnector : IUserAccountData
     {
         private IGenericData GD;
-        private const string m_realm = "useraccounts";
+        private const string m_realm = "user_accounts";
 
         public string Realm
         {
-            get { return "useraccounts"; }
+            get { return m_realm; }
         }
 
         #region IUserAccountData Members
