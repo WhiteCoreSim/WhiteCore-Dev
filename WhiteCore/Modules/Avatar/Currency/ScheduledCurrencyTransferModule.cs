@@ -33,6 +33,7 @@ using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
 using System;
+using WhiteCore.Framework.ConsoleFramework;
 
 namespace WhiteCore.Modules.Avatar.Currency
 {
@@ -122,6 +123,7 @@ namespace WhiteCore.Modules.Avatar.Currency
                 TransactionType type = !itemInfo.ContainsKey("Type") ? TransactionType.SystemGenerated : (TransactionType)itemInfo["Type"].AsInteger();
                 if (CheckWhetherUserShouldPay(agentID, text))
                 {
+                    MainConsole.Instance.Info("[MONEY MODULE] Scheduled Payment for " + agentID + " is now running");
                     bool success = moneyModule.Charge(agentID, amount, text, type);
                     if (!success)
                     {

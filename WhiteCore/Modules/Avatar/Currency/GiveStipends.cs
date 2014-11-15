@@ -34,6 +34,7 @@ using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Utilities;
+using WhiteCore.Framework.ConsoleFramework;
 
 namespace Simple.Currency
 {
@@ -46,12 +47,12 @@ namespace Simple.Currency
         private readonly IRegistryCore m_registry;
         private readonly SimpleCurrencyConnector m_currencyService;
 
-        public GiveStipends(SimpleCurrencyConfig options, IRegistryCore registry, SimpleCurrencyConnector dustCurrencyService)
+        public GiveStipends(SimpleCurrencyConfig options, IRegistryCore registry, SimpleCurrencyConnector CurrencyService)
         {
             m_enabled = options.GiveStipends;
             if (!m_enabled) return;
 
-            m_currencyService = dustCurrencyService;
+            m_currencyService = CurrencyService;
             m_options = options;
             m_registry = registry;
             taskTimer.Interval = 360000;
@@ -118,6 +119,7 @@ namespace Simple.Currency
                 IMoneyModule mo = m_registry.RequestModuleInterface<IMoneyModule>();
                 if (mo == null) return null;
                 UUID transid = UUID.Random();
+                MainConsole.Instance.Info("[MONEY MODULE] Stipend Payment for " + ua.Name + " " + ua.Name + " is now running");
                 if (m_currencyService.UserCurrencyTransfer(ua.PrincipalID, UUID.Zero, (uint)m_options.Stipend, "Stipend Payment", TransactionType.StipendPayment, transid))
                 {
                     return transid.ToString();
