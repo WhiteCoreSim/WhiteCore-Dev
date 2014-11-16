@@ -586,38 +586,25 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
         private void MoveLinear(float pTimestep, WhiteCoreODEPhysicsScene _pParentScene, WhiteCoreODEPrim parent)
         {
-            if (m_linearMotorDirection.LengthSquared() < 0.0001f)
-            {
-                m_linearMotorDirection = Vector3.Zero;
-                m_newVelocity = Vector3.Zero;
-            }
-            else
-            {
-                Vector3 addAmount = (m_linearMotorDirection - m_lastLinearVelocityVector)/(m_linearMotorTimescale);
-                m_lastLinearVelocityVector += (addAmount);
-
-                m_linearMotorDirection *= (1.0f - 1.0f/m_linearMotorDecayTimescale);
-
-                // convert requested object velocity to world-referenced vector
-                d.Quaternion rot = d.BodyGetQuaternion(Body);
-                Quaternion rotq = new Quaternion(rot.X, rot.Y, rot.Z, rot.W); // rotq = rotation of object
-                //Vector3 oldVelocity = m_newVelocity;
-                m_newVelocity = m_lastLinearVelocityVector*rotq; // apply obj rotation to velocity vector
-                //if (oldVelocity.Z == 0 && (Type != Vehicle.TYPE_AIRPLANE && Type != Vehicle.TYPE_BALLOON))
-                //    m_newVelocity.Z += dvel_now.Z; // Preserve the accumulated falling velocity
-            }
-
-            //if (m_newVelocity.Z == 0 && (Type != Vehicle.TYPE_AIRPLANE && Type != Vehicle.TYPE_BALLOON))
-            //    m_newVelocity.Z += dvel_now.Z; // Preserve the accumulated falling velocity
-
+            bool ishovering = false;
+            bool bypass_buoyancy = false;
             d.Vector3 dpos = d.BodyGetPosition(Body);
+            d.Vector3 dvel_now = d.BodyGetLinearVel(Body);
+            d.Quaternion drotq_now = d.BodyGetQuaternion(Body);
+
             Vector3 pos = new Vector3(dpos.X, dpos.Y, dpos.Z);
+            Vector3 vel_now = new Vector3(dvel_now.X, dvel_now.Y, dvel_now.Z);
+            Quaternion rotq = new Quaternion(drotq_now.X, drotq_now.Y, drotq_now.Z, drotq_now.W);
+            rotq *= m_referenceFrame; //add reference rotation to rotq
+            Quaternion irotq = new Quaternion(-rotq.X, -rotq.Y, -rotq.Z, rotq.W);
+
+            m_newVelocity = Vector3.Zero;
 
             if (!(m_lastPositionVector.X == 0 &&
                   m_lastPositionVector.Y == 0 &&
                   m_lastPositionVector.Z == 0))
             {
-                // Only do this if we have a last position
+                ///Only do this if we have a last position
                 m_lastposChange.X = pos.X - m_lastPositionVector.X;
                 m_lastposChange.Y = pos.Y - m_lastPositionVector.Y;
                 m_lastposChange.Z = pos.Z - m_lastPositionVector.Z;
@@ -628,32 +615,27 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             if (m_BlockingEndPoint != Vector3.Zero)
             {
                 bool needUpdateBody = false;
-                if (pos.X >= (m_BlockingEndPoint.X - 1))
-                {
+                if(pos.X >= (m_BlockingEndPoint.X - 1)) {
                     pos.X -= m_lastposChange.X + 1;
                     needUpdateBody = true;
                 }
-                if (pos.Y >= (m_BlockingEndPoint.Y - 1))
-                {
+                if(pos.Y >= (m_BlockingEndPoint.Y - 1)) {
                     pos.Y -= m_lastposChange.Y + 1;
                     needUpdateBody = true;
                 }
-                if (pos.Z >= (m_BlockingEndPoint.Z - 1))
-                {
+                if(pos.Z >= (m_BlockingEndPoint.Z - 1)) {
                     pos.Z -= m_lastposChange.Z + 1;
                     needUpdateBody = true;
                 }
-                if (pos.X <= 0)
-                {
+                if(pos.X <= 0) {
                     pos.X += m_lastposChange.X + 1;
                     needUpdateBody = true;
                 }
-                if (pos.Y <= 0)
-                {
+                if(pos.Y <= 0) {
                     pos.Y += m_lastposChange.Y + 1;
                     needUpdateBody = true;
                 }
-                if (needUpdateBody)
+                if(needUpdateBody)
                     d.BodySetPosition(Body, pos.X, pos.Y, pos.Z);
             }
 
@@ -662,400 +644,475 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             #region Terrain checks
 
             float terrainHeight = _pParentScene.GetTerrainHeightAtXY(pos.X, pos.Y);
-            if (pos.Z < terrainHeight - 5)
-            {
+            if(pos.Z < terrainHeight - 5) {
                 pos.Z = terrainHeight + 2;
                 m_lastPositionVector = pos;
-                //Make sure that we don't have an explosion the next frame with the posChange
                 d.BodySetPosition(Body, pos.X, pos.Y, pos.Z);
             }
-            else if (pos.Z < terrainHeight)
+            else if(pos.Z < terrainHeight) {
                 m_newVelocity.Z += 1;
+            }
 
             #endregion
 
             #region Hover
 
-            // Check if hovering
-            if ((m_flags &
-                 (VehicleFlag.HOVER_WATER_ONLY | VehicleFlag.HOVER_TERRAIN_ONLY | VehicleFlag.HOVER_GLOBAL_HEIGHT)) != 0)
-            {
-                // We should hover, get the target height
-                if ((m_flags & VehicleFlag.HOVER_WATER_ONLY) != 0)
-                {
-                    m_VhoverTargetHeight = (float) _pParentScene.GetWaterLevel(pos.X, pos.Y) + m_VhoverHeight;
+            Vector3 hovervel = Vector3.Zero;
+            if(m_VhoverTimescale * pTimestep <= 300.0f && m_VhoverHeight > 0.0f) {
+                ishovering = true;
+
+                if ((m_flags & VehicleFlag.HOVER_WATER_ONLY) != 0) {
+                    m_VhoverTargetHeight = (float) _pParentScene.GetWaterLevel(pos.X, pos.Y) + 0.3f + m_VhoverHeight;
                 }
-                if ((m_flags & VehicleFlag.HOVER_TERRAIN_ONLY) != 0)
-                {
+                else if ((m_flags & VehicleFlag.HOVER_TERRAIN_ONLY) != 0) {
                     m_VhoverTargetHeight = _pParentScene.GetTerrainHeightAtXY(pos.X, pos.Y) + m_VhoverHeight;
                 }
-                if ((m_flags & VehicleFlag.HOVER_GLOBAL_HEIGHT) != 0)
-                {
+                else if ((m_flags & VehicleFlag.HOVER_GLOBAL_HEIGHT) != 0) {
                     m_VhoverTargetHeight = m_VhoverHeight;
+                }
+                else {
+                    float waterlevel = (float)_pParentScene.GetWaterLevel(pos.X, pos.Y) + 0.3f;
+                    float terrainlevel = (float)_pParentScene.GetTerrainHeightAtXY(pos.X, pos.Y);
+                    if(waterlevel > terrainlevel) {
+                        m_VhoverTargetHeight = waterlevel + m_VhoverHeight;
+                    }
+                    else {
+                        m_VhoverTargetHeight = terrainlevel + m_VhoverHeight;
+                    }
                 }
 
                 float tempHoverHeight = m_VhoverTargetHeight;
-                if ((m_flags & VehicleFlag.HOVER_UP_ONLY) != 0)
-                {
+                if((m_flags & VehicleFlag.HOVER_UP_ONLY) != 0) {
                     // If body is aready heigher, use its height as target height
-                    if (pos.Z > tempHoverHeight)
+                    if (pos.Z > tempHoverHeight) {
                         tempHoverHeight = pos.Z;
+                        bypass_buoyancy = true; //emulate sl bug
+                    }
                 }
-                if ((m_flags & VehicleFlag.LOCK_HOVER_HEIGHT) != 0)
-                {
-                    if ((pos.Z - tempHoverHeight) > .2 || (pos.Z - tempHoverHeight) < -.2)
-                    {
+                if((m_flags & VehicleFlag.LOCK_HOVER_HEIGHT) != 0) {
+                    if((pos.Z - tempHoverHeight) > .2 || (pos.Z - tempHoverHeight) < -.2) {
                         float h = tempHoverHeight;
                         float groundHeight = _pParentScene.GetTerrainHeightAtXY(pos.X, pos.Y);
-                        if (groundHeight >= tempHoverHeight)
+                        if(groundHeight >= tempHoverHeight) 
                             h = groundHeight;
 
                         d.BodySetPosition(Body, pos.X, pos.Y, h);
                     }
                 }
-                else
-                {
-                    float herr0 = pos.Z - tempHoverHeight;
-                    // Replace Vertical speed with correction figure if significant
-                    if (herr0 > 0.01f)
-                    {
-                        m_newVelocity.Z = -((herr0*50.0f)/m_VhoverTimescale);
-                        //KF: m_VhoverEfficiency is not yet implemented
-                    }
-                    else if (herr0 < -0.01f)
-                    {
-                        m_newVelocity.Z = -((herr0*50f)/m_VhoverTimescale);
-                    }
-                    else
-                    {
-                        m_newVelocity.Z = 0f;
-                    }
-                }
+                else {
+                    hovervel.Z -= ((dvel_now.Z * 0.1f * m_VhoverEfficiency) + (pos.Z - tempHoverHeight)) / m_VhoverTimescale;
+                    hovervel.Z *= 7.0f * (1.0f + m_VhoverEfficiency);
 
-                //                m_VhoverEfficiency = 0f;    // 0=boucy, 1=Crit.damped
-                //                m_VhoverTimescale = 0f;        // time to acheive height
-                //                pTimestep  is time since last frame,in secs
+                    if(hovervel.Z > 50.0f) hovervel.Z = 50.0f;
+                    if(hovervel.Z < -50.0f) hovervel.Z = -50.0f;
+                }
             }
-
-            #endregion
-
-            #region No X,Y,Z
-
-            if ((m_flags & (VehicleFlag.NO_X)) != 0)
-                m_newVelocity.X = 0;
-            if ((m_flags & (VehicleFlag.NO_Y)) != 0)
-                m_newVelocity.Y = 0;
-            if ((m_flags & (VehicleFlag.NO_Z)) != 0)
-                m_newVelocity.Z = 0;
-
-            #endregion
-
-            #region Deal with tainted forces
-
-            // KF: So far I have found no good method to combine a script-requested
-            // .Z velocity and gravity. Therefore only 0g will used script-requested
-            // .Z velocity. >0g (m_VehicleBuoyancy < 1) will used modified gravity only.
-            // m_VehicleBuoyancy: -1=2g; 0=1g; 1=0g;
-            Vector3 TaintedForce = new Vector3();
-            if (m_forcelist.Count != 0)
-            {
-                try
-                {
-                    TaintedForce = m_forcelist.Aggregate(TaintedForce, (current, t) => current + (t));
-                }
-                catch (IndexOutOfRangeException)
-                {
-                    TaintedForce = Vector3.Zero;
-                }
-                catch (ArgumentOutOfRangeException)
-                {
-                    TaintedForce = Vector3.Zero;
-                }
-                m_forcelist = new List<Vector3>();
-            }
-
-            // force to deltaV
-            m_newVelocity += TaintedForce*(pTimestep/Mass);
-
-            #endregion
-
-            #region Deflection
-
-            //Forward is the prefered direction
-            /*Vector3 deflectionamount = m_newVelocity / (m_linearDeflectionTimescale / pTimestep);
-            //deflectionamount *= m_linearDeflectionEfficiency;
-            if (deflectionamount != Vector3.Zero)
-            {
-            }
-            Vector3 deflection = Vector3.One / deflectionamount;
-            m_newVelocity /= deflection;*/
 
             #endregion
 
             #region limitations
 
-            if (m_newVelocity.LengthSquared() > 1e6f)
-            {
-                m_newVelocity /= m_newVelocity.Length();
-                m_newVelocity *= 1000f;
+            //limit maximum velocity
+            if(vel_now.LengthSquared() > 1e6f) {
+                vel_now /= vel_now.Length();
+                vel_now *= 1000f;
+                d.BodySetLinearVel(Body, vel_now.X, vel_now.Y, vel_now.Z);
             }
-            else if (m_newVelocity.LengthSquared() < 1e-6f)
-                m_newVelocity = Vector3.Zero;
+
+            //block movement in x and y when low velocity
+            bool enable_ode_gravity = true;
+            if(vel_now.LengthSquared() < 0.02f) {
+                d.BodySetLinearVel(Body, 0.0f, 0.0f, 0.0f);
+                vel_now = Vector3.Zero;
+                if(parent.LinkSetIsColliding)
+                    enable_ode_gravity = false;
+            }
 
             #endregion
 
-            m_lastPositionVector = parent.Position;
+            #region Linear motors
 
-            float grav = -1*Mass*pTimestep;
-
-            // Apply velocity
-            if (m_newVelocity != Vector3.Zero)
-            {
-                if ((Type == Vehicle.TYPE_CAR || Type == Vehicle.TYPE_SLED) && !parent.LinkSetIsColliding)
-                {
-                    //Force ODE gravity here!!!
-                }
-                else
-                    d.BodySetLinearVel(Body, m_newVelocity.X, m_newVelocity.Y, m_newVelocity.Z + grav);
+            //cancel directions of linear friction for certain vehicles without having effect on ode gravity
+            Vector3 vt_vel_now = vel_now;
+            bool no_grav_calc = false;
+            if((Type != Vehicle.TYPE_AIRPLANE && Type != Vehicle.TYPE_BALLOON) && m_VehicleBuoyancy != 1.0f) {
+                vt_vel_now.Z = 0.0f;
+                no_grav_calc = true;
             }
-            // apply friction
-            m_lastLinearVelocityVector.X *= (1.0f - 1/m_linearFrictionTimescale.X);
-            m_lastLinearVelocityVector.Y *= (1.0f - 1/m_linearFrictionTimescale.Y);
-            m_lastLinearVelocityVector.Z *= (1.0f - 1/m_linearFrictionTimescale.Z);
-        }
 
-        // end MoveLinear()
+            if(!bypass_buoyancy) {
+                //apply additional gravity force over ode gravity
+                if(m_VehicleBuoyancy == 1.0f) enable_ode_gravity = false;
+                else if(m_VehicleBuoyancy != 0.0f && enable_ode_gravity) {
+                    float grav = _pParentScene.gravityz * parent.GravityMultiplier * -m_VehicleBuoyancy;
+                    m_newVelocity.Z += grav * Mass;
+                }
+            }
+
+            //set ode gravity
+            d.BodySetGravityMode(Body, enable_ode_gravity);
+
+            //add default linear friction (mimic sl friction as much as possible)
+            float initialFriction = 0.055f;
+            float defaultFriction = 180f;
+
+            Vector3 friction = Vector3.Zero;
+            if(parent.LinkSetIsColliding || ishovering) {
+                if(vt_vel_now.X > 0.0f) friction.X += initialFriction;
+                if(vt_vel_now.Y > 0.0f) friction.Y += initialFriction;
+                if(vt_vel_now.Z > 0.0f) friction.Z += initialFriction;
+                if(vt_vel_now.X < 0.0f) friction.X -= initialFriction;
+                if(vt_vel_now.Y < 0.0f) friction.Y -= initialFriction;
+                if(vt_vel_now.Z < 0.0f) friction.Z -= initialFriction;
+                friction += vt_vel_now / defaultFriction;
+                friction *= irotq;
+            }
+
+            //world -> body orientation
+            vel_now *= irotq;
+            vt_vel_now *= irotq;
+
+            //add linear friction
+            if(vt_vel_now.X > 0.0f)
+                friction.X += vt_vel_now.X * vt_vel_now.X / m_linearFrictionTimescale.X;
+            else
+                friction.X -= vt_vel_now.X * vt_vel_now.X / m_linearFrictionTimescale.X;
+
+            if(vt_vel_now.Y > 0.0f)
+                friction.Y += vt_vel_now.Y * vt_vel_now.Y / m_linearFrictionTimescale.Y;
+            else
+                friction.Y -= vt_vel_now.Y * vt_vel_now.Y / m_linearFrictionTimescale.Y;
+
+            if(vt_vel_now.Z > 0.0f)
+                friction.Z += vt_vel_now.Z * vt_vel_now.Z / m_linearFrictionTimescale.Z;
+            else
+                friction.Z -= vt_vel_now.Z * vt_vel_now.Z / m_linearFrictionTimescale.Z;
+	    
+            friction /= 1.35f; //1.5f;
+
+            //add linear forces
+            //not the best solution, but it is really close to sl motor velocity, and just works
+            Vector3 motorVelocity = (m_linearMotorDirection * 3.0f - vel_now) / m_linearMotorTimescale / 5.0f;  //2.8f;
+            Vector3 motorfrictionamp = new Vector3(4.0f, 4.0f, 4.0f);
+            Vector3 motorfrictionstart = new Vector3(1.0f, 1.0f, 1.0f);
+            motorVelocity *= motorfrictionstart + motorfrictionamp / (m_linearFrictionTimescale * pTimestep);
+            float addVel = 0.15f;
+            if(motorVelocity.LengthSquared() > 0.01f) {
+                if(motorVelocity.X > 0.0f) motorVelocity.X += addVel;
+                if(motorVelocity.Y > 0.0f) motorVelocity.Y += addVel;
+                if(motorVelocity.Z > 0.0f) motorVelocity.Z += addVel;
+                if(motorVelocity.X < 0.0f) motorVelocity.X -= addVel;
+                if(motorVelocity.Y < 0.0f) motorVelocity.Y -= addVel;
+                if(motorVelocity.Z < 0.0f) motorVelocity.Z -= addVel;
+            }
+
+            //free run
+            if(vel_now.X > m_linearMotorDirection.X && m_linearMotorDirection.X >= 0.0f) motorVelocity.X = 0.0f;
+            if(vel_now.Y > m_linearMotorDirection.Y && m_linearMotorDirection.Y >= 0.0f) motorVelocity.Y = 0.0f;
+            if(vel_now.Z > m_linearMotorDirection.Z && m_linearMotorDirection.Z >= 0.0f) motorVelocity.Z = 0.0f;
+
+            if(vel_now.X < m_linearMotorDirection.X && m_linearMotorDirection.X <= 0.0f) motorVelocity.X = 0.0f;
+            if(vel_now.Y < m_linearMotorDirection.Y && m_linearMotorDirection.Y <= 0.0f) motorVelocity.Y = 0.0f;
+            if(vel_now.Z < m_linearMotorDirection.Z && m_linearMotorDirection.Z <= 0.0f) motorVelocity.Z = 0.0f;
+
+            //decay linear motor
+            m_linearMotorDirection *= (1.0f - 1.0f/m_linearMotorDecayTimescale);
+
+            #endregion
+
+            #region Deflection
+
+            //does only deflect on x axis from world orientation with z axis rotated to body
+            //it is easier to filter out gravity deflection for vehicles(car) without rotation problems
+            Quaternion irotq_z = irotq;
+            irotq_z.X = 0.0f;
+            irotq_z.Y = 0.0f;
+            float mag = (float)Math.Sqrt(irotq_z.W * irotq_z.W + irotq_z.Z * irotq_z.Z); //normalize
+            irotq_z.W /= mag;
+            irotq_z.Z /= mag;
+
+            Vector3 vel_defl = new Vector3(dvel_now.X, dvel_now.Y, dvel_now.Z);
+            vel_defl *= irotq_z;
+            if(no_grav_calc) {
+                vel_defl.Z = 0.0f;
+                if(!parent.LinkSetIsColliding) vel_defl.Y = 0.0f;
+            }
+
+            Vector3 deflection = vel_defl / m_linearDeflectionTimescale * m_linearDeflectionEfficiency * 100.0f;
+            deflection.X = 0.0f;
+            float deflectionLength = deflection.Length();
+            if(deflectionLength < 0.0f) deflectionLength = 0.0f;
+
+            if(vel_defl.X < 0.0f) deflection.X = -deflectionLength;
+            else if(vel_defl.X > 0.0f) deflection.X = deflectionLength;
+
+            deflection.Y = -deflection.Y;
+            deflection.Z = -deflection.Z;
+
+            irotq_z.W = -irotq_z.W;
+            deflection *= irotq_z;
+
+            #endregion
+
+            #region Deal with tainted forces
+
+            Vector3 TaintedForce = new Vector3();
+            if(m_forcelist.Count != 0) {
+                try {
+                    TaintedForce = m_forcelist.Aggregate(TaintedForce, (current, t) => current + (t));
+                }
+                catch(IndexOutOfRangeException) {
+                    TaintedForce = Vector3.Zero;
+                }
+                catch(ArgumentOutOfRangeException) {
+                    TaintedForce = Vector3.Zero;
+                }
+                m_forcelist = new List<Vector3>();
+            }
+
+            #endregion
+
+            #region Add Forces
+
+            //add forces
+            m_newVelocity -= (friction *= Mass / pTimestep);
+            m_newVelocity += TaintedForce;
+            motorVelocity *= Mass / pTimestep;
+
+            #endregion
+
+            #region No X,Y,Z
+
+            if((m_flags & (VehicleFlag.NO_X)) != 0)
+                m_newVelocity.X = -vel_now.X * Mass / pTimestep;
+            if((m_flags & (VehicleFlag.NO_Y)) != 0)
+                m_newVelocity.Y = -vel_now.Y * Mass / pTimestep;
+            if((m_flags & (VehicleFlag.NO_Z)) != 0)
+                m_newVelocity.Z = -vel_now.Z * Mass / pTimestep;
+
+            #endregion
+
+    	    m_newVelocity *= rotq;
+            m_newVelocity += (hovervel *= Mass / pTimestep);
+	    
+            if(parent.LinkSetIsColliding || Type == Vehicle.TYPE_AIRPLANE || Type == Vehicle.TYPE_BALLOON || ishovering) {
+                if((m_flags & (VehicleFlag.NO_DEFLECTION_UP)) != 0 && deflection.Z > 0.0f) deflection.Z = 0.0f;
+                m_newVelocity += deflection;
+
+                motorVelocity *= rotq;
+
+                if((m_flags & (VehicleFlag.LIMIT_MOTOR_UP)) != 0 && motorVelocity.Z > 0.0f) motorVelocity.Z = 0.0f;
+                m_newVelocity += motorVelocity;
+            }
+
+            d.BodyAddForce(Body, m_newVelocity.X, m_newVelocity.Y, m_newVelocity.Z);
+
+        }
 
         private void MoveAngular(float pTimestep, WhiteCoreODEPhysicsScene _pParentScene, WhiteCoreODEPrim parent)
         {
-            d.Vector3 angularVelocity = d.BodyGetAngularVel(Body);
-            d.Quaternion rot = d.BodyGetQuaternion(Body);
-            Quaternion rotq = new Quaternion(rot.X, rot.Y, rot.Z, rot.W);
-            //         Vector3 angularVelocity = Vector3.Zero;
+            bool ishovering = false;
+            d.Vector3 d_angularVelocity = d.BodyGetAngularVel(Body);
+            d.Vector3 d_lin_vel_now = d.BodyGetLinearVel(Body);
+            d.Quaternion drotq = d.BodyGetQuaternion(Body);
+            Quaternion rotq = new Quaternion(drotq.X, drotq.Y, drotq.Z, drotq.W);
+            rotq *= m_referenceFrame; //add reference rotation to rotq
+            Quaternion irotq = new Quaternion(-rotq.X, -rotq.Y, -rotq.Z, rotq.W);
+            Vector3 angularVelocity = new Vector3(d_angularVelocity.X, d_angularVelocity.Y, d_angularVelocity.Z);
+            Vector3 linearVelocity = new Vector3(d_lin_vel_now.X, d_lin_vel_now.Y, d_lin_vel_now.Z);
 
-            /*if ((m_flags & VehicleFlag.MOUSELOOK_STEER) == VehicleFlag.MOUSELOOK_STEER)
-            {
-                if (m_userLookAt != Quaternion.Identity)
-                {
-                    Quaternion camrot = Quaternion.Subtract (m_userLookAt, rotq);
-                    camrot.Normalize ();
-                    m_angularMotorVelocity += Vector3.One * camrot;
-                    Console.WriteLine (Vector3.One * camrot);
-                }
-            }*/
-
-            if (m_angularMotorDirection.LengthSquared() > 1e-6f)
-            {
-                m_angularMotorVelocity.X = (m_angularMotorDirection.X - angularVelocity.X)/(m_angularMotorTimescale);
-                m_angularMotorVelocity.Y = (m_angularMotorDirection.Y - angularVelocity.Y)/(m_angularMotorTimescale);
-                m_angularMotorVelocity.Z = (m_angularMotorDirection.Z - angularVelocity.Z)/(m_angularMotorTimescale);
-                m_angularMotorDirection *= (1.0f - 1.0f/m_angularMotorDecayTimescale);
-            }
-            else
-            {
-                m_angularMotorVelocity = Vector3.Zero;
-            } // end motor section
-
-
-            // Vertical attractor section
+            Vector3 friction = Vector3.Zero;
             Vector3 vertattr = Vector3.Zero;
             Vector3 deflection = Vector3.Zero;
             Vector3 banking = Vector3.Zero;
 
-            if (m_verticalAttractionTimescale < 300 && m_lastAngularVelocity != Vector3.Zero)
-            {
-                float VAservo = 0;
-                if (Type == Vehicle.TYPE_BOAT)
-                {
-                    VAservo = 0.2f/(m_verticalAttractionTimescale);
-                    VAservo *= (m_verticalAttractionEfficiency*m_verticalAttractionEfficiency);
-                }
-                else
-                {
-                    if (parent.LinkSetIsColliding)
-                        VAservo = 0.05f/(m_verticalAttractionTimescale);
-                    else
-                        VAservo = 0.2f/(m_verticalAttractionTimescale);
-                    VAservo *= (m_verticalAttractionEfficiency*m_verticalAttractionEfficiency);
-                }
-                // make a vector pointing up
-                Vector3 verterr = Vector3.Zero;
-                verterr.Z = 1.0f;
-                // rotate it to Body Angle
-                verterr = verterr*rotq;
-                // verterr.X and .Y are the World error ammounts. They are 0 when there is no error (Vehicle Body is 'vertical'), and .Z will be 1.
-                // As the body leans to its side |.X| will increase to 1 and .Z fall to 0. As body inverts |.X| will fall and .Z will go
-                // negative. Similar for tilt and |.Y|. .X and .Y must be modulated to prevent a stable inverted body.
-                if (verterr.Z < 0.0f)
-                {
-                    verterr.X = 2.0f - verterr.X;
-                    verterr.Y = 2.0f - verterr.Y;
-                }
-                // Error is 0 (no error) to +/- 2 (max error)
-                // scale it by VAservo
-                verterr = verterr*VAservo;
-                //if (frcount == 0) Console.WriteLine("VAerr=" + verterr);
+            //limit maximum rotation speed
+            if(angularVelocity.LengthSquared() > 1e3f) {
+                angularVelocity = Vector3.Zero;
+                d.BodySetAngularVel(Body, angularVelocity.X, angularVelocity.Y, angularVelocity.Z);
+            }
 
-                // As the body rotates around the X axis, then verterr.Y increases; Rotated around Y then .X increases, so
-                // Change  Body angular velocity  X based on Y, and Y based on X. Z is not changed.
+            angularVelocity *= irotq; //world to body orientation
+
+            if(m_VhoverTimescale * pTimestep <= 300.0f && m_VhoverHeight > 0.0f) ishovering = true;
+
+            #region Angular motor
+            Vector3 motorDirection = Vector3.Zero;
+
+            if(Type == Vehicle.TYPE_BOAT) {
+                //keep z flat for boats, no sidediving lol
+                Vector3 tmp = new Vector3(0.0f, 0.0f, m_angularMotorDirection.Z);
+                m_angularMotorDirection.Z = 0.0f;
+                m_angularMotorDirection += tmp * irotq;
+            }
+
+            if(parent.LinkSetIsColliding || Type == Vehicle.TYPE_AIRPLANE || Type == Vehicle.TYPE_BALLOON || ishovering){
+                motorDirection = m_angularMotorDirection * 0.34f; //0.3f;
+            }
+
+            m_angularMotorVelocity.X = (motorDirection.X - angularVelocity.X) / m_angularMotorTimescale;
+            m_angularMotorVelocity.Y = (motorDirection.Y - angularVelocity.Y) / m_angularMotorTimescale;
+            m_angularMotorVelocity.Z = (motorDirection.Z - angularVelocity.Z) / m_angularMotorTimescale;
+            m_angularMotorDirection *= (1.0f - 1.0f/m_angularMotorDecayTimescale);
+
+            if(m_angularMotorDirection.LengthSquared() > 0.0f)
+            {
+                if(angularVelocity.X > m_angularMotorDirection.X && m_angularMotorDirection.X >= 0.0f) m_angularMotorVelocity.X = 0.0f;
+                if(angularVelocity.Y > m_angularMotorDirection.Y && m_angularMotorDirection.Y >= 0.0f) m_angularMotorVelocity.Y = 0.0f;
+                if(angularVelocity.Z > m_angularMotorDirection.Z && m_angularMotorDirection.Z >= 0.0f) m_angularMotorVelocity.Z = 0.0f;
+
+                if(angularVelocity.X < m_angularMotorDirection.X && m_angularMotorDirection.X <= 0.0f) m_angularMotorVelocity.X = 0.0f;
+                if(angularVelocity.Y < m_angularMotorDirection.Y && m_angularMotorDirection.Y <= 0.0f) m_angularMotorVelocity.Y = 0.0f;
+                if(angularVelocity.Z < m_angularMotorDirection.Z && m_angularMotorDirection.Z <= 0.0f) m_angularMotorVelocity.Z = 0.0f;
+            }
+
+            #endregion
+
+            #region friction
+
+            float initialFriction = 0.0001f;
+            if(angularVelocity.X > initialFriction) friction.X += initialFriction;
+    	    if(angularVelocity.Y > initialFriction) friction.Y += initialFriction;
+    	    if(angularVelocity.Z > initialFriction) friction.Z += initialFriction;
+            if(angularVelocity.X < -initialFriction) friction.X -= initialFriction;
+            if(angularVelocity.Y < -initialFriction) friction.Y -= initialFriction;
+            if(angularVelocity.Z < -initialFriction) friction.Z -= initialFriction;
+
+            if(angularVelocity.X > 0.0f)
+                friction.X += angularVelocity.X * angularVelocity.X / m_angularFrictionTimescale.X;
+            else
+                friction.X -= angularVelocity.X * angularVelocity.X / m_angularFrictionTimescale.X;
+            
+            if(angularVelocity.Y > 0.0f)
+                friction.Y += angularVelocity.Y * angularVelocity.Y / m_angularFrictionTimescale.Y;
+            else
+                friction.Y -= angularVelocity.Y * angularVelocity.Y / m_angularFrictionTimescale.Y;
+
+            if(angularVelocity.Z > 0.0f)
+                friction.Z += angularVelocity.Z * angularVelocity.Z / m_angularFrictionTimescale.Z;
+            else
+                friction.Z -= angularVelocity.Z * angularVelocity.Z / m_angularFrictionTimescale.Z;
+
+
+            if(Math.Abs(m_angularMotorDirection.X) > 0.01f) friction.X = 0.0f;
+            if(Math.Abs(m_angularMotorDirection.Y) > 0.01f) friction.Y = 0.0f;
+            if(Math.Abs(m_angularMotorDirection.Z) > 0.01f) friction.Z = 0.0f;
+
+            #endregion
+
+            #region Vertical attraction
+
+            if(m_verticalAttractionTimescale < 300)
+            {
+                float VAservo = 38.0f / m_verticalAttractionTimescale;
+                if(Type == Vehicle.TYPE_CAR) VAservo = 10.0f / m_verticalAttractionTimescale;
+
+                Vector3 verterr = new Vector3(0.0f, 0.0f, 1.0f);
+                verterr *= rotq;
                 vertattr.X = verterr.Y;
                 vertattr.Y = -verterr.X;
-                vertattr.Z = 0f;
+                vertattr.Z = 0.0f;
 
-                // scaling appears better usingsquare-law
-                float bounce = 1.0f - (m_verticalAttractionEfficiency*m_verticalAttractionEfficiency);
-                vertattr.X += bounce*angularVelocity.X;
-                vertattr.Y += bounce*angularVelocity.Y;
-            } // else vertical attractor is off
+                vertattr *= irotq;
 
-            #region Deflection
-
-            //Forward is the prefered direction, but if the reference frame has changed, we need to take this into account as well
-            Vector3 PreferredAxisOfMotion =
-                new Vector3((10*(m_angularDeflectionEfficiency/m_angularDeflectionTimescale)), 0, 0);
-            PreferredAxisOfMotion *= Quaternion.Add(rotq, m_referenceFrame);
-
-            //Multiply it so that it scales linearly
-            //deflection = PreferredAxisOfMotion;
-
-            //deflection = ((PreferredAxisOfMotion * m_angularDeflectionEfficiency) / (m_angularDeflectionTimescale / pTimestep));
-
-            #endregion
-
-            #region Banking
-
-            if (m_bankingEfficiency != 0)
-            {
-// 20131224 not used                Vector3 dir = Vector3.One*rotq;
-                float mult = (m_bankingMix*m_bankingMix)*-1*(m_bankingMix < 0 ? -1 : 1);
-                //Changes which way it banks in and out of turns
-
-                //Use the square of the efficiency, as it looks much more how SL banking works
-                float effSquared = (m_bankingEfficiency*m_bankingEfficiency);
-                if (m_bankingEfficiency < 0)
-                    effSquared *= -1; //Keep the negative!
-
-                float mix = Math.Abs(m_bankingMix);
-                if (m_angularMotorVelocity.X == 0)
-                {
-                    /*if (!parent.Orientation.ApproxEquals(this.m_referenceFrame, 0.25f))
-                    {
-                        Vector3 axisAngle;
-                        float angle;
-                        parent.Orientation.GetAxisAngle(out axisAngle, out angle);
-                        Vector3 rotatedVel = parent.Velocity * parent.Orientation;
-                        if ((rotatedVel.X < 0 && axisAngle.Y > 0) || (rotatedVel.X > 0 && axisAngle.Y < 0))
-                            m_angularMotorVelocity.X += (effSquared * (mult * mix)) * (1f) * 10;
-                        else
-                            m_angularMotorVelocity.X += (effSquared * (mult * mix)) * (-1f) * 10;
-                    }*/
+                //when upsidedown prefer x rotation of body, to keep forward movement direction the same
+                if(verterr.Z < 0.0f) {
+                    vertattr.Y = -vertattr.Y * 2.0f;
+                    if(vertattr.X < 0.0f) vertattr.X = -2.0f - vertattr.X;
+                    else vertattr.X = 2.0f - vertattr.X;
                 }
-                else
-                    banking.Z += (effSquared*(mult*mix))*(m_angularMotorVelocity.X)*4;
-                if (!parent.LinkSetIsColliding && Math.Abs(m_angularMotorVelocity.X) > mix)
-                    //If they are colliding, we probably shouldn't shove the prim around... probably
+
+                vertattr *= VAservo;
+
+                float bounce = 1.0f - m_verticalAttractionEfficiency;
+                float eff = 0.30f;
+
+                //disable this if vehicles go crazy using vertical attraction efficiency
+                if(m_angularMotorDirection.X == 0.0f && 
+                   m_angularMotorDirection.Y == 0.0f && 
+                   m_angularMotorDirection.Z == 0.0f && 
+                   Math.Abs(verterr.Z) > 0.8f)
                 {
-                    float angVelZ = m_angularMotorVelocity.X*-1;
-                    /*if(angVelZ > mix)
-                        angVelZ = mix;
-                    else if(angVelZ < -mix)
-                        angVelZ = -mix;*/
-                    //This controls how fast and how far the banking occurs
-                    Vector3 bankingRot = new Vector3(angVelZ*(effSquared*mult), 0, 0);
-                    if (bankingRot.X > 3)
-                        bankingRot.X = 3;
-                    else if (bankingRot.X < -3)
-                        bankingRot.X = -3;
-                    bankingRot *= rotq;
-                    banking += bankingRot;
+                    if((vertattr.X > 0.0f && angularVelocity.X > 0.0f) || (vertattr.X < 0.0f && angularVelocity.X < 0.0f))
+                        vertattr.X += bounce * angularVelocity.X * eff;
+                    if((vertattr.Y > 0.0f && angularVelocity.Y > 0.0f) || (vertattr.Y < 0.0f && angularVelocity.Y < 0.0f))
+                        vertattr.Y += bounce * angularVelocity.Y * eff;
                 }
-                m_angularMotorVelocity.X *= m_bankingEfficiency == 1 ? 0.0f : 1 - m_bankingEfficiency;
+
+                if((m_flags & (VehicleFlag.LIMIT_ROLL_ONLY)) != 0) vertattr.Y = 0.0f;
             }
 
             #endregion
 
-            #region Downward Force
+            #region deflection
+            //rotates body to direction of movement (linearMovement vector)
 
-            Vector3 downForce = Vector3.Zero;
-
-            double Zchange = m_lastposChange.Z;
-            if ((m_flags & (VehicleFlag.LIMIT_MOTOR_UP)) != 0) //if it isn't going up, don't apply the limiting force
+            if(m_angularDeflectionTimescale < 300)
             {
-                if (Zchange < -0.1f)
-                {
-                    if (Zchange < -0.3f)
-                        Zchange = -0.3f;
-                    //Requires idea of 'up', so use reference frame to rotate it
-                    //Add to the X, because that will normally tilt the vehicle downward (if its rotated, it'll be rotated by the ref. frame
-                    downForce = (new Vector3(0, ((float) Math.Abs(Zchange)*(pTimestep*_pParentScene.PID_P/4)), 0));
-                    downForce *= rotq;
+                float Dservo = 0.05f * m_angularDeflectionTimescale * m_angularDeflectionEfficiency;
+                float mag = (float)linearVelocity.LengthSquared();
+                if(mag > 0.01f) {
+                    linearVelocity.Y = -linearVelocity.Y;
+                    linearVelocity *= rotq;
+
+                    mag = (float)Math.Sqrt(mag);
+
+                    linearVelocity.Y /= mag;
+                    linearVelocity.Z /= mag;
+
+                    deflection.Y = -linearVelocity.Z;
+                    deflection.Z = -linearVelocity.Y;
+
+                    deflection *= Dservo;
                 }
             }
 
             #endregion
 
-            // Sum velocities
-            m_lastAngularVelocity = m_angularMotorVelocity + vertattr + deflection + banking + downForce;
+            #region banking
 
-            #region Linear Motor Offset
+            if(m_verticalAttractionTimescale < 300 && m_bankingEfficiency > 0) { //vertical attraction must be enabled		
+                float mag = (float)(linearVelocity.X * linearVelocity.X + linearVelocity.Y * linearVelocity.Y);
+                if(mag > 0.01f) {
+                    mag = (float)Math.Sqrt(mag);
+                    if(mag > 20.0f) mag = 1.0f;
+                    else mag /= 20.0f;
+                }
+                else mag = 0.0f;
 
-            //Offset section
-            if (m_linearMotorOffset != Vector3.Zero)
-            {
-                //Offset of linear velocity doesn't change the linear velocity,
-                //   but causes a torque to be applied, for example...
-                //
-                //      IIIII     >>>   IIIII
-                //      IIIII     >>>    IIIII
-                //      IIIII     >>>     IIIII
-                //          ^
-                //          |  Applying a force at the arrow will cause the object to move forward, but also rotate
-                //
-                //
-                // The torque created is the linear velocity crossed with the offset
+                float b_static = -m_angularMotorDirection.X * 0.12f * (1.0f - m_bankingMix);
+                float b_dynamic = -m_angularMotorDirection.X * 0.12f * mag * m_bankingMix;
 
-                //Note: we use the motor, otherwise you will just spin around and we divide by 10 since otherwise we go crazy
-                Vector3 torqueFromOffset = (m_linearMotorDirectionLASTSET/m_linearMotorOffset);
-                if (float.IsNaN(torqueFromOffset.X))
-                    torqueFromOffset.X = 0;
-                if (float.IsNaN(torqueFromOffset.Y))
-                    torqueFromOffset.Y = 0;
-                if (float.IsNaN(torqueFromOffset.Z))
-                    torqueFromOffset.Z = 0;
-                d.BodyAddTorque(Body, torqueFromOffset.X, torqueFromOffset.Y, torqueFromOffset.Z);
+                banking.Z = (b_static + b_dynamic - d_angularVelocity.Z) / m_bankingTimescale * m_bankingEfficiency;
             }
 
             #endregion
 
-            /*if ((m_flags & (VehicleFlag.NO_DEFLECTION_UP)) != 0)
-            {
-                m_lastAngularVelocity.X = 0;
-                m_lastAngularVelocity.Y = 0;
-            }*/
+            m_lastAngularVelocity = angularVelocity;
+            
+            if(parent.LinkSetIsColliding || Type == Vehicle.TYPE_AIRPLANE || Type == Vehicle.TYPE_BALLOON || ishovering) {		
+                angularVelocity += deflection;
+                angularVelocity -= friction;
+            }
+            else {
+                banking = Vector3.Zero;
+            }
 
-            // apply friction
+            angularVelocity += m_angularMotorVelocity;
+            angularVelocity += vertattr;
+            angularVelocity *= rotq;
+            angularVelocity += banking;
 
-            // Apply to the body
-
-            if (m_lastAngularVelocity.LengthSquared() < 0.0001f)
-            {
-                m_lastAngularVelocity = Vector3.Zero;
+            if(angularVelocity.LengthSquared() < 1e-5f) {
+                angularVelocity = Vector3.Zero;
                 d.BodySetAngularVel(Body, 0, 0, 0);
                 m_angularZeroFlag = true;
             }
-            else
-            {
-                if (!d.BodyIsEnabled(Body))
-                    d.BodyEnable(Body);
-                d.BodySetAngularVel(Body, m_lastAngularVelocity.X, m_lastAngularVelocity.Y, m_lastAngularVelocity.Z);
+            else {
+                d.BodySetAngularVel(Body, angularVelocity.X, angularVelocity.Y, angularVelocity.Z);
                 m_angularZeroFlag = false;
-
-                m_lastAngularVelocity.X *= (1.0f - 1.0f/m_angularFrictionTimescale.X);
-                m_lastAngularVelocity.Y *= (1.0f - 1.0f/m_angularFrictionTimescale.Y);
-                m_lastAngularVelocity.Z *= (1.0f - 1.0f/m_angularFrictionTimescale.Z);
             }
         }
-
 
         private Vector3 ToEuler(Quaternion m_lastCameraRotation)
         {
