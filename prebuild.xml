@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <Prebuild version="1.7" xmlns="http://dnpb.sourceforge.net/schemas/prebuild-1.7.xsd">
-  <Solution activeConfig="Debug" name="WhiteCore" path="./" version="0.9.2-$Rev$">
+  <Solution activeConfig="Debug" name="WhiteCore" path="./" version="0.9.3 $Rev$">
     <Configuration name="Debug" platform="x86">
       <Options>
         <CompilerDefines>TRACE;DEBUG</CompilerDefines>
@@ -89,7 +89,7 @@
       </Options>
     </Configuration>
 
-    <Project frameworkVersion="v4_0" name="WhiteCore.Framework" path="WhiteCore/Framework" type="Library">
+    <Project frameworkVersion="v4_5" name="WhiteCore.Framework" path="WhiteCore/Framework" type="Library">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
@@ -147,7 +147,7 @@
     </Project>
 
     <!-- Physics Plug-ins -->
-    <Project frameworkVersion="v4_0" name="WhiteCore.Physics.BasicPhysicsPlugin" path="WhiteCore/Physics/BasicPhysicsPlugin" type="Library">
+    <Project frameworkVersion="v4_5" name="WhiteCore.Physics.BasicPhysicsPlugin" path="WhiteCore/Physics/BasicPhysicsPlugin" type="Library">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/Physics/</OutputPath>
@@ -194,7 +194,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="WhiteCore.Physics.Meshing" path="WhiteCore/Physics/Meshing" type="Library">
+    <Project frameworkVersion="v4_5" name="WhiteCore.Physics.Meshing" path="WhiteCore/Physics/Meshing" type="Library">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/Physics/</OutputPath>
@@ -247,7 +247,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="WhiteCore.Physics.BulletSPlugin" path="WhiteCore/Physics/BulletSPlugin" type="Library">
+    <Project frameworkVersion="v4_5" name="WhiteCore.Physics.BulletSPlugin" path="WhiteCore/Physics/BulletSPlugin" type="Library">
       <Configuration name="Debug">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/Physics/</OutputPath>
@@ -280,7 +280,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="WhiteCore.Physics.ConvexDecompositionDotNet" path="WhiteCore/Physics/ConvexDecompositionDotNet" type="Library">
+    <Project frameworkVersion="v4_5" name="WhiteCore.Physics.ConvexDecompositionDotNet" path="WhiteCore/Physics/ConvexDecompositionDotNet" type="Library">
       <Configuration name="Debug">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
@@ -305,7 +305,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="WhiteCore.Region" path="WhiteCore/Region" type="Library">
+    <Project frameworkVersion="v4_5" name="WhiteCore.Region" path="WhiteCore/Region" type="Library">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
@@ -362,7 +362,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="WhiteCore.Services.NoSQLServices" path="WhiteCore/Services/NoSQLServices" type="Library">
+    <Project frameworkVersion="v4_5" name="WhiteCore.Services.NoSQLServices" path="WhiteCore/Services/NoSQLServices" type="Library">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
@@ -422,7 +422,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="WhiteCore.Services.SQLServices" path="WhiteCore/Services/SQLServices" type="Library">
+    <Project frameworkVersion="v4_5" name="WhiteCore.Services.SQLServices" path="WhiteCore/Services/SQLServices" type="Library">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
@@ -481,7 +481,7 @@
       </Files>
     </Project>
 	
-    <Project frameworkVersion="v4_0" name="WhiteCore.Services.GenericServices" path="WhiteCore/Services/GenericServices" type="Library">
+    <Project frameworkVersion="v4_5" name="WhiteCore.Services.GenericServices" path="WhiteCore/Services/GenericServices" type="Library">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
@@ -543,7 +543,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="WhiteCore.DataManager" path="WhiteCore/DataManager" type="Library">
+    <Project frameworkVersion="v4_5" name="WhiteCore.DataManager" path="WhiteCore/DataManager" type="Library">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
@@ -595,7 +595,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="WhiteCore.DataManager.MySQL" path="WhiteCore/DataManagerPlugins/MySQL" type="Library">
+    <Project frameworkVersion="v4_5" name="WhiteCore.DataManager.MySQL" path="WhiteCore/DataManagerPlugins/MySQL" type="Library">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
@@ -650,7 +650,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="WhiteCore.DataManager.SQLite" path="WhiteCore/DataManagerPlugins/SQLite" type="Library">
+    <Project frameworkVersion="v4_5" name="WhiteCore.DataManager.SQLite" path="WhiteCore/DataManagerPlugins/SQLite" type="Library">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
@@ -706,7 +706,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="WhiteCore.Services.DataService" path="WhiteCore/Services/DataService" type="Library">
+    <Project frameworkVersion="v4_5" name="WhiteCore.Services.DataService" path="WhiteCore/Services/DataService" type="Library">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
@@ -764,7 +764,7 @@
       </Files>
     </Project>
   
-    <Project frameworkVersion="v4_0" name="WhiteCore.ClientStack" path="WhiteCore/ClientStack" type="Library">
+    <Project frameworkVersion="v4_5" name="WhiteCore.ClientStack" path="WhiteCore/ClientStack" type="Library">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
@@ -818,7 +818,7 @@
     </Project>
 	  
     <!-- WhiteCore app -->
-    <Project frameworkVersion="v4_0" name="WhiteCore" path="WhiteCore/Application" type="Exe" appmanifest="app.manifest">
+    <Project frameworkVersion="v4_5" name="WhiteCore" path="WhiteCore/Application" type="Exe" appmanifest="app.manifest">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
@@ -864,7 +864,7 @@
       </Files>
     </Project>
 	
-    <Project frameworkVersion="v4_0" name="WhiteCore.Server" path="WhiteCore/Server" type="Exe" appmanifest="app.manifest">
+    <Project frameworkVersion="v4_5" name="WhiteCore.Server" path="WhiteCore/Server" type="Exe" appmanifest="app.manifest">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
@@ -915,7 +915,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="WhiteCore.Server.AssetServer" path="WhiteCore/Servers/AssetServer" type="Exe" appmanifest="app.manifest">
+    <Project frameworkVersion="v4_5" name="WhiteCore.Server.AssetServer" path="WhiteCore/Servers/AssetServer" type="Exe" appmanifest="app.manifest">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
@@ -966,7 +966,7 @@
       </Files>
     </Project>
 	
-    <Project frameworkVersion="v4_0" name="WhiteCore.Server.AvatarServer" path="WhiteCore/Servers/AvatarServer" type="Exe" appmanifest="app.manifest">
+    <Project frameworkVersion="v4_5" name="WhiteCore.Server.AvatarServer" path="WhiteCore/Servers/AvatarServer" type="Exe" appmanifest="app.manifest">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
@@ -1017,7 +1017,7 @@
       </Files>
     </Project>
 	
-    <Project frameworkVersion="v4_0" name="WhiteCore.Server.GridServer" path="WhiteCore/Servers/GridServer" type="Exe" appmanifest="app.manifest">
+    <Project frameworkVersion="v4_5" name="WhiteCore.Server.GridServer" path="WhiteCore/Servers/GridServer" type="Exe" appmanifest="app.manifest">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
@@ -1068,7 +1068,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="WhiteCore.Server.InventoryServer" path="WhiteCore/Servers/InventoryServer" type="Exe" appmanifest="app.manifest">
+    <Project frameworkVersion="v4_5" name="WhiteCore.Server.InventoryServer" path="WhiteCore/Servers/InventoryServer" type="Exe" appmanifest="app.manifest">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
@@ -1119,7 +1119,7 @@
       </Files>
     </Project>
 	
-    <Project frameworkVersion="v4_0" name="WhiteCore.Server.WebServer" path="WhiteCore/Servers/WebServer" type="Exe" appmanifest="app.manifest">
+    <Project frameworkVersion="v4_5" name="WhiteCore.Server.WebServer" path="WhiteCore/Servers/WebServer" type="Exe" appmanifest="app.manifest">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
@@ -1170,7 +1170,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="WhiteCore.Simulation.Base" path="WhiteCore/Simulation/Base" type="Library">
+    <Project frameworkVersion="v4_5" name="WhiteCore.Simulation.Base" path="WhiteCore/Simulation/Base" type="Library">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
@@ -1226,7 +1226,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="WhiteCore.CoreApplicationPlugins" path="WhiteCore/CoreApplicationPlugins" type="Library">
+    <Project frameworkVersion="v4_5" name="WhiteCore.CoreApplicationPlugins" path="WhiteCore/CoreApplicationPlugins" type="Library">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
@@ -1283,7 +1283,7 @@
       </Files>
     </Project>
     
-    <Project frameworkVersion="v4_0" name="WhiteCore.Modules" path="WhiteCore/Modules" type="Library">
+    <Project frameworkVersion="v4_5" name="WhiteCore.Modules" path="WhiteCore/Modules" type="Library">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
@@ -1345,7 +1345,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="WhiteCore.Physics.OpenDynamicsEngine" path="WhiteCore/Physics/OpenDynamicsEngine" type="Library">
+    <Project frameworkVersion="v4_5" name="WhiteCore.Physics.OpenDynamicsEngine" path="WhiteCore/Physics/OpenDynamicsEngine" type="Library">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/Physics/</OutputPath>
@@ -1393,7 +1393,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="WhiteCore.ScriptEngine.DotNetEngine" path="WhiteCore/DotNetEngine" type="Library">
+    <Project frameworkVersion="v4_5" name="WhiteCore.ScriptEngine.DotNetEngine" path="WhiteCore/DotNetEngine" type="Library">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
@@ -1452,7 +1452,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="WhiteCore.BotManager" path="WhiteCore/BotManager" type="Library">
+    <Project frameworkVersion="v4_5" name="WhiteCore.BotManager" path="WhiteCore/BotManager" type="Library">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../WhiteCoreSim/bin/</OutputPath>

@@ -8,8 +8,8 @@ echo.
 rem ## Default architecture (86 (for 32bit), 64, AnyCPU)
 set bits=AnyCPU
 
-rem ## Whether or not to add the .net3.5 flag
-set framework=4_0
+rem ## Whether or not to add the .netx.y flag
+set framework=4_5
 
 rem ## Default "configuration" choice ((r)elease, (d)ebug)
 set configuration=d

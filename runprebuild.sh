@@ -8,8 +8,9 @@ USAGE="[-c <config>] -a <arch> -v"
 LONG_USAGE="Configuration options to pass to prebuild environment
 
 Options:
-  -c|--config Build configuration Debug(default) or Release
-  -a|--arch Architecture to target x86(default), x64, or AnyCPU
+  -c|--config Build configuration Debug (default) or Release
+  -a|--arch Architecture to target x86 (default), x64, or AnyCPU
+  -b|--build Build after configuration No (default) or Yes
   -v|--version Update version details only
 "
 
@@ -75,7 +76,7 @@ fi
 # Configuring WhiteCore-Sim
 if ! ${VERSIONONLY:=true}; then
   echo "Configuring WhiteCore-Sim $ARCH $CONFIG build"
-  mono ./Prebuild.exe /target vs2010 /targetframework v4_0 /conditionals "LINUX;NET_4_0"
+  mono ./Prebuild.exe /target vs2010 /targetframework v4_5 /conditionals "LINUX;NET_4_5"
 fi
 
 # Update version info
