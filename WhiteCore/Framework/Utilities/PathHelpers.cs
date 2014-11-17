@@ -29,6 +29,7 @@ using System;
 using System.Text.RegularExpressions;
 using System.IO;
 using WhiteCore.Framework.ConsoleFramework;
+using System.Collections.Generic;
 
 namespace WhiteCore.Framework.Utilities
 {
@@ -124,6 +125,18 @@ namespace WhiteCore.Framework.Utilities
             }
 
             return fileName;
+        }
+
+        public static string VerifyReadFile(string fileName, List <string> extensions, string defaultDir)
+        {
+            foreach (var ext in extensions)
+            {
+                var fName = VerifyReadFile(fileName, ext, defaultDir);
+                if ( fName != "")
+                    return fName;
+            }
+
+            return "";
         }
 
         public static string VerifyReadFile(string fileName, string defaultExt, string defaultDir)

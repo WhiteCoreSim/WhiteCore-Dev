@@ -1406,7 +1406,8 @@ namespace WhiteCore.Region
 				return;
 			}
 
-            fileName = PathHelpers.VerifyReadFile (fileName, ".oar", Constants.DEFAULT_OARARCHIVE_DIR);
+//            fileName = PathHelpers.VerifyReadFile (fileName, ".oar", Constants.DEFAULT_OARARCHIVE_DIR);
+            fileName = PathHelpers.VerifyReadFile (fileName, new List<string>() {".oar","tgz"}, Constants.DEFAULT_OARARCHIVE_DIR);
             if (fileName == "")                 // something wrong...
                 return;
             cmdparams [2] = fileName;           // reset passed filename
