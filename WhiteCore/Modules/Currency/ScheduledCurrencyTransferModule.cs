@@ -35,7 +35,7 @@ using OpenMetaverse.StructuredData;
 using System;
 using WhiteCore.Framework.ConsoleFramework;
 
-namespace WhiteCore.Modules.Avatar.Currency
+namespace WhiteCore.Modules.Currency
 {
     public class ScheduledCurrencyTransferModule : IService, IScheduledMoneyModule
     {

@@ -43,7 +43,7 @@ using System.Collections;
 using System.Net;
 using System.Threading;
 
-namespace Simple.Currency
+namespace WhiteCore.Modules.Currency
 {
     public class RPCHandler : IService
     {
@@ -76,7 +76,7 @@ namespace Simple.Currency
             if (remoteCalls)
                 return;
 
-            m_connector = DataManager.RequestPlugin<ISimpleCurrencyConnector>() as SimpleCurrencyConnector;
+            m_connector = Framework.Utilities.DataManager.RequestPlugin<ISimpleCurrencyConnector>() as SimpleCurrencyConnector;
 
             if (m_connector.GetConfig().ClientPort == 0 && MainServer.Instance == null)
                 return;
@@ -229,7 +229,7 @@ namespace Simple.Currency
                 UUID.TryParse((string) requestData["agentId"], out agentId);
                 UserCurrency currency = m_connector.GetUserCurrency(agentId);
                 IUserProfileInfo profile =
-                    DataManager.RequestPlugin<IProfileConnector>("IProfileConnector").GetUserProfile(agentId);
+                    Framework.Utilities.DataManager.RequestPlugin<IProfileConnector>("IProfileConnector").GetUserProfile(agentId);
 
 
                 //IClientCapsService client = m_dustCurrencyService.Registry.RequestModuleInterface<ICapsService>().GetClientCapsService(agentId);

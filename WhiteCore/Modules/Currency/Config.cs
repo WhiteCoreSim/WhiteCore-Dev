@@ -35,7 +35,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Simple.Currency
+namespace WhiteCore.Modules.Currency
 {
     public class SimpleCurrencyConfig : IDataTransferable
     {

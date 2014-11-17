@@ -38,7 +38,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 
-namespace Simple.Currency
+namespace WhiteCore.Modules.Currency
 {
     
     public class SimpleCurrencyConnector : ConnectorBase, ISimpleCurrencyConnector
@@ -86,7 +86,7 @@ namespace Simple.Currency
 
             if (GenericData != null)
                 GenericData.ConnectToDatabase(defaultConnectionString, "SimpleCurrency", true);
-            DataManager.RegisterPlugin(Name, this);
+            Framework.Utilities.DataManager.RegisterPlugin(Name, this);
 
             m_config = new SimpleCurrencyConfig(config);
 

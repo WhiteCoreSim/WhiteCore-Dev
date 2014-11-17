@@ -36,7 +36,7 @@ using OpenMetaverse.StructuredData;
 using System.Collections.Generic;
 using System;
 
-namespace Simple.Currency
+namespace WhiteCore.Modules.Currency
 {
     public class SimpleCurrencyModule : IMoneyModule, IService
     {
@@ -61,7 +61,7 @@ namespace Simple.Currency
                 return;
 
             m_registry = registry;
-            m_connector = DataManager.RequestPlugin<ISimpleCurrencyConnector>() as SimpleCurrencyConnector;
+            m_connector = Framework.Utilities.DataManager.RequestPlugin<ISimpleCurrencyConnector>() as SimpleCurrencyConnector;
             //registry.RegisterModuleInterface<IMoneyModule>(this);
         }
 

@@ -36,7 +36,7 @@ using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Utilities;
 using WhiteCore.Framework.ConsoleFramework;
 
-namespace Simple.Currency
+namespace WhiteCore.Modules.Currency
 {
     class GiveStipends
     {
