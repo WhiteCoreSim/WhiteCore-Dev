@@ -279,6 +279,8 @@ namespace WhiteCore.Modules.Estate
                     //Remove the one we sent at X
                     telehub.SpawnPos.RemoveAt(int.Parse(Parameters[1]));
                     RegionConnector.AddTelehub(telehub, client.Scene.RegionInfo.RegionHandle);
+                    client.Scene.RegionInfo.RegionSettings.TeleHub = telehub;
+
                     SendTelehubInfo(client);
                 }
                 if (parameter1 == "spawnpoint add")
@@ -298,11 +300,15 @@ namespace WhiteCore.Modules.Estate
                         return; //No spawns without a telehub
                     telehub.SpawnPos.Add(part.AbsolutePosition - pos); //Spawns are offsets
                     RegionConnector.AddTelehub(telehub, client.Scene.RegionInfo.RegionHandle);
+                    client.Scene.RegionInfo.RegionSettings.TeleHub = telehub;
+
                     SendTelehubInfo(client);
                 }
                 if (parameter1 == "delete")
                 {
                     RegionConnector.RemoveTelehub(client.Scene.RegionInfo.RegionID, client.Scene.RegionInfo.RegionHandle);
+                    client.Scene.RegionInfo.RegionSettings.TeleHub = new Telehub();
+
                     SendTelehubInfo(client);
                 }
                 if (parameter1 == "connect")
@@ -326,6 +332,8 @@ namespace WhiteCore.Modules.Estate
                     telehub.ObjectUUID = part.UUID;
                     telehub.Name = part.Name;
                     RegionConnector.AddTelehub(telehub, client.Scene.RegionInfo.RegionHandle);
+                    client.Scene.RegionInfo.RegionSettings.TeleHub = telehub;
+
                     SendTelehubInfo(client);
                 }
 

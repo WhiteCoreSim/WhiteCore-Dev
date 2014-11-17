@@ -47,9 +47,9 @@ namespace WhiteCore.Framework.Serialization.External
         /// <param name="serializedSettings"></param>
         /// <returns></returns>
         /// <exception cref="System.Xml.XmlException"></exception>
-        public static RegionSettings Deserialize(byte[] serializedSettings)
+        public static RegionSettings Deserialize(byte[] serializedSettings, UUID RegionID)
         {
-            return Deserialize(m_asciiEncoding.GetString(serializedSettings, 0, serializedSettings.Length));
+            return Deserialize(m_asciiEncoding.GetString(serializedSettings, 0, serializedSettings.Length), RegionID);
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace WhiteCore.Framework.Serialization.External
         /// <param name="serializedSettings"></param>
         /// <returns></returns>
         /// <exception cref="System.Xml.XmlException"></exception>
-        public static RegionSettings Deserialize(string serializedSettings)
+        public static RegionSettings Deserialize(string serializedSettings, UUID RegionID)
         {
             RegionSettings settings = new RegionSettings();
 
@@ -188,6 +188,43 @@ namespace WhiteCore.Framework.Serialization.External
                 }
             }
 
+            xtr.ReadEndElement();
+
+            //  OAR 0.8 format addition, may not be present in older files
+            if (xtr.IsStartElement("Telehub"))
+            {
+                xtr.ReadStartElement("Telehub");
+
+                while (xtr.Read () && xtr.NodeType != XmlNodeType.EndElement)
+                {
+                    switch (xtr.Name)
+                    {
+                    case "TelehubObject":
+                        {
+                            settings.TeleHub.RegionID = RegionID;
+                            settings.TeleHub.ObjectUUID = UUID.Parse (xtr.ReadElementContentAsString ());
+                            break;
+                        }
+                    case "SpawnPoint":
+                        settings.TeleHub.SpawnPos.Add (Vector3.Parse (xtr.ReadElementContentAsString ()));
+                        break;
+
+                    //case "SpawnPoint":
+                    //    string str = xtr.ReadElementContentAsString();
+                    //    SpawnPoint sp = SpawnPoint.Parse(str);
+                    //    settings.AddSpawnPoint(sp);
+                    //    break;
+
+                
+                    case "TelehubName":
+                        settings.TeleHub.Name = xtr.ReadElementContentAsString ();
+                        break;
+                    }
+                }
+            }
+
+            xtr.ReadEndElement();
+
             xtr.Close();
 
             return settings;
@@ -240,6 +277,19 @@ namespace WhiteCore.Framework.Serialization.External
             xtw.WriteElementString("FixedSun", settings.FixedSun.ToString());
             // XXX: Need to expose interface to get sun phase information from sun module
             // xtw.WriteStartElement("SunPhase", 
+
+
+            // OAR format 0.8
+            xtw.WriteStartElement("Telehub");
+            if (settings.TeleHub.ObjectUUID != UUID.Zero)
+            {
+                xtw.WriteElementString("TelehubObject", settings.TeleHub.ObjectUUID.ToString());
+                xtw.WriteElementString("TelehubName", settings.TeleHub.Name);
+                foreach( var point in settings.TeleHub.SpawnPos) 
+                    xtw.WriteElementString("SpawnPoint", point.ToString());
+            }
+            xtw.WriteEndElement();
+
             xtw.WriteEndElement();
 
             xtw.WriteEndElement();

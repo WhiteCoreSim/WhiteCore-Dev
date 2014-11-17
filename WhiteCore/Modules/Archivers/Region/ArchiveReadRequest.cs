@@ -43,6 +43,7 @@ using System.IO.Compression;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
+using WhiteCore.Framework.ClientInterfaces;
 
 namespace WhiteCore.Modules.Archivers
 {
@@ -81,21 +82,21 @@ namespace WhiteCore.Modules.Archivers
         /// <summary>
         ///     Used to cache lookups for valid uuids.
         /// </summary>
-        private readonly IDictionary<UUID, UUID> m_validUserUuids = new Dictionary<UUID, UUID>();
+        readonly IDictionary<UUID, UUID> m_validUserUuids = new Dictionary<UUID, UUID>();
+        readonly IDictionary<UUID, UUID> m_validGroupUuids = new Dictionary<UUID, UUID>();
 
+        int m_offsetX = 0;
+        int m_offsetY = 0;
+        int m_offsetZ = 0;
+        bool m_flipX = false;
+        bool m_flipY = false;
+        bool m_useParcelOwnership = false;
+        bool m_checkOwnership = false;
 
-        private int m_offsetX = 0;
-        private int m_offsetY = 0;
-        private int m_offsetZ = 0;
-        private bool m_flipX = false;
-        private bool m_flipY = false;
-        private bool m_useParcelOwnership = false;
-        private bool m_checkOwnership = false;
-
-        private const string sPattern =
+        const string sPattern =
             @"(\{{0,1}([0-9a-fA-F]){8}-([0-9a-f]){4}-([0-9a-f]){4}-([0-9a-f]){4}-([0-9a-f]){12}\}{0,1})";
 
-        private readonly Dictionary<UUID, AssetBase> assetNonBinaryCollection = new Dictionary<UUID, AssetBase>();
+        readonly Dictionary<UUID, AssetBase> assetNonBinaryCollection = new Dictionary<UUID, AssetBase>();
 
         public ArchiveReadRequest(IScene scene, string loadPath, bool merge, bool skipAssets, bool skipTerrain,
                                   int offsetX, int offsetY, int offsetZ, bool flipX, bool flipY, bool useParcelOwnership,
@@ -159,7 +160,7 @@ namespace WhiteCore.Modules.Archivers
             return DearchiveRegion0DotStar();
         }
 
-        private bool DearchiveRegion0DotStar()
+        bool DearchiveRegion0DotStar()
         {
             if (m_loadStream == null)
                 return false;
@@ -285,8 +286,7 @@ namespace WhiteCore.Modules.Archivers
                     }
                     else if (!m_skipTerrain && filePath.StartsWith(ArchiveConstants.LANDDATA_PATH))
                     {
-                        LandData parcel = LandDataSerializer.Deserialize(m_utf8Encoding.GetString(data));
-                        parcel.OwnerID = ResolveUserUuid(parcel.OwnerID, UUID.Zero, "", Vector3.Zero, null);
+                        var parcel = LoadLandData(data);
                         landData.Add(parcel);
                     }
                     else if (filePath == ArchiveConstants.CONTROL_FILE_PATH)
@@ -363,17 +363,18 @@ namespace WhiteCore.Modules.Archivers
                         continue;
                     }
 
+                    // check sceneObject ownership
+                    sceneObject.OwnerID = ResolveUserUuid(sceneObject.OwnerID, sceneObject.LastSignificantPosition, landData);
+                    //... and children
                     foreach (ISceneChildEntity part in sceneObject.ChildrenEntities())
                     {
-                        if (string.IsNullOrEmpty(part.CreatorData))
-                            part.CreatorID = ResolveUserUuid(part.CreatorID, part.CreatorID, part.CreatorData,
-                                                             part.AbsolutePosition, landData);
+                        //if (string.IsNullOrEmpty(part.CreatorData))
+                        // always check & reset
+                            part.CreatorID = ResolveUserUuid(part.CreatorID, part.AbsolutePosition, landData);
 
-                        part.OwnerID = ResolveUserUuid(part.OwnerID, part.CreatorID, part.CreatorData,
-                                                       part.AbsolutePosition, landData);
+                        part.OwnerID = ResolveUserUuid(part.OwnerID, part.AbsolutePosition, landData);
 
-                        part.LastOwnerID = ResolveUserUuid(part.LastOwnerID, part.CreatorID, part.CreatorData,
-                                                           part.AbsolutePosition, landData);
+                        part.LastOwnerID = ResolveUserUuid(part.LastOwnerID, part.AbsolutePosition, landData);
 
                         // And zap any troublesome sit target information
                         part.SitTargetOrientation = new Quaternion(0, 0, 0, 1);
@@ -387,13 +388,18 @@ namespace WhiteCore.Modules.Archivers
                             TaskInventoryDictionary inv = part.TaskInventory;
                             foreach (KeyValuePair<UUID, TaskInventoryItem> kvp in inv)
                             {
-                                kvp.Value.OwnerID = ResolveUserUuid(kvp.Value.OwnerID, kvp.Value.CreatorID,
-                                                                    kvp.Value.CreatorData, part.AbsolutePosition,
-                                                                    landData);
-                                if (string.IsNullOrEmpty(kvp.Value.CreatorData))
-                                    kvp.Value.CreatorID = ResolveUserUuid(kvp.Value.CreatorID, kvp.Value.CreatorID,
-                                                                          kvp.Value.CreatorData, part.AbsolutePosition,
-                                                                          landData);
+                                kvp.Value.OwnerID = ResolveUserUuid(
+                                    kvp.Value.OwnerID,
+                                    part.AbsolutePosition,
+                                    landData
+                                );
+
+                                //if (string.IsNullOrEmpty(kvp.Value.CreatorData))
+                                    kvp.Value.CreatorID = ResolveUserUuid(
+                                        kvp.Value.CreatorID,
+                                        part.AbsolutePosition,
+                                        landData
+                                    );
                             }
                         }
                     }
@@ -436,7 +442,7 @@ namespace WhiteCore.Modules.Archivers
                 m_loadStream.Close();
                 m_loadStream.Dispose();
 
-                //Reeanble now that we are done
+                //Re-enable scripts now that we are done
                 foreach (IScriptModule module in modules)
                 {
                     module.Disabled = false;
@@ -470,8 +476,6 @@ namespace WhiteCore.Modules.Archivers
                 }
             }
 
-            // Try to retain the original creator/owner/lastowner if their uuid is present on this grid
-            // otherwise, use the master avatar uuid instead
 
             // Reload serialized parcels
             if (!m_skipTerrain)
@@ -491,12 +495,13 @@ namespace WhiteCore.Modules.Archivers
                                             (DateTime.Now - start).Minutes + ":" + (DateTime.Now - start).Seconds);
 
             m_validUserUuids.Clear();
+            m_validGroupUuids.Clear();
             m_scene.EventManager.TriggerOarFileLoaded(UUID.Zero.Guid, m_errorMessage);
 
             return true;    // all good
         }
 
-        private AssetBase SaveNonBinaryAssets(UUID key, AssetBase asset, Dictionary<UUID, UUID> assetBinaryChangeRecord)
+        AssetBase SaveNonBinaryAssets(UUID key, AssetBase asset, Dictionary<UUID, UUID> assetBinaryChangeRecord)
         {
             if (!asset.HasBeenSaved)
             {
@@ -543,14 +548,14 @@ namespace WhiteCore.Modules.Archivers
         ///     Look up the given user id to check whether it's one that is valid for this grid.
         /// </summary>
         /// <param name="uuid"></param>
-        /// <param name="creatorID"></param>
-        /// <param name="creatorData"></param>
         /// <param name="location"></param>
         /// <param name="parcels"></param>
         /// <returns></returns>
-        private UUID ResolveUserUuid(UUID uuid, UUID creatorID, string creatorData, Vector3 location,
-                                     IEnumerable<LandData> parcels)
+        UUID ResolveUserUuid(UUID uuid, Vector3 location, IEnumerable<LandData> parcels)
         {
+            // Try to retain the original creator/owner/lastowner if their uuid is present on this grid
+            // otherwise, use the master avatar uuid instead
+
             UUID u;
             if (!m_validUserUuids.TryGetValue(uuid, out u))
             {
@@ -596,7 +601,27 @@ namespace WhiteCore.Modules.Archivers
             return u;
         }
 
-        private bool ContainsPoint(LandData data, int checkx, int checky)
+        UUID ResolveGroupUuid(UUID GroupID)
+        {
+            UUID u;
+            if (!m_validGroupUuids.TryGetValue(GroupID, out u))
+            {
+                IGroupsModule groups = m_scene.RequestModuleInterface<IGroupsModule>();
+                if (groups != null)
+                {
+                    GroupRecord gr = groups.GetGroupRecord (GroupID);
+                    if (gr != null)
+                        m_validGroupUuids.Add (GroupID, GroupID);
+                } else  // GroupID does not exist.. keep track
+                    m_validGroupUuids.Add(GroupID, UUID.Zero);
+
+                return m_validGroupUuids[GroupID];
+            }
+
+            return u;
+        }
+
+        bool ContainsPoint(LandData data, int checkx, int checky)
         {
             int x = 0, y = 0, i = 0;
             for (i = 0; i < data.Bitmap.Length; i++)
@@ -630,7 +655,7 @@ namespace WhiteCore.Modules.Archivers
         /// <param name="data"></param>
         /// <param name="asset"> </param>
         /// <returns>true if asset was successfully loaded, false otherwise</returns>
-        private bool LoadAsset(string assetPath, byte[] data, out AssetBase asset)
+        bool LoadAsset(string assetPath, byte[] data, out AssetBase asset)
         {
             string filename = assetPath.Remove(0, ArchiveConstants.ASSETS_PATH.Length);
             int i = filename.LastIndexOf(ArchiveConstants.ASSET_EXTENSION_SEPARATOR);
@@ -664,7 +689,7 @@ namespace WhiteCore.Modules.Archivers
             return false;
         }
 
-        private void SaveAssets()
+        void SaveAssets()
         {
             AssetSaverIsRunning = true;
             lock (AssetsToAdd)
@@ -686,13 +711,21 @@ namespace WhiteCore.Modules.Archivers
         /// <returns>
         ///     true if settings were loaded successfully, false otherwise
         /// </returns>
-        private void LoadRegionSettings(string settingsPath, byte[] data)
+        void LoadRegionSettings(string settingsPath, byte[] data)
         {
             RegionSettings loadedRegionSettings;
 
             try
             {
-                loadedRegionSettings = RegionSettingsSerializer.Deserialize(data);
+                loadedRegionSettings = RegionSettingsSerializer.Deserialize(data, m_scene.RegionInfo.RegionID);
+                if (m_skipTerrain)
+                {
+                    // not loading terrain so leave the existing textures as well
+                    loadedRegionSettings.TerrainTexture1 = m_scene.RegionInfo.RegionSettings.TerrainTexture1;
+                    loadedRegionSettings.TerrainTexture2 = m_scene.RegionInfo.RegionSettings.TerrainTexture2;
+                    loadedRegionSettings.TerrainTexture3 = m_scene.RegionInfo.RegionSettings.TerrainTexture3;
+                    loadedRegionSettings.TerrainTexture4 = m_scene.RegionInfo.RegionSettings.TerrainTexture4;
+                }
             }
             catch (Exception e)
             {
@@ -721,7 +754,7 @@ namespace WhiteCore.Modules.Archivers
         /// <returns>
         ///     true if terrain was resolved successfully, false otherwise.
         /// </returns>
-        private void LoadTerrain(string terrainPath, byte[] data)
+        void LoadTerrain(string terrainPath, byte[] data)
         {
             ITerrainModule terrainModule = m_scene.RequestModuleInterface<ITerrainModule>();
 
@@ -732,11 +765,56 @@ namespace WhiteCore.Modules.Archivers
             MainConsole.Instance.DebugFormat("[ARCHIVER]: Restored terrain {0}", terrainPath);
         }
 
+
+        LandData LoadLandData(byte[] data)
+        {
+            LandData parcel = LandDataSerializer.Deserialize(m_utf8Encoding.GetString(data));
+            var estateOwnerId = m_scene.RegionInfo.EstateSettings.EstateOwner;
+            var defaultFlags = 
+                (uint)ParcelFlags.AllowFly |
+                (uint)ParcelFlags.AllowLandmark |
+                (uint)ParcelFlags.AllowAPrimitiveEntry |
+                (uint)ParcelFlags.AllowDeedToGroup |
+                (uint)ParcelFlags.AllowTerraform |
+                (uint)ParcelFlags.CreateObjects |
+                (uint)ParcelFlags.AllowOtherScripts |
+                (uint)ParcelFlags.SoundLocal |
+                (uint)ParcelFlags.AllowVoiceChat;
+
+            parcel.OwnerID = ResolveUserUuid(parcel.OwnerID, Vector3.Zero, null);
+
+            // reset to allow a clean start
+            parcel.AuthBuyerID = UUID.Zero;         
+            parcel.Flags = defaultFlags;
+
+            // we need to check group ownership as well
+            if (parcel.IsGroupOwned)
+            {
+                parcel.GroupID = ResolveGroupUuid(parcel.GroupID);
+                if (parcel.GroupID == UUID.Zero)
+                    parcel.IsGroupOwned = false;
+            } else
+                parcel.GroupID = UUID.Zero;
+
+            // check the parcel access list in case..
+            var parcelAccess = new List<ParcelManager.ParcelAccessEntry>();  
+            foreach (var pal in parcel.ParcelAccessList)
+            {
+                var agentID = ResolveUserUuid(pal.AgentID, Vector3.Zero, null);
+                if (agentID != estateOwnerId)
+                    parcelAccess.Add (pal);
+            }
+            parcel.ParcelAccessList = parcelAccess;
+
+            return parcel;
+
+        }
+
         /// <summary>
         ///     Load oar control file
         /// </summary>
         /// <param name="data"></param>
-        private void LoadControlFile(byte[] data)
+        void LoadControlFile(byte[] data)
         {
             //Create the XmlNamespaceManager.
             NameTable nt = new NameTable();
@@ -749,7 +827,7 @@ namespace WhiteCore.Modules.Archivers
 
             RegionSettings currentRegionSettings = m_scene.RegionInfo.RegionSettings;
 
-            // Loaded metadata will empty if no information exists in the archive
+            // Loaded metadata will be empty if no information exists in the archive
             currentRegionSettings.LoadedCreationDateTime = 0;
             currentRegionSettings.LoadedCreationID = "";
 

@@ -30,6 +30,8 @@ using System.Linq;
 using WhiteCore.Framework.Modules;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
+using System.Xml;
+using System.IO;
 
 namespace WhiteCore.Framework.ClientInterfaces
 {
@@ -125,5 +127,76 @@ namespace WhiteCore.Framework.ClientInterfaces
                              };
             return map;
         }
+
+        #region Serialization
+        public static string Serialize(Telehub settings)
+        {
+            StringWriter sw = new StringWriter();
+            XmlTextWriter xtw = new XmlTextWriter(sw) {Formatting = Formatting.Indented};
+            xtw.WriteStartDocument();
+
+            xtw.WriteStartElement("Telehub");
+            if (settings.ObjectUUID != UUID.Zero)
+            {
+                xtw.WriteElementString("TelehubObject", settings.ObjectUUID.ToString());
+                xtw.WriteElementString("TelehubName", settings.Name);
+                foreach( var point in settings.SpawnPos) 
+                    xtw.WriteElementString("SpawnPoint", point.ToString());
+            }
+            xtw.WriteEndElement();
+
+            xtw.Close();
+
+            return sw.ToString();
+        } 
+
+
+        public static Telehub Deserialize(string serializedSettings, UUID RegionID)
+        {
+            Telehub settings = new Telehub();
+
+            StringReader sr = new StringReader(serializedSettings);
+            XmlTextReader xtr = new XmlTextReader(sr);
+
+
+            xtr.ReadEndElement();
+            xtr.ReadStartElement("Telehub");
+
+            //  OAR 0.8 format addition
+            while (xtr.Read() && xtr.NodeType != XmlNodeType.EndElement)
+            {
+                switch (xtr.Name)
+                {
+                case "TelehubObject":
+                    {
+                        settings.RegionID = RegionID;
+                        settings.ObjectUUID = UUID.Parse (xtr.ReadElementContentAsString ());
+                        break;
+                    }
+                case "SpawnPoint":
+                    settings.SpawnPos.Add( Vector3.Parse(xtr.ReadElementContentAsString()) );
+                    break;
+
+                    //case "SpawnPoint":
+                    //    string str = xtr.ReadElementContentAsString();
+                    //    SpawnPoint sp = SpawnPoint.Parse(str);
+                    //    settings.AddSpawnPoint(sp);
+                    //    break;
+
+
+                case "TelehubName":
+                    settings.Name = xtr.ReadElementContentAsString();
+                    break;
+                }
+            }
+
+            xtr.ReadEndElement();
+            xtr.Close();
+
+            return settings;
+        }
+
+  
+        #endregion
     }
 }

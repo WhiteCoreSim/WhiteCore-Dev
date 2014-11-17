@@ -29,6 +29,7 @@ using System;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
 using ProtoBuf;
+using WhiteCore.Framework.ClientInterfaces;
 
 namespace WhiteCore.Framework.SceneInfo
 {
@@ -49,31 +50,33 @@ namespace WhiteCore.Framework.SceneInfo
         public static readonly UUID DEFAULT_TERRAIN_TEXTURE_2 = new UUID("abb783e6-3e93-26c0-248a-247666855da3");
         public static readonly UUID DEFAULT_TERRAIN_TEXTURE_3 = new UUID("179cdabd-398a-9b6b-1391-4dc333ba321f");
         public static readonly UUID DEFAULT_TERRAIN_TEXTURE_4 = new UUID("beb169c7-11ea-fff2-efe5-0f24dc881df2");
-        private int m_AgentLimit = 40;
-        private bool m_AllowLandJoinDivide = true;
-        private bool m_AllowLandResell = true;
-        private UUID m_Covenant = UUID.Zero;
-        private double m_Elevation1NE = 10;
-        private double m_Elevation1NW = 10;
-        private double m_Elevation1SE = 10;
-        private double m_Elevation1SW = 10;
-        private double m_Elevation2NE = 60;
-        private double m_Elevation2NW = 60;
-        private double m_Elevation2SE = 60;
-        private double m_Elevation2SW = 60;
-        private OSDMap m_Generic = new OSDMap();
-        private String m_LoadedCreationID = String.Empty;
-        private double m_ObjectBonus = 1.0;
 
-        private UUID m_RegionUUID = UUID.Zero;
-        private double m_TerrainLowerLimit = -100;
-        private double m_TerrainRaiseLimit = 100;
-        private UUID m_TerrainTexture1 = UUID.Zero;
-        private UUID m_TerrainTexture2 = UUID.Zero;
-        private UUID m_TerrainTexture3 = UUID.Zero;
-        private UUID m_TerrainTexture4 = UUID.Zero;
-        private bool m_UseEstateSun = true;
-        private double m_WaterHeight = 20;
+        int m_AgentLimit = 40;
+        bool m_AllowLandJoinDivide = true;
+        bool m_AllowLandResell = true;
+        UUID m_Covenant = UUID.Zero;
+        double m_Elevation1NE = 10;
+        double m_Elevation1NW = 10;
+        double m_Elevation1SE = 10;
+        double m_Elevation1SW = 10;
+        double m_Elevation2NE = 60;
+        double m_Elevation2NW = 60;
+        double m_Elevation2SE = 60;
+        double m_Elevation2SW = 60;
+        OSDMap m_Generic = new OSDMap();
+        String m_LoadedCreationID = String.Empty;
+        double m_ObjectBonus = 1.0;
+
+        UUID m_RegionUUID = UUID.Zero;
+        double m_TerrainLowerLimit = -100;
+        double m_TerrainRaiseLimit = 100;
+        UUID m_TerrainTexture1 = UUID.Zero;
+        UUID m_TerrainTexture2 = UUID.Zero;
+        UUID m_TerrainTexture3 = UUID.Zero;
+        UUID m_TerrainTexture4 = UUID.Zero;
+        bool m_UseEstateSun = true;
+        double m_WaterHeight = 20;
+        Telehub m_telehub = new Telehub ();
 
         [ProtoMember(1)]
         public UUID RegionUUID
@@ -328,6 +331,13 @@ namespace WhiteCore.Framework.SceneInfo
             set { m_LoadedCreationID = value; }
         }
 
+//       [ProtoMember(45)]
+        public Telehub TeleHub
+        {
+            get { return m_telehub ?? (m_telehub = new Telehub()); }
+            set { m_telehub = value; }
+        }
+
         public void AddGeneric(string key, OSD value)
         {
             m_Generic[key] = value;
@@ -350,97 +360,105 @@ namespace WhiteCore.Framework.SceneInfo
         {
             OSDMap map = new OSDMap();
 
-            map["AgentLimit"] = this.AgentLimit;
-            map["AllowDamage"] = this.AllowDamage;
-            map["AllowLandJoinDivide"] = this.AllowLandJoinDivide;
-            map["AllowLandResell"] = this.AllowLandResell;
-            map["BlockFly"] = this.BlockFly;
-            map["BlockShowInSearch"] = this.BlockShowInSearch;
-            map["BlockTerraform"] = this.BlockTerraform;
-            map["Covenant"] = this.Covenant;
-            map["CovenantLastUpdated"] = this.CovenantLastUpdated;
-            map["DisableCollisions"] = this.DisableCollisions;
-            map["DisablePhysics"] = this.DisablePhysics;
-            map["DisableScripts"] = this.DisableScripts;
-            map["Elevation1NE"] = this.Elevation1NE;
-            map["Elevation1NW"] = this.Elevation1NW;
-            map["Elevation1SE"] = this.Elevation1SE;
-            map["Elevation1SW"] = this.Elevation1SW;
-            map["Elevation2NE"] = this.Elevation2NE;
-            map["Elevation2NW"] = this.Elevation2NW;
-            map["Elevation2SE"] = this.Elevation2SE;
-            map["Elevation2SW"] = this.Elevation2SW;
-            map["FixedSun"] = this.FixedSun;
-            map["LoadedCreationDateTime"] = this.LoadedCreationDateTime;
-            map["LoadedCreationID"] = this.LoadedCreationID;
-            map["Maturity"] = this.Maturity;
-            map["MinimumAge"] = this.MinimumAge;
-            map["ObjectBonus"] = this.ObjectBonus;
-            map["RegionUUID"] = this.RegionUUID;
-            map["RestrictPushing"] = this.RestrictPushing;
-            map["Sandbox"] = this.Sandbox;
-            map["SunPosition"] = this.SunPosition;
-            map["SunVector"] = this.SunVector;
-            map["TerrainImageID"] = this.TerrainImageID;
-            map["ParcelMapImageID"] = this.ParcelMapImageID;
-            map["TerrainLowerLimit"] = this.TerrainLowerLimit;
-            map["TerrainMapImageID"] = this.TerrainMapImageID;
-            map["TerrainMapLastRegenerated"] = this.TerrainMapLastRegenerated;
-            map["TerrainRaiseLimit"] = this.TerrainRaiseLimit;
-            map["TerrainTexture1"] = this.TerrainTexture1;
-            map["TerrainTexture2"] = this.TerrainTexture2;
-            map["TerrainTexture3"] = this.TerrainTexture3;
-            map["TerrainTexture4"] = this.TerrainTexture4;
-            map["UseEstateSun"] = this.UseEstateSun;
-            map["WaterHeight"] = this.WaterHeight;
+            map["AgentLimit"] = AgentLimit;
+            map["AllowDamage"] = AllowDamage;
+            map["AllowLandJoinDivide"] = AllowLandJoinDivide;
+            map["AllowLandResell"] = AllowLandResell;
+            map["BlockFly"] = BlockFly;
+            map["BlockShowInSearch"] = BlockShowInSearch;
+            map["BlockTerraform"] = BlockTerraform;
+            map["Covenant"] = Covenant;
+            map["CovenantLastUpdated"] = CovenantLastUpdated;
+            map["DisableCollisions"] = DisableCollisions;
+            map["DisablePhysics"] = DisablePhysics;
+            map["DisableScripts"] = DisableScripts;
+            map["Elevation1NE"] = Elevation1NE;
+            map["Elevation1NW"] = Elevation1NW;
+            map["Elevation1SE"] = Elevation1SE;
+            map["Elevation1SW"] = Elevation1SW;
+            map["Elevation2NE"] = Elevation2NE;
+            map["Elevation2NW"] = Elevation2NW;
+            map["Elevation2SE"] = Elevation2SE;
+            map["Elevation2SW"] = Elevation2SW;
+            map["FixedSun"] = FixedSun;
+            map["LoadedCreationDateTime"] = LoadedCreationDateTime;
+            map["LoadedCreationID"] = LoadedCreationID;
+            map["Maturity"] = Maturity;
+            map["MinimumAge"] = MinimumAge;
+            map["ObjectBonus"] = ObjectBonus;
+            map["RegionUUID"] = RegionUUID;
+            map["RestrictPushing"] = RestrictPushing;
+            map["Sandbox"] = Sandbox;
+            map["SunPosition"] = SunPosition;
+            map["SunVector"] = SunVector;
+            map["TerrainImageID"] = TerrainImageID;
+            map["ParcelMapImageID"] = ParcelMapImageID;
+            map["TerrainLowerLimit"] = TerrainLowerLimit;
+            map["TerrainMapImageID"] = TerrainMapImageID;
+            map["TerrainMapLastRegenerated"] = TerrainMapLastRegenerated;
+            map["TerrainRaiseLimit"] = TerrainRaiseLimit;
+            map["TerrainTexture1"] = TerrainTexture1;
+            map["TerrainTexture2"] = TerrainTexture2;
+            map["TerrainTexture3"] = TerrainTexture3;
+            map["TerrainTexture4"] = TerrainTexture4;
+            map["UseEstateSun"] = UseEstateSun;
+            map["WaterHeight"] = WaterHeight;
+            if (TeleHub != null)
+                map["Telehub"] = TeleHub.ToOSD();
 
             return map;
         }
 
         public void FromOSD(OSDMap map)
         {
-            this.AgentLimit = map["AgentLimit"];
-            this.AllowLandJoinDivide = map["AllowLandJoinDivide"];
-            this.AllowLandResell = map["AllowLandResell"];
-            this.BlockFly = map["BlockFly"];
-            this.BlockShowInSearch = map["BlockShowInSearch"];
-            this.BlockTerraform = map["BlockTerraform"];
-            this.Covenant = map["Covenant"];
-            this.CovenantLastUpdated = map["CovenantLastUpdated"];
-            this.DisableCollisions = map["DisableCollisions"];
-            this.DisablePhysics = map["DisablePhysics"];
-            this.DisableScripts = map["DisableScripts"];
-            this.Elevation1NE = map["Elevation1NE"];
-            this.Elevation1NW = map["Elevation1NW"];
-            this.Elevation1SE = map["Elevation1SE"];
-            this.Elevation1SW = map["Elevation1SW"];
-            this.Elevation2NE = map["Elevation2NE"];
-            this.Elevation2NW = map["Elevation2NW"];
-            this.Elevation2SE = map["Elevation2SE"];
-            this.Elevation2SW = map["Elevation2SW"];
-            this.FixedSun = map["FixedSun"];
-            this.LoadedCreationDateTime = map["LoadedCreationDateTime"];
-            this.LoadedCreationID = map["LoadedCreationID"];
-            this.Maturity = map["Maturity"];
-            this.MinimumAge = map["MinimumAge"];
-            this.ObjectBonus = map["ObjectBonus"];
-            this.RegionUUID = map["RegionUUID"];
-            this.RestrictPushing = map["RestrictPushing"];
-            this.Sandbox = map["Sandbox"];
-            this.SunPosition = map["SunPosition"];
-            this.SunVector = map["SunVector"];
-            this.TerrainImageID = map["TerrainImageID"];
-            this.TerrainMapImageID = map["TerrainMapImageID"];
-            this.TerrainMapLastRegenerated = map["TerrainMapLastRegenerated"];
-            this.ParcelMapImageID = map["ParcelMapImageID"];
-            this.TerrainLowerLimit = map["TerrainLowerLimit"];
-            this.TerrainRaiseLimit = map["TerrainRaiseLimit"];
-            this.TerrainTexture1 = map["TerrainTexture1"];
-            this.TerrainTexture2 = map["TerrainTexture2"];
-            this.TerrainTexture3 = map["TerrainTexture3"];
-            this.TerrainTexture4 = map["TerrainTexture4"];
-            this.UseEstateSun = map["UseEstateSun"];
-            this.WaterHeight = map["WaterHeight"];
+            AgentLimit = map["AgentLimit"];
+            AllowLandJoinDivide = map["AllowLandJoinDivide"];
+            AllowLandResell = map["AllowLandResell"];
+            BlockFly = map["BlockFly"];
+            BlockShowInSearch = map["BlockShowInSearch"];
+            BlockTerraform = map["BlockTerraform"];
+            Covenant = map["Covenant"];
+            CovenantLastUpdated = map["CovenantLastUpdated"];
+            DisableCollisions = map["DisableCollisions"];
+            DisablePhysics = map["DisablePhysics"];
+            DisableScripts = map["DisableScripts"];
+            Elevation1NE = map["Elevation1NE"];
+            Elevation1NW = map["Elevation1NW"];
+            Elevation1SE = map["Elevation1SE"];
+            Elevation1SW = map["Elevation1SW"];
+            Elevation2NE = map["Elevation2NE"];
+            Elevation2NW = map["Elevation2NW"];
+            Elevation2SE = map["Elevation2SE"];
+            Elevation2SW = map["Elevation2SW"];
+            FixedSun = map["FixedSun"];
+            LoadedCreationDateTime = map["LoadedCreationDateTime"];
+            LoadedCreationID = map["LoadedCreationID"];
+            Maturity = map["Maturity"];
+            MinimumAge = map["MinimumAge"];
+            ObjectBonus = map["ObjectBonus"];
+            RegionUUID = map["RegionUUID"];
+            RestrictPushing = map["RestrictPushing"];
+            Sandbox = map["Sandbox"];
+            SunPosition = map["SunPosition"];
+            SunVector = map["SunVector"];
+            TerrainImageID = map["TerrainImageID"];
+            TerrainMapImageID = map["TerrainMapImageID"];
+            TerrainMapLastRegenerated = map["TerrainMapLastRegenerated"];
+            ParcelMapImageID = map["ParcelMapImageID"];
+            TerrainLowerLimit = map["TerrainLowerLimit"];
+            TerrainRaiseLimit = map["TerrainRaiseLimit"];
+            TerrainTexture1 = map["TerrainTexture1"];
+            TerrainTexture2 = map["TerrainTexture2"];
+            TerrainTexture3 = map["TerrainTexture3"];
+            TerrainTexture4 = map["TerrainTexture4"];
+            UseEstateSun = map["UseEstateSun"];
+            WaterHeight = map["WaterHeight"];
+            if (map.ContainsKey ("TeleHub"))
+            {
+                TeleHub = new Telehub ();
+                TeleHub.FromOSD ((OSDMap)map ["Telehub"]);
+            }
+
         }
     }
 }
