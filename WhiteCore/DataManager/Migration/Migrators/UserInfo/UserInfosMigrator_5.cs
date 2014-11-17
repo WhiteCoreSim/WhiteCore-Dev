@@ -31,11 +31,13 @@ using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.DataManager.Migration.Migrators.UserInfo
 {
-    public class UserInfoMigrator_4 : Migrator
+    public class UserInfoMigrator_5 : Migrator
     {
-        public UserInfoMigrator_4()
+        public UserInfoMigrator_5()
         {
-            Version = new Version(0, 0, 4);
+            // no changes from 0.0.4 but migration versions have got out of sync.
+            // this should correct
+            Version = new Version(0, 0, 5);
             MigrationName = "UserInfo";
 
             schema = new List<SchemaDefinition>();
@@ -45,8 +47,10 @@ namespace WhiteCore.DataManager.Migration.Migrators.UserInfo
             //
             //   Add the new UserInfo table that replaces the GridUser and Presence tables
             //
+            RenameSchema("userinfo", "user_info");
             RemoveSchema("userinfo");
-            AddSchema("userinfo", ColDefs(
+            
+            AddSchema("user_info", ColDefs(
                 ColDef("UserID", ColumnTypes.String50),
                 ColDef("RegionID", ColumnTypes.String50),
                 ColDef("LastSeen", ColumnTypes.Integer30),
