@@ -77,6 +77,7 @@ namespace WhiteCore.Framework.Utilities
             TimeSpan ts = DateTime.UtcNow - fromTime;
             if (TimeToRun > DateTime.UtcNow)
                 return;
+            // This part needs to be removed/rewritten and replaced with a basic 7 days timer - Fly 17/11/2014
             switch (RunEveryType)
             {
                 case RepeatType.second:

@@ -105,7 +105,7 @@ namespace Simple.Currency
 
         public XmlRpcResponse GetbalanceFunc(XmlRpcRequest request, IPEndPoint ep)
         {
-            MainConsole.Instance.Error("Remote procdure calls GetbalanceFunc was called.");
+            MainConsole.Instance.Error("Remote procedure calls GetbalanceFunc was called.");
             throw new NotImplementedException();
         }
 

@@ -114,7 +114,7 @@ namespace Simple.Currency
 
                 MainConsole.Instance.Commands.AddCommand(
                     "show user transactions",
-                    "show user transactionst",
+                    "show user transactions",
                     "Display user transactions for a period.",
                     HandleShowTransactions, false, true);
 

@@ -81,6 +81,7 @@ namespace Simple.Currency
 
             SchedulerItem i = m_scheduler.Get(user.PrincipalID.ToString(), "StipendsPayout");
             if (i != null) return null;
+            // Scheduler needs to get 1 date/time to set for "PayDay" - Fly 17/11/2014
             RepeatType runevertype = (RepeatType)Enum.Parse(typeof(RepeatType), m_options.StipendsEveryType);
             int runevery = m_options.StipendsEvery;
             m_scheduler.Save(new SchedulerItem("StipendsPayout",
@@ -138,6 +139,7 @@ namespace Simple.Currency
             {
                 SchedulerItem i = m_scheduler.Get(user.PrincipalID.ToString(), "StipendsPayout");
                 if (i != null) continue;
+                // Scheduler needs to get 1 date/time to set for "PayDay" - Fly 17/11/2014
                 RepeatType runevertype = (RepeatType)Enum.Parse(typeof(RepeatType), m_options.StipendsEveryType);
                 int runevery = m_options.StipendsEvery;
                 m_scheduler.Save(new SchedulerItem("StipendsPayout",
