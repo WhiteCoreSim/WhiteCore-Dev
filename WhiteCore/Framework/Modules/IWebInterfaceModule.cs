@@ -16,5 +16,6 @@ namespace WhiteCore.Framework.Modules
     public interface IWebHttpTextureService
     {
         string GetTextureURL(UUID textureID);
+        string GetRegionWorldViewURL(UUID RegionID);
     }
 }

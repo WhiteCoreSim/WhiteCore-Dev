@@ -53,14 +53,23 @@ namespace WhiteCore.Modules.WorldMap
 {
     public class WarpTileRenderer : IMapTileTerrainRenderer
     {
-        private static readonly Color4 WATER_COLOR = new Color4(29, 72, 96, 216);
-        private readonly Dictionary<UUID, Color4> m_colors = new Dictionary<UUID, Color4>();
-        private IConfigSource m_config;
-        private string m_assetCacheDir = Constants.DEFAULT_ASSETCACHE_DIR;
-        private IRendering m_primMesher;
-        private IScene m_scene;
-        private bool m_texturePrims;
-        private IJ2KDecoder m_imgDecoder;
+        static readonly Color4 WATER_COLOR = new Color4(29, 72, 96, 216);
+        static readonly Color4 OPAQUE_WATER_COLOR = new Color4(34, 92, 114, 255);
+        //static readonly Color4 SKY_COLOR = new Color4(106, 178, 236, 216);
+        static readonly Int32 SKYCOLOR = 0x8BC4EC;
+
+        readonly Dictionary<UUID, Color4> m_colors = new Dictionary<UUID, Color4>();
+        IConfigSource m_config;
+        string m_assetCacheDir = Constants.DEFAULT_ASSETCACHE_DIR;
+        IRendering m_primMesher;
+        IScene m_scene;
+        IJ2KDecoder m_imgDecoder;
+
+        bool m_drawPrimVolume = true;   // true if should render the prims on the tile
+        bool m_textureTerrain = true;   // true if to create terrain splatting texture
+        bool m_texturePrims = true;     // true if should texture the rendered prims
+        float m_texturePrimSize = 48f;  // size of prim before we consider texturing it
+        bool m_renderMeshes = true;     // true if to render meshes rather than just bounding boxes
 
         #region IMapTileTerrainRenderer Members
 
@@ -70,16 +79,6 @@ namespace WhiteCore.Modules.WorldMap
             m_imgDecoder = m_scene.RequestModuleInterface<IJ2KDecoder>();
             m_config = config;
             m_assetCacheDir = m_config.Configs ["AssetCache"].GetString ("CacheDirectory",m_assetCacheDir);
-
-            ReadCacheMap();
-        }
-
-        public Bitmap TerrainToBitmap(Bitmap mapBmp)
-        {
-            mapBmp = null;
-            // debug
-            //var currentProcess = System.Diagnostics.Process.GetCurrentProcess();
-            //long startMemory = currentProcess.WorkingSet64;
 
             List<string> renderers = RenderingLoader.ListRenderers(Util.ExecutingDirectory());
             if (renderers.Count > 0)
@@ -92,22 +91,21 @@ namespace WhiteCore.Modules.WorldMap
                 MainConsole.Instance.Info("[MAPTILE]: No prim mesher loaded, prim rendering will be disabled");
             }
 
-            bool drawPrimVolume = true;
-            bool textureTerrain = true;
-
-            try
+            var mapConfig = m_config.Configs ["MapModule"];
+            if (mapConfig != null)
             {
-                IConfig startupConfig = m_config.Configs["Startup"];
-                drawPrimVolume = startupConfig.GetBoolean("DrawPrimOnMapTile", drawPrimVolume);
-                textureTerrain = startupConfig.GetBoolean("TextureOnMapTile", textureTerrain);
-            }
-            catch
-            {
-                MainConsole.Instance.Warn("[MAPTILE]: Failed to load StartupConfig");
+                m_texturePrimSize = mapConfig.GetFloat ("TexturePrimSize", m_texturePrimSize);
+                m_renderMeshes = mapConfig.GetBoolean ("RenderMeshes", m_renderMeshes);
             }
 
-            m_texturePrims = m_config.Configs["MapModule"].GetBoolean("WarpTexturePrims", false);
 
+            ReadCacheMap();
+        }
+
+        // Standard maptile rendering
+        public Bitmap TerrainToBitmap(Bitmap mapBmp)
+        {
+            mapBmp = null;
             int scaledRemovalFactor = m_scene.RegionInfo.RegionSizeX/(Constants.RegionSize/2);
             Vector3 camPos = new Vector3(m_scene.RegionInfo.RegionSizeX/2 - 0.5f,
                                          m_scene.RegionInfo.RegionSizeY/2 - 0.5f, 221.7025033688163f);
@@ -117,14 +115,44 @@ namespace WhiteCore.Modules.WorldMap
                                              m_scene.RegionInfo.RegionSizeX - scaledRemovalFactor,
                                              m_scene.RegionInfo.RegionSizeY - scaledRemovalFactor);
 
-            int width = viewport.Width;
-            int height = viewport.Height;
+            viewport.FieldOfView = 150;
+            viewport.Width = Constants.RegionSize;
+            viewport.Height = Constants.RegionSize;
 
+            return TerrainBitmap (viewport, false);
+        }
 
+        public Bitmap TerrainToBitmap(Bitmap mapBmp, int size)
+        {
+            mapBmp = null;
+            int scaledRemovalFactor = m_scene.RegionInfo.RegionSizeX/(Constants.RegionSize/2);
+            Vector3 camPos = new Vector3(m_scene.RegionInfo.RegionSizeX/2 - 0.5f,
+                m_scene.RegionInfo.RegionSizeY/2 - 0.5f, 221.7025033688163f);
+            Viewport viewport = new Viewport(camPos, -Vector3.UnitZ, 1024f, 0.1f,
+                m_scene.RegionInfo.RegionSizeX - scaledRemovalFactor,
+                m_scene.RegionInfo.RegionSizeY - scaledRemovalFactor,
+                m_scene.RegionInfo.RegionSizeX - scaledRemovalFactor,
+                m_scene.RegionInfo.RegionSizeY - scaledRemovalFactor);
+
+            viewport.FieldOfView = 150;
+            viewport.Width = size;
+            viewport.Height = size;
+
+            return TerrainBitmap (viewport, false);
+
+        }
+
+        public Bitmap TerrainBitmap(Viewport viewport, bool threeD)
+            {
+            // AntiAliasing
+            int width = viewport.Width * 2;
+            int height = viewport.Height * 2;
+                            
             WarpRenderer renderer = new WarpRenderer();
-            //warp_Object terrainObj;
             renderer.CreateScene(width, height);
             renderer.Scene.autoCalcNormals = false;
+            if (threeD)
+                renderer.SetBackgroundColor (SKYCOLOR);
 
             #region Camera
 
@@ -144,8 +172,7 @@ namespace WhiteCore.Modules.WorldMap
             else
             {
                 viewport.Orthographic = false;
-                float fov = 256;
-                //fov *= 1.75f; // FIXME: ???
+                float fov = viewport.FieldOfView;
                 renderer.Scene.defaultCamera.setFov(fov);
             }
 
@@ -157,11 +184,10 @@ namespace WhiteCore.Modules.WorldMap
 
             try
             {
-                CreateWater(renderer);
-
-                CreateTerrain(renderer, textureTerrain);
+                CreateWater(renderer, threeD);
+                CreateTerrain(renderer, m_textureTerrain);
              
-                if (drawPrimVolume && m_primMesher != null)
+                if (m_drawPrimVolume && m_primMesher != null)
                 {
                     foreach (ISceneChildEntity part in m_scene.Entities.GetEntities().SelectMany(ent => ent.ChildrenEntities()))
                         CreatePrim(renderer, part);
@@ -175,7 +201,14 @@ namespace WhiteCore.Modules.WorldMap
 
             renderer.Render();
             Bitmap bitmap = renderer.Scene.getImage();
-            bitmap = ImageUtils.ResizeImage(bitmap, Constants.RegionSize, Constants.RegionSize);
+
+            // AntiAliasing
+            using (Bitmap origBitmap = bitmap)
+                    bitmap = ImageUtils.ResizeImage(origBitmap, viewport.Width, viewport.Height);
+
+
+            // Clean up
+            SaveCache();
             foreach (var o in renderer.Scene.objectData.Values)
             {
                 warp_Object obj = (warp_Object) o;
@@ -183,158 +216,55 @@ namespace WhiteCore.Modules.WorldMap
                 obj.triangleData = null;
             }
 
-
-
+            renderer.Scene.removeAllObjects();
             renderer.Reset ();
-            //renderer.Scene.removeAllObjects();
-            // renderer = null;
-            // viewport = null;
-            m_primMesher = null;
-            ///terrainObj.fastvertex = null;
-            ///terrainObj.fasttriangle = null;
-            ///terrainObj = null;
-            SaveCache();
             m_colors.Clear();
-
 
             //Force GC to try to clean this mess up
             GC.Collect();
-
-            // debug
-            //currentProcess = System.Diagnostics.Process.GetCurrentProcess();
-            //var endMemory = currentProcess.WorkingSet64;
-            //MainConsole.Instance.InfoFormat ("[Warp3D]:Render:  Memory Start: {0}, end: {1}, Diff: {2}", startMemory, endMemory, (endMemory-startMemory));
 
             return bitmap;
         }
 
 
-        public Bitmap TerrainViewToBitmap(Vector3 camPos, Vector3 camDir, float fov, int width, int height, bool useTextures)
+        public Bitmap CreateViewImage(Vector3 camPos, Vector3 camDir, float fov, int width, int height, bool useTextures)
         {
-
-            List<string> renderers = RenderingLoader.ListRenderers(Util.ExecutingDirectory());
-            if (renderers.Count > 0)
-            {
-                m_primMesher = RenderingLoader.LoadRenderer(renderers[0]);
-                MainConsole.Instance.Debug("[MAPTILE]: Loaded prim mesher " + m_primMesher);
-            }
-            else
-            {
-                MainConsole.Instance.Info("[MAPTILE]: No prim mesher loaded, prim rendering will be disabled");
-            }
-
-            bool drawPrimVolume = true;
-            bool textureTerrain = true;
-            m_texturePrims = true;
-
-            //int scaledRemovalFactor = m_scene.RegionInfo.RegionSizeX/(Constants.RegionSize/2);
-
-            //Vector3 camPos = new Vector3(m_scene.RegionInfo.RegionSizeX/2 - 0.5f,
-            //    m_scene.RegionInfo.RegionSizeY/2 - 0.5f, 221.7025033688163f);
-
-            Viewport viewport = new Viewport(
-                camPos,
-                camDir,
-                1024f,
-                0.1f,
-                width,
-                height,
-                width,
-                height);
-
-            //int width = viewport.Width;
-            //int height = viewport.Height;
-
-
-            WarpRenderer renderer = new WarpRenderer();
-            //warp_Object terrainObj;
-            renderer.CreateScene(width, height);
-            renderer.Scene.autoCalcNormals = false;
-
-            #region Camera
-
-            warp_Vector pos = ConvertVector(viewport.Position);
-            pos.z -= 0.001f; // Works around an issue with the Warp3D camera
-            warp_Vector lookat = warp_Vector.add(ConvertVector(viewport.Position), ConvertVector(viewport.LookDirection));
-
-            renderer.Scene.defaultCamera.setPos(pos);
-            renderer.Scene.defaultCamera.lookAt(lookat);
-
-            if (viewport.Orthographic)
-            {
-                renderer.Scene.defaultCamera.isOrthographic = true;
-                renderer.Scene.defaultCamera.orthoViewWidth = viewport.OrthoWindowWidth;
-                renderer.Scene.defaultCamera.orthoViewHeight = viewport.OrthoWindowHeight;
-            }
-            else
-            {
-                viewport.Orthographic = false;
-                //fov = 256;
-                //fov *= 1.75f; // FIXME: ???
-                renderer.Scene.defaultCamera.setFov(fov);
-            }
-
-            #endregion Camera
-
-            renderer.Scene.addLight("Light1", new warp_Light(new warp_Vector(1.0f, 0.5f, 1f), 0xffffff, 0, 320, 40));
-            renderer.Scene.addLight("Light2", new warp_Light(new warp_Vector(-1f, -1f, 1f), 0xffffff, 0, 100, 40));
-
-
-            try
-            {
-                CreateWater(renderer);
-
-                CreateTerrain(renderer, textureTerrain);
-
-                if (drawPrimVolume && m_primMesher != null)
-                {
-                    foreach (ISceneChildEntity part in m_scene.Entities.GetEntities().SelectMany(ent => ent.ChildrenEntities()))
-                        CreatePrim(renderer, part);
-                }
-
-            }
-            catch (Exception ex)
-            {
-                MainConsole.Instance.Warn("[Warp3D]: Exception in the worldview generation, " + ex);
-            }
-
-            renderer.Render();
-            Bitmap bitmap = renderer.Scene.getImage();
-            bitmap = ImageUtils.ResizeImage(bitmap, width, height);
-            foreach (var o in renderer.Scene.objectData.Values)
-            {
-                warp_Object obj = (warp_Object) o;
-                obj.vertexData = null;
-                obj.triangleData = null;
-            }
-
-            renderer.Reset ();
-            m_primMesher = null;
-            SaveCache();
-            m_colors.Clear();
-
-            //Force GC to try to clean this mess up
-            GC.Collect();
-
-            return bitmap;
+            Viewport viewport = new Viewport(camPos, camDir, fov, 1024f,  0.1f, width, height);
+//            Viewport viewport = new Viewport(camPos, camDir, fov, Constants.RegionSize,  0.1f, width, height);
+            return TerrainBitmap(viewport, true);
         }
-
 
 
         #endregion
 
         #region Rendering Methods
 
-        private void CreateWater(WarpRenderer renderer)
+        private void CreateWater(WarpRenderer renderer, bool threeD)
         {
             float waterHeight = (float) m_scene.RegionInfo.RegionSettings.WaterHeight;
+  
+            warp_Material waterColormaterial; 
+            if (!threeD)
+            {
+                renderer.AddPlane ("Water", m_scene.RegionInfo.RegionSizeX );
+                renderer.Scene.sceneobject ("Water").setPos ((m_scene.RegionInfo.RegionSizeX / 2) - 0.5f, waterHeight,
+                    (m_scene.RegionInfo.RegionSizeY / 2) - 0.5f);
+                               waterColormaterial = new warp_Material (ConvertColor (WATER_COLOR));
+                waterColormaterial.setTransparency ((byte)((1f - WATER_COLOR.A) * 255f) * 2);
+            } else
+            {
+                renderer.AddPlane ("Water", m_scene.RegionInfo.RegionSizeX);
+                renderer.Scene.sceneobject ("Water").setPos (
+                    (m_scene.RegionInfo.RegionSizeX / 2) -0.5f,
+                    - 0.5f,
+                    waterHeight+5.1f
+                    );
+               
+                waterColormaterial = new warp_Material(ConvertColor(OPAQUE_WATER_COLOR));
+                waterColormaterial.setTransparency (48);
+                //waterColormaterial.opaque = true;
+            }
 
-            renderer.AddPlane("Water", m_scene.RegionInfo.RegionSizeX*0.5f);
-            renderer.Scene.sceneobject("Water").setPos((m_scene.RegionInfo.RegionSizeX/2) - 0.5f, waterHeight,
-                                                       (m_scene.RegionInfo.RegionSizeY/2) - 0.5f);
-
-            warp_Material waterColormaterial = new warp_Material(ConvertColor(WATER_COLOR));
-            waterColormaterial.setTransparency((byte) ((1f - WATER_COLOR.A)*255f)*2);
             waterColormaterial.setReflectivity(50);
             renderer.Scene.addMaterial("WaterColor", waterColormaterial);
             renderer.SetObjectMaterial("Water", "WaterColor");
@@ -396,6 +326,7 @@ namespace WhiteCore.Modules.WorldMap
             }
 
             renderer.Scene.addObject("Terrain", obj);
+            renderer.Scene.sceneobject ("Terrain").setPos (0.0f, 0.0f, 0.0f);
 
             UUID[] textureIDs = new UUID[4];
             float[] startHeights = new float[4];

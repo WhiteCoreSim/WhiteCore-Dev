@@ -45,7 +45,12 @@ namespace WhiteCore.Modules.Web
 
         public string GetTextureURL(UUID textureID)
         {
-            return _server.ServerURI + "/index.php?method=GridTexture&uuid=" + textureID.ToString();
+            return _server.ServerURI + "/index.php?method=GridTexture&uuid=" + textureID;
+        }
+
+        public string GetRegionWorldViewURL(UUID RegionID)
+        {
+            return _server.ServerURI + "/worldview/" + RegionID;
         }
 
         public byte[] OnHTTPGetTextureImage(string path, Stream request, OSHttpRequest httpRequest,

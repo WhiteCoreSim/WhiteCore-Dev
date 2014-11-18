@@ -90,9 +90,10 @@ namespace WhiteCore.Modules.Web
                 vars.Add("RegionSizeY", region.RegionSizeY);
                 vars.Add("RegionType", region.RegionType);
                 vars.Add("RegionTerrain", region.RegionTerrain);
+
+                bool regionIsOnline = (region.Flags & (int)RegionFlags.RegionOnline) == (int)RegionFlags.RegionOnline;
                 vars.Add("RegionOnline",
-                    (region.Flags & (int) RegionFlags.RegionOnline) ==
-                    (int) RegionFlags.RegionOnline
+                    regionIsOnline
                     ? translator.GetTranslatedString("Online")
                     : translator.GetTranslatedString("Offline"));
 
@@ -155,10 +156,18 @@ namespace WhiteCore.Modules.Web
                 }
                 IWebHttpTextureService webTextureService = webInterface.Registry.
                     RequestModuleInterface<IWebHttpTextureService>();
+                var regionMapURL = "../images/icons/no_terrain.jpg";
+
                 if (webTextureService != null && region.TerrainMapImage != UUID.Zero)
-                    vars.Add("RegionImageURL", webTextureService.GetTextureURL(region.TerrainMapImage));
+                    regionMapURL = webTextureService.GetTextureURL(region.TerrainMapImage);
+
+                vars.Add("RegionImageURL", regionMapURL);
+
+                // worldview
+                if (webTextureService != null && regionIsOnline)
+                    vars.Add("RegionWorldViewURL", webTextureService.GetRegionWorldViewURL(region.RegionID));
                 else
-                    vars.Add("RegionImageURL", "../images/icons/no_terrain.jpg");
+                    vars.Add("RegionWorldViewURL", regionMapURL);
 
                 // Menu Region
                 vars.Add("MenuRegionTitle", translator.GetTranslatedString("MenuRegionTitle"));

@@ -164,36 +164,28 @@ namespace WhiteCore.Modules.WorldMap
         {
             int start = Environment.TickCount;
             var renderer = new WarpTileRenderer();
-           // var drawPrimVolume = false;
-        
 
             renderer.Initialise(m_scene, m_config);
-            Bitmap worldView = renderer.TerrainViewToBitmap(camPos, camDir, fov, width, height, useTextures);
+            Bitmap worldView = renderer.CreateViewImage (camPos, camDir, fov, width, height, useTextures);
 
-            /*
-            Bitmap terrainBMP, mapBMP;
-
-            mapBMP = null;
-            terrainBMP = new Bitmap(width, height, PixelFormat.Format24bppRgb);
-            terrainBMP = renderer.TerrainToBitmap(terrainBMP);
-
-            if (drawPrimVolume && terrainBMP != null)
-            {
-                mapBMP = new Bitmap(terrainBMP);
-                mapBMP = DrawObjectVolume(m_scene, mapBMP);
-            }
-            else
-            {
-                if (terrainBMP != null) mapBMP = new Bitmap(terrainBMP);
-            }
-
-            terrainRenderer = null;
-*/
             MainConsole.Instance.InfoFormat("[MapTileGenerator]: Generating worldview for {0} took {1} ms",
                 m_scene.RegionInfo.RegionName, (Environment.TickCount - start));
 
             return worldView;
-            //return null;
+        }
+
+        public Bitmap CreateViewTileImage(int size)
+        {
+            int start = Environment.TickCount;
+            var renderer = new WarpTileRenderer();
+
+            renderer.Initialise(m_scene, m_config);
+            Bitmap worldMap = renderer.TerrainToBitmap (null, size);
+
+            MainConsole.Instance.InfoFormat("[MapTileGenerator]: Generating world maptile for {0} took {1} ms",
+                m_scene.RegionInfo.RegionName, (Environment.TickCount - start));
+
+            return worldMap;
         }
 
         #endregion
@@ -242,7 +234,7 @@ namespace WhiteCore.Modules.WorldMap
                 MainConsole.Instance.Commands.AddCommand(
                     "update map",
                     "update map",
-                    "Updates the image of the world map",
+                    "Updates the maptile image of the world map",
                     HandleUpdateWorldMapConsoleCommand, true, false);
             }
 
