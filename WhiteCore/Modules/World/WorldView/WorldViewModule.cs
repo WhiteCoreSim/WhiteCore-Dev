@@ -150,7 +150,7 @@ namespace WhiteCore.Modules.WorldView
             if (!Directory.Exists(cacheDir))
                 Directory.CreateDirectory(cacheDir);
 
-            m_worldviewCacheDir = cacheDir + "/worldview";
+            m_worldviewCacheDir = cacheDir + "/Worldview";
             if (!Directory.Exists (m_worldviewCacheDir))
                 Directory.CreateDirectory (m_worldviewCacheDir);
         }
@@ -205,7 +205,7 @@ namespace WhiteCore.Modules.WorldView
             if (string.IsNullOrEmpty(fileName))
             {
                 fileName = scene.RegionInfo.RegionName + ".jpg";
-                savePath = PathHelpers.VerifyWriteFile (fileName, ".jpg", Constants.DEFAULT_DATA_DIR + "/worldview", true);
+                savePath = PathHelpers.VerifyWriteFile (fileName, ".jpg", Constants.DEFAULT_DATA_DIR + "/Worldview", true);
             }
             File.WriteAllBytes(savePath, jpeg);
 
@@ -225,7 +225,7 @@ namespace WhiteCore.Modules.WorldView
             if (string.IsNullOrEmpty(fileName))
             {
                 fileName = scene.RegionInfo.RegionName + "_maptile.jpg";
-                savePath = PathHelpers.VerifyWriteFile (fileName, ".jpg", Constants.DEFAULT_DATA_DIR + "/worldview", true);
+                savePath = PathHelpers.VerifyWriteFile (fileName, ".jpg", Constants.DEFAULT_DATA_DIR + "/Worldview", true);
             }
             File.WriteAllBytes(savePath, jpeg);
 
@@ -324,7 +324,7 @@ namespace WhiteCore.Modules.WorldView
             }
 
             //some file sanity checks
-            var savePath = PathHelpers.VerifyWriteFile (fileName, ".jpg", Constants.DEFAULT_DATA_DIR + "/worldview", true);
+            var savePath = PathHelpers.VerifyWriteFile (fileName, ".jpg", Constants.DEFAULT_DATA_DIR + "/Worldview", true);
 
             MainConsole.Instance.InfoFormat (
                 "[Worldview]: Saving worldview for {0} to {1}", scene.RegionInfo.RegionName, savePath);
@@ -345,8 +345,14 @@ namespace WhiteCore.Modules.WorldView
                 if (cmdparams [i].StartsWith ("--size"))
                 {
                     size = int.Parse(cmdparams [i + 1]);
+                    if (size > 4096)
+                    {
+                    	MainConsole.Instance.Warn("[Worldview]: Size can not be large then 4096");
+                    	size = int.Parse(MainConsole.Instance.Prompt (" World maptile size", "4096"));
+                    }
                     i +=2;
-                } else
+                } 
+                else
                 {
                     cmds.Add (cmdparams [i]);
                     i++;
@@ -364,7 +370,7 @@ namespace WhiteCore.Modules.WorldView
             }
 
             //some file sanity checks
-            var savePath = PathHelpers.VerifyWriteFile (fileName+"_maptile", ".jpg", Constants.DEFAULT_DATA_DIR + "/worldview", true);
+            var savePath = PathHelpers.VerifyWriteFile (fileName+"_maptile", ".jpg", Constants.DEFAULT_DATA_DIR + "/Worldview", true);
 
             MainConsole.Instance.InfoFormat (
                 "[Worldview]: Saving world maptile for {0} to {1}", scene.RegionInfo.RegionName, savePath);
