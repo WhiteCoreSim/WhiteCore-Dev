@@ -28,7 +28,7 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using WhiteCore.Framework;
+
 using WhiteCore.Framework.Modules;
 
 namespace WhiteCore.Modules.Terrain.FileLoaders

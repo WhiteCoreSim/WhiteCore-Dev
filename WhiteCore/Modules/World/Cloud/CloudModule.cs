@@ -30,7 +30,7 @@ using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using Nini.Config;
-using WhiteCore.Framework;
+
 
 namespace WhiteCore.Modules.Cloud
 {

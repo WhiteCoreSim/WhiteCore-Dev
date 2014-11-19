@@ -8,7 +8,7 @@ using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using Nini.Config;
 using OpenMetaverse;
-using WhiteCore.Framework;
+
 
 namespace WhiteCore.Modules.PhysicsState
 {

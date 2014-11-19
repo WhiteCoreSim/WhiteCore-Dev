@@ -27,7 +27,7 @@
 
 using System;
 using System.Collections.Generic;
-using WhiteCore.Framework;
+
 using WhiteCore.Framework.Modules;
 using OpenMetaverse;
 

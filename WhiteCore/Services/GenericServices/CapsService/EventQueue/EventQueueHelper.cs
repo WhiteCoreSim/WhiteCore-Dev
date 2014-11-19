@@ -34,7 +34,7 @@ using OpenMetaverse;
 using OpenMetaverse.Messages.Linden;
 using OpenMetaverse.Packets;
 using OpenMetaverse.StructuredData;
-using WhiteCore.Framework;
+
 
 namespace WhiteCore.Services
 {

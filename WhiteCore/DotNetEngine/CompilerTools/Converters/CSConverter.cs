@@ -334,7 +334,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
                              "using WhiteCore.ScriptEngine.DotNetEngine.Runtime;\n" +
                              "using WhiteCore.ScriptEngine.DotNetEngine;\n" +
                              "using WhiteCore.ScriptEngine.DotNetEngine.APIs.Interfaces;\n" +
-                             "using WhiteCore.Framework;\n" +
+                             "\n" +
                              "using WhiteCore.Framework.ClientInterfaces;\n" +
                              "using WhiteCore.Framework.ConsoleFramework;\n" +
                              "using WhiteCore.Framework.DatabaseInterfaces;\n" +

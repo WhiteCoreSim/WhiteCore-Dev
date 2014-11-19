@@ -11,7 +11,7 @@ using WhiteCore.Framework.Utilities;
 using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.Imaging;
-using WhiteCore.Framework;
+
 
 namespace WhiteCore.Modules.WorldShader
 {

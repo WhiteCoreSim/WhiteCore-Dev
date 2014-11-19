@@ -34,7 +34,7 @@ using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using Nini.Config;
 using OpenMetaverse;
-using WhiteCore.Framework;
+
 using GridRegion = WhiteCore.Framework.Services.GridRegion;
 
 namespace WhiteCore.Modules.Scripting

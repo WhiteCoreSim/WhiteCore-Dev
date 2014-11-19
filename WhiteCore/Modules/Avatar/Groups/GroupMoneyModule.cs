@@ -1,4 +1,4 @@
-﻿using WhiteCore.Framework;
+﻿
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;

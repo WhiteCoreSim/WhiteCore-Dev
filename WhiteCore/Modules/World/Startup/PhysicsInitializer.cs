@@ -31,7 +31,7 @@ using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Utilities;
 using Nini.Config;
-using WhiteCore.Framework;
+
 
 namespace WhiteCore.Modules.Startup
 {

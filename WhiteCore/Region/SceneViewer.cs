@@ -27,7 +27,7 @@
 //#define UseRemovingEntityUpdates
 
 #define UseDictionaryForEntityUpdates
-using WhiteCore.Framework;
+
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;

@@ -25,7 +25,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework;
+
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Utilities;
 using WhiteCore.Modules.SimProtection;

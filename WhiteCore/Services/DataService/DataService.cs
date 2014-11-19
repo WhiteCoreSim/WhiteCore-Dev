@@ -28,7 +28,7 @@
 //using WhiteCore.DataManager.MSSQL;
 using WhiteCore.DataManager.MySQL;
 using WhiteCore.DataManager.SQLite;
-using WhiteCore.Framework;
+
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.ModuleLoader;
 using WhiteCore.Framework.Modules;

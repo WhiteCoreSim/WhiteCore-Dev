@@ -28,7 +28,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using WhiteCore.Framework;
+
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;

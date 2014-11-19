@@ -33,7 +33,7 @@ using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.SceneInfo.Entities;
 using Nini.Config;
 using OpenMetaverse;
-using WhiteCore.Framework;
+
 using GridRegion = WhiteCore.Framework.Services.GridRegion;
 
 namespace WhiteCore.Modules.Entities.EntityCount

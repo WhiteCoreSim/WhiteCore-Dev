@@ -26,7 +26,7 @@
  */
 
 using System.Linq;
-using WhiteCore.Framework;
+
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
 

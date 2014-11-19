@@ -28,7 +28,7 @@
 using System;
 using WhiteCore.Framework.ClientInterfaces;
 using Nini.Config;
-using WhiteCore.Framework;
+
 
 namespace WhiteCore.ClientStack
 {

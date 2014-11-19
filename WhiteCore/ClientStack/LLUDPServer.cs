@@ -26,7 +26,7 @@
  */
 
 using Amib.Threading;
-using WhiteCore.Framework;
+
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;

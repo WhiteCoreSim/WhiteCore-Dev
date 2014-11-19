@@ -26,7 +26,7 @@
  */
 
 using System;
-using WhiteCore.Framework;
+
 using WhiteCore.Framework.Modules;
 
 namespace WhiteCore.Modules.Monitoring.Monitors

@@ -27,7 +27,7 @@
 
 using System;
 using System.IO;
-using WhiteCore.Framework;
+
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
 

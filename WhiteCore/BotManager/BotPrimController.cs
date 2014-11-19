@@ -1,4 +1,4 @@
-﻿using WhiteCore.Framework;
+﻿
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Physics;

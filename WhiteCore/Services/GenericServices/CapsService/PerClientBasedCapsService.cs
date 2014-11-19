@@ -34,7 +34,7 @@ using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.Servers.HttpServer.Interfaces;
 using WhiteCore.Framework.Services;
 using OpenMetaverse;
-using WhiteCore.Framework;
+
 using WhiteCore.Framework.Servers.HttpServer;
 
 namespace WhiteCore.Services

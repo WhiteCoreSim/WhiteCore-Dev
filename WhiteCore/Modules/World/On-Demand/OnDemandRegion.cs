@@ -33,7 +33,7 @@ using WhiteCore.Framework.SceneInfo;
 using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
-using WhiteCore.Framework;
+
 
 namespace WhiteCore.Modules.OnDemand
 {

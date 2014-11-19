@@ -30,7 +30,7 @@ using System.Linq;
 using WhiteCore.Framework.SceneInfo;
 using Nini.Config;
 using OpenMetaverse;
-using WhiteCore.Framework;
+
 using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.Modules;
 

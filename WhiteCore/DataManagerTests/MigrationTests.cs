@@ -33,7 +33,7 @@ using WhiteCore.DataManager.Migration.Migrators;
 using WhiteCore.DataManager.MySQL;
 using WhiteCore.DataManager.SQLite;
 using NUnit.Framework;
-using WhiteCore.Framework;
+
 
 namespace WhiteCore.DataManager.Tests
 {

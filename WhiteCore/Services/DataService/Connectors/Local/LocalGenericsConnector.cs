@@ -26,7 +26,7 @@
  */
 
 using System.Collections.Generic;
-using WhiteCore.Framework;
+
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Services;

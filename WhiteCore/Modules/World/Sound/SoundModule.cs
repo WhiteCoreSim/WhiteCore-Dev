@@ -34,7 +34,7 @@ using WhiteCore.Framework.SceneInfo.Entities;
 using WhiteCore.Framework.Utilities;
 using Nini.Config;
 using OpenMetaverse;
-using WhiteCore.Framework;
+
 
 namespace WhiteCore.Modules.Sound
 {

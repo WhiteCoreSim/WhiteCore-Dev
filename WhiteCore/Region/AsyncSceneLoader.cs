@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using WhiteCore.Framework;
+
 using WhiteCore.Framework.ModuleLoader;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;

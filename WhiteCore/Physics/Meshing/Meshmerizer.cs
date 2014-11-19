@@ -27,7 +27,7 @@
 
 //#define SPAM
 
-using WhiteCore.Framework;
+
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.SceneInfo;

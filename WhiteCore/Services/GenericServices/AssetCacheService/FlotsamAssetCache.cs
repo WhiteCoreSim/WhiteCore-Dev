@@ -28,7 +28,7 @@
 // Uncomment to make asset Get requests for existing 
 // #define WAIT_ON_INPROGRESS_REQUESTS
 
-using WhiteCore.Framework;
+
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;

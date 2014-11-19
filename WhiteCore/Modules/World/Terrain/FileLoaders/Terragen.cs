@@ -28,7 +28,7 @@
 using System;
 using System.IO;
 using System.Text;
-using WhiteCore.Framework;
+
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Utilities;

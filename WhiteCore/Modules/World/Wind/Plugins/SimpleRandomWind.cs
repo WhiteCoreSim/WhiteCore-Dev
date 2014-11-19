@@ -31,7 +31,7 @@ using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
 using Nini.Config;
 using OpenMetaverse;
-using WhiteCore.Framework;
+
 
 namespace WhiteCore.Modules.Wind.Plugins
 {

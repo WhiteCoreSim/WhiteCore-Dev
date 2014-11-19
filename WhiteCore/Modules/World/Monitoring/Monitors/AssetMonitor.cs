@@ -29,7 +29,7 @@ using System;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Services.ClassHelpers.Assets;
 using OpenMetaverse;
-using WhiteCore.Framework;
+
 
 namespace WhiteCore.Modules.Monitoring.Monitors
 {

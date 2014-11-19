@@ -28,7 +28,7 @@
 using WhiteCore.Framework.ClientInterfaces;
 using OpenMetaverse;
 using OpenMetaverse.Packets;
-using WhiteCore.Framework;
+
 
 namespace WhiteCore.ClientStack
 {

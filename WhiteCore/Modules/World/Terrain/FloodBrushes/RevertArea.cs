@@ -27,7 +27,7 @@
 
 using WhiteCore.Framework.Modules;
 using OpenMetaverse;
-using WhiteCore.Framework;
+
 
 namespace WhiteCore.Modules.Terrain.FloodBrushes
 {

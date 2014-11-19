@@ -37,7 +37,7 @@ using WhiteCore.Framework.Services.ClassHelpers.Inventory;
 using WhiteCore.Framework.Utilities;
 using Nini.Config;
 using OpenMetaverse;
-using WhiteCore.Framework;
+
 using WhiteCore.Framework.Serialization;
 
 namespace WhiteCore.Modules.Entities.BuySell

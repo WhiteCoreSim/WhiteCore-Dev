@@ -40,7 +40,7 @@ using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Utilities;
 using Nini.Config;
 using OpenMetaverse;
-using WhiteCore.Framework;
+
 using WhiteCore.Framework.Servers.HttpServer;
 
 /*****************************************************

@@ -35,7 +35,7 @@ using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.SceneInfo.Entities;
 using Nini.Config;
 using OpenMetaverse;
-using WhiteCore.Framework;
+
 
 namespace WhiteCore.Modules.Combat
 {

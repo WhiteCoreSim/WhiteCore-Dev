@@ -35,7 +35,7 @@ using WhiteCore.Framework.Utilities;
 using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
-using WhiteCore.Framework;
+
 
 namespace WhiteCore.Modules.ObjectCache
 {
