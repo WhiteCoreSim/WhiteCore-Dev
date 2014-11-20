@@ -227,10 +227,16 @@ namespace WhiteCore.Modules.Chat
             if (MainConsole.Instance != null)
             {
                 MainConsole.Instance.Commands.AddCommand(
-                    "alert user", "alert user [first] [last] [message]", "Send an alert to a user", HandleAlertConsoleCommand, true, false);
+                    "alert user", 
+                    "alert user [first] [last] [message]", 
+                    "Send an alert to a user", 
+                    HandleAlertConsoleCommand, true, false);
 
                 MainConsole.Instance.Commands.AddCommand(
-                    "alert general", "alert general [message]", "Send an alert to everyone", HandleAlertConsoleCommand, true, false);
+                    "alert general", 
+                    "alert general [message]", 
+                    "Send an alert to everyone", 
+                    HandleAlertConsoleCommand, true, false);
             }
         }
 

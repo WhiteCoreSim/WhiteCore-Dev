@@ -231,17 +231,29 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             {
                 if (MainConsole.Instance != null)
                 {
-                    MainConsole.Instance.Commands.AddCommand("WDNE restart", "WDNE restart",
+                    MainConsole.Instance.Commands.AddCommand("WDNE restart", 
+                	                                         "WDNE restart",
                                                              "Restarts all scripts and clears all script caches",
                                                              WhiteCoreDotNetRestart, false, false);
-                    MainConsole.Instance.Commands.AddCommand("WDNE stop", "WDNE stop", "Stops all scripts",
+                    
+                	MainConsole.Instance.Commands.AddCommand("WDNE stop",
+                	                                         "WDNE stop", 
+                	                                         "Stops all scripts",
                                                              WhiteCoreDotNetStop, false, false);
-                    MainConsole.Instance.Commands.AddCommand("WDNE stats", "WDNE stats",
-                                                             "Tells stats about the script engine", WhiteCoreDotNetStats, false, false);
-                    MainConsole.Instance.Commands.AddCommand("WDNE disable", "WDNE disable",
+                    
+                	MainConsole.Instance.Commands.AddCommand("WDNE stats",
+                	                                         "WDNE stats",
+                                                             "Tells stats about the script engine", 
+                                                             WhiteCoreDotNetStats, false, false);
+                    
+                	MainConsole.Instance.Commands.AddCommand("WDNE disable",
+                	                                         "WDNE disable",
                                                              "Disables the script engine temperarily",
                                                              WhiteCoreDotNetDisable, false, false);
-                    MainConsole.Instance.Commands.AddCommand("WDNE enable", "WDNE enable", "Reenables the script engine",
+                    
+                	MainConsole.Instance.Commands.AddCommand("WDNE enable",
+                	                                         "WDNE enable", 
+                	                                         "Reenables the script engine",
                                                              WhiteCoreDotNetEnable, false, false);
                 }
 

@@ -1000,45 +1000,72 @@ namespace WhiteCore.Modules.Estate
             if (MainConsole.Instance != null)
             {
                 MainConsole.Instance.Commands.AddCommand(
-                    "set regionsetting maturity", "set regionsetting maturity [value]",
-                    "Sets a region's maturity - 0(PG),1(Mature),2(Adult)", SetRegionInfoOption, true, false);
-                MainConsole.Instance.Commands.AddCommand(
-                    "set regionsetting addestateban", "set regionsetting addestateban [first] [last]",
-                    "Add a user to the estate ban list", SetRegionInfoOption, true, false);
-                MainConsole.Instance.Commands.AddCommand(
-                    "set regionsetting removeestateban", "set regionsetting removeestateban [first] [last]",
-                    "Remove a user from the estate ban list", SetRegionInfoOption, true, false);
-                MainConsole.Instance.Commands.AddCommand(
-                    "set regionsetting addestatemanager", "set regionsetting addestatemanager [first] [last]",
-                    "Add a user to the estate manager list", SetRegionInfoOption, true, false);
-                MainConsole.Instance.Commands.AddCommand(
-                    "set regionsetting removeestatemanager", "set regionsetting removeestatemanager [first] [last]",
-                    "Remove a user from the estate manager list", SetRegionInfoOption, true, false);
-                MainConsole.Instance.Commands.AddCommand(
-                    "set regionsetting addestateaccess", "set regionsetting addestateaccess [first] [last]",
-                    "Add a user to the estate access list", SetRegionInfoOption, true, false);
-                MainConsole.Instance.Commands.AddCommand(
-                    "set regionsetting removeestateaccess", "set regionsetting removeestateaccess [first] [last]",
-                    "Remove a user from the estate access list", SetRegionInfoOption, true, false);
-
-
-                MainConsole.Instance.Commands.AddCommand(
-                    "estate ban user", "estate ban user", "Bans a user from the current estate", BanUser, true, false);
-                MainConsole.Instance.Commands.AddCommand(
-                    "estate unban user", "estate unban user", "Bans a user from the current estate", UnBanUser, true, false);
-                MainConsole.Instance.Commands.AddCommand(
+                    "set regionsetting maturity", 
+                    "set regionsetting maturity [value]",
+                    "Sets a region's maturity - 0(PG),1(Mature),2(Adult)", 
+                    SetRegionInfoOption, true, false);
+                
+            	MainConsole.Instance.Commands.AddCommand(
+                    "set regionsetting addestateban", 
+                    "set regionsetting addestateban [first] [last]",
+                    "Add a user to the estate ban list", 
+                    SetRegionInfoOption, true, false);
+                
+            	MainConsole.Instance.Commands.AddCommand(
+                    "set regionsetting removeestateban", 
+                    "set regionsetting removeestateban [first] [last]",
+                    "Remove a user from the estate ban list", 
+                    SetRegionInfoOption, true, false);
+                
+            	MainConsole.Instance.Commands.AddCommand(
+                    "set regionsetting addestatemanager", 
+                    "set regionsetting addestatemanager [first] [last]",
+                    "Add a user to the estate manager list", 
+                    SetRegionInfoOption, true, false);
+                
+            	MainConsole.Instance.Commands.AddCommand(
+                    "set regionsetting removeestatemanager", 
+                    "set regionsetting removeestatemanager [first] [last]",
+                    "Remove a user from the estate manager list", 
+                    SetRegionInfoOption, true, false);
+                
+            	MainConsole.Instance.Commands.AddCommand(
+                    "set regionsetting addestateaccess", 
+                    "set regionsetting addestateaccess [first] [last]",
+                    "Add a user to the estate access list", 
+                    SetRegionInfoOption, true, false);
+                
+            	MainConsole.Instance.Commands.AddCommand(
+                    "set regionsetting removeestateaccess", 
+                    "set regionsetting removeestateaccess [first] [last]",
+                    "Remove a user from the estate access list", 
+                    SetRegionInfoOption, true, false);
+                
+            	MainConsole.Instance.Commands.AddCommand(
+                    "estate ban user", 
+                    "estate ban user", 
+                    "Bans a user from the current estate", 
+                    BanUser, true, false);
+                
+            	MainConsole.Instance.Commands.AddCommand(
+                    "estate unban user", 
+                    "estate unban user", 
+                    "Bans a user from the current estate", 
+                    UnBanUser, true, false);
+                
+            	MainConsole.Instance.Commands.AddCommand(
                     "login enable",
                     "login enable",
                     "Enable simulator logins",
                     ProcessLoginCommands, true, false);
-
-                MainConsole.Instance.Commands.AddCommand(
+                
+            	MainConsole.Instance.Commands.AddCommand(
                     "login disable",
                     "login disable",
                     "Disable simulator logins",
                     ProcessLoginCommands, true, false);
-
-                MainConsole.Instance.Commands.AddCommand(
+                
+            	MainConsole.Instance.Commands.AddCommand(
                     "login status",
                     "login status",
                     "Show login status",

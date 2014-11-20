@@ -109,7 +109,8 @@ namespace WhiteCore.Services.SQLServices.InventoryService
             if (m_enabled)
             {
                 if (MainConsole.Instance != null)
-                    MainConsole.Instance.Commands.AddCommand("clear default inventory", "clear default inventory",
+                    MainConsole.Instance.Commands.AddCommand("clear default inventory", 
+                	                                         "clear default inventory",
                                                              "Clears the Default Inventory stored for this grid",
                                                              ClearDefaultInventory, false, true);
             }

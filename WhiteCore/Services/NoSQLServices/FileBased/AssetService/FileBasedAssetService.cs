@@ -99,15 +99,18 @@ namespace WhiteCore.FileBasedServices.AssetService
             {
                 MainConsole.Instance.Commands.AddCommand("show digest",
                                                          "show digest <ID>",
-                                                         "Show asset digest", HandleShowDigest, false, true);
+                                                         "Show asset digest", 
+                                                         HandleShowDigest, false, true);
 
                 MainConsole.Instance.Commands.AddCommand("delete asset",
                                                          "delete asset <ID>",
-                                                         "Delete asset from database", HandleDeleteAsset, false, true);
+                                                         "Delete asset from database", 
+                                                         HandleDeleteAsset, false, true);
 
                 MainConsole.Instance.Commands.AddCommand("get asset",
                                                          "get asset <ID>",
-                                                         "Gets info about asset from database", HandleGetAsset, false, true);
+                                                         "Gets info about asset from database", 
+                                                         HandleGetAsset, false, true);
 
                 MainConsole.Instance.Info("[FILE ASSET SERVICE]: File based asset service enabled");
             }

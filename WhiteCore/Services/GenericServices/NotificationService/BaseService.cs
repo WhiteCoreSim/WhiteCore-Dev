@@ -74,11 +74,15 @@ namespace WhiteCore.Services
             MainConsole.Instance.Fatal(String.Format("[Console]: Console log level is {0}",
                                                          MainConsole.Instance.Threshold));
 
-            MainConsole.Instance.Commands.AddCommand("set log level", "set log level [level]",
-                                                     "Set the console logging level", HandleLogLevel, false, true);
+            MainConsole.Instance.Commands.AddCommand("set log level", 
+                                                     "set log level [level]",
+                                                     "Set the console logging level", 
+                                                     HandleLogLevel, false, true);
 
-            MainConsole.Instance.Commands.AddCommand("get log level", "get log level",
-                                                     "Returns the current console logging level", HandleGetLogLevel, false, true);
+            MainConsole.Instance.Commands.AddCommand("get log level", 
+                                                     "get log level",
+                                                     "Returns the current console logging level", 
+                                                     HandleGetLogLevel, false, true);
         }
 
         public void PostInitialise()

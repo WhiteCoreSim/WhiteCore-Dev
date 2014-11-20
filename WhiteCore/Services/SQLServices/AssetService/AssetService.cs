@@ -79,11 +79,13 @@ namespace WhiteCore.Services.SQLServices.AssetService
             {
                 MainConsole.Instance.Commands.AddCommand("show digest",
                                                          "show digest <ID>",
-                                                         "Show asset digest", HandleShowDigest, false, true);
+                                                         "Show asset digest", 
+                                                         HandleShowDigest, false, true);
 
                 MainConsole.Instance.Commands.AddCommand("delete asset",
                                                          "delete asset <ID>",
-                                                         "Delete asset from database", HandleDeleteAsset, false, true);
+                                                         "Delete asset from database", 
+                                                         HandleDeleteAsset, false, true);
             }
 
             MainConsole.Instance.Debug("[ASSET SERVICE]: Local asset service enabled");

@@ -137,13 +137,18 @@ namespace WhiteCore.Services
             {
                 MainConsole.Instance.Commands.AddCommand("grid send alert",
                                                          "grid send alert <message>",
-                                                         "Sends a message to all users in the grid", SendGridAlert, false, true);
-                MainConsole.Instance.Commands.AddCommand("grid send message",
+                                                         "Sends a message to all users in the grid", 
+                                                         SendGridAlert, false, true);
+                
+            	MainConsole.Instance.Commands.AddCommand("grid send message",
                                                          "grid send message <first> <last> <message>",
-                                                         "Sends a message to a user in the grid", SendGridMessage, false, true);
-                MainConsole.Instance.Commands.AddCommand("grid kick user",
+                                                         "Sends a message to a user in the grid", 
+                                                         SendGridMessage, false, true);
+                
+            	MainConsole.Instance.Commands.AddCommand("grid kick user",
                                                          "grid kick user <first> <last> <message>",
-                                                         "Kicks a user from the grid", KickUserMessage, false, true);
+                                                         "Kicks a user from the grid", 
+                                                         KickUserMessage, false, true);
             }
         }
 

@@ -160,7 +160,8 @@ textures 1
             scene.EventManager.OnRemovePresence += EventManager_OnRemovePresence;
 
             if (MainConsole.Instance != null)
-                MainConsole.Instance.Commands.AddCommand("force send appearance", "force send appearance",
+                MainConsole.Instance.Commands.AddCommand("force send appearance", 
+            	                                         "force send appearance",
                                                          "Force send the avatar's appearance",
                                                          HandleConsoleForceSendAppearance, true, false);
 

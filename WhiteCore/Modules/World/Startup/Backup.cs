@@ -61,16 +61,28 @@ namespace WhiteCore.Modules.Startup
         {
             if (MainConsole.Instance != null && m_backup.Count == 0) //Only add them once
             {
-                MainConsole.Instance.Commands.AddCommand("edit scale", "edit scale <name> <X> <Y> <Z>",
-                                                         "Change the scale of a named prim", EditScale, true, false);
-                MainConsole.Instance.Commands.AddCommand("offset region prims", "offset region prims <X> <Y> <Z>",
-                                                         "Offset all prims by the same amount", OffsetPrims, true, false);
-                MainConsole.Instance.Commands.AddCommand("backup", "backup",
+                MainConsole.Instance.Commands.AddCommand("edit scale", 
+            	                                         "edit scale <name> <X> <Y> <Z>",
+                                                         "Change the scale of a named prim", 
+                                                         EditScale, true, false);
+                
+            	MainConsole.Instance.Commands.AddCommand("offset region prims",
+            	                                         "offset region prims <X> <Y> <Z>",
+                                                         "Offset all prims by the same amount", 
+                                                         OffsetPrims, true, false);
+                
+            	MainConsole.Instance.Commands.AddCommand("backup",
+            	                                         "backup",
                                                          "Persist objects to the database now, if [all], will force the persistence of all prims",
                                                          RunCommand, true, false);
-                MainConsole.Instance.Commands.AddCommand("disable backup", "disable backup",
-                                                         "Disables persistance until reenabled", DisableBackup, true, false);
-                MainConsole.Instance.Commands.AddCommand("enable backup", "disable backup",
+                
+            	MainConsole.Instance.Commands.AddCommand("disable backup",
+            	                                         "disable backup",
+                                                         "Disables persistance until reenabled", 
+                                                         DisableBackup, true, false);
+                
+            	MainConsole.Instance.Commands.AddCommand("enable backup",
+            	                                         "enable backup",
                                                          "Enables persistance after 'disable persistance' has been run",
                                                          EnableBackup, true, false);
             }
@@ -193,16 +205,23 @@ namespace WhiteCore.Modules.Startup
                 {
                     MainConsole.Instance.Commands.AddCommand("delete object owner",
                                                              "delete object owner <UUID>",
-                                                             "Delete object by owner", HandleDeleteObject, true, false);
-                    MainConsole.Instance.Commands.AddCommand("delete object creator",
+                                                             "Delete object by owner", 
+                                                             HandleDeleteObject, true, false);
+                    
+                	MainConsole.Instance.Commands.AddCommand("delete object creator",
                                                              "delete object creator <UUID>",
-                                                             "Delete object by creator", HandleDeleteObject, true, false);
-                    MainConsole.Instance.Commands.AddCommand("delete object uuid",
+                                                             "Delete object by creator", 
+                                                             HandleDeleteObject, true, false);
+                    
+                	MainConsole.Instance.Commands.AddCommand("delete object uuid",
                                                              "delete object uuid <UUID>",
-                                                             "Delete object by uuid", HandleDeleteObject, true, false);
-                    MainConsole.Instance.Commands.AddCommand("delete object name",
+                                                             "Delete object by uuid", 
+                                                             HandleDeleteObject, true, false);
+                    
+                	MainConsole.Instance.Commands.AddCommand("delete object name",
                                                              "delete object name <name>",
-                                                             "Delete object by name", HandleDeleteObject, true, false);
+                                                             "Delete object by name", 
+                                                             HandleDeleteObject, true, false);
                 }
             }
 

@@ -108,7 +108,8 @@ namespace WhiteCore.Modules
         public void Initialise()
         { 
             MainConsole.Instance.Commands.AddCommand (
-                "update region info", "update region info",
+                "update region info", 
+                "update region info",
                 "Updates the region settings",
                 UpdateRegionInfo, true, true);
 

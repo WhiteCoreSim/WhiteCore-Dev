@@ -922,17 +922,27 @@ namespace WhiteCore.Modules.Monitoring
             PeriodicDiagnosticsTimer.Start();
             if (MainConsole.Instance != null)
             {
-                MainConsole.Instance.Commands.AddCommand("show threads", "show threads", "List tracked threads",
+                MainConsole.Instance.Commands.AddCommand("show threads", 
+            	                                         "show threads", 
+            	                                         "List tracked threads",
                                                          HandleShowThreads, false, true);
-                MainConsole.Instance.Commands.AddCommand("show uptime", "show uptime",
-                                                         "Show server startup time and uptime", HandleShowUptime, false, true);
-                MainConsole.Instance.Commands.AddCommand("show queues", "show queues [full]",
+                
+            	MainConsole.Instance.Commands.AddCommand("show uptime",
+            	                                         "show uptime",
+                                                         "Show server startup time and uptime", 
+                                                         HandleShowUptime, false, true);
+                
+            	MainConsole.Instance.Commands.AddCommand("show queues",
+            	                                         "show queues [full]",
                                                          "Shows the queues for the given agent (if full is given as a parameter, child agents are displayed as well)",
                                                          HandleShowQueues, false, true);
-                MainConsole.Instance.Commands.AddCommand("show stats", "show stats",
-                                                         "Show statistical information for this server", HandleShowStats, false, true);
-
-                MainConsole.Instance.Commands.AddCommand("stats report",
+                
+            	MainConsole.Instance.Commands.AddCommand("show stats",
+            	                                         "show stats",
+                                                         "Show statistical information for this server", 
+                                                         HandleShowStats, false, true);
+                
+            	MainConsole.Instance.Commands.AddCommand("stats report",
                                                          "stats report",
                                                          "Returns a variety of statistics about the current region and/or simulator",
                                                          DebugMonitors, false, true);

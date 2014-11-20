@@ -96,8 +96,10 @@ namespace WhiteCore.Services
             m_server = simBase.GetHttpServer(0);
 
             if (MainConsole.Instance != null)
-                MainConsole.Instance.Commands.AddCommand("show presences", "show presences",
-                                                         "Shows all presences in the grid", ShowUsers, false, true);
+                MainConsole.Instance.Commands.AddCommand("show presences", 
+            	                                         "show presences",
+                                                         "Shows all presences in the grid", 
+                                                         ShowUsers, false, true);
         }
 
         public void FinishedStartup()

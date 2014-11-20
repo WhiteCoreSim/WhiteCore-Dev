@@ -227,15 +227,23 @@ namespace WhiteCore.Services
 
                     if (MainConsole.Instance != null)
                     {
-                        MainConsole.Instance.Commands.AddCommand("fcache status", "fcache status",
-                                                                 "Display cache status", HandleConsoleCommand, false, true);
-                        MainConsole.Instance.Commands.AddCommand("fcache clear", "fcache clear [file] [memory]",
+                        MainConsole.Instance.Commands.AddCommand("fcache status", 
+                    	                                         "fcache status",
+                                                                 "Display cache status", 
+                                                                 HandleConsoleCommand, false, true);
+                        
+                    	MainConsole.Instance.Commands.AddCommand("fcache clear",
+                    	                                         "fcache clear [file] [memory]",
                                                                  "Remove all assets in the file and/or memory cache",
                                                                  HandleConsoleCommand, false, true);
-                        MainConsole.Instance.Commands.AddCommand("fcache assets", "fcache assets",
+                        
+                    	MainConsole.Instance.Commands.AddCommand("fcache assets",
+                    	                                         "fcache assets",
                                                                  "Attempt a deep scan and cache of all assets in all scenes",
                                                                  HandleConsoleCommand, false, true);
-                        MainConsole.Instance.Commands.AddCommand("fcache expire", "fcache expire <datetime>",
+                        
+                    	MainConsole.Instance.Commands.AddCommand("fcache expire",
+                    	                                         "fcache expire <datetime>",
                                                                  "Purge cached assets older then the specified date/time",
                                                                  HandleConsoleCommand, false, true);
                     }

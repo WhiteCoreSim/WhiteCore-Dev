@@ -73,7 +73,8 @@ namespace WhiteCore.Services.SQLServices.AvatarService
             registry.RegisterModuleInterface<IAvatarService>(this);
 
             if (MainConsole.Instance != null)
-                MainConsole.Instance.Commands.AddCommand("reset avatar appearance", "reset avatar appearance [Name]",
+                MainConsole.Instance.Commands.AddCommand("reset avatar appearance", 
+            	                                         "reset avatar appearance [Name]",
                                                          "Resets the given avatar's appearance to the default",
                                                          ResetAvatarAppearance, false, true);
             Init(registry, Name, serverPath: "/avatar/", serverHandlerName: "AvatarServerURI");

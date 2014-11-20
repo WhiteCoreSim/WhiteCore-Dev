@@ -62,9 +62,14 @@ namespace WhiteCore.Modules.WorldShader
         {
             if (MainConsole.Instance != null && !initialized)
             {
-                MainConsole.Instance.Commands.AddCommand("revert shade world", "revert shade world",
-                                                         "Reverts the shading of the world", RevertShadeWorld, true, false);
-                MainConsole.Instance.Commands.AddCommand("shade world", "shade world", "Shades the world with a color",
+                MainConsole.Instance.Commands.AddCommand("revert shade world", 
+            	                                         "revert shade world",
+                                                         "Reverts the shading of the world", 
+                                                         RevertShadeWorld, true, false);
+                
+            	MainConsole.Instance.Commands.AddCommand("shade world",
+            	                                         "shade world", 
+            	                                         "Shades the world with a color",
                                                          ShadeWorld, true, false);
             }
             initialized = true;

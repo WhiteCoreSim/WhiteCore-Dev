@@ -1136,7 +1136,8 @@ namespace WhiteCore.Services
                 return;
             MainConsole.Instance.Commands.AddCommand("login level",
                                                      "login level <level>",
-                                                     "Set the minimum user level to log in", HandleLoginCommand, false, true);
+                                                     "Set the minimum user level to log in", 
+                                                     HandleLoginCommand, false, true);
 
             MainConsole.Instance.Commands.AddCommand("login reset",
                                                      "login reset",
@@ -1145,7 +1146,8 @@ namespace WhiteCore.Services
 
             MainConsole.Instance.Commands.AddCommand("login text",
                                                      "login text <text>",
-                                                     "Set the text users will see on login", HandleLoginCommand, false, true);
+                                                     "Set the text users will see on login", 
+                                                     HandleLoginCommand, false, true);
         }
 
         protected void HandleLoginCommand(IScene scene, string[] cmd)

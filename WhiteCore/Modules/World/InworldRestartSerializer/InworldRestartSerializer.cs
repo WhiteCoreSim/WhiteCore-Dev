@@ -64,7 +64,10 @@ namespace WhiteCore.Modules
             config = source.Configs["Startup"];
             if (config != null)
                 m_fileName = config.GetString("RegionDataFileName", m_fileName);
-            MainConsole.Instance.Commands.AddCommand("quit serialized", "quit serialized", "Closes the scene and saves all agents", quitSerialized, true, false);
+            MainConsole.Instance.Commands.AddCommand("quit serialized", 
+                                                     "quit serialized", 
+                                                     "Closes the scene and saves all agents", 
+                                                     quitSerialized, true, false);
         }
 
         public void AddRegion(IScene scene)

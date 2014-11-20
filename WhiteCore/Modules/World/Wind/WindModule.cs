@@ -128,7 +128,8 @@ namespace WhiteCore.Modules.Wind
                             String.Format("wind base wind_plugin {0}", windPlugin.Name),
                             String.Format("{0} - {1}", windPlugin.Name, windPlugin.Description), "",
                             HandleConsoleBaseCommand, true, false);
-                        MainConsole.Instance.Commands.AddCommand(
+                        
+                    	MainConsole.Instance.Commands.AddCommand(
                             String.Format("wind base wind_update_rate"), "Change the wind update rate.", "",
                             HandleConsoleBaseCommand, true, false);
 

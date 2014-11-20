@@ -71,7 +71,8 @@ namespace WhiteCore.Services.DataService
 
                 if (MainConsole.Instance != null)
                 {
-                    MainConsole.Instance.Commands.AddCommand("fix missing region owner", "fix missing region owner",
+                    MainConsole.Instance.Commands.AddCommand("fix missing region owner", 
+                	                                         "fix missing region owner",
                                                              "Attempts to fix missing region owners in the database.",
                                                              delegate(IScene scene, string[] cmd) { FixMissingRegionOwners(); }, true, false);
                 }

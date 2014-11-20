@@ -190,11 +190,20 @@ namespace WhiteCore.Modules.SimProtection
             if (MainConsole.Instance != null)
             {
                 MainConsole.Instance.Commands.AddCommand(
-                    "physics stats", "physics stats", "physics stats <region>", PhysicsStatsCommand, true, false);
-                MainConsole.Instance.Commands.AddCommand(
-                    "physics profiler", "physics profiler", "physics profiler <region>", PhysicsProfilerCommand, true, false);
-                MainConsole.Instance.Commands.AddCommand(
-                    "physics current stats", "physics current stats",
+                    "physics stats", 
+                    "physics stats", 
+                    "physics stats <region>", 
+                    PhysicsStatsCommand, true, false);
+                
+            	MainConsole.Instance.Commands.AddCommand(
+                    "physics profiler", 
+                    "physics profiler", 
+                    "physics profiler <region>", 
+                    PhysicsProfilerCommand, true, false);
+                
+            	MainConsole.Instance.Commands.AddCommand(
+                    "physics current stats", 
+                    "physics current stats",
                     "physics current stats <region> NOTE: these are not calculated and are in milliseconds per unknown time",
                     CurrentPhysicsStatsCommand, true, false);
             }

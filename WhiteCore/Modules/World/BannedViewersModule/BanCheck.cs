@@ -176,17 +176,40 @@ namespace WhiteCore.Modules.Ban
 
             {
                 MainConsole.Instance.Commands.AddCommand(
-                    "show user info", "show user info", "Info on a given user", UserInfo, false, true);
-                MainConsole.Instance.Commands.AddCommand(
-                    "set user info", "set user info", "Sets the info of the given user", SetUserInfo, false, true);
-                MainConsole.Instance.Commands.AddCommand(
-                    "block user", "block user", "Blocks a given user from connecting anymore", BlockUser, false, true);
-                MainConsole.Instance.Commands.AddCommand(
-                    "ban user", "ban user", "Blocks a given user from connecting anymore", BlockUser, false, true);
-                MainConsole.Instance.Commands.AddCommand(
-                    "unblock user", "unblock user", "Removes the block for logging in on a given user", UnBlockUser, false, true);
-                MainConsole.Instance.Commands.AddCommand(
-                    "unban user", "unban user", "Removes the block for logging in on a given user", UnBlockUser, false, true);
+                    "show user info", 
+                    "show user info", 
+                    "Display info on a given user", 
+                    UserInfo, false, true);
+                
+            	MainConsole.Instance.Commands.AddCommand(
+                    "set user info", 
+                    "set user info", 
+                    "Sets the info of the given user", 
+                    SetUserInfo, false, true);
+                
+            	MainConsole.Instance.Commands.AddCommand(
+                    "block user", 
+                    "block user", 
+                    "Blocks a given user from connecting anymore", 
+                    BlockUser, false, true);
+                
+            	MainConsole.Instance.Commands.AddCommand(
+                    "ban user", 
+                    "ban user", 
+                    "Blocks a given user from connecting anymore", 
+                    BlockUser, false, true);
+                
+            	MainConsole.Instance.Commands.AddCommand(
+                    "unblock user", 
+                    "unblock user", 
+                    "Removes the block for logging in on a given user", 
+                    UnBlockUser, false, true);
+                
+            	MainConsole.Instance.Commands.AddCommand(
+                    "unban user", 
+                    "unban user", 
+                    "Removes the block for logging in on a given user", 
+                    UnBlockUser, false, true);
             }
 
         }

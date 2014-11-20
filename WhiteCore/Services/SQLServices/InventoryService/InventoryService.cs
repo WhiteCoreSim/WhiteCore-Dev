@@ -75,7 +75,8 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                 m_AllowDelete = invConfig.GetBoolean("AllowDelete", true);
 
             if (MainConsole.Instance != null)
-                MainConsole.Instance.Commands.AddCommand("fix inventory", "fix inventory",
+                MainConsole.Instance.Commands.AddCommand("fix inventory", 
+            	                                         "fix inventory",
                                                          "If the user's inventory has been corrupted, this function will attempt to fix it",
                                                          FixInventory, false, true);
             registry.RegisterModuleInterface<IInventoryService>(this);

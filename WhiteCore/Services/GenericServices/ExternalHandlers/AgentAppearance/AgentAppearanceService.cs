@@ -83,7 +83,10 @@ namespace WhiteCore.Services
             m_avatarService = registry.RequestModuleInterface<IAvatarService>();
             m_assetService = registry.RequestModuleInterface<IAssetService>();
 
-            MainConsole.Instance.Commands.AddCommand("bake avatar", "bake avatar", "Bakes an avatar's appearance", BakeAvatar, false, true);
+            MainConsole.Instance.Commands.AddCommand("bake avatar", 
+                                                     "bake avatar", 
+                                                     "Bakes an avatar's appearance", 
+                                                     BakeAvatar, false, true);
         }
 
         public void FinishedStartup()

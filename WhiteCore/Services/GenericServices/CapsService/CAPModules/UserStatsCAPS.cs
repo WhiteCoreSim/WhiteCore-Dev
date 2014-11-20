@@ -94,9 +94,15 @@ namespace WhiteCore.Services
 
         public void Start(IConfigSource config, IRegistryCore registry)
         {
-            MainConsole.Instance.Commands.AddCommand("user metrics", "user metrics", "Gives metrics on users", Metrics, false, true);
-            MainConsole.Instance.Commands.AddCommand("clear user metrics", "clear user metrics",
-                                                     "Clear all saved user metrics", ClearMetrics, false, true);
+            MainConsole.Instance.Commands.AddCommand("user metrics", 
+        	                                         "user metrics", 
+        	                                         "Gives metrics on users", 
+        	                                         Metrics, false, true);
+            
+        	MainConsole.Instance.Commands.AddCommand("clear user metrics",
+        	                                         "clear user metrics",
+                                                     "Clear all saved user metrics", 
+                                                     ClearMetrics, false, true);
         }
 
         public void FinishedStartup()
