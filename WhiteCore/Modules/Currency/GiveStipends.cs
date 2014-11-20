@@ -120,7 +120,7 @@ namespace WhiteCore.Modules.Currency
                 IMoneyModule mo = m_registry.RequestModuleInterface<IMoneyModule>();
                 if (mo == null) return null;
                 UUID transid = UUID.Random();
-                MainConsole.Instance.Info("[MONEY MODULE] Stipend Payment for " + ua.Name + " " + ua.Name + " is now running");
+                MainConsole.Instance.Info("[MONEY MODULE] Stipend Payment for " + ua.FirstName + " " + ua.LastName+ " is now running");
                 if (m_currencyService.UserCurrencyTransfer(ua.PrincipalID, UUID.Zero, (uint)m_options.Stipend, "Stipend Payment", TransactionType.StipendPayment, transid))
                 {
                     return transid.ToString();
