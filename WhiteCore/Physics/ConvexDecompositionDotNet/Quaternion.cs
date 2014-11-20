@@ -27,7 +27,7 @@
 
 using System;
 
-namespace OpenSim.Region.Physics.ConvexDecompositionDotNet
+namespace WhiteCore.Physics.ConvexDecompositionDotNet
 {
     public class Quaternion : float4
     {

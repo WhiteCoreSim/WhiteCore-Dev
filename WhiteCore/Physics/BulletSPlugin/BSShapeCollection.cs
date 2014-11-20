@@ -27,7 +27,7 @@
 using System;
 using System.Collections.Generic;
 using OMV = OpenMetaverse;
-using OpenSim.Region.Physics.ConvexDecompositionDotNet;
+using WhiteCore.Physics.ConvexDecompositionDotNet;
 using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services.ClassHelpers.Assets;
