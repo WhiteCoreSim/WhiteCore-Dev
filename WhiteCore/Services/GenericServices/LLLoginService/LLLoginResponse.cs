@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.Services;
