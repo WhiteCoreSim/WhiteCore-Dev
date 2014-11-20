@@ -26,24 +26,18 @@
  */
 
 using WhiteCore.Framework.ConsoleFramework;
-using WhiteCore.Framework.Modules;
-using Nwc.XmlRpc;
-using OpenMetaverse;
 using OpenMetaverse.StructuredData;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Text;
 #if NET_4_5
 using System.Net.Http;
 using System.Threading.Tasks;
 #endif
-using System.Web;
 using System.Xml;
-using WhiteCore.Framework.Servers.HttpServer;
 
 namespace WhiteCore.Framework.Utilities
 {

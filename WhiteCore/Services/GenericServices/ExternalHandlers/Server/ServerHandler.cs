@@ -27,7 +27,6 @@
 
 
 using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Interfaces;
 using WhiteCore.Framework.Services;
 using Nini.Config;

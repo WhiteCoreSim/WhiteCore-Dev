@@ -28,7 +28,6 @@
 using System;
 using System.IO;
 using System.Text;
-using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Framework.Serialization
 {

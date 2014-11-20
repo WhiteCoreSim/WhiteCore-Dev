@@ -30,7 +30,6 @@ using System.Collections.Generic;
 using System.Net;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
-using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Interfaces;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;

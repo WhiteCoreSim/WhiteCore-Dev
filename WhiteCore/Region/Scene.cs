@@ -38,7 +38,6 @@ using Nini.Config;
 using OpenMetaverse;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Threading;
 
 namespace WhiteCore.Region

@@ -26,7 +26,6 @@
  */
 
 using WhiteCore.Framework.Modules;
-using Nini.Config;
 using OpenMetaverse;
 using System.Collections.Generic;
 

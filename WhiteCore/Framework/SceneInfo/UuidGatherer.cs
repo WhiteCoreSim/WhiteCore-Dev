@@ -26,7 +26,6 @@
  */
 
 using WhiteCore.Framework.ConsoleFramework;
-using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo.Entities;
 using WhiteCore.Framework.Serialization;
 using WhiteCore.Framework.Services;

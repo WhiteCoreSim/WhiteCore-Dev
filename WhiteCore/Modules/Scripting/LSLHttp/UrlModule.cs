@@ -35,7 +35,6 @@ using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using Nini.Config;
 using OpenMetaverse;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 

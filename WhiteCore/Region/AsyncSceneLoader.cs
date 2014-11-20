@@ -32,7 +32,6 @@ using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
 using Nini.Config;
-using WhiteCore.Framework.Servers;
 
 namespace WhiteCore.Region
 {

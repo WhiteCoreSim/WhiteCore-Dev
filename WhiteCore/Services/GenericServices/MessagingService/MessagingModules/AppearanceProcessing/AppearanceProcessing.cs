@@ -27,17 +27,12 @@
 
 
 using WhiteCore.Framework.ClientInterfaces;
-using WhiteCore.Framework.ConsoleFramework;
-using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
-using WhiteCore.Framework.Services.ClassHelpers.Other;
 using Nini.Config;
-using OpenMetaverse;
 using OpenMetaverse.StructuredData;
-using System.Collections.Generic;
 using GridRegion = WhiteCore.Framework.Services.GridRegion;
 
 namespace WhiteCore.Services

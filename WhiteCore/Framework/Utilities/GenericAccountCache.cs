@@ -27,7 +27,6 @@
 
 using System.Collections.Generic;
 using OpenMetaverse;
-using WhiteCore.Framework.ConsoleFramework;
 
 namespace WhiteCore.Framework.Utilities
 {

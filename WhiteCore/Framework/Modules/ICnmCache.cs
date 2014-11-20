@@ -27,7 +27,6 @@
 
 using System;
 using System.Collections.Generic;
-using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Framework.Modules
 {

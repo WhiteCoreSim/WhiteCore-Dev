@@ -29,7 +29,6 @@ using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
-using WhiteCore.Framework.Utilities;
 using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;

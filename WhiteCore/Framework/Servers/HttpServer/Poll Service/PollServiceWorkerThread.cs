@@ -26,13 +26,10 @@
  */
 
 using System;
-using System.Collections;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
-using WhiteCore.Framework.Servers.HttpServer.Interfaces;
 using WhiteCore.Framework.Utilities;
 using WhiteCore.Framework.ConsoleFramework;
 using System.Net;

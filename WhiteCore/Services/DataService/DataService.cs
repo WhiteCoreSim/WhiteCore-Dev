@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-//using WhiteCore.DataManager.MSSQL;
 using WhiteCore.DataManager.MySQL;
 using WhiteCore.DataManager.SQLite;
 
@@ -36,7 +35,6 @@ using WhiteCore.Framework.Services;
 using Nini.Config;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace WhiteCore.Services.DataService
 {

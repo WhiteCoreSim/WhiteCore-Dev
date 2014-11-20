@@ -32,7 +32,6 @@ using OpenMetaverse;
 using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.ConsoleFramework;
-using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.WorldView
 {

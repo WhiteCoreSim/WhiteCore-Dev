@@ -30,7 +30,6 @@ using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Servers;
 using WhiteCore.Framework.Services;
 using Nini.Config;
-using OpenMetaverse.StructuredData;
 using System.Collections.Generic;
 using System.Linq;
 

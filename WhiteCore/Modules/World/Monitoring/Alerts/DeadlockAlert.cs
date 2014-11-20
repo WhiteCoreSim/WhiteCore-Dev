@@ -27,7 +27,6 @@
 
 
 using WhiteCore.Framework.Modules;
-using WhiteCore.Modules.Monitoring.Monitors;
 
 namespace WhiteCore.Modules.Monitoring.Alerts
 {

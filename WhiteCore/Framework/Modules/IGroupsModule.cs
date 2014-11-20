@@ -28,7 +28,6 @@
 using System.Collections.Generic;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.PresenceInfo;
-using WhiteCore.Framework.Services;
 using OpenMetaverse;
 using WhiteCore.Framework.DatabaseInterfaces;
 

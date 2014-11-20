@@ -29,7 +29,6 @@
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
-using WhiteCore.Framework.SceneInfo.Entities;
 using WhiteCore.Framework.Servers;
 using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
@@ -40,7 +39,6 @@ using OpenMetaverse;
 using OpenMetaverse.StructuredData;
 using System;
 using System.IO;
-using System.Text;
 
 
 namespace WhiteCore.Modules.Caps

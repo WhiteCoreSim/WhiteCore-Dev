@@ -27,7 +27,6 @@
 
 using System;
 using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Utilities;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;

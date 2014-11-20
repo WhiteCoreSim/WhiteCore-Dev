@@ -27,7 +27,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using WhiteCore.Framework.Modules;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
 

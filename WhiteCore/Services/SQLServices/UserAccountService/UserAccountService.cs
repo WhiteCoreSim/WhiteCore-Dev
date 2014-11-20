@@ -36,7 +36,6 @@ using Nini.Config;
 using OpenMetaverse;
 using System.Collections.Generic;
 using System.IO;
-using WhiteCore.Framework.ClientInterfaces;
 using System;
 using System.Globalization;
 

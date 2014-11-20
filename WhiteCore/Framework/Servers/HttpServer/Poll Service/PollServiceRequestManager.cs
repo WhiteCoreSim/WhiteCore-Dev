@@ -28,7 +28,6 @@
 using System;
 using System.Collections;
 using System.Threading;
-using WhiteCore.Framework.Servers.HttpServer.Interfaces;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using System.Text;
 using WhiteCore.Framework.ConsoleFramework;

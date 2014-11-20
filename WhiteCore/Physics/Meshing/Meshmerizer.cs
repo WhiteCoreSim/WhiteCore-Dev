@@ -33,7 +33,6 @@ using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.SceneInfo;
 using Nini.Config;
 using OpenMetaverse;
-using OpenMetaverse.Imaging;
 using OpenMetaverse.StructuredData;
 #if DEBUGING
 using PrimMesher;

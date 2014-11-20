@@ -27,7 +27,6 @@
 
 
 using WhiteCore.Framework.ClientInterfaces;
-using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;

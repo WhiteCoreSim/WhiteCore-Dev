@@ -39,7 +39,6 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Reflection;
 
 namespace WhiteCore.Simulation.Base
 {

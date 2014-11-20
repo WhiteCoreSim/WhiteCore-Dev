@@ -27,7 +27,6 @@
 
 using OpenMetaverse;
 using ProtoBuf;
-using System.Collections.Generic;
 
 namespace WhiteCore.Framework.ClientInterfaces
 {

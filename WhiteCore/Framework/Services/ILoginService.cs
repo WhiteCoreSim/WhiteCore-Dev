@@ -31,7 +31,6 @@ using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Services.ClassHelpers.Profile;
 using Nini.Config;
 using OpenMetaverse;
-using OpenMetaverse.StructuredData;
 
 namespace WhiteCore.Framework.Services
 {

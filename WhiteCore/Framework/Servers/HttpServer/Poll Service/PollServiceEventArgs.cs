@@ -26,7 +26,6 @@
  */
 
 using System;
-using System.Collections;
 using OpenMetaverse;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 

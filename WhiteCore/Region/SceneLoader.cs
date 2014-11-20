@@ -30,7 +30,6 @@ using System.Collections.Generic;
 using WhiteCore.Framework.ModuleLoader;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
-using WhiteCore.Framework.Servers;
 using WhiteCore.Framework.Services;
 using Nini.Config;
 

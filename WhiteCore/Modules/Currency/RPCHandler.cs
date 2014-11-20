@@ -33,7 +33,6 @@ using WhiteCore.Framework.Servers;
 using WhiteCore.Framework.Servers.HttpServer.Interfaces;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Profile;
-using WhiteCore.Framework.Utilities;
 using Nini.Config;
 using Nwc.XmlRpc;
 using OpenMetaverse;

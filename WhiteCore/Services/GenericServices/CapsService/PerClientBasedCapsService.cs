@@ -28,14 +28,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.Servers.HttpServer.Interfaces;
 using WhiteCore.Framework.Services;
 using OpenMetaverse;
 
-using WhiteCore.Framework.Servers.HttpServer;
 
 namespace WhiteCore.Services
 {

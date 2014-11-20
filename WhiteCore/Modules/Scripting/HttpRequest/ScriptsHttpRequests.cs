@@ -36,12 +36,10 @@ using System.Text;
 using System.Threading;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
-using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Utilities;
 using Nini.Config;
 using OpenMetaverse;
 
-using WhiteCore.Framework.Servers.HttpServer;
 
 /*****************************************************
  *
