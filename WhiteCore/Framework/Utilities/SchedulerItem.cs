@@ -120,7 +120,7 @@ namespace WhiteCore.Framework.Utilities
             HistoryReciept = false;
             FireFunction = string.Empty;
             FireParams = string.Empty;
-            HisotryKeep = false;
+            HistoryKeep = false;
             HistoryLastID = "";
             Enabled = false;
             ScheduleFor = UUID.Zero;
@@ -134,7 +134,7 @@ namespace WhiteCore.Framework.Utilities
 
         public bool Enabled { get; set; }
 
-        public bool HisotryKeep { get; set; }
+        public bool HistoryKeep { get; set; }
 
         public string FireParams { get; set; }
 
@@ -162,7 +162,7 @@ namespace WhiteCore.Framework.Utilities
                                          {"HistoryLastID", HistoryLastID},
                                          {"TimeToRun", TimeToRun},
                                          {"Enabled", Enabled},
-                                         {"HisotryKeep", HisotryKeep},
+                                         {"HistoryKeep", HistoryKeep},
                                          {"FireParams", FireParams},
                                          {"FireFunction", FireFunction},
                                          {"HistoryReciept", HistoryReciept},
@@ -183,7 +183,7 @@ namespace WhiteCore.Framework.Utilities
             HistoryLastID = map["HistoryLastID"].AsString();
             TimeToRun = map["TimeToRun"].AsDate();
             Enabled = map["Enabled"].AsBoolean();
-            HisotryKeep = map["HisotryKeep"].AsBoolean();
+            HistoryKeep = map["HistoryKeep"].AsBoolean();
             FireParams = map["FireParams"].AsString();
             FireFunction = map["FireFunction"].AsString();
             HistoryReciept = map["HistoryReciept"].AsBoolean();

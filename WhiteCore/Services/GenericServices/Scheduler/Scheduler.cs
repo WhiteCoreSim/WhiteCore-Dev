@@ -187,7 +187,7 @@ namespace WhiteCore.Services
                 if (I.RunOnce) I.Enabled = false;
                 if (I.Enabled) I.CalculateNextRunTime(I.TimeToRun);
 
-                if (!I.HisotryKeep)
+                if (!I.HistoryKeep)
                     m_database.HistoryDeleteOld(I);
                 m_database.SchedulerSave(I);
 
