@@ -1,5 +1,5 @@
 #!/bin/bash
-ARCH="x86"
+ARCH="AnyCPU"
 CONFIG="Debug"
 BUILD=false
 VERSIONONLY=false
