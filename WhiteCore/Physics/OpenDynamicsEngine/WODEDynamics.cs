@@ -839,15 +839,19 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             }
 
             Vector3 deflection = vel_defl / m_linearDeflectionTimescale * m_linearDeflectionEfficiency * 100.0f;
-            deflection.X = 0.0f;
-            float deflectionLength = deflection.Length();
-            if(deflectionLength < 0.0f) deflectionLength = 0.0f;
+            
+			float deflectionLengthY = Math.Abs(deflection.Y);
+            float deflectionLengthX = Math.Abs(deflection.X);
 
-            if(vel_defl.X < 0.0f) deflection.X = -deflectionLength;
-            else if(vel_defl.X > 0.0f) deflection.X = deflectionLength;
+            deflection.Z = 0.0f;
+            if((m_flags & (VehicleFlag.NO_DEFLECTION_UP)) == 0) {
+                deflection.Z = deflectionLengthX;
+                deflection.X = -deflection.X;
+            }
 
+            if(vel_defl.X < 0.0f) deflection.X = -deflectionLengthY;
+            else if(vel_defl.X >= 0.0f) deflection.X = deflectionLengthY;
             deflection.Y = -deflection.Y;
-            deflection.Z = -deflection.Z;
 
             irotq_z.W = -irotq_z.W;
             deflection *= irotq_z;
@@ -896,7 +900,6 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             m_newVelocity += (hovervel *= Mass / pTimestep);
 	    
             if(parent.LinkSetIsColliding || Type == Vehicle.TYPE_AIRPLANE || Type == Vehicle.TYPE_BALLOON || ishovering) {
-                if((m_flags & (VehicleFlag.NO_DEFLECTION_UP)) != 0 && deflection.Z > 0.0f) deflection.Z = 0.0f;
                 m_newVelocity += deflection;
 
                 motorVelocity *= rotq;
@@ -1024,20 +1027,8 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
                 vertattr *= VAservo;
 
-                float bounce = 1.0f - m_verticalAttractionEfficiency;
-                float eff = 0.30f;
-
-                //disable this if vehicles go crazy using vertical attraction efficiency
-                if(m_angularMotorDirection.X == 0.0f && 
-                   m_angularMotorDirection.Y == 0.0f && 
-                   m_angularMotorDirection.Z == 0.0f && 
-                   Math.Abs(verterr.Z) > 0.8f)
-                {
-                    if((vertattr.X > 0.0f && angularVelocity.X > 0.0f) || (vertattr.X < 0.0f && angularVelocity.X < 0.0f))
-                        vertattr.X += bounce * angularVelocity.X * eff;
-                    if((vertattr.Y > 0.0f && angularVelocity.Y > 0.0f) || (vertattr.Y < 0.0f && angularVelocity.Y < 0.0f))
-                        vertattr.Y += bounce * angularVelocity.Y * eff;
-                }
+                vertattr.X += (vertattr.X - angularVelocity.X) * (0.004f * m_verticalAttractionEfficiency + 0.0001f);
+                vertattr.Y += (vertattr.Y - angularVelocity.Y) * (0.004f * m_verticalAttractionEfficiency + 0.0001f);
 
                 if((m_flags & (VehicleFlag.LIMIT_ROLL_ONLY)) != 0) vertattr.Y = 0.0f;
             }
@@ -1046,7 +1037,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
             #region deflection
             //rotates body to direction of movement (linearMovement vector)
-
+			/* temporary disabled due to instabilities, needs to be rewritten
             if(m_angularDeflectionTimescale < 300)
             {
                 float Dservo = 0.05f * m_angularDeflectionTimescale * m_angularDeflectionEfficiency;
@@ -1066,7 +1057,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                     deflection *= Dservo;
                 }
             }
-
+			*/
             #endregion
 
             #region banking
