@@ -70,7 +70,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
 
         public bool firstStartup = true;
 
-        public UInt64 ScriptCompileCounter
+        public static UInt64 ScriptCompileCounter
         {
             get { return scriptCompileCounter; }
         }
@@ -233,7 +233,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
             IScriptConverter converter;
             string compileScript;
             CheckLanguageAndConvert(script, ownerUUID, out converter, out compileScript);
-            if (GetErrors().Length != 0)
+            if (GetErrors().Length > 0)
                 return;
             if (converter == null)
             {

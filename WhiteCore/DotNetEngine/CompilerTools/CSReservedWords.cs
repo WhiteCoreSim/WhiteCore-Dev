@@ -88,7 +88,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
             // anything that starts with an uppercase letter
             if (String.IsNullOrEmpty(word)) return false;
             if (word.Length < 2) return false;
-            if (word.StartsWith("ll")) return false;
+			if (word.StartsWith("ll", StringComparison.Ordinal))
+				return false;
             char first = word.ToCharArray(0, 1)[0];
             if (first >= 'A' && first <= 'Z') return false;
 
