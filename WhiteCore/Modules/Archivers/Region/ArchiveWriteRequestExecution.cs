@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
@@ -156,7 +155,7 @@ namespace WhiteCore.Modules.Archivers
         }
 
         /// <summary>
-        ///     Create the control file for a 0.2 version archive
+        ///     Create the control file for a 0.8 version archive
         /// </summary>
         /// <returns></returns>
         public static string Create0p2ControlFile()
@@ -166,7 +165,7 @@ namespace WhiteCore.Modules.Archivers
             xtw.WriteStartDocument();
             xtw.WriteStartElement("archive");
             xtw.WriteAttributeString("major_version", "0");
-            xtw.WriteAttributeString("minor_version", "3");
+            xtw.WriteAttributeString("minor_version", "8");
 
             xtw.WriteStartElement("creation_info");
             DateTime now = DateTime.UtcNow;

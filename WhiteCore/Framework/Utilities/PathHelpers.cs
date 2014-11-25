@@ -35,7 +35,8 @@ namespace WhiteCore.Framework.Utilities
 {
     public class PathHelpers
     {
-        private const string usernameVar = "%username%";
+        const string usernameVar = "%username%";
+        const string HomedriveVar = "%homedrive%";
 
         public static string PathUsername(string Path) //supports using %username% in place of username
         {
@@ -52,7 +53,6 @@ namespace WhiteCore.Framework.Utilities
             }
         }
 
-        private const string HomedriveVar = "%homedrive%";
 
         public static string PathHomeDrive(string Path) //supports for %homedrive%, gives the drive letter on Windows
         {
@@ -82,6 +82,14 @@ namespace WhiteCore.Framework.Utilities
             return PathHomeDrive(PathUsername(Path));
         }
 
+        /// <summary>
+        /// Verifies a file for writeing setting some defaults if needed.
+        /// </summary>
+        /// <returns>The write file.</returns>
+        /// <param name="fileName">File name.</param>
+        /// <param name="defaultExt">Default ext.</param>
+        /// <param name="defaultDir">Default dir.</param>
+        /// <param name="createPath">If set to <c>true</c> create path.</param>
         public static string VerifyWriteFile(string fileName, string defaultExt, string defaultDir, bool createPath)
         {
             // some file sanity checks when saving 
@@ -98,23 +106,24 @@ namespace WhiteCore.Framework.Utilities
             string filePath = Path.GetDirectoryName (fileName);
             if (filePath == "")
             {
-                if ( defaultDir == String.Empty )
+                if (defaultDir == String.Empty)
                     defaultDir = "./";
-
-                if (!Directory.Exists (defaultDir))
-                {
-                    if (createPath)
-                        Directory.CreateDirectory (defaultDir);
-                    else
-                    {
-                        MainConsole.Instance.Info ("[Error]: The folder specified, '" + defaultDir + "' does not exist!");
-                        return "";
-                    }
-                }
                 fileName = Path.Combine (defaultDir, fileName);
- 
-            }
 
+            }
+             
+            // check if the directory exists
+            if (!Directory.Exists (defaultDir))
+            {
+                if (createPath)
+                    Directory.CreateDirectory (defaultDir);
+                else
+                {
+                    MainConsole.Instance.Info ("[Error]: The folder specified, '" + defaultDir + "' does not exist!");
+                    return "";
+                }
+            }
+ 
             // last check...
             if (File.Exists (fileName))
             {
@@ -127,19 +136,48 @@ namespace WhiteCore.Framework.Utilities
             return fileName;
         }
 
+        /// <summary>
+        /// Verifies file for reading, setting some defaults if needed.
+        /// </summary>
+        /// <returns>The read file.</returns>
+        /// <param name="fileName">File name.</param>
+        /// <param name="extensions">Extensions.</param>
+        /// <param name="defaultDir">Default dir.</param>
         public static string VerifyReadFile(string fileName, List <string> extensions, string defaultDir)
         {
             foreach (var ext in extensions)
             {
-                var fName = VerifyReadFile(fileName, ext, defaultDir);
+
+                var fName = VerifyReadFile(fileName, ext, defaultDir, false);
                 if ( fName != "")
                     return fName;
             }
 
+            MainConsole.Instance.Info("[Error]: The file '" + fileName + "' cannot be found." );
             return "";
         }
 
+        /// <summary>
+        /// Verifies file for reading, setting some defaults if needed.
+        /// </summary>
+        /// <returns>The read file.</returns>
+        /// <param name="fileName">File name.</param>
+        /// <param name="defaultExt">Default ext.</param>
+        /// <param name="defaultDir">Default dir.</param>
         public static string VerifyReadFile(string fileName, string defaultExt, string defaultDir)
+        {
+            return VerifyReadFile (fileName, defaultExt, defaultDir, true);
+        }
+
+        /// <summary>
+        /// Verifies file for reading, setting some defaults if needed.
+        /// </summary>
+        /// <returns>The read file.</returns>
+        /// <param name="fileName">File name.</param>
+        /// <param name="defaultExt">Default ext.</param>
+        /// <param name="defaultDir">Default dir.</param>
+        /// <param name="showErrors">Show error messages.</param>
+        public static string VerifyReadFile(string fileName, string defaultExt, string defaultDir, bool showErrors)
         {
             // some sanity checks...
             string extension = Path.GetExtension(fileName).ToLower();
@@ -152,10 +190,10 @@ namespace WhiteCore.Framework.Utilities
                 if ( extension == string.Empty)
                 {
                     fileName = fileName + defaultExt;
-                }
-                else
+                } else 
                 {
-                    MainConsole.Instance.Info("Usage: the filename should be a '" + defaultExt +"' file");
+                    if (showErrors)
+                        MainConsole.Instance.Info("Usage: the filename should be a '" + defaultExt +"' file");
                     return "";
                 }
             }
@@ -168,7 +206,8 @@ namespace WhiteCore.Framework.Utilities
 
                 if (!Directory.Exists (defaultDir))
                 {
-                    MainConsole.Instance.Info ("[Error]: The folder specified, '" + defaultDir + "' does not exist!");
+                    if (showErrors)
+                        MainConsole.Instance.Info ("[Error]: The folder specified, '" + defaultDir + "' does not exist!");
                     return "";
                 }
                 fileName = Path.Combine (defaultDir, fileName);
@@ -177,7 +216,8 @@ namespace WhiteCore.Framework.Utilities
             // last check...
             if ( !File.Exists( fileName ) )
             {
-                MainConsole.Instance.Info ( "[Error]: The file '" + fileName + "' cannot be found." );
+                if (showErrors)
+                    MainConsole.Instance.Info ( "[Error]: The file '" + fileName + "' cannot be found." );
                 return "";
             }
 

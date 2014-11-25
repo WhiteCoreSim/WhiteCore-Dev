@@ -31,21 +31,20 @@ using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using Nini.Config;
 
-
 namespace WhiteCore.Modules.Cloud
 {
     public class CloudModule : ICloudModule
     {
-//        private static readonly log4net.ILog MainConsole.Instance 
-//            = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        private readonly float[] cloudCover = new float[16*16];
-        private readonly Random m_rndnums = new Random(Environment.TickCount);
-        private float m_cloudDensity = 1.0F;
-        private bool m_enabled;
-        private uint m_frame;
-        private int m_frameUpdateRate = 1000;
-        private bool m_ready;
-        private IScene m_scene;
+        float[] cloudCover;
+        int gridX;
+        int gridY;
+        readonly Random m_rndnums = new Random(Environment.TickCount);
+        float m_cloudDensity = 1.5F;
+        bool m_enabled;
+        uint m_frame;
+        int m_frameUpdateRate = 1000;
+        bool m_ready;
+        IScene m_scene;
 
         #region ICloudModule Members
 
@@ -66,6 +65,10 @@ namespace WhiteCore.Modules.Cloud
             if (m_enabled)
             {
                 m_scene = scene;
+
+                gridX = (m_scene.RegionInfo.RegionSizeX / 16);
+                gridY = (m_scene.RegionInfo.RegionSizeY / 16);
+                cloudCover = new float[gridX * gridY];
 
                 scene.EventManager.OnNewClient += CloudsToClient;
                 scene.RegisterModuleInterface<ICloudModule>(this);
@@ -115,12 +118,14 @@ namespace WhiteCore.Modules.Cloud
         public float CloudCover(int x, int y, int z)
         {
             float cover = 0f;
-            x /= 16;
-            y /= 16;
+            x /= (gridX);
+            y /= (gridY);
+
+            // check limits
             if (x < 0) x = 0;
-            if (x > 15) x = 15;
+            if (x > (gridX-1)) x = gridX-1;
             if (y < 0) y = 0;
-            if (y > 15) y = 15;
+            if (y > (gridY-1)) y = gridY-1;
 
             if (cloudCover != null)
             {
@@ -134,19 +139,20 @@ namespace WhiteCore.Modules.Cloud
 
         private void UpdateCloudCover()
         {
-            float[] newCover = new float[16*16];
+            float[] newCover = new float[gridX * gridY];
             int rowAbove = new int();
             int rowBelow = new int();
             int columnLeft = new int();
             int columnRight = new int();
-            for (int x = 0; x < 16; x++)
+
+            for (int x = 0; x < gridX; x++)
             {
                 if (x == 0)
                 {
                     columnRight = x + 1;
-                    columnLeft = 15;
+                    columnLeft = gridX-1;
                 }
-                else if (x == 15)
+                else if (x == gridX-1)
                 {
                     columnRight = 0;
                     columnLeft = x - 1;
@@ -156,14 +162,14 @@ namespace WhiteCore.Modules.Cloud
                     columnRight = x + 1;
                     columnLeft = x - 1;
                 }
-                for (int y = 0; y < 16; y++)
+                for (int y = 0; y < gridY; y++)
                 {
                     if (y == 0)
                     {
                         rowAbove = y + 1;
-                        rowBelow = 15;
+                        rowBelow = gridY-1;
                     }
-                    else if (y == 15)
+                    else if (y == gridY-1)
                     {
                         rowAbove = 0;
                         rowBelow = y - 1;
@@ -186,7 +192,7 @@ namespace WhiteCore.Modules.Cloud
                     newCover[y*16 + x] *= m_cloudDensity;
                 }
             }
-            Array.Copy(newCover, cloudCover, 16*16);
+            Array.Copy(newCover, cloudCover, gridX * gridY);
         }
 
         private void CloudUpdate()
@@ -212,12 +218,12 @@ namespace WhiteCore.Modules.Cloud
         /// </summary>
         private void GenerateCloudCover()
         {
-            for (int y = 0; y < 16; y++)
+            for (int y = 0; y < gridY; y++)
             {
-                for (int x = 0; x < 16; x++)
+                for (int x = 0; x < gridX; x++)
                 {
-                    cloudCover[y*16 + x] = (float) (m_rndnums.NextDouble()); // 0 to 1
-                    cloudCover[y*16 + x] *= m_cloudDensity;
+                    cloudCover[y*16 + x] = (float) (m_rndnums.NextDouble());        // 0 to 1
+                    cloudCover[y*16 + x] *= m_cloudDensity;                         //  normalize range 0: none < 1: rain > 2: snow
                 }
             }
         }

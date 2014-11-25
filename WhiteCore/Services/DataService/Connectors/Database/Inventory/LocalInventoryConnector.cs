@@ -76,6 +76,42 @@ namespace WhiteCore.Services.DataService
             get { return "IInventoryData"; }
         }
 
+        public bool FolderExists(UUID FolderID)
+        {
+            QueryFilter filter = new QueryFilter();
+            filter.andFilters["folderID"] = FolderID;
+            return GD.Query(new string[] {"folderID"}, m_foldersrealm, filter, null, null, null).Count > 0;
+        }
+
+        public bool FolderItemExists(UUID itemID, UUID FolderID)
+        {
+            QueryFilter filter = new QueryFilter();
+            filter.andFilters["assetID"] = itemID;
+            filter.andFilters["parentFolderID"] = FolderID;
+            return GD.Query(new string[] {"assetID"}, m_itemsrealm, filter, null, null, null).Count > 0;
+        }
+
+        public bool ItemExists(UUID itemID)
+        {
+            QueryFilter filter = new QueryFilter();
+            filter.andFilters["assetID"] = itemID;
+            return GD.Query(new string[] {"assetID"}, m_itemsrealm, filter, null, null, null).Count > 0;
+        }
+
+        /// <summary>
+        /// Gets a user inventory folder ID.
+        /// </summary>
+        /// <returns>The user folder ID or null.</returns>
+        /// <param name="avatarID">Avatar ID</param>
+        /// <param name="folderName">Folder name.</param>
+        public List<string> GetUserFolderID (UUID principalID, string folderName)
+        {
+            QueryFilter filter = new QueryFilter();
+            filter.andFilters["principalID"] = principalID;
+            filter.andFilters["folderName"] = folderName;
+            return GD.Query(new string[] {"folderID"}, m_foldersrealm, filter, null, null, null);
+        }
+
         public virtual List<InventoryFolderBase> GetFolders(string[] fields, string[] vals)
         {
             Dictionary<string, List<string>> retVal = GD.QueryNames(fields, vals, m_foldersrealm, "*");
