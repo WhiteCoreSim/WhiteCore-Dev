@@ -450,6 +450,8 @@ namespace WhiteCore.Region.Serialization
             m_SOPXmlProcessors.Add("PIDHoverHeight", ((sop, xml) => GenericFloat(sop, xml, "PIDHoverHeight", sopType)));
             m_SOPXmlProcessors.Add("PIDHoverTau", ((sop, xml) => GenericFloat(sop, xml, "PIDHoverTau", sopType)));
             m_SOPXmlProcessors.Add("VehicleType", ((sop, xml) => GenericInt(sop, xml, "VehicleType", sopType)));
+            //m_SOPXmlProcessors.Add("VehicleFlags", ((sop, xml) => GenericInt(sop,xml, "VehicleFlags", sopType)));
+            //m_SOPXmlProcessors.Add("VehicleParameters", ((sop, xml) => GenericInt(sop,xml, "VehicleParms", sopType)));
             m_SOPXmlProcessors.Add("SavedAttachedPos",
                                    ((sop, xml) => GenericVector3(sop, xml, "SavedAttachedPos", sopType)));
             m_SOPXmlProcessors.Add("SavedAttachmentPoint",
@@ -1537,7 +1539,17 @@ namespace WhiteCore.Region.Serialization
         {
             obj.FromUserInventoryItemID = ReadUUID(reader, "FromUserInventoryItemID");
         }
-
+/*        
+        private void ProcessVehicleFlags(SceneObjectPart obj, XmlTextReader reader)
+        {
+        	// Flags need to be processed here
+        }
+        
+        private void ProcessVehicleParams(SceneObjectPart obj, XmlTextReader reader)
+        {
+        	// Float & Vector need to be processed here
+        }
+*/
         private void GenericBool(SceneObjectPart obj, XmlTextReader reader, string name, Type SOPType)
         {
             bool val = reader.ReadElementContentAsBoolean(name, "");
