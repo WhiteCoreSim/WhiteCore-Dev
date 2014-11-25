@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
@@ -75,10 +74,12 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                 m_AllowDelete = invConfig.GetBoolean("AllowDelete", true);
 
             if (MainConsole.Instance != null)
-                MainConsole.Instance.Commands.AddCommand("fix inventory", 
-            	                                         "fix inventory",
-                                                         "If the user's inventory has been corrupted, this function will attempt to fix it",
-                                                         FixInventory, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "fix inventory",
+                    "fix inventory",
+                    "If the user's inventory has been corrupted, this function will attempt to fix it",
+                    FixInventory, false, true);
+
             registry.RegisterModuleInterface<IInventoryService>(this);
             Init(registry, Name, serverPath: "/inventory/", serverHandlerName: "InventoryServerURI");
         }
@@ -540,6 +541,46 @@ namespace WhiteCore.Services.SQLServices.InventoryService
             return allFolders;
         }
 
+        //[CanBeReflected(ThreatLevel = ThreatLevel.Low)]
+        public virtual bool FolderExists(UUID folderID)
+        {
+            object remoteValue = DoRemoteByURL("InventoryServerURI", folderID);
+            if (remoteValue != null || m_doRemoteOnly)
+                return remoteValue == null ? false : (bool) remoteValue;
+
+            return m_Database.FolderExists(folderID);
+        }
+
+        //[CanBeReflected(ThreatLevel = ThreatLevel.Low)]
+        public virtual bool FolderItemExists(UUID folderID, UUID itemID)
+        {
+            object remoteValue = DoRemoteByURL("InventoryServerURI", folderID, itemID);
+            if (remoteValue != null || m_doRemoteOnly)
+                return remoteValue == null ? false : (bool) remoteValue;
+
+            return m_Database.FolderItemExists(folderID, itemID);
+        }
+
+        //[CanBeReflected(ThreatLevel = ThreatLevel.Low)]
+        public virtual bool ItemExists(UUID itemID)
+        {
+            object remoteValue = DoRemoteByURL("InventoryServerURI", itemID);
+            if (remoteValue != null || m_doRemoteOnly)
+                return remoteValue == null ? false : (bool) remoteValue;
+
+            return m_Database.ItemExists(itemID);
+        }
+
+        //[CanBeReflected(ThreatLevel = ThreatLevel.Full)]
+        public virtual List<string> GetUserFolderID(UUID principalID, string folderName)
+        {
+            /*object remoteValue = DoRemoteByURL("InventoryServerURI", principalID);
+            if (remoteValue != null || m_doRemoteOnly)
+                return (List<InventoryFolderBase>)remoteValue;*/
+
+            return m_Database.GetUserFolderID (principalID, folderName);
+        }
+
         //[CanBeReflected(ThreatLevel = ThreatLevel.Full)]
         public virtual List<InventoryFolderBase> GetRootFolders(UUID principalID)
         {
@@ -576,6 +617,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
 
             return root;
         }
+
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public virtual InventoryFolderBase GetFolderForType(UUID principalID, InventoryType invType, AssetType type)

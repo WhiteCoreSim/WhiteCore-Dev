@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
@@ -48,17 +47,33 @@ namespace WhiteCore.Modules.Archivers
         /// <value>
         ///     Used to select all inventory nodes in a folder but not the folder itself
         /// </value>
-        private const string STAR_WILDCARD = "*";
+        const string STAR_WILDCARD = "*";
 
-        private readonly InventoryArchiverModule m_module;
-        private readonly bool m_saveAssets;
+        readonly InventoryArchiverModule m_module;
+        readonly bool m_saveAssets;
+
+        // some services
+        IInventoryService m_inventoryService;
+        IAssetService m_assetService;
+        IUserAccountService m_accountService;
+
+        /// <summary>
+        /// Determines which items will be included in the archive, according to their permissions.
+        /// Default is null, meaning no permission checks.
+        /// </summary>
+        public string FilterContent { get; set; }
+
+        /// <summary>
+        /// Counter for inventory items skipped due to permission filter option for passing to compltion event
+        /// </summary>
+        public int CountFiltered { get; set; }
 
         /// <value>
         ///     The stream to which the inventory archive will be saved.
         /// </value>
         private readonly Stream m_saveStream;
 
-        private readonly UserAccount m_userInfo;
+        readonly UserAccount m_userInfo;
         protected TarArchiveWriter m_archiveWriter;
         protected UuidGatherer m_assetGatherer;
 
@@ -92,7 +107,7 @@ namespace WhiteCore.Modules.Archivers
         /// </summary>
         public InventoryArchiveWriteRequest(
             Guid id, InventoryArchiverModule module, IRegistryCore registry,
-            UserAccount userInfo, string invPath, string savePath, bool UseAssets)
+            UserAccount userInfo, string invPath, string savePath, bool UseAssets, string checkPermissions)
             : this(
                 id,
                 module,
@@ -100,7 +115,10 @@ namespace WhiteCore.Modules.Archivers
                 userInfo,
                 invPath,
                 new GZipStream(new FileStream(savePath, FileMode.Create), CompressionMode.Compress),
-                UseAssets, null, new List<AssetBase>())
+                UseAssets,
+                null,
+                new List<AssetBase>(),
+                checkPermissions)
         {
         }
 
@@ -110,7 +128,7 @@ namespace WhiteCore.Modules.Archivers
         public InventoryArchiveWriteRequest(
             Guid id, InventoryArchiverModule module, IRegistryCore registry,
             UserAccount userInfo, string invPath, Stream saveStream, bool UseAssets, InventoryFolderBase folderBase,
-            List<AssetBase> assetsToAdd)
+            List<AssetBase> assetsToAdd, string checkPermissions)
         {
             m_id = id;
             m_module = module;
@@ -118,10 +136,22 @@ namespace WhiteCore.Modules.Archivers
             m_userInfo = userInfo;
             m_invPath = invPath;
             m_saveStream = saveStream;
-            m_assetGatherer = new UuidGatherer(m_registry.RequestModuleInterface<IAssetService>());
             m_saveAssets = UseAssets;
             m_defaultFolderToSave = folderBase;
             m_assetsToAdd = assetsToAdd;
+
+            // Set Permission filter if available
+            if (checkPermissions != null)
+                FilterContent = checkPermissions.ToUpper();
+
+            // some necessary services
+            m_inventoryService = m_registry.RequestModuleInterface<IInventoryService> ();
+            m_assetService = m_registry.RequestModuleInterface<IAssetService> ();
+            m_accountService = m_registry.RequestModuleInterface<IUserAccountService> ();
+
+            // lastly as it is dependant       
+            m_assetGatherer = new UuidGatherer(m_assetService);
+
         }
 
         protected void ReceivedAllAssets(ICollection<UUID> assetsFoundUuids, ICollection<UUID> assetsNotFoundUuids)
@@ -132,8 +162,8 @@ namespace WhiteCore.Modules.Archivers
             try
             {
                 // We're almost done.  Just need to write out the control file now
-                m_archiveWriter.WriteFile(ArchiveConstants.CONTROL_FILE_PATH, Create0p1ControlFile());
-                MainConsole.Instance.InfoFormat("[ARCHIVER]: Added control file to archive.");
+                m_archiveWriter.WriteFile(ArchiveConstants.CONTROL_FILE_PATH, CreateControlFile(m_saveAssets));
+                MainConsole.Instance.InfoFormat("[INVENTORY ARCHIVER]: Added control file to archive.");
                 m_archiveWriter.Close();
             }
             catch (Exception e)
@@ -153,19 +183,38 @@ namespace WhiteCore.Modules.Archivers
 
         protected void SaveInvItem(InventoryItemBase inventoryItem, string path)
         {
+
+            // Check For Permissions Filter Flags
+            if (!CanUserArchiveObject(m_userInfo.PrincipalID, inventoryItem))
+            {
+                MainConsole.Instance.InfoFormat(
+                    "[INVENTORY ARCHIVER]: Insufficient permissions, skipping inventory item {0} {1} at {2}",
+                    inventoryItem.Name, inventoryItem.ID, path);
+
+                // Count Items Excluded
+                CountFiltered++;
+
+                return;
+            }
+
             string filename = path + CreateArchiveItemName(inventoryItem);
 
             // Record the creator of this item for user record purposes (which might go away soon)
             m_userUuids[inventoryItem.CreatorIdAsUuid] = 1;
 
             InventoryItemBase saveItem = (InventoryItemBase) inventoryItem.Clone();
-            saveItem.CreatorId = OspResolver.MakeOspa(saveItem.CreatorIdAsUuid,
-                                                      m_registry.RequestModuleInterface<IUserAccountService>());
+            saveItem.CreatorId = OspResolver.MakeOspa(saveItem.CreatorIdAsUuid, m_accountService);
 
             string serialization = UserInventoryItemSerializer.Serialize(saveItem);
             m_archiveWriter.WriteFile(filename, serialization);
 
-            m_assetGatherer.GatherAssetUuids(saveItem.AssetID, (AssetType) saveItem.AssetType, m_assetUuids);
+   //         m_assetGatherer.GatherAssetUuids(saveItem.AssetID, (AssetType) saveItem.AssetType, m_assetUuids);
+            AssetType itemAssetType = (AssetType)inventoryItem.AssetType;
+
+            // Don't chase down link asset items as they actually point to their target item IDs rather than an asset
+            if (m_saveAssets && itemAssetType != AssetType.Link && itemAssetType != AssetType.LinkFolder)
+                m_assetGatherer.GatherAssetUuids(saveItem.AssetID, (AssetType) inventoryItem.AssetType, m_assetUuids);
+
         }
 
         /// <summary>
@@ -190,8 +239,7 @@ namespace WhiteCore.Modules.Archivers
             }
 
             InventoryCollection contents
-                = m_registry.RequestModuleInterface<IInventoryService>().GetFolderContent(inventoryFolder.Owner,
-                                                                                          inventoryFolder.ID);
+                = m_inventoryService.GetFolderContent(inventoryFolder.Owner, inventoryFolder.ID);
 
             foreach (InventoryFolderBase childFolder in contents.Folders)
             {
@@ -205,16 +253,48 @@ namespace WhiteCore.Modules.Archivers
         }
 
         /// <summary>
+        /// Checks whether the user has permission to export an inventory item to an IAR.
+        /// </summary>
+        /// <param name="UserID">The user</param>
+        /// <param name="InvItem">The inventory item</param>
+        /// <returns>Whether the user is allowed to export the object to an IAR</returns>
+        private bool CanUserArchiveObject(UUID UserID, InventoryItemBase InvItem)
+        {
+            if (FilterContent == null || FilterContent == "")
+                return true;// Default To Allow Export
+
+            bool permitted = true;
+
+            bool canCopy = (InvItem.CurrentPermissions & (uint)PermissionMask.Copy) != 0;
+            bool canTransfer = (InvItem.CurrentPermissions & (uint)PermissionMask.Transfer) != 0;
+            bool canMod = (InvItem.CurrentPermissions & (uint)PermissionMask.Modify) != 0;
+
+            if (FilterContent.Contains("C") && !canCopy)
+                permitted = false;
+
+            if (FilterContent.Contains("T") && !canTransfer)
+                permitted = false;
+
+            if (FilterContent.Contains("M") && !canMod)
+                permitted = false;
+
+            return permitted;
+        }
+
+
+        /// <summary>
         ///     Execute the inventory write request
         /// </summary>
         public void Execute()
         {
+
+
+
             try
             {
                 InventoryFolderBase inventoryFolder = null;
                 InventoryItemBase inventoryItem = null;
-                InventoryFolderBase rootFolder =
-                    m_registry.RequestModuleInterface<IInventoryService>().GetRootFolder(m_userInfo.PrincipalID);
+                InventoryFolderBase rootFolder = m_inventoryService.GetRootFolder(m_userInfo.PrincipalID);
 
                 if (m_defaultFolderToSave != null)
                     rootFolder = m_defaultFolderToSave;
@@ -234,6 +314,11 @@ namespace WhiteCore.Modules.Archivers
                 {
                     saveFolderContentsOnly = true;
                     maxComponentIndex--;
+                } else if (maxComponentIndex == -1)
+                {
+                    // If the user has just specified "/", then don't save the root "My Inventory" folder.  This is
+                    // more intuitive then requiring the user to specify "/*" for this.
+                    saveFolderContentsOnly = true;
                 }
 
                 m_invPath = String.Empty;
@@ -252,8 +337,7 @@ namespace WhiteCore.Modules.Archivers
                 {
                     m_invPath = m_invPath.Remove(m_invPath.LastIndexOf(InventoryFolderImpl.PATH_DELIMITER));
                     List<InventoryFolderBase> candidateFolders
-                        = InventoryArchiveUtils.FindFolderByPath(
-                            m_registry.RequestModuleInterface<IInventoryService>(), rootFolder, m_invPath);
+                        = InventoryArchiveUtils.FindFolderByPath(m_inventoryService, rootFolder, m_invPath);
                     if (candidateFolders.Count > 0)
                         inventoryFolder = candidateFolders[0];
                 }
@@ -262,8 +346,7 @@ namespace WhiteCore.Modules.Archivers
                 if (inventoryFolder == null)
                 {
                     inventoryItem =
-                        InventoryArchiveUtils.FindItemByPath(m_registry.RequestModuleInterface<IInventoryService>(),
-                                                             rootFolder, m_invPath);
+                        InventoryArchiveUtils.FindItemByPath(m_inventoryService, rootFolder, m_invPath);
                     //inventoryItem = m_userInfo.RootFolder.FindItemByPath(m_invPath);
                 }
 
@@ -314,8 +397,11 @@ namespace WhiteCore.Modules.Archivers
                     m_assetUuids[asset.ID] = (AssetType) asset.Type;
                 }
                 new AssetsRequest(
-                    new AssetsArchiver(m_archiveWriter), m_assetUuids,
-                    m_registry.RequestModuleInterface<IAssetService>(), ReceivedAllAssets).Execute();
+                    new AssetsArchiver(m_archiveWriter), m_assetUuids, m_assetService, ReceivedAllAssets).Execute();
+
+               // Watchdog time??
+                //Watchdog.RunInThread(o => ar.Execute(), string.Format("AssetsRequest ({0})", m_scene.Name), null);
+
             }
             else
             {
@@ -335,8 +421,7 @@ namespace WhiteCore.Modules.Archivers
             foreach (UUID creatorId in m_userUuids.Keys)
             {
                 // Record the creator of this item
-                UserAccount creator = m_registry.RequestModuleInterface<IUserAccountService>()
-                                                .GetUserAccount(null, creatorId);
+                UserAccount creator = m_accountService.GetUserAccount(null, creatorId);
 
                 if (creator != null)
                 {
@@ -410,14 +495,18 @@ namespace WhiteCore.Modules.Archivers
         ///     Create the control file for a 0.1 version archive
         /// </summary>
         /// <returns></returns>
-        public static string Create0p1ControlFile()
+        public static string CreateControlFile(bool saveAssets)
         {
             StringWriter sw = new StringWriter();
             XmlTextWriter xtw = new XmlTextWriter(sw) {Formatting = Formatting.Indented};
             xtw.WriteStartDocument();
             xtw.WriteStartElement("archive");
             xtw.WriteAttributeString("major_version", "0");
-            xtw.WriteAttributeString("minor_version", "1");
+            xtw.WriteAttributeString("minor_version", "3");
+
+            var includeAssets = saveAssets ? "True": "False";
+            xtw.WriteElementString("assets_included", includeAssets);
+
             xtw.WriteEndElement();
 
             xtw.Flush();

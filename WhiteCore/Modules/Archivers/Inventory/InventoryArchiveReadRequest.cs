@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
@@ -41,24 +40,33 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Xml;
+using System.Text;
 
 namespace WhiteCore.Modules.Archivers
 {
     public class InventoryArchiveReadRequest
     {
-        private readonly string m_invPath;
-        private readonly List<InventoryItemBase> itemsSavedOff = new List<InventoryItemBase>();
-        private readonly Queue<UUID> assets2Save = new Queue<UUID>();
+        readonly string m_invPath;
+        readonly List<InventoryItemBase> itemsSavedOff = new List<InventoryItemBase>();
+        readonly Queue<UUID> assets2Save = new Queue<UUID>();
+        protected bool m_assetsIncluded = true;
 
-        private const string sPattern =
+        // services...
+        IAssetService m_assetService;
+        IAssetDataPlugin m_assetData;
+        IInventoryService m_inventoryService;
+        IUserAccountService m_accountService;
+
+        const string sPattern =
             @"(\{{0,1}([0-9a-fA-F]){8}-([0-9a-f]){4}-([0-9a-f]){4}-([0-9a-f]){4}-([0-9a-f]){12}\}{0,1})";
 
         /// <value>
         ///     The stream from which the inventory archive will be loaded.
         /// </value>
-        private readonly Stream m_loadStream;
+        readonly Stream m_loadStream;
 
-        private readonly UserAccount m_userInfo;
+        readonly UserAccount m_userInfo;
         protected TarArchiveReader archive;
 
         /// <summary>
@@ -77,12 +85,12 @@ namespace WhiteCore.Modules.Archivers
         /// </value>
         protected IRegistryCore m_registry;
 
-        private UUID m_overridecreator = UUID.Zero;
+        UUID m_overridecreator = UUID.Zero;
 
         static InventoryArchiveReadRequest()
         {
-            if (WhiteCore.Framework.Serialization.SceneEntitySerializer.SceneObjectSerializer == null)
-                WhiteCore.Framework.Serialization.SceneEntitySerializer.SceneObjectSerializer =
+            if (SceneEntitySerializer.SceneObjectSerializer == null)
+                SceneEntitySerializer.SceneObjectSerializer =
                     new WhiteCore.Region.Serialization.SceneObjectSerializer();
         }
 
@@ -99,9 +107,15 @@ namespace WhiteCore.Modules.Archivers
             m_registry = registry;
             m_merge = merge;
             m_userInfo = userInfo;
-            m_invPath = invPath;
+            m_invPath = invPath.StartsWith("/") ? invPath.Remove(0, 1) : invPath;
             m_loadStream = new GZipStream(str, CompressionMode.Decompress);
             m_overridecreator = overwriteCreator;
+
+            // we will need thse at some time
+            m_assetService = m_registry.RequestModuleInterface<IAssetService>();
+            m_assetData = Framework.Utilities.DataManager.RequestPlugin<IAssetDataPlugin>();
+            m_inventoryService = m_registry.RequestModuleInterface<IInventoryService> ();
+            m_accountService = m_registry.RequestModuleInterface<IUserAccountService> ();
         }
 
         /// <summary>
@@ -125,18 +139,35 @@ namespace WhiteCore.Modules.Archivers
                 HashSet<InventoryNodeBase> loadedNodes = loadAll ? new HashSet<InventoryNodeBase>() : null;
 
                 List<InventoryFolderBase> folderCandidates
-                    = InventoryArchiveUtils.FindFolderByPath(
-                        m_registry.RequestModuleInterface<IInventoryService>(), m_userInfo.PrincipalID, m_invPath);
+                    = InventoryArchiveUtils.FindFolderByPath(m_inventoryService, m_userInfo.PrincipalID, m_invPath);
 
                 if (folderCandidates.Count == 0)
                 {
-                    // Possibly provide an option later on to automatically create this folder if it does not exist
-                    MainConsole.Instance.ErrorFormat("[INVENTORY ARCHIVER]: Inventory path {0} does not exist",
-                                                     m_invPath);
+                    // try and create requested folder
+                    var rootFolder = m_inventoryService.GetRootFolder(m_userInfo.PrincipalID);
 
-                    return loadedNodes;
+                    InventoryFolderBase iarImportFolder = new InventoryFolderBase();
+
+                    iarImportFolder.ID = UUID.Random();
+                    iarImportFolder.Name = m_invPath;                       // the path
+                    iarImportFolder.Owner = m_userInfo.PrincipalID;         // owner
+                    iarImportFolder.ParentID = rootFolder.ID;               // the root folder 
+                    iarImportFolder.Type = -1;                              // user defined folder
+                    iarImportFolder.Version = 1;                            // initial version
+
+                    m_inventoryService.AddFolder(iarImportFolder);
+
+                    // ensure that it now exists...
+                    folderCandidates = InventoryArchiveUtils.FindFolderByPath(m_inventoryService, m_userInfo.PrincipalID, m_invPath);
+                    if (folderCandidates.Count == 0)
+                    {
+                        MainConsole.Instance.ErrorFormat("[INVENTORY ARCHIVER]: Unable to create Inventory path {0}",
+                                                     m_invPath);
+                        return loadedNodes;
+                    }
                 }
 
+                // we have the base folder... do it...
                 InventoryFolderBase rootDestinationFolder = folderCandidates[0];
                 archive = new TarArchiveReader(m_loadStream);
 
@@ -144,11 +175,25 @@ namespace WhiteCore.Modules.Archivers
                 // resolved
                 Dictionary<string, InventoryFolderBase> resolvedFolders = new Dictionary<string, InventoryFolderBase>();
 
+                MainConsole.Instance.Info("[ARCHIVER]: Commencing load from archive");
+                int ticker = 0;
+
                 byte[] data;
                 TarArchiveReader.TarEntryType entryType;
 
                 while ((data = archive.ReadEntry(out filePath, out entryType)) != null)
                 {
+                    if (TarArchiveReader.TarEntryType.TYPE_NORMAL_FILE == entryType)
+                    {
+                        var fName = Path.GetFileName (filePath);
+                        if (fName.StartsWith ("."))                 // ignore hidden files
+                            continue;
+                    }
+
+                    ticker ++;
+                    if (ticker % 5 == 0)
+                        MainConsole.Instance.Ticker();
+
                     if (filePath.StartsWith(ArchiveConstants.ASSETS_PATH))
                     {
                         if (LoadAsset(filePath, data))
@@ -158,7 +203,7 @@ namespace WhiteCore.Modules.Archivers
 
                         if ((successfulAssetRestores)%50 == 0)
                             MainConsole.Instance.InfoFormat(
-                                "[INVENTORY ARCHIVER]: Loaded {0} assets...",
+                                " [INVENTORY ARCHIVER]: Loaded {0} assets...",
                                 successfulAssetRestores);
                     }
                     else if (filePath.StartsWith(ArchiveConstants.INVENTORY_PATH))
@@ -183,8 +228,7 @@ namespace WhiteCore.Modules.Archivers
 
                                 if ((successfulItemRestores)%50 == 0)
                                     MainConsole.Instance.InfoFormat(
-                                        "[INVENTORY ARCHIVER]: Restored {0} items...",
-                                        successfulItemRestores);
+                                        "[INVENTORY ARCHIVER]: Restored {0} items...",successfulItemRestores);
 
                                 // If we aren't loading the folder containing the item then well need to update the 
                                 // viewer separately for that item.
@@ -193,12 +237,25 @@ namespace WhiteCore.Modules.Archivers
                             }
                             item = null;
                         }
+                    } else if (filePath == ArchiveConstants.CONTROL_FILE_PATH)
+                    {
+                        LoadControlFile(data);
                     }
+
                     data = null;
                 }
+ 
+                MainConsole.Instance.CleanInfo("");
+                MainConsole.Instance.Info("[INVENTORY ARCHIVER]: Saving loaded inventory items");
+                ticker = 0;
+
                 int successfulItemLoaded = 0;
                 foreach (InventoryItemBase item in itemsSavedOff)
                 {
+                    ticker++;
+                    if (ticker % 5 == 0)
+                        MainConsole.Instance.Ticker();
+
                     AddInventoryItem(item);
                     successfulItemLoaded++;
 
@@ -210,6 +267,7 @@ namespace WhiteCore.Modules.Archivers
                 itemsSavedOff.Clear();
                 assets2Save.Clear();
 
+                MainConsole.Instance.CleanInfo("");
                 MainConsole.Instance.InfoFormat(
                     "[INVENTORY ARCHIVER]: Successfully loaded {0} assets with {1} failures",
                     successfulAssetRestores, failedAssetRestores);
@@ -309,9 +367,7 @@ namespace WhiteCore.Modules.Archivers
                     // iar name and try to find that instead.
                     string plainPath = ArchiveConstants.ExtractPlainPathFromIarPath(archivePath);
                     List<InventoryFolderBase> folderCandidates
-                        = InventoryArchiveUtils.FindFolderByPath(
-                            m_registry.RequestModuleInterface<IInventoryService>(), m_userInfo.PrincipalID,
-                            plainPath);
+                    = InventoryArchiveUtils.FindFolderByPath(m_inventoryService, m_userInfo.PrincipalID, plainPath);
 
                     if (folderCandidates.Count != 0)
                     {
@@ -383,7 +439,7 @@ namespace WhiteCore.Modules.Archivers
                 string newFolderName = rawDirsToCreate[i].Remove(identicalNameIdentifierIndex);
 
                 newFolderName = InventoryArchiveUtils.UnescapeArchivePath(newFolderName);
-                UUID newFolderId = UUID.Random();
+                UUID newFolderId = UUID.Random ();              // assume we need a new ID
 
                 // Asset type has to be Unknown here rather than Folder, otherwise the created folder can't be
                 // deleted once the client has relogged.
@@ -393,7 +449,12 @@ namespace WhiteCore.Modules.Archivers
                     = new InventoryFolderBase(
                         newFolderId, newFolderName, m_userInfo.PrincipalID,
                         (short) AssetType.Unknown, destFolder.ID, 1);
-                m_registry.RequestModuleInterface<IInventoryService>().AddFolder(destFolder);
+
+                var existingFolder = m_inventoryService.GetUserFolderID (m_userInfo.PrincipalID, newFolderName);
+                if (existingFolder == null)
+                    m_inventoryService.AddFolder (destFolder);      // add the folder
+                else
+                    destFolder.ID = (UUID)existingFolder [0];       // use the existing ID
 
                 // Record that we have now created this folder
                 iarPathExisting += rawDirsToCreate[i] + "/";
@@ -414,11 +475,8 @@ namespace WhiteCore.Modules.Archivers
         {
             InventoryItemBase item = UserInventoryItemSerializer.Deserialize(data);
 
-            // Don't use the item ID that's in the file
-            item.ID = UUID.Random();
 
-            UUID ospResolvedId = OspResolver.ResolveOspa(item.CreatorId,
-                                                         m_registry.RequestModuleInterface<IUserAccountService>());
+            UUID ospResolvedId = OspResolver.ResolveOspa(item.CreatorId, m_accountService);
             if (UUID.Zero != ospResolvedId)
             {
                 item.CreatorIdAsUuid = ospResolvedId;
@@ -435,8 +493,11 @@ namespace WhiteCore.Modules.Archivers
                 item.CreatorIdAsUuid = new UUID(item.CreatorId);
             }
 
+            // Don't use the item ID that's in the file, this could be a local user's folder
+            //item.ID = UUID.Random();
             item.Owner = m_userInfo.PrincipalID;
 
+        
             // Record the creator id for the item's asset so that we can use it later, if necessary, when the asset
             // is loaded.
             // FIXME: This relies on the items coming before the assets in the TAR file.  Need to create stronger
@@ -456,10 +517,11 @@ namespace WhiteCore.Modules.Archivers
         {
             if (UUID.Zero == item.Folder)
             {
-                InventoryFolderBase f =
-                    m_registry.RequestModuleInterface<IInventoryService>().GetFolderForType(item.Owner,
-                                                                                            (InventoryType) item.InvType,
-                                                                                            (AssetType) item.AssetType);
+                InventoryFolderBase f = m_inventoryService.GetFolderForType(
+                    item.Owner,
+                    (InventoryType) item.InvType,
+                    (AssetType) item.AssetType);
+
                 if (f != null)
                 {
                     //                    MainConsole.Instance.DebugFormat(
@@ -470,7 +532,7 @@ namespace WhiteCore.Modules.Archivers
                 }
                 else
                 {
-                    f = m_registry.RequestModuleInterface<IInventoryService>().GetRootFolder(item.Owner);
+                    f = m_inventoryService.GetRootFolder(item.Owner);
                     if (f != null)
                     {
                         item.Folder = f.ID;
@@ -485,13 +547,23 @@ namespace WhiteCore.Modules.Archivers
                 }
             }
 
-            if (!m_registry.RequestModuleInterface<IInventoryService>().AddItem(item))
+            // check if the folder item exists
+            if (!m_inventoryService.FolderItemExists (item.Folder, item.ID))
             {
-                MainConsole.Instance.WarnFormat(
-                    "[AGENT INVENTORY]: Agent {0} could not add item {1} {2}",
-                    item.Owner, item.Name, item.ID);
-                return false;
-            }
+                if (m_inventoryService.ItemExists (item.ID))
+                {
+                    // Don't use this item ID as it probably belongs to another local user's folder
+                    item.ID = UUID.Random();
+                }
+
+                if (!m_inventoryService.AddItem (item))
+                {
+                    MainConsole.Instance.WarnFormat (
+                        "[AGENT INVENTORY]: Agent {0} could not add item {1} {2}",
+                        item.Owner, item.Name, item.ID);
+                    return false;
+                }
+            } 
             return true;
         }
 
@@ -520,6 +592,7 @@ namespace WhiteCore.Modules.Archivers
 
             string extension = filename.Substring(i);
             string uuid = filename.Remove(filename.Length - extension.Length);
+            UUID assetID = UUID.Parse (uuid);
 
             if (ArchiveConstants.EXTENSION_TO_ASSET_TYPE.ContainsKey(extension))
             {
@@ -536,15 +609,16 @@ namespace WhiteCore.Modules.Archivers
                         xmlData, m_registry);
                     if (sceneObject != null)
                     {
-                        if (m_creatorIdForAssetId.ContainsKey(UUID.Parse(uuid)))
+                        if (m_creatorIdForAssetId.ContainsKey(assetID))
                         {
                             foreach (
                                 ISceneChildEntity sop in
                                     from sop in sceneObject.ChildrenEntities()
                                     where string.IsNullOrEmpty(sop.CreatorData)
                                     select sop)
-                                sop.CreatorID = m_creatorIdForAssetId[UUID.Parse(uuid)];
+                                sop.CreatorID = m_creatorIdForAssetId[assetID];
                         }
+
                         foreach (ISceneChildEntity sop in sceneObject.ChildrenEntities())
                         {
                             //Fix ownerIDs and perms
@@ -554,6 +628,7 @@ namespace WhiteCore.Modules.Archivers
                                 item.OwnerID = m_userInfo.PrincipalID;
                             sop.OwnerID = m_userInfo.PrincipalID;
                         }
+
                         data =
                             Utils.StringToBytes(
                                 SceneEntitySerializer.SceneObjectSerializer.ToOriginalXmlFormat(sceneObject));
@@ -561,21 +636,19 @@ namespace WhiteCore.Modules.Archivers
                 }
                 //MainConsole.Instance.DebugFormat("[INVENTORY ARCHIVER]: Importing asset {0}, type {1}", uuid, assetType);
 
-                AssetBase asset = new AssetBase(UUID.Parse(uuid), "RandomName", assetType, m_overridecreator)
+                AssetBase asset = new AssetBase(assetID, "From IAR", assetType, m_overridecreator)
                                       {
-                                          Data =
-                                              data,
-                                          Flags
-                                              =
-                                              AssetFlags
-                                              .Normal
+                                          Data = data,
+                                          Flags = AssetFlags.Normal
                                       };
-                IAssetService assetService = m_registry.RequestModuleInterface<IAssetService>();
-                IAssetDataPlugin assetData = Framework.Utilities.DataManager.RequestPlugin<IAssetDataPlugin>();
-                if (assetData != null && ReplaceAssets)
-                    assetData.Delete(asset.ID, true);
+ 
+                if (m_assetData != null && ReplaceAssets)
+                    m_assetData.Delete(asset.ID, true);
 
-                assetService.Store(asset);
+                // check if this asset already exists in the database
+                if (!m_assetService.GetExists(asset.ID.ToString()))
+                    m_assetService.Store(asset);
+
                 return true;
             }
             MainConsole.Instance.ErrorFormat(
@@ -584,5 +657,46 @@ namespace WhiteCore.Modules.Archivers
 
             return false;
         }
+
+
+        /// <summary>
+        /// Loads the archive.xml control file.
+        /// </summary>
+        /// <param name="data">Data.</param>
+        public void LoadControlFile(byte[] data)
+        {
+            //Create the XmlNamespaceManager.
+            ASCIIEncoding m_asciiEncoding = new ASCIIEncoding();
+            NameTable nt = new NameTable();
+            XmlNamespaceManager nsmgr = new XmlNamespaceManager(nt);
+
+            // Create the XmlParserContext.
+            XmlParserContext context = new XmlParserContext(null, nsmgr, null, XmlSpace.None);
+
+            XmlTextReader xtr = new XmlTextReader(m_asciiEncoding.GetString(data), XmlNodeType.Document, context);
+
+             while (xtr.Read())
+            {
+                if (xtr.NodeType == XmlNodeType.Element)
+                {
+                    if (xtr.Name == "archive")
+                    {
+                        int majorVersion = int.Parse (xtr.GetAttribute(0));
+                        int minorVersion = int.Parse (xtr.GetAttribute(1));
+                        string version = string.Format ("{0}.{1}", majorVersion, minorVersion);
+
+                        MainConsole.Instance.InfoFormat("[INVENTORY ARCHIVER]: Loading version {0} IAR", version);                        
+
+                    }
+                    if (xtr.Name == "assets_included")
+                    {
+                        bool value;
+                        if (bool.TryParse(xtr.ReadElementContentAsString(), out value))
+                            m_assetsIncluded = value;
+                    }
+                }
+            }
+        }
+
     }
 }
