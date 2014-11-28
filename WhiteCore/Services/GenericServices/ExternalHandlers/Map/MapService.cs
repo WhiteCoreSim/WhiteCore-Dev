@@ -46,20 +46,20 @@ namespace WhiteCore.Services
 {
     public class MapService : IService, IMapService
     {
-        private uint m_port = 8012;
-        private IHttpServer m_server;
-        private IRegistryCore m_registry;
-        private bool m_enabled = false;
-        private bool m_cacheEnabled = true;
-        private float m_cacheExpires = 24;
-        private IAssetService m_assetService;
-        private string m_assetCacheDir = Constants.DEFAULT_ASSETCACHE_DIR;
-        private string m_assetMapCacheDir;
-        private IGridService m_gridService;
-        private IJ2KDecoder m_j2kDecoder;
-        private static Bitmap m_blankRegionTile = null;
-        private MapTileIndex m_blankTiles = new MapTileIndex();
-        private byte[] m_blankRegionTileData;
+        uint m_port = 8012;
+        IHttpServer m_server;
+        IRegistryCore m_registry;
+        bool m_enabled = false;
+        bool m_cacheEnabled = true;
+        float m_cacheExpires = 24;
+        IAssetService m_assetService;
+        string m_assetCacheDir = Constants.DEFAULT_ASSETCACHE_DIR;
+        string m_assetMapCacheDir;
+        IGridService m_gridService;
+        IJ2KDecoder m_j2kDecoder;
+        static Bitmap m_blankRegionTile = null;
+        MapTileIndex m_blankTiles = new MapTileIndex();
+        byte[] m_blankRegionTileData;
 
         public void Initialize(IConfigSource config, IRegistryCore registry)
         {
@@ -104,7 +104,7 @@ namespace WhiteCore.Services
             }*/
         }
 
-        private void CreateCacheDirectories(string cacheDir)
+        void CreateCacheDirectories(string cacheDir)
         {
             if (!Directory.Exists(cacheDir))
                 Directory.CreateDirectory(cacheDir);
@@ -153,7 +153,7 @@ namespace WhiteCore.Services
             {
                 string resp = "var {0} = {\"x\":{1},\"y\":{2}};";
                 string sim_name = httpRequest.Query["sim_name"].ToString();
-                var region = m_registry.RequestModuleInterface<IGridService>().GetRegionByName(null, sim_name);
+                var region = m_gridService.GetRegionByName(null, sim_name);
                 if (region == null)
                     resp = "var " + var + " = {error: true};";
                 else
@@ -166,11 +166,9 @@ namespace WhiteCore.Services
                 string resp = "var {0} = \"{1}\";";
                 int grid_x = int.Parse(httpRequest.Query["grid_x"].ToString());
                 int grid_y = int.Parse(httpRequest.Query["grid_y"].ToString());
-                var region = m_registry.RequestModuleInterface<IGridService>().GetRegionByPosition(null,
-                                                                                                   grid_x*
-                                                                                                   Constants.RegionSize,
-                                                                                                   grid_y*
-                                                                                                   Constants.RegionSize);
+                var region = m_gridService.GetRegionByPosition(null,
+                                                               grid_x * Constants.RegionSize,
+                                                               grid_y * Constants.RegionSize);
                 if (region == null)
                 {
                     List<GridRegion> regions = m_gridService.GetRegionRange(null,
@@ -237,11 +235,9 @@ namespace WhiteCore.Services
                 }
                 using (MemoryStream imgstream = new MemoryStream())
                 {
-                    GridRegion region = m_registry.RequestModuleInterface<IGridService>().GetRegionByName(null,
-                                                                                                          uri.Remove
-                                                                                                              (4));
+                    GridRegion region = m_gridService.GetRegionByName(null, uri.Remove (4));
                     if (region == null)
-                        region = m_registry.RequestModuleInterface<IGridService>().GetRegionByUUID(null, OpenMetaverse.UUID.Parse(uri.Remove(uri.Length - 4)));
+                        region = m_gridService.GetRegionByUUID(null, OpenMetaverse.UUID.Parse(uri.Remove(uri.Length - 4)));
 
                     // non-async because we know we have the asset immediately.
                     byte[] mapasset = m_assetService.GetData(region.TerrainMapImage.ToString());
@@ -302,7 +298,7 @@ namespace WhiteCore.Services
             return jpeg;
         }
 
-        private Bitmap BuildMapTile(int mapView, int regionX, int regionY, List<GridRegion> regions)
+        Bitmap BuildMapTile(int mapView, int regionX, int regionY, List<GridRegion> regions)
         {
             Bitmap mapTexture = FindCachedImage(mapView, regionX, regionY);
             if (mapTexture != null) 
@@ -370,18 +366,18 @@ namespace WhiteCore.Services
             return mapTexture;
         }
 
-        private void DisposeTexture(Bitmap bitmap)
+        void DisposeTexture(Bitmap bitmap)
         {
             if (!IsStaticBlank(bitmap))
                 bitmap.Dispose();
         }
 
-        private bool IsStaticBlank(Bitmap bitmap)
+        bool IsStaticBlank(Bitmap bitmap)
         {
             return bitmap.Tag != null && (bitmap.Tag is string) && ((string)bitmap.Tag) == "StaticBlank";
         }
 
-        private Bitmap ResizeBitmap(Bitmap b, int nWidth, int nHeight)
+        Bitmap ResizeBitmap(Bitmap b, int nWidth, int nHeight)
         {
             Bitmap newsize = new Bitmap(nWidth, nHeight);
             using (Graphics temp = Graphics.FromImage(newsize))
@@ -393,7 +389,7 @@ namespace WhiteCore.Services
             return newsize;
         }
 
-        private Bitmap BuildMapTile(int regionX, int regionY, List<GridRegion> regions)
+        Bitmap BuildMapTile(int regionX, int regionY, List<GridRegion> regions)
         {
             if (regions == null)
             {
@@ -444,7 +440,7 @@ namespace WhiteCore.Services
                 return m_blankRegionTile;
             }
 
-            const int SizeOfImage = 256;
+            const int SizeOfImage = Constants.RegionSize;           // 256
 
             Bitmap mapTexture = new Bitmap(SizeOfImage, SizeOfImage);
             using (Graphics g = Graphics.FromImage(mapTexture))
@@ -481,13 +477,13 @@ namespace WhiteCore.Services
         }
 
         // From msdn
-        private static ImageCodecInfo GetEncoderInfo(String mimeType)
+        static ImageCodecInfo GetEncoderInfo(String mimeType)
         {
             ImageCodecInfo[] encoders = ImageCodecInfo.GetImageEncoders();
             return encoders.FirstOrDefault(t => t.MimeType == mimeType);
         }
 
-        private byte[] FindCachedImage(string name)
+        byte[] FindCachedImage(string name)
         {
             if (!m_cacheEnabled)
                 return new byte[0];
@@ -503,7 +499,7 @@ namespace WhiteCore.Services
             return new byte[0];
         }
 
-        private Bitmap FindCachedImage(int maplayer, int regionX, int regionY)
+        Bitmap FindCachedImage(int maplayer, int regionX, int regionY)
         {
             if (!m_cacheEnabled)
                 return null;
@@ -538,7 +534,7 @@ namespace WhiteCore.Services
             return null;
         }
 
-        private byte[] CacheMapTexture(int maplayer, int regionX, int regionY, Bitmap mapTexture, bool forced = false)
+        byte[] CacheMapTexture(int maplayer, int regionX, int regionY, Bitmap mapTexture, bool forced = false)
         {
             if (!forced && IsStaticBlank(mapTexture))
                 return m_blankRegionTileData;
@@ -560,7 +556,7 @@ namespace WhiteCore.Services
             return jpeg;
         }
 
-        private void SaveCachedImage(int maplayer, int regionX, int regionY, byte[] data)
+        void SaveCachedImage(int maplayer, int regionX, int regionY, byte[] data)
         {
             if (!m_cacheEnabled)
                 return;
@@ -573,7 +569,7 @@ namespace WhiteCore.Services
     }
 
     [ProtoContract()]
-    internal class MapTileIndex
+    class MapTileIndex
     {
         [ProtoMember(1)]
         public HashSet<ulong> BlankTiles = new HashSet<ulong>();

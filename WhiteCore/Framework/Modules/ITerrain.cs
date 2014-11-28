@@ -88,5 +88,8 @@ namespace WhiteCore.Framework.Modules
         Bitmap CreateViewImage(Vector3 pos, Vector3 camDir, float fov, int width, int height, bool usetex);
         Bitmap CreateViewTileImage (int size);
 
+        void UpdateWorldMaps ();
+
+
     }
 }
