@@ -33,6 +33,7 @@
 using System;
 using OpenMetaverse;
 using WhiteCore.Framework.Physics;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Region.Physics.BulletSPlugin
 {
@@ -50,23 +51,23 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         public Vehicle Type { get; set; }
 
         // private Quaternion m_referenceFrame = Quaternion.Identity;   // Axis modifier
-        private VehicleFlag m_flags = (VehicleFlag) 0;                  // Boolean settings:
-                                                                        // HOVER_TERRAIN_ONLY
-                                                                        // HOVER_GLOBAL_HEIGHT
-                                                                        // NO_DEFLECTION_UP
-                                                                        // HOVER_WATER_ONLY
-                                                                        // HOVER_UP_ONLY
-                                                                        // LIMIT_MOTOR_UP
-                                                                        // LIMIT_ROLL_ONLY
+        private VehicleFlag m_flags = (VehicleFlag)0; // Boolean settings:
+        // HOVER_TERRAIN_ONLY
+        // HOVER_GLOBAL_HEIGHT
+        // NO_DEFLECTION_UP
+        // HOVER_WATER_ONLY
+        // HOVER_UP_ONLY
+        // LIMIT_MOTOR_UP
+        // LIMIT_ROLL_ONLY
         private Vector3 m_BlockingEndPoint = Vector3.Zero;
         private Quaternion m_RollreferenceFrame = Quaternion.Identity;
         private Quaternion m_referenceFrame = Quaternion.Identity;
 
         // Linear properties
         private BSVMotor m_linearMotor = new BSVMotor("LinearMotor");
-        private Vector3 m_linearMotorDirection = Vector3.Zero;          // velocity requested by LSL, decayed by time
-        private Vector3 m_linearMotorOffset = Vector3.Zero;             // the point of force can be offset from the center
-        private Vector3 m_linearMotorDirectionLASTSET = Vector3.Zero;   // velocity requested by LSL
+        private Vector3 m_linearMotorDirection = Vector3.Zero; // velocity requested by LSL, decayed by time
+        private Vector3 m_linearMotorOffset = Vector3.Zero; // the point of force can be offset from the center
+        private Vector3 m_linearMotorDirectionLASTSET = Vector3.Zero; // velocity requested by LSL
         private Vector3 m_linearFrictionTimescale = Vector3.Zero;
         private float m_linearMotorDecayTimescale = 0;
         private float m_linearMotorTimescale = 0;
@@ -77,14 +78,14 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         //Angular properties
         private BSVMotor m_angularMotor = new BSVMotor("AngularMotor");
-        private Vector3 m_angularMotorDirection = Vector3.Zero;         // angular velocity requested by LSL motor
+        private Vector3 m_angularMotorDirection = Vector3.Zero; // angular velocity requested by LSL motor
         // private int m_angularMotorApply = 0;                            // application frame counter
-        private Vector3 m_angularMotorVelocity = Vector3.Zero;          // current angular motor velocity
-        private float m_angularMotorTimescale = 0;                      // motor angular velocity ramp up rate
-        private float m_angularMotorDecayTimescale = 0;                 // motor angular velocity decay rate
-        private Vector3 m_angularFrictionTimescale = Vector3.Zero;      // body angular velocity  decay rate
+        private Vector3 m_angularMotorVelocity = Vector3.Zero; // current angular motor velocity
+        private float m_angularMotorTimescale = 0; // motor angular velocity ramp up rate
+        private float m_angularMotorDecayTimescale = 0; // motor angular velocity decay rate
+        private Vector3 m_angularFrictionTimescale = Vector3.Zero; // body angular velocity  decay rate
         private Vector3 m_lastAngularVelocity = Vector3.Zero;
-        private Vector3 m_lastVertAttractor = Vector3.Zero;             // what VA was last applied to body
+        private Vector3 m_lastVertAttractor = Vector3.Zero; // what VA was last applied to body
 
         //Deflection properties
         private BSVMotor m_angularDeflectionMotor = new BSVMotor("AngularDeflection");
@@ -103,23 +104,23 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         private float m_VhoverHeight = 0f;
         private float m_VhoverEfficiency = 0f;
         private float m_VhoverTimescale = 0f;
-        private float m_VhoverTargetHeight = -1.0f;     // if <0 then no hover, else its the current target height
+        private float m_VhoverTargetHeight = -1.0f; // if <0 then no hover, else its the current target height
         // Modifies gravity. Slider between -1 (double-gravity) and 1 (full anti-gravity)
         private float m_VehicleBuoyancy = 0f;
-        private Vector3 m_VehicleGravity = Vector3.Zero;    // Gravity computed when buoyancy set
+        private Vector3 m_VehicleGravity = Vector3.Zero; // Gravity computed when buoyancy set
 
         //Attractor properties
         private BSVMotor m_verticalAttractionMotor = new BSVMotor("VerticalAttraction");
         private float m_verticalAttractionEfficiency = 1.0f; // damped
-        private float m_verticalAttractionCutoff = 500f;     // per the documentation
+        private float m_verticalAttractionCutoff = 500f; // per the documentation
         // Timescale > cutoff  means no vert attractor.
         private float m_verticalAttractionTimescale = 510f;
 
         // Just some recomputed constants:
-        static readonly float PIOverFour = ((float)Math.PI) / 4f;
+        private static readonly float PIOverFour = ((float)Math.PI) / 4f;
 
 #pragma warning disable 414
-        static readonly float PIOverTwo = ((float)Math.PI) / 2f;
+        private static readonly float PIOverTwo = ((float)Math.PI) / 2f;
 #pragma warning restore 414
 
         // For debugging, flags to turn on and off individual corrections.
@@ -164,6 +165,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         #region Vehicle parameter setting
+
         public void ProcessFloatVehicleParam(Vehicle pParam, float pValue)
         {
             VDetailLog("{0},ProcessFloatVehicleParam,param={1},val={2}", ControllingPrim.LocalID, pParam, pValue);
@@ -232,7 +234,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 // set all of the components to the same value
                 case Vehicle.ANGULAR_FRICTION_TIMESCALE:
                     m_angularFrictionTimescale = new Vector3(pValue, pValue, pValue);
-                    m_angularMotor.FrictionTimescale = m_angularFrictionTimescale;
+                    //m_angularMotor.FrictionTimescale = m_angularFrictionTimescale; // for the moment we do not use friction here
                     break;
                 case Vehicle.ANGULAR_MOTOR_DIRECTION:
                     m_angularMotorDirection = new Vector3(pValue, pValue, pValue);
@@ -241,7 +243,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                     break;
                 case Vehicle.LINEAR_FRICTION_TIMESCALE:
                     m_linearFrictionTimescale = new Vector3(pValue, pValue, pValue);
-                    m_linearMotor.FrictionTimescale = m_linearFrictionTimescale;
+                    //m_linearMotor.FrictionTimescale = m_linearFrictionTimescale;  // for the moment we do not use friction here
                     break;
                 case Vehicle.LINEAR_MOTOR_DIRECTION:
                     m_linearMotorDirection = new Vector3(pValue, pValue, pValue);
@@ -251,45 +253,90 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 case Vehicle.LINEAR_MOTOR_OFFSET:
                     m_linearMotorOffset = new Vector3(pValue, pValue, pValue);
                     break;
-
             }
-        }//end ProcessFloatVehicleParam
+        } //end ProcessFloatVehicleParam
 
-        internal void ProcessVectorVehicleParam(Vehicle pParam, Vector3 pValue)
+        internal void ProcessVectorVehicleParam(Vehicle pParam, float pValue)
         {
             VDetailLog("{0},ProcessVectorVehicleParam,param={1},val={2}", ControllingPrim.LocalID, pParam, pValue);
             switch (pParam)
             {
+                case Vehicle.ANGULAR_DEFLECTION_EFFICIENCY:
+                    m_angularDeflectionEfficiency = ClampInRange(0f, pValue, 1f);
+                    break;
+                case Vehicle.ANGULAR_DEFLECTION_TIMESCALE:
+                    m_angularDeflectionTimescale = Math.Max(pValue, 0.01f);
+                    break;
+                case Vehicle.ANGULAR_MOTOR_DECAY_TIMESCALE:
+                    m_angularMotorDecayTimescale =
+                        ClampInRange(0.01f, pValue, 120);
+                    m_angularMotor.TargetValueDecayTimeScale = m_angularMotorDecayTimescale;
+                    break;
+                case Vehicle.ANGULAR_MOTOR_TIMESCALE:
+                    m_angularMotorTimescale = Math.Max(pValue, 0.01f);
+                    m_angularMotor.TimeScale = m_angularMotorTimescale;
+                    break;
+                case Vehicle.BANKING_MIX:
+                    m_bankingMix = Math.Max(pValue, 0.01f);
+                    break;
+                case Vehicle.BANKING_TIMESCALE:
+                    m_bankingTimescale = Math.Max(pValue, 0.01f);
+                    break;
+                case Vehicle.BUOYANCY:
+                    m_VehicleBuoyancy = ClampInRange(-1f, pValue, 1f);
+                    m_VehicleGravity = ControllingPrim.ComputeGravity(m_VehicleBuoyancy);
+                    break;
+                case Vehicle.HOVER_EFFICIENCY:
+                    m_VhoverEfficiency = ClampInRange(0f, pValue, 1f);
+                    break;
+                case Vehicle.HOVER_HEIGHT:
+                    m_VhoverHeight = pValue;
+                    break;
+                case Vehicle.HOVER_TIMESCALE:
+                    m_VhoverTimescale = Math.Max(pValue, 0.01f);
+                    break;
+                case Vehicle.LINEAR_DEFLECTION_EFFICIENCY:
+                    m_linearDeflectionEfficiency = ClampInRange(0f, pValue, 1f);
+                    break;
+                case Vehicle.LINEAR_DEFLECTION_TIMESCALE:
+                    m_linearDeflectionTimescale = Math.Max(pValue, 0.01f);
+                    break;
+                case Vehicle.LINEAR_MOTOR_DECAY_TIMESCALE:
+                    m_linearMotorDecayTimescale = ClampInRange(0.01f, pValue, 120);
+                    m_linearMotor.TargetValueDecayTimeScale = m_linearMotorDecayTimescale;
+                    break;
+                case Vehicle.LINEAR_MOTOR_TIMESCALE:
+                    m_linearMotorTimescale = Math.Max(pValue, 0.01f);
+                    m_linearMotor.TimeScale = m_linearMotorTimescale;
+                    break;
+                case Vehicle.VERTICAL_ATTRACTION_EFFICIENCY:
+                    m_verticalAttractionEfficiency = ClampInRange(0.1f, pValue, 1f);
+                    m_verticalAttractionMotor.Efficiency = m_verticalAttractionEfficiency;
+                    break;
+
+                // These are vector properties but the engine lets you use a single float value to
+                // set all of the components to the same value
                 case Vehicle.ANGULAR_FRICTION_TIMESCALE:
-                    m_angularFrictionTimescale = new Vector3(pValue.X, pValue.Y, pValue.Z);
-                    m_angularMotor.FrictionTimescale = m_angularFrictionTimescale;
+                    m_angularFrictionTimescale = new Vector3(pValue, pValue, pValue);
                     break;
                 case Vehicle.ANGULAR_MOTOR_DIRECTION:
-                    // Limit requested angular speed to 2 rps= 4 pi rads/sec
-                    pValue.X = ClampInRange(-12.56f, pValue.X, 12.56f);
-                    pValue.Y = ClampInRange(-12.56f, pValue.Y, 12.56f);
-                    pValue.Z = ClampInRange(-12.56f, pValue.Z, 12.56f);
-                    m_angularMotorDirection = new Vector3(pValue.X, pValue.Y, pValue.Z);
+                    m_angularMotorDirection = new Vector3(pValue, pValue, pValue);
                     m_angularMotor.Zero();
                     m_angularMotor.SetTarget(m_angularMotorDirection);
                     break;
                 case Vehicle.LINEAR_FRICTION_TIMESCALE:
-                    m_linearFrictionTimescale = new Vector3(pValue.X, pValue.Y, pValue.Z);
-                    m_linearMotor.FrictionTimescale = m_linearFrictionTimescale;
+                    m_linearFrictionTimescale = new Vector3(pValue, pValue, pValue);
                     break;
                 case Vehicle.LINEAR_MOTOR_DIRECTION:
-                    m_linearMotorDirection = new Vector3(pValue.X, pValue.Y, pValue.Z);
-                    m_linearMotorDirectionLASTSET = new Vector3(pValue.X, pValue.Y, pValue.Z);
+                    m_linearMotorDirection = new Vector3(pValue, pValue, pValue);
+                    m_linearMotorDirectionLASTSET = new Vector3(pValue, pValue, pValue);
                     m_linearMotor.SetTarget(m_linearMotorDirection);
                     break;
                 case Vehicle.LINEAR_MOTOR_OFFSET:
-                    m_linearMotorOffset = new Vector3(pValue.X, pValue.Y, pValue.Z);
-                    break;
-                case Vehicle.BLOCK_EXIT:
-                    m_BlockingEndPoint = new Vector3(pValue.X, pValue.Y, pValue.Z);
+                    m_linearMotorOffset = new Vector3(pValue, pValue, pValue);
                     break;
             }
-        }//end ProcessVectorVehicleParam
+        } //end ProcessVectorVehicleParam
 
         internal void ProcessRotationVehicleParam(Vehicle pParam, Quaternion pValue)
         {
@@ -303,7 +350,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                     m_RollreferenceFrame = pValue;
                     break;
             }
-        }//end ProcessRotationVehicleParam
+        } //end ProcessRotationVehicleParam
 
         internal void ProcessVehicleFlags(int pParam, bool remove)
         {
@@ -373,7 +420,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                     m_angularFrictionTimescale = new Vector3(1000, 1000, 1000);
 
                     m_VhoverHeight = 0;
-                    m_VhoverEfficiency = 10;    // TODO: this looks wrong!!
+                    m_VhoverEfficiency = 10; // TODO: this looks wrong!!
                     m_VhoverTimescale = 10;
                     m_VehicleBuoyancy = 0;
 
@@ -392,12 +439,12 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
                     m_referenceFrame = Quaternion.Identity;
                     m_flags &= ~(VehicleFlag.HOVER_WATER_ONLY
-                                | VehicleFlag.HOVER_TERRAIN_ONLY
-                                | VehicleFlag.HOVER_GLOBAL_HEIGHT
-                                | VehicleFlag.HOVER_UP_ONLY);
+                                 | VehicleFlag.HOVER_TERRAIN_ONLY
+                                 | VehicleFlag.HOVER_GLOBAL_HEIGHT
+                                 | VehicleFlag.HOVER_UP_ONLY);
                     m_flags |= (VehicleFlag.NO_DEFLECTION_UP
-                            | VehicleFlag.LIMIT_ROLL_ONLY
-                            | VehicleFlag.LIMIT_MOTOR_UP);
+                                | VehicleFlag.LIMIT_ROLL_ONLY
+                                | VehicleFlag.LIMIT_MOTOR_UP);
 
                     break;
                 case Vehicle.TYPE_CAR:
@@ -431,8 +478,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
                     m_referenceFrame = Quaternion.Identity;
                     m_flags &= ~(VehicleFlag.HOVER_WATER_ONLY
-                                | VehicleFlag.HOVER_TERRAIN_ONLY
-                                | VehicleFlag.HOVER_GLOBAL_HEIGHT);
+                                 | VehicleFlag.HOVER_TERRAIN_ONLY
+                                 | VehicleFlag.HOVER_GLOBAL_HEIGHT);
                     m_flags |= (VehicleFlag.NO_DEFLECTION_UP
                                 | VehicleFlag.LIMIT_ROLL_ONLY
                                 | VehicleFlag.LIMIT_MOTOR_UP
@@ -447,7 +494,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                     m_angularMotorDirection = Vector3.Zero;
                     m_angularMotorTimescale = 4;
                     m_angularMotorDecayTimescale = 4;
-                    m_angularFrictionTimescale = new Vector3(10,10,10);
+                    m_angularFrictionTimescale = new Vector3(10, 10, 10);
 
                     m_VhoverHeight = 0;
                     m_VhoverEfficiency = 0.5f;
@@ -469,12 +516,12 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
                     m_referenceFrame = Quaternion.Identity;
                     m_flags &= ~(VehicleFlag.HOVER_TERRAIN_ONLY
-                                    | VehicleFlag.HOVER_GLOBAL_HEIGHT
-                                    | VehicleFlag.LIMIT_ROLL_ONLY
-                                    | VehicleFlag.HOVER_UP_ONLY);
+                                 | VehicleFlag.HOVER_GLOBAL_HEIGHT
+                                 | VehicleFlag.LIMIT_ROLL_ONLY
+                                 | VehicleFlag.HOVER_UP_ONLY);
                     m_flags |= (VehicleFlag.NO_DEFLECTION_UP
-                                    | VehicleFlag.LIMIT_MOTOR_UP
-                                    | VehicleFlag.HOVER_WATER_ONLY);
+                                | VehicleFlag.LIMIT_MOTOR_UP
+                                | VehicleFlag.HOVER_WATER_ONLY);
                     break;
                 case Vehicle.TYPE_AIRPLANE:
                     m_linearMotorDirection = Vector3.Zero;
@@ -507,11 +554,11 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
                     m_referenceFrame = Quaternion.Identity;
                     m_flags &= ~(VehicleFlag.HOVER_WATER_ONLY
-                                    | VehicleFlag.HOVER_TERRAIN_ONLY
-                                    | VehicleFlag.HOVER_GLOBAL_HEIGHT
-                                    | VehicleFlag.HOVER_UP_ONLY
-                                    | VehicleFlag.NO_DEFLECTION_UP
-                                    | VehicleFlag.LIMIT_MOTOR_UP);
+                                 | VehicleFlag.HOVER_TERRAIN_ONLY
+                                 | VehicleFlag.HOVER_GLOBAL_HEIGHT
+                                 | VehicleFlag.HOVER_UP_ONLY
+                                 | VehicleFlag.NO_DEFLECTION_UP
+                                 | VehicleFlag.LIMIT_MOTOR_UP);
                     m_flags |= (VehicleFlag.LIMIT_ROLL_ONLY);
                     break;
                 case Vehicle.TYPE_BALLOON:
@@ -547,12 +594,12 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
                     m_referenceFrame = Quaternion.Identity;
                     m_flags &= ~(VehicleFlag.HOVER_WATER_ONLY
-                                    | VehicleFlag.HOVER_TERRAIN_ONLY
-                                    | VehicleFlag.HOVER_UP_ONLY
-                                    | VehicleFlag.NO_DEFLECTION_UP
-                                    | VehicleFlag.LIMIT_MOTOR_UP);
+                                 | VehicleFlag.HOVER_TERRAIN_ONLY
+                                 | VehicleFlag.HOVER_UP_ONLY
+                                 | VehicleFlag.NO_DEFLECTION_UP
+                                 | VehicleFlag.LIMIT_MOTOR_UP);
                     m_flags |= (VehicleFlag.LIMIT_ROLL_ONLY
-                                    | VehicleFlag.HOVER_GLOBAL_HEIGHT);
+                                | VehicleFlag.HOVER_GLOBAL_HEIGHT);
                     break;
             }
 
@@ -560,14 +607,14 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             Refresh();
 
             m_linearMotor = new BSVMotor("LinearMotor", m_linearMotorTimescale,
-                                m_linearMotorDecayTimescale, m_linearFrictionTimescale,
-                                1f);
-            m_linearMotor.PhysicsScene = m_physicsScene;  // DEBUG DEBUG DEBUG (enables detail logging)
+                m_linearMotorDecayTimescale, 1f);
+            m_linearMotor.PhysicsScene = m_physicsScene; // DEBUG DEBUG DEBUG (enables detail logging)
 
             m_angularMotor = new BSVMotor("AngularMotor", m_angularMotorTimescale,
-                                m_angularMotorDecayTimescale, m_angularFrictionTimescale,
-                                1f);
-            m_angularMotor.PhysicsScene = m_physicsScene;  // DEBUG DEBUG DEBUG (enables detail logging)
+                m_angularMotorDecayTimescale, 1f);
+
+            // not needed here !
+            //m_angularMotor.PhysicsScene = m_physicsScene; // DEBUG DEBUG DEBUG (enables detail logging)
 
             /*  Not implemented
             m_verticalAttractionMotor = new BSVMotor("VerticalAttraction", m_verticalAttractionTimescale,
@@ -587,16 +634,15 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 RegisterForSceneEvents();
             }
         }
+
         #endregion // Vehicle parameter setting
 
         // BSActor.Refresh()
         public override void Refresh()
         {
             // If asking for a refresh, reset the physical parameters before the next simulation step.
-            m_physicsScene.PostTaintObject("BSDynamics.Refresh", ControllingPrim.LocalID, delegate()
-            {
-                SetPhysicalParameters();
-            });
+            m_physicsScene.PostTaintObject("BSDynamics.Refresh", ControllingPrim.LocalID,
+                delegate() { SetPhysicalParameters(); });
         }
 
         // Some of the properties of this prim may have changed.
@@ -622,7 +668,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 // Vehicles report collision events so we know when it's on the ground
                 m_physicsScene.PE.AddToCollisionFlags(ControllingPrim.PhysBody, CollisionFlags.BS_VEHICLE_COLLISIONS);
 
-                ControllingPrim.Inertia = m_physicsScene.PE.CalculateLocalInertia(ControllingPrim.PhysShape, m_vehicleMass);
+                ControllingPrim.Inertia = m_physicsScene.PE.CalculateLocalInertia(ControllingPrim.PhysShape,
+                    m_vehicleMass);
                 m_physicsScene.PE.SetMassProps(ControllingPrim.PhysBody, m_vehicleMass, ControllingPrim.Inertia);
                 m_physicsScene.PE.UpdateInertiaTensor(ControllingPrim.PhysBody);
 
@@ -632,16 +679,18 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 // The actual vehicle gravity is set to zero in Bullet so we can do all the application of same.
                 m_physicsScene.PE.SetGravity(ControllingPrim.PhysBody, Vector3.Zero);
 
-                VDetailLog("{0},BSDynamics.SetPhysicalParameters,mass={1},inert={2},vehGrav={3},aDamp={4},frict={5},rest={6},lFact={7},aFact={8}",
-                        ControllingPrim.LocalID, m_vehicleMass, ControllingPrim.Inertia, m_VehicleGravity,
-                        BSParam.VehicleAngularDamping, BSParam.VehicleFriction, BSParam.VehicleRestitution,
-                        BSParam.VehicleLinearFactor, BSParam.VehicleAngularFactor
-                        );
+                VDetailLog(
+                    "{0},BSDynamics.SetPhysicalParameters,mass={1},inert={2},vehGrav={3},aDamp={4},frict={5},rest={6},lFact={7},aFact={8}",
+                    ControllingPrim.LocalID, m_vehicleMass, ControllingPrim.Inertia, m_VehicleGravity,
+                    BSParam.VehicleAngularDamping, BSParam.VehicleFriction, BSParam.VehicleRestitution,
+                    BSParam.VehicleLinearFactor, BSParam.VehicleAngularFactor
+                    );
             }
             else
             {
                 if (ControllingPrim.PhysBody.HasPhysicalBody)
-                    m_physicsScene.PE.RemoveFromCollisionFlags(ControllingPrim.PhysBody, CollisionFlags.BS_VEHICLE_COLLISIONS);
+                    m_physicsScene.PE.RemoveFromCollisionFlags(ControllingPrim.PhysBody,
+                        CollisionFlags.BS_VEHICLE_COLLISIONS);
             }
         }
 
@@ -693,6 +742,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         #region Known vehicle value functions
+
         // Vehicle physical parameters that we buffer from constant getting and setting.
         // The "m_known*" values are unknown until they are fetched and the m_knownHas flag is set.
         //      Changing is remembered and the parameter is stored back into the physics engine only if updated.
@@ -711,25 +761,26 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         private Vector3 m_knownRotationalVelocity;
         private Vector3 m_knownRotationalForce;
         private Vector3 m_knownRotationalImpulse;
-        private Vector3 m_knownForwardVelocity;    // vehicle relative forward speed
+        private Vector3 m_knownForwardVelocity; // vehicle relative forward speed
 
-        private const int m_knownChangedPosition           = 1 << 0;
-        private const int m_knownChangedVelocity           = 1 << 1;
-        private const int m_knownChangedForce              = 1 << 2;
-        private const int m_knownChangedForceImpulse       = 1 << 3;
-        private const int m_knownChangedOrientation        = 1 << 4;
+        private const int m_knownChangedPosition = 1 << 0;
+        private const int m_knownChangedVelocity = 1 << 1;
+        private const int m_knownChangedForce = 1 << 2;
+        private const int m_knownChangedForceImpulse = 1 << 3;
+        private const int m_knownChangedOrientation = 1 << 4;
         private const int m_knownChangedRotationalVelocity = 1 << 5;
-        private const int m_knownChangedRotationalForce    = 1 << 6;
-        private const int m_knownChangedRotationalImpulse  = 1 << 7;
-        private const int m_knownChangedTerrainHeight      = 1 << 8;
-        private const int m_knownChangedWaterLevel         = 1 << 9;
-        private const int m_knownChangedForwardVelocity    = 1 <<10;
+        private const int m_knownChangedRotationalForce = 1 << 6;
+        private const int m_knownChangedRotationalImpulse = 1 << 7;
+        private const int m_knownChangedTerrainHeight = 1 << 8;
+        private const int m_knownChangedWaterLevel = 1 << 9;
+        private const int m_knownChangedForwardVelocity = 1 << 10;
 
         public void ForgetKnownVehicleProperties()
         {
             m_knownHas = 0;
             m_knownChanged = 0;
         }
+
         // Push all the changed values back into the physics engine
         public void PushKnownChanged()
         {
@@ -755,7 +806,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                     ControllingPrim.AddForce((Vector3)m_knownForce, false /*pushForce*/, true /*inTaintTime*/);
 
                 if ((m_knownChanged & m_knownChangedForceImpulse) != 0)
-                    ControllingPrim.AddForceImpulse((Vector3)m_knownForceImpulse, false /*pushforce*/, true /*inTaintTime*/);
+                    ControllingPrim.AddForceImpulse((Vector3)m_knownForceImpulse, false /*pushforce*/, true
+                        /*inTaintTime*/);
 
                 if ((m_knownChanged & m_knownChangedRotationalVelocity) != 0)
                 {
@@ -768,7 +820,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
                 if ((m_knownChanged & m_knownChangedRotationalForce) != 0)
                 {
-                    ControllingPrim.AddAngularForce((Vector3)m_knownRotationalForce, false /*pushForce*/, true /*inTaintTime*/);
+                    ControllingPrim.AddAngularForce((Vector3)m_knownRotationalForce, false /*pushForce*/, true
+                        /*inTaintTime*/);
                 }
 
                 // If we set one of the values (ie, the physics engine didn't do it) we must force
@@ -780,7 +833,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         // Since the computation of terrain height can be a little involved, this routine
         //    is used to fetch the height only once for each vehicle simulation step.
-        Vector3 lastRememberedHeightPos;
+        private Vector3 lastRememberedHeightPos;
+
         private float GetTerrainHeight(Vector3 pos)
         {
             if ((m_knownHas & m_knownChangedTerrainHeight) == 0 || pos != lastRememberedHeightPos)
@@ -901,6 +955,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 m_knownHas |= m_knownChangedRotationalVelocity;
             }
         }
+
         private void VehicleAddAngularForce(Vector3 aForce)
         {
             if ((m_knownHas & m_knownChangedRotationalForce) == 0)
@@ -911,6 +966,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             m_knownChanged |= m_knownChangedRotationalForce;
             m_knownHas |= m_knownChangedRotationalForce;
         }
+
         private void VehicleAddRotationalImpulse(Vector3 pImpulse)
         {
             if ((m_knownHas & m_knownChangedRotationalImpulse) == 0)
@@ -929,18 +985,17 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             {
                 if ((m_knownHas & m_knownChangedForwardVelocity) == 0)
                 {
-                    m_knownForwardVelocity = VehicleVelocity * Quaternion.Inverse(Quaternion.Normalize(VehicleOrientation));
+                    m_knownForwardVelocity = VehicleVelocity *
+                                             Quaternion.Inverse(Quaternion.Normalize(VehicleOrientation));
                     m_knownHas |= m_knownChangedForwardVelocity;
                 }
                 return m_knownForwardVelocity;
             }
         }
+
         private float VehicleForwardSpeed
         {
-            get
-            {
-                return VehicleForwardVelocity.X;
-            }
+            get { return VehicleForwardVelocity.X; }
         }
 
         #endregion // Known vehicle value functions
@@ -968,7 +1023,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 m_physicsScene.PE.DumpRigidBody(m_physicsScene.World, ControllingPrim.PhysBody);
 
             VDetailLog("{0},BSDynamics.Step,done,pos={1}, force={2},velocity={3},angvel={4}",
-                    ControllingPrim.LocalID, VehiclePosition, m_knownForce, VehicleVelocity, VehicleRotationalVelocity);
+                ControllingPrim.LocalID, VehiclePosition, m_knownForce, VehicleVelocity, VehicleRotationalVelocity);
         }
 
         // Called after the simulation step
@@ -1013,23 +1068,24 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             float newVelocityLengthSq = VehicleVelocity.LengthSquared();
             if (newVelocityLengthSq > BSParam.VehicleMaxLinearVelocitySquared)
             {
-                Vector3 origVelW = VehicleVelocity;         // DEBUG DEBUG
+                Vector3 origVelW = VehicleVelocity; // DEBUG DEBUG
                 VehicleVelocity /= VehicleVelocity.Length();
                 VehicleVelocity *= BSParam.VehicleMaxLinearVelocity;
-                VDetailLog("{0},  MoveLinear,clampMax,origVelW={1},lenSq={2},maxVelSq={3},,newVelW={4}", 
-                            ControllingPrim.LocalID, origVelW, newVelocityLengthSq, BSParam.VehicleMaxLinearVelocitySquared, VehicleVelocity);
+                VDetailLog("{0},  MoveLinear,clampMax,origVelW={1},lenSq={2},maxVelSq={3},,newVelW={4}",
+                    ControllingPrim.LocalID, origVelW, newVelocityLengthSq, BSParam.VehicleMaxLinearVelocitySquared,
+                    VehicleVelocity);
             }
             else if (newVelocityLengthSq < 0.001f)
                 VehicleVelocity = Vector3.Zero;
 
-            VDetailLog("{0},  MoveLinear,done,isColl={1},newVel={2}", ControllingPrim.LocalID, ControllingPrim.IsColliding, VehicleVelocity );
-
+            VDetailLog("{0},  MoveLinear,done,isColl={1},newVel={2}", ControllingPrim.LocalID,
+                ControllingPrim.IsColliding, VehicleVelocity);
         } // end MoveLinear()
 
         public void ComputeLinearVelocity(float pTimestep)
         {
             // Step the motor from the current value. Get the correction needed this step.
-            Vector3 origVelW = VehicleVelocity;             // DEBUG
+            Vector3 origVelW = VehicleVelocity; // DEBUG
             Vector3 currentVelV = VehicleVelocity * Quaternion.Inverse(VehicleOrientation);
             Vector3 linearMotorCorrectionV = m_linearMotor.Step(pTimestep, currentVelV);
 
@@ -1047,7 +1103,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             VehicleVelocity += linearMotorVelocityW;
 
             VDetailLog("{0},  MoveLinear,velocity,origVelW={1},velV={2},correctV={3},correctW={4},newVelW={5}",
-                        ControllingPrim.LocalID, origVelW, currentVelV, linearMotorCorrectionV, linearMotorVelocityW, VehicleVelocity);
+                ControllingPrim.LocalID, origVelW, currentVelV, linearMotorCorrectionV, linearMotorVelocityW,
+                VehicleVelocity);
         }
 
         public void ComputeLinearTerrainHeightCorrection(float pTimestep)
@@ -1061,7 +1118,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 newPosition.Z = GetTerrainHeight(VehiclePosition) + 1f;
                 VehiclePosition = newPosition;
                 VDetailLog("{0},  MoveLinear,terrainHeight,terrainHeight={1},pos={2}",
-                        ControllingPrim.LocalID, GetTerrainHeight(VehiclePosition), VehiclePosition);
+                    ControllingPrim.LocalID, GetTerrainHeight(VehiclePosition), VehiclePosition);
             }
         }
 
@@ -1069,7 +1126,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         {
             // m_VhoverEfficiency: 0=bouncy, 1=totally damped
             // m_VhoverTimescale: time to achieve height
-            if ((m_flags & (VehicleFlag.HOVER_WATER_ONLY | VehicleFlag.HOVER_TERRAIN_ONLY | VehicleFlag.HOVER_GLOBAL_HEIGHT)) != 0)
+            if ((m_flags &
+                 (VehicleFlag.HOVER_WATER_ONLY | VehicleFlag.HOVER_TERRAIN_ONLY | VehicleFlag.HOVER_GLOBAL_HEIGHT)) != 0)
             {
                 // We should hover, get the target height
                 if ((m_flags & VehicleFlag.HOVER_WATER_ONLY) != 0)
@@ -1091,7 +1149,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                     if (VehiclePosition.Z > m_VhoverTargetHeight)
                         m_VhoverTargetHeight = VehiclePosition.Z;
                 }
-                
+
                 if ((m_flags & VehicleFlag.LOCK_HOVER_HEIGHT) != 0)
                 {
                     if (Math.Abs(VehiclePosition.Z - m_VhoverTargetHeight) > 0.2f)
@@ -1128,12 +1186,12 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                     VehicleAddForceImpulse(verticalCorrection);
                      */
 
-                    VDetailLog("{0},  MoveLinear,hover,pos={1},eff={2},hoverTS={3},height={4},target={5},err={6},corr={7}",
-                                    ControllingPrim.LocalID, VehiclePosition, m_VhoverEfficiency,
-                                    m_VhoverTimescale, m_VhoverHeight, m_VhoverTargetHeight,
-                                    verticalError, verticalCorrection);
+                    VDetailLog(
+                        "{0},  MoveLinear,hover,pos={1},eff={2},hoverTS={3},height={4},target={5},err={6},corr={7}",
+                        ControllingPrim.LocalID, VehiclePosition, m_VhoverEfficiency,
+                        m_VhoverTimescale, m_VhoverHeight, m_VhoverTargetHeight,
+                        verticalError, verticalCorrection);
                 }
-
             }
         }
 
@@ -1174,7 +1232,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 {
                     VehiclePosition = pos;
                     VDetailLog("{0},  MoveLinear,blockingEndPoint,block={1},origPos={2},pos={3}",
-                                ControllingPrim.LocalID, m_BlockingEndPoint, posChange, pos);
+                        ControllingPrim.LocalID, m_BlockingEndPoint, posChange, pos);
                 }
             }
             return changed;
@@ -1236,7 +1294,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                     }
                         */
                     VDetailLog("{0},  MoveLinear,limitMotorUp,collide={1},upVel={2},newVel={3}",
-                                    ControllingPrim.LocalID, ControllingPrim.IsColliding, upVelocity, VehicleVelocity);
+                        ControllingPrim.LocalID, ControllingPrim.IsColliding, upVelocity, VehicleVelocity);
                 }
             }
         }
@@ -1251,9 +1309,9 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
             VehicleAddForce(appliedGravity);
 
-            VDetailLog("{0},  MoveLinear,applyGravity,vehGrav={1},collid={2},fudge={3},mass={4},appliedForce={3}", 
-                            ControllingPrim.LocalID, m_VehicleGravity,
-                            ControllingPrim.IsColliding, BSParam.VehicleGroundGravityFudge, m_vehicleMass, appliedGravity);
+            VDetailLog("{0},  MoveLinear,applyGravity,vehGrav={1},collid={2},fudge={3},mass={4},appliedForce={3}",
+                ControllingPrim.LocalID, m_VehicleGravity,
+                ControllingPrim.IsColliding, BSParam.VehicleGroundGravityFudge, m_vehicleMass, appliedGravity);
         }
 
         // =======================================================================
@@ -1281,7 +1339,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
             else
             {
-                VDetailLog("{0},  MoveAngular,done,nonZero,angVel={1}", ControllingPrim.LocalID, VehicleRotationalVelocity);
+                VDetailLog("{0},  MoveAngular,done,nonZero,angVel={1}", ControllingPrim.LocalID,
+                    VehicleRotationalVelocity);
             }
 
             // ==================================================================
@@ -1312,9 +1371,9 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                     torqueFromOffset.Z = 0;
 
                 VehicleAddAngularForce(torqueFromOffset * m_vehicleMass);
-                VDetailLog("{0},  BSDynamic.MoveAngular,motorOffset,applyTorqueImpulse={1}", ControllingPrim.LocalID, torqueFromOffset);
+                VDetailLog("{0},  BSDynamic.MoveAngular,motorOffset,applyTorqueImpulse={1}", ControllingPrim.LocalID,
+                    torqueFromOffset);
             }
-
         }
 
         private void ComputeAngularTurning(float pTimestep)
@@ -1332,13 +1391,14 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             // TODO: This is here because this is where ODE put it but documentation says it
             //    is a linear effect. Where should this check go?
             //if ((m_flags & (VehicleFlag.NO_DEFLECTION_UP)) != 0)
-           // {
+            // {
             //    angularMotorContributionV.X = 0f;
             //    angularMotorContributionV.Y = 0f;
-          //  }
+            //  }
 
             VehicleRotationalVelocity += angularMotorContributionV * VehicleOrientation;
-            VDetailLog("{0},  MoveAngular,angularTurning,angularMotorContrib={1}", ControllingPrim.LocalID, angularMotorContributionV);
+            VDetailLog("{0},  MoveAngular,angularTurning,angularMotorContrib={1}", ControllingPrim.LocalID,
+                angularMotorContributionV);
         }
 
         // From http://wiki.secondlife.com/wiki/Linden_Vehicle_Tutorial:
@@ -1351,7 +1411,6 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         //      efficiency of 1.0 will cause the spring to reach its equilibrium with exponential decay.
         public void ComputeAngularVerticalAttraction()
         {
-
             // If vertical attaction timescale is reasonable
             if (enableAngularVerticalAttraction && m_verticalAttractionTimescale < m_verticalAttractionCutoff)
             {
@@ -1366,7 +1425,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 // Create the axis that is perpendicular to the up vector and the rotated up vector.
                 Vector3 differenceAxis = Vector3.Cross(Vector3.UnitZ * justZOrientation, Vector3.UnitZ * VehicleOrientation);
                 // Compute the angle between those to vectors.
-                double differenceAngle = Math.Acos((double)Vector3.Dot(Vector3.UnitZ, Vector3.Normalize(Vector3.UnitZ * VehicleOrientation)));
+                double differenceAngle =
+                    Math.Acos((double)Vector3.Dot(Vector3.UnitZ, Vector3.Normalize(Vector3.UnitZ * VehicleOrientation)));
                 // 'differenceAngle' is the angle to rotate and 'differenceAxis' is the plane to rotate in to get the vehicle vertical
 
                 // Reduce the change by the time period it is to change in. Timestep is handled when velocity is applied.
@@ -1378,17 +1438,18 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
                 // Turn that quaternion into Euler values to make it into velocities to apply.
                 Vector3 vertContributionV = Vector3.Zero;
-                correctionRotation.GetEulerAngles(out vertContributionV.X, out vertContributionV.Y, out vertContributionV.Z);
+                correctionRotation.GetEulerAngles(out vertContributionV.X, out vertContributionV.Y,
+                    out vertContributionV.Z);
                 vertContributionV *= -1f;
 
                 VehicleRotationalVelocity += vertContributionV;
 
                 VDetailLog("{0},  MoveAngular,verticalAttraction,diffAxis={1},diffAng={2},corrRot={3},contrib={4}",
-                                ControllingPrim.LocalID,
-                                differenceAxis,
-                                differenceAngle,
-                                correctionRotation,
-                                vertContributionV);
+                    ControllingPrim.LocalID,
+                    differenceAxis,
+                    differenceAngle,
+                    correctionRotation,
+                    vertContributionV);
 
                 // ===================================================================
                 /*
@@ -1485,7 +1546,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 VDetailLog("{0},  MoveAngular,Deflection,movingDir={1},pointingDir={2},deflectError={3},ret={4}",
                     ControllingPrim.LocalID, movingDirection, pointingDirection, deflectionError, deflectContributionV);
                 VDetailLog("{0},  MoveAngular,Deflection,fwdSpd={1},defEff={2},defTS={3}",
-                    ControllingPrim.LocalID, VehicleForwardSpeed, m_angularDeflectionEfficiency, m_angularDeflectionTimescale);
+                    ControllingPrim.LocalID, VehicleForwardSpeed, m_angularDeflectionEfficiency,
+                    m_angularDeflectionTimescale);
             }
         }
 
@@ -1522,7 +1584,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         //      make a sluggish vehicle by giving it a timescale of several seconds. 
         public void ComputeAngularBanking()
         {
-            if (enableAngularBanking && m_bankingEfficiency != 0 && m_verticalAttractionTimescale < m_verticalAttractionCutoff)
+            if (enableAngularBanking && m_bankingEfficiency != 0 &&
+                m_verticalAttractionTimescale < m_verticalAttractionCutoff)
             {
                 Vector3 bankingContributionV = Vector3.Zero;
 
@@ -1534,7 +1597,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 // Figure out the yaw value for this much roll.
                 float yawAngle = m_angularMotorDirection.X * m_bankingEfficiency;
                 //        actual error  =       static turn error            +           dynamic turn error
-                float mixedYawAngle =(yawAngle * (1f - m_bankingMix)) + ((yawAngle * m_bankingMix) * VehicleForwardSpeed);
+                float mixedYawAngle = (yawAngle * (1f - m_bankingMix)) + ((yawAngle * m_bankingMix) * VehicleForwardSpeed);
 
                 // TODO: the banking effect should not go to infinity but what to limit it to?
                 //     And what should happen when this is being added to a user defined yaw that is already PI*4?
@@ -1548,10 +1611,11 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
                 //VehicleRotationalVelocity += bankingContributionV * VehicleOrientation;
                 VehicleRotationalVelocity += bankingContributionV;
-                
+
 
                 VDetailLog("{0},  MoveAngular,Banking,rollComp={1},speed={2},rollComp={3},yAng={4},mYAng={5},ret={6}",
-                            ControllingPrim.LocalID, rollComponents, VehicleForwardSpeed, rollComponents, yawAngle, mixedYawAngle, bankingContributionV);
+                    ControllingPrim.LocalID, rollComponents, VehicleForwardSpeed, rollComponents, yawAngle,
+                    mixedYawAngle, bankingContributionV);
             }
         }
 
@@ -1592,7 +1656,6 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 VehicleOrientation = m_rot;
                 VDetailLog("{0},  LimitRotation,done,orig={1},new={2}", ControllingPrim.LocalID, rotq, m_rot);
             }
-
         }
 
         private float ClampInRange(float low, float val, float high)

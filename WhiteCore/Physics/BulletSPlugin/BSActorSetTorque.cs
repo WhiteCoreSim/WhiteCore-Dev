@@ -31,7 +31,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 {
     public class BSActorSetTorque : BSActor
     {
-        BSFMotor m_torqueMotor;
+        private BSFMotor m_torqueMotor;
 
         public BSActorSetTorque(BSScene physicsScene, BSPhysObject pObj, string actorName)
             : base(physicsScene, pObj, actorName)
@@ -58,17 +58,19 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // BSActor.Refresh()
         public override void Refresh()
         {
-            m_physicsScene.DetailLog("{0},BSActorSetTorque,refresh,torque={1}", m_controllingPrim.LocalID, m_controllingPrim.RawTorque);
+            m_physicsScene.DetailLog("{0},BSActorSetTorque,refresh,torque={1}", m_controllingPrim.LocalID,
+                m_controllingPrim.RawTorque);
 
             // If not active any more, get rid of me (shouldn't ever happen, but just to be safe)
             if (m_controllingPrim.RawTorque == OMV.Vector3.Zero)
             {
-                m_physicsScene.DetailLog("{0},BSActorSetTorque,refresh,notSetTorque,disabling={1}", m_controllingPrim.LocalID, ActorName);
+                m_physicsScene.DetailLog("{0},BSActorSetTorque,refresh,notSetTorque,disabling={1}",
+                    m_controllingPrim.LocalID, ActorName);
                 Enabled = false;
                 return;
             }
 
-            // If the object is physically active, add the hoverer prestep action
+            // If the object is physically active, add the hoverer pre step action
             if (isActive)
             {
                 ActivateSetTorque();
@@ -80,7 +82,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // The object's physical representation is being rebuilt so pick up any physical dependencies (constraints, ...).
-        //     Register a prestep action to restore physical requirements before the next simulation step.
+        //     Register a pre step action to restore physical requirements before the next simulation step.
         // Called at taint-time.
         // BSActor.RemoveBodyDependencies()
         public override void RemoveBodyDependencies()
@@ -116,7 +118,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             if (!isActive)
                 return;
 
-            m_physicsScene.DetailLog("{0},BSActorSetTorque,preStep,force={1}", m_controllingPrim.LocalID, m_controllingPrim.RawTorque);
+            m_physicsScene.DetailLog("{0},BSActorSetTorque,preStep,force={1}", m_controllingPrim.LocalID,
+                m_controllingPrim.RawTorque);
             if (m_controllingPrim.PhysBody.HasPhysicalBody)
             {
                 m_controllingPrim.AddAngularForce(m_controllingPrim.RawTorque, false, true);

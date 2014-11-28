@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) Contributors, http://opensimulator.org/, http://whitecore-sim.org
+ * Copyright (c) Contributors, http://opensimulator.org/, http://whitecore-sim.org, http://virtualnexus.eu
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,12 +29,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
 using OMV = OpenMetaverse;
 
 namespace WhiteCore.Region.Physics.BulletSPlugin
 {
-    /*public class BSActorMoveToTarget : BSActor
+    public class BSActorMoveToTarget : BSActor
     {
         private BSVMotor m_targetMotor;
 
@@ -48,6 +47,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // BSActor.isActive
         public override bool isActive
         {
+            // MoveToTarget only works on physical prims
             get { return Enabled && m_controllingPrim.IsPhysicallyActive; }
         }
 
@@ -63,7 +63,9 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // BSActor.Refresh()
         public override void Refresh()
         {
-            m_physicsScene.DetailLog("{0},BSActorMoveToTarget,refresh", m_controllingPrim.LocalID);
+            m_physicsScene.DetailLog("{0},BSActorMoveToTarget,refresh,enabled={1},active={2},target={3},tau={4}",
+                m_controllingPrim.LocalID, Enabled, m_controllingPrim.MoveToTargetActive,
+                m_controllingPrim.MoveToTargetTarget, m_controllingPrim.MoveToTargetTau);
 
             // If not active any more...
             if (!m_controllingPrim.MoveToTargetActive)
@@ -98,18 +100,28 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 // We're taking over after this.
                 m_controllingPrim.ZeroMotion(true);
 
-                m_targetMotor = new BSVMotor("BSPrim.PIDTarget",
-                                            m_controllingPrim.MoveToTargetTau,                    // timeScale
-                                            BSMotor.Infinite,           // decay time scale
-                                            BSMotor.InfiniteVector,     // friction timescale
-                                            1f                          // efficiency
-                );
+                /* TODO !!!!!
+                m_targetMotor = new BSPIDVMotor("BSActorMoveToTarget-" + m_controllingPrim.LocalID.ToString());
+                m_targetMotor.TimeScale = m_controllingPrim.MoveToTargetTau;
+                m_targetMotor.Efficiency = 1f;
+                */
+
+                m_targetMotor = new BSVMotor("BSActorMoveToTarget-" + m_controllingPrim.LocalID.ToString(),
+                    m_controllingPrim.MoveToTargetTau, BSMotor.Infinite, 1f);
                 m_targetMotor.PhysicsScene = m_physicsScene; // DEBUG DEBUG so motor will output detail log messages.
                 m_targetMotor.SetTarget(m_controllingPrim.MoveToTargetTarget);
                 m_targetMotor.SetCurrent(m_controllingPrim.RawPosition);
 
                 m_physicsScene.BeforeStep += Mover;
+                // m_phsyicsScene.BeforStep += Mover2; // Mover2 not possible with BulletSim 2.80
             }
+            else
+            {
+                // If already allocated, make sure the target and other parameters are current
+                m_targetMotor.SetTarget(m_controllingPrim.MoveToTargetTarget);
+                m_targetMotor.SetCurrent(m_controllingPrim.RawPosition);
+            }
+
         }
 
         private void DeactivateMoveToTarget()
@@ -146,5 +158,5 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
             m_physicsScene.DetailLog("{0},BSPrim.PIDTarget,move,fromPos={1},movePos={2}", m_controllingPrim.LocalID, origPosition, movePosition);
         }
-    }*/
+    }
 }
