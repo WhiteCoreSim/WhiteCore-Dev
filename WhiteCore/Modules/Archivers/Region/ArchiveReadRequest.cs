@@ -240,6 +240,9 @@ namespace WhiteCore.Modules.Archivers
                     if (filePath.StartsWith(ArchiveConstants.OBJECTS_PATH))
                     {
                         seneObjectGroups.Add(data);
+                        if (seneObjectGroups.Count % 100 == 0)
+                            MainConsole.Instance.InfoFormat("[ARCHIVER]: Found {0} scene object groups...",seneObjectGroups.Count);
+
                     }
                     else if (!m_skipAssets && filePath.StartsWith(ArchiveConstants.ASSETS_PATH))
                     {
@@ -272,7 +275,7 @@ namespace WhiteCore.Modules.Archivers
                         else
                             failedAssetRestores++;
 
-                        if ((successfulAssetRestores + failedAssetRestores)%250 == 0)
+                        if ((successfulAssetRestores + failedAssetRestores)%100 == 0)
                             MainConsole.Instance.Info("[ARCHIVER]: Loaded " + successfulAssetRestores +
                                                       " assets and failed to load " + failedAssetRestores + " assets...");
                     }
@@ -312,7 +315,7 @@ namespace WhiteCore.Modules.Archivers
                         UUID assetid = assets2Save.Dequeue();
                         SaveNonBinaryAssets(assetid, assetNonBinaryCollection[assetid], assetBinaryChangeRecord);
                         savingAssetsCount++;
-                        if ((savingAssetsCount)%250 == 0)
+                        if ((savingAssetsCount)%100 == 0)
                             MainConsole.Instance.Info("[ARCHIVER]: Saving " + savingAssetsCount + " assets...");
                     }
                     catch (Exception ex)
@@ -368,13 +371,13 @@ namespace WhiteCore.Modules.Archivers
                     //... and children
                     foreach (ISceneChildEntity part in sceneObject.ChildrenEntities())
                     {
-                        //if (string.IsNullOrEmpty(part.CreatorData))
-                        // always check & reset
-                            part.CreatorID = ResolveUserUuid(part.CreatorID, part.AbsolutePosition, landData);
-
+                        // check user ID's
+                        part.CreatorID = ResolveUserUuid(part.CreatorID, part.AbsolutePosition, landData);
                         part.OwnerID = ResolveUserUuid(part.OwnerID, part.AbsolutePosition, landData);
-
                         part.LastOwnerID = ResolveUserUuid(part.LastOwnerID, part.AbsolutePosition, landData);
+
+                        //check group ID's
+                        part.GroupID = ResolveGroupUuid(part.GroupID);
 
                         // And zap any troublesome sit target information
                         part.SitTargetOrientation = new Quaternion(0, 0, 0, 1);
@@ -388,18 +391,28 @@ namespace WhiteCore.Modules.Archivers
                             TaskInventoryDictionary inv = part.TaskInventory;
                             foreach (KeyValuePair<UUID, TaskInventoryItem> kvp in inv)
                             {
+                                // check user ID's
                                 kvp.Value.OwnerID = ResolveUserUuid(
                                     kvp.Value.OwnerID,
                                     part.AbsolutePosition,
                                     landData
                                 );
 
-                                //if (string.IsNullOrEmpty(kvp.Value.CreatorData))
-                                    kvp.Value.CreatorID = ResolveUserUuid(
-                                        kvp.Value.CreatorID,
-                                        part.AbsolutePosition,
-                                        landData
-                                    );
+                                kvp.Value.LastOwnerID = ResolveUserUuid(
+                                    kvp.Value.LastOwnerID,
+                                    part.AbsolutePosition,
+                                    landData
+                                );
+
+                                kvp.Value.CreatorID = ResolveUserUuid(
+                                    kvp.Value.CreatorID,
+                                    part.AbsolutePosition,
+                                    landData
+                                );
+
+                                // ..and possible group ID's
+                                kvp.Value.GroupID = ResolveGroupUuid(kvp.Value.GroupID);
+
                             }
                         }
                     }
@@ -421,7 +434,7 @@ namespace WhiteCore.Modules.Archivers
                         sceneObject.CreateScriptInstances(0, false, StateSource.RegionStart, UUID.Zero, true);
                     }
                     sceneObjectsLoadedCount++;
-                    if (sceneObjectsLoadedCount%250 == 0)
+                    if (sceneObjectsLoadedCount%100 == 0)
                         MainConsole.Instance.Info("[ARCHIVER]: Loaded " + sceneObjectsLoadedCount + " objects...");
                 }
                 assetNonBinaryCollection.Clear();
@@ -612,9 +625,9 @@ namespace WhiteCore.Modules.Archivers
                     GroupRecord gr = groups.GetGroupRecord (GroupID);
                     if (gr != null)
                         m_validGroupUuids.Add (GroupID, GroupID);
-                } else  // GroupID does not exist.. keep track
-                    m_validGroupUuids.Add(GroupID, UUID.Zero);
-
+                    else  
+                        m_validGroupUuids.Add (GroupID, UUID.Zero);         // GroupID does not exist.. keep track
+                }
                 return m_validGroupUuids[GroupID];
             }
 
