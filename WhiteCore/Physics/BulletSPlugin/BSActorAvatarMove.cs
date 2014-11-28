@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) Contributors, http://opensimulator.org/, http://whitecore-sim.org
+ * Copyright (c) Contributors, http://opensimulator.org/, http://whitecore-sim.org, http://virtualnexus.eu
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,6 +25,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using BulletXNA.BulletCollision;
 using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.Utilities;
 using System;
@@ -35,12 +36,18 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 {
     public class BSActorAvatarMove : BSActor
     {
-        BSVMotor m_velocityMotor;
+        private BSVMotor m_velocityMotor;
+
+        private int m_walkingUpStairs;
+        private float m_lastStepUp;
+        private int m_jumpframes = 0;
+        private float m_jumpVelocity = 0f;
 
         public BSActorAvatarMove(BSScene physicsScene, BSPhysObject pObj, string actorName)
             : base(physicsScene, pObj, actorName)
         {
             m_velocityMotor = null;
+            m_walkingUpStairs = 0;
             m_physicsScene.DetailLog("{0},BSActorAvatarMove,constructor", m_controllingPrim.LocalID);
         }
 
@@ -55,6 +62,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         public override void Dispose()
         {
             Enabled = false;
+            Refresh();
         }
 
         // Called when physical parameters (properties set in Bullet) need to be re-applied.
@@ -90,11 +98,13 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         // Usually called when target velocity changes to set the current velocity and the target
         //     into the movement motor.
-        public void SetVelocityAndTarget(OMV.Vector3 vel, OMV.Vector3 targ, bool inTaintTime, int targetValueDecayTimeScale)
+        public void SetVelocityAndTarget(OMV.Vector3 vel, OMV.Vector3 targ, bool inTaintTime,
+            int targetValueDecayTimeScale)
         {
             if (m_disallowTargetVelocitySet)
             {
-                if (m_controllingPrim.Flying && (m_controllingPrim.IsJumping || m_controllingPrim.IsPreJumping))//They started flying while jumping
+                if (m_controllingPrim.Flying && (m_controllingPrim.IsJumping || m_controllingPrim.IsPreJumping))
+                //They started flying while jumping
                 {
                     m_physicsScene.TaintedObject("BSCharacter.setTargetVelocity", delegate()
                     {
@@ -122,7 +132,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             SetVelocityAndTargetInternal(vel, targ, inTaintTime, targetValueDecayTimeScale);
         }
 
-        private void SetVelocityAndTargetInternal(OMV.Vector3 vel, OMV.Vector3 targ, bool inTaintTime, int targetValueDecayTimeScale)
+        private void SetVelocityAndTargetInternal(OMV.Vector3 vel, OMV.Vector3 targ, bool inTaintTime,
+            int targetValueDecayTimeScale)
         {
             m_physicsScene.TaintedObject(inTaintTime, "BSActorAvatarMove.setVelocityAndTarget", delegate()
             {
@@ -144,15 +155,19 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             {
                 // Infinite decay and timescale values so motor only changes current to target values.
                 m_velocityMotor = new BSVMotor("BSCharacter.Velocity",
-                                                    0.2f,                       // time scale
-                                                    BSMotor.Infinite,           // decay time scale
-                                                    BSMotor.InfiniteVector,     // friction timescale
-                                                    1f                          // efficiency
-                );
+                    0.2f, // time scale
+                    BSMotor.Infinite, // decay time scale
+                    1f // efficiency
+                    );
+                // BSParam.AvatarStopZeroThreshold not included in BulletSim 2.80 :(
+
                 // _velocityMotor.PhysicsScene = PhysicsScene; // DEBUG DEBUG so motor will output detail log messages.
-                SetVelocityAndTarget(m_controllingPrim.RawVelocity, m_controllingPrim.TargetVelocity, true /* inTaintTime */, 0);
+                SetVelocityAndTarget(m_controllingPrim.RawVelocity, m_controllingPrim.TargetVelocity, true
+                    /* inTaintTime */, 0);
 
                 m_physicsScene.BeforeStep += Mover;
+                // Process_OnPreUpdateProperty not included in BulletSim 2.80 :(
+                m_walkingUpStairs = 0;
             }
         }
 
@@ -200,9 +215,10 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 if (m_controllingPrim.IsColliding)
                 {
                     // If we are colliding with a stationary object, presume we're standing and don't move around
-                    if (!m_controllingPrim.ColliderIsMoving)
+                    if (!m_controllingPrim.ColliderIsMoving && !m_controllingPrim.VolumeDetect)
                     {
-                        m_physicsScene.DetailLog("{0},BSCharacter.MoveMotor,collidingWithStationary,zeroingMotion", m_controllingPrim.LocalID);
+                        m_physicsScene.DetailLog("{0},BSCharacter.MoveMotor,collidingWithStationary,zeroingMotor",
+                            m_controllingPrim.LocalID);
                         m_controllingPrim.IsStationary = true;
                         m_controllingPrim.ZeroMotion(true /* inTaintTime */);
                     }
@@ -224,7 +240,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 }
 
                 m_physicsScene.DetailLog("{0},BSCharacter.MoveMotor,taint,stopping,target={1},colliding={2}",
-                                m_controllingPrim.LocalID, m_velocityMotor.TargetValue, m_controllingPrim.IsColliding);
+                    m_controllingPrim.LocalID, m_velocityMotor.TargetValue, m_controllingPrim.IsColliding);
             }
             else
             {
@@ -245,6 +261,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                     if (m_controllingPrim.RawVelocity.Z < 0)
                         stepVelocity.Z = m_controllingPrim.RawVelocity.Z;
                     // DetailLog("{0},BSCharacter.MoveMotor,taint,overrideStepZWithWorldZ,stepVel={1}", LocalID, stepVelocity);
+                    // no BSParam.AvatarJumpFrames supported in this Version :(
                 }
 
                 // 'stepVelocity' is now the speed we'd like the avatar to move in. Turn that into an instantanous force.
@@ -256,9 +273,9 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 moveForce += WalkUpStairs();
 
                 m_physicsScene.DetailLog("{0},BSCharacter.MoveMotor,move,stepVel={1},vel={2},mass={3},moveForce={4}",
-                                m_controllingPrim.LocalID, stepVelocity, m_controllingPrim.RawVelocity, m_controllingPrim.Mass, moveForce);
-                if(moveForce.IsFinite())
-                    m_physicsScene.PE.ApplyCentralImpulse(m_controllingPrim.PhysBody, moveForce);
+                    m_controllingPrim.LocalID, stepVelocity, m_controllingPrim.RawVelocity, m_controllingPrim.Mass,
+                    moveForce);
+                m_physicsScene.PE.ApplyCentralImpulse(m_controllingPrim.PhysBody, moveForce);
             }
 
             if (m_preJumpStart != 0 && Util.EnvironmentTickCountSubtract(m_preJumpStart) > 300)
@@ -270,7 +287,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 OMV.Vector3 target = m_jumpDirection;
                 target.X *= 1.5f;
                 target.Y *= 1.5f;
-                target.Z *= 2.5f;//Scale so that we actually jump
+                target.Z *= 2.5f; //Scale so that we actually jump
 
                 SetVelocityAndTargetInternal(m_controllingPrim.RawVelocity, target, false, 1);
                 m_jumpStart = Util.EnvironmentTickCount();
@@ -278,14 +295,15 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             if (!m_jumpFallState && m_jumpStart != 0 && Util.EnvironmentTickCountSubtract(m_jumpStart) > 500)
             {
                 OMV.Vector3 newTarget = m_controllingPrim.RawVelocity;
-                newTarget.X *= 1.5f;//Scale so that the jump looks correct
+                newTarget.X *= 1.5f; //Scale so that the jump looks correct
                 newTarget.Y *= 1.5f;
                 newTarget.Z *= -0.2f;
                 SetVelocityAndTargetInternal(m_controllingPrim.RawVelocity, newTarget, false, 3);
                 m_jumpFallState = true;
             }
-            else if (m_jumpFallState && m_jumpStart != 0 && m_controllingPrim.IsColliding && Util.EnvironmentTickCountSubtract(m_jumpStart) > 1500
-                || (m_jumpStart != 0 && Util.EnvironmentTickCountSubtract(m_jumpStart) > 10000))//Fallback
+            else if (m_jumpFallState && m_jumpStart != 0 && m_controllingPrim.IsColliding &&
+                     Util.EnvironmentTickCountSubtract(m_jumpStart) > 1500
+                     || (m_jumpStart != 0 && Util.EnvironmentTickCountSubtract(m_jumpStart) > 10000)) //Fallback
             {
                 //Reset everything in case something went wrong
                 m_disallowTargetVelocitySet = false;
@@ -306,19 +324,34 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             // This test is done if moving forward, not flying and is colliding with something.
             // DetailLog("{0},BSCharacter.WalkUpStairs,IsColliding={1},flying={2},targSpeed={3},collisions={4}",
             //                 LocalID, IsColliding, Flying, TargetSpeed, CollisionsLastTick.Count);
-            if (m_controllingPrim.IsColliding && !m_controllingPrim.Flying && m_controllingPrim.TargetVelocitySpeed > 0.1f /* && ForwardSpeed < 0.1f */)
+            m_physicsScene.DetailLog(
+                "{0},BSCharacter.WalkUpStairs,IsColliding={1},flying={2},targSpeed={3},collisions={4},avHeight={5}",
+                m_controllingPrim.TargetVelocitySpeed, m_controllingPrim.CollisionsLastTick.Count,
+                m_controllingPrim.Size.Z);
+
+            // Check for stairs climbing if colliding, not flying and moving forward
+            if (m_controllingPrim.IsColliding && !m_controllingPrim.Flying &&
+                m_controllingPrim.TargetVelocitySpeed > 0.1f)
             {
                 // The range near the character's feet where we will consider stairs
-                float nearFeetHeightMin = m_controllingPrim.RawPosition.Z - (m_controllingPrim.Size.Z / 2f) + 0.05f;
+                // float nearFeetHeightMin = m_controllingPrim.RawPosition.Z - (m_controllingPrim.Size.Z / 2f) + 0.05f
+                // Note: ther is a problem with the computation of the capsule height. Thus RawPosition is off
+                //       from the height. Revisit size and this computation when height is scaled properly.
+                float nearFeetHeightMin = m_controllingPrim.RawPosition.Z - (m_controllingPrim.Size.Z / 2f) - 0.05f;
                 float nearFeetHeightMax = nearFeetHeightMin + BSParam.AvatarStepHeight;
 
-                // Look for a collision point that is near the character's feet and is oriented the same as the charactor is
-                foreach (KeyValuePair<uint, ContactPoint> kvp in m_controllingPrim.CollisionsLastTick.GetCollisionEvents())
+                // look for a collision point that is near the character's feet and is oriented the same as the character is.
+                // find the highest 'good' collision.
+                OMV.Vector3 highestTouchPosition = OMV.Vector3.Zero;
+                // no m_objCollisionsList :(
+                foreach (
+                    KeyValuePair<uint, ContactPoint> kvp in m_controllingPrim.CollisionsLastTick.GetCollisionEvents())
                 {
                     // Don't care about collisions with the terrain
                     if (kvp.Key > m_physicsScene.TerrainManager.HighestTerrainID)
                     {
                         OMV.Vector3 touchPosition = kvp.Value.Position;
+
                         // DetailLog("{0},BSCharacter.WalkUpStairs,min={1},max={2},touch={3}",
                         //                 LocalID, nearFeetHeightMin, nearFeetHeightMax, touchPosition);
                         if (touchPosition.Z >= nearFeetHeightMin && touchPosition.Z <= nearFeetHeightMax)
@@ -332,15 +365,14 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                             if (diff < BSParam.AvatarStepApproachFactor)
                             {
                                 // Found the stairs contact point. Push up a little to raise the character.
-                                float upForce = (touchPosition.Z - nearFeetHeightMin) * m_controllingPrim.Mass * BSParam.AvatarStepForceFactor;
+                                float upForce = (touchPosition.Z - nearFeetHeightMin) * m_controllingPrim.Mass *
+                                                BSParam.AvatarStepForceFactor;
                                 ret = new OMV.Vector3(0f, 0f, upForce);
 
                                 // Also move the avatar up for the new height
                                 OMV.Vector3 displacement = new OMV.Vector3(0f, 0f, BSParam.AvatarStepHeight / 2f);
                                 m_controllingPrim.ForcePosition = m_controllingPrim.RawPosition + displacement;
                             }
-                            m_physicsScene.DetailLog("{0},BSCharacter.WalkUpStairs,touchPos={1},nearFeetMin={2},faceDir={3},norm={4},diff={5},ret={6}",
-                                    m_controllingPrim.LocalID, touchPosition, nearFeetHeightMin, directionFacing, touchNormal, diff, ret);
                         }
                     }
                 }
@@ -348,6 +380,5 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
             return ret;
         }
-
     }
 }

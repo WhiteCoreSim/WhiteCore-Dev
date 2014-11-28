@@ -31,7 +31,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 {
     public class BSActorSetForce : BSActor
     {
-        BSFMotor m_forceMotor;
+        private BSFMotor m_forceMotor;
 
         public BSActorSetForce(BSScene physicsScene, BSPhysObject pObj, string actorName)
             : base(physicsScene, pObj, actorName)
@@ -63,7 +63,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             // If not active any more, get rid of me (shouldn't ever happen, but just to be safe)
             if (m_controllingPrim.RawForce == OMV.Vector3.Zero)
             {
-                m_physicsScene.DetailLog("{0},BSActorSetForce,refresh,notSetForce,removing={1}", m_controllingPrim.LocalID, ActorName);
+                m_physicsScene.DetailLog("{0},BSActorSetForce,refresh,notSetForce,removing={1}",
+                    m_controllingPrim.LocalID, ActorName);
                 Enabled = false;
                 return;
             }
@@ -116,7 +117,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             if (!isActive)
                 return;
 
-            m_physicsScene.DetailLog("{0},BSActorSetForce,preStep,force={1}", m_controllingPrim.LocalID, m_controllingPrim.RawForce);
+            m_physicsScene.DetailLog("{0},BSActorSetForce,preStep,force={1}", m_controllingPrim.LocalID,
+                m_controllingPrim.RawForce);
             if (m_controllingPrim.PhysBody.HasPhysicalBody)
             {
                 m_physicsScene.PE.ApplyCentralForce(m_controllingPrim.PhysBody, m_controllingPrim.RawForce);
@@ -127,4 +129,3 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
     }
 }
-
