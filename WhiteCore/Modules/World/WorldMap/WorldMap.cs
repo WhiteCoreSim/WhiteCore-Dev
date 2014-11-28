@@ -52,19 +52,19 @@ namespace WhiteCore.Modules.WorldMap
 {
     public class WhiteCoreWorldMapModule : INonSharedRegionModule, IWorldMapModule
     {
-        private const string DEFAULT_WORLD_MAP_EXPORT_PATH = "exportmap.jpg";
+        const string DEFAULT_WORLD_MAP_EXPORT_PATH = "exportmap.jpg";
 
         protected IScene m_scene;
         protected bool m_Enabled;
 
-        private readonly ExpiringCache<ulong, List<mapItemReply>> m_mapItemCache =
+        readonly ExpiringCache<ulong, List<mapItemReply>> m_mapItemCache =
             new ExpiringCache<ulong, List<mapItemReply>>();
 
-        private readonly ConcurrentQueue<MapItemRequester> m_itemsToRequest = new ConcurrentQueue<MapItemRequester>();
-        private bool itemRequesterIsRunning;
-        private static WhiteCoreThreadPool threadpool;
-        private static WhiteCoreThreadPool blockthreadpool;
-        private int MapViewLength = 8;
+        readonly ConcurrentQueue<MapItemRequester> m_itemsToRequest = new ConcurrentQueue<MapItemRequester>();
+        bool itemRequesterIsRunning;
+        static WhiteCoreThreadPool threadpool;
+        static WhiteCoreThreadPool blockthreadpool;
+        int MapViewLength = 8;
 
         #region INonSharedRegionModule Members
 
@@ -159,14 +159,14 @@ namespace WhiteCore.Modules.WorldMap
         ///     Registered for event
         /// </summary>
         /// <param name="client"></param>
-        private void OnNewClient(IClientAPI client)
+        void OnNewClient(IClientAPI client)
         {
             client.OnRequestMapBlocks += RequestMapBlocks;
             client.OnMapItemRequest += HandleMapItemRequest;
             client.OnMapNameRequest += OnMapNameRequest;
         }
 
-        private void OnClosingClient(IClientAPI client)
+        void OnClosingClient(IClientAPI client)
         {
             client.OnRequestMapBlocks -= RequestMapBlocks;
             client.OnMapItemRequest -= HandleMapItemRequest;
@@ -212,29 +212,22 @@ namespace WhiteCore.Modules.WorldMap
                         return;
                     }
                     m_scene.ForEachScenePresence(delegate(IScenePresence sp)
-                                                     {
-                                                         // Don't send a green dot for yourself
-                                                         if (!sp.IsChildAgent && sp.UUID != remoteClient.AgentId)
-                                                         {
-                                                             mapitem = new mapItemReply
-                                                                           {
-                                                                               x =
-                                                                                   (uint)
-                                                                                   (xstart + sp.AbsolutePosition.X),
-                                                                               y =
-                                                                                   (uint)
-                                                                                   (ystart + sp.AbsolutePosition.Y),
-                                                                               id = UUID.Zero,
-                                                                               name =
-                                                                                   Util.Md5Hash(
-                                                                                       m_scene.RegionInfo.RegionName +
-                                                                                       tc.ToString()),
-                                                                               Extra = 1,
-                                                                               Extra2 = 0
-                                                                           };
-                                                             mapitems.Add(mapitem);
-                                                         }
-                                                     });
+                        {
+                            // Don't send a green dot for yourself
+                            if (!sp.IsChildAgent && sp.UUID != remoteClient.AgentId)
+                            {
+                                mapitem = new mapItemReply
+                                { 
+                                    x = (uint) (xstart + sp.AbsolutePosition.X),
+                                    y = (uint) (ystart + sp.AbsolutePosition.Y),
+                                    id = UUID.Zero,
+                                    name = Util.Md5Hash( m_scene.RegionInfo.RegionName + tc),
+                                    Extra = 1,
+                                    Extra2 = 0
+                                };
+                                mapitems.Add(mapitem);
+                            }
+                        });
                     remoteClient.SendMapItemReply(mapitems.ToArray(), itemtype, flags);
                 }
                 else
@@ -261,7 +254,7 @@ namespace WhiteCore.Modules.WorldMap
             }
         }
 
-        private void GetMapItems()
+        void GetMapItems()
         {
             itemRequesterIsRunning = true;
             while (true)
@@ -379,12 +372,12 @@ namespace WhiteCore.Modules.WorldMap
                 blockthreadpool.QueueEvent(GetMapBlocks, 3);
         }
 
-        private bool blockRequesterIsRunning;
+        bool blockRequesterIsRunning;
 
-        private readonly ConcurrentQueue<MapBlockRequester> m_blockitemsToRequest =
+        readonly ConcurrentQueue<MapBlockRequester> m_blockitemsToRequest =
             new ConcurrentQueue<MapBlockRequester>();
 
-        private class MapBlockRequester
+        class MapBlockRequester
         {
             public int minX;
             public int minY;
@@ -394,7 +387,7 @@ namespace WhiteCore.Modules.WorldMap
             public IClientAPI remoteClient;
         }
 
-        private void GetMapBlocks()
+        void GetMapBlocks()
         {
             try
             {
@@ -735,13 +728,13 @@ namespace WhiteCore.Modules.WorldMap
         }
 
         // From msdn
-        private static ImageCodecInfo GetEncoderInfo(String mimeType)
+        static ImageCodecInfo GetEncoderInfo(String mimeType)
         {
             ImageCodecInfo[] encoders = ImageCodecInfo.GetImageEncoders();
             return encoders.FirstOrDefault(t => t.MimeType == mimeType);
         }
 
-        private class MapItemRequester
+        class MapItemRequester
         {
             public ulong regionhandle = 0;
             public uint itemtype = 0;

@@ -39,7 +39,6 @@ namespace WhiteCore.Modules.Archivers
     /// </summary>
     public static class InventoryArchiveUtils
     {
-//        private static readonly ILog MainConsole.Instance = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         // Character used for escaping the path delimter ("\/") and itself ("\\") in human escaped strings
         public static readonly char ESCAPE_CHARACTER = '\\';

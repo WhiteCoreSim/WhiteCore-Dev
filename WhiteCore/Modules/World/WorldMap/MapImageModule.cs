@@ -66,19 +66,21 @@ namespace WhiteCore.Modules.WorldMap
 
     public class MapImageModule : IMapImageGenerator, INonSharedRegionModule, IDisposable
     {
-        private IConfigSource m_config;
-        private Dictionary<UUID, Color> m_mapping;
-        private IScene m_scene;
-        private IMapTileTerrainRenderer terrainRenderer;
-        private double minutes = 60*24;
-        private const double oneminute = 60000;
-        private Timer UpdateMapImage;
-        private Timer UpdateOnlineStatus;
-        private bool m_generateMapTiles = true;
-        private UUID staticMapTileUUID = UUID.Zero;
-        private UUID regionMapTileUUID = UUID.Zero;
-        private bool m_asyncMapTileCreation = false;
-        private string m_assetCacheDir = Constants.DEFAULT_ASSETCACHE_DIR;
+        IConfigSource m_config;
+        Dictionary<UUID, Color> m_mapping;
+        IScene m_scene;
+        IMapTileTerrainRenderer terrainRenderer;
+        double minutes = 60*24;
+        const double oneminute = 60000;
+        Timer UpdateMapImage;
+        Timer UpdateOnlineStatus;
+        bool m_generateMapTiles = true;
+        UUID staticMapTileUUID = UUID.Zero;
+        UUID regionMapTileUUID = UUID.Zero;
+        bool m_asyncMapTileCreation = false;
+        string m_assetCacheDir = Constants.DEFAULT_ASSETCACHE_DIR;
+        string m_assetMapCacheDir = Constants.DEFAULT_ASSETCACHE_DIR + "/mapzoomlevels";
+        string m_assetWorldviewCacheDir = Constants.DEFAULT_ASSETCACHE_DIR + "/Worldview";
 
         #region IMapImageGenerator Members
 
@@ -188,6 +190,22 @@ namespace WhiteCore.Modules.WorldMap
             return worldMap;
         }
 
+        public void UpdateWorldMaps()
+        {
+            if (m_scene != null)
+            {
+                CreateTerrainTexture (true);
+
+                ClearWebCachedImages(
+                    m_scene.RegionInfo.RegionLocX,
+                    m_scene.RegionInfo.RegionLocY,
+                    m_scene.RegionInfo.RegionSizeX,
+                    m_scene.RegionInfo.RegionSizeY
+                );
+                ClearWorldviewCachedImages (m_scene.RegionInfo.RegionID);
+            }
+        }
+
         #endregion
 
         #region INonSharedRegionModule Members
@@ -226,6 +244,9 @@ namespace WhiteCore.Modules.WorldMap
 
             // get cache dir
             m_assetCacheDir = m_config.Configs ["AssetCache"].GetString ("CacheDirectory",m_assetCacheDir);
+            m_assetMapCacheDir = m_assetCacheDir + "/mapzoomlevels";
+            m_assetWorldviewCacheDir = m_assetCacheDir + "/Worldview";
+
 
             m_scene.RegisterModuleInterface<IMapImageGenerator>(this);
 
@@ -311,6 +332,14 @@ namespace WhiteCore.Modules.WorldMap
             {
                 m_scene = scene;
                 CreateTerrainTexture (true);
+
+                ClearWebCachedImages(
+                    m_scene.RegionInfo.RegionLocX,
+                    m_scene.RegionInfo.RegionLocY,
+                    m_scene.RegionInfo.RegionSizeX,
+                    m_scene.RegionInfo.RegionSizeY
+                );
+                ClearWorldviewCachedImages (m_scene.RegionInfo.RegionID);
             }
         }
 
@@ -327,8 +356,18 @@ namespace WhiteCore.Modules.WorldMap
         private void OnTimedCreateNewMapImage(object source, ElapsedEventArgs e)
         {
             if (m_scene.SimulationDataService.MapTileNeedsGenerated)
-                CreateTerrainTexture();
-            m_scene.SimulationDataService.MapTileNeedsGenerated = false;
+            {
+                CreateTerrainTexture ();
+                m_scene.SimulationDataService.MapTileNeedsGenerated = false;
+                ClearWebCachedImages(
+                    m_scene.RegionInfo.RegionLocX,
+                    m_scene.RegionInfo.RegionLocY,
+                    m_scene.RegionInfo.RegionSizeX,
+                    m_scene.RegionInfo.RegionSizeY
+                );
+                ClearWorldviewCachedImages (m_scene.RegionInfo.RegionID);
+            }
+
         }
 
         /// <summary>
@@ -1128,6 +1167,51 @@ namespace WhiteCore.Modules.WorldMap
             returnpt.X /= m_scene.RegionInfo.RegionSizeX/Constants.RegionSize;
             returnpt.Y /= m_scene.RegionInfo.RegionSizeY/Constants.RegionSize;
             return returnpt;
+        }
+
+        /// <summary>
+        /// Clears the web cached images.
+        /// </summary>
+        /// <param name="regionX">Region x.</param>
+        /// <param name="regionY">Region y.</param>
+        public void ClearWebCachedImages(int regionX, int regionY, int sizeX, int sizeY)
+        {
+            if (m_assetMapCacheDir == "")
+                return;
+
+            // easier to use vars...
+            var regionXPos = regionX / Constants.RegionSize;
+            var regionYPos = regionY / Constants.RegionSize;
+            var xLimit = (regionX + sizeX) / Constants.RegionSize;
+            var yLimit = (regionY + sizeY) / Constants.RegionSize;
+
+            for (int maplayer = 1; maplayer < 9; maplayer++)
+            {
+                for (int xPos = regionXPos; xPos < xLimit; xPos++)
+                {
+                    for (int yPos = regionYPos; yPos < yLimit; yPos++)
+                    {
+                        string name = string.Format ("map-{0}-{1}-{2}-objects.jpg", maplayer, xPos, yPos);
+                        string fullPath = Path.Combine (m_assetMapCacheDir, name);
+
+                        if (File.Exists (fullPath))
+                            File.Delete (fullPath);
+                    }
+                }
+            }
+        }
+
+        public void ClearWorldviewCachedImages(UUID regionID)
+        {
+            if (m_assetWorldviewCacheDir == "")
+                return;
+
+            string name = string.Format ("wv-{0}.jpg", regionID);
+            string fullPath = Path.Combine (m_assetWorldviewCacheDir, name);
+
+            if (File.Exists (fullPath))
+                File.Delete (fullPath);
+
         }
 
         public void Dispose()

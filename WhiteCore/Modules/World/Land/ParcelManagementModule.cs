@@ -522,6 +522,8 @@ namespace WhiteCore.Modules.Land
 
             UserAccount account = m_scene.UserAccountService.GetUserAccount(m_scene.RegionInfo.AllScopeIDs,
                                                                             fullSimParcel.LandData.OwnerID);
+            // we should always have the estate user
+            string ownerName = account.Name;
 
             while (fullSimParcel.LandData.OwnerID == UUID.Zero || account == null)
             {
@@ -535,12 +537,19 @@ namespace WhiteCore.Modules.Land
                 }
                 account = m_scene.UserAccountService.GetUserAccount(m_scene.RegionInfo.AllScopeIDs, userName);
                 if (account != null)
+                {
                     fullSimParcel.LandData.OwnerID = account.PrincipalID;
+                    ownerName = account.Name;
+                }
                 else
                     MainConsole.Instance.Warn("Could not find the user.");
             }
-            MainConsole.Instance.Info("[ParcelManagement]: No land found for region " + m_scene.RegionInfo.RegionName +
-                                      ", setting owner to " + fullSimParcel.LandData.OwnerID);
+
+            MainConsole.Instance.InfoFormat (
+                "[ParcelManagement]: Setting land owner for region {0} to {1}",
+                m_scene.RegionInfo.RegionName,
+                ownerName);                 //  was >>   fullSimParcel.LandData.OwnerID);
+
             fullSimParcel.LandData.ClaimDate = Util.UnixTimeSinceEpoch();
             fullSimParcel.LandData.Bitmap =
                 new byte[(m_scene.RegionInfo.RegionSizeX/4)*(m_scene.RegionInfo.RegionSizeY/4)/8];

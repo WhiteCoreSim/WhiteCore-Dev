@@ -660,22 +660,44 @@ namespace WhiteCore.Region
                 "shows region objects or if object name is supplied, object info", 
                 HandleShowObjects, true, true);
 
-            MainConsole.Instance.Commands.AddCommand("rotate region",
-                "rotate region <degrees> [centerX] [centerY]",
+            MainConsole.Instance.Commands.AddCommand("rotate region objects",
+                "rotate region objects <degrees> [centerX] [centerY]",
                 "Rotates all region objects around centerX, centerY (default center of region)\n" +
                 "Rotation is +ve to the right, -ve to the left. (Have you backed up your region?)",
                 HandleRotateScene, true, true);
 
-            MainConsole.Instance.Commands.AddCommand("scale region",
-                "scale region <factor>",
+            MainConsole.Instance.Commands.AddCommand("scale region objects",
+                "scale region objects <factor>",
                 "Scales all region objects by the specified amount (please back up your region before using)",
                 HandleScaleScene, true, true);
 
-            MainConsole.Instance.Commands.AddCommand("reposition region",
-                "reposition region <xOffset> <yOffset> <zOffset>",
+            MainConsole.Instance.Commands.AddCommand("reposition region objects",
+                "reposition region objects <xOffset> <yOffset> <zOffset>",
                 "Move region objects by the specified amounts (Have you backed up your region?)",
                 HandleTranslateScene, true, true);
-                
+
+            // some region settings for maintenance
+            MainConsole.Instance.Commands.AddCommand("set region capacity",
+                "set region capacity [prims]",
+                "sets the region maximum prim count", 
+                HandleSetRegionCapacity, true, true);
+
+            MainConsole.Instance.Commands.AddCommand("set region startup",
+                "set region startup [normal/delayed]",
+                "set the startup mode of scripts in the region.\n" +
+                "   normal - scripts run continuously; delayed - scripts are started when an avatar enters", 
+                HandleSetRegionStartup, true, true);
+
+            MainConsole.Instance.Commands.AddCommand("set region infinite",
+                "set region infinite [yes/no]",
+                "sets the region type as 'infinite':  If 'infinite' this allows an avatar to fly out of the region", 
+                HandleSetRegionInfinite, true, true);
+
+            MainConsole.Instance.Commands.AddCommand("set region visibility",
+                "set region visibility [yes/no]",
+                "sets whether neighbouring regions can 'see into' this region", 
+                HandleSetRegionVisibility, true, true);
+
         }
 
         #region helpers
@@ -1440,6 +1462,11 @@ namespace WhiteCore.Region
                             MainConsole.Instance.Warn ("[SceneManager]: Region has been reloaded from the previous backup");
                         }
                     }
+
+                    // force a map update 
+                    var mapGen = scene.RequestModuleInterface<IMapImageGenerator>();
+                    mapGen.UpdateWorldMaps();
+
                 }
             }
             catch (Exception e)
@@ -1601,10 +1628,10 @@ namespace WhiteCore.Region
         /// <param name="cmdparams">Cmdparams.</param>
         private void HandleRotateScene(IScene scene, string[] cmdparams)
         {
-            var usage = "Usage: rotate scene <angle in degrees> [centerX centerY]\n"+
+            var usage = "Usage: rotate scene objects <angle in degrees> [centerX centerY]\n"+
                 "(centerX and centerY are optional and default to the center of the region";
 
-            if (cmdparams.Length < 3)
+            if (cmdparams.Length < 4)
             {
                 MainConsole.Instance.Info(usage);
                 return;
@@ -1613,7 +1640,7 @@ namespace WhiteCore.Region
             var centerX = scene.RegionInfo.RegionSizeX * 0.5f;
             var centerY = scene.RegionInfo.RegionSizeY * 0.5f;
 
-            var degrees = Convert.ToSingle(cmdparams[2]);
+            var degrees = Convert.ToSingle(cmdparams[3]);
             var angle = (float) (degrees * (Math.PI/180));
 
             // normalize rotation angle  -ve, anticlockwise, +ve clockwise
@@ -1622,10 +1649,10 @@ namespace WhiteCore.Region
             Quaternion rot = Quaternion.CreateFromAxisAngle(0, 0, 1, angle);
 
             // center supplied?
-            if (cmdparams.Length > 3)
-                centerX = Convert.ToSingle(cmdparams[3]);
             if (cmdparams.Length > 4)
-                centerY = Convert.ToSingle(cmdparams[4]);
+                centerX = Convert.ToSingle(cmdparams[4]);
+            if (cmdparams.Length > 5)
+                centerY = Convert.ToSingle(cmdparams[5]);
 
             var center = new Vector3(centerX, centerY, 0.0f);
             ISceneEntity[] entitlList = scene.Entities.GetEntities ();
@@ -1651,23 +1678,23 @@ namespace WhiteCore.Region
         /// <param name="cmdparams">Cmdparams.</param>
         private void HandleScaleScene(IScene scene, string[] cmdparams)
         {
-            string usage = "Usage: scale region <factor>";
+            string usage = "Usage: scale region objects <factor>";
 
-            if (cmdparams.Length < 3)
+            if (cmdparams.Length < 4)
             {
                 MainConsole.Instance.Info(usage);
                 return;
             }
 
-            float factor = Convert.ToSingle(cmdparams[2]);
+            float factor = Convert.ToSingle(cmdparams[3]);
             var centerX = scene.RegionInfo.RegionSizeX * 0.5f;
             var centerY = scene.RegionInfo.RegionSizeY * 0.5f;
 
             // center supplied?
-            if (cmdparams.Length > 3)
-                centerX = Convert.ToSingle(cmdparams[3]);
             if (cmdparams.Length > 4)
-                centerY = Convert.ToSingle(cmdparams[4]);
+                centerX = Convert.ToSingle(cmdparams[4]);
+            if (cmdparams.Length > 5)
+                centerY = Convert.ToSingle(cmdparams[5]);
 
             var center = new Vector3(centerX, centerY, 0.0f);
             ITerrainChannel heightmap = scene.RequestModuleInterface<ITerrainChannel>();
@@ -1714,15 +1741,15 @@ namespace WhiteCore.Region
         /// <param name="cmdparams">Cmdparams.</param>
         private void HandleTranslateScene(IScene scene, string[] cmdparams)
         {
-             if (cmdparams.Length < 5)
+             if (cmdparams.Length < 6)
             {
-                MainConsole.Instance.Info("Usage: translate scene <xOffset> <yOffset> <zOffset>");
+                MainConsole.Instance.Info("Usage: translate scene objects <xOffset> <yOffset> <zOffset>");
                 return;
             }
 
-            var xOffset = Convert.ToSingle(cmdparams[2]);
-            var yOffset = Convert.ToSingle(cmdparams[3]);
-            var zOffset = Convert.ToSingle(cmdparams[4]);
+            var xOffset = Convert.ToSingle(cmdparams[3]);
+            var yOffset = Convert.ToSingle(cmdparams[4]);
+            var zOffset = Convert.ToSingle(cmdparams[5]);
 
             var offset = new Vector3(xOffset, yOffset, zOffset);
             ISceneEntity[] entitlList = scene.Entities.GetEntities ();
@@ -1918,6 +1945,116 @@ namespace WhiteCore.Region
                 StartRegion (m_selectedDataService, region);
                 MainConsole.Instance.WarnFormat ("[SceneManager]: {0} has been reloaded from the backup", regionName);
             }
+        }
+
+
+        /// <summary>
+        /// Handles set region capacity.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmd">Cmd.</param>
+        void HandleSetRegionCapacity(IScene scene, string[] cmd)
+        {
+            int regionCapacity = scene.RegionInfo.ObjectCapacity;
+            int newCapacity;
+            string regionName = scene.RegionInfo.RegionName;
+
+            if (cmd.Length < 4)
+            {
+                var response = MainConsole.Instance.Prompt ("[SceneManager]: New prim capacity for " + regionName + "(-1 to cancel)", regionCapacity.ToString());
+                int.TryParse (response, out newCapacity);
+                if (newCapacity == -1)
+                    return;
+
+            } else
+                int.TryParse( cmd[3], out newCapacity );
+
+            bool setCapacity = true;
+            if (newCapacity == 0)
+            {
+                var response = MainConsole.Instance.Prompt ("Set region prims to zero. Are you sure? (yes/no)", "no");
+                setCapacity = response.ToLower ().StartsWith ("y");
+            }
+
+            if (setCapacity)
+            {
+                scene.RegionInfo.ObjectCapacity = newCapacity;
+                MainConsole.Instance.InfoFormat("[SceneManager]: New prim capacity for {0} set to {1}", regionName, newCapacity); 
+                scene.SimulationDataService.ForceBackup();
+            }
+        }
+
+        /// <summary>
+        /// Handles set region startup.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmd">Cmd.</param>
+        void HandleSetRegionStartup(IScene scene, string[] cmd)
+        {
+
+            string regionName = scene.RegionInfo.RegionName;
+            string response = "No";
+
+            if (cmd.Length < 4)
+                response = MainConsole.Instance.Prompt ("[SceneManager]: Delay " + regionName + " script startup? (yes/no)", response);
+            else
+                response = cmd [3];
+
+            response = response.ToLower ();
+            scene.RegionInfo.Startup = response.StartsWith ("n") ? StartupType.Normal : StartupType.Medium;
+
+            MainConsole.Instance.InfoFormat("[SceneManager]: Region has been set for {0} script startup.",
+                (scene.RegionInfo.Startup == StartupType.Normal) ? "Normal": "Delayed"); 
+            scene.SimulationDataService.ForceBackup();
+        }
+
+
+        /// <summary>
+        /// Handles set region infinite.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmd">Cmd.</param>
+        void HandleSetRegionInfinite(IScene scene, string[] cmd)
+        {
+            string regionName = scene.RegionInfo.RegionName;
+            string response = "No";
+
+            if (cmd.Length < 4)
+                response = MainConsole.Instance.Prompt ("[SceneManager]: Set " + regionName + " as infinite? (yes/no)", response);
+            else
+                response = cmd [3];
+
+            response = response.ToLower ();
+            scene.RegionInfo.InfiniteRegion = response.StartsWith ("y");
+
+            MainConsole.Instance.Info("[SceneManager]: Region has been set as " +
+                (scene.RegionInfo.InfiniteRegion ? "Infinite": "Finite")); 
+
+            scene.SimulationDataService.ForceBackup();
+        }
+
+        /// <summary>
+        /// Handles set region neighbour visibility.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmd">Cmd.</param>
+        void HandleSetRegionVisibility(IScene scene, string[] cmd)
+        {
+            string regionName = scene.RegionInfo.RegionName;
+            string response = "Yes";
+
+            if (cmd.Length < 4)
+                response = MainConsole.Instance.Prompt ("[SceneManager]: Allow neighbours to see into " + regionName + "(yes/no)", response);
+            else
+                response = cmd [3];
+
+            response = response.ToLower ();
+            scene.RegionInfo.SeeIntoThisSimFromNeighbor = response.StartsWith ("y");
+
+            MainConsole.Instance.InfoFormat("[SceneManager]: Region has been set to {0} visibility from neighbours.",
+                scene.RegionInfo.SeeIntoThisSimFromNeighbor ? " Allow": "Disallow"); 
+
+            scene.SimulationDataService.ForceBackup();
         }
 
         #endregion
