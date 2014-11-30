@@ -354,7 +354,10 @@ namespace WhiteCore.Modules.Web
                 webInterface.Registry.RequestModuleInterface<ISimulationBase>().ConfigSource.Configs["LoginService"];
             string tosLocation = "";
             if (loginServerConfig != null && loginServerConfig.GetBoolean("UseTermsOfServiceOnFirstLogin", false))
+            {
                 tosLocation = loginServerConfig.GetString("FileNameOfTOS", "");
+                tosLocation = PathHelpers.VerifyReadFile (tosLocation,  ".txt", Constants.DEFAULT_DATA_DIR);
+            }
             string ToS = "There are no Terms of Service currently. This may be changed at any point in the future.";
 
             if (tosLocation != "")
