@@ -188,13 +188,13 @@ namespace WhiteCore.Modules.Chat
             module.RegisterChatPlugin("all", this);
 
             // load web settings overrides (if any)
-            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
-            if (generics != null)
-            {
-                var settings = generics.GetGeneric<WhiteCore.Modules.Web.GridSettings> (UUID.Zero, "GridSettings", "Settings");
-                if (settings != null)
-                    WelcomeMessage = settings.WelcomeMessage;
-            }
+            //IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
+            //if (generics != null)
+            //{
+            //    var settings = generics.GetGeneric<WhiteCore.Modules.Web.GridSettings> (UUID.Zero, "GridSettings", "Settings");
+            //    if (settings != null)
+            //        WelcomeMessage = settings.WelcomeMessage;
+            //}
         }
 
         public bool OnNewChatMessageFromWorld(OSChatMessage c, out OSChatMessage newc)
