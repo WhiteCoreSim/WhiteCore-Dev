@@ -34,6 +34,8 @@ using Nini.Config;
 using System;
 using System.Collections;
 using System.IO;
+using WhiteCore.Framework.Utilities;
+using WhiteCore.Framework.Servers;
 
 namespace WhiteCore.Services
 {
@@ -56,6 +58,26 @@ namespace WhiteCore.Services
             {
                 m_UseTOS = loginServerConfig.GetBoolean("UseTermsOfServiceOnFirstLogin", false);
                 m_TOSLocation = loginServerConfig.GetString("FileNameOfTOS", "");
+
+                if (m_TOSLocation.Length > 0)
+                {
+                    // html appears to be broken
+                    if ( m_TOSLocation.ToLower().StartsWith("http://"))
+                        m_TOSLocation = m_TOSLocation.Replace("ServersHostname", MainServer.Instance.HostName);
+                    else
+                    {
+                        var TOSFileName = PathHelpers.VerifyReadFile (m_TOSLocation,  ".txt", Constants.DEFAULT_DATA_DIR);
+                        if (TOSFileName == "")
+                        {
+                            m_UseTOS = false;
+                            MainConsole.Instance.ErrorFormat ("Unable to locate the Terms of Service file : '{0}'", m_TOSLocation);
+                            MainConsole.Instance.Error (" Show 'Terms of Service' for a new user login is disabled!"); 
+                        } else
+                            m_TOSLocation = TOSFileName;
+                    }
+                } else
+                    m_UseTOS = false;
+
             }
             m_AuthenticationService = registry.RequestModuleInterface<IAuthenticationService>();
             m_LoginService = service;
@@ -88,9 +110,11 @@ namespace WhiteCore.Services
             }
 
             // TODO: Some TPV's now send their version in the Channel
+            /*
             string channel = "Unknown";
             if (request.Contains("channel") && request["channel"] != null)
                 channel = request["channel"].ToString();
+            */
 
             bool AcceptedNewTOS = false;
             //This gets if the viewer has accepted the new TOS
@@ -112,7 +136,12 @@ namespace WhiteCore.Services
             if (!AcceptedNewTOS && !agentInfo.AcceptTOS && m_UseTOS)
             {
                 data = "TOS not accepted";
-                return new LLFailedLoginResponse(LoginResponseEnum.ToSNeedsSent, File.ReadAllText(Path.Combine(Environment.CurrentDirectory, m_TOSLocation)), false);
+                if (m_TOSLocation.ToLower().StartsWith("http://"))
+                    return new LLFailedLoginResponse(LoginResponseEnum.ToSNeedsSent, m_TOSLocation, false);
+
+                // text file
+                var ToSText = File.ReadAllText (Path.Combine (Environment.CurrentDirectory, m_TOSLocation));
+                return new LLFailedLoginResponse(LoginResponseEnum.ToSNeedsSent, ToSText, false);
             }
             if ((agentInfo.Flags & IAgentFlags.PermBan) == IAgentFlags.PermBan)
             {

@@ -36,6 +36,7 @@ using System.Collections.Generic;
 using System.IO;
 using GridRegion = WhiteCore.Framework.Services.GridRegion;
 using RegionFlags = WhiteCore.Framework.Services.RegionFlags;
+using Nini.Config;
 
 
 namespace WhiteCore.Modules.Web
@@ -164,7 +165,11 @@ namespace WhiteCore.Modules.Web
                 vars.Add("RegionImageURL", regionMapURL);
 
                 // worldview
-                if (webTextureService != null && regionIsOnline)
+                IConfig worldViewConfig =
+                    webInterface.Registry.RequestModuleInterface<ISimulationBase>().ConfigSource.Configs["WorldViewModule"];
+                var worldViewEnabled = worldViewConfig.GetBoolean ("Enabled", true);
+
+                if (webTextureService != null && worldViewEnabled && regionIsOnline)
                     vars.Add("RegionWorldViewURL", webTextureService.GetRegionWorldViewURL(region.RegionID));
                 else
                     vars.Add("RegionWorldViewURL", regionMapURL);
