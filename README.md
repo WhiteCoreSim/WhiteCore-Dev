@@ -1,7 +1,10 @@
 # WhiteCore Sim
 
 *NOTE:
- As of Version 0.9.3, it's advised to Linux users to use a Mono version higher then 3.2.8, following a report about  GC.Collect() not cleaning up memory correctly. The most current version of Mono is 3.10 (Released 4th November 2014)*
+ As of today, we have included BulletSim into the repository as a second Physics Engine. Please try it out and tell us if it's working properly*
+
+*NOTE:
+ As of Version 0.9.3, it's advised to Linux users to use a Mono version higher then 3.2.8, following a report about GC.Collect() not cleaning up memory correctly. The most current version of Mono is 3.10 (Released 4th November 2014)*
 
  More information can be found here: http://www.mono-project.com/docs/getting-started/install/linux/
 
