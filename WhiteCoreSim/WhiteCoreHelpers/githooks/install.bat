@@ -1,0 +1,1 @@
+copy post-merge ..\..\.git\hooks

@@ -1,0 +1,4 @@
+#!/bin/sh
+
+git log --pretty=format:"WhiteCore 0.9.3 Dev (%cd.%h)" --date=short -n 1 > WhiteCoreSim/bin/.version
+
