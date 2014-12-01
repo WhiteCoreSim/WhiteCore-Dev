@@ -283,12 +283,12 @@
     <Project frameworkVersion="v4_5" name="WhiteCore.Physics.ConvexDecompositionDotNet" path="WhiteCore/Physics/ConvexDecompositionDotNet" type="Library">
       <Configuration name="Debug">
         <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
+          <OutputPath>../../../WhiteCoreSim/bin/Physics/</OutputPath>
         </Options>
       </Configuration>
       <Configuration name="Release">
         <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
+          <OutputPath>../../../WhiteCoreSim/bin/Physics/</OutputPath>
         </Options>
       </Configuration>
 
