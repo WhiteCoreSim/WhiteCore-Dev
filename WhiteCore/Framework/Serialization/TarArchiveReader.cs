@@ -36,8 +36,6 @@ namespace WhiteCore.Framework.Serialization
     /// </summary>
     public class TarArchiveReader
     {
-        //private static readonly ILog MainConsole.Instance = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         #region TarEntryType enum
 
         public enum TarEntryType

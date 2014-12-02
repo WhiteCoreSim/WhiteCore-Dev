@@ -44,8 +44,6 @@ namespace WhiteCore.Modules.Entities.PhysicsMaterials
 {
     public class PhysicsMaterialsModule : INonSharedRegionModule
     {
-        //private static readonly ILog MainConsole.Instance =
-        //    LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private IScene m_scene;
 
         #region INonSharedRegionModule Members

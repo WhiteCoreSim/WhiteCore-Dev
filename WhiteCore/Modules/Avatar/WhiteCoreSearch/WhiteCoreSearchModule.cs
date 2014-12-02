@@ -48,7 +48,6 @@ namespace WhiteCore.Modules.Search
     {
         #region Declares
 
-        //private static readonly ILog MainConsole.Instance = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private IScene m_Scene;
         private IGroupsModule GroupsModule;
         private IProfileConnector ProfileFrontend;

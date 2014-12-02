@@ -44,8 +44,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
     /// </summary>
     public class AppDomainManager
     {
-        //private static readonly ILog MainConsole.Instance = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         private readonly List<AppDomainStructure> appDomains =
             new List<AppDomainStructure>();
 

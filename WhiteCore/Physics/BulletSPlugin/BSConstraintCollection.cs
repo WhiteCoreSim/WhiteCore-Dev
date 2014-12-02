@@ -32,9 +32,6 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 {
     public sealed class BSConstraintCollection : IDisposable
     {
-        // private static readonly ILog m_log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        // private static readonly string LogHeader = "[CONSTRAINT COLLECTION]";
-
         private delegate bool ConstraintAction(BSConstraint constrain);
 
         private List<BSConstraint> m_constraints;

@@ -37,8 +37,6 @@ namespace WhiteCore.Framework.Serialization
     /// </summary>
     public class TarArchiveWriter
     {
-//        private static readonly ILog MainConsole.Instance = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         protected static ASCIIEncoding m_asciiEncoding = new ASCIIEncoding();
         protected static UTF8Encoding m_utf8Encoding = new UTF8Encoding();
 

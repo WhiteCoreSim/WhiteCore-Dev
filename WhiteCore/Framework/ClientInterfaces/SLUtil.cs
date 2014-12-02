@@ -268,8 +268,6 @@ namespace WhiteCore.Framework.ClientInterfaces
 
         #endregion SL / file extension / content-type conversions
 
-//        private static readonly ILog MainConsole.Instance = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         /// <summary>
         ///     Parse a notecard in Linden format to a string of ordinary text.
         /// </summary>

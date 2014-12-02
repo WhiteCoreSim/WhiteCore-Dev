@@ -46,8 +46,6 @@ namespace WhiteCore.Modules.SetHome
 {
     public class SetHomeModule : INonSharedRegionModule
     {
-        //private static readonly ILog MainConsole.Instance =
-        //    LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private IScene m_scene;
 
         #region INonSharedRegionModule Members

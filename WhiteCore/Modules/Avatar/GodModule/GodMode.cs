@@ -43,8 +43,7 @@ namespace WhiteCore.Modules.Gods
     public class GodModifiers : INonSharedRegionModule
     {
         #region Declares 
-
-        //private static readonly ILog MainConsole.Instance = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        
         private bool m_Enabled = true;
         private string m_savestate_oar_directory = "";
 

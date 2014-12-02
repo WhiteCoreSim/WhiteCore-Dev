@@ -89,9 +89,6 @@ namespace WhiteCore.Modules.Scripting
 {
     public class WorldCommModule : INonSharedRegionModule, IWorldComm
     {
-        // private static readonly ILog MainConsole.Instance =
-        //     LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         protected static Vector3 CenterOfRegion = new Vector3(128, 128, 20);
         private readonly List<int> BlockedChannels = new List<int>();
         private ListenerManager m_listenerManager;

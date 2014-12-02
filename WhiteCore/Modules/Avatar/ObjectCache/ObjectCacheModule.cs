@@ -43,8 +43,6 @@ namespace WhiteCore.Modules.ObjectCache
     {
         #region Declares
 
-        //private static readonly ILog MainConsole.Instance = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         private readonly Dictionary<UUID, Dictionary<uint, uint>> ObjectCacheAgents =
             new Dictionary<UUID, Dictionary<uint, uint>>();
 
