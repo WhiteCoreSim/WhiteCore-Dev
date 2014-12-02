@@ -28,7 +28,6 @@
 using System;
 using System.Collections.Generic;
 using OMV = OpenMetaverse;
-using WhiteCore.Framework.ConsoleFramework;
 
 namespace WhiteCore.Region.Physics.BulletSPlugin
 {

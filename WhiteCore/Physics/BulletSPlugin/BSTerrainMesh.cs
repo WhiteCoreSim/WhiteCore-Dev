@@ -28,7 +28,6 @@
 using System;
 using OpenMetaverse;
 
-
 namespace WhiteCore.Region.Physics.BulletSPlugin
 {
     public sealed class BSTerrainMesh : BSTerrainPhys

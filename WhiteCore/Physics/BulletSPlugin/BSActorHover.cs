@@ -28,9 +28,7 @@
 // Hover isn't implemented in BulletSim 2.80
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using OMV = OpenMetaverse;
 
 namespace WhiteCore.Region.Physics.BulletSPlugin

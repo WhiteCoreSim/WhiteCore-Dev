@@ -33,7 +33,6 @@ using BulletXNA;
 using BulletXNA.LinearMath;
 using BulletXNA.BulletCollision;
 using BulletXNA.BulletDynamics;
-//using BulletXNA.BulletCollision.CollisionDispatch;
 using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Region.Physics.BulletSPlugin
