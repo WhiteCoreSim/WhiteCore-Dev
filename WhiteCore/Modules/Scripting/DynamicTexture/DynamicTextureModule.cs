@@ -44,8 +44,6 @@ namespace WhiteCore.Modules.Scripting
 {
     public class DynamicTextureModule : INonSharedRegionModule, IDynamicTextureManager
     {
-        //private static readonly ILog MainConsole.Instance = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         private const int ALL_SIDES = -1;
 
         public const int DISP_EXPIRE = 1;

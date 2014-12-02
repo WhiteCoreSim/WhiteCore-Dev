@@ -44,8 +44,6 @@ namespace WhiteCore.Modules.Entities.BuySell
 {
     public class BuySellModule : IBuySellModule, INonSharedRegionModule
     {
-//        private static readonly ILog MainConsole.Instance = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         protected IDialogModule m_dialogModule;
         protected IScene m_scene;
 

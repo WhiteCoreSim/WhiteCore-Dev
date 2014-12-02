@@ -36,8 +36,6 @@ namespace WhiteCore.Framework.Servers.HttpServer
 {
     public class PollServiceRequestManager
     {
-        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         private static Queue m_requests = Queue.Synchronized(new Queue());
         private uint m_WorkerThreadCount = 0;
         private Thread[] m_workerThreads;

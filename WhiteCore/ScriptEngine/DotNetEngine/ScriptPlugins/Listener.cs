@@ -36,8 +36,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Plugins
 {
     public class ListenerPlugin : IScriptPlugin
     {
-        // private static readonly ILog MainConsole.Instance = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
         private readonly List<IWorldComm> m_modules = new List<IWorldComm>();
         public ScriptEngine m_ScriptEngine;
 

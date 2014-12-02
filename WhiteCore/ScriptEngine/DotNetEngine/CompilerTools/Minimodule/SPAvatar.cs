@@ -42,7 +42,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
         private readonly UUID m_ID;
         private readonly IScene m_rootScene;
         private readonly ISecurityCredential m_security;
-        //private static readonly ILog MainConsole.Instance = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public SPAvatar(IScene scene, UUID ID, ISecurityCredential security)
         {

@@ -36,8 +36,6 @@ namespace WhiteCore.Modules.Estate
 {
     public class EstateTerrainXferHandler
     {
-        //private static readonly ILog MainConsole.Instance = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         #region Delegates
 
         public delegate void TerrainUploadComplete(string name, byte[] filedata, IClientAPI remoteClient);

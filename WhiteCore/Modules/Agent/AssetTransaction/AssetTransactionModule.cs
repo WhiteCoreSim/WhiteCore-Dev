@@ -39,8 +39,6 @@ namespace WhiteCore.Modules.Agent.AssetTransaction
 {
     public class AssetTransactionModule : INonSharedRegionModule, IAgentAssetTransactions
     {
-//        private static readonly ILog MainConsole.Instance = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         /// <summary>
         ///     Each agent has its own singleton collection of transactions
         /// </summary>

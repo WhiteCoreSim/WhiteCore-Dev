@@ -42,8 +42,6 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
     /// </summary>
     public class WhiteCoreODEPlugin : IPhysicsPlugin
     {
-        //private static readonly log4net.ILog MainConsole.Instance = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
         private static bool m_initialized;
         private WhiteCoreODEPhysicsScene _mScene;
         private static object m_lock = new object();

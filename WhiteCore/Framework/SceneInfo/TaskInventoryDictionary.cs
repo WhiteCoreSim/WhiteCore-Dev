@@ -45,8 +45,6 @@ namespace WhiteCore.Framework.SceneInfo
     public class TaskInventoryDictionary : Dictionary<UUID, TaskInventoryItem>,
                                            ICloneable, IXmlSerializable
     {
-        // private static readonly ILog MainConsole.Instance = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         private static readonly XmlSerializer tiiSerializer = new XmlSerializer(typeof (TaskInventoryItem));
 
         #region ICloneable Members

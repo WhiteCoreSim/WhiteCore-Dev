@@ -34,8 +34,6 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Inventory
 {
     public sealed class InventoryFolderImpl : InventoryFolderBase
     {
-        //private static readonly ILog MainConsole.Instance = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         public static readonly string PATH_DELIMITER = "/";
 
         /// <summary>

@@ -33,7 +33,6 @@
 using System;
 using OpenMetaverse;
 using WhiteCore.Framework.Physics;
-using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Region.Physics.BulletSPlugin
 {

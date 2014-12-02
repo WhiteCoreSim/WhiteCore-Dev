@@ -97,8 +97,6 @@ namespace WhiteCore.Modules.AbuseReports
     /// </summary>
     public class AbuseReportsModule : INonSharedRegionModule
     {
-        //private static readonly ILog MainConsole.Instance = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         private IScene m_Scene;
         private bool m_enabled;
 

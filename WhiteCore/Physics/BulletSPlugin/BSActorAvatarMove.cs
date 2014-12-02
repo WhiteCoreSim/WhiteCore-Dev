@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using BulletXNA.BulletCollision;
 using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.Utilities;
 using System;
