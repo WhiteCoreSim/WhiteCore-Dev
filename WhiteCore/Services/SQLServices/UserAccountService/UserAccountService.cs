@@ -118,14 +118,6 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                         HandleCreateUser, false, true);
 
                     MainConsole.Instance.Commands.AddCommand(
-                        "add user",
-                        "add user [<first> [<last> [<pass> [<email>]]]] [--system] [--uuid]",
-                        "Add (Create) a new user.  If optional parameters are not supplied required details will be prompted\n"+
-                        "  --system : Enter user scope UUID\n"+
-                        "  --uuid : Enter a specific UUID for the user",
-                        HandleCreateUser, false, true);
-
-                    MainConsole.Instance.Commands.AddCommand(
                         "delete user",
                         "delete user  [<first> [<last>]] ",
                         "Deletes an existing user",
@@ -1256,7 +1248,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
         /// Handles the load users command.
         /// </summary>
         /// <param name="scene">Scene.</param>
-        /// <param name="cmdparams">Cmdparams.</param>
+        /// <param name="cmdParams">Cmdparams.</param>
         protected void HandleLoadUsers(IScene scene, string[] cmdParams)
         {
             string fileName = "users.csv";
@@ -1325,7 +1317,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
         /// Handles the save users command.
         /// </summary>
         /// <param name="scene">Scene.</param>
-        /// <param name="cmdparams">Cmdparams.</param>
+        /// <param name="cmdParams">Cmdparams.</param>
         protected void HandleSaveUsers(IScene scene, string[] cmdParams)
         {
             string fileName = "users.csv";
