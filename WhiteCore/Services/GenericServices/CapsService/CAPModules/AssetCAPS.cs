@@ -58,9 +58,9 @@ namespace WhiteCore.Services
         public const string DefaultFormat = "x-j2c";
         // TODO: Change this to a config option
         protected string REDIRECT_URL = null;
-        private string m_getTextureURI;
-        private string m_getMeshURI;
-        private string m_bakedTextureURI;
+        string m_getTextureURI;
+        string m_getMeshURI;
+        string m_bakedTextureURI;
 
         public string Name { get { return GetType().Name; } }
 
@@ -92,7 +92,7 @@ namespace WhiteCore.Services
 
         #region Get Texture
 
-        private byte[] ProcessGetTexture(string path, Stream request, OSHttpRequest httpRequest,
+        byte[] ProcessGetTexture(string path, Stream request, OSHttpRequest httpRequest,
                                          OSHttpResponse httpResponse)
         {
             //MainConsole.Instance.DebugFormat("[GETTEXTURE]: called in {0}", m_scene.RegionInfo.RegionName);
@@ -120,6 +120,7 @@ namespace WhiteCore.Services
                     if (formats.Length == 0)
                         formats = new[] {DefaultFormat}; // default
                 }
+
                 // OK, we have an array with preferred formats, possibly with only one entry
                 byte[] response;
                 foreach (string f in formats)
@@ -128,12 +129,10 @@ namespace WhiteCore.Services
                         return response;
                 }
             }
-            else
-            {
-                MainConsole.Instance.Warn("[GETTEXTURE]: Failed to parse a texture_id from GetTexture request: " +
-                                          httpRequest.Url);
-            }
 
+            // null or invalid UUID
+            MainConsole.Instance.Warn("[GETTEXTURE]: Failed to parse a texture_id from GetTexture request: " +
+                                          httpRequest.Url);
             httpResponse.StatusCode = (int) System.Net.HttpStatusCode.NotFound;
             return MainServer.BlankResponse;
         }
@@ -163,108 +162,116 @@ namespace WhiteCore.Services
 
                 if (texture != null)
                 {
-                    if (texture.Type != (sbyte) AssetType.Texture && texture.Type != (sbyte) AssetType.Unknown &&
-                        texture.Type != (sbyte) AssetType.Simstate)
+                    if (texture.Type != (sbyte) AssetType.Texture &&        // not actually a texture
+                        texture.Type != (sbyte) AssetType.Unknown &&        // .. but valid
+                        texture.Type != (sbyte) AssetType.Simstate)     
                     {
                         httpResponse.StatusCode = (int) System.Net.HttpStatusCode.NotFound;
                         response = MainServer.BlankResponse;
                         return true;
                     }
-                    WriteTextureData(httpRequest, httpResponse, texture, format);
+
+                    response = WriteTextureData(httpRequest, httpResponse, texture, format);
+                    return true;
                 }
                 else
                 {
-                    string textureUrl = REDIRECT_URL + textureID.ToString();
+                    string textureUrl = REDIRECT_URL + textureID;
                     MainConsole.Instance.Debug("[GETTEXTURE]: Redirecting texture request to " + textureUrl);
                     httpResponse.RedirectLocation = textureUrl;
                     response = MainServer.BlankResponse;
                     return true;
                 }
             }
-            else // no redirect
+
+            // no redirect
+            // try the cache
+            texture = m_assetService.GetCached(fullID);
+
+            if (texture == null)
             {
-                // try the cache
-                texture = m_assetService.GetCached(fullID);
+                //MainConsole.Instance.DebugFormat("[GETTEXTURE]: texture was not in the cache");
 
-                if (texture == null)
-                {
-                    //MainConsole.Instance.DebugFormat("[GETTEXTURE]: texture was not in the cache");
+                // Fetch locally or remotely. Misses return a 404
+                texture = m_assetService.Get(textureID.ToString());
 
-                    // Fetch locally or remotely. Misses return a 404
-                    texture = m_assetService.Get(textureID.ToString());
-
-					if (texture != null)
+                if (texture != null)
+				{
+					if (texture.Type != (sbyte)AssetType.Texture && 
+                        texture.Type != (sbyte)AssetType.Unknown &&
+                        texture.Type != (sbyte)AssetType.Simstate)
 					{
-						if (texture.Type != (sbyte)AssetType.Texture && texture.Type != (sbyte)AssetType.Unknown &&
-						                      texture.Type != (sbyte)AssetType.Simstate)
-						{
-							httpResponse.StatusCode = (int)System.Net.HttpStatusCode.NotFound;
-							response = MainServer.BlankResponse;
-							return true;
-						}
-						if (format == DefaultFormat)
-						{
-							response = WriteTextureData (httpRequest, httpResponse, texture, format);
-							texture = null;
-							return true;
-						}
-						AssetBase newTexture = new AssetBase (texture.ID + "-" + format, texture.Name, AssetType.Texture,
+					    httpResponse.StatusCode = (int)System.Net.HttpStatusCode.NotFound;
+						response = MainServer.BlankResponse;
+						return true;
+					}
+					
+                    if (format == DefaultFormat)
+					{
+						response = WriteTextureData (httpRequest, httpResponse, texture, format);
+						return true;
+					}
+					
+                    AssetBase newTexture = new AssetBase (texture.ID + "-" + format, texture.Name, AssetType.Texture,
 							                                         texture.CreatorID)
                                                    { Data = ConvertTextureData (texture, format) };
-						if (newTexture.Data.Length == 0)
-						{
-							response = MainServer.BlankResponse;
-							return false; // !!! Caller try another codec, please!
-						}
-
-						newTexture.Flags = AssetFlags.Collectable | AssetFlags.Temporary;
-						newTexture.ID = m_assetService.Store (newTexture);
-						response = WriteTextureData (httpRequest, httpResponse, newTexture, format);
-						newTexture = null;
-						return true;
-					} else
+					
+                    if (newTexture.Data.Length == 0)            // unable to convert
 					{
-						// nothing found... replace with the 'missing_texture" texture
-						// try the cache
-						texture = m_assetService.GetCached(MISSING_TEXTURE_ID);
-
-						if (texture == null)
-							texture = m_assetService.Get (MISSING_TEXTURE_ID);		// not in local cache...
-
-						if ((texture != null) && (format == DefaultFormat))
-						{
-							MainConsole.Instance.Warn("[GETTEXTURE]: Texture " + textureID + " replaced with default 'missing' texture");
-							response = WriteTextureData (httpRequest, httpResponse, texture, format);
-							texture = null;
-							return true;
-						}
+						response = MainServer.BlankResponse;
+						return false; // !!! Caller try another codec, please!
 					}
-                }
-                else // it was on the cache
+
+					newTexture.Flags = AssetFlags.Collectable | AssetFlags.Temporary;
+					newTexture.ID = m_assetService.Store (newTexture);
+					response = WriteTextureData (httpRequest, httpResponse, newTexture, format);
+					return true;
+				} 
+
+				// nothing found... replace with the 'missing_texture" texture
+				// try the cache first
+				texture = m_assetService.GetCached(MISSING_TEXTURE_ID);
+
+				if (texture == null)
+					texture = m_assetService.Get (MISSING_TEXTURE_ID);		// not in local cache...
+
+                if (texture != null)
                 {
-                    if (texture.Type != (sbyte) AssetType.Texture && texture.Type != (sbyte) AssetType.Unknown &&
-                        texture.Type != (sbyte) AssetType.Simstate)
+                    if (format == DefaultFormat)
                     {
-                        httpResponse.StatusCode = (int) System.Net.HttpStatusCode.NotFound;
-                        response = MainServer.BlankResponse;
+                        MainConsole.Instance.Debug ("[GETTEXTURE]: Texture " + textureID + " replaced with default 'missing' texture");
+                        response = WriteTextureData (httpRequest, httpResponse, texture, format);
                         return true;
                     }
-                    //MainConsole.Instance.DebugFormat("[GETTEXTURE]: texture was in the cache");
-                    response = WriteTextureData(httpRequest, httpResponse, texture, format);
-                    texture = null;
-                    return true;
                 }
+
+                // texture not found and we have no 'missing texture'??
+                // ... or if all else fails...
+                MainConsole.Instance.Warn("[GETTEXTURE]: Texture " + textureID + " not found (no default)");
+                httpResponse.StatusCode = (int) System.Net.HttpStatusCode.NotFound;
+                response = MainServer.BlankResponse;
+                return true;
 
             }
 
-            // not found
-            MainConsole.Instance.Warn("[GETTEXTURE]: Texture " + textureID + " not found");
-            httpResponse.StatusCode = (int) System.Net.HttpStatusCode.NotFound;
-            response = MainServer.BlankResponse;
+            // found the texture in th cache
+            if (texture.Type != (sbyte) AssetType.Texture &&
+                texture.Type != (sbyte) AssetType.Unknown &&
+                texture.Type != (sbyte) AssetType.Simstate)
+            {
+                httpResponse.StatusCode = (int) System.Net.HttpStatusCode.NotFound;
+                response = MainServer.BlankResponse;
+                return true;
+            }
+            
+            // the best result...
+            //MainConsole.Instance.DebugFormat("[GETTEXTURE]: texture was in the cache");
+            response = WriteTextureData(httpRequest, httpResponse, texture, format);
             return true;
+
         }
 
-        private byte[] WriteTextureData(OSHttpRequest request, OSHttpResponse response, AssetBase texture, string format)
+        byte[] WriteTextureData(OSHttpRequest request, OSHttpResponse response, AssetBase texture, string format)
         {
             string range = request.Headers.GetOne("Range");
             //MainConsole.Instance.DebugFormat("[GETTEXTURE]: Range {0}", range);
@@ -308,24 +315,22 @@ namespace WhiteCore.Services
                         return array;
                     }
                 }
-                else
-                {
-                    MainConsole.Instance.Warn("[GETTEXTURE]: Malformed Range header: " + range);
-                    response.StatusCode = (int) System.Net.HttpStatusCode.BadRequest;
-                    return MainServer.BlankResponse;
-                }
+               
+                MainConsole.Instance.Warn("[GETTEXTURE]: Malformed Range header: " + range);
+                response.StatusCode = (int) System.Net.HttpStatusCode.BadRequest;
+                return MainServer.BlankResponse;
+               
             }
-            else // JP2's or other formats
-            {
-                // Full content request
-                response.StatusCode = (int) System.Net.HttpStatusCode.OK;
+ 
+            // Full content request
+            response.StatusCode = (int) System.Net.HttpStatusCode.OK;
+            response.ContentType = texture.TypeString;
+            if (format == DefaultFormat)
                 response.ContentType = texture.TypeString;
-                if (format == DefaultFormat)
-                    response.ContentType = texture.TypeString;
-                else
-                    response.ContentType = "image/" + format;
-                return texture.Data;
-            }
+            else
+                response.ContentType = "image/" + format;
+            return texture.Data;
+
         }
 
 		/*
@@ -342,7 +347,7 @@ namespace WhiteCore.Services
      	 * <param name='start'>Undefined if the parse fails.</param>
      	 * <param name='end'>Undefined if the parse fails.</param>
      	*/
-		private bool TryParseRange(string header, out int start, out int end)
+		bool TryParseRange(string header, out int start, out int end)
         {
 			start = end = -1;
       		if (! header.StartsWith("bytes="))
@@ -367,7 +372,7 @@ namespace WhiteCore.Services
       		return true;
 		}
 
-        private byte[] ConvertTextureData(AssetBase texture, string format)
+        byte[] ConvertTextureData(AssetBase texture, string format)
         {
             MainConsole.Instance.DebugFormat("[GETTEXTURE]: Converting texture {0} to {1}", texture.ID, format);
             byte[] data = new byte[0];
@@ -410,17 +415,15 @@ namespace WhiteCore.Services
 
                 if (image != null)
                     image.Dispose();
-                image = null;
 
                 imgstream.Close();
-                imgstream = null;
             }
 
             return data;
         }
 
         // From msdn
-        private static ImageCodecInfo GetEncoderInfo(String mimeType)
+        static ImageCodecInfo GetEncoderInfo(String mimeType)
         {
             ImageCodecInfo[] encoders = ImageCodecInfo.GetImageEncoders();
             return encoders.FirstOrDefault(t => t.MimeType == mimeType);
@@ -464,9 +467,9 @@ namespace WhiteCore.Services
         public class BakedTextureUploader
         {
             public event UploadedBakedTexture OnUpLoad;
-            private UploadedBakedTexture handlerUpLoad = null;
+            UploadedBakedTexture handlerUpLoad = null;
 
-            private readonly string uploaderPath = String.Empty;
+            readonly string uploaderPath = String.Empty;
 
             public BakedTextureUploader(string path)
             {
@@ -533,45 +536,39 @@ namespace WhiteCore.Services
                         httpResponse.ContentType = "application/vnd.ll.mesh";
                         return mesh.Data;
                     }
-                        // Optionally add additional mesh types here
-                    else
-                    {
-                        httpResponse.StatusCode = 404; //501; //410; //404;
-                        httpResponse.ContentType = "text/plain";
-                        return Encoding.UTF8.GetBytes("Unfortunately, this asset isn't a mesh.");
-                    }
+
+                    // Optionally add additional mesh types here
+                    httpResponse.StatusCode = 404; //501; //410; //404;
+                    httpResponse.ContentType = "text/plain";
+                    return Encoding.UTF8.GetBytes("Unfortunately, this asset isn't a mesh.");
                 }
-                else
+          
+                // not in the cache
+                mesh = m_assetService.GetMesh(meshID.ToString());
+                if (mesh != null)
                 {
-                    mesh = m_assetService.GetMesh(meshID.ToString());
-                    if (mesh != null)
+                    if (mesh.Type == (SByte) AssetType.Mesh)
                     {
-                        if (mesh.Type == (SByte) AssetType.Mesh)
-                        {
-                            httpResponse.StatusCode = 200;
-                            httpResponse.ContentType = "application/vnd.ll.mesh";
-                            return mesh.Data;
-                        }
-                            // Optionally add additional mesh types here
-                        else
-                        {
-                            httpResponse.StatusCode = 404; //501; //410; //404;
-                            httpResponse.ContentType = "text/plain";
-                            return Encoding.UTF8.GetBytes("Unfortunately, this asset isn't a mesh.");
-                        }
+                        httpResponse.StatusCode = 200;
+                        httpResponse.ContentType = "application/vnd.ll.mesh";
+                        return mesh.Data;
                     }
 
-                    else
-                    {
-                        httpResponse.StatusCode = 404; //501; //410; //404;
-                        httpResponse.ContentType = "text/plain";
-                        return Encoding.UTF8.GetBytes("Your Mesh wasn't found.  Sorry!");
-                    }
+                    // Optionally add additional mesh types here
+                    httpResponse.StatusCode = 404; //501; //410; //404;
+                    httpResponse.ContentType = "text/plain";
+                    return Encoding.UTF8.GetBytes("Unfortunately, this asset isn't a mesh.");
                 }
+
+                // not found
+                httpResponse.StatusCode = 404; //501; //410; //404;
+                httpResponse.ContentType = "text/plain";
+                return Encoding.UTF8.GetBytes("Your Mesh wasn't found.  Sorry!");
             }
 
+            // null or not a UUID
             httpResponse.StatusCode = 404;
-            return Encoding.UTF8.GetBytes("Failed to find mesh");
+            return Encoding.UTF8.GetBytes("Invalid mesh");
         }
 
         #endregion
