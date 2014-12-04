@@ -75,17 +75,25 @@ namespace WhiteCore.Services.SQLServices.AssetService
             if (handlers != null)
                 doDatabaseCaching = handlers.GetBoolean("AssetHandlerUseCache", false);
 
-            if (MainConsole.Instance != null)
+            if (MainConsole.Instance != null && !DoRemoteCalls)
             {
-                MainConsole.Instance.Commands.AddCommand("show digest",
-                                                         "show digest <ID>",
-                                                         "Show asset digest", 
-                                                         HandleShowDigest, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "show digest",
+                    "show digest <ID>",
+                    "Show asset digest", 
+                    HandleShowDigest, false, true);
 
-                MainConsole.Instance.Commands.AddCommand("delete asset",
-                                                         "delete asset <ID>",
-                                                         "Delete asset from database", 
-                                                         HandleDeleteAsset, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "delete asset",
+                    "delete asset <ID>",
+                    "Delete asset from database", 
+                    HandleDeleteAsset, false, true);
+
+                MainConsole.Instance.Commands.AddCommand("get asset",
+                    "get asset <ID>",
+                    "Gets info about asset from database", 
+                    HandleGetAsset, false, true);
+
             }
 
             MainConsole.Instance.Debug("[ASSET SERVICE]: Local asset service enabled");
@@ -117,7 +125,13 @@ namespace WhiteCore.Services.SQLServices.AssetService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public virtual AssetBase Get(string id)
         {
-            if (id == UUID.Zero.ToString()) return null;
+            return Get (id, true);
+        }
+
+        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
+        public virtual AssetBase Get(string id, bool showWarnings)
+            {
+                if (id == UUID.Zero.ToString()) return null;
 
             IImprovedAssetCache cache = m_registry.RequestModuleInterface<IImprovedAssetCache>();
             if (doDatabaseCaching && cache != null)
@@ -135,7 +149,7 @@ namespace WhiteCore.Services.SQLServices.AssetService
                 return (AssetBase) remoteValue;
             }
 
-            AssetBase asset = m_database.GetAsset(UUID.Parse(id));
+            AssetBase asset = m_database.GetAsset(UUID.Parse(id),showWarnings);
             if (doDatabaseCaching && cache != null)
                 cache.Cache(id, asset);
             return asset;
@@ -245,7 +259,12 @@ namespace WhiteCore.Services.SQLServices.AssetService
 
         #region Console Commands
 
-        private void HandleShowDigest(IScene scene, string[] args)
+        /// <summary>
+        /// Handles the show digest command.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="args">Arguments.</param>
+        void HandleShowDigest(IScene scene, string[] args)
         {
             if (args.Length < 3)
             {
@@ -263,11 +282,11 @@ namespace WhiteCore.Services.SQLServices.AssetService
 
             int i;
 
-            MainConsole.Instance.Info(String.Format("Name: {0}", asset.Name));
-            MainConsole.Instance.Info(String.Format("Description: {0}", asset.Description));
-            MainConsole.Instance.Info(String.Format("Type: {0}", asset.TypeAsset));
-            MainConsole.Instance.Info(String.Format("Content-type: {0}", asset.TypeAsset.ToString()));
-            MainConsole.Instance.Info(String.Format("Flags: {0}", asset.Flags));
+            MainConsole.Instance.InfoFormat("Name: {0}", asset.Name);
+            MainConsole.Instance.InfoFormat("Description: {0}", asset.Description);
+            MainConsole.Instance.InfoFormat("Type: {0}", asset.TypeAsset);
+            MainConsole.Instance.InfoFormat("Content-type: {0}", asset.TypeAsset);
+            MainConsole.Instance.InfoFormat("Flags: {0}", asset.Flags);
 
             for (i = 0; i < 5; i++)
             {
@@ -286,7 +305,12 @@ namespace WhiteCore.Services.SQLServices.AssetService
             }
         }
 
-        private void HandleDeleteAsset(IScene scene, string[] args)
+        /// <summary>
+        /// Handles the delete asset commad.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="args">Arguments.</param>
+        void HandleDeleteAsset(IScene scene, string[] args)
         {
             if (args.Length < 3)
             {
@@ -306,6 +330,55 @@ namespace WhiteCore.Services.SQLServices.AssetService
 
             MainConsole.Instance.Info("Asset deleted");
         }
+
+        /// <summary>
+        /// Handles the get asset command.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="args">Arguments.</param>
+        void HandleGetAsset(IScene scene, string[] args)
+        {
+            if (args.Length < 3)
+            {
+                MainConsole.Instance.Info("Syntax: get asset <ID>");
+                return;
+            }
+
+            AssetBase asset = Get(args[2]);
+
+            if (asset == null || asset.Data.Length == 0)
+            {
+                MainConsole.Instance.Info("Asset not found");
+                return;
+            }
+
+            string creatorName = "Unknown";
+            if (asset.CreatorID == UUID.Zero)
+                creatorName = "System";
+            else
+            {
+                var accountService = m_registry.RequestModuleInterface<IUserAccountService> ();
+                if (accountService != null)
+                {
+                    var account = accountService.GetUserAccount (null, asset.CreatorID);
+                    if (account != null)
+                        creatorName = account.Name;
+                }
+            }
+
+            MainConsole.Instance.InfoFormat ("{0} - {1}",
+                asset.Name == "" ? "(No name)" : asset.Name,
+                asset.Description == "" ? "(No description)" : asset.Description
+            );
+
+            MainConsole.Instance.CleanInfoFormat (
+                "                  {0} created by {1} on {2}",
+                asset.AssetTypeInfo(),
+                creatorName,
+                asset.CreationDate.ToShortDateString()
+            );      
+        }
+
 
         #endregion
     }

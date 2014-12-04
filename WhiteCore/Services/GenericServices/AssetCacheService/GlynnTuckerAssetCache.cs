@@ -40,10 +40,10 @@ namespace WhiteCore.Services
     {
         #region Declares
 
-        private ICache m_Cache;
-        private uint m_DebugRate;
-        private ulong m_Hits;
-        private ulong m_Requests;
+        ICache m_Cache;
+        uint m_DebugRate;
+        ulong m_Hits;
+        ulong m_Requests;
 
         // Instrumentation
 

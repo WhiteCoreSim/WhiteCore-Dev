@@ -51,6 +51,14 @@ namespace WhiteCore.Framework.Services
         AssetBase Get(string id);
 
         /// <summary>
+        ///     Get an asset synchronously.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="showWarnings"></param>
+        /// <returns></returns>
+        AssetBase Get(string id, bool showWarnings);
+
+        /// <summary>
         ///     Get a mesh asset synchronously.
         /// </summary>
         /// <param name="id"></param>
@@ -121,6 +129,7 @@ namespace WhiteCore.Framework.Services
     public interface IAssetDataPlugin : IWhiteCoreDataPlugin
     {
         AssetBase GetAsset(UUID uuid);
+        AssetBase GetAsset(UUID uuid, bool showWarnings);
         AssetBase GetMeta(UUID uuid);
         UUID Store(AssetBase asset);
         bool StoreAsset(AssetBase asset);
