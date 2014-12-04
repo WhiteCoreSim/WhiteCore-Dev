@@ -172,6 +172,7 @@ namespace WhiteCore.Framework.Modules
         void FormatNoTime(Level level, string format, params object[] args);
         void Info(object message);
         void CleanInfo(object message);
+        void CleanInfoFormat(string format, params object[] args);
         void Ticker();
         void InfoFormat(string format, params object[] args);
         void Log(Level level, object message);

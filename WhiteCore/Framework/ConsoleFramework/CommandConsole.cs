@@ -43,7 +43,7 @@ namespace WhiteCore.Framework.ConsoleFramework
         /// <value>
         ///     Commands organized by keyword in a tree
         /// </value>
-        private readonly CommandSet tree = new CommandSet();
+        readonly CommandSet tree = new CommandSet();
 
         /// <summary>
         ///     Get help for the given help string
@@ -98,7 +98,7 @@ namespace WhiteCore.Framework.ConsoleFramework
         /// <summary>
         ///     Encapsulates a command that can be invoked from the console
         /// </summary>
-        private class CommandInfo
+        class CommandInfo
         {
             /// <summary>
             ///     The command for this commandinfo
@@ -135,13 +135,13 @@ namespace WhiteCore.Framework.ConsoleFramework
 
         #region Nested type: CommandSet
 
-        private class CommandSet
+        class CommandSet
         {
-            private readonly Dictionary<string, CommandInfo> commands = new Dictionary<string, CommandInfo>();
-            private readonly Dictionary<string, CommandSet> commandsets = new Dictionary<string, CommandSet>();
+            readonly Dictionary<string, CommandInfo> commands = new Dictionary<string, CommandInfo>();
+            readonly Dictionary<string, CommandSet> commandsets = new Dictionary<string, CommandSet>();
             public string Path = "";
-            private bool m_allowSubSets = true;
-            private string ourPath = "";
+            bool m_allowSubSets = true;
+            string ourPath = "";
 
             public void Initialize(string path, bool allowSubSets)
             {
@@ -341,7 +341,7 @@ namespace WhiteCore.Framework.ConsoleFramework
                 return new string[0];
             }
 
-            private List<IScene> GetScenes(CommandInfo cmd)
+            List<IScene> GetScenes(CommandInfo cmd)
             {
                 if (cmd.requiresAScene)
                 {
@@ -351,21 +351,21 @@ namespace WhiteCore.Framework.ConsoleFramework
                         {
                             if (MainConsole.Instance.ConsoleScenes.Count == 1)
                                 return new List<IScene> { MainConsole.Instance.ConsoleScenes [0] };
-                            else
-                            {
-                                MainConsole.Instance.Warn ("[Warning] This command requires a selected region");
-                                return new List<IScene> ();
-                            }
-                        } else
-                            return MainConsole.Instance.ConsoleScenes;
+ 
+                            MainConsole.Instance.Warn ("[Warning] This command requires a selected region");
+                            return new List<IScene> ();
+                        }
+
+                        return MainConsole.Instance.ConsoleScenes;
                     }
-                    else
-                        return new List<IScene> { MainConsole.Instance.ConsoleScene };
+
+                    return new List<IScene> { MainConsole.Instance.ConsoleScene };
                 }
+
                 if (MainConsole.Instance.ConsoleScene == null)
                     return cmd.fireOnceForAllScenes ? new List<IScene> { null } : MainConsole.Instance.ConsoleScenes;
-                else
-                    return new List<IScene> { MainConsole.Instance.ConsoleScene };
+
+                return new List<IScene> { MainConsole.Instance.ConsoleScene };
             }
 
             public string[] FindCommands(string[] command)
@@ -375,17 +375,14 @@ namespace WhiteCore.Framework.ConsoleFramework
                 {
                     string innerPath = string.Join(" ", command);
                     if (!_ConsoleIsCaseSensitive)
-                    {
                         innerPath = innerPath.ToLower();
-                    }
+
                     if (ourPath != "")
-                    {
                         innerPath = innerPath.Replace(ourPath, "");
-                    }
+
                     if (innerPath.StartsWith(" "))
-                    {
                         innerPath = innerPath.Remove(0, 1);
-                    }
+
                     string[] commandPath = innerPath.Split(new string[1] {" "}, StringSplitOptions.RemoveEmptyEntries);
                     if ((commandPath.Length == 1 || !m_allowSubSets))
                     {
@@ -402,9 +399,8 @@ namespace WhiteCore.Framework.ConsoleFramework
                                     cmdToExecute = commandPath[1];
                             }
                             if (!_ConsoleIsCaseSensitive)
-                            {
                                 cmdToExecute = cmdToExecute.ToLower();
-                            }
+
                             CommandSet downTheTree;
                             if (commandsets.TryGetValue(cmdToExecute, out downTheTree))
                             {
@@ -459,6 +455,7 @@ namespace WhiteCore.Framework.ConsoleFramework
             {
                 MainConsole.Instance.Debug("HTML mode: " + options.Contains("--html"));
                 List<string> help = new List<string>();
+
                 if (commandsets.Count != 0)
                 {
                     help.Add("");
@@ -705,7 +702,7 @@ namespace WhiteCore.Framework.ConsoleFramework
             return temp;
         }
 
-        private string InternalPrompt(string prompt, string defaultresponse, List<string> options)
+        string InternalPrompt(string prompt, string defaultresponse, List<string> options)
         {
             string ret = ReadLine(String.Format("{0}{2} [{1}]: ",
                                                 prompt,
@@ -916,6 +913,11 @@ namespace WhiteCore.Framework.ConsoleFramework
         public void CleanInfo(object message)
         {
             OutputNoTime(message.ToString(), Level.Info);
+        }
+
+        public void CleanInfoFormat(string format, params object[] args)
+        {
+            OutputNoTime(string.Format(format, args), Level.Error);
         }
 
         public void Ticker()

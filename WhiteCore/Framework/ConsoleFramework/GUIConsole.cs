@@ -58,9 +58,7 @@ namespace WhiteCore.Framework.ConsoleFramework
         {
             if (source.Configs["Console"] == null ||
                 source.Configs["Console"].GetString("Console", String.Empty) != Name)
-            {
                 return;
-            }
 
             baseOpenSim.ApplicationRegistry.RegisterModuleInterface<ICommandConsole>(this);
             MainConsole.Instance = this;
@@ -394,6 +392,11 @@ namespace WhiteCore.Framework.ConsoleFramework
         public void CleanInfo(object message)
         {
             OutputNoTime(message.ToString(), Level.Info);
+        }
+
+        public void CleanInfoFormat(string format, params object[] args)
+        {
+            OutputNoTime(string.Format(format, args), Level.Error);
         }
 
         public void Ticker()
