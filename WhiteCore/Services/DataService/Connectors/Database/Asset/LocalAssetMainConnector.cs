@@ -228,7 +228,7 @@ namespace WhiteCore.Services.DataService.Connectors.Database.Asset
             return Delete(id, false);
         }
 
-        private AssetBase GetAsset(UUID uuid, bool displaywarning)
+        public AssetBase GetAsset(UUID uuid, bool showWarnings)
         {
             DataReaderConnection dr = null;
             try
@@ -239,7 +239,7 @@ namespace WhiteCore.Services.DataService.Connectors.Database.Asset
                 {
                     return LoadAssetFromDataRead(dr.DataReader);
                 }
-                if (displaywarning && MainConsole.Instance != null)
+                if (showWarnings && MainConsole.Instance != null)
 					MainConsole.Instance.WarnFormat("[LocalAssetDatabase] GetAsset({0}) - Asset UUID(w) was not found.", uuid);
             }
             catch (Exception e)
