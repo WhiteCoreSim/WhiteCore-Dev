@@ -45,28 +45,28 @@ namespace WhiteCore.Modules.WorldMap.Warp3DMap
     {
         #region Constants
 
-        private static readonly UUID DIRT_DETAIL = new UUID("0bc58228-74a0-7e83-89bc-5c23464bcec5");
-        private static readonly UUID GRASS_DETAIL = new UUID("63338ede-0037-c4fd-855b-015d77112fc8");
-        private static readonly UUID MOUNTAIN_DETAIL = new UUID("303cd381-8560-7579-23f1-f0a880799740");
-        private static readonly UUID ROCK_DETAIL = new UUID("53a2f406-4895-1d13-d541-d2e3b86bc19c");
+        static readonly UUID DIRT_DETAIL = new UUID("0bc58228-74a0-7e83-89bc-5c23464bcec5");
+        static readonly UUID GRASS_DETAIL = new UUID("63338ede-0037-c4fd-855b-015d77112fc8");
+        static readonly UUID MOUNTAIN_DETAIL = new UUID("303cd381-8560-7579-23f1-f0a880799740");
+        static readonly UUID ROCK_DETAIL = new UUID("53a2f406-4895-1d13-d541-d2e3b86bc19c");
 
-        private static readonly UUID[] DEFAULT_TERRAIN_DETAIL = new[]
-                                                                    {
-                                                                        DIRT_DETAIL,
-                                                                        GRASS_DETAIL,
-                                                                        MOUNTAIN_DETAIL,
-                                                                        ROCK_DETAIL
-                                                                    };
+        static readonly UUID[] DEFAULT_TERRAIN_DETAIL = new[]
+                                                            {
+                                                                DIRT_DETAIL,
+                                                                GRASS_DETAIL,
+                                                                MOUNTAIN_DETAIL,
+                                                                ROCK_DETAIL
+                                                            };
 
-        private static readonly Color[] DEFAULT_TERRAIN_COLOR = new[]
-                                                                    {
-                                                                        Color.FromArgb(255, 164, 136, 117),
-                                                                        Color.FromArgb(255, 65, 87, 47),
-                                                                        Color.FromArgb(255, 157, 145, 131),
-                                                                        Color.FromArgb(255, 125, 128, 130)
-                                                                    };
+        static readonly Color[] DEFAULT_TERRAIN_COLOR = new[]
+                                                            {
+                                                                Color.FromArgb(255, 164, 136, 117),
+                                                                Color.FromArgb(255, 65, 87, 47),
+                                                                Color.FromArgb(255, 157, 145, 131),
+                                                                Color.FromArgb(255, 125, 128, 130)
+                                                            };
 
-        private static readonly UUID TERRAIN_CACHE_MAGIC = new UUID("2c0c7ef2-56be-4eb8-aacb-76712c535b4b");
+        static readonly UUID TERRAIN_CACHE_MAGIC = new UUID("2c0c7ef2-56be-4eb8-aacb-76712c535b4b");
 
         #endregion Constants
 
@@ -111,7 +111,8 @@ namespace WhiteCore.Modules.WorldMap.Warp3DMap
                     for (int i = 0; i < 4; i++)
                     {
                         UUID cacheID = UUID.Combine(TERRAIN_CACHE_MAGIC, textureIDs[i]);
-                        AssetBase asset = assetService.Get(cacheID.ToString());
+                        AssetBase asset = assetService.Get(cacheID.ToString(),false);           // ignore warnings here as the cached texture may not exist
+
                         if ((asset != null) && (asset.Data != null) && (asset.Data.Length != 0))
                         {
                             try
