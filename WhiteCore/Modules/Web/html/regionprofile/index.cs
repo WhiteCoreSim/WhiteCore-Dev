@@ -167,7 +167,9 @@ namespace WhiteCore.Modules.Web
                 // worldview
                 IConfig worldViewConfig =
                     webInterface.Registry.RequestModuleInterface<ISimulationBase>().ConfigSource.Configs["WorldViewModule"];
-                var worldViewEnabled = worldViewConfig.GetBoolean ("Enabled", true);
+                bool worldViewEnabled = false;
+                if (worldViewConfig != null)
+                    worldViewEnabled = worldViewConfig.GetBoolean ("Enabled", true);
 
                 if (webTextureService != null && worldViewEnabled && regionIsOnline)
                     vars.Add("RegionWorldViewURL", webTextureService.GetRegionWorldViewURL(region.RegionID));
