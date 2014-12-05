@@ -35,7 +35,7 @@ namespace WhiteCore.CoreApplicationPlugins.ServicesLoader
 {
     public class ServicesLoader : IApplicationPlugin
     {
-        private ISimulationBase m_openSim;
+        ISimulationBase m_simBase;
 
         #region IApplicationPlugin Members
 
@@ -43,9 +43,9 @@ namespace WhiteCore.CoreApplicationPlugins.ServicesLoader
         {
         }
 
-        public void Initialize(ISimulationBase openSim)
+        public void Initialize(ISimulationBase simBase)
         {
-            m_openSim = openSim;
+            m_simBase = simBase;
         }
 
         public void ReloadConfiguration(IConfigSource config)
@@ -58,7 +58,7 @@ namespace WhiteCore.CoreApplicationPlugins.ServicesLoader
 
         public void Start()
         {
-            IConfig handlerConfig = m_openSim.ConfigSource.Configs["ApplicationPlugins"];
+            IConfig handlerConfig = m_simBase.ConfigSource.Configs["ApplicationPlugins"];
             if (handlerConfig.GetString("ServicesLoader", "") != Name)
                 return;
 
@@ -67,7 +67,7 @@ namespace WhiteCore.CoreApplicationPlugins.ServicesLoader
             {
                 try
                 {
-                    connector.Initialize(m_openSim.ConfigSource, m_openSim.ApplicationRegistry);
+                    connector.Initialize(m_simBase.ConfigSource, m_simBase.ApplicationRegistry);
                 }
                 catch
                 {
@@ -77,7 +77,7 @@ namespace WhiteCore.CoreApplicationPlugins.ServicesLoader
             {
                 try
                 {
-                    connector.Start(m_openSim.ConfigSource, m_openSim.ApplicationRegistry);
+                    connector.Start(m_simBase.ConfigSource, m_simBase.ApplicationRegistry);
                 }
                 catch
                 {

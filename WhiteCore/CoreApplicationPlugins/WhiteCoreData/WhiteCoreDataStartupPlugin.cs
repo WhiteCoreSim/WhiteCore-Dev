@@ -40,10 +40,10 @@ namespace WhiteCore.CoreApplicationPlugins.WhiteCoreData
         {
         }
 
-        public void Initialize(ISimulationBase openSim)
+        public void Initialize(ISimulationBase simBase)
         {
             LocalDataService service = new LocalDataService();
-            service.Initialise(openSim.ConfigSource, openSim.ApplicationRegistry);
+            service.Initialise(simBase.ConfigSource, simBase.ApplicationRegistry);
         }
 
         public void PostInitialise()

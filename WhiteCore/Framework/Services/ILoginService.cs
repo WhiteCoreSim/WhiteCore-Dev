@@ -49,7 +49,7 @@ namespace WhiteCore.Framework.Services
         public static string OptionalUpdate = "optional"; //Informs the client that they have an optional update
 
         public static string PresenceIssue = "presence";
-        //Used by opensim to tell the viewer that the agent is already logged in
+        //Used by WhiteCore to tell the viewer that the agent is already logged in
 
         public static string OK = "true"; //Login went fine
         public static string Indeterminant = "indeterminate"; //Unknown exactly what this does

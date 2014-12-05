@@ -428,7 +428,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 NextCollisionOkTime = PhysicsScene.SimulationNowTime + SubscribedEventsMs;
 
                 // We are called if we previously had collisions. If there are no collisions
-                //   this time, send up one last empty event so OpenSim can sense collision end.
+                //   this time, send up one last empty event so WhiteCore can sense collision end.
                 if (CollisionCollection.Count == 0)
                 {
                     // If I have no collisions this time, remove me from the list of objects with collisions.

@@ -34,6 +34,7 @@ using WhiteCore.Framework.SceneInfo;
 using Nini.Config;
 using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.VisitorLogger
 {
@@ -59,6 +60,11 @@ namespace WhiteCore.Modules.VisitorLogger
             {
                 m_enabled = config.GetBoolean("Enabled", m_enabled);
                 m_fileName = config.GetString("FileName", m_fileName);
+
+                // verify path details
+                string filePath = Path.GetDirectoryName (m_fileName);
+                if (filePath == "")
+                    m_fileName = Path.Combine (Constants.DEFAULT_DATA_DIR, m_fileName);
             }
         }
 
@@ -93,7 +99,7 @@ namespace WhiteCore.Modules.VisitorLogger
             get { return null; }
         }
 
-        private void EventManager_OnClosingClient(IClientAPI client)
+        void EventManager_OnClosingClient(IClientAPI client)
         {
             string logPath = MainConsole.Instance.LogPath;
             IScenePresence presence;
@@ -123,7 +129,7 @@ namespace WhiteCore.Modules.VisitorLogger
             }
         }
 
-        private void OnMakeRootAgent(IScenePresence presence)
+        void OnMakeRootAgent(IScenePresence presence)
         {
             try
             {

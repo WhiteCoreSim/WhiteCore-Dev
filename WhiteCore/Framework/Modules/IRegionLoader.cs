@@ -55,8 +55,8 @@ namespace WhiteCore.Framework.Modules
         ///     Starts up the module and loads configuration
         /// </summary>
         /// <param name="configSource"></param>
-        /// <param name="openSim"></param>
-        void Initialise(IConfigSource configSource, ISimulationBase openSim);
+        /// <param name="simBase"></param>
+        void Initialise(IConfigSource configSource, ISimulationBase simBase);
 
         /// <summary>
         ///     Loads the region from all enabled plugins

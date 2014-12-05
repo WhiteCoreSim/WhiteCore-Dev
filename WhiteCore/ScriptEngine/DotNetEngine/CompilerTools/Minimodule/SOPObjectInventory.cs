@@ -36,13 +36,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
 {
     public class SOPObjectInventory : IObjectInventory
     {
-        private readonly TaskInventoryDictionary m_privateInventory;
+        readonly TaskInventoryDictionary m_privateInventory;
 
-        /// OpenSim's task inventory
-        private readonly Dictionary<UUID, IInventoryItem> m_publicInventory;
+        /// WhiteCore's task inventory
+        readonly Dictionary<UUID, IInventoryItem> m_publicInventory;
 
         /// MRM's inventory
-        private readonly IScene m_rootScene;
+        readonly IScene m_rootScene;
 
         public SOPObjectInventory(IScene rootScene, TaskInventoryDictionary taskInventory)
         {
@@ -75,7 +75,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
         ///     This will only convert those items which hasn't already been converted. ensuring that
         ///     no items are converted twice, and that any references already in use are maintained.
         /// </description>
-        private void SynchronizeDictionaries()
+        void SynchronizeDictionaries()
         {
             foreach (
                 TaskInventoryItem privateItem in
@@ -210,8 +210,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
                 IInventoryItem result;
                 if (TryGetValue(key, out result))
                     return result;
-                else
-                    throw new KeyNotFoundException("[MRM] The requrested item ID could not be found");
+
+                throw new KeyNotFoundException("[MRM] The requrested item ID could not be found");
             }
             set
             {

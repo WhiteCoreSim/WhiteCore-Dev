@@ -45,12 +45,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
     public class EventManager
     {
         //
-        // This class it the link between an event inside OpenSim and
+        // This class it the link between an event inside WhiteCore and
         // the corresponding event in a user script being executed.
         //
         // For example when an user touches an object then the
         // "scene.EventManager.OnObjectGrab" event is fired
-        // inside OpenSim.
+        // inside WhiteCore.
         // We hook up to this event and queue a touch_start in
         // the event queue with the proper LSL parameters.
         //

@@ -58,7 +58,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         public HashSet<BSPhysObject> ObjectsWithCollisions = new HashSet<BSPhysObject>();
         public HashSet<BSPhysObject> ObjectsWithNoMoreCollisions = new HashSet<BSPhysObject>();
         // Keep track of all the avatars so we can send them a collision event
-        //    every tick so OpenSim will update its animation.
+        //    every tick so WhiteCore will update its animation.
         private HashSet<BSPhysObject> m_avatars = new HashSet<BSPhysObject>();
 
         // let my minuions use my logger
@@ -123,7 +123,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         internal int m_maxUpdatesPerFrame;
         internal EntityProperties[] m_updateArray;
 
-        public const uint TERRAIN_ID = 0; // OpenSim senses terrain with a localID of zero
+        public const uint TERRAIN_ID = 0; // WhiteCore senses terrain with a localID of zero
         public const uint GROUNDPLANE_ID = 1;
         public const uint CHILDTERRAIN_ID = 2; // Terrain allocated based on our mega-prim childre start here
 
@@ -409,7 +409,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
             // TODO: Remove kludge someday.
             // We must generate a collision for avatars whether they collide or not.
-            // This is required by OpenSim to update avatar animations, etc.
+            // This is required by WhiteCore to update avatar animations, etc.
             lock (m_avatars)
                 m_avatars.Add(actor);
 

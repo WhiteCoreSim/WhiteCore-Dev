@@ -164,7 +164,7 @@ namespace WhiteCore.RedisServices.AssetService
                     return cachedAsset;
             }
 
-            object remoteValue = DoRemoteByURL("AssetServerURI", id);
+            object remoteValue = DoRemoteByURL("AssetServerURI", id, showWarnings);
             if (remoteValue != null || m_doRemoteOnly)
             {
                 if (doDatabaseCaching && cache != null)

@@ -46,6 +46,7 @@ WhiteCore.v12.suo
 WhiteCoreDocs/doxygen/
 
 WhiteCoreSim/Data/AssetCache/*
+WhiteCoreSim/Data/FileAssets/*
 WhiteCoreSim/Data/Region/*.sim
 WhiteCoreSim/Data/RegionBak/*.sim
 WhiteCoreSim/Data/SQLite/*.db
@@ -60,6 +61,7 @@ WhiteCoreSim/Data/AvatarArchives/*
 WhiteCoreSim/Data/UserArchives/*
 
 WhiteCoreSim/bin/*.log
+WhiteCoreSim/bin/.version
 WhiteCoreSim/bin/WhiteCore.exe
 WhiteCoreSim/bin/WhiteCore.*.exe
 WhitecoreSim/bin/WhiteCore.*.dll
@@ -77,7 +79,6 @@ WhiteCoreSim/bin/*/WhiteCore.*.dll
 #bin/*.manifest
 #bin/*.pdb
 #bin/*.sim
-#bin/.version
 #bin/addin-db-*
 #bin/assetcache
 #bin/WhiteCore.version

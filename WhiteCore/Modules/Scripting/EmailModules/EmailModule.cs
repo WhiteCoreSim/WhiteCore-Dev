@@ -52,28 +52,28 @@ namespace WhiteCore.Modules.Scripting
         //
         // Module vars
         //
-        private readonly Dictionary<UUID, DateTime> m_LastGetEmailCall = new Dictionary<UUID, DateTime>();
-        private readonly Dictionary<UUID, List<Email>> m_MailQueues = new Dictionary<UUID, List<Email>>();
+        readonly Dictionary<UUID, DateTime> m_LastGetEmailCall = new Dictionary<UUID, DateTime>();
+        readonly Dictionary<UUID, List<Email>> m_MailQueues = new Dictionary<UUID, List<Email>>();
 
-        private readonly TimeSpan m_QueueTimeout = new TimeSpan(2, 0, 0);
+        readonly TimeSpan m_QueueTimeout = new TimeSpan(2, 0, 0);
         // 2 hours without llGetNextEmail drops the queue
 
         // Scenes by Region Handle
 
 
-        private string SMTP_SERVER_HOSTNAME = string.Empty;
-        private string SMTP_SERVER_LOGIN = string.Empty;
-        private string SMTP_SERVER_PASSWORD = string.Empty;
-        private bool SMTP_SERVER_MONO_CERT = false;
-        private int SMTP_SERVER_PORT = 587;
-        private IConfigSource m_Config;
+        string SMTP_SERVER_HOSTNAME = string.Empty;
+        string SMTP_SERVER_LOGIN = string.Empty;
+        string SMTP_SERVER_PASSWORD = string.Empty;
+        bool SMTP_SERVER_MONO_CERT = false;
+        int SMTP_SERVER_PORT = 587;
+        IConfigSource m_Config;
 
-        private bool m_Enabled;
-        private string m_HostName = string.Empty;
-        private string m_InterObjectHostname = "lsl.whitecore.local";
-        private const int m_MaxQueueSize = 50; // maximum size of an object mail queue
-        private bool m_localOnly = true;
-        private int m_MaxEmailSize = 4096; // largest email allowed by default, as per lsl docs.
+        bool m_Enabled;
+        string m_HostName = string.Empty;
+        string m_InterObjectHostname = "lsl.whitecore.local";
+        const int m_MaxQueueSize = 50; // maximum size of an object mail queue
+        bool m_localOnly = true;
+        int m_MaxEmailSize = 4096; // largest email allowed by default, as per lsl docs.
 
         #region IEmailModule Members
 
@@ -147,7 +147,7 @@ namespace WhiteCore.Modules.Scripting
                                 string fromEmailAddress;
 
                                 if (scene != null && objectID != UUID.Zero)
-                                    fromEmailAddress = objectID.ToString () + "@" + m_HostName;
+                                    fromEmailAddress = objectID + "@" + m_HostName;
                                 else
                                     fromEmailAddress = "no-reply@" + m_HostName;
 
@@ -381,7 +381,7 @@ namespace WhiteCore.Modules.Scripting
             return null;
         }
 
-        private void GetRemoteEmails(UUID objectID, IScene scene)
+        void GetRemoteEmails(UUID objectID, IScene scene)
         {
             IEmailConnector conn = Framework.Utilities.DataManager.RequestPlugin<IEmailConnector>();
             List<Email> emails = conn.GetEmails(objectID);
@@ -432,13 +432,13 @@ namespace WhiteCore.Modules.Scripting
             }
         }
 
-        private bool IsLocal(UUID objectID, IScene scene)
+        bool IsLocal(UUID objectID, IScene scene)
         {
             string unused;
             return (findPrim(objectID, out unused, scene) != null);
         }
 
-        private ISceneChildEntity findPrim(UUID objectID, out string ObjectRegionName, IScene s)
+        ISceneChildEntity findPrim(UUID objectID, out string ObjectRegionName, IScene s)
         {
             ISceneChildEntity part = s.GetSceneObjectPart(objectID);
             if (part != null)
@@ -454,9 +454,9 @@ namespace WhiteCore.Modules.Scripting
             return null;
         }
 
-        private void resolveNamePositionRegionName(UUID objectID, out string ObjectName,
-                                                   out string ObjectAbsolutePosition, out string ObjectRegionName,
-                                                   IScene scene)
+        void resolveNamePositionRegionName(UUID objectID, out string ObjectName,
+                                           out string ObjectAbsolutePosition, out string ObjectRegionName,
+                                           IScene scene)
         {
             string m_ObjectRegionName;
             ISceneChildEntity part = findPrim(objectID, out m_ObjectRegionName, scene);
@@ -499,7 +499,6 @@ namespace WhiteCore.Modules.Scripting
                 m_Enabled = SMTPConfig.GetBoolean("enabled", true);
                 if (!m_Enabled)
                 {
-                    //MainConsole.Instance.InfoFormat("[SMTP] module disabled in configuration");
                     m_Enabled = false;
                     return;
                 }
@@ -514,7 +513,8 @@ namespace WhiteCore.Modules.Scripting
                 m_MaxEmailSize = SMTPConfig.GetInt("email_max_size", m_MaxEmailSize);
 
                 registry.RegisterModuleInterface<IEmailModule>(this);
-            }
+                MainConsole.Instance.InfoFormat("[SMTP] Email enabled for {0}", m_localOnly ? "Local only" : "Full service");
+                           }
             catch (Exception e)
             {
                 MainConsole.Instance.Error("[EMAIL] DefaultEmailModule not configured: " + e.Message);

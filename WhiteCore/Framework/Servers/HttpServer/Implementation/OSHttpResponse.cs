@@ -31,7 +31,7 @@ using System.Text;
 namespace WhiteCore.Framework.Servers.HttpServer.Implementation
 {
     /// <summary>
-    ///     OSHttpResponse is the OpenSim representation of an HTTP
+    ///     OSHttpResponse is the WhiteCore representation of an HTTP
     ///     response.
     /// </summary>
     public class OSHttpResponse

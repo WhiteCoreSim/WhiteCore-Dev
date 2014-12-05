@@ -1003,7 +1003,7 @@ namespace WhiteCore.Framework.Utilities
         {
             string temp;
             //            string personal=(Environment.GetFolderPath(Environment.SpecialFolder.Personal));
-            //            temp = Path.Combine(personal,".OpenSim");
+            //            temp = Path.Combine(personal,".WhiteCore");
             temp = ".";
             return temp;
         }

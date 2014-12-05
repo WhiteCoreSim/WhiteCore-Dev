@@ -90,7 +90,7 @@ namespace WhiteCore.Framework.SceneInfo
     }
 
     // I don't really know where to put this except here.
-    // Can't access the OpenSim.Region.ScriptEngine.Common.LSL_BaseClass.Changed constants
+    // Can't access the ScriptEngine.Common.LSL_BaseClass.Changed constants
     [Flags]
     public enum ExtraParamType
     {
