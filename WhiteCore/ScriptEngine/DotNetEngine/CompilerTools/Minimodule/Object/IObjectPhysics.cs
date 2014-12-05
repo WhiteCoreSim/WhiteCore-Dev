@@ -30,7 +30,7 @@ using OpenMetaverse;
 namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
 {
     /// <summary>
-    ///     This implements an interface similar to that provided by physics engines to OpenSim internally.
+    ///     This implements an interface similar to that provided by physics engines to WhiteCore internally.
     ///     Eg, PhysicsActor. It is capable of setting and getting properties related to the current
     ///     physics scene representation of this object.
     /// </summary>

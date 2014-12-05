@@ -44,8 +44,8 @@ namespace WhiteCore.CoreApplicationPlugins.RegionModulesController
         // Config access
 
         // Our name
-        private const string m_name = "RegionModulesControllerPlugin";
-        private ISimulationBase m_openSim;
+        const string m_name = "RegionModulesControllerPlugin";
+        ISimulationBase m_simBase;
 
         #region IApplicationPlugin Members
 
@@ -104,7 +104,7 @@ namespace WhiteCore.CoreApplicationPlugins.RegionModulesController
                 //                  scene.RegionInfo.RegionName, module.Name);
 
                 // Initialise the module
-                module.Initialise(m_openSim.ConfigSource);
+                module.Initialise(m_simBase.ConfigSource);
 
                 IRegionModuleBaseModules.Add(module);
                 list.Add(module);
@@ -152,7 +152,7 @@ namespace WhiteCore.CoreApplicationPlugins.RegionModulesController
 
                 try
                 {
-                    module.Initialise(m_openSim.ConfigSource);
+                    module.Initialise(m_simBase.ConfigSource);
                 }
                 catch (Exception ex)
                 {
@@ -217,7 +217,7 @@ namespace WhiteCore.CoreApplicationPlugins.RegionModulesController
             RegionModules[scene].Clear();
         }
 
-        private void AddRegionModule(IScene scene, string p, IRegionModuleBase module)
+        void AddRegionModule(IScene scene, string p, IRegionModuleBase module)
         {
             if (!RegionModules.ContainsKey(scene))
                 RegionModules.Add(scene, new Dictionary<string, IRegionModuleBase>());
@@ -241,15 +241,15 @@ namespace WhiteCore.CoreApplicationPlugins.RegionModulesController
         {
         }
 
-        public void Initialize(ISimulationBase openSim)
+        public void Initialize(ISimulationBase simBase)
         {
-            m_openSim = openSim;
+            m_simBase = simBase;
 
-            IConfig handlerConfig = openSim.ConfigSource.Configs["ApplicationPlugins"];
+            IConfig handlerConfig = simBase.ConfigSource.Configs["ApplicationPlugins"];
             if (handlerConfig.GetString("RegionModulesControllerPlugin", "") != Name)
                 return;
 
-            m_openSim.ApplicationRegistry.RegisterModuleInterface<IRegionModulesController>(this);
+            m_simBase.ApplicationRegistry.RegisterModuleInterface<IRegionModulesController>(this);
         }
 
         public void ReloadConfiguration(IConfigSource config)

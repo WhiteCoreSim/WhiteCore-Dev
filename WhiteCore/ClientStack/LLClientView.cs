@@ -3843,7 +3843,7 @@ namespace WhiteCore.ClientStack
                 // Compressed and cached object updates only make sense for LL primitives
                 if (entity is ISceneChildEntity)
                 {
-                    // Please do not remove this unless you can demonstrate on the OpenSim mailing list that a client
+                    // Please do not remove this unless you can demonstrate on the mailing list that a client
                     // will never receive an update after a prim kill.  Even then, keeping the kill record may be a good
                     // safety measure.
                     //

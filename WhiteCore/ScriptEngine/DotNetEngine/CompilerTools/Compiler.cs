@@ -103,7 +103,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
             //Find the default compiler
             FindDefaultCompiler();
 
-            #if WDNE_DEBUG
+#if WDNE_DEBUG
             TestScripts();
         }
         

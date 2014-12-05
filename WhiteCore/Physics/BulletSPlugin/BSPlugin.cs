@@ -30,7 +30,7 @@ using WhiteCore.Framework.Physics;
 namespace WhiteCore.Region.Physics.BulletSPlugin
 {
     /// <summary>
-    /// Entry for a port of Bullet (http://bulletphysics.org/) to OpenSim.
+    /// Entry for a port of Bullet (http://bulletphysics.org/) to WhiteCore.
     /// This module interfaces to an unmanaged C++ library which makes the
     /// actual calls into the Bullet physics engine.
     /// The unmanaged library is found in opensim-libs::trunk/unmanaged/BulletSim/.

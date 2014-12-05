@@ -56,14 +56,14 @@ namespace WhiteCore.Simulation.Base
         /// <summary>
         ///     Loader of configuration files
         /// </summary>
-        private static readonly ConfigurationLoader m_configLoader = new ConfigurationLoader();
+        static readonly ConfigurationLoader m_configLoader = new ConfigurationLoader();
 
         /// <summary>
         ///     Directory to save crash reports to.  Relative to bin/
         /// </summary>
         public static string m_crashDir = "crashes";
 
-        private static bool _IsHandlingException; // Make sure we don't go recursive on ourself
+        static bool _IsHandlingException; // Make sure we don't go recursive on ourself
 
         //could move our main function into OpenSimMain and kill this class
         public static void BaseMain(string[] args, string defaultIniFile, ISimulationBase simBase)
@@ -81,12 +81,12 @@ namespace WhiteCore.Simulation.Base
             // Increase the number of IOCP threads available. Mono defaults to a tragically low number
             int workerThreads, iocpThreads;
             ThreadPool.GetMaxThreads(out workerThreads, out iocpThreads);
-            //MainConsole.Instance.InfoFormat("[OPENSIM MAIN]: Runtime gave us {0} worker threads and {1} IOCP threads", workerThreads, iocpThreads);
+            //MainConsole.Instance.InfoFormat("[WHiteCore MAIN]: Runtime gave us {0} worker threads and {1} IOCP threads", workerThreads, iocpThreads);
             if (workerThreads < 500 || iocpThreads < 1000)
             {
                 workerThreads = 500;
                 iocpThreads = 1000;
-                //MainConsole.Instance.Info("[OPENSIM MAIN]: Bumping up to 500 worker threads and 1000 IOCP threads");
+                //MainConsole.Instance.Info("[WHiteCore MAIN]: Bumping up to 500 worker threads and 1000 IOCP threads");
                 ThreadPool.SetMaxThreads(workerThreads, iocpThreads);
             }
 
@@ -472,14 +472,14 @@ namespace WhiteCore.Simulation.Base
             }
         }
 
-        private static void MakeSureExists(string file)
+        static void MakeSureExists(string file)
         {
             if (File.Exists(file))
                 File.Delete(file);
             File.Create(file).Close();
         }
 
-        private static string ReadLine(string log, string defaultReturn)
+        static string ReadLine(string log, string defaultReturn)
         {
             Console.WriteLine(log + ": [" + defaultReturn + "]");
             string mode = Console.ReadLine();
@@ -516,7 +516,7 @@ namespace WhiteCore.Simulation.Base
         /// <param name="configSource"></param>
         /// <param name="defaultIniFile"></param>
         /// <returns></returns>
-        private static IConfigSource Configuration(IConfigSource configSource, string defaultIniFile)
+        static IConfigSource Configuration(IConfigSource configSource, string defaultIniFile)
         {
             if (defaultIniFile != "")
                 m_configLoader.defaultIniFile = defaultIniFile;
@@ -528,7 +528,7 @@ namespace WhiteCore.Simulation.Base
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             if (_IsHandlingException)
                 return;
@@ -541,7 +541,7 @@ namespace WhiteCore.Simulation.Base
             _IsHandlingException = false;
         }
 
-        private static void UnhandledException(bool isTerminating, Exception ex)
+        static void UnhandledException(bool isTerminating, Exception ex)
         {
             string msg = String.Empty;
             msg += "\r\n";
@@ -662,18 +662,18 @@ namespace WhiteCore.Simulation.Base
         // Overload requiring MiniDumpExceptionInformation 
         [DllImport("dbghelp.dll", EntryPoint = "MiniDumpWriteDump", CallingConvention = CallingConvention.StdCall,
             CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
-        private static extern bool MiniDumpWriteDump(IntPtr hProcess, uint processId, SafeHandle hFile, uint dumpType,
+        static extern bool MiniDumpWriteDump(IntPtr hProcess, uint processId, SafeHandle hFile, uint dumpType,
                                                      ref MiniDumpExceptionInformation expParam, IntPtr userStreamParam,
                                                      IntPtr callbackParam);
 
         // Overload supporting MiniDumpExceptionInformation == NULL 
         [DllImport("dbghelp.dll", EntryPoint = "MiniDumpWriteDump", CallingConvention = CallingConvention.StdCall,
             CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
-        private static extern bool MiniDumpWriteDump(IntPtr hProcess, uint processId, SafeHandle hFile, uint dumpType,
+        static extern bool MiniDumpWriteDump(IntPtr hProcess, uint processId, SafeHandle hFile, uint dumpType,
                                                      IntPtr expParam, IntPtr userStreamParam, IntPtr callbackParam);
 
         [DllImport("kernel32.dll", EntryPoint = "GetCurrentThreadId", ExactSpelling = true)]
-        private static extern uint GetCurrentThreadId();
+        static extern uint GetCurrentThreadId();
 
         public static bool Write(SafeHandle fileHandle, Option options, ExceptionInfo exceptionInfo)
         {

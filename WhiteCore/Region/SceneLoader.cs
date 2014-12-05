@@ -37,8 +37,8 @@ namespace WhiteCore.Region
 {
     public class SceneLoader : ISceneLoader, IApplicationPlugin
     {
-        private IConfigSource m_configSource;
-        private ISimulationBase m_openSimBase;
+        IConfigSource m_configSource;
+        ISimulationBase m_simBase;
 
         #region IApplicationPlugin Members
 
@@ -46,17 +46,17 @@ namespace WhiteCore.Region
         {
         }
 
-        public void Initialize(ISimulationBase openSim)
+        public void Initialize(ISimulationBase simBase)
         {
-            m_openSimBase = openSim;
-            m_configSource = openSim.ConfigSource;
+            m_simBase = simBase;
+            m_configSource = simBase.ConfigSource;
 
             bool enabled = true;
-            if (m_openSimBase.ConfigSource.Configs["SceneLoader"] != null)
-                enabled = m_openSimBase.ConfigSource.Configs["SceneLoader"].GetBoolean("SceneLoader", true);
+            if (m_simBase.ConfigSource.Configs["SceneLoader"] != null)
+                enabled = m_simBase.ConfigSource.Configs["SceneLoader"].GetBoolean("SceneLoader", true);
 
             if (enabled)
-                m_openSimBase.ApplicationRegistry.RegisterModuleInterface<ISceneLoader>(this);
+                m_simBase.ApplicationRegistry.RegisterModuleInterface<ISceneLoader>(this);
         }
 
         public void PostInitialise()
@@ -105,7 +105,7 @@ namespace WhiteCore.Region
             }
 
             Scene scene = new Scene();
-            scene.AddModuleInterfaces(m_openSimBase.ApplicationRegistry.GetInterfaces());
+            scene.AddModuleInterfaces(m_simBase.ApplicationRegistry.GetInterfaces());
             scene.Initialize(regionInfo, dataStore, circuitManager, allClientServers);
 
             return scene;
