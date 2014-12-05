@@ -61,6 +61,7 @@ WhiteCoreSim/Data/AvatarArchives/*
 WhiteCoreSim/Data/UserArchives/*
 
 WhiteCoreSim/bin/*.log
+WhiteCoreSim/bin/.version
 WhiteCoreSim/bin/WhiteCore.exe
 WhiteCoreSim/bin/WhiteCore.*.exe
 WhitecoreSim/bin/WhiteCore.*.dll
@@ -78,7 +79,6 @@ WhiteCoreSim/bin/*/WhiteCore.*.dll
 #bin/*.manifest
 #bin/*.pdb
 #bin/*.sim
-#bin/.version
 #bin/addin-db-*
 #bin/assetcache
 #bin/WhiteCore.version
