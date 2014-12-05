@@ -735,7 +735,9 @@ namespace WhiteCore.Modules.Web
             args.Add(new Dictionary<string, object> {
                 {"Value", translator.GetTranslatedString("Openspace")}, {"Index","2"} });
             args.Add(new Dictionary<string, object> {
-                {"Value", translator.GetTranslatedString("Custom")}, {"Index","3"} });
+                {"Value", translator.GetTranslatedString("WhiteCore")}, {"Index","3"} });
+            args.Add(new Dictionary<string, object> {
+                {"Value", translator.GetTranslatedString("Custom")}, {"Index","4"} });
             return args;
         }
 

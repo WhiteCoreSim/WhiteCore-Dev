@@ -77,8 +77,15 @@ namespace WhiteCore.Modules.Web
             if (requestParameters.ContainsKey("Submit"))
             {
 
+                string RegionServerURL = requestParameters["RegionServerURL"].ToString();
+                // required
+                if (RegionServerURL == "")  {
+                    response = "<h3>" + translator.GetTranslatedString ("RegionServerURLError") + "</h3>";   
+                    return null;
+                }
+
                 string RegionName = requestParameters["RegionName"].ToString();
-                string OwnerUUID = requestParameters["OwnerUUID"].ToString();
+                //string OwnerUUID = requestParameters["OwnerUUID"].ToString();
                 string RegionLocX = requestParameters["RegionLocX"].ToString();
                 string RegionLocY = requestParameters["RegionLocY"].ToString();
                 string RegionSizeX = requestParameters["RegionSizeX"].ToString();
@@ -91,8 +98,8 @@ namespace WhiteCore.Modules.Web
                 string RegionLoadTerrain = requestParameters.ContainsKey("RegionLoadTerrain")
                     ? requestParameters["RegionLoadTerrain"].ToString()
                     : "";
-                bool ToSAccept = requestParameters.ContainsKey("ToSAccept") &&
-                    requestParameters["ToSAccept"].ToString() == "Accepted";
+                //bool ToSAccept = requestParameters.ContainsKey("ToSAccept") &&
+                //    requestParameters["ToSAccept"].ToString() == "Accepted";
 
                // string UserType = requestParameters.ContainsKey("UserType")         // only admins can set membership
                //     ? requestParameters ["UserType"].ToString ()
@@ -111,36 +118,110 @@ namespace WhiteCore.Modules.Web
                 } 
 
                 // so far so good...
-                string RegionPort = requestParameters["RegionPort"].ToString();
-                bool RegionDelayStartup = false;
-                string RegionVisibility;
-                string RegionInfinite;
-                string RegionCapacity;
-
-                if (RegionPresetType.ToLower ().StartsWith ("c"))
-                {
-                    RegionPort = requestParameters["RegionPort"].ToString();
-                    RegionVisibility = requestParameters["RegionVisibility"].ToString();
-                    RegionInfinite = requestParameters["RegionInfinite"].ToString();
-                    RegionCapacity = requestParameters["RegionCapacity"].ToString();
-
-                    RegionDelayStartup = requestParameters.ContainsKey("RegionDelayStartup") &&
-                        requestParameters["RegionDelayStartup"].ToString() == "Yes";
-
-                }
-
                 // build the new region details
+                int RegionPort = int.Parse (requestParameters ["RegionPort"].ToString ());
+
                 var newRegion = new RegionInfo();
 
                 newRegion.RegionName = RegionName;
+                newRegion.RegionType = RegionType;
                 newRegion.RegionLocX = int.Parse (RegionLocX);
                 newRegion.RegionLocY = int.Parse (RegionLocY);
                 newRegion.RegionSizeX = int.Parse (RegionSizeX);
                 newRegion.RegionSizeY = int.Parse (RegionSizeY);
 
+                newRegion.RegionPort = RegionPort;
+                newRegion.SeeIntoThisSimFromNeighbor = true;
+                newRegion.InfiniteRegion = false;
+                newRegion.ObjectCapacity = 50000;
+                newRegion.Startup = StartupType.Normal;
 
+                var regionPreset = RegionPresetType.ToLower ();
+                if (regionPreset.StartsWith ("c"))
+                {
+                    newRegion.RegionPort = int.Parse( requestParameters["RegionPort"].ToString() );
+                    newRegion.SeeIntoThisSimFromNeighbor = (requestParameters["RegionVisibility"].ToString().ToLower() == "yes");
+                    newRegion.InfiniteRegion = (requestParameters["RegionInfinite"].ToString().ToLower() == "yes");
+                    newRegion.ObjectCapacity = int.Parse( requestParameters["RegionCapacity"].ToString() );
 
-               /* if (scenemanager.CreateRegion(newRegion))
+                    string delayStartup = requestParameters["RegionDelayStartup"].ToString();
+                    newRegion.Startup = delayStartup.StartsWith ("n") ? StartupType.Normal : StartupType.Medium;
+
+                }
+
+                if (regionPreset.StartsWith("w"))
+                {
+                    // 'standard' setup
+                    newRegion.RegionType = newRegion.RegionType + "Whitecore";                   
+                    //info.RegionPort;            // use auto assigned port
+                    newRegion.RegionTerrain = "Flatland";
+                    newRegion.Startup = StartupType.Normal;
+                    newRegion.SeeIntoThisSimFromNeighbor = true;
+                    newRegion.InfiniteRegion = false;
+                    newRegion.ObjectCapacity = 50000;
+                    newRegion.RegionPort = RegionPort;
+ 
+
+                }
+                if (regionPreset.StartsWith("o"))       
+                {
+                    // 'Openspace' setup
+                    newRegion.RegionType = newRegion.RegionType + "Openspace";                   
+                    //newRegion.RegionPort;            // use auto assigned port
+                    if (RegionTerrain.StartsWith("a"))
+                        newRegion.RegionTerrain = "Aquatic";
+                    else
+                        newRegion.RegionTerrain = "Grassland";
+                    newRegion.Startup = StartupType.Medium;
+                    newRegion.SeeIntoThisSimFromNeighbor = true;
+                    newRegion.InfiniteRegion = false;
+                    newRegion.ObjectCapacity = 750;
+                    newRegion.RegionSettings.AgentLimit = 10;
+                    newRegion.RegionSettings.AllowLandJoinDivide = false;
+                    newRegion.RegionSettings.AllowLandResell = false;
+                }
+                if (regionPreset.StartsWith("h"))       
+                {
+                    // 'Homestead' setup
+                    newRegion.RegionType = newRegion.RegionType + "Homestead";                   
+                    //info.RegionPort;            // use auto assigned port
+                    newRegion.RegionTerrain = "Homestead";
+                    newRegion.Startup = StartupType.Medium;
+                    newRegion.SeeIntoThisSimFromNeighbor = true;
+                    newRegion.InfiniteRegion = false;
+                    newRegion.ObjectCapacity = 3750;
+                    newRegion.RegionSettings.AgentLimit = 20;
+                    newRegion.RegionSettings.AllowLandJoinDivide = false;
+                    newRegion.RegionSettings.AllowLandResell = false;
+                }
+
+                if (regionPreset.StartsWith("f"))       
+                {
+                    // 'Full Region' setup
+                    newRegion.RegionType = newRegion.RegionType + "Full Region";                   
+                    //newRegion.RegionPort;            // use auto assigned port
+                    newRegion.RegionTerrain = RegionTerrain;
+                    newRegion.Startup = StartupType.Normal;
+                    newRegion.SeeIntoThisSimFromNeighbor = true;
+                    newRegion.InfiniteRegion = false;
+                    newRegion.ObjectCapacity = 15000;
+                    newRegion.RegionSettings.AgentLimit = 100;
+                    if (newRegion.RegionType.StartsWith ("M"))                           // defaults are 'true'
+                    {
+                        newRegion.RegionSettings.AllowLandJoinDivide = false;
+                        newRegion.RegionSettings.AllowLandResell = false;
+                    }
+                }
+
+                if (RegionLoadTerrain.Length > 0)
+                {
+                    // we are loading terrain from a file... handled later
+                    newRegion.RegionTerrain = "Custom";
+                }
+
+                // TODO: !!! Assumes everything is local for now !!!               
+                ISceneManager scenemanager = webInterface.Registry.RequestModuleInterface<ISceneManager> ();
+                if (scenemanager.CreateRegion(newRegion))
                 {   
                     IGridRegisterModule gridRegister = webInterface.Registry.RequestModuleInterface<IGridRegisterModule>();
                     if( gridRegister.RegisterRegionWithGrid(null, true, false, null)) 
@@ -156,7 +237,7 @@ namespace WhiteCore.Modules.Web
                             response = "<h3> Error registering region with grid</h3>";
                 }
                 else
-                */    response = "<h3>Error creating this region.</h3>";
+                   response = "<h3>Error creating this region.</h3>";
                 return null;
             }
 
@@ -213,7 +294,7 @@ namespace WhiteCore.Modules.Web
                 string regionName = rNames.FirstName (m_regionNameSeed == null ? Utilities.RegionNames: m_regionNameSeed, 3,7);
                 vars.Add ("RegionName", regionName);
 
-                var scenemanager = webInterface.Registry.RequestModuleInterface<ISceneManager> ();
+                //var scenemanager = webInterface.Registry.RequestModuleInterface<ISceneManager> ();
                 var gconnector = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector>();
                 var settings = gconnector.GetGeneric<WebUISettings>(UUID.Zero, "WebUISettings", "Settings");
 
