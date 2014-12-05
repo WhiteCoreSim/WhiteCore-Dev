@@ -46,6 +46,7 @@ WhiteCore.v12.suo
 WhiteCoreDocs/doxygen/
 
 WhiteCoreSim/Data/AssetCache/*
+WhiteCoreSim/Data/FileAssets/*
 WhiteCoreSim/Data/Region/*.sim
 WhiteCoreSim/Data/RegionBak/*.sim
 WhiteCoreSim/Data/SQLite/*.db
