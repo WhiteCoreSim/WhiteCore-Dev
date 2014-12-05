@@ -219,6 +219,7 @@ namespace WhiteCore.Modules.Web
                     newRegion.RegionTerrain = "Custom";
                 }
 
+                /* Disabled as this is a worl=k in progress and will break with the current scenemanager (Dec 5 - greythane-
                 // TODO: !!! Assumes everything is local for now !!!               
                 ISceneManager scenemanager = webInterface.Registry.RequestModuleInterface<ISceneManager> ();
                 if (scenemanager.CreateRegion(newRegion))
@@ -237,7 +238,8 @@ namespace WhiteCore.Modules.Web
                             response = "<h3> Error registering region with grid</h3>";
                 }
                 else
-                   response = "<h3>Error creating this region.</h3>";
+*/
+                response = "<h3>Error creating this region.</h3>";
                 return null;
             }
 
