@@ -11,16 +11,14 @@ CSJ2K.dll														1.0.4828.24322			04 Dec 2014				LibOMV
 Community.CsharpSqlite.SQLiteClient.dll							3.7.7.1					08 Apr 2013
 Community.CsharpSqlite.dll										1.0.0.0					08 Apr 2013
 CookComputing.XmlRpcV2.dll										0.0.0.0					08 Apr 2013
-DotNetOpenId.dll												2.6.0.8354				10 Dec 2012
-DotNetOpenMail.dll												1.0.2335.38471			10 Dec 2012				(Supposedly 0.5.8b)
 GlynnTucker.Cache.dll											1.0.0.0					10 Dec 2012
 Google.ProtocolBuffers.dll										1.0.0.0					10 Dec 2012
 MySql.Data.dll													6.9.4.0					29 Sep 2014
 Nini.dll														1.1.0.0					10 Dec 2012
-OpenMetaverse.Rendering.Meshmerizer.dll							0.9.2					04 Dec 2014				LibOMV
-OpenMetaverse.StructuredData.dll								0.9.2					04 Dec 2104				LibOMV
-OpenMetaverse.dll												0.9.2					04 Dec 2014				LibOMV
-OpenMetaverseTypes.dll											0.9.2					04 Dec 2014				LibOMV
+OpenMetaverse.Rendering.Meshmerizer.dll							0.9.3					04 Dec 2014				LibOMV
+OpenMetaverse.StructuredData.dll								0.9.3					04 Dec 2104				LibOMV
+OpenMetaverse.dll												0.9.3					04 Dec 2014				LibOMV
+OpenMetaverseTypes.dll											0.9.3					04 Dec 2014				LibOMV
 PrimMesher.dll													1.0.0.0					04 Dec 2014
 ScriptEngineParser.dll											1.0.5098.28468			16 Dec 2013
 Sider.dll														0.9.2.0					08 Apr 2013
