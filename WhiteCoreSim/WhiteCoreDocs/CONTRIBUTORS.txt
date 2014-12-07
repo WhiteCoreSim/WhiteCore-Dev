@@ -1,8 +1,15 @@
---------------- WhiteCore contributors (Thanks for all the patches :)) -----------------------
+--------------- WhiteCore Developers -----------------------
 
 Fly-Man-
 Greythane
 
+
+--------------- WhiteCore contributors (Thanks for all the patches :)) -----------------------
+
+Nhede
+Emperorstarfinder
+Fine77
+Any that we might have forgotten
 
 --------------- Aurora contributors (Thanks for all the patches :)) --------------------------
 
