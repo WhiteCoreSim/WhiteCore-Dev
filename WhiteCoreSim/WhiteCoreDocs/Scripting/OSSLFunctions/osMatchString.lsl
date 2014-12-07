@@ -17,16 +17,16 @@
 //
 default
 {
-    state_entry()
-    {
-        llSay(0, "Touch me to show Matched Strings");
-    }
-    touch_end(integer total_num)
-    {
-        key kAvatar = llDetectedKey(0);
-        string sSentence = "today we do this all day long and all night long";
-        list lMatches = [];
-        lMatches = osMatchString(sSentence, "all", 0);
-        llSay(0,"Matched String :\n"+llDumpList2String(lMatches, " @ "));  
-    }
+	state_entry()
+	{
+		llSay(0, "Touch me to show Matched Strings");
+	}
+	touch_end(integer total_num)
+	{
+		key kAvatar = llDetectedKey(0);
+		string sSentence = "today we do this all day long and all night long";
+		list lMatches = [];
+		lMatches = osMatchString(sSentence, "all", 0);
+		llSay(0,"Matched String :\n"+llDumpList2String(lMatches, " @ "));
+	}
 }

@@ -45,33 +45,33 @@ vector LookAt = <1,1,1>;                  // which way they look at when arrivin
 //
 default
 {
-    on_rez(integer start_param)
-    {
-        llResetScript();
-    }
+	on_rez(integer start_param)
+	{
+		llResetScript();
+	}
 
-    state_entry()
-    {
-        Destination = llGetRegionName();
-        llWhisper(0, "Touch to osTeleportAgent to destination "+Destination+" @ Landing Point "+(string)LandingPoint);
-    }
+	state_entry()
+	{
+		Destination = llGetRegionName();
+		llWhisper(0, "Touch to osTeleportAgent to destination "+Destination+" @ Landing Point "+(string)LandingPoint);
+	}
 
-    changed(integer change) // something changed, take action
-    {
-        if(change & CHANGED_OWNER)
-        {
-            llResetScript();
-        }
-        else if(change & 1024) // that bit is set during a region restart
-        {
-            llResetScript();
-        }
-    }
+	changed(integer change) // something changed, take action
+	{
+		if(change & CHANGED_OWNER)
+		{
+			llResetScript();
+		}
+		else if(change & 1024) // that bit is set during a region restart
+		{
+			llResetScript();
+		}
+	}
 
-    touch_end(integer num_detected)
-    {
-        key avatar = llDetectedKey(0);
-        llInstantMessage(avatar, "Teleporting you to : "+Destination+" @ Landing Point "+(string)LandingPoint);
-        osTeleportAgent(avatar, Destination, LandingPoint, LookAt);
-    }
+	touch_end(integer num_detected)
+	{
+		key avatar = llDetectedKey(0);
+		llInstantMessage(avatar, "Teleporting you to : "+Destination+" @ Landing Point "+(string)LandingPoint);
+		osTeleportAgent(avatar, Destination, LandingPoint, LookAt);
+	}
 }

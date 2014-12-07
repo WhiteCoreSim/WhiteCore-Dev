@@ -14,15 +14,15 @@
 // Inworld Script Line:    string osLoadedCreationDate();
 //
 // Example of osLoadedCreationDate()
-// Returns a string containing the date that a sim was first created such as "Monday, December 07, 2009". 
+// Returns a string containing the date that a sim was first created such as "Monday, December 07, 2009".
 default
 {
-    state_entry() // display @ start
-    {
-        llSay(0, "Touch to see Example osLoadedCreationDate()");
-    }
-    touch_end(integer num)
-    {
-        llSay(0,"osLoadedCreationDate is: "+osLoadedCreationDate());
-    }
+	state_entry() // display @ start
+	{
+		llSay(0, "Touch to see Example osLoadedCreationDate()");
+	}
+	touch_end(integer num)
+	{
+		llSay(0,"osLoadedCreationDate is: "+osLoadedCreationDate());
+	}
 }

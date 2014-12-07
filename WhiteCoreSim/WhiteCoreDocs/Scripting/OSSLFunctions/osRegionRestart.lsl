@@ -21,15 +21,15 @@
 //
 default
 {
-    state_entry()
-    {
-        llSay(0,"Touch to Restart this region");
-    }
-    touch_start(integer total_num)
-    {
-        float seconds = 60.0;
-        string message = "This Region is restarting in "+(string)seconds+" Seconds";
-        llSay(0,message);
-        osRegionRestart(seconds);
-    }
+	state_entry()
+	{
+		llSay(0,"Touch to Restart this region");
+	}
+	touch_start(integer total_num)
+	{
+		float seconds = 60.0;
+		string message = "This Region is restarting in "+(string)seconds+" Seconds";
+		llSay(0,message);
+		osRegionRestart(seconds);
+	}
 }

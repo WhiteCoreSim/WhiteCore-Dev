@@ -20,19 +20,19 @@
 //
 default
 {
-    on_rez(integer start_param)
-    {
-        llResetScript();
-    }
+	on_rez(integer start_param)
+	{
+		llResetScript();
+	}
 
-    state_entry()
-    {
-        llWhisper(0, "Touch to use osUnixTimeToTimestamp\nNOTE: this will convert Unix Time to a readable time");
-    }
+	state_entry()
+	{
+		llWhisper(0, "Touch to use osUnixTimeToTimestamp\nNOTE: this will convert Unix Time to a readable time");
+	}
 
-    touch_end(integer num_detected)
-    {
-        key avatar = llDetectedKey(0);
-        llInstantMessage(avatar, "Unix Time To Timestamp = [ "+osUnixTimeToTimestamp((integer)llGetUnixTime())+" ]");
-    }
+	touch_end(integer num_detected)
+	{
+		key avatar = llDetectedKey(0);
+		llInstantMessage(avatar, "Unix Time To Timestamp = [ "+osUnixTimeToTimestamp((integer)llGetUnixTime())+" ]");
+	}
 }

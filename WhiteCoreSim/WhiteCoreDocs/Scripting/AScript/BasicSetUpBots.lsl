@@ -1,6 +1,6 @@
 //ascript
 #useLSLAPI
-#include Aurora.BotManager;
+#include WhiteCore.BotManager;
 
 string first = "Zombie";
 string last = "Bot";
@@ -10,20 +10,20 @@ bool resetNext = false;
 
 public void state_entry()
 {
-    userToDuplicate = llGetOwner();
-    botID = botCreateBot(first, last, userToDuplicate, llGetPos());
-    botFollowAvatar(botID, llGetOwner(), 2.5, 2.5);
+	userToDuplicate = llGetOwner();
+	botID = botCreateBot(first, last, userToDuplicate, llGetPos());
+	botFollowAvatar(botID, llGetOwner(), 2.5, 2.5);
 }
 
 public void touch_start(LSL_Types.LSLInteger a)
 {
-    if(botID != "")
+	if(botID != "")
 	{
 		botRemoveBot(botID);
 		botID = "";
 	}
-    else
-    {
-        llResetScript();
-    }
+	else
+	{
+		llResetScript();
+	}
 }

@@ -24,12 +24,12 @@ string sJSON = "";  //test JSON String here
 
 default
 {
-    state_entry()
-    {
-        llSay(0,"Touch to parse test JSON String using osParseJSON");
-    }
-    touch_start(integer total_num)
-    {
-        llInstantMessage(llGetOwner(), (string)osParseJSON(sJSON));
-    }
+	state_entry()
+	{
+		llSay(0,"Touch to parse test JSON String using osParseJSON");
+	}
+	touch_start(integer total_num)
+	{
+		llInstantMessage(llGetOwner(), (string)osParseJSON(sJSON));
+	}
 }

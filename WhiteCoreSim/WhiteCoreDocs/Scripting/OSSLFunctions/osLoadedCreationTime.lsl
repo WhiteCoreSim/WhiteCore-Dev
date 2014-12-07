@@ -13,16 +13,16 @@
 // ================================================================
 // Inworld Script Line:    string osLoadedCreationTime();
 //
-// Example of osLoadedCreationTime() 
+// Example of osLoadedCreationTime()
 // Returns a string containing the time that Region was first created. Example "6:16:31 AM".
 default
 {
-    state_entry() // display @ start
-    {
-        llSay(0, "Example osLoadedCreationTime()");
-    }
-    touch_end(integer num)
-    {
-        llSay(0,"osLoadedCreationTime is: "+osLoadedCreationTime());
-    }
+	state_entry() // display @ start
+	{
+		llSay(0, "Example osLoadedCreationTime()");
+	}
+	touch_end(integer num)
+	{
+		llSay(0,"osLoadedCreationTime is: "+osLoadedCreationTime());
+	}
 }

@@ -2,7 +2,7 @@
 // Example / Sample Script to show function use.
 //
 // Script Title:    osFormatString.lsl
-// Script Author:   
+// Script Author:
 // Threat Level:    Low
 // Script Source:   Reference http://opensimulator.org/wiki/osFormatString
 //
@@ -17,14 +17,14 @@
 //
 default
 {
-    state_entry()
-    {
-         llSay(0,"Touch to see osFormatString chat formatted text"); 
-    }
-    touch_end(integer num)
-    {
-        string to_format = "My name is {0} and I am located in {1} Region. The avatar who just touched me is {2}.";
-        list format = [llGetObjectName(),llGetRegionName(),llKey2Name(llDetectedKey(0))];
-        llOwnerSay(osFormatString(to_format, format));
-    }
+	state_entry()
+	{
+		llSay(0,"Touch to see osFormatString chat formatted text");
+	}
+	touch_end(integer num)
+	{
+		string to_format = "My name is {0} and I am located in {1} Region. The avatar who just touched me is {2}.";
+		list format = [llGetObjectName(),llGetRegionName(),llKey2Name(llDetectedKey(0))];
+		llOwnerSay(osFormatString(to_format, format));
+	}
 }

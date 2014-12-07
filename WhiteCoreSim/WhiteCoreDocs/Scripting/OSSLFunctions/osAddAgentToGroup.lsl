@@ -13,7 +13,7 @@
 //================================================================
 // Inworld Script Line:  osAddAgentToGroup(key AgentID, string GroupName, string RequestedRole);
 //
-// PREREQUISITES 
+// PREREQUISITES
 // - The Group must be created
 // - You must have the Group UUID
 // - Roles within the group must be defined (default has Everyone & Owners)
@@ -24,14 +24,14 @@ string RoleToJoin = "Everyone";
 
 default
 {
-    state_entry()
-    {
-        llSay(0,"Touch to use osAddAgentToGroup to add yourself to a group"); 
-    }
-    
-    touch_end(integer num)
-    {
-        key AgentID = llDetectedKey(0);
-        osAddAgentToGroup(AgentID, GroupToJoin, RoleToJoin);
-    }
+	state_entry()
+	{
+		llSay(0,"Touch to use osAddAgentToGroup to add yourself to a group");
+	}
+
+	touch_end(integer num)
+	{
+		key AgentID = llDetectedKey(0);
+		osAddAgentToGroup(AgentID, GroupToJoin, RoleToJoin);
+	}
 }

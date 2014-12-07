@@ -17,26 +17,26 @@
 integer Touched = FALSE;
 default
 {
-    state_entry()
-    {
-         llSay(0,"Touch to see osDrawImage place an image on a prim from a Web Source"); 
-    }
-    touch_end(integer num)
-    {
-        if(Touched)
-        {
-            Touched = FALSE;
-            llSetTexture(TEXTURE_PLYWOOD, ALL_SIDES);
-        }
-        else
-        {
-            Touched = TRUE;
-            string DrawList = ""; 
-            string ImageURL = "http://grid.aurora-sim.org/splash/Aurora-Login.gif";
-            DrawList = osMovePen( DrawList, 0, 0 );                // Upper left corner at <0,0>
-            DrawList = osDrawImage( DrawList, 256, 54, ImageURL ); // 200 pixels by 100 pixels
-            // Draw the image
-            osSetDynamicTextureData( "", "vector", DrawList, "width:256,height:256", 0 );
-        }
-    }
+	state_entry()
+	{
+		llSay(0,"Touch to see osDrawImage place an image on a prim from a Web Source");
+	}
+	touch_end(integer num)
+	{
+		if(Touched)
+		{
+			Touched = FALSE;
+			llSetTexture(TEXTURE_PLYWOOD, ALL_SIDES);
+		}
+		else
+		{
+			Touched = TRUE;
+			string DrawList = "";
+			string ImageURL = "http://grid.aurora-sim.org/splash/Aurora-Login.gif";
+			DrawList = osMovePen( DrawList, 0, 0 );                // Upper left corner at <0,0>
+			DrawList = osDrawImage( DrawList, 256, 54, ImageURL ); // 200 pixels by 100 pixels
+			// Draw the image
+			osSetDynamicTextureData( "", "vector", DrawList, "width:256,height:256", 0 );
+		}
+	}
 }

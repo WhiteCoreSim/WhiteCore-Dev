@@ -18,14 +18,14 @@
 // Joins( start.x,start.y _to_ end.x,end.y ) Z is ignored but must exist in syntax
 default
 {
-    state_entry()
-    {
-        llSay(0,"Touch to Join adjacent Parcels");
-    }
-    touch_start()
-    {
-        vector start = <0.0, 0.0, 0.0>; //top corner
-        vector end = <100.0, 100.0, 0.0>;
-        osParcelJoin(start, end);
-    }
+	state_entry()
+	{
+		llSay(0,"Touch to Join adjacent Parcels");
+	}
+	touch_start()
+	{
+		vector start = <0.0, 0.0, 0.0>; //top corner
+		vector end = <100.0, 100.0, 0.0>;
+		osParcelJoin(start, end);
+	}
 }

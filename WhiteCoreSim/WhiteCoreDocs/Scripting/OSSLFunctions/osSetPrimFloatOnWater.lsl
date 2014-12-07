@@ -19,23 +19,23 @@
 integer iFloatYN = FALSE;
 default
 {
-    state_entry()
-    {
-        llSay(0,"Touch to see osSetPrimFloatOnWater work.  Sets TRUE / FALSE");
-    }
-    touch_end(integer num)
-    {
-        if(iFloatYN)
-        {
-            iFloatYN = FALSE;
-            llSay(0,"osSetPrimFloatOnWater = FALSE");
-            osSetPrimFloatOnWater(iFloatYN);
-        }
-        else
-        {
-            iFloatYN = TRUE;
-            llSay(0,"osSetPrimFloatOnWater = TRUE");
-            osSetPrimFloatOnWater(iFloatYN);
-        }
-    }
+	state_entry()
+	{
+		llSay(0,"Touch to see osSetPrimFloatOnWater work.  Sets TRUE / FALSE");
+	}
+	touch_end(integer num)
+	{
+		if(iFloatYN)
+		{
+			iFloatYN = FALSE;
+			llSay(0,"osSetPrimFloatOnWater = FALSE");
+			osSetPrimFloatOnWater(iFloatYN);
+		}
+		else
+		{
+			iFloatYN = TRUE;
+			llSay(0,"osSetPrimFloatOnWater = TRUE");
+			osSetPrimFloatOnWater(iFloatYN);
+		}
+	}
 }

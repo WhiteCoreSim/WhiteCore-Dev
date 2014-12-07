@@ -26,13 +26,13 @@ string sSIPAddress = "ip.address.of.freeswitch.server:5060"; //The SIP address w
 //
 default
 {
-    state_entry()
-    {
-        llSay(0, "Touch to see how osSetParcelSIPAddress works");
-    }
-    touch_start(integer num)
-    {
-        llSay(0,"SIP Address being set :"+sSIPAddress);
-        osSetParcelSIPAddress( sSIPAddress);
-    }
+	state_entry()
+	{
+		llSay(0, "Touch to see how osSetParcelSIPAddress works");
+	}
+	touch_start(integer num)
+	{
+		llSay(0,"SIP Address being set :"+sSIPAddress);
+		osSetParcelSIPAddress( sSIPAddress);
+	}
 }

@@ -2,7 +2,7 @@
 // Example / Sample Script to show function use.
 //
 // Script Title:    osGetAgentIP.lsl
-// Script Author:   
+// Script Author:
 // Threat Level:    High
 // Script Source:   Reference http://opensimulator.org/wiki/osGetAgentIP
 //
@@ -17,13 +17,13 @@
 //
 default
 {
-    state_entry()
-    {
-        llSay(0, "Touch to get see osGetAgentIP tell you your IP Address");
-    }
-    touch_start(integer total_number)
-    {
-        key Agent = llDetectedKey(0);
-        llInstantMessage(Agent, "Your IP is : "+ osGetAgentIP(Agent));
-    }
+	state_entry()
+	{
+		llSay(0, "Touch to get see osGetAgentIP tell you your IP Address");
+	}
+	touch_start(integer total_number)
+	{
+		key Agent = llDetectedKey(0);
+		llInstantMessage(Agent, "Your IP is : "+ osGetAgentIP(Agent));
+	}
 }

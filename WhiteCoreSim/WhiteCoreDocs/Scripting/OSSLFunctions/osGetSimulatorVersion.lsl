@@ -2,7 +2,7 @@
 // Example / Sample Script to show function use.
 //
 // Script Title:    osGetSimulatorVersion.lsl
-// Script Author:   
+// Script Author:
 // Threat Level:    High
 // Script Source:   http://opensimulator.org/wiki/OsGetSimulatorVersion
 //
@@ -17,12 +17,12 @@
 //
 default
 {
-    state_entry() // display @ start
-    {
-        llSay(0, "Touch me to get the Simulator Version Information using osGetSimulatorVersion");
-    }
-    touch_end(integer num) // Tell toucher our version
-    {
-        llInstantMessage(llDetectedKey(0), "Simulator Version: "+osGetSimulatorVersion());
-    }
+	state_entry() // display @ start
+	{
+		llSay(0, "Touch me to get the Simulator Version Information using osGetSimulatorVersion");
+	}
+	touch_end(integer num) // Tell toucher our version
+	{
+		llInstantMessage(llDetectedKey(0), "Simulator Version: "+osGetSimulatorVersion());
+	}
 }

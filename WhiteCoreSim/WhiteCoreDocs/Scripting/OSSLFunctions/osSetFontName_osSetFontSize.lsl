@@ -32,43 +32,43 @@ string sText;
 //
 DrawText()
 {
-    sCommandList = osSetFontName(sCommandList, sFontName);
-    sCommandList = osSetFontSize(sCommandList, iFontSize);
-    sCommandList = osMovePen( sCommandList, iX, iY );       // Upper left corner at <pixels in, pixels down>
-    sCommandList = osDrawText( sCommandList, sText);        // The Text to Display
-    // Now draw the image
-    llWhisper(0,"FontName = "+sFontName+" FontSize = "+(string)iFontSize);
-    osSetDynamicTextureData( "", "vector", sCommandList, "width:512,height:512", 0 );
+	sCommandList = osSetFontName(sCommandList, sFontName);
+	sCommandList = osSetFontSize(sCommandList, iFontSize);
+	sCommandList = osMovePen( sCommandList, iX, iY );       // Upper left corner at <pixels in, pixels down>
+	sCommandList = osDrawText( sCommandList, sText);        // The Text to Display
+	// Now draw the image
+	llWhisper(0,"FontName = "+sFontName+" FontSize = "+(string)iFontSize);
+	osSetDynamicTextureData( "", "vector", sCommandList, "width:512,height:512", 0 );
 }
 default
 {
-    state_entry()
-    {
-        llSay(0, "Touch to see how changing osSetFontName & osSetFontName work");
-        sText = "FontName = "+sFontName+"\nFontSize = "+(string)iFontSize;
-        DrawText();
-    }
-    touch_start(integer num)
-    {
-        if(iFlag)
-        {
-            iX = 10;
-            iY = 50;
-            iFlag = FALSE;
-            sFontName = "Times";
-            iFontSize = 18;
-            sText = "FontName = "+sFontName+"\nFontSize = "+(string)iFontSize;
-            DrawText();
-        }
-        else
-        {
-            iX = 10;
-            iY = 100;
-            iFlag = TRUE;
-            sFontName = "Courier";
-            iFontSize = 22;
-            sText = "FontName = "+sFontName+"\nFontSize = "+(string)iFontSize;
-            DrawText();
-        }
-    }
+	state_entry()
+	{
+		llSay(0, "Touch to see how changing osSetFontName & osSetFontName work");
+		sText = "FontName = "+sFontName+"\nFontSize = "+(string)iFontSize;
+		DrawText();
+	}
+	touch_start(integer num)
+	{
+		if(iFlag)
+		{
+			iX = 10;
+			iY = 50;
+			iFlag = FALSE;
+			sFontName = "Times";
+			iFontSize = 18;
+			sText = "FontName = "+sFontName+"\nFontSize = "+(string)iFontSize;
+			DrawText();
+		}
+		else
+		{
+			iX = 10;
+			iY = 100;
+			iFlag = TRUE;
+			sFontName = "Courier";
+			iFontSize = 22;
+			sText = "FontName = "+sFontName+"\nFontSize = "+(string)iFontSize;
+			DrawText();
+		}
+	}
 }

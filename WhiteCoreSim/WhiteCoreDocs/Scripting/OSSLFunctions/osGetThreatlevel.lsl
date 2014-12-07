@@ -17,8 +17,8 @@
 //
 default
 {
-    state_entry()
-    {
-        llSay(0, "FunctionThreatLevel = " + osGetThreatLevel("ThreatLevel"));
-    }
+	state_entry()
+	{
+		llSay(0, "FunctionThreatLevel = " + osGetThreatLevel("ThreatLevel"));
+	}
 }

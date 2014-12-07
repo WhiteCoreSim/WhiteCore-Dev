@@ -17,12 +17,12 @@
 //
 default
 {
-    state_entry()
-    {
-         llSay(0,"Touch to see osGetCurrentSunHour return the current sun hour setting"); 
-    }
-    touch_start(integer total_number)
-    {
-        llSay(0, "Current sun hour: ["+(string)osGetCurrentSunHour()+"]");
-    }
+	state_entry()
+	{
+		llSay(0,"Touch to see osGetCurrentSunHour return the current sun hour setting");
+	}
+	touch_start(integer total_number)
+	{
+		llSay(0, "Current sun hour: ["+(string)osGetCurrentSunHour()+"]");
+	}
 }
