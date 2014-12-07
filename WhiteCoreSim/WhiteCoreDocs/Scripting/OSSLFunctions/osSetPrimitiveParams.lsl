@@ -13,14 +13,14 @@
 // REFERENCEL http://wiki.secondlife.com/wiki/LlSetPrimitiveParams
 // ================================================================
 // C# Source Line:      public void osSetPrimitiveParams(LSL_Key prim, LSL_List rules)
-// Inworld Script Line: osSetPrimitiveParams(key prim_uuid, list rules); 
+// Inworld Script Line: osSetPrimitiveParams(key prim_uuid, list rules);
 //
 // Example of osSetPrimitiveParams
 //
 list PrimParams = [
-    PRIM_NAME = "examplePrimName",
-    PRIM_SIZE = <1.0,2.0,3.0>];
-//    
+	PRIM_NAME = "examplePrimName",
+	PRIM_SIZE = <1.0,2.0,3.0>];
+//
 // Standard Prim Values to set
 // Constant NAME  #Val  Description                             Example
 // PRIM_NAME 	    27 	Sets the prim's name.        	        [ PRIM_NAME, string name ]
@@ -42,16 +42,16 @@ list PrimParams = [
 // PRIM_FULLBRIGHT 20 	Sets the face's full bright flag. 	    [ PRIM_FULLBRIGHT, integer face, integer boolean ]
 // PRIM_FLEXIBLE 	21 	Sets the prim as flexible. 	            [ PRIM_FLEXIBLE, integer boolean, integer softness, float gravity, float friction, float wind, float tension, vector force ]
 // PRIM_TEXGEN 	22 	Sets the face's texture mode. 	            [ PRIM_TEXGEN, integer face, integer type ]
-// PRIM_GLOW 	    25 	Sets the face's glow attribute. 	    [ PRIM_GLOW, integer face, float intensity ] 
+// PRIM_GLOW 	    25 	Sets the face's glow attribute. 	    [ PRIM_GLOW, integer face, float intensity ]
 //
 default
 {
-    state_entry()
-    {
-        llSay(0,"Touch to see osSetPrimitiveParams work.");
-    }
-    touch_end(integer num)
-    {
-        osSetPrimitiveParams(PrimParams);
-    }
+	state_entry()
+	{
+		llSay(0,"Touch to see osSetPrimitiveParams work.");
+	}
+	touch_end(integer num)
+	{
+		osSetPrimitiveParams(PrimParams);
+	}
 }

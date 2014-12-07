@@ -18,13 +18,13 @@
 //
 default
 {
-    state_entry() // display @ start
-    {
-        llSay(0, "UUID/Key 2 Name Display Ready");
-    }
-    touch_end(integer num) // Tell toucher Their UUID & Name
-    {
-        key avatar = llDetectedKey(0);
-        llInstantMessage(avatar, "Your Key is: "+(string)avatar+" Name is: "+osKey2Name(avatar));
-    }
+	state_entry() // display @ start
+	{
+		llSay(0, "UUID/Key 2 Name Display Ready");
+	}
+	touch_end(integer num) // Tell toucher Their UUID & Name
+	{
+		key avatar = llDetectedKey(0);
+		llInstantMessage(avatar, "Your Key is: "+(string)avatar+" Name is: "+osKey2Name(avatar));
+	}
 }

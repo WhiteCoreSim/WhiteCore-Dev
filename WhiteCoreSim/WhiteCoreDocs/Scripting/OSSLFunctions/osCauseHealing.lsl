@@ -15,9 +15,9 @@
 //
 default
 {
-    state_entry()
-    {
-        // healing: 0 = none, 100 = full health
-        osCauseHealing(llGetOwner(), 50);
-    }
+	state_entry()
+	{
+		// healing: 0 = none, 100 = full health
+		osCauseHealing(llGetOwner(), 50);
+	}
 }

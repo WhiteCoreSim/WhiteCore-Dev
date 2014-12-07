@@ -17,20 +17,20 @@
 //
 default
 {
-    state_entry()
-    {
-        llSay(0, "Touch me to create a Notecard with your Avatar Name, containing: Name,Key,Position,Rotation" );
-    }
-    touch_end(integer total_num)
-    {
-        key kAvatar = llDetectedKey(0);
-        string sName = llDetectedName(0);
-        list lContents = [];              //to contain the values
-        lContents += "Name: "+sName;
-        lContents += "Key: "+(string)kAvatar;
-        lContents += "Position: "+(string)llDetectedPos(0);
-        lContents += "Rotation: "+(string)llDetectedRot(0);
-        osMakeNotecard(sName, lContents); //Makes the notecard. Avatar Name = NoteCard Name
-        llGiveInventory(kAvatar, sName);  //Gives the notecard to the person.
-    }
+	state_entry()
+	{
+		llSay(0, "Touch me to create a Notecard with your Avatar Name, containing: Name,Key,Position,Rotation" );
+	}
+	touch_end(integer total_num)
+	{
+		key kAvatar = llDetectedKey(0);
+		string sName = llDetectedName(0);
+		list lContents = [];              //to contain the values
+		lContents += "Name: "+sName;
+		lContents += "Key: "+(string)kAvatar;
+		lContents += "Position: "+(string)llDetectedPos(0);
+		lContents += "Rotation: "+(string)llDetectedRot(0);
+		osMakeNotecard(sName, lContents); //Makes the notecard. Avatar Name = NoteCard Name
+		llGiveInventory(kAvatar, sName);  //Gives the notecard to the person.
+	}
 }

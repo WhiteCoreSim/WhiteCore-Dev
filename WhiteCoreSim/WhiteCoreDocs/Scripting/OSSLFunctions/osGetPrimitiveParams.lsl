@@ -18,34 +18,34 @@
 // Refer to http://wiki.secondlife.com/wiki/LlGetPrimitiveParams for Param List
 default
 {
-    state_entry() 
-    {
-        key kPrimKey = llGetKey();
-        list lMyParams;
-        list lPrimParams = [
-            PRIM_NAME,
-            PRIM_DESC,
-            PRIM_TYPE,
-            PRIM_MATERIAL,
-            PRIM_PHYSICS,
-            PRIM_TEMP_ON_REZ,
-            PRIM_PHANTOM,
-            PRIM_POSITION,
-            PRIM_ROTATION,
-            PRIM_ROT_LOCAL,
-            PRIM_SIZE,
-            PRIM_TEXTURE, ALL_SIDES,
-            PRIM_COLOR, ALL_SIDES,
-            PRIM_BUMP_SHINY, ALL_SIDES,
-            PRIM_FULLBRIGHT, ALL_SIDES,
-            PRIM_FLEXIBLE,
-            PRIM_TEXGEN, ALL_SIDES,
-            PRIM_POINT_LIGHT,
-            PRIM_GLOW, ALL_SIDES];
-        
-        lMyParams = osGetPrimitiveParams(kPrimKey, lPrimParams); 
+	state_entry()
+	{
+		key kPrimKey = llGetKey();
+		list lMyParams;
+		list lPrimParams = [
+			PRIM_NAME,
+			PRIM_DESC,
+			PRIM_TYPE,
+			PRIM_MATERIAL,
+			PRIM_PHYSICS,
+			PRIM_TEMP_ON_REZ,
+			PRIM_PHANTOM,
+			PRIM_POSITION,
+			PRIM_ROTATION,
+			PRIM_ROT_LOCAL,
+			PRIM_SIZE,
+			PRIM_TEXTURE, ALL_SIDES,
+			PRIM_COLOR, ALL_SIDES,
+			PRIM_BUMP_SHINY, ALL_SIDES,
+			PRIM_FULLBRIGHT, ALL_SIDES,
+			PRIM_FLEXIBLE,
+			PRIM_TEXGEN, ALL_SIDES,
+			PRIM_POINT_LIGHT,
+			PRIM_GLOW, ALL_SIDES];
+
+		lMyParams = osGetPrimitiveParams(kPrimKey, lPrimParams);
 
 
-        llSay(0, llList2String(lMyParams,0));
-    }
+		llSay(0, llList2String(lMyParams,0));
+	}
 }

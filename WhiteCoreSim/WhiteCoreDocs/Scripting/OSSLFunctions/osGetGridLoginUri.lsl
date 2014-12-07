@@ -18,12 +18,12 @@
 //
 default
 {
-    state_entry()
-    {
-         llSay(0,"Touch to see osGetGridLoginURI return the value set for the loginuri "); 
-    }
-    touch_end(integer num)
-    {
-        llSay(0, "Grid Login Uri = "+osGetGridLoginURI());
-    }
+	state_entry()
+	{
+		llSay(0,"Touch to see osGetGridLoginURI return the value set for the loginuri ");
+	}
+	touch_end(integer num)
+	{
+		llSay(0, "Grid Login Uri = "+osGetGridLoginURI());
+	}
 }

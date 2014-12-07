@@ -18,12 +18,12 @@
 //
 default
 {
-    state_entry()
-    {
-         llSay(0,"Touch to see osGetGridName return the value set for the Grid Name "); 
-    }
-    touch_end(integer num)
-    {
-        llSay(0, "Grid Name = "+osGetGridName());
-    }
+	state_entry()
+	{
+		llSay(0,"Touch to see osGetGridName return the value set for the Grid Name ");
+	}
+	touch_end(integer num)
+	{
+		llSay(0, "Grid Name = "+osGetGridName());
+	}
 }

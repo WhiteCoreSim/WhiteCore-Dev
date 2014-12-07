@@ -19,12 +19,12 @@
 //
 default
 {
-    state_entry()
-    {
-         llSay(0,"Touch to see osGetGridNick return the value set for the gridnick "); 
-    }
-    touch_end(integer num)
-    {
-        llSay(0, "Grid Nick = "+osGetGridNick());
-    }
+	state_entry()
+	{
+		llSay(0,"Touch to see osGetGridNick return the value set for the gridnick ");
+	}
+	touch_end(integer num)
+	{
+		llSay(0, "Grid Nick = "+osGetGridNick());
+	}
 }

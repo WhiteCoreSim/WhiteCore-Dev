@@ -18,12 +18,12 @@
 //
 default
 {
-    state_entry()
-    {
-        llSay(0, "Touch to get a List of Avatars on this Region using osGetAgents");
-    }
-    touch_start(integer num)
-    {
-        llSay(0, "The Avatars located here are: "+ llList2CSV(osGetAgents()));
-    }
+	state_entry()
+	{
+		llSay(0, "Touch to get a List of Avatars on this Region using osGetAgents");
+	}
+	touch_start(integer num)
+	{
+		llSay(0, "The Avatars located here are: "+ llList2CSV(osGetAgents()));
+	}
 }

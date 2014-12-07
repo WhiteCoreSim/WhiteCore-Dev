@@ -15,10 +15,10 @@
 //
 default
 {
-    state_entry()
-    {
-        // hit points: 0 = none, 100 = dead
-        // also allows for damage on collision or touch
-        osCauseDamage(llGetOwner(), 50);
-    }
+	state_entry()
+	{
+		// hit points: 0 = none, 100 = dead
+		// also allows for damage on collision or touch
+		osCauseDamage(llGetOwner(), 50);
+	}
 }

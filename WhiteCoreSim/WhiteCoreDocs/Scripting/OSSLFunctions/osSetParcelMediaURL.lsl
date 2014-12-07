@@ -20,13 +20,13 @@ string sURL = "http://www.archive.org/download/CncdVsFairlightCeasefire/ceasefir
 //
 default
 {
-    state_entry()
-    {
-        llSay(0, "Touch to see how osSetParcelMediaURL works");
-    }
-    touch_start(integer num)
-    {
-        llSay(0,"Media URL being set to :"+sURL);
-        osSetParcelMediaURL( sURL);
-    }
+	state_entry()
+	{
+		llSay(0, "Touch to see how osSetParcelMediaURL works");
+	}
+	touch_start(integer num)
+	{
+		llSay(0,"Media URL being set to :"+sURL);
+		osSetParcelMediaURL( sURL);
+	}
 }

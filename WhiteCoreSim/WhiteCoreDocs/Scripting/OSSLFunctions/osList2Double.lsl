@@ -20,19 +20,19 @@
 // Float is short for "floating point", and just means a number with a point something on the end.
 // The difference between the two is in the size of the numbers that they can hold.
 // For float, you can have up to 7 digits in your number.
-// For doubles, you can have up to 16 digits. To be more precise, here's the official size: ( float: 1.5 × 10-45 to 3.4 × 1038 ) ( double: 5.0 × 10-324 to 1.7 × 10308 )
+// For doubles, you can have up to 16 digits. To be more precise, here's the official size: ( float: 1.5 ï¿½ 10-45 to 3.4 ï¿½ 1038 ) ( double: 5.0 ï¿½ 10-324 to 1.7 ï¿½ 10308 )
 //
 // for the example below, the return value is being dumped to string.
 //
 default
 {
-    state_entry() // display @ start
-    {
-        llSay(0, "Touch to see osList2Double convert double values to float");
-    }
-    touch_end(integer num)
-    {
-        list lDoubles = (["-4.42330604244772E-305","14009.349609375","0.100000001"]);
-        llSay(0,"Values are: "+(string)osList2Double(lDoubles, 0)+" "+(string)osList2Double(lDoubles, 1)+" "+(string)osList2Double(lDoubles, 2));
-    }
+	state_entry() // display @ start
+	{
+		llSay(0, "Touch to see osList2Double convert double values to float");
+	}
+	touch_end(integer num)
+	{
+		list lDoubles = (["-4.42330604244772E-305","14009.349609375","0.100000001"]);
+		llSay(0,"Values are: "+(string)osList2Double(lDoubles, 0)+" "+(string)osList2Double(lDoubles, 1)+" "+(string)osList2Double(lDoubles, 2));
+	}
 }

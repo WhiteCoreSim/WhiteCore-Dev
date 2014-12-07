@@ -17,28 +17,28 @@ integer Touched = FALSE;
 
 default
 {
-    state_entry()
-    {
-        llSay(0,"Touch to see osDrawFilledPolygon create a filled blue polygon figure on the prim"); 
-    }
-    
-    touch_end(integer num)
-    {
-        if(Touched)
-        {
-            Touched = FALSE;
-            llSetTexture(TEXTURE_PLYWOOD, ALL_SIDES);
-        }
-        else
-        {
-            Touched = TRUE;
-            string DrawList = ""; 
-            DrawList = osSetPenSize( DrawList, 5 );         // Set the pen width to 3 pixels
-            DrawList = osSetPenColor( DrawList, "Blue" );  // Set the pen color to blue
-            DrawList = osDrawFilledPolygon( DrawList, [50,100,150], ["50",100,150.0] ); // You can use either integer, float or string 
-            // Now draw the polygon
-            osSetDynamicTextureData( "", "vector", DrawList, "", 0 );
-            llSay(0,"Touch again to revert back to plywood texture");
-        }
-    }
+	state_entry()
+	{
+		llSay(0,"Touch to see osDrawFilledPolygon create a filled blue polygon figure on the prim");
+	}
+
+	touch_end(integer num)
+	{
+		if(Touched)
+		{
+			Touched = FALSE;
+			llSetTexture(TEXTURE_PLYWOOD, ALL_SIDES);
+		}
+		else
+		{
+			Touched = TRUE;
+			string DrawList = "";
+			DrawList = osSetPenSize( DrawList, 5 );         // Set the pen width to 3 pixels
+			DrawList = osSetPenColor( DrawList, "Blue" );  // Set the pen color to blue
+			DrawList = osDrawFilledPolygon( DrawList, [50,100,150], ["50",100,150.0] ); // You can use either integer, float or string
+			// Now draw the polygon
+			osSetDynamicTextureData( "", "vector", DrawList, "", 0 );
+			llSay(0,"Touch again to revert back to plywood texture");
+		}
+	}
 }

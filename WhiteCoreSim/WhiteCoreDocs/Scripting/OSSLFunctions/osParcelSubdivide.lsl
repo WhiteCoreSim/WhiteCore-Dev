@@ -19,14 +19,14 @@
 // Subdivides( start.x,start.y _to_ end.x,end.y ) Z is ignored but must exist in syntax
 default
 {
-    state_entry()
-    {
-        llSay(0,"Touch to subdivide adjacent Parcels using osParcelSubdivide");
-    }
-    touch_start(integer test)
-    {
-        vector start = <0.0, 0.0, 0.0>; //top corner
-        vector end = <100.0, 100.0, 0.0>;
-        osParcelSubdivide(start, end);
-    }
+	state_entry()
+	{
+		llSay(0,"Touch to subdivide adjacent Parcels using osParcelSubdivide");
+	}
+	touch_start(integer test)
+	{
+		vector start = <0.0, 0.0, 0.0>; //top corner
+		vector end = <100.0, 100.0, 0.0>;
+		osParcelSubdivide(start, end);
+	}
 }

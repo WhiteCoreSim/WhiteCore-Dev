@@ -17,12 +17,12 @@
 //
 default
 {
-    state_entry()
-    {
-        llSay(0,"Touch to get Script Engine Name");
-    }
-    touch_end(integer total_num)
-    {
-        llSay(0,"The Script Engine Name is: "+osGetScriptEngineName());
-    }
+	state_entry()
+	{
+		llSay(0,"Touch to get Script Engine Name");
+	}
+	touch_end(integer total_num)
+	{
+		llSay(0,"The Script Engine Name is: "+osGetScriptEngineName());
+	}
 }

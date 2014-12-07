@@ -24,23 +24,23 @@
 //
 default
 {
-    state_entry()
-    {
-        llSay(0,"Touch to use osSetParcelDetails Parcels");
-    }
-    touch_start(integer total_num)
-    {
-        vector position = <128.0, 128.0, 0.0>;       //Parcel Location: centre of region
-        string name = "My New Land ";                //Parcel Name to set
-        string descript = "My New Land Description"; //Parcel Description text
-        key owner = llGetOwner();                    //Parcel Owners UUID
-        key group = NULL_KEY;                        //Parcel Group UUID
-        // setup the Rules List with the above values 
-        list rules =[
-            PARCEL_DETAILS_NAME, name,
-            PARCEL_DETAILS_DESC, descript,
-            PARCEL_DETAILS_OWNER, owner,
-            PARCEL_DETAILS_GROUP, group];
-        osSetParcelDetails(position, rules);
-    }
+	state_entry()
+	{
+		llSay(0,"Touch to use osSetParcelDetails Parcels");
+	}
+	touch_start(integer total_num)
+	{
+		vector position = <128.0, 128.0, 0.0>;       //Parcel Location: centre of region
+		string name = "My New Land ";                //Parcel Name to set
+		string descript = "My New Land Description"; //Parcel Description text
+		key owner = llGetOwner();                    //Parcel Owners UUID
+		key group = NULL_KEY;                        //Parcel Group UUID
+		// setup the Rules List with the above values
+		list rules =[
+			PARCEL_DETAILS_NAME, name,
+			PARCEL_DETAILS_DESC, descript,
+			PARCEL_DETAILS_OWNER, owner,
+			PARCEL_DETAILS_GROUP, group];
+		osSetParcelDetails(position, rules);
+	}
 }

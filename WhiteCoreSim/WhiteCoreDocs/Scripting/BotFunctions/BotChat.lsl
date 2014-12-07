@@ -13,18 +13,18 @@ integer sayType = 1;
 integer channel = 0;
 default
 {
-    state_entry()
-    {
-        //On startup, we'll generate a new bot, then make it move when we touch it
-        //Create the bot with the given first/last name and the user whose appearance it will duplicate
-        userToDuplicate = llGetOwner();
+	state_entry()
+	{
+		//On startup, we'll generate a new bot, then make it move when we touch it
+		//Create the bot with the given first/last name and the user whose appearance it will duplicate
+		userToDuplicate = llGetOwner();
 		vector startPos = llGetPos();
-        botID = botCreateBot(first, last, userToDuplicate, startPos);
-    }
-    touch_start(integer number)
-    {
-        //Say the message to users
-        botSendChatMessage (botID, message, channel, sayType);
-        botSendIM (botID, llGetOwner(), message);
-    }
+		botID = botCreateBot(first, last, userToDuplicate, startPos);
+	}
+	touch_start(integer number)
+	{
+		//Say the message to users
+		botSendChatMessage (botID, message, channel, sayType);
+		botSendIM (botID, llGetOwner(), message);
+	}
 }

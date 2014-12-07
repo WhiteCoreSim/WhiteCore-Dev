@@ -18,27 +18,27 @@
 integer Touched = FALSE;
 default
 {
-    state_entry()
-    {
-         llSay(0,"Touch to see osDrawPolygon create a Polygon Image on the prim"); 
-    }
-    touch_end(integer num)
-    {
-        if(Touched)
-        {
-            Touched = FALSE;
-            llSetTexture(TEXTURE_PLYWOOD, ALL_SIDES);
-        }
-        else
-        {
-            Touched = TRUE;
-            string DrawList = ""; 
-            DrawList = osSetPenSize( DrawList, 3 );                               // Set the pen width to 3 pixels
-            DrawList = osSetPenColor( DrawList, "Purple" );                      // Set the pen color to blue
-            DrawList = osDrawPolygon( DrawList, [25,50,75], ["50",100.0,150] );   // integer, float or string are usable
-            // Draw the polygon
-            osSetDynamicTextureData( "", "vector", DrawList, "", 0 );
-            llSay(0,"Touch again to revert to Default Plywood texture");
-        }
-    }
+	state_entry()
+	{
+		llSay(0,"Touch to see osDrawPolygon create a Polygon Image on the prim");
+	}
+	touch_end(integer num)
+	{
+		if(Touched)
+		{
+			Touched = FALSE;
+			llSetTexture(TEXTURE_PLYWOOD, ALL_SIDES);
+		}
+		else
+		{
+			Touched = TRUE;
+			string DrawList = "";
+			DrawList = osSetPenSize( DrawList, 3 );                               // Set the pen width to 3 pixels
+			DrawList = osSetPenColor( DrawList, "Purple" );                      // Set the pen color to blue
+			DrawList = osDrawPolygon( DrawList, [25,50,75], ["50",100.0,150] );   // integer, float or string are usable
+			// Draw the polygon
+			osSetDynamicTextureData( "", "vector", DrawList, "", 0 );
+			llSay(0,"Touch again to revert to Default Plywood texture");
+		}
+	}
 }

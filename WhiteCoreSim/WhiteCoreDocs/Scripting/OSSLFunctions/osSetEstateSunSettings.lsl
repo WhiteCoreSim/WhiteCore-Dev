@@ -22,28 +22,28 @@ float fSunHour;
 
 default
 {
-    state_entry()
-    {
-        llSay(0,"Touch to see osSetEstateSunSettings used to change Sun Position ");
-    }
+	state_entry()
+	{
+		llSay(0,"Touch to see osSetEstateSunSettings used to change Sun Position ");
+	}
 
-    touch_start(integer total_num)
-    {
-        if(iTest)
-        {
-            iTest = FALSE;
-            iSunFixed = TRUE; // TRUE = Sun stationary, FALSE = use global time & move
-            fSunHour = 19.00;   // The "Sun Hour" that is desired, 0...24, with 0 just after SunRise
-            // Set the prepared texture to the Prim
-            osSetEstateSunSettings(iSunFixed, fSunHour);
-        }
-        else
-        {
-            iTest = TRUE;
-            iSunFixed = FALSE;
-            fSunHour = 10.00;
-            osSetEstateSunSettings(iSunFixed, fSunHour);
-        }
-        llSay(0,"osSetEstateSunSettings : SunFixed = ["+iSunFixed+"], SunHour = ["+fSunHour+"]");
-    }
+	touch_start(integer total_num)
+	{
+		if(iTest)
+		{
+			iTest = FALSE;
+			iSunFixed = TRUE; // TRUE = Sun stationary, FALSE = use global time & move
+			fSunHour = 19.00;   // The "Sun Hour" that is desired, 0...24, with 0 just after SunRise
+			// Set the prepared texture to the Prim
+			osSetEstateSunSettings(iSunFixed, fSunHour);
+		}
+		else
+		{
+			iTest = TRUE;
+			iSunFixed = FALSE;
+			fSunHour = 10.00;
+			osSetEstateSunSettings(iSunFixed, fSunHour);
+		}
+		llSay(0,"osSetEstateSunSettings : SunFixed = ["+iSunFixed+"], SunHour = ["+fSunHour+"]");
+	}
 }

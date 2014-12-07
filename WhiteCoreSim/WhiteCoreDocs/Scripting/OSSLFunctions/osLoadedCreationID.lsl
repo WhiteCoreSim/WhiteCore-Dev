@@ -14,15 +14,15 @@
 // Inworld Script Line:    string osLoadedCreationID();
 //
 // Example of osLoadedCreationID()
-// This function returns a string containing the UUID that a sim was created with.  
+// This function returns a string containing the UUID that a sim was created with.
 default
 {
-    state_entry() // display @ start
-    {
-        llSay(0, "Touch to see Example osLoadedCreationID()");
-    }
-    touch_end(integer num)
-    {
-        llSay(0,"osLoadedCreationID: " + osLoadedCreationID());
-    }
+	state_entry() // display @ start
+	{
+		llSay(0, "Touch to see Example osLoadedCreationID()");
+	}
+	touch_end(integer num)
+	{
+		llSay(0,"osLoadedCreationID: " + osLoadedCreationID());
+	}
 }

@@ -17,17 +17,17 @@
 //
 default
 {
-    state_entry() // display @ start
-    {
-        llSay(0, "Touch to see osKickAvatar kick you off the region with a message (You can relog after)");
-    }
-    touch_end(integer num)
-    {
-        key kAvatar = llDetectedKey(0);
-        list lName = llParseString2List(osKey2Name(kAvatar), [" "],[]);
-        string FirstName = llList2String(lName,0);
-        string LastName = llList2String(lName,1);
-        llInstantMessage(kAvatar, "Sorry, "+FirstName+" "+LastName+" This was an example osKickAvatar ");
-        osKickAvatar(FirstName,LastName,"You have been test kicked!");
-    }
+	state_entry() // display @ start
+	{
+		llSay(0, "Touch to see osKickAvatar kick you off the region with a message (You can relog after)");
+	}
+	touch_end(integer num)
+	{
+		key kAvatar = llDetectedKey(0);
+		list lName = llParseString2List(osKey2Name(kAvatar), [" "],[]);
+		string FirstName = llList2String(lName,0);
+		string LastName = llList2String(lName,1);
+		llInstantMessage(kAvatar, "Sorry, "+FirstName+" "+LastName+" This was an example osKickAvatar ");
+		osKickAvatar(FirstName,LastName,"You have been test kicked!");
+	}
 }

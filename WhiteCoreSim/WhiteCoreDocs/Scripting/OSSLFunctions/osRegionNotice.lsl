@@ -18,13 +18,13 @@
 //
 default
 {
-    state_entry()
-    {
-        llSay(0,"Touch to send a Notice to the region");
-    }
-    touch_start(integer total_num)
-    {
-        string message = "This is a test Notice to this region using osRegionNotice";
-        osRegionNotice(message);
-    }
+	state_entry()
+	{
+		llSay(0,"Touch to send a Notice to the region");
+	}
+	touch_start(integer total_num)
+	{
+		string message = "This is a test Notice to this region using osRegionNotice";
+		osRegionNotice(message);
+	}
 }
