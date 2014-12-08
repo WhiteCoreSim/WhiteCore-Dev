@@ -233,7 +233,7 @@ namespace WhiteCore.Modules.Startup
 
         #region ISharedRegionStartupModule Members
 
-        public void Initialise(IScene scene, IConfigSource source, ISimulationBase openSimBase)
+        public void Initialise(IScene scene, IConfigSource source, ISimulationBase simBase)
         {
             m_scene = scene;
             //Register the interface
@@ -252,15 +252,15 @@ namespace WhiteCore.Modules.Startup
             RegisterRegionWithGrid(scene, false, true, m_RegisterRegionPassword);
         }
 
-        public void PostInitialise(IScene scene, IConfigSource source, ISimulationBase openSimBase)
+        public void PostInitialise(IScene scene, IConfigSource source, ISimulationBase simBase)
         {
         }
 
-        public void FinishStartup(IScene scene, IConfigSource source, ISimulationBase openSimBase)
+        public void FinishStartup(IScene scene, IConfigSource source, ISimulationBase simBase)
         {
         }
 
-        public void PostFinishStartup(IScene scene, IConfigSource source, ISimulationBase openSimBase)
+        public void PostFinishStartup(IScene scene, IConfigSource source, ISimulationBase simBase)
         {
             scene.RequestModuleInterface<ISyncMessageRecievedService>().OnMessageReceived +=
                 RegisterRegionWithGridModule_OnMessageReceived;

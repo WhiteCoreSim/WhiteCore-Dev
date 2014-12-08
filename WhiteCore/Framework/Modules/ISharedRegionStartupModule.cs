@@ -38,8 +38,8 @@ namespace WhiteCore.Framework.Modules
         /// </summary>
         /// <param name="scene"></param>
         /// <param name="source"></param>
-        /// <param name="openSimBase"></param>
-        void Initialise(IScene scene, IConfigSource source, ISimulationBase openSimBase);
+        /// <param name="simBase"></param>
+        void Initialise(IScene scene, IConfigSource source, ISimulationBase simBase);
 
         /// <summary>
         ///     PostInitialise the module
@@ -47,24 +47,24 @@ namespace WhiteCore.Framework.Modules
         /// </summary>
         /// <param name="scene"></param>
         /// <param name="source"></param>
-        /// <param name="openSimBase"></param>
-        void PostInitialise(IScene scene, IConfigSource source, ISimulationBase openSimBase);
+        /// <param name="simBase"></param>
+        void PostInitialise(IScene scene, IConfigSource source, ISimulationBase simBase);
 
         /// <summary>
         ///     Do the functions of the module and set up any necessary functions
         /// </summary>
         /// <param name="scene"></param>
         /// <param name="source"></param>
-        /// <param name="openSimBase"></param>
-        void FinishStartup(IScene scene, IConfigSource source, ISimulationBase openSimBase);
+        /// <param name="simBase"></param>
+        void FinishStartup(IScene scene, IConfigSource source, ISimulationBase simBase);
 
         /// <summary>
         ///     Do the functions of the module and set up any necessary functions
         /// </summary>
         /// <param name="scene"></param>
         /// <param name="source"></param>
-        /// <param name="openSimBase"></param>
-        void PostFinishStartup(IScene scene, IConfigSource source, ISimulationBase openSimBase);
+        /// <param name="simBase"></param>
+        void PostFinishStartup(IScene scene, IConfigSource source, ISimulationBase simBase);
 
         /// <summary>
         ///     Close the module and remove all references to it
