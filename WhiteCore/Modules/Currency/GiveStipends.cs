@@ -55,7 +55,7 @@ namespace WhiteCore.Modules.Currency
             m_currencyService = CurrencyService;
             m_options = options;
             m_registry = registry;
-            taskTimer.Interval = 360000;
+            taskTimer.Interval = m_options.SchedulerInterval;
             taskTimer.Elapsed += TimerElapsed;
             m_scheduler = registry.RequestModuleInterface<IScheduleService>();
             if (m_scheduler == null) return;
@@ -64,10 +64,8 @@ namespace WhiteCore.Modules.Currency
             registry.RequestModuleInterface<ISimulationBase>().EventManager.RegisterEventHandler("DeleteUserInformation", DeleteUserInformation);
             registry.RequestModuleInterface<ISimulationBase>().EventManager.RegisterEventHandler("CreateUserInformation", CreateUserInformation);
             registry.RequestModuleInterface<ISimulationBase>().EventManager.RegisterEventHandler("UpdateUserInformation", CreateUserInformation);
-
-
         }
-
+        
         private object CreateUserInformation(string functionname, object parameters)
         {
             UUID userid = (UUID)parameters;

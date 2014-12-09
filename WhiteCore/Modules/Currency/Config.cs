@@ -41,32 +41,31 @@ namespace WhiteCore.Modules.Currency
     {
         #region declarations
 
-        private uint m_priceUpload = 0;
-        private uint m_priceGroupCreate = 0;
-        private uint m_priceDirectoryFee = 0;
-        private int m_stipend = 0;
-        private string m_upgradeMembershipUri = "";
-
-        private string m_errorURI = "";
-
+        private uint m_PriceUpload = 0;
+        private uint m_PriceGroupCreate = 0;
+        private uint m_PriceDirectoryFee = 0;
+        private int m_Stipend = 0;
+        private string m_UpgradeMembershipUri = "";
+        private string m_ErrorURI = "";
+        private int m_SchedulerInterval = 0;
         private bool m_CanBuyCurrencyInworld = true;
         private bool m_GiveStipends = false;
-        private string m_stipendsEveryType = "month";
-        private bool m_stipendsPremiumOnly = false;
+        private string m_StipendsEveryType = "month";
+        private bool m_StipendsPremiumOnly = false;
         private int m_StipendsEvery = 1;
-        private uint m_clientPort = 8002;
+        private uint m_ClientPort = 8002;
         private bool m_StipendsLoadOldUsers = true;
         private bool m_GiveStipendsOnlyWhenLoggedIn = false;
-        private bool m_saveTransactionLogs = false;
-        private int m_maxAmountBeforeLogging = -1;
+        private bool m_SaveTransactionLogs = false;
+        private int m_MaxAmountBeforeLogging = -1;
         private int m_AdditionPercentage = 291;
         private int m_AdditionAmount = 30;
-        private int m_realCurrencyConversionFactor = 1;
-        private int m_maxAmountPurchasable = 10000;
-        private int m_maxAmountPurchasableOverTime = 100000;
-        private int m_maxAmountPurchasableEveryAmount = 1;
-        private string m_maxAmountPurchasableEveryType = "week";
-        private int m_minAmountPurchasable = 0;
+        private int m_RealCurrencyConversionFactor = 1;
+        private int m_MaxAmountPurchasable = 10000;
+        private int m_MaxAmountPurchasableOverTime = 100000;
+        private int m_MaxAmountPurchasableEveryAmount = 1;
+        private string m_MaxAmountPurchasableEveryType = "week";
+        private int m_MinAmountPurchasable = 0;
 
         #endregion
 
@@ -183,20 +182,20 @@ namespace WhiteCore.Modules.Currency
 
         public string ErrorURI
         {
-            get { return m_errorURI; }
-            set { m_errorURI = value; }
+            get { return m_ErrorURI; }
+            set { m_ErrorURI = value; }
         }
 
         public string UpgradeMembershipUri
         {
-            get { return m_upgradeMembershipUri; }
-            set { m_upgradeMembershipUri = value; }
+            get { return m_UpgradeMembershipUri; }
+            set { m_UpgradeMembershipUri = value; }
         }
 
         public int Stipend
         {
-            get { return m_stipend; }
-            set { m_stipend = value; }
+            get { return m_Stipend; }
+            set { m_Stipend = value; }
         }
 
         public bool GiveStipends
@@ -207,8 +206,8 @@ namespace WhiteCore.Modules.Currency
 
         public string StipendsEveryType
         {
-            get { return m_stipendsEveryType; }
-            set { m_stipendsEveryType = value; }
+            get { return m_StipendsEveryType; }
+            set { m_StipendsEveryType = value; }
         }
 
         public int StipendsEvery
@@ -219,32 +218,32 @@ namespace WhiteCore.Modules.Currency
 
         public int PriceGroupCreate
         {
-            get { return (int) m_priceGroupCreate; }
-            set { m_priceGroupCreate = (uint) value; }
+            get { return (int) m_PriceGroupCreate; }
+            set { m_PriceGroupCreate = (uint) value; }
         }
 
         public int PriceUpload
         {
-            get { return (int) m_priceUpload; }
-            set { m_priceUpload = (uint) value; }
+            get { return (int) m_PriceUpload; }
+            set { m_PriceUpload = (uint) value; }
         }
 
         public int PriceDirectoryFee
         {
-            get { return (int)m_priceDirectoryFee; }
-            set { m_priceDirectoryFee = (uint)value; }
+            get { return (int)m_PriceDirectoryFee; }
+            set { m_PriceDirectoryFee = (uint)value; }
         }
 
         public bool StipendsPremiumOnly
         {
-            get { return m_stipendsPremiumOnly; }
-            set { m_stipendsPremiumOnly = value; }
+            get { return m_StipendsPremiumOnly; }
+            set { m_StipendsPremiumOnly = value; }
         }
 
         public int ClientPort
         {
-            get { return (int) m_clientPort; }
-            set { m_clientPort = (uint) value; }
+            get { return (int) m_ClientPort; }
+            set { m_ClientPort = (uint) value; }
         }
 
         public bool CanBuyCurrencyInworld
@@ -267,14 +266,14 @@ namespace WhiteCore.Modules.Currency
 
         public bool SaveTransactionLogs
         {
-            get { return m_saveTransactionLogs; }
-            set { m_saveTransactionLogs = value; }
+            get { return m_SaveTransactionLogs; }
+            set { m_SaveTransactionLogs = value; }
         }
 
         public int MaxAmountBeforeLogging
         {
-            get { return m_maxAmountBeforeLogging; }
-            set { m_maxAmountBeforeLogging = value; }
+            get { return m_MaxAmountBeforeLogging; }
+            set { m_MaxAmountBeforeLogging = value; }
         }
 
         public int AdditionPercentage
@@ -291,38 +290,44 @@ namespace WhiteCore.Modules.Currency
 
         public int RealCurrencyConversionFactor
         {
-            get { return m_realCurrencyConversionFactor; }
-            set { m_realCurrencyConversionFactor = value; }
+            get { return m_RealCurrencyConversionFactor; }
+            set { m_RealCurrencyConversionFactor = value; }
         }
 
         public int MaxAmountPurchasable
         {
-            get { return m_maxAmountPurchasable; }
-            set { m_maxAmountPurchasable = value; }
+            get { return m_MaxAmountPurchasable; }
+            set { m_MaxAmountPurchasable = value; }
         }
 
         public int MaxAmountPurchasableOverTime
         {
-            get { return m_maxAmountPurchasableOverTime; }
-            set { m_maxAmountPurchasableOverTime = value; }
+            get { return m_MaxAmountPurchasableOverTime; }
+            set { m_MaxAmountPurchasableOverTime = value; }
         }
 
         public int MaxAmountPurchasableEveryAmount
         {
-            get { return m_maxAmountPurchasableEveryAmount; }
-            set { m_maxAmountPurchasableEveryAmount = value; }
+            get { return m_MaxAmountPurchasableEveryAmount; }
+            set { m_MaxAmountPurchasableEveryAmount = value; }
         }
 
         public string MaxAmountPurchasableEveryType
         {
-            get { return m_maxAmountPurchasableEveryType; }
-            set { m_maxAmountPurchasableEveryType = value; }
+            get { return m_MaxAmountPurchasableEveryType; }
+            set { m_MaxAmountPurchasableEveryType = value; }
         }
 
         public int MinAmountPurchasable
         {
-            get { return m_minAmountPurchasable; }
-            set { m_minAmountPurchasable = value; }
+            get { return m_MinAmountPurchasable; }
+            set { m_MinAmountPurchasable = value; }
+        }
+        
+        public int SchedulerInterval
+        {
+        	get { return m_SchedulerInterval; }
+        	set { m_SchedulerInterval = value; }
         }
 
         #endregion
