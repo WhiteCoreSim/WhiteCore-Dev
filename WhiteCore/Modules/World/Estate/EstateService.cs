@@ -969,7 +969,7 @@ namespace WhiteCore.Modules.Estate
 
         #region ISharedRegionStartupModule Members
 
-        public void Initialise(IScene scene, IConfigSource source, ISimulationBase openSimBase)
+        public void Initialise(IScene scene, IConfigSource source, ISimulationBase simBase)
         {
             IConfig config = source.Configs["EstateSettingsModule"];
             if (config != null)
@@ -1073,15 +1073,15 @@ namespace WhiteCore.Modules.Estate
             }
         }
 
-        public void PostInitialise(IScene scene, IConfigSource source, ISimulationBase openSimBase)
+        public void PostInitialise(IScene scene, IConfigSource source, ISimulationBase simBase)
         {
         }
 
-        public void FinishStartup(IScene scene, IConfigSource source, ISimulationBase openSimBase)
+        public void FinishStartup(IScene scene, IConfigSource source, ISimulationBase simBase)
         {
         }
 
-        public void PostFinishStartup(IScene scene, IConfigSource source, ISimulationBase openSimBase)
+        public void PostFinishStartup(IScene scene, IConfigSource source, ISimulationBase simBase)
         {
         }
 

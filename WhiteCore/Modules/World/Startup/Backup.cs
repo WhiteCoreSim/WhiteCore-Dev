@@ -57,7 +57,7 @@ namespace WhiteCore.Modules.Startup
 
         #region ISharedRegionStartupModule Members
 
-        public void Initialise(IScene scene, IConfigSource source, ISimulationBase openSimBase)
+        public void Initialise(IScene scene, IConfigSource source, ISimulationBase simBase)
         {
             if (MainConsole.Instance != null && m_backup.Count == 0) //Only add them once
             {
@@ -90,15 +90,15 @@ namespace WhiteCore.Modules.Startup
             m_backup[scene] = new InternalSceneBackup(scene);
         }
 
-        public void PostInitialise(IScene scene, IConfigSource source, ISimulationBase openSimBase)
+        public void PostInitialise(IScene scene, IConfigSource source, ISimulationBase simBase)
         {
         }
 
-        public void FinishStartup(IScene scene, IConfigSource source, ISimulationBase openSimBase)
+        public void FinishStartup(IScene scene, IConfigSource source, ISimulationBase simBase)
         {
         }
 
-        public void PostFinishStartup(IScene scene, IConfigSource source, ISimulationBase openSimBase)
+        public void PostFinishStartup(IScene scene, IConfigSource source, ISimulationBase simBase)
         {
             m_backup[scene].FinishStartup();
         }

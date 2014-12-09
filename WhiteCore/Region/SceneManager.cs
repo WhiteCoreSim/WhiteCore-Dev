@@ -790,7 +790,7 @@ namespace WhiteCore.Region
 
                 if (newRegion.RegionName != "abort")
                 {
-                    //                    StartRegion (store, store.CreateNewRegion (m_OpenSimBase, currentInfo));
+                    //                    StartRegion (store, store.CreateNewRegion (m_SimBase, currentInfo));
                     StartRegion (store, newRegion);
 
                     foreach (ISimulationDataStore st in m_simulationDataServices)
@@ -898,7 +898,7 @@ namespace WhiteCore.Region
 
             // let's do it
             ISimulationDataStore store = m_selectedDataService.Copy ();
-            //StartRegion (store, store.CreateNewRegion (m_OpenSimBase, newRegion, currentInfo));
+            //StartRegion (store, store.CreateNewRegion (m_SimBase, newRegion, currentInfo));
 
             var newRegion = store.CreateNewRegion (m_SimBase, loadRegion, currentInfo);
             if (newRegion.RegionName != "abort")
