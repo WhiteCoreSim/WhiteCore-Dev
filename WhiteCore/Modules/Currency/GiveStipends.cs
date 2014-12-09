@@ -135,6 +135,7 @@ namespace WhiteCore.Modules.Currency
             users = userService.GetUserAccounts(new List<UUID> { UUID.Zero }, 0, m_options.StipendsPremiumOnly ? 600 : 0);
             foreach (UserAccount user in users)
             {
+            	if (Utilities.IsSystemUser(user.PrincipalID)) continue;
             	SchedulerItem i = m_scheduler.Get(user.PrincipalID.ToString(), "StipendsPayout");
                 if (i != null) continue;
                 // Scheduler needs to get 1 date/time to set for "PayDay" - Fly 17/11/2014
