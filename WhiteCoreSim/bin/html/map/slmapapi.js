@@ -149,7 +149,7 @@ var SLURL = {
 		}
 		function mapWindow(regionName, gridX, gridY){
 			var
-				url       = ['hop://{MainServerURL}/' + encodeURIComponent(regionName), (gridX % 1) * 256, (gridY % 1) * 256].join('/'),
+				url       = ['secondlife://{MainServerURL}/' + encodeURIComponent(regionName), (gridX % 1) * 256, (gridY % 1) * 256].join('/'),
 				debugInfo = SLURL.debugMode ? ' x: ' + Math.floor(gridX) + ' y: ' + Math.floor(gridY) : '';
 			;
 			slMap.addMapWindow( new SLURL.MapWindow('<b>' + regionName + '</b><br>' + debugInfo + '<a href="' + url + '" class="teleport-button">Teleport Now</a>'), new SLURL.XYPoint(gridX, gridY));
