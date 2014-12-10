@@ -40,26 +40,20 @@ namespace WhiteCore.Framework.Utilities
         days = 4,
         weeks = 5,
         months = 6,
-        years = 7,
-        decades = 8,
-        centuries = 9,
-        millennium = 10,
-        Kilenniums = 11,
-        Centrenniums = 12,
-        Megaannum = 13
+        years = 7
     }
 
     public class SchedulerItem : IDataTransferable
     {
         public SchedulerItem()
         {
-            SimpleInitilize();
+            SimpleInitialize();
         }
 
         public SchedulerItem(string sName, string sParams, bool runOnce, DateTime startTime, int runEvery,
                              RepeatType runEveryType, UUID schedulefor)
         {
-            SimpleInitilize();
+            SimpleInitialize();
             FireFunction = sName;
             FireParams = sParams;
             RunOnce = runOnce;
@@ -112,7 +106,7 @@ namespace WhiteCore.Framework.Utilities
         }
 
 
-        private void SimpleInitilize()
+        private void SimpleInitialize()
         {
             id = UUID.Random().ToString();
             RunOnce = true;
