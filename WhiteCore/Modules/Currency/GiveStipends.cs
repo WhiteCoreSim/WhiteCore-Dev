@@ -86,7 +86,7 @@ namespace WhiteCore.Modules.Currency
                                                 OSDParser.SerializeJsonString(
                                                     new StipendsInfo() { AgentID = user.PrincipalID }.ToOSD()),
                                                 false, UnixTimeStampToDateTime(user.Created), runevery,
-                                                runevertype, user.PrincipalID) { HistoryKeep = true, HistoryReciept = true });
+                                                runevertype, user.PrincipalID) { HistoryKeep = true, HistoryReceipt = true });
             return null;
 
         }
@@ -145,7 +145,7 @@ namespace WhiteCore.Modules.Currency
                                                    OSDParser.SerializeJsonString(
                                                        new StipendsInfo() { AgentID = user.PrincipalID }.ToOSD()),
                                                    false, UnixTimeStampToDateTime(user.Created), runevery,
-                                                   runevertype, user.PrincipalID) { HistoryKeep = true, HistoryReciept = true });
+                                                   runevertype, user.PrincipalID) { HistoryKeep = true, HistoryReceipt = true });
             }
         }
 

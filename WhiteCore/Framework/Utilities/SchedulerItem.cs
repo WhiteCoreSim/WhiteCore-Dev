@@ -78,10 +78,8 @@ namespace WhiteCore.Framework.Utilities
                     TimeToRun = fromTime.AddSeconds(RunEvery);
                     break;
                 case RepeatType.minute:
-                    {
-                        TimeToRun = fromTime.AddMinutes(RunEvery*Math.Ceiling(ts.TotalMinutes/RunEvery));
-                        break;
-                    }
+                    TimeToRun = fromTime.AddMinutes(RunEvery*Math.Ceiling(ts.TotalMinutes/RunEvery));
+                    break;
                 case RepeatType.hours:
                     TimeToRun = fromTime.AddHours(RunEvery*Math.Ceiling(ts.Duration().TotalHours/RunEvery));
                     break;
@@ -111,7 +109,7 @@ namespace WhiteCore.Framework.Utilities
             id = UUID.Random().ToString();
             RunOnce = true;
             RunEvery = 0;
-            HistoryReciept = false;
+            HistoryReceipt = false;
             FireFunction = string.Empty;
             FireParams = string.Empty;
             HistoryKeep = false;
@@ -134,7 +132,7 @@ namespace WhiteCore.Framework.Utilities
 
         public string FireFunction { get; set; }
 
-        public bool HistoryReciept { get; set; }
+        public bool HistoryReceipt { get; set; }
 
         public bool RunOnce { get; set; }
 
@@ -159,7 +157,7 @@ namespace WhiteCore.Framework.Utilities
                                          {"HistoryKeep", HistoryKeep},
                                          {"FireParams", FireParams},
                                          {"FireFunction", FireFunction},
-                                         {"HistoryReciept", HistoryReciept},
+                                         {"HistoryReceipt", HistoryReceipt},
                                          {"RunOnce", RunOnce},
                                          {"RunEvery", RunEvery},
                                          {"CreateTime", CreateTime},
@@ -180,7 +178,7 @@ namespace WhiteCore.Framework.Utilities
             HistoryKeep = map["HistoryKeep"].AsBoolean();
             FireParams = map["FireParams"].AsString();
             FireFunction = map["FireFunction"].AsString();
-            HistoryReciept = map["HistoryReciept"].AsBoolean();
+            HistoryReceipt = map["HistoryReceipt"].AsBoolean();
             RunOnce = map["RunOnce"].AsBoolean();
             RunEvery = map["RunEvery"].AsInteger();
             CreateTime = map["CreateTime"].AsDate();

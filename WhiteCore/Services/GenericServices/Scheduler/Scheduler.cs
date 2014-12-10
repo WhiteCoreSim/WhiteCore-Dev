@@ -181,7 +181,7 @@ namespace WhiteCore.Services
         {
             try
             {
-                // save chagnes before it fires in case its chagned during the fire
+                // save changes before it fires in case its changed during the fire
                 I = m_database.SaveHistory(I);
 
                 if (I.RunOnce) I.Enabled = false;
@@ -193,7 +193,7 @@ namespace WhiteCore.Services
 
                 // now fire
                 List<Object> reciept = EventManager.FireGenericEventHandler(I.FireFunction, I.FireParams);
-                if (!I.HistoryReciept)
+                if (!I.HistoryReceipt)
                     I = m_database.SaveHistoryComplete(I);
                 else
                 {
