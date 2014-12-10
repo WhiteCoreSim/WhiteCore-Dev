@@ -87,8 +87,8 @@ namespace WhiteCore.Framework.Utilities
                     TimeToRun = fromTime.AddDays(RunEvery*Math.Ceiling(ts.Duration().TotalDays/RunEvery));
                     break;
                 case RepeatType.weeks:
-                    RunEvery = RunEvery*7;
-                    TimeToRun = fromTime.AddDays(RunEvery*Math.Ceiling(ts.Duration().TotalDays/RunEvery));
+                    int Week = RunEvery*7;
+                    TimeToRun = fromTime.AddDays(Week*Math.Ceiling(ts.Duration().TotalDays/Week));
                     break;
                 case RepeatType.months:
                     TimeToRun = fromTime.AddMonths(RunEvery);
