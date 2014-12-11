@@ -31,7 +31,8 @@ using System.Reflection;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine
 {
-    public class AssemblyResolver
+    [Serializable]
+    public class AssemblyResolver : MarshalByRefObject
     {
         private readonly string PathToSearch = "";
 

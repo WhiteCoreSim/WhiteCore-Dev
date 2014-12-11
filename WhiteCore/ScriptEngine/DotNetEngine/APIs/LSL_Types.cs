@@ -33,12 +33,14 @@ using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine
 {
-    public partial class LSL_Types
+    [Serializable]
+	public partial class LSL_Types
     {
         // Types are kept is separate .dll to avoid having to add whatever .dll it is in it to script AppDomain
         // Define the tolerance for variation in their values 
         const double DoubleDifference = .0000005;
 
+        [Serializable]
         public struct Vector3
         {
             public LSLFloat x;
@@ -307,6 +309,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             #endregion
         }
 
+        [Serializable]
         public struct Quaternion
         {
             public double x;
@@ -473,6 +476,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             }
         }
 
+        [Serializable]
         public class list : IEnumerator
         {
             private object[] m_data;
@@ -1377,6 +1381,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             #endregion
         }
 
+        [Serializable]
         public struct LSLString
         {
             public string m_string;
@@ -1610,6 +1615,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             #endregion
         }
 
+        [Serializable]
         public struct LSLInteger
         {
             public int value;
@@ -1916,6 +1922,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             #endregion
         }
 
+        [Serializable]
         public struct LSLFloat
         {
             public double value;
