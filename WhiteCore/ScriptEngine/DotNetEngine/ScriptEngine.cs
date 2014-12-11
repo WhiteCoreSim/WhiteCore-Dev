@@ -481,7 +481,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                                       (MaintenanceThread.scriptThreadpool == null
                                            ? 0
                                            : MaintenanceThread.scriptThreadpool.nSleepingthreads).ToString());
-            MaintenanceThread.Stats();
+            //MaintenanceThread.Stats();
         }
 
         protected void WhiteCoreDotNetDisable(IScene scene, string[] cmdparams)
