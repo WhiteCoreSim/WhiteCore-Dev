@@ -36,9 +36,6 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 
-using WhiteCore.Framework.ConsoleFramework;
-
-//namespace PerlinNoise
 namespace WhiteCore.Framework.SceneInfo
 {
     class PerlinNoise
@@ -169,36 +166,31 @@ namespace WhiteCore.Framework.SceneInfo
             int width = baseNoise.Length;
             int height = baseNoise[0].Length;
 
-            float[][][] smoothNoise = new float[octaveCount][][]; //an array of 2D arrays containing
-
-            float persistance = 0.7f;
-
-            //generate smooth noise
-            for (int i = 0; i < octaveCount; i++)
-            {
-                smoothNoise[i] = GenerateSmoothNoise(baseNoise, i);
-            }
-
+            float[][] smoothNoise;
             float[][] perlinNoise = GetEmptyArray<float>(width, height); //an array of floats initialised to 0
 
+            float persistance = 0.25f;
             float amplitude = 1.0f;
             float totalAmplitude = 0.0f;
             
-            //blend noise together
+            //blend noise octaves together
             for (int octave = octaveCount - 1; octave >= 0; octave--)
             {
-                amplitude *= persistance;
                 totalAmplitude += amplitude;
+                smoothNoise = GenerateSmoothNoise(baseNoise, octave);
 
                 for (int i = 0; i < width; i++)
                 {
                     for (int j = 0; j < height; j++)
                     {
-                        perlinNoise[i][j] += smoothNoise[octave][i][j] * amplitude;
-
+                        perlinNoise[i][j] += smoothNoise[i][j] * amplitude;
                     }
                 }
+                amplitude *= persistance;
             }
+
+            // try and free up the bucket of memory we may have just used
+            GC.Collect();
 
             //normalisation
             for (int i = 0; i < width; i++)

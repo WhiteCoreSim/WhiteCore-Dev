@@ -291,7 +291,7 @@ namespace WhiteCore.Modules
         /// <param name="info">Info.</param>
         /// <param name="prompt">If set to <c>true</c> prompt.</param>
         /// <param name="currentInfo">Current info.</param>
-        private RegionInfo CreateRegionFromConsole(RegionInfo info, Boolean prompt, Dictionary<string, int> currentInfo)
+        RegionInfo CreateRegionFromConsole(RegionInfo info, Boolean prompt, Dictionary<string, int> currentInfo)
         {
 
             if (info == null || info.NewRegion)
@@ -349,6 +349,12 @@ namespace WhiteCore.Modules
                             ? 1000 
                             : info.RegionLocY / Constants.RegionSize)).ToString ())) * Constants.RegionSize;
             
+                //info.RegionLocZ =
+                //    int.Parse (MainConsole.Instance.Prompt ("Region location Z",
+                //        ((info.RegionLocZ == 0 
+                //            ? 0 
+                //            : info.RegionLocZ / Constants.RegionSize)).ToString ())) * Constants.RegionSize;
+
                 // TODO: Implement non square regions??
                 // info.RegionSizeX = int.Parse (MainConsole.Instance.Prompt ("Region size X", info.RegionSizeX.ToString ()));
                 // info.RegionSizeY = int.Parse (MainConsole.Instance.Prompt ("Region size Y", info.RegionSizeY.ToString ()));
@@ -356,6 +362,7 @@ namespace WhiteCore.Modules
                 // only allow square regions as this is the assumption for now - 20141022 - greythane -
                 info.RegionSizeX = int.Parse (MainConsole.Instance.Prompt ("Region size", info.RegionSizeX.ToString ()));
                 info.RegionSizeY = info.RegionSizeX;
+                //info.RegionSizeZ = info.RegionSizeX;
 
                 // * Mainland / Full Region (Private)
                 // * Mainland / Homestead
@@ -368,7 +375,7 @@ namespace WhiteCore.Modules
 
                 // Region presets or advanced setup
                 string setupMode;                             
-                string terrainWater = "Aquatic";                             
+                string terrainOpen = "Grassland";                             
                 string terrainFull = "Grassland";
                 var responses = new List<string>();
                 if (info.RegionType.ToLower().StartsWith("m"))
@@ -384,7 +391,7 @@ namespace WhiteCore.Modules
 
                     // allow specifying terrain for Openspace
                     if (setupMode.StartsWith("o"))
-                        terrainWater = MainConsole.Instance.Prompt("Openspace terrain (Aquatic / Land)?","Aquatic").ToLower();
+                        terrainOpen = MainConsole.Instance.Prompt("Openspace terrain ( Grassland, Swamp, Aquatic)?", terrainOpen).ToLower();
 
                 } else
                 {
@@ -396,13 +403,16 @@ namespace WhiteCore.Modules
                     setupMode = MainConsole.Instance.Prompt("Estate region type?","Full Region", responses).ToLower();
                 }
 
-                // terrain can be specified for Full regions
+                // terrain can be specified for Full or custom regions
                 if (setupMode.StartsWith ("f") || setupMode.StartsWith ("c"))
                 {
                     var tresp = new List<string>();
                     tresp.Add ("Flatland");
                     tresp.Add ("Grassland");
+                    tresp.Add ("Hills");
+                    tresp.Add ("Mountainous");
                     tresp.Add ("Island");
+                    tresp.Add ("Swamp");
                     tresp.Add ("Aquatic");
                     string tscape = MainConsole.Instance.Prompt ("Terrain Type?", terrainFull,tresp);
                     terrainFull = tscape;
@@ -411,8 +421,11 @@ namespace WhiteCore.Modules
 
                 if (setupMode.StartsWith("c"))
                 {
-                    info.RegionPort = int.Parse (MainConsole.Instance.Prompt ("Region Port", info.RegionPort.ToString ()));
+                    info.RegionType = info.RegionType + "Custom";                   
                     info.RegionTerrain = terrainFull;
+
+                    // allow port selection
+                    info.RegionPort = int.Parse (MainConsole.Instance.Prompt ("Region Port", info.RegionPort.ToString ()));
 
                     // Startup mode
                     string scriptStart = MainConsole.Instance.Prompt (
@@ -451,10 +464,14 @@ namespace WhiteCore.Modules
                     // 'Openspace' setup
                     info.RegionType = info.RegionType + "Openspace";                   
                     //info.RegionPort;            // use auto assigned port
-                    if (terrainWater.StartsWith("a"))
+
+                    if (terrainOpen.StartsWith("a"))
                         info.RegionTerrain = "Aquatic";
+                    else if (terrainOpen.StartsWith("s"))
+                        info.RegionTerrain = "Swamp";
                     else
                         info.RegionTerrain = "Grassland";
+
                     info.Startup = StartupType.Medium;
                     info.SeeIntoThisSimFromNeighbor = true;
                     info.InfiniteRegion = false;
@@ -810,7 +827,7 @@ namespace WhiteCore.Modules
         /// <param name="FunctionName"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        private object WhiteCoreEventManager_OnGenericEvent(string FunctionName, object parameters)
+        object WhiteCoreEventManager_OnGenericEvent(string FunctionName, object parameters)
         {
             if (FunctionName == "Backup")
             {
@@ -824,7 +841,7 @@ namespace WhiteCore.Modules
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void m_saveTimer_Elapsed(object sender, ElapsedEventArgs e)
+        void m_saveTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             if (m_requiresSave)
             {
@@ -860,7 +877,7 @@ namespace WhiteCore.Modules
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void m_backupSaveTimer_Elapsed(object sender, ElapsedEventArgs e)
+        void m_backupSaveTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             try
             {
@@ -1033,13 +1050,13 @@ namespace WhiteCore.Modules
                                       m_scene.RegionInfo.RegionName);
         }
 
-        private string BuildOldSaveFileName()
+        string BuildOldSaveFileName()
         {
             return Path.Combine(m_oldSaveDirectory,
                                 m_scene.RegionInfo.RegionName + SerializeDateTime() + ".sim");
         }
 
-        private string BuildSaveFileName()
+        string BuildSaveFileName()
         {
             //return (m_storeDirectory == "" || m_storeDirectory == "/")
             // the'/' diretcory is valid an someone might use it to store backups so don't
@@ -1051,14 +1068,14 @@ namespace WhiteCore.Modules
                        : Path.Combine(m_storeDirectory, name + ".sim");
         }
 
-        private string BuildSaveFileName( string name)
+        string BuildSaveFileName( string name)
         {
             return (m_storeDirectory == "")
                 ? name + ".sim"
                     : Path.Combine(m_storeDirectory, name + ".sim");
         }
 
-        private byte[] WriteTerrainToStream(ITerrainChannel tModule)
+        byte[] WriteTerrainToStream(ITerrainChannel tModule)
         {
             int tMapSize = tModule.Height*tModule.Height;
             byte[] sdata = new byte[tMapSize*2];
@@ -1098,7 +1115,7 @@ namespace WhiteCore.Modules
             GC.Collect();
         }
 
-        private ITerrainChannel ReadFromData(byte[] data)
+        ITerrainChannel ReadFromData(byte[] data)
         {
             if (data == null) return null;
             short[] sdata = new short[data.Length/2];

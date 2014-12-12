@@ -70,34 +70,34 @@ namespace WhiteCore.Modules.Terrain
 
         #endregion
 
-        private const int MAX_HEIGHT = 250;
-        private const int MIN_HEIGHT = 0;
+        const int MAX_HEIGHT = 250;
+        const int MIN_HEIGHT = 0;
 
-        private static readonly List<TerrainModule> m_terrainModules = new List<TerrainModule>();
+        static readonly List<TerrainModule> m_terrainModules = new List<TerrainModule>();
 
-        private readonly Dictionary<StandardTerrainEffects, ITerrainFloodEffect> m_floodeffects =
+        readonly Dictionary<StandardTerrainEffects, ITerrainFloodEffect> m_floodeffects =
             new Dictionary<StandardTerrainEffects, ITerrainFloodEffect>();
 
-        private readonly Dictionary<string, ITerrainLoader> m_loaders = new Dictionary<string, ITerrainLoader>();
+        readonly Dictionary<string, ITerrainLoader> m_loaders = new Dictionary<string, ITerrainLoader>();
 
-        private readonly Dictionary<StandardTerrainEffects, ITerrainPaintableEffect> m_painteffects =
+        readonly Dictionary<StandardTerrainEffects, ITerrainPaintableEffect> m_painteffects =
             new Dictionary<StandardTerrainEffects, ITerrainPaintableEffect>();
 
-        private readonly Timer m_queueTimer = new Timer();
-        private readonly UndoStack<LandUndoState> m_undo = new UndoStack<LandUndoState>(5);
+        readonly Timer m_queueTimer = new Timer();
+        readonly UndoStack<LandUndoState> m_undo = new UndoStack<LandUndoState>(5);
 
-        private ITerrainChannel m_channel;
+        ITerrainChannel m_channel;
         protected bool m_noTerrain;
-        private Vector3 m_previousCheckedPosition = Vector3.Zero;
-        private long m_queueNextSave;
-        private ITerrainChannel m_revert;
-        private int m_savetime = 2; // seconds to wait before saving terrain
-        private IScene m_scene;
-        private bool m_sendTerrainUpdatesByViewDistance;
+        Vector3 m_previousCheckedPosition = Vector3.Zero;
+        long m_queueNextSave;
+        ITerrainChannel m_revert;
+        int m_savetime = 2; // seconds to wait before saving terrain
+        IScene m_scene;
+        bool m_sendTerrainUpdatesByViewDistance;
         protected Dictionary<UUID, bool[,]> m_terrainPatchesSent = new Dictionary<UUID, bool[,]>();
         protected bool m_use3DWater;
-        private ITerrainChannel m_waterChannel;
-        private ITerrainChannel m_waterRevert;
+        ITerrainChannel m_waterChannel;
+        ITerrainChannel m_waterRevert;
 
         #region INonSharedRegionModule Members
 
@@ -347,7 +347,7 @@ namespace WhiteCore.Modules.Terrain
         /// </summary>
         /// <returns>The terrain loader.</returns>
         /// <param name="fileName">File name of the terrain heightmap.</param>
-        private ITerrainLoader GetTerrainLoader(string fileName)
+        ITerrainLoader GetTerrainLoader(string fileName)
         {
             ITerrainLoader loader = null;
 
@@ -674,7 +674,7 @@ namespace WhiteCore.Modules.Terrain
 
         #region Plugin Loading Methods
 
-        private void LoadPlugins()
+        void LoadPlugins()
         {
             string plugineffectsPath = "Terrain";
 
@@ -715,7 +715,7 @@ namespace WhiteCore.Modules.Terrain
         ///     Installs terrain brush hook to IClientAPI
         /// </summary>
         /// <param name="client"></param>
-        private void EventManager_OnNewClient(IClientAPI client)
+        void EventManager_OnNewClient(IClientAPI client)
         {
             client.OnModifyTerrain += client_OnModifyTerrain;
             client.OnBakeTerrain += client_OnBakeTerrain;
@@ -738,7 +738,7 @@ namespace WhiteCore.Modules.Terrain
             }
         }
 
-        private void OnClosingClient(IClientAPI client)
+        void OnClosingClient(IClientAPI client)
         {
             client.OnModifyTerrain -= client_OnModifyTerrain;
             client.OnBakeTerrain -= client_OnBakeTerrain;
@@ -772,7 +772,7 @@ namespace WhiteCore.Modules.Terrain
             }
         }
 
-        private object WhiteCoreEventManager_OnGenericEvent(string FunctionName, object parameters)
+        object WhiteCoreEventManager_OnGenericEvent(string FunctionName, object parameters)
         {
             if (FunctionName == "DrawDistanceChanged" || FunctionName == "SignficantCameraMovement")
             {
@@ -781,7 +781,7 @@ namespace WhiteCore.Modules.Terrain
             return null;
         }
 
-        private void EventManager_OnSignificantClientMovement(IScenePresence presence)
+        void EventManager_OnSignificantClientMovement(IScenePresence presence)
         {
             if (Vector3.DistanceSquared(presence.AbsolutePosition, m_previousCheckedPosition) > 16*16)
             {
@@ -790,7 +790,7 @@ namespace WhiteCore.Modules.Terrain
             }
         }
 
-        private void OnNewPresence(IScenePresence presence)
+        void OnNewPresence(IScenePresence presence)
         {
             SendTerrainUpdatesForClient(presence);
         }
@@ -1152,7 +1152,7 @@ namespace WhiteCore.Modules.Terrain
             return channel;
         }
 
-        private static Stream URIFetch(Uri uri)
+        static Stream URIFetch(Uri uri)
         {
             HttpWebRequest request = (HttpWebRequest) WebRequest.Create(uri);
 
@@ -1177,7 +1177,7 @@ namespace WhiteCore.Modules.Terrain
         /// <summary>
         ///     Installs into terrain module the standard suite of brushes
         /// </summary>
-        private void InstallDefaultEffects()
+        void InstallDefaultEffects()
         {
             // Draggable Paint Brush Effects
             m_painteffects[StandardTerrainEffects.Raise] = new RaiseSphere();
@@ -1271,7 +1271,7 @@ namespace WhiteCore.Modules.Terrain
             }
         }
 
-        private void client_onGodlikeMessage(IClientAPI client, UUID requester, string Method, List<string> Parameters)
+        void client_onGodlikeMessage(IClientAPI client, UUID requester, string Method, List<string> Parameters)
         {
             if (!m_scene.Permissions.IsGod(client.AgentId))
                 return;
@@ -1300,7 +1300,7 @@ namespace WhiteCore.Modules.Terrain
         ///     but won't attempt to limit those changes to the limits specified in the estate settings
         ///     currently invoked by the command line operations in the region server only
         /// </summary>
-        private void CheckForTerrainUpdates()
+        void CheckForTerrainUpdates()
         {
             CheckForTerrainUpdates(false, false, false);
         }
@@ -1315,7 +1315,7 @@ namespace WhiteCore.Modules.Terrain
         ///     <param name="forceSendOfTerrainInfo">force send terrain</param>
         ///     <param name="isWater">Check water or terrain</param>
         /// </summary>
-        private void CheckForTerrainUpdates(bool respectEstateSettings, bool forceSendOfTerrainInfo, bool isWater)
+        void CheckForTerrainUpdates(bool respectEstateSettings, bool forceSendOfTerrainInfo, bool isWater)
         {
             ITerrainChannel channel = isWater ? m_waterChannel : m_channel;
             bool shouldTaint = false;
@@ -1367,7 +1367,7 @@ namespace WhiteCore.Modules.Terrain
             }
         }
 
-        private bool LimitMaxTerrain(ITerrainChannel channel)
+        bool LimitMaxTerrain(ITerrainChannel channel)
         {
             bool changesLimited = false;
 
@@ -1400,7 +1400,7 @@ namespace WhiteCore.Modules.Terrain
         ///     are all within the current estate limits
         ///     <returns>true if changes were limited, false otherwise</returns>
         /// </summary>
-        private bool LimitChannelChanges(ITerrainChannel channel, ITerrainChannel revert)
+        bool LimitChannelChanges(ITerrainChannel channel, ITerrainChannel revert)
         {
             bool changesLimited = false;
             float minDelta = (float) m_scene.RegionInfo.RegionSettings.TerrainLowerLimit;
@@ -1432,7 +1432,7 @@ namespace WhiteCore.Modules.Terrain
             return changesLimited;
         }
 
-        private void client_OnLandUndo(IClientAPI client)
+        void client_OnLandUndo(IClientAPI client)
         {
             lock (m_undo)
             {
@@ -1445,7 +1445,7 @@ namespace WhiteCore.Modules.Terrain
             }
         }
 
-        private void client_OnModifyTerrain(UUID user, float height, float seconds, byte size, byte action,
+        void client_OnModifyTerrain(UUID user, float height, float seconds, byte size, byte action,
                                             float north, float west, float south, float east, UUID agentId,
                                             float BrushSize)
         {
@@ -1505,7 +1505,7 @@ namespace WhiteCore.Modules.Terrain
             }
         }
 
-        private void client_OnBakeTerrain(IClientAPI remoteClient)
+        void client_OnBakeTerrain(IClientAPI remoteClient)
         {
             // Not a good permissions check (see client_OnModifyTerrain above), need to check the entire area.
             // for now check a point in the centre of the region
@@ -1516,7 +1516,7 @@ namespace WhiteCore.Modules.Terrain
             }
         }
 
-        private void StoreUndoState()
+        void StoreUndoState()
         {
             lock (m_undo)
             {
@@ -1537,7 +1537,7 @@ namespace WhiteCore.Modules.Terrain
 
         #region Console Commands
 
-        private List<TerrainModule> FindModuleForScene(IScene scene)
+        List<TerrainModule> FindModuleForScene(IScene scene)
         {
             List<TerrainModule> modules = new List<TerrainModule>();
             if (scene == null)
@@ -1555,7 +1555,7 @@ namespace WhiteCore.Modules.Terrain
             return modules;
         }
 
-        private void InterfaceLoadFile(IScene scene, string[] cmd)
+        void InterfaceLoadFile(IScene scene, string[] cmd)
         {
             if (cmd.Length < 3)
 			{
@@ -1596,7 +1596,7 @@ namespace WhiteCore.Modules.Terrain
             // LoadFromFile(cmd[2], offsetX, offsetY);
         }
 
-        private void InterfaceLoadTileFile(IScene scene, string[] cmd)
+        void InterfaceLoadTileFile(IScene scene, string[] cmd)
         {
 
             if (cmd.Length < 7)
@@ -1637,7 +1637,7 @@ namespace WhiteCore.Modules.Terrain
 			}
         }
 
-        private void InterfaceSaveFile(IScene scene, string[] cmd)
+        void InterfaceSaveFile(IScene scene, string[] cmd)
         {
 			if (cmd.Length < 3)
 			{
@@ -1652,7 +1652,7 @@ namespace WhiteCore.Modules.Terrain
 			}
         }
 
-        private void InterfaceSavePhysics(IScene scene, string[] cmd)
+        void InterfaceSavePhysics(IScene scene, string[] cmd)
         {
         	List<TerrainModule> m = FindModuleForScene(MainConsole.Instance.ConsoleScene);
 
@@ -1662,7 +1662,7 @@ namespace WhiteCore.Modules.Terrain
 			}
         }
 
-        private void InterfaceBakeTerrain(IScene scene, string[] cmd)
+        void InterfaceBakeTerrain(IScene scene, string[] cmd)
         {
 	        List<TerrainModule> m = FindModuleForScene(MainConsole.Instance.ConsoleScene);
 			foreach (TerrainModule tmodule in m) {
@@ -1671,7 +1671,7 @@ namespace WhiteCore.Modules.Terrain
 			}
         }
 
-        private void InterfaceRevertTerrain(IScene scene, string[] cmd)
+        void InterfaceRevertTerrain(IScene scene, string[] cmd)
         {
 			List<TerrainModule> m = FindModuleForScene(MainConsole.Instance.ConsoleScene);
 			foreach (TerrainModule tmodule in m) {
@@ -1684,7 +1684,7 @@ namespace WhiteCore.Modules.Terrain
 			}
         }
 
-        private void InterfaceFlipTerrain(IScene scene, string[] cmd)
+        void InterfaceFlipTerrain(IScene scene, string[] cmd)
         {
 			if (cmd.Length < 3)
 			{
@@ -1735,7 +1735,7 @@ namespace WhiteCore.Modules.Terrain
 
         }
 
-        private void InterfaceRescaleTerrain(IScene scene, string[] cmd)
+        void InterfaceRescaleTerrain(IScene scene, string[] cmd)
         {
             if (cmd.Length < 4)
             {
@@ -1797,7 +1797,7 @@ namespace WhiteCore.Modules.Terrain
 			}
         }
 
-        private void InterfaceElevateTerrain(IScene scene, string[] cmd)
+        void InterfaceElevateTerrain(IScene scene, string[] cmd)
         {
             if (cmd.Length < 3)
             {
@@ -1817,7 +1817,7 @@ namespace WhiteCore.Modules.Terrain
 			}
         }
 
-        private void InterfaceMultiplyTerrain(IScene scene, string[] cmd)
+        void InterfaceMultiplyTerrain(IScene scene, string[] cmd)
         {
             if (cmd.Length < 3)
             {
@@ -1837,7 +1837,7 @@ namespace WhiteCore.Modules.Terrain
 			}
         }
 
-        private void InterfaceLowerTerrain(IScene scene, string[] cmd)
+        void InterfaceLowerTerrain(IScene scene, string[] cmd)
         {
             if (cmd.Length < 3)
             {
@@ -1857,7 +1857,7 @@ namespace WhiteCore.Modules.Terrain
 			}
         }
 
-        private void InterfaceFillTerrain(IScene scene, string[] cmd)
+        void InterfaceFillTerrain(IScene scene, string[] cmd)
         {
             if (cmd.Length < 3)
             {
@@ -1883,7 +1883,7 @@ namespace WhiteCore.Modules.Terrain
 		/// </summary>
 		/// <param name="scene">Scene.</param>
 		/// <param name="cmd">Cmd.</param>
-		private void InterfaceGenerateTerrain(IScene scene, string[] cmd)
+		void InterfaceGenerateTerrain(IScene scene, string[] cmd)
 		{
             string terrainType;
             //assume grassland paramters
@@ -1894,7 +1894,7 @@ namespace WhiteCore.Modules.Terrain
 
             if (cmd.Length < 3)
 			{
-				terrainType = MainConsole.Instance.Prompt("What terrain type to use, Flatland, Grassland, Hills, Island or Aquatic?","Flatland");
+				terrainType = MainConsole.Instance.Prompt("What terrain type to use,\n Flatland, Grassland, Hills, Mountainous, Island, Swamp or Aquatic?","Flatland");
             } else
                 terrainType = cmd[2];
             terrainType = terrainType.ToLower();
@@ -1912,12 +1912,28 @@ namespace WhiteCore.Modules.Terrain
                 {       
                     minHeight = waterHeight;                                     
                     maxHeight = 40;
+                    smoothing = 3;
+                } else if (terrainType.StartsWith("m"))
+                {       
+                    minHeight = waterHeight;                                     
+                    maxHeight = 60;
                     smoothing = 2;
+                } else if (terrainType.StartsWith("g"))
+                {       
+                    minHeight = waterHeight-0.25f;                                     
+                    maxHeight = waterHeight+2f;
+                    smoothing = 5;
+                }  else if (terrainType.StartsWith("s"))
+                {       
+                    minHeight = waterHeight-0.25f;                                     
+                    maxHeight = waterHeight+0.75f;
+                    smoothing = 3;
                 }
 
-                // prompt for heights...
+                // prompt for custom heights...
                 minHeight = float.Parse (MainConsole.Instance.Prompt ("Minimum land height", minHeight.ToString ()));
                 maxHeight = float.Parse (MainConsole.Instance.Prompt ("Maximum land height", maxHeight.ToString ()));
+                smoothing = int.Parse (MainConsole.Instance.Prompt ("Smoothing passes", smoothing.ToString ()));
 
             } else if (terrainType.StartsWith ("a"))
             {
@@ -1952,7 +1968,7 @@ namespace WhiteCore.Modules.Terrain
 			}
 		}
 
-        private void InterfaceCalcArea(IScene scene, string[] cmd)
+        void InterfaceCalcArea(IScene scene, string[] cmd)
         {
 
             uint regionArea = CalcLandArea(scene);
@@ -1984,7 +2000,7 @@ namespace WhiteCore.Modules.Terrain
             return regionArea;
         }
 
-		private void InterfaceShowDebugStats(IScene scene, string[] cmd)
+		void InterfaceShowDebugStats(IScene scene, string[] cmd)
         {
 			List<TerrainModule> m = FindModuleForScene(MainConsole.Instance.ConsoleScene);
 			foreach (TerrainModule tmodule in m)
@@ -2014,7 +2030,7 @@ namespace WhiteCore.Modules.Terrain
 			}
         }
 
-        private void InterfaceEnableExperimentalBrushes(IScene scene, string[] cmd)
+        void InterfaceEnableExperimentalBrushes(IScene scene, string[] cmd)
         {
         	List<TerrainModule> m = FindModuleForScene(MainConsole.Instance.ConsoleScene);
 			foreach (TerrainModule tmodule in m)
@@ -2036,7 +2052,7 @@ namespace WhiteCore.Modules.Terrain
 		/// </summary>
 		/// <param name="scene">Scene.</param>
 		/// <param name="cmd">Cmd.</param>
-        private void InterfaceHelp(IScene scene, string[] cmd)
+        void InterfaceHelp(IScene scene, string[] cmd)
         {
             if (!MainConsole.Instance.HasProcessedCurrentCommand)
                 MainConsole.Instance.HasProcessedCurrentCommand = true;
@@ -2119,7 +2135,7 @@ namespace WhiteCore.Modules.Terrain
 		/// <summary>
 		/// Adds the console commands.
 		/// </summary>
-		private void AddConsoleCommands()
+		void AddConsoleCommands()
         {
             // Load / Save
             string supportedFileExtensions = m_loaders.Aggregate("",

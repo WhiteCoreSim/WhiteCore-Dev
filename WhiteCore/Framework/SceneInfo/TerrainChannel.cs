@@ -42,10 +42,10 @@ namespace WhiteCore.Framework.SceneInfo
         /// <summary>
         ///     NOTE: This is NOT a normal map, it has a resolution of 10x
         /// </summary>
-        private short[] m_map;
+        short[] m_map;
 
-        private IScene m_scene;
-        private bool[,] taint;
+        IScene m_scene;
+        bool[,] taint;
 
         public TerrainChannel(IScene scene)
         {
@@ -269,20 +269,21 @@ namespace WhiteCore.Framework.SceneInfo
 			    m_Width = scene.RegionInfo.RegionSizeX;                 // use the region size
 			
             if (terrainType == null)
-			    terrainType = "x";                                      // Flatland then
+			    terrainType = "f";                                      // Flatland then
 
 			// try for the land type
             string tType = terrainType.ToLower ();
-            if (tType.StartsWith("m") || tType.StartsWith("g") || tType.StartsWith("h"))
-				CreateMainlandTerrain (min, max, smoothing);
-            else if (tType.StartsWith("i"))
+            if (tType.StartsWith("f"))                                  // basic flatland
+                CreateFlatlandTerrain ();
+            else if (tType.StartsWith("i"))                             // island
 				CreateIslandTerrain (min, max, smoothing);
-            else if (tType.StartsWith("a"))                             
-                CreateIslandTerrain (min, max, smoothing);                      // TODO: fully sort this one out
-            else if (tType.StartsWith("n"))                             
+            else if (tType.StartsWith("a"))                             // auqatic
+                CreateIslandTerrain (min, max, smoothing);              // TODO: fully sort this one out
+            else if (tType.StartsWith("n"))                             // null space
                 CreateNullSpaceTerrain ();   
 			else
-				CreateFlatlandTerrain ();
+                // grassland, (tType.StartsWith("m") || tType.StartsWith("g") || tType.StartsWith("h"))
+                    CreateMainlandTerrain (min, max, smoothing);
 
             CalcLandArea ();
 		}
@@ -297,36 +298,37 @@ namespace WhiteCore.Framework.SceneInfo
         /// <summary>
         /// Creates the default terrain, default is 'Flatland'
         /// </summary>
-		private void CreateDefaultTerrain(string landType)
+		void CreateDefaultTerrain(string terrainType)
 		{
             float waterHeight = (float) m_scene.RegionInfo.RegionSettings.WaterHeight;
 
-            if (landType == null)
-                landType = "o";                     // Flatland
+            if (terrainType == null)
+                terrainType = "f";                     // Flatland
 			
 			// try for the land type
-			var lT = landType.ToLower ();
-            if (lT.StartsWith("m"))                 // Mainland
-				CreateMainlandTerrain (4);
-            else if (lT.StartsWith("f"))            // Full Region
-                CreateMainlandTerrain (2);
-            else if (lT.StartsWith("g"))            // Grassland
-                CreateMainlandTerrain (waterHeight-1, waterHeight+2,5);
-            else if (lT.StartsWith("H"))            // Homestead
+            var lT = terrainType.ToLower ();
+
+            if (lT.Substring(1,2) == "ho")           // homestead
+                CreateMainlandTerrain (4);
+            else if (lT.StartsWith("m"))            // Mountainous
+				CreateMainlandTerrain (2);
+            else if (lT.StartsWith("h"))            // Hills
                 CreateMainlandTerrain (3);
-            else if (lT.StartsWith("o"))            // Openspace
-                CreateFlatlandTerrain ();
+            else if (lT.StartsWith("g"))            // Grassland
+                CreateMainlandTerrain (waterHeight - 0.5f, waterHeight + 2, 5);
 			else if (lT.StartsWith("i"))            // Island
 				CreateIslandTerrain ();
             else if (lT.StartsWith("a"))            // Aquatic
                 CreateIslandTerrain (0, 15, 3);     // TODO: fully sort this one out
+            else if (lT.StartsWith("s"))            // Swamp
+                CreateMainlandTerrain (waterHeight - 0.5f, waterHeight + 0.75f, 3);
 			else
 				CreateFlatlandTerrain ();           // we need something
 
             CalcLandArea ();
 		}
 
-        private void CreateNullSpaceTerrain()
+        void CreateNullSpaceTerrain()
         {
 
             m_map = null;
@@ -352,7 +354,7 @@ namespace WhiteCore.Framework.SceneInfo
             //m_scene.RegionInfo.RegionSettings.TerrainTexture1 = UUID.Zero;
         }
 
-        private void CreateFlatlandTerrain()
+        void CreateFlatlandTerrain()
 		{
 
 			m_map = null;
@@ -375,7 +377,7 @@ namespace WhiteCore.Framework.SceneInfo
         }
 
 
-        private void CreateMainlandTerrain(int smoothing)
+        void CreateMainlandTerrain(int smoothing)
 		{
 			float minHeight = (float) m_scene.RegionInfo.RegionSettings.WaterHeight - 5;
 			float maxHeight = 30;
@@ -383,7 +385,7 @@ namespace WhiteCore.Framework.SceneInfo
 			CreateMainlandTerrain (minHeight, maxHeight,smoothing);
 		}
 
-		private void CreateMainlandTerrain (float minHeight, float maxHeight, int smoothing)
+		void CreateMainlandTerrain (float minHeight, float maxHeight, int smoothing)
 		{
 			m_map = null;
 			taint = null;
@@ -414,7 +416,7 @@ namespace WhiteCore.Framework.SceneInfo
 			}
 		}
 
-		private void CreateIslandTerrain()
+		void CreateIslandTerrain()
 		{
 			float minHeight = (float) m_scene.RegionInfo.RegionSettings.WaterHeight - 5;
             float maxHeight = minHeight + 15;
@@ -422,7 +424,7 @@ namespace WhiteCore.Framework.SceneInfo
 			CreateIslandTerrain (minHeight, maxHeight,2);
 		}
 
-		private void CreateIslandTerrain(float minHeight, float maxHeight, int smoothing)
+		void CreateIslandTerrain(float minHeight, float maxHeight, int smoothing)
 		{
 			m_map = null;
 			taint = null;
@@ -450,7 +452,7 @@ namespace WhiteCore.Framework.SceneInfo
 		}
 
 		// original island from opensim
-		private void CreateAtolIslandTerrain()
+		void CreateAtolIslandTerrain()
 		{
 			m_map = null;
 			taint = null;
@@ -482,7 +484,7 @@ namespace WhiteCore.Framework.SceneInfo
         /// <summary>
         /// Calculates the land area.
         /// </summary>
-        private void CalcLandArea()
+        void CalcLandArea()
         {
             uint regionArea = 0;
 
