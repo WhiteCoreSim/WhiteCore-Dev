@@ -119,11 +119,11 @@ namespace WhiteCore.Region
 
         #region Fields
 
-        private readonly List<uint> m_lastColliders = new List<uint>();
+        readonly List<uint> m_lastColliders = new List<uint>();
         [XmlIgnore] public scriptEvents AggregateScriptEvents;
         [XmlIgnore] public bool IgnoreUndoUpdate;
         [XmlIgnore] public bool IsWaitingForFirstSpinUpdatePacket;
-        [XmlIgnore] private PrimFlags LocalFlags;
+        [XmlIgnore] PrimFlags LocalFlags;
         [XmlIgnore] public Vector3 RotationAxis = Vector3.One;
         [XmlIgnore] public Quaternion SpinOldOrientation = Quaternion.Identity;
         [XmlIgnore] public uint TimeStampLastActivity; // Will be used for AutoReturn
@@ -131,24 +131,24 @@ namespace WhiteCore.Region
         [XmlIgnore]
         public bool Undoing { get; set; }
 
-        private UUID _creatorID;
+        UUID _creatorID;
 
-        [XmlIgnore] private UUID m_AttachedAvatar;
-        [XmlIgnore] private Dictionary<int, string> m_CollisionFilter = new Dictionary<int, string>();
-        [XmlIgnore] private bool m_IsAttachment;
-        [XmlIgnore] private int[] m_PayPrice = {-2, -2, -2, -2, -2};
-        [XmlIgnore] private bool m_ValidpartOOB; // control recalcutation
+        [XmlIgnore] UUID m_AttachedAvatar;
+        [XmlIgnore] Dictionary<int, string> m_CollisionFilter = new Dictionary<int, string>();
+        [XmlIgnore] bool m_IsAttachment;
+        [XmlIgnore] int[] m_PayPrice = {-2, -2, -2, -2, -2};
+        [XmlIgnore] bool m_ValidpartOOB; // control recalcutation
         protected Vector3 m_acceleration;
         protected Vector3 m_angularVelocity;
-        private byte m_clickAction;
-        private UUID m_collisionSound;
-        private float m_collisionSoundVolume;
-        private UUID m_collisionSprite;
+        byte m_clickAction;
+        UUID m_collisionSound;
+        float m_collisionSoundVolume;
+        UUID m_collisionSprite;
         protected uint m_crc;
-        private string m_creatorData = string.Empty;
-        private string m_description = String.Empty;
+        string m_creatorData = string.Empty;
+        string m_description = String.Empty;
         protected Vector3 m_groupPosition;
-        private Vector3 m_initialPIDLocation = Vector3.Zero;
+        Vector3 m_initialPIDLocation = Vector3.Zero;
         protected SceneObjectPartInventory m_inventory;
         protected Vector3 m_lastAcceleration;
         protected Vector3 m_lastAngularVelocity;
@@ -156,7 +156,7 @@ namespace WhiteCore.Region
         protected Vector3 m_lastPosition;
         protected Quaternion m_lastRotation;
         protected Vector3 m_lastVelocity;
-        private int m_linkNum;
+        int m_linkNum;
         protected uint m_localId;
 
         /// <summary>
@@ -168,33 +168,33 @@ namespace WhiteCore.Region
         protected Vector3 m_offsetPosition;
 
         protected SceneObjectGroup m_parentGroup;
-        [XmlIgnore] private float m_partBSphereRadiusSQ; // the square of the radius of a sphere containing the oob
+        [XmlIgnore] float m_partBSphereRadiusSQ; // the square of the radius of a sphere containing the oob
 
-        [XmlIgnore] private Vector3 m_partOOBoffset;
+        [XmlIgnore] Vector3 m_partOOBoffset;
         // the position center of the bounding box relative to it's Position
 
-        [XmlIgnore] private Vector3 m_partOOBsize;
+        [XmlIgnore] Vector3 m_partOOBsize;
         // the size of a bounding box oriented as prim, is future will consider cutted prims, meshs etc
 
         protected byte[] m_particleSystem = Utils.EmptyBytes;
-        private int m_passTouches;
+        int m_passTouches;
 
-        private PhysicsActor m_physActor;
-        private bool m_pidActive;
-        private bool m_pidhoverActive;
-        private UndoStack<UndoState> m_redo = new UndoStack<UndoState>(5);
+        PhysicsActor m_physActor;
+        bool m_pidActive;
+        bool m_pidhoverActive;
+        UndoStack<UndoState> m_redo = new UndoStack<UndoState>(5);
         protected ulong m_regionHandle;
-        [XmlIgnore] private int m_scriptAccessPin;
-        [XmlIgnore] private Dictionary<UUID, scriptEvents> m_scriptEvents = new Dictionary<UUID, scriptEvents>();
+        [XmlIgnore] int m_scriptAccessPin;
+        [XmlIgnore] Dictionary<UUID, scriptEvents> m_scriptEvents = new Dictionary<UUID, scriptEvents>();
         protected PrimitiveBaseShape m_shape;
-        private string m_sitAnimation = "SIT";
-        private string m_sitName = String.Empty;
-        private UUID m_sound;
-        private string m_text = String.Empty;
-        private string m_touchName = String.Empty;
-        private UndoStack<UndoState> m_undo = new UndoStack<UndoState>(5);
+        string m_sitAnimation = "SIT";
+        string m_sitName = String.Empty;
+        UUID m_sound;
+        string m_text = String.Empty;
+        string m_touchName = String.Empty;
+        UndoStack<UndoState> m_undo = new UndoStack<UndoState>(5);
         protected UUID m_uuid;
-        private bool m_volumeDetectActive;
+        bool m_volumeDetectActive;
 
         [XmlIgnore]
         [ProtoMember(92)]
@@ -529,23 +529,23 @@ namespace WhiteCore.Region
 
         #region XML Schema
 
-        private uint _baseMask = (uint) PermissionMask.All;
-        private uint _category;
-        private uint _everyoneMask = (uint) PermissionMask.None;
-        private PrimFlags _flags = PrimFlags.None;
-        private UUID _groupID;
-        private uint _groupMask = (uint) PermissionMask.None;
-        private uint _nextOwnerMask = (uint) PermissionMask.All;
-        private byte _objectSaleType;
-        private UUID _ownerID;
-        private uint _ownerMask = (uint) PermissionMask.All;
-        private int _ownershipCost;
-        private uint _parentID;
-        private int _salePrice;
-        private byte[] m_ParticleSystem;
-        private string m_currentMediaVersion = "x-mv:0000000001/00000000-0000-0000-0000-000000000000";
-        private int m_passCollision;
-        private byte[] m_textureAnimation;
+        uint _baseMask = (uint) PermissionMask.All;
+        uint _category;
+        uint _everyoneMask = (uint) PermissionMask.None;
+        PrimFlags _flags = PrimFlags.None;
+        UUID _groupID;
+        uint _groupMask = (uint) PermissionMask.None;
+        uint _nextOwnerMask = (uint) PermissionMask.All;
+        byte _objectSaleType;
+        UUID _ownerID;
+        uint _ownerMask = (uint) PermissionMask.All;
+        int _ownershipCost;
+        uint _parentID;
+        int _salePrice;
+        byte[] m_ParticleSystem;
+        string m_currentMediaVersion = "x-mv:0000000001/00000000-0000-0000-0000-000000000000";
+        int m_passCollision;
+        byte[] m_textureAnimation;
 
         [XmlIgnore]
         public string CurrentMediaVersion
@@ -617,7 +617,7 @@ namespace WhiteCore.Region
             }
         }
 
-        private Quaternion m_APIDTarget;
+        Quaternion m_APIDTarget;
 
         [XmlIgnore, ProtoMember(65)]
         public Quaternion APIDTarget
@@ -920,7 +920,7 @@ namespace WhiteCore.Region
             return RotationOffset;
         }
 
-        private Vector3 m_tempVelocity = Vector3.Zero;
+        Vector3 m_tempVelocity = Vector3.Zero;
 
         /// <summary>
         /// </summary>
@@ -1193,11 +1193,11 @@ namespace WhiteCore.Region
 
         #region Public Properties with only Get
 
-        private UUID _parentUUID = UUID.Zero;
-        private float m_friction;
-        private float m_density;
-        private float m_gravityMultiplier;
-        private float m_restitution;
+        UUID _parentUUID = UUID.Zero;
+        float m_friction;
+        float m_density;
+        float m_gravityMultiplier;
+        float m_restitution;
 
         public SceneObjectGroup ParentGroup
         {
@@ -1499,7 +1499,7 @@ namespace WhiteCore.Region
 
         #endregion Public Properties with only Get
 
-        #region Private Methods
+        #region Methods
 
         public void FinishedSerializingGenericProperties()
         {
@@ -1507,7 +1507,7 @@ namespace WhiteCore.Region
                 this.ParentEntity.Scene.EventManager.OnFrame += UpdateLookAt;
         }
 
-        private void UpdateOOBfromOOBs()
+        void UpdateOOBfromOOBs()
         {
             m_partOOBoffset = Vector3.Zero;
 
@@ -1668,7 +1668,7 @@ namespace WhiteCore.Region
         }
 
 
-        private uint ApplyMask(uint val, bool set, uint mask)
+        uint ApplyMask(uint val, bool set, uint mask)
         {
             if (set)
             {
@@ -1680,14 +1680,14 @@ namespace WhiteCore.Region
             }
         }
 
-        private void SendObjectPropertiesToClient(UUID AgentID)
+        void SendObjectPropertiesToClient(UUID AgentID)
         {
             IScenePresence SP = ParentGroup.Scene.GetScenePresence(AgentID);
             if (SP != null)
                 m_parentGroup.GetProperties(SP.ControllingClient);
         }
 
-        #endregion Private Methods
+        #endregion Methods
 
         #region Public Methods
 
@@ -3450,18 +3450,47 @@ namespace WhiteCore.Region
 
         #region Vehicle Params
 
-        private OSDArray m_VehicleFlags;
+        OSDArray m_VehicleFlags;
 
-        private OSDMap m_VehicleParams;
+        OSDMap m_VehicleParams;
 
+        [ProtoMember(110)]
         public int VehicleType { get; set; }
+
+        [ProtoMember(111)]
+        string _vehicleFlags
+        {
+            get {
+                return m_VehicleFlags == null ? "" : OSDParser.SerializeLLSDXmlString(m_VehicleFlags);
+            }
+            set {
+                if (value != null)
+                    m_VehicleFlags =  value == "" ? null : (OSDArray)OSDParser.DeserializeLLSDXml(value);
+            }
+        }
+
+        [ProtoMember(112)]
+        string _vehicleParams
+        {
+            get { 
+                return m_VehicleParams == null ? "" : OSDParser.SerializeJsonString(m_VehicleParams, true);
+            }
+            set {
+                if (value != null)
+                    m_VehicleParams = value == "" ? null : (OSDMap) OSDParser.DeserializeJson(value);
+            }
+        }
+
 
         public OSDArray VehicleFlags
         {
             get
             {
                 if (m_VehicleFlags == null)
-                    m_VehicleFlags = new OSDArray();
+                {
+                    m_VehicleFlags = new OSDArray ();
+                    m_VehicleFlags.Add (0);                 
+                }
                 return m_VehicleFlags;
             }
             set { m_VehicleFlags = value; }
@@ -3472,11 +3501,16 @@ namespace WhiteCore.Region
             get
             {
                 if (m_VehicleParams == null)
-                    m_VehicleParams = new OSDMap();
+                {
+                    m_VehicleParams = new OSDMap ();
+                    //m_VehicleParams ["99"] = 0;
+                }
                 return m_VehicleParams;
             }
             set { m_VehicleParams = value; }
         }
+
+           
 
         #endregion
 
@@ -4615,7 +4649,7 @@ namespace WhiteCore.Region
         /// </summary>
         /// <param name="flags"></param>
         /// <returns></returns>
-        private bool IsTerse(PrimUpdateFlags flags)
+        bool IsTerse(PrimUpdateFlags flags)
         {
             return flags.HasFlag((PrimUpdateFlags.TerseUpdate))
                    && !flags.HasFlag((PrimUpdateFlags.AttachmentPoint | PrimUpdateFlags.ClickAction |
@@ -4890,7 +4924,7 @@ namespace WhiteCore.Region
             _ownerMask = permissions;
         }
 
-        private void UpdateLookAt()
+        void UpdateLookAt()
         {
             try
             {
