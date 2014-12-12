@@ -68,7 +68,7 @@ namespace WhiteCore.Framework.SceneInfo
         /// Creates and adds a region from supplied info.
         /// </summary>
         /// <param name="regionInfo">Region info.</param>
-        void CreateRegion (RegionInfo regionInfo);
+        bool CreateRegion (RegionInfo regionInfo);
 
         /// <summary>
         /// Finds the current region info.

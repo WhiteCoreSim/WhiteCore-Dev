@@ -74,8 +74,8 @@ namespace WhiteCore.Region
         protected List<ISimulationDataStore> m_simulationDataServices = new List<ISimulationDataStore>();
         protected ISimulationDataStore m_selectedDataService;
 
-        private IConfigSource m_config = null;
-        private DateTime m_startupTime;
+        IConfigSource m_config = null;
+        DateTime m_startupTime;
 
         public IConfigSource ConfigSource
         {
@@ -412,23 +412,24 @@ namespace WhiteCore.Region
         /// Creates and adds a region from supplied regioninfo.
         /// </summary>
         /// <param name="regionInfo">Region info.</param>
-        public void CreateRegion (RegionInfo regionInfo)
+        public bool CreateRegion (RegionInfo regionInfo)
         {
             if (regionInfo == null)
-                return;
+                return false;
 
             if (RegionNameExists(regionInfo.RegionName))
             {
                 MainConsole.Instance.InfoFormat ("[SceneManager]: A region already exists with the name '{0}'",
                     regionInfo.RegionName);
-                return;
+                return false;
             }
 
-            //if ( RegionAtLocation(regionInfo.RegionLocX, regionInfo.RegionLocY))
-            //{
-            //MainConsole.Instance.InfoFormat ("[SceneManager]: A region at @ {0},{1} already exists",
-            //    regionInfo.RegionLocX / Constants.RegionSize, regionInfo.RegionLocY / Constants.RegionSize);
-            //}
+            if ( RegionAtLocationExists(regionInfo.RegionLocX, regionInfo.RegionLocY))
+            {
+            MainConsole.Instance.InfoFormat ("[SceneManager]: A region at @ {0},{1} already exists",
+                regionInfo.RegionLocX / Constants.RegionSize, regionInfo.RegionLocY / Constants.RegionSize);
+                return false;
+            }
 
             // we should be ok..
             MainConsole.Instance.InfoFormat ("[SceneManager]: Creating new region \"{0}\" at @ {1},{2}",
@@ -441,6 +442,7 @@ namespace WhiteCore.Region
             regions.Add (new KeyValuePair<ISimulationDataStore, RegionInfo> (store, store.CreateNewRegion (m_SimBase, regionInfo, currentInfo)));
             StartRegion (store, regionInfo);
 
+            return true;
         }
         #endregion
 
@@ -519,7 +521,7 @@ namespace WhiteCore.Region
 
         #region Console Commands
 
-        private void AddConsoleCommands()
+        void AddConsoleCommands()
         {
             if (MainConsole.Instance == null)
                 return;
@@ -736,6 +738,27 @@ namespace WhiteCore.Region
             return retVal;
         }
 
+        /// <summary>
+        /// Checks if a Region exists at a location.
+        /// </summary>
+        /// <returns><c>true</c>, if region exists at location, <c>false</c> otherwise.</returns>
+        /// <param name="regionX">Region x.</param>
+        /// <param name="regionY">Region y.</param>
+        public bool RegionAtLocationExists(int regionX, int regionY)
+        {
+            bool retVal = false;
+            foreach (IScene scene in Scenes)
+            {
+                if (scene.RegionInfo.RegionLocX == regionX &&
+                    scene.RegionInfo.RegionLocY == regionY )
+                {
+                    retVal = true;
+                    break;
+                }
+            }
+
+            return retVal;
+        }
 
         /// <summary>
         /// Finds the current region info.
@@ -774,7 +797,7 @@ namespace WhiteCore.Region
         /// </summary>
         /// <param name="scene">Scene.</param>
         /// <param name="cmd">Cmd.</param>
-        private void HandleCreateNewRegion(IScene scene, string[] cmd)
+        void HandleCreateNewRegion(IScene scene, string[] cmd)
         {
             // get some current details
             var currentInfo = FindCurrentRegionInfo ();
@@ -803,7 +826,7 @@ namespace WhiteCore.Region
         /// Creates the new region.
         /// </summary>
         /// <param name="regionName">Region name.</param>
-        private void CreateNewRegion( string regionName)
+        void CreateNewRegion( string regionName)
         {
             // get some current details
             var currentInfo = FindCurrentRegionInfo ();
@@ -829,7 +852,7 @@ namespace WhiteCore.Region
         /// </summary>
         /// <param name="scene">Scene.</param>
         /// <param name="cmd">Cmd.</param>
-        private void CreateNewRegionExtended(IScene scene, string[] cmd)
+        void CreateNewRegionExtended(IScene scene, string[] cmd)
         {
 
             string defaultDir = "";
@@ -917,7 +940,7 @@ namespace WhiteCore.Region
         /// </summary>
         /// <param name="scene">Scene.</param>
         /// <param name="cmd">Cmd.</param>
-        private void HandleSaveRegionConfig(IScene scene, string[] cmd)
+        void HandleSaveRegionConfig(IScene scene, string[] cmd)
         {
  
             if (scene == null)
@@ -953,7 +976,7 @@ namespace WhiteCore.Region
         ///     Kicks users off the region
         /// </summary>
         /// <param name="cmdparams">name of avatar to kick</param>
-        private void KickUserCommand(IScene scene, string[] cmdparams)
+        void KickUserCommand(IScene scene, string[] cmdparams)
         {
             IList agents = new List<IScenePresence>(scene.GetScenePresences());
 
@@ -1007,7 +1030,7 @@ namespace WhiteCore.Region
         ///     Force resending of all updates to all clients in active region(s)
         /// </summary>
         /// <param name="args"></param>
-        private void HandleForceUpdate(IScene scene, string[] args)
+        void HandleForceUpdate(IScene scene, string[] args)
         {
             MainConsole.Instance.Info("Updating all clients");
             ISceneEntity[] EntityList = scene.Entities.GetEntities();
@@ -1031,7 +1054,7 @@ namespace WhiteCore.Region
         ///     Load, Unload, and list Region modules in use
         /// </summary>
         /// <param name="cmd"></param>
-        private void HandleModulesUnload(IScene scene, string[] cmd)
+        void HandleModulesUnload(IScene scene, string[] cmd)
         {
             List<string> args = new List<string>(cmd);
             args.RemoveAt(0);
@@ -1057,7 +1080,7 @@ namespace WhiteCore.Region
         ///     Load, Unload, and list Region modules in use
         /// </summary>
         /// <param name="cmd"></param>
-        private void HandleModulesList(IScene scene, string[] cmd)
+        void HandleModulesList(IScene scene, string[] cmd)
         {
             List<string> args = new List<string>(cmd);
             args.RemoveAt(0);
@@ -1078,7 +1101,7 @@ namespace WhiteCore.Region
         ///     Runs commands issued by the server console from the operator
         /// </summary>
         /// <param name="cmdparams">Additional arguments passed to the command</param>
-        private void RunCommand(IScene scene, string[] cmdparams)
+        void RunCommand(IScene scene, string[] cmdparams)
         {
             // TODO: Fix this so that additional commandline details can be passed
             if ( (MainConsole.Instance.ConsoleScene == null) &&
@@ -1200,7 +1223,7 @@ namespace WhiteCore.Region
         ///     console.
         /// </summary>
         /// <param name="newDebug"></param>
-        private void SetDebugPacketLevel(IScene scene, int newDebug)
+        void SetDebugPacketLevel(IScene scene, int newDebug)
         {
             scene.ForEachScenePresence(scenePresence =>
             {
@@ -1220,7 +1243,7 @@ namespace WhiteCore.Region
         ///     console.
         /// </summary>
         /// <param name="newDebug"></param>
-        private void SetDebugPacketName(IScene scene, string name, bool remove)
+        void SetDebugPacketName(IScene scene, string name, bool remove)
         {
             scene.ForEachScenePresence(scenePresence =>
             {
@@ -1234,7 +1257,12 @@ namespace WhiteCore.Region
             });
         }
 
-        private void HandleChangeRegion(IScene scene, string[] cmd)
+        /// <summary>
+        /// Handles the change region command.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmd">Cmd.</param>
+        void HandleChangeRegion(IScene scene, string[] cmd)
         {
             string regionName;
             if (cmd.Length < 3) 
@@ -1282,7 +1310,12 @@ namespace WhiteCore.Region
             SetRegionPrompt(rName);
         }
 
-        private void HandleShowUsers(IScene scene, string[] cmd)
+        /// <summary>
+        /// Handles the show users command.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmd">Cmd.</param>
+        void HandleShowUsers(IScene scene, string[] cmd)
         {
             List<string> args = new List<string>(cmd);
             args.RemoveAt(0);
@@ -1322,7 +1355,7 @@ namespace WhiteCore.Region
         /// </summary>
         /// <param name="scene">Scene.</param>
         /// <param name="cmd">Cmd.</param>
-        private void HandleShowRegions(IScene scene, string[] cmd)
+        void HandleShowRegions(IScene scene, string[] cmd)
         {
 
             string sceneInfo;
@@ -1359,7 +1392,12 @@ namespace WhiteCore.Region
 
         }
 
-        private void HandleShowMaturity(IScene scene, string[] cmd)
+        /// <summary>
+        /// Handles the show maturity command.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmd">Cmd.</param>
+        void HandleShowMaturity(IScene scene, string[] cmd)
         {
             string rating = "";
             if (scene.RegionInfo.RegionSettings.Maturity == 1)
@@ -1520,7 +1558,7 @@ namespace WhiteCore.Region
         /// </summary>
         /// <param name="scene">Scene.</param>
         /// <param name="cmdparams">Cmdparams.</param>
-        private void HandleResizeObject(IScene scene, string[] cmdparams)
+        void HandleResizeObject(IScene scene, string[] cmdparams)
         {
             if (cmdparams.Length < 4)
             {
@@ -1577,7 +1615,7 @@ namespace WhiteCore.Region
         /// </summary>
         /// <param name="scene">Scene.</param>
         /// <param name="cmdparams">Cmdparams.</param>
-        private void HandleShowObjects(IScene scene, string[] cmdparams)
+        void HandleShowObjects(IScene scene, string[] cmdparams)
         {
             string objectName = null;
             bool found = false;
@@ -1626,7 +1664,7 @@ namespace WhiteCore.Region
         /// </summary>
         /// <param name="scene">Scene.</param>
         /// <param name="cmdparams">Cmdparams.</param>
-        private void HandleRotateScene(IScene scene, string[] cmdparams)
+        void HandleRotateScene(IScene scene, string[] cmdparams)
         {
             var usage = "Usage: rotate scene objects <angle in degrees> [centerX centerY]\n"+
                 "(centerX and centerY are optional and default to the center of the region";
@@ -1676,7 +1714,7 @@ namespace WhiteCore.Region
         /// </summary>
         /// <param name="scene">Scene.</param>
         /// <param name="cmdparams">Cmdparams.</param>
-        private void HandleScaleScene(IScene scene, string[] cmdparams)
+        void HandleScaleScene(IScene scene, string[] cmdparams)
         {
             string usage = "Usage: scale region objects <factor>";
 
@@ -1739,7 +1777,7 @@ namespace WhiteCore.Region
         /// </summary>
         /// <param name="scene">Scene.</param>
         /// <param name="cmdparams">Cmdparams.</param>
-        private void HandleTranslateScene(IScene scene, string[] cmdparams)
+        void HandleTranslateScene(IScene scene, string[] cmdparams)
         {
              if (cmdparams.Length < 6)
             {
@@ -1764,7 +1802,7 @@ namespace WhiteCore.Region
             MainConsole.Instance.Info("Region objects have been offset");
         }
             
-        private string GetCmdRegionName(string prompt)
+        string GetCmdRegionName(string prompt)
         {
             string regionName;
             regionName = MainConsole.Instance.Prompt (prompt, "");
@@ -1775,7 +1813,12 @@ namespace WhiteCore.Region
             return regionName;
         }
 
-        private void HandleDeleteRegion(IScene scene, string[] cmd)
+        /// <summary>
+        /// Handles the delete region command.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmd">Cmd.</param>
+        void HandleDeleteRegion(IScene scene, string[] cmd)
         {
             // command is delete/remove region [regionname]
             string regionName;
@@ -1805,7 +1848,12 @@ namespace WhiteCore.Region
                 MainConsole.Instance.ConsoleScene = scene;
         }
 
-        private void HandleResetRegion(IScene scene, string[] cmd)
+        /// <summary>
+        /// Handles the reset region command.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmd">Cmd.</param>
+        void HandleResetRegion(IScene scene, string[] cmd)
         {
             string regionName;
             if (cmd.Length < 3)
@@ -1833,7 +1881,12 @@ namespace WhiteCore.Region
 
         }
 
-        private void HandleClearRegion(IScene scene, string[] cmd)
+        /// <summary>
+        /// Handles the clear region command.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmd">Cmd.</param>
+        void HandleClearRegion(IScene scene, string[] cmd)
         {
             string regionName;
             if (cmd.Length < 3)
@@ -1871,8 +1924,12 @@ namespace WhiteCore.Region
 
         }
             
-
-        private void HandleReloadRegion(IScene scene, string[] cmd)
+        /// <summary>
+        /// Handles the reload region command.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmd">Cmd.</param>
+        void HandleReloadRegion(IScene scene, string[] cmd)
         {
             IScene loadScene = scene;
             string regionName;
