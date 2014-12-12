@@ -52,6 +52,8 @@ namespace WhiteCore.Framework.Physics
         TYPE_BOAT = 3,
         TYPE_AIRPLANE = 4,
         TYPE_BALLOON = 5,
+
+        // ## these are Vector3 parameters ##
         LINEAR_FRICTION_TIMESCALE = 16,
 
         /// <summary>
@@ -65,14 +67,17 @@ namespace WhiteCore.Framework.Physics
         LINEAR_MOTOR_DIRECTION = 18,
 
         /// <summary>
+        ///     angular velocity that vehicle will try for
+        /// </summary>
+        ANGULAR_MOTOR_DIRECTION = 19,
+
+        /// <summary>
         ///     Offset from center of mass where linear motor forces are added
         /// </summary>
         LINEAR_MOTOR_OFFSET = 20,
 
-        /// <summary>
-        ///     angular velocity that vehicle will try for
-        /// </summary>
-        ANGULAR_MOTOR_DIRECTION = 19,
+ 
+        // ## these are Float parameters ##
         HOVER_HEIGHT = 24,
         HOVER_EFFICIENCY = 25,
         HOVER_TIMESCALE = 26,
@@ -94,9 +99,13 @@ namespace WhiteCore.Framework.Physics
         BANKING_EFFICIENCY = 38,
         BANKING_MIX = 39,
         BANKING_TIMESCALE = 40,
-        REFERENCE_FRAME = 44,
         BLOCK_EXIT = 45,
-        ROLL_FRAME = 46
+        ROLL_FRAME = 46,
+
+        //  ## rotationParam (Quaternion)
+        REFERENCE_FRAME = 44
+
+    
     }
 
     [Flags]

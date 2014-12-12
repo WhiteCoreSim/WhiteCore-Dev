@@ -61,30 +61,35 @@ namespace WhiteCore.Modules.Startup
         {
             if (MainConsole.Instance != null && m_backup.Count == 0) //Only add them once
             {
-                MainConsole.Instance.Commands.AddCommand("edit scale", 
-            	                                         "edit scale <name> <X> <Y> <Z>",
-                                                         "Change the scale of a named prim", 
-                                                         EditScale, true, false);
+                MainConsole.Instance.Commands.AddCommand(
+                    "edit scale", 
+                    "edit scale <name> <X> <Y> <Z>",
+                    "Change the scale of a named prim", 
+                    EditScale, true, false);
                 
-            	MainConsole.Instance.Commands.AddCommand("offset region prims",
-            	                                         "offset region prims <X> <Y> <Z>",
-                                                         "Offset all prims by the same amount", 
-                                                         OffsetPrims, true, false);
+            	MainConsole.Instance.Commands.AddCommand(
+                    "offset region prims",
+                    "offset region prims <X> <Y> <Z>",
+                    "Offset all prims by the same amount", 
+                    OffsetPrims, true, false);
                 
-            	MainConsole.Instance.Commands.AddCommand("backup",
-            	                                         "backup",
-                                                         "Persist objects to the database now, if [all], will force the persistence of all prims",
-                                                         RunCommand, true, false);
+            	MainConsole.Instance.Commands.AddCommand(
+                    "backup",
+                    "backup",
+                    "Persist objects to the database now, if [all], will force the persistence of all prims",
+                    RunCommand, true, false);
                 
-            	MainConsole.Instance.Commands.AddCommand("disable backup",
-            	                                         "disable backup",
-                                                         "Disables persistance until reenabled", 
-                                                         DisableBackup, true, false);
+            	MainConsole.Instance.Commands.AddCommand(
+                    "disable backup",
+                    "disable backup",
+                    "Disables persistance until re-enabled", 
+                    DisableBackup, true, false);
                 
-            	MainConsole.Instance.Commands.AddCommand("enable backup",
-            	                                         "enable backup",
-                                                         "Enables persistance after 'disable persistance' has been run",
-                                                         EnableBackup, true, false);
+            	MainConsole.Instance.Commands.AddCommand(
+                    "enable backup",
+                    "enable backup",
+                    "Enables persistance after 'disable backup' has been run",
+                    EnableBackup, true, false);
             }
             //Set up the backup for the scene
             m_backup[scene] = new InternalSceneBackup(scene);
@@ -203,25 +208,29 @@ namespace WhiteCore.Modules.Startup
 
                 if (MainConsole.Instance != null)
                 {
-                    MainConsole.Instance.Commands.AddCommand("delete object owner",
-                                                             "delete object owner <UUID>",
-                                                             "Delete object by owner", 
-                                                             HandleDeleteObject, true, false);
+                    MainConsole.Instance.Commands.AddCommand(
+                        "delete object owner",
+                        "delete object owner <UUID>",
+                        "Delete object by owner", 
+                        HandleDeleteObject, true, false);
                     
-                	MainConsole.Instance.Commands.AddCommand("delete object creator",
-                                                             "delete object creator <UUID>",
-                                                             "Delete object by creator", 
-                                                             HandleDeleteObject, true, false);
+                	MainConsole.Instance.Commands.AddCommand(
+                        "delete object creator",
+                        "delete object creator <UUID>",
+                        "Delete object by creator", 
+                        HandleDeleteObject, true, false);
                     
-                	MainConsole.Instance.Commands.AddCommand("delete object uuid",
-                                                             "delete object uuid <UUID>",
-                                                             "Delete object by uuid", 
-                                                             HandleDeleteObject, true, false);
+                	MainConsole.Instance.Commands.AddCommand(
+                        "delete object uuid",
+                        "delete object uuid <UUID>",
+                        "Delete object by uuid", 
+                        HandleDeleteObject, true, false);
                     
-                	MainConsole.Instance.Commands.AddCommand("delete object name",
-                                                             "delete object name <name>",
-                                                             "Delete object by name", 
-                                                             HandleDeleteObject, true, false);
+                	MainConsole.Instance.Commands.AddCommand(
+                        "delete object name",
+                        "delete object name <name>",
+                        "Delete object by name", 
+                        HandleDeleteObject, true, false);
                 }
             }
 
@@ -229,7 +238,7 @@ namespace WhiteCore.Modules.Startup
 
             #region Console Commands
 
-            private void HandleDeleteObject(IScene scene, string[] cmd)
+            void HandleDeleteObject(IScene scene, string[] cmd)
             {
                 if (cmd.Length < 4)
                     return;
@@ -573,13 +582,13 @@ namespace WhiteCore.Modules.Startup
 
             #region IWhiteCoreBackupModule Methods
 
-            private bool m_isArchiving = false;
-            private readonly List<UUID> m_missingAssets = new List<UUID>();
-            private readonly List<LandData> m_parcels = new List<LandData>();
-            private bool m_merge = false;
-            private bool m_loadAssets = false;
-            private GenericAccountCache<UserAccount> m_cache = new GenericAccountCache<UserAccount>();
-            private List<ISceneEntity> m_groups = new List<ISceneEntity>();
+            bool m_isArchiving = false;
+            readonly List<UUID> m_missingAssets = new List<UUID>();
+            readonly List<LandData> m_parcels = new List<LandData>();
+            bool m_merge = false;
+            bool m_loadAssets = false;
+            GenericAccountCache<UserAccount> m_cache = new GenericAccountCache<UserAccount>();
+            List<ISceneEntity> m_groups = new List<ISceneEntity>();
 
             public bool IsArchiving
             {
@@ -622,29 +631,28 @@ namespace WhiteCore.Modules.Startup
                     try
                     {
                         byte[] sdata = WriteTerrainToStream(tModule.TerrainMap);
-                        writer.WriteFile("newstyleterrain/" + scene.RegionInfo.RegionID.ToString() + ".terrain", sdata);
-                        sdata = null;
+                        writer.WriteFile("newstyleterrain/" + scene.RegionInfo.RegionID + ".terrain", sdata);
 
                         sdata = WriteTerrainToStream(tModule.TerrainRevertMap);
-                        writer.WriteFile("newstylerevertterrain/" + scene.RegionInfo.RegionID.ToString() + ".terrain",
+                        writer.WriteFile("newstylerevertterrain/" + scene.RegionInfo.RegionID + ".terrain",
                                          sdata);
                         sdata = null;
 
                         if (tModule.TerrainWaterMap != null)
                         {
                             sdata = WriteTerrainToStream(tModule.TerrainWaterMap);
-                            writer.WriteFile("newstylewater/" + scene.RegionInfo.RegionID.ToString() + ".terrain", sdata);
+                            writer.WriteFile("newstylewater/" + scene.RegionInfo.RegionID + ".terrain", sdata);
                             sdata = null;
 
                             sdata = WriteTerrainToStream(tModule.TerrainWaterRevertMap);
                             writer.WriteFile(
-                                "newstylerevertwater/" + scene.RegionInfo.RegionID.ToString() + ".terrain", sdata);
+                                "newstylerevertwater/" + scene.RegionInfo.RegionID + ".terrain", sdata);
                             sdata = null;
                         }
                     }
                     catch (Exception ex)
                     {
-                        MainConsole.Instance.WarnFormat("[Backup]: Exception caught: {0}", ex.ToString());
+                        MainConsole.Instance.WarnFormat("[Backup]: Exception caught: {0}", ex);
                     }
                 }
 
@@ -660,7 +668,7 @@ namespace WhiteCore.Modules.Startup
                 bool saveAssets = false;
                 if (archiver.AllowPrompting)
                     saveAssets =
-                        MainConsole.Instance.Prompt("Save assets? (Will not be able to load on other grids)", "false")
+                        MainConsole.Instance.Prompt("Save assets? (Will not be able to load on other grids if not saved)", "false")
                                    .Equals("true", StringComparison.CurrentCultureIgnoreCase);
 
                 int count = 0;
@@ -674,7 +682,7 @@ namespace WhiteCore.Modules.Startup
                             continue;
                         //Write all entities
                         byte[] xml = entity.ToBinaryXml2();
-                        writer.WriteFile("entities/" + entity.UUID.ToString(), xml);
+                        writer.WriteFile("entities/" + entity.UUID, xml);
                         xml = null;
                         count++;
                         if (count%3 == 0)
@@ -713,7 +721,7 @@ namespace WhiteCore.Modules.Startup
                 MainConsole.Instance.Info("[Archive]: Finished writing assets for entities to archive");
             }
 
-            private static byte[] WriteTerrainToStream(ITerrainChannel tModule)
+            static byte[] WriteTerrainToStream(ITerrainChannel tModule)
             {
                 int tMapSize = tModule.Height*tModule.Height;
                 byte[] sdata = new byte[tMapSize*2];
@@ -721,7 +729,7 @@ namespace WhiteCore.Modules.Startup
                 return sdata;
             }
 
-            private void RetrievedAsset(string id, Object sender, AssetBase asset)
+            void RetrievedAsset(string id, Object sender, AssetBase asset)
             {
                 TarArchiveWriter writer = (TarArchiveWriter) sender;
                 //Add the asset
@@ -731,7 +739,7 @@ namespace WhiteCore.Modules.Startup
                     m_isArchiving = false;
             }
 
-            private void WriteAsset(string id, AssetBase asset, TarArchiveWriter writer)
+            void WriteAsset(string id, AssetBase asset, TarArchiveWriter writer)
             {
                 if (asset != null)
                     writer.WriteFile("assets/" + asset.ID, OSDParser.SerializeJsonString(asset.ToOSD()));
@@ -941,14 +949,14 @@ namespace WhiteCore.Modules.Startup
                 }
             }
 
-            private ITerrainChannel ReadTerrain(byte[] data, IScene scene)
+            ITerrainChannel ReadTerrain(byte[] data, IScene scene)
             {
                 short[] sdata = new short[data.Length/2];
                 Buffer.BlockCopy(data, 0, sdata, 0, data.Length);
                 return new TerrainChannel(sdata, scene);
             }
 
-            private bool ResolveUserUuid(UUID uuid)
+            bool ResolveUserUuid(UUID uuid)
             {
                 UserAccount acc;
                 if (m_cache.Get(uuid, out acc))

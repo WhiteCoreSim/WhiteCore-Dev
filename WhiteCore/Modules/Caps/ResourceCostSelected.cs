@@ -39,6 +39,8 @@ using OpenMetaverse;
 using OpenMetaverse.StructuredData;
 using System;
 using System.IO;
+using WhiteCore.Framework.SceneInfo.Entities;
+using WhiteCore.Region;
 
 
 namespace WhiteCore.Modules.Caps
@@ -113,18 +115,45 @@ namespace WhiteCore.Modules.Caps
 
 			// This module gets the root of the prim(set)
 			// What needs to be done is to check how many prims there are selected (multiple selected_roots)
-			// and if they are part of a link-set
+            // and if they are part of a link-set
 			//
+            // update check:
+            //  http://wiki.secondlife.com/wiki/Mesh/Mesh_Server_Weight
+            //  http://wiki.secondlife.com/wiki/Mesh/Mesh_physics
+            //  http://wiki.secondlife.com/wiki/Mesh/Mesh_Streaming_Cost
+            //
 			// Each prim has a standard amount of details
 			//
 			// physics = 0.1 x amount of prims
-			// prim_equiv = 1 x amount of prims
+            // prim_equiv = 1 x amount of prims // update to // MIN{ (0.5*num_prims) + (0.25 * num_scripts), num_prims }
 			// simulation = 0.5 x amount of prims
 			// streaming = 0.06 x amount of prims
 			//
 			// These values need to be returned with the return that's underneath here
 
+            int primCount = 0;
+
+            ISceneEntity[] entityList = m_scene.Entities.GetEntities ();
+            foreach (ISceneEntity ent in entityList)
+            {
+                if (ent.IsSelected)
+                {
+                    primCount++;
+                    if (ent is SceneObjectGroup)
+                    {
+                        var entParts = ent.ChildrenEntities ();
+                        //MainConsole.Instance.Info ("Object: " + ent.Name + " at position " + ent.AbsolutePosition + ", comprised of " + entParts.Count + " parts");
+                        primCount += entParts.Count;
+                    }
+                }
+            }
+
             OSDMap map = new OSDMap();
+            map["prim_equiv"] = primCount;
+            map["physics"] = 0.1f * primCount;
+            map["simulation"] = 0.5f * primCount;
+            map["streaming"] = 0.06f * primCount;
+
             return OSDParser.SerializeLLSDXmlBytes(map);
         }
     }
