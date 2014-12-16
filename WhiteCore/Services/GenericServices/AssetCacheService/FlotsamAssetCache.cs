@@ -905,7 +905,8 @@ namespace WhiteCore.Services
             //Make sure this is not null
             if (m_AssetService == null)
                 return 0;
-
+            
+            HashSet<UUID> uniqueUuids = new HashSet<UUID>();
             Dictionary<UUID, AssetType> assets = new Dictionary<UUID, AssetType>();
             ISceneManager manager = m_simulationBase.ApplicationRegistry.RequestModuleInterface<ISceneManager>();
             if (manager != null)
@@ -924,15 +925,28 @@ namespace WhiteCore.Services
 
                     if (File.Exists(filename))
                     {
-                        File.SetLastAccessTime(filename, DateTime.Now);
+                    	if (!uniqueUuids.Contains(assetID))
+                    	{
+                    		File.SetLastAccessTime(filename, DateTime.Now);
+                    	}
                     }
                     else
                     {
-                        m_AssetService.Get(assetID.ToString());
+                    	AssetBase cachedAsset = null;
+                    	if(!uniqueUuids.Contains(assetID))
+                    	{
+                    		cachedAsset = m_AssetService.Get(assetID.ToString());
+                    	}
+                    	if (cachedAsset == null && assets[assetID] != AssetType.Unknown)
+                    	{
+                    		MainConsole.Instance.DebugFormat("[FLOTSAM ASSET CACHE]: Could not find asset {0}, type {1} when pre-caching all scene assets",
+                    		                                 assetID, assets[assetID]);
+                    	}
                     }
+                    uniqueUuids.Add(assetID);
                 }
+                assets.Clear();
             }
-
             return assets.Keys.Count;
         }
 
