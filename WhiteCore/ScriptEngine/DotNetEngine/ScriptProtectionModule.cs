@@ -58,16 +58,16 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         private ThreatLevel m_MaxThreatLevel = 0;
         private bool m_allowFunctionLimiting;
         private IConfig m_config;
-        public ThreatLevelDefinition m_threatLevelHigh;
-
-        public ThreatLevelDefinition m_threatLevelLow;
-        public ThreatLevelDefinition m_threatLevelModerate;
+        
+        public ThreatLevelDefinition m_threatLevelNoAccess;
         public ThreatLevelDefinition m_threatLevelNone;
         public ThreatLevelDefinition m_threatLevelNuisance;
-        public ThreatLevelDefinition m_threatLevelSevere;
-        public ThreatLevelDefinition m_threatLevelNoAccess;
-        public ThreatLevelDefinition m_threatLevelVeryHigh;
         public ThreatLevelDefinition m_threatLevelVeryLow;
+        public ThreatLevelDefinition m_threatLevelLow;
+        public ThreatLevelDefinition m_threatLevelModerate;        
+        public ThreatLevelDefinition m_threatLevelHigh;
+        public ThreatLevelDefinition m_threatLevelVeryHigh;        
+        public ThreatLevelDefinition m_threatLevelSevere;
 
         #region Limiting of functions
 
@@ -284,6 +284,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                     break;
                 case "None":
                     m_MaxThreatLevel = ThreatLevel.None;
+                    break;
+                case "Nuisance":
+                    m_MaxThreatLevel = ThreatLevel.Nuisance;
                     break;
                 case "VeryLow":
                     m_MaxThreatLevel = ThreatLevel.VeryLow;

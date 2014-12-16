@@ -119,11 +119,19 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                                                      Name = "Script Cmd Thread Pools"
                                                  };
             cmdThreadpool = new WhiteCoreThreadPool(info);
-            info.Name = "Script Loading Thread Pools";
-            scriptChangeThreadpool = new WhiteCoreThreadPool(info);
+            
+            WhiteCoreThreadPoolStartInfo scinfo = new WhiteCoreThreadPoolStartInfo
+                                                 {
+                                                     priority = ThreadPriority.Normal,
+                                                     Threads = 1,
+                                                     MaxSleepTime = Engine.Config.GetInt("SleepTime", 100),
+                                                     SleepIncrementTime = Engine.Config.GetInt("SleepIncrementTime", 1),
+                                                     Name = "Script Loading Thread Pools"
+                                                 };
+        
+            scriptChangeThreadpool = new WhiteCoreThreadPool(scinfo);
 
-
-            MaxScriptThreads = Engine.Config.GetInt("Threads", 100); // leave control threads out of user option
+            MaxScriptThreads = Engine.Config.GetInt("MaxScriptThreads", 100); // leave control threads out of user option
             WhiteCoreThreadPoolStartInfo sinfo = new WhiteCoreThreadPoolStartInfo
                                                   {
                                                       priority = ThreadPriority.Normal,

@@ -49,7 +49,8 @@ using LSL_Vector = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Vector3;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 {
-    public class AA_Api : MarshalByRefObject, IScriptApi
+	[Serializable]
+	public class AA_Api : MarshalByRefObject, IScriptApi
     {
         internal IAssetConnector AssetConnector;
         internal ScriptProtectionModule ScriptProtection;

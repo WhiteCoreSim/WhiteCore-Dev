@@ -62,7 +62,52 @@ using WhiteCore.Framework.DatabaseInterfaces;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 {
-    public class OSSL_Api : MarshalByRefObject, IScriptApi
+    //////////////////////////////////////////////////////////////
+    //
+    // Level description
+    //
+    // None     - Function is no threat at all. It doesn't constitute
+    //            an threat to either users or the system and has no
+    //            known side effects
+    //
+    // Nuisance - Abuse of this command can cause a nuisance to the
+    //            region operator, such as log message spew
+    //
+    // VeryLow  - Extreme levels ob abuse of this function can cause
+    //            impaired functioning of the region, or very gullible
+    //            users can be tricked into experiencing harmless effects
+    //
+    // Low      - Intentional abuse can cause crashes or malfunction
+    //            under certain circumstances, which can easily be rectified,
+    //            or certain users can be tricked into certain situations
+    //            in an avoidable manner.
+    //
+    // Moderate - Intentional abuse can cause denial of service and crashes
+    //            with potential of data or state loss, or trusting users
+    //            can be tricked into embarrassing or uncomfortable
+    //            situations.
+    //
+    // High     - Casual abuse can cause impaired functionality or temporary
+    //            denial of service conditions. Intentional abuse can easily
+    //            cause crashes with potential data loss, or can be used to
+    //            trick experienced and cautious users into unwanted situations,
+    //            or changes global data permanently and without undo ability
+    //            Malicious scripting can allow theft of content
+    //
+    // VeryHigh - Even normal use may, depending on the number of instances,
+    //            or frequency of use, result in severe service impairment
+    //            or crash with loss of data, or can be used to cause
+    //            unwanted or harmful effects on users without giving the
+    //            user a means to avoid it.
+    //
+    // Severe   - Even casual use is a danger to region stability, or function
+    //            allows console or OS command execution, or function allows
+    //            taking money without consent, or allows deletion or
+    //            modification of user data, or allows the compromise of
+    //            sensitive data by design.
+    
+	[Serializable]
+	public class OSSL_Api : MarshalByRefObject, IScriptApi
     {
         internal ScriptProtectionModule ScriptProtection;
         internal LSL_Api m_LSL_Api; // get a reference to the LSL API so we can call methods housed there
@@ -299,8 +344,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             // This may be upgraded depending on the griefing or DOS
             // potential, or guarded with a delay
             //
-            if (
-                !ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osSetDynamicTextureURL", m_host, "OSSL",
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osSetDynamicTextureURL", m_host, "OSSL",
                                                    m_itemID)) return "";
 
 
@@ -327,8 +371,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         public string osSetDynamicTextureURLBlend(string dynamicID, string contentType, string url, string extraParams,
                                                   int timer, int alpha)
         {
-            if (
-                !ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osSetDynamicTextureURLBlend", m_host, "OSSL",
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osSetDynamicTextureURLBlend", m_host, "OSSL",
                                                    m_itemID)) return "";
 
 
@@ -356,10 +399,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                                                       string extraParams,
                                                       bool blend, int disp, int timer, int alpha, int face)
         {
-            if (
-                !ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osSetDynamicTextureURLBlendFace", m_host,
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osSetDynamicTextureURLBlendFace", m_host,
                                                    "OSSL", m_itemID)) return "";
-
 
             IDynamicTextureManager textureManager = World.RequestModuleInterface<IDynamicTextureManager>();
             if (dynamicID == String.Empty)
@@ -384,10 +425,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         public string osSetDynamicTextureData(string dynamicID, string contentType, string data, string extraParams,
                                               int timer)
         {
-            if (
-                !ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osSetDynamicTextureData", m_host, "OSSL",
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osSetDynamicTextureData", m_host, "OSSL",
                                                    m_itemID)) return "";
-
 
             IDynamicTextureManager textureManager = World.RequestModuleInterface<IDynamicTextureManager>();
             if (textureManager != null)
@@ -421,10 +460,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         public string osSetDynamicTextureDataBlend(string dynamicID, string contentType, string data, string extraParams,
                                                    int timer, int alpha)
         {
-            if (
-                !ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osSetDynamicTextureDataBlend", m_host, "OSSL",
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osSetDynamicTextureDataBlend", m_host, "OSSL",
                                                    m_itemID)) return "";
-
 
             IDynamicTextureManager textureManager = World.RequestModuleInterface<IDynamicTextureManager>();
             if (textureManager != null)
@@ -518,7 +555,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return retval;
         }
 
-        public string osGetGridHomeURI() //patched from OpenSim, you can remove this comment after pull
+        public string osGetGridHomeURI()
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osGetGridHomeURI", m_host, "OSSL",
                                                    m_itemID)) return "";
@@ -531,7 +568,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return HomeURI;
         }
 
-        public string osGetGridCustom(string key) //patched from OpenSim, you can remove this comment after pull
+        public string osGetGridCustom(string key)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osGetGridCustom", m_host, "OSSL",
                                                    m_itemID)) return "";
@@ -557,10 +594,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return retval;
         }
 
-        public string osGetGridGatekeeperURI() //patched from OpenSim, you can remove this comment after pull
+        public string osGetGridGatekeeperURI()
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osGetGridGatekeeperURI", m_host, "OSSL", m_itemID))
                 return "";
+            
             string gatekeeperURI = String.Empty;
             IConfigSource config = m_ScriptEngine.ConfigSource;
             if (config.Configs["GridService"] != null)
@@ -572,16 +610,17 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osForceAttachToAvatar", m_host, "OSSL", m_itemID))
                 return;
+            
             InitLSL();
             m_LSL_Api.AttachToAvatar(attachmentPoint, false);
         }
 
         public void osForceDetachFromAvatar()
         {
-            if (
-                !ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osForceDetachFromAvatar", m_host, "OSSL", m_itemID))
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osForceDetachFromAvatar", m_host, "OSSL", m_itemID))
                 return;
-            InitLSL();
+            
+        	InitLSL();
             m_LSL_Api.DetachFromAvatar();
         }
 
@@ -589,10 +628,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                                                        string extraParams,
                                                        bool blend, int disp, int timer, int alpha, int face)
         {
-            if (
-                !ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osSetDynamicTextureDataBlendFace", m_host,
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osSetDynamicTextureDataBlendFace", m_host,
                                                    "OSSL", m_itemID)) return "";
-
 
             IDynamicTextureManager textureManager = World.RequestModuleInterface<IDynamicTextureManager>();
             if (textureManager != null)
@@ -628,7 +665,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Severe, "osConsoleCommand", m_host, "OSSL", m_itemID))
                 return false;
 
-
             if (m_ScriptEngine.Config.GetBoolean("AllowosConsoleCommand", false))
             {
                 if (World.Permissions.CanRunConsoleCommand(m_host.OwnerID))
@@ -642,8 +678,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
         public void osSetPrimFloatOnWater(int floatYN)
         {
-            if (
-                !ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osSetPrimFloatOnWater", m_host, "OSSL",
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osSetPrimFloatOnWater", m_host, "OSSL",
                                                    m_itemID)) return;
 
             if (m_host.ParentEntity != null)
@@ -801,12 +836,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         // Adam's super super custom animation functions
         public void osAvatarPlayAnimation(string avatar, string animation)
         {
-            if (
-                !ScriptProtection.CheckThreatLevel(ThreatLevel.VeryHigh, "osAvatarPlayAnimation", m_host, "OSSL",
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryHigh, "osAvatarPlayAnimation", m_host, "OSSL",
                                                    m_itemID)) return;
 
             UUID avatarID = (UUID) avatar;
-
 
             IScenePresence target;
             if (World.TryGetScenePresence(avatarID, out target))
@@ -840,12 +873,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
         public void osAvatarStopAnimation(string avatar, string animation)
         {
-            if (
-                !ScriptProtection.CheckThreatLevel(ThreatLevel.VeryHigh, "osAvatarStopAnimation", m_host, "OSSL",
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryHigh, "osAvatarStopAnimation", m_host, "OSSL",
                                                    m_itemID)) return;
 
             UUID avatarID = (UUID) avatar;
-
 
             IScenePresence target;
             if (World.TryGetScenePresence(avatarID, out target))
@@ -878,7 +909,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osMovePen", m_host, "OSSL", m_itemID)) return "";
 
-
             drawList += "MoveTo " + x + "," + y + ";";
             return new LSL_String(drawList);
         }
@@ -886,7 +916,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         public string osDrawLine(string drawList, int startX, int startY, int endX, int endY)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osDrawLine", m_host, "OSSL", m_itemID)) return "";
-
 
             drawList += "MoveTo " + startX + "," + startY + "; LineTo " + endX + "," + endY + "; ";
             return new LSL_String(drawList);
@@ -896,7 +925,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osDrawLine", m_host, "OSSL", m_itemID)) return "";
 
-
             drawList += "LineTo " + endX + "," + endY + "; ";
             return new LSL_String(drawList);
         }
@@ -904,7 +932,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         public string osDrawText(string drawList, string text)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osDrawText", m_host, "OSSL", m_itemID)) return "";
-
 
             drawList += "Text " + text + "; ";
             return new LSL_String(drawList);
@@ -915,7 +942,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osDrawEllipse", m_host, "OSSL", m_itemID))
                 return "";
 
-
             drawList += "Ellipse " + width + "," + height + "; ";
             return new LSL_String(drawList);
         }
@@ -924,7 +950,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osDrawRectangle", m_host, "OSSL", m_itemID))
                 return "";
-
 
             drawList += "Rectangle " + width + "," + height + "; ";
             return new LSL_String(drawList);
@@ -935,7 +960,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osDrawFilledRectangle", m_host, "OSSL", m_itemID))
                 return "";
 
-
             drawList += "FillRectangle " + width + "," + height + "; ";
             return new LSL_String(drawList);
         }
@@ -944,7 +968,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osDrawFilledPolygon", m_host, "OSSL", m_itemID))
                 return "";
-
 
             if (x.Length != y.Length || x.Length < 3)
             {
@@ -964,7 +987,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osDrawFilledPolygon", m_host, "OSSL", m_itemID))
                 return "";
 
-
             if (x.Length != y.Length || x.Length < 3)
             {
                 return new LSL_String("");
@@ -983,7 +1005,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osSetFontSize", m_host, "OSSL", m_itemID))
                 return "";
 
-
             drawList += "FontSize " + fontSize + "; ";
             return drawList;
         }
@@ -992,7 +1013,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osSetFontName", m_host, "OSSL", m_itemID))
                 return "";
-
 
             drawList += "FontName " + fontName + "; ";
             return new LSL_String(drawList);
@@ -1003,7 +1023,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osSetPenSize", m_host, "OSSL", m_itemID))
                 return "";
 
-
             drawList += "PenSize " + penSize + "; ";
             return new LSL_String(drawList);
         }
@@ -1012,7 +1031,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osSetPenColor", m_host, "OSSL", m_itemID))
                 return "";
-
 
             drawList += "PenColour " + colour + "; ";
             return new LSL_String(drawList);
@@ -1023,7 +1041,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osSetPenColor", m_host, "OSSL", m_itemID))
                 return "";
 
-
             drawList += "PenCap " + direction + "," + type + "; ";
             return new LSL_String(drawList);
         }
@@ -1033,7 +1050,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osDrawImage", m_host, "OSSL", m_itemID))
                 return "";
 
-
             drawList += "Image " + width + "," + height + "," + imageUrl + "; ";
             return new LSL_String(drawList);
         }
@@ -1042,7 +1058,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osGetDrawStringSize", m_host, "OSSL", m_itemID))
                 return new LSL_Vector();
-
 
             LSL_Vector vec = new LSL_Vector(0, 0, 0);
             IDynamicTextureManager textureManager = World.RequestModuleInterface<IDynamicTextureManager>();
@@ -1062,7 +1077,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osSetRegionWaterHeight", m_host, "OSSL", m_itemID))
                 return;
 
-
             //Check to make sure that the script's owner is the estate manager/master
             //World.Permissions.GenericEstatePermission(
             if (World.Permissions.IsGod(m_host.OwnerID))
@@ -1079,10 +1093,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         /// <param name="sunHour">The "Sun Hour" that is desired, 0...24, with 0 just after SunRise</param>
         public void osSetRegionSunSettings(bool useEstateSun, bool sunFixed, double sunHour)
         {
-            if (
-                !ScriptProtection.CheckThreatLevel(ThreatLevel.Nuisance, "osSetRegionSunSettings", m_host, "OSSL",
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Nuisance, "osSetRegionSunSettings", m_host, "OSSL",
                                                    m_itemID)) return;
-
 
             //Check to make sure that the script's owner is the estate manager/master
             //World.Permissions.GenericEstatePermission(
@@ -1111,10 +1123,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         /// <param name="sunHour">The "Sun Hour" that is desired, 0...24, with 0 just after SunRise</param>
         public void osSetEstateSunSettings(bool sunFixed, double sunHour)
         {
-            if (
-                !ScriptProtection.CheckThreatLevel(ThreatLevel.Nuisance, "osSetEstateSunSettings", m_host, "OSSL",
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Nuisance, "osSetEstateSunSettings", m_host, "OSSL",
                                                    m_itemID)) return;
-
 
             //Check to make sure that the script's owner is the estate manager/master
             //World.Permissions.GenericEstatePermission(
@@ -1147,7 +1157,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osGetCurrentSunHour", m_host, "OSSL", m_itemID))
                 return 0;
 
-
             // Must adjust for the fact that Region Sun Settings are still LL offset
             double sunHour = World.RegionInfo.RegionSettings.SunPosition - 6;
 
@@ -1165,6 +1174,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osGetSunParam", m_host, "OSSL", m_itemID))
                 return 0;
+            
             return GetSunParam(param);
         }
 
@@ -1181,11 +1191,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return value;
         }
 
-        public double osSunGetParam(string param) //patched from OpenSim, you can remove this comment after pull
+        public double osSunGetParam(string param)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osSunGetParam", m_host, "OSSL", m_itemID))
                 return 0;
-
 
             double value = 0.0;
 
@@ -1199,10 +1208,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         }
 
         public void osSunSetParam(string param, double value)
-            //patched from OpenSim, you can remove this comment after pull
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osSunSetParam", m_host, "OSSL", m_itemID)) return;
-
 
             ISunModule module = World.RequestModuleInterface<ISunModule>();
             if (module != null)
@@ -1214,6 +1221,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         public void osSetSunParam(string param, double value)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osSetSunParam", m_host, "OSSL", m_itemID)) return;
+            
             SetSunParam(param, value);
         }
 
@@ -1228,10 +1236,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
         public string osWindActiveModelPluginName()
         {
-            if (
-                !ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osWindActiveModelPluginName", m_host, "OSSL",
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osWindActiveModelPluginName", m_host, "OSSL",
                                                    m_itemID)) return "";
-
 
             IWindModule module = World.RequestModuleInterface<IWindModule>();
             if (module != null)
@@ -1246,7 +1252,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osSetWindParam", m_host, "OSSL", m_itemID))
                 return;
-
 
             IWindModule module = World.RequestModuleInterface<IWindModule>();
             if (module != null)
@@ -1280,7 +1285,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osParcelJoin", m_host, "OSSL", m_itemID)) return;
 
-
             int startx = (int) (pos1.x < pos2.x ? pos1.x : pos2.x);
             int starty = (int) (pos1.y < pos2.y ? pos1.y : pos2.y);
             int endx = (int) (pos1.x > pos2.x ? pos1.x : pos2.x);
@@ -1298,7 +1302,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osParcelSubdivide", m_host, "OSSL", m_itemID))
                 return;
 
-
             int startx = (int) (pos1.x < pos2.x ? pos1.x : pos2.x);
             int starty = (int) (pos1.y < pos2.y ? pos1.y : pos2.y);
             int endx = (int) (pos1.x > pos2.x ? pos1.x : pos2.x);
@@ -1315,7 +1318,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osSetParcelDetails", m_host, "OSSL", m_itemID))
                 return;
-
 
             // Get a reference to the land data and make sure the owner of the script
             // can modify it
@@ -1386,6 +1388,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osSetParcelDetails", m_host, "OSSL", m_itemID))
                 return;
+
             //Check to make sure that the script's owner is the estate manager/master
             //World.Permissions.GenericEstatePermission(
             if (World.Permissions.IsGod(m_host.OwnerID))
@@ -1436,7 +1439,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             //
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osList2Double", m_host, "OSSL", m_itemID))
                 return 0;
-
 
             if (index < 0)
             {
@@ -1507,7 +1509,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             //
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osGetScriptEngineName", m_host, "OSSL", m_itemID))
                 return "";
-
 
             int scriptEngineNameIndex = 0;
 
@@ -1601,10 +1602,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             }
         }
 
-        public Object osParseJSONNew(string JSON) //patched from OpenSim, you can remove this comment after pull
+        public Object osParseJSONNew(string JSON)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osParseJSONNew", m_host, "OSSL", m_itemID))
                 return new object();
+            
             try
             {
                 OSD decoded = OSDParser.DeserializeJson(JSON);
@@ -1826,7 +1828,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Low, "osMessageObject", m_host, "OSSL", m_itemID))
                 return;
 
-
             object[] resobj = new object[] {new LSL_Key(m_host.UUID.ToString()), new LSL_Key(message)};
 
             ISceneChildEntity sceneOP = World.GetSceneObjectPart(objectUUID);
@@ -1843,7 +1844,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osMakeNotecard", m_host, "OSSL", m_itemID))
                 return;
-
 
             // Create new asset
             AssetBase asset = new AssetBase(UUID.Random(), notecardName, AssetType.Notecard, m_host.OwnerID)
@@ -1907,7 +1907,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryHigh, "osGetNotecardLine", m_host, "OSSL", m_itemID))
                 return "";
 
-
             UUID assetID = UUID.Zero;
 
             if (!UUID.TryParse(name, out assetID))
@@ -1956,7 +1955,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryHigh, "osGetNotecard", m_host, "OSSL", m_itemID))
                 return "";
-
 
             UUID assetID = UUID.Zero;
             string NotecardData = "";
@@ -2010,10 +2008,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
         public int osGetNumberOfNotecardLines(string name)
         {
-            if (
-                !ScriptProtection.CheckThreatLevel(ThreatLevel.VeryHigh, "osGetNumberOfNotecardLines", m_host, "OSSL",
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryHigh, "osGetNumberOfNotecardLines", m_host, "OSSL",
                                                    m_itemID)) return 0;
-
 
             UUID assetID = UUID.Zero;
 
@@ -2138,7 +2134,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Low, "osFormatString", m_host, "OSSL", m_itemID))
                 return new LSL_String();
 
-
             return String.Format(str, strings.Data);
         }
 
@@ -2146,7 +2141,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osMatchString", m_host, "OSSL", m_itemID))
                 return new LSL_List();
-
 
             LSL_List result = new LSL_List();
 
@@ -2189,7 +2183,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Low, "osLoadedCreationDate", m_host, "OSSL", m_itemID))
                 return "";
 
-
             return World.RegionInfo.RegionSettings.LoadedCreationDate;
         }
 
@@ -2198,7 +2191,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Low, "osLoadedCreationTime", m_host, "OSSL", m_itemID))
                 return "";
 
-
             return World.RegionInfo.RegionSettings.LoadedCreationTime;
         }
 
@@ -2206,7 +2198,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Low, "osLoadedCreationID", m_host, "OSSL", m_itemID))
                 return "";
-
 
             return World.RegionInfo.RegionSettings.LoadedCreationID;
         }
@@ -2219,8 +2210,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         //
         public LSL_List osGetLinkPrimitiveParams(int linknumber, LSL_List rules)
         {
-            if (
-                !ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osGetLinkPrimitiveParams", m_host, "OSSL",
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osGetLinkPrimitiveParams", m_host, "OSSL",
                                                    m_itemID)) return new LSL_List();
 
             InitLSL();
@@ -2255,6 +2245,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osGetRegionMapTexture", m_host, "OSSL", m_itemID))
                 return new LSL_Key();
+            
             IScene scene = m_host.ParentEntity.Scene;
             UUID key = UUID.Zero;
 
@@ -2298,11 +2289,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
         public int osGetSimulatorMemory()
         {
-            if (
-                !ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "osGetSimulatorMemory", m_host, "OSSL",
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "osGetSimulatorMemory", m_host, "OSSL",
                                                    m_itemID)) return 0;
-
-            long pws = Process.GetCurrentProcess().WorkingSet64;
+            
+        	long pws = Process.GetCurrentProcess().WorkingSet64;
 
             if (pws > Int32.MaxValue)
                 return Int32.MaxValue;
@@ -2334,6 +2324,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Severe, "osKickAvatar", m_host, "OSSL", m_itemID))
                 return;
+            
             World.ForEachScenePresence(delegate(IScenePresence sp)
                                            {
                                                if (!sp.IsChildAgent &&
@@ -2501,7 +2492,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osUnixTimeToTimestamp", m_host, "OSSL",
                                                    m_itemID)) return new LSL_String();
-            const long baseTicks = 621355968000000000;
+            
+        	const long baseTicks = 621355968000000000;
             const long tickResolution = 10000000;
             long epochTicks = (time*tickResolution) + baseTicks;
             DateTime date = new DateTime(epochTicks);
@@ -2541,6 +2533,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osInviteToGroup", m_host, "OSSL", m_itemID))
                 return new LSL_Integer();
+            
             UUID agent = new UUID((string) agentId);
             // groups module is required
             IGroupsModule groupsModule = World.RequestModuleInterface<IGroupsModule>();
@@ -2568,6 +2561,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osInviteToGroup", m_host, "OSSL", m_itemID))
                 return new LSL_Integer();
+            
             UUID agent = new UUID((string) agentId);
             // groups module is required
             IGroupsModule groupsModule = World.RequestModuleInterface<IGroupsModule>();
@@ -2639,7 +2633,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osCauseHealing", m_host, "OSSL", m_itemID))
                 return;
 
-
             UUID avatarId = new UUID(avatar);
             IScenePresence presence = World.GetScenePresence(avatarId);
             if (presence != null)
@@ -2696,7 +2689,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             if (m_ScriptEngine.Config.GetBoolean("AllowOSFunctions", false))
                 m_OSFunctionsEnabled = true;
-
             m_ScriptDelayFactor =
                 m_ScriptEngine.Config.GetFloat("ScriptDelayFactor", 1.0f);
             m_ScriptDistanceFactor =
@@ -2805,7 +2797,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             // arbitrary builds the user would normally have no rights to
             //
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryHigh, "osSetRot", m_host, "OSSL", m_itemID)) return;
-
 
             IEntity entity;
             if (World.Entities.TryGetValue(target, out entity))
@@ -2956,6 +2947,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         public void osDropAttachment()
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "osDropAttachment", m_host, "OSSL", m_itemID)) return;
+            
             DropAttachment(true);
         }
 

@@ -318,7 +318,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             //Hook up to client events
             scene.EventManager.OnNewClient += EventManager_OnNewClient;
             scene.EventManager.OnClosingClient += EventManager_OnClosingClient;
-
             scene.EventManager.OnRemoveScript += StopScript;
         }
 
@@ -445,7 +444,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             }
             else
             {
-                MainConsole.Instance.Info("Not restarting all scripts");
+                MainConsole.Instance.Info("[WDNE]: Not restarting all scripts");
             }
         }
 
@@ -460,7 +459,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             }
             else
             {
-                MainConsole.Instance.Info("Not restarting all scripts");
+                MainConsole.Instance.Info("[WDNE]: Not restarting all scripts");
             }
         }
 
