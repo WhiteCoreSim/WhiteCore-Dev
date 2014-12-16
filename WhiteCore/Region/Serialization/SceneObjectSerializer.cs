@@ -950,33 +950,39 @@ namespace WhiteCore.Region.Serialization
         void WriteVehicle(XmlTextWriter writer, SceneObjectPart sop)
         {
             // flags & parameters need a character prefix to the element number to conform to xml specs
-            writer.WriteStartElement ("Vehicle");
-            writer.WriteElementString ("VehicleType", sop.VehicleType.ToString ());
+            writer.WriteStartElement("Vehicle");
+            writer.WriteElementString("VehicleType", sop.VehicleType.ToString ());
 
-            if (sop.VehicleType > 0)
+            if(sop.VehicleType > 0)
             {
-                writer.WriteStartElement ("VehicleSettings");
-
-                writer.WriteStartElement ("VehicleFlags");  
-                writer.WriteElementString ("Flags", sop.VehicleFlags.ToString ());
+                writer.WriteStartElement("VehicleSettings");
+                writer.WriteStartElement("VehicleFlags");
 
                 int elem = 0;
                 foreach (int flag in sop.VehicleFlags)
                 {
-                    writer.WriteElementString ("F"+elem, flag.ToString ());     
+                    writer.WriteElementString("F"+elem, flag.ToString());
                     elem++;
                 }
                 writer.WriteEndElement ();
 
-                writer.WriteStartElement ("VehicleParameters");           
-                foreach (KeyValuePair<string, OSD> param in sop.VehicleParameters)
-                    writer.WriteElementString ("P"+param.Key, param.Value.ToString ());
-                writer.WriteEndElement ();
-
-                writer.WriteEndElement ();
+                writer.WriteStartElement("VehicleParameters");
+                foreach (KeyValuePair<string, OSD> param in sop.VehicleParameters) {
+                    if(param.Value.Type == OSDType.Array) {
+                        OSDArray a = (OSDArray)param.Value;
+                        if(a.Count == 3)
+                            WriteVector(writer, "P"+param.Key, param.Value.AsVector3());
+                        else
+                            WriteQuaternion(writer, "P"+param.Key, param.Value.AsQuaternion());
+                    }
+                    else
+                        writer.WriteElementString("P"+param.Key, param.Value.ToString ());
+                }
+                writer.WriteEndElement();
+                writer.WriteEndElement();
             }
 
-            writer.WriteEndElement ();
+            writer.WriteEndElement();
         }
 
 
@@ -1277,54 +1283,46 @@ namespace WhiteCore.Region.Serialization
 
             if (obj.VehicleType > 0)
             {
-                reader.ReadStartElement("VehicleSettings", String.Empty); 
-                reader.ReadStartElement("VehicleFlags", String.Empty); 
-                //obj.VehicleFlags = reader.ReadElementContentAsInt ("VehicleFlags", String.Empty);
+                reader.ReadStartElement("VehicleSettings", String.Empty);
+                reader.ReadStartElement("VehicleFlags", String.Empty);
 
                 int nodeName = 0;
                 OSDArray partFlags = new OSDArray ();
                 while (reader.NodeType != XmlNodeType.EndElement)
                 {
-                    partFlags.Add(reader.ReadElementContentAsInt ("F"+nodeName, String.Empty));
+                    partFlags.Add(reader.ReadElementContentAsInt("F"+nodeName, String.Empty));
                     nodeName++;
                 }
                 obj.VehicleFlags = partFlags;
+                reader.ReadEndElement(); // VehicleFlags
 
-                reader.ReadStartElement("VehicleParameters", String.Empty); 
+                reader.ReadStartElement("VehicleParameters", String.Empty);
                 while (reader.NodeType != XmlNodeType.EndElement)
                 {
-                    //reader.Read ();
-                    //string key = reader.Name;
-                    //var value = reader.Value;
-                    //Type valueType = reader.ValueType;
-                    while (!reader.HasValue)
+                    int key = int.Parse(reader.Name.Substring(1));
+                    switch (key)
                     {
-                        string name = reader.Name;
-                        name = name.Substring (1);                  // xml name has a 'P" prefix to conform
-                        if (name == "VehicleParameters")
-                            break;
-
-                        int key = int.Parse (name);
-                        switch (key)
-                        {
-                        case 44:            // REFERENCE_FRAME
-                            obj.SetVehicleRotationParam(key, Quaternion.Parse(reader.Value));
-                            break;
-                        case 16:    // LINEAR_FRICTION_TIMESCALE:
-                        case 17:    // ANGULAR_FRICTION_TIMESCALE:
-                        case 18:    // LINEAR_MOTOR_DIRECTION:
-                        case 19:    // ANGULAR_MOTOR_DIRECTION:
-                        case 20:    // LINEAR_MOTOR_OFFSET:
-
-                            obj.SetVehicleVectorParam(key, Vector3.Parse(reader.Value));
-                            break;
-                        default:
-                            obj.SetVehicleFloatParam (key, float.Parse (reader.Value));
-                            break;
-                        }
+                    case 44:            // REFERENCE_FRAME
+                    case 46:            // ROLL_FRAME
+                        obj.SetVehicleRotationParam(key, ReadQuaternion(reader,reader.Name));
+                        break;
+                    case 16:    // LINEAR_FRICTION_TIMESCALE:
+                    case 17:    // ANGULAR_FRICTION_TIMESCALE:
+                    case 18:    // LINEAR_MOTOR_DIRECTION:
+                    case 19:    // ANGULAR_MOTOR_DIRECTION:
+                    case 20:    // LINEAR_MOTOR_OFFSET:
+                    case 45:    // BLOCK_EXIT:
+                        obj.SetVehicleVectorParam(key, ReadVector(reader,reader.Name));
+                        break;
+                    default:
+                        obj.SetVehicleFloatParam(key, reader.ReadElementContentAsFloat(reader.Name, String.Empty));
+                        break;
                     }
                 }
+                reader.ReadEndElement(); //VehicleParameters
+                reader.ReadEndElement(); //VehicleSettings
             }
+            reader.ReadEndElement(); //Vehicle
         }
 
 
