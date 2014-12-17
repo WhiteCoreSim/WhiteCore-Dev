@@ -450,11 +450,15 @@ namespace WhiteCore.Modules.Archivers
                         newFolderId, newFolderName, m_userInfo.PrincipalID,
                         (short) AssetType.Unknown, destFolder.ID, 1);
 
+                /* this breaks loading of default inventory..  remove until it can be debugged
                 var existingFolder = m_inventoryService.GetUserFolderID (m_userInfo.PrincipalID, newFolderName);
-                if (existingFolder == null)
+                if (existingFolder.Count == 0)
                     m_inventoryService.AddFolder (destFolder);      // add the folder
                 else
                     destFolder.ID = (UUID)existingFolder [0];       // use the existing ID
+                */
+                // in the meantime....
+                m_inventoryService.AddFolder (destFolder);      // add the folder
 
                 // Record that we have now created this folder
                 iarPathExisting += rawDirsToCreate[i] + "/";

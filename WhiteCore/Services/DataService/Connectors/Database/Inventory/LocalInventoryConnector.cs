@@ -107,7 +107,7 @@ namespace WhiteCore.Services.DataService
         public List<string> GetUserFolderID (UUID principalID, string folderName)
         {
             QueryFilter filter = new QueryFilter();
-            filter.andFilters["principalID"] = principalID;
+            filter.andFilters["agentID"] = principalID;
             filter.andFilters["folderName"] = folderName;
             return GD.Query(new string[] {"folderID"}, m_foldersrealm, filter, null, null, null);
         }
