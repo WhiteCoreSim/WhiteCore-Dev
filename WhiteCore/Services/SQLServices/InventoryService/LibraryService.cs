@@ -170,21 +170,30 @@ namespace WhiteCore.Services.SQLServices.InventoryService
 
         public void ClearDefaultInventory()
         {
-            //Delete the root folders
-            InventoryFolderBase root = m_inventoryService.GetRootFolder(LibraryOwner);
-            while (root != null)
+
+            // get root folders
+            List<InventoryFolderBase> rootFolders = m_inventoryService.GetRootFolders(LibraryOwner);
+
+            //Delete the root folder's folders
+            foreach (var rFF in rootFolders)
             {
-                MainConsole.Instance.Info("Removing folder " + root.Name);
-                m_inventoryService.ForcePurgeFolder(root);
-                root = m_inventoryService.GetRootFolder(LibraryOwner);
+                List<InventoryFolderBase> rootFolderFolders = m_inventoryService.GetFolderFolders (LibraryOwner, rFF.ID);
+        
+                // delete root folders
+                foreach (InventoryFolderBase rFolder in rootFolderFolders)
+                {
+                    MainConsole.Instance.Info ("Removing folder " + rFolder.Name);
+                    m_inventoryService.ForcePurgeFolder (rFolder);
+                }
             }
 
-            List<InventoryFolderBase> rootFolders = m_inventoryService.GetRootFolders(LibraryOwner);
+            // remove top level folders
             foreach (InventoryFolderBase rFolder in rootFolders)
             {
-                MainConsole.Instance.Info("Removing folder " + rFolder.Name);
-                m_inventoryService.ForcePurgeFolder(rFolder);
+                MainConsole.Instance.Info ("Removing folder " + rFolder.Name);
+                m_inventoryService.ForcePurgeFolder (rFolder);
             }
+
             MainConsole.Instance.Info("Finished removing default inventory");
             MainConsole.Instance.Info ("[LIBRARY]: If a new default inventory is to be loaded, please restart WhiteCore");
         }

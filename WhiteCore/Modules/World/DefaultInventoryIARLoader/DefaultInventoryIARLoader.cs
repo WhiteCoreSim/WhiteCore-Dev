@@ -79,7 +79,7 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
 
         #endregion
 
-        private void AddDefaultAssetTypes()
+        void AddDefaultAssetTypes()
         {
             m_assetTypes.Add("Animation", AssetType.Animation);
             m_assetTypes.Add("Bodypart", AssetType.Bodypart);
@@ -187,7 +187,7 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
             }
         }
 
-        private void TraverseFolders(UUID ID, IScene m_MockScene)
+        void TraverseFolders(UUID ID, IScene m_MockScene)
         {
             List<InventoryFolderBase> folders = m_MockScene.InventoryService.GetFolderFolders(m_service.LibraryOwner, ID);
             foreach (InventoryFolderBase folder in folders)
@@ -213,7 +213,7 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
             }
         }
 
-        private void FixParent(UUID ID, IScene m_MockScene, UUID LibraryRootID)
+        void FixParent(UUID ID, IScene m_MockScene, UUID LibraryRootID)
         {
             List<InventoryFolderBase> folders = m_MockScene.InventoryService.GetFolderFolders(m_service.LibraryOwner, ID);
             foreach (InventoryFolderBase folder in folders)
@@ -226,7 +226,7 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
             }
         }
 
-        private void FixPerms(InventoryNodeBase node)
+        void FixPerms(InventoryNodeBase node)
         {
             if (node is InventoryItemBase)
             {
@@ -238,7 +238,7 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
             }
         }
 
-        private string GetInventoryPathFromName(string name)
+        string GetInventoryPathFromName(string name)
         {
             string[] parts = name.Split(new[] {' '});
             if (parts.Length == 3)

@@ -208,7 +208,7 @@ namespace WhiteCore.Modules.Archivers
             string serialization = UserInventoryItemSerializer.Serialize(saveItem);
             m_archiveWriter.WriteFile(filename, serialization);
 
-   //         m_assetGatherer.GatherAssetUuids(saveItem.AssetID, (AssetType) saveItem.AssetType, m_assetUuids);
+    //        m_assetGatherer.GatherAssetUuids(saveItem.AssetID, (AssetType) saveItem.AssetType, m_assetUuids);
             AssetType itemAssetType = (AssetType)inventoryItem.AssetType;
 
             // Don't chase down link asset items as they actually point to their target item IDs rather than an asset
@@ -318,7 +318,7 @@ namespace WhiteCore.Modules.Archivers
                 {
                     // If the user has just specified "/", then don't save the root "My Inventory" folder.  This is
                     // more intuitive then requiring the user to specify "/*" for this.
-                    saveFolderContentsOnly = true;
+                   // 20141119-greythane- This breaks saving default inventory //  saveFolderContentsOnly = true;
                 }
 
                 m_invPath = String.Empty;
@@ -398,10 +398,7 @@ namespace WhiteCore.Modules.Archivers
                 }
                 new AssetsRequest(
                     new AssetsArchiver(m_archiveWriter), m_assetUuids, m_assetService, ReceivedAllAssets).Execute();
-
-               // Watchdog time??
-                //Watchdog.RunInThread(o => ar.Execute(), string.Format("AssetsRequest ({0})", m_scene.Name), null);
-
+                    
             }
             else
             {
