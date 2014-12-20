@@ -422,34 +422,6 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                 asset = m_AssetService.Get(AvatarWearable.DEFAULT_SHIRT_ASSET.ToString());
                 if (asset != null)
                 {
-                    OpenMetaverse.Assets.AssetClothing clothing = new OpenMetaverse.Assets.AssetClothing()
-                                                                      {
-                                                                          Creator = m_LibraryService.LibraryOwner,
-                                                                          Name = "Default shirt",
-                                                                          Owner = principalID,
-                                                                          Permissions =
-                                                                              new Permissions(
-                                                                              (uint) PermissionMask.All,
-                                                                              (uint) PermissionMask.All,
-                                                                              (uint) PermissionMask.All,
-                                                                              (uint) PermissionMask.All,
-                                                                              (uint) PermissionMask.All),
-                                                                          WearableType = WearableType.Shirt,
-                                                                          Textures =
-                                                                              new Dictionary<AvatarTextureIndex, UUID>()
-                                                                                  {
-                                                                                      {
-                                                                                          AvatarTextureIndex
-                                                                                          .UpperShirt
-                                                                                          ,
-                                                                                          UUID
-                                                                                          .Parse
-                                                                                          ("5748decc-f629-461c-9a36-a35a221fe21f")
-                                                                                      }
-                                                                                  }
-                                                                      };
-                    clothing.Encode();
-                    asset.Data = clothing.AssetData;
                     asset.ID = UUID.Random();
                     asset.ID = m_AssetService.Store(asset);
                     defaultShirt.AssetID = asset.ID;
@@ -477,34 +449,6 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                 asset = m_AssetService.Get(AvatarWearable.DEFAULT_PANTS_ASSET.ToString());
                 if (asset != null)
                 {
-                    OpenMetaverse.Assets.AssetClothing clothing = new OpenMetaverse.Assets.AssetClothing()
-                                                                      {
-                                                                          Creator = m_LibraryService.LibraryOwner,
-                                                                          Name = "Default pants",
-                                                                          Owner = principalID,
-                                                                          Permissions =
-                                                                              new Permissions(
-                                                                              (uint) PermissionMask.All,
-                                                                              (uint) PermissionMask.All,
-                                                                              (uint) PermissionMask.All,
-                                                                              (uint) PermissionMask.All,
-                                                                              (uint) PermissionMask.All),
-                                                                          WearableType = WearableType.Pants,
-                                                                          Textures =
-                                                                              new Dictionary<AvatarTextureIndex, UUID>()
-                                                                                  {
-                                                                                      {
-                                                                                          AvatarTextureIndex
-                                                                                          .LowerPants
-                                                                                          ,
-                                                                                          UUID
-                                                                                          .Parse
-                                                                                          ("5748decc-f629-461c-9a36-a35a221fe21f")
-                                                                                      }
-                                                                                  }
-                                                                      };
-                    clothing.Encode();
-                    asset.Data = clothing.AssetData;
                     asset.ID = UUID.Random();
                     asset.ID = m_AssetService.Store(asset);
                     defaultPants.AssetID = asset.ID;
