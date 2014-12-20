@@ -32,6 +32,7 @@ using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Inventory;
+using WhiteCore.Framework.Utilities;
 using Nini.Config;
 using OpenMetaverse;
 using System;
@@ -97,6 +98,7 @@ namespace WhiteCore.Modules.Gestures
         public virtual void ActivateGesture(IClientAPI client, UUID assetId, UUID gestureId)
         {
             IInventoryService invService = m_scene.InventoryService;
+			UUID libOwner = new UUID (Constants.LibraryOwner);
 
             InventoryItemBase item = invService.GetItem(client.AgentId, gestureId);
             if (item != null)
@@ -104,14 +106,18 @@ namespace WhiteCore.Modules.Gestures
                 item.Flags |= (uint) 1;
                 invService.UpdateItem(item);
             }
-            else
-                MainConsole.Instance.WarnFormat(
-                    "[GESTURES]: Unable to find gesture {0} to activate for {1}", gestureId, client.Name);
+            else {
+				if(invService.GetItem(libOwner, gestureId) == null) {
+					MainConsole.Instance.WarnFormat(
+						"[GESTURES]: Unable to find gesture {0} to activate for {1}", gestureId, client.Name);
+				}
+			}
         }
 
         public virtual void DeactivateGesture(IClientAPI client, UUID gestureId)
         {
             IInventoryService invService = m_scene.InventoryService;
+			UUID libOwner = new UUID (Constants.LibraryOwner);
 
             InventoryItemBase item = invService.GetItem(client.AgentId, gestureId);
             if (item != null)
@@ -120,8 +126,10 @@ namespace WhiteCore.Modules.Gestures
                 invService.UpdateItem(item);
             }
             else
-                MainConsole.Instance.ErrorFormat(
-                    "[GESTURES]: Unable to find gesture to deactivate {0} for {1}", gestureId, client.Name);
+				if(invService.GetItem(libOwner, gestureId) == null) {
+					MainConsole.Instance.ErrorFormat(
+						"[GESTURES]: Unable to find gesture to deactivate {0} for {1}", gestureId, client.Name);
+				}
         }
     }
 }
