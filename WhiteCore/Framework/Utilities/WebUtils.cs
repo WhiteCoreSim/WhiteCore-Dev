@@ -36,6 +36,9 @@ using System.Text;
 #if NET_4_5
 using System.Net.Http;
 using System.Threading.Tasks;
+#else
+using System.Net;
+using WhiteCore.Framework.Servers.HttpServer;
 #endif
 using System.Xml;
 

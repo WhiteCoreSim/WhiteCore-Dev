@@ -1996,6 +1996,27 @@ namespace WhiteCore.Modules.Land
                         int regX, regY;
                         Util.UlongToInts(regionHandle, out regX, out regY);
                         GridRegion info = m_scene.GridService.GetRegionByPosition(null, regX, regY);
+						
+						if(info == null) {
+                            int startX, startY;
+                            int maxRsize = m_scene.GridService.GetMaxRegionSize();
+
+                            if(maxRsize == 0) maxRsize = 8192;
+                            startX = regX - maxRsize;
+                            startY = regY - maxRsize;
+
+                            List<GridRegion> regions = m_scene.GridService.GetRegionRange(null, startX, regX, startY, regY);
+
+                            foreach(GridRegion r in regions) {
+                                if(r.RegionLocX <= regX && r.RegionLocX + r.RegionSizeX > regX &&
+                                   r.RegionLocY <= regY && r.RegionLocY + r.RegionSizeY > regY)
+                                {
+                                    info = r;
+                                    break;
+                                }
+                            }
+                        }
+						
                         if (info != null)
                             regionID = info.RegionID;
                     }
