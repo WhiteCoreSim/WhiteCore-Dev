@@ -3621,7 +3621,7 @@ namespace WhiteCore.ClientStack
             AvatarAppearancePacket avp =
                 (AvatarAppearancePacket) PacketPool.Instance.GetPacket(PacketType.AvatarAppearance);
             // TODO: don't create new blocks if recycling an old packet
-            avp.VisualParam = new AvatarAppearancePacket.VisualParamBlock[218];
+            avp.VisualParam = new AvatarAppearancePacket.VisualParamBlock[app.VisualParams.Length];
             avp.ObjectData.TextureEntry = app.Texture.GetBytes();
             for (int i = 0; i < app.VisualParams.Length; i++)
             {
