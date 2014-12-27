@@ -116,8 +116,8 @@ namespace WhiteCore.Modules.WorldMap
                                              m_scene.RegionInfo.RegionSizeY - scaledRemovalFactor);
 
             viewport.FieldOfView = 150;
-            viewport.Width = Constants.RegionSize;
-            viewport.Height = Constants.RegionSize;
+            viewport.Width = m_scene.RegionInfo.RegionSizeX;//Constants.RegionSize;
+            viewport.Height = m_scene.RegionInfo.RegionSizeY;//Constants.RegionSize;
 
             return TerrainBitmap (viewport, false);
         }
@@ -166,8 +166,14 @@ namespace WhiteCore.Modules.WorldMap
             if (viewport.Orthographic)
             {
                 renderer.Scene.defaultCamera.isOrthographic = true;
-                renderer.Scene.defaultCamera.orthoViewWidth = viewport.OrthoWindowWidth;
-                renderer.Scene.defaultCamera.orthoViewHeight = viewport.OrthoWindowHeight;
+                if(viewport.OrthoWindowWidth <= viewport.OrthoWindowHeight) {
+                    renderer.Scene.defaultCamera.orthoViewWidth = viewport.OrthoWindowWidth;
+                    renderer.Scene.defaultCamera.orthoViewHeight = viewport.OrthoWindowWidth;
+                }
+                else {
+                    renderer.Scene.defaultCamera.orthoViewWidth = viewport.OrthoWindowHeight;
+                    renderer.Scene.defaultCamera.orthoViewHeight = viewport.OrthoWindowHeight;
+                }
             }
             else
             {
@@ -246,14 +252,22 @@ namespace WhiteCore.Modules.WorldMap
             warp_Material waterColormaterial; 
             if (!threeD)
             {
-                renderer.AddPlane ("Water", m_scene.RegionInfo.RegionSizeX );
+                if(m_scene.RegionInfo.RegionSizeX >= m_scene.RegionInfo.RegionSizeY)
+                    renderer.AddPlane ("Water", m_scene.RegionInfo.RegionSizeX/2);
+                else
+                    renderer.AddPlane ("Water", m_scene.RegionInfo.RegionSizeY/2);
+
                 renderer.Scene.sceneobject ("Water").setPos ((m_scene.RegionInfo.RegionSizeX / 2) - 0.5f, waterHeight,
                     (m_scene.RegionInfo.RegionSizeY / 2) - 0.5f);
                                waterColormaterial = new warp_Material (ConvertColor (WATER_COLOR));
                 waterColormaterial.setTransparency ((byte)((1f - WATER_COLOR.A) * 255f) * 2);
             } else
             {
-                renderer.AddPlane ("Water", m_scene.RegionInfo.RegionSizeX);
+                if(m_scene.RegionInfo.RegionSizeX >= m_scene.RegionInfo.RegionSizeY)
+                    renderer.AddPlane ("Water", m_scene.RegionInfo.RegionSizeX/2);
+                else
+                    renderer.AddPlane ("Water", m_scene.RegionInfo.RegionSizeY/2);
+
                 renderer.Scene.sceneobject ("Water").setPos (
                     (m_scene.RegionInfo.RegionSizeX / 2) -0.5f,
                     - 0.5f,
@@ -265,7 +279,7 @@ namespace WhiteCore.Modules.WorldMap
                 //waterColormaterial.opaque = true;
             }
 
-            waterColormaterial.setReflectivity(50);
+            waterColormaterial.setReflectivity(0);
             renderer.Scene.addMaterial("WaterColor", waterColormaterial);
             renderer.SetObjectMaterial("Water", "WaterColor");
         }
@@ -274,38 +288,51 @@ namespace WhiteCore.Modules.WorldMap
         {
             ITerrainChannel terrain = m_scene.RequestModuleInterface<ITerrainChannel>();
 
-            float diff = (float) m_scene.RegionInfo.RegionSizeY/(float) Constants.RegionSize;
-            warp_Object obj =
-                new warp_Object(Constants.RegionSize*Constants.RegionSize,
-                                ((Constants.RegionSize - 1)*(Constants.RegionSize - 1)*2));
+            float diffX = 1.0f; //(float) m_scene.RegionInfo.RegionSizeX/(float) Constants.RegionSize;
+            float diffY = 1.0f; //(float) m_scene.RegionInfo.RegionSizeY/(float) Constants.RegionSize;
+            int newRsX = m_scene.RegionInfo.RegionSizeX / (int)diffX;
+            int newRsY = m_scene.RegionInfo.RegionSizeY / (int)diffY;
 
-            for (float y = 0; y < m_scene.RegionInfo.RegionSizeY; y += diff)
+            warp_Object obj =
+                new warp_Object(newRsX*newRsY,
+                                ((newRsX - 1)*(newRsY - 1)*2));
+
+            for (float y = 0; y < m_scene.RegionInfo.RegionSizeY; y += diffY)
             {
-                for (float x = 0; x < m_scene.RegionInfo.RegionSizeX; x += diff)
+                for (float x = 0; x < m_scene.RegionInfo.RegionSizeX; x += diffX)
                 {
-                    warp_Vector pos = ConvertVector(x, y, terrain[(int) x, (int) y]);
+                    float t_height = terrain[(int) x, (int) y];
+                    float waterHeight = (float) m_scene.RegionInfo.RegionSettings.WaterHeight;
+
+                    //clamp to eliminate artifacts
+                    t_height = Utils.Clamp(t_height, waterHeight - 0.5f, waterHeight + 0.5f);
+                    if(t_height < 0.0f) t_height = 0.0f;
+
+                    warp_Vector pos = ConvertVector(x / diffX, y / diffY, t_height);
                     obj.addVertex(new warp_Vertex(pos, x/(float) (m_scene.RegionInfo.RegionSizeX),
-                                                  (((float) m_scene.RegionInfo.RegionSizeX) - y)/
-                                                  (m_scene.RegionInfo.RegionSizeX)));
+                                                  (((float) m_scene.RegionInfo.RegionSizeY) - y)/
+                                                  (m_scene.RegionInfo.RegionSizeY)));
                 }
             }
 
-            for (float y = 0; y < m_scene.RegionInfo.RegionSizeY; y += diff)
+            for (float y = 0; y < m_scene.RegionInfo.RegionSizeY; y += diffY)
             {
-                for (float x = 0; x < m_scene.RegionInfo.RegionSizeX; x += diff)
+                for (float x = 0; x < m_scene.RegionInfo.RegionSizeX; x += diffX)
                 {
-                    float newX = x/diff;
-                    float newY = y/diff;
-                    if (newX < Constants.RegionSize - 1 && newY < Constants.RegionSize - 1)
+                    float newX = x/diffX;
+                    float newY = y/diffY;
+                    float normal_map_reduction = 2.0f; //2.0f-2.5f is the sweet spot
+
+                    if (newX < newRsX - 1 && newY < newRsY - 1)
                     {
-                        int v = (int) (newY*Constants.RegionSize + newX);
+                        int v = (int) (newY*newRsX + newX);
 
                         // Normal
-                        Vector3 v1 = new Vector3(newX, newY, (terrain[(int) x, (int) y])/Constants.TerrainCompression);
+                        Vector3 v1 = new Vector3(newX, newY, (terrain[(int) x, (int) y])/normal_map_reduction);
                         Vector3 v2 = new Vector3(newX + 1, newY,
-                                                 (terrain[(int) x + 1, (int) y])/Constants.TerrainCompression);
+                                                 (terrain[(int) x + 1, (int) y])/normal_map_reduction);
                         Vector3 v3 = new Vector3(newX, newY + 1,
-                                                 (terrain[(int) x, (int) (y + 1)])/Constants.TerrainCompression);
+                                                 (terrain[(int) x, (int) (y + 1)])/normal_map_reduction);
                         warp_Vector norm = ConvertVector(SurfaceNormal(v1, v2, v3));
                         norm = norm.reverse();
                         obj.vertex(v).n = norm;
@@ -314,12 +341,12 @@ namespace WhiteCore.Modules.WorldMap
                         obj.addTriangle(
                             v,
                             v + 1,
-                            v + Constants.RegionSize);
+                            v + newRsX);
 
                         // Triangle 2
                         obj.addTriangle(
-                            v + Constants.RegionSize + 1,
-                            v + Constants.RegionSize,
+                            v + newRsX + 1,
+                            v + newRsX,
                             v + 1);
                     }
                 }

@@ -94,6 +94,9 @@ namespace WhiteCore.Modules.WorldMap.Warp3DMap
             Debug.Assert(heightRanges.Length == 4);
 
             Bitmap[] detailTexture = new Bitmap[4];
+            int outWidth = heightmap.Width;
+            int outHeight = heightmap.Height;
+            IJ2KDecoder m_imgDecoder;
 
             if (textureTerrain)
             {
@@ -108,6 +111,8 @@ namespace WhiteCore.Modules.WorldMap.Warp3DMap
 
                 if (assetService != null)
                 {
+                    m_imgDecoder =  heightmap.Scene.RequestModuleInterface<IJ2KDecoder>();
+
                     for (int i = 0; i < 4; i++)
                     {
                         UUID cacheID = UUID.Combine(TERRAIN_CACHE_MAGIC, textureIDs[i]);
@@ -135,7 +140,7 @@ namespace WhiteCore.Modules.WorldMap.Warp3DMap
                             {
                                 try
                                 {
-                                    detailTexture[i] = (Bitmap) J2kImage.FromBytes(assetData);
+                                    detailTexture[i] = (Bitmap)m_imgDecoder.DecodeToImage(assetData);
                                 }
                                 catch (Exception ex)
                                 {
@@ -149,8 +154,8 @@ namespace WhiteCore.Modules.WorldMap.Warp3DMap
                                 Bitmap bitmap = detailTexture[i];
 
                                 // Make sure this texture is the correct size, otherwise resize
-                                if (bitmap.Width != 256 || bitmap.Height != 256)
-                                    bitmap = ImageUtils.ResizeImage(bitmap, 256, 256);
+                                if (bitmap.Width != outWidth || bitmap.Height != outHeight)
+                                    bitmap = ImageUtils.ResizeImage(bitmap, outWidth, outHeight);
 
                                 // Save the decoded and resized texture to the cache
                                 byte[] data;
@@ -187,31 +192,35 @@ namespace WhiteCore.Modules.WorldMap.Warp3DMap
                 if (detailTexture[i] == null)
                 {
                     // Create a solid color texture for this layer
-                    detailTexture[i] = new Bitmap(256, 256, PixelFormat.Format24bppRgb);
+                    detailTexture[i] = new Bitmap(outWidth, outHeight, PixelFormat.Format24bppRgb);
                     using (Graphics gfx = Graphics.FromImage(detailTexture[i]))
                     {
                         using (SolidBrush brush = new SolidBrush(DEFAULT_TERRAIN_COLOR[i]))
-                            gfx.FillRectangle(brush, 0, 0, 256, 256);
+                            gfx.FillRectangle(brush, 0, 0, outWidth, outHeight);
                     }
                 }
-                else if (detailTexture[i].Width != 256 || detailTexture[i].Height != 256)
+                else if (detailTexture[i].Width != outWidth || detailTexture[i].Height != outHeight)
                 {
-                    detailTexture[i] = ResizeBitmap(detailTexture[i], 256, 256);
+                    detailTexture[i] = ResizeBitmap(detailTexture[i], outWidth, outHeight);
                 }
             }
 
             #region Layer Map
 
-            float diff = (float) heightmap.Height/(float) Constants.RegionSize;
-            float[] layermap = new float[Constants.RegionSize*Constants.RegionSize];
+            float diffX = 1.0f;//(float) heightmap.Width/(float) Constants.RegionSize;
+            float diffY = 1.0f;//(float) heightmap.Height/(float) Constants.RegionSize;
+            int newRsX = heightmap.Width / (int)diffX;
+            int newRsY = heightmap.Height / (int)diffY;
 
-            for (float y = 0; y < heightmap.Height; y += diff)
+            float[] layermap = new float[newRsX*newRsY];
+
+            for (float y = 0; y < heightmap.Height; y += diffY)
             {
-                for (float x = 0; x < heightmap.Height; x += diff)
+                for (float x = 0; x < heightmap.Width; x += diffX)
                 {
-                    float newX = x/diff;
-                    float newY = y/diff;
-                    float height = heightmap[(int) newX, (int) newY];
+                    float newX = x/diffX;
+                    float newY = y/diffY;
+                    float height = heightmap[(int) x, (int) y];
 
                     float pctX = newX/255f;
                     float pctY = newY/255f;
@@ -251,7 +260,7 @@ namespace WhiteCore.Modules.WorldMap.Warp3DMap
                     float layer = ((height + noise - startHeight)/heightRange)*4f;
                     if (Single.IsNaN(layer))
                         layer = 0f;
-                    layermap[(int) (newY*Constants.RegionSize + newX)] = Utils.Clamp(layer, 0f, 3f);
+                    layermap[(int) (newY*newRsX + newX)] = Utils.Clamp(layer, 0f, 3f);
                 }
             }
 
@@ -259,8 +268,8 @@ namespace WhiteCore.Modules.WorldMap.Warp3DMap
 
             #region Texture Compositing
 
-            Bitmap output = new Bitmap(256, 256, PixelFormat.Format24bppRgb);
-            BitmapData outputData = output.LockBits(new Rectangle(0, 0, 256, 256), ImageLockMode.WriteOnly,
+            Bitmap output = new Bitmap(outWidth, outHeight, PixelFormat.Format24bppRgb);
+            BitmapData outputData = output.LockBits(new Rectangle(0, 0, outWidth, outHeight), ImageLockMode.WriteOnly,
                                                     PixelFormat.Format24bppRgb);
 
             unsafe
@@ -268,16 +277,16 @@ namespace WhiteCore.Modules.WorldMap.Warp3DMap
                 // Get handles to all of the texture data arrays
                 BitmapData[] datas = new[]
                                          {
-                                             detailTexture[0].LockBits(new Rectangle(0, 0, 256, 256),
+                                             detailTexture[0].LockBits(new Rectangle(0, 0, outWidth, outHeight),
                                                                        ImageLockMode.ReadOnly,
                                                                        detailTexture[0].PixelFormat),
-                                             detailTexture[1].LockBits(new Rectangle(0, 0, 256, 256),
+                                             detailTexture[1].LockBits(new Rectangle(0, 0, outWidth, outHeight),
                                                                        ImageLockMode.ReadOnly,
                                                                        detailTexture[1].PixelFormat),
-                                             detailTexture[2].LockBits(new Rectangle(0, 0, 256, 256),
+                                             detailTexture[2].LockBits(new Rectangle(0, 0, outWidth, outHeight),
                                                                        ImageLockMode.ReadOnly,
                                                                        detailTexture[2].PixelFormat),
-                                             detailTexture[3].LockBits(new Rectangle(0, 0, 256, 256),
+                                             detailTexture[3].LockBits(new Rectangle(0, 0, outWidth, outHeight),
                                                                        ImageLockMode.ReadOnly,
                                                                        detailTexture[3].PixelFormat)
                                          };
@@ -290,11 +299,11 @@ namespace WhiteCore.Modules.WorldMap.Warp3DMap
                                       (datas[3].PixelFormat == PixelFormat.Format32bppArgb) ? 4 : 3
                                   };
 
-                for (int y = 0; y < Constants.RegionSize; y++)
+                for (int y = 0; y < newRsY; y++)
                 {
-                    for (int x = 0; x < Constants.RegionSize; x++)
+                    for (int x = 0; x < newRsX; x++)
                     {
-                        float layer = layermap[y*Constants.RegionSize + x];
+                        float layer = layermap[y*newRsX + x];
 
                         // Select two textures
                         int l0 = (int) Math.Floor(layer);

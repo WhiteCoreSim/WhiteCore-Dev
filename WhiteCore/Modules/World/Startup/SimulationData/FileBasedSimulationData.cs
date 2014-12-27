@@ -355,14 +355,8 @@ namespace WhiteCore.Modules
                 //            ? 0 
                 //            : info.RegionLocZ / Constants.RegionSize)).ToString ())) * Constants.RegionSize;
 
-                // TODO: Implement non square regions??
-                // info.RegionSizeX = int.Parse (MainConsole.Instance.Prompt ("Region size X", info.RegionSizeX.ToString ()));
-                // info.RegionSizeY = int.Parse (MainConsole.Instance.Prompt ("Region size Y", info.RegionSizeY.ToString ()));
-
-                // only allow square regions as this is the assumption for now - 20141022 - greythane -
-                info.RegionSizeX = int.Parse (MainConsole.Instance.Prompt ("Region size", info.RegionSizeX.ToString ()));
-                info.RegionSizeY = info.RegionSizeX;
-                //info.RegionSizeZ = info.RegionSizeX;
+                info.RegionSizeX = int.Parse (MainConsole.Instance.Prompt ("Region size X", info.RegionSizeX.ToString ()));
+                info.RegionSizeY = int.Parse (MainConsole.Instance.Prompt ("Region size Y", info.RegionSizeY.ToString ()));
 
                 // * Mainland / Full Region (Private)
                 // * Mainland / Homestead
@@ -671,7 +665,7 @@ namespace WhiteCore.Modules
                 terrainModule.TerrainRevertMap = ReadFromData(_regionData.RevertTerrain);
                 //Make sure the size is right!
                 if (terrainModule.TerrainRevertMap != null &&
-                    terrainModule.TerrainRevertMap.Height != m_scene.RegionInfo.RegionSizeX)
+                    terrainModule.TerrainRevertMap.Width != m_scene.RegionInfo.RegionSizeX)
                     terrainModule.TerrainRevertMap = null;
             }
             else
@@ -679,7 +673,7 @@ namespace WhiteCore.Modules
                 terrainModule.TerrainMap = ReadFromData(_regionData.Terrain);
                 //Make sure the size is right!
                 if (terrainModule.TerrainMap != null &&
-                    terrainModule.TerrainMap.Height != m_scene.RegionInfo.RegionSizeX)
+                    terrainModule.TerrainMap.Width != m_scene.RegionInfo.RegionSizeX)
                     terrainModule.TerrainMap = null;
             }
         }
@@ -691,14 +685,14 @@ namespace WhiteCore.Modules
             {
                 terrainModule.TerrainWaterRevertMap = ReadFromData(_regionData.RevertWater);
                 //Make sure the size is right!
-                if (terrainModule.TerrainWaterRevertMap.Height != m_scene.RegionInfo.RegionSizeX)
+                if (terrainModule.TerrainWaterRevertMap.Width != m_scene.RegionInfo.RegionSizeX)
                     terrainModule.TerrainWaterRevertMap = null;
             }
             else
             {
                 terrainModule.TerrainWaterMap = ReadFromData(_regionData.Water);
                 //Make sure the size is right!
-                if (terrainModule.TerrainWaterMap.Height != m_scene.RegionInfo.RegionSizeX)
+                if (terrainModule.TerrainWaterMap.Width != m_scene.RegionInfo.RegionSizeX)
                     terrainModule.TerrainWaterMap = null;
             }
         }
@@ -1077,7 +1071,7 @@ namespace WhiteCore.Modules
 
         byte[] WriteTerrainToStream(ITerrainChannel tModule)
         {
-            int tMapSize = tModule.Height*tModule.Height;
+            int tMapSize = tModule.Width*tModule.Height;
             byte[] sdata = new byte[tMapSize*2];
             Buffer.BlockCopy(tModule.GetSerialised(), 0, sdata, 0, sdata.Length);
             return sdata;

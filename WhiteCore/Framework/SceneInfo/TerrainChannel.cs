@@ -38,6 +38,7 @@ namespace WhiteCore.Framework.SceneInfo
     public class TerrainChannel : ITerrainChannel
     {
         private int m_Width;
+        private int m_Height;
 
         /// <summary>
         ///     NOTE: This is NOT a normal map, it has a resolution of 10x
@@ -51,6 +52,7 @@ namespace WhiteCore.Framework.SceneInfo
         {
             m_scene = scene;
             m_Width = m_scene.RegionInfo.RegionSizeX;
+            m_Height = m_scene.RegionInfo.RegionSizeY;
 			CreateDefaultTerrain(m_scene.RegionInfo.RegionTerrain);
         }
 
@@ -58,9 +60,11 @@ namespace WhiteCore.Framework.SceneInfo
 		{
 			m_scene = scene;
 			m_Width = Constants.RegionSize;
+            m_Height = m_Width;
 			if (scene != null)
 			{
 				m_Width = scene.RegionInfo.RegionSizeX;
+                m_Height = scene.RegionInfo.RegionSizeY;
 			}
 
             CreateDefaultTerrain(terrainType);
@@ -70,15 +74,22 @@ namespace WhiteCore.Framework.SceneInfo
         {
             m_scene = scene;
             m_map = import;
-            m_Width = (int) Math.Sqrt(import.Length);
-            taint = new bool[m_Width,m_Width];
-            if ((m_Width != scene.RegionInfo.RegionSizeX ||
-                 m_Width != scene.RegionInfo.RegionSizeY) &&
-                (scene.RegionInfo.RegionSizeX != int.MaxValue) && //Child regions of a mega-region
-                (scene.RegionInfo.RegionSizeY != int.MaxValue))
-            {
+            m_Width = Constants.RegionSize;
+            m_Height = m_Width;
+			if (scene != null)
+			{
+                if(scene.RegionInfo.RegionSizeX != int.MaxValue &&
+                   scene.RegionInfo.RegionSizeY != int.MaxValue)
+                {
+                    m_Width = scene.RegionInfo.RegionSizeX;
+                    m_Height = scene.RegionInfo.RegionSizeY;
+                }
+            }
+            taint = new bool[m_Width/Constants.TerrainPatchSize,m_Height/Constants.TerrainPatchSize];
+
+            if((import.Length != m_Width * m_Height)) {
                 //We need to fix the map then
-				CreateDefaultTerrain(m_scene.RegionInfo.RegionTerrain);
+                CreateDefaultTerrain(m_scene.RegionInfo.RegionTerrain);
             }
         }
 
@@ -86,14 +97,16 @@ namespace WhiteCore.Framework.SceneInfo
         {
             m_scene = scene;
             m_Width = Constants.RegionSize;
+            m_Height = m_Width;
             if (scene != null)
             {
                 m_Width = scene.RegionInfo.RegionSizeX;
+                m_Height = scene.RegionInfo.RegionSizeY;
             }
             if (createMap)
             {
-                m_map = new short[m_Width*m_Width];
-                taint = new bool[m_Width/Constants.TerrainPatchSize,m_Width/Constants.TerrainPatchSize];
+                m_map = new short[m_Width*m_Height];
+                taint = new bool[m_Width/Constants.TerrainPatchSize,m_Height/Constants.TerrainPatchSize];
             }
         }
 
@@ -128,7 +141,7 @@ namespace WhiteCore.Framework.SceneInfo
 
         public int Height
         {
-            get { return m_Width; }
+            get { return m_Height; }
         }
 
         public IScene Scene
@@ -152,7 +165,7 @@ namespace WhiteCore.Framework.SceneInfo
                 {
                     //Get the nearest one so that things don't get screwed up near borders
                     int betterX = x < 0 ? 0 : x >= m_Width ? m_Width - 1 : x;
-                    int betterY = y < 0 ? 0 : y >= m_Width ? m_Width - 1 : y;
+                    int betterY = y < 0 ? 0 : y >= m_Height ? m_Height - 1 : y;
                     return (m_map[betterY*m_Width + betterX])/Constants.TerrainCompression;
                 }
             }
@@ -203,8 +216,8 @@ namespace WhiteCore.Framework.SceneInfo
                 x = m_Width - 1;
             if (y < 0)
                 y = 0;
-            if (y >= m_Width)
-                y = m_Width - 1;
+            if (y >= m_Height)
+                y = m_Height - 1;
 
             Vector3 p0 = new Vector3(x, y, this[x, y]);
             Vector3 p1 = new Vector3(p0);
@@ -215,7 +228,7 @@ namespace WhiteCore.Framework.SceneInfo
                 p1.Z = this[(int) p1.X, (int) p1.Y];
 
             p2.Y += 1.0f;
-            if (p2.Y < m_Width)
+            if (p2.Y < m_Height)
                 p2.Z = this[(int) p2.X, (int) p2.Y];
 
             Vector3 v0 = new Vector3(p1.X - p0.X, p1.Y - p0.Y, p1.Z - p0.Z);
@@ -265,8 +278,10 @@ namespace WhiteCore.Framework.SceneInfo
 		{
 			m_scene = scene;
             m_Width = Constants.RegionSize;
+            m_Height = m_Width;
 			if (scene != null)
 			    m_Width = scene.RegionInfo.RegionSizeX;                 // use the region size
+                m_Height = scene.RegionInfo.RegionSizeY;
 			
             if (terrainType == null)
 			    terrainType = "f";                                      // Flatland then
@@ -333,11 +348,12 @@ namespace WhiteCore.Framework.SceneInfo
 
             m_map = null;
             taint = null;
-            m_map = new short[m_scene.RegionInfo.RegionSizeX*m_scene.RegionInfo.RegionSizeX];
+            m_map = new short[m_scene.RegionInfo.RegionSizeX*m_scene.RegionInfo.RegionSizeY];
             taint =
                 new bool[m_scene.RegionInfo.RegionSizeX/Constants.TerrainPatchSize,
                     m_scene.RegionInfo.RegionSizeY/Constants.TerrainPatchSize];
             m_Width = m_scene.RegionInfo.RegionSizeX;
+            m_Height = m_scene.RegionInfo.RegionSizeY;
 
            /* int x;
             for (x = 0; x < m_scene.RegionInfo.RegionSizeX; x++)
@@ -359,11 +375,12 @@ namespace WhiteCore.Framework.SceneInfo
 
 			m_map = null;
 		 	taint = null;
-            m_map = new short[m_scene.RegionInfo.RegionSizeX*m_scene.RegionInfo.RegionSizeX];
+            m_map = new short[m_scene.RegionInfo.RegionSizeX*m_scene.RegionInfo.RegionSizeY];
             taint =
                 new bool[m_scene.RegionInfo.RegionSizeX/Constants.TerrainPatchSize,
                     m_scene.RegionInfo.RegionSizeY/Constants.TerrainPatchSize];
             m_Width = m_scene.RegionInfo.RegionSizeX;
+            m_Height = m_scene.RegionInfo.RegionSizeY;
 
             int x;
             for (x = 0; x < m_scene.RegionInfo.RegionSizeX; x++)
@@ -389,7 +406,7 @@ namespace WhiteCore.Framework.SceneInfo
 		{
 			m_map = null;
 			taint = null;
-			m_map = new short[m_scene.RegionInfo.RegionSizeX*m_scene.RegionInfo.RegionSizeX];
+			m_map = new short[m_scene.RegionInfo.RegionSizeX*m_scene.RegionInfo.RegionSizeY];
 			taint =
 				new bool[m_scene.RegionInfo.RegionSizeX/Constants.TerrainPatchSize,
 				         m_scene.RegionInfo.RegionSizeY/Constants.TerrainPatchSize];
@@ -397,6 +414,7 @@ namespace WhiteCore.Framework.SceneInfo
 			int rWidth = m_scene.RegionInfo.RegionSizeX;
 			int rHeight = m_scene.RegionInfo.RegionSizeY;
 			m_Width = rWidth; 
+            m_Height = rHeight;
             float waterHeight = (float) m_scene.RegionInfo.RegionSettings.WaterHeight;
 
 			int octaveCount = 8;
@@ -428,7 +446,7 @@ namespace WhiteCore.Framework.SceneInfo
 		{
 			m_map = null;
 			taint = null;
-			m_map = new short[m_scene.RegionInfo.RegionSizeX*m_scene.RegionInfo.RegionSizeX];
+			m_map = new short[m_scene.RegionInfo.RegionSizeX*m_scene.RegionInfo.RegionSizeY];
 			taint =
 				new bool[m_scene.RegionInfo.RegionSizeX/Constants.TerrainPatchSize,
 				         m_scene.RegionInfo.RegionSizeY/Constants.TerrainPatchSize];
@@ -436,6 +454,7 @@ namespace WhiteCore.Framework.SceneInfo
 			int rWidth = m_scene.RegionInfo.RegionSizeX;
 			int rHeight = m_scene.RegionInfo.RegionSizeY;
 			m_Width = rWidth; 
+            m_Height = rHeight;
 
 			int octaveCount = 8;
 			float[][] heightMap = PerlinNoise.GenerateIslandMap(rWidth, rHeight, octaveCount, minHeight, maxHeight, smoothing);
@@ -456,11 +475,12 @@ namespace WhiteCore.Framework.SceneInfo
 		{
 			m_map = null;
 			taint = null;
-			m_map = new short[m_scene.RegionInfo.RegionSizeX*m_scene.RegionInfo.RegionSizeX];
+			m_map = new short[m_scene.RegionInfo.RegionSizeX*m_scene.RegionInfo.RegionSizeY];
 			taint =
 				new bool[m_scene.RegionInfo.RegionSizeX/Constants.TerrainPatchSize,
 				         m_scene.RegionInfo.RegionSizeY/Constants.TerrainPatchSize];
 			m_Width = m_scene.RegionInfo.RegionSizeX;
+            m_Height = m_scene.RegionInfo.RegionSizeY;
 
 			int x;
 			int y;

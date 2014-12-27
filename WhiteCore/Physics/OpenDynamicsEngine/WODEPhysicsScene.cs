@@ -1511,7 +1511,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             {
                 for (int y = 0; y < m_region.RegionSizeY; y++)
                 {
-                    _heightmap[(x*m_region.RegionSizeX) + y] = heightMap[y*m_region.RegionSizeX + x]/
+                    _heightmap[(x*m_region.RegionSizeY) + y] = heightMap[y*m_region.RegionSizeX + x]/
                                                                Constants.TerrainCompression;
                 }
             }
@@ -1548,10 +1548,10 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                                                    //Add the memory pressure properly (note: should we be doing this since we have it in managed memory?)
                                                    //Do NOT copy it! Otherwise, it'll copy the terrain into unmanaged memory where we can't release it each time
                                                    d.GeomHeightfieldDataBuildSingle(HeightmapData, _heightmap, 0,
-                                                                                    m_region.RegionSizeX,
                                                                                     m_region.RegionSizeY,
                                                                                     m_region.RegionSizeX,
-                                                                                    m_region.RegionSizeY, scale,
+                                                                                    m_region.RegionSizeY,
+                                                                                    m_region.RegionSizeX, scale,
                                                                                     offset, thickness, wrap);
 
                                                    d.GeomHeightfieldDataSetBounds(HeightmapData, hfmin - 1.0f,
