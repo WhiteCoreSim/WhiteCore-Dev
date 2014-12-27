@@ -96,6 +96,7 @@ namespace WhiteCore.Modules.WorldMap.Warp3DMap
             Bitmap[] detailTexture = new Bitmap[4];
             int outWidth = heightmap.Width;
             int outHeight = heightmap.Height;
+            IJ2KDecoder m_imgDecoder;
 
             if (textureTerrain)
             {
@@ -110,6 +111,8 @@ namespace WhiteCore.Modules.WorldMap.Warp3DMap
 
                 if (assetService != null)
                 {
+                    m_imgDecoder =  heightmap.Scene.RequestModuleInterface<IJ2KDecoder>();
+
                     for (int i = 0; i < 4; i++)
                     {
                         UUID cacheID = UUID.Combine(TERRAIN_CACHE_MAGIC, textureIDs[i]);
@@ -137,7 +140,7 @@ namespace WhiteCore.Modules.WorldMap.Warp3DMap
                             {
                                 try
                                 {
-                                    detailTexture[i] = (Bitmap) J2kImage.FromBytes(assetData);
+                                    detailTexture[i] = (Bitmap)m_imgDecoder.DecodeToImage(assetData);
                                 }
                                 catch (Exception ex)
                                 {
