@@ -455,7 +455,7 @@ namespace WhiteCore.Services
                                 Constants.RegionSize;
                     float y = (regions[i].RegionLocY - (regionY * (float)Constants.RegionSize)) /
                                 Constants.RegionSize;
-                    y += (regions[i].RegionSizeX - Constants.RegionSize) / Constants.RegionSize;
+                    y += (regions[i].RegionSizeY - Constants.RegionSize) / Constants.RegionSize;
                     float xx = (float)(x * (SizeOfImage));
                     float yy = SizeOfImage - (y * (SizeOfImage) + (SizeOfImage));
                     g.DrawImage(bitImages[i], xx, yy,

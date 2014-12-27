@@ -723,7 +723,7 @@ namespace WhiteCore.Modules.Startup
 
             static byte[] WriteTerrainToStream(ITerrainChannel tModule)
             {
-                int tMapSize = tModule.Height*tModule.Height;
+                int tMapSize = tModule.Width*tModule.Height;
                 byte[] sdata = new byte[tMapSize*2];
                 Buffer.BlockCopy(tModule.GetSerialised(), 0, sdata, 0, sdata.Length);
                 return sdata;
