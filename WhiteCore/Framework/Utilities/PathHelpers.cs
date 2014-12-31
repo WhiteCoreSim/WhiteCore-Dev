@@ -36,7 +36,8 @@ namespace WhiteCore.Framework.Utilities
     public class PathHelpers
     {
         const string usernameVar = "%username%";
-        const string HomedriveVar = "%homedrive%";
+        const string winHomedriveVar = "%homedrive%";           // should the be  "%HOMEDRIVE%%HOMEPATH%" ?
+        const string nixHomeVar = "~/";
 
         public static string PathUsername(string Path) //supports using %username% in place of username
         {
@@ -54,32 +55,41 @@ namespace WhiteCore.Framework.Utilities
         }
 
 
-        public static string PathHomeDrive(string Path) //supports for %homedrive%, gives the drive letter on Windows
+        public static string PathHomeDrive(string fName) 
         {
-            if (Path.IndexOf(HomedriveVar, StringComparison.CurrentCultureIgnoreCase) == -1)
-                //does not contain username var
+            // supports for %homedrive%, gives the drive letter on Windows
+            // ~/ on *nix
+             
+            if ( fName.IndexOf (winHomedriveVar, StringComparison.CurrentCultureIgnoreCase) != -1)
             {
-                return Path;
+                string DriveLetter = Environment.GetEnvironmentVariable ("HOMEDRIVE");
+                fName =  Regex.Replace (fName, winHomedriveVar, DriveLetter, RegexOptions.IgnoreCase);
             }
-            else
+    
+            // *nix then ?
+            if ( fName.IndexOf (nixHomeVar, StringComparison.CurrentCultureIgnoreCase) != -1)
             {
-                if (Util.IsLinux)
-                {
-                    return Path;
-                }
-                else
-                {
-                    string DriveLetter = Environment.GetEnvironmentVariable("HOMEDRIVE");
+                string homePath = Environment.GetEnvironmentVariable("HOME") + "/";
+                fName = Regex.Replace (fName, nixHomeVar, homePath, RegexOptions.IgnoreCase);
+            }
 
-                    return Regex.Replace(Path, HomedriveVar, DriveLetter, RegexOptions.IgnoreCase);
-                }
-            }
+            return fName;        
         }
 
         public static string ComputeFullPath(string Path)
             //single function that calls the functions that help compute a full url Path
         {
             return PathHomeDrive(PathUsername(Path));
+        }
+
+        /// <summary>
+        /// Verifies and corrects the OS path.
+        /// </summary>
+        /// <returns>The OS path.</returns>
+        /// <param name="filename">Filename.</param>
+        public static string VerifyOSPath(string filename)
+        {
+            return Utilities.IsLinuxOs ? filename.Replace ('\\', '/') : filename.Replace ('/', '\\');
         }
 
         /// <summary>
@@ -102,13 +112,16 @@ namespace WhiteCore.Framework.Utilities
                 fileName = fileName + defaultExt;
             }
 
-            // verify path details
+            // check for user directories
+            fileName = ComputeFullPath(fileName);
+
             string filePath = Path.GetDirectoryName (fileName);
             if (filePath == "")
             {
                 if (defaultDir == String.Empty)
                     defaultDir = "./";
-                fileName = Path.Combine (defaultDir, fileName);
+
+                fileName = VerifyOSPath(Path.Combine (defaultDir, fileName));
 
             }
              
@@ -198,6 +211,9 @@ namespace WhiteCore.Framework.Utilities
                 }
             }
 
+            // check for user directories
+            fileName = ComputeFullPath(fileName);
+
             string filePath = Path.GetDirectoryName (fileName);
             if (filePath == "")
             {
@@ -210,7 +226,8 @@ namespace WhiteCore.Framework.Utilities
                         MainConsole.Instance.Info ("[Error]: The folder specified, '" + defaultDir + "' does not exist!");
                     return "";
                 }
-                fileName = Path.Combine (defaultDir, fileName);
+
+                fileName = VerifyOSPath(Path.Combine (defaultDir, fileName));
             }
              
             // last check...
