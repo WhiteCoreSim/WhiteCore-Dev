@@ -9,6 +9,7 @@
     ;; cache directory can be shared by multiple instances
     ;; Default >> CacheDirectory = ../Data/AssetCache
     CacheDirectory = ../Data/AssetCache
+    
     ; Other examples:
     ;CacheDirectory = /directory/writeable/by/WhiteCore/instance
 

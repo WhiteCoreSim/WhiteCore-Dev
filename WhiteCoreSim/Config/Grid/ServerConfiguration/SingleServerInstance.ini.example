@@ -15,6 +15,7 @@
     ;; This controls options about the v3 Server Side Appearance, which allows v3 viewers to have an appearance
     ;; Should we allow the use of this service?
     Enabled = true
+    
     ;; The port to run the SSAService on
     ;; Default is 8011
     Port = 8011
@@ -23,11 +24,14 @@
     ;; This controls options about the v2 MapService, which allows v2 viewers to see the map
     ;; Should we allow the use of this service?
     Enabled = true
+    
     ;; The port to run the MapService on
     ;; Default is 8012
     Port = 8012
+    
     ;; Should we build up an expiring cache of the map tiles?
     ;; Highly recommended, otherwise, many tiles will be generated more than once, which wastes CPU
     CacheEnabled = true
+    
     ;; The time for cached images to expire (in hours)
     CacheExpires = 24

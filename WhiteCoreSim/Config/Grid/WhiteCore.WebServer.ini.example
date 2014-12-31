@@ -4,10 +4,13 @@
     
     ;; HTTPS configs
     use_https = false
+    
     ;; Path to your HTTPS certificate
     https_cert_path = ""
+    
     ;; Password to your HTTPS cert
     https_cert_pass = ""
+    
     ;; The protocols that will be able to be used
     ;; The valid values are
     ;; Default - Specifies that either SSL 3.0 or TLS 1.0 are acceptable for secure communications
@@ -48,13 +51,14 @@
     ;PIDFile = /tmp/my.pid
 
     ;; Commands to be run on startup are in the given file
-    startup_console_commands_file = startup_commands.txt
+    ;startup_console_commands_file = ../Config/startup_commands.txt
 
     ;; Commands to be run on shutdown are in the given file
-    shutdown_console_commands_file = shutdown_commands.txt
+    ;shutdown_console_commands_file = ../Config/shutdown_commands.txt
 
     ;; To run a script every X minutes, set the script filename here
     ;timer_Script = filename
+    
     ;; Time between each timer to run (in minutes)
     ;timer_time = 20
 
