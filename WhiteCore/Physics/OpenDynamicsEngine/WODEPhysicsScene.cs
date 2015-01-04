@@ -156,6 +156,11 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             get { return m_region; }
         }
 
+        public IScene Scene
+        {
+            get { return m_scene; }
+        }
+
         public override float StepTime
         {
             get { return ODE_STEPSIZE; }

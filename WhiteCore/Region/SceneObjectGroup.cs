@@ -3934,13 +3934,16 @@ namespace WhiteCore.Region
                             }
                         }
                         IsInTransit = false;
-                        //The group should have crossed a region, but no region was found so return it instead
-                        MainConsole.Instance.Info("[SceneObjectGroup]: Returning prim " + Name + " @ " +
-                                                  AbsolutePosition +
-                                                  " because it has gone out of bounds.");
-                        ILLClientInventory inventoryModule = Scene.RequestModuleInterface<ILLClientInventory>();
-                        if (inventoryModule != null)
-                            inventoryModule.ReturnObjects(new ISceneEntity[] { this }, UUID.Zero);
+                        
+                        if(RootPart.VehicleType == (int)Vehicle.TYPE_NONE) {
+                            //The group should have crossed a region, but no region was found so return it instead
+                            MainConsole.Instance.Info("[SceneObjectGroup]: Returning prim " + Name + " @ " +
+                                                      AbsolutePosition +
+                                                      " because it has gone out of bounds.");
+                            ILLClientInventory inventoryModule = Scene.RequestModuleInterface<ILLClientInventory>();
+                            if (inventoryModule != null)
+                                inventoryModule.ReturnObjects(new ISceneEntity[] { this }, UUID.Zero);
+                        }
                         return;
                     }
                 }
