@@ -28,7 +28,8 @@
     ;; Time between each timer to run (in minutes)
     ;timer_time = 20
 
-    ;; Should WhiteCore wait until all modules have finished starting up before allowing logins and use of the console?
+    ;; Should WhiteCore wait until all modules have finished starting up before allowing 
+    ;; logins and use of the console?
     ;; Default is true
     CompleteStartupAfterAllModulesLoad = true
     

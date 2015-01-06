@@ -43,22 +43,63 @@ namespace WhiteCore.Framework.ClientInterfaces
     public sealed class AvatarAppearance : IDataTransferable
     {
         public static readonly int VISUALPARAM_COUNT = 218;
-
         public static readonly int TEXTURE_COUNT = 21;
         public static readonly byte[] BAKE_INDICES = new byte[] {8, 9, 10, 11, 19, 20};
-        private Dictionary<int, List<AvatarAttachment>> m_attachments;
-        private float m_avatarHeight;
-
-        private UUID m_owner;
+        
         private int m_serial = 1;
+        protected byte[] m_visualparams;
         private Primitive.TextureEntry m_texture;
-        private byte[] m_visualparams;
         private AvatarWearable[] m_wearables;
+        private Dictionary<int, List<AvatarAttachment>> m_attachments;        
+        private float m_avatarHeight = 0;
+        private UUID m_owner;
         private Dictionary<string, UUID> m_wearableCache = new Dictionary<string, UUID>();
+
+        public int Serial
+        {
+            get { return m_serial; }
+            set { m_serial = value; }
+        }
+
+        public byte[] VisualParams
+        {
+            get { return m_visualparams; }
+            set { m_visualparams = value; }
+        }
+
+        public Primitive.TextureEntry Texture
+        {
+            get { return m_texture; }
+            set { m_texture = value; }
+        }
+
+        public AvatarWearable[] Wearables
+        {
+            get { return m_wearables; }
+            set { m_wearables = value; }
+        }
+
+        public float AvatarHeight
+        {
+            get { return m_avatarHeight; }
+            set { m_avatarHeight = value; }
+        }
 
         public Dictionary<string, UUID> WearableCache
         {
             get { return m_wearableCache; }
+        }
+
+        public UUID Owner
+        {
+            get { return m_owner; }
+            set { m_owner = value; }
+        }
+
+        public Dictionary<int, List<AvatarAttachment>> Attachments
+        {
+            get { return m_attachments; }
+            set { m_attachments = value; }
         }
 
         public AvatarAppearance() : this(UUID.Zero)
@@ -67,8 +108,6 @@ namespace WhiteCore.Framework.ClientInterfaces
 
         public AvatarAppearance(UUID owner)
         {
-            // MainConsole.Instance.WarnFormat("[AVATAR APPEARANCE]: create empty appearance for {0}",owner);
-
             m_serial = 1;
             m_owner = owner;
 
@@ -76,14 +115,11 @@ namespace WhiteCore.Framework.ClientInterfaces
             SetDefaultTexture();
             SetDefaultParams();
             SetHeight();
-
             m_attachments = new Dictionary<int, List<AvatarAttachment>>();
         }
 
         public AvatarAppearance(UUID avatarID, OSDMap map)
         {
-            //            MainConsole.Instance.WarnFormat("[AVATAR APPEARANCE]: create appearance for {0} from OSDMap",avatarID);
-
             m_owner = avatarID;
             Unpack(map);
         }
@@ -162,54 +198,13 @@ namespace WhiteCore.Framework.ClientInterfaces
             m_visualparams = null;
             if (appearance.VisualParams != null)
                 m_visualparams = (byte[]) appearance.VisualParams.Clone();
-
+            
+            SetHeight();
+            
             // Copy the attachment, force append mode since that ensures consistency
             m_attachments = new Dictionary<int, List<AvatarAttachment>>();
             foreach (AvatarAttachment attachment in appearance.GetAttachments())
                 AppendAttachment(new AvatarAttachment(attachment));
-            SetHeight();
-        }
-
-        public UUID Owner
-        {
-            get { return m_owner; }
-            set { m_owner = value; }
-        }
-
-        public int Serial
-        {
-            get { return m_serial; }
-            set { m_serial = value; }
-        }
-
-        public byte[] VisualParams
-        {
-            get { return m_visualparams; }
-            set { m_visualparams = value; }
-        }
-
-        public Primitive.TextureEntry Texture
-        {
-            get { return m_texture; }
-            set { m_texture = value; }
-        }
-
-        public AvatarWearable[] Wearables
-        {
-            get { return m_wearables; }
-            set { m_wearables = value; }
-        }
-
-        public float AvatarHeight
-        {
-            get { return m_avatarHeight; }
-            set { m_avatarHeight = value; }
-        }
-
-        public Dictionary<int, List<AvatarAttachment>> Attachments
-        {
-            get { return m_attachments; }
-            set { m_attachments = value; }
         }
 
         public void GetAssetsFrom(AvatarAppearance app)
@@ -237,6 +232,12 @@ namespace WhiteCore.Framework.ClientInterfaces
         {
             m_wearables = AvatarWearable.DefaultWearables;
         }
+        
+        public void ResetAppearance()
+        {
+        	m_serial = 1;
+            SetDefaultTexture();
+        }
 
         private void SetDefaultParams()
         {
@@ -262,10 +263,6 @@ namespace WhiteCore.Framework.ClientInterfaces
                                      0, 127, 127, 150, 150, 150, 150, 150, 150, 150, 150, 0, 0, 150, 51, 132, 150, 150,
                                      150
                                  };
-            //            for (int i = 0; i < VISUALPARAM_COUNT; i++)
-            //            {
-            //                m_visualparams[i] = 150;
-            //            }
         }
 
         private void SetDefaultTexture()
@@ -335,16 +332,23 @@ namespace WhiteCore.Framework.ClientInterfaces
             // made. We determine if any of the visual parameters actually
             // changed to know if the appearance should be saved later
             bool changed = false;
-            for (int i = 0; i < VISUALPARAM_COUNT; i++)
+            
+            int newsize = visualParams.Length;
+            
+            if (newsize != m_visualparams.Length)
             {
-                if (visualParams[i] != m_visualparams[i])
+                changed = true;
+                m_visualparams = (byte[])visualParams.Clone();
+            }
+            else
+            {
+            	for (int i = 0; i < newsize; i++)
                 {
-                    // DEBUG ON
-                    //                    MainConsole.Instance.WarnFormat("[AVATARAPPEARANCE] vparams changed [{0}] {1} ==> {2}",
-                    //                                     i,m_visualparams[i],visualParams[i]);
-                    // DEBUG OFF
-                    m_visualparams[i] = visualParams[i];
-                    changed = true;
+                    if (visualParams[i] != m_visualparams[i])
+                    {
+                        m_visualparams[i] = visualParams[i];
+                        changed = true;
+                    }
                 }
             }
 
@@ -399,7 +403,7 @@ namespace WhiteCore.Framework.ClientInterfaces
             }
 
             s += "Visual Params: ";
-            for (uint j = 0; j < VISUALPARAM_COUNT; j++)
+            for (uint j = 0; j < m_visualparams.Length; j++)
                 s += String.Format("{0},", m_visualparams[j]);
             s += "\n";
 
@@ -1670,9 +1674,61 @@ namespace WhiteCore.Framework.ClientInterfaces
             SHAPE_EYELID_INNER_CORNER_UP = 214,
             SKIRT_SKIRT_RED = 215,
             SKIRT_SKIRT_GREEN = 216,
-            SKIRT_SKIRT_BLUE = 217
-        }
+            SKIRT_SKIRT_BLUE = 217,
 
+            /// <summary>
+            /// Avatar Physics section.  These are 0 type visual params which get transmitted.
+            /// </summary>
+
+            /// <summary>
+            /// Breast Part 1 
+            /// </summary>
+            BREAST_PHYSICS_MASS = 218,
+            BREAST_PHYSICS_GRAVITY = 219,
+            BREAST_PHYSICS_DRAG = 220,
+            BREAST_PHYSICS_UPDOWN_MAX_EFFECT = 221,
+            BREAST_PHYSICS_UPDOWN_SPRING = 222,
+            BREAST_PHYSICS_UPDOWN_GAIN = 223,
+            BREAST_PHYSICS_UPDOWN_DAMPING = 224,
+            BREAST_PHYSICS_INOUT_MAX_EFFECT = 225,
+            BREAST_PHYSICS_INOUT_SPRING = 226,
+            BREAST_PHYSICS_INOUT_GAIN = 227,
+            BREAST_PHYSICS_INOUT_DAMPING = 228,
+            
+            /// <summary>
+            /// Belly
+            /// </summary>
+            BELLY_PHYISCS_MASS = 229,
+            BELLY_PHYSICS_GRAVITY = 230,
+            BELLY_PHYSICS_DRAG = 231,
+            BELLY_PHYISCS_UPDOWN_MAX_EFFECT = 232,
+            BELLY_PHYSICS_UPDOWN_SPRING = 233,
+            BELLY_PHYSICS_UPDOWN_GAIN = 234,
+            BELLY_PHYSICS_UPDOWN_DAMPING = 235,
+
+            /// <summary>
+            /// Butt
+            /// </summary>
+            BUTT_PHYSICS_MASS = 236,
+            BUTT_PHYSICS_GRAVITY = 237,
+            BUTT_PHYSICS_DRAG = 238,
+            BUTT_PHYSICS_UPDOWN_MAX_EFFECT = 239,
+            BUTT_PHYSICS_UPDOWN_SPRING = 240,
+            BUTT_PHYSICS_UPDOWN_GAIN = 241,
+            BUTT_PHYSICS_UPDOWN_DAMPING = 242,
+            BUTT_PHYSICS_LEFTRIGHT_MAX_EFFECT = 243,
+            BUTT_PHYSICS_LEFTRIGHT_SPRING = 244,
+            BUTT_PHYSICS_LEFTRIGHT_GAIN = 245,
+            BUTT_PHYSICS_LEFTRIGHT_DAMPING = 246,
+            
+            /// <summary>
+            /// Breast Part 2
+            /// </summary>
+            BREAST_PHYSICS_LEFTRIGHT_MAX_EFFECT = 247,
+            BREAST_PHYSICS_LEFTRIGHT_SPRING= 248,
+            BREAST_PHYSICS_LEFTRIGHT_GAIN = 249,
+            BREAST_PHYSICS_LEFTRIGHT_DAMPING = 250
+        }
         #endregion
     }
 }

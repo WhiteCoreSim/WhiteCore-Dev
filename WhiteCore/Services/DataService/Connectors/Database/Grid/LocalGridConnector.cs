@@ -44,8 +44,8 @@ namespace WhiteCore.Services.DataService
 {
     public class LocalGridConnector : IRegionData
     {
-        private IGenericData GD;
-        private string m_realm = "gridregions";
+        IGenericData GD;
+        string m_realm = "gridregions";
 
         #region IRegionData Members
 
@@ -67,14 +67,16 @@ namespace WhiteCore.Services.DataService
                         source.Configs ["WhiteCoreConnectors"].GetBoolean ("ValidateTables", true));
 
                     Framework.Utilities.DataManager.RegisterPlugin (this);
-                }
-
-                if (MainConsole.Instance != null)
-                {
-                    MainConsole.Instance.Commands.AddCommand("fix missing region owner", 
-                	                                         "fix missing region owner",
-                                                             "Attempts to fix missing region owners in the database.",
-                                                             delegate(IScene scene, string[] cmd) { FixMissingRegionOwners(); }, true, false);
+       
+                    // add command if we have something to work with
+                    if (MainConsole.Instance != null)
+                    {
+                        MainConsole.Instance.Commands.AddCommand(
+                            "fix missing region owner", 
+                            "fix missing region owner",
+                            "Attempts to fix missing region owners in the database.",
+                            FixMissingRegionOwners, false, true);
+                    }
                 }
             }
         }
@@ -84,7 +86,12 @@ namespace WhiteCore.Services.DataService
             get { return "IRegionData"; }
         }
 
-        private void FixMissingRegionOwners()
+        /// <summary>
+        /// Fixs missing region owners command.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmd">Cmd.</param>
+        void FixMissingRegionOwners(IScene scene, string[] cmd)
         {
             QueryFilter filter = new QueryFilter();
             filter.andFilters["OwnerUUID"] = UUID.Zero;
@@ -93,8 +100,10 @@ namespace WhiteCore.Services.DataService
 
             if (borked.Count < 1)
             {
-                MainConsole.Instance.Debug("[LocalGridConnector] No regions found with missing owners.");
+                MainConsole.Instance.Info("[LocalGridConnector] No regions found with missing owners.");
+                return;
             }
+
             IEstateConnector estatePlugin = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector>();
 
             if (estatePlugin == null)
@@ -103,11 +112,10 @@ namespace WhiteCore.Services.DataService
                                            " regions found with missing owners, but could not get IEstateConnector plugin.");
                 return;
             }
-            else
-            {
-                MainConsole.Instance.Error("[LocalGridConnector] " + borked.Count +
+
+
+            MainConsole.Instance.Error("[LocalGridConnector] " + borked.Count +
                                            " regions found with missing owners, attempting fix.");
-            }
 
             Dictionary<int, List<GridRegion>> borkedByEstate = new Dictionary<int, List<GridRegion>>();
             foreach (GridRegion region in borked)
@@ -151,12 +159,11 @@ namespace WhiteCore.Services.DataService
                                                " regions found with missing owners, could not locate any estate settings from IEstateConnector plugin.");
                     return;
                 }
-                else
-                {
-                    MainConsole.Instance.Error("[LocalGridConnector] " + borked.Count +
+
+                MainConsole.Instance.Error("[LocalGridConnector] " + borked.Count +
                                                " regions found with missing owners, could not locate estate settings for " +
                                                estateFail + " estates.");
-                }
+
             }
 
             uint storeSuccess = 0;
@@ -529,7 +536,7 @@ namespace WhiteCore.Services.DataService
         {
         }
 
-        private List<GridRegion> Get(int regionFlags, List<UUID> scopeIDs)
+        List<GridRegion> Get(int regionFlags, List<UUID> scopeIDs)
         {
             QueryFilter filter = new QueryFilter();
             filter.andBitfieldAndFilters["Flags"] = (uint) regionFlags;
@@ -567,7 +574,7 @@ namespace WhiteCore.Services.DataService
 
         public class RegionDataDistanceCompare : IComparer<GridRegion>
         {
-            private readonly Vector2 m_origin;
+            readonly Vector2 m_origin;
 
             public RegionDataDistanceCompare(int x, int y)
             {
@@ -585,7 +592,7 @@ namespace WhiteCore.Services.DataService
 
             #endregion
 
-            private float VectorDistance(Vector2 x, Vector2 y)
+            float VectorDistance(Vector2 x, Vector2 y)
             {
                 return (x - y).Length();
             }

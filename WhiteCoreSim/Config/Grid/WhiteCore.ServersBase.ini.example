@@ -1,4 +1,7 @@
 [Network]
+    ;; Advanced configs
+    http_listener_port = 8003
+    
     ;; HTTPS configs (See HTTPS.txt in WhiteCoreDocs/)
     use_https = false
     
@@ -9,16 +12,20 @@
 
     ;; Only change this if you are having issues with connecting clients
     ;; The default is your external IP
-    ;HostName = http://127.0.0.1
+    ;HostName = 127.0.0.1
 
 [Console]
     ;; Setting for which console log will be used
     ;; Values are:
-    ;; LocalConsole = Color console that is enabled by default
+    ;; LocalConsole = Colour console that is enabled by default
     ;; RemoteConsole = Remote access enabled console
     ;; CommandConsole = Default black and white console
     ;; GUIConsole = Special interface to allow i/o redirection to work for GUI applications.
     Console = LocalConsole
+
+    ;; If you want to save your log file to a specific location, set your desired path
+    ;; Default is commented out >> Logfile are saved in the 'Data' folder
+    ;LogPath = 
 
     ;; These are the settings for the remote console, unneeded if not using the remote console
     ;RemoteConsoleUser =
@@ -38,13 +45,14 @@
     ;PIDFile = /tmp/my.pid
 
     ;; Commands to be run on startup are in the given file
-    startup_console_commands_file = startup_commands.txt
+    ;startup_console_commands_file = ../Config/startup_commands.txt
 
     ;; Commands to be run on shutdown are in the given file
-    shutdown_console_commands_file = shutdown_commands.txt
+    ;shutdown_console_commands_file = ../Config/shutdown_commands.txt
 
     ;; To run a script every X minutes, set the script filename here
     ;timer_Script = filename
+    
     ;; Time between each timer to run (in minutes)
     ;timer_time = 20
 
@@ -56,7 +64,7 @@
     DoRemote = true
     
 [Includes]
-    ;;Other .ini files to add...
+    ;;Other .ini files to include...
     Include-Login = Grid/ServerConfiguration/Login.ini
     Include-GridInfoService = Grid/ServerConfiguration/GridInfoService.ini
     Include-Data = Grid/ServerConfiguration/Data/Data.ini

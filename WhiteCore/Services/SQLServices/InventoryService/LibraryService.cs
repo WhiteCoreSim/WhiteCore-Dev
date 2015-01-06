@@ -49,8 +49,8 @@ namespace WhiteCore.Services.SQLServices.InventoryService
     public class LibraryService : ILibraryService, IService
     {
         // moved to Constants to allow for easier comparision from the WebUI
-        //private readonly UUID libOwner = new UUID("11111111-1111-0000-0000-000100bba000");
-        private readonly UUID libOwner = new UUID (Constants.LibraryOwner);
+        // readonly UUID libOwner = new UUID("11111111-1111-0000-0000-000100bba000");
+        readonly UUID libOwner = new UUID (Constants.LibraryOwner);
 
         public UUID LibraryRootFolderID
         {
@@ -59,10 +59,10 @@ namespace WhiteCore.Services.SQLServices.InventoryService
             get { return new UUID(Constants.LibraryRootFolderID); }
         }
 
-        private string libOwnerName = "Library Owner";
-        private bool m_enabled;
-        private IRegistryCore m_registry;
-        private string pLibName = "WhiteCore Library";
+        string libOwnerName = "Library Owner";
+        bool m_enabled;
+        IRegistryCore m_registry;
+        string pLibName = "WhiteCore Library";
         protected IInventoryService m_inventoryService;
 
         #region ILibraryService Members
@@ -109,10 +109,11 @@ namespace WhiteCore.Services.SQLServices.InventoryService
             if (m_enabled)
             {
                 if (MainConsole.Instance != null)
-                    MainConsole.Instance.Commands.AddCommand("clear default inventory", 
-                	                                         "clear default inventory",
-                                                             "Clears the Default Inventory stored for this grid",
-                                                             ClearDefaultInventory, false, true);
+                    MainConsole.Instance.Commands.AddCommand(
+                        "clear default inventory", 
+                        "clear default inventory",
+                        "Clears the Default Inventory stored for this grid",
+                        ClearDefaultInventory, false, true);
             }
         }
 
@@ -159,7 +160,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
             }
         }
 
-        private void ClearDefaultInventory(IScene scene, string[] cmd)
+        void ClearDefaultInventory(IScene scene, string[] cmd)
         {
             string sure = MainConsole.Instance.Prompt("Are you sure you want to delete the default inventory? (yes/no)", "no");
             if (!sure.Equals("yes", StringComparison.CurrentCultureIgnoreCase))
@@ -169,21 +170,32 @@ namespace WhiteCore.Services.SQLServices.InventoryService
 
         public void ClearDefaultInventory()
         {
-            //Delete the root folders
-            InventoryFolderBase root = m_inventoryService.GetRootFolder(LibraryOwner);
-            while (root != null)
-            {
-                MainConsole.Instance.Info("Removing folder " + root.Name);
-                m_inventoryService.ForcePurgeFolder(root);
-                root = m_inventoryService.GetRootFolder(LibraryOwner);
-            }
+
+            // get root folders
             List<InventoryFolderBase> rootFolders = m_inventoryService.GetRootFolders(LibraryOwner);
+
+            //Delete the root folder's folders
+            foreach (var rFF in rootFolders)
+            {
+                List<InventoryFolderBase> rootFolderFolders = m_inventoryService.GetFolderFolders (LibraryOwner, rFF.ID);
+        
+                // delete root folders
+                foreach (InventoryFolderBase rFolder in rootFolderFolders)
+                {
+                    MainConsole.Instance.Info ("Removing folder " + rFolder.Name);
+                    m_inventoryService.ForcePurgeFolder (rFolder);
+                }
+            }
+
+            // remove top level folders
             foreach (InventoryFolderBase rFolder in rootFolders)
             {
-                MainConsole.Instance.Info("Removing folder " + rFolder.Name);
-                m_inventoryService.ForcePurgeFolder(rFolder);
+                MainConsole.Instance.Info ("Removing folder " + rFolder.Name);
+                m_inventoryService.ForcePurgeFolder (rFolder);
             }
+
             MainConsole.Instance.Info("Finished removing default inventory");
+            MainConsole.Instance.Info ("[LIBRARY]: If a new default inventory is to be loaded, please restart WhiteCore");
         }
     }
 }

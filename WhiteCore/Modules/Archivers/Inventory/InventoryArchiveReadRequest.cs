@@ -450,14 +450,28 @@ namespace WhiteCore.Modules.Archivers
                         newFolderId, newFolderName, m_userInfo.PrincipalID,
                         (short) AssetType.Unknown, destFolder.ID, 1);
 
-                var existingFolder = m_inventoryService.GetUserFolderID (m_userInfo.PrincipalID, newFolderName);
-                if (existingFolder == null)
+                // Check for existing folders
+                string resPath = "";
+                foreach (var rPath in resolvedFolders)
+                {
+                    var pName = rPath.Key;
+                    if (pName.Contains (ArchiveConstants.INVENTORY_NODE_NAME_COMPONENT_SEPARATOR))
+                    {
+                        int splitIndex = pName.LastIndexOf (ArchiveConstants.INVENTORY_NODE_NAME_COMPONENT_SEPARATOR);
+                        pName = pName.Remove (splitIndex);
+                    }
+
+                    resPath += pName + "/";
+                }
+                var existingFolder = m_inventoryService.GetUserFolderID (m_userInfo.PrincipalID, resPath + newFolderName);
+                if (existingFolder.Count == 0)
                     m_inventoryService.AddFolder (destFolder);      // add the folder
                 else
                     destFolder.ID = (UUID)existingFolder [0];       // use the existing ID
 
                 // Record that we have now created this folder
                 iarPathExisting += rawDirsToCreate[i] + "/";
+
                 MainConsole.Instance.DebugFormat("[INVENTORY ARCHIVER]: Created folder {0} from IAR", iarPathExisting);
                 resolvedFolders[iarPathExisting] = destFolder;
 

@@ -142,6 +142,12 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                         HandleResetUserPassword, false, true);
                         
                     MainConsole.Instance.Commands.AddCommand(
+                        "set user email",
+                        "set user email [<first> [<last> [<email@address>]]]",
+                        "Set an email address for a user",
+                        HandleSetUserEmail, false, true);
+
+                    MainConsole.Instance.Commands.AddCommand(
                         "show account",
                         "show account [<first> [<last>]]",
                         "Show account details for the given user",
@@ -1221,7 +1227,24 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 return;
 
             // password as well?
-            newPassword = cmd.Length < 6 ? MainConsole.Instance.PasswordPrompt("New Password") : cmd[5];
+            if (cmd.Length < 6)
+            {
+                bool passMatch;
+                do
+                {
+                    newPassword = MainConsole.Instance.PasswordPrompt ("New Password ('cancel' to abort)");
+                    if (newPassword == "" || newPassword.ToLower () == "cancel")
+                        return;
+
+                    string confPass = MainConsole.Instance.PasswordPrompt ("Please confirm new Password");
+                    passMatch =  (newPassword == confPass);
+                    if (!passMatch)
+                        MainConsole.Instance.Error ("  Password confirmation does not match");
+
+                } while (!passMatch);
+
+            } else
+                newPassword = cmd[5];
 
             UserAccount account = GetUserAccount(null, firstName, lastName);
             if (account == null)
@@ -1242,6 +1265,62 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     "[USER ACCOUNT SERVICE]: Unable to reset password for account '{0} {1}.", firstName, lastName);
             else
                 MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Password reset for user '{0} {1}", firstName, lastName);
+        }
+
+        /// <summary>
+        /// Handles the set user email command.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmd">Cmd.</param>
+        protected void HandleSetUserEmail(IScene scene, string[] cmd)
+        {
+            string firstName, lastName;
+            string newEmail;
+
+            // check for passed username
+            firstName = cmd.Length < 4 ? MainConsole.Instance.Prompt("First name") : cmd[3];
+            if (firstName == "")
+                return;
+            lastName = cmd.Length < 5 ? MainConsole.Instance.Prompt("Last name") : cmd[4];
+            if (lastName == "")
+                return;
+
+
+            UserAccount account = GetUserAccount(null, firstName, lastName);
+            if (account == null)
+            {
+                MainConsole.Instance.ErrorFormat("[USER ACCOUNT SERVICE]: Unable to locate this user");
+                return;
+            }
+
+            // ensure the system users are left alone!
+            if (Utilities.IsSystemUser(account.PrincipalID))
+            {
+                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Changing system users is not a good idea!");
+                return;
+            }
+
+            // email address as well?
+            newEmail = account.Email;
+            newEmail = cmd.Length < 6 ? MainConsole.Instance.Prompt("Email address", newEmail) : cmd[5];
+            if (!Utilities.IsValidEmail (newEmail))
+            {
+                MainConsole.Instance.Error (" This email address appears to be incorrect");
+                do
+                {
+                    newEmail = MainConsole.Instance.Prompt ("Email address ('cancel' to abort)", newEmail);
+                    if (newEmail == "" || newEmail.ToLower () == "cancel")
+                        return;
+                } while (!Utilities.IsValidEmail (newEmail));
+            }
+            
+            account.Email = newEmail;
+            bool success = StoreUserAccount(account);
+            if (!success)
+                MainConsole.Instance.WarnFormat("[USER ACCOUNT SERVICE]: Unable to set Email for {0} {1}",firstName, lastName);
+            else
+                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Email for {0} {1} set to {2}", firstName, lastName, account.Email);
+
         }
 
         /// <summary>
