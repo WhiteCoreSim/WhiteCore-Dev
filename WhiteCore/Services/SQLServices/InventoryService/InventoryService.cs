@@ -870,6 +870,12 @@ namespace WhiteCore.Services.SQLServices.InventoryService
 
             foreach (InventoryItemBase i in items)
             {
+                //refetch because we don't have Owner filled in properly
+                InventoryItemBase item = GetItem(UUID.Zero, i.ID);
+                if(item == null) continue;
+                // Cannot move this item, its from libraryowner
+                if(item.Owner == m_LibraryService.LibraryOwner) continue;
+
                 m_Database.IncrementFolder(i.Folder); //Increment the new folder
                 m_Database.IncrementFolderByItem(i.ID);
                 //And the old folder too (have to use this one because we don't know the old folder)
@@ -891,9 +897,11 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                 foreach (UUID id in itemIDs)
                 {
                     InventoryItemBase item = GetItem(principalID, id);
+                    if(item == null) continue;
                     m_Database.IncrementFolder(item.Folder);
                     if (!ParentIsLinkFolder(item.Folder))
                         continue;
+                    if(item.Owner == m_LibraryService.LibraryOwner) continue;
                     m_Database.DeleteItems("inventoryID", id.ToString());
                 }
                 return true;
@@ -903,6 +911,9 @@ namespace WhiteCore.Services.SQLServices.InventoryService
             //
             foreach (UUID id in itemIDs)
             {
+                InventoryItemBase item = GetItem(UUID.Zero, id);
+                if(item == null) continue;
+                if(item.Owner == m_LibraryService.LibraryOwner) continue;
                 m_Database.DeleteItems("inventoryID", id.ToString());
                 m_Database.IncrementFolderByItem(id);
             }

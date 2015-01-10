@@ -46,7 +46,9 @@ using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Utilities;
+using WhiteCore.Framework.Modules;
 using OpenMetaverse;
+using GridRegion = WhiteCore.Framework.Services.GridRegion;
 
 namespace WhiteCore.Physics.OpenDynamicsEngine
 {
@@ -1514,6 +1516,54 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                     }
                     else
                     {
+                        #region Check for out of region
+
+                        if ((Position.X < 0.25f || Position.Y < 0.25f ||
+                            Position.X > _parent_scene.Region.RegionSizeX - .25f ||
+                            Position.Y > _parent_scene.Region.RegionSizeY - .25f) &&
+                            !_parent_scene.Region.InfiniteRegion)
+                        {
+                            Vector3 pos2 = Position;
+                            Vector3 vel = Velocity;
+
+                            pos2.X = pos2.X + ((Math.Abs(vel.X) < 2.5 ? vel.X*timestep*2 : vel.X*timestep));
+                            pos2.Y = pos2.Y + ((Math.Abs(vel.Y) < 2.5 ? vel.Y*timestep*2 : vel.Y*timestep));
+                            pos2.Z = pos2.Z + ((Math.Abs(vel.Z) < 2.5 ? vel.Z*timestep*2 : vel.Z*timestep));
+
+                            IGridRegisterModule neighborService = _parent_scene.Scene.RequestModuleInterface<IGridRegisterModule>();
+                            if (neighborService != null)
+                            {
+                                List<GridRegion> neighbors = neighborService.GetNeighbors(_parent_scene.Scene);
+
+                                double TargetX = (double) _parent_scene.Region.RegionLocX + (double) pos2.X;
+                                double TargetY = (double) _parent_scene.Region.RegionLocY + (double) pos2.Y;
+
+                                GridRegion neighborRegion = null;
+
+                                foreach (GridRegion region in neighbors)
+                                {
+                                    if (TargetX >= (double) region.RegionLocX
+                                     && TargetY >= (double) region.RegionLocY
+                                     && TargetX < (double) (region.RegionLocX + region.RegionSizeX)
+                                     && TargetY < (double) (region.RegionLocY + region.RegionSizeY))
+                                    {
+                                       neighborRegion = region;
+                                       break;
+                                    }
+                                }
+
+                                if (neighborRegion == null) {
+                                    Vector3 newPos = Position;
+                                    newPos.X = Util.Clip(Position.X, 0.75f, _parent_scene.Region.RegionSizeX - 0.75f);
+                                    newPos.Y = Util.Clip(Position.Y, 0.75f, _parent_scene.Region.RegionSizeY - 0.75f);
+                                    Position = newPos;
+                                    d.BodySetPosition(Body, newPos.X, newPos.Y, newPos.Z);
+                                }
+                            }
+                        }
+
+                        #endregion
+
                         /*
                         d.Vector3 vel = d.BodyGetLinearVel (Body);
                         m_lastVelocity = _velocity;

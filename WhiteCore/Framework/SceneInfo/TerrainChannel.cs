@@ -113,20 +113,23 @@ namespace WhiteCore.Framework.SceneInfo
         public TerrainChannel(int w, int h, IScene scene)
         {
             m_scene = scene;
+
+            if(w <= 0 || h <= 0)
+            {
+                if (m_scene != null)
+                {
+                    w = m_scene.RegionInfo.RegionSizeX;
+                    h = m_scene.RegionInfo.RegionSizeY;
+                }
+                else
+                {
+                    w = Constants.RegionSize;
+                    h = Constants.RegionSize;
+                }
+            }
+
             m_Width = w;
-
-			// the basic assumption is that regions are square so make sure...
-			if (m_scene != null)
-			{
-    			w = m_scene.RegionInfo.RegionSizeX;
-				h = m_scene.RegionInfo.RegionSizeY;
-			}
-			else
-			{
-				w = Constants.RegionSize;
-				h = Constants.RegionSize;
-			}
-
+            m_Height = h;
 
             m_map = new short[w*h];
             taint = new bool[w/Constants.TerrainPatchSize,h/Constants.TerrainPatchSize];
