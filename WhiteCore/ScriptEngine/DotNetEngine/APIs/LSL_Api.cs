@@ -6948,7 +6948,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             PSYS_SRC_TARGET_KEY = 20,
             PSYS_SRC_OMEGA = 21,
             PSYS_SRC_ANGLE_BEGIN = 22,
-            PSYS_SRC_ANGLE_END = 23
+            PSYS_SRC_ANGLE_END = 23,
+            PSYS_PART_BLEND_FUNC_SOURCE = 24,
+            PSYS_PART_BLEND_FUNC_DEST = 25,
+            PSYS_PART_START_GLOW = 25,
+            PSYS_PART_END_GLOW = 27
         }
 
         internal Primitive.ParticleSystem.ParticleDataFlags ConvertUINTtoFlags(uint flags)
@@ -6972,7 +6976,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                                                   BurstSpeedMax = 1.0f,
                                                   BurstRate = 0.1f,
                                                   PartMaxAge = 10.0f,
-                                                  BurstPartCount = 10
+                                                  BurstPartCount = 1,
+                                                  BlendFuncSource = (byte)((int)ScriptBaseClass.PSYS_PART_BF_SOURCE_ALPHA),
+                                                  BlendFuncDest = (byte)((int)ScriptBaseClass.PSYS_PART_BF_ONE_MINUS_SOURCE_ALPHA),
+                                                  PartStartGlow = 0.0f,
+                                                  PartEndGlow = 0.0f
                                               };
 
             // TODO find out about the other defaults and add them here
@@ -7009,28 +7017,27 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             {
                 Primitive.ParticleSystem prules = getNewParticleSystemWithSLDefaultValues();
                 LSL_Vector tempv = new LSL_Vector();
+                float tempf = 0;
+                int tmpi = 0;
 
                 for (int i = 0; i < rules.Length; i += 2)
                 {
-                    LSL_Integer rule = rules.GetLSLIntegerItem(i);
-                    if (rule == (int)ScriptBaseClass.PSYS_PART_FLAGS)
-                    {
-                        prules.PartDataFlags =
-                            (Primitive.ParticleSystem.ParticleDataFlags)(uint)rules.GetLSLIntegerItem(i + 1);
-                    }
+                        LSL_Integer rule = rules.GetLSLIntegerItem(i);
+                        if (rule == (int)ScriptBaseClass.PSYS_PART_FLAGS)
+                        {
+                            prules.PartDataFlags =
+                                (Primitive.ParticleSystem.ParticleDataFlags)(uint)rules.GetLSLIntegerItem(i + 1);
+                        }
 
-                    else if (rule == (int)ScriptBaseClass.PSYS_PART_START_COLOR)
-                    {
-                        tempv = rules.GetVector3Item(i + 1);
-                        prules.PartStartColor.R = (float)tempv.x;
-                        prules.PartStartColor.G = (float)tempv.y;
-                        prules.PartStartColor.B = (float)tempv.z;
-                    }
+                        else if (rule == (int)ScriptBaseClass.PSYS_PART_START_COLOR)
+                        {
+                            tempv = rules.GetVector3Item(i + 1);
+                            prules.PartStartColor.R = (float)tempv.x;
+                            prules.PartStartColor.G = (float)tempv.y;
+                            prules.PartStartColor.B = (float)tempv.z;
+                        }
 
-                    else
-                    {
-                        float tempf = 0;
-                        if (rule == (int)ScriptBaseClass.PSYS_PART_START_ALPHA)
+                        else if (rule == (int)ScriptBaseClass.PSYS_PART_START_ALPHA)
                         {
                             tempf = (float)rules.GetLSLFloatItem(i + 1);
                             prules.PartStartColor.A = tempf;
@@ -7080,7 +7087,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
                         else if (rule == (int)ScriptBaseClass.PSYS_SRC_PATTERN)
                         {
-                            int tmpi = rules.GetLSLIntegerItem(i + 1);
+                            tmpi = rules.GetLSLIntegerItem(i + 1);
                             prules.Pattern = (Primitive.ParticleSystem.SourcePattern)tmpi;
                         }
 
@@ -7100,6 +7107,30 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                             tempf = (float)rules.GetLSLFloatItem(i + 1);
                             prules.OuterAngle = tempf;
                             prules.PartFlags &= 0xFFFFFFFD; // Make sure new angle format is off.
+                        }
+
+                        else if (rule == (int)ScriptBaseClass.PSYS_PART_BLEND_FUNC_SOURCE)
+                        {
+                            tmpi = (int)rules.GetLSLIntegerItem(i + 1);
+                            prules.BlendFuncSource = (byte)tmpi;
+                        }
+
+                        else if (rule == (int)ScriptBaseClass.PSYS_PART_BLEND_FUNC_DEST)
+                        {
+                            tmpi = (int)rules.GetLSLIntegerItem(i + 1);
+                            prules.BlendFuncDest = (byte)tmpi;
+                        }
+
+                        else if (rule == (int)ScriptBaseClass.PSYS_PART_START_GLOW)
+                        {
+                            tempf = (float)rules.GetLSLFloatItem(i + 1);
+                            prules.PartStartGlow = (float)tempf;
+                        }
+
+                        else if (rule == (int)ScriptBaseClass.PSYS_PART_END_GLOW)
+                        {
+                            tempf = (float)rules.GetLSLFloatItem(i + 1);
+                            prules.PartEndGlow = (float)tempf;
                         }
 
                         else if (rule == (int)ScriptBaseClass.PSYS_SRC_TEXTURE)
@@ -7170,7 +7201,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                             prules.OuterAngle = tempf;
                             prules.PartFlags |= 0x02; // Set new angle format.
                         }
-                    }
                 }
                 prules.CRC = 1;
 
