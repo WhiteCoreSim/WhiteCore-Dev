@@ -3723,7 +3723,8 @@ namespace WhiteCore.Region
                     obPart.StoreUndoState();
                 }
 
-                part.PhysActor.BlockPhysicalReconstruction = true;
+                //On some linked objects this hangs (maybe deadlock), do we need this?
+                //part.PhysActor.BlockPhysicalReconstruction = true;
 
                 RebuildPhysicalRepresentation(true, () =>
                     {
