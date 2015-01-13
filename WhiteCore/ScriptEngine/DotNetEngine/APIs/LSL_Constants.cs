@@ -51,6 +51,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger AGENT = 1;
         public static readonly LSL_Types.LSLInteger AGENT_BY_LEGACY_NAME = 1;
         public static readonly LSL_Types.LSLInteger AGENT_BY_USERNAME = 0x10;
+        public static readonly LSL_Types.LSLInteger NPC = 0x20;
         public static readonly LSL_Types.LSLInteger ACTIVE = 2;
         public static readonly LSL_Types.LSLInteger PASSIVE = 4;
         public static readonly LSL_Types.LSLInteger SCRIPTED = 8;
@@ -106,6 +107,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger PSYS_PART_TARGET_POS_MASK = 64;
         public static readonly LSL_Types.LSLInteger PSYS_PART_TARGET_LINEAR_MASK = 128;
         public static readonly LSL_Types.LSLInteger PSYS_PART_EMISSIVE_MASK = 256;
+        public static readonly LSL_Types.LSLInteger PSYS_PART_RIBBON_MASK = 1024;
         public static readonly LSL_Types.LSLInteger PSYS_PART_FLAGS = 0;
         public static readonly LSL_Types.LSLInteger PSYS_PART_START_COLOR = 1;
         public static readonly LSL_Types.LSLInteger PSYS_PART_START_ALPHA = 2;
@@ -302,10 +304,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger CHANGED_REGION = 256;
         public static readonly LSL_Types.LSLInteger CHANGED_TELEPORT = 512;
         public static readonly LSL_Types.LSLInteger CHANGED_REGION_RESTART = 1024;
-
-        public static readonly LSL_Types.LSLInteger CHANGED_REGION_START = 1024;
-        //LL Changed the constant from CHANGED_REGION_RESTART
-
+        public static readonly LSL_Types.LSLInteger CHANGED_REGION_START = 1024; //LL Changed the constant from CHANGED_REGION_RESTART
         public static readonly LSL_Types.LSLInteger CHANGED_MEDIA = 2048;
         public static readonly LSL_Types.LSLInteger CHANGED_ANIMATION = 16384;
         public static readonly LSL_Types.LSLInteger CHANGED_STATE = 32768;
@@ -443,6 +442,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger PRIM_SCULPT_FLAG_INVERT = 64;
         public static readonly LSL_Types.LSLInteger PRIM_SCULPT_FLAG_MIRROR = 128;
 
+        public static readonly LSL_Types.LSLInteger PROFILE_NONE = 0;
+        public static readonly LSL_Types.LSLInteger PROFILE_SCRIPT_MEMORY = 1;
+
         public static readonly LSL_Types.LSLInteger MASK_BASE = 0;
         public static readonly LSL_Types.LSLInteger MASK_OWNER = 1;
         public static readonly LSL_Types.LSLInteger MASK_GROUP = 2;
@@ -507,66 +509,31 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
 
         public static readonly LSL_Types.LSLInteger PARCEL_FLAG_ALLOW_FLY = 0x1; // parcel allows flying
         public static readonly LSL_Types.LSLInteger PARCEL_FLAG_ALLOW_SCRIPTS = 0x2; // parcel allows outside scripts
-
-        public static readonly LSL_Types.LSLInteger PARCEL_FLAG_ALLOW_LANDMARK = 0x8;
-        // parcel allows landmarks to be created
-
-        public static readonly LSL_Types.LSLInteger PARCEL_FLAG_ALLOW_TERRAFORM = 0x10;
-        // parcel allows anyone to terraform the land
-
+        public static readonly LSL_Types.LSLInteger PARCEL_FLAG_ALLOW_LANDMARK = 0x8; // parcel allows landmarks to be created
+        public static readonly LSL_Types.LSLInteger PARCEL_FLAG_ALLOW_TERRAFORM = 0x10; // parcel allows anyone to terraform the land
         public static readonly LSL_Types.LSLInteger PARCEL_FLAG_ALLOW_DAMAGE = 0x20; // parcel allows damage
-
-        public static readonly LSL_Types.LSLInteger PARCEL_FLAG_ALLOW_CREATE_OBJECTS = 0x40;
-        // parcel allows anyone to create objects
-
-        public static readonly LSL_Types.LSLInteger PARCEL_FLAG_USE_ACCESS_GROUP = 0x100;
-        // parcel limits access to a group
-
-        public static readonly LSL_Types.LSLInteger PARCEL_FLAG_USE_ACCESS_LIST = 0x200;
-        // parcel limits access to a list of residents
-
-        public static readonly LSL_Types.LSLInteger PARCEL_FLAG_USE_BAN_LIST = 0x400;
-        // parcel uses a ban list, including restricting access based on payment info
-
-        public static readonly LSL_Types.LSLInteger PARCEL_FLAG_USE_LAND_PASS_LIST = 0x800;
-        // parcel allows passes to be purchased
-
-        public static readonly LSL_Types.LSLInteger PARCEL_FLAG_LOCAL_SOUND_ONLY = 0x8000;
-        // parcel restricts spatialized sound to the parcel
-
-        public static readonly LSL_Types.LSLInteger PARCEL_FLAG_RESTRICT_PUSHOBJECT = 0x200000;
-        // parcel restricts llPushObject
-
-        public static readonly LSL_Types.LSLInteger PARCEL_FLAG_ALLOW_GROUP_SCRIPTS = 0x2000000;
-        // parcel allows scripts owned by group
-
-        public static readonly LSL_Types.LSLInteger PARCEL_FLAG_ALLOW_CREATE_GROUP_OBJECTS = 0x4000000;
-        // parcel allows group object creation
-
-        public static readonly LSL_Types.LSLInteger PARCEL_FLAG_ALLOW_ALL_OBJECT_ENTRY = 0x8000000;
-        // parcel allows objects owned by any user to enter
-
-        public static readonly LSL_Types.LSLInteger PARCEL_FLAG_ALLOW_GROUP_OBJECT_ENTRY = 0x10000000;
-        // parcel allows with the same group to enter
-
+        public static readonly LSL_Types.LSLInteger PARCEL_FLAG_ALLOW_CREATE_OBJECTS = 0x40; // parcel allows anyone to create objects
+        public static readonly LSL_Types.LSLInteger PARCEL_FLAG_USE_ACCESS_GROUP = 0x100; // parcel limits access to a group
+        public static readonly LSL_Types.LSLInteger PARCEL_FLAG_USE_ACCESS_LIST = 0x200; // parcel limits access to a list of residents
+        public static readonly LSL_Types.LSLInteger PARCEL_FLAG_USE_BAN_LIST = 0x400; // parcel uses a ban list, including restricting access based on payment info
+        public static readonly LSL_Types.LSLInteger PARCEL_FLAG_USE_LAND_PASS_LIST = 0x800; // parcel allows passes to be purchased
+        public static readonly LSL_Types.LSLInteger PARCEL_FLAG_LOCAL_SOUND_ONLY = 0x8000; // parcel restricts spatialized sound to the parcel
+        public static readonly LSL_Types.LSLInteger PARCEL_FLAG_RESTRICT_PUSHOBJECT = 0x200000; // parcel restricts llPushObject
+        public static readonly LSL_Types.LSLInteger PARCEL_FLAG_ALLOW_GROUP_SCRIPTS = 0x2000000; // parcel allows scripts owned by group
+        public static readonly LSL_Types.LSLInteger PARCEL_FLAG_ALLOW_CREATE_GROUP_OBJECTS = 0x4000000; // parcel allows group object creation
+        public static readonly LSL_Types.LSLInteger PARCEL_FLAG_ALLOW_ALL_OBJECT_ENTRY = 0x8000000; // parcel allows objects owned by any user to enter
+        public static readonly LSL_Types.LSLInteger PARCEL_FLAG_ALLOW_GROUP_OBJECT_ENTRY = 0x10000000; // parcel allows with the same group to enter
         public static readonly LSL_Types.LSLInteger REGION_FLAG_ALLOW_DAMAGE = 0x1; // region is entirely damage enabled
         public static readonly LSL_Types.LSLInteger REGION_FLAG_FIXED_SUN = 0x10; // region has a fixed sun position
         public static readonly LSL_Types.LSLInteger REGION_FLAG_BLOCK_TERRAFORM = 0x40; // region terraforming disabled
         public static readonly LSL_Types.LSLInteger REGION_FLAG_SANDBOX = 0x100; // region is a sandbox
-
-        public static readonly LSL_Types.LSLInteger REGION_FLAG_DISABLE_COLLISIONS = 0x1000;
-        // region has disabled collisions
-
+        public static readonly LSL_Types.LSLInteger REGION_FLAG_DISABLE_COLLISIONS = 0x1000;  // region has disabled collisions
         public static readonly LSL_Types.LSLInteger REGION_FLAG_DISABLE_PHYSICS = 0x4000; // region has disabled physics
         public static readonly LSL_Types.LSLInteger REGION_FLAG_BLOCK_FLY = 0x80000; // region blocks flying
-
-        public static readonly LSL_Types.LSLInteger REGION_FLAG_ALLOW_DIRECT_TELEPORT = 0x100000;
-        // region allows direct teleports
-
-        public static readonly LSL_Types.LSLInteger REGION_FLAG_RESTRICT_PUSHOBJECT = 0x400000;
-        // region restricts llPushObject
-
-        public static readonly LSL_Types.LSLInteger PAY_HIDE = new LSL_Types.LSLInteger(-1);
+        public static readonly LSL_Types.LSLInteger REGION_FLAG_ALLOW_DIRECT_TELEPORT = 0x100000; // region allows direct teleports
+        public static readonly LSL_Types.LSLInteger REGION_FLAG_RESTRICT_PUSHOBJECT = 0x400000; // region restricts llPushObject
+        
+		public static readonly LSL_Types.LSLInteger PAY_HIDE = new LSL_Types.LSLInteger(-1);
         public static readonly LSL_Types.LSLInteger PAY_DEFAULT = new LSL_Types.LSLInteger(-2);
 
         public static readonly LSL_Types.LSLInteger PAYMENT_INFO_ON_FILE = 0x1;
