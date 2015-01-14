@@ -26,6 +26,10 @@ and a set of features around stability and simplified usability for users.
 
 Windows .Net 4.5 [![Build status](https://ci.appveyor.com/api/projects/status/tj3pr2xb4rg6ospe/branch/master?svg=true)](https://ci.appveyor.com/project/fly-man-/whitecore-dev/branch/master)
 
+Pull requests [![Issue Stats](http://www.issuestats.com/github/WhiteCoreSim/WhiteCore-Dev/badge/pr)](http://www.issuestats.com/github/WhiteCoreSim/WhiteCore-Dev)
+
+Issues closed [![Issue Stats](http://www.issuestats.com/github/WhiteCoreSim/WhiteCore-Dev/badge/issue)](http://www.issuestats.com/github/WhiteCoreSim/WhiteCore-Dev)
+
 ## Compiling WhiteCore
 
 *To compile WhiteCore, look at the Compiling.txt in the WhiteCoreDocs folder for more information*
