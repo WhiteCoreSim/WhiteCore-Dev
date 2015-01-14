@@ -442,9 +442,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger PRIM_SCULPT_FLAG_INVERT = 64;
         public static readonly LSL_Types.LSLInteger PRIM_SCULPT_FLAG_MIRROR = 128;
 
-        public static readonly LSL_Types.LSLInteger PROFILE_NONE = 0;
-        public static readonly LSL_Types.LSLInteger PROFILE_SCRIPT_MEMORY = 1;
-
         public static readonly LSL_Types.LSLInteger MASK_BASE = 0;
         public static readonly LSL_Types.LSLInteger MASK_OWNER = 1;
         public static readonly LSL_Types.LSLInteger MASK_GROUP = 2;
