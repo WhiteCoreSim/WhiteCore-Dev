@@ -1,8 +1,9 @@
-WhiteCore-Dev 0.9.2+ (git)
+WhiteCore-Dev 0.9.3+ (git)
 Rowan Deppeler <greythane@gmail.com>
 June 2014
+Fly-Man-
+Jan 2015
 ===============================================
-
 
 ** Simplified startup scripts **
 ================================
@@ -74,7 +75,7 @@ Checkout the 'Build Your Own.txt' file in the 'WhiteCoreDocs' folder for details
  if you want to build from source.
 Re-compile and copy/paste the new 'WhiteCoreSim/bin' subdirectory from your build environment.
 
-Weekly 'Development' build snapshots are available at the following links:
+Monthly 'Development' build snapshots are available at the following links:
 
 Windows
 https://drive.google.com/file/d/0B2u55gI751a8VXJBckZJWU5rZ1E/edit?usp=sharing
@@ -89,8 +90,6 @@ Download your desired update snapshot.
 Delete or backup the existing 'WhiteCoreSim/bin' subdirectory.
 Extract the update package and copy the resulting 'bin' folder to your 'WhiteCoreSim' folder.
 re-start..
-
-
 
 Questions?
 ==========
