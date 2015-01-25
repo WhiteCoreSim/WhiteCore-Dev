@@ -1135,61 +1135,6 @@ namespace WhiteCore.Framework.Utilities
             }
         }
 
-        public static void SerializeToFile(string filename, Object obj)
-        {
-            IFormatter formatter = new BinaryFormatter();
-            Stream stream = null;
-
-            try
-            {
-                stream = new FileStream(
-                    filename, FileMode.Create,
-                    FileAccess.Write, FileShare.None);
-
-                formatter.Serialize(stream, obj);
-            }
-            catch (Exception e)
-            {
-                MainConsole.Instance.Error(e.ToString());
-            }
-            finally
-            {
-                if (stream != null)
-                {
-                    stream.Close();
-                }
-            }
-        }
-
-        public static Object DeserializeFromFile(string filename)
-        {
-            IFormatter formatter = new BinaryFormatter();
-            Stream stream = null;
-            Object ret = null;
-
-            try
-            {
-                stream = new FileStream(
-                    filename, FileMode.Open,
-                    FileAccess.Read, FileShare.None);
-
-                ret = formatter.Deserialize(stream);
-            }
-            catch (Exception e)
-            {
-                MainConsole.Instance.Error(e.ToString());
-            }
-            finally
-            {
-                if (stream != null)
-                {
-                    stream.Close();
-                }
-            }
-
-            return ret;
-        }
-
         public static void Compress7ZipFile(string path, string destination)
         {
             ProcessStartInfo p = new ProcessStartInfo();
@@ -1571,19 +1516,6 @@ namespace WhiteCore.Framework.Utilities
             }
 
             return settingsClass;
-        }
-
-        public static string Base64ToString(string str)
-        {
-            UTF8Encoding encoder = new UTF8Encoding();
-            Decoder utf8Decode = encoder.GetDecoder();
-
-            byte[] todecode_byte = Convert.FromBase64String(str);
-            int charCount = utf8Decode.GetCharCount(todecode_byte, 0, todecode_byte.Length);
-            char[] decoded_char = new char[charCount];
-            utf8Decode.GetChars(todecode_byte, 0, todecode_byte.Length, decoded_char, 0);
-            string result = new String(decoded_char);
-            return result;
         }
 
         public static Guid GetHashGuid(string data, string salt)

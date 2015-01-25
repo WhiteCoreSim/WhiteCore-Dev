@@ -111,8 +111,6 @@ namespace WhiteCore.Modules.Caps
             if (r.Type != OSDType.Map) // not a proper request
                 return MainServer.BadRequest;
 
-            // Old return value??  -greythane- // OSDMap rm = (OSDMap) r;
-
 			// This module gets the root of the prim(set)
 			// What needs to be done is to check how many prims there are selected (multiple selected_roots)
             // and if they are part of a link-set

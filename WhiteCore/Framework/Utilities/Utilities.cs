@@ -599,9 +599,9 @@ namespace WhiteCore.Framework.Utilities
             /// Generates a random, human-readable password.
             ///
             /// </summary>
-            /// <param name=înumSyllablesî>Number of syllables the password will contain</param>
-            /// <param name=înumNumericî>Number of numbers the password will contain</param>
-            /// <param name=înumSymbolsî>Number of symbols the password will contain</param>
+            /// <param name="numSyllables">Number of syllables the password will contain</param>
+            /// <param name="numNumeric">Number of numbers the password will contain</param>
+            /// <param name="numSymbols">Number of symbols the password will contain</param>
             /// <returns></returns>
             public static string Generate(int numSyllables, int numNumeric, int numSymbols)
             {
