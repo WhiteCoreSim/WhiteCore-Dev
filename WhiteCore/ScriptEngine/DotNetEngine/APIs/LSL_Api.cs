@@ -3449,24 +3449,27 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         {
             // Determine where we are looking from
             LSL_Vector from = new LSL_Vector(obj.GetWorldPosition());
-
-            // Work out the normalised vector from the source to the target
-            LSL_Vector delta = llVecNorm(target - from);
-            LSL_Vector angle = new LSL_Vector(0, 0, 0)
-                                   {
-                                       x = llAtan2(delta.z, delta.y) - ScriptBaseClass.PI_BY_TWO,
-                                       y = llAtan2(delta.x, llSqrt((delta.y * delta.y) + (delta.z * delta.z)))
-                                   };
-
-            // Calculate the yaw
-            // subtracting PI_BY_TWO is required to compensate for the odd SL co-ordinate system
-
-            // Calculate pitch
-
-            // we need to convert from a vector describing
-            // the angles of rotation in radians into rotation value
-
-            LSL_Types.Quaternion rot = llEuler2Rot(angle);
+			
+			// The following code bit was written by Dahlia 
+			// from the Opensimulator Core Team. Thank you for fixing this issue
+			
+			// normalized direction to target
+            LSL_Vector dir = llVecNorm(target - from);
+            
+			// use vertical to help compute left axis
+            LSL_Vector up = new LSL_Vector(0.0, 0.0, 1.0);
+            
+			// find normalized left axis parallel to horizon
+            LSL_Vector left = llVecNorm(LSL_Vector.Cross(up, dir));
+            
+			// make up orthogonal to left and direction
+            up = LSL_Vector.Cross(dir, left);
+            
+			// compute rotation based on orthogonal axes
+            LSL_Rotation rot = new LSL_Rotation(0.0, 0.707107, 0.0, 0.707107) * llAxes2Rot(dir, left, up);
+			
+			// End codebit
+            	
             //If the strength is 0, or we are non-physical, set the rotation
             if (strength == 0 || obj.PhysActor == null || !obj.PhysActor.IsPhysical)
                 SetLinkRot(obj, rot);
