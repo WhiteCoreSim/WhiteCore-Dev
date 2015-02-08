@@ -37,7 +37,7 @@ namespace Games.Pathfinding.AStar2DTest
     {
         #region Test Maps
 
-        private static readonly int[,] Map =
+        static readonly int[,] Map =
             {
                 {1, -1, 1, 1, 1, -1, 1, 1, 1, 1},
                 {1, -1, 1, -1, 1, -1, 1, 1, 1, 1},
@@ -128,7 +128,7 @@ namespace Games.Pathfinding.AStar2DTest
         ///     The main entry point for the application.
         /// </summary>
         [STAThread]
-        private static void Main(string[] args)
+        static void Main(string[] args)
         {
             Console.WriteLine("Starting...");
 

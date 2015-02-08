@@ -13531,9 +13531,15 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             }
         }
 
-        public static string GetLine(UUID assetID, int line, int maxLength)
+        /// <summary>
+        /// Get a notecard line.
+        /// </summary>
+        /// <param name="assetID"></param>
+        /// <param name="lineNumber">Lines start at index 0</param>
+        /// <returns></returns>
+        public static string GetLine(UUID assetID, int lineNumber)
         {
-            if (line < 0)
+            if (lineNumber < 0)
                 return "";
 
             if (!IsCached(assetID))
@@ -13543,15 +13549,35 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             {
                 m_Notecards[assetID].lastRef = DateTime.Now;
 
-                if (line >= m_Notecards[assetID].text.Length)
+                if (lineNumber >= m_Notecards[assetID].text.Length)
                     return "\n\n\n";
 
-                string data = m_Notecards[assetID].text[line];
-                if (data.Length > maxLength)
-                    data = data.Substring(0, maxLength);
+                string data = m_Notecards[assetID].text[lineNumber];
 
                 return data;
             }
+        }
+
+        /// <summary>
+        /// Get a notecard line.
+        /// </summary>
+        /// <param name="assetID"></param>
+        /// <param name="lineNumber">Lines start at index 0</param>
+        /// <param name="maxLength">
+        /// Maximum length of the returned line.
+        /// </param>
+        /// <returns>
+        /// If the line length is longer than <paramref name="maxLength"/>,
+        /// the return string will be truncated.
+        /// </returns>
+        public static string GetLine(UUID assetID, int lineNumber, int maxLength)
+        {
+            string line = GetLine(assetID, lineNumber);
+
+            if (line.Length > maxLength)
+                line = line.Substring(0, maxLength);
+
+            return line;
         }
 
         public static void CacheCheck()

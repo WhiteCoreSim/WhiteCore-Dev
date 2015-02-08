@@ -41,6 +41,7 @@ namespace WhiteCore.Framework.Modules
         PhysicsActor PhysicsActor { get; }
         bool CanMove { get; }
         Vector3 AbsolutePosition { get; }
+        IScene GetScene();
 
         void SendChatMessage(int sayType, string message, int channel);
         void SendInstantMessage(GridInstantMessage im);
@@ -49,7 +50,6 @@ namespace WhiteCore.Framework.Modules
         void UpdateMovementAnimations(bool sendTerseUpdate);
         void StandUp();
         void Teleport(Vector3 pos);
-        IScene GetScene();
         void StopMoving(bool fly, bool clearPath);
         void SetSpeedModifier(float speed);
         void SetDrawDistance(float draw);

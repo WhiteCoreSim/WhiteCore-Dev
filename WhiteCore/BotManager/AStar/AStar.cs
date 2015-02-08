@@ -40,8 +40,8 @@ namespace Games.Pathfinding
     {
         #region Properties
 
-        private double FGoalEstimate;
-        private AStarNode FGoalNode;
+        double FGoalEstimate;
+        AStarNode FGoalNode;
 
         /// <summary>
         ///     The parent of the node.
@@ -180,19 +180,19 @@ namespace Games.Pathfinding
     {
         #region Private Fields
 
-        private readonly Heap FClosedList;
-        private readonly Heap FOpenList;
-        private readonly ArrayList FSuccessors;
-        private AStarNode FGoalNode;
-        private AStarNode FStartNode;
+        readonly Heap FClosedList;
+        readonly Heap FOpenList;
+        readonly ArrayList FSuccessors;
+        AStarNode FGoalNode;
+        AStarNode FStartNode;
 
         #endregion
 
         #region Properties
 
-        private readonly ArrayList FSolution;
+        readonly ArrayList FSolution;
 
-        private bool m_pathPossible = true;
+        bool m_pathPossible = true;
 
         /// <summary>
         ///     Holds the solution after pathfinding is done. <see>FindPath()</see>
@@ -227,7 +227,7 @@ namespace Games.Pathfinding
         ///     Prints all the nodes in a list
         /// </summary>
         /// <param name="ANodeList">List to print</param>
-        private void PrintNodeList(object ANodeList)
+        void PrintNodeList(object ANodeList)
         {
             Console.WriteLine("Node list:");
             foreach (AStarNode n in (ANodeList as IEnumerable))

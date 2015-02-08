@@ -59,6 +59,7 @@ using ReaderWriterLockSlim = System.Threading.ReaderWriterLockSlim;
 
 namespace WhiteCore.Framework.Utilities
 {
+
     /// <summary>
     ///     The method used by Util.FireAndForget for asynchronously firing events
     /// </summary>
@@ -589,7 +590,10 @@ namespace WhiteCore.Framework.Utilities
         /// <returns></returns>
         public static bool IsZeroVector(Vector3 v)
         {
-            if (v.X == 0 && v.Y == 0 && v.Z == 0)
+            //if (v.X == 0 && v.Y == 0 && v.Z == 0)
+            if (v.X < Constants.FloatDifference &&
+                v.Y < Constants.FloatDifference &&
+                v.Z < Constants.FloatDifference)
             {
                 return true;
             }

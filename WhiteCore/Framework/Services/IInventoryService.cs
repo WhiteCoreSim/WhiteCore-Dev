@@ -178,7 +178,7 @@ namespace WhiteCore.Framework.Services
         bool MoveFolder(InventoryFolderBase folder);
 
         /// <summary>
-        ///     Delete an item from the user's inventory
+        ///     Delete a folder from the user's inventory
         /// </summary>
         /// <param name="userID"></param>
         /// <param name="folderIDs"></param>
@@ -186,7 +186,7 @@ namespace WhiteCore.Framework.Services
         bool DeleteFolders(UUID userID, List<UUID> folderIDs);
 
         /// <summary>
-        ///     Force Deletes a folder (LOCAL ONLY)
+        ///     Force Deletes a folder 
         /// </summary>
         /// <param name="folder"></param>
         /// <returns></returns>
@@ -302,6 +302,13 @@ namespace WhiteCore.Framework.Services
         /// <param name="items"></param>
         /// <param name="success"></param>
         void MoveItemsAsync(UUID agentID, List<InventoryItemBase> items, NoParam success);
+
+        /// <summary>
+        /// Adds an item async to the temporary cache only.
+        ///  - used for non persistent inventory items eg NPC attachments
+        /// </summary>
+        /// <param name="item">Item.</param>
+        void AddCacheItemAsync (InventoryItemBase item);
 
         /// <summary>
         ///     Gives an inventory item to another user asychronously

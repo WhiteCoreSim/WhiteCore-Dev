@@ -48,9 +48,9 @@ namespace Tanis.Collections
 
         #endregion
 
-        private IComparer FComparer;
-        private ArrayList FList;
-        private bool FUseObjectsComparison;
+        IComparer FComparer;
+        ArrayList FList;
+        bool FUseObjectsComparison;
 
         #region Constructors
 
@@ -100,7 +100,7 @@ namespace Tanis.Collections
 
         #region Properties
 
-        private bool FAddDuplicates;
+        bool FAddDuplicates;
 
         /// <summary>
         ///     If set to true, it will not be possible to add an object to the list if its value is already in the list.
@@ -517,7 +517,7 @@ namespace Tanis.Collections
             return (Add(Object));
         }
 
-        private bool ObjectIsCompliant(object Object)
+        bool ObjectIsCompliant(object Object)
         {
             if (FUseObjectsComparison && !(Object is IComparable))
                 throw new ArgumentException(
@@ -527,7 +527,7 @@ namespace Tanis.Collections
             return true;
         }
 
-        private void InitProperties(IComparer Comparer, int Capacity)
+        void InitProperties(IComparer Comparer, int Capacity)
         {
             if (Comparer != null)
             {
@@ -545,7 +545,7 @@ namespace Tanis.Collections
 
         #region Nested type: Comparison
 
-        private class Comparison : IComparer
+        class Comparison : IComparer
         {
             #region IComparer Members
 

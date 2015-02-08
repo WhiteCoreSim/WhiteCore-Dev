@@ -2048,6 +2048,131 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return NotecardCache.GetLines(assetID);
         }
 
+
+        /// <summary>
+        /// Save a notecard to prim inventory.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="description">Description of notecard</param>
+        /// <param name="notecardData"></param>
+        /// <param name="forceSameName">
+        /// If true, then if an item exists with the same name, it is replaced.
+        /// If false, then a new item is created witha slightly different name (e.g. name 1)
+        /// </param>
+        /// <returns>Prim inventory item created.</returns>
+        protected TaskInventoryItem SaveNotecard(string name, string description, string data, bool forceSameName)
+        {
+            // Create new asset
+            AssetBase asset = new AssetBase(UUID.Random(), name, AssetType.Notecard, m_host.OwnerID);
+            asset.Description = description;
+
+            int textLength = data.Length;
+            data
+            = "Linden text version 2\n{\nLLEmbeddedItems version 1\n{\ncount 0\n}\nText length "
+                + textLength.ToString() + "\n" + data + "}\n";
+
+            asset.Data = Util.UTF8.GetBytes(data);
+            World.AssetService.Store(asset);
+
+            // Create Task Entry
+            TaskInventoryItem taskItem = new TaskInventoryItem();
+
+            taskItem.ResetIDs(m_host.UUID);
+            taskItem.ParentID = m_host.UUID;
+            taskItem.CreationDate = (uint)Util.UnixTimeSinceEpoch();
+            taskItem.Name = asset.Name;
+            taskItem.Description = asset.Description;
+            taskItem.Type = (int)AssetType.Notecard;
+            taskItem.InvType = (int)InventoryType.Notecard;
+            taskItem.OwnerID = m_host.OwnerID;
+            taskItem.CreatorID = m_host.OwnerID;
+            taskItem.BasePermissions = (uint)PermissionMask.All | (uint)PermissionMask.Export;
+            taskItem.CurrentPermissions = (uint)PermissionMask.All | (uint)PermissionMask.Export;
+            taskItem.EveryonePermissions = 0;
+            taskItem.NextPermissions = (uint)PermissionMask.All;
+            taskItem.GroupID = m_host.GroupID;
+            taskItem.GroupPermissions = 0;
+            taskItem.Flags = 0;
+            taskItem.PermsGranter = UUID.Zero;
+            taskItem.PermsMask = 0;
+            taskItem.AssetID = asset.ID;
+
+            if (forceSameName)
+                m_host.Inventory.AddInventoryItemExclusive(taskItem, false);
+            else
+                m_host.Inventory.AddInventoryItem(taskItem, false);
+
+            return taskItem;
+        }
+
+        /// <summary>
+        /// Load the notecard data found at the given prim inventory item name or asset uuid.
+        /// </summary>
+        /// <param name="notecardNameOrUuid"></param>
+        /// <returns>The text loaded.  Null if no notecard was found.</returns>
+        protected string LoadNotecard(string notecardNameOrUuid)
+        {
+            UUID assetID = CacheNotecard(notecardNameOrUuid);
+
+            if (assetID != UUID.Zero)
+            {
+                StringBuilder notecardData = new StringBuilder();
+
+                for (int count = 0; count < NotecardCache.GetLines(assetID); count++)
+                {
+                    string line = NotecardCache.GetLine(assetID, count) + "\n";
+
+                    // MainConsole.Instance.DebugFormat("[OSSL]: From notecard {0} loading line {1}", notecardNameOrUuid, line);
+
+                    notecardData.Append(line);
+                }
+
+                return notecardData.ToString();
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Cache a notecard's contents.
+        /// </summary>
+        /// <param name="notecardNameOrUuid"></param>
+        /// <returns>
+        /// The asset id of the notecard, which is used for retrieving the cached data.
+        /// UUID.Zero if no asset could be found.
+        /// </returns>
+        protected UUID CacheNotecard(string notecardNameOrUuid)
+        {
+            UUID assetID = UUID.Zero;
+
+            if (!UUID.TryParse(notecardNameOrUuid, out assetID))
+            {
+                foreach (TaskInventoryItem item in m_host.TaskInventory.Values)
+                {
+                    if (item.Type == 7 && item.Name == notecardNameOrUuid)
+                    {
+                        assetID = item.AssetID;
+                    }
+                }
+            }
+
+            if (assetID == UUID.Zero)
+                return UUID.Zero;
+
+            if (!NotecardCache.IsCached(assetID))
+            {
+                AssetBase a = World.AssetService.Get(assetID.ToString());
+
+                if (a == null)
+                    return UUID.Zero;
+
+                string data = Encoding.UTF8.GetString(a.Data);
+                NotecardCache.Cache(assetID, data);
+            };
+
+            return assetID;
+        }
+
         public string osAvatarName2Key(string firstname, string lastname)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Low, "osAvatarName2Key", m_host, "OSSL", m_itemID))
@@ -2223,6 +2348,64 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             //Will retun rules for specific part, or an empty list if part == null
             return retVal;
+        }
+
+
+        /// <summary>
+        /// Save the current appearance of the script owner permanently to the named notecard.
+        /// </summary>
+        /// <param name="notecard">The name of the notecard to which to save the appearance.</param>
+        /// <returns>The asset ID of the notecard saved.</returns>
+        public LSL_Key osOwnerSaveAppearance(string notecard)
+        {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osOwnerSaveAppearance", m_host, "OSSL", m_itemID))
+                return new LSL_Key();
+
+            return SaveAppearanceToNotecard(m_host.OwnerID, notecard);
+        }
+
+        public LSL_Key osAgentSaveAppearance(LSL_Key avatarId, string notecard)
+        {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osAgentSaveAppearance", m_host, "OSSL", m_itemID))
+                return new LSL_Key();
+ 
+            return SaveAppearanceToNotecard(avatarId, notecard);
+        }
+
+        protected LSL_Key SaveAppearanceToNotecard(IScenePresence sp, string notecard)
+        {
+            IAvatarAppearanceModule aa = sp.RequestModuleInterface<IAvatarAppearanceModule> ();
+            if (aa != null)
+            {
+                var appearance = new AvatarAppearance (aa.Appearance);
+                OSDMap appearancePacked = appearance.Pack ();
+ 
+                TaskInventoryItem item
+                = SaveNotecard (notecard, "Avatar Appearance", OSDParser.SerializeLLSDXmlString(appearancePacked), true);
+ 
+                return new LSL_Key (item.AssetID.ToString ());
+            }
+        
+            return new LSL_Key(UUID.Zero.ToString());
+        }
+
+        protected LSL_Key SaveAppearanceToNotecard(UUID avatarId, string notecard)
+        {
+            IScenePresence sp = World.GetScenePresence(avatarId);
+
+            if (sp == null || sp.IsChildAgent)
+                return new LSL_Key(UUID.Zero.ToString());
+
+            return SaveAppearanceToNotecard(sp, notecard);
+        }
+
+        protected LSL_Key SaveAppearanceToNotecard(LSL_Key rawAvatarId, string notecard)
+        {
+            UUID avatarId;
+            if (!UUID.TryParse(rawAvatarId, out avatarId))
+                return new LSL_Key(UUID.Zero.ToString());
+
+            return SaveAppearanceToNotecard(avatarId, notecard);
         }
 
         /// <summary>
@@ -3085,6 +3268,484 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             {
                 OSSLShoutError("Possible invalid regular expression detected.");
                 return 0;
+            }
+        }
+
+
+        // NPC functionality
+        public LSL_Key osNpcCreate(string firstname, string lastname, LSL_Types.Vector3 position, string notecard)
+        {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcCreate", m_host, "OSSL", m_itemID)) 
+                return "";
+
+            return NpcCreate(firstname, lastname, position, notecard, false, false);
+        }
+
+        public LSL_Key osNpcCreate(string firstname, string lastname, LSL_Types.Vector3 position, string notecard, int options)
+        {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcCreate", m_host, "OSSL", m_itemID)) 
+                return "";
+
+            return NpcCreate(
+                firstname, lastname, position, notecard,
+                (options & ScriptBaseClass.OS_NPC_NOT_OWNED) == 0,
+                (options & ScriptBaseClass.OS_NPC_SENSE_AS_AGENT) != 0);
+        }
+
+
+        LSL_Key NpcCreate(
+            string firstname, string lastname, LSL_Types.Vector3 position, string notecard, bool owned, bool senseAsAgent)
+        {
+            IBotManager manager = World.RequestModuleInterface<IBotManager>();
+            if (manager != null)
+            {
+                MainConsole.Instance.DebugFormat ("Creating NPC: {0} {1}, Position: {2}, Appearence: {3}, Options: {4} {5}",
+                    firstname, lastname, position, notecard, owned, senseAsAgent);
+
+                // check for notecard or UUID for appearance...
+                AvatarAppearance appearance = null;
+                UUID appearanceId;
+                UUID.TryParse (notecard, out appearanceId);
+
+                if (appearanceId == UUID.Zero)
+                {
+                    // not a UUID so try for a notecard
+                    string appearanceSerialized = LoadNotecard(notecard);
+
+                    if (appearanceSerialized != null)
+                    {
+                        var appearanceOsd = (OSDMap)OSDParser.DeserializeLLSDXml(appearanceSerialized);
+                        appearance = new AvatarAppearance();
+                        appearance.Unpack(appearanceOsd);
+                    }
+                    else
+                    {
+                        OSSLError(string.Format("osNpcCreate: Notecard reference '{0}' not found.", notecard));
+                    }
+                }
+
+                UUID ownerID = UUID.Zero;
+                if (owned)
+                    ownerID = m_host.OwnerID;
+
+                var npcPosition = position.ToVector3();
+                UUID newBotId;
+
+                if (appearance == null)
+                {
+                    newBotId = manager.CreateAvatar (
+                        firstname,
+                        lastname,
+                        World,
+                        appearanceId,
+                        ownerID,
+                        npcPosition
+                    );
+                } else
+                {
+                    newBotId = manager.CreateAvatar (
+                        firstname,
+                        lastname,
+                        World,
+                        appearance,
+                        ownerID,
+                        npcPosition
+                    );
+
+                }
+                return new LSL_Key(newBotId.ToString());
+            }
+
+            return new LSL_Key(UUID.Zero.ToString());
+        }
+
+        public void osNpcRemove(LSL_Key npc)
+        {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcRemove", m_host, "OSSL", m_itemID))
+                return ;
+
+            IBotManager manager = World.RequestModuleInterface<IBotManager>();
+            if (manager != null)
+            {
+                UUID npcId;
+                if (!UUID.TryParse(npc.m_string, out npcId))
+                    return;
+
+
+                manager.RemoveAvatar(npcId, World, m_host.OwnerID);
+            }
+        }
+
+        /// <summary>
+        /// Save the current appearance of the NPC permanently to the named notecard.
+        /// </summary>
+        /// <param name="npc"></param>
+        /// <param name="notecard">The name of the notecard to which to save the appearance.</param>
+        /// <returns>The asset ID of the notecard saved.</returns>
+        public LSL_Key osNpcSaveAppearance(LSL_Key npc, string notecard)
+        {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcSaveAppearance", m_host, "OSSL", m_itemID)) 
+                return "";
+
+            IBotManager manager = World.RequestModuleInterface<IBotManager>();
+            if (manager != null)
+            {
+                UUID npcId;
+                if (!UUID.TryParse(npc.m_string, out npcId))
+                    return new LSL_Key(UUID.Zero.ToString());
+
+                if (!manager.CheckPermission(npcId, m_host.OwnerID))
+                    return new LSL_Key(UUID.Zero.ToString());
+
+                return SaveAppearanceToNotecard(npcId, notecard);
+            }
+
+            return new LSL_Key(UUID.Zero.ToString());
+        }
+
+        public void osNpcLoadAppearance(LSL_Key npc, string notecard)
+        {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcLoadAppearance", m_host, "OSSL", m_itemID))
+                return;
+
+            IBotManager manager = World.RequestModuleInterface<IBotManager>();
+            if (manager != null)
+            {
+                UUID npcId;
+                if (!UUID.TryParse(npc.m_string, out npcId))
+                    return;
+
+                if (!manager.CheckPermission(npcId, m_host.OwnerID))
+                    return;
+
+                string appearanceSerialized = LoadNotecard(notecard);
+
+                if (appearanceSerialized == null)
+                    OSSLError(string.Format("osNpcCreate: Notecard reference '{0}' not found.", notecard));
+
+                OSDMap appearanceOsd = (OSDMap)OSDParser.DeserializeLLSDXml(appearanceSerialized);
+                AvatarAppearance appearance = new AvatarAppearance();
+                appearance.Unpack(appearanceOsd);
+
+                manager.SetAvatarAppearance(npcId, appearance, m_host.ParentEntity.Scene);
+            }
+        }
+
+        public LSL_Key osNpcGetOwner(LSL_Key npc)
+        {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcGetOwner", m_host, "OSSL", m_itemID))
+                return "";
+
+            IBotManager manager = World.RequestModuleInterface<IBotManager>();
+            if (manager != null)
+            {
+                UUID npcId;
+                if (UUID.TryParse(npc.m_string, out npcId))
+                {
+                    UUID owner = manager.GetOwner(npcId);
+                    if (owner != UUID.Zero)
+                        return new LSL_Key(owner.ToString());
+
+                    return npc;
+                }
+            }
+
+            return new LSL_Key(UUID.Zero.ToString());
+        }
+
+        public LSL_Vector osNpcGetPos(LSL_Key npc)
+        {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcGetPos", m_host, "OSSL", m_itemID)) 
+                return new LSL_Vector(0, 0, 0);
+
+            IBotManager manager = World.RequestModuleInterface<IBotManager>();
+            if (manager != null)
+            {
+                UUID npcId;
+                if (!UUID.TryParse (npc.m_string, out npcId))
+                {
+                    var pos = manager.GetPosition (npcId, m_host.OwnerID);
+
+                    return new LSL_Vector (pos); 
+                }
+            }
+
+            return new LSL_Vector(0, 0, 0);
+        }
+
+        public void osNpcMoveTo(LSL_Key npc, LSL_Vector pos)
+        {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcMoveTo", m_host, "OSSL", m_itemID))
+                return;
+
+            IBotManager manager = World.RequestModuleInterface<IBotManager>();
+            if (manager != null)
+            {
+                UUID npcId;
+                if (!UUID.TryParse(npc.m_string, out npcId))
+                    return;
+
+                manager.WalkTo(npcId, pos.ToVector3(), m_host.OwnerID);
+            }
+        }
+
+        public void osNpcMoveToTarget(LSL_Key npc, LSL_Vector target, int options)
+        {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcMoveToTarget", m_host, "OSSL", m_itemID)) 
+                return;
+
+            IBotManager manager = World.RequestModuleInterface<IBotManager>();
+            if (manager != null)
+            {
+                UUID npcId;
+                if (!UUID.TryParse(npc.m_string, out npcId))
+                    return;
+
+                Vector3 targetPos = target.ToVector3();
+
+                MainConsole.Instance.DebugFormat ("NPC: {0} moving to position: {1}, region: {2}, Options: {3}",
+                    npcId, targetPos, World, options);
+
+                manager.MoveToTarget(
+                    npcId,
+                    targetPos,
+                    options,
+                    m_host.OwnerID
+                );
+            }
+        }
+
+        public void osNpcStopMoveToTarget(LSL_Key npc)
+        {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcStopMoveToTarget", m_host, "OSSL", m_itemID)) 
+                return;
+
+            IBotManager manager = World.RequestModuleInterface<IBotManager>();
+            if (manager != null)
+            {
+                UUID npcId;
+                if (!UUID.TryParse(npc.m_string, out npcId))
+                    return;
+
+                //manager.StopMoveToTarget(npcId, World, m_host.OwnerID);
+                manager.StopMoving (npcId, m_host.OwnerID);               
+            }
+        }
+
+        public LSL_Rotation osNpcGetRot(LSL_Key npc)
+        {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcGetRot", m_host, "OSSL", m_itemID)) 
+                return new LSL_Rotation(0, 0, 0, 0);
+
+            IBotManager manager = World.RequestModuleInterface<IBotManager>();
+            if (manager != null)
+            {
+                UUID npcId;
+                if (UUID.TryParse (npc.m_string, out npcId))
+                {
+                    var rot = manager.GetRotation (npcId, m_host.OwnerID);
+                    var NpcRot = new LSL_Rotation ();
+                    NpcRot.x = rot.X;
+                    NpcRot.y = rot.Y;
+                    NpcRot.z = rot.Z;
+                    NpcRot.s = 1;
+
+                    return NpcRot;
+                }
+            }
+            
+            return new LSL_Rotation( 0,0,0,0);
+
+        }
+
+        public void osNpcSetRot(LSL_Key npc, LSL_Rotation rotation)
+        {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcSetRot", m_host, "OSSL", m_itemID))
+                return;
+
+            IBotManager manager = World.RequestModuleInterface<IBotManager>();
+            if (manager != null)
+            {
+                UUID npcId;
+                if (UUID.TryParse (npc.m_string, out npcId))
+                {
+                    if (!manager.CheckPermission (npcId, m_host.OwnerID))
+                        return;
+
+                    IScenePresence sp = World.GetScenePresence (npcId);
+
+                    if (sp != null)
+                        sp.Rotation = rotation.ToQuaternion ();
+                }
+            }
+        }
+
+
+        public void osNpcWhisper(LSL_Key npc, int channel, string message)
+        {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcWhisper", m_host, "OSSL", m_itemID))
+                return;
+
+            IBotManager manager = World.RequestModuleInterface<IBotManager>();
+            if (manager != null)
+            {
+                UUID npcId;
+                if (UUID.TryParse(npc.m_string, out npcId))
+                    manager.SendChatMessage(npcId, message, 0, channel, m_host.OwnerID);
+            }
+        }
+
+        public void osNpcSay(LSL_Key npc, string message)
+        {
+            osNpcSay(npc, 0, message);
+        }
+
+        public void osNpcSay(LSL_Key npc, int channel, string message)
+        {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcSay", m_host, "OSSL", m_itemID)) 
+                return;
+
+            IBotManager manager = World.RequestModuleInterface<IBotManager>();
+            if (manager != null)
+            {
+                UUID npcId;
+                if (UUID.TryParse(npc.m_string, out npcId))
+                    manager.SendChatMessage(npcId, message, 1, channel, m_host.OwnerID);
+            }
+        }
+
+        public void osNpcShout(LSL_Key npc, int channel, string message)
+        {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcShout", m_host, "OSSL", m_itemID))
+                return;
+
+            IBotManager manager = World.RequestModuleInterface<IBotManager>();
+            if (manager != null)
+            {
+                UUID npcId;
+                if (UUID.TryParse(npc.m_string, out npcId))
+                    manager.SendChatMessage(npcId, message, 2, channel, m_host.OwnerID);
+            }
+        }
+
+
+        public void osNpcSit(LSL_Key npc, LSL_Key target, int options)
+        {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcSit", m_host, "OSSL", m_itemID))
+                return;
+
+            IBotManager manager = World.RequestModuleInterface<IBotManager>();
+            if (manager != null)
+            {
+                UUID npcId;
+                if (UUID.TryParse (npc.m_string, out npcId))
+                {
+                    if (!manager.CheckPermission (npcId, m_host.OwnerID))
+                        return;
+
+                    IScenePresence sp = World.GetScenePresence (npcId);
+                    if (sp == null)
+                        return;
+
+                    var sitObjectID = UUID.Parse (target.m_string);
+                    ISceneChildEntity child = World.GetSceneObjectPart (sitObjectID);
+                    if (child == null)
+                        //throw new Exception("Failed to find entity to sit on");
+                        return;
+
+                    sp.HandleAgentRequestSit (sp.ControllingClient, sitObjectID, new Vector3 (0,0,0));
+
+                }
+            }
+        }
+
+        public void osNpcStand(LSL_Key npc)
+        {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcStand", m_host, "OSSL", m_itemID))
+                return;
+
+            IBotManager manager = World.RequestModuleInterface<IBotManager>();
+            if (manager != null)
+            {
+                UUID npcId;
+                if (UUID.TryParse (npc.m_string, out npcId))
+                {
+                    if (!manager.CheckPermission (npcId, m_host.OwnerID))
+                        return;
+
+                    IScenePresence sp = World.GetScenePresence (npcId);
+                    if (sp == null)
+                        return;
+                 
+                    sp.StandUp ();
+                }
+            }
+        }
+
+        public void osNpcPlayAnimation(LSL_Key npc, string animation)
+        {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcPlayAnimation", m_host, "OSSL", m_itemID))
+                return;
+
+            IBotManager manager = World.RequestModuleInterface<IBotManager>();
+            if (manager != null)
+            {
+                UUID npcId;
+                if (UUID.TryParse (npc.m_string, out npcId))
+                {
+                    if (manager.CheckPermission (npcId, m_host.OwnerID))
+                        osAvatarPlayAnimation (npcId.ToString (), animation);
+                }
+            }
+        }
+
+        public void osNpcStopAnimation(LSL_Key npc, string animation)
+        {
+            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.High, "osNpcStopAnimation", m_host, "OSSL", m_itemID))
+                return;
+
+            IBotManager manager = World.RequestModuleInterface<IBotManager>();
+            if (manager != null)
+            {
+                UUID npcId;
+                if (UUID.TryParse (npc.m_string, out npcId))
+                {
+                    if (manager.CheckPermission (npcId, m_host.OwnerID))
+                        osAvatarStopAnimation (npcId.ToString (), animation);
+                }
+            }
+        }
+
+         public void osNpcTouch(LSL_Key npcLSL_Key, LSL_Key object_key, LSL_Integer link_num)
+        {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcTouch", m_host, "OSSL", m_itemID))
+                return;
+
+            IBotManager manager = World.RequestModuleInterface<IBotManager>();
+            int linkNum = link_num.value;
+            if (manager != null || (linkNum < 0 && linkNum != ScriptBaseClass.LINK_THIS))
+            {
+                UUID npcId;
+                if (!UUID.TryParse(npcLSL_Key, out npcId) || !manager.CheckPermission(npcId, m_host.OwnerID))
+                    return;
+
+
+                IScenePresence sp = World.GetScenePresence(npcId);
+                if (sp == null)
+                    return;
+                ISceneChildEntity child = World.GetSceneObjectPart(UUID.Parse(object_key));
+                if (child == null)
+                    //throw new Exception("Failed to find entity to touch");
+                    return;
+
+                SurfaceTouchEventArgs touchArgs = new SurfaceTouchEventArgs();
+
+                World.EventManager.TriggerObjectGrab(child.ParentEntity.RootChild, child, Vector3.Zero, sp.ControllingClient,
+                    touchArgs);
+                World.EventManager.TriggerObjectGrabbing(child.ParentEntity.RootChild, child, Vector3.Zero,
+                    sp.ControllingClient, touchArgs);
+                World.EventManager.TriggerObjectDeGrab(child.ParentEntity.RootChild, child, sp.ControllingClient, touchArgs);
+                              
             }
         }
     }

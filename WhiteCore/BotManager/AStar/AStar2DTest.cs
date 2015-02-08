@@ -45,9 +45,8 @@ namespace Games.Pathfinding.AStar2DTest
     {
         #region Properties
 
-        private readonly int FX;
-
-        private readonly int FY;
+        readonly int FX;
+        readonly int FY;
 
         /// <summary>
         ///     The X-coordinate of the node
@@ -94,7 +93,7 @@ namespace Games.Pathfinding.AStar2DTest
         /// <param name="ASuccessors">List of successors</param>
         /// <param name="AX">X-coordinate</param>
         /// <param name="AY">Y-coordinate</param>
-        private void AddSuccessor(ArrayList ASuccessors, int AX, int AY)
+        void AddSuccessor(ArrayList ASuccessors, int AX, int AY)
         {
             int CurrentCost = StartPath.GetMap(AX, AY);
             if (CurrentCost == -1)

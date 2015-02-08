@@ -97,52 +97,60 @@ namespace WhiteCore.Services.SQLServices.InventoryService
 
         public virtual void FinishedStartup()
         {
-            _addInventoryItemQueue.Start(0.5, (agentID, itemsToAdd) =>
-                                                  {
-                                                      if (itemsToAdd == null)
-                                                          return;
-                                                      foreach (AddInventoryItemStore item in itemsToAdd)
-                                                      {
-                                                          if (UUID.Zero == item.Item.Folder)
-                                                          {
-                                                              InventoryFolderBase f = GetFolderForType(item.Item.Owner,
-                                                                                                       (InventoryType)
-                                                                                                       item.Item.InvType,
-                                                                                                       (AssetType)
-                                                                                                       item.Item
-                                                                                                           .AssetType);
-                                                              if (f != null)
-                                                                  item.Item.Folder = f.ID;
-                                                              else
-                                                              {
-                                                                  f = GetRootFolder(item.Item.Owner);
-                                                                  if (f != null)
-                                                                      item.Item.Folder = f.ID;
-                                                                  else
-                                                                  {
-                                                                      MainConsole.Instance.WarnFormat(
-                                                                          "[InventorySerivce]: Could not find root folder for {0} when trying to add item {1} with no parent folder specified",
-                                                                          item.Item.Owner, item.Item.Name);
-                                                                      return;
-                                                                  }
-                                                              }
-                                                          }
-                                                          AddItem(item.Item);
-                                                          lock (_tempItemCache)
-                                                              _tempItemCache.Remove(item.Item.ID);
-                                                          if (item.Complete != null)
-                                                              item.Complete(item.Item);
-                                                      }
-                                                  });
-            _moveInventoryItemQueue.Start(0.5, (agentID, itemsToMove) =>
-                                                   {
-                                                       foreach (var item in itemsToMove)
-                                                       {
-                                                           MoveItems(agentID, item.Items);
-                                                           if (item.Complete != null)
-                                                               item.Complete();
-                                                       }
-                                                   });
+            _addInventoryItemQueue.Start(
+                0.5,
+                (agentID, itemsToAdd) =>
+                {
+                    if (itemsToAdd == null)
+                        return;
+
+                    foreach (AddInventoryItemStore item in itemsToAdd)
+                    {
+                        if (UUID.Zero == item.Item.Folder)
+                        {
+                            InventoryFolderBase f = GetFolderForType(
+                                item.Item.Owner,
+                                (InventoryType) item.Item.InvType,
+                                (AssetType) item.Item.AssetType
+                            );
+
+                            if (f != null)
+                                item.Item.Folder = f.ID;
+                            else
+                            {
+                                f = GetRootFolder(item.Item.Owner);
+                                if (f != null)
+                                    item.Item.Folder = f.ID;
+                                else
+                                {
+                                    MainConsole.Instance.WarnFormat(
+                                        "[InventorySerivce]: Could not find root folder for {0} when trying to add item {1} with no parent folder specified",
+                                        item.Item.Owner, item.Item.Name);
+                                    return;
+                                }
+                            }
+                        }
+
+                        AddItem(item.Item);
+                        lock (_tempItemCache)
+                            _tempItemCache.Remove(item.Item.ID);
+
+                        if (item.Complete != null)
+                            item.Complete(item.Item);
+                    }
+                });
+
+            _moveInventoryItemQueue.Start(
+                0.5,
+                (agentID, itemsToMove) =>
+                {
+                    foreach (var item in itemsToMove)
+                    {
+                        MoveItems(agentID, item.Items);
+                        if (item.Complete != null)
+                            item.Complete();
+                    }
+                });
         }
 
         #endregion
@@ -782,12 +790,12 @@ namespace WhiteCore.Services.SQLServices.InventoryService
             return true;
         }
 
-        //[CanBeReflected(ThreatLevel = ThreatLevel.Full)]
+        [CanBeReflected(ThreatLevel = ThreatLevel.Full)]
         public virtual bool ForcePurgeFolder(InventoryFolderBase folder)
         {
-            /*object remoteValue = DoRemoteByURL("InventoryServerURI", folder);
+            object remoteValue = DoRemoteByURL("InventoryServerURI", folder);
             if (remoteValue != null || m_doRemoteOnly)
-                return remoteValue == null ? false : (bool)remoteValue;*/
+                return remoteValue == null ? false : (bool)remoteValue;
 
             List<InventoryFolderBase> subFolders = m_Database.GetFolders(
                 new[] {"parentFolderID"},
@@ -1071,6 +1079,18 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         public void MoveItemsAsync(UUID agentID, List<InventoryItemBase> items, NoParam success)
         {
             _moveInventoryItemQueue.Add(agentID, new MoveInventoryItemStore(items, success));
+        }
+
+        public void AddCacheItemAsync(InventoryItemBase item)
+        {
+            if (item == null)
+                return;
+            lock (_tempItemCache)
+            {
+                if (!_tempItemCache.ContainsKey(item.ID))
+                    _tempItemCache.Add(item.ID, item);
+            }
+            //_addInventoryItemQueue.Add(item.Owner, new AddInventoryItemStore(item, success));
         }
 
         /// <summary>

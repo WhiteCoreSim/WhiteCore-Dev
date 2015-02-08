@@ -50,24 +50,22 @@ namespace WhiteCore.Modules.Appearance
     {
         #region Declares
 
-        private readonly TimedSaving<AvatarAppearance> _saveQueue = new TimedSaving<AvatarAppearance>();
-        private readonly TimedSaving<AvatarAppearance> _sendQueue = new TimedSaving<AvatarAppearance>();
-        private readonly TimedSaving<AvatarAppearance> _initialSendQueue = new TimedSaving<AvatarAppearance>();
-        private readonly object m_setAppearanceLock = new object();
-        private int m_initialsendtime = 1; // seconds to wait before sending the initial appearance
-        private int m_savetime = 5; // seconds to wait before saving changed appearance
-        private int m_sendtime = 1; // seconds to wait before sending appearances
-        private IScene m_scene;
+        readonly TimedSaving<AvatarAppearance> _saveQueue = new TimedSaving<AvatarAppearance>();
+        readonly TimedSaving<AvatarAppearance> _sendQueue = new TimedSaving<AvatarAppearance>();
+        readonly TimedSaving<AvatarAppearance> _initialSendQueue = new TimedSaving<AvatarAppearance>();
+        readonly object m_setAppearanceLock = new object();
+        int m_initialsendtime = 1; // seconds to wait before sending the initial appearance
+        int m_savetime = 5; // seconds to wait before saving changed appearance
+        int m_sendtime = 1; // seconds to wait before sending appearances
+        IScene m_scene;
 
         #endregion
 
         #region Default UnderClothes
 
-        private static UUID m_underShirtUUID = UUID.Zero;
-
-        private static UUID m_underPantsUUID = UUID.Zero;
-
-        private const string m_defaultUnderPants = @"LLWearable version 22
+        static UUID m_underShirtUUID = UUID.Zero;
+        static UUID m_underPantsUUID = UUID.Zero;
+        const string m_defaultUnderPants = @"LLWearable version 22
 New Underpants
 
     permissions 0
@@ -97,7 +95,7 @@ parameters 5
 textures 1
 17 5748decc-f629-461c-9a36-a35a221fe21f";
 
-        private const string m_defaultUnderShirt = @"LLWearable version 22
+        const string m_defaultUnderShirt = @"LLWearable version 22
 New Undershirt
 
     permissions 0
@@ -217,13 +215,13 @@ textures 1
             client.OnAgentCachedTextureRequest -= AgentCachedTexturesRequest;
         }
 
-        private void EventManager_OnNewPresence(IScenePresence presence)
+        void EventManager_OnNewPresence(IScenePresence presence)
         {
             AvatarAppearanceModule m = new AvatarAppearanceModule(presence);
             presence.RegisterModuleInterface<IAvatarAppearanceModule>(m);
         }
 
-        private void EventManager_OnRemovePresence(IScenePresence presence)
+        void EventManager_OnRemovePresence(IScenePresence presence)
         {
             AvatarAppearanceModule m = (AvatarAppearanceModule)presence.RequestModuleInterface<IAvatarAppearanceModule>();
             if (m != null)
@@ -292,7 +290,7 @@ textures 1
         /// </summary>
         /// <param name="client"></param>
         /// <param name="args"></param>
-        private void AgentCachedTexturesRequest(IClientAPI client, List<CachedAgentArgs> args)
+        void AgentCachedTexturesRequest(IClientAPI client, List<CachedAgentArgs> args)
         {
             IScenePresence sp = m_scene.GetScenePresence(client.AgentId);
             IAvatarAppearanceModule app = sp.RequestModuleInterface<IAvatarAppearanceModule>();
@@ -368,7 +366,7 @@ textures 1
         /// </summary>
         /// <param name="agentid"></param>
         /// <param name="app"></param>
-        private void HandleAppearanceSend(UUID agentid, AvatarAppearance app)
+        void HandleAppearanceSend(UUID agentid, AvatarAppearance app)
         {
             IScenePresence sp = m_scene.GetScenePresence(agentid);
             if (sp == null)
@@ -393,7 +391,7 @@ textures 1
         /// </summary>
         /// <param name="agentid"></param>
         /// <param name="app"></param>
-        private void HandleAppearanceSave(UUID agentid, AvatarAppearance app)
+        void HandleAppearanceSave(UUID agentid, AvatarAppearance app)
         {
             IScenePresence sp = m_scene.GetScenePresence(agentid);
             if (sp == null)
@@ -414,7 +412,7 @@ textures 1
         /// </summary>
         /// <param name="agentid">Agent to send appearance for</param>
         /// <param name="app"></param>
-        private void HandleInitialAppearanceSend(UUID agentid, AvatarAppearance app)
+        void HandleInitialAppearanceSend(UUID agentid, AvatarAppearance app)
         {
             IScenePresence sp = m_scene.GetScenePresence(agentid);
             if (sp == null)
@@ -651,7 +649,7 @@ textures 1
             //  (handled above) and that takes care of it
         }
 
-        private void SetAppearanceAssets(UUID userID, List<AvatarWearingArgs.Wearable> nowWearing,
+        void SetAppearanceAssets(UUID userID, List<AvatarWearingArgs.Wearable> nowWearing,
                                          AvatarAppearance oldAppearance, ref AvatarAppearance appearance)
         {
             IInventoryService invService = m_scene.InventoryService;
@@ -712,7 +710,7 @@ textures 1
             MainConsole.Instance.Info("Resent appearance");
         }
 
-        private void HandleConsoleForceSendAppearance(IScene scene, string[] cmds)
+        void HandleConsoleForceSendAppearance(IScene scene, string[] cmds)
         {
             if (cmds.Length != 5)
             {
@@ -737,10 +735,10 @@ textures 1
 
         public class AvatarAppearanceModule : IAvatarAppearanceModule
         {
-            private bool m_InitialHasWearablesBeenSent;
+            bool m_InitialHasWearablesBeenSent;
             protected AvatarAppearance m_appearance;
-            public IScenePresence m_sp;
             protected IAgentUpdateMonitor _updateMonitor;
+            public IScenePresence m_sp;
 
             public AvatarAppearanceModule(IScenePresence sp)
             {
@@ -754,7 +752,7 @@ textures 1
                     Appearance = sp.Scene.AvatarService.GetAppearance(sp.UUID);
                 if (Appearance == null)
                 {
-                    MainConsole.Instance.Error("[Scene]: NO AVATAR APPEARANCE FOUND FOR " + sp.Name);
+                    MainConsole.Instance.Debug("[Scene]: NO AVATAR APPEARANCE FOUND FOR " + sp.Name);
                     Appearance = new AvatarAppearance(sp.UUID);
                 }
                 _updateMonitor = m_sp.Scene.RequestModuleInterface<IMonitorModule>().GetMonitor<IAgentUpdateMonitor>(sp.Scene);
@@ -889,7 +887,7 @@ textures 1
                 m_sp = null;
             }
 
-            private void EventManager_OnMakeRootAgent(IScenePresence presence)
+            void EventManager_OnMakeRootAgent(IScenePresence presence)
             {
                 if (m_sp != null && presence.UUID == m_sp.UUID)
                 {
@@ -937,7 +935,7 @@ textures 1
             /// </summary>
             /// <param name="sender"></param>
             /// <param name="e"></param>
-            private void CheckToMakeSureWearablesHaveBeenSent(object sender, ElapsedEventArgs e)
+            void CheckToMakeSureWearablesHaveBeenSent(object sender, ElapsedEventArgs e)
             {
                 if (m_sp == null || m_sp.IsChildAgent)
                     return;

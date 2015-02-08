@@ -53,12 +53,12 @@ namespace WhiteCore.Modules.Archivers
     {
         #region Declares
 
-        private IAssetService AssetService;
-        private IAvatarService AvatarService;
-        private IInventoryService InventoryService;
-        private IUserAccountService UserAccountService;
-        private IRegistryCore m_registry;
-        private string m_storeDirectory = Constants.DEFAULT_AVATARARCHIVE_DIR;
+        IAssetService assetService;
+        IAvatarService avatarService;
+        IInventoryService inventoryService;
+        IUserAccountService userAccountService;
+        IRegistryCore m_registry;
+        string m_storeDirectory = Constants.DEFAULT_AVATARARCHIVE_DIR;
 
         #endregion
 
@@ -67,7 +67,7 @@ namespace WhiteCore.Modules.Archivers
         public AvatarArchive LoadAvatarArchive(string fileName, UUID principalID)
         {
             AvatarArchive archive = new AvatarArchive();
-            UserAccount account = UserAccountService.GetUserAccount(null, principalID);
+            UserAccount account = userAccountService.GetUserAccount(null, principalID);
             if (account == null)
             {
                 MainConsole.Instance.Error("[AvatarArchive]: User not found!");
@@ -89,7 +89,7 @@ namespace WhiteCore.Modules.Archivers
 
             appearance.Owner = principalID;
 
-            InventoryFolderBase AppearanceFolder = InventoryService.GetFolderForType(account.PrincipalID,
+            InventoryFolderBase AppearanceFolder = inventoryService.GetFolderForType(account.PrincipalID,
                                                                                      InventoryType.Wearable,
                                                                                      AssetType.Clothing);
 
@@ -108,9 +108,9 @@ namespace WhiteCore.Modules.Archivers
                     UUID.Random(), archive.FolderName, account.PrincipalID,
                     -1, AppearanceFolder.ID, 1);
 
-            InventoryService.AddFolder(folderForAppearance);
+            inventoryService.AddFolder(folderForAppearance);
 
-            folderForAppearance = InventoryService.GetFolder(folderForAppearance);
+            folderForAppearance = inventoryService.GetFolder(folderForAppearance);
 
             try
             {
@@ -139,14 +139,14 @@ namespace WhiteCore.Modules.Archivers
         /// <param name="isPublic">If set to <c>true</c> is public.</param>
         public bool SaveAvatarArchive(string fileName, UUID principalID, string folderName, UUID snapshotUUID, bool isPublic)
         {
-            UserAccount account = UserAccountService.GetUserAccount(null, principalID);
+            UserAccount account = userAccountService.GetUserAccount(null, principalID);
             if (account == null)
             {
                 MainConsole.Instance.Error("[AvatarArchive]: User not found!");
                 return false;
             }
 
-            AvatarAppearance appearance = AvatarService.GetAppearance(account.PrincipalID);
+            AvatarAppearance appearance = avatarService.GetAppearance(account.PrincipalID);
             if (appearance == null)
             {
                 MainConsole.Instance.Error("[AvatarArchive] Appearance not found!");
@@ -185,6 +185,8 @@ namespace WhiteCore.Modules.Archivers
                 attachCount++;
             }
             MainConsole.Instance.InfoFormat("[AvatarArchive] Adding {0} attachments to {1}", attachCount, archiveName);
+
+            //InventoryFolderBase clothingFolder = inventoryService.GetFolderForType(principalID, AssetType.Clothing);
 
             // set details
             archive.Appearance = appearance;
@@ -305,7 +307,7 @@ namespace WhiteCore.Modules.Archivers
                 userName = cmdparams [3] + " " + cmdparams [4];
             }
 
-            UserAccount account = UserAccountService.GetUserAccount(null, userName);
+            UserAccount account = userAccountService.GetUserAccount(null, userName);
             if (account == null)
             {
                 MainConsole.Instance.Info("[AvatarArchive]: Sorry, unable to find an account for " + userName +"!");
@@ -342,7 +344,7 @@ namespace WhiteCore.Modules.Archivers
 
             AvatarArchive archive = LoadAvatarArchive(fileName, account.PrincipalID);
             if (archive != null)
-                AvatarService.SetAppearance(account.PrincipalID, archive.Appearance);
+                avatarService.SetAppearance(account.PrincipalID, archive.Appearance);
         }
 
         /// <summary>
@@ -395,7 +397,7 @@ namespace WhiteCore.Modules.Archivers
                 return;
             }
 
-            UserAccount account = UserAccountService.GetUserAccount(null, userName);
+            UserAccount account = userAccountService.GetUserAccount(null, userName);
             if (account == null)
             {
                 MainConsole.Instance.Error("[AvatarArchive]: User '" + userName + "' not found!");
@@ -431,7 +433,7 @@ namespace WhiteCore.Modules.Archivers
 
         #region Helpers
 
-        private InventoryItemBase GiveInventoryItem(UUID senderId, UUID recipient, InventoryItemBase item,
+        InventoryItemBase GiveInventoryItem(UUID senderId, UUID recipient, InventoryItemBase item,
                                                     InventoryFolderBase parentFolder)
         {
             InventoryItemBase itemCopy = new InventoryItemBase
@@ -456,14 +458,14 @@ namespace WhiteCore.Modules.Archivers
 
             if (parentFolder == null)
             {
-                InventoryFolderBase folder = InventoryService.GetFolderForType(recipient, InventoryType.Unknown,
+                InventoryFolderBase folder = inventoryService.GetFolderForType(recipient, InventoryType.Unknown,
                                                                                (AssetType)itemCopy.AssetType);
 
                 if (folder != null)
                     itemCopy.Folder = folder.ID;
                 else
                 {
-                    InventoryFolderBase root = InventoryService.GetRootFolder(recipient);
+                    InventoryFolderBase root = inventoryService.GetRootFolder(recipient);
 
                     if (root != null)
                         itemCopy.Folder = root.ID;
@@ -480,11 +482,11 @@ namespace WhiteCore.Modules.Archivers
             itemCopy.SalePrice = item.SalePrice;
             itemCopy.SaleType = item.SaleType;
 
-            InventoryService.AddItem(itemCopy);
+            inventoryService.AddItem(itemCopy);
             return itemCopy;
         }
 
-        private AvatarAppearance CopyWearablesAndAttachments(UUID destination, UUID source,
+        AvatarAppearance CopyWearablesAndAttachments(UUID destination, UUID source,
                                                              AvatarAppearance avatarAppearance,
                                                              InventoryFolderBase destinationFolder, UUID agentid,
                                                              OSDMap itemsMap,
@@ -515,7 +517,7 @@ namespace WhiteCore.Modules.Archivers
                     if (wearable[ii].ItemID != UUID.Zero)
                     {
                         // Get inventory item and copy it
-                        InventoryItemBase item = InventoryService.GetItem(UUID.Zero, wearable[ii].ItemID);
+                        InventoryItemBase item = inventoryService.GetItem(UUID.Zero, wearable[ii].ItemID);
 
                         if (item == null)
                         {
@@ -524,7 +526,7 @@ namespace WhiteCore.Modules.Archivers
                         }
                         if (item != null)
                         {
-                            InventoryItemBase destinationItem = InventoryService.InnerGiveInventoryItem(destination,
+                            InventoryItemBase destinationItem = inventoryService.InnerGiveInventoryItem(destination,
                                                                                                         destination,
                                                                                                         item,
                                                                                                         destinationFolder
@@ -561,7 +563,7 @@ namespace WhiteCore.Modules.Archivers
                 {
 
                     // Get inventory item and copy it
-                    InventoryItemBase item = InventoryService.GetItem(UUID.Zero, itemID);
+                    InventoryItemBase item = inventoryService.GetItem(UUID.Zero, itemID);
 
                     if (item == null)
                     {
@@ -571,7 +573,7 @@ namespace WhiteCore.Modules.Archivers
 
                     if (item != null)
                     {
-                        InventoryItemBase destinationItem = InventoryService.InnerGiveInventoryItem(destination,
+                        InventoryItemBase destinationItem = inventoryService.InnerGiveInventoryItem(destination,
                                                                                                     destination, item,
                                                                                                     destinationFolder.ID,
                                                                                                     false, false);
@@ -593,18 +595,18 @@ namespace WhiteCore.Modules.Archivers
             return avatarAppearance;
         }
 
-        private AvatarAppearance ConvertXMLToAvatarAppearance(OSDMap map)
+        AvatarAppearance ConvertXMLToAvatarAppearance(OSDMap map)
         {
             AvatarAppearance appearance = new AvatarAppearance();
             appearance.Unpack(map);
             return appearance;
         }
 
-        private void SaveAsset(UUID AssetID, ref AvatarArchive archive)
+        void SaveAsset(UUID AssetID, ref AvatarArchive archive)
         {
             try
             {
-                AssetBase asset = AssetService.Get(AssetID.ToString());
+                AssetBase asset = assetService.Get(AssetID.ToString());
                 if (asset != null)
                 {
                     MainConsole.Instance.Info("[AvatarArchive]: Saving asset " + asset.ID);
@@ -622,16 +624,16 @@ namespace WhiteCore.Modules.Archivers
             }
         }
 
-        private AssetBase LoadAssetBase(OSDMap map)
+        AssetBase LoadAssetBase(OSDMap map)
         {
             AssetBase asset = new AssetBase();
             asset.FromOSD(map);
             return asset;
         }
 
-        private void SaveItem(UUID ItemID, ref AvatarArchive archive)
+        void SaveItem(UUID ItemID, ref AvatarArchive archive)
         {
-            InventoryItemBase saveItem = InventoryService.GetItem(UUID.Zero, ItemID);
+            InventoryItemBase saveItem = inventoryService.GetItem(UUID.Zero, ItemID);
             if (saveItem == null)
             {
                 MainConsole.Instance.Warn("[AvatarArchive]: Could not find item to save: " + ItemID);
@@ -641,23 +643,25 @@ namespace WhiteCore.Modules.Archivers
             archive.ItemsMap[ItemID.ToString()] = saveItem.ToOSD();
         }
 
-        private void LoadAssets(OSDMap assets)
+        void LoadAssets(OSDMap assets)
         {
             foreach (KeyValuePair<string, OSD> kvp in assets)
             {
                 UUID AssetID = UUID.Parse(kvp.Key);
                 OSDMap assetMap = (OSDMap) kvp.Value;
-                AssetBase asset = AssetService.Get(AssetID.ToString());
-                MainConsole.Instance.Info("[AvatarArchive]: Loading asset " + AssetID.ToString());
-                if (asset == null) //Don't overwrite
+
+                MainConsole.Instance.Info("[AvatarArchive]: Loading asset " + AssetID);
+
+                AssetBase asset = assetService.Get(AssetID.ToString());
+                if (asset == null) //Don't overwrite if asset exists
                 {
                     asset = LoadAssetBase(assetMap);
-                    asset.ID = AssetService.Store(asset);
+                    asset.ID = assetService.Store(asset);
                 }
             }
         }
 
-        private void ExportArchiveImage(UUID imageUUID, string archiveName, string filePath)
+        void ExportArchiveImage(UUID imageUUID, string archiveName, string filePath)
         {
             byte[] jpeg = new byte[0];
 
@@ -666,7 +670,7 @@ namespace WhiteCore.Modules.Archivers
                 // Taking our jpeg2000 data, decoding it, then saving it to a byte array with regular jpeg data
 
                 // non-async because we know we have the asset immediately.
-                byte[] imageAsset = AssetService.GetData(imageUUID.ToString());
+                byte[] imageAsset = assetService.GetData(imageUUID.ToString());
 
                 if (imageAsset != null)
                 {
@@ -679,8 +683,7 @@ namespace WhiteCore.Modules.Archivers
                         using (Bitmap texture = ResizeBitmap(image, 256, 256, archiveName))
                         {
                             EncoderParameters myEncoderParameters = new EncoderParameters();
-                            myEncoderParameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality,
-                                75L);
+                            myEncoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 75L);
 
                             // Save bitmap to stream
                             texture.Save(imgstream, GetEncoderInfo("image/jpeg"), myEncoderParameters);
@@ -700,7 +703,7 @@ namespace WhiteCore.Modules.Archivers
             }
         }
 
-        private Bitmap ResizeBitmap(Image b, int nWidth, int nHeight, string name)
+        Bitmap ResizeBitmap(Image b, int nWidth, int nHeight, string name)
         {
             Bitmap newsize = new Bitmap(nWidth, nHeight);
             Graphics temp = Graphics.FromImage(newsize);
@@ -714,7 +717,7 @@ namespace WhiteCore.Modules.Archivers
         }
 
         // From msdn
-        private static ImageCodecInfo GetEncoderInfo(String mimeType)
+        static ImageCodecInfo GetEncoderInfo(String mimeType)
         {
             ImageCodecInfo[] encoders;
             encoders = ImageCodecInfo.GetImageEncoders();
@@ -776,10 +779,10 @@ namespace WhiteCore.Modules.Archivers
         public void Start(IConfigSource config, IRegistryCore registry)
         {
             m_registry = registry;
-            UserAccountService = registry.RequestModuleInterface<IUserAccountService>();
-            AvatarService = registry.RequestModuleInterface<IAvatarService>();
-            AssetService = registry.RequestModuleInterface<IAssetService>();
-            InventoryService = registry.RequestModuleInterface<IInventoryService>();
+            userAccountService = registry.RequestModuleInterface<IUserAccountService>();
+            avatarService = registry.RequestModuleInterface<IAvatarService>();
+            assetService = registry.RequestModuleInterface<IAssetService>();
+            inventoryService = registry.RequestModuleInterface<IInventoryService>();
             m_registry.RegisterModuleInterface<IAvatarAppearanceArchiver>(this);
         }
 

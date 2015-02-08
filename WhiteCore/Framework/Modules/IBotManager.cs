@@ -28,6 +28,7 @@
 using WhiteCore.Framework.SceneInfo;
 using OpenMetaverse;
 using System.Collections.Generic;
+using WhiteCore.Framework.ClientInterfaces;
 
 namespace WhiteCore.Framework.Modules
 {
@@ -48,8 +49,11 @@ namespace WhiteCore.Framework.Modules
 
         UUID CreateAvatar(string firstName, string LastName, IScene scene, UUID cloneAppearanceFrom, UUID creatorID,
                           Vector3 startPos);
+        UUID CreateAvatar (string firstName, string lastName, IScene scene, AvatarAppearance avatarApp,
+                          UUID creatorID, Vector3 startPos);
 
         void RemoveAvatar(UUID Bot, IScene iScene, UUID userAttempting);
+        bool SetAvatarAppearance (UUID botID, AvatarAppearance avatarApp, IScene scene);
 
         #endregion
 
@@ -61,6 +65,12 @@ namespace WhiteCore.Framework.Modules
 
         #endregion
 
+        #region security
+
+        bool CheckPermission(UUID botID, UUID userAttempting);
+
+        #endregion
+
         #region Basic Movement
 
         void SetBotMap(UUID Bot, List<Vector3> positions, List<TravelMode> mode, int flags, UUID userAttempting);
@@ -69,6 +79,9 @@ namespace WhiteCore.Framework.Modules
         void PauseMovement(UUID botID, UUID userAttempting);
         void ResumeMovement(UUID botID, UUID userAttempting);
         void SetSpeed(UUID botID, UUID userAttempting, float speedModifier);
+        void MoveToTarget (UUID botID, Vector3 destination, int options, UUID userAttempting);
+        void StopMoving (UUID botID, UUID userAttempting);
+        void WalkTo (UUID botID, Vector3 destination, UUID userAttempting);
 
         #endregion
 
@@ -76,7 +89,6 @@ namespace WhiteCore.Framework.Modules
 
         void FollowAvatar(UUID botID, string avatarName, float startFollowDistance, float endFollowDistance,
                           bool requireLOS, Vector3 offsetFromAvatar, UUID userAttempting);
-
         void StopFollowAvatar(UUID botID, UUID userAttempting);
 
         #endregion
@@ -84,8 +96,15 @@ namespace WhiteCore.Framework.Modules
         #region Chat
 
         void SendChatMessage(UUID botID, string message, int sayType, int channel, UUID userAttempting);
-
         void SendIM(UUID botID, UUID toUser, string message, UUID userAttempting);
+
+        #endregion
+
+        #region helpers
+
+        UUID GetOwner (UUID botID);
+        Vector3 GetPosition (UUID botID, UUID userAttempting);
+        Quaternion GetRotation (UUID botID, UUID userAttempting);
 
         #endregion
 

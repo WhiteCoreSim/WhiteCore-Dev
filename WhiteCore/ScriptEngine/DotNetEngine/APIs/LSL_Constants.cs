@@ -788,6 +788,17 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLString JSON_NULL = "JSON_NULL";
         public static readonly LSL_Types.LSLString JSON_APPEND = "JSON_APPEND";
 
+        // Constants for osNpc* functions
+        public static readonly LSL_Types.LSLInteger OS_NPC_FLY = 0;
+        public static readonly LSL_Types.LSLInteger OS_NPC_NO_FLY = 1;
+        public static readonly LSL_Types.LSLInteger OS_NPC_LAND_AT_TARGET = 2;
+        public static readonly LSL_Types.LSLInteger OS_NPC_RUNNING = 4;
+        public static readonly LSL_Types.LSLInteger OS_NPC_SIT_NOW = 0;
+
+        public static readonly LSL_Types.LSLInteger OS_NPC_CREATOR_OWNED = 0x1;
+        public static readonly LSL_Types.LSLInteger OS_NPC_NOT_OWNED = 0x2;
+        public static readonly LSL_Types.LSLInteger OS_NPC_SENSE_AS_AGENT = 0x4;
+
         /// <summary>
         /// process name parameter as regex
         /// </summary>

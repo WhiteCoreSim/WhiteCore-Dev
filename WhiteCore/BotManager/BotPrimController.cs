@@ -36,11 +36,11 @@ namespace WhiteCore.BotManager
 {
     public class BotPrimController : IBotController
     {
-        private ISceneEntity m_object;
-        private Bot m_bot;
-        private bool m_run;
-        private float m_speed = 1;
-        private bool m_hasStoppedMoving = false;
+        ISceneEntity m_object;
+        Bot m_bot;
+        bool m_run;
+        float m_speed = 1;
+        bool m_hasStoppedMoving;
 
         public BotPrimController(ISceneEntity obj, Bot bot)
         {
@@ -115,6 +115,7 @@ namespace WhiteCore.BotManager
         {
             if (isMoving)
                 m_hasStoppedMoving = false;
+
             m_object.AbsolutePosition += toward*(m_speed*(1f/45f));
             m_object.ScheduleGroupTerseUpdate();
         }
@@ -125,7 +126,7 @@ namespace WhiteCore.BotManager
                 m_object.ScheduleGroupTerseUpdate();
         }
 
-        public void Teleport(OpenMetaverse.Vector3 pos)
+        public void Teleport(Vector3 pos)
         {
             m_object.AbsolutePosition = pos;
         }
@@ -141,13 +142,16 @@ namespace WhiteCore.BotManager
                 return;
             m_hasStoppedMoving = true;
             m_bot.State = BotState.Idle;
+
             //Clear out any nodes
             if (clearPath)
                 m_bot.m_nodeGraph.Clear();
+
             //Send the stop message
             m_bot.m_movementFlag = (uint) AgentManager.ControlFlags.NONE;
             if (fly)
                 m_bot.m_movementFlag |= (uint) AgentManager.ControlFlags.AGENT_CONTROL_FLY;
+
             OnBotAgentUpdate(Vector3.Zero, m_bot.m_movementFlag, m_bot.m_bodyDirection, false);
 
             if (m_object.RootChild.PhysActor != null)
