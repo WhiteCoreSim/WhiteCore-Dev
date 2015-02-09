@@ -355,8 +355,19 @@ namespace WhiteCore.Modules
                 //            ? 0 
                 //            : info.RegionLocZ / Constants.RegionSize)).ToString ())) * Constants.RegionSize;
 
-                info.RegionSizeX = int.Parse (MainConsole.Instance.Prompt ("Region size X", info.RegionSizeX.ToString ()));
-                info.RegionSizeY = int.Parse (MainConsole.Instance.Prompt ("Region size Y", info.RegionSizeY.ToString ()));
+                do
+                {
+                    info.RegionSizeX = int.Parse (MainConsole.Instance.Prompt ("Region size X", info.RegionSizeX.ToString ()));
+                    if (info.RegionSizeX > Constants.MaxRegionSize)
+                        MainConsole.Instance.CleanInfo ("    Sorry, size cannot be greater than the recommended maximum of " + Constants.MaxRegionSize);
+                } while (info.RegionSizeX > Constants.MaxRegionSize);
+
+                do
+                {
+                    info.RegionSizeY = int.Parse (MainConsole.Instance.Prompt ("Region size Y", info.RegionSizeY.ToString ()));
+                    if (info.RegionSizeY > Constants.MaxRegionSize)
+                        MainConsole.Instance.CleanInfo ("    Sorry, size cannot be greater than the recommended maximum of " + Constants.MaxRegionSize);
+                } while (info.RegionSizeY > Constants.MaxRegionSize);
 
                 // * Mainland / Full Region (Private)
                 // * Mainland / Homestead

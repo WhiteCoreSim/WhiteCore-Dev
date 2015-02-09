@@ -48,6 +48,7 @@ namespace WhiteCore.Framework.Utilities
         public const int RegionHeight = 10000;
         public const byte TerrainPatchSize = 16;
         public const float TerrainCompression = 100.0f;
+        public const int MaxRegionSize = 4096;
         public const int MinRegionSize = 16;
 
 		public const int SystemUserCount = 2;

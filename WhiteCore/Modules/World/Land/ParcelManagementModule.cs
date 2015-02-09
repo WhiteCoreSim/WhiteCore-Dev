@@ -2001,7 +2001,7 @@ namespace WhiteCore.Modules.Land
                             int startX, startY;
                             int maxRsize = m_scene.GridService.GetMaxRegionSize();
 
-                            if(maxRsize == 0) maxRsize = 8192;
+                            if(maxRsize == 0) maxRsize = Constants.MaxRegionSize;
                             startX = regX - maxRsize;
                             startY = regY - maxRsize;
 

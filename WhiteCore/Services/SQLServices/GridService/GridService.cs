@@ -54,7 +54,7 @@ namespace WhiteCore.Services.SQLServices.GridService
         protected bool m_DisableRegistrations;
         protected bool m_UseSessionID = true;
         protected IConfigSource m_config;
-        protected int m_maxRegionSize = 8192;
+        protected int m_maxRegionSize = Constants.MaxRegionSize;
         protected int m_cachedMaxRegionSize = 0;
         protected int m_cachedRegionViewSize = 0;
         protected IAgentInfoService m_agentInfoService;
@@ -232,11 +232,11 @@ namespace WhiteCore.Services.SQLServices.GridService
             object remoteValue = DoRemoteByURL("GridServerURI");
             if (remoteValue != null || m_doRemoteOnly)
             {
-                m_cachedMaxRegionSize = (int) remoteValue == 0 ? 8192 : (int) remoteValue;
-                if ((int) remoteValue == 0) return 8192;
+                m_cachedMaxRegionSize = (int) remoteValue == 0 ? Constants.MaxRegionSize : (int) remoteValue;
+                if ((int) remoteValue == 0) return Constants.MaxRegionSize;
                 return (int) remoteValue;
             }
-            if (m_maxRegionSize == 0) return 8192;
+            if (m_maxRegionSize == 0) return Constants.MaxRegionSize;
             return m_maxRegionSize;
         }
 

@@ -281,7 +281,7 @@ namespace WhiteCore.Services
                 int regionY = int.Parse(splitUri[3]);
                 int distance = (int)Math.Pow(2, mapLayer);
                 int maxRegionSize = m_gridService.GetMaxRegionSize();
-                if (maxRegionSize == 0) maxRegionSize = 8192;
+                if (maxRegionSize == 0) maxRegionSize = Constants.MaxRegionSize;
                 List<GridRegion> regions = m_gridService.GetRegionRange(null,
                                                                     ((regionX) * Constants.RegionSize) - maxRegionSize,
                                                                     ((regionX + distance) * Constants.RegionSize) + maxRegionSize,
@@ -394,7 +394,7 @@ namespace WhiteCore.Services
             if (regions == null)
             {
                 int maxRegionSize = m_gridService.GetMaxRegionSize();
-                if (maxRegionSize == 0) maxRegionSize = 8192;
+                if (maxRegionSize == 0) maxRegionSize = Constants.MaxRegionSize;
                 regions = m_gridService.GetRegionRange(null,
                                                                     (regionX * Constants.RegionSize) - maxRegionSize,
                                                                     (regionX * Constants.RegionSize) + maxRegionSize,
