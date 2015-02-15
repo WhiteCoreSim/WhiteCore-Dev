@@ -973,7 +973,13 @@ namespace WhiteCore.Region
                 }
                 return m_angularVelocity;
             }
-            set { m_angularVelocity = value; }
+            set 
+            { 
+                m_angularVelocity = value;
+                PhysicsActor actor = PhysActor;
+                if ((actor != null) && actor.IsPhysical)
+                    actor.RotationalVelocity = m_angularVelocity;
+            }
         }
 
         public void GenerateRotationalVelocityFromOmega()
@@ -4985,17 +4991,42 @@ namespace WhiteCore.Region
                 }
                 if (APIDEnabled)
                 {
-                    if (APIDIterations <= 1)
+                    PhysicsActor pa = ParentGroup.RootPart.PhysActor;
+                    if (pa == null || !pa.IsPhysical || APIDStrength < 0.04)
                     {
-                        UpdateRotation(APIDTarget);
-                        APIDTarget = Quaternion.Identity;
+                        StopLookAt();
                         return;
                     }
 
-                    Quaternion rot = Quaternion.Slerp(GetRotationOffset(), APIDTarget, 1.0f/(float) APIDIterations);
-                    UpdateRotation(rot);
+                    Quaternion currRot = GetWorldRotation();
+                    currRot.Normalize();
 
-                    APIDIterations--;
+                    // difference between current orientation and desired orientation
+                    Quaternion dR = new Quaternion(currRot.X, currRot.Y, currRot.Z, -currRot.W) * APIDTarget;
+
+                    // find axis of rotation to rotate to desired orientation
+                    Vector3 axis = Vector3.UnitX;
+                    float s = (float)Math.Sqrt(1.0f - dR.W * dR.W);
+                    if (s >= 0.001)
+                    {
+                        float invS = 1.0f / s;
+                        if (dR.W < 0) invS = -invS;
+                        axis = new Vector3(dR.X * invS, dR.Y * invS, dR.Z * invS) * currRot;
+                        axis.Normalize();
+                    }
+
+                    // angle between current and desired orientation
+                    float angle = 2.0f * (float)Math.Acos(dR.W);
+                    if (angle > Math.PI)
+                        angle = 2.0f * (float)Math.PI - angle;
+
+                    // clamp strength to avoid overshoot
+                    float strength = 1.0f / APIDStrength;
+                    if (strength > 1.0) strength = 1.0f;
+
+                    // set angular velocity to rotate to desired orientation
+                    // with velocity proportional to strength and angle
+                    AngularVelocity = axis * angle * strength * (float)Math.PI;
                 }
             }
             catch (Exception ex)

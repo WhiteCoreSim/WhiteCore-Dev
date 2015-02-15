@@ -9381,7 +9381,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                     res.Add(new LSL_Vector(textColor.R,
                                            textColor.G,
                                            textColor.B));
-                    res.Add(new LSL_Float(textColor.A));
+                    res.Add(new LSL_Float(1 - textColor.A));
                 }
                 else if (code == (int)ScriptBaseClass.PRIM_ROT_LOCAL)
                 {
