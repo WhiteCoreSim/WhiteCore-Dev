@@ -47,7 +47,7 @@ namespace WhiteCore.Framework.ClientInterfaces
         public static readonly byte[] BAKE_INDICES = new byte[] {8, 9, 10, 11, 19, 20};
         
         private int m_serial = 1;
-        protected byte[] m_visualparams;
+        private byte[] m_visualparams;
         private Primitive.TextureEntry m_texture;
         private AvatarWearable[] m_wearables;
         private Dictionary<int, List<AvatarAttachment>> m_attachments;        
