@@ -45,7 +45,8 @@ namespace WhiteCore.Modules.Sun
         //
         private const double m_SeasonalTilt = 0.03*Math.PI; // A daily shift of approximately 1.7188 degrees
         private const double m_AverageTilt = -0.25*Math.PI; // A 45 degree tilt
-        private const double m_SunCycle = 2.0D*Math.PI; // A perfect circle measured in radians
+        //private const double m_SunCycle = 2.0D*Math.PI; // A perfect circle measured in radians
+        private const double m_SunCycle = Math.PI;
         private const double m_SeasonalCycle = 2.0D*Math.PI; // Ditto
         private const int TICKS_PER_SECOND = 10000000;
 
@@ -73,10 +74,8 @@ namespace WhiteCore.Modules.Sun
         private Vector3 Velocity = Vector3.Zero;
         private double d_DayTimeSunHourScale = 0.5; // Day/Night hours are equal
         private double d_day_length = 4; // A VW day is 4 RW hours long
-
         private double d_day_night = 0.5;
         // axis offset: Default Horizon shift to try and closely match the sun model in LL Viewer
-
         private int d_frame_mod = 25; // Every 2 seconds (actually less)
         private string d_mode = "SL";
         private int d_year_length = 60; // There are 60 VW days in a VW year
@@ -84,7 +83,6 @@ namespace WhiteCore.Modules.Sun
         private double m_DayTimeSunHourScale;
         private double m_HorizonShift;
         private string m_RegionMode = "SL";
-
 
         // Used to fix the sun in the sky so it doesn't move based on current time
         private bool m_SunFixed;
@@ -107,7 +105,7 @@ namespace WhiteCore.Modules.Sun
         // Current time in elapsed seconds since Jan 1st 1970
         private ulong CurrentTime
         {
-            get { return (ulong) (((DateTime.Now.Ticks) - TicksToEpoch + TicksUTCOffset)/TICKS_PER_SECOND); }
+            get { return (ulong) (((DateTime.Now.Ticks) - TicksToEpoch + TicksUTCOffset)); }
         }
 
         // Time in seconds since UTC to use to calculate sun position.
@@ -155,8 +153,7 @@ namespace WhiteCore.Modules.Sun
 
         public float GetCurrentSunHour()
         {
-            float ticksleftover = CurrentTime%SecondsPerSunCycle;
-
+            float ticksleftover = (CurrentTime/TICKS_PER_SECOND)%SecondsPerSunCycle;
 
             return (24.0f*(ticksleftover/SecondsPerSunCycle));
         }
@@ -202,10 +199,6 @@ namespace WhiteCore.Modules.Sun
                 {
                     // Mode: determines how the sun is handled
                     m_RegionMode = m_config.Configs["Sun"].GetString("mode", d_mode);
-                    // Mode: determines how the sun is handled
-                    // m_latitude = config.Configs["Sun"].GetDouble("latitude", d_latitude);
-                    // Mode: determines how the sun is handled
-                    // m_longitude = config.Configs["Sun"].GetDouble("longitude", d_longitude);
                     // Year length in days
                     m_YearLengthDays = m_config.Configs["Sun"].GetInt("year_length", d_year_length);
                     // Day length in decimal hours
@@ -215,11 +208,9 @@ namespace WhiteCore.Modules.Sun
                     // must hard code to ~.5 to match sun position in LL based viewers
                     m_HorizonShift = m_config.Configs["Sun"].GetDouble("day_night_offset", d_day_night);
 
-
                     // Scales the sun hours 0...12 vs 12...24, essentially makes daylight hours longer/shorter vs nighttime hours
                     m_DayTimeSunHourScale = m_config.Configs["Sun"].GetDouble("day_time_sun_hour_scale",
                                                                               d_DayTimeSunHourScale);
-
                     // Update frequency in frames
                     m_UpdateInterval = m_config.Configs["Sun"].GetInt("update_interval", d_frame_mod);
                 }
@@ -231,9 +222,6 @@ namespace WhiteCore.Modules.Sun
                     m_HorizonShift = d_day_night;
                     m_UpdateInterval = d_frame_mod;
                     m_DayTimeSunHourScale = d_DayTimeSunHourScale;
-
-                    // m_latitude    = d_latitude;
-                    // m_longitude   = d_longitude;
                 }
             }
             catch (Exception e)
@@ -282,13 +270,6 @@ namespace WhiteCore.Modules.Sun
                     scene.EventManager.OnEstateToolsSunUpdate += EstateToolsSunUpdate;
 
                     ready = true;
-
-                    //MainConsole.Instance.Debug("[SUN]: Mode is " + m_RegionMode);
-                    //MainConsole.Instance.Debug("[SUN]: Initialization completed. Day is " + SecondsPerSunCycle + " seconds, and year is " + m_YearLengthDays + " days");
-                    //MainConsole.Instance.Debug("[SUN]: Axis offset is " + m_HorizonShift);
-                    //MainConsole.Instance.Debug("[SUN]: Percentage of time for daylight " + m_DayTimeSunHourScale);
-                    //MainConsole.Instance.Debug("[SUN]: Positional data updated every " + m_UpdateInterval + " frames");
-
                     break;
             }
 
@@ -399,10 +380,7 @@ namespace WhiteCore.Modules.Sun
 
                 m_SunFixedHour = fixedSunHour;
                 m_SunFixed = fixedSun;
-
-                //MainConsole.Instance.DebugFormat("[SUN]: Sun Settings Update: Fixed Sun? : {0}", m_SunFixed.ToString());
-                //MainConsole.Instance.DebugFormat("[SUN]: Sun Settings Update: Sun Hour   : {0}", m_SunFixedHour.ToString());
-
+                
                 // Generate shared values
                 GenSunPos();
 
@@ -424,7 +402,7 @@ namespace WhiteCore.Modules.Sun
             if (!m_sunIsReadyToRun)
                 return; //We havn't set up the time for this region yet!
             // Time in seconds since UTC to use to calculate sun position.
-            PosTime = CurrentTime;
+            PosTime = (CurrentTime/TICKS_PER_SECOND);
 
             if (m_SunFixed)
             {
@@ -437,7 +415,7 @@ namespace WhiteCore.Modules.Sun
 
                 // Integer math rounded is on purpose to drop fractional day, determines number 
                 // of virtual days since Epoch
-                PosTime = CurrentTime/SecondsPerSunCycle;
+                PosTime = (CurrentTime/TICKS_PER_SECOND)/SecondsPerSunCycle;
 
                 // Since we want number of seconds since Epoch, multiply back up
                 PosTime *= SecondsPerSunCycle;
@@ -450,13 +428,13 @@ namespace WhiteCore.Modules.Sun
             {
                 if (m_DayTimeSunHourScale != 0.5f)
                 {
-                    ulong CurDaySeconds = CurrentTime%SecondsPerSunCycle;
+                	ulong CurDaySeconds = (CurrentTime/TICKS_PER_SECOND)%SecondsPerSunCycle;
                     double CurDayPercentage = (double) CurDaySeconds/SecondsPerSunCycle;
 
                     ulong DayLightSeconds = (ulong) (m_DayTimeSunHourScale*SecondsPerSunCycle);
                     ulong NightSeconds = SecondsPerSunCycle - DayLightSeconds;
 
-                    PosTime = CurrentTime/SecondsPerSunCycle;
+                    PosTime = (CurrentTime/TICKS_PER_SECOND)/SecondsPerSunCycle;
                     PosTime *= SecondsPerSunCycle;
 
                     if (CurDayPercentage < 0.5)
