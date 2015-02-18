@@ -141,6 +141,10 @@ namespace WhiteCore.Framework.SceneInfo
 
         public event SignificantClientMovement OnClientMovement;
 
+        public delegate void OnTerrainTickDelegate();
+
+        public event OnTerrainTickDelegate OnTerrainTick;
+
         public delegate void SignificantObjectMovement(ISceneEntity group);
 
         public event SignificantObjectMovement OnSignificantObjectMovement;
@@ -1769,5 +1773,28 @@ namespace WhiteCore.Framework.SceneInfo
                 }
             }
         }
+        
+        public void TriggerTerrainTick()
+        {
+            OnTerrainTickDelegate handlerTerrainTick = OnTerrainTick;
+            if (handlerTerrainTick != null)
+            {
+                foreach (OnTerrainTickDelegate d in handlerTerrainTick.GetInvocationList())
+                {
+                    try
+                    {
+                        d();
+                    }
+                    catch (Exception e)
+                    {
+                        MainConsole.Instance.ErrorFormat(
+                            "[EVENT MANAGER]: Delegate for TriggerTerrainTick failed - continuing.  {0} {1}",
+                            e.Message, e.StackTrace);
+                    }
+                }
+            }
+        }
+
+
     }
 }
