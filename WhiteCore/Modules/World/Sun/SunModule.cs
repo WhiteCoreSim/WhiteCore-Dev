@@ -45,8 +45,7 @@ namespace WhiteCore.Modules.Sun
         //
         private const double m_SeasonalTilt = 0.03*Math.PI; // A daily shift of approximately 1.7188 degrees
         private const double m_AverageTilt = -0.25*Math.PI; // A 45 degree tilt
-        //private const double m_SunCycle = 2.0D*Math.PI; // A perfect circle measured in radians
-        private const double m_SunCycle = Math.PI;
+        private const double m_SunCycle = 2.0D*Math.PI; // A perfect circle measured in radians
         private const double m_SeasonalCycle = 2.0D*Math.PI; // Ditto
         private const int TICKS_PER_SECOND = 10000000;
 
