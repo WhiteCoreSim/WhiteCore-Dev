@@ -66,10 +66,7 @@ namespace WhiteCore.Modules.Permissions
         // Bypasses the permissions engine
         private readonly Dictionary<string, bool> GrantAScript = new Dictionary<string, bool>();
         private readonly Dictionary<string, bool> GrantCS = new Dictionary<string, bool>();
-        private readonly Dictionary<string, bool> GrantJS = new Dictionary<string, bool>();
         private readonly Dictionary<string, bool> GrantLSL = new Dictionary<string, bool>();
-        private readonly Dictionary<string, bool> GrantVB = new Dictionary<string, bool>();
-        private readonly Dictionary<string, bool> GrantYP = new Dictionary<string, bool>();
         private readonly List<UUID> m_allowedAdministrators = new List<UUID>();
         private bool m_ParcelOwnerIsGod;
         private bool m_RegionManagerIsGod;
@@ -79,7 +76,6 @@ namespace WhiteCore.Modules.Permissions
         private bool m_allowGridGods = true;
         private UserSet m_allowedAScriptScriptCompilers = UserSet.All;
         private UserSet m_allowedCSScriptCompilers = UserSet.All;
-        private UserSet m_allowedJSScriptCompilers = UserSet.All;
 
         /// <value>
         ///     The set of users that are allowed to compile certain scripts.  This is only active if
@@ -99,9 +95,6 @@ namespace WhiteCore.Modules.Permissions
         /// </value>
         private UserSet m_allowedScriptEditors = UserSet.All;
 
-
-        private UserSet m_allowedVBScriptCompilers = UserSet.All;
-        private UserSet m_allowedYPScriptCompilers = UserSet.All;
         private bool m_bypassPermissions;
         private bool m_bypassPermissionsValue = true;
         private bool m_debugPermissions;
@@ -261,15 +254,6 @@ namespace WhiteCore.Modules.Permissions
             m_allowedCSScriptCompilers
                 = UserSetHelpers.ParseUserSetConfigSetting(PermissionsConfig, "allowed_cs_script_compilers",
                                                            m_allowedCSScriptCompilers);
-            m_allowedJSScriptCompilers
-                = UserSetHelpers.ParseUserSetConfigSetting(PermissionsConfig, "allowed_js_script_compilers",
-                                                           m_allowedJSScriptCompilers);
-            m_allowedVBScriptCompilers
-                = UserSetHelpers.ParseUserSetConfigSetting(PermissionsConfig, "allowed_vb_script_compilers",
-                                                           m_allowedVBScriptCompilers);
-            m_allowedYPScriptCompilers
-                = UserSetHelpers.ParseUserSetConfigSetting(PermissionsConfig, "allowed_yp_script_compilers",
-                                                           m_allowedYPScriptCompilers);
             m_allowedAScriptScriptCompilers
                 = UserSetHelpers.ParseUserSetConfigSetting(PermissionsConfig, "allowed_ascript_script_compilers",
                                                            m_allowedAScriptScriptCompilers);
@@ -422,33 +406,6 @@ namespace WhiteCore.Modules.Permissions
                 foreach (string uuid in grant.Split(',').Select(uuidl => uuidl.Trim(" \t".ToCharArray())))
                 {
                     GrantCS.Add(uuid, true);
-                }
-            }
-
-            grant = PermissionsConfig.GetString("GrantVB", "");
-            if (grant.Length > 0)
-            {
-                foreach (string uuid in grant.Split(',').Select(uuidl => uuidl.Trim(" \t".ToCharArray())))
-                {
-                    GrantVB.Add(uuid, true);
-                }
-            }
-
-            grant = PermissionsConfig.GetString("GrantJS", "");
-            if (grant.Length > 0)
-            {
-                foreach (string uuid in grant.Split(',').Select(uuidl => uuidl.Trim(" \t".ToCharArray())))
-                {
-                    GrantJS.Add(uuid, true);
-                }
-            }
-
-            grant = PermissionsConfig.GetString("GrantYP", "");
-            if (grant.Length > 0)
-            {
-                foreach (string uuid in grant.Split(',').Select(uuidl => uuidl.Trim(" \t".ToCharArray())))
-                {
-                    GrantYP.Add(uuid, true);
                 }
             }
 
@@ -860,33 +817,6 @@ namespace WhiteCore.Modules.Permissions
                         (m_allowedCSScriptCompilers == UserSet.ParcelOwners &&
                          !GenericParcelPermission(ownerUUID, scene.GetScenePresence(ownerUUID).AbsolutePosition, 0)) ||
                         GrantCS.Count == 0 || GrantCS.ContainsKey(ownerUUID.ToString()))
-                    {
-                        return (true);
-                    }
-                    break;
-                case "vb":
-                    if ((m_allowedVBScriptCompilers == UserSet.Administrators && !IsAdministrator(ownerUUID)) ||
-                        (m_allowedVBScriptCompilers == UserSet.ParcelOwners &&
-                         !GenericParcelPermission(ownerUUID, scene.GetScenePresence(ownerUUID).AbsolutePosition, 0)) ||
-                        GrantVB.Count == 0 || GrantVB.ContainsKey(ownerUUID.ToString()))
-                    {
-                        return (true);
-                    }
-                    break;
-                case "js":
-                    if ((m_allowedJSScriptCompilers == UserSet.Administrators && !IsAdministrator(ownerUUID)) ||
-                        (m_allowedJSScriptCompilers == UserSet.ParcelOwners &&
-                         !GenericParcelPermission(ownerUUID, scene.GetScenePresence(ownerUUID).AbsolutePosition, 0)) ||
-                        GrantJS.Count == 0 || GrantJS.ContainsKey(ownerUUID.ToString()))
-                    {
-                        return (true);
-                    }
-                    break;
-                case "yp":
-                    if ((m_allowedYPScriptCompilers == UserSet.Administrators && !IsAdministrator(ownerUUID)) ||
-                        (m_allowedYPScriptCompilers == UserSet.ParcelOwners &&
-                         !GenericParcelPermission(ownerUUID, scene.GetScenePresence(ownerUUID).AbsolutePosition, 0)) ||
-                        GrantYP.Count == 0 || GrantYP.ContainsKey(ownerUUID.ToString()))
                     {
                         return (true);
                     }
