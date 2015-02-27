@@ -29,6 +29,7 @@ using System;
 
 namespace WhiteCore.DataManager.Migration
 {
+    [Serializable]
     public class MigrationOperationException : Exception
     {
         public MigrationOperationException(string message) : base(message)

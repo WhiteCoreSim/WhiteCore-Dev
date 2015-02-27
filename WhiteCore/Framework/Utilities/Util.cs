@@ -811,8 +811,8 @@ namespace WhiteCore.Framework.Utilities
         /// </remarks>
         /// <param name="dllToLoad"></param>
         /// <returns></returns>
-        [DllImport("kernel32.dll")]
-        public static extern IntPtr LoadLibrary(string dllToLoad);
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+        private static extern IntPtr LoadLibrary(string dllToLoad);
 
         /// <summary>
         /// Determine whether the current process is 64 bit

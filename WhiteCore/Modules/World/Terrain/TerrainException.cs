@@ -29,6 +29,7 @@ using System;
 
 namespace WhiteCore.Modules.Terrain
 {
+    [Serializable]
     public class TerrainException : Exception
     {
         public TerrainException()
