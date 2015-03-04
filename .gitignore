@@ -59,6 +59,8 @@ WhiteCoreSim/Data/ScriptEngines/*/*.state
 WhiteCoreSim/Data/RealEstateUser.txt
 WhiteCoreSim/Data/AvatarArchives/*
 WhiteCoreSim/Data/UserArchives/*
+WhiteCoreSim/Data/Governor.txt
+WhiteCoreSim/Data/SystemEstate.txt
 
 WhiteCoreSim/bin/*.log
 WhiteCoreSim/bin/.version
@@ -103,8 +105,3 @@ TestResult.xml
 *StyleCop.Cache
 *.StyleCop
 debug/*
-
-
-WhiteCoreSim/Data/Governor.txt
-
-WhiteCoreSim/Data/SystemEstate.txt

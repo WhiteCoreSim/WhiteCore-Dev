@@ -1,2 +1,5 @@
-*.cs -crlf
-*.ini -crlf
+# Set the default behaviour, in case people don't have core.autocrlf set.
+* text=auto
+
+*.cs eol=crlf
+*.ini eol=crlf
