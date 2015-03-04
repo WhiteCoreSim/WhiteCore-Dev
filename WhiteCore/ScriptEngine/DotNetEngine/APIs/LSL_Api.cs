@@ -6835,9 +6835,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return new LSL_Integer();
 
-            // Make scripts designed for LSO happy
-            // Fly - Why do we set this to 16K as each script now uses Mono anyways
-            return 16384;
+            // Make scripts designed for Mono happy
+            return 65536;
         }
 
         public LSL_Integer llSetMemoryLimit(LSL_Integer limit)
@@ -6845,9 +6844,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return new LSL_Integer();
 
-            // Make scripts designed for LSO happy
-            // Fly - Why do we set this to 16K as each script now uses Mono anyways
-            return 16384;
+            // Make scripts designed for Mono happy
+            return 65536;
         }
 
         public LSL_Integer llGetMemoryLimit()
@@ -6855,9 +6853,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return new LSL_Integer();
 
-            // Make scripts designed for LSO happy
-            // Fly - Why do we set this to 16K as each script now uses Mono anyways
-            return 16384;
+            // Make scripts designed for Mono happy
+            return 65536;
         }
 
         public LSL_Integer llGetSPMaxMemory()
