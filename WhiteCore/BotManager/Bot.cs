@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
@@ -36,7 +35,6 @@ using WhiteCore.Framework.SceneInfo.Entities;
 using WhiteCore.Framework.Services.ClassHelpers.Inventory;
 using WhiteCore.Framework.Services.ClassHelpers.Other;
 using WhiteCore.Framework.Utilities;
-using Games.Pathfinding.AStar2DTest;
 using OpenMetaverse;
 using OpenMetaverse.Packets;
 using System;
@@ -44,6 +42,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Timers;
+using WhiteCore.BotManager.AStar;
 
 namespace WhiteCore.BotManager
 {

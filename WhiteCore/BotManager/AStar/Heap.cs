@@ -28,7 +28,7 @@
 using System;
 using System.Collections;
 
-namespace Tanis.Collections
+namespace WhiteCore.BotManager.AStar
 {
     /// <summary>
     ///     The Heap allows to maintain a list sorted as long as needed.

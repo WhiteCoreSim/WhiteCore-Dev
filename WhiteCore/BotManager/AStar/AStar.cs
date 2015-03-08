@@ -27,9 +27,8 @@
 
 using System;
 using System.Collections;
-using Tanis.Collections;
 
-namespace Games.Pathfinding
+namespace WhiteCore.BotManager.AStar
 {
     /// <summary>
     ///     Base class for pathfinding nodes, it holds no actual information about the map.

@@ -29,7 +29,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Games.Pathfinding.AStar2DTest
+namespace WhiteCore.BotManager.AStar
 {
     /// <summary>
     ///     A node class for doing pathfinding on a 2-dimensional map

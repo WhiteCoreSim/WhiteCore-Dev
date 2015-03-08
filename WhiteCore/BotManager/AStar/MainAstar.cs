@@ -28,7 +28,7 @@
 using System;
 using System.Collections;
 
-namespace Games.Pathfinding.AStar2DTest
+namespace WhiteCore.BotManager.AStar
 {
     /// <summary>
     ///     Test class for doing A* pathfinding on a 2D map.
