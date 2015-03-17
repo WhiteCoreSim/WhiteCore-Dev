@@ -112,12 +112,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         "moving_start", "moving_end", "not_at_target", "not_at_rot_target" };
             
         //This is the UUID of the actual script.
-        private readonly ScriptEngine m_ScriptEngine;
+        readonly ScriptEngine m_ScriptEngine;
         public Dictionary<string, IScriptApi> Apis;
         public AppDomain AppDomain;
         public string AssemblyName;
         public List<Changed> ChangedInQueue;
-        private double CollisionEventDelayTicks;
+        double CollisionEventDelayTicks;
         public bool CollisionInQueue;
         public bool TimerInQueue;
         public bool TouchInQueue;
@@ -134,8 +134,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         public bool RemoveTouchEvents;
         public bool Compiled;
         public int ControlEventsInQueue;
-        private double DefaultEventDelayTicks;
-        private string DefaultState;
+        double DefaultEventDelayTicks;
+        string DefaultState;
         public bool Disabled;
 
 
@@ -161,13 +161,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         public string State;
         public bool Suspended;
         public bool TargetOmegaWasSet;
-        private double TimerEventDelayTicks;
-        private double TouchEventDelayTicks;
-        private const long TicksPerMillisecond = 1000;
+        double TimerEventDelayTicks;
+        double TouchEventDelayTicks;
+        const long TicksPerMillisecond = 1000;
         public UUID UserInventoryItemID;
-        private System.Threading.Timer m_eventQueueTimer = null;
-        private object m_eventQueueLock = new object();
-        private ConcurrentQueue<QueueItemStruct> m_eventQueue = new ConcurrentQueue<QueueItemStruct>();
+        Timer m_eventQueueTimer = null;
+        object m_eventQueueLock = new object();
+        ConcurrentQueue<QueueItemStruct> m_eventQueue = new ConcurrentQueue<QueueItemStruct>();
 
         /// <summary>
         ///     This helps make sure that we clear out previous versions so that we don't have overlapping script versions running
@@ -264,7 +264,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         /// <summary>
         ///     Removes any permissions the script may have on other avatars.
         /// </summary>
-        private void ReleaseControls()
+        void ReleaseControls()
         {
             if (InventoryItem != null)
             {
@@ -334,6 +334,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             Script.ResetVars();
             //Tell the SOP about the change.
             Part.SetScriptEvents(ItemID, !Running ? 0 : Script.GetStateEventFlags(State));
+
+            StartParam = 0;
 
             //Remove MinEventDelay
             EventDelayTicks = 0;
@@ -908,7 +910,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             return false;
         }
 
-        private void EventQueuePoke(object o)
+        void EventQueuePoke(object o)
         {
             QueueItemStruct itm;
             lock (m_eventQueueLock)
