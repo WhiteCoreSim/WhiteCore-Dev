@@ -2066,12 +2066,23 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             AssetBase asset = new AssetBase(UUID.Random(), name, AssetType.Notecard, m_host.OwnerID);
             asset.Description = description;
 
-            int textLength = data.Length;
-            data
-            = "Linden text version 2\n{\nLLEmbeddedItems version 1\n{\ncount 0\n}\nText length "
-                + textLength.ToString() + "\n" + data + "}\n";
+            byte[] a;
+            byte[] b;
+            byte[] c;
 
-            asset.Data = Util.UTF8.GetBytes(data);
+            b = Util.UTF8.GetBytes(data);
+                       
+            a = Util.UTF8.GetBytes(
+                "Linden text version 2\n{\nLLEmbeddedItems version 1\n{\ncount 0\n}\nText length " + b.Length + "\n");
+
+            c = Util.UTF8.GetBytes("}");
+                        
+            byte[] d = new byte[a.Length + b.Length + c.Length];
+            Buffer.BlockCopy(a, 0, d, 0, a.Length);
+            Buffer.BlockCopy(b, 0, d, a.Length, b.Length);
+            Buffer.BlockCopy(c, 0, d, a.Length + b.Length, c.Length);
+                        
+            asset.Data = d;
             World.AssetService.Store(asset);
 
             // Create Task Entry
