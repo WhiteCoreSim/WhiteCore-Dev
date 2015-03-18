@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<Prebuild version="1.7" xmlns="http://dnpb.sourceforge.net/schemas/prebuild-1.7.xsd">
+<Prebuild version="1.10" xmlns="http://dnpb.sourceforge.net/schemas/prebuild-1.10.xsd">
   <Solution activeConfig="Debug" name="WhiteCore" path="./" version="0.9.3 $Rev$">
     <Configuration name="Debug" platform="x86">
       <Options>
