@@ -7775,13 +7775,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             {
                 cut.y = 1f;
             }
-            if (cut.y - cut.x < 0.05f)
+            if (cut.y - cut.x < 0.02f)
             {
-                cut.x = cut.y - 0.05f;
+                cut.x = cut.y - 0.02f;
                 if (cut.x < 0.0f)
                 {
                     cut.x = 0.0f;
-                    cut.y = 0.05f;
+                    cut.y = 0.02f;
                 }
             }
             shapeBlock.ProfileBegin = (ushort)(50000 * cut.x);
