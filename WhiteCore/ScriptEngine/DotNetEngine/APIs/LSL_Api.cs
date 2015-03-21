@@ -7790,9 +7790,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             {
                 hollow = 0f;
             }
-            if (hollow > 0.95)
+            if (hollow > 0.99)
             {
-                hollow = 0.95f;
+                hollow = 0.99f;
             }
             shapeBlock.ProfileHollow = (ushort)(50000 * hollow);
             if (twist.x < -1.0f)
@@ -7919,9 +7919,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             {
                 dimple.y = 1f;
             }
-            if (dimple.y - cut.x < 0.05f)
+            if (dimple.y - cut.x < 0.02f)
             {
-                dimple.x = cut.y - 0.05f;
+                dimple.x = cut.y - 0.02f;
             }
             shapeBlock.ProfileBegin = (ushort)(50000 * dimple.x);
             shapeBlock.ProfileEnd = (ushort)(50000 * (1 - dimple.y));
@@ -7944,17 +7944,17 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             shapeBlock.PathBegin = shapeBlock.ProfileBegin;
             shapeBlock.PathEnd = shapeBlock.ProfileEnd;
 
-            if (holesize.x < 0.05f)
+            if (holesize.x < 0.02f)
             {
-                holesize.x = 0.05f;
+                holesize.x = 0.02f;
             }
             if (holesize.x > 1f)
             {
                 holesize.x = 1f;
             }
-            if (holesize.y < 0.05f)
+            if (holesize.y < 0.02f)
             {
-                holesize.y = 0.05f;
+                holesize.y = 0.02f;
             }
             if (holesize.y > 0.5f)
             {
@@ -8000,13 +8000,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             {
                 profilecut.y = 1f;
             }
-            if (profilecut.y - profilecut.x < 0.05f)
+            if (profilecut.y - profilecut.x < 0.02f)
             {
-                profilecut.x = profilecut.y - 0.05f;
+                profilecut.x = profilecut.y - 0.02f;
                 if (profilecut.x < 0.0f)
                 {
                     profilecut.x = 0.0f;
-                    profilecut.y = 0.05f;
+                    profilecut.y = 0.02f;
                 }
             }
             shapeBlock.ProfileBegin = (ushort)(50000 * profilecut.x);
