@@ -8009,17 +8009,17 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             shapeBlock.PathBegin = shapeBlock.ProfileBegin;
             shapeBlock.PathEnd = shapeBlock.ProfileEnd;
 
-            if (holesize.x < 0.02f)
+            if (holesize.x < 0.01f)
             {
-                holesize.x = 0.02f;
+                holesize.x = 0.01f;
             }
             if (holesize.x > 1f)
             {
                 holesize.x = 1f;
             }
-            if (holesize.y < 0.02f)
+            if (holesize.y < 0.01f)
             {
-                holesize.y = 0.02f;
+                holesize.y = 0.01f;
             }
             if (holesize.y > 0.5f)
             {
