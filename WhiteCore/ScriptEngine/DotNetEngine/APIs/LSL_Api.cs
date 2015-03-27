@@ -95,6 +95,68 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         internal ScriptProtectionModule ScriptProtection;
         protected IWorldComm m_comms = null;
 
+        // Sleep parameters
+        protected int EMAIL_PAUSE_TIME = 20;  // documented delay value for smtp.
+        protected int m_sleepMsOnSetTexture = 200;
+        protected int m_sleepMsOnSetLinkTexture = 200;
+        protected int m_sleepMsOnScaleTexture = 200;
+        protected int m_sleepMsOnOffsetTexture = 200;
+        protected int m_sleepMsOnRotateTexture = 200;
+        protected int m_sleepMsOnSetPos = 200;
+        protected int m_sleepMsOnSetRot = 200;
+        protected int m_sleepMsOnSetLocalRot = 200;
+        protected int m_sleepMsOnPreloadSound = 1000;
+        protected int m_sleepMsOnMakeExplosion = 100;
+        protected int m_sleepMsOnMakeFountain = 100;
+        protected int m_sleepMsOnMakeSmoke = 100;
+        protected int m_sleepMsOnMakeFire = 100;
+        protected int m_sleepMsOnRezAtRoot = 100;
+        protected int m_sleepMsOnInstantMessage = 2000;
+        protected int m_sleepMsOnEmail = 20000;
+        protected int m_sleepMsOnCreateLink = 1000;
+        protected int m_sleepMsOnGiveInventory = 3000;
+        protected int m_sleepMsOnRequestAgentData = 100;
+        protected int m_sleepMsOnRequestInventoryData = 1000;
+        protected int m_sleepMsOnTeleportAgentHome = 5000;
+        protected int m_sleepMsOnTextBox = 1000;
+        protected int m_sleepMsOnAdjustSoundVolume = 100;
+        protected int m_sleepMsOnEjectFromLand = 5000;
+        protected int m_sleepMsOnAddToLandPassList = 100;
+        protected int m_sleepMsOnDialog = 1000;
+        protected int m_sleepMsOnRemoteLoadScript = 3000;
+        protected int m_sleepMsOnRemoteLoadScriptPin = 3000;
+        protected int m_sleepMsOnOpenRemoteDataChannel = 1000;
+        protected int m_sleepMsOnSendRemoteData = 3000;                 // was 100
+        protected int m_sleepMsOnRemoteDataReply = 3000;                // was 100
+        protected int m_sleepMsOnCloseRemoteDataChannel = 1000;
+        protected int m_sleepMsOnSetPrimitiveParams = 200;
+        protected int m_sleepMsOnSetLinkPrimitiveParams = 200;
+        protected int m_sleepMsOnXorBase64Strings = 300;
+        protected int m_sleepMsOnSetParcelMusicURL = 2000;
+        protected int m_sleepMsOnGetPrimMediaParams = 1000;
+        protected int m_sleepMsOnGetLinkMedia = 1000;
+        protected int m_sleepMsOnSetPrimMediaParams = 1000;
+        protected int m_sleepMsOnSetLinkMedia = 1000;
+        protected int m_sleepMsOnClearPrimMedia = 1000;
+        protected int m_sleepMsOnClearLinkMedia = 1000;
+        protected int m_sleepMsOnRequestSimulatorData = 1000;
+        protected int m_sleepMsOnLoadURL = 10000;
+        protected int m_sleepMsOnParcelMediaCommandList = 2000;
+        protected int m_sleepMsOnParcelMediaQuery = 2000;
+        protected int m_sleepMsOnModPow = 1000;
+        protected int m_sleepMsOnSetPrimURL = 2000;
+        protected int m_sleepMsOnRefreshPrimURL = 20000;
+        protected int m_sleepMsOnMapDestination = 1000;
+        protected int m_sleepMsOnAddToLandBanList = 100;
+        protected int m_sleepMsOnRemoveFromLandPassList = 100;
+        protected int m_sleepMsOnRemoveFromLandBanList = 100;
+        protected int m_sleepMsOnResetLandBanList = 100;
+        protected int m_sleepMsOnResetLandPassList = 100;
+        protected int m_sleepMsOnGetParcelPrimOwners = 2000;
+        protected int m_sleepMsOnGetNumberOfNotecardLines = 100;
+        protected int m_sleepMsOnGetNotecardLine = 100;
+        protected int m_sleepMsOnRequestUserName = 100;
+
         // MUST be a ref type
         public class UserInfoCacheEntry
         {
@@ -140,6 +202,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 World.RequestModuleInterface<IMessageTransferModule>();
             m_UrlModule = World.RequestModuleInterface<IUrlModule>();
             m_comms = World.RequestModuleInterface<IWorldComm>();
+
+            m_sleepMsOnEmail = EMAIL_PAUSE_TIME * 1000;
+
         }
 
         public IScriptApi Copy()
@@ -207,7 +272,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         protected DateTime PScriptSleep(int delay)
         {
             double dly = (delay * m_ScriptDelayFactor);
-            if (dly == 0.0)
+            if (dly <= DoubleDifference)
                 return DateTime.Now;
 
             DateTime timeToStopSleeping = DateTime.Now.AddMilliseconds(dly);
@@ -1987,7 +2052,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 return DateTime.Now;
 
             SetTexture(m_host, texture, face);
-            return PScriptSleep(200);
+            return PScriptSleep(m_sleepMsOnSetTexture);
         }
 
         public DateTime llSetLinkTexture(int linknumber, string texture, int face)
@@ -2001,7 +2066,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             foreach (ISceneChildEntity part in parts)
                 SetTexture(part, texture, face);
 
-            return PScriptSleep(100);
+            return PScriptSleep(m_sleepMsOnSetLinkTexture);
         }
 
         protected bool SetTexture(ISceneChildEntity part, string texture, int face)
@@ -2044,7 +2109,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
 
             ScaleTexture(m_host, u, v, face);
-            return PScriptSleep(200);
+            return PScriptSleep(m_sleepMsOnScaleTexture);
         }
 
         protected void ScaleTexture(ISceneChildEntity part, double u, double v, int face)
@@ -2082,7 +2147,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 return DateTime.Now;
 
             OffsetTexture(m_host, u, v, face);
-            return PScriptSleep(200);
+            return PScriptSleep(m_sleepMsOnOffsetTexture);
         }
 
         protected void OffsetTexture(ISceneChildEntity part, double u, double v, int face)
@@ -2120,7 +2185,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 return DateTime.Now;
 
             RotateTexture(m_host, rotation, face);
-            return PScriptSleep(200);
+            return PScriptSleep(m_sleepMsOnRotateTexture);
         }
 
         protected void RotateTexture(ISceneChildEntity part, double rotation, int face)
@@ -2186,7 +2251,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             SetPos(m_host, pos, true);
 
-            return PScriptSleep(200);
+            return PScriptSleep(m_sleepMsOnSetPos);
         }
 
         public LSL_Integer llSetRegionPos(LSL_Vector pos)
@@ -2302,7 +2367,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             // try to let this work as in SL...
             SetLinkRot(m_host, rot);
-            return PScriptSleep(200);
+            return PScriptSleep(m_sleepMsOnSetRot);
         }
 
         private void SetLinkRot(ISceneChildEntity obj, LSL_Rotation rot)
@@ -2333,7 +2398,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 return DateTime.Now;
 
             SetRot(m_host, Rot2Quaternion(rot));
-            return PScriptSleep(200);
+            return PScriptSleep(m_sleepMsOnSetLocalRot);
         }
 
         protected void SetRot(ISceneChildEntity part, Quaternion rot)
@@ -2824,7 +2889,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 return DateTime.Now;
 
             m_host.PreloadSound(sound);
-            return PScriptSleep(1000);
+            return PScriptSleep(m_sleepMsOnPreloadSound);
         }
 
         /// <summary>
@@ -3089,7 +3154,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 return DateTime.Now;
 
             Deprecated("llMakeExplosion", "Use llParticleSystem instead");
-            return PScriptSleep(100);
+            return PScriptSleep(m_sleepMsOnMakeExplosion);
         }
 
         public DateTime llMakeFountain(int particles, double scale, double vel, double lifetime, double arc, int bounce,
@@ -3099,7 +3164,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 return DateTime.Now;
 
             Deprecated("llMakeFountain", "Use llParticleSystem instead");
-            return PScriptSleep(100);
+            return PScriptSleep(m_sleepMsOnMakeFountain);
         }
 
         public DateTime llMakeSmoke(int particles, double scale, double vel, double lifetime, double arc, string texture,
@@ -3109,7 +3174,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 return DateTime.Now;
 
             Deprecated("llMakeSmoke", "Use llParticleSystem instead");
-            return PScriptSleep(100);
+            return PScriptSleep(m_sleepMsOnMakeSmoke);
         }
 
         public DateTime llMakeFire(int particles, double scale, double vel, double lifetime, double arc, string texture,
@@ -3119,7 +3184,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 return DateTime.Now;
 
             Deprecated("llMakeFire", "Use llParticleSystem instead");
-            return PScriptSleep(100);
+            return PScriptSleep(m_sleepMsOnMakeFire);
         }
 
         public DateTime llRezAtRoot(string inventory, LSL_Vector pos, LSL_Vector vel, LSL_Rotation rot, int param)
@@ -3258,7 +3323,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                             new_group.RootChild.SetDieAtEdge(true);
 
                         // Variable script delay? (see (http://wiki.secondlife.com/wiki/LSL_Delay)
-                        return PScriptSleep(100);
+                        return PScriptSleep(m_sleepMsOnRezAtRoot);
                     }
                 }
 
@@ -3833,7 +3898,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             {
                 m_TransferModule.SendInstantMessage(msg);
             }
-            return PScriptSleep(2000);
+            return PScriptSleep(m_sleepMsOnInstantMessage);
         }
 
         public DateTime llEmail(string address, string subject, string message)
@@ -3848,7 +3913,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             }
 
             emailModule.SendEmail(m_host.UUID, address, subject, message, World);
-            return PScriptSleep(20000);
+            return PScriptSleep(m_sleepMsOnEmail);
         }
 
         public void llGetNextEmail(string address, string subject)
@@ -4432,7 +4497,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (client != null)
                 parentPrim.GetProperties(client);
 
-            return PScriptSleep(1000);
+            return PScriptSleep(m_sleepMsOnCreateLink);
         }
 
         public void llBreakLink(int linknum)
@@ -4745,7 +4810,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 if (inventoryModule != null)
                     inventoryModule.MoveTaskInventoryItemToObject(destId, m_host, objId);
             }
-            return PScriptSleep(3000);
+            return PScriptSleep(m_sleepMsOnGiveInventory);
         }
 
         public void llRemoveInventory(string name)
@@ -4876,7 +4941,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             dataserverPlugin.AddReply(rq.ToString(), reply, 100);
 
-            ScriptSleep(200);
+            PScriptSleep(m_sleepMsOnRequestAgentData);
             return tid.ToString();
         }
 
@@ -4916,11 +4981,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                                                                          reply, 1000);
                                            });
 
-                    ScriptSleep(1000);
+                    PScriptSleep(m_sleepMsOnRequestInventoryData);
                     return tid.ToString();
                 }
             }
-            ScriptSleep(1000);
+            PScriptSleep(m_sleepMsOnRequestInventoryData);
             return String.Empty;
         }
 
@@ -4956,7 +5021,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                             presence.AbsolutePosition.X, presence.AbsolutePosition.Y).LandData.OwnerID &&
                             !World.Permissions.CanIssueEstateCommand(m_host.OwnerID, false))
                         {
-                            return PScriptSleep(5000);
+                            return PScriptSleep(m_sleepMsOnTeleportAgentHome);
                         }
                     }
 
@@ -4969,7 +5034,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                         presence.ControllingClient.SendTeleportFailed("Unable to perform teleports on this simulator.");
                 }
             }
-            return PScriptSleep(5000);
+            return PScriptSleep(m_sleepMsOnTeleportAgentHome);
         }
 
         public DateTime llTextBox(string agent, string message, int chatChannel)
@@ -4993,7 +5058,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 message = message.Substring(0, 1024);
 
             dm.SendTextBoxToUser(av, message, chatChannel, m_host.Name, m_host.UUID, m_host.OwnerID);
-            return PScriptSleep(1000);
+            return PScriptSleep(m_sleepMsOnTextBox);
         }
 
         public void llModifyLand(int action, int brush)
@@ -6433,7 +6498,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 return DateTime.Now;
 
             m_host.AdjustSoundGain(volume);
-            return PScriptSleep(100);
+            return PScriptSleep(m_sleepMsOnAdjustSoundVolume);
         }
 
         public void llSetSoundQueueing(int queue)
@@ -6579,7 +6644,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                             presence.AbsolutePosition.X, presence.AbsolutePosition.Y).LandData.OwnerID &&
                             !World.Permissions.CanIssueEstateCommand(m_host.OwnerID, false))
                         {
-                            return PScriptSleep(5000);
+                            return PScriptSleep(m_sleepMsOnEjectFromLand);
                         }
                     }
                     IEntityTransferModule transferModule = World.RequestModuleInterface<IEntityTransferModule>();
@@ -6589,7 +6654,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                         presence.ControllingClient.SendTeleportFailed("Unable to perform teleports on this simulator.");
                 }
             }
-            return PScriptSleep(5000);
+            return PScriptSleep(m_sleepMsOnEjectFromLand);
         }
 
         public LSL_Integer llOverMyLand(string id)
@@ -7462,7 +7527,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                     }
                 }
             }
-            return PScriptSleep(100);
+            return PScriptSleep(m_sleepMsOnAddToLandPassList);
         }
 
         public void llSetTouchText(string text)
@@ -7548,7 +7613,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             {
                 //Silently accepted in in SL NOTE: it does sleep though!
                 //LSLError("First parameter to llDialog needs to be a key");
-                return PScriptSleep(1000);
+                return PScriptSleep(m_sleepMsOnDialog);
             }
             if (buttons.Length > 12)
             {
@@ -7577,7 +7642,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 av, m_host.Name, m_host.UUID, m_host.OwnerID,
                 message, new UUID("00000000-0000-2222-3333-100000001000"), chat_channel, buts);
 
-            return PScriptSleep(1000);
+            return PScriptSleep(m_sleepMsOnDialog);
         }
 
         public void llVolumeDetect(int detect)
@@ -7604,7 +7669,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             // Report an error as it does in SL
             Deprecated("llRemoteLoadScript", "Use llRemoteLoadScriptPin instead");
-            return PScriptSleep(3000);
+            return PScriptSleep(m_sleepMsOnRemoteLoadScript);
         }
 
         public void llSetRemoteScriptAccessPin(int pin)
@@ -7664,7 +7729,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (inventoryModule != null)
                 inventoryModule.RezScript(srcId, m_host, destId, pin, running, start_param);
             // this will cause the delay even if the script pin or permissions were wrong - seems ok
-            return PScriptSleep(3000);
+            return PScriptSleep(m_sleepMsOnRemoteLoadScriptPin);
         }
 
         public DateTime llOpenRemoteDataChannel()
@@ -7698,7 +7763,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                                                                                       new DetectParams[0]),
                                                EventPriority.FirstStart);
             }
-            return PScriptSleep(1000);
+            return PScriptSleep(m_sleepMsOnOpenRemoteDataChannel);
         }
 
         public LSL_Key llSendRemoteData(string channel, string dest, int idata, string sdata)
@@ -7706,7 +7771,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return "";
 
             IXMLRPC xmlrpcMod = World.RequestModuleInterface<IXMLRPC>();
-            ScriptSleep(3000);
+            ScriptSleep(m_sleepMsOnSendRemoteData);
             return (xmlrpcMod.SendRemoteData(m_host.UUID, m_itemID, channel, dest, idata, sdata)).ToString();
         }
 
@@ -7717,7 +7782,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             IXMLRPC xmlrpcMod = World.RequestModuleInterface<IXMLRPC>();
             xmlrpcMod.RemoteDataReply(channel, message_id, sdata, idata);
-            return PScriptSleep(100);
+            return PScriptSleep(m_sleepMsOnRemoteDataReply);
         }
 
         public DateTime llCloseRemoteDataChannel(object _channel)
@@ -7727,7 +7792,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             IXMLRPC xmlrpcMod = World.RequestModuleInterface<IXMLRPC>();
             xmlrpcMod.CloseXMLRPCChannel(UUID.Parse(_channel.ToString()));
-            return PScriptSleep(100);
+            return PScriptSleep(m_sleepMsOnCloseRemoteDataChannel);
         }
 
         public LSL_String llMD5String(string src, int nonce)
@@ -8104,6 +8169,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
 
             SetPrimParams(m_host, rules, m_allowOpenSimParams);
+            PScriptSleep(m_sleepMsOnSetPrimitiveParams);
         }
 
         public void llSetLinkPrimitiveParams(int linknumber, LSL_List rules)
@@ -8115,6 +8181,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             foreach (IEntity part in parts)
                 SetPrimParams(part, rules, m_allowOpenSimParams);
+
+            PScriptSleep(m_sleepMsOnSetLinkPrimitiveParams);
         }
 
         public void llSetLinkPrimitiveParamsFast(int linknumber, LSL_List rules)
@@ -8727,7 +8795,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return "";
 
             Deprecated("llXorBase64Strings", "Use llXorBase64 instead");
-            ScriptSleep(300);
+            PScriptSleep(m_sleepMsOnXorBase64Strings);
             return String.Empty;
         }
 
@@ -8789,7 +8857,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 land.SetMusicUrl(url);
             }
 
-            return PScriptSleep(2000);
+            return PScriptSleep(m_sleepMsOnSetParcelMusicURL);
         }
 
         public LSL_Vector llGetRootPosition()
@@ -10323,7 +10391,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             {
             }
 
-            ScriptSleep(1000);
+            PScriptSleep(m_sleepMsOnRequestSimulatorData);
             return (LSL_Key)tid.ToString();
         }
 
@@ -10424,7 +10492,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 dm.SendUrlToUser(
                     new UUID(avatar_id), m_host.Name, m_host.UUID, m_host.OwnerID, false, message, url);
 
-            return PScriptSleep(10000);
+            return PScriptSleep(m_sleepMsOnLoadURL);
         }
 
         public DateTime llParcelMediaCommandList(LSL_List commandList)
@@ -10702,7 +10770,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                     }
                 }
             }
-            return PScriptSleep(2000);
+            return PScriptSleep(m_sleepMsOnParcelMediaCommandList);
         }
 
         public LSL_List llParcelMediaQuery(LSL_List aList)
@@ -10780,7 +10848,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                     }
                 }
             }
-            ScriptSleep(2000);
+            PScriptSleep(m_sleepMsOnParcelMediaQuery);
             return list;
         }
 
@@ -10788,7 +10856,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return new LSL_List();
-            ScriptSleep(1000);
+            PScriptSleep(m_sleepMsOnGetPrimMediaParams);
 
             // LSL Spec http://wiki.secondlife.com/wiki/LlGetPrimMediaParams says to fail silently if face is invalid
             // TODO: Need to correctly handle case where a face has no media (which gives back an empty list).
@@ -10803,6 +10871,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return new LSL_List();
 
+            PScriptSleep(m_sleepMsOnGetLinkMedia);
             List<ISceneChildEntity> entities = GetLinkParts(link);
             if (entities.Count == 0 || face < 0 || face > entities[0].GetNumberOfSides() - 1)
                 return new LSL_List();
@@ -10908,7 +10977,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         public LSL_Integer llClearPrimMedia(LSL_Integer face)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return 0;
-            ScriptSleep(1000);
+            PScriptSleep(m_sleepMsOnClearPrimMedia);
 
             ClearPrimMedia(m_host, face);
 
@@ -10918,7 +10987,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         public LSL_Integer llClearLinkMedia(LSL_Integer link, LSL_Integer face)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return 0;
-            ScriptSleep(1000);
+            PScriptSleep(m_sleepMsOnClearLinkMedia);
 
             List<ISceneChildEntity> entities = GetLinkParts(link);
             if (entities.Count == 0 || face < 0 || face > entities[0].GetNumberOfSides() - 1)
@@ -10947,7 +11016,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
         public LSL_Integer llSetPrimMediaParams(LSL_Integer face, LSL_List rules)
         {
-            ScriptSleep(1000);
+            PScriptSleep(m_sleepMsOnSetPrimMediaParams);
 
             // LSL Spec http://wiki.secondlife.com/wiki/LlSetPrimMediaParams says to fail silently if face is invalid
             // Assuming silently fail means sending back LSL_STATUS_OK.  Ideally, need to check this.
@@ -10959,7 +11028,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
         public LSL_Integer llSetLinkMedia(LSL_Integer link, LSL_Integer face, LSL_List rules)
         {
-            ScriptSleep(1000);
+            PScriptSleep(m_sleepMsOnSetLinkMedia);
 
             // LSL Spec http://wiki.secondlife.com/wiki/LlSetPrimMediaParams says to fail silently if face is invalid
             // Assuming silently fail means sending back LSL_STATUS_OK.  Ideally, need to check this.
@@ -11068,7 +11137,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             Int64 tmp = 0;
             Math.DivRem(Convert.ToInt64(Math.Pow(a, b)), c, out tmp);
-            ScriptSleep(100);
+            PScriptSleep(m_sleepMsOnModPow);
             return Convert.ToInt32(tmp);
         }
 
@@ -11186,7 +11255,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return DateTime.Now;
             Deprecated("llSetPrimURL", "Use llSetPrimMediaParams instead");
-            return PScriptSleep(2000);
+            return PScriptSleep(m_sleepMsOnSetPrimURL);
         }
 
         /// <summary>
@@ -11199,7 +11268,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 return DateTime.Now;
 
             Deprecated("llRefreshPrimURL");
-            return PScriptSleep(20000);
+            return PScriptSleep(m_sleepMsOnRefreshPrimURL);
         }
 
         public LSL_String llEscapeURL(string url)
@@ -11263,7 +11332,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                                                                    new Vector3((float)lookAt.x, (float)lookAt.y,
                                                                                (float)lookAt.z));
             }
-            return PScriptSleep(1000);
+            return PScriptSleep(m_sleepMsOnMapDestination);
         }
 
         public DateTime llAddToLandBanList(string avatar, double hours)
@@ -11289,7 +11358,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                     }
                 }
             }
-            return PScriptSleep(100);
+            return PScriptSleep(m_sleepMsOnAddToLandBanList);
         }
 
         public DateTime llRemoveFromLandPassList(string avatar)
@@ -11318,7 +11387,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                     }
                 }
             }
-            return PScriptSleep(100);
+            return PScriptSleep(m_sleepMsOnRemoveFromLandPassList);
         }
 
         public DateTime llRemoveFromLandBanList(string avatar)
@@ -11347,7 +11416,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                     }
                 }
             }
-            return PScriptSleep(100);
+            return PScriptSleep(m_sleepMsOnRemoveFromLandBanList);
         }
 
         public void llSetCameraParams(LSL_List rules)
@@ -11514,6 +11583,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 if (c >= src2.Length)
                     c = 0;
             }
+
+            PScriptSleep(m_sleepMsOnXorBase64Strings);
             return llStringToBase64(ret);
         }
 
@@ -11659,7 +11730,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                     }
                 }
             }
-            return PScriptSleep(100);
+            return PScriptSleep(m_sleepMsOnResetLandBanList);
         }
 
         public DateTime llResetLandPassList()
@@ -11683,7 +11754,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                     }
                 }
             }
-            return PScriptSleep(100);
+            return PScriptSleep(m_sleepMsOnResetLandPassList);
         }
 
         public LSL_Integer llGetParcelPrimCount(LSL_Vector pos, int category, int sim_wide)
@@ -11755,7 +11826,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                     }
                 }
             }
-            ScriptSleep(2000);
+            PScriptSleep(m_sleepMsOnGetParcelPrimOwners);
             return ret;
         }
 
@@ -12597,7 +12668,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             {
                 dataserverPlugin.AddReply(rq.ToString(),
                                           NotecardCache.GetLines(assetID).ToString(), 100);
-                ScriptSleep(100);
+                PScriptSleep(m_sleepMsOnGetNumberOfNotecardLines);
                 return tid.ToString();
             }
 
@@ -12619,7 +12690,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                                           }
                                       });
 
-            ScriptSleep(100);
+            PScriptSleep(m_sleepMsOnGetNumberOfNotecardLines);
             return tid.ToString();
         }
 
@@ -12649,7 +12720,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                                                                  name, 100);
                                    });
 
-            ScriptSleep(100);
+            PScriptSleep(m_sleepMsOnRequestUserName);
             return tid.ToString();
         }
 
@@ -12683,7 +12754,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                                                                  name, 100);
                                    });
 
-            ScriptSleep(100);
+            PScriptSleep(m_sleepMsOnRequestUserName);
             return tid.ToString();
         }
 
@@ -12725,7 +12796,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             {
                 dataserverPlugin.AddReply(rq.ToString(),
                                           NotecardCache.GetLine(assetID, line, m_notecardLineReadCharsMax), 100);
-                ScriptSleep(100);
+                PScriptSleep(m_sleepMsOnGetNotecardLine);
                 return tid.ToString();
             }
 
@@ -12748,7 +12819,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                                           }
                                       });
 
-            ScriptSleep(100);
+            PScriptSleep(m_sleepMsOnGetNotecardLine);
             return tid.ToString();
         }
 
