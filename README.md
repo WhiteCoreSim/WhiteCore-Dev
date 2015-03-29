@@ -46,6 +46,8 @@ If you are having issues logging into your simulator, take a look at http://foru
 ## Support
 Support is available from various sources.
 
-IRC channel #whitecore-support on freenode (http://webchat.freenode.net?channels=%23whitecore-support)
-Check out http://whitecore-sim.org for the latest developments, downloads and forum
-Sarge's Google + community is for both Aurora and WhiteCore with a friendly bunch that is happy to answer questions. Find it at https://plus.google.com/communities/113034607546142208907?cfem=1
+* IRC channel #whitecore-support on freenode (http://webchat.freenode.net?channels=%23whitecore-support)
+
+* Check out http://whitecore-sim.org for the latest developments, downloads and forum
+
+* Google + community for WhiteCore with a friendly bunch that is happy to answer questions. Find it at https://plus.google.com/communities/113034607546142208907?cfem=1
