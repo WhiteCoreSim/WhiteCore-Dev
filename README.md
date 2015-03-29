@@ -1,5 +1,7 @@
 # WhiteCore Sim
 
+[![Join the chat at https://gitter.im/WhiteCoreSim/WhiteCore-Dev](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/WhiteCoreSim/WhiteCore-Dev?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 *NOTE:
  As of today, we have included BulletSim into the repository as a second Physics Engine. Please try it out and tell us if it's working properly*
 
