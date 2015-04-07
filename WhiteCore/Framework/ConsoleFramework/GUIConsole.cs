@@ -25,14 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.SceneInfo;
-using WhiteCore.Framework.Utilities;
-using Nini.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
+using Nini.Config;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.SceneInfo;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Framework.ConsoleFramework
 {
@@ -54,13 +54,13 @@ namespace WhiteCore.Framework.ConsoleFramework
             set{ MainConsole.Instance.LogPath = value;}
         }
 
-        public virtual void Initialize(IConfigSource source, ISimulationBase baseOpenSim)
+        public virtual void Initialize(IConfigSource source, ISimulationBase simBase)
         {
             if (source.Configs["Console"] == null ||
                 source.Configs["Console"].GetString("Console", String.Empty) != Name)
                 return;
 
-            baseOpenSim.ApplicationRegistry.RegisterModuleInterface<ICommandConsole>(this);
+            simBase.ApplicationRegistry.RegisterModuleInterface<ICommandConsole>(this);
             MainConsole.Instance = this;
 
             m_Commands.AddCommand("help", "help", "Get a general command list", Help, false, true);

@@ -26,6 +26,11 @@
  */
 
 
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
@@ -34,11 +39,6 @@ using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.SceneInfo.Entities;
 using WhiteCore.Framework.Services.ClassHelpers.Inventory;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
-using System.Threading;
 using WhiteCore.ScriptEngine.DotNetEngine.Runtime;
 
 

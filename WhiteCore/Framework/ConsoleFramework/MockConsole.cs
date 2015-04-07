@@ -26,8 +26,8 @@
  */
 
 using System;
-using WhiteCore.Framework.Modules;
 using Nini.Config;
+using WhiteCore.Framework.Modules;
 
 namespace WhiteCore.Framework.ConsoleFramework
 {
@@ -38,7 +38,7 @@ namespace WhiteCore.Framework.ConsoleFramework
     /// </summary>
     public class MockConsole : CommandConsole
     {
-        public override void Initialize(IConfigSource source, ISimulationBase baseOpenSim)
+        public override void Initialize(IConfigSource source, ISimulationBase simBase)
         {
             if (source.Configs["Console"] == null ||
                 source.Configs["Console"].GetString("Console", String.Empty) != "MockConsole")
@@ -46,7 +46,7 @@ namespace WhiteCore.Framework.ConsoleFramework
                 return;
             }
 
-            baseOpenSim.ApplicationRegistry.RegisterModuleInterface<ICommandConsole>(this);
+            simBase.ApplicationRegistry.RegisterModuleInterface<ICommandConsole>(this);
             MainConsole.Instance = this;
 
             m_Commands.AddCommand("help", "help", "Get a general command list", Help, false, true);
