@@ -50,7 +50,7 @@ namespace WhiteCore.ClientStack
     ///     The LLUDP server for a region. This handles incoming and outgoing
     ///     packets for all UDP connections to the region
     /// </summary>
-    public class LLUDPServer : OpenSimUDPBase, IClientNetworkServer
+    public class LLUDPServer : UDPBase, IClientNetworkServer
     {
         /// <summary>
         ///     Maximum transmission unit, or UDP packet size, for the LLUDP protocol

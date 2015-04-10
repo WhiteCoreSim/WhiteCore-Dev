@@ -37,7 +37,7 @@ namespace WhiteCore.ClientStack
     /// <summary>
     ///     Base UDP server
     /// </summary>
-    public abstract class OpenSimUDPBase
+    public abstract class UDPBase
     {
         /// <summary>
         ///     Flag to process packets asynchronously or synchronously
@@ -305,39 +305,5 @@ namespace WhiteCore.ClientStack
                 }
             }
         }
-
-/* not in use Send Sync now
-        public void AsyncBeginSend(UDPPacketBuffer buf)
-        {
-            if (!m_shutdownFlag)
-            {
-                try
-                {
-                    m_udpSocket.BeginSendTo(
-                        buf.Data,
-                        0,
-                        buf.DataLength,
-                        SocketFlags.None,
-                        buf.RemoteEndPoint,
-                        AsyncEndSend,
-                        buf);
- 
-                }
-                catch (SocketException) { }
-                catch (ObjectDisposedException) { }
-            }
-        }
-
-        void AsyncEndSend(IAsyncResult result)
-        {
-            try
-            {
-//                UDPPacketBuffer buf = (UDPPacketBuffer)result.AsyncState;
-                m_udpSocket.EndSendTo(result);
-            }
-            catch (SocketException) { }
-            catch (ObjectDisposedException) { }
-        }
- */
     }
 }
