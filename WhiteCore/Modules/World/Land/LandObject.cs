@@ -709,7 +709,7 @@ namespace WhiteCore.Modules.Land
             min = heightmap == null ? 0 : heightmap [tx, ty];
             LandData.AABBMin =
                 new Vector3((min_x*4), (min_y*4),
-                            min);
+                            0);
 
             tx = max_x*4;
             if (tx > (m_scene.RegionInfo.RegionSizeX - 1))

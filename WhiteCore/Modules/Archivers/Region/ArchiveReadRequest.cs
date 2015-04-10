@@ -784,15 +784,20 @@ namespace WhiteCore.Modules.Archivers
             LandData parcel = LandDataSerializer.Deserialize(m_utf8Encoding.GetString(data));
             var estateOwnerId = m_scene.RegionInfo.EstateSettings.EstateOwner;
             var defaultFlags = 
-                (uint)ParcelFlags.AllowFly |
-                (uint)ParcelFlags.AllowLandmark |
-                (uint)ParcelFlags.AllowAPrimitiveEntry |
-                (uint)ParcelFlags.AllowDeedToGroup |
-                (uint)ParcelFlags.AllowTerraform |
-                (uint)ParcelFlags.CreateObjects |
-                (uint)ParcelFlags.AllowOtherScripts |
-                (uint)ParcelFlags.SoundLocal |
-                (uint)ParcelFlags.AllowVoiceChat;
+            	(uint)ParcelFlags.AllowAPrimitiveEntry |
+            	(uint)ParcelFlags.AllowDamage |
+            	(uint)ParcelFlags.AllowDeedToGroup |
+            	(uint)ParcelFlags.AllowFly |
+            	(uint)ParcelFlags.AllowGroupObjectEntry |
+            	(uint)ParcelFlags.AllowGroupScripts |
+            	(uint)ParcelFlags.AllowLandmark |
+            	(uint)ParcelFlags.AllowOtherScripts |
+            	(uint)ParcelFlags.AllowTerraform |
+            	(uint)ParcelFlags.AllowVoiceChat |
+            	(uint)ParcelFlags.CreateGroupObjects |
+            	(uint)ParcelFlags.CreateObjects |
+            	(uint)ParcelFlags.SoundLocal |
+            	(uint)ParcelFlags.UseEstateVoiceChan;
 
             parcel.OwnerID = ResolveUserUuid(parcel.OwnerID, Vector3.Zero, null);
 
