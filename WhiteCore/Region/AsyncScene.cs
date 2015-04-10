@@ -358,7 +358,7 @@ namespace WhiteCore.Region
         /// </summary>
         public void Close(bool killAgents)
         {
-            MainConsole.Instance.InfoFormat("[Scene]: Closing down the single simulator: {0}", RegionInfo.RegionName);
+            MainConsole.Instance.InfoFormat("[Scene]: Closing down region: {0}", RegionInfo.RegionName);
 
             SimulationDataService.Shutdown();
 

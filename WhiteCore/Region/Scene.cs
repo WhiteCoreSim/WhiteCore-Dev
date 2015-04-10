@@ -352,7 +352,7 @@ namespace WhiteCore.Region
             // Stop updating the scene objects and agents.
             shuttingdown = true;
 
-            MainConsole.Instance.InfoFormat("[Scene]: Closing down the single simulator: {0}", RegionInfo.RegionName);
+            MainConsole.Instance.InfoFormat("[Scene]: Closing down region: {0}", RegionInfo.RegionName);
 
             SimulationDataService.Shutdown();
 

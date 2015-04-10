@@ -25,18 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.ConsoleFramework;
-using WhiteCore.Framework.ModuleLoader;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.PresenceInfo;
-using WhiteCore.Framework.SceneInfo;
-using WhiteCore.Framework.SceneInfo.Entities;
-using WhiteCore.Framework.Services;
-using WhiteCore.ScriptEngine.DotNetEngine.CompilerTools;
-using WhiteCore.ScriptEngine.DotNetEngine.Runtime;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -44,7 +32,19 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
+using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.ModuleLoader;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.PresenceInfo;
+using WhiteCore.Framework.SceneInfo;
+using WhiteCore.Framework.SceneInfo.Entities;
+using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
+using WhiteCore.ScriptEngine.DotNetEngine.CompilerTools;
+using WhiteCore.ScriptEngine.DotNetEngine.Runtime;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine
 {
@@ -62,7 +62,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
         public static ScriptProtectionModule ScriptProtection;
 
-        private IScene m_Scene;
+        IScene m_Scene;
 
         public IScene Scene
         {
@@ -114,13 +114,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
         public bool ShowWarnings;
         public ScriptStateSave StateSave;
-        private IScriptApi[] m_APIs = new IScriptApi[0];
-        private IConfigSource m_ConfigSource;
-        private IXmlRpcRouter m_XmlRpcRouter;
 
-        private bool m_consoleDisabled;
-        private bool m_disabled;
-        private bool m_enabled;
+        IScriptApi[] m_APIs = new IScriptApi[0];
+        IConfigSource m_ConfigSource;
+        IXmlRpcRouter m_XmlRpcRouter;
+
+        bool m_consoleDisabled;
+        bool m_disabled;
+        bool m_enabled;
 
         /// <summary>
         ///     Disabled from the command line, takes precedence over normal Disabled
@@ -353,7 +354,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         {
         }
 
-        private void EventManager_OnStartupComplete(IScene scene, List<string> data)
+        void EventManager_OnStartupComplete(IScene scene, List<string> data)
         {
             //All done!
             MaintenanceThread.Started = true;
@@ -363,14 +364,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
         #region Client Events
 
-        private void EventManager_OnNewClient(IClientAPI client)
+        void EventManager_OnNewClient(IClientAPI client)
         {
             client.OnScriptReset += ProcessScriptReset;
             client.OnGetScriptRunning += OnGetScriptRunning;
             client.OnSetScriptRunning += SetScriptRunning;
         }
 
-        private void EventManager_OnClosingClient(IClientAPI client)
+        void EventManager_OnClosingClient(IClientAPI client)
         {
             client.OnScriptReset -= ProcessScriptReset;
             client.OnGetScriptRunning -= OnGetScriptRunning;
@@ -389,7 +390,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             }
         }
 
-        private void FindDefaultLSLScript()
+        void FindDefaultLSLScript()
         {
             if (!Directory.Exists(ScriptEnginesPath))
             {
@@ -465,21 +466,21 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
         protected void WhiteCoreDotNetStats(IScene scene, string[] cmdparams)
         {
-            MainConsole.Instance.Info("WhiteCore DotNet Script Engine Stats:"
-                                      + "\nNumber of scripts compiled: " + Compiler.ScriptCompileCounter
-                                      + "\nMax allowed threat level: " + ScriptProtection.GetThreatLevel()
-                                      + "\nNumber of scripts running now: " + ScriptProtection.GetAllScripts().Length
-                                      + "\nNumber of app domains: " + AppDomainManager.NumberOfAppDomains
-                                      + "\nPermission level of app domains: " + AppDomainManager.PermissionLevel
-                                      + "\nNumber Script Event threads: " +
+            MainConsole.Instance.Info ("WhiteCore DotNet Script Engine Stats:");
+            MainConsole.Instance.CleanInfo ("    Region: " + scene.RegionInfo.RegionName);
+            MainConsole.Instance.CleanInfo ("    Number of scripts compiled: " + Compiler.ScriptCompileCounter);
+            MainConsole.Instance.CleanInfo ("    Max allowed threat level: " + ScriptProtection.GetThreatLevel ());
+            MainConsole.Instance.CleanInfo ("    Number of scripts running now: " + ScriptProtection.GetAllScripts ().Length);
+            MainConsole.Instance.CleanInfo ("    Number of app domains: " + AppDomainManager.NumberOfAppDomains);
+            MainConsole.Instance.CleanInfo ("    Permission level of app domains: " + AppDomainManager.PermissionLevel);
+            MainConsole.Instance.CleanInfo ("    Number Script Event threads: " +
                                       (MaintenanceThread.scriptThreadpool == null
                                            ? 0
-                                           : MaintenanceThread.scriptThreadpool.nthreads).
-                                          ToString()
+                                           : MaintenanceThread.scriptThreadpool.nthreads)
                                       + "/" +
                                       (MaintenanceThread.scriptThreadpool == null
                                            ? 0
-                                           : MaintenanceThread.scriptThreadpool.nSleepingthreads).ToString());
+                                           : MaintenanceThread.scriptThreadpool.nSleepingthreads));
             //MaintenanceThread.Stats();
         }
 
@@ -1145,7 +1146,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
         #region API Manager
 
-        private static Dictionary<string, IScriptApi> m_apiFunctionNamesCache = new Dictionary<string, IScriptApi>();
+        static Dictionary<string, IScriptApi> m_apiFunctionNamesCache = new Dictionary<string, IScriptApi>();
 
         public IScriptApi GetApi(UUID itemID, string name)
         {
@@ -1224,7 +1225,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
         #region Script Plugin Manager
 
-        private readonly List<IScriptPlugin> ScriptPlugins = new List<IScriptPlugin>();
+        readonly List<IScriptPlugin> ScriptPlugins = new List<IScriptPlugin>();
 
         public IScriptPlugin GetScriptPlugin(string Name)
         {
@@ -1248,7 +1249,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         ///     Starts all non shared script plugins
         /// </summary>
         /// <param name="scene"></param>
-        private void AddRegionToScriptModules(IScene scene)
+        void AddRegionToScriptModules(IScene scene)
         {
             foreach (IScriptPlugin plugin in ScriptPlugins)
             {
@@ -1361,7 +1362,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         }
 
 
-        private bool ScriptDanger(ISceneChildEntity part, Vector3 pos)
+        bool ScriptDanger(ISceneChildEntity part, Vector3 pos)
         {
             IScene scene = part.ParentEntity.Scene;
             if (part.IsAttachment && RunScriptsInAttachments)
@@ -1488,7 +1489,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             return topScripts;
         }
 
-        private int ScriptScoreSorter(ScriptData scriptA, ScriptData scriptB)
+        int ScriptScoreSorter(ScriptData scriptA, ScriptData scriptB)
         {
             return scriptA.ScriptScore.CompareTo(scriptB.ScriptScore);
         }
@@ -1497,7 +1498,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
         #region Registry pieces
 
-        private readonly Dictionary<Type, object> m_extensions = new Dictionary<Type, object>();
+        readonly Dictionary<Type, object> m_extensions = new Dictionary<Type, object>();
 
         public Dictionary<Type, object> Extensions
         {
@@ -1515,8 +1516,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
     public class ScriptErrorReporter
     {
         //Errors that have been thrown while compiling
-        private readonly Dictionary<UUID, ArrayList> Errors = new Dictionary<UUID, ArrayList>();
-        private readonly int Timeout = 5000; // 5 seconds
+        readonly Dictionary<UUID, ArrayList> Errors = new Dictionary<UUID, ArrayList>();
+        readonly int Timeout = 5000; // 5 seconds
 
         public ScriptErrorReporter(IConfig config)
         {
@@ -1563,7 +1564,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         /// <param name="ItemID"></param>
         /// <param name="error"></param>
         /// <returns></returns>
-        private bool TryFindError(UUID ItemID, out ArrayList error)
+        bool TryFindError(UUID ItemID, out ArrayList error)
         {
             error = null;
             lock (Errors)
@@ -1578,10 +1579,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 Thread.Sleep(50);
                 i += 50;
             }
-            if (i < 5000)
-                return true;
-            else
-                return false; //Cut off
+            return i < 5000; // false is timeout
         }
 
         /// <summary>
