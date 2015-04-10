@@ -26,6 +26,13 @@
  */
 
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.ModuleLoader;
 using WhiteCore.Framework.Modules;
@@ -34,14 +41,7 @@ using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.SceneInfo.Entities;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using Timer = System.Timers.Timer;
-using System.IO;
-using OpenMetaverse;
 
 namespace WhiteCore.Region
 {
@@ -1419,6 +1419,7 @@ namespace WhiteCore.Region
         public List<string> GetOARFilenames()
         {
             var archives = new List<string>( Directory.GetFiles (Constants.DEFAULT_OARARCHIVE_DIR, "*.oar"));
+            archives.AddRange( new List<string>( Directory.GetFiles (Constants.DEFAULT_OARARCHIVE_DIR, "*.tgz")));
             var retVals = new List<string>();
             foreach (string file in archives)
                 retVals.Add (Path.GetFileNameWithoutExtension (file));

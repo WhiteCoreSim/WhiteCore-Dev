@@ -25,16 +25,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Assets;
-using Nini.Config;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.Archivers
@@ -47,17 +47,12 @@ namespace WhiteCore.Modules.Archivers
         /// <summary>
         /// The default save/load archive directory.
         /// </summary>
-        private string m_archiveDirectory = Constants.DEFAULT_USERINVENTORY_DIR;
-
-        /// <summary>
-        ///     The file to load and save inventory if no filename has been specified
-        /// </summary>
-        protected const string DEFAULT_INV_BACKUP_FILENAME = "user-inventory.iar";
+        string m_archiveDirectory = Constants.DEFAULT_USERINVENTORY_DIR;
 
         /// <value>
         ///     All scenes that this module knows about
         /// </value>
-        private readonly Dictionary<UUID, IScene> m_scenes = new Dictionary<UUID, IScene>();
+        readonly Dictionary<UUID, IScene> m_scenes = new Dictionary<UUID, IScene>();
 
         /// <value>
         ///     Pending save completions initiated from the console
@@ -288,6 +283,17 @@ namespace WhiteCore.Modules.Archivers
             return false;
         }
 
+        public List<string> GetIARFilenames()
+        {
+            var archives = new List<string>( Directory.GetFiles (m_archiveDirectory, "*.iar"));
+            archives.AddRange( new List<string>( Directory.GetFiles (m_archiveDirectory, "*.tgz")));
+            var retVals = new List<string>();
+            foreach (string file in archives)
+                retVals.Add (Path.GetFileNameWithoutExtension (file));
+
+            return retVals;
+        }
+
         /// <summary>
         ///     Load inventory from an inventory file archive
         /// </summary>
@@ -296,8 +302,6 @@ namespace WhiteCore.Modules.Archivers
         {
             try
             {
-                //MainConsole.Instance.Info(
-                //    "[Inventory Archiver]: PLEASE NOTE THAT THIS FACILITY IS EXPERIMENTAL.  BUG REPORTS WELCOME.");
                 string iarPath = "IAR Import";             // default path to load IAR
 
                 Dictionary<string, object> options = new Dictionary<string, object>();
@@ -343,26 +347,34 @@ namespace WhiteCore.Modules.Archivers
                 string archiveFileName = firstName+"_"+lastName+".iar";         // assume this is the IAR to load initially
 
                 // optional...
-                string loadPath = (newParams.Count > 4 ? newParams[4] : m_archiveDirectory+"/" + archiveFileName);
-
-                //some file sanity checks
-                loadPath = PathHelpers.VerifyReadFile(loadPath, new List<string>() {".iar",".tgz"}, m_archiveDirectory);
-
-                if (loadPath == "")
+                if (newParams.Count > 4)
+                    archiveFileName = newParams[4];
+                else
                 {
+                    // confirm iar to load
                     do
                     {
-                        archiveFileName = MainConsole.Instance.Prompt("IAR file to load : ", archiveFileName);
-                        if (archiveFileName.ToLower() == "cancel")
+                        archiveFileName = MainConsole.Instance.Prompt("IAR file to load (? for list): ", archiveFileName);
+                        if (archiveFileName == "")
                             return;
 
-                        // sanity checks...
-                        loadPath = PathHelpers.VerifyReadFile(archiveFileName, new List<string>() {".iar",".tgz"}, m_archiveDirectory);
-                        if (loadPath == "")
-                            MainConsole.Instance.InfoFormat("   IAR file '{0}' not found!", archiveFileName);
+                        if (archiveFileName == "?")
+                        {
+                            var archives = GetIARFilenames();
+                            MainConsole.Instance.CleanInfo (" Available archives are : ");
+                            foreach (string file in archives)
+                                MainConsole.Instance.CleanInfo ("   " + file);
+                            archiveFileName = "";    
+                        }
+                    } while (archiveFileName == "");
+                }
 
-                    } while (loadPath == "");
-
+                // sanity checks...
+                var loadPath = PathHelpers.VerifyReadFile(archiveFileName, new List<string>() {".iar",".tgz"}, m_archiveDirectory);
+                if (loadPath == "")
+                {
+                    MainConsole.Instance.InfoFormat("   Sorry, IAR file '{0}' not found!", archiveFileName);
+                    return;
                 }
 
                 if (cmdparams.Length > 5)
@@ -435,17 +447,26 @@ namespace WhiteCore.Modules.Archivers
                     firstName = newParams[2];
                     lastName = newParams[3];
                 }
-                string archiveFileName = firstName+"_"+lastName+".iar";
+
 
                 // optional...
                 string iarPath = "/*";
                 if (newParams.Count > 5)
                     iarPath = newParams[5];
 
-                string savePath = (newParams.Count > 4 ? newParams[4] : m_archiveDirectory + "/" + archiveFileName);
+                // archive name
+                string archiveFileName;
+                if (newParams.Count < 4)
+                {
+                    archiveFileName = firstName+"_"+lastName;
+                    archiveFileName = MainConsole.Instance.Prompt("IAR file to save: ", archiveFileName);
+                } else
+                    archiveFileName = newParams[4];
+                
 
                 //some file sanity checks
-                savePath = PathHelpers.VerifyWriteFile (savePath, ".iar", m_archiveDirectory, true);
+                string savePath;
+                savePath = PathHelpers.VerifyWriteFile (archiveFileName, ".iar", m_archiveDirectory, true);
 
                 MainConsole.Instance.InfoFormat(
                     "[Inventory Archiver]: Saving archive {0} using inventory path {1} for {2} {3}",
@@ -463,7 +484,7 @@ namespace WhiteCore.Modules.Archivers
             }
         }
 
-        private void SaveIARConsoleCommandCompleted(
+        void SaveIARConsoleCommandCompleted(
             Guid id, bool succeeded, UserAccount userInfo, string invPath, Stream saveStream,
             Exception reportedException)
 
