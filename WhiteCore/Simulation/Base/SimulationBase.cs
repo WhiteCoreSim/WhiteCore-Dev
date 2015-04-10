@@ -26,6 +26,13 @@
  */
 
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Timers;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.Configuration;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.ModuleLoader;
@@ -37,12 +44,6 @@ using WhiteCore.Framework.Servers.HttpServer.Interfaces;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Other;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Timers;
 
 namespace WhiteCore.Simulation.Base
 {
@@ -209,6 +210,17 @@ namespace WhiteCore.Simulation.Base
                               (IntPtr.Size == 4 ? "x86" : "x64")));
             MainConsole.Instance.Info("====================================================================");
             MainConsole.Instance.Info("[WhiteCoreStartup]: Version: " + Version + "\n");
+            if (Environment.Is64BitOperatingSystem)
+                MainConsole.Instance.Info("[WhiteCoreStartup]: Running on 64 bit architecture");
+            // get memory allocation
+            Process proc = Process.GetCurrentProcess();
+            MainConsole.Instance.Info("[WhiteCoreStartup]: Allocated RAM " + proc.WorkingSet64);
+            if (Utilities.IsLinuxOs)
+            {
+                var pc = new PerformanceCounter ("Mono Memory", "Total Physical Memory");
+                var bytes = pc.RawValue;
+                MainConsole.Instance.InfoFormat ("[WhiteCoreStartup]: Physical RAM (Mbytes): {0}", bytes / 1024000);
+            }
 
             SetUpHTTPServer();
 
@@ -261,6 +273,13 @@ namespace WhiteCore.Simulation.Base
             if (Utilities.HostName == "")
             {
                 hostName = m_config.Configs ["Network"].GetString ("HostName", "0.0.0.0");
+
+                // special case for 'localhost'.. try for an external network address then
+                if ((hostName.ToLower() == "localip"))
+                {
+                    MainConsole.Instance.Info ("[Network]: Retrieving the local system IP address");
+                    hostName = Utilities.GetLocalIp ();
+                }
 
                 // nothing set in the config.. try for an external network address then
                 if ((hostName == "") || (hostName == "0.0.0.0"))
@@ -439,7 +458,7 @@ namespace WhiteCore.Simulation.Base
                                                      runConfig, false, true);
         }
 
-        private void HandleQuit(IScene scene, string[] args)
+        void HandleQuit(IScene scene, string[] args)
         {
             Shutdown(true);
         }

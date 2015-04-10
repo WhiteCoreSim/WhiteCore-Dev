@@ -58,7 +58,13 @@
     ;; overloaded, or you could run more servers instead
     HttpThreadCount = 10
     
-    ;; This doesn't require any changes if you wish to use the automatic finding of the external IP
+    ;; This does not require any changes if you wish to use the automatic finding of the external IP
+    ;; Set to a specific IP address or hostname if known
+    ;; Alternatively, set to "localip" to use the local system IP address
+    ;; HostName = "http://mygrid.mydomain.com"
+    ;; HostName = "localip"
+    
+    ;; Default >> Commented - use your external IP address for connections
     ;HostName = 127.0.0.1
 
 [Console]

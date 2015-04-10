@@ -29,27 +29,28 @@
 //http://www.obviex.com/samples/Encryption.aspx
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
+using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Servers;
-using System.Text.RegularExpressions;
-using System.Collections.Generic;
 
 namespace WhiteCore.Framework.Utilities
 {
     public static class Utilities
     {
-        private static string EncryptorType = "SHA1";
-        private static int EncryptIterations = 2;
-        private static int KeySize = 256;
-        private static string CachedExternalIP = "";
+        static string EncryptorType = "SHA1";
+        static int EncryptIterations = 2;
+        static int KeySize = 256;
+        static string CachedExternalIP = "";
         public static string HostName = "";
 
         /// <summary>
@@ -349,6 +350,28 @@ namespace WhiteCore.Framework.Utilities
         }
 
         /// <summary>
+        /// Get local IP address of system
+        /// (Assumes only one address present... or gives the first valid address if mmultiple)
+        /// </summary>
+        /// <returns>The local ip.</returns>
+        public static string GetLocalIp()
+        {
+
+        IPHostEntry host;
+        string localIP = "?";
+        host = Dns.GetHostEntry(Dns.GetHostName());
+        foreach (IPAddress ip in host.AddressList)
+        {
+            if (ip.AddressFamily == AddressFamily.InterNetwork)
+            {
+                localIP = ip.ToString();
+                break;
+            }
+        }
+        return localIP;
+        }
+
+        /// <summary>
         ///     Read a website into a string
         /// </summary>
         /// <param name="URL">URL to change into a string</param>
@@ -378,7 +401,7 @@ namespace WhiteCore.Framework.Utilities
             return website;
         }
 
-        private static byte[] UnGzip(byte[] data, int start)
+        static byte[] UnGzip(byte[] data, int start)
         {
             int size = BitConverter.ToInt32(data, data.Length - 4);
             byte[] uncompressedData = new byte[size];
@@ -588,12 +611,12 @@ namespace WhiteCore.Framework.Utilities
 
         public static class RandomPassword
         {
-            private static Random rand = new Random();
+            static Random rand = new Random();
 
-            private static readonly char[] VOWELS = new char[] { 'a', 'e', 'i', 'o', 'u' };
-            private static readonly char[] CONSONANTS = new char[] { 'b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'y', 'z' };
-            private static readonly char[] SYMBOLS = new char[] { '*', '?', '/', '\\', '%', '$', '#', '@', '!', '~' };
-            private static readonly char[] NUMBERS = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+            static readonly char[] VOWELS = new char[] { 'a', 'e', 'i', 'o', 'u' };
+            static readonly char[] CONSONANTS = new char[] { 'b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'y', 'z' };
+            static readonly char[] SYMBOLS = new char[] { '*', '?', '/', '\\', '%', '$', '#', '@', '!', '~' };
+            static readonly char[] NUMBERS = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 
             /// <summary>
             /// Generates a random, human-readable password.
@@ -638,17 +661,17 @@ namespace WhiteCore.Framework.Utilities
                 return pw.ToString();
             }
 
-            private static char MakeSymbol()
+            static char MakeSymbol()
             {
                 return SYMBOLS[rand.Next(SYMBOLS.Length)];
             }
 
-            private static char MakeNumeric()
+            static char MakeNumeric()
             {
                 return NUMBERS[rand.Next(NUMBERS.Length)];
             }
 
-            private static string MakeSyllable()
+            static string MakeSyllable()
             {
                 int len = rand.Next(3, 5); // will return either 3 or 4
 
@@ -776,15 +799,15 @@ namespace WhiteCore.Framework.Utilities
             }
 
             //private members
-            private Dictionary<string, List<char>> _chains = new Dictionary<string, List<char>>();
-            private List<string> _samples = new List<string>();
-            private List<string> _used = new List<string>();
-            private Random _rnd = new Random();
-            private int _order;
-            private int _minLength;
+            Dictionary<string, List<char>> _chains = new Dictionary<string, List<char>>();
+            List<string> _samples = new List<string>();
+            List<string> _used = new List<string>();
+            Random _rnd = new Random();
+            int _order;
+            int _minLength;
 
             //Get a random letter from the chain
-            private char GetLetter(string token)
+            char GetLetter(string token)
             {
                 if (!_chains.ContainsKey(token))
                     return '?';
