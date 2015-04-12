@@ -406,10 +406,10 @@ namespace WhiteCore.Simulation.Base
                     {
                         string folder = WhiteCore_ConfigDir;
                         MakeSureExists(folder + "Grid/ServerConfiguration/Login.ini");
-                        IniConfigSource login_ini = new IniConfigSource(folder + "Grid/ServerConfiguration/Login.ini",
+                        IniConfigSource login_ini = new IniConfigSource(folder + "/Grid/ServerConfiguration/Login.ini",
                                                                         Nini.Ini.IniFileType.AuroraStyle);
                         IniConfigSource login_ini_example =
-                            new IniConfigSource(folder + "Grid/ServerConfiguration/Login.ini.example",
+                            new IniConfigSource(folder + "/Grid/ServerConfiguration/Login.ini.example",
                                                 Nini.Ini.IniFileType.AuroraStyle);
                         foreach (IConfig config in login_ini_example.Configs)
                         {
