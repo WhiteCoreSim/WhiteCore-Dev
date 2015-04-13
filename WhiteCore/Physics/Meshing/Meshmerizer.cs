@@ -27,7 +27,6 @@
 
 //#define SPAM
 
-
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.SceneInfo;
@@ -45,8 +44,8 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using zlib;
 using WhiteCore.Framework.Modules;
+using ComponentAce.Compression.Libs.ZLib;
 
 namespace WhiteCore.Physics.Meshing
 {
@@ -273,7 +272,7 @@ namespace WhiteCore.Physics.Meshing
                             {
                                 using (MemoryStream outMs = new MemoryStream())
                                 {
-                                    using (ZOutputStream zOut = new ZOutputStream(outMs))
+                                    using (ZOutputStream zOut = new ZOutputStream(outMs,1))
                                     {
                                         byte[] readBuffer = new byte[2048];
                                         int readLen = 0;
