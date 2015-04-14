@@ -5,58 +5,58 @@
 ;;
 
 [Modules]
-    EntityTransferModule = BasicEntityTransferModule
-    InventoryAccessModule = BasicInventoryAccessModule
+EntityTransferModule = BasicEntityTransferModule
+InventoryAccessModule = BasicInventoryAccessModule
 
 [WhiteCoreConnectors]
-    AbuseReportsConnector = LocalConnector
-    AvatarArchiverConnector = LocalConnector
-    ScriptDataConnector = LocalConnector
-    RegionInfoConnector = LocalConnector
-    ParcelConnector = LocalConnector
-    WebStatsDataConnector = LocalConnector
-    AssetConnector = LocalConnector
-    GroupsConnector = LocalConnector
-    AgentConnector = LocalConnector
-    RegionConnector = LocalConnector
-    ProfileConnector = LocalConnector
-    EstateConnector = LocalConnector
-    OfflineMessagesConnector = LocalConnector
-    DirectoryServiceConnector = LocalConnector
-    MuteListConnector = LocalConnector
-    EmailConnector = LocalConnector
+AbuseReportsConnector = LocalConnector
+AvatarArchiverConnector = LocalConnector
+ScriptDataConnector = LocalConnector
+RegionInfoConnector = LocalConnector
+ParcelConnector = LocalConnector
+WebStatsDataConnector = LocalConnector
+AssetConnector = LocalConnector
+GroupsConnector = LocalConnector
+AgentConnector = LocalConnector
+RegionConnector = LocalConnector
+ProfileConnector = LocalConnector
+EstateConnector = LocalConnector
+OfflineMessagesConnector = LocalConnector
+DirectoryServiceConnector = LocalConnector
+MuteListConnector = LocalConnector
+EmailConnector = LocalConnector
 
-    DoRemoteCalls = True
-    AllowRemoteCalls = False
+DoRemoteCalls = True
+AllowRemoteCalls = False
 
 [Configuration]
-    OSDRequestTimeout = 10000
-    OSDRequestTryCount = 5
+OSDRequestTimeout = 10000
+OSDRequestTryCount = 5
 
 [Handlers]
-    AbuseReportHandler = AbuseReportsService
-    AgentInfoHandler = AgentInfoService
-    AssetHandler = AssetService
-    AssetHandlerUseCache = true
-    AuthenticationHandler = PasswordAuthenticationService
-    AvatarHandler = AvatarService
-    ConfigurationHandler = ConfigurationService
-    EventQueueHandler = EventQueueService
-    FreeSwitchHandler = RemoteFreeswitchConnector
-    FriendsHandler = FriendsService
-    GridHandler = GridService
-    InventoryHandler = InventoryService
-    MessagingServiceInHandler = MessagingServiceInHandler
-    SyncMessagePosterServiceHandler = SyncMessagePosterService
-    UserAccountHandler = UserAccountService
+AbuseReportHandler = AbuseReportsService
+AgentInfoHandler = AgentInfoService
+AssetHandler = AssetService
+AssetHandlerUseCache = true
+AuthenticationHandler = PasswordAuthenticationService
+AvatarHandler = AvatarService
+ConfigurationHandler = ConfigurationService
+EventQueueHandler = EventQueueService
+FreeSwitchHandler = RemoteFreeswitchConnector
+FriendsHandler = FriendsService
+GridHandler = GridService
+InventoryHandler = InventoryService
+MessagingServiceInHandler = MessagingServiceInHandler
+SyncMessagePosterServiceHandler = SyncMessagePosterService
+UserAccountHandler = UserAccountService
 
-    SyncMessagePosterServiceOpenServerHandler = true
-    SyncMessagePosterServiceServerHandlerPort = 0
-    SyncMessagePosterServiceDoRemote = true
+SyncMessagePosterServiceOpenServerHandler = true
+SyncMessagePosterServiceServerHandlerPort = 0
+SyncMessagePosterServiceDoRemote = true
 
 [WebInterface]
-    Module = None
+Module = None
 
 [Includes]
-    Include-Data = Sim/Data/FileBased.ini
-    
+Include-Data = Sim/Data/FileBased.ini
+

@@ -1,15 +1,14 @@
 [Handlers]
-    InventoryServiceOpenServerHandler = true
-    InventoryServiceServerHandlerPort = 8013
+InventoryServiceOpenServerHandler = true
+InventoryServiceServerHandlerPort = 8013
 
-    SyncMessagePosterServiceHandler = SyncMessagePosterService
-    SyncMessagePosterServiceOpenServerHandler = true
-    SyncMessagePosterServiceServerHandlerPort = 8013
-    SyncMessagePosterServiceDoRemote = true
-    
+SyncMessagePosterServiceHandler = SyncMessagePosterService
+SyncMessagePosterServiceOpenServerHandler = true
+SyncMessagePosterServiceServerHandlerPort = 8013
+SyncMessagePosterServiceDoRemote = true
+
 [ExternalCaps]
-    CapsHandlers = InventoryCAPS
+CapsHandlers = InventoryCAPS
 
 [Includes]
-    Include-Base = Grid/WhiteCore.ServersBase.ini
-    
+Include-Base = Grid/WhiteCore.ServersBase.ini
