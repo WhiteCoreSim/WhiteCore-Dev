@@ -188,7 +188,7 @@ namespace WhiteCore.Framework.ModuleLoader
                                                Path.Combine(dir.FullName, "System.Data.SQLitex64.dll"),
                                                Path.Combine(dir.FullName, "System.Data.SQLitex86.dll"),
                                                Path.Combine(dir.FullName, "Tools.dll"),
-                                               Path.Combine(dir.FullName, "Warp3D.dll"),
+                                               Path.Combine(dir.FullName, "Warp3Dw.dll"),
                                                Path.Combine(dir.FullName, "XMLRPC.dll"),
                                                Path.Combine(dir.FullName, "xunit.dll"),
                                                Path.Combine(dir.FullName, "zlib.net.dll")
@@ -364,7 +364,7 @@ namespace WhiteCore.Framework.ModuleLoader
                                                Path.Combine(dir.FullName, "System.Data.SQLitex64.dll"),
                                                Path.Combine(dir.FullName, "System.Data.SQLitex86.dll"),
                                                Path.Combine(dir.FullName, "Tools.dll"),
-                                               Path.Combine(dir.FullName, "Warp3D.dll"),
+                                               Path.Combine(dir.FullName, "Warp3Dw.dll"),
                                                Path.Combine(dir.FullName, "XMLRPC.dll"),
                                                Path.Combine(dir.FullName, "xunit.dll"),
                                                Path.Combine(dir.FullName, "zlib.net.dll")                                           };

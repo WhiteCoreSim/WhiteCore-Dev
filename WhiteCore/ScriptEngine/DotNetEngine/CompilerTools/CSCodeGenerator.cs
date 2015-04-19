@@ -28,9 +28,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using WhiteCore.Framework.Utilities;
-using WhiteCore.ScriptEngineParser;
+using ScriptEngineParser;
 using Tools;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
 {

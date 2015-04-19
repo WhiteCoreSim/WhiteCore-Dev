@@ -25,19 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.ConsoleFramework;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.SceneInfo;
-using WhiteCore.Framework.SceneInfo.Entities;
-using WhiteCore.Framework.Utilities;
-using WhiteCore.Modules.WorldMap.Warp3DMap;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.Assets;
-using OpenMetaverse.Rendering;
-using OpenMetaverse.StructuredData;
-using WhiteCore.Warp3D;
-//using Rednettle.Warp3D;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -45,9 +32,20 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.Assets;
+using OpenMetaverse.Rendering;
+using OpenMetaverse.StructuredData;
+using Warp3Dw;
+using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.SceneInfo;
+using WhiteCore.Framework.SceneInfo.Entities;
+using WhiteCore.Framework.Utilities;
+using WhiteCore.Modules.WorldMap.Warp3DMap;
 using RegionSettings = WhiteCore.Framework.SceneInfo.RegionSettings;
-//using WarpRenderer = Warp3D.Warp3D;
-using WarpRenderer = WhiteCore.Warp3D.Warp3D;
+using WarpRenderer = Warp3Dw.Warp3D;
 
 namespace WhiteCore.Modules.WorldMap
 {
