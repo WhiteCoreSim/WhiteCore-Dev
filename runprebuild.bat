@@ -6,7 +6,7 @@ echo ====================================
 echo.
 
 rem ## Default architecture (86 (for 32bit), 64, AnyCPU)
-set bits=AnyCPU
+set bits=86
 
 rem ## Whether or not to add the .netx.y flag
 set framework=4_5
@@ -30,12 +30,11 @@ echo batch file in a text editor.
 echo.
 
 :bits
-set /p bits="Choose your architecture (AnyCPU, x86, x64) [%bits%]: "
+set /p bits="Choose your architecture (x86, x64) [%bits%]: "
 if %bits%==86 goto configuration
 if %bits%==x86 goto configuration
 if %bits%==64 goto configuration
 if %bits%==x64 goto configuration
-if %bits%==AnyCPU goto configuration
 echo "%bits%" isn't a valid choice!
 goto bits
 
