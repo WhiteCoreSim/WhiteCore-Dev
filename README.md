@@ -1,5 +1,8 @@
 # WhiteCore Sim
 
+[WARNING] Current master is broken, awaiting the update for the AvatarAppearance. Use at your own risk!
+
+
 [![Join the chat at https://gitter.im/WhiteCoreSim/WhiteCore-Dev](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/WhiteCoreSim/WhiteCore-Dev?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 *NOTE:
