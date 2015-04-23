@@ -1333,7 +1333,7 @@
       <Reference name="OpenMetaverse.StructuredData" path="../../WhiteCoreSim/bin/"/>
       <Reference name="OpenMetaverseTypes" path="../../WhiteCoreSim/bin/"/>
       <Reference name="protobuf-net.dll" path="../../WhiteCoreSim/bin/"/>
-      <Reference name="Warp3Dx" path="../../WhiteCoreSim/bin/"/>
+      <Reference name="Warp3Dw" path="../../WhiteCoreSim/bin/"/>
       <Reference name="XMLRPC" path="../../WhiteCoreSim/bin/"/>
       <Reference name="zlib.net" path="../../WhiteCoreSim/bin/"/>
 
