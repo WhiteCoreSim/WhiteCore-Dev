@@ -1,5 +1,5 @@
 ## Version details of libraries
-# Last updated:  December 5th 2014
+# Last updated:  April 24th 2015
 # Greythane / Fly-Man-
 
 Library															Version					Last updated			Origin
@@ -38,7 +38,7 @@ odex86.dll														???						11 Apr 2013
 openjpeg-dotnet-x86_64.dll										1.1.0.0					08 Apr 2013
 openjpeg-dotnet.dll												1.1.0.0					08 Apr 2013
 protobuf-net.dll												2.0.0.622				08 Apr 2013
-zlib.net.dll													1.0.3.0					10 Dec 2012
+zlib.net.dll													1.0.4.0					?? ??? 201?				Openmetaverse
 
 lib32/BulletSim.dll												???						24 Jun 2013				OpenSim
 lib32/libBulletSim.dylib										???						20 Dec 2013				OpenSim

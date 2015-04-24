@@ -43,7 +43,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using WhiteCore.Framework.Services.ClassHelpers.Assets;
-using ComponentAce.Compression.Libs.ZLib;
+using ComponentAce.Compression.Libs.zlib;
 
 namespace WhiteCore.Modules.Caps
 {

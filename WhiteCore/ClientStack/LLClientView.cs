@@ -3639,6 +3639,12 @@ namespace WhiteCore.ClientStack
                                              AppearanceVersion = (int)RegionProtocols.None
                                          }
                                      };
+            avp.AppearanceHover = new AvatarAppearancePacket.AppearanceHoverBlock[1] { 
+                new AvatarAppearancePacket.AppearanceHoverBlock () {
+                    HoverHeight = Vector3.Zero
+                }
+            };
+
             avp.Sender.IsTrial = false;
             avp.Sender.ID = app.Owner;
             //MainConsole.Instance.InfoFormat("[LLClientView]: Sending appearance for {0} to {1}", agentID.ToString(), AgentId.ToString());

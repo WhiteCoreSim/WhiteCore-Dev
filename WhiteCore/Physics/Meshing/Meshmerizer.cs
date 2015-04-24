@@ -27,25 +27,25 @@
 
 //#define SPAM
 
-using WhiteCore.Framework.ConsoleFramework;
-using WhiteCore.Framework.Physics;
-using WhiteCore.Framework.SceneInfo;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-#if DEBUGING
-using PrimMesher;
-#else
-using WhiteCore.Physics.PrimMesher;
-#endif
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
+using ComponentAce.Compression.Libs.zlib;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
+using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
-using ComponentAce.Compression.Libs.ZLib;
+using WhiteCore.Framework.Physics;
+using WhiteCore.Framework.SceneInfo;
+
+#if DEBUGING
+using PrimMesher;
+#else
+using WhiteCore.Physics.PrimMesher;
+#endif
 
 namespace WhiteCore.Physics.Meshing
 {
