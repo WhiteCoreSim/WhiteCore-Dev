@@ -1,15 +1,56 @@
 @ECHO OFF
 
-echo ====================================
-echo ==== WhiteCore  BUILDING ===========
-echo ====================================
+echo ========================================
+echo ==== WhiteCore Configuration ===========
+echo ========================================
+echo.
+echo If you wish to customise the configuration, re-run with the switch '-p'
+echo   e.g.   runprebuild -p
 echo.
 
-rem ## Default architecture (86 (for 32bit), 64, AnyCPU)
-set bits=86
+rem ## Default architecture (86 (for 32bit), 64)
+:CheckArch
+set bits=x86
+if exist "%PROGRAMFILES(X86)%" (set bits=x64)
+if %bits% == x64 (
+	echo Found 64bit architecture
+)
+if %bits% == x86 (
+	echo Found 32 bit architecture
+)
 
-rem ## Whether or not to add the .netx.y flag
+rem ## Determin native framework
+:CheckOS
 set framework=4_5
+for /f "tokens=4-5 delims=. " %%i in ('ver') do set VERSION=%%i.%%j
+if %version% == 10.0 (
+	set framework=4_5
+	echo Windows 10
+)
+if %version% == 6.3 (
+	set framework=4_5
+	echo Windows 8.1 or Server 2012 R2
+)
+if %version% == 6.2 (
+	set framework=4_5
+	echo Windows 8 or Server 2012
+)
+if %version% == 6.1 (
+	set framework=4_0
+	echo Windows 7 or Server 2008 R2
+)
+if %version% == 6.0 (
+	set framework=3_5
+	echo hmmm... Windows Vista or Server 2008
+)
+if %version% == 5.2 (
+	set framework=3_5
+	echo hmmm... Windows XP x64 or  Server 2003
+)
+if %version% == 5.1 (
+	set framework=3_5
+	echo hmmm... Windows XP
+)
 
 rem ## Default "configuration" choice ((r)elease, (d)ebug)
 set configuration=d
@@ -17,11 +58,18 @@ set configuration=d
 rem ## Default "run compile batch" choice (y(es),n(o))
 set compile_at_end=y
 
+rem ## If not requested, skip the prompting
+if "%1" =="" goto final
+if %1 == -p goto prompt
+if %1 == --prompt goto prompt
+goto final
+
+:prompt
 echo I will now ask you four questions regarding your build.
 echo However, if you wish to build for:
 echo        %bits% Architecture
 echo        .NET %framework%
-if %compile_at_end%==y echo And you would like to compile straight after prebuild...
+if %compile_at_end% == y echo And you would like to compile straight after prebuild...
 echo.
 echo Simply tap [ENTER] three times.
 echo.
@@ -35,6 +83,7 @@ if %bits%==86 goto configuration
 if %bits%==x86 goto configuration
 if %bits%==64 goto configuration
 if %bits%==x64 goto configuration
+Rem if %bits%==AnyCPU goto configuration
 echo "%bits%" isn't a valid choice!
 goto bits
 
@@ -49,12 +98,15 @@ goto configuration
 
 :framework
 set /p framework="Choose your .NET framework (4_0 or 4_5)? [%framework%]: "
+if %framework%==3_5 goto final
 if %framework%==4_0 goto final
 if %framework%==4_5 goto final
 echo "%framework%" isn't a valid choice!
 goto framework
 
 :final
+echo.
+echo Configuring for %bits% architecture using %framework% .NET framework
 echo.
 echo.
 
