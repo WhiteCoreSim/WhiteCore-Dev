@@ -1,0 +1,7 @@
+language: csharp
+solution: WhiteCore.sln
+mono:
+  - latest
+script:
+  - ./runprebuild.sh
+  - xbuild /p:Configuration=Release WhiteCore.sln
