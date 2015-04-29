@@ -26,6 +26,14 @@
  */
 
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Security.Cryptography;
+using System.Text;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
@@ -33,24 +41,16 @@ using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Servers.HttpServer.Interfaces;
-using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Security.Cryptography;
-using System.Text;
 using WhiteCore.Framework.Services.ClassHelpers.Assets;
-using ComponentAce.Compression.Libs.zlib;
+using WhiteCore.Framework.Utilities;
+using ZLib.Net;
 
 namespace WhiteCore.Modules.Caps
 {
     public class RenderMaterials : INonSharedRegionModule
     {
-        private IScene m_scene;
-        private bool m_enabled;
+        IScene m_scene;
+        bool m_enabled;
         public Dictionary<UUID, OSDMap> m_knownMaterials = new Dictionary<UUID, OSDMap>();
 
         #region INonSharedRegionModule Members
@@ -407,7 +407,7 @@ namespace WhiteCore.Modules.Caps
         /// </summary>
         /// <param name="osd"></param>
         /// <returns></returns>
-        private static UUID HashOsd(OSD osd)
+        static UUID HashOsd(OSD osd)
         {
             using (var md5 = MD5.Create())
             using (MemoryStream ms = new MemoryStream(OSDParser.SerializeLLSDBinary(osd, false)))

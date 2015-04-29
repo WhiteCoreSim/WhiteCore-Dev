@@ -32,7 +32,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using ComponentAce.Compression.Libs.zlib;
 using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
@@ -40,6 +39,7 @@ using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.SceneInfo;
+using ZLib.Net;
 
 #if DEBUGING
 using PrimMesher;
@@ -73,17 +73,17 @@ namespace WhiteCore.Physics.Meshing
 #if SPAM
         const string baseDir = "rawFiles";
 #else
-        private const string baseDir = null; //"rawFiles";
+        const string baseDir = null; //"rawFiles";
 #endif
 
-        private readonly bool cacheSculptMaps = true;
-        private bool cacheSculptAlphaMaps = true;
+        readonly bool cacheSculptMaps = true;
+        bool cacheSculptAlphaMaps = true;
 
-        private readonly string decodedSculptMapPath;
-        private readonly bool UseMeshesPhysicsMesh;
+        readonly string decodedSculptMapPath;
+        readonly bool UseMeshesPhysicsMesh;
 
-        private float minSizeForComplexMesh = 0.2f;
-        private IJ2KDecoder m_j2kDecoder = null;
+        float minSizeForComplexMesh = 0.2f;
+        IJ2KDecoder m_j2kDecoder = null;
         // prims with all dimensions smaller than this will have a bounding box mesh
 
         public Meshmerizer(IConfigSource config, IRegistryCore registry)
@@ -121,7 +121,7 @@ namespace WhiteCore.Physics.Meshing
         /// <param name="maxZ"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        private static Mesh CreateSimpleBoxMesh(float minX, float maxX, float minY, float maxY, float minZ, float maxZ,
+        static Mesh CreateSimpleBoxMesh(float minX, float maxX, float minY, float maxY, float minZ, float maxZ,
                                                 ulong key)
         {
             Mesh box = new Mesh(key);
@@ -179,12 +179,12 @@ namespace WhiteCore.Physics.Meshing
         /// <param name="meshIn"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        private static Mesh CreateBoundingBoxMesh(Vector3 size, ulong key)
+        static Mesh CreateBoundingBoxMesh(Vector3 size, ulong key)
         {
             return CreateSimpleBoxMesh(0, size.X,0, size.Y, 0, size.Z, key);
         }
 
-        private void ReportPrimError(string message, string primName, PrimMesh primMesh)
+        void ReportPrimError(string message, string primName, PrimMesh primMesh)
         {
             MainConsole.Instance.Error(message);
             MainConsole.Instance.Error("\nPrim Name: " + primName);
@@ -192,7 +192,7 @@ namespace WhiteCore.Physics.Meshing
         }
 
 
-        private Mesh CreateMeshFromPrimMesher(string primName, PrimitiveBaseShape primShape, Vector3 size, float lod,
+        Mesh CreateMeshFromPrimMesher(string primName, PrimitiveBaseShape primShape, Vector3 size, float lod,
                                               ulong key)
         {
             PrimMesh primMesh;
