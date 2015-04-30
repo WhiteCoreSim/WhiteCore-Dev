@@ -136,8 +136,10 @@
                     return "Nome della Regione";
                 case "RegionTypeText":
                     return "Tipo della Regione";
-            case "RegionTerrainText":
-                return "Regione Terrain";
+				case "RegionMaturityText":
+					return "Access Rating";
+				case "RegionTerrainText":
+					return "Regione Terrain";
                 case "ParcelsInRegionText":
                     return "Terreni della Regione";
                 case "ParcelNameText":

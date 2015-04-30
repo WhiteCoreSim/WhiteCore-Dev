@@ -169,6 +169,8 @@
                     return "Online Users";
                 case "RegionOnlineText":
                     return "Region Status";
+                   case "RegionMaturityText":
+                    return "Access Rating";
                 case "NumberOfUsersInRegionText":
                     return "Number of Users in region";
 

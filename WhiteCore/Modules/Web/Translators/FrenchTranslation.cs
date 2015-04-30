@@ -141,6 +141,8 @@
                     return "Région X";
                 case "RegionLocYText":
                     return "Région Y";
+				case "RegionMaturityText":
+					return "Access Rating";
                 case "SortByLocX":
                     return "Trié par Région X";
                 case "SortByLocY":
