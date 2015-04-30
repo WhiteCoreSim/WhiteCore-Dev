@@ -39,6 +39,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GridRegion = WhiteCore.Framework.Services.GridRegion;
 using RegionFlags = WhiteCore.Framework.Services.RegionFlags;
+using WhiteCore.Framework.DatabaseInterfaces;
 
 namespace WhiteCore.Services.SQLServices.GridService
 {
@@ -931,6 +932,7 @@ namespace WhiteCore.Services.SQLServices.GridService
             }
 
             IUserAccountService accountService = m_registry.RequestModuleInterface<IUserAccountService>();
+            // not yet  // IRegionInfoConnector regionService = m_registry.RequestModuleInterface<IRegionInfoConnector>();
 
             foreach (GridRegion r in regions)
             {
@@ -952,6 +954,21 @@ namespace WhiteCore.Services.SQLServices.GridService
                 MainConsole.Instance.Info("Region Owner   : " + account.Name + " [" + r.EstateOwner + "]");
                 MainConsole.Instance.Info("Region Flags   : " + flags);
                 //MainConsole.Instance.Info("Gridserver URI : " + r.ServerURI);				
+
+                MainConsole.Instance.CleanInfo("");
+                MainConsole.Instance.CleanInfo ("Type         : " + r.RegionType);                   
+                MainConsole.Instance.CleanInfo ("Terrain      : " + r.RegionTerrain);                   
+
+                /* Not yet
+                var ri = regionService.GetRegionInfo (r.RegionID);
+                MainConsole.Instance.CleanInfo ("Startup      : {0}" + String.Format( ri.Startup == StartupType.Normal ? "Normal" : "Delayed"));                  
+                MainConsole.Instance.CleanInfo ("See into     : {0}" + String.Format( ri.SeeIntoThisSimFromNeighbor ? "yes" : "No"));             
+                MainConsole.Instance.CleanInfo ("Inifinite    : {0}" + String.Format( ri.InfiniteRegion ? "Yes" : "No"));                   
+                MainConsole.Instance.CleanInfo ("Capacity     : {0}" + ri.ObjectCapacity);                   
+                MainConsole.Instance.CleanInfo ("Agent max    : {0}" + ri.RegionSettings.AgentLimit);
+                MainConsole.Instance.CleanInfo ("Allow divide : {0}" + String.Format( ri.RegionSettings.AllowLandJoinDivide ? "Yes" : "No"));
+                MainConsole.Instance.CleanInfo ("Allow resale : {0}" + String.Format( ri.RegionSettings.AllowLandResell ? "Yes" : "No"));
+                */
                 MainConsole.Instance.Info(
                     "-------------------------------------------------------------------------------");
                 MainConsole.Instance.CleanInfo (string.Empty);
