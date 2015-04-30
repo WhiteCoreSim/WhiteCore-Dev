@@ -147,7 +147,11 @@ namespace WhiteCore.Modules.WorldMap
             int height = viewport.Height * 2;
                             
             WarpRenderer renderer = new WarpRenderer();
-            renderer.CreateScene(width, height);
+            if (!renderer.CreateScene(width, height))
+            {
+                MainConsole.Instance.Error ("[Warp3D]: Unable to create the required scene! Maybe lack of RAM?");
+                return new Bitmap(Constants.RegionSize, Constants.RegionSize, PixelFormat.Format24bppRgb);
+            }
             renderer.Scene.autoCalcNormals = false;
             if (threeD)
                 renderer.SetBackgroundColor (SKYCOLOR);
