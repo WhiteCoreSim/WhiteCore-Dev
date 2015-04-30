@@ -355,19 +355,34 @@ namespace WhiteCore.Modules
                 //            ? 0 
                 //            : info.RegionLocZ / Constants.RegionSize)).ToString ())) * Constants.RegionSize;
 
+                var haveSize = true;
+                var sizeCheck = "";
                 do
                 {
                     info.RegionSizeX = int.Parse (MainConsole.Instance.Prompt ("Region size X", info.RegionSizeX.ToString ()));
                     if (info.RegionSizeX > Constants.MaxRegionSize)
-                        MainConsole.Instance.CleanInfo ("    Sorry, size cannot be greater than the recommended maximum of " + Constants.MaxRegionSize);
-                } while (info.RegionSizeX > Constants.MaxRegionSize);
+                    {
+                        MainConsole.Instance.CleanInfo ("    The currently recommended maximum size is " + Constants.MaxRegionSize);
+                        sizeCheck =  MainConsole.Instance.Prompt ("Continue with the X size of " + info.RegionSizeX + "? (yes/no)", "no");
+                        haveSize = sizeCheck.ToLower().StartsWith("y");
+                    }
+                } while (! haveSize);
+
+                // assume square regions
+                info.RegionSizeY = info.RegionSizeX;
 
                 do
                 {
                     info.RegionSizeY = int.Parse (MainConsole.Instance.Prompt ("Region size Y", info.RegionSizeY.ToString ()));
-                    if (info.RegionSizeY > Constants.MaxRegionSize)
-                        MainConsole.Instance.CleanInfo ("    Sorry, size cannot be greater than the recommended maximum of " + Constants.MaxRegionSize);
-                } while (info.RegionSizeY > Constants.MaxRegionSize);
+                    if ( (info.RegionSizeY > info.RegionSizeX) && (info.RegionSizeY > Constants.MaxRegionSize) )
+                    {
+                        MainConsole.Instance.CleanInfo ("    The currently recommended maximum size is " + Constants.MaxRegionSize);
+                        sizeCheck =  MainConsole.Instance.Prompt ("Continue with the Y size of " + info.RegionSizeY + "? (yes/no)", "no");
+                        haveSize = sizeCheck.ToLower().StartsWith("y");
+                    }
+                } while (! haveSize);
+
+                bool bigRegion = ((info.RegionSizeX > Constants.MaxRegionSize) || (info.RegionSizeY > Constants.MaxRegionSize));
 
                 // * Mainland / Full Region (Private)
                 // * Mainland / Homestead
@@ -379,7 +394,7 @@ namespace WhiteCore.Modules
                     (info.RegionType == "" ? "Estate" : info.RegionType));
 
                 // Region presets or advanced setup
-                string setupMode;                             
+                string setupMode;        
                 string terrainOpen = "Grassland";                             
                 string terrainFull = "Grassland";
                 var responses = new List<string>();
@@ -395,7 +410,9 @@ namespace WhiteCore.Modules
                     setupMode = MainConsole.Instance.Prompt("Mainland region type?", "Full Region", responses).ToLower ();
 
                     // allow specifying terrain for Openspace
-                    if (setupMode.StartsWith("o"))
+                    if (bigRegion)
+                        terrainOpen = "flatland";
+                    else if (setupMode.StartsWith("o"))
                         terrainOpen = MainConsole.Instance.Prompt("Openspace terrain ( Grassland, Swamp, Aquatic)?", terrainOpen).ToLower();
 
                 } else
@@ -409,7 +426,9 @@ namespace WhiteCore.Modules
                 }
 
                 // terrain can be specified for Full or custom regions
-                if (setupMode.StartsWith ("f") || setupMode.StartsWith ("c"))
+                if (bigRegion)
+                    terrainFull = "Flatland";
+                else if (setupMode.StartsWith ("f") || setupMode.StartsWith ("c"))
                 {
                     var tresp = new List<string>();
                     tresp.Add ("Flatland");
@@ -474,8 +493,10 @@ namespace WhiteCore.Modules
                         info.RegionTerrain = "Aquatic";
                     else if (terrainOpen.StartsWith("s"))
                         info.RegionTerrain = "Swamp";
-                    else
+                    else if (terrainOpen.StartsWith("g"))
                         info.RegionTerrain = "Grassland";
+                    else
+                        info.RegionTerrain = "Flatland";
 
                     info.Startup = StartupType.Medium;
                     info.SeeIntoThisSimFromNeighbor = true;
@@ -490,7 +511,11 @@ namespace WhiteCore.Modules
                     // 'Homestead' setup
                     info.RegionType = info.RegionType + "Homestead";                   
                     //info.RegionPort;            // use auto assigned port
-                    info.RegionTerrain = "Homestead";
+                    if (bigRegion)
+                        info.RegionTerrain = "Flatland";
+                    else
+                        info.RegionTerrain = "Homestead";
+
                     info.Startup = StartupType.Medium;
                     info.SeeIntoThisSimFromNeighbor = true;
                     info.InfiniteRegion = false;
