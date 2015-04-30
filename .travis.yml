@@ -2,5 +2,12 @@ language: csharp
 mono:
   - latest
 script:
-  - ./runprebuild.sh
-  - xbuild
+  - ./runprebuild.sh -c Debug -a x64 -b Yes
+notifications:
+  irc:
+    channels:
+      - "chat.freenode.net#whitecore-dev"
+    on_success: always
+    on_failure: always
+    use_notice: true
+    skip_join: true
