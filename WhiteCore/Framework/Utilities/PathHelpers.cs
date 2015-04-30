@@ -103,6 +103,9 @@ namespace WhiteCore.Framework.Utilities
         public static string VerifyWriteFile(string fileName, string defaultExt, string defaultDir, bool createPath)
         {
             // some file sanity checks when saving 
+            if (fileName == "")
+                return "";
+            
             string extension = Path.GetExtension (fileName);
             if (!defaultExt.StartsWith ("."))
                 defaultExt = "." + defaultExt;
@@ -193,6 +196,9 @@ namespace WhiteCore.Framework.Utilities
         public static string VerifyReadFile(string fileName, string defaultExt, string defaultDir, bool showErrors)
         {
             // some sanity checks...
+            if (fileName == "")
+                return "";
+            
             string extension = Path.GetExtension(fileName).ToLower();
             if (!defaultExt.StartsWith ("."))
                 defaultExt = "." + defaultExt;

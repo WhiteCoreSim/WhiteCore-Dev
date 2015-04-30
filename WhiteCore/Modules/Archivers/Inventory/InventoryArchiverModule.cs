@@ -285,11 +285,15 @@ namespace WhiteCore.Modules.Archivers
 
         public List<string> GetIARFilenames()
         {
-            var archives = new List<string>( Directory.GetFiles (m_archiveDirectory, "*.iar"));
-            archives.AddRange( new List<string>( Directory.GetFiles (m_archiveDirectory, "*.tgz")));
             var retVals = new List<string>();
-            foreach (string file in archives)
-                retVals.Add (Path.GetFileNameWithoutExtension (file));
+
+            if (Directory.Exists (m_archiveDirectory))
+            {
+                var archives = new List<string> (Directory.GetFiles (m_archiveDirectory, "*.iar"));
+                archives.AddRange (new List<string> (Directory.GetFiles (m_archiveDirectory, "*.tgz")));
+                foreach (string file in archives)
+                    retVals.Add (Path.GetFileNameWithoutExtension (file));
+            }
 
             return retVals;
         }
@@ -361,9 +365,14 @@ namespace WhiteCore.Modules.Archivers
                         if (archiveFileName == "?")
                         {
                             var archives = GetIARFilenames();
-                            MainConsole.Instance.CleanInfo (" Available archives are : ");
-                            foreach (string file in archives)
-                                MainConsole.Instance.CleanInfo ("   " + file);
+                            if (archives.Count > 0)
+                            {
+                                MainConsole.Instance.CleanInfo (" Available archives are : ");
+                                foreach (string file in archives)
+                                    MainConsole.Instance.CleanInfo ("   " + file);
+                            } else
+                                MainConsole.Instance.CleanInfo ("Sorry, no archives are available.");
+
                             archiveFileName = "";    
                         }
                     } while (archiveFileName == "");

@@ -1418,12 +1418,16 @@ namespace WhiteCore.Region
 
         public List<string> GetOARFilenames()
         {
-            var archives = new List<string>( Directory.GetFiles (Constants.DEFAULT_OARARCHIVE_DIR, "*.oar"));
-            archives.AddRange( new List<string>( Directory.GetFiles (Constants.DEFAULT_OARARCHIVE_DIR, "*.tgz")));
+            var defaultOarDir = Constants.DEFAULT_OARARCHIVE_DIR;
             var retVals = new List<string>();
-            foreach (string file in archives)
-                retVals.Add (Path.GetFileNameWithoutExtension (file));
 
+            if (Directory.Exists (defaultOarDir))
+            {
+                var archives = new List<string> (Directory.GetFiles (Constants.DEFAULT_OARARCHIVE_DIR, "*.oar"));
+                archives.AddRange (new List<string> (Directory.GetFiles (Constants.DEFAULT_OARARCHIVE_DIR, "*.tgz")));
+                foreach (string file in archives)
+                    retVals.Add (Path.GetFileNameWithoutExtension (file));
+            }
             return retVals;
         }
 
@@ -1441,17 +1445,24 @@ namespace WhiteCore.Region
                 do
                 {
                     fileName = MainConsole.Instance.Prompt("OAR to load (? for list)", "");
+                    if (fileName == "")
+                        return;
+
                     if (fileName == "?")
                     {
                         var archives = GetOARFilenames();
-                        MainConsole.Instance.CleanInfo (" Available archives are : ");
-                        foreach (string file in archives)
-                            MainConsole.Instance.CleanInfo ("   " + file);
-                    }
-                } while (fileName == "?");
+                        if (archives.Count > 0)
+                        {
+                            MainConsole.Instance.CleanInfo (" Available archives are : ");
+                            foreach (string file in archives)
+                                MainConsole.Instance.CleanInfo ("   " + file);
+                        } else
+                            MainConsole.Instance.CleanInfo (" Sorry!, no archives are currently available.");
 
-                if (fileName == "")
-                    return;
+                        fileName = "";
+                    }
+                } while (fileName == "");
+
 
                 // need to add this filename to the cmdparams
                 var newParams = new List<string>(cmdparams);
