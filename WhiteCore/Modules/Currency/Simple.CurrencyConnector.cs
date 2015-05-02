@@ -37,6 +37,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Globalization;
 
 namespace WhiteCore.Modules.Currency
 {
@@ -123,9 +124,14 @@ namespace WhiteCore.Modules.Currency
                     "show user purchases",
                     "Display user purchases for a period.",
                     HandleShowPurchases, false, true);
+
+                MainConsole.Instance.Commands.AddCommand(
+                    "stipend set",
+                    "stipend set",
+                    "Sets the next date for stipend",
+                    HandleStipendSet, false, true);
             }
         }
-
         #endregion
 
         #region Service Members
@@ -822,7 +828,17 @@ namespace WhiteCore.Modules.Currency
             }
             MainConsole.Instance.Info(account.Name + " has $" + currency.Amount);
         }
-
+        
+        public void HandleStipendSet(IScene scene, string[] cmd)
+        {
+            string rawDate = MainConsole.Instance.Prompt("Next Stipend Date (MM/dd/yyyy)");
+            // Make a new DateTime from rawDate
+            DateTime newDate = DateTime.ParseExact(rawDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
+            // Code needs to be added to run through the scheduler and change the 
+            // RunsNext to the date that the user wants the scheduler to be
+            // Fly-Man- 2-5-2015
+            MainConsole.Instance.Info("Stipend Date has been set to" + newDate);
+        }
  
         public void HandleShowTransactions(IScene scene, string [] cmd)
         {

@@ -68,9 +68,9 @@ namespace WhiteCore.Modules.Currency
 
             // we only want this if we are local..
             bool remoteCalls = false;
-            IConfig connectorConfig = config.Configs ["WhiteCoreConnectors"];
-            if ((connectorConfig != null) && connectorConfig.Contains ("DoRemoteCalls"))
-                remoteCalls = connectorConfig.GetBoolean ("DoRemoteCalls", false);
+            IConfig connectorConfig = config.Configs["WhiteCoreConnectors"];
+            if ((connectorConfig != null) && connectorConfig.Contains("DoRemoteCalls"))
+                remoteCalls = connectorConfig.GetBoolean("DoRemoteCalls", false);
 
             if (remoteCalls)
                 return;
@@ -81,14 +81,14 @@ namespace WhiteCore.Modules.Currency
                 return;
             IHttpServer server =
                 registry.RequestModuleInterface<ISimulationBase>()
-                        .GetHttpServer((uint) m_connector.GetConfig().ClientPort);
+                        .GetHttpServer((uint)m_connector.GetConfig().ClientPort);
             server.AddXmlRPCHandler("getCurrencyQuote", QuoteFunc);
             server.AddXmlRPCHandler("buyCurrency", BuyFunc);
             server.AddXmlRPCHandler("preflightBuyLandPrep", PreflightBuyLandPrepFunc);
             server.AddXmlRPCHandler("buyLandPrep", LandBuyFunc);
             server.AddXmlRPCHandler("getBalance", GetbalanceFunc);
-            server.AddXmlRPCHandler("/currency.php", GetbalanceFunc);       
-            server.AddXmlRPCHandler("/landtool.php", GetbalanceFunc);         
+            server.AddXmlRPCHandler("/currency.php", GetbalanceFunc);
+            server.AddXmlRPCHandler("/landtool.php", GetbalanceFunc);
 
             m_syncMessagePoster = registry.RequestModuleInterface<ISyncMessagePosterService>();
             m_agentInfoService = registry.RequestModuleInterface<IAgentInfoService>();
@@ -110,14 +110,14 @@ namespace WhiteCore.Modules.Currency
 
         public XmlRpcResponse LandBuyFunc(XmlRpcRequest request, IPEndPoint ep)
         {
-            Hashtable requestData = (Hashtable) request.Params[0];
+            Hashtable requestData = (Hashtable)request.Params[0];
 
             bool success = false;
             if (requestData.ContainsKey("agentId") && requestData.ContainsKey("currencyBuy") &&
                 m_connector.GetConfig().CanBuyCurrencyInworld)
             {
                 UUID agentId;
-                if (UUID.TryParse((string) requestData["agentId"], out agentId))
+                if (UUID.TryParse((string)requestData["agentId"], out agentId))
                 {
                     uint amountBuying = uint.Parse(requestData["currencyBuy"].ToString());
                     m_connector.UserCurrencyTransfer(agentId, UUID.Zero, amountBuying,
@@ -126,14 +126,14 @@ namespace WhiteCore.Modules.Currency
                 }
             }
             XmlRpcResponse returnval = new XmlRpcResponse();
-            Hashtable returnresp = new Hashtable {{"success", success}};
+            Hashtable returnresp = new Hashtable { { "success", success } };
             returnval.Value = returnresp;
             return returnval;
         }
 
         public XmlRpcResponse QuoteFunc(XmlRpcRequest request, IPEndPoint ep)
         {
-            Hashtable requestData = (Hashtable) request.Params[0];
+            Hashtable requestData = (Hashtable)request.Params[0];
 
             XmlRpcResponse returnval = new XmlRpcResponse();
 
@@ -187,27 +187,27 @@ namespace WhiteCore.Modules.Currency
 
         public XmlRpcResponse BuyFunc(XmlRpcRequest request, IPEndPoint ep)
         {
-            Hashtable requestData = (Hashtable) request.Params[0];
+            Hashtable requestData = (Hashtable)request.Params[0];
             bool success = false;
             if (requestData.ContainsKey("agentId") && requestData.ContainsKey("currencyBuy") &&
                 m_connector.GetConfig().CanBuyCurrencyInworld)
             {
                 UUID agentId;
-                if (UUID.TryParse((string) requestData["agentId"], out agentId))
+                if (UUID.TryParse((string)requestData["agentId"], out agentId))
                 {
                     uint amountBuying = uint.Parse(requestData["currencyBuy"].ToString());
                     success = m_connector.InworldCurrencyBuyTransaction(agentId, amountBuying, ep);
                 }
             }
             XmlRpcResponse returnval = new XmlRpcResponse();
-            Hashtable returnresp = new Hashtable {{"success", success}};
+            Hashtable returnresp = new Hashtable { { "success", success } };
             returnval.Value = returnresp;
             return returnval;
         }
 
         public XmlRpcResponse PreflightBuyLandPrepFunc(XmlRpcRequest request, IPEndPoint ep)
         {
-            Hashtable requestData = (Hashtable) request.Params[0];
+            Hashtable requestData = (Hashtable)request.Params[0];
             XmlRpcResponse ret = new XmlRpcResponse();
             Hashtable retparam = new Hashtable();
 
@@ -225,13 +225,10 @@ namespace WhiteCore.Modules.Currency
             if (requestData.ContainsKey("agentId") && requestData.ContainsKey("currencyBuy"))
             {
                 UUID agentId;
-                UUID.TryParse((string) requestData["agentId"], out agentId);
+                UUID.TryParse((string)requestData["agentId"], out agentId);
                 UserCurrency currency = m_connector.GetUserCurrency(agentId);
                 IUserProfileInfo profile =
                     Framework.Utilities.DataManager.RequestPlugin<IProfileConnector>("IProfileConnector").GetUserProfile(agentId);
-
-
-                //IClientCapsService client = m_dustCurrencyService.Registry.RequestModuleInterface<ICapsService>().GetClientCapsService(agentId);
                 OSDMap replyData = null;
                 bool response = false;
                 UserInfo user = m_agentInfoService.GetUserInfo(agentId.ToString());
@@ -271,14 +268,9 @@ namespace WhiteCore.Modules.Currency
                     }
                     else
                     {
-                        //if (client != null)
-                        //    m_dustCurrencyService.SendGridMessage(agentId, String.Format(m_dustCurrencyService.m_options.MessgeBeforeBuyLand, profile.DisplayName, replyData.ContainsKey("SalePrice")), false, UUID.Zero);
                         if (replyData.ContainsKey("SalePrice"))
                         {
-                            // I think, this might be usable if they don't have the money
-                            // Hashtable currencytable = new Hashtable { { "estimatedCost", replyData["SalePrice"].AsInteger() } };
-
-                            int landTierNeeded = (int) (currency.LandInUse + replyData["Area"].AsInteger());
+                            int landTierNeeded = (int)(currency.LandInUse + replyData["Area"].AsInteger());
                             bool needsUpgrade = false;
                             switch (profile.MembershipGroup)
                             {
@@ -290,9 +282,7 @@ namespace WhiteCore.Modules.Currency
                                     needsUpgrade = true;
                                     break;
                             }
-                            // landuse.Add("action", m_DustCurrencyService.m_options.upgradeMembershipUri);
                             landuse.Add("action", needsUpgrade);
-
                             retparam.Add("success", true);
                             retparam.Add("currency", currency);
                             retparam.Add("membership", level);
@@ -306,7 +296,6 @@ namespace WhiteCore.Modules.Currency
 
             return ret;
         }
-
         #endregion
     }
 }

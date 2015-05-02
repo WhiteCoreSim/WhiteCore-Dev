@@ -37,7 +37,7 @@ using WhiteCore.Framework.ConsoleFramework;
 
 namespace WhiteCore.Modules.Currency
 {
-    public class ScheduledCurrencyTransferModule : IService, IScheduledMoneyModule
+    public class ScheduledPayments : IService, IScheduledMoneyModule
     {
         #region Declares
 
@@ -114,7 +114,7 @@ namespace WhiteCore.Modules.Currency
         {
             if (functionName.StartsWith("ScheduledPayment"))
             {
-                OSDMap itemInfo = (OSDMap) OSDParser.DeserializeJson(parameters.ToString());
+                OSDMap itemInfo = (OSDMap)OSDParser.DeserializeJson(parameters.ToString());
                 IMoneyModule moneyModule = m_registry.RequestModuleInterface<IMoneyModule>();
                 UUID agentID = itemInfo["AgentID"];
                 string scdID = itemInfo["SchedulerID"];
