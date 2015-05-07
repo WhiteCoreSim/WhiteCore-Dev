@@ -25,24 +25,27 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.PresenceInfo;
-using WhiteCore.Framework.SceneInfo;
-using WhiteCore.Framework.Servers;
-using Nini.Config;
-using Nwc.XmlRpc;
-using OpenMetaverse;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
+using Nini.Config;
+using Nwc.XmlRpc;
+using OpenMetaverse;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.PresenceInfo;
+using WhiteCore.Framework.SceneInfo;
+using WhiteCore.Framework.Servers;
 
-namespace WhiteCore.Modules.SampleCurrencyModule
+namespace WhiteCore.Modules.BaseCurrencyModule
 {
+    /* This module provides the necessary economy functionality for the viewer
+       but with all values being $0
+    */
     public class CurrencyModule : IMoneyModule, INonSharedRegionModule
     {
-        private bool m_enabled;
-        private IConfigSource m_config;
+        bool m_enabled;
+        IConfigSource m_config;
 
         #region IMoneyModule Members
 
