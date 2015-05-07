@@ -26,6 +26,14 @@
  */
 
 
+using System;
+using System.Collections;
+using System.Net;
+using System.Threading;
+using Nini.Config;
+using Nwc.XmlRpc;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
@@ -33,14 +41,6 @@ using WhiteCore.Framework.Servers;
 using WhiteCore.Framework.Servers.HttpServer.Interfaces;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Profile;
-using Nini.Config;
-using Nwc.XmlRpc;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using System;
-using System.Collections;
-using System.Net;
-using System.Threading;
 
 namespace WhiteCore.Modules.Currency
 {
@@ -48,9 +48,9 @@ namespace WhiteCore.Modules.Currency
     {
         #region Declares
 
-        private SimpleCurrencyConnector m_connector;
-        private ISyncMessagePosterService m_syncMessagePoster;
-        private IAgentInfoService m_agentInfoService;
+        SimpleCurrencyConnector m_connector;
+        ISyncMessagePosterService m_syncMessagePoster;
+        IAgentInfoService m_agentInfoService;
 
         #endregion
 

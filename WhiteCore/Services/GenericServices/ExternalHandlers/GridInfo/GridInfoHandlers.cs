@@ -119,28 +119,28 @@ namespace WhiteCore.Services
                 GridWelcomeURI = GetConfig(m_config, "welcome");
                 if (GridWelcomeURI == "" && webInterface != null)
                     GridWelcomeURI = webInterface.LoginScreenURL;
-                _info["welcome"] = GridWelcomeURI;
+                _info["welcome"] = CheckServerHost(GridWelcomeURI);
 
                 // registration
                 GridRegisterURI = GetConfig(m_config, "register");
                 if (GridRegisterURI == "" && webInterface != null)
                     GridRegisterURI = webInterface.RegistrationScreenURL;
-                _info["register"] = GridRegisterURI;
+                _info["register"] = CheckServerHost(GridRegisterURI);
 
                 GridAboutURI = GetConfig(m_config, "about");
                 if (GridAboutURI == "" && webInterface != null)
                     GridAboutURI = webInterface.HomeScreenURL;
-                _info["about"] = GridAboutURI;
+                _info["about"] = CheckServerHost(GridAboutURI);
 
                 GridHelpURI = GetConfig(m_config, "help");
                 if (GridHelpURI == "" && webInterface != null)
                     GridHelpURI = webInterface.HelpScreenURL;
-                _info["help"] = GridHelpURI;
+                _info["help"] = CheckServerHost(GridHelpURI);
 
                 GridForgotPasswordURI = GetConfig(m_config, "forgottenpassword");
                 if (GridForgotPasswordURI == "" && webInterface != null)
                     GridForgotPasswordURI = webInterface.ForgotPasswordScreenURL;
-                _info["password"] = GridForgotPasswordURI;
+                 _info["password"] = CheckServerHost(GridForgotPasswordURI);
 
                 // mapping
                 GridMapTileURI = GetConfig(m_config, "map");
@@ -173,15 +173,25 @@ namespace WhiteCore.Services
                         GridEconomyURI = MainServer.Instance.FullHostName + ":" + port + "/";
                     }
                 }
-                _info["economy"] = _info["helperuri"] = GridEconomyURI;
+                _info["economy"] = _info["helperuri"] = CheckServerHost(GridEconomyURI);
 
 
                 // misc.. these must be set to be used
                 GridSearchURI = GetConfig(m_config, "search");
+                _info["search"] = CheckServerHost(GridSearchURI);
+
                 GridDestinationURI = GetConfig(m_config, "destination");
+                _info["destination"] = CheckServerHost(GridDestinationURI);
+
                 GridMarketplaceURI = GetConfig(m_config, "marketplace");
+                _info["marketplace"] = CheckServerHost(GridMarketplaceURI);
+
                 GridTutorialURI = GetConfig(m_config, "tutorial");
+                _info["tutorial"] = CheckServerHost(GridTutorialURI);
+
                 GridSnapshotConfigURI = GetConfig(m_config, "snapshotconfig");
+                _info["snapshotconfig"] = CheckServerHost(GridSnapshotConfigURI);
+
             }
             catch (Exception)
             {
@@ -191,6 +201,12 @@ namespace WhiteCore.Services
 
             MainConsole.Instance.DebugFormat("[GRID INFO SERVICE]: Grid info service initialized with {0} keys",
                                              _info.Count);
+        }
+
+        string CheckServerHost(string uri)
+        {
+            // if uri is in the format http://ServersHostnmae:nnnn/ replace with the current Hostname
+            return uri.Replace ("ServersHostname", MainServer.Instance.HostName);
         }
 
         private string GetConfig(IConfigSource config, string p)

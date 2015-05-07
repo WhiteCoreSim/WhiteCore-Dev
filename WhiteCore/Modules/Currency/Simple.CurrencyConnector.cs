@@ -25,19 +25,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Net;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Globalization;
 
 namespace WhiteCore.Modules.Currency
 {
@@ -45,16 +45,16 @@ namespace WhiteCore.Modules.Currency
     public class SimpleCurrencyConnector : ConnectorBase, ISimpleCurrencyConnector
     {
         #region Declares
-        private const string _REALM = "simple_currency";
-        private const string _REALMHISTORY = "simple_currency_history";
-        private const string _REALMPURCHASE = "simple_purchased";
+        const string _REALM = "simple_currency";
+        const string _REALMHISTORY = "simple_currency_history";
+        const string _REALMPURCHASE = "simple_purchased";
 
-        private IGenericData m_gd;
-        private SimpleCurrencyConfig m_config;
-        private ISyncMessagePosterService m_syncMessagePoster;
-        private IAgentInfoService m_userInfoService;
-        private string InWorldCurrency = "";
-        private string RealCurrency = "";
+        IGenericData m_gd;
+        SimpleCurrencyConfig m_config;
+        ISyncMessagePosterService m_syncMessagePoster;
+        IAgentInfoService m_userInfoService;
+        string InWorldCurrency = "";
+        string RealCurrency = "";
         
         #endregion
 
@@ -155,14 +155,12 @@ namespace WhiteCore.Modules.Currency
 
             Dictionary<string, object> where = new Dictionary<string, object>(1);
             where["PrincipalID"] = agentId;
-            List<string> query = m_gd.Query(new string[] {"*"}, _REALM, new QueryFilter()
+            List<string> query = m_gd.Query(new [] {"*"}, _REALM, new QueryFilter()
                                                                             {
                                                                                 andFilters = where
                                                                             }, null, null, null);
-
             UserCurrency currency;
-
-            if (query.Count == 0)
+            if ((query == null) || (query.Count == 0))
             {
                 currency = new UserCurrency(agentId, 0, 0, 0, false, 0);
                 UserCurrencyCreate(agentId);
@@ -191,12 +189,12 @@ namespace WhiteCore.Modules.Currency
                                   };
             Dictionary<string, object> where = new Dictionary<string, object>(1);
             where["PrincipalID"] = groupID;
-            List<string> queryResults = m_gd.Query(new string[] {"*"}, _REALM, new QueryFilter()
+            List<string> queryResults = m_gd.Query(new [] {"*"}, _REALM, new QueryFilter()
                                                                                    {
                                                                                        andFilters = where
                                                                                    }, null, null, null);
 
-            if (queryResults.Count == 0)
+            if ((queryResults == null) || (queryResults.Count == 0))
             {
                 GroupCurrencyCreate(groupID);
                 return gb;
@@ -300,10 +298,10 @@ namespace WhiteCore.Modules.Currency
 
    
             var transactions = m_gd.Query (new string[1] {"count(*)"}, _REALMHISTORY, filter, null, null, null);
-            if (transactions.Count == 0)
+            if ((transactions == null) || (transactions.Count == 0))
                 return 0;
-            else
-                return (uint)int.Parse (transactions[0]);
+           
+            return (uint)int.Parse (transactions[0]);
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
@@ -375,10 +373,10 @@ namespace WhiteCore.Modules.Currency
                 filter.andFilters["PrincipalID"] = UserID;
 
             var purchases = m_gd.Query (new string[1] { "count(*)" }, _REALMPURCHASE, filter, null, null, null);
-            if (purchases.Count == 0)
+            if ((purchases == null) || (purchases.Count == 0))
                 return 0;
-            else
-                return (uint)int.Parse (purchases [0]);
+            
+            return (uint)int.Parse (purchases [0]);
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
@@ -514,7 +512,7 @@ namespace WhiteCore.Modules.Currency
             return true;
         }
 
-        private void SendUpdateMoneyBalanceToClient(UUID toID, UUID transactionID, string serverURI, uint balance, string message)
+        void SendUpdateMoneyBalanceToClient(UUID toID, UUID transactionID, string serverURI, uint balance, string message)
         {
             OSDMap map = new OSDMap();
             map["Method"] = "UpdateMoneyBalance";
@@ -526,7 +524,7 @@ namespace WhiteCore.Modules.Currency
         }
 
         // Method Added By Alicia Raven
-        private void AddTransactionRecord(UUID TransID, string Description, UUID ToID, UUID FromID, uint Amount,
+        void AddTransactionRecord(UUID TransID, string Description, UUID ToID, UUID FromID, uint Amount,
             TransactionType TransType, uint ToBalance, uint FromBalance, string ToName, string FromName, string toObjectName, string fromObjectName, UUID regionID)
         {
             if(Amount > m_config.MaxAmountBeforeLogging)
@@ -550,7 +548,7 @@ namespace WhiteCore.Modules.Currency
 
         #region Helper Methods
 
-        private void UserCurrencyUpdate(UserCurrency agent, bool full)
+        void UserCurrencyUpdate(UserCurrency agent, bool full)
         {
             if (full)
                 m_gd.Update(_REALM,
@@ -590,7 +588,7 @@ namespace WhiteCore.Modules.Currency
                             , null, null);
         }
 
-        private void UserCurrencyCreate(UUID agentId)
+        void UserCurrencyCreate(UUID agentId)
         {
 			// Check if this agent has a user account, if not assume its a bot and exit
 			UserAccount account = m_registry.RequestModuleInterface<IUserAccountService>().GetUserAccount(new List<UUID> { UUID.Zero }, agentId);
@@ -600,12 +598,12 @@ namespace WhiteCore.Modules.Currency
             }
         }
 
-        private void GroupCurrencyCreate(UUID groupID)
+        void GroupCurrencyCreate(UUID groupID)
         {
             m_gd.Insert(_REALM, new object[] {groupID.ToString(), 0, 0, 0, 1, 0});
         }
 
-        private DateTime StartTransactionPeriod( int period, string periodType)
+        DateTime StartTransactionPeriod( int period, string periodType)
         {
             DateTime then = DateTime.Now;
             switch (periodType)
@@ -636,7 +634,7 @@ namespace WhiteCore.Modules.Currency
             return then;
         }
 
-        private static List<AgentTransfer> ParseTransferQuery(List<string> query)
+        static List<AgentTransfer> ParseTransferQuery(List<string> query)
         {
            var transferList = new List<AgentTransfer>();
 
@@ -666,7 +664,7 @@ namespace WhiteCore.Modules.Currency
         }
 
 
-        private static List<AgentPurchase> ParsePurchaseQuery(List<string> query)
+        static List<AgentPurchase> ParsePurchaseQuery(List<string> query)
         {
             var purchaseList = new List<AgentPurchase>();
 
@@ -738,9 +736,6 @@ namespace WhiteCore.Modules.Currency
         public void AddMoney(IScene scene, string[] cmd)
         {
             string name = MainConsole.Instance.Prompt("User Name: ");
-            uint amount = 0;
-            while (!uint.TryParse(MainConsole.Instance.Prompt("Amount: ", "0"), out amount))
-                MainConsole.Instance.Info("Bad input, must be a number > 0");
 
             UserAccount account =
                 m_registry.RequestModuleInterface<IUserAccountService>()
@@ -750,7 +745,11 @@ namespace WhiteCore.Modules.Currency
                 MainConsole.Instance.Info("No account found");
                 return;
             }
-           
+
+            uint amount = 0;
+            while (!uint.TryParse(MainConsole.Instance.Prompt("Amount: ", "0"), out amount))
+                MainConsole.Instance.Info("Bad input, must be a number > 0");
+                 
             // log the transfer
             UserCurrencyTransfer(account.PrincipalID, UUID.Zero, amount, "Money transfer", TransactionType.SystemGenerated, UUID.Zero);
            
@@ -766,7 +765,7 @@ namespace WhiteCore.Modules.Currency
             {
                 UserInfo toUserInfo = m_userInfoService.GetUserInfo(account.PrincipalID.ToString());
                 if (toUserInfo != null && toUserInfo.IsOnline)
-                    SendUpdateMoneyBalanceToClient(account.PrincipalID, UUID.Zero, toUserInfo.CurrentRegionURI, (currency.Amount + amount), "");
+                    SendUpdateMoneyBalanceToClient(account.PrincipalID, UUID.Zero, toUserInfo.CurrentRegionURI, (currency.Amount), "");
             }
 
 
@@ -775,9 +774,6 @@ namespace WhiteCore.Modules.Currency
         public void SetMoney(IScene scene, string[] cmd)
         {
             string name = MainConsole.Instance.Prompt("User Name: ");
-            uint amount = 0;
-            while (!uint.TryParse(MainConsole.Instance.Prompt("Set User's Money Amount: ", "0"), out amount))
-                MainConsole.Instance.Info("Bad input, must be a number > 0");
 
             UserAccount account =
                 m_registry.RequestModuleInterface<IUserAccountService>()
@@ -788,6 +784,10 @@ namespace WhiteCore.Modules.Currency
                 return;
             }
 
+            uint amount = 0;
+            while (!uint.TryParse(MainConsole.Instance.Prompt("Set User's Money Amount: ", "0"), out amount))
+                MainConsole.Instance.Info("Bad input, must be a number > 0");
+            
             // log the transfer
             UserCurrencyTransfer(account.PrincipalID, UUID.Zero, amount, "Set user money", TransactionType.SystemGenerated, UUID.Zero);
 
@@ -803,7 +803,7 @@ namespace WhiteCore.Modules.Currency
             {
                 UserInfo toUserInfo = m_userInfoService.GetUserInfo(account.PrincipalID.ToString());
                 if (toUserInfo != null && toUserInfo.IsOnline)
-                    SendUpdateMoneyBalanceToClient(account.PrincipalID, UUID.Zero, toUserInfo.CurrentRegionURI, amount, "");
+                    SendUpdateMoneyBalanceToClient(account.PrincipalID, UUID.Zero, toUserInfo.CurrentRegionURI, currency.Amount, "");
             }
 
  

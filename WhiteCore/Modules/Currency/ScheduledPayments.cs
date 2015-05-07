@@ -26,14 +26,14 @@
  */
 
 
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.Services;
-using WhiteCore.Framework.Utilities;
+using System;
 using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
-using System;
 using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.Services;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.Currency
 {
@@ -110,7 +110,7 @@ namespace WhiteCore.Modules.Currency
                 scheduler.Remove("ScheduledPayment " + identifier);
         }
 
-        private object ChargeNext(string functionName, object parameters)
+        object ChargeNext(string functionName, object parameters)
         {
             if (functionName.StartsWith("ScheduledPayment"))
             {
@@ -141,7 +141,7 @@ namespace WhiteCore.Modules.Currency
             return null;
         }
 
-        private bool CheckWhetherUserShouldPay(UUID agentID, string text)
+        bool CheckWhetherUserShouldPay(UUID agentID, string text)
         {
             if (OnCheckWhetherUserShouldPay == null)
                 return true;

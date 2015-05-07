@@ -30,21 +30,21 @@ using System.Collections.Generic;
 using System.Timers;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
-using WhiteCore.Framework.Services;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.Utilities;
 using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.Services;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.Currency
 {
     class GiveStipends
     {
-        private readonly Timer taskTimer = new Timer();
-        private readonly bool m_enabled = false;
-        private SimpleCurrencyConfig m_options;
+        readonly Timer taskTimer = new Timer();
+        readonly bool m_enabled = false;
         readonly IScheduleService m_scheduler;
-        private readonly IRegistryCore m_registry;
-        private readonly SimpleCurrencyConnector m_currencyService;
+        readonly IRegistryCore m_registry;
+        readonly SimpleCurrencyConnector m_currencyService;
+        SimpleCurrencyConfig m_options;
 
         public GiveStipends(SimpleCurrencyConfig options, IRegistryCore registry, SimpleCurrencyConnector CurrencyService)
         {
@@ -65,7 +65,7 @@ namespace WhiteCore.Modules.Currency
             registry.RequestModuleInterface<ISimulationBase>().EventManager.RegisterEventHandler("UpdateUserInformation", CreateUserInformation);
         }
         
-        private object CreateUserInformation(string functionname, object parameters)
+        object CreateUserInformation(string functionname, object parameters)
         {
             UUID userid = (UUID)parameters;
             IUserAccountService userService = m_registry.RequestModuleInterface<IUserAccountService>();
@@ -90,7 +90,7 @@ namespace WhiteCore.Modules.Currency
 
         }
 
-        private object DeleteUserInformation(string functionname, object parameters)
+        object DeleteUserInformation(string functionname, object parameters)
         {
             UUID user = (UUID)parameters;
             SchedulerItem i = m_scheduler.Get(user.ToString(), "StipendsPayout");
@@ -99,7 +99,7 @@ namespace WhiteCore.Modules.Currency
             return null;
         }
 
-        private object StipendsPayOutEvent(string functionName, object parameters)
+        object StipendsPayOutEvent(string functionName, object parameters)
         {
             if (functionName != "StipendsPayout") return null;
             StipendsInfo si = new StipendsInfo();
@@ -126,7 +126,7 @@ namespace WhiteCore.Modules.Currency
             return "";
         }
 
-        private void TimerElapsed(object sender, ElapsedEventArgs elapsedEventArgs)
+        void TimerElapsed(object sender, ElapsedEventArgs elapsedEventArgs)
         {
             taskTimer.Enabled = false;
             IUserAccountService userService = m_registry.RequestModuleInterface<IUserAccountService>();
@@ -148,7 +148,7 @@ namespace WhiteCore.Modules.Currency
             }
         }
 
-        private static DateTime UnixTimeStampToDateTime(int unixTimeStamp)
+        static DateTime UnixTimeStampToDateTime(int unixTimeStamp)
         {
             // Unix timestamp is seconds past epoch
             DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);

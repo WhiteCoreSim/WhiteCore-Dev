@@ -26,14 +26,15 @@
  */
 
 
-using WhiteCore.Framework.ConsoleFramework;
-using WhiteCore.Framework.Modules;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
+using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.Servers;
 
 namespace WhiteCore.Modules.Currency
 {
@@ -41,31 +42,31 @@ namespace WhiteCore.Modules.Currency
     {
         #region declarations
 
-        private uint m_PriceUpload = 0;
-        private uint m_PriceGroupCreate = 0;
-        private uint m_PriceDirectoryFee = 0;
-        private int m_Stipend = 0;
-        private string m_UpgradeMembershipUri = "";
-        private string m_ErrorURI = "";
-        private int m_SchedulerInterval = 0;
-        private bool m_CanBuyCurrencyInworld = true;
-        private bool m_GiveStipends = false;
-        private string m_StipendsEveryType = "month";
-        private bool m_StipendsPremiumOnly = false;
-        private int m_StipendsEvery = 1;
-        private uint m_ClientPort = 8002;
-        private bool m_StipendsLoadOldUsers = true;
-        private bool m_GiveStipendsOnlyWhenLoggedIn = false;
-        private bool m_SaveTransactionLogs = false;
-        private int m_MaxAmountBeforeLogging = -1;
-        private int m_AdditionPercentage = 291;
-        private int m_AdditionAmount = 30;
-        private int m_RealCurrencyConversionFactor = 1;
-        private int m_MaxAmountPurchasable = 10000;
-        private int m_MaxAmountPurchasableOverTime = 100000;
-        private int m_MaxAmountPurchasableEveryAmount = 1;
-        private string m_MaxAmountPurchasableEveryType = "week";
-        private int m_MinAmountPurchasable = 0;
+        uint m_PriceUpload = 0;
+        uint m_PriceGroupCreate = 0;
+        uint m_PriceDirectoryFee = 0;
+        int m_Stipend = 0;
+        string m_UpgradeMembershipUri = "";
+        string m_ErrorURI = "";
+        int m_SchedulerInterval = 0;
+        bool m_CanBuyCurrencyInworld = true;
+        bool m_GiveStipends = false;
+        string m_StipendsEveryType = "month";
+        bool m_StipendsPremiumOnly = false;
+        int m_StipendsEvery = 1;
+        uint m_ClientPort = 8002;
+        bool m_StipendsLoadOldUsers = true;
+        bool m_GiveStipendsOnlyWhenLoggedIn = false;
+        bool m_SaveTransactionLogs = false;
+        int m_MaxAmountBeforeLogging = -1;
+        int m_AdditionPercentage = 291;
+        int m_AdditionAmount = 30;
+        int m_RealCurrencyConversionFactor = 1;
+        int m_MaxAmountPurchasable = 10000;
+        int m_MaxAmountPurchasableOverTime = 100000;
+        int m_MaxAmountPurchasableEveryAmount = 1;
+        string m_MaxAmountPurchasableEveryType = "week";
+        int m_MinAmountPurchasable = 0;
 
         #endregion
 
@@ -183,13 +184,13 @@ namespace WhiteCore.Modules.Currency
         public string ErrorURI
         {
             get { return m_ErrorURI; }
-            set { m_ErrorURI = value; }
+            set { m_ErrorURI = value.Replace("ServersHostname", MainServer.Instance.HostName); }
         }
 
         public string UpgradeMembershipUri
         {
             get { return m_UpgradeMembershipUri; }
-            set { m_UpgradeMembershipUri = value; }
+            set { m_UpgradeMembershipUri = value.Replace ("ServersHostname", MainServer.Instance.HostName); }
         }
 
         public int Stipend
@@ -407,3 +408,4 @@ namespace WhiteCore.Modules.Currency
         }
     }
 }
+
