@@ -12021,6 +12021,36 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                         {
                             ret.Add(0);
                         }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_PHYSICS)
+                        {
+                        	ret.Add(0);
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_PHANTOM)
+                        {
+                        	ret.Add(0);
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_TEMP_ON_REZ)
+                        {
+                        	ret.Add(0);
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_RENDER_WEIGHT)
+                        {
+                        	ret.Add(-1);
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_HOVER_HEIGHT)
+                        {
+                        	ret.Add(new LSL_Float(0));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_LAST_OWNER_ID)
+                        {
+                        	ret.Add(ScriptBaseClass.NULL_KEY);
+                        	break;
+                        }
                         else
                         {
                             ret.Add(ScriptBaseClass.OBJECT_UNKNOWN_DETAIL);
