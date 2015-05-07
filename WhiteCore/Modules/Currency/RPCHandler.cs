@@ -48,7 +48,7 @@ namespace WhiteCore.Modules.Currency
     {
         #region Declares
 
-        SimpleCurrencyConnector m_connector;
+        BaseCurrencyConnector m_connector;
         ISyncMessagePosterService m_syncMessagePoster;
         IAgentInfoService m_agentInfoService;
 
@@ -75,7 +75,7 @@ namespace WhiteCore.Modules.Currency
             if (remoteCalls)
                 return;
 
-            m_connector = Framework.Utilities.DataManager.RequestPlugin<ISimpleCurrencyConnector>() as SimpleCurrencyConnector;
+            m_connector = Framework.Utilities.DataManager.RequestPlugin<ISimpleCurrencyConnector>() as BaseCurrencyConnector;
 
             if (m_connector.GetConfig().ClientPort == 0 && MainServer.Instance == null)
                 return;

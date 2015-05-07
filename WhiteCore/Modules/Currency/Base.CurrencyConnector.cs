@@ -42,7 +42,7 @@ using WhiteCore.Framework.Utilities;
 namespace WhiteCore.Modules.Currency
 {
     
-    public class SimpleCurrencyConnector : ConnectorBase, ISimpleCurrencyConnector
+    public class BaseCurrencyConnector : ConnectorBase, ISimpleCurrencyConnector
     {
         #region Declares
         const string _REALM = "simple_currency";
@@ -50,7 +50,7 @@ namespace WhiteCore.Modules.Currency
         const string _REALMPURCHASE = "simple_purchased";
 
         IGenericData m_gd;
-        SimpleCurrencyConfig m_config;
+        BaseCurrencyConfig m_config;
         ISyncMessagePosterService m_syncMessagePoster;
         IAgentInfoService m_userInfoService;
         string InWorldCurrency = "";
@@ -89,7 +89,7 @@ namespace WhiteCore.Modules.Currency
                 GenericData.ConnectToDatabase(defaultConnectionString, "SimpleCurrency", true);
             Framework.Utilities.DataManager.RegisterPlugin(Name, this);
 
-            m_config = new SimpleCurrencyConfig(config);
+            m_config = new BaseCurrencyConfig(config);
 
             Init(m_registry, Name, "", "/currency/", "CurrencyServerURI");
 
@@ -137,11 +137,11 @@ namespace WhiteCore.Modules.Currency
         #region Service Members
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public SimpleCurrencyConfig GetConfig()
+        public BaseCurrencyConfig GetConfig()
         {
             object remoteValue = DoRemoteByURL("CurrencyServerURI");
             if (remoteValue != null || m_doRemoteOnly)
-                return (SimpleCurrencyConfig) remoteValue;
+                return (BaseCurrencyConfig) remoteValue;
 
             return m_config;
         }

@@ -38,16 +38,16 @@ using WhiteCore.Framework.ConsoleFramework;
 
 namespace WhiteCore.Modules.Currency
 {
-    public class SimpleCurrencyModule : IMoneyModule, IService
+    public class BaseCurrencyServiceModule : IMoneyModule, IService
     {
         #region Declares
 
-        SimpleCurrencyConfig Config
+        BaseCurrencyConfig Config
         {
             get { return m_connector.GetConfig(); }
         }
         List<IScene> m_scenes = new List<IScene>();
-        SimpleCurrencyConnector m_connector;
+        BaseCurrencyConnector m_connector;
         IRegistryCore m_registry;
 
         #endregion
@@ -61,8 +61,7 @@ namespace WhiteCore.Modules.Currency
                 return;
 
             m_registry = registry;
-            m_connector = Framework.Utilities.DataManager.RequestPlugin<ISimpleCurrencyConnector>() as SimpleCurrencyConnector;
-            //registry.RegisterModuleInterface<IMoneyModule>(this);
+            m_connector = Framework.Utilities.DataManager.RequestPlugin<ISimpleCurrencyConnector>() as BaseCurrencyConnector;
         }
 
         public void Start(IConfigSource config, IRegistryCore registry)

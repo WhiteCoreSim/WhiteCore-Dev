@@ -38,7 +38,7 @@ using WhiteCore.Framework.Servers;
 
 namespace WhiteCore.Modules.Currency
 {
-    public class SimpleCurrencyConfig : IDataTransferable
+    public class BaseCurrencyConfig : IDataTransferable
     {
         #region declarations
 
@@ -72,7 +72,7 @@ namespace WhiteCore.Modules.Currency
 
         #region functions
 
-        public SimpleCurrencyConfig(IConfig economyConfig)
+        public BaseCurrencyConfig(IConfig economyConfig)
         {
             foreach (PropertyInfo propertyInfo in GetType().GetProperties())
             {
@@ -114,11 +114,11 @@ namespace WhiteCore.Modules.Currency
             }
         }
 
-        public SimpleCurrencyConfig()
+        public BaseCurrencyConfig()
         {
         }
 
-        public SimpleCurrencyConfig(OSDMap values)
+        public BaseCurrencyConfig(OSDMap values)
         {
             FromOSD(values);
         }

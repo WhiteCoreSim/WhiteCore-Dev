@@ -43,10 +43,10 @@ namespace WhiteCore.Modules.Currency
         readonly bool m_enabled = false;
         readonly IScheduleService m_scheduler;
         readonly IRegistryCore m_registry;
-        readonly SimpleCurrencyConnector m_currencyService;
-        SimpleCurrencyConfig m_options;
+        readonly BaseCurrencyConnector m_currencyService;
+        BaseCurrencyConfig m_options;
 
-        public GiveStipends(SimpleCurrencyConfig options, IRegistryCore registry, SimpleCurrencyConnector CurrencyService)
+        public GiveStipends(BaseCurrencyConfig options, IRegistryCore registry, BaseCurrencyConnector CurrencyService)
         {
             m_enabled = options.GiveStipends;
             if (!m_enabled) return;
