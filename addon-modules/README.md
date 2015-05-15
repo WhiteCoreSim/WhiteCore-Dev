@@ -18,9 +18,21 @@ There are two ways to install these modules, auto-installation, or manual compil
 Copy the selected directory to the addon-modules of the main source code directory.
 Each module should be in it's own tree and the root of the tree should contain a file named "prebuild.xml".
 
-The prebuild.xml should only contain <Project> and associated child tags. 
-The <?xml>, <Prebuild>, <Solution> and <Configuration> tags should not be included since the add-on modules prebuild.xml will be inserted directly into the main prebuild.xml
+*The prebuild.xml should only contain <Project> and associated child tags. 
+The <?xml>, <Prebuild>, <Solution> and <Configuration> tags should not be included since the add-on modules prebuild.xml will be inserted directly into the main prebuild.xml*
 
 The module source code will be included in the main WhiteCore solution when the "runprebuild" script is executed for your system.
 
 
+#Notes
+Latest update of May 15th, 2015
+
+All modules available compile correctly.
+##FlexibleWind: 
+  Needs the AForge.Nath.dll copied to the WhiteCoreSim/bin folder
+##FreeswitchVoice:
+  Has not been tested fully so there may be issues
+##IARModifierGUI:
+  Is a standalone program, still largely untested.  Have a goo backup if you are modifying the DefaultInventory.iar
+##IrCChat:
+  The 'group' chat is still under development and may work in unexpected ways.  The Region chat is fine.

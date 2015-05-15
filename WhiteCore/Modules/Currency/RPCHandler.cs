@@ -76,12 +76,11 @@ namespace WhiteCore.Modules.Currency
                 return;
 
             m_connector = Framework.Utilities.DataManager.RequestPlugin<ISimpleCurrencyConnector>() as BaseCurrencyConnector;
-
-            if (m_connector.GetConfig().ClientPort == 0 && MainServer.Instance == null)
+            var curPort = m_connector.GetConfig ().ClientPort;
+            if (curPort == 0 && MainServer.Instance == null)
                 return;
-            IHttpServer server =
-                registry.RequestModuleInterface<ISimulationBase>()
-                        .GetHttpServer((uint)m_connector.GetConfig().ClientPort);
+            
+            IHttpServer server = registry.RequestModuleInterface<ISimulationBase>().GetHttpServer((uint) curPort);
             server.AddXmlRPCHandler("getCurrencyQuote", QuoteFunc);
             server.AddXmlRPCHandler("buyCurrency", BuyFunc);
             server.AddXmlRPCHandler("preflightBuyLandPrep", PreflightBuyLandPrepFunc);

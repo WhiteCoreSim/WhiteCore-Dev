@@ -47,11 +47,11 @@ namespace WhiteCore.Services.DataService
 {
     public class LocalDirectoryServiceConnector : ConnectorBase, IDirectoryServiceConnector
     {
-        private IGenericData GD;
-        private string m_userClassifiedsTable = "user_classifieds";
-        private string m_eventInfoTable = "event_information";
-        private string m_eventNotificationTable = "event_notifications";
-        private string m_SearchParcelTable = "search_parcel";
+        IGenericData GD;
+        string m_userClassifiedsTable = "user_classifieds";
+        string m_eventInfoTable = "event_information";
+        string m_eventNotificationTable = "event_notifications";
+        string m_SearchParcelTable = "search_parcel";
 
         #region IDirectoryServiceConnector Members
 
@@ -117,14 +117,14 @@ namespace WhiteCore.Services.DataService
                                                                          args.RegionID,
                                                                          args.GlobalID,
                                                                          args.LocalID,
-                                                                         args.UserLocation.X,
+                                                                         args.UserLocation.X,       // this is actually the landing position for teleporting
                                                                          args.UserLocation.Y,
                                                                          args.UserLocation.Z,
                                                                          args.Name,
                                                                          args.Description,
                                                                          args.Flags,
                                                                          args.Dwell,
-                                                                         UUID.Zero,
+                                                                         UUID.Zero,                 // infoUUID - not used?
                                                                          ((args.Flags & (uint) ParcelFlags.ForSale) ==
                                                                           (uint) ParcelFlags.ForSale)
                                                                              ? 1
@@ -132,7 +132,7 @@ namespace WhiteCore.Services.DataService
                                                                          args.SalePrice,
                                                                          args.AuctionID,
                                                                          args.Area,
-                                                                         0,
+                                                                         0,                         // Estate ID - not used?
                                                                          args.Maturity,
                                                                          args.OwnerID,
                                                                          args.GroupID,
@@ -165,7 +165,7 @@ namespace WhiteCore.Services.DataService
 
         #region Parcels
 
-        private static List<LandData> Query2LandData(List<string> Query)
+        static List<LandData> Query2LandData(List<string> Query)
         {
             List<LandData> Lands = new List<LandData>();
 
@@ -184,6 +184,7 @@ namespace WhiteCore.Services.DataService
                                             Flags = uint.Parse(Query[i + 8]),
                                             Dwell = int.Parse(Query[i + 9]),
                                             //InfoUUID = UUID.Parse(Query[i + 10]),
+                                            SalePrice = int.Parse(Query[i + 12]),
                                             AuctionID = uint.Parse(Query[i + 13]),
                                             Area = int.Parse(Query[i + 14]),
                                             Maturity = int.Parse(Query[i + 16]),
@@ -198,6 +199,14 @@ namespace WhiteCore.Services.DataService
                 catch
                 {
                 }
+
+                // set some flags
+                if (uint.Parse (Query [i + 11]) != 0)
+                    LandData.Flags |= (uint) ParcelFlags.ForSale;
+                
+                if (uint.Parse (Query [i + 19]) != 0)
+                    LandData.Flags |= (uint) ParcelFlags.ShowDirectory;
+
                 LandData.Category = (string.IsNullOrEmpty(Query[i + 22]))
                                         ? ParcelCategory.None
                                         : (ParcelCategory) int.Parse(Query[i + 22]);
@@ -362,7 +371,7 @@ namespace WhiteCore.Services.DataService
                                }).ToList();
         }
 
-        private static QueryFilter GetParcelsByRegionWhereClause(UUID RegionID, UUID owner, ParcelFlags flags,
+        static QueryFilter GetParcelsByRegionWhereClause(UUID RegionID, UUID owner, ParcelFlags flags,
                                                                  ParcelCategory category)
         {
             QueryFilter filter = new QueryFilter();
@@ -819,7 +828,7 @@ namespace WhiteCore.Services.DataService
             return Data;
         }
 
-        private void ConvertBytesToLandBitmap(ref bool[,] tempConvertMap, byte[] Bitmap, int sizeX)
+        void ConvertBytesToLandBitmap(ref bool[,] tempConvertMap, byte[] Bitmap, int sizeX)
         {
             try
             {
@@ -1116,7 +1125,7 @@ namespace WhiteCore.Services.DataService
             return Data;
         }
 
-        private static List<EventData> Query2EventData(List<string> RetVal)
+        static List<EventData> Query2EventData(List<string> RetVal)
         {
             List<EventData> Events = new List<EventData>();
             IRegionData regiondata = Framework.Utilities.DataManager.RequestPlugin<IRegionData>();

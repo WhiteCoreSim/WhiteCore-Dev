@@ -462,13 +462,13 @@ namespace WhiteCore.Modules.Currency
         {
             foreach (IScene scene in m_scenes)
             {
-                MainConsole.Instance.Info ("Scene: " + scene.RegionInfo.RegionName);
-                if (scene.GetScenePresence (userID) != null)
+                var sp = scene.GetScenePresence (userID);
+                if ( sp != null && !sp.IsChildAgent)
                     return scene;
             }
             if (m_scenes.Count == 0)
             {
-                MainConsole.Instance.Debug ("No scenes??");
+                MainConsole.Instance.Debug ("User not present in any regions??");
                 return null;
             }
 

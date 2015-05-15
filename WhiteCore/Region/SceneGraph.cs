@@ -285,6 +285,8 @@ namespace WhiteCore.Region
         protected internal void AddScenePresence(IScenePresence presence)
         {
             AddEntity(presence, true);
+            MainConsole.Instance.DebugFormat ("Adding {0} to {1} at {2}:{3}",
+                presence.Name, presence.Scene.RegionInfo.RegionName, presence.AbsolutePosition.X, presence.AbsolutePosition.Y);
         }
 
         /// <summary>
