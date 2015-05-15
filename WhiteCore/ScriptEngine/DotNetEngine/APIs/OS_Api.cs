@@ -107,7 +107,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
     //            sensitive data by design.
     
 	[Serializable]
-	public class OSSL_Api : MarshalByRefObject, IScriptApi
+	public class OS_Api : MarshalByRefObject, IScriptApi
     {
         internal ScriptProtectionModule ScriptProtection;
         internal LSL_Api m_LSL_Api; // get a reference to the LSL API so we can call methods housed there
@@ -2892,17 +2892,17 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
         public IScriptApi Copy()
         {
-            return new OSSL_Api();
+            return new OS_Api();
         }
 
         public string Name
         {
-            get { return "os"; }
+            get { return "OS"; }
         }
 
         public string InterfaceName
         {
-            get { return "IOSSL_Api"; }
+            get { return "IOS_Api"; }
         }
 
         /// <summary>

@@ -35,18 +35,26 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         // LSL CONSTANTS
         public static readonly LSL_Types.LSLInteger TRUE = new LSL_Types.LSLInteger(1);
         public static readonly LSL_Types.LSLInteger FALSE = new LSL_Types.LSLInteger(0);
+        
+        // Mathemetical constants
+        public static readonly LSL_Types.LSLFloat PI = 3.14159265;
+        public static readonly LSL_Types.LSLFloat TWO_PI = 6.2831853;
+        public static readonly LSL_Types.LSLFloat PI_BY_TWO = 1.57079632;
+        public static readonly LSL_Types.LSLFloat DEG_TO_RAD = 0.017453292;
+        public static readonly LSL_Types.LSLFloat RAD_TO_DEG = 57.295779;
+        public static readonly LSL_Types.LSLFloat SQRT2 = 1.4142135;
 
-        public static readonly LSL_Types.LSLInteger STATUS_PHYSICS = 1;
-        public static readonly LSL_Types.LSLInteger STATUS_ROTATE_X = 2;
-        public static readonly LSL_Types.LSLInteger STATUS_ROTATE_Y = 4;
-        public static readonly LSL_Types.LSLInteger STATUS_ROTATE_Z = 8;
-        public static readonly LSL_Types.LSLInteger STATUS_PHANTOM = 16;
-        public static readonly LSL_Types.LSLInteger STATUS_SANDBOX = 32;
-        public static readonly LSL_Types.LSLInteger STATUS_BLOCK_GRAB = 64;
-        public static readonly LSL_Types.LSLInteger STATUS_DIE_AT_EDGE = 128;
-        public static readonly LSL_Types.LSLInteger STATUS_RETURN_AT_EDGE = 256;
-        public static readonly LSL_Types.LSLInteger STATUS_CAST_SHADOWS = 512;
-        public static readonly LSL_Types.LSLInteger STATUS_BLOCK_GRAB_OBJECT = 1024;
+        public static readonly LSL_Types.LSLInteger STATUS_PHYSICS = 0x1;
+        public static readonly LSL_Types.LSLInteger STATUS_ROTATE_X = 0x2;        
+        public static readonly LSL_Types.LSLInteger STATUS_ROTATE_Y = 0x4;
+        public static readonly LSL_Types.LSLInteger STATUS_ROTATE_Z = 0x8;
+        public static readonly LSL_Types.LSLInteger STATUS_PHANTOM = 0x10;
+        public static readonly LSL_Types.LSLInteger STATUS_SANDBOX = 0x20;
+        public static readonly LSL_Types.LSLInteger STATUS_BLOCK_GRAB = 0x40;
+        public static readonly LSL_Types.LSLInteger STATUS_DIE_AT_EDGE = 0x80;
+        public static readonly LSL_Types.LSLInteger STATUS_RETURN_AT_EDGE = 0x100;
+        public static readonly LSL_Types.LSLInteger STATUS_CAST_SHADOWS = 0x200;
+        public static readonly LSL_Types.LSLInteger STATUS_BLOCK_GRAB_OBJECT = 0x400;
 
         public static readonly LSL_Types.LSLInteger AGENT = 1;
         public static readonly LSL_Types.LSLInteger AGENT_BY_LEGACY_NAME = 1;
@@ -149,12 +157,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger PSYS_SRC_PATTERN_ANGLE_CONE = 8;
         public static readonly LSL_Types.LSLInteger PSYS_SRC_PATTERN_ANGLE_CONE_EMPTY = 16;
 
+        // Vehicle Types
         public static readonly LSL_Types.LSLInteger VEHICLE_TYPE_NONE = 0;
         public static readonly LSL_Types.LSLInteger VEHICLE_TYPE_SLED = 1;
         public static readonly LSL_Types.LSLInteger VEHICLE_TYPE_CAR = 2;
         public static readonly LSL_Types.LSLInteger VEHICLE_TYPE_BOAT = 3;
         public static readonly LSL_Types.LSLInteger VEHICLE_TYPE_AIRPLANE = 4;
         public static readonly LSL_Types.LSLInteger VEHICLE_TYPE_BALLOON = 5;
+        
         public static readonly LSL_Types.LSLInteger VEHICLE_LINEAR_FRICTION_TIMESCALE = 16;
         public static readonly LSL_Types.LSLInteger VEHICLE_ANGULAR_FRICTION_TIMESCALE = 17;
         public static readonly LSL_Types.LSLInteger VEHICLE_LINEAR_MOTOR_DIRECTION = 18;
@@ -365,7 +375,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger PRIM_OMEGA = 32;
         public static readonly LSL_Types.LSLInteger PRIM_POS_LOCAL = 33;
         public static readonly LSL_Types.LSLInteger PRIM_LINK_TARGET = 34;
-        public static readonly LSL_Types.LSLInteger PRIM_PHYSICS_SHAPE_TYPE = 35;
         public static readonly LSL_Types.LSLInteger PRIM_SPECULAR = 36;
         public static readonly LSL_Types.LSLInteger PRIM_NORMAL = 37;
         public static readonly LSL_Types.LSLInteger PRIM_ALPHA_MODE = 38;
@@ -378,8 +387,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger PRIM_TEXGEN_PLANAR = 1;
 
         public static readonly LSL_Types.LSLInteger PRIM_PHYSICS_SHAPE_PRIM = 0;
-        public static readonly LSL_Types.LSLInteger PRIM_PHYSICS_SHAPE_CONVEX = 2;
         public static readonly LSL_Types.LSLInteger PRIM_PHYSICS_SHAPE_NONE = 1;
+        public static readonly LSL_Types.LSLInteger PRIM_PHYSICS_SHAPE_CONVEX = 2;
+        public static readonly LSL_Types.LSLInteger PRIM_PHYSICS_SHAPE_TYPE = 30;
 
         public static readonly LSL_Types.LSLInteger DENSITY = 0;
         public static readonly LSL_Types.LSLInteger FRICTION = 1;
@@ -495,15 +505,16 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger PRIM_MEDIA_PERM_ANYONE = 4;
 
         // extra constants for llSetPrimMediaParams
-        public static readonly LSL_Types.LSLInteger LSL_STATUS_OK = new LSL_Types.LSLInteger(0);
-        public static readonly LSL_Types.LSLInteger LSL_STATUS_MALFORMED_PARAMS = new LSL_Types.LSLInteger(1000);
-        public static readonly LSL_Types.LSLInteger LSL_STATUS_TYPE_MISMATCH = new LSL_Types.LSLInteger(1001);
-        public static readonly LSL_Types.LSLInteger LSL_STATUS_BOUNDS_ERROR = new LSL_Types.LSLInteger(1002);
-        public static readonly LSL_Types.LSLInteger LSL_STATUS_NOT_FOUND = new LSL_Types.LSLInteger(1003);
-        public static readonly LSL_Types.LSLInteger LSL_STATUS_NOT_SUPPORTED = new LSL_Types.LSLInteger(1004);
-        public static readonly LSL_Types.LSLInteger LSL_STATUS_INTERNAL_ERROR = new LSL_Types.LSLInteger(1999);
-        public static readonly LSL_Types.LSLInteger LSL_STATUS_WHITELIST_FAILED = new LSL_Types.LSLInteger(2001);
-
+        public static readonly LSL_Types.LSLInteger STATUS_OK = 0;
+        public static readonly LSL_Types.LSLInteger STATUS_MALFORMED_PARAMS = 1000;
+        public static readonly LSL_Types.LSLInteger STATUS_TYPE_MISMATCH = 1001;
+        public static readonly LSL_Types.LSLInteger STATUS_BOUNDS_ERROR = 1002;
+        public static readonly LSL_Types.LSLInteger STATUS_NOT_FOUND = 1003;
+        public static readonly LSL_Types.LSLInteger STATUS_NOT_SUPPORTED = 1004;
+        public static readonly LSL_Types.LSLInteger STATUS_INTERNAL_ERROR = 1999;
+        public static readonly LSL_Types.LSLInteger STATUS_WHITELIST_FAILED = 2001;
+        
+        // Parcel Flags
         public static readonly LSL_Types.LSLInteger PARCEL_FLAG_ALLOW_FLY = 0x1; // parcel allows flying
         public static readonly LSL_Types.LSLInteger PARCEL_FLAG_ALLOW_SCRIPTS = 0x2; // parcel allows outside scripts
         public static readonly LSL_Types.LSLInteger PARCEL_FLAG_ALLOW_LANDMARK = 0x8; // parcel allows landmarks to be created
@@ -520,6 +531,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger PARCEL_FLAG_ALLOW_CREATE_GROUP_OBJECTS = 0x4000000; // parcel allows group object creation
         public static readonly LSL_Types.LSLInteger PARCEL_FLAG_ALLOW_ALL_OBJECT_ENTRY = 0x8000000; // parcel allows objects owned by any user to enter
         public static readonly LSL_Types.LSLInteger PARCEL_FLAG_ALLOW_GROUP_OBJECT_ENTRY = 0x10000000; // parcel allows with the same group to enter
+        
+        // Region Flags
         public static readonly LSL_Types.LSLInteger REGION_FLAG_ALLOW_DAMAGE = 0x1; // region is entirely damage enabled
         public static readonly LSL_Types.LSLInteger REGION_FLAG_FIXED_SUN = 0x10; // region has a fixed sun position
         public static readonly LSL_Types.LSLInteger REGION_FLAG_BLOCK_TERRAFORM = 0x40; // region terraforming disabled
@@ -538,15 +551,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
 
         public static readonly LSL_Types.LSLString NULL_KEY = "00000000-0000-0000-0000-000000000000";
         public static readonly LSL_Types.LSLString EOF = "\n\n\n";
-        public static readonly LSL_Types.LSLFloat PI = 3.1415926535897932384626433832795;
-        public static readonly LSL_Types.LSLFloat TWO_PI = 6.283185307179586476925286766559;
-        public static readonly LSL_Types.LSLFloat PI_BY_TWO = 1.5707963267948966192313216916398;
-        public static readonly LSL_Types.LSLFloat DEG_TO_RAD = 0.01745329238f;
-        public static readonly LSL_Types.LSLFloat RAD_TO_DEG = 57.29578f;
-        public static readonly LSL_Types.LSLFloat SQRT2 = 1.4142135623730950488016887242097;
+        
         public static readonly LSL_Types.LSLInteger STRING_TRIM_HEAD = 1;
         public static readonly LSL_Types.LSLInteger STRING_TRIM_TAIL = 2;
         public static readonly LSL_Types.LSLInteger STRING_TRIM = 3;
+        
         public static readonly LSL_Types.LSLInteger LIST_STAT_RANGE = 0;
         public static readonly LSL_Types.LSLInteger LIST_STAT_MIN = 1;
         public static readonly LSL_Types.LSLInteger LIST_STAT_MAX = 2;
@@ -661,31 +670,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLString TEXTURE_TRANSPARENT = "8dcd4a48-2d37-4909-9f78-f7a9eb4ef903";
         public static readonly LSL_Types.LSLString TEXTURE_MEDIA = "8b5fec65-8d8d-9dc5-cda8-8fdf2716e361";
 
-        // Constants for osGetRegionStats
-        public static readonly LSL_Types.LSLInteger STATS_TIME_DILATION = 0;
-        public static readonly LSL_Types.LSLInteger STATS_SIM_FPS = 1;
-        public static readonly LSL_Types.LSLInteger STATS_PHYSICS_FPS = 2;
-        public static readonly LSL_Types.LSLInteger STATS_AGENT_UPDATES = 3;
-        public static readonly LSL_Types.LSLInteger STATS_FRAME_MS = 4;
-        public static readonly LSL_Types.LSLInteger STATS_NET_MS = 5;
-        public static readonly LSL_Types.LSLInteger STATS_OTHER_MS = 6;
-        public static readonly LSL_Types.LSLInteger STATS_PHYSICS_MS = 7;
-        public static readonly LSL_Types.LSLInteger STATS_AGENT_MS = 8;
-        public static readonly LSL_Types.LSLInteger STATS_IMAGE_MS = 9;
-        public static readonly LSL_Types.LSLInteger STATS_SCRIPT_MS = 10;
-        public static readonly LSL_Types.LSLInteger STATS_TOTAL_PRIMS = 11;
-        public static readonly LSL_Types.LSLInteger STATS_ACTIVE_PRIMS = 12;
-        public static readonly LSL_Types.LSLInteger STATS_ROOT_AGENTS = 13;
-        public static readonly LSL_Types.LSLInteger STATS_CHILD_AGENTS = 14;
-        public static readonly LSL_Types.LSLInteger STATS_ACTIVE_SCRIPTS = 15;
-        public static readonly LSL_Types.LSLInteger STATS_SCRIPT_LPS = 16; //Doesn't work
-        public static readonly LSL_Types.LSLInteger STATS_SCRIPT_EPS = 31;
-        public static readonly LSL_Types.LSLInteger STATS_IN_PACKETS_PER_SECOND = 17;
-        public static readonly LSL_Types.LSLInteger STATS_OUT_PACKETS_PER_SECOND = 18;
-        public static readonly LSL_Types.LSLInteger STATS_PENDING_DOWNLOADS = 19;
-        public static readonly LSL_Types.LSLInteger STATS_PENDING_UPLOADS = 20;
-        public static readonly LSL_Types.LSLInteger STATS_UNACKED_BYTES = 24;
-
         public static readonly LSL_Types.LSLString URL_REQUEST_GRANTED = "URL_REQUEST_GRANTED";
         public static readonly LSL_Types.LSLString URL_REQUEST_DENIED = "URL_REQUEST_DENIED";
 
@@ -693,15 +677,15 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger PASS_ALWAYS = 1;
         public static readonly LSL_Types.LSLInteger PASS_NEVER = 2;
 
-        public static readonly LSL_Types.LSLInteger RC_REJECT_TYPES = 2;
         public static readonly LSL_Types.LSLInteger RC_DATA_FLAGS = 4;
         public static readonly LSL_Types.LSLInteger RC_MAX_HITS = 8;
         public static readonly LSL_Types.LSLInteger RC_DETECT_PHANTOM = 16;
-
-        public static readonly LSL_Types.LSLInteger RC_REJECT_AGENTS = 2;
-        public static readonly LSL_Types.LSLInteger RC_REJECT_PHYSICAL = 4;
-        public static readonly LSL_Types.LSLInteger RC_REJECT_NONPHYSICAL = 8;
-        public static readonly LSL_Types.LSLInteger RC_REJECT_LAND = 16;
+        
+        public static readonly LSL_Types.LSLInteger RC_REJECT_TYPES = 0;
+        public static readonly LSL_Types.LSLInteger RC_REJECT_AGENTS = 0x1;
+        public static readonly LSL_Types.LSLInteger RC_REJECT_PHYSICAL = 0x2;
+        public static readonly LSL_Types.LSLInteger RC_REJECT_NONPHYSICAL = 0x4;
+        public static readonly LSL_Types.LSLInteger RC_REJECT_LAND = 0x8;
 
         public static readonly LSL_Types.LSLInteger RC_GET_NORMAL = 2;
         public static readonly LSL_Types.LSLInteger RC_GET_ROOT_KEY = 4;
@@ -747,26 +731,29 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger CHARACTER_RADIUS = 2;
         public static readonly LSL_Types.LSLInteger CHARACTER_LENGTH = 3;
         public static readonly LSL_Types.LSLInteger CHARACTER_ORIENTATION = 4;
+        public static readonly LSL_Types.LSLInteger CHARACTER_AVOIDANCE_MODE = 5;
+        public static readonly LSL_Types.LSLInteger CHARACTER_TYPE = 6;        
         public static readonly LSL_Types.LSLInteger TRAVERSAL_TYPE = 7;
-        public static readonly LSL_Types.LSLInteger CHARACTER_TYPE = 8;
-        public static readonly LSL_Types.LSLInteger CHARACTER_AVOIDANCE_MODE = 9;
-        public static readonly LSL_Types.LSLInteger CHARACTER_MAX_ACCEL = 10;
-        public static readonly LSL_Types.LSLInteger CHARACTER_MAX_DECEL = 11;
-        public static readonly LSL_Types.LSLInteger CHARACTER_MAX_ANGULAR_SPEED = 12;
-        public static readonly LSL_Types.LSLInteger CHARACTER_MAX_ANGULAR_ACCEL = 13;
-        public static readonly LSL_Types.LSLInteger CHARACTER_TURN_SPEED_MULTIPLIER = 14;
+        public static readonly LSL_Types.LSLInteger CHARACTER_MAX_ACCEL = 8;
+        public static readonly LSL_Types.LSLInteger CHARACTER_MAX_DECEL = 9;
+        public static readonly LSL_Types.LSLInteger CHARACTER_MAX_TURN_RADIUS = 10;
+        public static readonly LSL_Types.LSLInteger CHARACTER_DESIRED_TURN_SPEED = 12;
+        public static readonly LSL_Types.LSLInteger CHARACTER_MAX_SPEED = 13;
+        public static readonly LSL_Types.LSLInteger CHARACTER_ACCOUNT_FOR_SKIPPED_FRAMES = 14;
+        public static readonly LSL_Types.LSLInteger CHARACTER_STAY_WITHIN_PARCEL = 15;
 
         public static readonly LSL_Types.LSLInteger PURSUIT_OFFSET = 1;
         public static readonly LSL_Types.LSLInteger REQUIRE_LINE_OF_SIGHT = 2;
+        public static readonly LSL_Types.LSLInteger PURSUIT_FUZZ_FACTOR = 3;
         public static readonly LSL_Types.LSLInteger PURSUIT_INTERCEPT = 4;
-        public static readonly LSL_Types.LSLInteger PURSUIT_FUZZ_FACTOR = 8;
+        public static readonly LSL_Types.LSLInteger PURSUIT_GOAL_TOLERANCE = 5;
 
-        public static readonly LSL_Types.LSLInteger CHARACTER_TYPE_NONE = 0;
-        public static readonly LSL_Types.LSLInteger CHARACTER_TYPE_A = 1;
-        public static readonly LSL_Types.LSLInteger CHARACTER_TYPE_B = 2;
-        public static readonly LSL_Types.LSLInteger CHARACTER_TYPE_C = 3;
-        public static readonly LSL_Types.LSLInteger CHARACTER_TYPE_D = 4;
-
+        public static readonly LSL_Types.LSLInteger CHARACTER_TYPE_A = 0;
+        public static readonly LSL_Types.LSLInteger CHARACTER_TYPE_B = 1;
+        public static readonly LSL_Types.LSLInteger CHARACTER_TYPE_C = 2;
+        public static readonly LSL_Types.LSLInteger CHARACTER_TYPE_D = 3;
+        public static readonly LSL_Types.LSLInteger CHARACTER_TYPE_NONE = 4;
+        
         public static readonly LSL_Types.LSLInteger AVOID_CHARACTERS = 1;
         public static readonly LSL_Types.LSLInteger AVOID_DYNAMIC_OBSTACLES = 2;
 
@@ -777,22 +764,25 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger TRAVERSAL_TYPE_FAST = 2;
         public static readonly LSL_Types.LSLInteger TRAVERSAL_TYPE_SLOW = 4;
 
-        public static readonly LSL_Types.LSLInteger PU_SLOWDOWN_DISTANCE_REACHED = 0x00;
-        public static readonly LSL_Types.LSLInteger PU_GOAL_REACHED = 0x01;
-        public static readonly LSL_Types.LSLInteger PU_FAILURE_INVALID_START = 0x02;
-        public static readonly LSL_Types.LSLInteger PU_FAILURE_INVALID_GOAL = 0x03;
-        public static readonly LSL_Types.LSLInteger PU_FAILURE_UNREACHABLE = 0x04;
-        public static readonly LSL_Types.LSLInteger PU_FAILURE_TARGET_GONE = 0x05;
-        public static readonly LSL_Types.LSLInteger PU_FAILURE_NO_VALID_DESTINATION = 0x06;
-        public static readonly LSL_Types.LSLInteger PU_EVADE_HIDDEN = 0x07;
-        public static readonly LSL_Types.LSLInteger PU_EVADE_SPOTTED = 0x08;
-        public static readonly LSL_Types.LSLInteger PU_FAILURE_NO_NAVMESH = 0x09;
-        public static readonly LSL_Types.LSLInteger PU_FAILURE_OTHER = 0xF4240;
+        public static readonly LSL_Types.LSLInteger PU_SLOWDOWN_DISTANCE_REACHED = 0;
+        public static readonly LSL_Types.LSLInteger PU_GOAL_REACHED = 1;
+        public static readonly LSL_Types.LSLInteger PU_FAILURE_INVALID_START = 2;
+        public static readonly LSL_Types.LSLInteger PU_FAILURE_INVALID_GOAL = 3;
+        public static readonly LSL_Types.LSLInteger PU_FAILURE_UNREACHABLE = 4;
+        public static readonly LSL_Types.LSLInteger PU_FAILURE_TARGET_GONE = 5;
+        public static readonly LSL_Types.LSLInteger PU_FAILURE_NO_VALID_DESTINATION = 6;
+        public static readonly LSL_Types.LSLInteger PU_EVADE_HIDDEN = 7;
+        public static readonly LSL_Types.LSLInteger PU_EVADE_SPOTTED = 8;
+        public static readonly LSL_Types.LSLInteger PU_FAILURE_NO_NAVMESH = 9;
+        public static readonly LSL_Types.LSLInteger PU_FAILURE_DYNAMIC_PATHFINDING_DISABLED = 10;
+        public static readonly LSL_Types.LSLInteger PU_FAILURE_PARCEL_UNREACHABLE = 11;
+        public static readonly LSL_Types.LSLInteger PU_FAILURE_OTHER = 1000000;
 
         public static readonly LSL_Types.LSLInteger FORCE_DIRECT_PATH = 1;
 
-        public static readonly LSL_Types.LSLInteger CHARACTER_CMD_STOP = 0x0;
-        public static readonly LSL_Types.LSLInteger CHARACTER_CMD_JUMP = 0x1;
+        public static readonly LSL_Types.LSLInteger CHARACTER_CMD_STOP = 0;
+        public static readonly LSL_Types.LSLInteger CHARACTER_CMD_JUMP = 1;
+        public static readonly LSL_Types.LSLInteger CHARACTER_CMD_SMOOTH_STOP = 2;
 
         public static readonly LSL_Types.LSLInteger SIM_STAT_PCT_CHARS_STEPPED = 0;
 
@@ -805,26 +795,26 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLString JSON_FALSE = "JSON_FALSE";
         public static readonly LSL_Types.LSLString JSON_NULL = "JSON_NULL";
         public static readonly LSL_Types.LSLString JSON_APPEND = "JSON_APPEND";
-
-        // Constants for osNpc* functions
-        public static readonly LSL_Types.LSLInteger OS_NPC_FLY = 0;
-        public static readonly LSL_Types.LSLInteger OS_NPC_NO_FLY = 1;
-        public static readonly LSL_Types.LSLInteger OS_NPC_LAND_AT_TARGET = 2;
-        public static readonly LSL_Types.LSLInteger OS_NPC_RUNNING = 4;
-        public static readonly LSL_Types.LSLInteger OS_NPC_SIT_NOW = 0;
-
-        public static readonly LSL_Types.LSLInteger OS_NPC_CREATOR_OWNED = 0x1;
-        public static readonly LSL_Types.LSLInteger OS_NPC_NOT_OWNED = 0x2;
-        public static readonly LSL_Types.LSLInteger OS_NPC_SENSE_AS_AGENT = 0x4;
-
-        /// <summary>
-        /// process name parameter as regex
-        /// </summary>
-        public const int OS_LISTEN_REGEX_NAME = 0x1;
-
-        /// <summary>
-        /// process message parameter as regex
-        /// </summary>
-        public const int OS_LISTEN_REGEX_MESSAGE = 0x2;
+        
+        // Experience Parameters (from event "experience_error")
+        public static readonly LSL_Types.LSLInteger XP_ERROR_NONE = 0;
+        public static readonly LSL_Types.LSLInteger XP_ERROR_THROTTLED = 1;
+        public static readonly LSL_Types.LSLInteger XP_ERROR_EXPERIENCES_DISABLED = 2;
+        public static readonly LSL_Types.LSLInteger XP_ERROR_INVALID_PARAMETERS = 3;
+        public static readonly LSL_Types.LSLInteger XP_ERROR_NOT_PERMITTED = 4;
+        public static readonly LSL_Types.LSLInteger XP_ERROR_NO_EXPERIENCE = 5;
+        public static readonly LSL_Types.LSLInteger XP_ERROR_NOT_FOUND = 6;
+        public static readonly LSL_Types.LSLInteger XP_ERROR_INVALID_EXPERIENCE = 7;        
+        public static readonly LSL_Types.LSLInteger XP_ERROR_EXPERIENCE_DISABLED = 8;
+        public static readonly LSL_Types.LSLInteger XP_ERROR_EXPERIENCE_SUSPENDED = 9;
+        public static readonly LSL_Types.LSLInteger XP_ERROR_UNKNOWN_ERROR = 10;
+        public static readonly LSL_Types.LSLInteger XP_ERROR_QUOTA_EXCEEDED = 11;
+        public static readonly LSL_Types.LSLInteger XP_ERROR_STORE_DISABLED = 12;
+        public static readonly LSL_Types.LSLInteger XP_ERROR_STORAGE_EXCEPTION = 13;        
+        public static readonly LSL_Types.LSLInteger XP_ERROR_KEY_NOT_FOUND = 14;
+        public static readonly LSL_Types.LSLInteger XP_ERROR_RETRY_UPDATE = 15;        
+        public static readonly LSL_Types.LSLInteger XP_ERROR_MATURITY_EXCEEDED = 16;
+        public static readonly LSL_Types.LSLInteger XP_ERROR_NOT_PERMITTED_LAND = 17;
+        public static readonly LSL_Types.LSLInteger XP_ERROR_REQUEST_PERM_TIMEOUT = 18;
     }
 }

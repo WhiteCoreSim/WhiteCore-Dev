@@ -10986,7 +10986,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             ClearPrimMedia(m_host, face);
 
-            return ScriptBaseClass.LSL_STATUS_OK;
+            return ScriptBaseClass.STATUS_OK;
         }
 
         public LSL_Integer llClearLinkMedia(LSL_Integer link, LSL_Integer face)
@@ -10996,18 +10996,18 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             List<ISceneChildEntity> entities = GetLinkParts(link);
             if (entities.Count == 0 || face < 0 || face > entities[0].GetNumberOfSides() - 1)
-                return ScriptBaseClass.LSL_STATUS_OK;
+                return ScriptBaseClass.STATUS_OK;
 
             foreach (ISceneChildEntity child in entities)
                 ClearPrimMedia(child, face);
 
-            return ScriptBaseClass.LSL_STATUS_OK;
+            return ScriptBaseClass.STATUS_OK;
         }
 
         private void ClearPrimMedia(ISceneChildEntity entity, LSL_Integer face)
         {
             // LSL Spec http://wiki.secondlife.com/wiki/LlClearPrimMedia says to fail silently if face is invalid
-            // Assuming silently fail means sending back LSL_STATUS_OK.  Ideally, need to check this.
+            // Assuming silently fail means sending back STATUS_OK.  Ideally, need to check this.
             // FIXME: Don't perform the media check directly
             if (face < 0 || face > entity.GetNumberOfSides() - 1)
                 return;
@@ -11024,10 +11024,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             PScriptSleep(m_sleepMsOnSetPrimMediaParams);
 
             // LSL Spec http://wiki.secondlife.com/wiki/LlSetPrimMediaParams says to fail silently if face is invalid
-            // Assuming silently fail means sending back LSL_STATUS_OK.  Ideally, need to check this.
+            // Assuming silently fail means sending back STATUS_OK.  Ideally, need to check this.
             // Don't perform the media check directly
             if (face < 0 || face > m_host.GetNumberOfSides() - 1)
-                return ScriptBaseClass.LSL_STATUS_OK;
+                return ScriptBaseClass.STATUS_OK;
             return SetPrimMediaParams(m_host, face, rules);
         }
 
@@ -11036,14 +11036,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             PScriptSleep(m_sleepMsOnSetLinkMedia);
 
             // LSL Spec http://wiki.secondlife.com/wiki/LlSetPrimMediaParams says to fail silently if face is invalid
-            // Assuming silently fail means sending back LSL_STATUS_OK.  Ideally, need to check this.
+            // Assuming silently fail means sending back STATUS_OK.  Ideally, need to check this.
             // Don't perform the media check directly
             List<ISceneChildEntity> entities = GetLinkParts(link);
             if (entities.Count == 0 || face < 0 || face > entities[0].GetNumberOfSides() - 1)
-                return ScriptBaseClass.LSL_STATUS_OK;
+                return ScriptBaseClass.STATUS_OK;
             foreach (ISceneChildEntity child in entities)
                 SetPrimMediaParams(child, face, rules);
-            return ScriptBaseClass.LSL_STATUS_OK;
+            return ScriptBaseClass.STATUS_OK;
         }
 
         public LSL_Integer SetPrimMediaParams(ISceneChildEntity obj, int face, LSL_List rules)
@@ -11133,7 +11133,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             module.SetMediaEntry(obj, face, me);
 
-            return ScriptBaseClass.LSL_STATUS_OK;
+            return ScriptBaseClass.STATUS_OK;
         }
 
         public LSL_Integer llModPow(int a, int b, int c)
@@ -13070,13 +13070,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                     else if (opt == ScriptBaseClass.CHARACTER_ORIENTATION)
                     {
                     }
-                    else if (opt == ScriptBaseClass.TRAVERSAL_TYPE)
+                    else if (opt == ScriptBaseClass.CHARACTER_AVOIDANCE_MODE)
                     {
                     }
                     else if (opt == ScriptBaseClass.CHARACTER_TYPE)
                     {
                     }
-                    else if (opt == ScriptBaseClass.CHARACTER_AVOIDANCE_MODE)
+                    else if (opt == ScriptBaseClass.TRAVERSAL_TYPE)
                     {
                     }
                     else if (opt == ScriptBaseClass.CHARACTER_MAX_ACCEL)
@@ -13085,13 +13085,19 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                     else if (opt == ScriptBaseClass.CHARACTER_MAX_DECEL)
                     {
                     }
-                    else if (opt == ScriptBaseClass.CHARACTER_MAX_ANGULAR_SPEED)
+                    else if (opt == ScriptBaseClass.CHARACTER_MAX_TURN_RADIUS)
                     {
                     }
-                    else if (opt == ScriptBaseClass.CHARACTER_MAX_ANGULAR_ACCEL)
+                    else if (opt == ScriptBaseClass.CHARACTER_DESIRED_TURN_SPEED)
                     {
                     }
-                    else if (opt == ScriptBaseClass.CHARACTER_TURN_SPEED_MULTIPLIER)
+                    else if (opt == ScriptBaseClass.CHARACTER_MAX_SPEED)
+                    {
+                    }
+                    else if (opt == ScriptBaseClass.CHARACTER_ACCOUNT_FOR_SKIPPED_FRAMES)
+                    {
+                    }
+                    else if (opt == ScriptBaseClass.CHARACTER_STAY_WITHIN_PARCEL)
                     {
                     }
                 }
