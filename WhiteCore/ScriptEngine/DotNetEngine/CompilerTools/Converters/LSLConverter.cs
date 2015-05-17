@@ -50,13 +50,16 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
         {
             m_compiler = compiler;
             new CSCodeGenerator(compiler);
-            //            LSL_Converter = new CSCodeGenerator(null, compiler);
 
             //Add new LSL events that haven't been added into the parser
-            LSL2CSCodeTransformer.AddLSLEvent(new EventInfo("transaction_result", new [] {
-                "LSL_Types.LSLString", "LSL_Types.LSLInteger", "LSL_Types.LSLString" }));
+            LSL2CSCodeTransformer.AddLSLEvent(new EventInfo("experience_permissions", new [] {
+                "LSL_Types.LSLString"}));
+            LSL2CSCodeTransformer.AddLSLEvent(new EventInfo("experience_permissions_denied", new [] {
+				"LSL_Types.LSLString", "LSL_Types.LSLInteger" }));
             LSL2CSCodeTransformer.AddLSLEvent(new EventInfo("path_update", new [] {
                 "LSL_Types.LSLInteger", "LSL_Types.list" }));
+            LSL2CSCodeTransformer.AddLSLEvent(new EventInfo("transaction_result", new [] {
+                "LSL_Types.LSLString", "LSL_Types.LSLInteger", "LSL_Types.LSLString" }));
         }
 
         public void Convert(string Script, out string CompiledScript,
@@ -66,9 +69,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
             LSL_Converter = new CSCodeGenerator(m_compiler);
             CompiledScript = LSL_Converter.Convert(Script);
             PositionMap = LSL_Converter.PositionMap;
-
-            //Unless we are using the same LSL_Converter more than once, we don't need to do this
-            //LSL_Converter.Dispose(); //Resets it for next time
         }
 
         public string Name

@@ -226,8 +226,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
 
             UUID assemblyGuid = UUID.Random();
 
-            //            assembly = CheckDirectories(FilePrefix + "_compiled_" + itemID.ToString() + "V" + VersionID + ".dll", itemID);
-
             assembly = CheckDirectories(assemblyGuid.ToString() + ".dll", assemblyGuid);
 
             IScriptConverter converter;
