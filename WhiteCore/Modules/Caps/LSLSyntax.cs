@@ -99,10 +99,15 @@ namespace WhiteCore.Modules.Caps
             // According to the information, this CAPS sends the LSL Syntax to the viewer
             // so new functions in LSL are reported correctly.
             //
-            // Needs further investigation as of which viewers exactly handle this and what is 
-            // being send back to them
+            // After determining what the LSLSyntax Caps exactly does:
             //
-            // Fly-Man- 11 May 2015
+            // * Request comes in to see what version the currency LSLSyntax.xml file is
+            //
+            // * If version of LSLSyntax.xml file is older, request the new version through the Caps
+            //
+            // * Including a bogus file for the time being in bin/Caps
+            //
+            // Fly-Man- 17 May 2015
             throw new NotImplementedException();
         }
     }
