@@ -1,17 +1,8 @@
 <!--
-
-{BackOne}
-{CurrentPage}
-{NextOne}
-
 {RegionNameText}        Region Name
 {RegionLocXText}        Region X
 {RegionLocYText}        Region Y
 {RegionOnlineText}		Online/Offline status
-{SortByLocX}            Sort By Region X
-{SortByLocY}            Sort By Region Y
-{SortByStatus}			Sort by online status
-{SortByName}            Sort By Name
 {RegionListText}        Region List
 {RegionList}        
   {RegionName}        
@@ -19,62 +10,28 @@
   {RegionLocY}        
   {RegionInfo}
   {RegionStatus}
-{FirstText}             First
-{BackText}              Back
-{NextText}              Next
-{LastText}              Last
-{CurrentPageText}       Current Page
-{MoreInfoText}          More Info
+  {MoreInfoText}          More Info
 -->
 
+<script type="text/javascript" src="../javascripts/jquery.datatables.js"></script>
+<link href="css/jquery.datatables.css" rel="stylesheet" type="text/css">
+
 <script type="text/javascript">
-  $(document).ready(function(){$(".regioninfo").colorbox({iframe:true, width:"990px", height:"440px"});});
+$(document).ready(function() 
+{
+	$('#regionlist').dataTable({
+        "order": [[ 0, "asc" ]]
+    });
+} );
 </script>
 
 <h2>{SystemName}: {RegionListText}</h2>
-<table id="region_list_navigation_top">
-  <caption></caption>
-  
-  <thead>
-    <tr>
-      <th><a class="fade" href="index.html?page=region_list&Start=0" target="_self" title="{FirstText}"><p class="nav">|&nbsp;<</p></a></th>
-	  <th><a class="fade" href="index.html?page=region_list&Start={BackOne}" target="_self" title="{BackText}"><p class="nav"><</p></a></th>
-	  <th><p>{CurrentPageText} {CurrentPage}</p></th>
-	  <th><a class="fade" href="index.html?page=region_list&Start={NextOne}" target="_self" title="{NextText}"><p class="nav">></p></a></th>
-	  <th><a class="fade" href="index.html?page=region_list&Start=-1" target="_self" title="{LastText}"><p class="nav">>&nbsp;|</p></a></th>
-    </tr>
-  </thead>
-<!--  
-  <tfoot>
-    <tr>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </tfoot>
-  
-  <tbody>
-    <tr>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-  </tbody>
--->
-</table>
-
-<table id="region_list">
-  <caption></caption>
-  
+<table id="regionlist" class="display" cellspacing="0" width="100%">
   <thead class="listhead">
     <tr>
-      <th class="region_list_left" style="width:200px"><a class="fade" href="index.html?page=region_list&Order=RegionName" title="{SortByName}"><p>{RegionText}</p></a></th>
-      <th class="region_list_left" style="width:100px"><a class="fade" href="index.html?page=region_list&Order=LocX" title="{SortByLocX}"><p>{RegionLocXText}</p></a></th>
-      <th class="region_list_left"  style="width:100px"><a class="fade" href="index.html?page=region_list&Order=LocY" title="{SortByLocY}"><p>{RegionLocYText}</p></a></th>
+      <th class="region_list_left" style="width:200px"><p>{RegionText}</p></th>
+      <th class="region_list_left" style="width:100px"><p>{RegionLocXText}</p></th>
+      <th class="region_list_left" style="width:100px"><p>{RegionLocYText}</p></th>
       <th class="region_list_right" ></th>
       <th class="region_list_right" style="width:50px"><p>{RegionOnlineText}</p></th>
       <th class="region_list_right" style="width:150px"><p>{RegionMoreInfo}</p></th>
@@ -82,16 +39,16 @@
   </thead>
   
   <tfoot class="listfoot">
-    <tr style= align:bottom;">
-      <th class="region_list_left"><a class="fade" href="index.html?page=region_list&Order=RegionName" title="{SortByName}"><p>{RegionText}</p></a></th>
-      <th class="region_list_left"><a class="fade" href="index.html?page=region_list&Order=LocX" title="{SortByLocX}"><p>{RegionLocXText}</p></a></th>
-      <th class="region_list_left"><a class="fade" href="index.html?page=region_list&Order=LocY" title="{SortByLocY}"><p>{RegionLocYText}</p></a></th>
+    <tr style= "align:bottom;">
+      <th class="region_list_left"><p>{RegionText}</p></th>
+      <th class="region_list_left"><p>{RegionLocXText}</p></th>
+      <th class="region_list_left"><p>{RegionLocYText}</p></th>
       <th class="region_list_right"></th>
       <th class="region_list_right"><p>{RegionOnlineText}</p></th>
       <th class="region_list_right"><p>{RegionMoreInfo}</p></th>
     </tr>
   </tfoot>
-
+  
   <tbody>
 {RegionListArrayBegin}
     <tr>
@@ -105,39 +62,3 @@
 {RegionListArrayEnd}
   </tbody>
 </table>
-
-<table id="region_list_navigation_bottom">
-  <caption></caption>
-  
-  <thead>
-    <tr>
-      <th><a class="fade" href="index.html?page=region_list&Start=0" target="_self" title="{FirstText}"><p class="nav">|&nbsp;<</p></a></th>
-	  <th><a class="fade" href="index.html?page=region_list&Start={BackOne}" target="_self" title="{BackText}"><p class="nav"><</p></a></th>
-	  <th><p>{CurrentPageText} {CurrentPage}</p></th>
-	  <th><a class="fade" href="index.html?page=region_list&Start={NextOne}" target="_self" title="{NextText}"><p class="nav">></p></a></th>
-	  <th><a class="fade" href="index.html?page=region_list&Start=-1" target="_self" title="{LastText}"><p class="nav">>&nbsp;|</p></a></th>
-    </tr>
-  </thead>
-<!--  
-  <tfoot>
-    <tr>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </tfoot>
-  
-  <tbody>
-    <tr>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-  </tbody>
--->
-</table>
-<script>$("li.fade, a.fade").hover(function(){$(this).fadeOut(150);$(this).fadeIn(150);});</script>
