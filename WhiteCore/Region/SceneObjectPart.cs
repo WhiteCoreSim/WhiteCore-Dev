@@ -5002,23 +5002,14 @@ namespace WhiteCore.Region
                     currRot.Normalize();
 
                     // difference between current orientation and desired orientation
-                    Quaternion dR = new Quaternion(currRot.X, currRot.Y, currRot.Z, -currRot.W) * APIDTarget;
+                    Quaternion dR = currRot / APIDTarget;
 
-                    // find axis of rotation to rotate to desired orientation
+                    // find axis and angle of rotation to rotate to desired orientation
                     Vector3 axis = Vector3.UnitX;
-                    float s = (float)Math.Sqrt(1.0f - dR.W * dR.W);
-                    if (s >= 0.001)
-                    {
-                        float invS = 1.0f / s;
-                        if (dR.W < 0) invS = -invS;
-                        axis = new Vector3(dR.X * invS, dR.Y * invS, dR.Z * invS) * currRot;
-                        axis.Normalize();
-                    }
-
-                    // angle between current and desired orientation
-                    float angle = 2.0f * (float)Math.Acos(dR.W);
-                    if (angle > Math.PI)
-                        angle = 2.0f * (float)Math.PI - angle;
+                    
+                    float angle;
+                    dR.GetAxisAngle(out axis, out angle);
+                    axis = axis * currRot;
 
                     // clamp strength to avoid overshoot
                     float strength = 1.0f / APIDStrength;
