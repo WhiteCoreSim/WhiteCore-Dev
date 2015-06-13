@@ -4,7 +4,7 @@ echo ========================================
 echo ==== WhiteCore Configuration ===========
 echo ========================================
 echo.
-echo If you wish to customise the configuration, re-run with the switch '-p'
+echo If you wish to customize the configuration, re-run with the switch '-p'
 echo   e.g.   runprebuild -p
 echo.
 
@@ -19,7 +19,7 @@ if %bits% == x86 (
 	echo Found 32 bit architecture
 )
 
-rem ## Determin native framework
+rem ## Determine native framework
 :CheckOS
 set framework=4_5
 for /f "tokens=4-5 delims=. " %%i in ('ver') do set VERSION=%%i.%%j
@@ -83,7 +83,6 @@ if %bits%==86 goto configuration
 if %bits%==x86 goto configuration
 if %bits%==64 goto configuration
 if %bits%==x64 goto configuration
-Rem if %bits%==AnyCPU goto configuration
 echo "%bits%" isn't a valid choice!
 goto bits
 
@@ -98,7 +97,6 @@ goto configuration
 
 :framework
 set /p framework="Choose your .NET framework (4_0 or 4_5)? [%framework%]: "
-if %framework%==3_5 goto final
 if %framework%==4_0 goto final
 if %framework%==4_5 goto final
 echo "%framework%" isn't a valid choice!
