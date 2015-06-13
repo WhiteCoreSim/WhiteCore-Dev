@@ -87,6 +87,21 @@ namespace WhiteCore.Framework.Utilities
         		return "Unknown";
         	}
         }
+        
+        public static string GetMaxMaturity(int Maturity)
+        {
+        	switch(Maturity)
+        	{
+        	case 0:
+        		return "PG";
+        	case 1:
+        		return "M";
+        	case 2:
+        		return "A";
+        	default:
+        		return "PG";
+        	}
+        }
 
         /// <summary>
         ///     What is our version?

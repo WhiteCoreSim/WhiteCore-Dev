@@ -58,21 +58,8 @@ namespace WhiteCore.Services
             m_service = service;
             m_agentInfoService = service.Registry.RequestModuleInterface<IAgentInfoService>();
             m_agentProcessing = service.Registry.RequestModuleInterface<IAgentProcessing>();
-
-            HttpServerHandle method = delegate(string path, Stream request,
-                                               OSHttpRequest httpRequest, OSHttpResponse httpResponse)
-                                          { return ProcessUpdateAgentLanguage(request, m_service.AgentID); };
-            service.AddStreamHandler("UpdateAgentLanguage",
-                                     new GenericStreamHandler("POST", service.CreateCAPS("UpdateAgentLanguage", ""),
-                                                              method));
-
-
-            method = delegate(string path, Stream request,
-                              OSHttpRequest httpRequest, OSHttpResponse httpResponse)
-                         { return ProcessUpdateAgentInfo(request, m_service.AgentID); };
-            service.AddStreamHandler("UpdateAgentInformation",
-                                     new GenericStreamHandler("POST", service.CreateCAPS("UpdateAgentInformation", ""),
-                                                              method));
+            
+            HttpServerHandle method;
 
             service.AddStreamHandler("AvatarPickerSearch",
                                      new GenericStreamHandler("GET", service.CreateCAPS("AvatarPickerSearch", ""),
@@ -100,8 +87,6 @@ namespace WhiteCore.Services
 
         public void DeregisterCaps()
         {
-            m_service.RemoveStreamHandler("UpdateAgentLanguage", "POST");
-            m_service.RemoveStreamHandler("UpdateAgentInformation", "POST");
             m_service.RemoveStreamHandler("AvatarPickerSearch", "GET");
             m_service.RemoveStreamHandler("HomeLocation", "POST");
             m_service.RemoveStreamHandler("TeleportLocation", "POST");
@@ -130,24 +115,6 @@ namespace WhiteCore.Services
 
             rm.Add("success", OSD.FromBoolean(true));
             return OSDParser.SerializeLLSDXmlBytes(rm);
-        }
-
-        private byte[] ProcessUpdateAgentLanguage(Stream request, UUID agentID)
-        {
-            OSDMap rm = OSDParser.DeserializeLLSDXml(HttpServerHandlerHelpers.ReadFully(request)) as OSDMap;
-            if (rm == null)
-                return MainServer.BadRequest;
-            IAgentConnector AgentFrontend = Framework.Utilities.DataManager.RequestPlugin<IAgentConnector>();
-            if (AgentFrontend != null)
-            {
-                IAgentInfo IAI = AgentFrontend.GetAgent(agentID);
-                if (IAI == null)
-                    return MainServer.BadRequest;
-                IAI.Language = rm["language"].AsString();
-                IAI.LanguageIsPublic = int.Parse(rm["language_is_public"].AsString()) == 1;
-                AgentFrontend.UpdateAgent(IAI);
-            }
-            return MainServer.BlankResponse;
         }
 
         private byte[] ProcessAvatarPickerSearch(string path, Stream request, OSHttpRequest httpRequest,
@@ -183,29 +150,6 @@ namespace WhiteCore.Services
             }
             body["agents"] = array;
             return OSDParser.SerializeLLSDXmlBytes(body);
-        }
-
-        private byte[] ProcessUpdateAgentInfo(Stream request, UUID agentID)
-        {
-            OSD r = OSDParser.DeserializeLLSDXml(HttpServerHandlerHelpers.ReadFully(request));
-            OSDMap rm = (OSDMap) r;
-            OSDMap access = (OSDMap) rm["access_prefs"];
-            string Level = access["max"].AsString();
-            int maxLevel = 0;
-            if (Level == "PG")
-                maxLevel = 0;
-            if (Level == "M")
-                maxLevel = 1;
-            if (Level == "A")
-                maxLevel = 2;
-            IAgentConnector data = Framework.Utilities.DataManager.RequestPlugin<IAgentConnector>();
-            if (data != null)
-            {
-                IAgentInfo agent = data.GetAgent(agentID);
-                agent.MaturityRating = maxLevel;
-                data.UpdateAgent(agent);
-            }
-            return MainServer.BlankResponse;
         }
 
         private bool _isInTeleportCurrently = false;

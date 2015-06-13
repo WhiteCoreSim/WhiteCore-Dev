@@ -79,7 +79,19 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Profile
         ///     Max maturity rating the user can ever to see
         /// </summary>
         public int MaxMaturity = 2;
-
+        
+        /// <summary>
+        /// 	Hoverheight of the user
+        /// </summary>
+        public double HoverHeight = 0.0;
+        
+        /// <summary>
+        /// 	Permissions set by the user
+        /// </summary>
+        public int PermEveryone = 0;
+        public int PermGroup = 0;
+        public int PermNextOwner = 532480;
+        
         /// <summary>
         ///     Other information can be stored in here.
         ///     For ex, temperary ban info for this user
@@ -102,11 +114,15 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Profile
                              {
                                  {"PrincipalID", OSD.FromUUID(PrincipalID)},
                                  {"Flags", OSD.FromInteger((int) Flags)},
-                                 {"MaxMaturity", OSD.FromInteger(MaxMaturity)},
+                                 {"AcceptTOS", OSD.FromBoolean(AcceptTOS)},                                 
                                  {"MaturityRating", OSD.FromInteger(MaturityRating)},
+                                 {"MaxMaturity", OSD.FromInteger(MaxMaturity)},
+                                 {"HoverHeight", OSD.FromReal(HoverHeight)},
                                  {"Language", OSD.FromString(Language)},
-                                 {"AcceptTOS", OSD.FromBoolean(AcceptTOS)},
                                  {"LanguageIsPublic", OSD.FromBoolean(LanguageIsPublic)},
+                                 {"PermEveryone", OSD.FromInteger(PermEveryone)},
+                                 {"PermGroup", OSD.FromInteger(PermGroup)},
+                                 {"PermNextOwner", OSD.FromInteger(PermNextOwner)},
                                  {
                                      "OtherAgentInformation",
                                      OSD.FromString(OSDParser.SerializeLLSDXmlString(OtherAgentInformation))
@@ -120,11 +136,15 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Profile
         {
             PrincipalID = map["PrincipalID"].AsUUID();
             Flags = (IAgentFlags) map["Flags"].AsInteger();
-            MaxMaturity = Convert.ToInt32(map["MaxMaturity"].AsInteger());
+            AcceptTOS = map["AcceptTOS"].AsBoolean();            
             MaturityRating = Convert.ToInt32(map["MaturityRating"].AsInteger());
+            MaxMaturity = Convert.ToInt32(map["MaxMaturity"].AsInteger());
+            HoverHeight = map["HoverHeight"].AsReal();
             Language = map["Language"].AsString();
-            AcceptTOS = map["AcceptTOS"].AsBoolean();
             LanguageIsPublic = map["LanguageIsPublic"].AsBoolean();
+            PermEveryone = Convert.ToInt32(map["PermEveryone"].AsInteger());
+            PermGroup = Convert.ToInt32(map["PermGroup"].AsInteger());
+            PermNextOwner = Convert.ToInt32(map["PermNextOwner"].AsInteger());
             if (map.ContainsKey("OtherAgentInformation"))
                 OtherAgentInformation = (OSDMap) OSDParser.DeserializeLLSDXml(map["OtherAgentInformation"].AsString());
         }
