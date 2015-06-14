@@ -31,7 +31,7 @@ libbulletnet.so                                                 ???             
 libopenjpeg-dotnet-2-1.5.0-dotnet-1-i686.so                     2.1.5.0                 08 Apr 2013
 libopenjpeg-dotnet-2-1.5.0-dotnet-1-x86_64.so                   2.1.5.0                 08 Apr 2013
 libopenjpeg-dotnet-2-1.5.0-dotnet-1.dylib                       2.1.5.0                 08 Apr 2013
-log4net.dll                                                     1.2.10.0                08 Apr 2013             Apache Log4Net
+log4net.dll                                                     1.2.13.0                14 Jun 2015             Apache Log4Net
 ode.dll                                                         ???                     12 Dec 2013             Dynamic copy of x86/x64
 odex64.dll                                                      ???                     11 Apr 2013
 odex86.dll                                                      ???                     11 Apr 2013
