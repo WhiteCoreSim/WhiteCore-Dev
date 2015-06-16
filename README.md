@@ -27,8 +27,6 @@ Pull requests [![Issue Stats](http://www.issuestats.com/github/WhiteCoreSim/Whit
 
 Issues closed [![Issue Stats](http://www.issuestats.com/github/WhiteCoreSim/WhiteCore-Dev/badge/issue)](http://www.issuestats.com/github/WhiteCoreSim/WhiteCore-Dev)
 
-
-
 ## Configuration
 *To see how to configure WhiteCore, look at "Setting up WhiteCore.txt" in the WhiteCoreDocs folder for more information*
 
@@ -36,7 +34,7 @@ Windows:
    Run the 'runprebuild.bat' file.
    This will check you current system configuration, compile the correct Visual Studio 2010 soultion and project files and prompt you to build immediately (if desired)
 
-*nix:      (Also OSX)
+*nix: (Also OSX)
    Execute the 'runprebuild.sh' form a terminal or console shell.
    You will be prompted for your desired configuration, the appropriate solution and project files for Mono will be compiled and finally, prompt you to build immediately (if desired)
    

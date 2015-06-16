@@ -1,4 +1,9 @@
 #!/bin/bash
+# Run prebuild to configure and create the appropriate Solution and Project files for building WhiteCore-Sim
+#
+# April 2015
+# Rowan Deppeler <greythane@gmail.com>
+
 ARCH="AnyCPU"
 CONFIG="Debug"
 BUILD=false
@@ -13,7 +18,6 @@ Options:
   -b|--build Build after configuration No (default) or Yes
   -v|--version Update version details only
 "
-
 
 # check if prompting needed
 if [ $# -eq 0 ]; then

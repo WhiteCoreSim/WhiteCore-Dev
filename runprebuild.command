@@ -1,5 +1,5 @@
 #!/bin/bash
-# Run prebuild to configure and create the appropriate Solution and Porject files for building WhiteCore-Sim
+# Run prebuild to configure and create the appropriate Solution and Project files for building WhiteCore-Sim
 #
 # April 2015
 # Rowan Deppeler <greythane@gmail.com>
