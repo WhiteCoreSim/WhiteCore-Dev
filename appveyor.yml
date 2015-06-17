@@ -1,0 +1,10 @@
+version: 0.9.3.{build}
+branches:
+  only:
+  - master
+build_script:
+- Prebuild.exe /target vs2010 /targetframework v4_5 /conditionals ISWIN;NET_4_5
+- msbuild WhiteCore.sln /p:Configuration=Debug  /p:DefineConstants="ISWIN;NET_4_5"
+artifacts:
+- path: WhiteCoreSim\bin
+  name: WhiteCore
