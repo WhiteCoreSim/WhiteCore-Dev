@@ -64,11 +64,16 @@ namespace WhiteCore.Services
                                             OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {
             OSDMap data = new OSDMap();
+            // 17-06-2015 Fly-Man- AvatarHoverHeight enabled
+            data["AvatarHoverHeightEnabled"] = true;
+            
+            // 17-06-2015 Fly-Man- MaxMaterialsPerTransaction enabled
+            data["MaxMaterialsPerTransaction"] = 50;
+            
             data["MeshRezEnabled"] = true;
             data["MeshUploadEnabled"] = true;
             data["MeshXferEnabled"] = true;
             data["PhysicsMaterialsEnabled"] = true;
-
 
             OSDMap typesMap = new OSDMap();
 
