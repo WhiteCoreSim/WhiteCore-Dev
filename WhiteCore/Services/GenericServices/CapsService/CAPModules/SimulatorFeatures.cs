@@ -83,11 +83,6 @@ namespace WhiteCore.Services
 
             data["PhysicsShapeTypes"] = typesMap;
 
-
-            //Data URLS need sent as well
-            //Not yet...
-            //data["DataUrls"] = m_service.Registry.RequestModuleInterface<IGridRegistrationService> ().GetUrlForRegisteringClient (m_service.AgentID + "|" + m_service.RegionHandle);
-
             //Send back data
             return OSDParser.SerializeLLSDXmlBytes(data);
         }
