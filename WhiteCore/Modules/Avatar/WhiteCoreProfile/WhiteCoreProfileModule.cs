@@ -619,6 +619,18 @@ namespace WhiteCore.Modules.Profiles
             }
             else
                 charterMember = Utils.StringToBytes(Profile.MembershipGroup);
+            
+            // 19-06-2015 Fly-Man-
+            // When charterMember set this character └ the viewer recognizes it
+            // as a Grid Master. Not sure what we want to do with that in WhiteCore
+            //
+            // Perhaps a talk with viewer devs to allow more options for this
+            //
+            
+            if (Utilities.IsSystemUser(Profile.PrincipalID))
+            {
+            	charterMember = Utils.StringToBytes("└");
+            }
 
             uint membershipGroupINT = 0;
             if (Profile.MembershipGroup != "")
