@@ -569,7 +569,7 @@ namespace WhiteCore.Framework.Services
                 return;
 
             System.IO.MemoryStream stream = new System.IO.MemoryStream(ObjectBlob);
-            WhiteCore.Framework.Serialization.SceneEntitySerializer.SceneObjectSerializer.FromXml2Format(ref stream, Scene);
+            Object = WhiteCore.Framework.Serialization.SceneEntitySerializer.SceneObjectSerializer.FromXml2Format(ref stream, Scene);
             stream.Close();
             ObjectBlob = null;
         }
