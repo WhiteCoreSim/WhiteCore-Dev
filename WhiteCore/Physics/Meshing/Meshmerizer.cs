@@ -608,6 +608,45 @@ namespace WhiteCore.Physics.Meshing
             return mesh;
         }
 
+        /// <summary>
+        /// temporary prototype code - please do not use until the interface has been finalized!
+        /// </summary>
+        /// <param name="size">value to scale the hull points by</param>
+        /// <returns>a list of vertices in the bounding hull if it exists and has been successfully decoded, otherwise null</returns>
+        public List<Vector3> GetBoundingHull(Vector3 size)
+        {
+            if (mBoundingHull == null)
+                return null;
+
+            List<Vector3> verts = new List<Vector3>();
+            foreach (var vert in mBoundingHull)
+                verts.Add(vert * size);
+
+            return verts;
+        }
+
+        /// <summary>
+        /// temporary prototype code - please do not use until the interface has been finalized!
+        /// </summary>
+        /// <param name="size">value to scale the hull points by</param>
+        /// <returns>a list of hulls if they exist and have been successfully decoded, otherwise null</returns>
+        public List<List<Vector3>> GetConvexHulls(Vector3 size)
+        {
+            if (mConvexHulls == null)
+                return null;
+
+            List<List<Vector3>> hulls = new List<List<Vector3>>();
+            foreach (var hull in mConvexHulls)
+            {
+                List<Vector3> verts = new List<Vector3>();
+                foreach (var vert in hull)
+                    verts.Add(vert * size);
+                hulls.Add(verts);
+            }
+
+            return hulls;
+        }
+
         public void RemoveMesh(ulong key)
         {
         }
