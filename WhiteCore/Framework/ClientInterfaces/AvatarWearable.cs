@@ -49,7 +49,8 @@ namespace WhiteCore.Framework.ClientInterfaces
         // these are guessed at by the list here -
         // http://wiki.secondlife.com/wiki/Avatar_Appearance.  We'll
         // correct them over time for when were are wrong.
-        public static readonly int BODY;
+        //public static readonly int BODY;
+        public static readonly int SHAPE = 0;
         public static readonly int SKIN = 1;
         public static readonly int HAIR = 2;
         public static readonly int EYES = 3;
@@ -68,8 +69,8 @@ namespace WhiteCore.Framework.ClientInterfaces
 
         public static readonly int MAX_WEARABLES = 16;
 
-        public static readonly UUID DEFAULT_BODY_ITEM = new UUID("66c41e39-38f9-f75a-024e-585989bfaba9");
-        public static readonly UUID DEFAULT_BODY_ASSET = new UUID("66c41e39-38f9-f75a-024e-585989bfab73");
+        public static readonly UUID DEFAULT_SHAPE_ITEM = new UUID("66c41e39-38f9-f75a-024e-585989bfaba9");
+        public static readonly UUID DEFAULT_SHAPE_ASSET = new UUID("66c41e39-38f9-f75a-024e-585989bfab73");
 
         public static readonly UUID DEFAULT_HAIR_ITEM = new UUID("d342e6c1-b9d2-11dc-95ff-0800200c9a66");
         public static readonly UUID DEFAULT_HAIR_ASSET = new UUID("d342e6c0-b9d2-11dc-95ff-0800200c9a66");
@@ -137,7 +138,7 @@ namespace WhiteCore.Framework.ClientInterfaces
                 }
 
                 // Body
-                defaultWearables[BODY].Add(DEFAULT_BODY_ITEM, DEFAULT_BODY_ASSET);
+                defaultWearables[SHAPE].Add(DEFAULT_SHAPE_ITEM, DEFAULT_SHAPE_ASSET);
 
                 // Hair
                 defaultWearables[HAIR].Add(DEFAULT_HAIR_ITEM, DEFAULT_HAIR_ASSET);

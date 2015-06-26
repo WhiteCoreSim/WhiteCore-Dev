@@ -319,7 +319,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                                                          ID = UUID.Random()
                                                      };
                 //Give a new copy to every person
-                AssetBase asset = m_AssetService.Get(AvatarWearable.DEFAULT_BODY_ASSET.ToString());
+                AssetBase asset = m_AssetService.Get(AvatarWearable.DEFAULT_SHAPE_ASSET.ToString());
                 if (asset != null)
                 {
                     asset.ID = UUID.Random();
@@ -1496,7 +1496,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                             brokenLinks.Add(item.ID);
                         }
                         else if (linkedItem.ID == AvatarWearable.DEFAULT_EYES_ITEM ||
-                                 linkedItem.ID == AvatarWearable.DEFAULT_BODY_ITEM ||
+                                 linkedItem.ID == AvatarWearable.DEFAULT_SHAPE_ITEM ||
                                  linkedItem.ID == AvatarWearable.DEFAULT_HAIR_ITEM ||
                                  linkedItem.ID == AvatarWearable.DEFAULT_PANTS_ITEM ||
                                  linkedItem.ID == AvatarWearable.DEFAULT_SHIRT_ITEM ||

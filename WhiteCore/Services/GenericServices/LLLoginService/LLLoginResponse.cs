@@ -313,7 +313,7 @@ namespace WhiteCore.Services
                 responseData["seed_capability"] = seedCapability;
 
                 responseData["event_categories"] = eventCategories;
-                responseData["event_notifications"] = eventNotifications; // TODO: What is this?
+                responseData["event_notifications"] = eventNotifications; // Fly-Man- This is the Notifications of Events that you "subscribed" to
                 responseData["classified_categories"] = classifiedCategories;
                 responseData["ui-config"] = uiConfig;
                 responseData["export"] = AllowExportPermission ? "flag" : "";
@@ -558,9 +558,7 @@ namespace WhiteCore.Services
                     TempHash["parent_id"] = library.LibraryRootFolderID.ToString();
                 else
                     TempHash["parent_id"] = folder.ParentID.ToString();
-                //TempHash["version"] = (Int32)folder.Version;
                 TempHash["version"] = 1;
-                //TempHash["type_default"] = (Int32) folder.Type;
                 TempHash["type_default"] = 9;
                 TempHash["folder_id"] = folder.ID.ToString();
                 table.Add(TempHash);
