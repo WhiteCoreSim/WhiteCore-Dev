@@ -7,6 +7,8 @@ WelcomeMessage = "Welcome to WhiteCore, <USERNAME>!"
 ;; OPTIONAL
 ;;This sets the message when a user logs in with a customizable welcome message. You need to add a welcome.txt file somewhere in the web and put the URL here if you want to use this
 ;;CustomizedMessageURL = http://127.0.0.1/welcome.txt
+
+;; Allow the Login level to be set remotely
 AllowRemoteSetLoginLevel = "false"
 
 ;; Should new users be shown the ToS when they log in if they have not seen it before?
