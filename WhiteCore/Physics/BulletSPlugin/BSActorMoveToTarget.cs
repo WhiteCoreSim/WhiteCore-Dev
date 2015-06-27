@@ -29,7 +29,7 @@ using System;
 using System.Linq;
 using OMV = OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public class BSActorMoveToTarget : BSActor
     {

@@ -31,7 +31,7 @@ using OMV = OpenMetaverse;
 using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.SceneInfo;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public class BSPrimLinkable : BSPrimDisplaced
     {

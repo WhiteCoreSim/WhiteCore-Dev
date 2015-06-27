@@ -34,7 +34,7 @@ using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services.ClassHelpers.Assets;
 using WhiteCore.Framework.Utilities;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public sealed class BSShapeCollection : IDisposable
     {

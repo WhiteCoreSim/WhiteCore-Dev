@@ -28,7 +28,7 @@
 using System.Text;
 using OMV = OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     // When a child is linked, the relationship position of the child to the parent
     //    is remembered so the child's world position can be recomputed when it is

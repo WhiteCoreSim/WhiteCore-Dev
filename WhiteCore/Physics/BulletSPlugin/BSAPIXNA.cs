@@ -35,7 +35,7 @@ using BulletXNA.BulletCollision;
 using BulletXNA.BulletDynamics;
 using WhiteCore.Framework.Utilities;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public sealed class BSAPIXNA : BSAPITemplate
     {

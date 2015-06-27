@@ -27,7 +27,7 @@
 
 using OMV = OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public sealed class BSLinksetConstraints : BSLinkset
     {

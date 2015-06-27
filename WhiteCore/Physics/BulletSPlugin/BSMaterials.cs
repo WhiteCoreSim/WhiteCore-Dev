@@ -29,7 +29,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Nini.Config;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public struct MaterialAttributes
     {

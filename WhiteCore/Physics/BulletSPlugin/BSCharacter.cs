@@ -32,7 +32,7 @@ using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Utilities;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public sealed class BSCharacter : BSPhysObject
     {

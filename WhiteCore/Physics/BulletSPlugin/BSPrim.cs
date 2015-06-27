@@ -32,7 +32,7 @@ using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.Utilities;
 using WhiteCore.Framework.ConsoleFramework;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     [Serializable]
     public class BSPrim : BSPhysObject

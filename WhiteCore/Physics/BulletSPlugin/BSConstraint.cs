@@ -28,7 +28,7 @@
 using System;
 using OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public abstract class BSConstraint : IDisposable
     {

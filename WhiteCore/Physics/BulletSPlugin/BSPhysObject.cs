@@ -31,7 +31,7 @@ using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.Utilities;
 using WhiteCore.Framework.SceneInfo;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     /*
      * Class to wrap all objects.

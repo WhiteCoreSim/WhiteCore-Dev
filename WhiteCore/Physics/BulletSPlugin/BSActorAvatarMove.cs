@@ -31,7 +31,7 @@ using System;
 using System.Collections.Generic;
 using OMV = OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public class BSActorAvatarMove : BSActor
     {

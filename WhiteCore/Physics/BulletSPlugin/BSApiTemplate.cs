@@ -30,7 +30,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     // Constraint type values as defined by Bullet
     public enum ConstraintType : int

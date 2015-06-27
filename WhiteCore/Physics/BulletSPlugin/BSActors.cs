@@ -28,7 +28,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public class BSActorCollection
     {

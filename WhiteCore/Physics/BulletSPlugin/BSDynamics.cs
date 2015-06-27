@@ -34,7 +34,7 @@ using System;
 using OpenMetaverse;
 using WhiteCore.Framework.Physics;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public sealed class BSDynamics : BSActor
     {

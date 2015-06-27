@@ -29,7 +29,7 @@ using System;
 using System.Collections.Generic;
 using OMV = OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     // A BSPrim can get individual information about its linkedness attached
     //    to it through an instance of a subclass of LinksetInfo.

@@ -29,7 +29,7 @@ using System.Collections.Generic;
 using System.Text;
 using OMV = OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     // Classes to allow some type checking for the API
     // These hold pointers to allocated objects in the unmanaged space.

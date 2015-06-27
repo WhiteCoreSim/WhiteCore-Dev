@@ -29,7 +29,7 @@ using System;
 using OpenMetaverse;
 using WhiteCore.Framework.Utilities;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     // The physical implementation of the terrain is wrapped in this class.
     public abstract class BSTerrainPhys : IDisposable
