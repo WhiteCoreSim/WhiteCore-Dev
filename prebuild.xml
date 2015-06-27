@@ -183,6 +183,7 @@
       <Reference name="System"/>
       
       <Reference name="WhiteCore.Framework"/>
+	  <Reference name="WhiteCore.Physics.Manager"/>
       
       <Reference name="Nini" path="../../../WhiteCoreSim/bin/"/>
       <Reference name="OpenMetaverseTypes" path="../../../WhiteCoreSim/bin/"/>
@@ -232,6 +233,7 @@
       <Reference name="System.Drawing"/>
       
       <Reference name="WhiteCore.Framework"/>
+	  <Reference name="WhiteCore.Physics.Manager"/>
 
       <Reference name="CSJ2K" path="../../../WhiteCoreSim/bin/"/>
       <Reference name="Nini" path="../../../WhiteCoreSim/bin/"/>
@@ -271,6 +273,7 @@
       <Reference name="WhiteCore.Region"/>
       <Reference name="WhiteCore.Physics.Meshing"/>
       <Reference name="WhiteCore.Physics.ConvexDecompositionDotNet"/>
+	  <Reference name="WhiteCore.Physics.Manager"/>
       <Reference name="BulletXNA.dll" path="../../../WhiteCoreSim/bin/"/>
 
       <Files>
@@ -279,6 +282,36 @@
         </Match>
       </Files>
     </Project>
+	
+    <Project frameworkVersion="v4_5" name="WhiteCore.Physics.Manager" path="WhiteCore/Physics/Manager" type="Library">
+      <Configuration name="Debug">
+        <Options>
+          <OutputPath>../../../WhiteCoreSim/bin/Physics/</OutputPath>
+          <AllowUnsafe>true</AllowUnsafe>
+        </Options>
+      </Configuration>
+      <Configuration name="Release">
+        <Options>
+          <OutputPath>../../../WhiteCoreSim/bin/Physics/</OutputPath>
+          <AllowUnsafe>true</AllowUnsafe>
+        </Options>
+      </Configuration>
+
+      <ReferencePath>../../../WhiteCoreSim/bin/</ReferencePath>
+      <Reference name="System"/>
+      <Reference name="System.Core"/>
+      <Reference name="System.Xml"/>
+      <Reference name="OpenMetaverseTypes" path="../../../WhiteCoreSim/bin/"/>
+      <Reference name="Nini.dll"  path="../../../WhiteCoreSim/bin/"/>
+      <Reference name="WhiteCore.Framework"/>
+      <Reference name="WhiteCore.Region"/>
+
+      <Files>
+        <Match pattern="*.cs" recurse="true">
+          <Exclude name="obj" pattern="obj"/>
+        </Match>
+      </Files>
+    </Project>	
 
     <Project frameworkVersion="v4_5" name="WhiteCore.Physics.ConvexDecompositionDotNet" path="WhiteCore/Physics/ConvexDecompositionDotNet" type="Library">
       <Configuration name="Debug">
@@ -297,6 +330,57 @@
       <Reference name="System.Core"/>
       <Reference name="System.Data"/>
       <Reference name="System.Xml"/>
+	  
+	  <Reference name="WhiteCore.Physics.Manager"/>
+
+      <Files>
+        <Match pattern="*.cs" recurse="true">
+          <Exclude name="obj" pattern="obj"/>
+        </Match>
+      </Files>
+    </Project>
+    
+	<Project frameworkVersion="v4_5" name="WhiteCore.Physics.OpenDynamicsEngine" path="WhiteCore/Physics/OpenDynamicsEngine" type="Library">
+      <Configuration name="Debug" platform="x86">
+        <Options>
+          <OutputPath>../../../WhiteCoreSim/bin/Physics/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Release" platform="x86">
+        <Options>
+          <OutputPath>../../../WhiteCoreSim/bin/Physics/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Debug" platform="x64">
+        <Options>
+          <OutputPath>../../../WhiteCoreSim/bin/Physics/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Release" platform="x64">
+        <Options>
+          <OutputPath>../../../WhiteCoreSim/bin/Physics/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Debug" platform="AnyCPU">
+        <Options>
+          <OutputPath>../../../WhiteCoreSim/bin/Physics/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Release" platform="AnyCPU">
+        <Options>
+          <OutputPath>../../../WhiteCoreSim/bin/Physics/</OutputPath>
+        </Options>
+      </Configuration>
+
+      <ReferencePath>../../../WhiteCoreSim/bin/</ReferencePath>
+      <Reference name="System"/>
+      <Reference name="System.Core"/>
+
+      <Reference name="WhiteCore.Framework"/>
+	  <Reference name="WhiteCore.Physics.Manager"/>
+      
+      <Reference name="Nini" path="../../../WhiteCoreSim/bin/"/>
+      <Reference name="OpenMetaverseTypes" path="../../../WhiteCoreSim/bin/"/>
 
       <Files>
         <Match pattern="*.cs" recurse="true">
@@ -1336,54 +1420,6 @@
       <Reference name="Warp3Dw" path="../../WhiteCoreSim/bin/"/>
       <Reference name="XMLRPC" path="../../WhiteCoreSim/bin/"/>
       <Reference name="zlib.net" path="../../WhiteCoreSim/bin/"/>
-
-      <Files>
-        <Match pattern="*.cs" recurse="true">
-          <Exclude name="obj" pattern="obj"/>
-        </Match>
-      </Files>
-    </Project>
-
-    <Project frameworkVersion="v4_5" name="WhiteCore.Physics.OpenDynamicsEngine" path="WhiteCore/Physics/OpenDynamicsEngine" type="Library">
-      <Configuration name="Debug" platform="x86">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/Physics/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Release" platform="x86">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/Physics/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Debug" platform="x64">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/Physics/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Release" platform="x64">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/Physics/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Debug" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/Physics/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Release" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/Physics/</OutputPath>
-        </Options>
-      </Configuration>
-
-      <ReferencePath>../../../WhiteCoreSim/bin/</ReferencePath>
-      <Reference name="System"/>
-      <Reference name="System.Core"/>
-
-      <Reference name="WhiteCore.Framework"/>
-      
-      <Reference name="Nini" path="../../../WhiteCoreSim/bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../WhiteCoreSim/bin/"/>
 
       <Files>
         <Match pattern="*.cs" recurse="true">
