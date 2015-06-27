@@ -29,104 +29,93 @@ using OMV = OpenMetaverse;
 
 namespace WhiteCore.Physics.BulletSPlugin
 {
-    public class BSActorSetTorque : BSActor
-    {
-        private BSFMotor m_torqueMotor;
+	public class BSActorSetTorque : BSActor
+	{
+		BSFMotor m_torqueMotor;
 
-        public BSActorSetTorque(BSScene physicsScene, BSPhysObject pObj, string actorName)
-            : base(physicsScene, pObj, actorName)
-        {
-            m_torqueMotor = null;
-            m_physicsScene.DetailLog("{0},BSActorSetTorque,constructor", m_controllingPrim.LocalID);
-        }
+		public BSActorSetTorque(BSScene physicsScene, BSPhysObject pObj, string actorName)
+			: base(physicsScene, pObj, actorName)
+		{
+			m_torqueMotor = null;
+			m_physicsScene.DetailLog("{0},BSActorSetTorque,constructor", m_controllingPrim.LocalID);
+		}
 
-        // BSActor.isActive
-        public override bool isActive
-        {
-            get { return Enabled && m_controllingPrim.IsPhysicallyActive; }
-        }
+		// BSActor.isActive
+		public override bool isActive {
+			get { return Enabled && m_controllingPrim.IsPhysicallyActive; }
+		}
 
-        // Release any connections and resources used by the actor.
-        // BSActor.Dispose()
-        public override void Dispose()
-        {
-            Enabled = false;
-        }
+		// Release any connections and resources used by the actor.
+		// BSActor.Dispose()
+		public override void Dispose()
+		{
+			Enabled = false;
+		}
 
-        // Called when physical parameters (properties set in Bullet) need to be re-applied.
-        // Called at taint-time.
-        // BSActor.Refresh()
-        public override void Refresh()
-        {
-            m_physicsScene.DetailLog("{0},BSActorSetTorque,refresh,torque={1}", m_controllingPrim.LocalID,
-                m_controllingPrim.RawTorque);
+		// Called when physical parameters (properties set in Bullet) need to be re-applied.
+		// Called at taint-time.
+		// BSActor.Refresh()
+		public override void Refresh()
+		{
+			m_physicsScene.DetailLog("{0},BSActorSetTorque,refresh,torque={1}", m_controllingPrim.LocalID, m_controllingPrim.RawTorque);
 
-            // If not active any more, get rid of me (shouldn't ever happen, but just to be safe)
-            if (m_controllingPrim.RawTorque == OMV.Vector3.Zero)
-            {
-                m_physicsScene.DetailLog("{0},BSActorSetTorque,refresh,notSetTorque,disabling={1}",
-                    m_controllingPrim.LocalID, ActorName);
-                Enabled = false;
-                return;
-            }
+			// If not active any more, get rid of me (shouldn't ever happen, but just to be safe)
+			if (m_controllingPrim.RawTorque == OMV.Vector3.Zero) {
+				m_physicsScene.DetailLog("{0},BSActorSetTorque,refresh,notSetTorque,disabling={1}", m_controllingPrim.LocalID, ActorName);
+				Enabled = false;
+				return;
+			}
 
-            // If the object is physically active, add the hoverer pre step action
-            if (isActive)
-            {
-                ActivateSetTorque();
-            }
-            else
-            {
-                DeactivateSetTorque();
-            }
-        }
+			// If the object is physically active, add the hoverer prestep action
+			if (isActive) {
+				ActivateSetTorque();
+			} else {
+				DeactivateSetTorque();
+			}
+		}
 
-        // The object's physical representation is being rebuilt so pick up any physical dependencies (constraints, ...).
-        //     Register a pre step action to restore physical requirements before the next simulation step.
-        // Called at taint-time.
-        // BSActor.RemoveBodyDependencies()
-        public override void RemoveBodyDependencies()
-        {
-            // Nothing to do for the hoverer since it is all software at pre-step action time.
-        }
+		// The object's physical representation is being rebuilt so pick up any physical dependencies (constraints, ...).
+		//     Register a prestep action to restore physical requirements before the next simulation step.
+		// Called at taint-time.
+		// BSActor.RemoveDependencies()
+		public override void RemoveDependencies()
+		{
+			// Nothing to do for the hoverer since it is all software at pre-step action time.
+		}
 
-        // If a hover motor has not been created, create one and start the hovering.
-        private void ActivateSetTorque()
-        {
-            if (m_torqueMotor == null)
-            {
-                // A fake motor that might be used someday
-                m_torqueMotor = new BSFMotor("setTorque", 1f, 1f, 1f, 1f);
+		// If a hover motor has not been created, create one and start the hovering.
+		private void ActivateSetTorque()
+		{
+			if (m_torqueMotor == null) {
+				// A fake motor that might be used someday
+				m_torqueMotor = new BSFMotor("setTorque", 1f, 1f, 1f);
 
-                m_physicsScene.BeforeStep += Mover;
-            }
-        }
+				m_physicsScene.BeforeStep += Mover;
+			}
+		}
 
-        private void DeactivateSetTorque()
-        {
-            if (m_torqueMotor != null)
-            {
-                m_physicsScene.BeforeStep -= Mover;
-                m_torqueMotor = null;
-            }
-        }
+		private void DeactivateSetTorque()
+		{
+			if (m_torqueMotor != null) {
+				m_physicsScene.BeforeStep -= Mover;
+				m_torqueMotor = null;
+			}
+		}
 
-        // Called just before the simulation step. Update the vertical position for hoverness.
-        private void Mover(float timeStep)
-        {
-            // Don't do force while the object is selected.
-            if (!isActive)
-                return;
+		// Called just before the simulation step. Update the vertical position for hoverness.
+		private void Mover(float timeStep)
+		{
+			// Don't do force while the object is selected.
+			if (!isActive)
+				return;
 
-            m_physicsScene.DetailLog("{0},BSActorSetTorque,preStep,force={1}", m_controllingPrim.LocalID,
-                m_controllingPrim.RawTorque);
-            if (m_controllingPrim.PhysBody.HasPhysicalBody)
-            {
-                m_controllingPrim.AddAngularForce(m_controllingPrim.RawTorque, false, true);
-                m_controllingPrim.ActivateIfPhysical(false);
-            }
+			m_physicsScene.DetailLog("{0},BSActorSetTorque,preStep,force={1}", m_controllingPrim.LocalID, m_controllingPrim.RawTorque);
+			if (m_controllingPrim.PhysBody.HasPhysicalBody) {
+				m_controllingPrim.AddAngularForce(m_controllingPrim.RawTorque, false, true);
+				m_controllingPrim.ActivateIfPhysical(false);
+			}
 
-            // TODO:
-        }
-    }
+			// TODO:
+		}
+	}
 }
