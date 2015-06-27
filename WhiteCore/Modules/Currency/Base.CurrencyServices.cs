@@ -57,11 +57,11 @@ namespace WhiteCore.Modules.Currency
         public void Initialize(IConfigSource config, IRegistryCore registry)
         {
             if (config.Configs["Currency"] == null ||
-                config.Configs["Currency"].GetString("Module", "") != "SimpleCurrency")
+                config.Configs["Currency"].GetString("Module", "") != "BaseCurrency")
                 return;
 
             m_registry = registry;
-            m_connector = Framework.Utilities.DataManager.RequestPlugin<ISimpleCurrencyConnector>() as BaseCurrencyConnector;
+            m_connector = Framework.Utilities.DataManager.RequestPlugin<IBaseCurrencyConnector>() as BaseCurrencyConnector;
         }
 
         public void Start(IConfigSource config, IRegistryCore registry)

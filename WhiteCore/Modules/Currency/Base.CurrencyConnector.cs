@@ -42,7 +42,7 @@ using WhiteCore.Framework.Utilities;
 namespace WhiteCore.Modules.Currency
 {
     
-    public class BaseCurrencyConnector : ConnectorBase, ISimpleCurrencyConnector
+    public class BaseCurrencyConnector : ConnectorBase, IBaseCurrencyConnector
     {
         #region Declares
         const string _REALM = "simple_currency";
@@ -62,7 +62,7 @@ namespace WhiteCore.Modules.Currency
 
         public string Name
         {
-            get { return "ISimpleCurrencyConnector"; }
+            get { return "IBaseCurrencyConnector"; }
         }
 
         public void Initialize(IGenericData GenericData, IConfigSource source, IRegistryCore registry,
@@ -72,7 +72,7 @@ namespace WhiteCore.Modules.Currency
             m_registry = registry;
 
             IConfig config = source.Configs["Currency"];
-            if (config == null || source.Configs["Currency"].GetString("Module", "") != "SimpleCurrency")
+            if (config == null || source.Configs["Currency"].GetString("Module", "") != "BaseCurrency")
                 return;
 
             IConfig gridInfo = source.Configs["GridInfoService"];
