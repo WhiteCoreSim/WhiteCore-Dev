@@ -49,8 +49,6 @@ namespace WhiteCore.Services.DataService
 
         // system groups
         string realEstateGroupName = Constants.RealEstateGroupName;
-        string financialServicesGroupName = Constants.FinancialServicesGroupName;
-        string marketplaceGroupName = Constants.MarketplaceGroupName;
 
         #endregion
 
@@ -87,8 +85,6 @@ namespace WhiteCore.Services.DataService
             if (grpConfig != null)
             {
                 realEstateGroupName = grpConfig.GetString("RealEstateGroupName", realEstateGroupName);
-                financialServicesGroupName = grpConfig.GetString("FinancialServicesGroupName", financialServicesGroupName);
-                marketplaceGroupName = grpConfig.GetString("MarketplaceGroupName", marketplaceGroupName);
             }
 
             Init (simBase, Name);
@@ -102,22 +98,7 @@ namespace WhiteCore.Services.DataService
                     (UUID) Constants.RealEstateOwnerUUID,
                     "RealEstate maintenance group"
                 );
-
-                VerifySystemGroup ( 
-                    financialServicesGroupName, 
-                    (UUID) Constants.FinancialServicesGroupUUID,
-                    (UUID) Constants.BankerUUID,
-                    "Financial services group"
-                );
-
-                VerifySystemGroup ( 
-                    marketplaceGroupName, 
-                    (UUID) Constants.MarketplaceGroupUUID ,
-                    (UUID) Constants.MarketplaceOwnerUUID,
-                    "Marketplace services group"
-                );
             }
-
         }
 
         public string Name

@@ -61,7 +61,7 @@ namespace WhiteCore.Framework.Utilities
         public const string RealEstateOwnerUUID = "bbb55499-7938-4752-ab7c-f7136e36cced";
 		public const string RealEstateOwnerName = "RealEstate Owner";
 
-        // System Govern Avatar Account
+        // System Governor Avatar Account
         public const string GovernorUUID = "3d6181b0-6a4b-97ef-18d8-722652995cf1";
         public const string GovernorName = "Governor White";
         
@@ -74,20 +74,13 @@ namespace WhiteCore.Framework.Utilities
 		public const string RealEstateGroupName = "Maintenance";
 
         // System Banker Avatar
-        public const string BankerUUID = "2f087cf0-0448-11e5-b939-0800200c9a66";
+        public const string BankerUUID = "f4261829-2796-4688-bfe2-085190cb639b";
         public const string BankerName = "WhiteCore Banker";
 
-        // System Financial Services Group
-        public const string FinancialServicesGroupUUID = "2f087cf1-0448-11e5-b939-0800200c9a66";
-        public const string FinancialServicesGroupName = "WhiteCore Financial Services";
-
         // System Marketplace Avatar
-        public const string MarketplaceOwnerUUID = "2f087cf2-0448-11e5-b939-0800200c9a66";
+        public const string MarketplaceOwnerUUID = "198e72a6-cef6-4bbb-ae08-c0a79e6b7d1e";
         public const string MarketplaceOwnerName = "Marketplace Concierge";
 
-        // System Marketplace Group
-        public const string MarketplaceGroupUUID = "2f087cf3-0448-11e5-b939-0800200c9a66";
-        public const string MarketplaceGroupName = "WhiteCore Marketplace";
 
         // user levels
         public const int USER_DISABLED = -2;
