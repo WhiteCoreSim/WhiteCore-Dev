@@ -29,12 +29,52 @@ using OpenMetaverse;
 
 namespace WhiteCore.Framework.Services
 {
-    public interface ISystemEstateService
+    public interface ISystemAccountService
+
     {
-         /// <summary>
-        ///     The system Estate name
+        /// <summary>
+        /// The governor UUID.
         /// </summary>
-        string SystemEstateName { get; }
+        /// <value>The governor UUID.</value>
+        UUID GovernorUUID { get;}
+
+        /// <summary>
+        ///     The Governor's configured name.
+        /// </summary>
+        /// <value>The Governor's name.</value>
+        string GovernorName { get; }
+
+        /// <summary>
+        ///     The System Real Estate owner's UUID
+        /// </summary>
+        UUID SystemEstateOwnerUUID { get; }
+
+        /// <summary>
+        ///     The system Real Estate owner's name
+        /// </summary>
+        string SystemEstateOwnerName { get; }
+
+        /// <summary>
+        ///     The Banker UUID.
+        /// </summary>
+        /// <value>The Banker UUID.</value>
+        UUID BankerUUID { get;}
+
+        /// <summary>
+        ///     The Banker's configured name.
+        /// </summary>
+        /// <value>The Bankers's name.</value>
+        string BankerName { get; }
+
+        /// <summary>
+        ///     The System Marketplace Owner's UUID
+        /// </summary>
+        UUID MarketplaceOwnerUUID { get; }
+
+        /// <summary>
+        ///     The System Marketplace owner's name
+        /// </summary>
+        string MarketplaceOwnerName { get; }
 
     }
 }

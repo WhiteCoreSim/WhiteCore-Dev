@@ -28,12 +28,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using WhiteCore.Framework.ClientInterfaces;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.Utilities;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
 using ProtoBuf;
+using WhiteCore.Framework.ClientInterfaces;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Framework.SceneInfo
 {
@@ -47,24 +47,24 @@ namespace WhiteCore.Framework.SceneInfo
 
         #endregion
 
-        private List<UUID> l_EstateAccess = new List<UUID>();
-        private List<EstateBan> l_EstateBans = new List<EstateBan>();
-        private List<UUID> l_EstateGroups = new List<UUID>();
-        private List<UUID> l_EstateManagers = new List<UUID>();
-        private string m_AbuseEmail = String.Empty;
-        private bool m_AllowDirectTeleport = true;
-        private bool m_AllowLandmark = true;
-        private bool m_AllowParcelChanges = true;
-        private bool m_AllowSetHome = true;
-        private bool m_AllowVoice = true;
+        List<UUID> l_EstateAccess = new List<UUID>();
+        List<EstateBan> l_EstateBans = new List<EstateBan>();
+        List<UUID> l_EstateGroups = new List<UUID>();
+        List<UUID> l_EstateManagers = new List<UUID>();
+        string m_AbuseEmail = String.Empty;
+        bool m_AllowDirectTeleport = true;
+        bool m_AllowLandmark = true;
+        bool m_AllowParcelChanges = true;
+        bool m_AllowSetHome = true;
+        bool m_AllowVoice = true;
 
-        private string m_EstateName = Constants.SystemEstateName;
-        private UUID m_EstateOwner = (UUID)Constants.RealEstateOwnerUUID;
+        string m_EstateName = Constants.SystemEstateName;
+        UUID m_EstateOwner = (UUID)Constants.RealEstateOwnerUUID;
 
-        private uint m_ParentEstateID = 1;
-        private int m_PricePerMeter = 1;
-        private bool m_PublicAccess = true;
-        private bool m_UseGlobalTime = true;
+        uint m_ParentEstateID = 1;
+        int m_PricePerMeter = 1;
+        bool m_PublicAccess = true;
+        bool m_UseGlobalTime = true;
 
         public EstateSettings()
         {

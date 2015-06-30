@@ -25,6 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.DatabaseInterfaces;
@@ -32,11 +37,6 @@ using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace WhiteCore.Services.DataService
 {
@@ -44,8 +44,13 @@ namespace WhiteCore.Services.DataService
     {
         #region Declares
 
-        private IGenericData data;
-        private List<UUID> agentsCanBypassGroupNoticePermsCheck = new List<UUID>();
+        IGenericData data;
+        List<UUID> agentsCanBypassGroupNoticePermsCheck = new List<UUID>();
+
+        // system groups
+        string realEstateGroupName = Constants.RealEstateGroupName;
+        string financialServicesGroupName = Constants.FinancialServicesGroupName;
+        string marketplaceGroupName = Constants.MarketplaceGroupName;
 
         #endregion
 
@@ -77,11 +82,41 @@ namespace WhiteCore.Services.DataService
             {
                 Framework.Utilities.DataManager.RegisterPlugin (this);
             }
+
+            IConfig grpConfig = source.Configs["SystemUserService"];
+            if (grpConfig != null)
+            {
+                realEstateGroupName = grpConfig.GetString("RealEstateGroupName", realEstateGroupName);
+                financialServicesGroupName = grpConfig.GetString("FinancialServicesGroupName", financialServicesGroupName);
+                marketplaceGroupName = grpConfig.GetString("MarketplaceGroupName", marketplaceGroupName);
+            }
+
             Init (simBase, Name);
 
-            // verify that the RealEstate group exists
+            // check for system groups if we are local
             if (!m_doRemoteCalls)
-            	CheckRealEstateGroupInfo ();
+            {
+                VerifySystemGroup ( 
+                    realEstateGroupName, 
+                    (UUID) Constants.RealEstateGroupUUID,
+                    (UUID) Constants.RealEstateOwnerUUID,
+                    "RealEstate maintenance group"
+                );
+
+                VerifySystemGroup ( 
+                    financialServicesGroupName, 
+                    (UUID) Constants.FinancialServicesGroupUUID,
+                    (UUID) Constants.BankerUUID,
+                    "Financial services group"
+                );
+
+                VerifySystemGroup ( 
+                    marketplaceGroupName, 
+                    (UUID) Constants.MarketplaceGroupUUID ,
+                    (UUID) Constants.MarketplaceOwnerUUID,
+                    "Marketplace services group"
+                );
+            }
 
         }
 
@@ -89,36 +124,31 @@ namespace WhiteCore.Services.DataService
         {
             get { return "IGroupsServiceConnector"; }
         }
-        
+
         /// <summary>
-        /// Checks and creates the real estate owner group info.
+        /// Verify existence of and create a system group if required.
         /// </summary>
-        private void CheckRealEstateGroupInfo()
+        /// <returns><c>true</c>, if system group was created, <c>false</c> otherwise.</returns>
+        /// <param name="grpName">Group name.</param>
+        /// <param name="grpUUID">Group UUID.</param>
+        /// <param name="grpOwnerUUID">Group owner UUID.</param>
+        /// <param name="grpCharter">Group charter.</param>
+        void VerifySystemGroup(string grpName, UUID grpUUID, UUID grpOwnerUUID, string grpCharter)
         {
-            if (GetGroupRecord (UUID.Zero, (UUID) Constants.RealEstateGroupUUID, Constants.RealEstateGroupName) == null)
+            if (GetGroupRecord (UUID.Zero, grpUUID, grpName) == null)
             {
-                CreateRealEstateGroup ();
+                MainConsole.Instance.WarnFormat ("Creating System Group '{0}'", grpName);
+
+                CreateGroup (
+                    grpUUID,                                            // Group UUID
+                    grpName,                                            // Name
+                    grpCharter,                                         // Charter / description
+                    false,                                              // Show in list
+                    UUID.Zero, 0, false, false, true,                   // Insignia UUID, Membership fee, Open Enrolement, Allow publishing, Mature
+                    grpOwnerUUID,                                       // founder UUID
+                    UUID.Random ());                                     // owner role UUID ??
             }
         }
-
-        /// <summary>
-        /// Creates the real estate 'Maintenance' group.
-        /// </summary>
-        /// <returns><c>true</c>, if real estate group was created, <c>false</c> otherwise.</returns>
-        private bool CreateRealEstateGroup()
-        {
-            MainConsole.Instance.Warn("Creating System Group " + Constants.RealEstateGroupName);
-
-            CreateGroup(
-                (UUID)Constants.RealEstateGroupUUID,                // UUID
-                Constants.RealEstateGroupName,                      // Name
-                "This group is for RealEstate Maintenance",         // Charter
-                false,                                              // Show in list
-                UUID.Zero, 0, false, false, true,                   // Insignia UUID, Membership fee, Open Enrolement, Allow publishing, Mature
-                (UUID)Constants.RealEstateOwnerUUID,                // founder UUID
-                UUID.Random());                                     // owner role UUID ??
-            return true;
-        }       
 
         #endregion
 
@@ -817,7 +847,7 @@ namespace WhiteCore.Services.DataService
             return proposals; //Return only ones that are still running
         }
 
-        private string GetHasVoted(UUID agentID, GroupProposalInfo p)
+        string GetHasVoted(UUID agentID, GroupProposalInfo p)
         {
             OpenMetaverse.StructuredData.OSDMap map = GenericUtils.GetGeneric(p.GroupID, p.VoteID.ToString(),
                                                                               agentID.ToString(), data);
@@ -910,7 +940,7 @@ namespace WhiteCore.Services.DataService
             return uint.Parse(data.Query(new[] {"COUNT(GroupID)"}, "group_data", filter, null, null, null)[0]);
         }
 
-        private static GroupRecord GroupRecordQueryResult2GroupRecord(List<String> result)
+        static GroupRecord GroupRecordQueryResult2GroupRecord(List<String> result)
         {
             return new GroupRecord
                        {
@@ -1759,7 +1789,7 @@ namespace WhiteCore.Services.DataService
                        : info;
         }
 
-        private static GroupNoticeData GroupNoticeQueryResult2GroupNoticeData(List<string> result)
+        static GroupNoticeData GroupNoticeQueryResult2GroupNoticeData(List<string> result)
         {
             GroupNoticeData GND = new GroupNoticeData
                                       {

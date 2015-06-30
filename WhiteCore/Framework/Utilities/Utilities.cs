@@ -606,12 +606,19 @@ namespace WhiteCore.Framework.Utilities
             return EMailreStrict.IsMatch(address);
         }
 
+        /// <summary>
+        /// Determines whether the specified userID is a system user.
+        /// </summary>
+        /// <returns><c>true</c> if the specified userID is a system user; otherwise, <c>false</c>.</returns>
+        /// <param name="userID">User I.</param>
         public static bool IsSystemUser(OpenMetaverse.UUID userID)
         {
             var userId = userID.ToString();
             return ( userId == Constants.GovernorUUID || 
                      userId == Constants.RealEstateOwnerUUID ||
-                     userId == Constants.LibraryOwner
+                     userId == Constants.LibraryOwner ||
+                     userId == Constants.BankerUUID ||
+                     userId == Constants.MarketplaceOwnerUUID 
             );
         }
 

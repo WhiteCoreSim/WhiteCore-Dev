@@ -25,6 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
@@ -32,12 +38,6 @@ using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Profile;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using System.Collections.Generic;
-using System.IO;
-using System;
-using System.Globalization;
 
 namespace WhiteCore.Services.SQLServices.UserAccountService
 {
@@ -103,12 +103,21 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 AddCommands ();
         }
 
-        private void AddCommands()
+        void AddCommands()
         {
             if (MainConsole.Instance != null)
             {
                 if (!m_doRemoteCalls)
                 {
+                    MainConsole.Instance.Commands.AddCommand(
+                        "add user",
+                        "add user [<first> [<last> [<pass> [<email>]]]] [--system] [--uuid]",
+                        "Create a new user. If optional parameters are not supplied required details will be prompted\n"+
+                        "  --system : Enter user scope UUID\n"+
+                        "  --uuid : Enter a specific UUID for the user",
+                        HandleCreateUser, false, true);
+
+                    // alias for 'add user' (legacy)
                     MainConsole.Instance.Commands.AddCommand(
                         "create user",
                         "create user [<first> [<last> [<pass> [<email>]]]] [--system] [--uuid]",
@@ -747,7 +756,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: User level set for user {0} {1} to {2}", firstName, lastName, level);
         }
 
-        private int UserTypeToUserFlags(string userType)
+        int UserTypeToUserFlags(string userType)
         {
             switch (userType)
             {
@@ -766,7 +775,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             }
         }
 
-        private string UserFlagToType(int userFlags)
+        string UserFlagToType(int userFlags)
         {
             switch (userFlags)
             {
@@ -785,7 +794,12 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             }
         }
 
-        string UserGodLevel(int level)
+        /// <summary>
+        /// Users 'god' level.
+        /// </summary>
+        /// <returns>The god level description.</returns>
+        /// <param name="level">Level.</param>
+        public string UserGodLevel(int level)
         {
             switch (level)
             {
@@ -804,7 +818,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             case Constants.USER_GOD_FULL:
                 return "A God";
             case Constants.USER_GOD_MAINTENANCE:
-                return"Super God";
+                return"Maintenance God";
             default:
                 return "User";
             }

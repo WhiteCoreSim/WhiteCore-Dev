@@ -25,6 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System.Collections.Generic;
+using System.Linq;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
@@ -32,18 +37,13 @@ using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Serialization;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse.StructuredData;
-using System.Collections.Generic;
-using System.Linq;
-using OpenMetaverse;
 
 namespace WhiteCore.Modules.Estate
 {
     public class EstateInitializer : ISharedRegionStartupModule, IWhiteCoreBackupModule
     {
-        private string LastEstateName = "";
-        private string LastEstateOwner = Constants.RealEstateOwnerName;
+        string LastEstateName = "";
+        string LastEstateOwner = Constants.RealEstateOwnerName;
         protected IRegistryCore m_registry;
          
 
@@ -124,7 +124,7 @@ namespace WhiteCore.Modules.Estate
         /// </summary>
         /// <returns>The mainland estate.</returns>
         /// <param name="regionID">Region I.</param>
-        private EstateSettings LinkMainlandEstate(UUID regionID)
+        EstateSettings LinkMainlandEstate(UUID regionID)
         {
             // link region to the Mainland... assign to RealEstateOwner & System Estate
             IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector>();
@@ -152,7 +152,7 @@ namespace WhiteCore.Modules.Estate
         /// </summary>
         /// <returns>The estate info.</returns>
         /// <param name="scene">Scene.</param>
-        private EstateSettings CreateEstateInfo(IScene scene)
+        EstateSettings CreateEstateInfo(IScene scene)
         {
 
             // check for regionType to determine if this is 'Mainland' or an 'Estate'
@@ -165,12 +165,13 @@ namespace WhiteCore.Modules.Estate
             // we are linking to a user estate
             IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector>();
             ISystemEstateService sysEstateInfo = m_registry.RequestModuleInterface<ISystemEstateService>();
-             
+            ISystemAccountService sysAccounts = m_registry.RequestModuleInterface<ISystemAccountService> ();
+
             string sysEstateOwnerName;
-            var sysAccount = scene.UserAccountService.GetUserAccount (scene.RegionInfo.AllScopeIDs, (UUID) Constants.RealEstateOwnerUUID);
+            var sysAccount = scene.UserAccountService.GetUserAccount (scene.RegionInfo.AllScopeIDs, sysAccounts.SystemEstateOwnerUUID);
 
             if (sysAccount == null)
-                sysEstateOwnerName = sysEstateInfo.SystemEstateOwnerName;
+                sysEstateOwnerName = sysAccounts.SystemEstateOwnerName;
             else
                 sysEstateOwnerName = sysAccount.Name;
 

@@ -51,35 +51,56 @@ namespace WhiteCore.Framework.Utilities
         public const int MaxRegionSize = 4096;
         public const int MinRegionSize = 16;
 
-		public const int SystemUserCount = 3;
+		public const int SystemUserCount = 5;
+
+        // System library Avatar Account
         public const string LibraryOwner = "11111111-1111-0000-0000-000100bba000";
         public const string LibraryRootFolderID = "00000112-000f-0000-0000-000100bba000";
 
+        // System Real Estate Avatar Account
         public const string RealEstateOwnerUUID = "bbb55499-7938-4752-ab7c-f7136e36cced";
 		public const string RealEstateOwnerName = "RealEstate Owner";
 
+        // System Govern Avatar Account
         public const string GovernorUUID = "3d6181b0-6a4b-97ef-18d8-722652995cf1";
         public const string GovernorName = "Governor White";
         
+        // System Estate
         public const string SystemEstateName = "WhiteCore Estate";
         public const int SystemEstateID = 1;
 
+        // System Real Estate Maintenance Group
 		public const string RealEstateGroupUUID = "dc7b21cd-3c89-fcaa-31c8-25f9ffd224cd";
 		public const string RealEstateGroupName = "Maintenance";
 
+        // System Banker Avatar
+        public const string BankerUUID = "2f087cf0-0448-11e5-b939-0800200c9a66";
+        public const string BankerName = "WhiteCore Banker";
+
+        // System Financial Services Group
+        public const string FinancialServicesGroupUUID = "2f087cf1-0448-11e5-b939-0800200c9a66";
+        public const string FinancialServicesGroupName = "WhiteCore Financial Services";
+
+        // System Marketplace Avatar
+        public const string MarketplaceOwnerUUID = "2f087cf2-0448-11e5-b939-0800200c9a66";
+        public const string MarketplaceOwnerName = "Marketplace Concierge";
+
+        // System Marketplace Group
+        public const string MarketplaceGroupUUID = "2f087cf3-0448-11e5-b939-0800200c9a66";
+        public const string MarketplaceGroupName = "WhiteCore Marketplace";
 
         // user levels
         public const int USER_DISABLED = -2;
         public const int USER_BANNED = -1;
         public const int USER_NORMAL = 0;
-        public const int USER_GOD_LIKE = 1;     //?? bit low, are some other levels needed??
+        public const int USER_GOD_LIKE = 1;                 //?? bit low, are some other levels needed??
         public const int USER_GOD_CUSTOMER_SERVICE = 100;
         public const int USER_GOD_LIASON = 150;
         public const int USER_GOD_FULL = 200;
         public const int USER_GOD_MAINTENANCE = 250;
 
         // user flags (account types)
-        public const int USER_FLAG_GUEST      = 0;         // Temporary: (Default) No payment info on account    
+        public const int USER_FLAG_GUEST      = 0;          // Temporary: (Default) No payment info on account    
         public const int USER_FLAG_RESIDENT   = 200;        // Resident: Payment info on account
         public const int USER_FLAG_PAY        = 300;        // Testing: Payment info on account
         public const int USER_FLAG_NOPAY      = 400;        // Testing: No Payment info on account
