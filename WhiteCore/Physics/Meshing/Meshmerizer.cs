@@ -128,27 +128,26 @@ namespace WhiteCore.Physics.Meshing
         {
             Mesh box = new Mesh(key);
             List<Coord> vertices = new List<Coord>
-                                        {
-                                            new Coord(minX, maxY, minZ),
-                                            new Coord(maxX, maxY, minZ),
-                                            new Coord(maxX, minY, minZ),
-                                            new Coord(minX, minY, minZ)
-                                        };
-            // bottom
+            {
+                new Coord(minX, maxY, minZ),
+                new Coord(maxX, maxY, minZ),
+                new Coord(maxX, minY, minZ),
+                new Coord(minX, minY, minZ),
+                new Coord(maxX, maxY, maxZ),
+                new Coord(minX, maxY, maxZ),
+                new Coord(minX, minY, maxZ),
+                new Coord(maxX, minY, maxZ)
+            };
 
             List<Face> faces = new List<Face>();
+
+            // bottom
             faces.Add(new Face(0, 1, 2));
-            faces.Add(new Face(0, 1, 3));
+            faces.Add(new Face(0, 2, 3));
 
             // top
-
-            vertices.Add(new Coord(maxX, maxY, maxZ));
-            vertices.Add(new Coord(minX, maxY, maxZ));
-            vertices.Add(new Coord(minX, minY, maxZ));
-            vertices.Add(new Coord(maxX, minY, maxZ));
-
             faces.Add(new Face(4, 5, 6));
-            faces.Add(new Face(4, 5, 7));
+            faces.Add(new Face(4, 6, 7));
 
             // sides
 
