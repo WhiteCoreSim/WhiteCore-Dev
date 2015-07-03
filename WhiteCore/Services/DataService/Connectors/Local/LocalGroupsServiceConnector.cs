@@ -145,64 +145,51 @@ namespace WhiteCore.Services.DataService
             if (remoteValue != null || m_doRemoteOnly)
                 return;
 
-            // Would this be cleaner as (GroupPowers)ulong.MaxValue;
-            // replaced by const definition below... this list does not appear to be all cases?
-            /* ulong OwnerPowers = (ulong)(GroupPowers.Accountable
-                                         | GroupPowers.AllowEditLand
-                                         | GroupPowers.AllowFly
-                                         | GroupPowers.AllowLandmark
-                                         | GroupPowers.AllowRez
-                                         | GroupPowers.AllowSetHome
-                                         | GroupPowers.AllowVoiceChat
-                                         | GroupPowers.AssignMember
-                                         | GroupPowers.AssignMemberLimited
-                                         | GroupPowers.ChangeActions
-                                         | GroupPowers.ChangeIdentity
-                                         | GroupPowers.ChangeMedia
-                                         | GroupPowers.ChangeOptions
-                                         | GroupPowers.CreateRole
-                                         | GroupPowers.DeedObject
-                                         | GroupPowers.DeleteRole
-                                         | GroupPowers.Eject
-                                         | GroupPowers.FindPlaces
-                                         | GroupPowers.HostEvent
-                                         | GroupPowers.Invite
-                                         | GroupPowers.JoinChat
-                                         | GroupPowers.LandChangeIdentity
-                                         | GroupPowers.LandDeed
-                                         | GroupPowers.LandDivideJoin
-                                         | GroupPowers.LandEdit
-                                         | GroupPowers.LandEjectAndFreeze
-                                         | GroupPowers.LandGardening
-                                         | GroupPowers.LandManageAllowed
-                                         | GroupPowers.LandManageBanned
-                                         | GroupPowers.LandManagePasses
-                                         | GroupPowers.LandOptions
-                                         | GroupPowers.LandRelease
-                                         | GroupPowers.LandSetSale
-                                         | GroupPowers.ModerateChat
-                                         | GroupPowers.ObjectManipulate
-                                         | GroupPowers.ObjectSetForSale
-                                         | GroupPowers.ReceiveNotices
-                                         | GroupPowers.RemoveMember
-                                         | GroupPowers.ReturnGroupOwned
-                                         | GroupPowers.ReturnGroupSet
-                                         | GroupPowers.ReturnNonGroup
-                                         | GroupPowers.RoleProperties
-                                         | GroupPowers.SendNotices
-                                         | GroupPowers.SetLandingPoint
-                                         | GroupPowers.StartProposal
-                                         | GroupPowers.VoteOnProposal);
-            */
-            //ulong EveryonePowers = (ulong) (GroupPowers.AllowSetHome |
-            //                                GroupPowers.Accountable |
-            //                                GroupPowers.JoinChat |
-            //                                GroupPowers.AllowVoiceChat |
-            //                                GroupPowers.ReceiveNotices |
-            //                                GroupPowers.StartProposal |
-            //                                GroupPowers.VoteOnProposal);
-
-
+           const ulong EveryonePowers = (ulong) (GroupPowers.AllowSetHome |
+                                            GroupPowers.Accountable |
+                                            GroupPowers.JoinChat |
+                                            GroupPowers.AllowVoiceChat |
+                                            GroupPowers.ReceiveNotices);
+           
+           const ulong OfficersPowers = (ulong) (GroupPowers.AllowSetHome |
+                                                 GroupPowers.Accountable |
+                                                 GroupPowers.JoinChat |
+                                                 GroupPowers.AllowVoiceChat |
+                                                 GroupPowers.ReceiveNotices |
+                                                 GroupPowers.ChangeIdentity | // Same as EveryonePowers
+                                                 GroupPowers.LandEjectAndFreeze |
+                                                 GroupPowers.LandEdit |
+                                                 GroupPowers.AllowFly |
+                                                 GroupPowers.AllowRez |
+                                                 GroupPowers.AllowLandmark |
+                                                 GroupPowers.LandChangeIdentity |
+                                                 GroupPowers.ChangeMedia |
+                                                 GroupPowers.LandDeed |
+                                                 GroupPowers.LandDivideJoin |
+                                                 GroupPowers.LandEdit |
+                                                 GroupPowers.FindPlaces |
+                                                 GroupPowers.LandGardening |
+                                                 GroupPowers.LandManageAllowed |
+                                                 GroupPowers.LandManageBanned |
+                                                 GroupPowers.LandManagePasses |
+                                                 GroupPowers.LandOptions |
+                                                 GroupPowers.LandRelease |
+                                                 GroupPowers.ReturnGroupOwned |
+                                                 GroupPowers.ReturnGroupSet |
+                                                 GroupPowers.ReturnNonGroup |
+                                                 GroupPowers.SetLandingPoint |
+                                                 GroupPowers.LandSetSale |
+                                                 GroupPowers.Eject |
+                                                 GroupPowers.Invite |
+                                                 GroupPowers.ChangeOptions |
+                                                 GroupPowers.MemberVisible |
+                                                 GroupPowers.SendNotices |
+                                                 GroupPowers.DeedObject |
+                                                 GroupPowers.ObjectManipulate |
+                                                 GroupPowers.ObjectSetForSale |
+                                                 GroupPowers.AssignMemberLimited |
+                                                 GroupPowers.RoleProperties |
+                                                 GroupPowers.ModerateChat);
 
             Dictionary<string, object> row = new Dictionary<string, object>(11);
             row["GroupID"] = groupID;
@@ -219,12 +206,19 @@ namespace WhiteCore.Services.DataService
 
             data.Insert("group_data", row);
 
-            const ulong EveryonePowers = 8796495740928;             // >> 0x80018010000
+            // const ulong EveryonePowers = 8796495740928;             // >> 0x80018010000
+            //
+            // 03-07-2015 Fly-Man- Removed this part in favor of using the real values
+            //
+            
             //Add everyone role to group
             AddRoleToGroup(founderID, groupID, UUID.Zero, "Everyone", "Everyone in the group is in the everyone role.",
                            "Member of " + name, EveryonePowers);
 
-            const ulong OfficersPowers = 436506116225230;           // >> 0x 18cfffffff8ce
+            // const ulong OfficersPowers = 436506116225230;           // >> 0x 18cfffffff8ce
+            //
+            // 03-07-2015 Fly-Man- Removed this part in favor of using the real values
+            //
 
             UUID officersRole = UUID.Random();
             //Add officers role to group

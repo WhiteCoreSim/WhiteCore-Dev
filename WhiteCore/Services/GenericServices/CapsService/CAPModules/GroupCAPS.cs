@@ -79,13 +79,11 @@ namespace WhiteCore.Services
                 UUID groupID = rm["group_id"].AsUUID();
 
                 OSDMap defaults = new OSDMap();
-                ulong EveryonePowers = (ulong) (GroupPowers.AllowSetHome |
-                                                GroupPowers.Accountable |
-                                                GroupPowers.JoinChat |
-                                                GroupPowers.AllowVoiceChat |
+                ulong EveryonePowers = (ulong) (GroupPowers.Accountable |
+                                                GroupPowers.AllowSetHome |
                                                 GroupPowers.ReceiveNotices |
-                                                GroupPowers.StartProposal |
-                                                GroupPowers.VoteOnProposal);
+                                                GroupPowers.JoinChat |
+                                                GroupPowers.AllowVoiceChat);
                 defaults["default_powers"] = EveryonePowers;
 
                 List<string> titles = new List<string>();
