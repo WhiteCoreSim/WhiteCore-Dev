@@ -63,7 +63,7 @@ namespace WhiteCore.Modules.Currency
         public void Start(IConfigSource config, IRegistryCore registry)
         {
             if (config.Configs["Currency"] == null ||
-                config.Configs["Currency"].GetString("Module", "") != "BaseCurrency")
+                config.Configs["Currency"].GetString("Module", "") != "SimpleCurrency")
                 return;
 
             // we only want this if we are local..
@@ -75,7 +75,7 @@ namespace WhiteCore.Modules.Currency
             if (remoteCalls)
                 return;
 
-            m_connector = Framework.Utilities.DataManager.RequestPlugin<IBaseCurrencyConnector>() as BaseCurrencyConnector;
+            m_connector = Framework.Utilities.DataManager.RequestPlugin<ISimpleCurrencyConnector>() as BaseCurrencyConnector;
             var curPort = m_connector.GetConfig ().ClientPort;
             if (curPort == 0 && MainServer.Instance == null)
                 return;

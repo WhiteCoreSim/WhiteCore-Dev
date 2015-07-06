@@ -264,9 +264,9 @@ namespace WhiteCore.Framework.Modules
         void RemoveFromScheduledCharge(string identifier);
     }
 
-    public interface IBaseCurrencyConnector : IWhiteCoreDataPlugin
+    public interface ISimpleCurrencyConnector : IWhiteCoreDataPlugin
     {
-        /*BaseCurrencyConfig GetConfig();
+        /*SimpleCurrencyConfig GetConfig();
         UserCurrency GetUserCurrency(UUID agentId);
         bool UserCurrencyUpdate(UserCurrency agent);
         GroupBalance GetGroupBalance(UUID groupID);
