@@ -264,7 +264,7 @@ namespace WhiteCore.Framework.Servers.HttpServer
 
         private string GetHTTP404()
         {
-            string file = Path.Combine(".", "http_404.html");
+            string file = Path.Combine(".", "http_404.html"); // Shouldn't this point to the html folder ?
             if (!File.Exists(file))
                 return getDefaultHTTP404();
 
@@ -276,7 +276,7 @@ namespace WhiteCore.Framework.Servers.HttpServer
 
         private string GetHTTP500()
         {
-            string file = Path.Combine(".", "http_500.html");
+            string file = Path.Combine(".", "http_500.html"); // Shouldn't this point to the html folder ?
             if (!File.Exists(file))
                 return getDefaultHTTP500();
 
