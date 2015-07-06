@@ -32,6 +32,7 @@ using OpenMetaverse;
 using OpenMetaverse.StructuredData;
 using ProtoBuf;
 using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Framework.SceneInfo
 {
@@ -328,11 +329,7 @@ namespace WhiteCore.Framework.SceneInfo
             set { _landingType = value; }
         }
 
-        /// <summary>
-        /// Gets or sets the maturity level of the parcel.
-        /// </summary>
-        /// <value>The maturity.</value>
-        [ProtoMember (24)]
+        [ProtoMember(24)]
         public int Maturity
         {
             get { return _Maturity; }
@@ -693,13 +690,13 @@ namespace WhiteCore.Framework.SceneInfo
 
             // OSD.FromVector3 is broken for non en_US locales
             // map["UserLocation"] = OSD.FromVector3(UserLocation);
-            map ["ULocX"] = UserLocation.X.ToString ();
-            map ["ULocY"] = UserLocation.Y.ToString ();
-            map ["ULocZ"] = UserLocation.Z.ToString ();
+            map["ULocX"] = OSD.FromReal(UserLocation.X).ToString();
+            map["ULocY"] = OSD.FromReal(UserLocation.Y).ToString();
+            map["ULocZ"] = OSD.FromReal(UserLocation.Z).ToString ();
             // map["UserLookAt"] = OSD.FromVector3(UserLookAt);
-            map ["ULookX"] = UserLookAt.X.ToString ();
-            map ["ULookY"] = UserLookAt.Y.ToString ();
-            map ["ULookZ"] = UserLookAt.Z.ToString ();
+            map["ULookX"] = OSD.FromReal(UserLookAt.X).ToString();
+            map["ULookY"] = OSD.FromReal(UserLookAt.Y).ToString ();
+            map["ULookZ"] = OSD.FromReal(UserLookAt.Z).ToString ();
 
             return map;
         }
@@ -709,74 +706,69 @@ namespace WhiteCore.Framework.SceneInfo
             var uloc = Vector3.Zero;
             var ulook = Vector3.Zero;
 
-            RegionID = map ["RegionID"].AsUUID ();
-            ScopeID = map ["ScopeID"].AsUUID ();
-            GlobalID = map ["GlobalID"].AsUUID ();
-            LocalID = map ["LocalID"].AsInteger ();
-            SalePrice = map ["SalePrice"].AsInteger ();
-            Name = map ["Name"].AsString ();
-            Description = map ["Description"].AsString ();
-            Flags = (uint)map ["Flags"].AsInteger ();
-            Dwell = map ["Dwell"].AsInteger ();
-            AuctionID = map ["AuctionID"].AsUInteger ();
-            Area = map ["Area"].AsInteger ();
-            Maturity = map ["Maturity"].AsInteger ();
-            OwnerID = map ["OwnerID"].AsUUID ();
-            GroupID = map ["GroupID"].AsUUID ();
+            RegionID = map["RegionID"].AsUUID();
+            ScopeID = map["ScopeID"].AsUUID();
+            GlobalID = map["GlobalID"].AsUUID();
+            LocalID = map["LocalID"].AsInteger();
+            SalePrice = map["SalePrice"].AsInteger();
+            Name = map["Name"].AsString();
+            Description = map["Description"].AsString();
+            Flags = (uint) map["Flags"].AsInteger();
+            Dwell = map["Dwell"].AsInteger();
+            AuctionID = map["AuctionID"].AsUInteger();
+            Area = map["Area"].AsInteger();
+            Maturity = map["Maturity"].AsInteger();
+            OwnerID = map["OwnerID"].AsUUID();
+            GroupID = map["GroupID"].AsUUID();
             IsGroupOwned = (GroupID != UUID.Zero);
-            SnapshotID = map ["SnapshotID"].AsUUID ();
-            MediaDescription = map ["MediaDescription"].AsString ();
-            MediaWidth = map ["MediaWidth"].AsInteger ();
-            MediaHeight = map ["MediaHeight"].AsInteger ();
-            MediaLoop = map ["MediaLoop"].AsBoolean ();
-            MediaType = map ["MediaType"].AsString ();
-            ObscureMedia = map ["ObscureMedia"].AsBoolean ();
-            ObscureMusic = map ["ObscureMusic"].AsBoolean ();
-            MediaLoopSet = (float)map ["MediaLoopSet"].AsReal ();
-            MediaAutoScale = (byte)map ["MediaAutoScale"].AsInteger ();
-            MediaURL = map ["MediaURL"].AsString ();
-            MusicURL = map ["MusicURL"].AsString ();
-            Bitmap = map ["Bitmap"].AsBinary ();
-            Category = (ParcelCategory)map ["Category"].AsInteger ();
-            FirstParty = map ["FirstParty"].AsBoolean ();
-            ClaimDate = map ["ClaimDate"].AsInteger ();
-            ClaimPrice = map ["ClaimPrice"].AsInteger ();
-            Status = (ParcelStatus)map ["Status"].AsInteger ();
-            LandingType = (byte)map ["LandingType"].AsInteger ();
-            PassHours = (float)map ["PassHours"].AsReal ();
-            PassPrice = map ["PassPrice"].AsInteger ();
-            AuthBuyerID = map ["AuthBuyerID"].AsUUID ();
-            OtherCleanTime = map ["OtherCleanTime"].AsInteger ();
-            RegionHandle = map ["RegionHandle"].AsULong ();
-            Private = map ["Private"].AsBoolean ();
-            AuctionInfo = new AuctionInfo ();
-            if (map.ContainsKey ("AuctionInfo"))
-                AuctionInfo.FromOSD ((OSDMap)map ["AuctionInfo"]);
+            SnapshotID = map["SnapshotID"].AsUUID();
+            MediaDescription = map["MediaDescription"].AsString();
+            MediaWidth = map["MediaWidth"].AsInteger();
+            MediaHeight = map["MediaHeight"].AsInteger();
+            MediaLoop = map["MediaLoop"].AsBoolean();
+            MediaType = map["MediaType"].AsString();
+            ObscureMedia = map["ObscureMedia"].AsBoolean();
+            ObscureMusic = map["ObscureMusic"].AsBoolean();
+            MediaLoopSet = (float) map["MediaLoopSet"].AsReal();
+            MediaAutoScale = (byte) map["MediaAutoScale"].AsInteger();
+            MediaURL = map["MediaURL"].AsString();
+            MusicURL = map["MusicURL"].AsString();
+            Bitmap = map["Bitmap"].AsBinary();
+            Category = (ParcelCategory) map["Category"].AsInteger();
+            FirstParty = map["FirstParty"].AsBoolean();
+            ClaimDate = map["ClaimDate"].AsInteger();
+            ClaimPrice = map["ClaimPrice"].AsInteger();
+            Status = (ParcelStatus) map["Status"].AsInteger();
+            LandingType = (byte) map["LandingType"].AsInteger();
+            PassHours = (float) map["PassHours"].AsReal();
+            PassPrice = map["PassPrice"].AsInteger();
+            AuthBuyerID = map["AuthBuyerID"].AsUUID();
+            OtherCleanTime = map["OtherCleanTime"].AsInteger();
+            RegionHandle = map["RegionHandle"].AsULong();
+            Private = map["Private"].AsBoolean();
+            AuctionInfo = new AuctionInfo();
+            if (map.ContainsKey("AuctionInfo"))
+                AuctionInfo.FromOSD((OSDMap) map["AuctionInfo"]);
 
-            if ((IsGroupOwned) && (GroupID != OwnerID))
-                OwnerID = GroupID;
+            if ((IsGroupOwned) && (GroupID != OwnerID)) OwnerID = GroupID;
 
             //UserLocation = map["UserLocation"].AsVector3();
-            if (map.ContainsKey ("UserLocation"))
-            {
+            if (map.ContainsKey("UserLocation")) {
                 UserLocation = map ["UserLocation"].AsVector3 ();
-            } else
-            {
-                uloc.X = (float)Convert.ToDouble (map ["ULocX"].AsString ());
-                uloc.Y = (float)Convert.ToDouble (map ["ULocY"].AsString ());
-                uloc.Z = (float)Convert.ToDouble (map ["ULocZ"].AsString ());
+            } else {
+                uloc.X = (float)Convert.ToDecimal (map ["ULocX"].AsString (), Culture.NumberFormatInfo);
+                uloc.Y = (float)Convert.ToDecimal (map ["ULocY"].AsString (), Culture.NumberFormatInfo);
+                uloc.Z = (float)Convert.ToDecimal (map ["ULocZ"].AsString (), Culture.NumberFormatInfo);
                 UserLocation = uloc;
             }
 
             //UserLookAt = map["UserLookAt"].AsVector3();
-            if (map.ContainsKey ("UserLookAt"))
-            {
+            if (map.ContainsKey("UserLookAt")) {
                 UserLookAt = map ["UserLookAt"].AsVector3 ();
-            } else
-            {
-                ulook.X = (float)Convert.ToDouble (map ["ULookX"].AsString ());
-                ulook.Y = (float)Convert.ToDouble (map ["ULookY"].AsString ());
-                ulook.Z = (float)Convert.ToDouble (map ["ULookZ"].AsString ());
+            } else {
+                ulook.X = (float)Convert.ToDecimal (map ["ULookX"].AsString (), Culture.NumberFormatInfo);
+                ulook.Y = (float)Convert.ToDecimal (map ["ULookY"].AsString (), Culture.NumberFormatInfo);
+                ulook.Z = (float)Convert.ToDecimal (map ["ULookZ"].AsString (), Culture.NumberFormatInfo);
                 UserLookAt = ulook;
             }
 

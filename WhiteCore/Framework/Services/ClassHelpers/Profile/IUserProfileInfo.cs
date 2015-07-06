@@ -26,10 +26,10 @@
  */
 
 using System;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Utilities;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 
 namespace WhiteCore.Framework.Services.ClassHelpers.Profile
 {
@@ -389,10 +389,10 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Profile
                 { "SnapshotUUID", OSD.FromUUID (SnapshotUUID) },
                 { "ScopeID", OSD.FromUUID (ScopeID) },
                 { "SimName", OSD.FromString (SimName) },
-                //  broken for non en_US locales          {"GlobalPos", OSD.FromVector3(GlobalPos)},
-                { "GPosX", GlobalPos.X.ToString () },
-                { "GPosY", GlobalPos.Y.ToString () },
-                { "GPosZ", GlobalPos.Z.ToString () },
+                //  broken for non en_US locales                                        {"GlobalPos", OSD.FromVector3(GlobalPos)},
+                { "GPosX", OSD.FromReal (GlobalPos.X).ToString () },
+                { "GPosY", OSD.FromReal (GlobalPos.Y).ToString () },
+                { "GPosZ", OSD.FromReal (GlobalPos.Z).ToString () },
                 { "ParcelName", OSD.FromString (ParcelName) },
                 { "ClassifiedFlags", OSD.FromInteger (ClassifiedFlags) },
                 { "PriceForListing", OSD.FromInteger (PriceForListing) }
@@ -420,9 +420,9 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Profile
                 GlobalPos = map ["GlobalPos"].AsVector3 ();
             } else
             {
-                GlobalPos.X = (float)Convert.ToDouble (map ["GPosX"].AsString ());
-                GlobalPos.Y = (float)Convert.ToDouble (map ["GPosY"].AsString ());
-                GlobalPos.Z = (float)Convert.ToDouble (map ["GPosZ"].AsString ());
+                GlobalPos.X = (float)Convert.ToDecimal (map ["GPosX"].AsString (), Culture.NumberFormatInfo);
+                GlobalPos.Y = (float)Convert.ToDecimal (map ["GPosY"].AsString (), Culture.NumberFormatInfo);
+                GlobalPos.Z = (float)Convert.ToDecimal (map ["GPosZ"].AsString (), Culture.NumberFormatInfo);
             }
             ParcelName = map ["ParcelName"].AsString ();
             ClassifiedFlags = (byte)map ["ClassifiedFlags"].AsInteger ();
@@ -460,9 +460,9 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Profile
                 { "OriginalName", OSD.FromString (OriginalName) },
                 { "SimName", OSD.FromString (SimName) },
 //  broken for non en_US locales   {"GlobalPos", OSD.FromVector3(GlobalPos)},
-                { "GPosX", GlobalPos.X.ToString () },
-                { "GPosY", GlobalPos.Y.ToString () },
-                { "GPosZ", GlobalPos.Z.ToString () },
+                { "GPosX", OSD.FromReal (GlobalPos.X).ToString () },
+                { "GPosY", OSD.FromReal (GlobalPos.Y).ToString () },
+                { "GPosZ", OSD.FromReal (GlobalPos.Z).ToString () },
                 { "SortOrder", OSD.FromInteger (SortOrder) },
                 { "Enabled", OSD.FromInteger (Enabled) }
             };
@@ -487,9 +487,9 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Profile
                 GlobalPos = map ["GlobalPos"].AsVector3 ();
             } else
             {
-                GlobalPos.X = (float)Convert.ToDouble (map ["GPosX"].AsString ());
-                GlobalPos.Y = (float)Convert.ToDouble (map ["GPosY"].AsString ());
-                GlobalPos.Z = (float)Convert.ToDouble (map ["GPosZ"].AsString ());
+                GlobalPos.X = (float)Convert.ToDecimal (map ["GPosX"].AsString (), Culture.NumberFormatInfo);
+                GlobalPos.Y = (float)Convert.ToDecimal (map ["GPosY"].AsString (), Culture.NumberFormatInfo);
+                GlobalPos.Z = (float)Convert.ToDecimal (map ["GPosZ"].AsString (), Culture.NumberFormatInfo);
             }
             SortOrder = map ["SortOrder"].AsInteger ();
             Enabled = map ["Enabled"].AsInteger ();

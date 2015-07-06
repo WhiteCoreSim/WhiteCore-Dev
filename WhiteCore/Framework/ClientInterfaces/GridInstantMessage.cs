@@ -82,10 +82,10 @@ namespace WhiteCore.Framework.ClientInterfaces
                 { "message", OSD.FromString (Message) },
                 { "imSessionID", OSD.FromUUID (SessionID) },
                 { "offline", OSD.FromInteger (Offline) },
-                //  broken for non en_US locales            {"Position", OSD.FromVector3(Position)},
-                { "GPosX", Position.X.ToString () },
-                { "GPosY", Position.Y.ToString () },
-                { "GPosZ", Position.Z.ToString () },
+                //  broken for non en_US locales                                  {"Position", OSD.FromVector3(Position)},
+                { "GPosX", OSD.FromReal (Position.X).ToString () },
+                { "GPosY", OSD.FromReal (Position.Y).ToString () },
+                { "GPosZ", OSD.FromReal (Position.Z).ToString () },
                 { "binaryBucket", OSD.FromBinary (BinaryBucket) },
                 { "ParentEstateID", OSD.FromUInteger (ParentEstateID) },
                 { "RegionID", OSD.FromUUID (RegionID) },
@@ -109,9 +109,9 @@ namespace WhiteCore.Framework.ClientInterfaces
                 Position = map ["Position"].AsVector3 ();
             } else
             {
-                Position.X = (float)Convert.ToDouble (map ["GPosX"].AsString ());
-                Position.Y = (float)Convert.ToDouble (map ["GPosY"].AsString ());
-                Position.Z = (float)Convert.ToDouble (map ["GPosZ"].AsString ());
+                Position.X = (float)Convert.ToDecimal (map ["GPosX"].AsString (), Culture.NumberFormatInfo);
+                Position.Y = (float)Convert.ToDecimal (map ["GPosY"].AsString (), Culture.NumberFormatInfo);
+                Position.Z = (float)Convert.ToDecimal (map ["GPosZ"].AsString (), Culture.NumberFormatInfo);
             }
 
             BinaryBucket = map ["binaryBucket"].AsBinary ();
