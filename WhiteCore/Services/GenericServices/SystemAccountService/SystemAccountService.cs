@@ -177,8 +177,8 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
 
             VerifySystemUserInfo("Govenor", GovernorUUID, GovernorName, 250);
             VerifySystemUserInfo("RealEstate", SystemEstateOwnerUUID, SystemEstateOwnerName, 150);
-            VerifySystemUserInfo("Banker", BankerUUID, BankerName, 250);
-            VerifySystemUserInfo("Marketplace", MarketplaceOwnerUUID, MarketplaceOwnerName, 250);
+            VerifySystemUserInfo("Banker", BankerUUID, BankerName, 100);
+            VerifySystemUserInfo("Marketplace", MarketplaceOwnerUUID, MarketplaceOwnerName, 100);
 
         }
 
