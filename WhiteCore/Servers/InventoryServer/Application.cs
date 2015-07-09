@@ -48,7 +48,7 @@ namespace WhiteCore.Servers.InventoryServer
                                                                        typeof (IInventoryData),
                                                                        typeof (IUserAccountData),
                                                                        typeof (IAssetDataPlugin),
-                                                                       typeof (ISimpleCurrencyConnector),
+                                                                       typeof (IBaseCurrencyConnector),
                                                                        typeof (IAgentInfoConnector)
                                                                    },
                                                                new List<Type>

@@ -329,7 +329,11 @@ namespace WhiteCore.Framework.SceneInfo
             set { _landingType = value; }
         }
 
-        [ProtoMember(24)]
+        /// <summary>
+        /// Gets or sets the maturity level of the parcel.
+        /// </summary>
+        /// <value>The maturity.</value>
+        [ProtoMember (24)]
         public int Maturity
         {
             get { return _Maturity; }

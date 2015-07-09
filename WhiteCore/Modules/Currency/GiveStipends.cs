@@ -39,122 +39,167 @@ namespace WhiteCore.Modules.Currency
 {
     class GiveStipends
     {
-        readonly Timer taskTimer = new Timer();
+        readonly Timer taskTimer = new Timer ();
         readonly bool m_enabled = false;
         readonly IScheduleService m_scheduler;
         readonly IRegistryCore m_registry;
         readonly BaseCurrencyConnector m_currencyService;
         BaseCurrencyConfig m_options;
 
-        public GiveStipends(BaseCurrencyConfig options, IRegistryCore registry, BaseCurrencyConnector CurrencyService)
+/*        static public DateTime StipendDate
+        {
+            get { return NextStipendDate(); }
+            set { SetStipendDate(value); }
+        }
+*/
+        public GiveStipends (BaseCurrencyConfig options, IRegistryCore registry, BaseCurrencyConnector CurrencyService)
         {
             m_enabled = options.GiveStipends;
-            if (!m_enabled) return;
+            if (!m_enabled)
+                return;
 
             m_currencyService = CurrencyService;
             m_options = options;
             m_registry = registry;
             taskTimer.Interval = m_options.SchedulerInterval;
             taskTimer.Elapsed += TimerElapsed;
-            m_scheduler = registry.RequestModuleInterface<IScheduleService>();
-            if (m_scheduler == null) return;
-            m_scheduler.Register("StipendsPayout", StipendsPayOutEvent);
-            if (m_options.StipendsLoadOldUsers) taskTimer.Enabled = true;
-            registry.RequestModuleInterface<ISimulationBase>().EventManager.RegisterEventHandler("DeleteUserInformation", DeleteUserInformation);
-            registry.RequestModuleInterface<ISimulationBase>().EventManager.RegisterEventHandler("CreateUserInformation", CreateUserInformation);
-            registry.RequestModuleInterface<ISimulationBase>().EventManager.RegisterEventHandler("UpdateUserInformation", CreateUserInformation);
+            m_scheduler = registry.RequestModuleInterface<IScheduleService> ();
+            if (m_scheduler == null)
+                return;
+
+            m_scheduler.Register ("StipendsPayout", StipendsPayOutEvent);
+            if (m_options.StipendsLoadOldUsers)
+                taskTimer.Enabled = true;
+
+            var simBase = registry.RequestModuleInterface<ISimulationBase> ();
+            simBase.EventManager.RegisterEventHandler ("DeleteUserInformation", DeleteUserInformation);
+            simBase.EventManager.RegisterEventHandler ("CreateUserInformation", CreateUserInformation);
+            simBase.EventManager.RegisterEventHandler ("UpdateUserInformation", CreateUserInformation);
         }
-        
-        object CreateUserInformation(string functionname, object parameters)
+
+/*        static DateTime NextStipendDate()
+        { 
+            var nextPayment = (int) (taskTimer.Interval / 1000);
+            return nextPayment <= 0 ? DateTime.Now :  Util.ToDateTime (nextPayment);
+
+        }
+
+        static void SetStipendDate(DateTime newDate)
+        {
+            var nextPayment = NextStipendDate ();
+            TimeSpan dtDiff = nextPayment.Subtract (newDate);
+            if (dtDiff.Seconds > 0)
+                taskTimer.Interval = dtDiff.Seconds * 1000;
+            
+        }
+*/
+        object CreateUserInformation (string functionname, object parameters)
         {
             UUID userid = (UUID)parameters;
-            IUserAccountService userService = m_registry.RequestModuleInterface<IUserAccountService>();
-            UserAccount user = userService.GetUserAccount(null, userid);
-            if (user == null) return null;
-            if ((m_options.StipendsPremiumOnly) && ((user.UserFlags & Constants.USER_FLAG_MEMBER) != Constants.USER_FLAG_MEMBER)) return null;
+            IUserAccountService userService = m_registry.RequestModuleInterface<IUserAccountService> ();
+            UserAccount user = userService.GetUserAccount (null, userid);
+            if (user == null)
+                return null;
+            if ((m_options.StipendsPremiumOnly) && ((user.UserFlags & Constants.USER_FLAG_MEMBER) != Constants.USER_FLAG_MEMBER))
+                return null;
 
             // Don't set a StipendPayment for System Users
-            if (Utilities.IsSystemUser(user.PrincipalID)) return null;
+            if (Utilities.IsSystemUser (user.PrincipalID))
+                return null;
 
-            SchedulerItem i = m_scheduler.Get(user.PrincipalID.ToString(), "StipendsPayout");
-            if (i != null) return null;
+            SchedulerItem i = m_scheduler.Get (user.PrincipalID.ToString (), "StipendsPayout");
+            if (i != null)
+                return null;
+            
             // Scheduler needs to get 1 date/time to set for "PayDay" - Fly 17/11/2014
-            RepeatType runevertype = (RepeatType)Enum.Parse(typeof(RepeatType), m_options.StipendsEveryType);
+            RepeatType runevertype = (RepeatType)Enum.Parse (typeof(RepeatType), m_options.StipendsEveryType);
             int runevery = m_options.StipendsEvery;
-            m_scheduler.Save(new SchedulerItem("StipendsPayout",
-                                                OSDParser.SerializeJsonString(
-                                                    new StipendsInfo() { AgentID = user.PrincipalID }.ToOSD()),
-                                                false, UnixTimeStampToDateTime(user.Created), runevery,
-                                                runevertype, user.PrincipalID) { HistoryKeep = true, HistoryReceipt = true });
+            m_scheduler.Save (new SchedulerItem ("StipendsPayout",
+                OSDParser.SerializeJsonString (
+                    new StipendsInfo () { AgentID = user.PrincipalID }.ToOSD ()),
+                false, UnixTimeStampToDateTime (user.Created), runevery,
+                runevertype, user.PrincipalID) {
+                HistoryKeep = true,
+                HistoryReceipt = true
+            });
             return null;
 
         }
 
-        object DeleteUserInformation(string functionname, object parameters)
+        object DeleteUserInformation (string functionname, object parameters)
         {
             UUID user = (UUID)parameters;
-            SchedulerItem i = m_scheduler.Get(user.ToString(), "StipendsPayout");
+            SchedulerItem i = m_scheduler.Get (user.ToString (), "StipendsPayout");
             if (i != null)
-                m_scheduler.Remove(i.id);
+                m_scheduler.Remove (i.id);
             return null;
         }
 
-        object StipendsPayOutEvent(string functionName, object parameters)
+        object StipendsPayOutEvent (string functionName, object parameters)
         {
-            if (functionName != "StipendsPayout") return null;
-            StipendsInfo si = new StipendsInfo();
-            si.FromOSD((OSDMap)OSDParser.DeserializeJson(parameters.ToString()));
-            IUserAccountService userService = m_registry.RequestModuleInterface<IUserAccountService>();
-            UserAccount ua = userService.GetUserAccount(null, si.AgentID);
+            if (functionName != "StipendsPayout")
+                return null;
+            StipendsInfo si = new StipendsInfo ();
+            si.FromOSD ((OSDMap)OSDParser.DeserializeJson (parameters.ToString ()));
+            IUserAccountService userService = m_registry.RequestModuleInterface<IUserAccountService> ();
+            UserAccount ua = userService.GetUserAccount (null, si.AgentID);
             if ((ua != null) && (ua.UserFlags >= 0) && ((!m_options.StipendsPremiumOnly) || ((ua.UserLevel & Constants.USER_FLAG_MEMBER) == Constants.USER_FLAG_MEMBER)))
             {
                 if (m_options.GiveStipendsOnlyWhenLoggedIn)
                 {
-                    ICapsService capsService = m_registry.RequestModuleInterface<ICapsService>();
-                    IClientCapsService client = capsService.GetClientCapsService(ua.PrincipalID);
-                    if (client == null) return "";
+                    ICapsService capsService = m_registry.RequestModuleInterface<ICapsService> ();
+                    IClientCapsService client = capsService.GetClientCapsService (ua.PrincipalID);
+                    if (client == null)
+                        return "";
                 }
-                IMoneyModule mo = m_registry.RequestModuleInterface<IMoneyModule>();
-                if (mo == null) return null;
-                UUID transid = UUID.Random();
-                MainConsole.Instance.Info("[MONEY MODULE] Stipend Payment for " + ua.FirstName + " " + ua.LastName+ " is now running");
-                if (m_currencyService.UserCurrencyTransfer(ua.PrincipalID, UUID.Zero, (uint)m_options.Stipend, "Stipend Payment", TransactionType.StipendPayment, transid))
+                IMoneyModule mo = m_registry.RequestModuleInterface<IMoneyModule> ();
+                if (mo == null)
+                    return null;
+                UUID transid = UUID.Random ();
+                MainConsole.Instance.Info ("[MONEY MODULE] Stipend Payment for " + ua.FirstName + " " + ua.LastName + " is now running");
+                if (m_currencyService.UserCurrencyTransfer (ua.PrincipalID, UUID.Zero, (uint)m_options.Stipend, "Stipend Payment", TransactionType.StipendPayment, transid))
                 {
-                    return transid.ToString();
+                    return transid.ToString ();
                 }
             }
             return "";
         }
 
-        void TimerElapsed(object sender, ElapsedEventArgs elapsedEventArgs)
+        void TimerElapsed (object sender, ElapsedEventArgs elapsedEventArgs)
         {
             taskTimer.Enabled = false;
-            IUserAccountService userService = m_registry.RequestModuleInterface<IUserAccountService>();
-            List<UserAccount> users = new List<UserAccount>();
-            users = userService.GetUserAccounts(new List<UUID> { UUID.Zero }, 0, m_options.StipendsPremiumOnly ? 600 : 0);
+            IUserAccountService userService = m_registry.RequestModuleInterface<IUserAccountService> ();
+            List<UserAccount> users = new List<UserAccount> ();
+            users = userService.GetUserAccounts (new List<UUID> { UUID.Zero }, 0, m_options.StipendsPremiumOnly ? 600 : 0);
             foreach (UserAccount user in users)
             {
-            	if (Utilities.IsSystemUser(user.PrincipalID)) continue;
-            	SchedulerItem i = m_scheduler.Get(user.PrincipalID.ToString(), "StipendsPayout");
-                if (i != null) continue;
+                if (Utilities.IsSystemUser (user.PrincipalID))
+                    continue;
+                SchedulerItem i = m_scheduler.Get (user.PrincipalID.ToString (), "StipendsPayout");
+                if (i != null)
+                    continue;
                 // Scheduler needs to get 1 date/time to set for "PayDay" - Fly 17/11/2014
-                RepeatType runevertype = (RepeatType)Enum.Parse(typeof(RepeatType), m_options.StipendsEveryType);
+                RepeatType runevertype = (RepeatType)Enum.Parse (typeof(RepeatType), m_options.StipendsEveryType);
                 int runevery = m_options.StipendsEvery;
-                m_scheduler.Save(new SchedulerItem("StipendsPayout",
-                                                   OSDParser.SerializeJsonString(
-                                                       new StipendsInfo() { AgentID = user.PrincipalID }.ToOSD()),
-                                                   false, UnixTimeStampToDateTime(user.Created), runevery,
-                                                   runevertype, user.PrincipalID) { HistoryKeep = true, HistoryReceipt = true });
+                m_scheduler.Save (new SchedulerItem ("StipendsPayout",
+                    OSDParser.SerializeJsonString (
+                        new StipendsInfo () { AgentID = user.PrincipalID }.ToOSD ()),
+                    false, UnixTimeStampToDateTime (user.Created), runevery,
+                    runevertype, user.PrincipalID) {
+                    HistoryKeep = true,
+                    HistoryReceipt = true
+                });
             }
         }
 
-        static DateTime UnixTimeStampToDateTime(int unixTimeStamp)
+        static DateTime UnixTimeStampToDateTime (int unixTimeStamp)
         {
             // Unix timestamp is seconds past epoch
-            DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-            dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
+            DateTime dtDateTime = new DateTime (1970, 1, 1, 0, 0, 0, 0);
+            dtDateTime = dtDateTime.AddSeconds (unixTimeStamp).ToLocalTime ();
             return dtDateTime;
         }
+            
     }
 
     public class StipendsInfo : IDataTransferable
@@ -162,25 +207,25 @@ namespace WhiteCore.Modules.Currency
         public UUID AgentID { get; set; }
 
         #region IDataTransferable
+
         /// <summary>
         ///   Serialize the module to OSD
         /// </summary>
         /// <returns></returns>
-        public override OSDMap ToOSD()
+        public override OSDMap ToOSD ()
         {
-            return new OSDMap()
-                       {
-                           {"AgentID", OSD.FromUUID(AgentID)}
-                       };
+            return new OSDMap () {
+                { "AgentID", OSD.FromUUID (AgentID) }
+            };
         }
 
         /// <summary>
         ///   Deserialize the module from OSD
         /// </summary>
         /// <param name = "map"></param>
-        public override void FromOSD(OSDMap map)
+        public override void FromOSD (OSDMap map)
         {
-            AgentID = map["AgentID"].AsUUID();
+            AgentID = map ["AgentID"].AsUUID ();
         }
 
         #endregion
