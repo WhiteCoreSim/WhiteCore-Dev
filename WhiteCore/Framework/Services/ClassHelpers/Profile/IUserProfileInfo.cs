@@ -48,6 +48,15 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Profile
         PastPrelude = 512
     }
 
+    [Flags]
+    public enum IAgentMembershipType : uint
+    {
+        Free = 0,
+        Basic = 2,
+        Premium = 4,
+        Concierge = 512
+    }
+
     public class IAgentInfo : IDataTransferable, BaseCacheAccount
     {
         /// <summary>

@@ -28,36 +28,37 @@
 using System;
 using System.Collections.Generic;
 using System.Timers;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.SceneInfo.Entities;
-using Nini.Config;
-using OpenMetaverse;
 
 
 namespace WhiteCore.Modules.Combat
 {
-    public class WhiteCoreCombatModule : INonSharedRegionModule, ICombatModule
+    public class CombatModule : INonSharedRegionModule, ICombatModule
     {
-        private readonly List<UUID> CombatAllowedAgents = new List<UUID>();
-        private readonly Dictionary<string, List<UUID>> Teams = new Dictionary<string, List<UUID>>();
+        IConfig m_config;
+        bool m_enabled;
+        readonly List<UUID> CombatAllowedAgents = new List<UUID>();
+        readonly Dictionary<string, List<UUID>> Teams = new Dictionary<string, List<UUID>>();
+        float MaximumHealth;
+
         public bool AllowTeamKilling;
         public bool AllowTeams;
         public float DamageToTeamKillers;
         public bool DisallowTeleportingForCombatants = true;
         public bool ForceRequireCombatPermission = true;
         public float MaximumDamageToInflict;
-        private float MaximumHealth;
         public float RegenerateHealthSpeed;
         public bool SendTeamKillerInfo;
         public float TeamHitsBeforeSend;
         public bool m_HasLeftCombat;
         public Vector3 m_RespawnPosition;
         public int m_SecondsBeforeRespawn;
-        private IConfig m_config;
-        private bool m_enabled;
         public bool m_regenHealth;
         public IScene m_scene;
         public bool m_shouldRespawn;
@@ -94,7 +95,7 @@ namespace WhiteCore.Modules.Combat
 
         public string Name
         {
-            get { return "WhiteCoreCombatModule"; }
+            get { return "CombatModule"; }
         }
 
         public Type ReplaceableInterface
@@ -168,7 +169,7 @@ namespace WhiteCore.Modules.Combat
 
         #endregion
 
-        private bool AllowedTeleports(UUID userID, IScene scene, out string reason)
+        bool AllowedTeleports(UUID userID, IScene scene, out string reason)
         {
             //Make sure that agents that are in combat cannot tp around. They CAN tp if they are out of combat however
             reason = "";
@@ -181,12 +182,12 @@ namespace WhiteCore.Modules.Combat
             return true;
         }
 
-        private void NewPresence(IScenePresence presence)
+        void NewPresence(IScenePresence presence)
         {
             presence.RegisterModuleInterface<ICombatPresence>(new CombatPresence(this, presence, m_config));
         }
 
-        private void EventManager_OnRemovePresence(IScenePresence presence)
+        void EventManager_OnRemovePresence(IScenePresence presence)
         {
             CombatPresence m = (CombatPresence) presence.RequestModuleInterface<ICombatPresence>();
             if (m != null)
@@ -225,7 +226,7 @@ namespace WhiteCore.Modules.Combat
             }
         }
 
-        private void OnLandObjectAdded(LandData newParcel)
+        void OnLandObjectAdded(LandData newParcel)
         {
             //If a new land object is added or updated, we need to redo the check for the avatars invulnerability
             m_scene.ForEachScenePresence(sp => AvatarEnteringParcel(sp, null));
@@ -235,7 +236,7 @@ namespace WhiteCore.Modules.Combat
         {
         }
 
-        private void AvatarEnteringParcel(IScenePresence avatar, ILandObject oldParcel)
+        void AvatarEnteringParcel(IScenePresence avatar, ILandObject oldParcel)
         {
             ILandObject obj = null;
             IParcelManagementModule parcelManagement = avatar.Scene.RequestModuleInterface<IParcelManagementModule>();
@@ -266,16 +267,16 @@ namespace WhiteCore.Modules.Combat
 
         #region Nested type: CombatObject
 
-        private class CombatObject //: ICombatPresence
+        class CombatObject //: ICombatPresence
         {
-            private readonly float MaximumDamageToInflict;
-            private readonly float MaximumHealth;
-            private readonly WhiteCoreCombatModule m_combatModule;
-            private readonly ISceneEntity m_part;
-            private string m_Team;
-            private float m_health = 100f;
+            readonly float MaximumDamageToInflict;
+            readonly float MaximumHealth;
+            readonly CombatModule m_combatModule;
+            readonly ISceneEntity m_part;
+            string m_Team;
+            float m_health = 100f;
 
-            public CombatObject(WhiteCoreCombatModule module, ISceneEntity part, IConfig m_config)
+            public CombatObject(CombatModule module, ISceneEntity part, IConfig m_config)
             {
                 m_part = part;
                 m_combatModule = module;
@@ -422,7 +423,7 @@ namespace WhiteCore.Modules.Combat
                     health = MaximumHealth;
             }
 
-            private void Die(UUID OwnerID)
+            void Die(UUID OwnerID)
             {
                 foreach (IScriptModule m in m_part.Scene.RequestModuleInterfaces<IScriptModule>())
                 {
@@ -439,17 +440,17 @@ namespace WhiteCore.Modules.Combat
 
         #region Nested type: CombatPresence
 
-        private class CombatPresence : ICombatPresence
+        class CombatPresence : ICombatPresence
         {
             #region Declares
 
-            private readonly Dictionary<UUID, float> TeamHits = new Dictionary<UUID, float>();
-            private readonly Timer m_healthtimer = new Timer();
-            private IScenePresence m_SP;
-            private string m_Team = "No Team";
-            private WhiteCoreCombatModule m_combatModule;
-            private float m_health = 100f;
-            //private Dictionary<string, float> GenericStats = new Dictionary<string, float>();
+            readonly Dictionary<UUID, float> TeamHits = new Dictionary<UUID, float>();
+            readonly Timer m_healthtimer = new Timer();
+            IScenePresence m_SP;
+            string m_Team = "No Team";
+            CombatModule m_combatModule;
+            float m_health = 100f;
+            //Dictionary<string, float> GenericStats = new Dictionary<string, float>();
 
             public float Health
             {
@@ -484,7 +485,7 @@ namespace WhiteCore.Modules.Combat
 
             #region Initialization/Close
 
-            public CombatPresence(WhiteCoreCombatModule module, IScenePresence SP, IConfig m_config)
+            public CombatPresence(CombatModule module, IScenePresence SP, IConfig m_config)
             {
                 m_SP = SP;
                 m_combatModule = module;
@@ -638,7 +639,7 @@ namespace WhiteCore.Modules.Combat
                         if (m_combatModule.m_SecondsBeforeRespawn != 0)
                         {
                             m_SP.AllowMovement = false;
-                            this.HasLeftCombat = true;
+                            HasLeftCombat = true;
                             Timer t = new Timer
                                           {Interval = m_combatModule.m_SecondsBeforeRespawn*1000, AutoReset = false};
                             //Use this to reenable movement and combat
@@ -670,7 +671,7 @@ namespace WhiteCore.Modules.Combat
 
             #region Timer events
 
-            private void fixAvatarHealth_Elapsed(object sender, ElapsedEventArgs e)
+            void fixAvatarHealth_Elapsed(object sender, ElapsedEventArgs e)
             {
                 //Regenerate health a bit every second
                 if (m_combatModule.m_regenHealth)
@@ -688,10 +689,10 @@ namespace WhiteCore.Modules.Combat
                 }
             }
 
-            private void respawn_Elapsed(object sender, ElapsedEventArgs e)
+            void respawn_Elapsed(object sender, ElapsedEventArgs e)
             {
                 m_SP.AllowMovement = true;
-                this.HasLeftCombat = false;
+                HasLeftCombat = false;
             }
 
             #endregion
@@ -743,7 +744,7 @@ namespace WhiteCore.Modules.Combat
             {
                 if (healing < 0)
                     return;
-                if (!this.HasLeftCombat || !m_combatModule.ForceRequireCombatPermission)
+                if (!HasLeftCombat || !m_combatModule.ForceRequireCombatPermission)
                 {
                     m_health += (float) healing;
                     if (m_health >= m_combatModule.MaximumHealth)
@@ -753,12 +754,12 @@ namespace WhiteCore.Modules.Combat
                 }
             }
 
-            private bool InnerIncurDamage(IScenePresence killingAvatar, double damage, bool teleport)
+            bool InnerIncurDamage(IScenePresence killingAvatar, double damage, bool teleport)
             {
                 if (damage < 0)
                     return false;
 
-                if (!this.HasLeftCombat || !m_combatModule.ForceRequireCombatPermission)
+                if (!HasLeftCombat || !m_combatModule.ForceRequireCombatPermission)
                 {
                     if (damage > m_combatModule.MaximumDamageToInflict)
                         damage = m_combatModule.MaximumDamageToInflict;
