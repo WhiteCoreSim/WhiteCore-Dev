@@ -469,7 +469,7 @@ namespace WhiteCore.Modules.WorldMap
                 for (int i = 0; i < renderMesh.Faces.Count; i++)
                 {
                     Face face = renderMesh.Faces[i];
-                    string meshName = primID + "-Face-" + i);
+                    string meshName = primID + "-Face-" + i;
 
                     warp_Object faceObj = new warp_Object(face.Vertices.Count, face.Indices.Count/3);
 
