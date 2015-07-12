@@ -103,7 +103,6 @@ namespace WhiteCore.Modules.WorldMap
         // Standard maptile rendering
         public Bitmap TerrainToBitmap(Bitmap mapBmp)
         {
-            mapBmp = null;
             int scaledRemovalFactor = m_scene.RegionInfo.RegionSizeX/(Constants.RegionSize/2);
             Vector3 camPos = new Vector3(m_scene.RegionInfo.RegionSizeX/2 - 0.5f,
                                          m_scene.RegionInfo.RegionSizeY/2 - 0.5f, 221.7025033688163f);
@@ -114,15 +113,14 @@ namespace WhiteCore.Modules.WorldMap
                                              m_scene.RegionInfo.RegionSizeY - scaledRemovalFactor);
 
             viewport.FieldOfView = 150;
-            viewport.Width = m_scene.RegionInfo.RegionSizeX;//Constants.RegionSize;
-            viewport.Height = m_scene.RegionInfo.RegionSizeY;//Constants.RegionSize;
+            viewport.Width = m_scene.RegionInfo.RegionSizeX;
+            viewport.Height = m_scene.RegionInfo.RegionSizeY;
 
             return TerrainBitmap (viewport, false);
         }
 
         public Bitmap TerrainToBitmap(Bitmap mapBmp, int size)
         {
-            mapBmp = null;
             int scaledRemovalFactor = m_scene.RegionInfo.RegionSizeX/(Constants.RegionSize/2);
             Vector3 camPos = new Vector3(m_scene.RegionInfo.RegionSizeX/2 - 0.5f,
                 m_scene.RegionInfo.RegionSizeY/2 - 0.5f, 221.7025033688163f);
@@ -238,7 +236,7 @@ namespace WhiteCore.Modules.WorldMap
         public Bitmap CreateViewImage(Vector3 camPos, Vector3 camDir, float fov, int width, int height, bool useTextures)
         {
             Viewport viewport = new Viewport(camPos, camDir, fov, 1024f,  0.1f, width, height);
-//            Viewport viewport = new Viewport(camPos, camDir, fov, Constants.RegionSize,  0.1f, width, height);
+//             Viewport viewport = new Viewport(camPos, camDir, fov, Constants.RegionSize,  0.1f, width, height);
             return TerrainBitmap(viewport, true);
         }
 
@@ -247,7 +245,7 @@ namespace WhiteCore.Modules.WorldMap
 
         #region Rendering Methods
 
-        private void CreateWater(WarpRenderer renderer, bool threeD)
+        void CreateWater(WarpRenderer renderer, bool threeD)
         {
             float waterHeight = (float) m_scene.RegionInfo.RegionSettings.WaterHeight;
   
@@ -286,7 +284,7 @@ namespace WhiteCore.Modules.WorldMap
             renderer.SetObjectMaterial("Water", "WaterColor");
         }
 
-        private warp_Object CreateTerrain(WarpRenderer renderer, bool textureTerrain)
+        warp_Object CreateTerrain(WarpRenderer renderer, bool textureTerrain)
         {
             ITerrainChannel terrain = m_scene.RequestModuleInterface<ITerrainChannel>();
 
@@ -391,7 +389,7 @@ namespace WhiteCore.Modules.WorldMap
             return obj;
         }
 
-        private static Vector3 SurfaceNormal(Vector3 c1, Vector3 c2, Vector3 c3)
+        static Vector3 SurfaceNormal(Vector3 c1, Vector3 c2, Vector3 c3)
         {
             Vector3 edge1 = new Vector3(c2.X - c1.X, c2.Y - c1.Y, c2.Z - c1.Z);
             Vector3 edge2 = new Vector3(c3.X - c1.X, c3.Y - c1.Y, c3.Z - c1.Z);
@@ -402,7 +400,7 @@ namespace WhiteCore.Modules.WorldMap
             return normal;
         }
 
-        private void CreatePrim(WarpRenderer renderer, ISceneChildEntity prim)
+        void CreatePrim(WarpRenderer renderer, ISceneChildEntity prim)
         {
             try
             {
@@ -471,7 +469,7 @@ namespace WhiteCore.Modules.WorldMap
                 for (int i = 0; i < renderMesh.Faces.Count; i++)
                 {
                     Face face = renderMesh.Faces[i];
-                    string meshName = primID + "-Face-" + i.ToString();
+                    string meshName = primID + "-Face-" + i);
 
                     warp_Object faceObj = new warp_Object(face.Vertices.Count, face.Indices.Count/3);
 
@@ -527,7 +525,7 @@ namespace WhiteCore.Modules.WorldMap
             }
         }
 
-        private Color4 GetFaceColor(Primitive.TextureEntryFace face)
+        Color4 GetFaceColor(Primitive.TextureEntryFace face)
         {
             Color4 color;
 
@@ -543,7 +541,6 @@ namespace WhiteCore.Modules.WorldMap
                 {
                     int width, height;
                     color = GetAverageColor(face.TextureID, textureAsset, m_scene, out width, out height);
-                    textureAsset = null;
                 }
                 else
                     color = new Color4(0.5f, 0.5f, 0.5f, 1.0f);
@@ -554,7 +551,7 @@ namespace WhiteCore.Modules.WorldMap
             return color*face.RGBA;
         }
 
-        private string GetOrCreateMaterial(WarpRenderer renderer, Color4 color)
+        string GetOrCreateMaterial(WarpRenderer renderer, Color4 color)
         {
             string name = color.ToString();
 
@@ -588,7 +585,7 @@ namespace WhiteCore.Modules.WorldMap
             return materialName;
         }
 
-        private warp_Texture GetTexture(UUID id)
+        warp_Texture GetTexture(UUID id)
         {
             warp_Texture ret = null;
             byte[] asset = m_scene.AssetService.GetData(id.ToString());
@@ -608,7 +605,7 @@ namespace WhiteCore.Modules.WorldMap
 
         #region Cache methods
 
-        private void ReadCacheMap()
+        void ReadCacheMap()
         {
             if (!Directory.Exists(m_assetCacheDir))
                 Directory.CreateDirectory(m_assetCacheDir);
@@ -641,7 +638,7 @@ namespace WhiteCore.Modules.WorldMap
             }
         }
 
-        private bool DeserializeCache(string file)
+        bool DeserializeCache(string file)
         {
             OSDMap map = OSDParser.DeserializeJson(file) as OSDMap;
             if (map == null)
@@ -658,7 +655,7 @@ namespace WhiteCore.Modules.WorldMap
             return true;
         }
 
-        private void SaveCache()
+        void SaveCache()
         {
             OSDMap map = SerializeCache();
             FileStream stream =
@@ -670,7 +667,7 @@ namespace WhiteCore.Modules.WorldMap
             writer.Close();
         }
 
-        private OSDMap SerializeCache()
+        OSDMap SerializeCache()
         {
             OSDMap map = new OSDMap();
             foreach (KeyValuePair<UUID, Color4> kvp in m_colors)
@@ -684,22 +681,22 @@ namespace WhiteCore.Modules.WorldMap
 
         #region Static Helpers
 
-        private static warp_Vector ConvertVector(float x, float y, float z)
+        static warp_Vector ConvertVector(float x, float y, float z)
         {
             return new warp_Vector(x, z, y);
         }
 
-        private static warp_Vector ConvertVector(Vector3 vector)
+        static warp_Vector ConvertVector(Vector3 vector)
         {
             return new warp_Vector(vector.X, vector.Z, vector.Y);
         }
 
-        private static warp_Quaternion ConvertQuaternion(Quaternion quat)
+        static warp_Quaternion ConvertQuaternion(Quaternion quat)
         {
             return new warp_Quaternion(quat.X, quat.Z, quat.Y, -quat.W);
         }
 
-        private static int ConvertColor(Color4 color)
+        static int ConvertColor(Color4 color)
         {
             int c = warp_Color.getColor((byte) (color.R*255f), (byte) (color.G*255f), (byte) (color.B*255f));
             if (color.A < 1f)
@@ -793,7 +790,6 @@ namespace WhiteCore.Modules.WorldMap
             {
                 if (bitmap != null)
                     bitmap.Dispose();
-                bitmap = null;
             }
         }
 
