@@ -57,12 +57,13 @@ namespace WhiteCore.Modules.Caps
 
         public void Initialise(IConfigSource source)
         {
-            m_enabled = (source.Configs["MaterialsDemoModule"] != null &&
-                source.Configs["MaterialsDemoModule"].GetBoolean("Enabled", false));
+            var cfg = source.Configs ["MaterialsModule"];
+            if (cfg != null)
+                m_enabled = cfg.GetBoolean("Enabled", false);
             if (!m_enabled)
                 return;
 
-            MainConsole.Instance.InfoFormat("[MaterialsDemoModule]: Initializing module");
+            MainConsole.Instance.Info("[Materials]: Initializing module");
         }
 
         public void AddRegion(IScene scene)
@@ -114,7 +115,7 @@ namespace WhiteCore.Modules.Caps
         public byte[] RenderMaterialsPostCap(string path, Stream request,
             OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {
-            MainConsole.Instance.Debug("[MaterialsDemoModule]: POST cap handler");
+            MainConsole.Instance.Debug("[Materials]: POST cap handler");
 
             OSDMap req = (OSDMap)OSDParser.DeserializeLLSDXml(request);
             OSDMap resp = new OSDMap();
@@ -125,7 +126,7 @@ namespace WhiteCore.Modules.Caps
 
             if (req.ContainsKey("Zipped"))
             {
-                OSD osd = null;
+                OSD osd;
 
                 byte[] inBytes = req["Zipped"].AsBinary();
 
@@ -146,7 +147,7 @@ namespace WhiteCore.Modules.Caps
                                     AssetBase materialAsset = null;
                                     if (m_knownMaterials.ContainsKey(id))
                                     {
-                                        MainConsole.Instance.Info("[MaterialsDemoModule]: request for known material ID: " + id.ToString());
+                                        MainConsole.Instance.Info("[Materials]: request for known material ID: " + id);
                                         OSDMap matMap = new OSDMap();
                                         matMap["ID"] = elem.AsBinary();
 
@@ -155,16 +156,15 @@ namespace WhiteCore.Modules.Caps
                                     }
                                     else if ((materialAsset = m_scene.AssetService.Get(id.ToString())) != null)
                                     {
-                                        MainConsole.Instance.Info("[MaterialsDemoModule]: request for stored material ID: " + id.ToString());
+                                        MainConsole.Instance.Info("[Materials]: request for stored material ID: " + id);
                                         OSDMap matMap = new OSDMap();
                                         matMap["ID"] = elem.AsBinary();
 
-                                        matMap["Material"] = (OSDMap)OSDParser.DeserializeJson(
-                                            Encoding.UTF8.GetString(materialAsset.Data));
+                                        matMap["Material"] = OSDParser.DeserializeJson(Encoding.UTF8.GetString(materialAsset.Data));
                                         respArr.Add(matMap);
                                     }
                                     else
-                                        MainConsole.Instance.Info("[MaterialsDemoModule]: request for UNKNOWN material ID: " + id.ToString());
+                                        MainConsole.Instance.Info("[Materials]: request for UNKNOWN material ID: " + id);
                                 }
                                 catch (Exception)
                                 {
@@ -188,18 +188,18 @@ namespace WhiteCore.Modules.Caps
                                     {
                                         foreach (OSDMap matsMap in matsArr)
                                         {
-                                            MainConsole.Instance.Debug("[MaterialsDemoModule]: processing matsMap: " + OSDParser.SerializeJsonString(matsMap));
+                                            MainConsole.Instance.Debug("[Materials]: processing matsMap: " + OSDParser.SerializeJsonString(matsMap));
 
                                             uint matLocalID = 0;
                                             try { matLocalID = matsMap["ID"].AsUInteger(); }
                                             catch (Exception e) { MainConsole.Instance.Warn("[MaterialsDemoModule]: cannot decode \"ID\" from matsMap: " + e.Message); }
-                                            MainConsole.Instance.Debug("[MaterialsDemoModule]: matLocalId: " + matLocalID.ToString());
+                                            MainConsole.Instance.Debug("[Materials]: matLocalId: " + matLocalID);
 
 
                                             OSDMap mat = null;
                                             try { mat = matsMap["Material"] as OSDMap; }
                                             catch (Exception e) { MainConsole.Instance.Warn("[MaterialsDemoModule]: cannot decode \"Material\" from matsMap: " + e.Message); }
-                                            MainConsole.Instance.Debug("[MaterialsDemoModule]: mat: " + OSDParser.SerializeJsonString(mat));
+                                            MainConsole.Instance.Debug("[Materials]: mat: " + OSDParser.SerializeJsonString(mat));
 
                                             UUID id = HashOsd(mat);
                                             m_knownMaterials[id] = mat;
@@ -207,7 +207,7 @@ namespace WhiteCore.Modules.Caps
 
                                             var sop = m_scene.GetSceneObjectPart(matLocalID);
                                             if (sop == null)
-                                                MainConsole.Instance.Debug("[MaterialsDemoModule]: null SOP for localId: " + matLocalID.ToString());
+                                                MainConsole.Instance.Debug("[Materials]: null SOP for localId: " + matLocalID);
                                             else
                                             {
                                                 //var te = sop.Shape.Textures;
@@ -215,7 +215,7 @@ namespace WhiteCore.Modules.Caps
 
                                                 if (te == null)
                                                 {
-                                                    MainConsole.Instance.Debug("[MaterialsDemoModule]: null TextureEntry for localId: " + matLocalID.ToString());
+                                                    MainConsole.Instance.Debug("[Materials]: null TextureEntry for localId: " + matLocalID);
                                                 }
                                                 else
                                                 {
@@ -227,7 +227,7 @@ namespace WhiteCore.Modules.Caps
                                                         if (te.FaceTextures == null) // && face == 0)
                                                         {
                                                             if (te.DefaultTexture == null)
-                                                                MainConsole.Instance.Debug("[MaterialsDemoModule]: te.DefaultTexture is null");
+                                                                MainConsole.Instance.Debug("[Materials]: te.DefaultTexture is null");
                                                             else
                                                             {
 //## FixMe ##
@@ -256,7 +256,7 @@ namespace WhiteCore.Modules.Caps
                                                             te.DefaultTexture.MaterialID = id;
                                                     }
 
-                                                    MainConsole.Instance.Debug("[MaterialsDemoModule]: setting material ID for face " + face.ToString() + " to " + id.ToString());
+                                                    MainConsole.Instance.Debug("[Materials]: setting material ID for face " + face + " to " + id);
 
                                                     //we cant use sop.UpdateTextureEntry(te); because it filters so do it manually
 
@@ -284,7 +284,7 @@ namespace WhiteCore.Modules.Caps
                                     }
                                     catch (Exception e)
                                     {
-                                        MainConsole.Instance.Warn("[MaterialsDemoModule]: exception processing received material: " + e.ToString());
+                                        MainConsole.Instance.Warn("[Materials]: exception processing received material: " + e);
                                     }
                                 }
                             }
@@ -294,19 +294,19 @@ namespace WhiteCore.Modules.Caps
                 }
                 catch (Exception e)
                 {
-                    MainConsole.Instance.Warn("[MaterialsDemoModule]: exception decoding zipped CAP payload: " + e.ToString());
+                    MainConsole.Instance.Warn("[Materials]: exception decoding zipped CAP payload: " + e);
                     //return "";
                 }
-                MainConsole.Instance.Debug("[MaterialsDemoModule]: knownMaterials.Count: " + m_knownMaterials.Count.ToString());
+                MainConsole.Instance.Debug("[Materials]: knownMaterials.Count: " + m_knownMaterials.Count);
             }
 
 
             resp["Zipped"] = ZCompressOSD(respArr, false);
             string response = OSDParser.SerializeLLSDXmlString(resp);
 
-            //MainConsole.Instance.Debug("[MaterialsDemoModule]: cap request: " + request);
-            MainConsole.Instance.Debug("[MaterialsDemoModule]: cap request (zipped portion): " + ZippedOsdBytesToString(req["Zipped"].AsBinary()));
-            MainConsole.Instance.Debug("[MaterialsDemoModule]: cap response: " + response);
+            //MainConsole.Instance.Debug("[Materials]: cap request: " + request);
+            MainConsole.Instance.Debug("[Materials]: cap request (zipped portion): " + ZippedOsdBytesToString(req["Zipped"].AsBinary()));
+            MainConsole.Instance.Debug("[Materials]: cap response: " + response);
             return OSDParser.SerializeLLSDBinary(resp);
         }
 
@@ -355,7 +355,7 @@ namespace WhiteCore.Modules.Caps
             }
             catch (Exception e)
             {
-                MainConsole.Instance.Warn("[MaterialsDemoModule]: exception in StoreMaterialsForPart(): " + e.ToString());
+                MainConsole.Instance.Warn("[Materials]: exception in StoreMaterialsForPart(): " + e);
             }
         }
 
@@ -363,7 +363,7 @@ namespace WhiteCore.Modules.Caps
         public byte[] RenderMaterialsGetCap(string path, Stream request,
             OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {
-            MainConsole.Instance.Debug("[MaterialsDemoModule]: GET cap handler");
+            MainConsole.Instance.Debug("[Materials]: GET cap handler");
 
             OSDMap resp = new OSDMap();
 
@@ -385,7 +385,7 @@ namespace WhiteCore.Modules.Caps
 
 
             resp["Zipped"] = ZCompressOSD(allOsd, false);
-            MainConsole.Instance.Debug("[MaterialsDemoModule]: matsCount: " + matsCount.ToString());
+            MainConsole.Instance.Debug("[Materials]: matsCount: " + matsCount);
 
             return OSDParser.SerializeLLSDBinary(resp);
         }
@@ -398,7 +398,7 @@ namespace WhiteCore.Modules.Caps
             }
             catch (Exception e)
             {
-                return "ZippedOsdBytesToString caught an exception: " + e.ToString();
+                return "ZippedOsdBytesToString caught an exception: " + e;
             }
         }
 
@@ -414,13 +414,19 @@ namespace WhiteCore.Modules.Caps
                 return new UUID(md5.ComputeHash(ms), 0);
         }
 
+        /// <summary>
+        /// Compress an OSD.
+        /// </summary>
+        /// <returns>The compressed OSD</returns>
+        /// <param name="inOsd">In osd.</param>
+        /// <param name="useHeader">If set to <c>true</c> use header.</param>
         public static OSD ZCompressOSD(OSD inOsd, bool useHeader)
         {
             OSD osd = null;
 
             using (MemoryStream msSinkCompressed = new MemoryStream())
             {
-                using (ZOutputStream zOut = new ZOutputStream(msSinkCompressed,1))
+                using (ZOutputStream zOut = new ZOutputStream(msSinkCompressed))
                 {
                     CopyStream(new MemoryStream(OSDParser.SerializeLLSDBinary(inOsd, useHeader)), zOut);
                     msSinkCompressed.Seek(0L, SeekOrigin.Begin);
@@ -433,6 +439,11 @@ namespace WhiteCore.Modules.Caps
             return osd;
         }
 
+        /// <summary>
+        /// Decompress bytes to osd.
+        /// </summary>
+        /// <returns>The decompressed osd.</returns>
+        /// <param name="input">Input.</param>
         public static OSD ZDecompressBytesToOsd(byte[] input)
         {
             OSD osd = null;
