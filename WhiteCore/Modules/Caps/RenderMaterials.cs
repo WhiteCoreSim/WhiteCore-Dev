@@ -420,7 +420,7 @@ namespace WhiteCore.Modules.Caps
 
             using (MemoryStream msSinkCompressed = new MemoryStream())
             {
-                using (ZOutputStream zOut = new ZOutputStream(msSinkCompressed,1))
+                using (ZOutputStream zOut = new ZOutputStream(msSinkCompressed))
                 {
                     CopyStream(new MemoryStream(OSDParser.SerializeLLSDBinary(inOsd, useHeader)), zOut);
                     msSinkCompressed.Seek(0L, SeekOrigin.Begin);
