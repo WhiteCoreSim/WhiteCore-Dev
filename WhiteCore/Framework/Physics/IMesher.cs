@@ -37,6 +37,14 @@ namespace WhiteCore.Framework.Physics
         void RemoveMesh(ulong key);
     }
 
+    public enum LevelOfDetail
+    {
+        High = 32,
+        Medium = 16,
+        Low = 8,
+        VeryLow = 4
+    }
+
     public interface IMesh
     {
         bool WasCached { get; set; }
