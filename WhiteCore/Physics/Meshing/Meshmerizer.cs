@@ -273,7 +273,7 @@ namespace WhiteCore.Physics.Meshing
                             {
                                 using (MemoryStream outMs = new MemoryStream())
                                 {
-                                    using (ZOutputStream zOut = new ZOutputStream(outMs,1))
+                                    using (ZOutputStream zOut = new ZOutputStream(outMs))
                                     {
                                         byte[] readBuffer = new byte[2048];
                                         int readLen = 0;
