@@ -37,7 +37,7 @@ using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Servers;
 
-namespace WhiteCore.Modules.BaseCurrencyModule
+namespace WhiteCore.Modules.Currency
 {
     /* This module provides the necessary economy functionality for the viewer
        but with all values being $0
