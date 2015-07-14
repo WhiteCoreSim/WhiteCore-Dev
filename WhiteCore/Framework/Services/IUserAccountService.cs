@@ -239,6 +239,14 @@ namespace WhiteCore.Framework.Services
         /// <param name="archiveInformation">Whether or not we should store the account's name and account information so that the user's information inworld does not go null</param>
         /// <param name="wipeFromDatabase">Whether or not we should remove all of the user's data from other locations in the database</param>
         void DeleteUser(UUID userID, string name, string password, bool archiveInformation, bool wipeFromDatabase);
+
+        /// <summary>
+        /// Users 'god' level.
+        /// </summary>
+        /// <returns>The god level description.</returns>
+        /// <param name="level">Level.</param>
+        string UserGodLevel(int level);
+
     }
 
     /// <summary>

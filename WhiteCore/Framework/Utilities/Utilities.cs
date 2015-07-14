@@ -60,7 +60,7 @@ namespace WhiteCore.Framework.Utilities
         public static string GetServerReleaseNotesURL()
         {
 			return (MainServer.Instance.Secure ? "https://" : "http://") + MainServer.Instance.HostName +
-                   ":" + MainServer.Instance.Port.ToString() + "/WhiteCoreServerRelease" + WhiteCoreServerVersion() + ".html";
+                   ":" + MainServer.Instance.Port + "/WhiteCoreServerRelease" + WhiteCoreServerVersion() + ".html";
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace WhiteCore.Framework.Utilities
         public static string GetAddress()
         {
 			return (MainServer.Instance.Secure ? "https://" : "http://") + MainServer.Instance.HostName + ":" +
-                   MainServer.Instance.Port.ToString();
+                   MainServer.Instance.Port;
         }
         
         public static string GetRegionMaturity(int Maturity)
@@ -375,8 +375,8 @@ namespace WhiteCore.Framework.Utilities
                 CachedExternalIP = externalIp;
                 return externalIp;
             }
-            else
-                return CachedExternalIP;
+
+            return CachedExternalIP;
         }
 
         /// <summary>
@@ -606,12 +606,19 @@ namespace WhiteCore.Framework.Utilities
             return EMailreStrict.IsMatch(address);
         }
 
+        /// <summary>
+        /// Determines whether the specified userID is a system user.
+        /// </summary>
+        /// <returns><c>true</c> if the specified userID is a system user; otherwise, <c>false</c>.</returns>
+        /// <param name="userID">User I.</param>
         public static bool IsSystemUser(OpenMetaverse.UUID userID)
         {
             var userId = userID.ToString();
             return ( userId == Constants.GovernorUUID || 
                      userId == Constants.RealEstateOwnerUUID ||
-                     userId == Constants.LibraryOwner
+                     userId == Constants.LibraryOwner ||
+                     userId == Constants.BankerUUID ||
+                     userId == Constants.MarketplaceOwnerUUID 
             );
         }
 
@@ -643,10 +650,10 @@ namespace WhiteCore.Framework.Utilities
         {
             static Random rand = new Random();
 
-            static readonly char[] VOWELS = new char[] { 'a', 'e', 'i', 'o', 'u' };
-            static readonly char[] CONSONANTS = new char[] { 'b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'y', 'z' };
-            static readonly char[] SYMBOLS = new char[] { '*', '?', '/', '\\', '%', '$', '#', '@', '!', '~' };
-            static readonly char[] NUMBERS = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+            static readonly char[] VOWELS = { 'a', 'e', 'i', 'o', 'u' };
+            static readonly char[] CONSONANTS =  { 'b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'y', 'z' };
+            static readonly char[] SYMBOLS = { '*', '?', '/', '\\', '%', '$', '#', '@', '!', '~' };
+            static readonly char[] NUMBERS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 
             /// <summary>
             /// Generates a random, human-readable password.

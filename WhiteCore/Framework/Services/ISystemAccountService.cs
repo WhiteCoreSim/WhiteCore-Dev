@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org, http://opensimulator.org/
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
@@ -25,39 +25,56 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using WhiteCore.Framework.SceneInfo;
 using OpenMetaverse;
 
-namespace WhiteCore.Framework.Physics
+namespace WhiteCore.Framework.Services
 {
-    public interface IMesher
+    public interface ISystemAccountService
+
     {
-        IMesh CreateMesh(String primName, PrimitiveBaseShape primShape, Vector3 size, float lod, bool isPhysical);
-        void RemoveMesh(ulong key);
-    }
+        /// <summary>
+        /// The governor UUID.
+        /// </summary>
+        /// <value>The governor UUID.</value>
+        UUID GovernorUUID { get;}
 
-    public enum LevelOfDetail
-    {
-        High = 32,
-        Medium = 16,
-        Low = 8,
-        VeryLow = 4
-    }
+        /// <summary>
+        ///     The Governor's configured name.
+        /// </summary>
+        /// <value>The Governor's name.</value>
+        string GovernorName { get; }
 
-    public interface IMesh
-    {
-        bool WasCached { get; set; }
-        ulong Key { get; }
-        void getIndexListAsPtrToIntArray(out IntPtr indices, out int triStride, out int indexCount);
-        void getVertexListAsPtrToFloatArray(out IntPtr vertexList, out int vertexStride, out int vertexCount);
-        void releaseSourceMeshData();
-        void releasePinned();
-        Vector3 GetCentroid();
+        /// <summary>
+        ///     The System Real Estate owner's UUID
+        /// </summary>
+        UUID SystemEstateOwnerUUID { get; }
 
-        OpenMetaverse.StructuredData.OSD Serialize();
+        /// <summary>
+        ///     The system Real Estate owner's name
+        /// </summary>
+        string SystemEstateOwnerName { get; }
 
-        int[] getIndexListAsInt();
-        float[] getVertexListAsFloat();
+        /// <summary>
+        ///     The Banker UUID.
+        /// </summary>
+        /// <value>The Banker UUID.</value>
+        UUID BankerUUID { get;}
+
+        /// <summary>
+        ///     The Banker's configured name.
+        /// </summary>
+        /// <value>The Bankers's name.</value>
+        string BankerName { get; }
+
+        /// <summary>
+        ///     The System Marketplace Owner's UUID
+        /// </summary>
+        UUID MarketplaceOwnerUUID { get; }
+
+        /// <summary>
+        ///     The System Marketplace owner's name
+        /// </summary>
+        string MarketplaceOwnerName { get; }
+
     }
 }

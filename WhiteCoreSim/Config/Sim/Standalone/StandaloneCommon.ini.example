@@ -44,12 +44,15 @@ MaxDistanceVariableRegionSightDistance = 512
 LibraryName = "WhiteCore Library"
 LibraryOwnerName = "Library Owner"
 
-[EstateService]
-;;  Set this if you want to change the name of the WhiteCore system Governor
+[SystemUserService]
+;;  Modify these if you want to change the name of a WhiteCore system user
 GovernorName = "Governor White"
+RealEstateOwnerName = "RealEstate Owner"
+BankerName = "WhiteCore Banker"
+MarketplaceOwnerName = "Marketplace Concierge"
 
-;;  Set these if you want to change the WhiteCore system Estate owner or name
-SystemEstateOwnerName = "RealEstate Owner"
+[EstateService]
+;;  Modify this if you want to change the WhiteCore system Estate name
 SystemEstateName = "Whitecore Estate"
 
 [LoginService]

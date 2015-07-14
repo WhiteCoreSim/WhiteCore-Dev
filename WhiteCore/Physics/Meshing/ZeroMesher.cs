@@ -26,13 +26,11 @@
  */
 
 using System;
-using System.Linq;
-using WhiteCore.Framework.SceneInfo;
 using Nini.Config;
 using OpenMetaverse;
-
-using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.Physics;
+using WhiteCore.Framework.SceneInfo;
 
 /*
  * This is the zero mesher.

@@ -27,22 +27,19 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Net;
 using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
-using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.Currency
 {
     
-    public class BaseCurrencyConnector : ConnectorBase, ISimpleCurrencyConnector
+    public class BaseCurrencyConnector : ConnectorBase, IBaseCurrencyConnector
     {
         #region Declares
         const string _REALM = "simple_currency";
@@ -53,8 +50,10 @@ namespace WhiteCore.Modules.Currency
         BaseCurrencyConfig m_config;
         ISyncMessagePosterService m_syncMessagePoster;
         IAgentInfoService m_userInfoService;
-        string InWorldCurrency = "";
-        string RealCurrency = "";
+        IUserAccountService m_userAccountService;
+
+        public string InWorldCurrency = "";
+        public string RealCurrency = "";
         
         #endregion
 
@@ -62,7 +61,7 @@ namespace WhiteCore.Modules.Currency
 
         public string Name
         {
-            get { return "ISimpleCurrencyConnector"; }
+            get { return "IBaseCurrencyConnector"; }
         }
 
         public void Initialize(IGenericData GenericData, IConfigSource source, IRegistryCore registry,
@@ -72,7 +71,7 @@ namespace WhiteCore.Modules.Currency
             m_registry = registry;
 
             IConfig config = source.Configs["Currency"];
-            if (config == null || source.Configs["Currency"].GetString("Module", "") != "SimpleCurrency")
+            if (config == null || source.Configs["Currency"].GetString("Module", "") != "BaseCurrency")
                 return;
 
             IConfig gridInfo = source.Configs["GridInfoService"];
@@ -93,45 +92,8 @@ namespace WhiteCore.Modules.Currency
 
             Init(m_registry, Name, "", "/currency/", "CurrencyServerURI");
 
-            if (!m_doRemoteCalls)
-            {
-                MainConsole.Instance.Commands.AddCommand(
-                    "money add",
-                    "money add",
-                    "Adds money to a user's account.",
-                    AddMoney, false, true);
-
-                MainConsole.Instance.Commands.AddCommand(
-                    "money set",
-                    "money set",
-                    "Sets the amount of money a user has.",
-                    SetMoney, false, true);
-
-                MainConsole.Instance.Commands.AddCommand(
-                    "money get",
-                    "money get",
-                    "Gets the amount of money a user has.",
-                    GetMoney, false, true);
-
-                MainConsole.Instance.Commands.AddCommand(
-                    "show user transactions",
-                    "show user transactions",
-                    "Display user transactions for a period.",
-                    HandleShowTransactions, false, true);
-
-                MainConsole.Instance.Commands.AddCommand(
-                    "show user purchases",
-                    "show user purchases",
-                    "Display user purchases for a period.",
-                    HandleShowPurchases, false, true);
-
-                MainConsole.Instance.Commands.AddCommand(
-                    "stipend set",
-                    "stipend set",
-                    "Sets the next date for stipend",
-                    HandleStipendSet, false, true);
-            }
         }
+
         #endregion
 
         #region Service Members
@@ -469,25 +431,34 @@ namespace WhiteCore.Modules.Currency
             UserCurrencyUpdate(toCurrency, true);
 
             //Must send out notifications to the users involved so that they get the updates
-            if (m_syncMessagePoster == null)
+            if (m_userInfoService == null)
             {
-                m_syncMessagePoster = m_registry.RequestModuleInterface<ISyncMessagePosterService>();
                 m_userInfoService = m_registry.RequestModuleInterface<IAgentInfoService>();
+                m_userAccountService = m_registry.RequestModuleInterface<IUserAccountService> ();
             }
-            if (m_syncMessagePoster != null)
+            if (m_userInfoService != null)
             {
                 UserInfo toUserInfo = m_userInfoService.GetUserInfo(toID.ToString());
                 UserInfo fromUserInfo = fromID == UUID.Zero ? null : m_userInfoService.GetUserInfo(fromID.ToString());
-                UserAccount toAccount = m_registry.RequestModuleInterface<IUserAccountService>()
-                                                  .GetUserAccount(null, toID);
-                UserAccount fromAccount = m_registry.RequestModuleInterface<IUserAccountService>()
-                                                    .GetUserAccount(null, fromID);
+                UserAccount toAccount = m_userAccountService.GetUserAccount(null, toID);
+                UserAccount fromAccount = m_userAccountService.GetUserAccount(null, fromID);
+
                 if (m_config.SaveTransactionLogs)
-                    AddTransactionRecord((transactionID == UUID.Zero ? UUID.Random() : transactionID), 
-                        description, toID, fromID, amount, type, (toCurrency == null ? 0 : toCurrency.Amount), 
-                        (fromCurrency == null ? 0 : fromCurrency.Amount), (toAccount == null ? "System" : toAccount.Name), 
-                        (fromAccount == null ? "System" : fromAccount.Name), toObjectName, fromObjectName, (fromUserInfo == null ? 
-                        UUID.Zero : fromUserInfo.CurrentRegionID));
+                    AddTransactionRecord((
+                        transactionID == UUID.Zero ? UUID.Random() : transactionID), 
+                        description,
+                        toID,
+                        fromID,
+                        amount,
+                        type,
+                        (toCurrency == null ? 0 : toCurrency.Amount), 
+                        (fromCurrency == null ? 0 : fromCurrency.Amount),
+                        (toAccount == null ? "System" : toAccount.Name), 
+                        (fromAccount == null ? "System" : fromAccount.Name),
+                        toObjectName,
+                        fromObjectName,
+                        (fromUserInfo == null ? UUID.Zero : fromUserInfo.CurrentRegionID)
+                    );
 
                 if (fromID == toID)
                 {
@@ -512,16 +483,28 @@ namespace WhiteCore.Modules.Currency
             return true;
         }
 
-        void SendUpdateMoneyBalanceToClient(UUID toID, UUID transactionID, string serverURI, uint balance, string message)
+        public void SendUpdateMoneyBalanceToClient(UUID toID, UUID transactionID, string serverURI, uint balance, string message)
         {
-            OSDMap map = new OSDMap();
-            map["Method"] = "UpdateMoneyBalance";
-            map["AgentID"] = toID;
-            map["Amount"] = balance;
-            map["Message"] = message;
-            map["TransactionID"] = transactionID;
-            m_syncMessagePoster.Post(serverURI, map);
+            if (m_syncMessagePoster == null)
+            {
+                m_syncMessagePoster = m_registry.RequestModuleInterface<ISyncMessagePosterService>();
+            }
+
+            if (m_syncMessagePoster != null)
+            {
+                OSDMap map = new OSDMap ();
+                map ["Method"] = "UpdateMoneyBalance";
+                map ["AgentID"] = toID;
+                map ["Amount"] = balance;
+                map ["Message"] = message;
+                map ["TransactionID"] = transactionID;
+                m_syncMessagePoster.Post (serverURI, map);
+            }
         }
+
+        #endregion
+
+        #region Helper Methods
 
         // Method Added By Alicia Raven
         void AddTransactionRecord(UUID TransID, string Description, UUID ToID, UUID FromID, uint Amount,
@@ -530,62 +513,58 @@ namespace WhiteCore.Modules.Currency
             if(Amount > m_config.MaxAmountBeforeLogging)
                 m_gd.Insert(_REALMHISTORY, new object[] {
                     TransID,
-                    (Description == null ? "" : Description),
-                    FromID.ToString(),
+                    Description ?? "",
+                    FromID.ToString (),
                     FromName,
-                    ToID.ToString(),
+                    ToID.ToString (),
                     ToName,
                     Amount,
                     (int)TransType,
-                    Util.UnixTimeSinceEpoch(),
+                    Util.UnixTimeSinceEpoch (),
                     ToBalance,
                     FromBalance,
-                    toObjectName == null ? "" : toObjectName, fromObjectName == null ? "" : fromObjectName, regionID 
+                    toObjectName ?? "",
+                    fromObjectName ?? "",
+                    regionID 
                 });
         }
 
-        #endregion
-
-        #region Helper Methods
-
-        void UserCurrencyUpdate(UserCurrency agent, bool full)
+        void UserCurrencyUpdate (UserCurrency agent, bool full)
         {
             if (full)
-                m_gd.Update(_REALM,
-                            new Dictionary<string, object>
-                                {
-                                    {"LandInUse", agent.LandInUse},
-                                    {"Tier", agent.Tier},
-                                    {"IsGroup", agent.IsGroup},
-                                    {"Amount", agent.Amount},
-                                    {"StipendsBalance", agent.StipendsBalance}
-                                }, null,
-                            new QueryFilter()
-                                {
-                                    andFilters =
-                                        new Dictionary<string, object>
-                                            {
-                                                {"PrincipalID", agent.PrincipalID}
-                                            }
-                                }
-                            , null, null);
+                m_gd.Update (_REALM,
+                    new Dictionary<string, object> {
+                        { "LandInUse", agent.LandInUse },
+                        { "Tier", agent.Tier },
+                        { "IsGroup", agent.IsGroup },
+                        { "Amount", agent.Amount },
+                        { "StipendsBalance", agent.StipendsBalance }
+                    },
+                    null,
+                    new QueryFilter () {
+                        andFilters = new Dictionary<string, object> {
+                            { "PrincipalID", agent.PrincipalID }
+                        }
+                    },
+                    null,
+                    null
+                );
             else
-                m_gd.Update(_REALM,
-                            new Dictionary<string, object>
-                                {
-                                    {"LandInUse", agent.LandInUse},
-                                    {"Tier", agent.Tier},
-                                    {"IsGroup", agent.IsGroup}
-                                }, null,
-                            new QueryFilter()
-                                {
-                                    andFilters =
-                                        new Dictionary<string, object>
-                                            {
-                                                {"PrincipalID", agent.PrincipalID}
-                                            }
-                                }
-                            , null, null);
+                m_gd.Update (_REALM,
+                    new Dictionary<string, object> {
+                        { "LandInUse", agent.LandInUse },
+                        { "Tier", agent.Tier },
+                        { "IsGroup", agent.IsGroup }
+                    },
+                    null,
+                    new QueryFilter () {
+                        andFilters = new Dictionary<string, object> {
+                            { "PrincipalID", agent.PrincipalID }
+                        }
+                    },
+                    null,
+                    null)
+                ;
         }
 
         void UserCurrencyCreate(UUID agentId)
@@ -686,247 +665,7 @@ namespace WhiteCore.Modules.Currency
             return purchaseList;
         }
             
-
-        public string TransactionTypeInfo(TransactionType transType)
-        {
-            switch (transType)
-            {
-            // One-Time Charges
-            case TransactionType.GroupCreate:       return "Group creation fee";
-            case TransactionType.GroupJoin:         return "Group joining fee";
-            case TransactionType.UploadCharge:      return "Upload charge";
-            case TransactionType.LandAuction:       return "Land auction fee";
-            case TransactionType.ClassifiedCharge:  return "Classified advert fee";
-                // Recurrent Charges
-            case TransactionType.ParcelDirFee:      return "Parcel directory fee";
-            case TransactionType.ClassifiedRenew:   return "Classified renewal";
-            case TransactionType.ScheduledFee:      return "Scheduled fee";
-                // Inventory Transactions
-            case TransactionType.GiveInventory:     return "Give inventory";
-                // Transfers Between Users
-            case TransactionType.ObjectSale:        return "Object sale";
-            case TransactionType.Gift:              return "Gift";
-            case TransactionType.LandSale:          return "Land sale";
-            case TransactionType.ReferBonus:        return "Refer bonus";
-            case TransactionType.InvntorySale:      return "Inventory sale";
-            case TransactionType.RefundPurchase:    return "Purchase refund";
-            case TransactionType.LandPassSale:      return "Land parcel sale";
-            case TransactionType.DwellBonus:        return "Dwell bonus";
-            case TransactionType.PayObject:         return "Pay object";
-            case TransactionType.ObjectPays:        return "Object pays";
-            case TransactionType.BuyMoney:          return "Money purchase";
-            case TransactionType.MoveMoney:         return "Move money";
-                // Group Transactions
-            case TransactionType.GroupLiability:    return "Group liability";
-            case TransactionType.GroupDividend:     return "Group dividend";
-                // Event Transactions
-            case TransactionType.EventFee:          return "Event fee";
-            case TransactionType.EventPrize:        return "Event prize";
-                // Stipend Credits
-            case TransactionType.StipendPayment:    return "Stipend payment";
-
-            default:                                return "System Generated";
-            }
-        }
-
         #endregion
 
-        #region Console Methods
-
-        public void AddMoney(IScene scene, string[] cmd)
-        {
-            string name = MainConsole.Instance.Prompt("User Name: ");
-
-            UserAccount account =
-                m_registry.RequestModuleInterface<IUserAccountService>()
-                          .GetUserAccount(new List<UUID> {UUID.Zero}, name);
-            if (account == null)
-            {
-                MainConsole.Instance.Info("No account found");
-                return;
-            }
-
-            uint amount = 0;
-            while (!uint.TryParse(MainConsole.Instance.Prompt("Amount: ", "0"), out amount))
-                MainConsole.Instance.Info("Bad input, must be a number > 0");
-                 
-            // log the transfer
-            UserCurrencyTransfer(account.PrincipalID, UUID.Zero, amount, "Money transfer", TransactionType.SystemGenerated, UUID.Zero);
-           
-            var currency = GetUserCurrency(account.PrincipalID);
-            MainConsole.Instance.Info(account.Name + " now has $" + (currency.Amount));
-
-            if (m_syncMessagePoster == null)
-            {
-                m_syncMessagePoster = m_registry.RequestModuleInterface<ISyncMessagePosterService>();
-                m_userInfoService = m_registry.RequestModuleInterface<IAgentInfoService>();
-            }
-            if (m_syncMessagePoster != null)
-            {
-                UserInfo toUserInfo = m_userInfoService.GetUserInfo(account.PrincipalID.ToString());
-                if (toUserInfo != null && toUserInfo.IsOnline)
-                    SendUpdateMoneyBalanceToClient(account.PrincipalID, UUID.Zero, toUserInfo.CurrentRegionURI, (currency.Amount), "");
-            }
-
-
-        }
-
-        public void SetMoney(IScene scene, string[] cmd)
-        {
-            string name = MainConsole.Instance.Prompt("User Name: ");
-
-            UserAccount account =
-                m_registry.RequestModuleInterface<IUserAccountService>()
-                          .GetUserAccount(new List<UUID> {UUID.Zero}, name);
-            if (account == null)
-            {
-                MainConsole.Instance.Info("No account found");
-                return;
-            }
-
-            uint amount = 0;
-            while (!uint.TryParse(MainConsole.Instance.Prompt("Set User's Money Amount: ", "0"), out amount))
-                MainConsole.Instance.Info("Bad input, must be a number > 0");
-            
-            // log the transfer
-            UserCurrencyTransfer(account.PrincipalID, UUID.Zero, amount, "Set user money", TransactionType.SystemGenerated, UUID.Zero);
-
-            var currency = GetUserCurrency(account.PrincipalID);
-            MainConsole.Instance.Info(account.Name + " now has $" + currency.Amount);
-
-            if (m_syncMessagePoster == null)
-            {
-                m_syncMessagePoster = m_registry.RequestModuleInterface<ISyncMessagePosterService>();
-                m_userInfoService = m_registry.RequestModuleInterface<IAgentInfoService>();
-            }
-            if (m_syncMessagePoster != null)
-            {
-                UserInfo toUserInfo = m_userInfoService.GetUserInfo(account.PrincipalID.ToString());
-                if (toUserInfo != null && toUserInfo.IsOnline)
-                    SendUpdateMoneyBalanceToClient(account.PrincipalID, UUID.Zero, toUserInfo.CurrentRegionURI, currency.Amount, "");
-            }
-
- 
-        }
-
-        public void GetMoney(IScene scene, string[] cmd)
-        {
-            string name = MainConsole.Instance.Prompt("User Name: ");
-            UserAccount account =
-                m_registry.RequestModuleInterface<IUserAccountService>()
-                          .GetUserAccount(new List<UUID> {UUID.Zero}, name);
-            if (account == null)
-            {
-                MainConsole.Instance.Info("No account found");
-                return;
-            }
-            var currency = GetUserCurrency(account.PrincipalID);
-            if (currency == null)
-            {
-                MainConsole.Instance.Info("No currency account found");
-                return;
-            }
-            MainConsole.Instance.Info(account.Name + " has $" + currency.Amount);
-        }
-        
-        public void HandleStipendSet(IScene scene, string[] cmd)
-        {
-            string rawDate = MainConsole.Instance.Prompt("Next Stipend Date (MM/dd/yyyy)");
-            // Make a new DateTime from rawDate
-            DateTime newDate = DateTime.ParseExact(rawDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
-            // Code needs to be added to run through the scheduler and change the 
-            // RunsNext to the date that the user wants the scheduler to be
-            // Fly-Man- 2-5-2015
-            MainConsole.Instance.Info("Stipend Date has been set to" + newDate);
-        }
- 
-        public void HandleShowTransactions(IScene scene, string [] cmd)
-        {
-                string name = MainConsole.Instance.Prompt("User Name: ");
-                UserAccount account =
-                    m_registry.RequestModuleInterface<IUserAccountService>()
-                        .GetUserAccount(new List<UUID> {UUID.Zero}, name);
-                if (account == null)
-                {
-                    MainConsole.Instance.Info("No account found");
-                    return;
-                }
-
-                int period;
-                while (!int.TryParse(MainConsole.Instance.Prompt("Number of days to display: ", "7"), out period))
-                    MainConsole.Instance.Info("Bad input, must be a number > 0");
-
-                string transInfo;
-
-                transInfo =  String.Format ("{0, -24}", "Date");
-                transInfo += String.Format ("{0, -25}", "From");
-                transInfo += String.Format ("{0, -30}", "Description");
-                transInfo += String.Format ("{0, -20}", "Type");
-                transInfo += String.Format ("{0, -12}", "Amount");
-                transInfo += String.Format ("{0, -12}", "Balance");
-
-                MainConsole.Instance.CleanInfo(transInfo);
-
-                MainConsole.Instance.CleanInfo(
-                    "-------------------------------------------------------------------------------------------------------------------------");
-
-                List<AgentTransfer> transactions =  GetTransactionHistory(account.PrincipalID, period, "day");
-
-                foreach (AgentTransfer transfer in transactions)
-                {
-                    transInfo =  String.Format ("{0, -24}", transfer.TransferDate.ToLocalTime());   
-                    transInfo += String.Format ("{0, -25}", transfer.FromAgentName);   
-                    transInfo += String.Format ("{0, -30}", transfer.Description);
-                    transInfo += String.Format ("{0, -20}", TransactionTypeInfo(transfer.TransferType));
-                    transInfo += String.Format ("{0, -12}", transfer.Amount);
-                    transInfo += String.Format ("{0, -12}", transfer.ToBalance);
-
-                    MainConsole.Instance.CleanInfo(transInfo);
-
-                }
-
-        }
-
-        public void HandleShowPurchases(IScene scene, string [] cmd)
-        {
-            string name = MainConsole.Instance.Prompt ("User Name: ");
-            UserAccount account =
-                m_registry.RequestModuleInterface<IUserAccountService> ()
-                    .GetUserAccount (new List<UUID> { UUID.Zero }, name);
-            if (account == null)
-            {
-                MainConsole.Instance.Info ("No account found");
-                return;
-            }
-
-            int period;
-            while (!int.TryParse (MainConsole.Instance.Prompt ("Number of days to display: ", "7"), out period))
-                MainConsole.Instance.Info ("Bad input, must be a number > 0");
-             string transInfo;
-
-            transInfo = String.Format ("{0, -24}", "Date");
-            transInfo += String.Format ("{0, -30}", "Description");
-            transInfo += String.Format ("{0, -20}", "InWorld Amount");
-            transInfo += String.Format ("{0, -12}", "Cost");
-
-            MainConsole.Instance.CleanInfo (transInfo);
-
-            MainConsole.Instance.CleanInfo (
-                "--------------------------------------------------------------------------------------------");
-
-            List<AgentPurchase> purchases = GetPurchaseHistory (account.PrincipalID, period, "day");
-
-            foreach (AgentPurchase purchase in purchases)
-            {
-                transInfo = String.Format ("{0, -24}", purchase.PurchaseDate.ToLocalTime());   
-                transInfo += String.Format ("{0, -30}", "Purchase");
-                transInfo += String.Format ("{0, -20}", InWorldCurrency + purchase.Amount);
-                transInfo += String.Format ("{0, -12}", RealCurrency + ((float) purchase.RealAmount/100).ToString("0.00"));
-
-                MainConsole.Instance.CleanInfo (transInfo);
-
-            }
-        }
-        #endregion
     }
 }

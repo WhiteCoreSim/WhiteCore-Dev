@@ -63,7 +63,6 @@ namespace WhiteCore.Modules.Inventory
                     m_Enabled = false;
                     return;
                 }
-                //m_currencyService = Framework.Utilities.DataManager.RequestPlugin<ISimpleCurrencyConnector>() as SimpleCurrencyConnector;
             }
         }
 

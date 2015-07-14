@@ -25,14 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using Amib.Threading;
-using WhiteCore.Framework.ConsoleFramework;
-using WhiteCore.Framework.Modules;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using ProtoBuf;
-using ProtoBuf.Meta;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -48,13 +40,19 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.InteropServices;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml;
+using Amib.Threading;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
+using ProtoBuf;
+using ProtoBuf.Meta;
+using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.Modules;
 using ReaderWriterLockSlim = System.Threading.ReaderWriterLockSlim;
 
 namespace WhiteCore.Framework.Utilities
@@ -84,20 +82,21 @@ namespace WhiteCore.Framework.Utilities
     /// </summary>
     public class Util
     {
-        private static uint nextXferID = 5000;
-        private static readonly Random randomClass = new ThreadSafeRandom();
+        static uint nextXferID = 5000;
+        static readonly Random randomClass = new ThreadSafeRandom();
+
         // Get a list of invalid file characters (OS dependent)
-        private static readonly string regexInvalidFileChars = "[" + new String(Path.GetInvalidFileNameChars()) + "]";
-        private static readonly string regexInvalidPathChars = "[" + new String(Path.GetInvalidPathChars()) + "]";
-        private static readonly object XferLock = new object();
+        static readonly string regexInvalidFileChars = "[" + new String(Path.GetInvalidFileNameChars()) + "]";
+        static readonly string regexInvalidPathChars = "[" + new String(Path.GetInvalidPathChars()) + "]";
+        static readonly object XferLock = new object();
 
         /// <summary>
         ///     Thread pool used for Util.FireAndForget if
         ///     FireAndForgetMethod.SmartThreadPool is used
         /// </summary>
-        private static SmartThreadPool m_ThreadPool;
+        static SmartThreadPool m_ThreadPool;
 
-        private static volatile bool m_threadPoolRunning;
+        static volatile bool m_threadPoolRunning;
 
         // Unix-epoch starts at January 1st 1970, 00:00:00 UTC. And all our times in the server are (or at least should be) in UTC.
         public static readonly DateTime UnixEpoch =
@@ -136,7 +135,7 @@ namespace WhiteCore.Framework.Utilities
         #region Protobuf helpers
 
         [ProtoContract]
-        private class UUIDSurrogate
+        class UUIDSurrogate
         {
             [ProtoMember(1)] public string ID;
             // protobuf-net wants an implicit or explicit operator between the types
@@ -155,7 +154,7 @@ namespace WhiteCore.Framework.Utilities
         }
 
         [ProtoContract]
-        private class Vector3Surrogate
+        class Vector3Surrogate
         {
             [ProtoMember(1)] public float X;
             [ProtoMember(2)] public float Y;
@@ -179,7 +178,7 @@ namespace WhiteCore.Framework.Utilities
         }
 
         [ProtoContract]
-        private class QuaternionSurrogate
+        class QuaternionSurrogate
         {
             [ProtoMember(1)] public float X;
             [ProtoMember(2)] public float Y;
@@ -204,7 +203,7 @@ namespace WhiteCore.Framework.Utilities
         }
 
         [ProtoContract]
-        private class IPEndPointSurrogate
+        class IPEndPointSurrogate
         {
             [ProtoMember(1)] public string IPAddr;
             [ProtoMember(2)] public int Port;
@@ -227,7 +226,7 @@ namespace WhiteCore.Framework.Utilities
         }
 
         [ProtoContract]
-        private class OSDSurrogate
+        class OSDSurrogate
         {
             [ProtoMember(1)] public string str;
             // protobuf-net wants an implicit or explicit operator between the types
@@ -246,7 +245,7 @@ namespace WhiteCore.Framework.Utilities
         }
 
         [ProtoContract]
-        private class OSDMapSurrogate
+        class OSDMapSurrogate
         {
             [ProtoMember(1)]
             public string str;
@@ -266,7 +265,7 @@ namespace WhiteCore.Framework.Utilities
         }
 
         [ProtoContract]
-        private class OSDArraySurrogate
+        class OSDArraySurrogate
         {
             [ProtoMember(1)]
             public string str;
@@ -286,7 +285,7 @@ namespace WhiteCore.Framework.Utilities
         }
 
         [ProtoContract]
-        private class ParcelAccessEntrySurrogate
+        class ParcelAccessEntrySurrogate
         {
             [ProtoMember(1)] public UUID AgentID;
             [ProtoMember(2)] public AccessList Flags;
@@ -315,7 +314,7 @@ namespace WhiteCore.Framework.Utilities
         }
 
         [ProtoContract]
-        private class MediaEntrySurrogate
+        class MediaEntrySurrogate
         {
             [ProtoMember(1)] public OSD info;
 
@@ -335,7 +334,7 @@ namespace WhiteCore.Framework.Utilities
         }
 
         [ProtoContract]
-        private class ColorSurrogate
+        class ColorSurrogate
         {
             [ProtoMember(1)] public int A;
             [ProtoMember(2)] public int R;
@@ -812,7 +811,7 @@ namespace WhiteCore.Framework.Utilities
         /// <param name="dllToLoad"></param>
         /// <returns></returns>
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
-        private static extern IntPtr LoadLibrary(string dllToLoad);
+        static extern IntPtr LoadLibrary(string dllToLoad);
 
         /// <summary>
         /// Determine whether the current process is 64 bit
@@ -860,7 +859,7 @@ namespace WhiteCore.Framework.Utilities
             return sb.ToString();
         }
 
-        private static byte[] ComputeMD5Hash(string data)
+        static byte[] ComputeMD5Hash(string data)
         {
             MD5 md5 = MD5.Create();
             return md5.ComputeHash(Encoding.Default.GetBytes(data));
@@ -877,7 +876,7 @@ namespace WhiteCore.Framework.Utilities
             return BitConverter.ToString(hash).Replace("-", String.Empty);
         }
 
-        private static byte[] ComputeSHA1Hash(string src)
+        static byte[] ComputeSHA1Hash(string src)
         {
             SHA1CryptoServiceProvider SHA1 = new SHA1CryptoServiceProvider();
             return SHA1.ComputeHash(Encoding.Default.GetBytes(src));
@@ -1760,10 +1759,10 @@ namespace WhiteCore.Framework.Utilities
         /// <summary>
         ///     Created to work around a limitation in Mono with nested delegates
         /// </summary>
-        private sealed class FireAndForgetWrapper
+        sealed class FireAndForgetWrapper
         {
-            private static volatile FireAndForgetWrapper instance;
-            private static readonly object syncRoot = new Object();
+            static volatile FireAndForgetWrapper instance;
+            static readonly object syncRoot = new Object();
 
             public static FireAndForgetWrapper Instance
             {
@@ -1794,7 +1793,7 @@ namespace WhiteCore.Framework.Utilities
                 callback.BeginInvoke(obj, EndFireAndForget, callback);
             }
 
-            private static void EndFireAndForget(IAsyncResult ar)
+            static void EndFireAndForget(IAsyncResult ar)
             {
                 WaitCallback callback = (WaitCallback) ar.AsyncState;
 
@@ -1898,7 +1897,7 @@ namespace WhiteCore.Framework.Utilities
             }
         }
 
-        private static object SmartThreadPoolCallback(object o)
+        static object SmartThreadPoolCallback(object o)
         {
             object[] array = (object[]) o;
             WaitCallback callback = (WaitCallback) array[0];
@@ -2001,25 +2000,26 @@ namespace WhiteCore.Framework.Utilities
                 return OSDBinary.FromBinary(ImageToByteArray(o as System.Drawing.Image));
             OSD oo;
             if ((oo = OSD.FromObject(o)).Type != OSDType.Unknown)
-                return (OSD) oo;
+                return oo;
             if (o is IDataTransferable)
                 return ((IDataTransferable) o).ToOSD();
             Type[] genericArgs = t.GetGenericArguments();
             if (Util.IsInstanceOfGenericType(typeof (List<>), t))
             {
                 OSDArray array = new OSDArray();
-                System.Collections.IList collection = (System.Collections.IList) o;
+                IList collection = (IList) o;
                 foreach (object item in collection)
                 {
                     array.Add(MakeOSD(item, genericArgs[0]));
                 }
                 return array;
             }
-            else if (Util.IsInstanceOfGenericType(typeof (Dictionary<,>), t))
+
+            if (Util.IsInstanceOfGenericType(typeof (Dictionary<,>), t))
             {
                 OSDMap array = new OSDMap();
-                System.Collections.IDictionary collection = (System.Collections.IDictionary) o;
-                foreach (System.Collections.DictionaryEntry item in collection)
+                IDictionary collection = (IDictionary) o;
+                foreach (DictionaryEntry item in collection)
                 {
                     array.Add(MakeOSD(item.Key, genericArgs[0]), MakeOSD(item.Value, genericArgs[1]));
                 }
@@ -2044,12 +2044,12 @@ namespace WhiteCore.Framework.Utilities
             return returnImage;
         }
 
-        private static object CreateInstance(Type type)
+        static object CreateInstance(Type type)
         {
             if (type == typeof (string))
                 return string.Empty;
-            else
-                return Activator.CreateInstance(type);
+            
+            return Activator.CreateInstance(type);
         }
 
         public static object OSDToObject(OSD o)
@@ -2107,9 +2107,9 @@ namespace WhiteCore.Framework.Utilities
             if (PossibleArrayType == typeof (Vector4))
                 return o.AsVector4();
             if (PossibleArrayType == typeof (OSDMap))
-                return (OSDMap) o;
+                return o;
             if (PossibleArrayType == typeof (OSDArray))
-                return (OSDArray) o;
+                return o;
             if (o.Type == OSDType.Array)
             {
                 OSDArray array = (OSDArray) o;
@@ -2133,7 +2133,8 @@ namespace WhiteCore.Framework.Utilities
                 data.FromOSD((OSDMap) o);
                 return data;
             }
-            else if (o.Type == OSDType.Map)
+
+            if (o.Type == OSDType.Map)
             {
                 OSDMap array = (OSDMap) o;
                 var possArrayTypeB = Activator.CreateInstance(PossibleArrayType);
@@ -2462,10 +2463,10 @@ namespace WhiteCore.Framework.Utilities
 
     public class NetworkUtils
     {
-        private static bool m_noInternetConnection;
-        private static int m_nextInternetConnectionCheck;
-        //private static bool useLocalhostLoopback=false;
-        private static readonly ExpiringCache<string, IPAddress> m_dnsCache = new ExpiringCache<string, IPAddress>();
+        static bool m_noInternetConnection;
+        static int m_nextInternetConnectionCheck;
+        //static bool useLocalhostLoopback=false;
+        static readonly ExpiringCache<string, IPAddress> m_dnsCache = new ExpiringCache<string, IPAddress>();
 
         public static IPEndPoint ResolveEndPoint(string hostName, int port)
         {
@@ -2648,7 +2649,7 @@ namespace WhiteCore.Framework.Utilities
             return false;
         }
 
-        private static bool CheckMask(IPAddress address, IPAddress mask, IPAddress target)
+        static bool CheckMask(IPAddress address, IPAddress mask, IPAddress target)
         {
             if (mask == null)
                 return false;
@@ -2817,9 +2818,9 @@ namespace WhiteCore.Framework.Utilities
 
         public class IPAddressRange
         {
-            private readonly AddressFamily addressFamily;
-            private readonly byte[] lowerBytes;
-            private readonly byte[] upperBytes;
+            readonly AddressFamily addressFamily;
+            readonly byte[] lowerBytes;
+            readonly byte[] upperBytes;
 
             public IPAddressRange(IPAddress lower, IPAddress upper)
             {
@@ -2842,7 +2843,7 @@ namespace WhiteCore.Framework.Utilities
                 bool lowerBoundary = true, upperBoundary = true;
 
                 for (int i = 0;
-                     i < this.lowerBytes.Length &&
+                     i < lowerBytes.Length &&
                      (lowerBoundary || upperBoundary);
                      i++)
                 {
@@ -2964,7 +2965,7 @@ namespace WhiteCore.Framework.Utilities
             return invoder;*/
         }
 
-        private static void EmitCastToReference(ILGenerator il, System.Type type)
+        static void EmitCastToReference(ILGenerator il, System.Type type)
         {
             if (type.IsValueType)
             {
@@ -2976,7 +2977,7 @@ namespace WhiteCore.Framework.Utilities
             }
         }
 
-        private static void EmitBoxIfNeeded(ILGenerator il, System.Type type)
+        static void EmitBoxIfNeeded(ILGenerator il, System.Type type)
         {
             if (type.IsValueType)
             {
@@ -2984,7 +2985,7 @@ namespace WhiteCore.Framework.Utilities
             }
         }
 
-        private static void EmitFastInt(ILGenerator il, int value)
+        static void EmitFastInt(ILGenerator il, int value)
         {
             switch (value)
             {

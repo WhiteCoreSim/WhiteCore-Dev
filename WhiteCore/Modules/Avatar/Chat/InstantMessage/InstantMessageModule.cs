@@ -26,28 +26,28 @@
  */
 
 
+using System;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
-using Nini.Config;
-using OpenMetaverse;
-using System;
 
 namespace WhiteCore.Modules.Chat
 {
     public class InstantMessageModule : INonSharedRegionModule
     {
-        private IScene m_Scene;
+        IScene m_Scene;
 
-        private IMessageTransferModule m_TransferModule;
+        IMessageTransferModule m_TransferModule;
 
         /// <value>
         ///     Is this module enabled?
         /// </value>
-        private bool m_enabled;
+        bool m_enabled;
 
         #region INonSharedRegionModule Members
 
@@ -55,13 +55,8 @@ namespace WhiteCore.Modules.Chat
         {
             if (config.Configs["Messaging"] != null)
             {
-                if (config.Configs["Messaging"].GetString(
-                    "InstantMessageModule", "InstantMessageModule") !=
-                    "InstantMessageModule")
-                    return;
+                m_enabled = (config.Configs["Messaging"].GetString("InstantMessageModule", Name) == Name);
             }
-
-            m_enabled = true;
         }
 
         public void AddRegion(IScene scene)
@@ -122,12 +117,12 @@ namespace WhiteCore.Modules.Chat
 
         #endregion
 
-        private void EventManager_OnClosingClient(IClientAPI client)
+        void EventManager_OnClosingClient(IClientAPI client)
         {
             //client.OnInstantMessage -= OnInstantMessage;
         }
 
-        private void EventManager_OnNewClient(IClientAPI client)
+        void EventManager_OnNewClient(IClientAPI client)
         {
             client.OnInstantMessage += OnInstantMessage;
         }
@@ -166,7 +161,7 @@ namespace WhiteCore.Modules.Chat
         /// <summary>
         /// </summary>
         /// <param name="msg"></param>
-        private void OnGridInstantMessage(GridInstantMessage msg)
+        void OnGridInstantMessage(GridInstantMessage msg)
         {
             byte dialog = msg.Dialog;
 

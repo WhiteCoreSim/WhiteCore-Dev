@@ -25,6 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.DatabaseInterfaces;
@@ -32,11 +37,6 @@ using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace WhiteCore.Services.DataService
 {
@@ -44,8 +44,11 @@ namespace WhiteCore.Services.DataService
     {
         #region Declares
 
-        private IGenericData data;
-        private List<UUID> agentsCanBypassGroupNoticePermsCheck = new List<UUID>();
+        IGenericData data;
+        List<UUID> agentsCanBypassGroupNoticePermsCheck = new List<UUID>();
+
+        // system groups
+        string realEstateGroupName = Constants.RealEstateGroupName;
 
         #endregion
 
@@ -77,48 +80,56 @@ namespace WhiteCore.Services.DataService
             {
                 Framework.Utilities.DataManager.RegisterPlugin (this);
             }
+
+            IConfig grpConfig = source.Configs["SystemUserService"];
+            if (grpConfig != null)
+            {
+                realEstateGroupName = grpConfig.GetString("RealEstateGroupName", realEstateGroupName);
+            }
+
             Init (simBase, Name);
 
-            // verify that the RealEstate group exists
+            // check for system groups if we are local
             if (!m_doRemoteCalls)
-            	CheckRealEstateGroupInfo ();
-
+            {
+                VerifySystemGroup ( 
+                    realEstateGroupName, 
+                    (UUID) Constants.RealEstateGroupUUID,
+                    (UUID) Constants.RealEstateOwnerUUID,
+                    "RealEstate maintenance group"
+                );
+            }
         }
 
         public string Name
         {
             get { return "IGroupsServiceConnector"; }
         }
-        
+
         /// <summary>
-        /// Checks and creates the real estate owner group info.
+        /// Verify existence of and create a system group if required.
         /// </summary>
-        private void CheckRealEstateGroupInfo()
+        /// <returns><c>true</c>, if system group was created, <c>false</c> otherwise.</returns>
+        /// <param name="grpName">Group name.</param>
+        /// <param name="grpUUID">Group UUID.</param>
+        /// <param name="grpOwnerUUID">Group owner UUID.</param>
+        /// <param name="grpCharter">Group charter.</param>
+        void VerifySystemGroup(string grpName, UUID grpUUID, UUID grpOwnerUUID, string grpCharter)
         {
-            if (GetGroupRecord (UUID.Zero, (UUID) Constants.RealEstateGroupUUID, Constants.RealEstateGroupName) == null)
+            if (GetGroupRecord (UUID.Zero, grpUUID, grpName) == null)
             {
-                CreateRealEstateGroup ();
+                MainConsole.Instance.WarnFormat ("Creating System Group '{0}'", grpName);
+
+                CreateGroup (
+                    grpUUID,                                            // Group UUID
+                    grpName,                                            // Name
+                    grpCharter,                                         // Charter / description
+                    false,                                              // Show in list
+                    UUID.Zero, 0, false, false, true,                   // Insignia UUID, Membership fee, Open Enrolement, Allow publishing, Mature
+                    grpOwnerUUID,                                       // founder UUID
+                    UUID.Random ());                                     // owner role UUID ??
             }
         }
-
-        /// <summary>
-        /// Creates the real estate 'Maintenance' group.
-        /// </summary>
-        /// <returns><c>true</c>, if real estate group was created, <c>false</c> otherwise.</returns>
-        private bool CreateRealEstateGroup()
-        {
-            MainConsole.Instance.Warn("Creating System Group " + Constants.RealEstateGroupName);
-
-            CreateGroup(
-                (UUID)Constants.RealEstateGroupUUID,                // UUID
-                Constants.RealEstateGroupName,                      // Name
-                "This group is for RealEstate Maintenance",         // Charter
-                false,                                              // Show in list
-                UUID.Zero, 0, false, false, true,                   // Insignia UUID, Membership fee, Open Enrolement, Allow publishing, Mature
-                (UUID)Constants.RealEstateOwnerUUID,                // founder UUID
-                UUID.Random());                                     // owner role UUID ??
-            return true;
-        }       
 
         #endregion
 
@@ -134,64 +145,51 @@ namespace WhiteCore.Services.DataService
             if (remoteValue != null || m_doRemoteOnly)
                 return;
 
-            // Would this be cleaner as (GroupPowers)ulong.MaxValue;
-            // replaced by const definition below... this list does not appear to be all cases?
-            /* ulong OwnerPowers = (ulong)(GroupPowers.Accountable
-                                         | GroupPowers.AllowEditLand
-                                         | GroupPowers.AllowFly
-                                         | GroupPowers.AllowLandmark
-                                         | GroupPowers.AllowRez
-                                         | GroupPowers.AllowSetHome
-                                         | GroupPowers.AllowVoiceChat
-                                         | GroupPowers.AssignMember
-                                         | GroupPowers.AssignMemberLimited
-                                         | GroupPowers.ChangeActions
-                                         | GroupPowers.ChangeIdentity
-                                         | GroupPowers.ChangeMedia
-                                         | GroupPowers.ChangeOptions
-                                         | GroupPowers.CreateRole
-                                         | GroupPowers.DeedObject
-                                         | GroupPowers.DeleteRole
-                                         | GroupPowers.Eject
-                                         | GroupPowers.FindPlaces
-                                         | GroupPowers.HostEvent
-                                         | GroupPowers.Invite
-                                         | GroupPowers.JoinChat
-                                         | GroupPowers.LandChangeIdentity
-                                         | GroupPowers.LandDeed
-                                         | GroupPowers.LandDivideJoin
-                                         | GroupPowers.LandEdit
-                                         | GroupPowers.LandEjectAndFreeze
-                                         | GroupPowers.LandGardening
-                                         | GroupPowers.LandManageAllowed
-                                         | GroupPowers.LandManageBanned
-                                         | GroupPowers.LandManagePasses
-                                         | GroupPowers.LandOptions
-                                         | GroupPowers.LandRelease
-                                         | GroupPowers.LandSetSale
-                                         | GroupPowers.ModerateChat
-                                         | GroupPowers.ObjectManipulate
-                                         | GroupPowers.ObjectSetForSale
-                                         | GroupPowers.ReceiveNotices
-                                         | GroupPowers.RemoveMember
-                                         | GroupPowers.ReturnGroupOwned
-                                         | GroupPowers.ReturnGroupSet
-                                         | GroupPowers.ReturnNonGroup
-                                         | GroupPowers.RoleProperties
-                                         | GroupPowers.SendNotices
-                                         | GroupPowers.SetLandingPoint
-                                         | GroupPowers.StartProposal
-                                         | GroupPowers.VoteOnProposal);
-            */
-            //ulong EveryonePowers = (ulong) (GroupPowers.AllowSetHome |
-            //                                GroupPowers.Accountable |
-            //                                GroupPowers.JoinChat |
-            //                                GroupPowers.AllowVoiceChat |
-            //                                GroupPowers.ReceiveNotices |
-            //                                GroupPowers.StartProposal |
-            //                                GroupPowers.VoteOnProposal);
-
-
+           const ulong EveryonePowers = (ulong) (GroupPowers.AllowSetHome |
+                                            GroupPowers.Accountable |
+                                            GroupPowers.JoinChat |
+                                            GroupPowers.AllowVoiceChat |
+                                            GroupPowers.ReceiveNotices);
+           
+           const ulong OfficersPowers = (ulong) (GroupPowers.AllowSetHome |
+                                                 GroupPowers.Accountable |
+                                                 GroupPowers.JoinChat |
+                                                 GroupPowers.AllowVoiceChat |
+                                                 GroupPowers.ReceiveNotices |
+                                                 GroupPowers.ChangeIdentity | // Same as EveryonePowers
+                                                 GroupPowers.LandEjectAndFreeze |
+                                                 GroupPowers.LandEdit |
+                                                 GroupPowers.AllowFly |
+                                                 GroupPowers.AllowRez |
+                                                 GroupPowers.AllowLandmark |
+                                                 GroupPowers.LandChangeIdentity |
+                                                 GroupPowers.ChangeMedia |
+                                                 GroupPowers.LandDeed |
+                                                 GroupPowers.LandDivideJoin |
+                                                 GroupPowers.LandEdit |
+                                                 GroupPowers.FindPlaces |
+                                                 GroupPowers.LandGardening |
+                                                 GroupPowers.LandManageAllowed |
+                                                 GroupPowers.LandManageBanned |
+                                                 GroupPowers.LandManagePasses |
+                                                 GroupPowers.LandOptions |
+                                                 GroupPowers.LandRelease |
+                                                 GroupPowers.ReturnGroupOwned |
+                                                 GroupPowers.ReturnGroupSet |
+                                                 GroupPowers.ReturnNonGroup |
+                                                 GroupPowers.SetLandingPoint |
+                                                 GroupPowers.LandSetSale |
+                                                 GroupPowers.Eject |
+                                                 GroupPowers.Invite |
+                                                 GroupPowers.ChangeOptions |
+                                                 GroupPowers.MemberVisible |
+                                                 GroupPowers.SendNotices |
+                                                 GroupPowers.DeedObject |
+                                                 GroupPowers.ObjectManipulate |
+                                                 GroupPowers.ObjectSetForSale |
+                                                 GroupPowers.AssignMemberLimited |
+                                                 GroupPowers.RoleProperties |
+                                                 GroupPowers.ModerateChat);
 
             Dictionary<string, object> row = new Dictionary<string, object>(11);
             row["GroupID"] = groupID;
@@ -208,12 +206,19 @@ namespace WhiteCore.Services.DataService
 
             data.Insert("group_data", row);
 
-            const ulong EveryonePowers = 8796495740928;             // >> 0x80018010000
+            // const ulong EveryonePowers = 8796495740928;             // >> 0x80018010000
+            //
+            // 03-07-2015 Fly-Man- Removed this part in favor of using the real values
+            //
+            
             //Add everyone role to group
             AddRoleToGroup(founderID, groupID, UUID.Zero, "Everyone", "Everyone in the group is in the everyone role.",
                            "Member of " + name, EveryonePowers);
 
-            const ulong OfficersPowers = 436506116225230;           // >> 0x 18cfffffff8ce
+            // const ulong OfficersPowers = 436506116225230;           // >> 0x 18cfffffff8ce
+            //
+            // 03-07-2015 Fly-Man- Removed this part in favor of using the real values
+            //
 
             UUID officersRole = UUID.Random();
             //Add officers role to group
@@ -817,7 +822,7 @@ namespace WhiteCore.Services.DataService
             return proposals; //Return only ones that are still running
         }
 
-        private string GetHasVoted(UUID agentID, GroupProposalInfo p)
+        string GetHasVoted(UUID agentID, GroupProposalInfo p)
         {
             OpenMetaverse.StructuredData.OSDMap map = GenericUtils.GetGeneric(p.GroupID, p.VoteID.ToString(),
                                                                               agentID.ToString(), data);
@@ -910,7 +915,7 @@ namespace WhiteCore.Services.DataService
             return uint.Parse(data.Query(new[] {"COUNT(GroupID)"}, "group_data", filter, null, null, null)[0]);
         }
 
-        private static GroupRecord GroupRecordQueryResult2GroupRecord(List<String> result)
+        static GroupRecord GroupRecordQueryResult2GroupRecord(List<String> result)
         {
             return new GroupRecord
                        {
@@ -1759,7 +1764,7 @@ namespace WhiteCore.Services.DataService
                        : info;
         }
 
-        private static GroupNoticeData GroupNoticeQueryResult2GroupNoticeData(List<string> result)
+        static GroupNoticeData GroupNoticeQueryResult2GroupNoticeData(List<string> result)
         {
             GroupNoticeData GND = new GroupNoticeData
                                       {

@@ -4,7 +4,7 @@
 # April 2015
 # Rowan Deppeler <greythane@gmail.com>
 
-ARCH="AnyCPU"
+ARCH="x86"
 CONFIG="Debug"
 BUILD=false
 VERSIONONLY=false

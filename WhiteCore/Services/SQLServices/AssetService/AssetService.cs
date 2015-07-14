@@ -189,7 +189,8 @@ namespace WhiteCore.Services.SQLServices.AssetService
             if (doDatabaseCaching && cache != null)
                 cache.Cache(id, asset);
             if (asset != null) return asset.Data;
-            return new byte[0];
+// An empty array is NOT null and a lot of tests depend on this//            return new byte[0];
+            return null;
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]

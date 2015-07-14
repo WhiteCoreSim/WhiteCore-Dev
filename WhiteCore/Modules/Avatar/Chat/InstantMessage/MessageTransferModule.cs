@@ -26,6 +26,12 @@
  */
 
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
@@ -36,12 +42,6 @@ using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using GridRegion = WhiteCore.Framework.Services.GridRegion;
 
 namespace WhiteCore.Modules.Chat
@@ -64,9 +64,9 @@ namespace WhiteCore.Modules.Chat
         /// </summary>
         protected static Dictionary<UUID, string> IMUsersCache = new Dictionary<UUID, string>();
 
-        private bool m_Enabled;
+        bool m_Enabled;
         protected static List<IScene> m_scenes = new List<IScene>();
-        protected bool m_addedHttpHandler = false;
+        protected bool m_addedHttpHandler;
         protected IAgentInfoService m_agentInfoService;
 
         #region IMessageTransferModule Members
@@ -135,21 +135,24 @@ namespace WhiteCore.Modules.Chat
         public virtual void Initialise(IConfigSource config)
         {
             IConfig cnf = config.Configs["Messaging"];
-            if (cnf != null && cnf.GetString(
-                "MessageTransferModule", "MessageTransferModule") !=
-                "MessageTransferModule")
+            if (cnf != null)
+            {
+                m_Enabled = (cnf.GetString ("MessageTransferModule", Name) == Name);
+
+                // only add one http handler !
+                if (!m_addedHttpHandler)
+                {
+                    m_addedHttpHandler = true;
+                    MainServer.Instance.AddStreamHandler (new GenericStreamHandler ("POST", "/gridinstantmessages/", processGridInstantMessage));
+                }
+            }
+
+            if (!m_Enabled)
             {
                 MainConsole.Instance.Debug("[MESSAGE TRANSFER]: Disabled by configuration");
                 return;
             }
 
-            m_Enabled = true;
-
-            if (!m_addedHttpHandler)
-            {
-                m_addedHttpHandler = true;
-                MainServer.Instance.AddStreamHandler(new GenericStreamHandler("POST", "/gridinstantmessages/", processGridInstantMessage));
-            }
         }
 
         public virtual void AddRegion(IScene scene)
@@ -191,7 +194,7 @@ namespace WhiteCore.Modules.Chat
 
         #endregion
 
-        private void HandleUndeliveredMessage(GridInstantMessage im, string reason)
+        void HandleUndeliveredMessage(GridInstantMessage im, string reason)
         {
             UndeliveredMessage handlerUndeliveredMessage = OnUndeliveredMessage;
 

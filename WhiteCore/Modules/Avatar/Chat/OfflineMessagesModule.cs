@@ -26,6 +26,10 @@
  */
 
 
+using System;
+using System.Collections.Generic;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.DatabaseInterfaces;
@@ -35,45 +39,33 @@ using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Profile;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
 
 namespace WhiteCore.Modules.Chat
 {
-    public class WhiteCoreOfflineMessageModule : INonSharedRegionModule
+    public class OfflineMessageModule : INonSharedRegionModule
     {
-        private bool enabled = true;
-        private IScene m_Scene;
-        private IMessageTransferModule m_TransferModule = null;
-        private IOfflineMessagesConnector OfflineMessagesConnector;
-        private bool m_SendOfflineMessagesToEmail = false;
+        bool m_enabled;
+        IScene m_Scene;
+        IMessageTransferModule m_TransferModule;
+        IOfflineMessagesConnector OfflineMessagesConnector;
+        bool m_SendOfflineMessagesToEmail;
 
-        private Dictionary<UUID, List<GridInstantMessage>> m_offlineMessagesCache =
+        Dictionary<UUID, List<GridInstantMessage>> m_offlineMessagesCache =
             new Dictionary<UUID, List<GridInstantMessage>>();
 
         public void Initialise(IConfigSource config)
         {
             IConfig cnf = config.Configs["Messaging"];
-            if (cnf == null)
+            if (cnf != null)
             {
-                enabled = false;
-                return;
+                m_enabled = (cnf.GetString("OfflineMessageModule", Name) == Name);
+                m_SendOfflineMessagesToEmail = cnf.GetBoolean("SendOfflineMessagesToEmail", m_SendOfflineMessagesToEmail);
             }
-            if (cnf.GetString("OfflineMessageModule", "WhiteCoreOfflineMessageModule") !=
-                "WhiteCoreOfflineMessageModule")
-            {
-                enabled = false;
-                return;
-            }
-
-            m_SendOfflineMessagesToEmail = cnf.GetBoolean("SendOfflineMessagesToEmail", m_SendOfflineMessagesToEmail);
         }
 
         public void AddRegion(IScene scene)
         {
-            if (!enabled)
+            if (!m_enabled)
                 return;
 
             m_Scene = scene;
@@ -85,7 +77,7 @@ namespace WhiteCore.Modules.Chat
 
         public void RegionLoaded(IScene scene)
         {
-            if (!enabled)
+            if (!m_enabled)
                 return;
 
             if (m_TransferModule == null)
@@ -97,7 +89,7 @@ namespace WhiteCore.Modules.Chat
                     scene.EventManager.OnNewClient -= OnNewClient;
                     scene.EventManager.OnClosingClient -= OnClosingClient;
 
-                    enabled = false;
+                    m_enabled = false;
                     m_Scene = null;
 
                     MainConsole.Instance.Error(
@@ -110,7 +102,7 @@ namespace WhiteCore.Modules.Chat
 
         public void RemoveRegion(IScene scene)
         {
-            if (!enabled)
+            if (!m_enabled)
                 return;
 
             m_Scene = null;
@@ -126,7 +118,7 @@ namespace WhiteCore.Modules.Chat
 
         public string Name
         {
-            get { return "WhiteCoreOfflineMessageModule"; }
+            get { return "OfflineMessageModule"; }
         }
 
         public Type ReplaceableInterface
@@ -138,29 +130,29 @@ namespace WhiteCore.Modules.Chat
         {
         }
 
-        private IClientAPI FindClient(UUID agentID)
+        IClientAPI FindClient(UUID agentID)
         {
             IScenePresence presence = m_Scene.GetScenePresence(agentID);
             return (presence != null && !presence.IsChildAgent) ? presence.ControllingClient : null;
         }
 
-        private void UpdateCachedInfo(UUID agentID, CachedUserInfo info)
+        void UpdateCachedInfo(UUID agentID, CachedUserInfo info)
         {
             lock (m_offlineMessagesCache)
                 m_offlineMessagesCache[agentID] = info.OfflineMessages;
         }
 
-        private void OnNewClient(IClientAPI client)
+        void OnNewClient(IClientAPI client)
         {
             client.OnRetrieveInstantMessages += RetrieveInstantMessages;
         }
 
-        private void OnClosingClient(IClientAPI client)
+        void OnClosingClient(IClientAPI client)
         {
             client.OnRetrieveInstantMessages -= RetrieveInstantMessages;
         }
 
-        private void RetrieveInstantMessages(IClientAPI client)
+        void RetrieveInstantMessages(IClientAPI client)
         {
             if (OfflineMessagesConnector == null)
                 return;
@@ -174,8 +166,10 @@ namespace WhiteCore.Modules.Chat
 
             if (msglist == null)
                 msglist = OfflineMessagesConnector.GetOfflineMessages(client.AgentId);
-            msglist.Sort(
-                delegate(GridInstantMessage a, GridInstantMessage b) { return a.Timestamp.CompareTo(b.Timestamp); });
+            msglist.Sort(delegate(GridInstantMessage a, GridInstantMessage b)
+                { return a.Timestamp.CompareTo(b.Timestamp); 
+                });
+
             foreach (GridInstantMessage IM in msglist)
             {
                 // Send through scene event manager so all modules get a chance
@@ -189,13 +183,15 @@ namespace WhiteCore.Modules.Chat
             }
         }
 
-        private void UndeliveredMessage(GridInstantMessage im, string reason)
+        void UndeliveredMessage(GridInstantMessage im, string reason)
         {
             if (OfflineMessagesConnector == null || im == null)
                 return;
+            
             IClientAPI client = FindClient(im.FromAgentID);
             if ((client == null) && (im.Dialog != 32))
                 return;
+            
             if (!OfflineMessagesConnector.AddOfflineMessage(im))
             {
                 if ((!im.FromGroup) && (reason != "User does not exist.") && (client != null))
@@ -212,17 +208,20 @@ namespace WhiteCore.Modules.Chat
                 else if (client == null)
                     return;
             }
-            else if ((im.Offline != 0)
-                     && (!im.FromGroup || im.FromGroup))
+            else if ((im.Offline != 0) && (!im.FromGroup || im.FromGroup))
             {
                 if (im.Dialog == 32) //Group notice
                 {
                     IGroupsModule module = m_Scene.RequestModuleInterface<IGroupsModule>();
                     if (module != null)
                         im = module.BuildOfflineGroupNotice(im);
+
+                    // TODO:  This drops (supposedly) group messages and the logic above is interesting!!
                     return;
                 }
+
                 if (client == null) return;
+
                 IEmailModule emailModule = m_Scene.RequestModuleInterface<IEmailModule>();
                 if (emailModule != null && m_SendOfflineMessagesToEmail)
                 {

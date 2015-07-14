@@ -70,9 +70,11 @@ WhiteCoreSim/bin/WhiteCore.exe
 
 WhiteCoreSim/Data/AssetCache/*
 WhiteCoreSim/Data/AvatarArchives/*
+WhiteCoreSim/Data/Banker.txt
 WhiteCoreSim/Data/FileAssets/*
 WhiteCoreSim/Data/Governor.txt
 WhiteCoreSim/Data/OarFiles/*
+WhiteCoreSim/Data/Marketplace.txt
 WhiteCoreSim/Data/RealEstateUser.txt
 WhiteCoreSim/Data/RegionBak/*.sim
 WhiteCoreSim/Data/Region/*.sim

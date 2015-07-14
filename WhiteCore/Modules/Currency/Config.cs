@@ -109,7 +109,7 @@ namespace WhiteCore.Modules.Currency
                 }
                 catch (Exception)
                 {
-                    MainConsole.Instance.Warn("[SimpleCurrency]: Exception reading economy config: " + propertyInfo.Name);
+                    MainConsole.Instance.Warn("[BaseCurrency]: Exception reading economy config: " + propertyInfo.Name);
                 }
             }
         }
@@ -143,7 +143,7 @@ namespace WhiteCore.Modules.Currency
                 }
                 catch (Exception ex)
                 {
-                    MainConsole.Instance.Warn("[SimpleCurrency]: Exception toOSD() config: " + ex.ToString());
+                    MainConsole.Instance.Warn("[BaseCurrency]: Exception toOSD() config: " + ex.ToString());
                 }
             }
             return returnvalue;
@@ -170,7 +170,7 @@ namespace WhiteCore.Modules.Currency
                     }
                     catch (Exception ex)
                     {
-                        MainConsole.Instance.Warn("[SimpleCurrency]: Exception reading fromOSD() config: " +
+                        MainConsole.Instance.Warn("[BaseCurrency]: Exception reading fromOSD() config: " +
                                                   ex.ToString());
                     }
                 }

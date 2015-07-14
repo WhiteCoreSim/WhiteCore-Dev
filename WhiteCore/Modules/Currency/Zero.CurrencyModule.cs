@@ -148,7 +148,7 @@ namespace WhiteCore.Modules.BaseCurrencyModule
 
         public string Name
         {
-            get { return "BaseCurrency"; }
+            get { return "ZeroCurrency"; }
         }
 
         #endregion

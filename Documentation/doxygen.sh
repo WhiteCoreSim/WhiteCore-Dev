@@ -1,5 +1,6 @@
+#!/bin/bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cd ${DIR}
+cd $DIR/../
 mkdir -p WhiteCoreSim/WhiteCoreDocs/doxygen
 rm -fr WhiteCoreSim/WhiteCoreDocs/doxygen/*
-doxygen doxygen.conf
+doxygen Documentation/doxygen.conf

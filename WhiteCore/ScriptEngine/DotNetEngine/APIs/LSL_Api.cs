@@ -4174,6 +4174,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 if (World.Permissions.CanRunConsoleCommand(m_host.OwnerID))
                 {
                     byte[] asset = World.AssetService.GetData(inventory);
+                    if (asset == null)
+                        return;
+                    
                     ISceneEntity group
                         = SceneEntitySerializer.SceneObjectSerializer.FromOriginalXmlFormat(UUID.Zero,
                                                                                             Utils.BytesToString(asset),

@@ -216,7 +216,8 @@ namespace WhiteCore.RedisServices.AssetService
             if (doDatabaseCaching && cache != null)
                 cache.Cache(id, asset);
             if (asset != null) return asset.Data;
-            return new byte[0];
+// see assetservice.GetData            return new byte[0];
+            return null;
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]

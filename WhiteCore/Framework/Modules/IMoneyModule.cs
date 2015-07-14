@@ -27,8 +27,8 @@
 
 using System;
 using System.Collections.Generic;
-using WhiteCore.Framework.PresenceInfo;
 using OpenMetaverse;
+using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.Services;
 
 namespace WhiteCore.Framework.Modules
@@ -168,7 +168,7 @@ namespace WhiteCore.Framework.Modules
         }
     }
 
-        public class AgentPurchase : IDataTransferable
+    public class AgentPurchase : IDataTransferable
     {
         public UUID ID;
         public UUID AgentID;
@@ -264,7 +264,7 @@ namespace WhiteCore.Framework.Modules
         void RemoveFromScheduledCharge(string identifier);
     }
 
-    public interface ISimpleCurrencyConnector : IWhiteCoreDataPlugin
+    public interface IBaseCurrencyConnector : IWhiteCoreDataPlugin
     {
         /*SimpleCurrencyConfig GetConfig();
         UserCurrency GetUserCurrency(UUID agentId);

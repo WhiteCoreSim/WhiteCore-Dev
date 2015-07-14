@@ -37,11 +37,11 @@ namespace WhiteCore.Framework.Utilities
     //From http://www.vcskicks.com/fast-image-processing2.php
     public unsafe class FastBitmap
     {
-        private readonly Bitmap workingBitmap;
-        private BitmapData bitmapData;
-        private Byte* pBase = null;
-        private PixelData* pixelData = null;
-        private int width;
+        readonly Bitmap workingBitmap;
+        BitmapData bitmapData;
+        Byte* pBase = null;
+        PixelData* pixelData = null;
+        int width;
 
         public FastBitmap(Bitmap inputBitmap)
         {
@@ -52,8 +52,9 @@ namespace WhiteCore.Framework.Utilities
         {
             Rectangle bounds = new Rectangle(Point.Empty, workingBitmap.Size);
 
-            width = (bounds.Width*sizeof (PixelData));
-            if (width%4 != 0) width = 4*(width/4 + 1);
+            width = (bounds.Width * sizeof(PixelData));
+            if (width % 4 != 0)
+                width = 4 * (width / 4 + 1);
 
             //Lock Image
             bitmapData = workingBitmap.LockBits(bounds, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
@@ -62,8 +63,8 @@ namespace WhiteCore.Framework.Utilities
 
         public Color GetPixel(int x, int y)
         {
-            pixelData = (PixelData*) (pBase + y*width + x*sizeof (PixelData));
-            return Color.FromArgb(pixelData->alpha, pixelData->red, pixelData->green, pixelData->blue);
+            pixelData = (PixelData*)(pBase + y * width + x * sizeof(PixelData));
+            return Color.FromArgb (pixelData->alpha, pixelData->red, pixelData->green, pixelData->blue);
         }
 
         public Color GetPixelNext()
@@ -74,7 +75,7 @@ namespace WhiteCore.Framework.Utilities
 
         public void SetPixel(int x, int y, Color color)
         {
-            PixelData* data = (PixelData*) (pBase + y*width + x*sizeof (PixelData));
+            PixelData* data = (PixelData*)(pBase + y * width + x * sizeof(PixelData));
             data->alpha = color.A;
             data->red = color.R;
             data->green = color.G;
@@ -95,7 +96,7 @@ namespace WhiteCore.Framework.Utilities
 
         #region Nested type: PixelData
 
-        private struct PixelData
+        struct PixelData
         {
             public byte alpha;
             public byte blue;
