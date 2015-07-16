@@ -2,7 +2,7 @@ language: csharp
 mono:
   - latest
 script:
-  - ./runprebuild.sh -c Debug -a x64 -b Yes
+  - ./runprebuild.sh -c Release -a x86 -b Yes
 notifications:
   irc:
     channels:
