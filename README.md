@@ -21,7 +21,7 @@ and a set of features around stability and simplified usability for users.
 
 Windows .Net 4.5 [![Build status](https://ci.appveyor.com/api/projects/status/tj3pr2xb4rg6ospe/branch/master?svg=true)](https://ci.appveyor.com/project/fly-man-/whitecore-dev/branch/master)
 
-Linux 64 Bit [![Build Status](https://travis-ci.org/WhiteCoreSim/WhiteCore-Dev.svg?branch=master)](https://travis-ci.org/WhiteCoreSim/WhiteCore-Dev)
+Linux 32 Bit [![Build Status](https://travis-ci.org/Whitecore-dev/WhiteCore-Dev.svg?branch=master)](https://travis-ci.org/Whitecore-dev/WhiteCore-Dev)
 
 Pull requests [![Issue Stats](http://www.issuestats.com/github/WhiteCoreSim/WhiteCore-Dev/badge/pr)](http://www.issuestats.com/github/WhiteCoreSim/WhiteCore-Dev)
 
