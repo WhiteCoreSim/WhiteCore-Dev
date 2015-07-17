@@ -25,21 +25,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace WhiteCore.Modules.Avatar.Groups
 {
     public class GroupMoneyModule : INonSharedRegionModule
     {
-        private bool m_enabled = false;
+        bool m_enabled;
 
         public string Name
         {
@@ -64,8 +64,8 @@ namespace WhiteCore.Modules.Avatar.Groups
 
         public void RegionLoaded(IScene scene)
         {
-            scene.EventManager.OnNewClient += new EventManager.OnNewClientDelegate(EventManager_OnNewClient);
-            scene.EventManager.OnClosingClient += new EventManager.OnNewClientDelegate(EventManager_OnClosingClient);
+            scene.EventManager.OnNewClient += EventManager_OnNewClient;
+            scene.EventManager.OnClosingClient += EventManager_OnClosingClient;
         }
 
         public void RemoveRegion(IScene scene)
@@ -76,20 +76,18 @@ namespace WhiteCore.Modules.Avatar.Groups
         {
         }
 
-        private void EventManager_OnClosingClient(IClientAPI client)
+        void EventManager_OnClosingClient(IClientAPI client)
         {
-            client.OnGroupAccountSummaryRequest -= new GroupAccountSummaryRequest(client_OnGroupAccountSummaryRequest);
-            client.OnGroupAccountTransactionsRequest -=
-                new GroupAccountTransactionsRequest(client_OnGroupAccountTransactionsRequest);
-            client.OnGroupAccountDetailsRequest -= new GroupAccountDetailsRequest(client_OnGroupAccountDetailsRequest);
+            client.OnGroupAccountSummaryRequest -= client_OnGroupAccountSummaryRequest;
+            client.OnGroupAccountTransactionsRequest -= client_OnGroupAccountTransactionsRequest;
+            client.OnGroupAccountDetailsRequest -= client_OnGroupAccountDetailsRequest;
         }
 
-        private void EventManager_OnNewClient(IClientAPI client)
+        void EventManager_OnNewClient(IClientAPI client)
         {
-            client.OnGroupAccountSummaryRequest += new GroupAccountSummaryRequest(client_OnGroupAccountSummaryRequest);
-            client.OnGroupAccountTransactionsRequest +=
-                new GroupAccountTransactionsRequest(client_OnGroupAccountTransactionsRequest);
-            client.OnGroupAccountDetailsRequest += new GroupAccountDetailsRequest(client_OnGroupAccountDetailsRequest);
+            client.OnGroupAccountSummaryRequest += client_OnGroupAccountSummaryRequest;
+            client.OnGroupAccountTransactionsRequest += client_OnGroupAccountTransactionsRequest;
+            client.OnGroupAccountDetailsRequest += client_OnGroupAccountDetailsRequest;
         }
 
         /// <summary>
@@ -102,9 +100,9 @@ namespace WhiteCore.Modules.Avatar.Groups
         /// <param name="sessionID"></param>
         /// <param name="currentInterval"></param>
         /// <param name="intervalDays"></param>
-        private void client_OnGroupAccountDetailsRequest(IClientAPI client, UUID agentID, UUID groupID,
-                                                         UUID transactionID, UUID sessionID, int currentInterval,
-                                                         int intervalDays)
+        void client_OnGroupAccountDetailsRequest(IClientAPI client, UUID agentID, UUID groupID,
+                                                 UUID transactionID, UUID sessionID, int currentInterval,
+                                                 int intervalDays)
         {
             IGroupsModule groupsModule = client.Scene.RequestModuleInterface<IGroupsModule>();
             if (groupsModule != null && groupsModule.GroupPermissionCheck(agentID, groupID, GroupPowers.Accountable))
@@ -141,9 +139,9 @@ namespace WhiteCore.Modules.Avatar.Groups
         /// <param name="sessionID"></param>
         /// <param name="currentInterval"></param>
         /// <param name="intervalDays"></param>
-        private void client_OnGroupAccountTransactionsRequest(IClientAPI client, UUID agentID, UUID groupID,
-                                                              UUID transactionID, UUID sessionID, int currentInterval,
-                                                              int intervalDays)
+        void client_OnGroupAccountTransactionsRequest(IClientAPI client, UUID agentID, UUID groupID,
+                                                      UUID transactionID, UUID sessionID, int currentInterval,
+                                                      int intervalDays)
         {
             IGroupsModule groupsModule = client.Scene.RequestModuleInterface<IGroupsModule>();
             if (groupsModule != null && groupsModule.GroupPermissionCheck(agentID, groupID, GroupPowers.Accountable))
@@ -156,22 +154,23 @@ namespace WhiteCore.Modules.Avatar.Groups
                     history = (from h in history where h.Payment select h).ToList();
                         //We want payments for things only, not stipends
                     GroupBalance balance = moneyModule.GetGroupBalance(groupID);
-                    client.SendGroupTransactionsSummaryDetails(client, groupID, transactionID, sessionID,
-                                                               currentInterval, intervalDays,
-                                                               Util.BuildYMDDateString(
-                                                                   balance.StartingDate.AddDays(-currentInterval*
-                                                                                                intervalDays)),
-                                                               history.ToArray());
-                }
-                else
-                    client.SendGroupTransactionsSummaryDetails(client, groupID, transactionID, sessionID,
-                                                               currentInterval, intervalDays,
-                                                               "Never", new GroupAccountHistory[0]);
+                    client.SendGroupTransactionsSummaryDetails(
+                        client, groupID, transactionID, sessionID,
+                        currentInterval, intervalDays,
+                        Util.BuildYMDDateString(balance.StartingDate.AddDays(-currentInterval * intervalDays)),
+                        history.ToArray()
+                    );
+                } else
+                    client.SendGroupTransactionsSummaryDetails(
+                        client, groupID, transactionID, sessionID,
+                        currentInterval, intervalDays,
+                        "Never", new GroupAccountHistory[0]
+                    );
             }
         }
 
-        private void client_OnGroupAccountSummaryRequest(IClientAPI client, UUID agentID, UUID groupID, UUID requestID,
-                                                         int currentInterval, int intervalDays)
+        void client_OnGroupAccountSummaryRequest(IClientAPI client, UUID agentID, UUID groupID, UUID requestID,
+                                                 int currentInterval, int intervalDays)
         {
             IGroupsModule groupsModule = client.Scene.RequestModuleInterface<IGroupsModule>();
             if (groupsModule != null && groupsModule.GroupPermissionCheck(agentID, groupID, GroupPowers.Accountable))
@@ -181,17 +180,16 @@ namespace WhiteCore.Modules.Avatar.Groups
                 {
                     int amt = moneyModule.Balance(groupID);
                     GroupBalance balance = moneyModule.GetGroupBalance(groupID);
-                    client.SendGroupAccountingSummary(client, groupID, requestID, amt, balance.TotalTierDebit,
-                                                      balance.TotalTierCredits,
-                                                      Util.BuildYMDDateString(
-                                                          balance.StartingDate.AddDays(-currentInterval*intervalDays)),
-                                                      currentInterval, intervalDays,
-                                                      Util.BuildYMDDateString(balance.StartingDate.AddDays(intervalDays)),
-                                                      Util.BuildYMDDateString(
-                                                          balance.StartingDate.AddDays(-(currentInterval + 1)*
-                                                                                       intervalDays)),
-                                                      balance.ParcelDirectoryFee, balance.LandFee, balance.GroupFee,
-                                                      balance.ObjectFee);
+                    client.SendGroupAccountingSummary(
+                        client, groupID, requestID, amt, balance.TotalTierDebit,
+                        balance.TotalTierCredits,
+                        Util.BuildYMDDateString(balance.StartingDate.AddDays(-currentInterval*intervalDays)),
+                        currentInterval, intervalDays,
+                        Util.BuildYMDDateString(balance.StartingDate.AddDays(intervalDays)),
+                        Util.BuildYMDDateString(balance.StartingDate.AddDays(-(currentInterval + 1) * intervalDays)),
+                        balance.ParcelDirectoryFee, balance.LandFee, balance.GroupFee,
+                        balance.ObjectFee
+                    );
                 }
                 else
                     client.SendGroupAccountingSummary(client, groupID, requestID, 0, 0, 0, "Never",

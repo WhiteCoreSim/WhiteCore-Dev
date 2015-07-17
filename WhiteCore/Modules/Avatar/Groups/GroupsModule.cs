@@ -26,6 +26,14 @@
  */
 
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.DatabaseInterfaces;
@@ -38,34 +46,26 @@ using WhiteCore.Framework.Servers.HttpServer.Interfaces;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Inventory;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 
 namespace WhiteCore.Modules.Groups
 {
     public class GroupsModule : INonSharedRegionModule, IGroupsModule
     {
-        private readonly Dictionary<UUID, GroupMembershipData> m_cachedGroupTitles =
+        readonly Dictionary<UUID, GroupMembershipData> m_cachedGroupTitles =
             new Dictionary<UUID, GroupMembershipData>();
 
-        private readonly Dictionary<UUID, List<GroupMembershipData>> m_cachedGroupMemberships =
+        readonly Dictionary<UUID, List<GroupMembershipData>> m_cachedGroupMemberships =
             new Dictionary<UUID, List<GroupMembershipData>>();
 
-        private IScene m_scene;
+        IScene m_scene;
 
         // Configuration settings
-        private bool m_debugEnabled = true;
-        private IGroupsServiceConnector m_groupData;
-        private bool m_groupNoticesEnabled = true;
-        private bool m_groupsEnabled;
-        private IMessageTransferModule m_msgTransferModule;
-        private IInstantMessagingService m_imService;
+        bool m_debugEnabled = true;
+        IGroupsServiceConnector m_groupData;
+        bool m_groupNoticesEnabled = true;
+        bool m_groupsEnabled;
+        IMessageTransferModule m_msgTransferModule;
+        IInstantMessagingService m_imService;
 
         #region IGroupsModule Members
 
@@ -79,6 +79,11 @@ namespace WhiteCore.Modules.Groups
         public GroupRecord GetGroupRecord(string name)
         {
             return m_groupData.GetGroupRecord(UUID.Zero, UUID.Zero, name);
+        }
+
+        public List <UUID> GetAllGroups (UUID requestingAgettID)
+        {
+            return m_groupData.GetAllGroups (requestingAgettID);
         }
 
         public void ActivateGroup(IClientAPI remoteClient, UUID groupID)
@@ -158,6 +163,14 @@ namespace WhiteCore.Modules.Groups
             return m_groupData.GetGroupProfile(GetRequestingAgentID(remoteClient), groupID);
         }
 
+        public List<GroupMembersData> GetGroupMembers(UUID requestingAgentID, UUID groupID)
+        {
+            if (m_debugEnabled)
+                MainConsole.Instance.DebugFormat("[GROUPS]: {0} called", MethodBase.GetCurrentMethod().Name);
+
+            return m_groupData.GetGroupMembers(requestingAgentID, groupID);
+        }
+
         public GroupMembershipData[] GetMembershipData(UUID agentID)
         {
             if (m_debugEnabled)
@@ -200,13 +213,13 @@ namespace WhiteCore.Modules.Groups
             NullCacheInfos(remoteClient.AgentId, groupID);
         }
 
-        private void NullCacheInfos(UUID groupID)
+        void NullCacheInfos(UUID groupID)
         {
             foreach (UUID agentID in m_cachedGroupMemberships.Keys)
                 NullCacheInfos(agentID, groupID);
         }
 
-        private void NullCacheInfos(UUID agentID, UUID groupID)
+        void NullCacheInfos(UUID agentID, UUID groupID)
         {
             if (!m_cachedGroupMemberships.ContainsKey(agentID))
                 return;
@@ -763,7 +776,7 @@ namespace WhiteCore.Modules.Groups
         /// <summary>
         ///     Try to find an active IClientAPI reference for agentID giving preference to root connections
         /// </summary>
-        private IClientAPI GetActiveClient(UUID agentID)
+        IClientAPI GetActiveClient(UUID agentID)
         {
             IClientAPI child = null;
 
@@ -788,7 +801,7 @@ namespace WhiteCore.Modules.Groups
         /// <summary>
         ///     Send 'remoteClient' the group membership 'data' for agent 'dataForAgentID'.
         /// </summary>
-        private void SendGroupMembershipInfoViaCaps(IClientAPI remoteClient, UUID dataForAgentID,
+        void SendGroupMembershipInfoViaCaps(IClientAPI remoteClient, UUID dataForAgentID,
                                                     GroupMembershipData[] data)
         {
             if (m_debugEnabled)
@@ -853,7 +866,7 @@ namespace WhiteCore.Modules.Groups
             return llsdEvent;
         }
 
-        private void SendScenePresenceUpdate(UUID AgentID, string Title)
+        void SendScenePresenceUpdate(UUID AgentID, string Title)
         {
             if (m_debugEnabled)
                 MainConsole.Instance.DebugFormat("[GROUPS]: Updating scene title for {0} with title: {1}", AgentID,
@@ -876,7 +889,7 @@ namespace WhiteCore.Modules.Groups
         /// <summary>
         ///     Send updates to all clients who might be interested in groups data for dataForClientID
         /// </summary>
-        private void UpdateAllClientsWithGroupInfo(UUID dataForAgentID, string activeGroupTitle)
+        void UpdateAllClientsWithGroupInfo(UUID dataForAgentID, string activeGroupTitle)
         {
             if (m_debugEnabled)
                 MainConsole.Instance.InfoFormat("[GROUPS]: {0} called", MethodBase.GetCurrentMethod().Name);
@@ -918,7 +931,7 @@ namespace WhiteCore.Modules.Groups
         /// <summary>
         ///     Update remoteClient with group information about dataForAgentID
         /// </summary>
-        private void SendAgentGroupDataUpdate(IClientAPI remoteClient, UUID dataForAgentID)
+        void SendAgentGroupDataUpdate(IClientAPI remoteClient, UUID dataForAgentID)
         {
             if (m_debugEnabled)
                 MainConsole.Instance.InfoFormat("[GROUPS]: SendAgentGroupDataUpdate called for {0}", remoteClient.Name);
@@ -934,7 +947,7 @@ namespace WhiteCore.Modules.Groups
         /// <summary>
         ///     Update remoteClient with group information about dataForAgentID
         /// </summary>
-        private void SendNewAgentGroupDataUpdate(IClientAPI remoteClient)
+        void SendNewAgentGroupDataUpdate(IClientAPI remoteClient)
         {
             if (m_debugEnabled)
                 MainConsole.Instance.InfoFormat("[GROUPS]: SendAgentGroupDataUpdate called for {0}", remoteClient.Name);
@@ -953,7 +966,7 @@ namespace WhiteCore.Modules.Groups
         /// <param name="requestingClient"></param>
         /// <param name="dataForAgentID"></param>
         /// <returns></returns>
-        private GroupMembershipData[] GetProfileListedGroupMemberships(IClientAPI requestingClient, UUID dataForAgentID)
+        GroupMembershipData[] GetProfileListedGroupMemberships(IClientAPI requestingClient, UUID dataForAgentID)
         {
             List<GroupMembershipData> membershipData = m_cachedGroupMemberships.ContainsKey(dataForAgentID)
                                                            ? m_cachedGroupMemberships[dataForAgentID]
@@ -1001,7 +1014,7 @@ namespace WhiteCore.Modules.Groups
             //
         }
 
-        private void OutgoingInstantMessage(GridInstantMessage msg, UUID msgTo)
+        void OutgoingInstantMessage(GridInstantMessage msg, UUID msgTo)
         {
             if (m_debugEnabled)
                 MainConsole.Instance.InfoFormat("[GROUPS]: {0} called", MethodBase.GetCurrentMethod().Name);
@@ -1023,7 +1036,7 @@ namespace WhiteCore.Modules.Groups
             }
         }
 
-        private void OutgoingInstantMessage(GridInstantMessage msg, UUID msgTo, bool localOnly)
+        void OutgoingInstantMessage(GridInstantMessage msg, UUID msgTo, bool localOnly)
         {
             if (m_debugEnabled)
                 MainConsole.Instance.InfoFormat("[GROUPS]: {0} called", MethodBase.GetCurrentMethod().Name);
@@ -1058,26 +1071,24 @@ namespace WhiteCore.Modules.Groups
                 // Do not run this module by default.
                 return;
             }
-            else
+
+            m_groupsEnabled = groupsConfig.GetBoolean("Enabled", false);
+            if (!m_groupsEnabled)
             {
-                m_groupsEnabled = groupsConfig.GetBoolean("Enabled", false);
-                if (!m_groupsEnabled)
-                {
-                    return;
-                }
-
-                if (groupsConfig.GetString("Module", "Default") != Name)
-                {
-                    m_groupsEnabled = false;
-
-                    return;
-                }
-
-                //MainConsole.Instance.InfoFormat("[GROUPS]: Initializing {0}", this.Name);
-
-                m_groupNoticesEnabled = groupsConfig.GetBoolean("NoticesEnabled", true);
-                m_debugEnabled = groupsConfig.GetBoolean("DebugEnabled", true);
+                return;
             }
+
+            if (groupsConfig.GetString("Module", "Default") != Name)
+            {
+                m_groupsEnabled = false;
+                return;
+            }
+
+            //MainConsole.Instance.InfoFormat("[GROUPS]: Initializing {0}", this.Name);
+
+            m_groupNoticesEnabled = groupsConfig.GetBoolean("NoticesEnabled", true);
+            m_debugEnabled = groupsConfig.GetBoolean("DebugEnabled", true);
+
         }
 
         public void AddRegion(IScene scene)
@@ -1171,7 +1182,7 @@ namespace WhiteCore.Modules.Groups
 
         #region EventHandlers
 
-        private void OnNewClient(IClientAPI client)
+        void OnNewClient(IClientAPI client)
         {
             if (m_debugEnabled)
                 MainConsole.Instance.DebugFormat("[GROUPS]: {0} called", MethodBase.GetCurrentMethod().Name);
@@ -1198,7 +1209,7 @@ namespace WhiteCore.Modules.Groups
             }
         }
 
-        private void OnClosingClient(IClientAPI client)
+        void OnClosingClient(IClientAPI client)
         {
             if (m_debugEnabled)
                 MainConsole.Instance.DebugFormat("[GROUPS]: {0} called", MethodBase.GetCurrentMethod().Name);
@@ -1216,13 +1227,13 @@ namespace WhiteCore.Modules.Groups
             RemoveFromGroupPowersCache(client.AgentId, UUID.Zero);
         }
 
-        private void GroupProposalBallotRequest(IClientAPI client, UUID agentID, UUID sessionID, UUID groupID,
+        void GroupProposalBallotRequest(IClientAPI client, UUID agentID, UUID sessionID, UUID groupID,
                                                 UUID proposalID, string vote)
         {
             m_groupData.VoteOnActiveProposals(agentID, groupID, proposalID, vote);
         }
 
-        private void GroupVoteHistoryRequest(IClientAPI client, UUID agentID, UUID sessionID, UUID groupID,
+        void GroupVoteHistoryRequest(IClientAPI client, UUID agentID, UUID sessionID, UUID groupID,
                                              UUID transactionID)
         {
             List<GroupProposalInfo> inactiveProposals = m_groupData.GetInactiveProposals(client.AgentId, groupID);
@@ -1247,7 +1258,7 @@ namespace WhiteCore.Modules.Groups
             }
         }
 
-        private void GroupActiveProposalsRequest(IClientAPI client, UUID agentID, UUID sessionID, UUID groupID,
+        void GroupActiveProposalsRequest(IClientAPI client, UUID agentID, UUID sessionID, UUID groupID,
                                                  UUID transactionID)
         {
             List<GroupProposalInfo> activeProposals = m_groupData.GetActiveProposals(client.AgentId, groupID);
@@ -1270,7 +1281,7 @@ namespace WhiteCore.Modules.Groups
             client.SendGroupActiveProposals(groupID, transactionID, proposals);
         }
 
-        private byte[] GroupProposalBallot(string request, UUID agentID)
+        byte[] GroupProposalBallot(string request, UUID agentID)
         {
             OSDMap map = (OSDMap) OSDParser.DeserializeLLSDXml(request);
 
@@ -1285,7 +1296,7 @@ namespace WhiteCore.Modules.Groups
             return OSDParser.SerializeLLSDXmlBytes(resp);
         }
 
-        private byte[] StartGroupProposal(string request, UUID agentID)
+        byte[] StartGroupProposal(string request, UUID agentID)
         {
             OSDMap map = (OSDMap) OSDParser.DeserializeLLSDXml(request);
 
@@ -1317,7 +1328,7 @@ namespace WhiteCore.Modules.Groups
             return OSDParser.SerializeLLSDXmlBytes(resp);
         }
 
-        private void OnRequestAvatarProperties(IClientAPI remoteClient, UUID avatarID)
+        void OnRequestAvatarProperties(IClientAPI remoteClient, UUID avatarID)
         {
             if (m_debugEnabled)
                 MainConsole.Instance.DebugFormat("[GROUPS]: {0} called", MethodBase.GetCurrentMethod().Name);
@@ -1327,7 +1338,7 @@ namespace WhiteCore.Modules.Groups
             remoteClient.SendAvatarGroupsReply(avatarID, avatarGroups);
         }
 
-        private void EventManager_OnClientLogin(IClientAPI client)
+        void EventManager_OnClientLogin(IClientAPI client)
         {
             if (client.Scene.GetScenePresence(client.AgentId).IsChildAgent)
                 return;
@@ -1383,7 +1394,7 @@ namespace WhiteCore.Modules.Groups
          * The InstantMessageModule.cs does not currently worry about unregistering the handles, 
          * and it should be an issue, since it's the client that references us not the other way around
          * , so as long as we don't keep a reference to the client laying around, the client can still be GC'ed
-        private void OnClientClosed(UUID AgentId)
+        void OnClientClosed(UUID AgentId)
         {
             if (m_debugEnabled) MainConsole.Instance.DebugFormat("[GROUPS]: {0} called", System.Reflection.MethodBase.GetCurrentMethod().Name);
 
@@ -1409,7 +1420,7 @@ namespace WhiteCore.Modules.Groups
         }
         */
 
-        private void OnDirFindQuery(IClientAPI remoteClient, UUID queryID, string queryText, uint queryFlags,
+        void OnDirFindQuery(IClientAPI remoteClient, UUID queryID, string queryText, uint queryFlags,
                                     int queryStart)
         {
             if (((DirectoryManager.DirFindFlags) queryFlags & DirectoryManager.DirFindFlags.Groups) ==
@@ -1427,13 +1438,12 @@ namespace WhiteCore.Modules.Groups
             }
         }
 
-        private void OnAgentDataUpdateRequest(IClientAPI remoteClient, UUID dataForAgentID, UUID sessionID)
+        void OnAgentDataUpdateRequest(IClientAPI remoteClient, UUID dataForAgentID, UUID sessionID)
         {
             OnAgentDataUpdateRequest(remoteClient, dataForAgentID, sessionID, true);
         }
 
-        private void OnAgentDataUpdateRequest(IClientAPI remoteClient, UUID dataForAgentID, UUID sessionID,
-                                              bool sendToAll)
+        void OnAgentDataUpdateRequest(IClientAPI remoteClient, UUID dataForAgentID, UUID sessionID, bool sendToAll)
         {
             if (m_debugEnabled)
                 MainConsole.Instance.DebugFormat("[GROUPS]: {0} called", MethodBase.GetCurrentMethod().Name);
@@ -1466,7 +1476,7 @@ namespace WhiteCore.Modules.Groups
                 SendScenePresenceUpdate(dataForAgentID, activeGroupTitle);
         }
 
-        private void HandleUUIDGroupNameRequest(UUID GroupID, IClientAPI remoteClient)
+        void HandleUUIDGroupNameRequest(UUID GroupID, IClientAPI remoteClient)
         {
             if (m_debugEnabled)
                 MainConsole.Instance.DebugFormat("[GROUPS]: {0} called", MethodBase.GetCurrentMethod().Name);
@@ -1479,7 +1489,7 @@ namespace WhiteCore.Modules.Groups
             remoteClient.SendGroupNameReply(GroupID, GroupName);
         }
 
-        private void OnInstantMessage(IClientAPI remoteClient, GridInstantMessage im)
+        void OnInstantMessage(IClientAPI remoteClient, GridInstantMessage im)
         {
             if (m_debugEnabled)
                 MainConsole.Instance.DebugFormat("[GROUPS]: {0} called", MethodBase.GetCurrentMethod().Name);
@@ -1759,7 +1769,7 @@ namespace WhiteCore.Modules.Groups
             }
         }
 
-        private GroupMembershipData AttemptFindGroupMembershipData(UUID requestingAgentID, UUID agentID, UUID groupID)
+        GroupMembershipData AttemptFindGroupMembershipData(UUID requestingAgentID, UUID agentID, UUID groupID)
         {
             if (m_cachedGroupMemberships.ContainsKey(agentID))
             {
@@ -1771,7 +1781,7 @@ namespace WhiteCore.Modules.Groups
             return m_groupData.GetGroupMembershipData(requestingAgentID, groupID, agentID);
         }
 
-        private void OnGridInstantMessage(GridInstantMessage msg)
+        void OnGridInstantMessage(GridInstantMessage msg)
         {
             if (m_debugEnabled)
                 MainConsole.Instance.InfoFormat("[GROUPS]: {0} called", MethodBase.GetCurrentMethod().Name);
@@ -1824,7 +1834,7 @@ namespace WhiteCore.Modules.Groups
             return retVal;
         }
 
-        private GridInstantMessage BuildGroupNoticeIM(GroupNoticeInfo data, UUID groupNoticeID, UUID AgentID)
+        GridInstantMessage BuildGroupNoticeIM(GroupNoticeInfo data, UUID groupNoticeID, UUID AgentID)
         {
             GridInstantMessage msg = new GridInstantMessage
                                          {
@@ -1863,7 +1873,7 @@ namespace WhiteCore.Modules.Groups
             return msg;
         }
 
-        private byte[] CreateBitBucketForGroupAttachment(GroupNoticeData groupNoticeData, UUID groupID)
+        byte[] CreateBitBucketForGroupAttachment(GroupNoticeData groupNoticeData, UUID groupID)
         {
             int i = 20;
             i += groupNoticeData.ItemName.Length;
@@ -1878,7 +1888,7 @@ namespace WhiteCore.Modules.Groups
             return bitbucket;
         }
 
-        private UUID GetRequestingAgentID(IClientAPI client)
+        UUID GetRequestingAgentID(IClientAPI client)
         {
             UUID requestingAgentID = UUID.Zero;
             if (client != null)
@@ -1896,7 +1906,7 @@ namespace WhiteCore.Modules.Groups
         ///     TKey 2 - UUID of the group
         ///     TValue - Powers of the agent in the given group
         /// </summary>
-        private readonly Dictionary<UUID, Dictionary<UUID, ulong>> AgentGroupPowersCache =
+        readonly Dictionary<UUID, Dictionary<UUID, ulong>> AgentGroupPowersCache =
             new Dictionary<UUID, Dictionary<UUID, ulong>>();
 
         /// <summary>
@@ -1954,7 +1964,7 @@ namespace WhiteCore.Modules.Groups
             return true;
         }
 
-        private void AddToGroupPowersCache(UUID AgentID, UUID GroupID, ulong powers)
+        void AddToGroupPowersCache(UUID AgentID, UUID GroupID, ulong powers)
         {
             lock (AgentGroupPowersCache)
             {
@@ -1966,7 +1976,7 @@ namespace WhiteCore.Modules.Groups
             }
         }
 
-        private void RemoveFromGroupPowersCache(UUID GroupID)
+        void RemoveFromGroupPowersCache(UUID GroupID)
         {
             lock (AgentGroupPowersCache)
             {
@@ -1977,7 +1987,7 @@ namespace WhiteCore.Modules.Groups
             }
         }
 
-        private void RemoveFromGroupPowersCache(UUID AgentID, UUID GroupID)
+        void RemoveFromGroupPowersCache(UUID AgentID, UUID GroupID)
         {
             lock (AgentGroupPowersCache)
             {

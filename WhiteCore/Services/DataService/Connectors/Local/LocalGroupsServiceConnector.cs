@@ -934,6 +934,30 @@ namespace WhiteCore.Services.DataService
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
+        public List <UUID> GetAllGroups(UUID requestingAgentID)
+        {
+            object remoteValue = DoRemote(requestingAgentID);
+            if (remoteValue != null || m_doRemoteOnly)
+                return (List<UUID>) remoteValue;
+
+            // maybe check for system user??
+            if (!Utilities.IsSystemUser(requestingAgentID))
+                return new List<UUID>();
+
+            QueryFilter filter = new QueryFilter();
+            List<string> groupsData = data.Query(new[] { "GroupID" }, "group_data", filter, null, null, null);
+
+            if (groupsData == null)
+                return new List <UUID>();
+
+            List <UUID> groupIDs = new List <UUID>();
+            foreach (var id in groupsData)
+                groupIDs.Add((UUID) id);
+
+            return groupIDs;
+        }
+
+        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public GroupRecord GetGroupRecord(UUID requestingAgentID, UUID GroupID, string GroupName)
         {
             object remoteValue = DoRemote(requestingAgentID, GroupID, GroupName);

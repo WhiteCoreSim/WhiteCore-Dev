@@ -25,14 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
 using System.Collections.Generic;
-using WhiteCore.Framework.ClientInterfaces;
-using WhiteCore.Framework.PresenceInfo;
-using WhiteCore.Framework.Services;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
-using System;
+using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.PresenceInfo;
+using WhiteCore.Framework.Services;
 
 namespace WhiteCore.Framework.DatabaseInterfaces
 {
@@ -82,6 +82,8 @@ namespace WhiteCore.Framework.DatabaseInterfaces
         uint GetNumberOfGroupNotices(UUID requestingAgentID, List<UUID> GroupIDs);
 
         uint GetNumberOfGroups(UUID requestingAgentID, Dictionary<string, bool> boolFields);
+
+        List <UUID> GetAllGroups (UUID requestingAgentID);
 
         GroupRecord GetGroupRecord(UUID requestingAgentID, UUID GroupID, string GroupName);
 
