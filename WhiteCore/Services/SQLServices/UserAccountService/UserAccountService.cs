@@ -25,6 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#undef TEST_USERS       // developers only here :)
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -216,6 +218,13 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                         "set user rezday [<first> [<last>]]",
                         "Sets the users creation date",
                         HandleSetRezday, false, true);
+                    #if TEST_USERS
+                    MainConsole.Instance.Commands.AddCommand(
+                        "create test users",
+                        "create test users",
+                        "Create multiple users for testing purposes",
+                        HandleTestUsers, false, true);
+                    #endif
                 }
             }
         }
@@ -1495,6 +1504,58 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             		MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: User account {0} {1} has a new rezday.", firstName, lastName);
             }
         }
+
+        #if TEST_USERS
+        protected void HandleTestUsers(IScene scene, string[] cmdParams)
+        {
+            string checkOk;
+            checkOk = MainConsole.Instance.Prompt ("[TESTING]:  Caution!! This will add random users for testing purposes. Continue? (yes, no)", "no").ToLower ();
+            if (!checkOk.StartsWith("y"))
+                return;
+
+            int addUsers = 0;
+            addUsers = int.Parse (MainConsole.Instance.Prompt ("Number of test users to add?", "0"));
+            if (addUsers == 0)
+                return;
+
+            // make sure
+            checkOk = MainConsole.Instance.Prompt ("[TESTING]: You are about to add " + addUsers + " to your database! Are you sure? (yes, no)", "no").ToLower ();
+            if (!checkOk.StartsWith("y"))
+                return;
+
+            var startTime = DateTime.Now;
+            int userNo = 0;
+            string FirstName = "Test";
+            string LastName = "User";
+            string Password = "none";
+            string Email = "none";
+            UUID UserUUID;
+
+            for (userNo = 0; userNo < addUsers; userNo++)
+            {
+                UserUUID = UUID.Random ();
+
+                string check = CreateUser (UserUUID, UUID.Zero, FirstName + " " + LastName+userNo, Util.Md5Hash(Password), Email);
+                if (check != "")
+                {
+                    MainConsole.Instance.Error ("Couldn't create the user. Reason: " + check);
+                    continue;
+                }
+
+                //set user levels and status  (if needed)
+                var account = GetUserAccount (null, UserUUID);
+                //account.UserLevel = 0;
+                account.UserFlags = Constants.USER_FLAG_RESIDENT;
+                StoreUserAccount (account);
+            }
+
+            var elapsed = DateTime.Now - startTime;
+
+            MainConsole.Instance.InfoFormat ("Added {0} test users in {1}", addUsers, elapsed.ToString());
+
+        }
+        #endif
+
         #endregion
     }
 }
