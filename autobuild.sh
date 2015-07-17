@@ -4,15 +4,9 @@
 # July 2015
 # Rowan Deppeler <greythane@gmail.com>
 
-# find and change to the current folder (bash does not start here by default)
-WCSDIR="${0%/*}"
-cd $WCSDIR
-echo $WCSDIR
-
-# default setings
 ARCH="x64"
 CONFIG="Debug"
-BUILD=false
+BUILD=true
 VERSIONONLY=false
 
 USAGE="[-c <config>] -a <arch> -v"
@@ -33,7 +27,7 @@ else
 fi
 
 # check if prompting needed
-if [ $# -eq 0 ]; then
+if [ $# -gt 0 ]; then
     read -p "Architecture to use? (AnyCPU, x86, x64) [$ARCH]: " bits
     if [[ $bits == "x64" ]]; then ARCH="x64"; fi
     if [[ $bits == "64" ]]; then ARCH="x64"; fi
@@ -103,10 +97,13 @@ if [ -d ".git" ]; then
 fi
 
 # Build WhiteCore-Sim
-if ${BUILD:=true} ; then
+if $BUILD ; then
   echo Building WhiteCore-Sim
   xbuild /property:Configuration="$CONFIG" /property:Platform="$ARCH"
   echo Finished Building WhiteCore
   echo Thank you for choosing WhiteCore-Sim
   echo Please report any errors to our Github Issue Tracker https://github.com/WhiteCoreSim/WhiteCore-Dev/issues
+else
+  echo "WhiteCore-Sim has been configured to compile with $ARCH $CONFIG options"
+  echo "To manually build, enter 'xbuild WhiteCore.sln' at the command prompt"
 fi

@@ -1,10 +1,10 @@
 #!/bin/bash
 # Run prebuild to configure and create the appropriate Solution and Project files for building WhiteCore-Sim
 #
-# April 2015
+# July 2015
 # Rowan Deppeler <greythane@gmail.com>
 
-ARCH="x86"
+ARCH="x64"
 CONFIG="Debug"
 BUILD=false
 VERSIONONLY=false
@@ -18,6 +18,13 @@ Options:
   -b|--build Build after configuration No (default) or Yes
   -v|--version Update version details only
 "
+# get the current system architecture
+if (( 1 == 1<<32 )); then
+    ARCH="x86";
+    echo "x86 architecture detected";
+else
+    echo "x64 architecture found";
+fi
 
 # check if prompting needed
 if [ $# -eq 0 ]; then
@@ -96,4 +103,7 @@ if ${BUILD:=true} ; then
   echo Finished Building WhiteCore
   echo Thank you for choosing WhiteCore-Sim
   echo Please report any errors to our Github Issue Tracker https://github.com/WhiteCoreSim/WhiteCore-Dev/issues
+else
+  echo "WhiteCore-Sim has been configured to compile with $ARCH $CONFIG options"
+  echo "To manually build, enter 'xbuild WhiteCore.sln' at the command prompt"
 fi
