@@ -28,7 +28,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.Packets;
@@ -187,8 +186,7 @@ namespace WhiteCore.Modules.Search
             //Find the user accounts
             List<UserAccount> accounts = m_Scene.UserAccountService.GetUserAccounts (remoteClient.AllScopeIDs,
                                              queryText.Trim ());
-            List<DirPeopleReplyData> ReturnValues =
-                new List<DirPeopleReplyData> ();
+            List<DirPeopleReplyData> ReturnValues = new List<DirPeopleReplyData> ();
 
             foreach (UserAccount item in accounts)
             {
@@ -335,7 +333,7 @@ namespace WhiteCore.Modules.Search
             uint xstart = 0;
             uint ystart = 0;
             Utils.LongToUInts (remoteClient.Scene.RegionInfo.RegionHandle, out xstart, out ystart);
-            GridRegion GR = null;
+            GridRegion GR;
 
             GR = regionhandle == 0
                      ? new GridRegion (remoteClient.Scene.RegionInfo)
@@ -555,12 +553,8 @@ namespace WhiteCore.Modules.Search
                     GridRegion region = m_Scene.GridService.GetRegionByName (remoteClient.AllScopeIDs, classified.SimName);
 
                     mapitem = new mapItemReply {
-                        x = (uint)
-                                          (region.RegionLocX + classified.GlobalPos.X +
-                        (remoteClient.Scene.RegionInfo.RegionSizeX / 2)),
-                        y = (uint)
-                                          (region.RegionLocY + classified.GlobalPos.Y +
-                        (remoteClient.Scene.RegionInfo.RegionSizeY / 2)),
+                        x = (uint) (region.RegionLocX + classified.GlobalPos.X + (remoteClient.Scene.RegionInfo.RegionSizeX / 2)),
+                        y = (uint) (region.RegionLocY + classified.GlobalPos.Y + (remoteClient.Scene.RegionInfo.RegionSizeY / 2)),
                         id = classified.CreatorUUID,
                         name = classified.Name,
                         Extra = 0,
