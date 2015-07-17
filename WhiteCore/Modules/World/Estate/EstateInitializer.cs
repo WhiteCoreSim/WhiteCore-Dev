@@ -164,7 +164,6 @@ namespace WhiteCore.Modules.Estate
 
             // we are linking to a user estate
             IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector>();
-            ISystemEstateService sysEstateInfo = m_registry.RequestModuleInterface<ISystemEstateService>();
             ISystemAccountService sysAccounts = m_registry.RequestModuleInterface<ISystemAccountService> ();
 
             string sysEstateOwnerName;
