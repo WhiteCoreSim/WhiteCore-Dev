@@ -115,12 +115,11 @@ namespace WhiteCore.Modules.Currency
             if (remoteValue != null || m_doRemoteOnly)
                 return (UserCurrency) remoteValue;
 
-            Dictionary<string, object> where = new Dictionary<string, object>(1);
-            where["PrincipalID"] = agentId;
-            List<string> query = m_gd.Query(new [] {"*"}, _REALM, new QueryFilter()
-                                                                            {
-                                                                                andFilters = where
-                                                                            }, null, null, null);
+            Dictionary<string, object> where = new Dictionary<string, object> (1);
+            where ["PrincipalID"] = agentId;
+            List<string> query = m_gd.Query (new [] { "*" }, _REALM, new QueryFilter () {
+                andFilters = where
+            }, null, null, null);
             UserCurrency currency;
             if ((query == null) || (query.Count == 0))
             {
@@ -139,22 +138,20 @@ namespace WhiteCore.Modules.Currency
             if (remoteValue != null || m_doRemoteOnly)
                 return (GroupBalance) remoteValue;
 
-            GroupBalance gb = new GroupBalance()
-                                  {
-                                      GroupFee = 0,
-                                      LandFee = 0,
-                                      ObjectFee = 0,
-                                      ParcelDirectoryFee = 0,
-                                      TotalTierCredits = 0,
-                                      TotalTierDebit = 0,
-                                      StartingDate = DateTime.UtcNow
-                                  };
-            Dictionary<string, object> where = new Dictionary<string, object>(1);
-            where["PrincipalID"] = groupID;
-            List<string> queryResults = m_gd.Query(new [] {"*"}, _REALM, new QueryFilter()
-                                                                                   {
-                                                                                       andFilters = where
-                                                                                   }, null, null, null);
+            GroupBalance gb = new GroupBalance () {
+                GroupFee = 0,
+                LandFee = 0,
+                ObjectFee = 0,
+                ParcelDirectoryFee = 0,
+                TotalTierCredits = 0,
+                TotalTierDebit = 0,
+                StartingDate = DateTime.UtcNow
+            };
+            Dictionary<string, object> where = new Dictionary<string, object> (1);
+            where ["PrincipalID"] = groupID;
+            List<string> queryResults = m_gd.Query (new [] { "*" }, _REALM, new QueryFilter () {
+                andFilters = where
+            }, null, null, null);
 
             if ((queryResults == null) || (queryResults.Count == 0))
             {
@@ -196,11 +193,10 @@ namespace WhiteCore.Modules.Currency
                                              "Currency Exchange", TransactionType.SystemGenerated, UUID.Zero);
 
             //Log to the database
-            List<object> values = new List<object>
-            {
-                UUID.Random(),                         // TransactionID
-                agentID.ToString(),                    // PrincipalID
-                ep.ToString(),                         // IP
+            List<object> values = new List<object> {
+                UUID.Random (),                         // TransactionID
+                agentID.ToString (),                    // PrincipalID
+                ep.ToString (),                         // IP
                 amount,                                // Amount
                 CalculateEstimatedCost(amount),        // Actual cost
                 Utils.GetUnixTime(),                   // Created
@@ -244,8 +240,8 @@ namespace WhiteCore.Modules.Currency
             filter.andLessThanEqFilters["Created"] = Utils.GetUnixTime();//Less than now
             List<string> query = m_gd.Query(new string[1] { "Amount" }, _REALMPURCHASE, filter, null, null, null);
             if (query == null)
-                return new List<uint>();
-            return query.ConvertAll<uint>(s=>uint.Parse(s));
+                return new List<uint> ();
+            return query.ConvertAll<uint> (s => uint.Parse (s));
         }
 
         // transactions...
@@ -291,7 +287,7 @@ namespace WhiteCore.Modules.Currency
             sort["Created"] = false;        // descending order
             //sort["FromName"] = true;
 
-            List<string> query = m_gd.Query(new string[] {"*"}, _REALMHISTORY, filter, sort, start, count);
+            List<string> query = m_gd.Query (new string[] { "*" }, _REALMHISTORY, filter, sort, start, count);
 
             return ParseTransferQuery(query);
         }
@@ -365,7 +361,7 @@ namespace WhiteCore.Modules.Currency
             //sort["PrincipalID"] = true;
             sort["Created"] = false;        // descending order
 
-            List<string> query = m_gd.Query(new string[] {"*"}, _REALMPURCHASE, filter, sort, start, count);
+            List<string> query = m_gd.Query (new string[] { "*" }, _REALMPURCHASE, filter, sort, start, count);
 
             return ParsePurchaseQuery(query);
         }
@@ -424,7 +420,8 @@ namespace WhiteCore.Modules.Currency
 
                 UserCurrencyUpdate(fromCurrency, true);
             }
-            if (fromID == toID) toCurrency = GetUserCurrency(toID);
+            if (fromID == toID)
+                toCurrency = GetUserCurrency (toID);
 
             //Update the user whose getting paid
             toCurrency.Amount += amount;
@@ -465,8 +462,7 @@ namespace WhiteCore.Modules.Currency
                     if (toUserInfo != null && toUserInfo.IsOnline)
                         SendUpdateMoneyBalanceToClient(toID, transactionID, toUserInfo.CurrentRegionURI, toCurrency.Amount,
                             toAccount == null ? "" : (toAccount.Name + " paid you $" + amount + (description == "" ? "" : ": " + description)));
-                }
-                else
+                } else
                 {
                     if (toUserInfo != null && toUserInfo.IsOnline)
                     {
@@ -563,8 +559,7 @@ namespace WhiteCore.Modules.Currency
                         }
                     },
                     null,
-                    null)
-                ;
+                    null);
         }
 
         void UserCurrencyCreate(UUID agentId)
@@ -582,7 +577,7 @@ namespace WhiteCore.Modules.Currency
             m_gd.Insert(_REALM, new object[] {groupID.ToString(), 0, 0, 0, 1, 0});
         }
 
-        DateTime StartTransactionPeriod( int period, string periodType)
+        DateTime StartTransactionPeriod (int period, string periodType)
         {
             DateTime then = DateTime.Now;
             switch (periodType)

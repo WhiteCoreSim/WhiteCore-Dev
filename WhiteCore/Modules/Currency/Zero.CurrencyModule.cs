@@ -49,6 +49,11 @@ namespace WhiteCore.Modules.Currency
 
         #region IMoneyModule Members
 
+		    public string InWorldCurrencySymbol
+        {
+            get { return "$"; }
+        }
+
         public int UploadCharge
         {
             get { return 0; }

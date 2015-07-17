@@ -129,20 +129,20 @@ namespace WhiteCore.Framework.Modules
 
         public override void FromOSD(OpenMetaverse.StructuredData.OSDMap map)
         {
-            ID = map["ID"];
-            Description = map["Description"];
-            FromAgent = map["FromAgent"];
-            FromAgentName = map["FromAgentName"];
-            ToAgent = map["ToAgent"];
-            ToAgentName = map["ToAgentName"];
-            Amount = map["Amount"];
-            TransferType = (TransactionType) Int32.Parse( map["TransferType"]);
-            TransferDate = map["TransferDate"];
-            ToBalance = map["ToBalance"];
-            FromBalance = map["FromBalance"];
-            FromObjectName = map["FromObjectName"];
-            ToObjectName = map["ToObjectName"];
-            RegionName = map["RegionName"];
+            ID = map ["ID"];
+            Description = map ["Description"];
+            FromAgent = map ["FromAgent"];
+            FromAgentName = map ["FromAgentName"];
+            ToAgent = map ["ToAgent"];
+            ToAgentName = map ["ToAgentName"];
+            Amount = map ["Amount"];
+            TransferType = (TransactionType)Int32.Parse (map ["TransferType"]);
+            TransferDate = map ["TransferDate"];
+            ToBalance = map ["ToBalance"];
+            FromBalance = map ["FromBalance"];
+            FromObjectName = map ["FromObjectName"];
+            ToObjectName = map ["ToObjectName"];
+            RegionName = map ["RegionName"];
 
         }
 
@@ -207,6 +207,8 @@ namespace WhiteCore.Framework.Modules
 
     public interface IMoneyModule
     {
+        string InWorldCurrencySymbol { get; }
+
         int UploadCharge { get; }
         int GroupCreationCharge { get; }
         int DirectoryFeeCharge { get; }
@@ -234,6 +236,7 @@ namespace WhiteCore.Framework.Modules
         List<GroupAccountHistory> GetTransactions(UUID groupID, UUID agentID, int currentInterval, int intervalDays);
 
         GroupBalance GetGroupBalance(UUID groupID);
+        //TODO:  Add group transactions and balance updates
 
         uint NumberOfTransactions(UUID toAgent, UUID fromAgent);
 

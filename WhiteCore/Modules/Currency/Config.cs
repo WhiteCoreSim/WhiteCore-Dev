@@ -192,6 +192,36 @@ namespace WhiteCore.Modules.Currency
             get { return m_UpgradeMembershipUri; }
             set { m_UpgradeMembershipUri = value.Replace ("ServersHostname", MainServer.Instance.HostName); }
         }
+            
+        public int PriceGroupCreate
+        {
+            get { return (int) m_PriceGroupCreate; }
+            set { m_PriceGroupCreate = (uint) value; }
+        }
+
+        public int PriceUpload
+        {
+            get { return (int) m_PriceUpload; }
+            set { m_PriceUpload = (uint) value; }
+        }
+
+        public int PriceDirectoryFee
+        {
+            get { return (int)m_PriceDirectoryFee; }
+            set { m_PriceDirectoryFee = (uint)value; }
+        }
+
+        public int ClientPort
+        {
+            get { return (int) m_ClientPort; }
+            set { m_ClientPort = (uint) value; }
+        }
+
+        public bool CanBuyCurrencyInworld
+        {
+            get { return m_CanBuyCurrencyInworld; }
+            set { m_CanBuyCurrencyInworld = value; }
+        }
 
         public int Stipend
         {
@@ -217,42 +247,11 @@ namespace WhiteCore.Modules.Currency
             set { m_StipendsEvery = value; }
         }
 
-        public int PriceGroupCreate
-        {
-            get { return (int) m_PriceGroupCreate; }
-            set { m_PriceGroupCreate = (uint) value; }
-        }
-
-        public int PriceUpload
-        {
-            get { return (int) m_PriceUpload; }
-            set { m_PriceUpload = (uint) value; }
-        }
-
-        public int PriceDirectoryFee
-        {
-            get { return (int)m_PriceDirectoryFee; }
-            set { m_PriceDirectoryFee = (uint)value; }
-        }
-
         public bool StipendsPremiumOnly
         {
             get { return m_StipendsPremiumOnly; }
             set { m_StipendsPremiumOnly = value; }
         }
-
-        public int ClientPort
-        {
-            get { return (int) m_ClientPort; }
-            set { m_ClientPort = (uint) value; }
-        }
-
-        public bool CanBuyCurrencyInworld
-        {
-            get { return m_CanBuyCurrencyInworld; }
-            set { m_CanBuyCurrencyInworld = value; }
-        }
-
         public bool StipendsLoadOldUsers
         {
             get { return m_StipendsLoadOldUsers; }
