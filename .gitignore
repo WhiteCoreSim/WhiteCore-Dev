@@ -62,7 +62,7 @@ addon-modules/*/
 WhiteCoreSim/bin/*.log
 WhiteCoreSim/bin/*/WhiteCore.*.dll
 WhiteCoreSim/bin/.version
-WhitecoreSim/bin/WhiteCore.*.dll
+WhiteCoreSim/bin/WhiteCore.*.dll
 WhiteCoreSim/bin/WhiteCore.*.exe
 WhiteCoreSim/bin/WhiteCore.exe
 
