@@ -782,14 +782,13 @@ namespace WhiteCore.Modules.Groups
 
             // Try root avatar first
             IScenePresence user;
-            if (m_scene.TryGetScenePresence(agentID, out user))
+            foreach (IScene scene in MainConsole.Instance.ConsoleScenes)
             {
-                if (!user.IsChildAgent)
+                if (scene.TryGetScenePresence (agentID, out user))
                 {
-                    return user.ControllingClient;
-                }
-                else
-                {
+                    if (!user.IsChildAgent)
+                        return user.ControllingClient;
+
                     child = user.ControllingClient;
                 }
             }
