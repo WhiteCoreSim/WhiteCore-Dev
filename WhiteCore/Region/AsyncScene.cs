@@ -26,6 +26,11 @@
  */
 
 
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Physics;
@@ -35,11 +40,6 @@ using WhiteCore.Framework.SceneInfo.Entities;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Other;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
-using System.Threading;
 
 namespace WhiteCore.Region
 {
@@ -47,7 +47,7 @@ namespace WhiteCore.Region
     {
         #region Fields
 
-        private readonly List<ISceneEntity> m_PhysicsReturns = new List<ISceneEntity>();
+        readonly List<ISceneEntity> m_PhysicsReturns = new List<ISceneEntity>();
 
         public List<ISceneEntity> PhysicsReturns
         {
@@ -59,7 +59,7 @@ namespace WhiteCore.Region
         /// <value>
         ///     The scene graph for this scene
         /// </value>
-        private SceneGraph m_sceneGraph;
+        SceneGraph m_sceneGraph;
 
         protected readonly ClientManager m_clientManager = new ClientManager();
 
@@ -78,7 +78,7 @@ namespace WhiteCore.Region
         protected ThreadMonitor monitor = new ThreadMonitor();
         protected ThreadMonitor physmonitor = new ThreadMonitor();
 
-        protected WhiteCoreEventManager m_WhiteCoreEventManager = null;
+        protected WhiteCoreEventManager m_WhiteCoreEventManager;
         protected EventManager m_eventManager;
 
         /// <value>
@@ -98,7 +98,7 @@ namespace WhiteCore.Region
             get { return m_WhiteCoreEventManager; }
         }
 
-        private ISceneManager m_sceneManager;
+        ISceneManager m_sceneManager;
 
         public ISceneManager SceneManager
         {
@@ -131,23 +131,22 @@ namespace WhiteCore.Region
             get { return m_frame; }
         }
 
-        private float m_basesimfps = 45f;
-        private float m_basesimphysfps = 45f;
+        float m_basesimfps = 45f;
+        float m_basesimphysfps = 45f;
 
         protected float m_updatetimespan = 0.022f;
         protected float m_physicstimespan = 0.022f;
         protected DateTime m_lastphysupdate = DateTime.UtcNow;
 
-        private const int m_update_physics = 1; //Trigger the physics update
-        private const int m_update_entities = 5; // Send prim updates for clients
-        private const int m_update_events = 1; //Trigger the OnFrame event and tell any modules about the new frame
+        const int m_update_physics = 1;             //Trigger the physics update
+        const int m_update_entities = 5;            // Send prim updates for clients
+        const int m_update_events = 1;              //Trigger the OnFrame event and tell any modules about the new frame
 
-        private const int m_update_coarse_locations = 30;
-                          //Trigger the sending of coarse location updates (minimap updates)
+        const int m_update_coarse_locations = 30;   //Trigger the sending of coarse location updates (minimap updates)
 
-        private volatile bool shuttingdown = false;
+        volatile bool shuttingdown;
 
-        private bool m_ShouldRunHeartbeat = true;
+        bool m_ShouldRunHeartbeat = true;
 
         public bool ShouldRunHeartbeat
         {
@@ -358,28 +357,27 @@ namespace WhiteCore.Region
         /// </summary>
         public void Close(bool killAgents)
         {
-            MainConsole.Instance.InfoFormat("[Scene]: Closing down region: {0}", RegionInfo.RegionName);
+            MainConsole.Instance.InfoFormat ("[Scene]: Closing down region: {0}", RegionInfo.RegionName);
 
-            SimulationDataService.Shutdown();
+            SimulationDataService.Shutdown ();
 
             if (killAgents)
             {
                 // Kick all ROOT agents with the message, 'The simulator is going down'
-                ForEachScenePresence(delegate(IScenePresence avatar)
-                                         {
-                                             if (!avatar.IsChildAgent)
-                                                 avatar.ControllingClient.Kick("The simulator is going down.");
-                                         });
+                ForEachScenePresence (delegate(IScenePresence avatar) {
+                    if (!avatar.IsChildAgent)
+                        avatar.ControllingClient.Kick ("The simulator is going down.");
+                });
 
                 //Let things process and get sent for a bit
-                Thread.Sleep(1000);
+                Thread.Sleep (1000);
 
-                IEntityTransferModule transferModule = RequestModuleInterface<IEntityTransferModule>();
+                IEntityTransferModule transferModule = RequestModuleInterface<IEntityTransferModule> ();
                 if (transferModule != null)
                 {
                     foreach (IScenePresence avatar in new List<IScenePresence>(GetScenePresences()))
                     {
-                        transferModule.IncomingCloseAgent(this, avatar.UUID);
+                        transferModule.IncomingCloseAgent (this, avatar.UUID);
                     }
                 }
             }
@@ -430,9 +428,9 @@ namespace WhiteCore.Region
 
         #region Scene Heartbeat Methods
 
-        private bool m_lastPhysicsChange = false;
+        bool m_lastPhysicsChange;
 
-        private bool PhysUpdate()
+        bool PhysUpdate()
         {
             IMonitorModule monitorModule = RequestModuleInterface<IMonitorModule>();
             IPhysicsFrameMonitor physicsFrameMonitor = monitorModule.GetMonitor<IPhysicsFrameMonitor>(this);
@@ -444,6 +442,7 @@ namespace WhiteCore.Region
             {
                 if (!ShouldRunHeartbeat) //If we arn't supposed to be running, kill ourselves
                     return false;
+                
                 int maintc = Util.EnvironmentTickCount();
                 int BeginningFrameTime = maintc;
 
@@ -494,18 +493,19 @@ namespace WhiteCore.Region
                 maintc = Util.EnvironmentTickCountSubtract(BeginningFrameTime);
                 if (maintc == 0)
                     continue;
+                
                 int getSleepTime = GetHeartbeatSleepTime(maintc, true);
                 if (getSleepTime > 0)
                     Thread.Sleep(getSleepTime);
             }
         }
 
-        private bool ApproxEquals(float a, float b, int approx)
+        bool ApproxEquals(float a, float b, int approx)
         {
             return (a - b + approx) > 0;
         }
 
-        private readonly List<Action> m_events = new List<Action>();
+        readonly List<Action> m_events = new List<Action>();
 
         public List<Action> Events
         {
@@ -518,7 +518,7 @@ namespace WhiteCore.Region
                 m_events.Add(action);
         }
 
-        private bool Update()
+        bool Update()
         {
             IMonitorModule monitorModule = RequestModuleInterface<IMonitorModule>();
             ISimFrameMonitor simFrameMonitor = monitorModule.GetMonitor<ISimFrameMonitor>(this);
@@ -643,10 +643,10 @@ namespace WhiteCore.Region
             }
         }
 
-        private readonly AveragingClass m_heartbeatList = new AveragingClass(50);
-        private readonly AveragingClass m_physheartbeatList = new AveragingClass(50);
+        readonly AveragingClass m_heartbeatList = new AveragingClass(50);
+        readonly AveragingClass m_physheartbeatList = new AveragingClass(50);
 
-        private int GetHeartbeatSleepTime(int timeBeatTook, bool phys)
+        int GetHeartbeatSleepTime(int timeBeatTook, bool phys)
         {
             if (phys)
             {
@@ -917,8 +917,8 @@ namespace WhiteCore.Region
 
         #region Startup Complete
 
-        private readonly List<string> StartupCallbacks = new List<string>();
-        private readonly List<string> StartupData = new List<string>();
+        readonly List<string> StartupCallbacks = new List<string>();
+        readonly List<string> StartupData = new List<string>();
 
         /// <summary>
         ///     Add a module to the startup queue

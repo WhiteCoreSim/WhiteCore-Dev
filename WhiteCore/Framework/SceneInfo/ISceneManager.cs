@@ -52,7 +52,7 @@ namespace WhiteCore.Framework.SceneInfo
         /// </summary>
         /// <param name="shutdownType"></param>
         /// <param name="p"></param>
-        void CloseRegion(IScene scene, ShutdownType shutdownType, int p);
+        void CloseRegion(IScene scene, ShutdownType shutdownType, int delaySecs, bool killAgents);
 
         /// <summary>
         ///     Removes and resets terrain and objects from the database
@@ -62,7 +62,7 @@ namespace WhiteCore.Framework.SceneInfo
         /// <summary>
         ///     Restart the given region
         /// </summary>
-        void RestartRegion(IScene scene);
+        void RestartRegion(IScene scene, bool killAgents);
 
         /// <summary>
         /// Creates and adds a region from supplied info.

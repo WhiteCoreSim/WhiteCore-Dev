@@ -27,14 +27,14 @@
 
 using System;
 using System.Collections.Generic;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo.Entities;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Other;
-using Nini.Config;
-using OpenMetaverse;
 
 namespace WhiteCore.Framework.SceneInfo
 {

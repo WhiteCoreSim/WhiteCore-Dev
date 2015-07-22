@@ -191,7 +191,7 @@ namespace WhiteCore.Region
             if (m_scenes.Count == 0)
                 return;
             foreach(IScene scene in new List<IScene>(m_scenes))
-                CloseRegion(scene, ShutdownType.Immediate, 0);
+                CloseRegion(scene, ShutdownType.Immediate, 0, true);
         }
 
         public void SetRegionPrompt(string region)
@@ -346,7 +346,7 @@ namespace WhiteCore.Region
 
         #region Restart a region
 
-        public void RestartRegion(IScene scene)
+        public void RestartRegion(IScene scene, bool killAgents)
         {
             m_startupTime = DateTime.Now;                           // for more meaningful startup times
             string regionName = scene.RegionInfo.RegionName;        // save current info for later
@@ -356,7 +356,7 @@ namespace WhiteCore.Region
             SetRegionPrompt("root");
 
             // close and clean up a bit
-            CloseRegion(scene, ShutdownType.Immediate, 0);
+            CloseRegion(scene, ShutdownType.Immediate, 0, killAgents);
             MainConsole.Instance.ConsoleScenes = m_scenes;
 
             // restart or die?
@@ -386,11 +386,11 @@ namespace WhiteCore.Region
         /// <param name="type"></param>
         /// <param name="seconds"></param>
         /// <returns></returns>
-        public void CloseRegion(IScene scene, ShutdownType type, int seconds)
+        public void CloseRegion(IScene scene, ShutdownType type, int delaySecs, bool killAgents)
         {
             if (type == ShutdownType.Immediate)
             {
-                scene.Close(true);
+                scene.Close(killAgents);
                 if (OnCloseScene != null)
                     OnCloseScene(scene);
                 CloseModules(scene);
@@ -398,8 +398,8 @@ namespace WhiteCore.Region
             }
             else
             {
-                Timer t = new Timer(seconds*1000); //Millisecond conversion
-                t.Elapsed += (sender, e) => CloseRegion(scene, ShutdownType.Immediate, 0);
+                Timer t = new Timer(delaySecs*1000); //Millisecond conversion
+                t.Elapsed += (sender, e) => CloseRegion(scene, ShutdownType.Immediate, 0, killAgents);
                 t.AutoReset = false;
                 t.Start();
             }
@@ -1478,7 +1478,6 @@ namespace WhiteCore.Region
 				return;
 			}
 
-//            fileName = PathHelpers.VerifyReadFile (fileName, ".oar", Constants.DEFAULT_OARARCHIVE_DIR);
             fileName = PathHelpers.VerifyReadFile (fileName, new List<string>() {".oar","tgz"}, Constants.DEFAULT_OARARCHIVE_DIR);
             if (fileName == "")                 // something wrong...
                 return;
@@ -2006,7 +2005,7 @@ namespace WhiteCore.Region
             if (loadScene.SimulationDataService.RestoreBackupFile(backupFileName, regionName))
             {
                 loadScene.RegionInfo = m_selectedDataService.LoadRegionNameInfo (regionName, m_SimBase);
-                CloseRegion(loadScene, ShutdownType.Immediate, 0);
+                CloseRegion(loadScene, ShutdownType.Immediate, 0, true);
                 MainConsole.Instance.ConsoleScenes = m_scenes;
 
                 RegionInfo region = m_selectedDataService.LoadRegionNameInfo (regionName, m_SimBase);
