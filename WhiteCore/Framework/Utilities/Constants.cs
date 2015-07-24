@@ -109,6 +109,9 @@ namespace WhiteCore.Framework.Utilities
         public const int STIPEND_PAY_INTERVAL = 1;          // number of period between payments (hours, weeks etc.)
         public const int STIPEND_RECENT_LOGIN_PERIOD = 7 * 24 * 60 * 60;    // week (of seconds)
 
-        public const int GROUP_PAYMENTS_DELAY = 15;         // minutes to wait after stipend payments before processing group payments
+        public const int SCHEDULED_PAYMENTS_DELAY = 15;     // minutes to wait after stipend payments before processing scheduled payments
+        public const int GROUP_PAYMENTS_DELAY = 30;         // minutes to wait after stipend payments before processing group payments
+        public const int DIRECTORYFEE_GRACE_PERIOD = 2;     // hours grace period before a fee will be charged at least once
+
     }
 }

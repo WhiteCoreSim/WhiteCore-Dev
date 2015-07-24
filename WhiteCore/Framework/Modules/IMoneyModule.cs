@@ -217,7 +217,7 @@ namespace WhiteCore.Framework.Modules
         bool ObjectGiveMoney(UUID objectID, string objectName, UUID fromID, UUID toID, int amount);
 
         int Balance(UUID agentID);
-        bool Charge(UUID agentID, int amount, string text, TransactionType type);
+        bool Charge(UUID agentID, int amount, string description, TransactionType type);
 
         event ObjectPaid OnObjectPaid;
 
@@ -261,10 +261,18 @@ namespace WhiteCore.Framework.Modules
 
     public interface IScheduledMoneyModule
     {
+        // duplicate these to save getting from the money module
+        int UploadCharge { get; }
+        int GroupCreationCharge { get; }
+        int DirectoryFeeCharge { get; }
+
         event UserDidNotPay OnUserDidNotPay;
         event CheckWhetherUserShouldPay OnCheckWhetherUserShouldPay;
-        bool Charge(UUID agentID, int amount, string text, int daysUntilNextCharge, TransactionType type, string identifier, bool chargeImmediately);
+        bool Charge(UUID agentID, int amount, string description, TransactionType transType, string identifier, bool chargeImmediately, bool runOnce);
         void RemoveFromScheduledCharge(string identifier);
+        void RemoveDirFeeScheduledCharge(string identifier);
+        DateTime GetStipendPaytime (int minsOffset);
+
     }
 
     public interface IBaseCurrencyConnector : IWhiteCoreDataPlugin

@@ -26,26 +26,19 @@
  */
 
 
-using WhiteCore.Framework.ConsoleFramework;
+using Nini.Config;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Other;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Timers;
 
 namespace WhiteCore.Services
 {
     public class Scheduler : ConnectorBase, IScheduleService, IService
     {
         public WhiteCoreEventManager EventManager = new WhiteCoreEventManager();
-        private ISchedulerDataPlugin m_database;
-        private bool m_enabled = false;
-
-        private readonly Timer scheduleTimer = new Timer();
+        ISchedulerDataPlugin m_database;
+//        bool m_enabled;
 
         #region Implementation of IService
 
@@ -57,7 +50,8 @@ namespace WhiteCore.Services
         public void Initialize(IConfigSource config, IRegistryCore registry)
         {
             registry.RegisterModuleInterface<IScheduleService>(this);
-            base.Init(registry, "Scheduler");
+
+            Init(registry, "Scheduler");
         }
 
         /// <summary>
@@ -77,37 +71,15 @@ namespace WhiteCore.Services
             if (!m_doRemoteCalls)
             {
                 m_database = Framework.Utilities.DataManager.RequestPlugin<ISchedulerDataPlugin>();
-                if (m_database != null)
-                    m_enabled = true;
+//                if (m_database != null)
+//                    m_enabled = true;
 
-                if (m_enabled)
-                {
-                    // don't want to start to soon
-                    scheduleTimer.Interval = 60000;
-                    scheduleTimer.Elapsed += t_Elapsed;
-                    scheduleTimer.Start();
-                }
             }
         }
 
         #endregion
 
         #region Implementation of IScheduleService
-
-        public bool Register(SchedulerItem I, OnGenericEventHandler handler)
-        {
-            if (m_doRemoteCalls) return false;
-            EventManager.RegisterEventHandler(I.FireFunction, handler);
-            return true;
-        }
-
-
-        public bool Register(string fName, OnGenericEventHandler handler)
-        {
-            if (m_doRemoteCalls) return false;
-            EventManager.RegisterEventHandler(fName, handler);
-            return true;
-        }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.High, RenamedMethod = "SchedulerSave")]
         public string Save(SchedulerItem I)
@@ -117,15 +89,26 @@ namespace WhiteCore.Services
             return m_database.SchedulerSave(I);
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.High, RenamedMethod = "SchedulerRemove")]
-        public void Remove(string id)
+        [CanBeReflected(ThreatLevel = ThreatLevel.High)]
+        public void RemoveID(string id)
         {
             if (m_doRemoteCalls)
             {
                 DoRemotePost(id);
                 return;
             }
-            m_database.SchedulerRemove(id);
+            m_database.SchedulerRemoveID(id);
+        }
+
+        [CanBeReflected(ThreatLevel = ThreatLevel.High)]
+        public void RemoveFireFunction(string identifier)
+        {
+            if (m_doRemoteCalls)
+            {
+                DoRemotePost(identifier);
+                return;
+            }
+            m_database.SchedulerRemoveFunction(identifier);
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low, RenamedMethod = "SchedulerExist")]
@@ -152,11 +135,19 @@ namespace WhiteCore.Services
             return m_database.Get(scheduleFor, fireFunction);
         }
 
+        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
+        public SchedulerItem GetFunctionItem(string fireFunction)
+        {
+            if (m_doRemoteCalls)
+                return (SchedulerItem) DoRemote(fireFunction);
+            return m_database.GetFunctionItem(fireFunction);
+        }
+
         #endregion
 
-        #region Timer
+ /*       #region Timer
 
-        private void t_Elapsed(object sender, ElapsedEventArgs e)
+        void t_Elapsed(object sender, ElapsedEventArgs e)
         {
             scheduleTimer.Enabled = false;
             try
@@ -169,7 +160,7 @@ namespace WhiteCore.Services
             }
             catch (Exception ee)
             {
-                MainConsole.Instance.ErrorFormat("[Scheduler] t_Elapsed Error {0}", ee.ToString());
+                MainConsole.Instance.ErrorFormat("[Scheduler] t_Elapsed Error {0}", ee);
             }
             finally
             {
@@ -177,18 +168,24 @@ namespace WhiteCore.Services
             }
         }
 
-        private void FireEvent(SchedulerItem I)
+        void FireEvent(SchedulerItem I)
         {
             try
             {
                 // save changes before it fires in case its changed during the fire
                 I = m_database.SaveHistory(I);
 
-                if (I.RunOnce) I.Enabled = false;
-                if (I.Enabled) I.CalculateNextRunTime(I.TimeToRun);
+                if (I.RunOnce)
+                    I.Enabled = false;
+                
+//                if (I.Enabled) I.CalculateNextRunTime(I.TimeToRun);
+                if (I.Enabled)
+                    I.TimeToRun = schedMoney.GetStipendPaytime(Constants.SCHEDULED_PAYMENTS_DELAY);      // next stipend payment cycle + delay
 
                 if (!I.HistoryKeep)
                     m_database.HistoryDeleteOld(I);
+                
+                // save the new schedule item
                 m_database.SchedulerSave(I);
 
                 // now fire
@@ -205,7 +202,7 @@ namespace WhiteCore.Services
             }
             catch (Exception e)
             {
-                MainConsole.Instance.ErrorFormat("[Scheduler] FireEvent Error {0}: {1}", I.id, e.ToString());
+                MainConsole.Instance.ErrorFormat("[Scheduler] FireEvent Error {0}: {1}", I.id, e);
             }
         }
 
@@ -215,5 +212,6 @@ namespace WhiteCore.Services
         }
 
         #endregion
+        */
     }
 }

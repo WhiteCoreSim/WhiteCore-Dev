@@ -35,6 +35,7 @@ using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.Currency
 {
@@ -517,50 +518,6 @@ namespace WhiteCore.Modules.Currency
 
         #endregion
 
-        #region helpers
-        public string TransactionTypeInfo(TransactionType transType)
-        {
-            switch (transType) {
-            // One-Time Charges
-            case TransactionType.GroupCreate:       return "Group creation fee";
-            case TransactionType.GroupJoin:         return "Group joining fee";
-            case TransactionType.UploadCharge:      return "Upload charge";
-            case TransactionType.LandAuction:       return "Land auction fee";
-            case TransactionType.ClassifiedCharge:  return "Classified advert fee";
-                // Recurrent Charges
-            case TransactionType.ParcelDirFee:      return "Parcel directory fee";
-            case TransactionType.ClassifiedRenew:   return "Classified renewal";
-            case TransactionType.ScheduledFee:      return "Scheduled fee";
-                // Inventory Transactions
-            case TransactionType.GiveInventory:     return "Give inventory";
-                // Transfers Between Users
-            case TransactionType.ObjectSale:        return "Object sale";
-            case TransactionType.Gift:              return "Gift";
-            case TransactionType.LandSale:          return "Land sale";
-            case TransactionType.ReferBonus:        return "Refer bonus";
-            case TransactionType.InvntorySale:      return "Inventory sale";
-            case TransactionType.RefundPurchase:    return "Purchase refund";
-            case TransactionType.LandPassSale:      return "Land parcel sale";
-            case TransactionType.DwellBonus:        return "Dwell bonus";
-            case TransactionType.PayObject:         return "Pay object";
-            case TransactionType.ObjectPays:        return "Object pays";
-            case TransactionType.BuyMoney:          return "Money purchase";
-            case TransactionType.MoveMoney:         return "Move money";
-                // Group Transactions
-            case TransactionType.GroupLiability:    return "Group liability";
-            case TransactionType.GroupDividend:     return "Group dividend";
-                // Event Transactions
-            case TransactionType.EventFee:          return "Event fee";
-            case TransactionType.EventPrize:        return "Event prize";
-                // Stipend Credits
-            case TransactionType.StipendPayment:    return "Stipend payment";
-
-            default:                                return "System Generated";
-            }
-        }
-
-        #endregion
-
         #region Console Methods
 
         UserAccount GetUserAccount()
@@ -709,7 +666,7 @@ namespace WhiteCore.Modules.Currency
                 transInfo = String.Format ("{0, -24}", transfer.TransferDate.ToLocalTime ());   
                 transInfo += String.Format ("{0, -25}", transfer.FromAgentName);   
                 transInfo += String.Format ("{0, -30}", transfer.Description);
-                transInfo += String.Format ("{0, -20}", TransactionTypeInfo(transfer.TransferType));
+                transInfo += String.Format ("{0, -20}", Utilities.TransactionTypeInfo(transfer.TransferType));
                 transInfo += String.Format ("{0, -12}", transfer.Amount);
                 transInfo += String.Format ("{0, -12}", transfer.ToBalance);
 

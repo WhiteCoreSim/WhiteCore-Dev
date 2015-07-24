@@ -90,31 +90,31 @@ namespace WhiteCore.Modules.Land
         /// <value>
         ///     Land objects keyed by local id
         /// </value>
-        private readonly Dictionary<int, ILandObject> m_landList = new Dictionary<int, ILandObject>();
+        readonly Dictionary<int, ILandObject> m_landList = new Dictionary<int, ILandObject>();
 
-        private readonly object m_landListLock = new object();
-        private bool UseDwell = true;
-        private bool m_TaintedLandData;
+        readonly object m_landListLock = new object();
+        bool UseDwell = true;
+        bool m_TaintedLandData;
 
-        private bool m_UpdateDirectoryOnTimer = true;
-        private bool m_UpdateDirectoryOnUpdate;
-        private Timer m_UpdateDirectoryTimer = new Timer();
+        bool m_UpdateDirectoryOnTimer = true;
+        bool m_UpdateDirectoryOnUpdate;
+        Timer m_UpdateDirectoryTimer = new Timer();
 
         public UUID GodParcelOwner { get; set; }
-        private string _godParcelOwner = "";
+        string _godParcelOwner = "";
 
         /// <value>
         ///     Local land ids at specified region co-ordinates (region size / 4)
         /// </value>
-        private int[,] m_landIDList;
+        int[,] m_landIDList;
 
-        private int m_lastLandLocalID = START_LAND_LOCAL_ID;
-        private int m_minutesBeforeTimer = 1;
+        int m_lastLandLocalID = START_LAND_LOCAL_ID;
+        int m_minutesBeforeTimer = 1;
 
         protected Dictionary<UUID, ReturnInfo> m_returns = new Dictionary<UUID, ReturnInfo>();
-        private IScene m_scene;
+        IScene m_scene;
 
-        private int m_update_land = 200;
+        int m_update_land = 200;
         //Check whether we need to rebuild the parcel prim count and other land related functions
 
         public int[,] LandIDList
@@ -241,18 +241,19 @@ namespace WhiteCore.Modules.Land
 
         #region MoneyModule pieces (for parcel directory payment)
 
-        private bool moneyModule_OnCheckWhetherUserShouldPay(UUID agentID, string paymentTextThatFailed)
+        bool moneyModule_OnCheckWhetherUserShouldPay(UUID agentID, string paymentTextThatFailed)
         {
             if (paymentTextThatFailed.StartsWith("Parcel Show in Search Fee - "))
             {
                 UUID parcelGlobalID = UUID.Parse(paymentTextThatFailed.Substring("Parcel Show in Search Fee - ".Length));
                 //Only charge if the parcel still exists
-                return GetLandObject(parcelGlobalID) != null;
+                var parcel =  GetLandObject(parcelGlobalID);
+                return parcel != null;
             }
             return true;
         }
 
-        private void moneyModule_OnUserDidNotPay(UUID agentID, string identifier, string paymentTextThatFailed)
+        void moneyModule_OnUserDidNotPay(UUID agentID, string identifier, string paymentTextThatFailed)
         {
             UUID parcelGlobalID = UUID.Parse(paymentTextThatFailed.Substring("Parcel Show in Search Fee - ".Length));
             ILandObject parcel;
@@ -264,7 +265,7 @@ namespace WhiteCore.Modules.Land
 
         #region Heartbeat Tick, Parcel Returns, Clean temp objects
 
-        private readonly HashSet<ISceneEntity> m_entitiesInAutoReturnQueue = new HashSet<ISceneEntity>();
+        readonly HashSet<ISceneEntity> m_entitiesInAutoReturnQueue = new HashSet<ISceneEntity>();
 
         /// <summary>
         ///     Return object to avatar Message
@@ -301,7 +302,7 @@ namespace WhiteCore.Modules.Land
             }
         }
 
-        private void EventManager_OnFrame()
+        void EventManager_OnFrame()
         {
             if (m_scene.Frame%m_update_land == 0)
             {
@@ -310,7 +311,7 @@ namespace WhiteCore.Modules.Land
             }
         }
 
-        private object WhiteCoreEventManager_OnGenericEvent(string FunctionName, object parameters)
+        object WhiteCoreEventManager_OnGenericEvent(string FunctionName, object parameters)
         {
             if (FunctionName == "ObjectAddedFlag")
             {
@@ -468,9 +469,9 @@ namespace WhiteCore.Modules.Land
 
         #region Parcel Add/Remove/Get/Create
 
-        private readonly Dictionary<UUID, ParcelResult> m_lastDataResults = new Dictionary<UUID, ParcelResult>();
-        private readonly Dictionary<UUID, ILandObject> m_lastLandObject = new Dictionary<UUID, ILandObject>();
-        private readonly Dictionary<UUID, int> m_lastResults = new Dictionary<UUID, int>();
+        readonly Dictionary<UUID, ParcelResult> m_lastDataResults = new Dictionary<UUID, ParcelResult>();
+        readonly Dictionary<UUID, ILandObject> m_lastLandObject = new Dictionary<UUID, ILandObject>();
+        readonly Dictionary<UUID, int> m_lastResults = new Dictionary<UUID, int>();
 
         public void UpdateLandObject(ILandObject lo)
         {
@@ -591,7 +592,7 @@ namespace WhiteCore.Modules.Land
         {
             lock (m_landListLock)
             {
-                ILandObject land = null;
+                ILandObject land;
                 m_landList.TryGetValue(parcelLocalID, out land);
                 return land;
             }
@@ -599,7 +600,14 @@ namespace WhiteCore.Modules.Land
 
         public ILandObject GetLandObject(UUID GlobalID)
         {
-            return AllParcels().FirstOrDefault(land => land.LandData.GlobalID == GlobalID);
+            var landParcels = AllParcels ();
+            foreach (var parcel in landParcels)
+                if (parcel.LandData.GlobalID == GlobalID)
+                    return parcel;
+
+            return null;
+
+//            return AllParcels().FirstOrDefault(land => land.LandData.GlobalID == GlobalID);
         }
 
         public ILandObject GetLandObject(float x, float y)
@@ -652,7 +660,7 @@ namespace WhiteCore.Modules.Land
             }
         }
 
-        private void RemoveLandObjectFromSearch(ILandObject iLandObject)
+        void RemoveLandObjectFromSearch(ILandObject iLandObject)
         {
             IDirectoryServiceConnector DSC = Framework.Utilities.DataManager.RequestPlugin<IDirectoryServiceConnector>();
             if (DSC != null)
@@ -772,7 +780,7 @@ namespace WhiteCore.Modules.Land
             } 
         }
 
-        private void SendOutNearestBanLine(IScenePresence sp, ILandObject ourLandObject)
+        void SendOutNearestBanLine(IScenePresence sp, ILandObject ourLandObject)
         {
             int multiple = 0;
             int result = 0;
@@ -819,7 +827,7 @@ namespace WhiteCore.Modules.Land
             ourLandObject.SendLandProperties(result, false, (int) dataResult, sp.ControllingClient);
         }
 
-        private void CheckEnteringNewParcel(IScenePresence avatar)
+        void CheckEnteringNewParcel(IScenePresence avatar)
         {
             ILandObject over = GetLandObject((int) avatar.AbsolutePosition.X,
                                              (int) avatar.AbsolutePosition.Y);
@@ -827,7 +835,7 @@ namespace WhiteCore.Modules.Land
             CheckEnteringNewParcel(avatar, over);
         }
 
-        private void CheckEnteringNewParcel(IScenePresence avatar, ILandObject over)
+        void CheckEnteringNewParcel(IScenePresence avatar, ILandObject over)
         {
             if (over != null)
             {
@@ -1041,7 +1049,7 @@ namespace WhiteCore.Modules.Land
         /// <param name="end_y">North Point</param>
         /// <param name="attempting_user_id">UUID of user who is trying to subdivide</param>
         /// <returns>Returns true if successful</returns>
-        private void subdivide(int start_x, int start_y, int end_x, int end_y, UUID attempting_user_id)
+        void subdivide(int start_x, int start_y, int end_x, int end_y, UUID attempting_user_id)
         {
             //First, lets loop through the points and make sure they are all in the same peice of land
             //Get the land object at start
@@ -1162,7 +1170,7 @@ namespace WhiteCore.Modules.Land
             }
         }
 
-        private void UpdateParcelBitmap(ILandObject lo)
+        void UpdateParcelBitmap(ILandObject lo)
         {
             int size = (m_scene.RegionInfo.RegionSizeX / 4) * (m_scene.RegionInfo.RegionSizeY / 4) / 8;
             if (lo.LandData.Bitmap.Length != size)
@@ -1187,7 +1195,7 @@ namespace WhiteCore.Modules.Land
             }
         }
 
-        private void MergeLandBitmaps(int masterLocalID, int slaveLocalID)
+         void MergeLandBitmaps(int masterLocalID, int slaveLocalID)
         {
             int x, y;
             for (y = 0; y < m_scene.RegionInfo.RegionSizeY/4; y++)
@@ -1210,7 +1218,7 @@ namespace WhiteCore.Modules.Land
         /// <param name="end_y">y value in second piece of land</param>
         /// <param name="attempting_user_id">UUID of the avatar trying to join the land objects</param>
         /// <returns>Returns true if successful</returns>
-        private void join(int start_x, int start_y, int end_x, int end_y, UUID attempting_user_id)
+        void join(int start_x, int start_y, int end_x, int end_y, UUID attempting_user_id)
         {
             IClientAPI client;
             m_scene.ClientManager.TryGetValue(attempting_user_id, out client);
@@ -1783,7 +1791,7 @@ namespace WhiteCore.Modules.Land
             UpdateAllParcelBitmaps();
         }
 
-        private bool SetLandBitmapFromByteArray(ILandObject parcel, bool forceSet, Vector2 offsetOfParcel)
+        bool SetLandBitmapFromByteArray(ILandObject parcel, bool forceSet, Vector2 offsetOfParcel)
         {
             int avg = (m_scene.RegionInfo.RegionSizeX*m_scene.RegionInfo.RegionSizeY/128);
             int oldParcelRegionAvg = (int) Math.Sqrt(parcel.LandData.Bitmap.Length*128);
@@ -1876,7 +1884,7 @@ namespace WhiteCore.Modules.Land
 
         #region CAPS handler
 
-        private OSDMap EventManagerOnRegisterCaps(UUID agentID, IHttpServer server)
+        OSDMap EventManagerOnRegisterCaps(UUID agentID, IHttpServer server)
         {
             OSDMap retVal = new OSDMap();
             retVal["RemoteParcelRequest"] = CapsUtil.CreateCAPS("RemoteParcelRequest", remoteParcelRequestPath);
@@ -1905,7 +1913,7 @@ namespace WhiteCore.Modules.Land
             return retVal;
         }
 
-        private byte[] ProcessParcelMediaURLFilterList(Stream request, UUID agentID)
+        byte[] ProcessParcelMediaURLFilterList(Stream request, UUID agentID)
         {
             IClientAPI client;
             if (!m_scene.ClientManager.TryGetValue(agentID, out client))
@@ -1925,7 +1933,7 @@ namespace WhiteCore.Modules.Land
             return OSDParser.SerializeLLSDXmlBytes(resp);
         }
 
-        private byte[] ProcessPropertiesUpdate(Stream request, UUID agentID)
+        byte[] ProcessPropertiesUpdate(Stream request, UUID agentID)
         {
             IClientAPI client;
             if (!m_scene.ClientManager.TryGetValue(agentID, out client))
@@ -1976,7 +1984,7 @@ namespace WhiteCore.Modules.Land
             return OSDParser.SerializeLLSDXmlBytes(new OSDMap());
         }
 
-        private byte[] RemoteParcelRequest(Stream request, UUID agentID)
+        byte[] RemoteParcelRequest(Stream request, UUID agentID)
         {
             UUID parcelID = UUID.Zero;
             try
@@ -2170,7 +2178,7 @@ namespace WhiteCore.Modules.Land
 
         #region Finding parcel point information
 
-        private Vector3? GetNearestPointInParcelAlongDirectionFromPoint(Vector3 pos, Vector3 direction,
+        Vector3? GetNearestPointInParcelAlongDirectionFromPoint(Vector3 pos, Vector3 direction,
                                                                         ILandObject parcel)
         {
             Vector3 unitDirection = Vector3.Normalize(direction);
@@ -2189,13 +2197,13 @@ namespace WhiteCore.Modules.Land
             return null;
         }
 
-        private float GetParcelDistancefromPoint(ILandObject parcel, float x, float y)
+        float GetParcelDistancefromPoint(ILandObject parcel, float x, float y)
         {
             return Vector2.Distance(new Vector2(x, y), GetParcelCenter(parcel));
         }
 
         //calculate the average center point of a parcel
-        private Vector2 GetParcelCenter(ILandObject parcel)
+        Vector2 GetParcelCenter(ILandObject parcel)
         {
             int count = 0;
             float avgx = 0;
@@ -2229,7 +2237,7 @@ namespace WhiteCore.Modules.Land
             return new Vector2(avgx, avgy);
         }
 
-        private Vector3 GetPositionAtAvatarHeightOrGroundHeight(IScenePresence avatar, float x, float y)
+        Vector3 GetPositionAtAvatarHeightOrGroundHeight(IScenePresence avatar, float x, float y)
         {
             Vector3 ground = GetPositionAtGround(x, y);
             if (avatar.AbsolutePosition.Z > ground.Z)
@@ -2239,7 +2247,7 @@ namespace WhiteCore.Modules.Land
             return ground;
         }
 
-        private Vector3 GetPositionAtGround(float x, float y)
+        Vector3 GetPositionAtGround(float x, float y)
         {
             ITerrainChannel heightmap = m_scene.RequestModuleInterface<ITerrainChannel>();
             if (heightmap == null)
@@ -2251,12 +2259,12 @@ namespace WhiteCore.Modules.Land
 
         #region Search Updates
 
-        private void EventManager_OnStartupComplete(IScene scene, List<string> data)
+        void EventManager_OnStartupComplete(IScene scene, List<string> data)
         {
             UpdateDirectoryTimerElapsed(null, null);
         }
 
-        private void UpdateDirectoryTimerElapsed(object sender, ElapsedEventArgs e)
+        void UpdateDirectoryTimerElapsed(object sender, ElapsedEventArgs e)
         {
             if (m_TaintedLandData)
             {
@@ -2265,7 +2273,7 @@ namespace WhiteCore.Modules.Land
             }
         }
 
-        private void DoSearchUpdate()
+        void DoSearchUpdate()
         {
             IDirectoryServiceConnector DSC = Framework.Utilities.DataManager.RequestPlugin<IDirectoryServiceConnector>();
             if (DSC != null)
@@ -2283,7 +2291,7 @@ namespace WhiteCore.Modules.Land
 
         #region Client Packets
 
-        private void EventManagerOnNewClient(IClientAPI client)
+        void EventManagerOnNewClient(IClientAPI client)
         {
             //Register some client events
             client.OnParcelPropertiesRequest += ClientOnParcelPropertiesRequest;
@@ -2332,7 +2340,7 @@ namespace WhiteCore.Modules.Land
             }
         }
 
-        private void client_OnGodlikeMessage(IClientAPI client, UUID requester, string Method, List<string> Parameter)
+        void client_OnGodlikeMessage(IClientAPI client, UUID requester, string Method, List<string> Parameter)
         {
             if (Method == "claimpublicland")
             {
@@ -2348,7 +2356,7 @@ namespace WhiteCore.Modules.Land
             }
         }
 
-        private void client_OnParcelGodMark(IClientAPI client, UUID agentID, int ParcelLocalID)
+        void client_OnParcelGodMark(IClientAPI client, UUID agentID, int ParcelLocalID)
         {
             if (m_scene.Permissions.IsGod(client.AgentId))
             {
@@ -2363,7 +2371,7 @@ namespace WhiteCore.Modules.Land
             }
         }
 
-        private void OnClosingClient(IClientAPI client)
+        void OnClosingClient(IClientAPI client)
         {
             client.OnParcelPropertiesRequest -= ClientOnParcelPropertiesRequest;
             client.OnParcelDivideRequest -= ClientOnParcelDivideRequest;
@@ -2390,7 +2398,7 @@ namespace WhiteCore.Modules.Land
             m_hasSentParcelOverLay.Remove(client.AgentId);
         }
 
-        private void ClientOnParcelDwellRequest(int localID, IClientAPI remoteClient)
+        void ClientOnParcelDwellRequest(int localID, IClientAPI remoteClient)
         {
             ILandObject selectedParcel = GetLandObject(localID);
             if (selectedParcel == null)
@@ -2399,7 +2407,7 @@ namespace WhiteCore.Modules.Land
             remoteClient.SendParcelDwellReply(localID, selectedParcel.LandData.GlobalID, selectedParcel.LandData.Dwell);
         }
 
-        private void ClientOnParcelInfoRequest(IClientAPI remoteClient, UUID parcelID)
+        void ClientOnParcelInfoRequest(IClientAPI remoteClient, UUID parcelID)
         {
             if (parcelID == UUID.Zero)
                 return;
@@ -2454,7 +2462,7 @@ namespace WhiteCore.Modules.Land
             UpdateLandObject(land);
         }
 
-        private void ResetRezzedObjectTime(ILandObject land)
+        void ResetRezzedObjectTime(ILandObject land)
         {
             IPrimCountModule primCount = m_scene.RequestModuleInterface<IPrimCountModule>();
             foreach (ISceneEntity sog in primCount.GetPrimCounts(land.LandData.GlobalID).Objects)

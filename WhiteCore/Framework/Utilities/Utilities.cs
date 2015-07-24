@@ -42,6 +42,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Servers;
+using WhiteCore.Framework.Modules;
 
 namespace WhiteCore.Framework.Utilities
 {
@@ -891,5 +892,49 @@ namespace WhiteCore.Framework.Utilities
             "Tindomelos", "Tourmaline", "Trali", "Tulip", "Turid", "Tuxton", "Ulfraed", "Voquo",
             "Warin", "Wilbordic", "Wilf", "Wulfwaru", "Yule"
         };
+
+
+        public static string TransactionTypeInfo(TransactionType transType)
+        {
+            switch (transType) {
+            // One-Time Charges
+            case TransactionType.GroupCreate:       return "Group creation fee";
+            case TransactionType.GroupJoin:         return "Group joining fee";
+            case TransactionType.UploadCharge:      return "Upload charge";
+            case TransactionType.LandAuction:       return "Land auction fee";
+            case TransactionType.ClassifiedCharge:  return "Classified advert fee";
+                // Recurrent Charges
+            case TransactionType.ParcelDirFee:      return "Parcel directory fee";
+            case TransactionType.ClassifiedRenew:   return "Classified renewal";
+            case TransactionType.ScheduledFee:      return "Scheduled fee";
+                // Inventory Transactions
+            case TransactionType.GiveInventory:     return "Give inventory";
+                // Transfers Between Users
+            case TransactionType.ObjectSale:        return "Object sale";
+            case TransactionType.Gift:              return "Gift";
+            case TransactionType.LandSale:          return "Land sale";
+            case TransactionType.ReferBonus:        return "Refer bonus";
+            case TransactionType.InvntorySale:      return "Inventory sale";
+            case TransactionType.RefundPurchase:    return "Purchase refund";
+            case TransactionType.LandPassSale:      return "Land parcel sale";
+            case TransactionType.DwellBonus:        return "Dwell bonus";
+            case TransactionType.PayObject:         return "Pay object";
+            case TransactionType.ObjectPays:        return "Object pays";
+            case TransactionType.BuyMoney:          return "Money purchase";
+            case TransactionType.MoveMoney:         return "Move money";
+                // Group Transactions
+            case TransactionType.GroupLiability:    return "Group liability";
+            case TransactionType.GroupDividend:     return "Group dividend";
+                // Event Transactions
+            case TransactionType.EventFee:          return "Event fee";
+            case TransactionType.EventPrize:        return "Event prize";
+                // Stipend Credits
+            case TransactionType.StipendPayment:    return "Stipend payment";
+
+            default:                                return "System Generated";
+            }
+        }
     }
+
+
 }

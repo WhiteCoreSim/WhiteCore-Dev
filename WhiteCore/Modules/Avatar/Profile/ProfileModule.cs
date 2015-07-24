@@ -257,8 +257,15 @@ namespace WhiteCore.Modules.Profiles
                 if (classcheck != null)
                     scheduledMoneyModule.RemoveFromScheduledCharge ("[Classified: " + queryClassifiedID + "]");
 
-                if (!scheduledMoneyModule.Charge (remoteClient.AgentId, queryclassifiedPrice, "Add Reoccurring Classified (" + queryClassifiedID + ")",
-                        7, TransactionType.ClassifiedCharge, "[Classified: " + queryClassifiedID + "]", true))
+                var payOK = scheduledMoneyModule.Charge (
+                                remoteClient.AgentId,                                           // who to charge
+                                queryclassifiedPrice,                                           // how much
+                                "Add Reoccurring Classified (" + queryClassifiedID + ")",       // description
+                                TransactionType.ClassifiedCharge,                               // transaction type
+                                "[Classified: " + queryClassifiedID + "]",                      // scheduler identifier
+                                true,                                                           // charger immediately
+                                false);                                                         // run once
+                if (!payOK)
                 {
                     remoteClient.SendAlertMessage ("You do not have enough money to create this classified.");
                     return;

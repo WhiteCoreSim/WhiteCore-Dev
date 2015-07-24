@@ -26,9 +26,9 @@
  */
 
 using System;
-using WhiteCore.Framework.Modules;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
+using WhiteCore.Framework.Modules;
 
 namespace WhiteCore.Framework.Utilities
 {
@@ -50,61 +50,31 @@ namespace WhiteCore.Framework.Utilities
             SimpleInitialize();
         }
 
-        public SchedulerItem(string sName, string sParams, bool runOnce, DateTime startTime, int runEvery,
-                             RepeatType runEveryType, UUID schedulefor)
+        /// <summary>
+        /// Initializes a new instance of a SchedulerItem. 
+        /// </summary>
+        /// <param name="sName">Schedule name.</param>
+        /// <param name="sParams">parameters.</param>
+        /// <param name="runOnce">If set to <c>true</c> run once.</param>
+        /// <param name="runSchedule">DateTime (utc) to run the schedule.</param>
+        /// <param name="agentID">AgentID of the schedule.</param>
+        public SchedulerItem(string sName, string sParams, bool runOnce, DateTime runSchedule, UUID agentID)
         {
             SimpleInitialize();
             FireFunction = sName;
             FireParams = sParams;
             RunOnce = runOnce;
-            RunEvery = runEvery;
-            RunEveryType = runEveryType;
-            StartTime = startTime;
-            CalculateNextRunTime(StartTime);
-            CreateTime = DateTime.UtcNow;
-            ScheduleFor = schedulefor;
+            //RunEvery = runEvery;
+            //RunEveryType = runEveryType;
+            StartTime = DateTime.Now;                   // was UtcNow; but this is all relative to the server time not UTC
+            TimeToRun = runSchedule;                    // dateTime to run this schedule
+            CreateTime = DateTime.Now;                  // was UtcNow;
+            ScheduleFor = agentID;
             Enabled = true;
         }
 
-        public void CalculateNextRunTime(DateTime fromTime)
-        {
-            TimeSpan ts = DateTime.UtcNow - fromTime;
-            if (TimeToRun > DateTime.UtcNow)
-                return;
-            // This part needs to be removed/rewritten and replaced with a basic 7 days timer - Fly 17/11/2014
-            switch (RunEveryType)
-            {
-                case RepeatType.second:
-                    TimeToRun = fromTime.AddSeconds(RunEvery);
-                    break;
-                case RepeatType.minute:
-                    TimeToRun = fromTime.AddMinutes(RunEvery*Math.Ceiling(ts.TotalMinutes/RunEvery));
-                    break;
-                case RepeatType.hours:
-                    TimeToRun = fromTime.AddHours(RunEvery*Math.Ceiling(ts.Duration().TotalHours/RunEvery));
-                    break;
-                case RepeatType.days:
-                    TimeToRun = fromTime.AddDays(RunEvery*Math.Ceiling(ts.Duration().TotalDays/RunEvery));
-                    break;
-                case RepeatType.weeks:
-                    int Week = RunEvery*7;
-                    TimeToRun = fromTime.AddDays(Week*Math.Ceiling(ts.Duration().TotalDays/Week));
-                    break;
-                case RepeatType.months:
-                    TimeToRun = fromTime.AddMonths(RunEvery);
-                    break;
-                case RepeatType.years:
-                    TimeToRun = fromTime.AddYears(RunEvery);
-                    break;
-            }
-            if (TimeToRun < DateTime.UtcNow)
-            {
-                CalculateNextRunTime(TimeToRun);
-            }
-        }
 
-
-        private void SimpleInitialize()
+        void SimpleInitialize()
         {
             id = UUID.Random().ToString();
             RunOnce = true;
