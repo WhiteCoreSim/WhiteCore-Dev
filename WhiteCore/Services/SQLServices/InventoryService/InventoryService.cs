@@ -299,7 +299,16 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                                                   return false;
                                               }))
                 CreateFolder(principalID, rootFolder.ID, (int) AssetType.CurrentOutfitFolder, "Current Outfit");
-
+            
+            // Marketplace related folders, unchecked at the moment
+            
+/*            if (!Array.Exists(sysFolders, delegate(InventoryFolderBase f)
+                                              {
+                                                  if (f.Type == (short) AssetType.MarketPlaceListingFolder) return true;
+                                                  return false;
+                                              }))
+                CreateFolder(principalID, rootFolder.ID, AssetType.MarketPlaceListingFolder(53), "Marketplace Listings");
+*/
             if (createDefaultItems && m_LibraryService != null)
             {
                 defaultItems = new List<InventoryItemBase>();

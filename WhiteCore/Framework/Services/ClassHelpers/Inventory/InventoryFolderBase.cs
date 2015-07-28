@@ -71,28 +71,32 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Inventory
         public UUID ParentID { get; set; }
 
 
-        /* Current Inventory folder types (as they do not appear to be lsited anywhere)
+        /* Current Inventory folder types (as they do not appear to be listed anywhere)
             -1  User Defined
-            0   Textures
-            1   Sounds
-            2   Calling Cards
-            3   Landmarks
-            5   Clothing
-            6   Objects
-            7   Notecards
-            8   My Inventory (OpenSimulator 0.6.x)
-            9   My Inventory ( OpenSimulator 0.7.x)
-            10  Scripts
-            13  Body Parts
-            14  Trash
-            15  Photo Album
-            16  Lost and Found
-            20  Animations
-            21  Gestures
-            22  Meshes
-            23  Favorites
-            47  Outfits
-            100 My Suitcase
+            0	Textures
+            1	Sounds
+            2	Calling Cards
+            3	Landmarks
+            5	Clothing
+            6	Objects
+            7	Notecards
+            9	My Inventory ( OpenSimulator 0.7.x / WhiteCore)
+            10	Scripts
+            13	Body Parts
+            14	Trash
+            15	Photo Album
+            16	Lost and Found
+            20	Animations
+            21	Gestures          
+            23	Favorites
+            26	ENSEMBLE Start (These are reserved for special clothing)
+            45	ENSEMBLE End (These are reserved for special clothing)
+            46	Current Outfit
+			48	My Outfits
+            50	Received Items
+            51	Merchant Outbox
+            53	Marketplace Listings
+            100	My Suitcase
         */
         public short Type { get; set; }
 
