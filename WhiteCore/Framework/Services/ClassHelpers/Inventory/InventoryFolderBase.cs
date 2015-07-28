@@ -92,7 +92,7 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Inventory
             26	ENSEMBLE Start (These are reserved for special clothing)
             45	ENSEMBLE End (These are reserved for special clothing)
             46	Current Outfit
-			48	My Outfits
+            48	My Outfits
             50	Received Items
             51	Merchant Outbox
             53	Marketplace Listings
