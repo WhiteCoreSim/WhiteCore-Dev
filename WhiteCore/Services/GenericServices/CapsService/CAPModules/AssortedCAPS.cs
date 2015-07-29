@@ -179,7 +179,7 @@ namespace WhiteCore.Services
 
             if (m_service.ClientCaps.GetRootCapsService().RegionHandle != m_service.RegionHandle)
             {
-                retVal.Add("reason", "Contacted by non-root region for teleport. Protocol implemention is wrong.");
+                retVal.Add("reason", "Contacted by non-root region for teleport. Protocol implementation is wrong.");
                 retVal.Add("success", OSD.FromBoolean(false));
                 return OSDParser.SerializeLLSDXmlBytes(retVal);
             }

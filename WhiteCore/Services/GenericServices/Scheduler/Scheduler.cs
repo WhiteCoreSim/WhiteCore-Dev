@@ -206,9 +206,9 @@ namespace WhiteCore.Services
             }
         }
 
-        public void MarkComplete(string history_id, string reciept)
+        public void MarkComplete(string history_id, string receipt)
         {
-            m_database.SaveHistoryCompleteReciept(history_id, reciept);
+            m_database.SaveHistoryCompleteReciept(history_id, receipt);
         }
 
         #endregion

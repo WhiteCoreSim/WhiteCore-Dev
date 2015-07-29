@@ -87,7 +87,7 @@ namespace WhiteCore.Services
             	IAgentInfo agent = data.GetAgent(agentID);
             	if (agent == null)
             		return MainServer.BadRequest;
-            	// Access prefs ?
+            	// Access preferences ?
             	if (rm.ContainsKey("access_prefs"))
             	{
             		OSDMap accessPrefs = (OSDMap)rm["access_prefs"];

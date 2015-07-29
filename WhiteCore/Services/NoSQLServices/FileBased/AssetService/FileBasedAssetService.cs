@@ -425,7 +425,7 @@ namespace WhiteCore.FileBasedServices.AssetService
                     //Deduplication...
                     if (duplicate)
                     {
-                        //Only set id --> asset, and not the hashcode --> data to deduplicate
+                        //Only set id --> asset, and not the hashcode --> data to de-duplicate
                         return true;
                     }
 

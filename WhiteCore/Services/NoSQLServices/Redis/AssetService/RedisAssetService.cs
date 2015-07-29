@@ -444,7 +444,7 @@ namespace WhiteCore.RedisServices.AssetService
                         MainConsole.Instance.Debug("[REDIS ASSET SERVICE]: Found duplicate asset " + asset.IDString +
                                                    " for " + asset.IDString);
 
-                    //Only set id --> asset, and not the hashcode --> data to deduplicate
+                    //Only set id --> asset, and not the hashcode --> data to de-duplicate
                     RedisEnsureConnection((conn) => conn.Set(asset.IDString, memStream.ToArray()));
                     return true;
                 }

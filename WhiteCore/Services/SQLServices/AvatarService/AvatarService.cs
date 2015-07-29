@@ -130,7 +130,7 @@ namespace WhiteCore.Services.SQLServices.AvatarService
                         loadedArchive = true;
                     }
                 }
-                if(avappearance == null)//Set as ruth
+                if(avappearance == null)//Set as Ruth
                 {
                     avappearance = new AvatarAppearance(principalID);
                     SetAppearance(principalID, avappearance);

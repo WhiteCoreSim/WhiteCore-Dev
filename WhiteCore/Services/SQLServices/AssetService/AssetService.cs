@@ -307,7 +307,7 @@ namespace WhiteCore.Services.SQLServices.AssetService
         }
 
         /// <summary>
-        /// Handles the delete asset commad.
+        /// Handles the delete asset command.
         /// </summary>
         /// <param name="scene">Scene.</param>
         /// <param name="args">Arguments.</param>

@@ -127,7 +127,7 @@ namespace WhiteCore.Services.DataService
                     grpName,                                            // Name
                     grpCharter,                                         // Charter / description
                     false,                                              // Show in list
-                    UUID.Zero, 0, false, false, false,                  // Insignia UUID, Membership fee, Open Enrolement, Allow publishing, Mature
+                    UUID.Zero, 0, false, false, false,                  // Insignia UUID, Membership fee, Open Enrollment, Allow publishing, Mature
                     grpOwnerUUID,                                       // founder UUID
                     UUID.Random ());                                    // owner role UUID
             } else
@@ -671,7 +671,7 @@ namespace WhiteCore.Services.DataService
             filter.andFilters["GroupID"] = GroupID;
             filter.andFilters["RoleID"] = RoleID;
             filter.andFilters["AgentID"] = AgentID;
-            //Make sure they arn't already in this role
+            //Make sure they aren't already in this role
             if (
                 uint.Parse(data.Query(new[] {"COUNT(AgentID)"}, "group_role_membership", filter, null, null, null)[0]) ==
                 0)

@@ -516,7 +516,7 @@ namespace WhiteCore.Services
         }
 
         /// <summary>
-        ///     Converts the inventory library skeleton into the form required by the rpc request.
+        ///     Converts the inventory library skeleton into the form required by the RPC request.
         /// </summary>
         /// <returns></returns>
         protected virtual ArrayList GetInventoryLibrary(ILibraryService library, IInventoryService inventoryService)

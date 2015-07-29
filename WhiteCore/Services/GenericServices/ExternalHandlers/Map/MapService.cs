@@ -476,7 +476,7 @@ namespace WhiteCore.Services
             return mapTexture;
         }
 
-        // From msdn
+        // From MSDN
         static ImageCodecInfo GetEncoderInfo(String mimeType)
         {
             ImageCodecInfo[] encoders = ImageCodecInfo.GetImageEncoders();

@@ -1340,7 +1340,7 @@ namespace WhiteCore.Services.SQLServices.GridService
 
                 if (r.RegionLocX + r.RegionSizeX - 1 < (region.RegionLocX - GetRegionViewSize ()) ||
                     r.RegionLocY + r.RegionSizeY - 1 < (region.RegionLocY - GetRegionViewSize ()))
-                    //Check for regions outside of the boundry (created above when checking for large regions next to us)
+                    //Check for regions outside of the boundary (created above when checking for large regions next to us)
                     return true;
 
                 return false;

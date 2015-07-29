@@ -87,7 +87,7 @@ namespace WhiteCore.Services.DataService
         }
 
         /// <summary>
-        /// Fixs missing region owners command.
+        /// Fixes missing region owners command.
         /// </summary>
         /// <param name="scene">Scene.</param>
         /// <param name="cmd">Cmd.</param>

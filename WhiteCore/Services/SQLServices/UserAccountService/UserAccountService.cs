@@ -173,7 +173,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     MainConsole.Instance.Commands.AddCommand(
                         "set user level",
                         "set user level [<first> [<last> [<level>]]]",
-                        "Set user level. If the user's level is > 0, this account will be treated as god-moded.\n" +
+                        "Set user level. If the user's level is > 0, this account will be treated as god-mode.\n" +
                         "It will also affect the 'login level' command. ",
                         HandleSetUserLevel, false, true);
 
@@ -553,7 +553,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
         public void DeleteUser(UUID userID, string name, string password, bool archiveInformation, bool wipeFromDatabase)
         {
             //if (password != "" && m_AuthenticationService.Authenticate(userID, "UserAccount", password, 0) == "")
-            //    return; //Not authed
+            //    return; //Not authenticated
 
             // ensure the system users are left alone!
             if (Utilities.IsSystemUser(userID))
@@ -823,7 +823,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             case Constants.USER_GOD_CUSTOMER_SERVICE:
                 return "Customer service";
             case Constants.USER_GOD_LIASON:
-                return "Liason";
+                return "Liaison";
             case Constants.USER_GOD_FULL:
                 return "A God";
             case Constants.USER_GOD_MAINTENANCE:
@@ -1035,14 +1035,14 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
 
             if ((email.ToLower() != "none") && !Utilities.IsValidEmail(email))
             {
-                MainConsole.Instance.Warn ("This does not look like a vaild email address. ('none' if unknown)");
+                MainConsole.Instance.Warn ("This does not look like a valid email address. ('none' if unknown)");
                 email = MainConsole.Instance.Prompt ("Email", email);
             }
 
             // Get user type (for payments etc)
             var userType = MainConsole.Instance.Prompt("User type", "Resident", userTypes);
 
-            // Get available user avatar acrchives
+            // Get available user avatar archives
             var userAvatarArchive = "";
             var avatarArchives = GetAvatarArchivesFiles ();
             if (avatarArchives.Count > 0)
@@ -1053,7 +1053,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     userAvatarArchive = "";
             }
 
-            // Allow the modifcation the UUID if required - for matching user UUID with other Grids etc eg SL
+            // Allow the modification the UUID if required - for matching user UUID with other Grids etc like SL
             uuid = UUID.Random().ToString();
             if (uuidFlag)
                 while (true)
@@ -1185,7 +1185,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             // if the user is disabled details will exist with a level set @ -2
             if (account.UserLevel < 0)
             {
-                MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: User is already diabled!");
+                MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: User is already disabled!");
                 return;
             }
 

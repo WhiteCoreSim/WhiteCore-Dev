@@ -133,7 +133,7 @@ namespace WhiteCore.Services
                 foreach (FriendInfo friend in friends)
                 {
                     if (friend.TheirFlags == -1 || friend.MyFlags == -1)
-                        continue; //Not validiated yet!
+                        continue; //Not validated yet!
                     UUID FriendToInform = UUID.Zero;
                     if (!UUID.TryParse(friend.Friend, out FriendToInform))
                         continue;
@@ -158,7 +158,7 @@ namespace WhiteCore.Services
                 foreach (FriendInfo friend in friends)
                 {
                     if (friend.TheirFlags == -1 || friend.MyFlags == -1)
-                        continue; //Not validiated yet!
+                        continue; //Not validated yet!
                     UUID FriendToInform = UUID.Zero;
                     if (!UUID.TryParse(friend.Friend, out FriendToInform))
                         continue;

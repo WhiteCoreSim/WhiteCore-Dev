@@ -77,7 +77,7 @@ namespace WhiteCore.Services
                 UUID FriendToInformID = innerMessage["FriendToInformID"].AsUUID();
                 bool NewStatus = innerMessage["NewStatus"].AsBoolean();
 
-                //Do this since IFriendsModule is a scene module, not a ISimulationBase module (not interchangable)
+                //Do this since IFriendsModule is a scene module, not a ISimulationBase module (not interchangeable)
                 ISceneManager manager = m_registry.RequestModuleInterface<ISceneManager>();
                 if (manager != null)
                 {
@@ -104,7 +104,7 @@ namespace WhiteCore.Services
                 UUID FriendToInformID = innerMessage["FriendToInformID"].AsUUID();
                 bool NewStatus = innerMessage["NewStatus"].AsBoolean();
 
-                //Do this since IFriendsModule is a scene module, not a ISimulationBase module (not interchangable)
+                //Do this since IFriendsModule is a scene module, not a ISimulationBase module (not interchangeable)
                 ISceneManager manager = m_registry.RequestModuleInterface<ISceneManager>();
                 if (manager != null)
                 {

@@ -254,7 +254,7 @@ namespace WhiteCore.Services
 
             }
 
-            // found the texture in th cache
+            // found the texture in the cache
             if (texture.Type != (sbyte) AssetType.Texture &&
                 texture.Type != (sbyte) AssetType.Unknown &&
                 texture.Type != (sbyte) AssetType.Simstate)
@@ -422,7 +422,7 @@ namespace WhiteCore.Services
             return data;
         }
 
-        // From msdn
+        // From MSDN
         static ImageCodecInfo GetEncoderInfo(String mimeType)
         {
             ImageCodecInfo[] encoders = ImageCodecInfo.GetImageEncoders();

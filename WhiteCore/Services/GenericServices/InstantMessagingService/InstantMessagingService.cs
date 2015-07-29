@@ -138,7 +138,7 @@ namespace WhiteCore.Services
 
                 if (!isOnline)
                 {
-                    //If they are going offline, actually remove from from all group chats so that the next time they log in, they will be readded
+                    //If they are going offline, actually remove from from all group chats so that the next time they log in, they will be re-added
                     foreach (GroupMembershipData gmd in m_groupData.GetAgentGroupMemberships(us, us))
                     {
                         ChatSessionMember member = FindMember(gmd.GroupID, us);
