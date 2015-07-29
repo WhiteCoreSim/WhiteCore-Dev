@@ -80,7 +80,7 @@ namespace WhiteCore.DataManager.SQLite
             string filePath = Path.GetDirectoryName (s1[0]);
             string fileName = Path.GetFileName (s1[0]);
 
-            if (filePath == "") //Only add this if we arn't an absolute path already
+            if (filePath == "") //Only add this if we aren't an absolute path already
             {
                 filePath = Util.BasePathCombine ("");
                 _connectionString = string.Format ("Data Source=file://{0}", Path.Combine (Util.BasePathCombine (""), fileName));
