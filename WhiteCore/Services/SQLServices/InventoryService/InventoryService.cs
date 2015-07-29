@@ -171,7 +171,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         public virtual bool CreateUserInventory(UUID principalID, bool createDefaultItems,
                                                 out List<InventoryItemBase> defaultItems)
         {
-            // This is braindeaad. We can't ever communicate that we fixed
+            // This is brain-dead. We can't ever communicate that we fixed
             // an existing inventory. Well, just return root folder status,
             // but check sanity anyway.
             //
@@ -302,13 +302,13 @@ namespace WhiteCore.Services.SQLServices.InventoryService
             
             // Marketplace related folders, unchecked at the moment
             
-/*            if (!Array.Exists(sysFolders, delegate(InventoryFolderBase f)
+            if (!Array.Exists(sysFolders, delegate(InventoryFolderBase f)
                                               {
-                                                  if (f.Type == (short) AssetType.MarketPlaceListingFolder) return true;
+                                                  if (f.Type == (short) AssetType.VMMListings) return true;
                                                   return false;
                                               }))
-                CreateFolder(principalID, rootFolder.ID, AssetType.MarketPlaceListingFolder(53), "Marketplace Listings");
-*/
+                CreateFolder(principalID, rootFolder.ID, (int) AssetType.VMMListings, "Marketplace Listings");
+
             if (createDefaultItems && m_LibraryService != null)
             {
                 defaultItems = new List<InventoryItemBase>();
@@ -589,7 +589,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
 
             if (invType == InventoryType.Snapshot)
                 type = AssetType.SnapshotFolder;
-            //Fix for snapshots, as they get the texture asset type, but need to get checked as snapshotfolder types
+            //Fix for snapshots, as they get the texture asset type, but need to get checked as snapshot folder types
 
             List<InventoryFolderBase> folders = m_Database.GetFolders(
                 new[] {"agentID", "type"},
@@ -615,7 +615,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
             if (remoteValue != null || m_doRemoteOnly)
                 return (InventoryCollection) remoteValue;
 
-            // This method doesn't receive a valud principal id from the
+            // This method doesn't receive a valid principal id from the
             // connector. So we disregard the principal and look
             // by ID.
             //
