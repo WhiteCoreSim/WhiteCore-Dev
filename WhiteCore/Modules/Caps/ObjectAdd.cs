@@ -140,7 +140,7 @@ namespace WhiteCore.Modules.Caps
             Vector3 scale = Vector3.Zero;
             int state = 0;
 
-            if (r.Type != OSDType.Map) // not a proper req
+            if (r.Type != OSDType.Map) // not a proper request
                 return MainServer.BadRequest;
 
             OSDMap rm = (OSDMap) r;

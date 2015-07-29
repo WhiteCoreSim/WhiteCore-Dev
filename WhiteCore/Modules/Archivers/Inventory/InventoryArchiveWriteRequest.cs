@@ -64,7 +64,7 @@ namespace WhiteCore.Modules.Archivers
         public string FilterContent { get; set; }
 
         /// <summary>
-        /// Counter for inventory items skipped due to permission filter option for passing to compltion event
+        /// Counter for inventory items skipped due to permission filter option for passing to completion event
         /// </summary>
         public int CountFiltered { get; set; }
 

@@ -193,7 +193,7 @@ namespace WhiteCore.Modules.Terrain.PaintBrushes
                         if (water[x, y] <= 0)
                             continue;
 
-                        // Step 1. Calculate average of neighbours
+                        // Step 1. Calculate average of neighbors
 
                         int neighbours = 0;
                         float altitudeTotal = 0.0f;
@@ -220,7 +220,7 @@ namespace WhiteCore.Modules.Terrain.PaintBrushes
                                 if (coords[1] < 0)
                                     continue;
 
-                                // Calculate total height of this neighbour
+                                // Calculate total height of this neighbor
                                 float altitudeNeighbour = water[coords[0], coords[1]] + map[coords[0], coords[1]];
 
                                 // If it's greater than me...
@@ -238,7 +238,7 @@ namespace WhiteCore.Modules.Terrain.PaintBrushes
 
                         float altitudeAvg = altitudeTotal/neighbours;
 
-                        // Step 2. Allocate water to neighbours.
+                        // Step 2. Allocate water to neighbors.
                         for (int j = 0; j < NEIGHBOUR_MAX; j++)
                         {
                             if (j != NEIGHBOUR_ME)
@@ -257,7 +257,7 @@ namespace WhiteCore.Modules.Terrain.PaintBrushes
                                 if (coords[1] < 0)
                                     continue;
 
-                                // Skip if we dont have water to begin with.
+                                // Skip if we don't have water to begin with.
                                 if (water[x, y] < 0)
                                     continue;
 

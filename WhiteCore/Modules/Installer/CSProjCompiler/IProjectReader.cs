@@ -20,7 +20,7 @@ namespace RunTimeCompiler
         ///     the file version.
         ///     Note!
         ///     If the call returns true it does not guaranties calls to ReadProject
-        ///     will be successfull.
+        ///     will be successful.
         /// </summary>
         /// <param name="filename">
         ///     The name of the project file. It should include

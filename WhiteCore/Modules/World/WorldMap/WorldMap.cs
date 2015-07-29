@@ -727,7 +727,7 @@ namespace WhiteCore.Modules.WorldMap
             return jpeg;
         }
 
-        // From msdn
+        // From MSDN
         static ImageCodecInfo GetEncoderInfo(String mimeType)
         {
             ImageCodecInfo[] encoders = ImageCodecInfo.GetImageEncoders();

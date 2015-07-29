@@ -132,7 +132,7 @@ namespace WhiteCore.Modules
         {
 //			List<string> regions = new List<string>(Directory.GetFiles(".", "*.sim", SearchOption.TopDirectoryOnly));
 			ReadConfig(simBase);
-			MainConsole.Instance.Info("Looking for previous sims in: "+ m_storeDirectory);
+			MainConsole.Instance.Info("Looking for previous regions in: "+ m_storeDirectory);
 			List<string> regions = new List<string>(Directory.GetFiles(m_storeDirectory, "*.sim", SearchOption.TopDirectoryOnly));
             newRegion = regions.Count == 0;
             List<string> retVals = new List<string>();
@@ -584,8 +584,8 @@ namespace WhiteCore.Modules
         /// <summary>
         /// Updates the region info, allowing for changes etc.
         /// </summary>
-        /// <param name="scene">Scene.</param>
-        /// <param name="cmds">Cmds.</param>
+        /// <param name="scene">Scene</param>
+        /// <param name="cmds">Commands</param>
         public void UpdateRegionInfo(IScene scene, string[] cmds)
         {
             if (MainConsole.Instance.ConsoleScene != null)
@@ -601,8 +601,8 @@ namespace WhiteCore.Modules
         /// <summary>
         /// Sets the region prim capacity.
         /// </summary>
-        /// <param name="scene">Scene.</param>
-        /// <param name="cmds">Cmds.</param>
+        /// <param name="scene">Scene</param>
+        /// <param name="cmds">Commands</param>
         public void UpdateRegionPrims(IScene scene, string[] cmds)
         {
             if (MainConsole.Instance.ConsoleScene == null)
@@ -626,8 +626,8 @@ namespace WhiteCore.Modules
         /// <summary>
         /// Cleanups the old region backups.
         /// </summary>
-        /// <param name="scene">Scene.</param>
-        /// <param name="cmds">Cmds.</param>
+        /// <param name="scene">Scene</param>
+        /// <param name="cmds">Commands</param>
         public void CleanupRegionBackups(IScene scene, string[] cmds)
         {
             int daysOld = m_removeArchiveDays;
@@ -810,7 +810,7 @@ namespace WhiteCore.Modules
                 m_keepOldSave = config.GetBoolean("SavePreviousBackup", m_keepOldSave);
 
                 // directories are references from the bin directory
-                // As of V0.9.2 the data is saved relative to the bin dirs
+                // As of V0.9.2 the data is saved relative to the bin dir
                 m_oldSaveDirectory =
                     PathHelpers.ComputeFullPath(config.GetString("PreviousBackupDirectory", m_oldSaveDirectory));
                 m_storeDirectory =
@@ -1060,12 +1060,12 @@ namespace WhiteCore.Modules
 
                 if (m_keepOldSave && !m_oldSaveHasBeenSaved)
                 {
-                    //Havn't moved it yet, so make sure the directory exists, then move it
+                    //Haven't moved it yet, so make sure the directory exists, then move it
                     m_oldSaveHasBeenSaved = true;
                     if (!Directory.Exists(m_oldSaveDirectory))
                         Directory.CreateDirectory(m_oldSaveDirectory);
 
-                    // need to check if backup file already exists as well (eg. save within the minute timeframe)
+                    // need to check if backup file already exists as well (e.g.. save within the minute timeframe)
                     string oldfileName = BuildOldSaveFileName ();
                     if (File.Exists(oldfileName))
                         File.Delete(oldfileName);
@@ -1090,7 +1090,7 @@ namespace WhiteCore.Modules
         string BuildSaveFileName()
         {
             //return (m_storeDirectory == "" || m_storeDirectory == "/")
-            // the'/' diretcory is valid an someone might use it to store backups so don't
+            // the'/' directory is valid an someone might use it to store backups so don't
             // fudge it to mean './' ... as it previously was...
 
             var name = BackupFile;

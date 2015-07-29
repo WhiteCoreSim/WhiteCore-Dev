@@ -116,11 +116,11 @@ namespace WhiteCore.Modules.Restart
         {
             MainConsole.Instance.Info (
                 "restart all regions  [<time (in seconds)> [<message>]]\n" +
-                "  Restart all simulator regions.\n Optionally delay <secs> displaying the <message> to users");
+                "  Restart all simulator regions.\n Optionally delay <seconds> displaying the <message> to users");
 
             MainConsole.Instance.Info (
                 "restart region  [<time (in seconds)> [<message>]]\n" +
-                "  Restart the currently selected region.\n Optionally delay <secs> displaying the <message> to users");
+                "  Restart the currently selected region.\n Optionally delay <seconds> displaying the <message> to users");
 
             MainConsole.Instance.Info (
                 "restart region abort <message>\n" +

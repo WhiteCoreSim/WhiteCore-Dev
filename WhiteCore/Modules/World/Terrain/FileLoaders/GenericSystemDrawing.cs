@@ -78,7 +78,7 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
             int yoffset = h*(fileHeight - y);
 
             MainConsole.Instance.DebugFormat(
-                "[TERRAIN]: Loading tile {0},{1} (offset {2},{3}) from tilemap size of {4},{5}",
+                "[TERRAIN]: Loading tile {0},{1} (offset {2},{3}) from tile-map size of {4},{5}",
                 x, y, xoffset, yoffset, fileWidth, fileHeight);
 
             Rectangle tileRect = new Rectangle(xoffset, yoffset, w, h);
@@ -179,7 +179,7 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
             {
                 for (int x = 0; x < map.Width; x++)
                 {
-                    // 512 is the largest possible height before colours clamp
+                    // 512 is the largest possible height before colors clamp
                     int colorindex = (int) (Math.Max(Math.Min(1.0, map[x, y]/128.0), 0.0)*(pallete - 1));
 
                     // Handle error conditions
@@ -193,11 +193,11 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
         }
 
         /// <summary>
-        ///     Protected method, generates a coloured bitmap
+        ///     Protected method, generates a colored bitmap
         ///     image from a specified terrain channel.
         /// </summary>
         /// <param name="map">The terrain channel to export to bitmap</param>
-        /// <returns>A System.Drawing.Bitmap containing a coloured image</returns>
+        /// <returns>A System.Drawing.Bitmap containing a colored image</returns>
         protected static Bitmap CreateBitmapFromMap(ITerrainChannel map)
         {
             Bitmap gradientmapLd = new Bitmap("defaultstripe.png");
@@ -216,7 +216,7 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
             {
                 for (int x = 0; x < map.Width; x++)
                 {
-                    // 512 is the largest possible height before colours clamp
+                    // 512 is the largest possible height before colors clamp
                     int colorindex = (int) (Math.Max(Math.Min(1.0, map[x, y]/512.0), 0.0)*(pallete - 1));
 
                     // Handle error conditions

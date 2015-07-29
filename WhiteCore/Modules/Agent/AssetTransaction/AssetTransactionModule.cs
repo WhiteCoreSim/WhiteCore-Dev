@@ -175,7 +175,7 @@ namespace WhiteCore.Modules.Agent.AssetTransaction
         /// <summary>
         ///     Update an inventory item with data that has been received through a transaction.
         ///     This is called when clothing or body parts are updated (for instance, with new textures or
-        ///     colours).  It may also be called in other situations.
+        ///     colors).  It may also be called in other situations.
         /// </summary>
         /// <param name="remoteClient"></param>
         /// <param name="transactionID"></param>

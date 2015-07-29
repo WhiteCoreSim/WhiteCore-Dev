@@ -82,13 +82,13 @@ namespace WhiteCore.Modules.Startup
             	MainConsole.Instance.Commands.AddCommand(
                     "disable backup",
                     "disable backup",
-                    "Disables persistance until re-enabled", 
+                    "Disables persistence until re-enabled", 
                     DisableBackup, true, false);
                 
             	MainConsole.Instance.Commands.AddCommand(
                     "enable backup",
                     "enable backup",
-                    "Enables persistance after 'disable backup' has been run",
+                    "Enables persistence after 'disable backup' has been run",
                     EnableBackup, true, false);
             }
             //Set up the backup for the scene

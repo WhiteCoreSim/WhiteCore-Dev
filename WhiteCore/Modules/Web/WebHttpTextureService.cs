@@ -134,7 +134,7 @@ namespace WhiteCore.Modules.Web
             return newsize;
         }
 
-        // From msdn
+        // From MSDN
         private static ImageCodecInfo GetEncoderInfo(String mimeType)
         {
             ImageCodecInfo[] encoders;

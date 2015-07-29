@@ -40,7 +40,7 @@ using System.Xml;
 namespace WhiteCore.Modules.Archivers
 {
     /// <summary>
-    ///     Dearchives assets
+    ///     De-archives assets
     /// </summary>
     public class AssetsDearchiver
     {
@@ -52,7 +52,7 @@ namespace WhiteCore.Modules.Archivers
         protected Dictionary<string, byte[]> m_assetDataAwaitingMetadata = new Dictionary<string, byte[]>();
 
         /// <summary>
-        ///     Cache to which dearchived assets will be added
+        ///     Cache to which de-archived assets will be added
         /// </summary>
         protected IAssetService m_cache;
 
@@ -67,7 +67,7 @@ namespace WhiteCore.Modules.Archivers
         }
 
         /// <summary>
-        ///     Add asset data to the dearchiver
+        ///     Add asset data to the de-archiver
         /// </summary>
         /// <param name="assetFilename"></param>
         /// <param name="data"></param>
@@ -163,7 +163,7 @@ namespace WhiteCore.Modules.Archivers
             else
             {
                 MainConsole.Instance.ErrorFormat(
-                    "[DEARCHIVER]: Tried to dearchive data with filename {0} without any corresponding metadata",
+                    "[DEARCHIVER]: Tried to de-archive data with filename {0} without any corresponding metadata",
                     assetPath);
             }
         }

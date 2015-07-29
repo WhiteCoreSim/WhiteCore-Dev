@@ -111,7 +111,7 @@ namespace WhiteCore.Modules.Archivers
             m_loadStream = new GZipStream(str, CompressionMode.Decompress);
             m_overridecreator = overwriteCreator;
 
-            // we will need thse at some time
+            // we will need these at some time
             m_assetService = m_registry.RequestModuleInterface<IAssetService>();
             m_assetData = Framework.Utilities.DataManager.RequestPlugin<IAssetDataPlugin>();
             m_inventoryService = m_registry.RequestModuleInterface<IInventoryService> ();

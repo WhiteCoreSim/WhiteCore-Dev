@@ -114,7 +114,7 @@ namespace WhiteCore.Modules.Land
 
             m_parcelManagementModule = scene.RequestModuleInterface<IParcelManagementModule> ();
 
-            //We don't set up the InfoID here... it will just be overwriten
+            //We don't set up the InfoID here... it will just be overwritten
         }
 
         // this is needed for non-convex parcels (example: rectangular parcel, and in the exact center

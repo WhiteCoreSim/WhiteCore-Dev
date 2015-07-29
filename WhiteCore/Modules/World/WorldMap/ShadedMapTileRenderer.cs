@@ -79,7 +79,7 @@ namespace WhiteCore.Modules.WorldMap
             {
                 for (int y = 0; y < m_scene.RegionInfo.RegionSizeY; y++)
                 {
-                    // Y flip the cordinates for the bitmap: hf origin is lower left, bm origin is upper left
+                    // Y flip the coordinates for the bitmap: hf origin is lower left, bm origin is upper left
                     int yr = (m_scene.RegionInfo.RegionSizeY - 1) - y;
 
                     float heightvalue = heightmap[x, y];

@@ -642,7 +642,7 @@ namespace WhiteCore.Modules.Combat
                             HasLeftCombat = true;
                             Timer t = new Timer
                                           {Interval = m_combatModule.m_SecondsBeforeRespawn*1000, AutoReset = false};
-                            //Use this to reenable movement and combat
+                            //Use this to re-enable movement and combat
                             //Only once
                             t.Elapsed += respawn_Elapsed;
                             t.Start();

@@ -58,8 +58,8 @@ namespace RunTimeCompiler
             //the project or use an other IProjectReader if the current version
             //of .csproj is unknown to CsprojReader.
 
-            //Get the appropiate reader for the filetype.
-            //As filetype is always .csproj i'll just use CsprojReader.
+            //Get the appropriate reader for the filetype.
+            //As filetype is always .csproj I'll just use CsprojReader.
             CsprojReader reader = new CsprojReader();
             //TODO: Decide if this is needed. ReadProject should only be called after CanOpen, 
             //so I may not need to check it again.

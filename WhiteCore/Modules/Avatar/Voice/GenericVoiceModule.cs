@@ -111,7 +111,7 @@ namespace WhiteCore.Modules.Voice
         #endregion
 
         // OnRegisterCaps is invoked via the scene.EventManager
-        // everytime WhiteCore hands out capabilities to a client
+        // every time WhiteCore hands out capabilities to a client
         // (login, region crossing). We contribute two capabilities to
         // the set of capabilities handed back to the client:
         // ProvisionVoiceAccountRequest and ParcelVoiceInfoRequest.

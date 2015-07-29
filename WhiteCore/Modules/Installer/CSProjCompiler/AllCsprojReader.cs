@@ -320,7 +320,7 @@ namespace RunTimeCompiler
             string configuration = string.Empty;
             string platform = string.Empty;
             XmlNode crtConfigurationNode;
-            //Get Configuration and Platform as these willl be needed to get
+            //Get Configuration and Platform as these will be needed to get
             //the active configuration.
             configuration = GetPropertyValue(doc, mgr, "Configuration");
             platform = GetPropertyValue(doc, mgr, "Platform");

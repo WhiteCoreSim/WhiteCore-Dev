@@ -84,7 +84,7 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
 
                 // if our region isn't the first X section of the areas to be landscaped, then
                 // advance the stream to the X start pos of our section in the file
-                // i.e. eat X upto where we start
+                // i.e. eat X up to where we start
                 while (currFileXOffset < offsetX)
                 {
                     bs.ReadBytes(sectionWidth*13);

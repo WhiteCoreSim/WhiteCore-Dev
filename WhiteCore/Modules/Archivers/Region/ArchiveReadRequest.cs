@@ -152,11 +152,11 @@ namespace WhiteCore.Modules.Archivers
         }
 
         /// <summary>
-        ///     Dearchive the region embodied in this request.
+        ///     De-archive the region embodied in this request.
         /// </summary>
         public bool DearchiveRegion()
         {
-            // The same code can handle dearchiving 0.1 and 0.2 OpenSim Archive versions
+            // The same code can handle de-archiving 0.1 and 0.2 OpenSim Archive versions
             return DearchiveRegion0DotStar();
         }
 
@@ -209,7 +209,7 @@ namespace WhiteCore.Modules.Archivers
             List<ISceneEntity> groupsToBackup = new List<ISceneEntity>();
             List<LandData> landData = new List<LandData>();
 
-            // must save off some stuff until after assets have been saved and recieved new uuids
+            // must save off some stuff until after assets have been saved and received new uuids
             // keeping these collection local because I am sure they will get large and garbage collection is better that way
             List<byte[]> seneObjectGroups = new List<byte[]>();
             Dictionary<UUID, UUID> assetBinaryChangeRecord = new Dictionary<UUID, UUID>();
@@ -696,7 +696,7 @@ namespace WhiteCore.Modules.Archivers
                 return true;
             }
             MainConsole.Instance.ErrorFormat(
-                "[ARCHIVER]: Tried to dearchive data with path {0} with an unknown type extension {1}",
+                "[ARCHIVER]: Tried to de-archive data with path {0} with an unknown type extension {1}",
                 assetPath, extension);
             asset = null;
             return false;

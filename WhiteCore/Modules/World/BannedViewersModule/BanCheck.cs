@@ -504,7 +504,7 @@ namespace WhiteCore.Modules.Ban
             }
             else if (GrieferAllowLevel == AllowLevel.AllowSuspected)
             {
-                //Block all alts of knowns, and suspected alts of knowns
+                //Block all alts of known, and suspected alts of known
                 if ((info.Flags & PresenceInfo.PresenceInfoFlags.Known) == PresenceInfo.PresenceInfoFlags.Known ||
                     (info.Flags & PresenceInfo.PresenceInfoFlags.SuspectedAltAccountOfKnown) ==
                     PresenceInfo.PresenceInfoFlags.SuspectedAltAccountOfKnown ||

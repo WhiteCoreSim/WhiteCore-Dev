@@ -460,14 +460,14 @@ namespace WhiteCore.Modules.Attachments
                     objatt.SetFromItemID(itemID, assetID);
 
                     //DO NOT SEND THIS KILL ENTITY
-                    // If we send this, when someone copies an inworld object, then wears it, the inworld objects disapepars
+                    // If we send this, when someone copies an inworld object, then wears it, the inworld objects disappears
                     // If a bug is caused by this, we need to figure out some other workaround.
                     //SendKillEntity(objatt.RootChild);
                     //We also have to reset the IDs so that it doesn't have the same IDs as one inworld (possibly)!
                     ISceneEntity[] atts = GetAttachmentsForAvatar(remoteClient.AgentId);
                     foreach (var obj in atts)
                         if (obj.UUID == objatt.UUID)
-                            updateUUIDs = false; //If the user is already wearing it, don't readd
+                            updateUUIDs = false; //If the user is already wearing it, don't re-add
                     bool forceUpdateOnNextDeattach = false;
                     try
                     {
@@ -715,12 +715,12 @@ namespace WhiteCore.Modules.Attachments
         /// <param name="group">The group (SceneObjectGroup) that is being attached</param>
         /// <param name="AttachmentPt">The point to where the attachment will go</param>
         /// <param name="assetID" />
-        /// <param name="forceUpdatePrim">Force updating of the prim the next time the user attempts to deattach it</param>
+        /// <param name="forceUpdatePrim">Force updating of the prim the next time the user attempts to detach it</param>
         /// <param name="isTempAttach">Is a temporary attachment</param>
         protected void FindAttachmentPoint(IClientAPI remoteClient, uint localID, ISceneEntity group,
                                            int AttachmentPt, UUID assetID, bool forceUpdatePrim, bool isTempAttach)
         {
-            //Make sure that we arn't over the limit of attachments
+            //Make sure that we aren't over the limit of attachments
             ISceneEntity[] attachments = GetAttachmentsForAvatar(remoteClient.AgentId);
             if (attachments.Length + 1 > m_maxNumberOfAttachments)
             {
@@ -742,7 +742,7 @@ namespace WhiteCore.Modules.Attachments
             // If the attachment point isn't the same as the one previously used
             // set it's offset position = 0 so that it appears on the attachment point
             // and not in a weird location somewhere unknown.
-            //Simplier terms: the attachment point changed, set it to the default 0,0,0 location
+            //Simpler terms: the attachment point changed, set it to the default 0,0,0 location
             if (AttachmentPt != 0 && AttachmentPt != (group.GetAttachmentPoint() & 0x7f))
             {
                 attachPos = Vector3.Zero;

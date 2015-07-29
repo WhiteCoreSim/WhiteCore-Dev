@@ -247,7 +247,7 @@ namespace WhiteCore.Modules.Groups
                     if (!money.Charge(GetRequestingAgentID(remoteClient), money.GroupCreationCharge, "Group Creation", TransactionType.GroupCreate))
                     {
                         remoteClient.SendCreateGroupReply(UUID.Zero, false,
-                                                          "You have got insuficient funds to create a group.");
+                                                          "You have got insufficient funds to create a group.");
                         return UUID.Zero;
                     }
                 }
@@ -263,7 +263,7 @@ namespace WhiteCore.Modules.Groups
                                                     insigniaID, membershipFee, openEnrollment, allowPublish,
                                                     maturePublish, GetRequestingAgentID(remoteClient), UUID.Random());
 
-            remoteClient.SendCreateGroupReply(groupID, true, "Group created successfullly");
+            remoteClient.SendCreateGroupReply(groupID, true, "Group created successfully");
             m_cachedGroupTitles[remoteClient.AgentId] =
                 AttemptFindGroupMembershipData(remoteClient.AgentId, remoteClient.AgentId, groupID);
             m_cachedGroupMemberships.Remove(remoteClient.AgentId);

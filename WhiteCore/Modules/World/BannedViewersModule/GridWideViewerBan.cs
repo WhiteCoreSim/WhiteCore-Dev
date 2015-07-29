@@ -105,7 +105,7 @@ namespace WhiteCore.Modules.Ban
                 if (m_map == null)
                     return; //Can't find it
 
-                //This is the givaway texture!
+                //This is the giveaway texture!
                 for (int i = 0; i < textureEntry.FaceTextures.Length; i++)
                 {
                     if (textureEntry.FaceTextures[i] != null)

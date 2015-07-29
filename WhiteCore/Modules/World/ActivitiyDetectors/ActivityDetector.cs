@@ -85,7 +85,7 @@ namespace WhiteCore.Modules.ActivityDetectors
             {
                 m_presenceUpdateTimer = new Timer {Interval = 1000*60*28};
                 //As agents move around, they could get to regions that won't update them in time, so we cut 
-                // the time in half, and then a bit less so that they are updated consistantly
+                // the time in half, and then a bit less so that they are updated consistently
                 m_presenceUpdateTimer.Elapsed += m_presenceUpdateTimer_Elapsed;
                 m_presenceUpdateTimer.Start();
             }

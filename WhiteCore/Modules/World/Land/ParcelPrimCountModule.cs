@@ -65,7 +65,7 @@ namespace WhiteCore.Modules.Land
         private readonly Dictionary<UUID, int> m_SimwideCounts =
             new Dictionary<UUID, int>();
 
-        // For now, a simple simwide taint to get this up. Later parcel based
+        // For now, a simple sim-wide taint to get this up. Later parcel based
         // taint to allow recounting a parcel if only ownership has changed
         // without recounting the whole sim.
         private readonly Object m_TaintLock = new Object();

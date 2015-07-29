@@ -191,7 +191,7 @@ namespace WhiteCore.Modules.Selection
                         prim.ParentEntity.IsSelected = true;
                     }
                 }
-                //Check for avies! They arn't prims!
+                //Check for avatars! They aren't prims!
                 if (scene.GetScenePresence(primLocalID) != null)
                     continue;
 
@@ -226,7 +226,7 @@ namespace WhiteCore.Modules.Selection
         }
 
         /// <summary>
-        ///     Handle the deselection of a prim from the client.
+        ///     Handle the de-selection of a prim from the client.
         /// </summary>
         /// <param name="primLocalID"></param>
         /// <param name="remoteClient"></param>
@@ -382,7 +382,7 @@ namespace WhiteCore.Modules.Selection
                     return;
 
                 ISceneChildEntity SOP = m_SelectedUUID;
-                if (SOP == null) //This IS nesessary, this is how we can clear this out
+                if (SOP == null) //This IS necessary, this is how we can clear this out
                 {
                     IsSelecting = false;
                     return;

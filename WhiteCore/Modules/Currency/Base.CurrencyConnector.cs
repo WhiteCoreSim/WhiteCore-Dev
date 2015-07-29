@@ -276,7 +276,7 @@ namespace WhiteCore.Modules.Currency
             if (fromAgentID != UUID.Zero)
                 filter.andFilters["FromPrincipalID"] = fromAgentID;
 
-            // back to utc please...
+            // back to UTC please...
             dateStart = dateStart.ToUniversalTime ();
             dateEnd = dateEnd.ToUniversalTime ();
 
@@ -349,7 +349,7 @@ namespace WhiteCore.Modules.Currency
             if (UserID != UUID.Zero)
                 filter.andFilters["PrincipalID"] = UserID;
 
-            // back to utc please...
+            // back to UTC please...
             dateStart = dateStart.ToUniversalTime ();
             dateEnd = dateEnd.ToUniversalTime ();
 

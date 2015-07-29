@@ -417,7 +417,7 @@ namespace WhiteCore.Modules.WorldMap
                 // Are we dealing with a sculptie or mesh?
                 if (omvPrim.Sculpt != null && omvPrim.Sculpt.SculptTexture != UUID.Zero)
                 {
-                    // Try fetchinng the asset
+                    // Try fetching the asset
                     byte[] sculptAsset = m_scene.AssetService.GetData(omvPrim.Sculpt.SculptTexture.ToString());
                     if (sculptAsset != null)
                     {
@@ -807,7 +807,7 @@ namespace WhiteCore.Modules.WorldMap
         /// <param name="v11">Fourth, or bottom right value</param>
         /// <param name="xPercent">Interpolation value on the X axis, between 0.0 and 1.0</param>
         /// <param name="yPercent">Interpolation value on the Y axis, between 0.0 and 1.0</param>
-        /// <returns>The bilinearly interpolated result</returns>
+        /// <returns>The bilinear interpolated result</returns>
         public static float Bilinear(float v00, float v01, float v10, float v11, float xPercent, float yPercent)
         {
             return Utils.Lerp(Utils.Lerp(v00, v01, xPercent), Utils.Lerp(v10, v11, xPercent), yPercent);

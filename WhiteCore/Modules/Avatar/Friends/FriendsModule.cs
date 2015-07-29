@@ -109,7 +109,7 @@ namespace WhiteCore.Modules.Friends
                 return;
             }
 
-            MainConsole.Instance.ErrorFormat ("[FriendsModule]: Could not send status update to non-existant client {0}.", 
+            MainConsole.Instance.ErrorFormat ("[FriendsModule]: Could not send status update to non-existent client {0}.", 
                 FriendToInformID);
 
         }

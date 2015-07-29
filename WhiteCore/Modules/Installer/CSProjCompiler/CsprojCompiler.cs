@@ -86,7 +86,7 @@ namespace RunTimeCompiler
         /// <returns></returns>
         private string[] GetReferences(BasicProject project)
         {
-            //TODO: Correct this code as the name of the file is not guaranted to be +".dll"!
+            //TODO: Correct this code as the name of the file is not guaranteed to be +".dll"!
             string[] resources = new string[project.References.Count];
             for (int i = 0; i < project.References.Count; i++)
             {

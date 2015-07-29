@@ -957,7 +957,7 @@ textures 1
                     // the avatar finishes updating its appearance
                     SendAppearanceToAllOtherAgents();
 
-                    // This agent just became roo t. We are going to tell everyone about it. The process of
+                    // This agent just became root. We are going to tell everyone about it. The process of
                     // getting other avatars information was initiated in the constructor... don't do it 
                     // again here... 
                     SendAvatarDataToAllAgents(true);

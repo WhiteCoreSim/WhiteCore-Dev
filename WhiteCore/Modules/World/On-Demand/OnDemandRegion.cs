@@ -132,7 +132,7 @@ namespace WhiteCore.Modules.OnDemand
                 if (m_zombieAgents.Contains(presence.UUID))
                 {
                     m_zombieAgents.Remove(presence.UUID);
-                    return; //It'll be readding an agent, don't kill the sim immediately
+                    return; //It'll be reading an agent, don't kill the sim immediately
                 }
                 //If all clients are out of the region, we can close it again
                 if (m_scene.RegionInfo.Startup == StartupType.Medium)

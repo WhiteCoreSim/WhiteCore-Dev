@@ -264,11 +264,11 @@ namespace WhiteCore.Modules.Wind
         /// </summary>
         private void HandleConsoleParamCommand(IScene scene, string[] cmdparams)
         {
-            // wind <plugin> <param> [value]
+            // wind <plugin> <parameter> [value]
             if ((cmdparams.Length != 4)
                 && (cmdparams.Length != 3))
             {
-                MainConsole.Instance.Info("[WIND] Usage: wind <plugin> <param> [value]");
+                MainConsole.Instance.Info("[WIND] Usage: wind <plugin> <parameter> [value]");
                 return;
             }
 

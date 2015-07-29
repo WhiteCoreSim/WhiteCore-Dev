@@ -211,7 +211,7 @@ namespace WhiteCore.Modules.Sound
             if (parcelManagement != null)
             {
                 ILO = parcelManagement.GetLandObject(position.X, position.Y);
-                if (ILO != null) //Check only if null, otherwise this breaks megaregions
+                if (ILO != null) //Check only if null, otherwise this breaks mega-regions
                     LocalOnly = (ILO.LandData.Flags & (uint) ParcelFlags.SoundLocal) == (uint) ParcelFlags.SoundLocal;
             }
             ISceneChildEntity part = m_scene.GetSceneObjectPart(objectID);

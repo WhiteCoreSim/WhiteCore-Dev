@@ -66,7 +66,7 @@ using System.Text.RegularExpressions;
  * digest, with a list of recent messages by UUID.  This can
  * be used to prevent in-world repeater loops.  However, the
  * linden functions do not have this capability, so for now
- * thats the way it works.
+ * that's the way it works.
  * Instead it blocks messages originating from the same prim.
  * (not Object!)
  *
@@ -294,7 +294,7 @@ namespace WhiteCore.Modules.Scripting
         /// <summary>
         ///     Are there any listen events ready to be dispatched?
         /// </summary>
-        /// <returns>boolean indication</returns>
+        /// <returns>Boolean indication</returns>
         public bool HasMessages()
         {
             return m_pending.Count != 0;

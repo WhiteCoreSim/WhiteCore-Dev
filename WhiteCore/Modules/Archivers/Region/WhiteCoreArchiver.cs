@@ -124,7 +124,7 @@ namespace WhiteCore.Modules.Archivers
                     "Loads a WhiteCore '.abackupArchive",
                     LoadWhiteCoreArchive, true, false);
             }
-            //Register the extention
+            //Register the extension
             const string ext = ".abackup";
             try
             {
@@ -157,7 +157,7 @@ namespace WhiteCore.Modules.Archivers
             string fileName = MainConsole.Instance.Prompt("What file name should we load?",
                                                           scene.RegionInfo.RegionName + ".abackup");
 
-            // a couple of sanity checkes
+            // a couple of sanity checks
             string extension = Path.GetExtension (fileName);
 
             if (extension == string.Empty)

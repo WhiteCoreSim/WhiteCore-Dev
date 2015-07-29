@@ -75,7 +75,7 @@ namespace WhiteCore.Modules.Currency
         // - Are the parcels in Search ?
         // - Yes, make a GroupLiability Task for each of the Parcels (Amount comes out of INI -> PriceDirectoryFee)
         // - Check if there's money in the Group
-        // - If there's money already there, substract the money by calling the Tasks
+        // - If there's money already there, subtract the money by calling the Tasks
         // - If there's no money, check which users have the "Accountability" role task and pull money from their accounts
         // into the group so the payments can be done
 

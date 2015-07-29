@@ -150,7 +150,7 @@ namespace WhiteCore.Modules.Monitoring
                     sb[i] = new SimStatsPacket.StatBlock();
                 }
 
-                //As we arn't a scene, we add all of the monitors that do not need the scene and run for the entire instance
+                //As we aren't a scene, we add all of the monitors that do not need the scene and run for the entire instance
                 AddDefaultMonitors();
             }
 
@@ -363,7 +363,7 @@ namespace WhiteCore.Modules.Monitoring
             public byte[] StatsPage(string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
             {
                 // If request was for a specific monitor
-                // eg url/?monitor=Monitor.Name
+                // e.g. url/?monitor=Monitor.Name
                 if (httpRequest.QueryString.Get("monitor") != null)
                 {
                     string monID = httpRequest.QueryString.Get("monitor");

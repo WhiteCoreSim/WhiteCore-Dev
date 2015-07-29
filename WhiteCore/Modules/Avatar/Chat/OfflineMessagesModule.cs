@@ -93,7 +93,7 @@ namespace WhiteCore.Modules.Chat
                     m_Scene = null;
 
                     MainConsole.Instance.Error(
-                        "[OFFLINE MESSAGING] No message transfer module or OfflineMessagesConnector is enabled. Diabling offline messages");
+                        "[OFFLINE MESSAGING] No message transfer module or OfflineMessagesConnector is enabled. Disabling offline messages");
                     return;
                 }
                 m_TransferModule.OnUndeliveredMessage += UndeliveredMessage;

@@ -209,7 +209,7 @@ namespace WhiteCore.Modules.Chat
                     {
                         isGod = true;
 
-                        // add to authorised users
+                        // add to authorized users
                         if (!m_authorizedSpeakers.Contains (c.SenderUUID))
                             m_authorizedSpeakers.Add (c.SenderUUID);
 
@@ -217,7 +217,7 @@ namespace WhiteCore.Modules.Chat
                             m_authList.Add (c.SenderUUID);
                     }
 
-                    //Check that the agent is allowed to speak in this reigon
+                    //Check that the agent is allowed to speak in this region
                     if (!m_authorizedSpeakers.Contains(c.SenderUUID))
                     {
                         //They can't talk, so block it
@@ -290,7 +290,7 @@ namespace WhiteCore.Modules.Chat
                                                       UUID.Zero, "WhiteCoreChat", ChatTypeEnum.Region, "Chat allowed.",
                                                       ChatSourceType.System, -1);
                     }
-                    //Remove speaking priviledges from an individual
+                    //Remove speaking privileges from an individual
                     if (message[1] == "RevokeSpeakingRights")
                     {
                         IScenePresence NewSP;

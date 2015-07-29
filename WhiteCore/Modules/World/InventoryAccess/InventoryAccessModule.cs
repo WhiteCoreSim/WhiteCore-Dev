@@ -482,7 +482,7 @@ namespace WhiteCore.Modules.InventoryAccess
                         item.EveryOnePermissions = group.RootChild.EveryoneMask & group.RootChild.NextOwnerMask;
                         item.GroupPermissions = group.RootChild.GroupMask & group.RootChild.NextOwnerMask;
 
-                        // Magic number badness. Maybe this deserves an enum.
+                        // Magic number badness. Maybe this deserves an Enum.
                         // bit 4 (16) is the "Slam" bit, it means treat as passed
                         // and apply next owner perms on rez
                         item.CurrentPermissions |= 16; // Slam!

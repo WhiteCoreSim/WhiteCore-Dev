@@ -71,7 +71,7 @@ namespace WhiteCore.Modules.Terrain.PaintBrushes
                         if (!map.Scene.Permissions.CanTerraformLand(userID, new Vector3(x, y, 0)))
                             continue;
 
-                        // Calculate a sphere and add it to the heighmap
+                        // Calculate a sphere and add it to the heightmap
                         float z = 0;
                         if (duration < 4.0)
                             z = TerrainUtil.SphericalFactor(x, y, rx, ry, strength)*duration*0.25f;

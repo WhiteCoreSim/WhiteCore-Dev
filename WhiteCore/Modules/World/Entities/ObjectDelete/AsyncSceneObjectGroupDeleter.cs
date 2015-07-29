@@ -52,7 +52,7 @@ namespace WhiteCore.Modules.Entities.ObjectDelete
     }
 
     /// <summary>
-    ///     Asynchronously derez objects.  This is used to derez large number of objects to inventory without holding
+    ///     Asynchronously de-rez objects.  This is used to de-rez large number of objects to inventory without holding
     ///     up the main client thread.
     /// </summary>
     public class AsyncSceneObjectGroupDeleter : INonSharedRegionModule, IAsyncSceneObjectGroupDeleter
@@ -63,7 +63,7 @@ namespace WhiteCore.Modules.Entities.ObjectDelete
         private bool DeleteLoopInUse;
 
         /// <value>
-        ///     Is the deleter currently enabled?
+        ///     Is the module currently enabled?
         /// </value>
         public bool Enabled;
 

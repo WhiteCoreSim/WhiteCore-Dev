@@ -49,7 +49,7 @@ namespace WhiteCore.Modules.Agent.J2KDecoder
     public class J2KDecoderModule : IService, IJ2KDecoder
     {
         /// <summary>
-        ///     Temporarily holds deserialized layer data information in memory
+        ///     Temporarily holds de-serialized layer data information in memory
         /// </summary>
         private readonly ExpiringCache<UUID, OpenJPEG.J2KLayerInfo[]> m_decodedCache =
             new ExpiringCache<UUID, OpenJPEG.J2KLayerInfo[]>();

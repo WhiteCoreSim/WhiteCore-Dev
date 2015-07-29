@@ -328,7 +328,7 @@ namespace WhiteCore.Modules.Ban
                      info.Flags == PresenceInfo.PresenceInfoFlags.Known ||
                      info.Flags == PresenceInfo.PresenceInfoFlags.SuspectedAltAccountOfKnown)
             {
-                //Flag 'em
+                //Flag them
                 AddFlag(ref info, PresenceInfo.PresenceInfoFlags.SuspectedAltAccountOfKnown);
                 AddFlag(ref suspectedInfo, PresenceInfo.PresenceInfoFlags.SuspectedAltAccountOfKnown);
             }
@@ -380,7 +380,7 @@ namespace WhiteCore.Modules.Ban
                                  info.Flags == PresenceInfo.PresenceInfoFlags.Known ||
                                  info.Flags == PresenceInfo.PresenceInfoFlags.SuspectedAltAccountOfKnown)
                         {
-                            //Flag 'em
+                            //Flag them
                             AddFlag(ref altInfo, PresenceInfo.PresenceInfoFlags.SuspectedAltAccountOfKnown);
                         }
                         altInfo.KnownAlts = new List<string>(alts.Where(s => s != altInfo.AgentID.ToString()));

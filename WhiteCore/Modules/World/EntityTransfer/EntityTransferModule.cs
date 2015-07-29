@@ -325,7 +325,7 @@ namespace WhiteCore.Modules.EntityTransfer
             sp.SetAgentLeaving(finalDestination);
 
             //Kill the groups here, otherwise they will become ghost attachments 
-            //  and stay in the sim, they'll get readded below into the new sim
+            //  and stay in the sim, they'll get re-added below into the new sim
             //KillAttachments(sp);
 
             // Well, this is it. The agent is over there.
@@ -595,7 +595,7 @@ namespace WhiteCore.Modules.EntityTransfer
                 ISceneEntity[] attachments = attModule.GetAttachmentsForAvatar(agent.UUID);
                 foreach (ISceneEntity grp in attachments)
                 {
-                    //Kill in all clients as it will be readded in the other region
+                    //Kill in all clients as it will be re-added in the other region
                     KillEntities(agent, grp.ChildrenEntities().ToArray());
                     //Now remove it from the Scene so that it will not come back
                     agent.Scene.SceneGraph.DeleteEntity(grp);
@@ -1021,7 +1021,7 @@ namespace WhiteCore.Modules.EntityTransfer
                 agent = data;
                 circuitData = BuildCircuitDataForPresence(sp, sp.AbsolutePosition);
                 //if (agentIsLeaving)
-                //    sp.SetAgentLeaving(null);//We arn't sure where they are going
+                //    sp.SetAgentLeaving(null);//We aren't sure where they are going
                 return true;
             }
 

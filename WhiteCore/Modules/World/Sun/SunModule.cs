@@ -399,7 +399,7 @@ namespace WhiteCore.Modules.Sun
         private void GenSunPos()
         {
             if (!m_sunIsReadyToRun)
-                return; //We havn't set up the time for this region yet!
+                return; //We haven't set up the time for this region yet!
             // Time in seconds since UTC to use to calculate sun position.
             PosTime = (CurrentTime/TICKS_PER_SECOND);
 

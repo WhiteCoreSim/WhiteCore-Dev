@@ -170,7 +170,7 @@ namespace WhiteCore.Modules.WorldMap
             //DateTime start = DateTime.Now;
             //MainConsole.Instance.Info("[MAPTILE]: Generating Maptile Step 1: Terrain");
 
-            // These textures should be in the AssetCache anyway, as every client conneting to this
+            // These textures should be in the AssetCache anyway, as every client connecting to this
             // region needs them. Except on start, when the map is recreated (before anyone connected),
             // and on change of the estate settings (textures and terrain values), when the map should
             // be recreated.
@@ -349,7 +349,7 @@ namespace WhiteCore.Modules.WorldMap
 
         #region Helpers
 
-        // This fetches the texture from the asset server synchroneously. That should be ok, as we
+        // This fetches the texture from the asset server synchronously. That should be ok, as we
         // call map-creation either async or sync, depending on what the user specified and it shouldn't
         // take too long, as most assets should be cached
         private Bitmap fetchTexture(UUID id)
@@ -369,19 +369,19 @@ namespace WhiteCore.Modules.WorldMap
                 catch (DllNotFoundException)
                 {
                     MainConsole.Instance.ErrorFormat(
-                        "[TexturedMapTileRenderer]: OpenJpeg is not installed correctly on this system.   Asset Data is emtpy for {0}",
+                        "[TexturedMapTileRenderer]: OpenJpeg is not installed correctly on this system.   Asset Data is empty for {0}",
                         id);
                 }
                 catch (IndexOutOfRangeException)
                 {
                     MainConsole.Instance.ErrorFormat(
-                        "[TexturedMapTileRenderer]: OpenJpeg was unable to encode this.   Asset Data is emtpy for {0}",
+                        "[TexturedMapTileRenderer]: OpenJpeg was unable to encode this.   Asset Data is empty for {0}",
                         id);
                 }
                 catch (Exception)
                 {
                     MainConsole.Instance.ErrorFormat(
-                        "[TexturedMapTileRenderer]: OpenJpeg was unable to encode this.   Asset Data is emtpy for {0}",
+                        "[TexturedMapTileRenderer]: OpenJpeg was unable to encode this.   Asset Data is empty for {0}",
                         id);
                 }
             }
@@ -464,7 +464,7 @@ namespace WhiteCore.Modules.WorldMap
         }
 
         // the heigthfield might have some jumps in values. Rendered land is smooth, though,
-        // as a slope is rendered at that place. So average 4 neighbour values to emulate that.
+        // as a slope is rendered at that place. So average 4 neighbor values to emulate that.
         private float getHeight(ITerrainChannel hm, int x, int y)
         {
             if (x < (m_scene.RegionInfo.RegionSizeX - 1) && y < (m_scene.RegionInfo.RegionSizeY - 1))

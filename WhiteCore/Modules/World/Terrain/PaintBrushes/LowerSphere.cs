@@ -65,7 +65,7 @@ namespace WhiteCore.Modules.Terrain.PaintBrushes
                     if (!map.Scene.Permissions.CanTerraformLand(userID, new Vector3(x, y, 0)))
                         continue;
 
-                    // Calculate a cos-sphere and add it to the heighmap
+                    // Calculate a cos-sphere and add it to the heightmap
                     float r = (float) Math.Sqrt((x - rx)*(x - rx) + ((y - ry)*(y - ry)));
                     float z = (float) Math.Cos(r*Math.PI/(BrushSize*2));
                     if (z > 0.0)

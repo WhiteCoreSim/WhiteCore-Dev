@@ -59,7 +59,7 @@ namespace WhiteCore.Modules.Land
         public const float BAN_LINE_SAFETY_HEIGHT = 100;
         public const int LAND_RESULT_NO_DATA = -1; // The request they made had no data
         public const int LAND_RESULT_SINGLE = 0; // The request they made contained only a single piece of land
-        public const int LAND_RESULT_MULTIPLE = 1; // The request they made contained more than a single peice of land
+        public const int LAND_RESULT_MULTIPLE = 1; // The request they made contained more than a single piece of land
 
         //ParcelSelectObjects
         public const int LAND_SELECT_OBJECTS_GROUP = 4;
@@ -160,9 +160,9 @@ namespace WhiteCore.Modules.Land
             UUID godParcelOwner;
             var regionType = scene.RegionInfo.RegionType.ToLower ();
             if ( regionType.StartsWith("m") )
-                godParcelOwner = (UUID)Constants.GovernorUUID;              // Mainland reverts to the 'Guv'
+                godParcelOwner = (UUID)Constants.GovernorUUID;              // Mainland reverts to Governor WhiteCore
             else
-                godParcelOwner = (UUID)Constants.RealEstateOwnerUUID;       // Estates revert to the RealEstate Owner
+                godParcelOwner = (UUID)Constants.RealEstateOwnerUUID;       // Estates revert to RealEstate Owner
 
             // This is an override to the default GodOwner and allows specifying a specific user
             if (_godParcelOwner != "")
@@ -273,7 +273,7 @@ namespace WhiteCore.Modules.Land
         /// <param name="agentID">Avatar Unique Id</param>
         /// <param name="objectName">Name of object returned</param>
         /// <param name="location">Location of object returned</param>
-        /// <param name="reason">Reasion for object return</param>
+        /// <param name="reason">Reason for object return</param>
         /// <param name="groups">The objects to return</param>
         public void AddReturns(UUID agentID, string objectName, Vector3 location, string reason,
                                List<ISceneEntity> groups)

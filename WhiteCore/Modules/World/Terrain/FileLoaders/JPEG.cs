@@ -62,7 +62,7 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
             int yoffset = h*(fileHeight - y);
 
             MainConsole.Instance.DebugFormat(
-                "[TERRAIN]: Loading tile {0},{1} (offset {2},{3}) from tilemap size of {4},{5}",
+                "[TERRAIN]: Loading tile {0},{1} (offset {2},{3}) from tile-map size of {4},{5}",
                 x, y, xoffset, yoffset, fileWidth, fileHeight);
 
             Rectangle tileRect = new Rectangle(xoffset, yoffset, w, h);
@@ -157,7 +157,7 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
             {
                 for (int x = 0; x < map.Width; x++)
                 {
-                    // 512 is the largest possible height before colours clamp
+                    // 512 is the largest possible height before colors clamp
                     int colorindex = (int) (Math.Max(Math.Min(1.0, map[x, y]/512.0), 0.0)*(pallete - 1));
                     bmp.SetPixel(x, map.Height - y - 1, colours[colorindex]);
                 }

@@ -143,7 +143,7 @@ namespace WhiteCore.Modules.Archivers
 
             if (nameSeparatorIndex < 0)
             {
-                MainConsole.Instance.WarnFormat("[OSP RESOLVER]: Ignoring unseparated name {0}", name);
+                MainConsole.Instance.WarnFormat("[OSP RESOLVER]: Ignoring un-separated name {0}", name);
                 return UUID.Zero;
             }
 

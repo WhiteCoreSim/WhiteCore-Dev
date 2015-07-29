@@ -102,7 +102,7 @@ namespace WhiteCore.Modules.Terrain
         #region INonSharedRegionModule Members
 
         /// <summary>
-        ///     Creates and initialises a terrain module for a region
+        ///     Creates and initializes a terrain module for a region
         /// </summary>
         /// <param name="config">Config for the region</param>
         public void Initialise(IConfigSource config)
@@ -2260,7 +2260,7 @@ namespace WhiteCore.Modules.Terrain
                 MainConsole.Instance.Commands.AddCommand(
                     "terrain calc area",
                     "terrain calc area",
-                    "Calcualates the rgion land area above the water line",
+                    "Calculates the region land area above the water line",
                     InterfaceCalcArea, true, false);
 
             }

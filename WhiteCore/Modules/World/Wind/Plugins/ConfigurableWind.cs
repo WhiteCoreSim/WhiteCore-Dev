@@ -208,8 +208,8 @@ namespace WhiteCore.Modules.Wind.Plugins
         {
             MainConsole.Instance.InfoFormat("[ConfigurableWind] Average Strength   : {0}", m_avgStrength);
             MainConsole.Instance.InfoFormat("[ConfigurableWind] Average Direction  : {0}", m_avgDirection);
-            MainConsole.Instance.InfoFormat("[ConfigurableWind] Varience Strength  : {0}", m_varStrength);
-            MainConsole.Instance.InfoFormat("[ConfigurableWind] Varience Direction : {0}", m_varDirection);
+            MainConsole.Instance.InfoFormat("[ConfigurableWind] Variance Strength  : {0}", m_varStrength);
+            MainConsole.Instance.InfoFormat("[ConfigurableWind] Variance Direction : {0}", m_varDirection);
             MainConsole.Instance.InfoFormat("[ConfigurableWind] Rate Change        : {0}", m_rateChange);
         }
     }

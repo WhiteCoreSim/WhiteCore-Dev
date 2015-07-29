@@ -88,13 +88,13 @@ namespace WhiteCore.Modules
         {
             OSDMap retVal = new OSDMap();
             retVal["EnvironmentSettings"] = CapsUtil.CreateCAPS("EnvironmentSettings", "");
-            //Sets the windlight settings
+            //Sets the Windlight settings
             server.AddStreamHandler(new GenericStreamHandler("POST", retVal["EnvironmentSettings"],
                                                              delegate(string path, Stream request,
                                                                       OSHttpRequest httpRequest,
                                                                       OSHttpResponse httpResponse)
                                                                  { return SetEnvironment(request, agentID); }));
-            //Sets the windlight settings
+            //Sets the Windlight settings
             server.AddStreamHandler(new GenericStreamHandler("GET", retVal["EnvironmentSettings"],
                                                              delegate(string path, Stream request,
                                                                       OSHttpRequest httpRequest,
@@ -120,7 +120,7 @@ namespace WhiteCore.Modules
             }
             else
             {
-                fail_reason = "You don't have permissions to set the windlight settings here.";
+                fail_reason = "You don't have permissions to set the Windlight settings here.";
                 SP.ControllingClient.SendAlertMessage(
                     "You don't have the correct permissions to set the Windlight Settings");
             }

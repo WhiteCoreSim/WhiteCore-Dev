@@ -380,7 +380,7 @@ namespace WhiteCore.Modules.Scripting
                     }
 
                     // I'm pretty sure we always want to force this to true
-                    // I'm pretty sure noone whats to set fullbright true if it wasn't true before.
+                    // I'm pretty sure no one wants to set fullbright true if it wasn't true before.
                     // tmptex.DefaultTexture.Fullbright = true;
 
                     part.UpdateTexture(tmptex, true);

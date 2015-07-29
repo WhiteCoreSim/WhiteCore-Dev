@@ -63,7 +63,7 @@ namespace WhiteCore.Modules.Archivers
 
         public void Initialise(IConfigSource source)
         {
-            //MainConsole.Instance.Debug("[ARCHIVER] Initialising");
+            //MainConsole.Instance.Debug("[ARCHIVER] Initializing");
         }
 
         public void AddRegion(IScene scene)

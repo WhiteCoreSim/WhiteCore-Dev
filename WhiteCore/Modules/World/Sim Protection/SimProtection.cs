@@ -172,7 +172,7 @@ namespace WhiteCore.Modules.SimProtection
                 stats[2] != 0 &&
                 AllowDisablePhysics &&
                 !m_scene.RegionInfo.RegionSettings.DisablePhysics)
-                //Don't redisable physics again, physics will be frozen at the last FPS
+                //Don't re-disable physics again, physics will be frozen at the last FPS
             {
                 DisabledPhysicsStartTime = DateTime.Now;
                 if (mod != null)
