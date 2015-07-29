@@ -186,7 +186,7 @@ namespace WhiteCore.Region
 
         protected string m_nextSitAnimation = String.Empty;
 
-        //PauPaw:Proper PID Controler for autopilot************
+        //PauPaw:Proper PID Controller for autopilot************
         protected bool m_moveToPositionInProgress;
         protected Vector3 m_moveToPositionTarget;
 
@@ -481,7 +481,7 @@ namespace WhiteCore.Region
                 // If m_parentID is not 0, assume we are a seated avatar and we should return the
                 // position based on the sittarget offset and rotation of the prim we are seated on.
                 //
-                // Generally, m_pos will contain the position of the avator in the sim unless the avatar
+                // Generally, m_pos will contain the position of the avatar in the sim unless the avatar
                 // is on a sit target. While on a sit target, m_pos will contain the desired offset
                 // without the parent rotation applied.
                 if (m_parentID != UUID.Zero)
@@ -1497,7 +1497,7 @@ namespace WhiteCore.Region
                         // nesting this check because LengthSquared() is expensive and we don't 
                         // want to do it every step when flying.
                         // then call it in the if...
-                        //The == Zero and Z > 0.1 are to stop people from flying and then falling down because the physics engine hasn't calculted the push yet
+                        //The == Zero and Z > 0.1 are to stop people from flying and then falling down because the physics engine hasn't calculated the push yet
                         if (Velocity != Vector3.Zero && Math.Abs(Velocity.Z) > 0.05 &&
                             (Velocity.LengthSquared() <= LAND_VELOCITYMAG_MAX))
                         {
@@ -1892,7 +1892,7 @@ namespace WhiteCore.Region
 
             ControllingClient.SendSitResponse(part.UUID, offset, sitOrientation, autopilot, cameraAtOffset,
                                               cameraEyeOffset, forceMouselook);
-            //Remove any bad terse updates lieing around
+            //Remove any bad terse updates lying around
             foreach (IScenePresence sp in Scene.GetScenePresences())
                 sp.SceneViewer.ClearPresenceUpdates(this);
             System.Threading.Thread.Sleep(10);
@@ -2144,7 +2144,7 @@ namespace WhiteCore.Region
                 }
                 else
                     Scene.SceneGraph.TaintPresenceForUpdate(this, PresenceTaint.Other);
-                        //We havn't sent the update yet, keep tainting
+                        //We haven't sent the update yet, keep tainting
             }
         }
 
@@ -2387,7 +2387,7 @@ namespace WhiteCore.Region
                                 transferModule.Cross(this, isFlying, neighborRegion);
                             else
                                 MainConsole.Instance.DebugFormat(
-                                    "[ScenePresence]: Unable to cross agent to neighbouring region, because there is no AgentTransferModule");
+                                    "[ScenePresence]: Unable to cross agent to neighboring region, because there is no AgentTransferModule");
                         }
                         return true;
                     }
@@ -2446,7 +2446,7 @@ namespace WhiteCore.Region
                                     transferModule.Cross(this, isFlying, neighborRegion);
                                 else
                                     MainConsole.Instance.DebugFormat(
-                                        "[ScenePresence]: Unable to cross agent to neighbouring region, because there is no AgentTransferModule");
+                                        "[ScenePresence]: Unable to cross agent to neighboring region, because there is no AgentTransferModule");
 
                                 return true;
                             }
@@ -2764,7 +2764,7 @@ namespace WhiteCore.Region
         /// </summary>
         public virtual void AddToPhysicalScene(bool isFlying, bool AddAvHeightToPosition)
         {
-            //Make sure we arn't already doing this
+            //Make sure we aren't already doing this
             if (m_creatingPhysicalRepresentation)
                 return;
 
@@ -2843,7 +2843,7 @@ namespace WhiteCore.Region
 
             if (ControllingClient != null)
                 ControllingClient.SendAgentAlertMessage(
-                    "Physics is having a problem with your avatar.  You may not be able to move until you relog.", true);
+                    "Physics is having a problem with your avatar.  You may not be able to move until you restart.", true);
         }
 
         protected void PhysicsUpdatePosAndVelocity()
@@ -2909,7 +2909,7 @@ namespace WhiteCore.Region
 
             if (coldata.Count != 0 && Animator != null)
             {
-                //If we are on the ground, we need to fix the collision plane for the avie (fixes their feet in the viewer)
+                //If we are on the ground, we need to fix the collision plane for the avatar (fixes their feet in the viewer)
                 switch (Animator.CurrentMovementAnimation)
                 {
                     case "STAND":

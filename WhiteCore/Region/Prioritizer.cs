@@ -39,9 +39,9 @@ using System.Collections.Generic;
 /*
  * Steps to add a new prioritization policy:
  * 
- *  - Add a new value to the UpdatePrioritizationSchemes enum.
+ *  - Add a new value to the UpdatePrioritizationSchemes Enum.
  *  - Specify this new value in the [InterestManagement] section of your
- *    WhiteCore.ini. The name in the config file must match the enum value name
+ *    WhiteCore.ini. The name in the config file must match the Enum value name
  *    (although it is not case sensitive).
  *  - Write a new GetPriorityBy*() method in this class.
  *  - Add a new entry to the switch statement in GetUpdatePriority() that calls
@@ -86,7 +86,7 @@ namespace WhiteCore.Region
         public bool ShowEntityToClient(IScenePresence client, IEntity entity, IScene scene, int currentTickCount)
         {
             if (!m_useCulling)
-                return true; //If we arn't using culling, return true by default to show all prims
+                return true; //If we aren't using culling, return true by default to show all prims
             if (entity == null || client == null || scene == null)
                 return false;
 

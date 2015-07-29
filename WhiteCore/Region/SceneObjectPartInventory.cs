@@ -535,7 +535,7 @@ namespace WhiteCore.Region
         /// </summary>
         /// <param name="name">The name that the new item should have.</param>
         /// <param name="item">
-        ///     The item itself.  The name within this structure is ignored in favour of the name
+        ///     The item itself.  The name within this structure is ignored in favor of the name
         ///     given in this method's arguments
         /// </param>
         /// <param name="allowedDrop">

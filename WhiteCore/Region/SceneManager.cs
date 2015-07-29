@@ -334,7 +334,7 @@ namespace WhiteCore.Region
             MainConsole.Instance.Warn("[SceneManager]: Region " + scene.RegionInfo.RegionName + " was removed\n"+
                 "To ensure all data is correct, you should consider restarting the simulator");
 
-            if (MainConsole.Instance.Prompt ("[SceneManager]: Do you wish to shutdown the systemn? (yes/no)", "no") == "yes")
+            if (MainConsole.Instance.Prompt ("[SceneManager]: Do you wish to shutdown the system? (yes/no)", "no") == "yes")
             {
                 MainConsole.Instance.Warn ("[SceneManager]: Shutting down in 5 seconds");
                 System.Threading.Thread.Sleep (5000);
@@ -697,7 +697,7 @@ namespace WhiteCore.Region
 
             MainConsole.Instance.Commands.AddCommand("set region visibility",
                 "set region visibility [yes/no]",
-                "sets whether neighbouring regions can 'see into' this region", 
+                "sets whether neighboring regions can 'see into' this region", 
                 HandleSetRegionVisibility, true, true);
 
         }
@@ -1282,7 +1282,7 @@ namespace WhiteCore.Region
                 if (regionName == "")
                     return;
             } else
-                regionName = Util.CombineParams(cmd, 2); // in case of spaces in the name eg Steam Island
+                regionName = Util.CombineParams(cmd, 2); // in case of spaces in the name e.g. Steam Island
 
             string rName;
             regionName = regionName.ToLower();
@@ -1565,7 +1565,7 @@ namespace WhiteCore.Region
         }
 
         /// <summary>
-        /// Resizes the scale of a primative/object with the name specified
+        /// Resizes the scale of a primitive/object with the name specified
         /// </summary>
         /// <param name="scene">Scene.</param>
         /// <param name="cmdparams">Cmdparams.</param>
@@ -1633,7 +1633,7 @@ namespace WhiteCore.Region
 
             if (cmdparams.Length > 2)
             {
-                objectName = Util.CombineParams(cmdparams, 2); // in case of spaces in the name eg Steam Island
+                objectName = Util.CombineParams(cmdparams, 2); // in case of spaces in the name e.g. Steam Island
             }
 
             ISceneEntity[] entityList = scene.Entities.GetEntities ();
@@ -1758,7 +1758,7 @@ namespace WhiteCore.Region
                     // offset above/below the current land height
                     var offsetZ = ent.AbsolutePosition.Z - heightmap.GetNormalizedGroundHeight( (int)ent.AbsolutePosition.X, (int)ent.AbsolutePosition.Y );
 
-                    offsetPos.Z = offsetZ;          // only scale theheight offset 
+                    offsetPos.Z = offsetZ;          // only scale the height offset 
                     offsetPos *= factor;    
 
                     var entParts = ent.ChildrenEntities ();
@@ -1839,7 +1839,7 @@ namespace WhiteCore.Region
                 if (regionName == "")
                     return;
             } else
-                regionName = Util.CombineParams(cmd, 2); // in case of spaces in the name eg Steam Island
+                regionName = Util.CombineParams(cmd, 2); // in case of spaces in the name e.g. Steam Island
 
             regionName = regionName.ToLower();
             IScene delScene = m_scenes.Find((s) => s.RegionInfo.RegionName.ToLower() == regionName);
@@ -1873,7 +1873,7 @@ namespace WhiteCore.Region
                 if (regionName == "")
                     return;
             } else
-                regionName = Util.CombineParams(cmd, 2); // in case of spaces in the name eg Steam Island
+                regionName = Util.CombineParams(cmd, 2); // in case of spaces in the name e.g. Steam Island
 
             regionName = regionName.ToLower();
             IScene resetScene = m_scenes.Find((s) => s.RegionInfo.RegionName.ToLower() == regionName);
@@ -1906,7 +1906,7 @@ namespace WhiteCore.Region
                 if (regionName == "")
                     return;
             } else
-                regionName = Util.CombineParams(cmd, 2); // in case of spaces in the name eg Steam Island
+                regionName = Util.CombineParams(cmd, 2); // in case of spaces in the name e.g. Steam Island
 
             regionName = regionName.ToLower();
             IScene clearScene = m_scenes.Find((s) => s.RegionInfo.RegionName.ToLower() == regionName);
@@ -2102,7 +2102,7 @@ namespace WhiteCore.Region
         }
 
         /// <summary>
-        /// Handles set region neighbour visibility.
+        /// Handles set region neighbor visibility.
         /// </summary>
         /// <param name="scene">Scene.</param>
         /// <param name="cmd">Cmd.</param>
@@ -2112,14 +2112,14 @@ namespace WhiteCore.Region
             string response = "Yes";
 
             if (cmd.Length < 4)
-                response = MainConsole.Instance.Prompt ("[SceneManager]: Allow neighbours to see into " + regionName + "(yes/no)", response);
+                response = MainConsole.Instance.Prompt ("[SceneManager]: Allow neighbors to see into " + regionName + "(yes/no)", response);
             else
                 response = cmd [3];
 
             response = response.ToLower ();
             scene.RegionInfo.SeeIntoThisSimFromNeighbor = response.StartsWith ("y");
 
-            MainConsole.Instance.InfoFormat("[SceneManager]: Region has been set to {0} visibility from neighbours.",
+            MainConsole.Instance.InfoFormat("[SceneManager]: Region has been set to {0} visibility from neighbors.",
                 scene.RegionInfo.SeeIntoThisSimFromNeighbor ? " Allow": "Disallow"); 
 
             scene.SimulationDataService.ForceBackup();

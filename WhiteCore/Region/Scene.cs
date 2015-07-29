@@ -406,7 +406,7 @@ namespace WhiteCore.Region
             }
             catch
             {
-                MainConsole.Instance.WarnFormat("[Scene]: Could not start udp server on port {0}, is this port already in use?", RegionInfo.RegionPort);
+                MainConsole.Instance.WarnFormat("[Scene]: Could not start UDP server on port {0}, is this port already in use?", RegionInfo.RegionPort);
                 RegionInfo.RegionPort = int.Parse(MainConsole.Instance.Prompt("Region Port: "));
                 foreach (IClientNetworkServer clientServer in m_clientServers)
                     clientServer.UpdatePort((uint)RegionInfo.RegionPort);
@@ -438,7 +438,7 @@ namespace WhiteCore.Region
             ILLClientInventory inventoryModule = RequestModuleInterface<ILLClientInventory>();
             while (true)
             {
-                if (!ShouldRunHeartbeat) //If we arn't supposed to be running, kill ourselves
+                if (!ShouldRunHeartbeat) //If we aren't supposed to be running, kill ourselves
                     return;
 
                 int maintc = Util.EnvironmentTickCount();

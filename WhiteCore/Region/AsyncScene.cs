@@ -440,7 +440,7 @@ namespace WhiteCore.Region
             ILLClientInventory inventoryModule = RequestModuleInterface<ILLClientInventory>();
             while (true)
             {
-                if (!ShouldRunHeartbeat) //If we arn't supposed to be running, kill ourselves
+                if (!ShouldRunHeartbeat) //If we aren't supposed to be running, kill ourselves
                     return false;
                 
                 int maintc = Util.EnvironmentTickCount();
@@ -529,7 +529,7 @@ namespace WhiteCore.Region
 
             while (true)
             {
-                if (!ShouldRunHeartbeat) //If we arn't supposed to be running, kill ourselves
+                if (!ShouldRunHeartbeat) //If we aren't supposed to be running, kill ourselves
                     return false;
 
                 int maintc = Util.EnvironmentTickCount();
