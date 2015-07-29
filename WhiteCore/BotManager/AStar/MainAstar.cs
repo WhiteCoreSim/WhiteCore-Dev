@@ -31,7 +31,7 @@ using System.Collections;
 namespace WhiteCore.BotManager.AStar
 {
     /// <summary>
-    ///     Test class for doing A* pathfinding on a 2D map.
+    ///     Test class for doing A* path finding on a 2D map.
     /// </summary>
     internal class MainClass
     {

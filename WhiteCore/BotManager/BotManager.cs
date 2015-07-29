@@ -90,7 +90,7 @@ namespace WhiteCore.BotManager
         #region IBotManager
 
         /// <summary>
-        ///     Creates a new bot inworld
+        ///     Creates a new bot in world
         /// </summary>
         /// <param name="firstName"></param>
         /// <param name="lastName"></param>
@@ -144,7 +144,7 @@ namespace WhiteCore.BotManager
             }
 
             scene.AuthenticateHandler.AgentCircuits.Add(m_character.CircuitCode, m_aCircuitData);
-            //This adds them to the scene and sets them inworld
+            //This adds them to the scene and sets them in world
             AddAndWaitUntilAgentIsAdded(scene, m_character);
 
             IScenePresence SP = scene.GetScenePresence(m_character.AgentId);

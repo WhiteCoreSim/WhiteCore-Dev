@@ -32,14 +32,14 @@ using System.Collections.Generic;
 namespace WhiteCore.BotManager.AStar
 {
     /// <summary>
-    ///     A node class for doing pathfinding on a 2-dimensional map
+    ///     A node class for doing path finding on a 2-dimensional map
     ///     Christy Lock Note:
     ///     Astar.cs, Heap.cs and Main.cs were originally written by Sune Trundslev 4 Jan 2004
-    ///     I has made small modifications to Astar. cs and Main.cs to handle the 3d Metaverse
+    ///     I has made small modifications to Astar.cs and Main.cs to handle the 3d Metaverse
     ///     Specifically to return waypoints in generic string Lists broken into slope changes. These are returned to BotMe.cs.
     ///     You can find the original code at http://www.codeproject.com/KB/recipes/csharppathfind.aspx
     ///     Note that there is no specific license in the code download and the author states " With this class, you should be able to implement your own
-    ///     A* pathfinding to your own c# projects."
+    ///     A* path finding to your own c# projects."
     /// </summary>
     public class AStarNode2D : AStarNode
     {
@@ -248,7 +248,7 @@ namespace WhiteCore.BotManager.AStar
         #region Entry
 
         /// <summary>
-        ///     The main entry point for the pathfinding routines.
+        ///     The main entry point for the path finding routines.
         ///     AstarNode2D is derived from AStar then the StarPath class creates an instance of AStar and uses AstarNode2D
         ///     to override the methods in AStar.cs.
         ///     Using Path method as an entry and return point from/to BotMe. Also StartPath is used to make maps and check limits

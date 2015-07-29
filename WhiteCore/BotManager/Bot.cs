@@ -897,7 +897,7 @@ namespace WhiteCore.BotManager
         void FollowDecision()
         {
             // FOLLOW an avatar - this is looking for an avatar UUID so wont follow a prim here  - yet
-            //Call this each iteration so that if the av leaves, we don't get stuck following a null person
+            //Call this each iteration so that if the avatar leaves, we don't get stuck following a null person
             FollowSP = m_controller.GetScene().GetScenePresence(FollowUUID);
             //If its still null, the person doesn't exist, cancel the follow and return
             if (FollowSP == null)
@@ -1224,7 +1224,7 @@ namespace WhiteCore.BotManager
             if (failedToMove > 1)
             {
                 return Vector3.Zero;
-                //CleanUpPos (raycastEntities, entites, ref newPos);
+                //CleanUpPos (raycastEntities, entities, ref newPos);
             }
             return newPos;
         }
@@ -1968,7 +1968,7 @@ namespace WhiteCore.BotManager
 
         public void Close(bool p)
         {
-            //raiseevent on the packet server to Shutdown the circuit
+            //raise event on the packet server to Shutdown the circuit
             if (OnLogout != null)
                 OnLogout(this);
             if (OnConnectionClosed != null)

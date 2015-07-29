@@ -453,7 +453,7 @@ namespace WhiteCore.BotManager.AStar
 
         /// <summary>
         ///     Removes all duplicates in the list.
-        ///     Each value encountered will have only one representant.
+        ///     Each value encountered will have only one representant
         /// </summary>
         public void RemoveDuplicates()
         {

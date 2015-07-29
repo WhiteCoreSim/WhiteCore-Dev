@@ -31,7 +31,7 @@ using System.Collections;
 namespace WhiteCore.BotManager.AStar
 {
     /// <summary>
-    ///     Base class for pathfinding nodes, it holds no actual information about the map.
+    ///     Base class for path finding nodes, it holds no actual information about the map.
     ///     An inherited class must be constructed from this class and all virtual methods must be
     ///     implemented. Note, that calling base() in the overridden methods is not needed.
     /// </summary>
@@ -173,7 +173,7 @@ namespace WhiteCore.BotManager.AStar
     }
 
     /// <summary>
-    ///     Class for performing A* pathfinding
+    ///     Class for performing A* path finding
     /// </summary>
     public sealed class AStar
     {
@@ -194,7 +194,7 @@ namespace WhiteCore.BotManager.AStar
         bool m_pathPossible = true;
 
         /// <summary>
-        ///     Holds the solution after pathfinding is done. <see>FindPath()</see>
+        ///     Holds the solution after path finding is done. <see>FindPath()</see>
         /// </summary>
         public ArrayList Solution
         {
@@ -272,7 +272,7 @@ namespace WhiteCore.BotManager.AStar
                 NodeCurrent.GetSuccessors(FSuccessors);
                 foreach (AStarNode NodeSuccessor in FSuccessors)
                 {
-                    // Test if the currect successor node is on the open list, if it is and
+                    // Test if the current successor node is on the open list, if it is and
                     // the TotalCost is higher, we will throw away the current successor.
                     AStarNode NodeOpen = null;
                     if (FOpenList.Contains(NodeSuccessor))
@@ -280,7 +280,7 @@ namespace WhiteCore.BotManager.AStar
                     if ((NodeOpen != null) && (NodeSuccessor.TotalCost > NodeOpen.TotalCost))
                         continue;
 
-                    // Test if the currect successor node is on the closed list, if it is and
+                    // Test if the current successor node is on the closed list, if it is and
                     // the TotalCost is higher, we will throw away the current successor.
                     AStarNode NodeClosed = null;
                     if (FClosedList.Contains(NodeSuccessor))
