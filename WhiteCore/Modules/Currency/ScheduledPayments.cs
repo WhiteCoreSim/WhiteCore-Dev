@@ -117,7 +117,7 @@ namespace WhiteCore.Modules.Currency
                 if (payStipends || payGroups)
                 {
                     InitializeScheduleTimer ();
-                    MainConsole.Instance.Info ("[Currency]: Stipend paymenst enabled. Next payment: " + nextStipendPayment.ToLongDateString ());
+                    MainConsole.Instance.Info ("[Currency]: Stipend payments enabled. Next payment: " + nextStipendPayment.ToLongDateString ());
                 }
             }
         }
