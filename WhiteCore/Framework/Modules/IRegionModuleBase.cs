@@ -73,7 +73,7 @@ namespace WhiteCore.Framework.Modules
 
         /// <summary>
         ///     This will be called once for every scene loaded. In a shared module
-        ///     this will be multiple times in one instance, while a nonshared
+        ///     this will be multiple times in one instance, while a non-shared
         ///     module instance will only be called once.
         ///     This method is called after AddRegion has been called in all
         ///     modules for that scene, providing an opportunity to request

@@ -60,7 +60,7 @@ namespace WhiteCore.Framework.PresenceInfo
         IScene Scene { get; set; }
 
         /// <summary>
-        ///     The actual client base (it sends and recieves packets)
+        ///     The actual client base (it sends and receives packets)
         /// </summary>
         IClientAPI ControllingClient { get; }
 
@@ -135,7 +135,7 @@ namespace WhiteCore.Framework.PresenceInfo
         bool IsBusy { get; set; }
 
         /// <summary>
-        ///     What state the avatar is in (has some OpenMetaverse enum for it)
+        ///     What state the avatar is in (has some OpenMetaverse Enum for it)
         /// </summary>
         byte State { get; set; }
 

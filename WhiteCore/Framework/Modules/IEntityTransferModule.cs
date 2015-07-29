@@ -52,7 +52,7 @@ namespace WhiteCore.Framework.Modules
         ///     Teleports the given agent to their home, and if it is not available, a welcome region
         /// </summary>
         /// <param name="id">The UUID of the client to teleport home</param>
-        /// <param name="client">The client to teleport hom</param>
+        /// <param name="client">The client to teleport home</param>
         bool TeleportHome(UUID id, IClientAPI client);
 
         /// <summary>

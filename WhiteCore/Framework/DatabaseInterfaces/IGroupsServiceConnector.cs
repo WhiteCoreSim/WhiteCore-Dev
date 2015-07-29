@@ -139,7 +139,7 @@ namespace WhiteCore.Framework.DatabaseInterfaces
 
     //Pulled from OpenMetaverse
     // Summary:
-    //     Struct representing a member of a group chat session and their settings
+    //     Structure representing a member of a group chat session and their settings
     public class ChatSessionMember
     {
         // Summary:

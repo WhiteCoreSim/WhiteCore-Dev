@@ -39,7 +39,7 @@ namespace WhiteCore.Framework.Utilities
         ///     Is process completed?
         /// </summary>
         /// <remarks>
-        ///     Should really be boolean, but VolatileRead has no boolean method
+        ///     Should really be Boolean, but VolatileRead has no Boolean method
         /// </remarks>
         private byte m_completed;
 
@@ -48,7 +48,7 @@ namespace WhiteCore.Framework.Utilities
         /// </summary>
         /// <remarks>
         ///     I have a hard time imagining a scenario where this is the case, again, same issue about
-        ///     booleans and VolatileRead as m_completed
+        ///     Booleans and VolatileRead as m_completed
         /// </remarks>
         private byte m_completedSynchronously;
 
@@ -169,7 +169,7 @@ namespace WhiteCore.Framework.Utilities
             m_result = result;
 
             // Tell the base class that the operation completed
-            // sucessfully (no exception)
+            // successfully (no exception)
             base.SetAsCompleted(completedSynchronously);
         }
 

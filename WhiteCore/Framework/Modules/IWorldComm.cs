@@ -72,7 +72,7 @@ namespace WhiteCore.Framework.Modules
         ///     Objects that do an llSay have their messages delivered here and for nearby avatars,
         ///     the OnChatFromClient event is used.
         /// </summary>
-        /// <param name="type">type of delvery (whisper,say,shout or regionwide)</param>
+        /// <param name="type">type of delivery (whisper,say,shout or regionwide)</param>
         /// <param name="channel">channel to sent on</param>
         /// <param name="name">name of sender (object or avatar)</param>
         /// <param name="id">key of sender (object or avatar)</param>
@@ -85,7 +85,7 @@ namespace WhiteCore.Framework.Modules
         /// <summary>
         ///     Are there any listen events ready to be dispatched?
         /// </summary>
-        /// <returns>boolean indication</returns>
+        /// <returns>Boolean indication</returns>
         bool HasMessages();
 
         /// <summary>
@@ -95,7 +95,7 @@ namespace WhiteCore.Framework.Modules
         bool HasListeners();
 
         /// <summary>
-        ///     Pop the first availlable listen event from the queue
+        ///     Pop the first available listen event from the queue
         /// </summary>
         /// <returns>ListenerInfo with filter filled in</returns>
         IWorldCommListenerInfo GetNextMessage();

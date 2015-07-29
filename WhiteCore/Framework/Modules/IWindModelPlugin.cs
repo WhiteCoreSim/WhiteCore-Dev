@@ -35,7 +35,7 @@ namespace WhiteCore.Framework.Modules
     public interface IWindModelPlugin
     {
         /// <summary>
-        ///     Brief description of this plugin's wind model
+        ///     Brief description of this Wind model plugin
         /// </summary>
         string Description { get; }
 

@@ -59,7 +59,7 @@ namespace WhiteCore.Framework.Serialization
         /// <param name="dirName"></param>
         public void WriteDir(string dirName)
         {
-            // Directories are signalled by a final /
+            // Directories are signaled by a final /
             if (!dirName.EndsWith("/"))
                 dirName += "/";
 

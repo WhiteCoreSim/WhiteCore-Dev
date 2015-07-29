@@ -93,7 +93,7 @@ namespace WhiteCore.Framework.Utilities
         }
 
         /// <summary>
-        /// Verifies a file for writeing setting some defaults if needed.
+        /// Verifies a file for writing setting some defaults if needed.
         /// </summary>
         /// <returns>The write file.</returns>
         /// <param name="fileName">File name.</param>

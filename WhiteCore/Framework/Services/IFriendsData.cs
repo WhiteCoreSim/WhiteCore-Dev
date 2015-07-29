@@ -30,7 +30,7 @@ using OpenMetaverse;
 namespace WhiteCore.Framework.Services
 {
     /// <summary>
-    ///     An interface for connecting to the friends datastore
+    ///     An interface for connecting to the friends data-store
     /// </summary>
     public interface IFriendsData : IWhiteCoreDataPlugin
     {

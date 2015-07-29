@@ -90,7 +90,7 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Profile
         public int MaxMaturity = 2;
         
         /// <summary>
-        /// 	Hoverheight of the user
+        /// 	Hover height of the user
         /// </summary>
         public double HoverHeight = 0.0;
         
@@ -103,7 +103,7 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Profile
         
         /// <summary>
         ///     Other information can be stored in here.
-        ///     For ex, temperary ban info for this user
+        ///     For ex, temporary ban info for this user
         /// </summary>
         public OSDMap OtherAgentInformation = new OSDMap ();
 

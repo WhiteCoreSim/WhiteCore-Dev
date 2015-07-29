@@ -36,7 +36,7 @@ namespace WhiteCore.Framework.DatabaseInterfaces
     /// <summary>
     ///     Some background to this class
     ///     This class saves any class that implements the IDataTransferable interface.
-    ///     When implementing the IDataTransferable interface, it is heavily recommending to implement ToOSD and FromOSD first, then use the Utility methods to convert OSDMaps into Dictionarys, as shown in the LandData class.
+    ///     When implementing the IDataTransferable interface, it is heavily recommending to implement ToOSD and FromOSD first, then use the Utility methods to convert OSDMaps into Dictionary's, as shown in the LandData class.
     ///     This method of saving uses 4 columns in the database, OwnerID, Type, Key, and Value
     ///     - OwnerID : This is a way to be able to save Agent or Region or anything with a UUID into the database and have it be set to that UUID only.
     ///     - Type : What made this data? This just tells what module created the given row in the database.

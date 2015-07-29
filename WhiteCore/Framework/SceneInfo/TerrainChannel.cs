@@ -295,7 +295,7 @@ namespace WhiteCore.Framework.SceneInfo
                 CreateFlatlandTerrain ();
             else if (tType.StartsWith("i"))                             // island
 				CreateIslandTerrain (min, max, smoothing);
-            else if (tType.StartsWith("a"))                             // auqatic
+            else if (tType.StartsWith("a"))                             // aquatic
                 CreateIslandTerrain (min, max, smoothing);              // TODO: fully sort this one out
             else if (tType.StartsWith("n"))                             // null space
                 CreateNullSpaceTerrain ();   
@@ -473,7 +473,7 @@ namespace WhiteCore.Framework.SceneInfo
 			}
 		}
 
-		// original island from opensim
+		// original island from Opensim
 		void CreateAtolIslandTerrain()
 		{
 			m_map = null;

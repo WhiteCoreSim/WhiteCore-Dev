@@ -60,7 +60,7 @@ namespace WhiteCore.Framework.ClientInterfaces
         public Vector3 ClientAgentPosition;
 
         /// <summary>
-        ///     Bitflag field for agent movement.  Fly, forward, backward, turn left, turn right, go up, go down, Straffe, etc.
+        ///     Bitflag field for agent movement.  Fly, forward, backward, turn left, turn right, go up, go down, Strafe, etc.
         /// </summary>
         public uint ControlFlags;
 

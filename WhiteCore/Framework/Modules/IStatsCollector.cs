@@ -169,7 +169,7 @@ namespace WhiteCore.Framework.Modules
         float UnackedBytes { get; }
 
         /// <summary>
-        ///     The number of downloads that the client has requested, but has not recieved at this time
+        ///     The number of downloads that the client has requested, but has not received at this time
         /// </summary>
         float PendingDownloads { get; }
 

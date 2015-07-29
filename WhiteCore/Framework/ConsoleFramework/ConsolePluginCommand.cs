@@ -57,7 +57,7 @@ namespace WhiteCore.Framework.ConsoleFramework
         ///     for use with RegisterConsolePluginCommand(myCmd);
         /// </summary>
         /// <param name="command">in the form of "showme new commands"</param>
-        /// <param name="dlg">ommand delegate used in running</param>
+        /// <param name="dlg">command delegate used in running</param>
         /// <param name="help">the text displayed in "help showme new commands"</param>
         public ConsolePluginCommand(string command, ConsoleCommand dlg, string help)
         {
@@ -87,7 +87,7 @@ namespace WhiteCore.Framework.ConsoleFramework
         }
 
         /// <summary>
-        ///     Run the delegate the incomming string may contain the command, if so, it is chopped off the cmdParams[]
+        ///     Run the delegate the incoming string may contain the command, if so, it is chopped off the cmdParams[]
         /// </summary>
         public void Run(string cmd, string[] cmdParams)
         {
@@ -117,7 +117,7 @@ namespace WhiteCore.Framework.ConsoleFramework
         }
 
         /// <summary>
-        ///     return true if the ShowHelp(..) method might be helpfull
+        ///     return true if the ShowHelp(..) method might be helpful
         /// </summary>
         public bool IsHelpfull(string cmdWithParams)
         {

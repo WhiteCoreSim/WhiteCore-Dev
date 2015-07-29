@@ -33,7 +33,7 @@ namespace WhiteCore.Framework.Modules
     public interface IRegionSerialiserModule
     {
         /// <summary>
-        ///     Deserializes a scene object from its xml2 representation.  This does not load the object into the scene.
+        ///     De-serializes a scene object from its xml2 representation.  This does not load the object into the scene.
         /// </summary>
         /// <param name="xmlString"></param>
         /// <param name="scene"></param>
@@ -41,7 +41,7 @@ namespace WhiteCore.Framework.Modules
         ISceneEntity DeserializeGroupFromXml2(string xmlString, IScene scene);
 
         /// <summary>
-        ///     Deserializes a scene object from its xml2 representation.  This does not load the object into the scene.
+        ///     De-serializes a scene object from its xml2 representation.  This does not load the object into the scene.
         /// </summary>
         /// <param name="xml"></param>
         /// <param name="scene"></param>

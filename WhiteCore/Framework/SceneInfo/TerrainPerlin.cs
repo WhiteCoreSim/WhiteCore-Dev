@@ -95,7 +95,7 @@ namespace WhiteCore.Framework.SceneInfo
             int width = perlinNoise.Length;
             int height = perlinNoise[0].Length;
 
-            Color[][] image = GetEmptyArray<Color>(width, height); //an array of colours
+            Color[][] image = GetEmptyArray<Color>(width, height); //an array of colors
 
             for (int i = 0; i < width; i++)
             {
@@ -167,7 +167,7 @@ namespace WhiteCore.Framework.SceneInfo
             int height = baseNoise[0].Length;
 
             float[][] smoothNoise;
-            float[][] perlinNoise = GetEmptyArray<float>(width, height); //an array of floats initialised to 0
+            float[][] perlinNoise = GetEmptyArray<float>(width, height); //an array of floats initialized to 0
 
             float persistance = 0.25f;
             float amplitude = 1.0f;
@@ -192,7 +192,7 @@ namespace WhiteCore.Framework.SceneInfo
             // try and free up the bucket of memory we may have just used
             GC.Collect();
 
-            //normalisation
+            //normalization
             for (int i = 0; i < width; i++)
             {
                 for (int j = 0; j < height; j++)
@@ -422,7 +422,7 @@ namespace WhiteCore.Framework.SceneInfo
             int width = image1.Length;
             int height = image1[0].Length;
 
-	        Color[][] image = GetEmptyArray<Color>(width, height); //an array of colours for the new image
+	        Color[][] image = GetEmptyArray<Color>(width, height); //an array of colors for the new image
             
             for (int i = 0; i < width; i++)
             {

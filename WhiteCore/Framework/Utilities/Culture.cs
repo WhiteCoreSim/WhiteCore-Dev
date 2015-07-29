@@ -72,7 +72,7 @@ namespace WhiteCore.Framework.Utilities
         /// <summary>
         /// Returns a formatted date string depending upon the system Locale.
         /// </summary>
-        /// <returns>The localised date.</returns>
+        /// <returns>The localized date.</returns>
         /// <param name="userDateTime">User date time.</param>
         /// <param name="dtFormat">DateTime format if required.</param>
         public static string LocaleDate(DateTime userDateTime, string dtFormat )

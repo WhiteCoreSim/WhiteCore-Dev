@@ -66,14 +66,14 @@ namespace WhiteCore.Framework.Modules
         void ArchiveRegion(Stream saveStream, Guid requestId);
 
         /// <summary>
-        ///     Dearchive the given region archive.  This replaces the existing scene.
+        ///     De-archive the given region archive.  This replaces the existing scene.
         /// </summary>
         /// If you want notification of when it has completed then subscribe to the EventManager.OnOarFileLoaded event.
         /// <param name="loadPath"></param>
         bool DearchiveRegion(string loadPath);
 
         /// <summary>
-        ///     Dearchive the given region archive.  This replaces the existing scene.
+        ///     De-archive the given region archive.  This replaces the existing scene.
         /// </summary>
         /// If you want notification of when it has completed then subscribe to the EventManager.OnOarFileLoaded event.
         /// <param name="loadPath"></param>
@@ -101,14 +101,14 @@ namespace WhiteCore.Framework.Modules
                              bool flipX, bool flipY, bool useParcelOwnership, bool checkOwnership);
 
         /// <summary>
-        ///     Dearchive a region from a stream.  This replaces the existing scene.
+        ///     De-archive a region from a stream.  This replaces the existing scene.
         /// </summary>
         /// If you want notification of when it has completed then subscribe to the EventManager.OnOarFileLoaded event.
         /// <param name="loadStream"></param>
         bool DearchiveRegion(Stream loadStream);
 
         /// <summary>
-        ///     Dearchive a region from a stream.  This replaces the existing scene.
+        ///     De-archive a region from a stream.  This replaces the existing scene.
         /// </summary>
         /// If you want notification of when it has completed then subscribe to the EventManager.OnOarFileLoaded event.
         /// <param name="loadStream"></param>

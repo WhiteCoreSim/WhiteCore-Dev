@@ -68,7 +68,7 @@ namespace WhiteCore.Framework.Servers.HttpServer.Implementation
         }
 
         /// <summary>
-        ///     Set a redirct location.
+        ///     Set a redirect location.
         /// </summary>
         public string RedirectLocation
         {

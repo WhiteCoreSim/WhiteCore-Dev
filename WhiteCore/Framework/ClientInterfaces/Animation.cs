@@ -72,7 +72,7 @@ namespace WhiteCore.Framework.ClientInterfaces
         }
 
         /// <summary>
-        ///     Animation from OSDMap from LLSD XML or LLSD json
+        ///     Animation from OSDMap from LLSD XML or LLSD JSON
         /// </summary>
         /// <param name="args"></param>
         public Animation(OSDMap args)
@@ -81,7 +81,7 @@ namespace WhiteCore.Framework.ClientInterfaces
         }
 
         /// <summary>
-        ///     Pack this object up as an OSDMap for transferring via LLSD XML or LLSD json
+        ///     Pack this object up as an OSDMap for transferring via LLSD XML or LLSD JSON
         /// </summary>
         /// <returns></returns>
         public OSDMap ToOSD()

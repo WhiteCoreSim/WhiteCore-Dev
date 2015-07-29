@@ -43,7 +43,7 @@ namespace WhiteCore.Framework.Modules
         string DefaultLSLScript { get; set; }
 
         /// <summary>
-        ///     Add the given inventory item to a user's inventory asyncronously.
+        ///     Add the given inventory item to a user's inventory asynchronously.
         /// </summary>
         /// <param name="item">The item to add</param>
         void AddInventoryItemAsync(InventoryItemBase item);
@@ -110,7 +110,7 @@ namespace WhiteCore.Framework.Modules
         /// <param name="destId">The UUID of the prim that the </param>
         /// <param name="pin">The ScriptAccessPin of the prim</param>
         /// <param name="running">Whether the script should be running when it is started</param>
-        /// <param name="start_param">The start param to pass to the script</param>
+        /// <param name="start_param">The start parameter to pass to the script</param>
         void RezScript(UUID srcId, ISceneChildEntity m_host, UUID destId, int pin, int running, int start_param);
     }
 }

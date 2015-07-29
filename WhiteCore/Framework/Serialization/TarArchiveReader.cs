@@ -103,7 +103,7 @@ namespace WhiteCore.Framework.Serialization
         /// <summary>
         ///     Read the next 512 byte chunk of data as a tar header.
         /// </summary>
-        /// <returns>A tar header struct.  null if we have reached the end of the archive.</returns>
+        /// <returns>A tar header structure.  null if we have reached the end of the archive.</returns>
         protected TarHeader ReadHeader()
         {
             byte[] header = m_br.ReadBytes(512);

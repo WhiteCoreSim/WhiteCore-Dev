@@ -44,7 +44,7 @@ namespace WhiteCore.Framework.Utilities
         /// <summary>
         ///     Register an interface to a region module.  This allows module methods to be called directly as
         ///     well as via events.  If there is already a module registered for this interface, it is not replaced
-        ///     (is this the best behaviour?)
+        ///     (is this the best behavior?)
         /// </summary>
         /// <param name="mod"></param>
         public void RegisterModuleInterface<T>(T mod)

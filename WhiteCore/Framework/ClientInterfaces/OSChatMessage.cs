@@ -72,7 +72,7 @@ namespace WhiteCore.Framework.ClientInterfaces
         }
 
         /// <summary>
-        ///     The type of message, eg say, shout, broadcast.
+        ///     The type of message, e.g. say, shout, broadcast.
         /// </summary>
         public ChatTypeEnum Type
         {

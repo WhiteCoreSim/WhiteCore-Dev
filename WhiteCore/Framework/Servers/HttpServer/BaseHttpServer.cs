@@ -90,7 +90,7 @@ namespace WhiteCore.Framework.Servers.HttpServer
         }
 
         /// <summary>
-        /// The hostname (external IP or dns name) that this server is on (without http(s)://)
+        /// The hostname (external IP or DNS name) that this server is on (without http(s)://)
         /// </summary>
         /// <value>The name of the host.</value>
         public string HostName
@@ -100,7 +100,7 @@ namespace WhiteCore.Framework.Servers.HttpServer
         }
 
         /// <summary>
-        /// The hostname (external IP or dns name) that this server is on (with http(s)://)
+        /// The hostname (external IP or DNS name) that this server is on (with http(s)://)
         /// </summary>
         /// <value>The full name of the host.</value>
         public string FullHostName
@@ -290,14 +290,14 @@ namespace WhiteCore.Framework.Servers.HttpServer
         private string getDefaultHTTP404()
         {
             return
-                "<HTML><HEAD><TITLE>404 Page not found</TITLE><BODY><BR /><H1>Ooops!</H1><P>The page you requested has been obsconded with by knomes. Find hippos quick!</P><P>If you are trying to log-in, your link parameters should have: &quot;-loginpage " +
+                "<HTML><HEAD><TITLE>404 Page not found</TITLE><BODY><BR /><H1>Ooops!</H1><P>The page you requested has been absconded with by gnomes. Find hippos quick!</P><P>If you are trying to log-in, your link parameters should have: &quot;-loginpage " +
                  ServerURI + "/?method=login -loginuri " + ServerURI + "/&quot; in your link </P></BODY></HTML>";
         }
 
         private static string getDefaultHTTP500()
         {
             return
-                "<HTML><HEAD><TITLE>500 Internal Server Error</TITLE><BODY><BR /><H1>Ooops!</H1><P>The server you requested is overun by knomes! Find hippos quick!</P></BODY></HTML>";
+                "<HTML><HEAD><TITLE>500 Internal Server Error</TITLE><BODY><BR /><H1>Ooops!</H1><P>The server you requested is overrun by gnomes! Find hippos quick!</P></BODY></HTML>";
         }
 
         #endregion

@@ -52,7 +52,7 @@ namespace WhiteCore.Framework.Modules
         event InventoryArchiveSaved OnInventoryArchiveSaved;
 
         /// <summary>
-        ///     Dearchive a user's inventory folder from the given stream
+        ///     De-archive a user's inventory folder from the given stream
         /// </summary>
         /// <param name="firstName"></param>
         /// <param name="lastName"></param>

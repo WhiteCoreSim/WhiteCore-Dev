@@ -45,12 +45,12 @@ namespace WhiteCore.Framework.Servers.HttpServer.Interfaces
         string ServerURI { get; }
 
         /// <summary>
-        ///     The hostname (external IP or dns name) that this server is on (without http(s)://)
+        ///     The hostname (external IP or DNS name) that this server is on (without http(s)://)
         /// </summary>
         string HostName { get; set; }
 
         /// <summary>
-        ///     The hostname (external IP or dns name) that this server is on (with http(s)://)
+        ///     The hostname (external IP or DNS name) that this server is on (with http(s)://)
         /// </summary>
         string FullHostName { get; }
 

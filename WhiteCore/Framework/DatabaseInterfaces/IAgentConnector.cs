@@ -41,7 +41,7 @@ namespace WhiteCore.Framework.DatabaseInterfaces
         IAgentInfo GetAgent(UUID agentID);
 
         /// <summary>
-        ///     Updates the language and maturity params of the agent.
+        ///     Updates the language and maturity parameters of the agent.
         ///     Note: we only allow for this on the grid side
         /// </summary>
         /// <param name="agent"></param>

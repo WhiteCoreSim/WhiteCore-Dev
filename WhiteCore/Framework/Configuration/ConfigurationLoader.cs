@@ -45,7 +45,7 @@ namespace WhiteCore.Framework.Configuration
         public string iniFilePath = "";
 
         /// <summary>
-        ///     Should we save all merging of the .ini files to the filesystem?
+        ///     Should we save all merging of the .ini files to the file-system?
         /// </summary>
         protected bool inidbg;
 
@@ -278,7 +278,7 @@ namespace WhiteCore.Framework.Configuration
                     ReadConfig(sources[i] + ".example", i, m_config);
             }
 
-            // add override paramteres if they exist ONLY for standalone operation
+            // add override parameters if they exist ONLY for standalone operation
             if (! mainIniFileName.Contains("GridServer"))
             {
                 string  worldIniFilePath = Path.Combine(mainIniDirectory, worldIniFileName);

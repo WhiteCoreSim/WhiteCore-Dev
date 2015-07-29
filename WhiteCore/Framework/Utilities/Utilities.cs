@@ -25,7 +25,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-//Uses the following website for the creation of the encrpyted hashes
+//Uses the following website for the creation of the encrypted hashes
 //http://www.obviex.com/samples/Encryption.aspx
 
 using System;

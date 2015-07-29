@@ -68,7 +68,7 @@ namespace WhiteCore.Framework.Services
         List<SchedulerItem> ToRun(DateTime timeBefore);
 
         /// <summary>
-        /// Saves scheuler itm in history.
+        /// Saves scheduler item in history.
         /// </summary>
         /// <returns>The history.</returns>
         /// <param name="I">Scheduler item</param>
@@ -77,15 +77,15 @@ namespace WhiteCore.Framework.Services
         /// <summary>
         /// Saves the history completed status only.
         /// </summary>
-        /// <returns>The history scheulder item.</returns>
+        /// <returns>The history scheduler item.</returns>
         /// <param name="I">I.</param>
         SchedulerItem SaveHistoryComplete(SchedulerItem I);
 
         /// <summary>
-        /// Saves a recipt to the history with completed status.
+        /// Saves a receipt to the history with completed status.
         /// </summary>
         /// <param name="historyID">History ID.</param>
-        /// <param name="reciept">Reciept.</param>
+        /// <param name="reciept">Receipt.</param>
         void SaveHistoryCompleteReciept(string historyID, string reciept);
 
         /// <summary>

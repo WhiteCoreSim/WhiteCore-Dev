@@ -65,7 +65,7 @@ namespace WhiteCore.Framework.Modules
         RegionInfo LoadRegion();
 
         /// <summary>
-        ///     This updates a Regions info given by the param 'oldName' to the new region info given
+        ///     This updates a Regions info given by the parameter 'oldName' to the new region info given
         /// </summary>
         /// <param name="oldName"></param>
         /// <param name="regionInfo"></param>

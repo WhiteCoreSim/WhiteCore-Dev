@@ -39,7 +39,7 @@ using WhiteCore.Framework.Services.ClassHelpers.Other;
 namespace WhiteCore.Framework.SceneInfo
 {
     /// <value>
-    ///     Indicate what action to take on an object derez request
+    ///     Indicate what action to take on an object de-rez request
     /// </value>
     public enum DeRezAction : byte
     {

@@ -208,7 +208,7 @@ namespace WhiteCore.Framework.Servers.HttpServer.Implementation
             }
             catch (Exception)
             {
-                MainConsole.Instance.Error("[OSHttpRequest]: Error parsing querystring");
+                MainConsole.Instance.Error("[OSHttpRequest]: Error parsing query-string");
             }
 
             if (ContentType != null && ContentType.StartsWith("multipart/form-data"))

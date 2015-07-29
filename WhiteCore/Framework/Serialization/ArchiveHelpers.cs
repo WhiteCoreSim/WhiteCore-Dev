@@ -108,7 +108,7 @@ namespace WhiteCore.Framework.Serialization
             WebResponse response = request.GetResponse();
             Stream file = response.GetResponseStream();
 
-            // justincc: gonna ignore the content type for now and just try anything
+            // justincc: going to ignore the content type for now and just try anything
             //if (response.ContentType != "application/x-oar")
             //    throw new Exception(String.Format("{0} does not identify an OAR file", uri.ToString()));
 

@@ -31,7 +31,7 @@ using OpenMetaverse.Packets;
 namespace WhiteCore.Framework.ClientInterfaces
 {
     /// <summary>
-    ///     Enapsulate statistics for a simulator/scene.
+    ///     Encapsulate statistics for a simulator/scene.
     /// </summary>
     public class SimStats
     {

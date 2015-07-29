@@ -121,7 +121,7 @@ namespace WhiteCore.Framework.Modules
         void SaveStateSave(UUID itemID, UUID primID);
 
         /// <summary>
-        ///     Get a list of all script function names in the Apis
+        ///     Get a list of all script function names in the API's
         /// </summary>
         /// <returns></returns>
         List<string> GetAllFunctionNames();

@@ -43,7 +43,7 @@ namespace WhiteCore.Framework.Modules
         /// <param name="initiator">The user (or other ID) that caused this restart</param>
         /// <param name="message">The message to send to the clients in the sim</param>
         /// <param name="alerts">The times to send alert messages to the clients in the sim</param>
-        /// <param name="notice">Send the alert messages as notices instead of blue box popups</param>
+        /// <param name="notice">Send the alert messages as notices instead of blue box popup</param>
         void ScheduleRestart(UUID initiator, string message, int[] alerts, bool notice);
 
         /// <summary>

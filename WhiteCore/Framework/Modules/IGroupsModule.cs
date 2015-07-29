@@ -81,7 +81,7 @@ namespace WhiteCore.Framework.Modules
         /// <summary>
         /// Gets a list of all groups.
         /// </summary>
-        /// <returns>Alist of group UUIDs</returns>
+        /// <returns>A list of group UUIDs</returns>
         List <UUID> GetAllGroups ( UUID RequestingAgentID);
         List<GroupMembersData> GetGroupMembers (UUID requestingAgentID, UUID GroupID);
 

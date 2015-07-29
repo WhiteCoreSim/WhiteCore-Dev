@@ -64,7 +64,7 @@ namespace WhiteCore.Framework.Services
         void CreateGroupChat(UUID agentID, GridInstantMessage im);
 
         /// <summary>
-        ///     Checks to make sure a group conference session exsits for the given group
+        ///     Checks to make sure a group conference session exists for the given group
         /// </summary>
         /// <param name="groupID"></param>
         void EnsureSessionIsStarted(UUID groupID);

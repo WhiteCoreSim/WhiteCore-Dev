@@ -35,7 +35,7 @@ namespace WhiteCore.Framework.Utilities
     public static class PrimeNumberHelper
     {
         /// <summary>
-        ///     Precalculated prime numbers.
+        ///     Pre-calculated prime numbers.
         /// </summary>
         private static readonly int[] Primes = new[]
                                                    {

@@ -55,7 +55,7 @@ namespace WhiteCore.Framework.SceneInfo
         string BackupFile { get; set; }
 
         /// <summary>
-        ///     Initialises the data storage engine
+        ///     Initializes the data storage engine
         /// </summary>
         void Initialise();
 
@@ -136,7 +136,7 @@ namespace WhiteCore.Framework.SceneInfo
         RegionInfo CreateNewRegion(ISimulationBase simBase, RegionInfo regionInfo, Dictionary<string, int> currentInfo);
 
         /// <summary>
-        ///     Load all region infos available
+        ///     Load all region info available
         /// </summary>
         /// <param name="simBase"></param>
         /// <param name="newRegion"></param>
@@ -158,7 +158,7 @@ namespace WhiteCore.Framework.SceneInfo
         void SetRegion(IScene scene);
 
         /// <summary>
-        ///     Forces the datastore to backup the region
+        ///     Forces the data-store to backup the region
         /// </summary>
         void ForceBackup();
 

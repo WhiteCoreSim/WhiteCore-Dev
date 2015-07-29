@@ -65,7 +65,7 @@ namespace WhiteCore.Framework.ConsoleFramework
 
             m_Commands.AddCommand("help", "help", "Get a general command list", Help, false, true);
 
-            MainConsole.Instance.Info("[GUIConsole] initialised.");
+            MainConsole.Instance.Info("[GUIConsole] initialized.");
         }
 
         public void Help(IScene scene, string[] cmd)

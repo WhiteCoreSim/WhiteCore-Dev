@@ -275,7 +275,7 @@ namespace WhiteCore.Framework.SceneInfo.Entities
         }
 
         /// <summary>
-        ///     Retrives the SceneObjectGroup of this child
+        ///     Retrieves the SceneObjectGroup of this child
         /// </summary>
         /// <param name="childkey"></param>
         /// <param name="obj"></param>
@@ -295,7 +295,7 @@ namespace WhiteCore.Framework.SceneInfo.Entities
         }
 
         /// <summary>
-        ///     Retrives the SceneObjectGroup of this child
+        ///     Retrieves the SceneObjectGroup of this child
         /// </summary>
         /// <param name="childkey"></param>
         /// <param name="obj"></param>

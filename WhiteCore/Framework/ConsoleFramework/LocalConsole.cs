@@ -291,7 +291,7 @@ namespace WhiteCore.Framework.ConsoleFramework
                     }
                     catch (ArgumentNullException)
                     {
-                        // Some older systems dont support coloured text.
+                        // Some older systems don't support colored text.
                         Console.WriteLine(sender);
                     }
                 }

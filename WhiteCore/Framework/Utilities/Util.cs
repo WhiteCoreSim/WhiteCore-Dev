@@ -434,7 +434,7 @@ namespace WhiteCore.Framework.Utilities
         ///     is located
         /// </summary>
         /// <returns>
-        ///     Filesystem path to the directory containing the current
+        ///     File system path to the directory containing the current
         ///     executable
         /// </returns>
         public static string ExecutingDirectory()
@@ -446,10 +446,10 @@ namespace WhiteCore.Framework.Utilities
         ///     Copy data from one stream to another, leaving the read position of both streams at the beginning.
         /// </summary>
         /// <param name='inputStream'>
-        ///     Input stream.  Must be seekable.
+        ///     Input stream.  Must be seek-able.
         /// </param>
         /// <exception cref='ArgumentException'>
-        ///     Thrown if the input stream is not seekable.
+        ///     Thrown if the input stream is not seek-able.
         /// </exception>
         public static Stream Copy(Stream inputStream)
         {
@@ -544,7 +544,7 @@ namespace WhiteCore.Framework.Utilities
         }
 
         /// <summary>
-        ///     Returns true if the distance beween A and B is less than amount. Significantly faster than GetDistanceTo since it eliminates the Sqrt.
+        ///     Returns true if the distance between A and B is less than amount. Significantly faster than GetDistanceTo since it eliminates the Sqrt.
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
@@ -570,14 +570,14 @@ namespace WhiteCore.Framework.Utilities
 
         /// <summary>
         ///     Get a normalized form of a 3d vector
-        ///     The vector paramater cannot be &lt;0,0,0&gt;
+        ///     The vector parameter cannot be &lt;0,0,0&gt;
         /// </summary>
         /// <param name="a">A 3d vector</param>
         /// <returns>A new vector which is normalized form of the vector</returns>
         public static Vector3 GetNormalizedVector(Vector3 a)
         {
             if (IsZeroVector(a))
-                throw new ArgumentException("Vector paramater cannot be a zero vector.");
+                throw new ArgumentException("Vector parameter cannot be a zero vector.");
 
             float Mag = (float) GetMagnitude(a);
             return new Vector3(a.X/Mag, a.Y/Mag, a.Z/Mag);

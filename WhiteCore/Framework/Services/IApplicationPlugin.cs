@@ -92,7 +92,7 @@ namespace WhiteCore.Framework.Services
         /// </summary>
         /// <param name="table">table to update</param>
         /// <param name="values">dictionary of table fields and new values</param>
-        /// <param name="incrementValues">dictionary of table fields and integer to increment by (use negative ints to decrement)</param>
+        /// <param name="incrementValues">dictionary of table fields and integer to increment by (use negative integers to decrement)</param>
         /// <param name="queryFilter">filter to control which rows get updated</param>
         /// <param name="start">LIMIT start or LIMIT start, count</param>
         /// <param name="count">LIMIT start, count</param>

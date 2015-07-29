@@ -101,7 +101,7 @@ namespace WhiteCore.Framework.Services
         bool ItemExists (UUID itemID);
 
         /// <summary>
-        /// Gets an exsting user folder.
+        /// Gets an existing user folder.
         /// </summary>
         /// <returns>The user folder.</returns>
         /// <param name="principalID">Principal I.</param>

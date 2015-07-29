@@ -297,7 +297,7 @@ namespace WhiteCore.Framework.Services
         UUID AgentID { get; }
 
         /// <summary>
-        ///     The host URI of this CAPS Servie (http://IP:port)
+        ///     The host URI of this CAPS Service (http://IP:port)
         /// </summary>
         String HostUri { get; }
 
@@ -432,7 +432,7 @@ namespace WhiteCore.Framework.Services
         void Initialise(UUID RegionID, IRegistryCore registry);
 
         /// <summary>
-        ///     Close the service and all underlieing services
+        ///     Close the service and all underlying services
         /// </summary>
         void Close();
 

@@ -56,7 +56,7 @@ namespace WhiteCore.Framework.Utilities
         /// <param name="sName">Schedule name.</param>
         /// <param name="sParams">parameters.</param>
         /// <param name="runOnce">If set to <c>true</c> run once.</param>
-        /// <param name="runSchedule">DateTime (utc) to run the schedule.</param>
+        /// <param name="runSchedule">DateTime (UTC) to run the schedule.</param>
         /// <param name="agentID">AgentID of the schedule.</param>
         public SchedulerItem(string sName, string sParams, bool runOnce, DateTime runSchedule, UUID agentID)
         {

@@ -28,7 +28,7 @@
 namespace WhiteCore.Framework.Utilities
 {
     /// <summary>
-    ///     Currently unused, but left as it is a useful enum
+    ///     Currently unused, but left as it is a useful Enum
     /// </summary>
     public enum Cardinals
     {

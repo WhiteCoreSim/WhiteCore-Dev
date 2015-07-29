@@ -31,7 +31,7 @@ using OpenMetaverse;
 namespace WhiteCore.Framework.ClientInterfaces
 {
     /// <summary>
-    ///     Args to return to a client that queries picker data
+    ///     Arguments to return to a client that queries picker data
     /// </summary>
     public class AvatarPickerReplyAgentDataArgs : EventArgs
     {

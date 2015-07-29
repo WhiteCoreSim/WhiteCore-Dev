@@ -297,17 +297,17 @@ namespace WhiteCore.Framework.Utilities
                             System.Diagnostics.StackTrace stackTrace = new System.Diagnostics.StackTrace();
 
                             MainConsole.Instance.Trace(
-                                string.Format("[WebUtils]: osd request (URI:{0}, METHOD:{1}, UPSTACK(4):{5}) took {2}ms overall, {3}ms writing, {4}ms deserializing",
+                                string.Format("[WebUtils]: osd request (URI:{0}, METHOD:{1}, UPSTACK(4):{5}) took {2}ms overall, {3}ms writing, {4}ms de-serializing",
                                 url, method, tickdiff, tickdata, tickserialize,
                                 (stackTrace.FrameCount > 4 ? stackTrace.GetFrame(4) : stackTrace.GetFrame(stackTrace.FrameCount - 1)).GetMethod().Name));
                         }
                         else if (MainConsole.Instance.IsDebugEnabled)
                             MainConsole.Instance.Debug(
-                                string.Format("[WebUtils]: request (URI:{0}, METHOD:{1}) took {2}ms overall, {3}ms writing, {4}ms deserializing",
+                                string.Format("[WebUtils]: request (URI:{0}, METHOD:{1}) took {2}ms overall, {3}ms writing, {4}ms de-serializing",
                                 url, method, tickdiff, tickdata, tickserialize));
                         if (tickdiff > 5000)
                             MainConsole.Instance.Info(
-                                string.Format("[WebUtils]: request took too long (URI:{0}, METHOD:{1}) took {2}ms overall, {3}ms writing, {4}ms deserializing",
+                                string.Format("[WebUtils]: request took too long (URI:{0}, METHOD:{1}) took {2}ms overall, {3}ms writing, {4}ms de-serializing",
                                 url, method, tickdiff, tickdata, tickserialize));
                     }
                 }
@@ -326,7 +326,7 @@ namespace WhiteCore.Framework.Utilities
         ///     Takes the value of an Accept header and returns the preferred types
         ///     ordered by q value (if it exists).
         ///     Example input: image/jpg;q=0.7, image/png;q=0.8, image/jp2
-        ///     Exmaple output: ["jp2", "png", "jpg"]
+        ///     Example output: ["jp2", "png", "jpg"]
         ///     NOTE: This doesn't handle the semantics of *'s...
         /// </summary>
         /// <param name="accept"></param>
@@ -369,7 +369,7 @@ namespace WhiteCore.Framework.Utilities
                 return null;
             try
             {
-                // We should pay attention to the content-type, but let's assume we know it's Json
+                // We should pay attention to the content-type, but let's assume we know it's JSON
                 OSD buffer = OSDParser.DeserializeJson(data);
                 if (buffer.Type == OSDType.Map)
                 {

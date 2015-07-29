@@ -35,7 +35,7 @@ using OpenMetaverse;
 namespace WhiteCore.Framework.Modules
 {
     /// <summary>
-    ///     Adds functionality so that modules can be developed to be triggered by chat said inworld by avatars
+    ///     Adds functionality so that modules can be developed to be triggered by chat said in world by avatars
     /// </summary>
     public interface IChatPlugin
     {

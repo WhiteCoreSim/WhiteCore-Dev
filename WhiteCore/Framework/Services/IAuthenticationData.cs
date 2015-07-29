@@ -38,7 +38,7 @@ namespace WhiteCore.Framework.Services
     }
 
     /// <summary>
-    ///     An interface for connecting to the authentication datastore
+    ///     An interface for connecting to the authentication data-store
     /// </summary>
     public interface IAuthenticationData : IWhiteCoreDataPlugin
     {

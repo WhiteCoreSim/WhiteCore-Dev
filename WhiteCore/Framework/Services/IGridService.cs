@@ -473,7 +473,7 @@ namespace WhiteCore.Framework.Services
 
         /// <value>
         ///     This accessor can throw all the exceptions that Dns.GetHostAddresses can throw.
-        ///     XXX Isn't this really doing too much to be a simple getter, rather than an explict method?
+        ///     XXX Isn't this really doing too much to be a simple getter, rather than an explicit method?
         /// </value>
         public IPEndPoint ExternalEndPoint
         {
@@ -639,7 +639,7 @@ namespace WhiteCore.Framework.Services
     }
 
     /// <summary>
-    ///     The threat level enum
+    ///     The threat level Enum
     ///     Tells how much we trust another host
     /// </summary>
     public enum ThreatLevel

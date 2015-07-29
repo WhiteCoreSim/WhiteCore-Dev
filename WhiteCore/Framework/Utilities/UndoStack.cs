@@ -90,7 +90,7 @@ namespace WhiteCore.Framework.Utilities
                 return deleted;
             }
             else
-                throw new InvalidOperationException("Cannot pop from emtpy stack");
+                throw new InvalidOperationException("Cannot pop from empty stack");
         }
 
         public T Peek()

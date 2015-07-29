@@ -202,7 +202,7 @@ namespace WhiteCore.Framework.SceneInfo
                 if (!Enum.IsDefined(typeof (HollowShape), hollowShapeByte))
                 {
                     MainConsole.Instance.WarnFormat(
-                        "[SHAPE]: Attempt to set a ProfileCurve with a hollow shape value of {0}, which isn't a valid enum.  Replacing with default shape.",
+                        "[SHAPE]: Attempt to set a ProfileCurve with a hollow shape value of {0}, which isn't a valid Enum.  Replacing with default shape.",
                         hollowShapeByte);
 
                     this._hollowShape = HollowShape.Same;
@@ -218,7 +218,7 @@ namespace WhiteCore.Framework.SceneInfo
                 if (!Enum.IsDefined(typeof (ProfileShape), profileShapeByte))
                 {
                     MainConsole.Instance.WarnFormat(
-                        "[SHAPE]: Attempt to set a ProfileCurve with a profile shape value of {0}, which isn't a valid enum.  Replacing with square.",
+                        "[SHAPE]: Attempt to set a ProfileCurve with a profile shape value of {0}, which isn't a valid Enum.  Replacing with square.",
                         profileShapeByte);
 
                     this._profileShape = ProfileShape.Square;
