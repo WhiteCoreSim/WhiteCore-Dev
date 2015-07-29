@@ -240,7 +240,7 @@ namespace WhiteCore.ClientStack
             lastDrip = now;
 /*
                 if (dripAmount < 0 || content < 0)
-                    // sim has been idle for too long, integer has overflown
+                    // sim has been idle for too long, integer is overflowing
                     // previous calculation is meaningless, let's put it at correct max
                     content = maxBurst;
 */

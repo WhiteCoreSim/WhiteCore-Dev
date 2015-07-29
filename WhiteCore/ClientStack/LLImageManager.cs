@@ -189,7 +189,7 @@ namespace WhiteCore.ClientStack
                 // If null was returned, the texture priority queue is currently empty
                 if (image == null)
                     break;
-                //Break so that we add any images back that we might remove because they arn't finished decoding
+                //Break so that we add any images back that we might remove because they aren't finished decoding
 
                 if (image.IsDecoded)
                 {

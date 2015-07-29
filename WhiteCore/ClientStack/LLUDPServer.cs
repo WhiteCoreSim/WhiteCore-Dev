@@ -477,7 +477,7 @@ namespace WhiteCore.ClientStack
             // Frequency analysis of outgoing packet sizes shows a large clump of packets at each end of the spectrum.
             // The vast majority of packets are less than 200 bytes, although due to asset transfers and packet splitting
             // there are a decent number of packets in the 1000-1140 byte range. We allocate one of two sizes of data here
-            // to accomodate for both common scenarios and provide ample room for ACK appending in both
+            // to accommodate for both common scenarios and provide ample room for ACK appending in both
             int bufferSize = dataLength*2;
 
             UDPPacketBuffer buffer = new UDPPacketBuffer(udpClient.RemoteEndPoint, bufferSize);
@@ -605,7 +605,7 @@ namespace WhiteCore.ClientStack
             {
                 //MainConsole.Instance.Debug("[LLUDPSERVER]: Resending " + expiredPackets.Count + " packets to " + udpClient.AgentID + ", RTO=" + udpClient.RTO);
 
-                // Exponential backoff of the retransmission timeout
+                // Exponential back off of the retransmission timeout
                 udpClient.BackoffRTO();
 
                 foreach (OutgoingPacket t in expiredPackets.Where(t => t.UnackedMethod != null))
@@ -797,7 +797,7 @@ namespace WhiteCore.ClientStack
                 else
                     // Don't create circuits for unauthorized clients
                     MainConsole.Instance.WarnFormat(
-                        "[LLUDPServer]: Connection request for client {0} connecting with unnotified circuit code {1} from {2}",
+                        "[LLUDPServer]: Connection request for client {0} connecting with un-notified circuit code {1} from {2}",
                         cPacket.CircuitCode.ID, cPacket.CircuitCode.Code, remoteEndPoint);
 
                 return;

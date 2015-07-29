@@ -79,7 +79,7 @@ namespace WhiteCore.ClientStack
         protected abstract void PacketReceived(UDPPacketBuffer buffer);
 
         /// <summary>
-        ///     Default initialiser
+        ///     Default Initialization
         /// </summary>
         /// <param name="bindAddress">Local IP address to bind the server to</param>
         /// <param name="port">Port to listening for incoming UDP packets on</param>
@@ -128,7 +128,7 @@ namespace WhiteCore.ClientStack
 
                 try
                 {
-                    // This udp socket flag is not supported under mono, 
+                    // This UDP socket flag is not supported under mono, 
                     // so we'll catch the exception and continue
                     if(Util.IsWindows())
                         m_udpSocket.IOControl(SIO_UDP_CONNRESET, new byte[] {0}, null);
