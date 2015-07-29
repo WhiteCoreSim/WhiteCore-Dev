@@ -12,6 +12,7 @@
 *.mds
 *.pdb
 *.StyleCop
+*.suo
 *.userprefs
 *.VisualState.xml
 *.vshost.*
