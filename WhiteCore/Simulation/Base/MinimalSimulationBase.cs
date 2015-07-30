@@ -178,7 +178,8 @@ namespace WhiteCore.Simulation.Base
         {
             IConfig startupConfig = m_config.Configs["Startup"];
 
-            int stpMaxThreads = 15;
+            int stpMinThreads = 15;
+            int stpMaxThreads = 300;
 
             if (startupConfig != null)
             {
@@ -203,11 +204,20 @@ namespace WhiteCore.Simulation.Base
                     Utils.EnumTryParse(asyncCallMethodStr, out asyncCallMethod))
                     Util.FireAndForgetMethod = asyncCallMethod;
 
-                stpMaxThreads = SystemConfig.GetInt("MaxPoolThreads", 15);
+                stpMinThreads = SystemConfig.GetInt("MinPoolThreads", stpMinThreads);
+                stpMaxThreads = SystemConfig.GetInt("MaxPoolThreads", stpMaxThreads);
+
+                if (stpMinThreads < 2)
+                    stpMinThreads = 2;
+                if (stpMaxThreads < 2)
+                    stpMaxThreads = 2;
+                if (stpMinThreads > stpMaxThreads)
+                    stpMinThreads = stpMaxThreads;
+                
             }
 
             if (Util.FireAndForgetMethod == FireAndForgetMethod.SmartThreadPool)
-                Util.InitThreadPool(stpMaxThreads);
+                Util.InitThreadPool(stpMinThreads, stpMaxThreads);
 
             //Set up console forcefully
             WhiteCore.Services.BaseService consoleService = new WhiteCore.Services.BaseService();
