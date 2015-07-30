@@ -1548,7 +1548,7 @@ namespace WhiteCore.Modules.Land
                 {
                     UserAccount CurrentAgent = m_scene.UserAccountService.GetUserAccount(null, remote_client.AgentId);
 
-                    string AbandonmentDate = DateTime.Now.ToString("M\\/dd\\/yyyy");
+                    string AbandonmentDate = DateTime.Now.ToString("yyyy-MM-dd");
 
                     if (land.LandData.IsGroupOwned)
                     {
@@ -1565,22 +1565,22 @@ namespace WhiteCore.Modules.Land
                             }
                         }
 
-                        land.LandData.Description = "Land owned by the group " + GroupName + " was abandoned by " + CurrentAgent.Name + " on " + AbandonmentDate;
+                        land.LandData.Description = "Parcel owned by the group " + GroupName + " was abandoned by " + CurrentAgent.Name + " on " + AbandonmentDate;
                     }
                     else
                     {
                         if (remote_client.AgentId == land.LandData.OwnerID)
                         {
-                            land.LandData.Description = "Land abandoned by " + CurrentAgent.Name + " on " + AbandonmentDate;
+                            land.LandData.Description = "Parcel owned by " + CurrentAgent.Name + " was abandoned on " + AbandonmentDate;
                         }
                         else
                         {
                             UserAccount ParcelOwner = m_scene.UserAccountService.GetUserAccount(null, land.LandData.OwnerID);
-                            land.LandData.Description = "Land owned by " + ParcelOwner.Name + " was abandoned by " + CurrentAgent.Name + " on " + AbandonmentDate;
+                            land.LandData.Description = "Parcel owned by " + ParcelOwner.Name + " was abandoned by " + CurrentAgent.Name + " on " + AbandonmentDate;
                         }
                     }
 
-                    land.LandData.Name = "Abandoned Land " + AbandonmentDate;
+                    land.LandData.Name = AbandonmentDate + ": Abandoned Land";
                     
                     land.LandData.OwnerID = m_scene.RegionInfo.EstateSettings.EstateOwner;
                     land.LandData.AuctionID = 0; //This must be reset!
@@ -1595,7 +1595,7 @@ namespace WhiteCore.Modules.Land
                           ParcelFlags.AllowAPrimitiveEntry | ParcelFlags.CreateObjects | ParcelFlags.RestrictPushObject | ParcelFlags.AllowDeedToGroup | ParcelFlags.DenyAgeUnverified | ParcelFlags.DenyAnonymous);
 
                     land.LandData.Flags |= (uint)(ParcelFlags.SoundLocal | ParcelFlags.AllowVoiceChat | ParcelFlags.AllowLandmark | ParcelFlags.AllowFly | ParcelFlags.AllowOtherScripts | ParcelFlags.AllowGroupScripts | ParcelFlags.AllowGroupObjectEntry | ParcelFlags.CreateGroupObjects | ParcelFlags.UseEstateVoiceChan);
-
+                    land.LandData.Status = ParcelStatus.Abandoned; // Parcel is Abandoned
                     m_hasSentParcelOverLay.Clear(); //Clear everyone out
                     m_scene.ForEachClient(SendParcelOverlay);
                     land.SendLandUpdateToClient(true, remote_client);
@@ -1619,6 +1619,7 @@ namespace WhiteCore.Modules.Land
                     land.LandData.IsGroupOwned = false;
                     land.LandData.SalePrice = 0;
                     land.LandData.AuthBuyerID = UUID.Zero;
+                    land.LandData.Status = ParcelStatus.Leased; // Parcel is back to be Leased
                     land.LandData.Flags &=
                         ~(uint)
                          (ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects |

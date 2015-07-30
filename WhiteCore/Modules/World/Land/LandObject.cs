@@ -401,6 +401,7 @@ namespace WhiteCore.Modules.Land
             LandData.ClaimPrice = claimprice;
             LandData.SalePrice = 0;
             LandData.AuthBuyerID = UUID.Zero;
+            LandData.Status = ParcelStatus.Leased;
             LandData.Flags &= ~(uint) 
                 (ParcelFlags.ForSale | ParcelFlags.ForSaleObjects |
                     ParcelFlags.SellParcelObjects | ParcelFlags.ShowDirectory);

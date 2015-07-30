@@ -144,7 +144,10 @@ namespace WhiteCore.Modules.Auction
                     return;
                 landObject.LandData.SnapshotID = SnapshotID;
                 landObject.LandData.AuctionID = (uint) Util.RandomClass.Next(0, int.MaxValue);
-                landObject.LandData.Status = ParcelStatus.Abandoned;
+                // landObject.LandData.Status = ParcelStatus.Abandoned;
+                // 150730 Fly-Man- Only when an parcel is Abandoned the Status is changed to Abandoned.
+                // During an Auction, the Status of an parcel stays "Leased"
+                landObject.LandData.Status = ParcelStatus.Leased;
                 landObject.SendLandUpdateToAvatarsOverMe();
             }
         }
