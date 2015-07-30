@@ -49,9 +49,14 @@ namespace WhiteCore.Modules.Currency
 
         #region IMoneyModule Members
 
-		    public string InWorldCurrencySymbol
+		public string InWorldCurrencySymbol
         {
             get { return "$"; }
+        }
+
+        public bool IsLocal
+        {
+            get { return !m_config.Configs ["WhiteCoreConnectors"].GetBoolean("DoRemoteCalls", false); }
         }
 
         public int UploadCharge

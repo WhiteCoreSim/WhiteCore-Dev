@@ -189,8 +189,15 @@ namespace WhiteCore.Modules.Currency
             amount = (uint)CheckMinMaxTransferSettings(agentID, amount);
             if (amount == 0)
                 return false;
-            UserCurrencyTransfer(agentID, UUID.Zero, amount,
-                                             "Currency Exchange", TransactionType.SystemGenerated, UUID.Zero);
+            
+            UserCurrencyTransfer(
+                agentID,
+                UUID.Zero,
+                amount,
+                "Currency Exchange",
+                TransactionType.BuyMoney,
+                UUID.Zero
+            );
 
             //Log to the database
             List<object> values = new List<object> {
@@ -202,6 +209,7 @@ namespace WhiteCore.Modules.Currency
                 Utils.GetUnixTime(),                   // Created
                 Utils.GetUnixTime()                    // Updated
             };
+
             m_gd.Insert(_REALMPURCHASE, values.ToArray());
             return true;
         }
@@ -398,6 +406,7 @@ namespace WhiteCore.Modules.Currency
             return UserCurrencyTransfer(toID, fromID, UUID.Zero, "", UUID.Zero, "", amount, description, type, transactionID);
         }
 
+        // This is the main entry point for currency transactions
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public bool UserCurrencyTransfer(UUID toID, UUID fromID, UUID toObjectID, string toObjectName, UUID fromObjectID,
             string fromObjectName, uint amount, string description, TransactionType type, UUID transactionID)
@@ -409,21 +418,37 @@ namespace WhiteCore.Modules.Currency
 
             UserCurrency toCurrency = GetUserCurrency(toID);
             UserCurrency fromCurrency = fromID == UUID.Zero ? null : GetUserCurrency(fromID);
+
             if (toCurrency == null)
                 return false;
+
+            // Groups (legacy) should not receive stiopends
+            if ((type == TransactionType.StipendPayment) && toCurrency.IsGroup)
+                return false;
+            
             if (fromCurrency != null)
             {
-                //Check to see whether they have enough money
-                if ((int) fromCurrency.Amount - (int) amount < 0)
-                    return false; //Not enough money
-                fromCurrency.Amount -= amount;
+                if (fromID == (UUID)Constants.BankerUUID)
+                {
+                    // payment from the Banker
+                    // 20150730 - greythane - need to fiddle 'the books' as -ve balances are not currently available
+                    fromCurrency.Amount += amount;
+                } else
+                {
+                    // Normal users cannot have a credit balance.. check to see whether they have enough money
+                    if ((int)fromCurrency.Amount - (int)amount < 0)
+                        return false; // Not enough money
+                }
 
-                UserCurrencyUpdate(fromCurrency, true);
+                // subtract this payment
+                fromCurrency.Amount -= amount;
+                UserCurrencyUpdate (fromCurrency, true);
             }
+
             if (fromID == toID)
                 toCurrency = GetUserCurrency (toID);
 
-            //Update the user whose getting paid
+            //Update the user who is getting paid
             toCurrency.Amount += amount;
             UserCurrencyUpdate(toCurrency, true);
 

@@ -208,6 +208,7 @@ namespace WhiteCore.Framework.Modules
     public interface IMoneyModule
     {
         string InWorldCurrencySymbol { get; }
+        bool IsLocal { get; }
 
         int UploadCharge { get; }
         int GroupCreationCharge { get; }
