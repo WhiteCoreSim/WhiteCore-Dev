@@ -1,0 +1,215 @@
+<!-- Abuse report -->
+
+
+<div id="content">
+  <div id="ContentHeaderCenter">
+    <h2>{SystemName}: {AbuserReportText}{Cardnumber}</h2>
+  </div>
+
+  {IsAdminAuthenticatedBegin}
+  <div id="error_message" class="info_message">{ErrorMessage}</div>
+
+  <form id="abuse_form" action="index.html?page=admin/abuse_report.html" method="POST">
+    <div style="display: inline-block;">
+      <table>
+        <caption></caption>
+
+        <thead>
+          <tr>
+            <th class="region_info_left"></th>
+            <th class="region_info_right" ></th>
+          </tr>
+        </thead>
+
+        <tfoot>
+          <tr>
+            <th class="region_info_left"></th>
+            <th class="region_info_right" ></th>
+          </tr>
+        </tfoot>
+
+        <tbody>
+          <tr>
+            <td class="region_info_picture" rowspan="10" style="padding-right:25px;">
+              <div class="region_info_picture" style="height:256px;">
+                <a class="regionslurl" onclick="document.location.href='secondlife://{MainServerURL}/{RegionName}/128/128/50'" alt="{RegionNameText}: {RegionName}" title="{RegionNameText}: {RegionName}<br />secondlife://{MainServerURL}/{RegionName}/128/128/50">
+                  <img height="256" src="{ScreenshotURL}" alt="{RegionNameText}: {RegionName}" title="{RegionNameText}: {RegionName}" />
+                </a>
+                <p class="region_info_picture_text">{RegionNameText}: {RegionName}
+                  <br /> {ObjectNameText}: {ObjectName}
+                  <br />{ObjectPosition}
+                  <br /> secondlife://{RegionName}/128/128/50
+                </p>
+              </div>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="region_info_left">
+              <p>{CategoryText}:</p>
+            </td>
+            <td class="region_info_right" colspan="2">
+              <p>{Category}</p>
+            </td>
+          </tr>
+          <tr>
+            <td class="region_info_left">
+              <p>{AbuseSummaryText}:</p>
+            </td>
+            <td class="region_info_right">
+              <p>{Summary}</p>
+            </td>
+          </tr>
+          <tr>
+            <td class="region_info_left">
+              <p>{AbuserNameText}:</p>
+            </td>
+            <td class="region_info_right">
+              <p>{AbuserName}</p>
+            </td>
+          </tr>
+          <tr>
+            <td class="region_info_left">
+              <p>{AbuseReporterNameText}:</p>
+            </td>
+            <td class="region_info_right">
+              <p>{ReporterName}</p>
+            </td>
+          </tr>
+          <tr>
+            <td class="region_info_left">
+              <p>{RegionNameText}:</p>
+            </td>
+            <td class="region_info_right">
+              <p>{RegionName}</p>
+            </td>
+          </tr>
+          <tr>
+            <td class="region_info_left">
+              <p>{ObjectNameText}:</p>
+            </td>
+            <td class="region_info_right">
+              <p>{ObjectName}</p>
+            </td>
+          </tr>
+          <tr>
+            <td class="region_info_left">
+              <p>{LocationText}:</p>
+            </td>
+            <td class="region_info_right">
+              <p>{ObjectPosition}</p>
+            </td>
+          </tr>
+          <tr>
+            <td class="region_info_left">
+              <p>{UUIDText}:</p>
+            </td>
+            <td class="region_info_right">
+              <p>{ObjectUUID}</p>
+            </td>
+          </tr>
+          <tr>
+            <td class="region_info_left">
+              <p>{DetailsText}:</p>
+            </td>
+            <td class="region_info_right">
+              <p>{Details}</p>
+            </td>
+          </tr>
+          <tr />
+          <tr>
+            <td class="region_info_left">
+              <p>{NotesText}:</p>
+            </td>
+            <td class="region_info_right">
+              <p>{Notes}</p>
+              <textarea name="AbuseNoteText" cols="80" rows="5" id="AbuseNoteText" value="{Notes}"></textarea>
+            </td>
+          </tr>
+          <tr>
+            <td class="region_info_left">
+              <p>{ActiveText}:</p>
+            </td>
+            <td class="region_info_right">	
+              <select id="Active" require="true" name='Active'>			
+				<option value="Yes">{Yes}</option>
+				<option value="No" selected="Yes">{No}</option>
+		 	  </select>
+
+              <p>{Active}</p>
+            </td>
+          </tr>
+          <tr>
+            <td class="region_info_left">
+              <p>{CheckedText}:</p>
+            </td>
+            <td class="region_info_right">
+              <select id="Checked" require="true" name='Checked'>			
+			    <option value="Yes">{Yes}</option>
+			    <option value="No" selected="Yes">{No}</option>
+		      </select>
+
+              <p>{Checked}</p>
+            </td>
+          </tr>
+          <tr>
+            <td class="region_info_left">
+              <p>{AssignedToText}:</p>
+            </td>
+            <td class="region_info_right">
+	            <input minlength="3" id="AssignedTo" require="true" label="AssignedTo" name="RegionName" type="text" size="25" maxlength="30" value="{AssignedTo}"></td>
+            </td>
+          </tr>
+          <tr>
+            <td class="region_info_left"></td>
+            <td class="region_info_right" colspan="3">
+              <input type="hidden" label="cardid" id="cardid" name="cardid" value="{CardNumber}"/>
+  			  <input type="hidden" label="Submit" id="Submit" name="Submit" value="SubmitUpdates" />
+              <button id="Submit" name="Submit" type="Submit">{Submit}</button>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+  </form>
+  {IsAdminAuthenticatedEnd}
+</div>
+
+<script type="text/javascript" rel="javasript">
+  jQuery(document).ready(function($) {
+    $('div.region_info_picture').each(function(i) {
+      var img_ = $('img', this);
+      var img_height = img_.attr('height');
+      var p_height = $('p', this).outerHeight();
+      $(this).height(img_height);
+      $(this).hover(function() {
+        img_.animate({
+          marginTop: -p_height - 5
+        }, 500);
+      }, function() {
+        img_.animate({
+          marginTop: '0'
+        }, 500);
+      });
+    });
+  });
+</script>
+
+<script>
+  /* attach a submit handler to the form */
+  $("#abuse_form").submit(function(event) {
+
+    /* stop form from submitting normally */
+    event.preventDefault();
+    /* get some values from elements on the page: */
+    var $form = $(this),
+      url = $form.attr('action');
+    /* Send the data using post and put the results in a div */
+    $.post(url, $form.serialize(),
+      function(data) {
+        $("#error_message").empty().append(data);
+      }
+    );
+  });
+</script>

@@ -33,6 +33,17 @@ namespace WhiteCore.Framework.DatabaseInterfaces
     public interface IAbuseReportsConnector : IWhiteCoreDataPlugin
     {
         /// <summary>
+        /// Abuse reports connector is enabled.
+        /// </summary>
+        bool Enabled();
+
+        /// <summary>
+        /// Gets the number of Abuse reports.
+        /// </summary>
+        /// <returns>The report count.</returns>
+        int AbuseReportCount();
+
+        /// <summary>
         ///     Gets the abuse report associated with the number and uses the pass to authenticate.
         /// </summary>
         /// <param name="Number"></param>

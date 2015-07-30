@@ -53,6 +53,22 @@ namespace WhiteCore.Framework.Services
 
         public AbuseReport()
         {
+            AbuseDetails = "";
+            AbuseLocation = "";
+            AbuseSummary = "";
+            AbuserName = "";
+            Active = false;;
+            AssignedTo = "";
+            Category = null;
+            Checked = false;
+            Notes = "";
+            Number = 0;
+            ObjectName = "";
+            ObjectPosition = "";
+            ObjectUUID = UUID.Zero;
+            RegionName = "";
+            ReporterName = "";
+            ScreenshotID = UUID.Zero;
         }
 
         public override void FromOSD(OSDMap DicCol)

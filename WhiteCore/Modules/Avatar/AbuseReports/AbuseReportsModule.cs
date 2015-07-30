@@ -26,7 +26,14 @@
  */
 
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
@@ -37,31 +44,17 @@ using WhiteCore.Framework.Servers.HttpServer.Interfaces;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Assets;
 using WhiteCore.Framework.Utilities;
-using WhiteCore.Modules.AbuseReportsGUI;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using System;
-using System.IO;
-using System.Threading;
-using System.Windows.Forms;
 
 namespace WhiteCore.Modules.AbuseReports
 {
-    public class AbuseReportsGUIService : IService
+    public class AbuseReportsService : IService
     {
         #region IService Members
 
-        private IRegistryCore m_registry;
+        IAbuseReportsConnector abuseConnector;
 
         public void Initialize(IConfigSource config, IRegistryCore registry)
         {
-            m_registry = registry;
-            if (MainConsole.Instance != null)
-                MainConsole.Instance.Commands.AddCommand("GUI abuse reports",
-                                                         "GUI abuse reports",
-                                                         "Opens the abuse reports GUI", 
-                                                         OpenGUI, false, true);
         }
 
         public void Start(IConfigSource config, IRegistryCore registry)
@@ -70,23 +63,57 @@ namespace WhiteCore.Modules.AbuseReports
 
         public void FinishedStartup()
         {
+            abuseConnector = Framework.Utilities.DataManager.RequestPlugin<IAbuseReportsConnector> ();
+            if (abuseConnector != null)
+            {
+                if (MainConsole.Instance != null)
+                {
+                    MainConsole.Instance.Commands.AddCommand (
+                        "abuse reports",
+                        "abuse reports",
+                        "Display a summary of current abuse reports", 
+                        HandleAbuseReports, false, true);
+                }
+            }
         }
+
 
         #endregion
 
-        #region GUI Code
-
-        protected void OpenGUI(IScene scene, string[] cmdparams)
+        #region console commands
+        protected void HandleAbuseReports(IScene scene, string [] cmd)
         {
-            Thread t = new Thread(ThreadProcARGUI);
-            t.Start();
-        }
 
-        public void ThreadProcARGUI()
-        {
-            Culture.SetCurrentCulture();
-            Application.Run(new Abuse(m_registry.RequestModuleInterface<IAssetService>(),
-                                      m_registry.RequestModuleInterface<IJ2KDecoder>()));
+            int reports;
+            while (!int.TryParse (MainConsole.Instance.Prompt ("Number of reports to display: ", "7"), out reports))
+                MainConsole.Instance.Info ("Bad input, must be a number > 0");
+
+            string abuseInfo;
+
+            abuseInfo = String.Format ("{0, -8}", "Card");
+            abuseInfo += String.Format ("{0, -30}", "Category");
+            abuseInfo += String.Format ("{0, -30}", "Summary");
+            abuseInfo += String.Format ("{0, -20}", "Reporter");
+            abuseInfo += String.Format ("{0, -20}", "Assigned");
+ 
+            MainConsole.Instance.CleanInfo (abuseInfo);
+
+            MainConsole.Instance.CleanInfo (
+                "----------------------------------------------------------------------------------------------------");
+
+            List<AbuseReport> abuseReports =  abuseConnector.GetAbuseReports(0, reports, true);
+
+            foreach (AbuseReport rpt in abuseReports) {
+                abuseInfo = String.Format ("{0, -8}", rpt.Number);
+                abuseInfo += String.Format ("{0, -30}", rpt.Category.ToString().Substring(0,28));   
+                abuseInfo += String.Format ("{0, -30}", rpt.AbuseSummary);
+                abuseInfo += String.Format ("{0, -20}", rpt.ReporterName);
+                abuseInfo += String.Format ("{0, -12}", rpt.AssignedTo);
+
+                MainConsole.Instance.CleanInfo (abuseInfo);
+                MainConsole.Instance.CleanInfo ("");
+
+            }
         }
 
         #endregion
@@ -97,8 +124,8 @@ namespace WhiteCore.Modules.AbuseReports
     /// </summary>
     public class AbuseReportsModule : INonSharedRegionModule
     {
-        private IScene m_Scene;
-        private bool m_enabled;
+        IScene m_Scene;
+        bool m_enabled;
 
         #region INonSharedRegionModule Members
 
@@ -156,12 +183,12 @@ namespace WhiteCore.Modules.AbuseReports
 
         #endregion
 
-        private void OnClosingClient(IClientAPI client)
+        void OnClosingClient(IClientAPI client)
         {
             client.OnUserReport -= UserReport;
         }
 
-        private void OnNewClient(IClientAPI client)
+        void OnNewClient(IClientAPI client)
         {
             client.OnUserReport += UserReport;
         }
@@ -181,7 +208,7 @@ namespace WhiteCore.Modules.AbuseReports
         /// <param name="screenshotID"></param>
         /// <param name="summery"></param>
         /// <param name="reporter"></param>
-        private void UserReport(IClientAPI client, string regionName, UUID abuserID, byte catagory, byte checkflags,
+        void UserReport(IClientAPI client, string regionName, UUID abuserID, byte catagory, byte checkflags,
                                 string details, UUID objectID, Vector3 position, byte reportType, UUID screenshotID,
                                 string summery, UUID reporter)
         {
@@ -246,14 +273,23 @@ namespace WhiteCore.Modules.AbuseReports
             {
                 IEmailModule Email = m_Scene.RequestModuleInterface<IEmailModule>();
                 if (Email != null)
-                    Email.SendEmail(UUID.Zero, ES.AbuseEmail, "Abuse Report", "This abuse report was submitted by " +
-                                                                              report.ReporterName + " against " +
-                                                                              report.AbuserName + " at " +
-                                                                              report.AbuseLocation + " in your region " +
-                                                                              report.RegionName +
-                                                                              ". Summary: " + report.AbuseSummary +
-                                                                              ". Details: " + report.AbuseDetails + ".",
-                                    client.Scene);
+                {
+                    string msg = "This abuse report was submitted by " +
+                                 report.ReporterName + " against " +
+                                 report.AbuserName + " at " +
+                                 report.AbuseLocation + " in your region " +
+                                 report.RegionName +
+                                 ". Summary: " + report.AbuseSummary +
+                                 ". Details: " + report.AbuseDetails + ".";
+                
+                    Email.SendEmail (
+                        UUID.Zero,
+                        ES.AbuseEmail,
+                        "Abuse Report",
+                        msg,
+                        client.Scene
+                    );
+                }
             }
             //Tell the DB about it
             IAbuseReports conn = m_Scene.RequestModuleInterface<IAbuseReports>();
@@ -263,7 +299,7 @@ namespace WhiteCore.Modules.AbuseReports
 
         #region Disabled CAPS code
 
-        private OSDMap OnRegisterCaps(UUID agentID, IHttpServer server)
+        OSDMap OnRegisterCaps(UUID agentID, IHttpServer server)
         {
             OSDMap retVal = new OSDMap();
             retVal["SendUserReportWithScreenshot"] = CapsUtil.CreateCAPS("SendUserReportWithScreenshot", "");
@@ -283,12 +319,13 @@ namespace WhiteCore.Modules.AbuseReports
             return retVal;
         }
 
-        private  byte[] ProcessSendUserReportWithScreenshot(UUID AgentID, string path, Stream request, OSHttpRequest httpRequest,
+         byte[] ProcessSendUserReportWithScreenshot(UUID AgentID, string path, Stream request, OSHttpRequest httpRequest,
                                           OSHttpResponse httpResponse) 
         {
             IScenePresence SP = findScenePresence(AgentID);
             OSDMap map = (OSDMap)OSDParser.DeserializeLLSDXml(HttpServerHandlerHelpers.ReadFully(request));
             //string RegionName = map["abuse-region-name"];
+
             UUID AbuserID = map["abuser-id"];
             uint Category = map["category"];
             uint CheckFlags = map["check-flags"];
@@ -307,8 +344,7 @@ namespace WhiteCore.Modules.AbuseReports
                 AbuseTextureUploader uploader = new AbuseTextureUploader(uploadpath, SP.UUID, ScreenShotID);
                 uploader.OnUpLoad += AbuseTextureUploaded;
 
-                MainServer.Instance.AddStreamHandler(new GenericStreamHandler("POST", uploadpath,
-                                                                    uploader.uploaderCaps));
+                MainServer.Instance.AddStreamHandler(new GenericStreamHandler("POST", uploadpath, uploader.uploaderCaps));
 
                 string uploaderURL = MainServer.Instance.ServerURI + uploadpath;
                 OSDMap resp = new OSDMap();
@@ -326,10 +362,10 @@ namespace WhiteCore.Modules.AbuseReports
         public class AbuseTextureUploader
         {
             public event UploadedAbuseTexture OnUpLoad;
-            private UploadedAbuseTexture handlerUpLoad = null;
-            private UUID m_agentID, m_assetID;
+            UploadedAbuseTexture handlerUpLoad = null;
+            UUID m_agentID, m_assetID;
 
-            private readonly string uploaderPath = String.Empty;
+            readonly string uploaderPath = String.Empty;
 
             public AbuseTextureUploader(string path, UUID agentID, UUID assetID)
             {
