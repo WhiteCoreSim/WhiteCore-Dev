@@ -11,58 +11,55 @@
 -->
 
 <div id="fullPage">
-<script type="text/javascript">
-  $(document).ready(function(){$(".agentinfo, .agentedit").colorbox({iframe:true, width:"990px", height:"440px"});});
-</script>
+  <script type="text/javascript">
+    $(document).ready(function(){$(".agentinfo, .agentedit").colorbox({iframe:true, width:"990px", height:"440px"});});
+  </script>
 
-<h2>{SystemName}: {UserSearchText}</h2>
-<h3>{SearchForUserText}</h3>
-<form id="user_search_form" action="user_search.html" method="post">
-<table id="user_search">
-  <caption></caption>
+  <h2>{SystemName}: {UserSearchText}</h2>
+  <h3>{SearchForUserText}</h3>
+  <form id="user_search_form" action="user_search.html" method="post">
+    <table id="user_search">
   
-  <thead>
-    <tr>
-      <th class="user_search_left"></th>
-      <th class="user_search_right"></th>
-    </tr>
-  </thead>
-  <tfoot>
-    <tr>
-      <th class="user_search_left"></th>
-      <th class="user_search_right"></th>
-    </tr>
-  </tfoot>
-  <tbody>
-    <tr>
-      <td class="user_search_left"><p>{UserNameText}*</p></td>
-      <td class="user_search_right">
-	    <input require="true" label="username" name="username" />
-		<input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
-		<button id="login_bouton" type="Submit" name="Submit" value="Submit">{Search}</button>
-	  </td>
-    </tr>
-  </tbody>
-</table>
-</form>
-<script>
-  /* attach a submit handler to the form */
-  $("#user_search_form").submit(function(event) {
+      <thead>
+        <tr>
+          <th class="user_search_left"></th>
+          <th class="user_search_right"></th>
+        </tr>
+      </thead>
 
-    /* stop form from submitting normally */
-    event.preventDefault(); 
-    /* get some values from elements on the page: */
-    var $form = $( this ),
-        url = $form.attr( 'action' );
-    /* Send the data using post and put the results in a div */
-    $.post( url, $form.serialize(),
-      function( data ) {
-		$("#fullPage").empty().append(data);
-      }
-    );
-  });
-</script>
+      <tbody>
+        <tr>
+          <td class="user_search_left"><p>{UserNameText}*</p></td>
+          <td class="user_search_right">
+	        <input require="true" label="username" name="username" />
+		    <input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
+		    <button id="login_bouton" type="Submit" name="Submit" value="Submit">{Search}</button>
+	      </td>
+        </tr>
+      </tbody>
+    </table>
+  </form>
+
+  <script>
+    /* attach a submit handler to the form */
+    $("#user_search_form").submit(function(event) {
+
+      /* stop form from submitting normally */
+      event.preventDefault(); 
+      /* get some values from elements on the page: */
+      var $form = $( this ),
+          url = $form.attr( 'action' );
+      /* Send the data using post and put the results in a div */
+      $.post( url, $form.serialize(),
+        function( data ) {
+	      $("#fullPage").empty().append(data);
+        }
+      );
+    });
+  </script>
+  
 <h3>{SearchResultForUserText}</h3>
+<!--
 <table id="user_search_result_navigation_top">
   <caption></caption>
   
@@ -75,51 +72,30 @@
 	  <th><a class="fade" href="index.html?page=user_search&Start=-1" target="_self" title="{LastText}"><p class="nav">>&nbsp;|</p></a></th>
     </tr>
   </thead>
-<!--  
-  <tfoot>
-    <tr>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </tfoot>
   
-  <tbody>
-    <tr>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-  </tbody>
--->
+
 </table>
-<table id="user_search_result">
-  <caption></caption>
-  
+-->
+  <div id="error_message" class="error_message">
+    <h3>{NoDetailsText}</h3>
+  </div>
+
+<table id="user_search_result" class="display">
   <thead class="listhead">
     <tr>
       <th class="user_search_result_left"><p>{UserNameText}</p></th>
       <th class="user_search_result_right"><p>{EditUserAccountText}</p></th>
     </tr>
   </thead>
+
   <tfoot class="listfoot">
     <tr style="align: bottom;">
       <th class="user_search_result_left"><p>{UserNameText}</p></th>
       <th class="user_search_result_right"><p>{EditUserAccountText}</p></th>
     </tr>
   </tfoot>
+
   <tbody>
-    <tr>
-  	<td colspan="5">
-  	  <div id="error_message" class="error_message">
-  	    <h3>{NoDetailsText}</h3>
-  	  </div>
-  	</td>
-  </tr>
 
 {UsersListArrayBegin}
     <tr>
@@ -131,6 +107,7 @@
 {UsersListArrayEnd}
   </tbody>
 </table>
+<!--
 <table id="user_search_result_navigation_bottom">
   <caption></caption>
   
@@ -143,26 +120,15 @@
 	  <th><a class="fade" href="index.html?page=user_search&Start=-1" target="_self" title="{LastText}"><p class="nav">>&nbsp;|</p></a></th>
     </tr>
   </thead>
-<!--  
-  <tfoot>
-    <tr>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </tfoot>
-  
-  <tbody>
-    <tr>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-  </tbody>
--->
 </table>
+-->
+  <script type="text/javascript">
+	$(document).ready(function()
+	{
+		$('#user_search_result').dataTable({
+        	"order": [[ 0, "asc" ]]
+    	});
+	} );
+  </script>
+
 </div>

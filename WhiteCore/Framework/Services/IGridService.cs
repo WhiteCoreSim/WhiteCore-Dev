@@ -489,7 +489,10 @@ namespace WhiteCore.Framework.Services
 
         public ulong RegionHandle
         {
-            get { return Util.IntsToUlong (RegionLocX, RegionLocY); }
+            get {
+                var regHdl = Util.IntsToUlong (RegionLocX, RegionLocY);
+                return regHdl;
+            }
         }
 
         /// <summary>

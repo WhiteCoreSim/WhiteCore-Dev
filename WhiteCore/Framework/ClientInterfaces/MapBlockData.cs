@@ -41,6 +41,8 @@ namespace WhiteCore.Framework.ClientInterfaces
         public ushort SizeX;
         public ushort SizeY;
         public byte WaterHeight;
+
+        //NOTE:  These are uint16 values so the current max location limitation is 63466, 63466 !!ß
         public ushort X;
         public ushort Y;
 

@@ -8,47 +8,42 @@
 {IsNotAdminAuthenticatedBegin}
 <meta http-equiv="REFRESH" content="0;url={SystemURL}">
 {IsNotAdminAuthenticatedEnd}
+
 {IsAdminAuthenticatedBegin}
-<script type="text/javascript" language="javascript" src="javascripts/menu.js"></script>
 <h2>{SystemName}: {NewsManager}</h3>
 <div id="info_message" class="info_message"><p>{Success}</p></div>
-<button id="add_news"><onClick="window.location.href='index.html?page=add_news';" id="add_news"><p>{AddNewsItem}</p></button>
-<table id="news_manager">
-  <caption></caption>
-  
-  <thead>
-    <tr>
-      <th class="news_manager_left"></th>
-      <th class="news_manager_right"></th>
-      <th class="news_manager_right"></th>
-      <th class="news_manager_right"></th>
-    </tr>
-  </thead>
-  
-  <tfoot>
-    <tr>
-      <th class="news_manager_left"></th>
-      <th class="news_manager_right"></th>
-      <th class="news_manager_right"></th>
-      <th class="news_manager_right"></th>
-    </tr>
-  </tfoot>
+<div>
+  <button id="add_news" onClick="window.location.href='index.html?page=add_news';" id="add_news"><p>{AddNewsItem}</p></button>
+  <table id="news_manager_list" class="display">
+    <thead class="listhead">
+      <tr>
+        <th class="news_manager_left">{NewsTitleText}</th>
+        <th class="news_manager_right">{NewsDateText}</th>
+        <th class="news_manager_right"></th>
+        <th class="news_manager_right"></th>
+      </tr>
+    </thead>
 
-  <tbody>
-    <tr>
-      <td class="news_manager_left"><p>{NewsTitleText}</p></td>
-      <td class="news_manager_right"><p>{NewsDateText}</p></td>
-      <td class="news_manager_right"><p>{EditNewsText}</p></td>
-      <td class="news_manager_right"><p>{DeleteNewsText}</p></td>
-    </tr>
-{NewsArrayBegin}
-    <tr>
-      <td class="news_manager_left"><p>{NewsTitle}</p></td>
-      <td class="news_manager_right"><p>{NewsDate}</p></td>
-	  <td class="news_manager_right"><a href="index.html?page=edit_news&newsid={NewsID}"><p>{EditNewsItem}</p></a></td>
-	  <td class="news_manager_right"><a href="index.html?page=news_manager&delete={NewsID}"><p>{DeleteNewsItem}</p></a></td>
-    </tr>
-{NewsArrayEnd}
-  </tbody>
-</table>
+    <tbody>
+      {NewsArrayBegin}
+      <tr onclick="document.location = 'index.html?page=edit_news&newsid={NewsID}';">
+        <td class="news_manager_left"><p>{NewsTitle}</p></td>
+        <td class="news_manager_right"><p>{NewsDate}</p></td>
+	    <td class="news_manager_right"><a href="index.html?page=edit_news&newsid={NewsID}"><p>{EditNewsItem}</p></a></td>
+	    <td class="news_manager_right"><a href="index.html?page=news_manager&delete={NewsID}"><p>{DeleteNewsItem}</p></a></td>
+      </tr>
+      {NewsArrayEnd}
+    </tbody>
+  </table>
+
+
+  <script type="text/javascript">
+	$(document).ready(function()
+	{
+		$('#news_manager_list').dataTable({
+        	"order": [[ 0, "asc" ]]
+    	});
+	} );
+  </script>
+</div>
 {IsAdminAuthenticatedEnd}

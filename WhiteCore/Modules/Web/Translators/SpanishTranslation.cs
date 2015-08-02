@@ -24,7 +24,17 @@
                 case "CurrentPageText": return "La página actual";
                 case "MoreInfoText": return "Más info";
                 case "NoDetailsText": return "No se encontraron datos...";
-
+            case "ObjectNameText": return "Objeto";
+            case "LocationText": return "Ubicación";
+            case "UUIDText": return "UUID";
+            case "DetailsText": return "Descripción";
+            case "NotesText": return "Notas";
+            case "SaveUpdates": return "Guardar cambios";
+            case "ActiveText": return "Activo";
+            case "CheckedText": return "Comprobado";
+            case "CategoryText": return "Categoria";
+            case "SummaryText": return "Resumen";
+                
                 // Status information
                 case "GridStatus": return "Estato de la Grid";
                 case "Online": return "En Linea";
@@ -570,6 +580,15 @@
                 case "PingTimeText": return "Tiempo Ping";
                 case "AgentsInViewText": return "Agentes de vista";
                 case "ClearStatsText": return "Borrar datos estadísticas";
+ 
+                // abuse reports
+            case "MenuAbuse": return "Abuso Informes";
+            case "TooltipsMenuAbuse": return "Usuario abuso informes";
+            case "AbuseReportText": return "Reportar abuso";
+            case "AbuserNameText": return "Abusador";
+            case "AbuseReporterNameText": return "Reportero";
+            case "AssignedToText": return "Asignado a";
+                
                 //Times
                 case "Sun":
                     return "Sun";

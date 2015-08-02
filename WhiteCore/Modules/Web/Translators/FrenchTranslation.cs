@@ -24,7 +24,17 @@
                 case "CurrentPageText": return "Page actuelle";
                 case "MoreInfoText": return "Plus d'informations";
                 case "NoDetailsText": return "Pas de détails trouvés...";
-
+            case "ObjectNameText": return "Objet";
+            case "LocationText": return "Emplacement";
+            case "UUIDText": return "UUID";
+            case "DetailsText": return "Description";
+            case "NotesText": return "Remarques";
+            case "SaveUpdates": return "Enregistrer les mises à jour";
+            case "ActiveText": return "Actif";
+            case "CheckedText": return "Vérifié";
+            case "CategoryText": return "Catégorie";
+            case "SummaryText": return "Résumé";
+                
                 //Status information
                 case "GridStatus": return "Etat de la Grille";
                 case "Online": return "En Ligne";
@@ -195,7 +205,7 @@
                 case "MenuMyTransactions": return "Mes Transactions";
                 case "MenuStatistics": return "Statistiques Viewer";
                 case "MenuGridSettings": return "Les paramètres de grille";
-
+                
                 // Tooltips Menu Buttons
                 case "TooltipsMenuHome": return "Accueil";
                 case "TooltipsMenuLogin": return "Connection";
@@ -226,7 +236,7 @@
                 case "TooltipsMenuTransactions": return "Informations sur la transaction";
                 case "TooltipsMenuStatistics": return "Statistiques Viewer";
                 case "TooltipsMenuGridSettings": return "Les paramètres de grille";
-
+                
                 // Menu Region
                 case "MenuRegionTitle": return "Région";
                 case "MenuParcelTitle": return "Colis";
@@ -557,6 +567,14 @@
                 case "PingTimeText": return "Ping temps";
                 case "AgentsInViewText": return "Agents en vue";
                 case "ClearStatsText": return "Effacer les statistiques sur";
+
+                // abuse reports
+            case "MenuAbuse": return "Abus Rapports";
+            case "TooltipsMenuAbuse": return "Utilisateur abuse journaliste";
+            case "AbuseReportText": return "Signaler un abus";
+            case "AbuserNameText": return "Abuser";
+            case "AbuseReporterNameText": return "Journaliste";
+            case "AssignedToText": return "Assigné à";
 
                 //Times
                 case "Sun":
