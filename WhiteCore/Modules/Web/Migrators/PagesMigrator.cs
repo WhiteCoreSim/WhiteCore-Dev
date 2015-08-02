@@ -382,7 +382,7 @@ namespace WhiteCore.Modules.Web
                 }
             });
 
-
+            // these are indivual paages that can be called
             _rootPage.Children.Add(new GridPage
                                        {
                                            MenuID = "add_news",

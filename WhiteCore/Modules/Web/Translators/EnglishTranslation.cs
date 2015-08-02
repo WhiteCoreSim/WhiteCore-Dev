@@ -199,7 +199,6 @@
                 case "MenuMyTransactions": return "My Transactions";
                 case "MenuStatistics": return "Viewer Statistics";
                 case "MenuGridSettings": return "Grid Settings";
-                case "MenuAbuse": return "Abuse Reports";
 
                 // Main Menu Tooltips
                 case "TooltipsMenuHome": return "Home";
@@ -232,7 +231,6 @@
                 case "TooltipsMenuTransactions": return "Transaction information";
                 case "TooltipsMenuStatistics": return "Viewer Statistics";
                 case "TooltipsMenuGridSettings": return "Grid settings";
-            case "TooltipsMenuAbuse": return "User abuse reports";
 
                 // Menu Region box
                 case "MenuRegionTitle": return "Region";
@@ -461,6 +459,9 @@
                 case "ClearStatsText": return "Clear statistics data";
 
                 // abuse reports
+            case "MenuAbuse": return "Abuse Reports";
+            case "TooltipsMenuAbuse": return "User abuse reports";
+            case "AbuseReportText": return "Abuse Report";
             case "AbuserNameText": return "Abuser";
             case "AbuseReporterNameText": return "Reporter";
             case "AssignedToText": return "Assigned to";

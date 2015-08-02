@@ -27,7 +27,6 @@
 
 using System;
 using System.Collections.Generic;
-using OpenMetaverse;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
@@ -38,10 +37,8 @@ namespace WhiteCore.Modules.Web
     {
         public string[] FilePath
         {
-            get
-            {
-                return new[]
-                {
+            get {
+                return new[] {
                     "html/admin/abuse_list.html"
                 };
             }
@@ -57,133 +54,71 @@ namespace WhiteCore.Modules.Web
             get { return true; }
         }
 
-        public Dictionary<string, object> Fill(WebInterface webInterface, string filename, OSHttpRequest httpRequest,
-            OSHttpResponse httpResponse, Dictionary<string, object> requestParameters,
-            ITranslator translator, out string response)
+        public Dictionary<string, object> Fill (WebInterface webInterface, string filename, OSHttpRequest httpRequest,
+                                               OSHttpResponse httpResponse, Dictionary<string, object> requestParameters,
+                                               ITranslator translator, out string response)
         {
             response = null;
-            var vars = new Dictionary<string, object>();
-            var abuseReportsList = new List<Dictionary<string, object>>();
+            var vars = new Dictionary<string, object> ();
+            var abuseReportsList = new List<Dictionary<string, object>> ();
 
-            uint amountPerQuery = 25;
-            var today = DateTime.Now;
-            var thirtyDays = today.AddDays (-30);
-            string DateStart = thirtyDays.ToShortDateString();
-            string DateEnd = today.ToShortDateString();
-            string UserName = "";
+            IAbuseReportsConnector abuseModule = Framework.Utilities.DataManager.RequestPlugin<IAbuseReportsConnector> ();
 
-            IAbuseReportsConnector abuseModule = Framework.Utilities.DataManager.RequestPlugin<IAbuseReportsConnector>();
-            //IUserAccountService accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
+            string noDetails = translator.GetTranslatedString ("NoDetailsText");
+            List<AbuseReport> abuseReports;
 
-            string noDetails = translator.GetTranslatedString ("NoTransactionsText");
-            List<AbuseReport> abuseReports = null;
+            abuseReports = abuseModule.GetAbuseReports (0, 0, true);
 
-            int start = 0;
-            int count = 0;
-
-            // Check if we're looking at the standard page or the submitted one
-            if (requestParameters.ContainsKey ("Submit"))
+            if (abuseReports.Count > 0)
             {
-                if (requestParameters.ContainsKey ("date_start"))
-                    DateStart = requestParameters ["date_start"].ToString ();
-                if (requestParameters.ContainsKey ("date_end"))
-                    DateEnd = requestParameters ["date_end"].ToString ();
-                if (requestParameters.ContainsKey ("user_name"))
-                    UserName = requestParameters ["user_name"].ToString ();
+                noDetails = "";
 
-
-                // paginations
-                start = httpRequest.Query.ContainsKey ("Start")
-                    ? int.Parse (httpRequest.Query ["Start"].ToString ())
-                    : 0;
-                count = (int)abuseModule.AbuseReportCount ();
-                int maxPages = (int)(count / amountPerQuery) - 1;
-
-                if (start == -1)
-                    start = (int)(maxPages < 0 ? 0 : maxPages);
-
-                vars.Add ("CurrentPage", start);
-                vars.Add ("NextOne", start + 1 > maxPages ? start : start + 1);
-                vars.Add ("BackOne", start - 1 < 0 ? 0 : start - 1);
-
-            
-            //    var timeNow = DateTime.Now.ToString ("HH:mm:ss");
-            //    var dateFrom = DateTime.Parse (DateStart + " " + timeNow);
-            //    var dateTo = DateTime.Parse (DateEnd + " " + timeNow);
-            }
-
-            abuseReports =  abuseModule.GetAbuseReports(start, count, true);
-
-                if (abuseReports.Count > 0)
+                foreach (var rpt in abuseReports)
                 {
-                    noDetails = "";
-
-                    foreach (var rpt in abuseReports)
-                    {
-                        abuseReportsList.Add (new Dictionary<string, object> {
-                            //{ "Date", Culture.LocaleDate (transaction.TransferDate.ToLocalTime(), "MMM dd, hh:mm:ss tt") },
-                            {"Category", rpt.Category},
-                            {"ReporterName", rpt.ReporterName},
-                            {"Abusername", rpt.AbuserName},
-                            {"Summary", rpt.AbuseSummary},
-                            {"AssignedTo", rpt.AssignedTo},
-                            {"Active", rpt.Active ? "Yes" : "No"},
-                            {"CardNumber", rpt.Number.ToString()}
-                        });
-                    }
+                    abuseReportsList.Add (new Dictionary<string, object> {
+                        //{ "Date", Culture.LocaleDate (transaction.TransferDate.ToLocalTime(), "MMM dd, hh:mm:ss tt") },
+                        { "Category", rpt.Category },
+                        { "ReporterName", rpt.ReporterName },
+                        { "Abusername", rpt.AbuserName },
+                        { "Summary", rpt.AbuseSummary },
+                        { "AssignedTo", rpt.AssignedTo },
+                        { "Active", rpt.Active ? "Yes" : "No" },
+                        { "CardNumber", rpt.Number.ToString () }
+                    });
                 }
-//            } else
-//            {
-//                vars.Add ("CurrentPage", 0 );
-//                vars.Add ("NextOne", 0);
-//                vars.Add ("BackOne", 0);
-//            }
+            }
 
             if (abuseReports == null)
             {
-                abuseReportsList.Add(new Dictionary<string, object> {
-                    {"Category", ""},
-                    {"ReporterName", ""},
-                    {"Abusername", ""},
-                    {"Summary", "No abuse reports available"},
-                    {"AssignedTo", ""},
-                    {"Active", ""},
-                    {"CardNumber", ""}
+                abuseReportsList.Add (new Dictionary<string, object> {
+                    { "Category", "" },
+                    { "ReporterName", "" },
+                    { "Abusername", "" },
+                    { "Summary", "No abuse reports available" },
+                    { "AssignedTo", "" },
+                    { "Active", "" },
+                    { "CardNumber", "" }
                 });
             }
 
             // always required data
-            vars.Add ("DateStart", DateStart );
-            vars.Add ("DateEnd", DateEnd );
-            vars.Add ("SearchUser", UserName);
             vars.Add ("AbuseReportsList", abuseReportsList);
             vars.Add ("NoDetailsText", noDetails);
+            vars.Add ("AbuseReportText", translator.GetTranslatedString ("MenuAbuse"));
 
-            // labels
-            vars.Add("AbuseText", translator.GetTranslatedString("AbuseText"));
-            vars.Add("DateInfoText", translator.GetTranslatedString("DateInfoText"));
-            vars.Add("DateStartText", translator.GetTranslatedString("DateStartText"));
-            vars.Add("DateEndText", translator.GetTranslatedString("DateEndText"));
-            vars.Add("SearchUserText", translator.GetTranslatedString("AvatarNameText"));
-
-            vars.Add("TransactionDateText", translator.GetTranslatedString("TransactionDateText"));
-            vars.Add("TransactionToAgentText", translator.GetTranslatedString("TransactionToAgentText"));
-            vars.Add("TransactionFromAgentText", translator.GetTranslatedString("TransactionFromAgentText"));
-            //vars.Add("TransactionTimeText", translator.GetTranslatedString("Time"));
-            vars.Add("TransactionDetailText", translator.GetTranslatedString("TransactionDetailText"));
-            vars.Add("TransactionAmountText", translator.GetTranslatedString("TransactionAmountText"));
-            vars.Add("ActiveText", translator.GetTranslatedString("ActiveText"));
-
-            vars.Add("FirstText", translator.GetTranslatedString("FirstText"));
-            vars.Add("BackText", translator.GetTranslatedString("BackText"));
-            vars.Add("NextText", translator.GetTranslatedString("NextText"));
-            vars.Add("LastText", translator.GetTranslatedString("LastText"));
-            vars.Add("CurrentPageText", translator.GetTranslatedString("CurrentPageText"));
+//            vars.Add("DateText", translator.GetTranslatedString("DateText"));
+            vars.Add ("CategoryText", translator.GetTranslatedString ("CategoryText"));
+            vars.Add ("AbuseReporterNameText", translator.GetTranslatedString ("AbuseReporterNameText"));
+            vars.Add ("AbuserNameText", translator.GetTranslatedString ("AbuserNameText"));
+            vars.Add ("SummaryText", translator.GetTranslatedString ("SummaryText"));
+            vars.Add ("AssignedToText", translator.GetTranslatedString ("AssignedToText"));
+            vars.Add ("ActiveText", translator.GetTranslatedString ("ActiveText"));
+            vars.Add ("MoreInfoText", translator.GetTranslatedString ("MoreInfoText"));
 
             return vars;
         }
 
-        public bool AttemptFindPage(string filename, ref OSHttpResponse httpResponse, out string text)
+        public bool AttemptFindPage (string filename, ref OSHttpResponse httpResponse, out string text)
         {
             text = "";
             return false;

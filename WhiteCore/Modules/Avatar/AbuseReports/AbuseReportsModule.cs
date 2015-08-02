@@ -145,7 +145,6 @@ namespace WhiteCore.Modules.AbuseReports
 
             scene.EventManager.OnNewClient += OnNewClient;
             scene.EventManager.OnClosingClient += OnClosingClient;
-            //Disabled until complete
             scene.EventManager.OnRegisterCaps += OnRegisterCaps;
         }
 
@@ -335,8 +334,21 @@ namespace WhiteCore.Modules.AbuseReports
             uint ReportType = map["report-type"];
             UUID ScreenShotID = map["screenshot-id"];
             string summary = map["summary"];
-            UserReport(SP.ControllingClient, SP.Scene.RegionInfo.RegionName, AbuserID, (byte)Category, (byte)CheckFlags,
-                       details, objectID, position, (byte)ReportType, ScreenShotID, summary, SP.UUID);
+
+            UserReport(
+                SP.ControllingClient,
+                SP.Scene.RegionInfo.RegionName,
+                AbuserID,
+                (byte)Category,
+                (byte)CheckFlags,
+                details,
+                objectID,
+                position,
+                (byte)ReportType,
+                ScreenShotID,
+                summary,
+                SP.UUID
+            );
 
             if (ScreenShotID != UUID.Zero)
             {
@@ -350,10 +362,11 @@ namespace WhiteCore.Modules.AbuseReports
                 OSDMap resp = new OSDMap();
                 resp["uploader"] = uploaderURL;
                 resp["state"] = "upload";
+
                 return OSDParser.SerializeLLSDXmlBytes(resp);
             }
-            else
-                return MainServer.BlankResponse;
+           
+            return MainServer.BlankResponse;
         }
 
 
@@ -362,7 +375,7 @@ namespace WhiteCore.Modules.AbuseReports
         public class AbuseTextureUploader
         {
             public event UploadedAbuseTexture OnUpLoad;
-            UploadedAbuseTexture handlerUpLoad = null;
+            UploadedAbuseTexture handlerUpLoad;
             UUID m_agentID, m_assetID;
 
             readonly string uploaderPath = String.Empty;
@@ -391,6 +404,7 @@ namespace WhiteCore.Modules.AbuseReports
                 map["new_asset"] = m_assetID.ToString();
                 map["item_id"] = UUID.Zero;
                 map["state"] = "complete";
+
                 MainServer.Instance.RemoveStreamHandler("POST", uploaderPath);
 
                 return OSDParser.SerializeLLSDXmlBytes(map);
@@ -402,7 +416,7 @@ namespace WhiteCore.Modules.AbuseReports
             //MainConsole.Instance.InfoFormat("[AssetCAPS]: Received baked texture {0}", assetID.ToString());
             AssetBase asset = new AssetBase(assetID, "Abuse Texture", AssetType.Texture, agentID) { Data = data };
             asset.ID = m_Scene.AssetService.Store(asset);
-            MainConsole.Instance.DebugFormat("[AbuseCAPS]: texture new id {0}", assetID.ToString());
+            MainConsole.Instance.DebugFormat("[AbuseCAPS]: texture new id {0}", assetID);
         }
 
         #endregion

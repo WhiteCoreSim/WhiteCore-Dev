@@ -24,7 +24,17 @@
                 case "CurrentPageText": return "Aktuelle Seite";
                 case "MoreInfoText": return "Mehr Informationen";
                 case "NoDetailsText": return "Keine Angaben gefunden...";
-
+            case "ObjectNameText": return "Objekt";
+            case "LocationText": return "Ort";
+            case "UUIDText": return "UUID";
+            case "DetailsText": return "Beschreibung";
+            case "NotesText": return "Aufzeichnungen";
+            case "SaveUpdates": return "Sparen Sie Aktuelles";
+            case "ActiveText": return "Activ";
+            case "CheckedText": return "Geprüft";
+            case "CategoryText": return "Kategorie";
+            case "SummaryText": return "Zusammenfassung";
+                
                 // Status information
                 case "GridStatus": return "Grid Status";
                 case "Online": return "Online";
@@ -569,6 +579,14 @@
                 case "PingTimeText": return "Ping-Zeit";
                 case "AgentsInViewText": return "Agents im Blick";
                 case "ClearStatsText": return "Klare Statistiken über";
+
+                // abuse reports
+            case "MenuAbuse": return "Missbrauch Berichte";
+            case "TooltipsMenuAbuse": return "Benutzer abuser berichte";
+            case "AbuseReportText": return "Missbrauch";
+            case "AbuserNameText": return "Abuser";
+            case "AbuseReporterNameText": return "Reporter";
+            case "AssignedToText": return "Zugewiesen";
 
                 //Times
                 case "Sun":
