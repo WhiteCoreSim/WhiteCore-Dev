@@ -24,7 +24,17 @@ namespace WhiteCore.Modules.Web.Translators
                 case "CurrentPageText": return "Current Page";
                 case "MoreInfoText": return "Meer Info";
                 case "NoDetailsText": return "Geen gegevens gevonden...";
-
+            case "ObjectNameText": return "Object";
+            case "LocationText": return "Plaats";
+            case "UUIDText": return "UUID";
+            case "DetailsText": return "Beschrijving";
+            case "NotesText": return "Notes";
+            case "SaveUpdates": return "Sia updates";
+            case "ActiveText": return "Actief";
+            case "CheckedText": return "Gecontroleerd";
+            case "CategoryText": return "Categorie";
+            case "SummaryText": return "Overzicht";
+                
                 // Status information
                 case "GridStatus": return "Grid Status";
                 case "Online": return "Online";
@@ -185,7 +195,7 @@ namespace WhiteCore.Modules.Web.Translators
                 case "MenuMyTransactions": return "Mijn Transacties";
                 case "MenuStatistics": return "Viewer statistieken";
                 case "MenuGridSettings": return "Grid instellingen";
-
+                
                 // Tooltips Menu Buttons
                 case "TooltipsMenuHome": return "Home";
                 case "TooltipsMenuLogin": return "Login";
@@ -217,7 +227,7 @@ namespace WhiteCore.Modules.Web.Translators
                 case "TooltipsMenuTransactions": return "Transactie-informatie";
                 case "TooltipsMenuStatistics": return "Viewer statistieken";
                 case "TooltipsMenuGridSettings": return "Grid instellingen";
-
+                
                 // Menu Region
                 case "MenuRegionTitle": return "Region";
                 case "MenuParcelTitle": return "Parcel";
@@ -553,6 +563,15 @@ namespace WhiteCore.Modules.Web.Translators
                 case "PingTimeText": return "Ping tijd";
                 case "AgentsInViewText": return "Agenten in het oog";
                 case "ClearStatsText": return "Duidelijke statistieken over";
+
+                // abuse reports
+            case "MenuAbuse": return "Misbruik Rapporten";
+            case "TooltipsMenuAbuse": return "Gebruiker misbruil rapporten";
+            case "AbuseReportText": return "Meld misbruikt";
+            case "AbuserNameText": return "Abuser";
+            case "AbuseReporterNameText": return "Verslaggever";
+            case "AssignedToText": return "Toegewezen aan";
+                
                 //Times
                 case "Sun":
                     return "Sun";

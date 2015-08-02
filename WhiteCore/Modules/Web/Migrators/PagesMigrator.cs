@@ -35,7 +35,7 @@ namespace WhiteCore.Modules.Web
     {
         public static readonly string Schema = "WebPages";
         private static GridPage _rootPage;
-        public static readonly uint CurrentVersion = 10;
+        public static readonly uint CurrentVersion = 11;
 
         private static void InitializeDefaults()
         {
@@ -296,9 +296,18 @@ namespace WhiteCore.Modules.Web
                     new GridPage {
                         ShowInMenu = true,
                         AdminRequired = true,
+                        MenuID = "Abuse_admin",
+                        Location = "admin/abuse_list.html",
+                        MenuPosition = 6,
+                        MenuTitle = "MenuAbuse",
+                        MenuToolTip = "TooltipsMenuAbuse"
+                    },
+                    new GridPage {
+                        ShowInMenu = true,
+                        AdminRequired = true,
                         MenuID = "Transactions_admin",
                         Location = "admin/transactions.html",
-                        MenuPosition = 6,
+                        MenuPosition = 7,
                         MenuTitle = "MenuTransactions",
                         MenuToolTip = "TooltipsMenuTransactions"
                     },
@@ -307,7 +316,7 @@ namespace WhiteCore.Modules.Web
                         AdminRequired = true,
                         MenuID = "Statistics",
                         Location = "admin/statistics.html",
-                        MenuPosition = 6,
+                        MenuPosition = 8,
                         MenuTitle = "MenuStatistics",
                         MenuToolTip = "TooltipsMenuStatistics"
                     }
@@ -373,7 +382,7 @@ namespace WhiteCore.Modules.Web
                 }
             });
 
-
+            // these are indivual paages that can be called
             _rootPage.Children.Add(new GridPage
                                        {
                                            MenuID = "add_news",
@@ -405,6 +414,14 @@ namespace WhiteCore.Modules.Web
                                            MenuID = "news_info",
                                            Location = "news.html"
                                        });
+            _rootPage.Children.Add(new GridPage
+            {
+                MenuID = "abuse_report",
+                ShowInMenu = false,
+                AdminRequired = true,
+                MenuPosition = 8,
+                Location = "admin/abuse_report.html"
+            });
 
             //Things added, but not used
             /*pages.Add(new Dictionary<string, object> { { "MenuItemID", "tweets" }, 

@@ -25,6 +25,17 @@
                 case "CurrentPageText": return "Current Page";
                 case "MoreInfoText": return "More Info";
                 case "NoDetailsText": return "No details found...";
+            case "ObjectNameText": return "Object";
+            case "LocationText": return "Location";
+            case "UUIDText": return "UUID";
+            case "DetailsText": return "Description";
+            case "NotesText": return "Notes";
+            case "SaveUpdates": return "Save updates";
+            case "ActiveText": return "Active";
+            case "CheckedText": return "Checked";
+            case "CategoryText": return "Category";
+            case "SummaryText": return "Summary";
+                
 
                 // Status information
                 case "GridStatus": return "Grid Status";
@@ -447,6 +458,14 @@
                 case "AgentsInViewText": return "Agents in view";
                 case "ClearStatsText": return "Clear statistics data";
 
+                // abuse reports
+            case "MenuAbuse": return "Abuse Reports";
+            case "TooltipsMenuAbuse": return "User abuse reports";
+            case "AbuseReportText": return "Abuse Report";
+            case "AbuserNameText": return "Abuser";
+            case "AbuseReporterNameText": return "Reporter";
+            case "AssignedToText": return "Assigned to";
+ 
 
 
                 //Times

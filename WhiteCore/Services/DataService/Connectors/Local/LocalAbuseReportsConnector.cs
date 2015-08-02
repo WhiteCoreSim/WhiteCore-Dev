@@ -26,21 +26,20 @@
  */
 
 
+using System.Collections.Generic;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Services;
-using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
 
 namespace WhiteCore.Services.DataService
 {
     public class LocalAbuseReportsConnector : IAbuseReportsConnector
     {
-        private IGenericData GD;
-        private string m_abuseReportsTable = "abusereports";
+        IGenericData GD;
+        string m_abuseReportsTable = "abusereports";
+        bool m_enabled;
 
         #region IAbuseReportsConnector Members
 
@@ -59,12 +58,35 @@ namespace WhiteCore.Services.DataService
             Framework.Utilities.DataManager.RegisterPlugin(Name + "Local", this);
             if (source.Configs["WhiteCoreConnectors"].GetString("AbuseReportsConnector", "LocalConnector") ==
                 "LocalConnector")
-                Framework.Utilities.DataManager.RegisterPlugin(this);
+            {
+                m_enabled = true;
+                Framework.Utilities.DataManager.RegisterPlugin (this);
+            }
         }
 
         public string Name
         {
             get { return "IAbuseReportsConnector"; }
+        }
+
+        public bool Enabled ()
+        {
+            return m_enabled;
+        }
+
+        /// <summary>
+        /// Gets the number of Abuse reports.
+        /// </summary>
+        /// <returns>The report count.</returns>
+        public int AbuseReportCount ()
+        {
+            QueryFilter filter = new QueryFilter ();
+            var reports = GD.Query (new string[1] { "count(*)" }, m_abuseReportsTable, filter, null, null, null);
+            if ((reports == null) || (reports.Count == 0))
+                return 0;
+
+            return int.Parse (reports [0]);
+
         }
 
         /// <summary>
@@ -85,41 +107,40 @@ namespace WhiteCore.Services.DataService
         /// <returns></returns>
         public AbuseReport GetAbuseReport(int Number)
         {
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["Number"] = Number;
-            List<string> Reports = GD.Query(new string[] {"*"}, m_abuseReportsTable, filter, null, null, null);
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["Number"] = Number;
+            List<string> Reports = GD.Query (new string[] { "*" }, m_abuseReportsTable, filter, null, null, null);
 
             return (Reports.Count == 0)
                        ? null
-                       : new AbuseReport
-                             {
-                                 Category = Reports[0],
-                                 ReporterName = Reports[1],
-                                 ObjectName = Reports[2],
-                                 ObjectUUID = new UUID(Reports[3]),
-                                 AbuserName = Reports[4],
-                                 AbuseLocation = Reports[5],
-                                 AbuseDetails = Reports[6],
-                                 ObjectPosition = Reports[7],
-                                 RegionName = Reports[8],
-                                 ScreenshotID = new UUID(Reports[9]),
-                                 AbuseSummary = Reports[10],
-                                 Number = int.Parse(Reports[11]),
-                                 AssignedTo = Reports[12],
-                                 Active = int.Parse(Reports[13]) == 1,
-                                 Checked = int.Parse(Reports[14]) == 1,
-                                 Notes = Reports[15]
-                             };
+                       : new AbuseReport {
+                Category = Reports [0],
+                ReporterName = Reports [1],
+                ObjectName = Reports [2],
+                ObjectUUID = new UUID (Reports [3]),
+                AbuserName = Reports [4],
+                AbuseLocation = Reports [5],
+                AbuseDetails = Reports [6],
+                ObjectPosition = Reports [7],
+                RegionName = Reports [8],
+                ScreenshotID = new UUID (Reports [9]),
+                AbuseSummary = Reports [10],
+                Number = int.Parse (Reports [11]),
+                AssignedTo = Reports [12],
+                Active = int.Parse (Reports [13]) == 1,
+                Checked = int.Parse (Reports [14]) == 1,
+                Notes = Reports [15]
+            };
         }
 
         public List<AbuseReport> GetAbuseReports(int start, int count, bool active)
         {
-            List<AbuseReport> rv = new List<AbuseReport>();
-            QueryFilter filter = new QueryFilter();
-            filter.andGreaterThanEqFilters["CAST(number AS UNSIGNED)"] = start;
-            filter.andFilters["Active"] = active ? 1 : 0;
-            List<string> query = GD.Query(new string[1] {"*"}, m_abuseReportsTable, filter, null, null, null);
-            if (query.Count%16 != 0)
+            List<AbuseReport> rv = new List<AbuseReport> ();
+            QueryFilter filter = new QueryFilter ();
+            filter.andGreaterThanEqFilters ["CAST(number AS UNSIGNED)"] = start;
+            filter.andFilters ["Active"] = active ? 1 : 0;
+            List<string> query = GD.Query (new string[1] { "*" }, m_abuseReportsTable, filter, null, null, null);
+            if (query.Count % 16 != 0)
             {
                 return rv;
             }
@@ -127,29 +148,27 @@ namespace WhiteCore.Services.DataService
             {
                 for (int i = 0; i < query.Count; i += 16)
                 {
-                    AbuseReport report = new AbuseReport
-                                             {
-                                                 Category = query[i + 0],
-                                                 ReporterName = query[i + 1],
-                                                 ObjectName = query[i + 2],
-                                                 ObjectUUID = new UUID(query[i + 3]),
-                                                 AbuserName = query[i + 4],
-                                                 AbuseLocation = query[i + 5],
-                                                 AbuseDetails = query[i + 6],
-                                                 ObjectPosition = query[i + 7],
-                                                 RegionName = query[i + 8],
-                                                 ScreenshotID = new UUID(query[i + 9]),
-                                                 AbuseSummary = query[i + 10],
-                                                 Number = int.Parse(query[i + 11]),
-                                                 AssignedTo = query[i + 12],
-                                                 Active = int.Parse(query[i + 13]) == 1,
-                                                 Checked = int.Parse(query[i + 14]) == 1,
-                                                 Notes = query[i + 15]
-                                             };
-                    rv.Add(report);
+                    AbuseReport report = new AbuseReport {
+                        Category = query [i + 0],
+                        ReporterName = query [i + 1],
+                        ObjectName = query [i + 2],
+                        ObjectUUID = new UUID (query [i + 3]),
+                        AbuserName = query [i + 4],
+                        AbuseLocation = query [i + 5],
+                        AbuseDetails = query [i + 6],
+                        ObjectPosition = query [i + 7],
+                        RegionName = query [i + 8],
+                        ScreenshotID = new UUID (query [i + 9]),
+                        AbuseSummary = query [i + 10],
+                        Number = int.Parse (query [i + 11]),
+                        AssignedTo = query [i + 12],
+                        Active = int.Parse (query [i + 13]) == 1,
+                        Checked = int.Parse (query [i + 14]) == 1,
+                        Notes = query [i + 15]
+                    };
+                    rv.Add (report);
                 }
-            }
-            catch
+            } catch
             {
             }
             return rv;
@@ -161,20 +180,19 @@ namespace WhiteCore.Services.DataService
         /// <param name="report"></param>
         public void AddAbuseReport(AbuseReport report)
         {
-            List<object> InsertValues = new List<object>
-                                            {
-                                                report.Category.ToString(),
-                                                report.ReporterName,
-                                                report.ObjectName,
-                                                report.ObjectUUID,
-                                                report.AbuserName,
-                                                report.AbuseLocation,
-                                                report.AbuseDetails,
-                                                report.ObjectPosition,
-                                                report.RegionName,
-                                                report.ScreenshotID,
-                                                report.AbuseSummary
-                                            };
+            List<object> InsertValues = new List<object> {
+                report.Category.ToString (),
+                report.ReporterName,
+                report.ObjectName,
+                report.ObjectUUID,
+                report.AbuserName,
+                report.AbuseLocation,
+                report.AbuseDetails,
+                report.ObjectPosition,
+                report.RegionName,
+                report.ScreenshotID,
+                report.AbuseSummary
+            };
 
             Dictionary<string, bool> sort = new Dictionary<string, bool>(1);
             sort["Number"] = false;

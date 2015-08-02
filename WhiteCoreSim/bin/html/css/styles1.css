@@ -63,6 +63,10 @@ tr:nth-child(even) td:nth-child(odd) { background: #111; }
 tr:nth-child(odd) td:nth-child(even) { background: #bbb; }
 th{background-image:url();}
 */
+/* DataTables */
+.dataTables_wrapper{color: #000;}
+a.cboxElement {color: #a9aaff;}
+a.cboxElement:hover {color: #090bff;}
 
 /* Not used Actually
 caption{caption-side:bottom; font-weight:normal; font-style:normal; margin:4px; text-align: left;}
@@ -143,6 +147,7 @@ table#region_lists_navigation_top th, table#region_list_navigation_bottom th {te
 table#region_list  {width: 100%;}
 table#region_list th {}
 table#region_list td {}
+table#region_list {color:#500EFF; background-color: #C2FDFF;}
 .region_list_left {text-align: left;}
 .region_list_right {text-align: right;}
 
@@ -370,6 +375,8 @@ table#region_info td {padding: 5px;}
 .region_info_right {text-align: left;}
 .region_info_picture {text-align: left; width: 256px; height:256px;}
 .region_parcel_info {text-align: left; width: 128px; height: 128px;}
+a.regioninfo.cboxElement {color: #a9aaff;}
+a.regioninfo.cboxElement:hover {color: #090bff;}
 
 /* region_info Caption */
 .region_info_picture img {
@@ -651,7 +658,7 @@ ul {list-style: outside;}
 li {display: inline;}
 a {color: #abe0e0 ; text-decoration: none;cursor: pointer;}
 a:active {color: #9A9E68; text-decoration: none;}
-a:hover {color: #9A9E68; text-decoration: none;}
+a:hover {color: #9AfE34; text-decoration: none;}
 p {margin-bottom: 0.5em;}
 u {text-decoration: none;}
 .clear {clear: both; height: 0; visibility: hidden; display: block;}
@@ -689,7 +696,7 @@ input, textarea, select, button {
 	padding: 5px;
 	margin: 5px;
 	height: 21px;
-	color: #cacaca;
+	color: #0507ca;
 	background: #406580;
 	border: 1px solid #333;
 	-webkit-border-radius: 5px;
@@ -904,6 +911,16 @@ label {display:inline-block;}
 #content {
 	line-height: 1.3em;
 	font-size: 14px;
+    background: transparent url(../images/icons/bg_black_01.png);
+  	border: 1px solid transparent;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	-webkit-box-shadow: #000 0 0 .5em;
+    -moz-box-shadow: #000 0 0 .5em;
+    box-shadow: #000 0 0 .5em;
+
+/*	background-color: rgba(28,28,28,0.6); */
 }
 
 /* Slide Show */
@@ -1287,7 +1304,7 @@ div#regionbox,div#infobox, div#news, div#gridstatus {
 
 div#regionbox:hover, div#infobox:hover, div#news:hover, div#gridstatus:hover {
     background: transparent url(../images/icons/bg_black_01.png);
-	color: #333;
+	color: #693;
 	border: 1px solid transparent;
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
@@ -1358,8 +1375,11 @@ div#regionbox:hover, div#infobox:hover, div#news:hover, div#gridstatus:hover {
 }
 
 #cboxContent{overflow:hidden; margin: 10px;}
-#colorbox {background:#1c557f1c557f;}
+#colorbox {background:#1c557f;}
+.cboxIframe{background:#1c557;}
+/*#colorbox {background:#1c557f1c557f;}
 .cboxIframe{background:#1c557f1c557f;}
+*/
 #cboxError{padding:10px; border:1px solid #111;}
 #cboxLoadedContent{margin-bottom:20px;}
 
