@@ -1,8 +1,7 @@
 
-
-<script type="text/javascript" src="../javascripts/jquery.datatables.js"></script>
-<link href="css/jquery.datatables.css" rel="stylesheet" type="text/css">
-
+<!--
+Abuse report listing
+-->
 
 
 <div id="fullPage">
@@ -21,7 +20,6 @@
     </thead>
 
     <tbody>
-
       {AbuseReportsListArrayBegin}
       <tr onclick="document.location = 'index.html?page=abuse_report&cardid={CardNumber}';">
         <td class="region_info_left"><p>{Category}</p></td>
@@ -36,13 +34,13 @@
     </tbody>
   </table>
 
-<script type="text/javascript">
-$(document).ready(function()
-{
-	$('#abusereport_list').dataTable({
-        "order": [[ 0, "asc" ]]
-    });
-} );
-</script>
+  <script type="text/javascript">
+	$(document).ready(function()
+	{
+		$('#abusereport_list').dataTable({
+        	"order": [[ 0, "asc" ]]
+    	});
+	} );
+  </script>
 
 </div>

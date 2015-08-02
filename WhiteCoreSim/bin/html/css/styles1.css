@@ -65,8 +65,8 @@ th{background-image:url();}
 */
 /* DataTables */
 .dataTables_wrapper{color: #000;}
-a.dataTables_wrapper {color: #a9aaff;}
-a.dataTables_wrapper:hover {color: #090bff;}
+a.cboxElement {color: #a9aaff;}
+a.cboxElement:hover {color: #090bff;}
 
 /* Not used Actually
 caption{caption-side:bottom; font-weight:normal; font-style:normal; margin:4px; text-align: left;}
@@ -696,7 +696,7 @@ input, textarea, select, button {
 	padding: 5px;
 	margin: 5px;
 	height: 21px;
-	color: #cacaca;
+	color: #0507ca;
 	background: #406580;
 	border: 1px solid #333;
 	-webkit-border-radius: 5px;
