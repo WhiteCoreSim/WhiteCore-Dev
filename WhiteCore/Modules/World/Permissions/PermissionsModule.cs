@@ -26,6 +26,12 @@
  */
 
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
@@ -34,104 +40,98 @@ using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.SceneInfo.Entities;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Inventory;
-using Nini.Config;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 
 namespace WhiteCore.Modules.Permissions
 {
     public class PermissionsModule : INonSharedRegionModule, IPermissionsModule
     {
-        private IConfig PermissionsConfig;
+        IConfig PermissionsConfig;
         protected IScene m_scene;
 
         #region Constants
 
         // These are here for testing.  They will be taken out
 
-        //private uint PERM_ALL = (uint)2147483647;
-        private uint PERM_COPY = 32768;
-        private uint PERM_LOCKED = 540672;
-        //private uint PERM_MODIFY = (uint)16384;
-        private uint PERM_MOVE = 524288;
-        private uint PERM_TRANS = 8192;
+        // uint PERM_ALL = (uint)2147483647;
+        uint PERM_COPY = 32768;
+        uint PERM_LOCKED = 540672;
+        // uint PERM_MODIFY = (uint)16384;
+        uint PERM_MOVE = 524288;
+        uint PERM_TRANS = 8192;
 
         #endregion
 
         #region Bypass Permissions / Debug Permissions Stuff
 
         // Bypasses the permissions engine
-        private readonly Dictionary<string, bool> GrantAScript = new Dictionary<string, bool>();
-        private readonly Dictionary<string, bool> GrantCS = new Dictionary<string, bool>();
-        private readonly Dictionary<string, bool> GrantLSL = new Dictionary<string, bool>();
-        private readonly List<UUID> m_allowedAdministrators = new List<UUID>();
-        private bool m_ParcelOwnerIsGod;
-        private bool m_RegionManagerIsGod;
-        private bool m_RegionOwnerIsGod = true;
-        private bool m_adminHasToBeInGodMode = true;
-        private bool m_allowAdminFriendEditRights = true;
-        private bool m_allowGridGods = true;
-        private UserSet m_allowedAScriptScriptCompilers = UserSet.All;
-        private UserSet m_allowedCSScriptCompilers = UserSet.All;
+        readonly Dictionary<string, bool> GrantAScript = new Dictionary<string, bool> ();
+        readonly Dictionary<string, bool> GrantCS = new Dictionary<string, bool> ();
+        readonly Dictionary<string, bool> GrantLSL = new Dictionary<string, bool> ();
+        readonly List<UUID> m_allowedAdministrators = new List<UUID> ();
+        bool m_ParcelOwnerIsGod;
+        bool m_RegionManagerIsGod;
+        bool m_RegionOwnerIsGod = true;
+        bool m_adminHasToBeInGodMode = true;
+        bool m_allowAdminFriendEditRights = true;
+        bool m_allowGridGods = true;
+        UserSet m_allowedAScriptScriptCompilers = UserSet.All;
+        UserSet m_allowedCSScriptCompilers = UserSet.All;
 
         /// <value>
         ///     The set of users that are allowed to compile certain scripts.  This is only active if
         ///     permissions are not being bypassed.  This overrides normal permissions.
         /// </value>
-        private UserSet m_allowedLSLScriptCompilers = UserSet.All;
+        UserSet m_allowedLSLScriptCompilers = UserSet.All;
 
         /// <value>
         ///     The set of users that are allowed to create scripts.  This is only active if permissions are not being
         ///     bypassed.  This overrides normal permissions.
         /// </value>
-        private UserSet m_allowedScriptCreators = UserSet.All;
+        UserSet m_allowedScriptCreators = UserSet.All;
 
         /// <value>
         ///     The set of users that are allowed to edit (save) scripts.  This is only active if
         ///     permissions are not being bypassed.  This overrides normal permissions.-
         /// </value>
-        private UserSet m_allowedScriptEditors = UserSet.All;
+        UserSet m_allowedScriptEditors = UserSet.All;
 
-        private bool m_bypassPermissions;
-        private bool m_bypassPermissionsValue = true;
-        private bool m_debugPermissions;
-        private IGroupsModule m_groupsModule;
-        private IMoapModule m_moapModule;
-        private IParcelManagementModule m_parcelManagement;
-        private bool m_propagatePermissions = true;
+        bool m_bypassPermissions;
+        bool m_bypassPermissionsValue = true;
+        bool m_debugPermissions;
+        IGroupsModule m_groupsModule;
+        IMoapModule m_moapModule;
+        IParcelManagementModule m_parcelManagement;
+        bool m_propagatePermissions = true;
 
         #endregion
 
         #region Helper Functions
 
-        protected void SendPermissionError(UUID user, string reason)
+        protected void SendPermissionError (UUID user, string reason)
         {
-            m_scene.EventManager.TriggerPermissionError(user, reason);
+            m_scene.EventManager.TriggerPermissionError (user, reason);
         }
 
-        protected void DebugPermissionInformation(string permissionCalled)
+        protected void DebugPermissionInformation (string permissionCalled)
         {
             if (m_debugPermissions)
-                MainConsole.Instance.Debug("[PERMISSIONS]: " + permissionCalled + " was called from " +
-                                           m_scene.RegionInfo.RegionName);
+                MainConsole.Instance.Debug ("[PERMISSIONS]: " + permissionCalled + " was called from " +
+                m_scene.RegionInfo.RegionName);
         }
 
-        public bool IsInGroup(UUID user, UUID groupID)
+        public bool IsInGroup (UUID user, UUID groupID)
         {
-            return IsGroupMember(groupID, user, 0);
+            return IsGroupMember (groupID, user, 0);
         }
 
         // Checks if the given group is active and if the user is a group member
         // with the powers requested (powers = 0 for no powers check)
-        protected bool IsGroupMember(UUID groupID, UUID userID, ulong powers)
+        protected bool IsGroupMember (UUID groupID, UUID userID, ulong powers)
         {
             if (null == m_groupsModule)
                 return false;
 
-            return m_groupsModule.GroupPermissionCheck(userID, groupID, (GroupPowers) powers);
+            return m_groupsModule.GroupPermissionCheck (userID, groupID, (GroupPowers)powers);
         }
 
         /// <summary>
@@ -139,9 +139,9 @@ namespace WhiteCore.Modules.Permissions
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        protected bool IsAdministrator(UUID user)
+        protected bool IsAdministrator (UUID user)
         {
-            return InternalIsAdministrator(user, false);
+            return InternalIsAdministrator (user, false);
         }
 
         /// <summary>
@@ -150,25 +150,26 @@ namespace WhiteCore.Modules.Permissions
         /// <param name="user"></param>
         /// <param name="checkGodStatus"></param>
         /// <returns></returns>
-        private bool InternalIsAdministrator(UUID user, bool checkGodStatus)
+        bool InternalIsAdministrator (UUID user, bool checkGodStatus)
         {
-            if (user == UUID.Zero) return false;
+            if (user == UUID.Zero)
+                return false;
 
-            if (m_allowedAdministrators.Contains(user))
-                return !checkGodStatus || CheckIsInGodMode(user);
+            if (m_allowedAdministrators.Contains (user))
+                return !checkGodStatus || CheckIsInGodMode (user);
 
             if (m_RegionOwnerIsGod && m_scene.RegionInfo.EstateSettings.EstateOwner == user)
-                return !checkGodStatus || CheckIsInGodMode(user);
+                return !checkGodStatus || CheckIsInGodMode (user);
 
-            if (m_RegionManagerIsGod && IsEstateManager(user))
-                return !checkGodStatus || CheckIsInGodMode(user);
+            if (m_RegionManagerIsGod && IsEstateManager (user))
+                return !checkGodStatus || CheckIsInGodMode (user);
 
-            IScenePresence sp = m_scene.GetScenePresence(user);
+            IScenePresence sp = m_scene.GetScenePresence (user);
             if (m_ParcelOwnerIsGod && m_parcelManagement != null && sp != null)
             {
-                ILandObject landObject = m_parcelManagement.GetLandObject(sp.AbsolutePosition.X, sp.AbsolutePosition.Y);
+                ILandObject landObject = m_parcelManagement.GetLandObject (sp.AbsolutePosition.X, sp.AbsolutePosition.Y);
                 if (landObject != null && landObject.LandData.OwnerID == user)
-                    return !checkGodStatus || CheckIsInGodMode(user);
+                    return !checkGodStatus || CheckIsInGodMode (user);
             }
 
             if (m_allowGridGods)
@@ -176,27 +177,28 @@ namespace WhiteCore.Modules.Permissions
                 if (sp != null)
                 {
                     if (sp.UserLevel > 0)
-                        return !checkGodStatus || CheckIsInGodMode(user);
+                        return !checkGodStatus || CheckIsInGodMode (user);
                 }
             }
 
             return false;
         }
 
-        protected bool CheckIsInGodMode(UUID userID)
+        protected bool CheckIsInGodMode (UUID userID)
         {
             if (m_adminHasToBeInGodMode)
             {
-                IScenePresence sp = m_scene.GetScenePresence(userID);
+                IScenePresence sp = m_scene.GetScenePresence (userID);
                 if (sp != null && sp.GodLevel == 0) //Allow null presences to be god always, as they are just gods
                     return false;
-                else if (sp != null)
+
+                if (sp != null)
                     return true; //Only allow logged in users to have god mode
             }
             return false;
         }
 
-        protected bool IsFriendWithPerms(UUID user, UUID objectOwner)
+        protected bool IsFriendWithPerms (UUID user, UUID objectOwner)
         {
             if (user == UUID.Zero)
                 return false;
@@ -204,90 +206,84 @@ namespace WhiteCore.Modules.Permissions
             if (user == objectOwner)
                 return true; //Same person, implicit trust
 
-            int friendPerms = m_scene.RequestModuleInterface<IFriendsModule>().GetFriendPerms(user, objectOwner);
+            int friendPerms = m_scene.RequestModuleInterface<IFriendsModule> ().GetFriendPerms (user, objectOwner);
 
             if (friendPerms == -1) //Not a friend
                 return false;
 
-            if ((friendPerms & (int) FriendRights.CanModifyObjects) != 0)
+            if ((friendPerms & (int)FriendRights.CanModifyObjects) != 0)
                 return true;
 
             return false;
         }
 
-        protected bool IsEstateManager(UUID user)
+        protected bool IsEstateManager (UUID user)
         {
-            if (user == UUID.Zero) return false;
+            if (user == UUID.Zero)
+                return false;
 
-            return m_scene.RegionInfo.EstateSettings.IsEstateManager(user);
+            return m_scene.RegionInfo.EstateSettings.IsEstateManager (user);
         }
 
         #endregion
 
         #region INonSharedRegionModule Members
 
-        public void Initialise(IConfigSource config)
+        public void Initialise (IConfigSource config)
         {
-            PermissionsConfig = config.Configs["Permissions"];
+            PermissionsConfig = config.Configs ["Permissions"];
 
-            m_allowGridGods = PermissionsConfig.GetBoolean("allow_grid_gods", m_allowGridGods);
-            m_bypassPermissions = !PermissionsConfig.GetBoolean("serverside_object_permissions", m_bypassPermissions);
-            m_propagatePermissions = PermissionsConfig.GetBoolean("propagate_permissions", m_propagatePermissions);
-            m_RegionOwnerIsGod = PermissionsConfig.GetBoolean("region_owner_is_god", m_RegionOwnerIsGod);
-            m_RegionManagerIsGod = PermissionsConfig.GetBoolean("region_manager_is_god", m_RegionManagerIsGod);
-            m_ParcelOwnerIsGod = PermissionsConfig.GetBoolean("parcel_owner_is_god", m_ParcelOwnerIsGod);
-            m_allowAdminFriendEditRights = PermissionsConfig.GetBoolean("allow_god_friends_edit_with_rights",
-                                                                        m_allowAdminFriendEditRights);
-            m_adminHasToBeInGodMode = PermissionsConfig.GetBoolean("admin_has_to_be_in_god_mode",
-                                                                   m_adminHasToBeInGodMode);
+            m_allowGridGods = PermissionsConfig.GetBoolean ("allow_grid_gods", m_allowGridGods);
+            m_bypassPermissions = !PermissionsConfig.GetBoolean ("serverside_object_permissions", m_bypassPermissions);
+            m_propagatePermissions = PermissionsConfig.GetBoolean ("propagate_permissions", m_propagatePermissions);
+            m_RegionOwnerIsGod = PermissionsConfig.GetBoolean ("region_owner_is_god", m_RegionOwnerIsGod);
+            m_RegionManagerIsGod = PermissionsConfig.GetBoolean ("region_manager_is_god", m_RegionManagerIsGod);
+            m_ParcelOwnerIsGod = PermissionsConfig.GetBoolean ("parcel_owner_is_god", m_ParcelOwnerIsGod);
+            m_allowAdminFriendEditRights = PermissionsConfig.GetBoolean ("allow_god_friends_edit_with_rights",
+                m_allowAdminFriendEditRights);
+            m_adminHasToBeInGodMode = PermissionsConfig.GetBoolean ("admin_has_to_be_in_god_mode",
+                m_adminHasToBeInGodMode);
 
-            m_allowedScriptCreators
-                = UserSetHelpers.ParseUserSetConfigSetting(PermissionsConfig, "allowed_script_creators",
-                                                           m_allowedScriptCreators);
-            m_allowedScriptEditors
-                = UserSetHelpers.ParseUserSetConfigSetting(PermissionsConfig, "allowed_script_editors",
-                                                           m_allowedScriptEditors);
+            m_allowedScriptCreators = UserSetHelpers.ParseUserSetConfigSetting (
+                PermissionsConfig, "allowed_script_creators", m_allowedScriptCreators);
+            m_allowedScriptEditors = UserSetHelpers.ParseUserSetConfigSetting (
+                PermissionsConfig, "allowed_script_editors", m_allowedScriptEditors);
 
-            m_allowedLSLScriptCompilers
-                = UserSetHelpers.ParseUserSetConfigSetting(PermissionsConfig, "allowed_lsl_script_compilers",
-                                                           m_allowedLSLScriptCompilers);
-            m_allowedCSScriptCompilers
-                = UserSetHelpers.ParseUserSetConfigSetting(PermissionsConfig, "allowed_cs_script_compilers",
-                                                           m_allowedCSScriptCompilers);
-            m_allowedAScriptScriptCompilers
-                = UserSetHelpers.ParseUserSetConfigSetting(PermissionsConfig, "allowed_ascript_script_compilers",
-                                                           m_allowedAScriptScriptCompilers);
+            m_allowedLSLScriptCompilers = UserSetHelpers.ParseUserSetConfigSetting (
+                PermissionsConfig, "allowed_lsl_script_compilers", m_allowedLSLScriptCompilers);
+            m_allowedCSScriptCompilers = UserSetHelpers.ParseUserSetConfigSetting (
+                PermissionsConfig, "allowed_cs_script_compilers", m_allowedCSScriptCompilers);
+            m_allowedAScriptScriptCompilers = UserSetHelpers.ParseUserSetConfigSetting (
+                PermissionsConfig, "allowed_ascript_script_compilers", m_allowedAScriptScriptCompilers);
 
-            string perm = PermissionsConfig.GetString("Allowed_Administrators", "");
+            string perm = PermissionsConfig.GetString ("Allowed_Administrators", "");
             if (perm != "")
             {
-                string[] ids = perm.Split(',');
-
+                string[] ids = perm.Split (',');
                 foreach (string current in ids.Select(id => id.Trim()))
                 {
                     UUID uuid;
-
-                    if (UUID.TryParse(current, out uuid))
+                    if (UUID.TryParse (current, out uuid))
                     {
                         if (uuid != UUID.Zero)
-                            m_allowedAdministrators.Add(uuid);
+                            m_allowedAdministrators.Add (uuid);
                     }
                 }
             }
 
-            string permissionModules = PermissionsConfig.GetString("Modules", "DefaultPermissionsModule");
+            string permissionModules = PermissionsConfig.GetString ("Modules", "DefaultPermissionsModule");
 
-            List<string> modules = new List<string>(permissionModules.Split(','));
+            List<string> modules = new List<string> (permissionModules.Split (','));
 
-            if (!modules.Contains("DefaultPermissionsModule"))
+            if (!modules.Contains ("DefaultPermissionsModule"))
                 return;
         }
 
-        public void AddRegion(IScene scene)
+        public void AddRegion (IScene scene)
         {
             m_scene = scene;
 
-            m_scene.RegisterModuleInterface<IPermissionsModule>(this);
+            m_scene.RegisterModuleInterface<IPermissionsModule> (this);
 
             //Register functions with Scene External Checks!
             m_scene.Permissions.OnBypassPermissions += BypassPermissions;
@@ -353,93 +349,93 @@ namespace WhiteCore.Modules.Permissions
 
             if (MainConsole.Instance != null)
             {
-                MainConsole.Instance.Commands.AddCommand(
+                MainConsole.Instance.Commands.AddCommand (
                     "bypass permissions",
                     "bypass permissions <true / false>",
                     "Bypass permission checks",
                     HandleBypassPermissions, false, false);
 
-                MainConsole.Instance.Commands.AddCommand(
+                MainConsole.Instance.Commands.AddCommand (
                     "force permissions",
                     "force permissions <true / false>",
                     "Force permissions on or off",
                     HandleForcePermissions, false, false);
 
-                MainConsole.Instance.Commands.AddCommand(
+                MainConsole.Instance.Commands.AddCommand (
                     "debug permissions",
                     "debug permissions <true / false>",
                     "Enable permissions debugging",
                     HandleDebugPermissions, true, false);
 
-                MainConsole.Instance.Commands.AddCommand(
-                    "transfer sim ownership",
-                    "transfer sim ownership",
+                MainConsole.Instance.Commands.AddCommand (
+                    "transfer region ownership",
+                    "transfer region ownership",
                     "Transfers all objects and land on the region to another user.",
-                    HandleTransferOwnership, true, false);
+                    HandleTransferOwnership, true, true);
 
-                MainConsole.Instance.Commands.AddCommand(
+                MainConsole.Instance.Commands.AddCommand (
                     "transfer objects ownership",
                     "transfer objects ownership",
                     "Transfers ownership of all objects on the region to another user.",
-                    HandleTransferObjectOwnership, true, false);
+                    HandleTransferObjectOwnership, true, true);
 
-                MainConsole.Instance.Commands.AddCommand(
+                MainConsole.Instance.Commands.AddCommand (
                     "transfer parcel ownership",
                     "transfer parcel ownership",
                     "Transfers ownership of all land in the region to another user.",
-                    HandleTransferLandOwnership, true, false);
+                    HandleTransferLandOwnership, true, true);
             }
 
 
-            string grant = PermissionsConfig.GetString("GrantLSL", "");
+            string grant = PermissionsConfig.GetString ("GrantLSL", "");
             if (grant.Length > 0)
             {
                 foreach (string uuid in grant.Split(',').Select(uuidl => uuidl.Trim(" \t".ToCharArray())))
                 {
-                    GrantLSL.Add(uuid, true);
+                    GrantLSL.Add (uuid, true);
                 }
             }
 
-            grant = PermissionsConfig.GetString("GrantCS", "");
+            grant = PermissionsConfig.GetString ("GrantCS", "");
             if (grant.Length > 0)
             {
                 foreach (string uuid in grant.Split(',').Select(uuidl => uuidl.Trim(" \t".ToCharArray())))
                 {
-                    GrantCS.Add(uuid, true);
+                    GrantCS.Add (uuid, true);
                 }
             }
 
-            grant = PermissionsConfig.GetString("GrantAScript", "");
+            grant = PermissionsConfig.GetString ("GrantAScript", "");
             if (grant.Length > 0)
             {
                 foreach (string uuid in grant.Split(',').Select(uuidl => uuidl.Trim(" \t".ToCharArray())))
                 {
-                    GrantAScript.Add(uuid, true);
+                    GrantAScript.Add (uuid, true);
                 }
             }
         }
 
-        public void RemoveRegion(IScene scene)
+        public void RemoveRegion (IScene scene)
         {
         }
 
-        public void RegionLoaded(IScene scene)
+        public void RegionLoaded (IScene scene)
         {
             //if (m_friendsModule == null)
             //    MainConsole.Instance.Warn("[PERMISSIONS]: Friends module not found, friend permissions will not work");
 
-            m_groupsModule = m_scene.RequestModuleInterface<IGroupsModule>();
+            m_groupsModule = m_scene.RequestModuleInterface<IGroupsModule> ();
 
             //if (m_groupsModule == null)
             //    MainConsole.Instance.Warn("[PERMISSIONS]: Groups module not found, group permissions will not work");
 
-            m_moapModule = m_scene.RequestModuleInterface<IMoapModule>();
+            m_moapModule = m_scene.RequestModuleInterface<IMoapModule> ();
 
             // This log line will be commented out when no longer required for debugging
 //            if (m_moapModule == null)
 //                MainConsole.Instance.Warn("[PERMISSIONS]: Media on a prim module not found, media on a prim permissions will not work");
 
-            m_parcelManagement = m_scene.RequestModuleInterface<IParcelManagementModule>();
+            m_parcelManagement = m_scene.RequestModuleInterface<IParcelManagementModule> ();
         }
 
         public Type ReplaceableInterface
@@ -447,7 +443,7 @@ namespace WhiteCore.Modules.Permissions
             get { return null; }
         }
 
-        public void Close()
+        public void Close ()
         {
         }
 
@@ -458,13 +454,13 @@ namespace WhiteCore.Modules.Permissions
 
         #endregion
 
-        public void HandleBypassPermissions(IScene scene, string[] args)
+        public void HandleBypassPermissions (IScene scene, string[] args)
         {
             if (args.Length > 2)
             {
                 bool val;
 
-                if (!bool.TryParse(args[2], out val))
+                if (!bool.TryParse (args [2], out val))
                     return;
 
                 m_bypassPermissions = val;
@@ -472,18 +468,18 @@ namespace WhiteCore.Modules.Permissions
                 if (!MainConsole.Instance.HasProcessedCurrentCommand)
                 {
                     MainConsole.Instance.HasProcessedCurrentCommand = true;
-                    MainConsole.Instance.InfoFormat(
+                    MainConsole.Instance.InfoFormat (
                         "[PERMISSIONS]: Set permissions bypass to {0} for {1}",
                         m_bypassPermissions, m_scene.RegionInfo.RegionName);
                 }
             }
         }
 
-        public void HandleForcePermissions(IScene scene, string[] args)
+        public void HandleForcePermissions (IScene scene, string[] args)
         {
             if (!m_bypassPermissions)
             {
-                MainConsole.Instance.Error("[PERMISSIONS] Permissions can't be forced unless they are bypassed first");
+                MainConsole.Instance.Error ("[PERMISSIONS] Permissions can't be forced unless they are bypassed first");
                 return;
             }
 
@@ -491,7 +487,7 @@ namespace WhiteCore.Modules.Permissions
             {
                 bool val;
 
-                if (!bool.TryParse(args[2], out val))
+                if (!bool.TryParse (args [2], out val))
                     return;
 
                 m_bypassPermissionsValue = val;
@@ -499,108 +495,111 @@ namespace WhiteCore.Modules.Permissions
                 if (!MainConsole.Instance.HasProcessedCurrentCommand)
                 {
                     MainConsole.Instance.HasProcessedCurrentCommand = true;
-                    MainConsole.Instance.InfoFormat("[PERMISSIONS] Forced permissions to {0} in {1}",
-                                                    m_bypassPermissionsValue,
-                                                    m_scene.RegionInfo.RegionName);
+                    MainConsole.Instance.InfoFormat ("[PERMISSIONS] Forced permissions to {0} in {1}",
+                        m_bypassPermissionsValue,
+                        m_scene.RegionInfo.RegionName);
                 }
             }
         }
 
-        public void HandleTransferOwnership(IScene scene, string[] args)
+        public void HandleTransferOwnership (IScene scene, string[] args)
         {
-            string name = MainConsole.Instance.Prompt("Name of the new owner: ", "");
+            var regionName = scene.RegionInfo.RegionName;
+            string name = MainConsole.Instance.Prompt ("[" +regionName +"]: Name of the new owner", "");
             if (name == "")
             {
-                MainConsole.Instance.InfoFormat("[PERMISSIONS]: No user selected.");
+                MainConsole.Instance.InfoFormat ("[PERMISSIONS]: No user selected.");
                 return;
             }
 
-            UserAccount acc = m_scene.UserAccountService.GetUserAccount(null, name);
+            UserAccount acc = m_scene.UserAccountService.GetUserAccount (null, name);
             if (acc == null)
             {
-                MainConsole.Instance.InfoFormat("[PERMISSIONS]: Sorry, user '{0}' was not found.", name);
+                MainConsole.Instance.InfoFormat ("[PERMISSIONS]: Sorry, user '{0}' was not found.", name);
                 return;
             }
 
-            IParcelManagementModule parcelManagement = m_scene.RequestModuleInterface<IParcelManagementModule>();
-            IPrimCountModule primCount = m_scene.RequestModuleInterface<IPrimCountModule>();
+            IParcelManagementModule parcelManagement = m_scene.RequestModuleInterface<IParcelManagementModule> ();
+            IPrimCountModule primCount = m_scene.RequestModuleInterface<IPrimCountModule> ();
             foreach (ILandObject parcel in parcelManagement.AllParcels())
             {
                 parcel.LandData.OwnerID = acc.PrincipalID;
                 foreach (ISceneEntity sog in primCount.GetPrimCounts(parcel.LandData.GlobalID).Objects)
                 {
-                    sog.SetOwnerId(acc.PrincipalID);
-                    sog.SetGroup(UUID.Zero, acc.PrincipalID, true);
-                    sog.ScheduleGroupUpdate(PrimUpdateFlags.ForcedFullUpdate);
+                    sog.SetOwnerId (acc.PrincipalID);
+                    sog.SetGroup (UUID.Zero, acc.PrincipalID, true);
+                    sog.ScheduleGroupUpdate (PrimUpdateFlags.ForcedFullUpdate);
 
                     foreach (ISceneChildEntity child in sog.ChildrenEntities())
-                        child.Inventory.ChangeInventoryOwner(acc.PrincipalID);
+                        child.Inventory.ChangeInventoryOwner (acc.PrincipalID);
                 }
             }
         }
 
-        public void HandleTransferLandOwnership(IScene scene, string[] args)
+        public void HandleTransferLandOwnership (IScene scene, string[] args)
         {
-            string name = MainConsole.Instance.Prompt("Name of the new owner: ", "");
+            var regionName = scene.RegionInfo.RegionName;
+            string name = MainConsole.Instance.Prompt ("[" +regionName +"]: Name of the new land owner", "");
             if (name == "")
             {
-                MainConsole.Instance.InfoFormat("[PERMISSIONS]: No user selected.");
+                MainConsole.Instance.InfoFormat ("[PERMISSIONS]: No user selected.");
                 return;
             }
 
-            UserAccount acc = m_scene.UserAccountService.GetUserAccount(null, name);
+            UserAccount acc = m_scene.UserAccountService.GetUserAccount (null, name);
             if (acc == null)
             {
-                MainConsole.Instance.InfoFormat("[PERMISSIONS]: Sorry, user '{0}' was not found.", name);
+                MainConsole.Instance.InfoFormat ("[PERMISSIONS]: Sorry, user '{0}' was not found.", name);
                 return;
             }
 
-            IParcelManagementModule parcelManagement = m_scene.RequestModuleInterface<IParcelManagementModule>();
+            IParcelManagementModule parcelManagement = m_scene.RequestModuleInterface<IParcelManagementModule> ();
             foreach (ILandObject parcel in parcelManagement.AllParcels())
             {
                 parcel.LandData.OwnerID = acc.PrincipalID;
             }
         }
 
-        public void HandleTransferObjectOwnership(IScene scene, string[] args)
+        public void HandleTransferObjectOwnership (IScene scene, string[] args)
         {
-            string name = MainConsole.Instance.Prompt("Name of user: ", "");
+            var regionName = scene.RegionInfo.RegionName;
+            string name = MainConsole.Instance.Prompt ("[" +regionName + "-Objects]: Name of the new owner", "");
             if (name == "")
             {
-                MainConsole.Instance.InfoFormat("[PERMISSIONS]: No user selected.");
+                MainConsole.Instance.InfoFormat ("[PERMISSIONS]: No user selected.");
                 return;
             }
 
-            UserAccount acc = m_scene.UserAccountService.GetUserAccount(null, name);
+            UserAccount acc = m_scene.UserAccountService.GetUserAccount (null, name);
             if (acc == null)
             {
-                MainConsole.Instance.InfoFormat("[PERMISSIONS]: Sorry, user '{0}' was not found.", name);
+                MainConsole.Instance.InfoFormat ("[PERMISSIONS]: Sorry, user '{0}' was not found.", name);
                 return;
             }
 
-            IParcelManagementModule parcelManagement = m_scene.RequestModuleInterface<IParcelManagementModule>();
-            IPrimCountModule primCount = m_scene.RequestModuleInterface<IPrimCountModule>();
+            IParcelManagementModule parcelManagement = m_scene.RequestModuleInterface<IParcelManagementModule> ();
+            IPrimCountModule primCount = m_scene.RequestModuleInterface<IPrimCountModule> ();
             foreach (ILandObject parcel in parcelManagement.AllParcels())
             {
                 foreach (ISceneEntity sog in primCount.GetPrimCounts(parcel.LandData.GlobalID).Objects)
                 {
-                    sog.SetOwnerId(acc.PrincipalID);
-                    sog.SetGroup(UUID.Zero, acc.PrincipalID, true);
-                    sog.ScheduleGroupUpdate(PrimUpdateFlags.ForcedFullUpdate);
+                    sog.SetOwnerId (acc.PrincipalID);
+                    sog.SetGroup (UUID.Zero, acc.PrincipalID, true);
+                    sog.ScheduleGroupUpdate (PrimUpdateFlags.ForcedFullUpdate);
 
                     foreach (ISceneChildEntity child in sog.ChildrenEntities())
-                        child.Inventory.ChangeInventoryOwner(acc.PrincipalID);
+                        child.Inventory.ChangeInventoryOwner (acc.PrincipalID);
                 }
             }
         }
 
-        public void HandleDebugPermissions(IScene scene, string[] args)
+        public void HandleDebugPermissions (IScene scene, string[] args)
         {
             if (args.Length > 2)
             {
                 bool val;
 
-                if (!bool.TryParse(args[2], out val))
+                if (!bool.TryParse (args [2], out val))
                     return;
 
                 m_debugPermissions = val;
@@ -608,14 +607,14 @@ namespace WhiteCore.Modules.Permissions
                 if (!MainConsole.Instance.HasProcessedCurrentCommand)
                 {
                     MainConsole.Instance.HasProcessedCurrentCommand = true;
-                    MainConsole.Instance.InfoFormat("[PERMISSIONS] Set permissions debugging to {0} in {1}",
-                                                    m_debugPermissions,
-                                                    m_scene.RegionInfo.RegionName);
+                    MainConsole.Instance.InfoFormat ("[PERMISSIONS] Set permissions debugging to {0} in {1}",
+                        m_debugPermissions,
+                        m_scene.RegionInfo.RegionName);
                 }
             }
         }
 
-        public bool PropagatePermissions()
+        public bool PropagatePermissions ()
         {
             if (m_bypassPermissions)
                 return false;
@@ -623,54 +622,59 @@ namespace WhiteCore.Modules.Permissions
             return m_propagatePermissions;
         }
 
-        public bool BypassPermissions()
+        public bool BypassPermissions ()
         {
             return m_bypassPermissions;
         }
 
-        public void SetBypassPermissions(bool value)
+        public void SetBypassPermissions (bool value)
         {
             m_bypassPermissions = value;
         }
 
-        private bool CanLinkObject(UUID userID, UUID objectID)
+        bool CanLinkObject (UUID userID, UUID objectID)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
-            return GenericObjectPermission(userID, objectID, false);
+            return GenericObjectPermission (userID, objectID, false);
         }
 
-        private bool CanDelinkObject(UUID userID, UUID objectID)
+        bool CanDelinkObject (UUID userID, UUID objectID)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
-            return GenericObjectPermission(userID, objectID, false);
+            return GenericObjectPermission (userID, objectID, false);
         }
 
-        private bool CanBuyLand(UUID userID, ILandObject parcel, IScene scene)
+        bool CanBuyLand (UUID userID, ILandObject parcel, IScene scene)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
             return true;
         }
 
-        private bool CanCopyObjectInventory(UUID itemID, UUID objectID, UUID userID)
+        bool CanCopyObjectInventory (UUID itemID, UUID objectID, UUID userID)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
-            return GenericObjectPermission(userID, objectID, true);
+            return GenericObjectPermission (userID, objectID, true);
         }
 
-        private bool CanDeleteObjectInventory(UUID itemID, UUID objectID, UUID userID)
+        bool CanDeleteObjectInventory (UUID itemID, UUID objectID, UUID userID)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
-            return GenericObjectPermission(userID, objectID, true);
+            return GenericObjectPermission (userID, objectID, true);
         }
 
         /// <summary>
@@ -681,25 +685,26 @@ namespace WhiteCore.Modules.Permissions
         /// <param name="objectID"></param>
         /// <param name="userID"></param>
         /// <returns></returns>
-        private bool CanCreateObjectInventory(int invType, UUID objectID, UUID userID)
+        bool CanCreateObjectInventory (int invType, UUID objectID, UUID userID)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
-            if ((int) InventoryType.LSL == invType)
+            if ((int)InventoryType.LSL == invType)
             {
-                if (m_allowedScriptCreators == UserSet.Administrators && !IsAdministrator(userID))
+                if (m_allowedScriptCreators == UserSet.Administrators && !IsAdministrator (userID))
                     return false;
                 if (m_allowedScriptCreators == UserSet.ParcelOwners &&
-                    !GenericParcelPermission(userID, m_scene.GetScenePresence(userID).AbsolutePosition, 0))
+                    !GenericParcelPermission (userID, m_scene.GetScenePresence (userID).AbsolutePosition, 0))
                     return false;
             }
 
-            ISceneChildEntity part = m_scene.GetSceneObjectPart(objectID);
+            ISceneChildEntity part = m_scene.GetSceneObjectPart (objectID);
             if (part.OwnerID == userID)
                 return true;
 
-            if (IsGroupMember(part.GroupID, userID, (ulong) GroupPowers.ObjectManipulate))
+            if (IsGroupMember (part.GroupID, userID, (ulong)GroupPowers.ObjectManipulate))
                 return true;
 
             return false;
@@ -711,30 +716,31 @@ namespace WhiteCore.Modules.Permissions
         /// <param name="invType"></param>
         /// <param name="userID"></param>
         /// <returns></returns>
-        private bool CanCreateUserInventory(int invType, UUID userID)
+        bool CanCreateUserInventory (int invType, UUID userID)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
-            if ((int) InventoryType.LSL == invType)
+            if ((int)InventoryType.LSL == invType)
             {
-                if (m_allowedScriptCreators == UserSet.Administrators && !IsAdministrator(userID))
+                if (m_allowedScriptCreators == UserSet.Administrators && !IsAdministrator (userID))
                     return false;
                 if (m_allowedScriptCreators == UserSet.ParcelOwners &&
-                    !GenericParcelPermission(userID, m_scene.GetScenePresence(userID).AbsolutePosition, 0))
+                    !GenericParcelPermission (userID, m_scene.GetScenePresence (userID).AbsolutePosition, 0))
                     return false;
             }
 
-            if ((int) InventoryType.Landmark == invType)
+            if ((int)InventoryType.Landmark == invType)
             {
-                IScenePresence SP = m_scene.GetScenePresence(userID);
+                IScenePresence SP = m_scene.GetScenePresence (userID);
                 if (m_parcelManagement == null)
                     return true;
-                ILandObject parcel = m_parcelManagement.GetLandObject(SP.AbsolutePosition.X, SP.AbsolutePosition.Y);
-                if ((parcel.LandData.Flags & (int) ParcelFlags.AllowLandmark) != 0)
+                ILandObject parcel = m_parcelManagement.GetLandObject (SP.AbsolutePosition.X, SP.AbsolutePosition.Y);
+                if ((parcel.LandData.Flags & (int)ParcelFlags.AllowLandmark) != 0)
                     return true;
-                else
-                    return GenericParcelPermission(userID, parcel, (uint) GroupPowers.AllowLandmark);
+                
+                return GenericParcelPermission (userID, parcel, (uint)GroupPowers.AllowLandmark);
             }
 
             return true;
@@ -746,10 +752,11 @@ namespace WhiteCore.Modules.Permissions
         /// <param name="itemID"></param>
         /// <param name="userID"></param>
         /// <returns></returns>
-        private bool CanCopyUserInventory(UUID itemID, UUID userID)
+        bool CanCopyUserInventory (UUID itemID, UUID userID)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
             return true;
         }
@@ -760,10 +767,11 @@ namespace WhiteCore.Modules.Permissions
         /// <param name="itemID"></param>
         /// <param name="userID"></param>
         /// <returns></returns>
-        private bool CanEditUserInventory(UUID itemID, UUID userID)
+        bool CanEditUserInventory (UUID itemID, UUID userID)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
             return true;
         }
@@ -774,99 +782,102 @@ namespace WhiteCore.Modules.Permissions
         /// <param name="itemID"></param>
         /// <param name="userID"></param>
         /// <returns></returns>
-        private bool CanDeleteUserInventory(UUID itemID, UUID userID)
+        bool CanDeleteUserInventory (UUID itemID, UUID userID)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
             return true;
         }
 
-        private bool CanResetScript(UUID prim, UUID script, UUID agentID, IScene scene)
+        bool CanResetScript (UUID prim, UUID script, UUID agentID, IScene scene)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
-            ISceneChildEntity part = m_scene.GetSceneObjectPart(prim);
+            ISceneChildEntity part = m_scene.GetSceneObjectPart (prim);
 
             // If we selected a sub-prim to reset, prim won't represent the object, but only a part.
             // We have to check the permissions of the object, though.
-            if (part.ParentID != 0) prim = part.ParentUUID;
+            if (part.ParentID != 0)
+                prim = part.ParentUUID;
 
             // You can reset the scripts in any object you can edit
-            return GenericObjectPermission(agentID, prim, false);
+            return GenericObjectPermission (agentID, prim, false);
         }
 
-        private bool CanCompileScript(UUID ownerUUID, string scriptType, IScene scene)
+        bool CanCompileScript (UUID ownerUUID, string scriptType, IScene scene)
         {
             //MainConsole.Instance.DebugFormat("check if {0} is allowed to compile {1}", ownerUUID, scriptType);
             switch (scriptType)
             {
-                case "lsl":
-                case "lsl2":
-                    if ((m_allowedLSLScriptCompilers == UserSet.Administrators && !IsAdministrator(ownerUUID)) ||
+            case "lsl":
+            case "lsl2":
+                if ((m_allowedLSLScriptCompilers == UserSet.Administrators && !IsAdministrator (ownerUUID)) ||
                         (m_allowedLSLScriptCompilers == UserSet.ParcelOwners &&
-                         !GenericParcelPermission(ownerUUID, scene.GetScenePresence(ownerUUID).AbsolutePosition, 0)) ||
-                        GrantLSL.Count == 0 || GrantLSL.ContainsKey(ownerUUID.ToString()))
-                    {
-                        return (true);
-                    }
-                    break;
-                case "cs":
-                    if ((m_allowedCSScriptCompilers == UserSet.Administrators && !IsAdministrator(ownerUUID)) ||
+                        !GenericParcelPermission (ownerUUID, scene.GetScenePresence (ownerUUID).AbsolutePosition, 0)) ||
+                        GrantLSL.Count == 0 || GrantLSL.ContainsKey (ownerUUID.ToString ()))
+                {
+                    return (true);
+                }
+                break;
+            case "cs":
+                if ((m_allowedCSScriptCompilers == UserSet.Administrators && !IsAdministrator (ownerUUID)) ||
                         (m_allowedCSScriptCompilers == UserSet.ParcelOwners &&
-                         !GenericParcelPermission(ownerUUID, scene.GetScenePresence(ownerUUID).AbsolutePosition, 0)) ||
-                        GrantCS.Count == 0 || GrantCS.ContainsKey(ownerUUID.ToString()))
-                    {
-                        return (true);
-                    }
-                    break;
-                case "ascript":
-                    if ((m_allowedAScriptScriptCompilers == UserSet.Administrators && !IsAdministrator(ownerUUID)) ||
+                        !GenericParcelPermission (ownerUUID, scene.GetScenePresence (ownerUUID).AbsolutePosition, 0)) ||
+                        GrantCS.Count == 0 || GrantCS.ContainsKey (ownerUUID.ToString ()))
+                {
+                    return (true);
+                }
+                break;
+            case "ascript":
+                if ((m_allowedAScriptScriptCompilers == UserSet.Administrators && !IsAdministrator (ownerUUID)) ||
                         (m_allowedAScriptScriptCompilers == UserSet.ParcelOwners &&
-                         !GenericParcelPermission(ownerUUID, scene.GetScenePresence(ownerUUID).AbsolutePosition, 0)) ||
-                        GrantAScript.Count == 0 || GrantAScript.ContainsKey(ownerUUID.ToString()))
-                    {
-                        return (true);
-                    }
-                    break;
+                        !GenericParcelPermission (ownerUUID, scene.GetScenePresence (ownerUUID).AbsolutePosition, 0)) ||
+                        GrantAScript.Count == 0 || GrantAScript.ContainsKey (ownerUUID.ToString ()))
+                {
+                    return (true);
+                }
+                break;
             }
             return false;
         }
 
-        private bool CanPushObject(UUID userID, ILandObject parcel)
+        bool CanPushObject (UUID userID, ILandObject parcel)
         {
             //This is used to check who is pushing objects in the parcel
             //When this is called, the AllowPushObject flag has already been checked
 
-            return GenericParcelPermission(userID, parcel, (ulong) GroupPowers.ObjectManipulate);
+            return GenericParcelPermission (userID, parcel, (ulong)GroupPowers.ObjectManipulate);
         }
 
-        private bool CanViewObjectOwners(UUID userID, ILandObject parcel)
+        bool CanViewObjectOwners (UUID userID, ILandObject parcel)
         {
             //If you have none of the three return flags, you cannot view object owners in the return menu
-            if (!GenericParcelPermission(userID, parcel, (ulong) GroupPowers.ReturnNonGroup))
-                if (!GenericParcelPermission(userID, parcel, (ulong) GroupPowers.ReturnGroupSet))
-                    if (!GenericParcelPermission(userID, parcel, (ulong) GroupPowers.ReturnGroupOwned))
-                        return false;
+            if (!GenericParcelPermission (userID, parcel, (ulong)GroupPowers.ReturnNonGroup))
+            if (!GenericParcelPermission (userID, parcel, (ulong)GroupPowers.ReturnGroupSet))
+            if (!GenericParcelPermission (userID, parcel, (ulong)GroupPowers.ReturnGroupOwned))
+                return false;
             return true;
         }
 
-        private bool CanEditParcelAccessList(UUID userID, ILandObject parcel, uint flags)
+        bool CanEditParcelAccessList (UUID userID, ILandObject parcel, uint flags)
         {
-            AccessList AccessFlag = (AccessList) flags;
+            AccessList AccessFlag = (AccessList)flags;
             if (AccessFlag == AccessList.Access)
-                if (!GenericParcelPermission(userID, parcel, (ulong) GroupPowers.LandManageAllowed))
-                    return false;
-                else if (AccessFlag == AccessList.Ban)
-                    if (
-                        !GenericParcelPermission(userID, parcel,
-                                                 (ulong) (GroupPowers.LandManageAllowed | GroupPowers.LandManageBanned)))
-                        return false;
+            if (!GenericParcelPermission (userID, parcel, (ulong)GroupPowers.LandManageAllowed))
+                return false;
+            else if (AccessFlag == AccessList.Ban)
+            if (
+                !GenericParcelPermission (userID, parcel,
+                    (ulong)(GroupPowers.LandManageAllowed | GroupPowers.LandManageBanned)))
+                return false;
             return true;
         }
 
-        private bool CanControlPrimMedia(UUID agentID, UUID primID, int face)
+        bool CanControlPrimMedia (UUID agentID, UUID primID, int face)
         {
 //            MainConsole.Instance.DebugFormat(
 //                "[PERMISSONS]: Performing CanControlPrimMedia check with agentID {0}, primID {1}, face {2}",
@@ -875,11 +886,11 @@ namespace WhiteCore.Modules.Permissions
             if (null == m_moapModule)
                 return false;
 
-            ISceneChildEntity part = m_scene.GetSceneObjectPart(primID);
+            ISceneChildEntity part = m_scene.GetSceneObjectPart (primID);
             if (null == part)
                 return false;
 
-            MediaEntry me = m_moapModule.GetMediaEntry(part, face);
+            MediaEntry me = m_moapModule.GetMediaEntry (part, face);
 
             // If there is no existing media entry then it can be controlled (in this context, created).
             if (null == me)
@@ -889,10 +900,10 @@ namespace WhiteCore.Modules.Permissions
 //                "[PERMISSIONS]: Checking CanControlPrimMedia for {0} on {1} face {2} with control permissions {3}", 
 //                agentID, primID, face, me.ControlPermissions);
 
-            return GenericObjectPermission(part.UUID, agentID, true);
+            return GenericObjectPermission (part.UUID, agentID, true);
         }
 
-        private bool CanInteractWithPrimMedia(UUID agentID, UUID primID, int face)
+        bool CanInteractWithPrimMedia (UUID agentID, UUID primID, int face)
         {
 //            MainConsole.Instance.DebugFormat(
 //                "[PERMISSONS]: Performing CanInteractWithPrimMedia check with agentID {0}, primID {1}, face {2}",
@@ -901,11 +912,11 @@ namespace WhiteCore.Modules.Permissions
             if (null == m_moapModule)
                 return false;
 
-            ISceneChildEntity part = m_scene.GetSceneObjectPart(primID);
+            ISceneChildEntity part = m_scene.GetSceneObjectPart (primID);
             if (null == part)
                 return false;
 
-            MediaEntry me = m_moapModule.GetMediaEntry(part, face);
+            MediaEntry me = m_moapModule.GetMediaEntry (part, face);
 
             // If there is no existing media entry then it can be controlled (in this context, created).
             if (null == me)
@@ -915,10 +926,10 @@ namespace WhiteCore.Modules.Permissions
 //                "[PERMISSIONS]: Checking CanInteractWithPrimMedia for {0} on {1} face {2} with interact permissions {3}", 
 //                agentID, primID, face, me.InteractPermissions);
 
-            return GenericPrimMediaPermission(part, agentID, me.InteractPermissions);
+            return GenericPrimMediaPermission (part, agentID, me.InteractPermissions);
         }
 
-        private bool GenericPrimMediaPermission(ISceneChildEntity part, UUID agentID, MediaPermission perms)
+        bool GenericPrimMediaPermission (ISceneChildEntity part, UUID agentID, MediaPermission perms)
         {
 //            if (IsAdministrator(agentID))
 //                return true;
@@ -934,7 +945,7 @@ namespace WhiteCore.Modules.Permissions
 
             if ((perms & MediaPermission.Group) == MediaPermission.Group)
             {
-                if (IsGroupMember(part.GroupID, agentID, 0))
+                if (IsGroupMember (part.GroupID, agentID, 0))
                     return true;
             }
 
@@ -943,7 +954,7 @@ namespace WhiteCore.Modules.Permissions
 
         #region Object Permissions
 
-        public PermissionClass GetPermissionClass(UUID user, ISceneChildEntity obj)
+        public PermissionClass GetPermissionClass (UUID user, ISceneChildEntity obj)
         {
             if (obj == null)
                 return PermissionClass.Everyone;
@@ -956,38 +967,38 @@ namespace WhiteCore.Modules.Permissions
             if (user == objectOwner)
                 return PermissionClass.Owner;
 
-            if (IsFriendWithPerms(user, objectOwner))
+            if (IsFriendWithPerms (user, objectOwner))
                 return PermissionClass.Owner;
 
             // Estate users should be able to edit anything in the sim if RegionOwnerIsGod is set
-            if (m_RegionOwnerIsGod && IsEstateManager(user) && !IsAdministrator(objectOwner))
+            if (m_RegionOwnerIsGod && IsEstateManager (user) && !IsAdministrator (objectOwner))
                 return PermissionClass.Owner;
 
             // Admin should be able to edit anything in the sim (including admin objects)
-            if (IsAdministrator(user))
+            if (IsAdministrator (user))
                 return PermissionClass.Owner;
 
             // Users should be able to edit what is over their land.
             Vector3 taskPos = obj.AbsolutePosition;
             if (m_parcelManagement != null)
             {
-                ILandObject parcel = m_parcelManagement.GetLandObject(taskPos.X, taskPos.Y);
+                ILandObject parcel = m_parcelManagement.GetLandObject (taskPos.X, taskPos.Y);
                 if (parcel != null && parcel.LandData.OwnerID == user && m_ParcelOwnerIsGod)
                 {
                     // Admin objects should not be editable by the above
-                    if (!IsAdministrator(objectOwner))
+                    if (!IsAdministrator (objectOwner))
                         return PermissionClass.Owner;
                 }
             }
 
             // Group permissions
-            if ((obj.GroupID != UUID.Zero) && IsGroupMember(obj.GroupID, user, 0))
+            if ((obj.GroupID != UUID.Zero) && IsGroupMember (obj.GroupID, user, 0))
                 return PermissionClass.Group;
 
             return PermissionClass.Everyone;
         }
 
-        public uint GenerateClientFlags(UUID user, ISceneChildEntity task)
+        public uint GenerateClientFlags (UUID user, ISceneChildEntity task)
         {
             // Here's the way this works,
             // ObjectFlags and Permission flags are two different enumerations
@@ -1004,7 +1015,7 @@ namespace WhiteCore.Modules.Permissions
             if (task == null)
                 return 0;
 
-            uint objflags = task.GetEffectiveObjectFlags();
+            uint objflags = task.GetEffectiveObjectFlags ();
             UUID objectOwner = task.OwnerID;
 
 
@@ -1016,70 +1027,62 @@ namespace WhiteCore.Modules.Permissions
 #pragma warning disable 0612 
             objflags &= (uint)
                         ~(PrimFlags.ObjectCopy | // Tells client you can copy the object
-                          PrimFlags.ObjectModify | // tells client you can modify the object
-                          PrimFlags.ObjectMove | // tells client that you can move the object (only, no mod)
-                          PrimFlags.ObjectTransfer |
+            PrimFlags.ObjectModify | // tells client you can modify the object
+            PrimFlags.ObjectMove | // tells client that you can move the object (only, no mod)
+            PrimFlags.ObjectTransfer |
                           // tells the client that you can /take/ the object if you don't own it
-                          PrimFlags.ObjectYouOwner | // Tells client that you're the owner of the object
-                          PrimFlags.ObjectAnyOwner | // Tells client that someone owns the object
-                          PrimFlags.ObjectOwnerModify | // Tells client that you're the owner of the object
-                          PrimFlags.ObjectYouOfficer
-                         // Tells client that you've got group object editing permission. Used when ObjectGroupOwned is set
-                         );
+            PrimFlags.ObjectYouOwner | // Tells client that you're the owner of the object
+            PrimFlags.ObjectAnyOwner | // Tells client that someone owns the object
+            PrimFlags.ObjectOwnerModify | // Tells client that you're the owner of the object
+            PrimFlags.ObjectYouOfficer
+            // Tells client that you've got group object editing permission. Used when ObjectGroupOwned is set
+            );
 #pragma warning restore 0612
 
 
             // Creating the three ObjectFlags options for this method to choose from.
             // Customize the OwnerMask
-            uint objectOwnerMask = ApplyObjectModifyMasks(task.OwnerMask, objflags);
-            objectOwnerMask |= (uint) PrimFlags.ObjectYouOwner | (uint) PrimFlags.ObjectAnyOwner |
-                               (uint) PrimFlags.ObjectOwnerModify;
+            uint objectOwnerMask = ApplyObjectModifyMasks (task.OwnerMask, objflags);
+            objectOwnerMask |= (uint)PrimFlags.ObjectYouOwner | (uint)PrimFlags.ObjectAnyOwner |
+            (uint)PrimFlags.ObjectOwnerModify;
 
             // Customize the GroupMask
-            uint objectGroupMask = ApplyObjectModifyMasks(task.GroupMask, objflags);
+            uint objectGroupMask = ApplyObjectModifyMasks (task.GroupMask, objflags);
 
             // Customize the EveryoneMask
-            uint objectEveryoneMask = ApplyObjectModifyMasks(task.EveryoneMask, objflags);
+            uint objectEveryoneMask = ApplyObjectModifyMasks (task.EveryoneMask, objflags);
             if (objectOwner != UUID.Zero)
-                objectEveryoneMask |= (uint) PrimFlags.ObjectAnyOwner;
+                objectEveryoneMask |= (uint)PrimFlags.ObjectAnyOwner;
 
-            PermissionClass permissionClass = GetPermissionClass(user, task);
+            PermissionClass permissionClass = GetPermissionClass (user, task);
             switch (permissionClass)
             {
-                case PermissionClass.Owner:
-                    return objectOwnerMask;
-                case PermissionClass.Group:
-                    return objectGroupMask | objectEveryoneMask;
-                case PermissionClass.Everyone:
-                default:
-                    return objectEveryoneMask;
+            case PermissionClass.Owner:
+                return objectOwnerMask;
+            case PermissionClass.Group:
+                return objectGroupMask | objectEveryoneMask;
+            case PermissionClass.Everyone:
+            default:
+                return objectEveryoneMask;
             }
         }
 
-        private uint ApplyObjectModifyMasks(uint setPermissionMask, uint objectFlagsMask)
+        uint ApplyObjectModifyMasks (uint setPermissionMask, uint objectFlagsMask)
         {
             // We are adding the temporary objectflags to the object's objectflags based on the
             // permission flag given.  These change the F flags on the client.
 
-            if ((setPermissionMask & (uint) PermissionMask.Copy) != 0)
-            {
-                objectFlagsMask |= (uint) PrimFlags.ObjectCopy;
-            }
+            if ((setPermissionMask & (uint)PermissionMask.Copy) != 0)
+                objectFlagsMask |= (uint)PrimFlags.ObjectCopy;
 
-            if ((setPermissionMask & (uint) PermissionMask.Move) != 0)
-            {
-                objectFlagsMask |= (uint) PrimFlags.ObjectMove;
-            }
+            if ((setPermissionMask & (uint)PermissionMask.Move) != 0)
+                objectFlagsMask |= (uint)PrimFlags.ObjectMove;
 
-            if ((setPermissionMask & (uint) PermissionMask.Modify) != 0)
-            {
-                objectFlagsMask |= (uint) PrimFlags.ObjectModify;
-            }
+            if ((setPermissionMask & (uint)PermissionMask.Modify) != 0)
+                objectFlagsMask |= (uint)PrimFlags.ObjectModify;
 
-            if ((setPermissionMask & (uint) PermissionMask.Transfer) != 0)
-            {
-                objectFlagsMask |= (uint) PrimFlags.ObjectTransfer;
-            }
+            if ((setPermissionMask & (uint)PermissionMask.Transfer) != 0)
+                objectFlagsMask |= (uint)PrimFlags.ObjectTransfer;
 
             return objectFlagsMask;
         }
@@ -1092,27 +1095,26 @@ namespace WhiteCore.Modules.Permissions
         /// <param name="objId"></param>
         /// <param name="denyOnLocked"></param>
         /// <returns></returns>
-        protected bool GenericObjectPermission(UUID currentUser, UUID objId, bool denyOnLocked)
+        protected bool GenericObjectPermission (UUID currentUser, UUID objId, bool denyOnLocked)
         {
             // Default: deny
             bool locked = false;
 
             ISceneEntity group;
             IEntity entity;
-            if (!m_scene.Entities.TryGetValue(objId, out entity))
+            if (!m_scene.Entities.TryGetValue (objId, out entity))
             {
-                if (!m_scene.Entities.TryGetChildPrimParent(objId, out entity))
+                if (!m_scene.Entities.TryGetChildPrimParent (objId, out entity))
                     return false;
 
-                group = (ISceneEntity) entity;
-            }
-            else
+                group = (ISceneEntity)entity;
+            } else
             {
                 // If it's not an object, we cant edit it.
                 if (!(entity is ISceneEntity))
                     return false;
 
-                group = (ISceneEntity) entity;
+                group = (ISceneEntity)entity;
             }
 
             UUID objectOwner = group.OwnerID;
@@ -1125,7 +1127,7 @@ namespace WhiteCore.Modules.Permissions
             // Nobody but the object owner can set permissions on an object
             //
 
-            if (locked && (!IsAdministrator(currentUser)) && denyOnLocked)
+            if (locked && (!IsAdministrator (currentUser)) && denyOnLocked)
                 return false;
 
             // Object owners should be able to edit their own content
@@ -1133,14 +1135,14 @@ namespace WhiteCore.Modules.Permissions
                 return true;
 
             //Check friend perms
-            if (IsFriendWithPerms(currentUser, objectOwner))
+            if (IsFriendWithPerms (currentUser, objectOwner))
                 return true;
 
             // Group members should be able to edit group objects
-            ISceneChildEntity part = m_scene.GetSceneObjectPart(objId);
+            ISceneChildEntity part = m_scene.GetSceneObjectPart (objId);
             if ((group.GroupID != UUID.Zero)
-                && (part != null && (part.GroupMask & (uint) PermissionMask.Modify) != 0)
-                && IsGroupMember(group.GroupID, currentUser, (ulong) GroupPowers.ObjectManipulate))
+                && (part != null && (part.GroupMask & (uint)PermissionMask.Modify) != 0)
+                && IsGroupMember (group.GroupID, currentUser, (ulong)GroupPowers.ObjectManipulate))
             {
                 // Return immediately, so that the administrator can shares group objects
                 return true;
@@ -1149,25 +1151,25 @@ namespace WhiteCore.Modules.Permissions
             // Users should be able to edit what is over their land.
             if (m_parcelManagement != null)
             {
-                ILandObject parcel = m_parcelManagement.GetLandObject(group.AbsolutePosition.X, group.AbsolutePosition.Y);
+                ILandObject parcel = m_parcelManagement.GetLandObject (group.AbsolutePosition.X, group.AbsolutePosition.Y);
                 if ((parcel != null) && (parcel.LandData.OwnerID == currentUser))
                     return true;
             }
 
             // Estate users should be able to edit anything in the sim
-            if (IsEstateManager(currentUser))
+            if (IsEstateManager (currentUser))
                 return true;
 
             // Admin objects should not be editable by the above
-            if (IsAdministrator(objectOwner))
+            if (IsAdministrator (objectOwner))
             {
-                bool permission = (IsFriendWithPerms(currentUser, objectOwner) && m_allowAdminFriendEditRights);
+                bool permission = (IsFriendWithPerms (currentUser, objectOwner) && m_allowAdminFriendEditRights);
                 if (permission)
                     return true;
             }
 
             // Admin should be able to edit anything in the sim (including admin objects)
-            if (IsAdministrator(currentUser))
+            if (IsAdministrator (currentUser))
                 return true;
 
             return false;
@@ -1177,7 +1179,7 @@ namespace WhiteCore.Modules.Permissions
 
         #region Generic Permissions
 
-        protected bool GenericCommunicationPermission(UUID user, UUID target)
+        protected bool GenericCommunicationPermission (UUID user, UUID target)
         {
             //TODO:FEATURE: Setting this to true so that cool stuff can happen until we define what determines Generic Communication Permission
             //bool permission = false;
@@ -1197,164 +1199,178 @@ namespace WhiteCore.Modules.Permissions
             return permission;*/
         }
 
-        public bool GenericEstatePermission(UUID user)
+        public bool GenericEstatePermission (UUID user)
         {
             // Default: deny
 
             // Estate admins should be able to use estate tools
-            if (IsEstateManager(user))
+            if (IsEstateManager (user))
                 return true;
 
             // Administrators always have permission
-            if (IsAdministrator(user))
+            if (IsAdministrator (user))
                 return true;
 
             return false;
         }
 
-        protected bool GenericParcelPermission(UUID user, ILandObject parcel, ulong groupPowers)
+        protected bool GenericParcelPermission (UUID user, ILandObject parcel, ulong groupPowers)
         {
             if (parcel.LandData.OwnerID == user)
                 return true;
 
-            if ((parcel.LandData.GroupID != UUID.Zero) && IsGroupMember(parcel.LandData.GroupID, user, groupPowers))
+            if ((parcel.LandData.GroupID != UUID.Zero) && IsGroupMember (parcel.LandData.GroupID, user, groupPowers))
                 return true;
 
-            if (GenericEstatePermission(user))
+            if (GenericEstatePermission (user))
                 return true;
 
             return false;
         }
 
-        public bool SetHomePoint(UUID userID)
+        public bool SetHomePoint (UUID userID)
         {
-            if (GenericEstatePermission(userID))
+            if (GenericEstatePermission (userID))
                 return true;
 
             if (!m_scene.RegionInfo.EstateSettings.AllowSetHome)
                 return false;
 
-            IScenePresence SP = m_scene.GetScenePresence(userID);
+            IScenePresence SP = m_scene.GetScenePresence (userID);
             if (SP == null)
                 return false;
 
             if (m_parcelManagement == null)
                 return true;
-            ILandObject parcel = m_parcelManagement.GetLandObject(SP.AbsolutePosition.X, SP.AbsolutePosition.Y);
-            if (parcel == null) return false;
+            
+            ILandObject parcel = m_parcelManagement.GetLandObject (SP.AbsolutePosition.X, SP.AbsolutePosition.Y);
+            if (parcel == null)
+                return false;
 
-            if (GenericParcelPermission(userID, parcel, (ulong) GroupPowers.AllowSetHome))
+            if (GenericParcelPermission (userID, parcel, (ulong)GroupPowers.AllowSetHome))
                 return true;
 
             return false;
         }
 
-        public bool TakeLandmark(UUID userID)
+        public bool TakeLandmark (UUID userID)
         {
-            if (IsAdministrator(userID))
+            if (IsAdministrator (userID))
                 return true;
 
-            if (GenericEstatePermission(userID))
+            if (GenericEstatePermission (userID))
                 return true;
 
             //No landmarks except for estate owners or gods
             if (!m_scene.RegionInfo.EstateSettings.AllowLandmark)
                 return false;
 
-            IScenePresence SP = m_scene.GetScenePresence(userID);
+            IScenePresence SP = m_scene.GetScenePresence (userID);
             if (SP == null)
                 return false;
 
             if (m_parcelManagement == null)
                 return true;
-            ILandObject parcel = m_parcelManagement.GetLandObject(SP.AbsolutePosition.X, SP.AbsolutePosition.Y);
-            if (parcel == null) return false;
+            
+            ILandObject parcel = m_parcelManagement.GetLandObject (SP.AbsolutePosition.X, SP.AbsolutePosition.Y);
+            if (parcel == null)
+                return false;
 
-            if (GenericParcelPermission(userID, parcel, (ulong) GroupPowers.AllowLandmark))
+            if (GenericParcelPermission (userID, parcel, (ulong)GroupPowers.AllowLandmark))
                 return true;
 
-            if ((parcel.LandData.Flags & (uint) ParcelFlags.AllowLandmark) == 0)
+            if ((parcel.LandData.Flags & (uint)ParcelFlags.AllowLandmark) == 0)
                 return false;
 
             return true;
         }
 
-        private bool CanEditParcelProperties(UUID user, ILandObject parcel, GroupPowers p, IScene scene)
+        bool CanEditParcelProperties (UUID user, ILandObject parcel, GroupPowers p, IScene scene)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
-            return GenericParcelPermission(user, parcel, (ulong) p);
+            return GenericParcelPermission (user, parcel, (ulong)p);
         }
 
-        protected bool GenericParcelPermission(UUID user, Vector3 pos, ulong groupPowers)
+        protected bool GenericParcelPermission (UUID user, Vector3 pos, ulong groupPowers)
         {
             if (m_parcelManagement == null)
                 return true;
-            ILandObject parcel = m_parcelManagement.GetLandObject(pos.X, pos.Y);
-            if (parcel == null) return false;
-            return GenericParcelPermission(user, parcel, groupPowers);
+            
+            ILandObject parcel = m_parcelManagement.GetLandObject (pos.X, pos.Y);
+            if (parcel == null)
+                return false;
+            
+            return GenericParcelPermission (user, parcel, groupPowers);
         }
 
         #endregion
 
         #region Permission Checks
 
-        private bool CanAbandonParcel(UUID user, ILandObject parcel, IScene scene)
+        bool CanAbandonParcel (UUID user, ILandObject parcel, IScene scene)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
-            return GenericParcelPermission(user, parcel, (ulong) GroupPowers.LandRelease);
+            return GenericParcelPermission (user, parcel, (ulong)GroupPowers.LandRelease);
         }
 
-        private bool CanReclaimParcel(UUID user, ILandObject parcel, IScene scene)
+        bool CanReclaimParcel (UUID user, ILandObject parcel, IScene scene)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
-            return GenericParcelPermission(user, parcel, (ulong) GroupPowers.LandRelease);
+            return GenericParcelPermission (user, parcel, (ulong)GroupPowers.LandRelease);
         }
 
-        private bool CanDeedParcel(UUID user, ILandObject parcel, IScene scene)
+        bool CanDeedParcel (UUID user, ILandObject parcel, IScene scene)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
             if (parcel.LandData.OwnerID != user) // Only the owner can deed!
                 return false;
 
-            return GenericParcelPermission(user, parcel, (ulong) GroupPowers.LandDeed);
+            return GenericParcelPermission (user, parcel, (ulong)GroupPowers.LandDeed);
         }
 
-        private bool CanDeedObject(UUID user, UUID group, IScene scene)
+        bool CanDeedObject (UUID user, UUID group, IScene scene)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
-            return m_groupsModule.GroupPermissionCheck(user, group, GroupPowers.DeedObject);
+            return m_groupsModule.GroupPermissionCheck (user, group, GroupPowers.DeedObject);
         }
 
-        private bool IsGod(UUID user, IScene scene)
+        bool IsGod (UUID user, IScene scene)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
-            return InternalIsAdministrator(user, true);
+            return InternalIsAdministrator (user, true);
         }
 
-        private bool CanDuplicateObject(int objectCount, UUID objectID, UUID owner, IScene scene, Vector3 objectPosition)
+        bool CanDuplicateObject (int objectCount, UUID objectID, UUID owner, IScene scene, Vector3 objectPosition)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
-            if (!GenericObjectPermission(owner, objectID, true))
+            if (!GenericObjectPermission (owner, objectID, true))
             {
                 //They can't even edit the object
                 return false;
             }
 
-            ISceneChildEntity part = scene.GetSceneObjectPart(objectID);
+            ISceneChildEntity part = scene.GetSceneObjectPart (objectID);
             if (part == null)
                 return false;
 
@@ -1370,51 +1386,53 @@ namespace WhiteCore.Modules.Permissions
                 if ((part.GroupMask & PERM_COPY) == 0)
                     return false;
 
-                if (!IsGroupMember(part.GroupID, owner, (ulong) GroupPowers.ObjectManipulate))
+                if (!IsGroupMember (part.GroupID, owner, (ulong)GroupPowers.ObjectManipulate))
                     return false;
             }
 
             //If they can rez, they can duplicate
             string reason;
-            return CanRezObject(objectCount, owner, objectPosition, scene, out reason);
+            return CanRezObject (objectCount, owner, objectPosition, scene, out reason);
         }
 
-        private bool CanDeleteObject(UUID objectID, UUID deleter, IScene scene)
+        bool CanDeleteObject (UUID objectID, UUID deleter, IScene scene)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
-            return GenericObjectPermission(deleter, objectID, false);
+            return GenericObjectPermission (deleter, objectID, false);
         }
 
-        private bool CanEditObject(UUID objectID, UUID editorID, IScene scene)
+        bool CanEditObject (UUID objectID, UUID editorID, IScene scene)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
-            return GenericObjectPermission(editorID, objectID, false);
+            return GenericObjectPermission (editorID, objectID, false);
         }
 
-        private bool CanEditObjectInventory(UUID objectID, UUID editorID, IScene scene)
+        bool CanEditObjectInventory (UUID objectID, UUID editorID, IScene scene)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
-            ISceneChildEntity part = m_scene.GetSceneObjectPart(objectID);
+            ISceneChildEntity part = m_scene.GetSceneObjectPart (objectID);
 
             if (part == null)
             {
                 IEntity group;
-                m_scene.Entities.TryGetValue(objectID, out group);
+                m_scene.Entities.TryGetValue (objectID, out group);
                 if (group == null)
                 {
-                    MainConsole.Instance.Warn("[PERMISSIONS]: COULD NOT FIND PRIM FOR CanEditObjectInventory! " +
-                                              objectID);
+                    MainConsole.Instance.Warn ("[PERMISSIONS]: COULD NOT FIND PRIM FOR CanEditObjectInventory! " +
+                    objectID);
                     return false;
                 }
                 objectID = group.UUID;
-            }
-            else
+            } else
             {
                 // If we selected a sub-prim to edit, the objectID won't represent the object, but only a part.
                 // We have to check the permissions of the group, though.
@@ -1424,23 +1442,25 @@ namespace WhiteCore.Modules.Permissions
                 }
             }
 
-            return GenericObjectPermission(editorID, objectID, false);
+            return GenericObjectPermission (editorID, objectID, false);
         }
 
-        private bool CanEditParcel(UUID user, ILandObject parcel, IScene scene)
+        bool CanEditParcel (UUID user, ILandObject parcel, IScene scene)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
-            return GenericParcelPermission(user, parcel, (ulong) GroupPowers.LandChangeIdentity);
+            return GenericParcelPermission (user, parcel, (ulong)GroupPowers.LandChangeIdentity);
         }
 
-        private bool CanSubdivideParcel(UUID user, ILandObject parcel, IScene scene)
+        bool CanSubdivideParcel (UUID user, ILandObject parcel, IScene scene)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
-            return GenericParcelPermission(user, parcel, (ulong) GroupPowers.LandDivideJoin);
+            return GenericParcelPermission (user, parcel, (ulong)GroupPowers.LandDivideJoin);
         }
 
         /// <summary>
@@ -1451,21 +1471,22 @@ namespace WhiteCore.Modules.Permissions
         /// <param name="user"></param>
         /// <param name="scene"></param>
         /// <returns></returns>
-        private bool CanEditScript(UUID script, UUID objectID, UUID user, IScene scene)
+        bool CanEditScript (UUID script, UUID objectID, UUID user, IScene scene)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
-            if (m_allowedScriptEditors == UserSet.Administrators && !IsAdministrator(user))
+            if (m_allowedScriptEditors == UserSet.Administrators && !IsAdministrator (user))
                 return false;
             if (m_allowedScriptEditors == UserSet.ParcelOwners &&
-                !GenericParcelPermission(user, scene.GetScenePresence(user).AbsolutePosition, 0))
+                !GenericParcelPermission (user, scene.GetScenePresence (user).AbsolutePosition, 0))
                 return false;
 
             // Ordinarily, if you can view it, you can edit it
             // There is no viewing a no mod script
             //
-            return CanViewScript(script, objectID, user, scene);
+            return CanViewScript (script, objectID, user, scene);
         }
 
         /// <summary>
@@ -1476,33 +1497,35 @@ namespace WhiteCore.Modules.Permissions
         /// <param name="user"></param>
         /// <param name="scene"></param>
         /// <returns></returns>
-        private bool CanEditNotecard(UUID notecard, UUID objectID, UUID user, IScene scene)
+        bool CanEditNotecard (UUID notecard, UUID objectID, UUID user, IScene scene)
         {
-            return CanViewNotecard(notecard, objectID, user, scene);
+            return CanViewNotecard (notecard, objectID, user, scene);
         }
 
-        private bool CanInstantMessage(UUID user, UUID target, IScene startScene)
+        bool CanInstantMessage (UUID user, UUID target, IScene startScene)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
             // If the sender is an object, check owner instead
             //
-            ISceneChildEntity part = startScene.GetSceneObjectPart(user);
+            ISceneChildEntity part = startScene.GetSceneObjectPart (user);
             if (part != null)
                 user = part.OwnerID;
 
-            return GenericCommunicationPermission(user, target);
+            return GenericCommunicationPermission (user, target);
         }
 
-        private bool CanGodTp(UUID user, UUID target)
+        bool CanGodTp (UUID user, UUID target)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
-            if (IsGod(user, m_scene))
+            if (IsGod (user, m_scene))
             {
-                if (IsGod(target, m_scene)) //if they are an admin
+                if (IsGod (target, m_scene)) //if they are an admin
                     return false;
 
                 return true;
@@ -1510,29 +1533,30 @@ namespace WhiteCore.Modules.Permissions
             return false;
         }
 
-        private bool CanIssueEstateCommand(UUID user, IScene requestFromScene, bool ownerCommand)
+        bool CanIssueEstateCommand (UUID user, IScene requestFromScene, bool ownerCommand)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
-            if (IsAdministrator(user))
+            if (IsAdministrator (user))
                 return true;
 
-            if (m_scene.RegionInfo.EstateSettings.IsEstateOwner(user))
+            if (m_scene.RegionInfo.EstateSettings.IsEstateOwner (user))
                 return true;
 
             if (ownerCommand)
                 return false;
 
-            return GenericEstatePermission(user);
+            return GenericEstatePermission (user);
         }
 
-        private bool CanMoveObject(UUID objectID, UUID moverID, IScene scene)
+        bool CanMoveObject (UUID objectID, UUID moverID, IScene scene)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
             if (m_bypassPermissions)
             {
-                ISceneChildEntity part = scene.GetSceneObjectPart(objectID);
+                ISceneChildEntity part = scene.GetSceneObjectPart (objectID);
                 if (part.OwnerID != moverID)
                 {
                     if (part.ParentEntity != null && !part.ParentEntity.IsDeleted)
@@ -1544,11 +1568,11 @@ namespace WhiteCore.Modules.Permissions
                 return m_bypassPermissionsValue;
             }
 
-            bool permission = GenericObjectPermission(moverID, objectID, true);
+            bool permission = GenericObjectPermission (moverID, objectID, true);
             if (!permission)
             {
                 IEntity ent;
-                if (!m_scene.Entities.TryGetValue(objectID, out ent))
+                if (!m_scene.Entities.TryGetValue (objectID, out ent))
                 {
                     return false;
                 }
@@ -1563,7 +1587,7 @@ namespace WhiteCore.Modules.Permissions
                     return false;
                 }
 
-                ISceneEntity task = (ISceneEntity) ent;
+                ISceneEntity task = (ISceneEntity)ent;
 
 
                 // UUID taskOwner = null;
@@ -1578,12 +1602,11 @@ namespace WhiteCore.Modules.Permissions
                 // Locked
                 if ((task.RootChild.OwnerMask & PERM_LOCKED) == 0)
                     permission = false;
-            }
-            else
+            } else
             {
                 bool locked = false;
                 IEntity ent;
-                if (!m_scene.Entities.TryGetValue(objectID, out ent))
+                if (!m_scene.Entities.TryGetValue (objectID, out ent))
                 {
                     return false;
                 }
@@ -1594,7 +1617,7 @@ namespace WhiteCore.Modules.Permissions
                     return false;
                 }
 
-                ISceneEntity group = (ISceneEntity) ent;
+                ISceneEntity group = (ISceneEntity)ent;
 
                 UUID objectOwner = group.OwnerID;
                 locked = ((group.RootChild.OwnerMask & PERM_LOCKED) == 0);
@@ -1615,10 +1638,11 @@ namespace WhiteCore.Modules.Permissions
             return permission;
         }
 
-        private bool CanObjectEntry(UUID objectID, bool enteringRegion, Vector3 newPoint, UUID OwnerID)
+        bool CanObjectEntry (UUID objectID, bool enteringRegion, Vector3 newPoint, UUID OwnerID)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
             if (newPoint.X > m_scene.RegionInfo.RegionSizeX || newPoint.X < 0 ||
                 newPoint.Y > m_scene.RegionInfo.RegionSizeY || newPoint.Y < 0)
@@ -1630,11 +1654,9 @@ namespace WhiteCore.Modules.Permissions
             if (m_parcelManagement == null)
                 return true;
 
-            ILandObject land = m_parcelManagement.GetLandObject(newPoint.X, newPoint.Y);
+            ILandObject land = m_parcelManagement.GetLandObject (newPoint.X, newPoint.Y);
             if (land == null)
-            {
                 return false;
-            }
 
             IEntity ent;
             if (!enteringRegion)
@@ -1644,52 +1666,45 @@ namespace WhiteCore.Modules.Permissions
                 if (!m_scene.Entities.TryGetValue (objectID, out ent))
                     return false;
             
-                ILandObject oldland = m_parcelManagement.GetLandObject(ent.AbsolutePosition.X, ent.AbsolutePosition.Y);
+                ILandObject oldland = m_parcelManagement.GetLandObject (ent.AbsolutePosition.X, ent.AbsolutePosition.Y);
                 if (oldland.LandData.GlobalID == land.LandData.GlobalID)
                     return true; //Same parcel
             }
 
-            if ((land.LandData.Flags & ((int) ParcelFlags.AllowAPrimitiveEntry)) != 0)
-            {
+            if ((land.LandData.Flags & ((int)ParcelFlags.AllowAPrimitiveEntry)) != 0)
                 return true;
-            }
 
             if (land.LandData.OwnerID == OwnerID)
-            {
                 return true;
-            }
 
             //Check for group permissions
-            if (((land.LandData.Flags & ((int) ParcelFlags.AllowGroupObjectEntry)) != 0) &&
+            if (((land.LandData.Flags & ((int)ParcelFlags.AllowGroupObjectEntry)) != 0) &&
                 (land.LandData.GroupID != UUID.Zero)
-                && IsGroupMember(land.LandData.GroupID, OwnerID, (ulong) GroupPowers.None))
+                && IsGroupMember (land.LandData.GroupID, OwnerID, (ulong)GroupPowers.None))
             {
                 return true;
             }
 
             //check for admin statuses
-            if (IsEstateManager(OwnerID))
-            {
+            if (IsEstateManager (OwnerID))
                 return true;
-            }
 
-            if (IsAdministrator(OwnerID))
-            {
+            if (IsAdministrator (OwnerID))
                 return true;
-            }
 
             //Otherwise false
             return false;
         }
 
-        private bool CanReturnObjects(ILandObject land, UUID user, List<ISceneEntity> objects, IScene scene)
+        bool CanReturnObjects (ILandObject land, UUID user, List<ISceneEntity> objects, IScene scene)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
             ILandObject l;
 
-            IScenePresence sp = scene.GetScenePresence(user);
+            IScenePresence sp = scene.GetScenePresence (user);
             if (sp == null)
                 return false;
 
@@ -1707,20 +1722,19 @@ namespace WhiteCore.Modules.Permissions
                 if (land != null)
                 {
                     l = land;
-                }
-                else
+                } else
                 {
                     Vector3 pos = g.AbsolutePosition;
                     if (m_parcelManagement == null)
                         continue;
 
-                    l = m_parcelManagement.GetLandObject(pos.X, pos.Y);
+                    l = m_parcelManagement.GetLandObject (pos.X, pos.Y);
                 }
 
                 // If it's not over any land, then we can't do a thing
                 if (l == null)
                 {
-                    objects.Remove(g);
+                    objects.Remove (g);
                     continue;
                 }
 
@@ -1735,33 +1749,33 @@ namespace WhiteCore.Modules.Permissions
                 {
                     // Not a group member, or no rights at all
                     //
-                    if (!m_groupsModule.GroupPermissionCheck(client.AgentId, g.GroupID, GroupPowers.None))
+                    if (!m_groupsModule.GroupPermissionCheck (client.AgentId, g.GroupID, GroupPowers.None))
                     {
-                        objects.Remove(g);
+                        objects.Remove (g);
                         continue;
                     }
 
                     // Group deeded object?
                     //
                     if (g.OwnerID == l.LandData.GroupID &&
-                        !m_groupsModule.GroupPermissionCheck(client.AgentId, g.GroupID, GroupPowers.ReturnGroupOwned))
+                        !m_groupsModule.GroupPermissionCheck (client.AgentId, g.GroupID, GroupPowers.ReturnGroupOwned))
                     {
-                        objects.Remove(g);
+                        objects.Remove (g);
                         continue;
                     }
 
                     // Group set object?
                     //
                     if (g.GroupID == l.LandData.GroupID &&
-                        !m_groupsModule.GroupPermissionCheck(client.AgentId, g.GroupID, GroupPowers.ReturnGroupSet))
+                        !m_groupsModule.GroupPermissionCheck (client.AgentId, g.GroupID, GroupPowers.ReturnGroupSet))
                     {
-                        objects.Remove(g);
+                        objects.Remove (g);
                         continue;
                     }
 
-                    if (!m_groupsModule.GroupPermissionCheck(client.AgentId, g.GroupID, GroupPowers.ReturnNonGroup))
+                    if (!m_groupsModule.GroupPermissionCheck (client.AgentId, g.GroupID, GroupPowers.ReturnNonGroup))
                     {
-                        objects.Remove(g);
+                        objects.Remove (g);
                         continue;
                     }
 
@@ -1773,7 +1787,7 @@ namespace WhiteCore.Modules.Permissions
 
                 // By default, we can't remove
                 //
-                objects.Remove(g);
+                objects.Remove (g);
             }
 
             if (objects.Count == 0)
@@ -1782,46 +1796,47 @@ namespace WhiteCore.Modules.Permissions
             return true;
         }
 
-        private bool CanRezObject(int objectCount, UUID attemptedRezzer, Vector3 objectPosition, IScene scene,
-                                  out string reason)
+        bool CanRezObject (int objectCount, UUID attemptedRezzer, Vector3 objectPosition, IScene scene,
+                          out string reason)
         {
             reason = "";
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
             bool permission = false;
 
             if (m_parcelManagement == null)
                 return true;
-            ILandObject land = m_parcelManagement.GetLandObject(objectPosition.X, objectPosition.Y);
+            ILandObject land = m_parcelManagement.GetLandObject (objectPosition.X, objectPosition.Y);
             if (land == null)
             {
                 reason = "Cannot find land at your current location";
                 return false;
             }
 
-            if ((land.LandData.Flags & ((int) ParcelFlags.CreateObjects)) ==
-                (int) ParcelFlags.CreateObjects)
+            if ((land.LandData.Flags & ((int)ParcelFlags.CreateObjects)) ==
+                (int)ParcelFlags.CreateObjects)
                 permission = true;
 
-            if ((land.LandData.Flags & ((int) ParcelFlags.CreateGroupObjects)) ==
-                (int) ParcelFlags.CreateGroupObjects &&
+            if ((land.LandData.Flags & ((int)ParcelFlags.CreateGroupObjects)) ==
+                (int)ParcelFlags.CreateGroupObjects &&
                 land.LandData.GroupID != UUID.Zero &&
-                IsGroupMember(land.LandData.GroupID, attemptedRezzer, 0))
+                IsGroupMember (land.LandData.GroupID, attemptedRezzer, 0))
                 permission = true;
 
-            if (IsAdministrator(attemptedRezzer))
+            if (IsAdministrator (attemptedRezzer))
                 return true;
 
             // Powers are zero (invalid), because GroupPowers.AllowRez is not a precondition for rezzing objects
-            if (GenericParcelPermission(attemptedRezzer, land, 1))
+            if (GenericParcelPermission (attemptedRezzer, land, 1))
                 permission = true;
 
-            IPrimCountModule primCountModule = m_scene.RequestModuleInterface<IPrimCountModule>();
+            IPrimCountModule primCountModule = m_scene.RequestModuleInterface<IPrimCountModule> ();
             if (primCountModule != null)
             {
-                IPrimCounts primCounts = primCountModule.GetPrimCounts(land.LandData.GlobalID);
-                int MaxPrimCounts = primCountModule.GetParcelMaxPrimCount(land);
+                IPrimCounts primCounts = primCountModule.GetPrimCounts (land.LandData.GlobalID);
+                int MaxPrimCounts = primCountModule.GetParcelMaxPrimCount (land);
                 if (primCounts.Total + objectCount > MaxPrimCounts)
                 {
                     reason = "There are too many prims in this parcel.";
@@ -1832,81 +1847,83 @@ namespace WhiteCore.Modules.Permissions
             return permission;
         }
 
-        private bool CanRunConsoleCommand(UUID user, IScene requestFromScene)
+        bool CanRunConsoleCommand (UUID user, IScene requestFromScene)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
 
-            return IsAdministrator(user);
+            return IsAdministrator (user);
         }
 
-        private bool CanRunScript(UUID script, UUID objectID, UUID user, IScene scene)
+        bool CanRunScript (UUID script, UUID objectID, UUID user, IScene scene)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
-            ISceneChildEntity part = scene.GetSceneObjectPart(objectID);
+            ISceneChildEntity part = scene.GetSceneObjectPart (objectID);
 
             if (part == null)
                 return false;
 
             if (m_parcelManagement == null)
                 return true;
-            ILandObject parcel = m_parcelManagement.GetLandObject(part.AbsolutePosition.X, part.AbsolutePosition.Y);
+            
+            ILandObject parcel = m_parcelManagement.GetLandObject (part.AbsolutePosition.X, part.AbsolutePosition.Y);
 
             if (parcel == null)
                 return false;
 
-            if ((parcel.LandData.Flags & (int) ParcelFlags.AllowOtherScripts) != 0)
+            if ((parcel.LandData.Flags & (int)ParcelFlags.AllowOtherScripts) != 0)
                 return true;
 
-            if ((parcel.LandData.Flags & (int) ParcelFlags.AllowGroupScripts) == 0)
+            if ((parcel.LandData.Flags & (int)ParcelFlags.AllowGroupScripts) == 0)
             {
                 //Only owner can run then
-                return GenericParcelPermission(user, parcel, 0);
+                return GenericParcelPermission (user, parcel, 0);
             }
 
-            return GenericParcelPermission(user, parcel, (ulong) GroupPowers.None);
+            return GenericParcelPermission (user, parcel, (ulong)GroupPowers.None);
         }
 
-        private bool CanSellParcel(UUID user, ILandObject parcel, IScene scene)
+        bool CanSellParcel (UUID user, ILandObject parcel, IScene scene)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
-            return GenericParcelPermission(user, parcel, (ulong) GroupPowers.LandSetSale);
+            return GenericParcelPermission (user, parcel, (ulong)GroupPowers.LandSetSale);
         }
 
-        private bool CanTakeObject(UUID objectID, UUID stealer, IScene scene)
+        bool CanTakeObject (UUID objectID, UUID stealer, IScene scene)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
-            return GenericObjectPermission(stealer, objectID, false);
+            return GenericObjectPermission (stealer, objectID, false);
         }
 
-        private bool CanTakeCopyObject(UUID objectID, UUID userID, IScene inScene)
+        bool CanTakeCopyObject (UUID objectID, UUID userID, IScene inScene)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
-            bool permission = GenericObjectPermission(userID, objectID, false);
+            bool permission = GenericObjectPermission (userID, objectID, false);
             if (!permission)
             {
                 IEntity ent;
-                if (!m_scene.Entities.TryGetValue(objectID, out ent))
-                {
+                if (!m_scene.Entities.TryGetValue (objectID, out ent))
                     return false;
-                }
 
                 // If it's not an object, we cant edit it.
                 if (!(ent is ISceneEntity))
-                {
                     return false;
-                }
 
-                ISceneEntity task = (ISceneEntity) ent;
+                ISceneEntity task = (ISceneEntity)ent;
                 // UUID taskOwner = null;
                 // Added this because at this point in time it wouldn't be wise for
                 // the administrator object permissions to take effect.
@@ -1917,23 +1934,21 @@ namespace WhiteCore.Modules.Permissions
 
                 if (task.OwnerID != userID)
                 {
-                    if ((task.GetEffectivePermissions() & (PERM_COPY | PERM_TRANS)) != (PERM_COPY | PERM_TRANS))
+                    if ((task.GetEffectivePermissions () & (PERM_COPY | PERM_TRANS)) != (PERM_COPY | PERM_TRANS))
                         permission = false;
-                }
-                else
+                } else
                 {
-                    if ((task.GetEffectivePermissions() & PERM_COPY) != PERM_COPY)
+                    if ((task.GetEffectivePermissions () & PERM_COPY) != PERM_COPY)
                         permission = false;
                 }
-            }
-            else
+            } else
             {
                 IEntity ent;
-                if (m_scene.Entities.TryGetValue(objectID, out ent) && ent is ISceneEntity)
+                if (m_scene.Entities.TryGetValue (objectID, out ent) && ent is ISceneEntity)
                 {
-                    ISceneEntity task = (ISceneEntity) ent;
+                    ISceneEntity task = (ISceneEntity)ent;
 
-                    if ((task.GetEffectivePermissions() & (PERM_COPY | PERM_TRANS)) != (PERM_COPY | PERM_TRANS))
+                    if ((task.GetEffectivePermissions () & (PERM_COPY | PERM_TRANS)) != (PERM_COPY | PERM_TRANS))
                         permission = false;
                 }
             }
@@ -1941,13 +1956,14 @@ namespace WhiteCore.Modules.Permissions
             return permission;
         }
 
-        private bool CanTerraformLand(UUID user, Vector3 position, IScene requestFromScene)
+        bool CanTerraformLand (UUID user, Vector3 position, IScene requestFromScene)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
             // Estate override
-            if (GenericEstatePermission(user))
+            if (GenericEstatePermission (user))
                 return true;
 
             if (m_scene.RegionInfo.RegionSettings.BlockTerraform)
@@ -1967,16 +1983,16 @@ namespace WhiteCore.Modules.Permissions
 
             if (m_parcelManagement == null)
                 return true;
-            ILandObject parcel = m_parcelManagement.GetLandObject(X, Y);
+            ILandObject parcel = m_parcelManagement.GetLandObject (X, Y);
             if (parcel == null)
                 return false;
 
             // Others allowed to terraform?
-            if ((parcel.LandData.Flags & ((int) ParcelFlags.AllowTerraform)) != 0)
+            if ((parcel.LandData.Flags & ((int)ParcelFlags.AllowTerraform)) != 0)
                 return true;
 
             // Land owner can terraform too
-            if (parcel != null && GenericParcelPermission(user, parcel, (ulong) GroupPowers.AllowEditLand))
+            if (parcel != null && GenericParcelPermission (user, parcel, (ulong)GroupPowers.AllowEditLand))
                 return true;
 
             return false;
@@ -1990,18 +2006,19 @@ namespace WhiteCore.Modules.Permissions
         /// <param name="user"></param>
         /// <param name="scene"></param>
         /// <returns></returns>
-        private bool CanViewScript(UUID script, UUID objectID, UUID user, IScene scene)
+        bool CanViewScript (UUID script, UUID objectID, UUID user, IScene scene)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
-            if (IsAdministrator(user))
+            if (IsAdministrator (user))
                 return true;
 
             if (objectID == UUID.Zero) // User inventory
             {
                 IInventoryService invService = m_scene.InventoryService;
-                InventoryItemBase assetRequestItem = invService.GetItem(user, script);
+                InventoryItemBase assetRequestItem = invService.GetItem (user, script);
                 if (assetRequestItem == null)
                 {
                     //Can't find, can't read
@@ -2019,21 +2036,20 @@ namespace WhiteCore.Modules.Permissions
                 // readable only if it's really full perms
                 //
                 if ((assetRequestItem.CurrentPermissions &
-                     ((uint) PermissionMask.Modify |
-                      (uint) PermissionMask.Copy |
-                      (uint) PermissionMask.Transfer)) !=
-                    ((uint) PermissionMask.Modify |
-                     (uint) PermissionMask.Copy |
-                     (uint) PermissionMask.Transfer))
+                    ((uint)PermissionMask.Modify |
+                    (uint)PermissionMask.Copy |
+                    (uint)PermissionMask.Transfer)) !=
+                    ((uint)PermissionMask.Modify |
+                    (uint)PermissionMask.Copy |
+                    (uint)PermissionMask.Transfer))
                     return false;
-            }
-            else // Prim inventory
+            } else // Prim inventory
             {
-                ISceneChildEntity part = scene.GetSceneObjectPart(objectID);
+                ISceneChildEntity part = scene.GetSceneObjectPart (objectID);
 
                 if (part == null)
                 {
-                    MainConsole.Instance.Warn("[PERMISSIONS]: NULL PRIM IN canViewScript! " + objectID);
+                    MainConsole.Instance.Warn ("[PERMISSIONS]: NULL PRIM IN canViewScript! " + objectID);
                     return false;
                 }
 
@@ -2041,20 +2057,19 @@ namespace WhiteCore.Modules.Permissions
                 {
                     if (part.GroupID != UUID.Zero)
                     {
-                        if (!IsGroupMember(part.GroupID, user, 0))
+                        if (!IsGroupMember (part.GroupID, user, 0))
                             return false;
 
-                        if ((part.GroupMask & (uint) PermissionMask.Modify) == 0)
+                        if ((part.GroupMask & (uint)PermissionMask.Modify) == 0)
                             return false;
                     }
-                }
-                else
+                } else
                 {
-                    if ((part.OwnerMask & (uint) PermissionMask.Modify) == 0)
+                    if ((part.OwnerMask & (uint)PermissionMask.Modify) == 0)
                         return false;
                 }
 
-                TaskInventoryItem ti = part.Inventory.GetInventoryItem(script);
+                TaskInventoryItem ti = part.Inventory.GetInventoryItem (script);
 
                 if (ti == null)
                     return false;
@@ -2064,18 +2079,18 @@ namespace WhiteCore.Modules.Permissions
                     if (ti.GroupID == UUID.Zero)
                         return false;
 
-                    if (!IsGroupMember(ti.GroupID, user, 0))
+                    if (!IsGroupMember (ti.GroupID, user, 0))
                         return false;
                 }
 
                 // Require full perms
                 if ((ti.CurrentPermissions &
-                     ((uint) PermissionMask.Modify |
-                      (uint) PermissionMask.Copy |
-                      (uint) PermissionMask.Transfer)) !=
-                    ((uint) PermissionMask.Modify |
-                     (uint) PermissionMask.Copy |
-                     (uint) PermissionMask.Transfer))
+                    ((uint)PermissionMask.Modify |
+                    (uint)PermissionMask.Copy |
+                    (uint)PermissionMask.Transfer)) !=
+                    ((uint)PermissionMask.Modify |
+                    (uint)PermissionMask.Copy |
+                    (uint)PermissionMask.Transfer))
                     return false;
             }
 
@@ -2090,21 +2105,23 @@ namespace WhiteCore.Modules.Permissions
         /// <param name="user"></param>
         /// <param name="scene"></param>
         /// <returns></returns>
-        private bool CanViewNotecard(UUID notecard, UUID objectID, UUID user, IScene scene)
+        bool CanViewNotecard (UUID notecard, UUID objectID, UUID user, IScene scene)
         {
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
-            DebugPermissionInformation(MethodBase.GetCurrentMethod().Name);
-            if (m_bypassPermissions) return m_bypassPermissionsValue;
+            DebugPermissionInformation (MethodBase.GetCurrentMethod ().Name);
+            if (m_bypassPermissions)
+                return m_bypassPermissionsValue;
 
-            if (IsAdministrator(user))
+            if (IsAdministrator (user))
                 return true;
 
             if (objectID == UUID.Zero) // User inventory
             {
                 IInventoryService invService = m_scene.InventoryService;
-                InventoryItemBase assetRequestItem = invService.GetItem(user, notecard);
+                InventoryItemBase assetRequestItem = invService.GetItem (user, notecard);
                 if (assetRequestItem == null) // Library item
                 {
                     //Can't find, can't read
@@ -2122,21 +2139,20 @@ namespace WhiteCore.Modules.Permissions
                 // readable only if it's really full perms
                 //
                 if ((assetRequestItem.CurrentPermissions &
-                     ((uint) PermissionMask.Modify |
-                      (uint) PermissionMask.Copy |
-                      (uint) PermissionMask.Transfer)) !=
-                    ((uint) PermissionMask.Modify |
-                     (uint) PermissionMask.Copy |
-                     (uint) PermissionMask.Transfer))
+                    ((uint)PermissionMask.Modify |
+                    (uint)PermissionMask.Copy |
+                    (uint)PermissionMask.Transfer)) !=
+                    ((uint)PermissionMask.Modify |
+                    (uint)PermissionMask.Copy |
+                    (uint)PermissionMask.Transfer))
                     return false;
-            }
-            else // Prim inventory
+            } else // Prim inventory
             {
-                ISceneChildEntity part = scene.GetSceneObjectPart(objectID);
+                ISceneChildEntity part = scene.GetSceneObjectPart (objectID);
 
                 if (part == null)
                 {
-                    MainConsole.Instance.Warn("[PERMISSIONS]: NULL PRIM IN canViewNotecard! " + objectID);
+                    MainConsole.Instance.Warn ("[PERMISSIONS]: NULL PRIM IN canViewNotecard! " + objectID);
                     return false;
                 }
 
@@ -2144,20 +2160,19 @@ namespace WhiteCore.Modules.Permissions
                 {
                     if (part.GroupID != UUID.Zero)
                     {
-                        if (!IsGroupMember(part.GroupID, user, 0))
+                        if (!IsGroupMember (part.GroupID, user, 0))
                             return false;
 
-                        if ((part.GroupMask & (uint) PermissionMask.Modify) == 0)
+                        if ((part.GroupMask & (uint)PermissionMask.Modify) == 0)
                             return false;
                     }
-                }
-                else
+                } else
                 {
-                    if ((part.OwnerMask & (uint) PermissionMask.Modify) == 0)
+                    if ((part.OwnerMask & (uint)PermissionMask.Modify) == 0)
                         return false;
                 }
 
-                TaskInventoryItem ti = part.Inventory.GetInventoryItem(notecard);
+                TaskInventoryItem ti = part.Inventory.GetInventoryItem (notecard);
 
                 if (ti == null)
                     return false;
@@ -2167,18 +2182,18 @@ namespace WhiteCore.Modules.Permissions
                     if (ti.GroupID == UUID.Zero)
                         return false;
 
-                    if (!IsGroupMember(ti.GroupID, user, 0))
+                    if (!IsGroupMember (ti.GroupID, user, 0))
                         return false;
                 }
 
                 // Require full perms
                 if ((ti.CurrentPermissions &
-                     ((uint) PermissionMask.Modify |
-                      (uint) PermissionMask.Copy |
-                      (uint) PermissionMask.Transfer)) !=
-                    ((uint) PermissionMask.Modify |
-                     (uint) PermissionMask.Copy |
-                     (uint) PermissionMask.Transfer))
+                    ((uint)PermissionMask.Modify |
+                    (uint)PermissionMask.Copy |
+                    (uint)PermissionMask.Transfer)) !=
+                    ((uint)PermissionMask.Modify |
+                    (uint)PermissionMask.Copy |
+                    (uint)PermissionMask.Transfer))
                     return false;
             }
 
