@@ -26,17 +26,17 @@
  */
 
 
+using System;
+using System.Collections.Generic;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using System;
-using System.Collections.Generic;
 using GridRegion = WhiteCore.Framework.Services.GridRegion;
 using RegionFlags = WhiteCore.Framework.Services.RegionFlags;
 
@@ -133,7 +133,7 @@ namespace WhiteCore.Services.DataService
             foreach (int estateID in borkedByEstate.Keys)
             {
                 EstateSettings es = estatePlugin.GetEstateSettings(estateID);
-                if (es == null)
+                if ((es == null) || (es.EstateID == 0))
                 {
                     MainConsole.Instance.Error("[LocalGridConnector] Cannot fix missing owner for regions in Estate " +
                                                estateID + ", could not get estate settings.");
@@ -459,14 +459,14 @@ namespace WhiteCore.Services.DataService
                 if (EstateConnector != null)
                 {
                     ES = EstateConnector.GetEstateSettings(region.RegionID);
-                    if (ES != null)
+                    if ((ES != null) && (ES.EstateID != 0))
                         region.EstateOwner = ES.EstateOwner;
                 }
                 if (region.EstateOwner == UUID.Zero && ES != null && ES.EstateID != 0)
                 {
                     MainConsole.Instance.Error(
                         "[LocalGridConnector] Attempt to store region with owner of UUID.Zero detected:" +
-                        (new System.Diagnostics.StackTrace()).GetFrame(1).ToString());
+                        (new System.Diagnostics.StackTrace()).GetFrame(1));
                 }
             }
 

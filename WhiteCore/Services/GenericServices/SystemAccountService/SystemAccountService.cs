@@ -93,6 +93,24 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
             get { return marketplaceOwnerName; }
         }
 
+        public string GetSystemEstateOwnerName(int estateID)
+        {
+            if (estateID == 1)  // Mainland estate
+                return governorName;
+
+            // System estate then
+            return realEstateOwnerName;
+        }
+
+        public UUID GetSystemEstateOwner(int estateID)
+        {
+            if (estateID == 1)  // Mainland estate
+                return GovernorUUID;
+
+            // System estate then
+            return SystemEstateOwnerUUID;
+        }
+
         #endregion
 
         #region IService Members

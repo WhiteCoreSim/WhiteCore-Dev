@@ -76,5 +76,19 @@ namespace WhiteCore.Framework.Services
         /// </summary>
         string MarketplaceOwnerName { get; }
 
+        /// <summary>
+        /// Get name of a system estate.
+        /// </summary>
+        /// <returns>The estate owner name.</returns>
+        /// <param name="estateID">Estate ID.</param>
+        string GetSystemEstateOwnerName(int estateID);
+
+        /// <summary>
+        /// Gets a system estate owner UUID.
+        /// </summary>
+        /// <returns>The estate owner's UUID.</returns>
+        /// <param name="estateID">Estate I.</param>
+        UUID GetSystemEstateOwner (int estateID);
+
     }
 }

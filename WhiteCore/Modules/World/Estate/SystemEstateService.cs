@@ -44,14 +44,30 @@ namespace WhiteCore.Modules.Estate
     {
         IUserAccountService m_accountService;
         IEstateConnector m_estateConnector;
-        string systemEstateName = Constants.SystemEstateName;
         IRegistryCore m_registry;
 
+        string mainlandEstateName = Constants.MainlandEstateName;
+        string systemEstateName = Constants.SystemEstateName;
+
         #region ISystemEstateService Members
+
+        public string MainlandEstateName
+        {
+            get { return mainlandEstateName; }
+        }
 
         public string SystemEstateName
         {
             get { return systemEstateName; }
+        }
+
+        public string GetSystemEstateName(int estateID)
+        {
+            if (estateID == 1)  // Mainland estate
+                return mainlandEstateName;
+
+            // System estate then
+            return systemEstateName;
         }
 
         #endregion
@@ -64,6 +80,7 @@ namespace WhiteCore.Modules.Estate
             IConfig estConfig = config.Configs ["EstateService"];
             if (estConfig != null)
             {
+                mainlandEstateName = estConfig.GetString ("MainlandEstateName", mainlandEstateName);
                 systemEstateName = estConfig.GetString ("SystemEstateName", systemEstateName);
             }
 
@@ -83,8 +100,9 @@ namespace WhiteCore.Modules.Estate
             // these are only valid if we are local
             if (!m_accountService.RemoteCalls ())
             {
-                // check and/or create default RealEstate user
-                CheckSystemEstateInfo ();
+                // check and/or create default system estates
+                CheckSystemEstateInfo (Constants.SystemEstateID, systemEstateName, (UUID) Constants.RealEstateOwnerUUID);
+                CheckSystemEstateInfo (Constants.MainlandEstateID, mainlandEstateName, (UUID) Constants.GovernorUUID);
 
                 AddCommands ();
             }
@@ -97,6 +115,12 @@ namespace WhiteCore.Modules.Estate
         {
             if (MainConsole.Instance != null)
             {
+                MainConsole.Instance.Commands.AddCommand (
+                    "reset mainland estate",
+                    "reset mainland estate",
+                    "Resets the mainland estate owner and name to those configured",
+                    HandleResetMainlandEstate, false, true);
+
                 MainConsole.Instance.Commands.AddCommand (
                     "reset system estate",
                     "reset system estate",
@@ -155,7 +179,7 @@ namespace WhiteCore.Modules.Estate
         /// Checks for a valid system estate. Adds or corrects if required
         /// </summary>
         /// <param name="estateConnector">Estate connector.</param>
-        void CheckSystemEstateInfo ()
+        void CheckSystemEstateInfo (int estateID, string estateName, UUID ownerUUID)
         {
             // these should have already been checked but just make sure...
             if (m_estateConnector == null)
@@ -164,31 +188,48 @@ namespace WhiteCore.Modules.Estate
             if (m_estateConnector.RemoteCalls ())
                 return;
 
+            ISystemAccountService sysAccounts = m_registry.RequestModuleInterface<ISystemAccountService> ();
             EstateSettings ES;
-            ES = m_estateConnector.GetEstateSettings (Constants.SystemEstateID);
+
+            // check for existing estate name in case of estate ID change
+            ES = m_estateConnector.GetEstateSettings (estateName);
             if (ES != null)
-            {   
+            {
                 // ensure correct ID
-                if (ES.EstateID != Constants.SystemEstateID)
-                    UpdateSystemEstates (m_estateConnector, ES);
+                if (ES.EstateID != estateID)
+                    UpdateSystemEstates (m_estateConnector, ES, estateID);
+            }
+
+            ES = m_estateConnector.GetEstateSettings (estateID);
+            if ((ES != null) && (ES.EstateID != 0))
+            {   
+
+                // ensure correct owner
+                if (ES.EstateOwner != ownerUUID)
+                {
+                    ES.EstateOwner = ownerUUID;
+                    m_estateConnector.SaveEstateSettings (ES);
+                    MainConsole.Instance.Info ("[EstateService]: The system Estate owner has been updated to " +
+                        sysAccounts.GetSystemEstateOwnerName(estateID));
+                }
+
 
                 // in case of configuration changes
-                if (ES.EstateName != SystemEstateName)
+                if (ES.EstateName != estateName)
                 {
-                    ES.EstateName = SystemEstateName;
+                    ES.EstateName = estateName;
                     m_estateConnector.SaveEstateSettings (ES);
-                    MainConsole.Instance.Info ("[EstateService]: The system Estate name has been updated to " + SystemEstateName);
+                    MainConsole.Instance.Info ("[EstateService]: The system Estate name has been updated to " + estateName);
                 }
 
                 return;
             }
 
             // Create a new estate
-            ISystemAccountService sysAccounts = m_registry.RequestModuleInterface<ISystemAccountService> ();
 
             ES = new EstateSettings ();
-            ES.EstateName = SystemEstateName;
-            ES.EstateOwner = sysAccounts.SystemEstateOwnerUUID;
+            ES.EstateName = estateName;
+            ES.EstateOwner = ownerUUID;
 
             ES.EstateID = (uint)m_estateConnector.CreateNewEstate (ES);
             if (ES.EstateID == 0)
@@ -199,7 +240,7 @@ namespace WhiteCore.Modules.Estate
             } else
             {
                 MainConsole.Instance.InfoFormat ("[EstateService]: The estate '{0}' owned by '{1}' has been created.", 
-                    SystemEstateName, sysAccounts.SystemEstateOwnerName);
+                    ES.EstateName, sysAccounts.GetSystemEstateOwnerName(estateID));
             }
         }
 
@@ -207,11 +248,10 @@ namespace WhiteCore.Modules.Estate
         /// Correct the system estate ID and update any linked regions.
         /// </summary>
         /// <param name="ES">EstateSettings</param>
-        void  UpdateSystemEstates (IEstateConnector estateConnector, EstateSettings ES)
+        void  UpdateSystemEstates (IEstateConnector estateConnector, EstateSettings ES, int newEstateID)
         {
             // this may be an ID correction or just an estate name change
             uint oldEstateID = ES.EstateID;
-            int newEstateID = Constants.SystemEstateID;
 
             // get existing linked regions
             var regions = estateConnector.GetRegions ((int)oldEstateID);
@@ -221,7 +261,7 @@ namespace WhiteCore.Modules.Estate
             {
                 estateConnector.DeleteEstate ((int)oldEstateID);
                 newEstateID = estateConnector.CreateNewEstate (ES);
-                MainConsole.Instance.Info ("System estate present but the ID was corrected.");
+                MainConsole.Instance.Info ("System estate '" + ES.EstateName + "' is present but the ID was corrected.");
             }
 
             // re-link regions
@@ -236,6 +276,33 @@ namespace WhiteCore.Modules.Estate
         #endregion
 
         #region Commands
+
+        protected void HandleResetMainlandEstate (IScene scene, string[] cmd)
+        {
+            CheckSystemEstateInfo (Constants.MainlandEstateID, mainlandEstateName, (UUID) Constants.GovernorUUID);
+
+            IGridService gridService = m_registry.RequestModuleInterface<IGridService> ();
+            IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
+
+            var regions = gridService.GetRegionsByName (null, "", null, null);
+            if (regions == null || regions.Count < 1)
+                return;
+
+            int updated = 0;
+            foreach (var region in regions)
+            {
+                string regType = region.RegionType.ToLower ();
+                if (regType.StartsWith ("m"))
+                {
+                    estateConnector.LinkRegion (region.RegionID, Constants.MainlandEstateID);
+                    updated ++;
+                }
+            }
+
+            if (updated > 0)
+                MainConsole.Instance.InfoFormat ("Relinked {0} mainland regions", updated);
+            
+        }
 
         protected void HandleResetSystemEstate (IScene scene, string[] cmd)
         {
@@ -540,7 +607,8 @@ namespace WhiteCore.Modules.Estate
             if (estateConnector.LinkRegion (region.RegionID, (int)ES.EstateID))
             {
                 // check for update..
-                if (estateConnector.GetEstateSettings (region.RegionID) == null)
+                var es = estateConnector.GetEstateSettings (region.RegionID);
+                if ((es == null) || (es.EstateID == 0))
                     MainConsole.Instance.Warn ("The region link failed, please try again soon.");
                 else
                     MainConsole.Instance.InfoFormat ("Region '{0}' is now attached to estate '{1}'", regionName, estateName);
@@ -638,7 +706,7 @@ namespace WhiteCore.Modules.Estate
 
             foreach (string Estate in estates)
             {
-                var EstateID = (int)estateConnector.GetEstateID (Estate);
+                var EstateID = estateConnector.GetEstateID (Estate);
                 EstateSettings ES = estateConnector.GetEstateSettings (EstateID);
 
                 //var regInfo = scene.RegionInfo;

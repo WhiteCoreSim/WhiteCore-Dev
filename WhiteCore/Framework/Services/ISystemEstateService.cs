@@ -25,16 +25,27 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using OpenMetaverse;
 
 namespace WhiteCore.Framework.Services
 {
     public interface ISystemEstateService
     {
-         /// <summary>
+        /// <summary>
+        ///     The system Mainland estate name
+        /// </summary>
+        string MainlandEstateName { get; }
+
+        /// <summary>
         ///     The system Estate name
         /// </summary>
         string SystemEstateName { get; }
+
+        /// <summary>
+        /// Gets the name of the system estate.
+        /// </summary>
+        /// <returns>The system estate name.</returns>
+        /// <param name="EstateID">Estate ID.</param>
+        string GetSystemEstateName (int EstateID);
 
     }
 }

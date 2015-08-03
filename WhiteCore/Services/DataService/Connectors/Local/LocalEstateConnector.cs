@@ -25,23 +25,23 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System.Collections.Generic;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using System.Collections.Generic;
 
 namespace WhiteCore.Services.DataService
 {
     public class LocalEstateConnector : ConnectorBase, IEstateConnector
     {
-        private IGenericData GD;
-        private string m_estateSettingsTable = "estate_settings";
-        private string m_estateRegionsTable = "estate_regions";
+        IGenericData GD;
+        string m_estateSettingsTable = "estate_settings";
+        string m_estateRegionsTable = "estate_regions";
 
         #region IEstateConnector Members
         public bool RemoteCalls()
@@ -113,8 +113,8 @@ namespace WhiteCore.Services.DataService
             int EstateID;
             if (!int.TryParse (estate[0], out EstateID))
                 return null;
-            else
-                return GetEstate (EstateID);
+            
+            return GetEstate (EstateID);
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
@@ -131,12 +131,14 @@ namespace WhiteCore.Services.DataService
                 return estateID;
             }
 
-            // check for system user/estate
-            if ( (es.EstateOwner == (UUID) Constants.RealEstateOwnerUUID) )           // probably don't need to check both :)
-//                (es.EstateName == Constants.SystemEstateName) )                     // maybe if the system user can have multiple estates??
+            // check for system or user estates
+            if ((es.EstateOwner == (UUID) Constants.GovernorUUID))                  // Mainland?
             {
-                es.EstateID = (uint) Constants.SystemEstateID;                        // Default Mainland estate  # 
-            } else
+                es.EstateID = Constants.MainlandEstateID;
+            } else if ( (es.EstateOwner == (UUID) Constants.RealEstateOwnerUUID) )  // System Estate?
+            {
+                es.EstateID = (uint) Constants.SystemEstateID;                       
+            } else                                                                  // must be a new user estate then
                 es.EstateID = GetNewEstateID();
 
             SaveEstateSettings(es, true);
@@ -348,7 +350,7 @@ namespace WhiteCore.Services.DataService
             return (retVal.Count > 0) ? int.Parse(retVal[0]) : 0;
         }
 
-        private EstateSettings GetEstate(int estateID)
+        EstateSettings GetEstate(int estateID)
         {
             QueryFilter filter = new QueryFilter();
             filter.andFilters["EstateID"] = estateID;
@@ -363,7 +365,7 @@ namespace WhiteCore.Services.DataService
             return settings;
         }
 
-        private uint GetNewEstateID()
+        uint GetNewEstateID()
         {
             List<string> QueryResults = GD.Query(new string[2]
                                                      {
@@ -373,7 +375,7 @@ namespace WhiteCore.Services.DataService
             if (uint.Parse (QueryResults [0]) > 0)
             {
                 uint esID = uint.Parse (QueryResults [1]);
-                if (esID > 99)                                 // system estate is #1, user estates start at 100
+                if (esID > 99)                                 // Mainland is @#1, system estate is #10, user estates start at 100
                     return esID + 1;
             }
             return 100;

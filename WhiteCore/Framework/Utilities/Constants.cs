@@ -64,10 +64,12 @@ namespace WhiteCore.Framework.Utilities
         // System Governor Avatar Account
         public const string GovernorUUID = "3d6181b0-6a4b-97ef-18d8-722652995cf1";
         public const string GovernorName = "Governor White";
-        
+
         // System Estate
+        public const string MainlandEstateName = "WhiteCore Mainland";
+        public const int MainlandEstateID = 1;
         public const string SystemEstateName = "WhiteCore Estate";
-        public const int SystemEstateID = 1;
+        public const int SystemEstateID = 10;
 
         // System Real Estate Maintenance Group
 		public const string RealEstateGroupUUID = "dc7b21cd-3c89-fcaa-31c8-25f9ffd224cd";

@@ -65,7 +65,7 @@ namespace WhiteCore.Modules.Estate
             if (EstateConnector != null)
             {
                 EstateSettings ES = EstateConnector.GetEstateSettings(scene.RegionInfo.RegionID);
-                if (ES == null)
+                if ((ES == null) || (ES.EstateID == 0))
                 {
                     //Could not locate the estate service, wait until it can find it
                     MainConsole.Instance.Warn(
@@ -120,30 +120,34 @@ namespace WhiteCore.Modules.Estate
         }
 
         /// <summary>
-        /// Links the region to the mainland estate.
+        /// Links a region to a system estate.
         /// </summary>
-        /// <returns>The mainland estate.</returns>
-        /// <param name="regionID">Region I.</param>
-        EstateSettings LinkMainlandEstate(UUID regionID)
+        /// <returns>The system estate.</returns>
+        /// <param name="regionID">Region ID.</param>
+        /// <param name="estateID">Estate ID.</param>
+        EstateSettings LinkSystemEstate(UUID regionID, int estateID)
         {
-            // link region to the Mainland... assign to RealEstateOwner & System Estate
+            // link region to a system estate > Mainland / Governor  or System / RealEstateOwner
             IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector>();
+            ISystemEstateService sysEstates = m_registry.RequestModuleInterface<ISystemEstateService> ();
             EstateSettings ES;
+            string estateName = sysEstates.GetSystemEstateName(estateID);
 
-            // link region to the 'Mainland'
-            if (estateConnector.LinkRegion(regionID, Constants.SystemEstateID))
+            // try & link region 
+            if (estateConnector.LinkRegion(regionID, estateID))
             {
                 ES = estateConnector.GetEstateSettings (regionID);     // refresh to check linking
                 if ( (ES == null) || (ES.EstateID == 0) )
                 {
-                    MainConsole.Instance.Warn("An error was encountered linking the region to the 'Mainland'!\nPossibly a problem with the server connection, please link this region later.");
+                    MainConsole.Instance.Warn("An error was encountered linking the region to '" + estateName + "'!\n" +
+                        "Possibly a problem with the server connection, please link this region later.");
                     return null;
                 }
-                MainConsole.Instance.Warn("Successfully joined the 'Mainland'!");
+                MainConsole.Instance.Warn("Successfully joined '" + estateName + "'!");
                 return ES;
             }
 
-            MainConsole.Instance.Warn("Joining the 'Mainland' failed. Please link this region later.");
+            MainConsole.Instance.Warn("Joining '" + estateName + "' failed. Please link this region later.");
             return null;
         }
 
@@ -159,7 +163,7 @@ namespace WhiteCore.Modules.Estate
             string regType = scene.RegionInfo.RegionType.ToLower ();
             if (regType.StartsWith ("m"))
             {
-                return LinkMainlandEstate (scene.RegionInfo.RegionID);
+                return LinkSystemEstate (scene.RegionInfo.RegionID, Constants.MainlandEstateID);
             }
 
             // we are linking to a user estate
@@ -202,10 +206,10 @@ namespace WhiteCore.Modules.Estate
                     else
                         MainConsole.Instance.WarnFormat("[Estate]: The user, {0}, has no estates currently.", account.Name);
 
-                    string joinMainland = MainConsole.Instance.Prompt(
+                    string joinSystemland = MainConsole.Instance.Prompt(
                         "Do you want to 'park' the region with the system owner/estate? (yes/no)", "yes");
-                    if (joinMainland.ToLower().StartsWith("y"))                      // joining 'mainland'
-                        return LinkMainlandEstate (scene.RegionInfo.RegionID);
+                    if (joinSystemland.ToLower().StartsWith("y"))                      // joining 'joinSystemland'
+                        return LinkSystemEstate (scene.RegionInfo.RegionID, Constants.SystemEstateID);
 
                     continue;
                 }
@@ -282,9 +286,17 @@ namespace WhiteCore.Modules.Estate
             {
                 // a bit of info re 'Mainland'
                 string regType = scene.RegionInfo.RegionType.ToLower ();
-                if (regType.StartsWith ("m") && (scene.RegionInfo.EstateSettings.EstateID == Constants.SystemEstateID) )
+                if (regType.StartsWith ("m"))
                 {
-                    MainConsole.Instance.Info("[Estate]: This region is already part of the Mainland system estate");
+                    if (scene.RegionInfo.EstateSettings.EstateID == Constants.MainlandEstateID)
+                    {
+                        MainConsole.Instance.Info ("[Estate]: This region is already part of the Mainland estate");
+                        return;
+                    }
+
+                    // link this region to the mainland
+                    MainConsole.Instance.Info ("[Estate]: Mainland type regions must be part of the Mainland estate");
+                    LinkSystemEstate (scene.RegionInfo.RegionID, Constants.MainlandEstateID);
                     return;
                 }
 
@@ -295,9 +307,6 @@ namespace WhiteCore.Modules.Estate
  
                 if (removeFromEstate == "yes")
                 {
-                    if (regType.StartsWith ("m"))
-                        MainConsole.Instance.Info("[Estate]: Mainland type regions can only be part of the Mainland system estate");
-
                     if (!EstateConnector.DelinkRegion(scene.RegionInfo.RegionID))
                     {
                         MainConsole.Instance.Warn("[Estate]: Unable to remove this region from the estate.");
