@@ -453,7 +453,9 @@ namespace WhiteCore.Simulation.Base
 
         private void HandleQuit(IScene scene, string[] args)
         {
-            Shutdown(true);
+            var ok = MainConsole.Instance.Prompt ("[CONSOLE]: Shutdown the simulator. Are you sure? (yes/no)", "no").ToLower();
+            if (ok.StartsWith("y"))
+                Shutdown(true);
         }
 
         /// <summary>
