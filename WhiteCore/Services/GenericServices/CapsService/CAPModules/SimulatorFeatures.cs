@@ -121,22 +121,23 @@ namespace WhiteCore.Services
 
 
             OSDMap namesmap = new OSDMap();
-//            if (httpRequest.Query.ContainsKey("god_names"))
-//                namesmap = httpRequest.Query["god_names"];
-//            else
-//                features["god_names"] = namesmap;
-
+            if (httpRequest.Query.ContainsKey ("god_names"))
+            {
+                OSD nmap = httpRequest.Query ["god_names"].ToString ();
+                namesmap = (OSDMap)nmap;
+            }
+ 
             OSDArray fnames = new OSDArray();
             foreach (string name in m_fullNames) {
                 fnames.Add(name);
             }
-            ((OSDMap)namesmap)["full_names"] = fnames;
+            namesmap["full_names"] = fnames;
 
             OSDArray lnames = new OSDArray();
             foreach (string name in m_lastNames) {
                 lnames.Add(name);
             }
-            ((OSDMap)namesmap)["last_names"] = lnames;
+            namesmap["last_names"] = lnames;
 
             return namesmap;
         }
