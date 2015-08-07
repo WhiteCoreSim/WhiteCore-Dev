@@ -45,6 +45,7 @@ namespace WhiteCore.Services
         static List<String> m_lastNames = new List<String>();
         static List<String> m_fullNames = new List<String>();
 
+
         #region ICapsServiceConnector Members
 
         public void RegisterCaps(IRegionClientCapsService service)
@@ -101,6 +102,7 @@ namespace WhiteCore.Services
         }
 
         #region helpers
+
         void InitGodNames()
         {
             if (m_fullNames.Count > 0)
@@ -141,6 +143,51 @@ namespace WhiteCore.Services
 
             return namesmap;
         }
+
+        void CameraOnllyModeRequest(OSHttpRequest httpRequest)
+        {
+            //if (ShouldSend(m_service.AgentID,m_service.RegionID) && UserLevel(m_service.AgentID) <= m_UserLevel)
+            //{
+            OSDMap extrasMap = new OSDMap();
+            if (httpRequest.Query.ContainsKey ("OpenSimExtras"))
+            {
+                OSD nmap = httpRequest.Query ["OpenSimExtras"].ToString ();
+                extrasMap = (OSDMap)nmap;
+            }
+
+            extrasMap["camera-only-mode"] = OSDMap.FromString("true");
+
+            // TODO: Need to find out how this is determined  i.e. sent from viewer??
+            // Detach agent attachments
+            //Util.FireAndForget(delegate { DetachAttachments(agentID); });
+
+            //}
+        }
+
+/*        void DetachAttachments(UUID agentID)
+        {
+            ScenePresence sp = m_scene.GetScenePresence(agentID);
+            if ((sp.TeleportFlags & TeleportFlags.ViaLogin) != 0)
+                // Wait a little, cos there's weird stuff going on at  login related to
+                // the Current Outfit Folder
+                Thread.Sleep(8000);
+
+            if (sp != null && m_scene.AttachmentsModule != null)
+            {
+                List<SceneObjectGroup> attachs = sp.GetAttachments();
+                if (attachs != null && attachs.Count > 0)
+                {
+                    foreach (SceneObjectGroup sog in attachs)
+                    {
+                        MainConsole.Instance.DebugFormat("[CAMERA-ONLY MODE]: Forcibly detaching attach {0} from {1} in {2}", 
+                            sog.Name, sp.Name, m_service.Region);
+
+                        m_scene.AttachmentsModule.DetachSingleAttachmentToInv(sp, sog);
+                    }
+                }
+            }
+        }
+*/
 
         #endregion
     }
