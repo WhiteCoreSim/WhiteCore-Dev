@@ -26,23 +26,33 @@
  */
 
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
-using OpenMetaverse.StructuredData;
-using System.IO;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Services
 {
     public class SimulatorFeatures : ICapsServiceConnector
     {
-        private IRegionClientCapsService m_service;
+        IRegionClientCapsService m_service;
+
+        // Configuration
+        static List<String> m_lastNames = new List<String>();
+        static List<String> m_fullNames = new List<String>();
 
         #region ICapsServiceConnector Members
 
         public void RegisterCaps(IRegionClientCapsService service)
         {
             m_service = service;
+
+            // retrieve our god's if needed
+            InitGodNames ();
 
             m_service.AddStreamHandler("SimulatorFeatures",
                                        new GenericStreamHandler("GET", m_service.CreateCAPS("SimulatorFeatures", ""),
@@ -60,7 +70,7 @@ namespace WhiteCore.Services
 
         #endregion
 
-        private byte[] SimulatorFeaturesCAP(string path, Stream request,
+        byte[] SimulatorFeaturesCAP(string path, Stream request,
                                             OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {
             OSDMap data = new OSDMap();
@@ -83,8 +93,55 @@ namespace WhiteCore.Services
 
             data["PhysicsShapeTypes"] = typesMap;
 
+            // some additional features
+            data["god_names"] = GodNames(httpRequest);
+
             //Send back data
             return OSDParser.SerializeLLSDXmlBytes(data);
         }
+
+        #region helpers
+        void InitGodNames()
+        {
+            if (m_fullNames.Count > 0)
+                return;
+            
+            IUserAccountService userService = m_service.Registry.RequestModuleInterface<IUserAccountService>();
+            var gods = userService.GetUserAccounts(null, "*");
+            foreach (UserAccount user in gods)
+                if (user.UserLevel >= Constants.USER_GOD_LIASON)
+                {
+                    m_lastNames.Add(user.LastName);
+                    m_fullNames.Add(user.Name);
+                }
+        }
+
+        OSDMap GodNames(OSHttpRequest httpRequest)
+        {
+
+
+            OSDMap namesmap = new OSDMap();
+            if (httpRequest.Query.ContainsKey ("god_names"))
+            {
+                OSD nmap = httpRequest.Query ["god_names"].ToString ();
+                namesmap = (OSDMap)nmap;
+            }
+ 
+            OSDArray fnames = new OSDArray();
+            foreach (string name in m_fullNames) {
+                fnames.Add(name);
+            }
+            namesmap["full_names"] = fnames;
+
+            OSDArray lnames = new OSDArray();
+            foreach (string name in m_lastNames) {
+                lnames.Add(name);
+            }
+            namesmap["last_names"] = lnames;
+
+            return namesmap;
+        }
+
+        #endregion
     }
 }
