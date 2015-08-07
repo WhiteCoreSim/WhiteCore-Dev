@@ -26,26 +26,31 @@
  */
 
 
+using System;
+using System.Collections.Generic;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
-using Nini.Config;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
 
 namespace WhiteCore.Modules.Wind.Plugins
 {
     public class ConfigurableWind : IWindModelPlugin
     {
-        private float m_avgDirection; // Average direction of the wind in degrees
-        private float m_avgStrength = 5.0f; // Average magnitude of the wind vector
+        float m_avgDirection;
+        // Average direction of the wind in degrees
+        float m_avgStrength = 5.0f;
+        // Average magnitude of the wind vector
 
-        private Vector2 m_curPredominateWind;
-        private float m_rateChange = 1.0f; // 
-        private float m_varDirection = 30.0f; // Max Direction Variance
-        private float m_varStrength = 5.0f; // Max Strength  Variance
-        private Vector2[] m_windSpeeds = new Vector2[16*16];
+        Vector2 m_curPredominateWind;
+        float m_rateChange = 1.0f;
+        //
+        float m_varDirection = 30.0f;
+        // Max Direction Variance
+        float m_varStrength = 5.0f;
+        // Max Strength  Variance
+        Vector2[] m_windSpeeds = new Vector2[16 * 16];
 
         public string Version
         {
@@ -59,29 +64,29 @@ namespace WhiteCore.Modules.Wind.Plugins
             get { return "ConfigurableWind"; }
         }
 
-        public void Initialise()
+        public void Initialise ()
         {
         }
 
-        public void WindConfig(IScene scene, IConfig windConfig)
+        public void WindConfig (IScene scene, IConfig windConfig)
         {
             if (windConfig != null)
             {
                 // Uses strength value if avg_strength not specified
-                m_avgStrength = windConfig.GetFloat("strength", 5.0F);
-                m_avgStrength = windConfig.GetFloat("avg_strength", 5.0F);
+                m_avgStrength = windConfig.GetFloat ("strength", 5.0F);
+                m_avgStrength = windConfig.GetFloat ("avg_strength", 5.0F);
 
-                m_avgDirection = windConfig.GetFloat("avg_direction", 0.0F);
-                m_varStrength = windConfig.GetFloat("var_strength", 5.0F);
-                m_varDirection = windConfig.GetFloat("var_direction", 30.0F);
-                m_rateChange = windConfig.GetFloat("rate_change", 1.0F);
+                m_avgDirection = windConfig.GetFloat ("avg_direction", 0.0F);
+                m_varStrength = windConfig.GetFloat ("var_strength", 5.0F);
+                m_varDirection = windConfig.GetFloat ("var_direction", 30.0F);
+                m_rateChange = windConfig.GetFloat ("rate_change", 1.0F);
             }
         }
 
-        public void WindUpdate(uint frame)
+        public void WindUpdate (uint frame)
         {
-            double avgAng = m_avgDirection*(Math.PI/180.0f);
-            double varDir = m_varDirection*(Math.PI/180.0f);
+            double avgAng = m_avgDirection * (Math.PI / 180.0f);
+            double varDir = m_varDirection * (Math.PI / 180.0f);
 
             // Prevailing wind algorithm
             // Inspired by Kanker Greenacre
@@ -89,43 +94,43 @@ namespace WhiteCore.Modules.Wind.Plugins
             // TODO: 
             // * This should probably be based on in-world time.
             // * should probably move all these local variables to class members and constants
-            double time = DateTime.Now.TimeOfDay.TotalSeconds/86400.0f;
+            double time = DateTime.Now.TimeOfDay.TotalSeconds / 86400.0f;
 
-            double theta = time*(2*Math.PI)*m_rateChange;
+            double theta = time * (2 * Math.PI) * m_rateChange;
 
-            double offset = Math.Sin(theta)*Math.Sin(theta*2)*Math.Sin(theta*9)*Math.Cos(theta*4);
+            double offset = Math.Sin (theta) * Math.Sin (theta * 2) * Math.Sin (theta * 9) * Math.Cos (theta * 4);
 
-            double windDir = avgAng + (varDir*offset);
+            double windDir = avgAng + (varDir * offset);
 
-            offset = Math.Sin(theta)*Math.Sin(theta*4) + (Math.Sin(theta*13)/3);
-            double windSpeed = m_avgStrength + (m_varStrength*offset);
+            offset = Math.Sin (theta) * Math.Sin (theta * 4) + (Math.Sin (theta * 13) / 3);
+            double windSpeed = m_avgStrength + (m_varStrength * offset);
 
             if (windSpeed < 0)
                 windSpeed = 0;
 
 
-            m_curPredominateWind.X = (float) Math.Cos(windDir);
-            m_curPredominateWind.Y = (float) Math.Sin(windDir);
+            m_curPredominateWind.X = (float)Math.Cos (windDir);
+            m_curPredominateWind.Y = (float)Math.Sin (windDir);
 
-            m_curPredominateWind.Normalize();
-            m_curPredominateWind.X *= (float) windSpeed;
-            m_curPredominateWind.Y *= (float) windSpeed;
+            m_curPredominateWind.Normalize ();
+            m_curPredominateWind.X *= (float)windSpeed;
+            m_curPredominateWind.Y *= (float)windSpeed;
 
             for (int y = 0; y < 16; y++)
             {
                 for (int x = 0; x < 16; x++)
                 {
-                    m_windSpeeds[y*16 + x] = m_curPredominateWind;
+                    m_windSpeeds [y * 16 + x] = m_curPredominateWind;
                 }
             }
         }
 
-        public Vector3 WindSpeed(float fX, float fY, float fZ)
+        public Vector3 WindSpeed (float fX, float fY, float fZ)
         {
-            return new Vector3(m_curPredominateWind, 0.0f);
+            return new Vector3 (m_curPredominateWind, 0.0f);
         }
 
-        public Vector2[] WindLLClientArray()
+        public Vector2[] WindLLClientArray ()
         {
             return m_windSpeeds;
         }
@@ -139,19 +144,15 @@ namespace WhiteCore.Modules.Wind.Plugins
             }
         }
 
-        public Dictionary<string, string> WindParams()
+        public Dictionary<string, string> WindParams ()
         {
-            Dictionary<string, string> Params = new Dictionary<string, string>
-                                                    {
-                                                        {"avgStrength", "average wind strength"},
-                                                        {"avgDirection", "average wind direction in degrees"},
-                                                        {"varStrength", "allowable variance in wind strength"},
-                                                        {
-                                                            "varDirection",
-                                                            "allowable variance in wind direction in +/- degrees"
-                                                        },
-                                                        {"rateChange", "rate of change"}
-                                                    };
+            Dictionary<string, string> Params = new Dictionary<string, string> {
+                { "avgStrength", "average wind strength" },
+                { "avgDirection", "average wind direction in degrees" },
+                { "varStrength", "allowable variance in wind strength" }, 
+                { "varDirection", "allowable variance in wind direction in +/- degrees" },
+                {"rateChange", "rate of change"}
+            };
 
             return Params;
         }
@@ -204,7 +205,7 @@ namespace WhiteCore.Modules.Wind.Plugins
             m_windSpeeds = null;
         }
 
-        private void LogSettings()
+        void LogSettings()
         {
             MainConsole.Instance.InfoFormat("[ConfigurableWind] Average Strength   : {0}", m_avgStrength);
             MainConsole.Instance.InfoFormat("[ConfigurableWind] Average Direction  : {0}", m_avgDirection);
