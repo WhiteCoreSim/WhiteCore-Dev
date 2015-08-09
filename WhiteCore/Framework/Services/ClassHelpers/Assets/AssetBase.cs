@@ -25,16 +25,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Diagnostics;
+using System.Security.Cryptography;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
+using ProtoBuf;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Utilities;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using ProtoBuf;
-using System;
-using System.Diagnostics;
-using System.Security.Cryptography;
 
 namespace WhiteCore.Framework.Services.ClassHelpers.Assets
 {
@@ -58,10 +58,10 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Assets
     [Serializable, ProtoContract(UseProtoMembersOnly = false)]
     public class AssetBase : IDataTransferable, IDisposable
     {
-        private static readonly SHA256Managed SHA256Managed = new SHA256Managed();
-        private string idString = "";
-        private byte[] myData = new byte[] {};
-        private string myHashCode = "";
+        static readonly SHA256Managed SHA256Managed = new SHA256Managed();
+        string idString = "";
+        byte[] myData = new byte[] {};
+        string myHashCode = "";
 
         #region Initiation
 
@@ -94,7 +94,7 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Assets
             Initiate(assetID.ToString(), name, assetType, creatorID);
         }
 
-        private void SimpleInitialize()
+        void SimpleInitialize()
         {
             DatabaseTable = "assets";
             ID = UUID.Zero;

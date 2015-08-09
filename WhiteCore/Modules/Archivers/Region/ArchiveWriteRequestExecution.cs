@@ -25,17 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Xml;
+using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.SceneInfo.Entities;
 using WhiteCore.Framework.Serialization;
 using WhiteCore.Framework.Serialization.External;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Xml;
 
 namespace WhiteCore.Modules.Archivers
 {
@@ -124,8 +124,7 @@ namespace WhiteCore.Modules.Archivers
                 foreach (ILandObject lo in landObjects)
                 {
                     LandData landData = lo.LandData;
-                    string landDataPath = String.Format("{0}{1}.xml", ArchiveConstants.LANDDATA_PATH,
-                                                        landData.GlobalID.ToString());
+                    string landDataPath = String.Format("{0}{1}.xml", ArchiveConstants.LANDDATA_PATH, landData.GlobalID);
                     m_archiveWriter.WriteFile(landDataPath, LandDataSerializer.Serialize(landData));
                 }
             }

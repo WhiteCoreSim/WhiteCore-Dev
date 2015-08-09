@@ -26,22 +26,22 @@
  */
 
 
-using WhiteCore.Framework.ConsoleFramework;
-using WhiteCore.Framework.Services;
-using WhiteCore.Framework.Services.ClassHelpers.Assets;
-using WhiteCore.Framework.Utilities;
-using OpenMetaverse;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
+using OpenMetaverse;
+using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.Services;
+using WhiteCore.Framework.Services.ClassHelpers.Assets;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.Archivers
 {
     /// <summary>
     ///     Encapsulate the asynchronous requests for the assets required for an archive operation
     /// </summary>
-    internal class AssetsRequest
+    class AssetsRequest
     {
         /// <value>
         ///     Timeout threshold if we still need assets or missing asset notifications but have stopped receiving them
@@ -86,7 +86,7 @@ namespace WhiteCore.Modules.Archivers
         /// <value>
         ///     State of this request
         /// </value>
-        private RequestState m_requestState = RequestState.Initial;
+        RequestState m_requestState = RequestState.Initial;
 
         /// <value>
         ///     uuids to request
@@ -277,7 +277,7 @@ namespace WhiteCore.Modules.Archivers
 
         #region Nested type: RequestState
 
-        private enum RequestState
+        enum RequestState
         {
             Initial,
             Running,

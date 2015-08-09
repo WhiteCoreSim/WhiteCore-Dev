@@ -25,21 +25,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.ConsoleFramework;
-using WhiteCore.Framework.SceneInfo.Entities;
-using WhiteCore.Framework.Serialization;
-using WhiteCore.Framework.Services;
-using WhiteCore.Framework.Services.ClassHelpers.Assets;
-using WhiteCore.Framework.Utilities;
-using OpenMetaverse;
-using OpenMetaverse.Assets;
-using OpenMetaverse.StructuredData;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
+using OpenMetaverse;
+using OpenMetaverse.Assets;
+using OpenMetaverse.StructuredData;
+using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.SceneInfo.Entities;
+using WhiteCore.Framework.Serialization;
+using WhiteCore.Framework.Services;
+using WhiteCore.Framework.Services.ClassHelpers.Assets;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Framework.SceneInfo
 {

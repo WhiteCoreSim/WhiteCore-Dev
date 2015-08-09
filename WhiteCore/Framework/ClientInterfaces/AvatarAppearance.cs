@@ -28,12 +28,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo.Entities;
 using WhiteCore.Framework.Utilities;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
 
 namespace WhiteCore.Framework.ClientInterfaces
 {
@@ -46,14 +46,14 @@ namespace WhiteCore.Framework.ClientInterfaces
         public static readonly int TEXTURE_COUNT = 21;
         public static readonly byte[] BAKE_INDICES = new byte[] {8, 9, 10, 11, 19, 20};
         
-        private int m_serial = 1;
-        private byte[] m_visualparams;
-        private Primitive.TextureEntry m_texture;
-        private AvatarWearable[] m_wearables;
-        private Dictionary<int, List<AvatarAttachment>> m_attachments;        
-        private float m_avatarHeight = 0;
-        private UUID m_owner;
-        private Dictionary<string, UUID> m_wearableCache = new Dictionary<string, UUID>();
+        int m_serial = 1;
+        byte[] m_visualparams;
+        Primitive.TextureEntry m_texture;
+        AvatarWearable[] m_wearables;
+        Dictionary<int, List<AvatarAttachment>> m_attachments;        
+        float m_avatarHeight = 0;
+        UUID m_owner;
+        Dictionary<string, UUID> m_wearableCache = new Dictionary<string, UUID>();
 
         public int Serial
         {
@@ -239,9 +239,9 @@ namespace WhiteCore.Framework.ClientInterfaces
             SetDefaultTexture();
         }
 
-        private void SetDefaultParams()
+        void SetDefaultParams()
         {
-            m_visualparams = new byte[]
+            var m_visualparams_old = new byte[]
                                  {
                                      33, 61, 85, 23, 58, 127, 63, 85, 63, 42, 0, 85, 63, 36, 85, 95, 153, 63, 34, 0, 63,
                                      109, 88, 132, 63, 136, 81, 85, 103, 136, 127, 0, 150, 150, 150, 127, 0, 0, 0, 0, 0,
@@ -263,9 +263,25 @@ namespace WhiteCore.Framework.ClientInterfaces
                                      0, 127, 127, 150, 150, 150, 150, 150, 150, 150, 150, 0, 0, 150, 51, 132, 150, 150,
                                      150
                                  };
+            // female params
+            m_visualparams = new byte[] {
+                33, 37, 56, 62, 25, 204, 12, 114, 66, 25, 37, 178, 102, 53, 139, 38, 114, 30, 0, 127,
+                102, 122, 76, 66, 63, 76, 38, 63, 122, 102, 158, 0, 203, 255, 0, 127, 0, 0, 255, 0, 28,
+                255, 255, 0, 0, 0, 132, 0, 96, 0, 226, 181, 35, 127, 153, 0, 0, 206, 0, 23, 0, 0, 
+                0, 0, 0, 0, 0, 0, 0, 145, 204, 178, 0, 43, 0, 165, 91, 0, 0, 102, 76, 76, 85,
+                127, 127, 25, 90, 152, 100, 216, 214, 255, 255, 135, 255, 25, 89, 76, 204, 0, 127,
+                73, 0, 147, 139, 142, 125, 114, 117, 0, 127, 193, 132, 127, 132, 122, 59, 63, 81, 127,
+                147, 183, 76, 79, 81, 127, 249, 63, 0, 0, 0, 0, 127, 127, 0, 0, 0, 0, 127, 0, 159, 0, 0,
+                0, 127, 83, 68, 131, 107, 158, 112, 193, 183, 0, 107, 142, 0, 130, 147, 0, 214, 255,
+                198, 0, 0, 96, 30, 122, 165, 209, 198, 127, 127, 153, 255, 255, 255, 255, 255, 255, 255,
+                0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 255, 255, 255, 255, 255, 
+                0, 132, 153, 255, 25, 100, 255, 255, 255, 255, 84, 0, 0, 0, 51, 91, 255, 255, 255, 0,
+                0, 25, 0, 25, 23, 51, 0, 25, 23, 51, 0, 0, 25, 0, 25, 23, 51, 0, 0, 25, 0, 25, 23, 51,
+                0, 25, 23, 51, 0, 25, 23, 51, 0, 127
+            };
         }
 
-        private void SetDefaultTexture()
+        void SetDefaultTexture()
         {
             m_texture = new Primitive.TextureEntry(new UUID("C228D1CF-4B5D-4BA8-84F4-899A0796AA97"));
             for (uint i = 0; i < TEXTURE_COUNT; i++)

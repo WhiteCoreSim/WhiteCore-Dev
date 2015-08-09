@@ -25,6 +25,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Linq;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.Imaging;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
@@ -32,17 +42,7 @@ using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Assets;
 using WhiteCore.Framework.Services.ClassHelpers.Inventory;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using OpenMetaverse.Imaging;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using WhiteCore.Framework.Utilities;
-using System.Drawing;
-using System.Drawing.Imaging;
 
 namespace WhiteCore.Modules.Archivers
 {
@@ -54,6 +54,7 @@ namespace WhiteCore.Modules.Archivers
         #region Declares
 
         IAssetService assetService;
+        UuidGatherer assetGatherer;
         IAvatarService avatarService;
         IInventoryService inventoryService;
         IUserAccountService userAccountService;
@@ -137,7 +138,9 @@ namespace WhiteCore.Modules.Archivers
         /// <param name="folderName">Folder name.</param>
         /// <param name="snapshotUUID">Snapshot UUI.</param>
         /// <param name="isPublic">If set to <c>true</c> is public.</param>
-        public bool SaveAvatarArchive(string fileName, UUID principalID, string folderName, UUID snapshotUUID, bool isPublic)
+        /// <param name="isPortable">If set to <c>true</c> create a portable archive.</param>
+        public bool SaveAvatarArchive(string fileName, UUID principalID, string folderName,
+            UUID snapshotUUID, bool isPublic, bool isPortable)
         {
             UserAccount account = userAccountService.GetUserAccount(null, principalID);
             if (account == null)
@@ -169,7 +172,7 @@ namespace WhiteCore.Modules.Archivers
                     if (w.AssetID != UUID.Zero)
                     {
                         SaveItem(w.ItemID, ref archive);
-                        SaveAsset(w.AssetID, ref archive);
+                        SaveAsset(w.AssetID, ref archive, isPortable);
                         wearCount++;
                     }
                 }
@@ -181,7 +184,7 @@ namespace WhiteCore.Modules.Archivers
             foreach (AvatarAttachment a in attachments.Where(a => a.AssetID != UUID.Zero))
             {
                 SaveItem(a.ItemID, ref archive);
-                SaveAsset(a.AssetID, ref archive);
+                SaveAsset(a.AssetID, ref archive, isPortable);
                 attachCount++;
             }
             MainConsole.Instance.InfoFormat("[AvatarArchive] Adding {0} attachments to {1}", attachCount, archiveName);
@@ -194,6 +197,7 @@ namespace WhiteCore.Modules.Archivers
             archive.FolderName = folderName;
             archive.Snapshot = snapshotUUID;
             archive.IsPublic = isPublic;
+            archive.IsPortable = isPortable;
 
             File.WriteAllText(fileName, OSDParser.SerializeLLSDXmlString(archive.ToOSD()));
 
@@ -265,8 +269,9 @@ namespace WhiteCore.Modules.Archivers
                     archiveNames.Add (Path.GetFileNameWithoutExtension (file));
              
                 return archiveNames;
-            } else
-                return archives;
+            }
+
+            return archives;
         }
 
         /// <summary>
@@ -359,12 +364,17 @@ namespace WhiteCore.Modules.Archivers
             string foldername;
             UUID snapshotUUID = UUID.Zero;
             bool isPublic = true;
+            bool isPortable = false;
 
             // check for switch options
             var parms = new List <string>();
             for (int i = 3; i < cmdparams.Length;)
             {
-                if (cmdparams [i].StartsWith ("--private"))
+                if (cmdparams [i].StartsWith ("--portable"))
+                {
+                    isPortable = true;
+                    i++;
+                } else if (cmdparams [i].StartsWith ("--private"))
                 {
                     isPublic = false;
                     i++;
@@ -426,7 +436,7 @@ namespace WhiteCore.Modules.Archivers
                 foldername = OSD.FromString(cmdparams[3]);
             foldername = foldername.Replace (' ', '_');    
 
-            SaveAvatarArchive(fileName, account.PrincipalID, foldername, snapshotUUID, isPublic);
+            SaveAvatarArchive(fileName, account.PrincipalID, foldername, snapshotUUID, isPublic, isPortable);
         }
 
         #endregion
@@ -501,7 +511,7 @@ namespace WhiteCore.Modules.Archivers
             {
                 InventoryItemBase item = new InventoryItemBase();
                 item.FromOSD((OSDMap)kvp.Value);
-                MainConsole.Instance.Info("[AvatarArchive]: Loading item " + item.ID.ToString());
+                MainConsole.Instance.Info("[AvatarArchive]: Loading item " + item.ID);
                 litems.Add(item);
             }
             
@@ -602,25 +612,37 @@ namespace WhiteCore.Modules.Archivers
             return appearance;
         }
 
-        void SaveAsset(UUID AssetID, ref AvatarArchive archive)
+        void SaveAsset(UUID AssetID, ref AvatarArchive archive, bool isPortable)
         {
-            try
+            IDictionary<UUID, AssetType> assetUuids = new Dictionary<UUID, AssetType> (); 
+
+            AssetBase assetBase = assetService.Get(AssetID.ToString());
+            if (assetBase == null)
+                return;
+
+            // add this to the list
+            // assetUuids [assetBase.ID] = assetBase.TypeAsset;
+
+            if (isPortable)
+                assetGatherer.GatherAssetUuids (assetBase.ID, assetBase.TypeAsset, assetUuids);
+            else
+                // we need this one
+                assetUuids [assetBase.ID] = assetBase.TypeAsset;
+            
+            // save the required assets
+            foreach (KeyValuePair<UUID, AssetType> kvp in assetUuids)
             {
-                AssetBase asset = assetService.Get(AssetID.ToString());
+                var asset = assetService.Get(kvp.Key.ToString());
                 if (asset != null)
                 {
-                    MainConsole.Instance.Info("[AvatarArchive]: Saving asset " + asset.ID);
+                    MainConsole.Instance.Debug("[AvatarArchive]: Saving asset " + asset.ID);
                     archive.AssetsMap[asset.ID.ToString()] = asset.ToOSD();
                 }
                 else
                 {
-                    MainConsole.Instance.Warn("[AvatarArchive]: Could not find asset to save: " + AssetID.ToString());
+                    MainConsole.Instance.Debug("[AvatarArchive]: Could not find asset to save: " + asset.ID);
                     return;
                 }
-            }
-            catch (Exception ex)
-            {
-                MainConsole.Instance.Warn("[AvatarArchive]: Could not save asset: " + AssetID.ToString() + ", " + ex);
             }
         }
 
@@ -639,7 +661,7 @@ namespace WhiteCore.Modules.Archivers
                 MainConsole.Instance.Warn("[AvatarArchive]: Could not find item to save: " + ItemID);
                 return;
             }
-            MainConsole.Instance.Info("[AvatarArchive]: Saving item " + ItemID.ToString());
+            MainConsole.Instance.Info("[AvatarArchive]: Saving item " + ItemID);
             archive.ItemsMap[ItemID.ToString()] = saveItem.ToOSD();
         }
 
@@ -663,7 +685,7 @@ namespace WhiteCore.Modules.Archivers
 
         void ExportArchiveImage(UUID imageUUID, string archiveName, string filePath)
         {
-            byte[] jpeg = new byte[0];
+            byte[] jpeg;
 
             using (MemoryStream imgstream = new MemoryStream())
             {
@@ -675,7 +697,7 @@ namespace WhiteCore.Modules.Archivers
                 if (imageAsset != null)
                 {
                     // Decode image to System.Drawing.Image
-                    Image image = null;
+                    Image image;
                     ManagedImage managedImage;
                     if (OpenJPEG.DecodeToImage(imageAsset, out managedImage, out image))
                     {
@@ -756,14 +778,15 @@ namespace WhiteCore.Modules.Archivers
                 {
                     MainConsole.Instance.Commands.AddCommand (
                         "save avatar archive",
-                        "save avatar archive [<First> <Last> [<Filename>]] [FolderNameToSaveInto] (--snapshot <UUID>) (--private)",
+                        "save avatar archive [<First> <Last> [<Filename>]] [FolderNameToSaveInto] (--snapshot <UUID>) (--private) (--portable)",
                         "Saves appearance to an avatar archive (.aa is the recommended file extension)\n" +
                         " Note: Put \"\" around the FolderName if you have spaces. \n" +
                         "     : e.g. \"../Data/MyAvatars/Male Avatar.aa\" \n" +
                     //"  Put all attachments in BodyParts folder before saving the archive) \n" +
-                        "  Both --snapshot and --private are optional.\n" +
+                        "   --snapshot --private and --portable are optional.\n" +
                         "   --snapshot sets a picture to display on the web interface if this archive is being used as a default avatar.\n" +
-                        "   --private tells any web interfaces that they cannot display this as a default avatar.",
+                        "   --private tells any web interfaces that they cannot display this as a default avatar.\n" +
+                        "   --portable includes full asset tells any web interfaces that they cannot display this as a default avatar.",
                         HandleSaveAvatarArchive, false, true);
 
                     MainConsole.Instance.Commands.AddCommand (
@@ -782,6 +805,7 @@ namespace WhiteCore.Modules.Archivers
             userAccountService = registry.RequestModuleInterface<IUserAccountService>();
             avatarService = registry.RequestModuleInterface<IAvatarService>();
             assetService = registry.RequestModuleInterface<IAssetService>();
+            assetGatherer = new UuidGatherer(assetService);
             inventoryService = registry.RequestModuleInterface<IInventoryService>();
             m_registry.RegisterModuleInterface<IAvatarAppearanceArchiver>(this);
         }

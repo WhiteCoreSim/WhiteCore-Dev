@@ -30,7 +30,7 @@ using WhiteCore.Simulation.Base;
 namespace WhiteCore
 {
     /// <summary>
-    ///     Starting class for the OpenSimulator Region
+    ///     Starting class for the WhiteCore Simulator
     /// </summary>
     public class Application
     {
