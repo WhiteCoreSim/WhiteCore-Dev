@@ -620,13 +620,10 @@ namespace WhiteCore.Modules.Archivers
             if (assetBase == null)
                 return;
 
-            // add this to the list
-            // assetUuids [assetBase.ID] = assetBase.TypeAsset;
-
-            if (isPortable)
+             if (isPortable)
                 assetGatherer.GatherAssetUuids (assetBase.ID, assetBase.TypeAsset, assetUuids);
             else
-                // we need this one
+                // we need this one at least
                 assetUuids [assetBase.ID] = assetBase.TypeAsset;
             
             // save the required assets
