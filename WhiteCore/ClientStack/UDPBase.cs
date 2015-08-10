@@ -269,7 +269,7 @@ namespace WhiteCore.ClientStack
                 }
                 catch (Exception ex)
                 {
-                    MainConsole.Instance.Error("[UDPBase]: Hit error: " + ex));
+                    MainConsole.Instance.Error("[UDPBase]: Hit error: " + ex);
                 }
                 finally
                 {

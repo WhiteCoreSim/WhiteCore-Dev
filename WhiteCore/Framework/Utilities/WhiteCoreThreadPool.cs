@@ -138,7 +138,7 @@ namespace WhiteCore.Framework.Utilities
                                                 {
                                                     Priority = m_info.priority,
                                                     Name =
-                                                        (m_info.Name == "" ? "WhiteCoreThreadPool" : m_info.Name) + "#" + i),
+                                                        (m_info.Name == "" ? "WhiteCoreThreadPool" : m_info.Name) + "#" + i,
                                                     IsBackground = true
                                                 };
                             try
