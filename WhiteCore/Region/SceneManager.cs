@@ -230,6 +230,7 @@ namespace WhiteCore.Region
 
         #endregion
 
+
         #region Add a region
 
         public void StartRegions(out bool newRegion)
@@ -260,8 +261,10 @@ namespace WhiteCore.Region
         public void StartRegion(ISimulationDataStore simData, RegionInfo regionInfo)
         {
             MainConsole.Instance.InfoFormat("[SceneManager]: Starting region \"{0}\" at @ {1},{2}",
-                                            regionInfo.RegionName,
-                                            regionInfo.RegionLocX/256, regionInfo.RegionLocY/256);
+                regionInfo.RegionName,
+                regionInfo.RegionLocX/Constants.RegionSize,
+                regionInfo.RegionLocY/Constants.RegionSize);
+            
             ISceneLoader sceneLoader = m_SimBase.ApplicationRegistry.RequestModuleInterface<ISceneLoader>();
             if (sceneLoader == null)
                 throw new Exception("No Scene Loader Interface!");
@@ -282,7 +285,7 @@ namespace WhiteCore.Region
             if (OnFinishedAddingScene != null)
                 OnFinishedAddingScene(scene);
 
-            //Start the heartbeats
+           //Start the heartbeats
             scene.StartHeartbeat();
             //Tell the scene that the startup is complete 
             // Note: this event is added in the scene constructor

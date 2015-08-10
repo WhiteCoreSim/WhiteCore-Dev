@@ -27,11 +27,11 @@
 
 using System.Collections.Generic;
 
+using Nini.Config;
 using WhiteCore.Framework.ModuleLoader;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
-using Nini.Config;
 
 namespace WhiteCore.Region
 {
