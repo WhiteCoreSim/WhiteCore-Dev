@@ -554,6 +554,9 @@ namespace WhiteCore.Framework.ConsoleFramework
             MainConsole.Instance = this;
 
             m_Commands.AddCommand("help", "help", "Get a general command list", Help, false, true);
+
+            // set the default path as preset or configured
+            LogPath = simBase.DefaultDataPath;
             string logName = "";
             string logPath = LogPath;
             if (source.Configs ["Console"] != null) {

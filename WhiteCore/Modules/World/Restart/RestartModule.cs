@@ -69,6 +69,12 @@ namespace WhiteCore.Modules.Restart
 
         public void AddRegion (IScene scene)
         {
+            if (m_storeDirectory == "")
+            {
+                var simBase = scene.RequestModuleInterface<ISimulationBase> ();
+                m_storeDirectory = Path.Combine(simBase.DefaultDataPath, "/Region");
+            }
+            
             m_scene = scene;
             scene.RegisterModuleInterface<IRestartModule> (this);
         }

@@ -49,6 +49,7 @@ namespace WhiteCore.Modules.WorldView
         string m_worldviewCacheDir;
         bool m_cacheEnabled = true;
         float m_cacheExpires = 24;
+        ISimulationBase simulationBase;
 
         public void Initialise(IConfigSource config)
         {
@@ -101,7 +102,7 @@ namespace WhiteCore.Modules.WorldView
                 return;
             }
 
-            ISimulationBase simulationBase = scene.RequestModuleInterface<ISimulationBase>();
+            simulationBase = scene.RequestModuleInterface<ISimulationBase>();
             if (simulationBase != null)
             {
                 IHttpServer server = simulationBase.GetHttpServer(0);
@@ -205,7 +206,7 @@ namespace WhiteCore.Modules.WorldView
             if (string.IsNullOrEmpty(fileName))
             {
                 fileName = scene.RegionInfo.RegionName + ".jpg";
-                savePath = PathHelpers.VerifyWriteFile (fileName, ".jpg", Constants.DEFAULT_DATA_DIR + "/Worldview", true);
+                savePath = PathHelpers.VerifyWriteFile (fileName, ".jpg", simulationBase.DefaultDataPath + "/Worldview", true);
             }
             File.WriteAllBytes(savePath, jpeg);
 
@@ -225,7 +226,7 @@ namespace WhiteCore.Modules.WorldView
             if (string.IsNullOrEmpty(fileName))
             {
                 fileName = scene.RegionInfo.RegionName + "_maptile.jpg";
-                savePath = PathHelpers.VerifyWriteFile (fileName, ".jpg", Constants.DEFAULT_DATA_DIR + "/Worldview", true);
+                savePath = PathHelpers.VerifyWriteFile (fileName, ".jpg", simulationBase.DefaultDataPath + "/Worldview", true);
             }
             File.WriteAllBytes(savePath, jpeg);
 
@@ -324,7 +325,7 @@ namespace WhiteCore.Modules.WorldView
             }
 
             //some file sanity checks
-            var savePath = PathHelpers.VerifyWriteFile (fileName, ".jpg", Constants.DEFAULT_DATA_DIR + "/Worldview", true);
+            var savePath = PathHelpers.VerifyWriteFile (fileName, ".jpg", simulationBase.DefaultDataPath + "/Worldview", true);
 
             MainConsole.Instance.InfoFormat (
                 "[Worldview]: Saving worldview for {0} to {1}", scene.RegionInfo.RegionName, savePath);
@@ -370,7 +371,7 @@ namespace WhiteCore.Modules.WorldView
             }
 
             //some file sanity checks
-            var savePath = PathHelpers.VerifyWriteFile (fileName+"_maptile", ".jpg", Constants.DEFAULT_DATA_DIR + "/Worldview", true);
+            var savePath = PathHelpers.VerifyWriteFile (fileName+"_maptile", ".jpg", simulationBase.DefaultDataPath + "/Worldview", true);
 
             MainConsole.Instance.InfoFormat (
                 "[Worldview]: Saving world maptile for {0} to {1}", scene.RegionInfo.RegionName, savePath);

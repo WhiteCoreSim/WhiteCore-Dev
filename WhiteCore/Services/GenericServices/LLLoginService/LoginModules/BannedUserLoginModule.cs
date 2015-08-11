@@ -66,7 +66,8 @@ namespace WhiteCore.Services
                         m_TOSLocation = m_TOSLocation.Replace("ServersHostname", MainServer.Instance.HostName);
                     else
                     {
-                        var TOSFileName = PathHelpers.VerifyReadFile (m_TOSLocation,  ".txt", Constants.DEFAULT_DATA_DIR);
+                        var simBase = registry.RequestModuleInterface<ISimulationBase> ();
+                        var TOSFileName = PathHelpers.VerifyReadFile (m_TOSLocation,  ".txt", simBase.DefaultDataPath);
                         if (TOSFileName == "")
                         {
                             m_UseTOS = false;

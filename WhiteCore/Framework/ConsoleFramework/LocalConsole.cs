@@ -90,7 +90,7 @@ namespace WhiteCore.Framework.ConsoleFramework
                                   "Get a general command list", base.Help, false, true);
 
             string logName = "";
-            string logPath = Constants.DEFAULT_DATA_DIR;
+            string logPath = simBase.DefaultDataPath;
             if (source.Configs ["Console"] != null) {
                 logName = source.Configs ["Console"].GetString ("LogAppendName", logName);
                 logPath = source.Configs ["Console"].GetString ("LogPath", logPath);

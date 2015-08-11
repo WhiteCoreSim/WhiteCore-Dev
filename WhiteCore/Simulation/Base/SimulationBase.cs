@@ -80,6 +80,13 @@ namespace WhiteCore.Simulation.Base
             get { return m_version; }
         }
 
+        protected string m_defaultDataPath = Constants.DEFAULT_DATA_DIR;
+        public string DefaultDataPath
+        { 
+            get { return m_defaultDataPath;}
+            set { m_defaultDataPath = value;}
+        }
+
         protected IRegistryCore m_applicationRegistry = new RegistryCore();
 
         public IRegistryCore ApplicationRegistry
@@ -204,6 +211,11 @@ namespace WhiteCore.Simulation.Base
                     stpMinThreads = stpMaxThreads;
             }
 
+            IConfig fileConfig = m_config.Configs["FileBasedSimulationData"];
+            if (fileConfig != null)
+                DefaultDataPath = 
+                    PathHelpers.ComputeFullPath(fileConfig.GetString("DataDirectory", Constants.DEFAULT_DATA_DIR));
+                
             if (Util.FireAndForgetMethod == FireAndForgetMethod.SmartThreadPool)
                 Util.InitThreadPool(stpMinThreads, stpMaxThreads);
         }

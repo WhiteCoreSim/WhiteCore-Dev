@@ -51,9 +51,9 @@ namespace WhiteCore.Modules
         protected Timer m_backupSaveTimer;
 
         protected string m_fileName = "";
-        protected string m_storeDirectory = Constants.DEFAULT_DATA_DIR + "/Region";
+        protected string m_storeDirectory = "";
         protected bool m_keepOldSave = true;
-        protected string m_oldSaveDirectory = Constants.DEFAULT_DATA_DIR + "/RegionBak";
+        protected string m_oldSaveDirectory = "";
         protected bool m_oldSaveHasBeenSaved;
         protected bool m_requiresSave = true;
         protected bool m_displayNotSavingNotice = true;
@@ -133,14 +133,18 @@ namespace WhiteCore.Modules
 //			List<string> regions = new List<string>(Directory.GetFiles(".", "*.sim", SearchOption.TopDirectoryOnly));
 			ReadConfig(simBase);
 			MainConsole.Instance.Info("Looking for previous regions in: "+ m_storeDirectory);
+
 			List<string> regions = new List<string>(Directory.GetFiles(m_storeDirectory, "*.sim", SearchOption.TopDirectoryOnly));
             newRegion = regions.Count == 0;
             List<string> retVals = new List<string>();
+
 			foreach (string r in regions)
-				if (Path.GetExtension (r) == ".sim") {
-				MainConsole.Instance.Info ("Found: " + Path.GetFileNameWithoutExtension (r));
+				if (Path.GetExtension (r) == ".sim") 
+                {
+				    MainConsole.Instance.Info ("Found: " + Path.GetFileNameWithoutExtension (r));
 					retVals.Add (Path.GetFileNameWithoutExtension (r));
 				}
+            
             return retVals;
         }
 
@@ -153,6 +157,7 @@ namespace WhiteCore.Modules
 
             List<string> regionBaks = new List<string>();
             regionName += "--";                                 // name & timestamp delimiter
+
             foreach (string regBak in allBackups)
             {
                 if (Path.GetFileName (regBak).StartsWith(regionName)) 
@@ -256,7 +261,6 @@ namespace WhiteCore.Modules
 			}
 
 			return regionInfo;
-
         }
 
         public virtual RegionInfo LoadRegionInfo(string fileName, ISimulationBase simBase)
@@ -264,6 +268,7 @@ namespace WhiteCore.Modules
             ReadConfig(simBase);
             ReadBackup(fileName);
             BackupFile = fileName;
+
             return _regionData.RegionInfo;
         }
 
@@ -809,16 +814,21 @@ namespace WhiteCore.Modules
                 m_timeBetweenSaves = config.GetInt("TimeBetweenSaves", m_timeBetweenSaves);
                 m_keepOldSave = config.GetBoolean("SavePreviousBackup", m_keepOldSave);
 
-                // directories are references from the bin directory
-                // As of V0.9.2 the data is saved relative to the bin dir
-                m_oldSaveDirectory =
-                    PathHelpers.ComputeFullPath(config.GetString("PreviousBackupDirectory", m_oldSaveDirectory));
+                // As of V0.9.2, data is saved in the '../Data' directory relative to the bin dir
+                // or as configured
+
+                // Get and save the default Data path
+                string defaultDataPath = simBase.DefaultDataPath;
+
                 m_storeDirectory =
                     PathHelpers.ComputeFullPath(config.GetString("StoreBackupDirectory", m_storeDirectory));
                 if (m_storeDirectory == "")
-                    m_storeDirectory = Constants.DEFAULT_DATA_DIR + "/Region";
+                    m_storeDirectory = Path.Combine(defaultDataPath, "/Region");
+       
+                m_oldSaveDirectory =
+                    PathHelpers.ComputeFullPath(config.GetString("PreviousBackupDirectory", m_oldSaveDirectory));
                 if (m_oldSaveDirectory == "")
-                    m_oldSaveDirectory = Constants.DEFAULT_DATA_DIR + "/RegionBak";
+                    m_oldSaveDirectory = Path.Combine(defaultDataPath, "/RegionBak");
 
                 m_removeArchiveDays = config.GetInt("ArchiveDays", m_removeArchiveDays);
                                
@@ -829,6 +839,7 @@ namespace WhiteCore.Modules
                 if (!Directory.Exists(m_oldSaveDirectory))
                     Directory.CreateDirectory(m_oldSaveDirectory);
 
+       
                 string regionNameSeed = config.GetString("RegionNameSeed", "");
                 if (regionNameSeed != "")
                     m_regionNameSeed = regionNameSeed.Split (',');
@@ -839,7 +850,7 @@ namespace WhiteCore.Modules
 
             if (m_saveChanges && m_timeBetweenSaves != 0)
             {
-                m_saveTimer = new Timer(m_timeBetweenSaves*60*1000);
+                m_saveTimer = new Timer(m_timeBetweenSaves * 60 * 1000);
                 m_saveTimer.Elapsed += m_saveTimer_Elapsed;
                 m_saveTimer.Start();
             }

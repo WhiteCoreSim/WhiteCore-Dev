@@ -26,10 +26,10 @@
  */
 
 using System;
-using System.Text.RegularExpressions;
-using System.IO;
-using WhiteCore.Framework.ConsoleFramework;
 using System.Collections.Generic;
+using System.IO;
+using System.Text.RegularExpressions;
+using WhiteCore.Framework.ConsoleFramework;
 
 namespace WhiteCore.Framework.Utilities
 {

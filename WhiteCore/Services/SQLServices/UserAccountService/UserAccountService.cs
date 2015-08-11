@@ -52,6 +52,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
         protected IUserAccountData m_Database;
         protected GenericAccountCache<UserAccount> m_cache = new GenericAccountCache<UserAccount>();
         protected string[] m_userNameSeed;
+        protected string m_defaultDataPath;
 
         #endregion
 
@@ -72,6 +73,10 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             IConfig handlerConfig = config.Configs["Handlers"];
             if (handlerConfig.GetString("UserAccountHandler", "") != Name)
                 return;
+
+            var simBase = registry.RequestModuleInterface<ISimulationBase> ();
+            m_defaultDataPath = simBase.DefaultDataPath;
+
             Configure(config, registry);
             Init(registry, Name, serverPath: "/user/", serverHandlerName: "UserAccountServerURI");
  
@@ -1369,7 +1374,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             string Email;
             UUID UserUUID;
 
-            fileName = PathHelpers.VerifyReadFile(fileName,"csv", Constants.DEFAULT_DATA_DIR+"/Updates");
+            fileName = PathHelpers.VerifyReadFile(fileName,"csv", m_defaultDataPath + "/Updates");
             if(fileName == "")
             {
                 MainConsole.Instance.Error("The file " + fileName + " does not exist. Please check and retry");
@@ -1433,7 +1438,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
 
             int userNo = 0;
 
-            fileName = PathHelpers.VerifyWriteFile(fileName,"csv", Constants.DEFAULT_DATA_DIR+"/Updates", true);
+            fileName = PathHelpers.VerifyWriteFile(fileName,"csv", m_defaultDataPath + "/Updates", true);
             if(fileName == "")
                 return;
     
