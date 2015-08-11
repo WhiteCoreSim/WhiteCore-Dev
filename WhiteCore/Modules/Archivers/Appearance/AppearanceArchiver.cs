@@ -124,6 +124,18 @@ namespace WhiteCore.Modules.Archivers
                 MainConsole.Instance.Warn("[AvatarArchiver]: Error loading assets and items, " + ex);
             }
 
+            /*  implement fully if we need to
+            // inform the client if needed
+
+            ScenePresence SP;
+            MainConsole.Instance.ConsoleScenes[0].TryGetScenePresence(account.PrincipalID, out SP);
+            if (SP == null)
+                return; // nobody home!
+
+            SP.ControllingClient.SendAlertMessage("Appearance loading in progress...");
+            SP.ControllingClient.SendBulkUpdateInventory(folderForAppearance);
+            */
+
             MainConsole.Instance.Info("[AvatarArchive]: Loaded archive from " + fileName);
             archive.Appearance = appearance;
             return archive;
@@ -169,6 +181,7 @@ namespace WhiteCore.Modules.Archivers
                 for (int i = 0; i < wear.Count; i++)
                 {
                     WearableItem w = wear[i];
+
                     if (w.AssetID != UUID.Zero)
                     {
                         SaveItem(w.ItemID, ref archive);
@@ -669,14 +682,16 @@ namespace WhiteCore.Modules.Archivers
                 UUID AssetID = UUID.Parse(kvp.Key);
                 OSDMap assetMap = (OSDMap) kvp.Value;
 
-                MainConsole.Instance.Info("[AvatarArchive]: Loading asset " + AssetID);
-
-                AssetBase asset = assetService.Get(AssetID.ToString());
-                if (asset == null) //Don't overwrite if asset exists
+                // check if this assets alreasy exists in the database
+                AssetBase asset = assetService.Get(AssetID.ToString(), false);
+                if (asset == null) // Only save if it does not exist
                 {
-                    asset = LoadAssetBase(assetMap);
-                    asset.ID = assetService.Store(asset);
-                }
+                    MainConsole.Instance.Info ("[AvatarArchive]: Saving asset " + AssetID);
+
+                    asset = LoadAssetBase (assetMap);
+                    asset.ID = assetService.Store (asset);
+                } else
+                    MainConsole.Instance.Debug ("[Avatararchive]: Asset " + AssetID + " already exists.");
             }
         }
 
