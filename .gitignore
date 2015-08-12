@@ -73,7 +73,7 @@ WhiteCoreSim/Data/FileAssets/*
 WhiteCoreSim/Data/Governor.txt
 WhiteCoreSim/Data/OarFiles/*
 WhiteCoreSim/Data/Marketplace.txt
-WhiteCoreSim/Data/RealEstateUser.txt
+WhiteCoreSim/Data/RealEstate.txt
 WhiteCoreSim/Data/RegionBak/*.sim
 WhiteCoreSim/Data/Region/*.sim
 WhiteCoreSim/Data/ScriptEngines/*-*-*-*-*
