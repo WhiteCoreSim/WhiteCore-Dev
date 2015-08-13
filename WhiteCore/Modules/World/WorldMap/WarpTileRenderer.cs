@@ -58,7 +58,7 @@ namespace WhiteCore.Modules.WorldMap
 
         readonly Dictionary<UUID, Color4> m_colors = new Dictionary<UUID, Color4>();
         IConfigSource m_config;
-        string m_assetCacheDir = Constants.DEFAULT_ASSETCACHE_DIR;
+        string m_assetCacheDir = "";
         IRendering m_primMesher;
         IScene m_scene;
         IJ2KDecoder m_imgDecoder;
@@ -77,6 +77,11 @@ namespace WhiteCore.Modules.WorldMap
             m_imgDecoder = m_scene.RequestModuleInterface<IJ2KDecoder>();
             m_config = config;
             m_assetCacheDir = m_config.Configs ["AssetCache"].GetString ("CacheDirectory",m_assetCacheDir);
+            if (m_assetCacheDir == "")
+            {
+                var defpath = scene.RequestModuleInterface<ISimulationBase> ().DefaultDataPath;
+                m_assetCacheDir = System.IO.Path.Combine(defpath, Constants.DEFAULT_ASSETCACHE_DIR);
+            }
 
             List<string> renderers = RenderingLoader.ListRenderers(Util.ExecutingDirectory());
             if (renderers.Count > 0)

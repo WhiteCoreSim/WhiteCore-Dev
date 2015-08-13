@@ -72,7 +72,7 @@ namespace WhiteCore.Modules.Restart
             if (m_storeDirectory == "")
             {
                 var simBase = scene.RequestModuleInterface<ISimulationBase> ();
-                m_storeDirectory = Path.Combine(simBase.DefaultDataPath, "/Region");
+                m_storeDirectory = Path.Combine(simBase.DefaultDataPath, "Region");
             }
             
             m_scene = scene;

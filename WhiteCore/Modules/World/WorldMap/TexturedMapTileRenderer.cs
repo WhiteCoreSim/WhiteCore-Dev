@@ -25,17 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.ConsoleFramework;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.SceneInfo;
-using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
+using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.SceneInfo;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.WorldMap
 {
@@ -54,61 +54,68 @@ namespace WhiteCore.Modules.WorldMap
         }
 
         // (for info about algorithm, see http://en.wikipedia.org/wiki/HSL_and_HSV)
-        public HSV(Color c)
+        public HSV (Color c)
         {
-            float r = c.R/255f;
-            float g = c.G/255f;
-            float b = c.B/255f;
-            float max = Math.Max(Math.Max(r, g), b);
-            float min = Math.Min(Math.Min(r, g), b);
+            float r = c.R / 255f;
+            float g = c.G / 255f;
+            float b = c.B / 255f;
+            float max = Math.Max (Math.Max (r, g), b);
+            float min = Math.Min (Math.Min (r, g), b);
             float diff = max - min;
 
-            if (max == min) h = 0f;
-            else if (max == r) h = (g - b)/diff*60f;
-            else if (max == g) h = (b - r)/diff*60f + 120f;
-            else h = (r - g)/diff*60f + 240f;
-            if (h < 0f) h += 360f;
+            if (max == min)
+                h = 0f;
+            else if (max == r)
+                h = (g - b) / diff * 60f;
+            else if (max == g)
+                h = (b - r) / diff * 60f + 120f;
+            else
+                h = (r - g) / diff * 60f + 240f;
+            if (h < 0f)
+                h += 360f;
 
-            if (max == 0f) s = 0f;
-            else s = diff/max;
+            if (max == 0f)
+                s = 0f;
+            else
+                s = diff / max;
 
             v = max;
         }
 
         // (for info about algorithm, see http://en.wikipedia.org/wiki/HSL_and_HSV)
-        public Color toColor()
+        public Color toColor ()
         {
-            float f = h/60f;
-            int sector = (int) f%6;
-            f = f - (int) f;
-            int pi = (int) (v*(1f - s)*255f);
-            int qi = (int) (v*(1f - s*f)*255f);
-            int ti = (int) (v*(1f - (1f - f)*s)*255f);
-            int vi = (int) (v*255f);
+            float f = h / 60f;
+            int sector = (int)f % 6;
+            f = f - (int)f;
+            int pi = (int)(v * (1f - s) * 255f);
+            int qi = (int)(v * (1f - s * f) * 255f);
+            int ti = (int)(v * (1f - (1f - f) * s) * 255f);
+            int vi = (int)(v * 255f);
 
-            if (pi < 0) pi = 0;
+            if (pi < 0)   pi = 0;
             if (pi > 255) pi = 255;
-            if (qi < 0) qi = 0;
+            if (qi < 0)   qi = 0;
             if (qi > 255) qi = 255;
-            if (ti < 0) ti = 0;
+            if (ti < 0)   ti = 0;
             if (ti > 255) ti = 255;
-            if (vi < 0) vi = 0;
+            if (vi < 0)   vi = 0;
             if (vi > 255) vi = 255;
 
             switch (sector)
             {
-                case 0:
-                    return Color.FromArgb(vi, ti, pi);
-                case 1:
-                    return Color.FromArgb(qi, vi, pi);
-                case 2:
-                    return Color.FromArgb(pi, vi, ti);
-                case 3:
-                    return Color.FromArgb(pi, qi, vi);
-                case 4:
-                    return Color.FromArgb(ti, pi, vi);
-                default:
-                    return Color.FromArgb(vi, pi, qi);
+            case 0:
+                return Color.FromArgb (vi, ti, pi);
+            case 1:
+                return Color.FromArgb (qi, vi, pi);
+            case 2:
+                return Color.FromArgb (pi, vi, ti);
+            case 3:
+                return Color.FromArgb (pi, qi, vi);
+            case 4:
+                return Color.FromArgb (ti, pi, vi);
+            default:
+                return Color.FromArgb (vi, pi, qi);
             }
         }
     }
@@ -119,26 +126,26 @@ namespace WhiteCore.Modules.WorldMap
 
         // some hardcoded terrain UUIDs that work with SL 1.20 (the four default textures and "Blank").
         // The color-values were choosen because they "look right" (at least to me) ;-)
-        private static readonly UUID defaultTerrainTexture1 = new UUID("0bc58228-74a0-7e83-89bc-5c23464bcec5");
-        private static readonly Color defaultColor1 = Color.FromArgb(165, 137, 118);
-        private static readonly UUID defaultTerrainTexture2 = new UUID("63338ede-0037-c4fd-855b-015d77112fc8");
-        private static readonly Color defaultColor2 = Color.FromArgb(69, 89, 49);
-        private static readonly UUID defaultTerrainTexture3 = new UUID("303cd381-8560-7579-23f1-f0a880799740");
-        private static readonly Color defaultColor3 = Color.FromArgb(162, 154, 141);
-        private static readonly UUID defaultTerrainTexture4 = new UUID("53a2f406-4895-1d13-d541-d2e3b86bc19c");
-        private static readonly Color defaultColor4 = Color.FromArgb(200, 200, 200);
+        static readonly UUID defaultTerrainTexture1 = new UUID("0bc58228-74a0-7e83-89bc-5c23464bcec5");
+        static readonly Color defaultColor1 = Color.FromArgb(165, 137, 118);
+        static readonly UUID defaultTerrainTexture2 = new UUID("63338ede-0037-c4fd-855b-015d77112fc8");
+        static readonly Color defaultColor2 = Color.FromArgb(69, 89, 49);
+        static readonly UUID defaultTerrainTexture3 = new UUID("303cd381-8560-7579-23f1-f0a880799740");
+        static readonly Color defaultColor3 = Color.FromArgb(162, 154, 141);
+        static readonly UUID defaultTerrainTexture4 = new UUID("53a2f406-4895-1d13-d541-d2e3b86bc19c");
+        static readonly Color defaultColor4 = Color.FromArgb(200, 200, 200);
 
-        private static readonly Color WATER_COLOR = Color.FromArgb(29, 71, 95);
+        static readonly Color WATER_COLOR = Color.FromArgb(29, 71, 95);
 
         #endregion
 
-        // private IConfigSource m_config; // not used currently
+        // IConfigSource m_config; // not used currently
 
         // mapping from texture UUIDs to averaged color. This will contain all the textures in the sim.
         //   This could be considered a memory-leak, but it's *hopefully* taken care of after the terrain is generated
-        private Dictionary<UUID, Color> m_mapping;
-        private IScene m_scene;
-        private string m_assetCacheDir = Constants.DEFAULT_ASSETCACHE_DIR;
+        Dictionary<UUID, Color> m_mapping;
+        IScene m_scene;
+        string m_assetCacheDir = "";
 
 
         #region IMapTileTerrainRenderer Members
@@ -150,6 +157,11 @@ namespace WhiteCore.Modules.WorldMap
 
             // get cache dir
             m_assetCacheDir = source.Configs ["AssetCache"].GetString ("CacheDirectory",m_assetCacheDir);
+            if (m_assetCacheDir == "")
+            {
+                var defpath = scene.RequestModuleInterface<ISimulationBase> ().DefaultDataPath;
+                m_assetCacheDir = Path.Combine(defpath, Constants.DEFAULT_ASSETCACHE_DIR);
+            }
 
             m_mapping = new Dictionary<UUID, Color>
                             {
@@ -274,7 +286,7 @@ namespace WhiteCore.Modules.WorldMap
 
         #endregion
 
-        private void ReadCacheMap()
+        void ReadCacheMap()
         {
             if (!Directory.Exists(m_assetCacheDir))
                 Directory.CreateDirectory(m_assetCacheDir);
@@ -307,7 +319,7 @@ namespace WhiteCore.Modules.WorldMap
             }
         }
 
-        private bool DeserializeCache(string file)
+        bool DeserializeCache(string file)
         {
             OSDMap map = OSDParser.DeserializeJson(file) as OSDMap;
             if (map == null)
@@ -325,7 +337,7 @@ namespace WhiteCore.Modules.WorldMap
             return true;
         }
 
-        private void SaveCache()
+        void SaveCache()
         {
             OSDMap map = SerializeCache();
             FileStream stream =
@@ -337,7 +349,7 @@ namespace WhiteCore.Modules.WorldMap
             writer.Close();
         }
 
-        private OSDMap SerializeCache()
+        OSDMap SerializeCache()
         {
             OSDMap map = new OSDMap();
             foreach (KeyValuePair<UUID, Color> kvp in m_mapping)
@@ -352,7 +364,7 @@ namespace WhiteCore.Modules.WorldMap
         // This fetches the texture from the asset server synchronously. That should be ok, as we
         // call map-creation either async or sync, depending on what the user specified and it shouldn't
         // take too long, as most assets should be cached
-        private Bitmap fetchTexture(UUID id)
+        Bitmap fetchTexture(UUID id)
         {
             byte[] asset = m_scene.AssetService.GetData(id.ToString());
             if (asset != null)
@@ -389,7 +401,7 @@ namespace WhiteCore.Modules.WorldMap
         }
 
         // Compute the average color of a texture.
-        private Color computeAverageColor(Bitmap bmp)
+        Color computeAverageColor(Bitmap bmp)
         {
             FastBitmap unsafeBMP = new FastBitmap(bmp);
             // we have 256 x 256 pixel, each with 256 possible color-values per
@@ -419,7 +431,7 @@ namespace WhiteCore.Modules.WorldMap
 
         // return either the average color of the texture, or the defaultColor if the texturID is invalid
         // or the texture couldn't be found
-        private Color computeAverageColor(UUID textureID, Color defaultColor)
+        Color computeAverageColor(UUID textureID, Color defaultColor)
         {
             if (textureID == UUID.Zero)
                 return defaultColor; // not set
@@ -441,13 +453,13 @@ namespace WhiteCore.Modules.WorldMap
         // f(0) = 0, f(0.5) = 0.5, f(1) = 1,
         // f'(x) = 0 at x = 0 and x = 1; f'(0.5) = 1.5,
         // f''(0.5) = 0, f''(x) != 0 for x != 0.5
-        private float S(float v)
+        float S(float v)
         {
             return (v*v*(3f - 2f*v));
         }
 
         // interpolate two colors in HSV space and return the resulting color
-        private HSV interpolateHSV(ref HSV c1, ref HSV c2, float ratio)
+        HSV interpolateHSV(ref HSV c1, ref HSV c2, float ratio)
         {
             if (ratio <= 0f) return c1;
             if (ratio >= 1f) return c2;
@@ -465,12 +477,12 @@ namespace WhiteCore.Modules.WorldMap
 
         // the heigthfield might have some jumps in values. Rendered land is smooth, though,
         // as a slope is rendered at that place. So average 4 neighbor values to emulate that.
-        private float getHeight(ITerrainChannel hm, int x, int y)
+        float getHeight(ITerrainChannel hm, int x, int y)
         {
             if (x < (m_scene.RegionInfo.RegionSizeX - 1) && y < (m_scene.RegionInfo.RegionSizeY - 1))
                 return (hm[x, y]*.444f + (hm[x + 1, y] + hm[x, y + 1])*.222f + hm[x + 1, y + 1]*.112f);
-            else
-                return 0;
+
+            return 0;
         }
 
         #endregion

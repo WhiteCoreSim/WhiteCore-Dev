@@ -26,17 +26,17 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using Nini.Config;
 using OpenMetaverse;
+using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Servers.HttpServer.Interfaces;
-using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Utilities;
-using System.Collections.Generic;
 
 namespace WhiteCore.Modules.WorldView
 {
@@ -45,7 +45,7 @@ namespace WhiteCore.Modules.WorldView
 
         bool m_Enabled = true;
         IMapImageGenerator m_Generator;
-        string m_assetCacheDir = Constants.DEFAULT_ASSETCACHE_DIR;
+        string m_assetCacheDir = "";
         string m_worldviewCacheDir;
         bool m_cacheEnabled = true;
         float m_cacheExpires = 24;
@@ -81,7 +81,6 @@ namespace WhiteCore.Modules.WorldView
                 if (m_cacheEnabled)
                 {
                     m_assetCacheDir = config.Configs ["AssetCache"].GetString ("CacheDirectory",m_assetCacheDir);
-                    CreateCacheDirectories (m_assetCacheDir);
                 }
 
             }
@@ -95,6 +94,7 @@ namespace WhiteCore.Modules.WorldView
         {
             if (!m_Enabled)
                 return;
+            
             m_Generator = scene.RequestModuleInterface<IMapImageGenerator>();
             if (m_Generator == null)
             {
@@ -105,6 +105,17 @@ namespace WhiteCore.Modules.WorldView
             simulationBase = scene.RequestModuleInterface<ISimulationBase>();
             if (simulationBase != null)
             {
+               // verify cache path
+                if (m_cacheEnabled)
+                {
+                    if (m_assetCacheDir == "")
+                    {
+                        var defpath = simulationBase.DefaultDataPath;
+                        m_assetCacheDir = Path.Combine (defpath, Constants.DEFAULT_ASSETCACHE_DIR);
+                    }
+                    CreateCacheDirectories (m_assetCacheDir);
+                }
+
                 IHttpServer server = simulationBase.GetHttpServer(0);
                 server.AddStreamHandler(new WorldViewRequestHandler(this,
                         scene.RegionInfo.RegionID.ToString()));

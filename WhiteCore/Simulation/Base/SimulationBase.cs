@@ -118,8 +118,7 @@ namespace WhiteCore.Simulation.Base
             get { return m_BaseHTTPServer; }
         }
 
-        protected Dictionary<uint, IHttpServer> m_Servers =
-            new Dictionary<uint, IHttpServer>();
+        protected Dictionary<uint, IHttpServer> m_Servers = new Dictionary<uint, IHttpServer>();
 
         protected uint m_Port;
 
@@ -128,7 +127,7 @@ namespace WhiteCore.Simulation.Base
             get { return m_Port; }
         }
 
-        protected string[] m_commandLineParameters = null;
+        protected string[] m_commandLineParameters;
 
         public string[] CommandLineParameters
         {
@@ -155,8 +154,8 @@ namespace WhiteCore.Simulation.Base
             m_configurationLoader = configLoader;
 
             // This thread will go on to become the console listening thread
-            if (System.Threading.Thread.CurrentThread.Name != "ConsoleThread")
-                System.Threading.Thread.CurrentThread.Name = "ConsoleThread";
+            System.Threading.Thread.CurrentThread.Name = "ConsoleThread";
+
             //Register the interface
             ApplicationRegistry.RegisterModuleInterface<ISimulationBase>(this);
 
@@ -180,6 +179,10 @@ namespace WhiteCore.Simulation.Base
 
             if (startupConfig != null)
             {
+                m_defaultDataPath = startupConfig.GetString("DataDirectory", Constants.DEFAULT_DATA_DIR);
+                if (m_defaultDataPath == "")
+                    m_defaultDataPath = Constants.DEFAULT_DATA_DIR;
+                
                 m_startupCommandsFile = startupConfig.GetString("startup_console_commands_file", "");
                 m_shutdownCommandsFile = startupConfig.GetString("shutdown_console_commands_file", "");
 
@@ -211,10 +214,6 @@ namespace WhiteCore.Simulation.Base
                     stpMinThreads = stpMaxThreads;
             }
 
-            IConfig fileConfig = m_config.Configs["FileBasedSimulationData"];
-            if (fileConfig != null)
-                DefaultDataPath = 
-                    PathHelpers.ComputeFullPath(fileConfig.GetString("DataDirectory", Constants.DEFAULT_DATA_DIR));
                 
             if (Util.FireAndForgetMethod == FireAndForgetMethod.SmartThreadPool)
                 Util.InitThreadPool(stpMinThreads, stpMaxThreads);
@@ -405,7 +404,7 @@ namespace WhiteCore.Simulation.Base
         ///     Opens a file and uses it as input to the console command parser.
         /// </summary>
         /// <param name="fileName">name of file to use as input to the console</param>
-        private void PrintFileToConsole(string fileName)
+        void PrintFileToConsole(string fileName)
         {
             if (File.Exists(fileName))
             {
@@ -424,7 +423,7 @@ namespace WhiteCore.Simulation.Base
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void RunAutoTimerScript(object sender, EventArgs e)
+        void RunAutoTimerScript(object sender, EventArgs e)
         {
             RunCommandScript(m_TimerScriptFileName);
         }
@@ -651,7 +650,7 @@ namespace WhiteCore.Simulation.Base
         {
             try
             {
-                string pidstring = System.Diagnostics.Process.GetCurrentProcess().Id.ToString();
+                string pidstring = Process.GetCurrentProcess().Id.ToString();
                 FileStream fs = File.Create(path);
                 System.Text.ASCIIEncoding enc = new System.Text.ASCIIEncoding();
                 Byte[] buf = enc.GetBytes(pidstring);

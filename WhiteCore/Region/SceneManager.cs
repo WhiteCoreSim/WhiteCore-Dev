@@ -1421,13 +1421,13 @@ namespace WhiteCore.Region
 
         public List<string> GetOARFilenames()
         {
-            var defaultOarDir = Constants.DEFAULT_OARARCHIVE_DIR;
+            var defaultOarDir =  Path.Combine(m_SimBase.DefaultDataPath, Constants.DEFAULT_OARARCHIVE_DIR);
             var retVals = new List<string>();
 
             if (Directory.Exists (defaultOarDir))
             {
-                var archives = new List<string> (Directory.GetFiles (Constants.DEFAULT_OARARCHIVE_DIR, "*.oar"));
-                archives.AddRange (new List<string> (Directory.GetFiles (Constants.DEFAULT_OARARCHIVE_DIR, "*.tgz")));
+                var archives = new List<string> (Directory.GetFiles (defaultOarDir, "*.oar"));
+                archives.AddRange (new List<string> (Directory.GetFiles (defaultOarDir, "*.tgz")));
                 foreach (string file in archives)
                     retVals.Add (Path.GetFileNameWithoutExtension (file));
             }
@@ -1481,7 +1481,8 @@ namespace WhiteCore.Region
 				return;
 			}
 
-            fileName = PathHelpers.VerifyReadFile (fileName, new List<string>() {".oar","tgz"}, Constants.DEFAULT_OARARCHIVE_DIR);
+            var defaultOarPath = Path.Combine(m_SimBase.DefaultDataPath, Constants.DEFAULT_OARARCHIVE_DIR);
+            fileName = PathHelpers.VerifyReadFile (fileName, new List<string>() {".oar","tgz"}, defaultOarPath);
             if (fileName == "")                 // something wrong...
                 return;
             cmdparams [2] = fileName;           // reset passed filename
@@ -1556,7 +1557,8 @@ namespace WhiteCore.Region
             else
                 fileName = cmdparams[2];
 
-            fileName = PathHelpers.VerifyWriteFile (fileName, ".oar", Constants.DEFAULT_OARARCHIVE_DIR, true);
+            var defaultOarPath = Path.Combine (m_SimBase.DefaultDataPath, Constants.DEFAULT_OARARCHIVE_DIR);
+            fileName = PathHelpers.VerifyWriteFile (fileName, ".oar", defaultOarPath, true);
             if (fileName == "")                 // something wrong...
                 return;
             cmdparams [2] = fileName;           // reset passed filename

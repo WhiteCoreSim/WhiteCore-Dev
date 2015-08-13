@@ -63,7 +63,11 @@ namespace WhiteCore.Framework.ConsoleFramework
             simBase.ApplicationRegistry.RegisterModuleInterface<ICommandConsole>(this);
             MainConsole.Instance = this;
 
-            m_Commands.AddCommand("help", "help", "Get a general command list", Help, false, true);
+            m_Commands.AddCommand(
+                "help",
+                "help",
+                "Get a general command list",
+                Help, false, true);
 
             MainConsole.Instance.Info("[GUIConsole] initialized.");
         }

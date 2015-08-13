@@ -47,7 +47,7 @@ namespace WhiteCore.Modules.Archivers
         /// <summary>
         /// The default save/load archive directory.
         /// </summary>
-        string m_archiveDirectory = Constants.DEFAULT_USERINVENTORY_DIR;
+        string m_archiveDirectory = "";
 
         /// <value>
         ///     All scenes that this module knows about
@@ -143,6 +143,10 @@ namespace WhiteCore.Modules.Archivers
             m_registry.RegisterModuleInterface<IInventoryArchiverModule>(this);
             if (m_scenes.Count == 0)
             {
+                // set default path to user archives
+                var defpath = registry.RequestModuleInterface<ISimulationBase>().DefaultDataPath;
+                m_archiveDirectory = Path.Combine (defpath, Constants.DEFAULT_USERINVENTORY_DIR);
+
                 OnInventoryArchiveSaved += SaveIARConsoleCommandCompleted;
 
                 if (MainConsole.Instance != null)

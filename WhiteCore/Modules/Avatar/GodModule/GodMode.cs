@@ -75,7 +75,7 @@ namespace WhiteCore.Modules.Gods
             if (m_savestate_oar_directory == "")
             {
                 var simBase =  scene.RequestModuleInterface<ISimulationBase>();
-                m_savestate_oar_directory = Path.Combine(simBase.DefaultDataPath, "/Region/SaveStates/");
+                m_savestate_oar_directory = Path.Combine(simBase.DefaultDataPath, "Region/SaveStates/");
             }
 
             scene.EventManager.OnNewClient += OnNewClient;

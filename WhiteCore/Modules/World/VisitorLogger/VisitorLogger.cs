@@ -75,7 +75,7 @@ namespace WhiteCore.Modules.VisitorLogger
                 if (m_fileName == "")
                 {
                     var simBase = scene.RequestModuleInterface<ISimulationBase> ();
-                    m_fileName = Path.Combine(simBase.DefaultDataPath, "/Vistors.log");
+                    m_fileName = Path.Combine(simBase.DefaultDataPath, "Vistors.log");
                 }
                 
                 scene.EventManager.OnMakeRootAgent += OnMakeRootAgent;

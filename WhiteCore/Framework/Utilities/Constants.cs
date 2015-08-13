@@ -35,14 +35,17 @@ namespace WhiteCore.Framework.Utilities
         // some predefined folders
         public const string DEFAULT_CONFIG_DIR = "../Config";
         public const string DEFAULT_DATA_DIR = "../Data";
-        public const string DEFAULT_ASSETCACHE_DIR = DEFAULT_DATA_DIR+"/AssetCache";
-        public const string DEFAULT_SCRIPTENGINE_DIR = DEFAULT_DATA_DIR+"/ScriptEngines";
-        public const string DEFAULT_FILEASSETS_DIR = DEFAULT_DATA_DIR+"/FileAssets";
-        public const string DEFAULT_AVATARARCHIVE_DIR = DEFAULT_DATA_DIR+"/AvatarArchives";
-        public const string DEFAULT_OARARCHIVE_DIR = DEFAULT_DATA_DIR + "/OarFiles";
-        public const string DEFAULT_USERINVENTORY_DIR = DEFAULT_DATA_DIR+"/UserArchives";
 
-        public const string DEFAULT_USERHTML_DIR = DEFAULT_DATA_DIR+"/html/";
+        // all these are relative to the default data directory,
+        // set either as above or via configuration
+        public const string DEFAULT_ASSETCACHE_DIR = "AssetCache";
+        public const string DEFAULT_SCRIPTENGINE_DIR = "ScriptEngines";
+        public const string DEFAULT_FILEASSETS_DIR = "FileAssets";
+        public const string DEFAULT_AVATARARCHIVE_DIR = "AvatarArchives";
+        public const string DEFAULT_OARARCHIVE_DIR = "OarFiles";
+        public const string DEFAULT_USERINVENTORY_DIR = "UserArchives";
+
+        public const string DEFAULT_USERHTML_DIR = "html";
 
         public const int RegionSize = 256;
         public const int RegionHeight = 10000;

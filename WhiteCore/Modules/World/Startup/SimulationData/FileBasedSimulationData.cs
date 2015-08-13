@@ -823,12 +823,12 @@ namespace WhiteCore.Modules
                 m_storeDirectory =
                     PathHelpers.ComputeFullPath(config.GetString("StoreBackupDirectory", m_storeDirectory));
                 if (m_storeDirectory == "")
-                    m_storeDirectory = Path.Combine(defaultDataPath, "/Region");
+                    m_storeDirectory = Path.Combine(defaultDataPath, "Region");
        
                 m_oldSaveDirectory =
                     PathHelpers.ComputeFullPath(config.GetString("PreviousBackupDirectory", m_oldSaveDirectory));
                 if (m_oldSaveDirectory == "")
-                    m_oldSaveDirectory = Path.Combine(defaultDataPath, "/RegionBak");
+                    m_oldSaveDirectory = Path.Combine(defaultDataPath, "RegionBak");
 
                 m_removeArchiveDays = config.GetInt("ArchiveDays", m_removeArchiveDays);
                                

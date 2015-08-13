@@ -265,7 +265,7 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
         void SaveSystemUserPassword(string userType, string userName, string password)
         {
             var simBase = m_registry.RequestModuleInterface<ISimulationBase> ();
-            string passFile = Path.Combine (simBase.DefaultDataPath, "/" + userType + ".txt");
+            string passFile = Path.Combine (simBase.DefaultDataPath, userType + ".txt");
             string userInfo = userType + " user";
 
             if (File.Exists (passFile))

@@ -26,6 +26,12 @@
  */
 
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Timers;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.Configuration;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.ModuleLoader;
@@ -38,12 +44,6 @@ using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Other;
 using WhiteCore.Framework.Utilities;
 using WhiteCore.Services.DataService;
-using Nini.Config;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Timers;
 
 namespace WhiteCore.Simulation.Base
 {
@@ -164,8 +164,7 @@ namespace WhiteCore.Simulation.Base
             m_configurationLoader = configLoader;
 
             // This thread will go on to become the console listening thread
-            if (System.Threading.Thread.CurrentThread.Name != "ConsoleThread")
-                System.Threading.Thread.CurrentThread.Name = "ConsoleThread";
+            System.Threading.Thread.CurrentThread.Name = "ConsoleThread";
 
             //Register the interface
             ApplicationRegistry.RegisterModuleInterface<ISimulationBase>(this);
@@ -190,6 +189,10 @@ namespace WhiteCore.Simulation.Base
 
             if (startupConfig != null)
             {
+                m_defaultDataPath = startupConfig.GetString("DataDirectory", Constants.DEFAULT_DATA_DIR);
+                if (m_defaultDataPath == "")
+                    m_defaultDataPath = Constants.DEFAULT_DATA_DIR;
+                
                 m_startupCommandsFile = startupConfig.GetString("startup_console_commands_file", "startup_commands.txt");
                 m_shutdownCommandsFile = startupConfig.GetString("shutdown_console_commands_file",
                                                                  "shutdown_commands.txt");
@@ -223,11 +226,7 @@ namespace WhiteCore.Simulation.Base
                 
             }
 
-            IConfig fileConfig = m_config.Configs["FileBasedSimulationData"];
-            if (fileConfig != null)
-                DefaultDataPath = 
-                    PathHelpers.ComputeFullPath(fileConfig.GetString("DataDirectory", Constants.DEFAULT_DATA_DIR));
-            
+
             if (Util.FireAndForgetMethod == FireAndForgetMethod.SmartThreadPool)
                 Util.InitThreadPool(stpMinThreads, stpMaxThreads);
 

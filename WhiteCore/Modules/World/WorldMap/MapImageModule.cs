@@ -25,22 +25,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.ConsoleFramework;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.SceneInfo;
-using WhiteCore.Framework.SceneInfo.Entities;
-using WhiteCore.Framework.Services.ClassHelpers.Assets;
-using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.Imaging;
-using OpenMetaverse.StructuredData;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Timers;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.Imaging;
+using OpenMetaverse.StructuredData;
+using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.SceneInfo;
+using WhiteCore.Framework.SceneInfo.Entities;
+using WhiteCore.Framework.Services.ClassHelpers.Assets;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.WorldMap
 {
@@ -77,10 +77,10 @@ namespace WhiteCore.Modules.WorldMap
         bool m_generateMapTiles = true;
         UUID staticMapTileUUID = UUID.Zero;
         UUID regionMapTileUUID = UUID.Zero;
-        bool m_asyncMapTileCreation = false;
-        string m_assetCacheDir = Constants.DEFAULT_ASSETCACHE_DIR;
-        string m_assetMapCacheDir = Constants.DEFAULT_ASSETCACHE_DIR + "/mapzoomlevels";
-        string m_assetWorldviewCacheDir = Constants.DEFAULT_ASSETCACHE_DIR + "/Worldview";
+        bool m_asyncMapTileCreation;
+        string m_assetCacheDir = "";
+        string m_assetMapCacheDir = "";
+        string m_assetWorldviewCacheDir = "";
 
         #region IMapImageGenerator Members
 
@@ -236,12 +236,15 @@ namespace WhiteCore.Modules.WorldMap
             {
                 string name = scene.RegionInfo.RegionName;
                 name = name.Replace(' ', '_');
+
+                // do we have a specific map tile to use?
                 string regionMapTile = m_config.Configs["MapModule"].GetString(name + "MaptileStaticUUID", "");
                 if (regionMapTile != "")
                 {
-                    //It exists, override the default
+                    // It exists, override the default
                     UUID.TryParse(regionMapTile, out regionMapTileUUID);
                 }
+
                 m_asyncMapTileCreation = m_config.Configs["MapModule"].GetBoolean("UseAsyncMapTileCreation",
                                                                                   m_asyncMapTileCreation);
                 minutes = m_config.Configs["MapModule"].GetDouble("TimeBeforeMapTileRegeneration", minutes);
@@ -250,10 +253,19 @@ namespace WhiteCore.Modules.WorldMap
                               out staticMapTileUUID);
             }
 
-            // get cache dir
-            m_assetCacheDir = m_config.Configs ["AssetCache"].GetString ("CacheDirectory",m_assetCacheDir);
-            m_assetMapCacheDir = m_assetCacheDir + "/mapzoomlevels";
-            m_assetWorldviewCacheDir = m_assetCacheDir + "/Worldview";
+            // setup cache directories
+            if (m_assetCacheDir == "")
+            {
+                m_assetCacheDir = m_config.Configs ["AssetCache"].GetString ("CacheDirectory",m_assetCacheDir);
+
+                if (m_assetCacheDir == "")  // use default
+                {
+                    var defpath = m_scene.RequestModuleInterface<ISimulationBase> ().DefaultDataPath;
+                    m_assetCacheDir = Path.Combine (defpath, Constants.DEFAULT_ASSETCACHE_DIR);
+                }
+                m_assetMapCacheDir = Path.Combine (m_assetCacheDir, "mapzoomlevels");
+                m_assetWorldviewCacheDir = Path.Combine (m_assetCacheDir, "Worldview");
+            }
 
 
             m_scene.RegisterModuleInterface<IMapImageGenerator>(this);
@@ -351,7 +363,7 @@ namespace WhiteCore.Modules.WorldMap
             }
         }
 
-        private void OnUpdateRegion(object source, ElapsedEventArgs e)
+        void OnUpdateRegion(object source, ElapsedEventArgs e)
         {
             if (m_scene != null)
             {
@@ -361,7 +373,7 @@ namespace WhiteCore.Modules.WorldMap
             }
         }
 
-        private void OnTimedCreateNewMapImage(object source, ElapsedEventArgs e)
+        void OnTimedCreateNewMapImage(object source, ElapsedEventArgs e)
         {
             if (m_scene.SimulationDataService.MapTileNeedsGenerated)
             {
@@ -544,7 +556,7 @@ namespace WhiteCore.Modules.WorldMap
         /// Generates the overlay.
         /// </summary>
         /// <returns>The overlay.</returns>
-        private Byte[] GenerateOverlay()
+        Byte[] GenerateOverlay()
         {
             Bitmap overlay = new Bitmap(m_scene.RegionInfo.RegionSizeX, m_scene.RegionInfo.RegionSizeY);
 
@@ -660,7 +672,7 @@ namespace WhiteCore.Modules.WorldMap
         }
 
         // From msdn
-        private static ImageCodecInfo GetEncoderInfo(String mimeType)
+        static ImageCodecInfo GetEncoderInfo(String mimeType)
         {
             ImageCodecInfo[] encoders = ImageCodecInfo.GetImageEncoders();
             foreach (ImageCodecInfo t in encoders)
@@ -670,7 +682,7 @@ namespace WhiteCore.Modules.WorldMap
             return null;
         }
 
-        private Bitmap OverlayBitmapText(Image bMap, string overlayText)
+        Bitmap OverlayBitmapText(Image bMap, string overlayText)
         {
             Bitmap newMap = new Bitmap(bMap);
             Graphics temp = Graphics.FromImage(newMap);
@@ -682,7 +694,7 @@ namespace WhiteCore.Modules.WorldMap
 
         #endregion
 
-        private Bitmap DrawObjectVolume(IScene whichScene, Bitmap mapbmp)
+        Bitmap DrawObjectVolume(IScene whichScene, Bitmap mapbmp)
         {
             ITerrainChannel heightmap = whichScene.RequestModuleInterface<ITerrainChannel>();
             //MainConsole.Instance.Info("[MAPTILE]: Generating Maptile Step 2: Object Volume Profile");
@@ -1010,7 +1022,7 @@ namespace WhiteCore.Modules.WorldMap
             return mapbmp;
         }
 
-        private void ReadCacheMap()
+        void ReadCacheMap()
         {
             if (!Directory.Exists(m_assetCacheDir))
                 Directory.CreateDirectory(m_assetCacheDir);
@@ -1043,7 +1055,7 @@ namespace WhiteCore.Modules.WorldMap
             }
         }
 
-        private bool DeserializeCache(string file)
+        bool DeserializeCache(string file)
         {
             OSDMap map = OSDParser.DeserializeJson(file) as OSDMap;
             if (map == null)
@@ -1061,7 +1073,7 @@ namespace WhiteCore.Modules.WorldMap
             return true;
         }
 
-        private void SaveCache()
+        void SaveCache()
         {
             OSDMap map = SerializeCache();
             FileStream stream =
@@ -1073,7 +1085,7 @@ namespace WhiteCore.Modules.WorldMap
             writer.Close();
         }
 
-        private OSDMap SerializeCache()
+        OSDMap SerializeCache()
         {
             OSDMap map = new OSDMap();
             foreach (KeyValuePair<UUID, Color> kvp in m_mapping)
@@ -1083,12 +1095,12 @@ namespace WhiteCore.Modules.WorldMap
             return map;
         }
 
-        private Color computeAverageColor(UUID textureID, Color defaultColor)
+        Color computeAverageColor(UUID textureID, Color defaultColor)
         {
             if (m_mapping == null)
             {
                 m_mapping = new Dictionary<UUID, Color>();
-                this.ReadCacheMap();
+                ReadCacheMap();
             }
             if (textureID == UUID.Zero) return defaultColor; // not set
             if (m_mapping.ContainsKey(textureID)) return m_mapping[textureID]; // one of the predefined textures
@@ -1101,7 +1113,7 @@ namespace WhiteCore.Modules.WorldMap
             return color;
         }
 
-        private Bitmap fetchTexture(UUID id)
+        Bitmap fetchTexture(UUID id)
         {
             byte[] asset = m_scene.AssetService.GetData(id.ToString());
             //MainConsole.Instance.DebugFormat("Fetched texture {0}, found: {1}", id, asset != null);
@@ -1133,7 +1145,7 @@ namespace WhiteCore.Modules.WorldMap
         }
 
         // Compute the average color of a texture.
-        private Color computeAverageColor(Bitmap bmp)
+        Color computeAverageColor(Bitmap bmp)
         {
             FastBitmap unsafeBMP = new FastBitmap(bmp);
             // we have 256 x 256 pixel, each with 256 possible color-values per
@@ -1160,7 +1172,7 @@ namespace WhiteCore.Modules.WorldMap
             return Color.FromArgb(r/pixels, g/pixels, b/pixels);
         }
 
-        private Point project(Vector3 point3d, Vector3 originpos)
+        Point project(Vector3 point3d, Vector3 originpos)
         {
             Point returnpt = new Point
                                  {X = (int) point3d.X, Y = (int) ((m_scene.RegionInfo.RegionSizeY - 1) - point3d.Y)};

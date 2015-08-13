@@ -59,7 +59,7 @@ namespace WhiteCore.Modules.Archivers
         IInventoryService inventoryService;
         IUserAccountService userAccountService;
         IRegistryCore m_registry;
-        string m_storeDirectory = Constants.DEFAULT_AVATARARCHIVE_DIR;
+        string m_storeDirectory = "";
 
         #endregion
 
@@ -775,7 +775,10 @@ namespace WhiteCore.Modules.Archivers
                 m_storeDirectory =
                     PathHelpers.ComputeFullPath (avatarConfig.GetString ("AvatarArchiveDirectory", m_storeDirectory));
                 if (m_storeDirectory == "")
-                    m_storeDirectory = Constants.DEFAULT_AVATARARCHIVE_DIR;
+                {
+                    var defpath = registry.RequestModuleInterface<ISimulationBase> ().DefaultDataPath;
+                    m_storeDirectory = Path.Combine(defpath, Constants.DEFAULT_AVATARARCHIVE_DIR);
+                }
             }
 
             bool remoteCalls = false;

@@ -25,17 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.ConsoleFramework;
-using WhiteCore.Framework.ModuleLoader;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.Servers;
-using WhiteCore.Framework.Servers.HttpServer;
-using WhiteCore.Framework.Servers.HttpServer.Implementation;
-using WhiteCore.Framework.Services;
-using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -47,7 +36,18 @@ using System.Text.RegularExpressions;
 using System.Web;
 using System.Xml;
 using System.Xml.Xsl;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
+using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.DatabaseInterfaces;
+using WhiteCore.Framework.ModuleLoader;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.Servers;
+using WhiteCore.Framework.Servers.HttpServer;
+using WhiteCore.Framework.Servers.HttpServer.Implementation;
+using WhiteCore.Framework.Services;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.Web
 {
@@ -61,6 +61,7 @@ namespace WhiteCore.Modules.Web
         protected Dictionary<string, IWebInterfacePage> _pages = new Dictionary<string, IWebInterfacePage>();
         protected List<ITranslator> _translators = new List<ITranslator>();
         protected ITranslator _defaultTranslator;
+        protected string m_localHtmlPath = "";
 
         // webpages and settings cacheing
         internal GridPage webPages;
@@ -161,6 +162,13 @@ namespace WhiteCore.Modules.Web
                 var server = registry.RequestModuleInterface<ISimulationBase>().GetHttpServer(_port);
                 server.AddStreamHandler(new GenericStreamHandler("GET", "/", FindAndSendPage));
                 server.AddStreamHandler(new GenericStreamHandler("POST", "/", FindAndSendPage));
+
+                // set local path in case..
+                if (m_localHtmlPath == "")
+                {
+                    var defpath = registry.RequestModuleInterface<ISimulationBase> ().DefaultDataPath;
+                    m_localHtmlPath = Path.Combine (defpath, Constants.DEFAULT_USERHTML_DIR);
+                }
             }
         }
 
@@ -560,7 +568,7 @@ namespace WhiteCore.Modules.Web
                 string file;
                 if (filePath.StartsWith("local/"))                      // local included files 
                 {
-                    file = Constants.DEFAULT_USERHTML_DIR+filePath.Remove(0,6);
+                    file = Path.Combine (m_localHtmlPath, filePath.Remove(0,6));
                 }
                 else                                                    // 'normal' page processing
                 {
