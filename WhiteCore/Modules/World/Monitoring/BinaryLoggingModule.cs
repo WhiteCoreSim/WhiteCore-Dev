@@ -25,23 +25,23 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.IO;
+using Nini.Config;
+using OpenMetaverse.Packets;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
-using Nini.Config;
-using OpenMetaverse.Packets;
-using System;
-using System.IO;
 
 namespace WhiteCore.Modules.Monitoring
 {
     public class BinaryLoggingModule : INonSharedRegionModule
     {
-        private static StatLogger m_statLog;
-        private static TimeSpan m_statLogPeriod = TimeSpan.FromSeconds(300);
-        private static string m_statsDir = MainConsole.Instance.LogPath;
-        private static readonly Object m_statLockObject = new Object();
+        static StatLogger m_statLog;
+        static TimeSpan m_statLogPeriod = TimeSpan.FromSeconds(300);
+        static string m_statsDir = MainConsole.Instance.LogPath;
+        static readonly Object m_statLockObject = new Object();
 
         protected bool m_collectStats;
         protected IScene m_scene;
@@ -116,7 +116,7 @@ namespace WhiteCore.Modules.Monitoring
 
         #endregion
 
-        private void LogSimStats(SimStats stats)
+        void LogSimStats(SimStats stats)
         {
             SimStatsPacket pack = new SimStatsPacket
                                       {Region = stats.RegionBlock, Stat = stats.StatsBlock, Header = {Reliable = false}};
@@ -155,7 +155,7 @@ namespace WhiteCore.Modules.Monitoring
                 }
                 catch (Exception ex)
                 {
-                    MainConsole.Instance.ErrorFormat("statistics gathering failed: {0}", ex.ToString());
+                    MainConsole.Instance.ErrorFormat("statistics gathering failed: {0}", ex);
                     if (m_statLog != null && m_statLog.Log != null)
                     {
                         m_statLog.Log.Close();

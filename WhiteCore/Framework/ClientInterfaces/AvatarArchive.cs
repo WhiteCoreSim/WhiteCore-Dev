@@ -25,9 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.Modules;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
+using WhiteCore.Framework.Modules;
 
 namespace WhiteCore.Framework.ClientInterfaces
 {
@@ -42,6 +42,11 @@ namespace WhiteCore.Framework.ClientInterfaces
         ///     true/false if its public
         /// </summary>
         public bool IsPublic;
+
+        /// <summary>
+        ///     true/false if it is a portabl;e archive
+        /// </summary>
+        public bool IsPortable;
 
         /// <summary>
         ///     Name of the archive
@@ -73,6 +78,7 @@ namespace WhiteCore.Framework.ClientInterfaces
             FolderName = map["FolderName"];
             Snapshot = map["Snapshot"];
             IsPublic = map["Public"];
+            IsPortable = map["Portable"];
         }
 
         public override OSDMap ToOSD()
@@ -85,6 +91,7 @@ namespace WhiteCore.Framework.ClientInterfaces
             map["FolderName"] = FolderName;
             map["Snapshot"] = Snapshot;
             map["Public"] = IsPublic;
+            map["Portable"] = IsPortable;
 
             return map;
         }

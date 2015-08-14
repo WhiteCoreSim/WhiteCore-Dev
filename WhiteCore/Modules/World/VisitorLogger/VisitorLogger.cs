@@ -28,12 +28,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.PresenceInfo;
-using WhiteCore.Framework.SceneInfo;
 using Nini.Config;
 using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.PresenceInfo;
+using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.VisitorLogger
@@ -46,7 +46,7 @@ namespace WhiteCore.Modules.VisitorLogger
         #region Declares
 
         protected bool m_enabled;
-        protected string m_fileName = "Vistors.log";
+        protected string m_fileName = "";
         protected Dictionary<UUID, DateTime> m_timesOfUsers = new Dictionary<UUID, DateTime>();
 
         #endregion
@@ -60,11 +60,6 @@ namespace WhiteCore.Modules.VisitorLogger
             {
                 m_enabled = config.GetBoolean("Enabled", m_enabled);
                 m_fileName = config.GetString("FileName", m_fileName);
-
-                // verify path details
-                string filePath = Path.GetDirectoryName (m_fileName);
-                if (filePath == "")
-                    m_fileName = Path.Combine (Constants.DEFAULT_DATA_DIR, m_fileName);
             }
         }
 
@@ -76,8 +71,16 @@ namespace WhiteCore.Modules.VisitorLogger
         {
             if (m_enabled)
             {
+                // verify log location
+                if (m_fileName == "")
+                {
+                    var simBase = scene.RequestModuleInterface<ISimulationBase> ();
+                    m_fileName = Path.Combine(simBase.DefaultDataPath, "Vistors.log");
+                }
+                
                 scene.EventManager.OnMakeRootAgent += OnMakeRootAgent;
                 scene.EventManager.OnClosingClient += EventManager_OnClosingClient;
+
             }
         }
 

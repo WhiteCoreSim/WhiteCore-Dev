@@ -934,7 +934,6 @@ namespace WhiteCore.Framework.Utilities
             default:                                return "System Generated";
             }
         }
+
     }
-
-
-}
+ }

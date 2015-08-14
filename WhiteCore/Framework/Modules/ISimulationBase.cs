@@ -25,11 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using Nini.Config;
 using WhiteCore.Framework.Configuration;
 using WhiteCore.Framework.Servers.HttpServer.Interfaces;
 using WhiteCore.Framework.Services.ClassHelpers.Other;
-using Nini.Config;
-using System;
 
 namespace WhiteCore.Framework.Modules
 {
@@ -114,5 +114,8 @@ namespace WhiteCore.Framework.Modules
         ///     Start console processing
         /// </summary>
         void Run();
+
+        // where all volatile data is kept
+        string DefaultDataPath { get; set; }
     }
 }

@@ -28,8 +28,8 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
-using WhiteCore.Framework.ConsoleFramework;
 using OpenMetaverse;
+using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.ClientStack
@@ -170,7 +170,7 @@ namespace WhiteCore.ClientStack
             }
         }
 
-        private void AsyncBeginReceive()
+        void AsyncBeginReceive()
         {
             // allocate a packet buffer
             //WrappedObject<UDPPacketBuffer> wrappedBuffer = Pool.CheckOut();
@@ -234,7 +234,7 @@ namespace WhiteCore.ClientStack
             }
         }
 
-        private void AsyncEndReceive(IAsyncResult iar)
+        void AsyncEndReceive(IAsyncResult iar)
         {
             // Asynchronous receive operations will complete here through the call
             // to AsyncBeginReceive
@@ -269,7 +269,7 @@ namespace WhiteCore.ClientStack
                 }
                 catch (Exception ex)
                 {
-                    MainConsole.Instance.Error("[UDPBase]: Hit error: " + ex.ToString());
+                    MainConsole.Instance.Error("[UDPBase]: Hit error: " + ex);
                 }
                 finally
                 {

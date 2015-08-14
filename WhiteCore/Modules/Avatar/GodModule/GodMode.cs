@@ -28,6 +28,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Nini.Config;
 using OpenMetaverse;
 using WhiteCore.Framework.ClientInterfaces;
@@ -60,9 +61,8 @@ namespace WhiteCore.Modules.Gods
                     m_Enabled = false;
                     return;
                 }
+
                 m_savestate_oar_directory = source.Configs ["GodModule"].GetString ("DirectoryForSaveStateOARs", m_savestate_oar_directory);
-                if (m_savestate_oar_directory == "")
-                    m_savestate_oar_directory = Constants.DEFAULT_DATA_DIR + "/Region/SaveStates/";
             }
         }
 
@@ -70,6 +70,13 @@ namespace WhiteCore.Modules.Gods
         {
             if (!m_Enabled)
                 return;
+
+            // set the savestate location if not configured
+            if (m_savestate_oar_directory == "")
+            {
+                var simBase =  scene.RequestModuleInterface<ISimulationBase>();
+                m_savestate_oar_directory = Path.Combine(simBase.DefaultDataPath, "Region/SaveStates/");
+            }
 
             scene.EventManager.OnNewClient += OnNewClient;
             scene.EventManager.OnClosingClient += OnClosingClient;

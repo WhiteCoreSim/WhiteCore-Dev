@@ -773,7 +773,7 @@ namespace WhiteCore.Framework.Utilities
 
         public static bool LoadArchSpecificWindowsDll(string libraryName)
         {
-            // We do this so that OpenSimulator on Windows loads the correct native library depending on whether
+            // We do this so that WhiteCore on Windows loads the correct native library depending on whether
             // it's running as a 32-bit process or a 64-bit one.  By invoking LoadLibary here, later DLLImports
             // will find it already loaded later on.
             //
@@ -795,10 +795,9 @@ namespace WhiteCore.Framework.Utilities
 
                 return false;
             }
-            else
-            {
-                return true;
-            }
+
+            return true;
+
         }
 
         /// <summary>

@@ -41,7 +41,7 @@ namespace WhiteCore.Framework.ConsoleFramework
     public class LocalConsole : CommandConsole
     {
 
-        private static readonly ConsoleColor[] Colors =
+        static readonly ConsoleColor[] Colors =
             {
                 // the dark colors don't seem to be visible on some black background terminals like putty :(
                 //ConsoleColor.DarkBlue,
@@ -75,26 +75,27 @@ namespace WhiteCore.Framework.ConsoleFramework
 
         public override void Initialize(IConfigSource source, ISimulationBase simBase)
         {
-            if (source.Configs["Console"] != null)
+            if (source.Configs ["Console"] == null ||
+                source.Configs ["Console"].GetString ("Console", Name) != Name)
             {
-                if (source.Configs["Console"].GetString("Console", Name) != Name)
-                    return;
-            }
-            else
                 return;
+            }
 
             simBase.ApplicationRegistry.RegisterModuleInterface<ICommandConsole>(this);
             MainConsole.Instance = this;
 
-            m_Commands.AddCommand("help", "help",
-                                  "Get a general command list", base.Help, false, true);
+            m_Commands.AddCommand(
+                "help",
+                "help",
+                "Get a general command list",
+                Help, false, true);
 
             string logName = "";
-            string logPath = Constants.DEFAULT_DATA_DIR;
-            if (source.Configs ["Console"] != null) {
-                logName = source.Configs ["Console"].GetString ("LogAppendName", logName);
-                logPath = source.Configs ["Console"].GetString ("LogPath", logPath);
-            }
+            string logPath = "";
+            logName = source.Configs ["Console"].GetString ("LogAppendName", logName);
+            logPath = source.Configs ["Console"].GetString ("LogPath", logPath);
+            if (logPath == "")
+                logPath = simBase.DefaultDataPath;
 
             InitializeLog(logPath, logName);
         }

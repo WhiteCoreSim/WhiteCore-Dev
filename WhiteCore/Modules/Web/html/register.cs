@@ -25,6 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
@@ -32,10 +36,6 @@ using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Profile;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
 using RegionFlags = WhiteCore.Framework.Services.RegionFlags;
 
 
@@ -112,10 +112,11 @@ namespace WhiteCore.Modules.Web
             bool anonymousLogins;
 
             // allow configuration to override the web settings
-            IConfig config = webInterface.Registry.RequestModuleInterface<ISimulationBase>().ConfigSource.Configs ["LoginService"];
-            if (config != null)
+            var simBase = webInterface.Registry.RequestModuleInterface<ISimulationBase>();
+            IConfig loginServerConfig = simBase.ConfigSource.Configs["LoginService"];
+            if (loginServerConfig != null)
             {
-                anonymousLogins = config.GetBoolean ("AllowAnonymousLogin", allowRegistration);
+                anonymousLogins = loginServerConfig.GetBoolean ("AllowAnonymousLogin", allowRegistration);
                 allowRegistration = (allowRegistration || anonymousLogins);
             }
 
@@ -350,13 +351,11 @@ namespace WhiteCore.Modules.Web
             vars.Add("AvatarArchive", avatarArchives);
 
 
-            IConfig loginServerConfig =
-                webInterface.Registry.RequestModuleInterface<ISimulationBase>().ConfigSource.Configs["LoginService"];
             string tosLocation = "";
             if (loginServerConfig != null && loginServerConfig.GetBoolean("UseTermsOfServiceOnFirstLogin", false))
             {
                 tosLocation = loginServerConfig.GetString("FileNameOfTOS", "");
-                tosLocation = PathHelpers.VerifyReadFile (tosLocation,  ".txt", Constants.DEFAULT_DATA_DIR);
+                tosLocation = PathHelpers.VerifyReadFile (tosLocation,  ".txt", simBase.DefaultDataPath);
             }
             string ToS = "There are no Terms of Service currently. This may be changed at any point in the future.";
 

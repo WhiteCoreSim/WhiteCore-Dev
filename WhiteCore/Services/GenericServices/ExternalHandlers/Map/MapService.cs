@@ -53,7 +53,7 @@ namespace WhiteCore.Services
         bool m_cacheEnabled = true;
         float m_cacheExpires = 24;
         IAssetService m_assetService;
-        string m_assetCacheDir = Constants.DEFAULT_ASSETCACHE_DIR;
+        string m_assetCacheDir = "";
         string m_assetMapCacheDir;
         IGridService m_gridService;
         IJ2KDecoder m_j2kDecoder;
@@ -78,6 +78,11 @@ namespace WhiteCore.Services
             if (m_cacheEnabled)
             {
                 m_assetCacheDir = config.Configs ["AssetCache"].GetString ("CacheDirectory",m_assetCacheDir);
+                if (m_assetCacheDir == "")
+                {
+                    var defpath = registry.RequestModuleInterface<ISimulationBase> ().DefaultDataPath;
+                    m_assetCacheDir = Path.Combine (defpath, Constants.DEFAULT_ASSETCACHE_DIR);
+                }
                 CreateCacheDirectories (m_assetCacheDir);
             }
 

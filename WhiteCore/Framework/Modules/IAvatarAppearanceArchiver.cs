@@ -25,9 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.ClientInterfaces;
-using OpenMetaverse;
 using System.Collections.Generic;
+using OpenMetaverse;
+using WhiteCore.Framework.ClientInterfaces;
 
 namespace WhiteCore.Framework.Modules
 {
@@ -35,7 +35,8 @@ namespace WhiteCore.Framework.Modules
     {
         AvatarArchive LoadAvatarArchive(string FileName, UUID principalID);
 
-        bool SaveAvatarArchive(string fileName, UUID principalID, string folderName, UUID snapshotUUID, bool isPublic);
+        bool SaveAvatarArchive(string fileName, UUID principalID, string folderName,
+            UUID snapshotUUID, bool isPublic, bool isPortable);
 
         /// <summary>
         /// Gets all public avatar archives

@@ -25,6 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Xml;
+using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
@@ -33,12 +39,6 @@ using WhiteCore.Framework.Serialization.External;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Assets;
 using WhiteCore.Framework.Services.ClassHelpers.Inventory;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Xml;
 
 namespace WhiteCore.Modules.Archivers
 {
@@ -71,7 +71,7 @@ namespace WhiteCore.Modules.Archivers
         /// <value>
         ///     The stream to which the inventory archive will be saved.
         /// </value>
-        private readonly Stream m_saveStream;
+        readonly Stream m_saveStream;
 
         readonly UserAccount m_userInfo;
         protected TarArchiveWriter m_archiveWriter;
@@ -90,7 +90,7 @@ namespace WhiteCore.Modules.Archivers
         /// </value>
         protected Guid m_id;
 
-        private string m_invPath;
+        string m_invPath;
 
         /// <value>
         ///     We only use this to request modules
@@ -258,7 +258,7 @@ namespace WhiteCore.Modules.Archivers
         /// <param name="UserID">The user</param>
         /// <param name="InvItem">The inventory item</param>
         /// <returns>Whether the user is allowed to export the object to an IAR</returns>
-        private bool CanUserArchiveObject(UUID UserID, InventoryItemBase InvItem)
+        bool CanUserArchiveObject(UUID UserID, InventoryItemBase InvItem)
         {
             if (FilterContent == null || FilterContent == "")
                 return true;// Default To Allow Export
@@ -287,9 +287,6 @@ namespace WhiteCore.Modules.Archivers
         /// </summary>
         public void Execute()
         {
-
-
-
             try
             {
                 InventoryFolderBase inventoryFolder = null;

@@ -3,6 +3,11 @@
 ;; Edit Sim/Main.ini   to select your Install Setup and follow to next appropriate file
 ;;
 [Startup]
+;; Directory path for all data
+;; Normally this will be the '../Data' directory, but you can change this to anywhere on your hard drive
+;; Default is "" 
+DataDirectory = ""
+
 ;; Set this to true if you want to log crashes to disk
 ;; this can be useful when submitting bug reports.
 save_crashes = false

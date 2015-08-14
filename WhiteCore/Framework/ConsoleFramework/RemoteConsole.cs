@@ -28,19 +28,19 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Web;
 using System.Xml;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Servers;
 using WhiteCore.Framework.Servers.HttpServer;
-using WhiteCore.Framework.Servers.HttpServer.Interfaces;
-using Nini.Config;
-using OpenMetaverse;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
-using System.IO;
-using System.Text;
+using WhiteCore.Framework.Servers.HttpServer.Interfaces;
 
 namespace WhiteCore.Framework.ConsoleFramework
 {
@@ -55,17 +55,17 @@ namespace WhiteCore.Framework.ConsoleFramework
     //
     public class RemoteConsole : CommandConsole
     {
-        private readonly Dictionary<UUID, ConsoleConnection> m_Connections =
+        readonly Dictionary<UUID, ConsoleConnection> m_Connections =
             new Dictionary<UUID, ConsoleConnection>();
 
-        private readonly ManualResetEvent m_DataEvent = new ManualResetEvent(false);
-        private readonly List<string> m_InputData = new List<string>();
-        private readonly List<string> m_Scrollback = new List<string>();
-        private long m_LineNumber;
+        readonly ManualResetEvent m_DataEvent = new ManualResetEvent(false);
+        readonly List<string> m_InputData = new List<string>();
+        readonly List<string> m_Scrollback = new List<string>();
+        long m_LineNumber;
 
-        private string m_Password = String.Empty;
-        private IHttpServer m_Server;
-        private string m_UserName = String.Empty;
+        string m_Password = String.Empty;
+        IHttpServer m_Server;
+        string m_UserName = String.Empty;
 
         public override string Name
         {
@@ -94,7 +94,11 @@ namespace WhiteCore.Framework.ConsoleFramework
 
             SetServer(m_consolePort == 0 ? MainServer.Instance : simbase.GetHttpServer(m_consolePort));
 
-            m_Commands.AddCommand("help", "help", "Get a general command list", base.Help, false, true);
+            m_Commands.AddCommand(
+                "help",
+                "help",
+                "Get a general command list",
+                Help, false, true);
         }
 
         public void SetServer(IHttpServer server)
@@ -162,7 +166,7 @@ namespace WhiteCore.Framework.ConsoleFramework
             return cmdinput;
         }
 
-        private void DoExpire()
+        void DoExpire()
         {
             List<UUID> expired = new List<UUID>();
 
@@ -180,7 +184,7 @@ namespace WhiteCore.Framework.ConsoleFramework
             }
         }
 
-        private byte[] HandleHttpStartSession(string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
+        byte[] HandleHttpStartSession(string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {
             DoExpire();
 
@@ -207,7 +211,7 @@ namespace WhiteCore.Framework.ConsoleFramework
                 m_Connections[sessionID] = c;
             }
 
-            string uri = "/ReadResponses/" + sessionID.ToString() + "/";
+            string uri = "/ReadResponses/" + sessionID + "/";
 
             m_Server.AddPollServiceHTTPHandler(uri, new PollServiceEventArgs(null, HasEvents, GetEvents, NoEvents,
                                                                         sessionID));
@@ -237,7 +241,7 @@ namespace WhiteCore.Framework.ConsoleFramework
             return Encoding.UTF8.GetBytes(xmldoc.InnerXml);
         }
 
-        private byte[] HandleHttpCloseSession(string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
+        byte[] HandleHttpCloseSession(string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {
             DoExpire();
 
@@ -281,7 +285,7 @@ namespace WhiteCore.Framework.ConsoleFramework
             return Encoding.UTF8.GetBytes(xmldoc.InnerXml);
         }
 
-        private byte[] HandleHttpSessionCommand(string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
+        byte[] HandleHttpSessionCommand(string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {
             DoExpire();
 
@@ -331,7 +335,7 @@ namespace WhiteCore.Framework.ConsoleFramework
             return Encoding.UTF8.GetBytes(xmldoc.InnerXml);
         }
 
-        private Hashtable DecodePostString(string data)
+        Hashtable DecodePostString(string data)
         {
             Hashtable result = new Hashtable();
 
@@ -359,7 +363,7 @@ namespace WhiteCore.Framework.ConsoleFramework
         {
             try
             {
-                string uri = "/ReadResponses/" + id.ToString() + "/";
+                string uri = "/ReadResponses/" + id + "/";
 
                 m_Server.RemovePollServiceHTTPHandler("", uri);
             }
@@ -368,9 +372,9 @@ namespace WhiteCore.Framework.ConsoleFramework
             }
         }
 
-        private bool HasEvents(UUID RequestID, UUID sessionID)
+        bool HasEvents(UUID RequestID, UUID sessionID)
         {
-            ConsoleConnection c = null;
+            ConsoleConnection c;
 
             lock (m_Connections)
             {
@@ -384,9 +388,9 @@ namespace WhiteCore.Framework.ConsoleFramework
             return false;
         }
 
-        private byte[] GetEvents(UUID RequestID, UUID sessionID, string req, OSHttpResponse response)
+         byte[] GetEvents(UUID RequestID, UUID sessionID, string req, OSHttpResponse response)
         {
-            ConsoleConnection c = null;
+            ConsoleConnection c;
 
             lock (m_Connections)
             {
@@ -403,8 +407,7 @@ namespace WhiteCore.Framework.ConsoleFramework
                                                 "", "");
 
             xmldoc.AppendChild(xmlnode);
-            XmlElement rootElement = xmldoc.CreateElement("", "ConsoleSession",
-                                                          "");
+            XmlElement rootElement = xmldoc.CreateElement("", "ConsoleSession", "");
 
             if (c.newConnection)
             {
@@ -440,7 +443,7 @@ namespace WhiteCore.Framework.ConsoleFramework
             return Encoding.UTF8.GetBytes(xmldoc.InnerXml);
         }
 
-        private byte[] NoEvents(UUID RequestID, UUID id, OSHttpResponse response)
+        byte[] NoEvents(UUID RequestID, UUID id, OSHttpResponse response)
         {
             XmlDocument xmldoc = new XmlDocument();
             XmlNode xmlnode = xmldoc.CreateNode(XmlNodeType.XmlDeclaration,

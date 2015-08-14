@@ -25,24 +25,24 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using Amib.Threading;
-
-using WhiteCore.Framework.ClientInterfaces;
-using WhiteCore.Framework.ConsoleFramework;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.PresenceInfo;
-using WhiteCore.Framework.SceneInfo;
-using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.Packets;
 using System;
+
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using Amib.Threading;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.Packets;
+using WhiteCore.Framework.ClientInterfaces;
+using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.PresenceInfo;
+using WhiteCore.Framework.SceneInfo;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.ClientStack
 {
@@ -62,10 +62,10 @@ namespace WhiteCore.ClientStack
         /// </summary>
         public const int MAX_PACKET_SEND = 4;
 
-        private readonly ThreadMonitor incomingPacketMonitor = new ThreadMonitor();
-        private readonly List<IClientAPI> m_currentClients = new List<IClientAPI>();
-        private readonly ExpiringCache<UUID, uint> m_inQueueCircuitCodes = new ExpiringCache<UUID, uint>();
-        private readonly ThreadMonitor outgoingPacketMonitor = new ThreadMonitor();
+        readonly ThreadMonitor incomingPacketMonitor = new ThreadMonitor();
+        readonly List<IClientAPI> m_currentClients = new List<IClientAPI>();
+        readonly ExpiringCache<UUID, uint> m_inQueueCircuitCodes = new ExpiringCache<UUID, uint>();
+        readonly ThreadMonitor outgoingPacketMonitor = new ThreadMonitor();
 
         //PacketEventDictionary packetEvents = new PacketEventDictionary();
         /// <summary>
@@ -74,7 +74,7 @@ namespace WhiteCore.ClientStack
         /// <summary>
         ///     Incoming packets that are awaiting handling
         /// </summary>
-        private readonly OpenMetaverse.BlockingQueue<IncomingPacket> packetInbox =
+        readonly OpenMetaverse.BlockingQueue<IncomingPacket> packetInbox =
             new OpenMetaverse.BlockingQueue<IncomingPacket>();
 
         /// <summary>
@@ -105,54 +105,54 @@ namespace WhiteCore.ClientStack
         /// <summary>
         ///     Flag to process packets asynchronously or synchronously
         /// </summary>
-        private bool m_asyncPacketHandling;
+        bool m_asyncPacketHandling;
 
         /// <summary>
         ///     Manages authentication for agent circuits
         /// </summary>
         public AgentCircuitManager m_circuitManager;
 
-        private int m_defaultRTO;
+        int m_defaultRTO;
 
         /// <summary>
         ///     Keeps track of the number of 100 millisecond periods elapsed in the outgoing packet handler executed
         /// </summary>
-        private int m_elapsed100MSOutgoingPacketHandler;
+        int m_elapsed100MSOutgoingPacketHandler;
 
         /// <summary>
         ///     Keeps track of the number of 500 millisecond periods elapsed in the outgoing packet handler executed
         /// </summary>
-        private int m_elapsed500MSOutgoingPacketHandler;
+        int m_elapsed500MSOutgoingPacketHandler;
 
         /// <summary>
         ///     Keeps track of the number of elapsed milliseconds since the last time the outgoing packet handler looped
         /// </summary>
-        private int m_elapsedMSOutgoingPacketHandler;
+        int m_elapsedMSOutgoingPacketHandler;
 
         /// <summary>
         ///     Environment.TickCount of the last time that packet stats were reported to the scene
         /// </summary>
-        private int m_elapsedMSSinceLastStatReport;
+        int m_elapsedMSSinceLastStatReport;
 
-        private int m_maxRTO;
+        int m_maxRTO;
 
         /// <summary>
         ///     Tracks whether or not a packet was sent each round so we know
         ///     whether or not to sleep
         /// </summary>
-        private bool m_packetSent;
+        bool m_packetSent;
 
         /// <summary>
         ///     The size of the receive buffer for the UDP socket. This value
         ///     is passed up to the operating system and used in the system networking
         ///     stack. Use zero to leave this value as the default
         /// </summary>
-        private int m_recvBufferSize;
+        int m_recvBufferSize;
 
         /// <summary>
         ///     Flag to signal when clients should check for resends
         /// </summary>
-        private bool m_resendUnacked;
+        bool m_resendUnacked;
 
         /// <summary>
         ///     Reference to the scene this UDP server is attached to
@@ -162,12 +162,12 @@ namespace WhiteCore.ClientStack
         /// <summary>
         ///     Flag to signal when clients should send ACKs
         /// </summary>
-        private bool m_sendAcks;
+        bool m_sendAcks;
 
         /// <summary>
         ///     Flag to signal when clients should send pings
         /// </summary>
-        private bool m_sendPing;
+        bool m_sendPing;
 
         //private UDPClientCollection m_clients = new UDPClientCollection();
         /// <summary>
@@ -185,7 +185,7 @@ namespace WhiteCore.ClientStack
         /// <summary>
         ///     Environment.TickCount of the last time the outgoing packet handler executed
         /// </summary>
-        private int m_tickLastOutgoingPacketHandler;
+        int m_tickLastOutgoingPacketHandler;
 
         public Socket Server
         {
@@ -346,8 +346,8 @@ namespace WhiteCore.ClientStack
 
         #endregion
 
-        private Amib.Threading.SmartThreadPool m_ThreadPool;
-        private volatile bool m_threadPoolRunning;
+        SmartThreadPool m_ThreadPool;
+        volatile bool m_threadPoolRunning;
 
         public void FireAndForget(Action<object> callback, object obj)
         {
@@ -357,7 +357,7 @@ namespace WhiteCore.ClientStack
                 m_ThreadPool.QueueWorkItem((WorkItemCallback) SmartThreadPoolCallback, new[] {callback, obj});
         }
 
-        private static object SmartThreadPoolCallback(object o)
+        static object SmartThreadPoolCallback(object o)
         {
             object[] array = (object[]) o;
             Action<object> callback = (Action<object>) array[0];
@@ -454,17 +454,13 @@ namespace WhiteCore.ClientStack
                 {
                     byte[] data = datas[i];
                     SendPacketData(udpClient, data, packet, category, resendMethod, finishedMethod);
-                    data = null;
                 }
-                datas = null;
             }
             else
             {
                 byte[] data = packet.ToBytes();
                 SendPacketData(udpClient, data, packet, category, resendMethod, finishedMethod);
-                data = null;
             }
-            packet = null;
         }
 
         public void SendPacketData(LLUDPClient udpClient, byte[] data, Packet packet, ThrottleOutPacketType category,
@@ -737,7 +733,7 @@ namespace WhiteCore.ClientStack
             //try { Thread.CurrentThread.Name = "PacketReceived (" + m_scene.RegionInfo.RegionName + ")"; }
             //catch (Exception) { }
 
-            LLUDPClient udpClient = null;
+            LLUDPClient udpClient;
             Packet packet = null;
             int packetEnd = buffer.DataLength - 1;
             IPEndPoint address = (IPEndPoint) buffer.RemoteEndPoint;
@@ -921,7 +917,7 @@ namespace WhiteCore.ClientStack
             packetInbox.Enqueue(new IncomingPacket(udpClient, packet));
         }
 
-        private void HandleUseCircuitCode(object o)
+        void HandleUseCircuitCode(object o)
         {
             MainConsole.Instance.Debug("[LLUDPServer] HandelUserCircuitCode");
             DateTime startTime = DateTime.Now;
@@ -936,7 +932,7 @@ namespace WhiteCore.ClientStack
             if (AddClient(packet.CircuitCode.Code, packet.CircuitCode.ID,
                           packet.CircuitCode.SessionID, remoteEndPoint, sessionInfo))
             {
-                uint ack = 0;
+                uint ack;
                 lock (m_inQueueCircuitCodes)
                 {
                     ack = (uint) m_inQueueCircuitCodes[sessionInfo.AgentID];
@@ -953,7 +949,7 @@ namespace WhiteCore.ClientStack
             }
         }
 
-        private void SendAckImmediate(IPEndPoint remoteEndpoint, uint sequenceNumber)
+        void SendAckImmediate(IPEndPoint remoteEndpoint, uint sequenceNumber)
         {
             PacketAckPacket ack = new PacketAckPacket
                                       {Header = {Reliable = false}, Packets = new PacketAckPacket.PacketsBlock[1]};
@@ -970,7 +966,7 @@ namespace WhiteCore.ClientStack
             SyncSend(buffer);
         }
 
-        private bool IsClientAuthorized(UseCircuitCodePacket useCircuitCode, IPEndPoint remoteEndPoint,
+        bool IsClientAuthorized(UseCircuitCodePacket useCircuitCode, IPEndPoint remoteEndPoint,
                                         out AgentCircuitData sessionInfo)
         {
             UUID agentID = useCircuitCode.CircuitCode.ID;
@@ -980,7 +976,7 @@ namespace WhiteCore.ClientStack
             return (sessionInfo = m_circuitManager.AuthenticateSession(sessionID, agentID, circuitCode, remoteEndPoint)) != null;
         }
 
-        private void ForEachInternalClient(Action<IClientAPI> action)
+        void ForEachInternalClient(Action<IClientAPI> action)
         {
             IClientAPI[] clients = m_currentClients.ToArray();
             foreach (IClientAPI client in clients)
@@ -991,8 +987,7 @@ namespace WhiteCore.ClientStack
                                          AgentCircuitData sessionInfo)
         {
             MainConsole.Instance.Debug("[LLUDPServer] AddClient-" + circuitCode + "-" + agentID + "-" + sessionID + "-" +
-                                       remoteEndPoint +
-                                       "-" + sessionInfo);
+                                       remoteEndPoint + "-" + sessionInfo);
             IScenePresence SP;
             if (!m_scene.TryGetScenePresence(agentID, out SP))
             {
@@ -1017,7 +1012,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private void RemoveClient(LLUDPClient udpClient)
+        void RemoveClient(LLUDPClient udpClient)
         {
             // Remove this client from the scene
             IClientAPI client;
@@ -1042,7 +1037,7 @@ namespace WhiteCore.ClientStack
                 monitor.AddLogout();
         }
 
-        private bool OutgoingPacketHandlerLoop()
+        bool OutgoingPacketHandlerLoop()
         {
             if (!IsRunning)
                 return false;
@@ -1109,12 +1104,12 @@ namespace WhiteCore.ClientStack
             catch (Exception ex)
             {
                 MainConsole.Instance.ErrorFormat(
-                    "[LLUDPSERVER]: OutgoingPacketHandler loop threw an exception: {0}", ex.ToString());
+                    "[LLUDPSERVER]: OutgoingPacketHandler loop threw an exception: {0}", ex);
             }
             return true;
         }
 
-        private void ClientOutgoingPacketHandler(IClientAPI client)
+        void ClientOutgoingPacketHandler(IClientAPI client)
         {
             try
             {
@@ -1143,12 +1138,12 @@ namespace WhiteCore.ClientStack
             catch (Exception ex)
             {
                 MainConsole.Instance.ErrorFormat("[LLUDPSERVER]: OutgoingPacketHandler iteration for " + client.Name +
-                                           " threw an exception: " + ex.ToString());
+                                           " threw an exception: " + ex);
                 return;
             }
         }
 
-        private bool IncomingPacketHandlerLoop()
+        bool IncomingPacketHandlerLoop()
         {
             if (!IsRunning)
                 return false;
@@ -1176,12 +1171,12 @@ namespace WhiteCore.ClientStack
             }
             catch (Exception ex)
             {
-                MainConsole.Instance.ErrorFormat("[LLUDPSERVER]: Error in the incoming packet handler loop: " + ex.ToString());
+                MainConsole.Instance.ErrorFormat("[LLUDPSERVER]: Error in the incoming packet handler loop: " + ex);
             }
             return true;
         }
 
-        private void ProcessInPacket(object state)
+        void ProcessInPacket(object state)
         {
             IncomingPacket incomingPacket = (IncomingPacket) state;
             Packet packet = incomingPacket.Packet;
@@ -1212,7 +1207,7 @@ namespace WhiteCore.ClientStack
                         if (packet != null)
                             MainConsole.Instance.ErrorFormat(
                                 "[LLUDPSERVER]: Client packet handler for {0} for packet {1} threw an exception: {2}",
-                                udpClient.AgentID, packet.Type, e.ToString());
+                                udpClient.AgentID, packet.Type, e);
                     }
                 }
             }
@@ -1232,9 +1227,9 @@ namespace WhiteCore.ClientStack
 
         protected static bool m_shouldCollectStats;
         // Number of seconds to log for
-        private static TimeSpan binStatsMaxFilesize = TimeSpan.FromSeconds(300);
-        private static readonly object binStatsLogLock = new object();
-        private static string binStatsDir = "";
+        static TimeSpan binStatsMaxFilesize = TimeSpan.FromSeconds(300);
+        static readonly object binStatsLogLock = new object();
+        static string binStatsDir = "";
 
         public static void LogPacketHeader(bool incoming, uint circuit, byte flags, PacketType packetType, ushort size)
         {
@@ -1292,7 +1287,7 @@ namespace WhiteCore.ClientStack
                 }
                 catch (Exception ex)
                 {
-                    MainConsole.Instance.ErrorFormat("Packet statistics gathering failed: ", ex.ToString());
+                    MainConsole.Instance.ErrorFormat("Packet statistics gathering failed: {0}", ex);
                     if (PacketLog != null && PacketLog.Log != null)
                     {
                         PacketLog.Log.Close();

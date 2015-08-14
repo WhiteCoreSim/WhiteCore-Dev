@@ -230,6 +230,7 @@ namespace WhiteCore.Region
 
         #endregion
 
+
         #region Add a region
 
         public void StartRegions(out bool newRegion)
@@ -260,8 +261,10 @@ namespace WhiteCore.Region
         public void StartRegion(ISimulationDataStore simData, RegionInfo regionInfo)
         {
             MainConsole.Instance.InfoFormat("[SceneManager]: Starting region \"{0}\" at @ {1},{2}",
-                                            regionInfo.RegionName,
-                                            regionInfo.RegionLocX/256, regionInfo.RegionLocY/256);
+                regionInfo.RegionName,
+                regionInfo.RegionLocX/Constants.RegionSize,
+                regionInfo.RegionLocY/Constants.RegionSize);
+            
             ISceneLoader sceneLoader = m_SimBase.ApplicationRegistry.RequestModuleInterface<ISceneLoader>();
             if (sceneLoader == null)
                 throw new Exception("No Scene Loader Interface!");
@@ -282,7 +285,7 @@ namespace WhiteCore.Region
             if (OnFinishedAddingScene != null)
                 OnFinishedAddingScene(scene);
 
-            //Start the heartbeats
+           //Start the heartbeats
             scene.StartHeartbeat();
             //Tell the scene that the startup is complete 
             // Note: this event is added in the scene constructor
@@ -1418,13 +1421,13 @@ namespace WhiteCore.Region
 
         public List<string> GetOARFilenames()
         {
-            var defaultOarDir = Constants.DEFAULT_OARARCHIVE_DIR;
+            var defaultOarDir =  Path.Combine(m_SimBase.DefaultDataPath, Constants.DEFAULT_OARARCHIVE_DIR);
             var retVals = new List<string>();
 
             if (Directory.Exists (defaultOarDir))
             {
-                var archives = new List<string> (Directory.GetFiles (Constants.DEFAULT_OARARCHIVE_DIR, "*.oar"));
-                archives.AddRange (new List<string> (Directory.GetFiles (Constants.DEFAULT_OARARCHIVE_DIR, "*.tgz")));
+                var archives = new List<string> (Directory.GetFiles (defaultOarDir, "*.oar"));
+                archives.AddRange (new List<string> (Directory.GetFiles (defaultOarDir, "*.tgz")));
                 foreach (string file in archives)
                     retVals.Add (Path.GetFileNameWithoutExtension (file));
             }
@@ -1478,7 +1481,8 @@ namespace WhiteCore.Region
 				return;
 			}
 
-            fileName = PathHelpers.VerifyReadFile (fileName, new List<string>() {".oar","tgz"}, Constants.DEFAULT_OARARCHIVE_DIR);
+            var defaultOarPath = Path.Combine(m_SimBase.DefaultDataPath, Constants.DEFAULT_OARARCHIVE_DIR);
+            fileName = PathHelpers.VerifyReadFile (fileName, new List<string>() {".oar","tgz"}, defaultOarPath);
             if (fileName == "")                 // something wrong...
                 return;
             cmdparams [2] = fileName;           // reset passed filename
@@ -1553,7 +1557,8 @@ namespace WhiteCore.Region
             else
                 fileName = cmdparams[2];
 
-            fileName = PathHelpers.VerifyWriteFile (fileName, ".oar", Constants.DEFAULT_OARARCHIVE_DIR, true);
+            var defaultOarPath = Path.Combine (m_SimBase.DefaultDataPath, Constants.DEFAULT_OARARCHIVE_DIR);
+            fileName = PathHelpers.VerifyWriteFile (fileName, ".oar", defaultOarPath, true);
             if (fileName == "")                 // something wrong...
                 return;
             cmdparams [2] = fileName;           // reset passed filename
