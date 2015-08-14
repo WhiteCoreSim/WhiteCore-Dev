@@ -53,6 +53,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
         protected GenericAccountCache<UserAccount> m_cache = new GenericAccountCache<UserAccount>();
         protected string[] m_userNameSeed;
         protected string m_defaultDataPath;
+        protected int m_newUserStipend = 0;
 
         #endregion
 
@@ -88,6 +89,11 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 if (userNameSeed != "")
                     m_userNameSeed = userNameSeed.Split (',');
             }
+
+            // check for initial stipend payment for new users
+            IConfig currConfig = config.Configs ["Currency"];
+            if (currConfig != null)
+                m_newUserStipend = currConfig.GetInt ("NewUserStipend", 0);
 
         }
 
@@ -505,53 +511,67 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
 
             UserAccount account = GetUserAccount(null, newAccount.PrincipalID);
             UserAccount nameaccount = GetUserAccount(null, newAccount.Name);
-            if (account == null && nameaccount == null)
+            if (account != null || nameaccount != null)
             {
-                if (StoreUserAccount(newAccount))
-                {
-                    bool success;
-                    if (m_AuthenticationService != null && password != "")
-                    {
-                        success = m_AuthenticationService.SetPasswordHashed(newAccount.PrincipalID, "UserAccount", password);
-                        if (!success)
-                        {
-                            MainConsole.Instance.WarnFormat(
-                                "[USER ACCOUNT SERVICE]: Unable to set password for account {0}.",
-                                newAccount.Name);
-                            return "Unable to set password";
-                        }
-                    }
-
-                    MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Account {0} created successfully",
-                                                    newAccount.Name);
-                    //Cache it as well
-                    CacheAccount(newAccount);
-                    m_registry.RequestModuleInterface<ISimulationBase>()
-                              .EventManager.FireGenericEventHandler("CreateUserInformation", newAccount.PrincipalID);
-
-                    // create a profile for the new user as well
-                    if (m_profileConnector != null)
-                    {
-                        m_profileConnector.CreateNewProfile (newAccount.PrincipalID);
-                        IUserProfileInfo profile = m_profileConnector.GetUserProfile (newAccount.PrincipalID);
-
-                        // if (AvatarArchive != "")
-                        //    profile.AArchiveName = AvatarArchive;
-                        profile.MembershipGroup = "Resident";
-                        profile.IsNewUser = true;
-                        m_profileConnector.UpdateUserProfile (profile);
-                    }
-
-                    return "";
-                }
-
-                MainConsole.Instance.ErrorFormat("[USER ACCOUNT SERVICE]: Account creation failed for account {0}", newAccount.Name);
-                return "Unable to save account";
-
+                MainConsole.Instance.ErrorFormat ("[USER ACCOUNT SERVICE]: A user with the name {0} already exists!", newAccount.Name);
+                return "A user with the same name already exists";
             }
 
-            MainConsole.Instance.ErrorFormat("[USER ACCOUNT SERVICE]: A user with the name {0} already exists!", newAccount.Name);
-            return "A user with the same name already exists";
+            // This one is available...
+            if (!StoreUserAccount (newAccount))
+            {
+                MainConsole.Instance.ErrorFormat ("[USER ACCOUNT SERVICE]: Account creation failed for account {0}", newAccount.Name);
+                return "Unable to save account";
+            }
+        
+            bool success;
+            if (m_AuthenticationService != null && password != "")
+            {
+                success = m_AuthenticationService.SetPasswordHashed (newAccount.PrincipalID, "UserAccount", password);
+                if (!success)
+                {
+                    MainConsole.Instance.WarnFormat (
+                        "[USER ACCOUNT SERVICE]: Unable to set password for account {0}.", newAccount.Name);
+                    return "Unable to set password";
+                }
+            }
+
+            MainConsole.Instance.InfoFormat ("[USER ACCOUNT SERVICE]: Account {0} created successfully", newAccount.Name);
+            //Cache it as well
+            CacheAccount (newAccount);
+            m_registry.RequestModuleInterface<ISimulationBase> ()
+                              .EventManager.FireGenericEventHandler ("CreateUserInformation", newAccount.PrincipalID);
+
+            // create a profile for the new user
+            if (m_profileConnector != null)
+            {
+                m_profileConnector.CreateNewProfile (newAccount.PrincipalID);
+                IUserProfileInfo profile = m_profileConnector.GetUserProfile (newAccount.PrincipalID);
+
+                // if (AvatarArchive != "")
+                //    profile.AArchiveName = AvatarArchive;
+                profile.MembershipGroup = "Resident";
+                profile.IsNewUser = true;
+                m_profileConnector.UpdateUserProfile (profile);
+            }
+
+            // top up the wallet?
+            if ((m_newUserStipend > 0) && !Utilities.IsSystemUser (newAccount.PrincipalID))
+            {
+                IMoneyModule money = m_registry.RequestModuleInterface<IMoneyModule> ();
+                if (money != null)
+                {
+                    money.Transfer (
+                        newAccount.PrincipalID,
+                        (UUID)Constants.BankerUUID,            
+                        m_newUserStipend,
+                        "New user stipend",
+                        TransactionType.SystemGenerated
+                    );
+                }
+            }
+            return "";
+
 
         }
 
