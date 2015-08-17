@@ -1392,6 +1392,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             string LastName;
             string Password;
             string Email;
+            string Rezday;
             UUID UserUUID;
 
             fileName = PathHelpers.VerifyReadFile(fileName,"csv", m_defaultDataPath + "/Updates");
@@ -1407,7 +1408,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 while (!rd.EndOfStream)
                 {
                     var userInfo = rd.ReadLine ().Split (',');
-                    if (userInfo.Length < 4)
+                    if (userInfo.Length < 5)
                     {
                         MainConsole.Instance.Error ("[User Load]: Insufficient details; Skipping " + userInfo);
                         continue;
@@ -1418,6 +1419,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     LastName = userInfo [2];
                     Password = userInfo [3];
                     Email = userInfo.Length < 6 ? userInfo [4] : "";
+                    Rezday = userInfo[5];
 
                     string check = CreateUser (UserUUID, UUID.Zero, FirstName + " " + LastName, Util.Md5Hash(Password), Email);
                     if (check != "")
@@ -1431,6 +1433,18 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     //account.UserLevel = 0;
                     account.UserFlags = Constants.USER_FLAG_RESIDENT;
                     StoreUserAccount (account);
+                    
+                    // [NEW] Set the users rezdate
+                    if (m_profileConnector != null)
+                    {
+                    	IUserProfileInfo profile = m_profileConnector.GetUserProfile (account.PrincipalID);
+                    	profile.Created = int.Parse(Rezday);
+                    	bool success = m_profileConnector.UpdateUserProfile (profile);
+                    	if (!success)
+                    		MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Unable to change rezday for {0} {1}.", account.FirstName, account.LastName);
+                    	else
+                    		MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Account {0} {1} has a rezday set.", account.FirstName, account.LastName);
+                    }
 
                     userNo++;
 
