@@ -75,7 +75,7 @@ namespace WhiteCore.Services.SQLServices.AssetService
             if (handlers != null)
                 doDatabaseCaching = handlers.GetBoolean("AssetHandlerUseCache", false);
 
-            if (MainConsole.Instance != null && !DoRemoteCalls)
+            if (IsLocalConnector && (MainConsole.Instance != null))
             {
                 MainConsole.Instance.Commands.AddCommand(
                     "show digest",

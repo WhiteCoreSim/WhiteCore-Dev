@@ -781,35 +781,32 @@ namespace WhiteCore.Modules.Archivers
                 }
             }
 
-            bool remoteCalls = false;
+            bool isLocal = true;
             IConfig connectorConfig = config.Configs ["WhiteCoreConnectors"];
             if ((connectorConfig != null) && connectorConfig.Contains ("DoRemoteCalls"))
-                remoteCalls = connectorConfig.GetBoolean ("DoRemoteCalls", false);
+                isLocal = ! connectorConfig.GetBoolean ("DoRemoteCalls", false);
 
             // Lock out if remote 
-            if (!remoteCalls)
+            if (isLocal && (MainConsole.Instance != null))
             {
-                if (MainConsole.Instance != null)
-                {
-                    MainConsole.Instance.Commands.AddCommand (
-                        "save avatar archive",
-                        "save avatar archive [<First> <Last> [<Filename>]] [FolderNameToSaveInto] (--snapshot <UUID>) (--private) (--portable)",
-                        "Saves appearance to an avatar archive (.aa is the recommended file extension)\n" +
-                        " Note: Put \"\" around the FolderName if you have spaces. \n" +
-                        "     : e.g. \"../Data/MyAvatars/Male Avatar.aa\" \n" +
-                    //"  Put all attachments in BodyParts folder before saving the archive) \n" +
-                        "   --snapshot --private and --portable are optional.\n" +
-                        "   --snapshot sets a picture to display on the web interface if this archive is being used as a default avatar.\n" +
-                        "   --private tells any web interfaces that they cannot display this as a default avatar.\n" +
-                        "   --portable includes full asset tells any web interfaces that they cannot display this as a default avatar.",
-                        HandleSaveAvatarArchive, false, true);
+                MainConsole.Instance.Commands.AddCommand (
+                    "save avatar archive",
+                    "save avatar archive [<First> <Last> [<Filename>]] [FolderNameToSaveInto] (--snapshot <UUID>) (--private) (--portable)",
+                    "Saves appearance to an avatar archive (.aa is the recommended file extension)\n" +
+                    " Note: Put \"\" around the FolderName if you have spaces. \n" +
+                    "     : e.g. \"../Data/MyAvatars/Male Avatar.aa\" \n" +
+                //"  Put all attachments in BodyParts folder before saving the archive) \n" +
+                    "   --snapshot --private and --portable are optional.\n" +
+                    "   --snapshot sets a picture to display on the web interface if this archive is being used as a default avatar.\n" +
+                    "   --private tells any web interfaces that they cannot display this as a default avatar.\n" +
+                    "   --portable includes full asset tells any web interfaces that they cannot display this as a default avatar.",
+                    HandleSaveAvatarArchive, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand (
-                        "load avatar archive",
-                        "load avatar archive [<First> <Last> [<Filename>]]",
-                        "Loads appearance from an avatar archive",
-                        HandleLoadAvatarArchive, false, true);
-                }
+                MainConsole.Instance.Commands.AddCommand (
+                    "load avatar archive",
+                    "load avatar archive [<First> <Last> [<Filename>]]",
+                    "Loads appearance from an avatar archive",
+                    HandleLoadAvatarArchive, false, true);
             }
         }
 

@@ -98,7 +98,7 @@ namespace WhiteCore.Modules.Estate
             m_estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
 
             // these are only valid if we are local
-            if (!m_accountService.RemoteCalls ())
+            if (m_accountService.IsLocalConnector)
             {
                 // check and/or create default system estates
                 CheckSystemEstateInfo (Constants.SystemEstateID, systemEstateName, (UUID) Constants.RealEstateOwnerUUID);
@@ -412,7 +412,7 @@ namespace WhiteCore.Modules.Estate
                 MainConsole.Instance.WarnFormat ("[USER ACCOUNT SERVICE]: The user, '{0}' was not found!", estateOwner);
 
                 // temporary fix until remote user creation can be implemented
-                if (!accountService.RemoteCalls ())
+                if (accountService.IsLocalConnector)
                 {
                     string createUser = MainConsole.Instance.Prompt ("Do you wish to create this user?  (yes/no)", "yes").ToLower ();
                     if (!createUser.StartsWith ("y"))
@@ -475,7 +475,7 @@ namespace WhiteCore.Modules.Estate
 
             // check for passed estate name
             estateName = (cmd.Length < 4) 
-                ? MainConsole.Instance.Prompt ("Estate name ") 
+                ? MainConsole.Instance.Prompt ("Estate name to be updated") 
                 : cmd [2];
             if (estateName == "")
                 return;
@@ -533,7 +533,7 @@ namespace WhiteCore.Modules.Estate
 
             // check for passed estate name
             estateName = (cmd.Length < 4) 
-                ? MainConsole.Instance.Prompt ("Estate name: ") 
+                ? MainConsole.Instance.Prompt ("Estate name to be changed") 
                 : cmd [3];
             if (estateName == "")
                 return;
@@ -548,7 +548,7 @@ namespace WhiteCore.Modules.Estate
 
             // check for passed  estate new name
             estateNewName = (cmd.Length < 4) 
-                ? MainConsole.Instance.Prompt ("Estate new name: ") 
+                ? MainConsole.Instance.Prompt ("New name for the Estate") 
                 : cmd [4];
             if (estateNewName == "")
                 return;
@@ -572,7 +572,7 @@ namespace WhiteCore.Modules.Estate
 
             // check for passed estate name
             estateName = (cmd.Length < 4) 
-                ? MainConsole.Instance.Prompt ("Estate name: ") 
+                ? MainConsole.Instance.Prompt ("Estate name") 
                 : cmd [3];
             if (estateName == "")
                 return;
@@ -590,7 +590,7 @@ namespace WhiteCore.Modules.Estate
                 regionName = scene.RegionInfo.RegionName;
 
             regionName = (cmd.Length < 4) 
-                ? MainConsole.Instance.Prompt ("Link to region: ", regionName) 
+                ? MainConsole.Instance.Prompt ("Region to add to " + estateName, regionName) 
                 : cmd [4];
             if (regionName == "")
                 return;
@@ -627,7 +627,7 @@ namespace WhiteCore.Modules.Estate
 
             // check for passed estate name
             estateName = (cmd.Length < 4) 
-                ? MainConsole.Instance.Prompt ("Estate name: ") 
+                ? MainConsole.Instance.Prompt ("Estate name") 
                 : cmd [3];
             if (estateName == "")
                 return;
@@ -645,7 +645,7 @@ namespace WhiteCore.Modules.Estate
                 regionName = scene.RegionInfo.RegionName;
 
             regionName = (cmd.Length < 4) 
-                ? MainConsole.Instance.Prompt ("Remove region: ", regionName) 
+                ? MainConsole.Instance.Prompt ("Region to remove", regionName) 
                 : cmd [4];
             if (regionName == "")
                 return;

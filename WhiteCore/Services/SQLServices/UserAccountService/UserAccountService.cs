@@ -57,11 +57,6 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
 
         #endregion
 
-        public bool RemoteCalls()
-        {
-            return m_doRemoteCalls;
-        }
-
         #region IService Members
 
         public virtual string Name
@@ -112,131 +107,129 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
         public void FinishedStartup()
         {
             // these are only valid if we are local
-            if (!m_doRemoteCalls)
+            if (IsLocalConnector)
                 AddCommands ();
         }
 
         void AddCommands()
         {
-            if (MainConsole.Instance != null)
+            if (IsLocalConnector && (MainConsole.Instance != null))
             {
-                if (!m_doRemoteCalls)
-                {
-                    MainConsole.Instance.Commands.AddCommand(
-                        "add user",
-                        "add user [<first> [<last> [<pass> [<email>]]]] [--system] [--uuid]",
-                        "Create a new user. If optional parameters are not supplied required details will be prompted\n"+
-                        "  --system : Enter user scope UUID\n"+
-                        "  --uuid : Enter a specific UUID for the user",
-                        HandleCreateUser, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "add user",
+                    "add user [<first> [<last> [<pass> [<email>]]]] [--system] [--uuid]",
+                    "Create a new user. If optional parameters are not supplied required details will be prompted\n"+
+                    "  --system : Enter user scope UUID\n"+
+                    "  --uuid : Enter a specific UUID for the user",
+                    HandleCreateUser, false, true);
 
-                    // alias for 'add user' (legacy)
-                    MainConsole.Instance.Commands.AddCommand(
-                        "create user",
-                        "create user [<first> [<last> [<pass> [<email>]]]] [--system] [--uuid]",
-                        "Create a new user. If optional parameters are not supplied required details will be prompted\n"+
-                        "  --system : Enter user scope UUID\n"+
-                        "  --uuid : Enter a specific UUID for the user",
-                        HandleCreateUser, false, true);
+                // alias for 'add user' (legacy)
+                MainConsole.Instance.Commands.AddCommand(
+                    "create user",
+                    "create user [<first> [<last> [<pass> [<email>]]]] [--system] [--uuid]",
+                    "Create a new user. If optional parameters are not supplied required details will be prompted\n"+
+                    "  --system : Enter user scope UUID\n"+
+                    "  --uuid : Enter a specific UUID for the user",
+                    HandleCreateUser, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand(
-                        "delete user",
-                        "delete user  [<first> [<last>]] ",
-                        "Deletes an existing user",
-                        HandleDeleteUser, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "delete user",
+                    "delete user  [<first> [<last>]] ",
+                    "Deletes an existing user",
+                    HandleDeleteUser, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand(
-                        "disable user",
-                        "disable user  [<first> [<last>]] ",
-                        "Disable an existing user",
-                        HandleDisableUser, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "disable user",
+                    "disable user  [<first> [<last>]] ",
+                    "Disable an existing user",
+                    HandleDisableUser, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand(
-                        "enable user",
-                        "enable user  [<first> [<last>]] ",
-                        "Enables an existing user that was previously disabled",
-                        HandleEnableUser, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "enable user",
+                    "enable user  [<first> [<last>]] ",
+                    "Enables an existing user that was previously disabled",
+                    HandleEnableUser, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand(
-                        "reset user password",
-                        "reset user password [<first> [<last> [<password>]]]",
-                        "Reset a user password",
-                        HandleResetUserPassword, false, true);
-                        
-                    MainConsole.Instance.Commands.AddCommand(
-                        "set user email",
-                        "set user email [<first> [<last> [<email@address>]]]",
-                        "Set an email address for a user",
-                        HandleSetUserEmail, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "reset user password",
+                    "reset user password [<first> [<last> [<password>]]]",
+                    "Reset a user password",
+                    HandleResetUserPassword, false, true);
+                    
+                MainConsole.Instance.Commands.AddCommand(
+                    "set user email",
+                    "set user email [<first> [<last> [<email@address>]]]",
+                    "Set an email address for a user",
+                    HandleSetUserEmail, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand(
-                        "show account",
-                        "show account [<first> [<last>]]",
-                        "Show account details for the given user",
-                        HandleShowAccount, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "show account",
+                    "show account [<first> [<last>]]",
+                    "Show account details for the given user",
+                    HandleShowAccount, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand(
-                        "show user account",
-                        "show user account [<first> [<last>]]",
-                        "Show account details for the given user",
-                        HandleShowUserAccount, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "show user account",
+                    "show user account [<first> [<last>]]",
+                    "Show account details for the given user",
+                    HandleShowUserAccount, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand(
-                        "set user level",
-                        "set user level [<first> [<last> [<level>]]]",
-                        "Set user level. If the user's level is > 0, this account will be treated as god-mode.\n" +
-                        "It will also affect the 'login level' command. ",
-                        HandleSetUserLevel, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "set user level",
+                    "set user level [<first> [<last> [<level>]]]",
+                    "Set user level. If the user's level is > 0, this account will be treated as god-mode.\n" +
+                    "It will also affect the 'login level' command. ",
+                    HandleSetUserLevel, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand(
-                        "set user type",
-                        "set user type [<first> [<last> [<type>]]]",
-                        "Set the user account type. I.e. Guest, Resident, Member etc (Used for stipend payments)",
-                        HandleSetUserType, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "set user type",
+                    "set user type [<first> [<last> [<type>]]]",
+                    "Set the user account type. I.e. Guest, Resident, Member etc (Used for stipend payments)",
+                    HandleSetUserType, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand(
-                        "set user profile title",
-                        "set user profile title [<first> [<last> [<Title>]]]",
-                        "Sets the title (Normally resident) in a user's title to some custom value.",
-                        HandleSetTitle, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "set user profile title",
+                    "set user profile title [<first> [<last> [<Title>]]]",
+                    "Sets the title (Normally resident) in a user's title to some custom value.",
+                    HandleSetTitle, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand(
-                        "set partner",
-                        "set partner",
-                        "Sets the partner in a user's profile.",
-                        HandleSetPartner, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "set partner",
+                    "set partner",
+                    "Sets the partner in a user's profile.",
+                    HandleSetPartner, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand(
-                        "reset partner",
-                        "reset partner",
-                        "Resets the partner in a user's profile.",
-                        HandleResetPartner, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "reset partner",
+                    "reset partner",
+                    "Resets the partner in a user's profile.",
+                    HandleResetPartner, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand(
-                        "load users",
-                        "load user [<CSV file>]",
-                        "Loads users from a CSV file into WhiteCore",
-                        HandleLoadUsers, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "load users",
+                    "load user [<CSV file>]",
+                    "Loads users from a CSV file into WhiteCore",
+                    HandleLoadUsers, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand(
-                        "save users",
-                        "save users [<CSV file>]",
-                        "Saves all users from WhiteCore into a CSV file",
-                        HandleSaveUsers, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "save users",
+                    "save users [<CSV file>]",
+                    "Saves all users from WhiteCore into a CSV file",
+                    HandleSaveUsers, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand(
-                        "set user rezday",
-                        "set user rezday [<first> [<last>]]",
-                        "Sets the users creation date",
-                        HandleSetRezday, false, true);
-                    #if TEST_USERS
-                    MainConsole.Instance.Commands.AddCommand(
-                        "create test users",
-                        "create test users",
-                        "Create multiple users for testing purposes",
-                        HandleTestUsers, false, true);
-                    #endif
-                }
+                MainConsole.Instance.Commands.AddCommand(
+                    "set user rezday",
+                    "set user rezday [<first> [<last>]]",
+                    "Sets the users creation date",
+                    HandleSetRezday, false, true);
+                #if TEST_USERS
+                MainConsole.Instance.Commands.AddCommand(
+                    "create test users",
+                    "create test users",
+                    "Create multiple users for testing purposes",
+                    HandleTestUsers, false, true);
+                #endif
+            
             }
         }
 

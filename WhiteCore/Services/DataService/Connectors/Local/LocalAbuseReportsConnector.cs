@@ -52,15 +52,18 @@ namespace WhiteCore.Services.DataService
                 defaultConnectionString = source.Configs[Name].GetString("ConnectionString", defaultConnectionString);
 
             if (GD != null)
-                GD.ConnectToDatabase(defaultConnectionString, "AbuseReports",
-                                     source.Configs["WhiteCoreConnectors"].GetBoolean("ValidateTables", true));
-
-            Framework.Utilities.DataManager.RegisterPlugin(Name + "Local", this);
-            if (source.Configs["WhiteCoreConnectors"].GetString("AbuseReportsConnector", "LocalConnector") ==
-                "LocalConnector")
             {
-                m_enabled = true;
-                Framework.Utilities.DataManager.RegisterPlugin (this);
+                GD.ConnectToDatabase (defaultConnectionString, "AbuseReports",
+                    source.Configs ["WhiteCoreConnectors"].GetBoolean ("ValidateTables", true));
+
+            
+                Framework.Utilities.DataManager.RegisterPlugin (Name + "Local", this);
+                if (source.Configs ["WhiteCoreConnectors"].GetString ("AbuseReportsConnector", "LocalConnector") ==
+                    "LocalConnector")
+                {
+                    m_enabled = true;
+                    Framework.Utilities.DataManager.RegisterPlugin (this);
+                }
             }
         }
 

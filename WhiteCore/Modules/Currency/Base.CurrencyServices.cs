@@ -106,7 +106,7 @@ namespace WhiteCore.Modules.Currency
 
 
             // these are only valid if we are local
-            if (!m_connector.DoRemoteCalls)
+            if (m_connector.IsLocalConnector)
             {
                 m_userInfoService = m_registry.RequestModuleInterface<IAgentInfoService> ();
                 m_userAccountService = m_registry.RequestModuleInterface<IUserAccountService> ();
@@ -191,7 +191,7 @@ namespace WhiteCore.Modules.Currency
         }
 
         public bool IsLocal {
-            get { return !m_connector.DoRemoteCalls; }
+            get { return m_connector.IsLocalConnector; }
         }
 
         public int UploadCharge {

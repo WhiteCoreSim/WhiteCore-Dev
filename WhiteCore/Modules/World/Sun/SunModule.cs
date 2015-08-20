@@ -43,60 +43,39 @@ namespace WhiteCore.Modules.Sun
         //
         // Global Constants used to determine where in the sky the sun is
         //
-        const double m_SeasonalTilt = 0.03 * Math.PI;
-        // A daily shift of approximately 1.7188 degrees
-        const double m_AverageTilt = -0.25 * Math.PI;
-        // A 45 degree tilt
-        const double m_SunCycle = 2.0D * Math.PI;
-        // A perfect circle measured in radians
-        const double m_SeasonalCycle = 2.0D * Math.PI;
-        // Ditto
+        const double m_SeasonalTilt = 0.03 * Math.PI;       // A daily shift of approximately 1.7188 degrees
+        const double m_AverageTilt = -0.25 * Math.PI;       // A 45 degree tilt
+        const double m_SunCycle = 2.0D * Math.PI;           // A perfect circle measured in radians
+        const double m_SeasonalCycle = 2.0D * Math.PI;      // Ditto
         const int TICKS_PER_SECOND = 10000000;
 
-        double HorizonShift;
-        // Axis offset to skew day and night
-        float Magnitude;
-        // Normal tilt
-        float OrbitalPosition;
-        // Orbital placement at a point in time
+        double HorizonShift;                                // Axis offset to skew day and night
+        float Magnitude;                                    // Normal tilt
+        float OrbitalPosition;                              // Orbital placement at a point in time
         ulong PosTime;
         Vector3 Position = Vector3.Zero;
-        double SeasonSpeed;
-        // Rate of change for seasonal effects
-        double SeasonalOffset;
-        // Seasonal variation of tilt
+        double SeasonSpeed;                                 // Rate of change for seasonal effects
+        double SeasonalOffset;                              // Seasonal variation of tilt
 
         //
         //    Per Region Values
         //
 
-        uint SecondsPerSunCycle;
-        // Length of a virtual day in RW seconds
-        uint SecondsPerYear;
-        // Length of a virtual year in RW seconds
-        double SunSpeed;
-        // Rate of passage in radians/second
-        long TicksToEpoch;
-        // Elapsed time for 1/1/1970
-        // double HoursToRadians;            // Rate of change for seasonal effects
-        long TicksUTCOffset;
-        // seconds offset from UTC
-        Quaternion Tilt = new Quaternion (1.0f, 0.0f, 0.0f, 0.0f);
-        // Calculated every update
-        double TotalDistanceTravelled;
-        // Distance since beginning of time (in radians)
+        uint SecondsPerSunCycle;                            // Length of a virtual day in RW seconds
+        uint SecondsPerYear;                                // Length of a virtual year in RW seconds
+        double SunSpeed;                                    // Rate of passage in radians/second
+        long TicksToEpoch;                                  // Elapsed time for 1/1/1970
+        // double HoursToRadians;                             // Rate of change for seasonal effects
+        long TicksUTCOffset;                                // seconds offset from UTC
+        Quaternion Tilt = new Quaternion (1.0f, 0.0f, 0.0f, 0.0f);        // Calculated every update
+        double TotalDistanceTravelled;                      // Distance since beginning of time (in radians)
         Vector3 Velocity = Vector3.Zero;
-        double d_DayTimeSunHourScale = 0.5;
-        // Day/Night hours are equal
-        double d_day_length = 4;
-        // A VW day is 4 RW hours long
-        double d_day_night = 0.5;
-        // axis offset: Default Horizon shift to try and closely match the sun model in LL Viewer
-        int d_frame_mod = 25;
-        // Every 2 seconds (actually less)
+        double d_DayTimeSunHourScale = 0.5;                 // Day/Night hours are equal
+        double d_day_length = 4;                            // A VW day is 4 RW hours long
+        double d_day_night = 0.5;                           // axis offset: Default Horizon shift to try and closely match the sun model in LL Viewer
+        int d_frame_mod = 25;                               // Every 2 seconds (actually less)
         string d_mode = "SL";
-        int d_year_length = 60;
-        // There are 60 VW days in a VW year
+        int d_year_length = 60;                             // There are 60 VW days in a VW year
         double m_DayLengthHours;
         double m_DayTimeSunHourScale;
         double m_HorizonShift;
@@ -258,28 +237,24 @@ namespace WhiteCore.Modules.Sun
             case "T1":
             default:
             case "SL":
-                    // Time taken to complete a cycle (day and season)
-
+                // Time taken to complete a cycle (day and season)
                 SecondsPerSunCycle = (uint)(m_DayLengthHours * 60 * 60);
                 SecondsPerYear = (uint)(SecondsPerSunCycle * m_YearLengthDays);
 
-                    // Ration of real-to-virtual time
+                // Ratio of real-to-virtual time
+                // VWTimeRatio        = 24/m_day_length;
 
-                    // VWTimeRatio        = 24/m_day_length;
-
-                    // Speed of rotation needed to complete a cycle in the
-                    // designated period (day and season)
-
+                // Speed of rotation needed to complete a cycle in the
+                // designated period (day and season)
                 SunSpeed = m_SunCycle / SecondsPerSunCycle;
                 SeasonSpeed = m_SeasonalCycle / SecondsPerYear;
 
-                    // Horizon translation
-
+                // Horizon translation
                 HorizonShift = m_HorizonShift; // Z axis translation
-                    // HoursToRadians    = (SunCycle/24)*VWTimeRatio;
 
-                    //  Insert our event handling hooks
+                // HoursToRadians    = (SunCycle/24)*VWTimeRatio;
 
+                //  Insert our event handling hooks
                 scene.EventManager.OnFrame += SunUpdate;
                 m_scene.EventManager.OnStartupComplete += EventManager_OnStartupComplete;
                 scene.EventManager.OnAvatarEnteringNewParcel += AvatarEnteringParcel;
@@ -566,7 +541,7 @@ namespace WhiteCore.Modules.Sun
                 try
                 {
                     double value = GetSunParameter(args[1]);
-                    Output.Add(String.Format("Parameter {0} is {1}.", args[1], value.ToString()));
+                    Output.Add(String.Format("Parameter {0} is {1}.", args[1], value));
                 }
                 catch (Exception)
                 {
@@ -575,7 +550,7 @@ namespace WhiteCore.Modules.Sun
             }
             else if (args.Length == 3)
             {
-                float value = 0.0f;
+                float value;
                 if (!float.TryParse(args[2], out value))
                 {
                     Output.Add(String.Format("The parameter value {0} is not a valid number.", args[2]));
@@ -608,7 +583,7 @@ namespace WhiteCore.Modules.Sun
                         return Output;
                 }
 
-                Output.Add(String.Format("Parameter {0} set to {1}.", args[1], value.ToString()));
+                Output.Add(String.Format("Parameter {0} set to {1}.", args[1], value));
 
                 // Generate shared values
                 GenSunPos();
