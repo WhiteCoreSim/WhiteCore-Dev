@@ -276,7 +276,7 @@ namespace WhiteCore.Modules.Wind
 
             string plugin = cmdparams [1];
             string param = cmdparams [2];
-            float value = 0f;
+            float value;
             if (cmdparams.Length == 4)
             {
                 if (!float.TryParse (cmdparams [3], out value))
@@ -345,10 +345,8 @@ namespace WhiteCore.Modules.Wind
             {
                 IWindModelPlugin windPlugin = m_availableWindPlugins [plugin];
                 return windPlugin.WindParamGet (param);
-            } else
-            {
-                throw new Exception (String.Format ("Could not find plugin {0}", plugin));
             }
+            throw new Exception (String.Format ("Could not find plugin {0}", plugin));
         }
 
         public string WindActiveModelPluginName
@@ -356,12 +354,9 @@ namespace WhiteCore.Modules.Wind
             get
             {
                 if (m_activeWindPlugin != null)
-                {
                     return m_activeWindPlugin.Name;
-                } else
-                {
-                    return String.Empty;
-                }
+
+                return String.Empty;
             }
         }
 

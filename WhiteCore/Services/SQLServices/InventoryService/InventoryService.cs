@@ -25,6 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
@@ -33,12 +39,6 @@ using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Assets;
 using WhiteCore.Framework.Services.ClassHelpers.Inventory;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace WhiteCore.Services.SQLServices.InventoryService
 {
@@ -71,17 +71,11 @@ namespace WhiteCore.Services.SQLServices.InventoryService
 
             IConfig invConfig = config.Configs["InventoryService"];
             if (invConfig != null)
-                m_AllowDelete = invConfig.GetBoolean("AllowDelete", true);
+                m_AllowDelete = invConfig.GetBoolean ("AllowDelete", true);
+            
+            registry.RegisterModuleInterface<IInventoryService> (this);
+            Init (registry, Name, serverPath: "/inventory/", serverHandlerName: "InventoryServerURI");
 
-            if (MainConsole.Instance != null)
-                MainConsole.Instance.Commands.AddCommand(
-                    "fix inventory",
-                    "fix inventory",
-                    "If the user's inventory has been corrupted, this function will attempt to fix it",
-                    FixInventory, false, true);
-
-            registry.RegisterModuleInterface<IInventoryService>(this);
-            Init(registry, Name, serverPath: "/inventory/", serverHandlerName: "InventoryServerURI");
         }
 
         public virtual void Start(IConfigSource config, IRegistryCore registry)
@@ -97,6 +91,15 @@ namespace WhiteCore.Services.SQLServices.InventoryService
 
         public virtual void FinishedStartup()
         {
+            if (IsLocalConnector &&  (MainConsole.Instance != null))
+            {
+                MainConsole.Instance.Commands.AddCommand (
+                    "fix inventory",
+                    "fix inventory",
+                    "If the user's inventory has been corrupted, this function will attempt to fix it",
+                    FixInventory, false, true);
+            }
+
             _addInventoryItemQueue.Start(
                 0.5,
                 (agentID, itemsToAdd) =>

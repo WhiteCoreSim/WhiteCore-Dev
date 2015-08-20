@@ -25,6 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.IO;
+using Nini.Config;
+using OpenMetaverse;
+using Sider;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
@@ -32,11 +37,6 @@ using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Assets;
 using WhiteCore.Framework.Utilities;
 using WhiteCore.RedisServices.ConnectionHelpers;
-using Nini.Config;
-using OpenMetaverse;
-using Sider;
-using System;
-using System.IO;
 
 namespace WhiteCore.RedisServices.AssetService
 {
@@ -45,13 +45,14 @@ namespace WhiteCore.RedisServices.AssetService
         #region Declares
 
         protected const string DATA_PREFIX = "DATA";
-        protected bool doDatabaseCaching = false;
-        protected string m_connectionDNS = "localhost", m_connectionPassword = null;
+        protected bool doDatabaseCaching;
+        protected string m_connectionDNS = "localhost";
+        protected string m_connectionPassword;
         protected Pool<RedisClient<byte[]>> m_connectionPool;
         protected int m_connectionPort = 6379;
-        protected bool m_enabled = false;
+        protected bool m_enabled;
 
-        protected bool m_doConversion = false;
+        protected bool m_doConversion;
         protected IAssetDataPlugin m_assetService;
 
         #endregion
@@ -68,6 +69,7 @@ namespace WhiteCore.RedisServices.AssetService
             IConfig handlerConfig = config.Configs["Handlers"];
             if (handlerConfig.GetString("AssetHandler", "") != "Redis" + Name)
                 return;
+            
             m_enabled = true;
             Configure(config, registry);
             Init(registry, Name, serverPath: "/asset/", serverHandlerName: "AssetServerURI");
@@ -77,6 +79,7 @@ namespace WhiteCore.RedisServices.AssetService
         {
             if (!m_enabled)
                 return;
+            
             m_registry = registry;
 
             registry.RegisterModuleInterface<IAssetService>(this);
@@ -101,7 +104,7 @@ namespace WhiteCore.RedisServices.AssetService
             m_connectionPool =
                 new Pool<RedisClient<byte[]>>(() => new RedisClient<byte[]>(m_connectionDNS, m_connectionPort));
 
-            if (MainConsole.Instance != null && !DoRemoteCalls)
+            if (IsLocalConnector && (MainConsole.Instance != null))
             {
                 MainConsole.Instance.Commands.AddCommand(
                     "show digest",
@@ -118,9 +121,8 @@ namespace WhiteCore.RedisServices.AssetService
                     "get asset <ID>",
                     "Gets info about asset from database", 
                     HandleGetAsset, false, true);
-
-                MainConsole.Instance.Info("[REDIS ASSET SERVICE]: Redis asset service enabled");
             }
+            MainConsole.Instance.Info("[REDIS ASSET SERVICE]: Redis asset service enabled");
         }
 
         public virtual void Start(IConfigSource config, IRegistryCore registry)
@@ -292,7 +294,7 @@ namespace WhiteCore.RedisServices.AssetService
 
         #endregion
 
-        private byte[] RedisEnsureConnection(Func<RedisClient<byte[]>, byte[]> func)
+        byte[] RedisEnsureConnection(Func<RedisClient<byte[]>, byte[]> func)
         {
             RedisClient<byte[]> client = null;
             try
@@ -322,7 +324,7 @@ namespace WhiteCore.RedisServices.AssetService
             return null;
         }
 
-        private bool RedisEnsureConnection(Func<RedisClient<byte[]>, bool> func)
+        bool RedisEnsureConnection(Func<RedisClient<byte[]>, bool> func)
         {
             RedisClient<byte[]> client = null;
             try
@@ -394,7 +396,7 @@ namespace WhiteCore.RedisServices.AssetService
             return asset;
         }
 
-        private AssetBase CheckForConversion(string id)
+        AssetBase CheckForConversion(string id)
         {
             if (!m_doConversion)
                 return null;
@@ -449,15 +451,16 @@ namespace WhiteCore.RedisServices.AssetService
                     return true;
                 }
 
-                RedisEnsureConnection((conn) =>
-                                          {
-                                              conn.Pipeline((c) =>
-                                                                {
-                                                                    c.Set(asset.IDString, memStream.ToArray());
-                                                                    c.Set(DATA_PREFIX + hash, data);
-                                                                });
-                                              return true;
-                                          });
+                RedisEnsureConnection(
+                    (conn) =>
+                    {
+                        conn.Pipeline((c) =>
+                            {
+                                c.Set(asset.IDString, memStream.ToArray());
+                                c.Set(DATA_PREFIX + hash, data);
+                            });
+                        return true;
+                    });
                 return true;
             }
             catch
@@ -475,6 +478,7 @@ namespace WhiteCore.RedisServices.AssetService
             AssetBase asset = RedisGetAsset(id);
             if (asset == null)
                 return;
+            
             RedisEnsureConnection((conn) => conn.Del(id) == 1);
             //DON'T DO THIS, there might be other references to this hash
             //RedisEnsureConnection((conn) => conn.Del(DATA_PREFIX + asset.HashCode) == 1);
@@ -508,7 +512,7 @@ namespace WhiteCore.RedisServices.AssetService
             MainConsole.Instance.InfoFormat("Name: {0}", asset.Name);
             MainConsole.Instance.InfoFormat("Description: {0}", asset.Description);
             MainConsole.Instance.InfoFormat("Type: {0}", asset.TypeAsset);
-            MainConsole.Instance.InfoFormat("Content-type: {0}", asset.TypeAsset.ToString());
+            MainConsole.Instance.InfoFormat("Content-type: {0}", asset.TypeAsset);
             MainConsole.Instance.InfoFormat("Flags: {0}", asset.Flags);
 
             for (i = 0; i < 5; i++)
@@ -516,6 +520,7 @@ namespace WhiteCore.RedisServices.AssetService
                 int off = i*16;
                 if (asset.Data.Length <= off)
                     break;
+                
                 int len = 16;
                 if (asset.Data.Length < off + len)
                     len = asset.Data.Length - off;
