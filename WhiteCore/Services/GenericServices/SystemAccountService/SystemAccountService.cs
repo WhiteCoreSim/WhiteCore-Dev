@@ -140,7 +140,7 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
             m_accountService = m_registry.RequestModuleInterface<IUserAccountService>();
 
             // these are only valid if we are local
-            if (!m_accountService.RemoteCalls())
+            if (m_accountService.IsLocalConnector)
             {
                 // check and/or create default RealEstate user
                 CheckSystemUserInfo ();

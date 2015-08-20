@@ -68,7 +68,7 @@ namespace WhiteCore.Services
         /// </summary>
         public void FinishedStartup()
         {
-            if (!m_doRemoteCalls)
+            if (IsLocalConnector)
             {
                 m_database = Framework.Utilities.DataManager.RequestPlugin<ISchedulerDataPlugin>();
 //                if (m_database != null)

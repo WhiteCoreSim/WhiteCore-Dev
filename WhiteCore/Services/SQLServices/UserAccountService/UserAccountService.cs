@@ -53,13 +53,9 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
         protected GenericAccountCache<UserAccount> m_cache = new GenericAccountCache<UserAccount>();
         protected string[] m_userNameSeed;
         protected string m_defaultDataPath;
+        protected int m_newUserStipend = 0;
 
         #endregion
-
-        public bool RemoteCalls()
-        {
-            return m_doRemoteCalls;
-        }
 
         #region IService Members
 
@@ -89,6 +85,11 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     m_userNameSeed = userNameSeed.Split (',');
             }
 
+            // check for initial stipend payment for new users
+            IConfig currConfig = config.Configs ["Currency"];
+            if (currConfig != null)
+                m_newUserStipend = currConfig.GetInt ("NewUserStipend", 0);
+
         }
 
         public void Configure(IConfigSource config, IRegistryCore registry)
@@ -106,131 +107,129 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
         public void FinishedStartup()
         {
             // these are only valid if we are local
-            if (!m_doRemoteCalls)
+            if (IsLocalConnector)
                 AddCommands ();
         }
 
         void AddCommands()
         {
-            if (MainConsole.Instance != null)
+            if (IsLocalConnector && (MainConsole.Instance != null))
             {
-                if (!m_doRemoteCalls)
-                {
-                    MainConsole.Instance.Commands.AddCommand(
-                        "add user",
-                        "add user [<first> [<last> [<pass> [<email>]]]] [--system] [--uuid]",
-                        "Create a new user. If optional parameters are not supplied required details will be prompted\n"+
-                        "  --system : Enter user scope UUID\n"+
-                        "  --uuid : Enter a specific UUID for the user",
-                        HandleCreateUser, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "add user",
+                    "add user [<first> [<last> [<pass> [<email>]]]] [--system] [--uuid]",
+                    "Create a new user. If optional parameters are not supplied required details will be prompted\n"+
+                    "  --system : Enter user scope UUID\n"+
+                    "  --uuid : Enter a specific UUID for the user",
+                    HandleCreateUser, false, true);
 
-                    // alias for 'add user' (legacy)
-                    MainConsole.Instance.Commands.AddCommand(
-                        "create user",
-                        "create user [<first> [<last> [<pass> [<email>]]]] [--system] [--uuid]",
-                        "Create a new user. If optional parameters are not supplied required details will be prompted\n"+
-                        "  --system : Enter user scope UUID\n"+
-                        "  --uuid : Enter a specific UUID for the user",
-                        HandleCreateUser, false, true);
+                // alias for 'add user' (legacy)
+                MainConsole.Instance.Commands.AddCommand(
+                    "create user",
+                    "create user [<first> [<last> [<pass> [<email>]]]] [--system] [--uuid]",
+                    "Create a new user. If optional parameters are not supplied required details will be prompted\n"+
+                    "  --system : Enter user scope UUID\n"+
+                    "  --uuid : Enter a specific UUID for the user",
+                    HandleCreateUser, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand(
-                        "delete user",
-                        "delete user  [<first> [<last>]] ",
-                        "Deletes an existing user",
-                        HandleDeleteUser, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "delete user",
+                    "delete user  [<first> [<last>]] ",
+                    "Deletes an existing user",
+                    HandleDeleteUser, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand(
-                        "disable user",
-                        "disable user  [<first> [<last>]] ",
-                        "Disable an existing user",
-                        HandleDisableUser, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "disable user",
+                    "disable user  [<first> [<last>]] ",
+                    "Disable an existing user",
+                    HandleDisableUser, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand(
-                        "enable user",
-                        "enable user  [<first> [<last>]] ",
-                        "Enables an existing user that was previously disabled",
-                        HandleEnableUser, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "enable user",
+                    "enable user  [<first> [<last>]] ",
+                    "Enables an existing user that was previously disabled",
+                    HandleEnableUser, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand(
-                        "reset user password",
-                        "reset user password [<first> [<last> [<password>]]]",
-                        "Reset a user password",
-                        HandleResetUserPassword, false, true);
-                        
-                    MainConsole.Instance.Commands.AddCommand(
-                        "set user email",
-                        "set user email [<first> [<last> [<email@address>]]]",
-                        "Set an email address for a user",
-                        HandleSetUserEmail, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "reset user password",
+                    "reset user password [<first> [<last> [<password>]]]",
+                    "Reset a user password",
+                    HandleResetUserPassword, false, true);
+                    
+                MainConsole.Instance.Commands.AddCommand(
+                    "set user email",
+                    "set user email [<first> [<last> [<email@address>]]]",
+                    "Set an email address for a user",
+                    HandleSetUserEmail, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand(
-                        "show account",
-                        "show account [<first> [<last>]]",
-                        "Show account details for the given user",
-                        HandleShowAccount, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "show account",
+                    "show account [<first> [<last>]]",
+                    "Show account details for the given user",
+                    HandleShowAccount, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand(
-                        "show user account",
-                        "show user account [<first> [<last>]]",
-                        "Show account details for the given user",
-                        HandleShowUserAccount, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "show user account",
+                    "show user account [<first> [<last>]]",
+                    "Show account details for the given user",
+                    HandleShowUserAccount, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand(
-                        "set user level",
-                        "set user level [<first> [<last> [<level>]]]",
-                        "Set user level. If the user's level is > 0, this account will be treated as god-mode.\n" +
-                        "It will also affect the 'login level' command. ",
-                        HandleSetUserLevel, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "set user level",
+                    "set user level [<first> [<last> [<level>]]]",
+                    "Set user level. If the user's level is > 0, this account will be treated as god-mode.\n" +
+                    "It will also affect the 'login level' command. ",
+                    HandleSetUserLevel, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand(
-                        "set user type",
-                        "set user type [<first> [<last> [<type>]]]",
-                        "Set the user account type. I.e. Guest, Resident, Member etc (Used for stipend payments)",
-                        HandleSetUserType, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "set user type",
+                    "set user type [<first> [<last> [<type>]]]",
+                    "Set the user account type. I.e. Guest, Resident, Member etc (Used for stipend payments)",
+                    HandleSetUserType, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand(
-                        "set user profile title",
-                        "set user profile title [<first> [<last> [<Title>]]]",
-                        "Sets the title (Normally resident) in a user's title to some custom value.",
-                        HandleSetTitle, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "set user profile title",
+                    "set user profile title [<first> [<last> [<Title>]]]",
+                    "Sets the title (Normally resident) in a user's title to some custom value.",
+                    HandleSetTitle, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand(
-                        "set partner",
-                        "set partner",
-                        "Sets the partner in a user's profile.",
-                        HandleSetPartner, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "set partner",
+                    "set partner",
+                    "Sets the partner in a user's profile.",
+                    HandleSetPartner, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand(
-                        "reset partner",
-                        "reset partner",
-                        "Resets the partner in a user's profile.",
-                        HandleResetPartner, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "reset partner",
+                    "reset partner",
+                    "Resets the partner in a user's profile.",
+                    HandleResetPartner, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand(
-                        "load users",
-                        "load user [<CSV file>]",
-                        "Loads users from a CSV file into WhiteCore",
-                        HandleLoadUsers, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "load users",
+                    "load user [<CSV file>]",
+                    "Loads users from a CSV file into WhiteCore",
+                    HandleLoadUsers, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand(
-                        "save users",
-                        "save users [<CSV file>]",
-                        "Saves all users from WhiteCore into a CSV file",
-                        HandleSaveUsers, false, true);
+                MainConsole.Instance.Commands.AddCommand(
+                    "save users",
+                    "save users [<CSV file>]",
+                    "Saves all users from WhiteCore into a CSV file",
+                    HandleSaveUsers, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand(
-                        "set user rezday",
-                        "set user rezday [<first> [<last>]]",
-                        "Sets the users creation date",
-                        HandleSetRezday, false, true);
-                    #if TEST_USERS
-                    MainConsole.Instance.Commands.AddCommand(
-                        "create test users",
-                        "create test users",
-                        "Create multiple users for testing purposes",
-                        HandleTestUsers, false, true);
-                    #endif
-                }
+                MainConsole.Instance.Commands.AddCommand(
+                    "set user rezday",
+                    "set user rezday [<first> [<last>]]",
+                    "Sets the users creation date",
+                    HandleSetRezday, false, true);
+                #if TEST_USERS
+                MainConsole.Instance.Commands.AddCommand(
+                    "create test users",
+                    "create test users",
+                    "Create multiple users for testing purposes",
+                    HandleTestUsers, false, true);
+                #endif
+            
             }
         }
 
@@ -505,53 +504,67 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
 
             UserAccount account = GetUserAccount(null, newAccount.PrincipalID);
             UserAccount nameaccount = GetUserAccount(null, newAccount.Name);
-            if (account == null && nameaccount == null)
+            if (account != null || nameaccount != null)
             {
-                if (StoreUserAccount(newAccount))
-                {
-                    bool success;
-                    if (m_AuthenticationService != null && password != "")
-                    {
-                        success = m_AuthenticationService.SetPasswordHashed(newAccount.PrincipalID, "UserAccount", password);
-                        if (!success)
-                        {
-                            MainConsole.Instance.WarnFormat(
-                                "[USER ACCOUNT SERVICE]: Unable to set password for account {0}.",
-                                newAccount.Name);
-                            return "Unable to set password";
-                        }
-                    }
-
-                    MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Account {0} created successfully",
-                                                    newAccount.Name);
-                    //Cache it as well
-                    CacheAccount(newAccount);
-                    m_registry.RequestModuleInterface<ISimulationBase>()
-                              .EventManager.FireGenericEventHandler("CreateUserInformation", newAccount.PrincipalID);
-
-                    // create a profile for the new user as well
-                    if (m_profileConnector != null)
-                    {
-                        m_profileConnector.CreateNewProfile (newAccount.PrincipalID);
-                        IUserProfileInfo profile = m_profileConnector.GetUserProfile (newAccount.PrincipalID);
-
-                        // if (AvatarArchive != "")
-                        //    profile.AArchiveName = AvatarArchive;
-                        profile.MembershipGroup = "Resident";
-                        profile.IsNewUser = true;
-                        m_profileConnector.UpdateUserProfile (profile);
-                    }
-
-                    return "";
-                }
-
-                MainConsole.Instance.ErrorFormat("[USER ACCOUNT SERVICE]: Account creation failed for account {0}", newAccount.Name);
-                return "Unable to save account";
-
+                MainConsole.Instance.ErrorFormat ("[USER ACCOUNT SERVICE]: A user with the name {0} already exists!", newAccount.Name);
+                return "A user with the same name already exists";
             }
 
-            MainConsole.Instance.ErrorFormat("[USER ACCOUNT SERVICE]: A user with the name {0} already exists!", newAccount.Name);
-            return "A user with the same name already exists";
+            // This one is available...
+            if (!StoreUserAccount (newAccount))
+            {
+                MainConsole.Instance.ErrorFormat ("[USER ACCOUNT SERVICE]: Account creation failed for account {0}", newAccount.Name);
+                return "Unable to save account";
+            }
+        
+            bool success;
+            if (m_AuthenticationService != null && password != "")
+            {
+                success = m_AuthenticationService.SetPasswordHashed (newAccount.PrincipalID, "UserAccount", password);
+                if (!success)
+                {
+                    MainConsole.Instance.WarnFormat (
+                        "[USER ACCOUNT SERVICE]: Unable to set password for account {0}.", newAccount.Name);
+                    return "Unable to set password";
+                }
+            }
+
+            MainConsole.Instance.InfoFormat ("[USER ACCOUNT SERVICE]: Account {0} created successfully", newAccount.Name);
+            //Cache it as well
+            CacheAccount (newAccount);
+            m_registry.RequestModuleInterface<ISimulationBase> ()
+                              .EventManager.FireGenericEventHandler ("CreateUserInformation", newAccount.PrincipalID);
+
+            // create a profile for the new user
+            if (m_profileConnector != null)
+            {
+                m_profileConnector.CreateNewProfile (newAccount.PrincipalID);
+                IUserProfileInfo profile = m_profileConnector.GetUserProfile (newAccount.PrincipalID);
+
+                // if (AvatarArchive != "")
+                //    profile.AArchiveName = AvatarArchive;
+                profile.MembershipGroup = "Resident";
+                profile.IsNewUser = true;
+                m_profileConnector.UpdateUserProfile (profile);
+            }
+
+            // top up the wallet?
+            if ((m_newUserStipend > 0) && !Utilities.IsSystemUser (newAccount.PrincipalID))
+            {
+                IMoneyModule money = m_registry.RequestModuleInterface<IMoneyModule> ();
+                if (money != null)
+                {
+                    money.Transfer (
+                        newAccount.PrincipalID,
+                        (UUID)Constants.BankerUUID,            
+                        m_newUserStipend,
+                        "New user stipend",
+                        TransactionType.SystemGenerated
+                    );
+                }
+            }
+            return "";
+
 
         }
 
@@ -1372,6 +1385,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             string LastName;
             string Password;
             string Email;
+            string Rezday;
             UUID UserUUID;
 
             fileName = PathHelpers.VerifyReadFile(fileName,"csv", m_defaultDataPath + "/Updates");
@@ -1387,7 +1401,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 while (!rd.EndOfStream)
                 {
                     var userInfo = rd.ReadLine ().Split (',');
-                    if (userInfo.Length < 4)
+                    if (userInfo.Length < 5)
                     {
                         MainConsole.Instance.Error ("[User Load]: Insufficient details; Skipping " + userInfo);
                         continue;
@@ -1398,6 +1412,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     LastName = userInfo [2];
                     Password = userInfo [3];
                     Email = userInfo.Length < 6 ? userInfo [4] : "";
+                    Rezday = userInfo[5];
 
                     string check = CreateUser (UserUUID, UUID.Zero, FirstName + " " + LastName, Util.Md5Hash(Password), Email);
                     if (check != "")
@@ -1411,6 +1426,18 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     //account.UserLevel = 0;
                     account.UserFlags = Constants.USER_FLAG_RESIDENT;
                     StoreUserAccount (account);
+                    
+                    // [NEW] Set the users rezdate
+                    if (m_profileConnector != null)
+                    {
+                    	IUserProfileInfo profile = m_profileConnector.GetUserProfile (account.PrincipalID);
+                    	profile.Created = int.Parse(Rezday);
+                    	bool success = m_profileConnector.UpdateUserProfile (profile);
+                    	if (!success)
+                    		MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Unable to change rezday for {0} {1}.", account.FirstName, account.LastName);
+                    	else
+                    		MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Account {0} {1} has a rezday set.", account.FirstName, account.LastName);
+                    }
 
                     userNo++;
 

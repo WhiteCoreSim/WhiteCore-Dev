@@ -67,14 +67,14 @@ namespace WhiteCore.Framework.Services
             get { return m_registry.RequestModuleInterface<IConfigurationService>(); }
         }
 
-        protected bool m_doRemoteCalls = false;
-        protected bool m_startedServer = false;
+        protected bool m_doRemoteCalls;
+        protected bool m_startedServer;
         protected string m_name;
-        protected bool m_doRemoteOnly = false;
+        protected bool m_doRemoteOnly;
         protected int m_OSDRequestTryCount = 7;
         protected string m_password = "";
 
-        public bool DoRemoteCalls { get { return m_doRemoteCalls; } }
+        public bool IsLocalConnector { get { return !m_doRemoteCalls; } }
 
         public string ServerHandlerName
         {
