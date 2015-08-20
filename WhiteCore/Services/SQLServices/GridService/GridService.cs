@@ -159,7 +159,10 @@ namespace WhiteCore.Services.SQLServices.GridService
                 m_AllowDuplicateNames = gridConfig.GetBoolean ("AllowDuplicateNames", m_AllowDuplicateNames);
             }
 
-            if (MainConsole.Instance != null)
+            registry.RegisterModuleInterface<IGridService> (this);
+            Init (registry, Name, serverPath: "/grid/", serverHandlerName: "GridServerURI");
+
+            if (IsLocalConnector && (MainConsole.Instance != null))
             {
                 MainConsole.Instance.Commands.AddCommand (
                     "show region",
@@ -214,10 +217,8 @@ namespace WhiteCore.Services.SQLServices.GridService
                     "show full grid",
                     "Show details of the grid regions",
                     HandleShowFullGrid, false, true);
-
             }
-            registry.RegisterModuleInterface<IGridService> (this);
-            Init (registry, Name, serverPath: "/grid/", serverHandlerName: "GridServerURI");
+
         }
 
         public virtual void Start (IConfigSource config, IRegistryCore registry)
@@ -230,6 +231,7 @@ namespace WhiteCore.Services.SQLServices.GridService
         public virtual void FinishedStartup ()
         {
             m_gridServerInfo = m_registry.RequestModuleInterface<IGridServerInfoService> ();
+
         }
 
         public virtual string Name

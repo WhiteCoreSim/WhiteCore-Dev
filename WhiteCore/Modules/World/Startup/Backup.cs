@@ -26,6 +26,15 @@
  */
 
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
@@ -35,15 +44,6 @@ using WhiteCore.Framework.Serialization;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Assets;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
 
 namespace WhiteCore.Modules.Startup
 {
@@ -130,6 +130,7 @@ namespace WhiteCore.Modules.Startup
         /// <summary>
         ///     Runs commands issued by the server console from the operator
         /// </summary>
+        /// <param name="scene">Currently selected scene</param>
         /// <param name="cmdparams">Additional arguments passed to the command</param>
         public void RunCommand(IScene scene, string[] cmdparams)
         {
@@ -163,6 +164,7 @@ namespace WhiteCore.Modules.Startup
                 MainConsole.Instance.Info("Not enough parameters");
                 return;
             }
+
             Vector3 offset = new Vector3(float.Parse(cmdParams[3]), float.Parse(cmdParams[4]), float.Parse(cmdParams[5]));
             scene.ForEachSceneEntity(delegate(ISceneEntity entity)
             {
@@ -303,8 +305,8 @@ namespace WhiteCore.Modules.Startup
             {
                 LoadingPrims = true;
 
-                MainConsole.Instance.Info("[BackupModule]: Loading objects for " + m_scene.RegionInfo.RegionName +
-                                          " from " + m_scene.SimulationDataService.Name);
+                MainConsole.Instance.InfoFormat("[BackupModule]: Loading objects for {0} from {1}",
+                    m_scene.RegionInfo.RegionName, m_scene.SimulationDataService.Name);
                 List<ISceneEntity> PrimsFromDB = m_scene.SimulationDataService.LoadObjects();
                 foreach (ISceneEntity group in PrimsFromDB)
                 {
@@ -337,9 +339,9 @@ namespace WhiteCore.Modules.Startup
                             group.AbsolutePosition.Y > m_scene.RegionInfo.RegionSizeY + 10 ||
                             group.AbsolutePosition.Y < -10)
                         {
-                            MainConsole.Instance.Warn("[BackupModule]: Object outside the region (" + group.Name + ", " +
-                                                      group.AbsolutePosition +
-                                                      ") found while loading objects, removing it from the database.");
+                            MainConsole.Instance.WarnFormat("[BackupModule]: Object outside the region "+
+                                "(" + group.Name + ", " + group.AbsolutePosition + ")" +
+                                " found while loading objects, removing it from the database.");
                             //WTF went wrong here? Remove by passing it by on loading
                             continue;
                         }
@@ -359,12 +361,11 @@ namespace WhiteCore.Modules.Startup
                     catch (Exception ex)
                     {
                         MainConsole.Instance.WarnFormat(
-                            "[BackupModule]: Exception attempting to load object from the database, {0}, continuing...",
-                            ex.ToString());
+                            "[BackupModule]: Exception attempting to load object from the database, {0}, continuing...", ex);
                     }
                 }
                 LoadingPrims = false;
-                MainConsole.Instance.Info("[BackupModule]: Loaded " + PrimsFromDB.Count.ToString() + " object(s) in " +
+                MainConsole.Instance.Info("[BackupModule]: Loaded " + PrimsFromDB.Count + " object(s) in " +
                                           m_scene.RegionInfo.RegionName);
                 PrimsFromDB.Clear();
             }
@@ -610,9 +611,8 @@ namespace WhiteCore.Modules.Startup
                     foreach (ILandObject parcel in landObject)
                     {
                         OSDMap parcelMap = parcel.LandData.ToOSD();
-                        writer.WriteFile("parcels/" + parcel.LandData.GlobalID.ToString(),
+                        writer.WriteFile("parcels/" + parcel.LandData.GlobalID,
                                          OSDParser.SerializeLLSDBinary(parcelMap));
-                        parcelMap = null;
                     }
                 }
 
@@ -642,7 +642,6 @@ namespace WhiteCore.Modules.Startup
                         {
                             sdata = WriteTerrainToStream(tModule.TerrainWaterMap);
                             writer.WriteFile("newstylewater/" + scene.RegionInfo.RegionID + ".terrain", sdata);
-                            sdata = null;
 
                             sdata = WriteTerrainToStream(tModule.TerrainWaterRevertMap);
                             writer.WriteFile(
@@ -680,13 +679,15 @@ namespace WhiteCore.Modules.Startup
                             ((entity.RootChild.Flags & PrimFlags.Temporary) == PrimFlags.Temporary)
                             || ((entity.RootChild.Flags & PrimFlags.TemporaryOnRez) == PrimFlags.TemporaryOnRez))
                             continue;
+                        
                         //Write all entities
                         byte[] xml = entity.ToBinaryXml2();
                         writer.WriteFile("entities/" + entity.UUID, xml);
                         xml = null;
                         count++;
-                        if (count%3 == 0)
+                        if (count % 3 == 0)
                             Thread.Sleep(5);
+                        
                         //Get all the assets too
                         if (saveAssets)
                             assetGatherer.GatherAssetUuids(entity, assets);
@@ -726,6 +727,7 @@ namespace WhiteCore.Modules.Startup
                 int tMapSize = tModule.Width*tModule.Height;
                 byte[] sdata = new byte[tMapSize*2];
                 Buffer.BlockCopy(tModule.GetSerialised(), 0, sdata, 0, sdata.Length);
+
                 return sdata;
             }
 
@@ -753,11 +755,13 @@ namespace WhiteCore.Modules.Startup
                 IScriptModule[] modules = scene.RequestModuleInterfaces<IScriptModule>();
                 IParcelManagementModule parcelModule = scene.RequestModuleInterface<IParcelManagementModule>();
                 //Disable the script engine so that it doesn't load in the background and kill OAR loading
+
                 foreach (IScriptModule module in modules)
                 {
                     if (module != null)
                         module.Disabled = true;
                 }
+
                 //Disable backup for now as well
                 if (backup != null)
                 {
@@ -788,11 +792,13 @@ namespace WhiteCore.Modules.Startup
             {
                 IBackupModule backup = scene.RequestModuleInterface<IBackupModule>();
                 IScriptModule[] modules = scene.RequestModuleInterfaces<IScriptModule>();
+
                 //Reeanble now that we are done
                 foreach (IScriptModule module in modules)
                 {
                     module.Disabled = false;
                 }
+
                 //Reset backup too
                 if (backup != null)
                     backup.LoadingPrims = false;
@@ -810,7 +816,9 @@ namespace WhiteCore.Modules.Startup
                             parcelManagementModule.UpdateLandObject(parcelManagementModule.GetLandObject(parcel.LocalID));
                         }
                     }
-                    else parcelManagementModule.ResetSimLandObjects();
+                    else 
+                        parcelManagementModule.ResetSimLandObjects();
+                    
                     m_parcels.Clear();
                 }
 
@@ -934,8 +942,6 @@ namespace WhiteCore.Modules.Startup
                     MemoryStream ms = new MemoryStream(data);
                     ISceneEntity sceneObject = SceneEntitySerializer.SceneObjectSerializer.FromXml2Format(ref ms, scene);
                     ms.Close();
-                    ms = null;
-                    data = null;
                     m_groups.Add(sceneObject);
                 }
                 else if (filePath.StartsWith("assets/"))
@@ -961,8 +967,10 @@ namespace WhiteCore.Modules.Startup
                 UserAccount acc;
                 if (m_cache.Get(uuid, out acc))
                     return acc != null;
+                
                 acc = m_scene.UserAccountService.GetUserAccount(m_scene.RegionInfo.AllScopeIDs, uuid);
                 m_cache.Cache(uuid, acc);
+
                 return acc != null;
             }
 

@@ -26,6 +26,13 @@
  */
 
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Timers;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
@@ -35,13 +42,6 @@ using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Assets;
 using WhiteCore.Framework.Services.ClassHelpers.Inventory;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Timers;
 using Timer = System.Timers.Timer;
 
 namespace WhiteCore.Modules.Appearance
@@ -158,10 +158,13 @@ textures 1
             scene.EventManager.OnRemovePresence += EventManager_OnRemovePresence;
 
             if (MainConsole.Instance != null)
-                MainConsole.Instance.Commands.AddCommand("force send appearance", 
-            	                                         "force send appearance",
-                                                         "Force send the avatar's appearance",
-                                                         HandleConsoleForceSendAppearance, true, false);
+            {
+                MainConsole.Instance.Commands.AddCommand (
+                    "force send appearance", 
+                    "force send appearance <first> <last>",
+                    "Force send the avatar's appearance",
+                    HandleConsoleForceSendAppearance, true, false);
+            }
 
             _saveQueue.Start(m_savetime, HandleAppearanceSave);
             _sendQueue.Start(m_sendtime, HandleAppearanceSend);
@@ -261,7 +264,7 @@ textures 1
             {
                 if (textureEntry != null)
                 {
-                    List<UUID> ChangedTextures = new List<UUID>();
+                    List<UUID> ChangedTextures;
                     texturesChanged = appearance.Appearance.SetTextureEntries(textureEntry, out ChangedTextures);
                 }
                 appearance.Appearance.SetCachedWearables(wearables);
@@ -690,7 +693,7 @@ textures 1
 
         public void ForceSendAvatarAppearance(UUID agentid)
         {
-            //If the avatar changes appearance, then proptly logs out, this will break!
+            //If the avatar changes appearance, then promptly logs out, this will break!
             IScenePresence sp = m_scene.GetScenePresence(agentid);
             if (sp == null || sp.IsChildAgent)
             {
@@ -712,13 +715,26 @@ textures 1
 
         void HandleConsoleForceSendAppearance(IScene scene, string[] cmds)
         {
-            if (cmds.Length != 5)
+            string firstName;
+            string lastName;
+
+            if (cmds.Length < 5)
             {
-                if (MainConsole.Instance != null)
-                    MainConsole.Instance.Info("Wrong number of commands.");
-                return;
+                string name = "";
+                name = MainConsole.Instance.Prompt ("User Name <first last>: ", name);
+                if (name == "")
+                    return;
+                var names = name.Split (' ');
+                if (names.Length < 2)
+                    return;
+                firstName = names [0];
+                lastName = names [1];
+
+            } else
+            {
+                firstName = cmds [3];
+                lastName = cmds [4];
             }
-            string firstName = cmds[3], lastName = cmds[4];
 
             IScenePresence SP;
             if (scene.TryGetAvatarByName(firstName + " " + lastName, out SP))

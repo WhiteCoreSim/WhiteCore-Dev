@@ -127,9 +127,10 @@ namespace WhiteCore.Framework.Services
     public interface IUserAccountService
     {
         /// <summary>
-        /// Returns true if the service is remote.
+        /// Returns true if service is local.
+        /// This exposes the ConnectorBase field so it can be used by inherited classes
         /// </summary>
-        bool RemoteCalls ();
+        bool IsLocalConnector { get; }
 
         IUserAccountService InnerService { get; }
 

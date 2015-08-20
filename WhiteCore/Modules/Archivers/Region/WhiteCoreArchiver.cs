@@ -26,136 +26,143 @@
  */
 
 
+using System;
+using System.IO;
+using System.IO.Compression;
+using System.Threading;
+using Nini.Config;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Serialization;
 using WhiteCore.Framework.Services;
-using Microsoft.Win32;
-using Nini.Config;
-using System;
-using System.IO;
-using System.IO.Compression;
-using System.Threading;
+
+#if ISWIN
 using System.Windows.Forms;
+using Microsoft.Win32;
 using WhiteCore.Framework.Utilities;
+#endif
 
 namespace WhiteCore.Modules.Archivers
 {
     public class WhiteCoreArchiver : IService, IWhiteCoreBackupArchiver
     {
-        private Int64 m_AllowPrompting;
+        Int64 m_AllowPrompting;
 
         #region IWhiteCoreBackupArchiver Members
 
         public bool AllowPrompting
         {
-            get { return Interlocked.Read(ref m_AllowPrompting) == 0; }
+            get { return Interlocked.Read (ref m_AllowPrompting) == 0; }
             set
             {
                 if (value)
-                    Interlocked.Increment(ref m_AllowPrompting);
+                    Interlocked.Increment (ref m_AllowPrompting);
                 else
-                    Interlocked.Decrement(ref m_AllowPrompting);
+                    Interlocked.Decrement (ref m_AllowPrompting);
             }
         }
 
-        public void SaveRegionBackup(TarArchiveWriter writer, IScene scene)
+        public void SaveRegionBackup (TarArchiveWriter writer, IScene scene)
         {
-            writer.WriteDir("assets"); //Used by many, create it by default
+            writer.WriteDir ("assets"); //Used by many, create it by default
 
-            IWhiteCoreBackupModule[] modules = scene.RequestModuleInterfaces<IWhiteCoreBackupModule>();
+            IWhiteCoreBackupModule[] modules = scene.RequestModuleInterfaces<IWhiteCoreBackupModule> ();
             foreach (IWhiteCoreBackupModule module in modules)
-                module.SaveModuleToArchive(writer, scene);
+                module.SaveModuleToArchive (writer, scene);
 
             foreach (IWhiteCoreBackupModule module in modules)
             {
                 while (module.IsArchiving) //Wait until all are done
-                    Thread.Sleep(100);
+                    Thread.Sleep (100);
             }
 
-            writer.Close();
-            GC.Collect();
-            MainConsole.Instance.Info("[Archive]: Finished saving of archive.");
+            writer.Close ();
+            GC.Collect ();
+            MainConsole.Instance.Info ("[Archive]: Finished saving of archive.");
         }
 
-        public void LoadRegionBackup(TarArchiveReader reader, IScene scene)
+        public void LoadRegionBackup (TarArchiveReader reader, IScene scene)
         {
-            IWhiteCoreBackupModule[] modules = scene.RequestModuleInterfaces<IWhiteCoreBackupModule>();
+            IWhiteCoreBackupModule[] modules = scene.RequestModuleInterfaces<IWhiteCoreBackupModule> ();
 
             byte[] data;
             string filePath;
             TarArchiveReader.TarEntryType entryType;
 
             foreach (IWhiteCoreBackupModule module in modules)
-                module.BeginLoadModuleFromArchive(scene);
+                module.BeginLoadModuleFromArchive (scene);
 
-            while ((data = reader.ReadEntry(out filePath, out entryType)) != null)
+            while ((data = reader.ReadEntry (out filePath, out entryType)) != null)
             {
                 if (TarArchiveReader.TarEntryType.TYPE_DIRECTORY == entryType)
                     continue;
                 foreach (IWhiteCoreBackupModule module in modules)
-                    module.LoadModuleFromArchive(data, filePath, entryType, scene);
+                    module.LoadModuleFromArchive (data, filePath, entryType, scene);
             }
 
-            reader.Close();
+            reader.Close ();
 
             foreach (IWhiteCoreBackupModule module in modules)
-                module.EndLoadModuleFromArchive(scene);
+                module.EndLoadModuleFromArchive (scene);
         }
 
         #endregion
 
         #region IService Members
 
-        public void Initialize(IConfigSource config, IRegistryCore registry)
+        public void Initialize (IConfigSource config, IRegistryCore registry)
         {
             if (MainConsole.Instance != null)
             {
-                MainConsole.Instance.Commands.AddCommand(
+                MainConsole.Instance.Commands.AddCommand (
                     "save archive",
                     "save archive",
                     "Saves a WhiteCore '.abackup' archive (deprecated)",
                     SaveWhiteCoreArchive, true, false);
 
-                MainConsole.Instance.Commands.AddCommand(
+                MainConsole.Instance.Commands.AddCommand (
                     "load archive",
                     "load archive",
-                    "Loads a WhiteCore '.abackupArchive",
+                    "Loads a WhiteCore '.abackup' archive",
                     LoadWhiteCoreArchive, true, false);
             }
+
+            #if ISWIN
             //Register the extension
             const string ext = ".abackup";
             try
             {
-                if(Util.IsWindows())
+                if (Util.IsWindows ())
                 {
-                    RegistryKey key = Registry.ClassesRoot.CreateSubKey(ext + "\\DefaultIcon");
-                    key.SetValue("", Application.StartupPath + "\\CrateDownload.ico");
-                    key.Close();
+                    RegistryKey key = Registry.ClassesRoot.CreateSubKey (ext + "\\DefaultIcon");
+                    key.SetValue ("", Application.StartupPath + "\\CrateDownload.ico");
+                    key.Close ();
                 }
-            }
-            catch
+            } catch
             {
             }
+            #endif
+
             //Register the interface
-            registry.RegisterModuleInterface<IWhiteCoreBackupArchiver>(this);
+            registry.RegisterModuleInterface<IWhiteCoreBackupArchiver> (this);
+
         }
 
-        public void Start(IConfigSource config, IRegistryCore registry)
+        public void Start (IConfigSource config, IRegistryCore registry)
         {
         }
 
-        public void FinishedStartup()
+        public void FinishedStartup ()
         {
         }
 
         #endregion
 
-        private void LoadWhiteCoreArchive(IScene scene, string[] cmd)
+        void LoadWhiteCoreArchive (IScene scene, string[] cmd)
         {
-            string fileName = MainConsole.Instance.Prompt("What file name should we load?",
-                                                          scene.RegionInfo.RegionName + ".abackup");
+            string fileName = MainConsole.Instance.Prompt ("What file name should we load?",
+                                  scene.RegionInfo.RegionName + ".abackup");
 
             // a couple of sanity checks
             string extension = Path.GetExtension (fileName);
@@ -165,28 +172,29 @@ namespace WhiteCore.Modules.Archivers
                 fileName = fileName + ".abackup";
             }
 
-            if (!File.Exists(fileName)) {
-                MainConsole.Instance.Info ("[Archiver]: Region archive file '"+fileName+"' not found.");
+            if (!File.Exists (fileName))
+            {
+                MainConsole.Instance.Info ("[Archiver]: Region archive file '" + fileName + "' not found.");
                 return;
             }
 
-            var stream = ArchiveHelpers.GetStream(fileName);
+            var stream = ArchiveHelpers.GetStream (fileName);
             if (stream == null)
             {
-                MainConsole.Instance.Warn("No file found with the specified name.");
+                MainConsole.Instance.Warn ("No file found with the specified name.");
                 return;
             }
-            GZipStream m_loadStream = new GZipStream(stream, CompressionMode.Decompress);
-            TarArchiveReader reader = new TarArchiveReader(m_loadStream);
+            GZipStream m_loadStream = new GZipStream (stream, CompressionMode.Decompress);
+            TarArchiveReader reader = new TarArchiveReader (m_loadStream);
 
-            LoadRegionBackup(reader, scene);
-            GC.Collect();
+            LoadRegionBackup (reader, scene);
+            GC.Collect ();
         }
 
-        private void SaveWhiteCoreArchive(IScene scene, string[] cmd)
+        void SaveWhiteCoreArchive (IScene scene, string[] cmd)
         {
-            string fileName = MainConsole.Instance.Prompt("What file name will this be saved as?",
-                                                          scene.RegionInfo.RegionName + ".abackup");
+            string fileName = MainConsole.Instance.Prompt ("What file name will this be saved as?",
+                                  scene.RegionInfo.RegionName + ".abackup");
 
             //some file sanity checks
             string extension = Path.GetExtension (fileName);
@@ -196,25 +204,29 @@ namespace WhiteCore.Modules.Archivers
                 fileName = fileName + ".abackup";
             }
 
-            string fileDir = Path.GetDirectoryName(fileName);
-            if (fileDir == "") { fileDir = "./"; }
-            if (!Directory.Exists(fileDir))
+            string fileDir = Path.GetDirectoryName (fileName);
+            if (fileDir == "")
             {
-                MainConsole.Instance.Info ( "[Archiver]: The file path specified, '" + fileDir + "' does not exist!" );
+                fileDir = "./";
+            }
+            if (!Directory.Exists (fileDir))
+            {
+                MainConsole.Instance.Info ("[Archiver]: The file path specified, '" + fileDir + "' does not exist!");
                 return;
             }
 
-            if (File.Exists(fileName)) {
-                if (MainConsole.Instance.Prompt ("[Archiver]: The Region archive file '" + fileName + "' already exists. Overwrite?", "yes" ) != "yes")
+            if (File.Exists (fileName))
+            {
+                if (MainConsole.Instance.Prompt ("[Archiver]: The Region archive file '" + fileName + "' already exists. Overwrite?", "yes") != "yes")
                     return;
 
                 File.Delete (fileName);
             }
 
-            GZipStream m_saveStream = new GZipStream(new FileStream(fileName, FileMode.Create), CompressionMode.Compress);
-            TarArchiveWriter writer = new TarArchiveWriter(m_saveStream);
+            GZipStream m_saveStream = new GZipStream (new FileStream (fileName, FileMode.Create), CompressionMode.Compress);
+            TarArchiveWriter writer = new TarArchiveWriter (m_saveStream);
 
-            SaveRegionBackup(writer, scene);
+            SaveRegionBackup (writer, scene);
         }
     }
 }

@@ -90,7 +90,7 @@ namespace WhiteCore.Services.DataService
             Init (simBase, Name);
 
             // check for system groups if we are local
-            if (!m_doRemoteCalls)
+            if (IsLocalConnector)
             {
                 VerifySystemGroup ( 
                     realEstateGroupName, 
