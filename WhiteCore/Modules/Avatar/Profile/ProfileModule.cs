@@ -74,14 +74,18 @@ namespace WhiteCore.Modules.Profiles
         public void Initialise (IConfigSource config)
         {
             IConfig profileConfig = config.Configs ["Profile"];
-            if (profileConfig == null)
+            if (profileConfig != null)
             {
-                MainConsole.Instance.Info ("[Profile] Not configured, disabling");
-                return;
+            	if (profileConfig.GetString ("ProfileModule", Name) == Name)
+            	{
+            		m_ProfileEnabled = true;
+            		MainConsole.Instance.Info ("[Profile] Profile Services are enabled");
+            	}
             }
-            if (profileConfig.GetString ("ProfileModule", Name) != Name)
+            else
             {
-                m_ProfileEnabled = false;
+            	m_ProfileEnabled = false;
+            	MainConsole.Instance.Info ("[Profile] Not configured, disabling");
             }
         }
 
@@ -424,8 +428,7 @@ namespace WhiteCore.Modules.Profiles
                 {
                     UserAccount parcelOwner =
                         remoteClient.Scene.UserAccountService.GetUserAccount (remoteClient.AllScopeIDs,
-                            targetlandObj.LandData
-                                                                                          .OwnerID);
+                            targetlandObj.LandData.OwnerID);
                     if (parcelOwner != null)
                         user = parcelOwner.Name;
 
@@ -678,8 +681,7 @@ namespace WhiteCore.Modules.Profiles
             if (UPI == null)
                 return;
             UserAccount account = remoteClient.Scene.UserAccountService.GetUserAccount (remoteClient.AllScopeIDs,
-                                      remoteClient
-                                                                                           .AgentId);
+                                      remoteClient.AgentId);
             remoteClient.SendUserInfoReply (UPI.Visible, UPI.IMViaEmail, account.Email);
         }
 
