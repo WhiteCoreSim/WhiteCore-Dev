@@ -134,11 +134,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         protected int m_sleepMsOnXorBase64Strings = 300;
         protected int m_sleepMsOnSetParcelMusicURL = 2000;
         protected int m_sleepMsOnGetPrimMediaParams = 1000;
-        protected int m_sleepMsOnGetLinkMedia = 1000;
+        //protected int m_sleepMsOnGetLinkMedia = 1000;
         protected int m_sleepMsOnSetPrimMediaParams = 1000;
-        protected int m_sleepMsOnSetLinkMedia = 1000;
+        //protected int m_sleepMsOnSetLinkMedia = 1000;
         protected int m_sleepMsOnClearPrimMedia = 1000;
-        protected int m_sleepMsOnClearLinkMedia = 1000;
+        //protected int m_sleepMsOnClearLinkMedia = 1000;
         protected int m_sleepMsOnRequestSimulatorData = 1000;
         protected int m_sleepMsOnLoadURL = 10000;
         protected int m_sleepMsOnParcelMediaCommandList = 2000;
@@ -10879,7 +10879,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return new LSL_List();
 
-            PScriptSleep(m_sleepMsOnGetLinkMedia);
+            //PScriptSleep(m_sleepMsOnGetLinkMedia);
             List<ISceneChildEntity> entities = GetLinkParts(link);
             if (entities.Count == 0 || face < 0 || face > entities[0].GetNumberOfSides() - 1)
                 return new LSL_List();
@@ -10995,7 +10995,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         public LSL_Integer llClearLinkMedia(LSL_Integer link, LSL_Integer face)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return 0;
-            PScriptSleep(m_sleepMsOnClearLinkMedia);
+            //PScriptSleep(m_sleepMsOnClearLinkMedia);
 
             List<ISceneChildEntity> entities = GetLinkParts(link);
             if (entities.Count == 0 || face < 0 || face > entities[0].GetNumberOfSides() - 1)
@@ -11036,7 +11036,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
         public LSL_Integer llSetLinkMedia(LSL_Integer link, LSL_Integer face, LSL_List rules)
         {
-            PScriptSleep(m_sleepMsOnSetLinkMedia);
+            //PScriptSleep(m_sleepMsOnSetLinkMedia);
 
             // LSL Spec http://wiki.secondlife.com/wiki/LlSetPrimMediaParams says to fail silently if face is invalid
             // Assuming silently fail means sending back STATUS_OK.  Ideally, need to check this.
