@@ -1407,7 +1407,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     LastName = userInfo [2];
                     Password = userInfo [3];
                     Email = userInfo.Length < 6 ? userInfo [4] : "";
-                    Rezday = userInfo[5];
+                    Rezday = userInfo.Length == 6 ? userInfo [5] : "";
 
                     string check = CreateUser (UserUUID, UUID.Zero, FirstName + " " + LastName, Util.Md5Hash(Password), Email);
                     if (check != "")
@@ -1423,7 +1423,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     StoreUserAccount (account);
                     
                     // [NEW] Set the users rezdate
-                    if (m_profileConnector != null)
+                    if ((Rezday != "") && (m_profileConnector != null))
                     {
                     	IUserProfileInfo profile = m_profileConnector.GetUserProfile (account.PrincipalID);
                     	profile.Created = int.Parse(Rezday);
