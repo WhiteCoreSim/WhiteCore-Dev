@@ -118,6 +118,18 @@ namespace WhiteCore.Modules
             // save for later
             m_registry = registry;
 
+            // we need to know if the service is local 
+            IConfig wcconf = config.Configs["WhiteCoreConnectors"];
+            if (wcconf == null)
+                return;                             // something major if we don't have this!!
+            if (wcconf.GetBoolean("DoRemoteCalls",false))
+                return;
+
+            MainConsole.Instance.InfoFormat("[VivoxVoice] Using Vivox for voice communications");
+
+            // This is a local service, either grid server or standalone
+            // (region servers do not require the admin configuration)
+            // get and initialise admin configuration for control
             try
             {
                 // retrieve configuration variables
