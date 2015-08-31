@@ -358,21 +358,18 @@ namespace WhiteCore.Modules.InventoryAccess
                     if (SP == null || SP.ControllingClient == null ||
                         objectGroups[0].OwnerID != agentId)
                     {
-                        folder = m_scene.InventoryService.GetFolderForType(userID, InventoryType.Unknown,
-                                                                           AssetType.LostAndFoundFolder);
+                        folder = m_scene.InventoryService.GetFolderForType(userID, InventoryType.Unknown, FolderType.LostAndFound);
                     }
                     else
                     {
-                        folder = m_scene.InventoryService.GetFolderForType(userID, InventoryType.Unknown,
-                                                                           AssetType.TrashFolder);
+                        folder = m_scene.InventoryService.GetFolderForType(userID, InventoryType.Unknown, FolderType.Trash);
                     }
                 }
                 else if (action == DeRezAction.Return)
                 {
                     // Dump to lost + found unconditionally
                     //
-                    folder = m_scene.InventoryService.GetFolderForType(userID, InventoryType.Unknown,
-                                                                       AssetType.LostAndFoundFolder);
+                    folder = m_scene.InventoryService.GetFolderForType(userID, InventoryType.Unknown, FolderType.LostAndFound);
                 }
 
                 if (folderID == UUID.Zero && folder == null)
@@ -381,21 +378,18 @@ namespace WhiteCore.Modules.InventoryAccess
                     {
                         // Deletes go to trash by default
                         //
-                        folder = m_scene.InventoryService.GetFolderForType(userID, InventoryType.Unknown,
-                                                                           AssetType.TrashFolder);
+                        folder = m_scene.InventoryService.GetFolderForType(userID, InventoryType.Unknown, FolderType.Trash);
                     }
                     else
                     {
                         if (SP == null || SP.ControllingClient == null ||
                             objectGroups[0].OwnerID != agentId)
                         {
-                            folder = m_scene.InventoryService.GetFolderForType(userID, InventoryType.Unknown,
-                                                                               AssetType.LostAndFoundFolder);
+                            folder = m_scene.InventoryService.GetFolderForType(userID, InventoryType.Unknown, FolderType.LostAndFound);
                         }
                         else
                         {
-                            folder = m_scene.InventoryService.GetFolderForType(userID, InventoryType.Unknown,
-                                                                               AssetType.TrashFolder);
+                            folder = m_scene.InventoryService.GetFolderForType(userID, InventoryType.Unknown, FolderType.Trash);
                         }
                     }
                 }
@@ -414,8 +408,7 @@ namespace WhiteCore.Modules.InventoryAccess
                     }
                     else
                     {
-                        folder = m_scene.InventoryService.GetFolderForType(userID, InventoryType.Object,
-                                                                           AssetType.Object);
+                        folder = m_scene.InventoryService.GetFolderForType(userID, InventoryType.Object, FolderType.Object);
                     }
                 }
 

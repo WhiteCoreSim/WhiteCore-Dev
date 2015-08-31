@@ -44,7 +44,7 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Inventory
         /// <summary>
         ///     Child folders that are contained in this folder
         /// </summary>
-        private Dictionary<UUID, InventoryFolderImpl> m_childFolders = new Dictionary<UUID, InventoryFolderImpl>();
+        Dictionary<UUID, InventoryFolderImpl> m_childFolders = new Dictionary<UUID, InventoryFolderImpl>();
 
         // Constructors
         public InventoryFolderImpl(InventoryFolderBase folderbase)
@@ -91,7 +91,7 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Inventory
                                                           Name = folderName,
                                                           ID = folderID,
                                                           Type = (short) type,
-                                                          ParentID = this.ID,
+                                                          ParentID = ID,
                                                           Owner = Owner
                                                       };
                     m_childFolders.Add(subFold.ID, subFold);
@@ -290,11 +290,11 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Inventory
         }
 
         /// <summary>
-        ///     Look through all child subfolders for a folder marked as one for a particular asset type, and return it.
+        ///     Look through all child subfolders for a folder marked as one for a particular folder type, and return it.
         /// </summary>
         /// <param name="type"></param>
         /// <returns>Returns null if no such folder is found</returns>
-        public InventoryFolderImpl FindFolderForType(int type)
+        public InventoryFolderImpl FindFolderForType(short type)
         {
             lock (m_childFolders)
             {

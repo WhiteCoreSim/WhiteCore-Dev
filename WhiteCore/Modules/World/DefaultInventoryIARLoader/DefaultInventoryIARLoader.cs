@@ -26,6 +26,12 @@
  */
 
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
@@ -33,12 +39,6 @@ using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Inventory;
 using WhiteCore.Modules.Archivers;
 using WhiteCore.Region;
-using Nini.Config;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 namespace WhiteCore.Modules.DefaultInventoryIARLoader
 {
@@ -70,6 +70,7 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
                 }
                 if (libConfig.GetBoolean("PreviouslyLoaded", false))
                     return; //If it is loaded, don't reload
+                
                 foreach (string iarFileName in Directory.GetFiles(pLibrariesLocation, "*.iar"))
                 {
                     LoadLibraries(iarFileName);
@@ -87,8 +88,6 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
             m_assetTypes.Add("CallingCard", AssetType.CallingCard);
             m_assetTypes.Add("Calling Card", AssetType.CallingCard);
             m_assetTypes.Add("Clothing", AssetType.Clothing);
-            m_assetTypes.Add("CurrentOutfit", AssetType.CurrentOutfitFolder);
-            m_assetTypes.Add("Current Outfit", AssetType.CurrentOutfitFolder);
             m_assetTypes.Add("Gesture", AssetType.Gesture);
             m_assetTypes.Add("Landmark", AssetType.Landmark);
             m_assetTypes.Add("Script", AssetType.LSLText);
@@ -96,8 +95,6 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
             m_assetTypes.Add("Mesh", AssetType.Mesh);
             m_assetTypes.Add("Notecard", AssetType.Notecard);
             m_assetTypes.Add("Object", AssetType.Object);
-            m_assetTypes.Add("Photo", AssetType.SnapshotFolder);
-            m_assetTypes.Add("Snapshot", AssetType.SnapshotFolder);
             m_assetTypes.Add("Sound", AssetType.Sound);
             m_assetTypes.Add("Texture", AssetType.Texture);
             m_assetTypes.Add("Images", AssetType.Texture);
@@ -110,7 +107,7 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
         protected void LoadLibraries(string iarFileName)
         {
             RegionInfo regInfo = new RegionInfo();
-            IScene m_MockScene = null;
+            IScene m_MockScene;
             //Make the scene for the IAR loader
             if (m_registry is IScene)
                 m_MockScene = (IScene) m_registry;
@@ -126,16 +123,14 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
             if (uinfo == null)
             {
                 MainConsole.Instance.Warn("Creating user " + m_service.LibraryOwnerName);
-                m_MockScene.UserAccountService.CreateUser(m_service.LibraryOwner, UUID.Zero, m_service.LibraryOwnerName,
-                                                          "", "");
+                m_MockScene.UserAccountService.CreateUser(m_service.LibraryOwner, UUID.Zero, m_service.LibraryOwnerName, "", "");
                 uinfo = m_MockScene.UserAccountService.GetUserAccount(null, m_service.LibraryOwner);
                 m_MockScene.InventoryService.CreateUserInventory(uinfo.PrincipalID, false);
             }
             if (m_MockScene.InventoryService.GetRootFolder(m_service.LibraryOwner) == null)
                 m_MockScene.InventoryService.CreateUserInventory(uinfo.PrincipalID, false);
 
-            List<InventoryFolderBase> rootFolders = m_MockScene.InventoryService.GetFolderFolders(uinfo.PrincipalID,
-                                                                                                  UUID.Zero);
+            List<InventoryFolderBase> rootFolders = m_MockScene.InventoryService.GetFolderFolders(uinfo.PrincipalID, UUID.Zero);
             bool alreadyExists = rootFolders.Any(folder => folder.Name == iarFileName);
 
             if (alreadyExists)
@@ -148,7 +143,7 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
             MainConsole.Instance.InfoFormat("[LIBRARY INVENTORY]: Loading IAR file {0}", iarFileName);
             InventoryFolderBase rootFolder = m_MockScene.InventoryService.GetRootFolder(uinfo.PrincipalID);
 
-            if (null == rootFolder)
+            if (rootFolder == null)
             {
                 //We need to create the root folder, otherwise the IAR freaks
                 m_MockScene.InventoryService.CreateUserInventory(uinfo.PrincipalID, false);
@@ -163,6 +158,7 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
                 List<InventoryNodeBase> nodes = new List<InventoryNodeBase>(archread.Execute(true));
                 if (nodes.Count == 0)
                     return;
+                
                 InventoryFolderBase f = (InventoryFolderBase) nodes[0];
                 UUID IARRootID = f.ID;
 
@@ -171,7 +167,7 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
                 f.Name = iarFileName;
                 f.ParentID = UUID.Zero;
                 f.ID = m_service.LibraryRootFolderID;
-                f.Type = (int) AssetType.RootFolder;
+                f.Type = (short) FolderType.Root;
                 f.Version = 1;
                 m_MockScene.InventoryService.UpdateFolder(f);
             }
@@ -206,7 +202,7 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
 
                 if (folder.Type == -1)
                 {
-                    folder.Type = (int) AssetType.Folder;
+                    folder.Type = (int) FolderType.None;
                     m_MockScene.InventoryService.UpdateFolder(folder);
                 }
                 TraverseFolders(folder.ID, m_MockScene);

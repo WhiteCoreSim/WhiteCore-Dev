@@ -52,10 +52,10 @@ namespace WhiteCore.Framework.ClientInterfaces
                     return "application/vnd.ll.primitive";
                 case AssetType.Notecard:
                     return "application/vnd.ll.notecard";
-                case AssetType.Folder:
-                    return "application/vnd.ll.folder";
-                case AssetType.RootFolder:
-                    return "application/vnd.ll.rootfolder";
+//            case AssetType.Folder:                              // 8 - Still a valid AssetType (used in inventory folder transfers)
+//                    return "application/vnd.ll.folder";
+//                case AssetType.RootFolder:
+//                    return "application/vnd.ll.rootfolder";
                 case AssetType.LSLText:
                     return "application/vnd.ll.lsltext";
                 case AssetType.LSLBytecode:
@@ -65,12 +65,12 @@ namespace WhiteCore.Framework.ClientInterfaces
                     return "image/tga";
                 case AssetType.Bodypart:
                     return "application/vnd.ll.bodypart";
-                case AssetType.TrashFolder:
-                    return "application/vnd.ll.trashfolder";
-                case AssetType.SnapshotFolder:
-                    return "application/vnd.ll.snapshotfolder";
-                case AssetType.LostAndFoundFolder:
-                    return "application/vnd.ll.lostandfoundfolder";
+//                case AssetType.TrashFolder:
+//                    return "application/vnd.ll.trashfolder";
+//                case AssetType.SnapshotFolder:
+ //                   return "application/vnd.ll.snapshotfolder";
+//                case AssetType.LostAndFoundFolder:
+//                    return "application/vnd.ll.lostandfoundfolder";
                 case AssetType.SoundWAV:
                     return "audio/x-wav";
                 case AssetType.ImageJPEG:
@@ -81,21 +81,49 @@ namespace WhiteCore.Framework.ClientInterfaces
                     return "application/vnd.ll.gesture";
                 case AssetType.Simstate:
                     return "application/x-metaverse-simstate";
-                case AssetType.FavoriteFolder:
-                    return "application/vnd.ll.favoritefolder";
+//                case AssetType.FavoriteFolder:
+//                    return "application/vnd.ll.favoritefolder";
                 case AssetType.Link:
                     return "application/vnd.ll.link";
                 case AssetType.LinkFolder:
                     return "application/vnd.ll.linkfolder";
-                case AssetType.CurrentOutfitFolder:
-                    return "application/vnd.ll.currentoutfitfolder";
-                case AssetType.OutfitFolder:
-                    return "application/vnd.ll.outfitfolder";
-                case AssetType.MyOutfitsFolder:
-                    return "application/vnd.ll.myoutfitsfolder";
+//                case AssetType.CurrentOutfitFolder:
+//                    return "application/vnd.ll.currentoutfitfolder";
+//                case AssetType.OutfitFolder:
+//                    return "application/vnd.ll.outfitfolder";
+//                case AssetType.MyOutfitsFolder:
+//                    return "application/vnd.ll.myoutfitsfolder";
                 case AssetType.Unknown:
                 default:
-                    return "application/octet-stream";
+//                    return "application/octet-stream";
+                return SLAssetTypeFolderToContentType(assetType);   // try for folder mapping
+            }
+        }
+
+        static string SLAssetTypeFolderToContentType(int folderType)
+        {
+            switch ((FolderType) folderType)
+            {
+            case FolderType.None:
+                return "application/vnd.ll.folder";
+            case FolderType.Root:
+                return "application/vnd.ll.rootfolder";
+            case FolderType.Trash:
+                return "application/vnd.ll.trashfolder";
+            case FolderType.Snapshot:
+                return "application/vnd.ll.snapshotfolder";
+            case FolderType.LostAndFound:
+                return "application/vnd.ll.lostandfoundfolder";
+            case FolderType.Favorites:
+                return "application/vnd.ll.favoritefolder";
+            case FolderType.CurrentOutfit:
+                return "application/vnd.ll.currentoutfitfolder";
+            case FolderType.Outfit:
+                return "application/vnd.ll.outfitfolder";
+            case FolderType.MyOutfits:
+                return "application/vnd.ll.myoutfitsfolder";
+            default:
+                return "application/octet-stream";
             }
         }
 
@@ -157,10 +185,6 @@ namespace WhiteCore.Framework.ClientInterfaces
                 case "application/vnd.ll.notecard":
                 case "application/x-metaverse-notecard":
                     return (sbyte) AssetType.Notecard;
-                case "application/vnd.ll.folder":
-                    return (sbyte) AssetType.Folder;
-                case "application/vnd.ll.rootfolder":
-                    return (sbyte) AssetType.RootFolder;
                 case "application/vnd.ll.lsltext":
                 case "application/x-metaverse-lsl":
                     return (sbyte) AssetType.LSLText;
@@ -173,12 +197,6 @@ namespace WhiteCore.Framework.ClientInterfaces
                 case "application/vnd.ll.bodypart":
                 case "application/x-metaverse-bodypart":
                     return (sbyte) AssetType.Bodypart;
-                case "application/vnd.ll.trashfolder":
-                    return (sbyte) AssetType.TrashFolder;
-                case "application/vnd.ll.snapshotfolder":
-                    return (sbyte) AssetType.SnapshotFolder;
-                case "application/vnd.ll.lostandfoundfolder":
-                    return (sbyte) AssetType.LostAndFoundFolder;
                 case "audio/x-wav":
                     return (sbyte) AssetType.SoundWAV;
                 case "image/jpeg":
@@ -191,20 +209,33 @@ namespace WhiteCore.Framework.ClientInterfaces
                     return (sbyte) AssetType.Gesture;
                 case "application/x-metaverse-simstate":
                     return (sbyte) AssetType.Simstate;
-                case "application/vnd.ll.favoritefolder":
-                    return (sbyte) AssetType.FavoriteFolder;
                 case "application/vnd.ll.link":
                     return (sbyte) AssetType.Link;
                 case "application/vnd.ll.linkfolder":
                     return (sbyte) AssetType.LinkFolder;
-                case "application/vnd.ll.currentoutfitfolder":
-                    return (sbyte) AssetType.CurrentOutfitFolder;
-                case "application/vnd.ll.outfitfolder":
-                    return (sbyte) AssetType.OutfitFolder;
-                case "application/vnd.ll.myoutfitsfolder":
-                    return (sbyte) AssetType.MyOutfitsFolder;
-                case "application/octet-stream":
-                default:
+
+                // folder types
+            case "application/vnd.ll.folder":
+                return (sbyte) FolderType.None;
+            case "application/vnd.ll.rootfolder":
+                return (sbyte) FolderType.Root;
+            case "application/vnd.ll.trashfolder":
+                return (sbyte) FolderType.Trash;
+            case "application/vnd.ll.snapshotfolder":
+                return (sbyte) FolderType.Snapshot;
+            case "application/vnd.ll.lostandfoundfolder":
+                return (sbyte) FolderType.LostAndFound;
+            case "application/vnd.ll.favoritefolder":
+                return (sbyte) FolderType.Favorites;
+            case "application/vnd.ll.currentoutfitfolder":
+                return (sbyte) FolderType.CurrentOutfit;
+            case "application/vnd.ll.outfitfolder":                                    
+                return (sbyte) FolderType.Outfit;
+            case "application/vnd.ll.myoutfitsfolder":
+                return (sbyte) FolderType.MyOutfits;
+
+            case "application/octet-stream":
+            default:
                     return (sbyte) AssetType.Unknown;
             }
         }

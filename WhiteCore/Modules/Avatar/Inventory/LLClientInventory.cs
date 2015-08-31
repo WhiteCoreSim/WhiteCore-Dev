@@ -252,7 +252,7 @@ namespace WhiteCore.Modules.Inventory
                                                    string folderName, UUID parentID)
         {
             InventoryFolderBase folder = new InventoryFolderBase(folderID, folderName, remoteClient.AgentId,
-                                                                 (short) folderType, parentID, 1);
+                                                                 (short)folderType, parentID, 1);
             if (!m_scene.InventoryService.AddFolder(folder))
             {
                 MainConsole.Instance.WarnFormat(
@@ -1728,7 +1728,7 @@ namespace WhiteCore.Modules.Inventory
                                        InventoryFolderBase rootFolder = m_scene.InventoryService.GetRootFolder(destID);
 
                                        InventoryFolderBase newFolder = new InventoryFolderBase(newFolderID, name, destID,
-                                                                                               -1, rootFolder.ID,
+                        (short) FolderType.None, rootFolder.ID,
                                                                                                rootFolder.Version);
                                        m_scene.InventoryService.AddFolder(newFolder);
 

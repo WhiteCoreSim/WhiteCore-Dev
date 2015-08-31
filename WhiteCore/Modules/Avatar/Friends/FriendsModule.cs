@@ -351,8 +351,7 @@ namespace WhiteCore.Modules.Friends
             {
                 UserAccount account = client.Scene.UserAccountService.GetUserAccount (client.AllScopeIDs, friendID);
                 UUID folderID =
-                    client.Scene.InventoryService.GetFolderForType (agentID, InventoryType.Unknown, AssetType.CallingCard)
-                          .ID;
+                    client.Scene.InventoryService.GetFolderForType (agentID, InventoryType.Unknown, FolderType.CallingCard).ID;
                 if (account != null)
                     ccmodule.CreateCallingCard (client, friendID, folderID, account.Name);
             }
@@ -548,8 +547,7 @@ namespace WhiteCore.Modules.Friends
                     UserAccount account = friendClient.Scene.UserAccountService.GetUserAccount (friendClient.AllScopeIDs,
                                               userID);
                     UUID folderID =
-                        friendClient.Scene.InventoryService.GetFolderForType (friendID, InventoryType.Unknown,
-                            AssetType.CallingCard).ID;
+                        friendClient.Scene.InventoryService.GetFolderForType (friendID, InventoryType.Unknown, FolderType.CallingCard).ID;
                     ccmodule.CreateCallingCard (friendClient, userID, folderID, account.Name);
                 }
                 // we're done
