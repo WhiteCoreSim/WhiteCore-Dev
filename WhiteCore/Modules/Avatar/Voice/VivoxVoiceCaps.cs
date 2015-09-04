@@ -42,6 +42,7 @@ using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
 
+
 namespace WhiteCore.Modules
 {
     public class VivoxVoiceService : IVoiceService, IService
@@ -384,7 +385,7 @@ namespace WhiteCore.Modules
 
         }
 
-        public void GetParcelChannelInfo(UUID avatarID, WhiteCore.Framework.Services.GridRegion region, string URL,
+        public void GetParcelChannelInfo(UUID avatarID, Framework.Services.GridRegion region, string URL,
                                          out bool success, out UUID parcelID, out string parcelName, out int localID,
                                          out uint parcelFlags, out string ParentID)
         {
@@ -419,7 +420,7 @@ namespace WhiteCore.Modules
             }
         }
 
-        string GetParentIDForRegion(WhiteCore.Framework.Services.GridRegion region)
+        string GetParentIDForRegion(Framework.Services.GridRegion region)
         {
             lock (vlock)
             {
