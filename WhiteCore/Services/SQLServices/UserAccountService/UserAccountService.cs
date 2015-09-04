@@ -608,30 +608,29 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 MainConsole.Instance.Error("[USER ACCOUNT SERVICE]: You are not able to set yourself as your partner");
                 return;
             }
-            else
+
+            if (m_profileConnector != null)
             {
-                if (m_profileConnector != null)
+                IUserProfileInfo firstProfile =
+                    m_profileConnector.GetUserProfile(GetUserAccount(null, first).PrincipalID);
+                IUserProfileInfo secondProfile =
+                    m_profileConnector.GetUserProfile(GetUserAccount(null, second).PrincipalID);
+
+                if (firstProfile == null || secondProfile == null)
                 {
-                    IUserProfileInfo firstProfile =
-                        m_profileConnector.GetUserProfile(GetUserAccount(null, first).PrincipalID);
-                    IUserProfileInfo secondProfile =
-                        m_profileConnector.GetUserProfile(GetUserAccount(null, second).PrincipalID);
-
-                    if (firstProfile == null || secondProfile == null)
-                    {
-                        MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: At least one of these users does not have a profile?");
-                        return;
-                    }
-
-                    firstProfile.Partner = secondProfile.PrincipalID;
-                    secondProfile.Partner = firstProfile.PrincipalID;
-
-                    m_profileConnector.UpdateUserProfile(firstProfile);
-                    m_profileConnector.UpdateUserProfile(secondProfile);
-
-                    MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: Partner information updated. ");
+                    MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: At least one of these users does not have a profile?");
+                    return;
                 }
+
+                firstProfile.Partner = secondProfile.PrincipalID;
+                secondProfile.Partner = firstProfile.PrincipalID;
+
+                m_profileConnector.UpdateUserProfile(firstProfile);
+                m_profileConnector.UpdateUserProfile(secondProfile);
+
+                MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: Partner information updated.");
             }
+          
         }
 
         /// <summary>
@@ -654,13 +653,13 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     MainConsole.Instance.Error("[USER ACCOUNT SERVICE]: This user doesn't have a partner");
                     return;
                 }
-                else if (firstProfile.Partner == firstProfile.PrincipalID)
+
+                if (firstProfile.Partner == firstProfile.PrincipalID)
                 {
                     MainConsole.Instance.Error("[USER ACCOUNT SERVICE]: Deadlock situation avoided, this avatar is his own partner");
                     firstProfile.Partner = UUID.Zero;
                     m_profileConnector.UpdateUserProfile(firstProfile);
-                }
-                else
+                } else
                 {
                     IUserProfileInfo secondProfile =
                             m_profileConnector.GetUserProfile(GetUserAccount(null, firstProfile.Partner).PrincipalID);
@@ -973,8 +972,6 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
         /// <param name="cmd">string array with parameters: firstname, lastname, password, email</param>
         protected void HandleCreateUser(IScene scene, string[] cmd)
         {
-            //string firstName = "Default";
-            //string lastName = "User";
             string userName = "";
             string password, email, uuid, scopeID;
             bool sysFlag = false;
@@ -1137,9 +1134,6 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             if (lastName == "")
                 return;
 
-            // password as well?
-            password = cmd.Length < 5 ? MainConsole.Instance.PasswordPrompt("Password") : cmd[4];
-
             UserAccount account = GetUserAccount(null, firstName, lastName);
             if (account == null)
             {
@@ -1150,14 +1144,17 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             // ensure the system users are left alone!
             if (Utilities.IsSystemUser(account.PrincipalID))
             {
-                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Naughty!! You cannot delete system users!");
+                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: You cannot delete system users!");
                 return;
             }
+
+            // password as well?
+            password = cmd.Length < 5 ? MainConsole.Instance.PasswordPrompt("Password") : cmd[4];
 
             bool archive;
             bool all = false;
 
-            archive = MainConsole.Instance.Prompt("Archive Information (just disable their login, but keep their information): (yes/no)", "yes").ToLower() == "yes";
+            archive = MainConsole.Instance.Prompt("Archive Information? (Disable login, but keep their information): (yes/no)", "yes").ToLower() == "yes";
             if (!archive)
                 all = MainConsole.Instance.Prompt("Remove all user information (yes/no)", "yes").ToLower() == "yes";
 
@@ -1192,6 +1189,13 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             if (account == null)
             {
                 MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: Unable to locate this user!");
+                return;
+            }
+
+            // ensure the system users are left alone!
+            if (Utilities.IsSystemUser(account.PrincipalID))
+            {
+                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: You cannot modify system users!");
                 return;
             }
 
@@ -1234,6 +1238,10 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 return;
             }
 
+            // quietly ensure the system users are left alone!
+            if (Utilities.IsSystemUser(account.PrincipalID))
+                return;
+
             // if the user is disabled details will exist with a level set @ -2
             account.UserLevel = 0;
 
@@ -1262,6 +1270,17 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             if (lastName == "")
                 return;
 
+            UserAccount account = GetUserAccount(null, firstName, lastName);
+            if (account == null)
+                MainConsole.Instance.ErrorFormat("[USER ACCOUNT SERVICE]: Unable to locate this user");
+
+            // ensure the system users are left alone!
+            if (Utilities.IsSystemUser(account.PrincipalID))
+            {
+                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Changing system users is not a good idea!");
+                return;
+            }
+
             // password as well?
             if (cmd.Length < 6)
             {
@@ -1281,17 +1300,6 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
 
             } else
                 newPassword = cmd[5];
-
-            UserAccount account = GetUserAccount(null, firstName, lastName);
-            if (account == null)
-                MainConsole.Instance.ErrorFormat("[USER ACCOUNT SERVICE]: Unable to locate this user");
-
-            // ensure the system users are left alone!
-            if (Utilities.IsSystemUser(account.PrincipalID))
-            {
-                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Changing system users is not a good idea!");
-                return;
-            }
 
             bool success = false;
             if (m_AuthenticationService != null)
@@ -1412,7 +1420,8 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     string check = CreateUser (UserUUID, UUID.Zero, FirstName + " " + LastName, Util.Md5Hash(Password), Email);
                     if (check != "")
                     {
-                        MainConsole.Instance.Error ("Couldn't create the user. Reason: " + check);
+                        MainConsole.Instance.ErrorFormat ("Couldn't create the user'{0} {1}'. Reason: {2}",
+                            FirstName, LastName, check);
                         continue;
                     }
 
