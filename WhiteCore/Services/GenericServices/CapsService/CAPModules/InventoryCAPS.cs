@@ -481,9 +481,7 @@ namespace WhiteCore.Services
                             textures.Add(textureAsset.ID);
                         }
 
-                        InventoryFolderBase meshFolder = m_inventoryService.GetFolderForType(m_agentID,
-                                                                                             InventoryType.Mesh,
-                                                                                             AssetType.Mesh);
+                        InventoryFolderBase meshFolder = m_inventoryService.GetFolderForType(m_agentID, InventoryType.Mesh, FolderType.Mesh);
                         for (int i = 0; i < mesh_list.Count; i++)
                         {
                             PrimitiveBaseShape pbs = PrimitiveBaseShape.CreateBox();
@@ -533,8 +531,7 @@ namespace WhiteCore.Services
                             if (meshFolder == null)
                             {
                                 m_inventoryService.CreateUserInventory(m_agentID, false);
-                                meshFolder = m_inventoryService.GetFolderForType(m_agentID, InventoryType.Mesh,
-                                                                                 AssetType.Mesh);
+                                meshFolder = m_inventoryService.GetFolderForType(m_agentID, InventoryType.Mesh, FolderType.Mesh);
                             }
 
                             InventoryItemBase itemBase = new InventoryItemBase(UUID.Random(), m_agentID)
