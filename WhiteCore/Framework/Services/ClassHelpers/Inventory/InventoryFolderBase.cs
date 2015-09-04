@@ -107,7 +107,6 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Inventory
             100	HG Suitcase
         */
         public short Type { get; set; }
-//        public FolderType Type { get; set; }
 
         public ushort Version { get; set; }
 

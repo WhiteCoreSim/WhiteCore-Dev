@@ -26,6 +26,12 @@
  */
 
 
+using System;
+using System.Collections.Generic;
+using System.Xml;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
@@ -36,18 +42,12 @@ using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Assets;
 using WhiteCore.Framework.Services.ClassHelpers.Inventory;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using System;
-using System.Collections.Generic;
-using System.Xml;
 
 namespace WhiteCore.Modules.InventoryAccess
 {
     public class BasicInventoryAccessModule : INonSharedRegionModule, IInventoryAccessModule
     {
-        protected bool m_Enabled = false;
+        protected bool m_Enabled;
         protected IScene m_scene;
         protected ILLClientInventory m_LLCLientInventoryModule;
 
@@ -129,7 +129,7 @@ namespace WhiteCore.Modules.InventoryAccess
         ///     The only difference between this and the other RezObject method is the return value...
         ///     The client needs this method
         /// </summary>
-        private void ClientRezObject(IClientAPI remoteClient, UUID itemID, Vector3 RayEnd, Vector3 RayStart,
+        void ClientRezObject(IClientAPI remoteClient, UUID itemID, Vector3 RayEnd, Vector3 RayStart,
                                      UUID RayTargetID, byte BypassRayCast, bool RayEndIsIntersection,
                                      bool RezSelected, bool RemoveItem, UUID fromTaskID)
         {
@@ -222,7 +222,7 @@ namespace WhiteCore.Modules.InventoryAccess
             return "";
         }
 
-        private string FailedCompileScriptCAPSUpdate(UUID assetID, UUID inv, string error)
+        string FailedCompileScriptCAPSUpdate(UUID assetID, UUID inv, string error)
         {
             OSDMap map = new OSDMap();
             map["new_asset"] = assetID.ToString();
@@ -234,7 +234,7 @@ namespace WhiteCore.Modules.InventoryAccess
             return OSDParser.SerializeLLSDXmlString(map);
         }
 
-        private string FailedPermissionsScriptCAPSUpdate(UUID assetID, UUID inv)
+        string FailedPermissionsScriptCAPSUpdate(UUID assetID, UUID inv)
         {
             OSDMap map = new OSDMap();
             map["new_asset"] = assetID.ToString();
@@ -246,7 +246,7 @@ namespace WhiteCore.Modules.InventoryAccess
             return OSDParser.SerializeLLSDXmlString(map);
         }
 
-        private string SuccessScriptCAPSUpdate(UUID assetID, UUID inv)
+        string SuccessScriptCAPSUpdate(UUID assetID, UUID inv)
         {
             OSDMap map = new OSDMap();
             map["new_asset"] = assetID.ToString();
@@ -257,7 +257,7 @@ namespace WhiteCore.Modules.InventoryAccess
             return OSDParser.SerializeLLSDXmlString(map);
         }
 
-        private string FailedPermissionsNotecardCAPSUpdate(UUID assetID, UUID inv)
+        string FailedPermissionsNotecardCAPSUpdate(UUID assetID, UUID inv)
         {
             OSDMap map = new OSDMap();
             map["new_asset"] = assetID.ToString();
@@ -266,7 +266,7 @@ namespace WhiteCore.Modules.InventoryAccess
             return OSDParser.SerializeLLSDXmlString(map);
         }
 
-        private string SuccessNotecardCAPSUpdate(UUID assetID, UUID inv)
+        string SuccessNotecardCAPSUpdate(UUID assetID, UUID inv)
         {
             OSDMap map = new OSDMap();
             map["new_asset"] = assetID.ToString();
@@ -714,7 +714,7 @@ namespace WhiteCore.Modules.InventoryAccess
                                               bool RezSelected, bool RemoveItem, UUID fromTaskID)
         {
             // Work out position details
-            byte bRayEndIsIntersection = (byte) 0;
+            byte bRayEndIsIntersection;
 
             bRayEndIsIntersection = (byte) (RayEndIsIntersection ? 1 : 0);
 
@@ -926,7 +926,7 @@ namespace WhiteCore.Modules.InventoryAccess
             return group;
         }
 
-        private List<ISceneEntity> RezMultipleObjectsFromInventory(XmlNodeList nodes, UUID itemId,
+        List<ISceneEntity> RezMultipleObjectsFromInventory(XmlNodeList nodes, UUID itemId,
                                                                    IClientAPI remoteClient, Vector3 pos,
                                                                    bool RezSelected,
                                                                    InventoryItemBase item, UUID RayTargetID,
@@ -1142,7 +1142,7 @@ namespace WhiteCore.Modules.InventoryAccess
         /// <param name="data"></param>
         /// <param name="creatorID"></param>
         /// <returns></returns>
-        private AssetBase CreateAsset(string name, string description, sbyte assetType, byte[] data, string creatorID)
+        AssetBase CreateAsset(string name, string description, sbyte assetType, byte[] data, string creatorID)
         {
             AssetBase asset = new AssetBase(UUID.Random(), name, (AssetType) assetType, UUID.Parse(creatorID))
                                   {Description = description, Data = data ?? new byte[1]};
