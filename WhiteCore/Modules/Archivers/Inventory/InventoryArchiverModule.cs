@@ -48,18 +48,14 @@ namespace WhiteCore.Modules.Archivers
         /// The default save/load archive directory.
         /// </summary>
         string m_archiveDirectory = "";
-
-        /// <value>
-        ///     All scenes that this module knows about
-        /// </value>
-        readonly Dictionary<UUID, IScene> m_scenes = new Dictionary<UUID, IScene>();
+        bool isLocal = true;
+        IRegistryCore m_registry;
 
         /// <value>
         ///     Pending save completions initiated from the console
         /// </value>
         protected List<Guid> m_pendingConsoleSaves = new List<Guid>();
 
-        IRegistryCore m_registry;
 
         public string Name
         {
@@ -140,12 +136,29 @@ namespace WhiteCore.Modules.Archivers
         public void Initialize(IConfigSource config, IRegistryCore registry)
         {
             m_registry = registry;
-            m_registry.RegisterModuleInterface<IInventoryArchiverModule>(this);
-            if (m_scenes.Count == 0)
+
+            // set default path to user archives
+            var defpath = m_registry.RequestModuleInterface<ISimulationBase>().DefaultDataPath;
+            m_archiveDirectory = Path.Combine (defpath, Constants.DEFAULT_USERINVENTORY_DIR);
+
+            // check if this is a local service
+            IConfig connectorConfig = config.Configs ["WhiteCoreConnectors"];
+            if ((connectorConfig != null) && connectorConfig.Contains ("DoRemoteCalls"))
+                isLocal = ! connectorConfig.GetBoolean ("DoRemoteCalls", false);
+            
+        }
+
+        public void Start(IConfigSource config, IRegistryCore registry)
+        {
+        }
+
+        public void FinishedStartup()
+        {
+
+            // Lock out if remote 
+            if (isLocal)
             {
-                // set default path to user archives
-                var defpath = registry.RequestModuleInterface<ISimulationBase>().DefaultDataPath;
-                m_archiveDirectory = Path.Combine (defpath, Constants.DEFAULT_USERINVENTORY_DIR);
+                m_registry.RegisterModuleInterface<IInventoryArchiverModule>(this);
 
                 OnInventoryArchiveSaved += SaveIARConsoleCommandCompleted;
 
@@ -181,14 +194,7 @@ namespace WhiteCore.Modules.Archivers
 
                 }
             }
-        }
 
-        public void Start(IConfigSource config, IRegistryCore registry)
-        {
-        }
-
-        public void FinishedStartup()
-        {
         }
 
         #endregion
@@ -391,8 +397,18 @@ namespace WhiteCore.Modules.Archivers
                     return;
                 }
 
+                // inventory path...
                 if (cmdparams.Length > 5)
                     iarPath = newParams[5];
+                else
+                {
+                    // not provided. Check for merge
+                    string mergeIar = MainConsole.Instance.Prompt(
+                        "Do you want to 'merge' this archive or 'create' a new folder 'IAR Import'? (merge/create)", "create");
+                    if (mergeIar.ToLower().StartsWith("m"))
+                        iarPath = "/";
+                }
+
                 if (iarPath == "/")
                     options["merge"] = true;                // always merge if using the root folder
 
