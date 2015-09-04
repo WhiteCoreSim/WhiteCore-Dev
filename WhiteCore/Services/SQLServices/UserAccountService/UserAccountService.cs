@@ -217,11 +217,6 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     "Saves all users from WhiteCore into a CSV file",
                     HandleSaveUsers, false, true);
 
-                MainConsole.Instance.Commands.AddCommand(
-                    "set user rezday",
-                    "set user rezday [<first> [<last>]]",
-                    "Sets the users creation date",
-                    HandleSetRezday, false, true);
                 #if TEST_USERS
                 MainConsole.Instance.Commands.AddCommand(
                     "create test users",
@@ -1412,7 +1407,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     LastName = userInfo [2];
                     Password = userInfo [3];
                     Email = userInfo.Length < 6 ? userInfo [4] : "";
-                    Rezday = userInfo[5];
+                    Rezday = userInfo.Length == 6 ? userInfo [5] : "";
 
                     string check = CreateUser (UserUUID, UUID.Zero, FirstName + " " + LastName, Util.Md5Hash(Password), Email);
                     if (check != "")
@@ -1428,7 +1423,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     StoreUserAccount (account);
                     
                     // [NEW] Set the users rezdate
-                    if (m_profileConnector != null)
+                    if ((Rezday != "") && (m_profileConnector != null))
                     {
                     	IUserProfileInfo profile = m_profileConnector.GetUserProfile (account.PrincipalID);
                     	profile.Created = int.Parse(Rezday);
@@ -1495,46 +1490,6 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
 
             MainConsole.Instance.InfoFormat ("File: {0} saved with {1} users", Path.GetFileName(fileName), userNo);
 
-        }
-
-        protected void HandleSetRezday(IScene scene, string[] cmdparams)
-        {
-            string firstName;
-            string lastName;
-            string rawDate;
-
-            firstName = cmdparams.Length < 4 ? MainConsole.Instance.Prompt("First name") : cmdparams[3];
-            if (firstName == "")
-                return;
-
-            lastName = cmdparams.Length < 5 ? MainConsole.Instance.Prompt("Last name") : cmdparams[4];
-            if (lastName == "")
-                return;
-
-            UserAccount account = GetUserAccount(null, firstName, lastName);
-            if (account == null)
-            {
-                MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: Unable to locate this user");
-                return;
-            }
-
-            rawDate = MainConsole.Instance.Prompt("Date (mm/dd/yyyy)");
-
-            // Make a new DateTime from rawDate
-            DateTime newDate = DateTime.ParseExact(rawDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
-            // Get difference between the 2 dates
-            TimeSpan parsedDate = (newDate - new DateTime(1970, 1, 1, 0, 0, 0));
-            // Return Unix Timestamp
-            if (m_profileConnector != null)
-            {
-            	IUserProfileInfo profile = m_profileConnector.GetUserProfile (account.PrincipalID);
-            	profile.Created = (int)parsedDate.TotalSeconds;
-            	bool success = m_profileConnector.UpdateUserProfile (profile);
-            	if (!success)
-            		MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Unable to change rezday for {0} {1}.", firstName, lastName);
-            	else
-            		MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: User account {0} {1} has a new rezday.", firstName, lastName);
-            }
         }
 
         #if TEST_USERS

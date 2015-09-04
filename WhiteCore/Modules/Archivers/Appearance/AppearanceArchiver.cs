@@ -92,14 +92,14 @@ namespace WhiteCore.Modules.Archivers
 
             InventoryFolderBase AppearanceFolder = inventoryService.GetFolderForType(account.PrincipalID,
                                                                                      InventoryType.Wearable,
-                                                                                     AssetType.Clothing);
+                                                                                     FolderType.Clothing);
 
             if (AppearanceFolder == null)
             {
                 AppearanceFolder = new InventoryFolderBase (); // does not exist so...
                 AppearanceFolder.Owner = account.PrincipalID;
                 AppearanceFolder.ID = UUID.Random ();  
-                AppearanceFolder.Type = (short) InventoryType.Wearable;
+                AppearanceFolder.Type = (short) FolderType.Clothing;
             }
 
             List<InventoryItemBase> items;
@@ -107,7 +107,7 @@ namespace WhiteCore.Modules.Archivers
             InventoryFolderBase folderForAppearance
                 = new InventoryFolderBase(
                     UUID.Random(), archive.FolderName, account.PrincipalID,
-                    -1, AppearanceFolder.ID, 1);
+                (short) FolderType.None, AppearanceFolder.ID, 1);
 
             inventoryService.AddFolder(folderForAppearance);
 
@@ -201,8 +201,6 @@ namespace WhiteCore.Modules.Archivers
                 attachCount++;
             }
             MainConsole.Instance.InfoFormat("[AvatarArchive] Adding {0} attachments to {1}", attachCount, archiveName);
-
-            //InventoryFolderBase clothingFolder = inventoryService.GetFolderForType(principalID, AssetType.Clothing);
 
             // set details
             archive.Appearance = appearance;
@@ -482,7 +480,7 @@ namespace WhiteCore.Modules.Archivers
             if (parentFolder == null)
             {
                 InventoryFolderBase folder = inventoryService.GetFolderForType(recipient, InventoryType.Unknown,
-                                                                               (AssetType)itemCopy.AssetType);
+                                                                               (FolderType)itemCopy.AssetType);
 
                 if (folder != null)
                     itemCopy.Folder = folder.ID;

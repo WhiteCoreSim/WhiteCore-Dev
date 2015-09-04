@@ -32,6 +32,7 @@ using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.Packets;
 using WhiteCore.Framework.ClientInterfaces;
+using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
@@ -668,8 +669,16 @@ namespace WhiteCore.Modules.Search
         {
             IConfig searchConfig = config.Configs ["Search"];
             if (searchConfig != null) //Check whether we are enabled
+            {
                 if (searchConfig.GetString ("SearchModule", Name) == Name)
                 m_SearchEnabled = true;
+            	MainConsole.Instance.Info ("[Search] Search Services are enabled");
+            }
+            else
+            {
+            	m_SearchEnabled = false;
+            	MainConsole.Instance.Info ("[Search] Not configured, disabling");
+            }
         }
 
         public void AddRegion (IScene scene)
