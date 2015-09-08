@@ -503,8 +503,7 @@ namespace WhiteCore.Physics.PrimMesher
             double denom = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
             double uaNumerator = (x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3);
 
-//            if (denom != 0.0)
-            if (Math.Abs(denom) <= Constants.FloatDifference)
+            if (Math.Abs(denom) > Constants.FloatDifference)
             {
                 double ua = uaNumerator / denom;
                 iX = (float)(x1 + ua * (x2 - x1));
@@ -1417,8 +1416,7 @@ namespace WhiteCore.Physics.PrimMesher
                     newNode.rotation = new Quat (new Coord (1.0f, 0.0f, 0.0f), angle + topShearY);
 
                     // next apply twist rotation to the profile layer
-                    //if (twistTotal != 0.0f || twistBegin != 0.0f)
-                    if (Math.Abs(twistTotal) <= Constants.FloatDifference || Math.Abs(twistBegin) <= Constants.FloatDifference)
+                    if ((Math.Abs(twistTotal) > Constants.FloatDifference) || (Math.Abs(twistBegin) > Constants.FloatDifference))
                         newNode.rotation *= new Quat (new Coord (0.0f, 0.0f, 1.0f), twist);
 
                     newNode.percentOfPath = percentOfPath;
@@ -1931,17 +1929,17 @@ namespace WhiteCore.Physics.PrimMesher
                             newViewerFace1.uv2.U = u1;
                             newViewerFace1.uv3.U = u2;
 
-                            newViewerFace1.uv1.V = 1.0f - node.percentOfPath;
+                            newViewerFace1.uv1.V = thisV;
                             newViewerFace1.uv2.V = lastV;
-                            newViewerFace1.uv3.V = lastV;
+                            newViewerFace1.uv3.V = thisV;
 
-                            newViewerFace2.uv1.U = u1;
-                            newViewerFace2.uv2.U = u2;
+                            newViewerFace2.uv1.U = u2;
+                            newViewerFace2.uv2.U = u1;
                             newViewerFace2.uv3.U = u2;
 
-                            newViewerFace2.uv1.V = 1.0f - node.percentOfPath;
+                            newViewerFace2.uv1.V = thisV;
                             newViewerFace2.uv2.V = lastV;
-                            newViewerFace2.uv3.V = 1.0f - node.percentOfPath;
+                            newViewerFace2.uv3.V = lastV;
 
                             newViewerFace1.v1 = coords [i];
                             newViewerFace1.v2 = coords [i - numVerts];
@@ -2076,7 +2074,7 @@ namespace WhiteCore.Physics.PrimMesher
             return normal;
         }
 
-        private Coord SurfaceNormal (Face face)
+        Coord SurfaceNormal (Face face)
         {
             return SurfaceNormal (coords [face.v1], coords [face.v2], coords [face.v3]);
         }

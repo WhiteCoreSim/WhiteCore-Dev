@@ -542,13 +542,15 @@ namespace WhiteCore.Modules.WorldMap
                 // Fetch the texture, decode and get the average color,
                 // then save it to a temporary metadata asset
                 byte[] textureAsset = m_scene.AssetService.GetData(face.TextureID.ToString());
-                if (textureAsset != null)
+                if (textureAsset == null || textureAsset.Length == 0)
+                {
+                    // no data.
+                    color = new Color4 (0.5f, 0.5f, 0.5f, 1.0f);
+                } else                   
                 {
                     int width, height;
                     color = GetAverageColor(face.TextureID, textureAsset, m_scene, out width, out height);
                 }
-                else
-                    color = new Color4(0.5f, 0.5f, 0.5f, 1.0f);
 
                 m_colors[face.TextureID] = color;
             }

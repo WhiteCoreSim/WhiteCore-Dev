@@ -65,7 +65,7 @@ namespace WhiteCore.Modules.Estate
             if (EstateConnector != null)
             {
                 EstateSettings ES = EstateConnector.GetEstateSettings(scene.RegionInfo.RegionID);
-                if ((ES == null) || (ES.EstateID == 0))
+                if (ES == null)
                 {
                     //Could not locate the estate service, wait until it can find it
                     MainConsole.Instance.Warn(
@@ -85,7 +85,7 @@ namespace WhiteCore.Modules.Estate
                 }
                 else if (ES.EstateID == 0)
                 {
-                    //Found the estate service, but found no estates for this region, make a new one
+                    //This region does not belong to an estate, make a new one or join and existing one
                     MainConsole.Instance.Warn("[EstateInitializer]: Your region '" + scene.RegionInfo.RegionName +
                         "' is not part of an estate.");
 

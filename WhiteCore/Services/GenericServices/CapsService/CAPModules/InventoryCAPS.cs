@@ -26,6 +26,13 @@
  */
 
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
@@ -37,13 +44,6 @@ using WhiteCore.Framework.Services.ClassHelpers.Assets;
 using WhiteCore.Framework.Services.ClassHelpers.Inventory;
 using WhiteCore.Framework.Utilities;
 using WhiteCore.Region;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace WhiteCore.Services
 {
@@ -59,13 +59,13 @@ namespace WhiteCore.Services
 
         #endregion
         
-        private IAssetService m_assetService;
-        private IInventoryService m_inventoryService;
-        private ILibraryService m_libraryService;
-        private IMoneyModule m_moneyModule;
-        private UUID m_agentID;
-        private IInventoryData m_inventoryData;
-        private List<string> m_uris = new List<string>();
+        IAssetService m_assetService;
+        IInventoryService m_inventoryService;
+        ILibraryService m_libraryService;
+        IMoneyModule m_moneyModule;
+        UUID m_agentID;
+        IInventoryData m_inventoryData;
+        List<string> m_uris = new List<string>();
 
         #region ICapsServiceConnector Members
 
@@ -318,13 +318,13 @@ namespace WhiteCore.Services
             return OSDParser.SerializeLLSDXmlBytes(map);
         }
 
-        private bool ChargeUser(string asset_type, OSDMap map)
+        bool ChargeUser(string asset_type, OSDMap map)
         {
             int charge, cost;
             return ChargeUser(asset_type, map, out charge, out cost);
         }
 
-        private bool ChargeUser(string asset_type, OSDMap map, out int charge, out int resourceCost)
+        bool ChargeUser(string asset_type, OSDMap map, out int charge, out int resourceCost)
         {
             charge = 0;
             resourceCost = 0;
@@ -358,7 +358,7 @@ namespace WhiteCore.Services
             return true;
         }
 
-        private OSDMap InternalNewAgentInventoryRequest(OSDMap map, OSHttpRequest httpRequest,
+        OSDMap InternalNewAgentInventoryRequest(OSDMap map, OSHttpRequest httpRequest,
                                                         OSHttpResponse httpResponse)
         {
             string asset_type = map["asset_type"].AsString();
@@ -643,22 +643,18 @@ namespace WhiteCore.Services
 
         public class AssetUploader
         {
-            private readonly UUID inventoryItemID;
-
-
-            private readonly string m_assetDes = String.Empty;
-            private readonly string m_assetName = String.Empty;
-
-            private readonly string m_assetType = String.Empty;
-
-            private readonly uint m_everyone_mask;
-            private readonly uint m_group_mask;
-            private readonly string m_invType = String.Empty;
-            private readonly uint m_next_owner_mask;
-            private readonly UUID parentFolder;
-            private readonly string uploaderPath = String.Empty;
-            private UUID newAssetID;
-            private UploadHandler m_uploadCompleteHandler;
+            readonly UUID inventoryItemID;
+            readonly string m_assetDes = String.Empty;
+            readonly string m_assetName = String.Empty;
+            readonly string m_assetType = String.Empty;
+            readonly uint m_everyone_mask;
+            readonly uint m_group_mask;
+            readonly string m_invType = String.Empty;
+            readonly uint m_next_owner_mask;
+            readonly UUID parentFolder;
+            readonly string uploaderPath = String.Empty;
+            UUID newAssetID;
+            UploadHandler m_uploadCompleteHandler;
             public delegate UUID UploadHandler(string assetName, string description, UUID assetID, UUID inventoryItem,
                                  UUID parentFolderID, byte[] data, string invType, string assetType,
                                  uint everyone_mask, uint group_mask, uint next_owner_mask);

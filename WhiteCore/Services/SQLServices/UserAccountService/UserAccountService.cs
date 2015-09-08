@@ -29,7 +29,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using Nini.Config;
 using OpenMetaverse;
@@ -116,15 +115,6 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             if (IsLocalConnector && (MainConsole.Instance != null))
             {
                 MainConsole.Instance.Commands.AddCommand(
-                    "add user",
-                    "add user [<first> [<last> [<pass> [<email>]]]] [--system] [--uuid]",
-                    "Create a new user. If optional parameters are not supplied required details will be prompted\n"+
-                    "  --system : Enter user scope UUID\n"+
-                    "  --uuid : Enter a specific UUID for the user",
-                    HandleCreateUser, false, true);
-
-                // alias for 'add user' (legacy)
-                MainConsole.Instance.Commands.AddCommand(
                     "create user",
                     "create user [<first> [<last> [<pass> [<email>]]]] [--system] [--uuid]",
                     "Create a new user. If optional parameters are not supplied required details will be prompted\n"+
@@ -135,6 +125,21 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 MainConsole.Instance.Commands.AddCommand(
                     "delete user",
                     "delete user  [<first> [<last>]] ",
+                    "Deletes an existing user",
+                    HandleDeleteUser, false, true);
+
+                // Alternative user commands for those more familiar with *nix systems
+                MainConsole.Instance.Commands.AddCommand(
+                    "adduser",
+                    "adduser [<first> [<last> [<pass> [<email>]]]] [--system] [--uuid]",
+                    "Create a new user. If optional parameters are not supplied required details will be prompted\n"+
+                    "  --system : Enter user scope UUID\n"+
+                    "  --uuid : Enter a specific UUID for the user",
+                    HandleCreateUser, false, true);
+
+                MainConsole.Instance.Commands.AddCommand(
+                    "deluser",
+                    "deluser  [<first> [<last>]] ",
                     "Deletes an existing user",
                     HandleDeleteUser, false, true);
 
@@ -187,6 +192,12 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     "Set the user account type. I.e. Guest, Resident, Member etc (Used for stipend payments)",
                     HandleSetUserType, false, true);
 
+                MainConsole.Instance.Commands.AddCommand(
+                    "rename user",
+                    "rename user",
+                    "Renames a current user account.",
+                    HandleRenameUser, false, true);
+                
                 MainConsole.Instance.Commands.AddCommand(
                     "set user profile title",
                     "set user profile title [<first> [<last> [<Title>]]]",
@@ -608,30 +619,29 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 MainConsole.Instance.Error("[USER ACCOUNT SERVICE]: You are not able to set yourself as your partner");
                 return;
             }
-            else
+
+            if (m_profileConnector != null)
             {
-                if (m_profileConnector != null)
+                IUserProfileInfo firstProfile =
+                    m_profileConnector.GetUserProfile(GetUserAccount(null, first).PrincipalID);
+                IUserProfileInfo secondProfile =
+                    m_profileConnector.GetUserProfile(GetUserAccount(null, second).PrincipalID);
+
+                if (firstProfile == null || secondProfile == null)
                 {
-                    IUserProfileInfo firstProfile =
-                        m_profileConnector.GetUserProfile(GetUserAccount(null, first).PrincipalID);
-                    IUserProfileInfo secondProfile =
-                        m_profileConnector.GetUserProfile(GetUserAccount(null, second).PrincipalID);
-
-                    if (firstProfile == null || secondProfile == null)
-                    {
-                        MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: At least one of these users does not have a profile?");
-                        return;
-                    }
-
-                    firstProfile.Partner = secondProfile.PrincipalID;
-                    secondProfile.Partner = firstProfile.PrincipalID;
-
-                    m_profileConnector.UpdateUserProfile(firstProfile);
-                    m_profileConnector.UpdateUserProfile(secondProfile);
-
-                    MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: Partner information updated. ");
+                    MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: At least one of these users does not have a profile?");
+                    return;
                 }
+
+                firstProfile.Partner = secondProfile.PrincipalID;
+                secondProfile.Partner = firstProfile.PrincipalID;
+
+                m_profileConnector.UpdateUserProfile(firstProfile);
+                m_profileConnector.UpdateUserProfile(secondProfile);
+
+                MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: Partner information updated.");
             }
+          
         }
 
         /// <summary>
@@ -654,13 +664,13 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     MainConsole.Instance.Error("[USER ACCOUNT SERVICE]: This user doesn't have a partner");
                     return;
                 }
-                else if (firstProfile.Partner == firstProfile.PrincipalID)
+
+                if (firstProfile.Partner == firstProfile.PrincipalID)
                 {
                     MainConsole.Instance.Error("[USER ACCOUNT SERVICE]: Deadlock situation avoided, this avatar is his own partner");
                     firstProfile.Partner = UUID.Zero;
                     m_profileConnector.UpdateUserProfile(firstProfile);
-                }
-                else
+                } else
                 {
                     IUserProfileInfo secondProfile =
                             m_profileConnector.GetUserProfile(GetUserAccount(null, firstProfile.Partner).PrincipalID);
@@ -957,6 +967,64 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
 
         }
 
+       
+        protected void HandleRenameUser(IScene scene, string[] cmdparams)
+        {
+            string firstName;
+            string lastName;
+
+            firstName = cmdparams.Length < 4 ? MainConsole.Instance.Prompt("First name") : cmdparams[3];
+            if (firstName == "")
+                return;
+
+            lastName = cmdparams.Length < 5 ? MainConsole.Instance.Prompt("Last name") : cmdparams[4];
+            if (lastName == "")
+                return;
+
+            UserAccount account = GetUserAccount(null, firstName, lastName);
+            if (account == null)
+            {
+                MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: Unable to locate this user");
+                return;
+            }
+
+            // ensure the system users are left alone!
+            if (Utilities.IsSystemUser(account.PrincipalID))
+            {
+                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Changing system users is not a good idea!");
+            }
+
+            // new name
+            var newName = MainConsole.Instance.Prompt("New user name to use <First Last>: ", "");
+            if (newName == "")
+                return;
+
+            string[] split = newName.Split (' ');
+            if (split.Length < 2)
+            {
+                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Sorry! Names must in the format 'Firstname Lastname'.");
+                return;
+            }
+            
+            // verify that this is ok...
+            var chkAcct = GetUserAccount(null, newName);
+            if (chkAcct != null)
+            {
+                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Sorry! This name is already assigned.");
+                return;
+            }
+
+            account.Name = newName;
+            bool success = StoreUserAccount(account);
+            if (!success)
+                MainConsole.Instance.WarnFormat("[USER ACCOUNT SERVICE]: Unable to set the new name for {0} {1}",firstName, lastName);
+            else
+                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: User '{0} {1}' has been renamed to '{2}'",
+                    firstName, lastName, newName);
+
+        }
+
+
         public List<string> GetAvatarArchivesFiles()
         {
             IAvatarAppearanceArchiver avieArchiver = m_registry.RequestModuleInterface<IAvatarAppearanceArchiver>();
@@ -973,8 +1041,6 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
         /// <param name="cmd">string array with parameters: firstname, lastname, password, email</param>
         protected void HandleCreateUser(IScene scene, string[] cmd)
         {
-            //string firstName = "Default";
-            //string lastName = "User";
             string userName = "";
             string password, email, uuid, scopeID;
             bool sysFlag = false;
@@ -1137,9 +1203,6 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             if (lastName == "")
                 return;
 
-            // password as well?
-            password = cmd.Length < 5 ? MainConsole.Instance.PasswordPrompt("Password") : cmd[4];
-
             UserAccount account = GetUserAccount(null, firstName, lastName);
             if (account == null)
             {
@@ -1150,14 +1213,17 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             // ensure the system users are left alone!
             if (Utilities.IsSystemUser(account.PrincipalID))
             {
-                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Naughty!! You cannot delete system users!");
+                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: You cannot delete system users!");
                 return;
             }
+
+            // password as well?
+            password = cmd.Length < 5 ? MainConsole.Instance.PasswordPrompt("Password") : cmd[4];
 
             bool archive;
             bool all = false;
 
-            archive = MainConsole.Instance.Prompt("Archive Information (just disable their login, but keep their information): (yes/no)", "yes").ToLower() == "yes";
+            archive = MainConsole.Instance.Prompt("Archive Information? (Disable login, but keep their information): (yes/no)", "yes").ToLower() == "yes";
             if (!archive)
                 all = MainConsole.Instance.Prompt("Remove all user information (yes/no)", "yes").ToLower() == "yes";
 
@@ -1192,6 +1258,13 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             if (account == null)
             {
                 MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: Unable to locate this user!");
+                return;
+            }
+
+            // ensure the system users are left alone!
+            if (Utilities.IsSystemUser(account.PrincipalID))
+            {
+                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: You cannot modify system users!");
                 return;
             }
 
@@ -1234,6 +1307,10 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 return;
             }
 
+            // quietly ensure the system users are left alone!
+            if (Utilities.IsSystemUser(account.PrincipalID))
+                return;
+
             // if the user is disabled details will exist with a level set @ -2
             account.UserLevel = 0;
 
@@ -1262,6 +1339,17 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             if (lastName == "")
                 return;
 
+            UserAccount account = GetUserAccount(null, firstName, lastName);
+            if (account == null)
+                MainConsole.Instance.ErrorFormat("[USER ACCOUNT SERVICE]: Unable to locate this user");
+
+            // ensure the system users are left alone!
+            if (Utilities.IsSystemUser(account.PrincipalID))
+            {
+                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Changing system users is not a good idea!");
+                return;
+            }
+
             // password as well?
             if (cmd.Length < 6)
             {
@@ -1281,17 +1369,6 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
 
             } else
                 newPassword = cmd[5];
-
-            UserAccount account = GetUserAccount(null, firstName, lastName);
-            if (account == null)
-                MainConsole.Instance.ErrorFormat("[USER ACCOUNT SERVICE]: Unable to locate this user");
-
-            // ensure the system users are left alone!
-            if (Utilities.IsSystemUser(account.PrincipalID))
-            {
-                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Changing system users is not a good idea!");
-                return;
-            }
 
             bool success = false;
             if (m_AuthenticationService != null)
@@ -1412,7 +1489,8 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     string check = CreateUser (UserUUID, UUID.Zero, FirstName + " " + LastName, Util.Md5Hash(Password), Email);
                     if (check != "")
                     {
-                        MainConsole.Instance.Error ("Couldn't create the user. Reason: " + check);
+                        MainConsole.Instance.ErrorFormat ("Couldn't create the user'{0} {1}'. Reason: {2}",
+                            FirstName, LastName, check);
                         continue;
                     }
 

@@ -130,7 +130,6 @@ namespace WhiteCore.Framework.Services
         /// <param name="invType"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-//        InventoryFolderBase GetFolderForType(UUID userID, InventoryType invType, AssetType type);
         InventoryFolderBase GetFolderForType(UUID userID, InventoryType invType, FolderType type);
 
         /// <summary>

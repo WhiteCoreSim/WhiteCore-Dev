@@ -52,10 +52,8 @@ namespace WhiteCore.Framework.ClientInterfaces
                     return "application/vnd.ll.primitive";
                 case AssetType.Notecard:
                     return "application/vnd.ll.notecard";
-//            case AssetType.Folder:                              // 8 - Still a valid AssetType (used in inventory folder transfers)
-//                    return "application/vnd.ll.folder";
-//                case AssetType.RootFolder:
-//                    return "application/vnd.ll.rootfolder";
+                case AssetType.Folder:                              // 8 - Still a valid AssetType (used in inventory folder transfers)
+                    return "application/vnd.ll.folder";
                 case AssetType.LSLText:
                     return "application/vnd.ll.lsltext";
                 case AssetType.LSLBytecode:
@@ -65,12 +63,6 @@ namespace WhiteCore.Framework.ClientInterfaces
                     return "image/tga";
                 case AssetType.Bodypart:
                     return "application/vnd.ll.bodypart";
-//                case AssetType.TrashFolder:
-//                    return "application/vnd.ll.trashfolder";
-//                case AssetType.SnapshotFolder:
- //                   return "application/vnd.ll.snapshotfolder";
-//                case AssetType.LostAndFoundFolder:
-//                    return "application/vnd.ll.lostandfoundfolder";
                 case AssetType.SoundWAV:
                     return "audio/x-wav";
                 case AssetType.ImageJPEG:
@@ -81,21 +73,13 @@ namespace WhiteCore.Framework.ClientInterfaces
                     return "application/vnd.ll.gesture";
                 case AssetType.Simstate:
                     return "application/x-metaverse-simstate";
-//                case AssetType.FavoriteFolder:
-//                    return "application/vnd.ll.favoritefolder";
                 case AssetType.Link:
                     return "application/vnd.ll.link";
                 case AssetType.LinkFolder:
                     return "application/vnd.ll.linkfolder";
-//                case AssetType.CurrentOutfitFolder:
-//                    return "application/vnd.ll.currentoutfitfolder";
-//                case AssetType.OutfitFolder:
-//                    return "application/vnd.ll.outfitfolder";
-//                case AssetType.MyOutfitsFolder:
-//                    return "application/vnd.ll.myoutfitsfolder";
                 case AssetType.Unknown:
+                    return "application/octet-stream";
                 default:
-//                    return "application/octet-stream";
                 return SLAssetTypeFolderToContentType(assetType);   // try for folder mapping
             }
         }

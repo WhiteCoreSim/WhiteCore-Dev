@@ -26,6 +26,15 @@
  */
 
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
@@ -40,15 +49,6 @@ using WhiteCore.Framework.Servers.HttpServer.Interfaces;
 using WhiteCore.Framework.Services.ClassHelpers.Assets;
 using WhiteCore.Framework.Services.ClassHelpers.Inventory;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace WhiteCore.Modules.Inventory
 {
@@ -1728,7 +1728,7 @@ namespace WhiteCore.Modules.Inventory
                                        InventoryFolderBase rootFolder = m_scene.InventoryService.GetRootFolder(destID);
 
                                        InventoryFolderBase newFolder = new InventoryFolderBase(newFolderID, name, destID,
-                        (short) FolderType.None, rootFolder.ID,
+                                                                                               (short) FolderType.None, rootFolder.ID,
                                                                                                rootFolder.Version);
                                        m_scene.InventoryService.AddFolder(newFolder);
 

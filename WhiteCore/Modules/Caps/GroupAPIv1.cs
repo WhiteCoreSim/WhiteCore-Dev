@@ -30,8 +30,10 @@ using OpenMetaverse;
 using OpenMetaverse.StructuredData;
 using System;
 using System.IO;
+using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
+using WhiteCore.Framework.Servers;
 using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Servers.HttpServer.Interfaces;
@@ -82,20 +84,37 @@ namespace WhiteCore.Modules.Caps
 
         public OSDMap RegisterCaps(UUID agentID, IHttpServer server)
         {
-            OSDMap retVal = new OSDMap();
-            retVal["GroupAPIv1"] = CapsUtil.CreateCAPS("GroupAPIv1", "");
-
-            server.AddStreamHandler(new GenericStreamHandler("POST", retVal["GroupAPIv1"],
-                                                 delegate(string path, Stream request,
-                                                          OSHttpRequest httpRequest,
-                                                          OSHttpResponse httpResponse)
-                                                 { return ProcessGroupAPI(request, httpResponse, agentID); }));
-
+            OSDMap retVal = new OSDMap ();
+        	retVal ["GroupAPIv1"] = CapsUtil.CreateCAPS ("GroupAPIv1", "");
+            server.AddStreamHandler (new GenericStreamHandler ("POST", retVal ["GroupAPIv1"],
+                ProcessPostGroupAPI));
+            server.AddStreamHandler (new GenericStreamHandler ("GET", retVal ["GroupAPIv1"],
+                ProcessGetGroupAPI));
             return retVal;
         }
 
-        private byte[] ProcessGroupAPI(Stream request, OSHttpResponse httpResponse, UUID agentID)
+        public byte[] ProcessGetGroupAPI (string path, Stream request,
+                                             OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {
+        	string groupID = string.Empty;
+        	
+        	if (httpRequest.QueryString["group_id"] != null)
+        		groupID = httpRequest.QueryString["group_id"];
+        	
+        	MainConsole.Instance.Info("[GroupAPIv1] Requesting groups bans for group_id: " + groupID);
+        	
+        	return MainServer.BlankResponse;
+        }
+        
+        public byte[] ProcessPostGroupAPI (string path, Stream request,
+                                             OSHttpRequest httpRequest, OSHttpResponse httpResponse)
+        {
+        	string groupID = string.Empty;
+        	
+        	if (httpRequest.QueryString["group_id"] != null)
+        		groupID = httpRequest.QueryString["group_id"];
+        	
+        	MainConsole.Instance.Info("[GroupAPIv1] Requesting a POST");
             //
             // This Caps is called with the following context:
             //
@@ -112,7 +131,7 @@ namespace WhiteCore.Modules.Caps
             // Suggestion would be: group_bans
             //
             // Fly-Man- 17 Jul 2015
-            throw new NotImplementedException();
+            return MainServer.BlankResponse;
         }
     }
 }

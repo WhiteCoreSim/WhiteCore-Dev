@@ -587,7 +587,7 @@ namespace WhiteCore.Modules.Archivers
         /// <param name="assetPath"> </param>
         /// <param name="data"></param>
         /// <returns>true if asset was successfully loaded, false otherwise</returns>
-        private bool LoadAsset(string assetPath, byte[] data)
+        bool LoadAsset(string assetPath, byte[] data)
         {
             //IRegionSerialiser serialiser = scene.RequestModuleInterface<IRegionSerialiser>();
             // Right now we're nastily obtaining the UUID from the filename
