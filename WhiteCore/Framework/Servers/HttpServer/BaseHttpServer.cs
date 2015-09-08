@@ -437,7 +437,7 @@ namespace WhiteCore.Framework.Servers.HttpServer
                     int tickdiff = requestEndTick - requestStartTick;
                     if (tickdiff > 3000 && requestHandler != null)
                     {
-                        MainConsole.Instance.InfoFormat(
+                        MainConsole.Instance.DebugFormat(
                             "[BASE HTTP SERVER]: Slow handling of {0} {1} took {2}ms",
                             requestMethod,
                             uriString,
