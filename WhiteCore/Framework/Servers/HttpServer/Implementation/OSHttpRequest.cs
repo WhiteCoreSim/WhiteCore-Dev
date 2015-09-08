@@ -108,7 +108,7 @@ namespace WhiteCore.Framework.Servers.HttpServer.Implementation
             get { return _contentType; }
         }
 
-        private string _contentType;
+        string _contentType;
 
         public HttpCookieCollection Cookies
         {
@@ -147,14 +147,14 @@ namespace WhiteCore.Framework.Servers.HttpServer.Implementation
             get { return _queryString; }
         }
 
-        private NameValueCollection _queryString;
+        NameValueCollection _queryString;
 
         public Hashtable Query
         {
             get { return _query; }
         }
 
-        private Hashtable _query;
+        Hashtable _query;
 
         /// <value>
         ///     POST request values, if applicable
