@@ -26,6 +26,16 @@
  */
 
 
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
@@ -35,22 +45,12 @@ using WhiteCore.Framework.Servers;
 using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Linq;
-using System.Threading;
 using GridRegion = WhiteCore.Framework.Services.GridRegion;
 using RegionFlags = WhiteCore.Framework.Services.RegionFlags;
 
 namespace WhiteCore.Modules.WorldMap
 {
-    public class WhiteCoreWorldMapModule : INonSharedRegionModule, IWorldMapModule
+    public class WorldMapModule : INonSharedRegionModule, IWorldMapModule
     {
         const string DEFAULT_WORLD_MAP_EXPORT_PATH = "exportmap.jpg";
 
@@ -72,9 +72,7 @@ namespace WhiteCore.Modules.WorldMap
         {
             if (source.Configs["MapModule"] != null)
             {
-                if (source.Configs["MapModule"].GetString(
-                    "WorldMapModule", "WhiteCoreWorldMapModule") !=
-                    "WhiteCoreWorldMapModule")
+                if (source.Configs["MapModule"].GetString( "WorldMapModule", "WorldMapModule") != Name)
                     return;
                 m_Enabled = true;
                 MapViewLength = source.Configs["MapModule"].GetInt("MapViewLength", MapViewLength);
@@ -123,7 +121,7 @@ namespace WhiteCore.Modules.WorldMap
 
         public virtual string Name
         {
-            get { return "WhiteCoreWorldMapModule"; }
+            get { return "WorldMapModule"; }
         }
 
         #endregion
@@ -131,7 +129,7 @@ namespace WhiteCore.Modules.WorldMap
         // this has to be called with a lock on m_scene
         protected virtual void AddHandlers()
         {
-            string regionimage = "/index.php?method=regionImage" + m_scene.RegionInfo.RegionID.ToString();
+            string regionimage = "/index.php?method=regionImage" + m_scene.RegionInfo.RegionID;
             regionimage = regionimage.Replace("-", "");
             MainConsole.Instance.Debug("[WORLD MAP]: JPEG Map location: " + MainServer.Instance.ServerURI +
                                        regionimage);
@@ -148,7 +146,7 @@ namespace WhiteCore.Modules.WorldMap
             m_scene.EventManager.OnNewClient -= OnNewClient;
             m_scene.EventManager.OnClosingClient -= OnClosingClient;
 
-            string regionimage = "/index.php?method=regionImage" + m_scene.RegionInfo.RegionID.ToString();
+            string regionimage = "/index.php?method=regionImage" + m_scene.RegionInfo.RegionID;
             regionimage = regionimage.Replace("-", "");
             MainServer.Instance.RemoveStreamHandler("GET", regionimage);
         }
@@ -203,7 +201,7 @@ namespace WhiteCore.Modules.WorldMap
                                           x = xstart + 1,
                                           y = ystart + 1,
                                           id = UUID.Zero,
-                                          name = Util.Md5Hash(m_scene.RegionInfo.RegionName + tc.ToString()),
+                                          name = Util.Md5Hash(m_scene.RegionInfo.RegionName + tc),
                                           Extra = 0,
                                           Extra2 = 0
                                       };
@@ -259,7 +257,7 @@ namespace WhiteCore.Modules.WorldMap
             itemRequesterIsRunning = true;
             while (true)
             {
-                MapItemRequester item = null;
+                MapItemRequester item;
                 if (!m_itemsToRequest.TryDequeue(out item))
                     break; //Nothing in the queue
 
@@ -472,7 +470,7 @@ namespace WhiteCore.Modules.WorldMap
                 (int) RegionFlags.RegionOnline)
                 block.Access = r.Access;
             else
-                block.Access = (byte) OpenMetaverse.SimAccess.Down;
+                block.Access = (byte) SimAccess.Down;
             block.MapImageID = r.TerrainImage;
             block.Name = r.RegionName;
             block.X = (ushort) (r.RegionLocX/Constants.RegionSize);
@@ -498,7 +496,7 @@ namespace WhiteCore.Modules.WorldMap
                 (int) RegionFlags.RegionOnline)
                 block.Access = r.Access;
             else
-                block.Access = (byte) OpenMetaverse.SimAccess.Down;
+                block.Access = (byte) SimAccess.Down;
             block.MapImageID = r.TerrainImage;
             block.Name = r.RegionName;
             block.X = (ushort) (r.RegionLocX/Constants.RegionSize);
@@ -532,7 +530,7 @@ namespace WhiteCore.Modules.WorldMap
             return blocks;
         }
 
-        private void OnMapNameRequest(IClientAPI remoteClient, string mapName, uint flags)
+        void OnMapNameRequest(IClientAPI remoteClient, string mapName, uint flags)
         {
             if (mapName.Length < 1)
             {
@@ -676,7 +674,7 @@ namespace WhiteCore.Modules.WorldMap
             byte[] jpeg = new byte[0];
 
             MemoryStream imgstream = new MemoryStream();
-            Bitmap mapTexture = new Bitmap(1, 1);
+            Bitmap mapTexture;
             Image image = null;
 
             try
@@ -736,10 +734,10 @@ namespace WhiteCore.Modules.WorldMap
 
         class MapItemRequester
         {
-            public ulong regionhandle = 0;
-            public uint itemtype = 0;
-            public IClientAPI remoteClient = null;
-            public uint flags = 0;
+            public ulong regionhandle;
+            public uint itemtype;
+            public IClientAPI remoteClient;
+            public uint flags;
         }
     }
 }
