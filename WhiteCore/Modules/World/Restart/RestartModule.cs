@@ -235,6 +235,15 @@ namespace WhiteCore.Modules.Restart
             restartRegionSerialized (m_scene);
         }
 
+        /// <summary>
+        /// Serializes the scene.
+        /// </summary>
+        public void SerializeScene()
+        {
+            MainConsole.Instance.InfoFormat ("[Restart]: Saving current users on {0} ready for restart", m_scene.RegionInfo.RegionName);
+            SerializeUsers (m_scene);
+        }
+
         #endregion
 
         public int DoOneNotice ()
