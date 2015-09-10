@@ -25,10 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.ConsoleFramework;
-using WhiteCore.Framework.Servers.HttpServer.Implementation;
-using WhiteCore.Framework.Servers.HttpServer.Interfaces;
-using Nwc.XmlRpc;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -36,12 +32,16 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Xml;
+using Nwc.XmlRpc;
+using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.Servers.HttpServer.Implementation;
+using WhiteCore.Framework.Servers.HttpServer.Interfaces;
 
 namespace WhiteCore.Framework.Servers.HttpServer
 {
     public class BaseHttpServer : IHttpServer, IDisposable
     {
-        public volatile bool HTTPDRunning = false;
+        public volatile bool HTTPDRunning;
 
         protected HttpListenerManager m_internalServer;
         protected Dictionary<string, XmlRpcMethod> m_rpcHandlers = new Dictionary<string, XmlRpcMethod>();
@@ -52,13 +52,14 @@ namespace WhiteCore.Framework.Servers.HttpServer
         protected Dictionary<string, PollServiceEventArgs> m_pollHandlers =
             new Dictionary<string, PollServiceEventArgs>();
 
-        public Action<HttpListenerContext> OnOverrideRequest = null;
+        public Action<HttpListenerContext> OnOverrideRequest;
         protected bool m_isSecure;
         protected uint m_port, m_threadCount;
         protected string m_hostName;
         protected int NotSocketErrors;
         protected IPAddress m_listenIPAddress = IPAddress.Any;
-        private PollServiceRequestManager m_PollServiceManager;
+
+        PollServiceRequestManager m_PollServiceManager;
 
         internal PollServiceRequestManager PollServiceManager
         {
@@ -262,9 +263,9 @@ namespace WhiteCore.Framework.Servers.HttpServer
 
         #region 400 and 500 responses
 
-        private string GetHTTP404()
+        string GetHTTP404()
         {
-            string file = Path.Combine(".", "http_404.html"); // Shouldn't this point to the html folder ?
+            string file = Path.Combine(".", "http_404.html"); 
             if (!File.Exists(file))
                 return getDefaultHTTP404();
 
@@ -274,9 +275,9 @@ namespace WhiteCore.Framework.Servers.HttpServer
             return result;
         }
 
-        private string GetHTTP500()
+        string GetHTTP500()
         {
-            string file = Path.Combine(".", "http_500.html"); // Shouldn't this point to the html folder ?
+            string file = Path.Combine(".", "http_500.html"); 
             if (!File.Exists(file))
                 return getDefaultHTTP500();
 
@@ -287,22 +288,22 @@ namespace WhiteCore.Framework.Servers.HttpServer
         }
 
         // Fallback HTTP responses in case the HTTP error response files don't exist
-        private string getDefaultHTTP404()
+        string getDefaultHTTP404()
         {
             return
-                "<HTML><HEAD><TITLE>404 Page not found</TITLE><BODY><BR /><H1>Ooops!</H1><P>The page you requested has been absconded with by gnomes. Find hippos quick!</P><P>If you are trying to log-in, your link parameters should have: &quot;-loginpage " +
+                "<HTML><HEAD><TITLE>404 Page not found</TITLE><BODY><BR /><H1>Ooops!</H1><P>The page you requested has been absconded with by gnomes!</P><P>If you are trying to log-in, your link parameters should have: &quot;-loginpage " +
                  ServerURI + "/?method=login -loginuri " + ServerURI + "/&quot; in your link </P></BODY></HTML>";
         }
 
-        private static string getDefaultHTTP500()
+        static string getDefaultHTTP500()
         {
             return
-                "<HTML><HEAD><TITLE>500 Internal Server Error</TITLE><BODY><BR /><H1>Ooops!</H1><P>The server you requested is overrun by gnomes! Find hippos quick!</P></BODY></HTML>";
+                "<HTML><HEAD><TITLE>500 Internal Server Error</TITLE><BODY><BR /><H1>Ooops!</H1><P>The server you requested is overrun by gnomes!</P></BODY></HTML>";
         }
 
         #endregion
 
-        private void OnRequest(HttpListenerContext context)
+        void OnRequest(HttpListenerContext context)
         {
             try
             {
@@ -436,7 +437,7 @@ namespace WhiteCore.Framework.Servers.HttpServer
                     int tickdiff = requestEndTick - requestStartTick;
                     if (tickdiff > 3000 && requestHandler != null)
                     {
-                        MainConsole.Instance.InfoFormat(
+                        MainConsole.Instance.DebugFormat(
                             "[BASE HTTP SERVER]: Slow handling of {0} {1} took {2}ms",
                             requestMethod,
                             uriString,
@@ -460,7 +461,7 @@ namespace WhiteCore.Framework.Servers.HttpServer
         /// </summary>
         /// <param name="request"></param>
         /// <param name="response"></param>
-        private byte[] HandleXmlRpcRequests(OSHttpRequest request, OSHttpResponse response)
+        byte[] HandleXmlRpcRequests(OSHttpRequest request, OSHttpResponse response)
         {
             string requestBody = HttpServerHandlerHelpers.ReadString(request.InputStream);
 

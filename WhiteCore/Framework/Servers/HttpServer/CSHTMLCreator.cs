@@ -51,6 +51,7 @@ namespace WhiteCore.Framework.Servers.HttpServer
                          (urlToAppend == "" ? "" : "/") + urlToAppend + "/index.php?method=" + methodName + secret;
             MainServer.Instance.RemoveStreamHandler("GET", "/index.php?method=" + methodName + secret);
             MainServer.Instance.RemoveStreamHandler("GET", "/index.php?method=" + methodName + secret2);
+
             variables["url"] = url;
             MainServer.Instance.AddStreamHandler(new GenericStreamHandler("GET", "/index.php?method=" + methodName + secret2,
                                                                         delegate(string path, Stream request,
@@ -81,7 +82,7 @@ namespace WhiteCore.Framework.Servers.HttpServer
             return navUrl;
         }
 
-        private static byte[] HandleResponse(OSHttpRequest httpRequest, OSHttpResponse response, Stream stream,
+        static byte[] HandleResponse(OSHttpRequest httpRequest, OSHttpResponse response, Stream stream,
                                              string urlToAppend, Dictionary<string, object> variables,
                                              HTTPReturned eventHandler)
         {
@@ -104,7 +105,7 @@ namespace WhiteCore.Framework.Servers.HttpServer
             return Encoding.UTF8.GetBytes(html);
         }
 
-        private static byte[] SetUpWebpage(OSHttpResponse response, string url, string html,
+        static byte[] SetUpWebpage(OSHttpResponse response, string url, string html,
                                            Dictionary<string, object> vars)
         {
             response.ContentType = "text/html";

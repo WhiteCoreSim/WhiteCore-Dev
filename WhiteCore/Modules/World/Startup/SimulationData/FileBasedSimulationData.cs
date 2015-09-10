@@ -130,7 +130,6 @@ namespace WhiteCore.Modules
 
         public virtual List<string> FindRegionInfos(out bool newRegion, ISimulationBase simBase)
         {
-//			List<string> regions = new List<string>(Directory.GetFiles(".", "*.sim", SearchOption.TopDirectoryOnly));
 			ReadConfig(simBase);
 			MainConsole.Instance.Info("Looking for previous regions in: "+ m_storeDirectory);
 
@@ -324,68 +323,9 @@ namespace WhiteCore.Modules
             // prompt for user input
             if (prompt)
             {
-                Utilities.MarkovNameGenerator rNames = new Utilities.MarkovNameGenerator();
-                string regionName = rNames.FirstName (m_regionNameSeed == null ? Utilities.RegionNames: m_regionNameSeed, 3,7);
-                if (info.RegionName != "")
-                    regionName = info.RegionName;
-
-                do
-                {
-                    info.RegionName = MainConsole.Instance.Prompt ("Region Name (? for suggestion)", regionName);
-                    if (info.RegionName == "" || info.RegionName == "?")
-                    {
-                        regionName = rNames.NextName;
-                        info.RegionName = "";
-                        continue;
-                    }
-                }
-                while (info.RegionName == "");
-                rNames.Reset();
-
-                info.RegionLocX =
-                    int.Parse (MainConsole.Instance.Prompt ("Region Location X",
-                    ((info.RegionLocX == 0 
-                            ? 1000 
-                            : info.RegionLocX / Constants.RegionSize)).ToString ())) * Constants.RegionSize;
-
-                info.RegionLocY =
-                    int.Parse (MainConsole.Instance.Prompt ("Region location Y",
-                    ((info.RegionLocY == 0 
-                            ? 1000 
-                            : info.RegionLocY / Constants.RegionSize)).ToString ())) * Constants.RegionSize;
-            
-                //info.RegionLocZ =
-                //    int.Parse (MainConsole.Instance.Prompt ("Region location Z",
-                //        ((info.RegionLocZ == 0 
-                //            ? 0 
-                //            : info.RegionLocZ / Constants.RegionSize)).ToString ())) * Constants.RegionSize;
-
-                var haveSize = true;
-                var sizeCheck = "";
-                do
-                {
-                    info.RegionSizeX = int.Parse (MainConsole.Instance.Prompt ("Region size X", info.RegionSizeX.ToString ()));
-                    if (info.RegionSizeX > Constants.MaxRegionSize)
-                    {
-                        MainConsole.Instance.CleanInfo ("    The currently recommended maximum size is " + Constants.MaxRegionSize);
-                        sizeCheck =  MainConsole.Instance.Prompt ("Continue with the X size of " + info.RegionSizeX + "? (yes/no)", "no");
-                        haveSize = sizeCheck.ToLower().StartsWith("y");
-                    }
-                } while (! haveSize);
-
-                // assume square regions
-                info.RegionSizeY = info.RegionSizeX;
-
-                do
-                {
-                    info.RegionSizeY = int.Parse (MainConsole.Instance.Prompt ("Region size Y", info.RegionSizeY.ToString ()));
-                    if ( (info.RegionSizeY > info.RegionSizeX) && (info.RegionSizeY > Constants.MaxRegionSize) )
-                    {
-                        MainConsole.Instance.CleanInfo ("    The currently recommended maximum size is " + Constants.MaxRegionSize);
-                        sizeCheck =  MainConsole.Instance.Prompt ("Continue with the Y size of " + info.RegionSizeY + "? (yes/no)", "no");
-                        haveSize = sizeCheck.ToLower().StartsWith("y");
-                    }
-                } while (! haveSize);
+                GetRegionName (ref info);
+                GetRegionLocation (ref info);
+                GetRegionSize (ref info);
 
                 bool bigRegion = ((info.RegionSizeX > Constants.MaxRegionSize) || (info.RegionSizeY > Constants.MaxRegionSize));
 
@@ -454,27 +394,8 @@ namespace WhiteCore.Modules
                     info.RegionType = info.RegionType + "Custom";                   
                     info.RegionTerrain = terrainFull;
 
-                    // allow port selection
-                    info.RegionPort = int.Parse (MainConsole.Instance.Prompt ("Region Port", info.RegionPort.ToString ()));
+                    GetRegionOptional (ref info);
 
-                    // Startup mode
-                    string scriptStart = MainConsole.Instance.Prompt (
-                        "Region Startup - Normal or Delayed startup (normal/delay) : ","normal").ToLower();
-                    info.Startup = scriptStart.StartsWith ("n") ? StartupType.Normal : StartupType.Medium;
-                              
-                    info.SeeIntoThisSimFromNeighbor =  MainConsole.Instance.Prompt (
-                        "See into this sim from neighbors (yes/no)",
-                        info.SeeIntoThisSimFromNeighbor ? "yes" : "no").ToLower() == "yes";
-
-                    info.InfiniteRegion = MainConsole.Instance.Prompt (
-                        "Make an infinite region (yes/no)",
-                        info.InfiniteRegion ? "yes" : "no").ToLower () == "yes";
-                
-                    info.ObjectCapacity =
-                        int.Parse (MainConsole.Instance.Prompt ("Object capacity",
-                        info.ObjectCapacity == 0
-                                               ? "50000"
-                                               : info.ObjectCapacity.ToString ()));
                 } 
 
                 if (setupMode.StartsWith("w"))
@@ -580,6 +501,200 @@ namespace WhiteCore.Modules
             return info;
         }
 
+
+        /// <summary>
+        /// Modifies the region settings.
+        /// </summary>
+        /// <returns>The region settings.</returns>
+        /// <param name="regInfo">Reg info.</param>
+        /// <param name="advanced">If set to <c>true</c> advanced.</param>
+        bool ModifyRegionSettings(ref RegionInfo regInfo, bool advanced)
+        {
+            bool updated = false;
+            if (regInfo == null || regInfo.NewRegion)
+                return updated;
+            
+            updated |= GetRegionName (ref regInfo);
+            updated |= GetRegionLocation (ref regInfo);
+            updated |= GetRegionSize (ref regInfo);
+
+            if (advanced)
+            {
+                // region type
+                var oldType = regInfo.RegionType;
+                regInfo.RegionType = MainConsole.Instance.Prompt ("Region Type (Mainland/Estate)",
+                    (regInfo.RegionType == "" ? "Estate" : regInfo.RegionType));
+                if (regInfo.RegionType != oldType)
+                    updated = true;
+
+                updated |= GetRegionOptional (ref regInfo);
+             }
+   
+             return updated;
+        }
+
+        /// <summary>
+        /// Gets the name of the region.
+        /// </summary>
+        /// <returns><c>true</c>, if region name was gotten, <c>false</c> otherwise.</returns>
+        /// <param name="regInfo">Reg info.</param>
+        bool GetRegionName(ref RegionInfo regInfo)
+        {
+            var updated = false;
+
+            Utilities.MarkovNameGenerator rNames = new Utilities.MarkovNameGenerator ();
+            string regionName = rNames.FirstName (m_regionNameSeed == null ? Utilities.RegionNames : m_regionNameSeed, 3, 7);
+
+            regionName = regInfo.RegionName;
+            var oldName = regionName;
+
+            do
+            {
+                regInfo.RegionName = MainConsole.Instance.Prompt ("Region Name (? for suggestion)", regionName);
+                if (regInfo.RegionName == "" || regInfo.RegionName == "?")
+                {
+                    regionName = rNames.NextName;
+                    regInfo.RegionName = "";
+                    continue;
+                }
+            } while (regInfo.RegionName == "");
+            rNames.Reset ();
+            if (regInfo.RegionName != oldName)
+                updated = true;
+            
+            return updated;
+        }
+
+        /// <summary>
+        /// Gets the region location.
+        /// </summary>
+        /// <returns><c>true</c>, if region location was gotten, <c>false</c> otherwise.</returns>
+        /// <param name="regInfo">Reg info.</param>
+        bool GetRegionLocation(ref RegionInfo regInfo)
+        {
+            var updated = false;
+            var loc = regInfo.RegionLocX;
+            regInfo.RegionLocX =
+                int.Parse (MainConsole.Instance.Prompt ("Region Location X",
+                    ((regInfo.RegionLocX == 0 
+                        ? 1000 
+                        : regInfo.RegionLocX / Constants.RegionSize)).ToString ())) * Constants.RegionSize;
+            if (regInfo.RegionLocX != loc)
+                updated = true;
+
+            loc = regInfo.RegionLocY;
+            regInfo.RegionLocY =
+                int.Parse (MainConsole.Instance.Prompt ("Region location Y",
+                    ((regInfo.RegionLocY == 0 
+                        ? 1000 
+                        : regInfo.RegionLocY / Constants.RegionSize)).ToString ())) * Constants.RegionSize;
+            if (regInfo.RegionLocY != loc)
+                updated = true;
+
+            //loc = regInfo.RegionLocZ;
+            //regInfo.RegionLocZ =
+            //        int.Parse (MainConsole.Instance.Prompt ("Region location Z",
+            //            ((regInfo.RegionLocZ == 0 
+            //            ? 0 
+            //            : regInfo.RegionLocZ / Constants.RegionSize)).ToString ())) * Constants.RegionSize;
+            //if (regInfo.RegionLocZ != loc)
+            //    updated = true;
+
+            return updated;
+        }
+
+        /// <summary>
+        /// Gets the size of the region.
+        /// </summary>
+        /// <returns><c>true</c>, if region size was gotten, <c>false</c> otherwise.</returns>
+        /// <param name="RegionInfo">Region info.</param>
+        bool GetRegionSize(ref RegionInfo regInfo)
+        {
+            var updated = false;
+            var haveSize = true;
+            var sizeCheck = "";
+            var oldSize = regInfo.RegionSizeX;
+            do
+            {
+                regInfo.RegionSizeX = int.Parse (MainConsole.Instance.Prompt ("Region size X", regInfo.RegionSizeX.ToString ()));
+                if (regInfo.RegionSizeX > Constants.MaxRegionSize)
+                {
+                    MainConsole.Instance.CleanInfo ("    The currently recommended maximum size is " + Constants.MaxRegionSize);
+                    sizeCheck = MainConsole.Instance.Prompt ("Continue with the X size of " + regInfo.RegionSizeX + "? (yes/no)", "no");
+                    haveSize = sizeCheck.ToLower ().StartsWith ("y");
+                }
+            } while (!haveSize);
+            if (regInfo.RegionSizeX != oldSize)
+                updated = true;
+
+            // assume square regions
+            regInfo.RegionSizeY = regInfo.RegionSizeX;
+            oldSize = regInfo.RegionSizeY;
+            do
+            {
+                regInfo.RegionSizeY = int.Parse (MainConsole.Instance.Prompt ("Region size Y", regInfo.RegionSizeY.ToString ()));
+                if ((regInfo.RegionSizeY > regInfo.RegionSizeX) && (regInfo.RegionSizeY > Constants.MaxRegionSize))
+                {
+                    MainConsole.Instance.CleanInfo ("    The currently recommended maximum size is " + Constants.MaxRegionSize);
+                    sizeCheck = MainConsole.Instance.Prompt ("Continue with the Y size of " + regInfo.RegionSizeY + "? (yes/no)", "no");
+                    haveSize = sizeCheck.ToLower ().StartsWith ("y");
+                }
+            } while (!haveSize);
+            if (regInfo.RegionSizeY != oldSize)
+                updated = true;
+
+            return updated;
+        }
+
+        /// <summary>
+        /// Gets the region optional settings.
+        /// </summary>
+        /// <returns><c>true</c>, if region optional was gotten, <c>false</c> otherwise.</returns>
+        /// <param name="regInfo">Reg info.</param>
+        bool GetRegionOptional(ref RegionInfo regInfo)
+        {
+            var updated = false;
+
+            // allow port selection
+            var oldPort = regInfo.RegionPort;
+            regInfo.RegionPort = int.Parse (MainConsole.Instance.Prompt ("Region Port (Only change if necessary)", regInfo.RegionPort.ToString ()));
+            if (regInfo.RegionPort != oldPort)
+                updated = true;
+
+            var oldStart = regInfo.Startup;
+            // Startup mode
+            string scriptStart = MainConsole.Instance.Prompt (
+                "Region Startup - Normal or Delayed startup (normal/delay) : ", "normal").ToLower ();
+            regInfo.Startup = scriptStart.StartsWith ("n") ? StartupType.Normal : StartupType.Medium;
+            if (regInfo.Startup != oldStart)
+                updated = true;
+
+            var oldSwitch = regInfo.SeeIntoThisSimFromNeighbor;
+            regInfo.SeeIntoThisSimFromNeighbor = MainConsole.Instance.Prompt (
+                "See into this sim from neighbors (yes/no)",
+                regInfo.SeeIntoThisSimFromNeighbor ? "yes" : "no").ToLower () == "yes";
+            if (regInfo.SeeIntoThisSimFromNeighbor != oldSwitch)
+                updated = true;
+
+            oldSwitch = regInfo.InfiniteRegion;
+            regInfo.InfiniteRegion = MainConsole.Instance.Prompt (
+                "Make an infinite region (yes/no)",
+                regInfo.InfiniteRegion ? "yes" : "no").ToLower () == "yes";
+            if (regInfo.InfiniteRegion != oldSwitch)
+                updated = true;
+
+            var oldCap = regInfo.ObjectCapacity;
+            regInfo.ObjectCapacity =
+                int.Parse (MainConsole.Instance.Prompt ("Object capacity",
+                    regInfo.ObjectCapacity == 0
+                    ? "50000"
+                    : regInfo.ObjectCapacity.ToString ()));
+            if (regInfo.ObjectCapacity != oldCap)
+                updated = true;
+
+            return updated;
+        }
+
         public virtual void SetRegion(IScene scene)
         {
             scene.WhiteCoreEventManager.RegisterEventHandler("Backup", WhiteCoreEventManager_OnGenericEvent);
@@ -596,9 +711,33 @@ namespace WhiteCore.Modules
             if (MainConsole.Instance.ConsoleScene != null)
             {
                 m_scene = scene;
-                var currentInfo = scene.RegionInfo;
-                MainConsole.Instance.ConsoleScene.RegionInfo = CreateRegionFromConsole(currentInfo, true, null);
-                MainConsole.Instance.DefaultPrompt = MainConsole.Instance.ConsoleScene.RegionInfo.RegionName+": ";
+                var regInfo = scene.RegionInfo;
+                string oldFile = BuildSaveFileName (scene.SimulationDataService.BackupFile);
+
+                if (ModifyRegionSettings(ref regInfo, true))
+                {
+                    scene.RegionInfo = regInfo;
+
+                    // save a new backup
+                    if (File.Exists (oldFile))
+                        File.Delete (oldFile);
+                    scene.SimulationDataService.BackupFile = regInfo.RegionName;       
+                    scene.SimulationDataService.ForceBackup();
+
+                    MainConsole.Instance.InfoFormat("[FileBasedSimulationData]: Save of {0} completed.",regInfo.RegionName);
+
+                    // bail out
+                    MainConsole.Instance.ConsoleScene = null;
+                    MainConsole.Instance.DefaultPrompt = "root: ";
+
+                    // save current region serialized
+                    var restart = scene.RequestModuleInterface<IRestartModule>();
+                    restart.SerializeScene ();
+
+                    // shutdown and restart
+                    restart.RestartScene();
+
+                }
             }
         }
 
