@@ -25,10 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System.IO;
-using WhiteCore.Framework.Servers.HttpServer.Implementation;
-using System.Text;
 using System;
+using System.IO;
+using System.Text;
+using WhiteCore.Framework.Servers.HttpServer.Implementation;
 
 namespace WhiteCore.Framework.Servers.HttpServer
 {
@@ -37,7 +37,7 @@ namespace WhiteCore.Framework.Servers.HttpServer
 
     public class GenericStreamHandler : BaseRequestHandler
     {
-        private HttpServerHandle _method;
+        HttpServerHandle _method;
 
         public GenericStreamHandler(string httpMethod, string path, HttpServerHandle method)
             : base(httpMethod, path)
@@ -126,7 +126,7 @@ namespace WhiteCore.Framework.Servers.HttpServer
 
     public static class MyExtensions
     {
-        public static string ReadUntilEnd(this System.IO.Stream stream)
+        public static string ReadUntilEnd(this Stream stream)
         {
             StreamReader rdr = new StreamReader(stream);
             string str = rdr.ReadToEnd();

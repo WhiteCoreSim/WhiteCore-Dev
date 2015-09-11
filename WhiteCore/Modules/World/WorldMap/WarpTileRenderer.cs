@@ -51,6 +51,8 @@ namespace WhiteCore.Modules.WorldMap
 {
     public class WarpTileRenderer : IMapTileTerrainRenderer
     {
+        const float MIN_PRIM_SIZE = 2f;     // minimum size of a prim before it is rendered
+
         static readonly Color4 WATER_COLOR = new Color4(29, 72, 96, 216);
         static readonly Color4 OPAQUE_WATER_COLOR = new Color4(34, 92, 114, 255);
         //static readonly Color4 SKY_COLOR = new Color4(106, 178, 236, 216);
@@ -66,7 +68,7 @@ namespace WhiteCore.Modules.WorldMap
         bool m_drawPrimVolume = true;   // true if should render the prims on the tile
         bool m_textureTerrain = true;   // true if to create terrain splatting texture
         bool m_texturePrims = true;     // true if should texture the rendered prims
-        float m_texturePrimSize = 48f;  // size of prim before we consider texturing it
+        float m_texturePrimSize = 4f;   // size of prim before we consider texturing it
         bool m_renderMeshes = true;     // true if to render meshes rather than just bounding boxes
 
         #region IMapTileTerrainRenderer Members
@@ -262,10 +264,14 @@ namespace WhiteCore.Modules.WorldMap
                 else
                     renderer.AddPlane ("Water", m_scene.RegionInfo.RegionSizeY/2);
 
-                renderer.Scene.sceneobject ("Water").setPos ((m_scene.RegionInfo.RegionSizeX / 2) - 0.5f, waterHeight,
+                renderer.Scene.sceneobject ("Water").setPos (
+                    (m_scene.RegionInfo.RegionSizeX / 2) - 0.5f,
+                    waterHeight,
                     (m_scene.RegionInfo.RegionSizeY / 2) - 0.5f);
-                               waterColormaterial = new warp_Material (ConvertColor (WATER_COLOR));
-                waterColormaterial.setTransparency ((byte)((1f - WATER_COLOR.A) * 255f) * 2);
+                
+                waterColormaterial = new warp_Material (ConvertColor (WATER_COLOR));
+//                waterColormaterial.setTransparency ((byte)((1f - WATER_COLOR.A) * 255f) * 2);
+                waterColormaterial.setTransparency ((byte)((1f - WATER_COLOR.A) * 255f));
             } else
             {
                 if(m_scene.RegionInfo.RegionSizeX >= m_scene.RegionInfo.RegionSizeY)
@@ -298,9 +304,7 @@ namespace WhiteCore.Modules.WorldMap
             int newRsX = m_scene.RegionInfo.RegionSizeX / (int)diffX;
             int newRsY = m_scene.RegionInfo.RegionSizeY / (int)diffY;
 
-            warp_Object obj =
-                new warp_Object(newRsX*newRsY,
-                                ((newRsX - 1)*(newRsY - 1)*2));
+            warp_Object obj = new warp_Object(newRsX*newRsY, ((newRsX - 1)*(newRsY - 1)*2));
 
             for (float y = 0; y < m_scene.RegionInfo.RegionSizeY; y += diffY)
             {
@@ -320,13 +324,14 @@ namespace WhiteCore.Modules.WorldMap
                 }
             }
 
+            const float normal_map_reduction = 2.0f; //2.0f-2.5f is the sweet spot
+
             for (float y = 0; y < m_scene.RegionInfo.RegionSizeY; y += diffY)
             {
                 for (float x = 0; x < m_scene.RegionInfo.RegionSizeX; x += diffX)
                 {
                     float newX = x/diffX;
                     float newY = y/diffY;
-                    float normal_map_reduction = 2.0f; //2.0f-2.5f is the sweet spot
 
                     if (newX < newRsX - 1 && newY < newRsY - 1)
                     {
@@ -409,11 +414,10 @@ namespace WhiteCore.Modules.WorldMap
         {
             try
             {
-                const float MIN_SIZE = 2f;
 
                 if ((PCode) prim.Shape.PCode != PCode.Prim)
                     return;
-                if (prim.Scale.LengthSquared() < MIN_SIZE*MIN_SIZE)
+                if (prim.Scale.LengthSquared() < MIN_PRIM_SIZE*MIN_PRIM_SIZE)
                     return;
 
                 Primitive omvPrim = prim.Shape.ToOmvPrimitive(prim.OffsetPosition, prim.GetRotationOffset());
@@ -502,7 +506,7 @@ namespace WhiteCore.Modules.WorldMap
                     string materialName;
                     Color4 faceColor = GetFaceColor(teFace);
 
-                    if (m_texturePrims && prim.Scale.LengthSquared() > 48*48)
+                    if (m_texturePrims && (prim.Scale.LengthSquared() > m_texturePrimSize))
                     {
                         materialName = GetOrCreateMaterial(renderer, faceColor, teFace.TextureID);
                     }
@@ -548,8 +552,7 @@ namespace WhiteCore.Modules.WorldMap
                     color = new Color4 (0.5f, 0.5f, 0.5f, 1.0f);
                 } else                   
                 {
-                    int width, height;
-                    color = GetAverageColor(face.TextureID, textureAsset, m_scene, out width, out height);
+                    color = GetAverageColor(face.TextureID, textureAsset, m_scene);
                 }
 
                 m_colors[face.TextureID] = color;
@@ -574,7 +577,7 @@ namespace WhiteCore.Modules.WorldMap
 
         public string GetOrCreateMaterial(WarpRenderer renderer, Color4 faceColor, UUID textureID)
         {
-            string materialName = "Color-" + faceColor.ToString() + "-Texture-" + textureID.ToString();
+            string materialName = "Color-" + faceColor + "-Texture-" + textureID;
 
             if (renderer.Scene.material(materialName) == null)
             {
@@ -712,7 +715,7 @@ namespace WhiteCore.Modules.WorldMap
             return c;
         }
 
-        public static Color4 GetAverageColor(UUID textureID, byte[] j2kData, IScene scene, out int width, out int height)
+        public static Color4 GetAverageColor(UUID textureID, byte[] j2kData, IScene scene)
         {
             ulong r = 0;
             ulong g = 0;
@@ -724,48 +727,32 @@ namespace WhiteCore.Modules.WorldMap
                 IJ2KDecoder decoder = scene.RequestModuleInterface<IJ2KDecoder>();
 
                 bitmap = (Bitmap) decoder.DecodeToImage(j2kData);
-                width = 0;
-                height = 0;
                 if (bitmap == null)
                     return new Color4(0.5f, 0.5f, 0.5f, 1.0f);
+                
                 j2kData = null;
-                width = bitmap.Width;
-                height = bitmap.Height;
+                int width = bitmap.Width;
+                int height = bitmap.Height;
 
                 BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly,
                                                         bitmap.PixelFormat);
                 int pixelBytes = (bitmap.PixelFormat == PixelFormat.Format24bppRgb) ? 3 : 4;
+                bool hasAlpha = (pixelBytes == 4);
 
                 // Sum up the individual channels
                 unsafe
                 {
-                    if (pixelBytes == 4)
+                    for (int y = 0; y < height; y++)
                     {
-                        for (int y = 0; y < height; y++)
-                        {
-                            byte* row = (byte*) bitmapData.Scan0 + (y*bitmapData.Stride);
+                        byte* row = (byte*) bitmapData.Scan0 + (y*bitmapData.Stride);
 
-                            for (int x = 0; x < width; x++)
-                            {
-                                b += row[x*pixelBytes + 0];
-                                g += row[x*pixelBytes + 1];
-                                r += row[x*pixelBytes + 2];
+                        for (int x = 0; x < width; x++)
+                        {
+                            b += row[x*pixelBytes + 0];
+                            g += row[x*pixelBytes + 1];
+                            r += row[x*pixelBytes + 2];
+                            if (hasAlpha)
                                 a += row[x*pixelBytes + 3];
-                            }
-                        }
-                    }
-                    else
-                    {
-                        for (int y = 0; y < height; y++)
-                        {
-                            byte* row = (byte*) bitmapData.Scan0 + (y*bitmapData.Stride);
-
-                            for (int x = 0; x < width; x++)
-                            {
-                                b += row[x*pixelBytes + 0];
-                                g += row[x*pixelBytes + 1];
-                                r += row[x*pixelBytes + 2];
-                            }
                         }
                     }
                 }
@@ -777,9 +764,10 @@ namespace WhiteCore.Modules.WorldMap
                 decimal rm = (r/totalPixels)*OO_255;
                 decimal gm = (g/totalPixels)*OO_255;
                 decimal bm = (b/totalPixels)*OO_255;
-                decimal am = (a/totalPixels)*OO_255;
-
-                if (pixelBytes == 3)
+                decimal am;
+                if (hasAlpha)
+                    am = (a/totalPixels)*OO_255;
+                else
                     am = 1m;
 
                 return new Color4((float) rm, (float) gm, (float) bm, (float) am);
@@ -789,8 +777,6 @@ namespace WhiteCore.Modules.WorldMap
                 MainConsole.Instance.WarnFormat("[MAPTILE]: Error decoding JPEG2000 texture {0} ({1} bytes): {2}",
                                                 textureID,
                                                 j2kData.Length, ex.Message);
-                width = 0;
-                height = 0;
                 return new Color4(0.5f, 0.5f, 0.5f, 1.0f);
             }
             finally

@@ -25,6 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Timers;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.ModuleLoader;
 using WhiteCore.Framework.Modules;
@@ -34,14 +42,6 @@ using WhiteCore.Framework.Utilities;
 using WhiteCore.Modules.Terrain.FileLoaders;
 using WhiteCore.Modules.Terrain.FloodBrushes;
 using WhiteCore.Modules.Terrain.PaintBrushes;
-using Nini.Config;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Timers;
 
 namespace WhiteCore.Modules.Terrain
 {
@@ -422,7 +422,7 @@ namespace WhiteCore.Modules.Terrain
                     } catch (FileNotFoundException)
                     {
                         MainConsole.Instance.ErrorFormat (
-                            "[TERRAIN]: Unable to load heightmap, file {0} not found. (or directory permissions error may also cause this)", filename);
+                            "[TERRAIN]: Unable to load heightmap, file {0} not found. (directory permissions errors may also cause this)", filename);
                     } catch (ArgumentException e)
                     {
                         MainConsole.Instance.ErrorFormat ("[TERRAIN]: Unable to load heightmap: {0}", e.Message);
@@ -1894,7 +1894,8 @@ namespace WhiteCore.Modules.Terrain
 
             if (cmd.Length < 3)
 			{
-				terrainType = MainConsole.Instance.Prompt("What terrain type to use,\n Flatland, Grassland, Hills, Mountainous, Island, Swamp or Aquatic?","Flatland");
+                MainConsole.Instance.Info ("Available terrains: Flatland, Grassland, Hills, Mountainous, Island, Swamp or Aquatic");
+				terrainType = MainConsole.Instance.Prompt("What terrain type to use?","Flatland");
             } else
                 terrainType = cmd[2];
             terrainType = terrainType.ToLower();

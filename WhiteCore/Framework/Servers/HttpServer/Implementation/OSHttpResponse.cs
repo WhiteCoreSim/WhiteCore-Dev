@@ -123,9 +123,7 @@ namespace WhiteCore.Framework.Servers.HttpServer.Implementation
         {
             _httpResponse.Cookies.Add(new Cookie(cookie.Name, cookie.Value, cookie.Path, cookie.Domain)
                                           {
-                                              Expires =
-                                                  cookie
-                                                  .Expires
+                                              Expires = cookie.Expires
                                           });
         }
 

@@ -37,6 +37,7 @@ using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
+using System.Globalization;
 
 namespace WhiteCore.Services.DataService
 {
@@ -1253,6 +1254,7 @@ namespace WhiteCore.Services.DataService
             return GMD;
         }
 
+
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public List<GroupTitlesData> GetGroupTitles(UUID requestingAgentID, UUID GroupID)
         {
@@ -1355,6 +1357,8 @@ namespace WhiteCore.Services.DataService
             }
             return results;
         }
+
+
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public GroupInviteInfo GetAgentToGroupInvite(UUID requestingAgentID, UUID inviteID)
@@ -1513,6 +1517,119 @@ namespace WhiteCore.Services.DataService
             return list;
         }
 
+
+        // Banned users
+        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
+        public List<GroupBannedAgentsData> GetGroupBannedMembers(UUID requestingAgentID, UUID groupID)
+        {
+            object remoteValue = DoRemote(requestingAgentID, groupID);
+            if (remoteValue != null || m_doRemoteOnly)
+                return (List<GroupBannedAgentsData>) remoteValue;
+
+            QueryFilter filter = new QueryFilter();
+            filter.andFilters["GroupID"] = groupID;
+            List<string> bannedAgents = data.Query(new[] {"AgentID, BanTime"}, "group_bans", filter, null, null, null);
+
+            var userList = new List<GroupBannedAgentsData>();
+            if (bannedAgents.Count == 0)
+            {
+                return userList;
+            }
+
+            for (int i = 0; i < bannedAgents.Count; i += 2)
+            {
+                GroupBannedAgentsData banUser = new GroupBannedAgentsData();
+                banUser.AgentID = UUID.Parse (bannedAgents [i]);
+                banUser.BanDate = DateTime.Parse(bannedAgents [i+1]).ToLocalTime();    
+
+                userList.Add(banUser);
+            }
+            return userList;
+        }
+
+        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
+        public void AddGroupBannedAgent(UUID requestingAgentID, UUID groupID, List<UUID> bannedUserID)
+        {
+            object remoteValue = DoRemote(requestingAgentID, groupID, bannedUserID);
+            if (remoteValue != null || m_doRemoteOnly)
+                return;
+
+            if (CheckGroupPermissions(requestingAgentID, groupID, (ulong) GroupPowers.GroupBanAccess))
+            {
+                foreach (UUID userID in bannedUserID)
+                {
+                    Dictionary<string, object> row = new Dictionary<string, object> (3);
+                    row ["GroupID"] = groupID;
+                    row ["AgentID"] = userID;
+                    row ["BanTime"] = DateTime.UtcNow; 
+
+                    data.Insert ("group_bans", row);
+                }
+            }
+        }
+
+
+        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
+        public void RemoveGroupBannedAgent(UUID requestingAgentID, UUID groupID, List<UUID> bannedUserID)
+        {
+            object remoteValue = DoRemote(requestingAgentID, groupID, bannedUserID);
+            if (remoteValue != null || m_doRemoteOnly)
+                return;
+
+            if (CheckGroupPermissions(requestingAgentID, groupID, (ulong) GroupPowers.GroupBanAccess))
+            {
+                foreach (UUID userID in bannedUserID)
+                {
+                    QueryFilter filter = new QueryFilter ();
+                    filter.andFilters ["GroupID"] = groupID;
+                    filter.andFilters ["AgentID"] = userID;
+
+                    data.Delete ("group_bans", filter);
+                }
+            }
+        }
+
+        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
+        public GroupBannedAgentsData GetGroupBannedUser(UUID requestingAgentID, UUID groupID, UUID agentID)
+        {
+            object remoteValue = DoRemote(requestingAgentID, groupID, agentID);
+            if (remoteValue != null || m_doRemoteOnly)
+                return (GroupBannedAgentsData) remoteValue;
+
+            QueryFilter filter = new QueryFilter();
+            filter.andFilters["GroupID"] = groupID;
+            filter.andFilters ["AgentID"] = agentID;
+
+            List<string>  bUser = data.Query(new[] {"AgentID, BanTime"}, "group_bans", filter, null, null, null);
+
+            GroupBannedAgentsData bannedUser = new GroupBannedAgentsData ();
+            if (bUser.Count > 0)
+            {
+                bannedUser.AgentID = UUID.Parse (bUser [0]);
+                bannedUser.BanDate = Util.ToDateTime (int.Parse (bUser [1]));   
+            }
+                            
+            return bannedUser;
+        }
+
+        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
+        public bool IsGroupBannedUser(UUID requestingAgentID, UUID groupID, UUID agentID)
+        {
+            object remoteValue = DoRemote(requestingAgentID, groupID, agentID);
+            if (remoteValue != null || m_doRemoteOnly)
+                return (bool) remoteValue;
+
+            QueryFilter filter = new QueryFilter();
+            filter.andFilters["GroupID"] = groupID;
+            filter.andFilters ["AgentID"] = agentID;
+
+            List<string>  banned = data.Query(new[] {"AgentID, BanTime"}, "group_bans", filter, null, null, null);
+
+            return (banned.Count != 0);        // true if banned
+        }
+
+
+        // Search
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public List<DirGroupsReplyData> FindGroups(UUID requestingAgentID, string search, uint? start, uint? count,
                                                    uint queryflags)
