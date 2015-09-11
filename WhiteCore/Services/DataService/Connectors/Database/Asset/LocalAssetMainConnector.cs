@@ -25,21 +25,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using System.Data;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Assets;
-using Nini.Config;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
-using System.Data;
 
 namespace WhiteCore.Services.DataService.Connectors.Database.Asset
 {
     public class LocalAssetMainConnector : IAssetDataPlugin
     {
-        private IGenericData m_Gd;
+        IGenericData m_Gd;
 
         #region Implementation of IWhiteCoreDataPlugin
 
@@ -187,7 +187,7 @@ namespace WhiteCore.Services.DataService.Connectors.Database.Asset
             }
         }
 
-        private void InsertAsset(AssetBase asset, UUID assetID)
+        void InsertAsset(AssetBase asset, UUID assetID)
         {
             int now = (int) Utils.DateTimeToUnixTime(DateTime.UtcNow);
             Dictionary<string, object> row = new Dictionary<string, object>(11);
@@ -305,7 +305,7 @@ namespace WhiteCore.Services.DataService.Connectors.Database.Asset
             return true;
         }
 
-        private static AssetBase LoadAssetFromDataRead(IDataRecord dr)
+        static AssetBase LoadAssetFromDataRead(IDataRecord dr)
         {
             AssetBase asset = new AssetBase(dr["id"].ToString())
                                   {
@@ -349,8 +349,8 @@ namespace WhiteCore.Services.DataService.Connectors.Database.Asset
             string temp = dr["temporary"].ToString();
             if (temp != "")
             {
-                bool tempbool = false;
-                int tempint = 0;
+                bool tempbool;
+                int tempint;
                 if (bool.TryParse(temp, out tempbool))
                 {
                     if (tempbool)

@@ -25,16 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.ConsoleFramework;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.Servers;
-using WhiteCore.Framework.Servers.HttpServer;
-using WhiteCore.Framework.Servers.HttpServer.Implementation;
-using WhiteCore.Framework.Services;
-using WhiteCore.Framework.Services.ClassHelpers.Assets;
-using WhiteCore.Framework.Utilities;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
 using System;
 using System.Collections.Specialized;
 using System.Drawing;
@@ -43,14 +33,22 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Web;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
+using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.Servers;
+using WhiteCore.Framework.Servers.HttpServer;
+using WhiteCore.Framework.Servers.HttpServer.Implementation;
+using WhiteCore.Framework.Services;
+using WhiteCore.Framework.Services.ClassHelpers.Assets;
+using WhiteCore.Framework.Utilities;
 using Encoder = System.Drawing.Imaging.Encoder;
 
 namespace WhiteCore.Services
 {
     public class AssetCAPS : IExternalCapsRequestHandler
     {
-		//const string missingTextureID = "aab281ce-a342-11e3-be40-425861b86ab6";		
-        const string MISSING_TEXTURE_ID = "41fcdbb9-0896-495d-8889-1eb6fad88da3";       // texture to use when all else fails...
 
         protected IAssetService m_assetService;
         protected IJ2KDecoder m_j2kDecoder;
@@ -145,7 +143,7 @@ namespace WhiteCore.Services
         /// <param name="format"></param>
         /// <param name="response"></param>
         /// <returns>False for "caller try another codec"; true otherwise</returns>
-        private bool FetchTexture(OSHttpRequest httpRequest, OSHttpResponse httpResponse, UUID textureID, string format,
+        bool FetchTexture(OSHttpRequest httpRequest, OSHttpResponse httpResponse, UUID textureID, string format,
                                   out byte[] response)
         {
             //MainConsole.Instance.DebugFormat("[GETTEXTURE]: {0} with requested format {1}", textureID, format);
@@ -230,10 +228,10 @@ namespace WhiteCore.Services
 
 				// nothing found... replace with the 'missing_texture" texture
 				// try the cache first
-				texture = m_assetService.GetCached(MISSING_TEXTURE_ID);
+				texture = m_assetService.GetCached(Constants.MISSING_TEXTURE_ID);
 
 				if (texture == null)
-					texture = m_assetService.Get (MISSING_TEXTURE_ID);		// not in local cache...
+					texture = m_assetService.Get (Constants.MISSING_TEXTURE_ID);		// not in local cache...
 
                 if (texture != null)
                 {
@@ -502,11 +500,11 @@ namespace WhiteCore.Services
 
         public void BakedTextureUploaded(byte[] data, out UUID newAssetID)
         {
-            //MainConsole.Instance.InfoFormat("[AssetCAPS]: Received baked texture {0}", assetID.ToString());
+            //MainConsole.Instance.InfoFormat("[AssetCAPS]: Received baked texture {0}", assetID);
             AssetBase asset = new AssetBase(UUID.Random(), "Baked Texture", AssetType.Texture, m_AgentID)
                                   {Data = data, Flags = AssetFlags.Deletable | AssetFlags.Temporary};
             newAssetID = asset.ID = m_assetService.Store(asset);
-            MainConsole.Instance.DebugFormat("[AssetCAPS]: Baked texture new id {0}", newAssetID.ToString());
+            MainConsole.Instance.DebugFormat("[AssetCAPS]: Baked texture new id {0}", newAssetID);
         }
 
         public byte[] ProcessGetMesh(string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
@@ -520,7 +518,7 @@ namespace WhiteCore.Services
                 meshStr = httpRequest.QueryString["mesh_id"];
 
 
-            UUID meshID = UUID.Zero;
+            UUID meshID;
             if (!String.IsNullOrEmpty(meshStr) && UUID.TryParse(meshStr, out meshID))
             {
                 if (m_assetService == null)

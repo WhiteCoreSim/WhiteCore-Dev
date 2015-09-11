@@ -25,18 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.Imaging;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Servers.HttpServer.Interfaces;
 using WhiteCore.Framework.Services;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.Imaging;
-using System;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
 
 namespace WhiteCore.Modules.Web
 {
@@ -95,7 +95,7 @@ namespace WhiteCore.Modules.Web
                 if (mapasset != null)
                 {
                     // Decode image to System.Drawing.Image
-                    Image image = null;
+                    Image image;
                     ManagedImage managedImage;
                     if (OpenJPEG.DecodeToImage(mapasset, out managedImage, out image))
                     {
@@ -122,7 +122,7 @@ namespace WhiteCore.Modules.Web
             return jpeg;
         }
 
-        private Bitmap ResizeBitmap(Image b, int nWidth, int nHeight)
+        Bitmap ResizeBitmap(Image b, int nWidth, int nHeight)
         {
             Bitmap newsize = new Bitmap(nWidth, nHeight);
             Graphics temp = Graphics.FromImage(newsize);
@@ -135,7 +135,7 @@ namespace WhiteCore.Modules.Web
         }
 
         // From MSDN
-        private static ImageCodecInfo GetEncoderInfo(String mimeType)
+        static ImageCodecInfo GetEncoderInfo(String mimeType)
         {
             ImageCodecInfo[] encoders;
             encoders = ImageCodecInfo.GetImageEncoders();
