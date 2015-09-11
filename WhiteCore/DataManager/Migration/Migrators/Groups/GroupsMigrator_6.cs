@@ -133,6 +133,8 @@ namespace WhiteCore.DataManager.Migration.Migrators.Groups
                 IndexDef(new string[1] {"RoleID"}, IndexType.Index)
             ));
 
+            // TODO:  Group proposals & votes are saved as generic data currently.
+            //        Should these be dropped or the appropriate functions re-worked to use these tables??
             AddSchema("group_proposals", ColDefs(
             	ColDef("GroupID", ColumnTypes.String50),
             	ColDef("Duration", ColumnTypes.Integer11),
