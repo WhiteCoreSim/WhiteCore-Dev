@@ -37,7 +37,6 @@ using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using System.Globalization;
 
 namespace WhiteCore.Services.DataService
 {
@@ -1612,10 +1611,11 @@ namespace WhiteCore.Services.DataService
             return bannedUser;
         }
 
+
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public bool IsGroupBannedUser(UUID requestingAgentID, UUID groupID, UUID agentID)
+        public bool IsGroupBannedUser(UUID groupID, UUID agentID)
         {
-            object remoteValue = DoRemote(requestingAgentID, groupID, agentID);
+            object remoteValue = DoRemote(groupID, agentID);
             if (remoteValue != null || m_doRemoteOnly)
                 return (bool) remoteValue;
 
@@ -1623,11 +1623,11 @@ namespace WhiteCore.Services.DataService
             filter.andFilters["GroupID"] = groupID;
             filter.andFilters ["AgentID"] = agentID;
 
-            List<string>  banned = data.Query(new[] {"AgentID, BanTime"}, "group_bans", filter, null, null, null);
+            List<string>  banned = data.Query(new[] {"AgentID"}, "group_bans", filter, null, null, null);
+            bool isBanned = (banned.Count > 0);        // true if found (banned)
 
-            return (banned.Count != 0);        // true if banned
+            return isBanned;
         }
-
 
         // Search
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
