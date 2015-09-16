@@ -30,7 +30,7 @@ using System;
 using OpenMetaverse;
 using WhiteCore.Framework.Utilities;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public abstract class BSMotor
     {

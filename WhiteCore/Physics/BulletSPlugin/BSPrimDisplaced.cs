@@ -32,10 +32,9 @@
 
 using System;
 using OpenMetaverse;
-using OMV = OpenMetaverse;
 using WhiteCore.Framework.SceneInfo;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public class BSPrimDisplaced : BSPrim
     {
@@ -54,11 +53,11 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         //    are converted into simulator origin values before being passed to the base
         //    class.
 
-        public virtual OMV.Vector3 PositionDisplacement { get; set; }
-        public virtual OMV.Quaternion OrientationDisplacement { get; set; }
+        public virtual Vector3 PositionDisplacement { get; set; }
+        public virtual Quaternion OrientationDisplacement { get; set; }
 
-        public BSPrimDisplaced(uint localID, String primName, BSScene parent_scene, OMV.Vector3 pos, OMV.Vector3 size,
-            OMV.Quaternion rotation, PrimitiveBaseShape pbs, bool pisPhysical)
+        public BSPrimDisplaced(uint localID, String primName, BSScene parent_scene, Vector3 pos, Vector3 size,
+            Quaternion rotation, PrimitiveBaseShape pbs, bool pisPhysical)
             : base(localID, primName, parent_scene, pos, size, rotation, pbs, pisPhysical)
         {
             ClearDisplacement();
@@ -66,8 +65,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         public void ClearDisplacement()
         {
-            PositionDisplacement = OMV.Vector3.Zero;
-            OrientationDisplacement = OMV.Quaternion.Identity;
+            PositionDisplacement = Vector3.Zero;
+            OrientationDisplacement = Quaternion.Identity;
         }
 
         // Set this sets and computes the displacement from the passed prim to the center-of-mass.
@@ -77,22 +76,22 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         {
             Vector3 comDisp;
             if (UserSetCenterOfMass.HasValue)
-                comDisp = (OMV.Vector3)UserSetCenterOfMass;
+                comDisp = (Vector3)UserSetCenterOfMass;
             else
                 comDisp = centerOfMassDisplacement;
 
             if (comDisp == Vector3.Zero)
             {
                 // If there is no diplacement. Things get reset.
-                PositionDisplacement = OMV.Vector3.Zero;
-                OrientationDisplacement = OMV.Quaternion.Identity;
+                PositionDisplacement = Vector3.Zero;
+                OrientationDisplacement = Quaternion.Identity;
             }
             else
             {
                 // Remember the displacement from root as well as the origional rotation of the
                 //    new center-of-mass.
                 PositionDisplacement = comDisp;
-                OrientationDisplacement = OMV.Quaternion.Identity;
+                OrientationDisplacement = Quaternion.Identity;
             }
         }
 
@@ -101,7 +100,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             get { return base.ForcePosition; }
             set
             {
-                if (PositionDisplacement != OMV.Vector3.Zero)
+                if (PositionDisplacement != Vector3.Zero)
                     base.ForcePosition = value - (PositionDisplacement * RawOrientation);
                 else
                     base.ForcePosition = value;
@@ -117,7 +116,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // TODO: decide if this is the right place for these variables.
         //     Somehow incorporate the optional settability by the user.
         // Is this used?
-        public override OMV.Vector3 CenterOfMass
+        public override Vector3 CenterOfMass
         {
             get { return RawPosition; }
         }
@@ -125,7 +124,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         public override void UpdateProperties(EntityProperties entprop)
         {
             // Undo any center-of-mass displacement that might have been done.
-            if (PositionDisplacement != OMV.Vector3.Zero || OrientationDisplacement != OMV.Quaternion.Identity)
+            if (PositionDisplacement != Vector3.Zero || OrientationDisplacement != Quaternion.Identity)
             {
                 // Correct for any rotation around the center-of-mass
                 // TODO!!!

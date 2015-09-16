@@ -27,9 +27,9 @@
 
 using System;
 using System.Collections.Generic;
-using OMV = OpenMetaverse;
+using OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     // A BSPrim can get individual information about its linkedness attached
     //    to it through an instance of a subclass of LinksetInfo.
@@ -115,12 +115,12 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             get { return false; }
         }
 
-        public OMV.Vector3 CenterOfMass
+        public Vector3 CenterOfMass
         {
             get { return ComputeLinksetCenterOfMass(); }
         }
 
-        public OMV.Vector3 GeometricCenter
+        public Vector3 GeometricCenter
         {
             get { return ComputeLinksetGeometricCenter(); }
         }
@@ -336,9 +336,9 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // Computes linkset's center of mass in world coordinates.
-        protected virtual OMV.Vector3 ComputeLinksetCenterOfMass()
+        protected virtual Vector3 ComputeLinksetCenterOfMass()
         {
-            OMV.Vector3 com;
+            Vector3 com;
             lock (m_linksetActivityLock)
             {
                 com = LinksetRoot.Position * LinksetRoot.RawMass;
@@ -356,9 +356,9 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             return com;
         }
 
-        protected virtual OMV.Vector3 ComputeLinksetGeometricCenter()
+        protected virtual Vector3 ComputeLinksetGeometricCenter()
         {
-            OMV.Vector3 com;
+            Vector3 com;
             lock (m_linksetActivityLock)
             {
                 com = LinksetRoot.Position;

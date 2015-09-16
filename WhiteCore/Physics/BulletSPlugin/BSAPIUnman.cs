@@ -32,11 +32,11 @@ using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Utilities;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public sealed class BSAPIUnman : BSAPITemplate
     {
-        private sealed class BulletWorldUnman : BulletWorld
+        sealed class BulletWorldUnman : BulletWorld
         {
             public IntPtr ptr;
 
@@ -47,7 +47,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
-        private sealed class BulletBodyUnman : BulletBody
+        sealed class BulletBodyUnman : BulletBody
         {
             public IntPtr ptr;
 
@@ -73,7 +73,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
-        private sealed class BulletShapeUnman : BulletShape
+        sealed class BulletShapeUnman : BulletShape
         {
             public IntPtr ptr;
 
@@ -102,7 +102,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             public override bool ReferenceSame(BulletShape other)
             {
                 BulletShapeUnman otheru = other as BulletShapeUnman;
-                return (otheru != null) && (this.ptr == otheru.ptr);
+                return (otheru != null) && (ptr == otheru.ptr);
             }
 
             public override string AddrString
@@ -111,7 +111,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
-        private sealed class BulletConstraintUnman : BulletConstraint
+        sealed class BulletConstraintUnman : BulletConstraint
         {
             public BulletConstraintUnman(IntPtr xx)
                 : base()
@@ -139,16 +139,16 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // We pin the memory passed between the managed and unmanaged code.
-        private GCHandle m_paramsHandle;
-        private GCHandle m_collisionArrayPinnedHandle;
-        private GCHandle m_updateArrayPinnedHandle;
+        GCHandle m_paramsHandle;
+        GCHandle m_collisionArrayPinnedHandle;
+        GCHandle m_updateArrayPinnedHandle;
 
         // Handle to the callback used by the unmanaged code to call into the managed code.
         // Used for debug logging.
         // Need to store the handle in a persistant variable so it won't be freed.
-        private BSAPICPP.DebugLogCallback m_DebugLogCallbackHandle;
+        BSAPICPP.DebugLogCallback m_DebugLogCallbackHandle;
 
-        private BSScene PhysicsScene { get; set; }
+        BSScene PhysicsScene { get; set; }
 
         public override string BulletEngineName
         {
@@ -208,13 +208,13 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // Called directly from unmanaged code so don't do much
-        private void BulletLogger(string msg)
+        void BulletLogger(string msg)
         {
             MainConsole.Instance.Debug("[BULLETS UNMANAGED]:" + msg);
         }
 
         // Called directly from unmanaged code so don't do much
-        private void BulletLoggerPhysLog(string msg)
+        void BulletLoggerPhysLog(string msg)
         {
             PhysicsScene.DetailLog("[BULLETS UNMANAGED]:" + msg);
         }
@@ -1418,7 +1418,7 @@ public override void SetBroadphaseHandle(BulletBody obj, IntPtr handle)
         // =====================================================================================
         // =====================================================================================
         // The actual interface to the unmanaged code
-        private static class BSAPICPP
+        static class BSAPICPP
         {
             // ===============================================================================
             // Link back to the managed code for outputting log messages

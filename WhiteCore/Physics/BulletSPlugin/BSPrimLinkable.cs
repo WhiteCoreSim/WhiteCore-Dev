@@ -31,7 +31,7 @@ using OMV = OpenMetaverse;
 using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.SceneInfo;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public class BSPrimLinkable : BSPrimDisplaced
     {
@@ -50,11 +50,11 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
             PhysicsScene.TaintedObject("BSPrimLinksetCompound.Refresh", delegate()
             {
-                base.SetMaterial(material);
-                base.Friction = friction;
-                base.Restitution = restitution;
-                base.GravityMultiplier = gravityMultiplier;
-                base.Density = density;
+                SetMaterial(material);
+                Friction = friction;
+                Restitution = restitution;
+                GravityMultiplier = gravityMultiplier;
+                Density = density;
                 Linkset.Refresh(this);
             });
         }

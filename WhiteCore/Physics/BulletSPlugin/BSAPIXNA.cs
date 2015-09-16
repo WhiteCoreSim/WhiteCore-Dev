@@ -28,18 +28,18 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using OpenMetaverse;
 using BulletXNA;
-using BulletXNA.LinearMath;
 using BulletXNA.BulletCollision;
 using BulletXNA.BulletDynamics;
+using BulletXNA.LinearMath;
+using OpenMetaverse;
 using WhiteCore.Framework.Utilities;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public sealed class BSAPIXNA : BSAPITemplate
     {
-        private sealed class BulletWorldXNA : BulletWorld
+        sealed class BulletWorldXNA : BulletWorld
         {
             public DiscreteDynamicsWorld world;
 
@@ -50,7 +50,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
-        private sealed class BulletBodyXNA : BulletBody
+        sealed class BulletBodyXNA : BulletBody
         {
             public CollisionObject body;
 
@@ -81,7 +81,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
-        private sealed class BulletShapeXNA : BulletShape
+        sealed class BulletShapeXNA : BulletShape
         {
             public CollisionShape shape;
 
@@ -119,7 +119,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
-        private sealed class BulletConstraintXNA : BulletConstraint
+        sealed class BulletConstraintXNA : BulletConstraint
         {
             public TypedConstraint constrain;
 
@@ -155,8 +155,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         internal EntityProperties[] UpdatedObjects;
         internal Dictionary<uint, GhostObject> specialCollisionObjects;
 
-        private static int m_collisionsThisFrame;
-        private BSScene PhysicsScene { get; set; }
+        static int m_collisionsThisFrame;
+        BSScene PhysicsScene { get; set; }
 
         public override string BulletEngineName
         {
@@ -1201,7 +1201,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                     ref updateArray, null));
         }
 
-        private static DiscreteDynamicsWorld Initialize2(Vector3 worldExtent,
+        static DiscreteDynamicsWorld Initialize2(Vector3 worldExtent,
             ConfigurationParameters[] o,
             int mMaxCollisionsPerFrame, ref CollisionDesc[] collisionArray,
             int mMaxUpdatesPerFrame, ref EntityProperties[] updateArray,
@@ -2077,7 +2077,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             return ret;
         }
 
-        private int PhysicsStep2(BulletWorld pWorld, float timeStep, int m_maxSubSteps, float m_fixedTimeStep,
+        int PhysicsStep2(BulletWorld pWorld, float timeStep, int m_maxSubSteps, float m_fixedTimeStep,
             out int updatedEntityCount, out EntityProperties[] updatedEntities,
             out int collidersCount, out CollisionDesc[] colliders)
         {
@@ -2087,7 +2087,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             return epic;
         }
 
-        private int PhysicsStepint(BulletWorld pWorld, float timeStep, int m_maxSubSteps, float m_fixedTimeStep,
+        int PhysicsStepint(BulletWorld pWorld, float timeStep, int m_maxSubSteps, float m_fixedTimeStep,
             out int updatedEntityCount,
             out EntityProperties[] updatedEntities, out int collidersCount, out CollisionDesc[] colliders,
             int maxCollisions, int maxUpdates)
@@ -2221,7 +2221,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
-        private static void RecordCollision(BSAPIXNA world, CollisionObject objA, CollisionObject objB,
+        static void RecordCollision(BSAPIXNA world, CollisionObject objA, CollisionObject objB,
             IndexedVector3 contact, IndexedVector3 norm, float penetration)
         {
             IndexedVector3 contactNormal = norm;
@@ -2255,7 +2255,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             m_collisionsThisFrame++;
         }
 
-        private static EntityProperties GetDebugProperties(BulletWorld pWorld, BulletBody pCollisionObject)
+        static EntityProperties GetDebugProperties(BulletWorld pWorld, BulletBody pCollisionObject)
         {
             EntityProperties ent = new EntityProperties();
             // 20131224 not used        DiscreteDynamicsWorld world = (pWorld as BulletWorldXNA).world;
@@ -2321,16 +2321,16 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         public RigidBody Rigidbody;
         public Vector3 ZeroVect;
 
-        private IndexedMatrix m_xform;
+        IndexedMatrix m_xform;
 
-        private EntityProperties m_properties;
-        private EntityProperties m_lastProperties;
-        private BSAPIXNA m_world;
+        EntityProperties m_properties;
+        EntityProperties m_lastProperties;
+        BSAPIXNA m_world;
 
-        private const float POSITION_TOLERANCE = 0.05f;
-        private const float VELOCITY_TOLERANCE = 0.001f;
-        private const float ROTATION_TOLERANCE = 0.01f;
-        private const float ANGULARVELOCITY_TOLERANCE = 0.01f;
+        const float POSITION_TOLERANCE = 0.05f;
+        const float VELOCITY_TOLERANCE = 0.001f;
+        const float ROTATION_TOLERANCE = 0.01f;
+        const float ANGULARVELOCITY_TOLERANCE = 0.01f;
 
         public SimMotionState(BSAPIXNA pWorld, uint id, IndexedMatrix starTransform, object frameUpdates)
         {

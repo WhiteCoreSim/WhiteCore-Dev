@@ -26,13 +26,13 @@
  */
 
 using System;
-using OMV = OpenMetaverse;
+using OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public class BSActorLockAxis : BSActor
     {
-        private BSConstraint LockAxisConstraint = null;
+        BSConstraint LockAxisConstraint = null;
 
         public BSActorLockAxis(BSScene physicsScene, BSPhysObject pObj, string actorName)
             : base(physicsScene, pObj, actorName)
@@ -93,7 +93,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
-        private void AddAxisLockConstraint()
+        void AddAxisLockConstraint()
         {
             if (LockAxisConstraint == null)
             {
@@ -106,7 +106,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 RemoveAxisLockConstraint();
 
                 BSConstraint6Dof axisConstrainer = new BSConstraint6Dof(m_physicsScene.World, m_controllingPrim.PhysBody,
-                    OMV.Vector3.Zero, OMV.Quaternion.Identity,
+                    Vector3.Zero, Quaternion.Identity,
                     false /* useLinearReferenceFrameB */, true /* disableCollisionsBetweenLinkedBodies */);
                 LockAxisConstraint = axisConstrainer;
                 m_physicsScene.Constraints.AddConstraint(LockAxisConstraint);
@@ -114,14 +114,14 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 // The constraint is tied to the world and oriented to the prim.
 
                 // Free to move linearly in the region
-                OMV.Vector3 linearLow = OMV.Vector3.Zero;
-                OMV.Vector3 linearHigh = m_physicsScene.TerrainManager.WorldMax;
+                Vector3 linearLow = Vector3.Zero;
+                Vector3 linearHigh = m_physicsScene.TerrainManager.WorldMax;
                 axisConstrainer.SetLinearLimits(linearLow, linearHigh);
 
                 // Angular with some axis locked
                 float fPI = (float)Math.PI;
-                OMV.Vector3 angularLow = new OMV.Vector3(-fPI, -fPI, -fPI);
-                OMV.Vector3 angularHigh = new OMV.Vector3(fPI, fPI, fPI);
+                Vector3 angularLow = new Vector3(-fPI, -fPI, -fPI);
+                Vector3 angularHigh = new Vector3(fPI, fPI, fPI);
                 if (m_controllingPrim.LockedAxis.X != 1f)
                 {
                     angularLow.X = 0f;
@@ -154,7 +154,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
-        private void RemoveAxisLockConstraint()
+        void RemoveAxisLockConstraint()
         {
             if (LockAxisConstraint != null)
             {

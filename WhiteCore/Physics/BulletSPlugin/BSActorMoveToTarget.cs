@@ -25,15 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Linq;
-using OMV = OpenMetaverse;
+using OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public class BSActorMoveToTarget : BSActor
     {
-        private BSVMotor m_targetMotor;
+        BSVMotor m_targetMotor;
 
         public BSActorMoveToTarget(BSScene physicsScene, BSPhysObject pObj, string actorName)
             : base(physicsScene, pObj, actorName)
@@ -91,7 +89,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // If a hover motor has not been created, create one and start the hovering.
-        private void ActivateMoveToTarget()
+        void ActivateMoveToTarget()
         {
             if (m_targetMotor == null)
             {
@@ -122,7 +120,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         }
 
-        private void DeactivateMoveToTarget()
+        void DeactivateMoveToTarget()
         {
             if (m_targetMotor != null)
             {
@@ -132,16 +130,16 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // Called just before the simulation step. Update the vertical position for hoverness.
-        private void Mover(float timeStep)
+        void Mover(float timeStep)
         {
             // Don't do hovering while the object is selected.
             if (!isActive)
                 return;
 
-            OMV.Vector3 origPosition = m_controllingPrim.RawPosition;     // DEBUG DEBUG (for printout below)
+            Vector3 origPosition = m_controllingPrim.RawPosition;     // DEBUG DEBUG (for printout below)
 
             // 'movePosition' is where we'd like the prim to be at this moment.
-            OMV.Vector3 movePosition = m_controllingPrim.RawPosition + m_targetMotor.Step(timeStep);
+            Vector3 movePosition = m_controllingPrim.RawPosition + m_targetMotor.Step(timeStep);
 
             // If we are very close to our target, turn off the movement motor.
             if (m_targetMotor.ErrorIsZero())

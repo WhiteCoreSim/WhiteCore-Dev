@@ -27,27 +27,27 @@
 
 using System;
 using System.Collections.Generic;
-using OMV = OpenMetaverse;
+using OpenMetaverse;
 using WhiteCore.Physics.ConvexDecompositionDotNet;
 using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services.ClassHelpers.Assets;
 using WhiteCore.Framework.Utilities;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public sealed class BSShapeCollection : IDisposable
     {
 #pragma warning disable 414
-        private static string LogHeader = "[BULLETSIM SHAPE COLLECTION]";
+        static string LogHeader = "[BULLETSIM SHAPE COLLECTION]";
 #pragma warning restore 414
 
-        private BSScene PhysicsScene { get; set; }
+        BSScene PhysicsScene { get; set; }
 
-        private Object m_collectionActivityLock = new Object();
+        Object m_collectionActivityLock = new Object();
 
         // Description of a Mesh
-        private struct MeshDesc
+        struct MeshDesc
         {
             public BulletShape shape;
             public int referenceCount;
@@ -57,7 +57,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         // Description of a hull.
         // Meshes and hulls have the same shape hash key but we only need hulls for efficient collision calculations.
-        private struct HullDesc
+        struct HullDesc
         {
             public BulletShape shape;
             public int referenceCount;
@@ -66,10 +66,10 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // The sharable set of meshes and hulls. Indexed by their shape hash.
-        private Dictionary<System.UInt64, MeshDesc> Meshes = new Dictionary<System.UInt64, MeshDesc>();
-        private Dictionary<System.UInt64, HullDesc> Hulls = new Dictionary<System.UInt64, HullDesc>();
+        Dictionary<UInt64, MeshDesc> Meshes = new Dictionary<UInt64, MeshDesc>();
+        Dictionary<UInt64, HullDesc> Hulls = new Dictionary<UInt64, HullDesc>();
 
-        private bool DDetail = false;
+        bool DDetail = false;
 
         public BSShapeCollection(BSScene physScene)
         {
@@ -138,7 +138,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // Track another user of a body.
         // We presume the caller has allocated the body.
         // Bodies only have one user so the body is just put into the world if not already there.
-        private void ReferenceBody(BulletBody body)
+        void ReferenceBody(BulletBody body)
         {
             lock (m_collectionActivityLock)
             {
@@ -237,7 +237,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                                 BSScene.DetailLogZero, shape.shapeKey.ToString("X"), hullDesc.referenceCount);
                         ret = true;
                     }
-                    hullDesc.lastReferenced = System.DateTime.Now;
+                    hullDesc.lastReferenced = DateTime.Now;
                     Hulls[shape.shapeKey] = hullDesc;
                     break;
                 case BSPhysicsShapeType.SHAPE_UNKNOWN:
@@ -292,7 +292,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         // Count down the reference count for a mesh shape
         // Called at taint-time.
-        private void DereferenceMesh(BulletShape shape, ShapeDestructionCallback shapeCallback)
+        void DereferenceMesh(BulletShape shape, ShapeDestructionCallback shapeCallback)
         {
             MeshDesc meshDesc;
             if (Meshes.TryGetValue(shape.shapeKey, out meshDesc))
@@ -310,7 +310,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         // Count down the reference count for a hull shape
         // Called at taint-time.
-        private void DereferenceHull(BulletShape shape, ShapeDestructionCallback shapeCallback)
+        void DereferenceHull(BulletShape shape, ShapeDestructionCallback shapeCallback)
         {
             HullDesc hullDesc;
             if (Hulls.TryGetValue(shape.shapeKey, out hullDesc))
@@ -335,7 +335,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         //      they could be shared. So, this removes each of the children from the compound and
         //      dereferences them separately before destroying the compound collision object itself.
         // Called at taint-time.
-        private void DereferenceCompound(BulletShape shape, ShapeDestructionCallback shapeCallback)
+        void DereferenceCompound(BulletShape shape, ShapeDestructionCallback shapeCallback)
         {
             if (!PhysicsScene.PE.IsCompound(shape))
             {
@@ -365,7 +365,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // Sometimes we have a pointer to a collision shape but don't know what type it is.
         // Figure out type and call the correct dereference routine.
         // Called at taint-time.
-        private void DereferenceAnonCollisionShape(BulletShape shapeInfo)
+        void DereferenceAnonCollisionShape(BulletShape shapeInfo)
         {
             MeshDesc meshDesc;
             HullDesc hullDesc;
@@ -422,7 +422,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // Info in prim.BSShape is updated to the new shape.
         // Returns 'true' if the geometry was rebuilt.
         // Called at taint-time!
-        private bool CreateGeom(bool forceRebuild, BSPhysObject prim, ShapeDestructionCallback shapeCallback)
+        bool CreateGeom(bool forceRebuild, BSPhysObject prim, ShapeDestructionCallback shapeCallback)
         {
             bool ret = false;
             bool haveShape = false;
@@ -473,7 +473,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 && ((pbs.SculptEntry && !BSParam.ShouldMeshSculptedPrim) || PrimHasNoCuts(pbs)))
             {
                 // Get the scale of any existing shape so we can see if the new shape is same native type and same size.
-                OMV.Vector3 scaleOfExistingShape = OMV.Vector3.Zero;
+                Vector3 scaleOfExistingShape = Vector3.Zero;
                 if (prim.PhysShape.HasPhysicalShape)
                     scaleOfExistingShape = PhysicsScene.PE.GetLocalScaling(prim.PhysShape);
 
@@ -526,7 +526,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // return 'true' if this shape description does not include any cutting or twisting.
-        private bool PrimHasNoCuts(PrimitiveBaseShape pbs)
+        bool PrimHasNoCuts(PrimitiveBaseShape pbs)
         {
             return pbs.ProfileBegin == 0 && pbs.ProfileEnd == 0
                    && pbs.ProfileHollow == 0
@@ -563,7 +563,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         // Creates a native shape and assignes it to prim.BSShape.
         // "Native" shapes are never shared. they are created here and destroyed in DereferenceShape().
-        private bool GetReferenceToNativeShape(BSPhysObject prim,
+        bool GetReferenceToNativeShape(BSPhysObject prim,
             BSPhysicsShapeType shapeType, FixedShapeKey shapeKey,
             ShapeDestructionCallback shapeCallback)
         {
@@ -582,7 +582,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             return true;
         }
 
-        private BulletShape BuildPhysicalNativeShape(BSPhysObject prim, BSPhysicsShapeType shapeType,
+        BulletShape BuildPhysicalNativeShape(BSPhysObject prim, BSPhysicsShapeType shapeType,
             FixedShapeKey shapeKey)
         {
             BulletShape newShape;
@@ -622,12 +622,12 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // Dereferences previous shape in BSShape and adds a reference for this new shape.
         // Returns 'true' of a mesh was actually built. Otherwise .
         // Called at taint-time!
-        private bool GetReferenceToMesh(BSPhysObject prim, ShapeDestructionCallback shapeCallback)
+        bool GetReferenceToMesh(BSPhysObject prim, ShapeDestructionCallback shapeCallback)
         {
             BulletShape newShape = new BulletShape();
 
             float lod;
-            System.UInt64 newMeshKey = ComputeShapeKey(prim.Size, prim.BaseShape, out lod);
+            UInt64 newMeshKey = ComputeShapeKey(prim.Size, prim.BaseShape, out lod);
 
             // if this new shape is the same as last time, don't recreate the mesh
             if (newMeshKey == prim.PhysShape.shapeKey && prim.PhysShape.type == BSPhysicsShapeType.SHAPE_MESH)
@@ -651,8 +651,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             return true; // 'true' means a new shape has been added to this prim
         }
 
-        private BulletShape CreatePhysicalMesh(BSPhysObject prim, System.UInt64 newMeshKey, PrimitiveBaseShape pbs,
-            OMV.Vector3 size, float lod)
+        BulletShape CreatePhysicalMesh(BSPhysObject prim, UInt64 newMeshKey, PrimitiveBaseShape pbs,
+            Vector3 size, float lod)
         {
             BulletShape newShape = new BulletShape();
 
@@ -729,12 +729,12 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // See that hull shape exists in the physical world and update prim.BSShape.
         // We could be creating the hull because scale changed or whatever.
         // Return 'true' if a new hull was built. Otherwise, returning a shared hull instance.
-        private bool GetReferenceToHull(BSPhysObject prim, ShapeDestructionCallback shapeCallback)
+        bool GetReferenceToHull(BSPhysObject prim, ShapeDestructionCallback shapeCallback)
         {
             BulletShape newShape;
 
             float lod;
-            System.UInt64 newHullKey = ComputeShapeKey(prim.Size, prim.BaseShape, out lod);
+            UInt64 newHullKey = ComputeShapeKey(prim.Size, prim.BaseShape, out lod);
 
             // if the hull hasn't changed, don't rebuild it
             if (newHullKey == prim.PhysShape.shapeKey && prim.PhysShape.type == BSPhysicsShapeType.SHAPE_HULL)
@@ -757,10 +757,10 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             return true; // 'true' means a new shape has been added to this prim
         }
 
-        private List<ConvexResult> m_hulls;
+        List<ConvexResult> m_hulls;
 
-        private BulletShape CreatePhysicalHull(string objName, System.UInt64 newHullKey, PrimitiveBaseShape pbs,
-            OMV.Vector3 size, float lod)
+        BulletShape CreatePhysicalHull(string objName, UInt64 newHullKey, PrimitiveBaseShape pbs,
+            Vector3 size, float lod)
         {
             BulletShape newShape = new BulletShape();
             // 20131224 not used        IntPtr hullPtr = IntPtr.Zero;
@@ -889,7 +889,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         // Callback from convex hull creater with a newly created hull.
         // Just add it to our collection of hulls for this shape.
-        private void HullReturn(ConvexResult result)
+        void HullReturn(ConvexResult result)
         {
             m_hulls.Add(result);
             return;
@@ -897,7 +897,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         // Compound shapes are always built from scratch.
         // This shouldn't be to bad since most of the parts will be meshes that had been built previously.
-        private bool GetReferenceToCompoundShape(BSPhysObject prim, ShapeDestructionCallback shapeCallback)
+        bool GetReferenceToCompoundShape(BSPhysObject prim, ShapeDestructionCallback shapeCallback)
         {
             // Remove reference to the old shape
             // Don't need to do this as the shape is freed when the new root shape is created below.
@@ -907,8 +907,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
             // Create the shape for the root prim and add it to the compound shape. Cannot be a native shape.
             CreateGeomMeshOrHull(prim, shapeCallback);
-            PhysicsScene.PE.AddChildShapeToCompoundShape(cShape, prim.PhysShape, OMV.Vector3.Zero,
-                OMV.Quaternion.Identity);
+            PhysicsScene.PE.AddChildShapeToCompoundShape(cShape, prim.PhysShape, Vector3.Zero,
+                OpenMetaverse.Quaternion.Identity);
             if (DDetail)
                 DetailLog("{0},BSShapeCollection.GetReferenceToCompoundShape,addRootPrim,compShape={1},rootShape={2}",
                     prim.LocalID, cShape, prim.PhysShape);
@@ -920,7 +920,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         // Create a hash of all the shape parameters to be used as a key
         //    for this particular shape.
-        private System.UInt64 ComputeShapeKey(OMV.Vector3 size, PrimitiveBaseShape pbs, out float retLod)
+        UInt64 ComputeShapeKey(Vector3 size, PrimitiveBaseShape pbs, out float retLod)
         {
             // level of detail based on size and type of the object
             float lod = BSParam.MeshLOD;
@@ -942,7 +942,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // For those who don't want the LOD
-        private System.UInt64 ComputeShapeKey(OMV.Vector3 size, PrimitiveBaseShape pbs)
+        UInt64 ComputeShapeKey(Vector3 size, PrimitiveBaseShape pbs)
         {
             float lod;
             return ComputeShapeKey(size, pbs, out lod);
@@ -955,7 +955,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         //     us to not loop forever.
         // Called after creating a physical mesh or hull. If the physical shape was created,
         //     just return.
-        private BulletShape VerifyMeshCreated(BulletShape newShape, BSPhysObject prim)
+        BulletShape VerifyMeshCreated(BulletShape newShape, BSPhysObject prim)
         {
             // If the shape was successfully created, nothing more to do
             if (newShape.HasPhysicalShape)
@@ -976,7 +976,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 if (prim.BaseShape.SculptEntry
                     && prim.PrimAssetState != BSPhysObject.PrimAssetCondition.Failed
                     && prim.PrimAssetState != BSPhysObject.PrimAssetCondition.Waiting
-                    && prim.BaseShape.SculptTexture != OMV.UUID.Zero
+                    && prim.BaseShape.SculptTexture != UUID.Zero
                     )
                 {
                     DetailLog("{0},BSShapeCollection.VerifyMeshCreated,fetchAsset", prim.LocalID);
@@ -1038,7 +1038,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // Updates prim.BSBody with the information about the new body if one is created.
         // Returns 'true' if an object was actually created.
         // Called at taint-time.
-        private bool CreateBody(bool forceRebuild, BSPhysObject prim, BulletWorld sim,
+        bool CreateBody(bool forceRebuild, BSPhysObject prim, BulletWorld sim,
             BodyDestructionCallback bodyCallback)
         {
             bool ret = false;
@@ -1091,7 +1091,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             return ret;
         }
 
-        private bool TryGetMeshByPtr(BulletShape shape, out MeshDesc outDesc)
+        bool TryGetMeshByPtr(BulletShape shape, out MeshDesc outDesc)
         {
             bool ret = false;
             MeshDesc foundDesc = new MeshDesc();
@@ -1108,7 +1108,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             return ret;
         }
 
-        private bool TryGetHullByPtr(BulletShape shape, out HullDesc outDesc)
+        bool TryGetHullByPtr(BulletShape shape, out HullDesc outDesc)
         {
             bool ret = false;
             HullDesc foundDesc = new HullDesc();
@@ -1125,7 +1125,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             return ret;
         }
 
-        private void DetailLog(string msg, params Object[] args)
+        void DetailLog(string msg, params Object[] args)
         {
             //if (PhysicsScene.PhysicsLogging.Enabled)
             PhysicsScene.DetailLog(msg, args);

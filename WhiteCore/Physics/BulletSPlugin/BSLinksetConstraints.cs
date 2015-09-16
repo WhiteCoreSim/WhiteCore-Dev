@@ -25,9 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using OMV = OpenMetaverse;
+using OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public sealed class BSLinksetConstraints : BSLinkset
     {
@@ -164,23 +164,23 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         // Create a constraint between me (root of linkset) and the passed prim (the child).
         // Called at taint time!
-        private void PhysicallyLinkAChildToRoot(BSPrimLinkable rootPrim, BSPrimLinkable childPrim)
+        void PhysicallyLinkAChildToRoot(BSPrimLinkable rootPrim, BSPrimLinkable childPrim)
         {
             // Don't build the constraint when asked. Put it off until just before the simulation step.
             Refresh(rootPrim);
         }
 
-        private BSConstraint BuildConstraint(BSPrimLinkable rootPrim, BSPrimLinkable childPrim)
+        BSConstraint BuildConstraint(BSPrimLinkable rootPrim, BSPrimLinkable childPrim)
         {
             // Zero motion for children so they don't interpolate
             childPrim.ZeroMotion(true);
 
             // Relative position normalized to the root prim
             // Essentually a vector pointing from center of rootPrim to center of childPrim
-            OMV.Vector3 childRelativePosition = childPrim.Position - rootPrim.Position;
+            Vector3 childRelativePosition = childPrim.Position - rootPrim.Position;
 
             // real world coordinate of midpoint between the two objects
-            OMV.Vector3 midPoint = rootPrim.Position + (childRelativePosition / 2);
+            Vector3 midPoint = rootPrim.Position + (childRelativePosition / 2);
 
             DetailLog(
                 "{0},BSLinksetConstraint.BuildConstraint,taint,root={1},rBody={2},child={3},cBody={4},rLoc={5},cLoc={6},midLoc={7}",
@@ -225,8 +225,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             PhysicsScene.Constraints.AddConstraint(constrain);
 
             // zero linear and angular limits makes the objects unable to move in relation to each other
-            constrain.SetLinearLimits(OMV.Vector3.Zero, OMV.Vector3.Zero);
-            constrain.SetAngularLimits(OMV.Vector3.Zero, OMV.Vector3.Zero);
+            constrain.SetLinearLimits(Vector3.Zero, Vector3.Zero);
+            constrain.SetAngularLimits(Vector3.Zero, Vector3.Zero);
 
             // tweek the constraint to increase stability
             constrain.UseFrameOffset(BSParam.LinkConstraintUseFrameOffset);

@@ -28,18 +28,18 @@
 using System;
 using OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public sealed class BSTerrainMesh : BSTerrainPhys
     {
-        private static string LogHeader = "[BULLETSIM TERRAIN MESH]";
+        static string LogHeader = "[BULLETSIM TERRAIN MESH]";
 
-        private float[] m_savedHeightMap;
-        private int m_sizeX;
-        private int m_sizeY;
+        float[] m_savedHeightMap;
+        int m_sizeX;
+        int m_sizeY;
 
-        private BulletShape m_terrainShape;
-        private BulletBody m_terrainBody;
+        BulletShape m_terrainShape;
+        BulletBody m_terrainBody;
 
         public BSTerrainMesh(BSScene physicsScene, Vector3 regionBase, uint id, Vector3 regionSize)
             : base(physicsScene, regionBase, id)
@@ -282,11 +282,11 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             return ret;
         }
 
-        private class HeightMapGetter
+        class HeightMapGetter
         {
-            private float[] m_heightMap;
-            private int m_sizeX;
-            private int m_sizeY;
+            float[] m_heightMap;
+            int m_sizeX;
+            int m_sizeY;
 
             public HeightMapGetter(float[] pHeightMap, int pSizeX, int pSizeY)
             {

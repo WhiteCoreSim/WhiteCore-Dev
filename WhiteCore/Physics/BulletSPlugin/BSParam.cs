@@ -26,10 +26,10 @@
  */
 
 using System;
-using OpenMetaverse;
 using Nini.Config;
+using OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public static class BSParam
     {
@@ -206,10 +206,10 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         public sealed class ParameterDefn<T> : ParameterDefnBase
         {
-            private T defaultValue;
-            private PSetValue<T> setter;
-            private PGetValue<T> getter;
-            private PSetOnObject<T> objectSet;
+            T defaultValue;
+            PSetValue<T> setter;
+            PGetValue<T> getter;
+            PSetOnObject<T> objectSet;
 
             public ParameterDefn(string pName, string pDesc, T pDefault, PGetValue<T> pGetter, PSetValue<T> pSetter)
                 : base(pName, pDesc)
@@ -320,7 +320,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         //    s = BSScene
         //    o = BSPhysObject
         //    v = value (appropriate type)
-        private static ParameterDefnBase[] ParameterDefinitions =
+        static ParameterDefnBase[] ParameterDefinitions =
         {
             new ParameterDefn<bool>("MeshSculptedPrim", "Whether to create meshes for sculpties",
                 true,
@@ -894,7 +894,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // =====================================================================
         // There are parameters that, when set, cause things to happen in the physics engine.
         // This causes the broadphase collision cache to be cleared.
-        private static void ResetBroadphasePoolTainted(BSScene pPhysScene, float v)
+        static void ResetBroadphasePoolTainted(BSScene pPhysScene, float v)
         {
             BSScene physScene = pPhysScene;
             physScene.TaintedObject("BSParam.ResetBroadphasePoolTainted",
@@ -902,7 +902,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // This causes the constraint solver cache to be cleared and reset.
-        private static void ResetConstraintSolverTainted(BSScene pPhysScene, float v)
+        static void ResetConstraintSolverTainted(BSScene pPhysScene, float v)
         {
             BSScene physScene = pPhysScene;
             physScene.TaintedObject("BSParam.ResetConstraintSolver",

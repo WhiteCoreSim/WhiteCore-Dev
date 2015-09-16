@@ -26,47 +26,47 @@
  */
 
 using System;
-using OMV = OpenMetaverse;
-using WhiteCore.Framework.SceneInfo;
-using WhiteCore.Framework.Physics;
-using WhiteCore.Framework.Utilities;
+using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.Physics;
+using WhiteCore.Framework.SceneInfo;
+using WhiteCore.Framework.Utilities;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     [Serializable]
     public class BSPrim : BSPhysObject
     {
-        private static readonly string LogHeader = "[BULLETS PRIM]";
+        static readonly string LogHeader = "[BULLETS PRIM]";
 
         // _size is what the user passed. Scale is what we pass to the physics engine with the mesh.
-        private OMV.Vector3 _size; // the multiplier for each mesh dimension as passed by the user
+        Vector3 _size; // the multiplier for each mesh dimension as passed by the user
 
-        private bool _grabbed;
-        private bool _isSelected;
-        private bool _isVolumeDetect;
+        bool _grabbed;
+        bool _isSelected;
+        bool _isVolumeDetect;
 
         // _position is what the simulator thinks the positions of the prim is.
         // shit listed
-        //private OMV.Vector3 _position;
+        //Vector3 _position;
 
-        private float _mass; // the mass of this object
-        private OMV.Vector3 _acceleration;
-        private int _physicsActorType;
+        float _mass; // the mass of this object
+        Vector3 _acceleration;
+        int _physicsActorType;
         // lol! i've lost my orientation after 64 beers! 
-        //private OMV.Quaternion _orientation;
-        private bool _isPhysical;
-        private bool _flying;
-        private bool _setAlwaysRun;
-        private bool _throttleUpdates;
-        private bool _floatOnWater;
-        private OMV.Vector3 _rotationalVelocity;
-        private bool _kinematic;
-        private float _buoyancy;
+        // Quaternion _orientation;
+        bool _isPhysical;
+        bool _flying;
+        bool _setAlwaysRun;
+        bool _throttleUpdates;
+        bool _floatOnWater;
+        Vector3 _rotationalVelocity;
+        bool _kinematic;
+        float _buoyancy;
 
-        private int CrossingFailures { get; set; }
+        int CrossingFailures { get; set; }
 
-        public BSDynamics VehicleActor;
+        //public BSDynamics VehicleActor;
         public const string VehicleActorName = "BasicVehicle";
 
         public const string HoverActorName = "HoverActor";
@@ -75,8 +75,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         public const string SetForceActorName = "SetForceActor";
         public const string SetTorqueActorName = "SetTorqueActor";
 
-        public BSPrim(uint localID, String primName, BSScene parent_scene, OMV.Vector3 pos, OMV.Vector3 size,
-            OMV.Quaternion rotation, PrimitiveBaseShape pbs, bool pisPhysical)
+        public BSPrim(uint localID, String primName, BSScene parent_scene, Vector3 pos, Vector3 size,
+            Quaternion rotation, PrimitiveBaseShape pbs, bool pisPhysical)
             : base(parent_scene, localID, primName, "BSPrim")
         {
             // MainConsole.Instance.DebugFormat("{0}: BSPrim creation of {1}, id={2}", LogHeader, primName, localID);
@@ -85,8 +85,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             _size = size;
             Scale = size; // prims are the size the user wants them to be (different for BSCharactes).
             _buoyancy = 0f;
-            RawVelocity = OMV.Vector3.Zero;
-            _rotationalVelocity = OMV.Vector3.Zero;
+            RawVelocity = Vector3.Zero;
+            _rotationalVelocity = Vector3.Zero;
             BaseShape = pbs;
             _isPhysical = pisPhysical;
             _isVolumeDetect = false;
@@ -133,7 +133,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             });
         }
 
-        public override OMV.Vector3 Size
+        public override Vector3 Size
         {
             get { return _size; }
             set
@@ -259,9 +259,9 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // Called at taint time!
         public override void ZeroMotion(bool inTaintTime)
         {
-            RawVelocity = OMV.Vector3.Zero;
-            _acceleration = OMV.Vector3.Zero;
-            _rotationalVelocity = OMV.Vector3.Zero;
+            RawVelocity = Vector3.Zero;
+            _acceleration = Vector3.Zero;
+            _rotationalVelocity = Vector3.Zero;
 
             // Zero some other properties in the physics engine
             PhysicsScene.TaintedObject(inTaintTime, "BSPrim.ZeroMotion", delegate()
@@ -273,7 +273,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         public override void ZeroAngularMotion(bool inTaintTime)
         {
-            _rotationalVelocity = OMV.Vector3.Zero;
+            _rotationalVelocity = Vector3.Zero;
             // Zero some other properties in the physics engine
             PhysicsScene.TaintedObject(inTaintTime, "BSPrim.ZeroMotion", delegate()
             {
@@ -286,12 +286,12 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             });
         }
 
-        public override void LockAngularMotion(OMV.Vector3 axis)
+        public override void LockAngularMotion(Vector3 axis)
         {
             DetailLog("{0},BSPrim.LockAngularMotion,call,axis={1}", LocalID, axis);
 
             // "1" means free, "0" means locked
-            OMV.Vector3 locking = LockedAxisFree;
+            Vector3 locking = LockedAxisFree;
             if (axis.X != 1) locking.X = 0f;
             if (axis.Y != 1) locking.Y = 0f;
             if (axis.Z != 1) locking.Z = 0f;
@@ -306,7 +306,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             return;
         }
 
-        public override OMV.Vector3 Position
+        public override Vector3 Position
         {
             get
             {
@@ -335,7 +335,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
-        public override OMV.Vector3 ForcePosition
+        public override Vector3 ForcePosition
         {
             get
             {
@@ -369,7 +369,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // Check that the current position is sane and, if not, modify the position to make it so.
         // Check for being below terrain and being out of bounds.
         // Returns 'true' of the position was made sane by some action.
-        private bool PositionSanityCheck(bool inTaintTime)
+        bool PositionSanityCheck(bool inTaintTime)
         {
             bool ret = false;
 
@@ -386,7 +386,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
 
             float terrainHeight = PhysicsScene.TerrainManager.GetTerrainHeightAtXYZ(RawPosition);
-            OMV.Vector3 upForce = OMV.Vector3.Zero;
+            Vector3 upForce = Vector3.Zero;
             float approxSize = Math.Max(Size.X, Math.Max(Size.Y, Size.Z));
             if ((RawPosition.Z + approxSize / 2f) < terrainHeight)
             {
@@ -395,7 +395,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 float targetHeight = terrainHeight + (Size.Z / 2f);
                 // If the object is below ground it just has to be moved up because pushing will
                 //     not get it through the terrain
-                RawPosition = new OMV.Vector3(RawPosition.X, RawPosition.Y, targetHeight);
+                RawPosition = new Vector3(RawPosition.X, RawPosition.Y, targetHeight);
                 if (inTaintTime)
                 {
                     ForcePosition = RawPosition;
@@ -415,7 +415,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                     upForce.Z = (waterHeight - RawPosition.Z) * 1f;
 
                     // Apply upforce and overcome gravity.
-                    OMV.Vector3 correctionForce = upForce - PhysicsScene.DefaultGravity;
+                    Vector3 correctionForce = upForce - PhysicsScene.DefaultGravity;
                     DetailLog("{0},BSPrim.PositionSanityCheck,applyForce,pos={1},upForce={2},correctionForce={3}",
                         LocalID, RawPosition, upForce, correctionForce);
                     AddForce(correctionForce, false, inTaintTime);
@@ -429,7 +429,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // Occasionally things will fly off and really get lost.
         // Find the wanderers and bring them back.
         // Return 'true' if some parameter need some sanity.
-        private bool ExtremeSanityCheck(bool inTaintTime)
+        bool ExtremeSanityCheck(bool inTaintTime)
         {
             bool ret = false;
 
@@ -440,7 +440,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 || RawPosition.Y < -Constants.RegionSize || RawPosition.Y > wayOutThere
                 || RawPosition.Z < -Constants.RegionSize || RawPosition.Z > wayOutThere)
             {
-                RawPosition = new OMV.Vector3(10, 10, 50);
+                RawPosition = new Vector3(10, 10, 50);
                 ZeroMotion(inTaintTime);
                 ret = true;
             }
@@ -487,7 +487,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 if (IsStatic)
                 {
                     PhysicsScene.PE.SetGravity(PhysBody, PhysicsScene.DefaultGravity);
-                    Inertia = OMV.Vector3.Zero;
+                    Inertia = Vector3.Zero;
                     PhysicsScene.PE.SetMassProps(PhysBody, 0f, Inertia);
                     PhysicsScene.PE.UpdateInertiaTensor(PhysBody);
                 }
@@ -521,9 +521,9 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // Return what gravity should be set to this very moment
-        public OMV.Vector3 ComputeGravity(float buoyancy)
+        public Vector3 ComputeGravity(float buoyancy)
         {
-            OMV.Vector3 ret = PhysicsScene.DefaultGravity;
+            Vector3 ret = PhysicsScene.DefaultGravity;
 
             if (!IsStatic)
             {
@@ -535,34 +535,71 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // Is this used?
-        public override OMV.Vector3 CenterOfMass
+        public override Vector3 CenterOfMass
         {
             get { return RawPosition; }
         }
 
-        public override OMV.Vector3 Force
+        public override Vector3 Force
         {
             get { return RawForce; }
             set
             {
                 RawForce = value;
-                EnableActor(RawForce != OMV.Vector3.Zero, SetForceActorName,
+                EnableActor(RawForce != Vector3.Zero, SetForceActorName,
                     delegate() { return new BSActorSetForce(PhysicsScene, this, SetForceActorName); });
             }
         }
 
+        public BSDynamics GetVehicleActor(bool createIfNone)
+        {
+            BSDynamics ret = null;
+            BSActor actor;
+            if (PhysicalActors.TryGetActor(VehicleActorName, out actor))
+            {
+                ret = actor as BSDynamics;
+            } else
+            {
+                if(createIfNone)
+                {
+                    ret = new BSDynamics(PhysicsScene, this, VehicleActorName);
+                    PhysicalActors.Add(ret.ActorName, ret);
+                }
+            }
+            return ret;
+        }
+
+
         public override int VehicleType
         {
-            get { return (int)VehicleActor.Type; }
-            set
-            {
+            get {
+                int ret = (int)Vehicle.TYPE_NONE;
+                BSDynamics vehicleActor = GetVehicleActor (false /* createname */);
+                if (vehicleActor != null)
+                    ret = (int)vehicleActor.Type; 
+                return ret;
+            }
+            set {
                 Vehicle type = (Vehicle)value;
-
                 PhysicsScene.TaintedObject("setVehicleType", delegate()
                 {
-                    // Vehicle code changes the parameters for this vehicle type.
-                    VehicleActor.ProcessTypeChange(type);
-                    ActivateIfPhysical(false);
+                    if (type == Vehicle.TYPE_NONE)
+                    {
+                        // get rid of any actor that may have been allocated
+                        BSDynamics vehicleActor = GetVehicleActor (false);
+                        if (vehicleActor != null)
+                            PhysicalActors.RemoveAndRelease (vehicleActor.ActorName);
+                    } else
+                    {
+                        // gentlemen, start your engines...
+                        BSDynamics vehicleActor = GetVehicleActor(true);
+                        if (vehicleActor != null)
+                        {
+                            // Vehicle code changes the parameters for this vehicle type.
+                            vehicleActor.ProcessTypeChange(type);
+                            ActivateIfPhysical(false);
+                        }
+                    }
                 });
             }
         }
@@ -571,8 +608,13 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         {
             PhysicsScene.TaintedObject("BSPrim.VehicleFloatParam", delegate()
             {
-                VehicleActor.ProcessFloatVehicleParam((Vehicle)param, value);
-                ActivateIfPhysical(false);
+                BSDynamics vehicleActor = GetVehicleActor(true);
+                if (vehicleActor != null)
+                {
+                                             
+                    vehicleActor.ProcessFloatVehicleParam((Vehicle)param, value);
+                    ActivateIfPhysical(false);
+                }
             });
         }
 
@@ -580,24 +622,38 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         {
             PhysicsScene.TaintedObject("BSPrim.VehicleVectorParam", delegate()
             {
-                VehicleActor.ProcessVectorVehicleParam((Vehicle)param, value);
-                ActivateIfPhysical(false);
+                BSDynamics vehicleActor = GetVehicleActor(true);
+                if (vehicleActor != null)
+                {
+                    vehicleActor.ProcessVectorVehicleParam((Vehicle)param, value);
+                    ActivateIfPhysical(false);
+                }
             });
         }
 
-        public override void VehicleRotationParam(int param, OMV.Quaternion rotation)
+        public override void VehicleRotationParam(int param, Quaternion rotation)
         {
             PhysicsScene.TaintedObject("BSPrim.VehicleRotationParam", delegate()
             {
-                VehicleActor.ProcessRotationVehicleParam((Vehicle)param, rotation);
-                ActivateIfPhysical(false);
+                BSDynamics vehicleActor = GetVehicleActor(true);
+                if (vehicleActor != null)
+                {
+                    vehicleActor.ProcessRotationVehicleParam((Vehicle)param, rotation);
+                    ActivateIfPhysical(false);
+                }
             });
         }
 
         public override void VehicleFlags(int param, bool remove)
         {
-            PhysicsScene.TaintedObject("BSPrim.VehicleFlags",
-                delegate() { VehicleActor.ProcessVehicleFlags(param, remove); });
+            PhysicsScene.TaintedObject("BSPrim.VehicleFlags", delegate()
+            {
+                BSDynamics vehicleActor = GetVehicleActor(true);
+                if (vehicleActor != null)
+                {
+                    vehicleActor.ProcessVehicleFlags(param, remove);
+                }
+           });
         }
 
         public override bool VolumeDetect
@@ -629,7 +685,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             PhysicsScene.TaintedObject("BSPrim.SetMaterial", delegate() { UpdatePhysicalParameters(); });
         }
 
-        public override OMV.Vector3 Velocity
+        public override Vector3 Velocity
         {
             get { return RawVelocity; }
             set
@@ -643,7 +699,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
-        public override OMV.Vector3 ForceVelocity
+        public override Vector3 ForceVelocity
         {
             get { return RawVelocity; }
             set
@@ -660,31 +716,31 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
-        public override OMV.Vector3 Torque
+        public override Vector3 Torque
         {
             get { return RawTorque; }
             set
             {
                 RawTorque = value;
-                EnableActor(RawTorque != OMV.Vector3.Zero, SetTorqueActorName,
+                EnableActor(RawTorque != Vector3.Zero, SetTorqueActorName,
                     delegate() { return new BSActorSetTorque(PhysicsScene, this, SetTorqueActorName); });
                 // DetailLog("{0},BSPrim.SetTorque,call,torque={1}", LocalID, _torque);
             }
         }
 
-        public override OMV.Vector3 Acceleration
+        public override Vector3 Acceleration
         {
             get { return _acceleration; }
             set { _acceleration = value; }
         }
 
-        public override OMV.Quaternion RawOrientation
-        {
-            get { return RawOrientation; }
-            set { RawOrientation = value; }
-        }
+//        public override Quaternion RawOrientation
+//        {
+//            get { return RawOrientation; }
+//            set { RawOrientation = value; }
+//        }
 
-        public override OMV.Quaternion Orientation
+        public override Quaternion Orientation
         {
             get { return RawOrientation; }
             set
@@ -698,7 +754,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // Go directly to Bullet to get/set the value.
-        public override OMV.Quaternion ForceOrientation
+        public override Quaternion ForceOrientation
         {
             get
             {
@@ -757,7 +813,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         // Make gravity work if the object is physical and not selected
         // Called at taint-time!!
-        private void SetObjectDynamic(bool forceRebuild)
+        void SetObjectDynamic(bool forceRebuild)
         {
             // Recreate the physical object if necessary
             CreateGeomAndObject(forceRebuild);
@@ -894,7 +950,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // To make transparent, we create a Bullet ghost object.
         // Note: This expects to be called from the UpdatePhysicalParameters() routine as
         //     the functions after this one set up the state of a possibly newly created collision body.
-        private void MakeSolid(bool makeSolid)
+        void MakeSolid(bool makeSolid)
         {
             CollisionObjectTypes bodyType = (CollisionObjectTypes)PhysicsScene.PE.GetBodyType(PhysBody);
             if (makeSolid)
@@ -926,7 +982,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // Turn on or off the flag controlling whether collision events are returned to the simulator.
-        private void EnableCollisions(bool wantsCollisionEvents)
+        void EnableCollisions(bool wantsCollisionEvents)
         {
             if (wantsCollisionEvents)
             {
@@ -1005,7 +1061,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
-        public override OMV.Vector3 RotationalVelocity
+        public override Vector3 RotationalVelocity
         {
             get { return _rotationalVelocity; }
             set
@@ -1018,7 +1074,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
-        public override OMV.Vector3 ForceRotationalVelocity
+        public override Vector3 ForceRotationalVelocity
         {
             get { return _rotationalVelocity; }
             set
@@ -1080,10 +1136,10 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
     }*/
 
-        public override void AddForce(OMV.Vector3 force, bool pushforce)
+        public override void AddForce(Vector3 force, bool pushforce)
         {
             // Per documentation, max force is limited.
-            OMV.Vector3 addForce = Util.ClampV(force, BSParam.MaxAddForceMagnitude);
+            Vector3 addForce = Util.ClampV(force, BSParam.MaxAddForceMagnitude);
 
             // Since this force is being applied in only one step, make this a force per second.
             addForce /= PhysicsScene.LastTimeStep;
@@ -1092,7 +1148,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         // Applying a force just adds this to the total force on the object.
         // This added force will only last the next simulation tick.
-        public void AddForce(OMV.Vector3 force, bool pushforce, bool inTaintTime)
+        public void AddForce(Vector3 force, bool pushforce, bool inTaintTime)
         {
             // for an object, doesn't matter if force is a pushforce or not
             if (IsPhysicallyActive)
@@ -1101,7 +1157,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 {
                     // DetailLog("{0},BSPrim.addForce,call,force={1}", LocalID, addForce);
 
-                    OMV.Vector3 addForce = force;
+                    Vector3 addForce = force;
                     PhysicsScene.TaintedObject(inTaintTime, "BSPrim.AddForce", delegate()
                     {
                         // Bullet adds this central force to the total force for this tick
@@ -1122,14 +1178,14 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
-        public void AddForceImpulse(OMV.Vector3 impulse, bool pushforce, bool inTaintTime)
+        public void AddForceImpulse(Vector3 impulse, bool pushforce, bool inTaintTime)
         {
             // for an object, doesn't matter if force is a pushforce or not
             if (!IsPhysicallyActive)
             {
                 if (impulse.IsFinite())
                 {
-                    OMV.Vector3 addImpulse = Util.ClampV(impulse, BSParam.MaxAddForceMagnitude);
+                    Vector3 addImpulse = Util.ClampV(impulse, BSParam.MaxAddForceMagnitude);
                     // DetailLog("{0},BSPrim.addForceImpulse,call,impulse={1}", LocalID, impulse);
 
                     PhysicsScene.TaintedObject(inTaintTime, "BSPrim.AddImpulse", delegate()
@@ -1153,11 +1209,11 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // BSPhysObject.AddAngularForce()
-        public override void AddAngularForce(OMV.Vector3 force, bool pushforce, bool inTaintTime)
+        public override void AddAngularForce(Vector3 force, bool pushforce, bool inTaintTime)
         {
             if (force.IsFinite())
             {
-                OMV.Vector3 angForce = force;
+                Vector3 angForce = force;
                 PhysicsScene.TaintedObject(inTaintTime, "BSPrim.AddAngularForce", delegate()
                 {
                     if (PhysBody.HasPhysicalBody)
@@ -1180,9 +1236,9 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // ApplyTorqueImpulse adds torque directly to the angularVelocity.
         // AddAngularForce accumulates the force and applied it to the angular velocity all at once.
         // Computed as: angularVelocity += impulse * inertia;
-        public void ApplyTorqueImpulse(OMV.Vector3 impulse, bool inTaintTime)
+        public void ApplyTorqueImpulse(Vector3 impulse, bool inTaintTime)
         {
-            OMV.Vector3 applyImpulse = impulse;
+            Vector3 applyImpulse = impulse;
             PhysicsScene.TaintedObject(inTaintTime, "BSPrim.ApplyTorqueImpulse", delegate()
             {
                 if (PhysBody.HasPhysicalBody)
@@ -1195,7 +1251,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         #region Mass Calculation
 
-        private float CalculateMass()
+        float CalculateMass()
         {
             float volume = _size.X * _size.Y * _size.Z; // default
             float tmp;
@@ -1518,20 +1574,20 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
             bool terseUpdate = false;
 
-            if (entprop.Velocity != OMV.Vector3.Zero && entprop.Velocity.ApproxEquals(OMV.Vector3.Zero, 0.01f) &&
-                Velocity != OMV.Vector3.Zero)
+            if (entprop.Velocity != Vector3.Zero && entprop.Velocity.ApproxEquals(Vector3.Zero, 0.01f) &&
+                Velocity != Vector3.Zero)
             {
-                entprop.Velocity = OMV.Vector3.Zero;
-                entprop.Acceleration = OMV.Vector3.Zero;
-                entprop.RotationalVelocity = OMV.Vector3.Zero;
-                Velocity = RawVelocity = OMV.Vector3.Zero;
+                entprop.Velocity = Vector3.Zero;
+                entprop.Acceleration = Vector3.Zero;
+                entprop.RotationalVelocity = Vector3.Zero;
+                Velocity = RawVelocity = Vector3.Zero;
                 ZeroMotion(true);
                 terseUpdate = true;
             }
 
             // DEBUG DEBUG DEBUG -- smooth velocity changes a bit. The simulator seems to be
             //    very sensitive to velocity changes.
-            if (entprop.Velocity == OMV.Vector3.Zero ||
+            if (entprop.Velocity == Vector3.Zero ||
                 (VehicleType != 0 /*&& !entprop.Velocity.ApproxEquals(RawVelocity, 0.01f)*/) ||
                 !entprop.Velocity.ApproxEquals(RawVelocity, BSParam.UpdateVelocityChangeThreshold / 2f))
             {
@@ -1572,7 +1628,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
              */
         }
 
-        public override OMV.Vector3 RawPosition { get; set; }
+        //public override Vector3 RawPosition { get; set; }
 
         // High performance detailed logging routine used by the physical objects.
         protected new void DetailLog(string msg, params Object[] args)

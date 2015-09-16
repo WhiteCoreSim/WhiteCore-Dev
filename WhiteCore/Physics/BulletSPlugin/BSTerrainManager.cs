@@ -29,7 +29,7 @@ using System;
 using OpenMetaverse;
 using WhiteCore.Framework.Utilities;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     // The physical implementation of the terrain is wrapped in this class.
     public abstract class BSTerrainPhys : IDisposable
@@ -74,21 +74,21 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         public const float HEIGHT_EQUAL_FUDGE = 0.2f;
 
         // The scene that I am part of
-        private BSScene PhysicsScene { get; set; }
+        BSScene PhysicsScene { get; set; }
 
         // The ground plane created to keep thing from falling to infinity.
-        private BulletBody m_groundPlane;
+        BulletBody m_groundPlane;
 
         // If doing mega-regions, if we're region zero we will be managing multiple
         //    region terrains since region zero does the physics for the whole mega-region.
-        private BSTerrainPhys m_terrain;
+        BSTerrainPhys m_terrain;
 
         // Flags used to know when to recalculate the height.
-        private bool m_terrainModified = false;
+        bool m_terrainModified = false;
 
         // If we are doing mega-regions, terrains are added from TERRAIN_ID to m_terrainCount.
         // This is incremented before assigning to new region so it is the last ID allocated.
-        private uint m_terrainCount = BSScene.CHILDTERRAIN_ID - 1;
+        uint m_terrainCount = BSScene.CHILDTERRAIN_ID - 1;
 
         public uint HighestTerrainID
         {
@@ -97,7 +97,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         // If the parent region (region 0), this is the extent of the combined regions
         //     relative to the origin of region zero
-        private Vector3 m_worldMax;
+        Vector3 m_worldMax;
 
         public Vector3 WorldMax
         {
@@ -184,7 +184,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         //     This call is most often used to update the heightMap and parameters of the terrain.
         // (The above does suggest that some simplification/refactoring is in order.)
         // Called during taint-time.
-        private void UpdateTerrain(uint id, float[] heightMap)
+        void UpdateTerrain(uint id, float[] heightMap)
         {
             DetailLog("{0},BSTerrainManager.UpdateTerrain,call,id={1}",
                 BSScene.DetailLogZero, id);
@@ -221,7 +221,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // TODO: redo terrain implementation selection to allow other base types than heightMap.
-        private BSTerrainPhys BuildPhysicalTerrain(uint id, float[] heightMap)
+        BSTerrainPhys BuildPhysicalTerrain(uint id, float[] heightMap)
         {
             // Find high and low points of passed heightmap.
             // The min and max passed in is usually the area objects can be in (maximum
@@ -304,9 +304,9 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         //    the same size and that is the default.
         // Once the heightMapInfo is found, we have all the information to
         //    compute the offset into the array.
-        private float lastHeightTX = 999999f;
-        private float lastHeightTY = 999999f;
-        private float lastHeight = HEIGHT_INITIAL_LASTHEIGHT;
+        float lastHeightTX = 999999f;
+        float lastHeightTY = 999999f;
+        float lastHeight = HEIGHT_INITIAL_LASTHEIGHT;
 
         public float GetTerrainHeightAtXYZ(Vector3 pos)
         {
@@ -328,7 +328,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             return m_terrain.GetWaterLevelAtXYZ(pos);
         }
 
-        private void DetailLog(string msg, params Object[] args)
+        void DetailLog(string msg, params Object[] args)
         {
             //PhysicsScene.PhysicsLogging.TraceFormat(msg, args);
         }

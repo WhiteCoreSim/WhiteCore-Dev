@@ -25,13 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using OMV = OpenMetaverse;
+using OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public class BSActorSetTorque : BSActor
     {
-        private BSFMotor m_torqueMotor;
+        BSFMotor m_torqueMotor;
 
         public BSActorSetTorque(BSScene physicsScene, BSPhysObject pObj, string actorName)
             : base(physicsScene, pObj, actorName)
@@ -62,7 +62,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 m_controllingPrim.RawTorque);
 
             // If not active any more, get rid of me (shouldn't ever happen, but just to be safe)
-            if (m_controllingPrim.RawTorque == OMV.Vector3.Zero)
+            if (m_controllingPrim.RawTorque == Vector3.Zero)
             {
                 m_physicsScene.DetailLog("{0},BSActorSetTorque,refresh,notSetTorque,disabling={1}",
                     m_controllingPrim.LocalID, ActorName);
@@ -91,7 +91,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // If a hover motor has not been created, create one and start the hovering.
-        private void ActivateSetTorque()
+        void ActivateSetTorque()
         {
             if (m_torqueMotor == null)
             {
@@ -102,7 +102,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
-        private void DeactivateSetTorque()
+        void DeactivateSetTorque()
         {
             if (m_torqueMotor != null)
             {
@@ -112,7 +112,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // Called just before the simulation step. Update the vertical position for hoverness.
-        private void Mover(float timeStep)
+        void Mover(float timeStep)
         {
             // Don't do force while the object is selected.
             if (!isActive)

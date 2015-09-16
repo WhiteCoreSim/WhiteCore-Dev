@@ -27,7 +27,7 @@
 
 using WhiteCore.Framework.Physics;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     /// <summary>
     /// Entry for a port of Bullet (http://bulletphysics.org/) to WhiteCore.
@@ -39,7 +39,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
     /// </summary>
     public class BSPlugin : IPhysicsPlugin
     {
-        private BSScene _mScene;
+        BSScene _mScene;
 
         public BSPlugin()
         {

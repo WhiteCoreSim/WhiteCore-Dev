@@ -25,13 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using OMV = OpenMetaverse;
+using OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public sealed class BSLinksetGroupCompound : BSLinkset
     {
-        private static string LogHeader = "[BULLETSIM LINKSET COMPOUND]";
+        static string LogHeader = "[BULLETSIM LINKSET COMPOUND]";
 
         public BSLinksetGroupCompound(BSScene scene, BSPrimLinkable parent)
             : base(scene, parent)
@@ -179,7 +179,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                                 // Found the child shape within the compound shape
                                 PhysicsScene.PE.UpdateChildTransform(LinksetRoot.PhysShape, updated.LinksetChildIndex,
                                     updated.RawPosition - LinksetRoot.RawPosition,
-                                    updated.RawOrientation * OMV.Quaternion.Inverse(LinksetRoot.RawOrientation),
+                                    updated.RawOrientation * Quaternion.Inverse(LinksetRoot.RawOrientation),
                                     true /* shouldRecalculateLocalAabb */);
                                 updatedChild = true;
                                 DetailLog(
@@ -255,7 +255,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // When the linkset is built, the child shape is added to the compound shape relative to the
         //    root shape. The linkset then moves around but this does not move the actual child
         //    prim. The child prim's location must be recomputed based on the location of the root shape.
-        private void RecomputeChildWorldPosition(BSPrimLinkable child, bool inTaintTime)
+        void RecomputeChildWorldPosition(BSPrimLinkable child, bool inTaintTime)
         {
             // For the moment (20130201), disable this computation (converting the child physical addr back to
             //    a region address) until we have a good handle on center-of-mass offsets and what the physics
@@ -352,9 +352,9 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // Constraint linksets are rebuilt every time.
         // Note that this works for rebuilding just the root after a linkset is taken apart.
         // Called at taint time!!
-        private bool disableCOM = false;
+        bool disableCOM = false;
 
-        private void RecomputeLinksetCompound()
+        void RecomputeLinksetCompound()
         {
             try
             {
@@ -369,20 +369,20 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                     // The center of mass for the linkset is the geometric center of the group.
                     // Compute a displacement for each component so it is relative to the center-of-mass.
                     // Bullet presumes an object's origin (relative <0,0,0>) is its center-of-mass
-                    OMV.Vector3 centerOfMassW = LinksetRoot.RawPosition;
+                    Vector3 centerOfMassW = LinksetRoot.RawPosition;
                     if (!disableCOM)
                     {
                         // Compute a center-of-mass in world coordinates.
                         centerOfMassW = ComputeLinksetCenterOfMass();
                     }
 
-                    OMV.Quaternion invRootOrientation = OMV.Quaternion.Inverse(LinksetRoot.RawOrientation);
+                    Quaternion invRootOrientation = Quaternion.Inverse(LinksetRoot.RawOrientation);
 
                     // 'centerDisplacement' is the value to subtract from children to give physical offset position
-                    OMV.Vector3 centerDisplacement = (centerOfMassW - LinksetRoot.RawPosition) * invRootOrientation;
+                    Vector3 centerDisplacement = (centerOfMassW - LinksetRoot.RawPosition) * invRootOrientation;
                     //Set the COM in bullet
                     PhysicsScene.PE.SetCenterOfMassByPosRot(LinksetRoot.PhysBody, centerDisplacement,
-                        OMV.Quaternion.Identity);
+                        Quaternion.Identity);
 
                     // This causes the physical position of the root prim to be offset to accomodate for the displacements
                     LinksetRoot.ForcePosition = LinksetRoot.RawPosition;
@@ -430,8 +430,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                                 BulletShape newShape = cPrim.PhysShape;
                                 cPrim.PhysShape = saveShape;
 
-                                OMV.Vector3 offsetPos = (cPrim.RawPosition - LinksetRoot.RawPosition) * invRootOrientation;
-                                OMV.Quaternion offsetRot = cPrim.RawOrientation * invRootOrientation;
+                                Vector3 offsetPos = (cPrim.RawPosition - LinksetRoot.RawPosition) * invRootOrientation;
+                                Quaternion offsetRot = cPrim.RawOrientation * invRootOrientation;
                                 PhysicsScene.PE.AddChildShapeToCompoundShape(LinksetRoot.PhysShape, newShape, offsetPos,
                                     offsetRot);
                                 DetailLog(
@@ -450,8 +450,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                                         "{0} Rebuilt sharable shape when building linkset! Region={1}, primID={2}, shape={3}",
                                         LogHeader, PhysicsScene.RegionName, cPrim.LocalID, cPrim.PhysShape);
                                 }
-                                OMV.Vector3 offsetPos = (cPrim.RawPosition - LinksetRoot.RawPosition) * invRootOrientation;
-                                OMV.Quaternion offsetRot = cPrim.RawOrientation * invRootOrientation;
+                                Vector3 offsetPos = (cPrim.RawPosition - LinksetRoot.RawPosition) * invRootOrientation;
+                                Quaternion offsetRot = cPrim.RawOrientation * invRootOrientation;
                                 PhysicsScene.PE.AddChildShapeToCompoundShape(LinksetRoot.PhysShape, cPrim.PhysShape,
                                     offsetPos, offsetRot);
                                 DetailLog(
@@ -490,7 +490,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                     //Update the AABB so that things will collide properly
                     PhysicsScene.PE.UpdateSingleAabb(PhysicsScene.World, LinksetRoot.PhysBody);
 
-                    // 20131224 not used                OMV.Quaternion invRootOrientation = OMV.Quaternion.Inverse(LinksetRoot.RawOrientation);
+                    // 20131224 not used                Quaternion invRootOrientation = Quaternion.Inverse(LinksetRoot.RawOrientation);
 
                     // This causes the physical position of the root prim to be offset to accomodate for the displacements
                     LinksetRoot.ForcePosition = LinksetRoot.RawPosition;
@@ -500,8 +500,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                     {
                         foreach (BSPrimLinkable cPrim in m_children)
                         {
-                            // 20131224 not used                        OMV.Vector3 offsetPos = (cPrim.RawPosition - LinksetRoot.RawPosition) * invRootOrientation;
-                            // 20131224 not used                        OMV.Quaternion offsetRot = cPrim.RawOrientation * invRootOrientation;
+                            // 20131224 not used                        Vector3 offsetPos = (cPrim.RawPosition - LinksetRoot.RawPosition) * invRootOrientation;
+                            // 20131224 not used                        Quaternion offsetRot = cPrim.RawOrientation * invRootOrientation;
 
                             // Build a simple shape for this child prim (given that we aren't allowing it to be dynamic
                             cPrim.ForceBodyShapeRebuild(true);

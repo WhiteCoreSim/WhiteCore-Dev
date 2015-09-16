@@ -36,7 +36,7 @@ using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Utilities;
 using WhiteCore.Framework.SceneInfo;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public sealed class BSScene : PhysicsScene
     {
@@ -59,7 +59,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         public HashSet<BSPhysObject> ObjectsWithNoMoreCollisions = new HashSet<BSPhysObject>();
         // Keep track of all the avatars so we can send them a collision event
         //    every tick so WhiteCore will update its animation.
-        private HashSet<BSPhysObject> m_avatars = new HashSet<BSPhysObject>();
+        HashSet<BSPhysObject> m_avatars = new HashSet<BSPhysObject>();
 
         // let my minuions use my logger
         public ICommandConsole Logger
@@ -152,7 +152,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         //   order before the simulation.
         public delegate void TaintCallback();
 
-        private struct TaintCallbackEntry
+        struct TaintCallbackEntry
         {
             public String ident;
             public TaintCallback callback;
@@ -164,10 +164,10 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
-        private Object _taintLock = new Object(); // lock for using the next object
-        private List<TaintCallbackEntry> _taintOperations;
-        private Dictionary<string, TaintCallbackEntry> _postTaintOperations;
-        private List<TaintCallbackEntry> _postStepOperations;
+        Object _taintLock = new Object(); // lock for using the next object
+        List<TaintCallbackEntry> _taintOperations;
+        Dictionary<string, TaintCallbackEntry> _postTaintOperations;
+        List<TaintCallbackEntry> _postStepOperations;
 
         // A pointer to an instance if this structure is passed to the C++ code
         // Used to pass basic configuration values to the unmanaged code.
@@ -175,12 +175,13 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         // Sometimes you just have to log everything.
         //public ICommandConsole PhysicsLogging;
-        private bool m_physicsLoggingEnabled;
-        private string m_physicsLoggingDir;
-        private string m_physicsLoggingPrefix;
-        private int m_physicsLoggingFileMinutes;
-        private bool m_physicsLoggingDoFlush;
-        private bool m_physicsPhysicalDumpEnabled;
+        bool m_physicsLoggingEnabled;
+        string m_physicsLoggingDir;
+        string m_physicsLoggingPrefix;
+        int m_physicsLoggingFileMinutes;
+        bool m_physicsLoggingDoFlush;
+        bool m_physicsPhysicalDumpEnabled;
+
         public int PhysicsMetricDumpFrames { get; set; }
         // 'true' of the vehicle code is to log lots of details
         public bool VehicleLoggingEnabled { get; private set; }
@@ -257,7 +258,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         // All default parameter values are set here. There should be no values set in the
         // variable definitions.
-        private void GetInitialParameterValues(IConfigSource config)
+        void GetInitialParameterValues(IConfigSource config)
         {
             ConfigurationParameters parms = new ConfigurationParameters();
             UnmanagedParams[0] = parms;
@@ -302,7 +303,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // A helper function that handles a true/false parameter and returns the proper float number encoding
-        private float ParamBoolean(IConfig config, string parmName, float deflt)
+        float ParamBoolean(IConfig config, string parmName, float deflt)
         {
             float ret = deflt;
             if (config.Contains(parmName))
@@ -320,7 +321,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // The main engine selection is the engineName up to the first hypen.
         // So "Bullet-2.80-OpenCL-Intel" specifies the 'bullet' class here and the whole name
         //     is passed to the engine to do its special selection, etc.
-        private BSAPITemplate SelectUnderlyingBulletEngine(string engineName)
+        BSAPITemplate SelectUnderlyingBulletEngine(string engineName)
         {
             // For the moment, do a simple switch statement.
             // Someday do fancyness with looking up the interfaces in the assembly.
@@ -688,7 +689,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // Something has collided
-        private void SendCollision(uint localID, uint collidingWith, Vector3 collidePoint, Vector3 collideNormal,
+        void SendCollision(uint localID, uint collidingWith, Vector3 collidePoint, Vector3 collideNormal,
             float penetration)
         {
             if (localID <= TerrainManager.HighestTerrainID)
@@ -811,14 +812,14 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 TaintedObject(ident, callback);
         }
 
-        private void TriggerPreStepEvent(float timeStep)
+        void TriggerPreStepEvent(float timeStep)
         {
             PreStepAction actions = BeforeStep;
             if (actions != null)
                 actions(timeStep);
         }
 
-        private void TriggerPostStepEvent(float timeStep)
+        void TriggerPostStepEvent(float timeStep)
         {
             PostStepAction actions = AfterStep;
             if (actions != null)
@@ -834,7 +835,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             ProcessPostTaintTaints();
         }
 
-        private void ProcessRegularTaints()
+        void ProcessRegularTaints()
         {
             if (_taintOperations.Count > 0) // save allocating new list if there is nothing to process
             {
@@ -879,7 +880,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // Taints that happen after the normal taint processing but before the simulation step.
-        private void ProcessPostTaintTaints()
+        void ProcessPostTaintTaints()
         {
             if (_postTaintOperations.Count > 0)
             {

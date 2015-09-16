@@ -27,9 +27,9 @@
 
 using System.Collections.Generic;
 using System.Text;
-using OMV = OpenMetaverse;
+using OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     // Classes to allow some type checking for the API
     // These hold pointers to allocated objects in the unmanaged space.
@@ -197,18 +197,18 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         {
             ID = id;
             heightMap = hm;
-            terrainRegionBase = OMV.Vector3.Zero;
-            minCoords = new OMV.Vector3(100f, 100f, 25f);
-            maxCoords = new OMV.Vector3(101f, 101f, 26f);
+            terrainRegionBase = Vector3.Zero;
+            minCoords = new Vector3(100f, 100f, 25f);
+            maxCoords = new Vector3(101f, 101f, 26f);
             minZ = maxZ = 0f;
             sizeX = sizeY = 256f;
         }
 
         public uint ID;
         public float[] heightMap;
-        public OMV.Vector3 terrainRegionBase;
-        public OMV.Vector3 minCoords;
-        public OMV.Vector3 maxCoords;
+        public Vector3 terrainRegionBase;
+        public Vector3 minCoords;
+        public Vector3 maxCoords;
         public float sizeX, sizeY;
         public float minZ, maxZ;
         public BulletShape terrainShape;

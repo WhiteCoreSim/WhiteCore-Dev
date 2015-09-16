@@ -30,7 +30,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     // Constraint type values as defined by Bullet
     public enum ConstraintType : int
@@ -100,8 +100,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         public Vector3 Scale;
         public float Mass;
         public float Buoyancy;
-        public System.UInt64 HullKey;
-        public System.UInt64 MeshKey;
+        public UInt64 HullKey;
+        public UInt64 MeshKey;
         public float Friction;
         public float Restitution;
         public float Collidable; // true of things bump into this
@@ -226,6 +226,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         DISABLE_SIMULATION,
     }
 
+    [Flags]
     public enum CollisionObjectTypes : int
     {
         CO_COLLISION_OBJECT = 1 << 0,
@@ -239,6 +240,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
     // Values used by Bullet and BulletSim to control object properties.
     // Bullet's "CollisionFlags" has more to do with operations on the
     //    object (if collisions happen, if gravity effects it, ...).
+    [Flags]
     public enum CollisionFlags : uint
     {
         CF_STATIC_OBJECT = 1 << 0,
@@ -258,6 +260,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
     };
 
     // Values f collisions groups and masks
+    [Flags]
     public enum CollisionFilterGroups : uint
     {
         // Don't use the bit definitions!!  Define the use in a

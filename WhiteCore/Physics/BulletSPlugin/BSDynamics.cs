@@ -34,23 +34,23 @@ using System;
 using OpenMetaverse;
 using WhiteCore.Framework.Physics;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public sealed class BSDynamics : BSActor
     {
         // the prim this dynamic controller belongs to
-        private BSPrim ControllingPrim { get; set; }
+        BSPrim ControllingPrim { get; set; }
 
-        private bool m_haveRegisteredForSceneEvents;
+        bool m_haveRegisteredForSceneEvents;
 
         // mass of the vehicle fetched each time we're calles
-        private float m_vehicleMass;
+        float m_vehicleMass;
 
         // Vehicle properties
         public Vehicle Type { get; set; }
 
         // private Quaternion m_referenceFrame = Quaternion.Identity;   // Axis modifier
-        private VehicleFlag m_flags = (VehicleFlag)0; // Boolean settings:
+        VehicleFlag m_flags = (VehicleFlag)0; // Boolean settings:
         // HOVER_TERRAIN_ONLY
         // HOVER_GLOBAL_HEIGHT
         // NO_DEFLECTION_UP
@@ -58,68 +58,68 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // HOVER_UP_ONLY
         // LIMIT_MOTOR_UP
         // LIMIT_ROLL_ONLY
-        private Vector3 m_BlockingEndPoint = Vector3.Zero;
-        private Quaternion m_RollreferenceFrame = Quaternion.Identity;
-        private Quaternion m_referenceFrame = Quaternion.Identity;
+        Vector3 m_BlockingEndPoint = Vector3.Zero;
+        Quaternion m_RollreferenceFrame = Quaternion.Identity;
+        Quaternion m_referenceFrame = Quaternion.Identity;
 
         // Linear properties
-        private BSVMotor m_linearMotor = new BSVMotor("LinearMotor");
-        private Vector3 m_linearMotorDirection = Vector3.Zero; // velocity requested by LSL, decayed by time
-        private Vector3 m_linearMotorOffset = Vector3.Zero; // the point of force can be offset from the center
-        private Vector3 m_linearMotorDirectionLASTSET = Vector3.Zero; // velocity requested by LSL
-        private Vector3 m_linearFrictionTimescale = Vector3.Zero;
-        private float m_linearMotorDecayTimescale = 0;
-        private float m_linearMotorTimescale = 0;
-        private Vector3 m_lastLinearVelocityVector = Vector3.Zero;
-        private Vector3 m_lastPositionVector = Vector3.Zero;
-        // private bool m_LinearMotorSetLastFrame = false;
-        // private Vector3 m_linearMotorOffset = Vector3.Zero;
+        BSVMotor m_linearMotor = new BSVMotor("LinearMotor");
+        Vector3 m_linearMotorDirection = Vector3.Zero; // velocity requested by LSL, decayed by time
+        Vector3 m_linearMotorOffset = Vector3.Zero; // the point of force can be offset from the center
+        Vector3 m_linearMotorDirectionLASTSET = Vector3.Zero; // velocity requested by LSL
+        Vector3 m_linearFrictionTimescale = Vector3.Zero;
+        float m_linearMotorDecayTimescale = 0;
+        float m_linearMotorTimescale = 0;
+        Vector3 m_lastLinearVelocityVector = Vector3.Zero;
+        Vector3 m_lastPositionVector = Vector3.Zero;
+        // bool m_LinearMotorSetLastFrame = false;
+        // Vector3 m_linearMotorOffset = Vector3.Zero;
 
         //Angular properties
-        private BSVMotor m_angularMotor = new BSVMotor("AngularMotor");
-        private Vector3 m_angularMotorDirection = Vector3.Zero; // angular velocity requested by LSL motor
-        // private int m_angularMotorApply = 0;                            // application frame counter
-        private Vector3 m_angularMotorVelocity = Vector3.Zero; // current angular motor velocity
-        private float m_angularMotorTimescale = 0; // motor angular velocity ramp up rate
-        private float m_angularMotorDecayTimescale = 0; // motor angular velocity decay rate
-        private Vector3 m_angularFrictionTimescale = Vector3.Zero; // body angular velocity  decay rate
-        private Vector3 m_lastAngularVelocity = Vector3.Zero;
-        private Vector3 m_lastVertAttractor = Vector3.Zero; // what VA was last applied to body
+        BSVMotor m_angularMotor = new BSVMotor("AngularMotor");
+        Vector3 m_angularMotorDirection = Vector3.Zero; // angular velocity requested by LSL motor
+        // int m_angularMotorApply = 0;                            // application frame counter
+        Vector3 m_angularMotorVelocity = Vector3.Zero; // current angular motor velocity
+        float m_angularMotorTimescale = 0; // motor angular velocity ramp up rate
+        float m_angularMotorDecayTimescale = 0; // motor angular velocity decay rate
+        Vector3 m_angularFrictionTimescale = Vector3.Zero; // body angular velocity  decay rate
+        Vector3 m_lastAngularVelocity = Vector3.Zero;
+        Vector3 m_lastVertAttractor = Vector3.Zero; // what VA was last applied to body
 
         //Deflection properties
-        private BSVMotor m_angularDeflectionMotor = new BSVMotor("AngularDeflection");
-        private float m_angularDeflectionEfficiency = 0;
-        private float m_angularDeflectionTimescale = 0;
-        private float m_linearDeflectionEfficiency = 0;
-        private float m_linearDeflectionTimescale = 0;
+        BSVMotor m_angularDeflectionMotor = new BSVMotor("AngularDeflection");
+        float m_angularDeflectionEfficiency = 0;
+        float m_angularDeflectionTimescale = 0;
+        float m_linearDeflectionEfficiency = 0;
+        float m_linearDeflectionTimescale = 0;
 
         //Banking properties
-        private float m_bankingEfficiency = 0;
-        private float m_bankingMix = 0;
-        private float m_bankingTimescale = 0;
+        float m_bankingEfficiency = 0;
+        float m_bankingMix = 0;
+        float m_bankingTimescale = 0;
 
         //Hover and Buoyancy properties
-        private BSVMotor m_hoverMotor = new BSVMotor("Hover");
-        private float m_VhoverHeight = 0f;
-        private float m_VhoverEfficiency = 0f;
-        private float m_VhoverTimescale = 0f;
-        private float m_VhoverTargetHeight = -1.0f; // if <0 then no hover, else its the current target height
+        BSVMotor m_hoverMotor = new BSVMotor("Hover");
+        float m_VhoverHeight = 0f;
+        float m_VhoverEfficiency = 0f;
+        float m_VhoverTimescale = 0f;
+        float m_VhoverTargetHeight = -1.0f; // if <0 then no hover, else its the current target height
         // Modifies gravity. Slider between -1 (double-gravity) and 1 (full anti-gravity)
-        private float m_VehicleBuoyancy = 0f;
-        private Vector3 m_VehicleGravity = Vector3.Zero; // Gravity computed when buoyancy set
+        float m_VehicleBuoyancy = 0f;
+        Vector3 m_VehicleGravity = Vector3.Zero; // Gravity computed when buoyancy set
 
         //Attractor properties
-        private BSVMotor m_verticalAttractionMotor = new BSVMotor("VerticalAttraction");
-        private float m_verticalAttractionEfficiency = 1.0f; // damped
-        private float m_verticalAttractionCutoff = 500f; // per the documentation
+        BSVMotor m_verticalAttractionMotor = new BSVMotor("VerticalAttraction");
+        float m_verticalAttractionEfficiency = 1.0f; // damped
+        float m_verticalAttractionCutoff = 500f; // per the documentation
         // Timescale > cutoff  means no vert attractor.
-        private float m_verticalAttractionTimescale = 510f;
+        float m_verticalAttractionTimescale = 510f;
 
         // Just some recomputed constants:
-        private static readonly float PIOverFour = ((float)Math.PI) / 4f;
+        static readonly float PIOverFour = ((float)Math.PI) / 4f;
 
 #pragma warning disable 414
-        private static readonly float PIOverTwo = ((float)Math.PI) / 2f;
+        static readonly float PIOverTwo = ((float)Math.PI) / 2f;
 #pragma warning restore 414
 
         // For debugging, flags to turn on and off individual corrections.
@@ -646,7 +646,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         // Some of the properties of this prim may have changed.
         // Do any updating needed for a vehicle
-        private void SetPhysicalParameters()
+        void SetPhysicalParameters()
         {
             if (IsActive)
             {
@@ -708,29 +708,29 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             return;
         }
 
-        private void RegisterForSceneEvents()
+        void RegisterForSceneEvents()
         {
             if (!m_haveRegisteredForSceneEvents)
             {
-                m_physicsScene.BeforeStep += this.Step;
-                m_physicsScene.AfterStep += this.PostStep;
-                ControllingPrim.OnPreUpdateProperty += this.PreUpdateProperty;
+                m_physicsScene.BeforeStep += Step;
+                m_physicsScene.AfterStep += PostStep;
+                ControllingPrim.OnPreUpdateProperty += PreUpdateProperty;
                 m_haveRegisteredForSceneEvents = true;
             }
         }
 
-        private void UnregisterForSceneEvents()
+        void UnregisterForSceneEvents()
         {
             if (m_haveRegisteredForSceneEvents)
             {
-                m_physicsScene.BeforeStep -= this.Step;
-                m_physicsScene.AfterStep -= this.PostStep;
-                ControllingPrim.OnPreUpdateProperty -= this.PreUpdateProperty;
+                m_physicsScene.BeforeStep -= Step;
+                m_physicsScene.AfterStep -= PostStep;
+                ControllingPrim.OnPreUpdateProperty -= PreUpdateProperty;
                 m_haveRegisteredForSceneEvents = false;
             }
         }
 
-        private void PreUpdateProperty(ref EntityProperties entprop)
+        void PreUpdateProperty(ref EntityProperties entprop)
         {
             // A temporary kludge to suppress the rotational effects introduced on vehicles by Bullet
             // TODO: handle physics introduced by Bullet with computed vehicle physics.
@@ -748,31 +748,31 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         //      This does two things: 1) saves continuious calls into unmanaged code, and
         //      2) signals when a physics property update must happen back to the simulator
         //      to update values modified for the vehicle.
-        private int m_knownChanged;
-        private int m_knownHas;
-        private float m_knownTerrainHeight;
-        private float m_knownWaterLevel;
-        private Vector3 m_knownPosition;
-        private Vector3 m_knownVelocity;
-        private Vector3 m_knownForce;
-        private Vector3 m_knownForceImpulse;
-        private Quaternion m_knownOrientation;
-        private Vector3 m_knownRotationalVelocity;
-        private Vector3 m_knownRotationalForce;
-        private Vector3 m_knownRotationalImpulse;
-        private Vector3 m_knownForwardVelocity; // vehicle relative forward speed
+        int m_knownChanged;
+        int m_knownHas;
+        float m_knownTerrainHeight;
+        float m_knownWaterLevel;
+        Vector3 m_knownPosition;
+        Vector3 m_knownVelocity;
+        Vector3 m_knownForce;
+        Vector3 m_knownForceImpulse;
+        Quaternion m_knownOrientation;
+        Vector3 m_knownRotationalVelocity;
+        Vector3 m_knownRotationalForce;
+        Vector3 m_knownRotationalImpulse;
+        Vector3 m_knownForwardVelocity; // vehicle relative forward speed
 
-        private const int m_knownChangedPosition = 1 << 0;
-        private const int m_knownChangedVelocity = 1 << 1;
-        private const int m_knownChangedForce = 1 << 2;
-        private const int m_knownChangedForceImpulse = 1 << 3;
-        private const int m_knownChangedOrientation = 1 << 4;
-        private const int m_knownChangedRotationalVelocity = 1 << 5;
-        private const int m_knownChangedRotationalForce = 1 << 6;
-        private const int m_knownChangedRotationalImpulse = 1 << 7;
-        private const int m_knownChangedTerrainHeight = 1 << 8;
-        private const int m_knownChangedWaterLevel = 1 << 9;
-        private const int m_knownChangedForwardVelocity = 1 << 10;
+        const int m_knownChangedPosition = 1 << 0;
+        const int m_knownChangedVelocity = 1 << 1;
+        const int m_knownChangedForce = 1 << 2;
+        const int m_knownChangedForceImpulse = 1 << 3;
+        const int m_knownChangedOrientation = 1 << 4;
+        const int m_knownChangedRotationalVelocity = 1 << 5;
+        const int m_knownChangedRotationalForce = 1 << 6;
+        const int m_knownChangedRotationalImpulse = 1 << 7;
+        const int m_knownChangedTerrainHeight = 1 << 8;
+        const int m_knownChangedWaterLevel = 1 << 9;
+        const int m_knownChangedForwardVelocity = 1 << 10;
 
         public void ForgetKnownVehicleProperties()
         {
@@ -832,9 +832,9 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         // Since the computation of terrain height can be a little involved, this routine
         //    is used to fetch the height only once for each vehicle simulation step.
-        private Vector3 lastRememberedHeightPos;
+        Vector3 lastRememberedHeightPos;
 
-        private float GetTerrainHeight(Vector3 pos)
+        float GetTerrainHeight(Vector3 pos)
         {
             if ((m_knownHas & m_knownChangedTerrainHeight) == 0 || pos != lastRememberedHeightPos)
             {
@@ -847,7 +847,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         // Since the computation of water level can be a little involved, this routine
         //    is used ot fetch the level only once for each vehicle simulation step.
-        private float GetWaterLevel(Vector3 pos)
+        float GetWaterLevel(Vector3 pos)
         {
             if ((m_knownHas & m_knownChangedWaterLevel) == 0)
             {
@@ -857,7 +857,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             return (float)m_knownWaterLevel;
         }
 
-        private Vector3 VehiclePosition
+        Vector3 VehiclePosition
         {
             get
             {
@@ -876,7 +876,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
-        private Quaternion VehicleOrientation
+        Quaternion VehicleOrientation
         {
             get
             {
@@ -895,7 +895,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
-        private Vector3 VehicleVelocity
+        Vector3 VehicleVelocity
         {
             get
             {
@@ -914,7 +914,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
-        private void VehicleAddForce(Vector3 pForce)
+        void VehicleAddForce(Vector3 pForce)
         {
             if ((m_knownHas & m_knownChangedForce) == 0)
             {
@@ -925,7 +925,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             m_knownChanged |= m_knownChangedForce;
         }
 
-        private void VehicleAddForceImpulse(Vector3 pImpulse)
+        void VehicleAddForceImpulse(Vector3 pImpulse)
         {
             if ((m_knownHas & m_knownChangedForceImpulse) == 0)
             {
@@ -936,7 +936,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             m_knownChanged |= m_knownChangedForceImpulse;
         }
 
-        private Vector3 VehicleRotationalVelocity
+        Vector3 VehicleRotationalVelocity
         {
             get
             {
@@ -955,7 +955,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
-        private void VehicleAddAngularForce(Vector3 aForce)
+        void VehicleAddAngularForce(Vector3 aForce)
         {
             if ((m_knownHas & m_knownChangedRotationalForce) == 0)
             {
@@ -966,7 +966,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             m_knownHas |= m_knownChangedRotationalForce;
         }
 
-        private void VehicleAddRotationalImpulse(Vector3 pImpulse)
+        void VehicleAddRotationalImpulse(Vector3 pImpulse)
         {
             if ((m_knownHas & m_knownChangedRotationalImpulse) == 0)
             {
@@ -978,7 +978,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // Vehicle relative forward velocity
-        private Vector3 VehicleForwardVelocity
+        Vector3 VehicleForwardVelocity
         {
             get
             {
@@ -992,7 +992,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
-        private float VehicleForwardSpeed
+        float VehicleForwardSpeed
         {
             get { return VehicleForwardVelocity.X; }
         }
@@ -1035,7 +1035,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // Apply the effect of the linear motor and other linear motions (like hover and float).
-        private void MoveLinear(float pTimestep)
+        void MoveLinear(float pTimestep)
         {
             ComputeLinearVelocity(pTimestep);
 
@@ -1298,7 +1298,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
-        private void ApplyGravity(float pTimeStep)
+        void ApplyGravity(float pTimeStep)
         {
             Vector3 appliedGravity = m_VehicleGravity * m_vehicleMass;
 
@@ -1319,7 +1319,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // The 'contribution' is how much angular correction velocity each function wants.
         //     All the contributions are added together and the resulting velocity is
         //     set directly on the vehicle.
-        private void MoveAngular(float pTimestep)
+        void MoveAngular(float pTimestep)
         {
             ComputeAngularTurning(pTimestep);
 
@@ -1375,7 +1375,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
-        private void ComputeAngularTurning(float pTimestep)
+        void ComputeAngularTurning(float pTimestep)
         {
             // The user wants this many radians per second angular change?
             Vector3 currentAngularV = VehicleRotationalVelocity * Quaternion.Inverse(VehicleOrientation);
@@ -1657,14 +1657,14 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
-        private float ClampInRange(float low, float val, float high)
+        float ClampInRange(float low, float val, float high)
         {
             return Math.Max(low, Math.Min(val, high));
             // return Utils.Clamp(val, low, high);
         }
 
         // Invoke the detailed logger and output something if it's enabled.
-        private void VDetailLog(string msg, params Object[] args)
+        void VDetailLog(string msg, params Object[] args)
         {
             if (ControllingPrim.PhysicsScene.VehicleLoggingEnabled)
                 ControllingPrim.PhysicsScene.DetailLog(msg, args);

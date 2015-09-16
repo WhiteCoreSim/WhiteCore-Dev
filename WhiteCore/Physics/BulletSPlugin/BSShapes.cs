@@ -30,7 +30,7 @@ using System.Collections.Generic;
 using System.Text;
 using OMV = OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public abstract class BSShape
     {
@@ -289,34 +289,34 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // The height, width and depth is one. All scaling is done by the simulator.
 
         // Z component -- how far the level is from the middle zero
-        private const float Aup = 0.5f;
-        private const float Bup = 0.4f;
-        private const float Cup = 0.3f;
-        private const float Dup = -0.4f;
-        private const float Eup = -0.5f;
+        const float Aup = 0.5f;
+        const float Bup = 0.4f;
+        const float Cup = 0.3f;
+        const float Dup = -0.4f;
+        const float Eup = -0.5f;
 
         // Y component -- distance from center to x0 and x3
-        private const float Awid = 0.25f;
-        private const float Bwid = 0.3f;
-        private const float Cwid = 0.5f;
-        private const float Dwid = 0.3f;
-        private const float Ewid = 0.2f;
+        const float Awid = 0.25f;
+        const float Bwid = 0.3f;
+        const float Cwid = 0.5f;
+        const float Dwid = 0.3f;
+        const float Ewid = 0.2f;
 
         // Y component -- distance from center to x1, x2, x4 and x5
-        private const float Afwid = 0.0f;
-        private const float Bfwid = 0.2f;
-        private const float Cfwid = 0.4f;
-        private const float Dfwid = 0.2f;
-        private const float Efwid = 0.0f;
+        const float Afwid = 0.0f;
+        const float Bfwid = 0.2f;
+        const float Cfwid = 0.4f;
+        const float Dfwid = 0.2f;
+        const float Efwid = 0.0f;
 
         // X component -- distance from zero to the front or back of a level
-        private const float Adep = 0f;
-        private const float Bdep = 0.3f;
-        private const float Cdep = 0.5f;
-        private const float Ddep = 0.2f;
-        private const float Edep = 0f;
+        const float Adep = 0f;
+        const float Bdep = 0.3f;
+        const float Cdep = 0.5f;
+        const float Ddep = 0.2f;
+        const float Edep = 0f;
 
-        private OMV.Vector3[] avatarVertices =
+        OMV.Vector3[] avatarVertices =
         {
             new OMV.Vector3(0.0f, -Awid, Aup), // A0
             new OMV.Vector3(0.0f, +Awid, Aup), // A3
@@ -347,7 +347,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         };
 
         // Offsets of the vertices in the vertices array
-        private enum Ind : int
+        enum Ind : int
         {
             A0,
             A3,
@@ -374,7 +374,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // Comments specify trianges and quads in clockwise direction
-        private Ind[] avatarIndices =
+        Ind[] avatarIndices =
         {
             Ind.A0, Ind.B0, Ind.B1, // A0,B0,B1
             Ind.A0, Ind.B1, Ind.B2, Ind.B2, Ind.A3, Ind.A0, // A0,B1,B2,A3

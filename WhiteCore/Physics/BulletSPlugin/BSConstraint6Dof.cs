@@ -27,11 +27,11 @@
 
 using OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public sealed class BSConstraint6Dof : BSConstraint
     {
-        private static string LogHeader = "[BULLETSIM 6DOF CONSTRAINT]";
+        static string LogHeader = "[BULLETSIM 6DOF CONSTRAINT]";
 
         public override ConstraintType Type
         {

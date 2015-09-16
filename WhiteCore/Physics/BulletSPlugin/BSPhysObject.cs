@@ -26,12 +26,12 @@
  */
 
 using System;
-using OMV = OpenMetaverse;
+using OpenMetaverse;
 using WhiteCore.Framework.Physics;
-using WhiteCore.Framework.Utilities;
 using WhiteCore.Framework.SceneInfo;
+using WhiteCore.Framework.Utilities;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     /*
      * Class to wrap all objects.
@@ -84,7 +84,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
             // Initialize variables kept in base.
             GravityMultiplier = 1.0f;
-            Gravity = new OMV.Vector3(0f, 0f, BSParam.Gravity);
+            Gravity = new Vector3(0f, 0f, BSParam.Gravity);
             //HoverActive = false;
 
             // We don't have any physical representation yet.
@@ -132,9 +132,9 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         public abstract void UpdatePhysicalMassProperties(float mass, bool inWorld);
 
         // The gravity being applied to the object. A function of default grav, GravityModifier and Buoyancy.
-        public virtual OMV.Vector3 Gravity { get; set; }
+        public virtual Vector3 Gravity { get; set; }
         // The last value calculated for the prim's inertia
-        public OMV.Vector3 Inertia { get; set; }
+        public Vector3 Inertia { get; set; }
 
         // Reference to the physical body (btCollisionObject) of this object
         public BulletBody PhysBody;
@@ -169,7 +169,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         public EntityProperties CurrentEntityProperties { get; set; }
         public EntityProperties LastEntityProperties { get; set; }
 
-        public virtual OMV.Vector3 Scale { get; set; }
+        public virtual Vector3 Scale { get; set; }
 
         // It can be confusing for an actor to know if it should move or update an object
         //    depeneding on the setting of 'selected', 'physical, ...
@@ -203,26 +203,26 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // Update the physical location and motion of the object. Called with data from Bullet.
         public abstract void UpdateProperties(EntityProperties entprop);
 
-        public abstract OMV.Vector3 RawPosition { get; set; }
-        public abstract OMV.Vector3 ForcePosition { get; set; }
+        public virtual Vector3 RawPosition { get; set; }
+        public abstract Vector3 ForcePosition { get; set; }
 
-        public abstract OMV.Quaternion RawOrientation { get; set; }
-        public abstract OMV.Quaternion ForceOrientation { get; set; }
+        public virtual Quaternion RawOrientation { get; set; }
+        public abstract Quaternion ForceOrientation { get; set; }
 
-        public OMV.Vector3 RawVelocity { get; set; }
-        public abstract OMV.Vector3 ForceVelocity { get; set; }
+        public virtual Vector3 RawVelocity { get; set; }
+        public abstract Vector3 ForceVelocity { get; set; }
 
-        public OMV.Vector3 RawForce { get; set; }
-        public OMV.Vector3 RawTorque { get; set; }
+        public Vector3 RawForce { get; set; }
+        public Vector3 RawTorque { get; set; }
 
-        public override void AddAngularForce(OMV.Vector3 force, bool pushforce)
+        public override void AddAngularForce(Vector3 force, bool pushforce)
         {
             AddAngularForce(force, pushforce, false);
         }
 
-        public abstract void AddAngularForce(OMV.Vector3 force, bool pushforce, bool inTaintTime);
+        public abstract void AddAngularForce(Vector3 force, bool pushforce, bool inTaintTime);
 
-        public abstract OMV.Vector3 ForceRotationalVelocity { get; set; }
+        public abstract Vector3 ForceRotationalVelocity { get; set; }
 
         public abstract float ForceBuoyancy { get; set; }
 
@@ -236,8 +236,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         {
             get
             {
-                OMV.Vector3 characterOrientedVelocity = RawVelocity *
-                                                        OMV.Quaternion.Inverse(OMV.Quaternion.Normalize(RawOrientation));
+                Vector3 characterOrientedVelocity = RawVelocity *
+                                                        Quaternion.Inverse(Quaternion.Normalize(RawOrientation));
                 return characterOrientedVelocity.X;
             }
         }
@@ -247,18 +247,18 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         {
             get
             {
-                OMV.Vector3 characterOrientedVelocity = TargetVelocity *
-                                                        OMV.Quaternion.Inverse(OMV.Quaternion.Normalize(RawOrientation));
+                Vector3 characterOrientedVelocity = TargetVelocity *
+                                                        Quaternion.Inverse(Quaternion.Normalize(RawOrientation));
                 return characterOrientedVelocity.X;
             }
         }
 
         // The user can optionally set the center of mass. The user's setting will override any
         //    computed center-of-mass (like in linksets).
-        public OMV.Vector3? UserSetCenterOfMass { get; set; }
+        public Vector3? UserSetCenterOfMass { get; set; }
 
-        public OMV.Vector3 LockedAxis { get; set; } // zero means locked. one means free.
-        public readonly OMV.Vector3 LockedAxisFree = new OMV.Vector3(1f, 1f, 1f); // All axis are free
+        public Vector3 LockedAxis { get; set; } // zero means locked. one means free.
+        public readonly Vector3 LockedAxisFree = new Vector3(1f, 1f, 1f); // All axis are free
 
 
         // Enable physical actions. Bullet will keep sleeping non-moving physical objects so
@@ -369,7 +369,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // Return 'false' if this object is not enabled/subscribed/appropriate for or has already seen this collision.
         // Called at taint time from within the Step() function
         public virtual bool Collide(uint collidingWith, BSPhysObject collidee,
-            OMV.Vector3 contactPoint, OMV.Vector3 contactNormal, float pentrationDepth)
+            Vector3 contactPoint, Vector3 contactNormal, float pentrationDepth)
         {
             bool ret = false;
             bool p2col = true;
@@ -390,7 +390,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             CollisionAccumulation++;
 
             // For movement tests, remember if we are colliding with an object that is moving.
-            ColliderIsMoving = collidee != null ? (collidee.RawVelocity != OMV.Vector3.Zero) : false;
+            ColliderIsMoving = collidee != null ? (collidee.RawVelocity != Vector3.Zero) : false;
 
             // If someone has subscribed for collision events log the collision so it will be reported up
             if (SubscribedEvents())
@@ -508,14 +508,14 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         public override float CollisionScore { get; set; }
         public bool MoveToTargetActive { get; set; }
-        public OMV.Vector3 MoveToTargetTarget { get; set; }
+        public Vector3 MoveToTargetTarget { get; set; }
         public float MoveToTargetTau { get; set; }
 
         #endregion // Collisions
 
         #region Per Simulation Step actions
 
-        public BSActorCollection PhysicalActors;
+        public BSActorCollection PhysicalActors;    // = new BSActorCollection (PhysicsScene);
 
         // When an update to the physical properties happens, this event is fired to let
         //    different actors to modify the update before it is passed around

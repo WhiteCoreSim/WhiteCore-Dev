@@ -27,13 +27,13 @@
 
 using OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public sealed class BSTerrainHeightmap : BSTerrainPhys
     {
-        private static string LogHeader = "[BULLETSIM TERRAIN HEIGHTMAP]";
+        static string LogHeader = "[BULLETSIM TERRAIN HEIGHTMAP]";
 
-        private BulletHMapInfo m_mapInfo = null;
+        BulletHMapInfo m_mapInfo = null;
 
         // Constructor to build a default, flat heightmap terrain.
         public BSTerrainHeightmap(BSScene physicsScene, Vector3 regionBase, uint id, Vector3 regionSize)
@@ -118,7 +118,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // If there is information in m_mapInfo pointing to physical structures, release same.
-        private void ReleaseHeightMapTerrain()
+        void ReleaseHeightMapTerrain()
         {
             if (m_mapInfo != null)
             {

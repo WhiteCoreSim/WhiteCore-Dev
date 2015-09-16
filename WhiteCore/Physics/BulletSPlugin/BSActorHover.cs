@@ -29,9 +29,9 @@
 
 using System;
 using System.Linq;
-using OMV = OpenMetaverse;
+using OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Phyics.BulletSPlugin
 {
     /*public class BSActorHover : BSActor
     {
