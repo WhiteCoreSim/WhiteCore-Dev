@@ -47,7 +47,7 @@ namespace WhiteCore.Framework.Utilities
         #endregion
 
 	public const string VERSION_NUMBER = "0.9.3";
-        public const Flavour VERSION_FLAVOUR = Flavour.RC2;
+	public const Flavour VERSION_FLAVOUR = Flavour.Release;
         public const string VERSION_NAME = "WhiteCore";
 
         public static string Version
