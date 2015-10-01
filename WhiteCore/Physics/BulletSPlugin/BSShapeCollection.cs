@@ -27,12 +27,12 @@
 
 using System;
 using System.Collections.Generic;
-using OpenMetaverse;
-using WhiteCore.Physics.ConvexDecompositionDotNet;
 using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services.ClassHelpers.Assets;
 using WhiteCore.Framework.Utilities;
+using WhiteCore.Physics.ConvexDecompositionDotNet;
+using OMV = OpenMetaverse;
 
 namespace WhiteCore.Physics.BulletSPlugin
 {
@@ -189,7 +189,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         public bool ReferenceShape(BulletShape shape)
         {
             bool ret = false;
-            switch (shape.type)
+            switch (shape.shapeType)
             {
                 case BSPhysicsShapeType.SHAPE_MESH:
                     MeshDesc meshDesc;
@@ -213,7 +213,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                                 BSScene.DetailLogZero, shape.shapeKey.ToString("X"), meshDesc.referenceCount);
                         ret = true;
                     }
-                    meshDesc.lastReferenced = System.DateTime.Now;
+                    meshDesc.lastReferenced = DateTime.Now;
                     Meshes[shape.shapeKey] = meshDesc;
                     break;
                 case BSPhysicsShapeType.SHAPE_HULL:
@@ -270,7 +270,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 }
                 else
                 {
-                    switch (shape.type)
+                    switch (shape.shapeType)
                     {
                         case BSPhysicsShapeType.SHAPE_HULL:
                             DereferenceHull(shape, shapeCallback);
@@ -300,7 +300,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 meshDesc.referenceCount--;
                 // TODO: release the Bullet storage
                 if (shapeCallback != null) shapeCallback(shape);
-                meshDesc.lastReferenced = System.DateTime.Now;
+                meshDesc.lastReferenced = DateTime.Now;
                 Meshes[shape.shapeKey] = meshDesc;
                 if (DDetail)
                     DetailLog("{0},BSShapeCollection.DereferenceMesh,shape={1},refCnt={2}",
@@ -321,7 +321,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 // Tell upper layers that, if they have dependencies on this shape, this link is going away
                 if (shapeCallback != null) shapeCallback(shape);
 
-                hullDesc.lastReferenced = System.DateTime.Now;
+                hullDesc.lastReferenced = DateTime.Now;
                 Hulls[shape.shapeKey] = hullDesc;
                 if (DDetail)
                     DetailLog("{0},BSShapeCollection.DereferenceHull,shape={1},refCnt={2}",
@@ -342,10 +342,10 @@ namespace WhiteCore.Physics.BulletSPlugin
                 // Failed the sanity check!!
                 PhysicsScene.Logger.ErrorFormat(
                     "{0} Attempt to free a compound shape that is not compound!! type={1}, ptr={2}",
-                    LogHeader, shape.type, shape.AddrString);
+                    LogHeader, shape.shapeType, shape.AddrString);
                 if (DDetail)
                     DetailLog("{0},BSShapeCollection.DereferenceCompound,notACompoundShape,type={1},ptr={2}",
-                        BSScene.DetailLogZero, shape.type, shape.AddrString);
+                        BSScene.DetailLogZero, shape.shapeType, shape.AddrString);
                 return;
             }
 
@@ -372,28 +372,28 @@ namespace WhiteCore.Physics.BulletSPlugin
 
             if (TryGetMeshByPtr(shapeInfo, out meshDesc))
             {
-                shapeInfo.type = BSPhysicsShapeType.SHAPE_MESH;
+                shapeInfo.shapeType = BSPhysicsShapeType.SHAPE_MESH;
                 shapeInfo.shapeKey = meshDesc.shapeKey;
             }
             else
             {
                 if (TryGetHullByPtr(shapeInfo, out hullDesc))
                 {
-                    shapeInfo.type = BSPhysicsShapeType.SHAPE_HULL;
+                    shapeInfo.shapeType = BSPhysicsShapeType.SHAPE_HULL;
                     shapeInfo.shapeKey = hullDesc.shapeKey;
                 }
                 else
                 {
                     if (PhysicsScene.PE.IsCompound(shapeInfo))
                     {
-                        shapeInfo.type = BSPhysicsShapeType.SHAPE_COMPOUND;
+                        shapeInfo.shapeType = BSPhysicsShapeType.SHAPE_COMPOUND;
                     }
                     else
                     {
                         if (PhysicsScene.PE.IsNativeShape(shapeInfo))
                         {
                             shapeInfo.isNativeShape = true;
-                            shapeInfo.type = BSPhysicsShapeType.SHAPE_BOX; // (technically, type doesn't matter)
+                            shapeInfo.shapeType = BSPhysicsShapeType.SHAPE_BOX; // (technically, type doesn't matter)
                         }
                     }
                 }
@@ -403,7 +403,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 DetailLog("{0},BSShapeCollection.DereferenceAnonCollisionShape,shape={1}", BSScene.DetailLogZero,
                     shapeInfo);
 
-            if (shapeInfo.type != BSPhysicsShapeType.SHAPE_UNKNOWN)
+            if (shapeInfo.shapeType != BSPhysicsShapeType.SHAPE_UNKNOWN)
             {
                 DereferenceShape(shapeInfo, null);
             }
@@ -422,6 +422,10 @@ namespace WhiteCore.Physics.BulletSPlugin
         // Info in prim.BSShape is updated to the new shape.
         // Returns 'true' if the geometry was rebuilt.
         // Called at taint-time!
+    public const int AvatarShapeCapsule = 0;
+    public const int AvatarShapeCube = 1;
+    public const int AvatarShapeOvoid = 2;
+    public const int AvatarShapeMesh = 3;
         bool CreateGeom(bool forceRebuild, BSPhysObject prim, ShapeDestructionCallback shapeCallback)
         {
             bool ret = false;
@@ -431,6 +435,17 @@ namespace WhiteCore.Physics.BulletSPlugin
             {
                 // an avatar capsule is close to a native shape (it is not shared)
                 GetReferenceToNativeShape(prim, BSPhysicsShapeType.SHAPE_CAPSULE, FixedShapeKey.KEY_CAPSULE,
+                    shapeCallback);
+                if (DDetail)
+                    DetailLog("{0},BSShapeCollection.CreateGeom,avatarCapsule,shape={1}", prim.LocalID, prim.PhysShape);
+                ret = true;
+                haveShape = true;
+            }
+
+           if (!haveShape && prim.PreferredPhysicalShape == BSPhysicsShapeType.SHAPE_BOX)
+            {
+                // a simple box 
+                GetReferenceToNativeShape(prim, BSPhysicsShapeType.SHAPE_BOX, FixedShapeKey.KEY_CAPSULE,
                     shapeCallback);
                 if (DDetail)
                     DetailLog("{0},BSShapeCollection.CreateGeom,avatarCapsule,shape={1}", prim.LocalID, prim.PhysShape);
@@ -473,14 +488,14 @@ namespace WhiteCore.Physics.BulletSPlugin
                 && ((pbs.SculptEntry && !BSParam.ShouldMeshSculptedPrim) || PrimHasNoCuts(pbs)))
             {
                 // Get the scale of any existing shape so we can see if the new shape is same native type and same size.
-                Vector3 scaleOfExistingShape = Vector3.Zero;
+                OMV.Vector3 scaleOfExistingShape = OMV.Vector3.Zero;
                 if (prim.PhysShape.HasPhysicalShape)
                     scaleOfExistingShape = PhysicsScene.PE.GetLocalScaling(prim.PhysShape);
 
                 if (DDetail)
                     DetailLog(
                         "{0},BSShapeCollection.CreateGeom,maybeNative,force={1},primScale={2},primSize={3},primShape={4}",
-                        prim.LocalID, forceRebuild, prim.Scale, prim.Size, prim.PhysShape.type);
+                        prim.LocalID, forceRebuild, prim.Scale, prim.Size, prim.PhysShape.shapeType);
 
                 // It doesn't look like Bullet scales native spheres so make sure the scales are all equal
                 if ((pbs.ProfileShape == ProfileShape.HalfCircle && pbs.PathCurve == (byte)Extrusion.Curve1)
@@ -489,7 +504,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                     haveShape = true;
                     if (forceRebuild
                         || prim.Scale != scaleOfExistingShape
-                        || prim.PhysShape.type != BSPhysicsShapeType.SHAPE_SPHERE
+                        || prim.PhysShape.shapeType != BSPhysicsShapeType.SHAPE_SPHERE
                         )
                     {
                         ret = GetReferenceToNativeShape(prim, BSPhysicsShapeType.SHAPE_SPHERE,
@@ -504,7 +519,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                     haveShape = true;
                     if (forceRebuild
                         || prim.Scale != scaleOfExistingShape
-                        || prim.PhysShape.type != BSPhysicsShapeType.SHAPE_BOX
+                        || prim.PhysShape.shapeType != BSPhysicsShapeType.SHAPE_BOX
                         )
                     {
                         ret = GetReferenceToNativeShape(prim, BSPhysicsShapeType.SHAPE_BOX,
@@ -627,10 +642,10 @@ namespace WhiteCore.Physics.BulletSPlugin
             BulletShape newShape = new BulletShape();
 
             float lod;
-            UInt64 newMeshKey = ComputeShapeKey(prim.Size, prim.BaseShape, out lod);
+            System.UInt64 newMeshKey = ComputeShapeKey(prim.Size, prim.BaseShape, out lod);
 
             // if this new shape is the same as last time, don't recreate the mesh
-            if (newMeshKey == prim.PhysShape.shapeKey && prim.PhysShape.type == BSPhysicsShapeType.SHAPE_MESH)
+            if (newMeshKey == prim.PhysShape.shapeKey && prim.PhysShape.shapeType == BSPhysicsShapeType.SHAPE_MESH)
                 return false;
 
             if (DDetail)
@@ -651,8 +666,8 @@ namespace WhiteCore.Physics.BulletSPlugin
             return true; // 'true' means a new shape has been added to this prim
         }
 
-        BulletShape CreatePhysicalMesh(BSPhysObject prim, UInt64 newMeshKey, PrimitiveBaseShape pbs,
-            Vector3 size, float lod)
+        BulletShape CreatePhysicalMesh(BSPhysObject prim, System.UInt64 newMeshKey, PrimitiveBaseShape pbs,
+            OMV.Vector3 size, float lod)
         {
             BulletShape newShape = new BulletShape();
 
@@ -737,7 +752,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             UInt64 newHullKey = ComputeShapeKey(prim.Size, prim.BaseShape, out lod);
 
             // if the hull hasn't changed, don't rebuild it
-            if (newHullKey == prim.PhysShape.shapeKey && prim.PhysShape.type == BSPhysicsShapeType.SHAPE_HULL)
+            if (newHullKey == prim.PhysShape.shapeKey && prim.PhysShape.shapeType == BSPhysicsShapeType.SHAPE_HULL)
                 return false;
 
             if (DDetail)
@@ -760,7 +775,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         List<ConvexResult> m_hulls;
 
         BulletShape CreatePhysicalHull(string objName, UInt64 newHullKey, PrimitiveBaseShape pbs,
-            Vector3 size, float lod)
+            OMV.Vector3 size, float lod)
         {
             BulletShape newShape = new BulletShape();
             // 20131224 not used        IntPtr hullPtr = IntPtr.Zero;
@@ -907,8 +922,8 @@ namespace WhiteCore.Physics.BulletSPlugin
 
             // Create the shape for the root prim and add it to the compound shape. Cannot be a native shape.
             CreateGeomMeshOrHull(prim, shapeCallback);
-            PhysicsScene.PE.AddChildShapeToCompoundShape(cShape, prim.PhysShape, Vector3.Zero,
-                OpenMetaverse.Quaternion.Identity);
+            PhysicsScene.PE.AddChildShapeToCompoundShape(cShape, prim.PhysShape, OMV.Vector3.Zero,
+                OMV.Quaternion.Identity);
             if (DDetail)
                 DetailLog("{0},BSShapeCollection.GetReferenceToCompoundShape,addRootPrim,compShape={1},rootShape={2}",
                     prim.LocalID, cShape, prim.PhysShape);
@@ -920,7 +935,7 @@ namespace WhiteCore.Physics.BulletSPlugin
 
         // Create a hash of all the shape parameters to be used as a key
         //    for this particular shape.
-        UInt64 ComputeShapeKey(Vector3 size, PrimitiveBaseShape pbs, out float retLod)
+        UInt64 ComputeShapeKey(OMV.Vector3 size, PrimitiveBaseShape pbs, out float retLod)
         {
             // level of detail based on size and type of the object
             float lod = BSParam.MeshLOD;
@@ -942,7 +957,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         }
 
         // For those who don't want the LOD
-        UInt64 ComputeShapeKey(Vector3 size, PrimitiveBaseShape pbs)
+        UInt64 ComputeShapeKey(OMV.Vector3 size, PrimitiveBaseShape pbs)
         {
             float lod;
             return ComputeShapeKey(size, pbs, out lod);
@@ -966,7 +981,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             // Prevent trying to keep fetching the mesh by declaring failure.
             if (prim.PrimAssetState == BSPhysObject.PrimAssetCondition.Fetched)
             {
-                prim.PrimAssetState = BSPhysObject.PrimAssetCondition.Failed;
+                prim.PrimAssetState = BSPhysObject.PrimAssetCondition.FailedMeshing;
                 PhysicsScene.Logger.WarnFormat("{0} Fetched asset would not mesh. {1}, texture={2}",
                     LogHeader, prim.PhysObjectName, prim.BaseShape.SculptTexture);
             }
@@ -974,9 +989,9 @@ namespace WhiteCore.Physics.BulletSPlugin
             {
                 // If this mesh has an underlying asset and we have not failed getting it before, fetch the asset
                 if (prim.BaseShape.SculptEntry
-                    && prim.PrimAssetState != BSPhysObject.PrimAssetCondition.Failed
+                    && prim.PrimAssetState != BSPhysObject.PrimAssetCondition.FailedAssetFetch
                     && prim.PrimAssetState != BSPhysObject.PrimAssetCondition.Waiting
-                    && prim.BaseShape.SculptTexture != UUID.Zero
+                    && prim.BaseShape.SculptTexture != OMV.UUID.Zero
                     )
                 {
                     DetailLog("{0},BSShapeCollection.VerifyMeshCreated,fetchAsset", prim.LocalID);
@@ -1011,7 +1026,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                                 if (assetFound)
                                     yprim.PrimAssetState = BSPhysObject.PrimAssetCondition.Fetched;
                                 else
-                                    yprim.PrimAssetState = BSPhysObject.PrimAssetCondition.Failed;
+                                    yprim.PrimAssetState = BSPhysObject.PrimAssetCondition.FailedAssetFetch;
                                 DetailLog("{0},BSShapeCollection,fetchAssetCallback,found={1},isSculpt={2},ids={3}",
                                     yprim.LocalID, assetFound, yprim.BaseShape.SculptEntry, mismatchIDs);
                             });
@@ -1019,7 +1034,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 }
                 else
                 {
-                    if (prim.PrimAssetState == BSPhysObject.PrimAssetCondition.Failed)
+                    if (prim.PrimAssetState == BSPhysObject.PrimAssetCondition.FailedMeshing)
                     {
                         PhysicsScene.Logger.WarnFormat("{0} Mesh failed to fetch asset. obj={1}, texture={2}",
                             LogHeader, prim.PhysObjectName, prim.BaseShape.SculptTexture);

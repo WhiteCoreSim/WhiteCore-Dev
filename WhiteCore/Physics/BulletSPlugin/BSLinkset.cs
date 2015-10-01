@@ -27,7 +27,7 @@
 
 using System;
 using System.Collections.Generic;
-using OpenMetaverse;
+using OMV = OpenMetaverse;
 
 namespace WhiteCore.Physics.BulletSPlugin
 {
@@ -85,15 +85,31 @@ namespace WhiteCore.Physics.BulletSPlugin
             return ret;
         }
 
-        public BSPrimLinkable LinksetRoot { get; protected set; }
+    public class BSLinkInfo
+    {
+        public BSPrimLinkable member;
+        public BSLinkInfo(BSPrimLinkable pMember)
+        {
+            member = pMember;
+        }
+        public virtual void ResetLink() { }
+        public virtual void SetLinkParameters(BSConstraint constrain) { }
+        // Returns 'true' if physical property updates from the child should be reported to the simulator
+        public virtual bool ShouldUpdateChildProperties() { return false; }
+    }
+
+    public LinksetImplementation LinksetImpl { get; protected set; }
+
+    public BSPrimLinkable LinksetRoot { get; protected set; }
 
         public BSScene PhysicsScene { get; private set; }
 
         private static int m_nextLinksetID = 1;
         public int LinksetID { get; private set; }
 
-        // The children under the root in this linkset.
-        protected HashSet<BSPrimLinkable> m_children;
+    // The children under the root in this linkset.
+     protected HashSet<BSPrimLinkable> m_children;
+    //protected Dictionary<BSPrimLinkable, BSLinkInfo> m_children;
 
         // We lock the diddling of linkset classes to prevent any badness.
         // This locks the modification of the instances of this class. Changes
@@ -115,12 +131,12 @@ namespace WhiteCore.Physics.BulletSPlugin
             get { return false; }
         }
 
-        public Vector3 CenterOfMass
+        public OMV.Vector3 CenterOfMass
         {
             get { return ComputeLinksetCenterOfMass(); }
         }
 
-        public Vector3 GeometricCenter
+        public OMV.Vector3 GeometricCenter
         {
             get { return ComputeLinksetGeometricCenter(); }
         }
@@ -135,6 +151,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             PhysicsScene = scene;
             LinksetRoot = parent;
             m_children = new HashSet<BSPrimLinkable>();
+        //m_children = new Dictionary<BSPrimLinkable, BSLinkInfo>();
             LinksetMass = parent.RawMass;
             Rebuilding = false;
 
@@ -269,6 +286,32 @@ namespace WhiteCore.Physics.BulletSPlugin
             return ret;
         }
 
+    // Called after a simulation step to post a collision with this object.
+    // Return 'true' if linkset processed the collision. 'false' says the linkset didn't have
+    //     anything to add for the collision and it should be passed through normal processing.
+    // Default processing for a linkset.
+    public virtual bool HandleCollide(uint collidingWith, BSPhysObject collidee,
+                                OMV.Vector3 contactPoint, OMV.Vector3 contactNormal, float pentrationDepth)
+    {
+        bool ret = false;
+
+        // prims in the same linkset cannot collide with each other
+        BSPrimLinkable convCollidee = collidee as BSPrimLinkable;
+        if (convCollidee != null && (LinksetID == convCollidee.Linkset.LinksetID))
+        {
+            // By returning 'true', we tell the caller the collision has been 'handled' so it won't
+            //     do anything about this collision and thus, effectivily, ignoring the collision.
+            ret = true;
+        }
+        else
+        {
+            // Not a collision between members of the linkset. Must be a real collision.
+            // So the linkset root can know if there is a collision anywhere in the linkset.
+            LinksetRoot.SomeCollisionSimulationStep = PhysicsScene.SimulationStep;
+        }
+
+        return ret;
+    }
         // I am the root of a linkset and a new child is being added
         // Called while LinkActivity is locked.
         protected abstract void AddChildToLinkset(BSPrimLinkable child, bool scheduleRebuild);
@@ -319,6 +362,84 @@ namespace WhiteCore.Physics.BulletSPlugin
         public abstract bool RemoveBodyDependencies(BSPrimLinkable child);
 
         // ================================================================
+   public virtual void SetPhysicalFriction(float friction)
+    {
+        ForEachMember((member) =>
+            {
+                if (member.PhysBody.HasPhysicalBody)
+                    PhysicsScene.PE.SetFriction(member.PhysBody, friction);
+                return false;   // 'false' says to continue looping
+            }
+        );
+    }
+    public virtual void SetPhysicalRestitution(float restitution)
+    {
+        ForEachMember((member) =>
+            {
+                if (member.PhysBody.HasPhysicalBody)
+                    PhysicsScene.PE.SetRestitution(member.PhysBody, restitution);
+                return false;   // 'false' says to continue looping
+            }
+        );
+    }
+    public virtual void SetPhysicalGravity(OMV.Vector3 gravity)
+    {
+        ForEachMember((member) =>
+            {
+                if (member.PhysBody.HasPhysicalBody)
+                    PhysicsScene.PE.SetGravity(member.PhysBody, gravity);
+                return false;   // 'false' says to continue looping
+            }
+        );
+    }
+    public virtual void ComputeAndSetLocalInertia(OMV.Vector3 inertiaFactor, float linksetMass)
+    {
+        ForEachMember((member) =>
+            {
+                if (member.PhysBody.HasPhysicalBody)
+                {
+                    OMV.Vector3 inertia = PhysicsScene.PE.CalculateLocalInertia(member.PhysShape, linksetMass);
+                    member.Inertia = inertia * inertiaFactor;
+                    PhysicsScene.PE.SetMassProps(member.PhysBody, linksetMass, member.Inertia);
+                    PhysicsScene.PE.UpdateInertiaTensor(member.PhysBody);
+                    DetailLog("{0},BSLinkset.ComputeAndSetLocalInertia,m.mass={1}, inertia={2}", member.LocalID, linksetMass, member.Inertia);
+
+                }
+                return false;   // 'false' says to continue looping
+            }
+        );
+    }
+    public virtual void SetPhysicalCollisionFlags(CollisionFlags collFlags)
+    {
+        ForEachMember((member) =>
+            {
+                if (member.PhysBody.HasPhysicalBody)
+                    PhysicsScene.PE.SetCollisionFlags(member.PhysBody, collFlags);
+                return false;   // 'false' says to continue looping
+            }
+        );
+    }
+    public virtual void AddToPhysicalCollisionFlags(CollisionFlags collFlags)
+    {
+        ForEachMember((member) =>
+            {
+                if (member.PhysBody.HasPhysicalBody)
+                    PhysicsScene.PE.AddToCollisionFlags(member.PhysBody, collFlags);
+                return false;   // 'false' says to continue looping
+            }
+        );
+    }
+    public virtual void RemoveFromPhysicalCollisionFlags(CollisionFlags collFlags)
+    {
+        ForEachMember((member) =>
+            {
+                if (member.PhysBody.HasPhysicalBody)
+                    PhysicsScene.PE.RemoveFromCollisionFlags(member.PhysBody, collFlags);
+                return false;   // 'false' says to continue looping
+            }
+        );
+    }
+    // ================================================================
         protected virtual float ComputeLinksetMass()
         {
             float mass = LinksetRoot.RawMass;
@@ -336,9 +457,9 @@ namespace WhiteCore.Physics.BulletSPlugin
         }
 
         // Computes linkset's center of mass in world coordinates.
-        protected virtual Vector3 ComputeLinksetCenterOfMass()
+        protected virtual OMV.Vector3 ComputeLinksetCenterOfMass()
         {
-            Vector3 com;
+            OMV.Vector3 com;
             lock (m_linksetActivityLock)
             {
                 com = LinksetRoot.Position * LinksetRoot.RawMass;
@@ -356,9 +477,9 @@ namespace WhiteCore.Physics.BulletSPlugin
             return com;
         }
 
-        protected virtual Vector3 ComputeLinksetGeometricCenter()
+        protected virtual OMV.Vector3 ComputeLinksetGeometricCenter()
         {
-            Vector3 com;
+            OMV.Vector3 com;
             lock (m_linksetActivityLock)
             {
                 com = LinksetRoot.Position;
@@ -372,6 +493,13 @@ namespace WhiteCore.Physics.BulletSPlugin
 
             return com;
         }
+
+    #region Extension
+    public virtual object Extension(string pFunct, params object[] pParams)
+    {
+        return null;
+    }
+    #endregion // Extension
 
         // Invoke the detailed logger and output something if it's enabled.
         protected void DetailLog(string msg, params Object[] args)

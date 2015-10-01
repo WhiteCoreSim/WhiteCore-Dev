@@ -32,16 +32,130 @@ using OMV = OpenMetaverse;
 
 namespace WhiteCore.Physics.BulletSPlugin
 {
+public class ShapeInfoInfo
+{
+    public int Vertices { get; set; }
+    private int m_hullCount;
+    private int[] m_verticesPerHull;
+    public ShapeInfoInfo()
+    {
+        Vertices = 0;
+        m_hullCount = 0;
+        m_verticesPerHull = null;
+    }
+    public int HullCount
+    {
+        set
+        {
+            m_hullCount = value;
+            m_verticesPerHull = new int[m_hullCount];
+            Array.Clear(m_verticesPerHull, 0, m_hullCount);
+        }
+        get { return m_hullCount; }
+    }
+    public void SetVerticesPerHull(int hullNum, int vertices)
+    {
+        if (m_verticesPerHull != null && hullNum < m_verticesPerHull.Length)
+        {
+            m_verticesPerHull[hullNum] = vertices;
+        }
+    }
+    public int GetVerticesPerHull(int hullNum)
+    {
+        if (m_verticesPerHull != null && hullNum < m_verticesPerHull.Length)
+        {
+            return m_verticesPerHull[hullNum];
+        }
+        return 0;
+    }
+    public override string ToString()
+    {
+        StringBuilder buff = new StringBuilder();
+        // buff.Append("ShapeInfo=<");
+        buff.Append("<");
+        if (Vertices > 0)
+        {
+            buff.Append("verts=");
+            buff.Append(Vertices.ToString());
+        }
+
+        if (Vertices > 0 && HullCount > 0) buff.Append(",");
+
+        if (HullCount > 0)
+        {
+            buff.Append("nHulls=");
+            buff.Append(HullCount.ToString());
+            buff.Append(",");
+            buff.Append("hullVerts=");
+            for (int ii = 0; ii < HullCount; ii++)
+            {
+                if (ii != 0) buff.Append(",");
+                buff.Append(GetVerticesPerHull(ii).ToString());
+            }
+        }
+        buff.Append(">");
+        return buff.ToString();
+    }
+}
     public abstract class BSShape
     {
         public int referenceCount { get; set; }
         public DateTime lastReferenced { get; set; }
+    public BulletShape physShapeInfo { get; set; }
+    public ShapeInfoInfo shapeInfo { get; private set; }
 
         public BSShape()
         {
-            referenceCount = 0;
+            referenceCount = 1;
             lastReferenced = DateTime.Now;
+        physShapeInfo = new BulletShape();
+        shapeInfo = new ShapeInfoInfo();
         }
+
+    public BSShape(BulletShape pShape)
+    {
+        referenceCount = 1;
+        lastReferenced = DateTime.Now;
+        physShapeInfo = pShape;
+        shapeInfo = new ShapeInfoInfo();
+    }
+
+    // Called when this shape is being used again.
+    // Used internally. External callers should call instance.GetReference() to properly copy/reference
+    //       the shape.
+    protected virtual void IncrementReference()
+    {
+        referenceCount++;
+        lastReferenced = DateTime.Now;
+    }
+
+    // Called when this shape is done being used.
+    protected virtual void DecrementReference()
+    {
+        referenceCount--;
+        lastReferenced = DateTime.Now;
+    }
+
+    // Return 'true' if there is an allocated physics physical shape under this class instance.
+    public virtual bool HasPhysicalShape
+    {
+        get
+        {
+            if (physShapeInfo != null)
+                return physShapeInfo.HasPhysicalShape;
+            return false;
+        }
+    }
+    public virtual BSPhysicsShapeType ShapeType
+    {
+        get
+        {
+            BSPhysicsShapeType ret = BSPhysicsShapeType.SHAPE_UNKNOWN;
+            if (physShapeInfo != null && physShapeInfo.HasPhysicalShape)
+                ret = physShapeInfo.shapeType;
+            return ret;
+        }
+    }
 
         // Get a reference to a physical shape. Create if it doesn't exist
         public static BSShape GetShapeReference(BSScene physicsScene, bool forceRebuild, BSPhysObject prim)
@@ -193,7 +307,7 @@ namespace WhiteCore.Physics.BulletSPlugin
 
     public class BSShapeMesh : BSShape
     {
-        private static Dictionary<System.UInt64, BSShapeMesh> Meshes = new Dictionary<System.UInt64, BSShapeMesh>();
+        static Dictionary<UInt64, BSShapeMesh> Meshes = new Dictionary<UInt64, BSShapeMesh>();
 
         public BSShapeMesh()
             : base()
@@ -212,7 +326,7 @@ namespace WhiteCore.Physics.BulletSPlugin
 
     public class BSShapeHull : BSShape
     {
-        private static Dictionary<System.UInt64, BSShapeHull> Hulls = new Dictionary<System.UInt64, BSShapeHull>();
+        static Dictionary<UInt64, BSShapeHull> Hulls = new Dictionary<UInt64, BSShapeHull>();
 
         public BSShapeHull()
             : base()
@@ -349,28 +463,11 @@ namespace WhiteCore.Physics.BulletSPlugin
         // Offsets of the vertices in the vertices array
         enum Ind : int
         {
-            A0,
-            A3,
-            B0,
-            B1,
-            B2,
-            B3,
-            B4,
-            B5,
-            C0,
-            C1,
-            C2,
-            C3,
-            C4,
-            C5,
-            D0,
-            D1,
-            D2,
-            D3,
-            D4,
-            D5,
-            E0,
-            E3
+            A0, A3,
+            B0, B1, B2, B3, B4, B5,
+            C0, C1, C2, C3, C4, C5,
+            D0, D1, D2, D3, D4, D5,
+            E0, E3
         }
 
         // Comments specify trianges and quads in clockwise direction

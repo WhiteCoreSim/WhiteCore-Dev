@@ -26,7 +26,7 @@
  */
 
 using System;
-using OpenMetaverse;
+using OMV = OpenMetaverse;
 
 namespace WhiteCore.Physics.BulletSPlugin
 {
@@ -106,7 +106,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 RemoveAxisLockConstraint();
 
                 BSConstraint6Dof axisConstrainer = new BSConstraint6Dof(m_physicsScene.World, m_controllingPrim.PhysBody,
-                    Vector3.Zero, Quaternion.Identity,
+                    OMV.Vector3.Zero, OMV.Quaternion.Identity,
                     false /* useLinearReferenceFrameB */, true /* disableCollisionsBetweenLinkedBodies */);
                 LockAxisConstraint = axisConstrainer;
                 m_physicsScene.Constraints.AddConstraint(LockAxisConstraint);
@@ -114,14 +114,14 @@ namespace WhiteCore.Physics.BulletSPlugin
                 // The constraint is tied to the world and oriented to the prim.
 
                 // Free to move linearly in the region
-                Vector3 linearLow = Vector3.Zero;
-                Vector3 linearHigh = m_physicsScene.TerrainManager.WorldMax;
+                OMV.Vector3 linearLow = OMV.Vector3.Zero;
+                OMV.Vector3 linearHigh = m_physicsScene.TerrainManager.WorldMax;
                 axisConstrainer.SetLinearLimits(linearLow, linearHigh);
 
                 // Angular with some axis locked
                 float fPI = (float)Math.PI;
-                Vector3 angularLow = new Vector3(-fPI, -fPI, -fPI);
-                Vector3 angularHigh = new Vector3(fPI, fPI, fPI);
+                OMV.Vector3 angularLow = new OMV.Vector3(-fPI, -fPI, -fPI);
+                OMV.Vector3 angularHigh = new OMV.Vector3(fPI, fPI, fPI);
                 if (m_controllingPrim.LockedAxis.X != 1f)
                 {
                     angularLow.X = 0f;

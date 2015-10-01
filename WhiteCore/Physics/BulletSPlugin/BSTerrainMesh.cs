@@ -301,15 +301,18 @@ namespace WhiteCore.Physics.BulletSPlugin
                 int offset = 0;
                 // Extend the height with the height from the last row or column
                 if (yy >= m_sizeY)
+	              {
                     if (xx >= m_sizeX)
                         offset = (m_sizeY - 1) * m_sizeX + (m_sizeX - 1);
                     else
                         offset = (m_sizeY - 1) * m_sizeX + xx;
-                else if (xx >= m_sizeX)
-                    offset = yy * m_sizeX + (m_sizeX - 1);
-                else
-                    offset = yy * m_sizeX + xx;
-
+                }
+                else {
+                    if (xx >= m_sizeX)
+                        offset = yy * m_sizeX + (m_sizeX - 1);
+                    else
+                        offset = yy * m_sizeX + xx;
+                }
                 return m_heightMap[offset];
             }
         }

@@ -179,7 +179,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         }
 
         // Use reflection to set the value in the attribute structure.
-        private static void SetAttributeValue(int matType, string attribName, float val)
+        static void SetAttributeValue(int matType, string attribName, float val)
         {
             // Get the current attribute values for this material
             MaterialAttributes thisAttrib = Attributes[matType];

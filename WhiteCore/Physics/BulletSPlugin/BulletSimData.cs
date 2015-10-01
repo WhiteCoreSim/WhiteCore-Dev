@@ -27,7 +27,7 @@
 
 using System.Collections.Generic;
 using System.Text;
-using OpenMetaverse;
+using OMV = OpenMetaverse;
 
 namespace WhiteCore.Physics.BulletSPlugin
 {
@@ -112,12 +112,12 @@ namespace WhiteCore.Physics.BulletSPlugin
     {
         public BulletShape()
         {
-            type = BSPhysicsShapeType.SHAPE_UNKNOWN;
+            shapeType = BSPhysicsShapeType.SHAPE_UNKNOWN;
             shapeKey = (System.UInt64)FixedShapeKey.KEY_NONE;
             isNativeShape = false;
         }
 
-        public BSPhysicsShapeType type;
+        public BSPhysicsShapeType shapeType;
         public System.UInt64 shapeKey;
         public bool isNativeShape;
 
@@ -154,7 +154,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             buff.Append("<p=");
             buff.Append(AddrString);
             buff.Append(",s=");
-            buff.Append(type.ToString());
+            buff.Append(shapeType.ToString());
             buff.Append(",k=");
             buff.Append(shapeKey.ToString("X"));
             buff.Append(",n=");
@@ -193,22 +193,24 @@ namespace WhiteCore.Physics.BulletSPlugin
     //      than making copies.
     public class BulletHMapInfo
     {
-        public BulletHMapInfo(uint id, float[] hm)
+    	public BulletHMapInfo(uint id, float[] hm, float pSizeX, float pSizeY)
         {
             ID = id;
             heightMap = hm;
-            terrainRegionBase = Vector3.Zero;
-            minCoords = new Vector3(100f, 100f, 25f);
-            maxCoords = new Vector3(101f, 101f, 26f);
+            terrainRegionBase = OMV.Vector3.Zero;
+            minCoords = new OMV.Vector3(100f, 100f, 25f);
+            maxCoords = new OMV.Vector3(101f, 101f, 26f);
             minZ = maxZ = 0f;
-            sizeX = sizeY = 256f;
+            //sizeX = sizeY = 256f;
+            sizeX = pSizeX;
+            sizeY = pSizeY;
         }
 
         public uint ID;
         public float[] heightMap;
-        public Vector3 terrainRegionBase;
-        public Vector3 minCoords;
-        public Vector3 maxCoords;
+        public OMV.Vector3 terrainRegionBase;
+        public OMV.Vector3 minCoords;
+        public OMV.Vector3 maxCoords;
         public float sizeX, sizeY;
         public float minZ, maxZ;
         public BulletShape terrainShape;
@@ -219,6 +221,7 @@ namespace WhiteCore.Physics.BulletSPlugin
     public enum CollisionType
     {
         Avatar,
+        PhantomToOthersAvatar, // An avatar that it phantom to other avatars but not to anything else
         Groundplane,
         Terrain,
         Static,
@@ -264,11 +267,18 @@ namespace WhiteCore.Physics.BulletSPlugin
                         (uint) CollisionFilterGroups.BAllGroup)
                 },
                 {
+                    CollisionType.PhantomToOthersAvatar,
+                    new CollisionTypeFilterGroup(CollisionType.PhantomToOthersAvatar,
+                        (uint)CollisionFilterGroups.BCharacterGroup,
+                        (uint)(CollisionFilterGroups.BAllGroup & ~CollisionFilterGroups.BCharacterGroup))
+                },
+                {
                     CollisionType.Groundplane,
                     new CollisionTypeFilterGroup(CollisionType.Groundplane,
                         (uint) CollisionFilterGroups.BGroundPlaneGroup,
-                        (uint) CollisionFilterGroups.BAllGroup)
-                },
+                        //(uint) CollisionFilterGroups.BAllGroup)
+                        (uint)(CollisionFilterGroups.BCharacterGroup | CollisionFilterGroups.BSolidGroup))
+                 },
                 {
                     CollisionType.Terrain,
                     new CollisionTypeFilterGroup(CollisionType.Terrain,

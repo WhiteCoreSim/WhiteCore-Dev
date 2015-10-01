@@ -128,8 +128,9 @@ namespace WhiteCore.Physics.BulletSPlugin
             // The ground plane is here to catch things that are trying to drop to negative infinity
             BulletShape groundPlaneShape = PhysicsScene.PE.CreateGroundPlaneShape(BSScene.GROUNDPLANE_ID, 1f,
                 BSParam.TerrainCollisionMargin);
+            Vector3 groundPlaneAltitude = new Vector3(0f, 0f, BSParam.TerrainGroundPlane);
             m_groundPlane = PhysicsScene.PE.CreateBodyWithDefaultMotionState(groundPlaneShape,
-                BSScene.GROUNDPLANE_ID, Vector3.Zero, Quaternion.Identity);
+                BSScene.GROUNDPLANE_ID, groundPlaneAltitude, Quaternion.Identity);
 
             PhysicsScene.PE.AddObjectToWorld(PhysicsScene.World, m_groundPlane);
             PhysicsScene.PE.UpdateSingleAabb(PhysicsScene.World, m_groundPlane);

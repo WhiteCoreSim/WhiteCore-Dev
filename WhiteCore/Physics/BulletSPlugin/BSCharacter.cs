@@ -26,11 +26,11 @@
  */
 
 using System;
-using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Utilities;
+using OMV = OpenMetaverse;
 
 namespace WhiteCore.Physics.BulletSPlugin
 {
@@ -38,33 +38,33 @@ namespace WhiteCore.Physics.BulletSPlugin
     {
         static readonly string LogHeader = "[BULLETS CHAR]";
 
-        //  bool _stopped;
-        Vector3 _size;
+        // private bool _stopped;
+        OMV.Vector3 _size;
         bool _selected;
-        Vector3 _position;
+        OMV.Vector3 _position;
         float _mass;
         float _avatarVolume;
         float _collisionScore;
-        Vector3 _acceleration;
-        Quaternion _orientation;
+        OMV.Vector3 _acceleration;
+        OMV.Quaternion _orientation;
         bool _flying;
         bool _setAlwaysRun;
         bool _throttleUpdates;
         bool _floatOnWater;
-        Vector3 _rotationalVelocity;
+        OMV.Vector3 _rotationalVelocity;
         float _buoyancy;
         BSActorAvatarMove m_moveActor;
         const string AvatarMoveActorName = "BSCharacter.AvatarMove";
 
-        public BSCharacter(uint localID, String avName, BSScene parent_scene, Vector3 pos, Vector3 size,
+        public BSCharacter(uint localID, String avName, BSScene parent_scene, OMV.Vector3 pos, OMV.Vector3 size,
             bool isFlying)
             : base(parent_scene, localID, avName, "BSCharacter")
         {
             _position = pos;
 
             _flying = isFlying;
-            _orientation = Quaternion.Identity;
-            RawVelocity = Vector3.Zero;
+            _orientation = OMV.Quaternion.Identity;
+            RawVelocity = OMV.Vector3.Zero;
             _buoyancy = ComputeBuoyancyFromFlying(isFlying);
             Friction = BSParam.AvatarStandingFriction;
             Density = BSParam.AvatarDensity / BSParam.DensityScaleFactor;
@@ -120,7 +120,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             });
         }
 
-        private void SetPhysicalProperties()
+        void SetPhysicalProperties()
         {
             PhysicsScene.PE.RemoveObjectFromWorld(PhysicsScene.World, PhysBody);
 
@@ -150,7 +150,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             UpdatePhysicalMassProperties(RawMass, false);
 
             // Make so capsule does not fall over
-            PhysicsScene.PE.SetAngularFactorV(PhysBody, Vector3.Zero);
+            PhysicsScene.PE.SetAngularFactorV(PhysBody, OMV.Vector3.Zero);
 
             // The avatar mover sets some parameters.
             PhysicalActors.Refresh();
@@ -163,8 +163,11 @@ namespace WhiteCore.Physics.BulletSPlugin
             PhysicsScene.PE.ForceActivationState(PhysBody, ActivationState.DISABLE_DEACTIVATION);
             PhysicsScene.PE.UpdateSingleAabb(PhysicsScene.World, PhysBody);
 
-            // Do this after the object has been added to the world
+        // Do this after the object has been added to the world
+        if (BSParam.AvatarToAvatarCollisionsByDefault)
             PhysBody.collisionType = CollisionType.Avatar;
+        else
+            PhysBody.collisionType = CollisionType.PhantomToOthersAvatar;
             PhysBody.ApplyCollisionMask(PhysicsScene);
         }
 
@@ -173,7 +176,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             base.RequestPhysicsterseUpdate();
         }
 
-        public override Vector3 Size
+        public override OMV.Vector3 Size
         {
             get
             {
@@ -183,6 +186,9 @@ namespace WhiteCore.Physics.BulletSPlugin
 
             set
             {
+				// This is how much the avatar size is changing. Positive means getting bigger.
+				// The avatar altitude must be adjusted for this change.
+				float heightChange = value.Z - _size.Z;
                 _size = value;
                 // Old versions of ScenePresence passed only the height. If width and/or depth are zero,
                 //     replace with the default values.
@@ -200,6 +206,8 @@ namespace WhiteCore.Physics.BulletSPlugin
                     {
                         PhysicsScene.PE.SetLocalScaling(PhysShape, Scale);
                         UpdatePhysicalMassProperties(RawMass, true);
+						// Adjust the avatar's position to account for the increase/decrease in size
+						ForcePosition = new OMV.Vector3(_position.X, _position.Y, _position.Z + heightChange / 2f);
                         // Make sure this change appears as a property update event
                         PhysicsScene.PE.PushUpdate(PhysBody);
                     }
@@ -249,9 +257,9 @@ namespace WhiteCore.Physics.BulletSPlugin
         // Called at taint time!
         public override void ZeroMotion(bool inTaintTime)
         {
-            RawVelocity = Vector3.Zero;
-            _acceleration = Vector3.Zero;
-            _rotationalVelocity = Vector3.Zero;
+            RawVelocity = OMV.Vector3.Zero;
+            _acceleration = OMV.Vector3.Zero;
+            _rotationalVelocity = OMV.Vector3.Zero;
 
             // Zero some other properties directly into the physics engine
             PhysicsScene.TaintedObject(inTaintTime, "BSCharacter.ZeroMotion", delegate()
@@ -263,14 +271,14 @@ namespace WhiteCore.Physics.BulletSPlugin
 
         public override void ZeroAngularMotion(bool inTaintTime)
         {
-            _rotationalVelocity = Vector3.Zero;
+            _rotationalVelocity = OMV.Vector3.Zero;
 
             PhysicsScene.TaintedObject(inTaintTime, "BSCharacter.ZeroMotion", delegate()
             {
                 if (PhysBody.HasPhysicalBody)
                 {
-                    PhysicsScene.PE.SetInterpolationAngularVelocity(PhysBody, Vector3.Zero);
-                    PhysicsScene.PE.SetAngularVelocity(PhysBody, Vector3.Zero);
+                    PhysicsScene.PE.SetInterpolationAngularVelocity(PhysBody, OMV.Vector3.Zero);
+                    PhysicsScene.PE.SetAngularVelocity(PhysBody, OMV.Vector3.Zero);
                     // The next also get rid of applied linear force but the linear velocity is untouched.
                     PhysicsScene.PE.ClearForces(PhysBody);
                 }
@@ -278,18 +286,18 @@ namespace WhiteCore.Physics.BulletSPlugin
         }
 
 
-        public override void LockAngularMotion(Vector3 axis)
+        public override void LockAngularMotion(OMV.Vector3 axis)
         {
             return;
         }
 
-        public override Vector3 RawPosition
+        public override OMV.Vector3 RawPosition
         {
             get { return _position; }
             set { _position = value; }
         }
 
-        public override Vector3 Position
+        public override OMV.Vector3 Position
         {
             get
             {
@@ -310,7 +318,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             }
         }
 
-        public override Vector3 ForcePosition
+        public override OMV.Vector3 ForcePosition
         {
             get
             {
@@ -403,11 +411,12 @@ namespace WhiteCore.Physics.BulletSPlugin
 
         public override void UpdatePhysicalMassProperties(float physMass, bool inWorld)
         {
-            Vector3 localInertia = PhysicsScene.PE.CalculateLocalInertia(PhysShape, physMass);
+			//OMV.Vector3 localInertia = PhysicsScene.PE.CalculateLocalInertia(PhysShape.physShapeInfo, physMass);  // new
+            OMV.Vector3 localInertia = PhysicsScene.PE.CalculateLocalInertia(PhysShape, physMass);
             PhysicsScene.PE.SetMassProps(PhysBody, physMass, localInertia);
         }
 
-        public override Vector3 Force
+        public override OMV.Vector3 Force
         {
             get { return RawForce; }
             set
@@ -438,7 +447,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         {
         }
 
-        public override void VehicleRotationParam(int param, Quaternion rotation)
+        public override void VehicleRotationParam(int param, OMV.Quaternion rotation)
         {
         }
 
@@ -446,22 +455,22 @@ namespace WhiteCore.Physics.BulletSPlugin
         {
         }
 
-        public override Vector3 CenterOfMass
+        public override OMV.Vector3 CenterOfMass
         {
-            get { return Vector3.Zero; }
+            get { return OMV.Vector3.Zero; }
         }
 
         // Sets the target in the motor. This starts the changing of the avatar's velocity.
-        public override Vector3 TargetVelocity
+        public override OMV.Vector3 TargetVelocity
         {
             get { return base.m_targetVelocity; }
             set
             {
                 DetailLog("{0},BSCharacter.setTargetVelocity,call,vel={1}", LocalID, value);
-                Vector3 targetVel = value;
+                OMV.Vector3 targetVel = value;
                 targetVel *= 3.84f;
                 if (_setAlwaysRun)
-                    targetVel *= new Vector3(BSParam.AvatarAlwaysRunFactor, BSParam.AvatarAlwaysRunFactor, 1f);
+                    targetVel *= new OMV.Vector3(BSParam.AvatarAlwaysRunFactor, BSParam.AvatarAlwaysRunFactor, 1f);
                 if (_flying)
                     targetVel *= 4f;
 
@@ -473,7 +482,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         }
 
         // Directly setting velocity means this is what the user really wants now.
-        public override Vector3 Velocity
+        public override OMV.Vector3 Velocity
         {
             get { return RawVelocity; }
             set
@@ -491,7 +500,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             }
         }
 
-        public override Vector3 ForceVelocity
+        public override OMV.Vector3 ForceVelocity
         {
             get { return RawVelocity; }
             set
@@ -504,7 +513,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             }
         }
 
-        public override Vector3 Torque
+        public override OMV.Vector3 Torque
         {
             get { return RawTorque; }
             set { RawTorque = value; }
@@ -516,19 +525,19 @@ namespace WhiteCore.Physics.BulletSPlugin
             set { _collisionScore = value; }
         }
 
-        public override Vector3 Acceleration
+        public override OMV.Vector3 Acceleration
         {
             get { return _acceleration; }
             set { _acceleration = value; }
         }
 
-        public override Quaternion RawOrientation
+        public override OMV.Quaternion RawOrientation
         {
             get { return _orientation; }
             set { _orientation = value; }
         }
 
-        public override Quaternion Orientation
+        public override OMV.Quaternion Orientation
         {
             get { return _orientation; }
             set
@@ -538,14 +547,28 @@ namespace WhiteCore.Physics.BulletSPlugin
                 if (_orientation != value)
                 {
                     _orientation = value;
-                    PhysicsScene.TaintedObject("BSCharacter.setOrientation",
-                        delegate() { ForceOrientation = _orientation; });
+						// Bullet assumes we know what we are doing when forcing orientation
+						//    so it lets us go against all the rules and just compensates for them later.
+						// This forces rotation to be only around the Z axis and doesn't change any of the other axis.
+						// This keeps us from flipping the capsule over which the veiwer does not understand.
+
+					  PhysicsScene.TaintedObject("BSCharacter.setOrientation", delegate() {
+						float oRoll, oPitch, oYaw;
+						_orientation.GetEulerAngles(out oRoll, out oPitch, out oYaw);
+						OMV.Quaternion trimmedOrientation = OMV.Quaternion.CreateFromEulers(0f, 0f, oYaw);
+						ForceOrientation = trimmedOrientation;
+						// DetailLog("{0},BSCharacter.setOrientation,taint,val={1},valDir={2},conv={3},convDir={4}",
+						//                 _orientation, OMV.Vector3.UnitX * _orientation,
+						//                 trimmedOrientation, OMV.Vector3.UnitX * trimmedOrientation);
+					});
+                   // PhysicsScene.TaintedObject("BSCharacter.setOrientation",
+                   //     delegate() { ForceOrientation = _orientation; });
                 }
             }
         }
 
         // Go directly to Bullet to get/set the value.
-        public override Quaternion ForceOrientation
+        public override OMV.Quaternion ForceOrientation
         {
             get
             {
@@ -641,13 +664,13 @@ namespace WhiteCore.Physics.BulletSPlugin
             }
         }
 
-        public override Vector3 RotationalVelocity
+        public override OMV.Vector3 RotationalVelocity
         {
             get { return _rotationalVelocity; }
             set { _rotationalVelocity = value; }
         }
 
-        public override Vector3 ForceRotationalVelocity
+        public override OMV.Vector3 ForceRotationalVelocity
         {
             get { return _rotationalVelocity; }
             set { _rotationalVelocity = value; }
@@ -679,24 +702,24 @@ namespace WhiteCore.Physics.BulletSPlugin
                 DetailLog("{0},BSCharacter.setForceBuoyancy,taint,buoy={1}", LocalID, _buoyancy);
                 // Buoyancy is faked by changing the gravity applied to the object
                 float grav = BSParam.Gravity * (1f - _buoyancy);
-                Gravity = new Vector3(0f, 0f, grav);
+                Gravity = new OMV.Vector3(0f, 0f, grav);
                 if (PhysBody.HasPhysicalBody)
                     PhysicsScene.PE.SetGravity(PhysBody, Gravity);
             }
         }
 
-        public override void AddForce(Vector3 force, bool pushforce)
+        public override void AddForce(OMV.Vector3 force, bool pushforce)
         {
             // Since this force is being applied in only one step, make this a force per second.
-            Vector3 addForce = force / PhysicsScene.LastTimeStep;
+            OMV.Vector3 addForce = force / PhysicsScene.LastTimeStep;
             AddForce(addForce, pushforce, false);
         }
 
-        void AddForce(Vector3 force, bool pushforce, bool inTaintTime)
+        void AddForce(OMV.Vector3 force, bool pushforce, bool inTaintTime)
         {
             if (force.IsFinite())
             {
-                Vector3 addForce = Util.ClampV(force, BSParam.MaxAddForceMagnitude);
+                OMV.Vector3 addForce = Util.ClampV(force, BSParam.MaxAddForceMagnitude);
                 // DetailLog("{0},BSCharacter.addForce,call,force={1}", LocalID, addForce);
 
                 PhysicsScene.TaintedObject(inTaintTime, "BSCharacter.AddForce", delegate()
@@ -717,13 +740,13 @@ namespace WhiteCore.Physics.BulletSPlugin
             }
         }
 
-        public override void AddAngularForce(Vector3 force, bool pushforce, bool inTaintTime)
+        public override void AddAngularForce(OMV.Vector3 force, bool pushforce, bool inTaintTime)
         {
         }
 
-        Vector3 ComputeAvatarScale(Vector3 size)
+        OMV.Vector3 ComputeAvatarScale(OMV.Vector3 size)
         {
-            Vector3 newScale;
+            OMV.Vector3 newScale;
 
             // Bullet's capsule total height is the "passed height + radius * 2";
             // The base capsule is 1 diameter and 2 height (passed radius=0.5, passed height = 1)
@@ -736,12 +759,29 @@ namespace WhiteCore.Physics.BulletSPlugin
             //     for a asymmetrical capsule, other parts of the code presume it is cylindrical.
 
             // Scale is multiplier of radius with one of "0.5"
+  		float heightAdjust = BSParam.AvatarHeightMidFudge;
+			if (BSParam.AvatarHeightLowFudge != 0f || BSParam.AvatarHeightHighFudge != 0f) {
+				const float AVATAR_LOW = 1.1f;
+				const float AVATAR_MID = 1.775f; // 1.87f
+				const float AVATAR_HI = 2.45f;
+				// An avatar is between 1.1 and 2.45 meters. Midpoint is 1.775m.
+				float midHeightOffset = size.Z - AVATAR_MID;
+				if (midHeightOffset < 0f) {
+					// Small avatar. Add the adjustment based on the distance from midheight
+					heightAdjust += ((-1f * midHeightOffset) / (AVATAR_MID - AVATAR_LOW)) * BSParam.AvatarHeightLowFudge;
+				} else {
+					// Large avatar. Add the adjustment based on the distance from midheight
+					heightAdjust += ((midHeightOffset) / (AVATAR_HI - AVATAR_MID)) * BSParam.AvatarHeightHighFudge;
+				}
+			}
+
             newScale.X = size.X / 2f;
             newScale.Y = size.Y / 2f;
 
             // The total scale height is the central cylindar plus the caps on the two ends.
-            newScale.Z = (size.Z + (Math.Min(size.X, size.Y) * 2)) / 2f;
-            // If smaller than the endcaps, just fake like we're almost that small
+            //newScale.Z = (size.Z + (Math.Min(size.X, size.Y) * 2)) / 2f;
+            newScale.Z = (size.Z + (Math.Min(size.X, size.Y) * 2) + heightAdjust) / 2f;
+          // If smaller than the endcaps, just fake like we're almost that small
             if (newScale.Z < 0)
                 newScale.Z = 0.1f;
 
@@ -749,7 +789,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         }
 
         // set _avatarVolume and _mass based on capsule size, _density and Scale
-        private void ComputeAvatarVolumeAndMass()
+        void ComputeAvatarVolumeAndMass()
         {
             _avatarVolume = (float)(
                 Math.PI
@@ -775,13 +815,13 @@ namespace WhiteCore.Physics.BulletSPlugin
 
             _orientation = entprop.Rotation;
 
-            if (entprop.Velocity != Vector3.Zero && entprop.Velocity.ApproxEquals(Vector3.Zero, 0.01f) &&
-                Velocity != Vector3.Zero)
+            if (entprop.Velocity != OMV.Vector3.Zero && entprop.Velocity.ApproxEquals(OMV.Vector3.Zero, 0.01f) &&
+                Velocity != OMV.Vector3.Zero)
             {
-                entprop.Velocity = Vector3.Zero;
-                entprop.Acceleration = Vector3.Zero;
-                entprop.RotationalVelocity = Vector3.Zero;
-                Velocity = Vector3.Zero;
+                entprop.Velocity = OMV.Vector3.Zero;
+                entprop.Acceleration = OMV.Vector3.Zero;
+                entprop.RotationalVelocity = OMV.Vector3.Zero;
+                Velocity = OMV.Vector3.Zero;
 
                 TriggerSignificantMovement();
                 TriggerMovementUpdate();

@@ -48,7 +48,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             {
                 initialMap[ii] = BSTerrainManager.HEIGHT_INITIALIZATION;
             }
-            m_mapInfo = new BulletHMapInfo(id, initialMap);
+            m_mapInfo = new BulletHMapInfo(id, initialMap, regionSize.X, regionSize.Y);
             m_mapInfo.minCoords = minTerrainCoords;
             m_mapInfo.maxCoords = maxTerrainCoords;
             m_mapInfo.terrainRegionBase = TerrainBase;
@@ -62,7 +62,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             Vector3 minCoords, Vector3 maxCoords)
             : base(physicsScene, regionBase, id)
         {
-            m_mapInfo = new BulletHMapInfo(id, initialMap);
+            m_mapInfo = new BulletHMapInfo(id, initialMap, maxCoords.X - minCoords.X, maxCoords.Y - minCoords.Y);
             m_mapInfo.minCoords = minCoords;
             m_mapInfo.maxCoords = maxCoords;
             m_mapInfo.minZ = minCoords.Z;
@@ -79,7 +79,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         }
 
         // Using the information in m_mapInfo, create the physical representation of the heightmap.
-        private void BuildHeightmapTerrain()
+        void BuildHeightmapTerrain()
         {
             // Create the terrain shape from the mapInfo
             m_mapInfo.terrainShape = PhysicsScene.PE.CreateTerrainShape(m_mapInfo.ID,

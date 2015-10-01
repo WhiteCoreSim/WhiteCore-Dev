@@ -110,7 +110,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         public int SimulationNowTime { get; private set; }
 
         // True if initialized and ready to do simulation steps
-        private bool m_initialized = false;
+        bool m_initialized = false;
 
         // Flag which is true when processing taints.
         // Not guaranteed to be correct all the time (don't depend on this) but good for debugging.
@@ -175,11 +175,11 @@ namespace WhiteCore.Physics.BulletSPlugin
 
         // Sometimes you just have to log everything.
         //public ICommandConsole PhysicsLogging;
-        bool m_physicsLoggingEnabled;
-        string m_physicsLoggingDir;
-        string m_physicsLoggingPrefix;
-        int m_physicsLoggingFileMinutes;
-        bool m_physicsLoggingDoFlush;
+        //bool m_physicsLoggingEnabled;
+        //string m_physicsLoggingDir;
+        //string m_physicsLoggingPrefix;
+        //int m_physicsLoggingFileMinutes;
+        //bool m_physicsLoggingDoFlush;
         bool m_physicsPhysicalDumpEnabled;
 
         public int PhysicsMetricDumpFrames { get; set; }
@@ -235,7 +235,9 @@ namespace WhiteCore.Physics.BulletSPlugin
             //    a child in a mega-region.
             // Bullet actually doesn't care about the extents of the simulated
             //    area. It tracks active objects no matter where they are.
-            Vector3 worldExtent = new Vector3(Constants.RegionSize, Constants.RegionSize, Constants.RegionHeight);
+//            Vector3 worldExtent = new Vector3(Constants.RegionSize, Constants.RegionSize, Constants.RegionHeight);
+            Vector3 worldExtent = new Vector3(scene.RegionInfo.RegionSizeX, scene.RegionInfo.RegionSizeX, Constants.RegionHeight);
+           // Vector3 worldExtent = regionExtent;
 
             World = PE.Initialize(worldExtent, Params, m_maxCollisionsPerFrame, ref m_collisionArray,
                 m_maxUpdatesPerFrame, ref m_updateArray);
@@ -278,18 +280,20 @@ namespace WhiteCore.Physics.BulletSPlugin
 
                     // Very detailed logging for physics debugging
                     // TODO: the boolean values can be moved to the normal parameter processing.
+                    /* Unused...
                     m_physicsLoggingEnabled = pConfig.GetBoolean("PhysicsLoggingEnabled", false);
                     m_physicsLoggingDir = pConfig.GetString("PhysicsLoggingDir", ".");
                     m_physicsLoggingPrefix = pConfig.GetString("PhysicsLoggingPrefix", "physics-%REGIONNAME%-");
                     m_physicsLoggingFileMinutes = pConfig.GetInt("PhysicsLoggingFileMinutes", 5);
                     m_physicsLoggingDoFlush = pConfig.GetBoolean("PhysicsLoggingDoFlush", false);
+                    */
                     m_physicsPhysicalDumpEnabled = pConfig.GetBoolean("PhysicsPhysicalDumpEnabled", false);
                     // Very detailed logging for vehicle debugging
                     VehicleLoggingEnabled = pConfig.GetBoolean("VehicleLoggingEnabled", false);
                     VehiclePhysicalLoggingEnabled = pConfig.GetBoolean("VehiclePhysicalLoggingEnabled", false);
 
                     // Do any replacements in the parameters
-                    m_physicsLoggingPrefix = m_physicsLoggingPrefix.Replace("%REGIONNAME%", RegionName);
+                    //m_physicsLoggingPrefix = m_physicsLoggingPrefix.Replace("%REGIONNAME%", RegionName);
                 }
 
                 // The material characteristics.
@@ -775,6 +779,84 @@ namespace WhiteCore.Physics.BulletSPlugin
             get { return false; }
         }
 
+/* not implemented
+        #region Extensions
+        public override object Extension(string pFunct, params object[] pParams)
+        {
+            DetailLog("{0} BSScene.Extension,op={1}", DetailLogZero, pFunct);
+            return base.Extension(pFunct, pParams);
+        }
+        #endregion // Extensions
+
+        public static string PrimitiveBaseShapeToString(PrimitiveBaseShape pbs)
+        {
+            float pathShearX = pbs.PathShearX < 128 ? (float)pbs.PathShearX * 0.01f : (float)(pbs.PathShearX - 256) * 0.01f;
+            float pathShearY = pbs.PathShearY < 128 ? (float)pbs.PathShearY * 0.01f : (float)(pbs.PathShearY - 256) * 0.01f;
+            float pathBegin = (float)pbs.PathBegin * 2.0e-5f;
+            float pathEnd = 1.0f - (float)pbs.PathEnd * 2.0e-5f;
+            float pathScaleX = (float)(200 - pbs.PathScaleX) * 0.01f;
+            float pathScaleY = (float)(200 - pbs.PathScaleY) * 0.01f;
+            float pathTaperX = pbs.PathTaperX * 0.01f;
+            float pathTaperY = pbs.PathTaperY * 0.01f;
+
+            float profileBegin = (float)pbs.ProfileBegin * 2.0e-5f;
+            float profileEnd = 1.0f - (float)pbs.ProfileEnd * 2.0e-5f;
+            float profileHollow = (float)pbs.ProfileHollow * 2.0e-5f;
+            if (profileHollow > 0.95f)
+                profileHollow = 0.95f;
+
+            StringBuilder buff = new StringBuilder();
+            buff.Append("shape=");
+            buff.Append(((ProfileShape)pbs.ProfileShape).ToString());
+            buff.Append(",");
+            buff.Append("hollow=");
+            buff.Append(((HollowShape)pbs.HollowShape).ToString());
+            buff.Append(",");
+            buff.Append("pathCurve=");
+            buff.Append(((Extrusion)pbs.PathCurve).ToString());
+            buff.Append(",");
+            buff.Append("profCurve=");
+            buff.Append(((Extrusion)pbs.ProfileCurve).ToString());
+            buff.Append(",");
+            buff.Append("profHollow=");
+            buff.Append(profileHollow.ToString());
+            buff.Append(",");
+            buff.Append("pathBegEnd=");
+            buff.Append(pathBegin.ToString());
+            buff.Append("/");
+            buff.Append(pathEnd.ToString());
+            buff.Append(",");
+            buff.Append("profileBegEnd=");
+            buff.Append(profileBegin.ToString());
+            buff.Append("/");
+            buff.Append(profileEnd.ToString());
+            buff.Append(",");
+            buff.Append("scaleXY=");
+            buff.Append(pathScaleX.ToString());
+            buff.Append("/");
+            buff.Append(pathScaleY.ToString());
+            buff.Append(",");
+            buff.Append("shearXY=");
+            buff.Append(pathShearX.ToString());
+            buff.Append("/");
+            buff.Append(pathShearY.ToString());
+            buff.Append(",");
+            buff.Append("taperXY=");
+            buff.Append(pbs.PathTaperX.ToString());
+            buff.Append("/");
+            buff.Append(pbs.PathTaperY.ToString());
+            buff.Append(",");
+            buff.Append("skew=");
+            buff.Append(pbs.PathSkew.ToString());
+            buff.Append(",");
+            buff.Append("twist/Beg=");
+            buff.Append(pbs.PathTwist.ToString());
+            buff.Append("/");
+            buff.Append(pbs.PathTwistBegin.ToString());
+
+            return buff.ToString();
+        }
+*/
         #region Taints
 
         // The simulation execution order is:

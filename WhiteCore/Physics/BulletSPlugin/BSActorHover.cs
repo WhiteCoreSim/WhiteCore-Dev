@@ -29,7 +29,7 @@
 
 using System;
 using System.Linq;
-using OpenMetaverse;
+using OMV = OpenMetaverse;
 
 namespace WhiteCore.Phyics.BulletSPlugin
 {
@@ -55,6 +55,7 @@ namespace WhiteCore.Phyics.BulletSPlugin
         public override void Dispose()
         {
             Enabled = false;
+            DeactivateHover();
         }
 
         // Called when physical parameters (properties set in Bullet) need to be re-applied.

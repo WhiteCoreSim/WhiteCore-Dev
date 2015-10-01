@@ -75,6 +75,8 @@ namespace WhiteCore.Physics.BulletSPlugin
         SHAPE_COMPOUND = 22,
         SHAPE_HEIGHTMAP = 23,
         SHAPE_AVATAR = 24,
+    SHAPE_CONVEXHULL= 25,
+    SHAPE_GIMPACT   = 26,
     };
 
     // The native shapes have predefined shape hash keys
@@ -214,6 +216,21 @@ namespace WhiteCore.Physics.BulletSPlugin
         public float addNeighboursDistPoints; // false
         public float addFacesPoints; // false
         public float shouldAdjustCollisionMargin; // false
+    // VHACD
+	public float whichHACD;				    // zero if Bullet HACD, non-zero says VHACD
+	// http://kmamou.blogspot.ca/2014/12/v-hacd-20-parameters-description.html
+	public float vHACDresolution;			// 100,000 max number of voxels generated during voxelization stage
+	public float vHACDdepth;				// 20 max number of clipping stages
+	public float vHACDconcavity;			// 0.0025 maximum concavity
+	public float vHACDplaneDownsampling;	// 4 granularity of search for best clipping plane
+	public float vHACDconvexHullDownsampling;	// 4 precision of hull gen process
+	public float vHACDalpha;				// 0.05 bias toward clipping along symmetry planes
+	public float vHACDbeta;				    // 0.05 bias toward clipping along revolution axis
+	public float vHACDgamma;				// 0.00125 max concavity when merging
+	public float vHACDpca;					// 0 on/off normalizing mesh before decomp
+	public float vHACDmode;				    // 0 0:voxel based, 1: tetrahedron based
+	public float vHACDmaxNumVerticesPerCH;	// 64 max triangles per convex hull
+	public float vHACDminVolumePerCH;		// 0.0001 sampling of generated convex hulls
     }
 
     // The states a bullet collision object can have
@@ -256,7 +273,8 @@ namespace WhiteCore.Physics.BulletSPlugin
         BS_VEHICLE_COLLISIONS = 1 << 12, // return collisions for vehicle ground checking
         BS_RETURN_ROOT_COMPOUND_SHAPE = 1 << 13, // return the pos/rot of the root shape in a compound shape
         BS_NONE = 0,
-        BS_ALL = 0xFFFFFFFF
+    BS_ALL = 0x7FFF   // collision flags are a signed short
+        //BS_ALL = 0xFFFFFFFF
     };
 
     // Values f collisions groups and masks
@@ -273,7 +291,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         BDebrisGroup = 1 << 3, // 0008
         BSensorTrigger = 1 << 4, // 0010
         BCharacterGroup = 1 << 5, // 0020
-        BAllGroup = 0x000FFFFF,
+/*        BAllGroup = 0x000FFFFF,
         // Filter groups defined by BulletSim
         BGroundPlaneGroup = 1 << 10, // 0400
         BTerrainGroup = 1 << 11, // 0800
@@ -281,6 +299,15 @@ namespace WhiteCore.Physics.BulletSPlugin
         BSolidGroup = 1 << 13, // 2000
         // BLinksetGroup        = xx  // a linkset proper is either static or dynamic
         BLinksetChildGroup = 1 << 14, // 4000
+*/
+    BAllGroup               = 0x0007FFF,        // collision flags are a signed short
+    // Filter groups defined by BulletSim
+    BGroundPlaneGroup       = 1 << 8,  // 0400
+    BTerrainGroup           = 1 << 9,  // 0800
+    BRaycastGroup           = 1 << 10,  // 1000
+    BSolidGroup             = 1 << 11,  // 2000
+    // BLinksetGroup        = xx  // a linkset proper is either static or dynamic
+    BLinksetChildGroup      = 1 << 12,  // 4000
     };
 
     // CFM controls the 'hardness' of the constraint. 0=fixed, 0..1=violatable. Default=0
@@ -333,11 +360,20 @@ namespace WhiteCore.Physics.BulletSPlugin
             int indicesCount, int[] indices,
             int verticesCount, float[] vertices);
 
+public abstract BulletShape CreateGImpactShape(BulletWorld world,
+                int indicesCount, int[] indices,
+                int verticesCount, float[] vertices );
+
         public abstract BulletShape CreateHullShape(BulletWorld world,
             int hullCount, float[] hulls);
 
         public abstract BulletShape BuildHullShapeFromMesh(BulletWorld world, BulletShape meshShape, HACDParams parms);
 
+public abstract BulletShape BuildConvexHullShapeFromMesh(BulletWorld world, BulletShape meshShape);
+
+public abstract BulletShape CreateConvexHullShape(BulletWorld world,
+                int indicesCount, int[] indices,
+                int verticesCount, float[] vertices );
         public abstract BulletShape BuildNativeShape(BulletWorld world, ShapeData shapeData);
 
         public abstract bool IsNativeShape(BulletShape shape);
@@ -449,6 +485,37 @@ namespace WhiteCore.Physics.BulletSPlugin
 
         public abstract bool SetBreakingImpulseThreshold(BulletConstraint constrain, float threshold);
 
+public const int HINGE_NOT_SPECIFIED = -1;
+public abstract bool HingeSetLimits(BulletConstraint constrain, float low, float high, float softness, float bias, float relaxation);
+
+public abstract bool SpringEnable(BulletConstraint constrain, int index, float numericTrueFalse);
+
+public const int SPRING_NOT_SPECIFIED = -1;
+public abstract bool SpringSetEquilibriumPoint(BulletConstraint constrain, int index, float equilibriumPoint);
+
+public abstract bool SpringSetStiffness(BulletConstraint constrain, int index, float stiffnesss);
+
+public abstract bool SpringSetDamping(BulletConstraint constrain, int index, float damping);
+
+public const int SLIDER_LOWER_LIMIT = 0;
+public const int SLIDER_UPPER_LIMIT = 1;
+public const int SLIDER_LINEAR = 2;
+public const int SLIDER_ANGULAR = 3;
+public abstract bool SliderSetLimits(BulletConstraint constrain, int lowerUpper, int linAng, float val);
+
+public const int SLIDER_SET_SOFTNESS = 4;
+public const int SLIDER_SET_RESTITUTION = 5;
+public const int SLIDER_SET_DAMPING = 6;
+public const int SLIDER_SET_DIRECTION = 7;
+public const int SLIDER_SET_LIMIT = 8;
+public const int SLIDER_SET_ORTHO = 9;
+public abstract bool SliderSet(BulletConstraint constrain, int softRestDamp, int dirLimOrtho, int linAng, float val);
+
+public abstract bool SliderMotorEnable(BulletConstraint constrain, int linAng, float numericTrueFalse);
+
+public const int SLIDER_MOTOR_VELOCITY = 10;
+public const int SLIDER_MAX_MOTOR_FORCE = 11;
+public abstract bool SliderMotor(BulletConstraint constrain, int forceVel, int linAng, float val);
         public abstract bool CalculateTransforms(BulletConstraint constrain);
 
         public abstract bool SetConstraintParam(BulletConstraint constrain, ConstraintParams paramIndex, float value,
@@ -472,6 +539,8 @@ namespace WhiteCore.Physics.BulletSPlugin
         public abstract bool AddObjectToWorld(BulletWorld world, BulletBody obj);
 
         public abstract bool RemoveObjectFromWorld(BulletWorld world, BulletBody obj);
+
+public abstract bool ClearCollisionProxyCache(BulletWorld world, BulletBody obj);
 
         public abstract bool AddConstraintToWorld(BulletWorld world, BulletConstraint constrain,
             bool disableCollisionsBetweenLinkedObjects);

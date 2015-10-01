@@ -53,6 +53,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         //    are converted into simulator origin values before being passed to the base
         //    class.
 
+        // PositionDisplacement is the vehicle relative distance from the root prim position to the center-of-mass.
         public virtual Vector3 PositionDisplacement { get; set; }
         public virtual Quaternion OrientationDisplacement { get; set; }
 
@@ -65,7 +66,10 @@ namespace WhiteCore.Physics.BulletSPlugin
 
         public void ClearDisplacement()
         {
-            PositionDisplacement = Vector3.Zero;
+            //if (UserSetCenterOfMassDisplacement.HasValue)     // wehere is this??
+            //    PositionDisplacement = (Vector3)UserSetCenterOfMassDisplacement;
+            //else
+                PositionDisplacement = Vector3.Zero;
             OrientationDisplacement = Quaternion.Identity;
         }
 
@@ -74,13 +78,18 @@ namespace WhiteCore.Physics.BulletSPlugin
         // The displacement is in local coordinates (relative to root prim in linkset oriented coordinates).
         public virtual void SetEffectiveCenterOfMassW(Vector3 centerOfMassDisplacement)
         {
+            PhysicsScene.AssertInTaintTime("BSPrimDisplaced.SetEffectiveCenterOfMassDisplacement");
             Vector3 comDisp;
             if (UserSetCenterOfMass.HasValue)
                 comDisp = (Vector3)UserSetCenterOfMass;
             else
                 comDisp = centerOfMassDisplacement;
 
-            if (comDisp == Vector3.Zero)
+        // Eliminate any jitter caused be very slight differences in masses and positions
+        if (comDisp.ApproxEquals(Vector3.Zero, 0.01f) )
+            comDisp = Vector3.Zero;
+            //if (comDisp == Vector3.Zero)
+            if ( comDisp.ApproxEquals(PositionDisplacement, 0.01f) )
             {
                 // If there is no diplacement. Things get reset.
                 PositionDisplacement = Vector3.Zero;
@@ -95,7 +104,8 @@ namespace WhiteCore.Physics.BulletSPlugin
             }
         }
 
-        public override Vector3 ForcePosition
+//original
+/*        public override Vector3 ForcePosition
         {
             get { return base.ForcePosition; }
             set
@@ -106,6 +116,50 @@ namespace WhiteCore.Physics.BulletSPlugin
                     base.ForcePosition = value;
             }
         }
+*/
+
+    // 'ForcePosition' is the one way to set the physical position of the body in the physics engine.
+    // Displace the simulator idea of position (center of root prim) to the physical position.
+    public override Vector3 ForcePosition
+    {
+        get {
+            Vector3 physPosition = PhysicsScene.PE.GetPosition(PhysBody);
+            if (PositionDisplacement != Vector3.Zero)
+            {
+                // If there is some displacement, return the physical position (center-of-mass)
+                //     location minus the displacement to give the center of the root prim.
+                Vector3 displacement = PositionDisplacement * ForceOrientation;
+                DetailLog("{0},BSPrimDisplaced.ForcePosition,get,physPos={1},disp={2},simPos={3}",
+                                LocalID, physPosition, displacement, physPosition - displacement);
+                physPosition -= displacement;
+            }
+            RawPosition = physPosition;
+            return physPosition;
+        }
+        set
+        {
+            if (PositionDisplacement != Vector3.Zero)
+            {
+                // This value is the simulator's idea of where the prim is: the center of the root prim
+                RawPosition = value;
+
+                // Move the passed root prim postion to the center-of-mass position and set in the physics engine.
+                Vector3 displacement = PositionDisplacement * RawOrientation;
+                Vector3 displacedPos = RawPosition + displacement;
+                DetailLog("{0},BSPrimDisplaced.ForcePosition,set,simPos={1},disp={2},physPos={3}",
+                                        LocalID, RawPosition, displacement, displacedPos);
+                if (PhysBody.HasPhysicalBody)
+                {
+                    PhysicsScene.PE.SetTranslation(PhysBody, displacedPos, RawOrientation);
+                    ActivateIfPhysical(false);
+                }
+            }
+            else
+            {
+                base.ForcePosition = value;
+            }
+        }
+    }
 
         public override Quaternion ForceOrientation
         {
@@ -128,8 +182,18 @@ namespace WhiteCore.Physics.BulletSPlugin
             {
                 // Correct for any rotation around the center-of-mass
                 // TODO!!!
-                entprop.Position = entprop.Position + (PositionDisplacement * entprop.Rotation);
+                //entprop.Position = entprop.Position + (PositionDisplacement * entprop.Rotation);
                 // entprop.Rotation = something;
+            // The origional shape was offset from 'zero' by PositionDisplacement.
+            // These physical location must be back converted to be centered around the displaced
+            //     root shape.
+
+            // Move the returned center-of-mass location to the root prim location.
+            Vector3 displacement = PositionDisplacement * entprop.Rotation;
+            Vector3 displacedPos = entprop.Position - displacement;
+            DetailLog("{0},BSPrimDisplaced.UpdateProperties,physPos={1},disp={2},simPos={3}",
+                                    LocalID, entprop.Position, displacement, displacedPos);
+            entprop.Position = displacedPos;
             }
 
             base.UpdateProperties(entprop);

@@ -25,7 +25,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using OpenMetaverse;
+using OMV = OpenMetaverse;
 
 namespace WhiteCore.Physics.BulletSPlugin
 {
@@ -51,6 +51,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         public override void Dispose()
         {
             Enabled = false;
+        DeactivateSetForce();
         }
 
         // Called when physical parameters (properties set in Bullet) need to be re-applied.
@@ -61,7 +62,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             m_physicsScene.DetailLog("{0},BSActorSetForce,refresh", m_controllingPrim.LocalID);
 
             // If not active any more, get rid of me (shouldn't ever happen, but just to be safe)
-            if (m_controllingPrim.RawForce == Vector3.Zero)
+            if (m_controllingPrim.RawForce == OMV.Vector3.Zero)
             {
                 m_physicsScene.DetailLog("{0},BSActorSetForce,refresh,notSetForce,removing={1}",
                     m_controllingPrim.LocalID, ActorName);

@@ -89,7 +89,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 : base()
             {
                 shape = xx;
-                type = typ;
+                shapeType = typ;
             }
 
             public override bool HasPhysicalShape
@@ -104,7 +104,7 @@ namespace WhiteCore.Physics.BulletSPlugin
 
             public override BulletShape Clone()
             {
-                return new BulletShapeXNA(shape, type);
+                return new BulletShapeXNA(shape, shapeType);
             }
 
             public override bool ReferenceSame(BulletShape other)
@@ -189,7 +189,20 @@ namespace WhiteCore.Physics.BulletSPlugin
             return true;
         }
 
-        public override bool AddConstraintToWorld(BulletWorld pWorld, BulletConstraint pConstraint,
+     public override bool ClearCollisionProxyCache(BulletWorld pWorld, BulletBody pBody)
+    {
+        DiscreteDynamicsWorld world = (pWorld as BulletWorldXNA).world;
+        RigidBody body = ((BulletBodyXNA)pBody).rigidBody;
+        CollisionObject collisionObject = ((BulletBodyXNA)pBody).body;
+        if (body != null && collisionObject != null && collisionObject.GetBroadphaseHandle() != null)
+        {
+            world.RemoveCollisionObject(collisionObject);
+            world.AddCollisionObject(collisionObject);
+        }
+        return true;
+    }
+
+       public override bool AddConstraintToWorld(BulletWorld pWorld, BulletConstraint pConstraint,
             bool pDisableCollisionsBetweenLinkedObjects)
         {
             DiscreteDynamicsWorld world = (pWorld as BulletWorldXNA).world;
@@ -790,7 +803,213 @@ namespace WhiteCore.Physics.BulletSPlugin
             constraint.SetBreakingImpulseThreshold(threshold);
             return true;
         }
+    public override bool HingeSetLimits(BulletConstraint pConstraint, float low, float high, float softness, float bias, float relaxation)
+    {
+        HingeConstraint constraint = (pConstraint as BulletConstraintXNA).constrain as HingeConstraint;
+        if (softness == HINGE_NOT_SPECIFIED)
+            constraint.SetLimit(low, high);
+        else
+            constraint.SetLimit(low, high, softness, bias, relaxation);
+        return true;
+    }
+    public override bool SpringEnable(BulletConstraint pConstraint, int index, float numericTrueFalse)
+    {
+        Generic6DofSpringConstraint constraint = (pConstraint as BulletConstraintXNA).constrain as Generic6DofSpringConstraint;
+        constraint.EnableSpring(index, (numericTrueFalse == 0f ? false : true));
+        return true;
+    }
 
+    public override bool SpringSetEquilibriumPoint(BulletConstraint pConstraint, int index, float equilibriumPoint)
+    {
+        Generic6DofSpringConstraint constraint = (pConstraint as BulletConstraintXNA).constrain as Generic6DofSpringConstraint;
+        if (index == SPRING_NOT_SPECIFIED)
+        {
+            constraint.SetEquilibriumPoint();
+        }
+        else
+        {
+            if (equilibriumPoint == SPRING_NOT_SPECIFIED)
+                constraint.SetEquilibriumPoint(index);
+            else
+                constraint.SetEquilibriumPoint(index, equilibriumPoint);
+        }
+        return true;
+    }
+
+    public override bool SpringSetStiffness(BulletConstraint pConstraint, int index, float stiffness)
+    {
+        Generic6DofSpringConstraint constraint = (pConstraint as BulletConstraintXNA).constrain as Generic6DofSpringConstraint;
+        constraint.SetStiffness(index, stiffness);
+        return true;
+    }
+
+    public override bool SpringSetDamping(BulletConstraint pConstraint, int index, float damping)
+    {
+        Generic6DofSpringConstraint constraint = (pConstraint as BulletConstraintXNA).constrain as Generic6DofSpringConstraint;
+        constraint.SetDamping(index, damping);
+        return true;
+    }
+
+    public override bool SliderSetLimits(BulletConstraint pConstraint, int lowerUpper, int linAng, float val)
+    {
+        SliderConstraint constraint = (pConstraint as BulletConstraintXNA).constrain as SliderConstraint;
+		switch (lowerUpper)
+		{
+			case SLIDER_LOWER_LIMIT:
+				switch (linAng)
+				{
+					case SLIDER_LINEAR:
+						constraint.SetLowerLinLimit(val);
+						break;
+					case SLIDER_ANGULAR:
+						constraint.SetLowerAngLimit(val);
+						break;
+				}
+				break;
+			case SLIDER_UPPER_LIMIT:
+				switch (linAng)
+				{
+					case SLIDER_LINEAR:
+						constraint.SetUpperLinLimit(val);
+						break;
+					case SLIDER_ANGULAR:
+						constraint.SetUpperAngLimit(val);
+						break;
+				}
+				break;
+		}
+        return true;
+    }
+    public override bool SliderSet(BulletConstraint pConstraint, int softRestDamp, int dirLimOrtho, int linAng, float val)
+    {
+        SliderConstraint constraint = (pConstraint as BulletConstraintXNA).constrain as SliderConstraint;
+		switch (softRestDamp)
+		{
+			case SLIDER_SET_SOFTNESS:
+				switch (dirLimOrtho)
+				{
+					case SLIDER_SET_DIRECTION:
+						switch (linAng)
+						{
+							case SLIDER_LINEAR: constraint.SetSoftnessDirLin(val); break;
+							case SLIDER_ANGULAR: constraint.SetSoftnessDirAng(val); break;
+						}
+						break;
+					case SLIDER_SET_LIMIT:
+						switch (linAng)
+						{
+							case SLIDER_LINEAR: constraint.SetSoftnessLimLin(val); break;
+							case SLIDER_ANGULAR: constraint.SetSoftnessLimAng(val); break;
+						}
+						break;
+					case SLIDER_SET_ORTHO:
+						switch (linAng)
+						{
+							case SLIDER_LINEAR: constraint.SetSoftnessOrthoLin(val); break;
+							case SLIDER_ANGULAR: constraint.SetSoftnessOrthoAng(val); break;
+						}
+						break;
+				}
+				break;
+			case SLIDER_SET_RESTITUTION:
+				switch (dirLimOrtho)
+				{
+					case SLIDER_SET_DIRECTION:
+						switch (linAng)
+						{
+							case SLIDER_LINEAR: constraint.SetRestitutionDirLin(val); break;
+							case SLIDER_ANGULAR: constraint.SetRestitutionDirAng(val); break;
+						}
+						break;
+					case SLIDER_SET_LIMIT:
+						switch (linAng)
+						{
+							case SLIDER_LINEAR: constraint.SetRestitutionLimLin(val); break;
+							case SLIDER_ANGULAR: constraint.SetRestitutionLimAng(val); break;
+						}
+						break;
+					case SLIDER_SET_ORTHO:
+						switch (linAng)
+						{
+							case SLIDER_LINEAR: constraint.SetRestitutionOrthoLin(val); break;
+							case SLIDER_ANGULAR: constraint.SetRestitutionOrthoAng(val); break;
+						}
+						break;
+				}
+				break;
+			case SLIDER_SET_DAMPING:
+				switch (dirLimOrtho)
+				{
+					case SLIDER_SET_DIRECTION:
+						switch (linAng)
+						{
+							case SLIDER_LINEAR: constraint.SetDampingDirLin(val); break;
+							case SLIDER_ANGULAR: constraint.SetDampingDirAng(val); break;
+						}
+						break;
+					case SLIDER_SET_LIMIT:
+						switch (linAng)
+						{
+							case SLIDER_LINEAR: constraint.SetDampingLimLin(val); break;
+							case SLIDER_ANGULAR: constraint.SetDampingLimAng(val); break;
+						}
+						break;
+					case SLIDER_SET_ORTHO:
+						switch (linAng)
+						{
+							case SLIDER_LINEAR: constraint.SetDampingOrthoLin(val); break;
+							case SLIDER_ANGULAR: constraint.SetDampingOrthoAng(val); break;
+						}
+						break;
+				}
+				break;
+		}
+        return true;
+    }
+    public override bool SliderMotorEnable(BulletConstraint pConstraint, int linAng, float numericTrueFalse)
+    {
+        SliderConstraint constraint = (pConstraint as BulletConstraintXNA).constrain as SliderConstraint;
+		switch (linAng)
+		{
+			case SLIDER_LINEAR:
+				constraint.SetPoweredLinMotor(numericTrueFalse == 0.0 ? false : true);
+				break;
+			case SLIDER_ANGULAR:
+				constraint.SetPoweredAngMotor(numericTrueFalse == 0.0 ? false : true);
+				break;
+		}
+        return true;
+    }
+    public override bool SliderMotor(BulletConstraint pConstraint, int forceVel, int linAng, float val)
+    {
+        SliderConstraint constraint = (pConstraint as BulletConstraintXNA).constrain as SliderConstraint;
+		switch (forceVel)
+		{
+			case SLIDER_MOTOR_VELOCITY:
+				switch (linAng)
+				{
+					case SLIDER_LINEAR:
+						constraint.SetTargetLinMotorVelocity(val);
+						break;
+					case SLIDER_ANGULAR:
+						constraint.SetTargetAngMotorVelocity(val);
+						break;
+				}
+				break;
+			case SLIDER_MAX_MOTOR_FORCE:
+				switch (linAng)
+				{
+					case SLIDER_LINEAR:
+						constraint.SetMaxLinMotorForce(val);
+						break;
+					case SLIDER_ANGULAR:
+						constraint.SetMaxAngMotorForce(val);
+						break;
+				}
+				break;
+		}
+        return true;
+    }
         //BulletSimAPI.SetAngularDamping(Prim.PhysBody.ptr, angularDamping);
         public override void SetAngularDamping(BulletBody pBody, float angularDamping)
         {
@@ -1191,7 +1410,8 @@ namespace WhiteCore.Physics.BulletSPlugin
             /* TODO */
             ConfigurationParameters[] configparms = new ConfigurationParameters[1];
             configparms[0] = parms;
-            Vector3 worldExtent = new Vector3(Constants.RegionSize, Constants.RegionSize, Constants.RegionHeight);
+//            Vector3 worldExtent = new Vector3(Constants.RegionSize, Constants.RegionSize, Constants.RegionHeight);
+        Vector3 worldExtent = maxPosition;
             m_maxCollisions = maxCollisions;
             m_maxUpdatesPerFrame = maxUpdates;
             specialCollisionObjects = new Dictionary<uint, GhostObject>();
@@ -1324,6 +1544,51 @@ namespace WhiteCore.Physics.BulletSPlugin
             //BSParam.TerrainImplementation = 0;
             world.SetGravity(new IndexedVector3(0, 0, p.gravity));
 
+            /*not available??
+        // Turn off Pooling since globals and pooling are bad for threading.
+        BulletGlobals.VoronoiSimplexSolverPool.SetPoolingEnabled(false);
+        BulletGlobals.SubSimplexConvexCastPool.SetPoolingEnabled(false);
+        BulletGlobals.ManifoldPointPool.SetPoolingEnabled(false);
+        BulletGlobals.CastResultPool.SetPoolingEnabled(false);
+        BulletGlobals.SphereShapePool.SetPoolingEnabled(false);
+        BulletGlobals.DbvtNodePool.SetPoolingEnabled(false);
+        BulletGlobals.SingleRayCallbackPool.SetPoolingEnabled(false);
+        BulletGlobals.SubSimplexClosestResultPool.SetPoolingEnabled(false);
+        BulletGlobals.GjkPairDetectorPool.SetPoolingEnabled(false);
+        BulletGlobals.DbvtTreeColliderPool.SetPoolingEnabled(false);
+        BulletGlobals.SingleSweepCallbackPool.SetPoolingEnabled(false);
+        BulletGlobals.BroadphaseRayTesterPool.SetPoolingEnabled(false);
+        BulletGlobals.ClosestNotMeConvexResultCallbackPool.SetPoolingEnabled(false);
+        BulletGlobals.GjkEpaPenetrationDepthSolverPool.SetPoolingEnabled(false);
+        BulletGlobals.ContinuousConvexCollisionPool.SetPoolingEnabled(false);
+        BulletGlobals.DbvtStackDataBlockPool.SetPoolingEnabled(false);
+
+        BulletGlobals.BoxBoxCollisionAlgorithmPool.SetPoolingEnabled(false);
+        BulletGlobals.CompoundCollisionAlgorithmPool.SetPoolingEnabled(false);
+        BulletGlobals.ConvexConcaveCollisionAlgorithmPool.SetPoolingEnabled(false);
+        BulletGlobals.ConvexConvexAlgorithmPool.SetPoolingEnabled(false);
+        BulletGlobals.ConvexPlaneAlgorithmPool.SetPoolingEnabled(false);
+        BulletGlobals.SphereBoxCollisionAlgorithmPool.SetPoolingEnabled(false);
+        BulletGlobals.SphereSphereCollisionAlgorithmPool.SetPoolingEnabled(false);
+        BulletGlobals.SphereTriangleCollisionAlgorithmPool.SetPoolingEnabled(false);
+        BulletGlobals.GImpactCollisionAlgorithmPool.SetPoolingEnabled(false);
+        BulletGlobals.GjkEpaSolver2MinkowskiDiffPool.SetPoolingEnabled(false);
+        BulletGlobals.PersistentManifoldPool.SetPoolingEnabled(false);
+        BulletGlobals.ManifoldResultPool.SetPoolingEnabled(false);
+        BulletGlobals.GJKPool.SetPoolingEnabled(false);
+        BulletGlobals.GIM_ShapeRetrieverPool.SetPoolingEnabled(false);
+        BulletGlobals.TriangleShapePool.SetPoolingEnabled(false);
+        BulletGlobals.SphereTriangleDetectorPool.SetPoolingEnabled(false);
+        BulletGlobals.CompoundLeafCallbackPool.SetPoolingEnabled(false);
+        BulletGlobals.GjkConvexCastPool.SetPoolingEnabled(false);
+        BulletGlobals.LocalTriangleSphereCastCallbackPool.SetPoolingEnabled(false);
+        BulletGlobals.BridgeTriangleRaycastCallbackPool.SetPoolingEnabled(false);
+        BulletGlobals.BridgeTriangleConcaveRaycastCallbackPool.SetPoolingEnabled(false);
+        BulletGlobals.BridgeTriangleConvexcastCallbackPool.SetPoolingEnabled(false);
+        BulletGlobals.MyNodeOverlapCallbackPool.SetPoolingEnabled(false);
+        BulletGlobals.ClosestRayResultCallbackPool.SetPoolingEnabled(false);
+        BulletGlobals.DebugDrawcallbackPool.SetPoolingEnabled(false);
+*/
             return world;
         }
 
@@ -1593,7 +1858,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                     ret = BSPhysicsShapeType.SHAPE_UNKNOWN;
                     break;
                 case BroadphaseNativeTypes.CONVEX_TRIANGLEMESH_SHAPE_PROXYTYPE:
-                    ret = BSPhysicsShapeType.SHAPE_MESH;
+                    ret = BSPhysicsShapeType.SHAPE_CONVEXHULL;
                     break;
                 case BroadphaseNativeTypes.CONVEX_HULL_SHAPE_PROXYTYPE:
                     ret = BSPhysicsShapeType.SHAPE_HULL;
@@ -1621,7 +1886,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                     ret = BSPhysicsShapeType.SHAPE_CONE;
                     break;
                 case BroadphaseNativeTypes.CONVEX_SHAPE_PROXYTYPE:
-                    ret = BSPhysicsShapeType.SHAPE_UNKNOWN;
+                    ret = BSPhysicsShapeType.SHAPE_CONVEXHULL;
                     break;
                 case BroadphaseNativeTypes.CYLINDER_SHAPE_PROXYTYPE:
                     ret = BSPhysicsShapeType.SHAPE_CYLINDER;
@@ -1665,7 +1930,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                     break;
                 ///Used for GIMPACT Trimesh integration
                 case BroadphaseNativeTypes.GIMPACT_SHAPE_PROXYTYPE:
-                    ret = BSPhysicsShapeType.SHAPE_MESH;
+                    ret = BSPhysicsShapeType.SHAPE_GIMPACT;
                     break;
                 ///Multimaterial mesh
                 case BroadphaseNativeTypes.MULTIMATERIAL_TRIANGLE_MESH_PROXYTYPE:
@@ -1914,6 +2179,15 @@ namespace WhiteCore.Physics.BulletSPlugin
             return null;
         }
 
+    public override BulletShape BuildConvexHullShapeFromMesh(BulletWorld world, BulletShape meshShape)
+    {
+        /* TODO */ return null;
+    }
+
+    public override BulletShape CreateConvexHullShape(BulletWorld pWorld, int pIndicesCount, int[] indices, int pVerticesCount, float[] verticesAsFloats)
+    {
+        /* TODO */ return null;
+    }
         public override BulletShape CreateMeshShape(BulletWorld pWorld, int pIndicesCount, int[] indices,
             int pVerticesCount, float[] verticesAsFloats)
         {
@@ -1946,6 +2220,12 @@ namespace WhiteCore.Physics.BulletSPlugin
             // world.UpdateSingleAabb(meshShape);
             return new BulletShapeXNA(meshShape, BSPhysicsShapeType.SHAPE_MESH);
         }
+
+    public override BulletShape CreateGImpactShape(BulletWorld pWorld, int pIndicesCount, int[] indices, int pVerticesCount, float[] verticesAsFloats)
+    {
+        // TODO:
+        return null;
+    }
 
         public static void DumpRaw(ObjectArray<int> indices, ObjectArray<float> vertices, int pIndicesCount,
             int pVerticesCount)
@@ -2035,7 +2315,8 @@ namespace WhiteCore.Physics.BulletSPlugin
                 heightMap, scaleFactor,
                 minHeight, maxHeight, upAxis,
                 false);
-            terrainShape.SetMargin(collisionMargin + 0.5f);
+  //          terrainShape.SetMargin(collisionMargin + 0.5f);
+            terrainShape.SetMargin(collisionMargin);
             terrainShape.SetUseDiamondSubdivision(true);
             terrainShape.SetUserPointer(id);
             return new BulletShapeXNA(terrainShape, BSPhysicsShapeType.SHAPE_TERRAIN);

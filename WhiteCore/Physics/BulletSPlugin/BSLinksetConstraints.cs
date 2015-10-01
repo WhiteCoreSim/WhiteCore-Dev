@@ -25,7 +25,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using OpenMetaverse;
+using OMV = OpenMetaverse;
 
 namespace WhiteCore.Physics.BulletSPlugin
 {
@@ -177,10 +177,10 @@ namespace WhiteCore.Physics.BulletSPlugin
 
             // Relative position normalized to the root prim
             // Essentually a vector pointing from center of rootPrim to center of childPrim
-            Vector3 childRelativePosition = childPrim.Position - rootPrim.Position;
+            OMV.Vector3 childRelativePosition = childPrim.Position - rootPrim.Position;
 
             // real world coordinate of midpoint between the two objects
-            Vector3 midPoint = rootPrim.Position + (childRelativePosition / 2);
+            OMV.Vector3 midPoint = rootPrim.Position + (childRelativePosition / 2);
 
             DetailLog(
                 "{0},BSLinksetConstraint.BuildConstraint,taint,root={1},rBody={2},child={3},cBody={4},rLoc={5},cLoc={6},midLoc={7}",
@@ -225,8 +225,8 @@ namespace WhiteCore.Physics.BulletSPlugin
             PhysicsScene.Constraints.AddConstraint(constrain);
 
             // zero linear and angular limits makes the objects unable to move in relation to each other
-            constrain.SetLinearLimits(Vector3.Zero, Vector3.Zero);
-            constrain.SetAngularLimits(Vector3.Zero, Vector3.Zero);
+            constrain.SetLinearLimits(OMV.Vector3.Zero, OMV.Vector3.Zero);
+            constrain.SetAngularLimits(OMV.Vector3.Zero, OMV.Vector3.Zero);
 
             // tweek the constraint to increase stability
             constrain.UseFrameOffset(BSParam.LinkConstraintUseFrameOffset);
@@ -245,7 +245,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         // The root and child bodies are passed in because we need to remove the constraint between
         //      the bodies that were present at unlink time.
         // Called at taint time!
-        private bool PhysicallyUnlinkAChildFromRoot(BSPrimLinkable rootPrim, BSPrimLinkable childPrim)
+        bool PhysicallyUnlinkAChildFromRoot(BSPrimLinkable rootPrim, BSPrimLinkable childPrim)
         {
             bool ret = false;
             DetailLog(
@@ -268,7 +268,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         // Remove linkage between myself and any possible children I might have.
         // Returns 'true' of any constraints were destroyed.
         // Called at taint time!
-        private bool PhysicallyUnlinkAllChildrenFromRoot(BSPrimLinkable rootPrim)
+        bool PhysicallyUnlinkAllChildrenFromRoot(BSPrimLinkable rootPrim)
         {
             DetailLog("{0},BSLinksetConstraint.PhysicallyUnlinkAllChildren,taint", rootPrim.LocalID);
 
@@ -280,7 +280,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         // Called before the simulation step to make sure the constraint based linkset
         //    is all initialized.
         // Called at taint time!!
-        private void RecomputeLinksetConstraints()
+        void RecomputeLinksetConstraints()
         {
             float linksetMass = LinksetMass;
             LinksetRoot.UpdatePhysicalMassProperties(linksetMass, true);
