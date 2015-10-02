@@ -36,7 +36,7 @@ namespace WhiteCore.Framework.Utilities
 
         public enum Flavour
         {
-            Dev,
+            Development,
             Prerelease,
             RC1,
             RC2,
@@ -46,8 +46,8 @@ namespace WhiteCore.Framework.Utilities
 
         #endregion
 
-	public const string VERSION_NUMBER = "0.9.3";
-	public const Flavour VERSION_FLAVOUR = Flavour.Release;
+        public const string VERSION_NUMBER = "0.9.4";
+        public const Flavour VERSION_FLAVOUR = Flavour.Development;
         public const string VERSION_NAME = "WhiteCore";
 
         public static string Version
@@ -58,12 +58,12 @@ namespace WhiteCore.Framework.Utilities
         public static string GetVersionString(string versionNumber, Flavour flavour)
         {
             string versionString = VERSION_NAME + " " + versionNumber + " " + flavour;
-            
+
             // Check if there's a custom .version file with the commit hash in it
             // Else return the standard versionString.
-            
+
             string gitCommitFileName = ".version";
-            
+
             if (File.Exists(gitCommitFileName))
             {
                 StreamReader CommitFile = File.OpenText(gitCommitFileName);
