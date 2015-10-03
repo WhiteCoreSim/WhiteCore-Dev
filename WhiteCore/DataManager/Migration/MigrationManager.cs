@@ -80,7 +80,8 @@ namespace WhiteCore.DataManager.Migration
             //if there is no WhiteCore version, this is likely an entirely new installation
             if (currentVersion == null)
             {
-                Migrator defaultMigrator = GetHighestVersionMigratorThatCanProvideDefaultSetup();
+            	MainConsole.Instance.InfoFormat("[Migrator] Clean installation for {0} found", migratorName);
+            	Migrator defaultMigrator = GetHighestVersionMigratorThatCanProvideDefaultSetup();
                 currentVersion = defaultMigrator.Version;
                 Migrator startMigrator = GetMigratorAfterVersion(defaultMigrator.Version);
                 var latestMigrator = GetLatestVersionMigrator();
@@ -97,6 +98,7 @@ namespace WhiteCore.DataManager.Migration
                 if (startMigrator != null)
                 {
                     Migrator targetMigrator = GetLatestVersionMigrator();
+                    MainConsole.Instance.InfoFormat("[Migrator] New migration script for {0} found", migratorName);
                     operationDescription = new MigrationOperationDescription(MigrationOperationTypes.UpgradeToTarget,
                                                                              currentVersion, startMigrator.Version,
                                                                              targetMigrator.Version);
