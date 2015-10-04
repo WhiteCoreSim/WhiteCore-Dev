@@ -25,22 +25,27 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.Physics;
-using WhiteCore.Framework.Utilities;
 using System;
 using System.Collections.Generic;
+using WhiteCore.Framework.Physics;
+using WhiteCore.Framework.Utilities;
 using OMV = OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public class BSActorAvatarMove : BSActor
     {
-        private BSVMotor m_velocityMotor;
+        BSVMotor m_velocityMotor;
 
-        private int m_walkingUpStairs;
-        private float m_lastStepUp;
-        private int m_jumpframes = 0;
-        private float m_jumpVelocity = 0f;
+        // Set to true if we think we're going up stairs.
+        //    This state is remembered because collisions will turn on and off as we go up stairs.
+        int m_walkingUpStairs;
+        // The amount the step up is applying. Used to smooth stair walking.
+        float m_lastStepUp;
+        // Jumping happens over several frames. If use applies up force while colliding, start the
+        //    jump and allow the jump to continue for this number of frames.
+        int m_jumpFrames = 0;
+        float m_jumpVelocity = 0f;
 
         public BSActorAvatarMove(BSScene physicsScene, BSPhysObject pObj, string actorName)
             : base(physicsScene, pObj, actorName)
@@ -62,6 +67,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         {
             Enabled = false;
             Refresh();
+        DeactivateAvatarMove();   //?? OS
+
         }
 
         // Called when physical parameters (properties set in Bullet) need to be re-applied.
@@ -91,9 +98,9 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             // Nothing to do for the hoverer since it is all software at pre-step action time.
         }
 
-        private bool m_disallowTargetVelocitySet, m_jumpFallState;
-        private int m_preJumpStart, m_jumpStart;
-        private OMV.Vector3 m_jumpDirection = OMV.Vector3.Zero;
+        bool m_disallowTargetVelocitySet, m_jumpFallState;
+        int m_preJumpStart, m_jumpStart;
+        OMV.Vector3 m_jumpDirection = OMV.Vector3.Zero;
 
         // Usually called when target velocity changes to set the current velocity and the target
         //     into the movement motor.
@@ -131,7 +138,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             SetVelocityAndTargetInternal(vel, targ, inTaintTime, targetValueDecayTimeScale);
         }
 
-        private void SetVelocityAndTargetInternal(OMV.Vector3 vel, OMV.Vector3 targ, bool inTaintTime,
+        void SetVelocityAndTargetInternal(OMV.Vector3 vel, OMV.Vector3 targ, bool inTaintTime,
             int targetValueDecayTimeScale)
         {
             m_physicsScene.TaintedObject(inTaintTime, "BSActorAvatarMove.setVelocityAndTarget", delegate()
@@ -148,7 +155,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // If a hover motor has not been created, create one and start the hovering.
-        private void ActivateAvatarMove()
+        void ActivateAvatarMove()
         {
             if (m_velocityMotor == null)
             {
@@ -158,29 +165,30 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                     BSMotor.Infinite, // decay time scale
                     1f // efficiency
                     );
-                // BSParam.AvatarStopZeroThreshold not included in BulletSim 2.80 :(
+                m_velocityMotor.ErrorZeroThreshold = BSParam.AvatarStopZeroThreshold;
 
                 // _velocityMotor.PhysicsScene = PhysicsScene; // DEBUG DEBUG so motor will output detail log messages.
                 SetVelocityAndTarget(m_controllingPrim.RawVelocity, m_controllingPrim.TargetVelocity, true
                     /* inTaintTime */, 0);
 
                 m_physicsScene.BeforeStep += Mover;
-                // Process_OnPreUpdateProperty not included in BulletSim 2.80 :(
+                m_controllingPrim.OnPreUpdateProperty += Process_OnPreUpdateProperty;
                 m_walkingUpStairs = 0;
             }
         }
 
-        private void DeactivateAvatarMove()
+        void DeactivateAvatarMove()
         {
             if (m_velocityMotor != null)
             {
+                m_controllingPrim.OnPreUpdateProperty -= Process_OnPreUpdateProperty;
                 m_physicsScene.BeforeStep -= Mover;
                 m_velocityMotor = null;
             }
         }
 
         // Called just before the simulation step. Update the vertical position for hoverness.
-        private void Mover(float timeStep)
+        void Mover(float timeStep)
         {
             // Don't do movement while the object is selected.
             if (!isActive)
@@ -215,28 +223,37 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 {
                     // If we are colliding with a stationary object, presume we're standing and don't move around
                     if (!m_controllingPrim.ColliderIsMoving && !m_controllingPrim.VolumeDetect)
+                    // new  //if (!m_controllingPrim.ColliderIsMoving && !m_controllingPrim.ColliderIsVolumeDetect)
                     {
-                        m_physicsScene.DetailLog("{0},BSCharacter.MoveMotor,collidingWithStationary,zeroingMotor",
+                        m_physicsScene.DetailLog ("{0},BSCharacter.MoveMotor,collidingWithStationary,zeroingMotion",
                             m_controllingPrim.LocalID);
                         m_controllingPrim.IsStationary = true;
-                        m_controllingPrim.ZeroMotion(true /* inTaintTime */);
+                        m_controllingPrim.ZeroMotion (true /* inTaintTime */);
                     }
 
                     // Standing has more friction on the ground
                     if (m_controllingPrim.Friction != BSParam.AvatarStandingFriction)
                     {
                         m_controllingPrim.Friction = BSParam.AvatarStandingFriction;
-                        m_physicsScene.PE.SetFriction(m_controllingPrim.PhysBody, m_controllingPrim.Friction);
+                        m_physicsScene.PE.SetFriction (m_controllingPrim.PhysBody, m_controllingPrim.Friction);
                     }
-                }
-                else
+                } else
                 {
                     if (m_controllingPrim.Flying)
                     {
-                        // Flying and not collising and velocity nearly zero.
-                        m_controllingPrim.ZeroMotion(true /* inTaintTime */);
+                        // Flying and not colliding and velocity nearly zero.
+                        m_controllingPrim.ZeroMotion (true /* inTaintTime */);
+                    } else
+                    {
+                        //We are falling but are not touching any keys make sure not falling too fast
+                        if (m_controllingPrim.RawVelocity.Z < BSParam.AvatarTerminalVelocity)
+                        {
+                            OMV.Vector3 slowingForce = new OMV.Vector3 (0f, 0f, BSParam.AvatarTerminalVelocity - m_controllingPrim.RawVelocity.Z) * m_controllingPrim.Mass;
+                            m_physicsScene.PE.ApplyCentralImpulse (m_controllingPrim.PhysBody, slowingForce);
+                        }
                     }
                 }
+            
 
                 m_physicsScene.DetailLog("{0},BSCharacter.MoveMotor,taint,stopping,target={1},colliding={2}",
                     m_controllingPrim.LocalID, m_velocityMotor.TargetValue, m_controllingPrim.IsColliding);
@@ -259,8 +276,59 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 {
                     if (m_controllingPrim.RawVelocity.Z < 0)
                         stepVelocity.Z = m_controllingPrim.RawVelocity.Z;
-                    // DetailLog("{0},BSCharacter.MoveMotor,taint,overrideStepZWithWorldZ,stepVel={1}", LocalID, stepVelocity);
-                    // no BSParam.AvatarJumpFrames supported in this Version :(
+                }
+
+                // Colliding and not flying with an upward force. The avatar must be trying to jump.
+                if (!m_controllingPrim.Flying && m_controllingPrim.IsColliding && stepVelocity.Z > 0)
+                {
+                    // We allow the upward force to happen for this many frames.
+                    m_jumpFrames = BSParam.AvatarJumpFrames;
+                    m_jumpVelocity = stepVelocity.Z;
+                }
+
+                // The case where the avatar is not colliding and is not flying is special.
+                // The avatar is either falling or jumping and the user can be applying force to the avatar
+                //     (force in some direction or force up or down).
+                // If the avatar has negative Z velocity and is not colliding, presume we're falling and keep the velocity.
+                // If the user is trying to apply upward force but we're not colliding, assume the avatar
+                //     is trying to jump and don't apply the upward force if not touching the ground any more.
+                if (!m_controllingPrim.Flying && !m_controllingPrim.IsColliding)
+                {
+                    // If upward velocity is being applied, this must be a jump and only allow that to go on so long
+                    if (m_jumpFrames > 0)
+                    {
+                        // Since not touching the ground, only apply upward force for so long.
+                        m_jumpFrames--;
+                        stepVelocity.Z = m_jumpVelocity;
+                    }
+                    else
+                    {
+                        
+                        // Since we're not affected by anything, the avatar must be falling and we do not want that to be too fast.
+                        if (m_controllingPrim.RawVelocity.Z < BSParam.AvatarTerminalVelocity)
+                        {
+                            
+                            stepVelocity.Z = BSParam.AvatarTerminalVelocity;
+                        }
+                        else
+                        {
+                            stepVelocity.Z = m_controllingPrim.RawVelocity.Z;
+                        }
+                    }
+                        // DetailLog("{0},BSCharacter.MoveMotor,taint,overrideStepZWithWorldZ,stepVel={1}", LocalID, stepVelocity);
+                }
+
+                //Alicia: Maintain minimum height when flying.
+                // SL has a flying effect that keeps the avatar flying above the ground by some margin
+                if (m_controllingPrim.Flying)
+                {
+                    float hover_height = m_physicsScene.TerrainManager.GetTerrainHeightAtXYZ(m_controllingPrim.RawPosition)
+                                                            + BSParam.AvatarFlyingGroundMargin;
+
+                    if( m_controllingPrim.Position.Z < hover_height)
+                    {
+                        stepVelocity.Z += BSParam.AvatarFlyingGroundUpForce;
+                    }
                 }
 
                 // 'stepVelocity' is now the speed we'd like the avatar to move in. Turn that into an instantanous force.
@@ -274,8 +342,10 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 m_physicsScene.DetailLog("{0},BSCharacter.MoveMotor,move,stepVel={1},vel={2},mass={3},moveForce={4}",
                     m_controllingPrim.LocalID, stepVelocity, m_controllingPrim.RawVelocity, m_controllingPrim.Mass,
                     moveForce);
-                m_physicsScene.PE.ApplyCentralImpulse(m_controllingPrim.PhysBody, moveForce);
+                if(moveForce.IsFinite())
+                     m_physicsScene.PE.ApplyCentralImpulse(m_controllingPrim.PhysBody, moveForce);
             }
+
 
             if (m_preJumpStart != 0 && Util.EnvironmentTickCountSubtract(m_preJumpStart) > 300)
             {
@@ -314,9 +384,25 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
+  
+
+        // Called just as the property update is received from the physics engine.
+        // Do any mode necessary for avatar movement.
+        void Process_OnPreUpdateProperty(ref EntityProperties entprop)
+        {
+            // Don't change position if standing on a stationary object.
+            if (m_controllingPrim.IsStationary)
+            {
+                entprop.Position = m_controllingPrim.RawPosition;
+                entprop.Velocity = OMV.Vector3.Zero;
+                m_physicsScene.PE.SetTranslation(m_controllingPrim.PhysBody, entprop.Position, entprop.Rotation);
+            }
+
+        }
+
         // Decide if the character is colliding with a low object and compute a force to pop the
         //    avatar up so it can walk up and over the low objects.
-        private OMV.Vector3 WalkUpStairs()
+        OMV.Vector3 WalkUpStairs()
         {
             OMV.Vector3 ret = OMV.Vector3.Zero;
 
@@ -329,14 +415,15 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 m_controllingPrim.Size.Z);
 
             // Check for stairs climbing if colliding, not flying and moving forward
-            if (m_controllingPrim.IsColliding && !m_controllingPrim.Flying &&
-                m_controllingPrim.TargetVelocitySpeed > 0.1f)
+            if (m_controllingPrim.IsColliding 
+                && !m_controllingPrim.Flying
+                &&  m_controllingPrim.TargetVelocitySpeed > 0.1f)
             {
                 // The range near the character's feet where we will consider stairs
                 // float nearFeetHeightMin = m_controllingPrim.RawPosition.Z - (m_controllingPrim.Size.Z / 2f) + 0.05f
                 // Note: ther is a problem with the computation of the capsule height. Thus RawPosition is off
                 //       from the height. Revisit size and this computation when height is scaled properly.
-                float nearFeetHeightMin = m_controllingPrim.RawPosition.Z - (m_controllingPrim.Size.Z / 2f) - 0.05f;
+                float nearFeetHeightMin = m_controllingPrim.RawPosition.Z - (m_controllingPrim.Size.Z / 2f) - BSParam.AvatarStepGroundFudge;
                 float nearFeetHeightMax = nearFeetHeightMin + BSParam.AvatarStepHeight;
 
                 // look for a collision point that is near the character's feet and is oriented the same as the character is.
@@ -360,21 +447,86 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                             //    thus the difference between our facing orientation and the normal should be small.
                             OMV.Vector3 directionFacing = OMV.Vector3.UnitX * m_controllingPrim.RawOrientation;
                             OMV.Vector3 touchNormal = OMV.Vector3.Normalize(kvp.Value.SurfaceNormal);
-                            float diff = Math.Abs(OMV.Vector3.Distance(directionFacing, touchNormal));
-                            if (diff < BSParam.AvatarStepApproachFactor)
+                            const float PIOver2 = 1.571f; // Used to make unit vector axis into approx radian angles
+                            // m_physicsScene.DetailLog("{0},BSCharacter.WalkUpStairs,avNormal={1},colNormal={2},diff={3}",
+                            //             m_controllingPrim.LocalID, directionFacing, touchNormal,
+                            //             Math.Abs(OMV.Vector3.Distance(directionFacing, touchNormal)) );
+                            if ((Math.Abs(directionFacing.Z) * PIOver2) < BSParam.AvatarStepAngle
+                                && (Math.Abs(touchNormal.Z) * PIOver2) < BSParam.AvatarStepAngle)
                             {
-                                // Found the stairs contact point. Push up a little to raise the character.
-                                float upForce = (touchPosition.Z - nearFeetHeightMin) * m_controllingPrim.Mass *
-                                                BSParam.AvatarStepForceFactor;
-                                ret = new OMV.Vector3(0f, 0f, upForce);
-
-                                // Also move the avatar up for the new height
-                                OMV.Vector3 displacement = new OMV.Vector3(0f, 0f, BSParam.AvatarStepHeight / 2f);
-                                m_controllingPrim.ForcePosition = m_controllingPrim.RawPosition + displacement;
+                                // The normal should be our contact point to the object so it is pointing away
+                                //    thus the difference between our facing orientation and the normal should be small.
+                                float diff = Math.Abs(OMV.Vector3.Distance(directionFacing, touchNormal));
+                                if (diff < BSParam.AvatarStepApproachFactor)
+                                {
+                                    if (highestTouchPosition.Z < touchPosition.Z)
+                                        highestTouchPosition = touchPosition;
+                                }
                             }
                         }
                     }
                 }
+        
+
+                m_walkingUpStairs = 0;
+                // If there is a good step sensing, move the avatar over the step.
+                if (highestTouchPosition != OMV.Vector3.Zero)
+                {
+                    // Remember that we are going up stairs. This is needed because collisions
+                    //    will stop when we move up so this smoothes out that effect.
+                    m_walkingUpStairs = BSParam.AvatarStepSmoothingSteps;
+
+                    m_lastStepUp = highestTouchPosition.Z - nearFeetHeightMin;
+                    ret = ComputeStairCorrection(m_lastStepUp);
+                    m_physicsScene.DetailLog("{0},BSCharacter.WalkUpStairs,touchPos={1},nearFeetMin={2},ret={3}",
+                            m_controllingPrim.LocalID, highestTouchPosition, nearFeetHeightMin, ret);
+                }
+            } else
+            {
+                // If we used to be going up stairs but are not now, smooth the case where collision goes away while
+                //    we are bouncing up the stairs.
+                if (m_walkingUpStairs > 0)
+                {
+                    m_walkingUpStairs--;
+                    ret = ComputeStairCorrection(m_lastStepUp);
+                }
+            }
+
+            return ret;
+        }
+
+        OMV.Vector3 ComputeStairCorrection(float stepUp)
+        {
+            OMV.Vector3 ret = OMV.Vector3.Zero;
+            OMV.Vector3 displacement = OMV.Vector3.Zero;
+
+            if (stepUp > 0f)
+            {
+                // Found the stairs contact point. Push up a little to raise the character.
+                if (BSParam.AvatarStepForceFactor > 0f)
+                {
+                    float upForce = stepUp * m_controllingPrim.Mass * BSParam.AvatarStepForceFactor;
+                    ret = new OMV.Vector3(0f, 0f, upForce);
+                }
+
+                // Also move the avatar up for the new height
+                if (BSParam.AvatarStepUpCorrectionFactor > 0f)
+                {
+                    // Move the avatar up related to the height of the collision
+                    displacement = new OMV.Vector3(0f, 0f, stepUp * BSParam.AvatarStepUpCorrectionFactor);
+                    m_controllingPrim.ForcePosition = m_controllingPrim.RawPosition + displacement;
+                } else
+                {
+                    if (BSParam.AvatarStepUpCorrectionFactor < 0f)
+                    {
+                        // Move the avatar up about the specified step height
+                        displacement = new OMV.Vector3(0f, 0f, BSParam.AvatarStepHeight);
+                        m_controllingPrim.ForcePosition = m_controllingPrim.RawPosition + displacement;
+                    }
+                }
+                m_physicsScene.DetailLog("{0},BSCharacter.WalkUpStairs.ComputeStairCorrection,stepUp={1},isp={2},force={3}",
+                                            m_controllingPrim.LocalID, stepUp, displacement, ret);
+
             }
 
             return ret;

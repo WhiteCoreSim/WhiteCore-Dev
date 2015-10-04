@@ -28,12 +28,12 @@
 using System;
 using System.Collections.Generic;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public class BSActorCollection
     {
-        private BSScene m_physicsScene { get; set; }
-        private Dictionary<string, BSActor> m_actors;
+        BSScene m_physicsScene { get; set; }
+        Dictionary<string, BSActor> m_actors;
 
         public BSActorCollection(BSScene physicsScene)
         {

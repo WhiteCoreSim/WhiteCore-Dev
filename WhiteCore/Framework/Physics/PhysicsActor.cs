@@ -27,9 +27,9 @@
 
 using System;
 using System.Collections.Generic;
+using OpenMetaverse;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.SceneInfo.Entities;
-using OpenMetaverse;
 
 namespace WhiteCore.Framework.Physics
 {
@@ -54,7 +54,7 @@ namespace WhiteCore.Framework.Physics
         // Raising the event on the object, so don't need to provide location..  further up the tree knows that info.
 
         public bool Cleared;
-        private Dictionary<uint, ContactPoint> m_objCollisionList = new Dictionary<uint, ContactPoint>();
+        Dictionary<uint, ContactPoint> m_objCollisionList = new Dictionary<uint, ContactPoint>();
 
         public CollisionEventUpdate()
         {

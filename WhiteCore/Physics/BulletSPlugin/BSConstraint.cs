@@ -28,11 +28,11 @@
 using System;
 using OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public abstract class BSConstraint : IDisposable
     {
-        private static string LogHeader = "[BULLETSIM CONSTRAINT]";
+        static string LogHeader = "[BULLETSIM CONSTRAINT]";
 
         protected BulletWorld m_world;
         protected BSScene PhysicsScene;

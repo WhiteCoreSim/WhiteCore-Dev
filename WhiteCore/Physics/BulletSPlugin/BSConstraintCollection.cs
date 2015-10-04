@@ -28,14 +28,14 @@
 using System;
 using System.Collections.Generic;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public sealed class BSConstraintCollection : IDisposable
     {
         private delegate bool ConstraintAction(BSConstraint constrain);
 
-        private List<BSConstraint> m_constraints;
-        private BulletWorld m_world;
+        List<BSConstraint> m_constraints;
+        BulletWorld m_world;
 
         public BSConstraintCollection(BulletWorld world)
         {
@@ -46,7 +46,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         public void Dispose()
         {
-            this.Clear();
+            Clear();
         }
 
         public void Clear()

@@ -26,12 +26,12 @@
  */
 
 using System;
-using OMV = OpenMetaverse;
 using WhiteCore.Framework.Physics;
-using WhiteCore.Framework.Utilities;
 using WhiteCore.Framework.SceneInfo;
+using WhiteCore.Framework.Utilities;
+using OMV = OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     /*
      * Class to wrap all objects.
@@ -85,7 +85,6 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             // Initialize variables kept in base.
             GravityMultiplier = 1.0f;
             Gravity = new OMV.Vector3(0f, 0f, BSParam.Gravity);
-            //HoverActive = false;
 
             // We don't have any physical representation yet.
             PhysBody = new BulletBody(localID);
@@ -147,11 +146,17 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         {
             Unknown,
             Waiting,
-            Failed,
+            FailedAssetFetch,
+            FailedMeshing,
             Fetched
         }
 
         public PrimAssetCondition PrimAssetState { get; set; }
+        public virtual bool AssetFailed()
+        {
+            return ( (this.PrimAssetState == PrimAssetCondition.FailedAssetFetch)
+                  || (this.PrimAssetState == PrimAssetCondition.FailedMeshing) );
+        }
 
         // The objects base shape information. Null if not a prim type shape.
         public PrimitiveBaseShape BaseShape { get; protected set; }

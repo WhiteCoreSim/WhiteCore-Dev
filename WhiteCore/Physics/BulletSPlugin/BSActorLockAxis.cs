@@ -28,11 +28,11 @@
 using System;
 using OMV = OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public class BSActorLockAxis : BSActor
     {
-        private BSConstraint LockAxisConstraint = null;
+        BSConstraint LockAxisConstraint = null;
 
         public BSActorLockAxis(BSScene physicsScene, BSPhysObject pObj, string actorName)
             : base(physicsScene, pObj, actorName)
@@ -93,7 +93,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
-        private void AddAxisLockConstraint()
+        void AddAxisLockConstraint()
         {
             if (LockAxisConstraint == null)
             {
@@ -154,7 +154,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
-        private void RemoveAxisLockConstraint()
+        void RemoveAxisLockConstraint()
         {
             if (LockAxisConstraint != null)
             {

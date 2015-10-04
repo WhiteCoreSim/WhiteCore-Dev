@@ -27,7 +27,7 @@
 
 using OMV = OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public sealed class BSLinksetConstraints : BSLinkset
     {
@@ -164,13 +164,13 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         // Create a constraint between me (root of linkset) and the passed prim (the child).
         // Called at taint time!
-        private void PhysicallyLinkAChildToRoot(BSPrimLinkable rootPrim, BSPrimLinkable childPrim)
+        void PhysicallyLinkAChildToRoot(BSPrimLinkable rootPrim, BSPrimLinkable childPrim)
         {
             // Don't build the constraint when asked. Put it off until just before the simulation step.
             Refresh(rootPrim);
         }
 
-        private BSConstraint BuildConstraint(BSPrimLinkable rootPrim, BSPrimLinkable childPrim)
+        BSConstraint BuildConstraint(BSPrimLinkable rootPrim, BSPrimLinkable childPrim)
         {
             // Zero motion for children so they don't interpolate
             childPrim.ZeroMotion(true);
@@ -245,7 +245,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // The root and child bodies are passed in because we need to remove the constraint between
         //      the bodies that were present at unlink time.
         // Called at taint time!
-        private bool PhysicallyUnlinkAChildFromRoot(BSPrimLinkable rootPrim, BSPrimLinkable childPrim)
+        bool PhysicallyUnlinkAChildFromRoot(BSPrimLinkable rootPrim, BSPrimLinkable childPrim)
         {
             bool ret = false;
             DetailLog(
@@ -268,7 +268,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // Remove linkage between myself and any possible children I might have.
         // Returns 'true' of any constraints were destroyed.
         // Called at taint time!
-        private bool PhysicallyUnlinkAllChildrenFromRoot(BSPrimLinkable rootPrim)
+        bool PhysicallyUnlinkAllChildrenFromRoot(BSPrimLinkable rootPrim)
         {
             DetailLog("{0},BSLinksetConstraint.PhysicallyUnlinkAllChildren,taint", rootPrim.LocalID);
 
@@ -280,7 +280,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // Called before the simulation step to make sure the constraint based linkset
         //    is all initialized.
         // Called at taint time!!
-        private void RecomputeLinksetConstraints()
+        void RecomputeLinksetConstraints()
         {
             float linksetMass = LinksetMass;
             LinksetRoot.UpdatePhysicalMassProperties(linksetMass, true);
