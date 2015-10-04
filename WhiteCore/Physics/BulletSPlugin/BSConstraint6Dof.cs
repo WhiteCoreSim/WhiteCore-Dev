@@ -29,7 +29,7 @@ using OpenMetaverse;
 
 namespace WhiteCore.Physics.BulletSPlugin
 {
-    public sealed class BSConstraint6Dof : BSConstraint
+    public class BSConstraint6Dof : BSConstraint
     {
         static string LogHeader = "[BULLETSIM 6DOF CONSTRAINT]";
 
@@ -37,12 +37,13 @@ namespace WhiteCore.Physics.BulletSPlugin
         {
             get { return ConstraintType.D6_CONSTRAINT_TYPE; }
         }
-    public BSConstraint6Dof(BulletWorld world, BulletBody obj1, BulletBody obj2) :base(world)
-    {
-        m_body1 = obj1;
-        m_body2 = obj2;
-        m_enabled = false;
-    }
+
+        public BSConstraint6Dof(BulletWorld world, BulletBody obj1, BulletBody obj2) :base(world)
+        {
+            m_body1 = obj1;
+            m_body2 = obj2;
+            m_enabled = false;
+        }
 
         // Create a btGeneric6DofConstraint
         public BSConstraint6Dof(BulletWorld world, BulletBody obj1, BulletBody obj2,

@@ -104,7 +104,10 @@ namespace WhiteCore.Physics.BulletSPlugin
                 */
 
                 m_targetMotor = new BSVMotor("BSActorMoveToTarget-" + m_controllingPrim.LocalID,
-                    m_controllingPrim.MoveToTargetTau, BSMotor.Infinite, 1f);
+                    m_controllingPrim.MoveToTargetTau,       // timeScale
+                    BSMotor.Infinite,                        // decay time scale
+                    1f                                       // efficiency
+                );
                 m_targetMotor.PhysicsScene = m_physicsScene; // DEBUG DEBUG so motor will output detail log messages.
                 m_targetMotor.SetTarget(m_controllingPrim.MoveToTargetTarget);
                 m_targetMotor.SetCurrent(m_controllingPrim.RawPosition);
@@ -131,9 +134,9 @@ namespace WhiteCore.Physics.BulletSPlugin
             }
         }
 
-    // Origional mover that set the objects position to move to the target.
-    // The problem was that gravity would keep trying to push the object down so
-    //    the overall downward velocity would increase to infinity.
+        // Origional mover that set the objects position to move to the target.
+        // The problem was that gravity would keep trying to push the object down so
+        //    the overall downward velocity would increase to infinity.
         // Called just before the simulation step. Update the vertical position for hoverness.
         void Mover(float timeStep)
         {
@@ -164,6 +167,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             }
             m_physicsScene.DetailLog("{0},BSPrim.PIDTarget,move,fromPos={1},movePos={2}", m_controllingPrim.LocalID, origPosition, movePosition);
         }
+
         // Version of mover that applies forces to move the physical object to the target.
         // Also overcomes gravity so the object doesn't just drop to the ground.
         // Called just before the simulation step.

@@ -152,11 +152,11 @@ namespace WhiteCore.Physics.BulletSPlugin
         }
 
         public PrimAssetCondition PrimAssetState { get; set; }
-    public virtual bool AssetFailed()
-    {
-        return ( (this.PrimAssetState == PrimAssetCondition.FailedAssetFetch)
-              || (this.PrimAssetState == PrimAssetCondition.FailedMeshing) );
-    }
+        public virtual bool AssetFailed()
+        {
+            return ( (this.PrimAssetState == PrimAssetCondition.FailedAssetFetch)
+                  || (this.PrimAssetState == PrimAssetCondition.FailedMeshing) );
+        }
 
         // The objects base shape information. Null if not a prim type shape.
         public PrimitiveBaseShape BaseShape { get; protected set; }

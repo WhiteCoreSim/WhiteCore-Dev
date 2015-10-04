@@ -223,7 +223,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 {
                     // If we are colliding with a stationary object, presume we're standing and don't move around
                     if (!m_controllingPrim.ColliderIsMoving && !m_controllingPrim.VolumeDetect)
-                    // newif (!m_controllingPrim.ColliderIsMoving && !m_controllingPrim.ColliderIsVolumeDetect)
+                    // new  //if (!m_controllingPrim.ColliderIsMoving && !m_controllingPrim.ColliderIsVolumeDetect)
                     {
                         m_physicsScene.DetailLog ("{0},BSCharacter.MoveMotor,collidingWithStationary,zeroingMotion",
                             m_controllingPrim.LocalID);
@@ -423,7 +423,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 // float nearFeetHeightMin = m_controllingPrim.RawPosition.Z - (m_controllingPrim.Size.Z / 2f) + 0.05f
                 // Note: ther is a problem with the computation of the capsule height. Thus RawPosition is off
                 //       from the height. Revisit size and this computation when height is scaled properly.
-                float nearFeetHeightMin = m_controllingPrim.RawPosition.Z - (m_controllingPrim.Size.Z / 2f) - 0.05f;
+                float nearFeetHeightMin = m_controllingPrim.RawPosition.Z - (m_controllingPrim.Size.Z / 2f) - BSParam.AvatarStepGroundFudge;
                 float nearFeetHeightMax = nearFeetHeightMin + BSParam.AvatarStepHeight;
 
                 // look for a collision point that is near the character's feet and is oriented the same as the character is.

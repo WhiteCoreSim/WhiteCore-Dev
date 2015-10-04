@@ -123,10 +123,6 @@ namespace WhiteCore.Physics.BulletSPlugin
         static readonly float PIOverTwo = ((float)Math.PI) / 2f;
 #pragma warning restore 414
 
-        // For debugging, flags to turn on and off individual corrections.
-        public bool enableAngularVerticalAttraction;
-        public bool enableAngularDeflection;
-        public bool enableAngularBanking;
 
         public BSDynamics(BSScene myScene, BSPrim myPrim, string actorName)
             : base(myScene, myPrim, actorName)
@@ -134,11 +130,16 @@ namespace WhiteCore.Physics.BulletSPlugin
             ControllingPrim = myPrim; // as BSPrimLinkable;;
             Type = Vehicle.TYPE_NONE;
             m_haveRegisteredForSceneEvents = false;
-            SetupVehicleDebugging();
+            // SetupVehicleDebugging();
         }
 
+/*  using params fro BSParams now -gerythane-
         // Stopgap debugging enablement. Allows source level debugging but still checking
         //    in changes by making enablement of debugging flags from INI file.
+        // For debugging, flags to turn on and off individual corrections.
+        public bool enableAngularVerticalAttraction;
+        public bool enableAngularDeflection;
+        public bool enableAngularBanking;
         public void SetupVehicleDebugging()
         {
             enableAngularVerticalAttraction = true;
@@ -151,6 +152,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 enableAngularBanking = false;
             }
         }
+*/
 
         // Return 'true' if this vehicle is doing vehicle things
         public bool IsActive
@@ -260,93 +262,8 @@ namespace WhiteCore.Physics.BulletSPlugin
                     break;
             }
         } //end ProcessFloatVehicleParam
-        /* not sure why we have two...??
-        internal void ProcessVectorVehicleParam(Vehicle pParam, float pValue)
-        {
-            VDetailLog("{0},ProcessVectorVehicleParam,param={1},val={2}", ControllingPrim.LocalID, pParam, pValue);
-            switch (pParam)
-            {
-                case Vehicle.ANGULAR_DEFLECTION_EFFICIENCY:
-                    m_angularDeflectionEfficiency = ClampInRange(0f, pValue, 1f);
-                    break;
-                case Vehicle.ANGULAR_DEFLECTION_TIMESCALE:
-                    m_angularDeflectionTimescale = Math.Max(pValue, 0.01f);
-                    break;
-                case Vehicle.ANGULAR_MOTOR_DECAY_TIMESCALE:
-                    m_angularMotorDecayTimescale =
-                        ClampInRange(0.01f, pValue, 120);
-                    m_angularMotor.TargetValueDecayTimeScale = m_angularMotorDecayTimescale;
-                    break;
-                case Vehicle.ANGULAR_MOTOR_TIMESCALE:
-                    m_angularMotorTimescale = Math.Max(pValue, 0.01f);
-                    m_angularMotor.TimeScale = m_angularMotorTimescale;
-                    break;
-                case Vehicle.BANKING_MIX:
-                    m_bankingMix = Math.Max(pValue, 0.01f);
-                    break;
-                case Vehicle.BANKING_TIMESCALE:
-                    m_bankingTimescale = Math.Max(pValue, 0.01f);
-                    break;
-                case Vehicle.BUOYANCY:
-                    m_VehicleBuoyancy = ClampInRange(-1f, pValue, 1f);
-                    m_VehicleGravity = ControllingPrim.ComputeGravity(m_VehicleBuoyancy);
-                    break;
-                case Vehicle.HOVER_EFFICIENCY:
-                    m_VhoverEfficiency = ClampInRange(0f, pValue, 1f);
-                    break;
-                case Vehicle.HOVER_HEIGHT:
-                    m_VhoverHeight = pValue;
-                    break;
-                case Vehicle.HOVER_TIMESCALE:
-                    m_VhoverTimescale = Math.Max(pValue, 0.01f);
-                    break;
-                case Vehicle.LINEAR_DEFLECTION_EFFICIENCY:
-                    m_linearDeflectionEfficiency = ClampInRange(0f, pValue, 1f);
-                    break;
-                case Vehicle.LINEAR_DEFLECTION_TIMESCALE:
-                    m_linearDeflectionTimescale = Math.Max(pValue, 0.01f);
-                    break;
-                case Vehicle.LINEAR_MOTOR_DECAY_TIMESCALE:
-                    m_linearMotorDecayTimescale = ClampInRange(0.01f, pValue, 120);
-                    m_linearMotor.TargetValueDecayTimeScale = m_linearMotorDecayTimescale;
-                    break;
-                case Vehicle.LINEAR_MOTOR_TIMESCALE:
-                    m_linearMotorTimescale = Math.Max(pValue, 0.01f);
-                    m_linearMotor.TimeScale = m_linearMotorTimescale;
-                    break;
-                case Vehicle.VERTICAL_ATTRACTION_EFFICIENCY:
-                    m_verticalAttractionEfficiency = ClampInRange(0.1f, pValue, 1f);
-                    m_verticalAttractionMotor.Efficiency = m_verticalAttractionEfficiency;
-                    break;
 
-                // These are vector properties but the engine lets you use a single float value to
-                // set all of the components to the same value
-                case Vehicle.ANGULAR_FRICTION_TIMESCALE:
-                    m_angularFrictionTimescale = new Vector3(pValue, pValue, pValue);
-                    break;
-                case Vehicle.ANGULAR_MOTOR_DIRECTION:
-                    m_angularMotorDirection = new Vector3(pValue, pValue, pValue);
-                    m_angularMotor.Zero();
-                    m_angularMotor.SetTarget(m_angularMotorDirection);
-                    break;
-                case Vehicle.LINEAR_FRICTION_TIMESCALE:
-                    m_linearFrictionTimescale = new Vector3(pValue, pValue, pValue);
-                    break;
-                case Vehicle.LINEAR_MOTOR_DIRECTION:
-                    m_linearMotorDirection = new Vector3(pValue, pValue, pValue);
-                    //m_linearMotorDirectionLASTSET = new Vector3(pValue, pValue, pValue);
-                    m_linearMotor.SetTarget(m_linearMotorDirection);
-                    break;
-                case Vehicle.LINEAR_MOTOR_OFFSET:
-                    m_linearMotorOffset = new Vector3(pValue, pValue, pValue);
-                    break;
-                case Vehicle.BLOCK_EXIT:
-                    m_BlockingEndPoint = new Vector3(pValue, pValue, pValue);
-                    break;
-            }
-        } //end ProcessVectorVehicleParam
-*/
-        // temporary addition using vector 3 parameters
+        // Vehicle vector 3 parameters
         internal void ProcessVectorVehicleParam(Vehicle pParam, Vector3 pValue)
         {
             VDetailLog("{0},ProcessVectorVehicleParam,param={1},val={2}", ControllingPrim.LocalID, pParam, pValue);
@@ -358,14 +275,14 @@ namespace WhiteCore.Physics.BulletSPlugin
                     pValue.Z = ClampInRange(0.25f, pValue.Z, 120);
                     m_angularFrictionTimescale = new Vector3(pValue.X, pValue.Y, pValue.Z);
                     break;
-            case Vehicle.ANGULAR_MOTOR_DIRECTION:
-                    // Limit requested angular speed to 2 rps= 4 pi rads/sec
-                pValue.X = ClampInRange (-FourPI, pValue.X, FourPI);
-                pValue.Y = ClampInRange (-FourPI, pValue.Y, FourPI);
-                pValue.Z = ClampInRange (-FourPI, pValue.Z, FourPI);
-                m_angularMotorDirection = new Vector3 (pValue.X, pValue.Y, pValue.Z);
-                m_angularMotor.Zero ();
-                m_angularMotor.SetTarget (m_angularMotorDirection);
+                case Vehicle.ANGULAR_MOTOR_DIRECTION:
+                        // Limit requested angular speed to 2 rps= 4 pi rads/sec
+                    pValue.X = ClampInRange (-FourPI, pValue.X, FourPI);
+                    pValue.Y = ClampInRange (-FourPI, pValue.Y, FourPI);
+                    pValue.Z = ClampInRange (-FourPI, pValue.Z, FourPI);
+                    m_angularMotorDirection = new Vector3 (pValue.X, pValue.Y, pValue.Z);
+                    m_angularMotor.Zero ();
+                    m_angularMotor.SetTarget (m_angularMotorDirection);
                     break;
                 case Vehicle.LINEAR_FRICTION_TIMESCALE:
                     pValue.X = ClampInRange(0.25f, pValue.X, 120);
@@ -685,7 +602,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             m_verticalAttractionMotor.PhysicsScene = PhysicsScene;  // DEBUG DEBUG DEBUG (enables detail logging)
              */
 
-            if (this.Type == Vehicle.TYPE_NONE)
+            if (Type == Vehicle.TYPE_NONE)
             {
                 UnregisterForSceneEvents();
             }
@@ -758,6 +675,8 @@ namespace WhiteCore.Physics.BulletSPlugin
                 if (ControllingPrim.PhysBody.HasPhysicalBody)
                     m_physicsScene.PE.RemoveFromCollisionFlags(ControllingPrim.PhysBody,
                         CollisionFlags.BS_VEHICLE_COLLISIONS);
+                    // ControllingPrim.Linkset.RemoveFromPhysicalCollisionFlags(CollisionFlags.BS_VEHICLE_COLLISIONS);
+
             }
         }
 
@@ -924,7 +843,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 m_knownWaterLevel = ControllingPrim.PhysicsScene.TerrainManager.GetWaterLevelAtXYZ(pos);
                 m_knownHas |= m_knownChangedWaterLevel;
             }
-            return (float)m_knownWaterLevel;
+            return m_knownWaterLevel;
         }
 
         Vector3 VehiclePosition
@@ -1055,7 +974,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 if ((m_knownHas & m_knownChangedForwardVelocity) == 0)
                 {
                     m_knownForwardVelocity = VehicleVelocity *
-                                             Quaternion.Inverse(Quaternion.Normalize(VehicleOrientation));
+                                             Quaternion.Inverse(Quaternion.Normalize(VehicleFrameOrientation));
                     m_knownHas |= m_knownChangedForwardVelocity;
                 }
                 return m_knownForwardVelocity;
@@ -1067,7 +986,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             get { return VehicleForwardVelocity.X; }
         }
 
-         private Quaternion VehicleFrameOrientation
+        Quaternion VehicleFrameOrientation
         {
             get
             {
@@ -1152,7 +1071,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                     ControllingPrim.LocalID, origVelW, newVelocityLengthSq, BSParam.VehicleMaxLinearVelocitySquared,
                     VehicleVelocity);
             }
-            else if (newVelocityLengthSq < 0.001f)
+            else if (newVelocityLengthSq < BSParam.VehicleMinLinearVelocitySquared)
                 VehicleVelocity = Vector3.Zero;
 
             VDetailLog("{0},  MoveLinear,done,isColl={1},newVel={2}", ControllingPrim.LocalID,
@@ -1188,7 +1107,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         }
         //Given a Deflection Effiency and a Velocity, Returns a Velocity that is Partially Deflected onto the X Axis
         //Clamped so that a DeflectionTimescale of less then 1 does not increase force over original velocity
-        private void ComputeLinearDeflection(float pTimestep)
+        void ComputeLinearDeflection(float pTimestep)
         {
             Vector3 linearDeflectionV = Vector3.Zero;
             Vector3 velocityV = VehicleForwardVelocity;
@@ -1246,8 +1165,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         {
             // m_VhoverEfficiency: 0=bouncy, 1=totally damped
             // m_VhoverTimescale: time to achieve height
-            if ((m_flags &
-                 (VehicleFlag.HOVER_WATER_ONLY | VehicleFlag.HOVER_TERRAIN_ONLY | VehicleFlag.HOVER_GLOBAL_HEIGHT)) != 0)
+            if ((m_flags & (VehicleFlag.HOVER_WATER_ONLY | VehicleFlag.HOVER_TERRAIN_ONLY | VehicleFlag.HOVER_GLOBAL_HEIGHT)) != 0 && (m_VhoverHeight > 0) && (m_VhoverTimescale < 300))
             {
                 // We should hover, get the target height
                 if ((m_flags & VehicleFlag.HOVER_WATER_ONLY) != 0)
@@ -1552,7 +1470,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         public void ComputeAngularVerticalAttraction()
         {
             // If vertical attaction timescale is reasonable
-            if (enableAngularVerticalAttraction && m_verticalAttractionTimescale < m_verticalAttractionCutoff)
+            if (BSParam.VehicleEnableAngularVerticalAttraction && m_verticalAttractionTimescale < m_verticalAttractionCutoff)
             {
                 Vector3 vehicleUpAxis = Vector3.UnitZ * VehicleFrameOrientation;
                 switch (BSParam.VehicleAngularVerticalAttractionAlgorithm)
@@ -1708,7 +1626,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             //     this creates an over-correction and then wabbling as the target is overshot.
             // TODO: rethink how the different correction computations inter-relate.
 
-            if (enableAngularDeflection && m_angularDeflectionEfficiency != 0 && VehicleForwardSpeed > 0.2)
+            if (BSParam.VehicleEnableAngularDeflection && m_angularDeflectionEfficiency != 0 && VehicleForwardSpeed > 0.2)
             {
                 Vector3 deflectContributionV = Vector3.Zero;
 
@@ -1791,7 +1709,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         //      make a sluggish vehicle by giving it a timescale of several seconds. 
         public void ComputeAngularBanking()
         {
-            if (enableAngularBanking && m_bankingEfficiency != 0 &&
+            if (BSParam.VehicleEnableAngularBanking && m_bankingEfficiency != 0 &&
                 m_verticalAttractionTimescale < m_verticalAttractionCutoff)
             {
                 Vector3 bankingContributionV = Vector3.Zero;

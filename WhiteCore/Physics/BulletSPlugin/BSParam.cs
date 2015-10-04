@@ -49,16 +49,16 @@ namespace WhiteCore.Physics.BulletSPlugin
         // ===================
         // From: 
 
-    /// <summary>
-    /// Set whether physics is active or not.
-    /// </summary>
-    /// <remarks>
-    /// Can be enabled and disabled to start and stop physics.
-    /// </remarks>
-    public static bool Active { get; private set; }
+        /// <summary>
+        /// Set whether physics is active or not.
+        /// </summary>
+        /// <remarks>
+        /// Can be enabled and disabled to start and stop physics.
+        /// </remarks>
+        public static bool Active { get; private set; }
 
-    public static bool UseSeparatePhysicsThread { get; private set; }
-    public static float PhysicsTimeStep { get; private set; }
+        public static bool UseSeparatePhysicsThread { get; private set; }
+        public static float PhysicsTimeStep { get; private set; }
         // Level of Detail values kept as float because that's what the Meshmerizer wants
         public static float MeshLOD { get; private set; }
         public static float MeshCircularLOD { get; private set; }
@@ -92,14 +92,14 @@ namespace WhiteCore.Physics.BulletSPlugin
         public static bool ShouldForceSimplePrimMeshing { get; private set; }       // if a cube or sphere, let Bullet do internal shapes
         public static bool ShouldUseHullsForPhysicalObjects { get; private set; }   // 'true' if should create hulls for physical objects
         public static bool ShouldRemoveZeroWidthTriangles { get; private set; }
-    public static bool ShouldUseBulletHACD { get; set; }
-    public static bool ShouldUseSingleConvexHullForPrims { get; set; }
-    public static bool ShouldUseGImpactShapeForPrims { get; set; }
-    public static bool ShouldUseAssetHulls { get; set; }
+        public static bool ShouldUseBulletHACD { get; set; }
+        public static bool ShouldUseSingleConvexHullForPrims { get; set; }
+        public static bool ShouldUseGImpactShapeForPrims { get; set; }
+        public static bool ShouldUseAssetHulls { get; set; }
 
         public static float TerrainImplementation { get; private set; }
         public static int TerrainMeshMagnification { get; private set; }
-    public static float TerrainGroundPlane { get; private set; }
+        public static float TerrainGroundPlane { get; private set; }
         public static float TerrainFriction { get; private set; }
         public static float TerrainHitFraction { get; private set; }
         public static float TerrainRestitution { get; private set; }
@@ -123,42 +123,42 @@ namespace WhiteCore.Physics.BulletSPlugin
         public static float NumberOfSolverIterations { get; private set; }
         public static bool UseSingleSidedMeshes { get; private set; }
         public static float GlobalContactBreakingThreshold { get; private set; }
-    public static float PhysicsUnmanLoggingFrames { get; private set; }
+        public static float PhysicsUnmanLoggingFrames { get; private set; }
 
         // Avatar parameters
-    public static bool AvatarToAvatarCollisionsByDefault { get; private set; }
+        public static bool AvatarToAvatarCollisionsByDefault { get; private set; }
         public static float AvatarFriction { get; private set; }
         public static float AvatarStandingFriction { get; private set; }
         public static float AvatarAlwaysRunFactor { get; private set; }
         public static float AvatarDensity { get; private set; }
         public static float AvatarRestitution { get; private set; }
-    public static int AvatarShape { get; private set; }
+        public static int AvatarShape { get; private set; }
         public static float AvatarCapsuleWidth { get; private set; }
         public static float AvatarCapsuleDepth { get; private set; }
         public static float AvatarCapsuleHeight { get; private set; }
-    public static float AvatarHeightLowFudge { get; private set; }
-    public static float AvatarHeightMidFudge { get; private set; }
-    public static float AvatarHeightHighFudge { get; private set; }
-    public static float AvatarFlyingGroundMargin { get; private set; }
-    public static float AvatarFlyingGroundUpForce { get; private set; }
-    public static float AvatarTerminalVelocity { get; private set; }
+        public static float AvatarHeightLowFudge { get; private set; }
+        public static float AvatarHeightMidFudge { get; private set; }
+        public static float AvatarHeightHighFudge { get; private set; }
+        public static float AvatarFlyingGroundMargin { get; private set; }
+        public static float AvatarFlyingGroundUpForce { get; private set; }
+        public static float AvatarTerminalVelocity { get; private set; }
         public static float AvatarContactProcessingThreshold { get; private set; }
-    public static float AvatarStopZeroThreshold { get; private set; }
-	  public static int AvatarJumpFrames { get; private set; }
+        public static float AvatarStopZeroThreshold { get; private set; }
+	    public static int AvatarJumpFrames { get; private set; }
         public static float AvatarBelowGroundUpCorrectionMeters { get; private set; }
         public static float AvatarStepHeight { get; private set; }
-	public static float AvatarStepAngle { get; private set; }
-	public static float AvatarStepGroundFudge { get; private set; }
+	    public static float AvatarStepAngle { get; private set; }
+	    public static float AvatarStepGroundFudge { get; private set; }
         public static float AvatarStepApproachFactor { get; private set; }
         public static float AvatarStepForceFactor { get; private set; }
-	public static float AvatarStepUpCorrectionFactor { get; private set; }
-	public static int AvatarStepSmoothingSteps { get; private set; }
+	    public static float AvatarStepUpCorrectionFactor { get; private set; }
+	    public static int AvatarStepSmoothingSteps { get; private set; }
 
         // Vehicle parameters
         public static float VehicleMaxLinearVelocity { get; private set; }
         public static float VehicleMaxLinearVelocitySquared { get; private set; }
-    public static float VehicleMinLinearVelocity { get; private set; }
-    public static float VehicleMinLinearVelocitySquared { get; private set; }
+        public static float VehicleMinLinearVelocity { get; private set; }
+        public static float VehicleMinLinearVelocitySquared { get; private set; }
         public static float VehicleMaxAngularVelocity { get; private set; }
         public static float VehicleMaxAngularVelocitySq { get; private set; }
         public static float VehicleAngularDamping { get; private set; }
@@ -166,15 +166,15 @@ namespace WhiteCore.Physics.BulletSPlugin
         public static float VehicleRestitution { get; private set; }
         public static Vector3 VehicleLinearFactor { get; private set; }
         public static Vector3 VehicleAngularFactor { get; private set; }
-    public static Vector3 VehicleInertiaFactor { get; private set; }
+        public static Vector3 VehicleInertiaFactor { get; private set; }
         public static float VehicleGroundGravityFudge { get; private set; }
         public static float VehicleAngularBankingTimescaleFudge { get; private set; }
-    public static bool VehicleEnableLinearDeflection { get; private set; }
-    public static bool VehicleLinearDeflectionNotCollidingNoZ { get; private set; }
-    public static bool VehicleEnableAngularVerticalAttraction { get; private set; }
-    public static int VehicleAngularVerticalAttractionAlgorithm { get; private set; }
-    public static bool VehicleEnableAngularDeflection { get; private set; }
-    public static bool VehicleEnableAngularBanking { get; private set; }
+        public static bool VehicleEnableLinearDeflection { get; private set; }
+        public static bool VehicleLinearDeflectionNotCollidingNoZ { get; private set; }
+        public static bool VehicleEnableAngularVerticalAttraction { get; private set; }
+        public static int VehicleAngularVerticalAttractionAlgorithm { get; private set; }
+        public static bool VehicleEnableAngularDeflection { get; private set; }
+        public static bool VehicleEnableAngularBanking { get; private set; }
         public static bool VehicleDebuggingEnabled { get; private set; }
 
         // Convex Hulls
@@ -184,35 +184,35 @@ namespace WhiteCore.Physics.BulletSPlugin
         public static float CSHullVolumeConservationThresholdPercent { get; private set; }
         public static int CSHullMaxVertices { get; private set; }
         public static float CSHullMaxSkinWidth { get; private set; }
-	public static float BHullMaxVerticesPerHull { get; private set; }		// 100
-	public static float BHullMinClusters { get; private set; }				// 2
-	public static float BHullCompacityWeight { get; private set; }			// 0.1
-	public static float BHullVolumeWeight { get; private set; }				// 0.0
-	public static float BHullConcavity { get; private set; }				    // 100
-	public static bool BHullAddExtraDistPoints { get; private set; }		// false
-	public static bool BHullAddNeighboursDistPoints { get; private set; }	// false
-	public static bool BHullAddFacesPoints { get; private set; }			// false
-	public static bool BHullShouldAdjustCollisionMargin { get; private set; }	// false
-	public static float WhichHACD { get; private set; }				    // zero if Bullet HACD, non-zero says VHACD
-    // Parameters for VHACD 2.0: http://code.google.com/p/v-hacd
-    // To enable, set both ShouldUseBulletHACD=true and WhichHACD=1
-	// http://kmamou.blogspot.ca/2014/12/v-hacd-20-parameters-description.html
-	public static float VHACDresolution { get; private set; }			// 100,000 max number of voxels generated during voxelization stage
-	public static float VHACDdepth { get; private set; }				// 20 max number of clipping stages
-	public static float VHACDconcavity { get; private set; }			// 0.0025 maximum concavity
-	public static float VHACDplaneDownsampling { get; private set; }	// 4 granularity of search for best clipping plane
-	public static float VHACDconvexHullDownsampling { get; private set; }	// 4 precision of hull gen process
-	public static float VHACDalpha { get; private set; }				// 0.05 bias toward clipping along symmetry planes
-	public static float VHACDbeta { get; private set; }				    // 0.05 bias toward clipping along revolution axis
-	public static float VHACDgamma { get; private set; }				// 0.00125 max concavity when merging
-	public static float VHACDpca { get; private set; }					// 0 on/off normalizing mesh before decomp
-	public static float VHACDmode { get; private set; }				    // 0 0:voxel based, 1: tetrahedron based
-	public static float VHACDmaxNumVerticesPerCH { get; private set; }	// 64 max triangles per convex hull
-	public static float VHACDminVolumePerCH { get; private set; }		// 0.0001 sampling of generated convex hulls
+    	public static float BHullMaxVerticesPerHull { get; private set; }		// 100
+    	public static float BHullMinClusters { get; private set; }				// 2
+    	public static float BHullCompacityWeight { get; private set; }			// 0.1
+    	public static float BHullVolumeWeight { get; private set; }				// 0.0
+    	public static float BHullConcavity { get; private set; }				    // 100
+    	public static bool BHullAddExtraDistPoints { get; private set; }		// false
+    	public static bool BHullAddNeighboursDistPoints { get; private set; }	// false
+    	public static bool BHullAddFacesPoints { get; private set; }			// false
+    	public static bool BHullShouldAdjustCollisionMargin { get; private set; }	// false
+    	public static float WhichHACD { get; private set; }				    // zero if Bullet HACD, non-zero says VHACD
+        // Parameters for VHACD 2.0: http://code.google.com/p/v-hacd
+        // To enable, set both ShouldUseBulletHACD=true and WhichHACD=1
+    	// http://kmamou.blogspot.ca/2014/12/v-hacd-20-parameters-description.html
+    	public static float VHACDresolution { get; private set; }			// 100,000 max number of voxels generated during voxelization stage
+    	public static float VHACDdepth { get; private set; }				// 20 max number of clipping stages
+    	public static float VHACDconcavity { get; private set; }			// 0.0025 maximum concavity
+    	public static float VHACDplaneDownsampling { get; private set; }	// 4 granularity of search for best clipping plane
+    	public static float VHACDconvexHullDownsampling { get; private set; }	// 4 precision of hull gen process
+    	public static float VHACDalpha { get; private set; }				// 0.05 bias toward clipping along symmetry planes
+    	public static float VHACDbeta { get; private set; }				    // 0.05 bias toward clipping along revolution axis
+    	public static float VHACDgamma { get; private set; }				// 0.00125 max concavity when merging
+    	public static float VHACDpca { get; private set; }					// 0 on/off normalizing mesh before decomp
+    	public static float VHACDmode { get; private set; }				    // 0 0:voxel based, 1: tetrahedron based
+    	public static float VHACDmaxNumVerticesPerCH { get; private set; }	// 64 max triangles per convex hull
+    	public static float VHACDminVolumePerCH { get; private set; }		// 0.0001 sampling of generated convex hulls
 
         // Linkset implementation parameters
         public static float LinksetImplementation { get; private set; }
-    public static bool LinksetOffsetCenterOfMass { get; private set; }
+        public static bool LinksetOffsetCenterOfMass { get; private set; }
         public static bool LinkConstraintUseFrameOffset { get; private set; }
         public static bool LinkConstraintEnableTransMotor { get; private set; }
         public static float LinkConstraintTransMotorMaxVel { get; private set; }
@@ -743,11 +743,11 @@ namespace WhiteCore.Physics.BulletSPlugin
                 (s) => { return AvatarStepHeight; },
                 (s, v) => { AvatarStepHeight = v; }),
  	        new ParameterDefn<float>("AvatarStepAngle", "The angle (in radians) for a vertical surface to be considered a step",
-                0.3f,
+                0.3f,      //OS => 0.999f
                 (s) => { return AvatarStepAngle; },
-                (s, v) => { AvatarStepAngle = v; }),   //OS => 0.999f
+                (s, v) => { AvatarStepAngle = v; }),   
 	        new ParameterDefn<float>("AvatarStepGroundFudge", "Fudge factor subtracted from avatar base when comparing collision height",
-                0.1f,
+                0.05f,      // OS =>  0.1f,
                 (s) => { return AvatarStepGroundFudge; },
                 (s, v) => { AvatarStepGroundFudge = v; }),
            new ParameterDefn<float>("AvatarStepApproachFactor",
@@ -771,20 +771,20 @@ namespace WhiteCore.Physics.BulletSPlugin
             new ParameterDefn<float>("VehicleMaxLinearVelocity",
                 "Maximum velocity magnitude that can be assigned to a vehicle",
                 1000.0f,
-                (s) => { return (float) VehicleMaxLinearVelocity; },
+                (s) => { return  VehicleMaxLinearVelocity; },
                 (s, v) =>
                 {
                     VehicleMaxLinearVelocity = v;
                     VehicleMaxLinearVelocitySquared = v * v;
                 }),
-        new ParameterDefn<float>("VehicleMinLinearVelocity", "Maximum velocity magnitude that can be assigned to a vehicle",
-            0.001f,
-            (s) => { return (float)VehicleMinLinearVelocity; },
-            (s,v) => { VehicleMinLinearVelocity = v; VehicleMinLinearVelocitySquared = v * v; } ),
+            new ParameterDefn<float>("VehicleMinLinearVelocity", "Maximum velocity magnitude that can be assigned to a vehicle",
+                0.001f,
+                (s) => { return VehicleMinLinearVelocity; },
+                (s,v) => { VehicleMinLinearVelocity = v; VehicleMinLinearVelocitySquared = v * v; } ),
             new ParameterDefn<float>("VehicleMaxAngularVelocity",
                 "Maximum rotational velocity magnitude that can be assigned to a vehicle",
                 12.0f,
-                (s) => { return (float) VehicleMaxAngularVelocity; },
+                (s) => { return  VehicleMaxAngularVelocity; },
                 (s, v) =>
                 {
                     VehicleMaxAngularVelocity = v;
@@ -1068,7 +1068,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 true,
                 (s) => { return LinksetOffsetCenterOfMass; },
                 (s, v) => { LinksetOffsetCenterOfMass = v; }),
-           new ParameterDefn<bool>("LinkConstraintUseFrameOffset",
+            new ParameterDefn<bool>("LinkConstraintUseFrameOffset",
                 "For linksets built with constraints, enable frame offsetFor linksets built with constraints, enable frame offset.",
                 false,
                 (s) => { return LinkConstraintUseFrameOffset; },
@@ -1173,29 +1173,29 @@ namespace WhiteCore.Physics.BulletSPlugin
         }
 
         /* not sure what/if this is yet
-    internal static PhysParameterEntry[] SettableParameters = new PhysParameterEntry[1];
+        internal static PhysParameterEntry[] SettableParameters = new PhysParameterEntry[1];
 
-    // This creates an array in the correct format for returning the list of
-    //    parameters. This is used by the 'list' option of the 'physics' command.
-    internal static void BuildParameterTable()
-    {
-        if (SettableParameters.Length < ParameterDefinitions.Length)
+        // This creates an array in the correct format for returning the list of
+        //    parameters. This is used by the 'list' option of the 'physics' command.
+        internal static void BuildParameterTable()
         {
-            List<PhysParameterEntry> entries = new List<PhysParameterEntry>();
-            for (int ii = 0; ii < ParameterDefinitions.Length; ii++)
+            if (SettableParameters.Length < ParameterDefinitions.Length)
             {
-                ParameterDefnBase pd = ParameterDefinitions[ii];
-                entries.Add(new PhysParameterEntry(pd.name, pd.desc));
+                List<PhysParameterEntry> entries = new List<PhysParameterEntry>();
+                for (int ii = 0; ii < ParameterDefinitions.Length; ii++)
+                {
+                    ParameterDefnBase pd = ParameterDefinitions[ii];
+                    entries.Add(new PhysParameterEntry(pd.name, pd.desc));
+                }
+
+                // make the list alphabetical for ease of finding anything
+                entries.Sort((ppe1, ppe2) => { return ppe1.name.CompareTo(ppe2.name); });
+
+                SettableParameters = entries.ToArray();
             }
-
-            // make the list alphabetical for ease of finding anything
-            entries.Sort((ppe1, ppe2) => { return ppe1.name.CompareTo(ppe2.name); });
-
-            SettableParameters = entries.ToArray();
         }
-    }
+        */
 
-*/
         // =====================================================================
         // =====================================================================
         // There are parameters that, when set, cause things to happen in the physics engine.

@@ -118,49 +118,50 @@ namespace WhiteCore.Physics.BulletSPlugin
         }
 */
 
-    // 'ForcePosition' is the one way to set the physical position of the body in the physics engine.
-    // Displace the simulator idea of position (center of root prim) to the physical position.
-    public override Vector3 ForcePosition
-    {
-        get {
-            Vector3 physPosition = PhysicsScene.PE.GetPosition(PhysBody);
-            if (PositionDisplacement != Vector3.Zero)
-            {
-                // If there is some displacement, return the physical position (center-of-mass)
-                //     location minus the displacement to give the center of the root prim.
-                Vector3 displacement = PositionDisplacement * ForceOrientation;
-                DetailLog("{0},BSPrimDisplaced.ForcePosition,get,physPos={1},disp={2},simPos={3}",
-                                LocalID, physPosition, displacement, physPosition - displacement);
-                physPosition -= displacement;
-            }
-            RawPosition = physPosition;
-            return physPosition;
-        }
-        set
+        // 'ForcePosition' is the one way to set the physical position of the body in the physics engine.
+        // Displace the simulator idea of position (center of root prim) to the physical position.
+        public override Vector3 ForcePosition
         {
-            if (PositionDisplacement != Vector3.Zero)
-            {
-                // This value is the simulator's idea of where the prim is: the center of the root prim
-                RawPosition = value;
-
-                // Move the passed root prim postion to the center-of-mass position and set in the physics engine.
-                Vector3 displacement = PositionDisplacement * RawOrientation;
-                Vector3 displacedPos = RawPosition + displacement;
-                DetailLog("{0},BSPrimDisplaced.ForcePosition,set,simPos={1},disp={2},physPos={3}",
-                                        LocalID, RawPosition, displacement, displacedPos);
-                if (PhysBody.HasPhysicalBody)
+            get {
+                Vector3 physPosition = PhysicsScene.PE.GetPosition(PhysBody);
+                if (PositionDisplacement != Vector3.Zero)
                 {
-                    PhysicsScene.PE.SetTranslation(PhysBody, displacedPos, RawOrientation);
-                    ActivateIfPhysical(false);
+                    // If there is some displacement, return the physical position (center-of-mass)
+                    //     location minus the displacement to give the center of the root prim.
+                    Vector3 displacement = PositionDisplacement * ForceOrientation;
+                    DetailLog("{0},BSPrimDisplaced.ForcePosition,get,physPos={1},disp={2},simPos={3}",
+                                    LocalID, physPosition, displacement, physPosition - displacement);
+                    physPosition -= displacement;
+                }
+                RawPosition = physPosition;
+                return physPosition;
+            }
+            set
+            {
+                if (PositionDisplacement != Vector3.Zero)
+                {
+                    // This value is the simulator's idea of where the prim is: the center of the root prim
+                    RawPosition = value;
+
+                    // Move the passed root prim postion to the center-of-mass position and set in the physics engine.
+                    Vector3 displacement = PositionDisplacement * RawOrientation;
+                    Vector3 displacedPos = RawPosition + displacement;
+                    DetailLog("{0},BSPrimDisplaced.ForcePosition,set,simPos={1},disp={2},physPos={3}",
+                                            LocalID, RawPosition, displacement, displacedPos);
+                    if (PhysBody.HasPhysicalBody)
+                    {
+                        PhysicsScene.PE.SetTranslation(PhysBody, displacedPos, RawOrientation);
+                        ActivateIfPhysical(false);
+                    }
+                }
+                else
+                {
+                    base.ForcePosition = value;
                 }
             }
-            else
-            {
-                base.ForcePosition = value;
-            }
         }
-    }
 
+        // redundant?? not used
         public override Quaternion ForceOrientation
         {
             get { return base.ForceOrientation; }

@@ -488,14 +488,15 @@ namespace WhiteCore.Physics.BulletSPlugin
             set
             {
                 RawVelocity = value;
-                // MainConsole.Instance.DebugFormat("{0}: set velocity = {1}", LogHeader, RawVelocity);
+                OMV.Vector3 vel = value;
+                // MainConsole.Instance.DebugFormat("{0}: set velocity = {1}", LogHeader, vel);
                 PhysicsScene.TaintedObject("BSCharacter.setVelocity", delegate()
                 {
                     if (m_moveActor != null)
-                        m_moveActor.SetVelocityAndTarget(RawVelocity, RawVelocity, true /* inTaintTime */, 3);
+                        m_moveActor.SetVelocityAndTarget(vel, vel, true /* inTaintTime */, 3);
 
-                    DetailLog("{0},BSCharacter.setVelocity,taint,vel={1}", LocalID, RawVelocity);
-                    ForceVelocity = RawVelocity;
+                    DetailLog("{0},BSCharacter.setVelocity,taint,vel={1}", LocalID, vel);
+                    ForceVelocity = vel;
                 });
             }
         }
@@ -586,11 +587,13 @@ namespace WhiteCore.Physics.BulletSPlugin
             }
         }
 
+        // we are always an Agent
         public override int PhysicsActorType
         {
             get { return (int)ActorTypes.Agent; }
         }
 
+        // ... and a physical one at that.
         public override bool IsPhysical
         {
             get { return true; }

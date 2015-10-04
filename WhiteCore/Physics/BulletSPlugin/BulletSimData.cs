@@ -201,7 +201,6 @@ namespace WhiteCore.Physics.BulletSPlugin
             minCoords = new OMV.Vector3(100f, 100f, 25f);
             maxCoords = new OMV.Vector3(101f, 101f, 26f);
             minZ = maxZ = 0f;
-            //sizeX = sizeY = 256f;
             sizeX = pSizeX;
             sizeY = pSizeY;
         }

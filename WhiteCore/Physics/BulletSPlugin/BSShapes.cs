@@ -32,130 +32,131 @@ using OMV = OpenMetaverse;
 
 namespace WhiteCore.Physics.BulletSPlugin
 {
-public class ShapeInfoInfo
-{
-    public int Vertices { get; set; }
-    private int m_hullCount;
-    private int[] m_verticesPerHull;
-    public ShapeInfoInfo()
+    public class ShapeInfoInfo
     {
-        Vertices = 0;
-        m_hullCount = 0;
-        m_verticesPerHull = null;
-    }
-    public int HullCount
-    {
-        set
+        public int Vertices { get; set; }
+        int m_hullCount;
+        int[] m_verticesPerHull;
+        public ShapeInfoInfo()
         {
-            m_hullCount = value;
-            m_verticesPerHull = new int[m_hullCount];
-            Array.Clear(m_verticesPerHull, 0, m_hullCount);
+            Vertices = 0;
+            m_hullCount = 0;
+            m_verticesPerHull = null;
         }
-        get { return m_hullCount; }
-    }
-    public void SetVerticesPerHull(int hullNum, int vertices)
-    {
-        if (m_verticesPerHull != null && hullNum < m_verticesPerHull.Length)
+        public int HullCount
         {
-            m_verticesPerHull[hullNum] = vertices;
-        }
-    }
-    public int GetVerticesPerHull(int hullNum)
-    {
-        if (m_verticesPerHull != null && hullNum < m_verticesPerHull.Length)
-        {
-            return m_verticesPerHull[hullNum];
-        }
-        return 0;
-    }
-    public override string ToString()
-    {
-        StringBuilder buff = new StringBuilder();
-        // buff.Append("ShapeInfo=<");
-        buff.Append("<");
-        if (Vertices > 0)
-        {
-            buff.Append("verts=");
-            buff.Append(Vertices.ToString());
-        }
-
-        if (Vertices > 0 && HullCount > 0) buff.Append(",");
-
-        if (HullCount > 0)
-        {
-            buff.Append("nHulls=");
-            buff.Append(HullCount.ToString());
-            buff.Append(",");
-            buff.Append("hullVerts=");
-            for (int ii = 0; ii < HullCount; ii++)
+            set
             {
-                if (ii != 0) buff.Append(",");
-                buff.Append(GetVerticesPerHull(ii).ToString());
+                m_hullCount = value;
+                m_verticesPerHull = new int[m_hullCount];
+                Array.Clear(m_verticesPerHull, 0, m_hullCount);
+            }
+            get { return m_hullCount; }
+        }
+        public void SetVerticesPerHull(int hullNum, int vertices)
+        {
+            if (m_verticesPerHull != null && hullNum < m_verticesPerHull.Length)
+            {
+                m_verticesPerHull[hullNum] = vertices;
             }
         }
-        buff.Append(">");
-        return buff.ToString();
+        public int GetVerticesPerHull(int hullNum)
+        {
+            if (m_verticesPerHull != null && hullNum < m_verticesPerHull.Length)
+            {
+                return m_verticesPerHull[hullNum];
+            }
+            return 0;
+        }
+        public override string ToString()
+        {
+            StringBuilder buff = new StringBuilder();
+            // buff.Append("ShapeInfo=<");
+            buff.Append("<");
+            if (Vertices > 0)
+            {
+                buff.Append("verts=");
+                buff.Append(Vertices.ToString());
+            }
+
+            if (Vertices > 0 && HullCount > 0) buff.Append(",");
+
+            if (HullCount > 0)
+            {
+                buff.Append("nHulls=");
+                buff.Append(HullCount.ToString());
+                buff.Append(",");
+                buff.Append("hullVerts=");
+                for (int ii = 0; ii < HullCount; ii++)
+                {
+                    if (ii != 0) buff.Append(",");
+                    buff.Append(GetVerticesPerHull(ii).ToString());
+                }
+            }
+            buff.Append(">");
+            return buff.ToString();
+        }
     }
-}
+
     public abstract class BSShape
     {
         public int referenceCount { get; set; }
         public DateTime lastReferenced { get; set; }
-    public BulletShape physShapeInfo { get; set; }
-    public ShapeInfoInfo shapeInfo { get; private set; }
+        public BulletShape physShapeInfo { get; set; }
+        public ShapeInfoInfo shapeInfo { get; private set; }
 
         public BSShape()
         {
             referenceCount = 1;
             lastReferenced = DateTime.Now;
-        physShapeInfo = new BulletShape();
-        shapeInfo = new ShapeInfoInfo();
+            physShapeInfo = new BulletShape();
+            shapeInfo = new ShapeInfoInfo();
         }
 
-    public BSShape(BulletShape pShape)
-    {
-        referenceCount = 1;
-        lastReferenced = DateTime.Now;
-        physShapeInfo = pShape;
-        shapeInfo = new ShapeInfoInfo();
-    }
-
-    // Called when this shape is being used again.
-    // Used internally. External callers should call instance.GetReference() to properly copy/reference
-    //       the shape.
-    protected virtual void IncrementReference()
-    {
-        referenceCount++;
-        lastReferenced = DateTime.Now;
-    }
-
-    // Called when this shape is done being used.
-    protected virtual void DecrementReference()
-    {
-        referenceCount--;
-        lastReferenced = DateTime.Now;
-    }
-
-    // Return 'true' if there is an allocated physics physical shape under this class instance.
-    public virtual bool HasPhysicalShape
-    {
-        get
+        public BSShape(BulletShape pShape)
         {
-            if (physShapeInfo != null)
-                return physShapeInfo.HasPhysicalShape;
-            return false;
+            referenceCount = 1;
+            lastReferenced = DateTime.Now;
+            physShapeInfo = pShape;
+            shapeInfo = new ShapeInfoInfo();
         }
-    }
-    public virtual BSPhysicsShapeType ShapeType
-    {
-        get
+
+        // Called when this shape is being used again.
+        // Used internally. External callers should call instance.GetReference() to properly copy/reference
+        //       the shape.
+        protected virtual void IncrementReference()
         {
-            BSPhysicsShapeType ret = BSPhysicsShapeType.SHAPE_UNKNOWN;
-            if (physShapeInfo != null && physShapeInfo.HasPhysicalShape)
-                ret = physShapeInfo.shapeType;
-            return ret;
+            referenceCount++;
+            lastReferenced = DateTime.Now;
         }
-    }
+
+        // Called when this shape is done being used.
+        protected virtual void DecrementReference()
+        {
+            referenceCount--;
+            lastReferenced = DateTime.Now;
+        }
+
+        // Return 'true' if there is an allocated physics physical shape under this class instance.
+        public virtual bool HasPhysicalShape
+        {
+            get
+            {
+                if (physShapeInfo != null)
+                    return physShapeInfo.HasPhysicalShape;
+                return false;
+            }
+        }
+        public virtual BSPhysicsShapeType ShapeType
+        {
+            get
+            {
+                BSPhysicsShapeType ret = BSPhysicsShapeType.SHAPE_UNKNOWN;
+                if (physShapeInfo != null && physShapeInfo.HasPhysicalShape)
+                    ret = physShapeInfo.shapeType;
+                return ret;
+            }
+        }
 
         // Get a reference to a physical shape. Create if it doesn't exist
         public static BSShape GetShapeReference(BSScene physicsScene, bool forceRebuild, BSPhysObject prim)
@@ -260,7 +261,7 @@ public class ShapeInfoInfo
             return null;
         }
 
-        private BSShapeNative(BSScene physicsScene, BSPhysObject prim,
+        BSShapeNative(BSScene physicsScene, BSPhysObject prim,
             BSPhysicsShapeType shapeType, FixedShapeKey shapeKey)
         {
             ShapeData nativeShapeData = new ShapeData();
@@ -473,12 +474,12 @@ public class ShapeInfoInfo
         // Comments specify trianges and quads in clockwise direction
         Ind[] avatarIndices =
         {
-            Ind.A0, Ind.B0, Ind.B1, // A0,B0,B1
+            Ind.A0, Ind.B0, Ind.B1,                         // A0,B0,B1
             Ind.A0, Ind.B1, Ind.B2, Ind.B2, Ind.A3, Ind.A0, // A0,B1,B2,A3
-            Ind.A3, Ind.B2, Ind.B3, // A3,B2,B3
-            Ind.A3, Ind.B3, Ind.B4, // A3,B3,B4
+            Ind.A3, Ind.B2, Ind.B3,                         // A3,B2,B3
+            Ind.A3, Ind.B3, Ind.B4,                         // A3,B3,B4
             Ind.A3, Ind.B4, Ind.B5, Ind.B5, Ind.A0, Ind.A3, // A3,B4,B5,A0
-            Ind.A0, Ind.B5, Ind.B0, // A0,B5,B0
+            Ind.A0, Ind.B5, Ind.B0,                         // A0,B5,B0
 
             Ind.B0, Ind.C0, Ind.C1, Ind.C1, Ind.B1, Ind.B0, // B0,C0,C1,B1
             Ind.B1, Ind.C1, Ind.C2, Ind.C2, Ind.B2, Ind.B1, // B1,C1,C2,B2
@@ -494,12 +495,12 @@ public class ShapeInfoInfo
             Ind.C4, Ind.D4, Ind.D5, Ind.D5, Ind.C5, Ind.C4, // C4,D4,D5,C5
             Ind.C5, Ind.D5, Ind.D0, Ind.D0, Ind.C0, Ind.C5, // C5,D5,D0,C0
 
-            Ind.E0, Ind.D0, Ind.D1, // E0,D0,D1
+            Ind.E0, Ind.D0, Ind.D1,                         // E0,D0,D1
             Ind.E0, Ind.D1, Ind.D2, Ind.D2, Ind.E3, Ind.E0, // E0,D1,D2,E3
-            Ind.E3, Ind.D2, Ind.D3, // E3,D2,D3
-            Ind.E3, Ind.D3, Ind.D4, // E3,D3,D4
+            Ind.E3, Ind.D2, Ind.D3,                         // E3,D2,D3
+            Ind.E3, Ind.D3, Ind.D4,                         // E3,D3,D4
             Ind.E3, Ind.D4, Ind.D5, Ind.D5, Ind.E0, Ind.E3, // E3,D4,D5,E0
-            Ind.E0, Ind.D5, Ind.D0, // E0,D5,D0
+            Ind.E0, Ind.D5, Ind.D0,                         // E0,D5,D0
         };
     }
 }

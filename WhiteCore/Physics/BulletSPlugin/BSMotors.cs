@@ -434,6 +434,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             LastError = Vector3.Zero;
         }
 
+        //redundant??
         public override void Zero()
         {
             base.Zero();

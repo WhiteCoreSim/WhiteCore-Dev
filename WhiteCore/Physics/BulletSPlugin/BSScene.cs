@@ -526,11 +526,13 @@ namespace WhiteCore.Physics.BulletSPlugin
             return new float[3] { 0, 0, DefaultGravityZ };
         }
 
+        //redundant??
         public override void SetGravityForce(bool enabled, float forceX, float forceY, float forceZ)
         {
             base.SetGravityForce(enabled, forceX, forceY, forceZ);
         }
 
+        //redundant??
         public override void AddGravityPoint(bool isApplyingForces, Vector3 position, float forceX, float forceY,
             float forceZ, float gravForce, float radius, int identifier)
         {
@@ -779,7 +781,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             get { return false; }
         }
 
-/* not implemented
+/* not yet implemented
         #region Extensions
         public override object Extension(string pFunct, params object[] pParams)
         {

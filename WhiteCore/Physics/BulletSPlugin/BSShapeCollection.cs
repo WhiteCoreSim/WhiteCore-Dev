@@ -422,10 +422,11 @@ namespace WhiteCore.Physics.BulletSPlugin
         // Info in prim.BSShape is updated to the new shape.
         // Returns 'true' if the geometry was rebuilt.
         // Called at taint-time!
-    public const int AvatarShapeCapsule = 0;
-    public const int AvatarShapeCube = 1;
-    public const int AvatarShapeOvoid = 2;
-    public const int AvatarShapeMesh = 3;
+        public const int AvatarShapeCapsule = 0;
+        public const int AvatarShapeCube = 1;
+        public const int AvatarShapeOvoid = 2;
+        public const int AvatarShapeMesh = 3;
+
         bool CreateGeom(bool forceRebuild, BSPhysObject prim, ShapeDestructionCallback shapeCallback)
         {
             bool ret = false;

@@ -33,7 +33,10 @@ using OMV = OpenMetaverse;
 
 namespace WhiteCore.Phyics.BulletSPlugin
 {
-    /*public class BSActorHover : BSActor
+    /*
+     //This functionality appers to have been incorporated directly in SceneObjectPart.UpdateLookAt()
+     
+    public class BSActorHover : BSActor
     {
         private BSFMotor m_hoverMotor;
 
