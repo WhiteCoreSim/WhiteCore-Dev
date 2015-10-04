@@ -114,12 +114,15 @@ namespace WhiteCore.Modules.Currency
                 taskTimer.Enabled = false;
                 taskTimer.Elapsed += SchedulerTimerElapsed;
 
-                if (payStipends || payGroups)
+                if (payStipends)
                 {
                     InitializeScheduleTimer ();
                     MainConsole.Instance.Info ("[Currency]: Stipend payments enabled. Next payment: " + String.Format ("{0:f}", nextStipendPayment));
                 }
-              
+                if (payGroups)
+                {
+                	MainConsole.Instance.Info ("[Currency]: Group payments enabled.");
+                }            
             }
         }
 
@@ -158,7 +161,7 @@ namespace WhiteCore.Modules.Currency
             MainConsole.Instance.Commands.AddCommand(
                 "grouppay enable",
                 "grouppay enable",
-                "Enables payments to groups and group memeners",
+                "Enables payments to groups and group members",
                 HandleGrouppayEnable, false, true);
 
             MainConsole.Instance.Commands.AddCommand(
