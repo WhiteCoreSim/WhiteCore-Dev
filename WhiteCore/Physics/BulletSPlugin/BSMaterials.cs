@@ -29,7 +29,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Nini.Config;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public struct MaterialAttributes
     {
@@ -179,7 +179,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // Use reflection to set the value in the attribute structure.
-        private static void SetAttributeValue(int matType, string attribName, float val)
+        static void SetAttributeValue(int matType, string attribName, float val)
         {
             // Get the current attribute values for this material
             MaterialAttributes thisAttrib = Attributes[matType];

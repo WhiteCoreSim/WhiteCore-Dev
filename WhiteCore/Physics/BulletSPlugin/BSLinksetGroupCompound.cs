@@ -27,11 +27,11 @@
 
 using OMV = OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public sealed class BSLinksetGroupCompound : BSLinkset
     {
-        private static string LogHeader = "[BULLETSIM LINKSET COMPOUND]";
+        static string LogHeader = "[BULLETSIM LINKSET COMPOUND]";
 
         public BSLinksetGroupCompound(BSScene scene, BSPrimLinkable parent)
             : base(scene, parent)
@@ -255,7 +255,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // When the linkset is built, the child shape is added to the compound shape relative to the
         //    root shape. The linkset then moves around but this does not move the actual child
         //    prim. The child prim's location must be recomputed based on the location of the root shape.
-        private void RecomputeChildWorldPosition(BSPrimLinkable child, bool inTaintTime)
+        void RecomputeChildWorldPosition(BSPrimLinkable child, bool inTaintTime)
         {
             // For the moment (20130201), disable this computation (converting the child physical addr back to
             //    a region address) until we have a good handle on center-of-mass offsets and what the physics
@@ -352,9 +352,9 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // Constraint linksets are rebuilt every time.
         // Note that this works for rebuilding just the root after a linkset is taken apart.
         // Called at taint time!!
-        private bool disableCOM = false;
+        bool disableCOM = false;
 
-        private void RecomputeLinksetCompound()
+        void RecomputeLinksetCompound()
         {
             try
             {

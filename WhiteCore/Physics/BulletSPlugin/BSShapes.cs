@@ -30,17 +30,132 @@ using System.Collections.Generic;
 using System.Text;
 using OMV = OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
+    public class ShapeInfoInfo
+    {
+        public int Vertices { get; set; }
+        int m_hullCount;
+        int[] m_verticesPerHull;
+        public ShapeInfoInfo()
+        {
+            Vertices = 0;
+            m_hullCount = 0;
+            m_verticesPerHull = null;
+        }
+        public int HullCount
+        {
+            set
+            {
+                m_hullCount = value;
+                m_verticesPerHull = new int[m_hullCount];
+                Array.Clear(m_verticesPerHull, 0, m_hullCount);
+            }
+            get { return m_hullCount; }
+        }
+        public void SetVerticesPerHull(int hullNum, int vertices)
+        {
+            if (m_verticesPerHull != null && hullNum < m_verticesPerHull.Length)
+            {
+                m_verticesPerHull[hullNum] = vertices;
+            }
+        }
+        public int GetVerticesPerHull(int hullNum)
+        {
+            if (m_verticesPerHull != null && hullNum < m_verticesPerHull.Length)
+            {
+                return m_verticesPerHull[hullNum];
+            }
+            return 0;
+        }
+        public override string ToString()
+        {
+            StringBuilder buff = new StringBuilder();
+            // buff.Append("ShapeInfo=<");
+            buff.Append("<");
+            if (Vertices > 0)
+            {
+                buff.Append("verts=");
+                buff.Append(Vertices.ToString());
+            }
+
+            if (Vertices > 0 && HullCount > 0) buff.Append(",");
+
+            if (HullCount > 0)
+            {
+                buff.Append("nHulls=");
+                buff.Append(HullCount.ToString());
+                buff.Append(",");
+                buff.Append("hullVerts=");
+                for (int ii = 0; ii < HullCount; ii++)
+                {
+                    if (ii != 0) buff.Append(",");
+                    buff.Append(GetVerticesPerHull(ii).ToString());
+                }
+            }
+            buff.Append(">");
+            return buff.ToString();
+        }
+    }
+
     public abstract class BSShape
     {
         public int referenceCount { get; set; }
         public DateTime lastReferenced { get; set; }
+        public BulletShape physShapeInfo { get; set; }
+        public ShapeInfoInfo shapeInfo { get; private set; }
 
         public BSShape()
         {
-            referenceCount = 0;
+            referenceCount = 1;
             lastReferenced = DateTime.Now;
+            physShapeInfo = new BulletShape();
+            shapeInfo = new ShapeInfoInfo();
+        }
+
+        public BSShape(BulletShape pShape)
+        {
+            referenceCount = 1;
+            lastReferenced = DateTime.Now;
+            physShapeInfo = pShape;
+            shapeInfo = new ShapeInfoInfo();
+        }
+
+        // Called when this shape is being used again.
+        // Used internally. External callers should call instance.GetReference() to properly copy/reference
+        //       the shape.
+        protected virtual void IncrementReference()
+        {
+            referenceCount++;
+            lastReferenced = DateTime.Now;
+        }
+
+        // Called when this shape is done being used.
+        protected virtual void DecrementReference()
+        {
+            referenceCount--;
+            lastReferenced = DateTime.Now;
+        }
+
+        // Return 'true' if there is an allocated physics physical shape under this class instance.
+        public virtual bool HasPhysicalShape
+        {
+            get
+            {
+                if (physShapeInfo != null)
+                    return physShapeInfo.HasPhysicalShape;
+                return false;
+            }
+        }
+        public virtual BSPhysicsShapeType ShapeType
+        {
+            get
+            {
+                BSPhysicsShapeType ret = BSPhysicsShapeType.SHAPE_UNKNOWN;
+                if (physShapeInfo != null && physShapeInfo.HasPhysicalShape)
+                    ret = physShapeInfo.shapeType;
+                return ret;
+            }
         }
 
         // Get a reference to a physical shape. Create if it doesn't exist
@@ -146,7 +261,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             return null;
         }
 
-        private BSShapeNative(BSScene physicsScene, BSPhysObject prim,
+        BSShapeNative(BSScene physicsScene, BSPhysObject prim,
             BSPhysicsShapeType shapeType, FixedShapeKey shapeKey)
         {
             ShapeData nativeShapeData = new ShapeData();
@@ -193,7 +308,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
     public class BSShapeMesh : BSShape
     {
-        private static Dictionary<System.UInt64, BSShapeMesh> Meshes = new Dictionary<System.UInt64, BSShapeMesh>();
+        static Dictionary<UInt64, BSShapeMesh> Meshes = new Dictionary<UInt64, BSShapeMesh>();
 
         public BSShapeMesh()
             : base()
@@ -212,7 +327,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
     public class BSShapeHull : BSShape
     {
-        private static Dictionary<System.UInt64, BSShapeHull> Hulls = new Dictionary<System.UInt64, BSShapeHull>();
+        static Dictionary<UInt64, BSShapeHull> Hulls = new Dictionary<UInt64, BSShapeHull>();
 
         public BSShapeHull()
             : base()
@@ -289,34 +404,34 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // The height, width and depth is one. All scaling is done by the simulator.
 
         // Z component -- how far the level is from the middle zero
-        private const float Aup = 0.5f;
-        private const float Bup = 0.4f;
-        private const float Cup = 0.3f;
-        private const float Dup = -0.4f;
-        private const float Eup = -0.5f;
+        const float Aup = 0.5f;
+        const float Bup = 0.4f;
+        const float Cup = 0.3f;
+        const float Dup = -0.4f;
+        const float Eup = -0.5f;
 
         // Y component -- distance from center to x0 and x3
-        private const float Awid = 0.25f;
-        private const float Bwid = 0.3f;
-        private const float Cwid = 0.5f;
-        private const float Dwid = 0.3f;
-        private const float Ewid = 0.2f;
+        const float Awid = 0.25f;
+        const float Bwid = 0.3f;
+        const float Cwid = 0.5f;
+        const float Dwid = 0.3f;
+        const float Ewid = 0.2f;
 
         // Y component -- distance from center to x1, x2, x4 and x5
-        private const float Afwid = 0.0f;
-        private const float Bfwid = 0.2f;
-        private const float Cfwid = 0.4f;
-        private const float Dfwid = 0.2f;
-        private const float Efwid = 0.0f;
+        const float Afwid = 0.0f;
+        const float Bfwid = 0.2f;
+        const float Cfwid = 0.4f;
+        const float Dfwid = 0.2f;
+        const float Efwid = 0.0f;
 
         // X component -- distance from zero to the front or back of a level
-        private const float Adep = 0f;
-        private const float Bdep = 0.3f;
-        private const float Cdep = 0.5f;
-        private const float Ddep = 0.2f;
-        private const float Edep = 0f;
+        const float Adep = 0f;
+        const float Bdep = 0.3f;
+        const float Cdep = 0.5f;
+        const float Ddep = 0.2f;
+        const float Edep = 0f;
 
-        private OMV.Vector3[] avatarVertices =
+        OMV.Vector3[] avatarVertices =
         {
             new OMV.Vector3(0.0f, -Awid, Aup), // A0
             new OMV.Vector3(0.0f, +Awid, Aup), // A3
@@ -347,41 +462,24 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         };
 
         // Offsets of the vertices in the vertices array
-        private enum Ind : int
+        enum Ind : int
         {
-            A0,
-            A3,
-            B0,
-            B1,
-            B2,
-            B3,
-            B4,
-            B5,
-            C0,
-            C1,
-            C2,
-            C3,
-            C4,
-            C5,
-            D0,
-            D1,
-            D2,
-            D3,
-            D4,
-            D5,
-            E0,
-            E3
+            A0, A3,
+            B0, B1, B2, B3, B4, B5,
+            C0, C1, C2, C3, C4, C5,
+            D0, D1, D2, D3, D4, D5,
+            E0, E3
         }
 
         // Comments specify trianges and quads in clockwise direction
-        private Ind[] avatarIndices =
+        Ind[] avatarIndices =
         {
-            Ind.A0, Ind.B0, Ind.B1, // A0,B0,B1
+            Ind.A0, Ind.B0, Ind.B1,                         // A0,B0,B1
             Ind.A0, Ind.B1, Ind.B2, Ind.B2, Ind.A3, Ind.A0, // A0,B1,B2,A3
-            Ind.A3, Ind.B2, Ind.B3, // A3,B2,B3
-            Ind.A3, Ind.B3, Ind.B4, // A3,B3,B4
+            Ind.A3, Ind.B2, Ind.B3,                         // A3,B2,B3
+            Ind.A3, Ind.B3, Ind.B4,                         // A3,B3,B4
             Ind.A3, Ind.B4, Ind.B5, Ind.B5, Ind.A0, Ind.A3, // A3,B4,B5,A0
-            Ind.A0, Ind.B5, Ind.B0, // A0,B5,B0
+            Ind.A0, Ind.B5, Ind.B0,                         // A0,B5,B0
 
             Ind.B0, Ind.C0, Ind.C1, Ind.C1, Ind.B1, Ind.B0, // B0,C0,C1,B1
             Ind.B1, Ind.C1, Ind.C2, Ind.C2, Ind.B2, Ind.B1, // B1,C1,C2,B2
@@ -397,12 +495,12 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             Ind.C4, Ind.D4, Ind.D5, Ind.D5, Ind.C5, Ind.C4, // C4,D4,D5,C5
             Ind.C5, Ind.D5, Ind.D0, Ind.D0, Ind.C0, Ind.C5, // C5,D5,D0,C0
 
-            Ind.E0, Ind.D0, Ind.D1, // E0,D0,D1
+            Ind.E0, Ind.D0, Ind.D1,                         // E0,D0,D1
             Ind.E0, Ind.D1, Ind.D2, Ind.D2, Ind.E3, Ind.E0, // E0,D1,D2,E3
-            Ind.E3, Ind.D2, Ind.D3, // E3,D2,D3
-            Ind.E3, Ind.D3, Ind.D4, // E3,D3,D4
+            Ind.E3, Ind.D2, Ind.D3,                         // E3,D2,D3
+            Ind.E3, Ind.D3, Ind.D4,                         // E3,D3,D4
             Ind.E3, Ind.D4, Ind.D5, Ind.D5, Ind.E0, Ind.E3, // E3,D4,D5,E0
-            Ind.E0, Ind.D5, Ind.D0, // E0,D5,D0
+            Ind.E0, Ind.D5, Ind.D0,                         // E0,D5,D0
         };
     }
 }

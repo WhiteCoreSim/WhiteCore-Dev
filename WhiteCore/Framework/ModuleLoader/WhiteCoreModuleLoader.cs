@@ -37,11 +37,11 @@ namespace WhiteCore.Framework.ModuleLoader
 {
     public static class WhiteCoreModuleLoader
     {
-        private static bool ALLOW_CACHE = true;
-        private static List<string> dllBlackList;
-        private static readonly List<string> firstLoad = new List<string>();
-        private static readonly Dictionary<string, List<Type>> LoadedDlls = new Dictionary<string, List<Type>>();
-        private static readonly Dictionary<string, Assembly> LoadedAssemblys = new Dictionary<string, Assembly>();
+        static bool ALLOW_CACHE = true;
+        static List<string> dllBlackList;
+        static readonly List<string> firstLoad = new List<string>();
+        static readonly Dictionary<string, List<Type>> LoadedDlls = new Dictionary<string, List<Type>>();
+        static readonly Dictionary<string, Assembly> LoadedAssemblys = new Dictionary<string, Assembly>();
 
         #region Module Loaders
 
