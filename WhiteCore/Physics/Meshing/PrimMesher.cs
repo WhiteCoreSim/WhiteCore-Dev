@@ -118,7 +118,6 @@ namespace WhiteCore.Physics.PrimMesher
 
         public override string ToString ()
         {
-//            return "< X: " + X. + ", Y: " + Y + ", Z: " + Z + ", W: " + W + ">";
             return String.Format ("< X: {0}, Y: {1}, Z: {2}, W: {3} >", X, Y, Z, W);
         }
     }
@@ -1236,8 +1235,7 @@ namespace WhiteCore.Physics.PrimMesher
         const float twoPi = 2.0f * (float)Math.PI;
         public float dimpleBegin;
         public float dimpleEnd = 1.0f;
-        public float holeSizeX = 1.0f;
-        // called pathScaleX in pbs
+        public float holeSizeX = 1.0f;        // called pathScaleX in pbs
         public float holeSizeY = 0.25f;
         public float pathCutBegin;
         public float pathCutEnd = 1.0f;
@@ -1473,8 +1471,7 @@ namespace WhiteCore.Physics.PrimMesher
         public float dimpleBegin;
         public float dimpleEnd = 1.0f;
         public float skew;
-        public float holeSizeX = 1.0f;
-        // called pathScaleX in pbs
+        public float holeSizeX = 1.0f;        // called pathScaleX in pbs
         public float holeSizeY = 0.25f;
         public float taperX;
         public float taperY;
@@ -1692,7 +1689,23 @@ namespace WhiteCore.Physics.PrimMesher
             }
 
             profileOuterFaceNumber = profile.outerFaceNumber;
-            //this is always true
+
+            if (pathType == PathType.Circular)
+            {
+                needEndFaces = false;
+                if (pathCutBegin != 0.0f || pathCutEnd != 1.0f)
+                    needEndFaces = true;
+                else if (taperX != 0.0f || taperY != 0.0f)
+                    needEndFaces = true;
+                else if (skew != 0.0f)
+                    needEndFaces = true;
+                else if (twistTotal != 0.0f)
+                    needEndFaces = true;
+                else if (radius != 0.0f)
+                    needEndFaces = true;
+            }
+            else needEndFaces = true;
+
             if (!needEndFaces)
                 profileOuterFaceNumber--;
 
@@ -1743,23 +1756,6 @@ namespace WhiteCore.Physics.PrimMesher
             };
 
             path.Create (pathType, steps);
-
-
-            if (pathType == PathType.Circular)
-            {
-                needEndFaces = false;
-                if (pathCutBegin != 0.0f || pathCutEnd != 1.0f)
-                    needEndFaces = true;
-                else if (taperX != 0.0f || taperY != 0.0f)
-                    needEndFaces = true;
-                else if (skew != 0.0f)
-                    needEndFaces = true;
-                else if (twistTotal != 0.0f)
-                    needEndFaces = true;
-                else if (radius != 0.0f)
-                    needEndFaces = true;
-            } else
-                needEndFaces = true;
 
             for (int nodeIndex = 0; nodeIndex < path.pathNodes.Count; nodeIndex++)
             {
@@ -1880,10 +1876,16 @@ namespace WhiteCore.Physics.PrimMesher
                             ViewerFace newViewerFace1 = new ViewerFace (primFaceNum);
                             ViewerFace newViewerFace2 = new ViewerFace (primFaceNum);
 
-                            float u1 = newLayer.us [whichVert];
+                            int uIndex = whichVert;
+                            if (!hasHollow && sides > 4 && uIndex < newLayer.us.Count - 1)
+                            {
+                                uIndex++;
+                            }
+
+                            float u1 = newLayer.us[uIndex];
                             float u2 = 1.0f;
-                            if (whichVert < newLayer.us.Count - 1)
-                                u2 = newLayer.us [whichVert + 1];
+                            if (uIndex < (int)newLayer.us.Count - 1)
+                                u2 = newLayer.us[uIndex + 1];
 
                             if (whichVert == cut1Vert || whichVert == cut2Vert)
                             {
@@ -1941,25 +1943,27 @@ namespace WhiteCore.Physics.PrimMesher
                             newViewerFace2.uv2.V = lastV;
                             newViewerFace2.uv3.V = lastV;
 
-                            newViewerFace1.v1 = coords [i];
-                            newViewerFace1.v2 = coords [i - numVerts];
-                            newViewerFace1.v3 = coords [iNext - numVerts];
+                            newViewerFace1.v1 = coords[newFace1.v1];
+                            newViewerFace1.v2 = coords[newFace1.v2];
+                            newViewerFace1.v3 = coords[newFace1.v3];
 
-                            newViewerFace2.v1 = coords [i];
-                            newViewerFace2.v2 = coords [iNext - numVerts];
-                            newViewerFace2.v3 = coords [iNext];
+                            newViewerFace2.v1 = coords[newFace2.v1];
+                            newViewerFace2.v2 = coords[newFace2.v2];
+                            newViewerFace2.v3 = coords[newFace2.v3];
 
-                            newViewerFace1.coordIndex1 = i;
-                            newViewerFace1.coordIndex2 = i - numVerts;
-                            newViewerFace1.coordIndex3 = iNext - numVerts;
+                            newViewerFace1.coordIndex1 = newFace1.v1;
+                            newViewerFace1.coordIndex2 = newFace1.v2;
+                            newViewerFace1.coordIndex3 = newFace1.v3;
 
-                            newViewerFace2.coordIndex1 = i;
-                            newViewerFace2.coordIndex2 = iNext - numVerts;
-                            newViewerFace2.coordIndex3 = iNext;
+                            newViewerFace2.coordIndex1 = newFace2.v1;
+                            newViewerFace2.coordIndex2 = newFace2.v2;
+                            newViewerFace2.coordIndex3 = newFace2.v3;
 
                             // profile cut faces
                             if (whichVert == cut1Vert)
                             {
+                                newViewerFace1.primFaceNumber = cut1FaceNumber;
+                                newViewerFace2.primFaceNumber = cut1FaceNumber;
                                 newViewerFace1.n1 = newLayer.cutNormal1;
                                 newViewerFace1.n2 = newViewerFace1.n3 = lastCutNormal1;
 
@@ -1967,10 +1971,14 @@ namespace WhiteCore.Physics.PrimMesher
                                 newViewerFace2.n2 = lastCutNormal1;
                             } else if (whichVert == cut2Vert)
                             {
+                                newViewerFace1.primFaceNumber = cut2FaceNumber;
+                                newViewerFace2.primFaceNumber = cut2FaceNumber;
                                 newViewerFace1.n1 = newLayer.cutNormal2;
-                                newViewerFace1.n2 = newViewerFace1.n3 = lastCutNormal2;
+                                newViewerFace1.n2 = lastCutNormal2;
+                                newViewerFace1.n3 = lastCutNormal2;
 
-                                newViewerFace2.n1 = newViewerFace2.n3 = newLayer.cutNormal2;
+                                newViewerFace2.n1 = newLayer.cutNormal2;
+                                newViewerFace2.n3 = newLayer.cutNormal2;
                                 newViewerFace2.n2 = lastCutNormal2;
                             } else // outer and hollow faces
                             {
@@ -1982,18 +1990,18 @@ namespace WhiteCore.Physics.PrimMesher
                                     newViewerFace2.CalcSurfaceNormal ();
                                 } else
                                 {
-                                    newViewerFace1.n1 = normals [i];
-                                    newViewerFace1.n2 = normals [i - numVerts];
-                                    newViewerFace1.n3 = normals [iNext - numVerts];
+                                    newViewerFace1.n1 = normals[newFace1.n1];
+                                    newViewerFace1.n2 = normals[newFace1.n2];
+                                    newViewerFace1.n3 = normals[newFace1.n3];
 
-                                    newViewerFace2.n1 = normals [i];
-                                    newViewerFace2.n2 = normals [iNext - numVerts];
-                                    newViewerFace2.n3 = normals [iNext];
+                                    newViewerFace2.n1 = normals[newFace2.n1];
+                                    newViewerFace2.n2 = normals[newFace2.n2];
+                                    newViewerFace2.n3 = normals[newFace2.n3];
                                 }
                             }
-
                             viewerFaces.Add (newViewerFace1);
                             viewerFaces.Add (newViewerFace2);
+
                         }
                     }
                 }
