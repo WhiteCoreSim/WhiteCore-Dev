@@ -215,7 +215,7 @@ namespace WhiteCore.Framework.Physics
         public abstract float Mass { get; }
         public abstract float CollisionScore { get; set; }
         public abstract Quaternion Orientation { get; set; }
-        public abstract int PhysicsActorType { get; }
+        public abstract int PhysicsActorType { get; set;}
         public abstract bool IsPhysical { get; set; }
         public abstract bool ThrottleUpdates { get; set; }
         public abstract bool IsColliding { get; set; }
@@ -421,6 +421,7 @@ namespace WhiteCore.Framework.Physics
         public override int PhysicsActorType
         {
             get { return (int) ActorTypes.Ground; }
+            set { return; }
         }
 
         public override Vector3 RotationalVelocity
@@ -564,6 +565,8 @@ namespace WhiteCore.Framework.Physics
         public override int PhysicsActorType
         {
             get { return (int) ActorTypes.Unknown; }
+            set { return; }
+
         }
 
         public override Vector3 RotationalVelocity

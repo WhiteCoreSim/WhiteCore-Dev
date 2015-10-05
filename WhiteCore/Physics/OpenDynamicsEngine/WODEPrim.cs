@@ -228,6 +228,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         public override int PhysicsActorType
         {
             get { return (int) ActorTypes.Prim; }
+            set { return; }
         }
 
         public override uint LocalID

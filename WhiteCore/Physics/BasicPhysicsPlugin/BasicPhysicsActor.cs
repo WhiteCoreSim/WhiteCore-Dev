@@ -53,6 +53,7 @@ namespace WhiteCore.Physics.BasicPhysicsPlugin
         public override int PhysicsActorType
         {
             get { return (int) ActorTypes.Agent; }
+            set { return; }
         }
 
         public override Vector3 RotationalVelocity { get; set; }
@@ -149,7 +150,7 @@ namespace WhiteCore.Physics.BasicPhysicsPlugin
 
     public class BasicObjectActor : PhysicsActor
     {
-        private Vector3 _size;
+        Vector3 _size;
 
         public override bool Selected
         {
@@ -158,7 +159,8 @@ namespace WhiteCore.Physics.BasicPhysicsPlugin
 
         public override int PhysicsActorType
         {
-            get { return (int) ActorTypes.Agent; }
+            get { return (int) ActorTypes.Agent; } 
+            set { return; }
         }
 
         public override Vector3 RotationalVelocity { get; set; }

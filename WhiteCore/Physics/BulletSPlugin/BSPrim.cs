@@ -46,6 +46,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         //bool _grabbed;
         //bool _kinematic;
 
+        int _physicsActorType;
         bool _isSelected;
         bool _isVolumeDetect;
 
@@ -78,7 +79,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             : base(parent_scene, localID, primName, "BSPrim")
         {
             // MainConsole.Instance.DebugFormat("{0}: BSPrim creation of {1}, id={2}", LogHeader, primName, localID);
-           // _physicsActorType = (int)ActorTypes.Prim;
+            _physicsActorType = (int)ActorTypes.Prim;
             _position = pos;
             _size = size;
             Scale = size; // prims are the size the user wants them to be (different for BSCharactes).
@@ -808,7 +809,8 @@ namespace WhiteCore.Physics.BulletSPlugin
         // we are a prim here
         public override int PhysicsActorType
         {
-            get { return (int)ActorTypes.Prim; }
+            get { return _physicsActorType; }
+            set { _physicsActorType = value; }
         }
 
         public override bool IsPhysical

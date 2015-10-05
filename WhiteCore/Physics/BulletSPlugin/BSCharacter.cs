@@ -590,7 +590,8 @@ namespace WhiteCore.Physics.BulletSPlugin
         // we are always an Agent
         public override int PhysicsActorType
         {
-            get { return (int)ActorTypes.Agent; }
+            get { return (int)ActorTypes.Agent; } 
+            set { return; }
         }
 
         // ... and a physical one at that.
