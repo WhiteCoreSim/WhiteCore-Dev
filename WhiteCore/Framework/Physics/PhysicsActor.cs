@@ -151,6 +151,7 @@ namespace WhiteCore.Framework.Physics
 
         public abstract Vector3 Size { get; set; }
         public virtual uint LocalID { get; set; }
+        public abstract bool Grabbed { set; }
         public virtual string Name { get; set; }
         public virtual UUID UUID { get; set; }
 
@@ -267,6 +268,7 @@ namespace WhiteCore.Framework.Physics
         public virtual void SubscribeEvents(int ms) { }
         public virtual void UnSubscribeEvents() { }
         public virtual bool VolumeDetect { get; set; }
+        public abstract bool Kinematic { get; set; }
 
         public event BlankHandler OnPhysicalRepresentationChanged;
 
@@ -333,6 +335,11 @@ namespace WhiteCore.Framework.Physics
         public override uint LocalID
         {
             get { return 0; }
+            set { return; }
+        }
+
+        public override bool Grabbed
+        {
             set { return; }
         }
 
@@ -430,6 +437,11 @@ namespace WhiteCore.Framework.Physics
             set { return; }
         }
 
+        public override bool Kinematic {
+            get { return false; }
+            set { return; }
+        }
+           
         public override void CrossingFailure()
         {
         }
@@ -498,6 +510,11 @@ namespace WhiteCore.Framework.Physics
         public override uint LocalID
         {
             get { return 0; }
+            set { return; }
+        }
+
+        public override bool Grabbed
+        {
             set { return; }
         }
 
@@ -572,6 +589,11 @@ namespace WhiteCore.Framework.Physics
         public override Vector3 RotationalVelocity
         {
             get { return Vector3.Zero; }
+            set { return; }
+        }
+
+        public override bool Kinematic {
+            get { return false; }
             set { return; }
         }
 

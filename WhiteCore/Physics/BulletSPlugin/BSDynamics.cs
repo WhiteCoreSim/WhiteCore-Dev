@@ -1734,7 +1734,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 // Don't do it all at once. Fudge because 1 second is too fast with most user defined roll as PI*4.
                 bankingContributionV /= m_bankingTimescale * BSParam.VehicleAngularBankingTimescaleFudge;
 
-                //VehicleRotationalVelocity += bankingContributionV * VehicleOrientation;
+                //VehicleRotationalVelocity += bankingContributionV * VehicleFrameOrientation;
                 VehicleRotationalVelocity += bankingContributionV;
 
 

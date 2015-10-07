@@ -122,7 +122,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             TimeScale = TargetValueDecayTimeScale = BSMotor.Infinite;
             Efficiency = 1f;
             CurrentValue = TargetValue = Vector3.Zero;
-            ErrorZeroThreshold = 0.001f;
+            ErrorZeroThreshold = BSParam.AvatarStopZeroThreshold;   // was 0.001f;
         }
 
         public BSVMotor(string useName, float timeScale, float decayTimeScale, float efficiency)

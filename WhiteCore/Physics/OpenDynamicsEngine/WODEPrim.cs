@@ -247,6 +247,11 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             set { _parent_scene.AddSimulationChange(() => changevoldtc(value)); }
         }
 
+        public override bool Grabbed
+        {
+            set { return; }
+        }
+
         public override bool Selected
         {
             set
@@ -353,6 +358,12 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                     MainConsole.Instance.Warn("[PHYSICS]: NaN in Force Applied to an Object");
                 }
             }
+        }
+
+        public override bool Kinematic
+        {
+            get { return false; }
+            set { return; }
         }
 
         public override int VehicleType

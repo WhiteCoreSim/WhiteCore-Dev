@@ -137,7 +137,7 @@ namespace WhiteCore.Physics.BulletSPlugin
 
         // Remove the specified child from the linkset.
         // Safe to call even if the child is not really in my linkset.
-        protected override void RemoveChildFromLinkset(BSPrimLinkable child)
+        protected override void RemoveChildFromLinkset(BSPrimLinkable child, bool inTaintTime)
         {
             if (m_children.Remove(child))
             {
@@ -149,7 +149,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                     rootx.LocalID, rootx.PhysBody.AddrString,
                     childx.LocalID, childx.PhysBody.AddrString);
 
-                PhysicsScene.TaintedObject("BSLinksetConstraints.RemoveChildFromLinkset",
+                PhysicsScene.TaintedObject(inTaintTime,"BSLinksetConstraints.RemoveChildFromLinkset",
                     delegate() { PhysicallyUnlinkAChildFromRoot(rootx, childx); });
                 // See that the linkset parameters are recomputed at the end of the taint time.
                 Refresh(LinksetRoot);

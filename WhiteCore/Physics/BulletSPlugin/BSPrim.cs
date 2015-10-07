@@ -42,13 +42,12 @@ namespace WhiteCore.Physics.BulletSPlugin
         // _size is what the user passed. Scale is what we pass to the physics engine with the mesh.
         OMV.Vector3 _size; // the multiplier for each mesh dimension as passed by the user
 
-        // These are not currently used but provided for future update
-        //bool _grabbed;
-        //bool _kinematic;
 
         int _physicsActorType;
         bool _isSelected;
         bool _isVolumeDetect;
+        bool _grabbed;
+        bool _kinematic;
 
         // _position is what the simulator thinks the positions of the prim is.
         OMV.Vector3 _position;
@@ -100,7 +99,7 @@ namespace WhiteCore.Physics.BulletSPlugin
 
             // DetailLog("{0},BSPrim.constructor,call", LocalID);
             // do the actual object creation at taint time
-            PhysicsScene.TaintedObject("BSPrim.create", delegate()
+            PhysicsScene.TaintedObject(LocalID, "BSPrim.create", delegate()
             {
                 // Make sure the object is being created with some sanity.
                 ExtremeSanityCheck(true /* inTaintTime */);
@@ -124,7 +123,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             // Undo any vehicle properties
             this.VehicleType = (int)Vehicle.TYPE_NONE;
 
-            PhysicsScene.TaintedObject("BSPrim.Destroy", delegate()
+            PhysicsScene.TaintedObject(LocalID, "BSPrim.Destroy", delegate()
             {
                 DetailLog("{0},BSPrim.Destroy,taint,", LocalID);
                 // If there are physical body and shape, release my use of same.
@@ -173,7 +172,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             }
             else
             {
-                PhysicsScene.TaintedObject("BSPrim.ForceBodyShapeRebuild", delegate()
+                PhysicsScene.TaintedObject(LocalID, "BSPrim.ForceBodyShapeRebuild", delegate()
                 {
                     _mass = CalculateMass(); // changing the shape changes the mass
                     CreateGeomAndObject(true);
@@ -182,6 +181,9 @@ namespace WhiteCore.Physics.BulletSPlugin
             return true;
         }
 
+        public override bool Grabbed {
+            set { _grabbed = value; }
+        }
         public override bool Selected
         {
             set
@@ -189,7 +191,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 if (value != _isSelected)
                 {
                     _isSelected = value;
-                    PhysicsScene.TaintedObject("BSPrim.setSelected", delegate()
+                    PhysicsScene.TaintedObject(LocalID, "BSPrim.setSelected", delegate()
                     {
                         DetailLog("{0},BSPrim.selected,taint,selected={1}", LocalID, _isSelected);
                         SetObjectDynamic(false);
@@ -305,7 +307,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 delegate() { return new BSActorLockAxis(PhysicsScene, this, LockedAxisActorName); });
 
             // Update parameters so the new actor's Refresh() action is called at the right time.
-            PhysicsScene.TaintedObject("BSPrim.LockAngularMotion", delegate() { UpdatePhysicalParameters(); });
+            PhysicsScene.TaintedObject(LocalID, "BSPrim.LockAngularMotion", delegate() { UpdatePhysicalParameters(); });
 
             return;
         }
@@ -337,7 +339,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 _position = value;
                 PositionSanityCheck(false);
 
-                PhysicsScene.TaintedObject("BSPrim.setPosition", delegate()
+                PhysicsScene.TaintedObject(LocalID, "BSPrim.setPosition", delegate()
                 {
                     DetailLog("{0},BSPrim.SetPosition,taint,pos={1},orient={2}", LocalID, _position, _orientation);
                     ForcePosition = _position;
@@ -581,7 +583,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             {
                 Vehicle type = (Vehicle)value;
 
-                PhysicsScene.TaintedObject ("setVehicleType", delegate() {
+                PhysicsScene.TaintedObject (LocalID,"setVehicleType", delegate() {
                     // Vehicle code changes the parameters for this vehicle type.
                     VehicleActor.ProcessTypeChange (type);
                     ActivateIfPhysical (false);
@@ -591,37 +593,42 @@ namespace WhiteCore.Physics.BulletSPlugin
 
         public override void VehicleFloatParam (int param, float value)
         {
-            PhysicsScene.TaintedObject ("BSPrim.VehicleFloatParam", delegate() {
+            PhysicsScene.TaintedObject(LocalID, "BSPrim.VehicleFloatParam", delegate() {
                 VehicleActor.ProcessFloatVehicleParam ((Vehicle)param, value);
                 ActivateIfPhysical (false);
             });
         }
 
-    // temporary override for vector 
-    public override void VehicleVectorParam(int param, OMV.Vector3 value)
-    {
-        PhysicsScene.TaintedObject("BSPrim.VehicleVectorParam", delegate()
+        // override for vector parameters
+        public override void VehicleVectorParam(int param, OMV.Vector3 value)
         {
-            VehicleActor.ProcessVectorVehicleParam((Vehicle)param, value);
-            ActivateIfPhysical(false);
-        });
-    }
+            PhysicsScene.TaintedObject(LocalID, "BSPrim.VehicleVectorParam", delegate()
+            {
+                VehicleActor.ProcessVectorVehicleParam((Vehicle)param, value);
+                ActivateIfPhysical(false);
+            });
+        }
 
-    public override void VehicleRotationParam(int param, OMV.Quaternion rotation)
-    {
-        PhysicsScene.TaintedObject("BSPrim.VehicleRotationParam", delegate()
+        public override void VehicleRotationParam(int param, OMV.Quaternion rotation)
         {
-            VehicleActor.ProcessRotationVehicleParam((Vehicle)param, rotation);
-            ActivateIfPhysical(false);
-        });
-    }
-    public override void VehicleFlags(int param, bool remove)
-    {
-        PhysicsScene.TaintedObject("BSPrim.VehicleFlags", delegate()
+            PhysicsScene.TaintedObject(LocalID, "BSPrim.VehicleRotationParam", delegate()
+            {
+                VehicleActor.ProcessRotationVehicleParam((Vehicle)param, rotation);
+                ActivateIfPhysical(false);
+            });
+        }
+        public override void VehicleFlags(int param, bool remove)
         {
-            VehicleActor.ProcessVehicleFlags(param, remove);
-        });
-    }
+            PhysicsScene.TaintedObject(LocalID, "BSPrim.VehicleFlags", delegate()
+            {
+                VehicleActor.ProcessVehicleFlags(param, remove);
+            });
+        }
+
+        //TODO!!!!   -greythane- 20151006 - use the VolumneDetect below, to directly set rather than the OS implementation
+        //
+        // Allows the detection of collisions with inherently non-physical prims. see llVolumeDetect for more info
+        //public override void SetVolumeDetect(int param)
 
         public override bool VolumeDetect
         {
@@ -631,7 +638,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 if (_isVolumeDetect != value)
                 {
                     _isVolumeDetect = value;
-                    PhysicsScene.TaintedObject("BSPrim.SetVolumeDetect", delegate()
+                    PhysicsScene.TaintedObject(LocalID, "BSPrim.SetVolumeDetect", delegate()
                     {
                         // DetailLog("{0},setVolumeDetect,taint,volDetect={1}", LocalID, _isVolumeDetect);
                         SetObjectDynamic(true);
@@ -641,7 +648,12 @@ namespace WhiteCore.Physics.BulletSPlugin
             }
         }
 
-        public override void SetMaterial(int material, float friction, float restitution, float gravityMultiplier,
+       public override bool IsVolumeDetect
+       {
+           get { return _isVolumeDetect; }
+       }
+
+       public override void SetMaterial(int material, float friction, float restitution, float gravityMultiplier,
             float density)
         {
             base.SetMaterial(material);
@@ -649,10 +661,10 @@ namespace WhiteCore.Physics.BulletSPlugin
             base.Restitution = restitution;
             base.GravityMultiplier = gravityMultiplier;
             base.Density = density;
-            PhysicsScene.TaintedObject("BSPrim.SetMaterial", delegate() { UpdatePhysicalParameters(); });
+            PhysicsScene.TaintedObject(LocalID, "BSPrim.SetMaterial", delegate() { UpdatePhysicalParameters(); });
         }
-// These appear to have been split out from ... or added into the SetMaterial() above ??
-/*    public override float Friction
+
+    public override float Friction
     {
         get { return base.Friction; }
         set
@@ -660,7 +672,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             if (base.Friction != value)
             {
                 base.Friction = value;
-                PhysicsScene.TaintedObject("BSPrim.setFriction", delegate()
+                PhysicsScene.TaintedObject(LocalID, "BSPrim.setFriction", delegate()
                 {
                     UpdatePhysicalParameters();
                 });
@@ -675,7 +687,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             if (base.Restitution != value)
             {
                 base.Restitution = value;
-                PhysicsScene.TaintedObject("BSPrim.setRestitution", delegate()
+                PhysicsScene.TaintedObject(LocalID, "BSPrim.setRestitution", delegate()
                 {
                     UpdatePhysicalParameters();
                 });
@@ -692,7 +704,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             if (base.Density != value)
             {
                 base.Density = value;
-                PhysicsScene.TaintedObject( "BSPrim.setDensity", delegate()
+                PhysicsScene.TaintedObject(LocalID, "BSPrim.setDensity", delegate()
                 {
                     UpdatePhysicalParameters();
                 });
@@ -707,21 +719,21 @@ namespace WhiteCore.Physics.BulletSPlugin
                 if (base.GravityMultiplier != value)
             {
                     base.GravityMultiplier = value;
-                    PhysicsScene.TaintedObject( "BSPrim.setGravityMultiplier", delegate()
+                    PhysicsScene.TaintedObject(LocalID, "BSPrim.setGravityMultiplier", delegate()
                 {
                     UpdatePhysicalParameters();
                 });
             }
         }
     }
-*/
+
         public override OMV.Vector3 Velocity
         {
             get { return RawVelocity; }
             set
             {
                 RawVelocity = value;
-                PhysicsScene.TaintedObject("BSPrim.setVelocity", delegate()
+                PhysicsScene.TaintedObject(LocalID, "BSPrim.setVelocity", delegate()
                 {
                     // DetailLog("{0},BSPrim.SetVelocity,taint,vel={1}", LocalID, RawVelocity);
                     ForceVelocity = RawVelocity;
@@ -786,7 +798,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                     return;
                 _orientation = value;
 
-                PhysicsScene.TaintedObject("BSPrim.setOrientation", delegate() { ForceOrientation = RawOrientation; });
+                PhysicsScene.TaintedObject(LocalID,"BSPrim.setOrientation", delegate() { ForceOrientation = RawOrientation; });
             }
         }
 
@@ -821,7 +833,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 if (_isPhysical != value)
                 {
                     _isPhysical = value;
-                    PhysicsScene.TaintedObject("BSPrim.setIsPhysical", delegate()
+                    PhysicsScene.TaintedObject(LocalID,"BSPrim.setIsPhysical", delegate()
                     {
                         DetailLog("{0},setIsPhysical,taint,isPhys={1}", LocalID, _isPhysical);
                         SetObjectDynamic(true);
@@ -1088,7 +1100,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             set
             {
                 _floatOnWater = value;
-                PhysicsScene.TaintedObject("BSPrim.setFloatOnWater", delegate()
+                PhysicsScene.TaintedObject(LocalID,"BSPrim.setFloatOnWater", delegate()
                 {
                     if (_floatOnWater)
                         CurrentCollisionFlags = PhysicsScene.PE.AddToCollisionFlags(PhysBody,
@@ -1108,7 +1120,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 _rotationalVelocity = value;
                 Util.ClampV(_rotationalVelocity, BSParam.MaxAngularVelocity);
                 // MainConsole.Instance.DebugFormat("{0}: RotationalVelocity={1}", LogHeader, _rotationalVelocity);
-                PhysicsScene.TaintedObject("BSPrim.setRotationalVelocity",
+                PhysicsScene.TaintedObject(LocalID,"BSPrim.setRotationalVelocity",
                     delegate() { ForceRotationalVelocity = _rotationalVelocity; });
             }
         }
@@ -1129,18 +1141,18 @@ namespace WhiteCore.Physics.BulletSPlugin
             }
         }
 
-//    public override bool Kinematic
-//    {
-//        get { return _kinematic; }
-//        set { _kinematic = value; }
-//    }
+      public override bool Kinematic
+      {
+          get { return _kinematic; }
+          set { _kinematic = value; }
+      }
 
         public override float Buoyancy
         {
             get { return _buoyancy; }
             set {
                 _buoyancy = value;
-                PhysicsScene.TaintedObject("BSPrim.setBuoyancy", delegate() { ForceBuoyancy = _buoyancy; });
+                PhysicsScene.TaintedObject(LocalID,"BSPrim.setBuoyancy", delegate() { ForceBuoyancy = _buoyancy; });
             }
         }
 

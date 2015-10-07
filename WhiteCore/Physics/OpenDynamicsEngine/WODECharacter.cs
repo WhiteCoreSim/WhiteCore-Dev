@@ -71,6 +71,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         //        float m_UpdateFPScntr = 0.05f;
         protected bool m_isJumping;
         public bool m_isPhysical; // the current physical status
+        protected bool m_kinematic;
         protected bool m_iscolliding;
 
         protected bool m_ispreJumping;
@@ -195,6 +196,17 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         {
             get { return m_shouldBePhysical; }
             set { m_shouldBePhysical = value; }
+        }
+
+        public override bool Grabbed
+        {
+            set { return; }
+        }
+
+        public override bool Kinematic
+        {
+            get { return m_kinematic; }
+            set { m_kinematic = value; }
         }
 
         public override bool ThrottleUpdates

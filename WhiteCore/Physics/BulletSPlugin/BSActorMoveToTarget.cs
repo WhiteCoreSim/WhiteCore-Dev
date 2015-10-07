@@ -155,15 +155,15 @@ namespace WhiteCore.Physics.BulletSPlugin
                 m_physicsScene.DetailLog("{0},BSPrim.PIDTarget,zeroMovement,movePos={1},pos={2},mass={3}",
                                         m_controllingPrim.LocalID, movePosition, m_controllingPrim.RawPosition, m_controllingPrim.Mass);
                 m_controllingPrim.ForcePosition = m_targetMotor.TargetValue;
-            m_controllingPrim.ForceVelocity = OMV.Vector3.Zero;
-            // Setting the position does not cause the physics engine to generate a property update. Force it.
-            m_physicsScene.PE.PushUpdate(m_controllingPrim.PhysBody);
+                m_controllingPrim.ForceVelocity = OMV.Vector3.Zero;
+                // Setting the position does not cause the physics engine to generate a property update. Force it.
+                m_physicsScene.PE.PushUpdate(m_controllingPrim.PhysBody);
             }
             else
             {
                 m_controllingPrim.ForcePosition = movePosition;
-            // Setting the position does not cause the physics engine to generate a property update. Force it.
-            m_physicsScene.PE.PushUpdate(m_controllingPrim.PhysBody);
+                // Setting the position does not cause the physics engine to generate a property update. Force it.
+                m_physicsScene.PE.PushUpdate(m_controllingPrim.PhysBody);
             }
             m_physicsScene.DetailLog("{0},BSPrim.PIDTarget,move,fromPos={1},movePos={2}", m_controllingPrim.LocalID, origPosition, movePosition);
         }

@@ -1,4 +1,4 @@
-﻿/*
+﻿    /*
  * Copyright (c) Contributors, http://opensimulator.org/, http://whitecore-sim.org
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
@@ -154,13 +154,20 @@ namespace WhiteCore.Physics.BulletSPlugin
 
         struct TaintCallbackEntry
         {
+            public String originator;
             public String ident;
             public TaintCallback callback;
-
-            public TaintCallbackEntry(string i, TaintCallback c)
+            public TaintCallbackEntry(string pIdent, TaintCallback pCallBack)
             {
-                ident = i;
-                callback = c;
+                originator = BSScene.DetailLogZero;
+                ident = pIdent;
+                callback = pCallBack;
+            }
+            public TaintCallbackEntry(string pOrigin, string pIdent, TaintCallback pCallBack)
+            {
+                originator = pOrigin;
+                ident = pIdent;
+                callback = pCallBack;
             }
         }
 
@@ -175,7 +182,7 @@ namespace WhiteCore.Physics.BulletSPlugin
 
         // Sometimes you just have to log everything.
         //public ICommandConsole PhysicsLogging;
-        //bool m_physicsLoggingEnabled;
+        bool m_physicsLoggingEnabled;
         //string m_physicsLoggingDir;
         //string m_physicsLoggingPrefix;
         //int m_physicsLoggingFileMinutes;
@@ -218,14 +225,14 @@ namespace WhiteCore.Physics.BulletSPlugin
             // By creating an empty logger when not logging, the log message invocation code
             //     can be left in and every call doesn't have to check for null.
             /*if (m_physicsLoggingEnabled)
-        {
-            PhysicsLogging = new Logging.LogWriter(m_physicsLoggingDir, m_physicsLoggingPrefix, m_physicsLoggingFileMinutes);
-            PhysicsLogging.ErrorLogger = m_log; // for DEBUG. Let's the logger output error messages.
-        }
-        else
-        {
-            PhysicsLogging = new Logging.LogWriter();
-        }*/
+            {
+                PhysicsLogging = new Logging.LogWriter(m_physicsLoggingDir, m_physicsLoggingPrefix, m_physicsLoggingFileMinutes);
+                PhysicsLogging.ErrorLogger = m_log; // for DEBUG. Let's the logger output error messages.
+            }
+            else
+            {
+                PhysicsLogging = new Logging.LogWriter();
+            }*/
 
             // Allocate memory for returning of the updates and collisions from the physics engine
             m_collisionArray = new CollisionDesc[m_maxCollisionsPerFrame];
@@ -235,7 +242,6 @@ namespace WhiteCore.Physics.BulletSPlugin
             //    a child in a mega-region.
             // Bullet actually doesn't care about the extents of the simulated
             //    area. It tracks active objects no matter where they are.
-//            Vector3 worldExtent = new Vector3(Constants.RegionSize, Constants.RegionSize, Constants.RegionHeight);
             Vector3 worldExtent = new Vector3(scene.RegionInfo.RegionSizeX, scene.RegionInfo.RegionSizeX, Constants.RegionHeight);
            // Vector3 worldExtent = regionExtent;
 
@@ -594,13 +600,13 @@ namespace WhiteCore.Physics.BulletSPlugin
                     out collidersCount);
 
                 //if (PhysicsLogging.Enabled)
-                {
+                //{
                     StatContactLoopTime = Util.EnvironmentTickCountSubtract(beforeTime);
                     DetailLog(
                         "{0},Simulate,call, frame={1}, nTaints={2}, simTime={3}, substeps={4}, updates={5}, colliders={6}, objWColl={7}",
                         DetailLogZero, m_simulationStep, numTaints, StatContactLoopTime, numSubSteps,
                         updatedEntityCount, collidersCount, ObjectsWithCollisions.Count);
-                }
+                //}
             }
             catch (Exception e)
             {
@@ -874,26 +880,37 @@ namespace WhiteCore.Physics.BulletSPlugin
         // Calls to the PhysicsActors can't directly call into the physics engine
         //       because it might be busy. We delay changes to a known time.
         // We rely on C#'s closure to save and restore the context for the delegate.
-        public void TaintedObject(String ident, TaintCallback callback)
+        public void TaintedObject(string pOriginator, string pIdent, TaintCallback pCallback)
+        {
+            TaintedObject(false /*inTaintTime*/, pOriginator, pIdent, pCallback);
+        }
+        public void TaintedObject(uint pOriginator, String pIdent, TaintCallback pCallback)
+        {
+            TaintedObject(false /*inTaintTime*/, m_physicsLoggingEnabled ? pOriginator.ToString() : BSScene.DetailLogZero, pIdent, pCallback);
+        }
+        public void TaintedObject(bool inTaintTime, String pIdent, TaintCallback pCallback)
+        {
+            TaintedObject(inTaintTime, BSScene.DetailLogZero, pIdent, pCallback);
+        }
+        public void TaintedObject(bool inTaintTime, uint pOriginator, String pIdent, TaintCallback pCallback)
+        {
+            TaintedObject(inTaintTime, m_physicsLoggingEnabled ? pOriginator.ToString() : BSScene.DetailLogZero, pIdent, pCallback);
+        }
+        // Sometimes a potentially tainted operation can be used in and out of taint time.
+        // This routine executes the command immediately if in taint-time otherwise it is queued.
+        public void TaintedObject(bool inTaintTime, string pOriginator, string pIdent, TaintCallback pCallback)
         {
             if (!m_initialized) return;
 
-            lock (_taintLock)
-            {
-                _taintOperations.Add(new TaintCallbackEntry(ident, callback));
-            }
-
-            return;
-        }
-
-        // Sometimes a potentially tainted operation can be used in and out of taint time.
-        // This routine executes the command immediately if in taint-time otherwise it is queued.
-        public void TaintedObject(bool inTaintTime, string ident, TaintCallback callback)
-        {
             if (inTaintTime)
-                callback();
+                pCallback();
             else
-                TaintedObject(ident, callback);
+            {
+                lock (_taintLock)
+                {
+                    _taintOperations.Add(new TaintCallbackEntry(pOriginator, pIdent, pCallback));
+                }
+            }
         }
 
         void TriggerPreStepEvent(float timeStep)
@@ -1021,3 +1038,4 @@ namespace WhiteCore.Physics.BulletSPlugin
         public const string DetailLogZero = "0000000000";
     }
 }
+

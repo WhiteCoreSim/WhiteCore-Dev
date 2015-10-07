@@ -40,6 +40,7 @@ namespace WhiteCore.Physics.BulletSPlugin
 
         // private bool _stopped;
         OMV.Vector3 _size;
+        bool _grabbed;
         bool _selected;
         OMV.Vector3 _position;
         float _mass;
@@ -47,11 +48,15 @@ namespace WhiteCore.Physics.BulletSPlugin
         float _collisionScore;
         OMV.Vector3 _acceleration;
         OMV.Quaternion _orientation;
+        int _physicsActorType;
+        bool _isPhysical;
         bool _flying;
         bool _setAlwaysRun;
         bool _throttleUpdates;
         bool _floatOnWater;
         OMV.Vector3 _rotationalVelocity;
+        bool _kinematic;  
+        bool _isVolumeDetect;
         float _buoyancy;
         BSActorAvatarMove m_moveActor;
         const string AvatarMoveActorName = "BSCharacter.AvatarMove";
@@ -60,6 +65,8 @@ namespace WhiteCore.Physics.BulletSPlugin
             bool isFlying)
             : base(parent_scene, localID, avName, "BSCharacter")
         {
+            _physicsActorType = (int)ActorTypes.Agent;
+            _isPhysical = true;
             _position = pos;
 
             _flying = isFlying;
@@ -92,7 +99,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 LocalID, _size, Scale, Density, _avatarVolume, RawMass);
 
             // do actual creation in taint time
-            PhysicsScene.TaintedObject("BSCharacter.create", delegate()
+            PhysicsScene.TaintedObject(LocalID, "BSCharacter.create", delegate()
             {
                 DetailLog("{0},BSCharacter.create,taint", LocalID);
                 // New body and shape into PhysBody and PhysShape
@@ -111,7 +118,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             base.Destroy();
 
             DetailLog("{0},BSCharacter.Destroy", LocalID);
-            PhysicsScene.TaintedObject("BSCharacter.destroy", delegate()
+            PhysicsScene.TaintedObject(LocalID,"BSCharacter.destroy", delegate()
             {
                 PhysicsScene.Shapes.DereferenceBody(PhysBody, null /* bodyCallback */);
                 PhysBody.Clear();
@@ -200,7 +207,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 DetailLog("{0},BSCharacter.setSize,call,size={1},scale={2},density={3},volume={4},mass={5}",
                     LocalID, _size, Scale, Density, _avatarVolume, RawMass);
 
-                PhysicsScene.TaintedObject("BSCharacter.setSize", delegate()
+                PhysicsScene.TaintedObject(LocalID, "BSCharacter.setSize", delegate()
                 {
                     if (PhysBody.HasPhysicalBody && PhysShape.HasPhysicalShape)
                     {
@@ -218,6 +225,10 @@ namespace WhiteCore.Physics.BulletSPlugin
         public override PrimitiveBaseShape Shape
         {
             set { BaseShape = value; }
+        }
+
+        public override bool Grabbed {
+            set { _grabbed = value; }
         }
 
         // I want the physics engine to make an avatar capsule
@@ -309,7 +320,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             {
                 _position = value;
 
-                PhysicsScene.TaintedObject("BSCharacter.setPosition", delegate()
+                PhysicsScene.TaintedObject(LocalID, "BSCharacter.setPosition", delegate()
                 {
                     DetailLog("{0},BSCharacter.SetPosition,taint,pos={1},orient={2}", LocalID, _position, _orientation);
                     PositionSanityCheck();
@@ -423,7 +434,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             {
                 RawForce = value;
                 // MainConsole.Instance.DebugFormat("{0}: Force = {1}", LogHeader, _force);
-                PhysicsScene.TaintedObject("BSCharacter.SetForce", delegate()
+                PhysicsScene.TaintedObject(LocalID, "BSCharacter.SetForce", delegate()
                 {
                     DetailLog("{0},BSCharacter.setForce,taint,force={1}", LocalID, RawForce);
                     if (PhysBody.HasPhysicalBody)
@@ -454,6 +465,9 @@ namespace WhiteCore.Physics.BulletSPlugin
         public override void VehicleFlags(int param, bool remove)
         {
         }
+            
+        public override bool VolumeDetect{ get; set; }
+        public override bool IsVolumeDetect { get { return false; } }
 
         public override OMV.Vector3 CenterOfMass
         {
@@ -477,7 +491,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 m_targetVelocity = targetVel * (1f / PhysicsScene.TimeDilation);
 
                 if (m_moveActor != null)
-                    m_moveActor.SetVelocityAndTarget(RawVelocity, m_targetVelocity, false /* inTaintTime */, 3);
+                    m_moveActor.SetVelocityAndTarget(RawVelocity, m_targetVelocity, false, 3);
             }
         }
 
@@ -490,10 +504,10 @@ namespace WhiteCore.Physics.BulletSPlugin
                 RawVelocity = value;
                 OMV.Vector3 vel = value;
                 // MainConsole.Instance.DebugFormat("{0}: set velocity = {1}", LogHeader, vel);
-                PhysicsScene.TaintedObject("BSCharacter.setVelocity", delegate()
+                PhysicsScene.TaintedObject(LocalID, "BSCharacter.setVelocity", delegate()
                 {
                     if (m_moveActor != null)
-                        m_moveActor.SetVelocityAndTarget(vel, vel, true /* inTaintTime */, 3);
+                        m_moveActor.SetVelocityAndTarget(vel, vel, true, 3);
 
                     DetailLog("{0},BSCharacter.setVelocity,taint,vel={1}", LocalID, vel);
                     ForceVelocity = vel;
@@ -553,7 +567,7 @@ namespace WhiteCore.Physics.BulletSPlugin
 						// This forces rotation to be only around the Z axis and doesn't change any of the other axis.
 						// This keeps us from flipping the capsule over which the veiwer does not understand.
 
-					  PhysicsScene.TaintedObject("BSCharacter.setOrientation", delegate() {
+					  PhysicsScene.TaintedObject(LocalID, "BSCharacter.setOrientation", delegate() {
 						float oRoll, oPitch, oYaw;
 						_orientation.GetEulerAngles(out oRoll, out oPitch, out oYaw);
 						OMV.Quaternion trimmedOrientation = OMV.Quaternion.CreateFromEulers(0f, 0f, oYaw);
@@ -587,18 +601,16 @@ namespace WhiteCore.Physics.BulletSPlugin
             }
         }
 
-        // we are always an Agent
         public override int PhysicsActorType
         {
-            get { return (int)ActorTypes.Agent; } 
-            set { return; }
+            get { return _physicsActorType; }
+            set { _physicsActorType = value; }
         }
 
-        // ... and a physical one at that.
         public override bool IsPhysical
         {
-            get { return true; }
-            set { }
+            get { return _isPhysical; }
+            set { _isPhysical = value; }
         }
 
         public override bool IsSolid
@@ -630,13 +642,12 @@ namespace WhiteCore.Physics.BulletSPlugin
 
         // Flying is implimented by changing the avatar's buoyancy.
         // Would this be done better with a vehicle type?
-        private float ComputeBuoyancyFromFlying(bool ifFlying)
+        float ComputeBuoyancyFromFlying(bool ifFlying)
         {
             return ifFlying ? 1f : 0f;
         }
 
-        public override bool
-            SetAlwaysRun
+        public override bool SetAlwaysRun
         {
             get { return _setAlwaysRun; }
             set { _setAlwaysRun = value; }
@@ -653,7 +664,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             set
             {
                 _floatOnWater = value;
-                PhysicsScene.TaintedObject("BSCharacter.setFloatOnWater", delegate()
+                PhysicsScene.TaintedObject(LocalID, "BSCharacter.setFloatOnWater", delegate()
                 {
                     if (PhysBody.HasPhysicalBody)
                     {
@@ -680,6 +691,11 @@ namespace WhiteCore.Physics.BulletSPlugin
             set { _rotationalVelocity = value; }
         }
 
+        public override bool Kinematic {
+            get { return _kinematic; }
+            set { _kinematic = value; }
+        }
+            
         // neg=fall quickly, 0=1g, 1=0g, pos=float up
         public override float Buoyancy
         {
@@ -687,7 +703,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             set
             {
                 _buoyancy = value;
-                PhysicsScene.TaintedObject("BSCharacter.setBuoyancy", delegate()
+                PhysicsScene.TaintedObject(LocalID, "BSCharacter.setBuoyancy", delegate()
                 {
                     DetailLog("{0},BSCharacter.setBuoyancy,taint,buoy={1}", LocalID, _buoyancy);
                     ForceBuoyancy = _buoyancy;

@@ -70,6 +70,10 @@ namespace WhiteCore.Physics.BasicPhysicsPlugin
             set { return; }
         }
 
+        public override bool Grabbed {
+            set { return; }
+        }
+
         public override bool FloatOnWater
         {
             set { return; }
@@ -107,6 +111,11 @@ namespace WhiteCore.Physics.BasicPhysicsPlugin
         public override float Mass
         {
             get { return 0f; }
+        }
+
+        public override bool Kinematic {
+            get { return false; }
+            set { return; }
         }
 
         public override Vector3 Force
@@ -152,6 +161,11 @@ namespace WhiteCore.Physics.BasicPhysicsPlugin
     {
         Vector3 _size;
 
+        public override bool Grabbed
+        {
+            set { return; }
+        }
+
         public override bool Selected
         {
             set { }
@@ -184,6 +198,11 @@ namespace WhiteCore.Physics.BasicPhysicsPlugin
 
         public override bool IsPhysical
         {
+            get { return false; }
+            set { return; }
+        }
+
+        public override bool Kinematic {
             get { return false; }
             set { return; }
         }

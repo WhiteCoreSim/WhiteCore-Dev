@@ -112,7 +112,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         public virtual void Destroy()
         {
             PhysicalActors.Enable(false);
-            PhysicsScene.TaintedObject("BSPhysObject.Destroy", delegate() { PhysicalActors.Dispose(); });
+            PhysicsScene.TaintedObject(LocalID, "BSPhysObject.Destroy", delegate() { PhysicalActors.Dispose(); });
         }
 
         public BSScene PhysicsScene { get; protected set; }
@@ -154,8 +154,8 @@ namespace WhiteCore.Physics.BulletSPlugin
         public PrimAssetCondition PrimAssetState { get; set; }
         public virtual bool AssetFailed()
         {
-            return ( (this.PrimAssetState == PrimAssetCondition.FailedAssetFetch)
-                  || (this.PrimAssetState == PrimAssetCondition.FailedMeshing) );
+            return ( (PrimAssetState == PrimAssetCondition.FailedAssetFetch)
+                  || (PrimAssetState == PrimAssetCondition.FailedMeshing) );
         }
 
         // The objects base shape information. Null if not a prim type shape.
@@ -185,6 +185,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         public abstract bool IsSolid { get; }
         public abstract bool IsStatic { get; }
         public abstract bool IsSelected { get; }
+        public abstract bool IsVolumeDetect { get; }
 
         // Materialness
         public MaterialAttributes.Material Material { get; private set; }
@@ -201,6 +202,11 @@ namespace WhiteCore.Physics.BulletSPlugin
             // DetailLog("{0},{1}.SetMaterial,Mat={2},frict={3},rest={4},den={5}", LocalID, TypeName, Material, Friction, Restitution, Density);
         }
 
+    	  public override float Density
+        {
+            get { return base.Density; }
+            set { base.Density = value; }
+        }
         // Stop all physical motion.
         public abstract void ZeroMotion(bool inTaintTime);
         public abstract void ZeroAngularMotion(bool inTaintTime);
@@ -271,8 +277,14 @@ namespace WhiteCore.Physics.BulletSPlugin
         // Called in taint-time!!
         public void ActivateIfPhysical(bool forceIt)
         {
-            if (IsPhysical && PhysBody.HasPhysicalBody)
-                PhysicsScene.PE.Activate(PhysBody, forceIt);
+            //if (IsPhysical && PhysBody.HasPhysicalBody)
+            if (PhysBody.HasPhysicalBody)
+            {
+                if (IsPhysical)
+                    PhysicsScene.PE.Activate(PhysBody, forceIt);
+                else
+                    PhysicsScene.PE.ClearCollisionProxyCache(PhysicsScene.World, PhysBody);
+            }
         }
 
         // 'actors' act on the physical object to change or constrain its motion. These can range from
@@ -321,6 +333,8 @@ namespace WhiteCore.Physics.BulletSPlugin
         // On a collision, check the collider and remember if the last collider was moving
         //    Used to modify the standing of avatars (avatars on stationary things stand still)
         public bool ColliderIsMoving;
+    	  // 'true' if the last collider was a volume detect object
+        public bool ColliderIsVolumeDetect;
         // Used by BSCharacter to manage standing (and not slipping)
         public bool IsStationary;
 
@@ -380,10 +394,10 @@ namespace WhiteCore.Physics.BulletSPlugin
             bool p2col = true;
 
             // We only need to test p2 for 'jump crouch purposes'
-            if (this.TypeName == "BSCharacter" && collidee is BSPrim)
+            if (TypeName == "BSCharacter" && collidee is BSPrim)
             {
                 // Testing if the collision is at the feet of the avatar
-                if ((this.Position.Z - contactPoint.Z) < (this.Size.Z * 0.5f))
+                if ((Position.Z - contactPoint.Z) < (Size.Z * 0.5f))
                     p2col = false;
             }
 
@@ -396,6 +410,7 @@ namespace WhiteCore.Physics.BulletSPlugin
 
             // For movement tests, remember if we are colliding with an object that is moving.
             ColliderIsMoving = collidee != null ? (collidee.RawVelocity != OMV.Vector3.Zero) : false;
+            ColliderIsVolumeDetect = collidee != null ? (collidee.IsVolumeDetect) : false;
 
             // If someone has subscribed for collision events log the collision so it will be reported up
             if (SubscribedEvents())
@@ -467,7 +482,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 // make sure first collision happens
                 NextCollisionOkTime = Util.EnvironmentTickCountSubtract(SubscribedEventsMs);
 
-                PhysicsScene.TaintedObject(TypeName + ".SubscribeEvents", delegate()
+                PhysicsScene.TaintedObject(LocalID, TypeName + ".SubscribeEvents", delegate()
                 {
                     if (PhysBody.HasPhysicalBody)
                         CurrentCollisionFlags = PhysicsScene.PE.AddToCollisionFlags(PhysBody,
@@ -485,7 +500,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         {
             // DetailLog("{0},{1}.UnSubscribeEvents,unsubscribing", LocalID, TypeName);
             SubscribedEventsMs = 0;
-            PhysicsScene.TaintedObject(TypeName + ".UnSubscribeEvents", delegate()
+            PhysicsScene.TaintedObject(LocalID, TypeName + ".UnSubscribeEvents", delegate()
             {
                 // Make sure there is a body there because sometimes destruction happens in an un-ideal order.
                 if (PhysBody.HasPhysicalBody)

@@ -48,7 +48,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         {
             Linkset = BSLinkset.Factory(PhysicsScene, this);
 
-            PhysicsScene.TaintedObject("BSPrimLinksetCompound.Refresh", delegate()
+            PhysicsScene.TaintedObject(LocalID, "BSPrimLinksetCompound.Refresh", delegate()
             {
                 SetMaterial(material);
                 Friction = friction;
@@ -63,7 +63,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         {
             if (!Linkset.LinksetRoot.BlockPhysicalReconstruction)
                 //If we are disabled, this entire linkset is being removed, so allow it to happen
-                Linkset = Linkset.RemoveMeFromLinkset(this);
+                Linkset = Linkset.RemoveMeFromLinkset(this, false /* inTaintTime */);
             base.Destroy();
         }
 
@@ -105,7 +105,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             BSPhysObject parentBefore = Linkset.LinksetRoot;
             int childrenBefore = Linkset.NumberOfChildren;
 
-            Linkset = Linkset.RemoveMeFromLinkset(this);
+            Linkset = Linkset.RemoveMeFromLinkset(this, false /* inTaintTime */);
 
             DetailLog(
                 "{0},BSPrimLinkset.delink,parentBefore={1},childrenBefore={2},parentAfter={3},childrenAfter={4}, ",
@@ -120,7 +120,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             set
             {
                 base.Position = value;
-                PhysicsScene.TaintedObject("BSPrimLinkset.setPosition",
+                PhysicsScene.TaintedObject(LocalID, "BSPrimLinkset.setPosition",
                     delegate() { Linkset.UpdateProperties(UpdatedProperties.Position, this); });
             }
         }
@@ -132,7 +132,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             set
             {
                 base.Orientation = value;
-                PhysicsScene.TaintedObject("BSPrimLinkset.setOrientation",
+                PhysicsScene.TaintedObject(LocalID,"BSPrimLinkset.setOrientation",
                     delegate() { Linkset.UpdateProperties(UpdatedProperties.Orientation, this); });
             }
         }

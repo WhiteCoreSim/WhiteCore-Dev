@@ -198,7 +198,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         // Returns a new linkset for the child which is a linkset of one (just the
         //    orphened child).
         // Called at runtime.
-        public BSLinkset RemoveMeFromLinkset(BSPrimLinkable child)
+        public BSLinkset RemoveMeFromLinkset(BSPrimLinkable child, bool inTaintTime)
         {
             lock (m_linksetActivityLock)
             {
@@ -207,7 +207,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                     // Cannot remove the root from a linkset.
                     return this;
                 }
-                RemoveChildFromLinkset(child);
+                RemoveChildFromLinkset(child, inTaintTime);
                 LinksetMass = ComputeLinksetMass();
             }
 
@@ -319,7 +319,7 @@ namespace WhiteCore.Physics.BulletSPlugin
 
         // I am the root of a linkset and one of my children is being removed.
         // Safe to call even if the child is not really in my linkset.
-        protected abstract void RemoveChildFromLinkset(BSPrimLinkable child);
+        protected abstract void RemoveChildFromLinkset(BSPrimLinkable child, bool inTaintTime);
 
         protected abstract void ScheduleRebuild(BSPrimLinkable requestor);
 

@@ -376,7 +376,7 @@ namespace WhiteCore.Physics.BulletSPlugin
 
         // Remove the specified child from the linkset.
         // Safe to call even if the child is not really in the linkset.
-        protected override void RemoveChildFromLinkset(BSPrimLinkable child)
+        protected override void RemoveChildFromLinkset(BSPrimLinkable child, bool inTaintTime)
         {
             child.ClearDisplacement();
 
@@ -388,19 +388,17 @@ namespace WhiteCore.Physics.BulletSPlugin
                     child.LocalID, child.PhysBody.AddrString);
 
                 // Cause the child's body to be rebuilt and thus restored to normal operation
-                RecomputeChildWorldPosition(child, false);
-                child.LinksetInfo = null;
-                child.ForceBodyShapeRebuild(false);
+                child.ForceBodyShapeRebuild(inTaintTime);
 
                 if (!HasAnyChildren)
                 {
                     // The linkset is now empty. The root needs rebuilding.
-                    LinksetRoot.ForceBodyShapeRebuild(false);
+                    LinksetRoot.ForceBodyShapeRebuild(inTaintTime);
                 }
                 else
                 {
                     // Rebuild the compound shape with the child removed
-                    ScheduleRebuild(LinksetRoot);
+                    Refresh(LinksetRoot);
                 }
             }
             return;
