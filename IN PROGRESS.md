@@ -6,6 +6,7 @@ General:
 
 Scripting:
 ----------
+* Upgrade DotNetEngine with latest OSSL / LSL / WhiteCore functions
 * New scriptengine Phlox (Apache 2 License by InWorldz) to be integrated by Fine (March 2016)
 
 Physics:
