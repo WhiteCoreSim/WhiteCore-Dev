@@ -338,7 +338,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             cmdThreadpool.Restart();
             LUQueue.Clear();
             QueueItemStruct itm;
-            while (ScriptEvents.TryDequeue(out itm)) ;
+			while (ScriptEvents.TryDequeue(out itm)) {}
             lock(SleepingScriptEvents)
                 SleepingScriptEvents.Clear();
         }
