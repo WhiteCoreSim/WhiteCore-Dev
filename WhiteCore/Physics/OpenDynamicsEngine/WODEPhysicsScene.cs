@@ -984,7 +984,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
 		internal void BadPrim(WhiteCoreODEPrim whitecoreODEPrim)
         {
-			DeletePrim(whitecoreODEPrim);
+			RemovePrim(whitecoreODEPrim);
             //Can't really do this here... as it will be readded before the delete gets called, which is wrong...
             //So... leave the prim out there for now
 			//AddPrimShape(whitecoreODEPrim.ParentEntity);
@@ -1035,11 +1035,6 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             RemoveQueue.Enqueue(prim);
         }
 
-        public override void DeletePrim(PhysicsActor prim)
-        {
-            //Add the prim to a queue which will be removed when Simulate has finished what it's doing.
-            DeleteQueue.Enqueue(prim);
-        }
 
         /// <summary>
         ///     This is called from within simulate but outside the locked portion
