@@ -25,17 +25,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using System;
-using System.Threading;
 using Nini.Config;
 using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.Physics;
+using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Region;
 
 namespace WhiteCore.Physics.BulletSPlugin
 {
-    /* Not yet implemented fully - 20151004 -greythane-
+
     public class ExtendedPhysics : INonSharedRegionModule
     {
         static string LogHeader = "[EXTENDED PHYSICS]";
@@ -61,7 +60,7 @@ namespace WhiteCore.Physics.BulletSPlugin
 
         IConfig Configuration { get; set; }
         bool Enabled { get; set; }
-        Scene BaseScene { get; set; }
+        IScene BaseScene { get; set; }
         IScriptModuleComms Comms { get; set; }
 
         #region INonSharedRegionModule
@@ -94,17 +93,20 @@ namespace WhiteCore.Physics.BulletSPlugin
         {
             if (BaseScene != null)
             {
+                // Not implemented yet!
+                /*
                 BaseScene.EventManager.OnObjectAddedToScene -= EventManager_OnObjectAddedToScene;
                 BaseScene.EventManager.OnSceneObjectPartUpdated -= EventManager_OnSceneObjectPartUpdated;
+                */
                 BaseScene = null;
             }
         }
 
-        public void AddRegion(Scene scene)
+        public void AddRegion(IScene scene)
         {
         }
 
-        public void RemoveRegion(Scene scene)
+        public void RemoveRegion(IScene scene)
         {
             if (BaseScene != null && BaseScene == scene)
             {
@@ -112,41 +114,39 @@ namespace WhiteCore.Physics.BulletSPlugin
             }
         }
 
-        public void RegionLoaded(Scene scene)
+        public void RegionLoaded(IScene scene)
         {
             if (!Enabled) return;
-
             BaseScene = scene;
-
             Comms = BaseScene.RequestModuleInterface<IScriptModuleComms>();
             if (Comms == null)
             {
                 MainConsole.Instance.WarnFormat("{0} ScriptModuleComms interface not defined", LogHeader);
                 Enabled = false;
-
                 return;
             }
- 
+
+            // Not implemented Yet!
             // Register as LSL functions all the [ScriptInvocation] marked methods.
-            Comms.RegisterScriptInvocations(this);
-            Comms.RegisterConstants(this);
+            //Comms.RegisterScriptInvocations(this);
+            //Comms.RegisterConstants(this);
 
-            // When an object is modified, we might need to update its extended physics parameters
-            BaseScene.EventManager.OnObjectAddedToScene += EventManager_OnObjectAddedToScene;
-            BaseScene.EventManager.OnSceneObjectPartUpdated += EventManager_OnSceneObjectPartUpdated;
-
+            // Not implemented Yet!
+            // When an object is modifed, we might need to update its extended physics Parameters
+            //BaseScene.EventManager.OnObjectBeingAddedToScene += Eventmanager_OnObjectAddedToScene;
+            //BaseScene.EventManager.OnSceneObjectPartUpdated += EventManager_OnSceneObjectPartUpdated;
         }
 
         public Type ReplaceableInterface { get { return null; } }
 
         #endregion // INonSharedRegionModule
 
-        private void EventManager_OnObjectAddedToScene(SceneObjectGroup obj)
+        void EventManager_OnObjectAddedToScene(SceneObjectGroup obj)
         {
         }
 
         // Event generated when some property of a prim changes.
-        private void EventManager_OnSceneObjectPartUpdated(SceneObjectPart sop, bool isFullUpdate)
+        void EventManager_OnSceneObjectPartUpdated(SceneObjectPart sop, bool isFullUpdate)
         {
         }
 
@@ -214,6 +214,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         public const int PHYS_AXIS_UNLOCK_ANGULAR_Z = 14721;
         [ScriptConstant]
         public const int PHYS_AXIS_UNLOCK           = 14722;
+/*
         // physAxisLockLimits()
         [ScriptInvocation]
         public int physAxisLock(UUID hostID, UUID scriptID, object[] parms)
@@ -237,7 +238,8 @@ namespace WhiteCore.Physics.BulletSPlugin
         public const int PHYS_LINKSET_TYPE_COMPOUND    = 1;
         [ScriptConstant]
         public const int PHYS_LINKSET_TYPE_MANUAL      = 2;
-
+ */
+/*
         [ScriptInvocation]
         public int physSetLinksetType(UUID hostID, UUID scriptID, int linksetType)
         {
@@ -325,7 +327,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             }
             return ret;
         }
-
+*/
         [ScriptConstant]
         public const int PHYS_LINK_TYPE_FIXED  = 1234;
         [ScriptConstant]
@@ -336,7 +338,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         public const int PHYS_LINK_TYPE_6DOF   = 6;
         [ScriptConstant]
         public const int PHYS_LINK_TYPE_SLIDER = 7;
-
+/*
         // physChangeLinkType(integer linkNum, integer typeCode)
         [ScriptInvocation]
         public int physChangeLinkType(UUID hostID, UUID scriptID, int linkNum, int typeCode)
@@ -394,7 +396,7 @@ namespace WhiteCore.Physics.BulletSPlugin
 
             return ret;
         }
-
+*/
         // Code for specifying params.
         // The choice if 14400 is arbitrary and only serves to catch parameter code misuse.
         public const int PHYS_PARAM_MIN                    = 14401;
@@ -463,7 +465,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         public const int PHYS_AXIS_ANGULAR_Y = 4;
         [ScriptConstant]
         public const int PHYS_AXIS_ANGULAR_Z = 5;
-
+/*
         // physChangeLinkParams(integer linkNum, [ PHYS_PARAM_*, value, PHYS_PARAM_*, value, ...])
         [ScriptInvocation]
         public int physChangeLinkParams(UUID hostID, UUID scriptID, int linkNum, object[] parms)
@@ -482,6 +484,7 @@ namespace WhiteCore.Physics.BulletSPlugin
 
             return ret;
         }
+
 
         bool GetRootPhysActor(UUID hostID, out PhysicsActor rootPhysActor)
         {
@@ -608,6 +611,6 @@ namespace WhiteCore.Physics.BulletSPlugin
             }
             return ret;
         }
+*/
     }
-    */
 }

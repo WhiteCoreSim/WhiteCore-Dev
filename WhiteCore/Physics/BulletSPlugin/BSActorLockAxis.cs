@@ -25,19 +25,24 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using OMV = OpenMetaverse;
 
 namespace WhiteCore.Physics.BulletSPlugin
 {
     public class BSActorLockAxis : BSActor
     {
-        BSConstraint LockAxisConstraint = null;
+        BSConstraint LockAxisConstraint;
+        bool HaveRegisteredForBeforeStepCallback = false;
 
-        public BSActorLockAxis(BSScene physicsScene, BSPhysObject pObj, string actorName)
-            : base(physicsScene, pObj, actorName)
+        // The lock access flags (which axises were locked) when the constraint was built.
+        // Used to see if locking has changed since when the constraint was built.
+        OMV.Vector3 LockAxisLinearFlags;
+        OMV.Vector3 LockAxisAngularFlags;
+
+        public BSActorLockAxis (BSScene physicsScene, BSPhysObject pObj, string actorName)
+            : base (physicsScene, pObj, actorName)
         {
-            m_physicsScene.DetailLog("{0},BSActorLockAxis,constructor", m_controllingPrim.LocalID);
+            m_physicsScene.DetailLog ("{0},BSActorLockAxis,constructor", m_controllingPrim.LocalID);
             LockAxisConstraint = null;
         }
 
@@ -49,31 +54,34 @@ namespace WhiteCore.Physics.BulletSPlugin
 
         // Release any connections and resources used by the actor.
         // BSActor.Dispose()
-        public override void Dispose()
+        public override void Dispose ()
         {
-            RemoveAxisLockConstraint();
+            RemoveAxisLockConstraint ();
         }
 
         // Called when physical parameters (properties set in Bullet) need to be re-applied.
         // Called at taint-time.
         // BSActor.Refresh()
-        public override void Refresh()
+        public override void Refresh ()
         {
-            m_physicsScene.DetailLog("{0},BSActorLockAxis,refresh,lockedAxis={1},enabled={2},pActive={3}",
-                m_controllingPrim.LocalID, m_controllingPrim.LockedAxis, Enabled, m_controllingPrim.IsPhysicallyActive);
             // If all the axis are free, we don't need to exist
-            if (m_controllingPrim.LockedAxis == m_controllingPrim.LockedAxisFree)
+            // Refresh() only turns off. Enabling is done by Initialize AxisActor()
+            //      whenever parameters are changed.
+            //      This leaves 'enable' free to turn off an actor when it is not wanted to run.
+            if (m_controllingPrim.LockedAngularAxis == m_controllingPrim.LockedAxisFree
+                && m_controllingPrim.LockedLinearAxis == m_controllingPrim.LockedAxisFree)
             {
                 Enabled = false;
             }
+
             // If the object is physically active, add the axis locking constraint
             if (isActive)
             {
-                AddAxisLockConstraint();
-            }
-            else
+                RegisterForBeforeStepCallback ();
+            } else
             {
-                RemoveAxisLockConstraint();
+                RemoveAxisLockConstraint ();
+                UnRegisterForBeforeStepCallback ();
             }
         }
 
@@ -81,19 +89,66 @@ namespace WhiteCore.Physics.BulletSPlugin
         //     Register a prestep action to restore physical requirements before the next simulation step.
         // Called at taint-time.
         // BSActor.RemoveBodyDependencies()
-        public override void RemoveBodyDependencies()
+        public override void RemoveBodyDependencies ()
         {
             if (LockAxisConstraint != null)
             {
                 // If a constraint is set up, remove it from the physical scene
-                RemoveAxisLockConstraint();
+                RemoveAxisLockConstraint ();
                 // Schedule a call before the next simulation step to restore the constraint.
-                m_physicsScene.PostTaintObject("BSActorLockAxis:" + ActorName, m_controllingPrim.LocalID,
-                    delegate() { Refresh(); });
+                m_physicsScene.PostTaintObject ("BSActorLockAxis:" + ActorName, m_controllingPrim.LocalID,
+                    delegate() {
+                        Refresh ();
+                    });
             }
         }
 
-        void AddAxisLockConstraint()
+        void RegisterForBeforeStepCallback ()
+        {
+            if (!HaveRegisteredForBeforeStepCallback)
+            {
+                m_physicsScene.BeforeStep += PhysicsScene_BeforeStep;
+                HaveRegisteredForBeforeStepCallback = true;
+            }
+        }
+
+        void UnRegisterForBeforeStepCallback ()
+        {
+            if (HaveRegisteredForBeforeStepCallback)
+            {
+                m_physicsScene.BeforeStep -= PhysicsScene_BeforeStep;
+                HaveRegisteredForBeforeStepCallback = false;
+            }
+        }
+
+        void PhysicsScene_BeforeStep (float timestep)
+        {
+            // If all the axis are free, we don't need to exist
+            if (m_controllingPrim.LockedAngularAxis == m_controllingPrim.LockedAxisFree &&
+                m_controllingPrim.LockedLinearAxis == m_controllingPrim.LockedAxisFree)
+            {
+                Enabled = false;
+            }
+
+            // If the object is physically active, add the axis locking constraint
+            if (isActive)
+            {
+                // Check to see if the locking parameters have changed
+                if (m_controllingPrim.LockedLinearAxis != this.LockAxisLinearFlags ||
+                    m_controllingPrim.LockedAngularAxis != this.LockAxisAngularFlags)
+                {
+                    // The locking has changed. Remove the old constraint and build a new one
+                    RemoveAxisLockConstraint ();
+                }
+                AddAxisLockConstraint ();
+            } else
+            {
+                RemoveAxisLockConstraint ();
+            }
+        }
+
+        // Note that this relies on being called at TaintTime
+        void AddAxisLockConstraint ()
         {
             if (LockAxisConstraint == null)
             {
@@ -103,64 +158,55 @@ namespace WhiteCore.Physics.BulletSPlugin
                 // http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?p=26380
 
                 // Remove any existing axis constraint (just to be sure)
-                RemoveAxisLockConstraint();
+                RemoveAxisLockConstraint ();
 
-                BSConstraint6Dof axisConstrainer = new BSConstraint6Dof(m_physicsScene.World, m_controllingPrim.PhysBody,
-                    OMV.Vector3.Zero, OMV.Quaternion.Identity,
-                    false /* useLinearReferenceFrameB */, true /* disableCollisionsBetweenLinkedBodies */);
+                BSConstraint6Dof axisConstrainer = new BSConstraint6Dof (m_physicsScene.World, m_controllingPrim.PhysBody,
+                                                       OMV.Vector3.Zero, OMV.Quaternion.Identity,
+                                                       false /* useLinearReferenceFrameB */, true /* disableCollisionsBetweenLinkedBodies */);
                 LockAxisConstraint = axisConstrainer;
-                m_physicsScene.Constraints.AddConstraint(LockAxisConstraint);
+                m_physicsScene.Constraints.AddConstraint (LockAxisConstraint);
+
+                // Remember the clocking being inforce so we can notice if they have changed
+                LockAxisLinearFlags = m_controllingPrim.LockedLinearAxis;
+                LockAxisAngularFlags = m_controllingPrim.LockedAngularAxis;
 
                 // The constraint is tied to the world and oriented to the prim.
-
-                // Free to move linearly in the region
-                OMV.Vector3 linearLow = OMV.Vector3.Zero;
-                OMV.Vector3 linearHigh = m_physicsScene.TerrainManager.WorldMax;
-                axisConstrainer.SetLinearLimits(linearLow, linearHigh);
-
-                // Angular with some axis locked
-                float fPI = (float)Math.PI;
-                OMV.Vector3 angularLow = new OMV.Vector3(-fPI, -fPI, -fPI);
-                OMV.Vector3 angularHigh = new OMV.Vector3(fPI, fPI, fPI);
-                if (m_controllingPrim.LockedAxis.X != 1f)
+                if (
+                    !axisConstrainer.SetLinearLimits (m_controllingPrim.LockedLinearAxisLow,
+                        m_controllingPrim.LockedLinearAxisHigh))
                 {
-                    angularLow.X = 0f;
-                    angularHigh.X = 0f;
-                }
-                if (m_controllingPrim.LockedAxis.Y != 1f)
-                {
-                    angularLow.Y = 0f;
-                    angularHigh.Y = 0f;
-                }
-                if (m_controllingPrim.LockedAxis.Z != 1f)
-                {
-                    angularLow.Z = 0f;
-                    angularHigh.Z = 0f;
-                }
-                if (!axisConstrainer.SetAngularLimits(angularLow, angularHigh))
-                {
-                    m_physicsScene.DetailLog("{0},BSActorLockAxis.AddAxisLockConstraint,failedSetAngularLimits",
+                    m_physicsScene.DetailLog ("{0},BSActorLockAxis.AddAxisLockConstraint,failedSetLinearLimits",
                         m_controllingPrim.LocalID);
                 }
 
-                m_physicsScene.DetailLog(
+                if (
+                    !axisConstrainer.SetAngularLimits (m_controllingPrim.LockedAngularAxisLow,
+                        m_controllingPrim.LockedAngularAxisHigh))
+                {
+                    m_physicsScene.DetailLog ("{0},BSActorLockAxis.AddAxisLockConstraint,failedSetAngularLimits", m_controllingPrim.LocalID);
+                }
+
+                m_physicsScene.DetailLog (
                     "{0},BSActorLockAxis.AddAxisLockConstraint,create,linLow={1},linHi={2},angLow={3},angHi={4}",
-                    m_controllingPrim.LocalID, linearLow, linearHigh, angularLow, angularHigh);
+                    m_controllingPrim.LocalID, m_controllingPrim.LockedLinearAxisLow,
+                    m_controllingPrim.LockedLinearAxisHigh, m_controllingPrim.LockedAngularAxisLow,
+                    m_controllingPrim.LockedAngularAxisHigh);
 
                 // Constants from one of the posts mentioned above and used in Bullet's ConstraintDemo.
-                axisConstrainer.TranslationalLimitMotor(true /* enable */, 5.0f, 0.1f);
-
-                axisConstrainer.RecomputeConstraintVariables(m_controllingPrim.RawMass);
+                axisConstrainer.TranslationalLimitMotor (true /* enable */, 5.0f, 0.1f);
+                axisConstrainer.RecomputeConstraintVariables (m_controllingPrim.RawMass);
+                RegisterForBeforeStepCallback ();
             }
         }
 
-        void RemoveAxisLockConstraint()
+        void RemoveAxisLockConstraint ()
         {
+            UnRegisterForBeforeStepCallback ();
             if (LockAxisConstraint != null)
             {
-                m_physicsScene.Constraints.RemoveAndDestroyConstraint(LockAxisConstraint);
+                m_physicsScene.Constraints.RemoveAndDestroyConstraint (LockAxisConstraint);
                 LockAxisConstraint = null;
-                m_physicsScene.DetailLog("{0},BSActorLockAxis.RemoveAxisLockConstraint,destroyingConstraint",
+                m_physicsScene.DetailLog ("{0},BSActorLockAxis.RemoveAxisLockConstraint,destroyingConstraint",
                     m_controllingPrim.LocalID);
             }
         }

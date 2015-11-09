@@ -79,16 +79,16 @@ namespace WhiteCore.Physics.BulletSPlugin
             Name = name; // PhysicsActor also has the name of the object. Someday consolidate.
             TypeName = typeName;
 
+            // Oddity if object is destroyed and recreated very quickly it could still have the old body.
+            if (!PhysBody.HasPhysicalBody)
+                PhysBody = new BulletBody(localID);
+
             // The collection of things that push me around
             PhysicalActors = new BSActorCollection(PhysicsScene);
 
             // Initialize variables kept in base.
             GravityMultiplier = 1.0f;
             Gravity = new OMV.Vector3(0f, 0f, BSParam.Gravity);
-
-            // We don't have any physical representation yet.
-            PhysBody = new BulletBody(localID);
-            PhysShape = new BulletShape();
 
             PrimAssetState = PrimAssetCondition.Unknown;
 
@@ -105,7 +105,8 @@ namespace WhiteCore.Physics.BulletSPlugin
             CollisionScore = 0;
 
             // All axis free.
-            LockedAxis = LockedAxisFree;
+            LockedLinearAxis = LockedAxisFree;
+            LockedAngularAxis = LockedAxisFree;
         }
 
         // Tell the object to clean up.
@@ -124,6 +125,15 @@ namespace WhiteCore.Physics.BulletSPlugin
         // This mostly prevents property update and collisions until the object is complete here.
         public bool IsInitialized { get; protected set; }
 
+        // Set to 'true' if an object (mesh/linkset/sculpty) is not completely constructed.
+        // This test is used to prevent some updates to the object when it only partially exists.
+        // There are several reasons and object might be incomplete:
+        //     Its underlying mesh/sculpty is an asset which must be fetched from the asset store
+        //     It is a linkset who is being added to or removed from
+        //     It is changing state (static to physical, for instance) which requires rebuilding
+        // This is a computed value based on the underlying physical object construction
+        abstract public bool IsIncomplete { get; }
+
         // Return the object mass without calculating it or having side effects
         public abstract float RawMass { get; }
         // Set the raw mass but also update physical mass properties (inertia, ...)
@@ -136,9 +146,9 @@ namespace WhiteCore.Physics.BulletSPlugin
         public OMV.Vector3 Inertia { get; set; }
 
         // Reference to the physical body (btCollisionObject) of this object
-        public BulletBody PhysBody;
+        public BulletBody PhysBody = new BulletBody(0);
         // Reference to the physical shape (btCollisionShape) of this object
-        public BulletShape PhysShape;
+        public BSShape PhysShape = new BSShapeNull();
 
         // The physical representation of the prim might require an asset fetch.
         // The asset state is first 'Unknown' then 'Waiting' then either 'Failed' or 'Fetched'.
@@ -207,6 +217,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             get { return base.Density; }
             set { base.Density = value; }
         }
+
         // Stop all physical motion.
         public abstract void ZeroMotion(bool inTaintTime);
         public abstract void ZeroAngularMotion(bool inTaintTime);
@@ -266,11 +277,22 @@ namespace WhiteCore.Physics.BulletSPlugin
 
         // The user can optionally set the center of mass. The user's setting will override any
         //    computed center-of-mass (like in linksets).
-        public OMV.Vector3? UserSetCenterOfMass { get; set; }
+        // Note this is a displacement from the root's coordinates. Zero means use the root prim as center-of-mass.
+        public OMV.Vector3? UserSetCenterOfMassDisplacement { get; set; }
 
-        public OMV.Vector3 LockedAxis { get; set; } // zero means locked. one means free.
-        public readonly OMV.Vector3 LockedAxisFree = new OMV.Vector3(1f, 1f, 1f); // All axis are free
+        public OMV.Vector3 LockedLinearAxis;    // zero means locked. one means free.
+        public OMV.Vector3 LockedAngularAxis;   // zero means locked. one means free.
+        public const float FreeAxis = 1f;
+        public const float LockedAxis = 0f;
+        public readonly OMV.Vector3 LockedAxisFree = new OMV.Vector3(FreeAxis, FreeAxis, FreeAxis); // All axis are free
 
+        // If an axis is locked (flagged above) then the limits of that axis are specified here.
+        // Linear axis limits are relative to the object's starting coordinates.
+        // Angular limits are limited to -PI to +PI
+        public OMV.Vector3 LockedLinearAxisLow;
+        public OMV.Vector3 LockedLinearAxisHigh;
+        public OMV.Vector3 LockedAngularAxisLow;
+        public OMV.Vector3 LockedAngularAxisHigh;
 
         // Enable physical actions. Bullet will keep sleeping non-moving physical objects so
         //     they need waking up when parameters are changed.
@@ -303,6 +325,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 if (PhysicalActors.TryGetActor(actorName, out theActor))
                 {
                     // The actor already exists so just turn it on or off
+                    DetailLog("{0},BSPhysObject.EnableActor,enableExistingActor,name={1},enable={2}", LocalID, actorName, enableActor);
                     theActor.Enabled = enableActor;
                 }
                 else
@@ -310,9 +333,14 @@ namespace WhiteCore.Physics.BulletSPlugin
                     // The actor does not exist. If it should, create it.
                     if (enableActor)
                     {
+                        DetailLog("{0},BSPhysObject.EnableActor,creatingActor,name={1}", LocalID, actorName);
                         theActor = creator();
                         PhysicalActors.Add(actorName, theActor);
                         theActor.Enabled = true;
+                    }
+                    else
+                    {
+                        DetailLog("{0},BSPhysobject.EnableActor,notCreatingActorSinceNotEnabled,name={1}", LocalID, actorName);
                     }
                 }
             }

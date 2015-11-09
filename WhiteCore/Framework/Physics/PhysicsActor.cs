@@ -278,6 +278,13 @@ namespace WhiteCore.Framework.Physics
                 OnPhysicalRepresentationChanged();
         }
 
+        // Extendable interface for new, physics engine specific operations
+        public virtual object Extension(string pFunct, params object[] pParams)
+        {
+            // A NOP of the physics engine does not implement this feature
+            return null;
+        }
+
         #endregion
 
         #region Character Defines

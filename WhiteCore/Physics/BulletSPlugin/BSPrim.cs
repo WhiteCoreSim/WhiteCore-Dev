@@ -26,11 +26,11 @@
  */
 
 using System;
-using OMV = OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Utilities;
+using OMV = OpenMetaverse;
 
 namespace WhiteCore.Physics.BulletSPlugin
 {
@@ -129,10 +129,20 @@ namespace WhiteCore.Physics.BulletSPlugin
                 // If there are physical body and shape, release my use of same.
                 PhysicsScene.Shapes.DereferenceBody(PhysBody, null);
                 PhysBody.Clear();
-                PhysicsScene.Shapes.DereferenceShape(PhysShape, null);
-                PhysShape.Clear();
+                PhysShape.Dereference(PhysicsScene);
+                PhysShape = new BSShapeNull();
             });
         }
+
+        public override bool IsIncomplete
+        {
+            get { return ShapeRebuildScheduled; }
+        }
+
+        // 'true' if this obejct's shape is in need of a rebuild and a rebuild has been queued.
+        // The prim is still available but its underlying shape will change soon.
+        // This is protected by a 'lock(this)'.
+        public bool ShapeRebuildScheduled { get; protected set; }
 
         public override OMV.Vector3 Size
         {
@@ -152,6 +162,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             set
             {
                 BaseShape = value;
+                DetailLog("{0},BSPrim.changeShape,pbs={1}", LocalID, BSScene.PrimitiveBaseShapeToString(BaseShape));
                 PrimAssetState = PrimAssetCondition.Unknown;
                 ForceBodyShapeRebuild(false);
             }
@@ -172,11 +183,23 @@ namespace WhiteCore.Physics.BulletSPlugin
             }
             else
             {
-                PhysicsScene.TaintedObject(LocalID, "BSPrim.ForceBodyShapeRebuild", delegate()
+                lock (this)
                 {
-                    _mass = CalculateMass(); // changing the shape changes the mass
-                    CreateGeomAndObject(true);
-                });
+                    // If a rebuild is not already in the queue
+                    if (!ShapeRebuildScheduled)
+                    {
+                        // Remember that a rebuild is queued -- this is used to flag an imcomplete object
+                        ShapeRebuildScheduled = true;
+                        PhysicsScene.TaintedObject(LocalID, "BSPrim.ForceBodyShapeRebuild", delegate()
+                        {
+                            _mass = CalculateMass(); // changing the shape changes the mass
+                            CreateGeomAndObject(true);
+                            ShapeRebuildScheduled = false;
+                        });
+                    }
+                }
+
+
             }
             return true;
         }
@@ -296,19 +319,21 @@ namespace WhiteCore.Physics.BulletSPlugin
         {
             DetailLog("{0},BSPrim.LockAngularMotion,call,axis={1}", LocalID, axis);
 
-            // "1" means free, "0" means locked
-            OMV.Vector3 locking = LockedAxisFree;
-            if (axis.X != 1) locking.X = 0f;
-            if (axis.Y != 1) locking.Y = 0f;
-            if (axis.Z != 1) locking.Z = 0f;
-            LockedAxis = locking;
+            ApplyAxisLimits(ExtendedPhysics.PHYS_AXIS_UNLOCK_ANGULAR, 0f, 0f);
+            if (axis.X != 1)
+            {
+                ApplyAxisLimits(ExtendedPhysics.PHYS_AXIS_LOCK_ANGULAR_X, 0f, 0f);
+            }
+            if (axis.Y != 1)
+            {
+                ApplyAxisLimits(ExtendedPhysics.PHYS_AXIS_ANGULAR_Y, 0f, 0f);
+            }
+            if (axis.Z != 1)
+            {
+                ApplyAxisLimits(ExtendedPhysics.PHYS_AXIS_ANGULAR_Z, 0f, 0f);
+            }
 
-            EnableActor(LockedAxis != LockedAxisFree, LockedAxisActorName,
-                delegate() { return new BSActorLockAxis(PhysicsScene, this, LockedAxisActorName); });
-
-            // Update parameters so the new actor's Refresh() action is called at the right time.
-            PhysicsScene.TaintedObject(LocalID, "BSPrim.LockAngularMotion", delegate() { UpdatePhysicalParameters(); });
-
+            InitializeAxisActor();
             return;
         }
 
@@ -526,7 +551,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                     Gravity = ComputeGravity(Buoyancy);
                     PhysicsScene.PE.SetGravity(PhysBody, Gravity);
 
-                    Inertia = PhysicsScene.PE.CalculateLocalInertia(PhysShape, physMass);
+                    Inertia = PhysicsScene.PE.CalculateLocalInertia(PhysShape.physShapeInfo, physMass);
                     PhysicsScene.PE.SetMassProps(PhysBody, physMass, Inertia);
                     PhysicsScene.PE.UpdateInertiaTensor(PhysBody);
 
@@ -1625,17 +1650,16 @@ namespace WhiteCore.Physics.BulletSPlugin
             // Create the correct physical representation for this type of object.
             // Updates base.PhysBody and base.PhysShape with the new information.
             // Ignore 'forceRebuild'. 'GetBodyAndShape' makes the right choices and changes of necessary.
-            PhysicsScene.Shapes.GetBodyAndShape(false /*forceRebuild */, PhysicsScene.World, this, null,
-                delegate(BulletBody dBody)
-                {
-                    // Called if the current prim body is about to be destroyed.
-                    // Remove all the physical dependencies on the old body.
-                    // (Maybe someday make the changing of BSShape an event to be subscribed to by BSLinkset, ...)
-                    RemoveBodyDependencies();
-                });
+            PhysicsScene.Shapes.GetBodyAndShape(false /*forceRebuild */, PhysicsScene.World, this, delegate(BulletBody pBody, BulletShape pShape)
+            {
+                // Called if the current prim body is about to be destroyed.
+                // Remove all the physical dependencies on the old body.
+                // (Maybe someday make the changing of BSShape an event to be subscribed to by BSLinkset, ...)
+                RemoveBodyDependencies();
+            });
 
             // Make sure the properties are set on the new object
-            //UpdatePhysicalParameters();
+            UpdatePhysicalParameters();
             return;
         }
 
@@ -1644,12 +1668,12 @@ namespace WhiteCore.Physics.BulletSPlugin
         {
             PhysicalActors.RemoveBodyDependencies();
         }
-/* not yet implemented
+
         #region Extension
         public override object Extension(string pFunct, params object[] pParams)
         {
             DetailLog("{0} BSPrim.Extension,op={1}", LocalID, pFunct);
-            object ret = null;
+            object ret;
             switch (pFunct)
             {
                 case ExtendedPhysics.PhysFunctAxisLockLimits:
@@ -1662,16 +1686,16 @@ namespace WhiteCore.Physics.BulletSPlugin
             return ret;
         }
 
-        private void InitializeAxisActor()
+        void InitializeAxisActor()
         {
             EnableActor(LockedAngularAxis != LockedAxisFree || LockedLinearAxis != LockedAxisFree,
                                         LockedAxisActorName, delegate()
             {
-                return new BSActorLockAxis(PhysScene, this, LockedAxisActorName);
+                return new BSActorLockAxis(PhysicsScene, this, LockedAxisActorName);
             });
 
             // Update parameters so the new actor's Refresh() action is called at the right time.
-            PhysScene.TaintedObject(LocalID, "BSPrim.LockAxis", delegate()
+            PhysicsScene.TaintedObject(LocalID, "BSPrim.LockAxis", delegate()
             {
                 UpdatePhysicalParameters();
             });
@@ -1680,7 +1704,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         // Passed an array of an array of parameters, set the axis locking.
         // This expects an int (PHYS_AXIS_*) followed by none or two limit floats
         //    followed by another int and floats, etc.
-        private object SetAxisLockLimitsExtension(object[] pParams)
+        object SetAxisLockLimitsExtension(object[] pParams)
         {
             DetailLog("{0} SetAxisLockLimitsExtension. parmlen={1}", LocalID, pParams.GetLength(0));
             object ret = null;
@@ -1729,7 +1753,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                                     index += 3;
                                     break;
                                 default:
-                                    m_log.WarnFormat("{0} SetSxisLockLimitsExtension. Unknown op={1}", LogHeader, funct);
+                                    MainConsole.Instance.WarnFormat("{0} SetSxisLockLimitsExtension. Unknown op={1}", LogHeader, funct);
                                     index += 1;
                                     break;
                             }
@@ -1741,7 +1765,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             }
             catch (Exception e)
             {
-                m_log.WarnFormat("{0} SetSxisLockLimitsExtension exception in object {1}: {2}", LogHeader, this.Name, e);
+                MainConsole.Instance.WarnFormat("{0} SetSxisLockLimitsExtension exception in object {1}: {2}", LogHeader, Name, e);
                 ret = null;
             }
             return ret;    // not implemented yet
@@ -1760,114 +1784,114 @@ namespace WhiteCore.Physics.BulletSPlugin
             switch (funct)
             {
                 case ExtendedPhysics.PHYS_AXIS_LOCK_LINEAR:
-                    this.LockedLinearAxis = new OMV.Vector3(LockedAxis, LockedAxis, LockedAxis);
-                    this.LockedLinearAxisLow = OMV.Vector3.Zero;
-                    this.LockedLinearAxisHigh = OMV.Vector3.Zero;
+                    LockedLinearAxis = new OMV.Vector3(LockedAxis, LockedAxis, LockedAxis);
+                    LockedLinearAxisLow = OMV.Vector3.Zero;
+                    LockedLinearAxisHigh = OMV.Vector3.Zero;
                     break;
                 case ExtendedPhysics.PHYS_AXIS_LOCK_LINEAR_X:
-                    this.LockedLinearAxis.X = LockedAxis;
-                    this.LockedLinearAxisLow.X = 0f;
-                    this.LockedLinearAxisHigh.X = 0f;
+                    LockedLinearAxis.X = LockedAxis;
+                    LockedLinearAxisLow.X = 0f;
+                    LockedLinearAxisHigh.X = 0f;
                     break;
                 case ExtendedPhysics.PHYS_AXIS_LIMIT_LINEAR_X:
-                    this.LockedLinearAxis.X = LockedAxis;
-                    this.LockedLinearAxisLow.X = Util.Clip(low, -linearMax, linearMax);
-                    this.LockedLinearAxisHigh.X = Util.Clip(high, -linearMax, linearMax);
+                    LockedLinearAxis.X = LockedAxis;
+                    LockedLinearAxisLow.X = Util.Clip(low, -linearMax, linearMax);
+                    LockedLinearAxisHigh.X = Util.Clip(high, -linearMax, linearMax);
                     break;
                 case ExtendedPhysics.PHYS_AXIS_LOCK_LINEAR_Y:
-                    this.LockedLinearAxis.Y = LockedAxis;
-                    this.LockedLinearAxisLow.Y = 0f;
-                    this.LockedLinearAxisHigh.Y = 0f;
+                    LockedLinearAxis.Y = LockedAxis;
+                    LockedLinearAxisLow.Y = 0f;
+                    LockedLinearAxisHigh.Y = 0f;
                     break;
                 case ExtendedPhysics.PHYS_AXIS_LIMIT_LINEAR_Y:
-                    this.LockedLinearAxis.Y = LockedAxis;
-                    this.LockedLinearAxisLow.Y = Util.Clip(low, -linearMax, linearMax);
-                    this.LockedLinearAxisHigh.Y = Util.Clip(high, -linearMax, linearMax);
+                    LockedLinearAxis.Y = LockedAxis;
+                    LockedLinearAxisLow.Y = Util.Clip(low, -linearMax, linearMax);
+                    LockedLinearAxisHigh.Y = Util.Clip(high, -linearMax, linearMax);
                     break;
                 case ExtendedPhysics.PHYS_AXIS_LOCK_LINEAR_Z:
-                    this.LockedLinearAxis.Z = LockedAxis;
-                    this.LockedLinearAxisLow.Z = 0f;
-                    this.LockedLinearAxisHigh.Z = 0f;
+                    LockedLinearAxis.Z = LockedAxis;
+                    LockedLinearAxisLow.Z = 0f;
+                    LockedLinearAxisHigh.Z = 0f;
                     break;
                 case ExtendedPhysics.PHYS_AXIS_LIMIT_LINEAR_Z:
-                    this.LockedLinearAxis.Z = LockedAxis;
-                    this.LockedLinearAxisLow.Z = Util.Clip(low, -linearMax, linearMax);
-                    this.LockedLinearAxisHigh.Z = Util.Clip(high, -linearMax, linearMax);
+                    LockedLinearAxis.Z = LockedAxis;
+                    LockedLinearAxisLow.Z = Util.Clip(low, -linearMax, linearMax);
+                    LockedLinearAxisHigh.Z = Util.Clip(high, -linearMax, linearMax);
                     break;
                 case ExtendedPhysics.PHYS_AXIS_LOCK_ANGULAR:
-                    this.LockedAngularAxis = new OMV.Vector3(LockedAxis, LockedAxis, LockedAxis);
-                    this.LockedAngularAxisLow = OMV.Vector3.Zero;
-                    this.LockedAngularAxisHigh = OMV.Vector3.Zero;
+                    LockedAngularAxis = new OMV.Vector3(LockedAxis, LockedAxis, LockedAxis);
+                    LockedAngularAxisLow = OMV.Vector3.Zero;
+                    LockedAngularAxisHigh = OMV.Vector3.Zero;
                     break;
                 case ExtendedPhysics.PHYS_AXIS_LOCK_ANGULAR_X:
-                    this.LockedAngularAxis.X = LockedAxis;
-                    this.LockedAngularAxisLow.X = 0;
-                    this.LockedAngularAxisHigh.X = 0;
+                    LockedAngularAxis.X = LockedAxis;
+                    LockedAngularAxisLow.X = 0;
+                    LockedAngularAxisHigh.X = 0;
                     break;
                 case ExtendedPhysics.PHYS_AXIS_LIMIT_ANGULAR_X:
-                    this.LockedAngularAxis.X = LockedAxis;
-                    this.LockedAngularAxisLow.X = Util.Clip(low, -angularMax, angularMax);
-                    this.LockedAngularAxisHigh.X = Util.Clip(high, -angularMax, angularMax);
+                    LockedAngularAxis.X = LockedAxis;
+                    LockedAngularAxisLow.X = Util.Clip(low, -angularMax, angularMax);
+                    LockedAngularAxisHigh.X = Util.Clip(high, -angularMax, angularMax);
                     break;
                 case ExtendedPhysics.PHYS_AXIS_LOCK_ANGULAR_Y:
-                    this.LockedAngularAxis.Y = LockedAxis;
-                    this.LockedAngularAxisLow.Y = 0;
-                    this.LockedAngularAxisHigh.Y = 0;
+                    LockedAngularAxis.Y = LockedAxis;
+                    LockedAngularAxisLow.Y = 0;
+                    LockedAngularAxisHigh.Y = 0;
                     break;
                 case ExtendedPhysics.PHYS_AXIS_LIMIT_ANGULAR_Y:
-                    this.LockedAngularAxis.Y = LockedAxis;
-                    this.LockedAngularAxisLow.Y = Util.Clip(low, -angularMax, angularMax);
-                    this.LockedAngularAxisHigh.Y = Util.Clip(high, -angularMax, angularMax);
+                    LockedAngularAxis.Y = LockedAxis;
+                    LockedAngularAxisLow.Y = Util.Clip(low, -angularMax, angularMax);
+                    LockedAngularAxisHigh.Y = Util.Clip(high, -angularMax, angularMax);
                     break;
                 case ExtendedPhysics.PHYS_AXIS_LOCK_ANGULAR_Z:
-                    this.LockedAngularAxis.Z = LockedAxis;
-                    this.LockedAngularAxisLow.Z = 0;
-                    this.LockedAngularAxisHigh.Z = 0;
+                    LockedAngularAxis.Z = LockedAxis;
+                    LockedAngularAxisLow.Z = 0;
+                    LockedAngularAxisHigh.Z = 0;
                     break;
                 case ExtendedPhysics.PHYS_AXIS_LIMIT_ANGULAR_Z:
-                    this.LockedAngularAxis.Z = LockedAxis;
-                    this.LockedAngularAxisLow.Z = Util.Clip(low, -angularMax, angularMax);
-                    this.LockedAngularAxisHigh.Z = Util.Clip(high, -angularMax, angularMax);
+                    LockedAngularAxis.Z = LockedAxis;
+                    LockedAngularAxisLow.Z = Util.Clip(low, -angularMax, angularMax);
+                    LockedAngularAxisHigh.Z = Util.Clip(high, -angularMax, angularMax);
                     break;
                 case ExtendedPhysics.PHYS_AXIS_UNLOCK_LINEAR:
-                    this.LockedLinearAxis = LockedAxisFree;
-                    this.LockedLinearAxisLow = new OMV.Vector3(-linearMax, -linearMax, -linearMax);
-                    this.LockedLinearAxisHigh = new OMV.Vector3(linearMax, linearMax, linearMax);
+                    LockedLinearAxis = LockedAxisFree;
+                    LockedLinearAxisLow = new OMV.Vector3(-linearMax, -linearMax, -linearMax);
+                    LockedLinearAxisHigh = new OMV.Vector3(linearMax, linearMax, linearMax);
                     break;
                 case ExtendedPhysics.PHYS_AXIS_UNLOCK_LINEAR_X:
-                    this.LockedLinearAxis.X = FreeAxis;
-                    this.LockedLinearAxisLow.X = -linearMax;
-                    this.LockedLinearAxisHigh.X = linearMax;
+                    LockedLinearAxis.X = FreeAxis;
+                    LockedLinearAxisLow.X = -linearMax;
+                    LockedLinearAxisHigh.X = linearMax;
                     break;
                 case ExtendedPhysics.PHYS_AXIS_UNLOCK_LINEAR_Y:
-                    this.LockedLinearAxis.Y = FreeAxis;
-                    this.LockedLinearAxisLow.Y = -linearMax;
-                    this.LockedLinearAxisHigh.Y = linearMax;
+                    LockedLinearAxis.Y = FreeAxis;
+                    LockedLinearAxisLow.Y = -linearMax;
+                    LockedLinearAxisHigh.Y = linearMax;
                     break;
                 case ExtendedPhysics.PHYS_AXIS_UNLOCK_LINEAR_Z:
-                    this.LockedLinearAxis.Z = FreeAxis;
-                    this.LockedLinearAxisLow.Z = -linearMax;
-                    this.LockedLinearAxisHigh.Z = linearMax;
+                    LockedLinearAxis.Z = FreeAxis;
+                    LockedLinearAxisLow.Z = -linearMax;
+                    LockedLinearAxisHigh.Z = linearMax;
                     break;
                 case ExtendedPhysics.PHYS_AXIS_UNLOCK_ANGULAR:
-                    this.LockedAngularAxis = LockedAxisFree;
-                    this.LockedAngularAxisLow = new OMV.Vector3(-angularMax, -angularMax, -angularMax);
-                    this.LockedAngularAxisHigh = new OMV.Vector3(angularMax, angularMax, angularMax);
+                    LockedAngularAxis = LockedAxisFree;
+                    LockedAngularAxisLow = new OMV.Vector3(-angularMax, -angularMax, -angularMax);
+                    LockedAngularAxisHigh = new OMV.Vector3(angularMax, angularMax, angularMax);
                     break;
                 case ExtendedPhysics.PHYS_AXIS_UNLOCK_ANGULAR_X:
-                    this.LockedAngularAxis.X = FreeAxis;
-                    this.LockedAngularAxisLow.X = -angularMax;
-                    this.LockedAngularAxisHigh.X = angularMax;
+                    LockedAngularAxis.X = FreeAxis;
+                    LockedAngularAxisLow.X = -angularMax;
+                    LockedAngularAxisHigh.X = angularMax;
                     break;
                 case ExtendedPhysics.PHYS_AXIS_UNLOCK_ANGULAR_Y:
-                    this.LockedAngularAxis.Y = FreeAxis;
-                    this.LockedAngularAxisLow.Y = -angularMax;
-                    this.LockedAngularAxisHigh.Y = angularMax;
+                    LockedAngularAxis.Y = FreeAxis;
+                    LockedAngularAxisLow.Y = -angularMax;
+                    LockedAngularAxisHigh.Y = angularMax;
                     break;
                 case ExtendedPhysics.PHYS_AXIS_UNLOCK_ANGULAR_Z:
-                    this.LockedAngularAxis.Z = FreeAxis;
-                    this.LockedAngularAxisLow.Z = -angularMax;
-                    this.LockedAngularAxisHigh.Z = angularMax;
+                    LockedAngularAxis.Z = FreeAxis;
+                    LockedAngularAxisLow.Z = -angularMax;
+                    LockedAngularAxisHigh.Z = angularMax;
                     break;
                 case ExtendedPhysics.PHYS_AXIS_UNLOCK:
                     ApplyAxisLimits(ExtendedPhysics.PHYS_AXIS_UNLOCK_LINEAR, 0f, 0f);
@@ -1879,15 +1903,15 @@ namespace WhiteCore.Physics.BulletSPlugin
             return;
         }
         #endregion  // Extension
-*/
-    // The physics engine says that properties have updated. Update same and inform
-    // the world that things have changed.
-    // NOTE: BSPrim.UpdateProperties is overloaded by BSPrimLinkable which modifies updates from root and children prims.
-    // NOTE: BSPrim.UpdateProperties is overloaded by BSPrimDisplaced which handles mapping physical position to simulator position.
-    public override void UpdateProperties(EntityProperties entprop)
-    {
-        // Let anyone (like the actors) modify the updated properties before they are pushed into the object and the simulator.
-        TriggerPreUpdatePropertyAction(ref entprop);
+
+        // The physics engine says that properties have updated. Update same and inform
+        // the world that things have changed.
+        // NOTE: BSPrim.UpdateProperties is overloaded by BSPrimLinkable which modifies updates from root and children prims.
+        // NOTE: BSPrim.UpdateProperties is overloaded by BSPrimDisplaced which handles mapping physical position to simulator position.
+        public override void UpdateProperties(EntityProperties entprop)
+        {
+            // Let anyone (like the actors) modify the updated properties before they are pushed into the object and the simulator.
+            TriggerPreUpdatePropertyAction(ref entprop);
 
             // DetailLog("{0},BSPrim.UpdateProperties,entry,entprop={1}", LocalID, entprop);   // DEBUG DEBUG
 
@@ -1939,17 +1963,17 @@ namespace WhiteCore.Physics.BulletSPlugin
             CurrentEntityProperties = entprop;
 
             if (terseUpdate)
-                base.RequestPhysicsterseUpdate();
+                RequestPhysicsterseUpdate ();
             /*
-        else
-        {
-            // For debugging, report the movement of children
-            DetailLog("{0},BSPrim.UpdateProperties,child,pos={1},orient={2},vel={3},accel={4},rotVel={5}",
-                    LocalID, entprop.Position, entprop.Rotation, entprop.Velocity,
-                    entprop.Acceleration, entprop.RotationalVelocity);
-        }
-             */
-        }
+            else
+            {
+                // For debugging, report the movement of children
+                DetailLog("{0},BSPrim.UpdateProperties,child,pos={1},orient={2},vel={3},accel={4},rotVel={5}",
+                        LocalID, entprop.Position, entprop.Rotation, entprop.Velocity,
+                        entprop.Acceleration, entprop.RotationalVelocity);
+            }
+            */
+         }
 
 
         // High performance detailed logging routine used by the physical objects.

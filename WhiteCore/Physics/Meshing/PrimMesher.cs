@@ -486,8 +486,7 @@ namespace WhiteCore.Physics.PrimMesher
             };
 
         internal List<Angle> angles;
-        float iX, iY;
-        // intersection point
+        float iX, iY;				            // intersection point
         internal List<Coord> normals;
 
         Angle interpolatePoints (float newPoint, Angle p1, Angle p2)
@@ -621,31 +620,34 @@ namespace WhiteCore.Physics.PrimMesher
     class Profile
     {
         const float twoPi = 2.0f * (float)Math.PI;
-        internal int bottomFaceNumber;
-        internal bool calcVertexNormals;
+        internal string errorMessage;
 
         internal List<Coord> coords;
+        internal List<Face> faces;
+        internal List<Coord> vertexNormals;
+        internal List<float> us;
+        internal List<UVCoord> faceUVs;
+        internal List<int> faceNumbers;
+
+        // use these for making individual meshes for each prim face
+        internal List<int> outerCoordIndices;
+        internal List<int> hollowCoordIndices;
         internal List<int> cut1CoordIndices;
         internal List<int> cut2CoordIndices;
 
+        internal Coord faceNormal = new Coord (0.0f, 0.0f, 1.0f);
         internal Coord cutNormal1;
         internal Coord cutNormal2;
-        internal string errorMessage;
-        internal Coord faceNormal = new Coord (0.0f, 0.0f, 1.0f);
-        internal List<int> faceNumbers;
-        internal List<UVCoord> faceUVs;
-        internal List<Face> faces;
-        internal List<int> hollowCoordIndices;
-
-        internal int hollowFaceNumber = -1;
+ 
         internal int numHollowVerts;
         internal int numOuterVerts;
 
-        internal int numPrimFaces;
-        internal List<int> outerCoordIndices;
         internal int outerFaceNumber = -1;
-        internal List<float> us;
-        internal List<Coord> vertexNormals;
+        internal int hollowFaceNumber = -1;
+
+        internal bool calcVertexNormals;
+        internal int bottomFaceNumber;
+        internal int numPrimFaces;
 
         internal Profile ()
         {
@@ -813,7 +815,7 @@ namespace WhiteCore.Physics.PrimMesher
                                                   ? angles.normals [i].Invert ()
                                                   : new Coord (-angle.X, -angle.Y, 0.0f));
 
-                            hollowUs.Add (angle.angle * hollow);
+                            hollowUs.Add (angle.angle * hollow);  //20151106 - not used here??
                         }
                     }
                 } else if (!simpleFace && createFaces && angle.angle > 0.0001f)
@@ -1079,10 +1081,11 @@ namespace WhiteCore.Physics.PrimMesher
         {
             int i;
             int numVerts = coords.Count;
+            Coord vert;
 
             for (i = 0; i < numVerts; i++)
             {
-                Coord vert = coords [i];
+                vert = coords [i];
                 vert.X += x;
                 vert.Y += y;
                 vert.Z += z;
@@ -1131,11 +1134,13 @@ namespace WhiteCore.Physics.PrimMesher
         {
             int i;
             int numFaces = faces.Count;
+            Face tmpFace;
+            int tmp;
 
             for (i = 0; i < numFaces; i++)
             {
-                Face tmpFace = faces [i];
-                int tmp = tmpFace.v3;
+                tmpFace = faces [i];
+                tmp = tmpFace.v3;
                 tmpFace.v3 = tmpFace.v1;
                 tmpFace.v1 = tmp;
                 faces [i] = tmpFace;
@@ -1168,9 +1173,10 @@ namespace WhiteCore.Physics.PrimMesher
         internal void AddValue2FaceVertexIndices (int num)
         {
             int numFaces = faces.Count;
+            Face tmpFace;
             for (int i = 0; i < numFaces; i++)
             {
-                Face tmpFace = faces [i];
+                tmpFace = faces [i];
                 tmpFace.v1 += num;
                 tmpFace.v2 += num;
                 tmpFace.v3 += num;
@@ -1184,9 +1190,10 @@ namespace WhiteCore.Physics.PrimMesher
             if (calcVertexNormals)
             {
                 int numFaces = faces.Count;
+                Face tmpFace;
                 for (int i = 0; i < numFaces; i++)
                 {
-                    Face tmpFace = faces [i];
+                    tmpFace = faces [i];
                     tmpFace.n1 += num;
                     tmpFace.n2 += num;
                     tmpFace.n3 += num;
@@ -1233,23 +1240,24 @@ namespace WhiteCore.Physics.PrimMesher
     public class Path
     {
         const float twoPi = 2.0f * (float)Math.PI;
-        public float dimpleBegin;
-        public float dimpleEnd = 1.0f;
-        public float holeSizeX = 1.0f;        // called pathScaleX in pbs
-        public float holeSizeY = 0.25f;
-        public float pathCutBegin;
-        public float pathCutEnd = 1.0f;
         public List<PathNode> pathNodes = new List<PathNode> ();
-        public float radius;
-        public float revolutions = 1.0f;
-        public float skew;
-        public int stepsPerRevolution = 24;
-        public float taperX;
-        public float taperY;
-        public float topShearX;
-        public float topShearY;
+
         public float twistBegin;
         public float twistEnd;
+        public float topShearX;
+        public float topShearY;
+        public float pathCutBegin;
+        public float pathCutEnd = 1.0f;
+        public float dimpleBegin;
+        public float dimpleEnd = 1.0f;
+        public float skew;
+        public float holeSizeX = 1.0f;        // called pathScaleX in pbs
+        public float holeSizeY = 0.25f;
+        public float taperX;
+        public float taperY;
+        public float radius;
+        public float revolutions = 1.0f;
+        public int stepsPerRevolution = 24;
 
         public void Create (PathType pathType, int steps)
         {
@@ -1414,8 +1422,10 @@ namespace WhiteCore.Physics.PrimMesher
                     newNode.rotation = new Quat (new Coord (1.0f, 0.0f, 0.0f), angle + topShearY);
 
                     // next apply twist rotation to the profile layer
-                    if ((Math.Abs(twistTotal) > Constants.FloatDifference) || (Math.Abs(twistBegin) > Constants.FloatDifference))
-                        newNode.rotation *= new Quat (new Coord (0.0f, 0.0f, 1.0f), twist);
+// 20151106                    if ((Math.Abs(twistTotal) > Constants.FloatDifference) || (Math.Abs(twistBegin) > Constants.FloatDifference))
+// *=??                        newNode.rotation *= new Quat (new Coord (0.0f, 0.0f, 1.0f), twist);
+                    if (twistTotal != 0.0f || twistBegin != 0.0f)
+                        newNode.rotation = new Quat(new Coord(0.0f, 0.0f, 1.0f), twist);
 
                     newNode.percentOfPath = percentOfPath;
 
@@ -1442,17 +1452,6 @@ namespace WhiteCore.Physics.PrimMesher
     {
         const float twoPi = 2.0f * (float)Math.PI;
 
-        readonly int sides = 4;
-        readonly int hollowSides = 4;
-        readonly float profileStart;
-        readonly float profileEnd = 1.0f;
-        readonly float hollow;
-
-        int profileOuterFaceNumber = -1;
-        int profileHollowFaceNumber = -1;
-        bool hasProfileCut;
-        bool hasHollow;
-        bool normalsProcessed;
 
         public string errorMessage = "";
 
@@ -1461,6 +1460,13 @@ namespace WhiteCore.Physics.PrimMesher
         public List<Face> faces;
 
         public List<ViewerFace> viewerFaces;
+
+        readonly int sides = 4;
+        readonly int hollowSides = 4;
+        readonly float profileStart;
+        readonly float profileEnd = 1.0f;
+
+        readonly float hollow;
 
         public int twistBegin;
         public int twistEnd;
@@ -1478,6 +1484,13 @@ namespace WhiteCore.Physics.PrimMesher
         public float radius;
         public float revolutions = 1.0f;
         public int stepsPerRevolution = 24;
+
+        int profileOuterFaceNumber = -1;
+        int profileHollowFaceNumber = -1;
+
+        bool hasProfileCut;
+        bool hasHollow;
+        bool normalsProcessed;
 
         public bool calcVertexNormals;
         public bool viewerMode;
@@ -1671,7 +1684,7 @@ namespace WhiteCore.Physics.PrimMesher
                     initialProfileRot = 1.25f * (float)Math.PI;
                     if (hollowSides != 4)
                         hollow2 *= 0.707f;
-                } else if (sides == 24 && hollowSides == 4)
+                } else if (sides == 24 && hollowSides == 5)
                     hollow2 *= 1.414f;
             }
 
@@ -1737,8 +1750,8 @@ namespace WhiteCore.Physics.PrimMesher
             float lastV = 0.0f;
 
             Path path = new Path {
-                twistBegin = twistBegin2,
-                twistEnd = twistEnd2,
+                twistBegin = twistBegin2,			//20151106 - original was twistBegin
+                twistEnd = twistEnd2,         //   ditto for twistEnd
                 topShearX = topShearX,
                 topShearY = topShearY,
                 pathCutBegin = pathCutBegin,
@@ -1891,6 +1904,12 @@ namespace WhiteCore.Physics.PrimMesher
                             {
                                 u1 = 0.0f;
                                 u2 = 1.0f;
+                                if (uIndex < (int) newLayer.us.Count - 1) u2 = newLayer.us[uIndex + 1];
+                                if (whichVert == cut1Vert || whichVert == cut2Vert)
+                                {
+                                    u1 = 0.0f;
+                                    u2 = 1.0f;
+                                }
                             } else if (sides < 5)
                             {
                                 if (whichVert < profile.numOuterVerts)
@@ -2179,10 +2198,11 @@ namespace WhiteCore.Physics.PrimMesher
         {
             int i;
             int numVerts = coords.Count;
+            Coord vert;
 
             for (i = 0; i < numVerts; i++)
             {
-                Coord vert = coords [i];
+                vert = coords [i];
                 vert.X += x;
                 vert.Y += y;
                 vert.Z += z;

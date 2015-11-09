@@ -74,6 +74,8 @@ namespace WhiteCore.Physics.Meshing
             const string baseDir = "rawFiles";
         #endif
 
+        // detailed debugging info
+        bool debugDetail = false;
         readonly bool cacheSculptMaps = true;
         bool cacheSculptAlphaMaps = true;
 
@@ -217,9 +219,7 @@ namespace WhiteCore.Physics.Meshing
                         }
                         zOut.Flush();
                         zOut.finish();
-                        //outMs.Seek(0, SeekOrigin.Begin);
 
-                        //byte[] decompressedBuf = outMs.GetBuffer();
                         byte[] decompressedBuf = outMs.ToArray();
 
                         decodedOsd = OSDParser.DeserializeLLSDBinary(decompressedBuf);
@@ -282,8 +282,7 @@ namespace WhiteCore.Physics.Meshing
 
             Vector3 posMax = new Vector3(0.5f, 0.5f, 0.5f);
             Vector3 posMin = new Vector3(-0.5f, -0.5f, -0.5f);
-            if (subMeshMap.ContainsKey("PositionDomain"))
-                //Optional, so leave the max and min values otherwise
+            if (subMeshMap.ContainsKey("PositionDomain"))                //Optional, so leave the max and min values otherwise
             {
                 posMax = ((OSDMap) subMeshMap["PositionDomain"])["Max"].AsVector3();
                 posMin = ((OSDMap) subMeshMap["PositionDomain"])["Min"].AsVector3();
@@ -335,6 +334,9 @@ namespace WhiteCore.Physics.Meshing
 
             if (primShape.SculptData == null || primShape.SculptData.Length <= 0)
             {
+                // At the moment we can not log here since ODEPrim, for instance, ends up triggering this
+                // method twice - once before it has loaded sculpt data from the asset service and once afterwards.
+                // The first time will always call with unloaded SculptData if this needs to be uploaded.
                 //MainConsole.Instance.Error("[MESH]: asset data is zero length");
                 return null;
             }
@@ -356,17 +358,28 @@ namespace WhiteCore.Physics.Meshing
 
             if (meshOsd is OSDMap)
             {
+                OSDMap physicsParms = null;
                 OSDMap map = (OSDMap)meshOsd;
-                OSDMap physicsParms = new OSDMap ();
-
-                if (map.ContainsKey ("physics_shape"))
-                    physicsParms = (OSDMap)map ["physics_shape"];   // old asset format
-                else if (map.ContainsKey ("physics_mesh"))
-                    physicsParms = (OSDMap)map ["physics_mesh"];    // new asset format
-                else if (map.ContainsKey ("medium_lod"))
-                    physicsParms = (OSDMap)map ["medium_lod"];      // fallback to medium LOD mesh
-                else if (map.ContainsKey ("high_lod"))
-                    physicsParms = (OSDMap)map ["high_lod"];        // if all else fails...
+                if (map.ContainsKey("physics_shape"))
+                {
+                    physicsParms = (OSDMap)map["physics_shape"]; // old asset format
+                    if (debugDetail) MainConsole.Instance.DebugFormat("[MESH]: prim='{0}': using 'physics_shape' mesh data", primName);
+                }
+                else if (map.ContainsKey("physics_mesh"))
+                {
+                    physicsParms = (OSDMap)map["physics_mesh"]; // new asset format
+                    if (debugDetail) MainConsole.Instance.DebugFormat("[MESH]: prim='{0}':using 'physics_mesh' mesh data", primName);
+                }
+                else if (map.ContainsKey("medium_lod"))
+                {
+                    physicsParms = (OSDMap)map["medium_lod"]; // if no physics mesh, try to fall back to medium LOD display mesh
+                    if (debugDetail) MainConsole.Instance.DebugFormat("[MESH]: prim='{0}':using 'medium_lod' mesh data", primName);
+                }
+                else if (map.ContainsKey("high_lod"))
+                {
+                    physicsParms = (OSDMap)map["high_lod"]; // if all else fails, use highest LOD display mesh and hope it works :)
+                    if (debugDetail) MainConsole.Instance.DebugFormat("[MESH]: prim='{0}':using 'high_lod' mesh data", primName);
+                }
 
                 if (map.ContainsKey ("physics_convex"))
                 { 
@@ -397,6 +410,13 @@ namespace WhiteCore.Physics.Meshing
                         {
                             convexBlock = convexBlockOsd as OSDMap;
 
+                            if (debugDetail)
+                            {
+                                string keys = "[Mesh]: keys found in convexBlock: ";
+                                foreach (KeyValuePair<string, OSD> kvp in convexBlock)
+                                    keys += "'" + kvp.Key + "' ";
+                                MainConsole.Instance.Debug(keys);
+                            }
                             Vector3 min = new Vector3 (-0.5f, -0.5f, -0.5f);
                             if (convexBlock.ContainsKey ("Min"))
                                 min = convexBlock ["Min"].AsVector3 ();
@@ -430,7 +450,7 @@ namespace WhiteCore.Physics.Meshing
                                 }
 
                                 mBoundingHull = boundingHull;
-                                MainConsole.Instance.DebugFormat ("[MESH]: prim '{0}': parsed bounding hull. nVerts={1}", primName, mBoundingHull.Count);
+                                if (debugDetail) MainConsole.Instance.DebugFormat ("[MESH]: prim '{0}': parsed bounding hull. nVerts={1}", primName, mBoundingHull.Count);
                             }
 
                             if (convexBlock.ContainsKey ("HullList"))
@@ -468,10 +488,10 @@ namespace WhiteCore.Physics.Meshing
                                 }
 
                                 mConvexHulls = hulls;
-                                MainConsole.Instance.DebugFormat ("[MESH]: prim '{0}': parsed hulls. nHulls '{1}'", primName, mConvexHulls.Count);
+                                if (debugDetail) MainConsole.Instance.DebugFormat ("[MESH]: prim '{0}': parsed hulls. nHulls '{1}'", primName, mConvexHulls.Count);
                             } else
                             {
-                                MainConsole.Instance.DebugFormat ("[MESH]: prim '{0}' has physics_convex but no HullList", primName);
+                                if (debugDetail) MainConsole.Instance.DebugFormat ("[MESH]: prim '{0}' has physics_convex but no HullList", primName);
                             }
                         }
                     } catch (Exception e)
@@ -516,8 +536,9 @@ namespace WhiteCore.Physics.Meshing
                         if (subMeshOsd is OSDMap)
                             AddSubMesh (subMeshOsd as OSDMap, size, coords, faces);
                     }
-                    MainConsole.Instance.DebugFormat ("[MESH]: {0}: mesh decoded. offset={1}, size={2}, nCoords={3}, nFaces={4}",
-                        primName, physOffset, physSize, coords.Count, faces.Count);
+										if (debugDetail) 
+                        MainConsole.Instance.DebugFormat ("[MESH]: {0}: mesh decoded. offset={1}, size={2}, nCoords={3}, nFaces={4}",
+                            primName, physOffset, physSize, coords.Count, faces.Count);
                 }
             }
         
@@ -875,27 +896,24 @@ namespace WhiteCore.Physics.Meshing
             return hulls;
         }
 
-        public void RemoveMesh(ulong key)
+        // Main mesh creation entry point
+        public IMesh CreateMesh(String primName, PrimitiveBaseShape primShape, Vector3 size, float lod, bool isPhysical, bool shouldCache)
         {
-        }
-
-        public IMesh CreateMesh(String primName, PrimitiveBaseShape primShape, Vector3 size, float lod)
-        {
-            return CreateMesh(primName, primShape, size, lod, false);
-        }
-
-        public IMesh CreateMesh(String primName, PrimitiveBaseShape primShape, Vector3 size, float lod, bool isPhysical)
-        {
+#if SPAM
+            MainConsole.Instance.DebugFormat("[MESH]: Creating mesh for {0}", primName);
+#endif
             Mesh mesh;
             ulong key = primShape.GetMeshKey(size, lod);
 
-            // If this mesh has been created already, return it instead of creating another copy
-            lock (m_uniqueMeshes)
+            // If caching and this mesh has been created already, return it instead of creating another copy
+            if (shouldCache)
             {
-                if (m_uniqueMeshes.TryGetValue(key, out mesh))
-                    return mesh;
+                lock (m_uniqueMeshes)
+                {
+                    if (m_uniqueMeshes.TryGetValue(key, out mesh))
+                        return mesh;
+                }
             }
-
             // set miniumm sizes
             if (size.X < 0.01f) size.X = 0.01f;
             if (size.Y < 0.01f) size.Y = 0.01f;
@@ -906,12 +924,14 @@ namespace WhiteCore.Physics.Meshing
             else
                 mesh = CreateMeshFromPrimMesher(primName, primShape, size, lod, key);
 
-            // cache newly created mesh's
-            lock (m_uniqueMeshes)
+            // cache newly created mesh?
+            if (shouldCache)
             {
-                m_uniqueMeshes.Add(key, mesh);
+                lock (m_uniqueMeshes)
+                {
+                    m_uniqueMeshes.Add(key, mesh);
+                }
             }
-
             return mesh;
         }
     }

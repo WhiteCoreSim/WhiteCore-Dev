@@ -1171,7 +1171,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
                     // Don't need to re-enable body..   it's done in SetMesh
                     IMesh mesh = _parent_scene.mesher.CreateMesh(_name, _pbs, _size,
-                                                            _parent_scene.meshSculptLOD, true);
+                                                            _parent_scene.meshSculptLOD, true, true);
 
                     //Tell things above if they want to cache it or something
                     if (mesh != null)

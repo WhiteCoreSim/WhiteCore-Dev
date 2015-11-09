@@ -28,6 +28,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Nini.Config;
 using OpenMetaverse;
 using WhiteCore.Framework.Physics;
@@ -286,8 +287,8 @@ namespace WhiteCore.Physics.BulletSPlugin
 
                     // Very detailed logging for physics debugging
                     // TODO: the boolean values can be moved to the normal parameter processing.
-                    /* Unused...
                     m_physicsLoggingEnabled = pConfig.GetBoolean("PhysicsLoggingEnabled", false);
+                    /* Unused...
                     m_physicsLoggingDir = pConfig.GetString("PhysicsLoggingDir", ".");
                     m_physicsLoggingPrefix = pConfig.GetString("PhysicsLoggingPrefix", "physics-%REGIONNAME%-");
                     m_physicsLoggingFileMinutes = pConfig.GetInt("PhysicsLoggingFileMinutes", 5);
@@ -458,24 +459,6 @@ namespace WhiteCore.Physics.BulletSPlugin
                     "{0}: Requested to remove avatar that is not a BSCharacter. ID={1}, type={2}",
                     LogHeader, actor.LocalID, actor.GetType().Name);
             }
-        }
-
-        public override void DeletePrim(PhysicsActor prim)
-        {
-            BSPrimLinkable linkablePrim = prim as BSPrimLinkable;
-            if (linkablePrim != null && linkablePrim.Linkset.HasAnyChildren)
-            {
-                linkablePrim.BlockPhysicalReconstruction = true;
-                //Remove all the children prims first, then kill the root
-                foreach (BSPrimLinkable childPrim in linkablePrim.Linkset.Children)
-                {
-                    childPrim.BlockPhysicalReconstruction = true;
-                    RemovePrim(childPrim);
-                }
-                //TODO: DISABLE LINKSET REBUILDING DURING THIS PROCESS
-            }
-
-            RemovePrim(prim);
         }
 
         public override void RemovePrim(PhysicsActor prim)
@@ -761,6 +744,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             SimpleWaterLevel = (float)baseheight;
         }
 
+
         #endregion // Terrain
 
         public override Dictionary<uint, float> GetTopColliders()
@@ -787,15 +771,6 @@ namespace WhiteCore.Physics.BulletSPlugin
             get { return false; }
         }
 
-/* not yet implemented
-        #region Extensions
-        public override object Extension(string pFunct, params object[] pParams)
-        {
-            DetailLog("{0} BSScene.Extension,op={1}", DetailLogZero, pFunct);
-            return base.Extension(pFunct, pParams);
-        }
-        #endregion // Extensions
-
         public static string PrimitiveBaseShapeToString(PrimitiveBaseShape pbs)
         {
             float pathShearX = pbs.PathShearX < 128 ? (float)pbs.PathShearX * 0.01f : (float)(pbs.PathShearX - 256) * 0.01f;
@@ -804,8 +779,8 @@ namespace WhiteCore.Physics.BulletSPlugin
             float pathEnd = 1.0f - (float)pbs.PathEnd * 2.0e-5f;
             float pathScaleX = (float)(200 - pbs.PathScaleX) * 0.01f;
             float pathScaleY = (float)(200 - pbs.PathScaleY) * 0.01f;
-            float pathTaperX = pbs.PathTaperX * 0.01f;
-            float pathTaperY = pbs.PathTaperY * 0.01f;
+            //float pathTaperX = pbs.PathTaperX * 0.01f;
+            //float pathTaperY = pbs.PathTaperY * 0.01f;
 
             float profileBegin = (float)pbs.ProfileBegin * 2.0e-5f;
             float profileEnd = 1.0f - (float)pbs.ProfileEnd * 2.0e-5f;
@@ -864,7 +839,7 @@ namespace WhiteCore.Physics.BulletSPlugin
 
             return buff.ToString();
         }
-*/
+
         #region Taints
 
         // The simulation execution order is:

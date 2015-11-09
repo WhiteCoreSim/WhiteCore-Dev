@@ -26,7 +26,6 @@
  */
 
 using System;
-using System.Linq;
 using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.SceneInfo;
 using OMV = OpenMetaverse;
@@ -35,9 +34,21 @@ namespace WhiteCore.Physics.BulletSPlugin
 {
     public class BSPrimLinkable : BSPrimDisplaced
     {
+        // The purpose of this subclass is to add linkset functionality to the prim. This overrides
+        //    operations necessary for keeping the linkset created and, additionally, this
+        //    calls the linkset implementation for its creation and management.
+
+//#pragma warning disable 414
+//         static readonly string LogHeader = "[BULLETS PRIMLINKABLE]";
+//#pragma warning restore 414
+
+        // This adds the overrides for link() and delink() so the prim is linkable.
+
         public BSLinkset Linkset { get; set; }
         // The index of this child prim.
         public int LinksetChildIndex { get; set; }
+
+        public BSLinkset.LinksetImplementation LinksetType { get; set; }
 
         public BSLinksetInfo LinksetInfo { get; set; }
 
@@ -46,30 +57,18 @@ namespace WhiteCore.Physics.BulletSPlugin
             float restitution, float gravityMultiplier, float density)
             : base(localID, primName, parent_scene, pos, size, rotation, pbs, pisPhysical)
         {
+            // Default linkset implementation for this prim
+            LinksetType = (BSLinkset.LinksetImplementation) BSParam.LinksetImplementation;
+
             Linkset = BSLinkset.Factory(PhysicsScene, this);
 
-            PhysicsScene.TaintedObject(LocalID, "BSPrimLinksetCompound.Refresh", delegate()
-            {
-                SetMaterial(material);
-                Friction = friction;
-                Restitution = restitution;
-                GravityMultiplier = gravityMultiplier;
-                Density = density;
-                Linkset.Refresh(this);
-            });
+            Linkset.Refresh(this);
         }
 
         public override void Destroy()
         {
-            if (!Linkset.LinksetRoot.BlockPhysicalReconstruction)
-                //If we are disabled, this entire linkset is being removed, so allow it to happen
-                Linkset = Linkset.RemoveMeFromLinkset(this, false /* inTaintTime */);
+            Linkset = Linkset.RemoveMeFromLinkset(this, false /* inTaintTime */);
             base.Destroy();
-        }
-
-        public override BSPhysicsShapeType PreferredPhysicalShape
-        {
-            get { return Linkset.PreferredPhysicalShape(this); }
         }
 
         public override void link(PhysicsActor obj)
@@ -87,14 +86,6 @@ namespace WhiteCore.Physics.BulletSPlugin
                     LocalID, parentBefore.LocalID, childrenBefore, Linkset.LinksetRoot.LocalID, Linkset.NumberOfChildren);
             }
             return;
-        }
-
-        public override void linkGroupToThis(PhysicsActor[] objs)
-        {
-            Linkset.AddGroupToLinkset(objs.Cast<BSPrimLinkable>().ToArray());
-
-            DetailLog("{0},BSPrimLinkset.linkGroupToThis,call, childrenAdded={1}, childrenAfter={2}",
-                LocalID, objs.Length, Linkset.NumberOfChildren);
         }
 
         public override void delink()
@@ -184,6 +175,7 @@ namespace WhiteCore.Physics.BulletSPlugin
 
         public override void UpdateProperties(EntityProperties entprop)
         {
+            // TODO!!! Linkset.ShouldReportPropertyUpdates
             if (Linkset.IsRoot(this))
             {
                 // Properties are only updated for the roots of a linkset.
@@ -206,13 +198,14 @@ namespace WhiteCore.Physics.BulletSPlugin
         public override bool Collide(uint collidingWith, BSPhysObject collidee,
             OMV.Vector3 contactPoint, OMV.Vector3 contactNormal, float pentrationDepth)
         {
-            // prims in the same linkset cannot collide with each other
-            BSPrimLinkable convCollidee = collidee as BSPrimLinkable;
-            if (convCollidee != null && (this.Linkset.LinksetID == convCollidee.Linkset.LinksetID))
+            bool ret = false;
+            // Ask the linkset if it wants to handle the collision
+            if (!Linkset.HandleCollide(collidingWith, collidee, contactPoint, contactNormal, pentrationDepth))
             {
-                return false;
+                // The linkset didn't handle it so pass the collision through normal processing
+                ret = base.Collide(collidingWith, collidee, contactPoint, contactNormal, pentrationDepth);
             }
-            return base.Collide(collidingWith, collidee, contactPoint, contactNormal, pentrationDepth);
+            return ret;
         }
 
 
@@ -349,5 +342,5 @@ namespace WhiteCore.Physics.BulletSPlugin
         }
         #endregion  // Extension
     */
-}
+    }
 }

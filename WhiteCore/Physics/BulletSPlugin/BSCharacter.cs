@@ -56,10 +56,13 @@ namespace WhiteCore.Physics.BulletSPlugin
         bool _floatOnWater;
         OMV.Vector3 _rotationalVelocity;
         bool _kinematic;  
-        bool _isVolumeDetect;
+        // not used?? //bool _isVolumeDetect;
         float _buoyancy;
         BSActorAvatarMove m_moveActor;
         const string AvatarMoveActorName = "BSCharacter.AvatarMove";
+
+        // Avatars are always complete (in the physics engine sense)
+        public override bool IsIncomplete {  get { return false; } }
 
         public BSCharacter(uint localID, String avName, BSScene parent_scene, OMV.Vector3 pos, OMV.Vector3 size,
             bool isFlying)
@@ -122,8 +125,8 @@ namespace WhiteCore.Physics.BulletSPlugin
             {
                 PhysicsScene.Shapes.DereferenceBody(PhysBody, null /* bodyCallback */);
                 PhysBody.Clear();
-                PhysicsScene.Shapes.DereferenceShape(PhysShape, null /* bodyCallback */);
-                PhysShape.Clear();
+                PhysShape.Dereference(PhysicsScene);
+                PhysShape = new BSShapeNull();
             });
         }
 
@@ -131,22 +134,22 @@ namespace WhiteCore.Physics.BulletSPlugin
         {
             PhysicsScene.PE.RemoveObjectFromWorld(PhysicsScene.World, PhysBody);
 
-            ZeroMotion(true);
-            ForcePosition = _position;
+            ForcePosition = RawPosition;
 
             // Set the velocity
             if (m_moveActor != null)
                 m_moveActor.SetVelocityAndTarget(RawVelocity, RawVelocity, false, 0);
 
             ForceVelocity = RawVelocity;
+            TargetVelocity = RawVelocity;
 
             // This will enable or disable the flying buoyancy of the avatar.
             // Needs to be reset especially when an avatar is recreated after crossing a region boundry.
             Flying = _flying;
 
             PhysicsScene.PE.SetRestitution(PhysBody, BSParam.AvatarRestitution);
-            PhysicsScene.PE.SetMargin(PhysShape, PhysicsScene.Params.collisionMargin);
-            PhysicsScene.PE.SetLocalScaling(PhysShape, Scale);
+            PhysicsScene.PE.SetMargin(PhysShape.physShapeInfo, PhysicsScene.Params.collisionMargin);
+            PhysicsScene.PE.SetLocalScaling(PhysShape.physShapeInfo, Scale);
             PhysicsScene.PE.SetContactProcessingThreshold(PhysBody, BSParam.ContactProcessingThreshold);
             if (BSParam.CcdMotionThreshold > 0f)
             {
@@ -170,11 +173,11 @@ namespace WhiteCore.Physics.BulletSPlugin
             PhysicsScene.PE.ForceActivationState(PhysBody, ActivationState.DISABLE_DEACTIVATION);
             PhysicsScene.PE.UpdateSingleAabb(PhysicsScene.World, PhysBody);
 
-        // Do this after the object has been added to the world
-        if (BSParam.AvatarToAvatarCollisionsByDefault)
-            PhysBody.collisionType = CollisionType.Avatar;
-        else
-            PhysBody.collisionType = CollisionType.PhantomToOthersAvatar;
+            // Do this after the object has been added to the world
+            if (BSParam.AvatarToAvatarCollisionsByDefault)
+                PhysBody.collisionType = CollisionType.Avatar;
+            else
+                PhysBody.collisionType = CollisionType.PhantomToOthersAvatar;
             PhysBody.ApplyCollisionMask(PhysicsScene);
         }
 
@@ -211,7 +214,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 {
                     if (PhysBody.HasPhysicalBody && PhysShape.HasPhysicalShape)
                     {
-                        PhysicsScene.PE.SetLocalScaling(PhysShape, Scale);
+                        PhysicsScene.PE.SetLocalScaling(PhysShape.physShapeInfo, Scale);
                         UpdatePhysicalMassProperties(RawMass, true);
 						// Adjust the avatar's position to account for the increase/decrease in size
 						ForcePosition = new OMV.Vector3(_position.X, _position.Y, _position.Z + heightChange / 2f);
@@ -423,7 +426,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         public override void UpdatePhysicalMassProperties(float physMass, bool inWorld)
         {
 			//OMV.Vector3 localInertia = PhysicsScene.PE.CalculateLocalInertia(PhysShape.physShapeInfo, physMass);  // new
-            OMV.Vector3 localInertia = PhysicsScene.PE.CalculateLocalInertia(PhysShape, physMass);
+            OMV.Vector3 localInertia = PhysicsScene.PE.CalculateLocalInertia(PhysShape.physShapeInfo, physMass);
             PhysicsScene.PE.SetMassProps(PhysBody, physMass, localInertia);
         }
 
