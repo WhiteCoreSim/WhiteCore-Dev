@@ -152,7 +152,7 @@ namespace WhiteCore.Physics.BasicPhysicsPlugin
             return false;
         }
 
-        public override void AddCollisionEvent(uint CollidedWith, ContactPoint contact)
+        public override void AddCollisionEvent(uint collidedWith, ContactPoint contact)
         {
         }
     }
@@ -299,7 +299,7 @@ namespace WhiteCore.Physics.BasicPhysicsPlugin
             return false;
         }
 
-        public override void AddCollisionEvent(uint CollidedWith, ContactPoint contact)
+        public override void AddCollisionEvent(uint collidedWith, ContactPoint contact)
         {
         }
     }

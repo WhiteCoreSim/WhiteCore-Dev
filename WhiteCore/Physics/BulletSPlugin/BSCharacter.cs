@@ -255,12 +255,12 @@ namespace WhiteCore.Physics.BulletSPlugin
             return;
         }
 
-        public override void link(PhysicsActor obj)
+        public override void Link(PhysicsActor obj)
         {
             return;
         }
 
-        public override void delink()
+        public override void Delink()
         {
             return;
         }

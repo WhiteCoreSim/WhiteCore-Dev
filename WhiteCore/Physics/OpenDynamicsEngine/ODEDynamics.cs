@@ -41,68 +41,68 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using WhiteCore.Framework.Physics;
 using OpenMetaverse;
+using WhiteCore.Framework.Physics;
 
 //using Ode.NET;
 
 namespace WhiteCore.Physics.OpenDynamicsEngine
 {
-    public class WhiteCoreODEDynamics
+    public class ODEDynamics
     {
         public float Mass;
-        private int frcount; // Used to limit dynamics debug output to
+        int frcount; // Used to limit dynamics debug output to
         // every 100th frame
 
-        // private OdeScene m_parentScene = null;
-        private Vector3 m_BlockingEndPoint = Vector3.Zero;
-        private Quaternion m_RollreferenceFrame = Quaternion.Identity;
-        private float m_VehicleBuoyancy; //KF: m_VehicleBuoyancy is set by VEHICLE_BUOYANCY for a vehicle.
-        private float m_VhoverEfficiency;
-        private float m_VhoverHeight;
-        private float m_VhoverTargetHeight = -1.0f; // if <0 then no hover, else its the current target height
-        private float m_VhoverTimescale;
+        // OdeScene m_parentScene = null;
+        Vector3 m_BlockingEndPoint = Vector3.Zero;
+        Quaternion m_RollreferenceFrame = Quaternion.Identity;
+        float m_VehicleBuoyancy; //KF: m_VehicleBuoyancy is set by VEHICLE_BUOYANCY for a vehicle.
+        float m_VhoverEfficiency;
+        float m_VhoverHeight;
+        float m_VhoverTargetHeight = -1.0f; // if <0 then no hover, else its the current target height
+        float m_VhoverTimescale;
         // Linear properties
         //       private Vector3 m_lastVertAttractor = Vector3.Zero;             // what VA was last applied to body
 
         //Deflection properties
-        private float m_angularDeflectionEfficiency;
-        private float m_angularDeflectionTimescale;
-        private Vector3 m_angularFrictionTimescale = Vector3.Zero; // body angular velocity  decay rate
+        float m_angularDeflectionEfficiency;
+        float m_angularDeflectionTimescale;
+        Vector3 m_angularFrictionTimescale = Vector3.Zero; // body angular velocity  decay rate
 
-        private float m_angularMotorDecayTimescale; // motor angular velocity decay rate
-        private Vector3 m_angularMotorDirection = Vector3.Zero; // angular velocity requested by LSL motor
-        private float m_angularMotorTimescale; // motor angular velocity ramp up rate
-        private Vector3 m_angularMotorVelocity = Vector3.Zero; // current angular motor velocity
+        float m_angularMotorDecayTimescale; // motor angular velocity decay rate
+        Vector3 m_angularMotorDirection = Vector3.Zero; // angular velocity requested by LSL motor
+        float m_angularMotorTimescale; // motor angular velocity ramp up rate
+        Vector3 m_angularMotorVelocity = Vector3.Zero; // current angular motor velocity
 
 
         //Banking properties
-        private float m_bankingEfficiency;
-        private float m_bankingMix;
-        private float m_bankingTimescale;
-        private IntPtr m_body = IntPtr.Zero;
-        private bool m_enabled;
-        private VehicleFlag m_flags = 0; // Boolean settings:
-        private List<Vector3> m_forcelist = new List<Vector3>();
-        private Vector3 m_lastAngVelocity = Vector3.Zero;
-        private Vector3 m_lastAngularVelocity = Vector3.Zero; // what was last applied to body
-        private Vector3 m_lastLinearVelocityVector = Vector3.Zero;
-        private Vector3 m_lastPositionVector = Vector3.Zero;
-        private Vector3 m_lastVelocity = Vector3.Zero;
-        private Vector3 m_lastposChange = Vector3.Zero;
-        private float m_linearDeflectionEfficiency;
-        private float m_linearDeflectionTimescale;
-        private Vector3 m_linearFrictionTimescale = Vector3.Zero;
-        private float m_linearMotorDecayTimescale;
-        private Vector3 m_linearMotorDirection = Vector3.Zero; // velocity requested by LSL, decayed by time
-        private Vector3 m_linearMotorDirectionLASTSET = Vector3.Zero; // velocity requested by LSL
-        private Vector3 m_linearMotorOffset = Vector3.Zero;
-        private float m_linearMotorTimescale;
-        //private bool m_linearZeroFlag;
-        private Vector3 m_newVelocity = Vector3.Zero; // velocity applied to body
-        private Quaternion m_referenceFrame = Quaternion.Identity; // Axis modifier
-        private Vehicle m_type = Vehicle.TYPE_NONE; // If a 'VEHICLE', and what kind
-        private Quaternion m_userLookAt = Quaternion.Identity;
+        float m_bankingEfficiency;
+        float m_bankingMix;
+        float m_bankingTimescale;
+        IntPtr m_body = IntPtr.Zero;
+        bool m_enabled;
+        VehicleFlag m_flags = 0; // Boolean settings:
+        List<Vector3> m_forcelist = new List<Vector3>();
+// not used        Vector3 m_lastAngVelocity = Vector3.Zero;
+        Vector3 m_lastAngularVelocity = Vector3.Zero; // what was last applied to body
+        Vector3 m_lastLinearVelocityVector = Vector3.Zero;
+        Vector3 m_lastPositionVector = Vector3.Zero;
+// not used        Vector3 m_lastVelocity = Vector3.Zero;
+        Vector3 m_lastposChange = Vector3.Zero;
+        float m_linearDeflectionEfficiency;
+        float m_linearDeflectionTimescale;
+        Vector3 m_linearFrictionTimescale = Vector3.Zero;
+        float m_linearMotorDecayTimescale;
+        Vector3 m_linearMotorDirection = Vector3.Zero; // velocity requested by LSL, decayed by time
+        Vector3 m_linearMotorDirectionLASTSET = Vector3.Zero; // velocity requested by LSL
+        Vector3 m_linearMotorOffset = Vector3.Zero;
+        float m_linearMotorTimescale;
+        //bool m_linearZeroFlag;
+        Vector3 m_newVelocity = Vector3.Zero; // velocity applied to body
+        Quaternion m_referenceFrame = Quaternion.Identity; // Axis modifier
+        Vehicle m_type = Vehicle.TYPE_NONE; // If a 'VEHICLE', and what kind
+        Quaternion m_userLookAt = Quaternion.Identity;
 
         //Hover and Buoyancy properties
         // Modifies gravity. Slider between -1 (double-gravity) and 1 (full anti-gravity)
@@ -110,8 +110,8 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         // Therefore only m_VehicleBuoyancy=1 (0g) will use the script-requested .Z velocity.
 
         //Attractor properties
-        private float m_verticalAttractionEfficiency = 1.0f; // damped
-        private float m_verticalAttractionTimescale = 500f; // Timescale > 300  means no vert attractor.
+        float m_verticalAttractionEfficiency = 1.0f; // damped
+        float m_verticalAttractionTimescale = 500f; // Timescale > 300  means no vert attractor.
 
 
         public Vehicle Type
@@ -246,7 +246,6 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             }
         }
 
-//end ProcessFloatVehicleParam
 
         //All parts hooked up
         internal void ProcessVectorVehicleParam(Vehicle pParam, Vector3 pValue, float timestep)
@@ -295,7 +294,6 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             }
         }
 
-//end ProcessVectorVehicleParam
 
         //All parts hooked up
         internal void ProcessRotationVehicleParam(Vehicle pParam, Quaternion pValue)
@@ -311,7 +309,6 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             }
         }
 
-//end ProcessRotationVehicleParam
 
         internal void ProcessVehicleFlags(int pParam, bool remove)
         {
@@ -329,9 +326,8 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                 m_flags |= param;
         }
 
-//end ProcessVehicleFlags
 
-        internal void ProcessTypeChange(WhiteCoreODEPrim parent, Vehicle pType, float timestep)
+        internal void ProcessTypeChange(ODEPrim parent, Vehicle pType, float timestep)
         {
             // Set Defaults For Type
             m_type = pType;
@@ -515,9 +511,8 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             }
         }
 
-//end SetDefaultsForType
 
-        internal void Enable(IntPtr pBody, WhiteCoreODEPrim parent, WhiteCoreODEPhysicsScene pParentScene)
+        internal void Enable(IntPtr pBody, ODEPrim parent, ODEPhysicsScene pParentScene)
         {
             if (m_enabled)
                 return;
@@ -533,7 +528,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             GetMass(pBody);
         }
 
-        internal void Disable(WhiteCoreODEPrim parent)
+        internal void Disable(ODEPrim parent)
         {
             if (!m_enabled || m_type == Vehicle.TYPE_NONE)
                 return;
@@ -558,7 +553,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         }
 
 
-        internal void Step(IntPtr pBody, float pTimestep, WhiteCoreODEPhysicsScene pParentScene, WhiteCoreODEPrim parent)
+        internal void Step(IntPtr pBody, float pTimestep, ODEPhysicsScene pParentScene, ODEPrim parent)
         {
             m_body = pBody;
             if (pBody == IntPtr.Zero || m_type == Vehicle.TYPE_NONE)
@@ -584,7 +579,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
         // end Step
 
-        private void MoveLinear(float pTimestep, WhiteCoreODEPhysicsScene _pParentScene, WhiteCoreODEPrim parent)
+        void MoveLinear(float pTimestep, ODEPhysicsScene _pParentScene, ODEPrim parent)
         {
             bool ishovering = false;
             bool bypass_buoyancy = false;
@@ -672,7 +667,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                 }
                 else {
                     float waterlevel = (float)_pParentScene.GetWaterLevel(pos.X, pos.Y) + 0.3f;
-                    float terrainlevel = (float)_pParentScene.GetTerrainHeightAtXY(pos.X, pos.Y);
+                    float terrainlevel = _pParentScene.GetTerrainHeightAtXY(pos.X, pos.Y);
                     if(waterlevel > terrainlevel) {
                         m_VhoverTargetHeight = waterlevel + m_VhoverHeight;
                     }
@@ -912,7 +907,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
         }
 
-        private void MoveAngular(float pTimestep, WhiteCoreODEPhysicsScene _pParentScene, WhiteCoreODEPrim parent)
+        void MoveAngular(float pTimestep, ODEPhysicsScene _pParentScene, ODEPrim parent)
         {
             bool ishovering = false;
             d.Vector3 d_angularVelocity = d.BodyGetAngularVel(Body);
@@ -1063,7 +1058,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             #region banking
 
             if(m_verticalAttractionTimescale < 300 && m_bankingEfficiency > 0) { //vertical attraction must be enabled		
-                float mag = (float)(linearVelocity.X * linearVelocity.X + linearVelocity.Y * linearVelocity.Y);
+                float mag = (linearVelocity.X * linearVelocity.X + linearVelocity.Y * linearVelocity.Y);
                 if(mag > 0.01f) {
                     mag = (float)Math.Sqrt(mag);
                     if(mag > 20.0f) mag = 1.0f;
@@ -1095,7 +1090,6 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             angularVelocity += banking;
 
             if(angularVelocity.LengthSquared() < 1e-5f) {
-                angularVelocity = Vector3.Zero;
                 d.BodySetAngularVel(Body, 0, 0, 0);
                 m_angularZeroFlag = true;
             }
@@ -1105,7 +1099,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             }
         }
 
-        private Vector3 ToEuler(Quaternion m_lastCameraRotation)
+        Vector3 ToEuler(Quaternion m_lastCameraRotation)
         {
             Quaternion t = new Quaternion(m_lastCameraRotation.X*m_lastCameraRotation.X,
                                           m_lastCameraRotation.Y*m_lastCameraRotation.Y,
@@ -1117,35 +1111,22 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             double n = 2*(m_lastCameraRotation.Y*m_lastCameraRotation.W + m_lastCameraRotation.X*m_lastCameraRotation.Y);
             double p = m*m - n*n;
             if (p > 0)
-                return
-                    new Vector3(
-                        (float)
-                        NormalizeAngle(
-                            Math.Atan2(
-                                2.0*
-                                (m_lastCameraRotation.X*m_lastCameraRotation.W -
-                                 m_lastCameraRotation.Y*m_lastCameraRotation.Z), (-t.X - t.Y + t.Z + t.W))),
-                        (float) NormalizeAngle(Math.Atan2(n, Math.Sqrt(p))),
-                        (float)
-                        NormalizeAngle(
-                            Math.Atan2(
-                                2.0*
-                                (m_lastCameraRotation.Z*m_lastCameraRotation.W -
-                                 m_lastCameraRotation.X*m_lastCameraRotation.Y), (t.X - t.Y - t.Z + t.W))));
-            else if (n > 0)
-                return new Vector3(0, (float) (Math.PI*0.5),
-                                   (float)
-                                   NormalizeAngle(
-                                       Math.Atan2(
-                                           (m_lastCameraRotation.Z*m_lastCameraRotation.W +
-                                            m_lastCameraRotation.X*m_lastCameraRotation.Y), 0.5 - t.X - t.Z)));
-            else
-                return new Vector3(0, (float) (-Math.PI*0.5),
-                                   (float)
-                                   NormalizeAngle(
-                                       Math.Atan2(
-                                           (m_lastCameraRotation.Z*m_lastCameraRotation.W +
-                                            m_lastCameraRotation.X*m_lastCameraRotation.Y), 0.5 - t.X - t.Z)));
+                return new Vector3 (
+                    (float) NormalizeAngle ( 
+                        Math.Atan2 ( 2.0 * (m_lastCameraRotation.X * m_lastCameraRotation.W -
+                            m_lastCameraRotation.Y * m_lastCameraRotation.Z), (-t.X - t.Y + t.Z + t.W))),
+                    (float) NormalizeAngle (Math.Atan2 (n, Math.Sqrt (p))),
+                    (float) NormalizeAngle (
+                        Math.Atan2 ( 2.0 * (m_lastCameraRotation.Z * m_lastCameraRotation.W -
+                            m_lastCameraRotation.X * m_lastCameraRotation.Y), (t.X - t.Y - t.Z + t.W))));
+            if (n > 0)
+                return new Vector3 (0, (float)(Math.PI * 0.5),
+                    (float) NormalizeAngle ( Math.Atan2 (
+                        (m_lastCameraRotation.Z * m_lastCameraRotation.W + m_lastCameraRotation.X * m_lastCameraRotation.Y), 0.5 - t.X - t.Z)));
+            
+            return new Vector3 (0, (float)(-Math.PI * 0.5),
+                    (float) NormalizeAngle ( Math.Atan2 (
+                    (m_lastCameraRotation.Z * m_lastCameraRotation.W + m_lastCameraRotation.X * m_lastCameraRotation.Y), 0.5 - t.X - t.Z)));
         }
 
         protected double NormalizeAngle(double angle)
@@ -1160,7 +1141,6 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             return remainder;
         }
 
-        //end MoveAngular
 
         internal void LimitRotation(float timestep)
         {
@@ -1195,6 +1175,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         {
             //m_referenceFrame -= m_lastCameraRotation;
             //m_referenceFrame += CameraRotation;
+            // 20151111 - greythane- set but not used at present??
             m_userLookAt = CameraRotation;
         }
 
@@ -1203,7 +1184,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             m_forcelist.Add(force);
         }
 
-        public Quaternion llRotBetween(Vector3 a, Vector3 b)
+        public Quaternion LlRotBetween(Vector3 a, Vector3 b)
         {
             Quaternion rotBetween;
             // Check for zero vectors. If either is zero, return zero rotation. Otherwise,

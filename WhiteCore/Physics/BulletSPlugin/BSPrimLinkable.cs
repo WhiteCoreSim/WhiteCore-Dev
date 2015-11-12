@@ -71,7 +71,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             base.Destroy();
         }
 
-        public override void link(PhysicsActor obj)
+        public override void Link(PhysicsActor obj)
         {
             BSPrimLinkable parent = obj as BSPrimLinkable;
             if (parent != null)
@@ -88,7 +88,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             return;
         }
 
-        public override void delink()
+        public override void Delink()
         {
             // TODO: decide if this parent checking needs to happen at taint time
             // Race condition here: if link() and delink() in same simulation tick, the delink will not happen

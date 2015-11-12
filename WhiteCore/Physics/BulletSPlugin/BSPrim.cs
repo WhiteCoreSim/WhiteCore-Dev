@@ -269,16 +269,16 @@ namespace WhiteCore.Physics.BulletSPlugin
         }
 
         // link me to the specified parent
-        public override void link(PhysicsActor obj)
+        public override void Link(PhysicsActor obj)
         {
         }
 
-        public override void linkGroupToThis(PhysicsActor[] objs)
+        public override void LinkGroupToThis(PhysicsActor[] objs)
         {
         }
 
         // delink me from my linkset
-        public override void delink()
+        public override void Delink()
         {
         }
 

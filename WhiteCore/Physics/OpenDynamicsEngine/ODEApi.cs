@@ -66,7 +66,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         }
 
         [Flags]
-        public enum ContactFlags : int
+        public enum ContactFlags
         {
             Mu2 = 0x001,
             FDir1 = 0x002,
@@ -84,7 +84,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             Approx1 = 0x3000
         }
 
-        public enum GeomClassID : int
+        public enum GeomClassID
         {
             SphereClass,
             BoxClass,
@@ -107,7 +107,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             MaxUserClasses = 4
         }
 
-        public enum JointType : int
+        public enum JointType
         {
             None,
             Ball,
@@ -123,7 +123,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             Plane2D
         }
 
-        public enum JointParam : int
+        public enum JointParam
         {
             LoStop,
             HiStop,
@@ -160,7 +160,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             SuspensionCFM3
         }
 
-        public enum dSweepAndPruneAxis : int
+        public enum dSweepAndPruneAxis
         {
             XYZ = ((0) | (1 << 2) | (2 << 4)),
             XZY = ((0) | (2 << 2) | (1 << 4)),
@@ -291,11 +291,11 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             }
 
             public Single M00, M10, M20;
-            private Single _m30;
+            Single _m30;
             public Single M01, M11, M21;
-            private Single _m31;
+            Single _m31;
             public Single M02, M12, M22;
-            private Single _m32;
+            Single _m32;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -367,7 +367,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             }
 
             public Single X, Y, Z;
-            private Single _w;
+            Single _w;
 
             public OpenMetaverse.Vector3 ToVector3()
             {
@@ -1632,8 +1632,8 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         internal static extern void JointSetSliderAxis(IntPtr j, Single x, Single y, Single z);
 
         [DllImport("ode", EntryPoint = "dJointSetSliderAxisDelta"), SuppressUnmanagedCodeSecurity]
-        internal static extern void JointSetSliderAxisDelta(IntPtr j, Single x, Single y, Single z, Single ax, Single ay,
-                                                          Single az);
+        internal static extern void JointSetSliderAxisDelta(IntPtr j, Single x, Single y, Single z,
+                                                            Single ax, Single ay, Single az);
 
         [DllImport("ode", EntryPoint = "dJointSetSliderParam"), SuppressUnmanagedCodeSecurity]
         internal static extern void JointSetSliderParam(IntPtr j, int parameter, Single value);
@@ -1995,21 +1995,23 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             }
             catch (Exception ex)
             {
-                MainConsole.Instance.Format(Level.Off, "[ODE]: Failed to copy ODE dll file, may have issues with physics! (Can be caused by running multiple instances in the same bin, if so, ignore this warning) " +
-                    ex.ToString());
+                MainConsole.Instance.Format(Level.Off, "[ODE]: Failed to copy ODE dll file, may have issues with physics!\n" +
+                    "(Can be caused by running multiple instances in the same bin, if so, ignore this warning) " +
+                    ex);
             }
             try
             {
                 if (!System.IO.File.Exists("ode.dll"))
                 {
-                    string fileName = System.IntPtr.Size == 4 ? "odex86.dll" : "odex64.dll";
+                    string fileName = IntPtr.Size == 4 ? "lib32/odex86.dll" : "lib64/odex64.dll";
                     System.IO.File.Copy(fileName, "ode.dll");
                 }
             }
             catch (Exception ex)
             {
-                MainConsole.Instance.Format(Level.Off, "[ODE]: Failed to copy ODE dll file, may have issues with physics! (Can be caused by running multiple instances in the same bin, if so, ignore this warning) " +
-                    ex.ToString());
+                MainConsole.Instance.Format(Level.Off, "[ODE]: Failed to copy ODE dll file, may have issues with physics!\n" +
+                    "(Can be caused by running multiple instances in the same bin, if so, ignore this warning) " +
+                    ex);
             }
         }
 

@@ -26,29 +26,23 @@
  */
 
 using System;
+using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Physics;
-using OpenMetaverse;
 
 namespace WhiteCore.Physics.OpenDynamicsEngine
 {
-    public class WhiteCoreODECharacter : PhysicsActor
+    public class ODECharacter : PhysicsActor
     {
         #region Declares
 
         protected readonly CollisionEventUpdate CollisionEventsThisFrame = new CollisionEventUpdate();
-        protected WhiteCoreODEPhysicsScene _parent_scene;
-        public float CAPSULE_LENGTH = 2.140599f;
-        public float CAPSULE_RADIUS = 0.37f;
-        public float MinimumGroundFlightOffset = 3f;
+        protected ODEPhysicsScene _parent_scene;
         protected float PID_D;
         protected float PID_P;
         protected bool ShouldBeWalking = true;
         protected bool StartingUnderWater = true;
         protected bool WasUnderWater;
-        public IntPtr Amotor = IntPtr.Zero;
-        public IntPtr Body = IntPtr.Zero;
-        public IntPtr Shell = IntPtr.Zero;
 
         protected Vector3 _position;
         protected Vector3 _velocity;
@@ -63,14 +57,15 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         protected CollisionCategories m_collisionCategories = (CollisionCategories.Character);
 
         // Default, Collide with Other Geometries, spaces, bodies and characters.
-        protected const CollisionCategories m_collisionFlags = (CollisionCategories.Geom | CollisionCategories.Space
-                                                                | CollisionCategories.Body |
-                                                                CollisionCategories.Character | CollisionCategories.Land);
+        protected const CollisionCategories m_collisionFlags = (CollisionCategories.Geom | 
+                                                                CollisionCategories.Space |
+                                                                CollisionCategories.Body |
+                                                                CollisionCategories.Character | 
+                                                                CollisionCategories.Land);
 
         //        float m_UpdateTimecntr = 0;
         //        float m_UpdateFPScntr = 0.05f;
         protected bool m_isJumping;
-        public bool m_isPhysical; // the current physical status
         protected bool m_kinematic;
         protected bool m_iscolliding;
 
@@ -78,7 +73,6 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         protected Vector3 m_lastAngVelocity;
         protected Vector3 m_lastPosition;
         protected Vector3 m_lastVelocity;
-        public uint m_localID;
 
         protected float m_mass = 80f;
         protected int m_preJumpCounter;
@@ -90,10 +84,19 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         protected int m_lastForceApplied = 0;
         protected Vector3 m_forceAppliedBeforeFalling = Vector3.Zero;
         protected ODESpecificAvatar _parent_ref;
+        protected bool realFlying;
+
+        public uint m_localID;
+        public bool m_isPhysical; // the current physical status (g- this probably should be a get/set
+        public float CAPSULE_LENGTH = 2.140599f;
+        public float CAPSULE_RADIUS = 0.37f;
+        public float MinimumGroundFlightOffset = 3f;
+        public IntPtr Amotor = IntPtr.Zero;
+        public IntPtr Body = IntPtr.Zero;
+        public IntPtr Shell = IntPtr.Zero;
 
         // unique UUID of this character object
         public UUID m_uuid;
-        protected bool realFlying;
 
         public override bool IsJumping
         {
@@ -115,7 +118,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
         #region Constructor
 
-        public WhiteCoreODECharacter(String avName, WhiteCoreODEPhysicsScene parent_scene, Vector3 pos, Quaternion rotation,
+        public ODECharacter(String avName, ODEPhysicsScene parent_scene, Vector3 pos, Quaternion rotation,
                                   Vector3 size)
         {
             m_uuid = UUID.Random();
@@ -306,7 +309,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             set { m_rotationalVelocity = value; }
         }
 
-        private Vector3 _lastSetSize = Vector3.Zero;
+        Vector3 _lastSetSize = Vector3.Zero;
 
         /// <summary>
         ///     This property sets the height of the avatar only.  We use the height to make sure the avatar stands up straight
@@ -477,7 +480,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             {
                 _parent_scene.BadCharacter(this);
                 vec = new Vector3(_position.X, _position.Y, _position.Z);
-                base.RaiseOutOfBounds(_position); // Tells ScenePresence that there's a problem!
+                RaiseOutOfBounds(_position); // Tells ScenePresence that there's a problem!
                 MainConsole.Instance.WarnFormat(
                     "[ODEPLUGIN]: Avatar Null reference for Avatar {0}, physical actor {1}", Name, m_uuid);
             }
@@ -491,7 +494,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             if (!_position.IsFinite())
             {
                 _parent_scene.BadCharacter(this);
-                base.RaiseOutOfBounds(_position); // Tells ScenePresence that there's a problem!
+                RaiseOutOfBounds(_position); // Tells ScenePresence that there's a problem!
                 return;
             }
 
@@ -531,7 +534,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             if (!_velocity.IsFinite())
             {
                 _parent_scene.BadCharacter(this);
-                base.RaiseOutOfBounds(_position); // Tells ScenePresence that there's a problem!
+                RaiseOutOfBounds(_position); // Tells ScenePresence that there's a problem!
                 return;
             }
 
@@ -610,10 +613,10 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                 m_lastVelocity = _velocity;
                 m_lastAngVelocity = RotationalVelocity;
 
-                base.TriggerSignificantMovement();
+                TriggerSignificantMovement();
                 //Tell any listeners about the new info
                 // This is for animations
-                base.TriggerMovementUpdate();
+                TriggerMovementUpdate();
             }
         }
 
@@ -622,7 +625,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         #region Unused code
 
 /* suspended
-        private void AlignAvatarTiltWithCurrentDirectionOfMovement(Vector3 movementVector)
+        void AlignAvatarTiltWithCurrentDirectionOfMovement(Vector3 movementVector)
             {
             if (!_parent_scene.IsAvCapsuleTilted)
                 return;
@@ -696,7 +699,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 //      This code is very useful. Written by DanX0r. We're just not using it right now.
 //      Commented out to prevent a warning.
 //
-//         private void standupStraight()
+//         void standupStraight()
 //         {
 //             // The purpose of this routine here is to quickly stabilize the Body while it's popped up in the air.
 //             // The amotor needs a few seconds to stabilize so without it, the avatar shoots up sky high when you
@@ -776,9 +779,9 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
         #region Collision events
 
-        public override void AddCollisionEvent(uint CollidedWith, ContactPoint contact)
+        public override void AddCollisionEvent(uint collidedWith, ContactPoint contact)
         {
-            CollisionEventsThisFrame.AddCollider(CollidedWith, contact);
+            CollisionEventsThisFrame.AddCollider(collidedWith, contact);
         }
 
         public override bool SendCollisions()
@@ -788,7 +791,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
             if (!CollisionEventsThisFrame.Cleared)
             {
-                base.SendCollisionUpdate(CollisionEventsThisFrame.Copy());
+                SendCollisionUpdate(CollisionEventsThisFrame.Copy());
                 CollisionEventsThisFrame.Clear();
             }
             return true;

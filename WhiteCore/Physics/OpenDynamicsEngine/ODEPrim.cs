@@ -42,12 +42,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Utilities;
-using WhiteCore.Framework.Modules;
-using OpenMetaverse;
 using GridRegion = WhiteCore.Framework.Services.GridRegion;
 
 namespace WhiteCore.Physics.OpenDynamicsEngine
@@ -55,103 +55,102 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
     /// <summary>
     ///     Various properties that ODE uses for AMotors but isn't exposed in ODE.NET so we must define them ourselves.
     /// </summary>
-    public class WhiteCoreODEPrim : PhysicsActor
+    public class ODEPrim : PhysicsActor
     {
-        private const CollisionCategories m_default_collisionFlags = (CollisionCategories.Geom
-                                                                      | CollisionCategories.Space
-                                                                      | CollisionCategories.Body
-                                                                      | CollisionCategories.Character
-                                                                     );
+        const CollisionCategories m_default_collisionFlags = (CollisionCategories.Geom
+                                                              | CollisionCategories.Space
+                                                              | CollisionCategories.Body
+                                                              | CollisionCategories.Character
+        );
 
-        private static readonly Dictionary<ulong, IntPtr> m_MeshToTriMeshMap = new Dictionary<ulong, IntPtr>();
-        private static readonly Dictionary<ulong, Vector3> m_MeshToCentroidMap = new Dictionary<ulong, Vector3>();
-        private readonly WhiteCoreODEPhysicsScene _parent_scene;
+        static readonly Dictionary<ulong, IntPtr> m_MeshToTriMeshMap = new Dictionary<ulong, IntPtr>();
+        static readonly Dictionary<ulong, Vector3> m_MeshToCentroidMap = new Dictionary<ulong, Vector3>();
+        readonly ODEPhysicsScene _parent_scene;
 
-        private readonly Vector3 _torque = Vector3.Zero;
-        private readonly int body_autodisable_frames = 20;
-        private readonly WhiteCoreODEDynamics m_vehicle;
-        private IntPtr Amotor = IntPtr.Zero;
-        public IntPtr Body { get; private set; }
-        private CollisionEventUpdate CollisionEventsThisFrame;
+        readonly Vector3 _torque = Vector3.Zero;
+        readonly int body_autodisable_frames = 20;
+        readonly ODEDynamics m_vehicle;
 
-        private float PID_D = 35f;
-        private float PID_G = 25f;
-        private Vector3 _acceleration;
-        private float _mass; // prim or object mass
-        private Quaternion _orientation;
-        private PhysicsActor _parent;
-        private PrimitiveBaseShape _pbs;
-        private Vector3 _position;
-        private Vector3 _size;
-        private IntPtr _triMeshData;
-        private Vector3 _velocity;
-        private bool _zeroFlag;
-        private bool _zeroFlagForceSet;
+        internal bool m_disabled;        //This disables the prim so that it cannot do much anything at all
+        internal bool m_frozen;
         internal volatile bool childPrim;
-        internal List<WhiteCoreODEPrim> childrenPrim = new List<WhiteCoreODEPrim>();
-        private int fakeori; // control the use of above
-        private int fakepos; // control the use of above
-        private bool hasOOBoffsetFromMesh; // if true we did compute it form mesh centroid, else from aabb
-        private bool iscolliding;
-        private Vector3 m_angularforceacc;
-        private Vector3 m_angularlock = Vector3.One;
-        private bool m_blockPhysicalReconstruction;
+        internal List<ODEPrim> childrenPrim = new List<ODEPrim>();
+        internal float m_collisionscore;
+        internal IntPtr m_targetSpace = IntPtr.Zero;
+
+        IntPtr Amotor = IntPtr.Zero;
+        CollisionEventUpdate CollisionEventsThisFrame;
+
+        float PID_D = 35f;
+        float PID_G = 25f;
+        Vector3 _acceleration;
+        float _mass; // prim or object mass
+        Quaternion _orientation;
+        PhysicsActor _parent;
+        PrimitiveBaseShape _pbs;
+        Vector3 _position;
+        Vector3 _size;
+        IntPtr _triMeshData;
+        Vector3 _velocity;
+        bool _zeroFlag;
+        bool _zeroFlagForceSet;
+        int fakeori; // control the use of above
+        int fakepos; // control the use of above
+        bool hasOOBoffsetFromMesh; // if true we did compute it form mesh centroid, else from aabb
+        bool iscolliding;
+        Vector3 m_angularforceacc;
+        Vector3 m_angularlock = Vector3.One;
+        bool m_blockPhysicalReconstruction;
 
         // KF: These next 7 params apply to llSetHoverHeight(float height, integer water, float tau),
         // and are for non-VEHICLES only.
-
-        private float m_buoyancy; //KF: m_buoyancy should be set by llSetBuoyancy() for non-vehicle. 
-
-        // private float m_tensor = 5f;
-
-        private bool m_collidesLand = true;
-        private bool m_collidesWater;
+        float m_buoyancy; //KF: m_buoyancy should be set by llSetBuoyancy() for non-vehicle. 
+        // float m_tensor = 5f;
+        bool m_collidesLand = true;
+        bool m_collidesWater;
 
         // Default we're a Geometry
-        private CollisionCategories m_collisionCategories = (CollisionCategories.Geom);
+        CollisionCategories m_collisionCategories = (CollisionCategories.Geom);
 
         // Default, Collide with Other Geometries, spaces and Bodies
-        private CollisionCategories m_collisionFlags = m_default_collisionFlags;
-        internal float m_collisionscore;
-        private int m_crossingfailures;
+        CollisionCategories m_collisionFlags = m_default_collisionFlags;
+        int m_crossingfailures;
 
-        internal bool m_disabled;
-        private bool m_eventsubscription;
-        //This disables the prim so that it cannot do much anything at all
+        bool m_eventsubscription;
 
-        private Vector3 m_force;
-        private Vector3 m_forceacc;
-        internal bool m_frozen;
-        private bool m_isSelected;
+        Vector3 m_force;
+        Vector3 m_forceacc;
+        bool m_isSelected;
 
-        private bool m_isVolumeDetect; // If true, this prim only detects collisions but doesn't collide actively
-        private bool m_isphysical;
-        private int m_lastUpdateSent;
-        private Vector3 m_lastVelocity;
-        private Quaternion m_lastorientation;
-        private Vector3 m_lastposition;
-        private uint m_localID;
-        private bool m_primIsRemoved;
-        private Vector3 m_pushForce;
-        private Vector3 m_rotationalVelocity;
-        internal IntPtr m_targetSpace = IntPtr.Zero;
+        bool m_isVolumeDetect; // If true, this prim only detects collisions but doesn't collide actively
+        bool m_isphysical;
+        int m_lastUpdateSent;
+        Vector3 m_lastVelocity;
+        Quaternion m_lastorientation;
+        Vector3 m_lastposition;
+        uint m_localID;
+        bool m_primIsRemoved;
+        Vector3 m_pushForce;
+        Vector3 m_rotationalVelocity;
 
-        private bool m_throttleUpdates;
+        bool m_throttleUpdates;
 
-        private float primMass; // prim own mass
+        float primMass; // prim own mass
+
+        d.Mass primdMass; // prim inertia information on it's own referencial
+        Quaternion showorientation; // tmp hack see showposition
+        string _name;
+        Vector3 showposition; // a temp hack for now rest of code expects position to be changed immediately
 
         public Vector3 primOOBoffset; // is centroid out of mesh or rest aabb
         public Vector3 primOOBsize; // prim real dimensions from mesh 
         public IntPtr prim_geom;
-        private d.Mass primdMass; // prim inertia information on it's own referencial
-        private Quaternion showorientation; // tmp hack see showposition
-        private string _name;
-        private Vector3 showposition; // a temp hack for now rest of code expects position to be changed immediately
+        public IntPtr Body { get; private set; }
 
-        public WhiteCoreODEPrim(string name, byte physicsType, PrimitiveBaseShape shape, Vector3 position, Vector3 size, Quaternion rotation, 
-            int material, float friction, float restitution, float gravityMultiplier, float density, WhiteCoreODEPhysicsScene parent_scene)
+        public ODEPrim(string name, byte physicsType, PrimitiveBaseShape shape, Vector3 position, Vector3 size, Quaternion rotation, 
+            int material, float friction, float restitution, float gravityMultiplier, float density, ODEPhysicsScene parent_scene)
         {
-            m_vehicle = new WhiteCoreODEDynamics();
+            m_vehicle = new ODEDynamics();
 
             // correct for changed timestep
             PID_D /= (parent_scene.ODE_STEPSIZE*50f); // original ode fps of 50
@@ -190,7 +189,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
             CalcPrimBodyData();
 
-            _parent_scene.AddSimulationChange(() => changeadd());
+            _parent_scene.AddSimulationChange(() => ChangeAdd());
         }
 
         public override bool BlockPhysicalReconstruction
@@ -213,7 +212,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                                                               }
                                                               if (!childPrim && childrenPrim.Count > 0)
                                                               {
-                                                                  foreach (WhiteCoreODEPrim prm in childrenPrim)
+                                                                  foreach (ODEPrim prm in childrenPrim)
                                                                       prm.BlockPhysicalReconstruction = value;
                                                               }
                                                           });
@@ -244,7 +243,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         public override bool VolumeDetect
         {
             get { return m_isVolumeDetect; }
-            set { _parent_scene.AddSimulationChange(() => changevoldtc(value)); }
+            set { _parent_scene.AddSimulationChange(() => ChangeVolDetect(value)); }
         }
 
         public override bool Grabbed
@@ -261,11 +260,11 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                 // without this, if an avatar selects prim, they can walk right
                 // through it while it's selected
                 if ((IsPhysical && !_zeroFlag) || !value)
-                    _parent_scene.AddSimulationChange(() => changeSelectedStatus(value));
+                    _parent_scene.AddSimulationChange(() => ChangeSelectedStatus(value));
                 else
                     m_isSelected = value;
                 if (m_isSelected)
-                    disableBodySoft();
+                    DisableBodySoft();
             }
         }
 
@@ -274,13 +273,13 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             get
             {
                 if (childPrim && _parent != null) // root prim defines if is physical or not
-                    return ((WhiteCoreODEPrim) _parent).m_isphysical;
+                    return ((ODEPrim) _parent).m_isphysical;
                 else
                     return m_isphysical;
             }
             set
             {
-                _parent_scene.AddSimulationChange(() => changePhysicsStatus(value));
+                _parent_scene.AddSimulationChange(() => ChangePhysicsStatus(value));
                 if (!value) // Zero the remembered last velocity
                     m_lastVelocity = Vector3.Zero;
             }
@@ -321,7 +320,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             {
                 showposition = value;
                 fakepos++;
-                _parent_scene.AddSimulationChange(() => changePosition(value));
+                _parent_scene.AddSimulationChange(() => ChangePosition(value));
             }
         }
 
@@ -331,7 +330,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             set
             {
                 if (value.IsFinite())
-                    _parent_scene.AddSimulationChange(() => changesize(value));
+                    _parent_scene.AddSimulationChange(() => ChangeSize(value));
                 else
                     MainConsole.Instance.Warn("[PHYSICS]: Got NaN Size on object");
             }
@@ -351,7 +350,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             {
                 if (value.IsFinite())
                 {
-                    _parent_scene.AddSimulationChange(() => changeforce(value, false));
+                    _parent_scene.AddSimulationChange(() => ChangeForce(value, false));
                 }
                 else
                 {
@@ -369,7 +368,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         public override int VehicleType
         {
             get { return (int) m_vehicle.Type; }
-            set { _parent_scene.AddSimulationChange(() => changeVehicleType(value)); }
+            set { _parent_scene.AddSimulationChange(() => ChangeVehicleType(value)); }
         }
 
         public override Vector3 CenterOfMass
@@ -404,7 +403,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         public override PrimitiveBaseShape Shape
         {
             get { return _pbs; }
-            set { _parent_scene.AddSimulationChange(() => changeshape(value)); }
+            set { _parent_scene.AddSimulationChange(() => ChangeShape(value)); }
         }
 
         public override Vector3 Velocity
@@ -425,7 +424,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             set
             {
                 if (value.IsFinite())
-                    _parent_scene.AddSimulationChange(() => changevelocity(value));
+                    _parent_scene.AddSimulationChange(() => Changevelocity(value));
                 else
                 {
                     MainConsole.Instance.Warn("[PHYSICS]: Got NaN Velocity in Object");
@@ -446,7 +445,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             set
             {
                 if (value.IsFinite())
-                    _parent_scene.AddSimulationChange(() => changeSetTorque(value));
+                    _parent_scene.AddSimulationChange(() => ChangeSetTorque(value));
                 else
                     MainConsole.Instance.Warn("[PHYSICS]: Got NaN Torque in Object");
             }
@@ -464,8 +463,8 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             {
                 if (fakeori > 0)
                     return showorientation;
-                else
-                    return _orientation;
+                
+                return _orientation;
             }
             set
             {
@@ -473,7 +472,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                 {
                     showorientation = value;
                     fakeori++;
-                    _parent_scene.AddSimulationChange(() => changeOrientation(value));
+                    _parent_scene.AddSimulationChange(() => ChangeOrientation(value));
                 }
                 else
                     MainConsole.Instance.Warn("[PHYSICS]: Got NaN quaternion Orientation from Scene in Object");
@@ -500,7 +499,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             set
             {
                 if (value.IsFinite())
-                    _parent_scene.AddSimulationChange(() => changeangvelocity(value));
+                    _parent_scene.AddSimulationChange(() => ChangeAngVelocity(value));
                 else
                     MainConsole.Instance.Warn("[PHYSICS]: Got NaN RotationalVelocity in Object");
             }
@@ -514,7 +513,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
         public override bool FloatOnWater
         {
-            set { _parent_scene.AddSimulationChange(() => changefloatonwater(value)); }
+            set { _parent_scene.AddSimulationChange(() => ChangeFloatOnWater(value)); }
         }
 
         public override void ClearVelocity()
@@ -560,9 +559,9 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
             if (childPrim)
             {
-                if (_parent != null && _parent is WhiteCoreODEPrim)
+                if (_parent != null && _parent is ODEPrim)
                 {
-                    WhiteCoreODEPrim parent = (WhiteCoreODEPrim) _parent;
+                    ODEPrim parent = (ODEPrim) _parent;
                     //Console.WriteLine("SetGeom calls ChildSetGeom");
                     parent.ChildSetGeom(this);
                 }
@@ -570,7 +569,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             //MainConsole.Instance.Warn("Setting Geom to: " + prim_geom);
         }
 
-        public void enableBodySoft()
+        public void EnableBodySoft()
         {
             if (!childPrim)
             {
@@ -585,7 +584,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             }
         }
 
-        public void disableBodySoft()
+        public void DisableBodySoft()
         {
             if (!childPrim)
             {
@@ -596,7 +595,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             }
         }
 
-        private void MakeBody()
+        void MakeBody()
         {
             //            d.Vector3 dvtmp;
             //            d.Vector3 dbtmp;
@@ -629,8 +628,11 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             d.Matrix3 mymat = new d.Matrix3();
             d.Quaternion myrot = new d.Quaternion();
 
+            // fiddle for incompatible typecasting
+            var actorType = (int)ActorTypes.Prim;
+            var ptrActorType = (IntPtr)actorType;
             Body = d.BodyCreate(_parent_scene.world);
-            d.BodySetData(Body, (IntPtr)ActorTypes.Prim);
+            d.BodySetData(Body, ptrActorType);
 
             DMassDup(ref primdMass, out objdmass);
 
@@ -660,7 +662,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
                 lock (childrenPrim)
                 {
-                    foreach (WhiteCoreODEPrim prm in childrenPrim)
+                    foreach (ODEPrim prm in childrenPrim)
                     {
                         if (prm.prim_geom == IntPtr.Zero)
                         {
@@ -743,7 +745,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
             lock (childrenPrim)
             {
-                foreach (WhiteCoreODEPrim prm in childrenPrim)
+                foreach (ODEPrim prm in childrenPrim)
                 {
                     if (prm.prim_geom == IntPtr.Zero)
                         continue;
@@ -767,28 +769,28 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                     }
 
                     prm.m_disabled = false;
-                    _parent_scene.addActivePrim(prm);
+                    _parent_scene.AddActivePrim(prm);
                 }
             }
             // The body doesn't already have a finite rotation mode set here
             if ((!m_angularlock.ApproxEquals(Vector3.One, 0.0f)) && _parent == null)
             {
-                createAMotor(m_angularlock);
+                CreateAMotor(m_angularlock);
             }
             if (m_vehicle.Type != Vehicle.TYPE_NONE)
                 m_vehicle.Enable(Body, this, _parent_scene);
 
-            _parent_scene.addActivePrim(this);
+            _parent_scene.AddActivePrim(this);
         }
 
-        private void SetInStaticSpace(WhiteCoreODEPrim prm)
+        void SetInStaticSpace(ODEPrim prm)
         {
             if (prm.m_targetSpace != IntPtr.Zero && prm.m_targetSpace == _parent_scene.space)
             {
                 if (d.SpaceQuery(prm.m_targetSpace, prm.prim_geom))
                     d.SpaceRemove(prm.m_targetSpace, prm.prim_geom);
             }
-            prm.m_targetSpace = _parent_scene.calculateSpaceForGeom(prm._position);
+            prm.m_targetSpace = _parent_scene.CalculateSpaceForGeom(prm._position);
             d.SpaceAdd(prm.m_targetSpace, prm.prim_geom);
         }
 
@@ -801,7 +803,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             {
                 if (Body != IntPtr.Zero)
                 {
-                    _parent_scene.remActivePrim(this);
+                    _parent_scene.RemoveActivePrim(this);
                     m_collisionCategories &= ~CollisionCategories.Body;
                     m_collisionFlags &= ~(CollisionCategories.Wind | CollisionCategories.Land);
                     if (prim_geom != IntPtr.Zero)
@@ -815,9 +817,9 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                     {
                         lock (childrenPrim)
                         {
-                            foreach (WhiteCoreODEPrim prm in childrenPrim)
+                            foreach (ODEPrim prm in childrenPrim)
                             {
-                                _parent_scene.remActivePrim(prm);
+                                _parent_scene.RemoveActivePrim(prm);
                                 prm.m_collisionCategories &= ~CollisionCategories.Body;
                                 prm.m_collisionFlags &= ~(CollisionCategories.Wind | CollisionCategories.Land);
                                 if (prm.prim_geom != IntPtr.Zero)
@@ -841,7 +843,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             m_disabled = true;
         }
 
-        private void changeAngularLock(Vector3 newlock)
+        void ChangeAngularLock(Vector3 newlock)
         {
             // do we have a Physical object?
             if (Body != IntPtr.Zero)
@@ -852,7 +854,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                 {
                     if (!newlock.ApproxEquals(Vector3.One, 0f))
                     {
-                        createAMotor(newlock);
+                        CreateAMotor(newlock);
                     }
                     else
                     {
@@ -868,7 +870,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             m_angularlock = newlock;
         }
 
-        private void changelink(WhiteCoreODEPrim newparent)
+        void ChangeLink(ODEPrim newparent)
         {
             // If the newly set parent is not null
             // create link
@@ -880,11 +882,11 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                 // destroy link
             else if (_parent != null)
             {
-                if (_parent is WhiteCoreODEPrim)
+                if (_parent is ODEPrim)
                 {
                     if (newparent != _parent)
                     {
-                        WhiteCoreODEPrim obj = (WhiteCoreODEPrim) _parent;
+                        ODEPrim obj = (ODEPrim) _parent;
                         obj.ChildDelink(this);
                         childPrim = false;
 
@@ -901,16 +903,16 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
         // I'm the parent
         // prim is the child
-        public void ParentPrim(WhiteCoreODEPrim prim)
+        public void ParentPrim(ODEPrim prim)
         {
             //Console.WriteLine("ParentPrim  " + m_primName);
-            if (this.m_localID != prim.m_localID)
+            if (m_localID != prim.m_localID)
             {
                 DestroyBody();
 
                 lock (childrenPrim)
                 {
-                    foreach (WhiteCoreODEPrim prm in prim.childrenPrim.Where(prm => !childrenPrim.Contains(prm)))
+                    foreach (ODEPrim prm in prim.childrenPrim.Where(prm => !childrenPrim.Contains(prm)))
                     {
                         childrenPrim.Add(prm);
                     }
@@ -932,22 +934,22 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             }
         }
 
-        private void ChildSetGeom(WhiteCoreODEPrim odePrim)
+        void ChildSetGeom(ODEPrim odePrim)
         {
             DestroyBody();
             MakeBody();
         }
 
-        private void UpdateChildsfromgeom()
+        void UpdateChildsfromgeom()
         {
             if (childrenPrim.Count > 0)
             {
-                foreach (WhiteCoreODEPrim prm in childrenPrim)
+                foreach (ODEPrim prm in childrenPrim)
                     prm.UpdateDataFromGeom();
             }
         }
 
-        private void UpdateDataFromGeom()
+        void UpdateDataFromGeom()
         {
             if (prim_geom != IntPtr.Zero)
             {
@@ -966,7 +968,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             }
         }
 
-        private void ChildDelink(WhiteCoreODEPrim odePrim)
+        void ChildDelink(ODEPrim odePrim)
         {
             // Okay, we have a delinked child.. destroy all body and remake
             if (odePrim != this && !childrenPrim.Contains(odePrim))
@@ -976,14 +978,14 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
             if (odePrim == this)
             {
-                WhiteCoreODEPrim newroot = null;
+                ODEPrim newroot = null;
                 lock (childrenPrim)
                 {
                     if (childrenPrim.Count > 0)
                     {
                         newroot = childrenPrim[0];
                         childrenPrim.RemoveAt(0);
-                        foreach (WhiteCoreODEPrim prm in childrenPrim)
+                        foreach (ODEPrim prm in childrenPrim)
                         {
                             newroot.childrenPrim.Add(prm);
                         }
@@ -1013,7 +1015,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             MakeBody();
         }
 
-        private void ChildRemove(WhiteCoreODEPrim odePrim)
+        void ChildRemove(ODEPrim odePrim)
         {
             // Okay, we have a delinked child.. destroy all body and remake
             if (odePrim != this && !childrenPrim.Contains(odePrim))
@@ -1023,14 +1025,14 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
             if (odePrim == this)
             {
-                WhiteCoreODEPrim newroot = null;
+                ODEPrim newroot = null;
                 lock (childrenPrim)
                 {
                     if (childrenPrim.Count > 0)
                     {
                         newroot = childrenPrim[0];
                         childrenPrim.RemoveAt(0);
-                        foreach (WhiteCoreODEPrim prm in childrenPrim)
+                        foreach (ODEPrim prm in childrenPrim)
                         {
                             newroot.childrenPrim.Add(prm);
                         }
@@ -1045,20 +1047,18 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                 }
                 return;
             }
-            else
+
+            lock (childrenPrim)
             {
-                lock (childrenPrim)
-                {
-                    childrenPrim.Remove(odePrim);
-                    odePrim.childPrim = false;
-                    odePrim._parent = null;
-                }
+                childrenPrim.Remove(odePrim);
+                odePrim.childPrim = false;
+                odePrim._parent = null;
             }
 
             MakeBody();
         }
 
-        private void changeSelectedStatus(bool newsel)
+        void ChangeSelectedStatus(bool newsel)
         {
             bool isphys = IsPhysical;
 
@@ -1091,7 +1091,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
                 if (isphys)
                 {
-                    disableBodySoft();
+                    DisableBodySoft();
                 }
 
                 if (prim_geom != IntPtr.Zero)
@@ -1102,7 +1102,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
                 if (isphys)
                 {
-                    disableBodySoft();
+                    DisableBodySoft();
                 }
             }
             else
@@ -1132,12 +1132,12 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                         d.BodySetAngularVel(Body, 0f, 0f, 0f);
                         d.BodySetForce(Body, 0, 0, 0);
                         d.BodySetTorque(Body, 0, 0, 0);
-                        enableBodySoft();
+                        EnableBodySoft();
                     }
                 }
             }
 
-            resetCollisionAccounting();
+            ResetCollisionAccounting();
             m_isSelected = newsel;
             if (!m_isSelected)
             {
@@ -1153,7 +1153,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
             bool havemesh = false;
             //Console.WriteLine("CreateGeom:");
-            if (_parent_scene.needsMeshing(this, PhysicsShapeType))
+            if (_parent_scene.NeedsMeshing(this, PhysicsShapeType))
             {
                 havemesh = true;
                 Vector3 centroid = Vector3.Zero;
@@ -1189,7 +1189,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                             {
                                 if (_parent != null)
                                 {
-                                    WhiteCoreODEPrim parent = (WhiteCoreODEPrim)_parent;
+                                    ODEPrim parent = (ODEPrim)_parent;
                                     parent.ChildDelink(this);
                                 }
                             }
@@ -1280,7 +1280,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             }
         }
 
-        private void RemoveGeom()
+        void RemoveGeom()
         {
             if (prim_geom != IntPtr.Zero)
             {
@@ -1313,10 +1313,10 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             CalcPrimBodyData();
         }
 
-        public void changeadd()
+        public void ChangeAdd()
         {
             // all prims are now created non physical
-            IntPtr targetspace = _parent_scene.calculateSpaceForGeom(_position);
+            IntPtr targetspace = _parent_scene.CalculateSpaceForGeom(_position);
             m_targetSpace = targetspace;
 
             //Console.WriteLine("changeadd 1");
@@ -1336,10 +1336,10 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                 //                    _parent_scene.actor_name_map[prim_geom] = (PhysicsActor)this;
             }
 
-            changeSelectedStatus(m_isSelected);
+            ChangeSelectedStatus(m_isSelected);
         }
 
-        public void changePosition(Vector3 newpos)
+        public void ChangePosition(Vector3 newpos)
         {
             if (m_isphysical)
             {
@@ -1366,7 +1366,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             {
                 if (newpos != _position)
                 {
-                    IntPtr tempspace = _parent_scene.recalculateSpaceForGeom(prim_geom, newpos, m_targetSpace);
+                    IntPtr tempspace = _parent_scene.RecalculateSpaceForGeom(prim_geom, newpos, m_targetSpace);
                     m_targetSpace = tempspace;
                     d.GeomSetPosition(prim_geom, newpos.X, newpos.Y, newpos.Z);
                     d.SpaceAdd(m_targetSpace, prim_geom);
@@ -1377,11 +1377,11 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             if (--fakepos < 0)
                 fakepos = 0;
 
-            changeSelectedStatus(m_isSelected);
-            resetCollisionAccounting();
+            ChangeSelectedStatus(m_isSelected);
+            ResetCollisionAccounting();
         }
 
-        public void changeOrientation(Quaternion newrot)
+        public void ChangeOrientation(Quaternion newrot)
         {
             if (m_isphysical)
             {
@@ -1405,7 +1405,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                         d.GeomSetQuaternion(prim_geom, ref myrot);
                         _orientation = newrot;
                         if (Body != IntPtr.Zero && !m_angularlock.ApproxEquals(Vector3.One, 0f))
-                            createAMotor(m_angularlock);
+                            CreateAMotor(m_angularlock);
                     }
                 }
                 if (Body != IntPtr.Zero)
@@ -1429,8 +1429,8 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             if (--fakeori < 0)
                 fakeori = 0;
 
-            changeSelectedStatus(m_isSelected);
-            resetCollisionAccounting();
+            ChangeSelectedStatus(m_isSelected);
+            ResetCollisionAccounting();
         }
 
         /*
@@ -1524,7 +1524,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                         d.BodySetForce(Body, 0, 0, 0);
                         d.BodySetLinearVel(Body, 0, 0, 0);
                         d.BodySetAngularVel(Body, 0, 0, 0);
-                        _parent_scene.BadPrim(this.childPrim ? (WhiteCoreODEPrim) _parent : this);
+                        _parent_scene.BadPrim(this.childPrim ? (ODEPrim) _parent : this);
                     }
                     else
                     {
@@ -1690,35 +1690,34 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                             m_lastposition = _position;
                             m_lastorientation = _orientation;
 
-                            base.RequestPhysicsterseUpdate();
+                            RequestPhysicsterseUpdate();
+                            m_crossingfailures = 0;
+                            return;
+                        }
+
+
+                        if (m_vehicle.Type == Vehicle.TYPE_NONE)
+                        {
+                            m_disabled = true;
+                            m_frozen = true;
+
+                            Vector3 l_position;
+                            l_position.X = lpos.X;
+                            l_position.Y = lpos.Y;
+                            l_position.Z = lpos.Z;
+
+                            RaiseOutOfBounds(l_position);
                             m_crossingfailures = 0;
                             return;
                         }
                         else
                         {
-                            if (m_vehicle.Type == Vehicle.TYPE_NONE)
-                            {
-                                m_disabled = true;
-                                m_frozen = true;
-
-                                Vector3 l_position;
-                                l_position.X = lpos.X;
-                                l_position.Y = lpos.Y;
-                                l_position.Z = lpos.Z;
-
-                                base.RaiseOutOfBounds(l_position);
-                                m_crossingfailures = 0;
-                                return;
-                            }
-                            else
-                            {
-                                Vector3 newPos = Position;
-                                newPos.X = Util.Clip(Position.X, 0.75f, _parent_scene.Region.RegionSizeX - 0.75f);
-                                newPos.Y = Util.Clip(Position.Y, 0.75f, _parent_scene.Region.RegionSizeY - 0.75f);
-                                Position = newPos;
-                                d.BodySetPosition(Body, newPos.X, newPos.Y, newPos.Z);
-                                m_crossingfailures = 0;
-                            }
+                            Vector3 newPos = Position;
+                            newPos.X = Util.Clip(Position.X, 0.75f, _parent_scene.Region.RegionSizeX - 0.75f);
+                            newPos.Y = Util.Clip(Position.Y, 0.75f, _parent_scene.Region.RegionSizeY - 0.75f);
+                            Position = newPos;
+                            d.BodySetPosition(Body, newPos.X, newPos.Y, newPos.Z);
+                            m_crossingfailures = 0;
                         }
                     }
 
@@ -1736,7 +1735,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                         // It's a hack and will generate a console message if it fails.
 
                         //IsPhysical = false;
-                        base.RaiseOutOfBounds(_position);
+                        RaiseOutOfBounds(_position);
 
                         cpos.Z = cpos.Z < 0 ? 0 : _parent_scene.m_flightCeilingHeight;
 
@@ -1757,7 +1756,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
                         m_lastposition = _position;
                         m_lastorientation = _orientation;
-                        base.RequestPhysicsterseUpdate();
+                        RequestPhysicsterseUpdate();
 
                         m_throttleUpdates = true;
                         _zeroFlag = true;
@@ -1860,7 +1859,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                     {
                         m_lastposition = _position;
                         m_lastorientation = _orientation;
-                        base.RequestPhysicsterseUpdate();
+                        RequestPhysicsterseUpdate();
                     }
                 }
                 else
@@ -1883,13 +1882,13 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             }
         }
 
-        private d.Quaternion ConvertTodQuat(Quaternion q)
+        d.Quaternion ConvertTodQuat(Quaternion q)
         {
             d.Quaternion dq = new d.Quaternion {X = q.X, Y = q.Y, Z = q.Z, W = q.W};
             return dq;
         }
 
-        internal void resetCollisionAccounting()
+        internal void ResetCollisionAccounting()
         {
             m_collisionscore = 0;
             m_disabled = false;
@@ -1905,7 +1904,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             }
         }
 
-        public void changePhysicsStatus(bool newphys)
+        public void ChangePhysicsStatus(bool newphys)
         {
             m_isphysical = newphys;
             if (!childPrim)
@@ -1916,7 +1915,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                     {
                         if (_pbs.SculptEntry && _parent_scene.meshSculptedPrim)
                         {
-                            changeshape(_pbs);
+                            ChangeShape(_pbs);
                         }
                         else
                         {
@@ -1931,7 +1930,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                         //UpdateChildsfromgeom ();
                         if (_pbs.SculptEntry && _parent_scene.meshSculptedPrim)
                         {
-                            changeshape(_pbs);
+                            ChangeShape(_pbs);
                         }
                         else
                             DestroyBody();
@@ -1939,13 +1938,13 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                 }
             }
 
-            changeSelectedStatus(m_isSelected);
-            resetCollisionAccounting();
+            ChangeSelectedStatus(m_isSelected);
+            ResetCollisionAccounting();
             FirePhysicalRepresentationChanged();
         }
 
 
-        public void changefloatonwater(bool arg)
+        public void ChangeFloatOnWater(bool arg)
         {
             m_collidesWater = arg;
 
@@ -1960,14 +1959,14 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         }
 
 
-        public void changeprimsizeshape()
+        public void ChangePrimSizeShape()
         {
             _parent_scene.actor_name_map.Remove(prim_geom);
-            WhiteCoreODEPrim parent = null;
+            ODEPrim parent = null;
 
             bool chp = childPrim;
             if (chp)
-                parent = (WhiteCoreODEPrim) _parent;
+                parent = (ODEPrim) _parent;
 
             // Cleanup of old prim geometry and Bodies
             if (chp)
@@ -2019,7 +2018,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                 _parent_scene.actor_name_map[prim_geom] = this;
             }
 
-            changeSelectedStatus(m_isSelected);
+            ChangeSelectedStatus(m_isSelected);
 
             if (chp)
             {
@@ -2032,19 +2031,19 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                 MakeBody();
         }
 
-        public void changeshape(PrimitiveBaseShape arg)
+        public void ChangeShape(PrimitiveBaseShape arg)
         {
             _pbs = arg;
-            changeprimsizeshape();
+            ChangePrimSizeShape();
         }
 
-        public void changesize(Vector3 arg)
+        public void ChangeSize(Vector3 arg)
         {
             _size = arg;
-            changeprimsizeshape();
+            ChangePrimSizeShape();
         }
 
-        public void changeAddForce(object arg)
+        public void ChangeAddForce(object arg)
         {
             if (!m_isSelected)
             {
@@ -2058,7 +2057,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             }
         }
 
-        public void changeSetTorque(Vector3 newtorque)
+        public void ChangeSetTorque(Vector3 newtorque)
         {
             if (!m_isSelected)
             {
@@ -2069,13 +2068,13 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             }
         }
 
-        public void changeAddAngularForce(Vector3 arg)
+        public void ChangeAddAngularForce(Vector3 arg)
         {
             if (!m_isSelected && IsPhysical)
                 m_angularforceacc += arg*100;
         }
 
-        private void changevelocity(Vector3 arg)
+        void Changevelocity(Vector3 arg)
         {
             _velocity = arg;
             if (!m_isSelected)
@@ -2092,7 +2091,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             }
         }
 
-        public void setPrimForRemoval()
+        public void SetPrimForRemoval()
         {
             if (m_primIsRemoved)
                 return; //Already being removed
@@ -2100,7 +2099,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             m_primIsRemoved = true;
             lock (childrenPrim)
             {
-                foreach (WhiteCoreODEPrim prm in childrenPrim)
+                foreach (ODEPrim prm in childrenPrim)
                 {
                     prm.m_primIsRemoved = true;
                 }
@@ -2110,7 +2109,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                                                   {
                                                       if (_parent != null)
                                                       {
-                                                          WhiteCoreODEPrim parent = (WhiteCoreODEPrim) _parent;
+                                                          ODEPrim parent = (ODEPrim) _parent;
                                                           parent.ChildRemove(this);
                                                       }
                                                       else
@@ -2122,7 +2121,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                                                   });
         }
 
-        public void setPrimForDeletion()
+        public void SetPrimForDeletion()
         {
             if (m_primIsRemoved)
                 return; //Already being removed
@@ -2130,20 +2129,20 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             m_primIsRemoved = true;
             lock (childrenPrim)
             {
-                foreach (WhiteCoreODEPrim prm in childrenPrim)
+                foreach (ODEPrim prm in childrenPrim)
                 {
                     prm.m_primIsRemoved = true;
                 }
             }
 
-            _parent_scene.AddSimulationChange(() => deletePrimLocked());
+            _parent_scene.AddSimulationChange(() => DeletePrimLocked());
         }
 
-        private void deletePrimLocked()
+        void DeletePrimLocked()
         {
             if (_parent != null)
             {
-                WhiteCoreODEPrim parent = (WhiteCoreODEPrim) _parent;
+                ODEPrim parent = (ODEPrim) _parent;
                 parent.DestroyBody();
             }
             else
@@ -2157,30 +2156,30 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         public override void VehicleFloatParam(int param, float value)
         {
             strVehicleFloatParam strf = new strVehicleFloatParam {param = param, value = value};
-            _parent_scene.AddSimulationChange(() => changeVehicleFloatParam(strf.param, strf.value));
+            _parent_scene.AddSimulationChange(() => ChangeVehicleFloatParam(strf.param, strf.value));
         }
 
         public override void VehicleVectorParam(int param, Vector3 value)
         {
             strVehicleVectorParam strv = new strVehicleVectorParam {param = param, value = value};
-            _parent_scene.AddSimulationChange(() => changeVehicleVectorParam(strv.param, strv.value));
+            _parent_scene.AddSimulationChange(() => ChangeVehicleVectorParam(strv.param, strv.value));
         }
 
         public override void VehicleRotationParam(int param, Quaternion rotation)
         {
             strVehicleQuartParam strq = new strVehicleQuartParam {param = param, value = rotation};
-            _parent_scene.AddSimulationChange(() => changeVehicleRotationParam(strq.param, strq.value));
+            _parent_scene.AddSimulationChange(() => ChangeVehicleRotationParam(strq.param, strq.value));
         }
 
         public override void VehicleFlags(int param, bool remove)
         {
             strVehicleBoolParam strb = new strVehicleBoolParam {param = param, value = remove};
-            _parent_scene.AddSimulationChange(() => changeVehicleFlags(strb.param, strb.value));
+            _parent_scene.AddSimulationChange(() => ChangeVehicleFlags(strb.param, strb.value));
         }
 
         public override void SetCameraPos(Quaternion CameraRotation)
         {
-            _parent_scene.AddSimulationChange(() => changeSetCameraPos(CameraRotation));
+            _parent_scene.AddSimulationChange(() => ChangeSetCameraPos(CameraRotation));
         }
 
         internal static bool QuaternionIsFinite(Quaternion q)
@@ -2200,7 +2199,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         {
             if (force.IsFinite())
             {
-                _parent_scene.AddSimulationChange(() => changeforce(force, pushforce));
+                _parent_scene.AddSimulationChange(() => ChangeForce(force, pushforce));
             }
             else
             {
@@ -2212,7 +2211,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         public override void AddAngularForce(Vector3 force, bool pushforce)
         {
             if (force.IsFinite())
-                _parent_scene.AddSimulationChange(() => changeAddAngularForce(force));
+                _parent_scene.AddSimulationChange(() => ChangeAddAngularForce(force));
             else
                 MainConsole.Instance.Warn("[PHYSICS]: Got Invalid Angular force vector from Scene in Object");
         }
@@ -2222,30 +2221,31 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             m_crossingfailures++;
             if (m_crossingfailures > _parent_scene.geomCrossingFailuresBeforeOutofbounds)
             {
-                base.RaiseOutOfBounds(_position);
+                RaiseOutOfBounds(_position);
                 return;
             }
-            else if (m_crossingfailures == _parent_scene.geomCrossingFailuresBeforeOutofbounds)
+
+            if (m_crossingfailures == _parent_scene.geomCrossingFailuresBeforeOutofbounds)
             {
                 MainConsole.Instance.Warn("[PHYSICS]: Too many crossing failures for: " + _name + " @ " +
                                           Position);
             }
         }
 
-        public override void link(PhysicsActor obj)
+        public override void Link(PhysicsActor obj)
         {
-            _parent_scene.AddSimulationChange(() => changelink((WhiteCoreODEPrim) obj));
+            _parent_scene.AddSimulationChange(() => ChangeLink((ODEPrim) obj));
         }
 
-        public override void linkGroupToThis(PhysicsActor[] objs)
+        public override void LinkGroupToThis(PhysicsActor[] objs)
         {
             for(int i = 0 ; i < objs.Length; i++)
-                _parent_scene.AddSimulationChange(() => ((WhiteCoreODEPrim) objs[i]).changelink(this));
+                _parent_scene.AddSimulationChange(() => ((ODEPrim) objs[i]).ChangeLink(this));
         }
 
-        public override void delink()
+        public override void Delink()
         {
-            _parent_scene.AddSimulationChange(() => changelink(null));
+            _parent_scene.AddSimulationChange(() => ChangeLink(null));
         }
 
         public override void LockAngularMotion(Vector3 axis)
@@ -2257,7 +2257,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                 axis.Y = (axis.Y > 0) ? 1f : 0f;
                 axis.Z = (axis.Z > 0) ? 1f : 0f;
                 MainConsole.Instance.DebugFormat("[axislock]: <{0},{1},{2}>", axis.X, axis.Y, axis.Z);
-                _parent_scene.AddSimulationChange(() => changeAngularLock(axis));
+                _parent_scene.AddSimulationChange(() => ChangeAngularLock(axis));
             }
             else
             {
@@ -2265,7 +2265,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             }
         }
 
-        private void createAMotor(Vector3 axis)
+        void CreateAMotor(Vector3 axis)
         {
             if (Body == IntPtr.Zero)
                 return;
@@ -2387,26 +2387,31 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             return obj;
         }
 
+        public override bool SubscribedEvents()
+        {
+            return m_eventsubscription;
+        }
+
         public override void SubscribeEvents(int ms)
         {
             m_eventsubscription = true;
-            _parent_scene.addCollisionEventReporting(this);
+            _parent_scene.AddCollisionEventReporting(this);
         }
 
         public override void UnSubscribeEvents()
         {
-            _parent_scene.remCollisionEventReporting(this);
+            _parent_scene.RemCollisionEventReporting(this);
             m_eventsubscription = false;
         }
 
-        public override void AddCollisionEvent(uint CollidedWith, ContactPoint contact)
+        public override void AddCollisionEvent(uint collidedWith, ContactPoint contact)
         {
-            if (base.SubscribedToCollisions() && SubscribedEvents())
+            if (SubscribedToCollisions() && SubscribedEvents())
                 //If we don't have anything that we are going to trigger, don't even add
             {
                 if (CollisionEventsThisFrame == null)
                     CollisionEventsThisFrame = new CollisionEventUpdate();
-                CollisionEventsThisFrame.AddCollider(CollidedWith, contact);
+                CollisionEventsThisFrame.AddCollider(collidedWith, contact);
             }
         }
 
@@ -2414,17 +2419,12 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         {
             if (CollisionEventsThisFrame == null || m_frozen) //No collisions or frozen, don't mess with it
                 return false;
-            base.SendCollisionUpdate(CollisionEventsThisFrame.Copy());
+            SendCollisionUpdate(CollisionEventsThisFrame.Copy());
             CollisionEventsThisFrame = CollisionEventsThisFrame.Count == 0 ? null : new CollisionEventUpdate();
             return true;
         }
 
-        public override bool SubscribedEvents()
-        {
-            return m_eventsubscription;
-        }
-
-        private static void DMassCopy(ref d.Mass src, ref d.Mass dst)
+        static void DMassCopy(ref d.Mass src, ref d.Mass dst)
         {
             dst.c.W = src.c.W;
             dst.c.X = src.c.X;
@@ -2442,11 +2442,9 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             dst.I.M22 = src.I.M22;
         }
 
-        private static void DMassDup(ref d.Mass src, out d.Mass dst)
+        static void DMassDup(ref d.Mass src, out d.Mass dst)
         {
-            dst = new d.Mass
-                      {
-                      };
+            dst = new d.Mass();
 
             dst.c.W = src.c.W;
             dst.c.X = src.c.X;
@@ -2464,17 +2462,17 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             dst.I.M22 = src.I.M22;
         }
 
-        private void changeacceleration(Object arg)
+        void ChangeAcceleration(Object arg)
         {
             _acceleration = (Vector3) arg;
         }
 
-        private void changeangvelocity(Vector3 arg)
+        void ChangeAngVelocity(Vector3 arg)
         {
             m_rotationalVelocity = arg;
         }
 
-        private void changeforce(Vector3 force, bool pushforce)
+        void ChangeForce(Vector3 force, bool pushforce)
         {
             if (pushforce)
             {
@@ -2487,43 +2485,43 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                 m_force = force;
         }
 
-        private void changevoldtc(bool arg)
+        void ChangeVolDetect(bool arg)
         {
             m_isVolumeDetect = arg;
         }
 
-        private void donullchange()
+        void DoNullChange()
         {
         }
 
-        private void changeVehicleType(int value)
+        void ChangeVehicleType(int value)
         {
             m_vehicle.ProcessTypeChange(this, (Vehicle) value, _parent_scene.ODE_STEPSIZE);
             if (m_vehicle.Type == Vehicle.TYPE_NONE)
                 m_vehicle.Enable(Body, this, _parent_scene);
         }
 
-        private void changeVehicleFloatParam(int param, float value)
+        void ChangeVehicleFloatParam(int param, float value)
         {
             m_vehicle.ProcessFloatVehicleParam((Vehicle) param, value, _parent_scene.ODE_STEPSIZE);
         }
 
-        private void changeVehicleVectorParam(int param, Vector3 value)
+        void ChangeVehicleVectorParam(int param, Vector3 value)
         {
             m_vehicle.ProcessVectorVehicleParam((Vehicle) param, value, _parent_scene.ODE_STEPSIZE);
         }
 
-        private void changeVehicleRotationParam(int param, Quaternion rotation)
+        void ChangeVehicleRotationParam(int param, Quaternion rotation)
         {
             m_vehicle.ProcessRotationVehicleParam((Vehicle) param, rotation);
         }
 
-        private void changeVehicleFlags(int param, bool remove)
+        void ChangeVehicleFlags(int param, bool remove)
         {
             m_vehicle.ProcessVehicleFlags(param, remove);
         }
 
-        private void changeSetCameraPos(Quaternion CameraRotation)
+        void ChangeSetCameraPos(Quaternion CameraRotation)
         {
             m_vehicle.ProcessSetCameraPos(CameraRotation);
         }
@@ -2540,13 +2538,96 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
         public void GetContactParam(PhysicsActor actor, ref d.Contact contact)
         {
+            // longer but easier to follow logic - g -
+            int pvt = 0;
+            int ppvt = 0;
+            Vehicle vehicleType;
+            const int vNone = (int)Vehicle.TYPE_NONE;     // grr.. PhysicsActor VehicleType is int  :(
+
+            if (_parent != null)
+            {
+                if (_parent.VehicleType != vNone)
+                    pvt = _parent.VehicleType;
+                else if (VehicleType != vNone)
+                    pvt = VehicleType;
+            }
+            if (actor is ODEPrim)
+            { 
+                var actorPrim = (ODEPrim)actor;
+                if (actorPrim.Parent != null && (actorPrim.Parent.VehicleType != vNone))
+                    ppvt = actorPrim.Parent.VehicleType;
+                else if( actor.VehicleType !=  vNone)
+                    ppvt = actor.VehicleType;
+            }
+
+            vehicleType = (Vehicle) pvt;
+            if (ppvt != vNone)
+                vehicleType = (Vehicle) ppvt;
+
+            // none is the norm
+            if (vehicleType == Vehicle.TYPE_NONE)
+            {
+                float restSquared = Restitution * Restitution * Restitution;
+                float maxVel = Velocity.Z < -1f ? -1f : Velocity.Z > 1f ? 1f : Velocity.Z;
+                contact.surface.bounce = (maxVel * -(restSquared));
+                //Its about 1:1 surprisingly, even though this constant was for havok
+                if (contact.surface.bounce > 0.5f)
+                    contact.surface.bounce = 0.5f; //Limit the bouncing please...
+                if (contact.surface.bounce <= 0)
+                {
+                    contact.surface.bounce = 0;
+                    contact.surface.bounce_vel = 0;
+                } else
+                    contact.surface.bounce_vel = 0.01f * restSquared * (-maxVel * restSquared);
+                //give it a good amount of bounce and have it depend on how much velocity is there too
+                contact.surface.mu = 800;
+                if (contact.surface.bounce_vel != 0)
+                    contact.surface.mode |= d.ContactFlags.Bounce;
+                else
+                    contact.surface.mode &= d.ContactFlags.Bounce;
+                if (actor.PhysicsActorType == (int)ActorTypes.Prim)
+                    contact.surface.mu *= Friction;
+                else if (actor.PhysicsActorType == (int)ActorTypes.Ground)
+                    contact.surface.mu *= 2;
+                else
+                    contact.surface.mu /= 2;
+                if (m_vehicle.Type != Vehicle.TYPE_NONE && actor.PhysicsActorType != (int)ActorTypes.Agent)
+                    contact.surface.mu *= 0.05f;
+            } else
+            {
+                switch (vehicleType)
+                {
+                case Vehicle.TYPE_CAR:
+                    contact.surface.bounce = 0;
+                    contact.surface.bounce_vel = 0;
+                    contact.surface.mu = 2;
+                    break;
+                case Vehicle.TYPE_SLED:
+                    contact.surface.bounce = 0;
+                    contact.surface.bounce_vel = 0;
+                    contact.surface.mu = 0;
+                    break;
+                case Vehicle.TYPE_AIRPLANE:
+                case Vehicle.TYPE_BALLOON:
+                case Vehicle.TYPE_BOAT:
+                    contact.surface.bounce = 0;
+                    contact.surface.bounce_vel = 0;
+                    contact.surface.mu = 100;
+                    break;
+                }
+            }
+         
+
+            /*
+            // TODO -greythane- This is super messy!! clean up
             int vehicleType = 0;
-            if ((_parent != null && (vehicleType = _parent.VehicleType) != (int) Vehicle.TYPE_NONE) ||
+            if ((_parent != null &&
+                (vehicleType = _parent.VehicleType) != (int) Vehicle.TYPE_NONE) ||
                 (vehicleType = VehicleType) != (int) Vehicle.TYPE_NONE ||
-                (actor is WhiteCoreODEPrim && ((WhiteCoreODEPrim) actor).Parent != null &&
-                 (vehicleType = ((WhiteCoreODEPrim) actor).Parent.VehicleType) != (int) Vehicle.TYPE_NONE) ||
-                (actor is WhiteCoreODEPrim &&
-                 (vehicleType = ((WhiteCoreODEPrim) actor).VehicleType) != (int) Vehicle.TYPE_NONE))
+                (actor is ODEPrim && 
+                    ((ODEPrim) actor).Parent != null && (vehicleType = ((ODEPrim) actor).Parent.VehicleType) != (int) Vehicle.TYPE_NONE) ||
+                (actor is ODEPrim &&
+                 (vehicleType = ((ODEPrim) actor).VehicleType) != (int) Vehicle.TYPE_NONE))
             {
                 if (vehicleType == (int) Vehicle.TYPE_CAR)
                 {
@@ -2568,7 +2649,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                     contact.surface.bounce_vel = 0;
                     contact.surface.mu = 100;
                 }
-            }
+            } 
             else
             {
                 float restSquared = Restitution*Restitution*Restitution;
@@ -2599,13 +2680,14 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                 if (m_vehicle.Type != Vehicle.TYPE_NONE && actor.PhysicsActorType != (int) ActorTypes.Agent)
                     contact.surface.mu *= 0.05f;
             }
+            */
         }
 
         #endregion
 
         #region Mass Calculation
 
-        private float CalculatePrimVolume()
+        float CalculatePrimVolume()
         {
             float volume = _size.X*_size.Y*_size.Z; // default
             float tmp;
@@ -2873,8 +2955,6 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             return volume;
         }
 
-        // end CalculateMass
-
 
         public void CalcPrimBodyData()
         {
@@ -2930,7 +3010,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
         #region Nested type: strVehicleBoolParam
 
-        private struct strVehicleBoolParam
+        struct strVehicleBoolParam
         {
             public int param;
             public bool value;
@@ -2940,7 +3020,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
         #region Nested type: strVehicleFloatParam
 
-        private struct strVehicleFloatParam
+        struct strVehicleFloatParam
         {
             public int param;
             public float value;
@@ -2950,7 +3030,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
         #region Nested type: strVehicleQuartParam
 
-        private struct strVehicleQuartParam
+        struct strVehicleQuartParam
         {
             public int param;
             public Quaternion value;
@@ -2960,7 +3040,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
         #region Nested type: strVehicleVectorParam
 
-        private struct strVehicleVectorParam
+        struct strVehicleVectorParam
         {
             public int param;
             public Vector3 value;

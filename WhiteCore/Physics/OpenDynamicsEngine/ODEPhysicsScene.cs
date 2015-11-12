@@ -31,17 +31,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
 
 namespace WhiteCore.Physics.OpenDynamicsEngine
 {
-    public class WhiteCoreODEPhysicsScene : PhysicsScene
+    public class ODEPhysicsScene : PhysicsScene
     {
         #region Declares
 
@@ -105,14 +105,14 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         protected bool m_filterCollisions;
 
         protected readonly d.NearCallback nearCallback;
-        protected readonly HashSet<WhiteCoreODECharacter> _characters = new HashSet<WhiteCoreODECharacter>();
-        protected readonly HashSet<WhiteCoreODEPrim> _prims = new HashSet<WhiteCoreODEPrim>();
+        protected readonly HashSet<ODECharacter> _characters = new HashSet<ODECharacter>();
+        protected readonly HashSet<ODEPrim> _prims = new HashSet<ODEPrim>();
         protected readonly object _activeprimsLock = new object();
-        protected readonly HashSet<WhiteCoreODEPrim> _activeprims = new HashSet<WhiteCoreODEPrim>();
+        protected readonly HashSet<ODEPrim> _activeprims = new HashSet<ODEPrim>();
 
         public override List<PhysicsActor> ActiveObjects
         {
-            get { return new List<WhiteCoreODEPrim>(_activeprims).ConvertAll<PhysicsActor>(prim => prim); }
+            get { return new List<ODEPrim>(_activeprims).ConvertAll<PhysicsActor>(prim => prim); }
         }
 
         public ConcurrentQueue<NoParam> SimulationChangesQueue = new ConcurrentQueue<NoParam>();
@@ -190,10 +190,10 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         public float m_flightCeilingHeight = 2048.0f; // rex
         public bool m_useFlightCeilingHeight;
 
-        protected WhiteCoreODERayCastRequestManager m_rayCastManager;
+        protected ODERayCastRequestManager m_rayCastManager;
         protected bool IsLocked;
         protected ConcurrentQueue<PhysicsActor> RemoveQueue = new ConcurrentQueue<PhysicsActor>();
-        protected ConcurrentQueue<PhysicsActor> DeleteQueue = new ConcurrentQueue<PhysicsActor>();
+        //protected ConcurrentQueue<PhysicsActor> DeleteQueue = new ConcurrentQueue<PhysicsActor>();
 
         internal float AvDecayTime = 0.95f;
 
@@ -237,9 +237,9 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         ///     Sets many properties that ODE requires to be stable
         ///     These settings need to be tweaked 'exactly' right or weird stuff happens.
         /// </summary>
-        public WhiteCoreODEPhysicsScene()
+        public ODEPhysicsScene()
         {
-            nearCallback = near;
+            nearCallback = IsNearBody;
             // Create the world and the first space
             world = d.WorldCreate();
             space = d.HashSpaceCreate(IntPtr.Zero);
@@ -261,7 +261,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
         public override void PostInitialise(IConfigSource config)
         {
-            m_rayCastManager = new WhiteCoreODERayCastRequestManager(this);
+            m_rayCastManager = new ODERayCastRequestManager(this);
             m_config = config;
             PID_D = 2200.0f;
             PID_P = 900.0f;
@@ -419,7 +419,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
         #region Collision Detection
 
-        private bool GetCurContactGeom(int index, ref d.ContactGeom newcontactgeom)
+        bool GetCurContactGeom(int index, ref d.ContactGeom newcontactgeom)
         {
             if (ContactgeomsArray == IntPtr.Zero || index >= contactsPerCollision)
                 return false;
@@ -429,7 +429,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             return true;
         }
 
-        private IntPtr CreateContacJoint(d.ContactGeom geom)
+        IntPtr CreateContacJoint(d.ContactGeom geom)
         {
             if (GlobalContactsArray == IntPtr.Zero || !ContinueCollisionProcessing)
                 return IntPtr.Zero;
@@ -452,10 +452,10 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         /// <summary>
         ///     This is our near callback.  A geometry is near a body
         /// </summary>
-        /// <param name="space">The space that contains the geoms.  Remember, spaces are also geoms</param>
+        /// <param name="gspace">The space that contains the geoms.  Remember, spaces are also geoms</param>
         /// <param name="g1">a geometry or space</param>
         /// <param name="g2">another geometry or space</param>
-        private void near(IntPtr space, IntPtr g1, IntPtr g2)
+        void IsNearBody(IntPtr gspace, IntPtr g1, IntPtr g2)
         {
             if (g1 == IntPtr.Zero || g2 == IntPtr.Zero || g1 == g2 || !ContinueCollisionProcessing)
                 return;
@@ -483,7 +483,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             IntPtr b2 = d.GeomGetBody(g2);
 
             // Figure out how many contact points we have
-            int count = 0;
+            int count;
             try
             {
                 // Colliding Geom To Geom
@@ -500,19 +500,19 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             }
             catch (Exception e)
             {
-                MainConsole.Instance.WarnFormat("[PHYSICS]:  ode Collide failed: {0} ", e.ToString());
+                MainConsole.Instance.WarnFormat("[PHYSICS]:  ode Collide failed: {0} ", e);
 
                 PhysicsActor badObj;
                 if (actor_name_map.TryGetValue(g1, out badObj))
-                    if (badObj is WhiteCoreODEPrim)
-                        RemovePrim((WhiteCoreODEPrim) badObj);
-                    else if (badObj is WhiteCoreODECharacter)
-                        RemoveAvatar((WhiteCoreODECharacter) badObj);
+                    if (badObj is ODEPrim)
+                        RemovePrim((ODEPrim) badObj);
+                    else if (badObj is ODECharacter)
+                        RemoveAvatar((ODECharacter) badObj);
                 if (actor_name_map.TryGetValue(g2, out badObj))
-                    if (badObj is WhiteCoreODEPrim)
-                        RemovePrim((WhiteCoreODEPrim) badObj);
-                    else if (badObj is WhiteCoreODECharacter)
-                        RemoveAvatar((WhiteCoreODECharacter) badObj);
+                    if (badObj is ODEPrim)
+                        RemovePrim((ODEPrim) badObj);
+                    else if (badObj is ODECharacter)
+                        RemoveAvatar((ODECharacter) badObj);
                 return;
             }
 
@@ -564,7 +564,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 // 20131224 not used                    maxContact = curContact;
                 }
             }
-            if (p1 is WhiteCoreODECharacter || p2 is WhiteCoreODECharacter)
+            if (p1 is ODECharacter || p2 is ODECharacter)
                 //This really should be maxContact, but there are crashes that users have reported when this is used...
                 //AddODECollision(maxContact, p1, p2, b1, b2, maxDepthContact, ref NotSkipedCount);
                 AddODECollision(curContact, p1, p2, b1, b2, maxDepthContact, ref NotSkipedCount);
@@ -593,11 +593,11 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                         p2.ThrottleUpdates = true;
                     }
                 }
-                collision_accounting_events(p1, p2, maxDepthContact);
+                Collision_accounting_events(p1, p2, maxDepthContact);
             } //);
         }
 
-        private void AddODECollision(d.ContactGeom curContact, PhysicsActor p1, PhysicsActor p2, IntPtr b1, IntPtr b2,
+        void AddODECollision(d.ContactGeom curContact, PhysicsActor p1, PhysicsActor p2, IntPtr b1, IntPtr b2,
                                      ContactPoint maxDepthContact, ref int NotSkipedCount)
         {
             IntPtr joint = IntPtr.Zero;
@@ -605,7 +605,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             bool p2col = true;
 
             // We only need to test p2 for 'jump crouch purposes'
-            if (p2 is WhiteCoreODECharacter && p1.PhysicsActorType == (int) ActorTypes.Prim)
+            if (p2 is ODECharacter && p1.PhysicsActorType == (int) ActorTypes.Prim)
             {
                 // Testing if the collision is at the feet of the avatar
                 if ((p2.Position.Z - maxDepthContact.Position.Z) < (p2.Size.Z*0.5f))
@@ -621,15 +621,15 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             // appears to be phantom for the world
 
             // No collision on volume detect prims
-            if ((p1 is WhiteCoreODEPrim && p1.VolumeDetect) ||
-                (p2 is WhiteCoreODEPrim && p2.VolumeDetect))
+            if ((p1 is ODEPrim && p1.VolumeDetect) ||
+                (p2 is ODEPrim && p2.VolumeDetect))
                 return;
 
             if (curContact.depth < 0f)
                 return; //Has to be penetrating
 
             if (m_filterCollisions &&
-                checkDupe(curContact, p2.PhysicsActorType))
+                CheckDupe(curContact, p2.PhysicsActorType))
                 return;
             if (m_filterCollisions)
                 _perloopContact.Add(curContact);
@@ -641,7 +641,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             {
                 if (p2.PhysicsActorType == (int) ActorTypes.Prim)
                 {
-                    ((WhiteCoreODEPrim) p2).GetContactParam(p2, ref newGlobalcontact);
+                    ((ODEPrim) p2).GetContactParam(p2, ref newGlobalcontact);
 
                     joint = CreateContacJoint(curContact);
                 }
@@ -667,7 +667,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             else if (p1.PhysicsActorType == (int) ActorTypes.Prim)
             {
                 //Add restitution and friction changes
-                ((WhiteCoreODEPrim) p1).GetContactParam(p2, ref newGlobalcontact);
+                ((ODEPrim) p1).GetContactParam(p2, ref newGlobalcontact);
 
                 joint = CreateContacJoint(curContact);
             }
@@ -676,18 +676,17 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             {
                 d.JointAttach(joint, b1, b2);
                 m_global_contactcount++;
-                joint = IntPtr.Zero;
             }
         }
 
-        private void GetContactParam(float mu, float AvatarContactBounce, ref d.Contact newGlobalcontact)
+        void GetContactParam(float mu, float AvatarContactBounce, ref d.Contact newGlobalcontact)
         {
             newGlobalcontact.surface.bounce_vel = 0;
             newGlobalcontact.surface.bounce = AvatarContactBounce;
             newGlobalcontact.surface.mu = mu;
         }
 
-        private bool checkDupe(d.ContactGeom contactGeom, int atype)
+        bool CheckDupe(d.ContactGeom contactGeom, int atype)
         {
             bool result = false;
 
@@ -741,7 +740,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             return result;
         }
 
-        private void collision_accounting_events(PhysicsActor p1, PhysicsActor p2, ContactPoint contact)
+        static void Collision_accounting_events(PhysicsActor p1, PhysicsActor p2, ContactPoint contact)
         {
             if (!p2.SubscribedEvents() && !p1.SubscribedEvents())
                 return;
@@ -755,21 +754,21 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         ///     This is our collision testing routine in ODE
         /// </summary>
         /// <param name="timeStep"></param>
-        private void collision_optimized(float timeStep)
+        void Collision_optimized(float timeStep)
         {
             m_global_contactcount = 0;
             //Clear out all the colliding attributes before we begin to collide anyone
-            foreach (WhiteCoreODECharacter chr in _characters)
+            foreach (ODECharacter chr in _characters)
             {
                 chr.IsColliding = false;
                 chr.IsTruelyColliding = false;
             }
-            List<IntPtr> shells = _characters.Where(chr => chr != null && chr.Shell != IntPtr.Zero && chr.Body != IntPtr.Zero).Select<WhiteCoreODECharacter, IntPtr>(chr => chr.Shell).ToList();
+            List<IntPtr> shells = _characters.Where(chr => chr != null && chr.Shell != IntPtr.Zero && chr.Body != IntPtr.Zero).Select<ODECharacter, IntPtr>(chr => chr.Shell).ToList();
                 
             lock (_activeprimsLock)
             {
-                List<WhiteCoreODEPrim> removeprims = null;
-                foreach (WhiteCoreODEPrim chr in _activeprims)
+                List<ODEPrim> removeprims = null;
+                foreach (ODEPrim chr in _activeprims)
                 {
                     //Fix colliding atributes!
                     chr.IsColliding = false;
@@ -777,7 +776,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                 }
                 if (space != IntPtr.Zero)
                 {
-                    List<WhiteCoreODEPrim> primsToCollide = new List<WhiteCoreODEPrim>(_activeprims.Where(
+                    List<ODEPrim> primsToCollide = new List<ODEPrim>(_activeprims.Where(
                         prm => prm != null && prm.Body != IntPtr.Zero && d.BodyIsEnabled(prm.Body) && 
                             !prm.m_disabled && !prm.m_frozen && prm.prim_geom != IntPtr.Zero));
                     shells.AddRange(primsToCollide.ConvertAll<IntPtr>(prm => prm.prim_geom));
@@ -811,11 +810,11 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                         List<UnmanagedODE.ContactGeom> contacts = UnmanagedODE.UnmanagedODEPhysics.CollisionLoop(space, shells);
                     }*/
 
-                    foreach (WhiteCoreODEPrim prm in
+                    foreach (ODEPrim prm in
                         _activeprims.Where(prm => prm != null && (prm.m_frozen || prm.prim_geom == IntPtr.Zero)))
                     {
                         if (removeprims == null)
-                            removeprims = new List<WhiteCoreODEPrim>();
+                            removeprims = new List<ODEPrim>();
                         removeprims.Add(prm);
                         if (prm.prim_geom == IntPtr.Zero)
                             MainConsole.Instance.Debug("[PHYSICS]: unable to collide test active prim against space. The space was zero, the geom was zero or " +
@@ -823,7 +822,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                     }
                     if (removeprims != null)
                     {
-                        foreach (WhiteCoreODEPrim chr in removeprims)
+                        foreach (ODEPrim chr in removeprims)
                             _activeprims.Remove(chr);
                     }
                 }
@@ -874,51 +873,46 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             float h1;
             float h2;
 
-            float invterrainscale = 1.0f/Constants.TerrainCompression;
+            float invterrainscale = 1.0f / Constants.TerrainCompression;
 
             iy *= m_region.RegionSizeX;
 
             if ((dx + dy) <= 1.0f)
             {
-                h0 = (TerrainHeightFieldHeights[iy + ix])*invterrainscale;
+                h0 = (TerrainHeightFieldHeights[iy + ix]) * invterrainscale;
+                h1 = 0;
+                h2 = 0;
 
                 if (dx > 0)
-                    h1 = ((TerrainHeightFieldHeights[iy + ix + 1])*invterrainscale - h0)*dx;
-                else
-                    h1 = 0;
+                    h1 = ((TerrainHeightFieldHeights[iy + ix + 1])*invterrainscale - h0) * dx;
 
                 if (dy > 0)
-                    h2 = ((TerrainHeightFieldHeights[iy + m_region.RegionSizeX + ix])*invterrainscale - h0)*dy;
-                else
-                    h2 = 0;
-
+                    h2 = ((TerrainHeightFieldHeights[iy + m_region.RegionSizeX + ix])*invterrainscale - h0) * dy;
+                
                 return h0 + h1 + h2;
             }
-            else
-            {
-                h0 = (TerrainHeightFieldHeights[iy + m_region.RegionSizeX + ix + 1])*invterrainscale;
 
-                if (dx > 0)
-                    h1 = ((TerrainHeightFieldHeights[iy + ix + 1])*invterrainscale - h0)*(1 - dy);
-                else
-                    h1 = 0;
+            h0 = (TerrainHeightFieldHeights[iy + m_region.RegionSizeX + ix + 1]) * invterrainscale;
+            h1 = 0;
+            h2 = 0;
 
-                if (dy > 0)
-                    h2 = ((TerrainHeightFieldHeights[iy + m_region.RegionSizeX + ix])*invterrainscale - h0)*(1 - dx);
-                else
-                    h2 = 0;
+            if (dx > 0)
+                h1 = ((TerrainHeightFieldHeights[iy + ix + 1])*invterrainscale - h0) * (1 - dy);
+            
+            if (dy > 0)
+                h2 = ((TerrainHeightFieldHeights[iy + m_region.RegionSizeX + ix])*invterrainscale - h0) * (1 - dx);
+            
+            return h0 + h1 + h2;
 
-                return h0 + h1 + h2;
-            }
         }
 
-        public void addCollisionEventReporting(PhysicsActor obj)
+        public void AddCollisionEventReporting(PhysicsActor obj)
         {
             if (!_collisionEventDictionary.ContainsKey(obj.UUID))
                 _collisionEventDictionary.TryAdd(obj.UUID, obj);
         }
 
-        public void remCollisionEventReporting(PhysicsActor obj)
+        public void RemCollisionEventReporting(PhysicsActor obj)
         {
             _collisionEventDictionary.TryRemove(obj.UUID, out obj);
         }
@@ -950,7 +944,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         ///     Internally locked, as it is called only in the Simulation Changes loop
         /// </summary>
         /// <param name="chr"></param>
-        internal void AddCharacter(WhiteCoreODECharacter chr)
+        internal void AddCharacter(ODECharacter chr)
         {
             if (!_characters.Contains(chr))
                 _characters.Add(chr);
@@ -961,7 +955,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         ///     Internally locked, as it is called only in the Simulation Changes loop
         /// </summary>
         /// <param name="chr"></param>
-        internal void RemoveCharacter(WhiteCoreODECharacter chr)
+        internal void RemoveCharacter(ODECharacter chr)
         {
             _characters.Remove(chr);
         }
@@ -969,10 +963,10 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         public override void RemoveAvatar(PhysicsActor actor)
         {
             //MainConsole.Instance.Debug("[PHYSICS]:ODELOCK");
-            ((WhiteCoreODECharacter) actor).Destroy();
+            ((ODECharacter) actor).Destroy();
         }
 
-        internal void BadCharacter(WhiteCoreODECharacter chr)
+        internal void BadCharacter(ODECharacter chr)
         {
             RemoveAvatar(chr);
             AddAvatar(chr.Name, new Vector3(m_region.RegionSizeX/2,
@@ -982,7 +976,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                                   chr.CAPSULE_LENGTH*2), true, chr.LocalID, chr.UUID);
         }
 
-		internal void BadPrim(WhiteCoreODEPrim whitecoreODEPrim)
+		internal void BadPrim(ODEPrim whitecoreODEPrim)
         {
 			RemovePrim(whitecoreODEPrim);
             //Can't really do this here... as it will be readded before the delete gets called, which is wrong...
@@ -994,7 +988,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                                                     Vector3 size, Quaternion rotation, bool isPhysical, int material, float friction, float restitution,
                                                     float gravityMultiplier, float density)
         {
-            WhiteCoreODEPrim newPrim = new WhiteCoreODEPrim(name, physicsType, shape, position, size, rotation, material, friction, restitution, gravityMultiplier, density, this);
+            ODEPrim newPrim = new ODEPrim(name, physicsType, shape, position, size, rotation, material, friction, restitution, gravityMultiplier, density, this);
             newPrim.UUID = primID;
             newPrim.LocalID = localID;
 
@@ -1007,7 +1001,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             return newPrim;
         }
 
-        internal void addActivePrim(WhiteCoreODEPrim activatePrim)
+        internal void AddActivePrim(ODEPrim activatePrim)
         {
             // adds active prim..   (ones that should be iterated over in collisions_optimized
             lock (_activeprimsLock)
@@ -1023,7 +1017,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             set { m_timeDilation = value; }
         }
 
-        internal void remActivePrim(WhiteCoreODEPrim deactivatePrim)
+        internal void RemoveActivePrim(ODEPrim deactivatePrim)
         {
             lock (_activeprimsLock)
                 _activeprims.Remove(deactivatePrim);
@@ -1035,7 +1029,6 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             RemoveQueue.Enqueue(prim);
         }
 
-
         /// <summary>
         ///     This is called from within simulate but outside the locked portion
         ///     We need to do our own locking here
@@ -1044,10 +1037,10 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         ///     that the space was using.
         /// </summary>
         /// <param name="prim"></param>
-        internal void RemovePrimThreadLocked(WhiteCoreODEPrim prim)
+        internal void RemovePrimThreadLocked(ODEPrim prim)
         {
-            remCollisionEventReporting(prim);
-            remActivePrim(prim);
+            RemCollisionEventReporting(prim);
+            RemoveActivePrim(prim);
             prim.m_frozen = true;
             if (prim.prim_geom != IntPtr.Zero)
             {
@@ -1075,7 +1068,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             if (!prim.childPrim)
             {
                 lock (prim.childrenPrim)
-                    foreach (WhiteCoreODEPrim prm in prim.childrenPrim)
+                    foreach (ODEPrim prm in prim.childrenPrim)
                         RemovePrimThreadLocked(prm);
             }
             lock (_prims)
@@ -1093,7 +1086,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         /// <param name="pos">The position that the geom moved to</param>
         /// <param name="currentspace">A pointer to the space it was in before it was moved.</param>
         /// <returns>A pointer to the new space it's in</returns>
-        public IntPtr recalculateSpaceForGeom(IntPtr geom, Vector3 pos, IntPtr currentspace)
+        public IntPtr RecalculateSpaceForGeom(IntPtr geom, Vector3 pos, IntPtr currentspace)
         {
             // Called from setting the Position and Size of an ODEPrim so
             // it's already in locked space.
@@ -1190,7 +1183,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             // so all we have to do is make sure that the space that we're putting the prim into
             // is in the 'main' space.
 //            int[] iprimspaceArrItem = calculateSpaceArrayItemFromPos(pos);
-            IntPtr newspace = calculateSpaceForGeom(pos);
+            IntPtr newspace = CalculateSpaceForGeom(pos);
 
 /*  spaces aren't deleted so already created
             if (newspace == IntPtr.Zero)
@@ -1207,9 +1200,9 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         /// </summary>
         /// <param name="pos"></param>
         /// <returns>A pointer to the space. This could be a new space or reused space.</returns>
-        public IntPtr calculateSpaceForGeom(Vector3 pos)
+        public IntPtr CalculateSpaceForGeom(Vector3 pos)
         {
-            int[] xyspace = calculateSpaceArrayItemFromPos(pos);
+            int[] xyspace = CalculateSpaceArrayItemFromPos(pos);
             //MainConsole.Instance.Info("[Physics]: Attempting to use arrayItem: " + xyspace[0].ToString() + "," + xyspace[1].ToString());
             return staticPrimspace[xyspace[0], xyspace[1]];
         }
@@ -1219,7 +1212,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         /// </summary>
         /// <param name="pos"></param>
         /// <returns>an array item based on the position</returns>
-        public int[] calculateSpaceArrayItemFromPos(Vector3 pos)
+        public int[] CalculateSpaceArrayItemFromPos(Vector3 pos)
         {
             int[] returnint = new int[2];
 
@@ -1244,9 +1237,9 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         /// </summary>
         /// <param name="pos"></param>
         /// <returns>Returns which split up space the given position is in.</returns>
-        public string whichspaceamIin(Vector3 pos)
+        public string WhichSpaceAmIIn(Vector3 pos)
         {
-            return calculateSpaceForGeom(pos).ToString();
+            return CalculateSpaceForGeom(pos).ToString();
         }
 
         #endregion
@@ -1256,9 +1249,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         /// <summary>
         ///     Routine to figure out if we need to mesh this prim with our mesher
         /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        internal bool needsMeshing(WhiteCoreODEPrim prim, byte physicalType)
+        internal bool NeedsMeshing(ODEPrim prim, byte physicalType)
         {
             PrimitiveBaseShape pbs = prim.Shape;
             // most of this is redundant now as the mesher will return null if it cant mesh a prim
@@ -1290,10 +1281,12 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
             if (pbs.SculptEntry && !meshSculptedPrim)
                 return false;
-            else if (pbs.SculptType != (byte) SculptType.Mesh &&
+
+            if (pbs.SculptType != (byte) SculptType.Mesh &&
                      pbs.SculptType != (byte) SculptType.None)
                 return true; //Sculpty, mesh it
-            else if (pbs.SculptType == (byte) SculptType.Mesh)
+
+            if (pbs.SculptType == (byte) SculptType.Mesh)
             {
                 //Mesh, we need to see what the prims says to do with it
                 if (physicalType == (byte) PhysicsShapeType.Prim)
@@ -1440,14 +1433,14 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
                     // Move other active objects
                     lock (_activeprimsLock)
-                        foreach (WhiteCoreODEPrim prim in _activeprims)
+                        foreach (ODEPrim prim in _activeprims)
                             prim.Move(ODE_STEPSIZE);
 
                     if (m_rayCastManager != null)
                         m_rayCastManager.ProcessQueuedRequests();
 
                     if (!DisableCollisions)
-                        collision_optimized(timeElapsed);
+                        Collision_optimized(timeElapsed);
 
                     d.WorldQuickStep(world, ODE_STEPSIZE);
                     d.JointGroupEmpty(contactgroup);
@@ -1466,18 +1459,19 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             PhysicsActor prm;
             while (RemoveQueue.TryDequeue(out prm))
             {
-                WhiteCoreODEPrim p = (WhiteCoreODEPrim) prm;
-                p.setPrimForRemoval();
+                ODEPrim p = (ODEPrim) prm;
+                p.SetPrimForRemoval();
             }
-            while (DeleteQueue.TryDequeue(out prm))
-            {
-                WhiteCoreODEPrim p = (WhiteCoreODEPrim) prm;
-                p.setPrimForDeletion();
-            }
+// dup of removequeue??
+            //while (DeleteQueue.TryDequeue(out prm))
+            //{
+            //    WhiteCoreODEPrim p = (WhiteCoreODEPrim) prm;
+            //    p.setPrimForDeletion();
+            //}
 
             if (!DisableCollisions)
             {
-                foreach (WhiteCoreODECharacter av in _characters.Where(av => av != null))
+                foreach (ODECharacter av in _characters.Where(av => av != null))
                     av.SendCollisions();
                 lock (_collisionEventListLock)
                 {
@@ -1486,12 +1480,12 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                 }
             }
 
-            foreach (WhiteCoreODECharacter actor in _characters.Where(actor => actor != null))
+            foreach (ODECharacter actor in _characters.Where(actor => actor != null))
                 actor.UpdatePositionAndVelocity(nodesteps*ODE_STEPSIZE);
 
             lock (_activeprimsLock)
             {
-                foreach (WhiteCoreODEPrim actor in _activeprims.Where(actor => actor.IsPhysical))
+                foreach (ODEPrim actor in _activeprims.Where(actor => actor.IsPhysical))
                     actor.UpdatePositionAndVelocity(nodesteps*ODE_STEPSIZE);
             }
         }
@@ -1565,10 +1559,8 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
                                                    d.Matrix3 R = new d.Matrix3();
 
-                                                   Quaternion q1 = Quaternion.CreateFromAxisAngle(new Vector3(1, 0, 0),
-                                                                                                  1.5707f);
-                                                   Quaternion q2 = Quaternion.CreateFromAxisAngle(new Vector3(0, 1, 0),
-                                                                                                  1.5707f);
+                                                   Quaternion q1 = Quaternion.CreateFromAxisAngle(new Vector3(1, 0, 0), 1.5707f);
+                                                   Quaternion q2 = Quaternion.CreateFromAxisAngle(new Vector3(0, 1, 0), 1.5707f);
 
                                                    q1 = q1*q2;
 
@@ -1605,7 +1597,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         {
             lock (_prims)
             {
-                foreach (WhiteCoreODEPrim prm in _prims)
+                foreach (ODEPrim prm in _prims)
                 {
                     RemovePrim(prm);
                 }
@@ -1634,11 +1626,11 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         public override Dictionary<uint, float> GetTopColliders()
         {
             Dictionary<uint, float> returncolliders = new Dictionary<uint, float>();
-            List<WhiteCoreODEPrim> collidingPrims = new List<WhiteCoreODEPrim>();
+            List<ODEPrim> collidingPrims = new List<ODEPrim>();
             lock (_prims)
             {
                 foreach (
-                    WhiteCoreODEPrim prm in
+                    ODEPrim prm in
                         _prims.Where(prm => prm.CollisionScore > 0).Where(prm => !collidingPrims.Contains(prm)))
                 {
                     collidingPrims.Add(prm);
@@ -1651,10 +1643,10 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             if (collidingPrims.Count > 25)
                 collidingPrims.RemoveRange(25, collidingPrims.Count - 25);
 
-            foreach (WhiteCoreODEPrim prm in collidingPrims)
+            foreach (ODEPrim prm in collidingPrims)
             {
                 returncolliders[prm.LocalID] = prm.CollisionScore;
-                prm.resetCollisionAccounting();
+                prm.ResetCollisionAccounting();
             }
             return returncolliders;
         }
@@ -1711,7 +1703,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
         #region Structs
 
-        private struct PointGravity
+        struct PointGravity
         {
             public float ForceX;
             public float ForceY;
@@ -1731,21 +1723,21 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
         #endregion
 
-        private bool normalGravityEnabled = true;
-        private readonly Dictionary<int, PointGravity> m_pointGravityPositions = new Dictionary<int, PointGravity>();
-        private bool pointGravityInUse;
+        bool NormalGravityEnabled = true;
+        readonly Dictionary<int, PointGravity> m_pointGravityPositions = new Dictionary<int, PointGravity>();
+        bool PointGravityInUse;
 
         public void CalculateGravity(float mass, Vector3 position, bool allowNormalGravity, float gravityModifier,
                                      ref Vector3 forceVector)
         {
-            if (normalGravityEnabled && allowNormalGravity)
+            if (NormalGravityEnabled && allowNormalGravity)
             {
                 //normal gravity, one axis, no center
                 forceVector.X += gravityx*mass*gravityModifier;
                 forceVector.Y += gravityy*mass*gravityModifier;
                 forceVector.Z += gravityz*mass*gravityModifier;
             }
-            if (pointGravityInUse)
+            if (PointGravityInUse)
             {
                 //Find the nearby centers of gravity
                 foreach (PointGravity pg in m_pointGravityPositions.Values)
@@ -1791,7 +1783,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         /// <param name="forceZ"></param>
         public override void SetGravityForce(bool enabled, float forceX, float forceY, float forceZ)
         {
-            normalGravityEnabled = enabled;
+            NormalGravityEnabled = enabled;
             gravityx = forceX;
             gravityy = forceY;
             gravityz = forceZ;
@@ -1823,7 +1815,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                                              PointForce = isApplyingForces
                                          };
 
-            pointGravityInUse = true;
+            PointGravityInUse = true;
             m_pointGravityPositions[identifier] = pointGrav;
         }
 

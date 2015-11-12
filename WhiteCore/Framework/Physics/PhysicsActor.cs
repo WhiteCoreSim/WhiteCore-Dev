@@ -232,7 +232,7 @@ namespace WhiteCore.Framework.Physics
         public abstract bool SubscribedEvents();
 
         public abstract bool SendCollisions();
-        public abstract void AddCollisionEvent(uint localID, ContactPoint contact);
+        public abstract void AddCollisionEvent(uint collidedWith, ContactPoint contact);
 
         public virtual void ForceSetVelocity(Vector3 velocity) { }
         public virtual void ForceSetRotVelocity(Vector3 velocity) { }
@@ -242,9 +242,9 @@ namespace WhiteCore.Framework.Physics
 
         #region Object Declares
 
-        public virtual void link(PhysicsActor obj) { }
-        public virtual void linkGroupToThis(PhysicsActor[] objs) { }
-        public virtual void delink() { }
+        public virtual void Link(PhysicsActor obj) { }
+        public virtual void LinkGroupToThis(PhysicsActor[] objs) { }
+        public virtual void Delink() { }
         public virtual bool LinkSetIsColliding { get; set; }
         public virtual void LockAngularMotion(Vector3 axis) { }
         public virtual void CrossingFailure() { }
@@ -479,7 +479,7 @@ namespace WhiteCore.Framework.Physics
             return false;
         }
 
-        public override void AddCollisionEvent(uint CollidedWith, ContactPoint contact)
+        public override void AddCollisionEvent(uint collidedWith, ContactPoint contact)
         {
         }
     }
@@ -618,7 +618,7 @@ namespace WhiteCore.Framework.Physics
             return false;
         }
 
-        public override void AddCollisionEvent(uint CollidedWith, ContactPoint contact)
+        public override void AddCollisionEvent(uint collidedWith, ContactPoint contact)
         {
         }
     }

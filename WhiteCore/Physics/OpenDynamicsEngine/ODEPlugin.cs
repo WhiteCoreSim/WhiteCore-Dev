@@ -30,10 +30,6 @@
 using System;
 using WhiteCore.Framework.Physics;
 
-//using Ode.NET;
-//#if USE_DRAWSTUFF
-//using Drawstuff.NET;
-//#endif 
 
 namespace WhiteCore.Physics.OpenDynamicsEngine
 {
@@ -42,9 +38,9 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
     /// </summary>
     public class WhiteCoreODEPlugin : IPhysicsPlugin
     {
-        private static bool m_initialized;
-        private WhiteCoreODEPhysicsScene _mScene;
-        private static object m_lock = new object();
+        static bool m_initialized;
+        ODEPhysicsScene _mScene;
+        static object m_lock = new object();
 
         #region IPhysicsPlugin Members
 
@@ -67,7 +63,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                         m_initialized = true;
                     }
 
-                    _mScene = new WhiteCoreODEPhysicsScene();
+                    _mScene = new ODEPhysicsScene();
                 }
             }
 
@@ -137,32 +133,12 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
     /// </summary>
     public enum Material
     {
-        /// <summary>
-        /// </summary>
         Stone = 0,
-
-        /// <summary>
-        /// </summary>
         Metal = 1,
-
-        /// <summary>
-        /// </summary>
         Glass = 2,
-
-        /// <summary>
-        /// </summary>
         Wood = 3,
-
-        /// <summary>
-        /// </summary>
         Flesh = 4,
-
-        /// <summary>
-        /// </summary>
         Plastic = 5,
-
-        /// <summary>
-        /// </summary>
         Rubber = 6
     }
 }
