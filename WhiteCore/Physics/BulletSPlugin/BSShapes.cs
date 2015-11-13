@@ -115,7 +115,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         public int referenceCount { get; set; }
         public DateTime lastReferenced { get; set; }
         public BulletShape physShapeInfo { get; set; }
-        public ShapeInfoInfo shapeInfo { get; }
+        public ShapeInfoInfo shapeInfo { get; set; }
 
         public BSShape()
         {
