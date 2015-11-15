@@ -37,6 +37,9 @@ namespace WhiteCore.Physics.BulletSPlugin
     public sealed class BSCharacter : BSPhysObject
     {
         static readonly string LogHeader = "[BULLETS CHAR]";
+        int m_ZeroUpdateSent;
+        OMV.Vector3 m_lastPosition;
+        OMV.Vector3 m_lastVelocity;
 
         // private bool _stopped;
         OMV.Vector3 _size;
@@ -342,6 +345,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             set
             {
                 _position = value;
+                m_lastPosition = value;
                 if (PhysBody.HasPhysicalBody)
                 {
                     PhysicsScene.PE.SetTranslation(PhysBody, _position, _orientation);
@@ -526,6 +530,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 PhysicsScene.AssertInTaintTime("BSCharacter.ForceVelocity");
 
                 RawVelocity = value;
+                m_lastVelocity = value;
                 PhysicsScene.PE.SetLinearVelocity(PhysBody, RawVelocity);
                 PhysicsScene.PE.Activate(PhysBody, true);
             }
@@ -832,10 +837,12 @@ namespace WhiteCore.Physics.BulletSPlugin
         // the world that things have changed.
         public override void UpdateProperties(EntityProperties entprop)
         {
+            bool needSendUpdate = false;
+
             // Don't change position if standing on a stationary object.
             if (!IsStationary)
                 _position = entprop.Position;
-
+ 
             _orientation = entprop.Rotation;
 
             if (entprop.Velocity != OMV.Vector3.Zero && entprop.Velocity.ApproxEquals(OMV.Vector3.Zero, 0.01f) &&
@@ -845,21 +852,15 @@ namespace WhiteCore.Physics.BulletSPlugin
                 entprop.Acceleration = OMV.Vector3.Zero;
                 entprop.RotationalVelocity = OMV.Vector3.Zero;
                 Velocity = OMV.Vector3.Zero;
-
-                TriggerSignificantMovement();
-                TriggerMovementUpdate();
+                m_ZeroUpdateSent = 3;
+                needSendUpdate = true;
             }
 
             if (!entprop.Velocity.ApproxEquals(RawVelocity, 0.4f))
             {
                 RawVelocity = entprop.Velocity;
-
-                TriggerSignificantMovement();
-                TriggerMovementUpdate();
+                needSendUpdate = true;
             }
-
-            _acceleration = entprop.Acceleration;
-            _rotationalVelocity = entprop.RotationalVelocity;
 
             // Do some sanity checking for the avatar. Make sure it's above ground and inbounds.
             if (PositionSanityCheck(true))
@@ -868,9 +869,71 @@ namespace WhiteCore.Physics.BulletSPlugin
                 entprop.Position = _position;
             }
 
-            // remember the current and last set values
-            LastEntityProperties = CurrentEntityProperties;
-            CurrentEntityProperties = entprop;
+            // animaton checks
+            const float POSITION_TOLERANCE = 5.0f;
+            float VELOCITY_TOLERANCE = 0.025f * 0.025f;
+            if (PhysicsScene.TimeDilation < 0.5)
+            {
+                float percent = (1f - PhysicsScene.TimeDilation) * 100;
+                VELOCITY_TOLERANCE *= percent*2;
+            }
+
+            bool VelIsZero = false;
+            OMV.Vector3 _velocity = Velocity;
+            int vcntr = 0;
+            if (Math.Abs(_velocity.X) < 0.01)
+            {
+                vcntr++;
+                _velocity.X = 0;
+            }
+            if (Math.Abs(_velocity.Y) < 0.01)
+            {
+                vcntr++;
+                _velocity.Y = 0;
+            }
+            if (Math.Abs(_velocity.Z) < 0.01)
+            {
+                vcntr++;
+                _velocity.Z = 0;
+            }
+            if (vcntr == 3)
+            {
+                Velocity = _velocity;
+                VelIsZero = true;
+            }
+            
+            float vlength = (Velocity - m_lastVelocity).LengthSquared();
+            float plength = (_position - m_lastPosition).LengthSquared();
+            if ( vlength > VELOCITY_TOLERANCE || plength > POSITION_TOLERANCE )
+            {
+                needSendUpdate = true;
+                m_ZeroUpdateSent = 3;
+            }
+            else if (VelIsZero)
+            {
+                if (m_ZeroUpdateSent > 0)
+                {
+                    needSendUpdate = true;
+                    m_ZeroUpdateSent--;
+                }
+            }
+
+
+            if (needSendUpdate)
+            {
+                m_lastPosition = _position;
+                m_lastVelocity = Velocity;
+                               
+                TriggerSignificantMovement();
+                TriggerMovementUpdate();
+
+                // remember the current and last set values
+                _acceleration = entprop.Acceleration;
+                _rotationalVelocity = entprop.RotationalVelocity;
+                LastEntityProperties = CurrentEntityProperties;
+                CurrentEntityProperties = entprop;
+
+            }
 
             // Tell the linkset about value changes
             // Linkset.UpdateProperties(UpdatedProperties.EntPropUpdates, this);
