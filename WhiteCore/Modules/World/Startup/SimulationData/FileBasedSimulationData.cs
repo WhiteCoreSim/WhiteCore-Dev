@@ -470,6 +470,10 @@ namespace WhiteCore.Modules
                     }
                 }
 
+                // re-proportion allocations based on actual region area <> std area
+                var regFactor = ( info.RegionSizeX * info.RegionSizeY) / (Constants.RegionSize * Constants.RegionSize);
+                info.ObjectCapacity = (int)Math.Round ((float)(info.ObjectCapacity * regFactor));
+                info.RegionSettings.AgentLimit = (int) Math.Round ((float)(info.RegionSettings.AgentLimit * regFactor));
             }
 
             // are we updating or adding??
