@@ -25,6 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.PresenceInfo;
@@ -32,12 +36,7 @@ using WhiteCore.Framework.SceneInfo.Entities;
 using WhiteCore.Framework.Servers;
 using WhiteCore.Framework.Servers.HttpServer.Interfaces;
 using WhiteCore.Framework.Services;
-using WhiteCore.Framework.Services.ClassHelpers.Assets;
 using WhiteCore.Framework.Utilities;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using System;
-using System.Collections.Generic;
 using GridRegion = WhiteCore.Framework.Services.GridRegion;
 
 namespace WhiteCore.Framework.SceneInfo
@@ -223,17 +222,10 @@ namespace WhiteCore.Framework.SceneInfo
 
         public delegate void FinishedStartup(string name, List<string> data);
 
-        public delegate void PhysicsRequestAsset(UUID assetID, AssetReceivedDelegate callback);
-
-        public delegate void AssetReceivedDelegate(AssetBase asset);
-
         public delegate void StartupComplete(IScene scene, List<string> data);
 
         public event FinishedStartup OnModuleFinishedStartup;
         public event AddToStartupQueue OnAddToStartupQueue;
-
-        public event PhysicsRequestAsset OnPhysicsRequestAsset;
-        public event AssetReceivedDelegate OnAssetReceivedDelegate;
 
         public event StartupComplete OnStartupComplete;
         //This is called after OnStartupComplete is done, it should ONLY be registered to the Scene

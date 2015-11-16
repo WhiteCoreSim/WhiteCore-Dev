@@ -869,7 +869,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 entprop.Position = _position;
             }
 
-            // animaton checks
+            // animation checks
             const float POSITION_TOLERANCE = 5.0f;
             float VELOCITY_TOLERANCE = 0.025f * 0.025f;
             if (PhysicsScene.TimeDilation < 0.5)

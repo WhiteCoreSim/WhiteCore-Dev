@@ -31,7 +31,6 @@ using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
-using WhiteCore.Framework.Services.ClassHelpers.Assets;
 
 namespace WhiteCore.Framework.Physics
 {
@@ -39,10 +38,6 @@ namespace WhiteCore.Framework.Physics
         bool hitYN, Vector3 collisionPoint, uint localid, float distance, Vector3 normal);
 
     public delegate void RayCallback(List<ContactResult> list);
-
-    public delegate void RequestAssetDelegate(UUID assetID, EventManager.AssetReceivedDelegate callback);
-
-    public delegate void AssetReceivedDelegate(AssetBase asset);
 
     /// <summary>
     /// Contact result from a raycast.
@@ -114,7 +109,7 @@ namespace WhiteCore.Framework.Physics
 
         /// <summary>
         /// A unique identifying string for this instance of the physics engine.
-        /// Useful in debug messages to distinguish one OdeScene instance from another.
+        /// Useful in debug messages to distinguish one Scene instance from another.
         /// Usually set to include the region name that the physics engine is acting for.
         /// </summary>
         public string PhysicsSceneName { get; protected set; }
@@ -126,9 +121,6 @@ namespace WhiteCore.Framework.Physics
         /// TODO!!!!!
         /// public abstract string EngineType { get; protected set; }
         public abstract string EngineType { get; }
-
-        public RequestAssetDelegate RequetAssetMethod { get; set; }
-
 
 
         public abstract PhysicsActor AddAvatar(string avName, Vector3 position, Quaternion rotation, Vector3 size,
@@ -224,7 +216,7 @@ namespace WhiteCore.Framework.Physics
 
     public class NullPhysicsScene : PhysicsScene
     {
-        private static int m_workIndicator;
+        static int m_workIndicator;
 
         public override bool DisableCollisions
         {

@@ -34,6 +34,7 @@ using WhiteCore.Framework.Services.ClassHelpers.Assets;
 using WhiteCore.Physics.ConvexDecompositionDotNet;
 using WhiteCore.Physics.Meshing;
 using OMV = OpenMetaverse;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Physics.BulletSPlugin
 {
@@ -230,8 +231,9 @@ namespace WhiteCore.Physics.BulletSPlugin
         //     just return.
         public static BulletShape VerifyMeshCreated(BSScene physicsScene, BulletShape newShape, BSPhysObject prim)
         {
-            // If the shape was sueccessfully created, nothing more to do
-            if (newShape.HasPhysicalShape) return newShape;
+            // If the shape was successfully created, nothing more to do
+            if (newShape.HasPhysicalShape)
+                return newShape;
 
             // VerifyMeshCreated is called after trying to create the mesh. If we think the asset had been
             //    fetched but we end up here again, the meshing of the asset must have failed.
@@ -247,83 +249,67 @@ namespace WhiteCore.Physics.BulletSPlugin
             else
             {
                 // If this mesh has an underlying asset and we have not failed getting it before, fetch the asset
-                if (prim.BaseShape.SculptEntry && !prim.AssetFailed() &&
-                    prim.PrimAssetState != BSPhysObject.PrimAssetCondition.Waiting &&
-                    prim.BaseShape.SculptTexture != OMV.UUID.Zero)
+                if (prim.BaseShape.SculptEntry
+                    && prim.PrimAssetState != BSPhysObject.PrimAssetCondition.FailedAssetFetch
+                    && prim.PrimAssetState != BSPhysObject.PrimAssetCondition.Waiting
+                    && prim.BaseShape.SculptTexture != OMV.UUID.Zero
+                )
                 {
-                    physicsScene.DetailLog("{0},BSShape.VerifyMeshCreated,fetchAsset,objNam={1},text={2}",
-                        prim.LocalID, prim.PhysObjectName, prim.BaseShape.SculptTexture);
+                    physicsScene.DetailLog("{0},BSShapeCollection.VerifyMeshCreated,fetchAsset", prim.LocalID);
                     // Multiple requestors will know we're waiting for this asset
                     prim.PrimAssetState = BSPhysObject.PrimAssetCondition.Waiting;
 
                     BSPhysObject xprim = prim;
-                    RequestAssetDelegate assetProvider = physicsScene.RequetAssetMethod;
-                    if (assetProvider != null)
-                    {
-                        var yprim = xprim; // probably not necessary, but, just in case.
-                        assetProvider(yprim.BaseShape.SculptTexture, delegate(AssetBase asset)
+                    Util.FireAndForget(delegate
                         {
-                            // physicsScene.DetailLog("{0},BSShape.VerifyMeshCreated,assetProviderCallback", xprim.LocalID);
-                            bool assetFound = false;
-                            string mismatchIDs = string.Empty; // DEBUG
-                            if (asset != null && yprim.BaseShape.SculptEntry)
-                            {
-                                yprim.BaseShape.SculptData = asset.Data;
-                                // This will cause the prim to see that the filler shape is not the right
-                                //    one and try again to build the object.
-                                // No race condition with the normal shape setting since the rebuild is at taint time.
-                                yprim.PrimAssetState = BSPhysObject.PrimAssetCondition.Fetched;
-                                yprim.ForceBodyShapeRebuild(false /* inTaintTime */);
-                                assetFound = true;
-                            }
-                            else
-                            {
-                                mismatchIDs = yprim.BaseShape.SculptTexture + "/" + asset.ID;
-                            }
-                            if (!assetFound)
-                            {
-                                yprim.PrimAssetState = BSPhysObject.PrimAssetCondition.FailedAssetFetch;
-                            }
-                            physicsScene.DetailLog(
-                                "{0},BSShape.VerifyMeshCreated,fetchAssetCallback,found={1},isSculpt={2},ids={3}",
-                                yprim.LocalID, assetFound, yprim.BaseShape.SculptEntry, mismatchIDs);
+                            BSPhysObject yprim = xprim; // probably not necessary, but, just in case.
+                            physicsScene.Scene.AssetService.Get(yprim.BaseShape.SculptTexture.ToString(), null,
+                                delegate(string id, Object sender, AssetBase asset)
+                                {
+                                    bool assetFound = false;
+                                    string mismatchIDs = String.Empty; // DEBUG DEBUG
+                                    if (asset != null && yprim.BaseShape.SculptEntry)
+                                    {
+                                        if (yprim.BaseShape.SculptTexture == asset.ID)
+                                        {
+                                            yprim.BaseShape.SculptData = asset.Data;
+                                            // This will cause the prim to see that the filler shape is not the right
+                                            //    one and try again to build the object.
+                                            // No race condition with the normal shape setting since the rebuild is at taint time.
+                                            yprim.ForceBodyShapeRebuild(false /* inTaintTime */);
+                                            assetFound = true;
+                                        }
+                                        else
+                                        {
+                                            mismatchIDs = yprim.BaseShape.SculptTexture + "/" + asset.ID;
+                                        }
+                                    }
+                                    if (assetFound)
+                                        yprim.PrimAssetState = BSPhysObject.PrimAssetCondition.Fetched;
+                                    else
+                                        yprim.PrimAssetState = BSPhysObject.PrimAssetCondition.FailedAssetFetch;
+                                    physicsScene.DetailLog("{0},BSShapeCollection,fetchAssetCallback,found={1},isSculpt={2},ids={3}",
+                                        yprim.LocalID, assetFound, yprim.BaseShape.SculptEntry, mismatchIDs);
+                                });
                         });
-                    }
-                    else
-                    {
-                        xprim.PrimAssetState = BSPhysObject.PrimAssetCondition.FailedAssetFetch;
-                        physicsScene.Logger.ErrorFormat(
-                            "{0} Physical object requires asset but no asset provider. Name={1}",
-                            LogHeader, physicsScene.PhysicsSceneName);
-                    }
                 }
                 else
                 {
                     if (prim.PrimAssetState == BSPhysObject.PrimAssetCondition.FailedAssetFetch)
                     {
-                        physicsScene.Logger.WarnFormat("{0} Mesh failed to fetch asset. prim={1}, texture={2}",
-                            LogHeader, UsefulPrimInfo(physicsScene, prim), prim.BaseShape.SculptTexture);
-                        physicsScene.DetailLog("{0},BSShape.VerifyMeshCreated,wasFailed,prim={1},tex={2}",
-                            prim.LocalID, UsefulPrimInfo(physicsScene, prim), prim.BaseShape.SculptTexture);
-                    }
-                    if (prim.PrimAssetState == BSPhysObject.PrimAssetCondition.FailedMeshing)
-                    {
-                        physicsScene.Logger.WarnFormat("{0} Mesh asset would not mesh. prim={1}, texture={2}",
-                            LogHeader, UsefulPrimInfo(physicsScene, prim), prim.BaseShape.SculptTexture);
-                        physicsScene.DetailLog("{0},BSShape.VerifyMeshCreated,wasFailedMeshing,prim={1},tex={2}",
-                            prim.LocalID, UsefulPrimInfo(physicsScene, prim), prim.BaseShape.SculptTexture);
+                        physicsScene.Logger.WarnFormat("{0} Mesh failed to fetch asset. obj={1}, texture={2}",
+                            LogHeader, prim.PhysObjectName, prim.BaseShape.SculptTexture);
                     }
                 }
             }
 
             // While we wait for the mesh defining asset to be loaded, stick in a simple box for the object.
-            BSShape fillShape = BSShapeNative.GetReference(physicsScene, prim, BSPhysicsShapeType.SHAPE_BOX,
-                FixedShapeKey.KEY_BOX);
+            BSShape fillShape = BSShapeNative.GetReference(physicsScene, prim, BSPhysicsShapeType.SHAPE_BOX, FixedShapeKey.KEY_BOX);
             physicsScene.DetailLog("{0},BSShape.VerifyMeshCreated,boxTempShape", prim.LocalID);
 
             return fillShape.physShapeInfo;
         }
-
+ 
         public static string UsefulPrimInfo(BSScene pScene, BSPhysObject prim)
         {
             StringBuilder buff = new StringBuilder(prim.PhysObjectName);
