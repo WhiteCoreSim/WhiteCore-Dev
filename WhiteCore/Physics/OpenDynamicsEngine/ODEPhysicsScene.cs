@@ -239,6 +239,8 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         /// </summary>
         public ODEPhysicsScene()
         {
+            MainConsole.Instance.WarnFormat("[PHYSICS]: Selected engine -> Open Dynamics");
+
             nearCallback = IsNearBody;
             // Create the world and the first space
             world = d.WorldCreate();
