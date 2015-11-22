@@ -15,7 +15,7 @@
         <NoStdLib>false</NoStdLib>
       </Options>
     </Configuration>
-    <Configuration name="Debug" platform="AnyCPU">
+    <Configuration name="Debug" platform="x86">
       <Options>
         <CompilerDefines>TRACE;DEBUG</CompilerDefines>
         <OptimizeCode>false</OptimizeCode>
@@ -42,23 +42,8 @@
         <IncrementalBuild>true</IncrementalBuild>
         <NoStdLib>false</NoStdLib>
       </Options>
-    </Configuration>
+    </Configuration>	
     <Configuration name="Release" platform="x86">
-      <Options>
-        <CompilerDefines></CompilerDefines>
-        <OptimizeCode>true</OptimizeCode>
-        <CheckUnderflowOverflow>false</CheckUnderflowOverflow>
-        <AllowUnsafe>true</AllowUnsafe>
-        <WarningLevel>4</WarningLevel>
-        <WarningsAsErrors>false</WarningsAsErrors>
-        <SuppressWarnings/>
-        <OutputPath>bin</OutputPath>
-        <DebugInformation>false</DebugInformation>
-        <IncrementalBuild>true</IncrementalBuild>
-        <NoStdLib>false</NoStdLib>
-      </Options>
-    </Configuration>
-    <Configuration name="Release" platform="AnyCPU">
       <Options>
         <CompilerDefines></CompilerDefines>
         <OptimizeCode>true</OptimizeCode>
@@ -1529,7 +1514,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_5" name="WhiteCore.Services.WebAPI" path="WhiteCore/Services/WebAPI" type="Library">
+    <Project frameworkVersion="v4_5" name="WhiteCore.Services.API" path="WhiteCore/Services/API" type="Library">
       <Configuration name="Debug" platform="x86">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>

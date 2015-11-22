@@ -34,7 +34,7 @@ using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
 
-namespace WhiteCore.Services.WebAPI
+namespace WhiteCore.Services.API.WebAPI
 {
 	public class CurrencyAPI : IService
 	{

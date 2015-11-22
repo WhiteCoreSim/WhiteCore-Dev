@@ -24,38 +24,3 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
- 
-using System.IO;
-using System.Text;
-using Nini.Config;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.Servers;
-using WhiteCore.Framework.Servers.HttpServer;
-using WhiteCore.Framework.Servers.HttpServer.Implementation;
-using WhiteCore.Framework.Services;
-
-namespace WhiteCore.Services.WebAPI
-{
-	public class ClassifiedAPI : IService
-	{
-		#region IService implementation
-		public void Initialize(IConfigSource config, IRegistryCore registry)
-		{
-		}
-        
-		public void Start(IConfigSource config, IRegistryCore registry)
-		{
-			MainServer.Instance.AddStreamHandler(new GenericStreamHandler("GET", "/API/Classifieds/", HandleClassifieds));
-		}
-        
-		public void FinishedStartup()
-		{
-		}
-		#endregion
-        
-		public byte[] HandleClassifieds(string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
-		{
-			return Encoding.UTF8.GetBytes("");
-		}
-	}
-}
