@@ -193,14 +193,27 @@ namespace WhiteCore.Modules.Gods
             if (!client.Scene.Permissions.IsGod (client.AgentId))
                 return;
 
+            string oldRegionName = client.Scene.RegionInfo.RegionName;
             //Update their current region with new information
-            client.Scene.RegionInfo.RegionName = Utils.BytesToString (SimName);
+            if (Utils.BytesToString (SimName) != oldRegionName)
+            {
+            	client.Scene.RegionInfo.RegionName = Utils.BytesToString (SimName);
+            	MainConsole.Instance.InfoFormat("[REGION GOD] Region {0} has been renamed to {1}", oldRegionName, Utils.BytesToString (SimName));
+            }
 
+            // Save the old region locations
+            int oldRegionLocX = client.Scene.RegionInfo.RegionLocX;
+            int oldRegionLocY = client.Scene.RegionInfo.RegionLocY;
+            
             //Set the region loc X and Y
             if (RedirectX != 0)
                 client.Scene.RegionInfo.RegionLocX = RedirectX * Constants.RegionSize;
             if (RedirectY != 0)
                 client.Scene.RegionInfo.RegionLocY = RedirectY * Constants.RegionSize;
+            
+            MainConsole.Instance.InfoFormat("[REGION GOD] Region {0} has been moved from {1},{2} to {3},{4}", 
+                                            client.Scene.RegionInfo.RegionName,(oldRegionLocX/Constants.RegionSize), (oldRegionLocY/Constants.RegionSize),
+                                                 (client.Scene.RegionInfo.RegionLocX/Constants.RegionSize), (client.Scene.RegionInfo.RegionLocY/Constants.RegionSize));
 
             //Update the estate ID
             if (client.Scene.RegionInfo.EstateSettings.EstateID != EstateID)
