@@ -32,11 +32,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 
-[assembly: AssemblyTitle("WhiteCore.Services.WebAPI")]
+[assembly: AssemblyTitle("WhiteCore.Services.API")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("WhiteCore.Services.WebAPI")]
+[assembly: AssemblyProduct("WhiteCore.Services.API")]
 [assembly: AssemblyCopyright("Copyright © 2014-2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
