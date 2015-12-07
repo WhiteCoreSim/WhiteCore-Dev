@@ -8,32 +8,44 @@ For the standard 'Standalone' configuration
 
 Directory: Config/Sim
 *********
-	
- /Data/MySql.ini :	Change the MySql connection details to your setup - This is for the Simulator services
-					 
- 					ConnectionString = "Data Source=127.0.0.1;Port=3306;Database=<whitecore databasename>;User ID=<database user>;Password=<user password>;"
-   
-   <whitecore databasename> :  The database name that you have created 
-   <database user>			:  The user that has permission to access the <whitecore databasename>
-   <user password>			:  The password for the whitecore user
 
-								  
- 
+# If you are using MySql or MariaDB as your database #
+ /Data/MySql.ini :	Change the MySql connection details to your setup - This is for the Simulator services
+
+ 	  ConnectionString = "Data Source=127.0.0.1;Port=3306;Database=<whitecore databasename>;User ID=<database user>;Password=<user password>;Charset=utf8;"
+
+	  <Data Source>            :  The Url or IP address of the server (e.g. mysql.mydomain.com / 192.168.1.200)
+	  <Port>                   :  The default standard is 3306, change if your server has been configured to listen on another port
+    <whitecore databasename> :  The database name that you have created
+    <database user>			     :  The user that has permission to access the <whitecore databasename>
+    <user password>			     :  The password for the whitecore user
+		<Charset>                :  This should be left as utf8
+
+
+# Simulator Names #
  /Standalone/GridInfoService.ini : Change the grid name and nickname
-	        gridname = "WhiteCore Sim Sandbox"
-            gridnick = "WhiteCoreSim"
- 		   
+      gridname = "WhiteCore Sim Sandbox"
+      gridnick = "WhiteCoreSim"
+
  /Standalone/StandaloneCommon.ini : Change the welcome message sent to the viewer on login
  			WelcomeMessage = "Welcome to the WhiteCore Sim Sandbox, <USERNAME>!"
- 
- /WhiteCore.ini : 
- 	If your viewer stalls on login You may need to specify the internal_ip
-			internal_ip = "127.0.0.1"
-	To use the external address of your system, comment thie hostname entry out
- 			Add comment ';' -> ;HostName = 127.0.0.1 
-			
-			
-			
+
+
+# Simulator host address #
+ /WhiteCore.ini :
+	To automatically find the external address of your system, comment this hostname entry out (default)
+ 			Add comment ';' -> ;HostName = 127.0.0.1
+
+	To specify a hostname for the simulator
+	    HostName = whitecore.mydomain.com     (Replace with your registered domain name)
+
+	To Use the local IP address of the system you are running on
+			HostName = localip
+
+	To use as specific IP address for network or multi adapter setups
+			HostName = 192.168.1.200 (replace with the required IP address)
+
+
 Grid Mode setup
 ===============
 
@@ -42,39 +54,45 @@ To change to a grid mode setup, modify the following...
 Directory:  Config/Grid/ServerConfiguration
 **********
 
- /Data/MySql.ini :	Change the MySql connection details to your setup 
+# If you are using MySql or MariaDB as your database #
+ /Data/MySql.ini :	Change the MySql connection details to your setup
  					- This is for the grid services and normally is the same as per the Simulator service configuration
-					If required, it can be different.
- 					
-					ConnectionString = "Data Source=127.0.0.1;Port=3306;Database=<whitecore databasename>;User ID=<database user>;Password=<user password>;"
-   
-   <whitecore databasename> :  The database name that you have created 
-   <database user>			:  The user that has permission to access the <whitecore databasename>
-   <user password>			:  The password for the whitecore user
 
+			ConnectionString = "Data Source=127.0.0.1;Port=3306;Database=<whitecore databasename>;User ID=<database user>;Password=<user password>;Charset=utf8;"
+
+	 <Data Source>            :  The Url or IP address of the server (e.g. mysql.mydomain.com / 192.168.1.200)
+	 <Port>                   :  The default standard is 3306, change if your server has been configured to listen on another port
+   <whitecore databasename> :  The database name that you have created
+   <database user>			    :  The user that has permission to access the <whitecore databasename>
+   <user password>			    :  The password for the whitecore user
+   <Charset>                :  This should be left as utf8
+
+
+# Grid Names #
 /GridInfoService.ini : Change the grid name and nickname
     gridname = "WhiteCore Sim Sandbox"
     gridnick = "WhiteCoreSim"
-	
+
 /Login.ini : The welcome message sent to a viewer on login
     WelcomeMessage = "Welcome to the WhiteCore Sim Sandbox, <USERNAME>!"
 
 
 You need to change the simulator setup from Standalone to grid mode
- 
+
 Directory: Config/Sim
 *********
 
   /Main.ini : change includes from Standalone to Grid mode
-	    	Add comment    ';' ->	 ;Include-Standalone = Configuration/Standalone/StandaloneCommon.ini
-			Remove comment ';' ->    Include-Grid = Configuration/Grid/WhiteCoreGridCommon.ini
+	    	Add comment   ';' ->	 ;Include-Standalone = Configuration/Standalone/StandaloneCommon.ini
+			Remove comment  ';' ->    Include-Grid = Configuration/Grid/WhiteCoreGridCommon.ini
 
  /Grid/GridCommon.ini :  If you are not running the Grid services on the same system as the simulator, you
  								  will need to change the Address of where to find the GridServerURI.
 								  (Please leave the port as 8012)
-						
-						e.g.	  [Configuration]
-								      GridServerURI = "http://127.0.0.1:8012/grid/"
+
+		[Configuration]
+		GridServerURI = "http://127.0.0.1:8012/grid/"
+
 
 Advanced configuration
 ======================
@@ -89,7 +107,6 @@ Questions?
 Checkout http://whitecore-sim.org, catch me on the '#whitecore-support' irc channel on freenode,
 or check into the Google+ group at https://plus.google.com/communitites/113034607546142208907
 
-
 Rowan
 <greythane@gmail.com>
-June 2014
+December 2015

@@ -1,22 +1,39 @@
-To run WhiteCore in Grid mode on your local, internal network ip address, you need to specify the HostName address for both the Grid and region server.
+Running a WhiteCore grid locally
 
-Using 10.0.1.5 as the example local IP, but you should change it to your own, if it's different (e.g 192.168.0.100 etc.).
+(Additional details are provided in 'Customising.txt')
+
+To run WhiteCore in Grid mode on your local, internal network ip address,
+ you need to specify the HostName address for both the Grid and region server.
+
+There are two methods to use
+  1. Automatic detection of your local IP address
+  2. Specifying an IP address
+
+  Using 10.0.1.5 as the example local IP, but you should change it to your own,
+  if it's different (e.g 192.168.0.100 etc.).
 
 #
 # Grid Configuration:
 #
 
-Set the HostName under the [Network] section in the WhiteCore.Server.ini, removing the 'comment' character if necessary.
-e.g. HostName = 10.0.1.5
+Set the HostName under the [Network] section in 'Config/WhiteCore.Server.ini' ,
+ removing the 'comment' character if necessary.
+examples:
+  HostName = localip          // preferred automatic detection
+  HostName = 10.0.1.5         // required if your system has multiple IP address allocations
 
 #
-# Local Region server only: 
+# Local Region server only:
 #
 
-Set the HostName under the [Network] section in WhiteCore.ini, removing the 'comment' character if necessary.
-e.g. HostName = 10.0.1.5
+Set the HostName under the [Network] section in 'Config/WhiteCore.ini' ,
+ removing the 'comment' character if necessary.
+examples:
+HostName = localip          // preferred automatic detection
+HostName = 10.0.1.5         // required if your system has multiple IP address allocations
 
-Specify grid mode operation in Config/Sim/Main.ini by commenting the Includes-Standalone and uncommenting the Includes-Grid lines
+Specify grid mode operation in 'Config/Sim/Main.ini' by commenting the
+ 'Includes-Standalone' and uncommenting the 'Includes-Grid' lines
 
 e.g.
     ;Include-Standalone = Sim/Standalone/StandaloneCommon.ini
