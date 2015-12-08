@@ -507,8 +507,9 @@ namespace WhiteCore.Framework.ConsoleFramework
                 if (unquoted[index].StartsWith("/") || startingIndex >= 0)
                 {
                     startingIndex = index;
-                    if (unquoted[index] != "")
-                        result.Add(unquoted[index]);
+                    string qstr = unquoted [index].Trim();
+                    if (qstr != "")
+                        result.Add(qstr);
                 }
                 else
                 {
