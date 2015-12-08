@@ -476,7 +476,7 @@ namespace WhiteCore.Modules.Estate
             // check for passed estate name
             estateName = (cmd.Length < 4) 
                 ? MainConsole.Instance.Prompt ("Estate name to be updated") 
-                : cmd [2];
+                : cmd [3];
             if (estateName == "")
                 return;
 
@@ -497,7 +497,7 @@ namespace WhiteCore.Modules.Estate
                 estateOwner = MainConsole.Instance.Prompt ("New owner for this estate", ownerAccount.Name); 
             } else
             {
-                estateOwner = Util.CombineParams (cmd, 5); // in case of spaces in the name e.g. Allan Allard
+                estateOwner = Util.CombineParams (cmd, 4); // in case of spaces in the name e.g. Allan Allard
             }
             if (estateOwner == "")
                 return;
