@@ -26,52 +26,83 @@
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security;
 using System.Security.Permissions;
 using System.Security.Policy;
+using System.Threading;
 
 #if LINUX
-using System.Collections;
+//using System.Collections;
 using System.Net;
 #endif
 
 namespace WhiteCore.ScriptEngine.DotNetEngine
 {
-    /// <summary>
-    ///     This manages app domains and controls what app domains are created/destroyed
-    /// </summary>
     public class AppDomainManager
     {
-        private readonly List<AppDomainStructure> appDomains =
-            new List<AppDomainStructure>();
+        //
+        // This class does AppDomain handling and loading/unloading of
+        // scripts in it. It is instanced in "ScriptEngine" and controlled
+        // from "ScriptManager"
+        //
+        // 1. Create a new AppDomain if old one is full (or doesn't exist)
+        // 2. Load scripts into AppDomain
+        // 3. Unload scripts from AppDomain (stopping them and marking
+        //    them as inactive
+        // 4. Unload AppDomain completely when all scripts in it has stopped
 
+        int maxScriptsPerAppDomain = 1;
+
+        // Internal list of all AppDomains
+        List<AppDomainStructure> appDomains = new List<AppDomainStructure>();
+
+        // Structure to keep track of data around AppDomain
+        class AppDomainStructure
+        {
+            // The AppDomain itself
+            public AppDomain CurrentAppDomain;
+
+            // Number of scripts loaded into AppDomain
+            public int ScriptsLoaded;
+
+            // Number of dead scripts
+            public int ScriptsWaitingUnload;
+        }
+
+        AppDomainStructure currentAD;
+
+        object getLock = new object();  // Mutex
+        object freeLock = new object(); // Mutex
+
+        // not used ?? // readonly ScriptEngine m_scriptEngine;
+        //public AppDomainManager(ScriptEngine scriptEngine)
+        public AppDomainManager(ScriptEngine scriptEngine)
+        {
+            // not used?? //  m_scriptEngine = scriptEngine;
+            // ignored now 20151210 // ReadConfig();
+        }
+        
+        public int NumberOfAppDomains
+        {
+            get { return appDomains.Count; }
+        }
+
+        /* not used now
         private readonly object m_appDomainLock = new object();
-        private readonly ScriptEngine m_scriptEngine;
-        private int AppDomainNameCount;
-        private AppDomainStructure currentAD;
-
+        
         private bool loadAllScriptsIntoCurrentDomain;
         private bool loadAllScriptsIntoOneDomain = true;
         private string m_PermissionLevel = "Internet";
-        private int maxScriptsPerAppDomain = 1;
 
-        public AppDomainManager(ScriptEngine scriptEngine)
-        {
-            m_scriptEngine = scriptEngine;
-            ReadConfig();
-        }
 
         public string PermissionLevel
         {
             get { return m_PermissionLevel; }
         }
 
-        public int NumberOfAppDomains
-        {
-            get { return appDomains.Count; }
-        }
 
         // Internal list of all AppDomains
 
@@ -86,81 +117,50 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             loadAllScriptsIntoOneDomain = m_scriptEngine.ScriptConfigSource.GetBoolean(
                 "LoadAllScriptsIntoOneAppDomain", true);
         }
+        */
 
         // Find a free AppDomain, creating one if necessary
-        private AppDomainStructure GetFreeAppDomain()
+        AppDomainStructure GetFreeAppDomain()
         {
-            if (loadAllScriptsIntoCurrentDomain)
+            lock (getLock)
             {
-                if (currentAD != null)
-                    return currentAD;
-                else
+                // Current full?
+                if (currentAD != null && currentAD.ScriptsLoaded >= maxScriptsPerAppDomain)
                 {
-                    lock (m_appDomainLock)
-                    {
-                        currentAD = new AppDomainStructure {CurrentAppDomain = AppDomain.CurrentDomain};
-                        AppDomain.CurrentDomain.AssemblyResolve += m_scriptEngine.AssemblyResolver.OnAssemblyResolve;
-                        return currentAD;
-                    }
+                    // Add it to AppDomains list and empty current
+                    appDomains.Add(currentAD);
+                    currentAD = null;
                 }
-            }
-            lock (m_appDomainLock)
-            {
-                if (loadAllScriptsIntoOneDomain)
+                // No current
+                if (currentAD == null)
                 {
-                    if (currentAD == null)
-                    {
-                        // Create a new current AppDomain
-                        currentAD = new AppDomainStructure {CurrentAppDomain = PrepareNewAppDomain()};
-                    }
+                    // Create a new current AppDomain
+                    currentAD = new AppDomainStructure();
+                    currentAD.CurrentAppDomain = PrepareNewAppDomain();
                 }
-                else
-                {
-                    // Current full?
-                    if (currentAD != null &&
-                        currentAD.ScriptsLoaded >= maxScriptsPerAppDomain)
-                    {
-                        // Add it to AppDomains list and empty current
-                        lock (m_appDomainLock)
-                        {
-                            appDomains.Add(currentAD);
-                        }
-                        currentAD = null;
-                    }
-                    // No current
-                    if (currentAD == null)
-                    {
-                        // Create a new current AppDomain
-                        currentAD = new AppDomainStructure {CurrentAppDomain = PrepareNewAppDomain()};
-                    }
-                }
-            }
 
-            return currentAD;
+                return currentAD;
+            }
         }
 
+        int AppDomainNameCount;
+
         // Create and prepare a new AppDomain for scripts
-        private AppDomain PrepareNewAppDomain()
+        AppDomain PrepareNewAppDomain()
         {
             // Create and prepare a new AppDomain
             AppDomainNameCount++;
 
             // Construct and initialize settings for a second AppDomain.
-            AppDomainSetup ads = new AppDomainSetup
-                                     {
-                                         ApplicationBase = AppDomain.CurrentDomain.BaseDirectory,
-                                         DisallowBindingRedirects = true,
-                                         DisallowCodeDownload = true,
-                                         LoaderOptimization = LoaderOptimization.MultiDomainHost,
-                                         ShadowCopyFiles = "false",
-                                         ConfigurationFile = AppDomain.CurrentDomain.SetupInformation.ConfigurationFile
-                                     };
-            // Disable shadowing
+            AppDomainSetup ads = new AppDomainSetup();
+            ads.ApplicationBase = AppDomain.CurrentDomain.BaseDirectory;
+            ads.DisallowBindingRedirects = true;
+            ads.DisallowCodeDownload = true;
+            ads.LoaderOptimization = LoaderOptimization.MultiDomainHost;
+            ads.ShadowCopyFiles = "false"; // Disable shadowing
+            ads.ConfigurationFile = AppDomain.CurrentDomain.SetupInformation.ConfigurationFile;
 
-            AppDomain AD = CreateRestrictedDomain(m_PermissionLevel,
-                                                  "ScriptAppDomain_" + AppDomainNameCount, ads);
-
-            AD.AssemblyResolve += m_scriptEngine.AssemblyResolver.OnAssemblyResolve;
+            AppDomain AD = AppDomain.CreateDomain("ScriptAppDomain_" + AppDomainNameCount, null, ads);
 
             // Return the new AppDomain
             return AD;
@@ -284,48 +284,25 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         }
 
         // Unload appdomains that are full and have only dead scripts
-        private void UnloadAppDomains()
+        void UnloadAppDomains()
         {
-            lock (m_appDomainLock)
+            lock (freeLock)
             {
                 // Go through all
-
-                foreach (
-                    AppDomainStructure ads in appDomains.Where(ads => ads.ScriptsLoaded <= ads.ScriptsWaitingUnload))
+                foreach (AppDomainStructure ads in new ArrayList(appDomains))
                 {
-                    // Remove from internal list
-                    appDomains.Remove(ads);
-
-                    try
+                    // Don't process current AppDomain
+                    if (ads.CurrentAppDomain != currentAD.CurrentAppDomain)
                     {
-                        // Unload
-                        if (ads != null) AppDomain.Unload(ads.CurrentAppDomain);
-                    }
-                    catch
-                    {
-                    }
-                    if (ads.CurrentAppDomain == currentAD.CurrentAppDomain)
-                        currentAD = null;
-                    ads.CurrentAppDomain = null;
-                }
-
-                if (currentAD != null)
-                {
-                    if (currentAD.ScriptsLoaded <= currentAD.ScriptsWaitingUnload)
-                    {
-                        if (currentAD.CurrentAppDomain.Id != AppDomain.CurrentDomain.Id)
-                            //Don't kill the current app domain!
+                        // Not current AppDomain
+                        // Is number of unloaded bigger or equal to number of loaded?
+                        if (ads.ScriptsLoaded <= ads.ScriptsWaitingUnload)
                         {
-                            try
-                            {
-                                // Unload
-                                AppDomain.Unload(currentAD.CurrentAppDomain);
-                            }
-                            catch
-                            {
-                            }
-                            currentAD.CurrentAppDomain = null;
-                            currentAD = null;
+                            // Remove from internal list
+                            appDomains.Remove(ads);
+
+                            // Unload
+                            AppDomain.Unload(ads.CurrentAppDomain);
                         }
                     }
                 }
@@ -349,18 +326,20 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         // Increase "dead script" counter for an AppDomain
         public void UnloadScriptAppDomain(AppDomain ad)
         {
-            lock (m_appDomainLock)
+            lock (freeLock)
             {
                 // Check if it is current AppDomain
                 if (currentAD.CurrentAppDomain == ad)
                 {
                     // Yes - increase
                     currentAD.ScriptsWaitingUnload++;
+                    return;
                 }
-                else
+
+                // Loop through all AppDomains
+                foreach (AppDomainStructure ads in new ArrayList(appDomains))
                 {
-                    // Lopp through all AppDomains
-                    foreach (AppDomainStructure ads in appDomains.Where(ads => ads.CurrentAppDomain == ad))
+                    if (ads.CurrentAppDomain == ad)
                     {
                         // Found it
                         ads.ScriptsWaitingUnload++;
@@ -372,20 +351,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             UnloadAppDomains(); // Outsite lock, has its own GetLock
         }
 
-        #region Nested type: AppDomainStructure
-
-        private class AppDomainStructure
+        // If set to true then threads and stuff should try
+        // to make a graceful exit
+        public bool PleaseShutdown
         {
-            // The AppDomain itself
-            public AppDomain CurrentAppDomain;
-
-            // Number of scripts loaded into AppDomain
-            public int ScriptsLoaded;
-
-            // Number of dead scripts
-            public int ScriptsWaitingUnload;
+            get { return _PleaseShutdown; }
+            set { _PleaseShutdown = value; }
         }
 
-        #endregion
+        bool _PleaseShutdown = false;
     }
 }

@@ -483,7 +483,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             MainConsole.Instance.CleanInfo ("    Max allowed threat level: " + ScriptProtection.GetThreatLevel ());
             MainConsole.Instance.CleanInfo ("    Number of scripts running now: " + ScriptProtection.GetAllScripts ().Length);
             MainConsole.Instance.CleanInfo ("    Number of app domains: " + AppDomainManager.NumberOfAppDomains);
-            MainConsole.Instance.CleanInfo ("    Permission level of app domains: " + AppDomainManager.PermissionLevel);
+//            MainConsole.Instance.CleanInfo ("    Permission level of app domains: " + AppDomainManager.PermissionLevel);
             MainConsole.Instance.CleanInfo ("    Number Script Event threads: " +
                                       (MaintenanceThread.scriptThreadpool == null
                                            ? 0
