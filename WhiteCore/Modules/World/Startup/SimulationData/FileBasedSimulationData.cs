@@ -49,6 +49,7 @@ namespace WhiteCore.Modules
     public class FileBasedSimulationData : ISimulationDataStore, IDisposable
     {
         protected Timer m_backupSaveTimer;
+        protected Timer m_saveTimer;
 
         protected string m_fileName = "";
         protected string m_storeDirectory = "";
@@ -61,7 +62,6 @@ namespace WhiteCore.Modules
         protected bool m_saveBackups;
         protected int m_removeArchiveDays = 30;
         protected bool m_saveChanges = true;
-        protected Timer m_saveTimer;
         protected IScene m_scene;
         protected int m_timeBetweenBackupSaves = 1440; //One day
         protected int m_timeBetweenSaves = 5;
@@ -131,8 +131,10 @@ namespace WhiteCore.Modules
         public virtual List<string> FindRegionInfos(out bool newRegion, ISimulationBase simBase)
         {
 			ReadConfig(simBase);
-			MainConsole.Instance.Info("Looking for previous regions in: "+ m_storeDirectory);
-
+			MainConsole.Instance.Info("Retrieving region data from: "+ m_storeDirectory);
+            if (m_keepOldSave)
+                MainConsole.Instance.Info("Region archives saved to:    "+ m_oldSaveDirectory);
+            
 			List<string> regions = new List<string>(Directory.GetFiles(m_storeDirectory, "*.sim", SearchOption.TopDirectoryOnly));
             newRegion = regions.Count == 0;
             List<string> retVals = new List<string>();
@@ -173,10 +175,7 @@ namespace WhiteCore.Modules
             if (m_oldSaveDirectory == "")
                 return null;
 
-            MainConsole.Instance.Info("Looking for sim backups in: "+ m_oldSaveDirectory);
             List<string> archives = new List<string>(Directory.GetFiles(m_oldSaveDirectory, "*.sim", SearchOption.TopDirectoryOnly));
-            MainConsole.Instance.InfoFormat ("Found {0} archive files", archives.Count);
-
             return archives;
         }
 
@@ -972,7 +971,7 @@ namespace WhiteCore.Modules
                     PathHelpers.ComputeFullPath(config.GetString("PreviousBackupDirectory", m_oldSaveDirectory));
                 if (m_oldSaveDirectory == "")
                     m_oldSaveDirectory = Path.Combine(defaultDataPath, "RegionBak");
-
+                        
                 m_removeArchiveDays = config.GetInt("ArchiveDays", m_removeArchiveDays);
                                
 
@@ -1000,7 +999,7 @@ namespace WhiteCore.Modules
 
             if (m_saveChanges && m_timeBetweenBackupSaves != 0)
             {
-                m_backupSaveTimer = new Timer(m_timeBetweenBackupSaves*60*1000);
+                m_backupSaveTimer = new Timer(m_timeBetweenBackupSaves*60*1000 + 5000);
                 m_backupSaveTimer.Elapsed += m_backupSaveTimer_Elapsed;
                 m_backupSaveTimer.Start();
             }
@@ -1077,20 +1076,28 @@ namespace WhiteCore.Modules
             }
             catch (Exception ex)
             {
-                MainConsole.Instance.Error("[FileBasedSimulationData]: Failed to save backup, exception occurred " + ex);
+                MainConsole.Instance.Error("[FileBasedSimulationData]: Failed to save archive, exception occurred " + ex);
             }
         }
 
         public void DeleteUpOldArchives(int daysOld)
         {
-
+            if (m_scene == null)
+                return;
+            
             if (daysOld < 0)
                 return;
 
-            var regionArchives = FindBackupRegionFiles();
+            var simRegion = m_scene.RegionInfo.RegionName;
+            if (String.IsNullOrEmpty (simRegion))
+                return;
+
+            var regionArchives = FindRegionBackupFiles(simRegion);
             if (regionArchives.Count == 0)
                 return;
 
+            MainConsole.Instance.InfoFormat ("Found {0} archive files", regionArchives.Count);
+            
             int removed = 0;
             DateTime archiveDate = DateTime.Today.AddDays(-daysOld);
 
