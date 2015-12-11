@@ -135,6 +135,13 @@ namespace WhiteCore.Modules.Estate
                     CreateEstateCommand, false, true);
 
                 MainConsole.Instance.Commands.AddCommand (
+                    "delete estate",
+                    "delete estate [name]",
+                    "Deletes an estate with the specified name."
+                    + "\n    The Estate must have no associated regions.",
+                    DeleteEstateCommand, false, true);
+
+                MainConsole.Instance.Commands.AddCommand (
                     "set estate owner",
                     "set estate owner [<estate-name> [owner (<Firstname> <Lastname>) ]]",
                     "Sets the owner of the specified estate to the specified user. ",
@@ -393,7 +400,7 @@ namespace WhiteCore.Modules.Estate
             // verify that the estate does not already exist
             if (estateConnector.EstateExists (estateName))
             {
-                MainConsole.Instance.ErrorFormat ("EstateService]: The estate '{0}' already exists!", estateName);
+                MainConsole.Instance.ErrorFormat ("[EstateService]: The estate '{0}' already exists!", estateName);
                 return;
             }
 
@@ -464,6 +471,53 @@ namespace WhiteCore.Modules.Estate
                 MainConsole.Instance.InfoFormat ("[EstateService]: The estate '{0}' owned by '{1}' has been created.", estateName, estateOwner);
         }
 
+        protected void DeleteEstateCommand (IScene scene, string[] cmd)
+        {
+            IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
+
+            string estateName = "";
+
+            // check for passed estate name
+            estateName = (cmd.Length < 3) 
+                ? MainConsole.Instance.Prompt ("Estate name: ") 
+                : Util.CombineParams (cmd, 2);
+            if (estateName == "")
+                return;
+
+            // verify that the estate does exist
+
+            EstateSettings ES = estateConnector.GetEstateSettings(estateName);
+            if (ES == null)
+            {
+                MainConsole.Instance.ErrorFormat ("[EstateService]: The estate '{0}' does not exist!", estateName);
+                return;
+            }
+
+            // check for bogies...
+            if (Utilities.IsSystemUser (ES.EstateOwner))
+            {
+                MainConsole.Instance.Info ("[EstateService]: Tsk, tsk.  System estates should not be deleted!");
+                return;
+            }
+
+            // check for linked regions
+            var regions = estateConnector.GetRegions((int)ES.EstateID);
+            if (regions.Count > 0)
+            {
+                MainConsole.Instance.InfoFormat ("[EstateService]: The estate '{0}' has {1} associated regions. These must be unlinked before deletion!",
+                    estateName, regions.Count);
+                return;
+            }
+
+            var okDelete = MainConsole.Instance.Prompt("Delete estate '" + estateName + "'. Are you sure? (yes/no)","no").ToLower() == "yes";
+            if (okDelete)
+            {
+                estateConnector.DeleteEstate((int) ES.EstateID);
+                MainConsole.Instance.Warn (estateName + " has been deleted");
+             } else
+                MainConsole.Instance.InfoFormat ("[EstateService]: The estate '{0}' has not been deleted.", estateName);
+        }
+
         protected void SetEstateOwnerCommand (IScene scene, string[] cmd)
         {
             IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
@@ -474,9 +528,9 @@ namespace WhiteCore.Modules.Estate
             UserAccount ownerAccount;
 
             // check for passed estate name
-            estateName = (cmd.Length < 4) 
-                ? MainConsole.Instance.Prompt ("Estate name to be updated") 
-                : cmd [3];
+            estateName = (cmd.Length < 3) 
+                ? MainConsole.Instance.Prompt ("Estate to be deleted?") 
+                : cmd [2];
             if (estateName == "")
                 return;
 
@@ -497,7 +551,7 @@ namespace WhiteCore.Modules.Estate
                 estateOwner = MainConsole.Instance.Prompt ("New owner for this estate", ownerAccount.Name); 
             } else
             {
-                estateOwner = Util.CombineParams (cmd, 4); // in case of spaces in the name e.g. Allan Allard
+                estateOwner = Util.CombineParams (cmd, 5); // in case of spaces in the name e.g. Allan Allard
             }
             if (estateOwner == "")
                 return;
@@ -560,7 +614,15 @@ namespace WhiteCore.Modules.Estate
             MainConsole.Instance.InfoFormat ("[EstateService]: Estate '{0}' changed to '{1}'", estateName, estateNewName);
         }
 
-
+        void UpdateConsoleRegionEstate(string regionName, EstateSettings estateSettings)
+        {
+            for (int idx = 0; idx < MainConsole.Instance.ConsoleScenes.Count; idx ++)
+            {
+                if (MainConsole.Instance.ConsoleScenes[idx].RegionInfo.RegionName == regionName)
+                        MainConsole.Instance.ConsoleScenes[idx].RegionInfo.EstateSettings = estateSettings;
+            }
+                    
+        }
 
         void EstateLinkRegionCommand (IScene scene, string[] cmd)
         {
@@ -604,6 +666,7 @@ namespace WhiteCore.Modules.Estate
             }
 
             // have all details.. do it...
+            regionName = region.RegionName;
             if (estateConnector.LinkRegion (region.RegionID, (int)ES.EstateID))
             {
                 // check for update..
@@ -611,7 +674,10 @@ namespace WhiteCore.Modules.Estate
                 if ((es == null) || (es.EstateID == 0))
                     MainConsole.Instance.Warn ("The region link failed, please try again soon.");
                 else
+                {
                     MainConsole.Instance.InfoFormat ("Region '{0}' is now attached to estate '{1}'", regionName, estateName);
+                    UpdateConsoleRegionEstate (regionName, es);        
+                }
             } else
                 MainConsole.Instance.Warn ("Joining the estate failed. Please try again.");
 
@@ -657,6 +723,15 @@ namespace WhiteCore.Modules.Estate
                 MainConsole.Instance.ErrorFormat ("[EstateService]: The requested region '{0}' does not exist!", regionName);
                 return;
             }
+            regionName = region.RegionName;
+
+            // verify that the region is actually part of the estate
+            if(!estateConnector.EstateRegionExists ((int)ES.EstateID, region.RegionID))
+            {
+                MainConsole.Instance.ErrorFormat ("[EstateService]: The requested region '{0}' is not part of the '{1}' estate!",
+                    regionName, ES.EstateName);
+                return;
+            }
 
             // have all details.. do it...
             if (!estateConnector.DelinkRegion (region.RegionID))
@@ -666,15 +741,19 @@ namespace WhiteCore.Modules.Estate
             }
 
             // unlink was successful..
-            MainConsole.Instance.DebugFormat ("Region '{0}' has been removed from estate '{1}'", regionName, estateName);
+            MainConsole.Instance.InfoFormat ("Region '{0}' has been removed from estate '{1}'", 
+                regionName, estateName);
 
             //We really need to attach it to another estate though... 
             ISystemEstateService sysEstateInfo = m_registry.RequestModuleInterface<ISystemEstateService> ();
             ES = estateConnector.GetEstateSettings (sysEstateInfo.SystemEstateName);
             if (ES != null)
             if (estateConnector.LinkRegion (region.RegionID, (int)ES.EstateID))
-                MainConsole.Instance.Warn ("'" + regionName + "' has been placed in the '" +
-                sysEstateInfo.SystemEstateName + "' estate until re-assigned");
+            {
+                MainConsole.Instance.WarnFormat ("'{0}' has been placed in the '{1}' estate until re-assigned",
+                    regionName, sysEstateInfo.SystemEstateName);
+                UpdateConsoleRegionEstate (regionName, ES);        
+            }
 
         }
 

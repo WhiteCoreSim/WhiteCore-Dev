@@ -159,5 +159,14 @@ namespace WhiteCore.Framework.DatabaseInterfaces
         /// <returns><c>true</c>, if exists, <c>false</c> otherwise.</returns>
         /// <param name="name">Name.</param>
         bool EstateExists (string name);
+
+        /// <summary>
+        /// Cheks to see if region is part of an estate.
+        /// </summary>
+        /// <returns><c>true</c>, if region is part of estate, <c>false</c> otherwise.</returns>
+        /// <param name="estateID">Estate ID</param>
+        /// <param name="regionID">Region ID</param>
+        bool EstateRegionExists(int estateID, UUID regionID);
+
     }
 }
