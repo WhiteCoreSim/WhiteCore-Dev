@@ -229,7 +229,8 @@ namespace WhiteCore.Simulation.Base
 				        string.Format("==================== STARTING WhiteCore ({0}) ======================",
                               (IntPtr.Size == 4 ? "x86" : "x64")));
             MainConsole.Instance.Info("====================================================================");
-            MainConsole.Instance.Info("[WhiteCoreStartup]: Version: " + Version + "\n");
+            MainConsole.Instance.Info("[WhiteCoreStartup]: Version : " + Version + "\n");
+            MainConsole.Instance.Info("[WhiteCoreStartup]: Git Base: " + VersionInfo.GitVersion + "\n");
             if (Environment.Is64BitOperatingSystem)
                 MainConsole.Instance.Info("[WhiteCoreStartup]: Running on 64 bit architecture");
             // get memory allocation

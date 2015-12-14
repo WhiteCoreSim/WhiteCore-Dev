@@ -240,7 +240,8 @@ namespace WhiteCore.Simulation.Base
                 MainConsole.Instance.DefaultPrompt = m_consolePrompt;
                 MainConsole.Instance.Info(string.Format("[MINWhiteCore]: STARTING MIN WhiteCore ({0})...",
                                                         (IntPtr.Size == 4 ? "x86" : "x64")));
-                MainConsole.Instance.Info("[MINWhiteCore]: Version: " + Version + "\n");
+                MainConsole.Instance.Info("[MINWhiteCore]: Version : " + Version + "\n");
+                MainConsole.Instance.Info("[MINWhiteCore]: Git Base: " + VersionInfo.GitVersion + "\n");
             }
         }
 
