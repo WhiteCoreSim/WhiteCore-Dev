@@ -54,28 +54,32 @@ is set for Windows Firewall.  On to the Gateway stuff.......
 ##
 ## Changing your Internal IP to Static
 ##
-  When many people here the term Static IP they think you have to purchase this from your ISP.
+  When many people here the term Static IP they think you have to purchase this from your ISP.  
   For your external IP address to be static this is true.  However you can get a FQDN for this at
-  DynDNS.com.  They will give you one FQDN subdomain such as you.dyndns.org for free.
-
+  DynDNS.com or ddns.net.  They will give you one FQDN subdomain such as you.dyndns.org or you.ddns.net for free.
+  After you have obtained a FQDN you can usually insert this in your Modem/ Gateway depending on your router.
+  Again consult your modem/ router manuel for the instructions on how to accomplish this. 
+	  
   To establish and give your machine a static ip address on your local network on Windows is very simple.
   To do this follow these steps.
-      1. Go to http://www.portforward.com and click Static IP on the page.
-      2. You will be asked if you want to download and or run application.  Select Download (run in Explorer).
-      3. Install the application.  You will be asked for a registration key.  No need to panic here, Just select
-      trial and you will be ok and click next.
-      4. After installed right click the PF icon on your desk top and select Run as Administrator (for Windows Vista,
-      Windows 7, Windows 8, Windows 2008 Server, Windows Server 2008 R2, and Windows Server 2012.
-      NOTE: If your server is being hosted in a Datacenter you do not need an internal static IP as this is already done.
-      5. It will show the current IP's and available IP's on your local network.  Click Make Static.
-      6. You will be asked if you want to apply the change.  Click Apply Change.
-      7. Thats it your done.  When it has configured the static IP on your NIC card you will be given your new internal IP.
-      In most cases it will be the first Static IP on the network.  If so it will either be:
-      192.168.0.1 or 192.168.1.1 depending on the gateway (router/ modem).
-
+      1. Right click on your internet network icon in the lower right hand corner of your desktop.
+      2. In the menu that appears select "Open Network and Sharing Center".
+      3. In the Network and Sharing Center click on "Change Adapter Settings"
+      4. Double click on your eithernet adapter.
+      5. In your Ethernet Adapter window select the Properties button.
+      6. In the Properties window that appears highlight Internet Protocol Version 4 (TCP/IPv4) and click Properties.
+      7. In the window that appears tick the circle that says "Use the following IP" and enter as follows (replacing the xxx with your own numeric values):
+         IP Address: 192.168.x.xxx
+         Subnet Mask: 255.255.255.0
+         Default Gateway: 192.168.x.x
+         NOTE: Default gateway is the default gateway assigned by your modem or router.  You can get this from your ISP provider or consult your modem/ router manual.  It usually is 192.168.0.1 or in some cases 192.168.1.1, etc)
+      8. After completing step 7, select the "Use the following DNS server addresses (if not already selected) and enter the IP address of the DNS servers provided by your ISP.
+      9. After completing step 7 and 8 click OK for each window.  If you have done this correctly your IP address for your machine will now have a static IP in your network
+  NOTE: If your server is being hosted in a Datacenter you do not need an internal static IP as this is already done.
+  
   That is it.  Now if you have followed these instructions and the instructions for port forwarding in your gateway's user
-  manual, your WhiteCore-Sim should not have any trouble at all connecting to your viewer or WhiteCore.exe having trouble
-  connecting to WhiteCore.Server.exe.
+  manual, your WhiteCoreSim should not have any trouble at all connecting to your viewer or WhiteCore.exe having trouble
+  connecting to WhiteCore.Server.exe.  It is also recommended and encouraged that once you change your machine's IP address in your ethernet adapter you should reboot the machine to ensure everything works properly.
 
 ##
 ## FAQ
