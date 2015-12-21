@@ -1,7 +1,7 @@
 [PacketPool]
 ;; Enables the experimental packet pool. Yes, we've been here before.
-RecyclePackets = true;
-RecycleDataBlocks = false;
+RecyclePackets = true
+RecycleDataBlocks = false
 
 [InterestManagement]
 ;; This section controls how updates for prims and avatars are sent to the client
@@ -9,11 +9,11 @@ RecycleDataBlocks = false;
 ;; Should we only send the updates that clients can see (based on their draw distance)?
 ;; EXTREMELY NOT RECOMMENDED to disable!
 ;; Default: true
-UseCulling = true;
+UseCulling = true
 
 ;; Culling based on distance
 ;; Default: true
-UseDistanceBasedCulling = true;
+UseDistanceBasedCulling = true
 
 ;; Distance child agent cameras have to move before updates are re-prioritized
 ChildReprioritizationDistance = 20.0
@@ -106,7 +106,7 @@ UseCSJ2K = false
 
 ;; Use the J2K cache to store decoded textures
 ;; NOT RECOMMENDED TO DISABLE
-UseJ2KCache = true;
+UseJ2KCache = true
 
 [System]
 ;; Sets the method that WhiteCore will use to fire asynchronous events. Valid values are:
