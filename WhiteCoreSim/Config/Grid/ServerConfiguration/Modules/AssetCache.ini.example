@@ -9,7 +9,7 @@ Include-FlotsamCache = Grid/ServerConfiguration/AssetCache/FlotsamCache.ini
 ;Include-CenomeCache = Grid/ServerConfiguration/AssetCache/CenomeCache.ini
 
 ;; This is the core asset cache. It is EXTREMELY NOT recommended to use this cache, and can slow down your sim!
-;AssetCaching = CoreAssetCache;
+;AssetCaching = CoreAssetCache
 
 [ImageDecoding]
 ;; Use CSJ2K for layer boundary decoding if true, OpenJPEG is used if false
@@ -18,4 +18,4 @@ UseCSJ2K = false
 
 ;; Use the J2K cache to store decoded textures
 ;; NOT RECOMMENDED TO DISABLE
-UseJ2KCache = true;
+UseJ2KCache = true

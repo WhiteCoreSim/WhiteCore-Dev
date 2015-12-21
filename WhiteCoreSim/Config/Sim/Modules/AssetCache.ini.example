@@ -9,4 +9,4 @@ Include-FlotsamCache = Sim/Modules/AssetCache/FlotsamCache.ini
 ;Include-CenomeCache = Sim/Modules/AssetCache/CenomeCache.ini
 
 ;; This is the core asset cache. It is EXTREMELY NOT recommended to use this cache, and can slow down your sim!
-;AssetCaching = CoreAssetCache;
+;AssetCaching = CoreAssetCache
