@@ -231,6 +231,7 @@ namespace WhiteCore.Framework.Utilities
                 request.Method = method;
                 request.Timeout = timeout;
                 request.KeepAlive = false;
+                request.Proxy = null;
                 request.MaximumAutomaticRedirections = 10;
                 request.ReadWriteTimeout = timeout / 4;
                 request.SendChunked = true;
