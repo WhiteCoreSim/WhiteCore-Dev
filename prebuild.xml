@@ -95,16 +95,6 @@
           <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
         </Options>
       </Configuration>
-      <Configuration name="Debug" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Release" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
 
       <ReferencePath>../../WhiteCoreSim/bin/</ReferencePath>
       <Reference name="System"/>
@@ -153,16 +143,6 @@
           <OutputPath>../../../WhiteCoreSim/bin/Physics/</OutputPath>
         </Options>
       </Configuration>
-      <Configuration name="Debug" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/Physics/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Release" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/Physics/</OutputPath>
-        </Options>
-      </Configuration>
 
       <ReferencePath>../../../WhiteCoreSim/bin/</ReferencePath>
       <Reference name="System"/>
@@ -196,16 +176,6 @@
         </Options>
       </Configuration>
       <Configuration name="Release" platform="x64">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/Physics/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Debug" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/Physics/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Release" platform="AnyCPU">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/Physics/</OutputPath>
         </Options>
@@ -333,16 +303,6 @@
           <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
         </Options>
       </Configuration>
-      <Configuration name="Debug" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Release" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
 
       <ReferencePath>../../WhiteCoreSim/bin/</ReferencePath>
       <Reference name="System"/>
@@ -386,16 +346,6 @@
         </Options>
       </Configuration>
       <Configuration name="Release" platform="x64">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Debug" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Release" platform="AnyCPU">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
         </Options>
@@ -450,16 +400,6 @@
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
         </Options>
       </Configuration>
-      <Configuration name="Debug" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Release" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
 
       <ReferencePath>../../../WhiteCoreSim/bin/</ReferencePath>
       <Reference name="System"/>
@@ -505,16 +445,6 @@
         </Options>
       </Configuration>
       <Configuration name="Release" platform="x64">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Debug" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Release" platform="AnyCPU">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
         </Options>
@@ -570,16 +500,6 @@
           <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
         </Options>
       </Configuration>
-      <Configuration name="Debug" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Release" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
 
       <ReferencePath>../../WhiteCoreSim/bin/</ReferencePath>
       <Reference name="System"/>
@@ -618,16 +538,6 @@
         </Options>
       </Configuration>
       <Configuration name="Release" platform="x64">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Debug" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Release" platform="AnyCPU">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
         </Options>
@@ -677,16 +587,6 @@
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
         </Options>
       </Configuration>
-      <Configuration name="Debug" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Release" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
 
       <ReferencePath>../../../WhiteCoreSim/bin/</ReferencePath>
       <Reference name="System"/>
@@ -729,16 +629,6 @@
         </Options>
       </Configuration>
       <Configuration name="Release" platform="x64">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Debug" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Release" platform="AnyCPU">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
         </Options>
@@ -791,16 +681,6 @@
           <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
         </Options>
       </Configuration>
-      <Configuration name="Debug" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Release" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
 
       <ReferencePath>../../WhiteCoreSim/bin/</ReferencePath>
       <Reference name="System"/>
@@ -845,16 +725,6 @@
           <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
         </Options>
       </Configuration>
-      <Configuration name="Debug" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Release" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
 
       <ReferencePath>../../WhiteCoreSim/bin/</ReferencePath>
       <Reference name="System"/>
@@ -887,16 +757,6 @@
         </Options>
       </Configuration>
       <Configuration name="Release" platform="x64">
-        <Options>
-          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Debug" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Release" platform="AnyCPU">
         <Options>
           <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
         </Options>
@@ -942,16 +802,6 @@
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
         </Options>
       </Configuration>
-      <Configuration name="Debug" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Release" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
 
       <ReferencePath>../../../WhiteCoreSim/bin/</ReferencePath>
       <Reference name="System"/>
@@ -989,16 +839,6 @@
         </Options>
       </Configuration>
       <Configuration name="Release" platform="x64">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Debug" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Release" platform="AnyCPU">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
         </Options>
@@ -1044,16 +884,6 @@
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
         </Options>
       </Configuration>
-      <Configuration name="Debug" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Release" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
 
       <ReferencePath>../../../WhiteCoreSim/bin/</ReferencePath>
       <Reference name="System"/>
@@ -1091,16 +921,6 @@
         </Options>
       </Configuration>
       <Configuration name="Release" platform="x64">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Debug" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Release" platform="AnyCPU">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
         </Options>
@@ -1146,16 +966,6 @@
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
         </Options>
       </Configuration>
-      <Configuration name="Debug" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Release" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
 
       <ReferencePath>../../../WhiteCoreSim/bin/</ReferencePath>
       <Reference name="System"/>
@@ -1193,16 +1003,6 @@
         </Options>
       </Configuration>
       <Configuration name="Release" platform="x64">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Debug" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Release" platform="AnyCPU">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
         </Options>
@@ -1253,16 +1053,6 @@
           <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
         </Options>
       </Configuration>
-      <Configuration name="Debug" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Release" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
 
       <ReferencePath>../../WhiteCoreSim/bin/</ReferencePath>
       <Reference name="System"/>
@@ -1306,16 +1096,6 @@
         </Options>
       </Configuration>
       <Configuration name="Release" platform="x64">
-        <Options>
-          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Debug" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Release" platform="AnyCPU">
         <Options>
           <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
         </Options>
@@ -1372,16 +1152,6 @@
           <OutputPath>../../../WhiteCoreSim/bin/Physics/</OutputPath>
         </Options>
       </Configuration>
-      <Configuration name="Debug" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/Physics/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Release" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/Physics/</OutputPath>
-        </Options>
-      </Configuration>
 
       <ReferencePath>../../../WhiteCoreSim/bin/</ReferencePath>
       <Reference name="System"/>
@@ -1416,16 +1186,6 @@
         </Options>
       </Configuration>
       <Configuration name="Release" platform="x64">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Debug" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Release" platform="AnyCPU">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
         </Options>
@@ -1479,16 +1239,6 @@
           <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
         </Options>
       </Configuration>
-      <Configuration name="Debug" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Release" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
 
       <ReferencePath>../../WhiteCoreSim/bin/</ReferencePath>
       <Reference name="System"/>
@@ -1531,16 +1281,6 @@
         </Options>
       </Configuration>
       <Configuration name="Release" platform="x64">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Debug" platform="AnyCPU">
-        <Options>
-          <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Release" platform="AnyCPU">
         <Options>
           <OutputPath>../../../WhiteCoreSim/bin/</OutputPath>
         </Options>
