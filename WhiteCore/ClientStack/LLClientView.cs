@@ -1577,7 +1577,7 @@ namespace WhiteCore.ClientStack
         {
             PlacesReplyPacket PlacesReply = new PlacesReplyPacket();
             
-            PlacesReplyPacket.QueryDataBlock[] Query = new PlacesReplyPacket.QueryDataBlock[LandData.Length];
+            PlacesReplyPacket.QueryDataBlock[] Query = new PlacesReplyPacket.QueryDataBlock[LandData.Length + 1];
             
             // Since we don't have Membership we should send an empty QueryData block 
             // here to keep the viewer happy
