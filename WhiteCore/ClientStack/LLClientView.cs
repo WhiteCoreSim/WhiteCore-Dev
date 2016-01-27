@@ -1577,10 +1577,29 @@ namespace WhiteCore.ClientStack
         {
             PlacesReplyPacket PlacesReply = new PlacesReplyPacket();
             
+            PlacesReplyPacket.QueryDataBlock[] Query = new PlacesReplyPacket.QueryDataBlock[LandData.Length];
+            
             // Since we don't have Membership we should send an empty QueryData block 
             // here to keep the viewer happy
             
-            PlacesReplyPacket.QueryDataBlock[] Query = new PlacesReplyPacket.QueryDataBlock[LandData.Length];
+            PlacesReplyPacket.QueryDataBlock MembershipBlock = new PlacesReplyPacket.QueryDataBlock
+            {
+            	ActualArea = 0,
+            	BillableArea = 0,
+            	Desc = Utils.StringToBytes(""),
+            	Dwell = 0,
+            	Flags = 0,
+            	GlobalX= 0,
+            	GlobalY = 0,
+            	GlobalZ = 0,
+            	Name = Utils.StringToBytes(""),
+            	OwnerID = UUID.Zero,
+            	Price = 0,
+            	SimName = Utils.StringToBytes(""),
+            	SnapshotID = UUID.Zero 
+            };
+            Query[0] = MembershipBlock;
+            
             //Note: Nothing is ever done with this?????
             int totalarea = 0;
             List<string> RegionTypes = new List<string>();
@@ -1606,7 +1625,7 @@ namespace WhiteCore.ClientStack
                                                                           Utils.StringToBytes(LandData[i].RegionName),
                                                                       SnapshotID = LandData[i].LandData.SnapshotID
                                                                   };
-                Query[i] = QueryBlock;
+                Query[i+1] = QueryBlock;
                 totalarea += LandData[i].LandData.Area;
                 RegionTypes.Add(LandData[i].RegionType);
             }
