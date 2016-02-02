@@ -602,7 +602,9 @@ namespace WhiteCore.Modules.Land
         public void SendAccessList (UUID agentID, UUID sessionID, uint flags, int sequenceID,
                                    IClientAPI remote_client)
         {
-            if (flags == (uint)AccessList.Access || flags == (uint)AccessList.Both)
+            // this apparently causes problems in the newer viewers - thanks jimtarber via Halcyon
+            //if (flags == (uint)AccessList.Access || flags == (uint)AccessList.Both)       
+            if ((flags & (uint) AccessList.Access) == (uint)AccessList.Access)
             {
                 List<List<UUID>> avatars = CreateAccessListArrayByFlag (AccessList.Access);
                 foreach (List<UUID> accessListAvs in avatars)
@@ -611,7 +613,9 @@ namespace WhiteCore.Modules.Land
                 }
             }
 
-            if (flags == (uint)AccessList.Ban || flags == (uint)AccessList.Both)
+            // this apparently causes problems in the newer viewers - thanks jimtarber via Halcyon
+            //if (flags == (uint)AccessList.Ban || flags == (uint)AccessList.Both)
+            if ((flags & (uint)AccessList.Ban) == (uint)AccessList.Ban)
             {
                 List<List<UUID>> avatars = CreateAccessListArrayByFlag (AccessList.Ban);
                 foreach (List<UUID> accessListAvs in avatars)
