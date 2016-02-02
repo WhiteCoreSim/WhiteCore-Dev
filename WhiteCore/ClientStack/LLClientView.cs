@@ -78,6 +78,7 @@ namespace WhiteCore.ClientStack
         public event ImprovedInstantMessage OnInstantMessage;
         public event PreSendImprovedInstantMessage OnPreSendInstantMessage;
         public event ChatMessage OnChatFromClient;
+        public event RezRestoreToWorld OnRezRestoreToWorld;
         public event RezObject OnRezObject;
         public event DeRezObject OnDeRezObject;
         public event ModifyTerrain OnModifyTerrain;
@@ -6679,7 +6680,8 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandlerRezRestoreToWorld(IClientAPI sender, Packet Pack)
+     /* original - assumed all objects were attachments
+      private bool HandlerRezRestoreToWorld(IClientAPI sender, Packet Pack)
         {
             RezSingleAttachmentFromInv handlerRezSingleAttachment = OnRezSingleAttachmentFromInv;
             if (handlerRezSingleAttachment != null)
@@ -6703,6 +6705,32 @@ namespace WhiteCore.ClientStack
 
             return true;
         }
+       */
+
+        // update 20160129 - greythane-
+        bool HandlerRezRestoreToWorld(IClientAPI sender, Packet Pack)
+        {
+            RezRestoreToWorld handlerRezRestoreToWorld = OnRezRestoreToWorld;
+            if (handlerRezRestoreToWorld != null)
+            {
+                RezRestoreToWorldPacket rezPacket = (RezRestoreToWorldPacket)Pack;
+
+                #region Packet Session and User Check
+                if (m_checkPackets)
+                {
+                    if (rezPacket.AgentData.SessionID != SessionId ||
+                        rezPacket.AgentData.AgentID != AgentId)
+                        return true;
+                }
+                #endregion
+
+                handlerRezRestoreToWorld(this, rezPacket.InventoryData.ItemID, rezPacket.InventoryData.GroupID);
+
+            }
+            return true;
+        }
+
+
 
         private bool HandleRezMultipleAttachmentsFromInv(IClientAPI sender, Packet Pack)
         {
