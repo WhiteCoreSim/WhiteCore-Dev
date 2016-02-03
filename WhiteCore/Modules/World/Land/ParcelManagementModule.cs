@@ -25,6 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Timers;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.Messages.Linden;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.DatabaseInterfaces;
@@ -37,15 +46,7 @@ using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Servers.HttpServer.Interfaces;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.Messages.Linden;
-using OpenMetaverse.StructuredData;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Timers;
+
 using GridRegion = WhiteCore.Framework.Services.GridRegion;
 
 namespace WhiteCore.Modules.Land
@@ -83,9 +84,9 @@ namespace WhiteCore.Modules.Land
 
         #region Declares
 
-        private static readonly string remoteParcelRequestPath = "0009/";
+        static readonly string remoteParcelRequestPath = "0009/";
 
-        private readonly List<UUID> m_hasSentParcelOverLay = new List<UUID>();
+        readonly List<UUID> m_hasSentParcelOverLay = new List<UUID>();
 
         /// <value>
         ///     Land objects keyed by local id
@@ -101,7 +102,7 @@ namespace WhiteCore.Modules.Land
         Timer m_UpdateDirectoryTimer = new Timer();
 
         public UUID GodParcelOwner { get; set; }
-        string _godParcelOwner = "";
+        string _godParcelOwner = "";    // configured parcel owner (if set, default '')
 
         /// <value>
         ///     Local land ids at specified region co-ordinates (region size / 4)
@@ -114,8 +115,7 @@ namespace WhiteCore.Modules.Land
         protected Dictionary<UUID, ReturnInfo> m_returns = new Dictionary<UUID, ReturnInfo>();
         IScene m_scene;
 
-        int m_update_land = 200;
-        //Check whether we need to rebuild the parcel prim count and other land related functions
+        int m_update_land = 200;        //Check whether we need to rebuild the parcel prim count and other land related functions
 
         public int[,] LandIDList
         {
@@ -152,7 +152,7 @@ namespace WhiteCore.Modules.Land
 
             if (m_UpdateDirectoryOnTimer)
             {
-                m_UpdateDirectoryTimer.Interval = 1000*60*m_minutesBeforeTimer;
+                m_UpdateDirectoryTimer.Interval = 1000 * 60 * m_minutesBeforeTimer;
                 m_UpdateDirectoryTimer.Elapsed += UpdateDirectoryTimerElapsed;
                 m_UpdateDirectoryTimer.Start();
             }
@@ -164,7 +164,7 @@ namespace WhiteCore.Modules.Land
             else
                 godParcelOwner = (UUID)Constants.RealEstateOwnerUUID;       // Estates revert to RealEstate Owner
 
-            // This is an override to the default GodOwner and allows specifying a specific user
+            // This is an configuration override to the default GodOwner and allows specifying a specific user
             if (_godParcelOwner != "")
             {
                 UserAccount acc = m_scene.UserAccountService.GetUserAccount(null, _godParcelOwner);
@@ -311,9 +311,9 @@ namespace WhiteCore.Modules.Land
             }
         }
 
-        object WhiteCoreEventManager_OnGenericEvent(string FunctionName, object parameters)
+        object WhiteCoreEventManager_OnGenericEvent(string functionName, object parameters)
         {
-            if (FunctionName == "ObjectAddedFlag")
+            if (functionName == "ObjectAddedFlag")
             {
                 object[] param = (object[]) parameters;
                 ISceneChildEntity child = (ISceneChildEntity) param[0];
@@ -321,7 +321,7 @@ namespace WhiteCore.Modules.Land
                 if (flag == PrimFlags.TemporaryOnRez)
                     m_entitiesInAutoReturnQueue.Add(child.ParentEntity);
             }
-            else if (FunctionName == "ObjectRemovedFlag")
+            else if (functionName == "ObjectRemovedFlag")
             {
                 object[] param = (object[]) parameters;
                 ISceneChildEntity child = (ISceneChildEntity) param[0];
@@ -338,8 +338,9 @@ namespace WhiteCore.Modules.Land
         protected internal void CheckFrameEvents()
         {
             // Go through all updates and check for temp and auto return
-            CheckPrimForAutoReturn();
-            CheckPrimForTemperary();
+            CheckPrimForAutoReturnObjects();
+            CheckPrimForTemporaryObjects();
+
             lock (m_returns)
             {
                 foreach (KeyValuePair<UUID, ReturnInfo> ret in m_returns)
@@ -348,22 +349,20 @@ namespace WhiteCore.Modules.Land
                     {
                         UUID transaction = UUID.Random();
 
-                        GridInstantMessage msg = new GridInstantMessage
-                                                     {
-                                                         FromAgentID = UUID.Zero,
-                                                         ToAgentID = ret.Key,
-                                                         SessionID = transaction,
-                                                         Timestamp = (uint) Util.UnixTimeSinceEpoch(),
-                                                         FromAgentName = "Server",
-                                                         Dialog = 19,
-                                                         FromGroup = false,
-                                                         Offline = 1,
-                                                         ParentEstateID =
-                                                             m_scene.RegionInfo.EstateSettings.ParentEstateID,
-                                                         Position = Vector3.Zero,
-                                                         RegionID = m_scene.RegionInfo.RegionID,
-                                                         BinaryBucket = Util.StringToBytes256("\0")
-                                                     };
+                        GridInstantMessage msg = new GridInstantMessage {
+                            FromAgentID = UUID.Zero,
+                            ToAgentID = ret.Key,
+                            SessionID = transaction,
+                            Timestamp = (uint) Util.UnixTimeSinceEpoch(),
+                            FromAgentName = "Server",
+                            Dialog = 19,
+                            FromGroup = false,
+                            Offline = 1,
+                            ParentEstateID = m_scene.RegionInfo.EstateSettings.ParentEstateID,
+                            Position = Vector3.Zero,
+                            RegionID = m_scene.RegionInfo.RegionID,
+                            BinaryBucket = Util.StringToBytes256("\0")
+                        };
                         // From server
                         // Object msg
                         // We must fill in a null-terminated 'empty' string here since bytes[0] will crash viewer 3.
@@ -371,12 +370,12 @@ namespace WhiteCore.Modules.Land
                         if (ret.Value.count > 1)
                             msg.Message =
                                 string.Format("Your {0} objects were returned from {1} in region {2} due to {3}",
-                                              ret.Value.count, ret.Value.location.ToString(),
+                                              ret.Value.count, ret.Value.location,
                                               m_scene.RegionInfo.RegionName, ret.Value.reason);
                         else
                             msg.Message = string.Format(
                                 "Your object {0} was returned from {1} in region {2} due to {3}", ret.Value.objectName,
-                                ret.Value.location.ToString(), m_scene.RegionInfo.RegionName, ret.Value.reason);
+                                ret.Value.location, m_scene.RegionInfo.RegionName, ret.Value.reason);
 
                         IMessageTransferModule tr = m_scene.RequestModuleInterface<IMessageTransferModule>();
                         if (tr != null)
@@ -403,7 +402,7 @@ namespace WhiteCore.Modules.Land
             }
         }
 
-        protected void CheckPrimForTemperary()
+        protected void CheckPrimForTemporaryObjects()
         {
             HashSet<ISceneEntity> entitiesToRemove = new HashSet<ISceneEntity>();
 
@@ -422,7 +421,7 @@ namespace WhiteCore.Modules.Land
             }
         }
 
-        protected void CheckPrimForAutoReturn()
+        protected void CheckPrimForAutoReturnObjects()
         {
             // Don't abort the whole thing if one entity happens to give us an exception.
             try
@@ -475,7 +474,7 @@ namespace WhiteCore.Modules.Land
 
         public void UpdateLandObject(ILandObject lo)
         {
-            AddLandObjectToSearch(lo);
+            UpdateLandObjectsInSearch();
             m_scene.EventManager.TriggerLandObjectAdded(lo.LandData);
 
             foreach (IScenePresence sp in m_scene.GetScenePresences())
@@ -504,6 +503,7 @@ namespace WhiteCore.Modules.Land
             {
                 m_scene.EventManager.TriggerLandObjectRemoved(land.LandData.RegionID, land.LandData.GlobalID);
             }
+
             lock (m_landListLock)
             {
                 m_landList.Clear();
@@ -516,38 +516,41 @@ namespace WhiteCore.Modules.Land
         /// </summary>
         public ILandObject ResetSimLandObjects()
         {
-            ClearAllParcels();
-            ILandObject fullSimParcel = new LandObject(UUID.Zero, false, m_scene);
+            ClearAllParcels ();
+            ILandObject fullSimParcel = new LandObject (UUID.Zero, false, m_scene);
             if (fullSimParcel.LandData.OwnerID == UUID.Zero)
                 fullSimParcel.LandData.OwnerID = m_scene.RegionInfo.EstateSettings.EstateOwner;
 
-            UserAccount account = m_scene.UserAccountService.GetUserAccount(m_scene.RegionInfo.AllScopeIDs,
-                                                                            fullSimParcel.LandData.OwnerID);
+            UserAccount account = m_scene.UserAccountService.GetUserAccount (m_scene.RegionInfo.AllScopeIDs,
+                                      fullSimParcel.LandData.OwnerID);
             // we should always have the estate user
-            string ownerName = account.Name;
-
+            string ownerName = "";
+            if (account != null)
+                ownerName = account.Name;
+ 
             while (fullSimParcel.LandData.OwnerID == UUID.Zero || account == null)
             {
-                MainConsole.Instance.Warn(
+                MainConsole.Instance.Warn (
                     "[ParcelManagement]: Could not find user for parcel, please give a valid user to make the owner");
-                string userName = MainConsole.Instance.Prompt("User Name:", "");
+                
+                string userName = MainConsole.Instance.Prompt ("User Name:", "");
                 if (userName == "")
                 {
-                    MainConsole.Instance.Warn("Put in a valid username.");
+                    MainConsole.Instance.Warn ("A valid username is required.");
                     continue;
                 }
-                account = m_scene.UserAccountService.GetUserAccount(m_scene.RegionInfo.AllScopeIDs, userName);
+
+                account = m_scene.UserAccountService.GetUserAccount (m_scene.RegionInfo.AllScopeIDs, userName);
                 if (account != null)
                 {
                     fullSimParcel.LandData.OwnerID = account.PrincipalID;
                     ownerName = account.Name;
-                }
-                else
-                    MainConsole.Instance.Warn("Could not find the user.");
+                } else
+                    MainConsole.Instance.Warn ("Could not find the user.");
             }
 
-            MainConsole.Instance.InfoFormat (
-                "[ParcelManagement]: Setting land owner for region {0} to {1}",
+
+            MainConsole.Instance.InfoFormat ("[ParcelManagement]: Setting land owner for region {0} to {1}",
                 m_scene.RegionInfo.RegionName,
                 ownerName);                 //  was >>   fullSimParcel.LandData.OwnerID);
 
@@ -555,10 +558,56 @@ namespace WhiteCore.Modules.Land
             fullSimParcel.LandData.Bitmap =
                 new byte[(m_scene.RegionInfo.RegionSizeX/4)*(m_scene.RegionInfo.RegionSizeY/4)/8];
             fullSimParcel = AddLandObject(fullSimParcel);
-            ModifyLandBitmapSquare(0, 0,
-                                   m_scene.RegionInfo.RegionSizeX, m_scene.RegionInfo.RegionSizeY,
-                                   fullSimParcel);
+
+            ModifyLandBitmapSquare(0, 0, m_scene.RegionInfo.RegionSizeX, m_scene.RegionInfo.RegionSizeY, fullSimParcel);
+
             return fullSimParcel;
+        }
+
+        /// <summary>
+        /// Reclaims (resets) parcel ownership.
+        /// </summary>
+        /// <param name="oldOwnerID">Old owner</param>
+        /// <param name="newOwnerID">New owner.</param>
+        public void ReclaimParcels(UUID oldOwnerID, UUID newOwnerID)
+        {
+            bool isGroup = false;
+            IGroupsModule groups = m_scene.RequestModuleInterface<IGroupsModule>();
+            if (groups != null)
+            {
+                GroupRecord gr = groups.GetGroupRecord(newOwnerID);
+                isGroup = (gr != null);
+            }
+
+            List<ILandObject> parcels = AllParcels();
+            foreach (ILandObject land in parcels)
+            {
+                if (land.LandData.OwnerID == oldOwnerID)    
+                {
+                    land.LandData.AuctionID = 0;                            // Not under auction!
+                    land.LandData.OwnerID = newOwnerID;
+                    land.LandData.ClaimDate = Util.UnixTimeSinceEpoch ();
+                    land.LandData.GroupID = isGroup ? newOwnerID : UUID.Zero;
+                    land.LandData.IsGroupOwned = isGroup;
+                    land.LandData.SalePrice = 0;                            // not for sale
+                    land.LandData.AuthBuyerID = UUID.Zero;
+                    land.LandData.Status = ParcelStatus.Leased;             // Parcel is back to be Leased
+                    land.LandData.Flags &= ~(uint)(
+                        ParcelFlags.ForSale |
+                        ParcelFlags.ForSaleObjects |
+                        ParcelFlags.SellParcelObjects |
+                        ParcelFlags.ShowDirectory);
+
+                    if(!isGroup)                                            // additional for non group owners
+                        land.LandData.Flags &= ~(uint) (
+                            ParcelFlags.AllowDeedToGroup |
+                            ParcelFlags.ContributeWithDeed);
+
+                    m_hasSentParcelOverLay.Clear (); //Clear everyone out
+                    m_scene.ForEachClient (SendParcelOverlay);
+                    UpdateLandObject (land);
+                }
+            }
         }
 
         public List<ILandObject> AllParcels()
@@ -598,11 +647,11 @@ namespace WhiteCore.Modules.Land
             }
         }
 
-        public ILandObject GetLandObject(UUID GlobalID)
+        public ILandObject GetLandObject(UUID globalID)
         {
             var landParcels = AllParcels ();
             foreach (var parcel in landParcels)
-                if (parcel.LandData.GlobalID == GlobalID)
+                if (parcel.LandData.GlobalID == globalID)
                     return parcel;
 
             return null;
@@ -618,17 +667,15 @@ namespace WhiteCore.Modules.Land
         public ILandObject GetLandObject(int x, int y)
         {
             RegionInfo r = m_scene.RegionInfo;
-            if (x >= r.RegionSizeX || y >= r.RegionSizeY || x < 0 || y < 0)
-            {
-                if (x >= r.RegionSizeX)
-                    x = r.RegionSizeX - 1;
-                if (x < 0)
-                    x = 1;
-                if (y >= r.RegionSizeY)
-                    y = r.RegionSizeY - 1;
-                if (y < 0)
-                    y = 1;
-            }
+            if (x >= r.RegionSizeX)
+                x = r.RegionSizeX - 1;
+            if (x < 0)
+                x = 1;
+            if (y >= r.RegionSizeY)
+                y = r.RegionSizeY - 1;
+            if (y < 0)
+                y = 1;
+
 
             lock (m_landListLock)
             {
@@ -647,31 +694,14 @@ namespace WhiteCore.Modules.Land
             }
         }
 
-        protected void AddLandObjectToSearch(ILandObject parcel)
+        protected void UpdateLandObjectsInSearch()
         {
-            IDirectoryServiceConnector DSC = Framework.Utilities.DataManager.RequestPlugin<IDirectoryServiceConnector>();
-            if (DSC != null)
-            {
-                if (m_UpdateDirectoryOnUpdate)
-                    //Update search database
-                    DoSearchUpdate();
-                else if (m_UpdateDirectoryOnTimer)
-                    m_TaintedLandData = true;
-            }
+            if (m_UpdateDirectoryOnUpdate)                    //Update search database
+                DoSearchUpdate();
+            else if (m_UpdateDirectoryOnTimer)
+                m_TaintedLandData = true;
         }
 
-        void RemoveLandObjectFromSearch(ILandObject iLandObject)
-        {
-            IDirectoryServiceConnector DSC = Framework.Utilities.DataManager.RequestPlugin<IDirectoryServiceConnector>();
-            if (DSC != null)
-            {
-                if (m_UpdateDirectoryOnUpdate)
-                    //Update search database
-                    DoSearchUpdate();
-                else if (m_UpdateDirectoryOnTimer)
-                    m_TaintedLandData = true;
-            }
-        }
 
         /// <summary>
         ///     Adds a land object to the stored list and adds them to the landIDList to what they own
@@ -701,9 +731,8 @@ namespace WhiteCore.Modules.Land
             new_land.ForceUpdateLandInfo();
             //If it isn't coming in from the database, make sure to save the new parcel and add it to search
             if (!incomingFromDatabase)
-            {
-                AddLandObjectToSearch(new_land);
-            }
+                UpdateLandObjectsInSearch();
+
             //Trigger the event for any interested listeners
             m_scene.EventManager.TriggerLandObjectAdded(new_land.LandData);
             return new_land;
@@ -803,7 +832,8 @@ namespace WhiteCore.Modules.Land
                     result |= (int) ParcelPropertiesStatus.CollisionBanned;
                     continue; //Only send one
                 }
-                else if ((result & (int) ParcelPropertiesStatus.CollisionNotOnAccessList) !=
+
+                if ((result & (int) ParcelPropertiesStatus.CollisionNotOnAccessList) !=
                          (int) ParcelPropertiesStatus.CollisionNotOnAccessList &&
                          parcel.IsRestrictedFromLand(sp.UUID))
                 {
@@ -966,7 +996,7 @@ namespace WhiteCore.Modules.Land
         ///     Removes a land object from the list. Will not remove if local_id is still owning an area in landIDList
         /// </summary>
         /// <param name="local_id">Land.localID of the piece of land to remove.</param>
-        public void removeLandObject(int local_id)
+        public void RemoveLandObject(int local_id)
         {
             lock (m_landListLock)
             {
@@ -987,13 +1017,13 @@ namespace WhiteCore.Modules.Land
                 ILandObject land = m_landList[local_id];
                 m_scene.EventManager.TriggerLandObjectRemoved(land.LandData.RegionID, land.LandData.GlobalID);
                 m_landList.Remove(local_id);
-                RemoveLandObjectFromSearch(land);
+                UpdateLandObjectsInSearch();
             }
         }
 
-        public void ParcelBuyPass(IClientAPI client, UUID agentID, int ParcelLocalID)
+        public void ParcelBuyPass(IClientAPI client, UUID agentID, int parcelLocalID)
         {
-            ILandObject landObject = GetLandObject(ParcelLocalID);
+            ILandObject landObject = GetLandObject(parcelLocalID);
             if (landObject == null)
             {
                 client.SendAlertMessage("Could not find the parcel you are currently on.");
@@ -1030,16 +1060,6 @@ namespace WhiteCore.Modules.Land
 
         #region Parcel Modification
 
-        public void Join(int start_x, int start_y, int end_x, int end_y, UUID attempting_user_id)
-        {
-            join(start_x, start_y, end_x, end_y, attempting_user_id);
-        }
-
-        public void Subdivide(int start_x, int start_y, int end_x, int end_y, UUID attempting_user_id)
-        {
-            subdivide(start_x, start_y, end_x, end_y, attempting_user_id);
-        }
-
         /// <summary>
         ///     Subdivides a piece of land
         /// </summary>
@@ -1048,8 +1068,7 @@ namespace WhiteCore.Modules.Land
         /// <param name="end_x">East Point</param>
         /// <param name="end_y">North Point</param>
         /// <param name="attempting_user_id">UUID of user who is trying to subdivide</param>
-        /// <returns>Returns true if successful</returns>
-        void subdivide(int start_x, int start_y, int end_x, int end_y, UUID attempting_user_id)
+        public void Subdivide(int start_x, int start_y, int end_x, int end_y, UUID attempting_user_id)
         {
             //First, lets loop through the points and make sure they are all in the same peice of land
             //Get the land object at start
@@ -1162,7 +1181,7 @@ namespace WhiteCore.Modules.Land
         /// <summary>
         ///     Rebuilds all of the parcel's bitmaps so that they are correct for saving and sending to clients
         /// </summary>
-        private void UpdateAllParcelBitmaps()
+        void UpdateAllParcelBitmaps()
         {
             foreach (ILandObject lo in AllParcels())
             {
@@ -1217,8 +1236,7 @@ namespace WhiteCore.Modules.Land
         /// <param name="end_x">x value in second piece of land</param>
         /// <param name="end_y">y value in second piece of land</param>
         /// <param name="attempting_user_id">UUID of the avatar trying to join the land objects</param>
-        /// <returns>Returns true if successful</returns>
-        void join(int start_x, int start_y, int end_x, int end_y, UUID attempting_user_id)
+        public void Join(int start_x, int start_y, int end_x, int end_y, UUID attempting_user_id)
         {
             IClientAPI client;
             m_scene.ClientManager.TryGetValue(attempting_user_id, out client);
@@ -1266,7 +1284,7 @@ namespace WhiteCore.Modules.Land
             foreach (ILandObject slaveLandObject in selectedLandObjects)
             {
                 MergeLandBitmaps(masterLandObject.LandData.LocalID, slaveLandObject.LandData.LocalID);
-                removeLandObject(slaveLandObject.LandData.LocalID);
+                RemoveLandObject(slaveLandObject.LandData.LocalID);
             }
             masterLandObject.LandData.OwnerID = attempting_user_id;
             IPrimCountModule primCountsModule = m_scene.RequestModuleInterface<IPrimCountModule>();
@@ -1481,12 +1499,12 @@ namespace WhiteCore.Modules.Land
 
         public void ClientOnParcelDivideRequest(int west, int south, int east, int north, IClientAPI remote_client)
         {
-            subdivide(west, south, east, north, remote_client.AgentId);
+            Subdivide(west, south, east, north, remote_client.AgentId);
         }
 
         public void ClientOnParcelJoinRequest(int west, int south, int east, int north, IClientAPI remote_client)
         {
-            join(west, south, east, north, remote_client.AgentId);
+            Join(west, south, east, north, remote_client.AgentId);
         }
 
         public void ClientOnParcelSelectObjects(int local_id, int request_type,
@@ -1596,6 +1614,7 @@ namespace WhiteCore.Modules.Land
 
                     land.LandData.Flags |= (uint)(ParcelFlags.SoundLocal | ParcelFlags.AllowVoiceChat | ParcelFlags.AllowLandmark | ParcelFlags.AllowFly | ParcelFlags.AllowOtherScripts | ParcelFlags.AllowGroupScripts | ParcelFlags.AllowGroupObjectEntry | ParcelFlags.CreateGroupObjects | ParcelFlags.UseEstateVoiceChan);
                     land.LandData.Status = ParcelStatus.Abandoned; // Parcel is Abandoned
+ 
                     m_hasSentParcelOverLay.Clear(); //Clear everyone out
                     m_scene.ForEachClient(SendParcelOverlay);
                     land.SendLandUpdateToClient(true, remote_client);
@@ -1664,9 +1683,9 @@ namespace WhiteCore.Modules.Land
 
         public bool EventManagerOnValidateLandBuy(EventManager.LandBuyArgs e)
         {
-            if (e.landValidated == false)
+            if (!e.landValidated)
             {
-                ILandObject lob = GetLandObject(e.parcelLocalID);
+                ILandObject lob = GetLandObject (e.parcelLocalID);
 
                 if (lob != null)
                 {
@@ -1675,19 +1694,17 @@ namespace WhiteCore.Modules.Land
                     UUID pOwnerID = lob.LandData.OwnerID;
 
                     bool landforsale = ((lob.LandData.Flags &
-                                         (uint)
+                                       (uint)
                                          (ParcelFlags.ForSale | ParcelFlags.ForSaleObjects |
-                                          ParcelFlags.SellParcelObjects)) != 0);
+                                       ParcelFlags.SellParcelObjects)) != 0);
                     if ((AuthorizedID == UUID.Zero || AuthorizedID == e.agentId) && e.parcelPrice >= saleprice &&
                         landforsale)
                     {
                         e.parcelOwnerID = pOwnerID;
                         e.landValidated = true;
-                    }
-                    else
+                    } else
                         return false;
-                }
-                else
+                } else
                     return false;
             }
             return true;
@@ -1794,6 +1811,7 @@ namespace WhiteCore.Modules.Land
 
         bool SetLandBitmapFromByteArray(ILandObject parcel, bool forceSet, Vector2 offsetOfParcel)
         {
+            //CHECK:  This might assume that regions are still 256x256 ??
             int avg = (m_scene.RegionInfo.RegionSizeX*m_scene.RegionInfo.RegionSizeY/128);
             int oldParcelRegionAvg = (int) Math.Sqrt(parcel.LandData.Bitmap.Length*128);
             if (parcel.LandData.Bitmap.Length != avg && !(forceSet && parcel.LandData.Bitmap.Length < avg))
@@ -1848,7 +1866,8 @@ namespace WhiteCore.Modules.Land
             {
                 ILandObject selectedParcel = GetLandObject(localID);
 
-                if (selectedParcel == null) return;
+                if (selectedParcel == null) 
+                    return;
 
                 selectedParcel.ReturnLandObjects(returnType, agentIDs, taskIDs, remoteClient);
             }
@@ -1868,7 +1887,8 @@ namespace WhiteCore.Modules.Land
             {
                 ILandObject selectedParcel = GetLandObject(localID);
 
-                if (selectedParcel == null) return;
+                if (selectedParcel == null)
+                    return;
 
                 selectedParcel.DisableLandObjects(returnType, agentIDs, taskIDs, remoteClient);
             }
@@ -1919,7 +1939,7 @@ namespace WhiteCore.Modules.Land
             IClientAPI client;
             if (!m_scene.ClientManager.TryGetValue(agentID, out client))
             {
-                MainConsole.Instance.WarnFormat("[LAND] unable to retrieve IClientAPI for {0}", agentID.ToString());
+                MainConsole.Instance.WarnFormat("[LAND] unable to retrieve IClientAPI for {0}", agentID);
                 return OSDParser.SerializeLLSDXmlBytes(new OSDMap());
             }
             OSDMap args = (OSDMap) OSDParser.DeserializeLLSDXml(HttpServerHandlerHelpers.ReadFully(request));
@@ -1939,7 +1959,7 @@ namespace WhiteCore.Modules.Land
             IClientAPI client;
             if (!m_scene.ClientManager.TryGetValue(agentID, out client))
             {
-                MainConsole.Instance.WarnFormat("[LAND] unable to retrieve IClientAPI for {0}", agentID.ToString());
+                MainConsole.Instance.WarnFormat("[LAND] unable to retrieve IClientAPI for {0}", agentID);
                 return new byte[0];
             }
 
@@ -2151,28 +2171,18 @@ namespace WhiteCore.Modules.Land
             if (xdistance < ydistance)
             {
                 if (avatar.AbsolutePosition.X < m_scene.RegionInfo.RegionSizeX/2)
-                {
                     return GetPositionAtAvatarHeightOrGroundHeight(avatar, 0.0f, avatar.AbsolutePosition.Y);
-                }
-                else
-                {
-                    return GetPositionAtAvatarHeightOrGroundHeight(avatar, m_scene.RegionInfo.RegionSizeX,
+
+                return GetPositionAtAvatarHeightOrGroundHeight(avatar, m_scene.RegionInfo.RegionSizeX,
                                                                    avatar.AbsolutePosition.Y);
-                }
             }
-                //find out what horizontal edge to go to
-            else
-            {
-                if (avatar.AbsolutePosition.Y < m_scene.RegionInfo.RegionSizeY/2)
-                {
-                    return GetPositionAtAvatarHeightOrGroundHeight(avatar, avatar.AbsolutePosition.X, 0.0f);
-                }
-                else
-                {
-                    return GetPositionAtAvatarHeightOrGroundHeight(avatar, avatar.AbsolutePosition.X,
+
+            //find out what horizontal edge to go to
+            if (avatar.AbsolutePosition.Y < m_scene.RegionInfo.RegionSizeY/2)
+                return GetPositionAtAvatarHeightOrGroundHeight(avatar, avatar.AbsolutePosition.X, 0.0f);
+
+            return GetPositionAtAvatarHeightOrGroundHeight(avatar, avatar.AbsolutePosition.X,
                                                                    m_scene.RegionInfo.RegionSizeY);
-                }
-            }
         }
 
         #endregion
@@ -2431,8 +2441,7 @@ namespace WhiteCore.Modules.Land
                     }
                     if (info == null)
                     {
-                        MainConsole.Instance.WarnFormat("[LAND]: Failed to find region having parcel {0} @ {1} {2}",
-                                                        parcelID);
+                        MainConsole.Instance.WarnFormat("[LAND]: Failed to find region having parcel {0}", parcelID);
                         return;
                     }
                     MainConsole.Instance.DebugFormat("[LAND] got parcelinfo for parcel {0} in region {1}; sending...",
