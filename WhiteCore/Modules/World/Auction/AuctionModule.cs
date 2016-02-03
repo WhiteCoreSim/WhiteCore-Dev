@@ -26,6 +26,11 @@
  */
 
 
+using System;
+using System.IO;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
@@ -36,17 +41,12 @@ using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Servers.HttpServer.Interfaces;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using System;
-using System.IO;
 
 namespace WhiteCore.Modules.Auction
 {
     public class AuctionModule : IAuctionModule, INonSharedRegionModule
     {
-        private IScene m_scene;
+        IScene m_scene;
 
         #region INonSharedRegionModule Members
 
@@ -96,7 +96,7 @@ namespace WhiteCore.Modules.Auction
             client.OnViewerStartAuction += StartAuction;
         }
 
-        private void OnClosingClient(IClientAPI client)
+        void OnClosingClient(IClientAPI client)
         {
             client.OnViewerStartAuction -= StartAuction;
         }
@@ -122,7 +122,7 @@ namespace WhiteCore.Modules.Auction
             return retVal;
         }
 
-        private byte[] ViewerStartAuction(string path, Stream request,
+        byte[] ViewerStartAuction(string path, Stream request,
                                           OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {
             //OSDMap rm = (OSDMap)OSDParser.DeserializeLLSDXml(HttpServerHandlerHelpers.ReadFully(request));
@@ -144,9 +144,9 @@ namespace WhiteCore.Modules.Auction
                     return;
                 landObject.LandData.SnapshotID = SnapshotID;
                 landObject.LandData.AuctionID = (uint) Util.RandomClass.Next(0, int.MaxValue);
-                // landObject.LandData.Status = ParcelStatus.Abandoned;
-                // 150730 Fly-Man- Only when an parcel is Abandoned the Status is changed to Abandoned.
+ 
                 // During an Auction, the Status of an parcel stays "Leased"
+                // 20160204 -greythane- maybe this could be set to 'pending'?
                 landObject.LandData.Status = ParcelStatus.Leased;
                 landObject.SendLandUpdateToAvatarsOverMe();
             }
@@ -206,7 +206,7 @@ namespace WhiteCore.Modules.Auction
             }
         }
 
-        private void SaveAuctionInfo(int LocalID, AuctionInfo info)
+        void SaveAuctionInfo(int LocalID, AuctionInfo info)
         {
             IParcelManagementModule parcelManagement = m_scene.RequestModuleInterface<IParcelManagementModule>();
             if (parcelManagement != null)
@@ -218,7 +218,7 @@ namespace WhiteCore.Modules.Auction
             }
         }
 
-        private AuctionInfo GetAuctionInfo(int LocalID)
+        AuctionInfo GetAuctionInfo(int LocalID)
         {
             IParcelManagementModule parcelManagement = m_scene.RequestModuleInterface<IParcelManagementModule>();
             if (parcelManagement != null)

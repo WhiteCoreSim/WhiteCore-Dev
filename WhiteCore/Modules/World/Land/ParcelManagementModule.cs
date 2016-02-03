@@ -1543,10 +1543,13 @@ namespace WhiteCore.Modules.Land
                     land.LandData.IsGroupOwned = false;
                     land.LandData.SalePrice = 0;
                     land.LandData.AuthBuyerID = UUID.Zero;
-                    land.LandData.Flags &=
-                        ~(uint)
-                         (ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects |
-                          ParcelFlags.ShowDirectory | ParcelFlags.AllowDeedToGroup | ParcelFlags.ContributeWithDeed);
+                    land.LandData.Flags &= ~(uint) (
+                        ParcelFlags.ForSale | 
+                        ParcelFlags.ForSaleObjects | 
+                        ParcelFlags.SellParcelObjects |
+                        ParcelFlags.ShowDirectory | 
+                        ParcelFlags.AllowDeedToGroup | 
+                        ParcelFlags.ContributeWithDeed);
 
                     m_hasSentParcelOverLay.Clear(); //Clear everyone out
                     m_scene.ForEachClient(SendParcelOverlay);
@@ -1599,20 +1602,50 @@ namespace WhiteCore.Modules.Land
                     }
 
                     land.LandData.Name = AbandonmentDate + ": Abandoned Land";
-                    
-                    land.LandData.OwnerID = m_scene.RegionInfo.EstateSettings.EstateOwner;
+
+                    var estateOwner = m_scene.RegionInfo.EstateSettings.EstateOwner;
+                    land.LandData.OwnerID = remote_client.AgentId == estateOwner ? GodParcelOwner : estateOwner;   
+
                     land.LandData.AuctionID = 0; //This must be reset!
                     land.LandData.GroupID = UUID.Zero;
                     land.LandData.IsGroupOwned = false;
                     land.LandData.SalePrice = 0;
                     land.LandData.AuthBuyerID = UUID.Zero;
-                    land.LandData.Flags &=
-                        ~(uint)
-                         (ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects | ParcelFlags.AllowDamage | ParcelFlags.UseAccessList | ParcelFlags.UseAccessGroup | ParcelFlags.UseBanList | ParcelFlags.UsePassList |
-                          ParcelFlags.ShowDirectory | ParcelFlags.AllowDeedToGroup | ParcelFlags.ContributeWithDeed | ParcelFlags.AllowTerraform | ParcelFlags.ShowDirectory |
-                          ParcelFlags.AllowAPrimitiveEntry | ParcelFlags.CreateObjects | ParcelFlags.RestrictPushObject | ParcelFlags.AllowDeedToGroup | ParcelFlags.DenyAgeUnverified | ParcelFlags.DenyAnonymous);
 
-                    land.LandData.Flags |= (uint)(ParcelFlags.SoundLocal | ParcelFlags.AllowVoiceChat | ParcelFlags.AllowLandmark | ParcelFlags.AllowFly | ParcelFlags.AllowOtherScripts | ParcelFlags.AllowGroupScripts | ParcelFlags.AllowGroupObjectEntry | ParcelFlags.CreateGroupObjects | ParcelFlags.UseEstateVoiceChan);
+                    // these are reset
+                    land.LandData.Flags &= ~(uint) (
+                        ParcelFlags.ForSale | 
+                        ParcelFlags.ForSaleObjects | 
+                        ParcelFlags.SellParcelObjects | 
+                        ParcelFlags.AllowDamage | 
+                        ParcelFlags.UseAccessList | 
+                        ParcelFlags.UseAccessGroup | 
+                        ParcelFlags.UseBanList | 
+                        ParcelFlags.UsePassList |
+                        ParcelFlags.ShowDirectory | 
+                        ParcelFlags.AllowDeedToGroup | 
+                        ParcelFlags.ContributeWithDeed | 
+                        ParcelFlags.AllowTerraform | 
+                        ParcelFlags.ShowDirectory |
+                        ParcelFlags.AllowAPrimitiveEntry | 
+                        ParcelFlags.CreateObjects | 
+                        ParcelFlags.RestrictPushObject | 
+                        ParcelFlags.AllowDeedToGroup | 
+                        ParcelFlags.DenyAgeUnverified | 
+                        ParcelFlags.DenyAnonymous);
+
+                    // but these are ok
+                    land.LandData.Flags |= (uint)(
+                        ParcelFlags.SoundLocal | 
+                        ParcelFlags.AllowVoiceChat | 
+                        ParcelFlags.AllowLandmark | 
+                        ParcelFlags.AllowFly | 
+                        ParcelFlags.AllowOtherScripts | 
+                        ParcelFlags.AllowGroupScripts | 
+                        ParcelFlags.AllowGroupObjectEntry | 
+                        ParcelFlags.CreateGroupObjects | 
+                        ParcelFlags.UseEstateVoiceChan);
+                    
                     land.LandData.Status = ParcelStatus.Abandoned; // Parcel is Abandoned
  
                     m_hasSentParcelOverLay.Clear(); //Clear everyone out
@@ -1639,10 +1672,13 @@ namespace WhiteCore.Modules.Land
                     land.LandData.SalePrice = 0;
                     land.LandData.AuthBuyerID = UUID.Zero;
                     land.LandData.Status = ParcelStatus.Leased; // Parcel is back to be Leased
-                    land.LandData.Flags &=
-                        ~(uint)
-                         (ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects |
-                          ParcelFlags.ShowDirectory | ParcelFlags.AllowDeedToGroup | ParcelFlags.ContributeWithDeed);
+                    land.LandData.Flags &= ~(uint) (
+                        ParcelFlags.ForSale |
+                        ParcelFlags.ForSaleObjects | 
+                        ParcelFlags.SellParcelObjects |
+                        ParcelFlags.ShowDirectory | 
+                        ParcelFlags.AllowDeedToGroup | 
+                        ParcelFlags.ContributeWithDeed);
 
                     land.SendLandUpdateToClient(true, remote_client);
                     m_hasSentParcelOverLay.Clear(); //Clear everyone out
@@ -1693,12 +1729,9 @@ namespace WhiteCore.Modules.Land
                     int saleprice = lob.LandData.SalePrice;
                     UUID pOwnerID = lob.LandData.OwnerID;
 
-                    bool landforsale = ((lob.LandData.Flags &
-                                       (uint)
-                                         (ParcelFlags.ForSale | ParcelFlags.ForSaleObjects |
-                                       ParcelFlags.SellParcelObjects)) != 0);
-                    if ((AuthorizedID == UUID.Zero || AuthorizedID == e.agentId) && e.parcelPrice >= saleprice &&
-                        landforsale)
+                    bool landforsale = (
+                        (lob.LandData.Flags & (uint) (ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects)) != 0);
+                    if ((AuthorizedID == UUID.Zero || AuthorizedID == e.agentId) && e.parcelPrice >= saleprice && landforsale)
                     {
                         e.parcelOwnerID = pOwnerID;
                         e.landValidated = true;
@@ -1811,9 +1844,8 @@ namespace WhiteCore.Modules.Land
 
         bool SetLandBitmapFromByteArray(ILandObject parcel, bool forceSet, Vector2 offsetOfParcel)
         {
-            //CHECK:  This might assume that regions are still 256x256 ??
-            int avg = (m_scene.RegionInfo.RegionSizeX*m_scene.RegionInfo.RegionSizeY/128);
-            int oldParcelRegionAvg = (int) Math.Sqrt(parcel.LandData.Bitmap.Length*128);
+             int avg = (m_scene.RegionInfo.RegionSizeX * m_scene.RegionInfo.RegionSizeY / 128);
+            int oldParcelRegionAvg = (int) Math.Sqrt(parcel.LandData.Bitmap.Length * 128);
             if (parcel.LandData.Bitmap.Length != avg && !(forceSet && parcel.LandData.Bitmap.Length < avg))
                 //Are the sizes the same
             {
