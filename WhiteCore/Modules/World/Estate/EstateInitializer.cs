@@ -254,7 +254,9 @@ namespace WhiteCore.Modules.Estate
 
                 // link up the region
                 EstateSettings ES;
-                UUID oldOwnerID = scene.RegionInfo.EstateSettings.EstateOwner;
+                UUID oldOwnerID = UUID.Zero;
+                if (scene.RegionInfo.EstateSettings != null)
+                    oldOwnerID = scene.RegionInfo.EstateSettings.EstateOwner;
 
                 if (!estateConnector.LinkRegion(scene.RegionInfo.RegionID, estateID))
                 {
@@ -270,9 +272,12 @@ namespace WhiteCore.Modules.Estate
                 }
 
                 // Linking was successful, change any previously owned parcels to the new owner 
-                IParcelManagementModule parcelManagement = scene.RequestModuleInterface<IParcelManagementModule>();
-                if (parcelManagement != null)
-                    parcelManagement.ReclaimParcels(oldOwnerID, ES.EstateOwner);
+                if (oldOwnerID != UUID.Zero)
+                {
+                    IParcelManagementModule parcelManagement = scene.RequestModuleInterface<IParcelManagementModule>();
+                    if (parcelManagement != null)
+                        parcelManagement.ReclaimParcels(oldOwnerID, ES.EstateOwner);
+                }
 
                 MainConsole.Instance.InfoFormat("[Estate]: Successfully joined the {0} estate!", LastEstateName);
                 return ES;
