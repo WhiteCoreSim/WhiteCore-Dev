@@ -401,7 +401,7 @@ namespace WhiteCore.Modules.WorldMap
         }
 
         // Compute the average color of a texture.
-        Color computeAverageColor(Bitmap bmp)
+        static Color computeAverageColor(Bitmap bmp)
         {
             FastBitmap unsafeBMP = new FastBitmap(bmp);
             // we have 256 x 256 pixel, each with 256 possible color-values per
@@ -453,13 +453,13 @@ namespace WhiteCore.Modules.WorldMap
         // f(0) = 0, f(0.5) = 0.5, f(1) = 1,
         // f'(x) = 0 at x = 0 and x = 1; f'(0.5) = 1.5,
         // f''(0.5) = 0, f''(x) != 0 for x != 0.5
-        float S(float v)
+        static float S(float v)
         {
             return (v*v*(3f - 2f*v));
         }
 
         // interpolate two colors in HSV space and return the resulting color
-        HSV interpolateHSV(ref HSV c1, ref HSV c2, float ratio)
+        static HSV interpolateHSV(ref HSV c1, ref HSV c2, float ratio)
         {
             if (ratio <= 0f) return c1;
             if (ratio >= 1f) return c2;

@@ -228,8 +228,7 @@ namespace WhiteCore.Modules.WorldMap
             m_scene = scene;
 
             IConfig startupConfig = m_config.Configs["Startup"];
-            if (startupConfig.GetString("MapImageModule", "MapImageModule") !=
-                "MapImageModule")
+            if (startupConfig.GetString("MapImageModule", "MapImageModule") != "MapImageModule")
                 return;
 
             if (m_config.Configs["MapModule"] != null)
@@ -334,11 +333,11 @@ namespace WhiteCore.Modules.WorldMap
         {
             if (m_generateMapTiles)
             {
-                UpdateMapImage = new Timer(oneminute*minutes);
+                UpdateMapImage = new Timer(oneminute*  minutes);
                 UpdateMapImage.Elapsed += OnTimedCreateNewMapImage;
                 UpdateMapImage.Enabled = true;
             }
-            UpdateOnlineStatus = new Timer(oneminute*60);
+            UpdateOnlineStatus = new Timer(oneminute * 60);
             UpdateOnlineStatus.Elapsed += OnUpdateRegion;
             UpdateOnlineStatus.Enabled = true;
         }
@@ -351,7 +350,6 @@ namespace WhiteCore.Modules.WorldMap
             if (scene != null)
             {
                 m_scene = scene;
-                CreateTerrainTexture (true);
 
                 ClearWebCachedImages(
                     m_scene.RegionInfo.RegionLocX,
@@ -360,6 +358,16 @@ namespace WhiteCore.Modules.WorldMap
                     m_scene.RegionInfo.RegionSizeY
                 );
                 ClearWorldviewCachedImages (m_scene.RegionInfo.RegionID);
+
+                CreateTerrainTexture (true);
+                m_scene.SimulationDataService.MapTileNeedsGenerated = false;
+
+                // refresh details
+                IGridRegisterModule gridRegModule = m_scene.RequestModuleInterface<IGridRegisterModule>();
+                if (gridRegModule != null)
+                    gridRegModule.UpdateGridRegion(m_scene);
+                
+
             }
         }
 
@@ -377,8 +385,6 @@ namespace WhiteCore.Modules.WorldMap
         {
             if (m_scene.SimulationDataService.MapTileNeedsGenerated)
             {
-                CreateTerrainTexture ();
-                m_scene.SimulationDataService.MapTileNeedsGenerated = false;
                 ClearWebCachedImages(
                     m_scene.RegionInfo.RegionLocX,
                     m_scene.RegionInfo.RegionLocY,
@@ -386,6 +392,9 @@ namespace WhiteCore.Modules.WorldMap
                     m_scene.RegionInfo.RegionSizeY
                 );
                 ClearWorldviewCachedImages (m_scene.RegionInfo.RegionID);
+
+                CreateTerrainTexture ();
+                m_scene.SimulationDataService.MapTileNeedsGenerated = false;
             }
 
         }
@@ -472,15 +481,16 @@ namespace WhiteCore.Modules.WorldMap
                 {
                     AssetBase Terrainasset = new AssetBase(
                         UUID.Random(),
-                        "terrainMapImage_" + m_scene.RegionInfo.RegionID.ToString(),
+                        "terrainMapImage_" + m_scene.RegionInfo.RegionID,
                         AssetType.Simstate,
                         m_scene.RegionInfo.RegionID)
                                                  {
                                                      Data = terraindata,
                                                      Description = m_scene.RegionInfo.RegionName,
                                                      Flags =
-                                                         AssetFlags.Deletable | AssetFlags.Rewritable |
-                                                         AssetFlags.Maptile
+                                                        AssetFlags.Deletable |
+                                                        AssetFlags.Rewritable |
+                                                        AssetFlags.Maptile
                                                  };
                     m_scene.RegionInfo.RegionSettings.TerrainMapImageID = m_scene.AssetService.Store(Terrainasset);
                 }
@@ -496,14 +506,16 @@ namespace WhiteCore.Modules.WorldMap
                 {
                     AssetBase Mapasset = new AssetBase(
                         UUID.Random(),
-                        "terrainImage_" + m_scene.RegionInfo.RegionID.ToString(),
+                        "terrainImage_" + m_scene.RegionInfo.RegionID,
                         AssetType.Simstate,
                         m_scene.RegionInfo.RegionID)
                                              {
                                                  Data = mapdata,
                                                  Description = m_scene.RegionInfo.RegionName,
                                                  Flags =
-                                                     AssetFlags.Deletable | AssetFlags.Rewritable | AssetFlags.Maptile
+                                                     AssetFlags.Deletable |
+                                                     AssetFlags.Rewritable |
+                                                     AssetFlags.Maptile
                                              };
                     m_scene.RegionInfo.RegionSettings.TerrainImageID = m_scene.AssetService.Store(Mapasset);
                 }
@@ -528,7 +540,8 @@ namespace WhiteCore.Modules.WorldMap
                                                     Data = overlay,
                                                     Description = m_scene.RegionInfo.RegionName,
                                                     Flags =
-                                                        AssetFlags.Deletable | AssetFlags.Rewritable |
+                                                        AssetFlags.Deletable |
+                                                        AssetFlags.Rewritable |
                                                         AssetFlags.Maptile
                                                 };
                     m_scene.RegionInfo.RegionSettings.ParcelMapImageID = m_scene.AssetService.Store(Parcelasset);
