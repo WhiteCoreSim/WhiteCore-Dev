@@ -26,6 +26,7 @@
  */
 
 using System.Reflection;
+using System.Resources;
 using System.Runtime.InteropServices;
 
 // Information about this assembly is defined by the following
@@ -54,4 +55,5 @@ using System.Runtime.InteropServices;
 // You can specify all values by your own or you can build default build and revision
 // numbers with the '*' character (the default):
 
-[assembly: AssemblyVersion("0.9.4.*")]
+[assembly: AssemblyVersion("0.9.3.14")]
+[assembly: NeutralResourcesLanguageAttribute("en")]

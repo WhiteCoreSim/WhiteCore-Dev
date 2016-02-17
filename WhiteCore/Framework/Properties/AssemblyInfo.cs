@@ -26,6 +26,7 @@
  */
 
 using System.Reflection;
+using System.Resources;
 using System.Runtime.InteropServices;
 
 // General information about an assembly is controlled through the following
@@ -58,4 +59,5 @@ using System.Runtime.InteropServices;
 //      Revision
 //
 
-[assembly: AssemblyVersion("0.9.4.*")]
+[assembly: AssemblyVersion("0.9.3.14")]
+[assembly: NeutralResourcesLanguageAttribute("en")]
