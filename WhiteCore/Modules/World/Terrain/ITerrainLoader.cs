@@ -26,7 +26,6 @@
  */
 
 using System.IO;
-
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
 
@@ -37,8 +36,10 @@ namespace WhiteCore.Modules.Terrain
         string FileExtension { get; }
         ITerrainChannel LoadFile(string filename, IScene scene);
 
-        ITerrainChannel LoadFile(string filename, IScene scene, int fileStartX, int fileStartY, int fileWidth, int fileHeight,
-                                 int sectionWidth, int sectionHeight);
+        ITerrainChannel LoadFile(string filename, IScene scene, 
+            int fileStartX, int fileStartY, 
+            int fileWidth, int fileHeight,
+            int sectionWidth, int sectionHeight);
 
         ITerrainChannel LoadStream(Stream stream, IScene scene);
         void SaveFile(string filename, ITerrainChannel map);

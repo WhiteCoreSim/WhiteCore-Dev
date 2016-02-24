@@ -383,9 +383,13 @@ namespace WhiteCore.Modules.Terrain
                         MainConsole.Instance.Info ("[TERRAIN]: Loading " + filename + " to " + m_scene.RegionInfo.RegionName);
                         ITerrainChannel channel = loader.LoadFile (filename, m_scene);
                         channel.Scene = m_scene;
+
                         if (m_scene.RegionInfo.RegionSizeY == channel.Height &&
                             m_scene.RegionInfo.RegionSizeX == channel.Width)
                         {
+                            if (offsetX > 0 || offsetY > 0)
+                                MainConsole.Instance.Warn("[TERRAIN]: The terrain file is the same size as the region! Offsets will be ignored");
+                            
                             m_channel = channel;
                             m_scene.RegisterModuleInterface (m_channel);
                             MainConsole.Instance.DebugFormat ("[TERRAIN]: Loaded terrain, wd/ht: {0}/{1}", channel.Width,
@@ -397,22 +401,23 @@ namespace WhiteCore.Modules.Terrain
                                 (offsetY + channel.Height) > m_channel.Height)
                             {
                                 MainConsole.Instance.Error (
-                                    "[TERRAIN]: Unable to load heightmap, the terrain you have given is larger than the current region.");
+                                    "[TERRAIN]: Unable to load heightmap, the terrain details you have specified are not able to fit in the current region." +
+                                    "\n      Maybe the 'terrain load-tile' command is what you need?");
                                 return;
-                            } else
-                            {
-                                //Merge the terrains together at the specified offset
-                                for (int x = offsetX; x < offsetX + channel.Width; x++)
-                                {
-                                    for (int y = offsetY; y < offsetY + channel.Height; y++)
-                                    {
-                                        m_channel [x, y] = channel [x - offsetX, y - offsetY];
-                                    }
-                                }
-                                MainConsole.Instance.DebugFormat ("[TERRAIN]: Loaded terrain, wd/ht: {0}/{1}",
-                                    channel.Width,
-                                    channel.Height);
                             }
+
+                            // Merge the new terrain at the specified offset with the existing terrain
+                            for (int x = offsetX; x < offsetX + channel.Width; x++)
+                            {
+                                for (int y = offsetY; y < offsetY + channel.Height; y++)
+                                {
+                                    m_channel [x, y] = channel [x - offsetX, y - offsetY];
+                                }
+                            }
+                            MainConsole.Instance.DebugFormat ("[TERRAIN]: Loaded terrain, wd/ht: {0}/{1}",
+                                channel.Width,
+                                channel.Height);
+
                         }
                         UpdateRevertMap ();
                     } catch (NotImplementedException)
@@ -422,7 +427,7 @@ namespace WhiteCore.Modules.Terrain
                     } catch (FileNotFoundException)
                     {
                         MainConsole.Instance.ErrorFormat (
-                            "[TERRAIN]: Unable to load heightmap, file {0} not found. (directory permissions errors may also cause this)", filename);
+                            "[TERRAIN]: Unable to load heightmap, file {0} not found. (Directory permissions errors may also cause this)", filename);
                     } catch (ArgumentException e)
                     {
                         MainConsole.Instance.ErrorFormat ("[TERRAIN]: Unable to load heightmap: {0}", e.Message);
@@ -437,7 +442,7 @@ namespace WhiteCore.Modules.Terrain
                 return;
             }
 
-            MainConsole.Instance.Error("[TERRAIN]: Unable to load heightmap, Unable to locate a file loader for " + filename);
+            MainConsole.Instance.Error("[TERRAIN]: Unable to locate a file loader for " + filename);
         }
 
 
@@ -1231,44 +1236,47 @@ namespace WhiteCore.Modules.Terrain
         }
 
         /// <summary>
-        ///     Loads a tile from a larger terrain file and installs it into the region.
+        ///     Loads a 256x256 tile from a larger terrain file and installs it into the region.
         /// </summary>
         /// <param name="filename">The terrain file to load</param>
-        /// <param name="fileWidth">The width of the file in units</param>
-        /// <param name="fileHeight">The height of the file in units</param>
-        /// <param name="fileStartX">Where to begin our slice</param>
-        /// <param name="fileStartY">Where to begin our slice</param>
-        public void LoadFromFile(string filename, int fileWidth, int fileHeight, int fileStartX, int fileStartY)
+        /// <param name="fileWidth">The width of the file</param>
+        /// <param name="fileHeight">The height of the file</param>
+        /// <param name="tileLocX">Where to begin our slice</param>
+        /// <param name="tileLocY">Where to begin our slice</param>
+        public void LoadTileFromFile(string filename, int fileTileWidth, int fileTileHeight, int tileLocX, int tileLocY)
         {
-            int offsetX = (m_scene.RegionInfo.RegionLocX/Constants.RegionSize) - fileStartX;
-            int offsetY = (m_scene.RegionInfo.RegionLocY/Constants.RegionSize) - fileStartY;
+            int offsetX = (m_scene.RegionInfo.RegionLocX/Constants.RegionSize) - tileLocX;
+            int offsetY = (m_scene.RegionInfo.RegionLocY/Constants.RegionSize) - tileLocY;
 
-            if (offsetX >= 0 && offsetX < fileWidth && offsetY >= 0 && offsetY < fileHeight)
+            if (offsetX >= 0 && offsetX < fileTileWidth && offsetY >= 0 && offsetY < fileTileHeight)
             {
-                // this region is included in the tile request
-                //foreach (
-                //    KeyValuePair<string, ITerrainLoader> loader in
-                //        m_loaders.Where(loader => Path.GetExtension(filename.ToLower()) == loader.Key))
-                //{
-                //{
                 var loader = GetTerrainLoader (filename);
                 if (loader != null)
                 {
                     lock (m_scene)
                     {
-						MainConsole.Instance.Info("[TERRAIN]: Loading "+filename+" to "+m_scene.RegionInfo.RegionName);
-                        ITerrainChannel channel = loader.LoadFile(filename, m_scene, offsetX, offsetY,
-                                                                        fileWidth, fileHeight,
-                                                                        m_scene.RegionInfo.RegionSizeX,
-                                                                        m_scene.RegionInfo.RegionSizeY);
+						MainConsole.Instance.Info("[TERRAIN]: Loading "+filename+" to " + m_scene.RegionInfo.RegionName);
+                        ITerrainChannel channel = loader.LoadFile(
+                            filename, m_scene,
+                            offsetX, offsetY,
+                            fileTileWidth, fileTileHeight,
+                            m_scene.RegionInfo.RegionSizeX,
+                            m_scene.RegionInfo.RegionSizeY);
+ 
                         channel.Scene = m_scene;
                         m_channel = channel;
                         m_scene.RegisterModuleInterface(m_channel);
                         UpdateRevertMap();
                     }
+                    CheckForTerrainUpdates();
+                    MainConsole.Instance.Info("[TERRAIN]: File (" + filename + ") loaded successfully");
                     return;
                 }
+                MainConsole.Instance.Error("[TERRAIN]: Unable to locate a file loader for " + filename);
+                return;
             }
+            MainConsole.Instance.Error("[TERRAIN]: Tile location is outside of image");
+
         }
 
         void client_onGodlikeMessage(IClientAPI client, UUID requester, string Method, List<string> Parameters)
@@ -1543,7 +1551,7 @@ namespace WhiteCore.Modules.Terrain
             if (scene == null)
             {
                 string line =
-                    MainConsole.Instance.Prompt("Are you sure that you want to do this command on all scenes?", "yes");
+                    MainConsole.Instance.Prompt("Are you sure that you want to do this command on all regions?", "yes");
                 if (!line.Equals("yes", StringComparison.CurrentCultureIgnoreCase))
                     return modules;
                 //Return them all
@@ -1557,20 +1565,39 @@ namespace WhiteCore.Modules.Terrain
 
         void InterfaceLoadFile(IScene scene, string[] cmd)
         {
-            if (cmd.Length < 3)
-			{
-				MainConsole.Instance.Info(
-					"You need to specify a filename to load [opt: xoffset  and/or yoffset].");
-				return;
-			}
-			if (!File.Exists(cmd[2])) {
-				MainConsole.Instance.Info("Terrain file '"+cmd[2]+"' not found.");
-				return;
-			}
- 
-			int offsetX = 0;
+
+            if (scene == null)
+            {
+                MainConsole.Instance.Warn ("[TERRAIN]: Please change to your region before loading terrain");
+                return;
+            }
+
+            bool prompt = false;
+            string loadFile;
+            if (cmd.Length > 2)
+            {
+                loadFile = cmd[2];
+                if (!File.Exists(loadFile)) {
+                    MainConsole.Instance.Info("Terrain file '"+loadFile+"' not found.");
+                    return;
+                }
+
+            } else {
+                var defpath = scene.RequestModuleInterface<ISimulationBase> ().DefaultDataPath;
+
+                loadFile = PathHelpers.GetReadFilename("Terrain file to load into " + scene.RegionInfo.RegionName,
+                    defpath, 
+                    new List<string>() {"png","jpg","bmp","gif","raw","tiff"},
+                    true);
+                if (loadFile == "")
+                    return;
+                prompt = true;
+            }
+
+            int offsetX = 0;
             int offsetY = 0;
 
+            // check for offsets
             int i = 0;
             foreach (string param in cmd)
             {
@@ -1587,43 +1614,101 @@ namespace WhiteCore.Modules.Terrain
                 i++;
             }
 
+            // check if interactive
+            if (prompt)
+            {
+                var enterOffsets = "no";
+                enterOffsets = MainConsole.Instance.Prompt ("Do you wish to offset this terrain in the region? (y/n)", enterOffsets);
+                if (enterOffsets.ToLower ().StartsWith ("y"))
+                {
+                    MainConsole.Instance.Info ("Note: The region should fit into the terrain image (including any offsets)");
+                    int.TryParse (MainConsole.Instance.Prompt ("X offset?", offsetX.ToString()), out offsetX);
+                    int.TryParse (MainConsole.Instance.Prompt ("Y offset?", offsetY.ToString()), out offsetY);
+                }
+            }
+
+                 
 			List<TerrainModule> m = FindModuleForScene(MainConsole.Instance.ConsoleScene);
 			foreach (TerrainModule tmodule in m)
             {
-				MainConsole.Instance.Info("[TERRAIN]: Loading "+cmd[2]+" to scene "+tmodule.m_scene.RegionInfo.RegionName);
-                tmodule.LoadFromFile(cmd[2], offsetX, offsetY);
+                tmodule.LoadFromFile(loadFile, offsetX, offsetY);
             }
-            // LoadFromFile(cmd[2], offsetX, offsetY);
         }
 
         void InterfaceLoadTileFile(IScene scene, string[] cmd)
         {
-
-            if (cmd.Length < 7)
-			{
-				MainConsole.Instance.Info(
-					"You do not have enough parameters. Please look at 'terrain help' for more info.");
-				return;
-			}
-			if (!File.Exists(cmd[2])) {
-				MainConsole.Instance.Info("Terrain file '"+cmd[2]+"' not found.");
-				return;
-			}
-
-            var fileWidth = int.Parse (cmd [3]);
-            var fileHeight = int.Parse (cmd [4]);
-            var xOffset = int.Parse (cmd [5]);
-            var yOffset = int.Parse (cmd [6]);
-
-            if ((fileWidth < scene.RegionInfo.RegionSizeX) ||
-                (fileHeight < scene.RegionInfo.RegionSizeY))
+            if (scene == null)
             {
-                MainConsole.Instance.Info ("The region is larger than the image size!");
+                MainConsole.Instance.Warn ("[TERRAIN]: Please change to your region before loading terrain");
                 return;
             }
 
-            if ( ((fileWidth+xOffset)  < scene.RegionInfo.RegionSizeX) ||
-                 ((fileHeight+yOffset) < scene.RegionInfo.RegionSizeY) )
+            bool prompt = false;
+            string loadFile;
+            if (cmd.Length > 2)
+            {
+                loadFile = cmd[2];
+                if (!File.Exists(loadFile)) {
+                    MainConsole.Instance.Info("Terrain file '"+loadFile+"' not found.");
+                    return;
+                }
+
+            } else {
+                var defpath = scene.RequestModuleInterface<ISimulationBase> ().DefaultDataPath;
+
+                loadFile = PathHelpers.GetReadFilename("Terrain file to load into " + scene.RegionInfo.RegionName,
+                    defpath,
+                    new List<string>() {"png","jpg","bmp","gif","raw","tiff"},
+                    true);
+                if (loadFile == "")
+                    return;
+                prompt = true;
+            }
+
+            int fileTileWidth = 0;
+            int fileTileHeight = 0;
+            int xOffset = 0;
+            int yOffset = 0;
+            if (prompt)
+            {
+                MainConsole.Instance.Info ("Please enter the height and width (in 256x256 tiles) of the terrain file");
+                int.TryParse (MainConsole.Instance.Prompt ("Terrain image width (tiles)?", fileTileWidth.ToString()), out fileTileWidth);
+                if (fileTileWidth == 0)
+                    return;
+                fileTileHeight = fileTileWidth;
+                int.TryParse (MainConsole.Instance.Prompt ("Terrain image hetight (tiles)?", fileTileHeight.ToString()), out fileTileHeight);
+                if (fileTileHeight == 0)
+                    return;
+
+                string regSize = Constants.RegionSize.ToString ();
+                string tileSize = regSize + "x" + regSize;
+                MainConsole.Instance.Info ("   The tile location is the X/Y position of the region tile (" + tileSize + ") within the image"); 
+                int.TryParse (MainConsole.Instance.Prompt ("Region X tile location?", xOffset.ToString()), out xOffset);
+                int.TryParse (MainConsole.Instance.Prompt ("Region Y tile location?", yOffset.ToString()), out yOffset);
+
+            } else
+            {
+                fileTileWidth = int.Parse (cmd [3]);
+                fileTileHeight = int.Parse (cmd [4]);
+                xOffset = int.Parse (cmd [5]);
+                yOffset = int.Parse (cmd [6]);
+
+                if (fileTileHeight == 0 || fileTileWidth == 0)
+                {
+                    MainConsole.Instance.Error ("[TERRAIN]: The file tile height and/or width must be specified");
+                    return;
+                }
+            }
+
+            if ( ((fileTileWidth * Constants.RegionSize) < scene.RegionInfo.RegionSizeX) ||
+                ((fileTileHeight * Constants.RegionSize) < scene.RegionInfo.RegionSizeY) )
+             {
+                MainConsole.Instance.Info ("The region is larger than the image size (Use the 'terrain load' command instead)!");
+                return;
+            }
+
+            if ( (((fileTileWidth  + xOffset) * Constants.RegionSize) < scene.RegionInfo.RegionSizeX) ||
+                 (((fileTileHeight + yOffset) * Constants.RegionSize) < scene.RegionInfo.RegionSizeY) )
             {
                 MainConsole.Instance.Info ("The region will not fit into the image given the offsets provided!");
                 return;
@@ -1632,8 +1717,7 @@ namespace WhiteCore.Modules.Terrain
             List<TerrainModule> m = FindModuleForScene(MainConsole.Instance.ConsoleScene);
 			foreach (TerrainModule tmodule in m)
             {
-				MainConsole.Instance.Info("[TERRAIN]: Loading "+cmd[2]+" tile to scene "+tmodule.m_scene.RegionInfo.RegionName);
-                tmodule.LoadFromFile (cmd [2], fileWidth, fileHeight, xOffset, yOffset);
+                tmodule.LoadTileFromFile (loadFile, fileTileWidth, fileTileHeight, xOffset, yOffset);
 			}
         }
 
@@ -2076,8 +2160,9 @@ namespace WhiteCore.Modules.Terrain
                 supportedFileExtensions);
 
             MainConsole.Instance.Info(
-                "terrain load-tile <file width> <file height> <minimum X tile> <minimum Y tile>\n" +
+                "terrain load-tile <FileName> <file width> <file height> <minimum X tile> <minimum Y tile>\n" +
                 "     - Loads a terrain from a section of a larger file.\n" +
+                "\n FileName: The image file to use for tiling" +
                 "\n file width: The width of the file image" +
                 "\n file height: The height of the file image" +
                 "\n minimum X tile: The X region coordinate of the first section on the file" +
@@ -2163,45 +2248,46 @@ namespace WhiteCore.Modules.Terrain
                     "terrain load <FileName> <OffsetX=> <OffsetY=>",
                     "Loads a terrain from a specified file. FileName: The file you wish to load from. Supported extensions include: " +
                     supportedFileExtensions,
-                    InterfaceLoadFile, true, false);
+                    InterfaceLoadFile, true, true);     
 
                 MainConsole.Instance.Commands.AddCommand (
                     "terrain load-tile",
-                    "terrain load-tile <file width> <file height> <minimum X tile> <minimum Y tile>",
+                    "terrain load-tile <FileName> <file width> <file height> <minimum X tile> <minimum Y tile>",
                     "Loads a terrain from a section of a larger file." +
+                    "\n FileName: The image file to use for tiling" +
                     "\n file width: The width of the file image" +
                     "\n file height: The height of the file image" +
                     "\n minimum X tile: The X region coordinate of the first section on the file" +
                     "\n minimum Y tile: The Y region coordinate of the first section on the file",
-                    InterfaceLoadTileFile, true, false);
+                    InterfaceLoadTileFile, true, true);
 
                 MainConsole.Instance.Commands.AddCommand(
                     "terrain fill",
                     "terrain fill <value> ",
                     "Fills the current heightmap with a specified value." +
                     "\n value: The numeric value of the height you wish to set your region to.",
-                    InterfaceFillTerrain, true, false);
+                    InterfaceFillTerrain, true, true);
 
                 MainConsole.Instance.Commands.AddCommand(
                     "terrain elevate",
                     "terrain elevate <amount> ",
                     "Raises the current heightmap by the specified amount." +
                     "\n amount: The amount of height to remove from the terrain in meters.",
-                    InterfaceElevateTerrain, true, false);
+                    InterfaceElevateTerrain, true, true);
 
                 MainConsole.Instance.Commands.AddCommand(
                     "terrain lower",
                     "terrain lower <amount> ",
                     "Lowers the current heightmap by the specified amount." +
                     "\n amount: The amount of height to remove from the terrain in meters.",
-                    InterfaceLowerTerrain, true, false);
+                    InterfaceLowerTerrain, true, true);
 
                 MainConsole.Instance.Commands.AddCommand (
                     "terrain multiply",
                     "terrain multiply <value> ",
                     "Multiplies the heightmap by the value specified." +
                     "\n value: The value to multiply the heightmap by.",
-                    InterfaceMultiplyTerrain, true, false);
+                    InterfaceMultiplyTerrain, true, true);
 
                 MainConsole.Instance.Commands.AddCommand (
                     "terrain bake",
@@ -2213,7 +2299,7 @@ namespace WhiteCore.Modules.Terrain
                     "terrain revert",
                     "terrain revert",
                     "Loads the revert map terrain into the regions heightmap.",
-                    InterfaceRevertTerrain, true, false);
+                    InterfaceRevertTerrain, true, true);
 
                 MainConsole.Instance.Commands.AddCommand(
                     "terrain stats",
