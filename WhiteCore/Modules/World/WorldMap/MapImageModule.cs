@@ -1128,8 +1128,10 @@ namespace WhiteCore.Modules.WorldMap
 
         Bitmap fetchTexture(UUID id)
         {
-            byte[] asset = m_scene.AssetService.GetData(id.ToString());
-            //MainConsole.Instance.DebugFormat("Fetched texture {0}, found: {1}", id, asset != null);
+            byte[] asset = null;
+            if (m_scene.AssetService.GetExists(id.ToString()))
+               asset = m_scene.AssetService.GetData(id.ToString());
+
             if (asset == null) return null;
 
             try

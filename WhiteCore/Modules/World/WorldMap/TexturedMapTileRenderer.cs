@@ -83,7 +83,7 @@ namespace WhiteCore.Modules.WorldMap
         }
 
         // (for info about algorithm, see http://en.wikipedia.org/wiki/HSL_and_HSV)
-        public Color toColor ()
+        public Color ToColor ()
         {
             float f = h / 60f;
             int sector = (int)f % 6;
@@ -262,7 +262,7 @@ namespace WhiteCore.Modules.WorldMap
                             else hsv = interpolateHSV(ref hsv3, ref hsv4, (hmod*3f) - 2f);
                         }
                         //get the data from the original image
-                        Color hsvColor = hsv.toColor();
+                        Color hsvColor = hsv.ToColor();
                         unsafeBMP.SetPixel((int) (x/sizeRatio),
                                            (int) (((m_scene.RegionInfo.RegionSizeY - 1) - y)/sizeRatio), hsvColor);
                     }
