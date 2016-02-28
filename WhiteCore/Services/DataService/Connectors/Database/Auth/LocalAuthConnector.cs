@@ -27,29 +27,28 @@
 
 using System;
 using System.Collections.Generic;
-
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.Services;
 using Nini.Config;
 using OpenMetaverse;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.Services;
 
 namespace WhiteCore.Services.DataService
 {
     public class LocalAuthConnector : IAuthenticationData
     {
-        private IGenericData GD;
-        private int m_LastExpire;
-        private string m_realm = "auth";
-        private string m_tokensrealm = "tokens";
+        IGenericData GD;
+        int m_LastExpire;
+        string m_realm = "auth";
+        string m_tokensrealm = "tokens";
 
         #region IAuthenticationData Members
 
-        public void Initialize(IGenericData GenericData, IConfigSource source, IRegistryCore simBase,
+        public void Initialize(IGenericData genericData, IConfigSource source, IRegistryCore simBase,
                                string defaultConnectionString)
         {
             if (source.Configs["WhiteCoreConnectors"].GetString("AuthConnector", "LocalConnector") == "LocalConnector")
             {
-                GD = GenericData;
+                GD = genericData;
 
                 string connectionString = defaultConnectionString;
                 if (source.Configs[Name] != null)
@@ -162,7 +161,7 @@ namespace WhiteCore.Services.DataService
         {
         }
 
-        private void DoExpire()
+        void DoExpire()
         {
             GD.DeleteByTime(m_tokensrealm, "validity");
 

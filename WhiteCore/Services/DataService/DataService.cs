@@ -25,27 +25,26 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using Nini.Config;
 using WhiteCore.DataManager.MySQL;
 using WhiteCore.DataManager.SQLite;
-
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.ModuleLoader;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Services;
-using Nini.Config;
-using System;
-using System.Collections.Generic;
 
 namespace WhiteCore.Services.DataService
 {
     public class LocalDataService
     {
-        private string ConnectionString = "";
-        private string StorageProvider = "";
+        string ConnectionString = "";
+        string StorageProvider = "";
 
-        public void Initialise(IConfigSource source, IRegistryCore simBase)
+        public void Initialise(IConfigSource config, IRegistryCore registry)
         {
-            IConfig m_config = source.Configs["WhiteCoreData"];
+            IConfig m_config = config.Configs["WhiteCoreData"];
             if (m_config != null)
             {
                 StorageProvider = m_config.GetString("StorageProvider", StorageProvider);
@@ -76,6 +75,10 @@ namespace WhiteCore.Services.DataService
                 //Allow for fallback when WhiteCoreData isn't set
             {
                 SQLiteLoader GenericData = new SQLiteLoader();
+
+                // set default data directory in case it is needed
+                var simBase = registry.RequestModuleInterface<ISimulationBase> ();
+                GenericData.DefaultDataPath = simBase.DefaultDataPath;
 
                 DataConnector = GenericData;
             }
@@ -85,21 +88,21 @@ namespace WhiteCore.Services.DataService
             {
                 try
                 {
-                    plugin.Initialize(DataConnector == null ? null : DataConnector.Copy(), source, simBase,
+                    plugin.Initialize(DataConnector == null ? null : DataConnector.Copy(), config, registry,
                                       ConnectionString);
                 }
                 catch (Exception ex)
                 {
                     if (MainConsole.Instance != null)
                         MainConsole.Instance.Warn("[DataService]: Exception occurred starting data plugin " +
-                                                  plugin.Name + ", " + ex.ToString());
+                                                  plugin.Name + ", " + ex);
                 }
             }
         }
 
-        public void Initialise(IConfigSource source, IRegistryCore simBase, List<Type> types)
+        public void Initialise(IConfigSource config, IRegistryCore registry, List<Type> types)
         {
-            IConfig m_config = source.Configs["WhiteCoreData"];
+            IConfig m_config = config.Configs["WhiteCoreData"];
             if (m_config != null)
             {
                 StorageProvider = m_config.GetString("StorageProvider", StorageProvider);
@@ -130,6 +133,10 @@ namespace WhiteCore.Services.DataService
                 //Allow for fallback when WhiteCoreData isn't set
             {
                 SQLiteLoader GenericData = new SQLiteLoader();
+
+                // set default data directory in case it is needed
+                var simBase = registry.RequestModuleInterface<ISimulationBase> ();
+                GenericData.DefaultDataPath = simBase.DefaultDataPath;
 
                 DataConnector = GenericData;
             }
@@ -141,13 +148,13 @@ namespace WhiteCore.Services.DataService
                 {
                     try
                     {
-                        plugin.Initialize(DataConnector.Copy(), source, simBase, ConnectionString);
+                        plugin.Initialize(DataConnector.Copy(), config, registry, ConnectionString);
                     }
                     catch (Exception ex)
                     {
                         if (MainConsole.Instance != null)
                             MainConsole.Instance.Warn("[DataService]: Exception occurred starting data plugin " +
-                                                      plugin.Name + ", " + ex.ToString());
+                                                      plugin.Name + ", " + ex);
                     }
                 }
             }
