@@ -354,6 +354,7 @@ namespace WhiteCore.Framework.Servers.HttpServer
                 }
 
                 response.KeepAlive = false;
+                response.AddHeader("X-Powered-By","WhiteCore Services");
                 string requestMethod = request.HttpMethod;
                 string uriString = request.RawUrl;
                 int requestStartTick = Environment.TickCount;
