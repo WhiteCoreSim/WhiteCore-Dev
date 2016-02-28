@@ -253,18 +253,15 @@ namespace WhiteCore.Modules.WorldMap
             }
 
             // setup cache directories
-            if (m_assetCacheDir == "")
+            m_assetCacheDir = m_config.Configs ["AssetCache"].GetString ("CacheDirectory",m_assetCacheDir);
+            if (m_assetCacheDir == "")  // use default
             {
-                m_assetCacheDir = m_config.Configs ["AssetCache"].GetString ("CacheDirectory",m_assetCacheDir);
-
-                if (m_assetCacheDir == "")  // use default
-                {
-                    var defpath = m_scene.RequestModuleInterface<ISimulationBase> ().DefaultDataPath;
-                    m_assetCacheDir = Path.Combine (defpath, Constants.DEFAULT_ASSETCACHE_DIR);
-                }
-                m_assetMapCacheDir = Path.Combine (m_assetCacheDir, "mapzoomlevels");
-                m_assetWorldviewCacheDir = Path.Combine (m_assetCacheDir, "Worldview");
+                var defpath = m_scene.RequestModuleInterface<ISimulationBase> ().DefaultDataPath;
+                m_assetCacheDir = Path.Combine (defpath, Constants.DEFAULT_ASSETCACHE_DIR);
             }
+            m_assetMapCacheDir = Path.Combine (m_assetCacheDir, "mapzoomlevels");
+            m_assetWorldviewCacheDir = Path.Combine (m_assetCacheDir, "Worldview");
+       
 
 
             m_scene.RegisterModuleInterface<IMapImageGenerator>(this);

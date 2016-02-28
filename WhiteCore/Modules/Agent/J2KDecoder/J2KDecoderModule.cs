@@ -26,21 +26,21 @@
  */
 
 
-using WhiteCore.Framework.ConsoleFramework;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.Services;
-using WhiteCore.Framework.Services.ClassHelpers.Assets;
-using WhiteCore.Framework.Utilities;
-using CSJ2K;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.Imaging;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using CSJ2K;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.Imaging;
+using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.Services;
+using WhiteCore.Framework.Services.ClassHelpers.Assets;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.Agent.J2KDecoder
 {
@@ -51,22 +51,22 @@ namespace WhiteCore.Modules.Agent.J2KDecoder
         /// <summary>
         ///     Temporarily holds de-serialized layer data information in memory
         /// </summary>
-        private readonly ExpiringCache<UUID, OpenJPEG.J2KLayerInfo[]> m_decodedCache =
+        readonly ExpiringCache<UUID, OpenJPEG.J2KLayerInfo[]> m_decodedCache =
             new ExpiringCache<UUID, OpenJPEG.J2KLayerInfo[]>();
 
         /// <summary>
         ///     List of client methods to notify of results of decode
         /// </summary>
-        private readonly Dictionary<UUID, List<DecodedCallback>> m_notifyList =
+        readonly Dictionary<UUID, List<DecodedCallback>> m_notifyList =
             new Dictionary<UUID, List<DecodedCallback>>();
 
         /// <summary>
         ///     Cache that will store decoded JPEG2000 layer boundary data
         /// </summary>
-        private IImprovedAssetCache m_cache;
+        IImprovedAssetCache m_cache;
 
-        private bool m_useCache = true;
-        private bool m_useCSJ2K = true;
+        bool m_useCache = true;
+        bool m_useCSJ2K = true;
 
         #region IJ2KDecoder
 
@@ -133,8 +133,8 @@ namespace WhiteCore.Modules.Agent.J2KDecoder
                     mimage = null;
                     return image;
                 }
-                else
-                    return null;
+
+                return null;
             }
         }
 
@@ -145,12 +145,12 @@ namespace WhiteCore.Modules.Agent.J2KDecoder
         /// </summary>
         /// <param name="assetID">UUID of Asset</param>
         /// <param name="j2kData">JPEG2000 data</param>
-        private bool DoJ2KDecode(UUID assetID, byte[] j2kData)
+        bool DoJ2KDecode(UUID assetID, byte[] j2kData)
         {
             return DoJ2KDecode(assetID, j2kData, m_useCSJ2K);
         }
 
-        private bool DoJ2KDecode(UUID assetID, byte[] j2kData, bool useCSJ2K)
+        bool DoJ2KDecode(UUID assetID, byte[] j2kData, bool useCSJ2K)
         {
             //int DecodeTime = 0;
             //DecodeTime = Environment.TickCount;
@@ -218,7 +218,7 @@ namespace WhiteCore.Modules.Agent.J2KDecoder
 
                 if (layers == null || layers.Length == 0)
                 {
-                    if (useCSJ2K == this.m_useCSJ2K)
+                    if (useCSJ2K == m_useCSJ2K)
                     {
                         MainConsole.Instance.Warn("[J2KDecoderModule]: Failed to decode layer data with (" +
                                                   (m_useCSJ2K ? "CSJ2K" : "OpenJPEG") + ") for texture " + assetID +
@@ -272,7 +272,7 @@ namespace WhiteCore.Modules.Agent.J2KDecoder
             return true;
         }
 
-        private OpenJPEG.J2KLayerInfo[] CreateDefaultLayers(int j2kLength)
+        OpenJPEG.J2KLayerInfo[] CreateDefaultLayers(int j2kLength)
         {
             OpenJPEG.J2KLayerInfo[] layers = new OpenJPEG.J2KLayerInfo[5];
 
@@ -297,14 +297,14 @@ namespace WhiteCore.Modules.Agent.J2KDecoder
             return layers;
         }
 
-        private void SaveFileCacheForAsset(UUID AssetId, OpenJPEG.J2KLayerInfo[] Layers)
+        void SaveFileCacheForAsset(UUID assetId, OpenJPEG.J2KLayerInfo[] layers)
         {
             if (m_useCache)
-                m_decodedCache.AddOrUpdate(AssetId, Layers, TimeSpan.FromMinutes(10));
+                m_decodedCache.AddOrUpdate(assetId, layers, TimeSpan.FromMinutes(10));
 
             if (m_cache != null)
             {
-                string assetID = "j2kCache_" + AssetId.ToString();
+                string assetID = "j2kCache_" + assetId;
 
                 AssetBase layerDecodeAsset = new AssetBase(assetID, assetID, AssetType.Notecard,
                                                            UUID.Zero)
@@ -314,13 +314,13 @@ namespace WhiteCore.Modules.Agent.J2KDecoder
 
                 StringBuilder stringResult = new StringBuilder();
                 string strEnd = "\n";
-                for (int i = 0; i < Layers.Length; i++)
+                for (int i = 0; i < layers.Length; i++)
                 {
-                    if (i == Layers.Length - 1)
+                    if (i == layers.Length - 1)
                         strEnd = String.Empty;
 
-                    stringResult.AppendFormat("{0}|{1}|{2}{3}", Layers[i].Start, Layers[i].End,
-                                              Layers[i].End - Layers[i].Start, strEnd);
+                    stringResult.AppendFormat("{0}|{1}|{2}{3}", layers[i].Start, layers[i].End,
+                                              layers[i].End - layers[i].Start, strEnd);
                 }
 
                 layerDecodeAsset.Data = Util.UTF8.GetBytes(stringResult.ToString());
@@ -331,15 +331,15 @@ namespace WhiteCore.Modules.Agent.J2KDecoder
             }
         }
 
-        private bool TryLoadCacheForAsset(UUID AssetId, out OpenJPEG.J2KLayerInfo[] Layers)
+        bool TryLoadCacheForAsset(UUID assetId, out OpenJPEG.J2KLayerInfo[] layers)
         {
-            if (m_decodedCache.TryGetValue(AssetId, out Layers))
+            if (m_decodedCache.TryGetValue(assetId, out layers))
             {
                 return true;
             }
             else if (m_cache != null)
             {
-                string assetName = "j2kCache_" + AssetId.ToString();
+                string assetName = "j2kCache_" + assetId;
                 AssetBase layerDecodeAsset = m_cache.Get(assetName);
 
                 if (layerDecodeAsset != null)
@@ -356,7 +356,7 @@ namespace WhiteCore.Modules.Agent.J2KDecoder
                         return false;
                     }
 
-                    Layers = new OpenJPEG.J2KLayerInfo[lines.Length];
+                    layers = new OpenJPEG.J2KLayerInfo[lines.Length];
 
                     for (int i = 0; i < lines.Length; i++)
                     {
@@ -378,7 +378,7 @@ namespace WhiteCore.Modules.Agent.J2KDecoder
                                 return false;
                             }
 
-                            Layers[i] = new OpenJPEG.J2KLayerInfo {Start = element1, End = element2};
+                            layers[i] = new OpenJPEG.J2KLayerInfo {Start = element1, End = element2};
                         }
                         else
                         {
