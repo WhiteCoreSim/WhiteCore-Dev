@@ -177,6 +177,7 @@ namespace WhiteCore.Services
                     {
                         var defpath = registry.RequestModuleInterface<ISimulationBase> ().DefaultDataPath;
                         m_CacheDirectory = Path.Combine (defpath, Constants.DEFAULT_ASSETCACHE_DIR);
+                        m_CacheDirectory = Path.Combine (m_CacheDirectory, "flotsam");
                     }
                     MainConsole.Instance.InfoFormat("[FLOTSAM ASSET CACHE]: Cache Directory '{0}'", m_CacheDirectory);
 
