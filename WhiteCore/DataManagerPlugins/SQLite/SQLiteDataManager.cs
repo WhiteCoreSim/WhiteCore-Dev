@@ -42,7 +42,7 @@ namespace WhiteCore.DataManager.SQLite
 {
     public class SQLiteLoader : DataManagerBase
     {
-        string m_defaultDataPath = Constants.DEFAULT_DATA_DIR+"/SQLite";   //Util.BasePathCombine ("");
+        string m_defaultDataPath = Constants.DEFAULT_DATA_DIR+"/SQLite";  
         protected Dictionary<string, FieldInfo> m_Fields = new Dictionary<string, FieldInfo>();
         protected string m_connectionString;
         protected static Dictionary<string, object> _locks = new Dictionary<string, object>();

@@ -38,7 +38,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Avatars
             Version = new Version(0, 0, 0);
             MigrationName = "Avatars";
 
-            schema = new List<SchemaDefinition>();
+            Schema = new List<SchemaDefinition>();
             this.RenameSchema("Avatars", "avatars");
             this.RemoveSchema("avatars");
 

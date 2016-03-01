@@ -25,6 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Timers;
+using OpenMetaverse;
+using OpenMetaverse.Packets;
+using WhiteCore.BotManager.AStar;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
@@ -35,14 +43,6 @@ using WhiteCore.Framework.SceneInfo.Entities;
 using WhiteCore.Framework.Services.ClassHelpers.Inventory;
 using WhiteCore.Framework.Services.ClassHelpers.Other;
 using WhiteCore.Framework.Utilities;
-using OpenMetaverse;
-using OpenMetaverse.Packets;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Timers;
-using WhiteCore.BotManager.AStar;
 
 namespace WhiteCore.BotManager
 {
@@ -343,9 +343,9 @@ namespace WhiteCore.BotManager
 
         #region Initialize/Close
 
-        public void Initialize(IScenePresence SP, UUID creatorID)
+        public void Initialize(IScenePresence presence, UUID creatorID)
         {
-            m_controller = new BotAvatarController(SP, this);
+            m_controller = new BotAvatarController(presence, this);
             m_controller.SetDrawDistance(1024f);
             m_avatarCreatorID = creatorID;
             m_frames = new Timer(10);
@@ -375,7 +375,7 @@ namespace WhiteCore.BotManager
 
         #region SetPath
 
-        public void SetPath(List<Vector3> Positions, List<TravelMode> modes, int flags)
+        public void SetPath(List<Vector3> positions, List<TravelMode> modes, int flags)
         {
             m_nodeGraph.Clear();
             const int BOT_FOLLOW_FLAG_INDEFINITELY = 1;
@@ -383,7 +383,7 @@ namespace WhiteCore.BotManager
 
             m_nodeGraph.FollowIndefinitely = (flags & BOT_FOLLOW_FLAG_INDEFINITELY) == BOT_FOLLOW_FLAG_INDEFINITELY;
             m_forceDirectFollowing = (flags & BOT_FOLLOW_FLAG_FORCEDIRECTPATH) == BOT_FOLLOW_FLAG_FORCEDIRECTPATH;
-            m_nodeGraph.AddRange(Positions, modes);
+            m_nodeGraph.AddRange(positions, modes);
             GetNextDestination();
         }
 
@@ -732,8 +732,8 @@ namespace WhiteCore.BotManager
         public List<Vector3> InnerFindPath(int[,] map, int startX, int startY, int finishX, int finishY)
         {
             StartPath.Map = map;
-            StartPath.xLimit = (int) Math.Sqrt(map.Length);
-            StartPath.yLimit = (int) Math.Sqrt(map.Length);
+            StartPath.XLimit = (int) Math.Sqrt(map.Length);
+            StartPath.YLimit = (int) Math.Sqrt(map.Length);
             //ShowMap ("", null);
             List<string> points = StartPath.Path(startX, startY, finishX, finishY, 0, 0, 0);
 
@@ -1277,11 +1277,11 @@ namespace WhiteCore.BotManager
             }
         }
 
-        void FindTargets(Vector3 currentPos, Vector3 targetPos, ref int targetX, ref int targetY)
+        void FindTargets(Vector3 currentPosition, Vector3 targetPos, ref int targetX, ref int targetY)
         {
             //we're at pos 11, 11, so we have to add/subtract from there
-            float xDiff = (targetPos.X - currentPos.X);
-            float yDiff = (targetPos.Y - currentPos.Y);
+            float xDiff = (targetPos.X - currentPosition.X);
+            float yDiff = (targetPos.Y - currentPosition.Y);
 
             targetX += (int) (xDiff*resolution);
             targetY += (int) (yDiff*resolution);
@@ -1958,7 +1958,7 @@ namespace WhiteCore.BotManager
         {
         }
 
-        public void ProcessInPacket(Packet NewPack)
+        public void ProcessInPacket(Packet newPack)
         {
         }
 
@@ -2116,7 +2116,7 @@ namespace WhiteCore.BotManager
         {
         }
 
-        public void SendCoarseLocationUpdate(List<UUID> users, List<Vector3> CoarseLocations)
+        public void SendCoarseLocationUpdate(List<UUID> users, List<Vector3> coarseLocations)
         {
         }
 
@@ -2146,7 +2146,7 @@ namespace WhiteCore.BotManager
         {
         }
 
-        public void SendInventoryItemCreateUpdate(InventoryItemBase Item, uint callbackId)
+        public void SendInventoryItemCreateUpdate(InventoryItemBase item, uint callbackId)
         {
         }
 
@@ -2154,7 +2154,7 @@ namespace WhiteCore.BotManager
         {
         }
 
-        public void SendTakeControls(int controls, bool passToAgent, bool TakeControls)
+        public void SendTakeControls(int controls, bool passToAgent, bool takeControls)
         {
         }
 
@@ -2178,16 +2178,16 @@ namespace WhiteCore.BotManager
         {
         }
 
-        public void SendEconomyData(float EnergyEfficiency, int ObjectCapacity, int ObjectCount, int PriceEnergyUnit,
-                                    int PriceGroupCreate, int PriceObjectClaim, float PriceObjectRent,
-                                    float PriceObjectScaleFactor, int PriceParcelClaim, float PriceParcelClaimFactor,
-                                    int PriceParcelRent, int PricePublicObjectDecay, int PricePublicObjectDelete,
-                                    int PriceRentLight, int PriceUpload, int TeleportMinPrice,
-                                    float TeleportPriceExponent)
+        public void SendEconomyData(float energyEfficiency, int objectCapacity, int objectCount, int priceEnergyUnit,
+                                    int priceGroupCreate, int priceObjectClaim, float priceObjectRent,
+                                    float priceObjectScaleFactor, int priceParcelClaim, float priceParcelClaimFactor,
+                                    int priceParcelRent, int pricePublicObjectDecay, int pricePublicObjectDelete,
+                                    int priceRentLight, int priceUpload, int teleportMinPrice,
+                                    float teleportPriceExponent)
         {
         }
 
-        public void SendAvatarPickerReply(AvatarPickerReplyAgentDataArgs AgentData, List<AvatarPickerReplyDataArgs> Data)
+        public void SendAvatarPickerReply(AvatarPickerReplyAgentDataArgs agentData, List<AvatarPickerReplyDataArgs> data)
         {
         }
 
@@ -2263,7 +2263,7 @@ namespace WhiteCore.BotManager
         {
         }
 
-        public void SendEstateList(UUID invoice, int code, List<UUID> Data, uint estateID)
+        public void SendEstateList(UUID invoice, int code, List<UUID> data, uint estateID)
         {
         }
 
@@ -2285,7 +2285,7 @@ namespace WhiteCore.BotManager
         {
         }
 
-        public void SendLandProperties(int sequence_id, bool snap_selection, int request_result, LandData landData,
+        public void SendLandProperties(int sequenceId, bool snapSelection, int requestResult, LandData landData,
                                        float simObjectBonusFactor, int parcelObjectCapacity, int simObjectCapacity,
                                        uint regionFlags)
         {
@@ -2299,7 +2299,7 @@ namespace WhiteCore.BotManager
         {
         }
 
-        public void SendCameraConstraint(Vector4 ConstraintPlane)
+        public void SendCameraConstraint(Vector4 constraintPlane)
         {
         }
 
@@ -2307,7 +2307,7 @@ namespace WhiteCore.BotManager
         {
         }
 
-        public void SendLandParcelOverlay(byte[] data, int sequence_id)
+        public void SendLandParcelOverlay(byte[] data, int sequenceId)
         {
         }
 
@@ -2320,15 +2320,15 @@ namespace WhiteCore.BotManager
         {
         }
 
-        public void SendAssetUploadCompleteMessage(sbyte AssetType, bool Success, UUID AssetFullID)
+        public void SendAssetUploadCompleteMessage(sbyte assetType, bool success, UUID assetFullID)
         {
         }
 
-        public void SendConfirmXfer(ulong xferID, uint PacketID)
+        public void SendConfirmXfer(ulong xferID, uint packetID)
         {
         }
 
-        public void SendXferRequest(ulong XferID, short AssetType, UUID vFileID, byte FilePath, byte[] FileName)
+        public void SendXferRequest(ulong xferID, short assetType, UUID vFileID, byte filePath, byte[] fileName)
         {
         }
 
@@ -2336,7 +2336,7 @@ namespace WhiteCore.BotManager
         {
         }
 
-        public void SendImageFirstPart(ushort numParts, UUID ImageUUID, uint ImageSize, byte[] ImageData,
+        public void SendImageFirstPart(ushort numParts, UUID imageUUID, uint imageSize, byte[] imageData,
                                        byte imageCodec)
         {
         }
@@ -2353,11 +2353,11 @@ namespace WhiteCore.BotManager
         {
         }
 
-        public void SendObjectPropertiesFamilyData(uint RequestFlags, UUID ObjectUUID, UUID OwnerID, UUID GroupID,
-                                                   uint BaseMask, uint OwnerMask, uint GroupMask, uint EveryoneMask,
-                                                   uint NextOwnerMask, int OwnershipCost, byte SaleType, int SalePrice,
-                                                   uint Category, UUID LastOwnerID, string ObjectName,
-                                                   string Description)
+        public void SendObjectPropertiesFamilyData(uint requestFlags, UUID objectUUID, UUID ownerID, UUID groupID,
+                                                   uint baseMask, uint ownerMask, uint groupMask, uint everyoneMask,
+                                                   uint nextOwnerMask, int ownershipCost, byte saleType, int salePrice,
+                                                   uint category, UUID lastOwnerID, string objectName,
+                                                   string description)
         {
         }
 
@@ -2373,20 +2373,20 @@ namespace WhiteCore.BotManager
         {
         }
 
-        public void SendSitResponse(UUID TargetID, Vector3 OffsetPos, Quaternion SitOrientation, bool autopilot,
-                                    Vector3 CameraAtOffset, Vector3 CameraEyeOffset, bool ForceMouseLook)
+        public void SendSitResponse(UUID targetID, Vector3 offsetPos, Quaternion sitOrientation, bool autopilot,
+                                    Vector3 cameraAtOffset, Vector3 cameraEyeOffset, bool forceMouseLook)
         {
         }
 
-        public void SendAdminResponse(UUID Token, uint AdminLevel)
+        public void SendAdminResponse(UUID token, uint adminLevel)
         {
         }
 
-        public void SendGroupMembership(GroupMembershipData[] GroupMembership)
+        public void SendGroupMembership(GroupMembershipData[] groupMembership)
         {
         }
 
-        public void SendGroupNameReply(UUID groupLLUID, string GroupName)
+        public void SendGroupNameReply(UUID groupLLUID, string groupName)
         {
         }
 
@@ -2423,7 +2423,7 @@ namespace WhiteCore.BotManager
             return new byte[0];
         }
 
-        public void SendBlueBoxMessage(UUID FromAvatarID, string FromAvatarName, string Message)
+        public void SendBlueBoxMessage(UUID fromAvatarID, string fromAvatarName, string message)
         {
         }
 
@@ -2448,7 +2448,7 @@ namespace WhiteCore.BotManager
         {
         }
 
-        public void SendParcelInfo(LandData land, UUID parcelID, uint x, uint y, string SimName)
+        public void SendParcelInfo(LandData land, UUID parcelID, uint x, uint y, string simName)
         {
         }
 
@@ -2561,21 +2561,21 @@ namespace WhiteCore.BotManager
         {
         }
 
-        public void SendGroupActiveProposals(UUID groupID, UUID transactionID, GroupActiveProposals[] Proposals)
+        public void SendGroupActiveProposals(UUID groupID, UUID transactionID, GroupActiveProposals[] proposals)
         {
         }
 
-        public void SendGroupVoteHistory(UUID groupID, UUID transactionID, GroupVoteHistory Vote,
-                                         GroupVoteHistoryItem[] Items)
+        public void SendGroupVoteHistory(UUID groupID, UUID transactionID, GroupVoteHistory vote,
+                                         GroupVoteHistoryItem[] items)
         {
         }
 
-        public bool AddGenericPacketHandler(string MethodName, GenericMessage handler)
+        public bool AddGenericPacketHandler(string methodName, GenericMessage handler)
         {
             return true;
         }
 
-        public bool RemoveGenericPacketHandler(string MethodName)
+        public bool RemoveGenericPacketHandler(string methodName)
         {
             return true;
         }
@@ -2618,15 +2618,15 @@ namespace WhiteCore.BotManager
         {
         }
 
-        public void SendPlacesQuery(ExtendedLandData[] LandData, UUID queryID, UUID transactionID)
+        public void SendPlacesQuery(ExtendedLandData[] landData, UUID queryID, UUID transactionID)
         {
         }
 
-        public void FireUpdateParcel(LandUpdateArgs args, int LocalID)
+        public void FireUpdateParcel(LandUpdateArgs args, int localID)
         {
         }
 
-        public void SendTelehubInfo(Vector3 TelehubPos, Quaternion TelehubRot, List<Vector3> SpawnPoint, UUID ObjectID,
+        public void SendTelehubInfo(Vector3 telehubPos, Quaternion telehubRot, List<Vector3> spawnPoint, UUID objectID,
                                     string nameT)
         {
         }

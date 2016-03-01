@@ -38,7 +38,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Groups
             Version = new Version(0, 0, 1);
             MigrationName = "Groups";
 
-            schema = new List<SchemaDefinition>();
+            Schema = new List<SchemaDefinition>();
 
             AddSchema("osagent", ColDefs(
                 ColDef("AgentID", ColumnTypes.String50),

@@ -43,7 +43,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Groups
             Version = new Version(0, 0, 5);
             MigrationName = "Groups";
             
-            schema = new List<SchemaDefinition>();
+            Schema = new List<SchemaDefinition>();
 
             // existing tables
             AddSchema("group_agent", ColDefs(

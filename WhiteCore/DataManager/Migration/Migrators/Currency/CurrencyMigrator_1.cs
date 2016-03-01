@@ -39,7 +39,7 @@ namespace Simple.Currency
             Version = new Version(0, 0, 1);
             MigrationName = "SimpleCurrency";
 
-            schema = new List<SchemaDefinition>();
+            Schema = new List<SchemaDefinition>();
 
             AddSchema("simple_currency", ColDefs(
                 ColDef("PrincipalID", ColumnTypes.String50),

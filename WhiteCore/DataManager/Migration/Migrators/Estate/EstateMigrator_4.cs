@@ -38,7 +38,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Estate
             Version = new Version(0, 0, 4);
             MigrationName = "Estate";
 
-            schema = new List<SchemaDefinition>();
+            Schema = new List<SchemaDefinition>();
 
             RenameSchema("estateregions", "estate_regions");
             RemoveSchema("estateregions");

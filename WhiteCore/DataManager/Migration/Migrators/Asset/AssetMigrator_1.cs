@@ -38,7 +38,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Asset
             Version = new Version(0, 0, 1);
             MigrationName = "Asset";
 
-            schema = new List<SchemaDefinition>();
+            Schema = new List<SchemaDefinition>();
 
             AddSchema("lslgenericdata", ColDefs(
                 ColDef("Token", ColumnTypes.String50),
@@ -48,14 +48,14 @@ namespace WhiteCore.DataManager.Migration.Migrators.Asset
                                                 IndexDef(new string[2] {"Token", "KeySetting"}, IndexType.Primary)
                                                    ));
 
-            renameColumns.Add("UUID", "id");
-            renameColumns.Add("Name", "name");
-            renameColumns.Add("Description", "description");
-            renameColumns.Add("Type", "assetType");
-            renameColumns.Add("Local", "local");
-            renameColumns.Add("Temporary", "temporary");
-            renameColumns.Add("CreatorID", "creatorID");
-            renameColumns.Add("Data", "data");
+            RenameColumns.Add("UUID", "id");
+            RenameColumns.Add("Name", "name");
+            RenameColumns.Add("Description", "description");
+            RenameColumns.Add("Type", "assetType");
+            RenameColumns.Add("Local", "local");
+            RenameColumns.Add("Temporary", "temporary");
+            RenameColumns.Add("CreatorID", "creatorID");
+            RenameColumns.Add("Data", "data");
 
             AddSchema("assets", ColDefs(
                 ColDef("id", ColumnTypes.Char36),

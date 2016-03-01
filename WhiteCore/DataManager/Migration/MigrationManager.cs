@@ -36,14 +36,14 @@ namespace WhiteCore.DataManager.Migration
 {
     public class MigrationManager
     {
-        private readonly IDataConnector genericData;
-        private readonly string migratorName;
-        private readonly List<Migrator> migrators = new List<Migrator>();
-        private readonly bool validateTables;
-        private bool executed;
-        private MigrationOperationDescription operationDescription;
-        private IRestorePoint restorePoint;
-        private bool rollback;
+        readonly IDataConnector genericData;
+        readonly string migratorName;
+        readonly List<Migrator> migrators = new List<Migrator>();
+        readonly bool validateTables;
+        bool executed;
+        MigrationOperationDescription operationDescription;
+        IRestorePoint restorePoint;
+        bool rollback;
 
         public MigrationManager(IDataConnector genericData, string migratorName, bool validateTables)
         {
@@ -111,7 +111,7 @@ namespace WhiteCore.DataManager.Migration
             }
         }
 
-        private Migrator GetMigratorAfterVersion(Version version)
+        Migrator GetMigratorAfterVersion(Version version)
         {
             if (version == null)
             {
@@ -123,12 +123,12 @@ namespace WhiteCore.DataManager.Migration
                     migrator => migrator.Version > version);
         }
 
-        private Migrator GetLatestVersionMigrator()
+        Migrator GetLatestVersionMigrator()
         {
             return (from m in migrators orderby m.Version descending select m).First();
         }
 
-        private Migrator GetHighestVersionMigratorThatCanProvideDefaultSetup()
+        Migrator GetHighestVersionMigratorThatCanProvideDefaultSetup()
         {
             return (from m in migrators orderby m.Version descending select m).First();
         }
@@ -138,7 +138,7 @@ namespace WhiteCore.DataManager.Migration
             if (migratorName == "")
                 return;
 
-            if (operationDescription != null && executed == false &&
+            if (operationDescription != null && !executed &&
                 operationDescription.OperationType != MigrationOperationTypes.DoNothing)
             {
                 Migrator currentMigrator = GetMigratorByVersion(operationDescription.CurrentVersion);
@@ -255,7 +255,7 @@ namespace WhiteCore.DataManager.Migration
 
         public void RollBackOperation()
         {
-            if (operationDescription != null && executed && rollback == false && restorePoint != null)
+            if (operationDescription != null && executed && !rollback && restorePoint != null)
             {
                 restorePoint.DoRestore(genericData);
                 rollback = true;
@@ -267,7 +267,7 @@ namespace WhiteCore.DataManager.Migration
             return GetMigratorByVersion(version).Validate(genericData);
         }
 
-        private Migrator GetMigratorByVersion(Version version)
+        Migrator GetMigratorByVersion(Version version)
         {
             if (version == null)
                 return null;

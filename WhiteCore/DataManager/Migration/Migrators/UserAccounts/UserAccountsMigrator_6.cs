@@ -38,7 +38,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.UserAccounts
             Version = new Version(0, 0, 6);
             MigrationName = "UserAccounts";
 
-            schema = new List<SchemaDefinition>();
+            Schema = new List<SchemaDefinition>();
 
             RenameSchema("useraccounts", "user_accounts");
             RemoveSchema("useraccounts");
