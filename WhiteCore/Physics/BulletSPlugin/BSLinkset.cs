@@ -48,9 +48,8 @@ namespace WhiteCore.Physics.BulletSPlugin
         public enum LinksetImplementation
         {
             Constraint = 0, // linkset tied together with constraints
-            Compound = 1, // linkset tied together as a compound object
-            Manual = 2, // linkset tied together manually (code moves all the pieces)
-            CompoundGroup = 3 // linkset tied together as a compound object
+            Compound = 1,   // linkset tied together as a compound object
+            Manual = 2      // linkset tied together manually (code moves all the pieces)
         }
 
         // Create the correct type of linkset for this child
@@ -58,19 +57,16 @@ namespace WhiteCore.Physics.BulletSPlugin
         {
             BSLinkset ret = null;
 
-            switch ((int)BSParam.LinksetImplementation)
+            switch (parent.LinksetType)
             {
-                case (int)LinksetImplementation.Constraint:
+                case LinksetImplementation.Constraint:
                     ret = new BSLinksetConstraints(physScene, parent);
                     break;
-                case (int)LinksetImplementation.Compound:
+                case LinksetImplementation.Compound:
                     ret = new BSLinksetCompound(physScene, parent);
                     break;
-                case (int)LinksetImplementation.Manual:
+                case LinksetImplementation.Manual:
                     // ret = new BSLinksetManual(physScene, parent);
-                    break;
-                case (int)LinksetImplementation.CompoundGroup:
-                    ret = new BSLinksetGroupCompound(physScene, parent);
                     break;
                 default:
                     ret = new BSLinksetCompound(physScene, parent);
@@ -104,12 +100,12 @@ namespace WhiteCore.Physics.BulletSPlugin
 
         public BSScene PhysicsScene { get; private set; }
 
-        private static int m_nextLinksetID = 1;
+        static int m_nextLinksetID = 1;
         public int LinksetID { get; private set; }
 
         // The children under the root in this linkset.
-        protected HashSet<BSPrimLinkable> m_children;
-        //protected Dictionary<BSPrimLinkable, BSLinkInfo> m_children;
+        //protected HashSet<BSPrimLinkable> m_children;
+        protected Dictionary<BSPrimLinkable, BSLinkInfo> m_children;
 
         // We lock the diddling of linkset classes to prevent any badness.
         // This locks the modification of the instances of this class. Changes
@@ -150,10 +146,11 @@ namespace WhiteCore.Physics.BulletSPlugin
                 m_nextLinksetID = 1;
             PhysicsScene = scene;
             LinksetRoot = parent;
-            m_children = new HashSet<BSPrimLinkable>();
-            //m_children = new Dictionary<BSPrimLinkable, BSLinkInfo>();
+            //m_children = new HashSet<BSPrimLinkable>();
+            m_children = new Dictionary<BSPrimLinkable, BSLinkInfo>();
             LinksetMass = parent.RawMass;
             Rebuilding = false;
+            RebuildScheduled = false;
 
             parent.ClearDisplacement();
         }
@@ -168,37 +165,17 @@ namespace WhiteCore.Physics.BulletSPlugin
             {
                 // Don't add the root to its own linkset
                 if (!IsRoot(child))
-                    AddChildToLinkset(child, true);
+                    AddChildToLinkset(child);
                 LinksetMass = ComputeLinksetMass();
             }
             return this;
-        }
-
-        // Link to a linkset where the child knows the parent.
-        // Parent changing should not happen so do some sanity checking.
-        // We return the parent's linkset so the child can track its membership.
-        // Called at runtime.
-        public void AddGroupToLinkset(BSPrimLinkable[] children)
-        {
-            lock (m_linksetActivityLock)
-            {
-                for (int i = 0; i < children.Length; i++)
-                {
-                    // Don't add the root to its own linkset
-                    if (!IsRoot(children[i]))
-                        AddChildToLinkset(children[i], false);
-                    children[i].Linkset = this;
-                }
-                ScheduleRebuild(LinksetRoot);
-                LinksetMass = ComputeLinksetMass();
-            }
         }
 
         // Remove a child from a linkset.
         // Returns a new linkset for the child which is a linkset of one (just the
         //    orphened child).
         // Called at runtime.
-        public BSLinkset RemoveMeFromLinkset(BSPrimLinkable child)
+        public BSLinkset RemoveMeFromLinkset(BSPrimLinkable child, bool inTaintTime)
         {
             lock (m_linksetActivityLock)
             {
@@ -207,7 +184,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                     // Cannot remove the root from a linkset.
                     return this;
                 }
-                RemoveChildFromLinkset(child);
+                RemoveChildFromLinkset(child, inTaintTime);
                 LinksetMass = ComputeLinksetMass();
             }
 
@@ -232,37 +209,13 @@ namespace WhiteCore.Physics.BulletSPlugin
             get { return (m_children.Count > 0); }
         }
 
-        public List<BSPrimLinkable> Children
-        {
-            get
-            {
-                List<BSPrimLinkable> children = new List<BSPrimLinkable>();
-                lock (m_linksetActivityLock)
-                {
-                    foreach (BSPrimLinkable prm in m_children)
-                        children.Add(prm);
-                }
-                return children;
-            }
-        }
-
         // Return 'true' if this child is in this linkset
         public bool HasChild(BSPrimLinkable child)
         {
-            bool ret = false;
+            bool ret;
             lock (m_linksetActivityLock)
             {
-                ret = m_children.Contains(child);
-                /* Safer version but the above should work
-            foreach (BSPrimLinkable bp in m_children)
-            {
-                if (child.LocalID == bp.LocalID)
-                {
-                    ret = true;
-                    break;
-                }
-            }
-             */
+                ret = m_children.ContainsKey(child);
             }
             return ret;
         }
@@ -277,7 +230,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             lock (m_linksetActivityLock)
             {
                 action(LinksetRoot);
-                foreach (BSPrimLinkable po in m_children)
+                foreach (BSPrimLinkable po in m_children.Keys)
                 {
                     if (action(po))
                         break;
@@ -286,6 +239,24 @@ namespace WhiteCore.Physics.BulletSPlugin
             return ret;
         }
 
+        // TODO!!! public bool TryGetLinkInfo
+
+        public delegate bool ForEachLinkInfoAction(BSLinkInfo obj);
+        public virtual bool ForEachLinkInfo(ForEachLinkInfoAction action)
+        {
+            bool ret = false;
+            lock (m_linksetActivityLock)
+            {
+                foreach (BSLinkInfo po in m_children.Values)
+                {
+                    if (action(po)) break;
+                }
+            }
+            return ret;
+        }
+
+        // TODO!!! public virtual bool ShouldReportPropertyUpdates
+        
         // Called after a simulation step to post a collision with this object.
         // Return 'true' if linkset processed the collision. 'false' says the linkset didn't have
         //     anything to add for the collision and it should be passed through normal processing.
@@ -315,11 +286,11 @@ namespace WhiteCore.Physics.BulletSPlugin
 
         // I am the root of a linkset and a new child is being added
         // Called while LinkActivity is locked.
-        protected abstract void AddChildToLinkset(BSPrimLinkable child, bool scheduleRebuild);
+        protected abstract void AddChildToLinkset(BSPrimLinkable child);
 
         // I am the root of a linkset and one of my children is being removed.
         // Safe to call even if the child is not really in my linkset.
-        protected abstract void RemoveChildFromLinkset(BSPrimLinkable child);
+        protected abstract void RemoveChildFromLinkset(BSPrimLinkable child, bool inTaintTime);
 
         protected abstract void ScheduleRebuild(BSPrimLinkable requestor);
 
@@ -335,6 +306,13 @@ namespace WhiteCore.Physics.BulletSPlugin
         // Used to know not the schedule a rebuild in the middle of a rebuild.
         protected bool Rebuilding { get; set; }
 
+        // Flag saying a linkset rebuild has been scheduled.
+        // This is turned on when the rebuld is requested and turned off when
+        //      the rebuild is complete. Used to limit modifications to the
+        //      linkset parameters while the linkset is in an intermediate state.
+        // Protected by a "lock(m_linksetActivityLock)" on the BSLinkset object
+        public bool RebuildScheduled { get; protected set; }
+
         // The object is going dynamic (physical). Do any setup necessary
         //     for a dynamic linkset.
         // Only the state of the passed object can be modified. The rest of the linkset
@@ -342,6 +320,25 @@ namespace WhiteCore.Physics.BulletSPlugin
         // Return 'true' if any properties updated on the passed object.
         // Called at taint-time!
         public abstract bool MakeDynamic(BSPrimLinkable child);
+
+        public virtual bool AllPartsComplete
+        {
+            get
+            {
+                bool ret = true;
+                ForEachMember((member) =>
+                {
+                    if ((!member.IsInitialized) || member.IsIncomplete ||
+                        member.PrimAssetState == BSPhysObject.PrimAssetCondition.Waiting)
+                    {
+                        ret = false;
+                        return true;    // exit loop
+                    }
+                    return false;   // continue loop
+                });
+                return ret;
+            }
+        }
 
         // The object is going static (non-physical). Do any setup necessary
         //     for a static linkset.
@@ -355,6 +352,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         // Called at taint-time!!
         public abstract void UpdateProperties(UpdatedProperties whichUpdated, BSPrimLinkable physObject);
 
+        // TODO!!! rename to RemoveDependencies
         // Routine used when rebuilding the body of the root of the linkset
         // Destroy all the constraints have have been made to root.
         // This is called when the root body is changing.
@@ -402,7 +400,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 {
                     if (member.PhysBody.HasPhysicalBody)
                     {
-                        OMV.Vector3 inertia = PhysicsScene.PE.CalculateLocalInertia(member.PhysShape, linksetMass);
+                        OMV.Vector3 inertia = PhysicsScene.PE.CalculateLocalInertia(member.PhysShape.physShapeInfo, linksetMass);
                         member.Inertia = inertia * inertiaFactor;
                         PhysicsScene.PE.SetMassProps(member.PhysBody, linksetMass, member.Inertia);
                         PhysicsScene.PE.UpdateInertiaTensor(member.PhysBody);
@@ -455,7 +453,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             {
                 lock (m_linksetActivityLock)
                 {
-                    foreach (BSPrimLinkable bp in m_children)
+                    foreach (BSPrimLinkable bp in m_children.Keys)
                     {
                         mass += bp.RawMass;
                     }
@@ -473,7 +471,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 com = LinksetRoot.Position * LinksetRoot.RawMass;
                 float totalMass = LinksetRoot.RawMass;
 
-                foreach (BSPrimLinkable bp in m_children)
+                foreach (BSPrimLinkable bp in m_children.Keys)
                 {
                     com += bp.Position * bp.RawMass;
                     totalMass += bp.RawMass;
@@ -492,7 +490,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             {
                 com = LinksetRoot.Position;
 
-                foreach (BSPrimLinkable bp in m_children)
+                foreach (BSPrimLinkable bp in m_children.Keys)
                 {
                     com += bp.Position;
                 }

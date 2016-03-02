@@ -111,9 +111,9 @@ namespace WhiteCore.Modules.WorldMap
         public Bitmap TerrainToBitmap(Bitmap mapBmp)
         {
             int scaledRemovalFactor = m_scene.RegionInfo.RegionSizeX/(Constants.RegionSize/2);
-            Vector3 camPos = new Vector3(m_scene.RegionInfo.RegionSizeX/2 - 0.5f,
-                                         m_scene.RegionInfo.RegionSizeY/2 - 0.5f, 221.7025033688163f);
-            Viewport viewport = new Viewport(camPos, -Vector3.UnitZ, 1024f, 0.1f,
+            Vector3 camPos = new Vector3 (m_scene.RegionInfo.RegionSizeX / 2 - 0.5f,
+                                 m_scene.RegionInfo.RegionSizeY / 2 - 0.5f, 221f); //.7025033688163f);
+            Viewport viewport = new Viewport(camPos, -Vector3.UnitZ, 256f, 0.1f,
                                              m_scene.RegionInfo.RegionSizeX - scaledRemovalFactor,
                                              m_scene.RegionInfo.RegionSizeY - scaledRemovalFactor,
                                              m_scene.RegionInfo.RegionSizeX - scaledRemovalFactor,
@@ -123,25 +123,32 @@ namespace WhiteCore.Modules.WorldMap
             viewport.Width = m_scene.RegionInfo.RegionSizeX;
             viewport.Height = m_scene.RegionInfo.RegionSizeY;
 
-            return TerrainBitmap (viewport, false);
+            mapBmp = TerrainBitmap (viewport, false);
+            return mapBmp;
         }
 
         public Bitmap TerrainToBitmap(Bitmap mapBmp, int size)
         {
             int scaledRemovalFactor = m_scene.RegionInfo.RegionSizeX/(Constants.RegionSize/2);
-            Vector3 camPos = new Vector3(m_scene.RegionInfo.RegionSizeX/2 - 0.5f,
-                m_scene.RegionInfo.RegionSizeY/2 - 0.5f, 221.7025033688163f);
-            Viewport viewport = new Viewport(camPos, -Vector3.UnitZ, 1024f, 0.1f,
+
+            Vector3 camPos = new Vector3 (m_scene.RegionInfo.RegionSizeX / 2 - 0.5f,
+                                 m_scene.RegionInfo.RegionSizeY / 2 - 0.5f, 221f);  //.7025033688163f);
+            
+
+            Viewport viewport = new Viewport(camPos, -Vector3.UnitZ, 256f, 0.1f,
                 m_scene.RegionInfo.RegionSizeX - scaledRemovalFactor,
                 m_scene.RegionInfo.RegionSizeY - scaledRemovalFactor,
                 m_scene.RegionInfo.RegionSizeX - scaledRemovalFactor,
                 m_scene.RegionInfo.RegionSizeY - scaledRemovalFactor);
 
             viewport.FieldOfView = 150;
-            viewport.Width = size;
-            viewport.Height = size;
 
-            return TerrainBitmap (viewport, false);
+            //testing
+            //viewport.Height = size;
+            //viewport.Width = size;
+
+            mapBmp = TerrainBitmap (viewport, false);
+            return mapBmp;
 
         }
 
@@ -255,11 +262,20 @@ namespace WhiteCore.Modules.WorldMap
         void CreateWater(WarpRenderer renderer, bool threeD)
         {
             float waterHeight = (float) m_scene.RegionInfo.RegionSettings.WaterHeight;
+            int maxSize = m_scene.RegionInfo.RegionSizeX;
+            if (m_scene.RegionInfo.RegionSizeY >= maxSize)
+                maxSize = m_scene.RegionInfo.RegionSizeY;
   
             warp_Material waterColormaterial; 
             if (!threeD)
             {
-                if(m_scene.RegionInfo.RegionSizeX >= m_scene.RegionInfo.RegionSizeY)
+                // 20160210 -greythane-
+                // it appears that the default plan object is rotated 45 degrees
+                // work-a-round until verified or otherwise in the Warp3D library
+                renderer.AddPlane ("Water", maxSize);
+                renderer.Scene.sceneobject ("Water").setPos (0, waterHeight,0);
+                
+/*                if(m_scene.RegionInfo.RegionSizeX >= m_scene.RegionInfo.RegionSizeY)
                     renderer.AddPlane ("Water", m_scene.RegionInfo.RegionSizeX/2);
                 else
                     renderer.AddPlane ("Water", m_scene.RegionInfo.RegionSizeY/2);
@@ -268,17 +284,22 @@ namespace WhiteCore.Modules.WorldMap
                     (m_scene.RegionInfo.RegionSizeX / 2) - 0.5f,
                     waterHeight,
                     (m_scene.RegionInfo.RegionSizeY / 2) - 0.5f);
-                
+
+
+*/                
                 waterColormaterial = new warp_Material (ConvertColor (WATER_COLOR));
 //                waterColormaterial.setTransparency ((byte)((1f - WATER_COLOR.A) * 255f) * 2);
                 waterColormaterial.setTransparency ((byte)((1f - WATER_COLOR.A) * 255f));
             } else
             {
+                renderer.AddPlane ("Water", maxSize/2);
+
+/* for reference
                 if(m_scene.RegionInfo.RegionSizeX >= m_scene.RegionInfo.RegionSizeY)
                     renderer.AddPlane ("Water", m_scene.RegionInfo.RegionSizeX/2);
                 else
                     renderer.AddPlane ("Water", m_scene.RegionInfo.RegionSizeY/2);
-
+*/
                 renderer.Scene.sceneobject ("Water").setPos (
                     (m_scene.RegionInfo.RegionSizeX / 2) -0.5f,
                     - 0.5f,

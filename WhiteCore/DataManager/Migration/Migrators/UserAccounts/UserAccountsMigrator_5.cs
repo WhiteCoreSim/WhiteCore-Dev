@@ -38,7 +38,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.UserAccounts
             Version = new Version(0, 0, 5);
             MigrationName = "UserAccounts";
 
-            schema = new List<SchemaDefinition>();
+            Schema = new List<SchemaDefinition>();
 
             //Remove the `OSD` column
             AddSchema("useraccounts", ColDefs(

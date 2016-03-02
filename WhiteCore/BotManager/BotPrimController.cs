@@ -25,12 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.SceneInfo.Entities;
-using OpenMetaverse;
 
 namespace WhiteCore.BotManager
 {
@@ -116,7 +116,7 @@ namespace WhiteCore.BotManager
             if (isMoving)
                 m_hasStoppedMoving = false;
 
-            m_object.AbsolutePosition += toward*(m_speed*(1f/45f));
+            m_object.AbsolutePosition += toward * (m_speed * (1f/45f));
             m_object.ScheduleGroupTerseUpdate();
         }
 

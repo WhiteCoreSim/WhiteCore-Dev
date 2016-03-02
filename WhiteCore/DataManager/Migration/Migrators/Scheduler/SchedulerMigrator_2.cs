@@ -38,7 +38,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Scheduler
             Version = new Version(0, 0, 2);
             MigrationName = "Scheduler";
 
-            schema = new List<SchemaDefinition>();
+            Schema = new List<SchemaDefinition>();
 
             AddSchema("scheduler", ColDefs(
                 ColDef("id", ColumnTypes.String36),

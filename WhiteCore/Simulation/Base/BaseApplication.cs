@@ -27,11 +27,6 @@
 
 //#define BlockUnsupportedVersions
 
-using WhiteCore.Framework.Configuration;
-using WhiteCore.Framework.ConsoleFramework;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.Utilities;
-using Nini.Config;
 using System;
 using System.Diagnostics;
 using System.Globalization;
@@ -39,6 +34,11 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Nini.Config;
+using WhiteCore.Framework.Configuration;
+using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Simulation.Base
 {
@@ -77,6 +77,10 @@ namespace WhiteCore.Simulation.Base
 
             if (!args.Contains("-skipconfig"))
                 Configure(false);
+
+            // provide a startup configuration generation option
+            if (args.Contains("-config"))
+                Configure(true);
 
             // Increase the number of IOCP threads available. Mono defaults to a tragically low number
             int workerThreads, iocpThreads;
@@ -118,7 +122,9 @@ namespace WhiteCore.Simulation.Base
             configSource.AddSwitch("Network", "http_listener_port");
 
             IConfigSource m_configSource = Configuration(configSource, defaultIniFile);
-
+            if (m_configSource == null)
+                Environment.Exit(0);            // No configuration.. exit
+                        
             // Check if we're saving crashes
             m_saveCrashDumps = m_configSource.Configs["Startup"].GetBoolean("save_crashes", m_saveCrashDumps);
 
@@ -147,18 +153,26 @@ namespace WhiteCore.Simulation.Base
                 if (!requested)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-					Console.WriteLine("\n\n************* WhiteCore initial run. *************");
+                    Console.WriteLine ("\n\n************* WhiteCore initial run. *************");
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine(
-                        "\n\n   This appears to be your first time running WhiteCore.\n"+
+                    Console.WriteLine (
+                        "\n\n   This appears to be your first time running WhiteCore.\n" +
                         "If you have already configured your *.ini files, please ignore this warning and press enter;\n" +
-                        "Otherwise type 'yes' and WhiteCore will guide you through the configuration process.\n\n"+
-                        "Remember, these file names are Case Sensitive in Linux and Proper Cased.\n"+
+                        "Otherwise type 'yes' and WhiteCore will guide you through the configuration process.\n\n" +
+                        "Remember, these file names are Case Sensitive in Linux and Proper Cased.\n" +
                         "1. " + WhiteCore_ConfigDir + "/WhiteCore.ini\nand\n" +
                         "2. " + WhiteCore_ConfigDir + "/Sim/Standalone/StandaloneCommon.ini \nor\n" +
                         "3. " + WhiteCore_ConfigDir + "/Grid/GridCommon.ini\n" +
                         "\nAlso, you will want to examine these files in great detail because only the basic system will " +
                         "load by default. WhiteCore can do a LOT more if you spend a little time going through these files.\n\n");
+                } else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine ("\n\n************* WhiteCore Configuration *************");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine (
+                        "\n     WhiteCore interactive configuration.\n" +
+                        "Enter 'yes' and WhiteCore will guide you through the configuration process.");
                 }
 
                 // Make sure...

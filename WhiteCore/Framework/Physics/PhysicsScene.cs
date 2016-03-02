@@ -26,11 +26,11 @@
  */
 
 using System.Collections.Generic;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
-using Nini.Config;
-using OpenMetaverse;
 
 namespace WhiteCore.Framework.Physics
 {
@@ -39,6 +39,9 @@ namespace WhiteCore.Framework.Physics
 
     public delegate void RayCallback(List<ContactResult> list);
 
+    /// <summary>
+    /// Contact result from a raycast.
+    /// </summary>
     public struct ContactResult
     {
         public uint ConsumerID;
@@ -103,7 +106,22 @@ namespace WhiteCore.Framework.Physics
 
         public abstract void Initialise(IMesher meshmerizer, IScene scene);
         public abstract void PostInitialise(IConfigSource config);
+
+        /// <summary>
+        /// A unique identifying string for this instance of the physics engine.
+        /// Useful in debug messages to distinguish one Scene instance from another.
+        /// Usually set to include the region name that the physics engine is acting for.
+        /// </summary>
+        public string PhysicsSceneName { get; protected set; }
+
+        /// <summary>
+        /// A string identifying the family of this physics engine. Most common values returned
+        /// are "OpenDynamicsEngine" and "BulletSim" but others are possible.
+        /// </summary>
+        /// TODO!!!!!
+        /// public abstract string EngineType { get; protected set; }
         public abstract string EngineType { get; }
+
 
         public abstract PhysicsActor AddAvatar(string avName, Vector3 position, Quaternion rotation, Vector3 size,
                                                    bool isFlying, uint LocalID, UUID UUID);
@@ -116,12 +134,6 @@ namespace WhiteCore.Framework.Physics
         /// </summary>
         /// <param name="prim"></param>
         public abstract void RemovePrim(PhysicsActor prim);
-
-        /// <summary>
-        /// Removes an entire group from the physics scene
-        /// </summary>
-        /// <param name="prim"></param>
-        public abstract void DeletePrim(PhysicsActor prim);
 
         public abstract PhysicsActor AddPrimShape(UUID primID, uint localID, string name, byte physicsType, PrimitiveBaseShape shape,
             Vector3 position, Vector3 size, Quaternion rotation, bool isPhysical, int material, float friction, float restitution,
@@ -204,7 +216,7 @@ namespace WhiteCore.Framework.Physics
 
     public class NullPhysicsScene : PhysicsScene
     {
-        private static int m_workIndicator;
+        static int m_workIndicator;
 
         public override bool DisableCollisions
         {
@@ -240,10 +252,6 @@ namespace WhiteCore.Framework.Physics
         }
 
         public override void RemovePrim(PhysicsActor prim)
-        {
-        }
-
-        public override void DeletePrim(PhysicsActor prim)
         {
         }
 
@@ -284,6 +292,13 @@ namespace WhiteCore.Framework.Physics
         {
             Dictionary<uint, float> returncolliders = new Dictionary<uint, float>();
             return returncolliders;
+        }
+
+        // Extendable interface for new, physics engine specific operations
+        public virtual object Extension(string pFunc, params object[] pParams)
+        {
+            // A NOP if the extension thing is not implemented by the physics engine
+            return null;
         }
     }
 }

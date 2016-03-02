@@ -771,7 +771,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             new ParameterDefn<float>("VehicleMaxLinearVelocity",
                 "Maximum velocity magnitude that can be assigned to a vehicle",
                 1000.0f,
-                (s) => { return  VehicleMaxLinearVelocity; },
+                (s) => { return VehicleMaxLinearVelocity; },
                 (s, v) =>
                 {
                     VehicleMaxLinearVelocity = v;
@@ -784,7 +784,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             new ParameterDefn<float>("VehicleMaxAngularVelocity",
                 "Maximum rotational velocity magnitude that can be assigned to a vehicle",
                 12.0f,
-                (s) => { return  VehicleMaxAngularVelocity; },
+                (s) => { return VehicleMaxAngularVelocity; },
                 (s, v) =>
                 {
                     VehicleMaxAngularVelocity = v;
@@ -1200,20 +1200,23 @@ namespace WhiteCore.Physics.BulletSPlugin
         // =====================================================================
         // There are parameters that, when set, cause things to happen in the physics engine.
         // This causes the broadphase collision cache to be cleared.
-        static void ResetBroadphasePoolTainted(BSScene pPhysScene, float v, bool inTainTime)
+        static void ResetBroadphasePoolTainted(BSScene pPhysScene, float v, bool inTaintTime)
         {
-// OSincludes an additional inTainTime parameter here... check TaintedObject function
             BSScene physScene = pPhysScene;
-            physScene.TaintedObject("BSParam.ResetBroadphasePoolTainted",
-                delegate() { physScene.PE.ResetBroadphasePool(physScene.World); });
+            physScene.TaintedObject(inTaintTime, "BSParam.ResetBroadphasePoolTainted", delegate() 
+            {
+                physScene.PE.ResetBroadphasePool(physScene.World);
+            });
         }
 
         // This causes the constraint solver cache to be cleared and reset.
         static void ResetConstraintSolverTainted(BSScene pPhysScene, float v)
         {
             BSScene physScene = pPhysScene;
-            physScene.TaintedObject("BSParam.ResetConstraintSolver",
-                delegate() { physScene.PE.ResetConstraintSolver(physScene.World); });
+            physScene.TaintedObject(BSScene.DetailLogZero, "BSParam.ResetConstraintSolver", delegate() 
+            {
+                physScene.PE.ResetConstraintSolver(physScene.World);
+            });
         }
     }
 }

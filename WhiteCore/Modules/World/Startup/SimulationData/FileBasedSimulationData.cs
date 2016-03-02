@@ -49,6 +49,7 @@ namespace WhiteCore.Modules
     public class FileBasedSimulationData : ISimulationDataStore, IDisposable
     {
         protected Timer m_backupSaveTimer;
+        protected Timer m_saveTimer;
 
         protected string m_fileName = "";
         protected string m_storeDirectory = "";
@@ -61,7 +62,6 @@ namespace WhiteCore.Modules
         protected bool m_saveBackups;
         protected int m_removeArchiveDays = 30;
         protected bool m_saveChanges = true;
-        protected Timer m_saveTimer;
         protected IScene m_scene;
         protected int m_timeBetweenBackupSaves = 1440; //One day
         protected int m_timeBetweenSaves = 5;
@@ -131,8 +131,10 @@ namespace WhiteCore.Modules
         public virtual List<string> FindRegionInfos(out bool newRegion, ISimulationBase simBase)
         {
 			ReadConfig(simBase);
-			MainConsole.Instance.Info("Looking for previous regions in: "+ m_storeDirectory);
-
+			MainConsole.Instance.Info("Retrieving region data from: "+ m_storeDirectory);
+            if (m_keepOldSave)
+                MainConsole.Instance.Info("Region archives saved to:    "+ m_oldSaveDirectory);
+            
 			List<string> regions = new List<string>(Directory.GetFiles(m_storeDirectory, "*.sim", SearchOption.TopDirectoryOnly));
             newRegion = regions.Count == 0;
             List<string> retVals = new List<string>();
@@ -173,10 +175,7 @@ namespace WhiteCore.Modules
             if (m_oldSaveDirectory == "")
                 return null;
 
-            MainConsole.Instance.Info("Looking for sim backups in: "+ m_oldSaveDirectory);
             List<string> archives = new List<string>(Directory.GetFiles(m_oldSaveDirectory, "*.sim", SearchOption.TopDirectoryOnly));
-            MainConsole.Instance.InfoFormat ("Found {0} archive files", archives.Count);
-
             return archives;
         }
 
@@ -334,8 +333,12 @@ namespace WhiteCore.Modules
                 // * Mainland / Openspace
                 //
                 // * Estate / Full Region   (Private)
+                // * Estate / Homestead
+                // * Estate / Openspace
                 //
-                info.RegionType = MainConsole.Instance.Prompt ("Region Type (Mainland/Estate)",
+                // * WhiteCore Home / Full Region (Private)
+                //
+                info.RegionType = MainConsole.Instance.Prompt ("Region Type (Mainland / Estate / Homes)",
                     (info.RegionType == "" ? "Estate" : info.RegionType));
 
                 // Region presets or advanced setup
@@ -349,9 +352,7 @@ namespace WhiteCore.Modules
                     info.RegionType = "Mainland / ";                   
                     responses.Add("Full Region");
                     responses.Add("Homestead");
-                    responses.Add ("Openspace");
-                    responses.Add ("Whitecore");                            // TODO: remove?
-                    responses.Add ("Custom");                               
+                    responses.Add("Openspace");                          
                     setupMode = MainConsole.Instance.Prompt("Mainland region type?", "Full Region", responses).ToLower ();
 
                     // allow specifying terrain for Openspace
@@ -360,22 +361,29 @@ namespace WhiteCore.Modules
                     else if (setupMode.StartsWith("o"))
                         terrainOpen = MainConsole.Instance.Prompt("Openspace terrain ( Grassland, Swamp, Aquatic)?", terrainOpen).ToLower();
 
-                } else
+                } 
+                else if (info.RegionType.ToLower().StartsWith("e"))
                 {
                     // Estate regions
                     info.RegionType = "Estate / ";                   
                     responses.Add("Full Region");
                     responses.Add("Homestead");
-                    responses.Add ("Whitecore");                            // TODO: WhiteCore 'standard' setup, rename??
-                    responses.Add ("Custom");
+                    responses.Add("Openspace");
                     setupMode = MainConsole.Instance.Prompt("Estate region type?","Full Region", responses).ToLower();
+                }
+                else
+                {
+                	info.RegionType = "WhiteCore Homes / ";
+                	responses.Add("Full Region");
+                	setupMode = MainConsole.Instance.Prompt("Estate region type?","Full Region", responses).ToLower();
                 }
 
                 // terrain can be specified for Full or custom regions
                 if (bigRegion)
                     terrainFull = "Flatland";
-                else if (setupMode.StartsWith ("f") || setupMode.StartsWith ("c"))
+                if (setupMode.StartsWith ("f"))
                 {
+                	// 'Region land types' setup
                     var tresp = new List<string>();
                     tresp.Add ("Flatland");
                     tresp.Add ("Grassland");
@@ -389,33 +397,11 @@ namespace WhiteCore.Modules
                     // TODO: This would be where we allow selection of preset terrain files
                 }
 
-                if (setupMode.StartsWith("c"))
-                {
-                    info.RegionType = info.RegionType + "Custom";                   
-                    info.RegionTerrain = terrainFull;
-
-                    GetRegionOptional (ref info);
-
-                } 
-
-                if (setupMode.StartsWith("w"))
-                {
-                    // 'standard' setup
-                    info.RegionType = info.RegionType + "Whitecore";                   
-                    //info.RegionPort;            // use auto assigned port
-                    info.RegionTerrain = "Flatland";
-                    info.Startup = StartupType.Normal;
-                    info.SeeIntoThisSimFromNeighbor = true;
-                    info.InfiniteRegion = false;
-                    info.ObjectCapacity = 50000;
-
-                }
                 if (setupMode.StartsWith("o"))       
                 {
                     // 'Openspace' setup
-                    info.RegionType = info.RegionType + "Openspace";                   
-                    //info.RegionPort;            // use auto assigned port
-
+                    info.RegionType = info.RegionType + "Openspace";
+                    
                     if (terrainOpen.StartsWith("a"))
                         info.RegionTerrain = "Aquatic";
                     else if (terrainOpen.StartsWith("s"))
@@ -432,12 +418,12 @@ namespace WhiteCore.Modules
                     info.RegionSettings.AgentLimit = 10;
                     info.RegionSettings.AllowLandJoinDivide = false;
                     info.RegionSettings.AllowLandResell = false;
-                                   }
-                if (setupMode.StartsWith("h"))       
+                }
+                
+                if (setupMode.StartsWith("h"))
                 {
                     // 'Homestead' setup
-                    info.RegionType = info.RegionType + "Homestead";                   
-                    //info.RegionPort;            // use auto assigned port
+                    info.RegionType = info.RegionType + "Homestead";
                     if (bigRegion)
                         info.RegionTerrain = "Flatland";
                     else
@@ -455,8 +441,7 @@ namespace WhiteCore.Modules
                 if (setupMode.StartsWith("f"))       
                 {
                     // 'Full Region' setup
-                    info.RegionType = info.RegionType + "Full Region";                   
-                    //info.RegionPort;            // use auto assigned port
+                    info.RegionType = info.RegionType + "Full Region";
                     info.RegionTerrain = terrainFull;
                     info.Startup = StartupType.Normal;
                     info.SeeIntoThisSimFromNeighbor = true;
@@ -468,8 +453,16 @@ namespace WhiteCore.Modules
                         info.RegionSettings.AllowLandJoinDivide = false;
                         info.RegionSettings.AllowLandResell = false;
                     }
+                    else if (info.RegionType.StartsWith ("H"))						// Homes always have 25000 prims
+                    {
+                    	info.ObjectCapacity = 25000;
+                    }
                 }
 
+                // re-proportion allocations based on actual region area <> std area
+                var regFactor = ( info.RegionSizeX * info.RegionSizeY) / (Constants.RegionSize * Constants.RegionSize);
+                info.ObjectCapacity = (int)Math.Round ((float)(info.ObjectCapacity * regFactor));
+                info.RegionSettings.AgentLimit = (int) Math.Round ((float)(info.RegionSettings.AgentLimit * regFactor));
             }
 
             // are we updating or adding??
@@ -968,7 +961,7 @@ namespace WhiteCore.Modules
                     PathHelpers.ComputeFullPath(config.GetString("PreviousBackupDirectory", m_oldSaveDirectory));
                 if (m_oldSaveDirectory == "")
                     m_oldSaveDirectory = Path.Combine(defaultDataPath, "RegionBak");
-
+                        
                 m_removeArchiveDays = config.GetInt("ArchiveDays", m_removeArchiveDays);
                                
 
@@ -996,7 +989,7 @@ namespace WhiteCore.Modules
 
             if (m_saveChanges && m_timeBetweenBackupSaves != 0)
             {
-                m_backupSaveTimer = new Timer(m_timeBetweenBackupSaves*60*1000);
+                m_backupSaveTimer = new Timer(m_timeBetweenBackupSaves*60*1000 + 5000);
                 m_backupSaveTimer.Elapsed += m_backupSaveTimer_Elapsed;
                 m_backupSaveTimer.Start();
             }
@@ -1073,20 +1066,28 @@ namespace WhiteCore.Modules
             }
             catch (Exception ex)
             {
-                MainConsole.Instance.Error("[FileBasedSimulationData]: Failed to save backup, exception occurred " + ex);
+                MainConsole.Instance.Error("[FileBasedSimulationData]: Failed to save archive, exception occurred " + ex);
             }
         }
 
         public void DeleteUpOldArchives(int daysOld)
         {
-
+            if (m_scene == null)
+                return;
+            
             if (daysOld < 0)
                 return;
 
-            var regionArchives = FindBackupRegionFiles();
+            var simRegion = m_scene.RegionInfo.RegionName;
+            if (String.IsNullOrEmpty (simRegion))
+                return;
+
+            var regionArchives = FindRegionBackupFiles(simRegion);
             if (regionArchives.Count == 0)
                 return;
 
+            MainConsole.Instance.InfoFormat ("Found {0} archive files", regionArchives.Count);
+            
             int removed = 0;
             DateTime archiveDate = DateTime.Today.AddDays(-daysOld);
 

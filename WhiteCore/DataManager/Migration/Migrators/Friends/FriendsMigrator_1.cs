@@ -38,7 +38,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Friends
             Version = new Version(0, 0, 1);
             MigrationName = "Friends";
 
-            schema = new List<SchemaDefinition>();
+            Schema = new List<SchemaDefinition>();
 
             //Remove the old name
             this.RemoveSchema("friends");

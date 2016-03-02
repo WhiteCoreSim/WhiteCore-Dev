@@ -38,7 +38,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Parcel
             Version = new Version(0, 0, 0);
             MigrationName = "Parcel";
 
-            schema = new List<SchemaDefinition>();
+            Schema = new List<SchemaDefinition>();
 
             AddSchema("parcelaccess", ColDefs(
                 ColDef("ParcelID", ColumnTypes.String50),

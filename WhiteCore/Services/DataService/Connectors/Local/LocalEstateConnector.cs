@@ -235,6 +235,25 @@ namespace WhiteCore.Services.DataService
             return retVal.Count > 0;
         }
 
+        [CanBeReflected(ThreatLevel = ThreatLevel.High)]
+        public bool EstateRegionExists(int estateID, UUID regionID)
+        {
+            object remoteValue = DoRemote(estateID, regionID);
+            if (remoteValue != null || m_doRemoteOnly)
+                return remoteValue == null ? false : (bool) remoteValue;
+
+            bool found = false;
+            var eRegions = GetRegions (estateID);
+            if (eRegions.Count == 0)
+                return found;
+
+            foreach (UUID rId in eRegions)
+                if (rId == regionID)
+                    found = true;
+            
+            return found;
+        }
+
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public int GetEstateID(string name)
         {

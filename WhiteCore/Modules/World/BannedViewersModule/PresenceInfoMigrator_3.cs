@@ -43,7 +43,7 @@ namespace WhiteCore.Modules.Ban
             Version = new Version(0, 0, 3);
             MigrationName = "PresenceInfo";
 
-            schema = new List<SchemaDefinition>();
+            Schema = new List<SchemaDefinition>();
 
             AddSchema("baninfo", ColDefs(
                 ColDef("AgentID", /*"AgentID"*/ ColumnTypes.String50),

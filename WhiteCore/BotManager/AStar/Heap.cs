@@ -44,7 +44,7 @@ namespace WhiteCore.BotManager.AStar
         /// <summary>
         ///     Defines an equality for two objects
         /// </summary>
-        public delegate bool Equality(object Object1, object Object2);
+        public delegate bool Equality(object object1, object object2);
 
         #endregion
 
@@ -67,33 +67,33 @@ namespace WhiteCore.BotManager.AStar
         ///     Constructor.
         ///     Since no IComparer is provided, added objects must implement the IComparer interface.
         /// </summary>
-        /// <param name="Capacity">
+        /// <param name="capacity">
         ///     Capacity of the list (<see cref="ArrayList.Capacity">ArrayList.Capacity</see>)
         /// </param>
-        public Heap(int Capacity)
+        public Heap(int capacity)
         {
-            InitProperties(null, Capacity);
+            InitProperties(null, capacity);
         }
 
         /// <summary>
         ///     Constructor.
         /// </summary>
-        /// <param name="Comparer">Will be used to compare added elements for sort and search operations.</param>
-        public Heap(IComparer Comparer)
+        /// <param name="comparer">Will be used to compare added elements for sort and search operations.</param>
+        public Heap(IComparer comparer)
         {
-            InitProperties(Comparer, 0);
+            InitProperties(comparer, 0);
         }
 
         /// <summary>
         ///     Constructor.
         /// </summary>
-        /// <param name="Comparer">Will be used to compare added elements for sort and search operations.</param>
-        /// <param name="Capacity">
+        /// <param name="comparer">Will be used to compare added elements for sort and search operations.</param>
+        /// <param name="capacity">
         ///     Capacity of the list (<see cref="ArrayList.Capacity">ArrayList.Capacity</see>)
         /// </param>
-        public Heap(IComparer Comparer, int Capacity)
+        public Heap(IComparer comparer, int capacity)
         {
-            InitProperties(Comparer, Capacity);
+            InitProperties(comparer, capacity);
         }
 
         #endregion
@@ -131,9 +131,9 @@ namespace WhiteCore.BotManager.AStar
         /// <returns>Cloned object.</returns>
         public object Clone()
         {
-            Heap Clone = new Heap(FComparer, FList.Capacity)
+            Heap newClone = new Heap(FComparer, FList.Capacity)
                              {FList = (ArrayList) FList.Clone(), FAddDuplicates = FAddDuplicates};
-            return Clone;
+            return newClone;
         }
 
         #endregion
@@ -147,13 +147,13 @@ namespace WhiteCore.BotManager.AStar
         /// </summary>
         /// <exception cref="ArgumentOutOfRangeException">Index is less than zero or Index is greater than Count.</exception>
         /// <exception cref="InvalidOperationException">[] operator cannot be used to set a value on a Heap.</exception>
-        public object this[int Index]
+        public object this[int index]
         {
             get
             {
-                if (Index >= FList.Count || Index < 0)
+                if (index >= FList.Count || index < 0)
                     throw new ArgumentOutOfRangeException("Index is less than zero or Index is greater than Count.");
-                return FList[Index];
+                return FList[index];
             }
             set { throw new InvalidOperationException("[] operator cannot be used to set a value in a Heap."); }
         }
@@ -162,18 +162,18 @@ namespace WhiteCore.BotManager.AStar
         ///     IList implementation.
         ///     Adds the object at the right place.
         /// </summary>
-        /// <param name="O">The object to add.</param>
+        /// <param name="obj">The object to add.</param>
         /// <returns>The index where the object has been added.</returns>
         /// <exception cref="ArgumentException">The Heap is set to use object's IComparable interface, and the specified object does not implement this interface.</exception>
-        public int Add(object O)
+        public int Add(object obj)
         {
             int Return = -1;
-            if (ObjectIsCompliant(O))
+            if (ObjectIsCompliant(obj))
             {
-                int Index = IndexOf(O);
+                int Index = IndexOf(obj);
                 int NewIndex = Index >= 0 ? Index : -Index - 1;
-                if (NewIndex >= Count) FList.Add(O);
-                else FList.Insert(NewIndex, O);
+                if (NewIndex >= Count) FList.Add(obj);
+                else FList.Insert(NewIndex, obj);
                 Return = NewIndex;
             }
             return Return;
@@ -185,11 +185,11 @@ namespace WhiteCore.BotManager.AStar
         ///     If the list is sorted, a &lt;see cref = &quot;ArrayList.BinarySearch&quot;&gt;BinarySearch&lt;/see&gt; is performed using IComparer interface.
         ///     Else the &lt;see cref = &quot;Equals&quot;&gt;Object.Equals&lt;/see&gt; implementation is used.
         /// </summary>
-        /// <param name="O">The object to look for</param>
+        /// <param name="obj">The object to look for</param>
         /// <returns>true if the object is in the list, otherwise false.</returns>
-        public bool Contains(object O)
+        public bool Contains(object obj)
         {
-            return FList.BinarySearch(O, FComparer) >= 0;
+            return FList.BinarySearch(obj, FComparer) >= 0;
         }
 
         /// <summary>
@@ -198,16 +198,16 @@ namespace WhiteCore.BotManager.AStar
         ///     If the list is sorted, a &lt;see cref = &quot;ArrayList.BinarySearch&quot;&gt;BinarySearch&lt;/see&gt; is performed using IComparer interface.
         ///     Else the &lt;see cref = &quot;Equals&quot;&gt;Object.Equals&lt;/see&gt; implementation of objects is used.
         /// </summary>
-        /// <param name="O">The object to locate.</param>
+        /// <param name="obj">The object to locate.</param>
         /// <returns>
         ///     If the object has been found, a positive integer corresponding to its position.
         ///     If the objects has not been found, a negative integer which is the bitwise complement of the index of the next element.
         /// </returns>
-        public int IndexOf(object O)
+        public int IndexOf(object obj)
         {
             int Result = -1;
-            Result = FList.BinarySearch(O, FComparer);
-            while (Result > 0 && FList[Result - 1].Equals(O))
+            Result = FList.BinarySearch(obj, FComparer);
+            while (Result > 0 && FList[Result - 1].Equals(obj))
                 Result--;
             return Result;
         }
@@ -243,10 +243,10 @@ namespace WhiteCore.BotManager.AStar
         ///     IList implementation.
         ///     Cannot be used on a Heap.
         /// </summary>
-        /// <param name="Index">The index before which the object must be added.</param>
-        /// <param name="O">The object to add.</param>
+        /// <param name="index">The index before which the object must be added.</param>
+        /// <param name="obj">The object to add.</param>
         /// <exception cref="InvalidOperationException">Insert method cannot be called on a Heap.</exception>
-        public void Insert(int Index, object O)
+        public void Insert(int index, object obj)
         {
             throw new InvalidOperationException("Insert method cannot be called on a Heap.");
         }
@@ -255,20 +255,20 @@ namespace WhiteCore.BotManager.AStar
         ///     IList implementation.
         ///     Idem <see cref="ArrayList">ArrayList</see>
         /// </summary>
-        /// <param name="Value">The object whose value must be removed if found in the list.</param>
-        public void Remove(object Value)
+        /// <param name="value">The object whose value must be removed if found in the list.</param>
+        public void Remove(object value)
         {
-            FList.Remove(Value);
+            FList.Remove(value);
         }
 
         /// <summary>
         ///     IList implementation.
         ///     Idem <see cref="ArrayList">ArrayList</see>
         /// </summary>
-        /// <param name="Index">Index of object to remove.</param>
-        public void RemoveAt(int Index)
+        /// <param name="index">Index of object to remove.</param>
+        public void RemoveAt(int index)
         {
-            FList.RemoveAt(Index);
+            FList.RemoveAt(index);
         }
 
         /// <summary>
@@ -338,9 +338,9 @@ namespace WhiteCore.BotManager.AStar
         ///     Object.Equals() override.
         /// </summary>
         /// <returns>true if object is equal to this, otherwise false.</returns>
-        public override bool Equals(object Object)
+        public override bool Equals(object obj)
         {
-            Heap SL = (Heap) Object;
+            Heap SL = (Heap) obj;
             if (SL.Count != Count)
                 return false;
             for (int i = 0; i < Count; i++)
@@ -361,14 +361,14 @@ namespace WhiteCore.BotManager.AStar
         /// <summary>
         ///     Idem IndexOf(object), but starting at a specified position in the list
         /// </summary>
-        /// <param name="Object">The object to locate.</param>
-        /// <param name="Start">The index for start position.</param>
+        /// <param name="obj">The object to locate.</param>
+        /// <param name="start">The index for start position.</param>
         /// <returns></returns>
-        public int IndexOf(object Object, int Start)
+        public int IndexOf(object obj, int start)
         {
             int Result = -1;
-            Result = FList.BinarySearch(Start, FList.Count - Start, Object, FComparer);
-            while (Result > Start && FList[Result - 1].Equals(Object))
+            Result = FList.BinarySearch(start, FList.Count - start, obj, FComparer);
+            while (Result > start && FList[Result - 1].Equals(obj))
                 Result--;
             return Result;
         }
@@ -376,51 +376,51 @@ namespace WhiteCore.BotManager.AStar
         /// <summary>
         ///     Idem IndexOf(object), but with a specified equality function
         /// </summary>
-        /// <param name="Object">The object to locate.</param>
-        /// <param name="AreEqual">Equality function to use for the search.</param>
+        /// <param name="obj">The object to locate.</param>
+        /// <param name="areEqual">Equality function to use for the search.</param>
         /// <returns></returns>
-        public int IndexOf(object Object, Equality AreEqual)
+        public int IndexOf(object obj, Equality areEqual)
         {
             for (int i = 0; i < FList.Count; i++)
-                if (AreEqual(FList[i], Object)) return i;
+                if (areEqual(FList[i], obj)) return i;
             return -1;
         }
 
         /// <summary>
         ///     Idem IndexOf(object), but with a start index and a specified equality function
         /// </summary>
-        /// <param name="Object">The object to locate.</param>
-        /// <param name="Start">The index for start position.</param>
-        /// <param name="AreEqual">Equality function to use for the search.</param>
+        /// <param name="obj">The object to locate.</param>
+        /// <param name="start">The index for start position.</param>
+        /// <param name="areEqual">Equality function to use for the search.</param>
         /// <returns></returns>
-        public int IndexOf(object Object, int Start, Equality AreEqual)
+        public int IndexOf(object obj, int start, Equality areEqual)
         {
-            if (Start < 0 || Start >= FList.Count)
+            if (start < 0 || start >= FList.Count)
                 throw new ArgumentException("Start index must belong to [0; Count-1].");
-            for (int i = Start; i < FList.Count; i++)
-                if (AreEqual(FList[i], Object)) return i;
+            for (int i = start; i < FList.Count; i++)
+                if (areEqual(FList[i], obj)) return i;
             return -1;
         }
 
         /// <summary>
         ///     The objects will be added at the right place.
         /// </summary>
-        /// <param name="C">The object to add.</param>
+        /// <param name="coll">The object to add.</param>
         /// <returns>The index where the object has been added.</returns>
         /// <exception cref="ArgumentException">The Heap is set to use object's IComparable interface, and the specified object does not implement this interface.</exception>
-        public void AddRange(ICollection C)
+        public void AddRange(ICollection coll)
         {
-            foreach (object Object in C)
+            foreach (object Object in coll)
                 Add(Object);
         }
 
         /// <summary>
         ///     Cannot be called on a Heap.
         /// </summary>
-        /// <param name="Index">The index before which the objects must be added.</param>
-        /// <param name="C">The object to add.</param>
+        /// <param name="index">The index before which the objects must be added.</param>
+        /// <param name="coll">The object to add.</param>
         /// <exception cref="InvalidOperationException">Insert cannot be called on a Heap.</exception>
-        public void InsertRange(int Index, ICollection C)
+        public void InsertRange(int index, ICollection coll)
         {
             throw new InvalidOperationException("Insert cannot be called on a Heap.");
         }
@@ -430,23 +430,23 @@ namespace WhiteCore.BotManager.AStar
         ///     Same values are equals according to the Equals() method of objects in the list.
         ///     The first occurrences encountered are kept.
         /// </summary>
-        /// <param name="Value">Value whose occurrences number must be limited.</param>
-        /// <param name="NumberToKeep">Number of occurrences to keep</param>
-        public void LimitOccurrences(object Value, int NumberToKeep)
+        /// <param name="value">Value whose occurrences number must be limited.</param>
+        /// <param name="numberToKeep">Number of occurrences to keep</param>
+        public void LimitOccurrences(object value, int numberToKeep)
         {
-            if (Value == null)
-                throw new ArgumentNullException("Value");
+            if (value == null)
+                throw new ArgumentNullException("Value is null");
             int Pos = 0;
-            while ((Pos = IndexOf(Value, Pos)) >= 0)
+            while ((Pos = IndexOf(value, Pos)) >= 0)
             {
-                if (NumberToKeep <= 0)
+                if (numberToKeep <= 0)
                     FList.RemoveAt(Pos);
                 else
                 {
                     Pos++;
-                    NumberToKeep--;
+                    numberToKeep--;
                 }
-                if (FComparer.Compare(FList[Pos], Value) > 0)
+                if (FComparer.Compare(FList[Pos], value) > 0)
                     break;
             }
         }
@@ -510,28 +510,28 @@ namespace WhiteCore.BotManager.AStar
         /// <summary>
         ///     Pushes an object on list. It will be inserted at the right spot.
         /// </summary>
-        /// <param name="Object">Object to add to the list</param>
+        /// <param name="obj">Object to add to the list</param>
         /// <returns></returns>
-        public int Push(object Object)
+        public int Push(object obj)
         {
-            return (Add(Object));
+            return (Add(obj));
         }
 
-        bool ObjectIsCompliant(object Object)
+        bool ObjectIsCompliant(object obj)
         {
-            if (FUseObjectsComparison && !(Object is IComparable))
+            if (FUseObjectsComparison && !(obj is IComparable))
                 throw new ArgumentException(
                     "The Heap is set to use the IComparable interface of objects, and the object to add does not implement the IComparable interface.");
-            if (!FAddDuplicates && Contains(Object))
+            if (!FAddDuplicates && Contains(obj))
                 return false;
             return true;
         }
 
-        void InitProperties(IComparer Comparer, int Capacity)
+        void InitProperties(IComparer comparer, int capacity)
         {
-            if (Comparer != null)
+            if (comparer != null)
             {
-                FComparer = Comparer;
+                FComparer = comparer;
                 FUseObjectsComparison = false;
             }
             else
@@ -539,7 +539,7 @@ namespace WhiteCore.BotManager.AStar
                 FComparer = new Comparison();
                 FUseObjectsComparison = true;
             }
-            FList = Capacity > 0 ? new ArrayList(Capacity) : new ArrayList();
+            FList = capacity > 0 ? new ArrayList(capacity) : new ArrayList();
             FAddDuplicates = true;
         }
 
@@ -549,10 +549,10 @@ namespace WhiteCore.BotManager.AStar
         {
             #region IComparer Members
 
-            public int Compare(object Object1, object Object2)
+            public int Compare(object obj1, object obj2)
             {
-                IComparable C = Object1 as IComparable;
-                return C.CompareTo(Object2);
+                IComparable C = obj1 as IComparable;
+                return C.CompareTo(obj2);
             }
 
             #endregion

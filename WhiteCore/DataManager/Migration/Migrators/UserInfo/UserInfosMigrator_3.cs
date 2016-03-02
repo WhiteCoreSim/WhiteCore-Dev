@@ -38,7 +38,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.UserInfo
             Version = new Version(0, 0, 3);
             MigrationName = "UserInfo";
 
-            schema = new List<SchemaDefinition>();
+            Schema = new List<SchemaDefinition>();
 
             //
             // Change summery:

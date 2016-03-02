@@ -42,8 +42,6 @@ namespace WhiteCore.Modules.Estate
 {
     public class EstateInitializer : ISharedRegionStartupModule, IWhiteCoreBackupModule
     {
-        string LastEstateName = "";
-        string LastEstateOwner = Constants.RealEstateOwnerName;
         protected IRegistryCore m_registry;
          
 
@@ -180,7 +178,9 @@ namespace WhiteCore.Modules.Estate
 
 
             // This is an 'Estate' so get some details....
-            LastEstateOwner = sysEstateOwnerName;
+            var LastEstateOwner = sysEstateOwnerName;
+            string LastEstateName;
+
             while (true)
             {
                 UserAccount account;
@@ -254,19 +254,29 @@ namespace WhiteCore.Modules.Estate
 
                 // link up the region
                 EstateSettings ES;
-                if (estateConnector.LinkRegion(scene.RegionInfo.RegionID, estateID))
-                {
-                    if ((ES = estateConnector.GetEstateSettings(scene.RegionInfo.RegionID)) == null ||
-                         ES.EstateID == 0)
-                        //We could do by EstateID now, but we need to completely make sure that it fully is set up
-                    {
-                        MainConsole.Instance.Warn("[Estate]: The connection to the server was broken, please try again.");
-                        continue;
-                    }
-                } else
+                UUID oldOwnerID = UUID.Zero;
+                if (scene.RegionInfo.EstateSettings != null)
+                    oldOwnerID = scene.RegionInfo.EstateSettings.EstateOwner;
+
+                if (!estateConnector.LinkRegion(scene.RegionInfo.RegionID, estateID))
                 {
                     MainConsole.Instance.WarnFormat("[Estate]: Joining the {0} estate failed. Please try again.", LastEstateName);
                     continue;
+                }
+
+                // make sure that the region is fully set up
+                if ((ES = estateConnector.GetEstateSettings(scene.RegionInfo.RegionID)) == null || ES.EstateID == 0)
+                {
+                    MainConsole.Instance.Warn("[Estate]: Unable to verify region update (possible server connection error), please try again.");
+                    continue;
+                }
+
+                // Linking was successful, change any previously owned parcels to the new owner 
+                if (oldOwnerID != UUID.Zero)
+                {
+                    IParcelManagementModule parcelManagement = scene.RequestModuleInterface<IParcelManagementModule>();
+                    if (parcelManagement != null)
+                        parcelManagement.ReclaimParcels(oldOwnerID, ES.EstateOwner);
                 }
 
                 MainConsole.Instance.InfoFormat("[Estate]: Successfully joined the {0} estate!", LastEstateName);
@@ -309,9 +319,10 @@ namespace WhiteCore.Modules.Estate
                 {
                     if (!EstateConnector.DelinkRegion(scene.RegionInfo.RegionID))
                     {
-                        MainConsole.Instance.Warn("[Estate]: Unable to remove this region from the estate.");
+                        MainConsole.Instance.Warn("[Estate]: Unable to remove this region from the current estate.");
                         return;
                     }
+                    // need to get new estate and re-link the region
                     scene.RegionInfo.EstateSettings = CreateEstateInfo(scene);
                 }
                 else

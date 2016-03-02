@@ -38,7 +38,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.GridRegion
             Version = new Version(0, 0, 2);
             MigrationName = "GridRegions";
 
-            schema = new List<SchemaDefinition>();
+            Schema = new List<SchemaDefinition>();
 
             //
             // Change summery:

@@ -38,7 +38,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Agent
             Version = new Version(0, 0, 3);
             MigrationName = "Agent";
 
-            schema = new List<SchemaDefinition>();
+            Schema = new List<SchemaDefinition>();
 
             AddSchema("userdata", ColDefs(
                 ColDef("ID", ColumnTypes.String45),

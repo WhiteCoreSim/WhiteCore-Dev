@@ -38,7 +38,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Inventory
             Version = new Version(0, 0, 0);
             MigrationName = "Inventory";
 
-            schema = new List<SchemaDefinition>();
+            Schema = new List<SchemaDefinition>();
 
             AddSchema("inventoryfolders", ColDefs(
                 ColDef("folderID", ColumnTypes.Char36),

@@ -38,7 +38,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Friends
             Version = new Version(0, 0, 0);
             MigrationName = "Friends";
 
-            schema = new List<SchemaDefinition>();
+            Schema = new List<SchemaDefinition>();
 
             //
             // Change summery:

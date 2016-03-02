@@ -135,7 +135,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     "Create a new user. If optional parameters are not supplied required details will be prompted\n"+
                     "  --system : Enter user scope UUID\n"+
                     "  --uuid : Enter a specific UUID for the user",
-                    HandleCreateUser, false, true);
+                    HandleAddUser, false, true);
 
                 MainConsole.Instance.Commands.AddCommand(
                     "deluser",
@@ -1032,6 +1032,14 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
 
             return archives;
 
+        }
+
+        protected void HandleAddUser(IScene scene, string[] cmd)
+        {
+            // short form command
+            var newcmds = new List <string>(cmd);
+            newcmds.Insert (1, "dummy");
+            HandleCreateUser (scene, newcmds.ToArray ());
         }
 
         /// <summary>

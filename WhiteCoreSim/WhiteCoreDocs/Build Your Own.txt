@@ -3,26 +3,41 @@ Building your own from source
 
 Prerequisites
 =============
-Mono V3.x    : Checkout http://www.go-mono.com/mono-downloads/download.html for the latest update
-(Optional)  Xamarin Studio for a nice IDE : Checkout http://http://monodevelop.com/Download
+Mono V3 +   : Checkout http://www.go-mono.com/mono-downloads/download.html for the latest update
+(Optional)  Xamarin Studio for a nice IDE available for all OS's.
+              Checkout http://http://monodevelop.com/Download
 
 Building
 ========
 
 Clone the WhiteCore repo at https://github.com/WhiteCoreSim/WhiteCore-Dev.git
 
+# Windows #
+Change to your download directory and run (double click) the 'runprebuild.bat' batch file
+ (or 'runprebuildvs2015.bat' if you have Visual Studio 2015 installed)
 
-Cd the the downloaded directory.
-Run(Execute) the  ./runprebuild.sh file to create the required c# solution files.
+At the completion of this process you will be asked if you wish to build immediately.
+ If you wish to build later, a 'build' batch file will be created with the required
+ configuration settings.
+
+
+# *nix based systems #
+Cd to the downloaded directory.
+Run(Execute) the 'runprebuild.sh' file to create the required c# solution files.
+#:  ./runprebuild.sh
 
 Compile WhiteCore :
 #:  xbuild WhiteCore.sln
 
-A large amount of compile information will be shown but when completed, 
+Note: Alternatively you can use the 'autobuild.sh' script to configure and
+ automatically build for your system configuration.
+
+
+A large amount of compile information will be shown but when completed,
 no errors should be indicated.
-NOTE:  Some warnings may be shown (36 at last count) but these do not present 
-any problem or prevent operation of the servers. 
-(These will be corrected and removed as time permits)
+NOTE:  Some warnings may be shown but these do not present any problem or prevent
+ operation of the servers.
+ (These do depend upon the system used will be corrected and removed as time permits)
 
 When completed the 'WhiteCoreSim/bin' subdirectory will contain the newly compiled WhiteCore files.
 
@@ -35,9 +50,10 @@ Checkout the ReadMe.txt file for the rest
 
 Questions?
 ==========
-Checkout the #whitecore-support irc channel on freenode,
+Checkout http://whitecore-sim.org, catch me on the '#whitecore-support' irc channel on freenode,
+or check into the Google+ group at https://plus.google.com/communitites/113034607546142208907
 
 
 Rowan
 <greythane@gmail.com>
-May 2014
+December 2015

@@ -167,10 +167,11 @@ namespace WhiteCore.Modules.Land
         public int GetParcelMaxPrimCount(ILandObject thisObject)
         {
             // Normal Calculations
-            return (int) Math.Round(((float) thisObject.LandData.Area/
-                                     (256*256))*
-                                    m_Scene.RegionInfo.ObjectCapacity*
-                                    (float) m_Scene.RegionInfo.RegionSettings.ObjectBonus);
+            // max = (this Land area) / (calculated region area) * region capacity * bonus  [ bonus is normally = 1 ]
+            return (int) Math.Round(
+                ((float) thisObject.LandData.Area / (m_Scene.RegionInfo.RegionSizeX * m_Scene.RegionInfo.RegionSizeY)) *   
+                m_Scene.RegionInfo.ObjectCapacity * (float) m_Scene.RegionInfo.RegionSettings.ObjectBonus
+            );
         }
 
         public IPrimCounts GetPrimCounts(UUID parcelID)

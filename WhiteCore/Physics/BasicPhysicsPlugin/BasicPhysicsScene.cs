@@ -26,19 +26,19 @@
  */
 
 using System.Collections.Generic;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.SceneInfo;
-using Nini.Config;
-using OpenMetaverse;
 
 namespace WhiteCore.Physics.BasicPhysicsPlugin
 {
     public class BasicScene : PhysicsScene
     {
-        private readonly List<PhysicsActor> _actors = new List<PhysicsActor>();
-        private short[] _heightMap;
-        private RegionInfo m_region;
+        readonly List<PhysicsActor> _actors = new List<PhysicsActor>();
+        short[] _heightMap;
+        RegionInfo m_region;
 
         public BasicScene()
         {
@@ -79,10 +79,6 @@ namespace WhiteCore.Physics.BasicPhysicsPlugin
         }
 
         public override void RemovePrim(PhysicsActor prim)
-        {
-        }
-
-        public override void DeletePrim(PhysicsActor prim)
         {
         }
 

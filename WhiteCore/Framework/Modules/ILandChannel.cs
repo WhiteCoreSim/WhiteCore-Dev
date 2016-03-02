@@ -26,10 +26,10 @@
  */
 
 using System.Collections.Generic;
+using OpenMetaverse;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.SceneInfo.Entities;
-using OpenMetaverse;
 
 namespace WhiteCore.Framework.Modules
 {
@@ -98,6 +98,13 @@ namespace WhiteCore.Framework.Modules
         ///     Delete all parcels and create one default parcel that spreads over the entire sim
         /// </summary>
         ILandObject ResetSimLandObjects();
+
+        /// <summary>
+        /// Reclaims (resets) parcel ownership.
+        /// </summary>
+        /// <param name="oldOwnerID">Old owner</param>
+        /// <param name="newOwnerID">New owner.</param>
+        void ReclaimParcels (UUID oldOwnerID, UUID newOwnerID);
 
         /// <summary>
         ///     Join all parcels within the given range into one large parcel

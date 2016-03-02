@@ -78,6 +78,7 @@ namespace WhiteCore.ClientStack
         public event ImprovedInstantMessage OnInstantMessage;
         public event PreSendImprovedInstantMessage OnPreSendInstantMessage;
         public event ChatMessage OnChatFromClient;
+        public event RezRestoreToWorld OnRezRestoreToWorld;
         public event RezObject OnRezObject;
         public event DeRezObject OnDeRezObject;
         public event ModifyTerrain OnModifyTerrain;
@@ -1577,10 +1578,29 @@ namespace WhiteCore.ClientStack
         {
             PlacesReplyPacket PlacesReply = new PlacesReplyPacket();
             
+            PlacesReplyPacket.QueryDataBlock[] Query = new PlacesReplyPacket.QueryDataBlock[LandData.Length + 1];
+            
             // Since we don't have Membership we should send an empty QueryData block 
             // here to keep the viewer happy
             
-            PlacesReplyPacket.QueryDataBlock[] Query = new PlacesReplyPacket.QueryDataBlock[LandData.Length];
+            PlacesReplyPacket.QueryDataBlock MembershipBlock = new PlacesReplyPacket.QueryDataBlock
+            {
+            	ActualArea = 0,
+            	BillableArea = 0,
+            	Desc = Utils.StringToBytes(""),
+            	Dwell = 0,
+            	Flags = 0,
+            	GlobalX= 0,
+            	GlobalY = 0,
+            	GlobalZ = 0,
+            	Name = Utils.StringToBytes(""),
+            	OwnerID = UUID.Zero,
+            	Price = 0,
+            	SimName = Utils.StringToBytes(""),
+            	SnapshotID = UUID.Zero 
+            };
+            Query[0] = MembershipBlock;
+            
             //Note: Nothing is ever done with this?????
             int totalarea = 0;
             List<string> RegionTypes = new List<string>();
@@ -1606,7 +1626,7 @@ namespace WhiteCore.ClientStack
                                                                           Utils.StringToBytes(LandData[i].RegionName),
                                                                       SnapshotID = LandData[i].LandData.SnapshotID
                                                                   };
-                Query[i] = QueryBlock;
+                Query[i+1] = QueryBlock;
                 totalarea += LandData[i].LandData.Area;
                 RegionTypes.Add(LandData[i].RegionType);
             }
@@ -6660,7 +6680,8 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandlerRezRestoreToWorld(IClientAPI sender, Packet Pack)
+     /* original - assumed all objects were attachments
+      private bool HandlerRezRestoreToWorld(IClientAPI sender, Packet Pack)
         {
             RezSingleAttachmentFromInv handlerRezSingleAttachment = OnRezSingleAttachmentFromInv;
             if (handlerRezSingleAttachment != null)
@@ -6684,6 +6705,32 @@ namespace WhiteCore.ClientStack
 
             return true;
         }
+       */
+
+        // update 20160129 - greythane-
+        bool HandlerRezRestoreToWorld(IClientAPI sender, Packet Pack)
+        {
+            RezRestoreToWorld handlerRezRestoreToWorld = OnRezRestoreToWorld;
+            if (handlerRezRestoreToWorld != null)
+            {
+                RezRestoreToWorldPacket rezPacket = (RezRestoreToWorldPacket)Pack;
+
+                #region Packet Session and User Check
+                if (m_checkPackets)
+                {
+                    if (rezPacket.AgentData.SessionID != SessionId ||
+                        rezPacket.AgentData.AgentID != AgentId)
+                        return true;
+                }
+                #endregion
+
+                handlerRezRestoreToWorld(this, rezPacket.InventoryData.ItemID, rezPacket.InventoryData.GroupID);
+
+            }
+            return true;
+        }
+
+
 
         private bool HandleRezMultipleAttachmentsFromInv(IClientAPI sender, Packet Pack)
         {

@@ -25,17 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using System.Net;
+using OpenMetaverse;
+using OpenMetaverse.Packets;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.SceneInfo.Entities;
 using WhiteCore.Framework.Services.ClassHelpers.Inventory;
-using OpenMetaverse;
-using OpenMetaverse.Packets;
-using OpenMetaverse.StructuredData;
-using System;
-using System.Collections.Generic;
-using System.Net;
 
 namespace WhiteCore.Framework.PresenceInfo
 {
@@ -55,6 +55,8 @@ namespace WhiteCore.Framework.PresenceInfo
     public delegate void ImprovedInstantMessage(IClientAPI remoteclient, GridInstantMessage im);
 
     public delegate bool PreSendImprovedInstantMessage(IClientAPI remoteclient, GridInstantMessage im);
+
+    public delegate void RezRestoreToWorld(IClientAPI remoteClient, UUID itemID, UUID groupID);
 
     public delegate void RezObject(IClientAPI remoteClient, UUID itemID, Vector3 RayEnd, Vector3 RayStart,
                                    UUID RayTargetID, byte BypassRayCast, bool RayEndIsIntersection,
@@ -962,6 +964,7 @@ namespace WhiteCore.Framework.PresenceInfo
         // [Obsolete("LLClientView Specific - Replace with more bare-bones arguments. Rename OnChat.")]
         event ChatMessage OnChatFromClient;
         // [Obsolete("LLClientView Specific - Remove bitbuckets. Adam, can you be more specific here..  as I don't see any bit buckets.")]
+        event RezRestoreToWorld OnRezRestoreToWorld;
         event RezObject OnRezObject;
         // [Obsolete("LLClientView Specific - Replace with more suitable arguments.")]
         event ModifyTerrain OnModifyTerrain;

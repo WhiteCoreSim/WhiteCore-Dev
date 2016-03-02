@@ -38,7 +38,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Auth
             Version = new Version(0, 0, 2);
             MigrationName = "Auth";
 
-            schema = new List<SchemaDefinition>();
+            Schema = new List<SchemaDefinition>();
 
             //
             // Change summery:

@@ -68,6 +68,17 @@ namespace WhiteCore.Framework.Modules
         /// <returns></returns>
         ISceneEntity CreateObjectFromInventory(IClientAPI remoteClient, UUID itemID, UUID assetID, InventoryItemBase item);
 
+
+        /// <summary>
+        /// Restores the object in world.
+        /// </summary>
+        /// <returns><c>true</c>, if object was restored, <c>false</c> otherwise.</returns>
+        /// <param name="remoteClient">Remote client.</param>
+        /// <param name="itemID">Item I.</param>
+        /// <param name="item">Item.</param>
+        /// <param name="groupID">Group I.</param>
+        bool RezRestoreToWorld (IClientAPI remoteClient, UUID itemID, InventoryItemBase item, UUID groupID);
+
         /// <summary>
         ///     Rez an object from inventory and add it to the scene
         /// </summary>

@@ -1,0 +1,60 @@
+<llsd>
+	<array>
+		<map>
+			<key>description</key>
+			<string>Mainland / Full Region</string>
+			<key>name</key>
+			<string>mainland_full</string>
+			<key>sku</key>
+			<string>001</string>
+		</map>
+		<map>
+			<key>description</key>
+			<string>Mainland / Homestead</string>
+			<key>name</key>
+			<string>mainland_homestead</string>
+			<key>sku</key>
+			<string>011</string>
+		</map>		
+		<map>
+			<key>description</key>
+			<string>Mainland / Openspace</string>
+			<key>name</key>
+			<string>mainland_openspace</string>
+			<key>sku</key>
+			<string>021</string>
+		</map>		
+		<map>
+			<key>description</key>
+			<string>Estate / Full Region</string>
+			<key>name</key>
+			<string>estate_full</string>
+			<key>sku</key>
+			<string>002</string>
+		</map>
+		<map>
+			<key>description</key>
+			<string>Estate / Homestead</string>
+			<key>name</key>
+			<string>estate_homestead</string>
+			<key>sku</key>
+			<string>012</string>
+		</map>		
+		<map>
+			<key>description</key>
+			<string>Estate / Openspace</string>
+			<key>name</key>
+			<string>estate_openspace</string>
+			<key>sku</key>
+			<string>022</string>
+		</map>
+		<map>
+			<key>description</key>
+			<string>WhiteCore Homes / Full Region</string>
+			<key>name</key>
+			<string>whitecore_homes</string>
+			<key>sku</key>
+			<string>101</string>
+		</map>
+	</array>
+</llsd>

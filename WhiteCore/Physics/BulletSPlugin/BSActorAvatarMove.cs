@@ -67,7 +67,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         {
             Enabled = false;
             Refresh();
-        DeactivateAvatarMove();   //?? OS
+            DeactivateAvatarMove();   //?? OS
 
         }
 
@@ -110,18 +110,18 @@ namespace WhiteCore.Physics.BulletSPlugin
             if (m_disallowTargetVelocitySet)
             {
                 if (m_controllingPrim.Flying && (m_controllingPrim.IsJumping || m_controllingPrim.IsPreJumping))
-                //They started flying while jumping
+                    //They started flying while jumping
                 {
-                    m_physicsScene.TaintedObject("BSCharacter.setTargetVelocity", delegate()
-                    {
-                        //Reset everything in case something went wrong
-                        m_disallowTargetVelocitySet = false;
-                        m_jumpFallState = false;
-                        m_controllingPrim.IsPreJumping = false;
-                        m_controllingPrim.IsJumping = false;
-                        m_jumpStart = 0;
-                        m_preJumpStart = 0;
-                    });
+                    m_physicsScene.TaintedObject(inTaintTime, "BSCharacter.setTargetVelocity", delegate()
+                        {
+                            //Reset everything in case something went wrong
+                            m_disallowTargetVelocitySet = false;
+                            m_jumpFallState = false;
+                            m_controllingPrim.IsPreJumping = false;
+                            m_controllingPrim.IsJumping = false;
+                            m_jumpStart = 0;
+                            m_preJumpStart = 0;
+                        });
                 }
                 return;
             }
@@ -141,7 +141,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         void SetVelocityAndTargetInternal(OMV.Vector3 vel, OMV.Vector3 targ, bool inTaintTime,
             int targetValueDecayTimeScale)
         {
-            m_physicsScene.TaintedObject(inTaintTime, "BSActorAvatarMove.setVelocityAndTarget", delegate()
+            m_physicsScene.TaintedObject(inTaintTime, m_controllingPrim.LocalID, "BSActorAvatarMove.setVelocityAndTarget", delegate ()
             {
                 if (m_velocityMotor != null)
                 {
@@ -168,8 +168,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 m_velocityMotor.ErrorZeroThreshold = BSParam.AvatarStopZeroThreshold;
 
                 // _velocityMotor.PhysicsScene = PhysicsScene; // DEBUG DEBUG so motor will output detail log messages.
-                SetVelocityAndTarget(m_controllingPrim.RawVelocity, m_controllingPrim.TargetVelocity, true
-                    /* inTaintTime */, 0);
+                SetVelocityAndTarget(m_controllingPrim.RawVelocity, m_controllingPrim.TargetVelocity, true, 0);
 
                 m_physicsScene.BeforeStep += Mover;
                 m_controllingPrim.OnPreUpdateProperty += Process_OnPreUpdateProperty;
@@ -342,11 +341,13 @@ namespace WhiteCore.Physics.BulletSPlugin
                 m_physicsScene.DetailLog("{0},BSCharacter.MoveMotor,move,stepVel={1},vel={2},mass={3},moveForce={4}",
                     m_controllingPrim.LocalID, stepVelocity, m_controllingPrim.RawVelocity, m_controllingPrim.Mass,
                     moveForce);
-                if(moveForce.IsFinite())
+
+                // i think this fix is working .. :-)
+                if (moveForce.IsFinite())
                      m_physicsScene.PE.ApplyCentralImpulse(m_controllingPrim.PhysBody, moveForce);
             }
 
-
+            // a bit of jump processing...
             if (m_preJumpStart != 0 && Util.EnvironmentTickCountSubtract(m_preJumpStart) > 300)
             {
                 m_controllingPrim.IsPreJumping = false;
@@ -371,8 +372,8 @@ namespace WhiteCore.Physics.BulletSPlugin
                 m_jumpFallState = true;
             }
             else if (m_jumpFallState && m_jumpStart != 0 && m_controllingPrim.IsColliding &&
-                     Util.EnvironmentTickCountSubtract(m_jumpStart) > 1500
-                     || (m_jumpStart != 0 && Util.EnvironmentTickCountSubtract(m_jumpStart) > 10000)) //Fallback
+                Util.EnvironmentTickCountSubtract(m_jumpStart) > 1500
+                || (m_jumpStart != 0 && Util.EnvironmentTickCountSubtract(m_jumpStart) > 10000)) //Fallback
             {
                 //Reset everything in case something went wrong
                 m_disallowTargetVelocitySet = false;
@@ -382,6 +383,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 m_jumpStart = 0;
                 m_preJumpStart = 0;
             }
+
         }
 
   

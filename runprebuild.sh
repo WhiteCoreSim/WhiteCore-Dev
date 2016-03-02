@@ -1,7 +1,7 @@
 #!/bin/bash
 # Run prebuild to configure and create the appropriate Solution and Project files for building WhiteCore-Sim
 #
-# July 2015
+# November 2015
 # Rowan Deppeler <greythane@gmail.com>
 
 ARCH="x64"
@@ -14,7 +14,7 @@ LONG_USAGE="Configuration options to pass to prebuild environment
 
 Options:
   -c|--config Build configuration Debug (default) or Release
-  -a|--arch Architecture to target x86 (default), x64, or AnyCPU
+  -a|--arch Architecture to target x86 or x64 (default)
   -b|--build Build after configuration No (default) or Yes
   -v|--version Update version details only
 "
@@ -28,13 +28,11 @@ fi
 
 # check if prompting needed
 if [ $# -eq 0 ]; then
-    read -p "Architecture to use? (AnyCPU, x86, x64) [$ARCH]: " bits
+    read -p "Architecture to use? (x86, x64) [$ARCH]: " bits
     if [[ $bits == "x86" ]]; then ARCH="x86"; fi
     if [[ $bits == "86" ]]; then ARCH="x86"; fi
     if [[ $bits == "x64" ]]; then ARCH="x64"; fi
     if [[ $bits == "64" ]]; then ARCH="x64"; fi
-    if [[ $bits == "AnyCPU" ]]; then ARCH="AnyCPU"; fi
-    if [[ $bits == "anycpu" ]]; then ARCH="AnyCPU"; fi
 
     read -p "Configuration? (Release, Debug) [$CONFIG]: " conf
     if [[ $conf == "Release" ]]; then CONFIG="Release"; fi
@@ -94,7 +92,7 @@ fi
 
 # Update version info
 if [ -d ".git" ]; then 
-  git log --pretty=format:"WhiteCore 0.9.3 (%cd.%h)" --date=short -n 1 > WhiteCoreSim/bin/.version; 
+  git log --pretty=format:"WhiteCore 0.9.4 (%cd.%h)" --date=short -n 1 > WhiteCoreSim/bin/.version; 
   echo "Version info updated"
 fi
 

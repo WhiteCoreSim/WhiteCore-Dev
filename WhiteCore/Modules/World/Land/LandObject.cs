@@ -356,16 +356,22 @@ namespace WhiteCore.Modules.Land
                         LandData.PassHours = args.PassHours;
                         LandData.PassPrice = args.PassPrice;
                     }
+
+                    // 20160203 -greythane- the only time we should play with the ParcelStatus is 
+                    // if it is being sold to a specified buyer
+                    if (LandData.AuthBuyerID != UUID.Zero)                                    
+                        LandData.Status = ParcelStatus.LeasePending;
+
                     // 141031 Greythane, this is an example of where the check needs to go
-                    LandData.Status = LandData.OwnerID == m_parcelManagementModule.GodParcelOwner
-                                          ? ParcelStatus.Abandoned
-                                          : LandData.AuthBuyerID != UUID.Zero
-                                                ? ParcelStatus.LeasePending
-                                                : ParcelStatus.Leased;
-
+/*                    LandData.Status = LandData.OwnerID == m_parcelManagementModule.GodParcelOwner
+                        ? ParcelStatus.Abandoned
+                        : LandData.AuthBuyerID != UUID.Zero
+                        ? ParcelStatus.LeasePending
+                        : ParcelStatus.Leased;
+*/
                     m_parcelManagementModule.UpdateLandObject (this);
-
                     SendLandUpdateToAvatarsOverMe (snap_selection);
+
                 } catch (Exception ex)
                 {
                     MainConsole.Instance.Warn ("[LAND]: Error updating land object " + LandData.Name + " in region " +
@@ -401,9 +407,11 @@ namespace WhiteCore.Modules.Land
             LandData.ClaimPrice = claimprice;
             LandData.SalePrice = 0;
             LandData.AuthBuyerID = UUID.Zero;
-            LandData.Flags &= ~(uint) 
-                (ParcelFlags.ForSale | ParcelFlags.ForSaleObjects |
-                    ParcelFlags.SellParcelObjects | ParcelFlags.ShowDirectory);
+            LandData.Flags &= ~(uint) (
+                ParcelFlags.ForSale |
+                ParcelFlags.ForSaleObjects |
+                ParcelFlags.SellParcelObjects |
+                ParcelFlags.ShowDirectory);
 
             m_parcelManagementModule.UpdateLandObject (this);
 
@@ -420,9 +428,11 @@ namespace WhiteCore.Modules.Land
             LandData.IsGroupOwned = true;
 
             // Reset show in directory flag on deed
-            LandData.Flags &= ~(uint)
-                (ParcelFlags.ForSale | ParcelFlags.ForSaleObjects |
-                    ParcelFlags.SellParcelObjects | ParcelFlags.ShowDirectory);
+            LandData.Flags &= ~(uint) (
+                ParcelFlags.ForSale | 
+                ParcelFlags.ForSaleObjects |
+                ParcelFlags.SellParcelObjects | 
+                ParcelFlags.ShowDirectory);
 
             m_parcelManagementModule.UpdateLandObject (this);
         }
@@ -492,19 +502,15 @@ namespace WhiteCore.Modules.Land
                         {
                             IScenePresence SP = m_scene.GetScenePresence (avatar);
                             if (SP != null && LandData.GroupID == SP.ControllingClient.ActiveGroupId)
-                            {
-                                //They are a part of the group, let them in
-                                return false;
-                            } else
-                            {
-                                //They are not allowed in this parcel, but not banned, so lets send them a notice about this parcel
-                                return true;
-                            }
-                        } else
-                        {
-                            //No group checking, not on the access list, restricted
+                                return false;       //They are a part of the group, let them in
+
+                            //They are not allowed in this parcel, but not banned, so lets send them a notice about this parcel
                             return true;
-                        }
+
+                        } 
+
+                        //No group checking, not on the access list, restricted
+                        return true;
                     } 
 
                     // If it does, we need to check the time
@@ -592,9 +598,7 @@ namespace WhiteCore.Modules.Land
             }
 
             if (list [0].Count == 0)
-            {
                 list [num].Add (UUID.Zero);
-            }
 
             return list;
         }
@@ -602,7 +606,9 @@ namespace WhiteCore.Modules.Land
         public void SendAccessList (UUID agentID, UUID sessionID, uint flags, int sequenceID,
                                    IClientAPI remote_client)
         {
-            if (flags == (uint)AccessList.Access || flags == (uint)AccessList.Both)
+            // this apparently causes problems in the newer viewers - thanks jimtarber via Halcyon
+            //if (flags == (uint)AccessList.Access || flags == (uint)AccessList.Both)       
+            if ((flags & (uint) AccessList.Access) == (uint)AccessList.Access)
             {
                 List<List<UUID>> avatars = CreateAccessListArrayByFlag (AccessList.Access);
                 foreach (List<UUID> accessListAvs in avatars)
@@ -611,7 +617,9 @@ namespace WhiteCore.Modules.Land
                 }
             }
 
-            if (flags == (uint)AccessList.Ban || flags == (uint)AccessList.Both)
+            // this apparently causes problems in the newer viewers - thanks jimtarber via Halcyon
+            //if (flags == (uint)AccessList.Ban || flags == (uint)AccessList.Both)
+            if ((flags & (uint)AccessList.Ban) == (uint)AccessList.Ban)
             {
                 List<List<UUID>> avatars = CreateAccessListArrayByFlag (AccessList.Ban);
                 foreach (List<UUID> accessListAvs in avatars)
@@ -687,7 +695,7 @@ namespace WhiteCore.Modules.Land
                             max_x = x;
                         if (max_y < y)
                             max_y = y;
-                        tempArea += 16; //16sqm peice of land
+                        tempArea += 16; //16sqm peice of land (4x4)
                     }
                 }
             }

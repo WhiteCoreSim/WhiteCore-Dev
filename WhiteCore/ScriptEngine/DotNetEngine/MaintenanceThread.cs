@@ -338,14 +338,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             cmdThreadpool.Restart();
             LUQueue.Clear();
             QueueItemStruct itm;
-            while (ScriptEvents.TryDequeue(out itm)) ;
+			while (ScriptEvents.TryDequeue(out itm)) {}
             lock(SleepingScriptEvents)
                 SleepingScriptEvents.Clear();
         }
 
         public void Stats()
         {
-#pragma warning disable 618
+#pragma warning disable 612, 618
             foreach (Thread t in scriptThreadpool.GetThreads())
             {
                 if (t != null)
@@ -385,7 +385,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                     MainConsole.Instance.Debug(trace.GetFrames());
                 }
             }
-#pragma warning restore 618
+#pragma warning restore 612, 618
         }
 
         /// <summary>

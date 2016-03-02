@@ -71,16 +71,16 @@ namespace WhiteCore.BotManager.AStar
         /// <summary>
         ///     Constructor for a node in a 2-dimensional map
         /// </summary>
-        /// <param name="AParent">Parent of the node</param>
-        /// <param name="AGoalNode">Goal node</param>
-        /// <param name="ACost">Accumulative cost</param>
-        /// <param name="AX">X-coordinate</param>
-        /// <param name="AY">Y-coordinate</param>
-        public AStarNode2D(AStarNode AParent, AStarNode AGoalNode, double ACost, int AX, int AY)
-            : base(AParent, AGoalNode, ACost)
+        /// <param name="aParent">Parent of the node</param>
+        /// <param name="aGoalNode">Goal node</param>
+        /// <param name="aCost">Accumulative cost</param>
+        /// <param name="aX">X-coordinate</param>
+        /// <param name="aY">Y-coordinate</param>
+        public AStarNode2D(AStarNode aParent, AStarNode aGoalNode, double aCost, int aX, int aY)
+            : base(aParent, aGoalNode, aCost)
         {
-            FX = AX;
-            FY = AY;
+            FX = aX;
+            FY = aY;
         }
 
         #endregion
@@ -90,22 +90,22 @@ namespace WhiteCore.BotManager.AStar
         /// <summary>
         ///     Adds a successor to a list if it is not impassible or the parent node
         /// </summary>
-        /// <param name="ASuccessors">List of successors</param>
-        /// <param name="AX">X-coordinate</param>
-        /// <param name="AY">Y-coordinate</param>
-        void AddSuccessor(ArrayList ASuccessors, int AX, int AY)
+        /// <param name="aSuccessors">List of successors</param>
+        /// <param name="aX">X-coordinate</param>
+        /// <param name="aY">Y-coordinate</param>
+        void AddSuccessor(ArrayList aSuccessors, int aX, int aY)
         {
-            int CurrentCost = StartPath.GetMap(AX, AY);
+            int CurrentCost = StartPath.GetMap(aX, aY);
             if (CurrentCost == -1)
             {
                 return;
             }
-            AStarNode2D NewNode = new AStarNode2D(this, GoalNode, Cost + CurrentCost, AX, AY);
+            AStarNode2D NewNode = new AStarNode2D(this, GoalNode, Cost + CurrentCost, aX, aY);
             if (NewNode.IsSameState(Parent))
             {
                 return;
             }
-            ASuccessors.Add(NewNode);
+            aSuccessors.Add(NewNode);
         }
 
         #endregion
@@ -115,16 +115,16 @@ namespace WhiteCore.BotManager.AStar
         /// <summary>
         ///     Determines whether the current node is the same state as the on passed.
         /// </summary>
-        /// <param name="ANode">AStarNode to compare the current node to</param>
+        /// <param name="aNode">AStarNode to compare the current node to</param>
         /// <returns>Returns true if they are the same state</returns>
-        public override bool IsSameState(AStarNode ANode)
+        public override bool IsSameState(AStarNode aNode)
         {
-            if (ANode == null)
+            if (aNode == null)
             {
                 return false;
             }
-            return ((((AStarNode2D) ANode).X == FX) &&
-                    (((AStarNode2D) ANode).Y == FY));
+            return ((((AStarNode2D) aNode).X == FX) &&
+                    (((AStarNode2D) aNode).Y == FY));
         }
 
         /// <summary>
@@ -156,18 +156,18 @@ namespace WhiteCore.BotManager.AStar
         /// <summary>
         ///     Gets all successors nodes from the current node and adds them to the successor list
         /// </summary>
-        /// <param name="ASuccessors">List in which the successors will be added</param>
-        public override void GetSuccessors(ArrayList ASuccessors)
+        /// <param name="aSuccessors">List in which the successors will be added</param>
+        public override void GetSuccessors(ArrayList aSuccessors)
         {
-            ASuccessors.Clear();
-            AddSuccessor(ASuccessors, FX - 1, FY);
-            AddSuccessor(ASuccessors, FX - 1, FY - 1);
-            AddSuccessor(ASuccessors, FX, FY - 1);
-            AddSuccessor(ASuccessors, FX + 1, FY - 1);
-            AddSuccessor(ASuccessors, FX + 1, FY);
-            AddSuccessor(ASuccessors, FX + 1, FY + 1);
-            AddSuccessor(ASuccessors, FX, FY + 1);
-            AddSuccessor(ASuccessors, FX - 1, FY + 1);
+            aSuccessors.Clear();
+            AddSuccessor(aSuccessors, FX - 1, FY);
+            AddSuccessor(aSuccessors, FX - 1, FY - 1);
+            AddSuccessor(aSuccessors, FX, FY - 1);
+            AddSuccessor(aSuccessors, FX + 1, FY - 1);
+            AddSuccessor(aSuccessors, FX + 1, FY);
+            AddSuccessor(aSuccessors, FX + 1, FY + 1);
+            AddSuccessor(aSuccessors, FX, FY + 1);
+            AddSuccessor(aSuccessors, FX - 1, FY + 1);
         }
 
         /// <summary>
@@ -184,15 +184,15 @@ namespace WhiteCore.BotManager.AStar
         #endregion
     }
 
-    internal class StartPath
+    static class StartPath
     {
         #region Maps
 
-        public static int[,] currentMap;
+        public static int[,] CurrentMap;
 
-        public static int xLimit;
+        public static int XLimit;
 
-        public static int yLimit;
+        public static int YLimit;
 
         /// <summary>
         ///     Entry and Exit from BotMe is StartPath.Path
@@ -200,23 +200,23 @@ namespace WhiteCore.BotManager.AStar
         /// </summary>
         public static int[,] Map
         {
-            get { return currentMap; }
-            set { currentMap = value; }
+            get { return CurrentMap; }
+            set { CurrentMap = value; }
         }
 
         /// <summary>
         ///     XL/YL comes from the map maker description - BotMe /gm ---> ReadMap sets this
         /// </summary>
-        public static int xL
+        public static int XL
         {
-            get { return xLimit - 1; }
-            set { xLimit = value; }
+            get { return XLimit - 1; }
+            set { XLimit = value; }
         }
 
-        public static int yL
+        public static int YL
         {
-            get { return yLimit - 1; }
-            set { yLimit = value; }
+            get { return YLimit - 1; }
+            set { YLimit = value; }
         }
 
         #endregion
@@ -232,9 +232,9 @@ namespace WhiteCore.BotManager.AStar
         /// <returns>Returns movement cost at the specified point in the map</returns>
         public static int GetMap(int x, int y)
         {
-            if ((x < 0) || (x > xL))
+            if ((x < 0) || (x > XL))
                 return (-1);
-            if ((y < 0) || (y > yL))
+            if ((y < 0) || (y > YL))
                 return (-1);
             if (Map[x, y] > 5) //5 is a wall 6789 are needs but they need to be a 1 for him to path through them
             {
@@ -261,8 +261,8 @@ namespace WhiteCore.BotManager.AStar
             // The characters '0' to '9' are represented by consecutive numbers, so finding 
             // the difference between the characters '0' and '2' results in the number 2.if char = 2 or whatever.
             int[,] mapArray = new int[mapx,mapy];
-            xLimit = mapx;
-            yLimit = mapy;
+            XLimit = mapx;
+            YLimit = mapy;
 
             try
             {
@@ -281,7 +281,7 @@ namespace WhiteCore.BotManager.AStar
                         mapArray[i, lineNum] = fooBar;
                     }
                 }
-                currentMap = mapArray;
+                CurrentMap = mapArray;
                 return mapArray;
             }
             catch
@@ -307,8 +307,8 @@ namespace WhiteCore.BotManager.AStar
             astar.FindPath(StartNode, GoalNode);
 
             // First check if the path was possible
-            bool pathDone = astar.pathPossible;
-            if (pathDone == false)
+            bool pathDone = astar.PathPossible;
+            if (!pathDone)
             {
                 //Use botPoint List as a flag to break out of this. Return to Botme
                 botPoint.Add("no_path");
@@ -343,14 +343,14 @@ namespace WhiteCore.BotManager.AStar
                 // Since it has been determined that the path is clear between these points this will work
                 // You can see the trouble with moving objects here though - he will have to constantly check on the way to these points
                 // To detect scene changes.
-                slope = calcSlope(Y2, Y1, X2, X1);
+                slope = CalcSlope(Y2, Y1, X2, X1);
 
                 if (lastSlope != slope)
                 {
                     // Build the list of waypoints only where changes of slope occur
                     xtemp = X1 + csx; //conerStone x and y from our map to get these into sim coordinates
                     ytemp = Y1 + csy;
-                    string temp = xtemp.ToString() + "," + ytemp.ToString() + "," + Z.ToString();
+                    string temp = xtemp + "," + ytemp + "," + Z;
                     botPoint.Add(temp);
                 }
                 X1 = X2;
@@ -360,7 +360,7 @@ namespace WhiteCore.BotManager.AStar
             // This adds the last point to the step
             xtemp = X1 + csx;
             ytemp = Y1 + csy;
-            string temp2 = xtemp.ToString() + "," + ytemp.ToString() + "," + Z.ToString();
+            string temp2 = xtemp + "," + ytemp + "," + Z;
             botPoint.Add(temp2);
             // This removes the first point of the steps so they turn and go right to the first bend point(slope)
             botPoint.RemoveRange(0, 1);
@@ -368,16 +368,16 @@ namespace WhiteCore.BotManager.AStar
             return botPoint;
         }
 
-        public static int calcSlope(int Y2, int Y1, int X2, int X1)
+        public static int CalcSlope(int y2, int y1, int x2, int x1)
         {
             // The 88 and 99 numbers above are flags to keep from dividing by zero and to know if we are on the first step
             // I was trying to not set a point 1 step from the start if it was not a change in slope.
-            int deltaX = X2 - X1;
+            int deltaX = x2 - x1;
             if (deltaX == 0)
             {
                 return 88;
             }
-            return (Y2 - Y1)/(X2 - X1);
+            return (y2 - y1)/(x2 - x1);
         }
 
         #endregion

@@ -6,37 +6,75 @@
 ##
 ##  Creating an avatar archive
 ##
-To create an avatar archive, you'll first set up a user on your sim, and have that user wear all of 
-   the clothing and attachments that you want the archive to have.
-After this is done, then you'll type the following into the console
+To create an avatar archive.
+  1. You need to set up a user on your sim that will be wearing all of the
+     clothing and attachments that you want the archive to have.
+     - It might be a good idea to create a new user for this purpose.
+  2. Once suitably attired, take a snapshot of your avatar that shows the final
+     appearance. Note down the UUID of the snapshot or copy it to the clipboard.
 
-save avatar archive <First> <Last> <Filename> <FolderNameToSaveInto> (--snapshot <UUID>) (--private)
+After this is done, the command to save the avatar archive is...
+   save avatar archive [<First> <Last> [<Filename>]] [FolderNameToSaveInto] (--snapshot <UUID>) (--private) (--portable)
+ - For easier use a shortened version will be used and you will be prompted for any missing details
 
-in which <First> is the user from above's first name, <Last> is the user from above's last name,
-  <Filename> is the file that you want to save it into (add the extension .aa),
-  <FolderNameToSaveInfo> is the folder name that will be created when this is loaded into a new
-  avatar. The last two parameters are optional, but necessary for setting up default avatars.
-  Adding "--snapshot <UUID>" will assign a screenshot to the archive, allowing a picture of it to be
-  set for the web interface. Adding "--private" will not allow the archive to be found by the web interface,
-  and it's existance will disallow the archives use for default avatars.
-  
-  
+  3. Save the avatar archive by entering the console command (grid server or standalone server)
+    save avatar archive --snapshot <The_UUID_You_Noted_Above>
+
+    - You will be prompted for the user's First and Last Name
+    - Then for the name of the archive file
+
+    After these prompts you will see the details of what has been saved to the avatar archive
+
+This will create the avatar archive in the folder 'Data/AvatarArchives' and will
+  now be available in the new user registration of the WebUI.
+  - The archive will also be available for the 'load avatar archive' command.
+
+The full command details
+    <First> is the first name of the user to save
+    <Last> is the last name of the user to save
+    <Filename> is the file that you want to save it into
+      - defaults to '.aa' and will save to the 'Data/AvatarArchives' folder
+      - Accepts absolute or relative path names for other folders
+    <FolderNameToSaveInfo> is the folder name that will be created when this is
+       loaded to a new user.
+
+  The last parameters are optional with only the --snapshot option necessary for
+    setting up avatar selections for the WebUI.
+   --snapshot <UUID>  - will assign a screenshot to the archive, allowing a picture
+                        of it to be set for the web interface.
+   --private          - will not allow the archive to be found by the WebUI for use
+                        as a default avatar.
+   --portable         - Create a portable archive (Still under development)
+
+
 ##
 ##  Setting up default avatars
 ##
-Once you have followed the step above for all default avatars, and you have set them all to have "--public", 
-  you are all set, and the default avatars will now show up in the registration page. Note that you must leave the 
-  .aa files in the bin directory where the web interface is run though for them to be loaded.
-  
-  
+Once you have followed the steps above for all default avatars you are all set.
+  The saved avatars will now show up in the user registration page, available for selection.
+
+Note: The avatar archives must be saved to the default folder to be available in the WebUI.
+
+
+
 ##
 ##  Loading an avatar archive
 ##
 If you want to load an avatar archive to a user (and replace their current appearance), you can load
 an archive. To do this, make sure that the user is not logged in, then type the following into the console
 
-load avatar archive <First> <Last> <Filename>
+'load avatar archive <First> <Last> <Filename>'
+       or
+'load avatar archive' and then fill in the prompts
 
-in which <First> is the user from above's first name, <Last> is the user from above's last name,
-  <Filename> is the file that you want to load (including the extension .aa). Once you type this, 
-  it will load the archive, and the avatar will be wearing the clothes from the archive the next time they log in.
+  <First>      The first name of the user to be set to the avatar
+  <Last>       The last name of the user to be set to the avatar
+  <Filename>   The avatar archive file that you want to load (extension of '.aa' is optional).
+               Note: Unless a full filename is specified, the 'Data/AvatarArchice'
+                     folder will be the default location for avatar archives
+  Details will be shown of the loading of the appearance from the avatar archive.
+  When next login occurs, the user avatar will be wearing the clothes from the archive.
+
+  Rowan
+  <greythane@gmail.com>
+  December 2015

@@ -38,7 +38,7 @@ namespace WhiteCore.Services.DataService.Connectors.Database.Scheduler
 {
     public class LocalSchedulerConnector : ISchedulerDataPlugin
     {
-        IGenericData m_Gd;
+        IGenericData GD;
 
         readonly string[] theFields = new[]
                                                   {
@@ -62,23 +62,23 @@ namespace WhiteCore.Services.DataService.Connectors.Database.Scheduler
         /// <summary>
         ///     Starts the database plugin, performs migrations if needed
         /// </summary>
-        /// <param name="GenericData">The Database Plugin</param>
+        /// <param name="genericData">The Database Plugin</param>
         /// <param name="source">Config if more parameters are needed</param>
         /// <param name="simBase"></param>
-        /// <param name="DefaultConnectionString">The connection string to use</param>
-        public void Initialize(IGenericData GenericData, IConfigSource source, IRegistryCore simBase,
-                               string DefaultConnectionString)
+        /// <param name="defaultConnectionString">The connection string to use</param>
+        public void Initialize(IGenericData genericData, IConfigSource source, IRegistryCore simBase,
+                               string defaultConnectionString)
         {
             if (source.Configs["WhiteCoreConnectors"].GetString("SchedulerConnector", "LocalConnector") != "LocalConnector")
                 return;
 
             if (source.Configs[Name] != null)
-                DefaultConnectionString = source.Configs[Name].GetString("ConnectionString", DefaultConnectionString);
-            if (GenericData != null)
-                GenericData.ConnectToDatabase(DefaultConnectionString, "Scheduler",
+                defaultConnectionString = source.Configs[Name].GetString("ConnectionString", defaultConnectionString);
+            if (genericData != null)
+                genericData.ConnectToDatabase(defaultConnectionString, "Scheduler",
                                               source.Configs["WhiteCoreConnectors"].GetBoolean("ValidateTables", true));
 
-            m_Gd = GenericData;
+            GD = genericData;
             Framework.Utilities.DataManager.RegisterPlugin(this);
         }
 
@@ -86,61 +86,61 @@ namespace WhiteCore.Services.DataService.Connectors.Database.Scheduler
 
         #region Implementation of ISchedulerDataPlugin
 
-        public string SchedulerSave(SchedulerItem I)
+        public string SchedulerSave(SchedulerItem itm)
         {
-            object[] dbv = GetDBValues(I);
+            object[] dbv = GetDBValues(itm);
             Dictionary<string, object> values = new Dictionary<string, object>(dbv.Length);
             int i = 0;
             foreach (object value in dbv)
             {
                 values[theFields[i++]] = value;
             }
-            if (SchedulerExist(I.id))
+            if (SchedulerExist(itm.id))
             {
                 QueryFilter filter = new QueryFilter();
-                filter.andFilters["id"] = I.id;
+                filter.andFilters["id"] = itm.id;
 
-                m_Gd.Update("scheduler", values, null, filter, null, null);
+                GD.Update("scheduler", values, null, filter, null, null);
             }
             else
             {
-                m_Gd.Insert("scheduler", values);
+                GD.Insert("scheduler", values);
             }
-            return I.id;
+            return itm.id;
         }
 
         public void SchedulerRemoveID(string id)
         {
             QueryFilter filter = new QueryFilter();
             filter.andFilters["id"] = id;
-            m_Gd.Delete("scheduler", filter);
+            GD.Delete("scheduler", filter);
         }
 
         public void SchedulerRemoveFunction(string identifier)
         {
             QueryFilter filter = new QueryFilter();
             filter.andFilters["fire_function"] = identifier;
-            m_Gd.Delete("scheduler", filter);
+            GD.Delete("scheduler", filter);
         }
 
-        object[] GetDBValues(SchedulerItem I)
+        object[] GetDBValues(SchedulerItem itm)
         {
             return new object[]
                        {
-                           I.id,
-                           I.FireFunction,
-                           I.FireParams,
-                           I.RunOnce,
-                           I.RunEvery,
-                           I.TimeToRun,         // "run_next" field in db
-                           I.HistoryKeep,
-                           I.HistoryReceipt,
-                           I.HistoryLastID,
-                           I.CreateTime,
-                           I.StartTime,
-                           (int) I.RunEveryType,
-                           I.Enabled,
-                           I.ScheduleFor
+                           itm.id,
+                           itm.FireFunction,
+                           itm.FireParams,
+                           itm.RunOnce,
+                           itm.RunEvery,
+                           itm.TimeToRun,         // "run_next" field in db
+                           itm.HistoryKeep,
+                           itm.HistoryReceipt,
+                           itm.HistoryLastID,
+                           itm.CreateTime,
+                           itm.StartTime,
+                           (int) itm.RunEveryType,
+                           itm.Enabled,
+                           itm.ScheduleFor
                        };
         }
 
@@ -148,7 +148,7 @@ namespace WhiteCore.Services.DataService.Connectors.Database.Scheduler
         {
             QueryFilter filter = new QueryFilter();
             filter.andFilters["id"] = id;
-            return m_Gd.Query(new string[] {"id"}, "scheduler", filter, null, null, null).Count >= 1;
+            return GD.Query(new string[] {"id"}, "scheduler", filter, null, null, null).Count >= 1;
         }
 
 
@@ -159,7 +159,7 @@ namespace WhiteCore.Services.DataService.Connectors.Database.Scheduler
             try
             {
                 dr =
-                    m_Gd.QueryData(
+                    GD.QueryData(
 //                        "WHERE enabled = 1 AND runs_next < '" + DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm") +
                         "WHERE enabled = 1 AND runs_next <='" + timeToRun.ToString("yyyy-MM-dd HH:mm") +
                         "' ORDER BY runs_next desc", "scheduler", string.Join(", ", theFields));
@@ -176,31 +176,31 @@ namespace WhiteCore.Services.DataService.Connectors.Database.Scheduler
             }
             finally
             {
-                m_Gd.CloseDatabase(dr);
+                GD.CloseDatabase(dr);
             }
 
             return returnValue;
         }
 
-        public SchedulerItem SaveHistory(SchedulerItem I)
+        public SchedulerItem SaveHistory(SchedulerItem itm)
         {
             string his_id = UUID.Random().ToString();
 
             Dictionary<string, object> row = new Dictionary<string, object>(7);
             row["id"] = his_id;
-            row["scheduler_id"] = I.id;
+            row["scheduler_id"] = itm.id;
             row["ran_time"] = DateTime.UtcNow;
-            row["run_time"] = I.TimeToRun;
+            row["run_time"] = itm.TimeToRun;
             row["is_complete"] = 0;
             row["complete_time"] = DateTime.UtcNow;
             row["reciept"] = "";
-            m_Gd.Insert("scheduler_history", row);
+            GD.Insert("scheduler_history", row);
 
-            I.HistoryLastID = his_id;
-            return I;
+            itm.HistoryLastID = his_id;
+            return itm;
         }
 
-        public SchedulerItem SaveHistoryComplete(SchedulerItem I)
+        public SchedulerItem SaveHistoryComplete(SchedulerItem itm)
         {
             Dictionary<string, object> values = new Dictionary<string, object>(3);
             values["is_complete"] = true;
@@ -208,11 +208,11 @@ namespace WhiteCore.Services.DataService.Connectors.Database.Scheduler
             values["reciept"] = "";
 
             QueryFilter filter = new QueryFilter();
-            filter.andFilters["id"] = I.HistoryLastID;
+            filter.andFilters["id"] = itm.HistoryLastID;
 
-            m_Gd.Update("scheduler_history", values, null, filter, null, null);
+            GD.Update("scheduler_history", values, null, filter, null, null);
 
-            return I;
+            return itm;
         }
 
         public void SaveHistoryCompleteReciept(string historyID, string reciept)
@@ -225,17 +225,17 @@ namespace WhiteCore.Services.DataService.Connectors.Database.Scheduler
             QueryFilter filter = new QueryFilter();
             filter.andFilters["id"] = historyID;
 
-            m_Gd.Update("scheduler_history", values, null, filter, null, null);
+            GD.Update("scheduler_history", values, null, filter, null, null);
         }
 
-        public void HistoryDeleteOld(SchedulerItem I)
+        public void HistoryDeleteOld(SchedulerItem itm)
         {
-            if ((I.id != "") && (I.HistoryLastID != ""))
+            if ((itm.id != "") && (itm.HistoryLastID != ""))
             {
                 QueryFilter filter = new QueryFilter();
-                filter.andNotFilters["id"] = I.HistoryLastID;
-                filter.andFilters["scheduler_id"] = I.id;
-                m_Gd.Delete("scheduler_history", filter);
+                filter.andNotFilters["id"] = itm.HistoryLastID;
+                filter.andFilters["scheduler_id"] = itm.id;
+                GD.Delete("scheduler_history", filter);
             }
         }
 
@@ -245,7 +245,7 @@ namespace WhiteCore.Services.DataService.Connectors.Database.Scheduler
             {
                 QueryFilter filter = new QueryFilter();
                 filter.andFilters["id"] = id;
-                List<string> results = m_Gd.Query(theFields, "scheduler", filter, null, null, null);
+                List<string> results = GD.Query(theFields, "scheduler", filter, null, null, null);
                 return LoadFromList(results);
             }
             return null;
@@ -258,7 +258,7 @@ namespace WhiteCore.Services.DataService.Connectors.Database.Scheduler
                 QueryFilter filter = new QueryFilter();
                 filter.andFilters["schedule_for"] = scheduleFor;
                 filter.andFilters["fire_function"] = fireFunction;
-                List<string> results = m_Gd.Query(theFields, "scheduler", filter, null, null, null);
+                List<string> results = GD.Query(theFields, "scheduler", filter, null, null, null);
                 return LoadFromList(results);
             }
             return null;
@@ -268,7 +268,7 @@ namespace WhiteCore.Services.DataService.Connectors.Database.Scheduler
         {
             QueryFilter filter = new QueryFilter();
             filter.andFilters["fire_function"] = fireFunction;
-            List<string> results = m_Gd.Query(theFields, "scheduler", filter, null, null, null);
+            List<string> results = GD.Query(theFields, "scheduler", filter, null, null, null);
 
             if (results == null || results.Count == 0)
                 return null;

@@ -38,7 +38,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("http://WhiteCore-sim.org")]
-[assembly: AssemblyCopyright("(C) WhiteCore-Sim.org Developers 2007-2009")]
+[assembly: AssemblyCopyright("Copyright © 2014-2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

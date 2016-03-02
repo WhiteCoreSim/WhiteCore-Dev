@@ -248,5 +248,124 @@ namespace WhiteCore.Framework.Utilities
 
         }
 
+        public static List<string> GetFilenames(string defaultDir, string extension, bool showextension)
+        {
+            var retVals = new List<string>();
+
+            if (string.IsNullOrEmpty(extension))
+                extension = ".*";
+            if (!extension.StartsWith ("."))
+                extension = "." + extension;
+            
+            if (defaultDir == String.Empty)
+                defaultDir = "./";
+                       
+            if (Directory.Exists (defaultDir))
+            {
+                var archives = new List<string> (Directory.GetFiles (defaultDir, "*" + extension));
+                foreach (string file in archives)
+                    if (showextension)
+                        retVals.Add (Path.GetFileName (file));
+                    else
+                        retVals.Add (Path.GetFileNameWithoutExtension (file));
+            }
+
+            return retVals;
+        }
+
+        /// <summary>
+        /// Gets file for reading and verifies that it exists.
+        /// </summary>
+        /// <returns>The read filename.</returns>
+        /// <param name="prompt">Prompt.</param>
+        /// <param name="defaultDir">Default dir.</param>
+        /// <param name="extensions">Extensions.</param>
+        /// <param name="showextension">If set to <c>true</c> showextension.</param>
+        public static string GetReadFilename(string prompt, string defaultDir, List <string> extensions, bool showextension)
+        {
+            // get a file and verify that it exists etc
+            string loadFileName = "";
+            do
+            {
+                loadFileName = MainConsole.Instance.Prompt(prompt + " (? for list) ", loadFileName);
+                if (loadFileName == "")
+                    return "";
+
+                if (loadFileName == "?")
+                {
+                    var availfiles = new List<string>();
+                    foreach (var ext in extensions)
+                    {
+                        var fnames = GetFilenames(defaultDir, ext, showextension);
+                        if ( fnames.Count > 0)
+                            availfiles.AddRange(fnames);
+                    }
+
+                    if (availfiles.Count > 0)
+                    {
+                        MainConsole.Instance.CleanInfo (" Available files are : ");
+                        foreach (string file in availfiles)
+                            MainConsole.Instance.CleanInfo ("   " + file);
+                    } else
+                        MainConsole.Instance.CleanInfo ("Sorry, no files are available.");
+
+                    loadFileName = "";    
+                }
+            } while (loadFileName == "");
+
+            // check for full pathing
+            var fileName = VerifyOSPath(Path.Combine (defaultDir, loadFileName));
+            if ( !File.Exists( fileName ) )
+            {
+                MainConsole.Instance.Info ( "[Error]: The file '" + loadFileName + "' cannot be found." );
+                return "";
+            }
+
+            return fileName;
+        }
+
+        /// <summary>
+        /// Gets file for reading and verifies that it exists.
+        /// </summary>
+        /// <returns>The read filename.</returns>
+        /// <param name="prompt">Prompt.</param>
+        /// <param name="defaultDir">Defaultdir.</param>
+        /// <param name="extension">Extension.</param>
+        public static string GetReadFilename(string prompt, string defaultDir, string extension, bool showextension)
+        {
+            // get a file and verify that it exists etc
+            string loadFileName = "";
+            do
+            {
+                loadFileName = MainConsole.Instance.Prompt(prompt + " (? for list) ", loadFileName);
+                if (loadFileName == "")
+                    return "";
+
+                if (loadFileName == "?")
+                {
+                    var availfiles = GetFilenames(defaultDir, extension, showextension);
+                    if (availfiles.Count > 0)
+                    {
+                        MainConsole.Instance.CleanInfo (" Available files are : ");
+                        foreach (string file in availfiles)
+                            MainConsole.Instance.CleanInfo ("   " + file);
+                    } else
+                        MainConsole.Instance.CleanInfo ("Sorry, no files are available.");
+
+                    loadFileName = "";    
+                }
+            } while (loadFileName == "");
+
+            // check for full pathing
+            var fileName = VerifyOSPath(Path.Combine (defaultDir, loadFileName));
+            if ( !File.Exists( fileName ) )
+            {
+                MainConsole.Instance.Info ( "[Error]: The file '" + loadFileName + "' cannot be found." );
+                return "";
+            }
+
+            return fileName;
+        }
+
     }
 }

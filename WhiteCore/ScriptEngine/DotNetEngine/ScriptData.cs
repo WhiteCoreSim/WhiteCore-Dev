@@ -56,9 +56,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             m_ScriptEngine = engine;
 
             NextEventDelay = new Dictionary<string, long>();
+            NextEventDelay.Add("attach", 0);
             NextEventDelay.Add("at_rot_target", 0);
             NextEventDelay.Add("at_target", 0);
-            NextEventDelay.Add("attach", 0);
             NextEventDelay.Add("changed", 0);
             NextEventDelay.Add("collision", 0);
             NextEventDelay.Add("collision_end", 0);

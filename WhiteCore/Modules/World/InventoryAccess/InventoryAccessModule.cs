@@ -95,11 +95,13 @@ namespace WhiteCore.Modules.InventoryAccess
 
         public virtual void OnNewClient(IClientAPI client)
         {
+            client.OnRezRestoreToWorld += ClientRezRestoreToWorld;
             client.OnRezObject += ClientRezObject;
         }
 
         public virtual void OnClosingClient(IClientAPI client)
         {
+            client.OnRezRestoreToWorld -= ClientRezRestoreToWorld;
             client.OnRezObject -= ClientRezObject;
         }
 
@@ -124,6 +126,23 @@ namespace WhiteCore.Modules.InventoryAccess
         #region Inventory Access
 
         #region Client methods
+
+        void ClientRezRestoreToWorld(IClientAPI remoteClient, UUID itemID, UUID groupID)
+        {
+            // Restore object to previous location
+            var userInfo = m_scene.UserAccountService.GetUserAccount(null,remoteClient.AgentId);
+            if (userInfo != null)
+            {
+                InventoryItemBase item = m_scene.InventoryService.GetItem(remoteClient.AgentId, itemID);
+
+                if (item != null)
+                {
+                    RezRestoreToWorld(remoteClient, itemID, item, groupID);
+                }
+            }
+            //else
+            //    MainConsole.Instance,DebugFormat("[AGENT INVENTORY]: User profile not found during restore object: {0}", RegionInfo.RegionName);
+        }
 
         /// <summary>
         ///     The only difference between this and the other RezObject method is the return value...
@@ -692,6 +711,61 @@ namespace WhiteCore.Modules.InventoryAccess
             return null;
         }
 
+        /// <summary>
+        /// Restores an object in world.
+        /// </summary>
+        /// <returns>true</returns>
+        /// <c>false</c>
+        /// <param name="remoteClient">Remote client.</param>
+        /// <param name="itemID">Item I.</param>
+        /// <param name="item">Item.</param>
+        /// <param name="groupID">Group I.</param>
+        public virtual bool RezRestoreToWorld(IClientAPI remoteClient, UUID itemID, InventoryItemBase item, UUID groupID)
+        {
+            AssetBase rezAsset = m_scene.AssetService.Get(item.AssetID.ToString());
+            if (rezAsset == null)
+            {
+                remoteClient.SendAlertMessage ("Failed to find the item you requested.");
+                return false;
+            }
+
+            UUID itemId = UUID.Zero;
+            bool success = false;
+            XmlDocument doc;
+
+            ISceneEntity group = CreateObjectFromInventory(item, remoteClient, itemID, out doc);
+            bool attachment = (group.IsAttachment || (group.RootChild.Shape.PCode == 9 && group.RootChild.Shape.State != 0));
+
+            if (attachment)
+            {
+                remoteClient.SendAlertMessage("Inventory item is an attachment, use Wear or Add instead.");
+                return false;                                    
+            }
+
+            Vector3 pos = group.AbsolutePosition;                                       // maybe .RootPart.GroupPositionNoUpdate;
+            var rezGroup = RezObject (remoteClient, itemID,
+                pos, Vector3.Zero, UUID.Zero, 1, true, false, false, UUID.Zero);        // NOTE May need taskID from calling llclientview
+
+            if (rezGroup != null)
+                success = true;
+      
+
+            if (success && !m_scene.Permissions.BypassPermissions ())
+            {
+                //we check the inventory item permissions here instead of the prim permissions
+                //if the group or item is no copy, it should be removed
+                if ((item.CurrentPermissions & (uint)PermissionMask.Copy) == 0)
+                {
+                    // Not an attachment and no-copy, so remove inventory copy.
+                    m_scene.AssetService.Delete (itemID);
+
+                    List<UUID> itemIDs = new List<UUID> { itemId };
+                    m_scene.InventoryService.DeleteItems (remoteClient.AgentId, itemIDs);
+                }
+            }
+            return success;
+
+        }
 
         /// <summary>
         ///     Rez an object into the scene from the user's inventory

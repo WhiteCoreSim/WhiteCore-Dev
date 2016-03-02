@@ -156,7 +156,7 @@ namespace WhiteCore.Services.DataService.Connectors.Database.Asset
         {
             newID = UUID.Zero;
 
-            AssetBase oldAsset = GetAsset(id);
+            AssetBase oldAsset = GetAsset(id, false);   // fail quietly as this is an update 
             if (oldAsset == null)
                 return;
 

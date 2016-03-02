@@ -33,9 +33,29 @@ namespace WhiteCore.Physics.BulletSPlugin
     {
         // private static string LogHeader = "[BULLETSIM LINKSET CONSTRAINTS]";
 
-        public BSLinksetConstraints(BSScene scene, BSPrimLinkable parent)
+        public class BSLinkInfoConstraint : BSLinkInfo
+        {
+            public ConstraintType constraintType;
+            public BSConstraint constraint;
+
+            public OMV.Vector3 frameInAloc;
+            public OMV.Quaternion frameInArot;
+            public OMV.Vector3 frameInBloc;
+            public OMV.Quaternion frameInBrot;
+            public bool useLinearReferenceFrameA;
+
+            public BSLinkInfoConstraint(BSPrimLinkable pMember) : base(pMember)
+            {
+                constraint = null;
+                ResetLink();
+                member.PhysicsScene.DetailLog("{0},BSLinkInfoConstraint.creation", member.LocalID);
+            }
+        }
+        
+        public BSLinksetConstraints(BSScene scene, BSPrimLinkable parent) 
             : base(scene, parent)
         {
+            LinksetImpl = LinksetImplementation.Constraint;
         }
 
         // When physical properties are changed the linkset needs to recalculate
@@ -44,17 +64,8 @@ namespace WhiteCore.Physics.BulletSPlugin
         //   refresh will happen once after all the other taints are applied.
         public override void Refresh(BSPrimLinkable requestor)
         {
+            ScheduleRebuild(requestor);
             base.Refresh(requestor);
-
-            if (HasAnyChildren && IsRoot(requestor))
-            {
-                // Queue to happen after all the other taint processing
-                PhysicsScene.PostTaintObject("BSLinksetContraints.Refresh", requestor.LocalID, delegate()
-                {
-                    if (HasAnyChildren && IsRoot(requestor))
-                        RecomputeLinksetConstraints();
-                });
-            }
         }
 
         // The object is going dynamic (physical). Do any setup necessary
@@ -86,6 +97,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             // Nothing to do for constraints on property updates
         }
 
+        // TODO!!! Rename to RemoveDependencies
         // Routine called when rebuilding the body of some member of the linkset.
         // Destroy all the constraints have have been made to root and set
         //     up to rebuild the constraints before the next simulation step.
@@ -112,20 +124,17 @@ namespace WhiteCore.Physics.BulletSPlugin
 
         // Add a new child to the linkset.
         // Called while LinkActivity is locked.
-        protected override void AddChildToLinkset(BSPrimLinkable child, bool scheduleRebuild)
+        protected override void AddChildToLinkset(BSPrimLinkable child)
         {
-            if (!this.LinksetRoot.IsPhysical)
-                return;
             if (!HasChild(child))
             {
-                m_children.Add(child);
-
+                m_children.Add(child, new BSLinkInfoConstraint(child));
+                
                 DetailLog("{0},BSLinksetConstraints.AddChildToLinkset,call,child={1}", LinksetRoot.LocalID,
                     child.LocalID);
 
                 // Cause constraints and assorted properties to be recomputed before the next simulation step.
-                if (scheduleRebuild)
-                    Refresh(LinksetRoot);
+                Refresh(LinksetRoot);
             }
             return;
         }
@@ -137,7 +146,7 @@ namespace WhiteCore.Physics.BulletSPlugin
 
         // Remove the specified child from the linkset.
         // Safe to call even if the child is not really in my linkset.
-        protected override void RemoveChildFromLinkset(BSPrimLinkable child)
+        protected override void RemoveChildFromLinkset(BSPrimLinkable child, bool inTaintTime)
         {
             if (m_children.Remove(child))
             {
@@ -149,7 +158,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                     rootx.LocalID, rootx.PhysBody.AddrString,
                     childx.LocalID, childx.PhysBody.AddrString);
 
-                PhysicsScene.TaintedObject("BSLinksetConstraints.RemoveChildFromLinkset",
+                PhysicsScene.TaintedObject(inTaintTime,"BSLinksetConstraints.RemoveChildFromLinkset",
                     delegate() { PhysicallyUnlinkAChildFromRoot(rootx, childx); });
                 // See that the linkset parameters are recomputed at the end of the taint time.
                 Refresh(LinksetRoot);
@@ -170,74 +179,83 @@ namespace WhiteCore.Physics.BulletSPlugin
             Refresh(rootPrim);
         }
 
-        BSConstraint BuildConstraint(BSPrimLinkable rootPrim, BSPrimLinkable childPrim)
+        // Create a static constraint between the two passed objects
+        BSConstraint BuildConstraint(BSPrimLinkable rootPrim, BSLinkInfo li)
         {
+            BSLinkInfoConstraint linkInfo = li as BSLinkInfoConstraint;
+            if (linkInfo == null) return null;
+
             // Zero motion for children so they don't interpolate
-            childPrim.ZeroMotion(true);
+            li.member.ZeroMotion(true);
 
-            // Relative position normalized to the root prim
-            // Essentually a vector pointing from center of rootPrim to center of childPrim
-            OMV.Vector3 childRelativePosition = childPrim.Position - rootPrim.Position;
+            BSConstraint constrain = null;
 
-            // real world coordinate of midpoint between the two objects
-            OMV.Vector3 midPoint = rootPrim.Position + (childRelativePosition / 2);
+            switch (linkInfo.constraintType)
+            {
+                case ConstraintType.BS_FIXED_CONSTRAINT_TYPE:
+                case ConstraintType.D6_CONSTRAINT_TYPE:
+                    // Relative position normalaized to the root prim
+                    // Essentually a vector pointing from center of rootPrim to center of li.member
+                    OMV.Vector3 childRelativePosition = linkInfo.member.Position - rootPrim.Position;
 
-            DetailLog(
-                "{0},BSLinksetConstraint.BuildConstraint,taint,root={1},rBody={2},child={3},cBody={4},rLoc={5},cLoc={6},midLoc={7}",
-                rootPrim.LocalID,
-                rootPrim.LocalID, rootPrim.PhysBody.AddrString,
-                childPrim.LocalID, childPrim.PhysBody.AddrString,
-                rootPrim.Position, childPrim.Position, midPoint);
+                    // real world coordinate of midpoint between the two objects
+                    OMV.Vector3 midPoint = rootPrim.Position + (childRelativePosition/2);
+                    DetailLog(
+                        "{0},BSLinksetConstraint.BuildConstraint,6Dof,rBody={1},cBody={2},rLoc={3},cLoc={4},midLoc={5}",
+                        rootPrim.LocalID, rootPrim.PhysBody, linkInfo.member.PhysBody, rootPrim.Position,
+                        linkInfo.member.Position, midPoint);
 
-            // create a constraint that allows no freedom of movement between the two objects
-            // http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?t=4818
+                    // create a constraint that allows no freedom of movement between the two objects
+                    // http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?t=4818
 
-            BSConstraint6Dof constrain = new BSConstraint6Dof(
-                PhysicsScene.World, rootPrim.PhysBody, childPrim.PhysBody, midPoint, true, true);
-            // PhysicsScene.World, childPrim.BSBody, rootPrim.BSBody, midPoint, true, true );
+                    constrain = new BSConstraint6Dof(PhysicsScene.World, rootPrim.PhysBody, linkInfo.member.PhysBody,
+                        midPoint, true, true);
+                    /* NOTE: below is an attempt to build constraint with full frame computation, etc.
+                     *     Using the midpoint is easier since it lets the Bullet code manipulate the transforms
+                     *     of the objects.
+                     * Code left for future programmers.
+                    // ==================================================================================
+                    // relative position normalized to the root prim
+                    OMV.Quaternion invThisOrientation = OMV.Quaternion.Inverse(rootPrim.Orientation);
+                    OMV.Vector3 childRelativePosition = (liConstraint.member.Position - rootPrim.Position) * invThisOrientation;
 
-            /* NOTE: below is an attempt to build constraint with full frame computation, etc.
-         *     Using the midpoint is easier since it lets the Bullet code manipulate the transforms
-         *     of the objects.
-         * Code left for future programmers.
-        // ==================================================================================
-        // relative position normalized to the root prim
-        OMV.Quaternion invThisOrientation = OMV.Quaternion.Inverse(rootPrim.Orientation);
-        OMV.Vector3 childRelativePosition = (childPrim.Position - rootPrim.Position) * invThisOrientation;
+            
+                    // relative rotation of the child to the parent
+                    OMV.Quaternion childRelativeRotation = invThisOrientation * childPrim.Orientation;
+                    OMV.Quaternion inverseChildRelativeRotation = OMV.Quaternion.Inverse(childRelativeRotation);
 
-        // relative rotation of the child to the parent
-        OMV.Quaternion childRelativeRotation = invThisOrientation * childPrim.Orientation;
-        OMV.Quaternion inverseChildRelativeRotation = OMV.Quaternion.Inverse(childRelativeRotation);
+                    DetailLog("{0},BSLinksetConstraint.PhysicallyLinkAChildToRoot,taint,root={1},child={2}", rootPrim.LocalID, rootPrim.LocalID, childPrim.LocalID);
+                    BS6DofConstraint constrain = new BS6DofConstraint(
+                                    PhysicsScene.World, rootPrim.Body, childPrim.Body,
+                                    OMV.Vector3.Zero,
+                                    OMV.Quaternion.Inverse(rootPrim.Orientation),
+                                    OMV.Vector3.Zero,
+                                    OMV.Quaternion.Inverse(childPrim.Orientation),
+                                    true,
+                                    true
+                                    );
+                    // ==================================================================================
+                    */
+                            break;
+                case ConstraintType.D6_SPRING_CONSTRAINT_TYPE:
+                    constrain = new BSConstraintSpring(PhysicsScene.World, rootPrim.PhysBody, linkInfo.member.PhysBody,
+                                    linkInfo.frameInAloc, linkInfo.frameInArot, linkInfo.frameInBloc, linkInfo.frameInBrot,
+                                    linkInfo.useLinearReferenceFrameA,
+                                    true /*disableCollisionsBetweenLinkedBodies*/);
+                    DetailLog("{0},BSLinksetConstraint.BuildConstraint,spring,root={1},rBody={2},child={3},cBody={4},rLoc={5},cLoc={6}",
+                                                    rootPrim.LocalID,
+                                                    rootPrim.LocalID, rootPrim.PhysBody.AddrString,
+                                                    linkInfo.member.LocalID, linkInfo.member.PhysBody.AddrString,
+                                                    rootPrim.Position, linkInfo.member.Position);
+                    break;
+                default:
+                    break;
+            }
 
-        DetailLog("{0},BSLinksetConstraint.PhysicallyLinkAChildToRoot,taint,root={1},child={2}", rootPrim.LocalID, rootPrim.LocalID, childPrim.LocalID);
-        BS6DofConstraint constrain = new BS6DofConstraint(
-                        PhysicsScene.World, rootPrim.Body, childPrim.Body,
-                        OMV.Vector3.Zero,
-                        OMV.Quaternion.Inverse(rootPrim.Orientation),
-                        OMV.Vector3.Zero,
-                        OMV.Quaternion.Inverse(childPrim.Orientation),
-                        true,
-                        true
-                        );
-        // ==================================================================================
-        */
+            linkInfo.SetLinkParameters(constrain);
 
             PhysicsScene.Constraints.AddConstraint(constrain);
 
-            // zero linear and angular limits makes the objects unable to move in relation to each other
-            constrain.SetLinearLimits(OMV.Vector3.Zero, OMV.Vector3.Zero);
-            constrain.SetAngularLimits(OMV.Vector3.Zero, OMV.Vector3.Zero);
-
-            // tweek the constraint to increase stability
-            constrain.UseFrameOffset(BSParam.LinkConstraintUseFrameOffset);
-            constrain.TranslationalLimitMotor(BSParam.LinkConstraintEnableTransMotor,
-                BSParam.LinkConstraintTransMotorMaxVel,
-                BSParam.LinkConstraintTransMotorMaxForce);
-            constrain.SetCFMAndERP(BSParam.LinkConstraintCFM, BSParam.LinkConstraintERP);
-            if (BSParam.LinkConstraintSolverIterations != 0f)
-            {
-                constrain.SetSolverIterations(BSParam.LinkConstraintSolverIterations);
-            }
             return constrain;
         }
 
@@ -288,22 +306,43 @@ namespace WhiteCore.Physics.BulletSPlugin
             DetailLog("{0},BSLinksetConstraint.RecomputeLinksetConstraints,set,rBody={1},linksetMass={2}",
                 LinksetRoot.LocalID, LinksetRoot.PhysBody.AddrString, linksetMass);
 
-            foreach (BSPrimLinkable child in m_children)
+            try
             {
-                // A child in the linkset physically shows the mass of the whole linkset.
-                // This allows Bullet to apply enough force on the child to move the whole linkset.
-                // (Also do the mass stuff before recomputing the constraint so mass is not zero.)
-                child.UpdatePhysicalMassProperties(linksetMass, true);
+                Rebuilding = true;
 
-                BSConstraint constrain;
-                if (!PhysicsScene.Constraints.TryGetConstraint(LinksetRoot.PhysBody, child.PhysBody, out constrain))
+                // There is no reason to build all this physical stuff for a non-physical linkset.
+                if (!LinksetRoot.IsPhysicallyActive || !HasAnyChildren)
                 {
-                    // If constraint doesn't exist yet, create it.
-                    constrain = BuildConstraint(LinksetRoot, child);
+                    DetailLog("{0},BSLinksetConstraint.RecomputeLinksetCompound,notPhysicalOrNoChildren",
+                        LinksetRoot.LocalID);
+                    return; // Note the 'finally' clause at the botton which will get executed.
                 }
-                constrain.RecomputeConstraintVariables(linksetMass);
 
-                // PhysicsScene.PE.DumpConstraint(PhysicsScene.World, constrain.Constraint);    // DEBUG DEBUG
+                ForEachLinkInfo((li) =>
+                {
+                    // A child in the linkset physically shows the mass of the whole linkset.
+                    // This allows Bullet to apply enough force on the child to move the whole linkset.
+                    // (Also do the mass stuff before recomputing the constraint so mass is not zero.)
+                    li.member.UpdatePhysicalMassProperties(linksetMass, true);
+
+                    BSConstraint constrain;
+                    if (
+                        !PhysicsScene.Constraints.TryGetConstraint(LinksetRoot.PhysBody, li.member.PhysBody,
+                            out constrain))
+                    {
+                        // If constraint doesn't exist yet, create it.
+                        constrain = BuildConstraint(LinksetRoot, li);
+                    }
+                    li.SetLinkParameters(constrain);
+                    constrain.RecomputeConstraintVariables(linksetMass);
+
+                    // PhysicScene.PE.DumpConstraint(PhysicsScene.World, constrain.Constraint);
+                    return false; // 'false' says to keep processing other members
+                });
+            }
+            finally
+            {
+                Rebuilding = false;
             }
         }
     }
