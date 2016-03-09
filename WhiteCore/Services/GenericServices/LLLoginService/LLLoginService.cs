@@ -707,6 +707,7 @@ namespace WhiteCore.Services
                 MainConsole.Instance.InfoFormat(
                     "[LLOGIN SERVICE]: All clear. Sending login response to client to login to region " +
                     destination.RegionName + ", tried to login to " + startLocation + " at " + position + ".");
+
                 return response;
             }
             catch (Exception e)
