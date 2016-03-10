@@ -26,16 +26,16 @@
  */
 
 
+using System.Collections.Generic;
+using System.Linq;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Servers.HttpServer.Interfaces;
 using WhiteCore.Framework.Services;
-using Nini.Config;
-using OpenMetaverse;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace WhiteCore.Services
 {
@@ -46,12 +46,12 @@ namespace WhiteCore.Services
         /// <summary>
         ///     A list of all clients and their Client Caps Handlers
         /// </summary>
-        protected Dictionary<UUID, IClientCapsService> m_ClientCapsServices = new Dictionary<UUID, IClientCapsService>();
+        protected Dictionary<UUID, IClientCapsService> m_ClientCapsServices = new Dictionary<UUID, IClientCapsService> ();
 
         /// <summary>
         ///     A list of all regions Caps Services
         /// </summary>
-        protected Dictionary<UUID, IRegionCapsService> m_RegionCapsServices = new Dictionary<UUID, IRegionCapsService>();
+        protected Dictionary<UUID, IRegionCapsService> m_RegionCapsServices = new Dictionary<UUID, IRegionCapsService> ();
 
         protected IRegistryCore m_registry;
 
@@ -78,31 +78,31 @@ namespace WhiteCore.Services
 
         public string Name
         {
-            get { return GetType().Name; }
+            get { return GetType ().Name; }
         }
 
-        public void Initialize(IConfigSource config, IRegistryCore registry)
+        public void Initialize (IConfigSource config, IRegistryCore registry)
         {
-            IConfig handlerConfig = config.Configs["Handlers"];
-            if (handlerConfig.GetString("CapsHandler", "") != Name)
+            IConfig handlerConfig = config.Configs ["Handlers"];
+            if (handlerConfig.GetString ("CapsHandler", "") != Name)
                 return;
             m_registry = registry;
-            registry.RegisterModuleInterface<ICapsService>(this);
+            registry.RegisterModuleInterface<ICapsService> (this);
         }
 
-        public void Start(IConfigSource config, IRegistryCore registry)
+        public void Start (IConfigSource config, IRegistryCore registry)
         {
-            ISimulationBase simBase = registry.RequestModuleInterface<ISimulationBase>();
-            m_server = simBase.GetHttpServer(0);
+            ISimulationBase simBase = registry.RequestModuleInterface<ISimulationBase> ();
+            m_server = simBase.GetHttpServer (0);
 
             if (MainConsole.Instance != null)
-                MainConsole.Instance.Commands.AddCommand("show presences", 
-            	                                         "show presences",
-                                                         "Shows all presences in the grid", 
-                                                         ShowUsers, false, true);
+                MainConsole.Instance.Commands.AddCommand ("show presences", 
+                    "show presences",
+                    "Shows all presences in the grid", 
+                    ShowUsers, false, true);
         }
 
-        public void FinishedStartup()
+        public void FinishedStartup ()
         {
         }
 
@@ -110,25 +110,25 @@ namespace WhiteCore.Services
 
         #region Console Commands
 
-        protected void ShowUsers(IScene scene, string[] cmd)
+        protected void ShowUsers (IScene scene, string[] cmd)
         {
             //Check for all or full to show child agents
-            bool showChildAgents = cmd.Length == 3 && (cmd[2] == "all" || (cmd[2] == "full"));
+            bool showChildAgents = cmd.Length == 3 && (cmd [2] == "all" || (cmd [2] == "full"));
             int count =
-                m_RegionCapsServices.Values.SelectMany(regionCaps => regionCaps.GetClients())
-                                    .Count(clientCaps => (clientCaps.RootAgent || showChildAgents));
+                m_RegionCapsServices.Values.SelectMany (regionCaps => regionCaps.GetClients ())
+                                    .Count (clientCaps => (clientCaps.RootAgent || showChildAgents));
 
-            MainConsole.Instance.WarnFormat("{0} agents found: ", count);
+            MainConsole.Instance.WarnFormat ("{0} agents found: ", count);
             foreach (IClientCapsService clientCaps in m_ClientCapsServices.Values)
             {
                 foreach (IRegionClientCapsService caps in clientCaps.GetCapsServices())
                 {
                     if ((caps.RootAgent || showChildAgents))
                     {
-                        MainConsole.Instance.InfoFormat("Region - {0}, User {1}, {2}, {3}",
-                                                        caps.Region.RegionName, clientCaps.AccountInfo.Name,
-                                                        caps.RootAgent ? "Root Agent" : "Child Agent",
-                                                        caps.Disabled ? "Disabled" : "Not Disabled");
+                        MainConsole.Instance.InfoFormat ("Region - {0}, User {1}, {2}, {3}",
+                            caps.Region.RegionName, clientCaps.AccountInfo.Name,
+                            caps.RootAgent ? "Root Agent" : "Child Agent",
+                            caps.Disabled ? "Disabled" : "Not Disabled");
                     }
                 }
             }
@@ -144,15 +144,15 @@ namespace WhiteCore.Services
         ///     Remove the all of the user's CAPS from the system
         /// </summary>
         /// <param name="AgentID"></param>
-        public void RemoveCAPS(UUID AgentID)
+        public void RemoveCAPS (UUID AgentID)
         {
-            if (m_ClientCapsServices.ContainsKey(AgentID))
+            if (m_ClientCapsServices.ContainsKey (AgentID))
             {
-                IClientCapsService perClient = m_ClientCapsServices[AgentID];
-                perClient.Close();
-                m_ClientCapsServices.Remove(AgentID);
-                m_registry.RequestModuleInterface<ISimulationBase>()
-                          .EventManager.FireGenericEventHandler("UserLogout", AgentID);
+                IClientCapsService perClient = m_ClientCapsServices [AgentID];
+                perClient.Close ();
+                m_ClientCapsServices.Remove (AgentID);
+                m_registry.RequestModuleInterface<ISimulationBase> ()
+                          .EventManager.FireGenericEventHandler ("UserLogout", AgentID);
             }
         }
 
@@ -166,19 +166,18 @@ namespace WhiteCore.Services
         /// <param name="circuitData"></param>
         /// <param name="port">The port to use for the CAPS service</param>
         /// <returns></returns>
-        public string CreateCAPS(UUID AgentID, string CAPSBase, UUID regionID, bool IsRootAgent,
+        public string CreateCAPS (UUID AgentID, string CAPSBase, UUID regionID, bool IsRootAgent,
                                  AgentCircuitData circuitData, uint port)
         {
             //Now make sure we didn't use an old one or something
-            IClientCapsService service = GetOrCreateClientCapsService(AgentID);
-            IRegionClientCapsService clientService = service.GetOrCreateCapsService(regionID, CAPSBase, circuitData,
-                                                                                    port);
+            IClientCapsService service = GetOrCreateClientCapsService (AgentID);
+            IRegionClientCapsService clientService = service.GetOrCreateCapsService (regionID, CAPSBase, circuitData,
+                                                         port);
 
             //Fix the root agent status
             clientService.RootAgent = IsRootAgent;
 
-            MainConsole.Instance.Debug("[CapsService]: Adding Caps URL " + clientService.CapsUrl + " for agent " +
-                                       AgentID);
+            MainConsole.Instance.Debug ("[CapsService]: Adding Caps URL " + clientService.CapsUrl + " for agent " + AgentID);
             return clientService.CapsUrl;
         }
 
@@ -188,15 +187,15 @@ namespace WhiteCore.Services
         /// </summary>
         /// <param name="AgentID"></param>
         /// <returns></returns>
-        public IClientCapsService GetOrCreateClientCapsService(UUID AgentID)
+        public IClientCapsService GetOrCreateClientCapsService (UUID AgentID)
         {
-            if (!m_ClientCapsServices.ContainsKey(AgentID))
+            if (!m_ClientCapsServices.ContainsKey (AgentID))
             {
-                PerClientBasedCapsService client = new PerClientBasedCapsService();
-                client.Initialise(this, AgentID);
-                m_ClientCapsServices.Add(AgentID, client);
+                PerClientBasedCapsService client = new PerClientBasedCapsService ();
+                client.Initialise (this, AgentID);
+                m_ClientCapsServices.Add (AgentID, client);
             }
-            return m_ClientCapsServices[AgentID];
+            return m_ClientCapsServices [AgentID];
         }
 
         /// <summary>
@@ -204,9 +203,9 @@ namespace WhiteCore.Services
         /// </summary>
         /// <param name="AgentID"></param>
         /// <returns></returns>
-        public IClientCapsService GetClientCapsService(UUID AgentID)
+        public IClientCapsService GetClientCapsService (UUID AgentID)
         {
-            if (!m_ClientCapsServices.ContainsKey(AgentID))
+            if (!m_ClientCapsServices.ContainsKey (AgentID))
                 return null;
             bool disabled = true;
             foreach (IRegionClientCapsService regionClients in m_ClientCapsServices[AgentID].GetCapsServices())
@@ -219,15 +218,15 @@ namespace WhiteCore.Services
             }
             if (disabled)
             {
-                RemoveCAPS(AgentID);
+                RemoveCAPS (AgentID);
                 return null;
             }
-            return m_ClientCapsServices[AgentID];
+            return m_ClientCapsServices [AgentID];
         }
 
-        public List<IClientCapsService> GetClientsCapsServices()
+        public List<IClientCapsService> GetClientsCapsServices ()
         {
-            return new List<IClientCapsService>(m_ClientCapsServices.Values);
+            return new List<IClientCapsService> (m_ClientCapsServices.Values);
         }
 
         #endregion
@@ -238,10 +237,10 @@ namespace WhiteCore.Services
         ///     Get a region handler for the given region
         /// </summary>
         /// <param name="regionID"></param>
-        public IRegionCapsService GetCapsForRegion(UUID regionID)
+        public IRegionCapsService GetCapsForRegion (UUID regionID)
         {
             IRegionCapsService service;
-            if (m_RegionCapsServices.TryGetValue(regionID, out service))
+            if (m_RegionCapsServices.TryGetValue (regionID, out service))
             {
                 return service;
             }
@@ -252,14 +251,14 @@ namespace WhiteCore.Services
         ///     Create a caps handler for the given region
         /// </summary>
         /// <param name="regionID"></param>
-        public void AddCapsForRegion(UUID regionID)
+        public void AddCapsForRegion (UUID regionID)
         {
-            if (!m_RegionCapsServices.ContainsKey(regionID))
+            if (!m_RegionCapsServices.ContainsKey (regionID))
             {
-                IRegionCapsService service = new PerRegionCapsService();
-                service.Initialise(regionID, Registry);
+                IRegionCapsService service = new PerRegionCapsService ();
+                service.Initialise (regionID, Registry);
 
-                m_RegionCapsServices.Add(regionID, service);
+                m_RegionCapsServices.Add (regionID, service);
             }
         }
 
@@ -267,15 +266,15 @@ namespace WhiteCore.Services
         ///     Remove the handler for the given region
         /// </summary>
         /// <param name="regionID"></param>
-        public void RemoveCapsForRegion(UUID regionID)
+        public void RemoveCapsForRegion (UUID regionID)
         {
-            if (m_RegionCapsServices.ContainsKey(regionID))
-                m_RegionCapsServices.Remove(regionID);
+            if (m_RegionCapsServices.ContainsKey (regionID))
+                m_RegionCapsServices.Remove (regionID);
         }
 
-        public List<IRegionCapsService> GetRegionsCapsServices()
+        public List<IRegionCapsService> GetRegionsCapsServices ()
         {
-            return new List<IRegionCapsService>(m_RegionCapsServices.Values);
+            return new List<IRegionCapsService> (m_RegionCapsServices.Values);
         }
 
         #endregion

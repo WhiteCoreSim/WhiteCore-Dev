@@ -26,6 +26,10 @@
  */
 
 
+using System;
+using System.IO;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
@@ -33,11 +37,6 @@ using WhiteCore.Framework.Servers;
 using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using System;
-using System.IO;
-using System.Linq;
 using Encoder = System.Drawing.Imaging.Encoder;
 using GridRegion = WhiteCore.Framework.Services.GridRegion;
 
@@ -51,73 +50,72 @@ namespace WhiteCore.Services
         protected GridRegion m_region;
         protected string m_uri;
 
-        public string Name { get { return GetType().Name; } }
+        public string Name { get { return GetType ().Name; } }
 
-        public void IncomingCapsRequest(UUID agentID, GridRegion region, ISimulationBase simbase, ref OSDMap capURLs)
+        public void IncomingCapsRequest (UUID agentID, GridRegion region, ISimulationBase simbase, ref OSDMap capURLs)
         {
-            m_syncMessage = simbase.ApplicationRegistry.RequestModuleInterface<ISyncMessagePosterService>();
-            m_appearanceService = simbase.ApplicationRegistry.RequestModuleInterface<IAgentAppearanceService>();
+            m_syncMessage = simbase.ApplicationRegistry.RequestModuleInterface<ISyncMessagePosterService> ();
+            m_appearanceService = simbase.ApplicationRegistry.RequestModuleInterface<IAgentAppearanceService> ();
             m_region = region;
             m_agentID = agentID;
 
             if (m_appearanceService == null)
                 return;//Can't bake!
-            m_uri = "/CAPS/UpdateAvatarAppearance/" + UUID.Random() + "/";
-            MainServer.Instance.AddStreamHandler(new GenericStreamHandler("POST",
-                                                    m_uri,
-                                                    UpdateAvatarAppearance));
-            capURLs["UpdateAvatarAppearance"] = MainServer.Instance.ServerURI + m_uri;
+            
+            m_uri = "/CAPS/UpdateAvatarAppearance/" + UUID.Random () + "/";
+            MainServer.Instance.AddStreamHandler (new GenericStreamHandler ("POST", m_uri, UpdateAvatarAppearance));
+            capURLs ["UpdateAvatarAppearance"] = MainServer.Instance.ServerURI + m_uri;
         }
 
-        public void IncomingCapsDestruction()
+        public void IncomingCapsDestruction ()
         {
-            MainServer.Instance.RemoveStreamHandler("POST", m_uri);
+            MainServer.Instance.RemoveStreamHandler ("POST", m_uri);
         }
 
         #region Server Side Baked Textures
 
-        private byte[] UpdateAvatarAppearance(string path, Stream request, OSHttpRequest httpRequest,
-                                             OSHttpResponse httpResponse)
+        byte[] UpdateAvatarAppearance (string path, Stream request, OSHttpRequest httpRequest,
+                                      OSHttpResponse httpResponse)
         {
             try
             {
-                OSDMap rm = (OSDMap)OSDParser.DeserializeLLSDXml(HttpServerHandlerHelpers.ReadFully(request));
-                int cof_version = rm["cof_version"].AsInteger();
+                OSDMap rm = (OSDMap)OSDParser.DeserializeLLSDXml (HttpServerHandlerHelpers.ReadFully (request));
+                int cof_version = rm ["cof_version"].AsInteger ();
 
                 bool success = false;
                 string error = "";
-                AvatarAppearance appearance = m_appearanceService.BakeAppearance(m_agentID, cof_version);
+                AvatarAppearance appearance = m_appearanceService.BakeAppearance (m_agentID, cof_version);
 
-                OSDMap map = new OSDMap();
+                OSDMap map = new OSDMap ();
                 if (appearance == null)
                 {
-                    map["success"] = false;
-                    map["error"] = "Wrong COF";
-                    map["agent_id"] = m_agentID;
-                    return OSDParser.SerializeLLSDXmlBytes(map);
+                    map ["success"] = false;
+                    map ["error"] = "Wrong COF";
+                    map ["agent_id"] = m_agentID;
+                    return OSDParser.SerializeLLSDXmlBytes (map);
                 }
 
-                OSDMap uaamap = new OSDMap();
-                uaamap["Method"] = "UpdateAvatarAppearance";
-                uaamap["AgentID"] = m_agentID;
-                uaamap["Appearance"] = appearance.ToOSD();
-                m_syncMessage.Post(m_region.ServerURI, uaamap);
+                OSDMap uaamap = new OSDMap ();
+                uaamap ["Method"] = "UpdateAvatarAppearance";
+                uaamap ["AgentID"] = m_agentID;
+                uaamap ["Appearance"] = appearance.ToOSD ();
+                m_syncMessage.Post (m_region.ServerURI, uaamap);
                 success = true;
 
-                map["success"] = success;
-                map["error"] = error;
-                map["agent_id"] = m_agentID;
+                map ["success"] = success;
+                map ["error"] = error;
+                map ["agent_id"] = m_agentID;
                 /*map["avatar_scale"] = appearance.AvatarHeight;
                 map["textures"] = newBakeIDs.ToOSDArray();
                 OSDArray visualParams = new OSDArray();
                 foreach(byte b in appearance.VisualParams)
                     visualParams.Add((int)b);
                 map["visual_params"] = visualParams;*/
-                return OSDParser.SerializeLLSDXmlBytes(map);
-            }
-            catch (Exception e)
+                return OSDParser.SerializeLLSDXmlBytes (map);
+
+            } catch (Exception e)
             {
-                MainConsole.Instance.Error("[CAPS]: " + e);
+                MainConsole.Instance.Error ("[CAPS]: " + e);
             }
 
             return null;

@@ -46,27 +46,26 @@ namespace WhiteCore.Services
         protected IGroupsServiceConnector m_groupService;
         protected IRegionClientCapsService m_service;
 
-        public void RegisterCaps(IRegionClientCapsService service)
+        public void RegisterCaps (IRegionClientCapsService service)
         {
             m_service = service;
-            m_groupService = Framework.Utilities.DataManager.RequestPlugin<IGroupsServiceConnector>();
+            m_groupService = Framework.Utilities.DataManager.RequestPlugin<IGroupsServiceConnector> ();
 
-            service.AddStreamHandler("GroupMemberData",
-                                     new GenericStreamHandler("POST", service.CreateCAPS("GroupMemberData", ""),
-                                                              GroupMemberData));
+            service.AddStreamHandler ("GroupMemberData",
+                new GenericStreamHandler ("POST", service.CreateCAPS ("GroupMemberData", ""), GroupMemberData));
 
 
-            var apiUri = service.CreateCAPS("GroupAPIv1", "");
+            var apiUri = service.CreateCAPS ("GroupAPIv1", "");
             service.AddStreamHandler ("GroupAPIv1", new GenericStreamHandler ("GET", apiUri, ProcessGetGroupAPI));
             service.AddStreamHandler ("GroupAPIv1", new GenericStreamHandler ("POST", apiUri, ProcessPostGroupAPI));
 
         }
 
-        public void EnteringRegion()
+        public void EnteringRegion ()
         {
         }
 
-        public void DeregisterCaps()
+        public void DeregisterCaps ()
         {
             m_service.RemoveStreamHandler ("GroupMemberData", "POST");
             m_service.RemoveStreamHandler ("GroupAPIv1", "GET");
@@ -75,56 +74,54 @@ namespace WhiteCore.Services
 
         #region Group Members
 
-        public byte[] GroupMemberData(string path, Stream request, OSHttpRequest httpRequest,
+        public byte[] GroupMemberData (string path, Stream request, OSHttpRequest httpRequest,
                                       OSHttpResponse httpResponse)
         {
             try
             {
-                OSDMap rm = (OSDMap) OSDParser.DeserializeLLSDXml(HttpServerHandlerHelpers.ReadFully(request));
-                UUID groupID = rm["group_id"].AsUUID();
+                OSDMap rm = (OSDMap)OSDParser.DeserializeLLSDXml (HttpServerHandlerHelpers.ReadFully (request));
+                UUID groupID = rm ["group_id"].AsUUID ();
 
-                OSDMap defaults = new OSDMap();
-                ulong EveryonePowers = (ulong) (GroupPowers.Accountable |
-                                                GroupPowers.AllowSetHome |
-                                                GroupPowers.ReceiveNotices |
-                                                GroupPowers.JoinChat |
-                                                GroupPowers.AllowVoiceChat);
-                defaults["default_powers"] = EveryonePowers;
+                OSDMap defaults = new OSDMap ();
+                ulong EveryonePowers = (ulong)(GroupPowers.Accountable |
+                                       GroupPowers.AllowSetHome |
+                                       GroupPowers.ReceiveNotices |
+                                       GroupPowers.JoinChat |
+                                       GroupPowers.AllowVoiceChat);
+                defaults ["default_powers"] = EveryonePowers;
 
-                List<string> titles = new List<string>();
-                OSDMap members = new OSDMap();
+                List<string> titles = new List<string> ();
+                OSDMap members = new OSDMap ();
                 int count = 0;
                 foreach (GroupMembersData gmd in m_groupService.GetGroupMembers(m_service.AgentID, groupID))
                 {
-                    OSDMap member = new OSDMap();
-                    member["donated_square_meters"] = gmd.Contribution;
-                    member["owner"] = (gmd.IsOwner ? "Y" : "N");
-                    member["last_login"] = gmd.OnlineStatus;
-                    if (titles.Contains(gmd.Title))
+                    OSDMap member = new OSDMap ();
+                    member ["donated_square_meters"] = gmd.Contribution;
+                    member ["owner"] = (gmd.IsOwner ? "Y" : "N");
+                    member ["last_login"] = gmd.OnlineStatus;
+                    if (titles.Contains (gmd.Title))
                     {
-                        member["title"] = titles.FindIndex((s) => s == gmd.Title);
-                    }
-                    else
+                        member ["title"] = titles.FindIndex ((s) => s == gmd.Title);
+                    } else
                     {
-                        titles.Add(gmd.Title);
-                        member["title"] = titles.Count-1;
+                        titles.Add (gmd.Title);
+                        member ["title"] = titles.Count - 1;
                     }
-                    member["powers"] = gmd.AgentPowers;
+                    member ["powers"] = gmd.AgentPowers;
                     count++;
-                    members[gmd.AgentID.ToString()] = member;
+                    members [gmd.AgentID.ToString ()] = member;
                 }
 
-                OSDMap map = new OSDMap();
-                map["member_count"] = count;
-                map["group_id"] = groupID;
-                map["defaults"] = defaults;
-                map["titles"] = titles.ToOSDArray();
-                map["members"] = members;
-                return OSDParser.SerializeLLSDXmlBytes(map);
-            }
-            catch (Exception e)
+                OSDMap map = new OSDMap ();
+                map ["member_count"] = count;
+                map ["group_id"] = groupID;
+                map ["defaults"] = defaults;
+                map ["titles"] = titles.ToOSDArray ();
+                map ["members"] = members;
+                return OSDParser.SerializeLLSDXmlBytes (map);
+            } catch (Exception e)
             {
-                MainConsole.Instance.Error("[CAPS]: " + e);
+                MainConsole.Instance.Error ("[CAPS]: " + e);
             }
 
             return null;
@@ -132,28 +129,28 @@ namespace WhiteCore.Services
 
 
         public byte[] ProcessGetGroupAPI (string path, Stream request, OSHttpRequest httpRequest,
-            OSHttpResponse httpResponse)
+                                          OSHttpResponse httpResponse)
         {
             string groupID;
-            if (httpRequest.QueryString["group_id"] != null)
+            if (httpRequest.QueryString ["group_id"] != null)
             {
-                groupID = httpRequest.QueryString["group_id"];
-                MainConsole.Instance.Debug("[GroupAPIv1] Requesting groups bans for group_id: " + groupID);
+                groupID = httpRequest.QueryString ["group_id"];
+                MainConsole.Instance.Debug ("[GroupAPIv1] Requesting groups bans for group_id: " + groupID);
 
                 // Get group banned member list
-                OSDMap bannedUsers = new OSDMap();
+                OSDMap bannedUsers = new OSDMap ();
 
                 foreach (GroupBannedAgentsData user in m_groupService.GetGroupBannedMembers(m_service.AgentID, (UUID) groupID))
                 {
-                    OSDMap banned = new OSDMap();
-                    banned["ban_date"] = user.BanDate;  
-                    bannedUsers[user.AgentID.ToString()] = banned;
+                    OSDMap banned = new OSDMap ();
+                    banned ["ban_date"] = user.BanDate;  
+                    bannedUsers [user.AgentID.ToString ()] = banned;
                 }
 
-                OSDMap map = new OSDMap();
-                map["group_id"] = groupID;
-                map["ban_list"] = bannedUsers;
-                return OSDParser.SerializeLLSDXmlBytes(map);
+                OSDMap map = new OSDMap ();
+                map ["group_id"] = groupID;
+                map ["ban_list"] = bannedUsers;
+                return OSDParser.SerializeLLSDXmlBytes (map);
 
             }
 
@@ -161,50 +158,50 @@ namespace WhiteCore.Services
         }
 
         public byte[] ProcessPostGroupAPI (string path, Stream request, OSHttpRequest httpRequest,
-            OSHttpResponse httpResponse)
+                                           OSHttpResponse httpResponse)
         {
             string groupID;
 
-            if (httpRequest.QueryString["group_id"] != null)
+            if (httpRequest.QueryString ["group_id"] != null)
             {
-                List<UUID> banUsers = new List<UUID>();
+                List<UUID> banUsers = new List<UUID> ();
 
-                groupID = httpRequest.QueryString["group_id"];
+                groupID = httpRequest.QueryString ["group_id"];
 
-                string body = HttpServerHandlerHelpers.ReadString(request).Trim();
-                OSDMap map = (OSDMap)OSDParser.DeserializeLLSDXml(body);
+                string body = HttpServerHandlerHelpers.ReadString (request).Trim ();
+                OSDMap map = (OSDMap)OSDParser.DeserializeLLSDXml (body);
 
-                MainConsole.Instance.Debug("[GroupAPIv1] Requesting a POST for group_id: " + groupID);
+                MainConsole.Instance.Debug ("[GroupAPIv1] Requesting a POST for group_id: " + groupID);
 
                 if (map.ContainsKey ("ban_ids"))
-                    banUsers = ((OSDArray) map["ban_ids"]).ConvertAll<UUID>(o => o);
+                    banUsers = ((OSDArray)map ["ban_ids"]).ConvertAll<UUID> (o => o);
 
                 if (map.ContainsKey ("ban_action"))
                 {
                     if (map ["ban_action"].AsInteger () == 1)
                     {
-                        m_groupService.AddGroupBannedAgent (m_service.AgentID, (UUID) groupID, banUsers);
+                        m_groupService.AddGroupBannedAgent (m_service.AgentID, (UUID)groupID, banUsers);
                         return null;
                     }
                     if (map ["ban_action"].AsInteger () == 2)
                     {
-                        m_groupService.RemoveGroupBannedAgent (m_service.AgentID, (UUID) groupID, banUsers);
+                        m_groupService.RemoveGroupBannedAgent (m_service.AgentID, (UUID)groupID, banUsers);
                         return null;
                     }
                 }
 
                 // get banned agent details
-                var banUser = m_groupService.GetGroupBannedUser(m_service.AgentID, (UUID) groupID, banUsers[0]);
-                OSDMap retMap = new OSDMap();
-                retMap["group_id"] = groupID;
+                var banUser = m_groupService.GetGroupBannedUser (m_service.AgentID, (UUID)groupID, banUsers [0]);
+                OSDMap retMap = new OSDMap ();
+                retMap ["group_id"] = groupID;
 
-                OSDMap banned = new OSDMap();
-                banned["ban_date"] = banUser.BanDate;               
-                banned[banUser.AgentID.ToString()] = banned;
+                OSDMap banned = new OSDMap ();
+                banned ["ban_date"] = banUser.BanDate;               
+                banned [banUser.AgentID.ToString ()] = banned;
 
-                retMap["ban_list"] = banned;
+                retMap ["ban_list"] = banned;
 
-                return OSDParser.SerializeLLSDXmlBytes(retMap);
+                return OSDParser.SerializeLLSDXmlBytes (retMap);
 
             }
             return null;

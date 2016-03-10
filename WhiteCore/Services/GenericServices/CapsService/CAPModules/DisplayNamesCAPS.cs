@@ -26,6 +26,16 @@
  */
 
 
+using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Web;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Servers;
@@ -34,26 +44,16 @@ using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Profile;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Web;
 
 namespace WhiteCore.Services
 {
     public class DisplayNamesCAPS : ICapsServiceConnector
     {
-        private List<string> bannedNames = new List<string>();
-        private IEventQueueService m_eventQueue;
-        private IProfileConnector m_profileConnector;
-        private IRegionClientCapsService m_service;
-        private IUserAccountService m_userService;
+        List<string> bannedNames = new List<string>();
+        IEventQueueService m_eventQueue;
+        IProfileConnector m_profileConnector;
+        IRegionClientCapsService m_service;
+        IUserAccountService m_userService;
 
         #region ICapsServiceConnector Members
 
@@ -76,12 +76,10 @@ namespace WhiteCore.Services
             m_userService = service.Registry.RequestModuleInterface<IUserAccountService>();
 
             string post = CapsUtil.CreateCAPS("SetDisplayName", "");
-            service.AddStreamHandler("SetDisplayName", new GenericStreamHandler("POST", post,
-                                                                                ProcessSetDisplayName));
+            service.AddStreamHandler("SetDisplayName", new GenericStreamHandler("POST", post, ProcessSetDisplayName));
 
             post = CapsUtil.CreateCAPS("GetDisplayNames", "");
-            service.AddStreamHandler("GetDisplayNames", new GenericStreamHandler("GET", post,
-                                                                                 ProcessGetDisplayName));
+            service.AddStreamHandler("GetDisplayNames", new GenericStreamHandler("GET", post, ProcessGetDisplayName));
         }
 
         public void EnteringRegion()
@@ -108,7 +106,7 @@ namespace WhiteCore.Services
         /// <param name="httpRequest"></param>
         /// <param name="httpResponse"></param>
         /// <returns></returns>
-        private byte[] ProcessSetDisplayName(string path, Stream request,
+        byte[] ProcessSetDisplayName(string path, Stream request,
                                              OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {
             try
@@ -138,16 +136,14 @@ namespace WhiteCore.Services
                     m_profileConnector.UpdateUserProfile(info);
 
                     //One for us
-                    DisplayNameUpdate(newDisplayName, oldDisplayName, m_service.ClientCaps.AccountInfo,
-                                      m_service.AgentID);
+                    DisplayNameUpdate(newDisplayName, oldDisplayName, m_service.ClientCaps.AccountInfo, m_service.AgentID);
 
                     foreach (
                         IRegionClientCapsService avatar in
                             m_service.RegionCaps.GetClients().Where(avatar => avatar.AgentID != m_service.AgentID))
                     {
                         //Update all others
-                        DisplayNameUpdate(newDisplayName, oldDisplayName, m_service.ClientCaps.AccountInfo,
-                                          avatar.AgentID);
+                        DisplayNameUpdate(newDisplayName, oldDisplayName, m_service.ClientCaps.AccountInfo, avatar.AgentID);
                     }
                     //The reply
                     SetDisplayNameReply(newDisplayName, oldDisplayName, m_service.ClientCaps.AccountInfo);
@@ -168,7 +164,7 @@ namespace WhiteCore.Services
         /// <param name="httpRequest"></param>
         /// <param name="httpResponse"></param>
         /// <returns></returns>
-        private byte[] ProcessGetDisplayName(string path, Stream request, OSHttpRequest httpRequest,
+        byte[] ProcessGetDisplayName(string path, Stream request, OSHttpRequest httpRequest,
                                              OSHttpResponse httpResponse)
         {
             //I've never seen this come in, so for now... do nothing
@@ -249,32 +245,32 @@ namespace WhiteCore.Services
         /// </summary>
         /// <param name="newDisplayName"></param>
         /// <param name="oldDisplayName"></param>
-        /// <param name="InfoFromAv"></param>
-        /// <param name="ToAgentID"></param>
-        public void DisplayNameUpdate(string newDisplayName, string oldDisplayName, UserAccount InfoFromAv,
-                                      UUID ToAgentID)
+        /// <param name="infoFromAv"></param>
+        /// <param name="toAgentID"></param>
+        public void DisplayNameUpdate(string newDisplayName, string oldDisplayName, UserAccount infoFromAv,
+                                      UUID toAgentID)
         {
             if (m_eventQueue != null)
             {
                 //If the DisplayName is blank, the client refuses to do anything, so we send the name by default
                 if (newDisplayName == "")
-                    newDisplayName = InfoFromAv.Name;
+                    newDisplayName = infoFromAv.Name;
 
-                bool isDefaultName = isDefaultDisplayName(InfoFromAv.FirstName, InfoFromAv.LastName, InfoFromAv.Name,
+                bool isDefaultName = isDefaultDisplayName(infoFromAv.FirstName, infoFromAv.LastName, infoFromAv.Name,
                                                           newDisplayName);
 
-                OSD item = DisplayNameUpdate(newDisplayName, oldDisplayName, InfoFromAv.PrincipalID, isDefaultName,
-                                             InfoFromAv.FirstName, InfoFromAv.LastName,
-                                             InfoFromAv.FirstName + "." + InfoFromAv.LastName);
-                m_eventQueue.Enqueue(item, ToAgentID, m_service.Region.RegionID);
+                OSD item = DisplayNameUpdate(newDisplayName, oldDisplayName, infoFromAv.PrincipalID, isDefaultName,
+                                             infoFromAv.FirstName, infoFromAv.LastName,
+                                             infoFromAv.FirstName + "." + infoFromAv.LastName);
+                m_eventQueue.Enqueue(item, toAgentID, m_service.Region.RegionID);
             }
         }
 
-        private bool isDefaultDisplayName(string first, string last, string name, string displayName)
+        static bool isDefaultDisplayName(string first, string last, string name, string displayName)
         {
             if (displayName == name)
                 return true;
-            else if (displayName == first + "." + last)
+            if (displayName == first + "." + last)
                 return true;
             return false;
         }
@@ -284,18 +280,18 @@ namespace WhiteCore.Services
         /// </summary>
         /// <param name="newDisplayName"></param>
         /// <param name="oldDisplayName"></param>
-        /// <param name="m_avatar"></param>
-        public void SetDisplayNameReply(string newDisplayName, string oldDisplayName, UserAccount m_avatar)
+        /// <param name="mAvatar"></param>
+        public void SetDisplayNameReply(string newDisplayName, string oldDisplayName, UserAccount mAvatar)
         {
             if (m_eventQueue != null)
             {
-                bool isDefaultName = isDefaultDisplayName(m_avatar.FirstName, m_avatar.LastName, m_avatar.Name,
+                bool isDefaultName = isDefaultDisplayName(mAvatar.FirstName, mAvatar.LastName, mAvatar.Name,
                                                           newDisplayName);
 
-                OSD item = DisplayNameReply(newDisplayName, oldDisplayName, m_avatar.PrincipalID, isDefaultName,
-                                            m_avatar.FirstName, m_avatar.LastName,
-                                            m_avatar.FirstName + "." + m_avatar.LastName);
-                m_eventQueue.Enqueue(item, m_avatar.PrincipalID, m_service.Region.RegionID);
+                OSD item = DisplayNameReply(newDisplayName, oldDisplayName, mAvatar.PrincipalID, isDefaultName,
+                                            mAvatar.FirstName, mAvatar.LastName,
+                                            mAvatar.FirstName + "." + mAvatar.LastName);
+                m_eventQueue.Enqueue(item, mAvatar.PrincipalID, m_service.Region.RegionID);
             }
         }
 
@@ -304,14 +300,14 @@ namespace WhiteCore.Services
         /// </summary>
         /// <param name="newDisplayName"></param>
         /// <param name="oldDisplayName"></param>
-        /// <param name="ID"></param>
+        /// <param name="iD"></param>
         /// <param name="isDefault"></param>
-        /// <param name="First"></param>
-        /// <param name="Last"></param>
-        /// <param name="Account"></param>
+        /// <param name="first"></param>
+        /// <param name="last"></param>
+        /// <param name="account"></param>
         /// <returns></returns>
-        public OSD DisplayNameUpdate(string newDisplayName, string oldDisplayName, UUID ID, bool isDefault, string First,
-                                     string Last, string Account)
+        public OSD DisplayNameUpdate(string newDisplayName, string oldDisplayName, UUID iD, bool isDefault, string first,
+                                     string last, string account)
         {
             OSDMap nameReply = new OSDMap {{"message", OSD.FromString("DisplayNameUpdate")}};
 
@@ -324,14 +320,14 @@ namespace WhiteCore.Services
                                                DateTime.ParseExact("1970-01-01 00:00:00 +0", "yyyy-MM-dd hh:mm:ss z",
                                                                    DateTimeFormatInfo.InvariantInfo).ToUniversalTime())
                                        },
-                                       {"id", OSD.FromUUID(ID)},
+                                       {"id", OSD.FromUUID(iD)},
                                        {"is_display_name_default", OSD.FromBoolean(isDefault)},
-                                       {"legacy_first_name", OSD.FromString(First)},
-                                       {"legacy_last_name", OSD.FromString(Last)},
-                                       {"username", OSD.FromString(Account)}
+                                       {"legacy_first_name", OSD.FromString(first)},
+                                       {"legacy_last_name", OSD.FromString(last)},
+                                       {"username", OSD.FromString(account)}
                                    };
             body.Add("agent", agentData);
-            body.Add("agent_id", OSD.FromUUID(ID));
+            body.Add("agent_id", OSD.FromUUID(iD));
             body.Add("old_display_name", OSD.FromString(oldDisplayName));
 
             nameReply.Add("body", body);
@@ -344,14 +340,14 @@ namespace WhiteCore.Services
         /// </summary>
         /// <param name="newDisplayName"></param>
         /// <param name="oldDisplayName"></param>
-        /// <param name="ID"></param>
+        /// <param name="iD"></param>
         /// <param name="isDefault"></param>
-        /// <param name="First"></param>
-        /// <param name="Last"></param>
-        /// <param name="Account"></param>
+        /// <param name="first"></param>
+        /// <param name="last"></param>
+        /// <param name="account"></param>
         /// <returns></returns>
-        public OSD DisplayNameReply(string newDisplayName, string oldDisplayName, UUID ID, bool isDefault, string First,
-                                    string Last, string Account)
+        public OSD DisplayNameReply(string newDisplayName, string oldDisplayName, UUID iD, bool isDefault, string first,
+                                    string last, string account)
         {
             OSDMap nameReply = new OSDMap();
 
@@ -363,11 +359,11 @@ namespace WhiteCore.Services
                         OSD.FromDate(
                             DateTime.ParseExact("1970-01-01 00:00:00 +0", "yyyy-MM-dd hh:mm:ss z",
                                                 DateTimeFormatInfo.InvariantInfo).ToUniversalTime()));
-            content.Add("id", OSD.FromUUID(ID));
+            content.Add("id", OSD.FromUUID(iD));
             content.Add("is_display_name_default", OSD.FromBoolean(isDefault));
-            content.Add("legacy_first_name", OSD.FromString(First));
-            content.Add("legacy_last_name", OSD.FromString(Last));
-            content.Add("username", OSD.FromString(Account));
+            content.Add("legacy_first_name", OSD.FromString(first));
+            content.Add("legacy_last_name", OSD.FromString(last));
+            content.Add("username", OSD.FromString(account));
             body.Add("content", content);
             body.Add("agent", agentData);
             body.Add("reason", OSD.FromString("OK"));

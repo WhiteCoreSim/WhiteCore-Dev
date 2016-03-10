@@ -40,109 +40,108 @@ namespace WhiteCore.Services
 {
     public class AgentPreferencesCAPS: ICapsServiceConnector
     {
-    	private IRegionClientCapsService m_service;
+        IRegionClientCapsService m_service;
 
-		#region ICapsServiceConnector implementation
+        #region ICapsServiceConnector implementation
 
-		public void RegisterCaps(IRegionClientCapsService service)
-		{
-			m_service = service;
+        public void RegisterCaps (IRegionClientCapsService service)
+        {
+            m_service = service;
             
-			HttpServerHandle method = delegate(string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
-			{
-				return ProcessUpdateAgentPreferences(request, m_service.AgentID);
-			};
+            HttpServerHandle method = delegate(string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse) {
+                return ProcessUpdateAgentPreferences (request, m_service.AgentID);
+            };
 
-            service.AddStreamHandler("AgentPreferences",
-			                         new GenericStreamHandler("POST", service.CreateCAPS("AgentPreferences", ""), method));
+            service.AddStreamHandler ("AgentPreferences",
+                new GenericStreamHandler ("POST", service.CreateCAPS ("AgentPreferences", ""), method));
 			
-            service.AddStreamHandler("UpdateAgentLanguage",
-			                         new GenericStreamHandler("POST", service.CreateCAPS("UpdateAgentLanguage", ""), method));
+            service.AddStreamHandler ("UpdateAgentLanguage",
+                new GenericStreamHandler ("POST", service.CreateCAPS ("UpdateAgentLanguage", ""), method));
 			
-            service.AddStreamHandler("UpdateAgentInformation",
-			                         new GenericStreamHandler("POST", service.CreateCAPS("UpdateAgentInformation", ""), method));
-		}
+            service.AddStreamHandler ("UpdateAgentInformation",
+                new GenericStreamHandler ("POST", service.CreateCAPS ("UpdateAgentInformation", ""), method));
+        }
 
-		public void DeregisterCaps()
-		{
-			m_service.RemoveStreamHandler("AgentPreferences", "POST");
-			m_service.RemoveStreamHandler("UpdateAgentLanguage", "POST");
-			m_service.RemoveStreamHandler("UpdateAgentInformation", "POST");
-		}
+        public void DeregisterCaps ()
+        {
+            m_service.RemoveStreamHandler ("AgentPreferences", "POST");
+            m_service.RemoveStreamHandler ("UpdateAgentLanguage", "POST");
+            m_service.RemoveStreamHandler ("UpdateAgentInformation", "POST");
+        }
 
-		public void EnteringRegion()
-		{
-		}
+        public void EnteringRegion ()
+        {
+        }
 
-		#endregion
-		
-		private byte[] ProcessUpdateAgentPreferences(Stream request, UUID agentID)
-		{
-            OSDMap rm = OSDParser.DeserializeLLSDXml(HttpServerHandlerHelpers.ReadFully(request)) as OSDMap;
+        #endregion
+
+        byte[] ProcessUpdateAgentPreferences (Stream request, UUID agentID)
+        {
+            OSDMap rm = OSDParser.DeserializeLLSDXml (HttpServerHandlerHelpers.ReadFully (request)) as OSDMap;
             if (rm == null)
                 return MainServer.BadRequest;
-            IAgentConnector data = Framework.Utilities.DataManager.RequestPlugin<IAgentConnector>();
+            IAgentConnector data = Framework.Utilities.DataManager.RequestPlugin<IAgentConnector> ();
             if (data != null)
             {
-            	IAgentInfo agent = data.GetAgent(agentID);
-            	if (agent == null)
-            		return MainServer.BadRequest;
-            	// Access preferences ?
-            	if (rm.ContainsKey("access_prefs"))
-            	{
-            		OSDMap accessPrefs = (OSDMap)rm["access_prefs"];
-            		string Level = accessPrefs["max"].AsString();
-            		int maxLevel = 0;
-            		if (Level == "PG")
-            			maxLevel = 0;
-            		if (Level == "M")
-            			maxLevel = 1;
-            		if (Level == "A")
-            			maxLevel = 2;
-            		agent.MaturityRating = maxLevel;
-            	}
-            	// Next permissions
-            	if (rm.ContainsKey("default_object_perm_masks"))
-            	{
-            		OSDMap permsMap = (OSDMap)rm["default_object_perm_masks"];
-            		agent.PermEveryone = permsMap["Everyone"].AsInteger();
-            		agent.PermGroup = permsMap["Group"].AsInteger();
-            		agent.PermNextOwner = permsMap["NextOwner"].AsInteger();
-            	}
-            	// Hoverheight
-            	if (rm.ContainsKey("hover_height"))
-            	{
-            		agent.HoverHeight = rm["hover_height"].AsReal();
-            	}
-            	// Language
-            	if (rm.ContainsKey("language"))
-            	{
-            		agent.Language = rm["language"].AsString();
-            	}
-            	// Show Language to others / objects
-            	if (rm.ContainsKey("language_is_public"))
-            	{
-            		agent.LanguageIsPublic = rm["language_is_public"].AsBoolean();
-            	}
-            	data.UpdateAgent(agent);
-            	// Build a response that can be send back to the viewer
-            	OSDMap resp = new OSDMap();
-            	OSDMap respAccessPrefs = new OSDMap();
-            	respAccessPrefs["max"] = Utilities.GetMaxMaturity(agent.MaxMaturity);
-            	resp["access_prefs"] = respAccessPrefs;
-            	OSDMap respDefaultPerms = new OSDMap();
-            		respDefaultPerms["Everyone"] = agent.PermEveryone;
-            		respDefaultPerms["Group"] = agent.PermGroup;
-            		respDefaultPerms["NextOwner"] = agent.PermNextOwner;
-            	resp["default_object_perm_masks"] = respDefaultPerms;
-            	resp["god_level"] = 0; // *TODO: Add this
-            	resp["hover_height"] = agent.HoverHeight;
-            	resp["language"] = agent.Language;
-            	resp["language_is_public"] = agent.LanguageIsPublic;
+                IAgentInfo agent = data.GetAgent (agentID);
+                if (agent == null)
+                    return MainServer.BadRequest;
+                // Access preferences ?
+                if (rm.ContainsKey ("access_prefs"))
+                {
+                    OSDMap accessPrefs = (OSDMap)rm ["access_prefs"];
+                    string Level = accessPrefs ["max"].AsString ();
+                    int maxLevel = 0;
+                    if (Level == "PG")
+                        maxLevel = 0;
+                    if (Level == "M")
+                        maxLevel = 1;
+                    if (Level == "A")
+                        maxLevel = 2;
+                    agent.MaturityRating = maxLevel;
+                }
+                // Next permissions
+                if (rm.ContainsKey ("default_object_perm_masks"))
+                {
+                    OSDMap permsMap = (OSDMap)rm ["default_object_perm_masks"];
+                    agent.PermEveryone = permsMap ["Everyone"].AsInteger ();
+                    agent.PermGroup = permsMap ["Group"].AsInteger ();
+                    agent.PermNextOwner = permsMap ["NextOwner"].AsInteger ();
+                }
+                // Hoverheight
+                if (rm.ContainsKey ("hover_height"))
+                {
+                    agent.HoverHeight = rm ["hover_height"].AsReal ();
+                }
+                // Language
+                if (rm.ContainsKey ("language"))
+                {
+                    agent.Language = rm ["language"].AsString ();
+                }
+                // Show Language to others / objects
+                if (rm.ContainsKey ("language_is_public"))
+                {
+                    agent.LanguageIsPublic = rm ["language_is_public"].AsBoolean ();
+                }
+                data.UpdateAgent (agent);
+                // Build a response that can be send back to the viewer
+                OSDMap resp = new OSDMap ();
+                OSDMap respAccessPrefs = new OSDMap ();
+                respAccessPrefs ["max"] = Utilities.GetMaxMaturity (agent.MaxMaturity);
+                resp ["access_prefs"] = respAccessPrefs;
+                OSDMap respDefaultPerms = new OSDMap ();
+                respDefaultPerms ["Everyone"] = agent.PermEveryone;
+                respDefaultPerms ["Group"] = agent.PermGroup;
+                respDefaultPerms ["NextOwner"] = agent.PermNextOwner;
+                resp ["default_object_perm_masks"] = respDefaultPerms;
+                resp ["god_level"] = 0; // *TODO: Add this
+                resp ["hover_height"] = agent.HoverHeight;
+                resp ["language"] = agent.Language;
+                resp ["language_is_public"] = agent.LanguageIsPublic;
             	
-            	return OSDParser.SerializeLLSDXmlBytes(resp);
+                return OSDParser.SerializeLLSDXmlBytes (resp);
             }
-			return MainServer.BlankResponse;
-		}
+            return MainServer.BlankResponse;
+        }
     }
- }
+}
