@@ -133,6 +133,7 @@ namespace WhiteCore.Services.GenericServices.CapsService
             UUID AgentID = message ["AgentID"];
             GridRegion region = new GridRegion ();
             region.FromOSD ((OSDMap)message ["Region"]);
+
             OSDMap map = new OSDMap ();
             switch (method)
             {

@@ -96,7 +96,8 @@ namespace WhiteCore.Services
             m_server = simBase.GetHttpServer (0);
 
             if (MainConsole.Instance != null)
-                MainConsole.Instance.Commands.AddCommand ("show presences", 
+                MainConsole.Instance.Commands.AddCommand (
+                    "show presences", 
                     "show presences",
                     "Shows all presences in the grid", 
                     ShowUsers, false, true);
@@ -143,41 +144,41 @@ namespace WhiteCore.Services
         /// <summary>
         ///     Remove the all of the user's CAPS from the system
         /// </summary>
-        /// <param name="AgentID"></param>
-        public void RemoveCAPS (UUID AgentID)
+        /// <param name="agentID"></param>
+        public void RemoveCAPS (UUID agentID)
         {
-            if (m_ClientCapsServices.ContainsKey (AgentID))
+            if (m_ClientCapsServices.ContainsKey (agentID))
             {
-                IClientCapsService perClient = m_ClientCapsServices [AgentID];
+                IClientCapsService perClient = m_ClientCapsServices [agentID];
                 perClient.Close ();
-                m_ClientCapsServices.Remove (AgentID);
+                m_ClientCapsServices.Remove (agentID);
                 m_registry.RequestModuleInterface<ISimulationBase> ()
-                          .EventManager.FireGenericEventHandler ("UserLogout", AgentID);
+                          .EventManager.FireGenericEventHandler ("UserLogout", agentID);
             }
         }
 
         /// <summary>
         ///     Create a Caps URL for the given user/region. Called normally by the EventQueueService or the LLLoginService on login
         /// </summary>
-        /// <param name="AgentID"></param>
-        /// <param name="CAPSBase"></param>
+        /// <param name="agentID"></param>
+        /// <param name="capsBase"></param>
         /// <param name="regionID"></param>
-        /// <param name="IsRootAgent">Will this child be a root agent</param>
+        /// <param name="isRootAgent">Will this child be a root agent</param>
         /// <param name="circuitData"></param>
         /// <param name="port">The port to use for the CAPS service</param>
         /// <returns></returns>
-        public string CreateCAPS (UUID AgentID, string CAPSBase, UUID regionID, bool IsRootAgent,
+        public string CreateCAPS (UUID agentID, string capsBase, UUID regionID, bool isRootAgent,
                                  AgentCircuitData circuitData, uint port)
         {
             //Now make sure we didn't use an old one or something
-            IClientCapsService service = GetOrCreateClientCapsService (AgentID);
-            IRegionClientCapsService clientService = service.GetOrCreateCapsService (regionID, CAPSBase, circuitData,
+            IClientCapsService service = GetOrCreateClientCapsService (agentID);
+            IRegionClientCapsService clientService = service.GetOrCreateCapsService (regionID, capsBase, circuitData,
                                                          port);
 
             //Fix the root agent status
-            clientService.RootAgent = IsRootAgent;
+            clientService.RootAgent = isRootAgent;
 
-            MainConsole.Instance.Debug ("[CapsService]: Adding Caps URL " + clientService.CapsUrl + " for agent " + AgentID);
+            MainConsole.Instance.Debug ("[CapsService]: Adding Caps URL " + clientService.CapsUrl + " for agent " + agentID);
             return clientService.CapsUrl;
         }
 
@@ -185,30 +186,30 @@ namespace WhiteCore.Services
         ///     Get or create a new Caps Service for the given client
         ///     Note: This does not add them to a region if one is created.
         /// </summary>
-        /// <param name="AgentID"></param>
+        /// <param name="agentID"></param>
         /// <returns></returns>
-        public IClientCapsService GetOrCreateClientCapsService (UUID AgentID)
+        public IClientCapsService GetOrCreateClientCapsService (UUID agentID)
         {
-            if (!m_ClientCapsServices.ContainsKey (AgentID))
+            if (!m_ClientCapsServices.ContainsKey (agentID))
             {
                 PerClientBasedCapsService client = new PerClientBasedCapsService ();
-                client.Initialise (this, AgentID);
-                m_ClientCapsServices.Add (AgentID, client);
+                client.Initialise (this, agentID);
+                m_ClientCapsServices.Add (agentID, client);
             }
-            return m_ClientCapsServices [AgentID];
+            return m_ClientCapsServices [agentID];
         }
 
         /// <summary>
         ///     Get a Caps Service for the given client
         /// </summary>
-        /// <param name="AgentID"></param>
+        /// <param name="agentID"></param>
         /// <returns></returns>
-        public IClientCapsService GetClientCapsService (UUID AgentID)
+        public IClientCapsService GetClientCapsService (UUID agentID)
         {
-            if (!m_ClientCapsServices.ContainsKey (AgentID))
+            if (!m_ClientCapsServices.ContainsKey (agentID))
                 return null;
             bool disabled = true;
-            foreach (IRegionClientCapsService regionClients in m_ClientCapsServices[AgentID].GetCapsServices())
+            foreach (IRegionClientCapsService regionClients in m_ClientCapsServices[agentID].GetCapsServices())
             {
                 if (!regionClients.Disabled)
                 {
@@ -218,10 +219,10 @@ namespace WhiteCore.Services
             }
             if (disabled)
             {
-                RemoveCAPS (AgentID);
+                RemoveCAPS (agentID);
                 return null;
             }
-            return m_ClientCapsServices [AgentID];
+            return m_ClientCapsServices [agentID];
         }
 
         public List<IClientCapsService> GetClientsCapsServices ()
