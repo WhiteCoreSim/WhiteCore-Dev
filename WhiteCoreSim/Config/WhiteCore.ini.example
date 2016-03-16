@@ -1,7 +1,12 @@
+;; This file is the setup template for the WhiteCore server 
+;;   when the configurator is used
+;;
+;;  ##  You DO NOT need to change anything here  ##
 ;;
 ;; See Sim/*   for the additional config files.
 ;; Edit Sim/Main.ini   to select your Install Setup and follow to next appropriate file
 ;;
+
 [Startup]
 ;; Directory path for all data
 ;; Normally this will be the '../Data' directory, but you can change this to anywhere on your hard drive
@@ -13,10 +18,10 @@ DataDirectory = ""
 save_crashes = false
 
 ;; Directory to save crashes to if above is enabled
-;; (default is /bin/crashes/*.txt or C:\bin\crashes\*.txt)
+;; (default is bin/crashes/*.txt)
 crash_dir = ./crashes
 
-;; Place to create a PID file
+;; Place to create a PID file (*nix only)
 ;PIDFile = /tmp/my.pid
 
 ;; Directory to load module .ini files from
@@ -59,7 +64,7 @@ http_listener_port = 9000
 use_https = false
 
 ;; The number of threads to concurrently process incoming http requests
-;; 5 is the recommended, but more can be set if the http server is being
+;; 10 is the recommended, but more can be set if the http server is being
 ;; overloaded, or you could run more servers instead
 HttpThreadCount = 10
 
@@ -82,7 +87,7 @@ HttpThreadCount = 10
 Console = LocalConsole
 
 ;; If you want to save your log file to a specific location, set your desired path
-;; Default is commented out >> Logfile are saved in the 'Data' folder
+;; Default is commented out >> The Logfile will be saved in the 'Data' folder
 ;LogPath = 
 
 ;; If you want to append a string to the log file name
