@@ -26,59 +26,42 @@
  */
 
 
-using System;
-using WhiteCore.Framework.DatabaseInterfaces;
+using System.IO;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
-using WhiteCore.Framework.Services.ClassHelpers.Profile;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using System.IO;
 
 namespace WhiteCore.Services
 {
     public class ProductInfoRequest : ICapsServiceConnector
     {
-        private IRegionClientCapsService m_service;
+        IRegionClientCapsService m_service;
 
         #region ICapsServiceConnector Members
 
-        public void RegisterCaps(IRegionClientCapsService service)
+        public void RegisterCaps (IRegionClientCapsService service)
         {
             m_service = service;
-            m_service.AddStreamHandler("ProductInfoRequest",
-                                       new GenericStreamHandler("GET", m_service.CreateCAPS("ProductInfoRequest", ""),
-                                                                ProductInfoRequestCAP));
+            m_service.AddStreamHandler ("ProductInfoRequest",
+                new GenericStreamHandler ("GET", m_service.CreateCAPS ("ProductInfoRequest", ""), ProductInfoRequestCAP));
         }
 
-        public void DeregisterCaps()
+        public void DeregisterCaps ()
         {
-            m_service.RemoveStreamHandler("ProductInfoRequest", "GET");
+            m_service.RemoveStreamHandler ("ProductInfoRequest", "GET");
         }
 
-        public void EnteringRegion()
+        public void EnteringRegion ()
         {
         }
 
         #endregion
 
-        private byte[] ProductInfoRequestCAP(string path, Stream request,
-                                         OSHttpRequest httpRequest, OSHttpResponse httpResponse)
+        byte[] ProductInfoRequestCAP (string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {
-        	// This Caps gets triggered at the start of each login
-            //
-            // It has the most recent details about what ProductSKU a specific region type has
-            //
-            // This needs to be flesh out, example of the response is the ProductInfoRequest.xml file
-            // in the Caps folder of bin.
-            //
-            /*
-            OSDMap data = new OSDMap();
-            //Send back data
-            return OSDParser.SerializeLLSDXmlBytes(data);
-            */
-           throw new NotImplementedException();
+            OSDMap data = m_service.GetCAPS ();
+            return OSDParser.SerializeLLSDXmlBytes (data);
         }
     }
 }

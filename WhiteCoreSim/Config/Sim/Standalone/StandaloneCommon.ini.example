@@ -1,5 +1,7 @@
 ;;
-;; This is the main configuration file for standalone WhiteCore-Sim instances
+;; This file is used as a template when the configurator is run for a standalone setup
+;;  ##  You DO NOT need to change anything here  ##
+;;
 ;;
 [Include]
 Include-Standalone = Sim/Standalone/Standalone.ini

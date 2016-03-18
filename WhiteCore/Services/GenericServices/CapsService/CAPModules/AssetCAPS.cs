@@ -444,7 +444,7 @@ namespace WhiteCore.Services
                 uploader.OnUpLoad += BakedTextureUploaded;
 
                 MainServer.Instance.AddStreamHandler(new GenericStreamHandler("POST", uploadpath,
-                                                                    uploader.uploaderCaps));
+                                                                    uploader.UploaderCaps));
 
                 string uploaderURL = MainServer.Instance.ServerURI + uploadpath;
                 OSDMap map = new OSDMap();
@@ -481,7 +481,7 @@ namespace WhiteCore.Services
             /// <param name="httpRequest"></param>
             /// <param name="httpResponse"></param>
             /// <returns></returns>
-            public byte[] uploaderCaps(string path, Stream request,
+            public byte[] UploaderCaps(string path, Stream request,
                                        OSHttpRequest httpRequest, OSHttpResponse httpResponse)
             {
                 handlerUpLoad = OnUpLoad;

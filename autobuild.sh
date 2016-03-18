@@ -1,7 +1,7 @@
 #!/bin/bash
 # Run prebuild to configure and create the appropriate Solution and Project files for building WhiteCore-Sim
 #
-# November 2015
+# March 2016
 # Rowan Deppeler <greythane@gmail.com>
 
 ARCH="x64"
@@ -92,14 +92,14 @@ fi
 
 # Update version info
 if [ -d ".git" ]; then 
-  git log --pretty=format:"WhiteCore 0.9.3 (%cd.%h)" --date=short -n 1 > WhiteCoreSim/bin/.version; 
+  git log --pretty=format:"WhiteCore 0.9.4 (%cd.%h)" --date=short -n 1 > WhiteCoreSim/bin/.version; 
   echo "Version info updated"
 fi
 
 # Build WhiteCore-Sim
 if $BUILD ; then
   echo Building WhiteCore-Sim
-  xbuild /property:Configuration="$CONFIG" /property:Platform="$ARCH"
+  xbuild WhiteCore.sln /property:Configuration="$CONFIG" /property:Platform="$ARCH"
   echo Finished Building WhiteCore
   echo Thank you for choosing WhiteCore-Sim
   echo Please report any errors to our Github Issue Tracker https://github.com/WhiteCoreSim/WhiteCore-Dev/issues

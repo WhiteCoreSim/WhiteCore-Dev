@@ -39,7 +39,7 @@ using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.SceneInfo;
-using ZLib.Net;
+using ZLibNet;
 
 #if DEBUGING
 using PrimMesher;

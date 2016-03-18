@@ -26,10 +26,10 @@
  */
 
 
+using System.Collections.Generic;
+using OpenMetaverse;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Services;
-using OpenMetaverse;
-using System.Collections.Generic;
 using GridRegion = WhiteCore.Framework.Services.GridRegion;
 
 namespace WhiteCore.Services
@@ -41,13 +41,13 @@ namespace WhiteCore.Services
     {
         #region Declares
 
-        private UUID m_RegionID;
-        private GridRegion m_cachedRegion;
+        UUID m_RegionID;
+        GridRegion m_cachedRegion;
 
         protected Dictionary<UUID, IRegionClientCapsService> m_clientsInThisRegion =
-            new Dictionary<UUID, IRegionClientCapsService>();
+            new Dictionary<UUID, IRegionClientCapsService> ();
 
-        private IRegistryCore m_registry;
+        IRegistryCore m_registry;
 
         public IRegistryCore Registry
         {
@@ -75,11 +75,9 @@ namespace WhiteCore.Services
             {
                 if (m_cachedRegion != null)
                     return m_cachedRegion;
-                else
-                {
-                    m_cachedRegion = Registry.RequestModuleInterface<IGridService>().GetRegionByUUID(null, m_RegionID);
-                    return m_cachedRegion;
-                }
+                
+                m_cachedRegion = Registry.RequestModuleInterface<IGridService> ().GetRegionByUUID (null, m_RegionID);
+                return m_cachedRegion;
             }
         }
 
@@ -92,19 +90,19 @@ namespace WhiteCore.Services
         /// </summary>
         /// <param name="regionID"></param>
         /// <param name="registry"></param>
-        public void Initialise(UUID regionID, IRegistryCore registry)
+        public void Initialise (UUID regionID, IRegistryCore registry)
         {
             m_RegionID = regionID;
             m_registry = registry;
         }
 
-        public void Close()
+        public void Close ()
         {
             foreach (IRegionClientCapsService regionC in m_clientsInThisRegion.Values)
             {
-                regionC.ClientCaps.RemoveCAPS(m_RegionID);
+                regionC.ClientCaps.RemoveCAPS (m_RegionID);
             }
-            m_clientsInThisRegion.Clear();
+            m_clientsInThisRegion.Clear ();
         }
 
         #endregion
@@ -115,33 +113,33 @@ namespace WhiteCore.Services
         ///     Add this client to the region
         /// </summary>
         /// <param name="service"></param>
-        public void AddClientToRegion(IRegionClientCapsService service)
+        public void AddClientToRegion (IRegionClientCapsService service)
         {
-            if (!m_clientsInThisRegion.ContainsKey(service.AgentID))
-                m_clientsInThisRegion.Add(service.AgentID, service);
+            if (!m_clientsInThisRegion.ContainsKey (service.AgentID))
+                m_clientsInThisRegion.Add (service.AgentID, service);
             else //Update the client then... this shouldn't ever happen!
-                m_clientsInThisRegion[service.AgentID] = service;
+                m_clientsInThisRegion [service.AgentID] = service;
         }
 
         /// <summary>
         ///     Remove the client from this region
         /// </summary>
         /// <param name="service"></param>
-        public void RemoveClientFromRegion(IRegionClientCapsService service)
+        public void RemoveClientFromRegion (IRegionClientCapsService service)
         {
-            if (m_clientsInThisRegion.ContainsKey(service.AgentID))
-                m_clientsInThisRegion.Remove(service.AgentID);
+            if (m_clientsInThisRegion.ContainsKey (service.AgentID))
+                m_clientsInThisRegion.Remove (service.AgentID);
         }
 
         /// <summary>
         ///     Get an agent's Caps by UUID
         /// </summary>
-        /// <param name="AgentID"></param>
+        /// <param name="agentID"></param>
         /// <returns></returns>
-        public IRegionClientCapsService GetClient(UUID AgentID)
+        public IRegionClientCapsService GetClient (UUID agentID)
         {
-            if (m_clientsInThisRegion.ContainsKey(AgentID))
-                return m_clientsInThisRegion[AgentID];
+            if (m_clientsInThisRegion.ContainsKey (agentID))
+                return m_clientsInThisRegion [agentID];
             return null;
         }
 
@@ -149,9 +147,9 @@ namespace WhiteCore.Services
         ///     Get all clients in this region
         /// </summary>
         /// <returns></returns>
-        public List<IRegionClientCapsService> GetClients()
+        public List<IRegionClientCapsService> GetClients ()
         {
-            return new List<IRegionClientCapsService>(m_clientsInThisRegion.Values);
+            return new List<IRegionClientCapsService> (m_clientsInThisRegion.Values);
         }
 
         #endregion

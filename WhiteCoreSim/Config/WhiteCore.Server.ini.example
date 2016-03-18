@@ -1,3 +1,11 @@
+;; This file is the setup template for the WhiteCore Grid server 
+;;   when the configurator is used
+;;
+;;  ##  You DO NOT need to change anything here  ##
+;;
+;; See Grid/ServerConfiguration/*           for the additional configuration options.
+;;
+
 [Network]
 ;; Advanced configs
 http_listener_port = 8003
@@ -6,7 +14,7 @@ http_listener_port = 8003
 use_https = false
 
 ;; The number of threads to concurrently process incoming http requests
-;; 5 is the recommended, but more can be set if the http server is being
+;; 10 is the recommended, but more can be set if the http server is being
 ;; overloaded, or you could run more servers instead
 HttpThreadCount = 10
 
@@ -49,10 +57,10 @@ DataDirectory = ""
 save_crashes = false
 
 ;; Directory to save crashes to if above is enabled
-;; (default is /bin/crashes/*.txt or C:\bin\crashes\*.txt)
+;; (default is bin/crashes/*.txt)
 crash_dir = ./crashes
 
-;; Place to create a PID file
+;; Place to create a PID file (*nix only)
 ;PIDFile = /tmp/my.pid
 
 ;; Commands to be run on startup are in the given file
@@ -133,12 +141,6 @@ AllowRemoteCalls = True
 [ApplicationPlugins]
 ServicesLoader = ServicesLoader
 StatsHandler = StatsHandler
-
-[VoiceIncludes]
-;; If you would like to set up voice for the entire grid, 
-;;  select one of these includes depending on which voice module you wish to set up
-;Include-Murmur = Grid/ServerConfiguration/Murmur.ini
-;Include-FreeSwitch = Grid/ServerConfiguration/FreeSwitch.ini
 
 [Includes]
 ;;Other .ini files to include... Please do not modify
