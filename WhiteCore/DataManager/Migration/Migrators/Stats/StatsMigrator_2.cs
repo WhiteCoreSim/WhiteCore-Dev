@@ -38,7 +38,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Stats
             Version = new Version(0, 0, 2);
             MigrationName = "Stats";
 
-            schema = new List<SchemaDefinition>();
+            Schema = new List<SchemaDefinition>();
 
             AddSchema("statsdata", ColDefs(ColDef("session_id", ColumnTypes.String50),
                                            ColDef("agent_id", ColumnTypes.String50),

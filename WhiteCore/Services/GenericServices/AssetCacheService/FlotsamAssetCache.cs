@@ -29,19 +29,19 @@
 // #define WAIT_ON_INPROGRESS_REQUESTS
 
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Timers;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Assets;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Timers;
 
 namespace WhiteCore.Services
 {
@@ -49,23 +49,22 @@ namespace WhiteCore.Services
     {
         #region Declares
 
-        private const string m_ModuleName = "FlotsamAssetCache";
-        private const string m_DefaultCacheDirectory = m_ModuleName;
-        private string m_CacheDirectory = m_DefaultCacheDirectory;
+        const string m_ModuleName = "FlotsamAssetCache";
+        string m_CacheDirectory = "";
 
-        private readonly List<char> m_InvalidChars = new List<char>();
+        readonly List<char> m_InvalidChars = new List<char>();
 
-        private int m_logLevel;
-        private ulong m_HitRateDisplay = 1; // How often to display hit statistics, given in requests
+        int m_logLevel;
+        ulong m_HitRateDisplay = 1; // How often to display hit statistics, given in requests
 
-        private static ulong m_Requests;
+        static ulong m_Requests;
 
-        private PreAddedDictionary<string, AssetRequest> m_assetRequests =
+        PreAddedDictionary<string, AssetRequest> m_assetRequests =
             new PreAddedDictionary<string, AssetRequest>(() => new AssetRequest());
 
-        private class AssetRequest
+        class AssetRequest
         {
-            private int _amt = 1;
+            int _amt = 1;
 
             public int Amt
             {
@@ -80,7 +79,7 @@ namespace WhiteCore.Services
                 }
             }
 
-            private int _savedamt = 1;
+            int _savedamt = 1;
 
             public int SavedAmt
             {
@@ -100,43 +99,43 @@ namespace WhiteCore.Services
             public object Lock = new object();
         }
 
-        private static ulong m_RequestsForInprogress;
-        private static ulong m_DiskHits;
-        private static ulong m_MemoryHits;
-        private static double m_HitRateMemory;
-        private static double m_HitRateFile;
+        static ulong m_RequestsForInprogress;
+        static ulong m_DiskHits;
+        static ulong m_MemoryHits;
+        static double m_HitRateMemory;
+        static double m_HitRateFile;
 
 #if WAIT_ON_INPROGRESS_REQUESTS
-        private Dictionary<string, ManualResetEvent> m_CurrentlyWriting = new Dictionary<string, ManualResetEvent>();
-        private int m_WaitOnInprogressTimeout = 3000;
+        Dictionary<string, ManualResetEvent> m_CurrentlyWriting = new Dictionary<string, ManualResetEvent>();
+        int m_WaitOnInprogressTimeout = 3000;
 #else
-        private HashSet<string> m_CurrentlyWriting = new HashSet<string>();
+        HashSet<string> m_CurrentlyWriting = new HashSet<string>();
 #endif
 
-        private ExpiringCache<string, AssetBase> m_MemoryCache;
-        private bool m_MemoryCacheEnabled = true;
+        ExpiringCache<string, AssetBase> m_MemoryCache;
+        bool m_MemoryCacheEnabled = true;
 
         // Expiration is expressed in hours.
-        private const double m_DefaultMemoryExpiration = 1.0;
-        private const double m_DefaultFileExpiration = 48;
-        private TimeSpan m_MemoryExpiration = TimeSpan.Zero;
-        private TimeSpan m_FileExpiration = TimeSpan.Zero;
-        private TimeSpan m_FileExpirationCleanupTimer = TimeSpan.Zero;
-        private readonly object m_fileCacheLock = new Object();
+        const double m_DefaultMemoryExpiration = 1.0;
+        const double m_DefaultFileExpiration = 48;
+        TimeSpan m_MemoryExpiration = TimeSpan.Zero;
+        TimeSpan m_FileExpiration = TimeSpan.Zero;
+        TimeSpan m_FileExpirationCleanupTimer = TimeSpan.Zero;
+        readonly object m_fileCacheLock = new Object();
 
-        private static int m_CacheDirectoryTiers = 1;
-        private static int m_CacheDirectoryTierLen = 3;
-        private static int m_CacheWarnAt = 30000;
+        static int m_CacheDirectoryTiers = 1;
+        static int m_CacheDirectoryTierLen = 3;
+        static int m_CacheWarnAt = 30000;
 
-        private Timer m_CacheCleanTimer;
+        Timer m_CacheCleanTimer;
 
-        private IAssetService m_AssetService;
-        private ISimulationBase m_simulationBase;
+        IAssetService m_AssetService;
+        ISimulationBase m_simulationBase;
 
-        private bool m_DeepScanBeforePurge;
+        bool m_DeepScanBeforePurge;
 
-        private static int _forceMemoryCacheAmount = 2;
-        private IAssetMonitor _assetMonitor;
+        static int _forceMemoryCacheAmount = 2;
+        IAssetMonitor _assetMonitor;
 
         public FlotsamAssetCache()
         {
@@ -165,18 +164,22 @@ namespace WhiteCore.Services
                 {
                     m_MemoryCache = new ExpiringCache<string, AssetBase>();
 
-                    //MainConsole.Instance.InfoFormat("[FLOTSAM ASSET CACHE]: {0} enabled", this.Name);
-
                     IConfig assetConfig = config.Configs["AssetCache"];
                     if (assetConfig == null)
                     {
                         //MainConsole.Instance.Warn("[FLOTSAM ASSET CACHE]: AssetCache missing from WhiteCore.ini, using defaults.");
-                        //MainConsole.Instance.InfoFormat("[FLOTSAM ASSET CACHE]: Cache Directory", m_DefaultCacheDirectory);
+                        //MainConsole.Instance.InfoFormat("[FLOTSAM ASSET CACHE]: Cache Directory", m_CacheDirectory);
                         return;
                     }
 
-                    m_CacheDirectory = assetConfig.GetString("CacheDirectory", m_DefaultCacheDirectory);
-                    //MainConsole.Instance.InfoFormat("[FLOTSAM ASSET CACHE]: Cache Directory", m_DefaultCacheDirectory);
+                    m_CacheDirectory = assetConfig.GetString("CacheDirectory", m_CacheDirectory);
+                    if (m_CacheDirectory == "")
+                    {
+                        var defpath = registry.RequestModuleInterface<ISimulationBase> ().DefaultDataPath;
+                        m_CacheDirectory = Path.Combine (defpath, Constants.DEFAULT_ASSETCACHE_DIR);
+                        m_CacheDirectory = Path.Combine (m_CacheDirectory, "flotsam");
+                    }
+                    MainConsole.Instance.InfoFormat("[FLOTSAM ASSET CACHE]: Cache Directory '{0}'", m_CacheDirectory);
 
                     m_MemoryCacheEnabled = assetConfig.GetBoolean("MemoryCacheEnabled", false);
                     m_MemoryExpiration =
@@ -227,25 +230,29 @@ namespace WhiteCore.Services
 
                     if (MainConsole.Instance != null)
                     {
-                        MainConsole.Instance.Commands.AddCommand("fcache status", 
-                    	                                         "fcache status",
-                                                                 "Display cache status", 
-                                                                 HandleConsoleCommand, false, true);
+                        MainConsole.Instance.Commands.AddCommand(
+                            "fcache status", 
+                            "fcache status",
+                            "Display cache status", 
+                            HandleConsoleCommand, false, true);
                         
-                    	MainConsole.Instance.Commands.AddCommand("fcache clear",
-                    	                                         "fcache clear [file] [memory]",
-                                                                 "Remove all assets in the file and/or memory cache",
-                                                                 HandleConsoleCommand, false, true);
+                    	MainConsole.Instance.Commands.AddCommand(
+                            "fcache clear",                    	                                         
+                            "fcache clear [file] [memory]",
+                            "Remove all assets in the file and/or memory cache",
+                            HandleConsoleCommand, false, true);
                         
-                    	MainConsole.Instance.Commands.AddCommand("fcache assets",
-                    	                                         "fcache assets",
-                                                                 "Attempt a deep scan and cache of all assets in all scenes",
-                                                                 HandleConsoleCommand, false, true);
+                    	MainConsole.Instance.Commands.AddCommand(
+                            "fcache assets",
+                            "fcache assets",
+                            "Attempt a deep scan and cache of all assets in all scenes",
+                            HandleConsoleCommand, false, true);
                         
-                    	MainConsole.Instance.Commands.AddCommand("fcache expire",
-                    	                                         "fcache expire <datetime>",
-                                                                 "Purge cached assets older then the specified date/time",
-                                                                 HandleConsoleCommand, false, true);
+                    	MainConsole.Instance.Commands.AddCommand(
+                            "fcache expire",
+                            "fcache expire <datetime>",
+                            "Purge cached assets older then the specified date/time",
+                            HandleConsoleCommand, false, true);
                     }
                     registry.RegisterModuleInterface<IImprovedAssetCache>(this);
                 }
@@ -277,12 +284,12 @@ namespace WhiteCore.Services
         // IImprovedAssetCache
         //
 
-        private void UpdateMemoryCache(string key, AssetBase asset)
+        void UpdateMemoryCache(string key, AssetBase asset)
         {
             UpdateMemoryCache(key, asset, false);
         }
 
-        private void UpdateMemoryCache(string key, AssetBase asset, bool forceMemCache)
+        void UpdateMemoryCache(string key, AssetBase asset, bool forceMemCache)
         {
             if (m_MemoryCacheEnabled || forceMemCache)
             {
@@ -546,12 +553,12 @@ namespace WhiteCore.Services
             return data;
         }
 
-        private byte[] ExtractData(string filename)
+        byte[] ExtractData(string filename)
         {
             return File.ReadAllBytes(filename);
         }
 
-        private AssetBase ExtractAsset(string id, AssetBase asset, string filename, bool forceMemCache)
+        AssetBase ExtractAsset(string id, AssetBase asset, string filename, bool forceMemCache)
         {
             try
             {
@@ -574,7 +581,7 @@ namespace WhiteCore.Services
             return asset;
         }
 
-        private static void InsertAsset(string filename, AssetBase asset, string directory, string tempname)
+        static void InsertAsset(string filename, AssetBase asset, string directory, string tempname)
         {
             if (!Directory.Exists(directory))
             {
@@ -647,7 +654,7 @@ namespace WhiteCore.Services
             return (m_MemoryCacheEnabled && m_MemoryCache.Contains(id)) || (File.Exists(GetFileName(id)));
         }
 
-        private void CleanupExpiredFiles(object source, ElapsedEventArgs e)
+        void CleanupExpiredFiles(object source, ElapsedEventArgs e)
         {
             if (m_logLevel >= 2)
                 MainConsole.Instance.DebugFormat("[FLOTSAM ASSET CACHE]: Checking for expired files older then {0}.",
@@ -711,7 +718,7 @@ namespace WhiteCore.Services
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        private string GetFileName(string id)
+        string GetFileName(string id)
         {
             // Would it be faster to just hash the darn thing?
             id = m_InvalidChars.Aggregate(id, (current, c) => current.Replace(c, '_'));
@@ -732,7 +739,7 @@ namespace WhiteCore.Services
         /// </summary>
         /// <param name="filename"></param>
         /// <param name="asset"></param>
-        private void WriteFileCache(string filename, AssetBase asset)
+        void WriteFileCache(string filename, AssetBase asset)
         {
             Stream stream = null;
 
@@ -791,7 +798,7 @@ namespace WhiteCore.Services
         /// </summary>
         /// <param name="filename"></param>
         /// <param name="data"></param>
-        private void WriteFileCache(string filename, byte[] data)
+        void WriteFileCache(string filename, byte[] data)
         {
             // Make sure the target cache directory exists
             string directory = Path.GetDirectoryName(filename);
@@ -850,7 +857,7 @@ namespace WhiteCore.Services
             }
         }
 
-        private static void LogException(Exception e)
+        static void LogException(Exception e)
         {
             string[] text = e.ToString().Split(new[] {'\n'});
             foreach (string t in text)
@@ -865,7 +872,7 @@ namespace WhiteCore.Services
         /// </summary>
         /// <param name="dir"></param>
         /// <returns></returns>
-        private int GetFileCacheCount(string dir)
+        int GetFileCacheCount(string dir)
         {
             return Directory.GetFiles(dir).Length +
                    Directory.GetDirectories(dir).Sum(subdir => GetFileCacheCount(subdir));
@@ -875,7 +882,7 @@ namespace WhiteCore.Services
         ///     This notes the last time the Region had a deep asset scan performed on it.
         /// </summary>
         /// <param name="RegionID"></param>
-        private void StampRegionStatusFile(UUID RegionID)
+        void StampRegionStatusFile(UUID RegionID)
         {
             string RegionCacheStatusFile = Path.Combine(m_CacheDirectory, "RegionStatus_" + RegionID.ToString() + ".fac");
             lock (m_fileCacheLock)
@@ -900,7 +907,7 @@ namespace WhiteCore.Services
         ///     in the scene
         /// </summary>
         /// <returns></returns>
-        private int CacheScenes()
+        int CacheScenes()
         {
             //Make sure this is not null
             if (m_AssetService == null)
@@ -953,7 +960,7 @@ namespace WhiteCore.Services
         /// <summary>
         ///     Deletes all cache contents
         /// </summary>
-        private void ClearFileCache()
+        void ClearFileCache()
         {
             lock (m_fileCacheLock)
             {
@@ -985,7 +992,7 @@ namespace WhiteCore.Services
 
         #region Console Commands
 
-        private void HandleConsoleCommand(IScene scene, string[] cmdparams)
+        void HandleConsoleCommand(IScene scene, string[] cmdparams)
         {
             if (cmdparams.Length >= 2)
             {

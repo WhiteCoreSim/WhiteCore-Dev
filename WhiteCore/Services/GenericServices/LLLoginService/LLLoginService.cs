@@ -25,6 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Net;
+using System.Text.RegularExpressions;
+using System.Xml;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.DatabaseInterfaces;
@@ -36,14 +44,6 @@ using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Inventory;
 using WhiteCore.Framework.Services.ClassHelpers.Profile;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Net;
-using System.Text.RegularExpressions;
-using System.Xml;
 using FriendInfo = WhiteCore.Framework.Services.FriendInfo;
 using GridRegion = WhiteCore.Framework.Services.GridRegion;
 using GridSettings = WhiteCore.Modules.Web.GridSettings;
@@ -52,11 +52,12 @@ namespace WhiteCore.Services
 {
     public class LLLoginService : ILoginService, IService
     {
-        private static bool Initialized = false;
+        static bool Initialized;
+
         // Global Textures
-        private const string sunTexture = "cce0f112-878f-4586-a2e2-a8f104bba271";
-        private const string cloudTexture = "dc4b9f0b-d008-45c6-96a4-01dd947ac621";
-        private const string moonTexture = "ec4b9f0b-d008-45c6-96a4-01dd947ac621";
+        const string sunTexture = "cce0f112-878f-4586-a2e2-a8f104bba271";
+        const string cloudTexture = "dc4b9f0b-d008-45c6-96a4-01dd947ac621";
+        const string moonTexture = "ec4b9f0b-d008-45c6-96a4-01dd947ac621";
 
         protected IUserAccountService m_UserAccountService;
         protected IAgentInfoService m_agentInfoService;
@@ -81,16 +82,16 @@ namespace WhiteCore.Services
 
         protected IConfig m_loginServerConfig;
         protected IConfigSource m_config;
-        protected bool m_AllowAnonymousLogin = false;
-        protected bool m_AllowDuplicateLogin = false;
+        protected bool m_AllowAnonymousLogin;
+        protected bool m_AllowDuplicateLogin;
         protected string m_DefaultUserAvatarArchive = "DefaultAvatar.aa";
         protected string m_DefaultHomeRegion = "";
         protected Vector3 m_DefaultHomeRegionPos = new Vector3();
         protected ArrayList eventCategories = new ArrayList();
         protected ArrayList classifiedCategories = new ArrayList();
         protected List<ILoginModule> LoginModules = new List<ILoginModule>();
-        private string m_forceUserToWearFolderName;
-        private string m_forceUserToWearFolderOwnerUUID;
+        string m_forceUserToWearFolderName;
+        string m_forceUserToWearFolderOwnerUUID;
 
         public int MinLoginLevel
         {
@@ -353,7 +354,7 @@ namespace WhiteCore.Services
             // Some TPV's now send their name in Channel instead of clientVersion 
             // while others send a Channel and a clientVersion.
 
-            string realViewer = "";
+            string realViewer;
 
             if (channel != "")
             {
@@ -705,7 +706,8 @@ namespace WhiteCore.Services
 
                 MainConsole.Instance.InfoFormat(
                     "[LLOGIN SERVICE]: All clear. Sending login response to client to login to region " +
-                    destination.RegionName + ", tried to login to " + startLocation + " at " + position.ToString() + ".");
+                    destination.RegionName + ", tried to login to " + startLocation + " at " + position + ".");
+
                 return response;
             }
             catch (Exception e)
@@ -720,7 +722,7 @@ namespace WhiteCore.Services
             }
         }
 
-        private void BuildEventNotifications(UUID principalID, ref ArrayList eventNotifications)
+        void BuildEventNotifications(UUID principalID, ref ArrayList eventNotifications)
         {
             IDirectoryServiceConnector dirService =
                 Framework.Utilities.DataManager.RequestPlugin<IDirectoryServiceConnector>();
@@ -990,8 +992,8 @@ namespace WhiteCore.Services
         {
             where = currentWhere;
             reason = string.Empty;
-            uint circuitCode = 0;
-            AgentCircuitData aCircuit = null;
+            uint circuitCode;
+            AgentCircuitData aCircuit;
             dest = destination;
 
             #region Launch Agent
@@ -1001,8 +1003,7 @@ namespace WhiteCore.Services
                                  clientIP);
             aCircuit.TeleportFlags = (uint) tpFlags;
             MainConsole.Instance.DebugFormat("[LoginService]: Attempting to log {0} into {1} at {2}...", account.Name, destination.RegionName, destination.ServerURI);
-            LoginAgentArgs args = m_registry.RequestModuleInterface<IAgentProcessing>().
-                                             LoginAgent(destination, aCircuit, friendsToInform);
+            LoginAgentArgs args = m_registry.RequestModuleInterface<IAgentProcessing>().LoginAgent(destination, aCircuit, friendsToInform);
             aCircuit.CachedUserInfo = args.CircuitData.CachedUserInfo;
             aCircuit.RegionUDPPort = args.CircuitData.RegionUDPPort;
 
@@ -1090,7 +1091,8 @@ namespace WhiteCore.Services
                                   LoginAgent(r, aCircuit, friendsToInform);
                 if (args.Success)
                 {
-                    aCircuit = MakeAgent(r, account, session, secureSession, circuitCode, position, clientIP);
+                    //aCircuit = MakeAgent(r, account, session, secureSession, circuitCode, position, clientIP);
+                    MakeAgent(r, account, session, secureSession, circuitCode, position, clientIP);
                     destination = r;
                     reason = args.Reason;
                     seedCap = args.SeedCap;
@@ -1180,28 +1182,24 @@ namespace WhiteCore.Services
 
         public AvatarAppearance WearFolder(AvatarAppearance avappearance, UUID user, UUID folderOwnerID)
         {
-            InventoryFolderBase Folder2Wear = m_InventoryService.GetFolderByOwnerAndName(folderOwnerID,
-                                                                                         m_forceUserToWearFolderName);
+            InventoryFolderBase Folder2Wear = m_InventoryService.GetFolderByOwnerAndName(folderOwnerID, m_forceUserToWearFolderName);
             if (Folder2Wear != null)
             {
                 List<InventoryItemBase> itemsInFolder = m_InventoryService.GetFolderItems(UUID.Zero, Folder2Wear.ID);
 
-                InventoryFolderBase appearanceFolder = m_InventoryService.GetFolderForType(user, InventoryType.Wearable,
-                                                                                           AssetType.Clothing);
-
-
+                InventoryFolderBase appearanceFolder = m_InventoryService.GetFolderForType(user, InventoryType.Wearable, FolderType.Clothing);
                 InventoryFolderBase folderForAppearance = new InventoryFolderBase(UUID.Random(), "GridWear", user, -1,
                                                                                   appearanceFolder.ID, 1);
                 List<InventoryFolderBase> userFolders = m_InventoryService.GetFolderFolders(user, appearanceFolder.ID);
                 bool alreadyThere = false;
                 List<UUID> items2RemoveFromAppearence = new List<UUID>();
                 List<UUID> toDelete = new List<UUID>();
+
                 foreach (InventoryFolderBase folder in userFolders)
                 {
                     if (folder.Name == folderForAppearance.Name)
                     {
-                        List<InventoryItemBase> itemsInCurrentFolder = m_InventoryService.GetFolderItems(UUID.Zero,
-                                                                                                         folder.ID);
+                        List<InventoryItemBase> itemsInCurrentFolder = m_InventoryService.GetFolderItems(UUID.Zero, folder.ID);
                         foreach (InventoryItemBase itemBase in itemsInCurrentFolder)
                         {
                             items2RemoveFromAppearence.Add(itemBase.AssetID);
@@ -1274,7 +1272,7 @@ namespace WhiteCore.Services
                                  doc.FirstChild.NextSibling.OuterXml.StartsWith("<groups>")))
                                 continue;
 
-                            string xml = "";
+                            string xml;
                             if ((doc.FirstChild.NodeType == XmlNodeType.XmlDeclaration) &&
                                 (doc.FirstChild.NextSibling != null))
                                 xml = doc.FirstChild.NextSibling.OuterXml;
@@ -1307,15 +1305,14 @@ namespace WhiteCore.Services
 
         public void FixCurrentOutFitFolder(UUID user, ref AvatarAppearance avappearance)
         {
-            InventoryFolderBase CurrentOutFitFolder = m_InventoryService.GetFolderForType(user, 0,
-                                                                                          AssetType.CurrentOutfitFolder);
+            InventoryFolderBase CurrentOutFitFolder = m_InventoryService.GetFolderForType(user, 0, FolderType.CurrentOutfit);
             if (CurrentOutFitFolder == null) return;
             List<InventoryItemBase> ic = m_InventoryService.GetFolderItems(user, CurrentOutFitFolder.ID);
             List<UUID> brokenLinks = new List<UUID>();
             List<UUID> OtherStuff = new List<UUID>();
             foreach (var i in ic)
             {
-                InventoryItemBase linkedItem = null;
+                InventoryItemBase linkedItem;
                 if ((linkedItem = m_InventoryService.GetItem(user, i.AssetID)) == null)
                     brokenLinks.Add(i.ID);
                 else if (linkedItem.ID == AvatarWearable.DEFAULT_EYES_ITEM ||
@@ -1336,7 +1333,7 @@ namespace WhiteCore.Services
                 {
                     if (!OtherStuff.Contains(wearable[ii].ItemID))
                     {
-                        InventoryItemBase linkedItem2 = null;
+                        InventoryItemBase linkedItem2;
                         if ((linkedItem2 = m_InventoryService.GetItem(user, wearable[ii].ItemID)) != null)
                         {
                             InventoryItemBase linkedItem3 = (InventoryItemBase) linkedItem2.Clone();
@@ -1363,7 +1360,7 @@ namespace WhiteCore.Services
                 {
                     if (!OtherStuff.Contains(attachment.ItemID))
                     {
-                        InventoryItemBase linkedItem2 = null;
+                        InventoryItemBase linkedItem2;
                         if ((linkedItem2 = m_InventoryService.GetItem(user, attachment.ItemID)) != null)
                         {
                             InventoryItemBase linkedItem3 = (InventoryItemBase) linkedItem2.Clone();

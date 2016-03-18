@@ -43,9 +43,7 @@ namespace WhiteCore.FileBasedServices.AssetService
         #region Declares
 
         protected bool doDatabaseCaching;
-        protected string m_connectionDNS = "localhost";
         protected string m_connectionPassword;
-
         protected bool m_doConversion;
         protected IAssetDataPlugin m_assetService;
         protected string m_assetsDirectory = "";
@@ -72,7 +70,7 @@ namespace WhiteCore.FileBasedServices.AssetService
             IConfig fileConfig = config.Configs ["FileBasedAssetService"];
             if (fileConfig != null)
             {
-                var assetFolderPath = fileConfig.GetString ("AssetFolderPath", "");
+                var assetFolderPath = fileConfig.GetString ("AssetFolderPath", m_assetsDirectory);
                 if (assetFolderPath == "")
                 {
                     var defpath = registry.RequestModuleInterface<ISimulationBase> ().DefaultDataPath;

@@ -38,7 +38,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Generics
             Version = new Version(0, 0, 4);
             MigrationName = "Generics";
 
-            schema = new List<SchemaDefinition>();
+            Schema = new List<SchemaDefinition>();
 
             AddSchema("generics", ColDefs(
                 ColDef("OwnerID", ColumnTypes.String36),

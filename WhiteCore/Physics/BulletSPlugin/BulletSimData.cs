@@ -29,7 +29,7 @@ using System.Collections.Generic;
 using System.Text;
 using OMV = OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     // Classes to allow some type checking for the API
     // These hold pointers to allocated objects in the unmanaged space.
@@ -112,12 +112,12 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
     {
         public BulletShape()
         {
-            type = BSPhysicsShapeType.SHAPE_UNKNOWN;
+            shapeType = BSPhysicsShapeType.SHAPE_UNKNOWN;
             shapeKey = (System.UInt64)FixedShapeKey.KEY_NONE;
             isNativeShape = false;
         }
 
-        public BSPhysicsShapeType type;
+        public BSPhysicsShapeType shapeType;
         public System.UInt64 shapeKey;
         public bool isNativeShape;
 
@@ -154,7 +154,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             buff.Append("<p=");
             buff.Append(AddrString);
             buff.Append(",s=");
-            buff.Append(type.ToString());
+            buff.Append(shapeType.ToString());
             buff.Append(",k=");
             buff.Append(shapeKey.ToString("X"));
             buff.Append(",n=");
@@ -193,7 +193,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
     //      than making copies.
     public class BulletHMapInfo
     {
-        public BulletHMapInfo(uint id, float[] hm)
+    	public BulletHMapInfo(uint id, float[] hm, float pSizeX, float pSizeY)
         {
             ID = id;
             heightMap = hm;
@@ -201,7 +201,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             minCoords = new OMV.Vector3(100f, 100f, 25f);
             maxCoords = new OMV.Vector3(101f, 101f, 26f);
             minZ = maxZ = 0f;
-            sizeX = sizeY = 256f;
+            sizeX = pSizeX;
+            sizeY = pSizeY;
         }
 
         public uint ID;
@@ -219,6 +220,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
     public enum CollisionType
     {
         Avatar,
+        PhantomToOthersAvatar, // An avatar that it phantom to other avatars but not to anything else
         Groundplane,
         Terrain,
         Static,
@@ -264,11 +266,18 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                         (uint) CollisionFilterGroups.BAllGroup)
                 },
                 {
+                    CollisionType.PhantomToOthersAvatar,
+                    new CollisionTypeFilterGroup(CollisionType.PhantomToOthersAvatar,
+                        (uint)CollisionFilterGroups.BCharacterGroup,
+                        (uint)(CollisionFilterGroups.BAllGroup & ~CollisionFilterGroups.BCharacterGroup))
+                },
+                {
                     CollisionType.Groundplane,
                     new CollisionTypeFilterGroup(CollisionType.Groundplane,
                         (uint) CollisionFilterGroups.BGroundPlaneGroup,
-                        (uint) CollisionFilterGroups.BAllGroup)
-                },
+                        //(uint) CollisionFilterGroups.BAllGroup)
+                        (uint)(CollisionFilterGroups.BCharacterGroup | CollisionFilterGroups.BSolidGroup))
+                 },
                 {
                     CollisionType.Terrain,
                     new CollisionTypeFilterGroup(CollisionType.Terrain,

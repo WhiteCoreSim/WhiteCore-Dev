@@ -42,120 +42,120 @@ namespace WhiteCore.Services
         IRegionClientCapsService m_service;
 
         // Configuration
-        static List<String> m_lastNames = new List<String>();
-        static List<String> m_fullNames = new List<String>();
+        static List<String> m_lastNames = new List<String> ();
+        static List<String> m_fullNames = new List<String> ();
 
 
         #region ICapsServiceConnector Members
 
-        public void RegisterCaps(IRegionClientCapsService service)
+        public void RegisterCaps (IRegionClientCapsService service)
         {
             m_service = service;
 
             // retrieve our god's if needed
             InitGodNames ();
 
-            m_service.AddStreamHandler("SimulatorFeatures",
-                                       new GenericStreamHandler("GET", m_service.CreateCAPS("SimulatorFeatures", ""),
-                                                                SimulatorFeaturesCAP));
+            m_service.AddStreamHandler ("SimulatorFeatures",
+                new GenericStreamHandler ("GET", m_service.CreateCAPS ("SimulatorFeatures", ""), SimulatorFeaturesCAP));
         }
 
-        public void DeregisterCaps()
+        public void DeregisterCaps ()
         {
-            m_service.RemoveStreamHandler("SimulatorFeatures", "GET");
+            m_service.RemoveStreamHandler ("SimulatorFeatures", "GET");
         }
 
-        public void EnteringRegion()
+        public void EnteringRegion ()
         {
         }
 
         #endregion
 
-        byte[] SimulatorFeaturesCAP(string path, Stream request,
-                                            OSHttpRequest httpRequest, OSHttpResponse httpResponse)
+        byte[] SimulatorFeaturesCAP (string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {
-            OSDMap data = new OSDMap();
+            OSDMap data = new OSDMap ();
             // 17-06-2015 Fly-Man- AvatarHoverHeight enabled
-            data["AvatarHoverHeightEnabled"] = true;
+            data ["AvatarHoverHeightEnabled"] = true;
             
             // 17-06-2015 Fly-Man- MaxMaterialsPerTransaction enabled
-            data["MaxMaterialsPerTransaction"] = 50;
+            data ["MaxMaterialsPerTransaction"] = 50;
             
-            data["MeshRezEnabled"] = true;
-            data["MeshUploadEnabled"] = true;
-            data["MeshXferEnabled"] = true;
-            data["PhysicsMaterialsEnabled"] = true;
+            data ["MeshRezEnabled"] = true;
+            data ["MeshUploadEnabled"] = true;
+            data ["MeshXferEnabled"] = true;
+            data ["PhysicsMaterialsEnabled"] = true;
 
-            OSDMap typesMap = new OSDMap();
+            OSDMap typesMap = new OSDMap ();
 
-            typesMap["convex"] = true;
-            typesMap["none"] = true;
-            typesMap["prim"] = true;
+            typesMap ["convex"] = true;
+            typesMap ["none"] = true;
+            typesMap ["prim"] = true;
 
-            data["PhysicsShapeTypes"] = typesMap;
+            data ["PhysicsShapeTypes"] = typesMap;
 
             // some additional features
-            data["god_names"] = GodNames(httpRequest);
+            data ["god_names"] = GodNames (httpRequest);
 
             //Send back data
-            return OSDParser.SerializeLLSDXmlBytes(data);
+            return OSDParser.SerializeLLSDXmlBytes (data);
         }
 
         #region helpers
 
-        void InitGodNames()
+        void InitGodNames ()
         {
             if (m_fullNames.Count > 0)
                 return;
             
-            IUserAccountService userService = m_service.Registry.RequestModuleInterface<IUserAccountService>();
-            var gods = userService.GetUserAccounts(null, "*");
+            IUserAccountService userService = m_service.Registry.RequestModuleInterface<IUserAccountService> ();
+            var gods = userService.GetUserAccounts (null, "*");
             foreach (UserAccount user in gods)
                 if (user.UserLevel >= Constants.USER_GOD_LIASON)
                 {
-                    m_lastNames.Add(user.LastName);
-                    m_fullNames.Add(user.Name);
+                    m_lastNames.Add (user.LastName);
+                    m_fullNames.Add (user.Name);
                 }
         }
 
-        OSDMap GodNames(OSHttpRequest httpRequest)
+        OSDMap GodNames (OSHttpRequest httpRequest)
         {
 
 
-            OSDMap namesmap = new OSDMap();
+            OSDMap namesmap = new OSDMap ();
             if (httpRequest.Query.ContainsKey ("god_names"))
             {
                 OSD nmap = httpRequest.Query ["god_names"].ToString ();
                 namesmap = (OSDMap)nmap;
             }
  
-            OSDArray fnames = new OSDArray();
-            foreach (string name in m_fullNames) {
-                fnames.Add(name);
+            OSDArray fnames = new OSDArray ();
+            foreach (string name in m_fullNames)
+            {
+                fnames.Add (name);
             }
-            namesmap["full_names"] = fnames;
+            namesmap ["full_names"] = fnames;
 
-            OSDArray lnames = new OSDArray();
-            foreach (string name in m_lastNames) {
-                lnames.Add(name);
+            OSDArray lnames = new OSDArray ();
+            foreach (string name in m_lastNames)
+            {
+                lnames.Add (name);
             }
-            namesmap["last_names"] = lnames;
+            namesmap ["last_names"] = lnames;
 
             return namesmap;
         }
 
-        void CameraOnllyModeRequest(OSHttpRequest httpRequest)
+        void CameraOnllyModeRequest (OSHttpRequest httpRequest)
         {
             //if (ShouldSend(m_service.AgentID,m_service.RegionID) && UserLevel(m_service.AgentID) <= m_UserLevel)
             //{
-            OSDMap extrasMap = new OSDMap();
+            OSDMap extrasMap = new OSDMap ();
             if (httpRequest.Query.ContainsKey ("OpenSimExtras"))
             {
                 OSD nmap = httpRequest.Query ["OpenSimExtras"].ToString ();
                 extrasMap = (OSDMap)nmap;
             }
 
-            extrasMap["camera-only-mode"] = OSDMap.FromString("true");
+            extrasMap ["camera-only-mode"] = OSDMap.FromString ("true");
 
             // TODO: Need to find out how this is determined  i.e. sent from viewer??
             // Detach agent attachments
@@ -164,7 +164,7 @@ namespace WhiteCore.Services
             //}
         }
 
-/*        void DetachAttachments(UUID agentID)
+        /*        void DetachAttachments(UUID agentID)
         {
             ScenePresence sp = m_scene.GetScenePresence(agentID);
             if ((sp.TeleportFlags & TeleportFlags.ViaLogin) != 0)

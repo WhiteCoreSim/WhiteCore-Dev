@@ -38,7 +38,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Asset
             Version = new Version(0, 0, 2);
             MigrationName = "Asset";
 
-            schema = new List<SchemaDefinition>();
+            Schema = new List<SchemaDefinition>();
 
             AddSchema("lslgenericdata", ColDefs(
                 ColDef("Token", ColumnTypes.String50),

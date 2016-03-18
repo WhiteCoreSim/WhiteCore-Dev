@@ -157,10 +157,6 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Assets
                      TypeAsset == AssetType.Texture ||
                      TypeAsset == AssetType.TextureTGA ||
                      TypeAsset == AssetType.Folder ||
-                     TypeAsset == AssetType.RootFolder ||
-                     TypeAsset == AssetType.LostAndFoundFolder ||
-                     TypeAsset == AssetType.SnapshotFolder ||
-                     TypeAsset == AssetType.TrashFolder ||
                      TypeAsset == AssetType.ImageJPEG ||
                      TypeAsset == AssetType.ImageTGA ||
                      TypeAsset == AssetType.LSLBytecode);
@@ -188,14 +184,12 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Assets
             case AssetType.Bodypart:            return "Bodypart";
             case AssetType.CallingCard:         return "CallingCard";
             case AssetType.Clothing:            return "Clothing";
-            case AssetType.CurrentOutfitFolder: return "CurrentOutfit";
             case AssetType.Gesture:             return "Gesture";
             case AssetType.Landmark:            return "Landmark";
             case AssetType.LSLText:             return "Script";
             case AssetType.Mesh:                return "Mesh";
             case AssetType.Notecard:            return "Notecard";
             case AssetType.Object:              return "Object";
-            case AssetType.SnapshotFolder:      return "Photo folder";
             case AssetType.Sound:               return "Sound";
             case AssetType.Texture:             return "Texture";
             case AssetType.TextureTGA:          return "TGA Texture";

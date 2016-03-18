@@ -1,43 +1,36 @@
 ##
-## How to set up Vivox Voice
+## How to set up your simulator to use Vivox Voice
 ##
 
 Jump to the section below that corresponds to your setup.
 
-## 
+##
 ## Standalone Setup
 ##
 
-In Config/Sim/Modules/VoiceModules.ini, you will find a section
-  with [Voice], you will need to comment (put a ;) in front of 
+In 'Config/Sim/Modules/VoiceModules.ini', you will find at the top the
+  [Voice] section. You will need to comment (put a ;) in front of
     Module = GenericVoice
 
-  and remove the comment (the ;) in front of 
+  and remove the comment (the ;) in front of
     Module = VivoxVoice
 
-  Disable the GenericVoice module 
-  [GenericVoice]
-    ;; This needs to be disabled if another voice module is being used!
-    Enabled = false
 
   then, you will go to the section [VivoxVoice], and you will put
   in the server information you have received from Vivox.
-  
+
   [VivoxVoice]
     ; vivox voice server
-    vivox_server = www.foobar.vivox.com
+    vivox_server = theServer.vivox.com
 
     ; vivox SIP URI
-    vivox_sip_uri = foobar.vivox.com
+    vivox_sip_uri = theServer.vivox.com
 
     ; vivox admin user name
-    vivox_admin_user = DeepThroat
+    vivox_admin_user = YourAssignedUserName
 
     ; vivox admin password
-    vivox_admin_password = VoiceG4te
-
-
-
+    vivox_admin_password = YourVivixAccountPassword
 
 
 
@@ -45,31 +38,46 @@ In Config/Sim/Modules/VoiceModules.ini, you will find a section
 ## Grid setup
 ##
 
-In Config/Grid/ServerConfiguration/Modules/VoiceModules.ini, you will find a section
-  with [Voice], you will need to comment (put a ;) in front of 
+In 'Config/Grid/ServerConfiguration/Modules/VoiceModules.ini', you will find at
+the top, the [Voice] section. You will need to comment (put a ;) in front of
     Module = GenericVoice
 
-  and remove the comment (the ;) in front of 
+  and remove the comment (the ;) in front of
     Module = VivoxVoice
-
-  Disable the GenericVoice module 
-  [GenericVoice]
-    ;; This needs to be disabled if another voice module is being used!
-    Enabled = false
 
   then, you will go to the section [VivoxVoice], and you will put
   in the server information you have received from Vivox.
 
   [VivoxVoice]
     ; vivox voice server
-    vivox_server = www.foobar.vivox.com
+    vivox_server = theServer.vivox.com
 
     ; vivox SIP URI
-    vivox_sip_uri = foobar.vivox.com
+    vivox_sip_uri = theServer.vivox.com
 
     ; vivox admin user name
-    vivox_admin_user = DeepThroat
+    vivox_admin_user = YourAssignedUserName
 
     ; vivox admin password
-    vivox_admin_password = VoiceG4te
+    vivox_admin_password = YourVivixAccountPassword
 
+##
+## Restart
+##
+
+When you restart your simulator (grid/standalone) you should see the Vivox connection
+  details similar to those shown below.
+
+ Dec 01 11:20:44 -  [BASE HTTP SERVER]: Starting HTTP server on port 8003
+ Dec 01 11:20:51 -  [BASE HTTP SERVER]: Starting HTTP server on port 8009
+ Dec 01 11:20:51 -  [VivoxVoice] Using Vivox for voice communications
+ Dec 01 11:20:51 -  [VivoxVoice] using vivox server www.osp.vivox.com
+ Dec 01 11:20:53 -  [VivoxVoice] Admin connection established
+ Dec 01 11:20:53 -  [VivoxVoice]: plugin enabled
+ Dec 01 11:20:53 -  [SMTP] Email enabled for Full service
+ Dec 01 11:20:53 -  [BASE HTTP SERVER]: Starting HTTP server on port 8011
+
+
+Rowan
+<greythane@gmail.com>
+December 2015

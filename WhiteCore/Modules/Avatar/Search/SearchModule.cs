@@ -32,6 +32,7 @@ using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.Packets;
 using WhiteCore.Framework.ClientInterfaces;
+using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
@@ -170,12 +171,10 @@ namespace WhiteCore.Modules.Search
         {
             if ((queryFlags & 1) != 0) //People query
             {
-                DirPeopleQuery (remoteClient, queryID, queryText, queryFlags,
-                    queryStart);
+                DirPeopleQuery (remoteClient, queryID, queryText, queryFlags, queryStart);
             } else if ((queryFlags & 32) != 0) //Events query
             {
-                DirEventsQuery (remoteClient, queryID, queryText, queryFlags,
-                    queryStart);
+                DirEventsQuery (remoteClient, queryID, queryText, queryFlags, queryStart);
             }
         }
 
@@ -296,11 +295,16 @@ namespace WhiteCore.Modules.Search
                 send (new T[0]);
                 return;
             }
+
+            //Split into sets of 10 packets
+            int count = Math.Min (10, packets.Count);
             int i = 0;
             while (i < packets.Count)
             {
-                int count = Math.Min (10, packets.Count);
-                //Split into sets of 10 packets
+                // check for remaining range
+                if ((i + count) > packets.Count)
+                    count = packets.Count - i;
+                
                 T[] data = packets.GetRange (i, count).ToArray ();
                 i += count;
                 if (data.Length != 0)
@@ -385,8 +389,8 @@ namespace WhiteCore.Modules.Search
                 if (DirectoryService == null)
                     return;
                 //Find all the land, use "0" for the flags so we get all land for sale, no price or area checking
-                List<DirLandReplyData> Landdata = DirectoryService.FindLandForSaleInRegion ("0", uint.MaxValue, 0, 0, 0,
-                                                      GR.RegionID);
+                List<DirLandReplyData> Landdata = DirectoryService.FindLandForSaleInRegion (
+                    "0", uint.MaxValue, 0, 0, 0, GR.RegionID);
 
                 int locX = 0;
                 int locY = 0;
@@ -440,8 +444,8 @@ namespace WhiteCore.Modules.Search
                 if (DirectoryService == null)
                     return;
                 //Find all the land, use "0" for the flags so we get all land for sale, no price or area checking
-                List<DirLandReplyData> Landdata = DirectoryService.FindLandForSale ("0", uint.MaxValue, 0, 0, 0,
-                                                      remoteClient.ScopeID);
+                List<DirLandReplyData> Landdata = DirectoryService.FindLandForSale (
+                    "0", uint.MaxValue, 0, 0, 0, remoteClient.ScopeID);
 
                 int locX = 0;
                 int locY = 0;
@@ -581,18 +585,19 @@ namespace WhiteCore.Modules.Search
         {
             if (QueryFlags == 64) //Agent Owned
             {
+                //Find all the user owned land
+                List<ExtendedLandData> parcels = DirectoryService.GetParcelByOwner (client.AgentId);
+            	
                 //Get all the parcels
-                client.SendPlacesQuery (DirectoryService.GetParcelByOwner (client.AgentId).ToArray (), QueryID,
-                    TransactionID);
+                client.SendPlacesQuery (parcels.ToArray (), QueryID, TransactionID);
             }
-            if (QueryFlags == 256) //Group Owned
+            else if (QueryFlags == 256) //Group Owned
             {
                 //Find all the group owned land
                 List<ExtendedLandData> parcels = DirectoryService.GetParcelByOwner (QueryID);
-
-                //Send if we have any parcels
-                if (parcels.Count != 0)
-                    client.SendPlacesQuery (parcels.ToArray (), QueryID, TransactionID);
+                
+                // Send all group owned parcels
+                client.SendPlacesQuery (parcels.ToArray (), QueryID, TransactionID);
             }
         }
 
@@ -668,8 +673,16 @@ namespace WhiteCore.Modules.Search
         {
             IConfig searchConfig = config.Configs ["Search"];
             if (searchConfig != null) //Check whether we are enabled
+            {
                 if (searchConfig.GetString ("SearchModule", Name) == Name)
                 m_SearchEnabled = true;
+            	MainConsole.Instance.Info ("[Search] Search Services are enabled");
+            }
+            else
+            {
+            	m_SearchEnabled = false;
+            	MainConsole.Instance.Info ("[Search] Not configured, disabling");
+            }
         }
 
         public void AddRegion (IScene scene)

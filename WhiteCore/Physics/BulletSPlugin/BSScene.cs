@@ -1,4 +1,4 @@
-﻿/*
+﻿    /*
  * Copyright (c) Contributors, http://opensimulator.org/, http://whitecore-sim.org
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
@@ -28,6 +28,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Nini.Config;
 using OpenMetaverse;
 using WhiteCore.Framework.Physics;
@@ -36,7 +37,7 @@ using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Utilities;
 using WhiteCore.Framework.SceneInfo;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public sealed class BSScene : PhysicsScene
     {
@@ -59,7 +60,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         public HashSet<BSPhysObject> ObjectsWithNoMoreCollisions = new HashSet<BSPhysObject>();
         // Keep track of all the avatars so we can send them a collision event
         //    every tick so WhiteCore will update its animation.
-        private HashSet<BSPhysObject> m_avatars = new HashSet<BSPhysObject>();
+        HashSet<BSPhysObject> m_avatars = new HashSet<BSPhysObject>();
 
         // let my minuions use my logger
         public ICommandConsole Logger
@@ -110,7 +111,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         public int SimulationNowTime { get; private set; }
 
         // True if initialized and ready to do simulation steps
-        private bool m_initialized = false;
+        bool m_initialized = false;
 
         // Flag which is true when processing taints.
         // Not guaranteed to be correct all the time (don't depend on this) but good for debugging.
@@ -152,22 +153,29 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         //   order before the simulation.
         public delegate void TaintCallback();
 
-        private struct TaintCallbackEntry
+        struct TaintCallbackEntry
         {
+            public String originator;
             public String ident;
             public TaintCallback callback;
-
-            public TaintCallbackEntry(string i, TaintCallback c)
+            public TaintCallbackEntry(string pIdent, TaintCallback pCallBack)
             {
-                ident = i;
-                callback = c;
+                originator = BSScene.DetailLogZero;
+                ident = pIdent;
+                callback = pCallBack;
+            }
+            public TaintCallbackEntry(string pOrigin, string pIdent, TaintCallback pCallBack)
+            {
+                originator = pOrigin;
+                ident = pIdent;
+                callback = pCallBack;
             }
         }
 
-        private Object _taintLock = new Object(); // lock for using the next object
-        private List<TaintCallbackEntry> _taintOperations;
-        private Dictionary<string, TaintCallbackEntry> _postTaintOperations;
-        private List<TaintCallbackEntry> _postStepOperations;
+        Object _taintLock = new Object(); // lock for using the next object
+        List<TaintCallbackEntry> _taintOperations;
+        Dictionary<string, TaintCallbackEntry> _postTaintOperations;
+        List<TaintCallbackEntry> _postStepOperations;
 
         // A pointer to an instance if this structure is passed to the C++ code
         // Used to pass basic configuration values to the unmanaged code.
@@ -175,12 +183,13 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         // Sometimes you just have to log everything.
         //public ICommandConsole PhysicsLogging;
-        private bool m_physicsLoggingEnabled;
-        private string m_physicsLoggingDir;
-        private string m_physicsLoggingPrefix;
-        private int m_physicsLoggingFileMinutes;
-        private bool m_physicsLoggingDoFlush;
-        private bool m_physicsPhysicalDumpEnabled;
+        bool m_physicsLoggingEnabled;
+        //string m_physicsLoggingDir;
+        //string m_physicsLoggingPrefix;
+        //int m_physicsLoggingFileMinutes;
+        //bool m_physicsLoggingDoFlush;
+        bool m_physicsPhysicalDumpEnabled;
+
         public int PhysicsMetricDumpFrames { get; set; }
         // 'true' of the vehicle code is to log lots of details
         public bool VehicleLoggingEnabled { get; private set; }
@@ -204,6 +213,10 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             PhysObjects = new Dictionary<uint, BSPhysObject>();
             Shapes = new BSShapeCollection(this);
 
+            // some identifiers
+            RegionName = scene.RegionInfo.RegionName;
+            PhysicsSceneName = RegionName;
+
             // Allocate pinned memory to pass parameters.
             UnmanagedParams = new ConfigurationParameters[1];
 
@@ -217,14 +230,14 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             // By creating an empty logger when not logging, the log message invocation code
             //     can be left in and every call doesn't have to check for null.
             /*if (m_physicsLoggingEnabled)
-        {
-            PhysicsLogging = new Logging.LogWriter(m_physicsLoggingDir, m_physicsLoggingPrefix, m_physicsLoggingFileMinutes);
-            PhysicsLogging.ErrorLogger = m_log; // for DEBUG. Let's the logger output error messages.
-        }
-        else
-        {
-            PhysicsLogging = new Logging.LogWriter();
-        }*/
+            {
+                PhysicsLogging = new Logging.LogWriter(m_physicsLoggingDir, m_physicsLoggingPrefix, m_physicsLoggingFileMinutes);
+                PhysicsLogging.ErrorLogger = m_log; // for DEBUG. Let's the logger output error messages.
+            }
+            else
+            {
+                PhysicsLogging = new Logging.LogWriter();
+            }*/
 
             // Allocate memory for returning of the updates and collisions from the physics engine
             m_collisionArray = new CollisionDesc[m_maxCollisionsPerFrame];
@@ -234,7 +247,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             //    a child in a mega-region.
             // Bullet actually doesn't care about the extents of the simulated
             //    area. It tracks active objects no matter where they are.
-            Vector3 worldExtent = new Vector3(Constants.RegionSize, Constants.RegionSize, Constants.RegionHeight);
+            Vector3 worldExtent = new Vector3(scene.RegionInfo.RegionSizeX, scene.RegionInfo.RegionSizeX, Constants.RegionHeight);
+           // Vector3 worldExtent = regionExtent;
 
             World = PE.Initialize(worldExtent, Params, m_maxCollisionsPerFrame, ref m_collisionArray,
                 m_maxUpdatesPerFrame, ref m_updateArray);
@@ -257,7 +271,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         // All default parameter values are set here. There should be no values set in the
         // variable definitions.
-        private void GetInitialParameterValues(IConfigSource config)
+        void GetInitialParameterValues(IConfigSource config)
         {
             ConfigurationParameters parms = new ConfigurationParameters();
             UnmanagedParams[0] = parms;
@@ -278,17 +292,19 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                     // Very detailed logging for physics debugging
                     // TODO: the boolean values can be moved to the normal parameter processing.
                     m_physicsLoggingEnabled = pConfig.GetBoolean("PhysicsLoggingEnabled", false);
+                    /* Unused...
                     m_physicsLoggingDir = pConfig.GetString("PhysicsLoggingDir", ".");
                     m_physicsLoggingPrefix = pConfig.GetString("PhysicsLoggingPrefix", "physics-%REGIONNAME%-");
                     m_physicsLoggingFileMinutes = pConfig.GetInt("PhysicsLoggingFileMinutes", 5);
                     m_physicsLoggingDoFlush = pConfig.GetBoolean("PhysicsLoggingDoFlush", false);
+                    */
                     m_physicsPhysicalDumpEnabled = pConfig.GetBoolean("PhysicsPhysicalDumpEnabled", false);
                     // Very detailed logging for vehicle debugging
                     VehicleLoggingEnabled = pConfig.GetBoolean("VehicleLoggingEnabled", false);
                     VehiclePhysicalLoggingEnabled = pConfig.GetBoolean("VehiclePhysicalLoggingEnabled", false);
 
                     // Do any replacements in the parameters
-                    m_physicsLoggingPrefix = m_physicsLoggingPrefix.Replace("%REGIONNAME%", RegionName);
+                    //m_physicsLoggingPrefix = m_physicsLoggingPrefix.Replace("%REGIONNAME%", RegionName);
                 }
 
                 // The material characteristics.
@@ -302,7 +318,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // A helper function that handles a true/false parameter and returns the proper float number encoding
-        private float ParamBoolean(IConfig config, string parmName, float deflt)
+        float ParamBoolean(IConfig config, string parmName, float deflt)
         {
             float ret = deflt;
             if (config.Contains(parmName))
@@ -320,7 +336,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // The main engine selection is the engineName up to the first hypen.
         // So "Bullet-2.80-OpenCL-Intel" specifies the 'bullet' class here and the whole name
         //     is passed to the engine to do its special selection, etc.
-        private BSAPITemplate SelectUnderlyingBulletEngine(string engineName)
+        BSAPITemplate SelectUnderlyingBulletEngine(string engineName)
         {
             // For the moment, do a simple switch statement.
             // Someday do fancyness with looking up the interfaces in the assembly.
@@ -349,8 +365,9 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
             else
             {
-                MainConsole.Instance.WarnFormat("{0} Selected bullet engine {1} -> {2}/{3}", LogHeader, engineName,
-                    ret.BulletEngineName, ret.BulletEngineVersion);
+                //MainConsole.Instance.WarnFormat("{0} Selected bullet engine {1} -> {2}/{3}", LogHeader, engineName,
+                //    ret.BulletEngineName, ret.BulletEngineVersion);
+                MainConsole.Instance.WarnFormat("{0} Selected bullet engine {1} -> {2}", LogHeader, engineName, ret.BulletEngineVersion);
             }
 
             return ret;
@@ -449,24 +466,6 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
-        public override void DeletePrim(PhysicsActor prim)
-        {
-            BSPrimLinkable linkablePrim = prim as BSPrimLinkable;
-            if (linkablePrim != null && linkablePrim.Linkset.HasAnyChildren)
-            {
-                linkablePrim.BlockPhysicalReconstruction = true;
-                //Remove all the children prims first, then kill the root
-                foreach (BSPrimLinkable childPrim in linkablePrim.Linkset.Children)
-                {
-                    childPrim.BlockPhysicalReconstruction = true;
-                    RemovePrim(childPrim);
-                }
-                //TODO: DISABLE LINKSET REBUILDING DURING THIS PROCESS
-            }
-
-            RemovePrim(prim);
-        }
-
         public override void RemovePrim(PhysicsActor prim)
         {
             if (!m_initialized) return;
@@ -521,11 +520,13 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             return new float[3] { 0, 0, DefaultGravityZ };
         }
 
+        //redundant??
         public override void SetGravityForce(bool enabled, float forceX, float forceY, float forceZ)
         {
             base.SetGravityForce(enabled, forceX, forceY, forceZ);
         }
 
+        //redundant??
         public override void AddGravityPoint(bool isApplyingForces, Vector3 position, float forceX, float forceY,
             float forceZ, float gravForce, float radius, int identifier)
         {
@@ -587,13 +588,13 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                     out collidersCount);
 
                 //if (PhysicsLogging.Enabled)
-                {
+                //{
                     StatContactLoopTime = Util.EnvironmentTickCountSubtract(beforeTime);
                     DetailLog(
                         "{0},Simulate,call, frame={1}, nTaints={2}, simTime={3}, substeps={4}, updates={5}, colliders={6}, objWColl={7}",
                         DetailLogZero, m_simulationStep, numTaints, StatContactLoopTime, numSubSteps,
                         updatedEntityCount, collidersCount, ObjectsWithCollisions.Count);
-                }
+                //}
             }
             catch (Exception e)
             {
@@ -688,7 +689,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // Something has collided
-        private void SendCollision(uint localID, uint collidingWith, Vector3 collidePoint, Vector3 collideNormal,
+        void SendCollision(uint localID, uint collidingWith, Vector3 collidePoint, Vector3 collideNormal,
             float penetration)
         {
             if (localID <= TerrainManager.HighestTerrainID)
@@ -748,6 +749,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             SimpleWaterLevel = (float)baseheight;
         }
 
+
         #endregion // Terrain
 
         public override Dictionary<uint, float> GetTopColliders()
@@ -774,6 +776,75 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             get { return false; }
         }
 
+        public static string PrimitiveBaseShapeToString(PrimitiveBaseShape pbs)
+        {
+            float pathShearX = pbs.PathShearX < 128 ? (float)pbs.PathShearX * 0.01f : (float)(pbs.PathShearX - 256) * 0.01f;
+            float pathShearY = pbs.PathShearY < 128 ? (float)pbs.PathShearY * 0.01f : (float)(pbs.PathShearY - 256) * 0.01f;
+            float pathBegin = (float)pbs.PathBegin * 2.0e-5f;
+            float pathEnd = 1.0f - (float)pbs.PathEnd * 2.0e-5f;
+            float pathScaleX = (float)(200 - pbs.PathScaleX) * 0.01f;
+            float pathScaleY = (float)(200 - pbs.PathScaleY) * 0.01f;
+            //float pathTaperX = pbs.PathTaperX * 0.01f;
+            //float pathTaperY = pbs.PathTaperY * 0.01f;
+
+            float profileBegin = (float)pbs.ProfileBegin * 2.0e-5f;
+            float profileEnd = 1.0f - (float)pbs.ProfileEnd * 2.0e-5f;
+            float profileHollow = (float)pbs.ProfileHollow * 2.0e-5f;
+            if (profileHollow > 0.95f)
+                profileHollow = 0.95f;
+
+            StringBuilder buff = new StringBuilder();
+            buff.Append("shape=");
+            buff.Append(((ProfileShape)pbs.ProfileShape).ToString());
+            buff.Append(",");
+            buff.Append("hollow=");
+            buff.Append(((HollowShape)pbs.HollowShape).ToString());
+            buff.Append(",");
+            buff.Append("pathCurve=");
+            buff.Append(((Extrusion)pbs.PathCurve).ToString());
+            buff.Append(",");
+            buff.Append("profCurve=");
+            buff.Append(((Extrusion)pbs.ProfileCurve).ToString());
+            buff.Append(",");
+            buff.Append("profHollow=");
+            buff.Append(profileHollow.ToString());
+            buff.Append(",");
+            buff.Append("pathBegEnd=");
+            buff.Append(pathBegin.ToString());
+            buff.Append("/");
+            buff.Append(pathEnd.ToString());
+            buff.Append(",");
+            buff.Append("profileBegEnd=");
+            buff.Append(profileBegin.ToString());
+            buff.Append("/");
+            buff.Append(profileEnd.ToString());
+            buff.Append(",");
+            buff.Append("scaleXY=");
+            buff.Append(pathScaleX.ToString());
+            buff.Append("/");
+            buff.Append(pathScaleY.ToString());
+            buff.Append(",");
+            buff.Append("shearXY=");
+            buff.Append(pathShearX.ToString());
+            buff.Append("/");
+            buff.Append(pathShearY.ToString());
+            buff.Append(",");
+            buff.Append("taperXY=");
+            buff.Append(pbs.PathTaperX.ToString());
+            buff.Append("/");
+            buff.Append(pbs.PathTaperY.ToString());
+            buff.Append(",");
+            buff.Append("skew=");
+            buff.Append(pbs.PathSkew.ToString());
+            buff.Append(",");
+            buff.Append("twist/Beg=");
+            buff.Append(pbs.PathTwist.ToString());
+            buff.Append("/");
+            buff.Append(pbs.PathTwistBegin.ToString());
+
+            return buff.ToString();
+        }
+
         #region Taints
 
         // The simulation execution order is:
@@ -789,36 +860,47 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // Calls to the PhysicsActors can't directly call into the physics engine
         //       because it might be busy. We delay changes to a known time.
         // We rely on C#'s closure to save and restore the context for the delegate.
-        public void TaintedObject(String ident, TaintCallback callback)
+        public void TaintedObject(string pOriginator, string pIdent, TaintCallback pCallback)
+        {
+            TaintedObject(false /*inTaintTime*/, pOriginator, pIdent, pCallback);
+        }
+        public void TaintedObject(uint pOriginator, String pIdent, TaintCallback pCallback)
+        {
+            TaintedObject(false /*inTaintTime*/, m_physicsLoggingEnabled ? pOriginator.ToString() : BSScene.DetailLogZero, pIdent, pCallback);
+        }
+        public void TaintedObject(bool inTaintTime, String pIdent, TaintCallback pCallback)
+        {
+            TaintedObject(inTaintTime, BSScene.DetailLogZero, pIdent, pCallback);
+        }
+        public void TaintedObject(bool inTaintTime, uint pOriginator, String pIdent, TaintCallback pCallback)
+        {
+            TaintedObject(inTaintTime, m_physicsLoggingEnabled ? pOriginator.ToString() : BSScene.DetailLogZero, pIdent, pCallback);
+        }
+        // Sometimes a potentially tainted operation can be used in and out of taint time.
+        // This routine executes the command immediately if in taint-time otherwise it is queued.
+        public void TaintedObject(bool inTaintTime, string pOriginator, string pIdent, TaintCallback pCallback)
         {
             if (!m_initialized) return;
 
-            lock (_taintLock)
-            {
-                _taintOperations.Add(new TaintCallbackEntry(ident, callback));
-            }
-
-            return;
-        }
-
-        // Sometimes a potentially tainted operation can be used in and out of taint time.
-        // This routine executes the command immediately if in taint-time otherwise it is queued.
-        public void TaintedObject(bool inTaintTime, string ident, TaintCallback callback)
-        {
             if (inTaintTime)
-                callback();
+                pCallback();
             else
-                TaintedObject(ident, callback);
+            {
+                lock (_taintLock)
+                {
+                    _taintOperations.Add(new TaintCallbackEntry(pOriginator, pIdent, pCallback));
+                }
+            }
         }
 
-        private void TriggerPreStepEvent(float timeStep)
+        void TriggerPreStepEvent(float timeStep)
         {
             PreStepAction actions = BeforeStep;
             if (actions != null)
                 actions(timeStep);
         }
 
-        private void TriggerPostStepEvent(float timeStep)
+        void TriggerPostStepEvent(float timeStep)
         {
             PostStepAction actions = AfterStep;
             if (actions != null)
@@ -834,7 +916,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             ProcessPostTaintTaints();
         }
 
-        private void ProcessRegularTaints()
+        void ProcessRegularTaints()
         {
             if (_taintOperations.Count > 0) // save allocating new list if there is nothing to process
             {
@@ -879,7 +961,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // Taints that happen after the normal taint processing but before the simulation step.
-        private void ProcessPostTaintTaints()
+        void ProcessPostTaintTaints()
         {
             if (_postTaintOperations.Count > 0)
             {
@@ -936,3 +1018,4 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         public const string DetailLogZero = "0000000000";
     }
 }
+

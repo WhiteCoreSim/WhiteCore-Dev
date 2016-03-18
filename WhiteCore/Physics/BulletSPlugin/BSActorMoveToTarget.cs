@@ -25,15 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Linq;
 using OMV = OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public class BSActorMoveToTarget : BSActor
     {
-        private BSVMotor m_targetMotor;
+        BSVMotor m_targetMotor;
 
         public BSActorMoveToTarget(BSScene physicsScene, BSPhysObject pObj, string actorName)
             : base(physicsScene, pObj, actorName)
@@ -54,6 +52,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         public override void Dispose()
         {
             Enabled = false;
+            DeactivateMoveToTarget();
         }
 
         // Called when physical parameters (properties set in Bullet) need to be re-applied.
@@ -91,7 +90,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // If a hover motor has not been created, create one and start the hovering.
-        private void ActivateMoveToTarget()
+        void ActivateMoveToTarget()
         {
             if (m_targetMotor == null)
             {
@@ -104,14 +103,17 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 m_targetMotor.Efficiency = 1f;
                 */
 
-                m_targetMotor = new BSVMotor("BSActorMoveToTarget-" + m_controllingPrim.LocalID.ToString(),
-                    m_controllingPrim.MoveToTargetTau, BSMotor.Infinite, 1f);
+                m_targetMotor = new BSVMotor("BSActorMoveToTarget-" + m_controllingPrim.LocalID,
+                    m_controllingPrim.MoveToTargetTau,       // timeScale
+                    BSMotor.Infinite,                        // decay time scale
+                    1f                                       // efficiency
+                );
                 m_targetMotor.PhysicsScene = m_physicsScene; // DEBUG DEBUG so motor will output detail log messages.
                 m_targetMotor.SetTarget(m_controllingPrim.MoveToTargetTarget);
                 m_targetMotor.SetCurrent(m_controllingPrim.RawPosition);
 
-                m_physicsScene.BeforeStep += Mover;
-                // m_phsyicsScene.BeforStep += Mover2; // Mover2 not possible with BulletSim 2.80
+                //m_physicsScene.BeforeStep += Mover;
+                m_physicsScene.BeforeStep += Mover2; 
             }
             else
             {
@@ -122,17 +124,21 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         }
 
-        private void DeactivateMoveToTarget()
+        void DeactivateMoveToTarget()
         {
             if (m_targetMotor != null)
             {
-                m_physicsScene.BeforeStep -= Mover;
+                //m_physicsScene.BeforeStep -= Mover;
+                m_physicsScene.BeforeStep -= Mover2;
                 m_targetMotor = null;
             }
         }
 
+        // Origional mover that set the objects position to move to the target.
+        // The problem was that gravity would keep trying to push the object down so
+        //    the overall downward velocity would increase to infinity.
         // Called just before the simulation step. Update the vertical position for hoverness.
-        private void Mover(float timeStep)
+        void Mover(float timeStep)
         {
             // Don't do hovering while the object is selected.
             if (!isActive)
@@ -149,12 +155,60 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 m_physicsScene.DetailLog("{0},BSPrim.PIDTarget,zeroMovement,movePos={1},pos={2},mass={3}",
                                         m_controllingPrim.LocalID, movePosition, m_controllingPrim.RawPosition, m_controllingPrim.Mass);
                 m_controllingPrim.ForcePosition = m_targetMotor.TargetValue;
+                m_controllingPrim.ForceVelocity = OMV.Vector3.Zero;
+                // Setting the position does not cause the physics engine to generate a property update. Force it.
+                m_physicsScene.PE.PushUpdate(m_controllingPrim.PhysBody);
             }
             else
             {
                 m_controllingPrim.ForcePosition = movePosition;
+                // Setting the position does not cause the physics engine to generate a property update. Force it.
+                m_physicsScene.PE.PushUpdate(m_controllingPrim.PhysBody);
             }
             m_physicsScene.DetailLog("{0},BSPrim.PIDTarget,move,fromPos={1},movePos={2}", m_controllingPrim.LocalID, origPosition, movePosition);
+        }
+
+        // Version of mover that applies forces to move the physical object to the target.
+        // Also overcomes gravity so the object doesn't just drop to the ground.
+        // Called just before the simulation step.
+        void Mover2(float timeStep)
+        {
+            // Don't do hovering while the object is selected.
+            if (!isActive)
+                return;
+
+            OMV.Vector3 origPosition = m_controllingPrim.RawPosition;     // DEBUG DEBUG (for printout below)
+            OMV.Vector3 addedForce = OMV.Vector3.Zero;
+
+            // CorrectionVector is the movement vector required this step
+            OMV.Vector3 correctionVector = m_targetMotor.Step(timeStep, m_controllingPrim.RawPosition);
+
+            // If we are very close to our target, turn off the movement motor.
+            if (m_targetMotor.ErrorIsZero())
+            {
+                m_physicsScene.DetailLog("{0},BSActorMoveToTarget.Mover3,zeroMovement,pos={1},mass={2}",
+                                        m_controllingPrim.LocalID, m_controllingPrim.RawPosition, m_controllingPrim.Mass);
+                m_controllingPrim.ForcePosition = m_targetMotor.TargetValue;
+                m_controllingPrim.ForceVelocity = OMV.Vector3.Zero;
+                // Setting the position does not cause the physics engine to generate a property update. Force it.
+                m_physicsScene.PE.PushUpdate(m_controllingPrim.PhysBody);
+            }
+            else
+            {
+                // First force to move us there -- the motor return a timestep scaled value.
+                addedForce = correctionVector / timeStep;
+                // Remove the existing velocity (only the moveToTarget force counts)
+                addedForce -= m_controllingPrim.RawVelocity;
+                // Overcome gravity. 
+                addedForce -= m_controllingPrim.Gravity;
+
+                // Add enough force to overcome the mass of the object
+                addedForce *= m_controllingPrim.Mass;
+
+                m_controllingPrim.AddAngularForce(addedForce, false /* pushForce */, true /* inTaintTime */);
+            }
+            m_physicsScene.DetailLog("{0},BSActorMoveToTarget.Mover3,move,fromPos={1},addedForce={2}",
+                                            m_controllingPrim.LocalID, origPosition, addedForce);
         }
     }
 }

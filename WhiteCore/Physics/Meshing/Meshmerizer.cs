@@ -39,7 +39,7 @@ using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.SceneInfo;
-using ZLib.Net;
+using ZLibNet;
 
 #if DEBUGING
 using PrimMesher;
@@ -70,12 +70,12 @@ namespace WhiteCore.Physics.Meshing
     {
         // Setting baseDir to a path will enable the dumping of raw files
         // raw files can be imported by blender so a visual inspection of the results can be done
-#if SPAM
-        const string baseDir = "rawFiles";
-#else
-        const string baseDir = null; //"rawFiles";
-#endif
+        #if SPAM
+            const string baseDir = "rawFiles";
+        #endif
 
+        // detailed debugging info
+        bool debugDetail = false;
         readonly bool cacheSculptMaps = true;
         bool cacheSculptAlphaMaps = true;
 
@@ -83,7 +83,7 @@ namespace WhiteCore.Physics.Meshing
         readonly bool UseMeshesPhysicsMesh;
 
         // prims with all dimensions smaller than this will have a bounding box mesh
-        float minSizeForComplexMesh = 0.15f;
+        float minSizeForComplexMesh = 0.2f;
 
         IJ2KDecoder m_j2kDecoder;
         List<List<Vector3>> mConvexHulls;
@@ -219,9 +219,7 @@ namespace WhiteCore.Physics.Meshing
                         }
                         zOut.Flush();
                         zOut.finish();
-                        //outMs.Seek(0, SeekOrigin.Begin);
 
-                        //byte[] decompressedBuf = outMs.GetBuffer();
                         byte[] decompressedBuf = outMs.ToArray();
 
                         decodedOsd = OSDParser.DeserializeLLSDBinary(decompressedBuf);
@@ -245,33 +243,22 @@ namespace WhiteCore.Physics.Meshing
         Mesh CreateMeshFromPrimMesher (string primName, PrimitiveBaseShape primShape, Vector3 size,
                                       float lod, ulong key)
         {
-            List<Coord> coords;
-            List<Face> faces;
+            Mesh mesh = null;
 
             if (primShape.SculptEntry)
             {
-                if (((SculptType)primShape.SculptType) == SculptType.Mesh)
+                if (((SculptType)primShape.SculptType & SculptType.Mesh) == SculptType.Mesh)
                 {
-                    if (!UseMeshesPhysicsMesh)
-                        return null;
-
-                    if (!GenerateFromPrimMeshData (primName, primShape, size, out coords, out faces))
-                        return null;
+                    if (UseMeshesPhysicsMesh)
+                        mesh = GenerateFromPrimMeshData (primName, primShape, size, key);
                 } else
                 {
-                    if (!GenerateFromPrimSculptData (primName, primShape, size, lod, out coords, out faces))
-                        return null;
+                    mesh = GenerateFromPrimSculptData (primName, primShape, size, lod, key);
                 }
             } else
             {
-                if (!GenerateFromPrimShapeData (primName, primShape, size, lod, out coords, out faces))
-                    return null;
+                mesh = GenerateFromPrimShapeData (primName, primShape, size, lod, key);
             }
-
-            Mesh mesh = new Mesh (key);
-            mesh.Set (coords, faces);
-            coords.Clear ();
-            faces.Clear ();
 
             return mesh;
         }
@@ -295,8 +282,7 @@ namespace WhiteCore.Physics.Meshing
 
             Vector3 posMax = new Vector3(0.5f, 0.5f, 0.5f);
             Vector3 posMin = new Vector3(-0.5f, -0.5f, -0.5f);
-            if (subMeshMap.ContainsKey("PositionDomain"))
-                //Optional, so leave the max and min values otherwise
+            if (subMeshMap.ContainsKey("PositionDomain"))                //Optional, so leave the max and min values otherwise
             {
                 posMax = ((OSDMap) subMeshMap["PositionDomain"])["Max"].AsVector3();
                 posMin = ((OSDMap) subMeshMap["PositionDomain"])["Min"].AsVector3();
@@ -330,19 +316,17 @@ namespace WhiteCore.Physics.Meshing
         }
 
         /// <summary>
-        /// Generate the co-ords and faces necessary to construct a mesh from the mesh data the accompanies a prim.
+        /// Generate a mesh from the mesh data the accompanies a prim.
         /// </summary>
         /// <param name="primName"></param>
         /// <param name="primShape"></param>
         /// <param name="size"></param>
-        /// <param name="coords">Coords are added to this list by the method.</param>
-        /// <param name="faces">Faces are added to this list by the method.</param>
-        /// <returns>true if coords and faces were successfully generated, false if not</returns>
-        bool GenerateFromPrimMeshData(string primName, PrimitiveBaseShape primShape, Vector3 size, 
-            out List<Coord> coords, out List<Face> faces)
+        /// <param name="key"></param> 
+        /// <returns>created mesh or null if invalid</returns>
+        Mesh GenerateFromPrimMeshData(string primName, PrimitiveBaseShape primShape, Vector3 size, ulong key)
         {
-            coords = new List<Coord> ();
-            faces = new List<Face> ();
+            var coords = new List<Coord> ();
+            var faces = new List<Face> ();
                      
             OSD meshOsd;
             mConvexHulls = null;
@@ -350,11 +334,14 @@ namespace WhiteCore.Physics.Meshing
 
             if (primShape.SculptData == null || primShape.SculptData.Length <= 0)
             {
+                // At the moment we can not log here since ODEPrim, for instance, ends up triggering this
+                // method twice - once before it has loaded sculpt data from the asset service and once afterwards.
+                // The first time will always call with unloaded SculptData if this needs to be uploaded.
                 //MainConsole.Instance.Error("[MESH]: asset data is zero length");
-                return false;
+                return null;
             }
 
-            long start = 0;
+            long start;
             using (MemoryStream data = new MemoryStream(primShape.SculptData))
             {
                 try
@@ -364,33 +351,35 @@ namespace WhiteCore.Physics.Meshing
                 catch (Exception e)
                 {
                     MainConsole.Instance.Error("[MESH]: Exception deserializing mesh asset header:" + e);
-                    return false;
+                    return null;
                 }
                 start = data.Position;
             }
 
             if (meshOsd is OSDMap)
             {
+                OSDMap physicsParms = null;
                 OSDMap map = (OSDMap)meshOsd;
-                OSDMap physicsParms = new OSDMap ();
-
-//               if (map.ContainsKey ("physics_cached"))
-//                {
-                    //                  OSD cachedMeshMap = map["physics_cached"]; // cached data from WhiteCore
-                    //                  Mesh cachedMesh = new Mesh(key);
-                    //                  cachedMesh.Deserialize(cachedMeshMap);
-                    //                  cachedMesh.WasCached = true;
-                    //                  return cachedMesh; //Return here, we found all of the info right here
-//                    return true;
-//                }
-                if (map.ContainsKey ("physics_shape"))
-                    physicsParms = (OSDMap)map ["physics_shape"];   // old asset format
-                else if (map.ContainsKey ("physics_mesh"))
-                    physicsParms = (OSDMap)map ["physics_mesh"];    // new asset format
-                else if (map.ContainsKey ("medium_lod"))
-                    physicsParms = (OSDMap)map ["medium_lod"];     // fallback to medium LOD mesh
-                else if (map.ContainsKey ("high_lod"))
-                    physicsParms = (OSDMap)map ["high_lod"];        // if all esle fails...
+                if (map.ContainsKey("physics_shape"))
+                {
+                    physicsParms = (OSDMap)map["physics_shape"]; // old asset format
+                    if (debugDetail) MainConsole.Instance.DebugFormat("[MESH]: prim='{0}': using 'physics_shape' mesh data", primName);
+                }
+                else if (map.ContainsKey("physics_mesh"))
+                {
+                    physicsParms = (OSDMap)map["physics_mesh"]; // new asset format
+                    if (debugDetail) MainConsole.Instance.DebugFormat("[MESH]: prim='{0}':using 'physics_mesh' mesh data", primName);
+                }
+                else if (map.ContainsKey("medium_lod"))
+                {
+                    physicsParms = (OSDMap)map["medium_lod"]; // if no physics mesh, try to fall back to medium LOD display mesh
+                    if (debugDetail) MainConsole.Instance.DebugFormat("[MESH]: prim='{0}':using 'medium_lod' mesh data", primName);
+                }
+                else if (map.ContainsKey("high_lod"))
+                {
+                    physicsParms = (OSDMap)map["high_lod"]; // if all else fails, use highest LOD display mesh and hope it works :)
+                    if (debugDetail) MainConsole.Instance.DebugFormat("[MESH]: prim='{0}':using 'high_lod' mesh data", primName);
+                }
 
                 if (map.ContainsKey ("physics_convex"))
                 { 
@@ -421,6 +410,13 @@ namespace WhiteCore.Physics.Meshing
                         {
                             convexBlock = convexBlockOsd as OSDMap;
 
+                            if (debugDetail)
+                            {
+                                string keys = "[Mesh]: keys found in convexBlock: ";
+                                foreach (KeyValuePair<string, OSD> kvp in convexBlock)
+                                    keys += "'" + kvp.Key + "' ";
+                                MainConsole.Instance.Debug(keys);
+                            }
                             Vector3 min = new Vector3 (-0.5f, -0.5f, -0.5f);
                             if (convexBlock.ContainsKey ("Min"))
                                 min = convexBlock ["Min"].AsVector3 ();
@@ -454,7 +450,7 @@ namespace WhiteCore.Physics.Meshing
                                 }
 
                                 mBoundingHull = boundingHull;
-                                MainConsole.Instance.DebugFormat ("[MESH]: prim '{0}': parsed bounding hull. nVerts={1}", primName, mBoundingHull.Count);
+                                if (debugDetail) MainConsole.Instance.DebugFormat ("[MESH]: prim '{0}': parsed bounding hull. nVerts={1}", primName, mBoundingHull.Count);
                             }
 
                             if (convexBlock.ContainsKey ("HullList"))
@@ -492,10 +488,10 @@ namespace WhiteCore.Physics.Meshing
                                 }
 
                                 mConvexHulls = hulls;
-                                MainConsole.Instance.DebugFormat ("[MESH]: prim '{0}': parsed hulls. nHulls '{1}'", primName, mConvexHulls.Count);
+                                if (debugDetail) MainConsole.Instance.DebugFormat ("[MESH]: prim '{0}': parsed hulls. nHulls '{1}'", primName, mConvexHulls.Count);
                             } else
                             {
-                                MainConsole.Instance.DebugFormat ("[MESH]: prim '{0}' has physics_convex but no HullList", primName);
+                                if (debugDetail) MainConsole.Instance.DebugFormat ("[MESH]: prim '{0}' has physics_convex but no HullList", primName);
                             }
                         }
                     } catch (Exception e)
@@ -507,14 +503,14 @@ namespace WhiteCore.Physics.Meshing
                 if (physicsParms == null)
                 {
                     MainConsole.Instance.WarnFormat ("[MESH]: No recognised physics mesh found in mesh asset for {0}", primName);
-                    return  false;
+                    return  null;
                 }
 
                 int physOffset = physicsParms ["offset"].AsInteger () + (int)start;
                 int physSize = physicsParms ["size"].AsInteger ();
 
                 if (physOffset < 0 || physSize == 0)
-                    return false; // no mesh data in asset
+                    return null; // no mesh data in asset
 
                 var decodedMeshOsd = new OSD ();
                 var meshBytes = new byte[physSize];
@@ -526,7 +522,7 @@ namespace WhiteCore.Physics.Meshing
                 } catch (Exception e)
                 {
                     MainConsole.Instance.ErrorFormat ("[MESH]: prim: '{0}', exception decoding physical mesh: {1}", primName, e);
-                    return false;
+                    return null;
                 }
 
                 OSDArray decodedMeshOsdArray = null;
@@ -540,31 +536,36 @@ namespace WhiteCore.Physics.Meshing
                         if (subMeshOsd is OSDMap)
                             AddSubMesh (subMeshOsd as OSDMap, size, coords, faces);
                     }
-                    MainConsole.Instance.DebugFormat ("[MESH]: {0}: mesh decoded. offset={1}, size={2}, nCoords={3}, nFaces={4}",
-                        primName, physOffset, physSize, coords.Count, faces.Count);
+										if (debugDetail) 
+                        MainConsole.Instance.DebugFormat ("[MESH]: {0}: mesh decoded. offset={1}, size={2}, nCoords={3}, nFaces={4}",
+                            primName, physOffset, physSize, coords.Count, faces.Count);
                 }
             }
         
-            return true;
+            Mesh mesh = new Mesh(key);
+            mesh.Set(coords, faces);
+            // This is probably wher we should process convexhulls etc. - greythane - Sep 2015
+            coords.Clear();
+            faces.Clear();
+
+            // debug info only
+            //Console.Write ("M");
+            return mesh;
 
         }
 
 
         /// <summary>
-        /// Generate the co-ords and faces necessary to construct a mesh from the sculpt data the accompanies a prim.
+        /// Generate a mesh from the sculpt data the accompanies a prim.
         /// </summary>
         /// <param name="primName"></param>
         /// <param name="primShape"></param>
         /// <param name="size"></param>
         /// <param name="lod"></param>
-        /// <param name="coords">Coords are added to this list by the method.</param>
-        /// <param name="faces">Faces are added to this list by the method.</param>
-        /// <returns>true if coords and faces were successfully generated, false if not</returns>
-        bool GenerateFromPrimSculptData(string primName, PrimitiveBaseShape primShape, Vector3 size, float lod,
-            out List<Coord> coords, out List<Face> faces)
+        /// <param name="key"></param> 
+        /// <returns>created mesh or null if invalid</returns>
+        Mesh GenerateFromPrimSculptData(string primName, PrimitiveBaseShape primShape, Vector3 size, float lod, ulong key)
         {
-            coords = new List<Coord> ();
-            faces = new List<Face> ();
             SculptMesh sculptMesh;
             Image idata = null;
             string decodedSculptFileName = "";
@@ -592,7 +593,7 @@ namespace WhiteCore.Physics.Meshing
             if (idata == null)
             {
                 if (primShape.SculptData == null || primShape.SculptData.Length == 0)
-                    return false;
+                    return null;
 
                 try
                 {
@@ -616,18 +617,18 @@ namespace WhiteCore.Physics.Meshing
                     MainConsole.Instance.Error (
                         "[PHYSICS]: OpenJpeg is not installed correctly on this system. Physics Proxy generation failed.\n" +
                         "Often times this is because of an old version of GLIBC.  You must have version 2.4 or above!");
-                    return false;
+                    return null;
                 } catch (IndexOutOfRangeException)
                 {
                     MainConsole.Instance.Error (
                         "[PHYSICS]: OpenJpeg was unable to decode this. Physics Proxy generation failed");
-                    return false;
+                    return null;
                 } catch (Exception ex)
                 {
                     MainConsole.Instance.Error (
                         "[PHYSICS]: Unable to generate a Sculpty physics proxy. Sculpty texture decode failed: " +
                         ex);
-                    return false;
+                    return null;
                 }
             }
 
@@ -655,39 +656,45 @@ namespace WhiteCore.Physics.Meshing
             bool invert = ((primShape.SculptType & 64) != 0);
 
             if (idata == null)
-                return false;
+                return null;
 
             sculptMesh = new SculptMesh ((Bitmap)idata, sculptType, (int)lod, false, mirror, invert);
 
             idata.Dispose ();
-
-            sculptMesh.DumpRaw (baseDir, primName, "primMesh");
+            #if SPAM
+                sculptMesh.DumpRaw (baseDir, primName, "primMesh");
+            #endif
 
             sculptMesh.Scale (size.X, size.Y, size.Z);
 
-            coords = sculptMesh.coords;
-            faces = sculptMesh.faces;
+            var coords = sculptMesh.coords;
+            var faces = sculptMesh.faces;
 
-            return true;
+            Mesh mesh = new Mesh(key);
+            mesh.Set(coords, faces);
+            coords.Clear();
+            faces.Clear();
+
+            // debug info only
+            //Console.Write ("S");
+
+            return mesh;
         }
 
 
 
         /// <summary>
-        /// Generate the co-ords and faces necessary to construct a mesh from the shape data the accompanies a prim.
+        /// Generate a mesh from the shape data the accompanies a prim.
         /// </summary>
         /// <param name="primName"></param>
         /// <param name="primShape"></param>
         /// <param name="size"></param>
-        /// <param name="coords">Coords are added to this list by the method.</param>
-        /// <param name="faces">Faces are added to this list by the method.</param>
-        /// <returns>true if coords and faces were successfully generated, false if not</returns>
-        bool GenerateFromPrimShapeData(string primName, PrimitiveBaseShape primShape, Vector3 size,
-            float lod, out List<Coord> coords, out List<Face> faces)
+        /// <param name="key"></param> 
+        /// <returns>created mesh or null if invalid</returns>
+        Mesh GenerateFromPrimShapeData(string primName, PrimitiveBaseShape primShape, Vector3 size, float lod, ulong key)
         {
             PrimMesh primMesh;
-            coords = new List<Coord>();
-            faces = new List<Face>();            
+
             float pathShearX = primShape.PathShearX < 128
                 ? primShape.PathShearX * 0.01f
                 : (primShape.PathShearX - 256) * 0.01f;
@@ -695,23 +702,136 @@ namespace WhiteCore.Physics.Meshing
                 ? primShape.PathShearY * 0.01f
                 : (primShape.PathShearY - 256) * 0.01f;
             float pathBegin = primShape.PathBegin * 2.0e-5f;
-            float pathEnd = 1.0f - primShape.PathEnd * 2.0e-5f;
+            float pathEnd = 1.0f - (primShape.PathEnd * 2.0e-5f);
             float pathScaleX = (primShape.PathScaleX - 100) * 0.01f;
             float pathScaleY = (primShape.PathScaleY - 100) * 0.01f;
 
             float profileBegin = primShape.ProfileBegin * 2.0e-5f;
-            float profileEnd = 1.0f - primShape.ProfileEnd * 2.0e-5f;
+            float profileEnd = 1.0f - (primShape.ProfileEnd * 2.0e-5f);
             float profileHollow = primShape.ProfileHollow * 2.0e-5f;
             if (profileHollow > 0.95f)
             {
                 if (profileHollow > 0.99f)
                     profileHollow = 0.99f;
-                float sizeX = primShape.Scale.X - (primShape.Scale.X*profileHollow);
-                if (sizeX < 0.1f)                           //If its > 0.1, its fine to mesh at the small hollow
-                    profileHollow = 0.95f + (sizeX/2);      //Scale the rest by how large the size of the prim is
+                float sizeX = primShape.Scale.X - (primShape.Scale.X * profileHollow);
+                if (sizeX < 0.1f)                             // If its > 0.1, its fine to mesh at the small hollow
+                    profileHollow = 0.95f + (sizeX / 2);      // Scale the rest by how large the size of the prim is
             }
 
-            int sides = 4;
+            int sides = 4;          // assume the prim is square
+            switch ((primShape.ProfileCurve & 0x07))
+            {
+            case (byte) ProfileShape.EquilateralTriangle:
+                sides = 3;
+                break;
+            case (byte) ProfileShape.Circle:
+                sides = GetLevelOfDetail(lod);
+                break;
+            case (byte) ProfileShape.HalfCircle:
+                sides = GetLevelOfDetail(lod);
+                profileBegin = (0.5f * profileBegin) + 0.5f;
+                profileEnd = (0.5f * profileEnd) + 0.5f;
+                break;  
+            }
+
+            int hollowSides = sides;
+            switch (primShape.HollowShape)
+            {
+            case HollowShape.Circle:
+                hollowSides = GetLevelOfDetail(lod);
+                break; 
+            case HollowShape.Square:
+                hollowSides = 4;
+                break;
+            case HollowShape.Triangle:
+                hollowSides = 3;
+                break;
+            }
+                
+            primMesh = new PrimMesh(sides, profileBegin, profileEnd, profileHollow, hollowSides);
+
+            if ( (primMesh.errorMessage != null) && (primMesh.errorMessage.Length > 0) )
+                MainConsole.Instance.Error("[ERROR] " + primMesh.errorMessage);
+
+            primMesh.topShearX = pathShearX;
+            primMesh.topShearY = pathShearY;
+            primMesh.pathCutBegin = pathBegin;
+            primMesh.pathCutEnd = pathEnd;
+
+            if (primShape.PathCurve == (byte)Extrusion.Straight || primShape.PathCurve == (byte)Extrusion.Flexible)
+            {
+                primMesh.twistBegin = (primShape.PathTwistBegin * 18) / 10;
+                primMesh.twistEnd = (primShape.PathTwist * 18) / 10;
+                primMesh.taperX = pathScaleX;
+                primMesh.taperY = pathScaleY;
+
+                #if SPAM
+                    MainConsole.Instance.Debug("****** PrimMesh Parameters (Linear) ******\n" + primMesh.ParamsToDisplayString());
+                #endif
+                try
+                {
+                    primMesh.Extrude (primShape.PathCurve == (byte)Extrusion.Straight
+                        ? PathType.Linear
+                        : PathType.Flexible);
+                } catch (Exception ex)
+                {
+                    ReportPrimError ("Extrusion failure: exception: " + ex, primName, primMesh);
+                    return null;
+                }
+            } else
+            {
+                primMesh.holeSizeX = (200 - primShape.PathScaleX) * 0.01f;
+                primMesh.holeSizeY = (200 - primShape.PathScaleY) * 0.01f;
+                primMesh.radius = 0.01f * primShape.PathRadiusOffset;
+                primMesh.revolutions = 1.0f + (primShape.PathRevolutions * 0.015f);
+                primMesh.skew = 0.01f * primShape.PathSkew;
+                primMesh.twistBegin = (primShape.PathTwistBegin * 36) / 10;
+                primMesh.twistEnd = (primShape.PathTwist * 36) / 10;
+                primMesh.taperX = primShape.PathTaperX * 0.01f;
+                primMesh.taperY = primShape.PathTaperY * 0.01f;
+
+               #if SPAM
+                    MainConsole.Instance.Debug("****** PrimMesh Parameters (Circular) ******\n" + primMesh.ParamsToDisplayString());
+                #endif
+                try
+                {
+                    primMesh.Extrude (PathType.Circular);
+                } catch (Exception ex)
+                {
+                    ReportPrimError ("Extrusion failure: exception: " + ex, primName, primMesh);
+                    return null;
+                }
+            }
+
+            #if SPAM
+                debugprimMesh.DumpRaw(baseDir, primName, "primMesh");
+            #endif
+
+            primMesh.Scale(size.X, size.Y, size.Z);
+
+            var coords = primMesh.coords;
+            var faces = primMesh.faces;
+
+            Mesh mesh = new Mesh(key);
+            mesh.Set(coords, faces);
+            coords.Clear();
+            faces.Clear();
+
+            // debug info only
+            //Console.Write ("P");
+
+            return mesh;
+        }
+
+
+        /// <summary>
+        /// Gets the level of detail for circles.
+        /// </summary>
+        /// <returns>The level of detail.</returns>
+        /// <param name="lod">Lod.</param>
+        int GetLevelOfDetail(float lod)
+        {
+            int sides;
 
             // defaults for LOD
             LevelOfDetail iLOD = (LevelOfDetail)lod;
@@ -734,133 +854,7 @@ namespace WhiteCore.Physics.Meshing
                 break;
             }
 
-            switch ((primShape.ProfileCurve & 0x07))
-            {
-            case (byte) ProfileShape.EquilateralTriangle:
-                sides = 3;
-                break;
-            case (byte) ProfileShape.Circle:
-                break;      // use lod set above
-            case (byte) ProfileShape.HalfCircle:
-                profileBegin = 0.5f * profileBegin + 0.5f;
-                profileEnd = 0.5f * profileEnd + 0.5f;
-                break;      // use lod already set and...
-            }
-
-            int hollowSides = sides;
-            // default lod for hollows
-            switch (iLOD)
-            {    
-            case LevelOfDetail.High:
-                hollowSides = 24;
-                break;
-            case LevelOfDetail.Medium:
-                hollowSides = 12;
-                break;
-            case LevelOfDetail.Low:
-                hollowSides = 6;
-                break;
-            case LevelOfDetail.VeryLow:
-                hollowSides = 3;
-                break;
-            default:
-                hollowSides = 24;
-                break;
-            }
-
-            switch (primShape.HollowShape)
-            {
-            case HollowShape.Circle:
-                //hollowSides = 24;
-                break; // use lod preset
-            case HollowShape.Square:
-                hollowSides = 4;
-                break;
-            case HollowShape.Triangle:
-                hollowSides = 3;
-                break;
-            }
-
-            primMesh = new PrimMesh(sides, profileBegin, profileEnd, profileHollow, hollowSides);
-
-            if (primMesh.errorMessage != null)
-            if (primMesh.errorMessage.Length > 0)
-                MainConsole.Instance.Error("[ERROR] " + primMesh.errorMessage);
-
-            primMesh.topShearX = pathShearX;
-            primMesh.topShearY = pathShearY;
-            primMesh.pathCutBegin = pathBegin;
-            primMesh.pathCutEnd = pathEnd;
-
-            if (primShape.PathCurve == (byte)Extrusion.Straight || primShape.PathCurve == (byte)Extrusion.Flexible)
-            {
-                primMesh.twistBegin = primShape.PathTwistBegin * 18 / 10;
-                primMesh.twistEnd = primShape.PathTwist * 18 / 10;
-                primMesh.taperX = pathScaleX;
-                primMesh.taperY = pathScaleY;
-
-                if (profileBegin < 0.0f || profileBegin >= profileEnd || profileEnd > 1.0f)
-                {
-                    ReportPrimError ("*** CORRUPT PRIM!! ***", primName, primMesh);
-                    if (profileBegin < 0.0f)
-                        profileBegin = 0.0f;
-                    if (profileEnd > 1.0f)
-                        profileEnd = 1.0f;
-                }
-#if SPAM
-                MainConsole.Instance.Debug("****** PrimMesh Parameters (Linear) ******\n" + primMesh.ParamsToDisplayString());
-#endif
-                try
-                {
-                    primMesh.Extrude (primShape.PathCurve == (byte)Extrusion.Straight
-                        ? PathType.Linear
-                        : PathType.Flexible);
-                } catch (Exception ex)
-                {
-                    ReportPrimError ("Extrusion failure: exception: " + ex, primName, primMesh);
-                    return false;
-                }
-            } else
-            {
-                primMesh.holeSizeX = (200 - primShape.PathScaleX) * 0.01f;
-                primMesh.holeSizeY = (200 - primShape.PathScaleY) * 0.01f;
-                primMesh.radius = 0.01f * primShape.PathRadiusOffset;
-                primMesh.revolutions = 1.0f + 0.015f * primShape.PathRevolutions;
-                primMesh.skew = 0.01f * primShape.PathSkew;
-                primMesh.twistBegin = primShape.PathTwistBegin * 36 / 10;
-                primMesh.twistEnd = primShape.PathTwist * 36 / 10;
-                primMesh.taperX = primShape.PathTaperX * 0.01f;
-                primMesh.taperY = primShape.PathTaperY * 0.01f;
-
-                if (profileBegin < 0.0f || profileBegin >= profileEnd || profileEnd > 1.0f)
-                {
-                    ReportPrimError ("*** CORRUPT PRIM!! ***", primName, primMesh);
-                    if (profileBegin < 0.0f)
-                        profileBegin = 0.0f;
-                    if (profileEnd > 1.0f)
-                        profileEnd = 1.0f;
-                }
-#if SPAM
-                MainConsole.Instance.Debug("****** PrimMesh Parameters (Circular) ******\n" + primMesh.ParamsToDisplayString());
-#endif
-                try
-                {
-                    primMesh.Extrude (PathType.Circular);
-                } catch (Exception ex)
-                {
-                    ReportPrimError ("Extrusion failure: exception: " + ex, primName, primMesh);
-                    return false;
-                }
-            }
-
-            primMesh.DumpRaw(baseDir, primName, "primMesh");
-
-            primMesh.Scale(size.X, size.Y, size.Z);
-
-            coords = primMesh.coords;
-            faces = primMesh.faces;
-
-            return true;
+            return sides;
         }
 
         /// <summary>
@@ -902,27 +896,24 @@ namespace WhiteCore.Physics.Meshing
             return hulls;
         }
 
-        public void RemoveMesh(ulong key)
+        // Main mesh creation entry point
+        public IMesh CreateMesh(String primName, PrimitiveBaseShape primShape, Vector3 size, float lod, bool isPhysical, bool shouldCache)
         {
-        }
-
-        public IMesh CreateMesh(String primName, PrimitiveBaseShape primShape, Vector3 size, float lod)
-        {
-            return CreateMesh(primName, primShape, size, lod, false);
-        }
-
-        public IMesh CreateMesh(String primName, PrimitiveBaseShape primShape, Vector3 size, float lod, bool isPhysical)
-        {
+#if SPAM
+            MainConsole.Instance.DebugFormat("[MESH]: Creating mesh for {0}", primName);
+#endif
             Mesh mesh;
             ulong key = primShape.GetMeshKey(size, lod);
 
-            // If this mesh has been created already, return it instead of creating another copy
-            lock (m_uniqueMeshes)
+            // If caching and this mesh has been created already, return it instead of creating another copy
+            if (shouldCache)
             {
-                if (m_uniqueMeshes.TryGetValue(key, out mesh))
-                    return mesh;
+                lock (m_uniqueMeshes)
+                {
+                    if (m_uniqueMeshes.TryGetValue(key, out mesh))
+                        return mesh;
+                }
             }
-
             // set miniumm sizes
             if (size.X < 0.01f) size.X = 0.01f;
             if (size.Y < 0.01f) size.Y = 0.01f;
@@ -933,12 +924,14 @@ namespace WhiteCore.Physics.Meshing
             else
                 mesh = CreateMeshFromPrimMesher(primName, primShape, size, lod, key);
 
-            // cache newly created mesh's
-            lock (m_uniqueMeshes)
+            // cache newly created mesh?
+            if (shouldCache)
             {
-                m_uniqueMeshes.Add(key, mesh);
+                lock (m_uniqueMeshes)
+                {
+                    m_uniqueMeshes.Add(key, mesh);
+                }
             }
-
             return mesh;
         }
     }

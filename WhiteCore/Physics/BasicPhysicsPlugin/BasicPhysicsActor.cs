@@ -53,6 +53,7 @@ namespace WhiteCore.Physics.BasicPhysicsPlugin
         public override int PhysicsActorType
         {
             get { return (int) ActorTypes.Agent; }
+            set { return; }
         }
 
         public override Vector3 RotationalVelocity { get; set; }
@@ -66,6 +67,10 @@ namespace WhiteCore.Physics.BasicPhysicsPlugin
         public override uint LocalID
         {
             get { return 0; }
+            set { return; }
+        }
+
+        public override bool Grabbed {
             set { return; }
         }
 
@@ -108,6 +113,11 @@ namespace WhiteCore.Physics.BasicPhysicsPlugin
             get { return 0f; }
         }
 
+        public override bool Kinematic {
+            get { return false; }
+            set { return; }
+        }
+
         public override Vector3 Force
         {
             get { return Vector3.Zero; }
@@ -142,14 +152,19 @@ namespace WhiteCore.Physics.BasicPhysicsPlugin
             return false;
         }
 
-        public override void AddCollisionEvent(uint CollidedWith, ContactPoint contact)
+        public override void AddCollisionEvent(uint collidedWith, ContactPoint contact)
         {
         }
     }
 
     public class BasicObjectActor : PhysicsActor
     {
-        private Vector3 _size;
+        Vector3 _size;
+
+        public override bool Grabbed
+        {
+            set { return; }
+        }
 
         public override bool Selected
         {
@@ -158,7 +173,8 @@ namespace WhiteCore.Physics.BasicPhysicsPlugin
 
         public override int PhysicsActorType
         {
-            get { return (int) ActorTypes.Agent; }
+            get { return (int) ActorTypes.Agent; } 
+            set { return; }
         }
 
         public override Vector3 RotationalVelocity { get; set; }
@@ -182,6 +198,11 @@ namespace WhiteCore.Physics.BasicPhysicsPlugin
 
         public override bool IsPhysical
         {
+            get { return false; }
+            set { return; }
+        }
+
+        public override bool Kinematic {
             get { return false; }
             set { return; }
         }
@@ -278,7 +299,7 @@ namespace WhiteCore.Physics.BasicPhysicsPlugin
             return false;
         }
 
-        public override void AddCollisionEvent(uint CollidedWith, ContactPoint contact)
+        public override void AddCollisionEvent(uint collidedWith, ContactPoint contact)
         {
         }
     }

@@ -33,7 +33,7 @@ namespace WhiteCore.BotManager.AStar
     /// <summary>
     ///     Test class for doing A* path finding on a 2D map.
     /// </summary>
-    internal class MainClass
+    class MainClass
     {
         #region Test Maps
 
@@ -98,15 +98,15 @@ namespace WhiteCore.BotManager.AStar
         /// <summary>
         ///     Prints the solution
         /// </summary>
-        /// <param name="ASolution">The list that holds the solution</param>
-        public static void PrintSolution(ArrayList ASolution)
+        /// <param name="aSolution">The list that holds the solution</param>
+        public static void PrintSolution(ArrayList aSolution)
         {
             for (int j = 0; j < 10; j++)
             {
                 for (int i = 0; i < 10; i++)
                 {
                     bool solution = false;
-                    foreach (AStarNode2D n in ASolution)
+                    foreach (AStarNode2D n in aSolution)
                     {
                         AStarNode2D tmp = new AStarNode2D(null, null, 0, i, j);
                         solution = n.IsSameState(tmp);

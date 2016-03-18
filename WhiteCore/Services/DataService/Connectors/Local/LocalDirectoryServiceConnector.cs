@@ -40,6 +40,7 @@ using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Profile;
 using WhiteCore.Framework.Utilities;
+
 using EventFlags = OpenMetaverse.DirectoryManager.EventFlags;
 using GridRegion = WhiteCore.Framework.Services.GridRegion;
 
@@ -112,39 +113,32 @@ namespace WhiteCore.Services.DataService
                 GD.Delete(m_SearchParcelTable, new QueryFilter { orFilters = OrFilters });
             }
 
-            List<object[]> insertValues = parcels.Select(args => new List<object>
-                                                                     {
-                                                                         args.RegionID,
-                                                                         args.GlobalID,
-                                                                         args.LocalID,
-                                                                         args.UserLocation.X,       // this is actually the landing position for teleporting
-                                                                         args.UserLocation.Y,
-                                                                         args.UserLocation.Z,
-                                                                         args.Name,
-                                                                         args.Description,
-                                                                         args.Flags,
-                                                                         args.Dwell,
-                                                                         UUID.Zero,                 // infoUUID - not used?
-                                                                         ((args.Flags & (uint) ParcelFlags.ForSale) ==
-                                                                          (uint) ParcelFlags.ForSale)
-                                                                             ? 1
-                                                                             : 0,
-                                                                         args.SalePrice,
-                                                                         args.AuctionID,
-                                                                         args.Area,
-                                                                         0,                         // Estate ID - not used?
-                                                                         args.Maturity,
-                                                                         args.OwnerID,
-                                                                         args.GroupID,
-                                                                         ((args.Flags & (uint) ParcelFlags.ShowDirectory) ==
-                                                                          (uint) ParcelFlags.ShowDirectory)
-                                                                             ? 1
-                                                                             : 0,
-                                                                         args.SnapshotID,
-                                                                         OSDParser.SerializeLLSDXmlString(args.Bitmap),
-                                                                         (int) args.Category,
-                                                                         args.ScopeID
-                                                                     }).Select(Values => Values.ToArray()).ToList();
+            List<object[]> insertValues = parcels.Select( args => new List<object> {
+                args.RegionID,
+                args.GlobalID,
+                args.LocalID,
+                args.UserLocation.X,       // this is actually the landing position for teleporting
+                args.UserLocation.Y,
+                args.UserLocation.Z,
+                args.Name,
+                args.Description,
+                args.Flags,
+                args.Dwell,
+                UUID.Zero,                 // infoUUID - not used?
+                ((args.Flags & (uint) ParcelFlags.ForSale) == (uint) ParcelFlags.ForSale) ? 1 : 0,
+                args.SalePrice,
+                args.AuctionID,
+                args.Area,
+                0,                         // Estate ID - will be set later
+                args.Maturity,
+                args.OwnerID,
+                args.GroupID,
+                ((args.Flags & (uint) ParcelFlags.ShowDirectory) == (uint) ParcelFlags.ShowDirectory) ? 1 : 0,
+                args.SnapshotID,
+                OSDParser.SerializeLLSDXmlString(args.Bitmap),
+                (int) args.Category,
+                args.ScopeID
+            }).Select(Values => Values.ToArray()).ToList();
 
             GD.InsertMultiple(m_SearchParcelTable, insertValues);
         }
@@ -171,30 +165,37 @@ namespace WhiteCore.Services.DataService
 
             for (int i = 0; i < Query.Count; i += 24)
             {
-                LandData LandData = new LandData
-                                        {
-                                            RegionID = UUID.Parse(Query[i]),
-                                            GlobalID = UUID.Parse(Query[i + 1]),
-                                            LocalID = int.Parse(Query[i + 2]),
-                                            UserLocation =
-                                                new Vector3(float.Parse(Query[i + 3]), float.Parse(Query[i + 4]),
-                                                            float.Parse(Query[i + 5])),
-                                            Name = Query[i + 6],
-                                            Description = Query[i + 7],
-                                            Flags = uint.Parse(Query[i + 8]),
-                                            Dwell = int.Parse(Query[i + 9]),
-                                            //InfoUUID = UUID.Parse(Query[i + 10]),
-                                            SalePrice = int.Parse(Query[i + 12]),
-                                            AuctionID = uint.Parse(Query[i + 13]),
-                                            Area = int.Parse(Query[i + 14]),
-                                            Maturity = int.Parse(Query[i + 16]),
-                                            OwnerID = UUID.Parse(Query[i + 17]),
-                                            GroupID = UUID.Parse(Query[i + 18]),
-                                            SnapshotID = UUID.Parse(Query[i + 20])
-                                        };
+                LandData landData = new LandData ();
+
+                landData.RegionID = UUID.Parse (Query [i]);
+                landData.GlobalID = UUID.Parse (Query [i + 1]);
+                landData.LocalID = int.Parse (Query [i + 2]);
+
+                // be aware of culture differences here...
+                var posX = (float)Convert.ToDecimal (Query[i + 3], Culture.NumberFormatInfo);
+                var posY = (float)Convert.ToDecimal (Query[i + 4], Culture.NumberFormatInfo);
+                var posZ = (float)Convert.ToDecimal (Query[i + 5], Culture.NumberFormatInfo);
+                landData.UserLocation = new Vector3 (posX, posY, posZ);
+
+//                                      UserLocation =
+//                                                new Vector3(float.Parse(Query[i + 3]), float.Parse(Query[i + 4]),
+//                                                            float.Parse(Query[i + 5])),
+                landData.Name = Query[i + 6];
+                landData.Description = Query[i + 7];
+                landData.Flags = uint.Parse(Query[i + 8]);
+                landData.Dwell = int.Parse(Query[i + 9]);
+                //landData.InfoUUID = UUID.Parse(Query[i + 10]);
+                landData.SalePrice = int.Parse(Query[i + 12]);
+                landData.AuctionID = uint.Parse(Query[i + 13]);
+                landData.Area = int.Parse(Query[i + 14]);
+                landData.Maturity = int.Parse(Query[i + 16]);
+                landData.OwnerID = UUID.Parse(Query[i + 17]);
+                landData.GroupID = UUID.Parse(Query[i + 18]);
+                landData.SnapshotID = UUID.Parse(Query[i + 20]);
+                     
                 try
                 {
-                    LandData.Bitmap = OSDParser.DeserializeLLSDXml(Query[i + 21]);
+                    landData.Bitmap = OSDParser.DeserializeLLSDXml(Query[i + 21]);
                 }
                 catch
                 {
@@ -202,17 +203,17 @@ namespace WhiteCore.Services.DataService
 
                 // set some flags
                 if (uint.Parse (Query [i + 11]) != 0)
-                    LandData.Flags |= (uint) ParcelFlags.ForSale;
+                    landData.Flags |= (uint) ParcelFlags.ForSale;
                 
                 if (uint.Parse (Query [i + 19]) != 0)
-                    LandData.Flags |= (uint) ParcelFlags.ShowDirectory;
+                    landData.Flags |= (uint) ParcelFlags.ShowDirectory;
 
-                LandData.Category = (string.IsNullOrEmpty(Query[i + 22]))
+                landData.Category = (string.IsNullOrEmpty(Query[i + 22]))
                                         ? ParcelCategory.None
                                         : (ParcelCategory) int.Parse(Query[i + 22]);
-                LandData.ScopeID = UUID.Parse(Query[i + 23]);
+                landData.ScopeID = UUID.Parse(Query[i + 23]);
 
-                Lands.Add(LandData);
+                Lands.Add(landData);
             }
             return Lands;
         }
@@ -240,17 +241,13 @@ namespace WhiteCore.Services.DataService
                 // classifieds and picks (plus it's not hard to keep this here).
                 ulong RegionHandle = 0;
                 uint X, Y, Z;
-                Util.ParseFakeParcelID(globalID, out RegionHandle,
-                                       out X, out Y, out Z);
+                Util.ParseFakeParcelID(globalID, out RegionHandle, out X, out Y, out Z);
 
                 int regX, regY;
                 Util.UlongToInts(RegionHandle, out regX, out regY);
 
                 GridRegion r = m_registry.RequestModuleInterface<IGridService>().GetRegionByPosition(null, regX, regY);
-                if (r == null)
-                    return null;
-                else
-                    return GetParcelInfo(r.RegionID, (int)X, (int)Y);
+                return r == null ? null : GetParcelInfo (r.RegionID, (int)X, (int)Y);
             }
 
             LandData LandData = null;
@@ -347,6 +344,7 @@ namespace WhiteCore.Services.DataService
             object remoteValue = DoRemote(OwnerID);
             if (remoteValue != null || m_doRemoteOnly)
                 return (List<ExtendedLandData>) remoteValue;
+            
             QueryFilter filter = new QueryFilter();
             filter.andFilters["OwnerID"] = OwnerID;
             List<string> Query = GD.Query(new[] { "*" }, m_SearchParcelTable, filter, null, null, null);
@@ -378,19 +376,13 @@ namespace WhiteCore.Services.DataService
             filter.andFilters["RegionID"] = RegionID;
 
             if (owner != UUID.Zero)
-            {
                 filter.andFilters["OwnerID"] = owner;
-            }
 
             if (flags != ParcelFlags.None)
-            {
                 filter.andBitfieldAndFilters["Flags"] = (uint) flags;
-            }
 
             if (category != ParcelCategory.Any)
-            {
                 filter.andFilters["Category"] = (int) category;
-            }
 
             return filter;
         }
@@ -405,9 +397,7 @@ namespace WhiteCore.Services.DataService
 
             List<LandData> resp = new List<LandData>(0);
             if (count == 0)
-            {
                 return resp;
-            }
 
             IRegionData regiondata = Framework.Utilities.DataManager.RequestPlugin<IRegionData>();
             if (regiondata != null)
@@ -453,9 +443,7 @@ namespace WhiteCore.Services.DataService
 
             List<LandData> resp = new List<LandData>(0);
             if (count == 0)
-            {
                 return resp;
-            }
 
             IRegionData regiondata = Framework.Utilities.DataManager.RequestPlugin<IRegionData>();
             if (regiondata != null)
@@ -521,11 +509,9 @@ namespace WhiteCore.Services.DataService
             Dictionary<string, bool> sort = new Dictionary<string, bool>();
 
             //If they dwell sort flag is there, sort by dwell going down
-            if ((Flags & (uint) DirectoryManager.DirFindFlags.DwellSort) ==
-                (uint) DirectoryManager.DirFindFlags.DwellSort)
-            {
+            if ((Flags & (uint) DirectoryManager.DirFindFlags.DwellSort) == (uint) DirectoryManager.DirFindFlags.DwellSort)
                 sort["Dwell"] = false;
-            }
+
             if (scopeID != UUID.Zero)
                 filter.andFilters["ScopeID"] = scopeID;
 
@@ -550,12 +536,9 @@ namespace WhiteCore.Services.DataService
                                                }, m_SearchParcelTable, filter, sort, (uint)StartQuery, 50);
 
             if (retVal.Count == 0)
-            {
                 return new List<DirPlacesReplyData>();
-            }
 
             List<DirPlacesReplyData> Data = new List<DirPlacesReplyData>();
-
             for (int i = 0; i < retVal.Count; i += 6)
             {
                 //Check to make sure we are sending the requested maturity levels
@@ -603,18 +586,13 @@ namespace WhiteCore.Services.DataService
                 filter.andFilters["ScopeID"] = scopeID;
 
             //They requested a sale price check
-            if ((Flags & (uint) DirectoryManager.DirFindFlags.LimitByPrice) ==
-                (uint) DirectoryManager.DirFindFlags.LimitByPrice)
-            {
+            if ((Flags & (uint) DirectoryManager.DirFindFlags.LimitByPrice) == (uint) DirectoryManager.DirFindFlags.LimitByPrice)
                 filter.andLessThanEqFilters["SalePrice"] = (int) price;
-            }
 
             //They requested a 
-            if ((Flags & (uint) DirectoryManager.DirFindFlags.LimitByArea) ==
-                (uint) DirectoryManager.DirFindFlags.LimitByArea)
-            {
+            if ((Flags & (uint) DirectoryManager.DirFindFlags.LimitByArea) ==  (uint) DirectoryManager.DirFindFlags.LimitByArea)
                 filter.andGreaterThanEqFilters["Area"] = (int) area;
-            }
+
             Dictionary<string, bool> sort = new Dictionary<string, bool>();
             if ((Flags & (uint) DirectoryManager.DirFindFlags.AreaSort) == (uint) DirectoryManager.DirFindFlags.AreaSort)
                 sort["Area"] = false;
@@ -833,7 +811,7 @@ namespace WhiteCore.Services.DataService
             try
             {
                 int x = 0, y = 0, i = 0;
-                int avg = (sizeX*sizeX/128);
+                int avg = (sizeX * sizeX / 128);
                 for (i = 0; i < avg; i++)
                 {
                     byte tempByte = Bitmap[i];
@@ -937,9 +915,7 @@ namespace WhiteCore.Services.DataService
             List<string> retVal = GD.Query(new[] { "*" }, m_userClassifiedsTable, filter, null, null, null);
 
             if (retVal.Count == 0)
-            {
                 return new List<Classified>();
-            }
 
             List<Classified> Classifieds = new List<Classified>();
             for (int i = 0; i < retVal.Count; i += 9)
@@ -968,8 +944,11 @@ namespace WhiteCore.Services.DataService
             Dictionary<string, object> where = new Dictionary<string, object>(1);
             where.Add("ClassifiedUUID", id);
             filter.andFilters = where;
+
             List<string> retVal = GD.Query(new[] { "*" }, m_userClassifiedsTable, filter, null, null, null);
+
             if ((retVal == null) || (retVal.Count == 0)) return null;
+
             Classified classified = new Classified();
             classified.FromOSD((OSDMap) OSDParser.DeserializeJson(retVal[6]));
             return classified;
@@ -1158,11 +1137,17 @@ namespace WhiteCore.Services.DataService
                 data.eventFlags = Convert.ToUInt32(RetVal[i + 7]);
                 data.duration = Convert.ToUInt32(RetVal[i + 8]);
 
-                data.regionPos = new Vector3(
-                    float.Parse(RetVal[i + 9]),
-                    float.Parse(RetVal[i + 10]),
-                    float.Parse(RetVal[i + 11])
-                    );
+                // be aware of culture differences here...
+                var posX = (float)Convert.ToDecimal (RetVal[i + 9], Culture.NumberFormatInfo);
+                var posY = (float)Convert.ToDecimal (RetVal[1 + 10], Culture.NumberFormatInfo);
+                var posZ = (float)Convert.ToDecimal (RetVal[i + 11], Culture.NumberFormatInfo);
+                data.regionPos = new Vector3 (posX, posY, posZ);
+
+//                data.regionPos = new Vector3(
+//                    float.Parse(RetVal[i + 9]),
+//                    float.Parse(RetVal[i + 10]),
+//                    float.Parse(RetVal[i + 11])
+//                    );
 
                 data.globalPos = new Vector3(
                     region.RegionLocX + data.regionPos.X,
@@ -1220,28 +1205,25 @@ namespace WhiteCore.Services.DataService
                 return null;
             }
 
-            EventData eventData = new EventData
-                                      {
-                                          eventID = GetMaxEventID() + 1,
-                                          creator = creator.ToString(),
-                                          simName = region.RegionName,
-                                          date = date.ToString(new DateTimeFormatInfo()),
-                                          dateUTC = (uint) Util.ToUnixTime(date),
-                                          amount = cover,
-                                          cover = cover,
-                                          maturity = (int) maturity,
-                                          eventFlags = flags | (uint) maturity,
-                                          duration = duration,
-                                          globalPos = new Vector3(
-                                              region.RegionLocX + localPos.X,
-                                              region.RegionLocY + localPos.Y,
-                                              region.RegionLocZ + localPos.Z
-                                              ),
-                                          regionPos = localPos,
-                                          name = name,
-                                          description = description,
-                                          category = category
-                                      };
+            EventData eventData = new EventData ();
+            eventData.eventID = GetMaxEventID () + 1;
+            eventData.creator = creator.ToString();
+            eventData.simName = region.RegionName;
+            eventData.date = date.ToString(new DateTimeFormatInfo());
+            eventData.dateUTC = (uint) Util.ToUnixTime(date);
+            eventData.amount = cover;
+            eventData.cover = cover;
+            eventData.maturity = (int) maturity;
+            eventData.eventFlags = flags | (uint) maturity;
+            eventData.duration = duration;
+            eventData.globalPos = new Vector3(
+                region.RegionLocX + localPos.X,
+                region.RegionLocY + localPos.Y,
+                region.RegionLocZ + localPos.Z);
+            eventData.regionPos = localPos;
+            eventData.name = name;
+            eventData.description = description;
+            eventData.category = category;
 
             Dictionary<string, object> row = new Dictionary<string, object>(15);
             row["EID"] = eventData.eventID;

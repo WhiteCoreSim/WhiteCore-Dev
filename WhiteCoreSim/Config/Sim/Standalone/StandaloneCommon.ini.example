@@ -1,5 +1,7 @@
 ;;
-;; This is the main configuration file for standalone WhiteCore-Sim instances
+;; This file is used as a template when the configurator is run for a standalone setup
+;;  ##  You DO NOT need to change anything here  ##
+;;
 ;;
 [Include]
 Include-Standalone = Sim/Standalone/Standalone.ini
@@ -16,7 +18,7 @@ Include-WebInterface = Sim/Standalone/WebInterface.ini
 ;; The maximum size a region can be
 ;; Note: 0 disables this check
 ;; Default is 0
-MaxRegionSize = 0;
+MaxRegionSize = 0
 
 ;; How many regions away should we allow child agents
 ;; This sets the number of regions in any direction we can see. 
@@ -123,4 +125,4 @@ UserNameSeed = ""
 
 [AuthenticationService]
 ;; Should we check user passwords? If this is set to false, there will be NO password checking.
-AuthenticateUsers = true;
+AuthenticateUsers = true

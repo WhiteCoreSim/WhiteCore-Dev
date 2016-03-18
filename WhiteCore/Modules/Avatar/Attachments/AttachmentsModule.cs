@@ -816,7 +816,7 @@ namespace WhiteCore.Modules.Attachments
 
             if (group.RootChild.PhysActor != null)
             {
-                m_scene.PhysicsScene.DeletePrim(group.RootChild.PhysActor);
+                m_scene.PhysicsScene.RemovePrim(group.RootChild.PhysActor);
                 group.RootChild.PhysActor = null;
             }
 

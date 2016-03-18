@@ -5,10 +5,12 @@ Greythane
 
 
 --------------- WhiteCore contributors (Thanks for all the patches :)) -----------------------
-
-Nhede
+EnricoNirvana
 Emperorstarfinder
 Fine77
+H-H-H
+Nhede
+Stormsonweathers
 Any that we might have forgotten
 
 --------------- Aurora contributors (Thanks for all the patches :)) --------------------------

@@ -38,7 +38,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Directory
             Version = new Version(0, 0, 12);
             MigrationName = "Directory";
 
-            schema = new List<SchemaDefinition>();
+            Schema = new List<SchemaDefinition>();
 
             RenameSchema("searchparcel", "search_parcel");
             RemoveSchema("searchparcel");

@@ -1482,7 +1482,7 @@ namespace WhiteCore.Region
 			}
 
             var defaultOarPath = Path.Combine(m_SimBase.DefaultDataPath, Constants.DEFAULT_OARARCHIVE_DIR);
-            fileName = PathHelpers.VerifyReadFile (fileName, new List<string>() {".oar","tgz"}, defaultOarPath);
+            fileName = PathHelpers.VerifyReadFile (fileName, new List<string>() {"oar","tgz"}, defaultOarPath);
             if (fileName == "")                 // something wrong...
                 return;
             cmdparams [2] = fileName;           // reset passed filename

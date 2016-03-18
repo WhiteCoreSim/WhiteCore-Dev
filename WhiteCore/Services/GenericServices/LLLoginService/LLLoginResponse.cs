@@ -25,18 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.ConsoleFramework;
-using WhiteCore.Framework.PresenceInfo;
-using WhiteCore.Framework.Services;
-using WhiteCore.Framework.Services.ClassHelpers.Inventory;
-using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using Nini.Config;
+using OpenMetaverse;
+using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.PresenceInfo;
+using WhiteCore.Framework.Services;
+using WhiteCore.Framework.Services.ClassHelpers.Inventory;
+using WhiteCore.Framework.Utilities;
 using FriendInfo = WhiteCore.Framework.Services.FriendInfo;
 using GridRegion = WhiteCore.Framework.Services.GridRegion;
 
@@ -47,40 +47,40 @@ namespace WhiteCore.Services
     /// </summary>
     public class LLLoginResponse : LoginResponse
     {
-        private readonly ArrayList classifiedCategories;
-        private readonly ArrayList eventCategories;
-        private readonly ArrayList eventNotifications;
-        private readonly ArrayList initialOutfit;
-        private readonly ArrayList loginFlags;
-        private readonly IConfigSource m_source;
-        private readonly ArrayList tutorial = new ArrayList();
-        private readonly ArrayList uiConfig;
-        private readonly Hashtable uiConfigHash;
-        private ArrayList activeGestures;
+        readonly ArrayList classifiedCategories;
+        readonly ArrayList eventCategories;
+        readonly ArrayList eventNotifications;
+        readonly ArrayList initialOutfit;
+        readonly ArrayList loginFlags;
+        readonly IConfigSource m_source;
+        readonly ArrayList tutorial = new ArrayList();
+        readonly ArrayList uiConfig;
+        readonly Hashtable uiConfigHash;
+        ArrayList activeGestures;
 
-        private string agentAccess;
-        private string agentAccessMax;
-        private string agentRegionAccess;
-        private int aoTransition;
-        private int agentFlags;
-        private UUID agentID;
-        private ArrayList agentInventory;
+        string agentAccess;
+        string agentAccessMax;
+        string agentRegionAccess;
+        int aoTransition;
+        int agentFlags;
+        UUID agentID;
+        ArrayList agentInventory;
 
         // Login
-        private string firstname;
-        private string home;
-        private ArrayList inventoryRoot;
-        private string lastname;
-        private string login;
-        private Hashtable loginFlagsHash;
-        private string lookAt;
-        private string COFVersion;
+        string firstname;
+        string home;
+        ArrayList inventoryRoot;
+        string lastname;
+        string login;
+        Hashtable loginFlagsHash;
+        string lookAt;
+        string COFVersion;
 
-        private BuddyList m_buddyList;
-        private string seedCapability;
-        private string startLocation;
-        private string udpBlackList;
-        private IGridInfo m_gridInfo;
+        BuddyList m_buddyList;
+        string seedCapability;
+        string startLocation;
+        string udpBlackList;
+        IGridInfo m_gridInfo;
 
         public LLLoginResponse()
         {
@@ -152,7 +152,7 @@ namespace WhiteCore.Services
 
         #region FillOutData
 
-        private void FillOutInventoryData(List<InventoryFolderBase> invSkel, ILibraryService libService,
+        void FillOutInventoryData(List<InventoryFolderBase> invSkel, ILibraryService libService,
                                           IInventoryService invService)
         {
             InventoryData inventData = null;
@@ -196,7 +196,7 @@ namespace WhiteCore.Services
             }
         }
 
-        private void FillOutActiveGestures(List<InventoryItemBase> gestures)
+        void FillOutActiveGestures(List<InventoryItemBase> gestures)
         {
             ArrayList list = new ArrayList();
             if (gestures != null)
@@ -212,7 +212,7 @@ namespace WhiteCore.Services
             ActiveGestures = list;
         }
 
-        private void FillOutHomeData(Framework.Services.UserInfo pinfo, GridRegion home)
+        void FillOutHomeData(Framework.Services.UserInfo pinfo, GridRegion home)
         {
             int x = 1000*Constants.RegionSize, y = 1000*Constants.RegionSize;
             if (home != null)
@@ -229,7 +229,7 @@ namespace WhiteCore.Services
                 pinfo.HomeLookAt.X, pinfo.HomeLookAt.Y, pinfo.HomeLookAt.Z);
         }
 
-        private void FillOutRegionData(AgentCircuitData circuitData, GridRegion destination)
+        void FillOutRegionData(AgentCircuitData circuitData, GridRegion destination)
         {
             IPEndPoint endPoint = destination.ExternalEndPoint;
             //We don't need this anymore, we set this from what we get from the region
@@ -242,7 +242,7 @@ namespace WhiteCore.Services
             RegionSizeY = destination.RegionSizeY;
         }
 
-        private void SetDefaultValues()
+        void SetDefaultValues()
         {
             DST = TimeZone.CurrentTimeZone.IsDaylightSavingTime(DateTime.Now) ? "Y" : "N";
             StipendSinceLogin = "N";
@@ -477,7 +477,7 @@ namespace WhiteCore.Services
             uiConfigHash[itemName] = item;
         }
 
-        private static BuddyList ConvertFriendListItem(FriendInfo[] friendsList)
+        static BuddyList ConvertFriendListItem(FriendInfo[] friendsList)
         {
             BuddyList buddylistreturn = new BuddyList();
             foreach (BuddyList.BuddyInfo buddyitem in from finfo in friendsList
@@ -494,7 +494,7 @@ namespace WhiteCore.Services
             return buddylistreturn;
         }
 
-        private InventoryData GetInventorySkeleton(ILibraryService library, IInventoryService inventoryService,
+        InventoryData GetInventorySkeleton(ILibraryService library, IInventoryService inventoryService,
                                                    List<InventoryFolderBase> folders)
         {
             UUID rootID = UUID.Zero;
@@ -502,7 +502,7 @@ namespace WhiteCore.Services
             Hashtable TempHash;
             foreach (InventoryFolderBase InvFolder in folders)
             {
-                if (InvFolder.ParentID == UUID.Zero && InvFolder.Name == "My Inventory")
+                if (InvFolder.ParentID == UUID.Zero && InvFolder.Name == InventoryFolderBase.ROOT_FOLDER_NAME)
                     rootID = InvFolder.ID;
                 TempHash = new Hashtable();
                 TempHash["name"] = InvFolder.Name;
@@ -532,7 +532,7 @@ namespace WhiteCore.Services
             AgentInventoryArray.Add(RootHash);
 
             List<UUID> rootFolderUUIDs =
-                (from rootFolder in rootFolders where rootFolder.Name != "My Inventory" select rootFolder.ID).ToList();
+                (from rootFolder in rootFolders where rootFolder.Name != InventoryFolderBase.ROOT_FOLDER_NAME select rootFolder.ID).ToList();
 
             if (rootFolderUUIDs.Count != 0)
             {
@@ -545,7 +545,7 @@ namespace WhiteCore.Services
             return AgentInventoryArray;
         }
 
-        private void TraverseFolder(UUID agentID, UUID folderID, IInventoryService invService, ILibraryService library,
+        void TraverseFolder(UUID agentID, UUID folderID, IInventoryService invService, ILibraryService library,
                                     bool rootFolder,
                                     ref ArrayList table)
         {
@@ -914,7 +914,7 @@ namespace WhiteCore.Services
     /// </summary>
     public class LLLoginResponseRegister
     {
-        private static readonly Dictionary<string, object> m_values = new Dictionary<string, object>();
+        static readonly Dictionary<string, object> m_values = new Dictionary<string, object>();
 
         public static void RegisterValue(string key, object value)
         {

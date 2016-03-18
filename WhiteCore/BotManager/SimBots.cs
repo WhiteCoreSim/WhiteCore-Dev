@@ -32,7 +32,7 @@ namespace WhiteCore.BotManager
     /// <summary>
     ///     Created by Christy Lock
     /// </summary>
-    internal class SimBots
+    class SimBots
     {
         public static double target;
 
@@ -43,7 +43,7 @@ namespace WhiteCore.BotManager
         ///     This returns the x and y to Bot(Me) and then he passes them on to Astar and builds a list of waypoints to
         ///     Reach the goal.
         /// </summary>
-        public static double distTarget
+        public static double DistTarget
         {
             get { return target; }
             set { target = value; }
@@ -69,7 +69,7 @@ namespace WhiteCore.BotManager
                         double distx = botx - i;
                         double disty = boty - j;
                         double goalDist = Math.Sqrt((distx*distx) + (disty*disty));
-                        if (goalDist < distTarget)
+                        if (goalDist < DistTarget)
                         {
                             target = goalDist;
                             itemLoc[0] = i;

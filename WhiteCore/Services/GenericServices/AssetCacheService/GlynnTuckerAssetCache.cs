@@ -26,13 +26,13 @@
  */
 
 
+using System;
+using GlynnTucker.Cache;
+using Nini.Config;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Assets;
-using GlynnTucker.Cache;
-using Nini.Config;
-using System;
 
 namespace WhiteCore.Services
 {

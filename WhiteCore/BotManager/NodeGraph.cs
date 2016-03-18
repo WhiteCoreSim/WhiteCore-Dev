@@ -27,9 +27,8 @@
 
 using System;
 using System.Collections.Generic;
-
-using WhiteCore.Framework.Modules;
 using OpenMetaverse;
+using WhiteCore.Framework.Modules;
 
 namespace WhiteCore.BotManager
 {

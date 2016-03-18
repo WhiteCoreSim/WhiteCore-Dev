@@ -27,10 +27,10 @@
 
 using System;
 using System.Collections.Generic;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.Services.ClassHelpers.Assets;
 using Nini.Config;
 using OpenMetaverse;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.Services.ClassHelpers.Assets;
 
 namespace WhiteCore.Framework.Services
 {

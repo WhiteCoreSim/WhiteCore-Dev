@@ -366,6 +366,12 @@ namespace WhiteCore.Framework.Services
         string CreateCAPS(string method, string appendedPath);
 
         /// <summary>
+        /// Gets the current region CAPS.
+        /// </summary>
+        /// <returns>The CAPs.</returns>
+        OSDMap GetCAPS();
+
+        /// <summary>
         ///     Get all CapsService modules
         /// </summary>
         /// <returns></returns>

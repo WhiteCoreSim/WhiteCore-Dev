@@ -26,18 +26,18 @@
  */
 
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using Nini.Config;
+using Nini.Ini;
+using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.ModuleLoader;
 using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Inventory;
-using Nini.Ini;
-using Nini.Config;
-using OpenMetaverse;
-using System;
-using System.IO;
-using System.Collections.Generic;
-using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Services.SQLServices.InventoryService
@@ -131,13 +131,15 @@ namespace WhiteCore.Services.SQLServices.InventoryService
             {
                 return;
             }
-            else if (!File.Exists("DefaultInventory/Inventory.ini") &&
-                     !File.Exists("DefaultInventory/Inventory.ini.example"))
+
+            if (!File.Exists("DefaultInventory/Inventory.ini") &&
+                !File.Exists("DefaultInventory/Inventory.ini.example"))
             {
                 MainConsole.Instance.Error(
                     "Could not find DefaultInventory/Inventory.ini or DefaultInventory/Inventory.ini.example");
                 return;
             }
+
             List<IDefaultLibraryLoader> Loaders = WhiteCoreModuleLoader.PickupModules<IDefaultLibraryLoader>();
             try
             {

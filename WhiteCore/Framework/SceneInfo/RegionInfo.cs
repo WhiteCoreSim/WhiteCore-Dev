@@ -25,15 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.Utilities;
+using System;
+using System.IO;
+using System.Xml;
+using System.Xml.Serialization;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
 using ProtoBuf;
-using System;
-using System.IO;
-using System.Xml.Serialization;
-using System.Xml;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Framework.SceneInfo
 {
@@ -46,7 +46,9 @@ namespace WhiteCore.Framework.SceneInfo
     [Serializable, ProtoContract(UseProtoMembersOnly = false)]
     public class RegionInfo : AllScopeIDImpl
     {
-        private RegionSettings m_regionSettings;
+        RegionSettings m_regionSettings;
+        UUID m_GridSecureSessionID = UUID.Zero;
+        bool m_seeIntoThisSimFromNeighbor = true;
 
         protected int m_objectCapacity = 0;
         protected string m_regionType = String.Empty;
@@ -58,8 +60,7 @@ namespace WhiteCore.Framework.SceneInfo
         protected int m_regionPort;
         protected string m_regionTerrain = "Flatland";
         protected uint m_regionArea;
-        private UUID m_GridSecureSessionID = UUID.Zero;
-        private bool m_seeIntoThisSimFromNeighbor = true;
+
 
         [XmlIgnore]
         public bool NewRegion = false;
@@ -120,7 +121,7 @@ namespace WhiteCore.Framework.SceneInfo
         }
 
         [ProtoMember(11)]
-        public bool InfiniteRegion = false;
+        public bool InfiniteRegion = true;
 
         [ProtoMember(13)]
         public bool SeeIntoThisSimFromNeighbor

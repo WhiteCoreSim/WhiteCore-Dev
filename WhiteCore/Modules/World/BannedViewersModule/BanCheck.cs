@@ -151,6 +151,7 @@ namespace WhiteCore.Modules.Ban
             string allowedViewers = config.GetString ("ViewersToAllow", "");
             m_allowedViewers = Util.ConvertToList (allowedViewers, false);
             m_useIncludeList = config.GetBoolean ("UseAllowListInsteadOfBanList", false);
+            m_debug = config.GetBoolean ("UserCheckDebugInfo", false);
 
             m_checkOnLogin = config.GetBoolean ("CheckForSimilaritiesOnLogin", m_checkOnLogin);
             m_checkOnTimer = config.GetBoolean ("CheckForSimilaritiesOnTimer", m_checkOnTimer);

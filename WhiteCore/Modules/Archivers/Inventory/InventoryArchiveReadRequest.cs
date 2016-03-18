@@ -152,7 +152,7 @@ namespace WhiteCore.Modules.Archivers
                     iarImportFolder.Name = m_invPath;                       // the path
                     iarImportFolder.Owner = m_userInfo.PrincipalID;         // owner
                     iarImportFolder.ParentID = rootFolder.ID;               // the root folder 
-                    iarImportFolder.Type = -1;                              // user defined folder
+                    iarImportFolder.Type = (short) FolderType.None;         // user defined folder
                     iarImportFolder.Version = 1;                            // initial version
 
                     m_inventoryService.AddFolder(iarImportFolder);
@@ -448,7 +448,7 @@ namespace WhiteCore.Modules.Archivers
                 destFolder
                     = new InventoryFolderBase(
                         newFolderId, newFolderName, m_userInfo.PrincipalID,
-                        (short) AssetType.Unknown, destFolder.ID, 1);
+                        (short) FolderType.None, destFolder.ID, 1);
 
                 // Check for existing folders
                 string resPath = "";
@@ -534,7 +534,7 @@ namespace WhiteCore.Modules.Archivers
                 InventoryFolderBase f = m_inventoryService.GetFolderForType(
                     item.Owner,
                     (InventoryType) item.InvType,
-                    (AssetType) item.AssetType);
+                    (FolderType) item.AssetType);
 
                 if (f != null)
                 {
@@ -587,7 +587,7 @@ namespace WhiteCore.Modules.Archivers
         /// <param name="assetPath"> </param>
         /// <param name="data"></param>
         /// <returns>true if asset was successfully loaded, false otherwise</returns>
-        private bool LoadAsset(string assetPath, byte[] data)
+        bool LoadAsset(string assetPath, byte[] data)
         {
             //IRegionSerialiser serialiser = scene.RequestModuleInterface<IRegionSerialiser>();
             // Right now we're nastily obtaining the UUID from the filename

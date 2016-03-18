@@ -26,12 +26,12 @@
  */
 
 using System;
-using OMV = OpenMetaverse;
 using WhiteCore.Framework.Physics;
-using WhiteCore.Framework.Utilities;
 using WhiteCore.Framework.SceneInfo;
+using WhiteCore.Framework.Utilities;
+using OMV = OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     /*
      * Class to wrap all objects.
@@ -79,17 +79,16 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             Name = name; // PhysicsActor also has the name of the object. Someday consolidate.
             TypeName = typeName;
 
+            // Oddity if object is destroyed and recreated very quickly it could still have the old body.
+            if (!PhysBody.HasPhysicalBody)
+                PhysBody = new BulletBody(localID);
+
             // The collection of things that push me around
             PhysicalActors = new BSActorCollection(PhysicsScene);
 
             // Initialize variables kept in base.
             GravityMultiplier = 1.0f;
             Gravity = new OMV.Vector3(0f, 0f, BSParam.Gravity);
-            //HoverActive = false;
-
-            // We don't have any physical representation yet.
-            PhysBody = new BulletBody(localID);
-            PhysShape = new BulletShape();
 
             PrimAssetState = PrimAssetCondition.Unknown;
 
@@ -106,14 +105,15 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             CollisionScore = 0;
 
             // All axis free.
-            LockedAxis = LockedAxisFree;
+            LockedLinearAxis = LockedAxisFree;
+            LockedAngularAxis = LockedAxisFree;
         }
 
         // Tell the object to clean up.
         public virtual void Destroy()
         {
             PhysicalActors.Enable(false);
-            PhysicsScene.TaintedObject("BSPhysObject.Destroy", delegate() { PhysicalActors.Dispose(); });
+            PhysicsScene.TaintedObject(LocalID, "BSPhysObject.Destroy", delegate() { PhysicalActors.Dispose(); });
         }
 
         public BSScene PhysicsScene { get; protected set; }
@@ -124,6 +124,15 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // Set to 'true' when the object is completely initialized.
         // This mostly prevents property update and collisions until the object is complete here.
         public bool IsInitialized { get; protected set; }
+
+        // Set to 'true' if an object (mesh/linkset/sculpty) is not completely constructed.
+        // This test is used to prevent some updates to the object when it only partially exists.
+        // There are several reasons and object might be incomplete:
+        //     Its underlying mesh/sculpty is an asset which must be fetched from the asset store
+        //     It is a linkset who is being added to or removed from
+        //     It is changing state (static to physical, for instance) which requires rebuilding
+        // This is a computed value based on the underlying physical object construction
+        abstract public bool IsIncomplete { get; }
 
         // Return the object mass without calculating it or having side effects
         public abstract float RawMass { get; }
@@ -137,9 +146,9 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         public OMV.Vector3 Inertia { get; set; }
 
         // Reference to the physical body (btCollisionObject) of this object
-        public BulletBody PhysBody;
+        public BulletBody PhysBody = new BulletBody(0);
         // Reference to the physical shape (btCollisionShape) of this object
-        public BulletShape PhysShape;
+        public BSShape PhysShape = new BSShapeNull();
 
         // The physical representation of the prim might require an asset fetch.
         // The asset state is first 'Unknown' then 'Waiting' then either 'Failed' or 'Fetched'.
@@ -147,11 +156,17 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         {
             Unknown,
             Waiting,
-            Failed,
+            FailedAssetFetch,
+            FailedMeshing,
             Fetched
         }
 
         public PrimAssetCondition PrimAssetState { get; set; }
+        public virtual bool AssetFailed()
+        {
+            return ( (PrimAssetState == PrimAssetCondition.FailedAssetFetch)
+                  || (PrimAssetState == PrimAssetCondition.FailedMeshing) );
+        }
 
         // The objects base shape information. Null if not a prim type shape.
         public PrimitiveBaseShape BaseShape { get; protected set; }
@@ -180,6 +195,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         public abstract bool IsSolid { get; }
         public abstract bool IsStatic { get; }
         public abstract bool IsSelected { get; }
+        public abstract bool IsVolumeDetect { get; }
 
         // Materialness
         public MaterialAttributes.Material Material { get; private set; }
@@ -194,6 +210,12 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             Restitution = matAttrib.restitution;
             Density = matAttrib.density / BSParam.DensityScaleFactor;
             // DetailLog("{0},{1}.SetMaterial,Mat={2},frict={3},rest={4},den={5}", LocalID, TypeName, Material, Friction, Restitution, Density);
+        }
+
+    	  public override float Density
+        {
+            get { return base.Density; }
+            set { base.Density = value; }
         }
 
         // Stop all physical motion.
@@ -255,19 +277,36 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
         // The user can optionally set the center of mass. The user's setting will override any
         //    computed center-of-mass (like in linksets).
-        public OMV.Vector3? UserSetCenterOfMass { get; set; }
+        // Note this is a displacement from the root's coordinates. Zero means use the root prim as center-of-mass.
+        public OMV.Vector3? UserSetCenterOfMassDisplacement { get; set; }
 
-        public OMV.Vector3 LockedAxis { get; set; } // zero means locked. one means free.
-        public readonly OMV.Vector3 LockedAxisFree = new OMV.Vector3(1f, 1f, 1f); // All axis are free
+        public OMV.Vector3 LockedLinearAxis;    // zero means locked. one means free.
+        public OMV.Vector3 LockedAngularAxis;   // zero means locked. one means free.
+        public const float FreeAxis = 1f;
+        public const float LockedAxis = 0f;
+        public readonly OMV.Vector3 LockedAxisFree = new OMV.Vector3(FreeAxis, FreeAxis, FreeAxis); // All axis are free
 
+        // If an axis is locked (flagged above) then the limits of that axis are specified here.
+        // Linear axis limits are relative to the object's starting coordinates.
+        // Angular limits are limited to -PI to +PI
+        public OMV.Vector3 LockedLinearAxisLow;
+        public OMV.Vector3 LockedLinearAxisHigh;
+        public OMV.Vector3 LockedAngularAxisLow;
+        public OMV.Vector3 LockedAngularAxisHigh;
 
         // Enable physical actions. Bullet will keep sleeping non-moving physical objects so
         //     they need waking up when parameters are changed.
         // Called in taint-time!!
         public void ActivateIfPhysical(bool forceIt)
         {
-            if (IsPhysical && PhysBody.HasPhysicalBody)
-                PhysicsScene.PE.Activate(PhysBody, forceIt);
+            //if (IsPhysical && PhysBody.HasPhysicalBody)
+            if (PhysBody.HasPhysicalBody)
+            {
+                if (IsPhysical)
+                    PhysicsScene.PE.Activate(PhysBody, forceIt);
+                else
+                    PhysicsScene.PE.ClearCollisionProxyCache(PhysicsScene.World, PhysBody);
+            }
         }
 
         // 'actors' act on the physical object to change or constrain its motion. These can range from
@@ -286,6 +325,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 if (PhysicalActors.TryGetActor(actorName, out theActor))
                 {
                     // The actor already exists so just turn it on or off
+                    DetailLog("{0},BSPhysObject.EnableActor,enableExistingActor,name={1},enable={2}", LocalID, actorName, enableActor);
                     theActor.Enabled = enableActor;
                 }
                 else
@@ -293,9 +333,14 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                     // The actor does not exist. If it should, create it.
                     if (enableActor)
                     {
+                        DetailLog("{0},BSPhysObject.EnableActor,creatingActor,name={1}", LocalID, actorName);
                         theActor = creator();
                         PhysicalActors.Add(actorName, theActor);
                         theActor.Enabled = true;
+                    }
+                    else
+                    {
+                        DetailLog("{0},BSPhysobject.EnableActor,notCreatingActorSinceNotEnabled,name={1}", LocalID, actorName);
                     }
                 }
             }
@@ -316,6 +361,8 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         // On a collision, check the collider and remember if the last collider was moving
         //    Used to modify the standing of avatars (avatars on stationary things stand still)
         public bool ColliderIsMoving;
+    	  // 'true' if the last collider was a volume detect object
+        public bool ColliderIsVolumeDetect;
         // Used by BSCharacter to manage standing (and not slipping)
         public bool IsStationary;
 
@@ -375,10 +422,10 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             bool p2col = true;
 
             // We only need to test p2 for 'jump crouch purposes'
-            if (this.TypeName == "BSCharacter" && collidee is BSPrim)
+            if (TypeName == "BSCharacter" && collidee is BSPrim)
             {
                 // Testing if the collision is at the feet of the avatar
-                if ((this.Position.Z - contactPoint.Z) < (this.Size.Z * 0.5f))
+                if ((Position.Z - contactPoint.Z) < (Size.Z * 0.5f))
                     p2col = false;
             }
 
@@ -391,6 +438,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
 
             // For movement tests, remember if we are colliding with an object that is moving.
             ColliderIsMoving = collidee != null ? (collidee.RawVelocity != OMV.Vector3.Zero) : false;
+            ColliderIsVolumeDetect = collidee != null ? (collidee.IsVolumeDetect) : false;
 
             // If someone has subscribed for collision events log the collision so it will be reported up
             if (SubscribedEvents())
@@ -462,7 +510,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
                 // make sure first collision happens
                 NextCollisionOkTime = Util.EnvironmentTickCountSubtract(SubscribedEventsMs);
 
-                PhysicsScene.TaintedObject(TypeName + ".SubscribeEvents", delegate()
+                PhysicsScene.TaintedObject(LocalID, TypeName + ".SubscribeEvents", delegate()
                 {
                     if (PhysBody.HasPhysicalBody)
                         CurrentCollisionFlags = PhysicsScene.PE.AddToCollisionFlags(PhysBody,
@@ -480,7 +528,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         {
             // DetailLog("{0},{1}.UnSubscribeEvents,unsubscribing", LocalID, TypeName);
             SubscribedEventsMs = 0;
-            PhysicsScene.TaintedObject(TypeName + ".UnSubscribeEvents", delegate()
+            PhysicsScene.TaintedObject(LocalID, TypeName + ".UnSubscribeEvents", delegate()
             {
                 // Make sure there is a body there because sometimes destruction happens in an un-ideal order.
                 if (PhysBody.HasPhysicalBody)

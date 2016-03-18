@@ -561,7 +561,7 @@ namespace WhiteCore.Modules.Startup
                 if (group.RootChild.PhysActor != null)
                 {
                     //Remove us from the physics sim
-                    m_scene.PhysicsScene.DeletePrim(group.RootChild.PhysActor);
+                    m_scene.PhysicsScene.RemovePrim(group.RootChild.PhysActor);
                     group.RootChild.PhysActor = null;
                 }
 

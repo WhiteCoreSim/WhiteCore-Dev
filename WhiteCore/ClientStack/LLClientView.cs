@@ -26,6 +26,17 @@
  */
 
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading;
+using System.Xml;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.Messages.Linden;
+using OpenMetaverse.Packets;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
@@ -36,17 +47,6 @@ using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Assets;
 using WhiteCore.Framework.Services.ClassHelpers.Inventory;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.Messages.Linden;
-using OpenMetaverse.Packets;
-using OpenMetaverse.StructuredData;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading;
-using System.Xml;
 using RegionFlags = OpenMetaverse.RegionFlags;
 
 namespace WhiteCore.ClientStack
@@ -62,11 +62,11 @@ namespace WhiteCore.ClientStack
         /// <value>
         ///     Debug packet level.  See OpenSim.RegisterConsoleCommands() for more details.
         /// </value>
-        private int m_debugPacketLevel;
-        private List<string> m_debugPackets = new List<string>();
-        private List<string> m_debugRemovePackets = new List<string>();
+        int m_debugPacketLevel;
+        List<string> m_debugPackets = new List<string>();
+        List<string> m_debugRemovePackets = new List<string>();
 
-        private readonly bool m_allowUDPInv;
+        readonly bool m_allowUDPInv;
 
         #region Events
 
@@ -78,6 +78,7 @@ namespace WhiteCore.ClientStack
         public event ImprovedInstantMessage OnInstantMessage;
         public event PreSendImprovedInstantMessage OnPreSendInstantMessage;
         public event ChatMessage OnChatFromClient;
+        public event RezRestoreToWorld OnRezRestoreToWorld;
         public event RezObject OnRezObject;
         public event DeRezObject OnDeRezObject;
         public event ModifyTerrain OnModifyTerrain;
@@ -324,22 +325,22 @@ namespace WhiteCore.ClientStack
         /// <summary>
         ///     Used to adjust Sun Orbit values so Linden based viewers properly position sun
         /// </summary>
-        private const float m_sunPainDaHalfOrbitalCutoff = 4.712388980384689858f;
+        const float m_sunPainDaHalfOrbitalCutoff = 4.712388980384689858f;
 
-        private static readonly Dictionary<PacketType, PacketMethod> PacketHandlers =
+        static readonly Dictionary<PacketType, PacketMethod> PacketHandlers =
             new Dictionary<PacketType, PacketMethod>(); //Global/static handlers for all clients
 
-        private readonly LLUDPServer m_udpServer;
-        private readonly LLUDPClient m_udpClient;
-        private readonly UUID m_sessionId;
-        private readonly UUID m_secureSessionId;
-        private readonly UUID m_agentId;
-        private readonly uint m_circuitCode;
-        private readonly byte[] m_channelVersion = Utils.EmptyBytes;
-        private readonly Dictionary<string, UUID> m_defaultAnimations = new Dictionary<string, UUID>();
-        private readonly IGroupsModule m_GroupsModule;
+        readonly LLUDPServer m_udpServer;
+        readonly LLUDPClient m_udpClient;
+        readonly UUID m_sessionId;
+        readonly UUID m_secureSessionId;
+        readonly UUID m_agentId;
+        readonly uint m_circuitCode;
+        readonly byte[] m_channelVersion = Utils.EmptyBytes;
+        readonly Dictionary<string, UUID> m_defaultAnimations = new Dictionary<string, UUID>();
+        readonly IGroupsModule m_GroupsModule;
 
-        private int m_cachedTextureSerial;
+        int m_cachedTextureSerial;
 
         /// <value>
         ///     Maintain a record of all the objects killed.  This allows us to stop an update being sent from the
@@ -349,32 +350,32 @@ namespace WhiteCore.ClientStack
         /// </value>
         //protected HashSet<uint> m_killRecord = new HashSet<uint>();
 //        protected HashSet<uint> m_attachmentsSent;
-        private int m_animationSequenceNumber = 1;
+        int m_animationSequenceNumber = 1;
 
-        private bool m_SendLogoutPacketWhenClosing = true;
-        private AgentUpdateArgs lastarg;
-        private bool m_IsActive = true;
+        bool m_SendLogoutPacketWhenClosing = true;
+        AgentUpdateArgs lastarg;
+        bool m_IsActive = true;
 
-        private readonly Dictionary<PacketType, PacketProcessor> m_packetHandlers =
+        readonly Dictionary<PacketType, PacketProcessor> m_packetHandlers =
             new Dictionary<PacketType, PacketProcessor>();
 
-        private readonly Dictionary<string, GenericMessage> m_genericPacketHandlers =
+        readonly Dictionary<string, GenericMessage> m_genericPacketHandlers =
             new Dictionary<string, GenericMessage>();
 
         //PauPaw:Local Generic Message handlers
 
-        private readonly IScene m_scene;
-        private readonly LLImageManager m_imageManager;
-        private readonly string m_Name;
-        private readonly EndPoint m_userEndPoint;
-        private UUID m_activeGroupID;
-        private string m_activeGroupName = String.Empty;
-        private ulong m_activeGroupPowers;
-        private uint m_agentFOVCounter;
+        readonly IScene m_scene;
+        readonly LLImageManager m_imageManager;
+        readonly string m_Name;
+        readonly EndPoint m_userEndPoint;
+        UUID m_activeGroupID;
+        string m_activeGroupName = String.Empty;
+        ulong m_activeGroupPowers;
+        uint m_agentFOVCounter;
 
-        private readonly IAssetService m_assetService;
+        readonly IAssetService m_assetService;
 // ReSharper disable ConvertToConstant.Local
-        private bool m_checkPackets = true;
+        bool m_checkPackets = true;
 // ReSharper restore ConvertToConstant.Local
 
         #endregion Class Members
@@ -685,7 +686,7 @@ namespace WhiteCore.ClientStack
         /// </summary>
         /// <param name="packet"></param>
         /// <returns>True if a handler was found which successfully processed the packet.</returns>
-        private bool ProcessPacketMethod(Packet packet)
+        bool ProcessPacketMethod(Packet packet)
         {
             bool result = false;
             PacketProcessor pprocessor;
@@ -1117,7 +1118,7 @@ namespace WhiteCore.ClientStack
         ///     Send terrain layer information to the client.
         /// </summary>
         /// <param name="o"></param>
-        private void DoSendLayerData(object o)
+        void DoSendLayerData(object o)
         {
             short[] map = (short[]) o;
             try
@@ -1325,7 +1326,7 @@ namespace WhiteCore.ClientStack
         ///     Send wind layer information to the client.
         /// </summary>
         /// <param name="o"></param>
-        private void DoSendWindData(object o)
+        void DoSendWindData(object o)
         {
             Vector2[] windSpeeds = (Vector2[]) o;
             TerrainPatch[] patches = new TerrainPatch[2];
@@ -1358,7 +1359,7 @@ namespace WhiteCore.ClientStack
         ///     Send cloud layer information to the client.
         /// </summary>
         /// <param name="o"></param>
-        private void DoSendCloudData(object o)
+        void DoSendCloudData(object o)
         {
             float[] cloudCover = (float[]) o;
             TerrainPatch[] patches = new TerrainPatch[1];
@@ -1577,10 +1578,29 @@ namespace WhiteCore.ClientStack
         {
             PlacesReplyPacket PlacesReply = new PlacesReplyPacket();
             
+            PlacesReplyPacket.QueryDataBlock[] Query = new PlacesReplyPacket.QueryDataBlock[LandData.Length + 1];
+            
             // Since we don't have Membership we should send an empty QueryData block 
             // here to keep the viewer happy
             
-            PlacesReplyPacket.QueryDataBlock[] Query = new PlacesReplyPacket.QueryDataBlock[LandData.Length];
+            PlacesReplyPacket.QueryDataBlock MembershipBlock = new PlacesReplyPacket.QueryDataBlock
+            {
+                ActualArea = 0,
+                BillableArea = 0,
+                Desc = Utils.StringToBytes(""),
+                Dwell = 0,
+                Flags = 0,
+                GlobalX= 0,
+                GlobalY = 0,
+                GlobalZ = 0,
+                Name = Utils.StringToBytes(""),
+                OwnerID = UUID.Zero,
+                Price = 0,
+                SimName = Utils.StringToBytes(""),
+                SnapshotID = UUID.Zero 
+            };
+            Query[0] = MembershipBlock;
+            
             //Note: Nothing is ever done with this?????
             int totalarea = 0;
             List<string> RegionTypes = new List<string>();
@@ -1606,7 +1626,7 @@ namespace WhiteCore.ClientStack
                                                                           Utils.StringToBytes(LandData[i].RegionName),
                                                                       SnapshotID = LandData[i].LandData.SnapshotID
                                                                   };
-                Query[i] = QueryBlock;
+                Query[i+1] = QueryBlock;
                 totalarea += LandData[i].LandData.Area;
                 RegionTypes.Add(LandData[i].RegionType);
             }
@@ -1806,7 +1826,7 @@ namespace WhiteCore.ClientStack
                 OutPacket(currentPacket, ThrottleOutPacketType.Asset, false, null);
         }
 
-        private InventoryDescendentsPacket.FolderDataBlock CreateFolderDataBlock(InventoryFolderBase folder)
+        InventoryDescendentsPacket.FolderDataBlock CreateFolderDataBlock(InventoryFolderBase folder)
         {
             InventoryDescendentsPacket.FolderDataBlock newBlock = new InventoryDescendentsPacket.FolderDataBlock
                                                                       {
@@ -1819,7 +1839,7 @@ namespace WhiteCore.ClientStack
             return newBlock;
         }
 
-        private InventoryDescendentsPacket.ItemDataBlock CreateItemDataBlock(InventoryItemBase item)
+        InventoryDescendentsPacket.ItemDataBlock CreateItemDataBlock(InventoryItemBase item)
         {
             InventoryDescendentsPacket.ItemDataBlock newBlock = new InventoryDescendentsPacket.ItemDataBlock
                                                                     {
@@ -1862,14 +1882,14 @@ namespace WhiteCore.ClientStack
             return newBlock;
         }
 
-        private void AddNullFolderBlockToDecendentsPacket(ref InventoryDescendentsPacket packet)
+        void AddNullFolderBlockToDecendentsPacket(ref InventoryDescendentsPacket packet)
         {
             packet.FolderData = new InventoryDescendentsPacket.FolderDataBlock[1];
             packet.FolderData[0] = new InventoryDescendentsPacket.FolderDataBlock
                                        {FolderID = UUID.Zero, ParentID = UUID.Zero, Type = -1, Name = new byte[0]};
         }
 
-        private void AddNullItemBlockToDescendentsPacket(ref InventoryDescendentsPacket packet)
+        void AddNullItemBlockToDescendentsPacket(ref InventoryDescendentsPacket packet)
         {
             packet.ItemData = new InventoryDescendentsPacket.ItemDataBlock[1];
             packet.ItemData[0] = new InventoryDescendentsPacket.ItemDataBlock
@@ -1900,7 +1920,7 @@ namespace WhiteCore.ClientStack
             // No need to add CRC
         }
 
-        private InventoryDescendentsPacket CreateInventoryDescendentsPacket(UUID ownerID, UUID folderID, int version,
+        InventoryDescendentsPacket CreateInventoryDescendentsPacket(UUID ownerID, UUID folderID, int version,
                                                                             int descendents, int folders, int items)
         {
             InventoryDescendentsPacket descend =
@@ -2007,7 +2027,7 @@ namespace WhiteCore.ClientStack
         /// <param name="folder"></param>
         /// <param name="folderDataBlocks"></param>
         /// <param name="transactionId"></param>
-        private void SendBulkUpdateInventoryFolderRecursive(
+        void SendBulkUpdateInventoryFolderRecursive(
             InventoryFolderBase folder, ref List<BulkUpdateInventoryPacket.FolderDataBlock> folderDataBlocks,
             UUID transactionId)
         {
@@ -2065,7 +2085,7 @@ namespace WhiteCore.ClientStack
         /// </summary>
         /// <param name="folder"></param>
         /// <returns></returns>
-        private BulkUpdateInventoryPacket.FolderDataBlock GenerateBulkUpdateFolderDataBlock(InventoryFolderBase folder)
+        BulkUpdateInventoryPacket.FolderDataBlock GenerateBulkUpdateFolderDataBlock(InventoryFolderBase folder)
         {
             BulkUpdateInventoryPacket.FolderDataBlock folderBlock = new BulkUpdateInventoryPacket.FolderDataBlock
                                                                         {
@@ -2084,7 +2104,7 @@ namespace WhiteCore.ClientStack
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        private BulkUpdateInventoryPacket.ItemDataBlock GenerateBulkUpdateItemDataBlock(InventoryItemBase item)
+        BulkUpdateInventoryPacket.ItemDataBlock GenerateBulkUpdateItemDataBlock(InventoryItemBase item)
         {
             BulkUpdateInventoryPacket.ItemDataBlock itemBlock = new BulkUpdateInventoryPacket.ItemDataBlock
                                                                     {
@@ -2759,7 +2779,7 @@ namespace WhiteCore.ClientStack
             OutPacket(scriptRunningReply, ThrottleOutPacketType.AvatarInfo);
         }
 
-        private void SendFailedAsset(AssetRequestToClient req, TransferPacketStatus assetErrors)
+        void SendFailedAsset(AssetRequestToClient req, TransferPacketStatus assetErrors)
         {
             TransferInfoPacket Transfer = new TransferInfoPacket
                                               {
@@ -4171,7 +4191,7 @@ namespace WhiteCore.ClientStack
             }
         }
 
-        private void ResendPrimUpdates(IEnumerable<EntityUpdate> updates, OutgoingPacket oPacket)
+        void ResendPrimUpdates(IEnumerable<EntityUpdate> updates, OutgoingPacket oPacket)
         {
             // Remove the update packet from the list of packets waiting for acknowledgement
             // because we are requeuing the list of updates. They will be resent in new packets
@@ -4207,7 +4227,7 @@ namespace WhiteCore.ClientStack
 
         #endregion Primitive Packet/Data Sending Methods
 
-        private void HandleQueueEmpty(object o)
+        void HandleQueueEmpty(object o)
         {
             // arraytmp  0 contains current number of packets in task
             // arraytmp  1 contains current number of packets in avatarinfo
@@ -4229,7 +4249,7 @@ namespace WhiteCore.ClientStack
                 ProcessTextureRequests(m_udpServer.TextureSendLimit);
         }
 
-        private void ProcessTextureRequests(int numPackets)
+        void ProcessTextureRequests(int numPackets)
         {
             //note: tmp is never used
             //int tmp = m_udpClient.GetCurTexPacksInQueue();
@@ -4326,7 +4346,7 @@ namespace WhiteCore.ClientStack
             OutPacket(notFoundPacket, ThrottleOutPacketType.Texture);
         }
 
-        private volatile bool m_sendingSimStatsPacket;
+        volatile bool m_sendingSimStatsPacket;
 
         public void SendSimStats(SimStats stats)
         {
@@ -4450,7 +4470,7 @@ namespace WhiteCore.ClientStack
 
         #region Estate Data Sending Methods
 
-        private static bool convertParamStringToBool(byte[] field)
+        static bool convertParamStringToBool(byte[] field)
         {
             string s = Utils.BytesToString(field);
             if (s == "1" || s.ToLower() == "y" || s.ToLower() == "yes" || s.ToLower() == "t" || s.ToLower() == "true")
@@ -4887,7 +4907,7 @@ namespace WhiteCore.ClientStack
 
         #region Helper Methods
 
-        private ImprovedTerseObjectUpdatePacket.ObjectDataBlock CreateImprovedTerseBlock(IEntity entity,
+        ImprovedTerseObjectUpdatePacket.ObjectDataBlock CreateImprovedTerseBlock(IEntity entity,
                                                                                          bool sendTexture)
         {
             #region ScenePresence/SOP Handling
@@ -5020,7 +5040,7 @@ namespace WhiteCore.ClientStack
             return block;
         }
 
-        private ObjectUpdatePacket.ObjectDataBlock CreateAvatarUpdateBlock(IScenePresence data)
+        ObjectUpdatePacket.ObjectDataBlock CreateAvatarUpdateBlock(IScenePresence data)
         {
             byte[] objectData = new byte[76];
 
@@ -5088,7 +5108,7 @@ namespace WhiteCore.ClientStack
             return update;
         }
 
-        private ObjectUpdateCachedPacket.ObjectDataBlock CreatePrimCachedUpdateBlock(ISceneChildEntity data,
+        ObjectUpdateCachedPacket.ObjectDataBlock CreatePrimCachedUpdateBlock(ISceneChildEntity data,
                                                                                      UUID recipientID)
         {
             ObjectUpdateCachedPacket.ObjectDataBlock odb = new ObjectUpdateCachedPacket.ObjectDataBlock
@@ -5117,7 +5137,7 @@ namespace WhiteCore.ClientStack
             return odb;
         }
 
-        private ObjectUpdatePacket.ObjectDataBlock CreatePrimUpdateBlock(ISceneChildEntity data, UUID recipientID)
+        ObjectUpdatePacket.ObjectDataBlock CreatePrimUpdateBlock(ISceneChildEntity data, UUID recipientID)
         {
             byte[] objectData = new byte[60];
             data.RelativePosition.ToBytes(objectData, 0);
@@ -5240,7 +5260,7 @@ namespace WhiteCore.ClientStack
             return update;
         }
 
-        private ObjectUpdateCompressedPacket.ObjectDataBlock CreateCompressedUpdateBlock(ISceneChildEntity part,
+        ObjectUpdateCompressedPacket.ObjectDataBlock CreateCompressedUpdateBlock(ISceneChildEntity part,
                                                                                          CompressedFlags updateFlags,
                                                                                          PrimUpdateFlags flags)
         {
@@ -5444,7 +5464,7 @@ namespace WhiteCore.ClientStack
         /// <summary>
         ///     This is a different way of processing packets then ProcessInPacket
         /// </summary>
-        private void RegisterLocalPacketHandlers()
+        void RegisterLocalPacketHandlers()
         {
             AddLocalPacketHandler(PacketType.LogoutRequest, HandleLogout);
             AddLocalPacketHandler(PacketType.AgentUpdate, HandleAgentUpdate, false);
@@ -5682,7 +5702,7 @@ namespace WhiteCore.ClientStack
 
         #region Scene/Avatar
 
-        private bool HandleAgentUpdate(IClientAPI sener, Packet Pack)
+        bool HandleAgentUpdate(IClientAPI sener, Packet Pack)
         {
             if (OnAgentUpdate != null)
             {
@@ -5759,7 +5779,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleMoneyTransferRequest(IClientAPI sender, Packet Pack)
+        bool HandleMoneyTransferRequest(IClientAPI sender, Packet Pack)
         {
             MoneyTransferRequestPacket money = (MoneyTransferRequestPacket) Pack;
             // validate the agent owns the agentID and sessionID
@@ -5780,7 +5800,7 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        private bool HandleParcelGodMarkAsContent(IClientAPI client, Packet Packet)
+        bool HandleParcelGodMarkAsContent(IClientAPI client, Packet Packet)
         {
             ParcelGodMarkAsContentPacket ParcelGodMarkAsContent =
                 (ParcelGodMarkAsContentPacket) Packet;
@@ -5807,7 +5827,7 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        private bool HandleFreezeUser(IClientAPI client, Packet Packet)
+        bool HandleFreezeUser(IClientAPI client, Packet Packet)
         {
             FreezeUserPacket FreezeUser = (FreezeUserPacket) Packet;
 
@@ -5834,7 +5854,7 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        private bool HandleEjectUser(IClientAPI client, Packet Packet)
+        bool HandleEjectUser(IClientAPI client, Packet Packet)
         {
             EjectUserPacket EjectUser =
                 (EjectUserPacket) Packet;
@@ -5862,7 +5882,7 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        private bool HandleParcelBuyPass(IClientAPI client, Packet Packet)
+        bool HandleParcelBuyPass(IClientAPI client, Packet Packet)
         {
             ParcelBuyPassPacket ParcelBuyPass =
                 (ParcelBuyPassPacket) Packet;
@@ -5889,7 +5909,7 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        private bool HandleParcelBuyRequest(IClientAPI sender, Packet Pack)
+        bool HandleParcelBuyRequest(IClientAPI sender, Packet Pack)
         {
             ParcelBuyPacket parcel = (ParcelBuyPacket) Pack;
 
@@ -5920,7 +5940,7 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        private bool HandleUUIDGroupNameRequest(IClientAPI sender, Packet Pack)
+        bool HandleUUIDGroupNameRequest(IClientAPI sender, Packet Pack)
         {
             UUIDGroupNameRequestPacket upack = (UUIDGroupNameRequestPacket) Pack;
 
@@ -5996,7 +6016,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleViewerEffect(IClientAPI sender, Packet Pack)
+        bool HandleViewerEffect(IClientAPI sender, Packet Pack)
         {
             ViewerEffectPacket viewer = (ViewerEffectPacket) Pack;
             if (viewer.AgentData.SessionID != SessionId) return false;
@@ -6026,7 +6046,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleAvatarPropertiesRequest(IClientAPI sender, Packet Pack)
+        bool HandleAvatarPropertiesRequest(IClientAPI sender, Packet Pack)
         {
             AvatarPropertiesRequestPacket avatarProperties = (AvatarPropertiesRequestPacket) Pack;
 
@@ -6049,7 +6069,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleChatFromViewer(IClientAPI sender, Packet Pack)
+        bool HandleChatFromViewer(IClientAPI sender, Packet Pack)
         {
             ChatFromViewerPacket inchatpack = (ChatFromViewerPacket) Pack;
 
@@ -6098,7 +6118,7 @@ namespace WhiteCore.ClientStack
                 handlerChatFromClient(this, args);
         }
 
-        private bool HandlerAvatarPropertiesUpdate(IClientAPI sender, Packet Pack)
+        bool HandlerAvatarPropertiesUpdate(IClientAPI sender, Packet Pack)
         {
             AvatarPropertiesUpdatePacket avatarProps = (AvatarPropertiesUpdatePacket) Pack;
 
@@ -6130,7 +6150,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandlerScriptDialogReply(IClientAPI sender, Packet Pack)
+        bool HandlerScriptDialogReply(IClientAPI sender, Packet Pack)
         {
             ScriptDialogReplyPacket rdialog = (ScriptDialogReplyPacket) Pack;
 
@@ -6169,7 +6189,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandlerImprovedInstantMessage(IClientAPI sender, Packet Pack)
+        bool HandlerImprovedInstantMessage(IClientAPI sender, Packet Pack)
         {
             ImprovedInstantMessagePacket msgpack = (ImprovedInstantMessagePacket) Pack;
 
@@ -6221,7 +6241,7 @@ namespace WhiteCore.ClientStack
                 handlerInstantMessage(this, im);
         }
 
-        private bool HandlerAcceptFriendship(IClientAPI sender, Packet Pack)
+        bool HandlerAcceptFriendship(IClientAPI sender, Packet Pack)
         {
             AcceptFriendshipPacket afriendpack = (AcceptFriendshipPacket) Pack;
 
@@ -6251,7 +6271,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandlerDeclineFriendship(IClientAPI sender, Packet Pack)
+        bool HandlerDeclineFriendship(IClientAPI sender, Packet Pack)
         {
             DeclineFriendshipPacket dfriendpack = (DeclineFriendshipPacket) Pack;
 
@@ -6276,7 +6296,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandlerTerminateFrendship(IClientAPI sender, Packet Pack)
+        bool HandlerTerminateFrendship(IClientAPI sender, Packet Pack)
         {
             TerminateFriendshipPacket tfriendpack = (TerminateFriendshipPacket) Pack;
 
@@ -6302,7 +6322,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleFindAgent(IClientAPI client, Packet Packet)
+        bool HandleFindAgent(IClientAPI client, Packet Packet)
         {
             FindAgentPacket FindAgent =
                 (FindAgentPacket) Packet;
@@ -6316,7 +6336,7 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        private bool HandleTrackAgent(IClientAPI client, Packet Packet)
+        bool HandleTrackAgent(IClientAPI client, Packet Packet)
         {
             TrackAgentPacket TrackAgent =
                 (TrackAgentPacket) Packet;
@@ -6343,7 +6363,7 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        private bool HandlerRezObject(IClientAPI sender, Packet Pack)
+        bool HandlerRezObject(IClientAPI sender, Packet Pack)
         {
             RezObjectPacket rezPacket = (RezObjectPacket) Pack;
 
@@ -6370,7 +6390,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandlerRezObjectFromNotecard(IClientAPI sender, Packet Pack)
+        bool HandlerRezObjectFromNotecard(IClientAPI sender, Packet Pack)
         {
             RezObjectFromNotecardPacket rezPacket = (RezObjectFromNotecardPacket) Pack;
 
@@ -6397,7 +6417,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandlerDeRezObject(IClientAPI sender, Packet Pack)
+        bool HandlerDeRezObject(IClientAPI sender, Packet Pack)
         {
             DeRezObjectPacket DeRezPacket = (DeRezObjectPacket) Pack;
 
@@ -6427,7 +6447,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandlerModifyLand(IClientAPI sender, Packet Pack)
+        bool HandlerModifyLand(IClientAPI sender, Packet Pack)
         {
             ModifyLandPacket modify = (ModifyLandPacket) Pack;
 
@@ -6466,7 +6486,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandlerRegionHandshakeReply(IClientAPI sender, Packet Pack)
+        bool HandlerRegionHandshakeReply(IClientAPI sender, Packet Pack)
         {
             Action<IClientAPI> handlerRegionHandShakeReply = OnRegionHandShakeReply;
             if (handlerRegionHandShakeReply != null)
@@ -6477,7 +6497,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandlerAgentWearablesRequest(IClientAPI sender, Packet Pack)
+        bool HandlerAgentWearablesRequest(IClientAPI sender, Packet Pack)
         {
             GenericCall1 handlerRequestWearables = OnRequestWearables;
 
@@ -6496,7 +6516,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandlerAgentSetAppearance(IClientAPI sender, Packet Pack)
+        bool HandlerAgentSetAppearance(IClientAPI sender, Packet Pack)
         {
             AgentSetAppearancePacket appear = (AgentSetAppearancePacket) Pack;
 
@@ -6558,7 +6578,7 @@ namespace WhiteCore.ClientStack
         /// <param name="simclient"></param>
         /// <param name="packet"></param>
         /// <returns></returns>
-        private bool HandleAgentTextureCached(IClientAPI simclient, Packet packet)
+        bool HandleAgentTextureCached(IClientAPI simclient, Packet packet)
         {
             AgentCachedTexturePacket cachedtex = (AgentCachedTexturePacket) packet;
 
@@ -6599,7 +6619,7 @@ namespace WhiteCore.ClientStack
             OutPacket(cachedresp, ThrottleOutPacketType.Texture);
         }
 
-        private bool HandlerAgentIsNowWearing(IClientAPI sender, Packet Pack)
+        bool HandlerAgentIsNowWearing(IClientAPI sender, Packet Pack)
         {
             if (OnAvatarNowWearing != null)
             {
@@ -6635,7 +6655,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandlerRezSingleAttachmentFromInv(IClientAPI sender, Packet Pack)
+        bool HandlerRezSingleAttachmentFromInv(IClientAPI sender, Packet Pack)
         {
             RezSingleAttachmentFromInv handlerRezSingleAttachment = OnRezSingleAttachmentFromInv;
             if (handlerRezSingleAttachment != null)
@@ -6660,7 +6680,8 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandlerRezRestoreToWorld(IClientAPI sender, Packet Pack)
+     /* original - assumed all objects were attachments
+      bool HandlerRezRestoreToWorld(IClientAPI sender, Packet Pack)
         {
             RezSingleAttachmentFromInv handlerRezSingleAttachment = OnRezSingleAttachmentFromInv;
             if (handlerRezSingleAttachment != null)
@@ -6684,8 +6705,34 @@ namespace WhiteCore.ClientStack
 
             return true;
         }
+       */
 
-        private bool HandleRezMultipleAttachmentsFromInv(IClientAPI sender, Packet Pack)
+        // update 20160129 - greythane-
+        bool HandlerRezRestoreToWorld(IClientAPI sender, Packet Pack)
+        {
+            RezRestoreToWorld handlerRezRestoreToWorld = OnRezRestoreToWorld;
+            if (handlerRezRestoreToWorld != null)
+            {
+                RezRestoreToWorldPacket rezPacket = (RezRestoreToWorldPacket)Pack;
+
+                #region Packet Session and User Check
+                if (m_checkPackets)
+                {
+                    if (rezPacket.AgentData.SessionID != SessionId ||
+                        rezPacket.AgentData.AgentID != AgentId)
+                        return true;
+                }
+                #endregion
+
+                handlerRezRestoreToWorld(this, rezPacket.InventoryData.ItemID, rezPacket.InventoryData.GroupID);
+
+            }
+            return true;
+        }
+
+
+
+        bool HandleRezMultipleAttachmentsFromInv(IClientAPI sender, Packet Pack)
         {
             RezSingleAttachmentFromInv handlerRezMultipleAttachments = OnRezSingleAttachmentFromInv;
 
@@ -6713,7 +6760,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleDetachAttachmentIntoInv(IClientAPI sender, Packet Pack)
+        bool HandleDetachAttachmentIntoInv(IClientAPI sender, Packet Pack)
         {
             UUIDNameRequest handlerDetachAttachmentIntoInv = OnDetachAttachmentIntoInv;
             if (handlerDetachAttachmentIntoInv != null)
@@ -6735,7 +6782,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectAttach(IClientAPI sender, Packet Pack)
+        bool HandleObjectAttach(IClientAPI sender, Packet Pack)
         {
             if (OnObjectAttach != null)
             {
@@ -6765,7 +6812,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectDetach(IClientAPI sender, Packet Pack)
+        bool HandleObjectDetach(IClientAPI sender, Packet Pack)
         {
             ObjectDetachPacket dett = (ObjectDetachPacket) Pack;
 
@@ -6792,7 +6839,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectDrop(IClientAPI sender, Packet Pack)
+        bool HandleObjectDrop(IClientAPI sender, Packet Pack)
         {
             ObjectDropPacket dropp = (ObjectDropPacket) Pack;
 
@@ -6819,7 +6866,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleSetAlwaysRun(IClientAPI sender, Packet Pack)
+        bool HandleSetAlwaysRun(IClientAPI sender, Packet Pack)
         {
             SetAlwaysRunPacket run = (SetAlwaysRunPacket) Pack;
 
@@ -6841,7 +6888,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleCompleteAgentMovement(IClientAPI sender, Packet Pack)
+        bool HandleCompleteAgentMovement(IClientAPI sender, Packet Pack)
         {
             GenericCall1 handlerCompleteMovementToRegion = OnCompleteMovementToRegion;
             if (handlerCompleteMovementToRegion != null)
@@ -6853,7 +6900,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleAgentAnimation(IClientAPI sender, Packet Pack)
+        bool HandleAgentAnimation(IClientAPI sender, Packet Pack)
         {
             AgentAnimationPacket AgentAni = (AgentAnimationPacket) Pack;
 
@@ -6890,7 +6937,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleAgentRequestSit(IClientAPI sender, Packet Pack)
+        bool HandleAgentRequestSit(IClientAPI sender, Packet Pack)
         {
             if (OnAgentRequestSit != null)
             {
@@ -6915,7 +6962,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleAgentSit(IClientAPI sender, Packet Pack)
+        bool HandleAgentSit(IClientAPI sender, Packet Pack)
         {
             if (OnAgentSit != null)
             {
@@ -6941,7 +6988,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleSoundTrigger(IClientAPI sender, Packet Pack)
+        bool HandleSoundTrigger(IClientAPI sender, Packet Pack)
         {
             SoundTriggerPacket soundTriggerPacket = (SoundTriggerPacket) Pack;
 
@@ -6967,7 +7014,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleAvatarPickerRequest(IClientAPI sender, Packet Pack)
+        bool HandleAvatarPickerRequest(IClientAPI sender, Packet Pack)
         {
             AvatarPickerRequestPacket avRequestQuery = (AvatarPickerRequestPacket) Pack;
 
@@ -6995,7 +7042,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleAgentDataUpdateRequest(IClientAPI sender, Packet Pack)
+        bool HandleAgentDataUpdateRequest(IClientAPI sender, Packet Pack)
         {
             AgentDataUpdateRequestPacket avRequestDataUpdatePacket = (AgentDataUpdateRequestPacket) Pack;
 
@@ -7021,7 +7068,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleUserInfoRequest(IClientAPI sender, Packet Pack)
+        bool HandleUserInfoRequest(IClientAPI sender, Packet Pack)
         {
             UserInfoRequest handlerUserInfoRequest = OnUserInfoRequest;
             if (handlerUserInfoRequest != null)
@@ -7035,7 +7082,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleUpdateUserInfo(IClientAPI sender, Packet Pack)
+        bool HandleUpdateUserInfo(IClientAPI sender, Packet Pack)
         {
             UpdateUserInfoPacket updateUserInfo = (UpdateUserInfoPacket) Pack;
 
@@ -7066,7 +7113,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleSetStartLocationRequest(IClientAPI sender, Packet Pack)
+        bool HandleSetStartLocationRequest(IClientAPI sender, Packet Pack)
         {
             SetStartLocationRequestPacket avSetStartLocationRequestPacket = (SetStartLocationRequestPacket) Pack;
 
@@ -7113,7 +7160,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleAgentThrottle(IClientAPI sender, Packet Pack)
+        bool HandleAgentThrottle(IClientAPI sender, Packet Pack)
         {
             AgentThrottlePacket atpack = (AgentThrottlePacket) Pack;
 
@@ -7132,7 +7179,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleAgentPause(IClientAPI sender, Packet Pack)
+        bool HandleAgentPause(IClientAPI sender, Packet Pack)
         {
             #region Packet Session and User Check
 
@@ -7150,7 +7197,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleAgentResume(IClientAPI sender, Packet Pack)
+        bool HandleAgentResume(IClientAPI sender, Packet Pack)
         {
             #region Packet Session and User Check
 
@@ -7169,7 +7216,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleForceScriptControlRelease(IClientAPI sender, Packet Pack)
+        bool HandleForceScriptControlRelease(IClientAPI sender, Packet Pack)
         {
             ForceReleaseControls handlerForceReleaseControls = OnForceReleaseControls;
             if (handlerForceReleaseControls != null)
@@ -7183,7 +7230,7 @@ namespace WhiteCore.ClientStack
 
         #region Objects/m_sceneObjects
 
-        private bool HandleObjectLink(IClientAPI sender, Packet Pack)
+        bool HandleObjectLink(IClientAPI sender, Packet Pack)
         {
             ObjectLinkPacket link = (ObjectLinkPacket) Pack;
 
@@ -7217,7 +7264,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectDelink(IClientAPI sender, Packet Pack)
+        bool HandleObjectDelink(IClientAPI sender, Packet Pack)
         {
             ObjectDelinkPacket delink = (ObjectDelinkPacket) Pack;
 
@@ -7245,7 +7292,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectAdd(IClientAPI sender, Packet Pack)
+        bool HandleObjectAdd(IClientAPI sender, Packet Pack)
         {
             if (OnAddPrim != null)
             {
@@ -7281,7 +7328,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectShape(IClientAPI sender, Packet Pack)
+        bool HandleObjectShape(IClientAPI sender, Packet Pack)
         {
             ObjectShapePacket shapePacket = (ObjectShapePacket) Pack;
 
@@ -7331,7 +7378,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectExtraParams(IClientAPI sender, Packet Pack)
+        bool HandleObjectExtraParams(IClientAPI sender, Packet Pack)
         {
             ObjectExtraParamsPacket extraPar = (ObjectExtraParamsPacket) Pack;
 
@@ -7359,7 +7406,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectDuplicate(IClientAPI sender, Packet Pack)
+        bool HandleObjectDuplicate(IClientAPI sender, Packet Pack)
         {
             ObjectDuplicatePacket dupe = (ObjectDuplicatePacket) Pack;
 
@@ -7390,7 +7437,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleRequestMultipleObjects(IClientAPI sender, Packet Pack)
+        bool HandleRequestMultipleObjects(IClientAPI sender, Packet Pack)
         {
             RequestMultipleObjectsPacket incomingRequest = (RequestMultipleObjectsPacket) Pack;
 
@@ -7417,7 +7464,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectSelect(IClientAPI sender, Packet Pack)
+        bool HandleObjectSelect(IClientAPI sender, Packet Pack)
         {
             ObjectSelectPacket incomingselect = (ObjectSelectPacket) Pack;
 
@@ -7434,9 +7481,9 @@ namespace WhiteCore.ClientStack
 
             ObjectSelect handlerObjectSelect = null;
             
-			List<uint> LocalIDs = incomingselect.ObjectData.Select(t => t.ObjectLocalID).ToList();
+            List<uint> LocalIDs = incomingselect.ObjectData.Select(t => t.ObjectLocalID).ToList();
 
-			handlerObjectSelect = OnObjectSelect;
+            handlerObjectSelect = OnObjectSelect;
             if (handlerObjectSelect != null)
             {
                 handlerObjectSelect(LocalIDs, this);
@@ -7444,7 +7491,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectDeselect(IClientAPI sender, Packet Pack)
+        bool HandleObjectDeselect(IClientAPI sender, Packet Pack)
         {
             ObjectDeselectPacket incomingdeselect = (ObjectDeselectPacket) Pack;
 
@@ -7470,7 +7517,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectPosition(IClientAPI sender, Packet Pack)
+        bool HandleObjectPosition(IClientAPI sender, Packet Pack)
         {
             // DEPRECATED: but till libsecondlife removes it, people will use it
             ObjectPositionPacket position = (ObjectPositionPacket) Pack;
@@ -7497,7 +7544,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectScale(IClientAPI sender, Packet Pack)
+        bool HandleObjectScale(IClientAPI sender, Packet Pack)
         {
             // DEPRECATED: but till libsecondlife removes it, people will use it
             ObjectScalePacket scale = (ObjectScalePacket) Pack;
@@ -7523,7 +7570,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectRotation(IClientAPI sender, Packet Pack)
+        bool HandleObjectRotation(IClientAPI sender, Packet Pack)
         {
             // DEPRECATED: but till libsecondlife removes it, people will use it
             ObjectRotationPacket rotation = (ObjectRotationPacket) Pack;
@@ -7550,7 +7597,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectFlagUpdate(IClientAPI sender, Packet Pack)
+        bool HandleObjectFlagUpdate(IClientAPI sender, Packet Pack)
         {
             ObjectFlagUpdatePacket flags = (ObjectFlagUpdatePacket) Pack;
 
@@ -7575,7 +7622,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectImage(IClientAPI sender, Packet Pack)
+        bool HandleObjectImage(IClientAPI sender, Packet Pack)
         {
             ObjectImagePacket imagePack = (ObjectImagePacket) Pack;
 
@@ -7591,7 +7638,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectGrab(IClientAPI sender, Packet Pack)
+        bool HandleObjectGrab(IClientAPI sender, Packet Pack)
         {
             ObjectGrabPacket grab = (ObjectGrabPacket) Pack;
 
@@ -7628,7 +7675,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectGrabUpdate(IClientAPI sender, Packet Pack)
+        bool HandleObjectGrabUpdate(IClientAPI sender, Packet Pack)
         {
             ObjectGrabUpdatePacket grabUpdate = (ObjectGrabUpdatePacket) Pack;
 
@@ -7671,7 +7718,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectDeGrab(IClientAPI sender, Packet Pack)
+        bool HandleObjectDeGrab(IClientAPI sender, Packet Pack)
         {
             ObjectDeGrabPacket deGrab = (ObjectDeGrabPacket) Pack;
 
@@ -7708,7 +7755,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectSpinStart(IClientAPI sender, Packet Pack)
+        bool HandleObjectSpinStart(IClientAPI sender, Packet Pack)
         {
             //MainConsole.Instance.Warn("[CLIENT]: unhandled ObjectSpinStart packet");
             ObjectSpinStartPacket spinStart = (ObjectSpinStartPacket) Pack;
@@ -7732,7 +7779,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectSpinUpdate(IClientAPI sender, Packet Pack)
+        bool HandleObjectSpinUpdate(IClientAPI sender, Packet Pack)
         {
             //MainConsole.Instance.Warn("[CLIENT]: unhandled ObjectSpinUpdate packet");
             ObjectSpinUpdatePacket spinUpdate = (ObjectSpinUpdatePacket) Pack;
@@ -7761,7 +7808,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectSpinStop(IClientAPI sender, Packet Pack)
+        bool HandleObjectSpinStop(IClientAPI sender, Packet Pack)
         {
             //MainConsole.Instance.Warn("[CLIENT]: unhandled ObjectSpinStop packet");
             ObjectSpinStopPacket spinStop = (ObjectSpinStopPacket) Pack;
@@ -7785,7 +7832,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectDescription(IClientAPI sender, Packet Pack)
+        bool HandleObjectDescription(IClientAPI sender, Packet Pack)
         {
             ObjectDescriptionPacket objDes = (ObjectDescriptionPacket) Pack;
 
@@ -7812,7 +7859,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectName(IClientAPI sender, Packet Pack)
+        bool HandleObjectName(IClientAPI sender, Packet Pack)
         {
             ObjectNamePacket objName = (ObjectNamePacket) Pack;
 
@@ -7839,7 +7886,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectPermissions(IClientAPI sender, Packet Pack)
+        bool HandleObjectPermissions(IClientAPI sender, Packet Pack)
         {
             if (OnObjectPermissions != null)
             {
@@ -7888,7 +7935,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleUndo(IClientAPI sender, Packet Pack)
+        bool HandleUndo(IClientAPI sender, Packet Pack)
         {
             UndoPacket undoitem = (UndoPacket) Pack;
 
@@ -7918,7 +7965,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleLandUndo(IClientAPI sender, Packet Pack)
+        bool HandleLandUndo(IClientAPI sender, Packet Pack)
         {
             UndoLandPacket undolanditem = (UndoLandPacket) Pack;
 
@@ -7941,7 +7988,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleRedo(IClientAPI sender, Packet Pack)
+        bool HandleRedo(IClientAPI sender, Packet Pack)
         {
             RedoPacket redoitem = (RedoPacket) Pack;
 
@@ -7971,7 +8018,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectDuplicateOnRay(IClientAPI sender, Packet Pack)
+        bool HandleObjectDuplicateOnRay(IClientAPI sender, Packet Pack)
         {
             ObjectDuplicateOnRayPacket dupeOnRay = (ObjectDuplicateOnRayPacket) Pack;
 
@@ -8004,7 +8051,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleRequestObjectPropertiesFamily(IClientAPI sender, Packet Pack)
+        bool HandleRequestObjectPropertiesFamily(IClientAPI sender, Packet Pack)
         {
             //This powers the little tooltip that appears when you move your mouse over an object
             RequestObjectPropertiesFamilyPacket packToolTip = (RequestObjectPropertiesFamilyPacket) Pack;
@@ -8033,7 +8080,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectIncludeInSearch(IClientAPI sender, Packet Pack)
+        bool HandleObjectIncludeInSearch(IClientAPI sender, Packet Pack)
         {
             //This lets us set objects to appear in search (stuff like DataSnapshot, etc)
             ObjectIncludeInSearchPacket packInSearch = (ObjectIncludeInSearchPacket) Pack;
@@ -8064,7 +8111,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleScriptAnswerYes(IClientAPI sender, Packet Pack)
+        bool HandleScriptAnswerYes(IClientAPI sender, Packet Pack)
         {
             ScriptAnswerYesPacket scriptAnswer = (ScriptAnswerYesPacket) Pack;
 
@@ -8088,7 +8135,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectClickAction(IClientAPI sender, Packet Pack)
+        bool HandleObjectClickAction(IClientAPI sender, Packet Pack)
         {
             ObjectClickActionPacket ocpacket = (ObjectClickActionPacket) Pack;
 
@@ -8116,7 +8163,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectMaterial(IClientAPI sender, Packet Pack)
+        bool HandleObjectMaterial(IClientAPI sender, Packet Pack)
         {
             ObjectMaterialPacket ompacket = (ObjectMaterialPacket) Pack;
 
@@ -8148,7 +8195,7 @@ namespace WhiteCore.ClientStack
 
         #region Inventory/Asset/Other related packets
 
-        private bool HandleRequestImage(IClientAPI sender, Packet Pack)
+        bool HandleRequestImage(IClientAPI sender, Packet Pack)
         {
             RequestImagePacket imageRequest = (RequestImagePacket) Pack;
             //MainConsole.Instance.Debug("image request: " + Pack.ToString());
@@ -8199,7 +8246,7 @@ namespace WhiteCore.ClientStack
         /// <param name="sender"></param>
         /// <param name="Pack"></param>
         /// <returns>This parameter may be ignored since we appear to return true whatever happens</returns>
-        private bool HandleTransferRequest(IClientAPI sender, Packet Pack)
+        bool HandleTransferRequest(IClientAPI sender, Packet Pack)
         {
             //MainConsole.Instance.Debug("ClientView.ProcessPackets.cs:ProcessInPacket() - Got transfer request");
 
@@ -8326,7 +8373,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleAssetUploadRequest(IClientAPI sender, Packet Pack)
+        bool HandleAssetUploadRequest(IClientAPI sender, Packet Pack)
         {
             AssetUploadRequestPacket request = (AssetUploadRequestPacket) Pack;
 
@@ -8347,7 +8394,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleRequestXfer(IClientAPI sender, Packet Pack)
+        bool HandleRequestXfer(IClientAPI sender, Packet Pack)
         {
             RequestXferPacket xferReq = (RequestXferPacket) Pack;
 
@@ -8360,7 +8407,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleSendXferPacket(IClientAPI sender, Packet Pack)
+        bool HandleSendXferPacket(IClientAPI sender, Packet Pack)
         {
             SendXferPacketPacket xferRec = (SendXferPacketPacket) Pack;
 
@@ -8372,7 +8419,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleConfirmXferPacket(IClientAPI sender, Packet Pack)
+        bool HandleConfirmXferPacket(IClientAPI sender, Packet Pack)
         {
             ConfirmXferPacketPacket confirmXfer = (ConfirmXferPacketPacket) Pack;
 
@@ -8384,7 +8431,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleAbortXfer(IClientAPI sender, Packet Pack)
+        bool HandleAbortXfer(IClientAPI sender, Packet Pack)
         {
             AbortXferPacket abortXfer = (AbortXferPacket) Pack;
             AbortXfer handlerAbortXfer = OnAbortXfer;
@@ -8403,7 +8450,7 @@ namespace WhiteCore.ClientStack
             OutPacket(xferItem, ThrottleOutPacketType.Transfer);
         }
 
-        private bool HandleCreateInventoryFolder(IClientAPI sender, Packet Pack)
+        bool HandleCreateInventoryFolder(IClientAPI sender, Packet Pack)
         {
             CreateInventoryFolderPacket invFolder = (CreateInventoryFolderPacket) Pack;
 
@@ -8430,7 +8477,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleUpdateInventoryFolder(IClientAPI sender, Packet Pack)
+        bool HandleUpdateInventoryFolder(IClientAPI sender, Packet Pack)
         {
             if (OnUpdateInventoryFolder != null)
             {
@@ -8462,7 +8509,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleMoveInventoryFolder(IClientAPI sender, Packet Pack)
+        bool HandleMoveInventoryFolder(IClientAPI sender, Packet Pack)
         {
             if (OnMoveInventoryFolder != null)
             {
@@ -8492,7 +8539,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleCreateInventoryItem(IClientAPI sender, Packet Pack)
+        bool HandleCreateInventoryItem(IClientAPI sender, Packet Pack)
         {
             CreateInventoryItemPacket createItem = (CreateInventoryItemPacket) Pack;
 
@@ -8525,7 +8572,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleLinkInventoryItem(IClientAPI sender, Packet Pack)
+        bool HandleLinkInventoryItem(IClientAPI sender, Packet Pack)
         {
             LinkInventoryItemPacket createLink = (LinkInventoryItemPacket) Pack;
 
@@ -8559,7 +8606,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleFetchInventory(IClientAPI sender, Packet Pack)
+        bool HandleFetchInventory(IClientAPI sender, Packet Pack)
         {
             if (OnFetchInventory != null)
             {
@@ -8590,7 +8637,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleFetchInventoryDescendents(IClientAPI sender, Packet Pack)
+        bool HandleFetchInventoryDescendents(IClientAPI sender, Packet Pack)
         {
             FetchInventoryDescendentsPacket Fetch = (FetchInventoryDescendentsPacket) Pack;
 
@@ -8615,7 +8662,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandlePurgeInventoryDescendents(IClientAPI sender, Packet Pack)
+        bool HandlePurgeInventoryDescendents(IClientAPI sender, Packet Pack)
         {
             PurgeInventoryDescendentsPacket Purge = (PurgeInventoryDescendentsPacket) Pack;
 
@@ -8639,7 +8686,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleUpdateInventoryItem(IClientAPI sender, Packet Pack)
+        bool HandleUpdateInventoryItem(IClientAPI sender, Packet Pack)
         {
             UpdateInventoryItemPacket inventoryItemUpdate = (UpdateInventoryItemPacket) Pack;
 
@@ -8696,7 +8743,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleCopyInventoryItem(IClientAPI sender, Packet Pack)
+        bool HandleCopyInventoryItem(IClientAPI sender, Packet Pack)
         {
             CopyInventoryItemPacket copyitem = (CopyInventoryItemPacket) Pack;
 
@@ -8728,7 +8775,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleMoveInventoryItem(IClientAPI sender, Packet Pack)
+        bool HandleMoveInventoryItem(IClientAPI sender, Packet Pack)
         {
             MoveInventoryItemPacket moveitem = (MoveInventoryItemPacket) Pack;
 
@@ -8765,7 +8812,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleChangeInventoryItemFlags(IClientAPI sender, Packet Pack)
+        bool HandleChangeInventoryItemFlags(IClientAPI sender, Packet Pack)
         {
             ChangeInventoryItemFlagsPacket inventoryItemUpdate = (ChangeInventoryItemFlagsPacket) Pack;
 
@@ -8798,7 +8845,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleRemoveInventoryItem(IClientAPI sender, Packet Pack)
+        bool HandleRemoveInventoryItem(IClientAPI sender, Packet Pack)
         {
             RemoveInventoryItemPacket removeItem = (RemoveInventoryItemPacket) Pack;
 
@@ -8826,7 +8873,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleRemoveInventoryFolder(IClientAPI sender, Packet Pack)
+        bool HandleRemoveInventoryFolder(IClientAPI sender, Packet Pack)
         {
             RemoveInventoryFolderPacket removeFolder = (RemoveInventoryFolderPacket) Pack;
 
@@ -8855,7 +8902,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleRemoveInventoryObjects(IClientAPI sender, Packet Pack)
+        bool HandleRemoveInventoryObjects(IClientAPI sender, Packet Pack)
         {
             RemoveInventoryObjectsPacket removeObject = (RemoveInventoryObjectsPacket) Pack;
 
@@ -8895,7 +8942,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleRequestTaskInventory(IClientAPI sender, Packet Pack)
+        bool HandleRequestTaskInventory(IClientAPI sender, Packet Pack)
         {
             RequestTaskInventoryPacket requesttask = (RequestTaskInventoryPacket) Pack;
 
@@ -8918,7 +8965,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleUpdateTaskInventory(IClientAPI sender, Packet Pack)
+        bool HandleUpdateTaskInventory(IClientAPI sender, Packet Pack)
         {
             UpdateTaskInventoryPacket updatetask = (UpdateTaskInventoryPacket) Pack;
 
@@ -8978,7 +9025,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleRemoveTaskInventory(IClientAPI sender, Packet Pack)
+        bool HandleRemoveTaskInventory(IClientAPI sender, Packet Pack)
         {
             RemoveTaskInventoryPacket removeTask = (RemoveTaskInventoryPacket) Pack;
 
@@ -9003,7 +9050,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleMoveTaskInventory(IClientAPI sender, Packet Pack)
+        bool HandleMoveTaskInventory(IClientAPI sender, Packet Pack)
         {
             MoveTaskInventoryPacket moveTaskInventoryPacket = (MoveTaskInventoryPacket) Pack;
 
@@ -9031,7 +9078,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleRezScript(IClientAPI sender, Packet Pack)
+        bool HandleRezScript(IClientAPI sender, Packet Pack)
         {
             //MainConsole.Instance.Debug(Pack.ToString());
             RezScriptPacket rezScriptx = (RezScriptPacket) Pack;
@@ -9079,7 +9126,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleMapLayerRequest(IClientAPI sender, Packet Pack)
+        bool HandleMapLayerRequest(IClientAPI sender, Packet Pack)
         {
             #region Packet Session and User Check
 
@@ -9096,7 +9143,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleMapBlockRequest(IClientAPI sender, Packet Pack)
+        bool HandleMapBlockRequest(IClientAPI sender, Packet Pack)
         {
             MapBlockRequestPacket MapRequest = (MapBlockRequestPacket) Pack;
 
@@ -9121,7 +9168,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleMapNameRequest(IClientAPI sender, Packet Pack)
+        bool HandleMapNameRequest(IClientAPI sender, Packet Pack)
         {
             MapNameRequestPacket map = (MapNameRequestPacket) Pack;
 
@@ -9146,7 +9193,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleTeleportLandmarkRequest(IClientAPI sender, Packet Pack)
+        bool HandleTeleportLandmarkRequest(IClientAPI sender, Packet Pack)
         {
             TeleportLandmarkRequestPacket tpReq = (TeleportLandmarkRequestPacket) Pack;
 
@@ -9231,7 +9278,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleTeleportLocationRequest(IClientAPI sender, Packet Pack)
+        bool HandleTeleportLocationRequest(IClientAPI sender, Packet Pack)
         {
             TeleportLocationRequestPacket tpLocReq = (TeleportLocationRequestPacket) Pack;
             // MainConsole.Instance.Debug(tpLocReq.ToString());
@@ -9267,7 +9314,7 @@ namespace WhiteCore.ClientStack
 
         #endregion Inventory/Asset/Other related packets
 
-        private bool HandleUUIDNameRequest(IClientAPI sender, Packet Pack)
+        bool HandleUUIDNameRequest(IClientAPI sender, Packet Pack)
         {
             UUIDNameRequestPacket incoming = (UUIDNameRequestPacket) Pack;
 
@@ -9284,7 +9331,7 @@ namespace WhiteCore.ClientStack
 
         #region Parcel related packets
 
-        private bool HandleRegionHandleRequest(IClientAPI sender, Packet Pack)
+        bool HandleRegionHandleRequest(IClientAPI sender, Packet Pack)
         {
             RegionHandleRequestPacket rhrPack = (RegionHandleRequestPacket) Pack;
 
@@ -9296,7 +9343,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleParcelInfoRequest(IClientAPI sender, Packet Pack)
+        bool HandleParcelInfoRequest(IClientAPI sender, Packet Pack)
         {
             ParcelInfoRequestPacket pirPack = (ParcelInfoRequestPacket) Pack;
 
@@ -9319,7 +9366,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleParcelAccessListRequest(IClientAPI sender, Packet Pack)
+        bool HandleParcelAccessListRequest(IClientAPI sender, Packet Pack)
         {
             ParcelAccessListRequestPacket requestPacket = (ParcelAccessListRequestPacket) Pack;
 
@@ -9345,7 +9392,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleParcelAccessListUpdate(IClientAPI sender, Packet Pack)
+        bool HandleParcelAccessListUpdate(IClientAPI sender, Packet Pack)
         {
             ParcelAccessListUpdatePacket updatePacket = (ParcelAccessListUpdatePacket) Pack;
 
@@ -9378,7 +9425,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleParcelPropertiesRequest(IClientAPI sender, Packet Pack)
+        bool HandleParcelPropertiesRequest(IClientAPI sender, Packet Pack)
         {
             ParcelPropertiesRequestPacket propertiesRequest = (ParcelPropertiesRequestPacket) Pack;
 
@@ -9406,7 +9453,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleParcelDivide(IClientAPI sender, Packet Pack)
+        bool HandleParcelDivide(IClientAPI sender, Packet Pack)
         {
             ParcelDividePacket landDivide = (ParcelDividePacket) Pack;
 
@@ -9432,7 +9479,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleParcelJoin(IClientAPI sender, Packet Pack)
+        bool HandleParcelJoin(IClientAPI sender, Packet Pack)
         {
             ParcelJoinPacket landJoin = (ParcelJoinPacket) Pack;
 
@@ -9459,7 +9506,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleParcelPropertiesUpdate(IClientAPI sender, Packet Pack)
+        bool HandleParcelPropertiesUpdate(IClientAPI sender, Packet Pack)
         {
             ParcelPropertiesUpdatePacket parcelPropertiesPacket = (ParcelPropertiesUpdatePacket) Pack;
 
@@ -9514,7 +9561,7 @@ namespace WhiteCore.ClientStack
             }
         }
 
-        private bool HandleParcelSelectObjects(IClientAPI sender, Packet Pack)
+        bool HandleParcelSelectObjects(IClientAPI sender, Packet Pack)
         {
             ParcelSelectObjectsPacket selectPacket = (ParcelSelectObjectsPacket) Pack;
 
@@ -9541,7 +9588,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleParcelObjectOwnersRequest(IClientAPI sender, Packet Pack)
+        bool HandleParcelObjectOwnersRequest(IClientAPI sender, Packet Pack)
         {
             ParcelObjectOwnersRequestPacket reqPacket = (ParcelObjectOwnersRequestPacket) Pack;
 
@@ -9565,7 +9612,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleParcelGodForceOwner(IClientAPI sender, Packet Pack)
+        bool HandleParcelGodForceOwner(IClientAPI sender, Packet Pack)
         {
             ParcelGodForceOwnerPacket godForceOwnerPacket = (ParcelGodForceOwnerPacket) Pack;
 
@@ -9588,7 +9635,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleParcelRelease(IClientAPI sender, Packet Pack)
+        bool HandleParcelRelease(IClientAPI sender, Packet Pack)
         {
             ParcelReleasePacket releasePacket = (ParcelReleasePacket) Pack;
 
@@ -9611,7 +9658,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleParcelReclaim(IClientAPI sender, Packet Pack)
+        bool HandleParcelReclaim(IClientAPI sender, Packet Pack)
         {
             ParcelReclaimPacket reclaimPacket = (ParcelReclaimPacket) Pack;
 
@@ -9634,7 +9681,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleParcelReturnObjects(IClientAPI sender, Packet Pack)
+        bool HandleParcelReturnObjects(IClientAPI sender, Packet Pack)
         {
             ParcelReturnObjectsPacket parcelReturnObjects = (ParcelReturnObjectsPacket) Pack;
 
@@ -9668,7 +9715,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleParcelSetOtherCleanTime(IClientAPI sender, Packet Pack)
+        bool HandleParcelSetOtherCleanTime(IClientAPI sender, Packet Pack)
         {
             ParcelSetOtherCleanTimePacket parcelSetOtherCleanTimePacket = (ParcelSetOtherCleanTimePacket) Pack;
 
@@ -9693,7 +9740,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleLandStatRequest(IClientAPI sender, Packet Pack)
+        bool HandleLandStatRequest(IClientAPI sender, Packet Pack)
         {
             LandStatRequestPacket lsrp = (LandStatRequestPacket) Pack;
 
@@ -9717,7 +9764,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleParcelDwellRequest(IClientAPI sender, Packet Pack)
+        bool HandleParcelDwellRequest(IClientAPI sender, Packet Pack)
         {
             ParcelDwellRequestPacket dwellrq =
                 (ParcelDwellRequestPacket) Pack;
@@ -9745,7 +9792,7 @@ namespace WhiteCore.ClientStack
 
         #region Estate Packets
 
-        private bool HandleEstateOwnerMessage(IClientAPI sender, Packet Pack)
+        bool HandleEstateOwnerMessage(IClientAPI sender, Packet Pack)
         {
             EstateOwnerMessagePacket messagePacket = (EstateOwnerMessagePacket) Pack;
             //MainConsole.Instance.Debug(messagePacket.ToString());
@@ -10144,7 +10191,7 @@ namespace WhiteCore.ClientStack
             }
         }
 
-        private bool HandleRequestRegionInfo(IClientAPI sender, Packet Pack)
+        bool HandleRequestRegionInfo(IClientAPI sender, Packet Pack)
         {
             RequestRegionInfoPacket.AgentDataBlock mPacket = ((RequestRegionInfoPacket) Pack).AgentData;
 
@@ -10167,7 +10214,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleEstateCovenantRequest(IClientAPI sender, Packet Pack)
+        bool HandleEstateCovenantRequest(IClientAPI sender, Packet Pack)
         {
             //EstateCovenantRequestPacket.AgentDataBlock epack =
             //     ((EstateCovenantRequestPacket)Pack).AgentData;
@@ -10184,7 +10231,7 @@ namespace WhiteCore.ClientStack
 
         #region GodPackets
 
-        private bool HandleRequestGodlikePowers(IClientAPI sender, Packet Pack)
+        bool HandleRequestGodlikePowers(IClientAPI sender, Packet Pack)
         {
             RequestGodlikePowersPacket rglpPack = (RequestGodlikePowersPacket) Pack;
             RequestGodlikePowersPacket.RequestBlockBlock rblock = rglpPack.RequestBlock;
@@ -10213,7 +10260,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleGodUpdateRegionInfoUpdate(IClientAPI client, Packet Packet)
+        bool HandleGodUpdateRegionInfoUpdate(IClientAPI client, Packet Packet)
         {
             GodUpdateRegionInfoPacket GodUpdateRegionInfo =
                 (GodUpdateRegionInfoPacket) Packet;
@@ -10246,7 +10293,7 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        private bool HandleSimWideDeletes(IClientAPI client, Packet Packet)
+        bool HandleSimWideDeletes(IClientAPI client, Packet Packet)
         {
             SimWideDeletesPacket SimWideDeletesRequest =
                 (SimWideDeletesPacket) Packet;
@@ -10272,7 +10319,7 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        private bool HandleGodlikeMessage(IClientAPI client, Packet Packet)
+        bool HandleGodlikeMessage(IClientAPI client, Packet Packet)
         {
             GodlikeMessagePacket GodlikeMessage =
                 (GodlikeMessagePacket) Packet;
@@ -10304,7 +10351,7 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        private bool HandleSaveStatePacket(IClientAPI client, Packet Packet)
+        bool HandleSaveStatePacket(IClientAPI client, Packet Packet)
         {
             StateSavePacket SaveStateMessage =
                 (StateSavePacket) Packet;
@@ -10329,7 +10376,7 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        private bool HandleGodKickUser(IClientAPI sender, Packet Pack)
+        bool HandleGodKickUser(IClientAPI sender, Packet Pack)
         {
             GodKickUserPacket gkupack = (GodKickUserPacket) Pack;
 
@@ -10353,7 +10400,7 @@ namespace WhiteCore.ClientStack
 
         #region Economy/Transaction Packets
 
-        private bool HandleMoneyBalanceRequest(IClientAPI sender, Packet Pack)
+        bool HandleMoneyBalanceRequest(IClientAPI sender, Packet Pack)
         {
             MoneyBalanceRequestPacket moneybalancerequestpacket = (MoneyBalanceRequestPacket) Pack;
 
@@ -10380,7 +10427,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleEconomyDataRequest(IClientAPI sender, Packet Pack)
+        bool HandleEconomyDataRequest(IClientAPI sender, Packet Pack)
         {
             EconomyDataRequest handlerEconomoyDataRequest = OnEconomyDataRequest;
             if (handlerEconomoyDataRequest != null)
@@ -10390,7 +10437,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleRequestPayPrice(IClientAPI sender, Packet Pack)
+        bool HandleRequestPayPrice(IClientAPI sender, Packet Pack)
         {
             RequestPayPricePacket requestPayPricePacket = (RequestPayPricePacket) Pack;
 
@@ -10402,7 +10449,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectSaleInfo(IClientAPI sender, Packet Pack)
+        bool HandleObjectSaleInfo(IClientAPI sender, Packet Pack)
         {
             ObjectSaleInfoPacket objectSaleInfoPacket = (ObjectSaleInfoPacket) Pack;
 
@@ -10433,7 +10480,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectBuy(IClientAPI sender, Packet Pack)
+        bool HandleObjectBuy(IClientAPI sender, Packet Pack)
         {
             ObjectBuyPacket objectBuyPacket = (ObjectBuyPacket) Pack;
 
@@ -10471,7 +10518,7 @@ namespace WhiteCore.ClientStack
 
         #region Script Packets
 
-        private bool HandleGetScriptRunning(IClientAPI sender, Packet Pack)
+        bool HandleGetScriptRunning(IClientAPI sender, Packet Pack)
         {
             GetScriptRunningPacket scriptRunning = (GetScriptRunningPacket) Pack;
 
@@ -10483,7 +10530,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleSetScriptRunning(IClientAPI sender, Packet Pack)
+        bool HandleSetScriptRunning(IClientAPI sender, Packet Pack)
         {
             SetScriptRunningPacket setScriptRunning = (SetScriptRunningPacket) Pack;
 
@@ -10507,7 +10554,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleScriptReset(IClientAPI sender, Packet Pack)
+        bool HandleScriptReset(IClientAPI sender, Packet Pack)
         {
             ScriptResetPacket scriptResetPacket = (ScriptResetPacket) Pack;
 
@@ -10534,7 +10581,7 @@ namespace WhiteCore.ClientStack
 
         #region Gesture Managment
 
-        private bool HandleActivateGestures(IClientAPI sender, Packet Pack)
+        bool HandleActivateGestures(IClientAPI sender, Packet Pack)
         {
             ActivateGesturesPacket activateGesturePacket = (ActivateGesturesPacket) Pack;
 
@@ -10561,7 +10608,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleDeactivateGestures(IClientAPI sender, Packet Pack)
+        bool HandleDeactivateGestures(IClientAPI sender, Packet Pack)
         {
             DeactivateGesturesPacket deactivateGesturePacket = (DeactivateGesturesPacket) Pack;
 
@@ -10584,7 +10631,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleObjectOwner(IClientAPI sender, Packet Pack)
+        bool HandleObjectOwner(IClientAPI sender, Packet Pack)
         {
             ObjectOwnerPacket objectOwnerPacket = (ObjectOwnerPacket) Pack;
 
@@ -10612,7 +10659,7 @@ namespace WhiteCore.ClientStack
 
         #endregion Gesture Managment
 
-        private bool HandleAgentFOV(IClientAPI sender, Packet Pack)
+        bool HandleAgentFOV(IClientAPI sender, Packet Pack)
         {
             AgentFOVPacket fovPacket = (AgentFOVPacket) Pack;
 
@@ -10641,25 +10688,25 @@ namespace WhiteCore.ClientStack
 
         #region unimplemented handlers
 
-        private bool HandleViewerStats(IClientAPI sender, Packet Pack)
+        bool HandleViewerStats(IClientAPI sender, Packet Pack)
         {
             //MainConsole.Instance.Warn("[CLIENT]: unhandled ViewerStats packet");
             return true;
         }
 
-        private bool HandleUseCircuitCode(IClientAPI sender, Packet Pack)
+        bool HandleUseCircuitCode(IClientAPI sender, Packet Pack)
         {
             return true;
         }
 
-        private bool HandleAgentHeightWidth(IClientAPI sender, Packet Pack)
+        bool HandleAgentHeightWidth(IClientAPI sender, Packet Pack)
         {
             return true;
         }
 
         #endregion unimplemented handlers
 
-        private bool HandleMapItemRequest(IClientAPI sender, Packet Pack)
+        bool HandleMapItemRequest(IClientAPI sender, Packet Pack)
         {
             MapItemRequestPacket mirpk = (MapItemRequestPacket) Pack;
 
@@ -10685,7 +10732,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleMuteListRequest(IClientAPI sender, Packet Pack)
+        bool HandleMuteListRequest(IClientAPI sender, Packet Pack)
         {
             MuteListRequestPacket muteListRequest =
                 (MuteListRequestPacket) Pack;
@@ -10713,7 +10760,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleUpdateMuteListEntry(IClientAPI client, Packet Packet)
+        bool HandleUpdateMuteListEntry(IClientAPI client, Packet Packet)
         {
             UpdateMuteListEntryPacket UpdateMuteListEntry =
                 (UpdateMuteListEntryPacket) Packet;
@@ -10741,7 +10788,7 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        private bool HandleRemoveMuteListEntry(IClientAPI client, Packet Packet)
+        bool HandleRemoveMuteListEntry(IClientAPI client, Packet Packet)
         {
             RemoveMuteListEntryPacket RemoveMuteListEntry =
                 (RemoveMuteListEntryPacket) Packet;
@@ -10769,7 +10816,7 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        private bool HandleUserReport(IClientAPI client, Packet Packet)
+        bool HandleUserReport(IClientAPI client, Packet Packet)
         {
             UserReportPacket UserReport =
                 (UserReportPacket) Packet;
@@ -10805,7 +10852,7 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        private bool HandleSendPostcard(IClientAPI client, Packet packet)
+        bool HandleSendPostcard(IClientAPI client, Packet packet)
         {
             SendPostcardPacket SendPostcard =
                 (SendPostcardPacket) packet;
@@ -10830,7 +10877,7 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        private bool HandleViewerStartAuction(IClientAPI client, Packet packet)
+        bool HandleViewerStartAuction(IClientAPI client, Packet packet)
         {
             ViewerStartAuctionPacket aPacket = (ViewerStartAuctionPacket) packet;
             ViewerStartAuction handlerStartAuction = OnViewerStartAuction;
@@ -10843,7 +10890,7 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        private bool HandleParcelDisableObjects(IClientAPI client, Packet packet)
+        bool HandleParcelDisableObjects(IClientAPI client, Packet packet)
         {
             ParcelDisableObjectsPacket aPacket = (ParcelDisableObjectsPacket) packet;
             ParcelReturnObjectsRequest handlerParcelDisableObjectsRequest = OnParcelDisableObjectsRequest;
@@ -10858,7 +10905,7 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        private bool HandleVelocityInterpolate(IClientAPI client, Packet packet)
+        bool HandleVelocityInterpolate(IClientAPI client, Packet packet)
         {
             VelocityInterpolateChangeRequest handlerVelocityInterpolateChangeRequest = OnVelocityInterpolateChangeRequest;
 
@@ -10870,7 +10917,7 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        private bool HandleTeleportCancel(IClientAPI client, Packet packet)
+        bool HandleTeleportCancel(IClientAPI client, Packet packet)
         {
             TeleportCancel handlerTeleportCancel = OnTeleportCancel;
 
@@ -10884,7 +10931,7 @@ namespace WhiteCore.ClientStack
 
         #region Dir handlers
 
-        private bool HandleDirPlacesQuery(IClientAPI sender, Packet Pack)
+        bool HandleDirPlacesQuery(IClientAPI sender, Packet Pack)
         {
             DirPlacesQueryPacket dirPlacesQueryPacket = (DirPlacesQueryPacket) Pack;
             //MainConsole.Instance.Debug(dirPlacesQueryPacket.ToString());
@@ -10916,7 +10963,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleDirFindQuery(IClientAPI sender, Packet Pack)
+        bool HandleDirFindQuery(IClientAPI sender, Packet Pack)
         {
             DirFindQueryPacket dirFindQueryPacket = (DirFindQueryPacket) Pack;
 
@@ -10944,7 +10991,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleDirLandQuery(IClientAPI sender, Packet Pack)
+        bool HandleDirLandQuery(IClientAPI sender, Packet Pack)
         {
             DirLandQueryPacket dirLandQueryPacket = (DirLandQueryPacket) Pack;
 
@@ -10973,7 +11020,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleDirPopularQuery(IClientAPI sender, Packet Pack)
+        bool HandleDirPopularQuery(IClientAPI sender, Packet Pack)
         {
             DirPopularQueryPacket dirPopularQueryPacket = (DirPopularQueryPacket) Pack;
 
@@ -10998,7 +11045,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleDirClassifiedQuery(IClientAPI sender, Packet Pack)
+        bool HandleDirClassifiedQuery(IClientAPI sender, Packet Pack)
         {
             DirClassifiedQueryPacket dirClassifiedQueryPacket = (DirClassifiedQueryPacket) Pack;
 
@@ -11027,7 +11074,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleEventInfoRequest(IClientAPI sender, Packet Pack)
+        bool HandleEventInfoRequest(IClientAPI sender, Packet Pack)
         {
             EventInfoRequestPacket eventInfoRequestPacket = (EventInfoRequestPacket) Pack;
 
@@ -11053,7 +11100,7 @@ namespace WhiteCore.ClientStack
 
         #region Calling Card
 
-        private bool HandleOfferCallingCard(IClientAPI sender, Packet Pack)
+        bool HandleOfferCallingCard(IClientAPI sender, Packet Pack)
         {
             OfferCallingCardPacket offerCallingCardPacket = (OfferCallingCardPacket) Pack;
 
@@ -11077,7 +11124,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleAcceptCallingCard(IClientAPI sender, Packet Pack)
+        bool HandleAcceptCallingCard(IClientAPI sender, Packet Pack)
         {
             AcceptCallingCardPacket acceptCallingCardPacket = (AcceptCallingCardPacket) Pack;
 
@@ -11103,7 +11150,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleDeclineCallingCard(IClientAPI sender, Packet Pack)
+        bool HandleDeclineCallingCard(IClientAPI sender, Packet Pack)
         {
             DeclineCallingCardPacket declineCallingCardPacket = (DeclineCallingCardPacket) Pack;
 
@@ -11130,7 +11177,7 @@ namespace WhiteCore.ClientStack
 
         #region Groups
 
-        private bool HandleActivateGroup(IClientAPI sender, Packet Pack)
+        bool HandleActivateGroup(IClientAPI sender, Packet Pack)
         {
             ActivateGroupPacket activateGroupPacket = (ActivateGroupPacket) Pack;
 
@@ -11152,7 +11199,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleGroupVoteHistoryRequest(IClientAPI client, Packet Packet)
+        bool HandleGroupVoteHistoryRequest(IClientAPI client, Packet Packet)
         {
             GroupVoteHistoryRequestPacket GroupVoteHistoryRequest =
                 (GroupVoteHistoryRequestPacket) Packet;
@@ -11168,7 +11215,7 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        private bool HandleGroupProposalBallot(IClientAPI client, Packet Packet)
+        bool HandleGroupProposalBallot(IClientAPI client, Packet Packet)
         {
             GroupProposalBallotPacket GroupProposalBallotRequest =
                 (GroupProposalBallotPacket) Packet;
@@ -11185,7 +11232,7 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        private bool HandleGroupActiveProposalsRequest(IClientAPI client, Packet Packet)
+        bool HandleGroupActiveProposalsRequest(IClientAPI client, Packet Packet)
         {
             GroupActiveProposalsRequestPacket GroupActiveProposalsRequest =
                 (GroupActiveProposalsRequestPacket) Packet;
@@ -11201,7 +11248,7 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        private bool HandleGroupAccountDetailsRequest(IClientAPI client, Packet Packet)
+        bool HandleGroupAccountDetailsRequest(IClientAPI client, Packet Packet)
         {
             GroupAccountDetailsRequestPacket GroupAccountDetailsRequest =
                 (GroupAccountDetailsRequestPacket) Packet;
@@ -11219,7 +11266,7 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        private bool HandleGroupAccountSummaryRequest(IClientAPI client, Packet Packet)
+        bool HandleGroupAccountSummaryRequest(IClientAPI client, Packet Packet)
         {
             GroupAccountSummaryRequestPacket GroupAccountSummaryRequest =
                 (GroupAccountSummaryRequestPacket) Packet;
@@ -11236,7 +11283,7 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        private bool HandleGroupTransactionsDetailsRequest(IClientAPI client, Packet Packet)
+        bool HandleGroupTransactionsDetailsRequest(IClientAPI client, Packet Packet)
         {
             GroupAccountTransactionsRequestPacket GroupAccountTransactionsRequest =
                 (GroupAccountTransactionsRequestPacket) Packet;
@@ -11254,7 +11301,7 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        private bool HandleGroupTitlesRequest(IClientAPI sender, Packet Pack)
+        bool HandleGroupTitlesRequest(IClientAPI sender, Packet Pack)
         {
             GroupTitlesRequestPacket groupTitlesRequest =
                 (GroupTitlesRequestPacket) Pack;
@@ -11306,7 +11353,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleGroupProfileRequest(IClientAPI sender, Packet Pack)
+        bool HandleGroupProfileRequest(IClientAPI sender, Packet Pack)
         {
             GroupProfileRequestPacket groupProfileRequest =
                 (GroupProfileRequestPacket) Pack;
@@ -11356,7 +11403,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleGroupMembersRequest(IClientAPI sender, Packet Pack)
+        bool HandleGroupMembersRequest(IClientAPI sender, Packet Pack)
         {
             GroupMembersRequestPacket groupMembersRequestPacket =
                 (GroupMembersRequestPacket) Pack;
@@ -11427,7 +11474,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleGroupRoleDataRequest(IClientAPI sender, Packet Pack)
+        bool HandleGroupRoleDataRequest(IClientAPI sender, Packet Pack)
         {
             GroupRoleDataRequestPacket groupRolesRequest =
                 (GroupRoleDataRequestPacket) Pack;
@@ -11493,7 +11540,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleGroupRoleMembersRequest(IClientAPI sender, Packet Pack)
+        bool HandleGroupRoleMembersRequest(IClientAPI sender, Packet Pack)
         {
             GroupRoleMembersRequestPacket groupRoleMembersRequest =
                 (GroupRoleMembersRequestPacket) Pack;
@@ -11553,7 +11600,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleCreateGroupRequest(IClientAPI sender, Packet Pack)
+        bool HandleCreateGroupRequest(IClientAPI sender, Packet Pack)
         {
             CreateGroupRequestPacket createGroupRequest =
                 (CreateGroupRequestPacket) Pack;
@@ -11571,6 +11618,12 @@ namespace WhiteCore.ClientStack
 
             if (m_GroupsModule != null)
             {
+                if (Utilities.IsSystemUser (AgentId))
+                {
+                    SendAgentAlertMessage ("System users are for mainteneace tasks only!", false);
+                    return false;
+                }
+               
                 m_GroupsModule.CreateGroup(this,
                                            Utils.BytesToString(createGroupRequest.GroupData.Name),
                                            Utils.BytesToString(createGroupRequest.GroupData.Charter),
@@ -11584,7 +11637,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleUpdateGroupInfo(IClientAPI sender, Packet Pack)
+        bool HandleUpdateGroupInfo(IClientAPI sender, Packet Pack)
         {
             UpdateGroupInfoPacket updateGroupInfo =
                 (UpdateGroupInfoPacket) Pack;
@@ -11616,7 +11669,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleSetGroupAcceptNotices(IClientAPI sender, Packet Pack)
+        bool HandleSetGroupAcceptNotices(IClientAPI sender, Packet Pack)
         {
             SetGroupAcceptNoticesPacket setGroupAcceptNotices =
                 (SetGroupAcceptNoticesPacket) Pack;
@@ -11643,7 +11696,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleGroupTitleUpdate(IClientAPI sender, Packet Pack)
+        bool HandleGroupTitleUpdate(IClientAPI sender, Packet Pack)
         {
             GroupTitleUpdatePacket groupTitleUpdate =
                 (GroupTitleUpdatePacket) Pack;
@@ -11669,7 +11722,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleParcelDeedToGroup(IClientAPI sender, Packet Pack)
+        bool HandleParcelDeedToGroup(IClientAPI sender, Packet Pack)
         {
             ParcelDeedToGroupPacket parcelDeedToGroup = (ParcelDeedToGroupPacket) Pack;
 
@@ -11696,7 +11749,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleGroupNoticesListRequest(IClientAPI sender, Packet Pack)
+        bool HandleGroupNoticesListRequest(IClientAPI sender, Packet Pack)
         {
             GroupNoticesListRequestPacket groupNoticesListRequest =
                 (GroupNoticesListRequestPacket) Pack;
@@ -11747,7 +11800,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleGroupNoticeRequest(IClientAPI sender, Packet Pack)
+        bool HandleGroupNoticeRequest(IClientAPI sender, Packet Pack)
         {
             GroupNoticeRequestPacket groupNoticeRequest =
                 (GroupNoticeRequestPacket) Pack;
@@ -11771,7 +11824,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleGroupRoleUpdate(IClientAPI sender, Packet Pack)
+        bool HandleGroupRoleUpdate(IClientAPI sender, Packet Pack)
         {
             GroupRoleUpdatePacket groupRoleUpdate =
                 (GroupRoleUpdatePacket) Pack;
@@ -11806,7 +11859,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleGroupRoleChanges(IClientAPI sender, Packet Pack)
+        bool HandleGroupRoleChanges(IClientAPI sender, Packet Pack)
         {
             GroupRoleChangesPacket groupRoleChanges =
                 (GroupRoleChangesPacket) Pack;
@@ -11838,7 +11891,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleJoinGroupRequest(IClientAPI sender, Packet Pack)
+        bool HandleJoinGroupRequest(IClientAPI sender, Packet Pack)
         {
             JoinGroupRequestPacket joinGroupRequest =
                 (JoinGroupRequestPacket) Pack;
@@ -11862,7 +11915,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleLeaveGroupRequest(IClientAPI sender, Packet Pack)
+        bool HandleLeaveGroupRequest(IClientAPI sender, Packet Pack)
         {
             LeaveGroupRequestPacket leaveGroupRequest =
                 (LeaveGroupRequestPacket) Pack;
@@ -11886,7 +11939,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleEjectGroupMemberRequest(IClientAPI sender, Packet Pack)
+        bool HandleEjectGroupMemberRequest(IClientAPI sender, Packet Pack)
         {
             EjectGroupMemberRequestPacket ejectGroupMemberRequest =
                 (EjectGroupMemberRequestPacket) Pack;
@@ -11915,7 +11968,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleInviteGroupRequest(IClientAPI sender, Packet Pack)
+        bool HandleInviteGroupRequest(IClientAPI sender, Packet Pack)
         {
             InviteGroupRequestPacket inviteGroupRequest =
                 (InviteGroupRequestPacket) Pack;
@@ -11947,7 +12000,7 @@ namespace WhiteCore.ClientStack
 
         #endregion Groups
 
-        private bool HandleStartLure(IClientAPI sender, Packet Pack)
+        bool HandleStartLure(IClientAPI sender, Packet Pack)
         {
             StartLurePacket startLureRequest = (StartLurePacket) Pack;
 
@@ -11972,7 +12025,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleTeleportLureRequest(IClientAPI sender, Packet Pack)
+        bool HandleTeleportLureRequest(IClientAPI sender, Packet Pack)
         {
             TeleportLureRequestPacket teleportLureRequest =
                 (TeleportLureRequestPacket) Pack;
@@ -11997,7 +12050,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleClassifiedInfoRequest(IClientAPI sender, Packet Pack)
+        bool HandleClassifiedInfoRequest(IClientAPI sender, Packet Pack)
         {
             ClassifiedInfoRequestPacket classifiedInfoRequest =
                 (ClassifiedInfoRequestPacket) Pack;
@@ -12021,7 +12074,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleClassifiedInfoUpdate(IClientAPI sender, Packet Pack)
+        bool HandleClassifiedInfoUpdate(IClientAPI sender, Packet Pack)
         {
             ClassifiedInfoUpdatePacket classifiedInfoUpdate =
                 (ClassifiedInfoUpdatePacket) Pack;
@@ -12057,7 +12110,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleClassifiedDelete(IClientAPI sender, Packet Pack)
+        bool HandleClassifiedDelete(IClientAPI sender, Packet Pack)
         {
             ClassifiedDeletePacket classifiedDelete =
                 (ClassifiedDeletePacket) Pack;
@@ -12081,7 +12134,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleClassifiedGodDelete(IClientAPI sender, Packet Pack)
+        bool HandleClassifiedGodDelete(IClientAPI sender, Packet Pack)
         {
             ClassifiedGodDeletePacket classifiedGodDelete =
                 (ClassifiedGodDeletePacket) Pack;
@@ -12105,7 +12158,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleEventGodDelete(IClientAPI sender, Packet Pack)
+        bool HandleEventGodDelete(IClientAPI sender, Packet Pack)
         {
             EventGodDeletePacket eventGodDelete =
                 (EventGodDeletePacket) Pack;
@@ -12134,7 +12187,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleEventNotificationAddRequest(IClientAPI sender, Packet Pack)
+        bool HandleEventNotificationAddRequest(IClientAPI sender, Packet Pack)
         {
             EventNotificationAddRequestPacket eventNotificationAdd =
                 (EventNotificationAddRequestPacket) Pack;
@@ -12157,7 +12210,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleEventNotificationRemoveRequest(IClientAPI sender, Packet Pack)
+        bool HandleEventNotificationRemoveRequest(IClientAPI sender, Packet Pack)
         {
             EventNotificationRemoveRequestPacket eventNotificationRemove =
                 (EventNotificationRemoveRequestPacket) Pack;
@@ -12180,7 +12233,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleRetrieveInstantMessages(IClientAPI sender, Packet Pack)
+        bool HandleRetrieveInstantMessages(IClientAPI sender, Packet Pack)
         {
             RetrieveInstantMessagesPacket rimpInstantMessagePack = (RetrieveInstantMessagesPacket) Pack;
 
@@ -12201,7 +12254,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandlePickDelete(IClientAPI sender, Packet Pack)
+        bool HandlePickDelete(IClientAPI sender, Packet Pack)
         {
             PickDeletePacket pickDelete =
                 (PickDeletePacket) Pack;
@@ -12223,7 +12276,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandlePickGodDelete(IClientAPI sender, Packet Pack)
+        bool HandlePickGodDelete(IClientAPI sender, Packet Pack)
         {
             PickGodDeletePacket pickGodDelete =
                 (PickGodDeletePacket) Pack;
@@ -12248,7 +12301,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandlePickInfoUpdate(IClientAPI sender, Packet Pack)
+        bool HandlePickInfoUpdate(IClientAPI sender, Packet Pack)
         {
             PickInfoUpdatePacket pickInfoUpdate =
                 (PickInfoUpdatePacket) Pack;
@@ -12279,7 +12332,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleAvatarNotesUpdate(IClientAPI sender, Packet Pack)
+        bool HandleAvatarNotesUpdate(IClientAPI sender, Packet Pack)
         {
             AvatarNotesUpdatePacket avatarNotesUpdate =
                 (AvatarNotesUpdatePacket) Pack;
@@ -12303,7 +12356,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleAvatarInterestsUpdate(IClientAPI sender, Packet Pack)
+        bool HandleAvatarInterestsUpdate(IClientAPI sender, Packet Pack)
         {
             AvatarInterestsUpdatePacket avatarInterestUpdate =
                 (AvatarInterestsUpdatePacket) Pack;
@@ -12330,7 +12383,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleGrantUserRights(IClientAPI sender, Packet Pack)
+        bool HandleGrantUserRights(IClientAPI sender, Packet Pack)
         {
             GrantUserRightsPacket GrantUserRights =
                 (GrantUserRightsPacket) Pack;
@@ -12355,7 +12408,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandlePlacesQuery(IClientAPI sender, Packet Pack)
+        bool HandlePlacesQuery(IClientAPI sender, Packet Pack)
         {
             PlacesQueryPacket placesQueryPacket =
                 (PlacesQueryPacket) Pack;
@@ -12394,7 +12447,7 @@ namespace WhiteCore.ClientStack
             OutPacket(scriptQuestion, ThrottleOutPacketType.AvatarInfo);
         }
 
-        private void InitDefaultAnimations()
+        void InitDefaultAnimations()
         {
             using (XmlTextReader reader = new XmlTextReader("data/avataranimations.xml"))
             {
@@ -12426,7 +12479,7 @@ namespace WhiteCore.ClientStack
         /// <param name="client"></param>
         /// <param name="packet"></param>
         /// <returns></returns>
-        private bool HandleLogout(IClientAPI client, Packet packet)
+        bool HandleLogout(IClientAPI client, Packet packet)
         {
             if (packet.Type == PacketType.LogoutRequest)
             {
@@ -12440,7 +12493,7 @@ namespace WhiteCore.ClientStack
         /// </summary>
         /// <param name="client"></param>
         /// <returns></returns>
-        private bool Logout(IClientAPI client)
+        bool Logout(IClientAPI client)
         {
             //MainConsole.Instance.InfoFormat("[CLIENT]: Got a logout request for {0} in {1}", Name, Scene.RegionInfo.RegionName);
 
@@ -12454,7 +12507,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        private bool HandleMultipleObjUpdate(IClientAPI simClient, Packet packet)
+        bool HandleMultipleObjUpdate(IClientAPI simClient, Packet packet)
         {
             MultipleObjectUpdatePacket multipleupdate = (MultipleObjectUpdatePacket) packet;
             if (multipleupdate.AgentData.SessionID != SessionId) return false;
@@ -12674,7 +12727,7 @@ namespace WhiteCore.ClientStack
         /// </summary>
         /// <param name="packet">Packet to send</param>
         /// <param name="throttlePacketType">Throttling category for the packet</param>
-        private void OutPacket(Packet packet, ThrottleOutPacketType throttlePacketType)
+        void OutPacket(Packet packet, ThrottleOutPacketType throttlePacketType)
         {
             #region BinaryStats
 
@@ -12695,7 +12748,7 @@ namespace WhiteCore.ClientStack
         ///     packets (the default), or false to disable splitting if the calling code
         ///     handles splitting manually
         /// </param>
-        private void OutPacket(Packet packet, ThrottleOutPacketType throttlePacketType, bool doAutomaticSplitting)
+        void OutPacket(Packet packet, ThrottleOutPacketType throttlePacketType, bool doAutomaticSplitting)
         {
             OutPacket(packet, throttlePacketType, doAutomaticSplitting, null);
         }
@@ -12711,7 +12764,7 @@ namespace WhiteCore.ClientStack
         ///     handles splitting manually
         /// </param>
         /// <param name="resendMethod">Method that will be called if the packet needs resent</param>
-        private void OutPacket(Packet packet, ThrottleOutPacketType throttlePacketType, bool doAutomaticSplitting,
+        void OutPacket(Packet packet, ThrottleOutPacketType throttlePacketType, bool doAutomaticSplitting,
                                UnackedPacketMethod resendMethod)
         {
             OutPacket(packet, throttlePacketType, doAutomaticSplitting, resendMethod, null);
@@ -12729,7 +12782,7 @@ namespace WhiteCore.ClientStack
         /// </param>
         /// <param name="resendMethod">Method that will be called if the packet needs resent</param>
         /// <param name="finishedMethod">Method that will be called when the packet is sent</param>
-        private void OutPacket(Packet packet, ThrottleOutPacketType throttlePacketType, bool doAutomaticSplitting,
+        void OutPacket(Packet packet, ThrottleOutPacketType throttlePacketType, bool doAutomaticSplitting,
                                UnackedPacketMethod resendMethod, UnackedPacketMethod finishedMethod)
         {
             if (m_debugPacketLevel > 0 || m_debugPackets.Contains(packet.Type.ToString()))
@@ -12860,7 +12913,7 @@ namespace WhiteCore.ClientStack
             PacketPool.Instance.ReturnPacket(packet);
         }
 
-        private static PrimitiveBaseShape GetShapeFromAddPacket(ObjectAddPacket addPacket)
+        static PrimitiveBaseShape GetShapeFromAddPacket(ObjectAddPacket addPacket)
         {
             PrimitiveBaseShape shape = new PrimitiveBaseShape
                                            {
@@ -12980,14 +13033,14 @@ namespace WhiteCore.ClientStack
 
         #region IClientCore
 
-        private readonly Dictionary<Type, object> m_clientInterfaces = new Dictionary<Type, object>();
+        readonly Dictionary<Type, object> m_clientInterfaces = new Dictionary<Type, object>();
 
         /// <summary>
         ///     Register an interface on this client, should only be called in the constructor.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="iface"></param>
-        private void RegisterInterface<T>(T iface)
+        void RegisterInterface<T>(T iface)
         {
             lock (m_clientInterfaces)
             {
@@ -13016,9 +13069,9 @@ namespace WhiteCore.ClientStack
 
         #endregion
 
-        private readonly List<UUID> m_transfersToAbort = new List<UUID>();
+        readonly List<UUID> m_transfersToAbort = new List<UUID>();
 
-        private bool HandleTransferAbort(IClientAPI sender, Packet Pack)
+        bool HandleTransferAbort(IClientAPI sender, Packet Pack)
         {
             TransferAbortPacket transferAbort = (TransferAbortPacket) Pack;
             m_transfersToAbort.Add(transferAbort.TransferInfo.TransferID);
@@ -13030,7 +13083,7 @@ namespace WhiteCore.ClientStack
         /// </summary>
         /// <param name="transferRequest"></param>
         /// <param name="taskID"></param>
-        private void MakeAssetRequest(TransferRequestPacket transferRequest, UUID taskID)
+        void MakeAssetRequest(TransferRequestPacket transferRequest, UUID taskID)
         {
             UUID requestID = UUID.Zero;
             switch (transferRequest.TransferInfo.SourceType)
@@ -13054,7 +13107,7 @@ namespace WhiteCore.ClientStack
         /// <param name="id"></param>
         /// <param name="sender"></param>
         /// <param name="asset"></param>
-        private void AssetReceived(string id, Object sender, AssetBase asset)
+        void AssetReceived(string id, Object sender, AssetBase asset)
         {
             //MainConsole.Instance.InfoFormat("[CLIENT]: {0} found requested asset", Name);
 
@@ -13108,7 +13161,7 @@ namespace WhiteCore.ClientStack
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        private static int CalculateNumPackets(byte[] data)
+        static int CalculateNumPackets(byte[] data)
         {
             const uint m_maxPacketSize = 1024;
 

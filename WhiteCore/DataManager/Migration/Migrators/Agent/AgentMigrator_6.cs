@@ -27,7 +27,6 @@
 
 using System;
 using System.Collections.Generic;
-using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.DataManager.Migration.Migrators.Agent
@@ -39,7 +38,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Agent
             Version = new Version(0, 0, 6);
             MigrationName = "Agent";
 
-            schema = new List<SchemaDefinition>();
+            Schema = new List<SchemaDefinition>();
 
             RenameSchema("userdata", "user_profile");
             RemoveSchema("userdata");

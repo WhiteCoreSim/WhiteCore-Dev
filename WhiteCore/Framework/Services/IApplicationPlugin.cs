@@ -28,8 +28,8 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using WhiteCore.Framework.Modules;
 using Nini.Config;
+using WhiteCore.Framework.Modules;
 
 namespace WhiteCore.Framework.Services
 {
@@ -332,7 +332,7 @@ namespace WhiteCore.Framework.Services
             }
         }
 
-        private static string preparedKey(string key)
+        static string preparedKey(string key)
         {
             return
                 key.Replace("`", "")
@@ -365,7 +365,7 @@ namespace WhiteCore.Framework.Services
                 parts = new List<string>();
                 foreach (KeyValuePair<string, object> where in andFilters)
                 {
-                    string key = prepared.ToString() + "where_AND_" + (++i) + preparedKey(where.Key);
+                    string key = prepared + "where_AND_" + (++i) + preparedKey(where.Key);
                     ps[key] = where.Value;
                     parts.Add(string.Format("{0} = {1}", where.Key, key));
                 }
@@ -378,7 +378,7 @@ namespace WhiteCore.Framework.Services
                 parts = new List<string>();
                 foreach (KeyValuePair<string, object> where in orFilters)
                 {
-                    string key = prepared.ToString() + "where_OR_" + (++i) + preparedKey(where.Key);
+                    string key = prepared + "where_OR_" + (++i) + preparedKey(where.Key);
                     ps[key] = where.Value;
                     parts.Add(string.Format("{0} = {1}", where.Key, key));
                 }
@@ -393,7 +393,7 @@ namespace WhiteCore.Framework.Services
                 {
                     foreach (object value in where.Value)
                     {
-                        string key = prepared.ToString() + "where_OR_" + (++i) + preparedKey(where.Key);
+                        string key = prepared + "where_OR_" + (++i) + preparedKey(where.Key);
                         ps[key] = value;
                         parts.Add(string.Format("{0} = {1}", where.Key, key));
                     }
@@ -407,7 +407,7 @@ namespace WhiteCore.Framework.Services
                 parts = new List<string>();
                 foreach (KeyValuePair<string, object> where in andNotFilters)
                 {
-                    string key = prepared.ToString() + "where_AND_NOT_" + (++i) + preparedKey(where.Key);
+                    string key = prepared + "where_AND_NOT_" + (++i) + preparedKey(where.Key);
                     ps[key] = where.Value;
                     parts.Add(string.Format("{0} != {1}", where.Key, key));
                 }
@@ -424,7 +424,7 @@ namespace WhiteCore.Framework.Services
                 parts = new List<string>();
                 foreach (KeyValuePair<string, string> where in andLikeFilters)
                 {
-                    string key = prepared.ToString() + "where_ANDLIKE_" + (++i) + preparedKey(where.Key);
+                    string key = prepared + "where_ANDLIKE_" + (++i) + preparedKey(where.Key);
                     ps[key] = where.Value;
                     parts.Add(string.Format("{0} LIKE {1}", where.Key, key));
                 }
@@ -437,7 +437,7 @@ namespace WhiteCore.Framework.Services
                 parts = new List<string>();
                 foreach (KeyValuePair<string, string> where in orLikeFilters)
                 {
-                    string key = prepared.ToString() + "where_ORLIKE_" + (++i) + preparedKey(where.Key);
+                    string key = prepared + "where_ORLIKE_" + (++i) + preparedKey(where.Key);
                     ps[key] = where.Value;
                     parts.Add(string.Format("{0} LIKE {1}", where.Key, key));
                 }
@@ -452,7 +452,7 @@ namespace WhiteCore.Framework.Services
                 {
                     foreach (string value in where.Value)
                     {
-                        string key = prepared.ToString() + "where_ORLIKE_" + (++i) + preparedKey(where.Key);
+                        string key = prepared + "where_ORLIKE_" + (++i) + preparedKey(where.Key);
                         ps[key] = value;
                         parts.Add(string.Format("{0} LIKE {1}", where.Key, key));
                     }
@@ -470,7 +470,7 @@ namespace WhiteCore.Framework.Services
                 parts = new List<string>();
                 foreach (KeyValuePair<string, uint> where in andBitfieldAndFilters)
                 {
-                    string key = prepared.ToString() + "where_bAND_" + (++i) + preparedKey(where.Key);
+                    string key = prepared + "where_bAND_" + (++i) + preparedKey(where.Key);
                     ps[key] = where.Value;
                     parts.Add(string.Format("{0} & {1}", where.Key, key));
                 }
@@ -483,7 +483,7 @@ namespace WhiteCore.Framework.Services
                 parts = new List<string>();
                 foreach (KeyValuePair<string, uint> where in orBitfieldAndFilters)
                 {
-                    string key = prepared.ToString() + "where_bOR_" + (++i) + preparedKey(where.Key);
+                    string key = prepared + "where_bOR_" + (++i) + preparedKey(where.Key);
                     ps[key] = where.Value;
                     parts.Add(string.Format("{0} & {1}", where.Key, key));
                 }
@@ -496,7 +496,7 @@ namespace WhiteCore.Framework.Services
                 parts = new List<string>();
                 foreach (KeyValuePair<string, uint> where in andBitfieldNandFilters)
                 {
-                    string key = prepared.ToString() + "where_bNAND_" + (++i) + preparedKey(where.Key);
+                    string key = prepared + "where_bNAND_" + (++i) + preparedKey(where.Key);
                     ps[key] = where.Value;
                     parts.Add(string.Format("({0} & {1}) = 0", where.Key, key));
                 }
@@ -513,7 +513,7 @@ namespace WhiteCore.Framework.Services
                 parts = new List<string>();
                 foreach (KeyValuePair<string, object> where in andGreaterThanFilters)
                 {
-                    string key = prepared.ToString() + "where_gtAND_" + (++i) + preparedKey(where.Key);
+                    string key = prepared + "where_gtAND_" + (++i) + preparedKey(where.Key);
                     ps[key] = float.Parse((where.Value).ToString());
                     parts.Add(string.Format("{0} > {1}", where.Key, key));
                 }
@@ -526,7 +526,7 @@ namespace WhiteCore.Framework.Services
                 parts = new List<string>();
                 foreach (KeyValuePair<string, object> where in orGreaterThanFilters)
                 {
-                    string key = prepared.ToString() + "where_gtOR_" + (++i) + preparedKey(where.Key);
+                    string key = prepared + "where_gtOR_" + (++i) + preparedKey(where.Key);
                     ps[key] = float.Parse((where.Value).ToString());
                     parts.Add(string.Format("{0} > {1}", where.Key, key));
                 }
@@ -539,7 +539,7 @@ namespace WhiteCore.Framework.Services
                 parts = new List<string>();
                 foreach (KeyValuePair<string, object> where in andGreaterThanEqFilters)
                 {
-                    string key = prepared.ToString() + "where_gteqAND_" + (++i) + preparedKey(where.Key);
+                    string key = prepared + "where_gteqAND_" + (++i) + preparedKey(where.Key);
                     ps[key] = float.Parse((where.Value).ToString());
                     parts.Add(string.Format("{0} >= {1}", where.Key, key));
                 }
@@ -552,7 +552,7 @@ namespace WhiteCore.Framework.Services
                 parts = new List<string>();
                 foreach (KeyValuePair<string, object> where in orGreaterThanEqFilters)
                 {
-                    string key = prepared.ToString() + "where_gteqOR_" + (++i) + preparedKey(where.Key);
+                    string key = prepared + "where_gteqOR_" + (++i) + preparedKey(where.Key);
                     ps[key] = float.Parse((where.Value).ToString());
                     parts.Add(string.Format("{0} >= {1}", where.Key, key));
                 }
@@ -569,7 +569,7 @@ namespace WhiteCore.Framework.Services
                 parts = new List<string>();
                 foreach (KeyValuePair<string, object> where in andLessThanFilters)
                 {
-                    string key = prepared.ToString() + "where_ltAND_" + (++i) + preparedKey(where.Key);
+                    string key = prepared + "where_ltAND_" + (++i) + preparedKey(where.Key);
                     ps[key] = float.Parse((where.Value).ToString());
                     parts.Add(string.Format("{0} < {1}", where.Key, key));
                 }
@@ -582,7 +582,7 @@ namespace WhiteCore.Framework.Services
                 parts = new List<string>();
                 foreach (KeyValuePair<string, object> where in orLessThanFilters)
                 {
-                    string key = prepared.ToString() + "where_ltOR_" + (++i) + preparedKey(where.Key);
+                    string key = prepared + "where_ltOR_" + (++i) + preparedKey(where.Key);
                     ps[key] = float.Parse((where.Value).ToString());
                     parts.Add(string.Format("{0} < {1}", where.Key, key));
                 }
@@ -595,7 +595,7 @@ namespace WhiteCore.Framework.Services
                 parts = new List<string>();
                 foreach (KeyValuePair<string, object> where in andLessThanEqFilters)
                 {
-                    string key = prepared.ToString() + "where_lteqAND_" + (++i) + preparedKey(where.Key);
+                    string key = prepared + "where_lteqAND_" + (++i) + preparedKey(where.Key);
                     ps[key] = float.Parse((where.Value).ToString());
                     parts.Add(string.Format("{0} <= {1}", where.Key, key));
                 }
@@ -670,17 +670,17 @@ namespace WhiteCore.Framework.Services
         /// <summary>
         ///     Starts the database plugin, performs migrations if needed
         /// </summary>
-        /// <param name="GenericData">The Database Plugin</param>
+        /// <param name="genericData">The Database Plugin</param>
         /// <param name="source">Config if more parameters are needed</param>
         /// <param name="simBase"></param>
-        /// <param name="DefaultConnectionString">The connection string to use</param>
-        void Initialize(IGenericData GenericData, IConfigSource source, IRegistryCore simBase,
-                        string DefaultConnectionString);
+        /// <param name="defaultConnectionString">The connection string to use</param>
+        void Initialize(IGenericData genericData, IConfigSource source, IRegistryCore simBase,
+                        string defaultConnectionString);
     }
 
     public class QueryTables
     {
-        private readonly List<QueryTable> tables = new List<QueryTable>();
+        readonly List<QueryTable> tables = new List<QueryTable>();
 
         public void AddTable(QueryTable newTable)
         {
@@ -690,23 +690,23 @@ namespace WhiteCore.Framework.Services
         /// <summary>
         ///     Add main table to select from
         /// </summary>
-        /// <param name="Name"></param>
-        /// <param name="Alias"></param>
-        public void AddTable(string Name, string Alias)
+        /// <param name="name"></param>
+        /// <param name="alias"></param>
+        public void AddTable(string name, string alias)
         {
-            AddTable(new QueryTable() {TableName = Name, TableAlias = Alias});
+            AddTable(new QueryTable() {TableName = name, TableAlias = alias});
         }
 
         /// <summary>
         ///     Add secondary table that joins to another table
         /// </summary>
-        /// <param name="Name"></param>
-        /// <param name="Alias"></param>
+        /// <param name="name"></param>
+        /// <param name="alias"></param>
         /// <param name="jType"></param>
         /// <param name="toJoinOn"></param>
-        public void AddTable(string Name, string Alias, JoinType jType, string[,] toJoinOn)
+        public void AddTable(string name, string alias, JoinType jType, string[,] toJoinOn)
         {
-            AddTable(new QueryTable() {JoinOn = toJoinOn, TableAlias = Alias, TableName = Name, TypeJoin = jType});
+            AddTable(new QueryTable() {JoinOn = toJoinOn, TableAlias = alias, TableName = name, TypeJoin = jType});
         }
 
         public string ToSQL()

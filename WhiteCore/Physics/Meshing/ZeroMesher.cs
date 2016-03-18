@@ -66,13 +66,12 @@ namespace WhiteCore.Physics.Meshing
     {
         #region IMesher Members
 
-        public IMesh CreateMesh(String primName, PrimitiveBaseShape primShape, Vector3 size, float lod, bool isPhysical)
+        public IMesh CreateMesh(String primName, PrimitiveBaseShape primShape, Vector3 size, float lod, bool isPhysical, bool shouldCache)
         {
-            return null;
-        }
+            // Remove the reference to the encoded JPEG2000 data so it can be GCed
+            primShape.SculptData = Utils.EmptyBytes;
 
-        public void RemoveMesh(ulong key)
-        {
+            return null;
         }
 
         #endregion

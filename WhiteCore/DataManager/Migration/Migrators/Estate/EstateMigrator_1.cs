@@ -27,11 +27,11 @@
 
 using System;
 using System.Collections.Generic;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
 
 namespace WhiteCore.DataManager.Migration.Migrators.Estate
 {
@@ -42,7 +42,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Estate
             Version = new Version(0, 0, 1);
             MigrationName = "Estate";
 
-            schema = new List<SchemaDefinition>();
+            Schema = new List<SchemaDefinition>();
 
             RemoveSchema("estates");
             AddSchema("estateregions", ColDefs(

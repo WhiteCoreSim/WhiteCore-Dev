@@ -377,8 +377,8 @@ namespace WhiteCore.Services.DataService
 
                     if (fetch_folders)
                     {
-                        if (int.Parse(versionRetVal[1]) == (int) AssetType.TrashFolder ||
-                            int.Parse(versionRetVal[1]) == (int) AssetType.CurrentOutfitFolder ||
+                        if (int.Parse(versionRetVal[1]) == (int) FolderType.Trash ||
+                            int.Parse(versionRetVal[1]) == (int) FolderType.CurrentOutfit ||
                             int.Parse(versionRetVal[1]) == (int) AssetType.LinkFolder)
                         {
                             //If it is the trash folder, we need to send its descendents, because the viewer wants it

@@ -38,7 +38,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Region
             Version = new Version(0, 0, 0);
             MigrationName = "Region";
 
-            schema = new List<SchemaDefinition>();
+            Schema = new List<SchemaDefinition>();
 
             AddSchema("telehubs", ColDefs(
                 ColDef("RegionID", ColumnTypes.String50),

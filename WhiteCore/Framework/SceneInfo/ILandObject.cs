@@ -26,10 +26,10 @@
  */
 
 using System.Collections.Generic;
+using OpenMetaverse;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo.Entities;
-using OpenMetaverse;
 
 namespace WhiteCore.Framework.SceneInfo
 {

@@ -26,14 +26,14 @@
  */
 
 using System;
+using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.Utilities;
-using OpenMetaverse;
 
 namespace WhiteCore.Physics.OpenDynamicsEngine
 {
-    public class ODESpecificAvatar : WhiteCoreODECharacter
+    public class ODESpecificAvatar : ODECharacter
     {
         #region Declares
 
@@ -43,17 +43,17 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
         #region Constructor
 
-        public ODESpecificAvatar(String avName, WhiteCoreODEPhysicsScene parent_scene, Vector3 pos, Quaternion rotation,
+        public ODESpecificAvatar(String avName, ODEPhysicsScene parent_scene, Vector3 pos, Quaternion rotation,
                                  Vector3 size) : base(avName, parent_scene, pos, rotation, size)
         {
-            base._parent_ref = this;
+            _parent_ref = this;
         }
 
         #endregion
 
         #region Move
 
-        private int _appliedFallingForce = 0;
+        int _appliedFallingForce;
 
         /// <summary>
         ///     Called from Simulate
@@ -252,8 +252,10 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             #region Gravity
 
             if (!flying)
-                vec.Z += -9.8f*35*Mass*(_appliedFallingForce > 100 ? 1 : _appliedFallingForce++/100f)*
-                         (this.IsTruelyColliding ? 0.5f : 1.0f);
+                vec.Z += -9.8f * 35 * Mass
+                    * ( _appliedFallingForce > 100 ? 1 : _appliedFallingForce++/100f)
+                    * (IsTruelyColliding ? 0.5f : 1.0f);
+            
             else if (_parent_scene.AllowAvGravity && m_targetVelocity.Z > 0 &&
                      tempPos.Z > _parent_scene.AvGravityHeight) //Should be stop avies from flying upwards
             {
@@ -442,8 +444,12 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             PID_P /= 50*80;
             PID_P *= m_mass/_parent_scene.ODE_STEPSIZE;
 
+            // some filddles to prevent barfing - greythane
+            var actorType = (int) ActorTypes.Agent;
+            var ptrActorType = (IntPtr)actorType;
+
             Body = d.BodyCreate(_parent_scene.world);
-            d.BodySetData(Body, (IntPtr)ActorTypes.Agent);
+            d.BodySetData (Body, ptrActorType);
 
             d.BodySetPosition(Body, npositionX, npositionY, npositionZ);
 

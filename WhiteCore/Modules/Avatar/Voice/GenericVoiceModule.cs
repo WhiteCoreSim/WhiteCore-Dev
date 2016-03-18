@@ -26,6 +26,11 @@
  */
 
 
+using System;
+using System.Text;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
@@ -34,19 +39,13 @@ using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Interfaces;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using System;
-using System.Text;
 
 namespace WhiteCore.Modules.Voice
 {
     public class GenericVoiceModule : INonSharedRegionModule
     {
-        private string configToSend = "SLVoice";
-        private bool m_enabled = true;
-        private IScene m_scene;
+        bool m_enabled;
+        IScene m_scene;
 
         #region INonSharedRegionModule Members
 
@@ -55,17 +54,14 @@ namespace WhiteCore.Modules.Voice
             IConfig voiceconfig = config.Configs["Voice"];
             if (voiceconfig == null)
                 return;
-            m_enabled = false;
+            
             const string voiceModule = "GenericVoice";
             if (voiceconfig.GetString("Module", voiceModule) != voiceModule)
                 return;
+
+            // We are using generic voice calls to keep the viewer happy
             m_enabled = true;
-            IConfig m_config = config.Configs["GenericVoice"];
 
-            if (m_config == null)
-                return;
-
-            configToSend = m_config.GetString("ModuleToSend", configToSend);
         }
 
         public void AddRegion(IScene scene)
@@ -175,7 +171,7 @@ namespace WhiteCore.Modules.Voice
 
         #region Region-side message sending
 
-        private OSDMap syncRecievedService_OnMessageReceived(OSDMap message)
+        OSDMap syncRecievedService_OnMessageReceived(OSDMap message)
         {
             string method = message["Method"];
             if (method == "GetParcelChannelInfo")

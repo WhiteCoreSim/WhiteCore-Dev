@@ -7,6 +7,7 @@ If you are using the master build, you will need to compile WhiteCore-Sim before
   To do this, follow the instructions in Compiling.txt for your system before continuing on with
   this tutorial.
 
+Note: Additionmal details are in the 'Customising.txt' help file
 
 ##
 ## Setting up WhiteCore-Sim
@@ -16,25 +17,25 @@ If you are using the master build, you will need to compile WhiteCore-Sim before
       and should jump to the standalone section of this file.
   If you want to run more than one sim and allow remote sim connections, you want to run grid
       mode, and should jump to the grid section of this file.
-	  
+
 ##
 ## Standalone Mode
 ##
-  To run WhiteCore-Sim in standalone mode, just run WhiteCore.exe, and enter yes to allow it to 
+  To run WhiteCore-Sim in standalone mode, just run WhiteCore.exe, and enter yes to allow it to
       configure itself with the inputs from you.
-	  
+
 ##
 ## Grid Mode
 ##
-  To run WhiteCore-Sim in grid mode, Uncomment "Include-Single = ServerConfiguration/SingleServerInstance.ini" 
-	  in the WhiteCore.Server.ini file, setup the files under ServerConfiguration and then run WhiteCore.Server.exe, 
+  To run WhiteCore-Sim in grid mode, Uncomment "Include-Single = ServerConfiguration/SingleServerInstance.ini"
+	  in the WhiteCore.Server.ini file, setup the files under ServerConfiguration and then run WhiteCore.Server.exe,
 	  and enter yes to allow it to configure itself with the inputs from you
-	  
+
   Next, you'll start WhiteCore.exe, and enter yes to allow it to configure itself (make sure to set it
-      up in grid mode!) with the inputs from you. 
+      up in grid mode!) with the inputs from you.
   Your grid is now fully configured, and to restart it, just start the same .exe files as above (without
       re-configuring the grid) in the same order.
-	  
+
 ##
 ## ADVANCED OPTIONS BELOW
 ##
@@ -43,21 +44,22 @@ If you are using the master build, you will need to compile WhiteCore-Sim before
 ## Setting up standalone to allow remote connections
 ##
   To allow standalone WhiteCore.exe to allow remote connections (like grid mode can),
-    you'll be doing some major config changes! 
+    you'll be doing some major config changes!
     If you're doing this, you had better have a good reason to!
-	YOU WILL NOT GET ANY ASSISTANCE IF YOU ARE TRYING TO DO THIS.
+	ASSISTANCE MAY BE SCARCE IF YOU ARE TRYING TO DO THIS.
+
   In essence, what you have to do is to enable the server handlers for WhiteCore.exe
 	which is possible, it's just not very pretty.
 	To do this, you'll have to open up Standalone.ini, and find the [Handlers]
-	section, and add in 
-	
+	section, and add in
+
 	#START COPYING
-	
-	LLLoginHandlerPort = 8002 ;;If you want to change this to 8002
+
+	  LLLoginHandlerPort = 8002 ;;If you want to change this to 8002
 
     SyncMessagePosterServiceOpenServerHandler = true
     SyncMessagePosterServiceServerHandlerPort = 8014
-	SyncMessagePosterServiceDoRemote = true
+	  SyncMessagePosterServiceDoRemote = true
     InstantMessagingServiceOpenServerHandler = true
     InstantMessagingServiceServerHandlerPort = 8014
     AssetServiceOpenServerHandler = true
@@ -70,26 +72,26 @@ If you are using the master build, you will need to compile WhiteCore-Sim before
     InventoryServiceServerHandlerPort = 8013
     UserAccountServiceOpenServerHandler = true
     UserAccountServiceServerHandlerPort = 8015
-	
+
 	#END COPYING
-	
+
 	Then in [WhiteCoreConnectors],
-	
+
 	#START COPYING
-	
-	DoRemoteCalls = False
+
+	  DoRemoteCalls = False
     AllowRemoteCalls = True
-	
+
 	#END COPYING
-	
-  This enables all of the remote listening handlers, so that other WhiteCore.exe 
+
+  This enables all of the remote listening handlers, so that other WhiteCore.exe
 	instances can connect to WhiteCore.exe as if it were WhiteCore.Server.exe
-	
+
 ##
 ## Running a grid of standalone WhiteCore.exe services all with one database
 ##
 
-This is possible... if you can do it, congratulations, you know the configs 
+This is possible... if you can do it, congratulations, you know the configs
   and how they interact with WhiteCore very well!
 
 ##
@@ -101,7 +103,12 @@ This too is possible, and if you can do it, congratulations, just like above.
 ##
 ## Tips on speeding up closed grids
 ##
-	
+
 1: Disable remote services for WhiteCore.exe in grid mode
     EG. Disabling the remote asset connector, and just have it directly
 	    access the database, so that WhiteCore.Server isn't as necessary.
+
+
+Rowan
+<greythane@gmail.com>
+December 2015

@@ -103,6 +103,13 @@ namespace WhiteCore.Framework.DatabaseInterfaces
         GroupMembersData GetAgentGroupMemberData(UUID requestingAgentID, UUID GroupID, UUID AgentID);
         List<GroupMembersData> GetGroupMembers(UUID requestingAgentID, UUID GroupID);
 
+        // banned
+        List<GroupBannedAgentsData> GetGroupBannedMembers(UUID requestingAgentID, UUID groupID);
+        void AddGroupBannedAgent (UUID requestingAgentID, UUID groupID, List<UUID> bannedUserID);
+        void RemoveGroupBannedAgent (UUID requestingAgentID, UUID groupID, List<UUID> bannedUserID);
+        bool IsGroupBannedUser (UUID groupID, UUID agentID);
+        GroupBannedAgentsData GetGroupBannedUser (UUID requestingAgentID, UUID groupID, UUID agentID);
+
         List<DirGroupsReplyData> FindGroups(UUID requestingAgentID, string search, uint? start, uint? count,
                                             uint queryflags);
 

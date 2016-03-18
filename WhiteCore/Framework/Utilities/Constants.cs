@@ -31,6 +31,7 @@ namespace WhiteCore.Framework.Utilities
     public static class Constants
     {
         public const double FloatDifference = .0000005;
+        public const string MISSING_TEXTURE_ID = "41fcdbb9-0896-495d-8889-1eb6fad88da3";       // texture to use when all else fails...
 
         // some predefined folders
         public const string DEFAULT_CONFIG_DIR = "../Config";
@@ -116,6 +117,7 @@ namespace WhiteCore.Framework.Utilities
 
         public const int SCHEDULED_PAYMENTS_DELAY = 15;     // minutes to wait after stipend payments before processing scheduled payments
         public const int GROUP_PAYMENTS_DELAY = 30;         // minutes to wait after stipend payments before processing group payments
+        public const int GROUP_DISBURSMENTS_DELAY = 5;      // offset disbursments by 5 minutes
         public const int DIRECTORYFEE_GRACE_PERIOD = 2;     // hours grace period before a fee will be charged at least once
 
     }

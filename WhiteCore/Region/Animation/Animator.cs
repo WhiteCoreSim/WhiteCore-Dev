@@ -26,14 +26,14 @@
  */
 
 using System;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
 
 
 namespace WhiteCore.Region.Animation
@@ -43,12 +43,12 @@ namespace WhiteCore.Region.Animation
     /// </summary>
     public class Animator : IAnimator
     {
-        private static AvatarAnimations m_defaultAnimations;
+        static AvatarAnimations m_defaultAnimations;
         protected int SLOWFLY_DELAY = 10;
 
-        private float m_animTickFall;
-        private float m_animTickStandup;
-        private float m_animTickWalk;
+        float m_animTickFall;
+        float m_animTickStandup;
+        float m_animTickWalk;
         protected AnimationSet m_animations;
         protected string m_movementAnimation = "DEFAULT";
 
@@ -57,9 +57,9 @@ namespace WhiteCore.Region.Animation
         /// </value>
         protected IScenePresence m_scenePresence;
 
-        private int m_timesBeforeSlowFlyIsOff;
+        int m_timesBeforeSlowFlyIsOff;
         protected bool m_useSplatAnimation = true;
-        private bool wasLastFlying = false;
+        bool wasLastFlying = false;
 
         public bool NeedsAnimationResent { get; set; }
 
@@ -224,8 +224,8 @@ namespace WhiteCore.Region.Animation
             PhysicsActor actor = m_scenePresence.PhysicsActor;
 
             // Create forward and left vectors from the current avatar rotation
-            Vector3 fwd = Vector3.UnitX*m_scenePresence.Rotation;
-            Vector3 left = Vector3.UnitY*m_scenePresence.Rotation;
+            Vector3 fwd = Vector3.UnitX * m_scenePresence.Rotation;
+            Vector3 left = Vector3.UnitY * m_scenePresence.Rotation;
 
             // Check control flags
             bool heldForward =
@@ -284,6 +284,7 @@ namespace WhiteCore.Region.Animation
             {
                 move.Z -= 1;
             }
+
             float fallVelocity = (actor != null) ? actor.Velocity.Z : 0.0f;
 
             if (heldTurnLeft && yawPos && !heldForward &&
@@ -319,13 +320,15 @@ namespace WhiteCore.Region.Animation
                 m_scenePresence.PhysicsActor.Velocity = Vector3.Zero;
                 return "STANDUP";
             }
-            else if (standupElapsed < BRUSH_TIME &&
-                     m_useSplatAnimation)
+
+            // need the brush off?
+            if (standupElapsed < BRUSH_TIME && m_useSplatAnimation)
             {
                 m_scenePresence.FallenStandUp = true;
                 return "BRUSH";
             }
-            else if (m_animTickStandup != 0 || m_scenePresence.FallenStandUp)
+
+            if (m_animTickStandup != 0 || m_scenePresence.FallenStandUp)
             {
                 m_scenePresence.FallenStandUp = false;
                 m_animTickStandup = 0;
@@ -343,6 +346,7 @@ namespace WhiteCore.Region.Animation
                 m_animTickFall = 0;
                 if (move.X != 0f || move.Y != 0f)
                 {
+                    // level?
                     if (move.Z == 0)
                     {
                         if (m_scenePresence.Scene.PhysicsScene.UseUnderWaterPhysics &&
@@ -350,42 +354,51 @@ namespace WhiteCore.Region.Animation
                         {
                             return "SWIM_FORWARD";
                         }
-                        else
+
+                        // must be flying then
+                        if (m_timesBeforeSlowFlyIsOff < SLOWFLY_DELAY)
                         {
-                            if (m_timesBeforeSlowFlyIsOff < SLOWFLY_DELAY)
-                            {
-                                m_timesBeforeSlowFlyIsOff++;
-                                return "FLYSLOW";
-                            }
-                            else
-                                return "FLY";
+                            m_timesBeforeSlowFlyIsOff++;
+                            return "FLYSLOW";
                         }
+
+                        return "FLY";
+                        
                     }
-                    else if (move.Z > 0)
+
+                    // going up then...
+                    if (move.Z > 0)
                     {
                         if (m_scenePresence.Scene.PhysicsScene.UseUnderWaterPhysics &&
                             actor.Position.Z < m_scenePresence.Scene.RegionInfo.RegionSettings.WaterHeight)
                             return "SWIM_UP";
-                        else
-                            return "FLYSLOW";
+
+                        // easy does it
+                        return "FLYSLOW";
                     }
                     if (m_scenePresence.Scene.PhysicsScene.UseUnderWaterPhysics &&
                         actor.Position.Z < m_scenePresence.Scene.RegionInfo.RegionSettings.WaterHeight)
                         return "SWIM_DOWN";
-                    else
-                        return "FLY";
+
+                    // in the wild blue yonder
+                    return "FLY";
                 }
-                else if (move.Z > 0f)
+
+                // moving left/right but going up as well?
+                if (move.Z > 0f)
                 {
                     //This is for the slow fly timer
                     m_timesBeforeSlowFlyIsOff = 0;
                     if (m_scenePresence.Scene.PhysicsScene.UseUnderWaterPhysics &&
                         actor.Position.Z < m_scenePresence.Scene.RegionInfo.RegionSettings.WaterHeight)
                         return "SWIM_UP";
-                    else
-                        return "HOVER_UP";
+
+                    // going up...
+                    return "HOVER_UP";
                 }
-                else if (move.Z < 0f)
+
+                // mabye moving down then?
+                if (move.Z < 0f)
                 {
                     wasLastFlying = true;
                     //This is for the slow fly timer
@@ -403,23 +416,23 @@ namespace WhiteCore.Region.Animation
                                                                   (int) m_scenePresence.AbsolutePosition.Y);
                             if (actor != null && (m_scenePresence.AbsolutePosition.Z - groundHeight) < 2)
                                 return "LAND";
-                            else
-                                return "HOVER_DOWN";
-                        }
-                        else
+                           
                             return "HOVER_DOWN";
+                        }
+
+                        // no ground here...
+                        return "HOVER_DOWN";
                     }
                 }
-                else
-                {
-                    //This is for the slow fly timer
-                    m_timesBeforeSlowFlyIsOff = 0;
-                    if (m_scenePresence.Scene.PhysicsScene.UseUnderWaterPhysics &&
-                        actor.Position.Z < m_scenePresence.Scene.RegionInfo.RegionSettings.WaterHeight)
-                        return "SWIM_HOVER";
-                    else
-                        return "HOVER";
-                }
+
+
+                //This is for the slow fly timer
+                m_timesBeforeSlowFlyIsOff = 0;
+                if (m_scenePresence.Scene.PhysicsScene.UseUnderWaterPhysics &&
+                    actor.Position.Z < m_scenePresence.Scene.RegionInfo.RegionSettings.WaterHeight)
+                    return "SWIM_HOVER";
+
+                return "HOVER";
             }
 
             m_timesBeforeSlowFlyIsOff = 0;
@@ -432,6 +445,7 @@ namespace WhiteCore.Region.Animation
             {
                 return "JUMP";
             }
+
             if (actor != null && actor.IsPreJumping)
             {
                 return "PREJUMP";
@@ -458,31 +472,36 @@ namespace WhiteCore.Region.Animation
             if (m_movementAnimation == "FALLDOWN")
             {
                 float fallElapsed = (Util.EnvironmentTickCount() - m_animTickFall)/1000f;
+                // soft landing?
                 if (fallElapsed < 0.75)
                 {
                     m_animTickFall = Util.EnvironmentTickCount();
 
                     return "SOFT_LAND";
                 }
-                else if (fallElapsed < 1.1 ||
+
+                // a bit harder then?
+                if (fallElapsed < 1.1 ||
                          (Math.Abs(actor.Velocity.X) > 1 && Math.Abs(actor.Velocity.Y) > 1 && actor.Velocity.Z < 3))
                 {
                     m_animTickFall = Util.EnvironmentTickCount();
 
                     return "LAND";
                 }
-                else
+
+                // maybe a hard one...
+                if (m_useSplatAnimation)
                 {
-                    if (m_useSplatAnimation)
-                    {
-                        m_animTickStandup = Util.EnvironmentTickCount();
-                        return "STANDUP";
-                    }
-                    else
-                        return "LAND";
+                    m_animTickStandup = Util.EnvironmentTickCount();
+                    return "STANDUP";
                 }
+
+                // just a simple landing
+                return "LAND";
             }
-            else if (m_movementAnimation == "LAND")
+
+            // landing then
+            if (m_movementAnimation == "LAND")
             {
                 if (actor != null && actor.Velocity.Z < 0)
                 {
@@ -503,26 +522,29 @@ namespace WhiteCore.Region.Animation
                     wasLastFlying = false;
                     if (actor.IsColliding)
                         m_animTickWalk = Util.EnvironmentTickCount();
+                    
                     // Walking / crouchwalking / running
                     if (move.Z < 0f)
                         return "CROUCHWALK";
-                    else if (m_scenePresence.SetAlwaysRun)
+
+                    // always run?
+                    if (m_scenePresence.SetAlwaysRun)
                         return "RUN";
-                    else
-                        return "WALK";
+                    
+                    // must be walking then
+                    return "WALK";
                 }
-                else
-                {
-                    // Not walking
-                    if (move.Z < 0f && !wasLastFlying)
-                        return "CROUCH";
-                    else
-                        return "STAND";
-                }
+
+                // Not walking
+                if (move.Z < 0f && !wasLastFlying)
+                    return "CROUCH";
+                
+                return "STAND";
             }
 
             #endregion Ground Movement
 
+            // none of the above so just continue the last animation
             return m_movementAnimation;
         }
 

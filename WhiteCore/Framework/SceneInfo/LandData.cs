@@ -79,7 +79,7 @@ namespace WhiteCore.Framework.SceneInfo
         string _mediaURL = String.Empty;
         int _mediaWidth;
         string _musicURL = String.Empty;
-        string _name = "Your Parcel";
+        string _name = "My Parcel";
         bool _obscureMedia;
         bool _obscureMusic;
         int _otherCleanTime;

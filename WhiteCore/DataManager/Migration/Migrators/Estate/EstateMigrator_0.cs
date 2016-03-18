@@ -38,7 +38,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Estate
             Version = new Version(0, 0, 0);
             MigrationName = "Estate";
 
-            schema = new List<SchemaDefinition>();
+            Schema = new List<SchemaDefinition>();
 
             AddSchema("estates", ColDefs(
                 ColDef("ID", ColumnTypes.String45),

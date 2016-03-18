@@ -125,7 +125,7 @@ namespace WhiteCore.Framework.Utilities
 
     public class SchemaDefinition
     {
-        private string m_name;
+        string m_name;
 
         /// <summary>
         ///     Name of schema
@@ -135,7 +135,7 @@ namespace WhiteCore.Framework.Utilities
             get { return m_name; }
         }
 
-        private ColumnDefinition[] m_columns;
+        ColumnDefinition[] m_columns;
 
         /// <summary>
         ///     Columns in schema
@@ -145,7 +145,7 @@ namespace WhiteCore.Framework.Utilities
             get { return m_columns; }
         }
 
-        private IndexDefinition[] m_indices;
+        IndexDefinition[] m_indices;
 
         /// <summary>
         ///     Indices in schema

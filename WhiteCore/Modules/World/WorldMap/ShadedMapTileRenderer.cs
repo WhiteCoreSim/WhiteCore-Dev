@@ -26,20 +26,20 @@
  */
 
 
+using System;
+using System.Drawing;
+using Nini.Config;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
-using Nini.Config;
-using System;
-using System.Drawing;
 
 namespace WhiteCore.Modules.WorldMap
 {
     public class ShadedMapTileRenderer : IMapTileTerrainRenderer
     {
-        private static readonly Color WATER_COLOR = Color.FromArgb(29, 71, 95);
+        static readonly Color WATER_COLOR = Color.FromArgb(29, 71, 95);
 
-        private IScene m_scene;
+        IScene m_scene;
         //private IConfigSource m_config; // not used currently
 
         #region IMapTileTerrainRenderer Members
@@ -150,7 +150,7 @@ namespace WhiteCore.Modules.WorldMap
                                 }
                                 catch (OverflowException)
                                 {
-                                    MainConsole.Instance.Debug("[MAPTILE]: Shadow failed at value: " + hfdiff.ToString());
+                                    MainConsole.Instance.Debug("[MAPTILE]: Shadow failed at value: " + hfdiff);
                                     ShadowDebugContinue = false;
                                 }
 

@@ -25,6 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
@@ -32,21 +36,16 @@ using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Inventory;
-using Nini.Config;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
 
 namespace WhiteCore.Modules.Inventory
 {
     public class InventoryTransferModule : INonSharedRegionModule
     {
-        //private IScene m_Scene;
-        private readonly List<IScene> m_Scenelist = new List<IScene>();
+        readonly List<IScene> m_Scenelist = new List<IScene>();
 
-        private bool m_Enabled = true;
-        private IMessageTransferModule m_TransferModule;
-        private IMoneyModule moneyService;
+        bool m_Enabled = true;
+        IMessageTransferModule m_TransferModule;
+        IMoneyModule moneyService;
 
         #region INonSharedRegionModule Members
 
@@ -71,7 +70,6 @@ namespace WhiteCore.Modules.Inventory
             if (!m_Enabled)
                 return;
 
-            //m_Scene = scene;
             m_Scenelist.Add(scene);
 
             scene.RegisterModuleInterface(this);
@@ -89,14 +87,12 @@ namespace WhiteCore.Modules.Inventory
             if (m_TransferModule == null)
             {
                 m_TransferModule = m_Scenelist[0].RequestModuleInterface<IMessageTransferModule>();
-//                m_TransferModule = m_Scene.RequestModuleInterface<IMessageTransferModule>();
                 if (m_TransferModule == null)
                 {
                     MainConsole.Instance.Error(
                         "[INVENTORY TRANSFER]: No Message transfer module found, transfers will be local only");
                     m_Enabled = false;
 
-                    //m_Scene = null;
                     m_Scenelist.Clear();
                     scene.EventManager.OnNewClient -= OnNewClient;
                     scene.EventManager.OnClosingClient -= OnClosingClient;
@@ -107,8 +103,6 @@ namespace WhiteCore.Modules.Inventory
 
         public void RemoveRegion(IScene scene)
         {
-            //m_Scene = null;
-
             scene.EventManager.OnNewClient -= OnNewClient;
             scene.EventManager.OnClosingClient -= OnClosingClient;
             scene.EventManager.OnIncomingInstantMessage -= OnGridInstantMessage;
@@ -131,18 +125,18 @@ namespace WhiteCore.Modules.Inventory
 
         #endregion
 
-        private void OnNewClient(IClientAPI client)
+        void OnNewClient(IClientAPI client)
         {
             // Inventory giving is conducted via instant message
             client.OnInstantMessage += OnInstantMessage;
         }
 
-        private void OnClosingClient(IClientAPI client)
+        void OnClosingClient(IClientAPI client)
         {
             client.OnInstantMessage -= OnInstantMessage;
         }
 
-        private IScene FindClientScene(UUID agentId)
+        IScene FindClientScene(UUID agentId)
         {
             lock (m_Scenelist)
             {
@@ -156,7 +150,7 @@ namespace WhiteCore.Modules.Inventory
             return null;
         }
 
-        private void OnInstantMessage(IClientAPI client, GridInstantMessage im)
+        void OnInstantMessage(IClientAPI client, GridInstantMessage im)
         {
             //MainConsole.Instance.InfoFormat("[INVENTORY TRANSFER]: OnInstantMessage {0}", im.dialog);
             IScene clientScene = FindClientScene(client.AgentId);
@@ -316,7 +310,7 @@ namespace WhiteCore.Modules.Inventory
                 MainConsole.Instance.DebugFormat ("[INVENTORY TRANSFER]: Declined message received");
 
                 InventoryFolderBase trashFolder =
-                    invService.GetFolderForType(client.AgentId, InventoryType.Unknown, AssetType.TrashFolder);
+                    invService.GetFolderForType(client.AgentId, InventoryType.Unknown, FolderType.Trash);
 
                 UUID inventoryID = im.SessionID; // The inventory item/folder, back from it's trip
 
@@ -385,7 +379,7 @@ namespace WhiteCore.Modules.Inventory
         /// <summary>
         /// </summary>
         /// <param name="msg"></param>
-        private void OnGridInstantMessage(GridInstantMessage msg)
+        void OnGridInstantMessage(GridInstantMessage msg)
         {
             // Check if this is ours to handle
             //

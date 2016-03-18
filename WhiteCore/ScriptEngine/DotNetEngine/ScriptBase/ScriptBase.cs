@@ -282,18 +282,18 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
             LSL_Types.list v = (LSL_Types.list) o;
             foreach (object ob in v.Data)
             {
-                if (ob.GetType() == typeof (LSL_Types.LSLInteger))
-                    cur = "i" + ob;
-                else if (ob.GetType() == typeof (LSL_Types.LSLFloat))
-                    cur = "f" + ob;
-                else if (ob.GetType() == typeof (LSL_Types.Vector3))
-                    cur = "v" + ob;
-                else if (ob.GetType() == typeof (LSL_Types.Quaternion))
-                    cur = "q" + ob;
-                else if (ob.GetType() == typeof (LSL_Types.LSLString))
-                    cur = "\"" + EscapeString(ob.ToString()) + "\"";
-                else if (o.GetType() == typeof (LSL_Types.list))
-                    cur = "{" + ListToString(ob) + "}";
+				if (ob is LSL_Types.LSLInteger)
+					cur = "i" + ob;
+				else if (ob is LSL_Types.LSLFloat)
+					cur = "f" + ob;
+				else if (ob is LSL_Types.Vector3)
+					cur = "v" + ob;
+				else if (ob is LSL_Types.Quaternion)
+					cur = "q" + ob;
+				else if (ob is LSL_Types.LSLString)
+					cur = "\"" + EscapeString(ob.ToString()) + "\"";
+				else if (o.GetType() == typeof(LSL_Types.list))
+					cur = "{" + ListToString(ob) + "}";
 
                 if (tmp == "")
                     tmp = cur;
@@ -325,18 +325,18 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
                     LSL_Types.list v = (LSL_Types.list) field.GetValue(this);
                     foreach (object o in v.Data)
                     {
-                        if (o.GetType() == typeof (LSL_Types.LSLInteger))
-                            cur = "i" + o;
-                        else if (o.GetType() == typeof (LSL_Types.LSLFloat))
-                            cur = "f" + o;
-                        else if (o.GetType() == typeof (LSL_Types.Vector3))
-                            cur = "v" + o;
-                        else if (o.GetType() == typeof (LSL_Types.Quaternion))
-                            cur = "q" + o;
-                        else if (o.GetType() == typeof (LSL_Types.LSLString))
-                            cur = "\"" + EscapeString(o.ToString()) + "\"";
-                        else if (o.GetType() == typeof (LSL_Types.list))
-                            cur = "{" + ListToString(o) + "}";
+						if (o is LSL_Types.LSLInteger)
+							cur = "i" + o;
+						else if (o is LSL_Types.LSLFloat)
+							cur = "f" + o;
+						else if (o is LSL_Types.Vector3)
+							cur = "v" + o;
+						else if (o is LSL_Types.Quaternion)
+							cur = "q" + o;
+						else if (o is LSL_Types.LSLString)
+							cur = "\"" + EscapeString(o.ToString()) + "\"";
+						else if (o.GetType() == typeof(LSL_Types.list))
+							cur = "{" + ListToString(o) + "}";
 
                         if (tmp == "")
                             tmp = cur;
@@ -582,6 +582,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
 
         public void Dispose()
         {
+        	GC.SuppressFinalize(this);
         }
 
         private Type m_typeCache; //This shouldn't normally be used

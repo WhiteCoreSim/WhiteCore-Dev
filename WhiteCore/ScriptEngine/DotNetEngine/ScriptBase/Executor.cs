@@ -75,7 +75,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
             no_sensor = 8589934592,
             on_rez = 17179869184,
             sensor = 34359738368,
-            transaction_event = 68719476736,
+            transaction_result = 68719476736,
             http_request = 137438953472
         }
 
@@ -286,6 +286,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
             m_eventFlagsMap.Add("not_at_rot_target", scriptEvents.not_at_rot_target);
             m_eventFlagsMap.Add("not_at_target", scriptEvents.not_at_target);
             m_eventFlagsMap.Add("no_sensor", scriptEvents.no_sensor);
+            m_eventFlagsMap.Add("object_rez", scriptEvents.object_rez);            
             m_eventFlagsMap.Add("on_rez", scriptEvents.on_rez);
             m_eventFlagsMap.Add("remote_data", scriptEvents.remote_data);
             m_eventFlagsMap.Add("run_time_permissions", scriptEvents.run_time_permissions);
@@ -296,8 +297,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
             m_eventFlagsMap.Add("touch", scriptEvents.touch);
             m_eventFlagsMap.Add("touch_end", scriptEvents.touch_end);
             m_eventFlagsMap.Add("touch_start", scriptEvents.touch_start);
-            m_eventFlagsMap.Add("transaction_event", scriptEvents.transaction_event);
-            m_eventFlagsMap.Add("object_rez", scriptEvents.object_rez);
+            m_eventFlagsMap.Add("transaction_result", scriptEvents.transaction_result);
         }
 
         public void ResetStateEventFlags()

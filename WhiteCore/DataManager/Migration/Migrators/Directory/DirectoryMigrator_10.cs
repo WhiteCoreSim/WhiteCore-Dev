@@ -38,7 +38,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Directory
             Version = new Version(0, 0, 10);
             MigrationName = "Directory";
 
-            schema = new List<SchemaDefinition>();
+            Schema = new List<SchemaDefinition>();
 
             AddSchema("searchparcel", ColDefs(
                 ColDef("RegionID", ColumnTypes.Char36),

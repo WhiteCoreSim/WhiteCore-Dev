@@ -27,11 +27,11 @@
 
 using OMV = OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Physics.BulletSPlugin
 {
     public class BSActorSetTorque : BSActor
     {
-        private BSFMotor m_torqueMotor;
+        BSFMotor m_torqueMotor;
 
         public BSActorSetTorque(BSScene physicsScene, BSPhysObject pObj, string actorName)
             : base(physicsScene, pObj, actorName)
@@ -51,6 +51,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         public override void Dispose()
         {
             Enabled = false;
+        DeactivateSetTorque();
         }
 
         // Called when physical parameters (properties set in Bullet) need to be re-applied.
@@ -91,7 +92,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // If a hover motor has not been created, create one and start the hovering.
-        private void ActivateSetTorque()
+        void ActivateSetTorque()
         {
             if (m_torqueMotor == null)
             {
@@ -102,7 +103,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
             }
         }
 
-        private void DeactivateSetTorque()
+        void DeactivateSetTorque()
         {
             if (m_torqueMotor != null)
             {
@@ -112,7 +113,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         }
 
         // Called just before the simulation step. Update the vertical position for hoverness.
-        private void Mover(float timeStep)
+        void Mover(float timeStep)
         {
             // Don't do force while the object is selected.
             if (!isActive)

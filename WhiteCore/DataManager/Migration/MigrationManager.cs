@@ -36,14 +36,14 @@ namespace WhiteCore.DataManager.Migration
 {
     public class MigrationManager
     {
-        private readonly IDataConnector genericData;
-        private readonly string migratorName;
-        private readonly List<Migrator> migrators = new List<Migrator>();
-        private readonly bool validateTables;
-        private bool executed;
-        private MigrationOperationDescription operationDescription;
-        private IRestorePoint restorePoint;
-        private bool rollback;
+        readonly IDataConnector genericData;
+        readonly string migratorName;
+        readonly List<Migrator> migrators = new List<Migrator>();
+        readonly bool validateTables;
+        bool executed;
+        MigrationOperationDescription operationDescription;
+        IRestorePoint restorePoint;
+        bool rollback;
 
         public MigrationManager(IDataConnector genericData, string migratorName, bool validateTables)
         {
@@ -80,7 +80,8 @@ namespace WhiteCore.DataManager.Migration
             //if there is no WhiteCore version, this is likely an entirely new installation
             if (currentVersion == null)
             {
-                Migrator defaultMigrator = GetHighestVersionMigratorThatCanProvideDefaultSetup();
+            	MainConsole.Instance.InfoFormat("[Migrator]: Clean installation for {0} found", migratorName);
+            	Migrator defaultMigrator = GetHighestVersionMigratorThatCanProvideDefaultSetup();
                 currentVersion = defaultMigrator.Version;
                 Migrator startMigrator = GetMigratorAfterVersion(defaultMigrator.Version);
                 var latestMigrator = GetLatestVersionMigrator();
@@ -97,6 +98,7 @@ namespace WhiteCore.DataManager.Migration
                 if (startMigrator != null)
                 {
                     Migrator targetMigrator = GetLatestVersionMigrator();
+                    MainConsole.Instance.InfoFormat("[Migrator]: New migration script for {0} found", migratorName);
                     operationDescription = new MigrationOperationDescription(MigrationOperationTypes.UpgradeToTarget,
                                                                              currentVersion, startMigrator.Version,
                                                                              targetMigrator.Version);
@@ -109,7 +111,7 @@ namespace WhiteCore.DataManager.Migration
             }
         }
 
-        private Migrator GetMigratorAfterVersion(Version version)
+        Migrator GetMigratorAfterVersion(Version version)
         {
             if (version == null)
             {
@@ -121,12 +123,12 @@ namespace WhiteCore.DataManager.Migration
                     migrator => migrator.Version > version);
         }
 
-        private Migrator GetLatestVersionMigrator()
+        Migrator GetLatestVersionMigrator()
         {
             return (from m in migrators orderby m.Version descending select m).First();
         }
 
-        private Migrator GetHighestVersionMigratorThatCanProvideDefaultSetup()
+        Migrator GetHighestVersionMigratorThatCanProvideDefaultSetup()
         {
             return (from m in migrators orderby m.Version descending select m).First();
         }
@@ -136,7 +138,7 @@ namespace WhiteCore.DataManager.Migration
             if (migratorName == "")
                 return;
 
-            if (operationDescription != null && executed == false &&
+            if (operationDescription != null && !executed &&
                 operationDescription.OperationType != MigrationOperationTypes.DoNothing)
             {
                 Migrator currentMigrator = GetMigratorByVersion(operationDescription.CurrentVersion);
@@ -161,7 +163,7 @@ namespace WhiteCore.DataManager.Migration
                 {
                     //Try rerunning the migrator and then the validation
                     //prepare restore point if something goes wrong
-                    MainConsole.Instance.Fatal(string.Format("Failed to validate migration {0}-{1}, retrying...",
+                    MainConsole.Instance.Fatal(string.Format("[Migrator]: Failed to validate migration {0}-{1}, retrying...",
                                                              currentMigrator.MigrationName, currentMigrator.Version));
 
                     currentMigrator.Migrate(genericData);
@@ -171,7 +173,7 @@ namespace WhiteCore.DataManager.Migration
                         SchemaDefinition rec;
                         currentMigrator.DebugTestThatAllTablesValidate(genericData, out rec);
                         MainConsole.Instance.Fatal(string.Format(
-                            "FAILED TO REVALIDATE MIGRATION {0}-{1}, FIXING TABLE FORCIBLY... NEW TABLE NAME {2}",
+                            "[Migrator]: FAILED TO REVALIDATE MIGRATION {0}-{1}, FIXING TABLE FORCIBLY... NEW TABLE NAME {2}",
                             currentMigrator.MigrationName,
                             currentMigrator.Version,
                             rec.Name + "_broken"
@@ -182,7 +184,7 @@ namespace WhiteCore.DataManager.Migration
                         if (!validated)
                         {
                             throw new MigrationOperationException(string.Format(
-                                "Current version {0}-{1} did not validate. Stopping here so we don't cause any trouble. No changes were made.",
+                                "[Migrator]: Current version {0}-{1} did not validate. Stopping here so we don't cause any trouble. No changes were made.",
                                 currentMigrator.MigrationName,
                                 currentMigrator.Version
                                                                       ));
@@ -218,7 +220,7 @@ namespace WhiteCore.DataManager.Migration
                     catch (Exception ex)
                     {
                         if (currentMigrator != null)
-                            throw new MigrationOperationException(string.Format("Migrating to version {0} failed, {1}.",
+                            throw new MigrationOperationException(string.Format("[Migrator]: Migrating to version {0} failed, {1}.",
                                                                                 currentMigrator.Version, ex));
                     }
                     executed = true;
@@ -230,7 +232,7 @@ namespace WhiteCore.DataManager.Migration
                         RollBackOperation();
                         if (currentMigrator != null)
                             throw new MigrationOperationException(
-                                string.Format("Migrating to version {0} did not validate. Restoring to restore point.",
+                                string.Format("[Migrator]: Migrating to version {0} did not validate. Restoring to restore point.",
                                               currentMigrator.Version));
                     }
                     else
@@ -253,7 +255,7 @@ namespace WhiteCore.DataManager.Migration
 
         public void RollBackOperation()
         {
-            if (operationDescription != null && executed && rollback == false && restorePoint != null)
+            if (operationDescription != null && executed && !rollback && restorePoint != null)
             {
                 restorePoint.DoRestore(genericData);
                 rollback = true;
@@ -265,7 +267,7 @@ namespace WhiteCore.DataManager.Migration
             return GetMigratorByVersion(version).Validate(genericData);
         }
 
-        private Migrator GetMigratorByVersion(Version version)
+        Migrator GetMigratorByVersion(Version version)
         {
             if (version == null)
                 return null;

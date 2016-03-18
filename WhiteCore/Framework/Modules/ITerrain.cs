@@ -26,8 +26,8 @@
  */
 
 using System.Drawing;
-using WhiteCore.Framework.PresenceInfo;
 using OpenMetaverse;
+using WhiteCore.Framework.PresenceInfo;
 
 namespace WhiteCore.Framework.Modules
 {

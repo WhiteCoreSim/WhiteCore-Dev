@@ -31,9 +31,12 @@ using System;
 using System.Linq;
 using OMV = OpenMetaverse;
 
-namespace WhiteCore.Region.Physics.BulletSPlugin
+namespace WhiteCore.Phyics.BulletSPlugin
 {
-    /*public class BSActorHover : BSActor
+    /*
+     //This functionality appers to have been incorporated directly in SceneObjectPart.UpdateLookAt()
+     
+    public class BSActorHover : BSActor
     {
         private BSFMotor m_hoverMotor;
 
@@ -55,6 +58,7 @@ namespace WhiteCore.Region.Physics.BulletSPlugin
         public override void Dispose()
         {
             Enabled = false;
+            DeactivateHover();
         }
 
         // Called when physical parameters (properties set in Bullet) need to be re-applied.

@@ -26,14 +26,14 @@
  */
 
 
+using System;
+using System.IO;
+using System.Text;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
-using OpenMetaverse.StructuredData;
-using System;
-using System.IO;
-using System.Text;
 
 namespace WhiteCore.Services
 {
@@ -49,8 +49,7 @@ namespace WhiteCore.Services
             if (m_imService != null)
             {
                 service.AddStreamHandler("ChatSessionRequest",
-                                         new GenericStreamHandler("POST", service.CreateCAPS("ChatSessionRequest", ""),
-                                                                  ChatSessionRequest));
+                                         new GenericStreamHandler("POST", service.CreateCAPS("ChatSessionRequest", ""), ChatSessionRequest));
             }
         }
 
@@ -76,7 +75,7 @@ namespace WhiteCore.Services
             }
             catch (Exception e)
             {
-                MainConsole.Instance.Error("[IMCAPS]: " + e.ToString());
+                MainConsole.Instance.Error("[IMCAPS]: " + e);
             }
 
             return null;

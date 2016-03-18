@@ -42,7 +42,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Groups
             Version = new Version(0, 0, 4);
             MigrationName = "Groups";
 
-            schema = new List<SchemaDefinition>();
+            Schema = new List<SchemaDefinition>();
 
             RenameSchema("osagent", "group_agent");
             RemoveSchema("osagent");

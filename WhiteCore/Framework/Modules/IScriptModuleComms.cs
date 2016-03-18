@@ -25,6 +25,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
 using OpenMetaverse;
 
 namespace WhiteCore.Framework.Modules
@@ -56,4 +57,12 @@ namespace WhiteCore.Framework.Modules
         // For use ONLY by the script API
         void RaiseEvent(UUID script, string id, string module, string command, string key);
     }
+	
+	[AttributeUsage(AttributeTargets.Method)]
+    public class ScriptInvocationAttribute : Attribute
+    { }
+
+    [AttributeUsage(AttributeTargets.Field)]
+    public class ScriptConstantAttribute : Attribute
+    { }
 }
