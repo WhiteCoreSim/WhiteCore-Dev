@@ -105,7 +105,7 @@ fi
 # Build WhiteCore-Sim
 if ${BUILD:=true} ; then
   echo Building WhiteCore-Sim
-  xbuild /property:Configuration="$CONFIG" /property:Platform="$ARCH"
+  xbuild  WhiteCore.sln /property:Configuration="$CONFIG" /property:Platform="$ARCH"
   echo Finished Building WhiteCore
   echo Thank you for choosing WhiteCore-Sim
   echo Please report any errors to our Github Issue Tracker https://github.com/WhiteCoreSim/WhiteCore-Dev/issues
