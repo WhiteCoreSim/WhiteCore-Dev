@@ -43,7 +43,7 @@ using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Servers.HttpServer.Interfaces;
 using WhiteCore.Framework.Services.ClassHelpers.Assets;
 using WhiteCore.Framework.Utilities;
-using ZLib.Net;
+using ZLibNet;
 
 namespace WhiteCore.Modules.Caps
 {
