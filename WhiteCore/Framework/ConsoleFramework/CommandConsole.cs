@@ -531,7 +531,9 @@ namespace WhiteCore.Framework.ConsoleFramework
         public bool m_isPrompting;
         public int m_lastSetPromptOption;
         protected TextWriter m_logFile;
-        protected string m_logPath = Constants.DEFAULT_DATA_DIR;
+        protected string m_logPath = "";
+        protected string m_logName = "";
+        protected DateTime m_logDate;
 
         public List<string> m_promptOptions = new List<string>();
 
@@ -560,21 +562,41 @@ namespace WhiteCore.Framework.ConsoleFramework
             logName = source.Configs ["Console"].GetString ("LogAppendName", logName);
             logPath = source.Configs ["Console"].GetString ("LogPath", logPath);
             if (logPath == "")
-                logPath = simBase.DefaultDataPath;
+                logPath = Path.Combine(simBase.DefaultDataPath, Constants.DEFAULT_LOG_DIR);
 
-            InitializeLog(logPath, logName);
+            InitializeLog(LogPath, logName);
         }
 
-        protected void InitializeLog(string logPath, string appendName)
+        protected void InitializeLog(string logPath, string logName)
         {
             // check the logPath to ensure correct format
-            if (!logPath.EndsWith ("/")) 
+            if (!logPath.EndsWith ("/"))
                 logPath = logPath + "/";
             m_logPath = logPath;
+            m_logName = logName;
 
+            // make sure the directory exists
+            if (!Directory.Exists (m_logPath))
+                Directory.CreateDirectory (m_logPath);
+             
+            OpenLog ();
+        }
+
+        protected void OpenLog()
+        {
+            // opens the logfile using the 
             string runFilename = System.Diagnostics.Process.GetCurrentProcess ().MainModule.FileName;
             string runProcess = Path.GetFileNameWithoutExtension(runFilename);
-            m_logFile = StreamWriter.Synchronized(new StreamWriter(logPath + runProcess + appendName + ".log", true));
+            string timestamp =  DateTime.Now.ToString("yyyyMMdd");
+
+            m_logFile = StreamWriter.Synchronized(new StreamWriter(m_logPath + runProcess + m_logName + timestamp + ".log", true));
+            m_logDate = DateTime.Now.Date;
+        }
+
+        protected void RotateLog()
+        {
+            m_logFile.Close();      // close the current log
+            OpenLog();               // start a new one
         }
 
         public void Dispose()
@@ -745,6 +767,9 @@ namespace WhiteCore.Framework.ConsoleFramework
                 Console.WriteLine(text);
                 if (m_logFile != null)
                 {
+                    if (m_logDate != DateTime.Now.Date)
+                        RotateLog ();
+                    
                     m_logFile.WriteLine(text);
                     m_logFile.Flush();
                 }
@@ -759,6 +784,9 @@ namespace WhiteCore.Framework.ConsoleFramework
                 Console.WriteLine(text);
                 if (m_logFile != null)
                 {
+                    if (m_logDate != DateTime.Now.Date)
+                        RotateLog ();
+                    
                     m_logFile.WriteLine(text);
                     m_logFile.Flush();
                 }

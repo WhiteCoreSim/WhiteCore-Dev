@@ -670,7 +670,7 @@ namespace WhiteCore.Simulation.Base
 
             MainConsole.Instance.ErrorFormat("[APPLICATION]: {0}", msg);
 
-            handleException(msg, ex);
+            HandleCrashException(msg, ex);
         }
 
         /// <summary>
@@ -678,10 +678,13 @@ namespace WhiteCore.Simulation.Base
         /// </summary>
         /// <param name="msg"></param>
         /// <param name="ex"></param>
-        public static void handleException(string msg, Exception ex)
+        public static void HandleCrashException(string msg, Exception ex)
         {
-            if (m_saveCrashDumps && Environment.OSVersion.Platform == PlatformID.Win32NT)
-            {
+
+            //if (m_saveCrashDumps && Environment.OSVersion.Platform == PlatformID.Win32NT)
+            // 20160323 -greythane - not sure why this will not work on *nix as well?
+            if (m_saveCrashDumps)
+                           {
                 // Log exception to disk
                 try
                 {
@@ -799,7 +802,7 @@ namespace WhiteCore.Simulation.Base
             {
                 exp.ExceptionPointers = Marshal.GetExceptionPointers();
             }
-            bool bRet = false;
+            bool bRet;
             if (exp.ExceptionPointers == IntPtr.Zero)
             {
                 bRet = MiniDumpWriteDump(currentProcessHandle, currentProcessId, fileHandle, (uint) options, IntPtr.Zero,

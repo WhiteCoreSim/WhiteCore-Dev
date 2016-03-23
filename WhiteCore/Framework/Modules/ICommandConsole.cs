@@ -26,9 +26,9 @@
  */
 
 using System.Collections.Generic;
+using Nini.Config;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.SceneInfo;
-using Nini.Config;
 
 namespace WhiteCore.Framework.Modules
 {

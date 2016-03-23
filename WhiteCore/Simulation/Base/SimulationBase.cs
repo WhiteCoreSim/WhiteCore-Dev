@@ -405,7 +405,7 @@ namespace WhiteCore.Simulation.Base
         ///     Opens a file and uses it as input to the console command parser.
         /// </summary>
         /// <param name="fileName">name of file to use as input to the console</param>
-        void PrintFileToConsole(string fileName)
+        static void PrintFileToConsole(string fileName)
         {
             if (File.Exists(fileName))
             {
@@ -438,45 +438,54 @@ namespace WhiteCore.Simulation.Base
         {
             if (MainConsole.Instance == null)
                 return;
-            MainConsole.Instance.Commands.AddCommand("quit", 
-                                                     "quit", 
-                                                     "Quit the application", 
-                                                     HandleQuit, false, true);
+            MainConsole.Instance.Commands.AddCommand(
+                "quit", 
+                "quit", 
+                "Quit the application", 
+                HandleQuit, false, true);
             
-            MainConsole.Instance.Commands.AddCommand("shutdown",
-                                                     "shutdown", 
-                                                     "Quit the application", 
-                                                     HandleQuit, false, true);
+            MainConsole.Instance.Commands.AddCommand(
+                "shutdown",
+                "shutdown", 
+                "Quit the application", 
+                HandleQuit, false, true);
             
-            MainConsole.Instance.Commands.AddCommand("show info",
-                                                     "show info",
-                                                     "Show server information (e.g. startup path)", 
-                                                     HandleShowInfo, false, true);
+            MainConsole.Instance.Commands.AddCommand(
+                "show info",
+                "show info",
+                "Show server information (e.g. startup path)", 
+                HandleShowInfo, false, true);
             
-            MainConsole.Instance.Commands.AddCommand("show version",
-                                                     "show version", 
-                                                     "Show server version",
-                                                     HandleShowVersion, false, true);
+            MainConsole.Instance.Commands.AddCommand(
+                "show version",
+                "show version", 
+                "Show server version",
+                HandleShowVersion, false, true);
             
-            MainConsole.Instance.Commands.AddCommand("reload config",
-                                                     "reload config", 
-                                                     "Reloads .ini file configuration",
-                                                     HandleConfigRefresh, false, true);
+            MainConsole.Instance.Commands.AddCommand(
+                "reload config",
+                "reload config", 
+                "Reloads .ini file configuration",
+                HandleConfigRefresh, false, true);
 
             
-            MainConsole.Instance.Commands.AddCommand("set timer script interval", "set timer script interval",
-                                                     "Set the interval for the timer script (in minutes).",
-                                                     HandleTimerScriptTime, false, true);
+            MainConsole.Instance.Commands.AddCommand(
+                "set timer script interval",
+                "set timer script interval",
+                "Set the interval for the timer script (in minutes).",
+                HandleTimerScriptTime, false, true);
             
-            MainConsole.Instance.Commands.AddCommand("force GC",
-                                                     "force GC", 
-                                                     "Forces garbage collection.", 
-                                                     HandleForceGC, false, true);
+            MainConsole.Instance.Commands.AddCommand(
+                "force GC",
+                "force GC", 
+                "Forces garbage collection.", 
+                HandleForceGC, false, true);
             
-            MainConsole.Instance.Commands.AddCommand("run configurator",
-                                                     "run configurator", 
-                                                     "Runs WhiteCore.Configurator.",
-                                                     runConfig, false, true);
+            MainConsole.Instance.Commands.AddCommand(
+                "run configurator",
+                "run configurator", 
+                "Runs WhiteCore.Configurator.",
+                RunConfig, false, true);
         }
 
         void HandleQuit(IScene scene, string[] args)
@@ -522,7 +531,7 @@ namespace WhiteCore.Simulation.Base
             MainConsole.Instance.Warn("Garbage collection finished");
         }
 
-        public virtual void runConfig(IScene scene, string[] cmd)
+        public virtual void RunConfig(IScene scene, string[] cmd)
         {
             BaseApplication.Configure(true);
         }
@@ -634,6 +643,8 @@ namespace WhiteCore.Simulation.Base
 
                 MainConsole.Instance.Info("[SHUTDOWN]: Shutdown processing on main thread complete. " +
                                           (close ? " Exiting..." : ""));
+                MainConsole.Instance.CleanInfo("");
+                MainConsole.Instance.CleanInfo("");
 
                 if (close)
                     Environment.Exit(0);

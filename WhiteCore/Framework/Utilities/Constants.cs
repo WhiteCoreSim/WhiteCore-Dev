@@ -47,6 +47,7 @@ namespace WhiteCore.Framework.Utilities
         public const string DEFAULT_USERINVENTORY_DIR = "UserArchives";
 
         public const string DEFAULT_USERHTML_DIR = "html";
+        public const string DEFAULT_LOG_DIR = "logs";
 
         public const int RegionSize = 256;
         public const int RegionHeight = 10000;

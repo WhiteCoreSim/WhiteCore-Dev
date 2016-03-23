@@ -27,6 +27,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading;
 using Nini.Config;
@@ -95,7 +96,7 @@ namespace WhiteCore.Framework.ConsoleFramework
             logName = source.Configs ["Console"].GetString ("LogAppendName", logName);
             logPath = source.Configs ["Console"].GetString ("LogPath", logPath);
             if (logPath == "")
-                logPath = simBase.DefaultDataPath;
+                logPath = Path.Combine(simBase.DefaultDataPath, Constants.DEFAULT_LOG_DIR);
 
             InitializeLog(logPath, logName);
         }
