@@ -40,6 +40,8 @@ namespace WhiteCore.Framework.Configuration
     /// </summary>
     public class ConfigurationLoader
     {
+        public bool IsGridServer = false;
+
         public string defaultIniFile = "WhiteCore.ini";
 
         public string iniFilePath = "";
@@ -279,7 +281,8 @@ namespace WhiteCore.Framework.Configuration
             }
 
             // add override parameters if they exist ONLY for standalone operation
-            if (! mainIniFileName.Contains("GridServer"))
+            IsGridServer = mainIniFileName.Contains("Server");
+            if (!IsGridServer)
             {
                 string  worldIniFilePath = Path.Combine(mainIniDirectory, worldIniFileName);
                 if (File.Exists(worldIniFilePath))

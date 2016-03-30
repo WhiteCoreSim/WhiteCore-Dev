@@ -80,6 +80,16 @@ namespace WhiteCore.Simulation.Base
             get { return m_version; }
         }
 
+        /// <summary>
+        /// Is this instance a grid server.
+        /// </summary>
+        /// <value>true</value>
+        /// <c>false</c>
+        public bool IsGridServer
+        {
+            get { return m_configurationLoader.IsGridServer; }
+        }
+
         protected string m_defaultDataPath = Constants.DEFAULT_DATA_DIR;
         public string DefaultDataPath
         { 

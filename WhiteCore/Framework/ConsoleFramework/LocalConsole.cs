@@ -98,7 +98,7 @@ namespace WhiteCore.Framework.ConsoleFramework
             if (logPath == "")
                 logPath = Path.Combine(simBase.DefaultDataPath, Constants.DEFAULT_LOG_DIR);
 
-            InitializeLog(logPath, logName);
+            InitializeLog(logPath, logName, simBase.IsGridServer);
         }
 
         static ConsoleColor DeriveColor(string input)
@@ -377,6 +377,9 @@ namespace WhiteCore.Framework.ConsoleFramework
                 MainConsole.TriggerLog(level.ToString(), fullText);
                 if (m_logFile != null)
                 {
+                    if (m_logDate != DateTime.Now.Date)
+                        RotateLog ();
+
                     m_logFile.WriteLine(fullText);
                     m_logFile.Flush();
                 }

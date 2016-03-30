@@ -554,7 +554,11 @@ namespace WhiteCore.Framework.ConsoleFramework
             simBase.ApplicationRegistry.RegisterModuleInterface<ICommandConsole>(this);
             MainConsole.Instance = this;
 
-            m_Commands.AddCommand("help", "help", "Get a general command list", Help, false, true);
+            m_Commands.AddCommand(
+                "help",
+                "help",
+                "Get a general command list",
+                Help, false, true);
 
             // set the default path as preset or configured
             string logName = "";
@@ -564,16 +568,20 @@ namespace WhiteCore.Framework.ConsoleFramework
             if (logPath == "")
                 logPath = Path.Combine(simBase.DefaultDataPath, Constants.DEFAULT_LOG_DIR);
 
-            InitializeLog(LogPath, logName);
+            InitializeLog(LogPath, logName, simBase.IsGridServer);
         }
 
-        protected void InitializeLog(string logPath, string logName)
+        protected void InitializeLog(string logPath, string logName, bool gridServer )
         {
             // check the logPath to ensure correct format
             if (!logPath.EndsWith ("/"))
                 logPath = logPath + "/";
             m_logPath = logPath;
-            m_logName = logName;
+
+            if (gridServer)
+                m_logName = logName + "_grid";
+            else
+                m_logName = logName + "_sim";
 
             // make sure the directory exists
             if (!Directory.Exists (m_logPath))
@@ -587,10 +595,11 @@ namespace WhiteCore.Framework.ConsoleFramework
             // opens the logfile using the 
             string runFilename = System.Diagnostics.Process.GetCurrentProcess ().MainModule.FileName;
             string runProcess = Path.GetFileNameWithoutExtension(runFilename);
-            string timestamp =  DateTime.Now.ToString("yyyyMMdd");
+            var logtime = DateTime.Now.AddMinutes (5);          // just a bit of leeway for rotation
+            string timestamp =  logtime.ToString("yyyyMMdd");
 
-            m_logFile = StreamWriter.Synchronized(new StreamWriter(m_logPath + runProcess + m_logName + timestamp + ".log", true));
-            m_logDate = DateTime.Now.Date;
+            m_logFile = StreamWriter.Synchronized(new StreamWriter(m_logPath + runProcess + m_logName + "_" + timestamp + ".log", true));
+            m_logDate = logtime.Date;
         }
 
         protected void RotateLog()

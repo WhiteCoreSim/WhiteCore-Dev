@@ -80,6 +80,16 @@ namespace WhiteCore.Simulation.Base
             get { return m_version; }
         }
 
+        /// <summary>
+        /// Is this instance a grid server.
+        /// </summary>
+        /// <value>true</value>
+        /// <c>false</c>
+        public bool IsGridServer
+        {
+            get { return m_configurationLoader.IsGridServer; }
+        }
+
         protected string m_defaultDataPath = Constants.DEFAULT_DATA_DIR;
         public string DefaultDataPath
         { 
@@ -389,7 +399,7 @@ namespace WhiteCore.Simulation.Base
         ///     Opens a file and uses it as input to the console command parser.
         /// </summary>
         /// <param name="fileName">name of file to use as input to the console</param>
-        private void PrintFileToConsole(string fileName)
+        void PrintFileToConsole(string fileName)
         {
             if (File.Exists(fileName))
             {
@@ -408,7 +418,7 @@ namespace WhiteCore.Simulation.Base
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void RunAutoTimerScript(object sender, EventArgs e)
+        void RunAutoTimerScript(object sender, EventArgs e)
         {
             RunCommandScript(m_TimerScriptFileName);
         }
@@ -422,48 +432,56 @@ namespace WhiteCore.Simulation.Base
         {
             if (MainConsole.Instance == null)
                 return;
-            MainConsole.Instance.Commands.AddCommand("quit", 
-                                                     "quit", 
-                                                     "Quit the application", 
-                                                     HandleQuit, false, true);
+            MainConsole.Instance.Commands.AddCommand(
+                "quit", 
+                "quit", 
+                "Quit the application", 
+                HandleQuit, false, true);
             
-            MainConsole.Instance.Commands.AddCommand("shutdown",
-                                                     "shutdown", 
-                                                     "Quit the application", 
-                                                     HandleQuit, false, true);
+            MainConsole.Instance.Commands.AddCommand(
+                "shutdown",
+                "shutdown", 
+                "Quit the application", 
+                HandleQuit, false, true);
             
-            MainConsole.Instance.Commands.AddCommand("show info",
-                                                     "show info",
-                                                     "Show server information (e.g. startup path)", 
-                                                     HandleShowInfo, false, true);
+            MainConsole.Instance.Commands.AddCommand(
+                "show info",
+                "show info",
+                "Show server information (e.g. startup path)", 
+                HandleShowInfo, false, true);
             
-            MainConsole.Instance.Commands.AddCommand("show version",
-                                                     "show version", 
-                                                     "Show server version",
-                                                     HandleShowVersion, false, true);
+            MainConsole.Instance.Commands.AddCommand(
+                "show version",
+                "show version", 
+                "Show server version",
+                HandleShowVersion, false, true);
             
-            MainConsole.Instance.Commands.AddCommand("reload config",
-                                                     "reload config", 
-                                                     "Reloads .ini file configuration",
-                                                     HandleConfigRefresh, false, true);
+            MainConsole.Instance.Commands.AddCommand(
+                "reload config",
+                "reload config", 
+                "Reloads .ini file configuration",
+                HandleConfigRefresh, false, true);
             
-            MainConsole.Instance.Commands.AddCommand("set timer script interval",
-                                                     "set timer script interval",
-                                                     "Set the interval for the timer script (in minutes).",
-                                                     HandleTimerScriptTime, false, true);
+            MainConsole.Instance.Commands.AddCommand(
+                "set timer script interval",
+                "set timer script interval",
+                "Set the interval for the timer script (in minutes).",
+                HandleTimerScriptTime, false, true);
             
-            MainConsole.Instance.Commands.AddCommand("force GC",
-                                                     "force GC", 
-                                                     "Forces garbage collection.", 
-                                                     HandleForceGC, false, true);
+            MainConsole.Instance.Commands.AddCommand(
+                "force GC",
+                "force GC", 
+                "Forces garbage collection.", 
+                HandleForceGC, false, true);
             
-            MainConsole.Instance.Commands.AddCommand("run configurator",
-                                                     "run configurator", 
-                                                     "Runs WhiteCore.Configurator.",
-                                                     runConfig, false, true);
+            MainConsole.Instance.Commands.AddCommand(
+                "run configurator",
+                "run configurator", 
+                "Runs WhiteCore.Configurator.",
+                runConfig, false, true);
         }
 
-        private void HandleQuit(IScene scene, string[] args)
+        void HandleQuit(IScene scene, string[] args)
         {
             var ok = MainConsole.Instance.Prompt ("[CONSOLE]: Shutdown the simulator. Are you sure? (yes/no)", "no").ToLower();
             if (ok.StartsWith("y"))
