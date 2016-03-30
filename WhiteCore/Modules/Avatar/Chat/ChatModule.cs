@@ -110,7 +110,7 @@ namespace WhiteCore.Modules.Chat
         }
 
         public void SimChat (string message, ChatTypeEnum type, int channel, Vector3 fromPos, string fromName,
-                            UUID fromID, bool fromAgent, bool broadcast, float range, UUID ToAgentID, IScene scene)
+                            UUID fromID, bool fromAgent, bool broadcast, float range, UUID toAgentID, IScene scene)
         {
             OSChatMessage args = new OSChatMessage {
                 Message = message,
@@ -120,7 +120,7 @@ namespace WhiteCore.Modules.Chat
                 Range = range,
                 SenderUUID = fromID,
                 Scene = scene,
-                ToAgentID = ToAgentID
+                ToAgentID = toAgentID
             };
 
 
@@ -212,9 +212,54 @@ namespace WhiteCore.Modules.Chat
                 break;
             }
 
+
+            // from below it appears that if the source is an agent then do not send messge??
+            if (sourceType == ChatSourceType.Agent)
+                return;
+            
             if (message.Length >= 1000) // libomv limit
                 message = message.Substring (0, 1000);
 
+            // determine who should receive the message
+            var presences = m_Scene.GetScenePresences();
+            var fromRegionPos = fromPos;
+
+            foreach (IScenePresence presence in presences)
+            {   
+                if (presence.IsChildAgent)
+                    continue;
+
+                // check presence distances
+                var toRegionPos = presence.AbsolutePosition;
+                var dis = (int)Util.GetDistanceTo (toRegionPos, fromRegionPos);
+
+                if (c.Type == ChatTypeEnum.Custom && dis > c.Range)                 // further than the defined custom range
+                    continue;
+
+                if (c.Type == ChatTypeEnum.Shout && dis > m_shoutdistance)          // too far for shouting
+                    continue;
+                
+                if (c.Type == ChatTypeEnum.Say && dis > m_saydistance)              // too far for normal chat
+                    continue;
+
+                if (c.Type == ChatTypeEnum.Whisper && dis > m_whisperdistance)      // too far out for whisper
+                    continue;
+
+                if (avatar != null)
+                {
+                    if (avatar.CurrentParcelUUID != presence.CurrentParcelUUID)     // not in the same parcel
+                        continue;
+                
+                    // If both are not in the same proviate parcel, don't send the chat message
+                    if (!(avatar.CurrentParcel.LandData.Private && presence.CurrentParcel.LandData.Private))
+                        continue;
+                }   
+                
+                // this one is good to go....
+                TrySendChatMessage (presence, fromPos, fromID, fromName, c.Type, message, sourceType,
+                        c.Range);
+            }
+            /* previous for reference - remove when verified - greythane -
             foreach (IScenePresence presence in from presence in m_Scene.GetScenePresences()
                                                 where !presence.IsChildAgent
                                                 let fromRegionPos = fromPos
@@ -237,11 +282,12 @@ namespace WhiteCore.Modules.Chat
                 TrySendChatMessage (presence, fromPos, fromID, fromName, c.Type, message, sourceType,
                     c.Range);
             }
+            */
         }
 
         public virtual void TrySendChatMessage (IScenePresence presence, Vector3 fromPos,
                                                UUID fromAgentID, string fromName, ChatTypeEnum type,
-                                               string message, ChatSourceType src, float Range)
+                                               string message, ChatSourceType src, float range)
         {
             if (type == ChatTypeEnum.Custom)
             {
@@ -279,23 +325,23 @@ namespace WhiteCore.Modules.Chat
         /// <summary>
         ///     Get all the mutes from the database
         /// </summary>
-        /// <param name="AgentID"></param>
-        /// <param name="Cached"></param>
+        /// <param name="agentID"></param>
+        /// <param name="cached"></param>
         /// <returns></returns>
-        public MuteList[] GetMutes (UUID AgentID, out bool Cached)
+        public MuteList[] GetMutes (UUID agentID, out bool cached)
         {
-            Cached = false;
+            cached = false;
             MuteList[] List = new MuteList[0];
             if (MuteListConnector == null)
                 return List;
             lock (MuteListCache)
             {
-                if (!MuteListCache.TryGetValue (AgentID, out List))
+                if (!MuteListCache.TryGetValue (agentID, out List))
                 {
-                    List = MuteListConnector.GetMuteList (AgentID).ToArray ();
-                    MuteListCache.Add (AgentID, List);
+                    List = MuteListConnector.GetMuteList (agentID).ToArray ();
+                    MuteListCache.Add (agentID, List);
                 } else
-                    Cached = true;
+                    cached = true;
             }
 
             return List;
@@ -310,38 +356,38 @@ namespace WhiteCore.Modules.Chat
         /// <summary>
         ///     Update the mute in the database
         /// </summary>
-        /// <param name="MuteID"></param>
-        /// <param name="Name"></param>
-        /// <param name="Flags"></param>
-        /// <param name="AgentID"></param>
-        public void UpdateMuteList (UUID MuteID, string Name, int Flags, UUID AgentID)
+        /// <param name="muteID"></param>
+        /// <param name="muteName"></param>
+        /// <param name="flags"></param>
+        /// <param name="agentID"></param>
+        public void UpdateMuteList (UUID muteID, string muteName, int flags, UUID agentID)
         {
-            if (MuteID == UUID.Zero)
+            if (muteID == UUID.Zero)
                 return;
             MuteList Mute = new MuteList {
-                MuteID = MuteID,
-                MuteName = Name,
-                MuteType = Flags.ToString ()
+                MuteID = muteID,
+                MuteName = muteName,
+                MuteType = flags.ToString ()
             };
-            MuteListConnector.UpdateMute (Mute, AgentID);
+            MuteListConnector.UpdateMute (Mute, agentID);
             lock (MuteListCache)
-                MuteListCache.Remove (AgentID);
+                MuteListCache.Remove (agentID);
         }
 
         /// <summary>
         ///     Remove the given mute from the user's mute list in the database
         /// </summary>
-        /// <param name="MuteID"></param>
-        /// <param name="Name"></param>
-        /// <param name="AgentID"></param>
-        public void RemoveMute (UUID MuteID, string Name, UUID AgentID)
+        /// <param name="muteID"></param>
+        /// <param name="muteName"></param>
+        /// <param name="agentID"></param>
+        public void RemoveMute (UUID muteID, string muteName, UUID agentID)
         {
             //Gets sent if a mute is not selected.
-            if (MuteID != UUID.Zero)
+            if (muteID != UUID.Zero)
             {
-                MuteListConnector.DeleteMute (MuteID, AgentID);
+                MuteListConnector.DeleteMute (muteID, agentID);
                 lock (MuteListCache)
-                    MuteListCache.Remove (AgentID);
+                    MuteListCache.Remove (agentID);
             }
         }
 
@@ -597,7 +643,7 @@ namespace WhiteCore.Modules.Chat
                             (c.ToAgentID != client.AgentId))
                         return;
                 
-                    bool cached = false;
+                    bool cached;
                     MuteList[] mutes = GetMutes (client.AgentId, out cached);
                     foreach (MuteList m in mutes)
                         if (m.MuteID == c.SenderUUID ||
@@ -627,11 +673,11 @@ namespace WhiteCore.Modules.Chat
             if (!m_useMuteListModule)
                 return;
             //Sends the name of the file being sent by the xfer module DO NOT EDIT!!!
-            string filename = "mutes" + client.AgentId.ToString ();
+            string filename = "mutes" + client.AgentId;
             byte[] fileData = new byte[0];
             string invString = "";
             int i = 0;
-            bool cached = false;
+            bool cached;
             MuteList[] List = GetMutes (client.AgentId, out cached);
             if (List == null)
                 return;
@@ -665,15 +711,15 @@ namespace WhiteCore.Modules.Chat
         ///     Update the mute (from the client)
         /// </summary>
         /// <param name="client"></param>
-        /// <param name="MuteID"></param>
-        /// <param name="Name"></param>
-        /// <param name="Flags"></param>
-        /// <param name="AgentID"></param>
-        void OnMuteListUpdate (IClientAPI client, UUID MuteID, string Name, int Flags, UUID AgentID)
+        /// <param name="muteID"></param>
+        /// <param name="muteName"></param>
+        /// <param name="flags"></param>
+        /// <param name="agentID"></param>
+        void OnMuteListUpdate (IClientAPI client, UUID muteID, string muteName, int flags, UUID agentID)
         {
             if (!m_useMuteListModule)
                 return;
-            UpdateMuteList (MuteID, Name, Flags, client.AgentId);
+            UpdateMuteList (muteID, muteName, flags, client.AgentId);
             OnMuteListRequest (client, 0);
         }
 
@@ -681,14 +727,14 @@ namespace WhiteCore.Modules.Chat
         ///     Remove the mute (from the client)
         /// </summary>
         /// <param name="client"></param>
-        /// <param name="MuteID"></param>
-        /// <param name="Name"></param>
-        /// <param name="AgentID"></param>
-        void OnMuteListRemove (IClientAPI client, UUID MuteID, string Name, UUID AgentID)
+        /// <param name="muteID"></param>
+        /// <param name="muteName"></param>
+        /// <param name="agentID"></param>
+        void OnMuteListRemove (IClientAPI client, UUID muteID, string muteName, UUID agentID)
         {
             if (!m_useMuteListModule)
                 return;
-            RemoveMute (MuteID, Name, client.AgentId);
+            RemoveMute (muteID, muteName, client.AgentId);
             OnMuteListRequest (client, 0);
         }
 
@@ -697,7 +743,7 @@ namespace WhiteCore.Modules.Chat
         /// </summary>
         /// <param name="avID"></param>
         /// <returns></returns>
-        public IScenePresence findScenePresence (UUID avID)
+        public IScenePresence FindScenePresence (UUID avID)
         {
             return m_Scene.GetScenePresence (avID);
         }
