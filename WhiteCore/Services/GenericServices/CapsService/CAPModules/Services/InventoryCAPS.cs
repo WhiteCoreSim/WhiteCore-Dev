@@ -149,7 +149,7 @@ namespace WhiteCore.Services
                 
             } catch (Exception ex)
             {
-                MainConsole.Instance.Warn ("[InventoryCaps]: SERIOUS ISSUE! " + ex);
+                MainConsole.Instance.Warn ("[InventoryCAPS]: SERIOUS ISSUE! " + ex);
             } finally
             {
                 map = null;
@@ -175,7 +175,7 @@ namespace WhiteCore.Services
                 
             } catch (Exception ex)
             {
-                MainConsole.Instance.Warn ("[InventoryCaps]: SERIOUS ISSUE! " + ex);
+                MainConsole.Instance.Warn ("[InventoryCAPS]: SERIOUS ISSUE! " + ex);
             }
 
             OSDMap rmap = new OSDMap ();
@@ -214,7 +214,7 @@ namespace WhiteCore.Services
 
             } catch (Exception ex)
             {
-                MainConsole.Instance.Warn ("[InventoryCaps]: SERIOUS ISSUE! " + ex);
+                MainConsole.Instance.Warn ("[InventoryCAPS]: SERIOUS ISSUE! " + ex);
             }
 
             OSDMap rmap = new OSDMap ();
@@ -249,7 +249,7 @@ namespace WhiteCore.Services
 
             } catch (Exception ex)
             {
-                MainConsole.Instance.Warn ("[InventoryCaps]: SERIOUS ISSUE! " + ex);
+                MainConsole.Instance.Warn ("[InventoryCAPS]: SERIOUS ISSUE! " + ex);
             }
 
             OSDMap rmap = new OSDMap ();
@@ -290,7 +290,7 @@ namespace WhiteCore.Services
             OSDMap map = (OSDMap)OSDParser.DeserializeLLSDXml (HttpServerHandlerHelpers.ReadFully (request));
             string asset_type = map ["asset_type"].AsString ();
             int charge = 0;
-            int resourceCost = 0;
+            int resourceCost;
             if (!ChargeUser (asset_type, map, out charge, out resourceCost))
             {
                 map = new OSDMap ();
@@ -647,11 +647,11 @@ namespace WhiteCore.Services
 
             public delegate UUID UploadHandler (string assetName, string description, UUID assetID, UUID inventoryItem,
                                  UUID parentFolderID, byte[] data, string invType, string assetType,
-                                 uint everyone_mask, uint group_mask, uint next_owner_mask);
+                                 uint everyoneMask, uint groupMask, uint nextOwnerMask);
 
             public AssetUploader (string assetName, string description, UUID assetID, UUID inventoryItem,
                                   UUID parentFolderID, string invType, string assetType, string path,
-                                  uint everyone_mask, uint group_mask, uint next_owner_mask, UploadHandler action)
+                                  uint everyoneMask, uint groupMask, uint nextOwnerMask, UploadHandler action)
             {
                 m_assetName = assetName;
                 m_assetDes = description;
@@ -661,9 +661,9 @@ namespace WhiteCore.Services
                 parentFolder = parentFolderID;
                 m_assetType = assetType;
                 m_invType = invType;
-                m_everyone_mask = everyone_mask;
-                m_group_mask = group_mask;
-                m_next_owner_mask = next_owner_mask;
+                m_everyone_mask = everyoneMask;
+                m_group_mask = groupMask;
+                m_next_owner_mask = nextOwnerMask;
                 m_uploadCompleteHandler = action;
             }
 

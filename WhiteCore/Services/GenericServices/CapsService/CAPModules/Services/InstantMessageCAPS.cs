@@ -75,7 +75,7 @@ namespace WhiteCore.Services
             }
             catch (Exception e)
             {
-                MainConsole.Instance.Error("[IMCAPS]: " + e);
+                MainConsole.Instance.Error("[ImCAPS]: " + e);
             }
 
             return null;

@@ -60,7 +60,51 @@ namespace WhiteCore.Services
 
         byte[] ProductInfoRequestCAP (string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {
-            OSDMap data = m_service.GetCAPS ();
+            //OSDMap data = m_service.GetCAPS ();
+            var data = new OSDArray();
+
+            var mf = new OSDMap ();
+            mf ["name"] = "mainland_full";
+            mf ["description"] = "Mainland / Full Region";
+            mf ["sku"] = "001";
+            data.Add(mf);
+            
+            var mh = new OSDMap ();
+            mh ["name"] = "mainland_homestead";
+            mh ["description"] = "Mainland / Homestead";
+            mh ["sku"] = "011";
+            data.Add(mh);
+
+            var mo = new OSDMap ();
+            mo ["name"] = "mainland_openspace";
+            mo ["description"] = "Mainland / Openspace";
+            mo ["sku"] = "021";
+            data.Add(mo);
+
+            var ef = new OSDMap ();
+            ef ["name"] = "estate_full";
+            ef ["description"] = "Estate / Full Region";
+            ef ["sku"] = "002";
+            data.Add(ef);
+
+            var eh = new OSDMap ();
+            eh ["name"] = "estate_homestead";
+            eh ["description"] = "Estate / Homestead";
+            eh ["sku"] = "012";
+            data.Add(eh);
+
+            var eo = new OSDMap ();
+            eo ["name"] = "estate_openspace";
+            eo ["description"] = "Estate / Openspace";
+            eo ["sku"] = "022";
+            data.Add(eo);
+
+            var wh = new OSDMap ();
+            wh ["name"] = "whitecore_homes";
+            wh ["description"] = "WhiteCore Homes / Full Region";
+            wh ["sku"] = "101";
+            data.Add(wh);
+
             return OSDParser.SerializeLLSDXmlBytes (data);
         }
     }

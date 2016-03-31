@@ -129,7 +129,7 @@ namespace WhiteCore.Services
             }
 
             // null or invalid UUID
-            MainConsole.Instance.Warn("[GETTEXTURE]: Failed to parse a texture_id from GetTexture request: " +
+            MainConsole.Instance.Warn("[AssetCAPS]: Failed to parse a texture_id from GetTexture request: " +
                                           httpRequest.Url);
             httpResponse.StatusCode = (int) System.Net.HttpStatusCode.NotFound;
             return MainServer.BlankResponse;
@@ -175,7 +175,7 @@ namespace WhiteCore.Services
                 else
                 {
                     string textureUrl = REDIRECT_URL + textureID;
-                    MainConsole.Instance.Debug("[GETTEXTURE]: Redirecting texture request to " + textureUrl);
+                    MainConsole.Instance.Debug("[AssetCAPS]: Redirecting texture request to " + textureUrl);
                     httpResponse.RedirectLocation = textureUrl;
                     response = MainServer.BlankResponse;
                     return true;
@@ -237,7 +237,7 @@ namespace WhiteCore.Services
                 {
                     if (format == DefaultFormat)
                     {
-                        MainConsole.Instance.Debug ("[GETTEXTURE]: Texture " + textureID + " replaced with default 'missing' texture");
+                        MainConsole.Instance.Debug ("[AssetCAPS]: Texture " + textureID + " replaced with default 'missing' texture");
                         response = WriteTextureData (httpRequest, httpResponse, texture, format);
                         return true;
                     }
@@ -245,7 +245,7 @@ namespace WhiteCore.Services
 
                 // texture not found and we have no 'missing texture'??
                 // ... or if all else fails...
-                MainConsole.Instance.Warn("[GETTEXTURE]: Texture " + textureID + " not found (no default)");
+                MainConsole.Instance.Warn("[AssetCAPS]: Texture " + textureID + " not found (no default)");
                 httpResponse.StatusCode = (int) System.Net.HttpStatusCode.NotFound;
                 response = MainServer.BlankResponse;
                 return true;
@@ -314,7 +314,7 @@ namespace WhiteCore.Services
                     }
                 }
                
-                MainConsole.Instance.Warn("[GETTEXTURE]: Malformed Range header: " + range);
+                MainConsole.Instance.Warn("[AssetCAPS]: Malformed Range header: " + range);
                 response.StatusCode = (int) System.Net.HttpStatusCode.BadRequest;
                 return MainServer.BlankResponse;
                
@@ -372,7 +372,7 @@ namespace WhiteCore.Services
 
         byte[] ConvertTextureData(AssetBase texture, string format)
         {
-            MainConsole.Instance.DebugFormat("[GETTEXTURE]: Converting texture {0} to {1}", texture.ID, format);
+            MainConsole.Instance.DebugFormat("[AssetCAPS]: Converting texture {0} to {1}", texture.ID, format);
             byte[] data = new byte[0];
 
             MemoryStream imgstream = new MemoryStream();
@@ -399,11 +399,11 @@ namespace WhiteCore.Services
                     data = imgstream.ToArray();
                 }
                 else
-                    MainConsole.Instance.WarnFormat("[GETTEXTURE]: No such codec {0}", format);
+                    MainConsole.Instance.WarnFormat("[AssetCAPS]: No such codec {0}", format);
             }
             catch (Exception e)
             {
-                MainConsole.Instance.WarnFormat("[GETTEXTURE]: Unable to convert texture {0} to {1}: {2}", texture.ID,
+                MainConsole.Instance.WarnFormat("[AssetCAPS]: Unable to convert texture {0} to {1}: {2}", texture.ID,
                                                 format, e.Message);
             }
             finally
@@ -454,7 +454,7 @@ namespace WhiteCore.Services
             }
             catch (Exception e)
             {
-                MainConsole.Instance.Error("[CAPS]: " + e);
+                MainConsole.Instance.Error("[AssetCAPS]: " + e);
             }
 
             return null;

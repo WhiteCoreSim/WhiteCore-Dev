@@ -63,7 +63,7 @@ namespace WhiteCore.Services
             m_userScopeIDs = simbase.ApplicationRegistry.RequestModuleInterface<IUserAccountService> ().GetUserAccount (null, m_agentID).AllScopeIDs;
 
             m_gridService = simbase.ApplicationRegistry.RequestModuleInterface<IGridService> ();
-            IConfig config = simbase.ConfigSource.Configs ["MapCaps"];
+            IConfig config = simbase.ConfigSource.Configs ["MapCAPS"];
             if (config != null)
                 m_allowCapsMessage = config.GetBoolean ("AllowCapsMessage", m_allowCapsMessage);
 
@@ -89,7 +89,6 @@ namespace WhiteCore.Services
         /// <param name="request"></param>
         /// <param name="httpRequest"></param>
         /// <param name="httpResponse"></param>
-        /// <param name="agentID"></param>
         /// <returns></returns>
         public byte[] MapLayerRequest (string request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {

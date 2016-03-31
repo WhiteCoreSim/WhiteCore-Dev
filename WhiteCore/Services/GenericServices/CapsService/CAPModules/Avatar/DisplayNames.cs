@@ -88,8 +88,9 @@ namespace WhiteCore.Services
 
         public void DeregisterCaps()
         {
-            if (m_service == null)
-                return; //If display names aren't enabled
+            if (m_service == null)          //If display names aren't enabled
+                return; 
+            
             m_service.RemoveStreamHandler("SetDisplayName", "POST");
             m_service.RemoveStreamHandler("GetDisplayNames", "GET");
         }
@@ -220,7 +221,7 @@ namespace WhiteCore.Services
             return OSDParser.SerializeLLSDXmlBytes(map);
         }
 
-        private void PackUserInfo(IUserProfileInfo info, UserAccount account, ref OSDArray agents)
+        void PackUserInfo(IUserProfileInfo info, UserAccount account, ref OSDArray agents)
         {
             OSDMap agentMap = new OSDMap();
             agentMap["username"] = account.Name;
@@ -270,9 +271,7 @@ namespace WhiteCore.Services
         {
             if (displayName == name)
                 return true;
-            if (displayName == first + "." + last)
-                return true;
-            return false;
+            return displayName == first + "." + last;
         }
 
         /// <summary>
@@ -354,6 +353,7 @@ namespace WhiteCore.Services
             OSDMap body = new OSDMap();
             OSDMap content = new OSDMap();
             OSDMap agentData = new OSDMap();
+
             content.Add("display_name", OSD.FromString(newDisplayName));
             content.Add("display_name_next_update",
                         OSD.FromDate(
@@ -364,6 +364,7 @@ namespace WhiteCore.Services
             content.Add("legacy_first_name", OSD.FromString(first));
             content.Add("legacy_last_name", OSD.FromString(last));
             content.Add("username", OSD.FromString(account));
+
             body.Add("content", content);
             body.Add("agent", agentData);
             body.Add("reason", OSD.FromString("OK"));
