@@ -578,10 +578,13 @@ namespace WhiteCore.Framework.ConsoleFramework
                 logPath = logPath + "/";
             m_logPath = logPath;
 
+            if (logName == "")
+                logName = "WhiteCore";
+            
             if (gridServer)
-                m_logName = logName + "_grid";
+                m_logName = logName + "_Grid_";
             else
-                m_logName = logName + "_sim";
+                m_logName = logName + "_Sim_";
 
             // make sure the directory exists
             if (!Directory.Exists (m_logPath))
@@ -592,20 +595,22 @@ namespace WhiteCore.Framework.ConsoleFramework
 
         protected void OpenLog()
         {
-            // opens the logfile using the 
-            string runFilename = System.Diagnostics.Process.GetCurrentProcess ().MainModule.FileName;
-            string runProcess = Path.GetFileNameWithoutExtension(runFilename);
             var logtime = DateTime.Now.AddMinutes (5);          // just a bit of leeway for rotation
             string timestamp =  logtime.ToString("yyyyMMdd");
 
-            m_logFile = StreamWriter.Synchronized(new StreamWriter(m_logPath + runProcess + m_logName + "_" + timestamp + ".log", true));
+            // opens the logfile using the system process names
+            //string runFilename = System.Diagnostics.Process.GetCurrentProcess ().MainModule.FileName;
+            //string runProcess = Path.GetFileNameWithoutExtension(runFilename);
+            //m_logFile = StreamWriter.Synchronized(new StreamWriter(m_logPath + runProcess + m_logName + "_" + timestamp + ".log", true));
+
+            m_logFile = StreamWriter.Synchronized(new StreamWriter(m_logPath + m_logName + timestamp + ".log", true));
             m_logDate = logtime.Date;
         }
 
         protected void RotateLog()
         {
-            m_logFile.Close();      // close the current log
-            OpenLog();               // start a new one
+            m_logFile.Close();          // close the current log
+            OpenLog();                  // start a new one
         }
 
         public void Dispose()
