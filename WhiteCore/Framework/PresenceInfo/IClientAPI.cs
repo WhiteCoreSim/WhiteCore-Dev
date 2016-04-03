@@ -597,7 +597,7 @@ namespace WhiteCore.Framework.PresenceInfo
         public string Description;
         public string TimeString;
         public string UserCausingCharge;
-        private bool _ispayment = true;
+        bool _ispayment = true;
 
         public bool Payment
         {

@@ -81,6 +81,7 @@ namespace WhiteCore.Framework.Modules
         public int LandFee = 0;
         public int ObjectFee = 0;
         public int GroupFee = 0;
+        public int Balance = 0;
         public DateTime StartingDate;
 
         public override void FromOSD(OpenMetaverse.StructuredData.OSDMap map)
@@ -91,6 +92,7 @@ namespace WhiteCore.Framework.Modules
             LandFee = map["LandFee"];
             ObjectFee = map["ObjectFee"];
             GroupFee = map["GroupFee"];
+            Balance = map["Balance"];
             StartingDate = map["StartingDate"];
         }
 
@@ -104,6 +106,7 @@ namespace WhiteCore.Framework.Modules
             map["LandFee"] = LandFee;
             map["ObjectFee"] = ObjectFee;
             map["GroupFee"] = GroupFee;
+            map["Balance"] = Balance;
             map["StartingDate"] = StartingDate;
 
             return map;
@@ -227,17 +230,7 @@ namespace WhiteCore.Framework.Modules
         bool Transfer(UUID toID, UUID fromID, UUID toObjectID, string toObjectName, UUID fromObjectID, string fromObjectName, int amount, string description,
                       TransactionType type);
 
-        /// <summary>
-        ///     Get a list of transactions that have occurred over the given interval (0 is this period of interval days, positive #s go back previous sets)
-        /// </summary>
-        /// <param name="groupID"></param>
-        /// <param name="agentID">Requesting agentID (must be checked whether they can call this)</param>
-        /// <param name="currentInterval"></param>
-        /// <param name="intervalDays"></param>
-        List<GroupAccountHistory> GetTransactions(UUID groupID, UUID agentID, int currentInterval, int intervalDays);
-
-        GroupBalance GetGroupBalance(UUID groupID);
-        //TODO:  Add group transactions and balance updates
+                   
 
         uint NumberOfTransactions(UUID toAgent, UUID fromAgent);
 
@@ -253,6 +246,39 @@ namespace WhiteCore.Framework.Modules
         List<AgentPurchase> GetPurchaseHistory (UUID toAgentID, int period, string periodType);
         List<AgentPurchase> GetPurchaseHistory (DateTime dateStart, DateTime dateEnd, uint? start, uint? count);
         List<AgentPurchase> GetPurchaseHistory (int period, string periodType, uint? start, uint? count);
+
+        /// <summary>
+        ///     Get a list of transactions that have occurred over the given interval (0 is this period of interval days, positive #s go back previous sets)
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <param name="agentID">Requesting agentID (must be checked whether they can call this)</param>
+        /// <param name="currentInterval"></param>
+        /// <param name="intervalDays"></param>
+        List<GroupAccountHistory> GetGroupTransactions(UUID groupID, UUID agentID, int currentInterval, int intervalDays);
+
+        /// <summary>
+        /// Gets the group balance.
+        /// </summary>
+        /// <returns>The group balance.</returns>
+        /// <param name="groupID">Group UUID.</param>
+        GroupBalance GetGroupBalance(UUID groupID);
+
+        /// <summary>
+        /// Processes  group currency transfer.
+        /// </summary>
+        /// <returns><c>true</c>, if gurrency transfer was grouped, <c>false</c> otherwise.</returns>
+        /// <param name="groupID">Group ID.</param>
+        /// <param name="userID">User ID.</param>
+        /// <param name="payUser">Payment is from the group.</param>
+        /// <param name="toObjectName">To object name.</param>
+        /// <param name="fromObjectID">From object ID.</param>
+        /// <param name="fromObjectName">From object name.</param>
+        /// <param name="amount">Amount.</param>
+        /// <param name="description">Description.</param>
+        /// <param name="type">Type.</param>
+        /// <param name="transactionID">Transaction ID.</param>
+        bool GroupCurrencyTransfer (UUID groupID, UUID userID, bool payUser, string toObjectName, UUID fromObjectID,
+            string fromObjectName, int amount, string description, TransactionType type, UUID transactionID);
 
     }
 

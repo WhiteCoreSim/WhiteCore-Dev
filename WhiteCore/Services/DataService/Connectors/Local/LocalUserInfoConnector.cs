@@ -25,24 +25,24 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using System;
-using System.Collections.Generic;
 
 namespace WhiteCore.Services.DataService
 {
     public class LocalUserInfoConnector : IAgentInfoConnector
     {
-        private IGenericData GD;
+        IGenericData GD;
         protected bool m_allowDuplicatePresences = true;
         protected bool m_checkLastSeen = true;
-        private string m_userInfoTable = "user_info";
+        string m_userInfoTable = "user_info";
 
         #region IAgentInfoConnector Members
 
@@ -135,7 +135,7 @@ namespace WhiteCore.Services.DataService
             Update(userID, values);
         }
 
-        private static List<UserInfo> ParseQuery(List<string> query)
+        static List<UserInfo> ParseQuery(List<string> query)
         {
             List<UserInfo> users = new List<UserInfo>();
 
@@ -224,7 +224,7 @@ namespace WhiteCore.Services.DataService
         public uint RecentlyOnline(uint secondsAgo, bool stillOnline)
         {
              //Beware!! login times are UTC!
-            int now = (int) Util.ToUnixTime(DateTime.Now.ToUniversalTime()) - (int) secondsAgo;
+            int now = Util.ToUnixTime (DateTime.Now.ToUniversalTime ()) - (int)secondsAgo;
 
             QueryFilter filter = new QueryFilter();
             filter.orGreaterThanEqFilters["LastLogin"] = now;
@@ -245,7 +245,7 @@ namespace WhiteCore.Services.DataService
             if (secondsAgo > 0)
             {
                 //Beware!! login times are UTC!
-                int now = (int) Util.ToUnixTime(DateTime.Now.ToUniversalTime()) - (int) secondsAgo;
+                int now = Util.ToUnixTime (DateTime.Now.ToUniversalTime ()) - (int)secondsAgo;
 
                 filter.orGreaterThanEqFilters ["LastLogin"] = now;
                 filter.orGreaterThanEqFilters ["LastSeen"] = now;
@@ -263,7 +263,7 @@ namespace WhiteCore.Services.DataService
                                              uint start, uint count)
         {
             //Beware!! login times are UTC!
-            int now = (int) Util.ToUnixTime(DateTime.Now.ToUniversalTime()) - (int) secondsAgo;
+            int now = Util.ToUnixTime (DateTime.Now.ToUniversalTime ()) - (int)secondsAgo;
 
             QueryFilter filter = new QueryFilter();
             filter.orGreaterThanEqFilters["LastLogin"] = now;
@@ -287,7 +287,7 @@ namespace WhiteCore.Services.DataService
             if (secondsAgo > 0)
             {
                 //Beware!! login times are UTC!
-                int now = (int)Util.ToUnixTime (DateTime.Now.ToUniversalTime ());
+                int now = Util.ToUnixTime (DateTime.Now.ToUniversalTime ());
                 now -= (int) secondsAgo;
 
                 filter.orGreaterThanEqFilters["LastLogin"] = now;

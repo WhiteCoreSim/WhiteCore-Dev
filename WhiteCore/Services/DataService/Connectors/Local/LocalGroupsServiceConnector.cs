@@ -43,6 +43,14 @@ namespace WhiteCore.Services.DataService
     public class LocalGroupsServiceConnector : ConnectorBase, IGroupsServiceConnector
     {
         #region Declares
+        const string _DATAREALM = "group_data";
+        const string _NOTICEREALM = "group_notice";
+        const string _MEMBERSHIPREALM = "group_membership";
+        const string _MEMBERSHIPROLEREALM = "group_role_membership";
+        const string _AGENTREALM = "group_agent";
+        const string _ROLEREALM = "group_roles";
+        const string _INVITEREALM = "group_invite";
+        const string _BANREALM = "group_bans";
 
         IGenericData GD;
         List<UUID> agentsCanBypassGroupNoticePermsCheck = new List<UUID>();
@@ -60,9 +68,8 @@ namespace WhiteCore.Services.DataService
             GD = genericData;
 
             if (source.Configs[Name] != null)
-            {
                 defaultConnectionString = source.Configs[Name].GetString("ConnectionString", defaultConnectionString);
-            }
+
             if (source.Configs["Groups"] != null)
             {
                 agentsCanBypassGroupNoticePermsCheck =
@@ -77,15 +84,11 @@ namespace WhiteCore.Services.DataService
             Framework.Utilities.DataManager.RegisterPlugin (Name + "Local", this);
 
             if (source.Configs ["WhiteCoreConnectors"].GetString ("GroupsConnector", "LocalConnector") == "LocalConnector")
-            {
                 Framework.Utilities.DataManager.RegisterPlugin (this);
-            }
 
             IConfig grpConfig = source.Configs["SystemUserService"];
             if (grpConfig != null)
-            {
                 realEstateGroupName = grpConfig.GetString("RealEstateGroupName", realEstateGroupName);
-            }
 
             Init (simBase, Name);
 
@@ -142,12 +145,32 @@ namespace WhiteCore.Services.DataService
         #region IGroupsServiceConnector Members
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
+        public bool IsGroup(UUID groupID)
+        {
+            object remoteValue = DoRemote(groupID);
+            if (remoteValue != null || m_doRemoteOnly)
+                return (bool)remoteValue;
+
+            QueryFilter filter = new QueryFilter();
+
+            if (groupID != UUID.Zero)
+            {
+                filter.andFilters ["GroupID"] = groupID;
+                List<string> groupsData = GD.Query (new[] { "GroupID" }, _DATAREALM, filter, null, null, null);
+
+                return (groupsData.Count != 0);
+            }
+
+            return false;
+        }
+
+        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public void CreateGroup(UUID groupID, string name, string charter, bool showInList, UUID insigniaID,
                                 int membershipFee, bool openEnrollment, bool allowPublish, bool maturePublish,
-                                UUID founderID, UUID OwnerRoleID)
+                                UUID founderID, UUID ownerRoleID)
         {
             object remoteValue = DoRemote(groupID, name, charter, showInList, insigniaID, membershipFee, openEnrollment,
-                                          allowPublish, maturePublish, founderID, OwnerRoleID);
+                                          allowPublish, maturePublish, founderID, ownerRoleID);
             if (remoteValue != null || m_doRemoteOnly)
                 return;
 
@@ -224,9 +247,9 @@ namespace WhiteCore.Services.DataService
             row["ShowInList"] = showInList ? 1 : 0;
             row["AllowPublish"] = allowPublish ? 1 : 0;
             row["MaturePublish"] = maturePublish ? 1 : 0;
-            row["OwnerRoleID"] = OwnerRoleID;
+            row["OwnerRoleID"] = ownerRoleID;
 
-            GD.Insert("group_data", row);
+            GD.Insert(_DATAREALM, row);
 
             // const ulong EveryonePowers = 8796495740928;             // >> 0x80018010000
             //
@@ -253,14 +276,14 @@ namespace WhiteCore.Services.DataService
             // the default above is : 349644697632766 >>  0x13dfffffffffe
            
             //Add owner role to group
-            AddRoleToGroup(founderID, groupID, OwnerRoleID, "Owners", "Owners of " + name, "Owner of " + name,
+            AddRoleToGroup(founderID, groupID, ownerRoleID, "Owners", "Owners of " + name, "Owner of " + name,
                            OwnersPowers);
 
             //Add owner to the group as owner
-            AddAgentToGroup(founderID, founderID, groupID, OwnerRoleID);
+            AddAgentToGroup(founderID, founderID, groupID, ownerRoleID);
             AddAgentToRole(founderID, founderID, groupID, officersRole);
 
-            SetAgentGroupSelectedRole(founderID, groupID, OwnerRoleID);
+            SetAgentGroupSelectedRole(founderID, groupID, ownerRoleID);
 
             SetAgentActiveGroup(founderID, groupID);
         }
@@ -280,7 +303,7 @@ namespace WhiteCore.Services.DataService
             QueryFilter filter = new QueryFilter();
             filter.andFilters["GroupID"] = groupID;
 
-            GD.Update("group_data", values, null, filter, null, null);
+            GD.Update(_DATAREALM, values, null, filter, null, null);
 
             if (!newUserExists)
                 AddAgentToGroup(newOwner, newOwner, groupID, record.OwnerRoleID);
@@ -315,16 +338,16 @@ namespace WhiteCore.Services.DataService
                 QueryFilter filter = new QueryFilter();
                 filter.andFilters["GroupID"] = groupID;
 
-                GD.Update("group_data", values, null, filter, null, null);
+                GD.Update(_DATAREALM, values, null, filter, null, null);
             }
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public void AddGroupNotice(UUID requestingAgentID, UUID groupID, UUID noticeID, string fromName, string subject,
-                                   string message, UUID ItemID, int AssetType, string ItemName)
+                                   string message, UUID itemID, int assetType, string itemName)
         {
-            object remoteValue = DoRemote(requestingAgentID, groupID, noticeID, fromName, subject, message, ItemID,
-                                          AssetType, ItemName);
+            object remoteValue = DoRemote(requestingAgentID, groupID, noticeID, fromName, subject, message, itemID,
+                                          assetType, itemName);
             if (remoteValue != null || m_doRemoteOnly)
                 return;
 
@@ -337,12 +360,12 @@ namespace WhiteCore.Services.DataService
                 row["FromName"] = fromName;
                 row["Subject"] = subject;
                 row["Message"] = message;
-                row["HasAttachment"] = (ItemID != UUID.Zero) ? 1 : 0;
-                row["ItemID"] = ItemID;
-                row["AssetType"] = AssetType;
-                row["ItemName"] = ItemName == null ? "" : ItemName;
+                row["HasAttachment"] = (itemID != UUID.Zero) ? 1 : 0;
+                row["ItemID"] = itemID;
+                row["AssetType"] = assetType;
+                row["ItemName"] = itemName == null ? "" : itemName;
 
-                GD.Insert("group_notice", row);
+                GD.Insert(_NOTICEREALM, row);
             }
         }
 
@@ -390,7 +413,7 @@ namespace WhiteCore.Services.DataService
             update["Subject"] = subject.Trim();
             update["Message"] = message.Trim();
 
-            return GD.Update("group_notice", update, null, filter, null, null);
+            return GD.Update(_NOTICEREALM, update, null, filter, null, null);
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.High)]
@@ -427,137 +450,135 @@ namespace WhiteCore.Services.DataService
             filter.andFilters["GroupID"] = groupID;
             filter.andFilters["NoticeID"] = noticeID;
 
-            return GD.Delete("group_notice", filter);
+            return GD.Delete(_NOTICEREALM, filter);
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public string SetAgentActiveGroup(UUID AgentID, UUID GroupID)
+        public string SetAgentActiveGroup(UUID agentID, UUID groupID)
         {
-            object remoteValue = DoRemote(AgentID, GroupID);
+            object remoteValue = DoRemote(agentID, groupID);
             if (remoteValue != null || m_doRemoteOnly)
                 return (string) remoteValue;
 
             QueryFilter filter = new QueryFilter();
-            filter.andFilters["AgentID"] = AgentID;
-            if (GD.Query(new[] {"*"}, "group_agent", filter, null, null, null).Count != 0)
+            filter.andFilters["AgentID"] = agentID;
+            if (GD.Query(new[] {"*"}, _AGENTREALM, filter, null, null, null).Count != 0)
             {
                 Dictionary<string, object> values = new Dictionary<string, object>(1);
-                values["ActiveGroupID"] = GroupID;
+                values["ActiveGroupID"] = groupID;
 
-                GD.Update("group_agent", values, null, filter, null, null);
+                GD.Update(_AGENTREALM, values, null, filter, null, null);
             }
             else
             {
                 Dictionary<string, object> row = new Dictionary<string, object>(2);
-                row["AgentID"] = AgentID;
-                row["ActiveGroupID"] = GroupID;
-                GD.Insert("group_agent", row);
+                row["AgentID"] = agentID;
+                row["ActiveGroupID"] = groupID;
+                GD.Insert(_AGENTREALM, row);
             }
-            GroupMembersData gdata = GetAgentGroupMemberData(AgentID, GroupID, AgentID);
+            GroupMembersData gdata = GetAgentGroupMemberData(agentID, groupID, agentID);
             return gdata == null ? "" : gdata.Title;
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public UUID GetAgentActiveGroup(UUID RequestingAgentID, UUID AgentID)
+        public UUID GetAgentActiveGroup(UUID requestingAgentID, UUID agentID)
         {
-            object remoteValue = DoRemote(RequestingAgentID, AgentID);
+            object remoteValue = DoRemote(requestingAgentID, agentID);
             if (remoteValue != null || m_doRemoteOnly)
                 return (UUID) remoteValue; // note: this is bad, you can't cast a null object to a UUID
 
             QueryFilter filter = new QueryFilter();
-            filter.andFilters["AgentID"] = AgentID;
-            List<string> groups = GD.Query(new string[1] {"ActiveGroupID"}, "group_agent", filter, null, null, null);
+            filter.andFilters["AgentID"] = agentID;
+            List<string> groups = GD.Query(new string[1] {"ActiveGroupID"}, _AGENTREALM, filter, null, null, null);
 
             return (groups.Count != 0) ? UUID.Parse(groups[0]) : UUID.Zero;
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public string SetAgentGroupSelectedRole(UUID AgentID, UUID GroupID, UUID RoleID)
+        public string SetAgentGroupSelectedRole(UUID agentID, UUID groupID, UUID roleID)
         {
-            object remoteValue = DoRemote(AgentID, GroupID, RoleID);
+            object remoteValue = DoRemote(agentID, groupID, roleID);
             if (remoteValue != null || m_doRemoteOnly)
                 return (string) remoteValue;
 
             Dictionary<string, object> values = new Dictionary<string, object>(1);
-            values["SelectedRoleID"] = RoleID;
+            values["SelectedRoleID"] = roleID;
 
             QueryFilter filter = new QueryFilter();
-            filter.andFilters["AgentID"] = AgentID;
-            filter.andFilters["GroupID"] = GroupID;
+            filter.andFilters["AgentID"] = agentID;
+            filter.andFilters["GroupID"] = groupID;
 
-            GD.Update("group_membership", values, null, filter, null, null);
+            GD.Update(_MEMBERSHIPREALM, values, null, filter, null, null);
 
-            GroupMembersData gdata = GetAgentGroupMemberData(AgentID, GroupID, AgentID);
+            GroupMembersData gdata = GetAgentGroupMemberData(agentID, groupID, agentID);
             return gdata == null ? "" : gdata.Title;
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public void AddAgentToGroup(UUID requestingAgentID, UUID AgentID, UUID GroupID, UUID RoleID)
+        public void AddAgentToGroup(UUID requestingAgentID, UUID agentID, UUID groupID, UUID roleID)
         {
-            object remoteValue = DoRemote(requestingAgentID, AgentID, GroupID, RoleID);
+            object remoteValue = DoRemote(requestingAgentID, agentID, groupID, roleID);
             if (remoteValue != null || m_doRemoteOnly)
                 return;
 
             Dictionary<string, object> where = new Dictionary<string, object>(2);
-            where["AgentID"] = AgentID;
-            where["GroupID"] = GroupID;
+            where["AgentID"] = agentID;
+            where["GroupID"] = groupID;
 
-            if (GD.Query(new[] {"*"}, "group_membership", new QueryFilter
-                                                                 {
-                                                                     andFilters = where
-                                                                 }, null, null, null).Count != 0)
+            if (GD.Query(new[] {"*"}, _MEMBERSHIPREALM, 
+                new QueryFilter {andFilters = where}, null, null, null).Count != 0)
             {
-                MainConsole.Instance.Error("[AGM]: Agent " + AgentID + " is already in " + GroupID);
+                MainConsole.Instance.Error("[AGM]: Agent " + agentID + " is already in " + groupID);
                 return;
             }
             Dictionary<string, object> row = new Dictionary<string, object>(6);
-            row["GroupID"] = GroupID;
-            row["AgentID"] = AgentID;
-            row["SelectedRoleID"] = RoleID;
+            row["GroupID"] = groupID;
+            row["AgentID"] = agentID;
+            row["SelectedRoleID"] = roleID;
             row["Contribution"] = 0;
             row["ListInProfile"] = 1;
             row["AcceptNotices"] = 1;
-            GD.Insert("group_membership", row);
+            GD.Insert(_MEMBERSHIPREALM, row);
 
             // Make sure they're in the Everyone role
-            AddAgentToRole(requestingAgentID, AgentID, GroupID, UUID.Zero);
+            AddAgentToRole(requestingAgentID, agentID, groupID, UUID.Zero);
             // Make sure they're in specified role, if they were invited
-            if (RoleID != UUID.Zero)
-                AddAgentToRole(requestingAgentID, AgentID, GroupID, RoleID);
+            if (roleID != UUID.Zero)
+                AddAgentToRole(requestingAgentID, agentID, groupID, roleID);
             //Set the role they were invited to as their selected role
-            SetAgentGroupSelectedRole(AgentID, GroupID, RoleID);
-            SetAgentActiveGroup(AgentID, GroupID);
+            SetAgentGroupSelectedRole(agentID, groupID, roleID);
+            SetAgentActiveGroup(agentID, groupID);
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public bool RemoveAgentFromGroup(UUID requestingAgentID, UUID AgentID, UUID GroupID)
+        public bool RemoveAgentFromGroup(UUID requestingAgentID, UUID agentID, UUID groupID)
         {
             //Allow kicking yourself
-            object remoteValue = DoRemote(requestingAgentID, AgentID, GroupID);
+            object remoteValue = DoRemote(requestingAgentID, agentID, groupID);
             if (remoteValue != null || m_doRemoteOnly)
                 return remoteValue != null && (bool) remoteValue;
 
-            if ((CheckGroupPermissions(requestingAgentID, GroupID, (ulong) GroupPowers.RemoveMember)) ||
-                (requestingAgentID == AgentID))
+            if ((CheckGroupPermissions(requestingAgentID, groupID, (ulong) GroupPowers.RemoveMember)) ||
+                (requestingAgentID == agentID))
             {
                 QueryFilter filter = new QueryFilter();
-                filter.andFilters["AgentID"] = AgentID;
-                filter.andFilters["ActiveGroupID"] = GroupID;
+                filter.andFilters["AgentID"] = agentID;
+                filter.andFilters["ActiveGroupID"] = groupID;
 
                 Dictionary<string, object> values = new Dictionary<string, object>(1);
                 values["ActiveGroupID"] = UUID.Zero;
 
                 // 1. If group is agent's active group, change active group to uuidZero
-                GD.Update("group_agent", values, null, filter, null, null);
+                GD.Update(_AGENTREALM, values, null, filter, null, null);
 
                 filter.andFilters.Remove("ActiveGroupID");
-                filter.andFilters["GroupID"] = GroupID;
+                filter.andFilters["GroupID"] = groupID;
 
-                // 2. Remove Agent from group (group_membership)
-                GD.Delete("group_role_membership", filter);
+                // 2. Remove Agent from all of the group roles
+                GD.Delete(_MEMBERSHIPROLEREALM, filter);
 
-                // 3. Remove Agent from all of the groups roles (group_role_membership)
-                GD.Delete("group_membership", filter);
+                // 3. Remove Agent from the groups
+                GD.Delete(_MEMBERSHIPREALM, filter);
 
                 return true;
             }
@@ -565,199 +586,198 @@ namespace WhiteCore.Services.DataService
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public void AddRoleToGroup(UUID requestingAgentID, UUID GroupID, UUID RoleID, string NameOf, string Description,
-                                   string Title, ulong Powers)
+        public void AddRoleToGroup(UUID requestingAgentID, UUID groupID, UUID roleID, string nameOf, string description,
+                                   string title, ulong powers)
         {
-            object remoteValue = DoRemote(requestingAgentID, GroupID, RoleID, NameOf, Description, Title, Powers);
+            object remoteValue = DoRemote(requestingAgentID, groupID, roleID, nameOf, description, title, powers);
             if (remoteValue != null || m_doRemoteOnly)
                 return;
 
-            if (CheckGroupPermissions(requestingAgentID, GroupID, (ulong) GroupPowers.CreateRole))
+            if (CheckGroupPermissions(requestingAgentID, groupID, (ulong) GroupPowers.CreateRole))
             {
                 Dictionary<string, object> row = new Dictionary<string, object>(6);
-                row["GroupID"] = GroupID;
-                row["RoleID"] = RoleID;
-                row["Name"] = NameOf;
-                row["Description"] = Description != null ? Description : "";
-                row["Title"] = Title;
-                row["Powers"] = Powers.ToString();
-                GD.Insert("group_roles", row);
+                row["GroupID"] = groupID;
+                row["RoleID"] = roleID;
+                row["Name"] = nameOf;
+                row["Description"] = description != null ? description : "";
+                row["Title"] = title;
+                row["Powers"] = powers.ToString();
+                GD.Insert(_ROLEREALM, row);
             }
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public void UpdateRole(UUID requestingAgentID, UUID GroupID, UUID RoleID, string NameOf, string Desc,
-                               string Title, ulong Powers)
+        public void UpdateRole(UUID requestingAgentID, UUID groupID, UUID roleID, string nameOf, string desc,
+                               string roleTitle, ulong powers)
         {
-            object remoteValue = DoRemote(requestingAgentID, GroupID, RoleID, NameOf, Desc, Title, Powers);
+            object remoteValue = DoRemote(requestingAgentID, groupID, roleID, nameOf, desc, roleTitle, powers);
             if (remoteValue != null || m_doRemoteOnly)
                 return;
 
-            if (CheckGroupPermissions(requestingAgentID, GroupID, (ulong) GroupPowers.RoleProperties))
+            if (CheckGroupPermissions(requestingAgentID, groupID, (ulong) GroupPowers.RoleProperties))
             {
                 Dictionary<string, object> values = new Dictionary<string, object>();
-                values["RoleID"] = RoleID;
-                if (NameOf != null)
+                values["RoleID"] = roleID;
+                if (nameOf != null)
                 {
-                    values["Name"] = NameOf;
+                    values["Name"] = nameOf;
                 }
-                if (Desc != null)
-                    values["Description"] = Desc;
+                if (desc != null)
+                    values["Description"] = desc;
 
-                if (Title != null)
+                if (roleTitle != null)
                 {
-                    values["Title"] = Title;
+                    values["Title"] = roleTitle;
                 }
-                values["Powers"] = Powers.ToString();
+                values["Powers"] = powers.ToString();
 
                 QueryFilter filter = new QueryFilter();
-                filter.andFilters["GroupID"] = GroupID;
-                filter.andFilters["RoleID"] = RoleID;
+                filter.andFilters["GroupID"] = groupID;
+                filter.andFilters["RoleID"] = roleID;
 
-                GD.Update("group_roles", values, null, filter, null, null);
+                GD.Update(_ROLEREALM, values, null, filter, null, null);
             }
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public void RemoveRoleFromGroup(UUID requestingAgentID, UUID RoleID, UUID GroupID)
+        public void RemoveRoleFromGroup(UUID requestingAgentID, UUID roleID, UUID groupID)
         {
-            object remoteValue = DoRemote(requestingAgentID, RoleID, GroupID);
+            object remoteValue = DoRemote(requestingAgentID, roleID, groupID);
             if (remoteValue != null || m_doRemoteOnly)
                 return;
 
-            if (CheckGroupPermissions(requestingAgentID, GroupID, (ulong) GroupPowers.DeleteRole))
+            if (CheckGroupPermissions(requestingAgentID, groupID, (ulong) GroupPowers.DeleteRole))
             {
                 Dictionary<string, object> values = new Dictionary<string, object>(1);
                 values["SelectedRoleID"] = UUID.Zero;
 
                 QueryFilter ufilter = new QueryFilter();
-                ufilter.andFilters["GroupID"] = GroupID;
-                ufilter.andFilters["SelectedRoleID"] = RoleID;
+                ufilter.andFilters["GroupID"] = groupID;
+                ufilter.andFilters["SelectedRoleID"] = roleID;
 
                 QueryFilter dfilter = new QueryFilter();
-                dfilter.andFilters["GroupID"] = GroupID;
-                dfilter.andFilters["RoleID"] = RoleID;
+                dfilter.andFilters["GroupID"] = groupID;
+                dfilter.andFilters["RoleID"] = roleID;
 
-                GD.Delete("group_role_membership", dfilter);
-                GD.Update("group_membership", values, null, ufilter, null, null);
-                GD.Delete("group_roles", dfilter);
+                GD.Delete(_MEMBERSHIPROLEREALM, dfilter);
+                GD.Update(_MEMBERSHIPREALM, values, null, ufilter, null, null);
+                GD.Delete(_ROLEREALM, dfilter);
             }
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public void AddAgentToRole(UUID requestingAgentID, UUID AgentID, UUID GroupID, UUID RoleID)
+        public void AddAgentToRole(UUID requestingAgentID, UUID agentID, UUID groupID, UUID roleID)
         {
-            object remoteValue = DoRemote(requestingAgentID, AgentID, GroupID, RoleID);
+            object remoteValue = DoRemote(requestingAgentID, agentID, groupID, roleID);
             if (remoteValue != null || m_doRemoteOnly)
                 return;
 
-            if (!CheckGroupPermissions(requestingAgentID, GroupID, (ulong) GroupPowers.AssignMember))
+            if (!CheckGroupPermissions(requestingAgentID, groupID, (ulong) GroupPowers.AssignMember))
             {
                 //This isn't an open and shut case, they could be setting the agent to their role, which would allow for AssignMemberLimited
-                if (!CheckGroupPermissions(requestingAgentID, GroupID, (ulong) GroupPowers.AssignMemberLimited))
+                if (!CheckGroupPermissions(requestingAgentID, groupID, (ulong) GroupPowers.AssignMemberLimited))
                 {
-                    GroupProfileData profile = GetGroupProfile(requestingAgentID, GroupID);
-                    if (profile == null || !profile.OpenEnrollment || RoleID != UUID.Zero) //For open enrollment adding
+                    GroupProfileData profile = GetGroupProfile(requestingAgentID, groupID);
+                    if (profile == null || !profile.OpenEnrollment || roleID != UUID.Zero) //For open enrollment adding
                     {
                         MainConsole.Instance.Warn("[AGM]: User " + requestingAgentID + " attempted to add user " +
-                                                  AgentID +
-                                                  " to group " + GroupID + ", but did not have permissions to do so!");
+                                                  agentID +
+                                                  " to group " + groupID + ", but did not have permissions to do so!");
                         return;
                     }
                 }
             }
 
             QueryFilter filter = new QueryFilter();
-            filter.andFilters["GroupID"] = GroupID;
-            filter.andFilters["RoleID"] = RoleID;
-            filter.andFilters["AgentID"] = AgentID;
+            filter.andFilters["GroupID"] = groupID;
+            filter.andFilters["RoleID"] = roleID;
+            filter.andFilters["AgentID"] = agentID;
             //Make sure they aren't already in this role
             if (
-                uint.Parse(GD.Query(new[] {"COUNT(AgentID)"}, "group_role_membership", filter, null, null, null)[0]) ==
+                uint.Parse(GD.Query(new[] {"COUNT(AgentID)"}, _MEMBERSHIPROLEREALM, filter, null, null, null)[0]) ==
                 0)
             {
                 Dictionary<string, object> row = new Dictionary<string, object>(3);
-                row["GroupID"] = GroupID;
-                row["RoleID"] = RoleID;
-                row["AgentID"] = AgentID;
-                GD.Insert("group_role_membership", row);
+                row["GroupID"] = groupID;
+                row["RoleID"] = roleID;
+                row["AgentID"] = agentID;
+                GD.Insert(_MEMBERSHIPROLEREALM, row);
             }
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public void RemoveAgentFromRole(UUID requestingAgentID, UUID AgentID, UUID GroupID, UUID RoleID)
+        public void RemoveAgentFromRole(UUID requestingAgentID, UUID agentID, UUID groupID, UUID roleID)
         {
-            object remoteValue = DoRemote(requestingAgentID, AgentID, GroupID, RoleID);
+            object remoteValue = DoRemote(requestingAgentID, agentID, groupID, roleID);
             if (remoteValue != null || m_doRemoteOnly)
                 return;
 
-            if (CheckGroupPermissions(requestingAgentID, GroupID, (ulong) GroupPowers.AssignMember))
+            if (CheckGroupPermissions(requestingAgentID, groupID, (ulong) GroupPowers.AssignMember))
             {
                 Dictionary<string, object> values = new Dictionary<string, object>(1);
                 values["SelectedRoleID"] = UUID.Zero;
 
                 QueryFilter filter = new QueryFilter();
-                filter.andFilters["AgentID"] = AgentID;
-                filter.andFilters["GroupID"] = GroupID;
-                filter.andFilters["SelectedRoleID"] = RoleID;
+                filter.andFilters["AgentID"] = agentID;
+                filter.andFilters["GroupID"] = groupID;
+                filter.andFilters["SelectedRoleID"] = roleID;
 
-                GD.Update("group_membership", values, null, filter, null, null);
+                GD.Update(_MEMBERSHIPREALM, values, null, filter, null, null);
 
                 filter.andFilters.Remove("SelectedRoleID");
-                filter.andFilters["RoleID"] = RoleID;
-                GD.Delete("group_role_membership", filter);
+                filter.andFilters["RoleID"] = roleID;
+                GD.Delete(_MEMBERSHIPROLEREALM, filter);
             }
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public void SetAgentGroupInfo(UUID requestingAgentID, UUID AgentID, UUID GroupID, int AcceptNotices,
-                                      int ListInProfile)
+        public void SetAgentGroupInfo(UUID requestingAgentID, UUID agentID, UUID groupID, int acceptNotices,
+                                      int listInProfile)
         {
-            object remoteValue = DoRemote(requestingAgentID, AgentID, GroupID, AcceptNotices, ListInProfile);
+            object remoteValue = DoRemote(requestingAgentID, agentID, groupID, acceptNotices, listInProfile);
             if (remoteValue != null || m_doRemoteOnly)
                 return;
 
-            if (!CheckGroupPermissions(requestingAgentID, GroupID, (ulong) GroupPowers.ChangeIdentity))
+            if (!CheckGroupPermissions(requestingAgentID, groupID, (ulong) GroupPowers.ChangeIdentity))
             {
                 return;
             }
 
             Dictionary<string, object> values = new Dictionary<string, object>(3);
-            values["AgentID"] = AgentID;
-            values["AcceptNotices"] = AcceptNotices;
-            values["ListInProfile"] = ListInProfile;
+            values["AgentID"] = agentID;
+            values["AcceptNotices"] = acceptNotices;
+            values["ListInProfile"] = listInProfile;
 
             QueryFilter filter = new QueryFilter();
-            // these look the wrong way around ~ SignpostMarv
-            filter.andFilters["GroupID"] = AgentID;
-            filter.andFilters["AgentID"] = GroupID;
+            filter.andFilters["GroupID"] = groupID;     // these were reversed - 20160314 -greythane-
+            filter.andFilters["AgentID"] = agentID;
 
-            GD.Update("group_membership", values, null, filter, null, null);
+            GD.Update(_MEMBERSHIPREALM, values, null, filter, null, null);
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public void AddAgentGroupInvite(UUID requestingAgentID, UUID inviteID, UUID GroupID, UUID roleID, UUID AgentID,
-                                        string FromAgentName)
+        public void AddAgentGroupInvite(UUID requestingAgentID, UUID inviteID, UUID groupID, UUID roleID, UUID agentID,
+                                        string fromAgentName)
         {
-            object remoteValue = DoRemote(requestingAgentID, inviteID, GroupID, roleID, AgentID, FromAgentName);
+            object remoteValue = DoRemote(requestingAgentID, inviteID, groupID, roleID, agentID, fromAgentName);
             if (remoteValue != null || m_doRemoteOnly)
                 return;
 
-            if (CheckGroupPermissions(requestingAgentID, GroupID, (ulong) GroupPowers.Invite))
+            if (CheckGroupPermissions(requestingAgentID, groupID, (ulong) GroupPowers.Invite))
             {
                 QueryFilter filter = new QueryFilter();
-                filter.andFilters["AgentID"] = AgentID;
-                filter.andFilters["GroupID"] = GroupID;
-                GD.Delete("group_invite", filter);
+                filter.andFilters["AgentID"] = agentID;
+                filter.andFilters["GroupID"] = groupID;
+                GD.Delete(_INVITEREALM, filter);
 
                 Dictionary<string, object> row = new Dictionary<string, object>(6);
                 row["InviteID"] = inviteID;
-                row["GroupID"] = GroupID;
+                row["GroupID"] = groupID;
                 row["RoleID"] = roleID;
-                row["AgentID"] = AgentID;
+                row["AgentID"] = agentID;
                 row["TMStamp"] = Util.UnixTimeSinceEpoch();
-                row["FromAgentName"] = FromAgentName;
-                GD.Insert("group_invite", row);
+                row["FromAgentName"] = fromAgentName;
+                GD.Insert(_INVITEREALM, row);
             }
         }
 
@@ -770,7 +790,7 @@ namespace WhiteCore.Services.DataService
 
             QueryFilter filter = new QueryFilter();
             filter.andFilters["InviteID"] = inviteID;
-            GD.Delete("group_invite", filter);
+            GD.Delete(_INVITEREALM, filter);
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
@@ -869,35 +889,35 @@ namespace WhiteCore.Services.DataService
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public uint GetNumberOfGroupNotices(UUID requestingAgentID, UUID GroupID)
+        public uint GetNumberOfGroupNotices(UUID requestingAgentID, UUID groupID)
         {
-            object remoteValue = DoRemote(requestingAgentID, GroupID);
+            object remoteValue = DoRemote(requestingAgentID, groupID);
             if (remoteValue != null || m_doRemoteOnly)
                 return (uint) remoteValue; // note: this is bad, you can't cast a null object to a uint
 
-            List<UUID> GroupIDs = new List<UUID> {GroupID};
+            List<UUID> GroupIDs = new List<UUID> {groupID};
             return GetNumberOfGroupNotices(requestingAgentID, GroupIDs);
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public uint GetNumberOfGroupNotices(UUID requestingAgentID, List<UUID> GroupIDs)
+        public uint GetNumberOfGroupNotices(UUID requestingAgentID, List<UUID> groupIDList)
         {
-            object remoteValue = DoRemote(requestingAgentID, GroupIDs);
+            object remoteValue = DoRemote(requestingAgentID, groupIDList);
             if (remoteValue != null || m_doRemoteOnly)
                 return (uint) remoteValue; // note: this is bad, you can't cast a null object to a uint
 
-            bool had = GroupIDs.Count > 0;
+            bool had = groupIDList.Count > 0;
 
             List<UUID> groupIDs = new List<UUID>();
             if (!agentsCanBypassGroupNoticePermsCheck.Contains(requestingAgentID))
             {
                 groupIDs.AddRange(
-                    GroupIDs.Where(
+                    groupIDs.Where(
                         GroupID => CheckGroupPermissions(requestingAgentID, GroupID, (ulong) GroupPowers.ReceiveNotices)));
             }
             else
             {
-                groupIDs = GroupIDs;
+                groupIDs = groupIDList;
             }
 
             if (had && groupIDs.Count == 0)
@@ -913,7 +933,7 @@ namespace WhiteCore.Services.DataService
                 filter.orMultiFilters["GroupID"] = filterGroupIDs;
             }
 
-            return uint.Parse(GD.Query(new[] {"COUNT(NoticeID)"}, "group_notice", filter, null, null, null)[0]);
+            return uint.Parse(GD.Query(new[] {"COUNT(NoticeID)"}, _NOTICEREALM, filter, null, null, null)[0]);
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
@@ -934,7 +954,7 @@ namespace WhiteCore.Services.DataService
                 }
             }
 
-            return uint.Parse(GD.Query(new[] {"COUNT(GroupID)"}, "group_data", filter, null, null, null)[0]);
+            return uint.Parse(GD.Query(new[] {"COUNT(GroupID)"}, _DATAREALM, filter, null, null, null)[0]);
         }
 
         static GroupRecord GroupRecordQueryResult2GroupRecord(List<String> result)
@@ -967,7 +987,7 @@ namespace WhiteCore.Services.DataService
                 return new List<UUID>();
 
             QueryFilter filter = new QueryFilter();
-            List<string> groupsData = GD.Query(new[] { "GroupID" }, "group_data", filter, null, null, null);
+            List<string> groupsData = GD.Query(new[] { "GroupID" }, _DATAREALM, filter, null, null, null);
 
             if (groupsData == null)
                 return new List <UUID>();
@@ -980,21 +1000,21 @@ namespace WhiteCore.Services.DataService
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public GroupRecord GetGroupRecord(UUID requestingAgentID, UUID GroupID, string GroupName)
+        public GroupRecord GetGroupRecord(UUID requestingAgentID, UUID groupID, string groupName)
         {
-            object remoteValue = DoRemote(requestingAgentID, GroupID, GroupName);
+            object remoteValue = DoRemote(requestingAgentID, groupID, groupName);
             if (remoteValue != null || m_doRemoteOnly)
                 return (GroupRecord) remoteValue;
 
             QueryFilter filter = new QueryFilter();
 
-            if (GroupID != UUID.Zero)
+            if (groupID != UUID.Zero)
             {
-                filter.andFilters["GroupID"] = GroupID;
+                filter.andFilters["GroupID"] = groupID;
             }
-            if (!string.IsNullOrEmpty(GroupName))
+            if (!string.IsNullOrEmpty(groupName))
             {
-                filter.andFilters["Name"] = GroupName;
+                filter.andFilters["Name"] = groupName;
             }
             if (filter.Count == 0)
             {
@@ -1013,7 +1033,7 @@ namespace WhiteCore.Services.DataService
                                                            "AllowPublish",
                                                            "MaturePublish",
                                                            "OwnerRoleID"
-                                                       }, "group_data", filter, null, null, null);
+            }, _DATAREALM, filter, null, null, null);
             return (osgroupsData.Count == 0) ? null : GroupRecordQueryResult2GroupRecord(osgroupsData);
         }
 
@@ -1021,8 +1041,6 @@ namespace WhiteCore.Services.DataService
         public List<GroupRecord> GetGroupRecords(UUID requestingAgentID, uint start, uint count,
                                                  Dictionary<string, bool> sort, Dictionary<string, bool> boolFields)
         {
-            //            List<string> filter = new List<string>();
-
             object remoteValue = DoRemote(requestingAgentID, start, count, boolFields);
             if (remoteValue != null || m_doRemoteOnly)
                 return (List<GroupRecord>) remoteValue;
@@ -1063,7 +1081,7 @@ namespace WhiteCore.Services.DataService
                                                            "AllowPublish",
                                                            "MaturePublish",
                                                            "OwnerRoleID"
-                                                       }, "group_data", filter, sort, start, count);
+            }, _DATAREALM, filter, sort, start, count);
 
             if (osgroupsData.Count < 11)
             {
@@ -1077,21 +1095,21 @@ namespace WhiteCore.Services.DataService
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<GroupRecord> GetGroupRecords(UUID requestingAgentID, List<UUID> GroupIDs)
+        public List<GroupRecord> GetGroupRecords(UUID requestingAgentID, List<UUID> groupIDList)
         {
-            object remoteValue = DoRemote(requestingAgentID, GroupIDs);
+            object remoteValue = DoRemote(requestingAgentID, groupIDList);
             if (remoteValue != null || m_doRemoteOnly)
                 return (List<GroupRecord>) remoteValue;
 
             List<GroupRecord> Reply = new List<GroupRecord>(0);
-            if (GroupIDs.Count <= 0)
+            if (groupIDList.Count <= 0)
             {
                 return Reply;
             }
 
             QueryFilter filter = new QueryFilter();
             filter.orMultiFilters["GroupID"] = new List<object>();
-            foreach (UUID groupID in GroupIDs)
+            foreach (UUID groupID in groupIDList)
             {
                 filter.orMultiFilters["GroupID"].Add(groupID);
             }
@@ -1109,7 +1127,7 @@ namespace WhiteCore.Services.DataService
                                                            "AllowPublish",
                                                            "MaturePublish",
                                                            "OwnerRoleID"
-                                                       }, "group_data", filter, null, null, null);
+            }, _DATAREALM, filter, null, null, null);
 
             if (osgroupsData.Count < 11)
             {
@@ -1123,36 +1141,36 @@ namespace WhiteCore.Services.DataService
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public GroupProfileData GetMemberGroupProfile(UUID requestingAgentID, UUID GroupID, UUID AgentID)
+        public GroupProfileData GetMemberGroupProfile(UUID requestingAgentID, UUID groupID, UUID agentID)
         {
-            object remoteValue = DoRemote(requestingAgentID, GroupID, AgentID);
+            object remoteValue = DoRemote(requestingAgentID, groupID, agentID);
             if (remoteValue != null || m_doRemoteOnly)
                 return (GroupProfileData) remoteValue;
 
-            if (!CheckGroupPermissions(requestingAgentID, GroupID, (ulong) GroupPowers.MemberVisible))
+            if (!CheckGroupPermissions(requestingAgentID, groupID, (ulong) GroupPowers.MemberVisible))
                 return new GroupProfileData();
 
             GroupProfileData GPD = new GroupProfileData();
-            GroupRecord record = GetGroupRecord(requestingAgentID, GroupID, null);
+            GroupRecord record = GetGroupRecord(requestingAgentID, groupID, null);
 
             QueryFilter filter1 = new QueryFilter();
-            filter1.andFilters["GroupID"] = AgentID; // yes these look the wrong way around
-            filter1.andFilters["AgentID"] = GroupID; // but they were like that when I got here! ~ SignpostMarv
+            filter1.andFilters["GroupID"] = agentID; // yes these look the wrong way around
+            filter1.andFilters["AgentID"] = groupID; // but they were like that when I got here! ~ SignpostMarv
 
             QueryFilter filter2 = new QueryFilter();
-            filter2.andFilters["GroupID"] = GroupID;
+            filter2.andFilters["GroupID"] = groupID;
 
             List<string> Membership = GD.Query(new[]
                                                      {
                                                          "Contribution",
                                                          "ListInProfile",
                                                          "SelectedRoleID"
-                                                     }, "group_membership", filter1, null, null, null);
+            }, _MEMBERSHIPREALM, filter1, null, null, null);
 
             int GroupMemCount =
-                int.Parse(GD.Query(new[] {"COUNT(AgentID)"}, "group_membership", filter2, null, null, null)[0]);
+                int.Parse(GD.Query(new[] {"COUNT(AgentID)"}, _MEMBERSHIPREALM, filter2, null, null, null)[0]);
 
-            int GroupRoleCount = int.Parse(GD.Query(new[] {"COUNT(RoleID)"}, "group_roles", filter2, null, null, null)[0]);
+            int GroupRoleCount = int.Parse(GD.Query(new[] {"COUNT(RoleID)"}, _ROLEREALM, filter2, null, null, null)[0]);
 
             QueryFilter filter3 = new QueryFilter();
             filter3.andFilters["RoleID"] = Membership[2];
@@ -1160,7 +1178,7 @@ namespace WhiteCore.Services.DataService
                                                     {
                                                         "Name",
                                                         "Powers"
-                                                    }, "group_roles", filter3, null, null, null);
+            }, _ROLEREALM, filter3, null, null, null);
 
             GPD.AllowPublish = record.AllowPublish;
             GPD.Charter = record.Charter;
@@ -1184,26 +1202,26 @@ namespace WhiteCore.Services.DataService
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public GroupMembershipData GetGroupMembershipData(UUID requestingAgentID, UUID GroupID, UUID AgentID)
+        public GroupMembershipData GetGroupMembershipData(UUID requestingAgentID, UUID groupID, UUID agentID)
         {
-            object remoteValue = DoRemote(requestingAgentID, GroupID, AgentID);
+            object remoteValue = DoRemote(requestingAgentID, groupID, agentID);
             if (remoteValue != null || m_doRemoteOnly)
                 return (GroupMembershipData) remoteValue;
 
-            if (GroupID == UUID.Zero)
-                GroupID = GetAgentActiveGroup(requestingAgentID, AgentID);
-            if (GroupID == UUID.Zero)
+            if (groupID == UUID.Zero)
+                groupID = GetAgentActiveGroup(requestingAgentID, agentID);
+            if (groupID == UUID.Zero)
                 return null;
 
             QueryTables tables = new QueryTables();
-            tables.AddTable("group_data", "osg");
-            tables.AddTable("group_membership", "osgm", JoinType.Inner, new[,] {{"osg.GroupID", "osgm.GroupID"}});
-            tables.AddTable("group_roles", "osr", JoinType.Inner,
+            tables.AddTable(_DATAREALM, "osg");
+            tables.AddTable(_MEMBERSHIPREALM, "osgm", JoinType.Inner, new[,] {{"osg.GroupID", "osgm.GroupID"}});
+            tables.AddTable(_ROLEREALM, "osr", JoinType.Inner,
                             new[,] {{"osgm.SelectedRoleID", "osr.RoleID"}, {"osr.GroupID", "osg.GroupID"}});
 
             QueryFilter filter = new QueryFilter();
-            filter.andFilters["osg.GroupID"] = GroupID;
-            filter.andFilters["osgm.AgentID"] = AgentID;
+            filter.andFilters["osg.GroupID"] = groupID;
+            filter.andFilters["osgm.AgentID"] = agentID;
 
             string[] fields = new[]
                                   {
@@ -1237,7 +1255,7 @@ namespace WhiteCore.Services.DataService
                                               Charter = Membership[7],
                                               Contribution = int.Parse(Membership[1]),
                                               FounderID = UUID.Parse(Membership[8]),
-                                              GroupID = GroupID,
+                                              GroupID = groupID,
                                               GroupName = Membership[9],
                                               GroupPicture = UUID.Parse(Membership[10]),
                                               GroupPowers = ulong.Parse(Membership[5]),
@@ -1255,23 +1273,23 @@ namespace WhiteCore.Services.DataService
 
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<GroupTitlesData> GetGroupTitles(UUID requestingAgentID, UUID GroupID)
+        public List<GroupTitlesData> GetGroupTitles(UUID requestingAgentID, UUID groupID)
         {
-            object remoteValue = DoRemote(requestingAgentID, GroupID);
+            object remoteValue = DoRemote(requestingAgentID, groupID);
             if (remoteValue != null || m_doRemoteOnly)
                 return (List<GroupTitlesData>) remoteValue;
 
             QueryTables tables = new QueryTables();
-            tables.AddTable("group_membership", "osgm");
-            tables.AddTable("group_role_membership", "osgrm", JoinType.Inner,
+            tables.AddTable(_MEMBERSHIPREALM, "osgm");
+            tables.AddTable(_MEMBERSHIPROLEREALM, "osgrm", JoinType.Inner,
                             new[,] {{"osgm.AgentID", "osgrm.AgentID"}, {"osgm.GroupID", "osgrm.GroupID"}});
-            tables.AddTable("group_roles", "osr", JoinType.Inner,
+            tables.AddTable(_ROLEREALM, "osr", JoinType.Inner,
                             new[,] {{"osgrm.RoleID", "osr.RoleID"}, {"osgm.GroupID", "osr.GroupID"}});
 
 
             QueryFilter filter = new QueryFilter();
             filter.andFilters["osgm.AgentID"] = requestingAgentID;
-            filter.andFilters["osgm.GroupID"] = GroupID;
+            filter.andFilters["osgm.GroupID"] = groupID;
 
             List<string> Membership = GD.Query(new[]
                                                      {
@@ -1302,9 +1320,9 @@ namespace WhiteCore.Services.DataService
                 return (List<GroupMembershipData>) remoteValue;
 
             QueryTables tables = new QueryTables();
-            tables.AddTable("group_data", "osg");
-            tables.AddTable("group_membership", "osgm", JoinType.Inner, new[,] {{"osg.GroupID", "osgm.GroupID"}});
-            tables.AddTable("group_roles", "osr", JoinType.Inner, new[,] {{"osgm.SelectedRoleID", "osr.RoleID"}});
+            tables.AddTable(_DATAREALM, "osg");
+            tables.AddTable(_MEMBERSHIPREALM, "osgm", JoinType.Inner, new[,] {{"osg.GroupID", "osgm.GroupID"}});
+            tables.AddTable(_ROLEREALM, "osr", JoinType.Inner, new[,] {{"osgm.SelectedRoleID", "osr.RoleID"}});
 
             QueryFilter filter = new QueryFilter();
             filter.andFilters["osgm.AgentID"] = AgentID;
@@ -1372,10 +1390,8 @@ namespace WhiteCore.Services.DataService
             where["AgentID"] = requestingAgentID;
             where["InviteID"] = inviteID;
 
-            List<string> groupInvite = GD.Query(new[] {"*"}, "group_invite", new QueryFilter
-                                                                                    {
-                                                                                        andFilters = where
-                                                                                    }, null, null, null);
+            List<string> groupInvite = GD.Query(new[] {"*"}, _INVITEREALM,
+                new QueryFilter{ andFilters = where }, null, null, null);
 
             if (groupInvite.Count == 0)
             {
@@ -1400,7 +1416,7 @@ namespace WhiteCore.Services.DataService
             if (remoteValue != null || m_doRemoteOnly)
                 return (List<GroupInviteInfo>) remoteValue;
 
-            List<string> groupInvite = GD.Query(new[] {"*"}, "group_invite", filter, null, null, null);
+            List<string> groupInvite = GD.Query(new[] {"*"}, _INVITEREALM, filter, null, null, null);
 
             List<GroupInviteInfo> invites = new List<GroupInviteInfo>();
 
@@ -1420,16 +1436,16 @@ namespace WhiteCore.Services.DataService
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public GroupMembersData GetAgentGroupMemberData(UUID requestingAgentID, UUID GroupID, UUID AgentID)
+        public GroupMembersData GetAgentGroupMemberData(UUID requestingAgentID, UUID groupID, UUID agentID)
         {
-            object remoteValue = DoRemote(requestingAgentID, GroupID, AgentID);
+            object remoteValue = DoRemote(requestingAgentID, groupID, agentID);
             if (remoteValue != null || m_doRemoteOnly)
                 return (GroupMembersData) remoteValue;
 
 
             QueryFilter filter = new QueryFilter();
-            filter.andFilters["GroupID"] = GroupID;
-            filter.andFilters["AgentID"] = AgentID;
+            filter.andFilters["GroupID"] = groupID;
+            filter.andFilters["AgentID"] = agentID;
 
             List<string> Membership = GD.Query(new string[4]
                                                      {
@@ -1437,7 +1453,7 @@ namespace WhiteCore.Services.DataService
                                                          "Contribution",
                                                          "ListInProfile",
                                                          "SelectedRoleID"
-                                                     }, "group_membership", filter, null, null, null);
+            }, _MEMBERSHIPREALM, filter, null, null, null);
 
             if (Membership.Count != 4)
             {
@@ -1451,7 +1467,7 @@ namespace WhiteCore.Services.DataService
                                                     {
                                                         "Title",
                                                         "Powers"
-                                                    }, "group_roles", filter, null, null, null);
+            }, _ROLEREALM, filter, null, null, null);
 
             if (GroupRole.Count != 2)
             {
@@ -1463,20 +1479,20 @@ namespace WhiteCore.Services.DataService
             List<string> OwnerRoleID = GD.Query(new string[1]
                                                       {
                                                           "OwnerRoleID"
-                                                      }, "group_data", filter, null, null, null);
+            }, _DATAREALM, filter, null, null, null);
 
             filter.andFilters["RoleID"] = OwnerRoleID[0];
-            filter.andFilters["AgentID"] = AgentID;
+            filter.andFilters["AgentID"] = agentID;
 
             bool IsOwner = uint.Parse(GD.Query(new string[1]
                                                      {
                                                          "COUNT(AgentID)"
-                                                     }, "group_role_membership", filter, null, null, null)[0]) == 1;
+            }, _MEMBERSHIPROLEREALM, filter, null, null, null)[0]) == 1;
 
             return new GroupMembersData
                        {
                            AcceptNotices = (Membership[0]) == "1",
-                           AgentID = AgentID,
+                           AgentID = agentID,
                            Contribution = int.Parse(Membership[1]),
                            IsOwner = IsOwner,
                            ListInProfile = (Membership[2]) == "1",
@@ -1487,20 +1503,20 @@ namespace WhiteCore.Services.DataService
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<GroupMembersData> GetGroupMembers(UUID requestingAgentID, UUID GroupID)
+        public List<GroupMembersData> GetGroupMembers(UUID requestingAgentID, UUID groupID)
         {
-            object remoteValue = DoRemote(requestingAgentID, GroupID);
+            object remoteValue = DoRemote(requestingAgentID, groupID);
             if (remoteValue != null || m_doRemoteOnly)
                 return (List<GroupMembersData>) remoteValue;
 
             QueryFilter filter = new QueryFilter();
-            filter.andFilters["GroupID"] = GroupID;
-            List<string> Agents = GD.Query(new[] {"AgentID"}, "group_membership", filter, null, null, null);
+            filter.andFilters["GroupID"] = groupID;
+            List<string> Agents = GD.Query(new[] {"AgentID"}, _MEMBERSHIPREALM, filter, null, null, null);
 
             List<GroupMembersData> list = new List<GroupMembersData>();
             foreach (string agent in Agents)
             {
-                GroupMembersData d = GetAgentGroupMemberData(requestingAgentID, GroupID, UUID.Parse(agent));
+                GroupMembersData d = GetAgentGroupMemberData(requestingAgentID, groupID, UUID.Parse(agent));
                 if (d == null) continue;
                 UserInfo info =
                     m_registry.RequestModuleInterface<IAgentInfoService>().GetUserInfo(
@@ -1527,7 +1543,7 @@ namespace WhiteCore.Services.DataService
 
             QueryFilter filter = new QueryFilter();
             filter.andFilters["GroupID"] = groupID;
-            List<string> bannedAgents = GD.Query(new[] {"AgentID, BanTime"}, "group_bans", filter, null, null, null);
+            List<string> bannedAgents = GD.Query(new[] {"AgentID, BanTime"}, _BANREALM, filter, null, null, null);
 
             var userList = new List<GroupBannedAgentsData>();
             if (bannedAgents.Count == 0)
@@ -1562,7 +1578,7 @@ namespace WhiteCore.Services.DataService
                     row ["AgentID"] = userID;
                     row ["BanTime"] = DateTime.UtcNow; 
 
-                    GD.Insert ("group_bans", row);
+                    GD.Insert (_BANREALM, row);
                 }
             }
         }
@@ -1583,7 +1599,7 @@ namespace WhiteCore.Services.DataService
                     filter.andFilters ["GroupID"] = groupID;
                     filter.andFilters ["AgentID"] = userID;
 
-                    GD.Delete ("group_bans", filter);
+                    GD.Delete (_BANREALM, filter);
                 }
             }
         }
@@ -1599,7 +1615,7 @@ namespace WhiteCore.Services.DataService
             filter.andFilters["GroupID"] = groupID;
             filter.andFilters ["AgentID"] = agentID;
 
-            List<string>  bUser = GD.Query(new[] {"AgentID, BanTime"}, "group_bans", filter, null, null, null);
+            List<string>  bUser = GD.Query(new[] {"AgentID, BanTime"}, _BANREALM, filter, null, null, null);
 
             GroupBannedAgentsData bannedUser = new GroupBannedAgentsData ();
             if (bUser.Count > 0)
@@ -1623,7 +1639,7 @@ namespace WhiteCore.Services.DataService
             filter.andFilters["GroupID"] = groupID;
             filter.andFilters ["AgentID"] = agentID;
 
-            List<string>  banned = GD.Query(new[] {"AgentID"}, "group_bans", filter, null, null, null);
+            List<string>  banned = GD.Query(new[] {"AgentID"}, _BANREALM, filter, null, null, null);
             bool isBanned = (banned.Count > 0);        // true if found (banned)
 
             return isBanned;
@@ -1648,7 +1664,7 @@ namespace WhiteCore.Services.DataService
                                                      "ShowInList",
                                                      "AllowPublish",
                                                      "MaturePublish"
-                                                 }, "group_data", filter, null, start, count);
+            }, _DATAREALM, filter, null, start, count);
 
             List<DirGroupsReplyData> Reply = new List<DirGroupsReplyData>();
 
@@ -1676,7 +1692,7 @@ namespace WhiteCore.Services.DataService
                 filter = new QueryFilter();
                 filter.andFilters["GroupID"] = dirgroup.groupID;
                 dirgroup.members =
-                    int.Parse(GD.Query(new[] {"COUNT(AgentID)"}, "group_membership", filter, null, null, null)[0]);
+                    int.Parse(GD.Query(new[] {"COUNT(AgentID)"}, _MEMBERSHIPREALM, filter, null, null, null)[0]);
 
                 Reply.Add(dirgroup);
             }
@@ -1684,22 +1700,22 @@ namespace WhiteCore.Services.DataService
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<GroupRolesData> GetAgentGroupRoles(UUID requestingAgentID, UUID AgentID, UUID GroupID)
+        public List<GroupRolesData> GetAgentGroupRoles(UUID requestingAgentID, UUID agentID, UUID groupID)
         {
             // I couldn't actually get this function to call when testing changes
-            object remoteValue = DoRemote(requestingAgentID, AgentID, GroupID);
+            object remoteValue = DoRemote(requestingAgentID, agentID, groupID);
             if (remoteValue != null || m_doRemoteOnly)
                 return (List<GroupRolesData>) remoteValue;
 
             //No permissions check necessary, we are checking only roles that they are in, so if they arn't in the group, that isn't a problem
 
             QueryTables tables = new QueryTables();
-            tables.AddTable("group_role_membership", "osgm");
-            tables.AddTable("group_roles", "osr", JoinType.Inner, new[,] {{"osgm.RoleID", "osr.RoleID"}});
+            tables.AddTable(_MEMBERSHIPROLEREALM, "osgm");
+            tables.AddTable(_ROLEREALM, "osr", JoinType.Inner, new[,] {{"osgm.RoleID", "osr.RoleID"}});
 
             QueryFilter filter = new QueryFilter();
-            filter.andFilters["osgm.AgentID"] = AgentID;
-            filter.andFilters["osgm.GroupID"] = GroupID;
+            filter.andFilters["osgm.AgentID"] = agentID;
+            filter.andFilters["osgm.GroupID"] = groupID;
 
             string[] fields = new[]
                                   {
@@ -1731,14 +1747,14 @@ namespace WhiteCore.Services.DataService
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<GroupRolesData> GetGroupRoles(UUID requestingAgentID, UUID GroupID)
+        public List<GroupRolesData> GetGroupRoles(UUID requestingAgentID, UUID groupID)
         {
             // Can't use joins here without a group by as well
-            object remoteValue = DoRemote(requestingAgentID, GroupID);
+            object remoteValue = DoRemote(requestingAgentID, groupID);
             if (remoteValue != null || m_doRemoteOnly)
                 return (List<GroupRolesData>) remoteValue;
 
-            if (!CheckGroupPermissions(requestingAgentID, GroupID, (ulong) GroupPowers.None))
+            if (!CheckGroupPermissions(requestingAgentID, groupID, (ulong) GroupPowers.None))
             {
                 return new List<GroupRolesData>(0);
             }
@@ -1746,7 +1762,7 @@ namespace WhiteCore.Services.DataService
             List<GroupRolesData> GroupRoles = new List<GroupRolesData>();
 
             QueryFilter rolesFilter = new QueryFilter();
-            rolesFilter.andFilters["GroupID"] = GroupID;
+            rolesFilter.andFilters["GroupID"] = groupID;
             List<string> Roles = GD.Query(new[]
                                                 {
                                                     "Name",
@@ -1754,16 +1770,16 @@ namespace WhiteCore.Services.DataService
                                                     "Title",
                                                     "Powers",
                                                     "RoleID"
-                                                }, "group_roles", rolesFilter, null, null, null);
+            }, _ROLEREALM, rolesFilter, null, null, null);
 
             QueryFilter filter = new QueryFilter();
-            filter.andFilters["GroupID"] = GroupID;
+            filter.andFilters["GroupID"] = groupID;
 
             for (int i = 0; i < Roles.Count; i += 5)
             {
                 filter.andFilters["RoleID"] = UUID.Parse(Roles[i + 4]);
                 int Count =
-                    int.Parse(GD.Query(new[] {"COUNT(AgentID)"}, "group_role_membership", filter, null, null, null)[0]);
+                    int.Parse(GD.Query(new[] {"COUNT(AgentID)"}, _MEMBERSHIPROLEREALM, filter, null, null, null)[0]);
 
                 GroupRoles.Add(new GroupRolesData
                                    {
@@ -1779,20 +1795,20 @@ namespace WhiteCore.Services.DataService
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<GroupRoleMembersData> GetGroupRoleMembers(UUID requestingAgentID, UUID GroupID)
+        public List<GroupRoleMembersData> GetGroupRoleMembers(UUID requestingAgentID, UUID groupID)
         {
-            object remoteValue = DoRemote(requestingAgentID, GroupID);
+            object remoteValue = DoRemote(requestingAgentID, groupID);
             if (remoteValue != null || m_doRemoteOnly)
                 return (List<GroupRoleMembersData>) remoteValue;
 
             List<GroupRoleMembersData> RoleMembers = new List<GroupRoleMembersData>();
 
             QueryTables tables = new QueryTables();
-            tables.AddTable("group_role_membership", "osgrm");
-            tables.AddTable("group_roles", "osr", JoinType.Inner, new[,] {{"osr.RoleID", "osgrm.RoleID"}});
+            tables.AddTable(_MEMBERSHIPROLEREALM, "osgrm");
+            tables.AddTable(_ROLEREALM, "osr", JoinType.Inner, new[,] {{"osr.RoleID", "osgrm.RoleID"}});
 
             QueryFilter filter = new QueryFilter();
-            filter.andFilters["osgrm.GroupID"] = GroupID;
+            filter.andFilters["osgrm.GroupID"] = groupID;
             string[] fields = new[]
                                   {
                                       "osgrm.RoleID",
@@ -1801,7 +1817,7 @@ namespace WhiteCore.Services.DataService
                                   };
             List<string> Roles = GD.Query(fields, tables, filter, null, null, null);
 
-            GroupMembersData GMD = GetAgentGroupMemberData(requestingAgentID, GroupID, requestingAgentID);
+            GroupMembersData GMD = GetAgentGroupMemberData(requestingAgentID, groupID, requestingAgentID);
             const long canViewMemebersBit = 140737488355328L;
             for (int i = 0; i < Roles.Count; i += fields.Length)
             {
@@ -1844,7 +1860,7 @@ namespace WhiteCore.Services.DataService
                                       "AssetType",
                                       "ItemName"
                                   };
-            List<string> notice = GD.Query(fields, "group_notice", filter, null, null, null);
+            List<string> notice = GD.Query(fields, _NOTICEREALM, filter, null, null, null);
 
             if (notice.Count != fields.Length)
             {
@@ -1891,7 +1907,7 @@ namespace WhiteCore.Services.DataService
                                       "AssetType",
                                       "ItemName"
                                   };
-            List<string> notice = GD.Query(fields, "group_notice", filter, null, null, null);
+            List<string> notice = GD.Query(fields, _NOTICEREALM, filter, null, null, null);
 
             if (notice.Count != fields.Length)
             {
@@ -1948,19 +1964,19 @@ namespace WhiteCore.Services.DataService
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<GroupNoticeData> GetGroupNotices(UUID requestingAgentID, uint start, uint count, UUID GroupID)
+        public List<GroupNoticeData> GetGroupNotices(UUID requestingAgentID, uint start, uint count, UUID groupID)
         {
-            object remoteValue = DoRemote(requestingAgentID, start, count, GroupID);
+            object remoteValue = DoRemote(requestingAgentID, start, count, groupID);
             if (remoteValue != null || m_doRemoteOnly)
                 return (List<GroupNoticeData>) remoteValue;
 
-            return GetGroupNotices(requestingAgentID, start, count, new List<UUID>(new[] {GroupID}));
+            return GetGroupNotices(requestingAgentID, start, count, new List<UUID>(new[] {groupID}));
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<GroupNoticeData> GetGroupNotices(UUID requestingAgentID, uint start, uint count, List<UUID> GroupIDs)
+        public List<GroupNoticeData> GetGroupNotices(UUID requestingAgentID, uint start, uint count, List<UUID> groupIDList)
         {
-            object remoteValue = DoRemote(requestingAgentID, start, count, GroupIDs);
+            object remoteValue = DoRemote(requestingAgentID, start, count, groupIDList);
             if (remoteValue != null || m_doRemoteOnly)
                 return (List<GroupNoticeData>) remoteValue;
 
@@ -1968,12 +1984,12 @@ namespace WhiteCore.Services.DataService
             if (!agentsCanBypassGroupNoticePermsCheck.Contains(requestingAgentID))
             {
                 groupIDs.AddRange(
-                    GroupIDs.Where(
+                    groupIDList.Where(
                         GroupID => CheckGroupPermissions(requestingAgentID, GroupID, (ulong) GroupPowers.ReceiveNotices)));
             }
             else
             {
-                groupIDs = GroupIDs;
+                groupIDs = groupIDList;
             }
 
             List<GroupNoticeData> AllNotices = new List<GroupNoticeData>();
@@ -2008,7 +2024,7 @@ namespace WhiteCore.Services.DataService
                                                          "Message",
                                                          "AssetType",
                                                          "ItemName"
-                                                     }, "group_notice", filter, sort, s, c);
+                }, _NOTICEREALM, filter, sort, s, c);
 
                 for (int i = 0; i < notice.Count; i += 10)
                 {
@@ -2019,24 +2035,24 @@ namespace WhiteCore.Services.DataService
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public GroupProfileData GetGroupProfile(UUID requestingAgentID, UUID GroupID)
+        public GroupProfileData GetGroupProfile(UUID requestingAgentID, UUID groupID)
         {
-            object remoteValue = DoRemote(requestingAgentID, GroupID);
+            object remoteValue = DoRemote(requestingAgentID, groupID);
             if (remoteValue != null || m_doRemoteOnly)
                 return (GroupProfileData) remoteValue;
 
             GroupProfileData profile = new GroupProfileData();
 
-            GroupRecord groupInfo = GetGroupRecord(requestingAgentID, GroupID, null);
+            GroupRecord groupInfo = GetGroupRecord(requestingAgentID, groupID, null);
             if (groupInfo != null)
             {
                 profile.AllowPublish = groupInfo.AllowPublish;
                 profile.Charter = groupInfo.Charter;
                 profile.FounderID = groupInfo.FounderID;
-                profile.GroupID = GroupID;
+                profile.GroupID = groupID;
                 profile.GroupMembershipCount =
-                    GetGroupMembers(requestingAgentID, GroupID).Count;
-                profile.GroupRolesCount = GetGroupRoles(requestingAgentID, GroupID).Count;
+                    GetGroupMembers(requestingAgentID, groupID).Count;
+                profile.GroupRolesCount = GetGroupRoles(requestingAgentID, groupID).Count;
                 profile.InsigniaID = groupInfo.GroupPicture;
                 profile.MaturePublish = groupInfo.MaturePublish;
                 profile.MembershipFee = groupInfo.MembershipFee;
@@ -2048,7 +2064,7 @@ namespace WhiteCore.Services.DataService
             }
 
             GroupMembershipData memberInfo = GetGroupMembershipData(requestingAgentID,
-                                                                    GroupID,
+                                                                    groupID,
                                                                     requestingAgentID);
             if (memberInfo != null)
             {
@@ -2065,30 +2081,30 @@ namespace WhiteCore.Services.DataService
         {
         }
 
-        public bool CheckGroupPermissions(UUID AgentID, UUID GroupID, ulong Permissions)
+        public bool CheckGroupPermissions(UUID agentID, UUID groupID, ulong permissions)
         {
-            if (GroupID == UUID.Zero)
+            if (groupID == UUID.Zero)
                 return false;
 
-            if (AgentID == UUID.Zero)
+            if (agentID == UUID.Zero)
                 return false;
 
-            GroupMembersData GMD = GetAgentGroupMemberData(AgentID, GroupID, AgentID);
-            GroupRecord record = GetGroupRecord(AgentID, GroupID, null);
-            if (Permissions == 0)
+            GroupMembersData GMD = GetAgentGroupMemberData(agentID, groupID, agentID);
+            GroupRecord record = GetGroupRecord(agentID, groupID, null);
+            if (permissions == 0)
             {
-                if (GMD != null || record.FounderID == AgentID || record.OpenEnrollment)
+                if (GMD != null || record.FounderID == agentID || record.OpenEnrollment)
                     return true;
                 return false;
             }
 
-            if (record != null && record.FounderID == AgentID)
+            if (record != null && record.FounderID == agentID)
                 return true;
 
             if (GMD == null)
                 return false;
 
-            if ((GMD.AgentPowers & Permissions) != Permissions)
+            if ((GMD.AgentPowers & permissions) != permissions)
                 return false;
 
             return true;

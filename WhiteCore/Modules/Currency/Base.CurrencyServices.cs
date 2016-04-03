@@ -259,17 +259,6 @@ namespace WhiteCore.Modules.Currency
             return result;
         }
 
-        public List<GroupAccountHistory> GetTransactions(UUID groupID, UUID agentID, int currentInterval,
-                                                         int intervalDays)
-        {
-            return new List<GroupAccountHistory>();
-        }
-
-        public GroupBalance GetGroupBalance(UUID groupID)
-        {
-            return m_connector.GetGroupBalance(groupID);
-        }
-
         public uint NumberOfTransactions(UUID toAgent, UUID fromAgent)
         {
             return m_connector.NumberOfTransactions(toAgent, fromAgent);
@@ -325,6 +314,25 @@ namespace WhiteCore.Modules.Currency
         {
             return m_connector.GetPurchaseHistory(period, periodType, start, count);
         }
+
+        public List<GroupAccountHistory> GetGroupTransactions(UUID groupID, UUID agentID, int currentInterval,
+            int intervalDays)
+        {
+            return m_connector.GetGroupTransactions (groupID, agentID, currentInterval, intervalDays);
+        }
+
+        public GroupBalance GetGroupBalance(UUID groupID)
+        {
+            return m_connector.GetGroupBalance(groupID);
+        }
+
+        public bool GroupCurrencyTransfer(UUID groupID, UUID userID, bool payUser, string toObjectName, UUID fromObjectID,
+            string fromObjectName, int amount, string description, TransactionType type, UUID transactionID)
+        {
+            return m_connector.GroupCurrencyTransfer(groupID, userID, payUser, toObjectName, fromObjectID,
+                fromObjectName, amount, description, type, transactionID);
+        }
+
 
         #endregion
 
