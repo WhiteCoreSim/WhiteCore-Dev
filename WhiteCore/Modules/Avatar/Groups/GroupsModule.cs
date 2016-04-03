@@ -71,9 +71,14 @@ namespace WhiteCore.Modules.Groups
 
         public event NewGroupNotice OnNewGroupNotice;
 
-        public GroupRecord GetGroupRecord(UUID GroupID)
+        public bool IsGroup (UUID groupID)
         {
-            return m_groupData.GetGroupRecord(UUID.Zero, GroupID, null);
+            return m_groupData.IsGroup (groupID);
+        }
+
+        public GroupRecord GetGroupRecord(UUID groupID)
+        {
+            return m_groupData.GetGroupRecord(UUID.Zero, groupID, null);
         }
 
         public GroupRecord GetGroupRecord(string name)
@@ -363,8 +368,8 @@ namespace WhiteCore.Modules.Groups
                     if (m_debugEnabled)
                     {
                         GroupPowers gp = (GroupPowers) powers;
-                        MainConsole.Instance.DebugFormat("[GROUPS]: Role ({0}) updated with Powers ({1}) ({2})", name,
-                                                         powers.ToString(), gp.ToString());
+                        MainConsole.Instance.DebugFormat("[GROUPS]: Role ({0}) updated with Powers ({1}) ({2})",
+                                                            name, powers, gp);
                     }
                     m_groupData.UpdateRole(GetRequestingAgentID(remoteClient), groupID, roleID, name, description,
                                                 title, powers);
@@ -885,24 +890,24 @@ namespace WhiteCore.Modules.Groups
             IEventQueueService queue = remoteClient.Scene.RequestModuleInterface<IEventQueueService>();
 
             if (queue != null)
-                queue.Enqueue(buildEvent("AgentGroupDataUpdate", llDataStruct), GetRequestingAgentID(remoteClient),
+                queue.Enqueue(BuildEvent("AgentGroupDataUpdate", llDataStruct), GetRequestingAgentID(remoteClient),
                               remoteClient.Scene.RegionInfo.RegionID);
         }
 
-        public OSD buildEvent(string eventName, OSD eventBody)
+        public OSD BuildEvent(string eventName, OSD eventBody)
         {
             OSDMap llsdEvent = new OSDMap(2) {{"body", eventBody}, {"message", new OSDString(eventName)}};
 
             return llsdEvent;
         }
 
-        void SendScenePresenceUpdate(UUID AgentID, string Title)
+        void SendScenePresenceUpdate(UUID agentID, string title)
         {
             if (m_debugEnabled)
-                MainConsole.Instance.DebugFormat("[GROUPS]: Updating scene title for {0} with title: {1}", AgentID,
-                                                 Title);
+                MainConsole.Instance.DebugFormat("[GROUPS]: Updating scene title for {0} with title: {1}", agentID,
+                                                 title);
 
-            IScenePresence presence = m_scene.GetScenePresence(AgentID);
+            IScenePresence presence = m_scene.GetScenePresence(agentID);
             if (presence != null && !presence.IsChildAgent)
             {
                 //Force send a full update
@@ -1506,17 +1511,17 @@ namespace WhiteCore.Modules.Groups
                 SendScenePresenceUpdate(dataForAgentID, activeGroupTitle);
         }
 
-        void HandleUUIDGroupNameRequest(UUID GroupID, IClientAPI remoteClient)
+        void HandleUUIDGroupNameRequest(UUID groupID, IClientAPI remoteClient)
         {
             if (m_debugEnabled)
                 MainConsole.Instance.DebugFormat("[GROUPS]: {0} called", MethodBase.GetCurrentMethod().Name);
 
             string GroupName;
 
-            GroupRecord group = m_groupData.GetGroupRecord(GetRequestingAgentID(remoteClient), GroupID, null);
+            GroupRecord group = m_groupData.GetGroupRecord(GetRequestingAgentID(remoteClient), groupID, null);
             GroupName = group != null ? group.GroupName : "Unknown";
 
-            remoteClient.SendGroupNameReply(GroupID, GroupName);
+            remoteClient.SendGroupNameReply(groupID, GroupName);
         }
 
         void OnInstantMessage(IClientAPI remoteClient, GridInstantMessage im)
@@ -1942,16 +1947,16 @@ namespace WhiteCore.Modules.Groups
         /// <summary>
         ///     WARNING: This is not the only place permissions are checked! They are checked in each of the connectors as well!
         /// </summary>
-        /// <param name="AgentID"></param>
-        /// <param name="GroupID"></param>
+        /// <param name="agentID"></param>
+        /// <param name="groupID"></param>
         /// <param name="permissions"></param>
         /// <returns></returns>
-        public bool GroupPermissionCheck(UUID AgentID, UUID GroupID, GroupPowers permissions)
+        public bool GroupPermissionCheck(UUID agentID, UUID groupID, GroupPowers permissions)
         {
-            if (GroupID == UUID.Zero)
+            if (groupID == UUID.Zero)
                 return false;
 
-            if (AgentID == UUID.Zero)
+            if (agentID == UUID.Zero)
                 return false;
 
             ulong ourPowers = 0;
@@ -1959,11 +1964,11 @@ namespace WhiteCore.Modules.Groups
             Dictionary<UUID, ulong> groupsCache;
             lock (AgentGroupPowersCache)
             {
-                if (AgentGroupPowersCache.TryGetValue(AgentID, out groupsCache))
+                if (AgentGroupPowersCache.TryGetValue(agentID, out groupsCache))
                 {
-                    if (groupsCache.ContainsKey(GroupID))
+                    if (groupsCache.ContainsKey(groupID))
                     {
-                        ourPowers = groupsCache[GroupID];
+                        ourPowers = groupsCache[groupID];
                         if (ourPowers == 1)
                             return false;
                         // 1 means not in the group or not found in the cache, so stop it here so that we don't check every time,
@@ -1974,15 +1979,15 @@ namespace WhiteCore.Modules.Groups
             //Ask the server as we don't know about this user
             if (ourPowers == 0)
             {
-                GroupMembershipData GMD = AttemptFindGroupMembershipData(AgentID, AgentID, GroupID);
+                GroupMembershipData GMD = AttemptFindGroupMembershipData(agentID, agentID, groupID);
                 if (GMD == null)
                 {
-                    AddToGroupPowersCache(AgentID, GroupID, 1);
+                    AddToGroupPowersCache(agentID, groupID, 1);
                     return false;
                 }
                 ourPowers = GMD.GroupPowers;
                 //Add to the cache
-                AddToGroupPowersCache(AgentID, GroupID, ourPowers);
+                AddToGroupPowersCache(agentID, groupID, ourPowers);
             }
 
             //The user is the group, or it would have been weeded out earlier, so check whether we just need to know whether they are in the group
@@ -1995,44 +2000,44 @@ namespace WhiteCore.Modules.Groups
             return true;
         }
 
-        void AddToGroupPowersCache(UUID AgentID, UUID GroupID, ulong powers)
+        void AddToGroupPowersCache(UUID agentID, UUID groupID, ulong powers)
         {
             lock (AgentGroupPowersCache)
             {
                 Dictionary<UUID, ulong> Groups;
-                if (!AgentGroupPowersCache.TryGetValue(AgentID, out Groups))
+                if (!AgentGroupPowersCache.TryGetValue(agentID, out Groups))
                     Groups = new Dictionary<UUID, ulong>();
-                Groups[GroupID] = powers;
-                AgentGroupPowersCache[AgentID] = Groups;
+                Groups[groupID] = powers;
+                AgentGroupPowersCache[agentID] = Groups;
             }
         }
 
-        void RemoveFromGroupPowersCache(UUID GroupID)
+        void RemoveFromGroupPowersCache(UUID groupID)
         {
             lock (AgentGroupPowersCache)
             {
                 foreach (Dictionary<UUID, ulong> grp in AgentGroupPowersCache.Values)
                 {
-                    grp.Remove(GroupID);
+                    grp.Remove(groupID);
                 }
             }
         }
 
-        void RemoveFromGroupPowersCache(UUID AgentID, UUID GroupID)
+        void RemoveFromGroupPowersCache(UUID agentID, UUID groupID)
         {
             lock (AgentGroupPowersCache)
             {
-                if (GroupID == UUID.Zero)
+                if (groupID == UUID.Zero)
                 {
-                    AgentGroupPowersCache.Remove(AgentID);
+                    AgentGroupPowersCache.Remove(agentID);
                 }
                 else
                 {
                     Dictionary<UUID, ulong> Groups;
-                    if (AgentGroupPowersCache.TryGetValue(AgentID, out Groups))
+                    if (AgentGroupPowersCache.TryGetValue(agentID, out Groups))
                     {
-                        Groups.Remove(GroupID);
-                        AgentGroupPowersCache[AgentID] = Groups;
+                        Groups.Remove(groupID);
+                        AgentGroupPowersCache[agentID] = Groups;
                     }
                 }
             }

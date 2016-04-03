@@ -65,6 +65,13 @@ namespace WhiteCore.Framework.Modules
             bool openEnrollment, bool allowPublish, bool maturePublish);
 
         /// <summary>
+        /// Determines whether the specified groupID is actually a group.
+        /// </summary>
+        /// <returns><c>true</c> if the specified groupID is a group ; otherwise, <c>false</c>.</returns>
+        /// <param name="groupID">Group UUID.</param>
+        bool IsGroup (UUID groupID);
+          
+        /// <summary>
         ///     Get a group
         /// </summary>
         /// <param name="name">Name of the group</param>
