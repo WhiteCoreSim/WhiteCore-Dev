@@ -38,8 +38,10 @@ namespace WhiteCore.Framework.DatabaseInterfaces
 {
     public interface IGroupsServiceConnector : IWhiteCoreDataPlugin
     {
+        bool IsGroup (UUID groupID);
+
         void CreateGroup(UUID groupID, string name, string charter, bool showInList, UUID insigniaID, int membershipFee,
-                         bool openEnrollment, bool allowPublish, bool maturePublish, UUID founderID, UUID OwnerRoleID);
+                         bool openEnrollment, bool allowPublish, bool maturePublish, UUID founderID, UUID ownerRoleID);
 
         void UpdateGroup(UUID requestingAgentID, UUID groupID, string charter, int showInList, UUID insigniaID,
                          int membershipFee, int openEnrollment, int allowPublish, int maturePublish);
@@ -47,61 +49,61 @@ namespace WhiteCore.Framework.DatabaseInterfaces
         void UpdateGroupFounder(UUID groupID, UUID newOwner, bool keepOldOwnerInGroup);
 
         void AddGroupNotice(UUID requestingAgentID, UUID groupID, UUID noticeID, string fromName, string subject,
-                            string message, UUID ItemID, int AssetType, string ItemName);
+                            string message, UUID ItemID, int assetType, string itemName);
 
         bool EditGroupNotice(UUID requestingAgentID, UUID groupID, UUID noticeID, string subject, string message);
         bool RemoveGroupNotice(UUID requestingAgentID, UUID groupID, UUID noticeID);
 
-        string SetAgentActiveGroup(UUID AgentID, UUID GroupID);
-        UUID GetAgentActiveGroup(UUID RequestingAgentID, UUID AgentID);
+        string SetAgentActiveGroup(UUID agentID, UUID groupID);
+        UUID GetAgentActiveGroup(UUID requestingAgentID, UUID agentID);
 
-        string SetAgentGroupSelectedRole(UUID AgentID, UUID GroupID, UUID RoleID);
+        string SetAgentGroupSelectedRole(UUID agentID, UUID groupID, UUID roleID);
 
-        void AddAgentToGroup(UUID requestingAgentID, UUID AgentID, UUID GroupID, UUID RoleID);
-        bool RemoveAgentFromGroup(UUID requestingAgentID, UUID AgentID, UUID GroupID);
+        void AddAgentToGroup(UUID requestingAgentID, UUID agentID, UUID groupID, UUID roleID);
+        bool RemoveAgentFromGroup(UUID requestingAgentID, UUID agentID, UUID groupID);
 
-        void AddRoleToGroup(UUID requestingAgentID, UUID GroupID, UUID RoleID, string Name, string Description,
-                            string Title, ulong Powers);
+        void AddRoleToGroup(UUID requestingAgentID, UUID groupID, UUID roleID, string name, string description,
+                            string roleTitle, ulong powers);
 
-        void UpdateRole(UUID requestingAgentID, UUID GroupID, UUID RoleID, string Name, string Desc, string Title,
-                        ulong Powers);
+        void UpdateRole(UUID requestingAgentID, UUID groupID, UUID roleID, string name, string desc, string roleTitle,
+                        ulong powers);
 
-        void RemoveRoleFromGroup(UUID requestingAgentID, UUID RoleID, UUID GroupID);
+        void RemoveRoleFromGroup(UUID requestingAgentID, UUID roleID, UUID groupID);
 
-        void AddAgentToRole(UUID requestingAgentID, UUID AgentID, UUID GroupID, UUID RoleID);
-        void RemoveAgentFromRole(UUID requestingAgentID, UUID AgentID, UUID GroupID, UUID RoleID);
+        void AddAgentToRole(UUID requestingAgentID, UUID agentID, UUID groupID, UUID roleID);
+        void RemoveAgentFromRole(UUID requestingAgentID, UUID agentID, UUID groupID, UUID roleID);
 
-        void SetAgentGroupInfo(UUID requestingAgentID, UUID AgentID, UUID GroupID, int AcceptNotices, int ListInProfile);
+        void SetAgentGroupInfo(UUID requestingAgentID, UUID agentID, UUID groupID, int acceptNotices, int listInProfile);
 
-        void AddAgentGroupInvite(UUID requestingAgentID, UUID inviteID, UUID GroupID, UUID roleID, UUID AgentID,
-                                 string FromAgentName);
+        void AddAgentGroupInvite(UUID requestingAgentID, UUID inviteID, UUID groupID, UUID roleID, UUID agentID,
+                                 string fromAgentName);
 
         void RemoveAgentInvite(UUID requestingAgentID, UUID inviteID);
 
-        uint GetNumberOfGroupNotices(UUID requestingAgentID, UUID GroupID);
-        uint GetNumberOfGroupNotices(UUID requestingAgentID, List<UUID> GroupIDs);
+        uint GetNumberOfGroupNotices(UUID requestingAgentID, UUID groupID);
+        uint GetNumberOfGroupNotices(UUID requestingAgentID, List<UUID> groupIDList);
 
         uint GetNumberOfGroups(UUID requestingAgentID, Dictionary<string, bool> boolFields);
 
         List <UUID> GetAllGroups (UUID requestingAgentID);
 
-        GroupRecord GetGroupRecord(UUID requestingAgentID, UUID GroupID, string GroupName);
+        GroupRecord GetGroupRecord(UUID requestingAgentID, UUID groupID, string groupName);
 
         List<GroupRecord> GetGroupRecords(UUID requestingAgentID, uint start, uint count, Dictionary<string, bool> sort,
                                           Dictionary<string, bool> boolFields);
 
-        List<GroupRecord> GetGroupRecords(UUID requestingAgentID, List<UUID> GroupIDs);
+        List<GroupRecord> GetGroupRecords(UUID requestingAgentID, List<UUID> groupIDList);
 
-        GroupProfileData GetMemberGroupProfile(UUID requestingAgentID, UUID GroupID, UUID AgentID);
+        GroupProfileData GetMemberGroupProfile(UUID requestingAgentID, UUID groupID, UUID agentID);
 
-        GroupMembershipData GetGroupMembershipData(UUID requestingAgentID, UUID GroupID, UUID AgentID);
-        List<GroupMembershipData> GetAgentGroupMemberships(UUID requestingAgentID, UUID AgentID);
+        GroupMembershipData GetGroupMembershipData(UUID requestingAgentID, UUID groupID, UUID agentID);
+        List<GroupMembershipData> GetAgentGroupMemberships(UUID requestingAgentID, UUID agentID);
 
         GroupInviteInfo GetAgentToGroupInvite(UUID requestingAgentID, UUID inviteID);
         List<GroupInviteInfo> GetGroupInvites(UUID requestingAgentID);
 
-        GroupMembersData GetAgentGroupMemberData(UUID requestingAgentID, UUID GroupID, UUID AgentID);
-        List<GroupMembersData> GetGroupMembers(UUID requestingAgentID, UUID GroupID);
+        GroupMembersData GetAgentGroupMemberData(UUID requestingAgentID, UUID groupID, UUID agentID);
+        List<GroupMembersData> GetGroupMembers(UUID requestingAgentID, UUID groupID);
 
         // banned
         List<GroupBannedAgentsData> GetGroupBannedMembers(UUID requestingAgentID, UUID groupID);
@@ -113,20 +115,20 @@ namespace WhiteCore.Framework.DatabaseInterfaces
         List<DirGroupsReplyData> FindGroups(UUID requestingAgentID, string search, uint? start, uint? count,
                                             uint queryflags);
 
-        List<GroupRolesData> GetAgentGroupRoles(UUID requestingAgentID, UUID AgentID, UUID GroupID);
-        List<GroupRolesData> GetGroupRoles(UUID requestingAgentID, UUID GroupID);
+        List<GroupRolesData> GetAgentGroupRoles(UUID requestingAgentID, UUID agentID, UUID groupID);
+        List<GroupRolesData> GetGroupRoles(UUID requestingAgentID, UUID groupID);
 
-        List<GroupRoleMembersData> GetGroupRoleMembers(UUID requestingAgentID, UUID GroupID);
+        List<GroupRoleMembersData> GetGroupRoleMembers(UUID requestingAgentID, UUID groupID);
 
         GroupNoticeData GetGroupNoticeData(UUID requestingAgentID, UUID noticeID);
         GroupNoticeInfo GetGroupNotice(UUID requestingAgentID, UUID noticeID);
 
-        List<GroupNoticeData> GetGroupNotices(UUID requestingAgentID, uint start, uint count, UUID GroupID);
-        List<GroupNoticeData> GetGroupNotices(UUID requestingAgentID, uint start, uint count, List<UUID> GroupIDs);
+        List<GroupNoticeData> GetGroupNotices(UUID requestingAgentID, uint start, uint count, UUID groupID);
+        List<GroupNoticeData> GetGroupNotices(UUID requestingAgentID, uint start, uint count, List<UUID> groupIDList);
 
-        GroupProfileData GetGroupProfile(UUID requestingAgentID, UUID GroupID);
+        GroupProfileData GetGroupProfile(UUID requestingAgentID, UUID groupID);
 
-        List<GroupTitlesData> GetGroupTitles(UUID requestingAgentID, UUID GroupID);
+        List<GroupTitlesData> GetGroupTitles(UUID requestingAgentID, UUID groupID);
 
         List<GroupProposalInfo> GetActiveProposals(UUID agentID, UUID groupID);
         List<GroupProposalInfo> GetInactiveProposals(UUID agentID, UUID groupID);
