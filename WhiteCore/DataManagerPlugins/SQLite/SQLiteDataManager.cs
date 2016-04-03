@@ -1063,6 +1063,8 @@ namespace WhiteCore.DataManager.SQLite
                     return "BINARY(32)";
                 case ColumnTypes.Binary64:
                     return "BINARY(64)";
+                case ColumnTypes.UUID:
+                    return "CHAR(36)";
                 case ColumnTypes.Unknown:
                     return "";
                 default:

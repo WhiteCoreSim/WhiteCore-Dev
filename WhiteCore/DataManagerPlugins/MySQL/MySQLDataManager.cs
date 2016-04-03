@@ -887,6 +887,8 @@ namespace WhiteCore.DataManager.MySQL
                     return "BINARY(32)";
                 case ColumnTypes.Binary64:
                     return "BINARY(64)";
+                case ColumnTypes.UUID:
+                    return "CHAR(36)";
                 default:
                     throw new DataManagerException("Unknown column type.");
             }
