@@ -98,7 +98,7 @@ namespace WhiteCore.Framework.ConsoleFramework
             if (logPath == "")
                 logPath = Path.Combine(simBase.DefaultDataPath, Constants.DEFAULT_LOG_DIR);
 
-            InitializeLog(logPath, logName, simBase.IsGridServer);
+            InitializeLog(logPath, logName, simBase);
         }
 
         static ConsoleColor DeriveColor(string input)

@@ -534,7 +534,8 @@ namespace WhiteCore.Framework.ConsoleFramework
         protected string m_logPath = "";
         protected string m_logName = "";
         protected DateTime m_logDate;
-
+        bool m_gridserver;
+        ISimulationBase m_simbase;
         public List<string> m_promptOptions = new List<string>();
 
         public string LogPath
@@ -568,11 +569,14 @@ namespace WhiteCore.Framework.ConsoleFramework
             if (logPath == "")
                 logPath = Path.Combine(simBase.DefaultDataPath, Constants.DEFAULT_LOG_DIR);
 
-            InitializeLog(LogPath, logName, simBase.IsGridServer);
+            InitializeLog(LogPath, logName, simBase);
         }
 
-        protected void InitializeLog(string logPath, string logName, bool gridServer )
+        protected void InitializeLog(string logPath, string logName, ISimulationBase simbase )
         {
+            m_simbase = simbase;
+            m_gridserver = simbase.IsGridServer;
+
             // check the logPath to ensure correct format
             if (!logPath.EndsWith ("/"))
                 logPath = logPath + "/";
@@ -580,8 +584,8 @@ namespace WhiteCore.Framework.ConsoleFramework
 
             if (logName == "")
                 logName = "WhiteCore";
-            
-            if (gridServer)
+
+             if (m_gridserver)
                 m_logName = logName + "_Grid_";
             else
                 m_logName = logName + "_Sim_";
@@ -611,6 +615,22 @@ namespace WhiteCore.Framework.ConsoleFramework
         {
             m_logFile.Close();          // close the current log
             OpenLog();                  // start a new one
+
+            var serv = "WhiteCore ";
+            if (m_gridserver)
+                serv = serv + "Grid server";
+            else
+                serv = serv + "Simulator";
+                
+            var startup = String.Format(serv + " has been running since {0}, {1}", 
+                m_simbase.StartupTime.DayOfWeek, m_simbase.StartupTime);
+            var elapsed = String.Format("Current run time of {0}", DateTime.Now - m_simbase.StartupTime);
+
+            MainConsole.Instance.Info ("==============================================================================");
+            MainConsole.Instance.Info ("  " + startup);
+            MainConsole.Instance.Info ("  " + elapsed);
+            MainConsole.Instance.Info ("==============================================================================");
+
         }
 
         public void Dispose()
