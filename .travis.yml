@@ -1,3 +1,5 @@
+language: csharp
+
 env:
   global:
    # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
@@ -14,7 +16,6 @@ addons:
     build_command:   "xbuild"
     branch_pattern: master
     
-language: csharp
 mono:
   - latest
 script:
