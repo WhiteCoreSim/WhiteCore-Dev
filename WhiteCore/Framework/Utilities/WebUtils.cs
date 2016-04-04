@@ -25,13 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.ConsoleFramework;
-using OpenMetaverse.StructuredData;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 #if NET_4_5
 using System.Net.Http;
@@ -41,12 +38,14 @@ using System.Net;
 using WhiteCore.Framework.Servers.HttpServer;
 #endif
 using System.Xml;
+using OpenMetaverse.StructuredData;
+using WhiteCore.Framework.ConsoleFramework;
 
 namespace WhiteCore.Framework.Utilities
 {
     public static class WebUtils
     {
-        private const int m_defaultTimeout = 10000;
+        const int m_defaultTimeout = 10000;
 
 #if NET_4_5
 
@@ -142,27 +141,47 @@ namespace WhiteCore.Framework.Utilities
                 {
                     if (errorMessage == "")//No error
                     {
-                        // This just dumps a warning for any operation that takes more than 500 ms
+                        // This just dumps a warning for any operation that takes more than 5000 ms
                         if (MainConsole.Instance.IsDebugEnabled)
                         {
                             System.Diagnostics.StackTrace stackTrace = new System.Diagnostics.StackTrace();
 
                             MainConsole.Instance.Debug(
-                                string.Format("[WebUtils]: request (URI:{0}, METHOD:{1}, UPSTACK(4):{3}) took {2}ms",
+                                string.Format("[WebUtils]: Request (URI:{0}, METHOD:{1}, UPSTACK(4):{3}) took {2}ms",
                                 url, method, tickelapsed,
                                 stackTrace.GetFrame(3).GetMethod().Name));
                         }
                         if (tickelapsed > 5000)
+                        {
                             MainConsole.Instance.Info(
-                                string.Format("[WebUtils]: request took too long (URI:{0}, METHOD:{1}) took {2}ms",
+                                string.Format("[WebUtils]: Slow request - (URI:{0}, METHOD:{1}) took {2}ms",
                                 url, method, tickelapsed));
+                            var bufdata = buffer.Length > 0 ?  Encoding.UTF8.GetString(buffer) : "null";
+                            MainConsole.Instance.WarnFormat("[WebUtils] Request - {0}", bufdata);
+                        }
                     }
+                }
+            }
+            catch (TaskCanceledException ex)
+            {
+                if (MainConsole.Instance != null)
+                {
+                    if (ex.CancellationToken.IsCancellationRequested)
+                        MainConsole.Instance.WarnFormat ("[WebUtils] Request cancelled - (URI:{0}, METHOD:{1}) : {2}", url, method, ex.Message);
+                    else
+                        MainConsole.Instance.WarnFormat ("[WebUtils] Request timed out - (URI:{0}, METHOD:{1}) : {2}", url, method, ex.Message);
+                    var bufdata = buffer.Length > 0 ? Encoding.UTF8.GetString(buffer) : "null";
+                    MainConsole.Instance.WarnFormat ("[WebUtils] Request - {0}", bufdata);
                 }
             }
             catch (Exception ex)
             {
                 if (MainConsole.Instance != null)
-                    MainConsole.Instance.WarnFormat("[WebUtils] request failed: {0} to {1}", ex.ToString(), url);
+                {
+                    MainConsole.Instance.WarnFormat ("[WebUtils] Request failed - (URI:{0}, METHOD:{1}) : {2}", url, method, ex.Message);
+                    var bufdata = buffer.Length > 0 ? Encoding.UTF8.GetString(buffer) : "null";
+                    MainConsole.Instance.WarnFormat ("[WebUtils] Request - {0}", bufdata);
+                }
             }
             return response;
         }
@@ -379,15 +398,15 @@ namespace WhiteCore.Framework.Utilities
                 }
                 // uh?
                 if (doLogMessages)
-                    MainConsole.Instance.Warn(("[WebUtils]: Got OSD of unexpected type " + buffer.Type.ToString()));
+                    MainConsole.Instance.Warn(("[WebUtils]: Got OSD of unexpected type " + buffer.Type));
                 return null;
             }
             catch (Exception ex)
             {
                 if (doLogMessages)
                 {
-                    MainConsole.Instance.Warn("[WebUtils]: exception on parse of REST message " + ex);
-                    MainConsole.Instance.Warn("[WebUtils]: bad data: " + data);
+                    MainConsole.Instance.Warn("[WebUtils]: Exception on parse of REST message " + ex);
+                    MainConsole.Instance.Warn("[WebUtils]: Bad data: " + data);
                 }
                 return null;
             }
@@ -412,7 +431,7 @@ namespace WhiteCore.Framework.Utilities
 
             #endregion
 
-            private float GetQ(Object o)
+            float GetQ(Object o)
             {
                 // Example: image/png;q=0.9
 
@@ -425,7 +444,7 @@ namespace WhiteCore.Framework.Utilities
                         string[] kvp = parts[1].Split(new[] {'='});
                         if (kvp.Length == 2 && kvp[0] == "q")
                         {
-                            float qvalue = 1F;
+                            float qvalue;
                             float.TryParse(kvp[1], out qvalue);
                             return qvalue;
                         }
@@ -445,14 +464,12 @@ namespace WhiteCore.Framework.Utilities
         {
             XmlDocument doc = new XmlDocument();
 
-            XmlNode xmlnode = doc.CreateNode(XmlNodeType.XmlDeclaration,
-                                             "", "");
+            XmlNode xmlnode = doc.CreateNode(XmlNodeType.XmlDeclaration, "", "");
             // Set the encoding declaration.
             ((XmlDeclaration)xmlnode).Encoding = "UTF-8";
             doc.AppendChild(xmlnode);
 
-            XmlElement rootElement = doc.CreateElement("", "ServerResponse",
-                                                       "");
+            XmlElement rootElement = doc.CreateElement("", "ServerResponse", "");
 
             doc.AppendChild(rootElement);
 
@@ -461,7 +478,7 @@ namespace WhiteCore.Framework.Utilities
             return doc.InnerXml;
         }
 
-        private static void BuildXmlData(XmlElement parent, Dictionary<string, object> data)
+        static void BuildXmlData(XmlElement parent, Dictionary<string, object> data)
         {
             foreach (KeyValuePair<string, object> kvp in data)
             {
@@ -470,13 +487,11 @@ namespace WhiteCore.Framework.Utilities
 
                 if (parent.OwnerDocument != null)
                 {
-                    XmlElement elem = parent.OwnerDocument.CreateElement("",
-                                                                         kvp.Key, "");
+                    XmlElement elem = parent.OwnerDocument.CreateElement("", kvp.Key, "");
 
                     if (kvp.Value is Dictionary<string, object>)
                     {
-                        XmlAttribute type = parent.OwnerDocument.CreateAttribute("",
-                                                                                 "type", "");
+                        XmlAttribute type = parent.OwnerDocument.CreateAttribute("", "type", "");
                         type.Value = "List";
 
                         elem.Attributes.Append(type);
@@ -485,24 +500,20 @@ namespace WhiteCore.Framework.Utilities
                     }
                     else if (kvp.Value is Dictionary<string, string>)
                     {
-                        XmlAttribute type = parent.OwnerDocument.CreateAttribute("",
-                                                                                 "type", "");
+                        XmlAttribute type = parent.OwnerDocument.CreateAttribute("", "type", "");
                         type.Value = "List";
 
                         elem.Attributes.Append(type);
-#if (!ISWIN)
+
                         Dictionary<string, object> value = new Dictionary<string, object>();
                         foreach (KeyValuePair<string, string> pair in ((Dictionary<string, string>) kvp.Value))
                             value.Add(pair.Key, pair.Value);
-#else
-                        Dictionary<string, object> value = ((Dictionary<string, string>)kvp.Value).ToDictionary<KeyValuePair<string, string>, string, object>(pair => pair.Key, pair => pair.Value);
-#endif
+
                         BuildXmlData(elem, value);
                     }
                     else
                     {
-                        elem.AppendChild(parent.OwnerDocument.CreateTextNode(
-                            kvp.Value.ToString()));
+                        elem.AppendChild(parent.OwnerDocument.CreateTextNode( kvp.Value.ToString()));
                     }
 
                     parent.AppendChild(elem);
@@ -515,7 +526,6 @@ namespace WhiteCore.Framework.Utilities
             //MainConsole.Instance.DebugFormat("[XXX]: received xml string: {0}", data);
 
             Dictionary<string, object> ret = new Dictionary<string, object>();
-
             XmlDocument doc = new XmlDocument();
 
             doc.LoadXml(data);
@@ -532,10 +542,9 @@ namespace WhiteCore.Framework.Utilities
             return ret;
         }
 
-        private static Dictionary<string, object> ParseElement(XmlNode element)
+        static Dictionary<string, object> ParseElement(XmlNode element)
         {
             Dictionary<string, object> ret = new Dictionary<string, object>();
-
             XmlNodeList partL = element.ChildNodes;
 
             foreach (XmlNode part in partL)
@@ -544,13 +553,9 @@ namespace WhiteCore.Framework.Utilities
                 {
                     XmlNode type = part.Attributes.GetNamedItem("type");
                     if (type == null || type.Value != "List")
-                    {
-                        ret[part.Name] = part.InnerText;
-                    }
+                        ret [part.Name] = part.InnerText;
                     else
-                    {
-                        ret[part.Name] = ParseElement(part);
-                    }
+                        ret [part.Name] = ParseElement (part);
                 }
             }
 
