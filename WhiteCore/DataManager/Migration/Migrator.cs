@@ -248,6 +248,9 @@ namespace WhiteCore.DataManager.Migration
                 case ColumnTypes.Binary64:
                     type = ColumnTypeDef.Binary64;
                     break;
+                case ColumnTypes.UUID:
+                    type = ColumnTypeDef.UUID;
+                    break;
                 default:
                     type = ColumnTypeDef.Unknown;
                     break;
