@@ -44,7 +44,7 @@ namespace WhiteCore.FileBasedServices.AssetService
 
         protected bool doDatabaseCaching;
         protected string m_connectionPassword;
-        protected bool m_doConversion;
+        protected bool m_migrateSQL;
         protected IAssetDataPlugin m_assetService;
         protected string m_assetsDirectory = "";
         protected bool m_enabled;
@@ -77,11 +77,10 @@ namespace WhiteCore.FileBasedServices.AssetService
                     assetFolderPath = Path.Combine (defpath, Constants.DEFAULT_FILEASSETS_DIR);
                 }
                 SetUpFileBase (assetFolderPath);
-            }
 
-            IConfig assetConfig = config.Configs ["AssetService"];
-            if (assetConfig != null)
-                m_doConversion = assetConfig.GetBoolean ("DoConversion", true);
+                // try and migrate sql assets if they are missing?
+                m_migrateSQL = fileConfig.GetBoolean ("MigrateSQLAssets", true);
+            }
         }
 
         public virtual void Configure (IConfigSource config, IRegistryCore registry)
@@ -117,13 +116,13 @@ namespace WhiteCore.FileBasedServices.AssetService
                     HandleGetAsset, false, true);
 
             }
-            MainConsole.Instance.Info ("[FILE ASSET SERVICE]: File based asset service enabled");
+            MainConsole.Instance.Info ("[Filebased asset service]: File based asset service enabled");
 
         }
 
         public virtual void Start (IConfigSource config, IRegistryCore registry)
         {
-            if (m_doConversion)
+            if (m_migrateSQL)
                 m_assetService = Framework.Utilities.DataManager.RequestPlugin<IAssetDataPlugin> ();
         }
 
@@ -295,12 +294,14 @@ namespace WhiteCore.FileBasedServices.AssetService
         void SetUpFileBase (string path)
         {
             m_assetsDirectory = path;
+
             if (!Directory.Exists (m_assetsDirectory))
                 Directory.CreateDirectory (m_assetsDirectory);
+
             if (!Directory.Exists (Path.Combine (m_assetsDirectory, "data")))
                 Directory.CreateDirectory (Path.Combine (m_assetsDirectory, "data"));
 
-            MainConsole.Instance.InfoFormat ("[FILE BASED ASSET SERVICE]: Set up File Based Assets in {0}.",
+            MainConsole.Instance.InfoFormat ("[Filebased asset service]: Set up Filebased Assets in {0}.",
                 m_assetsDirectory);
         }
 
@@ -362,7 +363,7 @@ namespace WhiteCore.FileBasedServices.AssetService
                 }
             } catch (Exception ex)
             {
-                MainConsole.Instance.WarnFormat ("[FILE BASED ASSET SERVICE]: Failed to get asset {0}: {1} ", id, ex);
+                MainConsole.Instance.WarnFormat ("[Filebased asset service]: Failed to retrieve asset {0}: {1} ", id, ex);
                 return null;
             }
 #if ASSET_DEBUG
@@ -380,7 +381,7 @@ namespace WhiteCore.FileBasedServices.AssetService
 
         AssetBase CheckForConversion (string id)
         {
-            if (!m_doConversion)
+            if (!m_migrateSQL)
                 return null;
 
             AssetBase asset;

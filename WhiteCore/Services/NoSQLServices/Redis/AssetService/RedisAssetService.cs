@@ -52,7 +52,7 @@ namespace WhiteCore.RedisServices.AssetService
         protected int m_connectionPort = 6379;
         protected bool m_enabled;
 
-        protected bool m_doConversion;
+        protected bool m_migrateSQL;
         protected IAssetDataPlugin m_assetService;
 
         #endregion
@@ -95,11 +95,11 @@ namespace WhiteCore.RedisServices.AssetService
                 m_connectionDNS = connString.Split(':')[0];
                 m_connectionPort = int.Parse(connString.Split(':')[1]);
                 m_connectionPassword = redisConnection.Get("ConnectionPassword", null);
-            }
 
-            IConfig assetConfig = config.Configs["AssetService"];
-            if (assetConfig != null)
-                m_doConversion = assetConfig.GetBoolean("DoConversion", true);
+                // try and migrate sql assets if they are missing?
+                m_migrateSQL = redisConnection.GetBoolean("MigrateSQLAssets", true);
+
+            }
 
             m_connectionPool =
                 new Pool<RedisClient<byte[]>>(() => new RedisClient<byte[]>(m_connectionDNS, m_connectionPort));
@@ -122,14 +122,14 @@ namespace WhiteCore.RedisServices.AssetService
                     "Gets info about asset from database", 
                     HandleGetAsset, false, true);
             }
-            MainConsole.Instance.Info("[REDIS ASSET SERVICE]: Redis asset service enabled");
+            MainConsole.Instance.Info("[Redis asset service]: Redis asset service enabled");
         }
 
         public virtual void Start(IConfigSource config, IRegistryCore registry)
         {
             if (!m_enabled)
                 return;
-            if (m_doConversion)
+            if (m_migrateSQL)
                 m_assetService = Framework.Utilities.DataManager.RequestPlugin<IAssetDataPlugin>();
         }
 
@@ -389,7 +389,7 @@ namespace WhiteCore.RedisServices.AssetService
 #if DEBUG
                 long endTime = System.Diagnostics.Stopwatch.GetTimestamp();
                 if (MainConsole.Instance != null && asset != null)
-                    MainConsole.Instance.Warn("[REDIS ASSET SERVICE]: Took " + (endTime - startTime)/10000 +
+                    MainConsole.Instance.Warn("[Redis asset service]: Took " + (endTime - startTime)/10000 +
                                               " to get asset " + id + " sized " + asset.Data.Length/(1024) + "kbs");
 #endif
             }
@@ -398,7 +398,7 @@ namespace WhiteCore.RedisServices.AssetService
 
         AssetBase CheckForConversion(string id)
         {
-            if (!m_doConversion)
+            if (!m_migrateSQL)
                 return null;
 
             AssetBase asset;
@@ -443,7 +443,7 @@ namespace WhiteCore.RedisServices.AssetService
                 if (duplicate)
                 {
                     if (MainConsole.Instance != null)
-                        MainConsole.Instance.Debug("[REDIS ASSET SERVICE]: Found duplicate asset " + asset.IDString +
+                        MainConsole.Instance.Debug("[Redis asset service]: Found duplicate asset " + asset.IDString +
                                                    " for " + asset.IDString);
 
                     //Only set id --> asset, and not the hashcode --> data to de-duplicate
