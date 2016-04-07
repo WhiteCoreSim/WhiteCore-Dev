@@ -217,9 +217,9 @@ namespace WhiteCore.RedisServices.AssetService
             AssetBase asset = RedisGetAsset(id);
             if (doDatabaseCaching && cache != null)
                 cache.Cache(id, asset);
-            if (asset != null) return asset.Data;
-// see assetservice.GetData            return new byte[0];
-            return null;
+            
+            return asset == null ? null : asset.Data;
+
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
@@ -260,7 +260,7 @@ namespace WhiteCore.RedisServices.AssetService
                 cache.Cache(asset.ID.ToString(), asset);
             }
 
-            return asset != null ? asset.ID : UUID.Zero;
+            return asset.ID;
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]

@@ -257,7 +257,7 @@ namespace WhiteCore.FileBasedServices.AssetService
                 cache.Cache (asset.ID.ToString (), asset);
             }
 
-            return asset != null ? asset.ID : UUID.Zero;
+            return asset.ID;
         }
 
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
