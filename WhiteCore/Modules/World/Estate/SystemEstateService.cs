@@ -63,11 +63,7 @@ namespace WhiteCore.Modules.Estate
 
         public string GetSystemEstateName(int estateID)
         {
-            if (estateID == 1)  // Mainland estate
-                return mainlandEstateName;
-
-            // System estate then
-            return systemEstateName;
+            return estateID == 1 ? mainlandEstateName : systemEstateName;
         }
 
         #endregion
@@ -185,7 +181,9 @@ namespace WhiteCore.Modules.Estate
         /// <summary>
         /// Checks for a valid system estate. Adds or corrects if required
         /// </summary>
-        /// <param name="estateConnector">Estate connector.</param>
+        /// <param name="estateID">Estate I.</param>
+        /// <param name="estateName">Estate name.</param>
+        /// <param name="ownerUUID">Owner UUI.</param>
         void CheckSystemEstateInfo (int estateID, string estateName, UUID ownerUUID)
         {
             // these should have already been checked but just make sure...
@@ -254,11 +252,13 @@ namespace WhiteCore.Modules.Estate
         /// <summary>
         /// Correct the system estate ID and update any linked regions.
         /// </summary>
-        /// <param name="ES">EstateSettings</param>
-        void  UpdateSystemEstates (IEstateConnector estateConnector, EstateSettings ES, int newEstateID)
+        /// <param name="estateConnector">Estate connector.</param>
+        /// <param name="eS">E s.</param>
+        /// <param name="newEstateID">New estate I.</param>
+        static void  UpdateSystemEstates (IEstateConnector estateConnector, EstateSettings eS, int newEstateID)
         {
             // this may be an ID correction or just an estate name change
-            uint oldEstateID = ES.EstateID;
+            uint oldEstateID = eS.EstateID;
 
             // get existing linked regions
             var regions = estateConnector.GetRegions ((int)oldEstateID);
@@ -267,8 +267,8 @@ namespace WhiteCore.Modules.Estate
             if (oldEstateID != newEstateID)
             {
                 estateConnector.DeleteEstate ((int)oldEstateID);
-                newEstateID = estateConnector.CreateNewEstate (ES);
-                MainConsole.Instance.Info ("System estate '" + ES.EstateName + "' is present but the ID was corrected.");
+                newEstateID = estateConnector.CreateNewEstate (eS);
+                MainConsole.Instance.Info ("System estate '" + eS.EstateName + "' is present but the ID was corrected.");
             }
 
             // re-link regions
@@ -392,7 +392,7 @@ namespace WhiteCore.Modules.Estate
 
             // check for passed estate name
             estateName = (cmd.Length < 3) 
-                ? MainConsole.Instance.Prompt ("Estate name: ") 
+                ? MainConsole.Instance.Prompt ("Estate name",estateName) 
                 : cmd [2];
             if (estateName == "")
                 return;
@@ -416,7 +416,7 @@ namespace WhiteCore.Modules.Estate
             UserAccount account = accountService.GetUserAccount (null, estateOwner);
             if (account == null)
             {
-                MainConsole.Instance.WarnFormat ("[USER ACCOUNT SERVICE]: The user, '{0}' was not found!", estateOwner);
+                MainConsole.Instance.WarnFormat ("[User account service]: The user, '{0}' was not found!", estateOwner);
 
                 // temporary fix until remote user creation can be implemented
                 if (accountService.IsLocalConnector)
@@ -441,8 +441,8 @@ namespace WhiteCore.Modules.Estate
                     }
                 } else
                 {
-                    MainConsole.Instance.WarnFormat ("[USER ACCOUNT SERVICE]: The user must be created on the Grid before assigning an estate!");
-                    MainConsole.Instance.WarnFormat ("[USER ACCOUNT SERVICE]: Regions should be assigned to the system user estate until this can be corrected");
+                    MainConsole.Instance.WarnFormat ("[User account service]: The user must be created on the Grid before assigning an estate!");
+                    MainConsole.Instance.WarnFormat ("[User account service]: Regions should be assigned to the system user estate until this can be corrected");
 
                     return;
                 }
@@ -457,7 +457,7 @@ namespace WhiteCore.Modules.Estate
 
             // we have an estate name and a user
             // Create a new estate
-            EstateSettings ES = new EstateSettings ();
+            var ES = new EstateSettings ();
             ES.EstateName = estateName;
             ES.EstateOwner = account.PrincipalID;
 
@@ -479,7 +479,7 @@ namespace WhiteCore.Modules.Estate
 
             // check for passed estate name
             estateName = (cmd.Length < 3) 
-                ? MainConsole.Instance.Prompt ("Estate name: ") 
+                ? MainConsole.Instance.Prompt ("Estate name", estateName) 
                 : Util.CombineParams (cmd, 2);
             if (estateName == "")
                 return;
@@ -524,12 +524,12 @@ namespace WhiteCore.Modules.Estate
             IUserAccountService accountService = m_registry.RequestModuleInterface<IUserAccountService> ();
 
             string estateName = "";
-            string estateOwner = "";
+            string estateOwner;
             UserAccount ownerAccount;
 
             // check for passed estate name
             estateName = (cmd.Length < 3) 
-                ? MainConsole.Instance.Prompt ("Estate to be deleted?") 
+                ? MainConsole.Instance.Prompt ("Estate to be deleted?", estateName) 
                 : cmd [2];
             if (estateName == "")
                 return;
@@ -587,7 +587,7 @@ namespace WhiteCore.Modules.Estate
 
             // check for passed estate name
             estateName = (cmd.Length < 4) 
-                ? MainConsole.Instance.Prompt ("Estate name to be changed") 
+                ? MainConsole.Instance.Prompt ("Estate name to be changed", estateName) 
                 : cmd [3];
             if (estateName == "")
                 return;
@@ -602,7 +602,7 @@ namespace WhiteCore.Modules.Estate
 
             // check for passed  estate new name
             estateNewName = (cmd.Length < 4) 
-                ? MainConsole.Instance.Prompt ("New name for the Estate") 
+                ? MainConsole.Instance.Prompt ("New name for the Estate", estateNewName) 
                 : cmd [4];
             if (estateNewName == "")
                 return;
@@ -614,7 +614,7 @@ namespace WhiteCore.Modules.Estate
             MainConsole.Instance.InfoFormat ("[EstateService]: Estate '{0}' changed to '{1}'", estateName, estateNewName);
         }
 
-        void UpdateConsoleRegionEstate(string regionName, EstateSettings estateSettings)
+        static void UpdateConsoleRegionEstate(string regionName, EstateSettings estateSettings)
         {
             for (int idx = 0; idx < MainConsole.Instance.ConsoleScenes.Count; idx ++)
             {
@@ -634,7 +634,7 @@ namespace WhiteCore.Modules.Estate
 
             // check for passed estate name
             estateName = (cmd.Length < 4) 
-                ? MainConsole.Instance.Prompt ("Estate name") 
+                ? MainConsole.Instance.Prompt ("Estate name", estateName) 
                 : cmd [3];
             if (estateName == "")
                 return;
@@ -693,7 +693,7 @@ namespace WhiteCore.Modules.Estate
 
             // check for passed estate name
             estateName = (cmd.Length < 4) 
-                ? MainConsole.Instance.Prompt ("Estate name") 
+                ? MainConsole.Instance.Prompt ("Estate name", estateName) 
                 : cmd [3];
             if (estateName == "")
                 return;
