@@ -25,6 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Text;
+using System.Xml;
+using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
@@ -34,14 +42,6 @@ using WhiteCore.Framework.Serialization.External;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Assets;
 using WhiteCore.Framework.Services.ClassHelpers.Inventory;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Xml;
-using System.Text;
 
 namespace WhiteCore.Modules.Archivers
 {
@@ -554,7 +554,7 @@ namespace WhiteCore.Modules.Archivers
                     else
                     {
                         MainConsole.Instance.WarnFormat(
-                            "[AGENT INVENTORY]: Could not find root folder for {0} when trying to add item {1} with no parent folder specified",
+                            "[Agent inventory]: Could not find root folder for {0} when trying to add item {1} with no parent folder specified",
                             item.Owner, item.Name);
                         return false;
                     }
@@ -573,7 +573,7 @@ namespace WhiteCore.Modules.Archivers
                 if (!m_inventoryService.AddItem (item))
                 {
                     MainConsole.Instance.WarnFormat (
-                        "[AGENT INVENTORY]: Agent {0} could not add item {1} {2}",
+                        "[Agent inventory]: Agent {0} could not add item {1} {2}",
                         item.Owner, item.Name, item.ID);
                     return false;
                 }

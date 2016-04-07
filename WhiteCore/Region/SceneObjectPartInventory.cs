@@ -26,31 +26,31 @@
  */
 
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.SceneInfo.Entities;
 using WhiteCore.Framework.Serialization;
-using OpenMetaverse;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace WhiteCore.Region
 {
     public class SceneObjectPartInventory : IEntityInventory
     {
-        private string m_inventoryFileName = String.Empty;
-        private byte[] m_fileData = new byte[0];
-        private uint m_inventoryFileNameSerial = 0;
+        string m_inventoryFileName = String.Empty;
+        byte[] m_fileData = new byte[0];
+        uint m_inventoryFileNameSerial = 0;
 
         /// <value>
         ///     The part to which the inventory belongs.
         /// </value>
-        private readonly SceneObjectPart m_part;
+        readonly SceneObjectPart m_part;
 
         /// <summary>
         ///     Serial count for inventory file , used to tell if inventory has changed
@@ -96,11 +96,18 @@ namespace WhiteCore.Region
         /// </value>
         protected internal TaskInventoryDictionary Items
         {
-            get { return m_items; }
+            get
+            { 
+                lock (m_itemsLock)
+                    return m_items;
+            }
             set
             {
-                m_items = value;
-                m_inventorySerial++;
+                lock (m_itemsLock)
+                {
+                    m_items = value;
+                    m_inventorySerial++;
+                }
             }
         }
 
@@ -134,13 +141,12 @@ namespace WhiteCore.Region
             if (null == m_part || null == m_part.ParentGroup)
                 return;
 
-            if (0 == m_items.Count)
-                return;
-
-            IList<TaskInventoryItem> items = GetInventoryItems();
             lock (m_itemsLock)
             {
+                if (m_items.Count == 0)
+                    return;
                 m_items.Clear();
+                IList<TaskInventoryItem> items = GetInventoryItems();
 
                 foreach (TaskInventoryItem item in items)
                 {
@@ -223,9 +229,7 @@ namespace WhiteCore.Region
             lock (m_itemsLock)
             {
                 if (0 == Items.Count)
-                {
                     return;
-                }
             }
 
             HasInventoryChanged = true;
@@ -252,9 +256,7 @@ namespace WhiteCore.Region
             lock (m_itemsLock)
             {
                 if (0 == Items.Count)
-                {
                     return;
-                }
             }
 
             HasInventoryChanged = true;
@@ -337,7 +339,7 @@ namespace WhiteCore.Region
         public void CreateScriptInstance(TaskInventoryItem item, int startParam, bool postOnRez, StateSource stateSource)
         {
             // MainConsole.Instance.InfoFormat(
-            //     "[PRIM INVENTORY]: " +
+            //     "[Prim inventory]: " +
             //     "Starting script {0}, {1} in prim {2}, {3}",
             //     item.Name, item.ItemID, Name, UUID);
 
@@ -374,29 +376,30 @@ namespace WhiteCore.Region
         public void UpdateScriptInstance(UUID itemID, byte[] assetData, int startParam, bool postOnRez,
                                          StateSource stateSource)
         {
-            TaskInventoryItem item = m_items[itemID];
-            if (!m_part.ParentGroup.Scene.Permissions.CanRunScript(item.ItemID, m_part.UUID, item.OwnerID))
-                return;
-
-            m_part.AddFlag(PrimFlags.Scripted);
-
-            if (!m_part.ParentGroup.Scene.RegionInfo.RegionSettings.DisableScripts)
+            lock (m_itemsLock)
             {
-                lock (m_itemsLock)
-                {
-                    m_items[item.ItemID].PermsMask = 0;
-                    m_items[item.ItemID].PermsGranter = UUID.Zero;
-                }
+                TaskInventoryItem item = m_items [itemID];
 
-                string script = Utils.BytesToString(assetData);
-                IScriptModule[] modules = m_part.ParentGroup.Scene.RequestModuleInterfaces<IScriptModule>();
-                foreach (IScriptModule module in modules)
+                if (!m_part.ParentGroup.Scene.Permissions.CanRunScript (item.ItemID, m_part.UUID, item.OwnerID))
+                    return;
+
+                m_part.AddFlag (PrimFlags.Scripted);
+
+                if (!m_part.ParentGroup.Scene.RegionInfo.RegionSettings.DisableScripts)
                 {
-                    module.UpdateScript(m_part.UUID, item.ItemID, script, startParam, postOnRez, stateSource);
+                    m_items [item.ItemID].PermsMask = 0;
+                    m_items [item.ItemID].PermsGranter = UUID.Zero;
+
+                    string script = Utils.BytesToString (assetData);
+                    IScriptModule[] modules = m_part.ParentGroup.Scene.RequestModuleInterfaces<IScriptModule> ();
+                    foreach (IScriptModule module in modules)
+                    {
+                        module.UpdateScript (m_part.UUID, item.ItemID, script, startParam, postOnRez, stateSource);
+                    }
+                    ResumeScript (item);
                 }
-                ResumeScript(item);
+                HasInventoryChanged = true;
             }
-            HasInventoryChanged = true;
         }
 
         /// <summary>
@@ -415,7 +418,7 @@ namespace WhiteCore.Region
                 CreateScriptInstance(item, startParam, postOnRez, stateSource);
             else
                 MainConsole.Instance.ErrorFormat(
-                    "[PRIM INVENTORY]: " +
+                    "[Prim inventory]: " +
                     "Couldn't start script with ID {0} since it couldn't be found for prim {1}, {2} at {3} in {4}",
                     itemId, m_part.Name, m_part.UUID,
                     m_part.AbsolutePosition, m_part.ParentGroup.Scene.RegionInfo.RegionName);
@@ -449,7 +452,7 @@ namespace WhiteCore.Region
             else
             {
                 MainConsole.Instance.ErrorFormat(
-                    "[PRIM INVENTORY]: " +
+                    "[Prim inventory]: " +
                     "Couldn't stop script with ID {0} since it couldn't be found for prim {1}, {2} at {3} in {4}",
                     itemId, m_part.Name, m_part.UUID,
                     m_part.AbsolutePosition, m_part.ParentGroup.Scene.RegionInfo.RegionName);
@@ -461,7 +464,7 @@ namespace WhiteCore.Region
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        private bool InventoryContainsName(string name)
+        bool InventoryContainsName(string name)
         {
             lock (m_itemsLock)
             {
@@ -479,7 +482,7 @@ namespace WhiteCore.Region
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        private string FindAvailableInventoryName(string name)
+        string FindAvailableInventoryName(string name)
         {
             if (!InventoryContainsName(name))
                 return name;
@@ -632,7 +635,7 @@ namespace WhiteCore.Region
             if (null == rezAsset)
             {
                 MainConsole.Instance.WarnFormat(
-                    "[PRIM INVENTORY]: Could not find asset {0} for inventory item {1} in {2}",
+                    "[Prim inventory]: Could not find asset {0} for inventory item {1} in {2}",
                     item.AssetID, item.Name, m_part.Name);
                 return null;
             }
@@ -716,7 +719,6 @@ namespace WhiteCore.Region
             {
                 item.ParentID = m_part.UUID;
                 item.ParentPartID = m_part.UUID;
-                item.Flags = m_items[item.ItemID].Flags;
 
                 // If group permissions have been set on, check that the groupID is up to date in case it has
                 // changed since permissions were last set.
@@ -728,6 +730,7 @@ namespace WhiteCore.Region
 
                 lock (m_itemsLock)
                 {
+                    item.Flags = m_items[item.ItemID].Flags;
                     m_items[item.ItemID] = item;
                     m_inventorySerial++;
                 }
@@ -739,7 +742,7 @@ namespace WhiteCore.Region
                 return true;
             }
             MainConsole.Instance.ErrorFormat(
-                "[PRIM INVENTORY]: " +
+                "[Prim inventory]: " +
                 "Tried to retrieve item ID {0} from prim {1}, {2} at {3} in {4} but the item does not exist in this inventory",
                 item.ItemID, m_part.Name, m_part.UUID,
                 m_part.AbsolutePosition, m_part.ParentGroup.Scene.RegionInfo.RegionName);
@@ -759,24 +762,27 @@ namespace WhiteCore.Region
             TaskInventoryItem item = GetInventoryItem(itemID);
             if (item != null)
             {
-                int type = m_items[itemID].InvType;
-                if (type == 10) // Script
+                lock (m_itemsLock)
                 {
-                    m_part.RemoveScriptEvents(itemID);
-                    m_part.ParentGroup.Scene.EventManager.TriggerRemoveScript(m_part.LocalId, itemID);
-                }
-                m_items.Remove(itemID);
-                m_inventorySerial++;
-                m_part.TriggerScriptChangedEvent(Changed.INVENTORY);
+                    int type = m_items [itemID].InvType;
+                    if (type == 10) // Script
+                    {
+                        m_part.RemoveScriptEvents (itemID);
+                        m_part.ParentGroup.Scene.EventManager.TriggerRemoveScript (m_part.LocalId, itemID);
+                    }
+                    m_items.Remove (itemID);
+                    m_inventorySerial++;
+                    m_part.TriggerScriptChangedEvent (Changed.INVENTORY);
+                
+                    HasInventoryChanged = true;
 
-                HasInventoryChanged = true;
-
-                if (!ContainsScripts())
-                {
-                    if (m_part.RemFlag(PrimFlags.Scripted))
-                        m_part.ScheduleUpdate(PrimUpdateFlags.PrimFlags);
+                    if (!ContainsScripts ())
+                    {
+                        if (m_part.RemFlag (PrimFlags.Scripted))
+                            m_part.ScheduleUpdate (PrimUpdateFlags.PrimFlags);
+                    }
+                    return type;
                 }
-                return type;
             }
 
             return -1;
@@ -838,58 +844,63 @@ namespace WhiteCore.Region
             if (m_part.ParentGroup.Scene.Permissions.CanEditObjectInventory(m_part.UUID, client.AgentId))
                 includeAssets = true;
 
-            List<TaskInventoryItem> items = m_items.Clone2List();
-            foreach (TaskInventoryItem item in items)
+            lock (m_itemsLock)
             {
-                UUID ownerID = item.OwnerID;
-                const uint everyoneMask = 0;
-                uint baseMask = item.BasePermissions;
-                uint ownerMask = item.CurrentPermissions;
-                uint groupMask = item.GroupPermissions;
+                List<TaskInventoryItem> items = m_items.Clone2List ();
 
-                invString.AddItemStart();
-                invString.AddNameValueLine("item_id", item.ItemID.ToString());
-                invString.AddNameValueLine("parent_id", m_part.UUID.ToString());
+                foreach (TaskInventoryItem item in items)
+                {
+                    UUID ownerID = item.OwnerID;
+                    const uint everyoneMask = 0;
+                    uint baseMask = item.BasePermissions;
+                    uint ownerMask = item.CurrentPermissions;
+                    uint groupMask = item.GroupPermissions;
 
-                invString.AddPermissionsStart();
+                    invString.AddItemStart ();
+                    invString.AddNameValueLine ("item_id", item.ItemID.ToString ());
+                    invString.AddNameValueLine ("parent_id", m_part.UUID.ToString ());
 
-                invString.AddNameValueLine("base_mask", Utils.UIntToHexString(baseMask));
-                invString.AddNameValueLine("owner_mask", Utils.UIntToHexString(ownerMask));
-                invString.AddNameValueLine("group_mask", Utils.UIntToHexString(groupMask));
-                invString.AddNameValueLine("everyone_mask", Utils.UIntToHexString(everyoneMask));
-                invString.AddNameValueLine("next_owner_mask", Utils.UIntToHexString(item.NextPermissions));
+                    invString.AddPermissionsStart ();
 
-                invString.AddNameValueLine("creator_id", item.CreatorID.ToString());
-                invString.AddNameValueLine("owner_id", ownerID.ToString());
+                    invString.AddNameValueLine ("base_mask", Utils.UIntToHexString (baseMask));
+                    invString.AddNameValueLine ("owner_mask", Utils.UIntToHexString (ownerMask));
+                    invString.AddNameValueLine ("group_mask", Utils.UIntToHexString (groupMask));
+                    invString.AddNameValueLine ("everyone_mask", Utils.UIntToHexString (everyoneMask));
+                    invString.AddNameValueLine ("next_owner_mask", Utils.UIntToHexString (item.NextPermissions));
 
-                invString.AddNameValueLine("last_owner_id", item.LastOwnerID.ToString());
+                    invString.AddNameValueLine ("creator_id", item.CreatorID.ToString ());
+                    invString.AddNameValueLine ("owner_id", ownerID.ToString ());
 
-                invString.AddNameValueLine("group_id", item.GroupID.ToString());
-                invString.AddSectionEnd();
+                    invString.AddNameValueLine ("last_owner_id", item.LastOwnerID.ToString ());
 
-                invString.AddNameValueLine("asset_id", includeAssets ? item.AssetID.ToString() : UUID.Zero.ToString());
-                invString.AddNameValueLine("type", TaskInventoryItemHelpers.Types[item.Type]);
-                invString.AddNameValueLine("inv_type", TaskInventoryItemHelpers.InvTypes[item.InvType]);
-                invString.AddNameValueLine("flags", Utils.UIntToHexString(item.Flags));
+                    invString.AddNameValueLine ("group_id", item.GroupID.ToString ());
+                    invString.AddSectionEnd ();
 
-                invString.AddSaleStart();
-                invString.AddNameValueLine("sale_type", TaskInventoryItemHelpers.SaleTypes[item.SaleType]);
-                invString.AddNameValueLine("sale_price", item.SalePrice.ToString());
-                invString.AddSectionEnd();
+                    invString.AddNameValueLine ("asset_id", includeAssets ? item.AssetID.ToString () : UUID.Zero.ToString ());
+                    invString.AddNameValueLine ("type", TaskInventoryItemHelpers.Types [item.Type]);
+                    invString.AddNameValueLine ("inv_type", TaskInventoryItemHelpers.InvTypes [item.InvType]);
+                    invString.AddNameValueLine ("flags", Utils.UIntToHexString (item.Flags));
 
-                invString.AddNameValueLine("name", item.Name + "|");
-                invString.AddNameValueLine("desc", item.Description + "|");
+                    invString.AddSaleStart ();
+                    invString.AddNameValueLine ("sale_type", TaskInventoryItemHelpers.SaleTypes [item.SaleType]);
+                    invString.AddNameValueLine ("sale_price", item.SalePrice.ToString ());
+                    invString.AddSectionEnd ();
 
-                invString.AddNameValueLine("creation_date", item.CreationDate.ToString());
-                invString.AddSectionEnd();
+                    invString.AddNameValueLine ("name", item.Name + "|");
+                    invString.AddNameValueLine ("desc", item.Description + "|");
+
+                    invString.AddNameValueLine ("creation_date", item.CreationDate.ToString ());
+                    invString.AddSectionEnd ();
+                }
             }
+
             string str = invString.GetString();
             if (str.Length > 0)
                 str = str.Substring(0, str.Length - 1);
             m_fileData = Utils.StringToBytes(str);
 
             //MainConsole.Instance.Debug(Utils.BytesToString(fileData));
-            //MainConsole.Instance.Debug("[PRIM INVENTORY]: RequestInventoryFile fileData: " + Utils.BytesToString(fileData));
+            //MainConsole.Instance.Debug("[Prim inventory]: RequestInventoryFile fileData: " + Utils.BytesToString(fileData));
 
             if (m_fileData.Length > 2)
             {
@@ -926,8 +937,8 @@ namespace WhiteCore.Region
 
         public class InventoryStringBuilder
         {
-            private StringBuilder BuildString = new StringBuilder();
-            private bool _hasAddeditems = false;
+            StringBuilder BuildString = new StringBuilder();
+            bool _hasAddeditems = false;
 
             public string GetString()
             {

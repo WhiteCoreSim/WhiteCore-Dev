@@ -141,19 +141,19 @@ namespace WhiteCore.Modules.InventoryAccess
                 }
             }
             //else
-            //    MainConsole.Instance,DebugFormat("[AGENT INVENTORY]: User profile not found during restore object: {0}", RegionInfo.RegionName);
+            //    MainConsole.Instance,DebugFormat("[Agent inventory]: User profile not found during restore object: {0}", RegionInfo.RegionName);
         }
 
         /// <summary>
         ///     The only difference between this and the other RezObject method is the return value...
         ///     The client needs this method
         /// </summary>
-        void ClientRezObject(IClientAPI remoteClient, UUID itemID, Vector3 RayEnd, Vector3 RayStart,
-                                     UUID RayTargetID, byte BypassRayCast, bool RayEndIsIntersection,
-                                     bool RezSelected, bool RemoveItem, UUID fromTaskID)
+        void ClientRezObject(IClientAPI remoteClient, UUID itemID, Vector3 rayEnd, Vector3 rayStart,
+                                     UUID rayTargetID, byte bypassRayCast, bool rayEndIsIntersection,
+                                     bool rezSelected, bool removeItem, UUID fromTaskID)
         {
-            RezObject(remoteClient, itemID, RayEnd, RayStart, RayTargetID, BypassRayCast,
-                      RayEndIsIntersection, RezSelected, RemoveItem, fromTaskID);
+            RezObject(remoteClient, itemID, rayEnd, rayStart, rayTargetID, bypassRayCast,
+                      rayEndIsIntersection, rezSelected, removeItem, fromTaskID);
         }
 
         #endregion
@@ -235,7 +235,7 @@ namespace WhiteCore.Modules.InventoryAccess
                 return "";
             }
             MainConsole.Instance.ErrorFormat(
-                "[AGENT INVENTORY]: Could not find item {0} for caps inventory update",
+                "[Agent inventory]: Could not find item {0} for caps inventory update",
                 itemID);
 
             return "";
@@ -348,7 +348,7 @@ namespace WhiteCore.Modules.InventoryAccess
             //
 
             InventoryFolderBase folder = null;
-            InventoryItemBase item = null;
+            InventoryItemBase item;
 
             if (DeRezAction.SaveToExistingUserInventoryItem == action)
             {
@@ -357,10 +357,10 @@ namespace WhiteCore.Modules.InventoryAccess
                 //item = userInfo.RootFolder.FindItem(
                 //        objectGroup.RootPart.FromUserInventoryItemID);
 
-                if (null == item)
+                if (item == null)
                 {
                     MainConsole.Instance.DebugFormat(
-                        "[AGENT INVENTORY]: Object {0} {1} scheduled for save to inventory has already been deleted.",
+                        "[Agent inventory]: Object {0} {1} scheduled for save to inventory has already been deleted.",
                         objectGroups[0].Name, objectGroups[0].UUID);
                     return UUID.Zero;
                 }
@@ -597,7 +597,7 @@ namespace WhiteCore.Modules.InventoryAccess
                 Utils.StringToBytes(AssetXML),
                 objectGroups[0].OwnerID.ToString());
             asset.ID = m_scene.AssetService.Store(asset);
-            AssetXML = null;
+
             return asset.ID;
         }
 
@@ -774,23 +774,23 @@ namespace WhiteCore.Modules.InventoryAccess
         /// things to the scene.  The caller should be doing that, I think.
         /// <param name="remoteClient"></param>
         /// <param name="itemID"></param>
-        /// <param name="RayEnd"></param>
-        /// <param name="RayStart"></param>
-        /// <param name="RayTargetID"></param>
-        /// <param name="BypassRayCast"></param>
-        /// <param name="RayEndIsIntersection"></param>
-        /// <param name="RezSelected"></param>
-        /// <param name="RemoveItem"></param>
+        /// <param name="rayEnd"></param>
+        /// <param name="rayStart"></param>
+        /// <param name="rayTargetID"></param>
+        /// <param name="bypassRayCast"></param>
+        /// <param name="rayEndIsIntersection"></param>
+        /// <param name="rezSelected"></param>
+        /// <param name="removeItem"></param>
         /// <param name="fromTaskID"></param>
         /// <returns>The SceneObjectGroup rezzed or null if rez was unsuccessful.</returns>
-        public virtual ISceneEntity RezObject(IClientAPI remoteClient, UUID itemID, Vector3 RayEnd, Vector3 RayStart,
-                                              UUID RayTargetID, byte BypassRayCast, bool RayEndIsIntersection,
-                                              bool RezSelected, bool RemoveItem, UUID fromTaskID)
+        public virtual ISceneEntity RezObject(IClientAPI remoteClient, UUID itemID, Vector3 rayEnd, Vector3 rayStart,
+                                              UUID rayTargetID, byte bypassRayCast, bool rayEndIsIntersection,
+                                              bool rezSelected, bool removeItem, UUID fromTaskID)
         {
             // Work out position details
             byte bRayEndIsIntersection;
 
-            bRayEndIsIntersection = (byte) (RayEndIsIntersection ? 1 : 0);
+            bRayEndIsIntersection = (byte) (rayEndIsIntersection ? 1 : 0);
 
             XmlDocument doc;
             //It might be a library item, send UUID.Zero
@@ -803,8 +803,8 @@ namespace WhiteCore.Modules.InventoryAccess
             ISceneEntity group = CreateObjectFromInventory(item, remoteClient, itemID, out doc);
 
             Vector3 pos = m_scene.SceneGraph.GetNewRezLocation(
-                RayStart, RayEnd, RayTargetID, Quaternion.Identity,
-                BypassRayCast, bRayEndIsIntersection, true, new Vector3(0.5f, 0.5f, 0.5f), false);
+                rayStart, rayEnd, rayTargetID, Quaternion.Identity,
+                bypassRayCast, bRayEndIsIntersection, true, new Vector3(0.5f, 0.5f, 0.5f), false);
 
             if (doc == null)
             {
@@ -873,9 +873,9 @@ namespace WhiteCore.Modules.InventoryAccess
                     return null;
                 }
                 List<ISceneEntity> Groups = RezMultipleObjectsFromInventory(nodes, itemID, remoteClient, pos,
-                                                                            RezSelected, item, RayTargetID,
-                                                                            BypassRayCast, RayEndIsIntersection, RayEnd,
-                                                                            RayStart, bRayEndIsIntersection);
+                                                                            rezSelected, item, rayTargetID,
+                                                                            bypassRayCast, rayEndIsIntersection, rayEnd,
+                                                                            rayStart, bRayEndIsIntersection);
                 if (Groups.Count != 0)
                     return Groups[0];
                 remoteClient.SendAlertMessage("Failed to rez the item you requested.");
@@ -902,7 +902,7 @@ namespace WhiteCore.Modules.InventoryAccess
                 return null;
             }
 
-            if (RezSelected)
+            if (rezSelected)
                 group.RootChild.AddFlag(PrimFlags.CreateSelected);
             // If we're rezzing an attachment then don't ask AddNewSceneObject() to update the client since
             // we'll be doing that later on.  Scheduling more than one full update during the attachment
@@ -915,8 +915,8 @@ namespace WhiteCore.Modules.InventoryAccess
             //The OOBsize is only half the size, x2
             Vector3 newSize = (group.OOBsize*2)*Quaternion.Inverse(group.GroupRotation);
             pos = m_scene.SceneGraph.GetNewRezLocation(
-                RayStart, RayEnd, RayTargetID, Quaternion.Identity,
-                BypassRayCast, bRayEndIsIntersection, true, newSize, false);
+                rayStart, rayEnd, rayTargetID, Quaternion.Identity,
+                bypassRayCast, bRayEndIsIntersection, true, newSize, false);
             pos.Z += offsetHeight;
             group.AbsolutePosition = pos;
             //   MainConsole.Instance.InfoFormat("rezx point for inventory rezz is {0} {1} {2}  and offsetheight was {3}", pos.X, pos.Y, pos.Z, offsetHeight);
@@ -924,7 +924,7 @@ namespace WhiteCore.Modules.InventoryAccess
             ISceneChildEntity rootPart = group.GetChildPart(group.UUID);
             if (rootPart == null)
             {
-                MainConsole.Instance.Error("[AGENT INVENTORY]: Error rezzing ItemID: " + itemID +
+                MainConsole.Instance.Error("[Agent inventory]: Error rezzing ItemID: " + itemID +
                                            " object has no rootpart.");
                 return null;
             }
@@ -1002,10 +1002,10 @@ namespace WhiteCore.Modules.InventoryAccess
 
         List<ISceneEntity> RezMultipleObjectsFromInventory(XmlNodeList nodes, UUID itemId,
                                                                    IClientAPI remoteClient, Vector3 pos,
-                                                                   bool RezSelected,
-                                                                   InventoryItemBase item, UUID RayTargetID,
-                                                                   byte BypassRayCast, bool RayEndIsIntersection,
-                                                                   Vector3 RayEnd, Vector3 RayStart,
+                                                                   bool rezSelected,
+                                                                   InventoryItemBase item, UUID rayTargetID,
+                                                                   byte BypassRayCast, bool rayEndIsIntersection,
+                                                                   Vector3 rayEnd, Vector3 rayStart,
                                                                    byte bRayEndIsIntersection)
         {
             Vector3 OldMiddlePos = Vector3.Zero;
@@ -1047,7 +1047,7 @@ namespace WhiteCore.Modules.InventoryAccess
                     return null;
                 }
 
-                if (RezSelected)
+                if (rezSelected)
                     group.RootChild.AddFlag(PrimFlags.CreateSelected);
                 // If we're rezzing an attachment then don't ask AddNewSceneObject() to update the client since
                 // we'll be doing that later on.  Scheduling more than one full update during the attachment
@@ -1059,7 +1059,7 @@ namespace WhiteCore.Modules.InventoryAccess
                 // if not, we set it's position in world.
                 float offsetHeight = 0;
                 pos = m_scene.SceneGraph.GetNewRezLocation(
-                    RayStart, RayEnd, RayTargetID, Quaternion.Identity,
+                    rayStart, rayEnd, rayTargetID, Quaternion.Identity,
                     BypassRayCast, bRayEndIsIntersection, true, group.GetAxisAlignedBoundingBox(out offsetHeight), false);
                 pos.Z += offsetHeight;
                 //group.AbsolutePosition = pos;

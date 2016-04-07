@@ -616,9 +616,9 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.High)]
-        public virtual InventoryCollection GetFolderContent(UUID UserID, UUID folderID)
+        public virtual InventoryCollection GetFolderContent(UUID userID, UUID folderID)
         {
-            object remoteValue = DoRemoteByURL("InventoryServerURI", UserID, folderID);
+            object remoteValue = DoRemoteByURL("InventoryServerURI", userID, folderID);
             if (remoteValue != null || m_doRemoteOnly)
                 return (InventoryCollection) remoteValue;
 
@@ -626,15 +626,15 @@ namespace WhiteCore.Services.SQLServices.InventoryService
             // connector. So we disregard the principal and look
             // by ID.
             //
-            MainConsole.Instance.DebugFormat("[XINVENTORY SERVICE]: Fetch contents for folder {0}", folderID.ToString());
+            MainConsole.Instance.DebugFormat("[XINVENTORY SERVICE]: Fetch contents for folder {0}", folderID);
             InventoryCollection inventory = new InventoryCollection
                                                 {
-                                                    UserID = UserID,
+                                                    UserID = userID,
                                                     FolderID = folderID,
                                                     Folders = m_Database.GetFolders(
                                                         new[] {"parentFolderID"},
                                                         new[] {folderID.ToString()}),
-                                                    Items = m_Database.GetItems(UserID,
+                                                    Items = m_Database.GetItems(userID,
                                                                                 new[] {"parentFolderID"},
                                                                                 new[] {folderID.ToString()})
                                                 };
@@ -847,16 +847,16 @@ namespace WhiteCore.Services.SQLServices.InventoryService
 
                 if (folder == null || folder.Owner != item.Owner)
                 {
-                    MainConsole.Instance.DebugFormat ("[InventoryService]: Aborting adding item as folder {0} does not exist or is not the owner's",folder);
+                    MainConsole.Instance.DebugFormat ("[Inventory service]: Aborting adding item as folder {0} does not exist or is not the owner's",folder);
                     return false;
                 }
             }
             m_Database.IncrementFolder(item.Folder);
             bool success = m_Database.StoreItem(item);
             if (!success)
-                MainConsole.Instance.DebugFormat ("[InventoryService]: Failed to save item {0} in folder {1}",item.Name,item.Folder);
+                MainConsole.Instance.DebugFormat ("[Inventory service]: Failed to save item {0} in folder {1}",item.Name,item.Folder);
             else
-                MainConsole.Instance.DebugFormat ("[InventoryService]: Saved item {0} in folder {1}",item.Name,item.Folder);
+                MainConsole.Instance.DebugFormat ("[Inventory service]: Saved item {0} in folder {1}",item.Name,item.Folder);
 
             return success;
         }
@@ -925,7 +925,8 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                     m_Database.IncrementFolder(item.Folder);
                     if (!ParentIsLinkFolder(item.Folder))
                         continue;
-                    if(item.Owner == m_LibraryService.LibraryOwner) continue;
+                    if (item.Owner == m_LibraryService.LibraryOwner) 
+                        continue;
                     m_Database.DeleteItems("inventoryID", id.ToString());
                 }
                 return true;
@@ -961,9 +962,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
             string[] vals = userID != UUID.Zero
                                 ? new[] {inventoryID.ToString(), userID.ToString()}
                                 : new[] {inventoryID.ToString()};
-            List<InventoryItemBase> items = m_Database.GetItems(userID,
-                                                                fields,
-                                                                vals);
+            List<InventoryItemBase> items = m_Database.GetItems(userID, fields, vals);
 
             if (items.Count == 0)
                 return null;
@@ -1028,15 +1027,15 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public virtual InventoryFolderBase GetFolderByOwnerAndName(UUID FolderOwner, string FolderName)
+        public virtual InventoryFolderBase GetFolderByOwnerAndName(UUID folderOwner, string folderName)
         {
-            object remoteValue = DoRemoteByURL("InventoryServerURI", FolderOwner, FolderName);
+            object remoteValue = DoRemoteByURL("InventoryServerURI", folderOwner, folderName);
             if (remoteValue != null || m_doRemoteOnly)
                 return (InventoryFolderBase) remoteValue;
 
             List<InventoryFolderBase> folders = m_Database.GetFolders(
                 new[] {"folderName", "agentID"},
-                new[] {FolderName, FolderOwner.ToString()});
+                new[] {folderName, folderOwner.ToString()});
 
             if (folders.Count == 0)
                 return null;
@@ -1063,7 +1062,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                 foreach (var folder in skel)
                 {
                     var items = GetFolderContent(user, folder.ID);
-                    DeleteItems(user, items.Items.ConvertAll<UUID>((item) => item.ID));
+                    DeleteItems(user, items.Items.ConvertAll<UUID>(item => item.ID));
                     ForcePurgeFolder(folder);
                 }
             }
@@ -1134,7 +1133,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                                        if (null == folder)
                                        {
                                            MainConsole.Instance.ErrorFormat(
-                                               "[InventoryService]: Could not find inventory folder {0} to give",
+                                               "[Inventory service]: Could not find inventory folder {0} to give",
                                                folderId);
                                            success(null);
                                            return;
@@ -1149,7 +1148,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                                            else
                                            {
                                                MainConsole.Instance.WarnFormat(
-                                                   "[InventoryService]: Unable to find root folder for receiving agent");
+                                                   "[Inventory service]: Unable to find root folder for receiving agent");
                                                success(null);
                                                return;
                                            }
@@ -1210,7 +1209,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         {
             if (item == null)
             {
-                MainConsole.Instance.Info("[InventoryService]: Could not find item to give to " + recipient);
+                MainConsole.Instance.Info("[Inventory service]: Could not find item to give to " + recipient);
                 return null;
             }
             if (!doOwnerCheck || item.Owner == senderId)
@@ -1220,7 +1219,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                     if ((item.CurrentPermissions & (uint)PermissionMask.Transfer) == 0)
                     {
                         MainConsole.Instance.WarnFormat (
-                            "[InventoryService]: Inventory copy of {0} aborted due to permissions: Sender {1}, recipient {2}",
+                            "[Inventory service]: Inventory copy of {0} aborted due to permissions: Sender {1}, recipient {2}",
                             item.AssetID, senderId, recipient);
                         return null;
                     }
@@ -1341,7 +1340,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                     // set to
                     itemCopy.GroupPermissions = 0;
 
-                    MainConsole.Instance.Debug ("[InventoryService]: Updated item permissions for new user");
+                    MainConsole.Instance.Debug ("[Inventory service]: Updated item permissions for new user");
                 }
                 else
                 {
@@ -1369,20 +1368,20 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                 itemCopy.SaleType = item.SaleType;
 
                 if (! AddItem(itemCopy))
-                    MainConsole.Instance.Warn ("[InventoryService]: Failed to insert inventory item copy into database");
+                    MainConsole.Instance.Warn ("[Inventory service]: Failed to insert inventory item copy into database");
 
 
                 if ((item.CurrentPermissions & (uint)PermissionMask.Copy) == 0)
                 {
                     DeleteItems (senderId, new List<UUID> { item.ID });
-                    MainConsole.Instance.Debug ("[InventoryService]: Deleting new item as permissions prevent copying");
+                    MainConsole.Instance.Debug ("[Inventory service]: Deleting new item as permissions prevent copying");
                 }
 
 
                 return itemCopy;
             }
             MainConsole.Instance.WarnFormat(
-                "[InventoryService]: Failed to give item {0} as item does not belong to giver", item.ID.ToString());
+                "[Inventory service]: Failed to give item {0} as item does not belong to giver", item.ID);
             return null;
         }
 
@@ -1589,20 +1588,22 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         {
             List <UserAccount> userAccounts;
             userAccounts = m_UserAccountService.GetUserAccounts (null, "*");
-
-            foreach (var account in userAccounts)
+            if (userAccounts != null)       // unlikely but..
             {
-                if (!Utilities.IsSystemUser(account.PrincipalID))
+                foreach (var account in userAccounts)
                 {
-                    InventoryFolderBase rootFolder = GetRootFolder(account.PrincipalID);
-                    if (rootFolder != null)
+                    if (!Utilities.IsSystemUser (account.PrincipalID))
                     {
-                        // Check to make sure we have the correct foldertype (Sep 2015)
-                        if (rootFolder.Type != (short) FolderType.Root)
+                        InventoryFolderBase rootFolder = GetRootFolder (account.PrincipalID);
+                        if (rootFolder != null)
                         {
-                            rootFolder.Type = (short) FolderType.Root;
-                            MainConsole.Instance.Warn ("Correcting root folder type for " + account.Name);
-                            m_Database.StoreFolder (rootFolder);
+                            // Check to make sure we have the correct foldertype (Sep 2015)
+                            if (rootFolder.Type != (short)FolderType.Root)
+                            {
+                                rootFolder.Type = (short)FolderType.Root;
+                                MainConsole.Instance.Warn ("Correcting root folder type for " + account.Name);
+                                m_Database.StoreFolder (rootFolder);
+                            }
                         }
                     }
                 }
