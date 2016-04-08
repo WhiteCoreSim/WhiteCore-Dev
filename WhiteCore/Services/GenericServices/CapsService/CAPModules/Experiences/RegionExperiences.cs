@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org
+ * Copyright (c) Contributors, http://whitecore-sim.org/
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,8 +26,8 @@
  */
 
 
-using System;
 using System.IO;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
@@ -60,7 +60,10 @@ namespace WhiteCore.Services
                                       OSHttpResponse httpResponse)
         {
         	MainConsole.Instance.DebugFormat("[RegionExperiences] Call = {0}", httpRequest);
-        	return null;
+            var regionExp = new OSDMap();
+
+            return OSDParser.SerializeLLSDXmlBytes (regionExp);
+
         }
     }
 }

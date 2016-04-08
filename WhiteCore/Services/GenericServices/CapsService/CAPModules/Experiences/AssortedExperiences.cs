@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org
+ * Copyright (c) Contributors, http://whitecore-sim.org/
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,8 +26,8 @@
  */
 
 
-using System;
 using System.IO;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
@@ -86,63 +86,81 @@ namespace WhiteCore.Services
                                       OSHttpResponse httpResponse)
         {
         	MainConsole.Instance.DebugFormat("[ExperiencePreferences] Call = {0}", httpRequest);
-        	return null;
+            var expPref = new OSDMap();
+
+            return OSDParser.SerializeLLSDXmlBytes (expPref);
         }
         
         public byte[] FindExperienceByName (string path, Stream request, OSHttpRequest httpRequest,
                                       OSHttpResponse httpResponse)
         {
         	MainConsole.Instance.DebugFormat("[ExperiencePreferences] Call = {0}", httpRequest);
-        	return null;
+            var experience = new OSDMap();
+
+            return OSDParser.SerializeLLSDXmlBytes (experience);
         }
         
         public byte[] GetExperiences (string path, Stream request, OSHttpRequest httpRequest,
                                       OSHttpResponse httpResponse)
         {
         	MainConsole.Instance.DebugFormat("[ExperiencePreferences] Call = {0}", httpRequest);
-        	return null;
+            var experiences = new OSDMap();
+
+            return OSDParser.SerializeLLSDXmlBytes (experiences);
         }
         
         public byte[] GetExperienceInfo (string path, Stream request, OSHttpRequest httpRequest,
                                       OSHttpResponse httpResponse)
         {
         	MainConsole.Instance.DebugFormat("[GetExperienceInfo] Call = {0}", httpRequest);
-        	return null;
+            var expInfo = new OSDMap();
+
+            return OSDParser.SerializeLLSDXmlBytes (expInfo);
         }
         
         public byte[] GetAdminExperiences (string path, Stream request, OSHttpRequest httpRequest,
                                       OSHttpResponse httpResponse)
         {
         	MainConsole.Instance.DebugFormat("[GetAdminExperiences] Call = {0}", httpRequest);
-        	return null;
+            var adminExp = new OSDMap();
+
+            return OSDParser.SerializeLLSDXmlBytes (adminExp);
         }
         
         public byte[] GetCreatorExperiences (string path, Stream request, OSHttpRequest httpRequest,
                                       OSHttpResponse httpResponse)
         {
         	MainConsole.Instance.DebugFormat("[GetCreatorExperiences] Call = {0}", httpRequest);
-        	return null;
+            var creatorExp = new OSDMap();
+
+            return OSDParser.SerializeLLSDXmlBytes (creatorExp);
         }
         
         public byte[] UpdateExperience (string path, Stream request, OSHttpRequest httpRequest,
                                       OSHttpResponse httpResponse)
         {
         	MainConsole.Instance.DebugFormat("[UpdateExperience] Call = {0}", httpRequest);
-        	return null;
+            var updateExp = new OSDMap();
+
+            return OSDParser.SerializeLLSDXmlBytes (updateExp);
         }
         
         public byte[] IsExperienceAdmin (string path, Stream request, OSHttpRequest httpRequest,
                                       OSHttpResponse httpResponse)
         {
         	MainConsole.Instance.DebugFormat("[IsExperienceAdmin] Call = {0}", httpRequest);
-        	return null;
+            var adminExp = new OSDMap();
+
+            return OSDParser.SerializeLLSDXmlBytes (adminExp);
         }
         
         public byte[] IsExperienceContributor (string path, Stream request, OSHttpRequest httpRequest,
                                       OSHttpResponse httpResponse)
         {
         	MainConsole.Instance.DebugFormat("[IsExperienceContributor] Call = {0}", httpRequest);
-        	return null;
+            var contribExp = new OSDMap();
+
+            return OSDParser.SerializeLLSDXmlBytes (contribExp);
         }
     }
 }
