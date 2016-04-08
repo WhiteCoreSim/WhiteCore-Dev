@@ -193,6 +193,9 @@ namespace WhiteCore.Framework.Servers.HttpServer.Implementation
             {
                 foreach (string item in _request.QueryString.Keys)
                 {
+                    if (item == null)
+                        continue;
+
                     try
                     {
                         _queryString.Add(item, _request.QueryString[item]);
