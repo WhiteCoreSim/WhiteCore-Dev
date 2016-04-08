@@ -44,7 +44,7 @@ namespace WhiteCore.Modules.Archivers
         /// <value>
         ///     The file used to load and save an opensimulator archive if no filename has been specified
         /// </value>
-        protected const string DEFAULT_OAR_BACKUP_FILENAME = "region.oar";
+        protected const string DEFAULT_OAR_BACKUP_FILENAME = Constants.DEFAULT_OAR_BACKUP_FILENAME;
 
         private IScene m_scene;
 
