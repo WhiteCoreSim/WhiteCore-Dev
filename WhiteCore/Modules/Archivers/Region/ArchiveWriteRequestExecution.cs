@@ -85,7 +85,7 @@ namespace WhiteCore.Modules.Archivers
                 m_archiveWriter.Close();
             }
 
-            MainConsole.Instance.InfoFormat("[ARCHIVER]: Finished writing out OAR for {0}",
+            MainConsole.Instance.InfoFormat("[Archiver]: Finished writing out OAR for {0}",
                                             m_scene.RegionInfo.RegionName);
 
             m_scene.EventManager.TriggerOarFileSaved(m_requestId, String.Empty);
@@ -95,18 +95,17 @@ namespace WhiteCore.Modules.Archivers
         {
             foreach (UUID uuid in assetsNotFoundUuids)
             {
-                MainConsole.Instance.DebugFormat("[ARCHIVER]: Could not find asset {0}", uuid);
+                MainConsole.Instance.DebugFormat("[Archiver]: Could not find asset {0}", uuid);
             }
+            
+            //MainConsole.Instance.InfoFormat(
+            //    "[Archiver]: Received {0} of {1} assets requested", assetsFoundUuids.Count, assetsFoundUuids.Count + assetsNotFoundUuids.Count);
 
-//            MainConsole.Instance.InfoFormat(
-//                "[ARCHIVER]: Received {0} of {1} assets requested",
-//                assetsFoundUuids.Count, assetsFoundUuids.Count + assetsNotFoundUuids.Count);
-
-            MainConsole.Instance.InfoFormat("[ARCHIVER]: Creating archive file.  This may take some time.");
+            MainConsole.Instance.InfoFormat("[Archiver]: Creating archive file.  This may take some time.");
 
             // Write out control file
             m_archiveWriter.WriteFile(ArchiveConstants.CONTROL_FILE_PATH, Create0p2ControlFile());
-            MainConsole.Instance.InfoFormat("[ARCHIVER]: Added control file to archive.");
+            MainConsole.Instance.InfoFormat("[Archiver]: Added control file to archive.");
 
             // Write out region settings
             string settingsPath
@@ -114,7 +113,7 @@ namespace WhiteCore.Modules.Archivers
             m_archiveWriter.WriteFile(settingsPath,
                                       RegionSettingsSerializer.Serialize(m_scene.RegionInfo.RegionSettings));
 
-            MainConsole.Instance.InfoFormat("[ARCHIVER]: Added region settings to archive.");
+            MainConsole.Instance.InfoFormat("[Archiver]: Added region settings to archive.");
 
             // Write out land data (aka parcel) settings
             IParcelManagementModule parcelManagement = m_scene.RequestModuleInterface<IParcelManagementModule>();
@@ -128,7 +127,8 @@ namespace WhiteCore.Modules.Archivers
                     m_archiveWriter.WriteFile(landDataPath, LandDataSerializer.Serialize(landData));
                 }
             }
-            MainConsole.Instance.InfoFormat("[ARCHIVER]: Added parcel settings to archive.");
+
+            MainConsole.Instance.InfoFormat("[Archiver]: Added parcel settings to archive.");
 
             // Write out terrain
             string terrainPath
@@ -139,18 +139,18 @@ namespace WhiteCore.Modules.Archivers
             m_archiveWriter.WriteFile(terrainPath, ms.ToArray());
             ms.Close();
 
-            MainConsole.Instance.InfoFormat("[ARCHIVER]: Added terrain information to archive.");
+            MainConsole.Instance.InfoFormat("[Archiver]: Added terrain information to archive.");
 
             // Write out scene object metadata
             foreach (ISceneEntity sceneObject in m_sceneObjects)
             {
-                //MainConsole.Instance.DebugFormat("[ARCHIVER]: Saving {0} {1}, {2}", entity.Name, entity.UUID, entity.GetType());
+                //MainConsole.Instance.DebugFormat("[Archiver]: Saving {0} {1}, {2}", entity.Name, entity.UUID, entity.GetType());
 
                 string serializedObject = m_serialiser.SerializeGroupToXml2(sceneObject);
                 m_archiveWriter.WriteFile(ArchiveHelpers.CreateObjectPath(sceneObject), serializedObject);
             }
 
-            MainConsole.Instance.InfoFormat("[ARCHIVER]: Added scene objects to archive.");
+            MainConsole.Instance.InfoFormat("[Archiver]: Added scene objects to archive.");
         }
 
         /// <summary>

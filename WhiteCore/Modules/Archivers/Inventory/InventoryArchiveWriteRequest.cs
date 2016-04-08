@@ -163,7 +163,7 @@ namespace WhiteCore.Modules.Archivers
             {
                 // We're almost done.  Just need to write out the control file now
                 m_archiveWriter.WriteFile(ArchiveConstants.CONTROL_FILE_PATH, CreateControlFile(m_saveAssets));
-                MainConsole.Instance.InfoFormat("[INVENTORY ARCHIVER]: Added control file to archive.");
+                MainConsole.Instance.InfoFormat("[Inventory Archiver]: Added control file to archive.");
                 m_archiveWriter.Close();
             }
             catch (Exception e)
@@ -188,7 +188,7 @@ namespace WhiteCore.Modules.Archivers
             if (!CanUserArchiveObject(m_userInfo.PrincipalID, inventoryItem))
             {
                 MainConsole.Instance.InfoFormat(
-                    "[INVENTORY ARCHIVER]: Insufficient permissions, skipping inventory item {0} {1} at {2}",
+                    "[Inventory Archiver]: Insufficient permissions, skipping inventory item {0} {1} at {2}",
                     inventoryItem.Name, inventoryItem.ID, path);
 
                 // Count Items Excluded
@@ -362,7 +362,7 @@ namespace WhiteCore.Modules.Archivers
                 if (inventoryFolder != null)
                 {
                     MainConsole.Instance.DebugFormat(
-                        "[INVENTORY ARCHIVER]: Found folder {0} {1} at {2}",
+                        "[Inventory Archiver]: Found folder {0} {1} at {2}",
                         inventoryFolder.Name,
                         inventoryFolder.ID,
                         m_invPath == String.Empty ? InventoryFolderImpl.PATH_DELIMITER : m_invPath);
@@ -373,7 +373,7 @@ namespace WhiteCore.Modules.Archivers
                 else if (inventoryItem != null)
                 {
                     MainConsole.Instance.DebugFormat(
-                        "[INVENTORY ARCHIVER]: Found item {0} {1} at {2}",
+                        "[Inventory Archiver]: Found item {0} {1} at {2}",
                         inventoryItem.Name, inventoryItem.ID, m_invPath);
 
                     SaveInvItem(inventoryItem, ArchiveConstants.INVENTORY_PATH);
@@ -399,7 +399,7 @@ namespace WhiteCore.Modules.Archivers
             }
             else
             {
-                MainConsole.Instance.Debug("[INVENTORY ARCHIVER]: Save Complete");
+                MainConsole.Instance.Debug("[Inventory Archiver]: Save Complete");
                 m_archiveWriter.Close();
             }
         }
@@ -409,7 +409,7 @@ namespace WhiteCore.Modules.Archivers
         /// </summary>
         protected void SaveUsers()
         {
-            MainConsole.Instance.InfoFormat("[INVENTORY ARCHIVER]: Saving user information for {0} users",
+            MainConsole.Instance.InfoFormat("[Inventory Archiver]: Saving user information for {0} users",
                                             m_userUuids.Count);
 
             foreach (UUID creatorId in m_userUuids.Keys)
@@ -425,7 +425,7 @@ namespace WhiteCore.Modules.Archivers
                 }
                 else
                 {
-                    MainConsole.Instance.WarnFormat("[INVENTORY ARCHIVER]: Failed to get creator profile for {0}",
+                    MainConsole.Instance.WarnFormat("[Inventory Archiver]: Failed to get creator profile for {0}",
                                                     creatorId);
                 }
             }
