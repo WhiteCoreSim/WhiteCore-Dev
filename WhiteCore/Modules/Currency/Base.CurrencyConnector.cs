@@ -132,12 +132,12 @@ namespace WhiteCore.Modules.Currency
                 StartingDate = DateTime.UtcNow
             };
             Dictionary<string, object> where = new Dictionary<string, object> (1);
-                where ["GroupID"] = groupID;
-            List<string> queryResults = GD.Query (new [] { "*" }, _GROUPREALM, new QueryFilter () {
-                andFilters = where
-            }, null, null, null);
+            where ["GroupID"] = groupID;
 
-            if ((queryResults == null) || (queryResults.Count == 0))
+            List<string> queryResults = GD.Query (new [] { "*" }, _GROUPREALM,
+                new QueryFilter () { andFilters = where }, null, null, null);
+
+            if (queryResults.Count == 0)
             {
                 GroupCurrencyCreate(groupID);
                 return gb;
@@ -767,7 +767,11 @@ namespace WhiteCore.Modules.Currency
 
         void GroupCurrencyCreate(UUID groupID)
         {
-            GD.Insert(_GROUPREALM, new object[] {groupID.ToString(), 0, 0, 0, 0, 0, 0, 0});
+            var qryResults = GD.Query (new [] { "*" }, _GROUPREALM,
+                new QueryFilter () { andFilters = new Dictionary<string, object>{{"GroupID", groupID}}}, null, null, null);
+            
+            if (qryResults.Count == 0)
+                GD.Insert(_GROUPREALM, new object[] {groupID.ToString(), 0, 0, 0, 0, 0, 0, 0});
         }
 
         static GroupBalance ParseGroupBalance(List<string> queryResults)
