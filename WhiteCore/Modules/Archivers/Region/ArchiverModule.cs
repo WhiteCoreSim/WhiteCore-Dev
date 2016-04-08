@@ -33,6 +33,7 @@ using Nini.Config;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.Archivers
 {
