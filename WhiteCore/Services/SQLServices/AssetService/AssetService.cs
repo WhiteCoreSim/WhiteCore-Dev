@@ -215,7 +215,7 @@ namespace WhiteCore.Services.SQLServices.AssetService
             // this should never happen but...
             if (asset == null)
             {
-                MainConsole.Instance.Error ("[Asset service]: Trying to stro a null asset!");
+                MainConsole.Instance.Error ("[Asset service]: Trying to store a null asset!");
                 return UUID.Zero;
             }
 
@@ -229,11 +229,14 @@ namespace WhiteCore.Services.SQLServices.AssetService
             else
                 asset.ID = m_database.Store(asset);
             
-            IImprovedAssetCache cache = m_registry.RequestModuleInterface<IImprovedAssetCache>();
-            if (doDatabaseCaching && cache != null && asset.Data != null && asset.Data.Length != 0)
+            if (doDatabaseCaching)
             {
-                cache.Expire(asset.ID.ToString());
-                cache.Cache(asset.ID.ToString(), asset);
+                IImprovedAssetCache cache = m_registry.RequestModuleInterface<IImprovedAssetCache> ();
+                if (cache != null && asset.Data.Length != 0)
+                {
+                    cache.Expire (asset.ID.ToString ());
+                    cache.Cache (asset.ID.ToString (), asset);
+                }
             }
 
             return asset.ID;
