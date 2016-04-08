@@ -236,21 +236,21 @@ namespace WhiteCore.Simulation.Base
         {
             MainConsole.Instance.Info("====================================================================");
             MainConsole.Instance.Info(
-				        string.Format("==================== STARTING WhiteCore ({0}) ======================",
+				        string.Format("==================== Starting WhiteCore-Sim ({0}) ======================",
                               (IntPtr.Size == 4 ? "x86" : "x64")));
             MainConsole.Instance.Info("====================================================================");
-            MainConsole.Instance.Info("[WhiteCoreStartup]: Version : " + Version + "\n");
-            MainConsole.Instance.Info("[WhiteCoreStartup]: Git Base: " + VersionInfo.GitVersion + "\n");
+            MainConsole.Instance.Info("[WhiteCore-Sim Startup]: Version : " + Version + "\n");
+            MainConsole.Instance.Info("[WhiteCore-Sim Startup]: Git Base: " + VersionInfo.GitVersion + "\n");
             if (Environment.Is64BitOperatingSystem)
-                MainConsole.Instance.Info("[WhiteCoreStartup]: Running on 64 bit architecture");
+                MainConsole.Instance.Info("[WhiteCore-Sim Startup]: Running on 64 bit architecture");
             // get memory allocation
             Process proc = Process.GetCurrentProcess();
-            MainConsole.Instance.Info("[WhiteCoreStartup]: Allocated RAM " + proc.WorkingSet64);
+            MainConsole.Instance.Info("[WhiteCore-Sim Startup]: Allocated RAM " + proc.WorkingSet64);
             if (Utilities.IsLinuxOs)
             {
                 var pc = new PerformanceCounter ("Mono Memory", "Total Physical Memory");
                 var bytes = pc.RawValue;
-                MainConsole.Instance.InfoFormat ("[WhiteCoreStartup]: Physical RAM (Mbytes): {0}", bytes / 1024000);
+                MainConsole.Instance.InfoFormat ("[WhiteCore-Sim Startup]: Physical RAM (Mbytes): {0}", bytes / 1024000);
             }
 
             SetUpHTTPServer();
@@ -538,7 +538,7 @@ namespace WhiteCore.Simulation.Base
         public virtual void HandleForceGC(IScene scene, string[] cmd)
         {
             GC.Collect();
-            MainConsole.Instance.Warn("Garbage collection finished");
+            MainConsole.Instance.Warn("[Garbage Collection Service]: Garbage collection finished");
         }
 
         public virtual void RunConfig(IScene scene, string[] cmd)
@@ -580,7 +580,7 @@ namespace WhiteCore.Simulation.Base
                 {
                     server.HostName = hostName;
                 }
-                MainConsole.Instance.Info ("Finished reloading configuration.");
+                MainConsole.Instance.Info ("[WhiteCore-Sim Configuration]: Finished reloading configuration.");
             }
         }
 
@@ -651,10 +651,10 @@ namespace WhiteCore.Simulation.Base
                 }
 
                 if (close)
-                    MainConsole.Instance.Info("[SHUTDOWN]: Terminating");
+                    MainConsole.Instance.Info("[Shut Down]: Terminating");
 
-                MainConsole.Instance.Info("[SHUTDOWN]: Shutdown processing on main thread complete. " +
-                                          (close ? " Exiting..." : ""));
+                MainConsole.Instance.Info("[Shut Down]: Shut down processing on main thread complete. " +
+                                          (close ? " Exiting WhiteCore-Sim..." : ""));
                 MainConsole.Instance.CleanInfo("");
                 MainConsole.Instance.CleanInfo("");
 

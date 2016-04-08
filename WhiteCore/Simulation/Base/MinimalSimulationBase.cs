@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -232,10 +231,8 @@ namespace WhiteCore.Simulation.Base
                 if (stpMaxThreads < 2)
                     stpMaxThreads = 2;
                 if (stpMinThreads > stpMaxThreads)
-                    stpMinThreads = stpMaxThreads;
-                
+                    stpMinThreads = stpMaxThreads;           
             }
-
 
             if (Util.FireAndForgetMethod == FireAndForgetMethod.SmartThreadPool)
                 Util.InitThreadPool(stpMinThreads, stpMaxThreads);
@@ -248,10 +245,10 @@ namespace WhiteCore.Simulation.Base
             if (MainConsole.Instance != null)
             {
                 MainConsole.Instance.DefaultPrompt = m_consolePrompt;
-                MainConsole.Instance.Info(string.Format("[MINWhiteCore]: STARTING MIN WhiteCore ({0})...",
+                MainConsole.Instance.Info(string.Format("[Mini WhiteCore-Sim]: Starting Mini WhiteCore-Sim ({0})...",
                                                         (IntPtr.Size == 4 ? "x86" : "x64")));
-                MainConsole.Instance.Info("[MINWhiteCore]: Version : " + Version + "\n");
-                MainConsole.Instance.Info("[MINWhiteCore]: Git Base: " + VersionInfo.GitVersion + "\n");
+                MainConsole.Instance.Info("[Mini WhiteCore-Sim]: Version : " + Version + "\n");
+                MainConsole.Instance.Info("[Mini WhiteCore-Sim]: Git Base: " + VersionInfo.GitVersion + "\n");
             }
         }
 
@@ -260,7 +257,7 @@ namespace WhiteCore.Simulation.Base
         /// </summary>
         public virtual void Startup()
         {
-            MainConsole.Instance.Info("[MINWhiteCore]: Startup completed in " +
+            MainConsole.Instance.Info("[Mini WhiteCore-Sim]: Startup completed in " +
                                       (DateTime.Now - this.StartupTime).TotalSeconds);
         }
 
@@ -521,7 +518,7 @@ namespace WhiteCore.Simulation.Base
         public virtual void HandleForceGC(IScene scene, string[] cmd)
         {
             GC.Collect();
-            MainConsole.Instance.Warn("Garbage collection finished");
+            MainConsole.Instance.Warn("[Garbage Collection Service]: Garbage collection finished");
         }
 
         public virtual void runConfig(IScene scene, string[] cmd)
@@ -564,7 +561,7 @@ namespace WhiteCore.Simulation.Base
                 {
                     server.HostName = hostName;
                 }
-                MainConsole.Instance.Info ("Finished reloading configuration.");
+                MainConsole.Instance.Info ("[WhiteCore-Sim Configuration]: Finished reloading configuration.");
             }
         }
 
@@ -635,10 +632,10 @@ namespace WhiteCore.Simulation.Base
                 }
 
                 if (close)
-                    MainConsole.Instance.Info("[Shutdown]: Terminating");
+                    MainConsole.Instance.Info("[Shut Down]: Terminating");
 
-                MainConsole.Instance.Info("[Shutdown]: Shutdown processing on main thread complete. " +
-                                          (close ? " Exiting..." : ""));
+                MainConsole.Instance.Info("[Shut Down]: Shut down processing on main thread complete. " +
+                                          (close ? " Exiting WhiteCore-Sim..." : ""));
 
                 if (close)
                     Environment.Exit(0);
