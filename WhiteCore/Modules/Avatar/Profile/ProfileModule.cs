@@ -638,7 +638,7 @@ namespace WhiteCore.Modules.Profiles
             
             if (Utilities.IsSystemUser (Profile.PrincipalID))
             {
-                charterMember = Utils.StringToBytes ("└");
+                charterMember = Utils.StringToBytes ("WhiteCore System User");
             }
 
             uint membershipGroupINT = 0;
