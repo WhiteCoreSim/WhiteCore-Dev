@@ -135,12 +135,12 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
 
             if (alreadyExists)
             {
-                MainConsole.Instance.InfoFormat("[LIBRARY INVENTORY]: Found previously loaded IAR file {0}, ignoring.",
+                MainConsole.Instance.InfoFormat("[Library Inventory]: Found previously loaded IAR file {0}, ignoring.",
                                                 iarFileName);
                 return;
             }
 
-            MainConsole.Instance.InfoFormat("[LIBRARY INVENTORY]: Loading IAR file {0}", iarFileName);
+            MainConsole.Instance.InfoFormat("[Library Inventory]: Loading IAR file {0}", iarFileName);
             InventoryFolderBase rootFolder = m_MockScene.InventoryService.GetRootFolder(uinfo.PrincipalID);
 
             if (rootFolder == null)
