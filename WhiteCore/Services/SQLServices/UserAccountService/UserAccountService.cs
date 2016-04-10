@@ -1540,6 +1540,14 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
         protected void HandleSaveUsers(IScene scene, string[] cmdParams)
         {
             string fileName = "users.csv";
+            
+            // This is the query string that gets all the detailed information
+            //
+            // SELECT `PrincipalID`, `FirstName`,`LastName`, `Email`, auth.passwordHash, auth.passwordSalt 
+            // FROM user_accounts LEFT JOIN auth ON user_accounts.PrincipalID=auth.UUID
+            //
+            //string fileName = "users_salted.csv";
+            
             if (cmdParams.Length < 3)
             {
                 fileName = MainConsole.Instance.Prompt ("Please enter the user CSV file to save", fileName);
