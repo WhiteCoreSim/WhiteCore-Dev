@@ -25,14 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.Servers.HttpServer.Implementation;
-using System.Collections.Generic;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.Utilities;
 using System;
-using WhiteCore.Framework.Services;
-using OpenMetaverse;
+using System.Collections.Generic;
 using Nini.Config;
+using OpenMetaverse;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.Servers.HttpServer.Implementation;
+using WhiteCore.Framework.Services;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.Web
 {
@@ -120,8 +120,9 @@ namespace WhiteCore.Modules.Web
             var dateTo = DateTime.Parse (DateEnd + " " + timeNow);
             TimeSpan period = dateTo.Subtract (dateFrom);
 
-            List<AgentPurchase> purchases;
-            purchases = moneyModule.GetPurchaseHistory (user.PrincipalID, dateFrom, dateTo, (uint)start, amountPerQuery);
+            var purchases = new List<AgentPurchase> ();
+            if (user != null && moneyModule != null)
+                purchases = moneyModule.GetPurchaseHistory (user.PrincipalID, dateFrom, dateTo, (uint)start, amountPerQuery);
 
             // data
             if (purchases.Count > 0)

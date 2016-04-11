@@ -113,16 +113,18 @@ namespace WhiteCore.Modules.Web
 
             // get admin users
             var adminUsers = accountService.GetUserAccounts (null, Constants.USER_GOD_CUSTOMER_SERVICE, 0);
-            List<Dictionary<string, object>> adminUsersList = new List<Dictionary<string, object>> ();
-
-            foreach (var user in adminUsers)
+            var adminUsersList = new List<Dictionary<string, object>> ();
+            if (adminUsers != null)
             {
-                if (!Utilities.IsSystemUser (user.PrincipalID))
-                    adminUsersList.Add (new Dictionary<string, object> { { "Value", user.Name } });
-            }
-            adminUsersList.Add (new Dictionary<string, object> { { "Value", "No One" } });
-            vars.Add ("AdminUsersList", adminUsersList);
 
+                foreach (var user in adminUsers)
+                {
+                    if (!Utilities.IsSystemUser (user.PrincipalID))
+                        adminUsersList.Add (new Dictionary<string, object> { { "Value", user.Name } });
+                }
+                adminUsersList.Add (new Dictionary<string, object> { { "Value", "No One" } });
+            }
+            vars.Add ("AdminUsersList", adminUsersList);
                 
             // details
             vars.Add ("CardNumber", rpt.Number);

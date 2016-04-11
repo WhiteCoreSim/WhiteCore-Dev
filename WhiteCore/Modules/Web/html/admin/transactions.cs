@@ -25,13 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.Servers.HttpServer.Implementation;
-using System.Collections.Generic;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.Utilities;
 using System;
+using System.Collections.Generic;
 using OpenMetaverse;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.Web
 {
@@ -121,12 +121,14 @@ namespace WhiteCore.Modules.Web
                 var dateFrom = DateTime.Parse (DateStart + " " + timeNow);
                 var dateTo = DateTime.Parse (DateEnd + " " + timeNow);
 
-                List<AgentTransfer> transactions;
-                if (UserID != UUID.Zero)
-                    transactions = moneyModule.GetTransactionHistory (UserID, UUID.Zero, dateFrom, dateTo, (uint)start, amountPerQuery);
-                else
-                    transactions = moneyModule.GetTransactionHistory (dateFrom, dateTo, (uint)start, amountPerQuery);
-
+                var transactions = new List<AgentTransfer>();
+                if (moneyModule != null)
+                {
+                    if (UserID != UUID.Zero)
+                        transactions = moneyModule.GetTransactionHistory (UserID, UUID.Zero, dateFrom, dateTo, (uint)start, amountPerQuery);
+                    else
+                        transactions = moneyModule.GetTransactionHistory (dateFrom, dateTo, (uint)start, amountPerQuery);
+                }
 
                 // data
                 if (transactions.Count > 0)

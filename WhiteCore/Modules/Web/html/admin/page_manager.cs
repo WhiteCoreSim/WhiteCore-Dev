@@ -26,11 +26,10 @@
  */
 
 
-using WhiteCore.Framework.DatabaseInterfaces;
-using WhiteCore.Framework.Servers.HttpServer;
-using WhiteCore.Framework.Servers.HttpServer.Implementation;
-using OpenMetaverse;
 using System.Collections.Generic;
+using OpenMetaverse;
+using WhiteCore.Framework.DatabaseInterfaces;
+using WhiteCore.Framework.Servers.HttpServer.Implementation;
 
 namespace WhiteCore.Modules.Web
 {
@@ -70,6 +69,9 @@ namespace WhiteCore.Modules.Web
 
             IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector>();
             GridPage rootPage = generics.GetGeneric<GridPage>(UUID.Zero, "WebPages", "Root");
+            if (rootPage == null)
+                return null;            // major bummer !!
+            
             rootPage.Children.Sort((a, b) => a.MenuPosition.CompareTo(b.MenuPosition));
             List<GridPage> allPages = new List<GridPage>(rootPage.Children);
             foreach (GridPage page in rootPage.Children)

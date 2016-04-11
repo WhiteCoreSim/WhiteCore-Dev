@@ -26,16 +26,15 @@
  */
 
 
-using WhiteCore.Framework.DatabaseInterfaces;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.Servers.HttpServer;
-using WhiteCore.Framework.Servers.HttpServer.Implementation;
-using WhiteCore.Framework.Services;
-using WhiteCore.Framework.Services.ClassHelpers.Profile;
-using OpenMetaverse;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using OpenMetaverse;
+using WhiteCore.Framework.DatabaseInterfaces;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.Servers.HttpServer.Implementation;
+using WhiteCore.Framework.Services;
+using WhiteCore.Framework.Services.ClassHelpers.Profile;
 
 namespace WhiteCore.Modules.Web
 {

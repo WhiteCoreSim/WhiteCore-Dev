@@ -25,18 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System.Collections.Generic;
+using System.IO;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using WhiteCore.Framework.SceneInfo;
-using OpenMetaverse;
-using System.Collections.Generic;
-using System.IO;
 using GridRegion = WhiteCore.Framework.Services.GridRegion;
 using RegionFlags = WhiteCore.Framework.Services.RegionFlags;
-using Nini.Config;
 
 
 namespace WhiteCore.Modules.Web
@@ -79,12 +79,19 @@ namespace WhiteCore.Modules.Web
 
                 IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector>();
                 EstateSettings estate = estateConnector.GetEstateSettings(region.RegionID);
+                if (estate != null)
+                {
+                    vars.Add ("OwnerUUID", estate.EstateOwner);
+                    var estateOwnerAccount = webInterface.Registry.RequestModuleInterface<IUserAccountService> ().
+                    GetUserAccount (null, estate.EstateOwner);
+                    vars.Add ("OwnerName", estateOwnerAccount == null ? "No account found" : estateOwnerAccount.Name);
+                } else
+                {
+                    vars.Add ("OwnerUUID", "Unknown");
+                    vars.Add ("OwnerName", "Unknown");
+                }
 
                 vars.Add("RegionName", region.RegionName);
-                vars.Add("OwnerUUID", estate.EstateOwner);
-                var estateOwnerAccount = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
-                    GetUserAccount(null, estate.EstateOwner);
-                vars.Add("OwnerName", estateOwnerAccount == null ? "No account found" : estateOwnerAccount.Name);
                 vars.Add("RegionLocX", region.RegionLocX/Constants.RegionSize);
                 vars.Add("RegionLocY", region.RegionLocY/Constants.RegionSize);
                 vars.Add("RegionSizeX", region.RegionSizeX);
@@ -106,16 +113,19 @@ namespace WhiteCore.Modules.Web
                     List<UserInfo> usersInRegion = agentInfoService.GetUserInfos(region.RegionID);
                     vars.Add("NumberOfUsersInRegion", usersInRegion.Count);
                     List<Dictionary<string, object>> users = new List<Dictionary<string, object>>();
-                    foreach (var client in usersInRegion)
+                    if (userService != null)
                     {
-                        UserAccount account = userService.GetUserAccount(null, (UUID) client.UserID);
-                        if (account == null)
-                            continue;
-                        Dictionary<string, object> user = new Dictionary<string, object>();
-                        user.Add("UserNameText", translator.GetTranslatedString("UserNameText"));
-                        user.Add("UserUUID", client.UserID);
-                        user.Add("UserName", account.Name);
-                        users.Add(user);
+                        foreach (var client in usersInRegion)
+                        {
+                            UserAccount account = userService.GetUserAccount (null, (UUID)client.UserID);
+                            if (account == null)
+                                continue;
+                            Dictionary<string, object> user = new Dictionary<string, object> ();
+                            user.Add ("UserNameText", translator.GetTranslatedString ("UserNameText"));
+                            user.Add ("UserUUID", client.UserID);
+                            user.Add ("UserName", account.Name);
+                            users.Add (user);
+                        }
                     }
                     vars.Add("UsersInRegion", users);
                 }
@@ -154,7 +164,10 @@ namespace WhiteCore.Modules.Web
 
                     vars.Add("ParcelInRegion", parcels);
 */
-                    vars.Add("NumberOfParcelsInRegion", parcelData.Count);
+                    if (parcelData != null)
+                        vars.Add("NumberOfParcelsInRegion", parcelData.Count);
+                    else
+                        vars.Add("NumberOfParcelsInRegion", 0);
                 }
                 IWebHttpTextureService webTextureService = webInterface.Registry.
                     RequestModuleInterface<IWebHttpTextureService>();

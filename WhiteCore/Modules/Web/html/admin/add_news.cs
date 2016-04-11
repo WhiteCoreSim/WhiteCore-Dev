@@ -26,12 +26,11 @@
  */
 
 
-using WhiteCore.Framework.DatabaseInterfaces;
-using WhiteCore.Framework.Servers.HttpServer;
-using WhiteCore.Framework.Servers.HttpServer.Implementation;
-using OpenMetaverse;
 using System;
 using System.Collections.Generic;
+using OpenMetaverse;
+using WhiteCore.Framework.DatabaseInterfaces;
+using WhiteCore.Framework.Servers.HttpServer.Implementation;
 
 namespace WhiteCore.Modules.Web
 {

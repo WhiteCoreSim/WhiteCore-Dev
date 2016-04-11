@@ -25,14 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.DatabaseInterfaces;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.Servers.HttpServer.Implementation;
-using WhiteCore.Framework.Services;
-using OpenMetaverse;
 using System.Collections.Generic;
 using System.IO;
+using OpenMetaverse;
+using WhiteCore.Framework.DatabaseInterfaces;
+using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
+using WhiteCore.Framework.Servers.HttpServer.Implementation;
+using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
 using GridRegion = WhiteCore.Framework.Services.GridRegion;
 using RegionFlags = WhiteCore.Framework.Services.RegionFlags;
@@ -81,13 +81,21 @@ namespace WhiteCore.Modules.Web
                 var region = regionService.GetRegionByUUID(null, UUID.Parse(httpRequest.Query["regionid"].ToString()));
 
                 IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector>();
-                EstateSettings estate = estateConnector.GetEstateSettings(region.RegionID);
+                if (estateConnector != null)
+                {
+
+                    EstateSettings estate = estateConnector.GetEstateSettings (region.RegionID);
+                    vars.Add ("OwnerUUID", estate.EstateOwner);
+                    var estateOwnerAccount = webInterface.Registry.RequestModuleInterface<IUserAccountService> ().
+                        GetUserAccount (null, estate.EstateOwner);
+                    vars.Add ("OwnerName", estateOwnerAccount == null ? "No account found" : estateOwnerAccount.Name);
+                } else
+                {
+                    vars.Add ("OwnerUUID", "Unknown");
+                    vars.Add ("OwnerName", "Unknown");
+                }
 
                 vars.Add("RegionName", region.RegionName);
-                vars.Add("OwnerUUID", estate.EstateOwner);
-                var estateOwnerAccount = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
-                    GetUserAccount(null, estate.EstateOwner);
-                vars.Add("OwnerName", estateOwnerAccount == null ? "No account found" : estateOwnerAccount.Name);
                 vars.Add("RegionLocX", region.RegionLocX/Constants.RegionSize);
                 vars.Add("RegionLocY", region.RegionLocY/Constants.RegionSize);
                 vars.Add("RegionSizeX", region.RegionSizeX);
@@ -104,31 +112,34 @@ namespace WhiteCore.Modules.Web
                     Framework.Utilities.DataManager.RequestPlugin<IDirectoryServiceConnector>();
                 if (directoryConnector != null)
                 {
+                    IUserAccountService accountService =
+                        webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
                     List<LandData> data = directoryConnector.GetParcelsByRegion(0, 10, region.RegionID, UUID.Zero,
                         ParcelFlags.None, ParcelCategory.Any);
                     List<Dictionary<string, object>> parcels = new List<Dictionary<string, object>>();
                     string url = "../images/icons/no_parcel.jpg";
 
-                    foreach (var p in data)
+                    if (data != null)
                     {
-                        Dictionary<string, object> parcel = new Dictionary<string, object>();
-                        parcel.Add("ParcelNameText", translator.GetTranslatedString("ParcelNameText"));
-                        parcel.Add("ParcelOwnerText", translator.GetTranslatedString("ParcelOwnerText"));
-                        parcel.Add("ParcelUUID", p.GlobalID);
-                        parcel.Add("ParcelName", p.Name);
-                        parcel.Add("ParcelOwnerUUID", p.OwnerID);
-                        parcel.Add ("ParcelSnapshotURL", url);
-                        IUserAccountService accountService =
-                            webInterface.Registry.RequestModuleInterface<IUserAccountService>();
-                        if (accountService != null)
+                        foreach (var p in data)
                         {
-                            var account = accountService.GetUserAccount(null, p.OwnerID);
-                            if (account == null)
-                                parcel.Add("ParcelOwnerName", translator.GetTranslatedString("NoAccountFound"));
-                            else
-                                parcel.Add("ParcelOwnerName", account.Name);
+                            Dictionary<string, object> parcel = new Dictionary<string, object> ();
+                            parcel.Add ("ParcelNameText", translator.GetTranslatedString ("ParcelNameText"));
+                            parcel.Add ("ParcelOwnerText", translator.GetTranslatedString ("ParcelOwnerText"));
+                            parcel.Add ("ParcelUUID", p.GlobalID);
+                            parcel.Add ("ParcelName", p.Name);
+                            parcel.Add ("ParcelOwnerUUID", p.OwnerID);
+                            parcel.Add ("ParcelSnapshotURL", url);
+                            if (accountService != null)
+                            {
+                                var account = accountService.GetUserAccount (null, p.OwnerID);
+                                if (account == null)
+                                    parcel.Add ("ParcelOwnerName", translator.GetTranslatedString ("NoAccountFound"));
+                                else
+                                    parcel.Add ("ParcelOwnerName", account.Name);
+                            }
+                            parcels.Add (parcel);
                         }
-                        parcels.Add(parcel);
                     }
                     vars.Add("ParcelInRegion", parcels);
                     vars.Add("NumberOfParcelsInRegion", parcels.Count);

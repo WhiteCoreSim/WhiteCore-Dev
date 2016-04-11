@@ -25,11 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.Servers.HttpServer.Implementation;
-using OpenMetaverse;
-using System.Collections.Generic;
-using WhiteCore.Framework.Services;
 using System;
+using System.Collections.Generic;
+using OpenMetaverse;
+using WhiteCore.Framework.Servers.HttpServer.Implementation;
+using WhiteCore.Framework.Services;
 
 namespace WhiteCore.Modules.Web
 {

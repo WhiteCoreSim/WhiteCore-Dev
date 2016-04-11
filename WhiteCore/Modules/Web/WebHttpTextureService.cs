@@ -97,23 +97,21 @@ namespace WhiteCore.Modules.Web
                     // Decode image to System.Drawing.Image
                     Image image;
                     ManagedImage managedImage;
+                    EncoderParameters myEncoderParameters = new EncoderParameters();
+                    myEncoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 75L);
                     if (OpenJPEG.DecodeToImage(mapasset, out managedImage, out image))
                     {
                         // Save to bitmap
-                        using (Bitmap texture = ResizeBitmap(image, 256, 256))
-                        {
-                            EncoderParameters myEncoderParameters = new EncoderParameters();
-                            myEncoderParameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality,
-                                                                                75L);
-
-                            // Save bitmap to stream
+                        var texture = ResizeBitmap(image, 256, 256);
+                        var encInfo = GetEncoderInfo ("image/jpeg");
+                        if (encInfo != null)
                             texture.Save(imgstream, GetEncoderInfo("image/jpeg"), myEncoderParameters);
 
-                            // Write the stream to a byte array for output
-                            jpeg = imgstream.ToArray();
-                        }
-                        image.Dispose();
+                        // Write the stream to a byte array for output
+                        jpeg = imgstream.ToArray();
+                        
                     }
+                    image.Dispose();
                 }
             }
 
@@ -131,6 +129,7 @@ namespace WhiteCore.Modules.Web
             temp.DrawString(_gridNick, new Font("Arial", 8, FontStyle.Regular),
                             new SolidBrush(Color.FromArgb(90, 255, 255, 50)), new Point(2, nHeight - 13));
 
+            temp.Dispose();
             return newsize;
         }
 

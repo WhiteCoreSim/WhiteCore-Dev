@@ -25,8 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using System.Collections.Generic;
+using WhiteCore.Framework.Servers.HttpServer.Implementation;
 
 namespace WhiteCore.Modules.Web
 {

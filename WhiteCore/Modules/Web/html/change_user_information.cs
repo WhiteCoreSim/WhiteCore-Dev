@@ -25,10 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System.Collections.Generic;
+using OpenMetaverse;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
-using OpenMetaverse;
-using System.Collections.Generic;
 
 namespace WhiteCore.Modules.Web
 {
@@ -64,6 +64,11 @@ namespace WhiteCore.Modules.Web
 
             string error = "";
             UserAccount user = Authenticator.GetAuthentication(httpRequest);
+            if (user != null)
+            {
+                response = "No authentication service was available to change your password";
+                return null;
+            }
             vars.Add ("UserName", user.Name);
 
             // password change

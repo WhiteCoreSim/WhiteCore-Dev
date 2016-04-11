@@ -25,14 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using OpenMetaverse;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Profile;
 using WhiteCore.Framework.Utilities;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
 
 namespace WhiteCore.Modules.Web
 {
@@ -73,8 +73,12 @@ namespace WhiteCore.Modules.Web
                             : UUID.Parse(requestParameters["userid"].ToString());
 
             IUserAccountService userService = webInterface.Registry.RequestModuleInterface<IUserAccountService>();
+            UserAccount account = null;
+
+            if (userService != null)
+                account = userService.GetUserAccount(null, userID);
+            
             var agentService = Framework.Utilities.DataManager.RequestPlugin<IAgentConnector>();
-            UserAccount account = userService.GetUserAccount(null, userID);
             IAgentInfo agent = agentService.GetAgent(userID);
 
             if (agent == null)
@@ -89,14 +93,17 @@ namespace WhiteCore.Modules.Web
                 int UserFlags = webInterface.UserTypeToUserFlags (UserType);
 
                 // set the user account type
-                account.UserFlags = UserFlags;
-                userService.StoreUserAccount (account);
+                if (account != null)
+                {
+                    account.UserFlags = UserFlags;
+                    userService.StoreUserAccount (account);
+                } else
+                    response = "Unable to update user account!'";
 
                 if (agent != null)
                 {
                     agent.OtherAgentInformation ["UserFlags"] = UserFlags;
                     agentService.UpdateAgent (agent);
-                    response = "User has been updated.";
                 } else
                     response = "Agent information is not available! Has the user logged in yet?";
 
@@ -115,7 +122,8 @@ namespace WhiteCore.Modules.Web
                     profileData.UpdateUserProfile (profile);
                 }
 
-                response = "User has been updated.";
+                if (response == null)
+                    response = "User has been updated.";
                 return null;
             }
 
@@ -148,7 +156,7 @@ namespace WhiteCore.Modules.Web
             {
                 string email = requestParameters["email"].ToString();
 
-                if (userService != null)
+                if (account != null)
                 {
                     account.Email = email;
                     userService.StoreUserAccount(account);

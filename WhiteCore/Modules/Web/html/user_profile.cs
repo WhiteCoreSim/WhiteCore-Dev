@@ -25,15 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.Servers.HttpServer.Implementation;
-using WhiteCore.Framework.Services;
 using System.Collections.Generic;
 using System.Linq;
 using OpenMetaverse;
-using WhiteCore.Framework.Utilities;
-using WhiteCore.Framework.Services.ClassHelpers.Profile;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.Servers.HttpServer.Implementation;
+using WhiteCore.Framework.Services;
+using WhiteCore.Framework.Services.ClassHelpers.Profile;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.Web
 {
@@ -158,18 +158,22 @@ namespace WhiteCore.Modules.Web
 
             if (groupsConnector != null)
             {
-                foreach (var grp in groupsConnector.GetAgentGroupMemberships(account.PrincipalID, account.PrincipalID))
+                var groupsIn = groupsConnector.GetAgentGroupMemberships(account.PrincipalID, account.PrincipalID);
+                if (groupsIn != null)
                 {
-                    var grpData = groupsConnector.GetGroupProfile (account.PrincipalID, grp.GroupID);
-                    string url = "../images/icons/no_groups.jpg";
-                    if (webhttpService != null && grpData.InsigniaID != UUID.Zero)
-                        url = webhttpService.GetTextureURL (grpData.InsigniaID);
-                    groups.Add (new Dictionary<string, object> {
-                        { "GroupPictureURL", url },
-                        { "GroupName", grp.GroupName }
-                    });
-
+                    foreach (var grp in groupsIn)
+                    {
+                        var grpData = groupsConnector.GetGroupProfile (account.PrincipalID, grp.GroupID);
+                        string url = "../images/icons/no_groups.jpg";
+                        if (webhttpService != null && grpData.InsigniaID != UUID.Zero)
+                            url = webhttpService.GetTextureURL (grpData.InsigniaID);
+                        groups.Add (new Dictionary<string, object> {
+                            { "GroupPictureURL", url },
+                            { "GroupName", grp.GroupName }
+                        });
+                    }
                 }
+            
 
                 if (groups.Count == 0)
                 {

@@ -25,14 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.DatabaseInterfaces;
-using OpenMetaverse;
 using Nini.Config;
+using OpenMetaverse;
+using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
 
 namespace WhiteCore.Modules.Web
 {
-    internal class SettingsMigrator
+    class SettingsMigrator
     {
         public static readonly string Schema = "WebSettings";
         public static uint CurrentVersion = 2;

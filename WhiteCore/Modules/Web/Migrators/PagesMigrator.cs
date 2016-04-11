@@ -25,19 +25,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.DatabaseInterfaces;
-using OpenMetaverse;
 using System.Collections.Generic;
+using OpenMetaverse;
+using WhiteCore.Framework.DatabaseInterfaces;
 
 namespace WhiteCore.Modules.Web
 {
-    internal class PagesMigrator
+    class PagesMigrator
     {
+        static GridPage _rootPage;
         public static readonly string Schema = "WebPages";
-        private static GridPage _rootPage;
         public static readonly uint CurrentVersion = 11;
 
-        private static void InitializeDefaults()
+        static void InitializeDefaults()
         {
             _rootPage = new GridPage();
 

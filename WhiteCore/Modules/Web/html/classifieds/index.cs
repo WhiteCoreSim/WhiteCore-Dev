@@ -27,11 +27,6 @@
 
 using System.Collections.Generic;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
-using WhiteCore.Framework.Services;
-using System;
-using WhiteCore.Framework.Modules;
-using OpenMetaverse;
-using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.Web
 {

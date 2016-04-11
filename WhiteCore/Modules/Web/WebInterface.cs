@@ -125,8 +125,8 @@ namespace WhiteCore.Modules.Web
         {
             Registry = registry;
 
-            var webPages = WhiteCoreModuleLoader.PickupModules<IWebInterfacePage>();
-            foreach (var pages in webPages)
+            var wbPages = WhiteCoreModuleLoader.PickupModules<IWebInterfacePage>();
+            foreach (var pages in wbPages)
             {
                 foreach (var page in pages.FilePath)
                 {
@@ -203,10 +203,11 @@ namespace WhiteCore.Modules.Web
         protected byte[] FindAndSendPage(string path, Stream request, OSHttpRequest httpRequest,
                                          OSHttpResponse httpResponse)
         {
-            byte[] response = MainServer.BlankResponse;
+            byte[] response;
             string filename = GetFileNameFromHTMLPath(path, httpRequest.Query);
             if (filename == null)
                 return MainServer.BlankResponse;
+            
             if (httpRequest.HttpMethod == "POST")
                 httpResponse.KeepAlive = false;
             MainConsole.Instance.Debug("[WebInterface]: Serving " + filename + ", keep-alive: " + httpResponse.KeepAlive);
@@ -245,20 +246,22 @@ namespace WhiteCore.Modules.Web
                 }
                 else
                 {
-                    string respStr = null;
-                    var vars = AddVarsForPage(filename, filename, httpRequest,
-                                              httpResponse, requestParameters, out respStr);
+                    string respStr;
+                    var vars = AddVarsForPage(filename, filename, httpRequest, httpResponse, requestParameters, out respStr);
 
                     AddDefaultVarsForPage(ref vars);
 
                     if (!string.IsNullOrEmpty(respStr))
-                        return response = Encoding.UTF8.GetBytes(respStr);
+                        return Encoding.UTF8.GetBytes(respStr);
+                    
                     if (httpResponse.StatusCode != 200)
                         return MainServer.BlankResponse;
+                    
                     if (vars == null)
                         return MainServer.BadRequest;
-                    response = Encoding.UTF8.GetBytes(ConvertHTML(filename, text, httpRequest, httpResponse,
-                                                                  requestParameters, vars));
+                    
+                    response = Encoding.UTF8.GetBytes(
+                        ConvertHTML(filename, text, httpRequest, httpResponse, requestParameters, vars));
                 }
             }
             else
@@ -291,7 +294,7 @@ namespace WhiteCore.Modules.Web
                                                             out string response)
         {
             response = null;
-            Dictionary<string, object> vars = new Dictionary<string, object>();
+            Dictionary<string, object> vars;
             IWebInterfacePage page = GetPage(filename);
             if (page != null)
             {
@@ -300,8 +303,7 @@ namespace WhiteCore.Modules.Web
                 {
                     translator =
                         _translators.FirstOrDefault(t => t.LanguageName == httpRequest.Query["language"].ToString());
-                    httpResponse.AddCookie(new System.Web.HttpCookie("language",
-                                                                     httpRequest.Query["language"].ToString()));
+                    httpResponse.AddCookie(new HttpCookie("language", httpRequest.Query["language"].ToString()));
                 }
                 else if (httpRequest.Cookies.Get("language") != null)
                 {
@@ -328,7 +330,7 @@ namespace WhiteCore.Modules.Web
             return null;
         }
 
-        private WhiteCoreXmlDocument GetXML(string filename, OSHttpRequest httpRequest, OSHttpResponse httpResponse,
+        WhiteCoreXmlDocument GetXML(string filename, OSHttpRequest httpRequest, OSHttpResponse httpResponse,
                                          Dictionary<string, object> requestParameters)
         {
             IWebInterfacePage page = GetPage(filename);
@@ -351,11 +353,11 @@ namespace WhiteCore.Modules.Web
                             return null;
                     }
                 }
-                string response = null;
-                return
-                    (WhiteCoreXmlDocument)
-                    page.Fill(this, filename, httpRequest, httpResponse, requestParameters, translator, out response)[
-                        "xml"];
+                string response;
+                var pageVars = page.Fill(this, filename, httpRequest, httpResponse, requestParameters, translator,
+                    out response)["xml"];
+                if (pageVars != null)
+                    return (WhiteCoreXmlDocument) pageVars;
             }
             return null;
         }
@@ -379,13 +381,16 @@ namespace WhiteCore.Modules.Web
                     for (int i = 0; i < split.Length; i += 2)
                     {
                         string filename = GetFileNameFromHTMLPath(split[i], request.Query);
-                        string response = null;
-                        Dictionary<string, object> newVars = AddVarsForPage(filename, originalFileName,
-                                                                            request, httpResponse, requestParameters,
-                                                                            out response);
-                        AddDefaultVarsForPage(ref newVars);
-                        sb.AppendLine(ConvertHTML(filename, File.ReadAllText(filename),
-                                                  request, httpResponse, requestParameters, newVars));
+                        if (filename != null)
+                        {
+                            string response;
+                            Dictionary<string, object> newVars = AddVarsForPage (filename, originalFileName,
+                                                                     request, httpResponse, requestParameters,
+                                                                     out response);
+                            AddDefaultVarsForPage (ref newVars);
+                            sb.AppendLine (ConvertHTML (filename, File.ReadAllText (filename),
+                                request, httpResponse, requestParameters, newVars));
+                        }
                     }
                 }
                 else if (cleanLine.StartsWith("<!--#include folder="))
@@ -395,26 +400,31 @@ namespace WhiteCore.Modules.Web
                     for (int i = split.Length%2 == 0 ? 0 : 1; i < split.Length; i += 2)
                     {
                         string filename = GetFileNameFromHTMLPath(split[i], request.Query).Replace("index.html", "");
-                        if (Directory.Exists(filename))
+                        if (filename != null)
                         {
-                            string response = null;
-                            Dictionary<string, object> newVars = AddVarsForPage(filename, filename, request,
-                                                                                httpResponse,
-                                                                                requestParameters, out response);
-                            string[] files = Directory.GetFiles(filename);
-                            foreach (string f in files)
+                            if (Directory.Exists (filename))
                             {
-                                if (!f.EndsWith(".html")) continue;
-                                Dictionary<string, object> newVars2 =
-                                    AddVarsForPage(f, filename, request, httpResponse, requestParameters, out response) ??
-                                    new Dictionary<string, object>();
-                                foreach (
+                                string response;
+                                Dictionary<string, object> newVars = AddVarsForPage (filename, filename, request,
+                                                                     httpResponse,
+                                                                     requestParameters, out response);
+                                string[] files = Directory.GetFiles (filename);
+                                foreach (string f in files)
+                                {
+                                    if (!f.EndsWith (".html"))
+                                        continue;
+                                    
+                                    Dictionary<string, object> newVars2 =
+                                        AddVarsForPage (f, filename, request, httpResponse, requestParameters, out response) ??
+                                        new Dictionary<string, object> ();
+                                    foreach (
                                     KeyValuePair<string, object> pair in
                                         newVars.Where(pair => !newVars2.ContainsKey(pair.Key)))
-                                    newVars2.Add(pair.Key, pair.Value);
-                                AddDefaultVarsForPage(ref newVars2);
-                                sb.AppendLine(ConvertHTML(f, File.ReadAllText(f), request, httpResponse,
-                                                          requestParameters, newVars2));
+                                        newVars2.Add (pair.Key, pair.Value);
+                                    AddDefaultVarsForPage (ref newVars2);
+                                    sb.AppendLine (ConvertHTML (f, File.ReadAllText (f), request, httpResponse,
+                                        requestParameters, newVars2));
+                                }
                             }
                         }
                     }
@@ -439,30 +449,30 @@ namespace WhiteCore.Modules.Web
                                                               httpResponse, requestParameters, dict));
                         }
                     }
-                    else if ((indEnd = cleanLine.IndexOf("AuthenticatedBegin}")) != -1)
+                    else if ((indEnd = cleanLine.IndexOf ("AuthenticatedBegin}", StringComparison.Ordinal)) != -1)
                     {
                         string key = cleanLine.Substring(1, indEnd - 1) + "AuthenticatedEnd";
                         int posToCheckFrom = FindLines(lines, pos, "", key);
                         if (!CheckAuth(cleanLine, request))
                             pos = posToCheckFrom;
                     }
-                    else if ((indBegin = cleanLine.IndexOf("{If")) != -1 &&
-                             (indEnd = cleanLine.IndexOf("Begin}")) != -1)
+                    else if ((indBegin = cleanLine.IndexOf ("{If", StringComparison.Ordinal)) != -1 &&
+                             (indEnd = cleanLine.IndexOf ("Begin}", StringComparison.Ordinal)) != -1)
                     {
                         string key = cleanLine.Substring(indBegin + 3, indEnd - indBegin - 3);
                         int posToCheckFrom = FindLines(lines, pos, "If" + key, "End");
-                        if (!vars.ContainsKey(key) || ((bool) vars[key]) == false)
+                        if (!vars.ContainsKey(key) || (!(bool) vars[key]))
                             pos = posToCheckFrom;
                     }
-                    else if ((indBegin = cleanLine.IndexOf("{If")) != -1 &&
-                             (indEnd = cleanLine.IndexOf("End}")) != -1)
+                    else if ((cleanLine.IndexOf ("{If", StringComparison.Ordinal)) != -1 &&
+                             (cleanLine.IndexOf ("End}", StringComparison.Ordinal)) != -1)
                     {
                         //end of an if statement, just ignore it
                     }
-                    else if ((indBegin = cleanLine.IndexOf("{Is")) != -1 &&
-                             (indEnd = cleanLine.IndexOf("End}")) != -1)
+                    else if ((cleanLine.IndexOf ("{Is", StringComparison.Ordinal)) != -1 &&
+                             (cleanLine.IndexOf ("End}", StringComparison.Ordinal)) != -1)
                     {
-                        //end of an if statement, just ignore it
+                        //end of an is statement, just ignore it
                     }
                     else
                         sb.AppendLine(line);
@@ -480,28 +490,24 @@ namespace WhiteCore.Modules.Web
         /// <param name="p"></param>
         /// <param name="request"></param>
         /// <returns></returns>
-        private bool CheckAuth(string p, OSHttpRequest request)
+        bool CheckAuth(string p, OSHttpRequest request)
         {
-            if (p.StartsWith("{IsAuthenticatedBegin}"))
-            {
-                return Authenticator.CheckAuthentication(request);
-            }
-            else if (p.StartsWith("{IsNotAuthenticatedBegin}"))
-            {
-                return !Authenticator.CheckAuthentication(request);
-            }
-            else if (p.StartsWith("{IsAdminAuthenticatedBegin}"))
-            {
-                return Authenticator.CheckAdminAuthentication(request);
-            }
-            else if (p.StartsWith("{IsNotAdminAuthenticatedBegin}"))
-            {
-                return !Authenticator.CheckAdminAuthentication(request);
-            }
+            if (p.StartsWith ("{IsAuthenticatedBegin}", StringComparison.Ordinal))
+                return Authenticator.CheckAuthentication (request);
+            
+            if (p.StartsWith ("{IsNotAuthenticatedBegin}", StringComparison.Ordinal))
+                return !Authenticator.CheckAuthentication (request);
+            
+            if (p.StartsWith ("{IsAdminAuthenticatedBegin}", StringComparison.Ordinal))
+                return Authenticator.CheckAdminAuthentication (request);
+            
+            if (p.StartsWith ("{IsNotAdminAuthenticatedBegin}", StringComparison.Ordinal))
+                return !Authenticator.CheckAdminAuthentication (request);
+            
             return false;
         }
 
-        private static int FindLines(string[] lines, int pos, string keyToCheck, string type)
+        static int FindLines(string[] lines, int pos, string keyToCheck, string type)
         {
             int posToCheckFrom = pos + 1;
             while (!lines[posToCheckFrom++].TrimStart().StartsWith("{" + keyToCheck + type + "}"))
@@ -510,7 +516,7 @@ namespace WhiteCore.Modules.Web
             return posToCheckFrom - 1;
         }
 
-        private static List<string> ExtractLines(string[] lines, int pos,
+        static List<string> ExtractLines(string[] lines, int pos,
                                                  string keyToCheck, string type, out int posToCheckFrom)
         {
             posToCheckFrom = pos + 1;
@@ -526,16 +532,16 @@ namespace WhiteCore.Modules.Web
             {
                 case ".jpeg":
                 case ".jpg":
-                    response.AddHeader("Cache-Control", "Public;max-age=" + CLIENT_CACHE_TIME.ToString());
+                    response.AddHeader("Cache-Control", "Public;max-age=" + CLIENT_CACHE_TIME);
                     return "image/jpeg";
                 case ".gif":
-                    response.AddHeader("Cache-Control", "Public;max-age=" + CLIENT_CACHE_TIME.ToString());
+                    response.AddHeader("Cache-Control", "Public;max-age=" + CLIENT_CACHE_TIME);
                     return "image/gif";
                 case ".png":
-                    response.AddHeader("Cache-Control", "Public;max-age=" + CLIENT_CACHE_TIME.ToString());
+                    response.AddHeader("Cache-Control", "Public;max-age=" + CLIENT_CACHE_TIME);
                     return "image/png";
                 case ".tiff":
-                    response.AddHeader("Cache-Control", "Public;max-age=" + CLIENT_CACHE_TIME.ToString());
+                    response.AddHeader("Cache-Control", "Public;max-age=" + CLIENT_CACHE_TIME);
                     return "image/tiff";
                 case ".html":
                 case ".htm":
@@ -543,11 +549,11 @@ namespace WhiteCore.Modules.Web
                     response.AddHeader("Cache-Control", "no-cache");
                     return "text/html";
                 case ".css":
-                    //response.AddHeader("Cache-Control", "max-age=" + CLIENT_CACHE_TIME.ToString() + ", public");
+                    //response.AddHeader("Cache-Control", "max-age=" + CLIENT_CACHE_TIME + ", public");
                     response.AddHeader("Cache-Control", "no-cache");
                     return "text/css";
                 case ".js":
-                    //response.AddHeader("Cache-Control", "max-age=" + CLIENT_CACHE_TIME.ToString() + ", public");
+                    //response.AddHeader("Cache-Control", "max-age=" + CLIENT_CACHE_TIME + ", public");
                     return "application/javascript";
             }
             return "text/plain";
@@ -580,9 +586,9 @@ namespace WhiteCore.Modules.Web
                     if (Path.GetFileName(file) == "")
                         file = Path.Combine(file, "index.html");
 
-                    if (query.ContainsKey("page") && _pages.ContainsKey("html/" + query["page"].ToString() + ".html"))
+                    if (query.ContainsKey("page") && _pages.ContainsKey("html/" + query["page"] + ".html"))
                     {
-                        file = _pages["html/" + query["page"].ToString() + ".html"].FilePath[0];
+                        file = _pages["html/" + query["page"] + ".html"].FilePath[0];
                     }
                 }
                 if (!File.Exists(file))
@@ -595,7 +601,7 @@ namespace WhiteCore.Modules.Web
             }
             catch
             {
-                return null;
+                return "html/http_404.html";
             }
         }
 
@@ -800,7 +806,7 @@ namespace WhiteCore.Modules.Web
             IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
             generics.AddGeneric(UUID.Zero, "WebUISettings", "Settings", settings.ToOSD());
 
-            webUISettings = settings;;
+            webUISettings = settings;
         }
 
         public GridSettings GetGridSettings()
@@ -842,7 +848,7 @@ namespace WhiteCore.Modules.Web
         }
     }
 
-    internal class GridNewsItem : IDataTransferable
+    class GridNewsItem : IDataTransferable
     {
         public static readonly GridNewsItem NoNewsItem = new GridNewsItem()
                                                              {
@@ -889,7 +895,7 @@ namespace WhiteCore.Modules.Web
         }
     }
 
-    internal class GridWelcomeScreen : IDataTransferable
+    class GridWelcomeScreen : IDataTransferable
     {
         public static readonly GridWelcomeScreen Default = new GridWelcomeScreen
                                                                {
@@ -928,7 +934,7 @@ namespace WhiteCore.Modules.Web
         }
     }
 
-    internal class GridPage : IDataTransferable
+    class GridPage : IDataTransferable
     {
         public List<GridPage> Children = new List<GridPage>();
         public bool ShowInMenu = false;
@@ -997,9 +1003,10 @@ namespace WhiteCore.Modules.Web
             {
                 if (page.MenuID == item)
                     return page;
-                else if (page.Children.Count > 0)
+
+                if (page.Children.Count > 0)
                 {
-                    var p = GetPage(item, page);
+                    var p = GetPage (item, page);
                     if (p != null)
                         return p;
                 }
@@ -1020,9 +1027,10 @@ namespace WhiteCore.Modules.Web
             {
                 if (page.Location == item)
                     return page;
-                else if (page.Children.Count > 0)
+                
+                if (page.Children.Count > 0)
                 {
-                    var p = GetPageByLocation(item, page);
+                    var p = GetPageByLocation (item, page);
                     if (p != null)
                         return p;
                 }
@@ -1030,21 +1038,22 @@ namespace WhiteCore.Modules.Web
             return null;
         }
 
-        public void ReplacePage(string MenuItem, GridPage replacePage)
+        public void ReplacePage(string menuItem, GridPage replacePage)
         {
-            foreach (var page in this.Children)
+            foreach (var page in Children)
             {
-                if (page.MenuID == MenuItem)
+                if (page.MenuID == menuItem)
                 {
-                    page.FromOSD(replacePage.ToOSD());
+                    page.FromOSD (replacePage.ToOSD ());
                     return;
                 }
-                else if (page.Children.Count > 0)
+
+                if (page.Children.Count > 0)
                 {
-                    var p = GetPage(MenuItem, page);
+                    var p = GetPage (menuItem, page);
                     if (p != null)
                     {
-                        p.FromOSD(replacePage.ToOSD());
+                        p.FromOSD (replacePage.ToOSD ());
                         return;
                     }
                 }
@@ -1054,14 +1063,15 @@ namespace WhiteCore.Modules.Web
         public void RemovePage(string MenuID, GridPage replacePage)
         {
             GridPage foundPage = null;
-            foreach (var page in this.Children)
+            foreach (var page in Children)
             {
                 if (page.MenuID == MenuID)
                 {
                     foundPage = page;
                     break;
                 }
-                else if (page.Children.Count > 0)
+
+                if (page.Children.Count > 0)
                 {
                     var p = GetPage(MenuID, page);
                     if (p != null)
@@ -1072,22 +1082,23 @@ namespace WhiteCore.Modules.Web
                 }
             }
             if (foundPage != null)
-                this.Children.Remove(foundPage);
+                Children.Remove(foundPage);
         }
 
-        public void RemovePageByLocation(string MenuLocation, GridPage replacePage)
+        public void RemovePageByLocation(string menuLocation, GridPage replacePage)
         {
             GridPage foundPage = null;
-            foreach (var page in this.Children)
+            foreach (var page in Children)
             {
-                if (page.Location == MenuLocation)
+                if (page.Location == menuLocation)
                 {
                     foundPage = page;
                     break;
                 }
-                else if (page.Children.Count > 0)
+
+                if (page.Children.Count > 0)
                 {
-                    var p = GetPageByLocation(MenuLocation, page);
+                    var p = GetPageByLocation(menuLocation, page);
                     if (p != null)
                     {
                         page.Children.Remove(p);
@@ -1096,7 +1107,7 @@ namespace WhiteCore.Modules.Web
                 }
             }
             if (foundPage != null)
-                this.Children.Remove(foundPage);
+                Children.Remove(foundPage);
         }
 
         public GridPage GetParent(GridPage page)
@@ -1112,7 +1123,8 @@ namespace WhiteCore.Modules.Web
             {
                 if (item.Location == p.Location)
                     return toCheck;
-                else if (p.Children.Count > 0)
+
+                if (p.Children.Count > 0)
                 {
                     var pp = GetParent(item, p);
                     if (pp != null)
@@ -1163,7 +1175,7 @@ namespace WhiteCore.Modules.Web
         }
     }
 
-    internal class WebUISettings : IDataTransferable
+    class WebUISettings : IDataTransferable
     {
         public Vector2 MapCenter = Vector2.Zero;
         public uint LastPagesVersionUpdateIgnored = 0;

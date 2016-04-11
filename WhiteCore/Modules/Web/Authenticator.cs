@@ -25,18 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.Servers.HttpServer.Implementation;
-using WhiteCore.Framework.Services;
-using OpenMetaverse;
 using System.Collections.Generic;
 using System.Linq;
+using OpenMetaverse;
+using WhiteCore.Framework.Servers.HttpServer.Implementation;
+using WhiteCore.Framework.Services;
 
 namespace WhiteCore.Modules.Web
 {
     public class Authenticator
     {
-        private static Dictionary<UUID, UserAccount> _authenticatedUsers = new Dictionary<UUID, UserAccount>();
-        private static Dictionary<UUID, UserAccount> _authenticatedAdminUsers = new Dictionary<UUID, UserAccount>();
+        static Dictionary<UUID, UserAccount> _authenticatedUsers = new Dictionary<UUID, UserAccount>();
+        static Dictionary<UUID, UserAccount> _authenticatedAdminUsers = new Dictionary<UUID, UserAccount>();
 
         public static bool CheckAuthentication(OSHttpRequest request)
         {

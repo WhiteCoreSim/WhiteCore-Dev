@@ -25,14 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System.Collections.Generic;
+using OpenMetaverse;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using OpenMetaverse;
-using System.Collections.Generic;
 using GridRegion = WhiteCore.Framework.Services.GridRegion;
 using RegionFlags = WhiteCore.Framework.Services.RegionFlags;
 
@@ -97,20 +97,30 @@ namespace WhiteCore.Modules.Web
                 if (agentInfoService != null)
                 {
                     List<UserInfo> usersInRegion = agentInfoService.GetUserInfos(region.RegionID);
-                    vars.Add("NumberOfUsersInRegion", usersInRegion.Count);
-                    List<Dictionary<string, object>> users = new List<Dictionary<string, object>>();
-                    foreach (var client in usersInRegion)
+                    if (usersInRegion == null)
                     {
-                        UserAccount account = userService.GetUserAccount(null, client.UserID);
-                        if (account == null)
-                            continue;
-                        Dictionary<string, object> user = new Dictionary<string, object>();
-                        user.Add("UserNameText", translator.GetTranslatedString("UserNameText"));
-                        user.Add("UserUUID", client.UserID);
-                        user.Add("UserName", account.Name);
-                        users.Add(user);
+                        vars.Add ("NumberOfUsersInRegion", 0);
+                        vars.Add ("UsersInRegion", new List<Dictionary<string, object>> ());
+                    } else
+                    {
+                        vars.Add ("NumberOfUsersInRegion", usersInRegion.Count);
+                        List<Dictionary<string, object>> users = new List<Dictionary<string, object>> ();
+                        foreach (var client in usersInRegion)
+                        {
+                            if (userService == null)
+                                continue;
+                        
+                            UserAccount account = userService.GetUserAccount (null, client.UserID);
+                            if (account == null)
+                                continue;
+                            Dictionary<string, object> user = new Dictionary<string, object> ();
+                            user.Add ("UserNameText", translator.GetTranslatedString ("UserNameText"));
+                            user.Add ("UserUUID", client.UserID);
+                            user.Add ("UserName", account.Name);
+                            users.Add (user);
+                        }
+                        vars.Add ("UsersInRegion", users);
                     }
-                    vars.Add("UsersInRegion", users);
                 }
                 else
                 {
@@ -119,30 +129,34 @@ namespace WhiteCore.Modules.Web
                 }
                 IDirectoryServiceConnector directoryConnector =
                     Framework.Utilities.DataManager.RequestPlugin<IDirectoryServiceConnector>();
+                IUserAccountService accountService =
+                    webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
+                
                 if (directoryConnector != null)
                 {
                     List<LandData> data = directoryConnector.GetParcelsByRegion(0, 10, region.RegionID, UUID.Zero,
                                                                                 ParcelFlags.None, ParcelCategory.Any);
                     List<Dictionary<string, object>> parcels = new List<Dictionary<string, object>>();
-                    foreach (var p in data)
+                    if (data != null)
                     {
-                        Dictionary<string, object> parcel = new Dictionary<string, object>();
-                        parcel.Add("ParcelNameText", translator.GetTranslatedString("ParcelNameText"));
-                        parcel.Add("ParcelOwnerText", translator.GetTranslatedString("ParcelOwnerText"));
-                        parcel.Add("ParcelUUID", p.GlobalID);
-                        parcel.Add("ParcelName", p.Name);
-                        parcel.Add("ParcelOwnerUUID", p.OwnerID);
-                        IUserAccountService accountService =
-                            webInterface.Registry.RequestModuleInterface<IUserAccountService>();
-                        if (accountService != null)
+                        foreach (var p in data)
                         {
-                            var account = accountService.GetUserAccount(null, p.OwnerID);
-                            if (account == null)
-                                parcel.Add("ParcelOwnerName", translator.GetTranslatedString("NoAccountFound"));
-                            else
-                                parcel.Add("ParcelOwnerName", account.Name);
+                            Dictionary<string, object> parcel = new Dictionary<string, object> ();
+                            parcel.Add ("ParcelNameText", translator.GetTranslatedString ("ParcelNameText"));
+                            parcel.Add ("ParcelOwnerText", translator.GetTranslatedString ("ParcelOwnerText"));
+                            parcel.Add ("ParcelUUID", p.GlobalID);
+                            parcel.Add ("ParcelName", p.Name);
+                            parcel.Add ("ParcelOwnerUUID", p.OwnerID);
+                            if (accountService != null)
+                            {
+                                var account = accountService.GetUserAccount (null, p.OwnerID);
+                                if (account == null)
+                                    parcel.Add ("ParcelOwnerName", translator.GetTranslatedString ("NoAccountFound"));
+                                else
+                                    parcel.Add ("ParcelOwnerName", account.Name);
+                            }
+                            parcels.Add (parcel);
                         }
-                        parcels.Add(parcel);
                     }
                     vars.Add("ParcelInRegion", parcels);
                     vars.Add("NumberOfParcelsInRegion", parcels.Count);

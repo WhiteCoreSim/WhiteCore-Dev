@@ -25,13 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.Servers.HttpServer.Implementation;
-using System.Collections.Generic;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.Utilities;
 using System;
+using System.Collections.Generic;
 using OpenMetaverse;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.Web
 {
@@ -89,7 +89,9 @@ namespace WhiteCore.Modules.Web
                 start = httpRequest.Query.ContainsKey ("Start")
                     ? int.Parse (httpRequest.Query ["Start"].ToString ())
                     : 0;
-                int count = (int) moneyModule.NumberOfTransactions(UserID, UUID.Zero);
+                int count = 0;
+                if (moneyModule != null)
+                    count = (int) moneyModule.NumberOfTransactions(UserID, UUID.Zero);
                 int maxPages = (int)(count / amountPerQuery) - 1;
 
                 if (start == -1)
@@ -114,8 +116,9 @@ namespace WhiteCore.Modules.Web
             var dateTo = DateTime.Parse (DateEnd + " " + timeNow);
             TimeSpan period = dateTo.Subtract (dateFrom);
 
-            List<AgentTransfer> transactions;
-            transactions = moneyModule.GetTransactionHistory (user.PrincipalID, UUID.Zero, dateFrom, dateTo, (uint)start, amountPerQuery);
+            var transactions = new List<AgentTransfer> ();
+            if (user != null && moneyModule != null)
+                transactions = moneyModule.GetTransactionHistory (user.PrincipalID, UUID.Zero, dateFrom, dateTo, (uint)start, amountPerQuery);
 
                 // data
             if (transactions.Count > 0)

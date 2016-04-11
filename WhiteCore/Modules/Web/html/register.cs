@@ -363,8 +363,14 @@ namespace WhiteCore.Modules.Web
             {
                 System.IO.StreamReader reader =
                     new System.IO.StreamReader(System.IO.Path.Combine(Environment.CurrentDirectory, tosLocation));
-                ToS = reader.ReadToEnd();
-                reader.Close();
+                try
+                {
+                    ToS = reader.ReadToEnd();
+                }
+                finally
+                {
+                    reader.Close();
+                }
             }
 
             // check for user name seed
