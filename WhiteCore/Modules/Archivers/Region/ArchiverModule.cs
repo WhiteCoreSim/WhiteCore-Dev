@@ -38,7 +38,7 @@ using WhiteCore.Framework.Utilities;
 namespace WhiteCore.Modules.Archivers
 {
     /// <summary>
-    ///     This module loads and saves OpenSimulator region archives
+    ///     This module loads and saves WhiteCore-Sim region archives
     /// </summary>
     public class ArchiverModule : INonSharedRegionModule, IRegionArchiverModule
     {

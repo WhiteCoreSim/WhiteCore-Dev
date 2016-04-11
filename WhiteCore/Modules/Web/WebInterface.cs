@@ -1140,8 +1140,8 @@ namespace WhiteCore.Modules.Web
         public string Gridname = "WhiteCore Grid";
         public string Gridnick = "WhiteCore";
         public string WelcomeMessage = "Welcome to WhiteCore, <USERNAME>!";
-        public string SystemEstateOwnerName = "Governor White";
-        public string SystemEstateName = "Whitecore Estate";
+        public string SystemEstateOwnerName = Constants.GovernorName;
+        public string SystemEstateName = Constants.SystemEstateName;
 
         public GridSettings()
         {
