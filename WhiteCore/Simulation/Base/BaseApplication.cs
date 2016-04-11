@@ -84,12 +84,12 @@ namespace WhiteCore.Simulation.Base
             // Increase the number of IOCP threads available. Mono defaults to a tragically low number
             int workerThreads, iocpThreads;
             ThreadPool.GetMaxThreads(out workerThreads, out iocpThreads);
-            //MainConsole.Instance.InfoFormat("[WHiteCore MAIN]: Runtime gave us {0} worker threads and {1} IOCP threads", workerThreads, iocpThreads);
+            //MainConsole.Instance.InfoFormat("[WhiteCore Main]: Runtime gave us {0} worker threads and {1} IOCP threads", workerThreads, iocpThreads);
             if (workerThreads < 500 || iocpThreads < 1000)
             {
                 workerThreads = 500;
                 iocpThreads = 1000;
-                //MainConsole.Instance.Info("[WHiteCore MAIN]: Bumping up to 500 worker threads and 1000 IOCP threads");
+                //MainConsole.Instance.Info("[WhiteCore Main]: Bumping up to 500 worker threads and 1000 IOCP threads");
                 ThreadPool.SetMaxThreads(workerThreads, iocpThreads);
             }
 
@@ -152,26 +152,26 @@ namespace WhiteCore.Simulation.Base
                 if (!requested)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine ("\n\n************* WhiteCore initial run. *************");
+                    Console.WriteLine ("\n\n************* WhiteCore-Sim initial run. *************");
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine (
-                        "\n\n   This appears to be your first time running WhiteCore.\n" +
+                        "\n\n   This appears to be your first time running WhiteCore-Sim.\n" +
                         "If you have already configured your *.ini files, please ignore this warning and press enter;\n" +
-                        "Otherwise type 'yes' and WhiteCore will guide you through the configuration process.\n\n" +
+                        "Otherwise type 'yes' and WhiteCore-Sim will guide you through the configuration process.\n\n" +
                         "Remember, these file names are Case Sensitive in Linux and Proper Cased.\n" +
                         "1. " + WhiteCore_ConfigDir + "/WhiteCore.ini\nand\n" +
                         "2. " + WhiteCore_ConfigDir + "/Sim/Standalone/StandaloneCommon.ini \nor\n" +
                         "3. " + WhiteCore_ConfigDir + "/Grid/GridCommon.ini\n" +
                         "\nAlso, you will want to examine these files in great detail because only the basic system will " +
-                        "load by default. WhiteCore can do a LOT more if you spend a little time going through these files.\n\n");
+                        "load by default. WhiteCore-Sim can do a LOT more if you spend a little time going through these files.\n\n");
                 } else
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine ("\n\n************* WhiteCore Configuration *************");
+                    Console.WriteLine ("\n\n************* WhiteCore-Sim Configuration *************");
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine (
                         "\n     WhiteCore interactive configuration.\n" +
-                        "Enter 'yes' and WhiteCore will guide you through the configuration process.");
+                        "Enter 'yes' and WhiteCore-Sim will guide you through the configuration process.");
                 }
 
                 // Make sure...
@@ -179,9 +179,11 @@ namespace WhiteCore.Simulation.Base
                 Console.WriteLine ("");
                 Console.WriteLine (" ##  WARNING  ##");
                 Console.WriteLine("This will overwrite any existing configuration files!");
+                Console.WriteLine("It is strongly recommended that you save a backup copy");
+                Console.WriteLine("of your configuration files before proceeding!");
                 Console.ResetColor();
                 Console.WriteLine ("");
-                resp = ReadLine("Do you want to configure WhiteCore now?  (yes/no)", resp);
+                resp = ReadLine("Do you want to configure WhiteCore-Sim now?  (yes/no)", resp);
 
                 if (resp == "yes")
                 {
@@ -204,7 +206,7 @@ namespace WhiteCore.Simulation.Base
 
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("====================================================================");
-					Console.WriteLine("======================= WhiteCore CONFIGURATOR =====================");
+					Console.WriteLine("======================= WhiteCore-Sim Configurator =================");
                     Console.WriteLine("====================================================================");
                     Console.ResetColor();
 
@@ -333,6 +335,7 @@ namespace WhiteCore.Simulation.Base
                                         newConfig.Set(key, config.Get(key));
                                 }
                             }
+
                             mysql_ini.Save();
                             Console.ForegroundColor = ConsoleColor.Green;
                             Console.WriteLine("Your MySQL.ini has been successfully configured");
@@ -375,7 +378,6 @@ namespace WhiteCore.Simulation.Base
                                 newConfig.Set ("HostName", regionIPAddress);
                             }
                         }
-
 
 						whitecore_ini.Save();
                         Console.ForegroundColor = ConsoleColor.Green;
@@ -455,7 +457,6 @@ namespace WhiteCore.Simulation.Base
                             Console.WriteLine("Your Grid.ini has been successfully configured");
                             Console.ResetColor();
                             Console.WriteLine ("");
-
                         }
                     }
 
@@ -527,6 +528,7 @@ namespace WhiteCore.Simulation.Base
                                     newConfig.Set(key, config.Get(key));
                             }
                         }
+
                         login_ini.Save();
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine("Your Login.ini has been successfully configured");
@@ -574,10 +576,9 @@ namespace WhiteCore.Simulation.Base
                     Console.WriteLine(
                         "To re-run this configurator, enter \"run configurator\" into the console.");
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine(" >> Please restart to use your new configuration. <<");
+                    Console.WriteLine(" >> Please restart WhiteCore-Sim to use your new configuration. <<");
                     Console.ResetColor ();
-                    Console.WriteLine ("");
-                    
+                    Console.WriteLine ("");           
                 }
             }
         }
@@ -679,9 +680,11 @@ namespace WhiteCore.Simulation.Base
         /// <param name="ex"></param>
         public static void HandleCrashException(string msg, Exception ex)
         {
-
             //if (m_saveCrashDumps && Environment.OSVersion.Platform == PlatformID.Win32NT)
             // 20160323 -greythane - not sure why this will not work on *nix as well?
+            // 20160408 -EmperorStarfinder - This appears to not work on either Windows or Nix.
+            // Maybe consider removing the saveCrashDumps as it appears it is writing it to the
+            // logs for WhiteCore.Server and WhiteCore consoles already?
             if (m_saveCrashDumps)
                            {
                 // Log exception to disk
@@ -801,6 +804,7 @@ namespace WhiteCore.Simulation.Base
             {
                 exp.ExceptionPointers = Marshal.GetExceptionPointers();
             }
+
             bool bRet;
             if (exp.ExceptionPointers == IntPtr.Zero)
             {

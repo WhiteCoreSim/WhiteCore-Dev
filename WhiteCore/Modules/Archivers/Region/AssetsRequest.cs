@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -111,7 +110,7 @@ namespace WhiteCore.Modules.Archivers
         {
             m_requestState = RequestState.Running;
 
-            MainConsole.Instance.DebugFormat("[ARCHIVER]: AssetsRequest executed looking for {0} assets",
+            MainConsole.Instance.DebugFormat("[Archiver]: AssetsRequest executed looking for {0} assets",
                                              m_repliesRequired);
 
             // We can stop here if there are no assets to fetch
@@ -159,12 +158,12 @@ namespace WhiteCore.Modules.Archivers
                 }
 
                 MainConsole.Instance.ErrorFormat(
-                    "[ARCHIVER]: Asset service failed to return information about {0} requested assets", uuids.Count);
+                    "[Archiver]: Asset service failed to return information about {0} requested assets", uuids.Count);
 
                 int i = 0;
                 foreach (UUID uuid in uuids)
                 {
-                    MainConsole.Instance.ErrorFormat("[ARCHIVER]: No information about asset {0} received", uuid);
+                    MainConsole.Instance.ErrorFormat("[Archiver]: No information about asset {0} received", uuid);
 
                     if (++i >= MAX_UUID_DISPLAY_ON_TIMEOUT)
                         break;
@@ -172,13 +171,13 @@ namespace WhiteCore.Modules.Archivers
 
                 if (uuids.Count > MAX_UUID_DISPLAY_ON_TIMEOUT)
                     MainConsole.Instance.ErrorFormat(
-                        "[ARCHIVER]: (... {0} more not shown)", uuids.Count - MAX_UUID_DISPLAY_ON_TIMEOUT);
+                        "[Archiver]: (... {0} more not shown)", uuids.Count - MAX_UUID_DISPLAY_ON_TIMEOUT);
 
-                MainConsole.Instance.Error("[ARCHIVER]: OAR save aborted.");
+                MainConsole.Instance.Error("[Archiver]: OAR save aborted.");
             }
             catch (Exception e)
             {
-                MainConsole.Instance.ErrorFormat("[ARCHIVER]: Timeout handler exception {0}", e);
+                MainConsole.Instance.ErrorFormat("[Archiver]: Timeout handler exception {0}", e);
             }
             finally
             {
@@ -192,7 +191,7 @@ namespace WhiteCore.Modules.Archivers
             if (fetchedAsset != null && fetchedAsset.Type == (sbyte) AssetType.Unknown)
             {
                 AssetType type = (AssetType) assetType;
-                MainConsole.Instance.InfoFormat("[ARCHIVER]: Rewriting broken asset type for {0} to {1}",
+                MainConsole.Instance.InfoFormat("[Archiver]: Rewriting broken asset type for {0} to {1}",
                                                 fetchedAsset.ID, type);
                 fetchedAsset.Type = (sbyte) type;
             }
@@ -212,14 +211,14 @@ namespace WhiteCore.Modules.Archivers
             {
                 lock (this)
                 {
-                    //MainConsole.Instance.DebugFormat("[ARCHIVER]: Received callback for asset {0}", id);
+                    //MainConsole.Instance.DebugFormat("[Archiver]: Received callback for asset {0}", id);
 
                     m_requestCallbackTimer.Stop();
 
                     if (m_requestState == RequestState.Aborted)
                     {
                         MainConsole.Instance.WarnFormat(
-                            "[ARCHIVER]: Received information about asset {0} after archive save abortion.  Ignoring.",
+                            "[Archiver]: Received information about asset {0} after archive save abortion.  Ignoring.",
                             assetID);
 
                         return;
@@ -227,13 +226,13 @@ namespace WhiteCore.Modules.Archivers
 
                     if (asset != null)
                     {
-//                        MainConsole.Instance.DebugFormat("[ARCHIVER]: Writing asset {0}", id);
+                        //MainConsole.Instance.DebugFormat("[Archiver]: Writing asset {0}", id);
                         m_foundAssetUuids.Add(asset.ID);
                         m_assetsArchiver.WriteAsset(asset);
                     }
                     else
                     {
-//                        MainConsole.Instance.DebugFormat("[ARCHIVER]: Recording asset {0} as not found", id);
+                        //MainConsole.Instance.DebugFormat("[Archiver]: Recording asset {0} as not found", id);
                         m_notFoundAssetUuids.Add(new UUID(assetID));
                     }
 
@@ -242,7 +241,7 @@ namespace WhiteCore.Modules.Archivers
                         m_requestState = RequestState.Completed;
 
                         MainConsole.Instance.InfoFormat(
-                            "[ARCHIVER]: Successfully added {0} assets ({1} assets notified missing)",
+                            "[Archiver]: Successfully added {0} assets ({1} assets notified missing)",
                             m_foundAssetUuids.Count, m_notFoundAssetUuids.Count);
 
                         // We want to stop using the asset cache thread asap 
@@ -255,7 +254,7 @@ namespace WhiteCore.Modules.Archivers
             }
             catch (Exception e)
             {
-                MainConsole.Instance.ErrorFormat("[ARCHIVER]: AssetRequestCallback failed with {0}", e);
+                MainConsole.Instance.ErrorFormat("[Archiver]: AssetRequestCallback failed with {0}", e);
             }
         }
 
@@ -271,7 +270,7 @@ namespace WhiteCore.Modules.Archivers
             catch (Exception e)
             {
                 MainConsole.Instance.ErrorFormat(
-                    "[ARCHIVER]: Terminating archive creation since asset requster callback failed with {0}", e);
+                    "[Archiver]: Terminating archive creation since asset requster callback failed with {0}", e);
             }
         }
 

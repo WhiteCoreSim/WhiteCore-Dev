@@ -46,7 +46,7 @@ namespace WhiteCore.Server
             if (MainConsole.Instance != null)
 			{
 				MainConsole.Instance.DefaultPrompt = "WhiteCore.Server ";
-				MainConsole.Instance.Info ("[WhiteCoreSTARTUP]: Startup completed in " +
+				MainConsole.Instance.Info ("[WhiteCore-Sim Startup]: Startup completed in " +
 					(DateTime.Now - this.StartupTime).TotalSeconds);
 			}
         }
