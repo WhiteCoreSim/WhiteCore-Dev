@@ -192,7 +192,7 @@ namespace WhiteCore.Services
                         if (info != null)
                             PackUserInfo(info, account, ref agents);
                         else
-                            PackUserInfo(info, account, ref agents);
+                            PackUserInfo(new IUserProfileInfo (), account, ref agents);
                         //else //Technically is right, but needs to be packed no matter what for OS based grids
                         //    bad_ids.Add (id);
                     }

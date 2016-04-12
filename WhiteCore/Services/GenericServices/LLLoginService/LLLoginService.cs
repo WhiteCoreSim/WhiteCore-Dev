@@ -148,6 +148,7 @@ namespace WhiteCore.Services
             {
                 WebClient client = new WebClient();
                 m_WelcomeMessage = client.DownloadString(m_WelcomeMessageURL);
+                client.Dispose ();
             }
             // load web settings overrides (if any)
             IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
@@ -322,12 +323,12 @@ namespace WhiteCore.Services
             IAgentConnector agentData = Framework.Utilities.DataManager.RequestPlugin<IAgentConnector>();
             if (agentData != null)
             {
-                agent = agentData.GetAgent(account.PrincipalID);
-            }
-            if (agent == null)
-            {
-                agentData.CreateNewAgent(account.PrincipalID);
-                agent = agentData.GetAgent(account.PrincipalID);
+                agent = agentData.GetAgent (account.PrincipalID);
+                if (agent == null)
+                {
+                    agentData.CreateNewAgent (account.PrincipalID);
+                    agent = agentData.GetAgent (account.PrincipalID);
+                }
             }
 
             foreach (ILoginModule module in LoginModules)
@@ -1008,7 +1009,6 @@ namespace WhiteCore.Services
             aCircuit.RegionUDPPort = args.CircuitData.RegionUDPPort;
 
             reason = args.Reason;
-            reason = "";
             seedCap = args.SeedCap;
             bool success = args.Success;
             if (!success && m_GridService != null)

@@ -1310,7 +1310,10 @@ namespace WhiteCore.Services.DataService
         {
             object remoteValue = DoRemote(user);
             if (remoteValue != null || m_doRemoteOnly)
-                return (List<EventData>) remoteValue;
+            if (remoteValue != null)
+                return (List<EventData>)remoteValue;
+            else
+                return new List<EventData> ();
 
             QueryFilter filter = new QueryFilter();
             filter.andFilters.Add("UserID", user.ToString());

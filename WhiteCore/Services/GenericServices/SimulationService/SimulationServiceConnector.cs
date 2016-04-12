@@ -26,6 +26,11 @@
  */
 
 
+using System.Collections.Generic;
+using System.Threading;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
@@ -33,12 +38,6 @@ using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo.Entities;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using System;
-using System.Collections.Generic;
-using System.Threading;
 using GridRegion = WhiteCore.Framework.Services.GridRegion;
 
 namespace WhiteCore.Services
@@ -95,10 +94,9 @@ namespace WhiteCore.Services
             AutoResetEvent resetEvent = new AutoResetEvent(false);
             OSDMap result = null;
             MainConsole.Instance.DebugFormat("[SimulationServiceConnector]: Sending Create Agent to " + destination.ServerURI);
-            m_syncMessagePoster.Get(destination.ServerURI, request.ToOSD(), (osdresp) =>
-            {
+            m_syncMessagePoster.Get(destination.ServerURI, request.ToOSD(), osdresp => {
                 result = osdresp;
-                resetEvent.Set();
+                resetEvent.Set ();
             });
             bool success = resetEvent.WaitOne(10000);
             if (!success || result == null)
@@ -112,8 +110,6 @@ namespace WhiteCore.Services
             response = new CreateAgentResponse();
             response.FromOSD(result);
 
-            if (!response.Success)
-                return false;
             return response.Success;
         }
 
@@ -138,12 +134,11 @@ namespace WhiteCore.Services
 
             AutoResetEvent resetEvent = new AutoResetEvent(false);
             OSDMap result = null;
-            m_syncMessagePoster.Get(destination.ServerURI, request.ToOSD(), (response) =>
-            {
+            m_syncMessagePoster.Get(destination.ServerURI, request.ToOSD(), response => {
                 result = response;
-                resetEvent.Set();
+                resetEvent.Set ();
             });
-            bool success = resetEvent.WaitOne(10000);
+            bool success = resetEvent.WaitOne(10000) && result != null;
             if (!success)
             {
                 if (m_blackListedRegions.ContainsKey(destination.ServerURI))
@@ -188,11 +183,11 @@ namespace WhiteCore.Services
 
             AutoResetEvent resetEvent = new AutoResetEvent(false);
             OSDMap result = null;
-            m_syncMessagePoster.Get(destination.ServerURI, request.ToOSD(), (response) =>
-            {
+            m_syncMessagePoster.Get(destination.ServerURI, request.ToOSD(), response => {
                 result = response;
-                resetEvent.Set();
+                resetEvent.Set ();
             });
+            
             bool success = resetEvent.WaitOne(10000) && result != null;
             if (!success)
             {
@@ -217,20 +212,20 @@ namespace WhiteCore.Services
             return result["Success"].AsBoolean();
         }
 
-        public bool FailedToMoveAgentIntoNewRegion(UUID AgentID, GridRegion destination)
+        public bool FailedToMoveAgentIntoNewRegion(UUID agentID, GridRegion destination)
         {
             FailedToMoveAgentIntoNewRegionRequest request = new FailedToMoveAgentIntoNewRegionRequest();
-            request.AgentID = AgentID;
+            request.AgentID = agentID;
             request.RegionID = destination.RegionID;
 
             m_syncMessagePoster.Post(destination.ServerURI, request.ToOSD());
             return true;
         }
 
-        public bool MakeChildAgent(UUID AgentID, GridRegion oldRegion, GridRegion destination, bool isCrossing)
+        public bool MakeChildAgent(UUID agentID, GridRegion oldRegion, GridRegion destination, bool isCrossing)
         {
             MakeChildAgentRequest request = new MakeChildAgentRequest();
-            request.AgentID = AgentID;
+            request.AgentID = agentID;
             request.OldRegion = oldRegion;
             request.Destination = destination;
             request.IsCrossing = isCrossing;
@@ -239,11 +234,11 @@ namespace WhiteCore.Services
             return true;
         }
 
-        public bool FailedToTeleportAgent(GridRegion destination, UUID failedRegionID, UUID AgentID, string reason,
+        public bool FailedToTeleportAgent(GridRegion destination, UUID failedRegionID, UUID agentID, string reason,
                                           bool isCrossing)
         {
             FailedToTeleportAgentRequest request = new FailedToTeleportAgentRequest();
-            request.AgentID = AgentID;
+            request.AgentID = agentID;
             request.Destination = destination;
             request.IsCrossing = isCrossing;
             request.FailedRegionID = failedRegionID;
@@ -266,12 +261,11 @@ namespace WhiteCore.Services
 
             AutoResetEvent resetEvent = new AutoResetEvent(false);
             OSDMap result = null;
-            m_syncMessagePoster.Get(destination.ServerURI, request.ToOSD(), (osdresp) =>
-            {
+            m_syncMessagePoster.Get(destination.ServerURI, request.ToOSD(), osdresp => {
                 result = osdresp;
-                resetEvent.Set();
+                resetEvent.Set ();
             });
-            bool success = resetEvent.WaitOne(10000);
+            bool success = resetEvent.WaitOne(10000) && result != null;
             if (!success) return false;
 
             RetrieveAgentResponse response = new RetrieveAgentResponse();
@@ -298,14 +292,16 @@ namespace WhiteCore.Services
             request.Destination = destination;
             AutoResetEvent resetEvent = new AutoResetEvent(false);
             OSDMap result = null;
-            m_syncMessagePoster.Get(destination.ServerURI, request.ToOSD(), (osdresp) =>
-            {
+            m_syncMessagePoster.Get(destination.ServerURI, request.ToOSD(), osdresp => {
                 result = osdresp;
-                resetEvent.Set();
+                resetEvent.Set ();
             });
-            bool success = resetEvent.WaitOne(10000);
-            if (!success) return false;
-            return result["Success"].AsBoolean();
+            
+            bool success = resetEvent.WaitOne(10000) && result != null;
+            if (!success)
+                return false;
+            
+            return result ["Success"].AsBoolean ();
         }
 
         #endregion
