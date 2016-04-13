@@ -46,7 +46,7 @@ using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.BotManager
 {
-
+    
     #region Enums
     public enum BotState
     {
@@ -249,6 +249,7 @@ namespace WhiteCore.BotManager
     {
         #region Declares
         static readonly object _lock = new object();
+        readonly float EPSILON = (float) Constants.FloatDifference;
 
         IBotController m_controller;
 
@@ -1192,7 +1193,7 @@ namespace WhiteCore.BotManager
             start:
             if (i == path.Count)
                 return Vector3.Zero;
-            if (path[i].X == (11*resolution) && path[i].Y == (11*resolution))
+            if (Math.Abs (path [i].X - (11 * resolution)) < EPSILON && Math.Abs (path [i].Y - (11 * resolution)) < EPSILON)
             {
                 i++;
                 goto start;
@@ -1316,7 +1317,7 @@ namespace WhiteCore.BotManager
             for (int i = 0; i < sigPos.Length; i++)
             {
                 double val = Util.GetDistanceTo(m_controller.AbsolutePosition, sigPos[i]);
-                if (closestDistance == 0 || closestDistance > val)
+                if (Math.Abs (closestDistance) < EPSILON || closestDistance > val)
                 {
                     closestDistance = val;
                     closestPosition = i;
@@ -1528,7 +1529,7 @@ namespace WhiteCore.BotManager
         public readonly AgentCircuitData m_circuitData;
         public readonly UUID m_myID = UUID.Random();
         public readonly IScene m_scene;
-        static UInt32 UniqueId = 1;
+        static uint UniqueId = 1;
         BotAvatarController m_controller;
 
         public UUID ScopeID { get; set; }
