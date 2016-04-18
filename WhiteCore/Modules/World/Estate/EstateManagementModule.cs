@@ -50,7 +50,10 @@ namespace WhiteCore.Modules.Estate
 {
     public class EstateManagementModule : IEstateModule
     {
-        private delegate void LookupUUIDS (List<UUID> uuidLst);
+        readonly double EPSILON = Constants.FloatDifference;
+        static readonly object _lock = new object ();
+
+        delegate void LookupUUIDS (List<UUID> uuidLst);
 
         IScene m_scene;
         EstateTerrainXferHandler TerrainUploader;
@@ -173,7 +176,7 @@ namespace WhiteCore.Modules.Estate
             m_scene.RegionInfo.EstateSettings.FixedSun = is_sun_fixed;
             m_scene.RegionInfo.EstateSettings.AbuseEmail = owner_abuse_email;
 
-            if (sun_hour == 0)
+            if (Math.Abs (sun_hour) < EPSILON)
             {
                 m_scene.RegionInfo.EstateSettings.UseGlobalTime = true;
                 m_scene.RegionInfo.EstateSettings.SunPosition = 0;
@@ -183,8 +186,7 @@ namespace WhiteCore.Modules.Estate
                 m_scene.RegionInfo.EstateSettings.SunPosition = sun_hour;
             }
 
-            WhiteCore.Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ().
-                SaveEstateSettings (m_scene.RegionInfo.EstateSettings);
+            Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ().SaveEstateSettings (m_scene.RegionInfo.EstateSettings);
 
             TriggerEstateInfoChange ();
             TriggerEstateSunUpdate ();
@@ -280,29 +282,35 @@ namespace WhiteCore.Modules.Estate
 
         public void setEstateTerrainTextureHeights (IClientAPI client, int corner, float lowValue, float highValue)
         {
-            if (m_scene.Permissions.CanIssueEstateCommand (client.AgentId, true))
+            if (client != null)
+                if (!m_scene.Permissions.CanIssueEstateCommand (client.AgentId, true))
+                    return;
+            
+            // update terrain heights
+            switch (corner)
             {
-                switch (corner)
-                {
-                case 0:
-                    m_scene.RegionInfo.RegionSettings.Elevation1SW = lowValue;
-                    m_scene.RegionInfo.RegionSettings.Elevation2SW = highValue;
-                    break;
-                case 1:
-                    m_scene.RegionInfo.RegionSettings.Elevation1NW = lowValue;
-                    m_scene.RegionInfo.RegionSettings.Elevation2NW = highValue;
-                    break;
-                case 2:
-                    m_scene.RegionInfo.RegionSettings.Elevation1SE = lowValue;
-                    m_scene.RegionInfo.RegionSettings.Elevation2SE = highValue;
-                    break;
-                case 3:
-                    m_scene.RegionInfo.RegionSettings.Elevation1NE = lowValue;
-                    m_scene.RegionInfo.RegionSettings.Elevation2NE = highValue;
-                    break;
-                }
+            case 0:
+                m_scene.RegionInfo.RegionSettings.Elevation1SW = lowValue;
+                m_scene.RegionInfo.RegionSettings.Elevation2SW = highValue;
+                break;
+            case 1:
+                m_scene.RegionInfo.RegionSettings.Elevation1NW = lowValue;
+                m_scene.RegionInfo.RegionSettings.Elevation2NW = highValue;
+                break;
+            case 2:
+                m_scene.RegionInfo.RegionSettings.Elevation1SE = lowValue;
+                m_scene.RegionInfo.RegionSettings.Elevation2SE = highValue;
+                break;
+            case 3:
+                m_scene.RegionInfo.RegionSettings.Elevation1NE = lowValue;
+                m_scene.RegionInfo.RegionSettings.Elevation2NE = highValue;
+                break;
             }
+            TriggerRegionInfoChange ();
+            sendRegionHandshakeToAll ();
+
         }
+
 
         void handleCommitEstateTerrainTextureRequest (IClientAPI remoteClient)
         {
@@ -591,7 +599,7 @@ namespace WhiteCore.Modules.Estate
         {
             if (TerrainUploader != null)
             {
-                lock (TerrainUploader)
+                lock (_lock)
                 {
                     if (XferID == TerrainUploader.XferID)
                     {
@@ -608,7 +616,7 @@ namespace WhiteCore.Modules.Estate
 
         void HandleTerrainApplication (string filename, byte[] terrainData, IClientAPI remoteClient)
         {
-            lock (TerrainUploader)
+            lock (_lock)
             {
                 remoteClient.OnXferReceive -= TerrainUploader.XferReceive;
                 remoteClient.OnAbortXfer -= AbortTerrainXferHandler;
@@ -616,12 +624,13 @@ namespace WhiteCore.Modules.Estate
 
                 TerrainUploader = null;
             }
+
             remoteClient.SendAlertMessage ("Terrain Upload Complete. Loading....");
             ITerrainModule terr = m_scene.RequestModuleInterface<ITerrainModule> ();
 
             if (terr != null)
             {
-                MainConsole.Instance.Warn ("[CLIENT]: Got Request to Send Terrain in region " +
+                MainConsole.Instance.Warn ("[Estate Manager]: Got Request to Send Terrain in region " +
                 m_scene.RegionInfo.RegionName);
 
                 try
@@ -630,67 +639,69 @@ namespace WhiteCore.Modules.Estate
 
                     if (x.Extension == ".oar") // It's an oar file
                     {
-                        bool check = false;
-                        while (!check)
-                        {
-                            if (File.Exists (filename))
-                            {
-                                filename = "duplicate" + filename;
-                            } else
-                                check = true;
-                        }
+                        if (File.Exists(filename))
+                            filename = DateTime.UtcNow.ToString("yyyMMdd") + filename;
+
+                        // save OAR to a local file
                         FileStream input = new FileStream (filename, FileMode.CreateNew);
-                        input.Write (terrainData, 0, terrainData.Length);
-                        input.Close ();
+                        try {
+                            input.Write (terrainData, 0, terrainData.Length);
+                        } finally {
+                            input.Close ();
+                        }
+
+                        // load it to the region
                         MainConsole.Instance.RunCommand ("load oar " + filename);
                         remoteClient.SendAlertMessage ("Your oar file was loaded. It may take a few moments to appear.");
-                    } else
-                    {
-                        MemoryStream terrainStream = new MemoryStream (terrainData);
-                        terr.LoadFromStream (filename, terrainStream);
-                        terrainStream.Close ();
-                        remoteClient.SendAlertMessage ("Your terrain was loaded as a ." + x.Extension +
-                        " file. It may take a few moments to appear.");
-                    }
+
+                        return;
+                    } 
+
+                    // just terrain data
+                    MemoryStream terrainStream = new MemoryStream (terrainData);
+                    terr.LoadFromStream (filename, terrainStream);
+                    terrainStream.Close ();
+
+                    remoteClient.SendAlertMessage ("Your terrain was loaded as a ." + x.Extension +
+                     " file. It may take a few moments to appear.");
+                    
                 } catch (IOException e)
                 {
                     MainConsole.Instance.ErrorFormat (
-                        "[TERRAIN]: Error Saving a terrain file uploaded via the estate tools.  It gave us the following error: {0}",
+                        "[Estate Manager]: Error Saving a terrain file uploaded via the estate tools.  It gave us the following error: {0}",
                         e);
                     remoteClient.SendAlertMessage (
                         "There was an IO Exception loading your terrain.  Please check free space.");
 
-                    return;
                 } catch (SecurityException e)
                 {
                     MainConsole.Instance.ErrorFormat (
-                        "[TERRAIN]: Error Saving a terrain file uploaded via the estate tools.  It gave us the following error: {0}",
+                        "[Estate Manager]: Error Saving a terrain file uploaded via the estate tools.  It gave us the following error: {0}",
                         e);
                     remoteClient.SendAlertMessage (
                         "There was a security Exception loading your terrain.  Please check the security on the simulator drive");
 
-                    return;
                 } catch (UnauthorizedAccessException e)
                 {
                     MainConsole.Instance.ErrorFormat (
-                        "[TERRAIN]: Error Saving a terrain file uploaded via the estate tools.  It gave us the following error: {0}",
+                        "[Estate Manager]: Error Saving a terrain file uploaded via the estate tools.  It gave us the following error: {0}",
                         e);
                     remoteClient.SendAlertMessage (
                         "There was a security Exception loading your terrain.  Please check the security on the simulator drive");
 
-                    return;
                 } catch (Exception e)
                 {
                     MainConsole.Instance.ErrorFormat (
-                        "[TERRAIN]: Error loading a terrain file uploaded via the estate tools.  It gave us the following error: {0}",
+                        "[Estate Manager]: Error loading a terrain file uploaded via the estate tools.  It gave us the following error: {0}",
                         e);
                     remoteClient.SendAlertMessage (
                         "There was a general error loading your terrain.  Please fix the terrain file and try again");
+                    
                 }
-            } else
-            {
-                remoteClient.SendAlertMessage ("Unable to apply terrain.  Cannot get an instance of the terrain module");
+                return;
             }
+            remoteClient.SendAlertMessage ("Unable to apply terrain.  Cannot get an instance of the terrain module");
+
         }
 
         void handleUploadTerrain (IClientAPI remote_client, string clientFileName)
@@ -719,23 +730,24 @@ namespace WhiteCore.Modules.Estate
 
             if (terr != null)
             {
-                MainConsole.Instance.Warn ("[CLIENT]: Got Request to Send Terrain in region " +
+                MainConsole.Instance.Warn ("[Estate Manager]: Got Request to Send Terrain in region " +
                 m_scene.RegionInfo.RegionName);
                 if (File.Exists (Util.dataDir () + "/terrain.raw"))
-                {
                     File.Delete (Util.dataDir () + "/terrain.raw");
-                }
                 terr.SaveToFile (Util.dataDir () + "/terrain.raw");
 
                 FileStream input = new FileStream (Util.dataDir () + "/terrain.raw", FileMode.Open);
                 byte[] bdata = new byte[input.Length];
                 input.Read (bdata, 0, (int)input.Length);
+                input.Close ();
+
                 remote_client.SendAlertMessage ("Terrain file written, starting download...");
                 IXfer xfer = m_scene.RequestModuleInterface<IXfer> ();
                 if (xfer != null)
                     xfer.AddNewFile ("terrain.raw", bdata);
+
                 // Tell client about it
-                MainConsole.Instance.Warn ("[CLIENT]: Sending Terrain to " + remote_client.Name);
+                MainConsole.Instance.Warn ("[Estate Manager]: Sending Terrain to " + remote_client.Name);
                 remote_client.SendInitiateDownload ("terrain.raw", clientFileName);
             }
         }
@@ -763,7 +775,7 @@ namespace WhiteCore.Modules.Estate
                 waterHeight =
                                                            (float)m_scene.RegionInfo.RegionSettings.WaterHeight,
                 simName = m_scene.RegionInfo.RegionName,
-                regionType = m_scene.RegionInfo.RegionType,
+                regionType = m_scene.RegionInfo.RegionType
                 //regionTerrain = m_scene.RegionInfo.RegionTerrain
             };
 
@@ -794,7 +806,7 @@ namespace WhiteCore.Modules.Estate
             }
 
             List<LandStatReportItem> SceneReport = new List<LandStatReportItem> ();
-            lock (SceneData)
+            lock (_lock)
             {
                 foreach (uint obj in SceneData.Keys)
                 {
@@ -965,8 +977,8 @@ namespace WhiteCore.Modules.Estate
             m_scene.ForEachClient (sendRegionHandshake);
         }
 
-        public void handleEstateChangeInfo (IClientAPI remoteClient, UUID invoice, UUID senderID, UInt32 parms1,
-                                           UInt32 parms2)
+        public void handleEstateChangeInfo (IClientAPI remoteClient, UUID invoice, UUID senderID,
+                                            uint parms1, uint parms2)
         {
             if (parms2 == 0)
             {
@@ -989,8 +1001,7 @@ namespace WhiteCore.Modules.Estate
             m_scene.RegionInfo.RegionSettings.BlockShowInSearch = (parms1 & (uint)RegionFlags.BlockParcelSearch) ==
             (uint)RegionFlags.BlockParcelSearch;
 
-            WhiteCore.Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ().
-                SaveEstateSettings (m_scene.RegionInfo.EstateSettings);
+            Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ().SaveEstateSettings (m_scene.RegionInfo.EstateSettings);
             TriggerEstateInfoChange ();
             TriggerEstateSunUpdate ();
 
@@ -1021,7 +1032,7 @@ namespace WhiteCore.Modules.Estate
                     int corner = int.Parse (num);
                     UUID texture = UUID.Parse (uuid);
 
-                    MainConsole.Instance.Debug ("[ESTATEMODULE] Setting terrain textures for " +
+                    MainConsole.Instance.Debug ("[Estate Manager]: Setting terrain textures for " +
                     m_scene.RegionInfo.RegionName +
                     string.Format (" (C#{0} = {1})", corner, texture));
 
@@ -1062,7 +1073,7 @@ namespace WhiteCore.Modules.Estate
                     float lowValue = float.Parse (min, Culture.NumberFormatInfo);
                     float highValue = float.Parse (max, Culture.NumberFormatInfo);
 
-                    MainConsole.Instance.Debug ("[ESTATEMODULE] Setting terrain heights " + m_scene.RegionInfo.RegionName +
+                    MainConsole.Instance.Debug ("[Estate Manager]: Setting terrain heights " + m_scene.RegionInfo.RegionName +
                     string.Format (" (C{0}, {1}-{2}", corner, lowValue, highValue));
 
                     switch (corner)

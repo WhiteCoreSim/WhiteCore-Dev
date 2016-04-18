@@ -299,7 +299,7 @@ namespace WhiteCore.Modules.Estate
             foreach (var region in regions)
             {
                 string regType = region.RegionType.ToLower ();
-                if (regType.StartsWith ("m"))
+                if (regType.StartsWith ("m", StringComparison.Ordinal))
                 {
                     estateConnector.LinkRegion (region.RegionID, Constants.MainlandEstateID);
                     updated ++;
@@ -422,7 +422,7 @@ namespace WhiteCore.Modules.Estate
                 if (accountService.IsLocalConnector)
                 {
                     string createUser = MainConsole.Instance.Prompt ("Do you wish to create this user?  (yes/no)", "yes").ToLower ();
-                    if (!createUser.StartsWith ("y"))
+                    if (!createUser.StartsWith ("y", StringComparison.Ordinal))
                         return;
 
                     // Create a new account
@@ -771,38 +771,40 @@ namespace WhiteCore.Modules.Estate
             var estates = estateConnector.GetEstates ();
 
             // headings
-            estateInfo = String.Format ("{0, -20}", "Estate");
-            estateInfo += String.Format ("{0, -20}", "Owner");
-            estateInfo += String.Format ("{0, -10}", "Regions");
-            estateInfo += String.Format ("{0, -10}", "Voice");
-            estateInfo += String.Format ("{0, -10}", "Price/M");
-            estateInfo += String.Format ("{0, -10}", "Public");
-            estateInfo += String.Format ("{0, -10}", "Tax Free");
-            estateInfo += String.Format ("{0, -10}", "Direct Tp");
+            estateInfo =  string.Format ("{0, -20}", "Estate");
+            estateInfo += string.Format ("{0, -20}", "Owner");
+            estateInfo += string.Format ("{0, -10}", "Regions");
+            estateInfo += string.Format ("{0, -10}", "Voice");
+            estateInfo += string.Format ("{0, -10}", "Price/M");
+            estateInfo += string.Format ("{0, -10}", "Public");
+            estateInfo += string.Format ("{0, -10}", "Tax Free");
+            estateInfo += string.Format ("{0, -10}", "Direct Tp");
 
             MainConsole.Instance.CleanInfo (estateInfo);
             MainConsole.Instance.CleanInfo ("--------------------------------------------------------------------------------------------------");
 
-            foreach (string Estate in estates)
+            foreach (string estate in estates)
             {
-                var EstateID = estateConnector.GetEstateID (Estate);
-                EstateSettings ES = estateConnector.GetEstateSettings (EstateID);
+                var estateID = estateConnector.GetEstateID (estate);
+                EstateSettings ES = estateConnector.GetEstateSettings (estateID);
 
-                //var regInfo = scene.RegionInfo;
-                UserAccount EstateOwner = accountService.GetUserAccount (null, ES.EstateOwner);
-                var regions = estateConnector.GetRegions (EstateID);
+                if (ES != null) {
+                    //var regInfo = scene.RegionInfo;
+                    UserAccount EstateOwner = accountService.GetUserAccount (null, ES.EstateOwner);
+                    var regions = estateConnector.GetRegions (estateID);
 
-                // todo ... change hardcoded field sizes to public constants
-                estateInfo = String.Format ("{0, -20}", ES.EstateName);
-                estateInfo += String.Format ("{0, -20}", EstateOwner.Name);
-                estateInfo += String.Format ("{0, -10}", regions.Count);
-                estateInfo += String.Format ("{0, -10}", (ES.AllowVoice) ? "Yes" : "No");
-                estateInfo += String.Format ("{0, -10}", ES.PricePerMeter);
-                estateInfo += String.Format ("{0, -10}", (ES.PublicAccess) ? "Yes" : "No");
-                estateInfo += String.Format ("{0, -10}", (ES.TaxFree) ? "Yes" : "No");
-                estateInfo += String.Format ("{0, -10}", (ES.AllowDirectTeleport) ? "Yes" : "No");
+                    // todo ... change hardcoded field sizes to public constants
+                    estateInfo =  string.Format ("{0, -20}", ES.EstateName);
+                    estateInfo += string.Format ("{0, -20}", EstateOwner.Name);
+                    estateInfo += string.Format ("{0, -10}", regions.Count);
+                    estateInfo += string.Format ("{0, -10}", (ES.AllowVoice) ? "Yes" : "No");
+                    estateInfo += string.Format ("{0, -10}", ES.PricePerMeter);
+                    estateInfo += string.Format ("{0, -10}", (ES.PublicAccess) ? "Yes" : "No");
+                    estateInfo += string.Format ("{0, -10}", (ES.TaxFree) ? "Yes" : "No");
+                    estateInfo += string.Format ("{0, -10}", (ES.AllowDirectTeleport) ? "Yes" : "No");
 
-                MainConsole.Instance.CleanInfo (estateInfo);
+                    MainConsole.Instance.CleanInfo (estateInfo);
+                }
             }
             MainConsole.Instance.CleanInfo ("\n");
 
@@ -830,8 +832,8 @@ namespace WhiteCore.Modules.Estate
                     {
                         var estates = estateConnector.GetEstates ();
                         MainConsole.Instance.CleanInfo (" Available estates are : ");
-                        foreach (string Estate in estates)
-                            MainConsole.Instance.CleanInfo ("    " + Estate);
+                        foreach (string estate in estates)
+                            MainConsole.Instance.CleanInfo ("    " + estate);
                     }
                 } while (estateName == "?");
 
@@ -856,12 +858,12 @@ namespace WhiteCore.Modules.Estate
 
             string regionInfo;
 
-            regionInfo = String.Format ("{0, -20}", "Region");
-            regionInfo += String.Format ("{0, -12}", "Location");
-            regionInfo += String.Format ("{0, -14}", "Size");
-            regionInfo += String.Format ("{0, -12}", "Area");
-            regionInfo += String.Format ("{0, -26}", "Type");
-            regionInfo += String.Format ("{0, -10}", "Online");
+            regionInfo =  string.Format ("{0, -20}", "Region");
+            regionInfo += string.Format ("{0, -12}", "Location");
+            regionInfo += string.Format ("{0, -14}", "Size");
+            regionInfo += string.Format ("{0, -12}", "Area");
+            regionInfo += string.Format ("{0, -26}", "Type");
+            regionInfo += string.Format ("{0, -10}", "Online");
 
             MainConsole.Instance.CleanInfo (regionInfo);
 
@@ -882,12 +884,12 @@ namespace WhiteCore.Modules.Estate
                     offLine++;
 
                 // TODO ... change hardcoded field sizes to public constants
-                regionInfo = String.Format ("{0, -20}", region.RegionName);
-                regionInfo += String.Format ("{0, -12}", region.RegionLocX / Constants.RegionSize + "," + region.RegionLocY / Constants.RegionSize);
-                regionInfo += String.Format ("{0, -14}", region.RegionSizeX + "x" + region.RegionSizeY);
-                regionInfo += String.Format ("{0, -12}", region.RegionArea < 1000000 ? region.RegionArea + " m2" : (region.RegionArea / 1000000) + " km2");
-                regionInfo += String.Format ("{0, -26}", region.RegionType);
-                regionInfo += String.Format ("{0, -10}", region.IsOnline ? "yes" : "no");
+                regionInfo = string.Format ("{0, -20}", region.RegionName);
+                regionInfo += string.Format ("{0, -12}", region.RegionLocX / Constants.RegionSize + "," + region.RegionLocY / Constants.RegionSize);
+                regionInfo += string.Format ("{0, -14}", region.RegionSizeX + "x" + region.RegionSizeY);
+                regionInfo += string.Format ("{0, -12}", region.RegionArea < 1000000 ? region.RegionArea + " m2" : (region.RegionArea / 1000000) + " km2");
+                regionInfo += string.Format ("{0, -26}", region.RegionType);
+                regionInfo += string.Format ("{0, -10}", region.IsOnline ? "yes" : "no");
 
                 MainConsole.Instance.CleanInfo (regionInfo);
             }
