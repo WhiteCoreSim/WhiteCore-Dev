@@ -592,7 +592,7 @@ namespace WhiteCore.Modules.Inventory
                     if (invType == (sbyte) InventoryType.Gesture)
                     {
                         /*Default empty gesture*/
-                        data =  new byte[13] {50, 10, 50, 53, 53, 10, 48, 10, 10, 10, 48, 10, 0};
+                        data =  new byte[] {50, 10, 50, 53, 53, 10, 48, 10, 10, 10, 48, 10, 0};
                     }
 
                     AssetBase asset = new AssetBase(UUID.Random(), name, (AssetType) assetType,
@@ -625,8 +625,7 @@ namespace WhiteCore.Modules.Inventory
         byte[] BuildLandmark(IScenePresence presence)
         {
             Vector3 pos = presence.AbsolutePosition;
-            string strdata = String.Format(
-                "Landmark version 2\nregion_id {0}\nlocal_pos {1} {2} {3}\nregion_handle {4}",
+            string strdata = string.Format("Landmark version 2\nregion_id {0}\nlocal_pos {1} {2} {3}\nregion_handle {4}",
                 presence.Scene.RegionInfo.RegionID,
                 pos.X, pos.Y, pos.Z,
                 presence.Scene.RegionInfo.RegionHandle);
@@ -715,7 +714,7 @@ namespace WhiteCore.Modules.Inventory
             InventoryItemBase item = m_scene.InventoryService.GetItem(UUID.Zero, oldItemID);
             if (item == null)
             {
-                MainConsole.Instance.Error("[Agent inventory]: Failed to find item " + oldItemID.ToString());
+                MainConsole.Instance.Error("[Agent inventory]: Failed to find item " + oldItemID);
                 return;
             }
 
@@ -727,7 +726,7 @@ namespace WhiteCore.Modules.Inventory
                 {
                     if (asset != null)
                     {
-                        if (newName != String.Empty)
+                        if (newName != string.Empty)
                             asset.Name = newName;
                         else
                             newName = item.Name;
@@ -949,8 +948,7 @@ namespace WhiteCore.Modules.Inventory
             else
             {
                 MainConsole.Instance.ErrorFormat(
-                    "[Prim inventory]: " +
-                    "Couldn't find part {0} to request inventory data",
+                    "[Prim Inventory]: Couldn't find part {0} to request inventory data",
                     primLocalID);
             }
         }
@@ -982,8 +980,7 @@ namespace WhiteCore.Modules.Inventory
                 else
                 {
                     MainConsole.Instance.ErrorFormat(
-                        "[Prim inventory]: " +
-                        "Removal of item {0} requested of prim {1} but this prim does not exist",
+                        "[Prim Inventory]: Removal of item {0} requested of prim {1} but this prim does not exist",
                         itemID,
                         localID);
                 }
@@ -1007,8 +1004,7 @@ namespace WhiteCore.Modules.Inventory
             if (null == part)
             {
                 MainConsole.Instance.WarnFormat(
-                    "[Prim inventory]: " +
-                    "Move of inventory item {0} from prim with local id {1} failed because the prim could not be found",
+                    "[Prim Inventory]: Move of inventory item {0} from prim with local id {1} failed because the prim could not be found",
                     itemId, primLocalId);
 
                 return;
@@ -1019,7 +1015,7 @@ namespace WhiteCore.Modules.Inventory
             if (null == taskItem)
             {
                 MainConsole.Instance.WarnFormat(
-                    "[Prim inventory]: Move of inventory item {0} from prim with local id {1} failed"
+                    "[Prim Inventory]: Move of inventory item {0} from prim with local id {1} failed"
                     + " because the inventory item could not be found",
                     itemId, primLocalId);
 
@@ -1202,8 +1198,7 @@ namespace WhiteCore.Modules.Inventory
             else
             {
                 MainConsole.Instance.WarnFormat(
-                    "[Prim inventory]: " +
-                    "Update with item {0} requested of prim {1} for {2} but this prim does not exist",
+                    "[Prim inventory]: Update with item {0} requested of prim {1} for {2} but this prim does not exist",
                     itemID, primLocalID, remoteClient.Name);
             }
         }
@@ -1244,8 +1239,7 @@ namespace WhiteCore.Modules.Inventory
                     else
                     {
                         MainConsole.Instance.ErrorFormat(
-                            "[Prim inventory]: " +
-                            "Could not rez script {0} into prim local ID {1} for user {2}"
+                            "[Prim inventory]: Could not rez script {0} into prim local ID {1} for user {2}"
                             + " because the prim could not be found in the region!",
                             item.Name, localID, remoteClient.Name);
                     }
@@ -1453,8 +1447,7 @@ namespace WhiteCore.Modules.Inventory
             if (destPart == null)
             {
                 MainConsole.Instance.ErrorFormat(
-                    "[Prim inventory]: " +
-                    "Could not find script for ID {0}",
+                    "[Prim inventory]: Could not find script for ID {0}",
                     destId);
                 return;
             }
@@ -1476,8 +1469,7 @@ namespace WhiteCore.Modules.Inventory
             if (destPart.ScriptAccessPin == 0 || destPart.ScriptAccessPin != pin)
             {
                 MainConsole.Instance.WarnFormat(
-                    "[Prim inventory]: " +
-                    "Script in object {0} : {1}, attempted to load script {2} : {3} into object {4} : {5} with invalid pin {6}",
+                    "[Prim inventory]: Script in object {0} : {1}, attempted to load script {2} : {3} into object {4} : {5} with invalid pin {6}",
                     srcPart.Name, srcId, srcTaskItem.Name, srcTaskItem.ItemID, destPart.Name, destId, pin);
                 // the LSL Wiki says we are supposed to shout on the DEBUG_CHANNEL -
                 //   "Object: Task Object trying to illegally load script onto task Other_Object!"
@@ -1510,14 +1502,14 @@ namespace WhiteCore.Modules.Inventory
             {
                 if (m_scene.Permissions.PropagatePermissions())
                 {
-                    destTaskItem.CurrentPermissions = srcTaskItem.CurrentPermissions &
-                                                      srcTaskItem.NextPermissions;
-                    destTaskItem.GroupPermissions = srcTaskItem.GroupPermissions &
-                                                    srcTaskItem.NextPermissions;
-                    destTaskItem.EveryonePermissions = srcTaskItem.EveryonePermissions &
-                                                       srcTaskItem.NextPermissions;
-                    destTaskItem.BasePermissions = srcTaskItem.BasePermissions &
-                                                   srcTaskItem.NextPermissions;
+                    destTaskItem.CurrentPermissions = 
+                        srcTaskItem.CurrentPermissions & srcTaskItem.NextPermissions;
+                    destTaskItem.GroupPermissions = 
+                        srcTaskItem.GroupPermissions & srcTaskItem.NextPermissions;
+                    destTaskItem.EveryonePermissions = 
+                        srcTaskItem.EveryonePermissions & srcTaskItem.NextPermissions;
+                    destTaskItem.BasePermissions = 
+                        srcTaskItem.BasePermissions & srcTaskItem.NextPermissions;
                     destTaskItem.CurrentPermissions |= 16; // Slam!
                 }
             }
@@ -1579,10 +1571,7 @@ namespace WhiteCore.Modules.Inventory
 
             if (destPart == null)
             {
-                MainConsole.Instance.ErrorFormat(
-                    "[Prim inventory]: " +
-                    "Could not find prim for ID {0}",
-                    destId);
+                MainConsole.Instance.ErrorFormat("[Prim inventory]: Could not find prim for ID {0}", destId);
                 return;
             }
 
@@ -1708,35 +1697,29 @@ namespace WhiteCore.Modules.Inventory
         {
             UUID newFolderID = UUID.Random();
 
-            Util.FireAndForget((o) =>
-                                   {
-                                       InventoryFolderBase rootFolder = m_scene.InventoryService.GetRootFolder(destID);
+            Util.FireAndForget ((o) => {
+                InventoryFolderBase rootFolder = m_scene.InventoryService.GetRootFolder (destID);
+                InventoryFolderBase newFolder = new InventoryFolderBase (newFolderID, name, destID,
+                                                                        (short)FolderType.None, rootFolder.ID,
+                                                                        rootFolder.Version);
+                m_scene.InventoryService.AddFolder (newFolder);
 
-                                       InventoryFolderBase newFolder = new InventoryFolderBase(newFolderID, name, destID,
-                                                                                               (short) FolderType.None, rootFolder.ID,
-                                                                                               rootFolder.Version);
-                                       m_scene.InventoryService.AddFolder(newFolder);
+                foreach (UUID itemID in items) {
+                    InventoryItemBase agentItem = CreateAgentInventoryItemFromTask (destID, host,
+                                                                                   itemID);
 
-                                       foreach (UUID itemID in items)
-                                       {
-                                           InventoryItemBase agentItem = CreateAgentInventoryItemFromTask(destID, host,
-                                                                                                          itemID);
+                    if (agentItem != null) {
+                        agentItem.Folder = newFolderID;
+                        m_scene.InventoryService.AddItem (agentItem);
+                    }
+                }
 
-                                           if (agentItem != null)
-                                           {
-                                               agentItem.Folder = newFolderID;
-
-                                               m_scene.InventoryService.AddItem(agentItem);
-                                           }
-                                       }
-
-                                       IScenePresence avatar;
-                                       if (m_scene.TryGetScenePresence(destID, out avatar))
-                                       {
-                                           SendInventoryUpdate(avatar.ControllingClient, rootFolder, true, false);
-                                           SendInventoryUpdate(avatar.ControllingClient, newFolder, false, true);
-                                       }
-                                   });
+                IScenePresence avatar;
+                if (m_scene.TryGetScenePresence (destID, out avatar)) {
+                    SendInventoryUpdate (avatar.ControllingClient, rootFolder, true, false);
+                    SendInventoryUpdate (avatar.ControllingClient, newFolder, false, true);
+                }
+            });
 
             return newFolderID;
         }

@@ -626,19 +626,12 @@ namespace WhiteCore.Services.SQLServices.InventoryService
             // connector. So we disregard the principal and look
             // by ID.
             //
-            MainConsole.Instance.DebugFormat("[XINVENTORY SERVICE]: Fetch contents for folder {0}", folderID);
-            InventoryCollection inventory = new InventoryCollection
-                                                {
-                                                    UserID = userID,
-                                                    FolderID = folderID,
-                                                    Folders = m_Database.GetFolders(
-                                                        new[] {"parentFolderID"},
-                                                        new[] {folderID.ToString()}),
-                                                    Items = m_Database.GetItems(userID,
-                                                                                new[] {"parentFolderID"},
-                                                                                new[] {folderID.ToString()})
-                                                };
-
+            MainConsole.Instance.DebugFormat("[Inventory Service]: Fetch contents for folder {0}", folderID);
+            InventoryCollection inventory = new InventoryCollection ();
+            inventory.UserID = userID;
+            inventory.FolderID = folderID;
+            inventory.Folders = m_Database.GetFolders (new [] { "parentFolderID" }, new [] { folderID.ToString()});
+            inventory.Items = m_Database.GetItems (userID, new [] { "parentFolderID" }, new [] { folderID.ToString()});
 
             return inventory;
         }

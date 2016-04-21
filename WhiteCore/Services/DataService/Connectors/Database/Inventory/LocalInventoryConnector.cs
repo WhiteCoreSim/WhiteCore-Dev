@@ -76,18 +76,19 @@ namespace WhiteCore.Services.DataService
             get { return "IInventoryData"; }
         }
 
-        public bool FolderExists(UUID FolderID)
+        public bool FolderExists(UUID folderID)
         {
             QueryFilter filter = new QueryFilter();
-            filter.andFilters["folderID"] = FolderID;
+            filter.andFilters["folderID"] = folderID;
             return GD.Query(new string[] {"folderID"}, m_foldersrealm, filter, null, null, null).Count > 0;
         }
 
-        public bool FolderItemExists(UUID FolderID, UUID itemID)
+        public bool FolderItemExists(UUID folderID, UUID itemID)
         {
             QueryFilter filter = new QueryFilter();
-            filter.andFilters["parentFolderID"] = FolderID;
+            filter.andFilters["parentFolderID"] = folderID;
             filter.andFilters["assetID"] = itemID;
+
             return GD.Query(new string[] {"assetID"}, m_itemsrealm, filter, null, null, null).Count > 0;
         }
 
