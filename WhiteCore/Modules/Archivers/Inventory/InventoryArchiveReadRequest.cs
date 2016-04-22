@@ -91,7 +91,7 @@ namespace WhiteCore.Modules.Archivers
         {
             if (SceneEntitySerializer.SceneObjectSerializer == null)
                 SceneEntitySerializer.SceneObjectSerializer =
-                    new WhiteCore.Region.Serialization.SceneObjectSerializer();
+                    new Region.Serialization.SceneObjectSerializer();
         }
 
         public bool ReplaceAssets { get; set; }
@@ -107,7 +107,7 @@ namespace WhiteCore.Modules.Archivers
             m_registry = registry;
             m_merge = merge;
             m_userInfo = userInfo;
-            m_invPath = invPath.StartsWith("/") ? invPath.Remove(0, 1) : invPath;
+            m_invPath = invPath.StartsWith ("/", StringComparison.Ordinal) ? invPath.Remove(0, 1) : invPath;
             m_loadStream = new GZipStream(str, CompressionMode.Decompress);
             m_overridecreator = overwriteCreator;
 
@@ -185,16 +185,22 @@ namespace WhiteCore.Modules.Archivers
                 {
                     if (TarArchiveReader.TarEntryType.TYPE_NORMAL_FILE == entryType)
                     {
-                        var fName = Path.GetFileName (filePath);
-                        if (fName.StartsWith ("."))                 // ignore hidden files
+                        string fName;
+                        try {
+                            fName = Path.GetFileName (filePath);
+                            if (fName.StartsWith (".", StringComparison.Ordinal))                 // ignore hidden files
+                                continue;
+                        } catch {
+                            MainConsole.Instance.ErrorFormat ("[Archiver]: Invalid file name in archive: {0}", filePath);
                             continue;
+                        }
                     }
 
                     ticker ++;
                     if (ticker % 5 == 0)
                         MainConsole.Instance.Ticker();
 
-                    if (filePath.StartsWith(ArchiveConstants.ASSETS_PATH))
+                    if (filePath.StartsWith (ArchiveConstants.ASSETS_PATH, StringComparison.Ordinal))
                     {
                         if (LoadAsset(filePath, data))
                             successfulAssetRestores++;
@@ -202,17 +208,16 @@ namespace WhiteCore.Modules.Archivers
                             failedAssetRestores++;
 
                         if ((successfulAssetRestores)%50 == 0)
-                            MainConsole.Instance.InfoFormat(
-                                " [Inventory Archiver]: Loaded {0} assets...",
+                            MainConsole.Instance.InfoFormat(" [Inventory Archiver]: Loaded {0} assets...",
                                 successfulAssetRestores);
                     }
-                    else if (filePath.StartsWith(ArchiveConstants.INVENTORY_PATH))
+                    else if (filePath.StartsWith (ArchiveConstants.INVENTORY_PATH, StringComparison.Ordinal))
                     {
                         filePath = filePath.Substring(ArchiveConstants.INVENTORY_PATH.Length);
 
                         // Trim off the file portion if we aren't already dealing with a directory path
                         if (TarArchiveReader.TarEntryType.TYPE_DIRECTORY != entryType)
-                            filePath = filePath.Remove(filePath.LastIndexOf("/") + 1);
+                            filePath = filePath.Remove(filePath.LastIndexOf ("/", StringComparison.Ordinal) + 1);
 
                         InventoryFolderBase foundFolder
                             = ReplicateArchivePathToUserInventory(
@@ -377,7 +382,7 @@ namespace WhiteCore.Modules.Archivers
                 }
 
                 // Don't include the last slash so find the penultimate one
-                int penultimateSlashIndex = archivePath.LastIndexOf("/", archivePath.Length - 2);
+                int penultimateSlashIndex = archivePath.LastIndexOf ("/", archivePath.Length - 2, StringComparison.Ordinal);
 
                 if (penultimateSlashIndex >= 0)
                 {
@@ -431,8 +436,8 @@ namespace WhiteCore.Modules.Archivers
                     continue;
 
                 int identicalNameIdentifierIndex
-                    = rawDirsToCreate[i].LastIndexOf(
-                        ArchiveConstants.INVENTORY_NODE_NAME_COMPONENT_SEPARATOR);
+                    = rawDirsToCreate [i].LastIndexOf (
+                        ArchiveConstants.INVENTORY_NODE_NAME_COMPONENT_SEPARATOR, StringComparison.Ordinal);
 
                 string newFolderName = rawDirsToCreate[i].Remove(identicalNameIdentifierIndex);
 
@@ -455,7 +460,8 @@ namespace WhiteCore.Modules.Archivers
                     var pName = rPath.Key;
                     if (pName.Contains (ArchiveConstants.INVENTORY_NODE_NAME_COMPONENT_SEPARATOR))
                     {
-                        int splitIndex = pName.LastIndexOf (ArchiveConstants.INVENTORY_NODE_NAME_COMPONENT_SEPARATOR);
+                        int splitIndex = 
+                            pName.LastIndexOf (ArchiveConstants.INVENTORY_NODE_NAME_COMPONENT_SEPARATOR, StringComparison.Ordinal);
                         pName = pName.Remove (splitIndex);
                     }
 
@@ -588,7 +594,7 @@ namespace WhiteCore.Modules.Archivers
             // Right now we're nastily obtaining the UUID from the filename
             string filename = assetPath.Remove(0, ArchiveConstants.ASSETS_PATH.Length);
 
-            int i = filename.LastIndexOf(ArchiveConstants.ASSET_EXTENSION_SEPARATOR);
+            int i = filename.LastIndexOf (ArchiveConstants.ASSET_EXTENSION_SEPARATOR, StringComparison.Ordinal);
 
             if (i == -1)
             {
