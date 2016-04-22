@@ -107,17 +107,17 @@ namespace WhiteCore.Modules.Web
                         List<Dictionary<string, object>> users = new List<Dictionary<string, object>> ();
                         foreach (var client in usersInRegion)
                         {
-                            if (userService == null)
-                                continue;
-                        
-                            UserAccount account = userService.GetUserAccount (null, client.UserID);
-                            if (account == null)
-                                continue;
-                            Dictionary<string, object> user = new Dictionary<string, object> ();
-                            user.Add ("UserNameText", translator.GetTranslatedString ("UserNameText"));
-                            user.Add ("UserUUID", client.UserID);
-                            user.Add ("UserName", account.Name);
-                            users.Add (user);
+                            if (userService != null) {
+                                UserAccount account = userService.GetUserAccount (null, client.UserID);
+                                if (account != null) {
+
+                                    Dictionary<string, object> user = new Dictionary<string, object> ();
+                                    user.Add ("UserNameText", translator.GetTranslatedString ("UserNameText"));
+                                    user.Add ("UserUUID", client.UserID);
+                                    user.Add ("UserName", account.Name);
+                                    users.Add (user);
+                                }
+                            }
                         }
                         vars.Add ("UsersInRegion", users);
                     }
@@ -150,10 +150,10 @@ namespace WhiteCore.Modules.Web
                             if (accountService != null)
                             {
                                 var account = accountService.GetUserAccount (null, p.OwnerID);
-                                if (account == null)
-                                    parcel.Add ("ParcelOwnerName", translator.GetTranslatedString ("NoAccountFound"));
-                                else
+                                if (account != null)
                                     parcel.Add ("ParcelOwnerName", account.Name);
+                                else
+                                    parcel.Add ("ParcelOwnerName", translator.GetTranslatedString ("NoAccountFound"));
                             }
                             parcels.Add (parcel);
                         }

@@ -64,11 +64,13 @@ namespace WhiteCore.Modules.Web
 
             string error = "";
             UserAccount user = Authenticator.GetAuthentication(httpRequest);
-            if (user != null)
+            if (user == null)
             {
-                response = "No authentication service was available to change your password";
+                response = "No authentication service was available to change user details";
                 return null;
             }
+
+            // who we are dealing with...
             vars.Add ("UserName", user.Name);
 
             // password change

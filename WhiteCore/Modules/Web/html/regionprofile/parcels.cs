@@ -133,10 +133,10 @@ namespace WhiteCore.Modules.Web
                             if (accountService != null)
                             {
                                 var account = accountService.GetUserAccount (null, p.OwnerID);
-                                if (account == null)
-                                    parcel.Add ("ParcelOwnerName", translator.GetTranslatedString ("NoAccountFound"));
-                                else
+                                if (account != null)
                                     parcel.Add ("ParcelOwnerName", account.Name);
+                                else
+                                    parcel.Add ("ParcelOwnerName", translator.GetTranslatedString ("NoAccountFound"));
                             }
                             parcels.Add (parcel);
                         }

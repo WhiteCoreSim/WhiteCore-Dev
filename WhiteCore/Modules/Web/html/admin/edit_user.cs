@@ -93,19 +93,21 @@ namespace WhiteCore.Modules.Web
                 int UserFlags = webInterface.UserTypeToUserFlags (UserType);
 
                 // set the user account type
-                if (account != null)
-                {
+                if (account != null) {
                     account.UserFlags = UserFlags;
                     userService.StoreUserAccount (account);
-                } else
+                } else {
                     response = "Unable to update user account!'";
+                    return null;
+                }
 
-                if (agent != null)
-                {
+                if (agent != null) {
                     agent.OtherAgentInformation ["UserFlags"] = UserFlags;
                     agentService.UpdateAgent (agent);
-                } else
+                } else {
                     response = "Agent information is not available! Has the user logged in yet?";
+                    return null;
+                }
 
                 IProfileConnector profileData =
                     Framework.Utilities.DataManager.RequestPlugin<IProfileConnector>();
@@ -122,8 +124,7 @@ namespace WhiteCore.Modules.Web
                     profileData.UpdateUserProfile (profile);
                 }
 
-                if (response == null)
-                    response = "User has been updated.";
+                response = "User has been updated.";
                 return null;
             }
 
