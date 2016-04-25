@@ -245,6 +245,7 @@ namespace WhiteCore.Modules.Archivers
                     }
                     catch
                     {
+                        MainConsole.Instance.ErrorFormat ("[AvatarArchive]: error deserializing {0} archive", file);
                     }
                 }
             }
@@ -381,19 +382,19 @@ namespace WhiteCore.Modules.Archivers
             var parms = new List <string>();
             for (int i = 3; i < cmdparams.Length;)
             {
-                if (cmdparams [i].StartsWith ("--portable"))
+                if (cmdparams [i].StartsWith ("--portable", StringComparison.Ordinal))
                 {
                     isPortable = true;
                     i++;
-                } else if (cmdparams [i].StartsWith ("--private"))
+                } else if (cmdparams [i].StartsWith ("--private", StringComparison.Ordinal))
                 {
                     isPublic = false;
                     i++;
-                } else if (cmdparams [i].StartsWith ("--snapshot"))
+                } else if (cmdparams [i].StartsWith ("--snapshot", StringComparison.Ordinal))
                 {
                     snapshotUUID = UUID.Parse (cmdparams [i + 1]);
                     i += 2;
-                } else if (cmdparams [i].StartsWith ("--"))
+                } else if (cmdparams [i].StartsWith ("--", StringComparison.Ordinal))
                 {
                     MainConsole.Instance.WarnFormat ("Unknown parameter: " + cmdparams [i]);
                     i++;
@@ -633,10 +634,11 @@ namespace WhiteCore.Modules.Archivers
 
              if (isPortable)
                 assetGatherer.GatherAssetUuids (assetBase.ID, assetBase.TypeAsset, assetUuids);
-            else
+             else
                 // we need this one at least
                 assetUuids [assetBase.ID] = assetBase.TypeAsset;
-            
+            assetBase = null;
+
             // save the required assets
             foreach (KeyValuePair<UUID, AssetType> kvp in assetUuids)
             {
@@ -648,9 +650,10 @@ namespace WhiteCore.Modules.Archivers
                 }
                 else
                 {
-                    MainConsole.Instance.Debug("[AvatarArchive]: Could not find asset to save: " + asset.ID);
+                    MainConsole.Instance.Debug("[AvatarArchive]: Could not find asset to save: " + kvp.Key);
                     return;
                 }
+                asset = null;
             }
         }
 
@@ -718,7 +721,9 @@ namespace WhiteCore.Modules.Archivers
                             myEncoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 75L);
 
                             // Save bitmap to stream
-                            texture.Save(imgstream, GetEncoderInfo("image/jpeg"), myEncoderParameters);
+                            var encInfo = GetEncoderInfo ("image/jpeg");
+                            if (encInfo != null)
+                                texture.Save(imgstream, encInfo, myEncoderParameters);
 
                             // Write the stream to a byte array for output
                             jpeg = imgstream.ToArray();
@@ -749,7 +754,7 @@ namespace WhiteCore.Modules.Archivers
         }
 
         // From MSDN
-        static ImageCodecInfo GetEncoderInfo(String mimeType)
+        static ImageCodecInfo GetEncoderInfo(string mimeType)
         {
             ImageCodecInfo[] encoders;
             encoders = ImageCodecInfo.GetImageEncoders();
