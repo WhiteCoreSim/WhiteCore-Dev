@@ -158,7 +158,8 @@ namespace WhiteCore.Modules.Agent.J2KDecoder
 
             if (!TryLoadCacheForAsset(assetID, out layers))
             {
-                if (j2kData == null || j2kData.Length == 0)
+				var okDecode = (j2kData != null) && (j2kData.Length > 0);
+				if (!okDecode)
                 {
                     // Layer decoding completely failed. Guess at sane defaults for the layer boundaries
                     layers = CreateDefaultLayers(j2kData.Length);
@@ -175,6 +176,7 @@ namespace WhiteCore.Modules.Agent.J2KDecoder
                     }
                     return false;
                 }
+
                 if (m_useCSJ2K)
                 {
                     try
@@ -216,7 +218,8 @@ namespace WhiteCore.Modules.Agent.J2KDecoder
                     }
                 }
 
-                if (layers == null || layers.Length == 0)
+				var okTexture = (layers != null) && (layers.Length > 0);
+				if (!okTexture)
                 {
                     if (useCSJ2K == m_useCSJ2K)
                     {
@@ -317,7 +320,7 @@ namespace WhiteCore.Modules.Agent.J2KDecoder
                 for (int i = 0; i < layers.Length; i++)
                 {
                     if (i == layers.Length - 1)
-                        strEnd = String.Empty;
+                        strEnd = string.Empty;
 
                     stringResult.AppendFormat("{0}|{1}|{2}{3}", layers[i].Start, layers[i].End,
                                               layers[i].End - layers[i].Start, strEnd);
