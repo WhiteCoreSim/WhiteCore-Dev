@@ -88,7 +88,7 @@ namespace WhiteCore.Modules.Archivers
             MainConsole.Instance.InfoFormat("[Archiver]: Finished writing out OAR for {0}",
                                             m_scene.RegionInfo.RegionName);
 
-            m_scene.EventManager.TriggerOarFileSaved(m_requestId, String.Empty);
+            m_scene.EventManager.TriggerOarFileSaved(m_requestId, string.Empty);
         }
 
         protected internal void Save(ICollection<UUID> assetsFoundUuids, ICollection<UUID> assetsNotFoundUuids)
@@ -109,7 +109,7 @@ namespace WhiteCore.Modules.Archivers
 
             // Write out region settings
             string settingsPath
-                = String.Format("{0}{1}.xml", ArchiveConstants.SETTINGS_PATH, m_scene.RegionInfo.RegionName);
+                = string.Format("{0}{1}.xml", ArchiveConstants.SETTINGS_PATH, m_scene.RegionInfo.RegionName);
             m_archiveWriter.WriteFile(settingsPath,
                                       RegionSettingsSerializer.Serialize(m_scene.RegionInfo.RegionSettings));
 
@@ -123,7 +123,7 @@ namespace WhiteCore.Modules.Archivers
                 foreach (ILandObject lo in landObjects)
                 {
                     LandData landData = lo.LandData;
-                    string landDataPath = String.Format("{0}{1}.xml", ArchiveConstants.LANDDATA_PATH, landData.GlobalID);
+                    string landDataPath = string.Format("{0}{1}.xml", ArchiveConstants.LANDDATA_PATH, landData.GlobalID);
                     m_archiveWriter.WriteFile(landDataPath, LandDataSerializer.Serialize(landData));
                 }
             }
@@ -132,7 +132,7 @@ namespace WhiteCore.Modules.Archivers
 
             // Write out terrain
             string terrainPath
-                = String.Format("{0}{1}.r32", ArchiveConstants.TERRAINS_PATH, m_scene.RegionInfo.RegionName);
+                = string.Format("{0}{1}.r32", ArchiveConstants.TERRAINS_PATH, m_scene.RegionInfo.RegionName);
 
             MemoryStream ms = new MemoryStream();
             m_terrainModule.SaveToStream(m_terrainModule.TerrainMap, terrainPath, ms);
@@ -147,7 +147,8 @@ namespace WhiteCore.Modules.Archivers
                 //MainConsole.Instance.DebugFormat("[Archiver]: Saving {0} {1}, {2}", entity.Name, entity.UUID, entity.GetType());
 
                 string serializedObject = m_serialiser.SerializeGroupToXml2(sceneObject);
-                m_archiveWriter.WriteFile(ArchiveHelpers.CreateObjectPath(sceneObject), serializedObject);
+                if (serializedObject != null)
+                    m_archiveWriter.WriteFile(ArchiveHelpers.CreateObjectPath(sceneObject), serializedObject);
             }
 
             MainConsole.Instance.InfoFormat("[Archiver]: Added scene objects to archive.");
@@ -177,7 +178,7 @@ namespace WhiteCore.Modules.Archivers
             xtw.Flush();
             xtw.Close();
 
-            String s = sw.ToString();
+            string s = sw.ToString();
             sw.Close();
 
             return s;

@@ -226,7 +226,7 @@ namespace WhiteCore.Modules.Archivers
         protected void SaveInvFolder(InventoryFolderBase inventoryFolder, string path, bool saveThisFolderItself)
         {
             // ignore viewer folders (special folders?)
-            if (inventoryFolder.Name.StartsWith ("#"))
+            if (inventoryFolder.Name.StartsWith ("#", StringComparison.Ordinal))
                 return;
 
 
@@ -260,7 +260,7 @@ namespace WhiteCore.Modules.Archivers
         /// <returns>Whether the user is allowed to export the object to an IAR</returns>
         bool CanUserArchiveObject(UUID UserID, InventoryItemBase InvItem)
         {
-            if (FilterContent == null || FilterContent == "")
+            if (string.IsNullOrEmpty(FilterContent))
                 return true;// Default To Allow Export
 
             bool permitted = true;
@@ -293,6 +293,12 @@ namespace WhiteCore.Modules.Archivers
                 InventoryItemBase inventoryItem = null;
                 InventoryFolderBase rootFolder = m_inventoryService.GetRootFolder(m_userInfo.PrincipalID);
 
+                if (rootFolder == null) {
+                    MainConsole.Instance.ErrorFormat ("[Inventory Archiver]: Unable to fine root folder for {0}",
+                                               m_userInfo.PrincipalID);
+                    return;
+                }
+
                 if (m_defaultFolderToSave != null)
                     rootFolder = m_defaultFolderToSave;
 
@@ -318,7 +324,7 @@ namespace WhiteCore.Modules.Archivers
                    // 20141119-greythane- This breaks saving default inventory //  saveFolderContentsOnly = true;
                 }
 
-                m_invPath = String.Empty;
+                m_invPath = string.Empty;
                 for (int i = 0; i <= maxComponentIndex; i++)
                 {
                     m_invPath += components[i] + InventoryFolderImpl.PATH_DELIMITER;
@@ -332,7 +338,7 @@ namespace WhiteCore.Modules.Archivers
                 }
                 else
                 {
-                    m_invPath = m_invPath.Remove(m_invPath.LastIndexOf(InventoryFolderImpl.PATH_DELIMITER));
+                    m_invPath = m_invPath.Remove(m_invPath.LastIndexOf (InventoryFolderImpl.PATH_DELIMITER, StringComparison.Ordinal));
                     List<InventoryFolderBase> candidateFolders
                         = InventoryArchiveUtils.FindFolderByPath(m_inventoryService, rootFolder, m_invPath);
                     if (candidateFolders.Count > 0)
@@ -365,7 +371,7 @@ namespace WhiteCore.Modules.Archivers
                         "[Inventory Archiver]: Found folder {0} {1} at {2}",
                         inventoryFolder.Name,
                         inventoryFolder.ID,
-                        m_invPath == String.Empty ? InventoryFolderImpl.PATH_DELIMITER : m_invPath);
+                        m_invPath == string.Empty ? InventoryFolderImpl.PATH_DELIMITER : m_invPath);
 
                     //recurse through all dirs getting dirs and files
                     SaveInvFolder(inventoryFolder, ArchiveConstants.INVENTORY_PATH, !saveFolderContentsOnly);
@@ -506,7 +512,7 @@ namespace WhiteCore.Modules.Archivers
             xtw.Flush();
             xtw.Close();
 
-            String s = sw.ToString();
+            string s = sw.ToString();
             sw.Close();
 
             return s;

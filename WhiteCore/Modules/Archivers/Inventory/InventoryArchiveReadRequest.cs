@@ -145,6 +145,10 @@ namespace WhiteCore.Modules.Archivers
                 {
                     // try and create requested folder
                     var rootFolder = m_inventoryService.GetRootFolder(m_userInfo.PrincipalID);
+                    if (rootFolder == null) {
+                        if (m_inventoryService.CreateUserInventory (m_userInfo.PrincipalID, true))
+                            rootFolder = m_inventoryService.GetRootFolder (m_userInfo.PrincipalID);
+                    }
 
                     InventoryFolderBase iarImportFolder = new InventoryFolderBase();
 

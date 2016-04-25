@@ -173,13 +173,11 @@ namespace WhiteCore.Modules.Archivers
             TarArchiveReader archive = new TarArchiveReader(m_loadStream);
 
             if (!m_skipAssets)
-                m_threadpool = new WhiteCoreThreadPool(new WhiteCoreThreadPoolStartInfo()
-                                                                         {
-                                                                             Threads = 1,
-                                                                             priority =
-                                                                                 System.Threading.ThreadPriority
-                                                                                       .BelowNormal
-                                                                         });
+                m_threadpool = new WhiteCoreThreadPool(
+                    new WhiteCoreThreadPoolStartInfo() {
+                        Threads = 1,
+                        priority =System.Threading.ThreadPriority.BelowNormal
+                    });
 
             IBackupModule backup = m_scene.RequestModuleInterface<IBackupModule>();
             if (!m_merge)
@@ -276,6 +274,7 @@ namespace WhiteCore.Modules.Archivers
                                     }
                                 }
                             }
+                            asset = null;
                         }
                         else
                             failedAssetRestores++;
@@ -866,6 +865,7 @@ namespace WhiteCore.Modules.Archivers
                     }
                 }
             }
+            xtr.Close ();
         }
     }
 }
