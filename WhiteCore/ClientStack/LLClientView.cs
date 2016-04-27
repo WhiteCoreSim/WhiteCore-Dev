@@ -690,33 +690,33 @@ namespace WhiteCore.ClientStack
         {
             bool result = false;
             PacketProcessor pprocessor;
-            if (m_packetHandlers.TryGetValue(packet.Type, out pprocessor))
-            {
-                //there is a local handler for this packet type
-                if (pprocessor.Async)
-                {
-                    object obj = new AsyncPacketProcess(this, pprocessor.method, packet);
-                    m_udpServer.FireAndForget(ProcessSpecificPacketAsync, obj);
-                    result = true;
-                }
-                else
-                {
-                    result = pprocessor.method(this, packet);
-                }
+
+            bool localHandler;
+            lock (m_packetHandlers) {
+                localHandler = m_packetHandlers.TryGetValue (packet.Type, out pprocessor);
             }
-            else
+            if (localHandler) {
+                //there is a local handler for this packet type
+                if (pprocessor.Async) {
+                    object obj = new AsyncPacketProcess (this, pprocessor.method, packet);
+                    m_udpServer.FireAndForget (ProcessSpecificPacketAsync, obj);
+                    result = true;
+                } else {
+                    result = pprocessor.method (this, packet);
+                }
+                return result;
+            }
+
+            //there is not a local handler so see if there is a Global handler
+            PacketMethod method = null;
+            bool found;
+            lock (PacketHandlers)
             {
-                //there is not a local handler so see if there is a Global handler
-                PacketMethod method = null;
-                bool found;
-                lock (PacketHandlers)
-                {
-                    found = PacketHandlers.TryGetValue(packet.Type, out method);
-                }
-                if (found)
-                {
-                    result = method(this, packet);
-                }
+                found = PacketHandlers.TryGetValue(packet.Type, out method);
+            }
+            if (found)
+            {
+                result = method(this, packet);
             }
             return result;
         }
@@ -1224,7 +1224,7 @@ namespace WhiteCore.ClientStack
             }
             catch (Exception e)
             {
-                MainConsole.Instance.ErrorFormat("[CLIENT]: SendLayerData() Failed with exception: " + e.ToString());
+                MainConsole.Instance.ErrorFormat("[CLIENT]: SendLayerData() Failed with exception: " + e);
             }
         }
 
@@ -2730,6 +2730,7 @@ namespace WhiteCore.ClientStack
             OutPacket(pack, ThrottleOutPacketType.AvatarInfo);
         }
 
+        static readonly object _lock = new object ();
         public void SendLandStatReply(uint reportType, uint requestFlags, uint resultCount, LandStatReportItem[] lsrpia)
         {
             LandStatReplyMessage message = new LandStatReplyMessage
@@ -2740,23 +2741,21 @@ namespace WhiteCore.ClientStack
                                                    ReportDataBlocks =
                                                        new LandStatReplyMessage.ReportDataBlock[lsrpia.Length]
                                                };
-
-            for (int i = 0; i < lsrpia.Length; i++)
-            {
-                LandStatReplyMessage.ReportDataBlock block = new LandStatReplyMessage.ReportDataBlock
-                                                                 {
-                                                                     Location = lsrpia[i].Location,
-                                                                     MonoScore = lsrpia[i].Score,
-                                                                     OwnerName = lsrpia[i].OwnerName,
-                                                                     Score = lsrpia[i].Score,
-                                                                     TaskID = lsrpia[i].TaskID,
-                                                                     TaskLocalID = lsrpia[i].TaskLocalID,
-                                                                     TaskName = lsrpia[i].TaskName,
-                                                                     TimeStamp = lsrpia[i].TimeModified
-                                                                 };
-                message.ReportDataBlocks[i] = block;
+            lock (_lock) {
+                for (int i = 0; i < lsrpia.Length; i++) {
+                    LandStatReplyMessage.ReportDataBlock block = new LandStatReplyMessage.ReportDataBlock {
+                        Location = lsrpia [i].Location,
+                        MonoScore = lsrpia [i].Score,
+                        OwnerName = lsrpia [i].OwnerName,
+                        Score = lsrpia [i].Score,
+                        TaskID = lsrpia [i].TaskID,
+                        TaskLocalID = lsrpia [i].TaskLocalID,
+                        TaskName = lsrpia [i].TaskName,
+                        TimeStamp = lsrpia [i].TimeModified
+                    };
+                    message.ReportDataBlocks [i] = block;
+                }
             }
-
             IEventQueueService eventService = m_scene.RequestModuleInterface<IEventQueueService>();
             if (eventService != null)
             {
@@ -11332,8 +11331,7 @@ namespace WhiteCore.ClientStack
 
 
                 List<GroupTitlesData> titles =
-                    m_GroupsModule.GroupTitlesRequest(this,
-                                                      groupTitlesRequest.AgentData.GroupID);
+                    m_GroupsModule.GroupTitlesRequest(this, groupTitlesRequest.AgentData.GroupID);
 
                 groupTitlesReply.GroupData =
                     new GroupTitlesReplyPacket.GroupDataBlock[titles.Count];

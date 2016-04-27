@@ -41,22 +41,22 @@ namespace WhiteCore.ClientStack
         /// <summary>
         ///     Holds the actual unacked packet data, sorted by sequence number
         /// </summary>
-        private readonly Dictionary<uint, OutgoingPacket> m_packets = new Dictionary<uint, OutgoingPacket>();
+        readonly Dictionary<uint, OutgoingPacket> m_packets = new Dictionary<uint, OutgoingPacket>();
 
         /// <summary>
         ///     Holds information about pending acknowledgements
         /// </summary>
-        private readonly ConcurrentQueue<PendingAck> m_pendingAcknowledgements = new ConcurrentQueue<PendingAck>();
+        readonly ConcurrentQueue<PendingAck> m_pendingAcknowledgements = new ConcurrentQueue<PendingAck>();
 
         /// <summary>
         ///     Holds packets that need to be added to the unacknowledged list
         /// </summary>
-        private readonly ConcurrentQueue<OutgoingPacket> m_pendingAdds = new ConcurrentQueue<OutgoingPacket>();
+        readonly ConcurrentQueue<OutgoingPacket> m_pendingAdds = new ConcurrentQueue<OutgoingPacket>();
 
         /// <summary>
         ///     Holds information about pending removals
         /// </summary>
-        private readonly ConcurrentQueue<uint> m_pendingRemoves = new ConcurrentQueue<uint>();
+        readonly ConcurrentQueue<uint> m_pendingRemoves = new ConcurrentQueue<uint>();
 
         /// <summary>
         ///     Add an unacked packet to the collection
@@ -139,7 +139,7 @@ namespace WhiteCore.ClientStack
 
             if (m_packets.Count > 0)
             {
-                int now = Environment.TickCount & Int32.MaxValue;
+                int now = Environment.TickCount & int.MaxValue;
                 int i = 0;
 
                 foreach (
@@ -170,7 +170,7 @@ namespace WhiteCore.ClientStack
             return expiredPackets;
         }
 
-        private void ProcessQueues()
+        void ProcessQueues()
         {
             // Process all the pending adds
 
@@ -234,7 +234,7 @@ namespace WhiteCore.ClientStack
         /// <summary>
         ///     Holds information about a pending acknowledgement
         /// </summary>
-        private struct PendingAck
+        struct PendingAck
         {
             /// <summary>
             ///     Whether or not this acknowledgement was attached to a

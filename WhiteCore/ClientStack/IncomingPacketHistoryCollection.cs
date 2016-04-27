@@ -35,11 +35,11 @@ namespace WhiteCore.ClientStack
     /// </summary>
     public sealed class IncomingPacketHistoryCollection
     {
-        private readonly int m_capacity;
-        private readonly HashSet<uint> m_hashSet;
-        private readonly uint[] m_items;
-        private int m_first;
-        private int m_next;
+        readonly int m_capacity;
+        readonly HashSet<uint> m_hashSet;
+        readonly uint[] m_items;
+        int m_first;
+        int m_next;
 
         public IncomingPacketHistoryCollection(int capacity)
         {
