@@ -96,10 +96,11 @@ namespace WhiteCore.Framework.ClientInterfaces
             set { m_owner = value; }
         }
 
+        static readonly object _lock = new object ();
         public Dictionary<int, List<AvatarAttachment>> Attachments
         {
-            get { return m_attachments; }
-            set { m_attachments = value; }
+            get { lock (_lock) { return m_attachments; }}
+            set { lock (_lock) { m_attachments = value; }}
         }
 
         public AvatarAppearance() : this(UUID.Zero)
@@ -197,10 +198,12 @@ namespace WhiteCore.Framework.ClientInterfaces
 
             m_visualparams = null;
             if (appearance.VisualParams != null)
-                m_visualparams = (byte[]) appearance.VisualParams.Clone();
+                m_visualparams = (byte [])appearance.VisualParams.Clone ();
+            else
+                SetDefaultParams ();    // we need something to work with
             
-            SetHeight();
-            
+            SetHeight ();
+
             // Copy the attachment, force append mode since that ensures consistency
             m_attachments = new Dictionary<int, List<AvatarAttachment>>();
             foreach (AvatarAttachment attachment in appearance.GetAttachments())
@@ -651,10 +654,14 @@ namespace WhiteCore.Framework.ClientInterfaces
             data["visualparams"] = visualparams;
 
             // Attachments
-            OSDArray attachs = new OSDArray(m_attachments.Count);
-            foreach (AvatarAttachment attach in GetAttachments())
-                attachs.Add(attach.Pack());
-            data["attachments"] = attachs;
+            int attachCount;
+            lock (m_attachments) {
+                attachCount = m_attachments.Count;
+            }
+            OSDArray attachs = new OSDArray (attachCount);
+            foreach (AvatarAttachment attach in GetAttachments ())
+                attachs.Add (attach.Pack ());
+            data ["attachments"] = attachs;
 
             data["wearableCache"] = m_wearableCache.ToOSDMap();
 
