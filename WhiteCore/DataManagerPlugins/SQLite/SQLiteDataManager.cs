@@ -233,7 +233,7 @@ namespace WhiteCore.DataManager.SQLite
         {
             cmd.Connection.Close();
             cmd.Parameters.Clear();
-            //cmd.Dispose ();
+            cmd.Dispose ();                 // previously commented but this is a resource leak if not cleared out - greythane - 20160427
         }
 
         void AddParams(ref SqliteCommand cmd, Dictionary<string, object> ps)
