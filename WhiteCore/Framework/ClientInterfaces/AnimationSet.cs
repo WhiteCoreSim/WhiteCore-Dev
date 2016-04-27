@@ -37,11 +37,11 @@ namespace WhiteCore.Framework.ClientInterfaces
     {
         public static AvatarAnimations Animations = new AvatarAnimations();
 
-        private readonly List<Animation> m_animations = new List<Animation>();
-        private Animation m_implicitDefaultAnimation = new Animation();
-        private Animation m_defaultAnimation = new Animation();
-        private readonly Dictionary<string, UUID> m_defaultAnimationOverrides = new Dictionary<string,UUID>();
-        private readonly Dictionary<string, string> m_defaultAnimationOverridesName = new Dictionary<string, string>();
+        readonly List<Animation> m_animations = new List<Animation>();
+        Animation m_implicitDefaultAnimation = new Animation();
+        Animation m_defaultAnimation = new Animation();
+        readonly Dictionary<string, UUID> m_defaultAnimationOverrides = new Dictionary<string,UUID>();
+        readonly Dictionary<string, string> m_defaultAnimationOverridesName = new Dictionary<string, string>();
 
         public AnimationSet(AvatarAnimations animations)
         {
@@ -101,7 +101,9 @@ namespace WhiteCore.Framework.ClientInterfaces
         public void Clear()
         {
             ResetDefaultAnimation();
-            m_animations.Clear();
+            lock (m_animations) {
+                m_animations.Clear ();
+            }
         }
 
         /// <summary>
@@ -199,7 +201,7 @@ namespace WhiteCore.Framework.ClientInterfaces
                 else if (m_animations.Count == 0)
                 {
                     animIDs[0] = m_implicitDefaultAnimation.AnimID;
-                    sequenceNums[0] = m_defaultAnimation.SequenceNum;
+                    sequenceNums[0] = m_implicitDefaultAnimation.SequenceNum;
                     objectIDs[0] = m_implicitDefaultAnimation.ObjectID;
                 }
 
@@ -214,26 +216,29 @@ namespace WhiteCore.Framework.ClientInterfaces
 
         public Animation[] ToArray()
         {
-            Animation[] theArray = new Animation[m_animations.Count];
-            uint i = 0;
-            try
-            {
-                foreach (Animation anim in m_animations)
-                    theArray[i++] = anim;
+            lock (m_animations) {
+                Animation [] theArray = new Animation [m_animations.Count];
+                uint i = 0;
+                try {
+                    foreach (Animation anim in m_animations)
+                        theArray [i++] = anim;
+                } catch {
+                    /* S%^t happens. Ignore. */
+                }
+
+                return theArray;
             }
-            catch
-            {
-                /* S%^t happens. Ignore. */
-            }
-            return theArray;
         }
 
         public void FromArray(Animation[] theArray)
         {
             if (theArray == null)
                 return;
-            foreach (Animation anim in theArray)
-                m_animations.Add(anim);
+   
+            lock (m_animations) {
+                foreach (Animation anim in theArray)
+                    m_animations.Add (anim);
+            }
         }
     }
 }
