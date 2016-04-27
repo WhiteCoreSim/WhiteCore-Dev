@@ -74,6 +74,7 @@ namespace WhiteCore.DataManager.MySQL
             var migrationManager = new MigrationManager(this, migratorName, validateTables);
             migrationManager.DetermineOperation();
             migrationManager.ExecuteOperation();
+            c.Close ();
         }
 
         public void CloseDatabase(MySqlConnection connection)
@@ -1127,7 +1128,7 @@ namespace WhiteCore.DataManager.MySQL
 
             foreach (KeyValuePair<string, Dictionary<uint, string>> index in indexLookup)
             {
-                index.Value.OrderBy(x => x.Key);
+                //index.Value.OrderBy(x => x.Key);
                 defs[index.Key] = new IndexDefinition
                                       {
                                           Fields = index.Value.Values.ToArray<string>(),
