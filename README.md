@@ -5,7 +5,7 @@
 *NOTE:
  For those using the master, please report back when you are having issues with the builds. We, the developers, can't test everything and we hope that you, the users, are able to help us report things that break. 
  
- Please use the Issue Tracker with the predefined text to make it easier to report issues.
+ Please use the Issue Tracker with the predefined text to make it easier to report issues.*
 
 *NOTE:
  As of today, we have included BulletSim into the repository as a second Physics Engine. Please try it out and tell us if it's working properly*
