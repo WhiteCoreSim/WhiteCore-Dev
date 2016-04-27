@@ -3,9 +3,7 @@
 [![Join the chat at https://gitter.im/WhiteCoreSim/WhiteCore-Dev](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/WhiteCoreSim/WhiteCore-Dev?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 *NOTE:
- For those using the master, please report back when you are having issues with the builds. We, the developers, can't test everything and we hope that you, the users, are able to help us report things that break. 
- 
- Please use the Issue Tracker with the predefined text to make it easier to report issues.*
+ For those using the master, please report back when you are having issues with the builds. We, the developers, can't test everything and we hope that you, the users, are able to help us report things that break. Please use the Issue Tracker with the predefined text to make it easier to report issues*
 
 *NOTE:
  As of today, we have included BulletSim into the repository as a second Physics Engine. Please try it out and tell us if it's working properly*
