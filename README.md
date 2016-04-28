@@ -64,9 +64,3 @@ Support is available from various sources.
 
 * Google + community for WhiteCore with a friendly bunch that is happy to answer questions. Find it at https://plus.google.com/communities/113034607546142208907?cfem=1
 
-*NOTE: 
- As of Version 0.9.2, the WhiteCore repository format has changed.  
- The WhiteCore-Optional-Modules repository has also been updated for the new structure.
- To ensure correct compiling, use the latest commits of the WhiteCore-Dev or a release version >= 0.9.2*
-
-*Please see the "Migration to 0.9.2.txt" file for details on files and configurations that will need to be modified*
