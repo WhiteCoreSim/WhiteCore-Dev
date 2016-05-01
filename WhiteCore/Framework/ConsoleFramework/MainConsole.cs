@@ -33,17 +33,17 @@ namespace WhiteCore.Framework.ConsoleFramework
     {
         #region Delegates
 
-        public delegate void IncomingLogWrite(string level, string text);
+        public delegate void IncomingLogWrite (string level, string text);
 
         #endregion
 
         public static ICommandConsole Instance { get; set; }
         public static event IncomingLogWrite OnIncomingLogWrite;
 
-        public static void TriggerLog(string level, string text)
+        public static void TriggerLog (string level, string text)
         {
             if (OnIncomingLogWrite != null)
-                OnIncomingLogWrite(level, text);
+                OnIncomingLogWrite (level, text);
         }
     }
 }
