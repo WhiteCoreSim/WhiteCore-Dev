@@ -53,12 +53,12 @@ namespace WhiteCore.Framework.Utilities
         /// <summary>
         ///     The cache object.
         /// </summary>
-        private readonly ICnmCache<TKey, TValue> m_cache;
+        readonly ICnmCache<TKey, TValue> m_cache;
 
         /// <summary>
         ///     Synchronization root.
         /// </summary>
-        private readonly object m_syncRoot;
+        readonly object m_syncRoot;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="CnmSynchronizedCache{TKey,TValue}" /> class.
@@ -67,7 +67,7 @@ namespace WhiteCore.Framework.Utilities
         /// <param name="cache">
         ///     The cache.
         /// </param>
-        private CnmSynchronizedCache(ICnmCache<TKey, TValue> cache)
+        CnmSynchronizedCache (ICnmCache<TKey, TValue> cache)
         {
             m_cache = cache;
             m_syncRoot = m_cache.SyncRoot;
@@ -88,12 +88,9 @@ namespace WhiteCore.Framework.Utilities
         /// <seealso cref="ICnmCache{TKey,TValue}.IsCountLimited" />
         /// <seealso cref="ICnmCache{TKey,TValue}.IsSizeLimited" />
         /// <seealso cref="ICnmCache{TKey,TValue}.IsTimeLimited" />
-        public int Count
-        {
-            get
-            {
-                lock (m_syncRoot)
-                {
+        public int Count {
+            get {
+                lock (m_syncRoot) {
                     return m_cache.Count;
                 }
             }
@@ -108,8 +105,7 @@ namespace WhiteCore.Framework.Utilities
         /// <remarks>
         ///     <para>
         ///         When element has been stored in <see cref="ICnmCache{TKey,TValue}" /> longer than
-        ///         <see
-        ///             cref="ICnmCache{TKey,TValue}.ExpirationTime" />
+        ///         <see cref="ICnmCache{TKey,TValue}.ExpirationTime" />
         ///         and it is not accessed through <see cref="ICnmCache{TKey,TValue}.TryGetValue" /> method or element's value is
         ///         not replaced by <see cref="ICnmCache{TKey,TValue}.Set" /> method, then it is automatically removed from the
         ///         <see cref="ICnmCache{TKey,TValue}" />.
@@ -117,11 +113,9 @@ namespace WhiteCore.Framework.Utilities
         ///     <para>
         ///         It is possible that <see cref="ICnmCache{TKey,TValue}" /> implementation removes element before it's expiration time,
         ///         because total size or count of elements stored to cache is larger than
-        ///         <see
-        ///             cref="ICnmCache{TKey,TValue}.MaxSize" />
+        ///         <see cref="ICnmCache{TKey,TValue}.MaxSize" />
         ///         or
-        ///         <see
-        ///             cref="ICnmCache{TKey,TValue}.MaxCount" />
+        ///         <see cref="ICnmCache{TKey,TValue}.MaxCount" />
         ///         .
         ///     </para>
         ///     <para>
@@ -132,8 +126,7 @@ namespace WhiteCore.Framework.Utilities
         ///     </para>
         ///     <para>
         ///         To disable time limit in cache, set <see cref="ICnmCache{TKey,TValue}.ExpirationTime" /> to
-        ///         <see
-        ///             cref="DateTime.MaxValue" />
+        ///         <see cref="DateTime.MaxValue" />
         ///         .
         ///     </para>
         /// </remarks>
@@ -145,20 +138,15 @@ namespace WhiteCore.Framework.Utilities
         /// <seealso cref="ICnmCache{TKey,TValue}.MaxCount" />
         /// <seealso cref="ICnmCache{TKey,TValue}.MaxSize" />
         /// <seealso cref="ICnmCache{TKey,TValue}.Size" />
-        public TimeSpan ExpirationTime
-        {
-            get
-            {
-                lock (m_syncRoot)
-                {
+        public TimeSpan ExpirationTime {
+            get {
+                lock (m_syncRoot) {
                     return m_cache.ExpirationTime;
                 }
             }
 
-            set
-            {
-                lock (m_syncRoot)
-                {
+            set {
+                lock (m_syncRoot) {
                     m_cache.ExpirationTime = value;
                 }
             }
@@ -181,12 +169,9 @@ namespace WhiteCore.Framework.Utilities
         /// <seealso cref="ICnmCache{TKey,TValue}.MaxCount" />
         /// <seealso cref="ICnmCache{TKey,TValue}.IsSizeLimited" />
         /// <seealso cref="ICnmCache{TKey,TValue}.IsTimeLimited" />
-        public bool IsCountLimited
-        {
-            get
-            {
-                lock (m_syncRoot)
-                {
+        public bool IsCountLimited {
+            get {
+                lock (m_syncRoot) {
                     return m_cache.IsCountLimited;
                 }
             }
@@ -210,12 +195,9 @@ namespace WhiteCore.Framework.Utilities
         /// <seealso cref="ICnmCache{TKey,TValue}.MaxSize" />
         /// <seealso cref="ICnmCache{TKey,TValue}.IsCountLimited" />
         /// <seealso cref="ICnmCache{TKey,TValue}.IsTimeLimited" />
-        public bool IsSizeLimited
-        {
-            get
-            {
-                lock (m_syncRoot)
-                {
+        public bool IsSizeLimited {
+            get {
+                lock (m_syncRoot) {
                     return m_cache.IsSizeLimited;
                 }
             }
@@ -237,8 +219,7 @@ namespace WhiteCore.Framework.Utilities
         /// </remarks>
         /// <seealso cref="ICnmCache{TKey,TValue}.SyncRoot" />
         /// <seealso cref="CnmSynchronizedCache{TKey,TValue}" />
-        public bool IsSynchronized
-        {
+        public bool IsSynchronized {
             get { return true; }
         }
 
@@ -251,8 +232,7 @@ namespace WhiteCore.Framework.Utilities
         /// </value>
         /// <remarks>
         ///     If <see cref="ICnmCache{TKey,TValue}" /> have limited inactivity time and element is not accessed through
-        ///     <see
-        ///         cref="ICnmCache{TKey,TValue}.Set" />
+        ///     <see cref="ICnmCache{TKey,TValue}.Set" />
         ///     or <see cref="ICnmCache{TKey,TValue}.TryGetValue" /> methods in <see cref="ICnmCache{TKey,TValue}.ExpirationTime" /> , then element is automatically removed from
         ///     the cache. Depending on implementation of the <see cref="ICnmCache{TKey,TValue}" />, some of the elements may
         ///     stay longer in cache.
@@ -261,12 +241,9 @@ namespace WhiteCore.Framework.Utilities
         /// <seealso cref="ICnmCache{TKey,TValue}.PurgeExpired" />
         /// <seealso cref="ICnmCache{TKey,TValue}.IsCountLimited" />
         /// <seealso cref="ICnmCache{TKey,TValue}.IsSizeLimited" />
-        public bool IsTimeLimited
-        {
-            get
-            {
-                lock (m_syncRoot)
-                {
+        public bool IsTimeLimited {
+            get {
+                lock (m_syncRoot) {
                     return m_cache.IsTimeLimited;
                 }
             }
@@ -285,20 +262,15 @@ namespace WhiteCore.Framework.Utilities
         ///         <see cref="ICnmCache{TKey,TValue}" /> will remove less recently used elements until it can fit an new element.
         ///     </para>
         /// </remarks>
-        public int MaxCount
-        {
-            get
-            {
-                lock (m_syncRoot)
-                {
+        public int MaxCount {
+            get {
+                lock (m_syncRoot) {
                     return m_cache.MaxCount;
                 }
             }
 
-            set
-            {
-                lock (m_syncRoot)
-                {
+            set {
+                lock (m_syncRoot) {
                     m_cache.MaxCount = value;
                 }
             }
@@ -320,12 +292,9 @@ namespace WhiteCore.Framework.Utilities
         /// <seealso cref="ICnmCache{TKey,TValue}.IsSizeLimited" />
         /// <seealso cref="ICnmCache{TKey,TValue}.Size" />
         /// <seealso cref="ICnmCache{TKey,TValue}.MaxSize" />
-        public long MaxElementSize
-        {
-            get
-            {
-                lock (m_syncRoot)
-                {
+        public long MaxElementSize {
+            get {
+                lock (m_syncRoot) {
                     return m_cache.MaxElementSize;
                 }
             }
@@ -350,20 +319,15 @@ namespace WhiteCore.Framework.Utilities
         /// <seealso cref="ICnmCache{TKey,TValue}.MaxElementSize" />
         /// <seealso cref="ICnmCache{TKey,TValue}.IsSizeLimited" />
         /// <seealso cref="ICnmCache{TKey,TValue}.Size" />
-        public long MaxSize
-        {
-            get
-            {
-                lock (m_syncRoot)
-                {
+        public long MaxSize {
+            get {
+                lock (m_syncRoot) {
                     return m_cache.MaxSize;
                 }
             }
 
-            set
-            {
-                lock (m_syncRoot)
-                {
+            set {
+                lock (m_syncRoot) {
                     m_cache.MaxSize = value;
                 }
             }
@@ -392,12 +356,9 @@ namespace WhiteCore.Framework.Utilities
         /// <seealso cref="ICnmCache{TKey,TValue}.MaxSize" />
         /// <seealso cref="ICnmCache{TKey,TValue}.IsCountLimited" />
         /// <seealso cref="ICnmCache{TKey,TValue}.ExpirationTime" />
-        public long Size
-        {
-            get
-            {
-                lock (m_syncRoot)
-                {
+        public long Size {
+            get {
+                lock (m_syncRoot) {
                     return m_cache.Size;
                 }
             }
@@ -412,16 +373,14 @@ namespace WhiteCore.Framework.Utilities
         /// <remarks>
         ///     <para>
         ///         To get synchronized (thread safe) access to <see cref="ICnmCache{TKey,TValue}" />, use
-        ///         <see
-        ///             cref="CnmSynchronizedCache{TKey,TValue}" />
+        ///         <see cref="CnmSynchronizedCache{TKey,TValue}" />
         ///         method <see cref="CnmSynchronizedCache{TKey,TValue}.Synchronized" /> to retrieve synchronized wrapper interface to
         ///         <see cref="ICnmCache{TKey,TValue}" />.
         ///     </para>
         /// </remarks>
         /// <seealso cref="ICnmCache{TKey,TValue}.IsSynchronized" />
         /// <seealso cref="CnmSynchronizedCache{TKey,TValue}" />
-        public object SyncRoot
-        {
+        public object SyncRoot {
             get { return m_syncRoot; }
         }
 
@@ -433,11 +392,10 @@ namespace WhiteCore.Framework.Utilities
         /// <seealso cref="ICnmCache{TKey,TValue}.RemoveRange" />
         /// <seealso cref="ICnmCache{TKey,TValue}.TryGetValue" />
         /// <seealso cref="ICnmCache{TKey,TValue}.PurgeExpired" />
-        public void Clear()
+        public void Clear ()
         {
-            lock (m_syncRoot)
-            {
-                m_cache.Clear();
+            lock (m_syncRoot) {
+                m_cache.Clear ();
             }
         }
 
@@ -448,11 +406,10 @@ namespace WhiteCore.Framework.Utilities
         ///     A <see cref="IEnumerator{T}" /> that can be used to iterate through the collection.
         /// </returns>
         /// <filterpriority>1</filterpriority>
-        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
+        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator ()
         {
-            lock (m_syncRoot)
-            {
-                return new SynchronizedEnumerator(m_cache.GetEnumerator(), m_syncRoot);
+            lock (m_syncRoot) {
+                return new SynchronizedEnumerator (m_cache.GetEnumerator (), m_syncRoot);
             }
         }
 
@@ -462,8 +419,7 @@ namespace WhiteCore.Framework.Utilities
         /// <remarks>
         ///     <para>
         ///         Element becomes expired when last access time to it has been longer time than
-        ///         <see
-        ///             cref="ICnmCache{TKey,TValue}.ExpirationTime" />
+        ///         <see cref="ICnmCache{TKey,TValue}.ExpirationTime" />
         ///         .
         ///     </para>
         ///     <para>
@@ -478,11 +434,10 @@ namespace WhiteCore.Framework.Utilities
         /// <seealso cref="ICnmCache{TKey,TValue}.RemoveRange" />
         /// <seealso cref="ICnmCache{TKey,TValue}.TryGetValue" />
         /// <seealso cref="ICnmCache{TKey,TValue}.Clear" />
-        public void PurgeExpired()
+        public void PurgeExpired ()
         {
-            lock (m_syncRoot)
-            {
-                m_cache.PurgeExpired();
+            lock (m_syncRoot) {
+                m_cache.PurgeExpired ();
             }
         }
 
@@ -500,18 +455,16 @@ namespace WhiteCore.Framework.Utilities
         /// <seealso cref="ICnmCache{TKey,TValue}.TryGetValue" />
         /// <seealso cref="ICnmCache{TKey,TValue}.Clear" />
         /// <seealso cref="ICnmCache{TKey,TValue}.PurgeExpired" />
-        public void Remove(TKey key)
+        public void Remove (TKey key)
         {
-            lock (m_syncRoot)
-            {
-                m_cache.Remove(key);
+            lock (m_syncRoot) {
+                m_cache.Remove (key);
             }
         }
 
         /// <summary>
         ///     Removes elements that are associated with one of <paramref name="keys" /> from the
-        ///     <see
-        ///         cref="ICnmCache{TKey,TValue}" />
+        ///     <see cref="ICnmCache{TKey,TValue}" />
         ///     .
         /// </summary>
         /// <param name="keys">
@@ -525,18 +478,16 @@ namespace WhiteCore.Framework.Utilities
         /// <seealso cref="ICnmCache{TKey,TValue}.TryGetValue" />
         /// <seealso cref="ICnmCache{TKey,TValue}.Clear" />
         /// <seealso cref="ICnmCache{TKey,TValue}.PurgeExpired" />
-        public void RemoveRange(IEnumerable<TKey> keys)
+        public void RemoveRange (IEnumerable<TKey> keys)
         {
-            lock (m_syncRoot)
-            {
-                m_cache.RemoveRange(keys);
+            lock (m_syncRoot) {
+                m_cache.RemoveRange (keys);
             }
         }
 
         /// <summary>
         ///     Add or replace an element with the provided <paramref name="key" />, <paramref name="value" /> and
-        ///     <paramref
-        ///         name="size" />
+        ///     <paramref name="size" />
         ///     to
         ///     <see cref="ICnmCache{TKey,TValue}" />.
         /// </summary>
@@ -581,11 +532,10 @@ namespace WhiteCore.Framework.Utilities
         /// <seealso cref="ICnmCache{TKey,TValue}.TryGetValue" />
         /// <seealso cref="ICnmCache{TKey,TValue}.Clear" />
         /// <seealso cref="ICnmCache{TKey,TValue}.PurgeExpired" />
-        public bool Set(TKey key, TValue value, long size)
+        public bool Set (TKey key, TValue value, long size)
         {
-            lock (m_syncRoot)
-            {
-                return m_cache.Set(key, value, size);
+            lock (m_syncRoot) {
+                return m_cache.Set (key, value, size);
             }
         }
 
@@ -612,17 +562,17 @@ namespace WhiteCore.Framework.Utilities
         /// <seealso cref="ICnmCache{TKey,TValue}.RemoveRange" />
         /// <seealso cref="ICnmCache{TKey,TValue}.Clear" />
         /// <seealso cref="ICnmCache{TKey,TValue}.PurgeExpired" />
-        public bool TryGetValue(TKey key, out TValue value)
+        public bool TryGetValue (TKey key, out TValue value)
         {
-            lock (m_syncRoot)
-            {
-                return m_cache.TryGetValue(key, out value);
+            lock (m_syncRoot) {
+                return m_cache.TryGetValue (key, out value);
             }
         }
 
-        public bool Contains(TKey key)
+        public bool Contains (TKey key)
         {
-            return m_cache.Contains(key);
+            lock (m_syncRoot)
+                return m_cache.Contains (key);
         }
 
         /// <summary>
@@ -632,9 +582,9 @@ namespace WhiteCore.Framework.Utilities
         ///     A <see cref="IEnumerator" /> that can be used to iterate through the collection.
         /// </returns>
         /// <filterpriority>1</filterpriority>
-        IEnumerator IEnumerable.GetEnumerator()
+        IEnumerator IEnumerable.GetEnumerator ()
         {
-            return GetEnumerator();
+            return GetEnumerator ();
         }
 
         #endregion
@@ -651,11 +601,11 @@ namespace WhiteCore.Framework.Utilities
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="cache" />is null.
         /// </exception>
-        public static ICnmCache<TKey, TValue> Synchronized(ICnmCache<TKey, TValue> cache)
+        public static ICnmCache<TKey, TValue> Synchronized (ICnmCache<TKey, TValue> cache)
         {
             if (cache == null)
-                throw new ArgumentNullException("cache");
-            return cache.IsSynchronized ? cache : new CnmSynchronizedCache<TKey, TValue>(cache);
+                throw new ArgumentNullException ("cache");
+            return cache.IsSynchronized ? cache : new CnmSynchronizedCache<TKey, TValue> (cache);
         }
 
         #region Nested type: SynchronizedEnumerator
@@ -663,7 +613,7 @@ namespace WhiteCore.Framework.Utilities
         /// <summary>
         ///     Synchronized enumerator.
         /// </summary>
-        private class SynchronizedEnumerator : IEnumerator<KeyValuePair<TKey, TValue>>
+        class SynchronizedEnumerator : IEnumerator<KeyValuePair<TKey, TValue>>
         {
             /// <summary>
             ///     Enumerator that is being synchronized.
@@ -684,11 +634,11 @@ namespace WhiteCore.Framework.Utilities
             /// <param name="syncRoot">
             ///     The sync root.
             /// </param>
-            public SynchronizedEnumerator(IEnumerator<KeyValuePair<TKey, TValue>> enumerator, object syncRoot)
+            public SynchronizedEnumerator (IEnumerator<KeyValuePair<TKey, TValue>> enumerator, object syncRoot)
             {
                 m_syncRoot = syncRoot;
                 m_enumerator = enumerator;
-                Monitor.Enter(m_syncRoot);
+                Monitor.Enter (m_syncRoot);
             }
 
             #region IEnumerator<KeyValuePair<TKey,TValue>> Members
@@ -702,8 +652,7 @@ namespace WhiteCore.Framework.Utilities
             /// <exception cref="InvalidOperationException">
             ///     The enumerator has reach end of collection or <see cref="MoveNext" /> is not called.
             /// </exception>
-            public KeyValuePair<TKey, TValue> Current
-            {
+            public KeyValuePair<TKey, TValue> Current {
                 get { return m_enumerator.Current; }
             }
 
@@ -717,24 +666,22 @@ namespace WhiteCore.Framework.Utilities
             ///     The enumerator is positioned before the first element of the collection or after the last element.
             /// </exception>
             /// <filterpriority>2</filterpriority>
-            object IEnumerator.Current
-            {
+            object IEnumerator.Current {
                 get { return Current; }
             }
 
             /// <summary>
             ///     Releases synchronization lock.
             /// </summary>
-            public void Dispose()
+            public void Dispose ()
             {
-                if (m_syncRoot != null)
-                {
-                    Monitor.Exit(m_syncRoot);
+                if (m_syncRoot != null) {
+                    Monitor.Exit (m_syncRoot);
                     m_syncRoot = null;
                 }
 
-                m_enumerator.Dispose();
-                GC.SuppressFinalize(this);
+                m_enumerator.Dispose ();
+                GC.SuppressFinalize (this);
             }
 
             /// <summary>
@@ -746,9 +693,9 @@ namespace WhiteCore.Framework.Utilities
             /// <exception cref="InvalidOperationException">
             ///     The collection was modified after the enumerator was created.
             /// </exception>
-            public bool MoveNext()
+            public bool MoveNext ()
             {
-                return m_enumerator.MoveNext();
+                return m_enumerator.MoveNext ();
             }
 
             /// <summary>
@@ -757,9 +704,9 @@ namespace WhiteCore.Framework.Utilities
             /// <exception cref="InvalidOperationException">
             ///     The collection was modified after the enumerator was created.
             /// </exception>
-            public void Reset()
+            public void Reset ()
             {
-                m_enumerator.Reset();
+                m_enumerator.Reset ();
             }
 
             #endregion
@@ -767,9 +714,9 @@ namespace WhiteCore.Framework.Utilities
             /// <summary>
             ///     Finalizes an instance of the <see cref="SynchronizedEnumerator" /> class.
             /// </summary>
-            ~SynchronizedEnumerator()
+            ~SynchronizedEnumerator ()
             {
-                Dispose();
+                Dispose ();
             }
         }
 
