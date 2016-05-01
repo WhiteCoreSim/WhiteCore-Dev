@@ -26,25 +26,24 @@
  */
 
 using System;
-using System.Linq;
 using WhiteCore.Framework.Modules;
 
 namespace WhiteCore.Framework.SceneInfo
 {
     public static class TerrainUtil
     {
-        public static float MetersToSphericalStrength(float size)
+        public static float MetersToSphericalStrength (float size)
         {
             //return Math.Pow(2, size);
-            return (size + 1)*1.35f; // MCP: a more useful brush size range
+            return (size + 1) * 1.35f; // MCP: a more useful brush size range
         }
 
-        public static float SphericalFactor(float x, float y, float rx, float ry, float size)
+        public static float SphericalFactor (float x, float y, float rx, float ry, float size)
         {
-            return size*size - ((x - rx)*(x - rx) + (y - ry)*(y - ry));
+            return size * size - ((x - rx) * (x - rx) + (y - ry) * (y - ry));
         }
 
-        public static float GetBilinearInterpolate(float x, float y, ITerrainChannel map)
+        public static float GetBilinearInterpolate (float x, float y, ITerrainChannel map)
         {
             int w = map.Width;
             int h = map.Height;
@@ -68,10 +67,10 @@ namespace WhiteCore.Framework.SceneInfo
                 y = 0;
 
             const int stepSize = 1;
-            float h00 = map[(int) x, (int) y];
-            float h10 = map[(int) x + stepSize, (int) y];
-            float h01 = map[(int) x, (int) y + stepSize];
-            float h11 = map[(int) x + stepSize, (int) y + stepSize];
+            float h00 = map [(int)x, (int)y];
+            float h10 = map [(int)x + stepSize, (int)y];
+            float h01 = map [(int)x, (int)y + stepSize];
+            float h11 = map [(int)x + stepSize, (int)y + stepSize];
             float h1 = h00;
             float h2 = h10;
             float h3 = h01;
@@ -80,61 +79,60 @@ namespace WhiteCore.Framework.SceneInfo
             float a10 = h2 - h1;
             float a01 = h3 - h1;
             float a11 = h1 - h2 - h3 + h4;
-            float partialx = x - (int) x;
-            float partialz = y - (int) y;
-            float hi = a00 + (a10*partialx) + (a01*partialz) + (a11*partialx*partialz);
+            float partialx = x - (int)x;
+            float partialz = y - (int)y;
+            float hi = a00 + (a10 * partialx) + (a01 * partialz) + (a11 * partialx * partialz);
             return hi;
         }
 
-        private static float Noise(float x, float y)
+        static float Noise (float x, float y)
         {
-            int n = (int) x + (int) (y*749);
+            int n = (int)x + (int)(y * 749);
             n = (n << 13) ^ n;
-            return (1 - ((n*(n*n*15731 + 789221) + 1376312589) & 0x7fffffff)/1073741824);
+            return (1 - ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824);
         }
 
-        private static float SmoothedNoise1(float x, float y)
+        static float SmoothedNoise1 (float x, float y)
         {
-            float corners = (Noise(x - 1, y - 1) + Noise(x + 1, y - 1) + Noise(x - 1, y + 1) + Noise(x + 1, y + 1))/16;
-            float sides = (Noise(x - 1, y) + Noise(x + 1, y) + Noise(x, y - 1) + Noise(x, y + 1))/8;
-            float center = Noise(x, y)/4;
+            float corners = (Noise (x - 1, y - 1) + Noise (x + 1, y - 1) + Noise (x - 1, y + 1) + Noise (x + 1, y + 1)) / 16;
+            float sides = (Noise (x - 1, y) + Noise (x + 1, y) + Noise (x, y - 1) + Noise (x, y + 1)) / 8;
+            float center = Noise (x, y) / 4;
             return corners + sides + center;
         }
 
-        private static float Interpolate(float x, float y, float z)
+        static float Interpolate (float x, float y, float z)
         {
-            return (x*(1 - z)) + (y*z);
+            return (x * (1 - z)) + (y * z);
         }
 
-        public static float InterpolatedNoise(float x, float y)
+        public static float InterpolatedNoise (float x, float y)
         {
-            int integer_X = (int) (x);
+            int integer_X = (int)(x);
             float fractional_X = x - integer_X;
 
-            int integer_Y = (int) y;
+            int integer_Y = (int)y;
             float fractional_Y = y - integer_Y;
 
-            float v1 = SmoothedNoise1(integer_X, integer_Y);
-            float v2 = SmoothedNoise1(integer_X + 1, integer_Y);
-            float v3 = SmoothedNoise1(integer_X, integer_Y + 1);
-            float v4 = SmoothedNoise1(integer_X + 1, integer_Y + 1);
+            float v1 = SmoothedNoise1 (integer_X, integer_Y);
+            float v2 = SmoothedNoise1 (integer_X + 1, integer_Y);
+            float v3 = SmoothedNoise1 (integer_X, integer_Y + 1);
+            float v4 = SmoothedNoise1 (integer_X + 1, integer_Y + 1);
 
-            float i1 = Interpolate(v1, v2, fractional_X);
-            float i2 = Interpolate(v3, v4, fractional_X);
+            float i1 = Interpolate (v1, v2, fractional_X);
+            float i2 = Interpolate (v3, v4, fractional_X);
 
-            return Interpolate(i1, i2, fractional_Y);
+            return Interpolate (i1, i2, fractional_Y);
         }
 
-        public static float PerlinNoise2D(float x, float y, int octaves, float persistence)
+        public static float PerlinNoise2D (float x, float y, int octaves, float persistence)
         {
             float total = 0;
 
-            for (int i = 0; i < octaves; i++)
-            {
-                float frequency = (float) Math.Pow(2, i);
-                float amplitude = (float) Math.Pow(persistence, i);
+            for (int i = 0; i < octaves; i++) {
+                float frequency = (float)Math.Pow (2, i);
+                float amplitude = (float)Math.Pow (persistence, i);
 
-                total += InterpolatedNoise(x*frequency, y*frequency)*amplitude;
+                total += InterpolatedNoise (x * frequency, y * frequency) * amplitude;
             }
             return total;
         }
