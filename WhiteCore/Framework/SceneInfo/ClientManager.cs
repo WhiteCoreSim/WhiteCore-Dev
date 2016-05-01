@@ -25,11 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.PresenceInfo;
-using OpenMetaverse;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using OpenMetaverse;
+using WhiteCore.Framework.PresenceInfo;
 
 namespace WhiteCore.Framework.SceneInfo
 {
@@ -43,40 +43,39 @@ namespace WhiteCore.Framework.SceneInfo
         ///     A dictionary mapping from <seealso cref="UUID" />
         ///     to <seealso cref="IClientAPI" /> references
         /// </summary>
-        private readonly Dictionary<UUID, IClientAPI> m_dict1;
+        readonly Dictionary<UUID, IClientAPI> m_dict1;
 
         /// <summary>
         ///     A dictionary mapping from <seealso cref="IPEndPoint" />
         ///     to <seealso cref="IClientAPI" /> references
         /// </summary>
-        private readonly Dictionary<IPEndPoint, IClientAPI> m_dict2;
+        readonly Dictionary<IPEndPoint, IClientAPI> m_dict2;
 
         /// <summary>
         ///     Synchronization object for writing to the collections
         /// </summary>
-        private readonly object m_syncRoot = new object();
+        readonly object m_syncRoot = new object ();
 
         /// <summary>
         ///     An immutable collection of <seealso cref="IClientAPI" />
         ///     references
         /// </summary>
-        private IClientAPI[] m_array;
+        IClientAPI [] m_array;
 
         /// <summary>
         ///     Default constructor
         /// </summary>
-        public ClientManager()
+        public ClientManager ()
         {
-            m_dict1 = new Dictionary<UUID, IClientAPI>();
-            m_dict2 = new Dictionary<IPEndPoint, IClientAPI>();
-            m_array = new IClientAPI[0];
+            m_dict1 = new Dictionary<UUID, IClientAPI> ();
+            m_dict2 = new Dictionary<IPEndPoint, IClientAPI> ();
+            m_array = new IClientAPI [0];
         }
 
         /// <summary>
         ///     Number of clients in the collection
         /// </summary>
-        public int Count
-        {
+        public int Count {
             get { return m_dict1.Count; }
         }
 
@@ -89,23 +88,22 @@ namespace WhiteCore.Framework.SceneInfo
         ///     True if the client reference was successfully added,
         ///     otherwise false if the given key already existed in the collection
         /// </returns>
-        public bool Add(IClientAPI value)
+        public bool Add (IClientAPI value)
         {
-            lock (m_syncRoot)
-            {
-                if (m_dict1.ContainsKey(value.AgentId) || m_dict2.ContainsKey(value.RemoteEndPoint))
+            lock (m_syncRoot) {
+                if (m_dict1.ContainsKey (value.AgentId) || m_dict2.ContainsKey (value.RemoteEndPoint))
                     return false;
 
-                m_dict1[value.AgentId] = value;
-                m_dict2[value.RemoteEndPoint] = value;
+                m_dict1 [value.AgentId] = value;
+                m_dict2 [value.RemoteEndPoint] = value;
 
-                IClientAPI[] oldArray = m_array;
+                IClientAPI [] oldArray = m_array;
                 int oldLength = oldArray.Length;
 
-                IClientAPI[] newArray = new IClientAPI[oldLength + 1];
+                IClientAPI [] newArray = new IClientAPI [oldLength + 1];
                 for (int i = 0; i < oldLength; i++)
-                    newArray[i] = oldArray[i];
-                newArray[oldLength] = value;
+                    newArray [i] = oldArray [i];
+                newArray [oldLength] = value;
 
                 m_array = newArray;
             }
@@ -121,25 +119,22 @@ namespace WhiteCore.Framework.SceneInfo
         ///     True if a client was removed, or false if the given UUID
         ///     was not present in the collection
         /// </returns>
-        public bool Remove(UUID key)
+        public bool Remove (UUID key)
         {
-            lock (m_syncRoot)
-            {
+            lock (m_syncRoot) {
                 IClientAPI value;
-                if (m_dict1.TryGetValue(key, out value))
-                {
-                    m_dict1.Remove(key);
-                    m_dict2.Remove(value.RemoteEndPoint);
+                if (m_dict1.TryGetValue (key, out value)) {
+                    m_dict1.Remove (key);
+                    m_dict2.Remove (value.RemoteEndPoint);
 
-                    IClientAPI[] oldArray = m_array;
+                    IClientAPI [] oldArray = m_array;
                     int oldLength = oldArray.Length;
 
-                    IClientAPI[] newArray = new IClientAPI[oldLength - 1];
+                    IClientAPI [] newArray = new IClientAPI [oldLength - 1];
                     int j = 0;
-                    for (int i = 0; i < oldLength; i++)
-                    {
-                        if (oldArray[i] != value)
-                            newArray[j++] = oldArray[i];
+                    for (int i = 0; i < oldLength; i++) {
+                        if (oldArray [i] != value)
+                            newArray [j++] = oldArray [i];
                     }
 
                     m_array = newArray;
@@ -153,13 +148,12 @@ namespace WhiteCore.Framework.SceneInfo
         /// <summary>
         ///     Resets the client collection
         /// </summary>
-        public void Clear()
+        public void Clear ()
         {
-            lock (m_syncRoot)
-            {
-                m_dict1.Clear();
-                m_dict2.Clear();
-                m_array = new IClientAPI[0];
+            lock (m_syncRoot) {
+                m_dict1.Clear ();
+                m_dict2.Clear ();
+                m_array = new IClientAPI [0];
             }
         }
 
@@ -168,9 +162,9 @@ namespace WhiteCore.Framework.SceneInfo
         /// </summary>
         /// <param name="key">UUID to check for</param>
         /// <returns>True if the UUID was found in the collection, otherwise false</returns>
-        public bool ContainsKey(UUID key)
+        public bool ContainsKey (UUID key)
         {
-            return m_dict1.ContainsKey(key);
+            return m_dict1.ContainsKey (key);
         }
 
         /// <summary>
@@ -178,9 +172,9 @@ namespace WhiteCore.Framework.SceneInfo
         /// </summary>
         /// <param name="key">Endpoint to check for</param>
         /// <returns>True if the endpoint was found in the collection, otherwise false</returns>
-        public bool ContainsKey(IPEndPoint key)
+        public bool ContainsKey (IPEndPoint key)
         {
-            return m_dict2.ContainsKey(key);
+            return m_dict2.ContainsKey (key);
         }
 
         /// <summary>
@@ -189,14 +183,11 @@ namespace WhiteCore.Framework.SceneInfo
         /// <param name="key">UUID of the client to retrieve</param>
         /// <param name="value">Retrieved client, or null on lookup failure</param>
         /// <returns>True if the lookup succeeded, otherwise false</returns>
-        public bool TryGetValue(UUID key, out IClientAPI value)
+        public bool TryGetValue (UUID key, out IClientAPI value)
         {
-            try
-            {
-                return m_dict1.TryGetValue(key, out value);
-            }
-            catch (Exception)
-            {
+            try {
+                return m_dict1.TryGetValue (key, out value);
+            } catch (Exception) {
                 value = null;
                 return false;
             }
@@ -208,14 +199,11 @@ namespace WhiteCore.Framework.SceneInfo
         /// <param name="key">Endpoint of the client to retrieve</param>
         /// <param name="value">Retrieved client, or null on lookup failure</param>
         /// <returns>True if the lookup succeeded, otherwise false</returns>
-        public bool TryGetValue(IPEndPoint key, out IClientAPI value)
+        public bool TryGetValue (IPEndPoint key, out IClientAPI value)
         {
-            try
-            {
-                return m_dict2.TryGetValue(key, out value);
-            }
-            catch (Exception)
-            {
+            try {
+                return m_dict2.TryGetValue (key, out value);
+            } catch (Exception) {
                 value = null;
                 return false;
             }
@@ -226,13 +214,12 @@ namespace WhiteCore.Framework.SceneInfo
         ///     collection
         /// </summary>
         /// <param name="action">Action to perform on each element</param>
-        public void ForEach(Action<IClientAPI> action)
+        public void ForEach (Action<IClientAPI> action)
         {
-            IClientAPI[] localArray = m_array;
-
-            Parallel.For(0, localArray.Length,
-                         i => action(localArray[i])
-                );
+            IClientAPI [] localArray;
+            lock (m_syncRoot)
+                localArray = m_array;
+            Parallel.For (0, localArray.Length, i => action (localArray [i]));
         }
 
         /// <summary>
@@ -240,11 +227,13 @@ namespace WhiteCore.Framework.SceneInfo
         ///     the collection
         /// </summary>
         /// <param name="action">Action to perform on each element</param>
-        public void ForEachSync(Action<IClientAPI> action)
+        public void ForEachSync (Action<IClientAPI> action)
         {
-            IClientAPI[] localArray = m_array;
+            IClientAPI [] localArray;
+            lock (m_syncRoot)
+                localArray = m_array;
             foreach (IClientAPI t in localArray)
-                action(t);
+                action (t);
         }
     }
 }
