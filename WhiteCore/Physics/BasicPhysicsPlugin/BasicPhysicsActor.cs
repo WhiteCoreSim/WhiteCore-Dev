@@ -25,8 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.Physics;
 using OpenMetaverse;
+using WhiteCore.Framework.Physics;
 
 namespace WhiteCore.Physics.BasicPhysicsPlugin
 {

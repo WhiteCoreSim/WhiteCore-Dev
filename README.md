@@ -69,4 +69,5 @@ Support is available from various sources.
  The WhiteCore-Optional-Modules repository has also been updated for the new structure.
  To ensure correct compiling, use the latest commits of the WhiteCore-Dev or a release version >= 0.9.2*
 
-*Please see the "Migration to 0.9.2.txt" file for details on files and configurations that will need to be modified*
+*Please see the "Updating from a pre 0.9.2 version.txt" file for details on files and configurations that will need to be modified
+ The document can be found in the WhiteCoreDocs directory*
