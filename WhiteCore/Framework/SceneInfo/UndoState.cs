@@ -178,9 +178,7 @@ namespace WhiteCore.Framework.SceneInfo
 
         public bool Compare (ITerrainChannel terrainChannel)
         {
-            if (m_terrainChannel != terrainChannel)
-                return false;
-            return false;
+            return m_terrainChannel == terrainChannel;
         }
 
         public void PlaybackState ()

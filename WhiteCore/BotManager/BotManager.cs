@@ -156,7 +156,11 @@ namespace WhiteCore.BotManager
             appearance.InitialHasWearablesBeenSent = true;
             Bot bot = new Bot();
             bot.Initialize(SP, creatorID);
-            SP.MakeRootAgent(startPos, false, true);
+            try {
+                SP.MakeRootAgent (startPos, false, true);
+            } catch {
+                MainConsole.Instance.ErrorFormat ("[BotManager]: Error creating bot {0} as root agent!",m_character.AgentId);
+            }
             //Move them
             SP.Teleport(startPos);
 
