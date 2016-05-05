@@ -26,7 +26,6 @@
  */
 
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using OpenMetaverse.StructuredData;
@@ -42,8 +41,8 @@ namespace WhiteCore.Services
         IRegionClientCapsService m_service;
 
         // Configuration
-        static List<String> m_lastNames = new List<String> ();
-        static List<String> m_fullNames = new List<String> ();
+        static List<string> m_lastNames = new List<string> ();
+        static List<string> m_fullNames = new List<string> ();
 
 
         #region ICapsServiceConnector Members
@@ -70,15 +69,15 @@ namespace WhiteCore.Services
 
         #endregion
 
-        byte[] SimulatorFeaturesCAP (string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
+        byte [] SimulatorFeaturesCAP (string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {
             OSDMap data = new OSDMap ();
             // 17-06-2015 Fly-Man- AvatarHoverHeight enabled
             data ["AvatarHoverHeightEnabled"] = true;
-            
+
             // 17-06-2015 Fly-Man- MaxMaterialsPerTransaction enabled
             data ["MaxMaterialsPerTransaction"] = 50;
-            
+
             data ["MeshRezEnabled"] = true;
             data ["MeshUploadEnabled"] = true;
             data ["MeshXferEnabled"] = true;
@@ -105,15 +104,16 @@ namespace WhiteCore.Services
         {
             if (m_fullNames.Count > 0)
                 return;
-            
+
             IUserAccountService userService = m_service.Registry.RequestModuleInterface<IUserAccountService> ();
             var gods = userService.GetUserAccounts (null, "*");
-            foreach (UserAccount user in gods)
-                if (user.UserLevel >= Constants.USER_GOD_LIASON)
-                {
-                    m_lastNames.Add (user.LastName);
-                    m_fullNames.Add (user.Name);
-                }
+            if (gods != null) {
+                foreach (UserAccount user in gods)
+                    if (user.UserLevel >= Constants.USER_GOD_LIASON) {
+                        m_lastNames.Add (user.LastName);
+                        m_fullNames.Add (user.Name);
+                    }
+            }
         }
 
         OSDMap GodNames (OSHttpRequest httpRequest)
@@ -121,22 +121,19 @@ namespace WhiteCore.Services
 
 
             OSDMap namesmap = new OSDMap ();
-            if (httpRequest.Query.ContainsKey ("god_names"))
-            {
+            if (httpRequest.Query.ContainsKey ("god_names")) {
                 OSD nmap = httpRequest.Query ["god_names"].ToString ();
                 namesmap = (OSDMap)nmap;
             }
- 
+
             OSDArray fnames = new OSDArray ();
-            foreach (string name in m_fullNames)
-            {
+            foreach (string name in m_fullNames) {
                 fnames.Add (name);
             }
             namesmap ["full_names"] = fnames;
 
             OSDArray lnames = new OSDArray ();
-            foreach (string name in m_lastNames)
-            {
+            foreach (string name in m_lastNames) {
                 lnames.Add (name);
             }
             namesmap ["last_names"] = lnames;
@@ -149,8 +146,7 @@ namespace WhiteCore.Services
             //if (ShouldSend(m_service.AgentID,m_service.RegionID) && UserLevel(m_service.AgentID) <= m_UserLevel)
             //{
             OSDMap extrasMap = new OSDMap ();
-            if (httpRequest.Query.ContainsKey ("OpenSimExtras"))
-            {
+            if (httpRequest.Query.ContainsKey ("OpenSimExtras")) {
                 OSD nmap = httpRequest.Query ["OpenSimExtras"].ToString ();
                 extrasMap = (OSDMap)nmap;
             }
