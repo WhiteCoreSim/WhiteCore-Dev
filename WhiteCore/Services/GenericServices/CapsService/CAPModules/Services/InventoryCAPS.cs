@@ -53,8 +53,8 @@ namespace WhiteCore.Services
 
         static InventoryCAPS ()
         {
-            WhiteCore.Framework.Serialization.SceneEntitySerializer.SceneObjectSerializer =
-                new WhiteCore.Region.Serialization.SceneObjectSerializer ();
+            Framework.Serialization.SceneEntitySerializer.SceneObjectSerializer =
+                new Region.Serialization.SceneObjectSerializer ();
         }
 
         #endregion
@@ -71,7 +71,7 @@ namespace WhiteCore.Services
 
         public string Name { get { return GetType ().Name; } }
 
-        public void IncomingCapsRequest (UUID agentID, WhiteCore.Framework.Services.GridRegion region, ISimulationBase simbase, ref OSDMap capURLs)
+        public void IncomingCapsRequest (UUID agentID, Framework.Services.GridRegion region, ISimulationBase simbase, ref OSDMap capURLs)
         {
             m_agentID = agentID;
             m_moneyModule = simbase.ApplicationRegistry.RequestModuleInterface<IMoneyModule> ();
@@ -80,9 +80,11 @@ namespace WhiteCore.Services
             m_libraryService = simbase.ApplicationRegistry.RequestModuleInterface<ILibraryService> ();
             m_inventoryData = Framework.Utilities.DataManager.RequestPlugin<IInventoryData> ();
 
-            HttpServerHandle method = (path, request, httpRequest, httpResponse) => HandleWebFetchInventoryDescendents (request, m_agentID);
+            HttpServerHandle method;
+            string uri;
 
-            string uri = "/CAPS/FetchInventoryDescendents/" + UUID.Random () + "/";
+            method = (path, request, httpRequest, httpResponse) => HandleFetchInventoryDescendents (request, m_agentID);
+            uri = "/CAPS/FetchInventoryDescendents/" + UUID.Random () + "/";
             capURLs ["WebFetchInventoryDescendents"] = MainServer.Instance.ServerURI + uri;
             capURLs ["FetchInventoryDescendents"] = MainServer.Instance.ServerURI + uri;
             capURLs ["FetchInventoryDescendents2"] = MainServer.Instance.ServerURI + uri;
@@ -137,21 +139,18 @@ namespace WhiteCore.Services
 
         #region Inventory
 
-        public byte[] HandleWebFetchInventoryDescendents (Stream request, UUID agentID)
+        public byte [] HandleFetchInventoryDescendents (Stream request, UUID agentID)
         {
             OSDMap map = (OSDMap)OSDParser.DeserializeLLSDXml (HttpServerHandlerHelpers.ReadFully (request));
             OSDArray foldersrequested = (OSDArray)map ["folders"];
-            try
-            {
+            try {
                 //MainConsole.Instance.DebugFormat("[InventoryCAPS]: Received WebFetchInventoryDescendents request for {0}", AgentID);
                 return m_inventoryData.FetchInventoryReply (foldersrequested, agentID,
                     UUID.Zero, m_libraryService.LibraryOwner);
-                
-            } catch (Exception ex)
-            {
+
+            } catch (Exception ex) {
                 MainConsole.Instance.Warn ("[InventoryCAPS]: SERIOUS ISSUE! " + ex);
-            } finally
-            {
+            } finally {
                 map = null;
                 foldersrequested = null;
             }
@@ -161,10 +160,9 @@ namespace WhiteCore.Services
             return OSDParser.SerializeLLSDXmlBytes (rmap);
         }
 
-        public byte[] HandleFetchLibDescendents (Stream request, UUID agentID)
+        public byte [] HandleFetchLibDescendents (Stream request, UUID agentID)
         {
-            try
-            {
+            try {
                 //MainConsole.Instance.DebugFormat("[InventoryCAPS]: Received FetchLibDescendents request for {0}", agentID);
                 OSDMap map = (OSDMap)OSDParser.DeserializeLLSDXml (HttpServerHandlerHelpers.ReadFully (request));
                 OSDArray foldersrequested = (OSDArray)map ["folders"];
@@ -172,9 +170,8 @@ namespace WhiteCore.Services
                 return m_inventoryData.FetchInventoryReply (foldersrequested,
                     m_libraryService.LibraryOwner,
                     agentID, m_libraryService.LibraryOwner);
-                
-            } catch (Exception ex)
-            {
+
+            } catch (Exception ex) {
                 MainConsole.Instance.Warn ("[InventoryCAPS]: SERIOUS ISSUE! " + ex);
             }
 
@@ -183,10 +180,9 @@ namespace WhiteCore.Services
             return OSDParser.SerializeLLSDXmlBytes (rmap);
         }
 
-        public byte[] HandleFetchInventory (Stream request, UUID agentID)
+        public byte [] HandleFetchInventory (Stream request, UUID agentID)
         {
-            try
-            {
+            try {
                 //MainConsole.Instance.DebugFormat("[InventoryCAPS]: Received FetchInventory request for {0}", agentID);
                 OSDMap requestmap = (OSDMap)OSDParser.DeserializeLLSDXml (HttpServerHandlerHelpers.ReadFully (request));
                 if (requestmap ["items"].Type == OSDType.Unknown)
@@ -199,21 +195,19 @@ namespace WhiteCore.Services
                 OSDArray items = new OSDArray ();
                 foreach (
                     OSDArray item in
-                        foldersrequested.Cast<OSDMap>()
-                                        .Select(requestedFolders => requestedFolders["item_id"].AsUUID())
-                                        .Select(item_id => m_inventoryService.GetOSDItem(m_agentID, item_id))
-                                        .Where(item => item != null && item.Count > 0))
-                {
+                        foldersrequested.Cast<OSDMap> ()
+                                        .Select (requestedFolders => requestedFolders ["item_id"].AsUUID ())
+                                        .Select (item_id => m_inventoryService.GetOSDItem (m_agentID, item_id))
+                                        .Where (item => item != null && item.Count > 0)) {
                     items.Add (item [0]);
                 }
                 map.Add ("items", items);
 
-                byte[] response = OSDParser.SerializeLLSDXmlBytes (map);
+                byte [] response = OSDParser.SerializeLLSDXmlBytes (map);
                 map.Clear ();
                 return response;
 
-            } catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 MainConsole.Instance.Warn ("[InventoryCAPS]: SERIOUS ISSUE! " + ex);
             }
 
@@ -222,10 +216,9 @@ namespace WhiteCore.Services
             return OSDParser.SerializeLLSDXmlBytes (rmap);
         }
 
-        public byte[] HandleFetchLib (Stream request, UUID agentID)
+        public byte [] HandleFetchLib (Stream request, UUID agentID)
         {
-            try
-            {
+            try {
                 //MainConsole.Instance.DebugFormat("[InventoryCAPS]: Received FetchLib request for {0}", agentID);
                 OSDMap requestmap = (OSDMap)OSDParser.DeserializeLLSDXml (HttpServerHandlerHelpers.ReadFully (request));
                 OSDArray foldersrequested = (OSDArray)requestmap ["items"];
@@ -234,21 +227,19 @@ namespace WhiteCore.Services
 
                 foreach (
                     OSDArray item in
-                        foldersrequested.Cast<OSDMap>()
-                                        .Select(requestedFolders => requestedFolders["item_id"].AsUUID())
-                                        .Select(item_id => m_inventoryService.GetOSDItem(UUID.Zero, item_id))
-                                        .Where(item => item != null && item.Count > 0))
-                {
+                        foldersrequested.Cast<OSDMap> ()
+                                        .Select (requestedFolders => requestedFolders ["item_id"].AsUUID ())
+                                        .Select (item_id => m_inventoryService.GetOSDItem (UUID.Zero, item_id))
+                                        .Where (item => item != null && item.Count > 0)) {
                     items.Add (item [0]);
                 }
                 map.Add ("items", items);
 
-                byte[] response = OSDParser.SerializeLLSDXmlBytes (map);
+                byte [] response = OSDParser.SerializeLLSDXmlBytes (map);
                 map.Clear ();
                 return response;
 
-            } catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 MainConsole.Instance.Warn ("[InventoryCAPS]: SERIOUS ISSUE! " + ex);
             }
 
@@ -269,13 +260,12 @@ namespace WhiteCore.Services
         /// <param name="httpRequest"></param>
         /// <param name="httpResponse"></param>
         /// <returns></returns>
-        public byte[] NewAgentInventoryRequest (string path, Stream request, OSHttpRequest httpRequest,
+        public byte [] NewAgentInventoryRequest (string path, Stream request, OSHttpRequest httpRequest,
                                                 OSHttpResponse httpResponse)
         {
             OSDMap map = (OSDMap)OSDParser.DeserializeLLSDXml (HttpServerHandlerHelpers.ReadFully (request));
             string asset_type = map ["asset_type"].AsString ();
-            if (!ChargeUser (asset_type, map))
-            {
+            if (!ChargeUser (asset_type, map)) {
                 map = new OSDMap ();
                 map ["uploader"] = "";
                 map ["state"] = "error";
@@ -284,15 +274,14 @@ namespace WhiteCore.Services
             return OSDParser.SerializeLLSDXmlBytes (InternalNewAgentInventoryRequest (map, httpRequest, httpResponse));
         }
 
-        public byte[] NewAgentInventoryRequestVariablePrice (string path, Stream request, OSHttpRequest httpRequest,
+        public byte [] NewAgentInventoryRequestVariablePrice (string path, Stream request, OSHttpRequest httpRequest,
                                                              OSHttpResponse httpResponse)
         {
             OSDMap map = (OSDMap)OSDParser.DeserializeLLSDXml (HttpServerHandlerHelpers.ReadFully (request));
             string asset_type = map ["asset_type"].AsString ();
             int charge = 0;
             int resourceCost;
-            if (!ChargeUser (asset_type, map, out charge, out resourceCost))
-            {
+            if (!ChargeUser (asset_type, map, out charge, out resourceCost)) {
                 map = new OSDMap ();
                 map ["uploader"] = "";
                 map ["state"] = "error";
@@ -317,17 +306,14 @@ namespace WhiteCore.Services
             charge = 0;
             resourceCost = 0;
 
-            if (m_moneyModule != null)
-            {
+            if (m_moneyModule != null) {
                 if (assetType == "texture" ||
                     assetType == "animation" ||
                     assetType == "snapshot" ||
-                    assetType == "sound")
-                {
+                    assetType == "sound") {
                     charge = m_moneyModule.UploadCharge;
                 } else if (assetType == "mesh" ||
-                         assetType == "object")
-                {
+                         assetType == "object") {
                     OSDMap meshMap = (OSDMap)map ["asset_resources"];
                     //OSDArray instance_list = (OSDArray)meshMap["instance_list"];
                     int mesh_list = meshMap.ContainsKey ("mesh_list") ? ((OSDArray)meshMap ["mesh_list"]).Count : 1;
@@ -381,7 +367,7 @@ namespace WhiteCore.Services
             return map;
         }
 
-        public byte[] CreateInventoryCategory (string path, Stream request, OSHttpRequest httpRequest,
+        public byte [] CreateInventoryCategory (string path, Stream request, OSHttpRequest httpRequest,
                                                OSHttpResponse httpResponse)
         {
             OSDMap map = (OSDMap)OSDParser.DeserializeLLSDXml (HttpServerHandlerHelpers.ReadFully (request));
@@ -417,14 +403,13 @@ namespace WhiteCore.Services
         /// <param name="groupMask"></param>
         /// <param name="nextOwnerMask"></param>
         public UUID UploadCompleteHandler (string assetName, string assetDescription, UUID assetID,
-                                           UUID inventoryItem, UUID parentFolder, byte[] data, string inventoryType,
+                                           UUID inventoryItem, UUID parentFolder, byte [] data, string inventoryType,
                                            string assetType, uint everyoneMask, uint groupMask, uint nextOwnerMask)
         {
             sbyte assType = 0;
             sbyte inType = 0;
 
-            switch (inventoryType)
-            {
+            switch (inventoryType) {
             case "sound":
                 inType = 1;
                 assType = 1;
@@ -439,8 +424,7 @@ namespace WhiteCore.Services
                 break;
             case "wearable":
                 inType = 18;
-                switch (assetType)
-                {
+                switch (assetType) {
                 case "bodypart":
                     assType = 13;
                     break;
@@ -449,8 +433,7 @@ namespace WhiteCore.Services
                     break;
                 }
                 break;
-            case "object":
-                {
+            case "object": {
                     inType = (sbyte)InventoryType.Object;
                     assType = (sbyte)AssetType.Object;
 
@@ -465,16 +448,14 @@ namespace WhiteCore.Services
                     List<UUID> textures = new List<UUID> ();
                     foreach (
                             AssetBase textureAsset in
-                                texture_list.Select(t => new AssetBase(UUID.Random(), assetName, AssetType.Texture,
-                                                                       m_agentID) { Data = t.AsBinary() }))
-                    {
+                                texture_list.Select (t => new AssetBase (UUID.Random (), assetName, AssetType.Texture,
+                                                                        m_agentID) { Data = t.AsBinary () })) {
                         textureAsset.ID = m_assetService.Store (textureAsset);
                         textures.Add (textureAsset.ID);
                     }
 
                     InventoryFolderBase meshFolder = m_inventoryService.GetFolderForType (m_agentID, InventoryType.Mesh, FolderType.Mesh);
-                    for (int i = 0; i < mesh_list.Count; i++)
-                    {
+                    for (int i = 0; i < mesh_list.Count; i++) {
                         PrimitiveBaseShape pbs = PrimitiveBaseShape.CreateBox ();
 
                         Primitive.TextureEntry textureEntry =
@@ -482,8 +463,7 @@ namespace WhiteCore.Services
                         OSDMap inner_instance_list = (OSDMap)instance_list [i];
 
                         OSDArray face_list = (OSDArray)inner_instance_list ["face_list"];
-                        for (uint face = 0; face < face_list.Count; face++)
-                        {
+                        for (uint face = 0; face < face_list.Count; face++) {
                             OSDMap faceMap = (OSDMap)face_list [(int)face];
                             Primitive.TextureEntryFace f = pbs.Textures.CreateFace (face);
                             if (faceMap.ContainsKey ("fullbright"))
@@ -515,12 +495,10 @@ namespace WhiteCore.Services
                         }
                         pbs.TextureEntry = textureEntry.GetBytes ();
 
-                        AssetBase meshAsset = new AssetBase (UUID.Random (), assetName, AssetType.Mesh, m_agentID)
-                                                      { Data = mesh_list [i].AsBinary () };
+                        AssetBase meshAsset = new AssetBase (UUID.Random (), assetName, AssetType.Mesh, m_agentID) { Data = mesh_list [i].AsBinary () };
                         meshAsset.ID = m_assetService.Store (meshAsset);
 
-                        if (meshFolder == null)
-                        {
+                        if (meshFolder == null) {
                             m_inventoryService.CreateUserInventory (m_agentID, false);
                             meshFolder = m_inventoryService.GetFolderForType (m_agentID, InventoryType.Mesh, FolderType.Mesh);
                         }
@@ -551,12 +529,11 @@ namespace WhiteCore.Services
                         Quaternion rotation = inner_instance_list ["rotation"].AsQuaternion ();
 
                         int physicsShapeType = inner_instance_list ["physics_shape_type"].AsInteger ();
-// 20131224 not used                        int material = inner_instance_list["material"].AsInteger();
-// 20131224 not used                        int mesh = inner_instance_list["mesh"].AsInteger();
+                        // not currently used                        int material = inner_instance_list["material"].AsInteger();
+                        // not currently used                        int mesh = inner_instance_list["mesh"].AsInteger();
 
                         SceneObjectPart prim = new SceneObjectPart (m_agentID, pbs, position, Quaternion.Identity,
-                                                   Vector3.Zero, assetName)
-                                                       { Scale = scale, AbsolutePosition = position };
+                                                   Vector3.Zero, assetName) { Scale = scale, AbsolutePosition = position };
 
                         rotations.Add (rotation);
                         positions.Add (position);
@@ -582,24 +559,24 @@ namespace WhiteCore.Services
                             grp.AddChild (prim, i + 1);
                         grp.RootPart.IsAttachment = false;
                     }
-                    if (grp.ChildrenList.Count > 1) //Fix first link #
+                    if (grp != null) {              // unlikely not to have anything but itis possible
+                        if (grp.ChildrenList.Count > 1) //Fix first link #
                             grp.RootPart.LinkNum++;
 
-                    Vector3 rootPos = positions [0];
-                    grp.SetAbsolutePosition (false, rootPos);
-                    for (int i = 0; i < positions.Count; i++)
-                    {
-                        Vector3 offset = positions [i] - rootPos;
-                        grp.ChildrenList [i].SetOffsetPosition (offset);
+                        Vector3 rootPos = positions [0];
+                        grp.SetAbsolutePosition (false, rootPos);
+                        for (int i = 0; i < positions.Count; i++) {
+                            Vector3 offset = positions [i] - rootPos;
+                            grp.ChildrenList [i].SetOffsetPosition (offset);
+                        }
+                        //grp.Rotation = rotations[0];
+                        for (int i = 0; i < rotations.Count; i++) {
+                            if (i != 0)
+                                grp.ChildrenList [i].SetRotationOffset (false, rotations [i], false);
+                        }
+                        grp.UpdateGroupRotationR (rotations [0]);
+                        data = Encoding.ASCII.GetBytes (grp.ToXml2 ());
                     }
-                    //grp.Rotation = rotations[0];
-                    for (int i = 0; i < rotations.Count; i++)
-                    {
-                        if (i != 0)
-                            grp.ChildrenList [i].SetRotationOffset (false, rotations [i], false);
-                    }
-                    grp.UpdateGroupRotationR (rotations [0]);
-                    data = Encoding.ASCII.GetBytes (grp.ToXml2 ());
                 }
                 break;
             }
@@ -633,20 +610,20 @@ namespace WhiteCore.Services
         public class AssetUploader
         {
             readonly UUID inventoryItemID;
-            readonly string m_assetDes = String.Empty;
-            readonly string m_assetName = String.Empty;
-            readonly string m_assetType = String.Empty;
+            readonly string m_assetDes = string.Empty;
+            readonly string m_assetName = string.Empty;
+            readonly string m_assetType = string.Empty;
             readonly uint m_everyone_mask;
             readonly uint m_group_mask;
-            readonly string m_invType = String.Empty;
+            readonly string m_invType = string.Empty;
             readonly uint m_next_owner_mask;
             readonly UUID parentFolder;
-            readonly string uploaderPath = String.Empty;
+            readonly string uploaderPath = string.Empty;
             UUID newAssetID;
-            UploadHandler m_uploadCompleteHandler;
+            readonly UploadHandler m_uploadCompleteHandler;
 
             public delegate UUID UploadHandler (string assetName, string description, UUID assetID, UUID inventoryItem,
-                                 UUID parentFolderID, byte[] data, string invType, string assetType,
+                                 UUID parentFolderID, byte [] data, string invType, string assetType,
                                  uint everyoneMask, uint groupMask, uint nextOwnerMask);
 
             public AssetUploader (string assetName, string description, UUID assetID, UUID inventoryItem,
@@ -674,11 +651,11 @@ namespace WhiteCore.Services
             /// <param name="httpRequest"></param>
             /// <param name="httpResponse"></param>
             /// <returns></returns>
-            public byte[] UploaderCaps (string path, Stream request,
+            public byte [] UploaderCaps (string path, Stream request,
                                         OSHttpRequest httpRequest, OSHttpResponse httpResponse)
             {
                 UUID inv = inventoryItemID;
-                byte[] data = HttpServerHandlerHelpers.ReadFully (request);
+                byte [] data = HttpServerHandlerHelpers.ReadFully (request);
                 MainServer.Instance.RemoveStreamHandler ("POST", uploaderPath);
 
                 newAssetID = m_uploadCompleteHandler (m_assetName, m_assetDes, newAssetID, inv, parentFolder,
