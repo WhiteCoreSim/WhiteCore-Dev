@@ -43,8 +43,8 @@ namespace WhiteCore.Modules.Combat
     {
         IConfig m_config;
         bool m_enabled;
-        readonly List<UUID> CombatAllowedAgents = new List<UUID>();
-        readonly Dictionary<string, List<UUID>> Teams = new Dictionary<string, List<UUID>>();
+        readonly List<UUID> CombatAllowedAgents = new List<UUID> ();
+        readonly Dictionary<string, List<UUID>> Teams = new Dictionary<string, List<UUID>> ();
         float MaximumHealth;
 
         public bool AllowTeamKilling;
@@ -65,25 +65,23 @@ namespace WhiteCore.Modules.Combat
 
         #region ICombatModule Members
 
-        public void AddCombatPermission(UUID AgentID)
+        public void AddCombatPermission (UUID AgentID)
         {
-            if (!CombatAllowedAgents.Contains(AgentID))
-                CombatAllowedAgents.Add(AgentID);
+            if (!CombatAllowedAgents.Contains (AgentID))
+                CombatAllowedAgents.Add (AgentID);
         }
 
-        public bool CheckCombatPermission(UUID AgentID)
+        public bool CheckCombatPermission (UUID AgentID)
         {
-            return CombatAllowedAgents.Contains(AgentID);
+            return CombatAllowedAgents.Contains (AgentID);
         }
 
-        public List<UUID> GetTeammates(string Team)
+        public List<UUID> GetTeammates (string Team)
         {
-            lock (Teams)
-            {
-                List<UUID> Teammates = new List<UUID>();
-                if (Teams.ContainsKey(Team))
-                {
-                    Teams.TryGetValue(Team, out Teammates);
+            lock (Teams) {
+                List<UUID> Teammates = new List<UUID> ();
+                if (Teams.ContainsKey (Team)) {
+                    Teams.TryGetValue (Team, out Teammates);
                 }
                 return Teammates;
             }
@@ -93,54 +91,50 @@ namespace WhiteCore.Modules.Combat
 
         #region INonSharedRegionModule Members
 
-        public string Name
-        {
+        public string Name {
             get { return "CombatModule"; }
         }
 
-        public Type ReplaceableInterface
-        {
+        public Type ReplaceableInterface {
             get { return null; }
         }
 
-        public void Initialise(IConfigSource source)
+        public void Initialise (IConfigSource source)
         {
-            m_config = source.Configs["CombatModule"];
-            if (m_config != null)
-            {
-                m_enabled = m_config.GetBoolean("Enabled", true);
-                MaximumHealth = m_config.GetFloat("MaximumHealth", 100);
-                ForceRequireCombatPermission = m_config.GetBoolean("ForceRequireCombatPermission",
+            m_config = source.Configs ["CombatModule"];
+            if (m_config != null) {
+                m_enabled = m_config.GetBoolean ("Enabled", true);
+                MaximumHealth = m_config.GetFloat ("MaximumHealth", 100);
+                ForceRequireCombatPermission = m_config.GetBoolean ("ForceRequireCombatPermission",
                                                                    ForceRequireCombatPermission);
-                DisallowTeleportingForCombatants = m_config.GetBoolean("DisallowTeleportingForCombatants",
+                DisallowTeleportingForCombatants = m_config.GetBoolean ("DisallowTeleportingForCombatants",
                                                                        DisallowTeleportingForCombatants);
-                AllowTeamKilling = m_config.GetBoolean("AllowTeamKilling", true);
-                AllowTeams = m_config.GetBoolean("AllowTeams", false);
-                SendTeamKillerInfo = m_config.GetBoolean("SendTeamKillerInfo", false);
-                TeamHitsBeforeSend = m_config.GetFloat("TeamHitsBeforeSend", 3);
-                DamageToTeamKillers = m_config.GetFloat("DamageToTeamKillers", 100);
-                MaximumHealth = m_config.GetFloat("MaximumHealth", 100);
-                MaximumDamageToInflict = m_config.GetFloat("MaximumDamageToInflict", 100);
-                m_RespawnPosition.X = m_config.GetFloat("RespawnPositionX", 128);
-                m_RespawnPosition.Y = m_config.GetFloat("RespawnPositionY", 128);
-                m_RespawnPosition.Z = m_config.GetFloat("RespawnPositionZ", 128);
-                m_SecondsBeforeRespawn = m_config.GetInt("SecondsBeforeRespawn", 5);
-                m_shouldRespawn = m_config.GetBoolean("ShouldRespawn", false);
-                m_regenHealth = m_config.GetBoolean("RegenerateHealth", true);
-                RegenerateHealthSpeed = m_config.GetFloat("RegenerateHealthSpeed", 0.0625f);
+                AllowTeamKilling = m_config.GetBoolean ("AllowTeamKilling", true);
+                AllowTeams = m_config.GetBoolean ("AllowTeams", false);
+                SendTeamKillerInfo = m_config.GetBoolean ("SendTeamKillerInfo", false);
+                TeamHitsBeforeSend = m_config.GetFloat ("TeamHitsBeforeSend", 3);
+                DamageToTeamKillers = m_config.GetFloat ("DamageToTeamKillers", 100);
+                MaximumHealth = m_config.GetFloat ("MaximumHealth", 100);
+                MaximumDamageToInflict = m_config.GetFloat ("MaximumDamageToInflict", 100);
+                m_RespawnPosition.X = m_config.GetFloat ("RespawnPositionX", 128);
+                m_RespawnPosition.Y = m_config.GetFloat ("RespawnPositionY", 128);
+                m_RespawnPosition.Z = m_config.GetFloat ("RespawnPositionZ", 128);
+                m_SecondsBeforeRespawn = m_config.GetInt ("SecondsBeforeRespawn", 5);
+                m_shouldRespawn = m_config.GetBoolean ("ShouldRespawn", false);
+                m_regenHealth = m_config.GetBoolean ("RegenerateHealth", true);
+                RegenerateHealthSpeed = m_config.GetFloat ("RegenerateHealthSpeed", 0.0625f);
             }
         }
 
-        public void Close()
+        public void Close ()
         {
         }
 
-        public void AddRegion(IScene scene)
+        public void AddRegion (IScene scene)
         {
-            if (m_enabled)
-            {
+            if (m_enabled) {
                 m_scene = scene;
-                scene.RegisterModuleInterface<ICombatModule>(this);
+                scene.RegisterModuleInterface<ICombatModule> (this);
                 scene.EventManager.OnNewPresence += NewPresence;
                 scene.EventManager.OnRemovePresence += EventManager_OnRemovePresence;
                 scene.EventManager.OnAvatarEnteringNewParcel += AvatarEnteringParcel;
@@ -150,10 +144,9 @@ namespace WhiteCore.Modules.Combat
             }
         }
 
-        public void RemoveRegion(IScene scene)
+        public void RemoveRegion (IScene scene)
         {
-            if (m_enabled)
-            {
+            if (m_enabled) {
                 scene.EventManager.OnNewPresence -= NewPresence;
                 scene.EventManager.OnRemovePresence -= EventManager_OnRemovePresence;
                 scene.EventManager.OnAvatarEnteringNewParcel -= AvatarEnteringParcel;
@@ -163,105 +156,94 @@ namespace WhiteCore.Modules.Combat
             }
         }
 
-        public void RegionLoaded(IScene scene)
+        public void RegionLoaded (IScene scene)
         {
         }
 
         #endregion
 
-        bool AllowedTeleports(UUID userID, IScene scene, out string reason)
+        bool AllowedTeleports (UUID userID, IScene scene, out string reason)
         {
             //Make sure that agents that are in combat cannot tp around. They CAN tp if they are out of combat however
             reason = "";
             IScenePresence SP = null;
-            if (scene.TryGetScenePresence(userID, out SP))
+            if (scene.TryGetScenePresence (userID, out SP))
                 if (DisallowTeleportingForCombatants &&
-                    SP.RequestModuleInterface<ICombatPresence>() != null &&
-                    !SP.RequestModuleInterface<ICombatPresence>().HasLeftCombat && !SP.Invulnerable)
+                    SP.RequestModuleInterface<ICombatPresence> () != null &&
+                    !SP.RequestModuleInterface<ICombatPresence> ().HasLeftCombat && !SP.Invulnerable)
                     return false;
             return true;
         }
 
-        void NewPresence(IScenePresence presence)
+        void NewPresence (IScenePresence presence)
         {
-            presence.RegisterModuleInterface<ICombatPresence>(new CombatPresence(this, presence, m_config));
+            presence.RegisterModuleInterface<ICombatPresence> (new CombatPresence (this, presence, m_config));
         }
 
-        void EventManager_OnRemovePresence(IScenePresence presence)
+        void EventManager_OnRemovePresence (IScenePresence presence)
         {
-            CombatPresence m = (CombatPresence) presence.RequestModuleInterface<ICombatPresence>();
-            if (m != null)
-            {
-                presence.UnregisterModuleInterface<ICombatPresence>(m);
-                m.Close();
+            CombatPresence m = (CombatPresence)presence.RequestModuleInterface<ICombatPresence> ();
+            if (m != null) {
+                presence.UnregisterModuleInterface<ICombatPresence> (m);
+                m.Close ();
             }
         }
 
-        public void AddPlayerToTeam(string Team, UUID AgentID)
+        public void AddPlayerToTeam (string Team, UUID AgentID)
         {
-            lock (Teams)
-            {
-                List<UUID> Teammates = new List<UUID>();
-                if (Teams.TryGetValue(Team, out Teammates))
-                    Teams.Remove(Team);
+            lock (Teams) {
+                List<UUID> Teammates = new List<UUID> ();
+                if (Teams.TryGetValue (Team, out Teammates))
+                    Teams.Remove (Team);
                 else
-                    Teammates = new List<UUID>();
-                Teammates.Add(AgentID);
-                Teams.Add(Team, Teammates);
+                    Teammates = new List<UUID> ();
+                Teammates.Add (AgentID);
+                Teams.Add (Team, Teammates);
             }
         }
 
-        public void RemovePlayerFromTeam(string Team, UUID AgentID)
+        public void RemovePlayerFromTeam (string Team, UUID AgentID)
         {
-            lock (Teams)
-            {
-                List<UUID> Teammates = new List<UUID>();
-                if (Teams.TryGetValue(Team, out Teammates))
-                {
-                    Teams.Remove(Team);
-                    if (Teammates.Contains(AgentID))
-                        Teammates.Remove(AgentID);
-                    Teams.Add(Team, Teammates);
+            lock (Teams) {
+                List<UUID> Teammates = new List<UUID> ();
+                if (Teams.TryGetValue (Team, out Teammates)) {
+                    Teams.Remove (Team);
+                    if (Teammates.Contains (AgentID))
+                        Teammates.Remove (AgentID);
+                    Teams.Add (Team, Teammates);
                 }
             }
         }
 
-        void OnLandObjectAdded(LandData newParcel)
+        void OnLandObjectAdded (LandData newParcel)
         {
             //If a new land object is added or updated, we need to redo the check for the avatars invulnerability
-            m_scene.ForEachScenePresence(sp => AvatarEnteringParcel(sp, null));
+            m_scene.ForEachScenePresence (sp => AvatarEnteringParcel (sp, null));
         }
 
-        public void AddDamageToPrim(ISceneEntity entity)
+        public void AddDamageToPrim (ISceneEntity entity)
         {
         }
 
-        void AvatarEnteringParcel(IScenePresence avatar, ILandObject oldParcel)
+        void AvatarEnteringParcel (IScenePresence avatar, ILandObject oldParcel)
         {
             ILandObject obj = null;
-            IParcelManagementModule parcelManagement = avatar.Scene.RequestModuleInterface<IParcelManagementModule>();
-            if (parcelManagement != null)
-            {
-                obj = parcelManagement.GetLandObject(avatar.AbsolutePosition.X, avatar.AbsolutePosition.Y);
+            IParcelManagementModule parcelManagement = avatar.Scene.RequestModuleInterface<IParcelManagementModule> ();
+            if (parcelManagement != null) {
+                obj = parcelManagement.GetLandObject (avatar.AbsolutePosition.X, avatar.AbsolutePosition.Y);
             }
             if (obj == null)
                 return;
 
-            try
-            {
-                if ((obj.LandData.Flags & (uint) ParcelFlags.AllowDamage) != 0)
-                {
-                    ICombatPresence CP = avatar.RequestModuleInterface<ICombatPresence>();
+            try {
+                if ((obj.LandData.Flags & (uint)ParcelFlags.AllowDamage) != 0) {
+                    ICombatPresence CP = avatar.RequestModuleInterface<ICombatPresence> ();
                     CP.Health = MaximumHealth;
                     avatar.Invulnerable = false;
-                }
-                else
-                {
+                } else {
                     avatar.Invulnerable = true;
                 }
-            }
-            catch (Exception)
-            {
+            } catch (Exception) {
             }
         }
 
@@ -276,13 +258,13 @@ namespace WhiteCore.Modules.Combat
             string m_Team;
             float m_health = 100f;
 
-            public CombatObject(CombatModule module, ISceneEntity part, IConfig m_config)
+            public CombatObject (CombatModule module, ISceneEntity part, IConfig m_config)
             {
                 m_part = part;
                 m_combatModule = module;
 
-                MaximumHealth = m_config.GetFloat("MaximumHealth", 100);
-                MaximumDamageToInflict = m_config.GetFloat("MaximumDamageToInflict", 100);
+                MaximumHealth = m_config.GetFloat ("MaximumHealth", 100);
+                MaximumDamageToInflict = m_config.GetFloat ("MaximumDamageToInflict", 100);
 
 
                 m_Team = "No Team";
@@ -291,42 +273,38 @@ namespace WhiteCore.Modules.Combat
                 m_part.RootChild.OnRemovePhysics += RemovePhysics;
             }
 
-            public string Team
-            {
+            public string Team {
                 get { return m_Team; }
-                set
-                {
-                    m_combatModule.RemovePlayerFromTeam(m_Team, m_part.UUID);
+                set {
+                    m_combatModule.RemovePlayerFromTeam (m_Team, m_part.UUID);
                     m_Team = value;
-                    m_combatModule.AddPlayerToTeam(m_Team, m_part.UUID);
+                    m_combatModule.AddPlayerToTeam (m_Team, m_part.UUID);
                 }
             }
 
-            public float Health
-            {
+            public float Health {
                 get { return m_health; }
                 set { m_health = value; }
             }
 
-            public bool HasLeftCombat
-            {
+            public bool HasLeftCombat {
                 get { return false; }
                 set { }
             }
 
-            public void RemovePhysics()
+            public void RemovePhysics ()
             {
                 if (m_part.RootChild.PhysActor != null)
                     m_part.RootChild.PhysActor.OnCollisionUpdate -= PhysicsActor_OnCollisionUpdate;
             }
 
-            public void AddPhysics()
+            public void AddPhysics ()
             {
                 if (m_part.RootChild.PhysActor != null)
                     m_part.RootChild.PhysActor.OnCollisionUpdate += PhysicsActor_OnCollisionUpdate;
             }
 
-            public void PhysicsActor_OnCollisionUpdate(EventArgs e)
+            public void PhysicsActor_OnCollisionUpdate (EventArgs e)
             {
                 /*if (HasLeftCombat)
                     return;
@@ -370,22 +348,22 @@ namespace WhiteCore.Modules.Combat
                 }*/
             }
 
-            public void LeaveCombat()
+            public void LeaveCombat ()
             {
                 //NoOp
             }
 
-            public void JoinCombat()
+            public void JoinCombat ()
             {
                 //NoOp
             }
 
-            public List<UUID> GetTeammates()
+            public List<UUID> GetTeammates ()
             {
-                return m_combatModule.GetTeammates(m_Team);
+                return m_combatModule.GetTeammates (m_Team);
             }
 
-            public void IncurDamage(uint localID, double damage, UUID OwnerID)
+            public void IncurDamage (uint localID, double damage, UUID OwnerID)
             {
                 if (damage < 0)
                     return;
@@ -393,12 +371,12 @@ namespace WhiteCore.Modules.Combat
                 if (damage > MaximumDamageToInflict)
                     damage = MaximumDamageToInflict;
                 float health = Health;
-                health -= (float) damage;
+                health -= (float)damage;
                 if (health <= 0)
-                    Die(OwnerID);
+                    Die (OwnerID);
             }
 
-            public void IncurDamage(uint localID, double damage, string RegionName, Vector3 pos, Vector3 lookat,
+            public void IncurDamage (uint localID, double damage, string RegionName, Vector3 pos, Vector3 lookat,
                                     UUID OwnerID)
             {
                 if (damage < 0)
@@ -407,31 +385,30 @@ namespace WhiteCore.Modules.Combat
                 if (damage > MaximumDamageToInflict)
                     damage = MaximumDamageToInflict;
                 float health = Health;
-                health -= (float) damage;
+                health -= (float)damage;
                 if (health <= 0)
-                    Die(OwnerID);
+                    Die (OwnerID);
             }
 
-            public void IncurHealing(double healing, UUID OwnerID)
+            public void IncurHealing (double healing, UUID OwnerID)
             {
                 if (healing < 0)
                     return;
 
                 float health = Health;
-                health += (float) healing;
+                health += (float)healing;
                 if (health >= MaximumHealth)
                     health = MaximumHealth;
             }
 
-            void Die(UUID OwnerID)
+            void Die (UUID OwnerID)
             {
-                foreach (IScriptModule m in m_part.Scene.RequestModuleInterfaces<IScriptModule>())
-                {
-                    m.PostObjectEvent(m_part.UUID, "dead_object", new object[] {OwnerID});
+                foreach (IScriptModule m in m_part.Scene.RequestModuleInterfaces<IScriptModule> ()) {
+                    m.PostObjectEvent (m_part.UUID, "dead_object", new object [] { OwnerID });
                 }
             }
 
-            public void SetStat(string StatName, float statValue)
+            public void SetStat (string StatName, float statValue)
             {
             }
         }
@@ -444,40 +421,35 @@ namespace WhiteCore.Modules.Combat
         {
             #region Declares
 
-            readonly Dictionary<UUID, float> TeamHits = new Dictionary<UUID, float>();
-            readonly Timer m_healthtimer = new Timer();
+            readonly Dictionary<UUID, float> TeamHits = new Dictionary<UUID, float> ();
+            readonly Timer m_healthtimer = new Timer ();
             IScenePresence m_SP;
             string m_Team = "No Team";
             CombatModule m_combatModule;
             float m_health = 100f;
             //Dictionary<string, float> GenericStats = new Dictionary<string, float>();
 
-            public float Health
-            {
+            public float Health {
                 get { return m_health; }
-                set
-                {
+                set {
                     if (value > m_health)
-                        IncurHealing(value - m_health);
+                        IncurHealing (value - m_health);
                     else
-                        IncurDamage(null, m_health - value);
+                        IncurDamage (null, m_health - value);
                 }
             }
 
-            public bool HasLeftCombat
-            {
+            public bool HasLeftCombat {
                 get { return m_combatModule.m_HasLeftCombat; }
                 set { m_combatModule.m_HasLeftCombat = value; }
             }
 
-            public string Team
-            {
+            public string Team {
                 get { return m_Team; }
-                set
-                {
-                    m_combatModule.RemovePlayerFromTeam(m_Team, m_SP.UUID);
+                set {
+                    m_combatModule.RemovePlayerFromTeam (m_Team, m_SP.UUID);
                     m_Team = value;
-                    m_combatModule.AddPlayerToTeam(m_Team, m_SP.UUID);
+                    m_combatModule.AddPlayerToTeam (m_Team, m_SP.UUID);
                 }
             }
 
@@ -485,7 +457,7 @@ namespace WhiteCore.Modules.Combat
 
             #region Initialization/Close
 
-            public CombatPresence(CombatModule module, IScenePresence SP, IConfig m_config)
+            public CombatPresence (CombatModule module, IScenePresence SP, IConfig m_config)
             {
                 m_SP = SP;
                 m_combatModule = module;
@@ -499,16 +471,16 @@ namespace WhiteCore.Modules.Combat
                 //Use this to fix the avatars health
                 m_healthtimer.Interval = 1000; // 1 sec
                 m_healthtimer.Elapsed += fixAvatarHealth_Elapsed;
-                m_healthtimer.Start();
+                m_healthtimer.Start ();
             }
 
-            public void Close()
+            public void Close ()
             {
-                m_healthtimer.Stop();
-                m_healthtimer.Close();
+                m_healthtimer.Stop ();
+                m_healthtimer.Close ();
                 m_SP.OnAddPhysics -= SP_OnAddPhysics;
                 m_SP.OnRemovePhysics -= SP_OnRemovePhysics;
-                SP_OnRemovePhysics();
+                SP_OnRemovePhysics ();
                 m_combatModule = null;
                 m_SP = null;
             }
@@ -517,38 +489,36 @@ namespace WhiteCore.Modules.Combat
 
             #region Physics events
 
-            public void SP_OnRemovePhysics()
+            public void SP_OnRemovePhysics ()
             {
                 if (m_SP.PhysicsActor != null)
                     m_SP.PhysicsActor.OnCollisionUpdate -= PhysicsActor_OnCollisionUpdate;
             }
 
-            public void SP_OnAddPhysics()
+            public void SP_OnAddPhysics ()
             {
                 if (m_SP.PhysicsActor != null)
                     m_SP.PhysicsActor.OnCollisionUpdate += PhysicsActor_OnCollisionUpdate;
             }
 
-            public void PhysicsActor_OnCollisionUpdate(EventArgs e)
+            public void PhysicsActor_OnCollisionUpdate (EventArgs e)
             {
                 if (m_SP == null || m_SP.Scene == null || m_SP.Invulnerable || HasLeftCombat || e == null)
                     return;
 
-                CollisionEventUpdate collisionData = (CollisionEventUpdate) e;
-                Dictionary<uint, ContactPoint> coldata = collisionData.GetCollisionEvents();
+                CollisionEventUpdate collisionData = (CollisionEventUpdate)e;
+                Dictionary<uint, ContactPoint> coldata = collisionData.GetCollisionEvents ();
 
                 float starthealth = Health;
                 IScenePresence killingAvatar = null;
-                foreach (uint localid in coldata.Keys)
-                {
-                    ISceneChildEntity part = m_SP.Scene.GetSceneObjectPart(localid);
+                foreach (uint localid in coldata.Keys) {
+                    ISceneChildEntity part = m_SP.Scene.GetSceneObjectPart (localid);
                     IScenePresence otherAvatar = null;
-                    if (part != null && part.ParentEntity.Damage > 0)
-                    {
-                        otherAvatar = m_SP.Scene.GetScenePresence(part.OwnerID);
+                    if (part != null && part.ParentEntity.Damage > 0) {
+                        otherAvatar = m_SP.Scene.GetScenePresence (part.OwnerID);
                         ICombatPresence OtherAvatarCP = otherAvatar == null
                                                             ? null
-                                                            : otherAvatar.RequestModuleInterface<ICombatPresence>();
+                                                            : otherAvatar.RequestModuleInterface<ICombatPresence> ();
                         if (OtherAvatarCP != null && OtherAvatarCP.HasLeftCombat)
                             // If the avatar is null, the person is not inworld, and not on a team
                             //If they have left combat, do not let them cause any damage.
@@ -560,37 +530,31 @@ namespace WhiteCore.Modules.Combat
 
                         // If the avatar is null, the person is not inworld, and not on a team
                         if (m_combatModule.AllowTeams && OtherAvatarCP != null && otherAvatar.UUID != m_SP.UUID &&
-                            OtherAvatarCP.Team == Team)
-                        {
+                            OtherAvatarCP.Team == Team) {
                             float Hits = 0;
-                            if (!TeamHits.TryGetValue(otherAvatar.UUID, out Hits))
+                            if (!TeamHits.TryGetValue (otherAvatar.UUID, out Hits))
                                 Hits = 0;
                             Hits++;
-                            if (m_combatModule.SendTeamKillerInfo && Hits == m_combatModule.TeamHitsBeforeSend)
-                            {
-                                otherAvatar.ControllingClient.SendAlertMessage("You have shot too many teammates and " +
+                            if (m_combatModule.SendTeamKillerInfo && Hits == m_combatModule.TeamHitsBeforeSend) {
+                                otherAvatar.ControllingClient.SendAlertMessage ("You have shot too many teammates and " +
                                                                                m_combatModule.DamageToTeamKillers +
                                                                                " health has been taken from you!");
-                                OtherAvatarCP.IncurDamage(null, m_combatModule.DamageToTeamKillers);
+                                OtherAvatarCP.IncurDamage (null, m_combatModule.DamageToTeamKillers);
                                 Hits = 0;
                             }
-                            TeamHits[otherAvatar.UUID] = Hits;
+                            TeamHits [otherAvatar.UUID] = Hits;
 
                             if (m_combatModule.AllowTeamKilling) //Green light on team killing
                                 Health -= part.ParentEntity.Damage;
-                        }
-                        else //Object, hit em
+                        } else //Object, hit em
                             Health -= part.ParentEntity.Damage;
-                    }
-                    else
-                    {
-                        float Z = m_SP.Velocity.Length();
-                        if (coldata[localid].PenetrationDepth >= 0.05f && m_SP.Velocity.Z < -3 &&
-                            !m_SP.PhysicsActor.Flying && !m_SP.PhysicsActor.IsJumping)
-                        {
-                            Z = Math.Max(Z, 1.5f) * 10;
-                            float damage = Math.Min(coldata[localid].PenetrationDepth, 15f);
-                            Health -= damage*Z;
+                    } else {
+                        float Z = m_SP.Velocity.Length ();
+                        if (coldata [localid].PenetrationDepth >= 0.05f && m_SP.Velocity.Z < -3 &&
+                            !m_SP.PhysicsActor.Flying && !m_SP.PhysicsActor.IsJumping) {
+                            Z = Math.Max (Z, 1.5f) * 10;
+                            float damage = Math.Min (coldata [localid].PenetrationDepth, 15f);
+                            Health -= damage * Z;
                         }
                     }
 
@@ -603,171 +567,153 @@ namespace WhiteCore.Modules.Combat
                 }
 
                 if (starthealth != Health)
-                    m_SP.ControllingClient.SendHealth(Health);
+                    m_SP.ControllingClient.SendHealth (Health);
 
                 if (Health <= 0)
-                    KillAvatar(killingAvatar, "You killed " + m_SP.Name, "You died!", true, true);
+                    KillAvatar (killingAvatar, "You killed " + m_SP.Name, "You died!", true, true);
             }
 
             #endregion
 
             #region Kill Avatar
-
-            public void KillAvatar(IScenePresence killingAvatar, string killingAvatarMessage, string deadAvatarMessage,
+            Timer respawnTimer;
+            public void KillAvatar (IScenePresence killingAvatar, string killingAvatarMessage, string deadAvatarMessage,
                                    bool TeleportAgent, bool showAgentMessages)
             {
-                try
-                {
-                    if (showAgentMessages)
-                    {
+                try {
+                    if (showAgentMessages) {
                         if (deadAvatarMessage != "")
-                            m_SP.ControllingClient.SendAgentAlertMessage(deadAvatarMessage, true);
+                            m_SP.ControllingClient.SendAgentAlertMessage (deadAvatarMessage, true);
                         //Send it as a blue box at the bottom of the screen rather than as a full popup
                         if (killingAvatar != null && killingAvatarMessage != "")
-                            killingAvatar.ControllingClient.SendAlertMessage(killingAvatarMessage);
+                            killingAvatar.ControllingClient.SendAlertMessage (killingAvatarMessage);
                     }
-                }
-                catch (InvalidOperationException)
-                {
+                } catch (InvalidOperationException) {
                 }
 
                 Health = m_combatModule.MaximumHealth;
-                if (TeleportAgent)
-                {
-                    if (m_combatModule.m_shouldRespawn)
-                    {
-                        if (m_combatModule.m_SecondsBeforeRespawn != 0)
-                        {
+                if (TeleportAgent) {
+                    if (m_combatModule.m_shouldRespawn) {
+                        if (m_combatModule.m_SecondsBeforeRespawn != 0) {
                             m_SP.AllowMovement = false;
                             HasLeftCombat = true;
-                            Timer t = new Timer
-                                          {Interval = m_combatModule.m_SecondsBeforeRespawn*1000, AutoReset = false};
+                            respawnTimer = new Timer { Interval = m_combatModule.m_SecondsBeforeRespawn * 1000, AutoReset = false };
                             //Use this to re-enable movement and combat
                             //Only once
-                            t.Elapsed += respawn_Elapsed;
-                            t.Start();
+                            respawnTimer.Elapsed += respawn_Elapsed;
+                            respawnTimer.Start ();
                         }
-                        m_SP.Teleport(m_combatModule.m_RespawnPosition);
-                    }
-                    else
-                    {
+                        m_SP.Teleport (m_combatModule.m_RespawnPosition);
+                    } else {
                         IEntityTransferModule transferModule =
-                            m_SP.Scene.RequestModuleInterface<IEntityTransferModule>();
+                            m_SP.Scene.RequestModuleInterface<IEntityTransferModule> ();
                         if (transferModule != null)
-                            if (!transferModule.TeleportHome(m_SP.UUID, m_SP.ControllingClient))
-                            {
+                            if (!transferModule.TeleportHome (m_SP.UUID, m_SP.ControllingClient)) {
                                 if (m_SP.PhysicsActor != null)
                                     m_SP.PhysicsActor.Flying = true;
-                                m_SP.Teleport(new Vector3(m_SP.Scene.RegionInfo.RegionSizeX/2,
-                                                          m_SP.Scene.RegionInfo.RegionSizeY/2, 128));
+                                m_SP.Teleport (new Vector3 (m_SP.Scene.RegionInfo.RegionSizeX / 2,
+                                                          m_SP.Scene.RegionInfo.RegionSizeY / 2, 128));
                             }
                     }
                 }
 
-                m_SP.Scene.WhiteCoreEventManager.FireGenericEventHandler("OnAvatarDeath", m_SP);
+                m_SP.Scene.WhiteCoreEventManager.FireGenericEventHandler ("OnAvatarDeath", m_SP);
             }
 
             #endregion
 
             #region Timer events
 
-            void fixAvatarHealth_Elapsed(object sender, ElapsedEventArgs e)
+            void fixAvatarHealth_Elapsed (object sender, ElapsedEventArgs e)
             {
                 //Regenerate health a bit every second
-                if (m_combatModule.m_regenHealth)
-                {
-                    if ((Health + m_combatModule.RegenerateHealthSpeed) <= m_combatModule.MaximumHealth)
-                    {
+                if (m_combatModule.m_regenHealth) {
+                    if ((Health + m_combatModule.RegenerateHealthSpeed) <= m_combatModule.MaximumHealth) {
                         m_health += m_combatModule.RegenerateHealthSpeed;
-                        m_SP.ControllingClient.SendHealth(Health);
-                    }
-                    else if (Health != m_combatModule.MaximumHealth)
-                    {
+                        m_SP.ControllingClient.SendHealth (Health);
+                    } else if (Health > m_combatModule.MaximumHealth) {
                         m_health = m_combatModule.MaximumHealth;
-                        m_SP.ControllingClient.SendHealth(Health);
+                        m_SP.ControllingClient.SendHealth (Health);
                     }
                 }
             }
 
-            void respawn_Elapsed(object sender, ElapsedEventArgs e)
+            void respawn_Elapsed (object sender, ElapsedEventArgs e)
             {
                 m_SP.AllowMovement = true;
                 HasLeftCombat = false;
+                respawnTimer.Close ();   // not needed anymore... until next time
             }
 
             #endregion
 
             #region Combat functions
 
-            public void LeaveCombat()
+            public void LeaveCombat ()
             {
-                m_combatModule.RemovePlayerFromTeam(m_Team, m_SP.UUID);
+                m_combatModule.RemovePlayerFromTeam (m_Team, m_SP.UUID);
                 HasLeftCombat = true;
             }
 
-            public void JoinCombat()
+            public void JoinCombat ()
             {
                 HasLeftCombat = false;
-                m_combatModule.AddPlayerToTeam(m_Team, m_SP.UUID);
+                m_combatModule.AddPlayerToTeam (m_Team, m_SP.UUID);
             }
 
-            public List<UUID> GetTeammates()
+            public List<UUID> GetTeammates ()
             {
-                return m_combatModule.GetTeammates(m_Team);
+                return m_combatModule.GetTeammates (m_Team);
             }
 
             #endregion
 
             #region Incur* functions
 
-            public void IncurDamage(IScenePresence killingAvatar, double damage)
+            public void IncurDamage (IScenePresence killingAvatar, double damage)
             {
-                InnerIncurDamage(killingAvatar, damage, true);
+                InnerIncurDamage (killingAvatar, damage, true);
             }
 
-            public void IncurDamage(IScenePresence killingAvatar, double damage, string RegionName, Vector3 pos,
+            public void IncurDamage (IScenePresence killingAvatar, double damage, string RegionName, Vector3 pos,
                                     Vector3 lookat)
             {
                 if (damage < 0)
                     return;
-                if (InnerIncurDamage(killingAvatar, damage, false))
-                {
+                if (InnerIncurDamage (killingAvatar, damage, false)) {
                     //They died, teleport them
-                    IEntityTransferModule entityTransfer = m_SP.Scene.RequestModuleInterface<IEntityTransferModule>();
+                    IEntityTransferModule entityTransfer = m_SP.Scene.RequestModuleInterface<IEntityTransferModule> ();
                     if (entityTransfer != null)
-                        entityTransfer.RequestTeleportLocation(m_SP.ControllingClient, RegionName, pos, lookat,
-                                                               (uint) TeleportFlags.ViaHome);
+                        entityTransfer.RequestTeleportLocation (m_SP.ControllingClient, RegionName, pos, lookat,
+                                                               (uint)TeleportFlags.ViaHome);
                 }
             }
 
-            public void IncurHealing(double healing)
+            public void IncurHealing (double healing)
             {
                 if (healing < 0)
                     return;
-                if (!HasLeftCombat || !m_combatModule.ForceRequireCombatPermission)
-                {
-                    m_health += (float) healing;
+                if (!HasLeftCombat || !m_combatModule.ForceRequireCombatPermission) {
+                    m_health += (float)healing;
                     if (m_health >= m_combatModule.MaximumHealth)
                         m_health = m_combatModule.MaximumHealth;
 
-                    m_SP.ControllingClient.SendHealth(m_health);
+                    m_SP.ControllingClient.SendHealth (m_health);
                 }
             }
 
-            bool InnerIncurDamage(IScenePresence killingAvatar, double damage, bool teleport)
+            bool InnerIncurDamage (IScenePresence killingAvatar, double damage, bool teleport)
             {
                 if (damage < 0)
                     return false;
 
-                if (!HasLeftCombat || !m_combatModule.ForceRequireCombatPermission)
-                {
+                if (!HasLeftCombat || !m_combatModule.ForceRequireCombatPermission) {
                     if (damage > m_combatModule.MaximumDamageToInflict)
                         damage = m_combatModule.MaximumDamageToInflict;
-                    m_health -= (float) damage;
-                    m_SP.ControllingClient.SendHealth(Health);
-                    if (Health <= 0)
-                    {
-                        KillAvatar(killingAvatar, "You killed " + m_SP.Name, "You died!", teleport, true);
+                    m_health -= (float)damage;
+                    m_SP.ControllingClient.SendHealth (Health);
+                    if (Health <= 0) {
+                        KillAvatar (killingAvatar, "You killed " + m_SP.Name, "You died!", teleport, true);
                         return true;
                     }
                 }
@@ -778,7 +724,7 @@ namespace WhiteCore.Modules.Combat
 
             #region Stat functions
 
-            public void SetStat(string StatName, float statValue)
+            public void SetStat (string StatName, float statValue)
             {
             }
 
