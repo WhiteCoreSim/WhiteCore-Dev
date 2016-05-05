@@ -72,13 +72,11 @@ namespace WhiteCore.Modules.Chat
         {
         }
 
-        public string Name
-        {
+        public string Name {
             get { return "PresenceModule"; }
         }
 
-        public Type ReplaceableInterface
-        {
+        public Type ReplaceableInterface {
             get { return null; }
         }
 
@@ -94,7 +92,7 @@ namespace WhiteCore.Modules.Chat
             client.RemoveGenericPacketHandler ("requestonlinenotification");
         }
 
-        public void OnRequestOnlineNotification (Object sender, string method, List<String> args)
+        public void OnRequestOnlineNotification (object sender, string method, List<string> args)
         {
             if (!(sender is IClientAPI))
                 return;
@@ -103,12 +101,13 @@ namespace WhiteCore.Modules.Chat
             MainConsole.Instance.DebugFormat ("[PRESENCE MODULE]: OnlineNotification requested by {0}", client.Name);
 
             List<UserInfo> status = m_Scene.RequestModuleInterface<IAgentInfoService> ().GetUserInfos (args);
+            if (status == null)
+                return;
 
             List<UUID> online = new List<UUID> ();
             List<UUID> offline = new List<UUID> ();
 
-            foreach (UserInfo pi in status)
-            {
+            foreach (UserInfo pi in status) {
                 UUID uuid = new UUID (pi.UserID);
                 if (pi.IsOnline && !online.Contains (uuid))
                     online.Add (uuid);

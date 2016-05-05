@@ -81,8 +81,7 @@ namespace WhiteCore.Modules.Chat
 
         public void SendGeneralAlert (string message)
         {
-            m_scene.ForEachScenePresence (delegate(IScenePresence presence)
-            {
+            m_scene.ForEachScenePresence (delegate (IScenePresence presence) {
                 if (!presence.IsChildAgent)
                     presence.ControllingClient.SendAlertMessage (message);
             });
@@ -90,27 +89,23 @@ namespace WhiteCore.Modules.Chat
 
         public void SendDialogToUser (
             UUID avatarID, string objectName, UUID objectID, UUID ownerID,
-            string message, UUID textureID, int ch, string[] buttonlabels)
+            string message, UUID textureID, int ch, string [] buttonlabels)
         {
             UserAccount account = m_scene.UserAccountService.GetUserAccount (m_scene.RegionInfo.AllScopeIDs, ownerID);
             string ownerFirstName, ownerLastName;
-            if (account != null)
-            {
+            if (account != null) {
                 ownerFirstName = account.FirstName;
                 ownerLastName = account.LastName;
-            } else
-            {
+            } else {
                 ownerFirstName = "(unknown";
                 ownerLastName = "user)";
             }
 
             //If the user is muted, we do NOT send them dialog boxes
-            if (m_muteListModule != null)
-            {
+            if (m_muteListModule != null) {
                 bool cached; // Not used but needed for call
 
-                if (m_muteListModule.GetMutes (avatarID, out cached).Any (mute => mute.MuteID == ownerID))
-                {
+                if (m_muteListModule.GetMutes (avatarID, out cached).Any (mute => mute.MuteID == ownerID)) {
                     return;
                 }
             }
@@ -119,13 +114,13 @@ namespace WhiteCore.Modules.Chat
             if (sp != null && !sp.IsChildAgent)
                 sp.ControllingClient.SendDialog (
                     objectName,
-                    objectID, 
-                    ownerID, 
-                    ownerFirstName, 
-                    ownerLastName, 
+                    objectID,
+                    ownerID,
+                    ownerFirstName,
+                    ownerLastName,
                     message,
                     textureID,
-                    ch, 
+                    ch,
                     buttonlabels);
         }
 
@@ -135,11 +130,9 @@ namespace WhiteCore.Modules.Chat
             IScenePresence sp = m_scene.GetScenePresence (avatarID);
 
             //If the user is muted, do NOT send them URL boxes
-            if (m_muteListModule != null)
-            {
+            if (m_muteListModule != null) {
                 bool cached; // Not used but needed for call
-                if (m_muteListModule.GetMutes (avatarID, out cached).Any (mute => mute.MuteID == ownerID))
-                {
+                if (m_muteListModule.GetMutes (avatarID, out cached).Any (mute => mute.MuteID == ownerID)) {
                     return;
                 }
             }
@@ -153,35 +146,28 @@ namespace WhiteCore.Modules.Chat
         {
             IScenePresence sp = m_scene.GetScenePresence (avatarID);
 
-            if (sp != null && !sp.IsChildAgent)
-            {
+            if (sp != null && !sp.IsChildAgent) {
                 UserAccount account = m_scene.UserAccountService.GetUserAccount (m_scene.RegionInfo.AllScopeIDs, ownerID);
                 string ownerFirstName, ownerLastName;
 
-                if (account != null)
-                {
+                if (account != null) {
                     ownerFirstName = account.FirstName;
                     ownerLastName = account.LastName;
-                } else
-                {
-                    if (name != "")
-                    {
+                } else {
+                    if (name != "") {
                         ownerFirstName = name;
                         ownerLastName = "";
-                    } else
-                    {
+                    } else {
                         ownerFirstName = "(unknown";
                         ownerLastName = "user)";
                     }
                 }
 
                 //If the user is muted, do not send the text box
-                if (m_muteListModule != null)
-                {
+                if (m_muteListModule != null) {
                     bool cached; // Not used but needed for call
 
-                    if (m_muteListModule.GetMutes (avatarID, out cached).Any (mute => mute.MuteID == ownerID))
-                    {
+                    if (m_muteListModule.GetMutes (avatarID, out cached).Any (mute => mute.MuteID == ownerID)) {
                         return;
                     }
                 }
@@ -193,8 +179,7 @@ namespace WhiteCore.Modules.Chat
         public void SendNotificationToUsersInRegion (
             UUID fromAvatarID, string fromAvatarName, string message)
         {
-            m_scene.ForEachScenePresence (delegate(IScenePresence presence)
-            {
+            m_scene.ForEachScenePresence (delegate (IScenePresence presence) {
                 if (!presence.IsChildAgent)
                     presence.ControllingClient.SendBlueBoxMessage (
                         fromAvatarID,
@@ -210,8 +195,7 @@ namespace WhiteCore.Modules.Chat
         public void Initialise (IConfigSource config)
         {
             IConfig m_config = config.Configs ["Dialog"];
-            if (m_config != null)
-            {
+            if (m_config != null) {
                 m_enabled = m_config.GetString ("DialogModule", Name) == Name;
             }
         }
@@ -220,31 +204,30 @@ namespace WhiteCore.Modules.Chat
         {
             if (!m_enabled)
                 return;
-            
+
             m_scene = scene;
             m_scene.RegisterModuleInterface<IDialogModule> (this);
             m_scene.EventManager.OnPermissionError += SendAlertToUser;
 
-            if (MainConsole.Instance != null)
-            {
+            if (MainConsole.Instance != null) {
                 MainConsole.Instance.Commands.AddCommand (
-                    "alert user", 
-                    "alert user <<first last> message>", 
-                    "Send an alert to a user in the current region", 
+                    "alert user",
+                    "alert user <<first last> message>",
+                    "Send an alert to a user in the current region",
                     HandleAlertConsoleCommand, true, true);
 
                 MainConsole.Instance.Commands.AddCommand (
-                    "alert general", 
-                    "alert general <message>", 
-                    "Send an alert to everyone in the current region", 
+                    "alert general",
+                    "alert general <message>",
+                    "Send an alert to everyone in the current region",
                     HandleAlertConsoleCommand, true, true);
 
                 MainConsole.Instance.Commands.AddCommand (
-                    "alert broadcast", 
-                    "alert broadcast <message>", 
-                    "Send an alert to everyone logged in", 
+                    "alert broadcast",
+                    "alert broadcast <message>",
+                    "Send an alert to everyone logged in",
                     HandleAlertConsoleCommand, false, true);
-                
+
             }
         }
 
@@ -257,8 +240,7 @@ namespace WhiteCore.Modules.Chat
             m_muteListModule = m_scene.RequestModuleInterface<IMuteListModule> ();
         }
 
-        public Type ReplaceableInterface
-        {
+        public Type ReplaceableInterface {
             get { return null; }
         }
 
@@ -266,8 +248,7 @@ namespace WhiteCore.Modules.Chat
         {
         }
 
-        public string Name
-        {
+        public string Name {
             get { return "DialogModule"; }
         }
 
@@ -277,14 +258,13 @@ namespace WhiteCore.Modules.Chat
         ///     Handle an alert command from the console.
         /// </summary>
         /// <param name="cmdparams"></param>
-        protected void HandleAlertConsoleCommand (IScene scene, string[] cmdparams)
+        protected void HandleAlertConsoleCommand (IScene scene, string [] cmdparams)
         {
             string message = "";
             string userName = "";
             string cmdType = cmdparams [1].ToLower ();
- 
-            if (cmdType.StartsWith ("g") || cmdType.StartsWith ("b")  )
-            {
+
+            if (cmdType.StartsWith ("g", StringComparison.Ordinal) || cmdType.StartsWith ("b", StringComparison.Ordinal)) {
                 // general
                 if (cmdparams.Length > 2)
                     message = Util.CombineParams (cmdparams, 2);
@@ -293,25 +273,22 @@ namespace WhiteCore.Modules.Chat
                 if (message == "")
                     return;
 
-                if (cmdType.StartsWith ("g"))
-                {
+                if (cmdType.StartsWith ("g", StringComparison.Ordinal)) {
                     MainConsole.Instance.InfoFormat ("[DIALOG]: Sending general alert in region {0} with message '{1}'",
                         scene.RegionInfo.RegionName, message);
 
                     // send the message
-                    scene.ForEachScenePresence (delegate(IScenePresence sp) {
+                    scene.ForEachScenePresence (delegate (IScenePresence sp) {
                         if (!sp.IsChildAgent)
                             sp.ControllingClient.SendAlertMessage (message);
                     });
-                } else
-                {
+                } else {
 
-                    MainConsole.Instance.InfoFormat ("[DIALOG]: Sending broadcast alert to all regions with message '{0}'",  message);
+                    MainConsole.Instance.InfoFormat ("[DIALOG]: Sending broadcast alert to all regions with message '{0}'", message);
 
                     // broadcast the message
-                    foreach (IScene scn in MainConsole.Instance.ConsoleScenes)
-                    {
-                        scn.ForEachScenePresence (delegate(IScenePresence sp) {
+                    foreach (IScene scn in MainConsole.Instance.ConsoleScenes) {
+                        scn.ForEachScenePresence (delegate (IScenePresence sp) {
                             if (!sp.IsChildAgent)
                                 sp.ControllingClient.SendAlertMessage (message);
                         });
@@ -319,7 +296,7 @@ namespace WhiteCore.Modules.Chat
                 }
                 return;
             }
-                
+
             // user alert
             if (cmdparams.Length >= 4)
                 userName = cmdparams [2] + " " + cmdparams [3];
@@ -327,14 +304,14 @@ namespace WhiteCore.Modules.Chat
                 userName = MainConsole.Instance.Prompt ("User name? (First Last)", "");
             if (userName == "")
                 return;
-            
+
             if (cmdparams.Length > 4)
                 message = Util.CombineParams (cmdparams, 4);
             else
                 message = MainConsole.Instance.Prompt ("Message to send?", "");
             if (message == "")
                 return;
-                       
+
 
             MainConsole.Instance.InfoFormat ("[DIALOG]: Sending alert in region {0} to {1} with message '{2}'",
                 scene.RegionInfo.RegionName, userName, message);

@@ -51,19 +51,18 @@ namespace WhiteCore.Modules.Chat
         bool m_SendOfflineMessagesToEmail;
 
         Dictionary<UUID, List<GridInstantMessage>> m_offlineMessagesCache =
-            new Dictionary<UUID, List<GridInstantMessage>>();
+            new Dictionary<UUID, List<GridInstantMessage>> ();
 
-        public void Initialise(IConfigSource config)
+        public void Initialise (IConfigSource config)
         {
-            IConfig cnf = config.Configs["Messaging"];
-            if (cnf != null)
-            {
-                m_enabled = (cnf.GetString("OfflineMessageModule", Name) == Name);
-                m_SendOfflineMessagesToEmail = cnf.GetBoolean("SendOfflineMessagesToEmail", m_SendOfflineMessagesToEmail);
+            IConfig cnf = config.Configs ["Messaging"];
+            if (cnf != null) {
+                m_enabled = (cnf.GetString ("OfflineMessageModule", Name) == Name);
+                m_SendOfflineMessagesToEmail = cnf.GetBoolean ("SendOfflineMessagesToEmail", m_SendOfflineMessagesToEmail);
             }
         }
 
-        public void AddRegion(IScene scene)
+        public void AddRegion (IScene scene)
         {
             if (!m_enabled)
                 return;
@@ -75,24 +74,22 @@ namespace WhiteCore.Modules.Chat
             scene.EventManager.OnCachedUserInfo += UpdateCachedInfo;
         }
 
-        public void RegionLoaded(IScene scene)
+        public void RegionLoaded (IScene scene)
         {
             if (!m_enabled)
                 return;
 
-            if (m_TransferModule == null)
-            {
-                OfflineMessagesConnector = Framework.Utilities.DataManager.RequestPlugin<IOfflineMessagesConnector>();
-                m_TransferModule = scene.RequestModuleInterface<IMessageTransferModule>();
-                if (m_TransferModule == null || OfflineMessagesConnector == null)
-                {
+            if (m_TransferModule == null) {
+                OfflineMessagesConnector = Framework.Utilities.DataManager.RequestPlugin<IOfflineMessagesConnector> ();
+                m_TransferModule = scene.RequestModuleInterface<IMessageTransferModule> ();
+                if (m_TransferModule == null || OfflineMessagesConnector == null) {
                     scene.EventManager.OnNewClient -= OnNewClient;
                     scene.EventManager.OnClosingClient -= OnClosingClient;
 
                     m_enabled = false;
                     m_Scene = null;
 
-                    MainConsole.Instance.Error(
+                    MainConsole.Instance.Error (
                         "[OFFLINE MESSAGING] No message transfer module or OfflineMessagesConnector is enabled. Disabling offline messages");
                     return;
                 }
@@ -100,15 +97,14 @@ namespace WhiteCore.Modules.Chat
             }
         }
 
-        public void RemoveRegion(IScene scene)
+        public void RemoveRegion (IScene scene)
         {
             if (!m_enabled)
                 return;
 
             m_Scene = null;
 
-            if (m_TransferModule != null)
-            {
+            if (m_TransferModule != null) {
                 scene.EventManager.OnNewClient -= OnNewClient;
                 scene.EventManager.OnClosingClient -= OnClosingClient;
                 scene.EventManager.OnCachedUserInfo -= UpdateCachedInfo;
@@ -116,87 +112,83 @@ namespace WhiteCore.Modules.Chat
             }
         }
 
-        public string Name
-        {
+        public string Name {
             get { return "OfflineMessageModule"; }
         }
 
-        public Type ReplaceableInterface
-        {
+        public Type ReplaceableInterface {
             get { return null; }
         }
 
-        public void Close()
+        public void Close ()
         {
         }
 
-        IClientAPI FindClient(UUID agentID)
+        IClientAPI FindClient (UUID agentID)
         {
-            IScenePresence presence = m_Scene.GetScenePresence(agentID);
+            IScenePresence presence = m_Scene.GetScenePresence (agentID);
             return (presence != null && !presence.IsChildAgent) ? presence.ControllingClient : null;
         }
 
-        void UpdateCachedInfo(UUID agentID, CachedUserInfo info)
+        void UpdateCachedInfo (UUID agentID, CachedUserInfo info)
         {
             lock (m_offlineMessagesCache)
-                m_offlineMessagesCache[agentID] = info.OfflineMessages;
+                m_offlineMessagesCache [agentID] = info.OfflineMessages;
         }
 
-        void OnNewClient(IClientAPI client)
+        void OnNewClient (IClientAPI client)
         {
             client.OnRetrieveInstantMessages += RetrieveInstantMessages;
         }
 
-        void OnClosingClient(IClientAPI client)
+        void OnClosingClient (IClientAPI client)
         {
             client.OnRetrieveInstantMessages -= RetrieveInstantMessages;
         }
 
-        void RetrieveInstantMessages(IClientAPI client)
+        void RetrieveInstantMessages (IClientAPI client)
         {
             if (OfflineMessagesConnector == null)
                 return;
 
             List<GridInstantMessage> msglist;
-            lock (m_offlineMessagesCache)
-            {
-                if (m_offlineMessagesCache.TryGetValue(client.AgentId, out msglist))
-                    m_offlineMessagesCache.Remove(client.AgentId);
+            lock (m_offlineMessagesCache) {
+                if (m_offlineMessagesCache.TryGetValue (client.AgentId, out msglist))
+                    m_offlineMessagesCache.Remove (client.AgentId);
             }
 
             if (msglist == null)
-                msglist = OfflineMessagesConnector.GetOfflineMessages(client.AgentId);
-            msglist.Sort(delegate(GridInstantMessage a, GridInstantMessage b)
-                { return a.Timestamp.CompareTo(b.Timestamp); 
+                msglist = OfflineMessagesConnector.GetOfflineMessages (client.AgentId);
+            if (msglist != null) {
+                msglist.Sort (delegate (GridInstantMessage a, GridInstantMessage b) {
+                    return a.Timestamp.CompareTo (b.Timestamp);
                 });
 
-            foreach (GridInstantMessage IM in msglist)
-            {
-                // Send through scene event manager so all modules get a chance
-                // to look at this message before it gets delivered.
-                //
-                // Needed for proper state management for stored group
-                // invitations
-                //
-                IM.Offline = 1;
-                m_Scene.EventManager.TriggerIncomingInstantMessage(IM);
+                foreach (GridInstantMessage IM in msglist) {
+                    // Send through scene event manager so all modules get a chance
+                    // to look at this message before it gets delivered.
+                    //
+                    // Needed for proper state management for stored group
+                    // invitations
+                    //
+                    IM.Offline = 1;
+                    m_Scene.EventManager.TriggerIncomingInstantMessage (IM);
+                }
             }
         }
 
-        void UndeliveredMessage(GridInstantMessage im, string reason)
+        void UndeliveredMessage (GridInstantMessage im, string reason)
         {
             if (OfflineMessagesConnector == null || im == null)
                 return;
-            
-            IClientAPI client = FindClient(im.FromAgentID);
+
+            IClientAPI client = FindClient (im.FromAgentID);
             if ((client == null) && (im.Dialog != 32))
                 return;
-            
-            if (!OfflineMessagesConnector.AddOfflineMessage(im))
-            {
+
+            if (!OfflineMessagesConnector.AddOfflineMessage (im)) {
                 if ((!im.FromGroup) && (reason != "User does not exist.") && (client != null))
-                    client.SendInstantMessage(new GridInstantMessage()
-                    {
+                    client.SendInstantMessage (new GridInstantMessage () {
                         FromAgentID = im.ToAgentID,
                         FromAgentName = "System",
                         ToAgentID = im.FromAgentID,
@@ -207,14 +199,12 @@ namespace WhiteCore.Modules.Chat
                     });
                 else if (client == null)
                     return;
-            }
-            else if ((im.Offline != 0) && (!im.FromGroup || im.FromGroup))
-            {
+            } else if ((im.Offline != 0) && (!im.FromGroup || im.FromGroup)) {
                 if (im.Dialog == 32) //Group notice
                 {
-                    IGroupsModule module = m_Scene.RequestModuleInterface<IGroupsModule>();
+                    IGroupsModule module = m_Scene.RequestModuleInterface<IGroupsModule> ();
                     if (module != null)
-                        im = module.BuildOfflineGroupNotice(im);
+                        im = module.BuildOfflineGroupNotice (im);
 
                     // TODO:  This drops (supposedly) group messages and the logic above is interesting!!
                     return;
@@ -222,30 +212,25 @@ namespace WhiteCore.Modules.Chat
 
                 if (client == null) return;
 
-                IEmailModule emailModule = m_Scene.RequestModuleInterface<IEmailModule>();
-                if (emailModule != null && m_SendOfflineMessagesToEmail)
-                {
+                IEmailModule emailModule = m_Scene.RequestModuleInterface<IEmailModule> ();
+                if (emailModule != null && m_SendOfflineMessagesToEmail) {
                     IUserProfileInfo profile =
-                        Framework.Utilities.DataManager.RequestPlugin<IProfileConnector>().GetUserProfile(im.ToAgentID);
-                    if (profile != null && profile.IMViaEmail)
-                    {
-                        UserAccount account = m_Scene.UserAccountService.GetUserAccount(null, im.ToAgentID);
-                        if (account != null && !string.IsNullOrEmpty(account.Email))
-                        {
-                            emailModule.SendEmail(UUID.Zero, account.Email,
-                                                  string.Format("Offline Message from {0}", im.FromAgentName),
-                                                  string.Format("Time: {0}\n",
-                                                                Util.ToDateTime(im.Timestamp).ToShortDateString()) +
-                                                  string.Format("From: {0}\n", im.FromAgentName) +
-                                                  string.Format("Message: {0}\n", im.Message), m_Scene);
+                        Framework.Utilities.DataManager.RequestPlugin<IProfileConnector> ().GetUserProfile (im.ToAgentID);
+                    if (profile != null && profile.IMViaEmail) {
+                        UserAccount account = m_Scene.UserAccountService.GetUserAccount (null, im.ToAgentID);
+                        if (account != null && !string.IsNullOrEmpty (account.Email)) {
+                            emailModule.SendEmail (UUID.Zero, account.Email,
+                                                  string.Format ("Offline Message from {0}", im.FromAgentName),
+                                                  string.Format ("Time: {0}\n",
+                                                                Util.ToDateTime (im.Timestamp).ToShortDateString ()) +
+                                                  string.Format ("From: {0}\n", im.FromAgentName) +
+                                                  string.Format ("Message: {0}\n", im.Message), m_Scene);
                         }
                     }
                 }
 
-                if (im.Dialog == (byte) InstantMessageDialog.MessageFromAgent && !im.FromGroup)
-                {
-                    client.SendInstantMessage(new GridInstantMessage()
-                    {
+                if (im.Dialog == (byte)InstantMessageDialog.MessageFromAgent && !im.FromGroup) {
+                    client.SendInstantMessage (new GridInstantMessage () {
                         FromAgentID = im.ToAgentID,
                         FromAgentName = "System",
                         ToAgentID = im.FromAgentID,
@@ -256,16 +241,12 @@ namespace WhiteCore.Modules.Chat
                     });
                 }
 
-                if (im.Dialog == (byte) InstantMessageDialog.InventoryOffered)
-                    client.SendAlertMessage("User is not online. Inventory has been saved");
-            }
-            else if (im.Offline == 0)
-            {
+                if (im.Dialog == (byte)InstantMessageDialog.InventoryOffered)
+                    client.SendAlertMessage ("User is not online. Inventory has been saved");
+            } else if (im.Offline == 0) {
                 if (client == null) return;
-                if (im.Dialog == (byte) InstantMessageDialog.MessageFromAgent && !im.FromGroup)
-                {
-                    client.SendInstantMessage(new GridInstantMessage()
-                    {
+                if (im.Dialog == (byte)InstantMessageDialog.MessageFromAgent && !im.FromGroup) {
+                    client.SendInstantMessage (new GridInstantMessage () {
                         FromAgentID = im.ToAgentID,
                         FromAgentName = "System",
                         ToAgentID = im.FromAgentID,
@@ -276,8 +257,8 @@ namespace WhiteCore.Modules.Chat
                     });
                 }
 
-                if (im.Dialog == (byte) InstantMessageDialog.InventoryOffered)
-                    client.SendAlertMessage("User not able to be found. Inventory has been saved");
+                if (im.Dialog == (byte)InstantMessageDialog.InventoryOffered)
+                    client.SendAlertMessage ("User not able to be found. Inventory has been saved");
             }
         }
     }
