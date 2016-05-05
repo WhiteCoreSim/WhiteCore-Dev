@@ -841,16 +841,17 @@ textures 1
                 m_sp = null;
             }
 
+            Timer checkTimer;
             void EventManager_OnMakeRootAgent (IScenePresence presence)
             {
                 if (m_sp != null && presence.UUID == m_sp.UUID) {
                     //Send everyone to me!
                     SendOtherAgentsAvatarDataToMe ();
                     //Check to make sure that we have sent all the appearance info 10 seconds later
-                    Timer t = new Timer (10 * 1000);
-                    t.Elapsed += CheckToMakeSureWearablesHaveBeenSent;
-                    t.AutoReset = false;
-                    t.Start ();
+                    checkTimer = new Timer (10 * 1000);
+                    checkTimer.Elapsed += CheckToMakeSureWearablesHaveBeenSent;
+                    checkTimer.AutoReset = false;
+                    checkTimer.Start ();
                 }
             }
 
@@ -889,8 +890,12 @@ textures 1
             /// <param name="e"></param>
             void CheckToMakeSureWearablesHaveBeenSent (object sender, ElapsedEventArgs e)
             {
+                // clear up the timer that fires this
+                checkTimer.Dispose ();  
+
                 if (m_sp == null || m_sp.IsChildAgent)
                     return;
+
                 if (!m_InitialHasWearablesBeenSent) {
                     //Force send!
                     m_InitialHasWearablesBeenSent = true;
