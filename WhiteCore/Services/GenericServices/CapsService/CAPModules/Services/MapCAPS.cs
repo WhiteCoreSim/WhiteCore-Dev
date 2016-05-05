@@ -90,7 +90,7 @@ namespace WhiteCore.Services
         /// <param name="httpRequest"></param>
         /// <param name="httpResponse"></param>
         /// <returns></returns>
-        public byte[] MapLayerRequest (string request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
+        public byte [] MapLayerRequest (string request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {
             int bottom = (m_region.RegionLocY / Constants.RegionSize) - m_mapDistance;
             int top = (m_region.RegionLocY / Constants.RegionSize) + m_mapDistance;
@@ -107,24 +107,20 @@ namespace WhiteCore.Services
             };
             OSDArray mapBlocksData = new OSDArray ();
 
-            if (m_allowCapsMessage)
-            {
-                if (m_mapLayer == null || m_mapLayer.Count == 0)
-                {
+            if (m_allowCapsMessage) {
+                if (m_mapLayer.Count == 0) {
                     List<GridRegion> regions = m_gridService.GetRegionRange (
                                                    m_userScopeIDs,
                                                    left * Constants.RegionSize,
                                                    right * Constants.RegionSize,
                                                    bottom * Constants.RegionSize,
                                                    top * Constants.RegionSize);
-                    foreach (GridRegion r in regions)
-                    {
+                    foreach (GridRegion r in regions) {
                         m_mapLayer.Add (MapBlockFromGridRegion (r, flags));
                     }
                 }
             }
-            foreach (MapBlockData block in m_mapLayer)
-            {
+            foreach (MapBlockData block in m_mapLayer) {
                 //Add to the array
                 mapBlocksData.Add (block.ToOSD ());
             }
@@ -135,8 +131,7 @@ namespace WhiteCore.Services
         protected MapBlockData MapBlockFromGridRegion (GridRegion r, int flag)
         {
             MapBlockData block = new MapBlockData ();
-            if (r == null)
-            {
+            if (r == null) {
                 block.Access = (byte)SimAccess.Down;
                 block.MapImageID = UUID.Zero;
                 return block;
