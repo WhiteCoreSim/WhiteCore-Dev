@@ -32,13 +32,13 @@ namespace WhiteCore.Framework.ClientInterfaces
 {
     public class TextureRequestArgs : EventArgs
     {
-        private sbyte m_discardLevel;
-        private uint m_packetNumber;
-        private float m_priority;
-        private int m_requestType;
+        sbyte m_discardLevel;
+        uint m_packetNumber;
+        float m_priority;
+        int m_requestType;
         protected UUID m_requestedAssetID;
 
-        public float Priority
+        public float Priority     // 20160427 - greythane - Why is this a float?  Does it provide fractional priotities?
         {
             get { return m_priority; }
             set { m_priority = value; }
@@ -46,8 +46,7 @@ namespace WhiteCore.Framework.ClientInterfaces
 
         /// <summary>
         /// </summary>
-        public uint PacketNumber
-        {
+        public uint PacketNumber {
             get { return m_packetNumber; }
             set { m_packetNumber = value; }
         }
@@ -56,29 +55,26 @@ namespace WhiteCore.Framework.ClientInterfaces
 
         /// <summary>
         /// </summary>
-        public sbyte DiscardLevel
-        {
+        public sbyte DiscardLevel {
             get { return m_discardLevel; }
             set { m_discardLevel = value; }
         }
 
         /// <summary>
         /// </summary>
-        public UUID RequestedAssetID
-        {
+        public UUID RequestedAssetID {
             get { return m_requestedAssetID; }
             set { m_requestedAssetID = value; }
         }
 
-        public int RequestType
-        {
+        public int RequestType {
             get { return m_requestType; }
             set { m_requestType = value; }
         }
 
-        public override string ToString()
+        public override string ToString ()
         {
-            return String.Format("DiscardLevel: {0}, Priority: {1}, PacketNumber: {2}, AssetId:{3}, RequestType:{4}",
+            return String.Format ("DiscardLevel: {0}, Priority: {1}, PacketNumber: {2}, AssetId:{3}, RequestType:{4}",
                                  m_discardLevel,
                                  m_priority, m_packetNumber, m_requestedAssetID, m_requestType);
         }

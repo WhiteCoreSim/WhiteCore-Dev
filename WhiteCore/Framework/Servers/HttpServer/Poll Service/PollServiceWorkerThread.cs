@@ -28,11 +28,11 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
+using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Utilities;
-using WhiteCore.Framework.ConsoleFramework;
-using System.Net;
 
 namespace WhiteCore.Framework.Servers.HttpServer
 {
@@ -42,9 +42,9 @@ namespace WhiteCore.Framework.Servers.HttpServer
     {
         public event ReQueuePollServiceItem ReQueue;
 
-        private BlockingQueue<PollServiceHttpRequest> m_request;
-        private bool m_running = true;
-        private int m_timeout = 250;
+        readonly BlockingQueue<PollServiceHttpRequest> m_request;
+        bool m_running = true;
+        int m_timeout = 250;
 
         public PollServiceWorkerThread(int pTimeout)
         {
@@ -73,7 +73,7 @@ namespace WhiteCore.Framework.Servers.HttpServer
                         {
                             str = new StreamReader(req.Context.Request.InputStream);
                         }
-                        catch (System.ArgumentException)
+                        catch (ArgumentException)
                         {
                             // Stream was not readable means a child agent
                             // was closed due to logout, leaving the
@@ -130,7 +130,7 @@ namespace WhiteCore.Framework.Servers.HttpServer
                         {
                             if (!(ex is HttpListenerException) ||
                                 !HttpListenerManager.IGNORE_ERROR_CODES.Contains(((HttpListenerException)ex).ErrorCode))
-                                MainConsole.Instance.WarnFormat("[POLL SERVICE WORKER THREAD]: Failed to write all data to the stream: {0}", ex.ToString());
+                                MainConsole.Instance.WarnFormat("[Poll service worker thread]: Failed to write all data to the stream: {0}", ex.ToString());
                         }
                     }
                 }

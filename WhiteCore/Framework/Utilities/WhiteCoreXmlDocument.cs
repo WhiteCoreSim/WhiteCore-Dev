@@ -41,7 +41,7 @@ namespace WhiteCore.Framework.Utilities
         /// <summary>
         ///     Default Constructor
         /// </summary>
-        public WhiteCoreXmlDocument()
+        public WhiteCoreXmlDocument ()
         {
         }
 
@@ -49,10 +49,9 @@ namespace WhiteCore.Framework.Utilities
         ///     Creates a WhiteCoreXmlDocument and loads it with the xml
         /// </summary>
         /// <param name="xml"></param>
-        public WhiteCoreXmlDocument(string xml)
-            : this()
+        public WhiteCoreXmlDocument (string xml): this ()
         {
-            LoadXml(xml);
+            LoadXml (xml);
         }
 
         #endregion
@@ -64,9 +63,9 @@ namespace WhiteCore.Framework.Utilities
         /// </summary>
         /// <param name="rootName"></param>
         /// <returns></returns>
-        public static WhiteCoreXmlDocument NewXmlDocumentWithRoot(string rootName)
+        public static WhiteCoreXmlDocument NewXmlDocumentWithRoot (string rootName)
         {
-            return new WhiteCoreXmlDocument("<" + rootName + "/>");
+            return new WhiteCoreXmlDocument ("<" + rootName + "/>");
         }
 
         /// <summary>
@@ -74,9 +73,9 @@ namespace WhiteCore.Framework.Utilities
         /// </summary>
         /// <param name="nodeName"></param>
         /// <returns></returns>
-        public XmlElement AddRootElement(string nodeName)
+        public XmlElement AddRootElement (string nodeName)
         {
-            return CreateElement(nodeName);
+            return CreateElement (nodeName);
         }
 
         #endregion
@@ -91,23 +90,22 @@ namespace WhiteCore.Framework.Utilities
         /// <param name="attributeName">Attribute name in the node to create</param>
         /// <param name="attributeValue">Attribute value in the node to create</param>
         /// <returns>XmlNode created</returns>
-        public XmlNode CreateNode(string nodeName, string nodeValue, string attributeName, string attributeValue)
+        public XmlNode CreateNode (string nodeName, string nodeValue, string attributeName, string attributeValue)
         {
-            XmlNode node = CreateElement(nodeName);
+            XmlNode node = CreateElement (nodeName);
             node.InnerText = nodeValue;
 
-            if (!IsNull(attributeName))
-            {
-                XmlAttribute attribute = CreateAttribute(attributeName);
+            if (!IsNull (attributeName)) {
+                XmlAttribute attribute = CreateAttribute (attributeName);
                 attribute.Value = attributeValue;
-                if (node.Attributes != null) node.Attributes.SetNamedItem(attribute);
+                if (node.Attributes != null) node.Attributes.SetNamedItem (attribute);
             }
             return node;
         }
 
-        private static bool IsNull(string val)
+        static bool IsNull (string val)
         {
-            return val == null || val.Trim() == string.Empty;
+            return val == null || val.Trim () == string.Empty;
         }
 
         /// <summary>
@@ -116,9 +114,9 @@ namespace WhiteCore.Framework.Utilities
         /// <param name="nodeName">Name of the node to create</param>
         /// <param name="nodeValue">Value of the node to create</param>
         /// <returns>XmlNode created</returns>
-        public XmlNode CreateNode(string nodeName, string nodeValue)
+        public XmlNode CreateNode (string nodeName, string nodeValue)
         {
-            return CreateNode(nodeName, nodeValue, string.Empty, string.Empty);
+            return CreateNode (nodeName, nodeValue, string.Empty, string.Empty);
         }
 
         /// <summary>
@@ -127,9 +125,9 @@ namespace WhiteCore.Framework.Utilities
         /// <param name="nodeName">Name of the node to create</param>
         /// <param name="nodeValue">Value of the node to create</param>
         /// <returns>XmlNode created</returns>
-        public XmlNode CreateNode(string nodeName, int nodeValue)
+        public XmlNode CreateNode (string nodeName, int nodeValue)
         {
-            return CreateNode(nodeName, Convert.ToString(nodeValue), string.Empty, string.Empty);
+            return CreateNode (nodeName, Convert.ToString (nodeValue), string.Empty, string.Empty);
         }
 
         /// <summary>
@@ -140,9 +138,9 @@ namespace WhiteCore.Framework.Utilities
         /// <param name="attributeName">Attribute name in the node to create</param>
         /// <param name="attributeValue">Attribute value in the node to create</param>
         /// <returns>XmlNode created</returns>
-        public XmlNode CreateNode(string nodeName, int nodeValue, string attributeName, string attributeValue)
+        public XmlNode CreateNode (string nodeName, int nodeValue, string attributeName, string attributeValue)
         {
-            return CreateNode(nodeName, Convert.ToString(nodeValue), attributeName, attributeValue);
+            return CreateNode (nodeName, Convert.ToString (nodeValue), attributeName, attributeValue);
         }
 
         /// <summary>
@@ -153,9 +151,9 @@ namespace WhiteCore.Framework.Utilities
         /// <param name="attributeName">Attribute name in the node to create</param>
         /// <param name="attributeValue">Attribute value in the node to create</param>
         /// <returns>XmlNode created</returns>
-        public XmlNode CreateNode(string nodeName, string nodeValue, string attributeName, int attributeValue)
+        public XmlNode CreateNode (string nodeName, string nodeValue, string attributeName, int attributeValue)
         {
-            return CreateNode(nodeName, nodeValue, attributeName, Convert.ToString(attributeValue));
+            return CreateNode (nodeName, nodeValue, attributeName, Convert.ToString (attributeValue));
         }
 
         /// <summary>
@@ -166,9 +164,9 @@ namespace WhiteCore.Framework.Utilities
         /// <param name="attributeName">Attribute name in the node to create</param>
         /// <param name="attributeValue">Attribute value in the node to create</param>
         /// <returns>XmlNode created</returns>
-        public XmlNode CreateNode(string nodeName, int nodeValue, string attributeName, int attributeValue)
+        public XmlNode CreateNode (string nodeName, int nodeValue, string attributeName, int attributeValue)
         {
-            return CreateNode(nodeName, Convert.ToString(nodeValue), attributeName, Convert.ToString(attributeValue));
+            return CreateNode (nodeName, Convert.ToString (nodeValue), attributeName, Convert.ToString (attributeValue));
         }
 
 
@@ -178,9 +176,9 @@ namespace WhiteCore.Framework.Utilities
         /// <param name="selectedNode">XmlNode where to add</param>
         /// <param name="nodeToAdd">XmlNode to add</param>
         /// <returns>XmlNode added</returns>
-        public XmlNode AddNode(XmlNode selectedNode, XmlNode nodeToAdd)
+        public XmlNode AddNode (XmlNode selectedNode, XmlNode nodeToAdd)
         {
-            selectedNode.AppendChild(nodeToAdd);
+            selectedNode.AppendChild (nodeToAdd);
             return nodeToAdd;
         }
 
@@ -190,9 +188,9 @@ namespace WhiteCore.Framework.Utilities
         /// <param name="nodeName">Name of the node to add</param>
         /// <param name="nodeValue">Value of node to add</param>
         /// <returns>XmlNode added</returns>
-        public XmlNode AddNode(string nodeName, string nodeValue)
+        public XmlNode AddNode (string nodeName, string nodeValue)
         {
-            return AddNode(DocumentElement, CreateNode(nodeName, nodeValue));
+            return AddNode (DocumentElement, CreateNode (nodeName, nodeValue));
         }
 
         /// <summary>
@@ -203,9 +201,9 @@ namespace WhiteCore.Framework.Utilities
         /// <param name="attributeName"></param>
         /// <param name="attributeValue"></param>
         /// <returns>XmlNode added</returns>
-        public XmlNode AddNode(string nodeName, string nodeValue, string attributeName, string attributeValue)
+        public XmlNode AddNode (string nodeName, string nodeValue, string attributeName, string attributeValue)
         {
-            return AddNode(DocumentElement, CreateNode(nodeName, nodeValue, attributeName, attributeValue));
+            return AddNode (DocumentElement, CreateNode (nodeName, nodeValue, attributeName, attributeValue));
         }
 
         /// <summary>
@@ -215,10 +213,10 @@ namespace WhiteCore.Framework.Utilities
         /// <param name="nodeName"></param>
         /// <param name="nodeValue"></param>
         /// <returns>XmlNode added</returns>
-        public XmlNode AddNode(string xPath, string nodeName, string nodeValue)
+        public XmlNode AddNode (string xPath, string nodeName, string nodeValue)
         {
-            if (DocumentElement == null) throw new Exception("DocumentElemnt is null");
-            return AddNode(DocumentElement.SelectSingleNode(xPath), CreateNode(nodeName, nodeValue));
+            if (DocumentElement == null) throw new Exception ("DocumentElemnt is null");
+            return AddNode (DocumentElement.SelectSingleNode (xPath), CreateNode (nodeName, nodeValue));
         }
 
         /// <summary>
@@ -230,12 +228,12 @@ namespace WhiteCore.Framework.Utilities
         /// <param name="attributeName"></param>
         /// <param name="attributeValue"></param>
         /// <returns>XmlNode added</returns>
-        public XmlNode AddNode(string xPath, string nodeName, string nodeValue, string attributeName,
+        public XmlNode AddNode (string xPath, string nodeName, string nodeValue, string attributeName,
                                string attributeValue)
         {
-            if (DocumentElement == null) throw new Exception("DocumentElemnt is null");
-            return AddNode(DocumentElement.SelectSingleNode(xPath),
-                           CreateNode(nodeName, nodeValue, attributeName, attributeValue));
+            if (DocumentElement == null) throw new Exception ("DocumentElemnt is null");
+            return AddNode (DocumentElement.SelectSingleNode (xPath),
+                           CreateNode (nodeName, nodeValue, attributeName, attributeValue));
         }
 
         #endregion
@@ -249,19 +247,17 @@ namespace WhiteCore.Framework.Utilities
         /// <param name="xPathFrom">XPath to the node or nodes you want to move</param>
         /// <param name="xPathTo">XPath to the node that you want to place the xml</param>
         /// <returns></returns>
-        public WhiteCoreXmlDocument AddXMLDoc(WhiteCoreXmlDocument XmlDoc, string xPathFrom, string xPathTo)
+        public WhiteCoreXmlDocument AddXMLDoc (WhiteCoreXmlDocument XmlDoc, string xPathFrom, string xPathTo)
         {
-            if (DocumentElement == null) throw new Exception("DocumentElemnt is null");
-            XmlNode node = XmlDoc.SelectSingleNode(xPathFrom);
-            if (node != null)
-            {
-                if (node.ParentNode != null)
-                {
-                    XmlNode selectedNode = node.ParentNode.RemoveChild(node);
-                    XmlNode selectedNode2 = ImportNode(selectedNode, true);
-                    XmlNode singleNode = DocumentElement.SelectSingleNode(xPathTo);
+            if (DocumentElement == null) throw new Exception ("DocumentElemnt is null");
+            XmlNode node = XmlDoc.SelectSingleNode (xPathFrom);
+            if (node != null) {
+                if (node.ParentNode != null) {
+                    XmlNode selectedNode = node.ParentNode.RemoveChild (node);
+                    XmlNode selectedNode2 = ImportNode (selectedNode, true);
+                    XmlNode singleNode = DocumentElement.SelectSingleNode (xPathTo);
                     if (singleNode != null)
-                        singleNode.AppendChild(selectedNode2);
+                        singleNode.AppendChild (selectedNode2);
                 }
             }
             return this;
@@ -277,9 +273,9 @@ namespace WhiteCore.Framework.Utilities
         /// <param name="xPath">XPath to the node</param>
         /// <param name="theValue">New Value of the node</param>
         /// <returns>XmlNode edited</returns>
-        public XmlNode EditNode(string xPath, string theValue)
+        public XmlNode EditNode (string xPath, string theValue)
         {
-            return EditNode(xPath, theValue, null, null);
+            return EditNode (xPath, theValue, null, null);
         }
 
         /// <summary>
@@ -288,22 +284,9 @@ namespace WhiteCore.Framework.Utilities
         /// <param name="xPath">XPath to the node</param>
         /// <param name="theValue">New Value of the node</param>
         /// <returns>XmlNode edited</returns>
-        public XmlNode EditNode(string xPath, int theValue)
+        public XmlNode EditNode (string xPath, int theValue)
         {
-            return EditNode(xPath, Convert.ToString(theValue), null, null);
-        }
-
-        /// <summary>
-        ///     Edit the value of a node
-        /// </summary>
-        /// <param name="xPath">XPath to the node</param>
-        /// <param name="theValue">New Value of the node</param>
-        /// <param name="attributeName">Attribute name in the node to edit</param>
-        /// <param name="attributeValue">Attribute value in the node to edit</param>
-        /// <returns>XmlNode edited</returns>
-        public XmlNode EditNode(string xPath, int theValue, string attributeName, string attributeValue)
-        {
-            return EditNode(xPath, Convert.ToString(theValue), attributeName, attributeValue);
+            return EditNode (xPath, Convert.ToString (theValue), null, null);
         }
 
         /// <summary>
@@ -314,9 +297,9 @@ namespace WhiteCore.Framework.Utilities
         /// <param name="attributeName">Attribute name in the node to edit</param>
         /// <param name="attributeValue">Attribute value in the node to edit</param>
         /// <returns>XmlNode edited</returns>
-        public XmlNode EditNode(string xPath, string theValue, string attributeName, int attributeValue)
+        public XmlNode EditNode (string xPath, int theValue, string attributeName, string attributeValue)
         {
-            return EditNode(xPath, theValue, attributeName, Convert.ToString(attributeValue));
+            return EditNode (xPath, Convert.ToString (theValue), attributeName, attributeValue);
         }
 
         /// <summary>
@@ -327,9 +310,9 @@ namespace WhiteCore.Framework.Utilities
         /// <param name="attributeName">Attribute name in the node to edit</param>
         /// <param name="attributeValue">Attribute value in the node to edit</param>
         /// <returns>XmlNode edited</returns>
-        public XmlNode EditNode(string xPath, int theValue, string attributeName, int attributeValue)
+        public XmlNode EditNode (string xPath, string theValue, string attributeName, int attributeValue)
         {
-            return EditNode(xPath, Convert.ToString(theValue), attributeName, Convert.ToString(attributeValue));
+            return EditNode (xPath, theValue, attributeName, Convert.ToString (attributeValue));
         }
 
         /// <summary>
@@ -340,20 +323,32 @@ namespace WhiteCore.Framework.Utilities
         /// <param name="attributeName">Attribute name in the node to edit</param>
         /// <param name="attributeValue">Attribute value in the node to edit</param>
         /// <returns>XmlNode edited</returns>
-        public XmlNode EditNode(string xPath, string theValue, string attributeName, string attributeValue)
+        public XmlNode EditNode (string xPath, int theValue, string attributeName, int attributeValue)
         {
-            if (DocumentElement == null) throw new Exception("DocumentElemnt is null");
-            XmlNode selectedNode = !IsNull(attributeName)
-                                       ? DocumentElement.SelectSingleNode(xPath + "[@" + attributeName + "='" +
+            return EditNode (xPath, Convert.ToString (theValue), attributeName, Convert.ToString (attributeValue));
+        }
+
+        /// <summary>
+        ///     Edit the value of a node
+        /// </summary>
+        /// <param name="xPath">XPath to the node</param>
+        /// <param name="theValue">New Value of the node</param>
+        /// <param name="attributeName">Attribute name in the node to edit</param>
+        /// <param name="attributeValue">Attribute value in the node to edit</param>
+        /// <returns>XmlNode edited</returns>
+        public XmlNode EditNode (string xPath, string theValue, string attributeName, string attributeValue)
+        {
+            if (DocumentElement == null) throw new Exception ("DocumentElemnt is null");
+            XmlNode selectedNode = !IsNull (attributeName)
+                                       ? DocumentElement.SelectSingleNode (xPath + "[@" + attributeName + "='" +
                                                                           attributeValue + "']")
-                                       : DocumentElement.SelectSingleNode(xPath);
+                                       : DocumentElement.SelectSingleNode (xPath);
 
-            if (selectedNode != null)
-            {
+            if (selectedNode != null) {
                 selectedNode.InnerText = theValue;
                 return selectedNode;
             }
-            throw new Exception("Node does not exist");
+            throw new Exception ("Node does not exist");
         }
 
         #endregion
@@ -365,10 +360,10 @@ namespace WhiteCore.Framework.Utilities
         /// </summary>
         /// <param name="xPath">XPath to the node to delete</param>
         /// <returns></returns>
-        public bool DeleteNode(string xPath)
+        public bool DeleteNode (string xPath)
         {
-            if (DocumentElement == null) throw new Exception("DocumentElemnt is null");
-            return DeleteNode(DocumentElement.SelectSingleNode(xPath));
+            if (DocumentElement == null) throw new Exception ("DocumentElemnt is null");
+            return DeleteNode (DocumentElement.SelectSingleNode (xPath));
         }
 
         /// <summary>
@@ -376,11 +371,11 @@ namespace WhiteCore.Framework.Utilities
         /// </summary>
         /// <param name="selectedNode">Node to delete from document</param>
         /// <returns></returns>
-        public bool DeleteNode(XmlNode selectedNode)
+        public bool DeleteNode (XmlNode selectedNode)
         {
             if (selectedNode == null) return false;
             XmlNode selectedNode2 = selectedNode.ParentNode;
-            if (selectedNode2 != null) selectedNode2.RemoveChild(selectedNode);
+            if (selectedNode2 != null) selectedNode2.RemoveChild (selectedNode);
             return true;
         }
 
@@ -389,10 +384,10 @@ namespace WhiteCore.Framework.Utilities
         /// </summary>
         /// <param name="xPath">xPath to the nodes to be deleted</param>
         /// <returns></returns>
-        public bool DeleteNodes(string xPath)
+        public bool DeleteNodes (string xPath)
         {
-            if (DocumentElement == null) throw new Exception("DocumentElemnt is null");
-            return DeleteNodes(DocumentElement.SelectNodes(xPath));
+            if (DocumentElement == null) throw new Exception ("DocumentElemnt is null");
+            return DeleteNodes (DocumentElement.SelectNodes (xPath));
         }
 
         /// <summary>
@@ -400,11 +395,11 @@ namespace WhiteCore.Framework.Utilities
         /// </summary>
         /// <param name="selectedNodes">Nodes to be deleted</param>
         /// <returns></returns>
-        public bool DeleteNodes(XmlNodeList selectedNodes)
+        public bool DeleteNodes (XmlNodeList selectedNodes)
         {
-            if (DocumentElement == null) throw new Exception("DocumentElemnt is null");
+            if (DocumentElement == null) throw new Exception ("DocumentElemnt is null");
             foreach (XmlNode selectedNode in selectedNodes)
-                DocumentElement.RemoveChild(selectedNode);
+                DocumentElement.RemoveChild (selectedNode);
             return true;
         }
 
@@ -418,10 +413,12 @@ namespace WhiteCore.Framework.Utilities
         /// <param name="xPath">XPath of the node to add the attribute and attribute value to</param>
         /// <param name="attributeName">Name of the attribute to add</param>
         /// <param name="attributeValue">Value of the attribute being added</param>
-        public void AddAttribute(string xPath, string attributeName, string attributeValue)
+        public void AddAttribute (string xPath, string attributeName, string attributeValue)
         {
-            if (DocumentElement == null) throw new Exception("DocumentElemnt is null");
-            AddAttribute(DocumentElement.SelectSingleNode(xPath), attributeName, attributeValue);
+            if (DocumentElement == null) throw new Exception ("DocumentElemnt is null");
+            var selm = DocumentElement.SelectSingleNode (xPath);
+            if (selm != null)
+                AddAttribute (selm, attributeName, attributeValue);
         }
 
         /// <summary>
@@ -430,13 +427,12 @@ namespace WhiteCore.Framework.Utilities
         /// <param name="node">Node to add the attribute and attribute value to</param>
         /// <param name="attributeName">Name of the attribute to add</param>
         /// <param name="attributeValue">Value of the attribute being added</param>
-        public void AddAttribute(XmlNode node, string attributeName, string attributeValue)
+        public void AddAttribute (XmlNode node, string attributeName, string attributeValue)
         {
-            if (!IsNull(attributeName))
-            {
-                XmlAttribute attribute = CreateAttribute(attributeName);
+            if (!IsNull (attributeName)) {
+                XmlAttribute attribute = CreateAttribute (attributeName);
                 attribute.Value = attributeValue;
-                if (node.Attributes != null) node.Attributes.SetNamedItem(attribute);
+                if (node.Attributes != null) node.Attributes.SetNamedItem (attribute);
             }
         }
 
@@ -448,16 +444,15 @@ namespace WhiteCore.Framework.Utilities
         /// <param name="attributeName">Name of the attribute to edit</param>
         /// <param name="attributeValue">New value of the attribute</param>
         /// <returns></returns>
-        public XmlNode EditAttribute(string xPath, string attributeName, string attributeValue)
+        public XmlNode EditAttribute (string xPath, string attributeName, string attributeValue)
         {
-            if (DocumentElement == null) throw new Exception("DocumentElemnt is null");
-            XmlNode node = DocumentElement.SelectSingleNode(xPath);
-            if (node != null)
-            {
+            if (DocumentElement == null) throw new Exception ("DocumentElemnt is null");
+            XmlNode node = DocumentElement.SelectSingleNode (xPath);
+            if (node != null) {
                 XmlAttributeCollection oAtt = node.Attributes;
-                if (oAtt != null) oAtt[attributeName].Value = attributeValue;
+                if (oAtt != null) oAtt [attributeName].Value = attributeValue;
             }
-            return DocumentElement.SelectSingleNode(xPath);
+            return DocumentElement.SelectSingleNode (xPath);
         }
 
         /// <summary>
@@ -466,16 +461,15 @@ namespace WhiteCore.Framework.Utilities
         /// <param name="xPath">XPath to the node with the attribute to edit</param>
         /// <param name="attributeName">Name of the attribute to edit</param>
         /// <returns></returns>
-        public string GetAttribute(string xPath, string attributeName)
+        public string GetAttribute (string xPath, string attributeName)
         {
-            if (DocumentElement == null) throw new Exception("DocumentElemnt is null");
+            if (DocumentElement == null) throw new Exception ("DocumentElemnt is null");
             string returnValue = "";
-            XmlNode node = DocumentElement.SelectSingleNode(xPath);
-            if (node != null && ((node.Attributes != null) && (node.Attributes[attributeName] != null)))
-            {
-                XmlNode singleNode = DocumentElement.SelectSingleNode(xPath);
+            XmlNode node = DocumentElement.SelectSingleNode (xPath);
+            if (node != null && ((node.Attributes != null) && (node.Attributes [attributeName] != null))) {
+                XmlNode singleNode = DocumentElement.SelectSingleNode (xPath);
                 if (singleNode != null)
-                    if (singleNode.Attributes != null) returnValue = singleNode.Attributes[attributeName].Value;
+                    if (singleNode.Attributes != null) returnValue = singleNode.Attributes [attributeName].Value;
             }
             return returnValue;
         }
@@ -484,9 +478,9 @@ namespace WhiteCore.Framework.Utilities
 
         #region misc functions
 
-        public bool hasChildNodes2(XmlNode selectedNode)
+        public bool hasChildNodes2 (XmlNode selectedNode)
         {
-            return selectedNode.ChildNodes.Cast<XmlNode>().Any(selectedNode2 => selectedNode2.Name != "#text");
+            return selectedNode.ChildNodes.Cast<XmlNode> ().Any (selectedNode2 => selectedNode2.Name != "#text");
         }
 
 
@@ -495,23 +489,22 @@ namespace WhiteCore.Framework.Utilities
         /// </summary>
         /// <param name="xmlDate"></param>
         /// <returns></returns>
-        public string ConvertDateXML(string xmlDate)
+        public string ConvertDateXML (string xmlDate)
         {
-            if (xmlDate.IndexOf("T") == 0)
-            {
-                if (IsDate(xmlDate))
+            if (xmlDate.IndexOf ("T", StringComparison.Ordinal) == 0) {
+                if (IsDate (xmlDate))
                     return xmlDate;
                 return "";
             }
-            if (xmlDate.IndexOf(".") > 0)
-                xmlDate = xmlDate.Substring(1, xmlDate.IndexOf(".") - 1);
-            return Convert.ToString(Convert.ToDateTime(xmlDate.Replace("T", " ")));
+            if (xmlDate.IndexOf (".", StringComparison.Ordinal) > 0)
+                xmlDate = xmlDate.Substring (1, xmlDate.IndexOf (".", StringComparison.Ordinal) - 1);
+            return Convert.ToString (Convert.ToDateTime (xmlDate.Replace ("T", " ")));
         }
 
-        public static bool IsDate(string value)
+        public static bool IsDate (string value)
         {
             DateTime t;
-            return DateTime.TryParse(value, out t);
+            return DateTime.TryParse (value, out t);
         }
 
         /// <summary>
@@ -519,10 +512,10 @@ namespace WhiteCore.Framework.Utilities
         /// </summary>
         /// <param name="xPath">XPath to the node you want the value of</param>
         /// <returns>Return the value of a node, if the node does not exsist then string.Empty is returned</returns>
-        public string GetXmlnodeValue(string xPath)
+        public string GetXmlnodeValue (string xPath)
         {
-            if (DocumentElement == null) throw new Exception("DocumentElemnt is null");
-            XmlNode node = this.DocumentElement.SelectSingleNode(xPath);
+            if (DocumentElement == null) throw new Exception ("DocumentElemnt is null");
+            XmlNode node = DocumentElement.SelectSingleNode (xPath);
             if (node == null)
                 return string.Empty;
             return node.InnerText;

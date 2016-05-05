@@ -51,7 +51,7 @@ namespace WhiteCore.Framework.SceneInfo.Entities
         /// <summary>
         ///     Creates a new Entity (should not occur on it's own)
         /// </summary>
-        public EntityBase()
+        public EntityBase ()
         {
             m_name = "(basic entity)";
         }
@@ -59,8 +59,7 @@ namespace WhiteCore.Framework.SceneInfo.Entities
         /// <summary>
         ///     The scene to which this entity belongs
         /// </summary>
-        public IScene Scene
-        {
+        public IScene Scene {
             get { return m_scene; }
             set { m_scene = value; }
         }
@@ -68,22 +67,19 @@ namespace WhiteCore.Framework.SceneInfo.Entities
         /// <summary>
         ///     Signals whether this entity was in a scene but has since been removed from it.
         /// </summary>
-        public bool IsDeleted
-        {
+        public bool IsDeleted {
             get { return m_isDeleted; }
             set { m_isDeleted = value; }
         }
 
-        public virtual bool HasGroupChanged
-        {
+        public virtual bool HasGroupChanged {
             get { return m_hasGroupChanged; }
             set { m_hasGroupChanged = value; }
         }
 
         #region IEntity Members
 
-        public virtual UUID UUID
-        {
+        public virtual UUID UUID {
             get { return m_uuid; }
             set { m_uuid = value; }
         }
@@ -91,8 +87,7 @@ namespace WhiteCore.Framework.SceneInfo.Entities
         /// <summary>
         ///     The name of this entity
         /// </summary>
-        public virtual string Name
-        {
+        public virtual string Name {
             get { return m_name; }
             set { m_name = value; }
         }
@@ -101,16 +96,14 @@ namespace WhiteCore.Framework.SceneInfo.Entities
 
         /// <summary>
         /// </summary>
-        public virtual Vector3 AbsolutePosition
-        {
+        public virtual Vector3 AbsolutePosition {
             get { return m_pos; }
             set { m_pos = value; }
         }
 
         /// <summary>
         /// </summary>
-        public virtual Quaternion Rotation
-        {
+        public virtual Quaternion Rotation {
             get { return m_rot; }
             set { m_rot = value; }
         }
@@ -118,14 +111,12 @@ namespace WhiteCore.Framework.SceneInfo.Entities
         /// <summary>
         ///     Current velocity of the entity.
         /// </summary>
-        public virtual Vector3 Velocity
-        {
+        public virtual Vector3 Velocity {
             get { return Vector3.Zero; }
             set { }
         }
 
-        public virtual uint LocalId
-        {
+        public virtual uint LocalId {
             get { return m_localId; }
             set { m_localId = value; }
         }
@@ -136,19 +127,19 @@ namespace WhiteCore.Framework.SceneInfo.Entities
     //Nested Classes
     public class EntityIntersection
     {
-        public Vector3 AAfaceNormal = new Vector3(0, 0, 0);
+        public Vector3 AAfaceNormal = new Vector3 (0, 0, 0);
         public bool HitTF;
         public float distance;
         public int face = -1;
-        public Vector3 ipoint = new Vector3(0, 0, 0);
-        public Vector3 normal = new Vector3(0, 0, 0);
+        public Vector3 ipoint = new Vector3 (0, 0, 0);
+        public Vector3 normal = new Vector3 (0, 0, 0);
         public IEntity obj;
 
-        public EntityIntersection()
+        public EntityIntersection ()
         {
         }
 
-        public EntityIntersection(Vector3 _ipoint, Vector3 _normal, bool _HitTF)
+        public EntityIntersection (Vector3 _ipoint, Vector3 _normal, bool _HitTF)
         {
             ipoint = _ipoint;
             normal = _normal;

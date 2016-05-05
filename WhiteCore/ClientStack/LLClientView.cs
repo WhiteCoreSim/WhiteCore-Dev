@@ -2741,8 +2741,8 @@ namespace WhiteCore.ClientStack
                                                    ReportDataBlocks =
                                                        new LandStatReplyMessage.ReportDataBlock[lsrpia.Length]
                                                };
-            lock (_lock) {
                 for (int i = 0; i < lsrpia.Length; i++) {
+                lock (_lock) {
                     LandStatReplyMessage.ReportDataBlock block = new LandStatReplyMessage.ReportDataBlock {
                         Location = lsrpia [i].Location,
                         MonoScore = lsrpia [i].Score,
@@ -2758,9 +2758,8 @@ namespace WhiteCore.ClientStack
             }
             IEventQueueService eventService = m_scene.RequestModuleInterface<IEventQueueService>();
             if (eventService != null)
-            {
                 eventService.LandStatReply(message, AgentId, m_scene.RegionInfo.RegionID);
-            }
+            
         }
 
         public void SendScriptRunningReply(UUID objectID, UUID itemID, bool running)
@@ -2780,7 +2779,7 @@ namespace WhiteCore.ClientStack
 
         void SendFailedAsset(AssetRequestToClient req, TransferPacketStatus assetErrors)
         {
-            TransferInfoPacket Transfer = new TransferInfoPacket
+            TransferInfoPacket TransferPkt = new TransferInfoPacket
                                               {
                                                   TransferInfo =
                                                       {
@@ -2793,7 +2792,7 @@ namespace WhiteCore.ClientStack
                                                       },
                                                   Header = {Zerocoded = true}
                                               };
-            OutPacket(Transfer, ThrottleOutPacketType.Transfer);
+            OutPacket(TransferPkt, ThrottleOutPacketType.Transfer);
         }
 
         public void SendAsset(AssetRequestToClient req)
@@ -11329,23 +11328,20 @@ namespace WhiteCore.ClientStack
                             RequestID = groupTitlesRequest.AgentData.RequestID
                         };
 
-
                 List<GroupTitlesData> titles =
                     m_GroupsModule.GroupTitlesRequest(this, groupTitlesRequest.AgentData.GroupID);
+                if (titles != null) {
+                    groupTitlesReply.GroupData =
+                        new GroupTitlesReplyPacket.GroupDataBlock [titles.Count];
 
-                groupTitlesReply.GroupData =
-                    new GroupTitlesReplyPacket.GroupDataBlock[titles.Count];
+                    int i = 0;
+                    foreach (GroupTitlesData d in titles) {
+                        groupTitlesReply.GroupData [i] =
+                            new GroupTitlesReplyPacket.GroupDataBlock { Title = Util.StringToBytes256 (d.Name), RoleID = d.UUID, Selected = d.Selected };
 
-                int i = 0;
-                foreach (GroupTitlesData d in titles)
-                {
-                    groupTitlesReply.GroupData[i] =
-                        new GroupTitlesReplyPacket.GroupDataBlock
-                            {Title = Util.StringToBytes256(d.Name), RoleID = d.UUID, Selected = d.Selected};
-
-                    i++;
+                        i++;
+                    }
                 }
-
                 OutPacket(groupTitlesReply, ThrottleOutPacketType.Asset);
             }
             return true;

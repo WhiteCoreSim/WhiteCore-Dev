@@ -54,10 +54,8 @@ namespace WhiteCore.Modules.Gods
 
         public void Initialise (IConfigSource source)
         {
-            if (source.Configs ["GodModule"] != null)
-            {
-                if (source.Configs ["GodModule"].GetString ("GodModule", Name) != Name)
-                {
+            if (source.Configs ["GodModule"] != null) {
+                if (source.Configs ["GodModule"].GetString ("GodModule", Name) != Name) {
                     m_Enabled = false;
                     return;
                 }
@@ -72,10 +70,9 @@ namespace WhiteCore.Modules.Gods
                 return;
 
             // set the savestate location if not configured
-            if (m_savestate_oar_directory == "")
-            {
-                var simBase =  scene.RequestModuleInterface<ISimulationBase>();
-                m_savestate_oar_directory = Path.Combine(simBase.DefaultDataPath, "Region/SaveStates/");
+            if (m_savestate_oar_directory == "") {
+                var simBase = scene.RequestModuleInterface<ISimulationBase> ();
+                m_savestate_oar_directory = Path.Combine (simBase.DefaultDataPath, "Region/SaveStates/");
             }
 
             scene.EventManager.OnNewClient += OnNewClient;
@@ -95,13 +92,11 @@ namespace WhiteCore.Modules.Gods
         {
         }
 
-        public Type ReplaceableInterface
-        {
+        public Type ReplaceableInterface {
             get { return null; }
         }
 
-        public string Name
-        {
+        public string Name {
             get { return "GodModeModule"; }
         }
 
@@ -137,10 +132,8 @@ namespace WhiteCore.Modules.Gods
         void onGodlikeMessage (IClientAPI client, UUID requester, string Method, List<string> Parameter)
         {
             //Just rebuild the map
-            if (Method == "refreshmapvisibility")
-            {
-                if (client.Scene.Permissions.IsGod (client.AgentId))
-                {
+            if (Method == "refreshmapvisibility") {
+                if (client.Scene.Permissions.IsGod (client.AgentId)) {
                     //Rebuild the map tile
                     IMapImageGenerator mapModule = client.Scene.RequestModuleInterface<IMapImageGenerator> ();
                     if (mapModule != null)
@@ -157,8 +150,7 @@ namespace WhiteCore.Modules.Gods
         public void GodSaveState (IClientAPI client, UUID agentID)
         {
             //Check for god perms
-            if (client.Scene.Permissions.IsGod (client.AgentId))
-            {
+            if (client.Scene.Permissions.IsGod (client.AgentId)) {
                 IScene scene = MainConsole.Instance.ConsoleScene; //Switch back later
                 MainConsole.Instance.RunCommand ("change region " + client.Scene.RegionInfo.RegionName);
                 MainConsole.Instance.RunCommand (
@@ -185,7 +177,7 @@ namespace WhiteCore.Modules.Gods
         /// <param name="RedirectX"></param>
         /// <param name="RedirectY"></param>
         public void GodUpdateRegionInfoUpdate (IClientAPI client, float BillableFactor, int PricePerMeter, ulong EstateID,
-                                              ulong RegionFlags, byte[] SimName, int RedirectX, int RedirectY)
+                                              ulong RegionFlags, byte [] SimName, int RedirectX, int RedirectY)
         {
             IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
 
@@ -195,11 +187,10 @@ namespace WhiteCore.Modules.Gods
 
             string oldRegionName = client.Scene.RegionInfo.RegionName;
             //Update their current region with new information
-            if (Utils.BytesToString (SimName) != oldRegionName)
-            {
-            	client.Scene.RegionInfo.RegionName = Utils.BytesToString (SimName);
-            	MainConsole.Instance.InfoFormat("[REGION GOD] Region {0} has been renamed to {1}", oldRegionName, Utils.BytesToString (SimName));
-            	client.SendAgentAlertMessage("Region has been renamed to " + Utils.BytesToString(SimName), true);
+            if (Utils.BytesToString (SimName) != oldRegionName) {
+                client.Scene.RegionInfo.RegionName = Utils.BytesToString (SimName);
+                MainConsole.Instance.InfoFormat ("[REGION GOD] Region {0} has been renamed to {1}", oldRegionName, Utils.BytesToString (SimName));
+                client.SendAgentAlertMessage ("Region has been renamed to " + Utils.BytesToString (SimName), true);
             }
 
             // Save the old region locations
@@ -207,37 +198,32 @@ namespace WhiteCore.Modules.Gods
             int oldRegionLocY = client.Scene.RegionInfo.RegionLocY;
             int newRegionLocX = client.Scene.RegionInfo.RegionLocX;
             int newRegionLocY = client.Scene.RegionInfo.RegionLocY;
-            
+
             //Set the region loc X and Y
-            if (RedirectX != 0)
-            {
+            if (RedirectX != 0) {
                 client.Scene.RegionInfo.RegionLocX = RedirectX * Constants.RegionSize;
-            	newRegionLocX = RedirectX;
+                newRegionLocX = RedirectX;
             }
-            if (RedirectY != 0)
-            {
+            if (RedirectY != 0) {
                 client.Scene.RegionInfo.RegionLocY = RedirectY * Constants.RegionSize;
-            	newRegionLocY = RedirectY;
+                newRegionLocY = RedirectY;
             }
-            
+
             // Check if there's changes to display the new coords on the console and inworld
-            if(newRegionLocX != oldRegionLocX || newRegionLocY != oldRegionLocY)
-            {
-            	MainConsole.Instance.InfoFormat("[REGION GOD] Region {0} has been moved from {1},{2} to {3},{4}",
-                                            client.Scene.RegionInfo.RegionName,(oldRegionLocX/Constants.RegionSize), (oldRegionLocY/Constants.RegionSize),
-                                                 (client.Scene.RegionInfo.RegionLocX/Constants.RegionSize), (client.Scene.RegionInfo.RegionLocY/Constants.RegionSize));
-            	client.SendAgentAlertMessage("Region has been moved from "+ (oldRegionLocX/Constants.RegionSize) +","+ (oldRegionLocY/Constants.RegionSize) 
-            	                             +" to " + newRegionLocX +","+ newRegionLocY ,true);
+            if (newRegionLocX != oldRegionLocX || newRegionLocY != oldRegionLocY) {
+                MainConsole.Instance.InfoFormat ("[REGION GOD] Region {0} has been moved from {1},{2} to {3},{4}",
+                                            client.Scene.RegionInfo.RegionName, (oldRegionLocX / Constants.RegionSize), (oldRegionLocY / Constants.RegionSize),
+                                                 (client.Scene.RegionInfo.RegionLocX / Constants.RegionSize), (client.Scene.RegionInfo.RegionLocY / Constants.RegionSize));
+                client.SendAgentAlertMessage ("Region has been moved from " + (oldRegionLocX / Constants.RegionSize) + "," + (oldRegionLocY / Constants.RegionSize)
+                                             + " to " + newRegionLocX + "," + newRegionLocY, true);
             }
 
             //Update the estate ID
-            if (client.Scene.RegionInfo.EstateSettings.EstateID != EstateID)
-            {
+            if (client.Scene.RegionInfo.EstateSettings.EstateID != EstateID) {
                 bool changed = estateConnector.LinkRegion (client.Scene.RegionInfo.RegionID, (int)EstateID);
                 if (!changed)
                     client.SendAgentAlertMessage ("Unable to connect to the given estate.", false);
-                else
-                {
+                else {
                     client.Scene.RegionInfo.EstateSettings.EstateID = (uint)EstateID;
                     estateConnector.SaveEstateSettings (client.Scene.RegionInfo.EstateSettings);
                 }
@@ -248,13 +234,13 @@ namespace WhiteCore.Modules.Gods
             client.Scene.RegionInfo.EstateSettings.PricePerMeter = PricePerMeter;
             client.Scene.RegionInfo.EstateSettings.SetFromFlags (RegionFlags);
 
-            client.Scene.RegionInfo.RegionSettings.AllowDamage = 
+            client.Scene.RegionInfo.RegionSettings.AllowDamage =
                 ((RegionFlags & (ulong)OpenMetaverse.RegionFlags.AllowDamage) == (ulong)OpenMetaverse.RegionFlags.AllowDamage);
             client.Scene.RegionInfo.RegionSettings.FixedSun = ((RegionFlags & (ulong)OpenMetaverse.RegionFlags.SunFixed) ==
             (ulong)OpenMetaverse.RegionFlags.SunFixed);
-            client.Scene.RegionInfo.RegionSettings.BlockTerraform = 
+            client.Scene.RegionInfo.RegionSettings.BlockTerraform =
                 ((RegionFlags & (ulong)OpenMetaverse.RegionFlags.BlockTerraform) == (ulong)OpenMetaverse.RegionFlags.BlockTerraform);
-            client.Scene.RegionInfo.RegionSettings.Sandbox = 
+            client.Scene.RegionInfo.RegionSettings.Sandbox =
                 ((RegionFlags & (ulong)OpenMetaverse.RegionFlags.Sandbox) == (ulong)OpenMetaverse.RegionFlags.Sandbox);
 
             //Update skipping scripts/physics/collisions
@@ -269,8 +255,7 @@ namespace WhiteCore.Modules.Gods
             estateConnector.SaveEstateSettings (client.Scene.RegionInfo.EstateSettings);
 
             //Tell the clients to update all references to the new settings
-            foreach (IScenePresence sp in client.Scene.GetScenePresences())
-            {
+            foreach (IScenePresence sp in client.Scene.GetScenePresences ()) {
                 HandleRegionInfoRequest (sp.ControllingClient, client.Scene);
             }
 

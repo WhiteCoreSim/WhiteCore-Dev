@@ -29,7 +29,7 @@ using System;
 
 namespace WhiteCore.Framework.ConsoleFramework
 {
-    public delegate void ConsoleCommand(string[] comParams);
+    public delegate void ConsoleCommand (string [] comParams);
 
     /// <summary>
     ///     Holder object for a new console plugin command
@@ -40,17 +40,17 @@ namespace WhiteCore.Framework.ConsoleFramework
         /// <summary>
         ///     command in the form of "showme new commands"
         /// </summary>
-        private readonly string[] m_cmdText;
+        readonly string [] m_cmdText;
 
         /// <summary>
         ///     command delegate used in running
         /// </summary>
-        private readonly ConsoleCommand m_commandDelegate;
+        readonly ConsoleCommand m_commandDelegate;
 
         /// <summary>
         ///     help text displayed
         /// </summary>
-        private readonly string m_helpText;
+        readonly string m_helpText;
 
         /// <summary>
         ///     Construct a new ConsolePluginCommand
@@ -59,9 +59,9 @@ namespace WhiteCore.Framework.ConsoleFramework
         /// <param name="command">in the form of "showme new commands"</param>
         /// <param name="dlg">command delegate used in running</param>
         /// <param name="help">the text displayed in "help showme new commands"</param>
-        public ConsolePluginCommand(string command, ConsoleCommand dlg, string help)
+        public ConsolePluginCommand (string command, ConsoleCommand dlg, string help)
         {
-            m_cmdText = command.Split(new[] {' '});
+            m_cmdText = command.Split (new [] { ' ' });
             m_commandDelegate = dlg;
             m_helpText = help;
         }
@@ -73,13 +73,12 @@ namespace WhiteCore.Framework.ConsoleFramework
         ///     @see OopenSim.RunPluginCommands
         ///     It will only run the one with the highest number
         /// </summary>
-        public int matchLength(string cmdWithParams)
+        public int matchLength (string cmdWithParams)
         {
             // QUESTION: have a case insensitive flag?
-            cmdWithParams = cmdWithParams.ToLower().Trim();
-            string matchText = String.Join(" ", m_cmdText).ToLower().Trim();
-            if (cmdWithParams.StartsWith(matchText))
-            {
+            cmdWithParams = cmdWithParams.ToLower ().Trim ();
+            string matchText = string.Join (" ", m_cmdText).ToLower ().Trim ();
+            if (cmdWithParams.StartsWith (matchText, StringComparison.Ordinal)) {
                 // QUESTION Instead return cmdText.Length; ?
                 return matchText.Length;
             }
@@ -89,41 +88,36 @@ namespace WhiteCore.Framework.ConsoleFramework
         /// <summary>
         ///     Run the delegate the incoming string may contain the command, if so, it is chopped off the cmdParams[]
         /// </summary>
-        public void Run(string cmd, string[] cmdParams)
+        public void Run (string cmd, string [] cmdParams)
         {
             int skipParams = 0;
-            if (m_cmdText.Length > 1)
-            {
+            if (m_cmdText.Length > 1) {
                 int currentParam = 1;
-                while (currentParam < m_cmdText.Length)
-                {
-                    if (cmdParams[skipParams].ToLower().Equals(m_cmdText[currentParam].ToLower()))
-                    {
+                while (currentParam < m_cmdText.Length) {
+                    if (cmdParams [skipParams].ToLower ().Equals (m_cmdText [currentParam].ToLower ())) {
                         skipParams++;
                     }
                     currentParam++;
                 }
             }
-            string[] sendCmdParams = cmdParams;
-            if (skipParams > 0)
-            {
-                sendCmdParams = new string[cmdParams.Length - skipParams];
-                for (int i = 0; i < sendCmdParams.Length; i++)
-                {
-                    sendCmdParams[i] = cmdParams[skipParams++];
+            string [] sendCmdParams = cmdParams;
+            if (skipParams > 0) {
+                sendCmdParams = new string [cmdParams.Length - skipParams];
+                for (int i = 0; i < sendCmdParams.Length; i++) {
+                    sendCmdParams [i] = cmdParams [skipParams++];
                 }
             }
-            m_commandDelegate(sendCmdParams); //.Trim().Split(new char[] { ' ' }));
+            m_commandDelegate (sendCmdParams); //.Trim().Split(new char[] { ' ' }));
         }
 
         /// <summary>
         ///     return true if the ShowHelp(..) method might be helpful
         /// </summary>
-        public bool IsHelpfull(string cmdWithParams)
+        public bool IsHelpfull (string cmdWithParams)
         {
-            cmdWithParams = cmdWithParams.ToLower();
-            return cmdWithParams.Contains(String.Join(" ", m_cmdText).ToLower()) ||
-                   m_helpText.ToLower().Contains(cmdWithParams);
+            cmdWithParams = cmdWithParams.ToLower ();
+            return cmdWithParams.Contains (string.Join (" ", m_cmdText).ToLower ()) ||
+                   m_helpText.ToLower ().Contains (cmdWithParams);
         }
     }
 }

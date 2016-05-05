@@ -43,16 +43,16 @@ namespace WhiteCore.Framework.ConsoleFramework
         /// <value>
         ///     Commands organized by keyword in a tree
         /// </value>
-        readonly CommandSet tree = new CommandSet();
+        readonly CommandSet tree = new CommandSet ();
 
         /// <summary>
         ///     Get help for the given help string
         /// </summary>
         /// <param name="cmd">Parsed parts of the help string.  If empty then general help is returned.</param>
         /// <returns></returns>
-        public List<string> GetHelp(string[] cmd)
+        public List<string> GetHelp (string [] cmd)
         {
-            return tree.GetHelp(new List<string>(0));
+            return tree.GetHelp (new List<string> (0));
         }
 
         /// <summary>
@@ -64,33 +64,32 @@ namespace WhiteCore.Framework.ConsoleFramework
         /// <param name="fn"></param>
         /// <param name="requiresAScene">Whether this command requires a scene to be fired</param>
         /// <param name="fireOnceForAllScenes">Whether this command will only be executed once if there is no current scene</param>
-        public void AddCommand(string command, string commandHelp, string infomessage, CommandDelegate fn, bool requiresAScene, bool fireOnceForAllScenes)
+        public void AddCommand (string command, string commandHelp, string infomessage, CommandDelegate fn, bool requiresAScene, bool fireOnceForAllScenes)
         {
-            CommandInfo info = new CommandInfo
-                                   {
-                                       command = command,
-                                       commandHelp = commandHelp,
-                                       info = infomessage,
-                                       fireOnceForAllScenes = fireOnceForAllScenes,
-                                       requiresAScene = requiresAScene,
-                                       fn = new List<CommandDelegate> {fn}
-                                   };
-            tree.AddCommand(info);
+            CommandInfo info = new CommandInfo {
+                command = command,
+                commandHelp = commandHelp,
+                info = infomessage,
+                fireOnceForAllScenes = fireOnceForAllScenes,
+                requiresAScene = requiresAScene,
+                fn = new List<CommandDelegate> { fn }
+            };
+            tree.AddCommand (info);
         }
 
-        public bool ContainsCommand(string command)
+        public bool ContainsCommand (string command)
         {
-            return tree.FindCommands(new string[1] {command}).Length > 0;
+            return tree.FindCommands (new string [] { command }).Length > 0;
         }
 
-        public string[] FindNextOption(string[] cmd)
+        public string [] FindNextOption (string [] cmd)
         {
-            return tree.FindCommands(cmd);
+            return tree.FindCommands (cmd);
         }
 
-        public string[] Resolve(string[] cmd)
+        public string [] Resolve (string [] cmd)
         {
-            return tree.ExecuteCommand(cmd);
+            return tree.ExecuteCommand (cmd);
         }
 
         #region Nested type: CommandInfo
@@ -137,149 +136,123 @@ namespace WhiteCore.Framework.ConsoleFramework
 
         class CommandSet
         {
-            readonly Dictionary<string, CommandInfo> commands = new Dictionary<string, CommandInfo>();
-            readonly Dictionary<string, CommandSet> commandsets = new Dictionary<string, CommandSet>();
+            readonly Dictionary<string, CommandInfo> commands = new Dictionary<string, CommandInfo> ();
+            readonly Dictionary<string, CommandSet> commandsets = new Dictionary<string, CommandSet> ();
             public string Path = "";
             bool m_allowSubSets = true;
             string ourPath = "";
 
-            public void Initialize(string path, bool allowSubSets)
+            public void Initialize (string path, bool allowSubSets)
             {
                 m_allowSubSets = allowSubSets;
                 ourPath = path;
-                string[] paths = path.Split(' ');
-                if (paths.Length != 0)
-                {
-                    Path = paths[paths.Length - 1];
+                string [] paths = path.Split (' ');
+                if (paths.Length != 0) {
+                    Path = paths [paths.Length - 1];
                 }
             }
 
-            public void AddCommand(CommandInfo info)
+            public void AddCommand (CommandInfo info)
             {
                 if (!_ConsoleIsCaseSensitive) //Force to all lowercase
                 {
-                    info.command = info.command.ToLower();
+                    info.command = info.command.ToLower ();
                 }
 
                 //If our path is "", we can't replace, otherwise we just get ""
                 string innerPath = info.command;
-                if (ourPath != "")
-                {
-                    innerPath = info.command.Replace(ourPath, "");
+                if (ourPath != "") {
+                    innerPath = info.command.Replace (ourPath, "");
                 }
-                if (innerPath.StartsWith(" "))
-                {
-                    innerPath = innerPath.Remove(0, 1);
+                if (innerPath.StartsWith (" ", StringComparison.Ordinal)) {
+                    innerPath = innerPath.Remove (0, 1);
                 }
-                string[] commandPath = innerPath.Split(new string[1] {" "}, StringSplitOptions.RemoveEmptyEntries);
-                if (commandPath.Length == 1 || !m_allowSubSets)
-                {
+                string [] commandPath = innerPath.Split (new string [] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                if (commandPath.Length == 1 || !m_allowSubSets) {
                     //Only one command after our path, its ours
 
                     //Add commands together if there is more than one event hooked to one command
-                    if (!commands.ContainsKey(info.command))
-                    {
-                        commands[info.command] = info;
+                    if (!commands.ContainsKey (info.command)) {
+                        commands [info.command] = info;
                     }
-                }
-                else
-                {
+                } else {
                     //Its down the tree somewhere
                     CommandSet downTheTree;
-                    if (!commandsets.TryGetValue(commandPath[0], out downTheTree))
-                    {
+                    if (!commandsets.TryGetValue (commandPath [0], out downTheTree)) {
                         //Need to add it to the tree then
-                        downTheTree = new CommandSet();
-                        downTheTree.Initialize((ourPath == "" ? "" : ourPath + " ") + commandPath[0], false);
-                        commandsets.Add(commandPath[0], downTheTree);
+                        downTheTree = new CommandSet ();
+                        downTheTree.Initialize ((ourPath == "" ? "" : ourPath + " ") + commandPath [0], false);
+                        commandsets.Add (commandPath [0], downTheTree);
                     }
-                    downTheTree.AddCommand(info);
+                    downTheTree.AddCommand (info);
                 }
             }
 
-            public string[] ExecuteCommand(string[] commandPath)
+            public string [] ExecuteCommand (string [] commandPath)
             {
-                if (commandPath.Length != 0)
-                {
-                    List<string> commandPathList = new List<string>(commandPath);
-                    List<string> commandOptions = new List<string>();
+                if (commandPath.Length != 0) {
+                    List<string> commandPathList = new List<string> (commandPath);
+                    List<string> commandOptions = new List<string> ();
                     int i;
-                    for (i = commandPath.Length - 1; i >= 0; --i)
-                    {
-                        if (commandPath[i].Length > 1 && commandPath[i].Substring(0, 2) == "--")
-                        {
-                            commandOptions.Add(commandPath[i]);
-                            commandPathList.RemoveAt(i);
-                        }
-                        else
-                        {
+                    for (i = commandPath.Length - 1; i >= 0; --i) {
+                        if (commandPath [i].Length > 1 && commandPath [i].Substring (0, 2) == "--") {
+                            commandOptions.Add (commandPath [i]);
+                            commandPathList.RemoveAt (i);
+                        } else {
                             break;
                         }
                     }
-                    commandOptions.Reverse();
-                    commandPath = commandPathList.ToArray();
+                    commandOptions.Reverse ();
+                    commandPath = commandPathList.ToArray ();
                     //if (commandOptions.Count > 0)
                     //    MainConsole.Instance.Info("Options: " + string.Join(", ", commandOptions.ToArray()));
                     List<string> cmdList;
-                    if (commandPath.Length == 1 || !m_allowSubSets)
-                    {
-                        for (i = 1; i <= commandPath.Length; i++)
-                        {
-                            string[] comm = new string[i];
+                    if (commandPath.Length == 1 || !m_allowSubSets) {
+                        for (i = 1; i <= commandPath.Length; i++) {
+                            string [] comm = new string [i];
                             Array.Copy (commandPath, comm, i);
                             string com = string.Join (" ", comm);
                             //Only one command after our path, its ours
-                            if (commands.ContainsKey (com))
-                            {
+                            if (commands.ContainsKey (com)) {
                                 MainConsole.Instance.HasProcessedCurrentCommand = false;
 
-                                foreach (CommandDelegate fn in commands[com].fn.Where(fn => fn != null))
-                                {
+                                foreach (CommandDelegate fn in commands [com].fn.Where (fn => fn != null)) {
                                     cmdList = new List<string> (commandPath);
                                     cmdList.AddRange (commandOptions);
-                                    foreach (IScene scene in GetScenes(commands[com]))
+                                    foreach (IScene scene in GetScenes (commands [com]))
                                         fn (scene, cmdList.ToArray ());
                                 }
-                                return new string[0];
+                                return new string [0];
                             }
 
-                            if (commandPath [0] == "help")
-                            {
+                            if (commandPath [0] == "help") {
                                 List<string> help = GetHelp (commandOptions);
 
-                                foreach (string s in help)
-                                {
+                                foreach (string s in help) {
                                     MainConsole.Instance.FormatNoTime (Level.Off, s);
                                 }
-                                return new string[0];
-                            } else
-                            {
-                                foreach (KeyValuePair<string, CommandInfo> cmd in commands)
-                                {
-                                    string[] cmdSplit = cmd.Key.Split (' ');
-                                    if (cmdSplit.Length == commandPath.Length)
-                                    {
+                                return new string [0];
+                            } else {
+                                foreach (KeyValuePair<string, CommandInfo> cmd in commands) {
+                                    string [] cmdSplit = cmd.Key.Split (' ');
+                                    if (cmdSplit.Length == commandPath.Length) {
                                         bool any = false;
                                         for (int k = 0; k < commandPath.Length; k++)
-                                            if (!cmdSplit [k].StartsWith (commandPath [k]))
-                                            {
+                                            if (!cmdSplit [k].StartsWith (commandPath [k], StringComparison.Ordinal)) {
                                                 any = true;
                                                 break;
                                             }
                                         bool same = !any;
-                                        if (same)
-                                        {
-                                            foreach (CommandDelegate fn in cmd.Value.fn)
-                                            {
+                                        if (same) {
+                                            foreach (CommandDelegate fn in cmd.Value.fn) {
                                                 cmdList = new List<string> (commandPath);
                                                 cmdList.AddRange (commandOptions);
-                                                if (fn != null)
-                                                {
-                                                    foreach (IScene scene in GetScenes(cmd.Value))
+                                                if (fn != null) {
+                                                    foreach (IScene scene in GetScenes (cmd.Value))
                                                         fn (scene, cmdList.ToArray ());
                                                 }
                                             }
-                                            return new string[0];
+                                            return new string [0];
                                         }
                                     }
                                 }
@@ -287,48 +260,38 @@ namespace WhiteCore.Framework.ConsoleFramework
                         }
                         // unable to determine multi word command
                         MainConsole.Instance.Warn (" Sorry.. missed that...");
-                    }
-                    else if(commandPath.Length > 0)
-                    {
-                        string cmdToExecute = commandPath[0];
-                        if (cmdToExecute == "help")
-                        {
-                            cmdToExecute = commandPath[1];
+                    } else if (commandPath.Length > 0) {
+                        string cmdToExecute = commandPath [0];
+                        if (cmdToExecute == "help") {
+                            cmdToExecute = commandPath [1];
                         }
-                        if (!_ConsoleIsCaseSensitive)
-                        {
-                            cmdToExecute = cmdToExecute.ToLower();
+                        if (!_ConsoleIsCaseSensitive) {
+                            cmdToExecute = cmdToExecute.ToLower ();
                         }
                         //Its down the tree somewhere
                         CommandSet downTheTree;
-                        if (commandsets.TryGetValue(cmdToExecute, out downTheTree))
-                        {
-                            cmdList = new List<string>(commandPath);
-                            cmdList.AddRange(commandOptions);
-                            return downTheTree.ExecuteCommand(cmdList.ToArray());
-                        }
-                        else
-                        {
+                        if (commandsets.TryGetValue (cmdToExecute, out downTheTree)) {
+                            cmdList = new List<string> (commandPath);
+                            cmdList.AddRange (commandOptions);
+                            return downTheTree.ExecuteCommand (cmdList.ToArray ());
+                        } else {
                             //See if this is part of a word, and if it is part of a word, execute it
                             foreach (
                                 KeyValuePair<string, CommandSet> cmd in
-                                    commandsets.Where(cmd => cmd.Key.StartsWith(commandPath[0])))
-                            {
+                                    commandsets.Where (cmd => cmd.Key.StartsWith (commandPath [0], StringComparison.Ordinal))) {
                                 cmdList = new List<string> (commandPath);
                                 cmdList.AddRange (commandOptions);
                                 return cmd.Value.ExecuteCommand (cmdList.ToArray ());
                             }
 
-                            if (commands.ContainsKey (cmdToExecute))
-                            {
-                                foreach (CommandDelegate fn in commands[cmdToExecute].fn.Where(fn => fn != null))
-                                {
+                            if (commands.ContainsKey (cmdToExecute)) {
+                                foreach (CommandDelegate fn in commands [cmdToExecute].fn.Where (fn => fn != null)) {
                                     cmdList = new List<string> (commandPath);
                                     cmdList.AddRange (commandOptions);
-                                    foreach (IScene scene in GetScenes(commands[cmdToExecute]))
+                                    foreach (IScene scene in GetScenes (commands [cmdToExecute]))
                                         fn (scene, cmdList.ToArray ());
                                 }
-                                return new string[0];
+                                return new string [0];
                             }
                             MainConsole.Instance.Warn (" Sorry.. missed that...");
 
@@ -336,20 +299,17 @@ namespace WhiteCore.Framework.ConsoleFramework
                     }
                 }
 
-                return new string[0];
+                return new string [0];
             }
 
-            List<IScene> GetScenes(CommandInfo cmd)
+            List<IScene> GetScenes (CommandInfo cmd)
             {
-                if (cmd.requiresAScene)
-                {
-                    if (MainConsole.Instance.ConsoleScene == null)
-                    {
-                        if (cmd.fireOnceForAllScenes)
-                        {
+                if (cmd.requiresAScene) {
+                    if (MainConsole.Instance.ConsoleScene == null) {
+                        if (cmd.fireOnceForAllScenes) {
                             if (MainConsole.Instance.ConsoleScenes.Count == 1)
                                 return new List<IScene> { MainConsole.Instance.ConsoleScenes [0] };
- 
+
                             MainConsole.Instance.Warn ("[Warning] This command requires a selected region");
                             return new List<IScene> ();
                         }
@@ -366,123 +326,105 @@ namespace WhiteCore.Framework.ConsoleFramework
                 return new List<IScene> { MainConsole.Instance.ConsoleScene };
             }
 
-            public string[] FindCommands(string[] command)
+            public string [] FindCommands (string [] command)
             {
-                List<string> values = new List<string>();
-                if (command.Length != 0)
-                {
-                    string innerPath = string.Join(" ", command);
+                List<string> values = new List<string> ();
+                if (command.Length != 0) {
+                    string innerPath = string.Join (" ", command);
                     if (!_ConsoleIsCaseSensitive)
-                        innerPath = innerPath.ToLower();
+                        innerPath = innerPath.ToLower ();
 
                     if (ourPath != "")
-                        innerPath = innerPath.Replace(ourPath, "");
+                        innerPath = innerPath.Replace (ourPath, "");
 
-                    if (innerPath.StartsWith(" "))
-                        innerPath = innerPath.Remove(0, 1);
+                    if (innerPath.StartsWith (" ", StringComparison.Ordinal))
+                        innerPath = innerPath.Remove (0, 1);
 
-                    string[] commandPath = innerPath.Split(new string[1] {" "}, StringSplitOptions.RemoveEmptyEntries);
-                    if ((commandPath.Length == 1 || !m_allowSubSets))
-                    {
-                        string fullcommand = string.Join(" ", command, 0, 2 > command.Length ? command.Length : 2);
-                        values.AddRange(from cmd in commands
-                                        where cmd.Key.StartsWith(fullcommand)
-                                        select cmd.Value.commandHelp);
-                        if (commandPath.Length != 0)
-                        {
-                            string cmdToExecute = commandPath[0];
-                            if (cmdToExecute == "help")
-                            {
+                    string [] commandPath = innerPath.Split (new string [] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                    if ((commandPath.Length == 1 || !m_allowSubSets)) {
+                        string fullcommand = string.Join (" ", command, 0, 2 > command.Length ? command.Length : 2);
+                        values.AddRange (from cmd in commands
+                                         where cmd.Key.StartsWith (fullcommand, StringComparison.Ordinal)
+                                         select cmd.Value.commandHelp);
+                        if (commandPath.Length != 0) {
+                            string cmdToExecute = commandPath [0];
+                            if (cmdToExecute == "help") {
                                 if (commandPath.Length > 1)
-                                    cmdToExecute = commandPath[1];
+                                    cmdToExecute = commandPath [1];
                             }
                             if (!_ConsoleIsCaseSensitive)
-                                cmdToExecute = cmdToExecute.ToLower();
+                                cmdToExecute = cmdToExecute.ToLower ();
 
                             CommandSet downTheTree;
-                            if (commandsets.TryGetValue(cmdToExecute, out downTheTree))
-                            {
-                                values.AddRange(downTheTree.FindCommands(commandPath));
-                            }
-                            else
-                            {
+                            if (commandsets.TryGetValue (cmdToExecute, out downTheTree)) {
+                                values.AddRange (downTheTree.FindCommands (commandPath));
+                            } else {
                                 //See if this is part of a word, and if it is part of a word, execute it
                                 foreach (
                                     KeyValuePair<string, CommandSet> cmd in
-                                        commandsets.Where(cmd => cmd.Key.StartsWith(cmdToExecute)))
-                                {
-                                    values.AddRange(cmd.Value.FindCommands(commandPath));
+                                        commandsets.Where (cmd => cmd.Key.StartsWith (cmdToExecute, StringComparison.Ordinal))) {
+                                    values.AddRange (cmd.Value.FindCommands (commandPath));
                                 }
                             }
                         }
-                    }
-                    else if (commandPath.Length != 0)
-                    {
-                        string cmdToExecute = commandPath[0];
-                        if (cmdToExecute == "help")
-                        {
-                            cmdToExecute = commandPath[1];
+                    } else if (commandPath.Length != 0) {
+                        string cmdToExecute = commandPath [0];
+                        if (cmdToExecute == "help") {
+                            cmdToExecute = commandPath [1];
                         }
-                        if (!_ConsoleIsCaseSensitive)
-                        {
-                            cmdToExecute = cmdToExecute.ToLower();
+                        if (!_ConsoleIsCaseSensitive) {
+                            cmdToExecute = cmdToExecute.ToLower ();
                         }
                         //Its down the tree somewhere
                         CommandSet downTheTree;
-                        if (commandsets.TryGetValue(cmdToExecute, out downTheTree))
-                        {
-                            return downTheTree.FindCommands(commandPath);
-                        }
-                        else
-                        {
+                        if (commandsets.TryGetValue (cmdToExecute, out downTheTree)) {
+                            return downTheTree.FindCommands (commandPath);
+                        } else {
                             //See if this is part of a word, and if it is part of a word, execute it
                             foreach (
                                 KeyValuePair<string, CommandSet> cmd in
-                                    commandsets.Where(cmd => cmd.Key.StartsWith(cmdToExecute)))
-                            {
-                                return cmd.Value.FindCommands(commandPath);
+                                    commandsets.Where (cmd => cmd.Key.StartsWith (cmdToExecute, StringComparison.Ordinal))) {
+                                return cmd.Value.FindCommands (commandPath);
                             }
                         }
                     }
                 }
 
-                return values.ToArray();
+                return values.ToArray ();
             }
 
-            public List<string> GetHelp(List<string> options)
+            public List<string> GetHelp (List<string> options)
             {
-                MainConsole.Instance.Debug("HTML mode: " + options.Contains("--html"));
-                List<string> help = new List<string>();
+                MainConsole.Instance.Debug ("HTML mode: " + options.Contains ("--html"));
+                List<string> help = new List<string> ();
 
-                if (commandsets.Count != 0)
-                {
-                    help.Add("");
-                    help.Add("------- Help Sets (type the name and help to get more info about that set) -------");
-                    help.Add("");
+                if (commandsets.Count != 0) {
+                    help.Add ("");
+                    help.Add ("------- Help Sets (type the name and help to get more info about that set) -------");
+                    help.Add ("");
                 }
-                List<string> paths = new List<string>();
+                List<string> paths = new List<string> ();
 
-                paths.AddRange(commandsets.Values.Select(set => string.Format("-- Help Set: {0}", set.Path)));
+                paths.AddRange (commandsets.Values.Select (set => string.Format ("-- Help Set: {0}", set.Path)));
 
-                help.AddRange(StringUtils.AlphanumericSort(paths));
-                if (help.Count != 0)
-                {
-                    help.Add("");
-                    help.Add("------- Help options -------");
+                help.AddRange (StringUtils.AlphanumericSort (paths));
+                if (help.Count != 0) {
+                    help.Add ("");
+                    help.Add ("------- Help options -------");
                 }
-                paths.Clear();
+                paths.Clear ();
 
-                paths.AddRange(
+                paths.AddRange (
                     //    commands.Values.Select(
                     //    command =>
                     //    string.Format("-- {0}  [{1}]:   {2}", command.command, command.commandHelp, command.info)));
-                    commands.Values.Select(
+                    commands.Values.Select (
                         command =>
-                        string.Format("-- {0}:\n      {1}", command.commandHelp, command.info.Replace("\n","\n        "))));
+                        string.Format ("-- {0}:\n      {1}", command.commandHelp, command.info.Replace ("\n", "\n        "))));
 
-                help.Add("");
-                help.AddRange(StringUtils.AlphanumericSort(paths));
-                help.Add("");
+                help.Add ("");
+                help.AddRange (StringUtils.AlphanumericSort (paths));
+                help.Add ("");
                 return help;
             }
         }
@@ -490,36 +432,32 @@ namespace WhiteCore.Framework.ConsoleFramework
         #endregion
     }
 
-    public delegate void CommandDelegate(IScene scene, string[] cmd);
+    public delegate void CommandDelegate (IScene scene, string [] cmd);
 
-    public class Parser
+    public static class Parser
     {
-        public static string[] Parse(string text)
+        public static string [] Parse (string text)
         {
-            List<string> result = new List<string>();
+            List<string> result = new List<string> ();
 
             int index;
             int startingIndex = -1;
-            string[] unquoted = text.Split(new[] {'"'});
+            string [] unquoted = text.Split (new [] { '"' });
 
-            for (index = 0; index < unquoted.Length; index++)
-            {
-                if (unquoted[index].StartsWith("/") || startingIndex >= 0)
-                {
+            for (index = 0; index < unquoted.Length; index++) {
+                if (unquoted [index].StartsWith ("/", StringComparison.Ordinal) || startingIndex >= 0) {
                     startingIndex = index;
-                    string qstr = unquoted [index].Trim();
+                    string qstr = unquoted [index].Trim ();
                     if (qstr != "")
-                        result.Add(qstr);
-                }
-                else
-                {
+                        result.Add (qstr);
+                } else {
                     startingIndex = 0;
-                    string[] words = unquoted[index].Split(new[] {' '});
-                    result.AddRange(words.Where(w => w != String.Empty));
+                    string [] words = unquoted [index].Split (new [] { ' ' });
+                    result.AddRange (words.Where (w => w != string.Empty));
                 }
             }
 
-            return result.ToArray();
+            return result.ToArray ();
         }
     }
 
@@ -536,26 +474,24 @@ namespace WhiteCore.Framework.ConsoleFramework
         protected DateTime m_logDate;
         bool m_gridserver;
         ISimulationBase m_simbase;
-        public List<string> m_promptOptions = new List<string>();
+        public List<string> m_promptOptions = new List<string> ();
 
-        public string LogPath
-        {
-            get{ return m_logPath; }
-            set{ m_logPath = value;}
+        public string LogPath {
+            get { return m_logPath; }
+            set { m_logPath = value; }
         }
 
-        public virtual void Initialize(IConfigSource source, ISimulationBase simBase)
+        public virtual void Initialize (IConfigSource source, ISimulationBase simBase)
         {
-            if (source.Configs["Console"] == null ||
-                source.Configs["Console"].GetString("Console", String.Empty) != Name)
-            {
+            if (source.Configs ["Console"] == null ||
+                source.Configs ["Console"].GetString ("Console", string.Empty) != Name) {
                 return;
             }
 
-            simBase.ApplicationRegistry.RegisterModuleInterface<ICommandConsole>(this);
+            simBase.ApplicationRegistry.RegisterModuleInterface<ICommandConsole> (this);
             MainConsole.Instance = this;
 
-            m_Commands.AddCommand(
+            m_Commands.AddCommand (
                 "help",
                 "help",
                 "Get a general command list",
@@ -567,25 +503,25 @@ namespace WhiteCore.Framework.ConsoleFramework
             logName = source.Configs ["Console"].GetString ("LogAppendName", logName);
             logPath = source.Configs ["Console"].GetString ("LogPath", logPath);
             if (logPath == "")
-                logPath = Path.Combine(simBase.DefaultDataPath, Constants.DEFAULT_LOG_DIR);
+                logPath = Path.Combine (simBase.DefaultDataPath, Constants.DEFAULT_LOG_DIR);
 
-            InitializeLog(LogPath, logName, simBase);
+            InitializeLog (LogPath, logName, simBase);
         }
 
-        protected void InitializeLog(string logPath, string logName, ISimulationBase simbase )
+        protected void InitializeLog (string logPath, string logName, ISimulationBase simbase)
         {
             m_simbase = simbase;
             m_gridserver = simbase.IsGridServer;
 
             // check the logPath to ensure correct format
-            if (!logPath.EndsWith ("/"))
+            if (!logPath.EndsWith ("/", StringComparison.Ordinal))
                 logPath = logPath + "/";
             m_logPath = logPath;
 
             if (logName == "")
                 logName = "WhiteCore";
 
-             if (m_gridserver)
+            if (m_gridserver)
                 m_logName = logName + "_Grid_";
             else
                 m_logName = logName + "_Sim_";
@@ -593,38 +529,38 @@ namespace WhiteCore.Framework.ConsoleFramework
             // make sure the directory exists
             if (!Directory.Exists (m_logPath))
                 Directory.CreateDirectory (m_logPath);
-             
+
             OpenLog ();
         }
 
-        protected void OpenLog()
+        protected void OpenLog ()
         {
             var logtime = DateTime.Now.AddMinutes (5);          // just a bit of leeway for rotation
-            string timestamp =  logtime.ToString("yyyyMMdd");
+            string timestamp = logtime.ToString ("yyyyMMdd");
 
             // opens the logfile using the system process names
             //string runFilename = System.Diagnostics.Process.GetCurrentProcess ().MainModule.FileName;
             //string runProcess = Path.GetFileNameWithoutExtension(runFilename);
             //m_logFile = StreamWriter.Synchronized(new StreamWriter(m_logPath + runProcess + m_logName + "_" + timestamp + ".log", true));
 
-            m_logFile = StreamWriter.Synchronized(new StreamWriter(m_logPath + m_logName + timestamp + ".log", true));
+            m_logFile = StreamWriter.Synchronized (new StreamWriter (m_logPath + m_logName + timestamp + ".log", true));
             m_logDate = logtime.Date;
         }
 
-        protected void RotateLog()
+        protected void RotateLog ()
         {
-            m_logFile.Close();          // close the current log
-            OpenLog();                  // start a new one
+            m_logFile.Close ();          // close the current log
+            OpenLog ();                  // start a new one
 
             var serv = "WhiteCore ";
             if (m_gridserver)
                 serv = serv + "Grid server";
             else
                 serv = serv + "Simulator";
-                
-            var startup = String.Format(serv + " has been running since {0}, {1}", 
+
+            var startup = string.Format (serv + " has been running since {0}, {1}",
                 m_simbase.StartupTime.DayOfWeek, m_simbase.StartupTime);
-            var elapsed = String.Format("Current run time of {0}", DateTime.Now - m_simbase.StartupTime);
+            var elapsed = string.Format ("Current run time of {0}", DateTime.Now - m_simbase.StartupTime);
 
             MainConsole.Instance.Info ("==============================================================================");
             MainConsole.Instance.Info ("  " + startup);
@@ -633,149 +569,136 @@ namespace WhiteCore.Framework.ConsoleFramework
 
         }
 
-        public void Dispose()
+        public void Dispose ()
         {
-            m_logFile.Close();
+            m_logFile.Close ();
         }
 
-        public void Help(IScene scene, string[] cmd)
+        public void Help (IScene scene, string [] cmd)
         {
-            List<string> help = m_Commands.GetHelp(cmd);
+            List<string> help = m_Commands.GetHelp (cmd);
 
             foreach (string s in help)
-                OutputNoTime(s, Level.Off);
+                OutputNoTime (s, Level.Off);
         }
 
         /// <summary>
         ///     Display a command prompt on the console and wait for user input
         /// </summary>
-        public void Prompt()
+        public void Prompt ()
         {
             // Set this culture for the thread 
             // to en-US to avoid number parsing issues
-            Culture.SetCurrentCulture();
-            string line = ReadLine(m_defaultPrompt + "# ", true, true);
+            Culture.SetCurrentCulture ();
+            string line = ReadLine (m_defaultPrompt + "# ", true, true);
 
-            if (line != String.Empty && line.Replace(" ", "") != String.Empty) //If there is a space, its fine
+            if (line != string.Empty && line.Replace (" ", "") != string.Empty) //If there is a space, its fine
             {
-                MainConsole.Instance.Info("[CONSOLE] Invalid command");
+                MainConsole.Instance.Info ("[CONSOLE] Invalid command");
             }
         }
 
-        public void RunCommand(string cmd)
+        public void RunCommand (string cmd)
         {
-            string[] parts = Parser.Parse(cmd);
-            m_Commands.Resolve(parts);
-            Output("", Threshold);
+            string [] parts = Parser.Parse (cmd);
+            m_Commands.Resolve (parts);
+            Output ("", Threshold);
         }
 
-        public virtual string ReadLine(string p, bool isCommand, bool e)
+        public virtual string ReadLine (string p, bool isCommand, bool e)
         {
             string oldDefaultPrompt = m_defaultPrompt;
             m_defaultPrompt = p;
-            Console.Write("{0}", p);
-            string cmdinput = Console.ReadLine();
+            Console.Write ("{0}", p);
+            string cmdinput = Console.ReadLine ();
 
-            if (isCommand)
-            {
-                if (cmdinput != null)
-                {
-                    string[] cmd = m_Commands.Resolve(Parser.Parse(cmdinput));
+            if (isCommand) {
+                if (cmdinput != null) {
+                    string [] cmd = m_Commands.Resolve (Parser.Parse (cmdinput));
 
-                    if (cmd.Length != 0)
-                    {
+                    if (cmd.Length != 0) {
                         int i;
 
-                        for (i = 0; i < cmd.Length; i++)
-                        {
-                            if (cmd[i].Contains(" "))
-                                cmd[i] = "\"" + cmd[i] + "\"";
+                        for (i = 0; i < cmd.Length; i++) {
+                            if (cmd [i].Contains (" "))
+                                cmd [i] = "\"" + cmd [i] + "\"";
                         }
                     }
-                }
-                else
-                {
-                    Environment.Exit(0);
+                } else {
+                    Environment.Exit (0);
                 }
                 m_defaultPrompt = oldDefaultPrompt;
-                return String.Empty;
+                return string.Empty;
             }
             return cmdinput;
         }
 
-        public string Prompt(string prompt)
+        public string Prompt (string prompt)
         {
-            return Prompt(prompt, "");
+            return Prompt (prompt, "");
         }
 
-        public string Prompt(string prompt, string defaultResponse)
+        public string Prompt (string prompt, string defaultResponse)
         {
-            return Prompt(prompt, defaultResponse, new List<string>());
+            return Prompt (prompt, defaultResponse, new List<string> ());
         }
 
-        public string Prompt(string prompt, string defaultResponse, List<char> excludedCharacters)
+        public string Prompt (string prompt, string defaultResponse, List<char> excludedCharacters)
         {
-            return Prompt(prompt, defaultResponse, new List<string>(), excludedCharacters);
+            return Prompt (prompt, defaultResponse, new List<string> (), excludedCharacters);
         }
 
-        public string Prompt(string prompt, string defaultresponse, List<string> options)
+        public string Prompt (string prompt, string defaultresponse, List<string> options)
         {
-            return Prompt(prompt, defaultresponse, options, new List<char>());
+            return Prompt (prompt, defaultresponse, options, new List<char> ());
         }
 
         // Displays a command prompt and returns a default value, user may only enter 1 of 2 options
-        public string Prompt(string prompt, string defaultresponse, List<string> options, List<char> excludedCharacters)
+        public string Prompt (string prompt, string defaultresponse, List<string> options, List<char> excludedCharacters)
         {
             m_isPrompting = true;
-            m_promptOptions = new List<string>(options);
+            m_promptOptions = new List<string> (options);
 
             bool itisdone = false;
-            string optstr = options.Aggregate(String.Empty, (current, s) => current + (" " + s));
-            string temp = InternalPrompt(prompt, defaultresponse, options);
- 
-            while (!itisdone && options.Count > 0)
-            {
-                if (options.Contains(temp))
-                {
+            string optstr = options.Aggregate (string.Empty, (current, s) => current + (" " + s));
+            string temp = InternalPrompt (prompt, defaultresponse, options);
+
+            while (!itisdone && options.Count > 0) {
+                if (options.Contains (temp)) {
                     itisdone = true;
-                }
-                else
-                {
-                    Console.WriteLine("Valid options are" + optstr);
-                    temp = InternalPrompt(prompt, defaultresponse, options);
+                } else {
+                    Console.WriteLine ("Valid options are" + optstr);
+                    temp = InternalPrompt (prompt, defaultresponse, options);
                 }
             }
             itisdone = false;
-            while (!itisdone && excludedCharacters.Count > 0)
-            {
-                foreach (char c in excludedCharacters.Where(c => temp.Contains(c.ToString())))
-                {
-                    Console.WriteLine("The character \"" + c.ToString() + "\" is not permitted.");
+            while (!itisdone && excludedCharacters.Count > 0) {
+                foreach (char c in excludedCharacters.Where (c => temp.Contains (c.ToString ()))) {
+                    Console.WriteLine ("The character \"" + c + "\" is not permitted.");
                     itisdone = false;
                 }
             }
             m_isPrompting = false;
-            m_promptOptions.Clear();
+            m_promptOptions.Clear ();
             return temp;
         }
 
-        string InternalPrompt(string prompt, string defaultresponse, List<string> options)
+        string InternalPrompt (string prompt, string defaultresponse, List<string> options)
         {
-            string ret = ReadLine(String.Format("{0}{2} [{1}]: ",
+            string ret = ReadLine (string.Format ("{0}{2} [{1}]: ",
                                                 prompt,
                                                 defaultresponse,
                                                 options.Count == 0
                                                     ? ""
-                                                    : ", Options are [" + string.Join(", ", options.ToArray()) + "]"
+                                                    : ", Options are [" + string.Join (", ", options.ToArray ()) + "]"
                                       ), false, true);
-            if (ret == String.Empty)
+            if (ret == string.Empty)
                 ret = defaultresponse;
 
             // let's be a little smarter here if we can
-            if (options.Count > 0)
-            {
+            if (options.Count > 0) {
                 foreach (string option in options)
-                    if (option.StartsWith (ret))
+                    if (option.StartsWith (ret, StringComparison.Ordinal))
                         ret = option;
             }
             return ret;
@@ -783,127 +706,111 @@ namespace WhiteCore.Framework.ConsoleFramework
 
         // Displays a prompt and waits for the user to enter a string, then returns that string
         // (Done with no echo and suitable for passwords)
-        public string PasswordPrompt(string p)
+        public string PasswordPrompt (string p)
         {
             m_isPrompting = true;
-            string line = ReadLine(p + ": ", false, false);
+            string line = ReadLine (p + ": ", false, false);
             m_isPrompting = false;
             return line;
         }
 
-        public virtual void Output(string text, Level level)
+        public virtual void Output (string text, Level level)
         {
-            if (Threshold <= level)
-            {
-                MainConsole.TriggerLog(level.ToString(), text);
+            if (Threshold <= level) {
+                MainConsole.TriggerLog (level.ToString (), text);
                 text = string.Format ("{0} ; {1}", Culture.LocaleLogStamp (), text);
 
-                Console.WriteLine(text);
-                if (m_logFile != null)
-                {
+                Console.WriteLine (text);
+                if (m_logFile != null) {
                     if (m_logDate != DateTime.Now.Date)
                         RotateLog ();
-                    try
-                    {
-                        m_logFile.WriteLine(text);
-                        m_logFile.Flush();
-                    }
-                    catch
-                    {
+                    try {
+                        m_logFile.WriteLine (text);
+                        m_logFile.Flush ();
+                    } catch {
                         // encountered an error writing... 
                     }
                 }
             }
         }
 
-        public virtual void OutputNoTime(string text, Level level)
+        public virtual void OutputNoTime (string text, Level level)
         {
-            if (Threshold <= level)
-            {
-                MainConsole.TriggerLog(level.ToString(), text);
-                Console.WriteLine(text);
-                if (m_logFile != null)
-                {
+            if (Threshold <= level) {
+                MainConsole.TriggerLog (level.ToString (), text);
+                Console.WriteLine (text);
+                if (m_logFile != null) {
                     if (m_logDate != DateTime.Now.Date)
                         RotateLog ();
 
-                    try
-                    {
-                        m_logFile.WriteLine(text);
-                        m_logFile.Flush();
-                    }
-                    catch
-                    {
+                    try {
+                        m_logFile.WriteLine (text);
+                        m_logFile.Flush ();
+                    } catch {
                         // encountered an error writing... 
                     }
                 }
             }
         }
 
-        public virtual void LockOutput()
+        public virtual void LockOutput ()
         {
         }
 
-        public virtual void UnlockOutput()
+        public virtual void UnlockOutput ()
         {
         }
 
-        public virtual bool CompareLogLevels(string a, string b)
+        public virtual bool CompareLogLevels (string a, string b)
         {
-            Level aa = (Level)Enum.Parse(typeof(Level), a, true);
-            Level bb = (Level)Enum.Parse(typeof(Level), b, true);
+            Level aa = (Level)Enum.Parse (typeof (Level), a, true);
+            Level bb = (Level)Enum.Parse (typeof (Level), b, true);
             return aa <= bb;
         }
 
         /// <summary>
         ///     The default prompt text.
         /// </summary>
-        public virtual string DefaultPrompt
-        {
+        public virtual string DefaultPrompt {
             set { m_defaultPrompt = value; }
             get { return m_defaultPrompt; }
         }
 
         protected string m_defaultPrompt;
 
-        public virtual string Name
-        {
+        public virtual string Name {
             get { return "CommandConsole"; }
         }
 
-        public Commands m_Commands = new Commands();
+        public Commands m_Commands = new Commands ();
 
-        public Commands Commands
-        {
+        public Commands Commands {
             get { return m_Commands; }
             set { m_Commands = value; }
         }
 
-        public List<IScene> ConsoleScenes
-        {
+        public List<IScene> ConsoleScenes {
             get { return m_ConsoleScenes; }
             set { m_ConsoleScenes = value; }
         }
 
-        public IScene ConsoleScene
-        {
+        public IScene ConsoleScene {
             get { return m_consoleScene; }
             set { m_consoleScene = value; }
         }
 
         public bool HasProcessedCurrentCommand { get; set; }
 
-        public List<IScene> m_ConsoleScenes = new List<IScene>();
+        public List<IScene> m_ConsoleScenes = new List<IScene> ();
         public IScene m_consoleScene = null;
 
         /// <summary>
         ///     Starts the prompt for the console. This will never stop until the region is closed.
         /// </summary>
-        public void ReadConsole()
+        public void ReadConsole ()
         {
-            while (true)
-            {
-                Prompt();
+            while (true) {
+                Prompt ();
             }
         }
 
@@ -911,124 +818,118 @@ namespace WhiteCore.Framework.ConsoleFramework
 
         #region ILog Members
 
-        public bool IsDebugEnabled
-        {
+        public bool IsDebugEnabled {
             get { return Threshold <= Level.Debug; }
         }
 
-        public bool IsErrorEnabled
-        {
+        public bool IsErrorEnabled {
             get { return Threshold <= Level.Error; }
         }
 
-        public bool IsFatalEnabled
-        {
+        public bool IsFatalEnabled {
             get { return Threshold <= Level.Fatal; }
         }
 
-        public bool IsInfoEnabled
-        {
+        public bool IsInfoEnabled {
             get { return Threshold <= Level.Info; }
         }
 
-        public bool IsWarnEnabled
-        {
+        public bool IsWarnEnabled {
             get { return Threshold <= Level.Warn; }
         }
 
-        public bool IsTraceEnabled
-        {
+        public bool IsTraceEnabled {
             get { return Threshold <= Level.Trace; }
         }
 
-        public void Debug(object message)
+        public void Debug (object message)
         {
-            Output(message.ToString(), Level.Debug);
+            Output (message.ToString (), Level.Debug);
         }
 
-        public void DebugFormat(string format, params object[] args)
+        public void DebugFormat (string format, params object [] args)
         {
-            Output(string.Format(format, args), Level.Debug);
+            Output (string.Format (format, args), Level.Debug);
         }
 
-        public void Error(object message)
+        public void Error (object message)
         {
-            Output(message.ToString(), Level.Error);
+            Output (message.ToString (), Level.Error);
         }
 
-        public void ErrorFormat(string format, params object[] args)
+        public void ErrorFormat (string format, params object [] args)
         {
-            Output(string.Format(format, args), Level.Error);
+            Output (string.Format (format, args), Level.Error);
         }
 
-        public void Fatal(object message)
+        public void Fatal (object message)
         {
-            Output(message.ToString(), Level.Fatal);
+            Output (message.ToString (), Level.Fatal);
         }
 
-        public void FatalFormat(string format, params object[] args)
+        public void FatalFormat (string format, params object [] args)
         {
-            Output(string.Format(format, args), Level.Fatal);
+            Output (string.Format (format, args), Level.Fatal);
         }
 
-        public void Format(Level level, string format, params object[] args)
+        public void Format (Level level, string format, params object [] args)
         {
-            Output(string.Format(format, args), level);
+            Output (string.Format (format, args), level);
         }
 
-        public void FormatNoTime(Level level, string format, params object[] args)
+        public void FormatNoTime (Level level, string format, params object [] args)
         {
-            OutputNoTime(string.Format(format, args), level);
+            OutputNoTime (string.Format (format, args), level);
         }
 
-        public void Info(object message)
+        public void Info (object message)
         {
-            Output(message.ToString(), Level.Info);
+            Output (message.ToString (), Level.Info);
         }
 
-        public void CleanInfo(object message)
+        public void CleanInfo (object message)
         {
-            OutputNoTime(message.ToString(), Level.Info);
+            OutputNoTime (message.ToString (), Level.Info);
         }
 
-        public void CleanInfoFormat(string format, params object[] args)
+        public void CleanInfoFormat (string format, params object [] args)
         {
-            OutputNoTime(string.Format(format, args), Level.Error);
+            OutputNoTime (string.Format (format, args), Level.Error);
         }
 
-        public void Ticker()
+        public void Ticker ()
         {
-            Console.Write(".");
+            Console.Write (".");
         }
 
-        public void InfoFormat(string format, params object[] args)
+        public void InfoFormat (string format, params object [] args)
         {
-            Output(string.Format(format, args), Level.Info);
+            Output (string.Format (format, args), Level.Info);
         }
 
-        public void Log(Level level, object message)
+        public void Log (Level level, object message)
         {
-            Output(message.ToString(), level);
+            Output (message.ToString (), level);
         }
 
-        public void Trace(object message)
+        public void Trace (object message)
         {
-            Output(message.ToString(), Level.Trace);
+            Output (message.ToString (), Level.Trace);
         }
 
-        public void TraceFormat(string format, params object[] args)
+        public void TraceFormat (string format, params object [] args)
         {
-            Output(string.Format(format, args), Level.Trace);
+            Output (string.Format (format, args), Level.Trace);
         }
 
-        public void Warn(object message)
+        public void Warn (object message)
         {
-            Output(message.ToString(), Level.Warn);
+            Output (message.ToString (), Level.Warn);
         }
 
-        public void WarnFormat(string format, params object[] args)
+        public void WarnFormat (string format, params object [] args)
         {
-            Output(string.Format(format, args), Level.Warn);
+            Output (string.Format (format, args), Level.Warn);
         }
 
         #endregion

@@ -55,332 +55,303 @@ namespace WhiteCore.Framework.ConsoleFramework
     //
     public class RemoteConsole : CommandConsole
     {
-        readonly Dictionary<UUID, ConsoleConnection> m_Connections =
-            new Dictionary<UUID, ConsoleConnection>();
+        readonly Dictionary<UUID, ConsoleConnection> m_Connections = new Dictionary<UUID, ConsoleConnection> ();
 
-        readonly ManualResetEvent m_DataEvent = new ManualResetEvent(false);
-        readonly List<string> m_InputData = new List<string>();
-        readonly List<string> m_Scrollback = new List<string>();
+        readonly ManualResetEvent m_DataEvent = new ManualResetEvent (false);
+        readonly List<string> m_InputData = new List<string> ();
+        readonly List<string> m_Scrollback = new List<string> ();
         long m_LineNumber;
 
-        string m_Password = String.Empty;
+        string m_Password = string.Empty;
         IHttpServer m_Server;
-        string m_UserName = String.Empty;
+        string m_UserName = string.Empty;
 
-        public override string Name
-        {
+        public override string Name {
             get { return "RemoteConsole"; }
         }
 
-        public override void Initialize(IConfigSource source, ISimulationBase simbase)
+        public override void Initialize (IConfigSource source, ISimulationBase simBase)
         {
             uint m_consolePort = 0;
 
-            if (source.Configs["Console"] != null)
-            {
-                //if (source.Configs["Console"].GetString("RemoteConsole", String.Empty) != "enable")
-                    if (source.Configs["Console"].GetString("Console", String.Empty) != Name)
-                        return;
+            if (source.Configs ["Console"] != null) {
+                //if (source.Configs["Console"].GetString("RemoteConsole", string.Empty) != "enable")
+                if (source.Configs ["Console"].GetString ("Console", string.Empty) != Name)
+                    return;
 
-                m_consolePort = (uint) source.Configs["Console"].GetInt("remote_console_port", 0);
-                m_UserName = source.Configs["Console"].GetString("RemoteConsoleUser", String.Empty);
-                m_Password = source.Configs["Console"].GetString("RemoteConsolePass", String.Empty);
-            }
-            else
+                m_consolePort = (uint)source.Configs ["Console"].GetInt ("remote_console_port", 0);
+                m_UserName = source.Configs ["Console"].GetString ("RemoteConsoleUser", string.Empty);
+                m_Password = source.Configs ["Console"].GetString ("RemoteConsolePass", string.Empty);
+            } else
                 return;
 
-            simbase.ApplicationRegistry.RegisterModuleInterface<ICommandConsole>(this);
+            simBase.ApplicationRegistry.RegisterModuleInterface<ICommandConsole> (this);
             MainConsole.Instance = this;
 
-            SetServer(m_consolePort == 0 ? MainServer.Instance : simbase.GetHttpServer(m_consolePort));
+            SetServer (m_consolePort == 0 ? MainServer.Instance : simBase.GetHttpServer (m_consolePort));
 
-            m_Commands.AddCommand(
+            m_Commands.AddCommand (
                 "help",
                 "help",
                 "Get a general command list",
                 Help, false, true);
         }
 
-        public void SetServer(IHttpServer server)
+        public void SetServer (IHttpServer server)
         {
             m_Server = server;
 
-            m_Server.AddStreamHandler(new GenericStreamHandler("GET", "/StartSession/", HandleHttpStartSession));
-            m_Server.AddStreamHandler(new GenericStreamHandler("GET", "/CloseSession/", HandleHttpCloseSession));
-            m_Server.AddStreamHandler(new GenericStreamHandler("GET", "/SessionCommand/", HandleHttpSessionCommand));
+            m_Server.AddStreamHandler (new GenericStreamHandler ("GET", "/StartSession/", HandleHttpStartSession));
+            m_Server.AddStreamHandler (new GenericStreamHandler ("GET", "/CloseSession/", HandleHttpCloseSession));
+            m_Server.AddStreamHandler (new GenericStreamHandler ("GET", "/SessionCommand/", HandleHttpSessionCommand));
         }
 
-        public override void Output(string text, Level level)
+        public override void Output (string text, Level level)
         {
-            lock (m_Scrollback)
-            {
+            lock (m_Scrollback) {
                 while (m_Scrollback.Count >= 1000)
-                    m_Scrollback.RemoveAt(0);
+                    m_Scrollback.RemoveAt (0);
                 m_LineNumber++;
-                m_Scrollback.Add(String.Format("{0}", m_LineNumber) + ":" + level + ":" + text);
+                m_Scrollback.Add (string.Format ("{0}", m_LineNumber) + ":" + level + ":" + text);
             }
-            Console.WriteLine(text.Trim());
+            Console.WriteLine (text.Trim ());
         }
 
-        public override string ReadLine(string p, bool isCommand, bool e)
+        public override string ReadLine (string p, bool isCommand, bool e)
         {
-            if (isCommand)
-                Output("+++" + p, Threshold);
-            else
-                Output("-++" + p, Threshold);
-
-            m_DataEvent.WaitOne();
-
             string cmdinput;
 
-            lock (m_InputData)
-            {
-                if (m_InputData.Count == 0)
-                {
-                    m_DataEvent.Reset();
+            if (isCommand)
+                Output ("+++" + p, Threshold);
+            else
+                Output ("-++" + p, Threshold);
+
+            lock (m_InputData) {
+                m_DataEvent.WaitOne ();
+
+                if (m_InputData.Count == 0) {
+                    m_DataEvent.Reset ();
                     return "";
                 }
 
-                cmdinput = m_InputData[0];
-                m_InputData.RemoveAt(0);
+                cmdinput = m_InputData [0];
+                m_InputData.RemoveAt (0);
                 if (m_InputData.Count == 0)
-                    m_DataEvent.Reset();
+                    m_DataEvent.Reset ();
             }
 
-            if (isCommand)
-            {
-                string[] cmd = Commands.Resolve(Parser.Parse(cmdinput));
+            if (isCommand) {
+                string [] cmd = Commands.Resolve (Parser.Parse (cmdinput));
 
-                if (cmd.Length != 0)
-                {
+                if (cmd.Length != 0) {
                     int i;
 
-                    for (i = 0; i < cmd.Length; i++)
-                    {
-                        if (cmd[i].Contains(" "))
-                            cmd[i] = "\"" + cmd[i] + "\"";
+                    for (i = 0; i < cmd.Length; i++) {
+                        if (cmd [i].Contains (" "))
+                            cmd [i] = "\"" + cmd [i] + "\"";
                     }
-                    return String.Empty;
+                    return string.Empty;
                 }
             }
             return cmdinput;
         }
 
-        void DoExpire()
+        void DoExpire ()
         {
-            List<UUID> expired = new List<UUID>();
+            List<UUID> expired = new List<UUID> ();
 
-            lock (m_Connections)
-            {
-                expired.AddRange(from kvp in m_Connections
-                                 where Environment.TickCount - kvp.Value.last > 500000
-                                 select kvp.Key);
+            lock (m_Connections) {
+                expired.AddRange (from kvp in m_Connections
+                                  where Environment.TickCount - kvp.Value.last > 500000
+                                  select kvp.Key);
 
-                foreach (UUID id in expired)
-                {
-                    m_Connections.Remove(id);
-                    CloseConnection(id);
+                foreach (UUID id in expired) {
+                    m_Connections.Remove (id);
+                    CloseConnection (id);
                 }
             }
         }
 
-        byte[] HandleHttpStartSession(string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
+        byte [] HandleHttpStartSession (string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {
-            DoExpire();
+            DoExpire ();
 
-            Hashtable post = DecodePostString(HttpServerHandlerHelpers.ReadString(request));
+            Hashtable post = DecodePostString (HttpServerHandlerHelpers.ReadString (request));
 
             httpResponse.StatusCode = 401;
             httpResponse.ContentType = "text/plain";
-            if (m_UserName == String.Empty)
+            if (m_UserName == string.Empty)
                 return MainServer.BlankResponse;
 
-            if (post["USER"] == null || post["PASS"] == null)
+            if (post ["USER"] == null || post ["PASS"] == null)
                 return MainServer.BlankResponse;
 
-            if (m_UserName != post["USER"].ToString() ||
-                m_Password != post["PASS"].ToString())
+            if (m_UserName != post ["USER"].ToString () ||
+                m_Password != post ["PASS"].ToString ())
                 return MainServer.BlankResponse;
 
-            ConsoleConnection c = new ConsoleConnection {last = Environment.TickCount, lastLineSeen = 0};
+            ConsoleConnection c = new ConsoleConnection { last = Environment.TickCount, lastLineSeen = 0 };
 
-            UUID sessionID = UUID.Random();
+            UUID sessionID = UUID.Random ();
 
-            lock (m_Connections)
-            {
-                m_Connections[sessionID] = c;
+            lock (m_Connections) {
+                m_Connections [sessionID] = c;
             }
 
             string uri = "/ReadResponses/" + sessionID + "/";
 
-            m_Server.AddPollServiceHTTPHandler(uri, new PollServiceEventArgs(null, HasEvents, GetEvents, NoEvents,
+            m_Server.AddPollServiceHTTPHandler (uri, new PollServiceEventArgs (null, HasEvents, GetEvents, NoEvents,
                                                                         sessionID));
 
-            XmlDocument xmldoc = new XmlDocument();
-            XmlNode xmlnode = xmldoc.CreateNode(XmlNodeType.XmlDeclaration,
-                                                "", "");
+            XmlDocument xmldoc = new XmlDocument ();
+            XmlNode xmlnode = xmldoc.CreateNode (XmlNodeType.XmlDeclaration, "", "");
 
-            xmldoc.AppendChild(xmlnode);
-            XmlElement rootElement = xmldoc.CreateElement("", "ConsoleSession",
-                                                          "");
+            xmldoc.AppendChild (xmlnode);
+            XmlElement rootElement = xmldoc.CreateElement ("", "ConsoleSession", "");
 
-            xmldoc.AppendChild(rootElement);
+            xmldoc.AppendChild (rootElement);
 
-            XmlElement id = xmldoc.CreateElement("", "SessionID", "");
-            id.AppendChild(xmldoc.CreateTextNode(sessionID.ToString()));
+            XmlElement id = xmldoc.CreateElement ("", "SessionID", "");
+            id.AppendChild (xmldoc.CreateTextNode (sessionID.ToString ()));
 
-            rootElement.AppendChild(id);
+            rootElement.AppendChild (id);
 
-            XmlElement prompt = xmldoc.CreateElement("", "Prompt", "");
-            prompt.AppendChild(xmldoc.CreateTextNode(DefaultPrompt));
+            XmlElement prompt = xmldoc.CreateElement ("", "Prompt", "");
+            prompt.AppendChild (xmldoc.CreateTextNode (DefaultPrompt));
 
-            rootElement.AppendChild(prompt);
+            rootElement.AppendChild (prompt);
 
             httpResponse.StatusCode = 200;
             httpResponse.ContentType = "text/xml";
-            return Encoding.UTF8.GetBytes(xmldoc.InnerXml);
+            return Encoding.UTF8.GetBytes (xmldoc.InnerXml);
         }
 
-        byte[] HandleHttpCloseSession(string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
+        byte [] HandleHttpCloseSession (string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {
-            DoExpire();
+            DoExpire ();
 
-            Hashtable post = DecodePostString(HttpServerHandlerHelpers.ReadString(request));
+            Hashtable post = DecodePostString (HttpServerHandlerHelpers.ReadString (request));
 
             httpResponse.StatusCode = 401;
             httpResponse.ContentType = "text/plain";
-            if (post["ID"] == null)
+            if (post ["ID"] == null)
                 return MainServer.BlankResponse;
 
             UUID id;
-            if (!UUID.TryParse(post["ID"].ToString(), out id))
+            if (!UUID.TryParse (post ["ID"].ToString (), out id))
                 return MainServer.BlankResponse;
 
-            lock (m_Connections)
-            {
-                if (m_Connections.ContainsKey(id))
-                {
-                    m_Connections.Remove(id);
-                    CloseConnection(id);
+            lock (m_Connections) {
+                if (m_Connections.ContainsKey (id)) {
+                    m_Connections.Remove (id);
+                    CloseConnection (id);
                 }
             }
 
-            XmlDocument xmldoc = new XmlDocument();
-            XmlNode xmlnode = xmldoc.CreateNode(XmlNodeType.XmlDeclaration,
-                                                "", "");
+            XmlDocument xmldoc = new XmlDocument ();
+            XmlNode xmlnode = xmldoc.CreateNode (XmlNodeType.XmlDeclaration, "", "");
 
-            xmldoc.AppendChild(xmlnode);
-            XmlElement rootElement = xmldoc.CreateElement("", "ConsoleSession",
-                                                          "");
+            xmldoc.AppendChild (xmlnode);
+            XmlElement rootElement = xmldoc.CreateElement ("", "ConsoleSession", "");
 
-            xmldoc.AppendChild(rootElement);
+            xmldoc.AppendChild (rootElement);
 
-            XmlElement res = xmldoc.CreateElement("", "Result", "");
-            res.AppendChild(xmldoc.CreateTextNode("OK"));
+            XmlElement res = xmldoc.CreateElement ("", "Result", "");
+            res.AppendChild (xmldoc.CreateTextNode ("OK"));
 
-            rootElement.AppendChild(res);
+            rootElement.AppendChild (res);
 
             httpResponse.StatusCode = 200;
             httpResponse.ContentType = "text/xml";
-            return Encoding.UTF8.GetBytes(xmldoc.InnerXml);
+            return Encoding.UTF8.GetBytes (xmldoc.InnerXml);
         }
 
-        byte[] HandleHttpSessionCommand(string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
+        byte [] HandleHttpSessionCommand (string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {
-            DoExpire();
+            DoExpire ();
 
-            Hashtable post = DecodePostString(HttpServerHandlerHelpers.ReadString(request));
+            Hashtable post = DecodePostString (HttpServerHandlerHelpers.ReadString (request));
 
             httpResponse.StatusCode = 401;
             httpResponse.ContentType = "text/plain";
-            if (post["ID"] == null)
+            if (post ["ID"] == null)
                 return MainServer.BlankResponse;
 
             UUID id;
-            if (!UUID.TryParse(post["ID"].ToString(), out id))
+            if (!UUID.TryParse (post ["ID"].ToString (), out id))
                 return MainServer.BlankResponse;
 
-            lock (m_Connections)
-            {
-                if (!m_Connections.ContainsKey(id))
+            lock (m_Connections) {
+                if (!m_Connections.ContainsKey (id))
                     return MainServer.BlankResponse;
             }
 
-            if (post["COMMAND"] == null)
+            if (post ["COMMAND"] == null)
                 return MainServer.BlankResponse;
 
-            lock (m_InputData)
-            {
-                m_DataEvent.Set();
-                m_InputData.Add(post["COMMAND"].ToString());
+            lock (m_InputData) {
+                m_DataEvent.Set ();
+                m_InputData.Add (post ["COMMAND"].ToString ());
             }
 
-            XmlDocument xmldoc = new XmlDocument();
-            XmlNode xmlnode = xmldoc.CreateNode(XmlNodeType.XmlDeclaration,
-                                                "", "");
+            XmlDocument xmldoc = new XmlDocument ();
+            XmlNode xmlnode = xmldoc.CreateNode (XmlNodeType.XmlDeclaration, "", "");
 
-            xmldoc.AppendChild(xmlnode);
-            XmlElement rootElement = xmldoc.CreateElement("", "ConsoleSession",
-                                                          "");
+            xmldoc.AppendChild (xmlnode);
+            XmlElement rootElement = xmldoc.CreateElement ("", "ConsoleSession", "");
 
-            xmldoc.AppendChild(rootElement);
+            xmldoc.AppendChild (rootElement);
 
-            XmlElement res = xmldoc.CreateElement("", "Result", "");
-            res.AppendChild(xmldoc.CreateTextNode("OK"));
+            XmlElement res = xmldoc.CreateElement ("", "Result", "");
+            res.AppendChild (xmldoc.CreateTextNode ("OK"));
 
-            rootElement.AppendChild(res);
+            rootElement.AppendChild (res);
 
             httpResponse.StatusCode = 200;
             httpResponse.ContentType = "text/xml";
-            return Encoding.UTF8.GetBytes(xmldoc.InnerXml);
+            return Encoding.UTF8.GetBytes (xmldoc.InnerXml);
         }
 
-        Hashtable DecodePostString(string data)
+        Hashtable DecodePostString (string data)
         {
-            Hashtable result = new Hashtable();
+            Hashtable result = new Hashtable ();
 
-            string[] terms = data.Split(new[] {'&'});
+            string [] terms = data.Split (new [] { '&' });
 
-            foreach (string term in terms)
-            {
-                string[] elems = term.Split(new[] {'='});
+            foreach (string term in terms) {
+                string [] elems = term.Split (new [] { '=' });
                 if (elems.Length == 0)
                     continue;
 
-                string name = HttpUtility.UrlDecode(elems[0]);
-                string value = String.Empty;
+                string name = HttpUtility.UrlDecode (elems [0]);
+                string value = string.Empty;
 
                 if (elems.Length > 1)
-                    value = HttpUtility.UrlDecode(elems[1]);
+                    value = HttpUtility.UrlDecode (elems [1]);
 
-                result[name] = value;
+                result [name] = value;
             }
 
             return result;
         }
 
-        public void CloseConnection(UUID id)
+        public void CloseConnection (UUID id)
         {
-            try
-            {
+            try {
                 string uri = "/ReadResponses/" + id + "/";
-
-                m_Server.RemovePollServiceHTTPHandler("", uri);
-            }
-            catch (Exception)
-            {
+                m_Server.RemovePollServiceHTTPHandler ("", uri);
+            } catch (Exception) {
             }
         }
 
-        bool HasEvents(UUID RequestID, UUID sessionID)
+        bool HasEvents (UUID RequestID, UUID sessionID)
         {
             ConsoleConnection c;
 
-            lock (m_Connections)
-            {
-                if (!m_Connections.ContainsKey(sessionID))
+            lock (m_Connections) {
+                if (!m_Connections.ContainsKey (sessionID))
                     return false;
-                c = m_Connections[sessionID];
+                c = m_Connections [sessionID];
             }
             c.last = Environment.TickCount;
             if (c.lastLineSeen < m_LineNumber)
@@ -388,76 +359,69 @@ namespace WhiteCore.Framework.ConsoleFramework
             return false;
         }
 
-         byte[] GetEvents(UUID RequestID, UUID sessionID, string req, OSHttpResponse response)
+        byte [] GetEvents (UUID RequestID, UUID sessionID, string req, OSHttpResponse response)
         {
             ConsoleConnection c;
 
-            lock (m_Connections)
-            {
-                if (!m_Connections.ContainsKey(sessionID))
-                    return NoEvents(RequestID, UUID.Zero, response);
-                c = m_Connections[sessionID];
+            lock (m_Connections) {
+                if (!m_Connections.ContainsKey (sessionID))
+                    return NoEvents (RequestID, UUID.Zero, response);
+                c = m_Connections [sessionID];
             }
             c.last = Environment.TickCount;
             if (c.lastLineSeen >= m_LineNumber)
-                return NoEvents(RequestID, UUID.Zero, response);
+                return NoEvents (RequestID, UUID.Zero, response);
 
-            XmlDocument xmldoc = new XmlDocument();
-            XmlNode xmlnode = xmldoc.CreateNode(XmlNodeType.XmlDeclaration,
-                                                "", "");
+            XmlDocument xmldoc = new XmlDocument ();
+            XmlNode xmlnode = xmldoc.CreateNode (XmlNodeType.XmlDeclaration, "", "");
 
-            xmldoc.AppendChild(xmlnode);
-            XmlElement rootElement = xmldoc.CreateElement("", "ConsoleSession", "");
+            xmldoc.AppendChild (xmlnode);
+            XmlElement rootElement = xmldoc.CreateElement ("", "ConsoleSession", "");
 
-            if (c.newConnection)
-            {
+            if (c.newConnection) {
                 c.newConnection = false;
-                Output("+++" + DefaultPrompt, Threshold);
+                Output ("+++" + DefaultPrompt, Threshold);
             }
 
-            lock (m_Scrollback)
-            {
+            lock (m_Scrollback) {
                 long startLine = m_LineNumber - m_Scrollback.Count;
                 long sendStart = startLine;
                 if (sendStart < c.lastLineSeen)
                     sendStart = c.lastLineSeen;
 
-                for (long i = sendStart; i < m_LineNumber; i++)
-                {
-                    XmlElement res = xmldoc.CreateElement("", "Line", "");
+                for (long i = sendStart; i < m_LineNumber; i++) {
+                    XmlElement res = xmldoc.CreateElement ("", "Line", "");
                     long line = i + 1;
-                    res.SetAttribute("Number", line.ToString());
-                    res.AppendChild(xmldoc.CreateTextNode(m_Scrollback[(int) (i - startLine)]));
+                    res.SetAttribute ("Number", line.ToString ());
+                    res.AppendChild (xmldoc.CreateTextNode (m_Scrollback [(int)(i - startLine)]));
 
-                    rootElement.AppendChild(res);
+                    rootElement.AppendChild (res);
                 }
+                c.lastLineSeen = m_LineNumber;
             }
-            c.lastLineSeen = m_LineNumber;
 
-            xmldoc.AppendChild(rootElement);
+            xmldoc.AppendChild (rootElement);
 
 
             response.StatusCode = 200;
             response.ContentType = "application/xml";
 
-            return Encoding.UTF8.GetBytes(xmldoc.InnerXml);
+            return Encoding.UTF8.GetBytes (xmldoc.InnerXml);
         }
 
-        byte[] NoEvents(UUID RequestID, UUID id, OSHttpResponse response)
+        byte [] NoEvents (UUID RequestID, UUID id, OSHttpResponse response)
         {
-            XmlDocument xmldoc = new XmlDocument();
-            XmlNode xmlnode = xmldoc.CreateNode(XmlNodeType.XmlDeclaration,
-                                                "", "");
+            XmlDocument xmldoc = new XmlDocument ();
+            XmlNode xmlnode = xmldoc.CreateNode (XmlNodeType.XmlDeclaration, "", "");
 
-            xmldoc.AppendChild(xmlnode);
-            XmlElement rootElement = xmldoc.CreateElement("", "ConsoleSession",
-                                                          "");
+            xmldoc.AppendChild (xmlnode);
+            XmlElement rootElement = xmldoc.CreateElement ("", "ConsoleSession", "");
 
-            xmldoc.AppendChild(rootElement);
+            xmldoc.AppendChild (rootElement);
 
             response.StatusCode = 200;
             response.ContentType = "text/xml";
-            return Encoding.UTF8.GetBytes(xmldoc.InnerXml);
+            return Encoding.UTF8.GetBytes (xmldoc.InnerXml);
         }
     }
 }

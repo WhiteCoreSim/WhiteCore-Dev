@@ -41,33 +41,32 @@ namespace WhiteCore.DataManager.MySQL
     {
         string m_connectionString = "";
 
-        public override string Identifier
-        {
+        public override string Identifier {
             get { return "MySQLData"; }
         }
- 
+
         #region Database
 
-        public override void ConnectToDatabase(string connectionString, string migratorName, bool validateTables)
+        public override void ConnectToDatabase (string connectionString, string migratorName, bool validateTables)
         {
             m_connectionString = connectionString;
-            MySqlConnection c = new MySqlConnection(connectionString);
-            int subStrA = connectionString.IndexOf("Database=");
-            int subStrB = connectionString.IndexOf(";", subStrA);
-            string noDatabaseConnector = m_connectionString.Substring(0, subStrA) +
-                                         m_connectionString.Substring(subStrB + 1);
+            MySqlConnection c = new MySqlConnection (connectionString);
+            int subStrA = connectionString.IndexOf ("Database=");
+            int subStrB = connectionString.IndexOf (";", subStrA);
+            string noDatabaseConnector = m_connectionString.Substring (0, subStrA) +
+                                         m_connectionString.Substring (subStrB + 1);
 
-            retry:
-            try
-            {
-                ExecuteNonQuery(noDatabaseConnector, "create schema IF NOT EXISTS " + c.Database,
-                                new Dictionary<string, object>(), false);
-            }
-            catch
-            {
-                MainConsole.Instance.Error(
+        retry:
+            try {
+                ExecuteNonQuery (noDatabaseConnector, "create schema IF NOT EXISTS " + c.Database,
+                                new Dictionary<string, object> (), false);
+            } catch {
+                MainConsole.Instance.Error (
                     "[MySQLDatabase]: We cannot connect to the MySQL instance you have provided. Please make sure it is online, and then press enter to try again.");
-                Console.Read();
+                try {
+                    Console.Read ();
+                } catch {
+                }
                 goto retry;
             }
 
@@ -87,7 +86,9 @@ namespace WhiteCore.DataManager.MySQL
         public override void CloseDatabase(DataReaderConnection connection)
         {
             if (connection != null && connection.DataReader != null)
+            {
                 connection.DataReader.Close();
+
             //Interlocked.Decrement (ref m_locked);
             //m_connection.Close();
             //m_connection.Dispose();

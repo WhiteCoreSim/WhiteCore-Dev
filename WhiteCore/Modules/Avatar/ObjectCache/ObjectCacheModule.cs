@@ -28,13 +28,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
 
 
 namespace WhiteCore.Modules.ObjectCache
@@ -43,88 +43,80 @@ namespace WhiteCore.Modules.ObjectCache
     {
         #region Declares
 
-        private readonly Dictionary<UUID, Dictionary<uint, uint>> ObjectCacheAgents =
-            new Dictionary<UUID, Dictionary<uint, uint>>();
+        readonly Dictionary<UUID, Dictionary<uint, uint>> ObjectCacheAgents =
+            new Dictionary<UUID, Dictionary<uint, uint>> ();
 
         protected bool m_Enabled = true;
 
-        private string m_filePath = "ObjectCache/";
-        private IScene m_scene;
+        string m_filePath = "ObjectCache/";
+        IScene m_scene;
 
         #endregion
 
         #region INonSharedRegionModule
 
-        public virtual void Initialise(IConfigSource source)
+        public virtual void Initialise (IConfigSource source)
         {
-            IConfig moduleConfig = source.Configs["ObjectCache"];
-            if (moduleConfig != null)
-            {
-                m_Enabled = moduleConfig.GetString("Module", "") == Name;
-                m_filePath = moduleConfig.GetString("PathToSaveFiles", m_filePath);
+            IConfig moduleConfig = source.Configs ["ObjectCache"];
+            if (moduleConfig != null) {
+                m_Enabled = moduleConfig.GetString ("Module", "") == Name;
+                m_filePath = moduleConfig.GetString ("PathToSaveFiles", m_filePath);
             }
-            if (!Directory.Exists(m_filePath))
-            {
-                try
-                {
-                    Directory.CreateDirectory(m_filePath);
-                }
-                catch (Exception)
-                {
+            if (!Directory.Exists (m_filePath)) {
+                try {
+                    Directory.CreateDirectory (m_filePath);
+                } catch (Exception) {
                 }
             }
             m_Enabled = false;
         }
 
-        public virtual void AddRegion(IScene scene)
+        public virtual void AddRegion (IScene scene)
         {
             if (!m_Enabled)
                 return;
             m_scene = scene;
-            scene.RegisterModuleInterface<IObjectCache>(this);
+            scene.RegisterModuleInterface<IObjectCache> (this);
             scene.EventManager.OnNewClient += OnNewClient;
             scene.EventManager.OnClosingClient += OnClosingClient;
         }
 
-        public virtual void RemoveRegion(IScene scene)
+        public virtual void RemoveRegion (IScene scene)
         {
             if (!m_Enabled)
                 return;
 
-            scene.UnregisterModuleInterface<IObjectCache>(this);
+            scene.UnregisterModuleInterface<IObjectCache> (this);
             scene.EventManager.OnNewClient -= OnNewClient;
             scene.EventManager.OnClosingClient -= OnClosingClient;
         }
 
-        public virtual void RegionLoaded(IScene scene)
+        public virtual void RegionLoaded (IScene scene)
         {
         }
 
-        public virtual void Close()
+        public virtual void Close ()
         {
         }
 
-        public Type ReplaceableInterface
-        {
+        public Type ReplaceableInterface {
             get { return null; }
         }
 
-        public virtual string Name
-        {
+        public virtual string Name {
             get { return "ObjectCacheModule"; }
         }
 
         #region Events
 
-        public void OnNewClient(IClientAPI client)
+        public void OnNewClient (IClientAPI client)
         {
             IScenePresence sp;
-            client.Scene.TryGetScenePresence(client.AgentId, out sp);
+            client.Scene.TryGetScenePresence (client.AgentId, out sp);
             //Create the client's cache
             //This is shared, so all get saved into one file
-            if (sp != null && !sp.IsChildAgent)
-            {
-                Util.FireAndForget(LoadFileOnNewClient, sp.UUID);
+            if (sp != null && !sp.IsChildAgent) {
+                Util.FireAndForget (LoadFileOnNewClient, sp.UUID);
             }
         }
 
@@ -132,24 +124,23 @@ namespace WhiteCore.Modules.ObjectCache
         ///     Load the file for the client async so that we don't lock up the system for too long
         /// </summary>
         /// <param name="o"></param>
-        public void LoadFileOnNewClient(object o)
+        public void LoadFileOnNewClient (object o)
         {
-            UUID agentID = (UUID) o;
-            LoadFromFileForClient(agentID);
+            UUID agentID = (UUID)o;
+            LoadFromFileForClient (agentID);
         }
 
-        public void OnClosingClient(IClientAPI client)
+        public void OnClosingClient (IClientAPI client)
         {
             //Save the cache to the file for the client
             IScenePresence sp;
-            client.Scene.TryGetScenePresence(client.AgentId, out sp);
+            client.Scene.TryGetScenePresence (client.AgentId, out sp);
             //This is shared, so all get saved into one file
             if (sp != null && !sp.IsChildAgent)
-                SaveToFileForClient(client.AgentId);
+                SaveToFileForClient (client.AgentId);
             //Remove the client's cache
-            lock (ObjectCacheAgents)
-            {
-                ObjectCacheAgents.Remove(client.AgentId);
+            lock (ObjectCacheAgents) {
+                ObjectCacheAgents.Remove (client.AgentId);
             }
         }
 
@@ -157,29 +148,24 @@ namespace WhiteCore.Modules.ObjectCache
 
         #region Serialization
 
-        public string SerializeAgentCache(Dictionary<uint, uint> cache)
+        public string SerializeAgentCache (Dictionary<uint, uint> cache)
         {
-            OSDMap cachedMap = new OSDMap();
-            foreach (KeyValuePair<uint, uint> kvp in cache)
-            {
-                cachedMap.Add(kvp.Key.ToString(), OSD.FromUInteger(kvp.Value));
+            OSDMap cachedMap = new OSDMap ();
+            foreach (KeyValuePair<uint, uint> kvp in cache) {
+                cachedMap.Add (kvp.Key.ToString (), OSD.FromUInteger (kvp.Value));
             }
-            return OSDParser.SerializeJsonString(cachedMap);
+            return OSDParser.SerializeJsonString (cachedMap);
         }
 
-        public Dictionary<uint, uint> DeserializeAgentCache(string osdMap)
+        public Dictionary<uint, uint> DeserializeAgentCache (string osdMap)
         {
-            Dictionary<uint, uint> cache = new Dictionary<uint, uint>();
-            try
-            {
-                OSDMap cachedMap = (OSDMap) OSDParser.DeserializeJson(osdMap);
-                foreach (KeyValuePair<string, OSD> kvp in cachedMap)
-                {
-                    cache[uint.Parse(kvp.Key)] = kvp.Value.AsUInteger();
+            Dictionary<uint, uint> cache = new Dictionary<uint, uint> ();
+            try {
+                OSDMap cachedMap = (OSDMap)OSDParser.DeserializeJson (osdMap);
+                foreach (KeyValuePair<string, OSD> kvp in cachedMap) {
+                    cache [uint.Parse (kvp.Key)] = kvp.Value.AsUInteger ();
                 }
-            }
-            catch
-            {
+            } catch {
                 //It has an error, destroy the cache
                 //null will tell the caller that it has errors and needs to be removed
                 cache = null;
@@ -191,57 +177,59 @@ namespace WhiteCore.Modules.ObjectCache
 
         #region Load/Save from file
 
-        public void SaveToFileForClient(UUID AgentID)
+        public void SaveToFileForClient (UUID AgentID)
         {
             Dictionary<uint, uint> cache;
-            lock (ObjectCacheAgents)
-            {
-                if (!ObjectCacheAgents.ContainsKey(AgentID))
+            lock (ObjectCacheAgents) {
+                if (!ObjectCacheAgents.ContainsKey (AgentID))
                     return;
-                cache = new Dictionary<uint, uint>(ObjectCacheAgents[AgentID]);
-                ObjectCacheAgents[AgentID].Clear();
-                ObjectCacheAgents.Remove(AgentID);
+                cache = new Dictionary<uint, uint> (ObjectCacheAgents [AgentID]);
+                ObjectCacheAgents [AgentID].Clear ();
+                ObjectCacheAgents.Remove (AgentID);
             }
-            FileStream stream = new FileStream(m_filePath + AgentID + m_scene.RegionInfo.RegionName + ".oc",
+            FileStream stream = new FileStream (m_filePath + AgentID + m_scene.RegionInfo.RegionName + ".oc",
                                                FileMode.Create);
-            StreamWriter m_streamWriter = new StreamWriter(stream);
-            m_streamWriter.WriteLine(SerializeAgentCache(cache));
-            m_streamWriter.Close();
+            StreamWriter m_streamWriter = new StreamWriter (stream);
+            try {
+                m_streamWriter.WriteLine (SerializeAgentCache (cache));
+            } catch {
+            }
+            m_streamWriter.Close ();
         }
 
-        public void LoadFromFileForClient(UUID AgentID)
+        public void LoadFromFileForClient (UUID AgentID)
         {
-            FileStream stream = new FileStream(m_filePath + AgentID + m_scene.RegionInfo.RegionName + ".oc",
+            FileStream stream = new FileStream (m_filePath + AgentID + m_scene.RegionInfo.RegionName + ".oc",
                                                FileMode.OpenOrCreate);
-            StreamReader m_streamReader = new StreamReader(stream);
-            string file = m_streamReader.ReadToEnd();
-            m_streamReader.Close();
+            StreamReader m_streamReader = new StreamReader (stream);
+            string file = "";
+            try {
+                file = m_streamReader.ReadToEnd ();
+            } catch {
+            }
+            m_streamReader.Close ();
+
             //Read file here
             if (file != "") //New file
             {
-                Dictionary<uint, uint> cache = DeserializeAgentCache(file);
-                if (cache == null)
-                {
+                Dictionary<uint, uint> cache = DeserializeAgentCache (file);
+                if (cache == null) {
                     //Something went wrong, delete the file
-                    try
-                    {
-                        File.Delete(m_filePath + AgentID + m_scene.RegionInfo.RegionName + ".oc");
-                    }
-                    catch
-                    {
+                    try {
+                        File.Delete (m_filePath + AgentID + m_scene.RegionInfo.RegionName + ".oc");
+                    } catch {
                     }
                     return;
                 }
-                lock (ObjectCacheAgents)
-                {
-                    ObjectCacheAgents[AgentID] = cache;
+                lock (ObjectCacheAgents) {
+                    ObjectCacheAgents [AgentID] = cache;
                 }
             }
         }
 
         #endregion
 
-        public virtual void PostInitialise()
+        public virtual void PostInitialise ()
         {
         }
 
@@ -256,17 +244,13 @@ namespace WhiteCore.Modules.ObjectCache
         /// <param name="localID"></param>
         /// <param name="CurrentEntityCRC"></param>
         /// <returns></returns>
-        public bool UseCachedObject(UUID AgentID, uint localID, uint CurrentEntityCRC)
+        public bool UseCachedObject (UUID AgentID, uint localID, uint CurrentEntityCRC)
         {
-            lock (ObjectCacheAgents)
-            {
-                if (ObjectCacheAgents.ContainsKey(AgentID))
-                {
+            lock (ObjectCacheAgents) {
+                if (ObjectCacheAgents.ContainsKey (AgentID)) {
                     uint CurrentCachedCRC = 0;
-                    if (ObjectCacheAgents[AgentID].TryGetValue(localID, out CurrentCachedCRC))
-                    {
-                        if (CurrentEntityCRC == CurrentCachedCRC)
-                        {
+                    if (ObjectCacheAgents [AgentID].TryGetValue (localID, out CurrentCachedCRC)) {
+                        if (CurrentEntityCRC == CurrentCachedCRC) {
                             //The client knows of the newest version
                             return true;
                         }
@@ -276,22 +260,20 @@ namespace WhiteCore.Modules.ObjectCache
             }
         }
 
-        public void AddCachedObject(UUID AgentID, uint localID, uint CRC)
+        public void AddCachedObject (UUID AgentID, uint localID, uint CRC)
         {
-            lock (ObjectCacheAgents)
-            {
-                if (!ObjectCacheAgents.ContainsKey(AgentID))
-                    ObjectCacheAgents[AgentID] = new Dictionary<uint, uint>();
-                ObjectCacheAgents[AgentID][localID] = CRC;
+            lock (ObjectCacheAgents) {
+                if (!ObjectCacheAgents.ContainsKey (AgentID))
+                    ObjectCacheAgents [AgentID] = new Dictionary<uint, uint> ();
+                ObjectCacheAgents [AgentID] [localID] = CRC;
             }
         }
 
-        public void RemoveObject(UUID AgentID, uint localID, byte cacheMissType)
+        public void RemoveObject (UUID AgentID, uint localID, byte cacheMissType)
         {
-            lock (ObjectCacheAgents)
-            {
-                if (ObjectCacheAgents.ContainsKey(AgentID))
-                    ObjectCacheAgents[AgentID].Remove(localID);
+            lock (ObjectCacheAgents) {
+                if (ObjectCacheAgents.ContainsKey (AgentID))
+                    ObjectCacheAgents [AgentID].Remove (localID);
             }
         }
 

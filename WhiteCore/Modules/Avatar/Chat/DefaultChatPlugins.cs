@@ -49,52 +49,44 @@ namespace WhiteCore.Modules.Chat
     {
         #region IChatPlugin Members
 
-        public void Initialize(IChatModule module)
+        public void Initialize (IChatModule module)
         {
-            module.RegisterChatPlugin("calc", this);
+            module.RegisterChatPlugin ("calc", this);
         }
 
-        public bool OnNewChatMessageFromWorld(OSChatMessage c, out OSChatMessage newc)
+        public bool OnNewChatMessageFromWorld (OSChatMessage c, out OSChatMessage newc)
         {
-            string[] operators = c.Message.Split(' ');
-            if (operators[0] == "calc.Add")
-            {
-                if (operators.Length == 3)
-                {
-                    float Num1 = float.Parse(operators[1]);
-                    float Num2 = float.Parse(operators[2]);
+            string [] operators = c.Message.Split (' ');
+            if (operators [0] == "calc.Add") {
+                if (operators.Length == 3) {
+                    float Num1 = float.Parse (operators [1]);
+                    float Num2 = float.Parse (operators [2]);
                     float RetVal = Num1 + Num2;
-                    BuildAndSendResult(RetVal, c.Scene, c.Position);
+                    BuildAndSendResult (RetVal, c.Scene, c.Position);
                 }
             }
-            if (operators[0] == "calc.Subtract")
-            {
-                if (operators.Length == 3)
-                {
-                    float Num1 = float.Parse(operators[1]);
-                    float Num2 = float.Parse(operators[2]);
+            if (operators [0] == "calc.Subtract") {
+                if (operators.Length == 3) {
+                    float Num1 = float.Parse (operators [1]);
+                    float Num2 = float.Parse (operators [2]);
                     float RetVal = Num1 - Num2;
-                    BuildAndSendResult(RetVal, c.Scene, c.Position);
+                    BuildAndSendResult (RetVal, c.Scene, c.Position);
                 }
             }
-            if (operators[0] == "calc.Multiply")
-            {
-                if (operators.Length == 3)
-                {
-                    float Num1 = float.Parse(operators[1]);
-                    float Num2 = float.Parse(operators[2]);
-                    float RetVal = Num1*Num2;
-                    BuildAndSendResult(RetVal, c.Scene, c.Position);
+            if (operators [0] == "calc.Multiply") {
+                if (operators.Length == 3) {
+                    float Num1 = float.Parse (operators [1]);
+                    float Num2 = float.Parse (operators [2]);
+                    float RetVal = Num1 * Num2;
+                    BuildAndSendResult (RetVal, c.Scene, c.Position);
                 }
             }
-            if (operators[0] == "calc.Divide")
-            {
-                if (operators.Length == 3)
-                {
-                    float Num1 = float.Parse(operators[1]);
-                    float Num2 = float.Parse(operators[2]);
-                    float RetVal = Num1/Num2;
-                    BuildAndSendResult(RetVal, c.Scene, c.Position);
+            if (operators [0] == "calc.Divide") {
+                if (operators.Length == 3) {
+                    float Num1 = float.Parse (operators [1]);
+                    float Num2 = float.Parse (operators [2]);
+                    float RetVal = Num1 / Num2;
+                    BuildAndSendResult (RetVal, c.Scene, c.Position);
                 }
             }
             newc = c;
@@ -102,16 +94,15 @@ namespace WhiteCore.Modules.Chat
             return true;
         }
 
-        public void OnNewClient(IClientAPI client)
+        public void OnNewClient (IClientAPI client)
         {
         }
 
-        public void OnClosingClient(UUID clientID, IScene scene)
+        public void OnClosingClient (UUID clientID, IScene scene)
         {
         }
 
-        public string Name
-        {
+        public string Name {
             get { return "CalcChatPlugin"; }
         }
 
@@ -123,7 +114,7 @@ namespace WhiteCore.Modules.Chat
         /// <param name="result"></param>
         /// <param name="scene"></param>
         /// <param name="position"></param>
-        static void BuildAndSendResult(float result, IScene scene, Vector3 position)
+        static void BuildAndSendResult (float result, IScene scene, Vector3 position)
         {
             var message = new OSChatMessage {
                 From = "Server",
@@ -135,10 +126,10 @@ namespace WhiteCore.Modules.Chat
                 SenderUUID = UUID.Zero,
                 Scene = scene
             };
-            scene.EventManager.TriggerOnChatBroadcast(null, message);
+            scene.EventManager.TriggerOnChatBroadcast (null, message);
         }
 
-        public void Dispose()
+        public void Dispose ()
         {
         }
     }
@@ -148,8 +139,8 @@ namespace WhiteCore.Modules.Chat
     /// </summary>
     public class AdminChatPlugin : IChatPlugin
     {
-        readonly List<UUID> m_authList = new List<UUID>();
-        readonly List<UUID> m_authorizedSpeakers = new List<UUID>();
+        readonly List<UUID> m_authList = new List<UUID> ();
+        readonly List<UUID> m_authorizedSpeakers = new List<UUID> ();
         IChatModule chatModule;
         bool m_announceClosedAgents;
         bool m_announceNewAgents;
@@ -160,31 +151,30 @@ namespace WhiteCore.Modules.Chat
         bool m_useWelcomeMessage;
         string m_welcomeMessage;
 
-        public string WelcomeMessage
-        {
+        public string WelcomeMessage {
             get { return m_welcomeMessage; }
             set { m_welcomeMessage = value; }
         }
 
         #region IChatPlugin Members
 
-        public void Initialize(IChatModule module)
+        public void Initialize (IChatModule module)
         {
             //Show gods in chat by adding the godPrefix to their name
-            m_indicategod = module.Config.GetBoolean("indicate_god", true);
-            m_godPrefix = module.Config.GetString("godPrefix", "");
+            m_indicategod = module.Config.GetBoolean ("indicate_god", true);
+            m_godPrefix = module.Config.GetString ("godPrefix", "");
 
             //Send incoming users a message
-            m_useWelcomeMessage = module.Config.GetBoolean("useWelcomeMessage", true);
-            m_welcomeMessage = module.Config.GetString("welcomeMessage", "");
+            m_useWelcomeMessage = module.Config.GetBoolean ("useWelcomeMessage", true);
+            m_welcomeMessage = module.Config.GetString ("welcomeMessage", "");
 
             //Tell all users about an incoming or outgoing agent
-            m_announceNewAgents = module.Config.GetBoolean("announceNewAgents", true);
-            m_announceClosedAgents = module.Config.GetBoolean("announceClosingAgents", true);
-            m_useAuth = module.Config.GetBoolean("use_Auth", true);
+            m_announceNewAgents = module.Config.GetBoolean ("announceNewAgents", true);
+            m_announceClosedAgents = module.Config.GetBoolean ("announceClosingAgents", true);
+            m_useAuth = module.Config.GetBoolean ("use_Auth", true);
             chatModule = module;
-            module.RegisterChatPlugin("Chat", this);
-            module.RegisterChatPlugin("all", this);
+            module.RegisterChatPlugin ("Chat", this);
+            module.RegisterChatPlugin ("all", this);
 
             // load web settings overrides (if any)
             //IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
@@ -196,17 +186,14 @@ namespace WhiteCore.Modules.Chat
             //}
         }
 
-        public bool OnNewChatMessageFromWorld(OSChatMessage c, out OSChatMessage newc)
+        public bool OnNewChatMessageFromWorld (OSChatMessage c, out OSChatMessage newc)
         {
             bool isGod = false;
-            IScenePresence sP = c.Scene.GetScenePresence(c.SenderUUID);
-            if (sP != null)
-            {
-                if (!sP.IsChildAgent)
-                {
+            IScenePresence sP = c.Scene.GetScenePresence (c.SenderUUID);
+            if (sP != null) {
+                if (!sP.IsChildAgent) {
                     // Check if the sender is a 'god...'
-                    if (sP.GodLevel != 0)
-                    {
+                    if (sP.GodLevel != 0) {
                         isGod = true;
 
                         // add to authorized users
@@ -218,8 +205,7 @@ namespace WhiteCore.Modules.Chat
                     }
 
                     //Check that the agent is allowed to speak in this region
-                    if (!m_authorizedSpeakers.Contains(c.SenderUUID))
-                    {
+                    if (!m_authorizedSpeakers.Contains (c.SenderUUID)) {
                         //They can't talk, so block it
                         newc = c;
                         return false;
@@ -227,88 +213,77 @@ namespace WhiteCore.Modules.Chat
                 }
             }
 
-            if (c.Message.Contains("Chat."))
-            {
-                if (!m_useAuth || m_authList.Contains(c.SenderUUID))
-                {
+            if (c.Message.Contains ("Chat.")) {
+                if (!m_useAuth || m_authList.Contains (c.SenderUUID)) {
                     IScenePresence senderSP;
-                    c.Scene.TryGetScenePresence(c.SenderUUID, out senderSP);
-                    string[] message = c.Message.Split('.');
-                    if (message[1] == "SayDistance")
-                    {
-                        chatModule.SayDistance = Convert.ToInt32(message[2]);
-                        chatModule.TrySendChatMessage(senderSP, c.Position,
+                    c.Scene.TryGetScenePresence (c.SenderUUID, out senderSP);
+                    string [] message = c.Message.Split ('.');
+                    if (message [1] == "SayDistance") {
+                        chatModule.SayDistance = Convert.ToInt32 (message [2]);
+                        chatModule.TrySendChatMessage (senderSP, c.Position,
                                                       UUID.Zero, "WhiteCoreChat", ChatTypeEnum.Region,
-                                                      message[1] + " changed.", ChatSourceType.System, -1);
+                                                      message [1] + " changed.", ChatSourceType.System, -1);
                     }
-                    if (message[1] == "WhisperDistance")
-                    {
-                        chatModule.WhisperDistance = Convert.ToInt32(message[2]);
-                        chatModule.TrySendChatMessage(senderSP, c.Position,
+                    if (message [1] == "WhisperDistance") {
+                        chatModule.WhisperDistance = Convert.ToInt32 (message [2]);
+                        chatModule.TrySendChatMessage (senderSP, c.Position,
                                                       UUID.Zero, "WhiteCoreChat", ChatTypeEnum.Region,
-                                                      message[1] + " changed.", ChatSourceType.System, -1);
+                                                      message [1] + " changed.", ChatSourceType.System, -1);
                     }
-                    if (message[1] == "ShoutDistance")
-                    {
-                        chatModule.ShoutDistance = Convert.ToInt32(message[2]);
-                        chatModule.TrySendChatMessage(senderSP, c.Position,
+                    if (message [1] == "ShoutDistance") {
+                        chatModule.ShoutDistance = Convert.ToInt32 (message [2]);
+                        chatModule.TrySendChatMessage (senderSP, c.Position,
                                                       UUID.Zero, "WhiteCoreChat", ChatTypeEnum.Region,
-                                                      message[1] + " changed.", ChatSourceType.System, -1);
+                                                      message [1] + " changed.", ChatSourceType.System, -1);
                     }
                     //Add the user to the list of allowed speakers and 'chat' admins
-                    if (message[1] == "AddToAuth")
-                    {
+                    if (message [1] == "AddToAuth") {
                         IScenePresence NewSP;
-                        c.Scene.TryGetAvatarByName(message[2], out NewSP);
-                        m_authList.Add(NewSP.UUID);
-                        chatModule.TrySendChatMessage(senderSP, c.Position,
+                        c.Scene.TryGetAvatarByName (message [2], out NewSP);
+                        m_authList.Add (NewSP.UUID);
+                        chatModule.TrySendChatMessage (senderSP, c.Position,
                                                       UUID.Zero, "WhiteCoreChat", ChatTypeEnum.Region,
-                                                      message[2] + " added.", ChatSourceType.System, -1);
+                                                      message [2] + " added.", ChatSourceType.System, -1);
                     }
-                    if (message[1] == "RemoveFromAuth")
-                    {
+                    if (message [1] == "RemoveFromAuth") {
                         IScenePresence NewSP;
-                        c.Scene.TryGetAvatarByName(message[2], out NewSP);
-                        m_authList.Remove(NewSP.UUID);
-                        chatModule.TrySendChatMessage(senderSP, c.Position,
+                        c.Scene.TryGetAvatarByName (message [2], out NewSP);
+                        m_authList.Remove (NewSP.UUID);
+                        chatModule.TrySendChatMessage (senderSP, c.Position,
                                                       UUID.Zero, "WhiteCoreChat", ChatTypeEnum.Region,
-                                                      message[2] + " added.", ChatSourceType.System, -1);
+                                                      message [2] + " added.", ChatSourceType.System, -1);
                     }
                     //Block chat from those not in the auth list
-                    if (message[1] == "BlockChat")
-                    {
+                    if (message [1] == "BlockChat") {
                         m_blockChat = true;
-                        chatModule.TrySendChatMessage(senderSP, c.Position,
+                        chatModule.TrySendChatMessage (senderSP, c.Position,
                                                       UUID.Zero, "WhiteCoreChat", ChatTypeEnum.Region, "Chat blocked.",
                                                       ChatSourceType.System, -1);
                     }
                     //Allow chat from all again
-                    if (message[1] == "AllowChat")
-                    {
+                    if (message [1] == "AllowChat") {
                         m_blockChat = false;
-                        chatModule.TrySendChatMessage(senderSP, c.Position,
+                        chatModule.TrySendChatMessage (senderSP, c.Position,
                                                       UUID.Zero, "WhiteCoreChat", ChatTypeEnum.Region, "Chat allowed.",
                                                       ChatSourceType.System, -1);
                     }
                     //Remove speaking privileges from an individual
-                    if (message[1] == "RevokeSpeakingRights")
-                    {
+                    if (message [1] == "RevokeSpeakingRights") {
                         IScenePresence NewSP;
-                        c.Scene.TryGetAvatarByName(message[2], out NewSP);
-                        m_authorizedSpeakers.Remove(NewSP.UUID);
-                        chatModule.TrySendChatMessage(senderSP, c.Position,
+                        c.Scene.TryGetAvatarByName (message [2], out NewSP);
+                        m_authorizedSpeakers.Remove (NewSP.UUID);
+                        chatModule.TrySendChatMessage (senderSP, c.Position,
                                                       UUID.Zero, "WhiteCoreChat", ChatTypeEnum.Region,
-                                                      message[2] + " - revoked.", ChatSourceType.System, -1);
+                                                      message [2] + " - revoked.", ChatSourceType.System, -1);
                     }
                     //Allow an individual to speak again
-                    if (message[1] == "GiveSpeakingRights")
-                    {
+                    if (message [1] == "GiveSpeakingRights") {
                         IScenePresence NewSP;
-                        c.Scene.TryGetAvatarByName(message[2], out NewSP);
-                        m_authorizedSpeakers.Add(NewSP.UUID);
-                        chatModule.TrySendChatMessage(senderSP, c.Position,
+                        c.Scene.TryGetAvatarByName (message [2], out NewSP);
+                        m_authorizedSpeakers.Add (NewSP.UUID);
+                        chatModule.TrySendChatMessage (senderSP, c.Position,
                                                       UUID.Zero, "WhiteCoreChat", ChatTypeEnum.Region,
-                                                      message[2] + " - revoked.", ChatSourceType.System, -1);
+                                                      message [2] + " - revoked.", ChatSourceType.System, -1);
                     }
                 }
 
@@ -317,8 +292,7 @@ namespace WhiteCore.Modules.Chat
                 return false;
             }
 
-            if (sP != null)
-            {
+            if (sP != null) {
                 //Add the god prefix
                 if (isGod && m_indicategod)
                     c.Message = m_godPrefix + c.Message;
@@ -328,104 +302,91 @@ namespace WhiteCore.Modules.Chat
             return true;
         }
 
-        public void OnNewClient(IClientAPI client)
+        public void OnNewClient (IClientAPI client)
         {
-            IScenePresence SP = client.Scene.GetScenePresence(client.AgentId);
+            IScenePresence SP = client.Scene.GetScenePresence (client.AgentId);
             //If chat is not blocked for now, add to the not blocked list
-            if (!m_blockChat)
-            {
-                if (!m_authorizedSpeakers.Contains(client.AgentId))
-                    m_authorizedSpeakers.Add(client.AgentId);
+            if (!m_blockChat) {
+                if (!m_authorizedSpeakers.Contains (client.AgentId))
+                    m_authorizedSpeakers.Add (client.AgentId);
             }
-            if (!SP.IsChildAgent)
-            {
+            if (!SP.IsChildAgent) {
                 //Tell all the clients about the incoming client if it is enabled
-                if (m_announceNewAgents)
-                {
-                    client.Scene.ForEachScenePresence (delegate(IScenePresence presence)
-                        {
-                            if (presence.UUID != client.AgentId && !presence.IsChildAgent)
-                            {
-                                IEntityCountModule entityCountModule = client.Scene.RequestModuleInterface<IEntityCountModule> ();
-                                if (entityCountModule != null)
-                                    presence.ControllingClient.SendChatMessage (
-                                        client.Name + " has joined the region. Total Agents: " + (entityCountModule.RootAgents + 1),
-                                        1,
-                                        SP.AbsolutePosition,
-                                        "System",
-                                        UUID.Zero,
-                                        (byte)ChatSourceType.System,
-                                        (byte)ChatAudibleLevel.Fully
-                                    );
-                            }
+                if (m_announceNewAgents) {
+                    client.Scene.ForEachScenePresence (delegate (IScenePresence presence) {
+                        if (presence.UUID != client.AgentId && !presence.IsChildAgent) {
+                            IEntityCountModule entityCountModule = client.Scene.RequestModuleInterface<IEntityCountModule> ();
+                            if (entityCountModule != null)
+                                presence.ControllingClient.SendChatMessage (
+                                    client.Name + " has joined the region. Total Agents: " + (entityCountModule.RootAgents + 1),
+                                    1,
+                                    SP.AbsolutePosition,
+                                    "System",
+                                    UUID.Zero,
+                                    (byte)ChatSourceType.System,
+                                    (byte)ChatAudibleLevel.Fully
+                                );
                         }
+                    }
                     );
                 }
 
                 //Send the new user a welcome message
-                if (m_useWelcomeMessage)
-                {
-                    if (m_welcomeMessage != "")
-                    {
-                        client.SendChatMessage(
+                if (m_useWelcomeMessage) {
+                    if (m_welcomeMessage != "") {
+                        client.SendChatMessage (
                             m_welcomeMessage,
                             1, SP.AbsolutePosition,
                             "System",
                             UUID.Zero,
-                            (byte) ChatSourceType.System,
-                            (byte) ChatAudibleLevel.Fully
+                            (byte)ChatSourceType.System,
+                            (byte)ChatAudibleLevel.Fully
                         );
                     }
                 }
             }
         }
 
-        public void OnClosingClient(UUID clientID, IScene scene)
+        public void OnClosingClient (UUID clientID, IScene scene)
         {
-            IScenePresence client = scene.GetScenePresence(clientID);
-            if (client != null && !client.IsChildAgent)
-            {
+            IScenePresence client = scene.GetScenePresence (clientID);
+            if (client != null && !client.IsChildAgent) {
                 //Clear out the auth speakers list
-                lock (m_authorizedSpeakers)
-                {
-                    if (m_authorizedSpeakers.Contains(clientID))
-                        m_authorizedSpeakers.Remove(clientID);
+                lock (m_authorizedSpeakers) {
+                    if (m_authorizedSpeakers.Contains (clientID))
+                        m_authorizedSpeakers.Remove (clientID);
                 }
 
-                IScenePresence presence = scene.GetScenePresence(clientID);
+                IScenePresence presence = scene.GetScenePresence (clientID);
                 //Announce the closing agent if enabled
-                if (m_announceClosedAgents)
-                {
-                    scene.ForEachScenePresence(delegate(IScenePresence sP)
-                        {
-                            if (sP.UUID != clientID && !sP.IsChildAgent)
-                            {
-                                IEntityCountModule entityCountModule = scene.RequestModuleInterface<IEntityCountModule>();
-                                if (entityCountModule != null)
-                                    sP.ControllingClient.SendChatMessage(
-                                        presence.Name + " has left the region. Total Agents: " + (entityCountModule.RootAgents - 1),
-                                        1,
-                                        sP.AbsolutePosition,
-                                        "System",
-                                        UUID.Zero,
-                                        (byte) ChatSourceType.System,
-                                        (byte) ChatAudibleLevel.Fully
-                                    );
-                            }
+                if (m_announceClosedAgents) {
+                    scene.ForEachScenePresence (delegate (IScenePresence sP) {
+                        if (sP.UUID != clientID && !sP.IsChildAgent) {
+                            IEntityCountModule entityCountModule = scene.RequestModuleInterface<IEntityCountModule> ();
+                            if (entityCountModule != null)
+                                sP.ControllingClient.SendChatMessage (
+                                    presence.Name + " has left the region. Total Agents: " + (entityCountModule.RootAgents - 1),
+                                    1,
+                                    sP.AbsolutePosition,
+                                    "System",
+                                    UUID.Zero,
+                                    (byte)ChatSourceType.System,
+                                    (byte)ChatAudibleLevel.Fully
+                                );
                         }
+                    }
                     );
                 }
             }
         }
 
-        public string Name
-        {
+        public string Name {
             get { return "AdminChatPlugin"; }
         }
 
         #endregion
 
-        public void Dispose()
+        public void Dispose ()
         {
         }
     }

@@ -28,9 +28,9 @@
 using System.IO;
 using System.Text;
 using System.Xml;
+using OpenMetaverse;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Utilities;
-using OpenMetaverse;
 
 namespace WhiteCore.Framework.Serialization.External
 {
@@ -39,7 +39,7 @@ namespace WhiteCore.Framework.Serialization.External
     /// </summary>
     public class RegionSettingsSerializer
     {
-        protected static ASCIIEncoding m_asciiEncoding = new ASCIIEncoding();
+        protected static ASCIIEncoding m_asciiEncoding = new ASCIIEncoding ();
 
         /// <summary>
         ///     Deserialize settings
@@ -47,9 +47,9 @@ namespace WhiteCore.Framework.Serialization.External
         /// <param name="serializedSettings"></param>
         /// <returns></returns>
         /// <exception cref="System.Xml.XmlException"></exception>
-        public static RegionSettings Deserialize(byte[] serializedSettings, UUID RegionID)
+        public static RegionSettings Deserialize (byte [] serializedSettings, UUID RegionID)
         {
-            return Deserialize(m_asciiEncoding.GetString(serializedSettings, 0, serializedSettings.Length), RegionID);
+            return Deserialize (m_asciiEncoding.GetString (serializedSettings, 0, serializedSettings.Length), RegionID);
         }
 
         /// <summary>
@@ -58,149 +58,139 @@ namespace WhiteCore.Framework.Serialization.External
         /// <param name="serializedSettings"></param>
         /// <returns></returns>
         /// <exception cref="System.Xml.XmlException"></exception>
-        public static RegionSettings Deserialize(string serializedSettings, UUID RegionID)
+        public static RegionSettings Deserialize (string serializedSettings, UUID RegionID)
         {
-            RegionSettings settings = new RegionSettings();
+            RegionSettings settings = new RegionSettings ();
 
-            StringReader sr = new StringReader(serializedSettings);
-            XmlTextReader xtr = new XmlTextReader(sr);
+            StringReader sr = new StringReader (serializedSettings);
+            XmlTextReader xtr = new XmlTextReader (sr);
 
-            xtr.ReadStartElement("RegionSettings");
+            xtr.ReadStartElement ("RegionSettings");
 
-            xtr.ReadStartElement("General");
+            xtr.ReadStartElement ("General");
 
-            while (xtr.Read() && xtr.NodeType != XmlNodeType.EndElement)
-            {
-                switch (xtr.Name)
-                {
-                    case "AllowDamage":
-                        settings.AllowDamage = bool.Parse(xtr.ReadElementContentAsString());
-                        break;
-                    case "AllowLandResell":
-                        settings.AllowLandResell = bool.Parse(xtr.ReadElementContentAsString());
-                        break;
-                    case "AllowLandJoinDivide":
-                        settings.AllowLandJoinDivide = bool.Parse(xtr.ReadElementContentAsString());
-                        break;
-                    case "BlockFly":
-                        settings.BlockFly = bool.Parse(xtr.ReadElementContentAsString());
-                        break;
-                    case "BlockLandShowInSearch":
-                        settings.BlockShowInSearch = bool.Parse(xtr.ReadElementContentAsString());
-                        break;
-                    case "BlockTerraform":
-                        settings.BlockTerraform = bool.Parse(xtr.ReadElementContentAsString());
-                        break;
-                    case "DisableCollisions":
-                        settings.DisableCollisions = bool.Parse(xtr.ReadElementContentAsString());
-                        break;
-                    case "DisablePhysics":
-                        settings.DisablePhysics = bool.Parse(xtr.ReadElementContentAsString());
-                        break;
-                    case "DisableScripts":
-                        settings.DisableScripts = bool.Parse(xtr.ReadElementContentAsString());
-                        break;
-                    case "MaturityRating":
-                        settings.Maturity = int.Parse(xtr.ReadElementContentAsString());
-                        break;
-                    case "RestrictPushing":
-                        settings.RestrictPushing = bool.Parse(xtr.ReadElementContentAsString());
-                        break;
-                    case "AgentLimit":
-                        settings.AgentLimit = int.Parse(xtr.ReadElementContentAsString());
-                        break;
-                    case "ObjectBonus":
-                        settings.ObjectBonus = double.Parse(xtr.ReadElementContentAsString(), Culture.NumberFormatInfo);
-                        break;
+            while (xtr.Read () && xtr.NodeType != XmlNodeType.EndElement) {
+                switch (xtr.Name) {
+                case "AllowDamage":
+                    settings.AllowDamage = bool.Parse (xtr.ReadElementContentAsString ());
+                    break;
+                case "AllowLandResell":
+                    settings.AllowLandResell = bool.Parse (xtr.ReadElementContentAsString ());
+                    break;
+                case "AllowLandJoinDivide":
+                    settings.AllowLandJoinDivide = bool.Parse (xtr.ReadElementContentAsString ());
+                    break;
+                case "BlockFly":
+                    settings.BlockFly = bool.Parse (xtr.ReadElementContentAsString ());
+                    break;
+                case "BlockLandShowInSearch":
+                    settings.BlockShowInSearch = bool.Parse (xtr.ReadElementContentAsString ());
+                    break;
+                case "BlockTerraform":
+                    settings.BlockTerraform = bool.Parse (xtr.ReadElementContentAsString ());
+                    break;
+                case "DisableCollisions":
+                    settings.DisableCollisions = bool.Parse (xtr.ReadElementContentAsString ());
+                    break;
+                case "DisablePhysics":
+                    settings.DisablePhysics = bool.Parse (xtr.ReadElementContentAsString ());
+                    break;
+                case "DisableScripts":
+                    settings.DisableScripts = bool.Parse (xtr.ReadElementContentAsString ());
+                    break;
+                case "MaturityRating":
+                    settings.Maturity = int.Parse (xtr.ReadElementContentAsString ());
+                    break;
+                case "RestrictPushing":
+                    settings.RestrictPushing = bool.Parse (xtr.ReadElementContentAsString ());
+                    break;
+                case "AgentLimit":
+                    settings.AgentLimit = int.Parse (xtr.ReadElementContentAsString ());
+                    break;
+                case "ObjectBonus":
+                    settings.ObjectBonus = double.Parse (xtr.ReadElementContentAsString (), Culture.NumberFormatInfo);
+                    break;
                 }
             }
 
-            xtr.ReadEndElement();
-            xtr.ReadStartElement("GroundTextures");
+            xtr.ReadEndElement ();
+            xtr.ReadStartElement ("GroundTextures");
 
-            while (xtr.Read() && xtr.NodeType != XmlNodeType.EndElement)
-            {
-                switch (xtr.Name)
-                {
-                    case "Texture1":
-                        settings.TerrainTexture1 = UUID.Parse(xtr.ReadElementContentAsString());
-                        break;
-                    case "Texture2":
-                        settings.TerrainTexture2 = UUID.Parse(xtr.ReadElementContentAsString());
-                        break;
-                    case "Texture3":
-                        settings.TerrainTexture3 = UUID.Parse(xtr.ReadElementContentAsString());
-                        break;
-                    case "Texture4":
-                        settings.TerrainTexture4 = UUID.Parse(xtr.ReadElementContentAsString());
-                        break;
-                    case "ElevationLowSW":
-                        settings.Elevation1SW = double.Parse(xtr.ReadElementContentAsString(), Culture.NumberFormatInfo);
-                        break;
-                    case "ElevationLowNW":
-                        settings.Elevation1NW = double.Parse(xtr.ReadElementContentAsString(), Culture.NumberFormatInfo);
-                        break;
-                    case "ElevationLowSE":
-                        settings.Elevation1SE = double.Parse(xtr.ReadElementContentAsString(), Culture.NumberFormatInfo);
-                        break;
-                    case "ElevationLowNE":
-                        settings.Elevation1NE = double.Parse(xtr.ReadElementContentAsString(), Culture.NumberFormatInfo);
-                        break;
-                    case "ElevationHighSW":
-                        settings.Elevation2SW = double.Parse(xtr.ReadElementContentAsString(), Culture.NumberFormatInfo);
-                        break;
-                    case "ElevationHighNW":
-                        settings.Elevation2NW = double.Parse(xtr.ReadElementContentAsString(), Culture.NumberFormatInfo);
-                        break;
-                    case "ElevationHighSE":
-                        settings.Elevation2SE = double.Parse(xtr.ReadElementContentAsString(), Culture.NumberFormatInfo);
-                        break;
-                    case "ElevationHighNE":
-                        settings.Elevation2NE = double.Parse(xtr.ReadElementContentAsString(), Culture.NumberFormatInfo);
-                        break;
+            while (xtr.Read () && xtr.NodeType != XmlNodeType.EndElement) {
+                switch (xtr.Name) {
+                case "Texture1":
+                    settings.TerrainTexture1 = UUID.Parse (xtr.ReadElementContentAsString ());
+                    break;
+                case "Texture2":
+                    settings.TerrainTexture2 = UUID.Parse (xtr.ReadElementContentAsString ());
+                    break;
+                case "Texture3":
+                    settings.TerrainTexture3 = UUID.Parse (xtr.ReadElementContentAsString ());
+                    break;
+                case "Texture4":
+                    settings.TerrainTexture4 = UUID.Parse (xtr.ReadElementContentAsString ());
+                    break;
+                case "ElevationLowSW":
+                    settings.Elevation1SW = double.Parse (xtr.ReadElementContentAsString (), Culture.NumberFormatInfo);
+                    break;
+                case "ElevationLowNW":
+                    settings.Elevation1NW = double.Parse (xtr.ReadElementContentAsString (), Culture.NumberFormatInfo);
+                    break;
+                case "ElevationLowSE":
+                    settings.Elevation1SE = double.Parse (xtr.ReadElementContentAsString (), Culture.NumberFormatInfo);
+                    break;
+                case "ElevationLowNE":
+                    settings.Elevation1NE = double.Parse (xtr.ReadElementContentAsString (), Culture.NumberFormatInfo);
+                    break;
+                case "ElevationHighSW":
+                    settings.Elevation2SW = double.Parse (xtr.ReadElementContentAsString (), Culture.NumberFormatInfo);
+                    break;
+                case "ElevationHighNW":
+                    settings.Elevation2NW = double.Parse (xtr.ReadElementContentAsString (), Culture.NumberFormatInfo);
+                    break;
+                case "ElevationHighSE":
+                    settings.Elevation2SE = double.Parse (xtr.ReadElementContentAsString (), Culture.NumberFormatInfo);
+                    break;
+                case "ElevationHighNE":
+                    settings.Elevation2NE = double.Parse (xtr.ReadElementContentAsString (), Culture.NumberFormatInfo);
+                    break;
                 }
             }
 
-            xtr.ReadEndElement();
-            xtr.ReadStartElement("Terrain");
+            xtr.ReadEndElement ();
+            xtr.ReadStartElement ("Terrain");
 
-            while (xtr.Read() && xtr.NodeType != XmlNodeType.EndElement)
-            {
-                switch (xtr.Name)
-                {
-                    case "WaterHeight":
-                        settings.WaterHeight = double.Parse(xtr.ReadElementContentAsString(), Culture.NumberFormatInfo);
-                        break;
-                    case "TerrainRaiseLimit":
-                        settings.TerrainRaiseLimit = double.Parse(xtr.ReadElementContentAsString(),
-                                                                  Culture.NumberFormatInfo);
-                        break;
-                    case "TerrainLowerLimit":
-                        settings.TerrainLowerLimit = double.Parse(xtr.ReadElementContentAsString(),
-                                                                  Culture.NumberFormatInfo);
-                        break;
-                    case "UseEstateSun":
-                        settings.UseEstateSun = bool.Parse(xtr.ReadElementContentAsString());
-                        break;
-                    case "FixedSun":
-                        settings.FixedSun = bool.Parse(xtr.ReadElementContentAsString());
-                        break;
+            while (xtr.Read () && xtr.NodeType != XmlNodeType.EndElement) {
+                switch (xtr.Name) {
+                case "WaterHeight":
+                    settings.WaterHeight = double.Parse (xtr.ReadElementContentAsString (), Culture.NumberFormatInfo);
+                    break;
+                case "TerrainRaiseLimit":
+                    settings.TerrainRaiseLimit = double.Parse (xtr.ReadElementContentAsString (),
+                                                              Culture.NumberFormatInfo);
+                    break;
+                case "TerrainLowerLimit":
+                    settings.TerrainLowerLimit = double.Parse (xtr.ReadElementContentAsString (),
+                                                              Culture.NumberFormatInfo);
+                    break;
+                case "UseEstateSun":
+                    settings.UseEstateSun = bool.Parse (xtr.ReadElementContentAsString ());
+                    break;
+                case "FixedSun":
+                    settings.FixedSun = bool.Parse (xtr.ReadElementContentAsString ());
+                    break;
                 }
             }
 
-            xtr.ReadEndElement();
+            xtr.ReadEndElement ();
 
             //  OAR 0.8 format addition, may not be present in older files
-            if (xtr.IsStartElement("Telehub"))
-            {
-                xtr.ReadStartElement("Telehub");
+            if (xtr.IsStartElement ("Telehub")) {
+                xtr.ReadStartElement ("Telehub");
 
-                while (xtr.Read () && xtr.NodeType != XmlNodeType.EndElement)
-                {
-                    switch (xtr.Name)
-                    {
-                    case "TelehubObject":
-                        {
+                while (xtr.Read () && xtr.NodeType != XmlNodeType.EndElement) {
+                    switch (xtr.Name) {
+                    case "TelehubObject": {
                             settings.TeleHub.RegionID = RegionID;
                             settings.TeleHub.ObjectUUID = UUID.Parse (xtr.ReadElementContentAsString ());
                             break;
@@ -215,7 +205,7 @@ namespace WhiteCore.Framework.Serialization.External
                     //    settings.AddSpawnPoint(sp);
                     //    break;
 
-                
+
                     case "TelehubName":
                         settings.TeleHub.Name = xtr.ReadElementContentAsString ();
                         break;
@@ -223,80 +213,79 @@ namespace WhiteCore.Framework.Serialization.External
                 }
             }
 
-            xtr.ReadEndElement();
+            xtr.ReadEndElement ();
 
-            xtr.Close();
+            xtr.Close ();
 
             return settings;
         }
 
-        public static string Serialize(RegionSettings settings)
+        public static string Serialize (RegionSettings settings)
         {
-            StringWriter sw = new StringWriter();
-            XmlTextWriter xtw = new XmlTextWriter(sw) {Formatting = Formatting.Indented};
-            xtw.WriteStartDocument();
+            StringWriter sw = new StringWriter ();
+            XmlTextWriter xtw = new XmlTextWriter (sw) { Formatting = Formatting.Indented };
+            xtw.WriteStartDocument ();
 
-            xtw.WriteStartElement("RegionSettings");
+            xtw.WriteStartElement ("RegionSettings");
 
-            xtw.WriteStartElement("General");
-            xtw.WriteElementString("AllowDamage", settings.AllowDamage.ToString());
-            xtw.WriteElementString("AllowLandResell", settings.AllowLandResell.ToString());
-            xtw.WriteElementString("AllowLandJoinDivide", settings.AllowLandJoinDivide.ToString());
-            xtw.WriteElementString("BlockFly", settings.BlockFly.ToString());
-            xtw.WriteElementString("BlockLandShowInSearch", settings.BlockShowInSearch.ToString());
-            xtw.WriteElementString("BlockTerraform", settings.BlockTerraform.ToString());
-            xtw.WriteElementString("DisableCollisions", settings.DisableCollisions.ToString());
-            xtw.WriteElementString("DisablePhysics", settings.DisablePhysics.ToString());
-            xtw.WriteElementString("DisableScripts", settings.DisableScripts.ToString());
-            xtw.WriteElementString("MaturityRating", settings.Maturity.ToString());
-            xtw.WriteElementString("RestrictPushing", settings.RestrictPushing.ToString());
-            xtw.WriteElementString("AgentLimit", settings.AgentLimit.ToString());
-            xtw.WriteElementString("ObjectBonus", settings.ObjectBonus.ToString());
-            xtw.WriteEndElement();
+            xtw.WriteStartElement ("General");
+            xtw.WriteElementString ("AllowDamage", settings.AllowDamage.ToString ());
+            xtw.WriteElementString ("AllowLandResell", settings.AllowLandResell.ToString ());
+            xtw.WriteElementString ("AllowLandJoinDivide", settings.AllowLandJoinDivide.ToString ());
+            xtw.WriteElementString ("BlockFly", settings.BlockFly.ToString ());
+            xtw.WriteElementString ("BlockLandShowInSearch", settings.BlockShowInSearch.ToString ());
+            xtw.WriteElementString ("BlockTerraform", settings.BlockTerraform.ToString ());
+            xtw.WriteElementString ("DisableCollisions", settings.DisableCollisions.ToString ());
+            xtw.WriteElementString ("DisablePhysics", settings.DisablePhysics.ToString ());
+            xtw.WriteElementString ("DisableScripts", settings.DisableScripts.ToString ());
+            xtw.WriteElementString ("MaturityRating", settings.Maturity.ToString ());
+            xtw.WriteElementString ("RestrictPushing", settings.RestrictPushing.ToString ());
+            xtw.WriteElementString ("AgentLimit", settings.AgentLimit.ToString ());
+            xtw.WriteElementString ("ObjectBonus", settings.ObjectBonus.ToString ());
+            xtw.WriteEndElement ();
 
-            xtw.WriteStartElement("GroundTextures");
-            xtw.WriteElementString("Texture1", settings.TerrainTexture1.ToString());
-            xtw.WriteElementString("Texture2", settings.TerrainTexture2.ToString());
-            xtw.WriteElementString("Texture3", settings.TerrainTexture3.ToString());
-            xtw.WriteElementString("Texture4", settings.TerrainTexture4.ToString());
-            xtw.WriteElementString("ElevationLowSW", settings.Elevation1SW.ToString());
-            xtw.WriteElementString("ElevationLowNW", settings.Elevation1NW.ToString());
-            xtw.WriteElementString("ElevationLowSE", settings.Elevation1SE.ToString());
-            xtw.WriteElementString("ElevationLowNE", settings.Elevation1NE.ToString());
-            xtw.WriteElementString("ElevationHighSW", settings.Elevation2SW.ToString());
-            xtw.WriteElementString("ElevationHighNW", settings.Elevation2NW.ToString());
-            xtw.WriteElementString("ElevationHighSE", settings.Elevation2SE.ToString());
-            xtw.WriteElementString("ElevationHighNE", settings.Elevation2NE.ToString());
-            xtw.WriteEndElement();
+            xtw.WriteStartElement ("GroundTextures");
+            xtw.WriteElementString ("Texture1", settings.TerrainTexture1.ToString ());
+            xtw.WriteElementString ("Texture2", settings.TerrainTexture2.ToString ());
+            xtw.WriteElementString ("Texture3", settings.TerrainTexture3.ToString ());
+            xtw.WriteElementString ("Texture4", settings.TerrainTexture4.ToString ());
+            xtw.WriteElementString ("ElevationLowSW", settings.Elevation1SW.ToString ());
+            xtw.WriteElementString ("ElevationLowNW", settings.Elevation1NW.ToString ());
+            xtw.WriteElementString ("ElevationLowSE", settings.Elevation1SE.ToString ());
+            xtw.WriteElementString ("ElevationLowNE", settings.Elevation1NE.ToString ());
+            xtw.WriteElementString ("ElevationHighSW", settings.Elevation2SW.ToString ());
+            xtw.WriteElementString ("ElevationHighNW", settings.Elevation2NW.ToString ());
+            xtw.WriteElementString ("ElevationHighSE", settings.Elevation2SE.ToString ());
+            xtw.WriteElementString ("ElevationHighNE", settings.Elevation2NE.ToString ());
+            xtw.WriteEndElement ();
 
-            xtw.WriteStartElement("Terrain");
-            xtw.WriteElementString("WaterHeight", settings.WaterHeight.ToString());
-            xtw.WriteElementString("TerrainRaiseLimit", settings.TerrainRaiseLimit.ToString());
-            xtw.WriteElementString("TerrainLowerLimit", settings.TerrainLowerLimit.ToString());
-            xtw.WriteElementString("UseEstateSun", settings.UseEstateSun.ToString());
-            xtw.WriteElementString("FixedSun", settings.FixedSun.ToString());
+            xtw.WriteStartElement ("Terrain");
+            xtw.WriteElementString ("WaterHeight", settings.WaterHeight.ToString ());
+            xtw.WriteElementString ("TerrainRaiseLimit", settings.TerrainRaiseLimit.ToString ());
+            xtw.WriteElementString ("TerrainLowerLimit", settings.TerrainLowerLimit.ToString ());
+            xtw.WriteElementString ("UseEstateSun", settings.UseEstateSun.ToString ());
+            xtw.WriteElementString ("FixedSun", settings.FixedSun.ToString ());
             // XXX: Need to expose interface to get sun phase information from sun module
             // xtw.WriteStartElement("SunPhase", 
 
 
             // OAR format 0.8
-            xtw.WriteStartElement("Telehub");
-            if (settings.TeleHub.ObjectUUID != UUID.Zero)
-            {
-                xtw.WriteElementString("TelehubObject", settings.TeleHub.ObjectUUID.ToString());
-                xtw.WriteElementString("TelehubName", settings.TeleHub.Name);
-                foreach( var point in settings.TeleHub.SpawnPos) 
-                    xtw.WriteElementString("SpawnPoint", point.ToString());
+            xtw.WriteStartElement ("Telehub");
+            if (settings.TeleHub.ObjectUUID != UUID.Zero) {
+                xtw.WriteElementString ("TelehubObject", settings.TeleHub.ObjectUUID.ToString ());
+                xtw.WriteElementString ("TelehubName", settings.TeleHub.Name);
+                foreach (var point in settings.TeleHub.SpawnPos)
+                    xtw.WriteElementString ("SpawnPoint", point.ToString ());
             }
-            xtw.WriteEndElement();
+            xtw.WriteEndElement ();
 
-            xtw.WriteEndElement();
+            xtw.WriteEndElement ();
 
-            xtw.WriteEndElement();
+            xtw.WriteEndElement ();
 
-            xtw.Close();
+            xtw.Close ();
 
-            return sw.ToString();
+            return sw.ToString ();
         }
     }
 }

@@ -58,8 +58,7 @@ namespace WhiteCore.Modules.Chat
         public void Initialise (IConfigSource source)
         {
             IConfig ccmModuleConfig = source.Configs ["Messaging"];
-            if (ccmModuleConfig != null)
-            {
+            if (ccmModuleConfig != null) {
                 m_Enabled = ccmModuleConfig.GetString ("LureModule", Name) == Name;
                 m_allowGodTeleports = ccmModuleConfig.GetBoolean ("AllowGodTeleports", m_allowGodTeleports);
             }
@@ -99,8 +98,7 @@ namespace WhiteCore.Modules.Chat
                 MainConsole.Instance.Error ("[INSTANT MESSAGE]: No message transfer module, lures will not work!");
         }
 
-        public Type ReplaceableInterface
-        {
+        public Type ReplaceableInterface {
             get { return null; }
         }
 
@@ -108,8 +106,7 @@ namespace WhiteCore.Modules.Chat
         {
         }
 
-        public string Name
-        {
+        public string Name {
             get { return "LureModule"; }
         }
 
@@ -148,13 +145,12 @@ namespace WhiteCore.Modules.Chat
                 SessionID = dest,
                 Offline = 0,
                 Position = presence.AbsolutePosition,
-                BinaryBucket = new Byte[0],
+                BinaryBucket = new Byte [0],
                 RegionID = client.Scene.RegionInfo.RegionID
             };
 
             // if we are an admin and are in god mode
-            if (m_allowGodTeleports && client.Scene.Permissions.CanGodTeleport (client.AgentId, targetid))
-            {
+            if (m_allowGodTeleports && client.Scene.Permissions.CanGodTeleport (client.AgentId, targetid)) {
                 //God tp them
                 m.Dialog = (byte)InstantMessageDialog.GodLikeRequestTeleport;
             }
@@ -174,16 +170,14 @@ namespace WhiteCore.Modules.Chat
 
             Vector3 position = new Vector3 { X = x, Y = y, Z = z };
             IEntityTransferModule entityTransfer = client.Scene.RequestModuleInterface<IEntityTransferModule> ();
-            if (entityTransfer != null)
-            {
+            if (entityTransfer != null) {
                 entityTransfer.RequestTeleportLocation (client, handle, position, Vector3.Zero, teleportFlags);
             }
         }
 
         void OnGridInstantMessage (GridInstantMessage im)
         {
-            if (im.Dialog == (byte)InstantMessageDialog.RequestTeleport)
-            {
+            if (im.Dialog == (byte)InstantMessageDialog.RequestTeleport) {
                 MainConsole.Instance.DebugFormat (
                     "[HG LURE MODULE]: RequestTeleport sessionID={0}, regionID={1}, message={2}",
                     im.SessionID, im.RegionID, im.Message);

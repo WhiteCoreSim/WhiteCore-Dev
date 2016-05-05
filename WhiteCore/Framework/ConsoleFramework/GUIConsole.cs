@@ -45,65 +45,64 @@ namespace WhiteCore.Framework.ConsoleFramework
     {
         public bool m_isPrompting;
         public int m_lastSetPromptOption;
-        public List<string> m_promptOptions = new List<string>();
+        public List<string> m_promptOptions = new List<string> ();
         public bool HasProcessedCurrentCommand { get; set; }
 
-        public string LogPath
-        {
-            get{ return MainConsole.Instance.LogPath; }
-            set{ MainConsole.Instance.LogPath = value;}
+        public string LogPath {
+            get { return MainConsole.Instance.LogPath; }
+            set { MainConsole.Instance.LogPath = value; }
         }
 
-        public virtual void Initialize(IConfigSource source, ISimulationBase simBase)
+        public virtual void Initialize (IConfigSource source, ISimulationBase simBase)
         {
-            if (source.Configs["Console"] == null ||
-                source.Configs["Console"].GetString("Console", String.Empty) != Name)
+            if (source.Configs ["Console"] == null ||
+                source.Configs ["Console"].GetString ("Console", string.Empty) != Name)
                 return;
 
-            simBase.ApplicationRegistry.RegisterModuleInterface<ICommandConsole>(this);
+            simBase.ApplicationRegistry.RegisterModuleInterface<ICommandConsole> (this);
             MainConsole.Instance = this;
 
-            m_Commands.AddCommand(
+            m_Commands.AddCommand (
                 "help",
                 "help",
                 "Get a general command list",
                 Help, false, true);
 
-            MainConsole.Instance.Info("[GUIConsole] initialized.");
+            MainConsole.Instance.Info ("[GUIConsole] initialized.");
         }
 
-        public void Help(IScene scene, string[] cmd)
+        public void Help (IScene scene, string [] cmd)
         {
-            List<string> help = m_Commands.GetHelp(cmd);
+            List<string> help = m_Commands.GetHelp (cmd);
 
             foreach (string s in help)
-                Output(s, Level.Off);
+                Output (s, Level.Off);
         }
 
         /// <summary>
         ///     Display a command prompt on the console and wait for user input
         /// </summary>
-        public void Prompt()
+        public void Prompt ()
         {
             // Set this culture for the thread 
             // to en-US to avoid number parsing issues
-            Culture.SetCurrentCulture();
+            Culture.SetCurrentCulture ();
             /*string line = */
-            ReadLine(m_defaultPrompt + "# ", true, true);
+            ReadLine (m_defaultPrompt + "# ", true, true);
 
-//            result.AsyncWaitHandle.WaitOne(-1);
+            //            result.AsyncWaitHandle.WaitOne(-1);
 
-//            if (line != String.Empty && line.Replace(" ", "") != String.Empty) //If there is a space, its fine
-//            {
-//                MainConsole.Instance.Info("[GUICONSOLE] Invalid command");
-//            }
+            //            if (line != String.Empty && line.Replace(" ", "") != String.Empty) //If there is a space, its fine
+            //            {
+            //                MainConsole.Instance.Info("[GUICONSOLE] Invalid command");
+            //            }
         }
 
-        public void RunCommand(string cmd)
+        public void RunCommand (string cmd)
         {
-            string[] parts = Parser.Parse(cmd);
-            m_Commands.Resolve(parts);
-            Output("", Threshold);
+            string [] parts = Parser.Parse (cmd);
+            m_Commands.Resolve (parts);
+            Output ("", Threshold);
         }
 
         /// <summary>
@@ -113,78 +112,72 @@ namespace WhiteCore.Framework.ConsoleFramework
         /// <param name="isCommand"></param>
         /// <param name="e"></param>
         /// <returns></returns>
-        public virtual string ReadLine(string p, bool isCommand, bool e)
+        public virtual string ReadLine (string p, bool isCommand, bool e)
         {
             string oldDefaultPrompt = m_defaultPrompt;
             m_defaultPrompt = p;
-//            System.Console.Write("{0}", p);
-            string cmdinput = Console.ReadLine();
+            //            System.Console.Write("{0}", p);
+            string cmdinput = Console.ReadLine ();
 
-//            while (cmdinput.Equals(null))
-//            {
-//                ;
-//            }
+            //            while (cmdinput.Equals(null))
+            //            {
+            //                ;
+            //            }
+            if (cmdinput == null)
+                return string.Empty;
 
-            if (isCommand)
-            {
-                string[] cmd = m_Commands.Resolve(Parser.Parse(cmdinput));
+            if (isCommand) {
+                string [] cmd = m_Commands.Resolve (Parser.Parse (cmdinput));
 
-                if (cmd.Length != 0)
-                {
+                if (cmd.Length != 0) {
                     int i;
 
-                    for (i = 0; i < cmd.Length; i++)
-                    {
-                        if (cmd[i].Contains(" "))
-                            cmd[i] = "\"" + cmd[i] + "\"";
+                    for (i = 0; i < cmd.Length; i++) {
+                        if (cmd [i].Contains (" "))
+                            cmd [i] = "\"" + cmd [i] + "\"";
                     }
-                    return String.Empty;
+                    return string.Empty;
                 }
             }
             m_defaultPrompt = oldDefaultPrompt;
             return cmdinput;
         }
 
-        public string Prompt(string p)
+        public string Prompt (string p)
         {
             m_isPrompting = true;
-            string line = ReadLine(String.Format("{0}: ", p), false, true);
+            string line = ReadLine (string.Format ("{0}: ", p), false, true);
             m_isPrompting = false;
             return line;
         }
 
-        public string Prompt(string p, string def)
+        public string Prompt (string p, string def)
         {
             m_isPrompting = true;
-            string ret = ReadLine(String.Format("{0} [{1}]: ", p, def), false, true);
-            if (ret == String.Empty)
+            string ret = ReadLine (string.Format ("{0} [{1}]: ", p, def), false, true);
+            if (ret == string.Empty)
                 ret = def;
 
             m_isPrompting = false;
             return ret;
         }
 
-        public string Prompt(string p, string def, List<char> excludedCharacters)
+        public string Prompt (string p, string def, List<char> excludedCharacters)
         {
             m_isPrompting = true;
             bool itisdone = false;
-            string ret = String.Empty;
-            while (!itisdone)
-            {
+            string ret = string.Empty;
+            while (!itisdone) {
                 itisdone = true;
-                ret = Prompt(p, def);
+                ret = Prompt (p, def);
 
-                if (ret == String.Empty)
-                {
+                if (ret == string.Empty) {
                     ret = def;
-                }
-                else
-                {
+                } else {
                     string ret1 = ret;
 
-                    foreach (char c in excludedCharacters.Where(c => ret1.Contains(c.ToString())))
-                    {
-                        Console.WriteLine("The character \"" + c.ToString() + "\" is not permitted.");
+                    foreach (char c in excludedCharacters.Where (c => ret1.Contains (c.ToString ()))) {
+                        Console.WriteLine ("The character \"" + c + "\" is not permitted.");
                         itisdone = false;
                     }
                 }
@@ -195,247 +188,231 @@ namespace WhiteCore.Framework.ConsoleFramework
         }
 
         // Displays a command prompt and returns a default value, user may only enter 1 of 2 options
-        public string Prompt(string prompt, string defaultresponse, List<string> options)
+        public string Prompt (string prompt, string defaultresponse, List<string> options)
         {
             m_isPrompting = true;
-            m_promptOptions = new List<string>(options);
+            m_promptOptions = new List<string> (options);
 
             bool itisdone = false;
 
-            string optstr = options.Aggregate(String.Empty, (current, s) => current + (" " + s));
+            string optstr = options.Aggregate (string.Empty, (current, s) => current + (" " + s));
 
-            string temp = Prompt(prompt, defaultresponse);
-            while (itisdone == false)
-            {
-                if (options.Contains(temp))
-                {
+            string temp = Prompt (prompt, defaultresponse);
+            while (itisdone == false) {
+                if (options.Contains (temp)) {
                     itisdone = true;
-                }
-                else
-                {
-                    Console.WriteLine("Valid options are" + optstr);
-                    temp = Prompt(prompt, defaultresponse);
+                } else {
+                    Console.WriteLine ("Valid options are" + optstr);
+                    temp = Prompt (prompt, defaultresponse);
                 }
             }
             m_isPrompting = false;
-            m_promptOptions.Clear();
+            m_promptOptions.Clear ();
             return temp;
         }
 
         // Displays a prompt and waits for the user to enter a string, then returns that string
         // (Done with no echo and suitable for passwords)
-        public string PasswordPrompt(string p)
+        public string PasswordPrompt (string p)
         {
             m_isPrompting = true;
-            string line = ReadLine(p + ": ", false, false);
+            string line = ReadLine (p + ": ", false, false);
             m_isPrompting = false;
             return line;
         }
 
-        public virtual void Output(string text, Level level)
+        public virtual void Output (string text, Level level)
         {
         }
 
-        public virtual void OutputNoTime(string text, Level level)
+        public virtual void OutputNoTime (string text, Level level)
         {
         }
 
-        public virtual void LockOutput()
+        public virtual void LockOutput ()
         {
         }
 
-        public virtual void UnlockOutput()
+        public virtual void UnlockOutput ()
         {
         }
 
-        public virtual bool CompareLogLevels(string a, string b)
+        public virtual bool CompareLogLevels (string a, string b)
         {
-            Level aa = (Level)Enum.Parse(typeof(Level), a, true);
-            Level bb = (Level)Enum.Parse(typeof(Level), b, true);
+            Level aa = (Level)Enum.Parse (typeof (Level), a, true);
+            Level bb = (Level)Enum.Parse (typeof (Level), b, true);
             return aa <= bb;
         }
 
         /// <summary>
         ///     The default prompt text.
         /// </summary>
-        public virtual string DefaultPrompt
-        {
+        public virtual string DefaultPrompt {
             set { m_defaultPrompt = value; }
             get { return m_defaultPrompt; }
         }
 
         protected string m_defaultPrompt;
 
-        public virtual string Name
-        {
+        public virtual string Name {
             get { return "GUIConsole"; }
         }
 
-        public Commands m_Commands = new Commands();
+        public Commands m_Commands = new Commands ();
 
-        public Commands Commands
-        {
+        public Commands Commands {
             get { return m_Commands; }
             set { m_Commands = value; }
         }
 
-        public List<IScene> ConsoleScenes
-        {
+        public List<IScene> ConsoleScenes {
             get { return m_ConsoleScenes; }
             set { m_ConsoleScenes = value; }
         }
 
-        public IScene ConsoleScene
-        {
+        public IScene ConsoleScene {
             get { return m_ConsoleScene; }
             set { m_ConsoleScene = value; }
         }
 
-        public List<IScene> m_ConsoleScenes = new List<IScene>();
+        public List<IScene> m_ConsoleScenes = new List<IScene> ();
         public IScene m_ConsoleScene = null;
 
-        public void Dispose()
+        public void Dispose ()
         {
         }
 
         /// <summary>
         ///     Starts the prompt for the console. This will never stop until the region is closed.
         /// </summary>
-        public void ReadConsole()
+        public void ReadConsole ()
         {
-            while (true)
-            {
-                Prompt();
+            while (true) {
+                Prompt ();
             }
         }
 
-        private void t_Elapsed(object sender, ElapsedEventArgs e)
+        void t_Elapsed (object sender, ElapsedEventArgs e)
         {
             //Tell the GUI that we are still here and it needs to keep checking
-            Console.Write((char) 0);
+            Console.Write ((char)0);
         }
 
         public Level Threshold { get; set; }
 
         #region ILog Members
 
-        public bool IsDebugEnabled
-        {
+        public bool IsDebugEnabled {
             get { return Threshold <= Level.Debug; }
         }
 
-        public bool IsErrorEnabled
-        {
+        public bool IsErrorEnabled {
             get { return Threshold <= Level.Error; }
         }
 
-        public bool IsFatalEnabled
-        {
+        public bool IsFatalEnabled {
             get { return Threshold <= Level.Fatal; }
         }
 
-        public bool IsInfoEnabled
-        {
+        public bool IsInfoEnabled {
             get { return Threshold <= Level.Info; }
         }
 
-        public bool IsWarnEnabled
-        {
+        public bool IsWarnEnabled {
             get { return Threshold <= Level.Warn; }
         }
 
-        public bool IsTraceEnabled
-        {
+        public bool IsTraceEnabled {
             get { return Threshold <= Level.Trace; }
         }
 
-        public void Debug(object message)
+        public void Debug (object message)
         {
-            Output(message.ToString(), Level.Debug);
+            Output (message.ToString (), Level.Debug);
         }
 
-        public void DebugFormat(string format, params object[] args)
+        public void DebugFormat (string format, params object [] args)
         {
-            Output(string.Format(format, args), Level.Debug);
+            Output (string.Format (format, args), Level.Debug);
         }
 
-        public void Error(object message)
+        public void Error (object message)
         {
-            Output(message.ToString(), Level.Error);
+            Output (message.ToString (), Level.Error);
         }
 
-        public void ErrorFormat(string format, params object[] args)
+        public void ErrorFormat (string format, params object [] args)
         {
-            Output(string.Format(format, args), Level.Error);
+            Output (string.Format (format, args), Level.Error);
         }
 
-        public void Fatal(object message)
+        public void Fatal (object message)
         {
-            Output(message.ToString(), Level.Fatal);
+            Output (message.ToString (), Level.Fatal);
         }
 
-        public void FatalFormat(string format, params object[] args)
+        public void FatalFormat (string format, params object [] args)
         {
-            Output(string.Format(format, args), Level.Fatal);
+            Output (string.Format (format, args), Level.Fatal);
         }
 
-        public void Format(Level level, string format, params object[] args)
+        public void Format (Level level, string format, params object [] args)
         {
-            Output(string.Format(format, args), level);
+            Output (string.Format (format, args), level);
         }
 
-        public void FormatNoTime(Level level, string format, params object[] args)
+        public void FormatNoTime (Level level, string format, params object [] args)
         {
-            OutputNoTime(string.Format(format, args), level);
+            OutputNoTime (string.Format (format, args), level);
         }
-        public void Info(object message)
+        public void Info (object message)
         {
-            Output(message.ToString(), Level.Info);
-        }
-
-        public void CleanInfo(object message)
-        {
-            OutputNoTime(message.ToString(), Level.Info);
+            Output (message.ToString (), Level.Info);
         }
 
-        public void CleanInfoFormat(string format, params object[] args)
+        public void CleanInfo (object message)
         {
-            OutputNoTime(string.Format(format, args), Level.Error);
+            OutputNoTime (message.ToString (), Level.Info);
         }
 
-        public void Ticker()
+        public void CleanInfoFormat (string format, params object [] args)
         {
-            Console.Write(".");
+            OutputNoTime (string.Format (format, args), Level.Error);
         }
 
-        public void InfoFormat(string format, params object[] args)
+        public void Ticker ()
         {
-            Output(string.Format(format, args), Level.Info);
+            Console.Write (".");
         }
 
-        public void Log(Level level, object message)
+        public void InfoFormat (string format, params object [] args)
         {
-            Output(message.ToString(), level);
+            Output (string.Format (format, args), Level.Info);
         }
 
-        public void Trace(object message)
+        public void Log (Level level, object message)
         {
-            Output(message.ToString(), Level.Trace);
+            Output (message.ToString (), level);
         }
 
-        public void TraceFormat(string format, params object[] args)
+        public void Trace (object message)
         {
-            Output(string.Format(format, args), Level.Trace);
+            Output (message.ToString (), Level.Trace);
         }
 
-        public void Warn(object message)
+        public void TraceFormat (string format, params object [] args)
         {
-            Output(message.ToString(), Level.Warn);
+            Output (string.Format (format, args), Level.Trace);
         }
 
-        public void WarnFormat(string format, params object[] args)
+        public void Warn (object message)
         {
-            Output(string.Format(format, args), Level.Warn);
+            Output (message.ToString (), Level.Warn);
+        }
+
+        public void WarnFormat (string format, params object [] args)
+        {
+            Output (string.Format (format, args), Level.Warn);
         }
 
         #endregion

@@ -26,6 +26,13 @@
  */
 
 
+using System;
+using System.IO;
+using System.Text;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.Messages.Linden;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
@@ -36,20 +43,13 @@ using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Servers.HttpServer.Interfaces;
 using WhiteCore.Framework.Utilities;
 using WhiteCore.Region;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.Messages.Linden;
-using OpenMetaverse.StructuredData;
-using System;
-using System.IO;
-using System.Text;
 using ExtraParamType = OpenMetaverse.ExtraParamType;
 
 namespace WhiteCore.Modules.Caps
 {
     public class UploadObjectAssetModule : INonSharedRegionModule
     {
-        private IScene m_scene;
+        IScene m_scene;
 
         #region INonSharedRegionModule Members
 
@@ -307,21 +307,23 @@ namespace WhiteCore.Modules.Caps
                 allparts[i] = grp;
             }
 
-            for (int j = 1; j < allparts.Length; j++)
-            {
-                rootGroup.LinkToGroup(allparts[j]);
-            }
+            if (rootGroup != null) {
+                for (int j = 1; j < allparts.Length; j++) {
+                    rootGroup.LinkToGroup (allparts [j]);
+                }
 
-            rootGroup.ScheduleGroupUpdate(PrimUpdateFlags.ForcedFullUpdate);
-            pos = m_scene.SceneGraph.GetNewRezLocation(Vector3.Zero, rootpos, UUID.Zero, rot, 1, 1, true,
-                                                       allparts[0].GroupScale(), false);
-
+                rootGroup.ScheduleGroupUpdate (PrimUpdateFlags.ForcedFullUpdate);
+                pos = m_scene.SceneGraph.GetNewRezLocation (Vector3.Zero, rootpos, UUID.Zero, rot, 1, 1, true,
+                                                           allparts [0].GroupScale (), false);
+            } else
+                MainConsole.Instance.Error ("[UploadObjectAssetModule]: Unable to locate root group!");
+            
             OSDMap map = new OSDMap();
             map["local_id"] = allparts[0].LocalId;
             return OSDParser.SerializeLLSDXmlBytes(map);
         }
 
-        private string ConvertUintToBytes(uint val)
+        string ConvertUintToBytes(uint val)
         {
             byte[] resultbytes = Utils.UIntToBytes(val);
             if (BitConverter.IsLittleEndian)

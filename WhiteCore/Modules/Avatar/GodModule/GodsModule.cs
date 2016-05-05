@@ -59,10 +59,8 @@ namespace WhiteCore.Modules.Gods
         {
             IScenePresence sp = m_scene.GetScenePresence (agentID);
 
-            if (sp != null)
-            {
-                if (godLike == false)
-                {
+            if (sp != null) {
+                if (godLike == false) {
                     //Unconditionally remove god levels
                     sp.GodLevel = Constants.USER_NORMAL;
                     sp.ControllingClient.SendAdminResponse (token, (uint)sp.GodLevel);
@@ -70,18 +68,16 @@ namespace WhiteCore.Modules.Gods
                 }
 
                 // First check that this is the sim owner
-                if (m_scene.Permissions.IsAdministrator (sp.UUID))
-                {
+                if (m_scene.Permissions.IsAdministrator (sp.UUID)) {
                     sp.GodLevel = sp.UserLevel;
                     if (sp.GodLevel == Constants.USER_NORMAL)
                         sp.GodLevel = Constants.USER_GOD_MAINTENANCE;
 
                     MainConsole.Instance.InfoFormat ("[GODS]: God level set for {0}, level {1}", sp.Name, sp.GodLevel);
                     sp.ControllingClient.SendAdminResponse (token, (uint)sp.GodLevel);
-                } else
-                {
+                } else {
                     if (m_dialogModule != null)
-                        m_dialogModule.SendAlertToUser ( agentID, "Request for god powers denied. This request has been logged.");
+                        m_dialogModule.SendAlertToUser (agentID, "Request for god powers denied. This request has been logged.");
                     MainConsole.Instance.Info ("[GODS]: God powers requested by " + sp.Name +
                         ", user is not allowed to have god powers");
                 }
@@ -94,53 +90,49 @@ namespace WhiteCore.Modules.Gods
 
             IScenePresence sp = m_scene.GetScenePresence (agentID);
 
-            if (sp != null || agentID == kickUserID)
-            {
-                if (m_scene.Permissions.IsGod (godID))
-                {
-                    if (kickflags == 0)
-                    {
-                        if (agentID == kickUserID)
-                        {
+            if (sp != null || agentID == kickUserID) {
+                if (m_scene.Permissions.IsGod (godID)) {
+                    switch (kickflags) {
+                    case 0:
+                        if (agentID == kickUserID) {
                             m_scene.ForEachClient (
-                                delegate(IClientAPI controller)
-                                {
+                                delegate (IClientAPI controller) {
                                     if (controller.AgentId != godID)
                                         controller.Kick (reason);
                                 }
                             );
 
                             //This does modify this list, but we make a copy of it
-                            foreach (IScenePresence p in m_scene.GetScenePresences())
-                            {
-                                if (p.UUID != godID)
-                                {
+                            foreach (IScenePresence p in m_scene.GetScenePresences ()) {
+                                if (p.UUID != godID) {
                                     IEntityTransferModule transferModule =
                                         m_scene.RequestModuleInterface<IEntityTransferModule> ();
                                     if (transferModule != null)
                                         transferModule.IncomingCloseAgent (m_scene, p.UUID);
                                 }
                             }
-                        } else
-                        {
+                        } else {
                             IEntityTransferModule transferModule =
                                 m_scene.RequestModuleInterface<IEntityTransferModule> ();
                             if (transferModule != null)
                                 transferModule.IncomingCloseAgent (m_scene, sp.UUID);
                         }
-                    } else if (kickflags == 1)
-                    {
-                        sp.Frozen = true;
+
+                        break;
+                    case 1:
+                        if (sp != null)
+                            sp.Frozen = true;
                         m_dialogModule.SendAlertToUser (agentID, reason);
                         m_dialogModule.SendAlertToUser (godID, "User Frozen");
-                    } else if (kickflags == 2)
-                    {
-                        sp.Frozen = false;
+                        break;
+                    case 2:
+                        if (sp != null)
+                            sp.Frozen = false;
                         m_dialogModule.SendAlertToUser (agentID, reason);
                         m_dialogModule.SendAlertToUser (godID, "User Unfrozen");
+                        break;
                     }
-                } else
-                {
+                } else {
                     m_dialogModule.SendAlertToUser (godID, "Kick request denied");
                 }
             }
@@ -176,8 +168,7 @@ namespace WhiteCore.Modules.Gods
             m_dialogModule = m_scene.RequestModuleInterface<IDialogModule> ();
         }
 
-        public Type ReplaceableInterface
-        {
+        public Type ReplaceableInterface {
             get { return null; }
         }
 
@@ -185,8 +176,7 @@ namespace WhiteCore.Modules.Gods
         {
         }
 
-        public string Name
-        {
+        public string Name {
             get { return "Gods Module"; }
         }
 
@@ -210,20 +200,18 @@ namespace WhiteCore.Modules.Gods
             retVal ["UntrustedSimulatorMessage"] = CapsUtil.CreateCAPS ("UntrustedSimulatorMessage", "");
 
             server.AddStreamHandler (new GenericStreamHandler ("POST", retVal ["UntrustedSimulatorMessage"],
-                delegate(string path, Stream request,
+                delegate (string path, Stream request,
                                                                       OSHttpRequest httpRequest,
-                                                                      OSHttpResponse httpResponse)
-                {
-                    return UntrustedSimulatorMessage (agentID, request);
-                }));
+                                                                      OSHttpResponse httpResponse) {
+                                                                          return UntrustedSimulatorMessage (agentID, request);
+                                                                      }));
             return retVal;
         }
 
-        byte[] UntrustedSimulatorMessage (UUID AgentID, Stream request)
+        byte [] UntrustedSimulatorMessage (UUID AgentID, Stream request)
         {
             OSDMap rm = (OSDMap)OSDParser.DeserializeLLSDXml (HttpServerHandlerHelpers.ReadFully (request));
-            if (rm ["message"] == "GodKickUser")
-            {
+            if (rm ["message"] == "GodKickUser") {
                 OSDArray innerArray = ((OSDArray)((OSDMap)rm ["body"]) ["UserInfo"]);
                 OSDMap innerMap = (OSDMap)innerArray [0];
                 UUID toKick = innerMap ["AgentID"].AsUUID ();
@@ -232,7 +220,7 @@ namespace WhiteCore.Modules.Gods
                 uint kickFlags = innerMap ["KickFlags"].AsUInteger ();
                 KickUser (AgentID, sessionID, toKick, kickFlags, reason);
             }
-            return new byte[0];
+            return new byte [0];
         }
 
         /// <summary>
@@ -246,7 +234,7 @@ namespace WhiteCore.Modules.Gods
         /// <param name="agentID">the person that is being kicked</param>
         /// <param name="kickflags">Tells what to do to the user</param>
         /// <param name="reason">The message to send to the user after it's been turned into a field</param>
-        public void KickUser (UUID godID, UUID sessionID, UUID agentID, uint kickflags, byte[] reason)
+        public void KickUser (UUID godID, UUID sessionID, UUID agentID, uint kickflags, byte [] reason)
         {
             KickUser (godID, sessionID, agentID, kickflags, Utils.BytesToString (reason));
         }

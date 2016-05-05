@@ -31,13 +31,13 @@ using WhiteCore.Framework.Servers.HttpServer.Implementation;
 
 namespace WhiteCore.Framework.Servers.HttpServer
 {
-    public delegate void RequestMethod(UUID requestID, OSHttpRequest request);
+    public delegate void RequestMethod (UUID requestID, OSHttpRequest request);
 
-    public delegate bool HasEventsMethod(UUID requestID, UUID pId);
+    public delegate bool HasEventsMethod (UUID requestID, UUID pId);
 
-    public delegate byte[] GetEventsMethod(UUID requestID, UUID pId, string request, OSHttpResponse response);
+    public delegate byte [] GetEventsMethod (UUID requestID, UUID pId, string request, OSHttpResponse response);
 
-    public delegate byte[] NoEventsMethod(UUID requestID, UUID pId, OSHttpResponse response);
+    public delegate byte [] NoEventsMethod (UUID requestID, UUID pId, OSHttpResponse response);
 
     public class PollServiceEventArgs : EventArgs
     {
@@ -47,7 +47,7 @@ namespace WhiteCore.Framework.Servers.HttpServer
         public NoEventsMethod NoEvents;
         public RequestMethod Request;
 
-        public PollServiceEventArgs(RequestMethod pRequest, HasEventsMethod pHasEvents, GetEventsMethod pGetEvents,
+        public PollServiceEventArgs (RequestMethod pRequest, HasEventsMethod pHasEvents, GetEventsMethod pGetEvents,
                                     NoEventsMethod pNoEvents, UUID pId)
         {
             Request = pRequest;

@@ -26,7 +26,6 @@
  */
 
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using OpenMetaverse;
@@ -50,7 +49,7 @@ namespace WhiteCore.Services
         {
             m_service = service;
             m_groupService = Framework.Utilities.DataManager.RequestPlugin<IGroupsServiceConnector> ();
-            
+
             var apiUri = service.CreateCAPS ("GroupAPIv1", "");
             service.AddStreamHandler ("GroupAPIv1", new GenericStreamHandler ("GET", apiUri, ProcessGetGroupAPI));
             service.AddStreamHandler ("GroupAPIv1", new GenericStreamHandler ("POST", apiUri, ProcessPostGroupAPI));
@@ -69,42 +68,40 @@ namespace WhiteCore.Services
 
         #region Group API v1
 
-        public byte[] ProcessGetGroupAPI (string path, Stream request, OSHttpRequest httpRequest,
+        public byte [] ProcessGetGroupAPI (string path, Stream request, OSHttpRequest httpRequest,
                                           OSHttpResponse httpResponse)
         {
             string groupID;
-            if (httpRequest.QueryString ["group_id"] != null)
-            {
+            if (httpRequest.QueryString ["group_id"] != null) {
                 groupID = httpRequest.QueryString ["group_id"];
                 MainConsole.Instance.Debug ("[GroupAPIv1] Requesting groups bans for group_id: " + groupID);
 
                 // Get group banned member list
                 OSDMap bannedUsers = new OSDMap ();
-
-                foreach (GroupBannedAgentsData user in m_groupService.GetGroupBannedMembers(m_service.AgentID, (UUID) groupID))
-                {
-                    OSDMap banned = new OSDMap ();
-                    banned ["ban_date"] = user.BanDate;  
-                    bannedUsers [user.AgentID.ToString ()] = banned;
+                var banUsers = m_groupService.GetGroupBannedMembers (m_service.AgentID, (UUID)groupID);
+                if (banUsers != null) {
+                    foreach (GroupBannedAgentsData user in banUsers) {
+                        OSDMap banned = new OSDMap ();
+                        banned ["ban_date"] = user.BanDate;
+                        bannedUsers [user.AgentID.ToString ()] = banned;
+                    }
                 }
 
                 OSDMap map = new OSDMap ();
                 map ["group_id"] = groupID;
                 map ["ban_list"] = bannedUsers;
                 return OSDParser.SerializeLLSDXmlBytes (map);
-
             }
 
             return null;
         }
 
-        public byte[] ProcessPostGroupAPI (string path, Stream request, OSHttpRequest httpRequest,
+        public byte [] ProcessPostGroupAPI (string path, Stream request, OSHttpRequest httpRequest,
                                            OSHttpResponse httpResponse)
         {
             string groupID;
 
-            if (httpRequest.QueryString ["group_id"] != null)
-            {
+            if (httpRequest.QueryString ["group_id"] != null) {
                 List<UUID> banUsers = new List<UUID> ();
 
                 groupID = httpRequest.QueryString ["group_id"];
@@ -117,15 +114,12 @@ namespace WhiteCore.Services
                 if (map.ContainsKey ("ban_ids"))
                     banUsers = ((OSDArray)map ["ban_ids"]).ConvertAll<UUID> (o => o);
 
-                if (map.ContainsKey ("ban_action"))
-                {
-                    if (map ["ban_action"].AsInteger () == 1)
-                    {
+                if (map.ContainsKey ("ban_action")) {
+                    if (map ["ban_action"].AsInteger () == 1) {
                         m_groupService.AddGroupBannedAgent (m_service.AgentID, (UUID)groupID, banUsers);
                         return null;
                     }
-                    if (map ["ban_action"].AsInteger () == 2)
-                    {
+                    if (map ["ban_action"].AsInteger () == 2) {
                         m_groupService.RemoveGroupBannedAgent (m_service.AgentID, (UUID)groupID, banUsers);
                         return null;
                     }
@@ -133,13 +127,15 @@ namespace WhiteCore.Services
 
                 // get banned agent details
                 var banUser = m_groupService.GetGroupBannedUser (m_service.AgentID, (UUID)groupID, banUsers [0]);
+
                 OSDMap retMap = new OSDMap ();
                 retMap ["group_id"] = groupID;
 
                 OSDMap banned = new OSDMap ();
-                banned ["ban_date"] = banUser.BanDate;               
-                banned [banUser.AgentID.ToString ()] = banned;
-
+                if (banUser != null) {
+                    banned ["ban_date"] = banUser.BanDate;
+                    banned [banUser.AgentID.ToString ()] = banned;
+                }
                 retMap ["ban_list"] = banned;
 
                 return OSDParser.SerializeLLSDXmlBytes (retMap);

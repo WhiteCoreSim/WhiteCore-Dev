@@ -26,16 +26,16 @@
  */
 
 
+using System;
+using System.Collections.Generic;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services.ClassHelpers.Inventory;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
 
 namespace WhiteCore.Modules.CallingCards
 {
@@ -100,14 +100,14 @@ namespace WhiteCore.Modules.CallingCards
 
         public string Name
         {
-            get { return "WhiteCoreCallingCardModule"; }
+            get { return "CallingCardModule"; }
         }
 
         #endregion
 
         #region Client
 
-        private void OnNewClient(IClientAPI client)
+        void OnNewClient(IClientAPI client)
         {
             // ... calling card handling...
             client.OnOfferCallingCard += OnOfferCallingCard;
@@ -115,7 +115,7 @@ namespace WhiteCore.Modules.CallingCards
             client.OnDeclineCallingCard += OnDeclineCallingCard;
         }
 
-        private void OnClosingClient(IClientAPI client)
+        void OnClosingClient(IClientAPI client)
         {
             client.OnOfferCallingCard -= OnOfferCallingCard;
             client.OnAcceptCallingCard -= OnAcceptCallingCard;
@@ -135,7 +135,7 @@ namespace WhiteCore.Modules.CallingCards
         /// <param name="name"></param>
         public void CreateCallingCard(IClientAPI client, UUID creator, UUID folder, string name)
         {
-            MainConsole.Instance.Debug("[WhiteCore CALLING CARD MODULE]: Creating calling card for " + client.Name);
+            MainConsole.Instance.Debug("[Calling card module]: Creating calling card for " + client.Name);
             InventoryItemBase item = new InventoryItemBase
                                          {
                                              AssetID = UUID.Zero,
@@ -171,10 +171,10 @@ namespace WhiteCore.Modules.CallingCards
         /// <param name="client"></param>
         /// <param name="destID"></param>
         /// <param name="transactionID"></param>
-        private void OnOfferCallingCard(IClientAPI client, UUID destID, UUID transactionID)
+        void OnOfferCallingCard(IClientAPI client, UUID destID, UUID transactionID)
         {
             MainConsole.Instance.DebugFormat(
-                "[WhiteCore CALLING CARD MODULE]: Got offer from {0} for {1}, transaction {2}",
+                "[Calling card module]: Got offer from {0} for {1}, transaction {2}",
                 client.AgentId, destID, transactionID);
 
             IClientAPI friendClient = LocateClientObject(destID);
@@ -198,10 +198,10 @@ namespace WhiteCore.Modules.CallingCards
         /// <param name="client"></param>
         /// <param name="transactionID"></param>
         /// <param name="folderID"></param>
-        private void OnAcceptCallingCard(IClientAPI client, UUID transactionID, UUID folderID)
+        void OnAcceptCallingCard(IClientAPI client, UUID transactionID, UUID folderID)
         {
             MainConsole.Instance.DebugFormat(
-                "[WhiteCore CALLING CARD MODULE]: User {0} ({1}) accepted tid {2}, folder {3}",
+                "[Calling card module]: User {0} ({1}) accepted tid {2}, folder {3}",
                 client.AgentId,
                 client.Name,
                 transactionID, folderID);
@@ -211,7 +211,7 @@ namespace WhiteCore.Modules.CallingCards
                 if (!m_pendingCallingcardRequests.TryGetValue(transactionID, out destID))
                 {
                     MainConsole.Instance.WarnFormat(
-                        "[WhiteCore CALLING CARD MODULE]: Got a AcceptCallingCard from {0} without an offer before.",
+                        "[Calling card module]: Got a AcceptCallingCard from {0} without an offer before.",
                         client.Name);
                     return;
                 }
@@ -222,11 +222,14 @@ namespace WhiteCore.Modules.CallingCards
 
             IClientAPI friendClient = LocateClientObject(destID);
             // inform sender of the card that destination accepted the offer
-            if (friendClient != null)
-                friendClient.SendAcceptCallingCard(transactionID);
+            if (friendClient != null) {
+                friendClient.SendAcceptCallingCard (transactionID);
 
-            // put a calling card into the inventory of receiver
-            CreateCallingCard(client, destID, folderID, friendClient.Name);
+                // put a calling card into the inventory of receiver
+                CreateCallingCard (client, destID, folderID, friendClient.Name);
+            } else
+                client.SendAlertMessage ("The person you have offered a card to can't be found anymore.");
+
         }
 
         /// <summary>
@@ -234,9 +237,9 @@ namespace WhiteCore.Modules.CallingCards
         /// </summary>
         /// <param name="client"></param>
         /// <param name="transactionID"></param>
-        private void OnDeclineCallingCard(IClientAPI client, UUID transactionID)
+        void OnDeclineCallingCard(IClientAPI client, UUID transactionID)
         {
-            MainConsole.Instance.DebugFormat("[WhiteCore CALLING CARD MODULE]: User {0} (ID:{1}) declined card, tid {2}",
+            MainConsole.Instance.DebugFormat("[Calling card module]: User {0} (ID:{1}) declined card, tid {2}",
                                              client.Name, client.AgentId, transactionID);
             UUID destID;
             lock (m_pendingCallingcardRequests)
@@ -244,7 +247,7 @@ namespace WhiteCore.Modules.CallingCards
                 if (!m_pendingCallingcardRequests.TryGetValue(transactionID, out destID))
                 {
                     MainConsole.Instance.WarnFormat(
-                        "[WhiteCore CALLING CARD MODULE]: Got a AcceptCallingCard from {0} without an offer before.",
+                        "[Calling card module]: Got a AcceptCallingCard from {0} without an offer before.",
                         client.Name);
                     return;
                 }
@@ -256,6 +259,7 @@ namespace WhiteCore.Modules.CallingCards
             // inform sender of the card that destination declined the offer
             if (friendClient != null)
                 friendClient.SendDeclineCallingCard(transactionID);
+
         }
 
         #endregion
