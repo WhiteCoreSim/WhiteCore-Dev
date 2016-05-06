@@ -1,4 +1,4 @@
-Contributing to WhiteCore
+#Contributing to WhiteCore
 
 The easiest way to contribute to WhiteCore is to send in a Pull Request. 
 

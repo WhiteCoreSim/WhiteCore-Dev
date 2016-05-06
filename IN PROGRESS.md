@@ -1,19 +1,20 @@
-General:
+#General:
 --------
+* Code cleanup of issues reported via Coverity
 * Implement the remaining Caps we might have missed
-* IWC / HG implementation (even when it really basic)
+* IWC implementation (even when it really basic)
 * Redesign the WebUI to use the WebAPI
 
-Scripting:
+#Scripting:
 ----------
 * Upgrade DotNetEngine with latest OSSL / LSL / WhiteCore functions
-* New scriptengine Phlox (Apache 2 License by InWorldz) to be integrated by Fine (March 2016)
+* Check if integrating the Halycon scriptengine Phlox (Apache 2 License by InWorldz) is possible
 
-Physics:
+#Physics:
 --------
-* Upgrade Physics engine (Bullet 2.82 and perhaps PhysX for Windows machines)
+* Continue upgrade of the Physics engines (Bullet and ODE)
 
 
-Wiki
+#Wiki
 ----
 * Update and fill the Wiki page with needed details (also point to the Documentation Repository)
