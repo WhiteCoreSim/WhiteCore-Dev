@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) Contributors, http://whitecore-sim.org/
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
@@ -29,7 +29,7 @@ using WhiteCore.Framework.Services;
 
 namespace WhiteCore.Services.API.WorldAPI
 {
-	public class GroupWorldAPI : IService
+	public class RegionWorldAPI : IService
 	{
 		#region IService implementation
 
