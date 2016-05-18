@@ -28,6 +28,7 @@
 using System;
 using System.IO;
 using System.Net;
+using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.SceneInfo.Entities;
 
 namespace WhiteCore.Framework.Serialization
@@ -74,7 +75,7 @@ namespace WhiteCore.Framework.Serialization
                     return new FileStream (uri.AbsolutePath, FileMode.Open, FileAccess.Read);
                 }
                 if (uri.Scheme != "http" && uri.Scheme != "https")
-                    throw new Exception (string.Format ("Unsupported URI scheme ({0})", path));
+                    MainConsole.Instance.Error (string.Format ("Unsupported URI scheme ({0})", path));
 
                 // OK, now we know we have an HTTP URI to work with
                 return URIFetch (uri);
@@ -102,7 +103,7 @@ namespace WhiteCore.Framework.Serialization
             //    throw new Exception(String.Format("{0} does not identify an OAR file", uri.ToString()));
 
             if (response.ContentLength == 0)
-                throw new Exception (string.Format ("{0} returned an empty file", uri));
+                MainConsole.Instance.Error(string.Format ("{0} returned an empty file", uri));
             response.Dispose ();
 
             // return new BufferedStream(file, (int) response.ContentLength);

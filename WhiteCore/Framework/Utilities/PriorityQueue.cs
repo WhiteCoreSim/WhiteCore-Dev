@@ -34,6 +34,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using WhiteCore.Framework.ConsoleFramework;
 
 namespace WhiteCore.Framework.Utilities
 {
@@ -41,226 +42,211 @@ namespace WhiteCore.Framework.Utilities
     // Writen by Jim Mischel
 
     [Serializable]
-    [ComVisible(false)]
+    [ComVisible (false)]
     public struct PriorityQueueItem<TValue, TPriority>
     {
         public TPriority _priority;
-        private TValue _value;
+        TValue _value;
 
-        public PriorityQueueItem(TValue val, TPriority pri)
+        public PriorityQueueItem (TValue val, TPriority pri)
         {
-            this._value = val;
-            this._priority = pri;
+            _value = val;
+            _priority = pri;
         }
 
-        public TValue Value
-        {
+        public TValue Value {
             get { return _value; }
             set { _value = value; }
         }
 
-        public TPriority Priority
-        {
+        public TPriority Priority {
             get { return _priority; }
             set { _priority = value; }
         }
     }
 
     [Serializable]
-    [ComVisible(false)]
+    [ComVisible (false)]
     public class PriorityQueue<TValue, TPriority> : ICollection,
                                                     IEnumerable<PriorityQueueItem<TValue, TPriority>>
     {
-        private const Int32 DefaultCapacity = 16;
-        private Int32 capacity;
+        const int DefaultCapacity = 16;
+        int capacity;
 
-        private Comparison<TPriority> compareFunc;
-        private PriorityQueueItem<TValue, TPriority>[] items;
-        private Int32 numItems;
+        Comparison<TPriority> compareFunc;
+        PriorityQueueItem<TValue, TPriority> [] items;
+        int numItems;
 
         /// <summary>
         ///     Initializes a new instance of the PriorityQueue class that is empty,
         ///     has the default initial capacity, and uses the default IComparer.
         /// </summary>
-        public PriorityQueue()
-            : this(DefaultCapacity, Comparer<TPriority>.Default)
+        public PriorityQueue ()
+            : this (DefaultCapacity, Comparer<TPriority>.Default)
         {
         }
 
-        public PriorityQueue(Int32 initialCapacity)
-            : this(initialCapacity, Comparer<TPriority>.Default)
+        public PriorityQueue (int initialCapacity)
+            : this (initialCapacity, Comparer<TPriority>.Default)
         {
         }
 
-        public PriorityQueue(IComparer<TPriority> comparer)
-            : this(DefaultCapacity, comparer)
+        public PriorityQueue (IComparer<TPriority> comparer)
+            : this (DefaultCapacity, comparer)
         {
         }
 
-        public PriorityQueue(int initialCapacity, IComparer<TPriority> comparer)
+        public PriorityQueue (int initialCapacity, IComparer<TPriority> comparer)
         {
-            Init(initialCapacity, comparer.Compare);
+            Init (initialCapacity, comparer.Compare);
         }
 
-        public PriorityQueue(Comparison<TPriority> comparison)
-            : this(DefaultCapacity, comparison)
+        public PriorityQueue (Comparison<TPriority> comparison)
+            : this (DefaultCapacity, comparison)
         {
         }
 
-        public PriorityQueue(int initialCapacity, Comparison<TPriority> comparison)
+        public PriorityQueue (int initialCapacity, Comparison<TPriority> comparison)
         {
-            Init(initialCapacity, comparison);
+            Init (initialCapacity, comparison);
         }
 
-        public PriorityQueueItem<TValue, TPriority>[] Items
-        {
+        public PriorityQueueItem<TValue, TPriority> [] Items {
             get { return items; }
         }
 
-        public int Capacity
-        {
+        public int Capacity {
             get { return items.Length; }
-            set { SetCapacity(value); }
+            set { SetCapacity (value); }
         }
 
         #region ICollection Members
 
-        public int Count
-        {
+        public int Count {
             get { return numItems; }
         }
 
-        public void CopyTo(Array array, int index)
+        public void CopyTo (Array array, int index)
         {
-            this.CopyTo((PriorityQueueItem<TValue, TPriority>[]) array, index);
+            CopyTo ((PriorityQueueItem<TValue, TPriority> [])array, index);
         }
 
-        public bool IsSynchronized
-        {
+        public bool IsSynchronized {
             get { return false; }
         }
 
-        public object SyncRoot
-        {
+        public object SyncRoot {
             get { return items.SyncRoot; }
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
+        IEnumerator IEnumerable.GetEnumerator ()
         {
-            return GetEnumerator();
+            return GetEnumerator ();
         }
 
         #endregion
 
         #region IEnumerable<PriorityQueueItem<TValue,TPriority>> Members
 
-        public IEnumerator<PriorityQueueItem<TValue, TPriority>> GetEnumerator()
+        public IEnumerator<PriorityQueueItem<TValue, TPriority>> GetEnumerator ()
         {
-            for (int i = 0; i < numItems; i++)
-            {
-                yield return items[i];
+            for (int i = 0; i < numItems; i++) {
+                yield return items [i];
             }
         }
 
         #endregion
 
-        private void Init(int initialCapacity, Comparison<TPriority> comparison)
+        void Init (int initialCapacity, Comparison<TPriority> comparison)
         {
             numItems = 0;
             compareFunc = comparison;
-            SetCapacity(initialCapacity);
+            SetCapacity (initialCapacity);
         }
 
-        private void SetCapacity(int newCapacity)
+        void SetCapacity (int newCapacity)
         {
             int newCap = newCapacity;
             if (newCap < DefaultCapacity)
                 newCap = DefaultCapacity;
 
             // throw exception if newCapacity < NumItems
-            if (newCap < numItems)
-                throw new ArgumentOutOfRangeException("newCapacity", "New capacity is less than Count");
+            if (newCap < numItems) {
+                MainConsole.Instance.Warn ("[Priority Queue]: New capacity is less than Count");
+                return;
+            }
 
-            this.capacity = newCap;
-            if (items == null)
-            {
-                items = new PriorityQueueItem<TValue, TPriority>[newCap];
+            capacity = newCap;
+            if (items == null) {
+                items = new PriorityQueueItem<TValue, TPriority> [newCap];
                 return;
             }
 
             // Resize the array.
-            Array.Resize(ref items, newCap);
+            Array.Resize (ref items, newCap);
         }
 
-        public void Enqueue(PriorityQueueItem<TValue, TPriority> newItem)
+        public void Enqueue (PriorityQueueItem<TValue, TPriority> newItem)
         {
-            if (numItems == capacity)
-            {
+            if (numItems == capacity) {
                 // need to increase capacity
                 // grow by 50 percent
-                SetCapacity((3*Capacity)/2);
+                SetCapacity ((3 * Capacity) / 2);
             }
 
             int i = numItems;
             ++numItems;
-            while ((i > 0) && (compareFunc(items[(i - 1)/2].Priority, newItem.Priority) < 0))
-            {
-                items[i] = items[(i - 1)/2];
-                i = (i - 1)/2;
+            while ((i > 0) && (compareFunc (items [(i - 1) / 2].Priority, newItem.Priority) < 0)) {
+                items [i] = items [(i - 1) / 2];
+                i = (i - 1) / 2;
             }
-            items[i] = newItem;
+            items [i] = newItem;
             //if (!VerifyQueue())
             //{
             //    Console.WriteLine("ERROR: Queue out of order!");
             //}
         }
 
-        public void Enqueue(TValue value, TPriority priority)
+        public void Enqueue (TValue value, TPriority priority)
         {
-            Enqueue(new PriorityQueueItem<TValue, TPriority>(value, priority));
+            Enqueue (new PriorityQueueItem<TValue, TPriority> (value, priority));
         }
 
-        private PriorityQueueItem<TValue, TPriority> RemoveAt(Int32 index)
+        PriorityQueueItem<TValue, TPriority> RemoveAt (int index)
         {
-            PriorityQueueItem<TValue, TPriority> o = items[index];
+            PriorityQueueItem<TValue, TPriority> o = items [index];
             --numItems;
             // move the last item to fill the hole
-            PriorityQueueItem<TValue, TPriority> tmp = items[numItems];
+            PriorityQueueItem<TValue, TPriority> tmp = items [numItems];
             // If you forget to clear this, you have a potential memory leak.
-            items[numItems] = default(PriorityQueueItem<TValue, TPriority>);
-            if (numItems > 0 && index != numItems)
-            {
+            items [numItems] = default (PriorityQueueItem<TValue, TPriority>);
+            if (numItems > 0 && index != numItems) {
                 // If the new item is greater than its parent, bubble up.
                 int i = index;
-                int parent = (i - 1)/2;
-                while (compareFunc(tmp.Priority, items[parent].Priority) > 0)
-                {
-                    items[i] = items[parent];
+                int parent = (i - 1) / 2;
+                while (compareFunc (tmp.Priority, items [parent].Priority) > 0) {
+                    items [i] = items [parent];
                     i = parent;
-                    parent = (i - 1)/2;
+                    parent = (i - 1) / 2;
                 }
 
                 // if i == index, then we didn't move the item up
-                if (i == index)
-                {
+                if (i == index) {
                     // bubble down ...
-                    while (i < (numItems)/2)
-                    {
-                        int j = (2*i) + 1;
-                        if ((j < numItems - 1) && (compareFunc(items[j].Priority, items[j + 1].Priority) < 0))
-                        {
+                    while (i < (numItems) / 2) {
+                        int j = (2 * i) + 1;
+                        if ((j < numItems - 1) && (compareFunc (items [j].Priority, items [j + 1].Priority) < 0)) {
                             ++j;
                         }
-                        if (compareFunc(items[j].Priority, tmp.Priority) <= 0)
-                        {
+                        if (compareFunc (items [j].Priority, tmp.Priority) <= 0) {
                             break;
                         }
-                        items[i] = items[j];
+                        items [i] = items [j];
                         i = j;
                     }
                 }
                 // Be sure to store the item in its place.
-                items[i] = tmp;
+                items [i] = tmp;
             }
             //if (!VerifyQueue())
             //{
@@ -270,19 +256,16 @@ namespace WhiteCore.Framework.Utilities
         }
 
         // Function to check that the queue is coherent.
-        public bool VerifyQueue()
+        public bool VerifyQueue ()
         {
             int i = 0;
-            while (i < numItems/2)
-            {
-                int leftChild = (2*i) + 1;
+            while (i < numItems / 2) {
+                int leftChild = (2 * i) + 1;
                 int rightChild = leftChild + 1;
-                if (compareFunc(items[i].Priority, items[leftChild].Priority) < 0)
-                {
+                if (compareFunc (items [i].Priority, items [leftChild].Priority) < 0) {
                     return false;
                 }
-                if (rightChild < numItems && compareFunc(items[i].Priority, items[rightChild].Priority) < 0)
-                {
+                if (rightChild < numItems && compareFunc (items [i].Priority, items [rightChild].Priority) < 0) {
                     return false;
                 }
                 ++i;
@@ -290,19 +273,20 @@ namespace WhiteCore.Framework.Utilities
             return true;
         }
 
-        public PriorityQueueItem<TValue, TPriority> Dequeue()
+        public PriorityQueueItem<TValue, TPriority> Dequeue ()
         {
             if (Count == 0)
-                throw new InvalidOperationException("The queue is empty");
-            return RemoveAt(0);
+                MainConsole.Instance.Warn ("[Priority Queue]: The queue is empty");
+
+            return RemoveAt (0);
         }
 
-        public bool TryDequeue(out PriorityQueueItem<TValue, TPriority> value)
+        public bool TryDequeue (out PriorityQueueItem<TValue, TPriority> value)
         {
-            value = new PriorityQueueItem<TValue, TPriority>();
+            value = new PriorityQueueItem<TValue, TPriority> ();
             if (Count == 0)
                 return false;
-            value = RemoveAt(0);
+            value = RemoveAt (0);
             return true;
         }
 
@@ -315,18 +299,16 @@ namespace WhiteCore.Framework.Utilities
         ///     An object that implements the IEqualityComparer interface
         ///     for the type of item in the collection.
         /// </param>
-        public void Remove(TValue item, IEqualityComparer comparer)
+        public void Remove (TValue item, IEqualityComparer comparer)
         {
             // need to find the PriorityQueueItem that has the Data value of o
-            for (int index = 0; index < numItems; ++index)
-            {
-                if (comparer.Equals(item, items[index].Value))
-                {
-                    RemoveAt(index);
+            for (int index = 0; index < numItems; ++index) {
+                if (comparer.Equals (item, items [index].Value)) {
+                    RemoveAt (index);
                     return;
                 }
             }
-            throw new ApplicationException("The specified itemm is not in the queue.");
+            MainConsole.Instance.Warn ("[Priority Queue]: The specified item is not in the queue.");
         }
 
         /// <summary>
@@ -338,17 +320,15 @@ namespace WhiteCore.Framework.Utilities
         ///     An object that implements the IComparer interface
         ///     for the type of item in the collection.
         /// </param>
-        public TValue Find(TValue item, IComparer<TValue> comparer)
+        public TValue Find (TValue item, IComparer<TValue> comparer)
         {
             // need to find the PriorityQueueItem that has the Data value of o
-            for (int index = 0; index < numItems; ++index)
-            {
-                if (comparer.Compare(item, items[index].Value) > 1)
-                {
-                    return items[index].Value;
+            for (int index = 0; index < numItems; ++index) {
+                if (comparer.Compare (item, items [index].Value) > 1) {
+                    return items [index].Value;
                 }
             }
-            return default(TValue);
+            return default (TValue);
         }
 
         /// <summary>
@@ -356,66 +336,74 @@ namespace WhiteCore.Framework.Utilities
         ///     The default type comparison function is used.
         /// </summary>
         /// <param name="item">The item to be removed.</param>
-        public void Remove(TValue item)
+        public void Remove (TValue item)
         {
-            Remove(item, EqualityComparer<TValue>.Default);
+            Remove (item, EqualityComparer<TValue>.Default);
         }
 
-        public PriorityQueueItem<TValue, TPriority> Peek()
+        public PriorityQueueItem<TValue, TPriority> Peek ()
         {
             if (Count == 0)
-                throw new InvalidOperationException("The queue is empty");
-            return items[0];
+                MainConsole.Instance.Warn ("[Priority Queue]: The queue is empty");
+            return items [0];
         }
 
         // Clear
-        public void Clear()
+        public void Clear ()
         {
-            for (int i = 0; i < numItems; ++i)
-            {
-                items[i] = default(PriorityQueueItem<TValue, TPriority>);
+            for (int i = 0; i < numItems; ++i) {
+                items [i] = default (PriorityQueueItem<TValue, TPriority>);
             }
             numItems = 0;
-            TrimExcess();
+            TrimExcess ();
         }
 
         /// <summary>
         ///     Set the capacity to the actual number of items, if the current
         ///     number of items is less than 90 percent of the current capacity.
         /// </summary>
-        public void TrimExcess()
+        public void TrimExcess ()
         {
-            if (numItems < (float) 0.9*capacity)
-            {
-                SetCapacity(numItems);
+            if (numItems < (float)0.9 * capacity) {
+                SetCapacity (numItems);
             }
         }
 
         // Contains
-        public bool Contains(TValue o)
+        public bool Contains (TValue o)
         {
-            return items.Any(x => x.Value.Equals(o));
+            return items.Any (x => x.Value.Equals (o));
         }
 
-        public void CopyTo(PriorityQueueItem<TValue, TPriority>[] array, int arrayIndex)
+        public void CopyTo (PriorityQueueItem<TValue, TPriority> [] array, int arrayIndex)
         {
-            if (array == null)
-                throw new ArgumentNullException("array");
-            if (arrayIndex < 0)
-                throw new ArgumentOutOfRangeException("arrayIndex", "arrayIndex is less than 0.");
-            if (array.Rank > 1)
-                throw new ArgumentException("array is multidimensional.");
+            if (array == null) {
+                MainConsole.Instance.Error ("[Priority Queue]: Array is null");
+                return;
+            }
+            if (arrayIndex < 0) {
+                MainConsole.Instance.Error ("[Priority Queue]: arrayIndex is less than 0.");
+                return;
+            }
+            if (array.Rank > 1) {
+                MainConsole.Instance.Error ("[Priority Queue]: array is multidimensional.");
+                return;
+            }
             if (numItems == 0)
                 return;
-            if (arrayIndex >= array.Length)
-                throw new ArgumentException("arrayIndex is equal to or greater than the length of the array.");
-            if (numItems > (array.Length - arrayIndex))
-                throw new ArgumentException(
-                    "The number of elements in the source ICollection is greater than the available space from arrayIndex to the end of the destination array.");
+            if (arrayIndex >= array.Length) {
+                MainConsole.Instance.Error ("[Priority Queue]: ArrayIndex is equal to or greater than the length of the array.");
+                return;
+            }
+            if (numItems > (array.Length - arrayIndex)) {
+                MainConsole.Instance.Error ("[Priority Queue]: " +
+                                            " The number of elements in the source ICollection is greater than the available space" +
+                                            " from arrayIndex to the end of the destination array.");
+                return;
+            }
 
-            for (int i = 0; i < numItems; i++)
-            {
-                array[arrayIndex + i] = items[i];
+            for (int i = 0; i < numItems; i++) {
+                array [arrayIndex + i] = items [i];
             }
         }
     }
@@ -462,26 +450,26 @@ namespace WhiteCore.Framework.Utilities
         #region Fields
 
         // The maximum level of the skip list.
-        private const int LevelMaxValue = 16;
+        const int LevelMaxValue = 16;
 
         // The probability value used to randomly select the next level value.
-        private const double Probability = 0.5;
-        private readonly IComparer comparer;
+        const double Probability = 0.5;
+        readonly IComparer comparer;
 
         // The current level of the skip list.
 
         // Used to generate node levels.
-        private readonly Random rand = new Random();
+        readonly Random rand = new Random ();
 
         // The number of elements in the PriorityQueue.
-        private int count;
-        private int currentLevel = 1;
+        int count;
+        int currentLevel = 1;
 
         // The header node of the skip list.
-        private Node header = new Node(null, LevelMaxValue);
+        Node header = new Node (null, LevelMaxValue);
 
         // The version of this PriorityQueue.
-        private long version;
+        long version;
 
         // Used for comparing and sorting elements.
 
@@ -496,9 +484,9 @@ namespace WhiteCore.Framework.Utilities
         ///     The PriorityQueue will cast its elements to the IComparable
         ///     interface when making comparisons.
         /// </remarks>
-        public LPriorityQueue()
+        public LPriorityQueue ()
         {
-            comparer = new DefaultComparer();
+            comparer = new DefaultComparer ();
         }
 
         /// <summary>
@@ -512,17 +500,15 @@ namespace WhiteCore.Framework.Utilities
         ///     If the specified IComparer is null, the PriorityQueue will cast its
         ///     elements to the IComparable interface when making comparisons.
         /// </remarks>
-        public LPriorityQueue(IComparer comparer)
+        public LPriorityQueue (IComparer comparer)
         {
             // If no comparer was provided.
-            if (comparer == null)
-            {
+            if (comparer == null) {
                 // Use the DefaultComparer.
-                this.comparer = new DefaultComparer();
+                this.comparer = new DefaultComparer ();
             }
-                // Else a comparer was provided.
-            else
-            {
+            // Else a comparer was provided.
+            else {
                 // Use the provided comparer.
                 this.comparer = comparer;
             }
@@ -541,38 +527,33 @@ namespace WhiteCore.Framework.Utilities
         /// <exception cref="ArgumentNullException">
         ///     If element is null.
         /// </exception>
-        public virtual void Enqueue(object element)
+        public virtual void Enqueue (object element)
         {
             #region Require
 
-            if (element == null)
-            {
-                throw new ArgumentNullException("element");
+            if (element == null) {
+                throw new ArgumentNullException ("element");
             }
 
             #endregion
 
             Node x = header;
-            Node[] update = new Node[LevelMaxValue];
-            int nextLevel = NextLevel();
+            Node [] update = new Node [LevelMaxValue];
+            int nextLevel = NextLevel ();
 
             // Find the place in the queue to insert the new element.
-            for (int i = currentLevel - 1; i >= 0; i--)
-            {
-                while (x[i] != null && comparer.Compare(x[i].Element, element) > 0)
-                {
-                    x = x[i];
+            for (int i = currentLevel - 1; i >= 0; i--) {
+                while (x [i] != null && comparer.Compare (x [i].Element, element) > 0) {
+                    x = x [i];
                 }
 
-                update[i] = x;
+                update [i] = x;
             }
 
             // If the new node's level is greater than the current level.
-            if (nextLevel > currentLevel)
-            {
-                for (int i = currentLevel; i < nextLevel; i++)
-                {
-                    update[i] = header;
+            if (nextLevel > currentLevel) {
+                for (int i = currentLevel; i < nextLevel; i++) {
+                    update [i] = header;
                 }
 
                 // Update level.
@@ -580,13 +561,12 @@ namespace WhiteCore.Framework.Utilities
             }
 
             // Create new node.
-            Node newNode = new Node(element, nextLevel);
+            Node newNode = new Node (element, nextLevel);
 
             // Insert the new node into the list.
-            for (int i = 0; i < nextLevel; i++)
-            {
-                newNode[i] = update[i][i];
-                update[i][i] = newNode;
+            for (int i = 0; i < nextLevel; i++) {
+                newNode [i] = update [i] [i];
+                update [i] [i] = newNode;
             }
 
             // Keep track of the number of elements in the PriorityQueue.
@@ -604,35 +584,32 @@ namespace WhiteCore.Framework.Utilities
         /// <exception cref="InvalidOperationException">
         ///     If Count is zero.
         /// </exception>
-        public virtual object Dequeue()
+        public virtual object Dequeue ()
         {
             #region Require
 
-            if (Count == 0)
-            {
-                throw new InvalidOperationException(
+            if (Count == 0) {
+                throw new InvalidOperationException (
                     "Cannot dequeue into an empty PriorityQueue.");
             }
 
             #endregion
 
             // Get the first item in the queue.
-            object element = header[0].Element;
+            object element = header [0].Element;
 
             // Keep track of the node that is about to be removed.
-            Node oldNode = header[0];
+            Node oldNode = header [0];
 
             // Update the header so that its pointers that pointed to the
             // node to be removed now point to the node that comes after it.
-            for (int i = 0; i < currentLevel && header[i] == oldNode; i++)
-            {
-                header[i] = oldNode[i];
+            for (int i = 0; i < currentLevel && header [i] == oldNode; i++) {
+                header [i] = oldNode [i];
             }
 
             // Update the current level of the list in case the node that
             // was removed had the highest level.
-            while (currentLevel > 1 && header[currentLevel - 1] == null)
-            {
+            while (currentLevel > 1 && header [currentLevel - 1] == null) {
                 currentLevel--;
             }
 
@@ -653,45 +630,40 @@ namespace WhiteCore.Framework.Utilities
         /// <exception cref="ArgumentNullException">
         ///     If element is null
         /// </exception>
-        public virtual void Remove(object element)
+        public virtual void Remove (object element)
         {
             #region Require
 
-            if (element == null)
-            {
-                throw new ArgumentNullException("element");
+            if (element == null) {
+                MainConsole.Instance.Error ("[Priority Queue]: Element is null");
+                return;
             }
 
             #endregion
 
             Node x = header;
-            Node[] update = new Node[LevelMaxValue];
+            Node [] update = new Node [LevelMaxValue];
 
             // Find the specified element.
-            for (int i = currentLevel - 1; i >= 0; i--)
-            {
-                while (x[i] != null && comparer.Compare(x[i].Element, element) > 0)
-                {
-                    x = x[i];
+            for (int i = currentLevel - 1; i >= 0; i--) {
+                while (x [i] != null && comparer.Compare (x [i].Element, element) > 0) {
+                    x = x [i];
                 }
 
-                update[i] = x;
+                update [i] = x;
             }
 
-            x = x[0];
+            x = x [0];
 
             // If the specified element was found.
-            if (x != null && comparer.Compare(x.Element, element) == 0)
-            {
+            if (x != null && comparer.Compare (x.Element, element) == 0) {
                 // Remove element.
-                for (int i = 0; i < currentLevel && update[i][i] == x; i++)
-                {
-                    update[i][i] = x[i];
+                for (int i = 0; i < currentLevel && update [i] [i] == x; i++) {
+                    update [i] [i] = x [i];
                 }
 
                 // Update list level.
-                while (currentLevel > 1 && header[currentLevel - 1] == null)
-                {
+                while (currentLevel > 1 && header [currentLevel - 1] == null) {
                     currentLevel--;
                 }
 
@@ -713,12 +685,11 @@ namespace WhiteCore.Framework.Utilities
         ///     <b>true</b> if the element is in the PriorityQueue; otherwise
         ///     <b>false</b>.
         /// </returns>
-        public virtual bool Contains(object element)
+        public virtual bool Contains (object element)
         {
             #region Guard
 
-            if (element == null)
-            {
+            if (element == null) {
                 return false;
             }
 
@@ -728,24 +699,20 @@ namespace WhiteCore.Framework.Utilities
             Node x = header;
 
             // Find the specified element.
-            for (int i = currentLevel - 1; i >= 0; i--)
-            {
-                while (x[i] != null && comparer.Compare(x[i].Element, element) > 0)
-                {
-                    x = x[i];
+            for (int i = currentLevel - 1; i >= 0; i--) {
+                while (x [i] != null && comparer.Compare (x [i].Element, element) > 0) {
+                    x = x [i];
                 }
             }
 
-            x = x[0];
+            x = x [0];
 
             // If the element is in the PriorityQueue.
-            if (x != null && comparer.Compare(x.Element, element) == 0)
-            {
+            if (x != null && comparer.Compare (x.Element, element) == 0) {
                 found = true;
             }
-                // Else the element is not in the PriorityQueue.
-            else
-            {
+            // Else the element is not in the PriorityQueue.
+            else {
                 found = false;
             }
 
@@ -759,27 +726,26 @@ namespace WhiteCore.Framework.Utilities
         /// <returns>
         ///     The element at the head of the PriorityQueue.
         /// </returns>
-        public virtual object Peek()
+        public virtual object Peek ()
         {
             #region Require
 
-            if (Count == 0)
-            {
-                throw new InvalidOperationException(
-                    "Cannot peek into an empty PriorityQueue.");
+            if (Count == 0) {
+                MainConsole.Instance.Warn ("[Priority Queue]: Cannot peek into an empty PriorityQueue.");
+                return new object ();
             }
 
             #endregion
 
-            return header[0].Element;
+            return header [0].Element;
         }
 
         /// <summary>
         ///     Removes all elements from the PriorityQueue.
         /// </summary>
-        public virtual void Clear()
+        public virtual void Clear ()
         {
-            header = new Node(null, LevelMaxValue);
+            header = new Node (null, LevelMaxValue);
 
             currentLevel = 1;
 
@@ -800,29 +766,28 @@ namespace WhiteCore.Framework.Utilities
         /// <exception cref="ArgumentNullException">
         ///     If queue is null.
         /// </exception>
-        public static LPriorityQueue Synchronized(LPriorityQueue queue)
+        public static LPriorityQueue Synchronized (LPriorityQueue queue)
         {
             #region Require
 
-            if (queue == null)
-            {
-                throw new ArgumentNullException("queue");
+            if (queue == null) {
+                MainConsole.Instance.Warn ("[Priority Queue]: Queue is null");
+                return null;
             }
 
             #endregion
 
-            return new SynchronizedPriorityQueue(queue);
+            return new SynchronizedPriorityQueue (queue);
         }
 
         // Generates a random level for the next node.
-        private int NextLevel()
+        int NextLevel ()
         {
             int nextLevel = 1;
 
-            while (rand.NextDouble() < Probability &&
+            while (rand.NextDouble () < Probability &&
                    nextLevel < LevelMaxValue &&
-                   nextLevel <= currentLevel)
-            {
+                   nextLevel <= currentLevel) {
                 nextLevel++;
             }
 
@@ -836,19 +801,19 @@ namespace WhiteCore.Framework.Utilities
         #region SynchronizedPriorityQueue Class
 
         // A synchronized wrapper for the PriorityQueue class.
-        private class SynchronizedPriorityQueue : LPriorityQueue
+        class SynchronizedPriorityQueue : LPriorityQueue
         {
-            private readonly LPriorityQueue queue;
+            readonly LPriorityQueue queue;
 
-            private readonly object root;
+            readonly object root;
 
-            public SynchronizedPriorityQueue(LPriorityQueue queue)
+            public SynchronizedPriorityQueue (LPriorityQueue queue)
             {
                 #region Require
 
-                if (queue == null)
-                {
-                    throw new ArgumentNullException("queue");
+                if (queue == null) {
+                    MainConsole.Instance.Error ("[Priority Queue]: Queue is null");
+                    return;
                 }
 
                 #endregion
@@ -858,88 +823,75 @@ namespace WhiteCore.Framework.Utilities
                 root = queue.SyncRoot;
             }
 
-            public override int Count
-            {
-                get
-                {
-                    lock (root)
-                    {
+            public override int Count {
+                get {
+                    lock (root) {
                         return queue.Count;
                     }
                 }
             }
 
-            public override bool IsSynchronized
-            {
+            public override bool IsSynchronized {
                 get { return true; }
             }
 
-            public override object SyncRoot
-            {
+            public override object SyncRoot {
                 get { return root; }
             }
 
-            public override void Enqueue(object element)
+            public override void Enqueue (object element)
             {
-                lock (root)
-                {
-                    queue.Enqueue(element);
+                lock (root) {
+                    queue.Enqueue (element);
                 }
             }
 
-            public override object Dequeue()
+            public override object Dequeue ()
             {
-                lock (root)
-                {
-                    return queue.Dequeue();
+                lock (root) {
+                    return queue.Dequeue ();
                 }
             }
 
-            public override void Remove(object element)
+            public override void Remove (object element)
             {
-                lock (root)
-                {
-                    queue.Remove(element);
+                lock (root) {
+                    queue.Remove (element);
                 }
             }
 
-            public override void Clear()
+            public override void Clear ()
             {
-                lock (root)
-                {
-                    queue.Clear();
+                lock (root) {
+                    queue.Clear ();
                 }
             }
 
-            public override bool Contains(object element)
+            public override bool Contains (object element)
             {
-                lock (root)
-                {
-                    return queue.Contains(element);
+                lock (root) {
+                    return queue.Contains (element);
                 }
             }
 
-            public override object Peek()
+            public override object Peek ()
             {
-                lock (root)
-                {
-                    return queue.Peek();
+                lock (root) {
+                    return queue.Peek ();
                 }
             }
 
-            public override void CopyTo(Array array, int index)
+            public override void CopyTo (Array array, int index)
             {
-                lock (root)
-                {
-                    queue.CopyTo(array, index);
+                lock (root) {
+                    queue.CopyTo (array, index);
                 }
             }
 
-            public override IEnumerator GetEnumerator()
+            public override IEnumerator GetEnumerator ()
             {
-                lock (root)
-                {
-                    return queue.GetEnumerator();
+                lock (root) {
+                    return queue.GetEnumerator ();
                 }
             }
         }
@@ -949,17 +901,16 @@ namespace WhiteCore.Framework.Utilities
         #region DefaultComparer Class
 
         // The IComparer to use of no comparer was provided.
-        private class DefaultComparer : IComparer
+        class DefaultComparer : IComparer
         {
             #region IComparer Members
 
-            public int Compare(object x, object y)
+            public int Compare (object x, object y)
             {
                 #region Require
 
-                if (!(y is IComparable))
-                {
-                    throw new ArgumentException(
+                if (!(y is IComparable)) {
+                    throw new ArgumentException (
                         "Item does not implement IComparable.");
                 }
 
@@ -967,7 +918,7 @@ namespace WhiteCore.Framework.Utilities
 
                 IComparable a = x as IComparable;
 
-                return a.CompareTo(y);
+                return a.CompareTo (y);
             }
 
             #endregion
@@ -978,25 +929,23 @@ namespace WhiteCore.Framework.Utilities
         #region Node Class
 
         // Represents a node in the list of nodes.
-        private class Node
+        class Node
         {
-            private readonly object element;
-            private readonly Node[] forward;
+            readonly object element;
+            readonly Node [] forward;
 
-            public Node(object element, int level)
+            public Node (object nodeEelement, int level)
             {
-                this.forward = new Node[level];
-                this.element = element;
+                forward = new Node [level];
+                element = nodeEelement;
             }
 
-            public Node this[int index]
-            {
-                get { return forward[index]; }
-                set { forward[index] = value; }
+            public Node this [int index] {
+                get { return forward [index]; }
+                set { forward [index] = value; }
             }
 
-            public object Element
-            {
+            public object Element {
                 get { return element; }
             }
         }
@@ -1006,35 +955,37 @@ namespace WhiteCore.Framework.Utilities
         #region PriorityQueueEnumerator Class
 
         // Implements the IEnumerator interface for the PriorityQueue class.
-        private class PriorityQueueEnumerator : IEnumerator
+        class PriorityQueueEnumerator : IEnumerator
         {
-            private readonly Node head;
-            private readonly LPriorityQueue owner;
-            private readonly long version;
+            readonly Node head;
+            readonly LPriorityQueue owner;
+            readonly long version;
 
-            private Node currentNode;
+            Node currentNode;
 
-            private bool moveResult;
+            bool moveResult;
 
-            public PriorityQueueEnumerator(LPriorityQueue owner)
+            public PriorityQueueEnumerator (LPriorityQueue pqOwner)
             {
-                this.owner = owner;
-                this.version = owner.version;
-                head = owner.header;
+                owner = pqOwner;
+                version = pqOwner.version;
+                head = pqOwner.header;
 
-                Reset();
+                Reset ();
             }
 
             #region IEnumerator Members
 
-            public void Reset()
+            public void Reset ()
             {
                 #region Require
 
-                if (version != owner.version)
-                {
-                    throw new InvalidOperationException(
+                if (version != owner.version) {
+                    MainConsole.Instance.Error ("[Priority Queue]: " +
                         "The PriorityQueue was modified after the enumerator was created.");
+
+                    moveResult = false;
+                    return;
                 }
 
                 #endregion
@@ -1043,15 +994,12 @@ namespace WhiteCore.Framework.Utilities
                 moveResult = true;
             }
 
-            public object Current
-            {
-                get
-                {
+            public object Current {
+                get {
                     #region Require
 
-                    if (currentNode == head || currentNode == null)
-                    {
-                        throw new InvalidOperationException(
+                    if (currentNode == head || currentNode == null) {
+                        throw new InvalidOperationException (
                             "The enumerator is positioned before the first " +
                             "element of the collection or after the last element.");
                     }
@@ -1062,25 +1010,22 @@ namespace WhiteCore.Framework.Utilities
                 }
             }
 
-            public bool MoveNext()
+            public bool MoveNext ()
             {
                 #region Require
 
-                if (version != owner.version)
-                {
-                    throw new InvalidOperationException(
-                        "The PriorityQueue was modified after the enumerator was created.");
+                if (version != owner.version) {
+                    MainConsole.Instance.Warn ("[Priority Queue]: The PriorityQueue was modified after the enumerator was created.");
+                    return false;
                 }
 
                 #endregion
 
-                if (moveResult)
-                {
-                    currentNode = currentNode[0];
+                if (moveResult) {
+                    currentNode = currentNode [0];
                 }
 
-                if (currentNode == null)
-                {
+                if (currentNode == null) {
                     moveResult = false;
                 }
 
@@ -1096,66 +1041,58 @@ namespace WhiteCore.Framework.Utilities
 
         #region ICollection Members
 
-        public virtual bool IsSynchronized
-        {
+        public virtual bool IsSynchronized {
             get { return false; }
         }
 
-        public virtual int Count
-        {
+        public virtual int Count {
             get { return count; }
         }
 
-        public virtual void CopyTo(Array array, int index)
+        public virtual void CopyTo (Array array, int index)
         {
             #region Require
 
-            if (array == null)
-            {
-                throw new ArgumentNullException("array");
+            if (array == null) {
+                MainConsole.Instance.Warn ("[Priority Queue]: Array is null");
+                return;
             }
-            else if (index < 0)
-            {
-                throw new ArgumentOutOfRangeException("index", index,
-                                                      "Array index out of range.");
+            if (index < 0) {
+                MainConsole.Instance.WarnFormat ("[Priority Queue]: Array index '{0}' is out of range.", index);
+                return;
             }
-            else if (array.Rank > 1)
-            {
-                throw new ArgumentException(
-                    "Array has more than one dimension.", "array");
+            if (array.Rank > 1) {
+                MainConsole.Instance.WarnFormat ("[Priority Queue]: Array '{0}' has more than one dimension.", array);
+                return;
             }
-            else if (index >= array.Length)
-            {
-                throw new ArgumentException(
-                    "index is equal to or greater than the length of array.", "index");
+            if (index >= array.Length) {
+                MainConsole.Instance.WarnFormat ("[Priority Queue]: index '{0}' is equal to or greater than the length of array.", index);
+                return;
             }
-            else if (Count > array.Length - index)
-            {
-                throw new ArgumentException(
-                    "The number of elements in the PriorityQueue is greater " +
-                    "than the available space from index to the end of the " +
-                    "destination array.", "index");
+            if (Count > array.Length - index) {
+                MainConsole.Instance.WarnFormat ("[Priority Queue]:  The number of elements in the PriorityQueue is greater " +
+                                                 "than the available space from index '{0}' to the end of the " +
+                                                 "destination array.", "index");
+                return;
             }
 
             #endregion
 
             int i = index;
 
-            foreach (object element in this)
-            {
-                array.SetValue(element, i);
+            foreach (object element in this) {
+                array.SetValue (element, i);
                 i++;
             }
         }
 
-        public virtual object SyncRoot
-        {
+        public virtual object SyncRoot {
             get { return this; }
         }
 
-        public virtual IEnumerator GetEnumerator()
+        public virtual IEnumerator GetEnumerator ()
         {
-            return new PriorityQueueEnumerator(this);
+            return new PriorityQueueEnumerator (this);
         }
 
         #endregion
