@@ -96,11 +96,11 @@ namespace WhiteCore.Framework.ClientInterfaces
             set { m_owner = value; }
         }
 
-        static readonly object _lock = new object ();
+        static readonly object _attachmentslock = new object ();
         public Dictionary<int, List<AvatarAttachment>> Attachments
         {
-            get { lock (_lock) { return m_attachments; }}
-            set { lock (_lock) { m_attachments = value; }}
+            get { lock (_attachmentslock) { return m_attachments; }}
+            set { lock (_attachmentslock) { m_attachments = value; }}
         }
 
         public AvatarAppearance() : this(UUID.Zero)
@@ -401,25 +401,25 @@ namespace WhiteCore.Framework.ClientInterfaces
         }
 
         // DEBUG ON
-        public override String ToString()
+        public override string ToString()
         {
-            String s = "";
+            string s = "";
 
-            s += String.Format("Serial: {0}\n", m_serial);
+            s += string.Format("Serial: {0}\n", m_serial);
 
             for (uint i = 0; i < TEXTURE_COUNT; i++)
                 if (m_texture.FaceTextures[i] != null)
-                    s += String.Format("Texture: {0} --> {1}\n", i, m_texture.FaceTextures[i].TextureID);
+                    s += string.Format("Texture: {0} --> {1}\n", i, m_texture.FaceTextures[i].TextureID);
 
             foreach (AvatarWearable awear in m_wearables)
             {
                 for (int i = 0; i < awear.Count; i++)
-                    s += String.Format("Wearable: item={0}, asset={1}\n", awear[i].ItemID, awear[i].AssetID);
+                    s += string.Format("Wearable: item={0}, asset={1}\n", awear[i].ItemID, awear[i].AssetID);
             }
 
             s += "Visual Params: ";
             for (uint j = 0; j < m_visualparams.Length; j++)
-                s += String.Format("{0},", m_visualparams[j]);
+                s += string.Format("{0},", m_visualparams[j]);
             s += "\n";
 
             return s;
@@ -433,7 +433,7 @@ namespace WhiteCore.Framework.ClientInterfaces
         /// </summary>
         public List<AvatarAttachment> GetAttachments()
         {
-            lock (m_attachments)
+            lock (_attachmentslock)
                 return (from kvp in m_attachments from attach in kvp.Value select new AvatarAttachment(attach)).ToList();
         }
 
@@ -443,13 +443,13 @@ namespace WhiteCore.Framework.ClientInterfaces
         /// </summary>
         public Dictionary<int, List<AvatarAttachment>> GetAttachmentsDictionary()
         {
-            lock (m_attachments)
+            lock (_attachmentslock)
                 return new Dictionary<int, List<AvatarAttachment>>(m_attachments);
         }
 
         internal void AppendAttachment(AvatarAttachment attach)
         {
-            lock (m_attachments)
+            lock (_attachmentslock)
             {
                 if (!m_attachments.ContainsKey(attach.AttachPoint))
                     m_attachments[attach.AttachPoint] = new List<AvatarAttachment>();
@@ -472,7 +472,7 @@ namespace WhiteCore.Framework.ClientInterfaces
         /// <returns>Whether attachments changed</returns>
         internal bool ReplaceAttachment(AvatarAttachment attach)
         {
-            lock (m_attachments)
+            lock (_attachmentslock)
             {
                 bool result = true;
                 if (m_attachments.ContainsKey(attach.AttachPoint))
@@ -499,7 +499,7 @@ namespace WhiteCore.Framework.ClientInterfaces
 
             if (item == UUID.Zero)
             {
-                lock (m_attachments)
+                lock (_attachmentslock)
                 {
                     if (m_attachments.ContainsKey(attachpoint))
                         m_attachments.Remove(attachpoint);
@@ -534,7 +534,7 @@ namespace WhiteCore.Framework.ClientInterfaces
         {
             if ((attPnt & 0x80) > 0)
                 return true;
-            lock (m_attachments)
+            lock (_attachmentslock)
             {
                 if (m_attachments.ContainsKey(attPnt))
                 {
@@ -556,7 +556,7 @@ namespace WhiteCore.Framework.ClientInterfaces
                     continue;
                 AvatarAttachment a = new AvatarAttachment(e.GetAttachmentPoint(), e.RootChild.FromUserInventoryItemID,
                                                           e.RootChild.FromUserInventoryAssetID);
-                lock (m_attachments)
+                lock (_attachmentslock)
                 {
                     if (!m_attachments.ContainsKey(e.GetAttachmentPoint()))
                         m_attachments.Add(e.GetAttachmentPoint(), new List<AvatarAttachment>());
@@ -567,7 +567,7 @@ namespace WhiteCore.Framework.ClientInterfaces
 
         public int GetAttachpoint(UUID itemID)
         {
-            lock (m_attachments)
+            lock (_attachmentslock)
             {
                 return (m_attachments.Select(
                     kvp =>
@@ -579,7 +579,7 @@ namespace WhiteCore.Framework.ClientInterfaces
 
         public bool DetachAttachment(UUID itemID)
         {
-            lock (m_attachments)
+            lock (_attachmentslock)
             {
                 foreach (KeyValuePair<int, List<AvatarAttachment>> kvp in m_attachments)
                 {
@@ -602,7 +602,7 @@ namespace WhiteCore.Framework.ClientInterfaces
 
         public void ClearAttachments()
         {
-            lock (m_attachments)
+            lock (_attachmentslock)
                 m_attachments.Clear();
         }
 
@@ -655,7 +655,7 @@ namespace WhiteCore.Framework.ClientInterfaces
 
             // Attachments
             int attachCount;
-            lock (m_attachments) {
+            lock (_attachmentslock) {
                 attachCount = m_attachments.Count;
             }
             OSDArray attachs = new OSDArray (attachCount);
