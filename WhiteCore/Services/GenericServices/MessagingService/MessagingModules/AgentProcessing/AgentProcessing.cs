@@ -69,8 +69,7 @@ namespace WhiteCore.Services
             {
                 m_enabled = agentConfig.GetString("Module", "AgentProcessing") == "AgentProcessing";
                 VariableRegionSight = agentConfig.GetBoolean("UseVariableRegionSightDistance", VariableRegionSight);
-                MaxVariableRegionSight = agentConfig.GetInt("MaxDistanceVariableRegionSightDistance",
-                                                            MaxVariableRegionSight);
+                MaxVariableRegionSight = agentConfig.GetInt("MaxDistanceVariableRegionSightDistance", MaxVariableRegionSight);
             }
             if (m_enabled)
                 m_registry.RegisterModuleInterface<IAgentProcessing>(this);
@@ -101,10 +100,14 @@ namespace WhiteCore.Services
                 return null;
 
             string method = message["Method"].AsString();
-            if (method != "RegionIsOnline" && method != "LogoutRegionAgents" &&
-                method != "ArrivedAtDestination" && method != "CancelTeleport" &&
-                method != "AgentLoggedOut" && method != "SendChildAgentUpdate" &&
-                method != "TeleportAgent" && method != "CrossAgent")
+            if (method != "RegionIsOnline" && 
+                method != "LogoutRegionAgents" &&
+                method != "ArrivedAtDestination" &&
+                method != "CancelTeleport" &&
+                method != "AgentLoggedOut" &&
+                method != "SendChildAgentUpdate" &&
+                method != "TeleportAgent" && 
+                method != "CrossAgent")
                 return null;
 
 
@@ -116,11 +119,11 @@ namespace WhiteCore.Services
             IRegionClientCapsService regionCaps = null;
             if (clientCaps != null)
                 regionCaps = clientCaps.GetCapsService(requestingRegion);
-            if (message["Method"] == "LogoutRegionAgents")
+            if (method == "LogoutRegionAgents")
             {
                 LogOutAllAgentsForRegion(requestingRegion);
             }
-            else if (message["Method"] == "RegionIsOnline")
+            else if (method == "RegionIsOnline")
                 //This gets fired when the scene is fully finished starting up
             {
                 //Log out all the agents first, then add any child agents that should be in this region
@@ -134,7 +137,7 @@ namespace WhiteCore.Services
                         Util.FireAndForget(o => EnableChildAgentsForRegion (requestingGridRegion));
                 }
             }
-            else if (message["Method"] == "ArrivedAtDestination")
+            else if (method == "ArrivedAtDestination")
             {
                 if (regionCaps == null || clientCaps == null)
                     return null;
@@ -157,7 +160,7 @@ namespace WhiteCore.Services
                 //Now do the creation
                 EnableChildAgents(AgentID, requestingRegion, DrawDistance, circuitData);
             }
-            else if (message["Method"] == "CancelTeleport")
+            else if (method == "CancelTeleport")
             {
                 if (regionCaps == null || clientCaps == null)
                     return null;
@@ -170,7 +173,7 @@ namespace WhiteCore.Services
                     regionCaps.Disabled = false;
                 }
             }
-            else if (message["Method"] == "AgentLoggedOut")
+            else if (method == "AgentLoggedOut")
             {
                 //ONLY if the agent is root do we even consider it
                 if (regionCaps != null && regionCaps.RootAgent)
@@ -188,7 +191,7 @@ namespace WhiteCore.Services
                     });
                 }
             }
-            else if (message["Method"] == "SendChildAgentUpdate")
+            else if (method == "SendChildAgentUpdate")
             {
                 if (regionCaps == null || clientCaps == null)
                     return null;
@@ -204,7 +207,7 @@ namespace WhiteCore.Services
                     regionCaps.Disabled = false;
                 }
             }
-            else if (message["Method"] == "TeleportAgent")
+            else if (method == "TeleportAgent")
             {
                 if (regionCaps == null || clientCaps == null)
                     return null;
@@ -234,7 +237,7 @@ namespace WhiteCore.Services
                     return null;
                 }
             }
-            else if (message["Method"] == "CrossAgent")
+            else if (method == "CrossAgent")
             {
                 if (regionCaps == null || clientCaps == null)
                     return null;
@@ -363,8 +366,7 @@ namespace WhiteCore.Services
                     foreach (IRegionClientCapsService regionClientCaps in regionCaps.GetClients())
                     {
                         if (usersInformed.Contains (regionClientCaps.AgentID) || !regionClientCaps.RootAgent ||
-                        AllScopeIDImpl.CheckScopeIDs (regionClientCaps.ClientCaps.AccountInfo.AllScopeIDs, neighbor) ==
-                        null)
+                        AllScopeIDImpl.CheckScopeIDs (regionClientCaps.ClientCaps.AccountInfo.AllScopeIDs, neighbor) == null)
                         //Only inform agents once
                         continue;
 
@@ -454,8 +456,7 @@ namespace WhiteCore.Services
                 reason = "The region you are attempting to teleport to is offline";
                 return false;
             }*/
-            MainConsole.Instance.Info("[AgentProcessing]: Starting to inform client about neighbor " +
-                                      neighbor.RegionName);
+            MainConsole.Instance.Info("[AgentProcessing]: Starting to inform client about neighbor " + neighbor.RegionName);
 
             //Notes on this method
             // 1) the SimulationService.CreateAgent MUST have a fixed CapsUrl for the region, so we have to create (if needed)
@@ -479,12 +480,11 @@ namespace WhiteCore.Services
                 }
 
                 bool newAgent = oldRegionService == null;
-                IRegionClientCapsService otherRegionService = clientCaps.GetOrCreateCapsService(neighbor.RegionID,
-                                                                                                CapsUtil.GetCapsSeedPath
-                                                                                                    (CapsUtil.
-                                                                                                         GetRandomCapsObjectPath
-                                                                                                         ()),
-                                                                                                circuitData, 0);
+                IRegionClientCapsService otherRegionService = 
+                    clientCaps.GetOrCreateCapsService(neighbor.RegionID,
+                                                      CapsUtil.GetCapsSeedPath
+                                                      (CapsUtil.GetRandomCapsObjectPath()),
+                                                      circuitData, 0);
 
                 if (!newAgent)
                 {
@@ -507,7 +507,11 @@ namespace WhiteCore.Services
 
                 int requestedPort = 0;
                 CreateAgentResponse createAgentResponse;
-                bool regionAccepted = CreateAgent(neighbor, otherRegionService, ref circuitData, SimulationService, new List<UUID>(),
+                bool regionAccepted = CreateAgent(neighbor,
+                                                  otherRegionService,
+                                                  ref circuitData,
+                                                  SimulationService,
+                                                  new List<UUID>(),
                                                   out createAgentResponse);
                 reason = createAgentResponse.Reason;
                 if (regionAccepted)
@@ -851,7 +855,11 @@ namespace WhiteCore.Services
 
         public virtual List<GridRegion> GetNeighbors(List<UUID> scopeIDs, GridRegion region, int userDrawDistance)
         {
-            List<GridRegion> neighbors;
+            var neighbors = new List<GridRegion>();
+            var gridService = m_registry.RequestModuleInterface<IGridService> ();
+            if (gridService == null)
+                return neighbors;       // no grid service??
+            
             if (VariableRegionSight && userDrawDistance != 0)
             {
                 //Enforce the max draw distance
@@ -865,11 +873,10 @@ namespace WhiteCore.Services
                 int yMax = (region.RegionLocY) + (userDrawDistance);
 
                 //Ask the grid service about the range
-                neighbors = m_registry.RequestModuleInterface<IGridService>().GetRegionRange(scopeIDs,
-                                                                                             xMin, xMax, yMin, yMax);
+                neighbors = gridService.GetRegionRange(scopeIDs, xMin, xMax, yMin, yMax);
             }
             else
-                neighbors = m_registry.RequestModuleInterface<IGridService>().GetNeighbors(scopeIDs, region);
+                neighbors = gridService.GetNeighbors(scopeIDs, region);
 
             return neighbors;
         }

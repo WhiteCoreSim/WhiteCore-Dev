@@ -26,16 +26,16 @@
  */
 
 
+using System.Collections.Generic;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Other;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using System.Collections.Generic;
 using GridRegion = WhiteCore.Framework.Services.GridRegion;
 
 namespace WhiteCore.Services
@@ -50,21 +50,21 @@ namespace WhiteCore.Services
 
         #region IService Members
 
-        public void Initialize(IConfigSource config, IRegistryCore registry)
+        public void Initialize (IConfigSource config, IRegistryCore registry)
         {
             m_registry = registry;
         }
 
-        public void Start(IConfigSource config, IRegistryCore registry)
+        public void Start (IConfigSource config, IRegistryCore registry)
         {
-            registry.RequestModuleInterface<ISimulationBase>().EventManager.RegisterEventHandler("EstateUpdated",
+            registry.RequestModuleInterface<ISimulationBase> ().EventManager.RegisterEventHandler ("EstateUpdated",
                                                                                                  OnGenericEvent);
         }
 
-        public void FinishedStartup()
+        public void FinishedStartup ()
         {
             //Also look for incoming messages to display
-            m_registry.RequestModuleInterface<ISyncMessageRecievedService>().OnMessageReceived += OnMessageReceived;
+            m_registry.RequestModuleInterface<ISyncMessageRecievedService> ().OnMessageReceived += OnMessageReceived;
         }
 
         #endregion
@@ -75,30 +75,22 @@ namespace WhiteCore.Services
         /// <param name="FunctionName"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        protected object OnGenericEvent(string FunctionName, object parameters)
+        protected object OnGenericEvent (string FunctionName, object parameters)
         {
-            if (FunctionName == "EstateUpdated")
-            {
-                EstateSettings es = (EstateSettings) parameters;
-                IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector>();
-                ISyncMessagePosterService asyncPoster =
-                    m_registry.RequestModuleInterface<ISyncMessagePosterService>();
-                IGridService gridService = m_registry.RequestModuleInterface<IGridService>();
-                if (estateConnector != null)
-                {
-                    List<UUID> regions = estateConnector.GetRegions((int) es.EstateID);
-                    if (regions != null)
-                    {
-                        foreach (UUID region in regions)
-                        {
+            if (FunctionName == "EstateUpdated") {
+                EstateSettings es = (EstateSettings)parameters;
+                IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
+                ISyncMessagePosterService asyncPoster = m_registry.RequestModuleInterface<ISyncMessagePosterService> ();
+                IGridService gridService = m_registry.RequestModuleInterface<IGridService> ();
+
+                if (estateConnector != null && gridService != null && asyncPoster != null) {
+                    List<UUID> regions = estateConnector.GetRegions ((int)es.EstateID);
+                    if (regions != null) {
+                        foreach (UUID region in regions) {
                             //Send the message to update all regions that are in this estate, as a setting changed
-                            if (gridService != null && asyncPoster != null)
-                            {
-                                GridRegion r = gridService.GetRegionByUUID(null, region);
-                                if (r != null)
-                                    asyncPoster.Post(r.ServerURI,
-                                                     SyncMessageHelper.UpdateEstateInfo(es.EstateID, region));
-                            }
+                            GridRegion r = gridService.GetRegionByUUID (null, region);
+                            if (r != null)
+                                asyncPoster.Post (r.ServerURI, SyncMessageHelper.UpdateEstateInfo (es.EstateID, region));
                         }
                     }
                 }
@@ -111,32 +103,24 @@ namespace WhiteCore.Services
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        protected OSDMap OnMessageReceived(OSDMap message)
+        protected OSDMap OnMessageReceived (OSDMap message)
         {
             //We need to check and see if this is an AgentStatusChange
-            if (message.ContainsKey("Method") && message["Method"] == "EstateUpdated")
-            {
-                OSDMap innerMessage = (OSDMap) message["Message"];
+            if (message.ContainsKey ("Method") && message ["Method"] == "EstateUpdated") {
+                OSDMap innerMessage = (OSDMap)message ["Message"];
                 //We got a message, deal with it
-                uint estateID = innerMessage["EstateID"].AsUInteger();
-                UUID regionID = innerMessage["RegionID"].AsUUID();
-                ISceneManager manager = m_registry.RequestModuleInterface<ISceneManager>();
-                if (manager != null)
-                {
-                    foreach (IScene scene in manager.Scenes)
-                    {
-                        if (scene.RegionInfo.EstateSettings.EstateID == estateID)
-                        {
-                            IEstateConnector estateConnector =
-                                Framework.Utilities.DataManager.RequestPlugin<IEstateConnector>();
-                            if (estateConnector != null)
-                            {
-                                EstateSettings es = null;
-                                if ((es = estateConnector.GetEstateSettings(regionID)) != null && es.EstateID != 0)
-                                {
-                                    scene.RegionInfo.EstateSettings = es;
-                                    MainConsole.Instance.Debug("[EstateProcessor]: Updated estate information.");
-                                }
+                uint estateID = innerMessage ["EstateID"].AsUInteger ();
+                UUID regionID = innerMessage ["RegionID"].AsUUID ();
+                ISceneManager manager = m_registry.RequestModuleInterface<ISceneManager> ();
+                IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
+
+                if (manager != null && estateConnector != null) {
+                    foreach (IScene scene in manager.Scenes) {
+                        if (scene.RegionInfo.EstateSettings.EstateID == estateID) {
+                            EstateSettings es = null;
+                            if ((es = estateConnector.GetEstateSettings (regionID)) != null && es.EstateID != 0) {
+                                scene.RegionInfo.EstateSettings = es;
+                                MainConsole.Instance.Debug ("[EstateProcessor]: Updated estate information.");
                             }
                         }
                     }

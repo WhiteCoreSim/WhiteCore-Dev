@@ -36,9 +36,9 @@ namespace WhiteCore.Services
 {
     public class Scheduler : ConnectorBase, IScheduleService, IService
     {
-        public WhiteCoreEventManager EventManager = new WhiteCoreEventManager();
+        public WhiteCoreEventManager EventManager = new WhiteCoreEventManager ();
         ISchedulerDataPlugin m_database;
-//        bool m_enabled;
+        // bool m_enabled;
 
         #region Implementation of IService
 
@@ -47,11 +47,11 @@ namespace WhiteCore.Services
         /// </summary>
         /// <param name="config">Config file</param>
         /// <param name="registry">Place to register the modules into</param>
-        public void Initialize(IConfigSource config, IRegistryCore registry)
+        public void Initialize (IConfigSource config, IRegistryCore registry)
         {
-            registry.RegisterModuleInterface<IScheduleService>(this);
+            registry.RegisterModuleInterface<IScheduleService> (this);
 
-            Init(registry, "Scheduler");
+            Init (registry, "Scheduler");
         }
 
         /// <summary>
@@ -59,20 +59,19 @@ namespace WhiteCore.Services
         /// </summary>
         /// <param name="config">Config file</param>
         /// <param name="registry">Place to register and retrieve module interfaces</param>
-        public void Start(IConfigSource config, IRegistryCore registry)
+        public void Start (IConfigSource config, IRegistryCore registry)
         {
         }
 
         /// <summary>
         ///     All modules have started up and it is ready to run
         /// </summary>
-        public void FinishedStartup()
+        public void FinishedStartup ()
         {
-            if (IsLocalConnector)
-            {
-                m_database = Framework.Utilities.DataManager.RequestPlugin<ISchedulerDataPlugin>();
-//                if (m_database != null)
-//                    m_enabled = true;
+            if (IsLocalConnector) {
+                m_database = Framework.Utilities.DataManager.RequestPlugin<ISchedulerDataPlugin> ();
+                // if (m_database != null)
+                //     m_enabled = true;
 
             }
         }
@@ -81,137 +80,135 @@ namespace WhiteCore.Services
 
         #region Implementation of IScheduleService
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.High, RenamedMethod = "SchedulerSave")]
-        public string Save(SchedulerItem I)
+        [CanBeReflected (ThreatLevel = ThreatLevel.High, RenamedMethod = "SchedulerSave")]
+        public string Save (SchedulerItem I)
         {
             if (m_doRemoteCalls)
-                return (string) DoRemote(I);
-            return m_database.SchedulerSave(I);
+                return (string)DoRemote (I);
+            return m_database.SchedulerSave (I);
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.High)]
-        public void RemoveID(string id)
+        [CanBeReflected (ThreatLevel = ThreatLevel.High)]
+        public void RemoveID (string id)
         {
-            if (m_doRemoteCalls)
-            {
-                DoRemotePost(id);
+            if (m_doRemoteCalls) {
+                DoRemotePost (id);
                 return;
             }
-            m_database.SchedulerRemoveID(id);
+            m_database.SchedulerRemoveID (id);
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.High)]
-        public void RemoveFireFunction(string identifier)
+        [CanBeReflected (ThreatLevel = ThreatLevel.High)]
+        public void RemoveFireFunction (string identifier)
         {
-            if (m_doRemoteCalls)
-            {
-                DoRemotePost(identifier);
+            if (m_doRemoteCalls) {
+                DoRemotePost (identifier);
                 return;
             }
-            m_database.SchedulerRemoveFunction(identifier);
+            m_database.SchedulerRemoveFunction (identifier);
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low, RenamedMethod = "SchedulerExist")]
-        public bool Exist(string scdID)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low, RenamedMethod = "SchedulerExist")]
+        public bool Exist (string scdID)
         {
             if (m_doRemoteCalls)
-                return (bool) DoRemote(scdID);
-            return m_database.SchedulerExist(scdID);
+                return (bool)DoRemote (scdID);
+            return m_database.SchedulerExist (scdID);
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low, RenamedMethod = "SchedulerGet")]
-        public SchedulerItem Get(string ID)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low, RenamedMethod = "SchedulerGet")]
+        public SchedulerItem Get (string ID)
         {
             if (m_doRemoteCalls)
-                return (SchedulerItem) DoRemote(ID);
-            return m_database.Get(ID);
+                return (SchedulerItem)DoRemote (ID);
+            return m_database.Get (ID);
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low, RenamedMethod = "SchedulerGet")]
-        public SchedulerItem Get(string scheduleFor, string fireFunction)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low, RenamedMethod = "SchedulerGet")]
+        public SchedulerItem Get (string scheduleFor, string fireFunction)
         {
             if (m_doRemoteCalls)
-                return (SchedulerItem) DoRemote(scheduleFor, fireFunction);
-            return m_database.Get(scheduleFor, fireFunction);
+                return (SchedulerItem)DoRemote (scheduleFor, fireFunction);
+            return m_database.Get (scheduleFor, fireFunction);
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public SchedulerItem GetFunctionItem(string fireFunction)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public SchedulerItem GetFunctionItem (string fireFunction)
         {
             if (m_doRemoteCalls)
-                return (SchedulerItem) DoRemote(fireFunction);
-            return m_database.GetFunctionItem(fireFunction);
+                return (SchedulerItem)DoRemote (fireFunction);
+            return m_database.GetFunctionItem (fireFunction);
         }
 
         #endregion
 
- /*       #region Timer
+        /*       #region Timer
 
-        void t_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            scheduleTimer.Enabled = false;
-            try
-            {
-                List<SchedulerItem> CurrentSchedule = m_database.ToRun();
-                foreach (SchedulerItem I in CurrentSchedule)
-                {
-                    FireEvent(I);
-                }
-            }
-            catch (Exception ee)
-            {
-                MainConsole.Instance.ErrorFormat("[Scheduler] t_Elapsed Error {0}", ee);
-            }
-            finally
-            {
-                scheduleTimer.Enabled = true;
-            }
-        }
+               void t_Elapsed(object sender, ElapsedEventArgs e)
+               {
+                   scheduleTimer.Enabled = false;
+                   try
+                   {
+                       List<SchedulerItem> CurrentSchedule = m_database.ToRun();
+                       foreach (SchedulerItem I in CurrentSchedule)
+                       {
+                           FireEvent(I);
+                       }
+                   }
+                   catch (Exception ee)
+                   {
+                       MainConsole.Instance.ErrorFormat("[Scheduler] t_Elapsed Error {0}", ee);
+                   }
+                   finally
+                   {
+                       scheduleTimer.Enabled = true;
+                   }
+               }
 
-        void FireEvent(SchedulerItem I)
-        {
-            try
-            {
-                // save changes before it fires in case its changed during the fire
-                I = m_database.SaveHistory(I);
+               void FireEvent(SchedulerItem I)
+               {
+                   try
+                   {
+                       // save changes before it fires in case its changed during the fire
+                       I = m_database.SaveHistory(I);
 
-                if (I.RunOnce)
-                    I.Enabled = false;
-                
-//                if (I.Enabled) I.CalculateNextRunTime(I.TimeToRun);
-                if (I.Enabled)
-                    I.TimeToRun = schedMoney.GetStipendPaytime(Constants.SCHEDULED_PAYMENTS_DELAY);      // next stipend payment cycle + delay
+                       if (I.RunOnce)
+                           I.Enabled = false;
 
-                if (!I.HistoryKeep)
-                    m_database.HistoryDeleteOld(I);
-                
-                // save the new schedule item
-                m_database.SchedulerSave(I);
+       //                if (I.Enabled) I.CalculateNextRunTime(I.TimeToRun);
+                       if (I.Enabled)
+                           I.TimeToRun = schedMoney.GetStipendPaytime(Constants.SCHEDULED_PAYMENTS_DELAY);      // next stipend payment cycle + delay
 
-                // now fire
-                List<Object> reciept = EventManager.FireGenericEventHandler(I.FireFunction, I.FireParams);
-                if (!I.HistoryReceipt)
-                    I = m_database.SaveHistoryComplete(I);
-                else
-                {
-                    foreach (string results in reciept.Cast<string>().Where(results => results != ""))
-                    {
-                        m_database.SaveHistoryCompleteReciept(I.HistoryLastID, results);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                MainConsole.Instance.ErrorFormat("[Scheduler] FireEvent Error {0}: {1}", I.id, e);
-            }
-        }
+                       if (!I.HistoryKeep)
+                           m_database.HistoryDeleteOld(I);
 
-        public void MarkComplete(string history_id, string receipt)
-        {
-            m_database.SaveHistoryCompleteReciept(history_id, receipt);
-        }
+                       // save the new schedule item
+                       m_database.SchedulerSave(I);
 
-        #endregion
-        */
+                       // now fire
+                       List<Object> reciept = EventManager.FireGenericEventHandler(I.FireFunction, I.FireParams);
+                       if (!I.HistoryReceipt)
+                           I = m_database.SaveHistoryComplete(I);
+                       else
+                       {
+                           foreach (string results in reciept.Cast<string>().Where(results => results != ""))
+                           {
+                               m_database.SaveHistoryCompleteReciept(I.HistoryLastID, results);
+                           }
+                       }
+                   }
+                   catch (Exception e)
+                   {
+                       MainConsole.Instance.ErrorFormat("[Scheduler] FireEvent Error {0}: {1}", I.id, e);
+                   }
+               }
+
+               public void MarkComplete(string history_id, string receipt)
+               {
+                   m_database.SaveHistoryCompleteReciept(history_id, receipt);
+               }
+
+               #endregion
+               */
     }
 }
