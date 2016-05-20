@@ -369,9 +369,10 @@ namespace WhiteCore.Framework.ConsoleFramework
                 c = m_Connections [sessionID];
             }
             c.last = Environment.TickCount;
-            if (c.lastLineSeen >= m_LineNumber)
-                return NoEvents (RequestID, UUID.Zero, response);
-
+            lock (m_Scrollback) {
+                if (c.lastLineSeen >= m_LineNumber)
+                    return NoEvents (RequestID, UUID.Zero, response);
+            }
             XmlDocument xmldoc = new XmlDocument ();
             XmlNode xmlnode = xmldoc.CreateNode (XmlNodeType.XmlDeclaration, "", "");
 

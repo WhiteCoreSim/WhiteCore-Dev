@@ -41,7 +41,7 @@ namespace WhiteCore.Framework.ConsoleFramework
     /// </summary>
     public class LocalConsole : CommandConsole
     {
-
+        static readonly object _cmdlock = new object ();
         static readonly ConsoleColor [] Colors =
             {
                 // the dark colors don't seem to be visible on some black background terminals like putty :(
@@ -61,12 +61,12 @@ namespace WhiteCore.Framework.ConsoleFramework
             };
 
         readonly List<string> history = new List<string> ();
+        protected string prompt = "# ";
 
         StringBuilder cmdline = new StringBuilder ();
         int cp;
         bool echo = true;
         int h = 1;
-        protected string prompt = "# ";
         int y = -1;
 
         public override string Name {
@@ -198,7 +198,7 @@ namespace WhiteCore.Framework.ConsoleFramework
 
         void Show ()
         {
-            lock (cmdline) {
+            lock (_cmdlock) {
                 if (y == -1 || Console.BufferWidth == 0)
                     return;
 
@@ -347,7 +347,7 @@ namespace WhiteCore.Framework.ConsoleFramework
                     m_logFile.WriteLine (fullText);
                     m_logFile.Flush ();
                 }
-                lock (cmdline) {
+                lock (_cmdlock) {
                     if (y == -1) {
                         WriteColorText (ConsoleColor.DarkCyan, ts);
                         WriteLocalText (text, level);
@@ -401,8 +401,10 @@ namespace WhiteCore.Framework.ConsoleFramework
 
         public override string ReadLine (string p, bool isCommand, bool e)
         {
-            h = 1;
-            cp = 0;
+            lock (_cmdlock) {
+                h = 1;
+                cp = 0;
+            }
             prompt = p;
             echo = e;
             int historyLine = history.Count;
@@ -411,7 +413,7 @@ namespace WhiteCore.Framework.ConsoleFramework
             SetCursorLeft (0); // Needed for mono
             Console.Write (" "); // Needed for mono
 
-            lock (cmdline) {
+            lock (_cmdlock) {
                 y = Console.CursorTop;
                 cmdline.Remove (0, cmdline.Length);
             }
@@ -591,7 +593,7 @@ namespace WhiteCore.Framework.ConsoleFramework
                         else
                             Console.WriteLine ("{0}", prompt);
 
-                        lock (cmdline) {
+                        lock (_cmdlock) {
                             y = -1;
                         }
                         string commandLine = cmdline.ToString ();
