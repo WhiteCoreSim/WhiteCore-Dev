@@ -11,10 +11,10 @@
 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 * copies of the Software, and to permit persons to whom the Software is
 * furnished to do so, subject to the following conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be included in
 * all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,12 +24,12 @@
 * THE SOFTWARE.
 *
 * This javascript makes use of the Second Life Map API, which is documented
-* at http://wiki.secondlife.com/wiki/Map_API 
+* at http://wiki.secondlife.com/wiki/Map_API
 *
 * Use of the Second Life Map API is subject to the Second Life API Terms of Use:
 *   https://wiki.secondlife.com/wiki/Linden_Lab_Official:API_Terms_of_Use
 *
-* Questions regarding this javascript, and any suggested improvements to it, 
+* Questions regarding this javascript, and any suggested improvements to it,
 * should be sent to the mailing list opensource-dev@list.secondlife.com
 */
 //
@@ -67,9 +67,9 @@
 // Taken from prototype.js...
 //
 
-Object.extend = function(destination, source) 
+Object.extend = function(destination, source)
 {
-	for (property in source) 
+	for (property in source)
 	{
 			destination[property] = source[property];
 	}
@@ -204,7 +204,7 @@ var SLURL = {
 		var sl_zoom = SLURL.convertZoom(zoom);
 
 		var regions_per_tile_edge = Math.pow(2, sl_zoom - 1);
-		
+
 		var x = pos.x * regions_per_tile_edge;
 		var y = pos.y * regions_per_tile_edge;
 
@@ -218,11 +218,11 @@ var SLURL = {
 		// are named by lower-left corner.  Since we flipped in Y, correct the
 		// name.  JC
 		y -= regions_per_tile_edge;
-		
+
 		// We name our tiles based on the grid_x, grid_y of the region in the
 		// lower-left corner.
 		x -= x % regions_per_tile_edge;
-		y -= y % regions_per_tile_edge; 
+		y -= y % regions_per_tile_edge;
 
 		return (
 			[ // this used to be a variable, but it wasn't used anywhere else in the JS, so it was moved here
@@ -286,7 +286,7 @@ var SLURL = {
 		this.tileBounds=[];
 		var BitmapSize = 512;
 		var c=1;
-		
+
 		for(var d=0; d < NumZoomLevels; d++){
 			var e= BitmapSize / 2;
 			this.pixelsPerLonDegree.push(BitmapSize / 360);
@@ -299,7 +299,7 @@ var SLURL = {
 	},
 
 // Img
-	Img                        : function(imgURL, imgWidth, imgHeight, hasAlpha){		
+	Img                        : function(imgURL, imgWidth, imgHeight, hasAlpha){
 		this.URL    = imgURL;
 		this.width  = imgWidth;
 		this.height = imgHeight;
@@ -355,7 +355,7 @@ var SLURL = {
 		this.hasPanningControls         = true;
 		this.hasOverviewMapControl      = true;
 		this.onStateChangedClickHandler = null;
-		
+
 		if(options){
 			Object.extend(this, options);
 		}
@@ -420,15 +420,15 @@ var SLURL = {
 
 			// Install our various event handlers
 			GEvent.addListener( // clicking on the map
-				slMap.GMap, 
-				"click", 
+				slMap.GMap,
+				"click",
 				function(marker, point){
 					SLURL.clickHandler(slMap, marker, point);
 				}
 			);
 			GEvent.addListener( // map stops moving
-					slMap.GMap, 
-					"moveend", 
+					slMap.GMap,
+					"moveend",
 					function(){
 						slMap.onStateChangedHandler();
 					}
@@ -444,19 +444,19 @@ var SLURL = {
 				);
 				GEvent.addListener(
 					this.GMap,
-					"mouseout", 
+					"mouseout",
 					function(pos){
 						slMap.onMouseOutHandler(pos);
 					}
 				);
 			}
 			GEvent.addListener(
-				slMap.GMap, 
-				"dragstart", 
+				slMap.GMap,
+				"dragstart",
 				function(){
 					SLURL.dragHandler(slMap);
 				}
-			);        
+			);
 
 			// Moved this to the end as GMaps seemed to fail if I did it right
 			// after map creation, and I don't have time to debug other people's code.
@@ -503,24 +503,24 @@ SLURL.RegionPoint.prototype = new SLURL.XYPoint;
 SLURL.EuclideanProjection.prototype=new GProjection();
 
 
-// == A method for converting latitudes and longitudes to pixel coordinates == 
+// == A method for converting latitudes and longitudes to pixel coordinates ==
 SLURL.EuclideanProjection.prototype.fromLatLngToPixel=function(LatLng,zoom)
 {
     var RawMapX = LatLng.lng() / SLURL.mapFactor;
     var RawMapY = -LatLng.lat() / SLURL.mapFactor;
-    
+
     // Now map this square onto a 1:1 bitmap of the entire SL map, based
     // on the size of SL map tiles (at zoom level 1, the closest)
     var RawPixelX = RawMapX * SLURL.tileSize;
     var RawPixelY = RawMapY * SLURL.tileSize;
-    
+
     // Now account for the fact that the map may be zoomed out
     zoom = SLURL.convertZoom(zoom);
     var ZoomFactor = Math.pow(2, zoom - 1);
 
     var PixelX = RawPixelX / ZoomFactor;
     var PixelY = RawPixelY / ZoomFactor;
-    
+
     return new GPoint(PixelX, PixelY)
 };
 
@@ -534,28 +534,28 @@ SLURL.EuclideanProjection.prototype.fromPixelToLatLng=function(pos,zoom,c)
 
     var RawPixelX = pos.x * ZoomFactor;
     var RawPixelY = pos.y * ZoomFactor;
-    
+
     // Now map this 1:1 bitmap position onto a 10k square of SL tiles, located at the origin
     var RawMapX = RawPixelX / SLURL.tileSize;
     var RawMapY = RawPixelY / SLURL.tileSize;
-    
+
     // Now map this 10k SL square onto a 90 LatLng square
     var Lng = RawMapX * SLURL.mapFactor;
     var Lat = RawMapY * SLURL.mapFactor;
-    
+
     return new GLatLng(-Lat,Lng,c)
 };
- 
+
 // == a method that checks if the x/y value is in range ==
 SLURL.EuclideanProjection.prototype.tileCheckRange=function(pos, zoom, tileSize)
 {
 	return ((pos.x < 0) || (pos.y < 0)) ? false : true;
 }
 
-// == a method that returns the width of the tilespace (the bounding box of the map) ==      
-SLURL.EuclideanProjection.prototype.getWrapWidth=function(zoom) 
+// == a method that returns the width of the tilespace (the bounding box of the map) ==
+SLURL.EuclideanProjection.prototype.getWrapWidth=function(zoom)
 {
-	return this.tileBounds[zoom] * SLURL.gridEdgeSizeInRegions;		
+	return this.tileBounds[zoom] * SLURL.gridEdgeSizeInRegions;
 }
 
 
@@ -579,7 +579,7 @@ SLURL.XYPoint.prototype.GetGLatLng = function()
     var lng = this.x * SLURL.mapFactor;
 	return new GLatLng(lat, lng);
 }
- 
+
 
 SLURL.XYPoint.prototype._SetFromGLatLng = function(gpos)
 {
@@ -599,13 +599,13 @@ SLURL.Bounds.prototype._SetFromGLatLngBounds = function(gbounds)
 {
 		var SW = new SLURL.XYPoint();
 		var NE = new SLURL.XYPoint();
-		
+
 		SW._SetFromGLatLng(gbounds.getSouthWest());
 		NE._SetFromGLatLng(gbounds.getNorthEast());
-		
+
 		this.xMin = SW.x;
 		this.yMin = SW.y;
-		
+
 		this.xMax = NE.x;
 		this.yMax = NE.y;
 }
@@ -659,7 +659,7 @@ SLURL.Map.prototype.onMouseMoveHandler = function(pos){
 	// We just got a mouse move, so the user isn't 'hovering' right now
 	this.resetHoverTimeout(true);
 	this.hoverPos = pos;
-	
+
 	// If we're showing a tooltip, close it
 	if (this.showingHoverWindow){
 		this.GMap.closeInfoWindow();
@@ -720,7 +720,7 @@ SLURL.Map.prototype.showTileNameToolTip = function(slMap, tileX, tileY){
 			map       = slMap,
 			hoverText = regionName
 			;
-		
+
 		map.ID = null;
 		map.GMap.openInfoWindowHtml(map.hoverPos, hoverText, { onCloseFn: function() { map.hoverWindowCloseHandler(); }});
 		map.showingHoverWindow = true;
@@ -738,12 +738,12 @@ SLURL.Map.prototype.showTileNameToolTip = function(slMap, tileX, tileY){
 SLURL.Map.prototype.hoverWindowCloseHandler = function(){
 	// Window has just closed, so reset any hover timer, so a window doesn't appear immediately
 	this.showingHoverWindow = false;
-	this.resetHoverTimeout(false);	
+	this.resetHoverTimeout(false);
 }
 
 SLURL.Map.prototype.CreateMapTypes = function(){
 	var mapTypes = [];
-	
+
 		var copyCollection = new GCopyrightCollection('WhiteCore');
 		var copyright = new GCopyright(1, new GLatLngBounds(new GLatLng(0, 0), new GLatLng(-90, 90)), 0, "(C) 2014 - " + (new Date).getFullYear() + " WhiteCore-Sim.org");
 		copyCollection.addCopyright(copyright);
@@ -751,14 +751,14 @@ SLURL.Map.prototype.CreateMapTypes = function(){
 		// Create the 'Land' type of map
 		var landTilelayers = [new GTileLayer(copyCollection, 10, 16)];
 		landTilelayers[0].getTileUrl = SLURL.getTileUrl;
-		
+
 		//var landMap = new GMapType(landTilelayers, this.mapProjection, "Land", {errorMessage:"No SL data available"});
 		var landMap = new GMapType(landTilelayers, this.mapProjection, "Land" );
 		landMap.getMinimumResolution = function() { return SLURL.convertZoom(SLURL.minZoomLevel); };
 		landMap.getMaximumResolution = function() { return SLURL.convertZoom(SLURL.maxZoomLevel); };
 
 		mapTypes.push(landMap);
-		
+
 	return mapTypes;
 }
 
@@ -767,7 +767,7 @@ SLURL.Map.prototype.CreateMapDiv = function(mainDiv){
 		SLMap = this,
 		mapDiv = document.createElement("div") // Create a div to be the main map container as a child of the main div
 	;
-	
+
 	// Match parent height
 	mapDiv.style.height = "100%";
 
@@ -780,7 +780,7 @@ SLURL.Map.prototype.CreateMapDiv = function(mainDiv){
 			formButton    = document.createElement("input"),
 			clickHandler  = function(){
 				if(formText){
-					SLMap.gotoRegion(formText.value); 
+					SLMap.gotoRegion(formText.value);
 				}else{
 					alert("Can't find textField!");
 				}
@@ -803,7 +803,7 @@ SLURL.Map.prototype.CreateMapDiv = function(mainDiv){
 		formLabelSpan.appendChild(formLabel);
 
 		// Text field for the region name
-		formText.value = "WhiteCore";
+		formText.value = "<Search Region>";
 		formText.size = 15;
 
 		// Button to activate 'go to region'
@@ -962,8 +962,8 @@ SLURL.Map.prototype.addMarker = function(marker, mapWindow){
 		gicon.infoWindowAnchor = gicon.iconAnchor; // TODO: need to change this? It's probably ok for most cases
 
 		var gmarkeroptions = {
-				icon: gicon, 
-				clickable: isClickable, 
+				icon: gicon,
+				clickable: isClickable,
 				draggable: false,
 				zIndexProcess: function() { return markerZIndex; }
 		};
@@ -1045,7 +1045,7 @@ SLURL.Map.prototype._forceZoomToLimits = function(zoom){ // Enforce zoom limits 
 	}
 	if (this.options && this.options.zoomMin){
 		zoom = Math.min(zoom, this.options.zoomMin);
-	}	
+	}
 	return zoom;
 }
 

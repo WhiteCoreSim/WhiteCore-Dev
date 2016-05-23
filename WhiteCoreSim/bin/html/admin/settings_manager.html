@@ -19,7 +19,7 @@
 <div id="info_message" class="info"><h3></h3></div>
 <table id="settings_manager">
   <caption></caption>
-  
+
   <thead>
     <tr>
       <th class="settings_manager_left"></th>
@@ -96,12 +96,13 @@
   </tbody>
 </table>
 </form>
+
 <script>
   /* attach a submit handler to the form */
   $("#settings_manager_form").submit(function(event) {
 
     /* stop form from submitting normally */
-    event.preventDefault(); 
+    event.preventDefault();
     /* get some values from elements on the page: */
     var $form = $( this ),
         url = $form.attr( 'action' );

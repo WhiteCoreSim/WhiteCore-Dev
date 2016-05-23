@@ -5,9 +5,9 @@
 {ErrorMessage}             Error Message Handling
 {NewsItemTitle}            News Item Title
 {NewsItemText}             News Item Text
-{NewsTitle}                
-{NewsText}             
-{NewsID}             
+{NewsTitle}
+{NewsText}
+{NewsID}
 {Submit}                   Submit
 
 -->
@@ -18,14 +18,14 @@
 <form id="edit_news_form" action="admin/edit_news.html" method="post">
 <table id="edit_news">
   <caption></caption>
-  
+
   <thead>
     <tr>
       <th class="add_news_left"></th>
       <th class="add_news_right"></th>
     </tr>
   </thead>
-  
+
   <tfoot>
     <tr>
       <th class="add_news_left"></th>
@@ -50,19 +50,20 @@
   </tbody>
 </table>
 </form>
+
 <script>
   /* attach a submit handler to the form */
   $("#edit_news_form").submit(function(event) {
 
     /* stop form from submitting normally */
-    event.preventDefault(); 
+    event.preventDefault();
     /* get some values from elements on the page: */
     var $form = $( this ),
         url = $form.attr( 'action' );
     /* Send the data using post and put the results in a div */
     $.post( url, $form.serialize(),
       function( data ) {
-		$("#info_message").empty().append("<h3>" + data + "</h3>");
+    $("#info_message").empty().append("<h3>" + data + "</h3>");
       }
     );
   });

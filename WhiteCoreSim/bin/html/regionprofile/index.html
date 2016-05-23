@@ -7,18 +7,44 @@
 	<meta name="description" content="{SystemName}"/>
 	<link rel="shortcut icon" href="../images/icons/favicon.ico" />
 
-	<script src="{SystemURL}/javascripts/jquery-2.2.3.min.js" type="text/javascript"></script> 
-
 	<!-- StyleSwitch -->
-	<script src="{SystemURL}/javascripts/styleswitch.js"></script>
 	<link href="{SystemURL}/css/styles1.css" rel="stylesheet" type="text/css" media="screen" title="styles1" />
 	<link href="{SystemURL}/css/styles2.css" rel="alternate stylesheet" type="text/css" title="styles2" media="screen" />
 	<link href="{SystemURL}/css/styles3.css" rel="alternate stylesheet" type="text/css" title="styles3" media="screen" />
 	<link href="{SystemURL}/css/styles4.css" rel="alternate stylesheet" type="text/css" title="styles4" media="screen" />
 	<link href="{SystemURL}/css/styles5.css" rel="alternate stylesheet" type="text/css" title="styles5" media="screen" />
 
+
+
+</head>
+
+<body>
+<div id="container">
+
+	<div id="topregion">
+		<ul id="menuregion">
+			<li id="region" class="fade active" alt="{TooltipsMenuRegion}" title="{TooltipsMenuRegion}">{MenuRegionTitle}</li>
+			<li id="parcels" class="fade " alt="{TooltipsMenuParcel}" title="{TooltipsMenuParcel}">{MenuParcelTitle}</li>
+			<li id="owner" class="fade" alt="{TooltipsMenuOwner}" title="{TooltipsMenuOwner}">{MenuOwnerTitle}</li>
+		</ul>
+		<span class="clear"></span>
+	</div>
+
+	<div id="content"></div>
+	<span class="clear"></span>
+
+	<script src="{SystemURL}/js/jquery-2.2.3.min.js" type="text/javascript"></script>
+	<script type="text/javascript" src="{SystemURL}/js/menu.region.js"></script>
+	<script type="text/javascript" src="{SystemURL}/js/menu.region.js"></script>
+	<script type="text/javascript" src="{SystemURL}/js/menu.profile.js"></script>
+	<!--<script type="text/javascript" src="{SystemURL}/js/jquery.tooltip.js"></script> -->
+	<script type="text/javascript" src="{SystemURL}/js/styleswitch.js"></script>
+
+	<!-- Carousel -->
+	<!-- <script src="../js/jquery.jcarousel.js"></script>  -->
+
 	<!-- date time -->
-<!--	<script src="{SystemURL}/javascripts/jquery.jclock.js" language="javascript"></script>
+<!--	<script src="{SystemURL}/js/jquery.jclock.js" language="javascript"></script>
 	<script type="text/javascript">
 		$(function($) {var options1 = {format: '%A %B %d, %Y %I:%M:%S %p'} // 12-hour
 		$('#jclock1').jclock(options1);
@@ -32,14 +58,11 @@
 		$('#jclock5').jclock(options5);});
 	</script>
 -->
-	
 	<!-- Tooltips -->
-	<script src="{SystemURL}/javascripts/jquery.tooltip.js"></script>
-	<script type="text/javascript">$(function() {$('#container *').tooltip({showURL: false});});</script>
-
-	<script src="{SystemURL}/javascripts/menu.profile.js"></script>
 	<script>
-	  $(document).ready(function() 
+		function tooltip() {$('#container *').tooltip({showURL: false});};
+
+	  $(document).ready(function()
 	  {
 		$( '#container' ).fadeIn("slow");
 		var result = {};
@@ -77,34 +100,14 @@
 		if(found == 0)
 			content.load("base.html" + window.location.search);
 	});
-    </script>
-	<!-- Carousel -->
-	<script src="../javascripts/jquery.jcarousel.js"></script>
 
-</head>
 
-<body>
-<div id="container"> 
-
-	<script src="{SystemURL}/javascripts/menu.region.js"></script>
-	<div id="topregion">
-		<ul id="menuregion">
-			<li id="region" class="fade active" alt="{TooltipsMenuRegion}" title="{TooltipsMenuRegion}">{MenuRegionTitle}</li>
-			<li id="parcels" class="fade " alt="{TooltipsMenuParcel}" title="{TooltipsMenuParcel}">{MenuParcelTitle}</li>
-			<li id="owner" class="fade" alt="{TooltipsMenuOwner}" title="{TooltipsMenuOwner}">{MenuOwnerTitle}</li>
-		</ul>
-		<span class="clear"></span>
-	</div>
-
-	<div id="content"></div>
-	<span class="clear"></span>
-
-	<script type="text/javascript">
-		// fade class
+	// fade class
 		$("li.fade, a.fade").hover(function(){$(this).fadeOut(150);$(this).fadeIn(150);});
 		$("a.languageswitch, a.styleswitch, a.webprofile").hover(function(){$(this).fadeOut(150);$(this).fadeIn(150);});
 		$("a.welcomescreen, a.world_map, a.copyright").hover(function(){$(this).fadeOut(150);$(this).fadeIn(150);});
 	</script>
-</div> 
+
+</div>
 </body>
 </html>

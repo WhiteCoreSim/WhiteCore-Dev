@@ -22,14 +22,14 @@
 <div id="password_error_message" class="error_message"><h3>{ErrorMessage}</h3></div>
 <table id="change_user_password">
   <caption></caption>
-  
+
   <thead>
     <tr>
       <th class="change_user_password_left"></th>
       <th class="change_user_password_right"></th>
     </tr>
   </thead>
-  
+
   <tfoot>
     <tr>
       <th class="change_user_password_left"></th>
@@ -59,14 +59,14 @@
 <div id="email_error_message" class="error_message"><h3>{ErrorMessage}</h3></div>
 <table id="change_user_email_adress">
   <caption></caption>
-  
+
   <thead>
     <tr>
       <th class="change_user_email_adress_left"></th>
       <th class="change_user_email_adress_right"></th>
     </tr>
   </thead>
-  
+
   <tfoot>
     <tr>
       <th class="change_user_email_adress_left"></th>
@@ -95,14 +95,14 @@
 <div id="delete_error_message" class="error_message"><h3>{ErrorMessage}</h3></div>
 <table id="delete_my_account">
   <caption></caption>
-  
+
   <thead>
     <tr>
       <th class="delete_my_account_left"></th>
       <th class="delete_my_account_right"></th>
     </tr>
   </thead>
-  
+
   <tfoot>
     <tr>
       <th class="delete_my_account_left"></th>
@@ -131,7 +131,7 @@
   $("#delete_my_account").submit(function(event) {
 
     /* stop form from submitting normally */
-    event.preventDefault(); 
+    event.preventDefault();
     /* get some values from elements on the page: */
     var $form = $( this ),
         url = $form.attr( 'action' );
@@ -142,11 +142,12 @@
       }
     );
   });
+
   /* attach a submit handler to the form */
   $("#change_email").submit(function(event) {
 
     /* stop form from submitting normally */
-    event.preventDefault(); 
+    event.preventDefault();
     /* get some values from elements on the page: */
     var $form = $( this ),
         url = $form.attr( 'action' );
@@ -157,11 +158,12 @@
       }
     );
   });
+
   /* attach a submit handler to the form */
   $("#change_password").submit(function(event) {
 
     /* stop form from submitting normally */
-    event.preventDefault(); 
+    event.preventDefault();
     /* get some values from elements on the page: */
     var $form = $( this ),
         url = $form.attr( 'action' );

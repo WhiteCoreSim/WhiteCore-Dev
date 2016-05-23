@@ -39,105 +39,102 @@ namespace WhiteCore.Modules.Web
         public static GridSettings _settingsGrid;
         public static WebUISettings _settingsWebUI;
 
-        public static void InitializeWebUIDefaults(WebInterface webinterface)
+        public static void InitializeWebUIDefaults (WebInterface webinterface)
         {
             _settingsWebUI = new WebUISettings ();
 
             _settingsWebUI.LastSettingsVersionUpdateIgnored = CurrentVersion;
             _settingsWebUI.LastPagesVersionUpdateIgnored = PagesMigrator.GetVersion ();
             _settingsWebUI.MapCenter = new Vector2 (1000, 1000);
-                         
+
             var configSrc = webinterface.Registry.RequestModuleInterface<ISimulationBase> ().ConfigSource;
-            var loginConfig =  configSrc.Configs ["LoginService"];
-            if (loginConfig != null)
-            {
+            var loginConfig = configSrc.Configs ["LoginService"];
+            if (loginConfig != null) {
                 _settingsWebUI.WebRegistration = loginConfig.GetBoolean ("AllowAnonymousLogin", true);
             }
         }
 
-        public static bool RequiresUpdate()
+        public static bool RequiresUpdate ()
         {
-            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector>();
+            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
 
-            OSDWrapper version = generics.GetGeneric<OSDWrapper>(UUID.Zero, Schema + "Version", "");
-            return version == null || version.Info.AsInteger() < CurrentVersion;
+            OSDWrapper version = generics.GetGeneric<OSDWrapper> (UUID.Zero, Schema + "Version", "");
+            return version == null || version.Info.AsInteger () < CurrentVersion;
         }
 
-        public static uint GetVersion()
+        public static uint GetVersion ()
         {
-            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector>();
+            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
 
-            OSDWrapper version = generics.GetGeneric<OSDWrapper>(UUID.Zero, Schema + "Version", "");
-            return version == null ? 0 : (uint) version.Info.AsInteger();
+            OSDWrapper version = generics.GetGeneric<OSDWrapper> (UUID.Zero, Schema + "Version", "");
+            return version == null ? 0 : (uint)version.Info.AsInteger ();
         }
 
-        public static bool RequiresInitialUpdate()
+        public static bool RequiresInitialUpdate ()
         {
-            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector>();
+            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
 
-            OSDWrapper version = generics.GetGeneric<OSDWrapper>(UUID.Zero, Schema + "Version", "");
-            return version == null || version.Info.AsInteger() < 1;
+            OSDWrapper version = generics.GetGeneric<OSDWrapper> (UUID.Zero, Schema + "Version", "");
+            return version == null || version.Info.AsInteger () < 1;
         }
 
-        public static void GetGridConfigSettings(WebInterface webinterface)
+        public static void GetGridConfigSettings (WebInterface webinterface)
         {
             var configSrc = webinterface.Registry.RequestModuleInterface<ISimulationBase> ().ConfigSource;
             IConfig config;
             _settingsGrid = new GridSettings ();
 
             // login
-            config =  configSrc.Configs ["LoginService"];
-            if (config != null)
-            {
-                _settingsGrid.WelcomeMessage = config.GetString("WelcomeMessage", _settingsGrid.WelcomeMessage);
+            config = configSrc.Configs ["LoginService"];
+            if (config != null) {
+                _settingsGrid.WelcomeMessage = config.GetString ("WelcomeMessage", _settingsGrid.WelcomeMessage);
             }
 
             // gridinfo
-            config =  configSrc.Configs ["GridInfoService"];
-            if (config != null)
-            {
-                _settingsGrid.Gridname = config.GetString("gridname", _settingsGrid.Gridname);
-                _settingsGrid.Gridnick = config.GetString("gridnick", _settingsGrid.Gridnick);
+            config = configSrc.Configs ["GridInfoService"];
+            if (config != null) {
+                _settingsGrid.Gridname = config.GetString ("gridname", _settingsGrid.Gridname);
+                _settingsGrid.Gridnick = config.GetString ("gridnick", _settingsGrid.Gridnick);
             }
 
             // Library
-//            config =  configSrc.Configs ["LibraryService"];
-//            if (config != null)
-//            {
-//                _settingsGrid.LibraryName = config.GetString("LibraryName", _settingsGrid.LibraryName);
-//                _settingsGrid.LibraryOwnerName = config.GetString("LibraryOwnerName", _settingsGrid.LibraryOwnerName);
-//            }
+            //            config =  configSrc.Configs ["LibraryService"];
+            //            if (config != null)
+            //            {
+            //                _settingsGrid.LibraryName = config.GetString("LibraryName", _settingsGrid.LibraryName);
+            //                _settingsGrid.LibraryOwnerName = config.GetString("LibraryOwnerName", _settingsGrid.LibraryOwnerName);
+            //            }
+
             // RealEstate
-            config =  configSrc.Configs ["EstateService"];
-            if (config != null)
-            {
-                _settingsGrid.SystemEstateOwnerName = config.GetString("SystemEstateOwnerName", _settingsGrid.SystemEstateOwnerName);
-                _settingsGrid.SystemEstateName = config.GetString("SystemEstateName", _settingsGrid.SystemEstateName);
+            config = configSrc.Configs ["EstateService"];
+            if (config != null) {
+                _settingsGrid.SystemEstateOwnerName = config.GetString ("SystemEstateOwnerName", _settingsGrid.SystemEstateOwnerName);
+                _settingsGrid.SystemEstateName = config.GetString ("SystemEstateName", _settingsGrid.SystemEstateName);
             }
 
 
         }
 
-        public static void ResetToDefaults(WebInterface webinterface)
+        public static void ResetToDefaults (WebInterface webinterface)
         {
-            InitializeWebUIDefaults(webinterface);
+            InitializeWebUIDefaults (webinterface);
             GetGridConfigSettings (webinterface);
 
-            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector>();
+            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
 
             //Remove all pages
-            generics.RemoveGeneric(UUID.Zero, "WebUISettings");
-            generics.RemoveGeneric(UUID.Zero, "GridSettings");
-            generics.RemoveGeneric(UUID.Zero, "WebSettingsVersion");
+            generics.RemoveGeneric (UUID.Zero, "WebUISettings");
+            generics.RemoveGeneric (UUID.Zero, "GridSettings");
+            generics.RemoveGeneric (UUID.Zero, "WebSettingsVersion");
 
-            generics.AddGeneric(UUID.Zero, "WebUISettings", "Settings", _settingsWebUI.ToOSD());
-            generics.AddGeneric(UUID.Zero, "GridSettings", "Settings",_settingsGrid.ToOSD());
-            generics.AddGeneric(UUID.Zero, "WebSettingsVersion", "", new OSDWrapper {Info = CurrentVersion}.ToOSD());
+            generics.AddGeneric (UUID.Zero, "WebUISettings", "Settings", _settingsWebUI.ToOSD ());
+            generics.AddGeneric (UUID.Zero, "GridSettings", "Settings", _settingsGrid.ToOSD ());
+            generics.AddGeneric (UUID.Zero, "WebSettingsVersion", "", new OSDWrapper { Info = CurrentVersion }.ToOSD ());
         }
 
-        public static bool CheckWhetherIgnoredVersionUpdate(uint version)
+        public static bool CheckWhetherIgnoredVersionUpdate (uint version)
         {
-            return version != SettingsMigrator.CurrentVersion;
+            return version != CurrentVersion;
         }
     }
 }

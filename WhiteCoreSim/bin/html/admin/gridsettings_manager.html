@@ -19,7 +19,7 @@
 <div id="info_message" class="info"></div>
 <table id="settings_manager">
   <caption></caption>
-  
+
   <thead>
     <tr>
       <th class="settings_manager_left"></th>
@@ -57,25 +57,26 @@
     <td></td>
     <td></td>
     <td></td>
-	  <input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
+    <input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
       <td class="settings_manager_right"><button id="Submit" type="Submit" name="Submit" style="width:100px;">{Save}</button></td>
     </tr>
   </tbody>
 </table>
 </form>
+
 <script>
   /* attach a submit handler to the form */
   $("#gridsettings_manager_form").submit(function(event) {
 
     /* stop form from submitting normally */
-    event.preventDefault(); 
+    event.preventDefault();
     /* get some values from elements on the page: */
     var $form = $( this ),
         url = $form.attr( 'action' );
     /* Send the data using post and put the results in a div */
     $.post( url, $form.serialize(),
       function( data ) {
-		$("#info_message").empty().append("<p>" + data + "</p>");
+    $("#info_message").empty().append("<p>" + data + "</p>");
       }
     );
   });

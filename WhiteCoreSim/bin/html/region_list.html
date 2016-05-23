@@ -4,65 +4,50 @@
 {RegionLocYText}        Region Y
 {RegionOnlineText}		Online/Offline status
 {RegionListText}        Region List
-{RegionList}        
-  {RegionName}        
-  {RegionLocX}        
-  {RegionLocY}        
+{RegionList}
+  {RegionName}
+  {RegionLocX}
+  {RegionLocY}
   {RegionInfo}
   {RegionStatus}
   {MoreInfoText}          More Info
 -->
 
-<script type="text/javascript" src="../javascripts/jquery.datatables.js"></script>
-<link href="css/jquery.datatables.css" rel="stylesheet" type="text/css">
-
-<script type="text/javascript">
-$(document).ready(function() 
-{
-	$('#regionlist').dataTable({
-        "order": [[ 0, "asc" ]]
-    });
-} );
-</script>
-
-<script type="text/javascript">
-  $(document).ready(function(){$(".regioninfo").colorbox({iframe:true, width:"990px", height:"440px"});});
-</script>
-
 <h2>{SystemName}: {RegionListText}</h2>
 <table id="regionlist" class="display" cellspacing="0" width="100%">
-  <thead class="listhead">
-    <tr>
-      <th class="region_list_left" style="width:200px"><p>{RegionText}</p></th>
-      <th class="region_list_left" style="width:100px"><p>{RegionLocXText}</p></th>
-      <th class="region_list_left" style="width:100px"><p>{RegionLocYText}</p></th>
-      <th class="region_list_right" ></th>
-      <th class="region_list_right" style="width:50px"><p>{RegionOnlineText}</p></th>
-      <th class="region_list_right" style="width:150px"><p>{RegionMoreInfo}</p></th>
-    </tr>
-  </thead>
-  
-  <tfoot class="listfoot">
-    <tr style= "align:bottom;">
-      <th class="region_list_left"><p>{RegionText}</p></th>
-      <th class="region_list_left"><p>{RegionLocXText}</p></th>
-      <th class="region_list_left"><p>{RegionLocYText}</p></th>
-      <th class="region_list_right"></th>
-      <th class="region_list_right"><p>{RegionOnlineText}</p></th>
-      <th class="region_list_right"><p>{RegionMoreInfo}</p></th>
-    </tr>
-  </tfoot>
-  
   <tbody>
-{RegionListArrayBegin}
+    <thead class="listhead">
+      <tr>
+        <th class="region_list_left" style="width:200px"><p>{RegionText}</p></th>
+        <th class="region_list_left" style="width:100px"><p>{RegionLocXText}</p></th>
+        <th class="region_list_left" style="width:100px"><p>{RegionLocYText}</p></th>
+        <th class="region_list_right" ></th>
+        <th class="region_list_right" style="width:50px"><p>{RegionOnlineText}</p></th>
+        <th class="region_list_right" style="width:150px"><p>{RegionMoreInfo}</p></th>
+      </tr>
+    </thead>
+
+    {RegionListArrayBegin}
     <tr>
       <td class="region_list_left"><p>{RegionName}</p></td>
       <td class="region_list_left"><p>{RegionLocX}</p></td>
-	  <td class="region_list_left"><p>{RegionLocY}</p></td>
-	  <td class="region_list_left"><p>{RegionInfo}</p></td>
-	  <td class="region_list_right"><p>{RegionStatus}</p></td>
-	  <td class="region_list_right"><p><a target="_self" class='regioninfo' href="regionprofile/?regionid={RegionID}">{MoreInfoText}</a></p></td>
+	    <td class="region_list_left"><p>{RegionLocY}</p></td>
+	    <td class="region_list_left"><p>{RegionInfo}</p></td>
+	    <td class="region_list_right"><p>{RegionStatus}</p></td>
+	    <td class="region_list_right"><p><a target="_self" class='regioninfo' href="regionprofile/?regionid={RegionID}">{MoreInfoText}</a></p></td>
     </tr>
-{RegionListArrayEnd}
+    {RegionListArrayEnd}
+
   </tbody>
 </table>
+
+<script>
+  $(document).ready(function()
+  {
+    $('#regionlist').dataTable({
+        "order": [[ 0, "asc" ]]
+    });
+  });
+
+  $(document).ready(function(){$(".regioninfo").colorbox({iframe:true, width:"990px", height:"440px"});});
+</script>

@@ -37,107 +37,79 @@ namespace WhiteCore.Modules.Web
 {
     public class AdminUserTransactionsPage : IWebInterfacePage
     {
-        public string[] FilePath
-        {
-            get
-            {
-                return new[]
+        public string [] FilePath {
+            get {
+                return new []
                            {
                                "html/admin/transactions.html"
                            };
             }
         }
 
-        public bool RequiresAuthentication
-        {
+        public bool RequiresAuthentication {
             get { return true; }
         }
 
-        public bool RequiresAdminAuthentication
-        {
+        public bool RequiresAdminAuthentication {
             get { return true; }
         }
 
-        public Dictionary<string, object> Fill(WebInterface webInterface, string filename, OSHttpRequest httpRequest,
+        public Dictionary<string, object> Fill (WebInterface webInterface, string filename, OSHttpRequest httpRequest,
                                                 OSHttpResponse httpResponse, Dictionary<string, object> requestParameters,
                                                 ITranslator translator, out string response)
         {
             response = null;
-            var vars = new Dictionary<string, object>();
-            var transactionsList = new List<Dictionary<string, object>>();
+            var vars = new Dictionary<string, object> ();
+            var transactionsList = new List<Dictionary<string, object>> ();
 
-            uint amountPerQuery = 25;
             var today = DateTime.Now;
             var thirtyDays = today.AddDays (-30);
-            string DateStart = thirtyDays.ToShortDateString();
-            string DateEnd = today.ToShortDateString();
+            string DateStart = thirtyDays.ToShortDateString ();
+            string DateEnd = today.ToShortDateString ();
             string UserName = "";
             UUID UserID = UUID.Zero;
 
-            IMoneyModule moneyModule = webInterface.Registry.RequestModuleInterface<IMoneyModule>();
+            IMoneyModule moneyModule = webInterface.Registry.RequestModuleInterface<IMoneyModule> ();
             string noDetails = translator.GetTranslatedString ("NoTransactionsText");
+            if (moneyModule != null) {
+                // Check if we're looking at the standard page or the submitted one
+                if (requestParameters.ContainsKey ("Submit")) {
+                    if (requestParameters.ContainsKey ("date_start"))
+                        DateStart = requestParameters ["date_start"].ToString ();
+                    if (requestParameters.ContainsKey ("date_end"))
+                        DateEnd = requestParameters ["date_end"].ToString ();
+                    if (requestParameters.ContainsKey ("user_name"))
+                        UserName = requestParameters ["user_name"].ToString ();
 
-            // Check if we're looking at the standard page or the submitted one
-            if (requestParameters.ContainsKey ("Submit"))
-            {
-                if (requestParameters.ContainsKey ("date_start"))
-                    DateStart = requestParameters ["date_start"].ToString ();
-                if (requestParameters.ContainsKey ("date_end"))
-                    DateEnd = requestParameters ["date_end"].ToString ();
-                if (requestParameters.ContainsKey ("user_name"))
-                    UserName = requestParameters ["user_name"].ToString ();
+                    if (UserName != "") {
+                        // TODO: Work out a better way to catch this
+                        UserID = (UUID)Constants.LibraryOwner;         // This user should hopefully never have transactions
 
-                if (UserName != "")
-                {
-                    // TODO: Work out a better way to catch this
-                    UserID = (UUID)Constants.LibraryOwner;         // This user should hopefully never have transactions
-
-                    if (UserName.Split (' ').Length == 2)
-                    {
-                        IUserAccountService accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
-                        var userAccount = accountService.GetUserAccount (null, UserName);
-                        if (userAccount != null)
-                            UserID = userAccount.PrincipalID;
+                        if (UserName.Split (' ').Length == 2) {
+                            IUserAccountService accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
+                            var userAccount = accountService.GetUserAccount (null, UserName);
+                            if (userAccount != null)
+                                UserID = userAccount.PrincipalID;
+                        }
                     }
-                }
 
-                // paginations
-                int start = httpRequest.Query.ContainsKey ("Start")
-                    ? int.Parse (httpRequest.Query ["Start"].ToString ())
-                    : 0;
-                int count = (int) moneyModule.NumberOfTransactions(UserID, UUID.Zero);
-                int maxPages = (int)(count / amountPerQuery) - 1;
+                    // Transaction Logs
+                    var timeNow = DateTime.Now.ToString ("HH:mm:ss");
+                    var dateFrom = DateTime.Parse (DateStart + " " + timeNow);
+                    var dateTo = DateTime.Parse (DateEnd + " " + timeNow);
 
-                if (start == -1)
-                    start = (int)(maxPages < 0 ? 0 : maxPages);
-
-                vars.Add ("CurrentPage", start);
-                vars.Add ("NextOne", start + 1 > maxPages ? start : start + 1);
-                vars.Add ("BackOne", start - 1 < 0 ? 0 : start - 1);
-
-
-                // Transaction Logs
-                var timeNow = DateTime.Now.ToString ("HH:mm:ss");
-                var dateFrom = DateTime.Parse (DateStart + " " + timeNow);
-                var dateTo = DateTime.Parse (DateEnd + " " + timeNow);
-
-                var transactions = new List<AgentTransfer>();
-                if (moneyModule != null)
-                {
+                    var transactions = new List<AgentTransfer> ();
                     if (UserID != UUID.Zero)
-                        transactions = moneyModule.GetTransactionHistory (UserID, UUID.Zero, dateFrom, dateTo, (uint)start, amountPerQuery);
+                        transactions = moneyModule.GetTransactionHistory (UserID, UUID.Zero, dateFrom, dateTo, null, null);
                     else
-                        transactions = moneyModule.GetTransactionHistory (dateFrom, dateTo, (uint)start, amountPerQuery);
-                }
+                        transactions = moneyModule.GetTransactionHistory (dateFrom, dateTo, null, null);
 
-                // data
-                if (transactions.Count > 0)
-                {
-                    noDetails = "";
+                    // data
+                    if (transactions != null && transactions.Count > 0) {
+                        noDetails = "";
 
-                    foreach (var transaction in transactions)
-                    {
-                        transactionsList.Add (new Dictionary<string, object> {
+                        foreach (var transaction in transactions) {
+                            transactionsList.Add (new Dictionary<string, object> {
                             { "Date", Culture.LocaleDate (transaction.TransferDate.ToLocalTime(), "MMM dd, hh:mm:ss tt") },
                             { "ToAgent", transaction.ToAgentName },
                             { "FromAgent", transaction.FromAgentName },
@@ -146,18 +118,12 @@ namespace WhiteCore.Modules.Web
                             { "ToBalance",transaction.ToBalance }
 
                         });
+                        }
                     }
-                }
-            } else
-            {
-                vars.Add ("CurrentPage", 0 );
-                vars.Add ("NextOne", 0);
-                vars.Add ("BackOne", 0);
-            }
+                } 
 
-            if (transactionsList.Count == 0)
-            {
-                transactionsList.Add(new Dictionary<string, object> {
+                if (transactionsList.Count == 0) {
+                    transactionsList.Add (new Dictionary<string, object> {
                     {"Date", ""},                   //Culture.LocaleDate(today,"MMM dd, hh:mm:ss")},
                     {"ToAgent", ""},
                     {"FromAgent", ""},
@@ -166,40 +132,41 @@ namespace WhiteCore.Modules.Web
                     {"ToBalance",""}
 
                 });
-            }
+                }
+            } 
 
             // always required data
-            vars.Add("DateStart", DateStart );
-            vars.Add ("DateEnd", DateEnd );
+            vars.Add ("DateStart", DateStart);
+            vars.Add ("DateEnd", DateEnd);
             vars.Add ("SearchUser", UserName);
-            vars.Add("TransactionsList",transactionsList);
+            vars.Add ("TransactionsList", transactionsList);
             vars.Add ("NoTransactionsText", noDetails);
 
             // labels
-            vars.Add("TransactionsText", translator.GetTranslatedString("TransactionsText"));
-            vars.Add("DateInfoText", translator.GetTranslatedString("DateInfoText"));
-            vars.Add("DateStartText", translator.GetTranslatedString("DateStartText"));
-            vars.Add("DateEndText", translator.GetTranslatedString("DateEndText"));
-            vars.Add("SearchUserText", translator.GetTranslatedString("AvatarNameText"));
+            vars.Add ("TransactionsText", translator.GetTranslatedString ("TransactionsText"));
+            vars.Add ("DateInfoText", translator.GetTranslatedString ("DateInfoText"));
+            vars.Add ("DateStartText", translator.GetTranslatedString ("DateStartText"));
+            vars.Add ("DateEndText", translator.GetTranslatedString ("DateEndText"));
+            vars.Add ("SearchUserText", translator.GetTranslatedString ("AvatarNameText"));
 
-            vars.Add("TransactionDateText", translator.GetTranslatedString("TransactionDateText"));
-            vars.Add("TransactionToAgentText", translator.GetTranslatedString("TransactionToAgentText"));
-            vars.Add("TransactionFromAgentText", translator.GetTranslatedString("TransactionFromAgentText"));
+            vars.Add ("TransactionDateText", translator.GetTranslatedString ("TransactionDateText"));
+            vars.Add ("TransactionToAgentText", translator.GetTranslatedString ("TransactionToAgentText"));
+            vars.Add ("TransactionFromAgentText", translator.GetTranslatedString ("TransactionFromAgentText"));
             //vars.Add("TransactionTimeText", translator.GetTranslatedString("Time"));
-            vars.Add("TransactionDetailText", translator.GetTranslatedString("TransactionDetailText"));
-            vars.Add("TransactionAmountText", translator.GetTranslatedString("TransactionAmountText"));
-            vars.Add("TransactionBalanceText", translator.GetTranslatedString("TransactionBalanceText"));
+            vars.Add ("TransactionDetailText", translator.GetTranslatedString ("TransactionDetailText"));
+            vars.Add ("TransactionAmountText", translator.GetTranslatedString ("TransactionAmountText"));
+            vars.Add ("TransactionBalanceText", translator.GetTranslatedString ("TransactionBalanceText"));
 
-            vars.Add("FirstText", translator.GetTranslatedString("FirstText"));
-            vars.Add("BackText", translator.GetTranslatedString("BackText"));
-            vars.Add("NextText", translator.GetTranslatedString("NextText"));
-            vars.Add("LastText", translator.GetTranslatedString("LastText"));
-            vars.Add("CurrentPageText", translator.GetTranslatedString("CurrentPageText"));
-                    
+            vars.Add ("FirstText", translator.GetTranslatedString ("FirstText"));
+            vars.Add ("BackText", translator.GetTranslatedString ("BackText"));
+            vars.Add ("NextText", translator.GetTranslatedString ("NextText"));
+            vars.Add ("LastText", translator.GetTranslatedString ("LastText"));
+            vars.Add ("CurrentPageText", translator.GetTranslatedString ("CurrentPageText"));
+
             return vars;
         }
 
-        public bool AttemptFindPage(string filename, ref OSHttpResponse httpResponse, out string text)
+        public bool AttemptFindPage (string filename, ref OSHttpResponse httpResponse, out string text)
         {
             text = "";
             return false;

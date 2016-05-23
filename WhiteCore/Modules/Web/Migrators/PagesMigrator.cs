@@ -35,11 +35,11 @@ namespace WhiteCore.Modules.Web
     {
         static GridPage _rootPage;
         public static readonly string Schema = "WebPages";
-        public static readonly uint CurrentVersion = 11;
+        public static readonly uint CurrentVersion = 12;
 
-        static void InitializeDefaults()
+        static void InitializeDefaults ()
         {
-            _rootPage = new GridPage();
+            _rootPage = new GridPage ();
 
             // home
             _rootPage.Children.Add (new GridPage {
@@ -78,19 +78,20 @@ namespace WhiteCore.Modules.Web
                         MenuTitle = "MenuWorldMap",
                         MenuToolTip = "TooltipsMenuWorldMap"
                     },
-                    new GridPage {
+                    /* removed as region list now provides search capabilitie
+                     new GridPage {
                         ShowInMenu = true,
                         MenuID = "region_search",
                         Location = "region_search.html",
                         MenuPosition = 1,
                         MenuTitle = "MenuRegionSearch",
                         MenuToolTip = "TooltipsMenuRegionSearch"
-                    },
+                    }, */
                     new GridPage {
                         ShowInMenu = true,
                         MenuID = "region_list",
                         Location = "region_list.html",
-                        MenuPosition = 2,
+                        MenuPosition = 1,
                         MenuTitle = "MenuRegion",
                         MenuToolTip = "TooltipsMenuRegion"
                     }
@@ -377,45 +378,40 @@ namespace WhiteCore.Modules.Web
                         MenuPosition = 3,
                         MenuTitle = "MenuWelcomeScreenManager",
                         MenuToolTip = "TooltipsMenuWelcomeScreenManager"
-                                                                
+
                     }
                 }
             });
 
             // these are indivual paages that can be called
-            _rootPage.Children.Add(new GridPage
-                                       {
-                                           MenuID = "add_news",
-                                           ShowInMenu = false,
-                                           AdminRequired = true,
-                                           MenuPosition = 8,
-                                           Location = "admin/add_news.html"
-                                       });
-            _rootPage.Children.Add(new GridPage
-                                       {
-                                           MenuID = "edit_news",
-                                           ShowInMenu = false,
-                                           AdminRequired = true,
-                                           MenuPosition = 8,
-                                           Location = "admin/edit_news.html"
-                                       });
-            _rootPage.Children.Add(new GridPage
-                                       {
-                                           MenuID = "edit_user",
-                                           ShowInMenu = false,
-                                           AdminRequired = true,
-                                           MenuPosition = 8,
-                                           Location = "admin/edit_user.html"
-                                       });
+            _rootPage.Children.Add (new GridPage {
+                MenuID = "add_news",
+                ShowInMenu = false,
+                AdminRequired = true,
+                MenuPosition = 8,
+                Location = "admin/add_news.html"
+            });
+            _rootPage.Children.Add (new GridPage {
+                MenuID = "edit_news",
+                ShowInMenu = false,
+                AdminRequired = true,
+                MenuPosition = 8,
+                Location = "admin/edit_news.html"
+            });
+            _rootPage.Children.Add (new GridPage {
+                MenuID = "edit_user",
+                ShowInMenu = false,
+                AdminRequired = true,
+                MenuPosition = 8,
+                Location = "admin/edit_user.html"
+            });
 
-            _rootPage.Children.Add(new GridPage
-                                       {
-                                           ShowInMenu = false,
-                                           MenuID = "news_info",
-                                           Location = "news.html"
-                                       });
-            _rootPage.Children.Add(new GridPage
-            {
+            _rootPage.Children.Add (new GridPage {
+                ShowInMenu = false,
+                MenuID = "news_info",
+                Location = "news.html"
+            });
+            _rootPage.Children.Add (new GridPage {
                 MenuID = "abuse_report",
                 ShowInMenu = false,
                 AdminRequired = true,
@@ -453,43 +449,43 @@ namespace WhiteCore.Modules.Web
                 { "MenuItemTitle", translator.GetTranslatedString("MenuNewsManager") } });*/
         }
 
-        public static bool RequiresUpdate()
+        public static bool RequiresUpdate ()
         {
-            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector>();
+            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
 
-            OSDWrapper version = generics.GetGeneric<OSDWrapper>(UUID.Zero, Schema + "Version", "");
-            return version == null || version.Info.AsInteger() < CurrentVersion;
+            OSDWrapper version = generics.GetGeneric<OSDWrapper> (UUID.Zero, Schema + "Version", "");
+            return version == null || version.Info.AsInteger () < CurrentVersion;
         }
 
-        public static uint GetVersion()
+        public static uint GetVersion ()
         {
-            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector>();
+            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
 
-            OSDWrapper version = generics.GetGeneric<OSDWrapper>(UUID.Zero, Schema + "Version", "");
-            return version == null ? 0 : (uint) version.Info.AsInteger();
+            OSDWrapper version = generics.GetGeneric<OSDWrapper> (UUID.Zero, Schema + "Version", "");
+            return version == null ? 0 : (uint)version.Info.AsInteger ();
         }
 
-        public static bool RequiresInitialUpdate()
+        public static bool RequiresInitialUpdate ()
         {
-            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector>();
+            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
 
-            OSDWrapper version = generics.GetGeneric<OSDWrapper>(UUID.Zero, Schema + "Version", "");
-            return version == null || version.Info.AsInteger() < 1;
+            OSDWrapper version = generics.GetGeneric<OSDWrapper> (UUID.Zero, Schema + "Version", "");
+            return version == null || version.Info.AsInteger () < 1;
         }
 
-        public static void ResetToDefaults()
+        public static void ResetToDefaults ()
         {
-            InitializeDefaults();
-            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector>();
+            InitializeDefaults ();
+            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
 
             //Remove all pages
-            generics.RemoveGeneric(UUID.Zero, Schema);
+            generics.RemoveGeneric (UUID.Zero, Schema);
 
-            generics.AddGeneric(UUID.Zero, Schema, "Root", _rootPage.ToOSD());
-            generics.AddGeneric(UUID.Zero, Schema + "Version", "", new OSDWrapper {Info = CurrentVersion}.ToOSD());
+            generics.AddGeneric (UUID.Zero, Schema, "Root", _rootPage.ToOSD ());
+            generics.AddGeneric (UUID.Zero, Schema + "Version", "", new OSDWrapper { Info = CurrentVersion }.ToOSD ());
         }
 
-        public static bool CheckWhetherIgnoredVersionUpdate(uint version)
+        public static bool CheckWhetherIgnoredVersionUpdate (uint version)
         {
             return version != PagesMigrator.CurrentVersion;
         }

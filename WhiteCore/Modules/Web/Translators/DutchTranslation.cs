@@ -307,20 +307,22 @@ namespace WhiteCore.Modules.Web.Translators
 
                 // Language Switcher Tooltips
                 case "en":
-                    return "Engels";
+                    return "English";
                 case "fr":
-                    return "Frans";
+                    return "Fran?ais";
                 case "de":
-                    return "Duits";
+                    return "Deutsch";
                 case "it":
-                    return "Italiaans";
+                    return "Italiano";
                 case "es":
-                    return "Spaans";
+                    return "Espa?ol";
                 case "nl":
                     return "Nederlands";
+                case "ru":
+                    return "§²§å§ã§ã§Ü§Ú§Û";
 
-                // Index Page
-                case "HomeText":
+            // Index Page
+            case "HomeText":
                     return "Home";
                 case "HomeTextWelcome":
                     return "This is our New Virtual World! Join us now, and make a difference!";

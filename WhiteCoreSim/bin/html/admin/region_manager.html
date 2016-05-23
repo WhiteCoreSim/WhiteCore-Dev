@@ -1,34 +1,5 @@
 <!-- Region edit/create -->
- 
-<!-- Carousel -->
-<script src="../javascripts/jquery.jcarousellite.js"></script>
-<script>
-		jQuery(document).ready(function($) {
-			$('div.region_archive_screenshot').each(function(i) {
-				var img_ = $('img', this);			
-				var img_height = img_.attr('height');
-				var p_height = $('p', this).outerHeight();
-				$(this).height(img_height);
-				$(this).hover(function() {
-					img_.animate({marginTop : -p_height-5}, 500);
-				}, function() {
-					img_.animate({marginTop : '0'}, 500);
-				});
-			});		
-		});
 
-</script>
-
-<script>
-	$(function() {
-    	$('.regionscarousel').jCarouselLite({
-        	btnNext: '.next-horiz-big',
-        	btnPrev: '.prev-horiz-big',
-        	visible: 3
-   		});
-	});
-</script>
-  
 {IsAdminAuthenticatedBegin}
 <h2>{SystemName}: {RegionManagerText}</h2>
 <div id="error_message" class="error">{ErrorMessage}</div>
@@ -36,14 +7,14 @@
 <form id="region_form" action="{SubmitURL}" method="POST">
 <div style ="display: inline-block;"><table>
   <caption></caption>
-  
+
   <thead>
     <tr>
       <th class="region_info_left"></th>
       <th class="region_info_right" colspan="5"></th>
     </tr>
   </thead>
-  
+
   <tfoot>
     <tr>
       <th class="region_info_left"></th>
@@ -55,155 +26,179 @@
     <tr>
       <td class="region_info_left"><p id="regname_label">{RegionNameText}*</p></td>
       <td class="region_info_right" colspan="4"><input minlength="3" id="RegionName" require="true" label="RegionName" name="RegionName" type="text" size="25" maxlength="30" value="{RegionName}"></td>
-	  <td class="register_left"> Enter the region name</td>
+    <td class="register_left"> Enter the region name</td>
     </tr>
-	<tr>
-	  <td class="region_info_left"><p>{RegionLocationText}:</p></td>
-	  <td>X:&nbsp;
+  <tr>
+    <td class="region_info_left"><p>{RegionLocationText}:</p></td>
+    <td>X:&nbsp;
         <input style="width:80px;"id="RegionLocX" require="true" label="RegionLocX" name="RegionLocX" type="text" size="8" value="{RegionLocX}" />
       </td>
-	  <td>Y:&nbsp;
-	    <input style="width:80px;" id="RegionLocY" require="true" label="RegionLocY" name="RegionLocY" type="text" size="8" value="{RegionLocY}" />
-	  </td>
-	</tr>
-	<tr>
-	  <td class="region_info_left"><p>{RegionSizeText}:</p></td>
-	  <td class="region_info_right">X:&nbsp;
-	  	    <input style="width:80px;" id="RegionSizeX" require="true" label="RegionSizeX" name="RegionSizeX" type="text" size="8" value="{RegionSizeX}" />
-	  </td>
-	  <td class="region_info_right">Y:&nbsp;
-	  	    <input style="width:80px;" id="RegionSizeY" require="true" label="RegionSizeY" name="RegionSizeY" type="text" size="8" value="{RegionSizeY}" />
-	  </td>
-	</tr>
-	<tr>
-	  <td class="region_info_left"><p>{RegionTypeText}:</p></td>
+    <td>Y:&nbsp;
+      <input style="width:80px;" id="RegionLocY" require="true" label="RegionLocY" name="RegionLocY" type="text" size="8" value="{RegionLocY}" />
+    </td>
+  </tr>
+  <tr>
+    <td class="region_info_left"><p>{RegionSizeText}:</p></td>
+    <td class="region_info_right">X:&nbsp;
+          <input style="width:80px;" id="RegionSizeX" require="true" label="RegionSizeX" name="RegionSizeX" type="text" size="8" value="{RegionSizeX}" />
+    </td>
+    <td class="region_info_right">Y:&nbsp;
+          <input style="width:80px;" id="RegionSizeY" require="true" label="RegionSizeY" name="RegionSizeY" type="text" size="8" value="{RegionSizeY}" />
+    </td>
+  </tr>
+  <tr>
+    <td class="region_info_left"><p>{RegionTypeText}:</p></td>
       <td class="region_info_right">
-      	    <select id="RegionType" require="true" name="RegionType" style="width:120px;">			
+            <select id="RegionType" require="true" name="RegionType" style="width:120px;">
 {RegionTypeArrayBegin}
-		  <option value="{Index}">{Value}</option>
+      <option value="{Index}">{Value}</option>
 {RegionTypeArrayEnd}
-		</select>
-	  </td>
-	  <td class="register_left"> Enter the region type</td>
-	</tr>
-	<tr>
-	  <td class="region_info_left"><p>{RegionPresetTypeText}:</p></td>
+    </select>
+    </td>
+    <td class="register_left"> Enter the region type</td>
+  </tr>
+  <tr>
+    <td class="region_info_left"><p>{RegionPresetTypeText}:</p></td>
       <td class="region_info_right">
-      	    <select id="RegionPresetType" require="true" name="RegionPresetType" style="width:120px;">			
+            <select id="RegionPresetType" require="true" name="RegionPresetType" style="width:120px;">
 {RegionPresetTypeArrayBegin}
-		  <option value="{Index}">{Value}</option>
+      <option value="{Index}">{Value}</option>
 {RegionPresetTypeArrayEnd}
-		</select>
-	  </td>
-	  <td class="register_left"> Enter the region configuration</td>
-	</tr>
+    </select>
+    </td>
+    <td class="register_left"> Enter the region configuration</td>
+  </tr>
 
-	{IsAdminAuthenticatedBegin}
+  {IsAdminAuthenticatedBegin}
 <!-- Only high level admins can set membership types -->
     <tr>
       <td class="region_info_left"><p>{RegionTerrainText}*</p></td>
       <td class="region_info_right">
-	    <select id="RegionTerrain" require="true" name="RegionTerrain" style="width:120px;">			
+      <select id="RegionTerrain" require="true" name="RegionTerrain" style="width:120px;">
 {RegionTerrainArrayBegin}
-		  <option value="{Index}">{Value}</option>
+      <option value="{Index}">{Value}</option>
 {RegionTerrainArrayEnd}
-		</select>
-	  </td>
+    </select>
+    </td>
     </tr>
 {IsAdminAuthenticatedEnd}
 
 
-		<tr>
-		  <td class="region_info_left"><p>{OwnerNameText}:</p></td>
-		  <td class="region_info_right" colspan="4">
-		  <a class="webprofile" href="/webprofile/?userid={OwnerUUID}"  alt="{OwnerNameText}: {OwnerName}" title="{OwnerNameText}: {OwnerName}">{OwnerName}</a></td>
-		</tr>
+    <tr>
+      <td class="region_info_left"><p>{OwnerNameText}:</p></td>
+      <td class="region_info_right" colspan="4">
+      <a class="webprofile" href="/webprofile/?userid={OwnerUUID}"  alt="{OwnerNameText}: {OwnerName}" title="{OwnerNameText}: {OwnerName}">{OwnerName}</a></td>
+    </tr>
 
 <!-- advanced stuff here -->
-	<tr>
-	  <td class="region_info_left"><p>{RegionPortText}:</p></td>
-	  <td class="region_info_right" colspan="4">
-	    <input style="width:80px;"id="RegionPort" require="true" label="RegionPort" name="RegionPort" type="text" size="8" value="{RegionPort}" />
+  <tr>
+    <td class="region_info_left"><p>{RegionPortText}:</p></td>
+    <td class="region_info_right" colspan="4">
+      <input style="width:80px;"id="RegionPort" require="true" label="RegionPort" name="RegionPort" type="text" size="8" value="{RegionPort}" />
       </td>
-	</tr>
-	<tr>
-	  <td class="region_info_left"><p>{RegionCapacityText}:</p></td>
-	  <td class="region_info_right" colspan="4">
+  </tr>
+  <tr>
+    <td class="region_info_left"><p>{RegionCapacityText}:</p></td>
+    <td class="region_info_right" colspan="4">
         <input style="width:80px;"id="RegionCapacity" require="true" label="RegionCapacity" name="RegionCapacity" type="text" size="8" value="{RegionCapacity}" />
       </td>
-	</tr>
-	<tr>
-	  <td class="region_info_left"><p>{RegionVisibilityText}:</p></td>
-	  <td class="region_info_right" colspan="4">
-	  	 <select id="RegionVisibility" require="true" name='RegionVisibility'>			
-			<option value="Yes" selected="Yes">{Yes}</option>
-			<option value="No">{No}</option>
-		 </select>
-	  </td>
-	</tr>
-	<tr>
-	  <td class="region_info_left"><p>{RegionInfiniteText}:</p></td>
-	  <td class="region_info_right" colspan="4">
-	  	 <select id="RegionInfinite" require="true" name='RegionInfinite'>			
-			<option value="Yes">{Yes}</option>
-			<option value="No" selected="Yes">{No}</option>
-		 </select>
-	  </td>
-	</tr>
-	<tr>
-	  <td class="region_info_left"><p>{RegionDelayStartupText}:</p></td>
-	  <td class="region_info_right" colspan="4">
-	  	 <select id="RegionDelayedStart" require="true" name='RegionDelayedStart'>			
-			<option value="Yes">{Yes}</option>
-			<option value="No" selected="Yes">{No}</option>
-		 </select>
-	  </td>
-	</tr>
+  </tr>
+  <tr>
+    <td class="region_info_left"><p>{RegionVisibilityText}:</p></td>
+    <td class="region_info_right" colspan="4">
+       <select id="RegionVisibility" require="true" name='RegionVisibility'>
+      <option value="Yes" selected="Yes">{Yes}</option>
+      <option value="No">{No}</option>
+      </select>
+    </td>
+  </tr>
+  <tr>
+    <td class="region_info_left"><p>{RegionInfiniteText}:</p></td>
+    <td class="region_info_right" colspan="4">
+       <select id="RegionInfinite" require="true" name='RegionInfinite'>
+      <option value="Yes">{Yes}</option>
+      <option value="No" selected="Yes">{No}</option>
+     </select>
+    </td>
+  </tr>
+  <tr>
+    <td class="region_info_left"><p>{RegionDelayStartupText}:</p></td>
+    <td class="region_info_right" colspan="4">
+       <select id="RegionDelayedStart" require="true" name='RegionDelayedStart'>
+      <option value="Yes">{Yes}</option>
+      <option value="No" selected="Yes">{No}</option>
+     </select>
+    </td>
+  </tr>
 
     <tr>
-      <td class="region_info_left">Region Preset</td>	
+      <td class="region_info_left">Region Preset</td>
       <td class="region_info_left" colspan="5" valign="top">
-	    <div class="carousel">	
+      <div class="carousel">
          <div class="prev-horiz">◄</div>
-		 <div class="next-horiz">►</div> 
+     <div class="next-horiz">►</div>
          <div class= "regionarchivecarousel" style="height: 190px;">
            <ul id="regionscarousel" class="jcarousel-skin-aurora">
 {RegionPresetsArrayBegin}
-	       <li>
-		     <div class="region_archive_screenshot">
-		       <label for="{RegionArchiveName}" alt="{SystemName}: {RegionArchiveName}" title="{SystemName}: {RegionArchiveName}">{RegionArchiveName}</label>
-			   <input type="radio" id="{RegionArchiveName}" name="RegionArchive" value="{RegionArchiveName}" alt="{SystemName}: {RegionArchiveName}" title="{SystemName}: {AvatarArchiveName}">
-			   <img src="{RegionArchiveSnapshotURL}" alt="{SystemName}: {RegionArchiveName}" title="{SystemName}: {RegionArchiveName}" />
-		     </div>
-	       </li>
+         <li>
+         <div class="region_archive_screenshot">
+           <label for="{RegionArchiveName}" alt="{SystemName}: {RegionArchiveName}" title="{SystemName}: {RegionArchiveName}">{RegionArchiveName}</label>
+         <input type="radio" id="{RegionArchiveName}" name="RegionArchive" value="{RegionArchiveName}" alt="{SystemName}: {RegionArchiveName}" title="{SystemName}: {AvatarArchiveName}">
+         <img src="{RegionArchiveSnapshotURL}" alt="{SystemName}: {RegionArchiveName}" title="{SystemName}: {RegionArchiveName}" />
+         </div>
+         </li>
 {RegionPresetsArrayEnd}
          </ul>
-		</div>
-		</div>
-	  </td>
+    </div>
+    </div>
+    </td>
     </tr>
 
     <tr>
-	  <td class="region_info_left"></td><input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
+    <td class="region_info_left"></td><input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
       <td class="region_info_right" colspan="3"><input type="hidden" name="action" value="check"><button id="Submit" name="Submit" type="Submit">{Submit}</button></input></td>
     </tr>
   </tbody>
 </table></div>
 </form>
 
+<!-- Carousel -->
+<script src="../js/jquery.jcarousellite.js"></script>
 <script>
+    jQuery(document).ready(function($) {
+      $('div.region_archive_screenshot').each(function(i) {
+        var img_ = $('img', this);
+        var img_height = img_.attr('height');
+        var p_height = $('p', this).outerHeight();
+        $(this).height(img_height);
+        $(this).hover(function() {
+          img_.animate({marginTop : -p_height-5}, 500);
+        }, function() {
+          img_.animate({marginTop : '0'}, 500);
+        });
+      });
+    });
+
+  $(function() {
+      $('.regionscarousel').jCarouselLite({
+          btnNext: '.next-horiz-big',
+          btnPrev: '.prev-horiz-big',
+          visible: 3
+      });
+  });
+
   /* attach a submit handler to the form */
   $("#region_form").submit(function(event) {
 
     /* stop form from submitting normally */
-    event.preventDefault(); 
+    event.preventDefault();
     /* get some values from elements on the page: */
     var $form = $( this ),
         url = $form.attr( 'action' );
     /* Send the data using post and put the results in a div */
     $.post( url, $form.serialize(),
       function( data ) {
-		$("#error_message").empty().append(data);
+    $("#error_message").empty().append(data);
       }
     );
   });

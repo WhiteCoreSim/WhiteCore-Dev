@@ -26,7 +26,6 @@
  */
 
 using System.Collections.Generic;
-using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 
 namespace WhiteCore.Modules.Web
@@ -39,7 +38,7 @@ namespace WhiteCore.Modules.Web
             {
                 return new[]
                            {
-                               "html/javascripts/jquery.colorbox.js"
+                               "html/js/jquery.colorbox.js"
                            };
             }
         }

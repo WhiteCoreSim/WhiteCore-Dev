@@ -14,15 +14,13 @@
 <div id="error_message" class="error_message"><h3>{ErrorMessage}</h3></div>
 <form action="login.html" id="login_form" method="POST">
 <table id="login">
-  <caption></caption>
-  
-  <thead>
+   <thead>
     <tr>
       <th class="login_left"></th>
       <th class="login_right"></th>
     </tr>
   </thead>
-  
+
   <tfoot>
     <tr>
       <th class="login_left"></th>
@@ -46,12 +44,15 @@
   </tbody>
 </table>
 </form>
+
 <script>
+  $(document).ready(function() { document.getElementById("login_input").focus(); } );
+
   /* attach a submit handler to the form */
   $("#login_form").submit(function(event) {
 
     /* stop form from submitting normally */
-    event.preventDefault(); 
+    event.preventDefault();
     /* get some values from elements on the page: */
     var $form = $( this ),
         url = $form.attr( 'action' );

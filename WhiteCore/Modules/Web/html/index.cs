@@ -39,7 +39,7 @@ namespace WhiteCore.Modules.Web
                 return new[]
                            {
                                "html/index.html",
-                               "html/javascripts/menu.js"
+                               "html/js/menu.js"
                            };
             }
         }
@@ -153,6 +153,7 @@ namespace WhiteCore.Modules.Web
             vars.Add("it", translator.GetTranslatedString("it"));
             vars.Add("es", translator.GetTranslatedString("es"));
             vars.Add("nl", translator.GetTranslatedString("nl"));
+            vars.Add ("ru", translator.GetTranslatedString ("ru"));
 
             // Index Page
             vars.Add("HomeText", translator.GetTranslatedString("HomeText"));

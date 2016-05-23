@@ -65,23 +65,10 @@ namespace WhiteCore.Modules.Web
             var usersList = new List<Dictionary<string, object>>();
             var agentInfo = Framework.Utilities.DataManager.RequestPlugin<IAgentInfoConnector> ();
 
-            uint amountPerQuery = 10;
-            int start = httpRequest.Query.ContainsKey("Start") ? int.Parse(httpRequest.Query["Start"].ToString()) : 0;
-            //uint count = agentInfo.RecentlyOnline(15*60, true);
-            uint count = agentInfo.OnlineUsers(0);
-            int maxPages = (int) (count/amountPerQuery) - 1;
-
-            if (start == -1)
-                start = (int) (maxPages < 0 ? 0 : maxPages);
-
-            vars.Add("CurrentPage", start);
-            vars.Add("NextOne", start + 1 > maxPages ? start : start + 1);
-            vars.Add("BackOne", start - 1 < 0 ? 0 : start - 1);
-
             var IsAdmin = Authenticator.CheckAdminAuthentication (httpRequest);
 
-            //var activeUsers = agentInfo.RecentlyOnline(15*60, true, new Dictionary<string, bool>(), (uint) start, amountPerQuery);
-            var activeUsers = agentInfo.CurrentlyOnline(0, new Dictionary<string, bool>(), (uint) start, amountPerQuery);
+            //var activeUsers = agentInfo.RecentlyOnline(15*60, true, new Dictionary<string, bool>());
+            var activeUsers = agentInfo.CurrentlyOnline(0, new Dictionary<string, bool>());
 
             if (activeUsers.Count > 0)
             {

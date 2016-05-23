@@ -3,14 +3,14 @@
 {SystemURL}
 {SystemName}
 {PagesList}
-	{PageID}
-	{PageTitle}
-	{PagePosition}
-	{PageTooltip}
-	{PageLocation}
-	{RequiresAdmin}
-	{RequiresLogin}
-	{RequiresLogout}
+  {PageID}
+  {PageTitle}
+  {PagePosition}
+  {PageTooltip}
+  {PageLocation}
+  {RequiresAdmin}
+  {RequiresLogin}
+  {RequiresLogout}
 {PageManager}                   Page Manager
 {SaveMenuItemChanges}           Save Menu Item
 {PageTitleText}                 Menu Item Title
@@ -32,13 +32,13 @@
 <div id="info_message" class="info_message"></div>
 <table id="page_manager_select">
   <caption></caption>
-  
+
   <thead>
     <tr>
       <th class="page_manager_select_left"></th>
     </tr>
   </thead>
-  
+
   <tfoot>
     <tr>
       <th class="page_manager_select_left"></th>
@@ -49,63 +49,66 @@
     <tr>
       <th class="page_manager_select_left"></th>
         <form id="page_manager_add_form" action="admin/page_manager.html" method="post">
-		  <input type="hidden" label="Submit" id="AddItem" name="AddItem" value="AddItem" />
-	      <button id="AddItem" type="Submit" name="AddItem">{AddItem}</button>
+      <input type="hidden" label="Submit" id="AddItem" name="AddItem" value="AddItem" />
+        <button id="AddItem" type="Submit" name="AddItem">{AddItem}</button>
         </form>
     </tr>
     <tr>
       <td class="page_manager_select_left">
         <form id="page_manager_select_form" action="admin/page_manager.html" method="post">
-	      <select id="MenuItem" require="true" name="MenuItem">
+        <select id="MenuItem" require="true" name="MenuItem">
 {PagesListArrayBegin}
-		    <option value="{Value}" {PageSelected}>{Name}</option>
+        <option value="{Value}" {PageSelected}>{Name}</option>
 {PagesListArrayEnd}
-	      </select>
-		  <button id="SelectItem" type="Submit" name="SelectItem">{SelectItem}</button>
-	      <button id="DeleteItem" type="Submit" name="DeleteItem">{DeleteItem}</button>
+        </select>
+      <button id="SelectItem" type="Submit" name="SelectItem">{SelectItem}</button>
+        <button id="DeleteItem" type="Submit" name="DeleteItem">{DeleteItem}</button>
         </form>
-	  </td>
+    </td>
     </tr>
   </tbody>
 </table>
+
 <script>
   /* attach a submit handler to the form */
   $("#page_manager_add_form").submit(function(event) {
 
     /* stop form from submitting normally */
-    event.preventDefault(); 
+    event.preventDefault();
     /* get some values from elements on the page: */
     var $form = $( this ),
         url = $form.attr( 'action' );
     /* Send the data using post and put the results in a div */
     $.post( url, $form.serialize(),
       function( data ) {
-		$("#fullPage").empty().append(data);
+    $("#fullPage").empty().append(data);
       }
     );
   });
+
   $("#SelectItem").click(function(event) {
 
     /* stop form from submitting normally */
-    event.preventDefault(); 
+    event.preventDefault();
     /* get some values from elements on the page: */
     var $form = $(this).closest('form'),
         url = $form.attr( 'action' );
-		
+
     var formData = $form.serializeArray();
     formData.push({ name: this.name, value: this.value });
     /* Send the data using post and put the results in a div */
     $.post( url, formData,
       function( data ) {
-		$("#fullPage").empty().append(data);
+    $("#fullPage").empty().append(data);
       }
     );
   });
+
   /* attach a submit handler to the form */
   $("#DeleteItem").click(function(event) {
 
     /* stop form from submitting normally */
-    event.preventDefault(); 
+    event.preventDefault();
     /* get some values from elements on the page: */
     var $form = $(this).closest('form'),
         url = $form.attr( 'action' );
@@ -114,23 +117,24 @@
     /* Send the data using post and put the results in a div */
     $.post( url, formData,
       function( data ) {
-		$("#info_message").empty().append("<h3>" + data + "</h3>");
+    $("#info_message").empty().append("<h3>" + data + "</h3>");
       }
     );
   });
 </script>
+
 {IfDisplayEditBegin}
 <form id="page_manager_edit_form" action="admin/page_manager.html" method="post">
 <table id="page_manager">
   <caption></caption>
-  
+
   <thead>
     <tr>
       <th class="page_manager_left"></th>
       <th class="page_manager_right"></th>
     </tr>
   </thead>
-  
+
   <tfoot>
     <tr>
       <th class="page_manager_left"></th>
@@ -162,38 +166,38 @@
     <tr>
       <td class="page_manager_left"><p>{DisplayInMenu}</p></td>
       <td class="page_manager_right">
-	    <select id="DisplayInMenu" require="true" name="DisplayInMenu">
-		  <option value="false" {DisplayInMenuNo}>{No}</option>
-		  <option value="true" {DisplayInMenuYes}>{Yes}</option>
-		</select>
-	  </td>
+      <select id="DisplayInMenu" require="true" name="DisplayInMenu">
+      <option value="false" {DisplayInMenuNo}>{No}</option>
+      <option value="true" {DisplayInMenuYes}>{Yes}</option>
+    </select>
+    </td>
     </tr>
     <tr>
       <td class="page_manager_left"><p>{RequiresLoginText}</p></td>
       <td class="page_manager_right">
-	    <select id="RequiresLogin" require="true" name="RequiresLogin">
-		  <option value="false" {RequiresLoginNo}>{No}</option>
-		  <option value="true" {RequiresLoginYes}>{Yes}</option>
-		</select>
-	  </td>
+      <select id="RequiresLogin" require="true" name="RequiresLogin">
+      <option value="false" {RequiresLoginNo}>{No}</option>
+      <option value="true" {RequiresLoginYes}>{Yes}</option>
+    </select>
+    </td>
     </tr>
     <tr>
       <td class="page_manager_left"><p>{RequiresLogoutText}</p></td>
       <td class="page_manager_right">
-	    <select id="RequiresLogout" require="true" name="RequiresLogout">	
-		  <option value="false" {RequiresLogoutNo}>{No}</option>
-		  <option value="true" {RequiresLogoutYes}>{Yes}</option>
-		</select>
-	  </td>
+      <select id="RequiresLogout" require="true" name="RequiresLogout">
+      <option value="false" {RequiresLogoutNo}>{No}</option>
+      <option value="true" {RequiresLogoutYes}>{Yes}</option>
+    </select>
+    </td>
     </tr>
     <tr>
       <td class="page_manager_left"><p>{RequiresAdminText}</p></td>
       <td class="page_manager_right">
-	    <select id="RequiresAdmin" require="true" name="RequiresAdmin">
-		  <option value="false" {RequiresAdminNo}>{No}</option>
-		  <option value="true" {RequiresAdminYes}>{Yes}</option>
-		</select>
-	  </td>
+      <select id="RequiresAdmin" require="true" name="RequiresAdmin">
+      <option value="false" {RequiresAdminNo}>{No}</option>
+      <option value="true" {RequiresAdminYes}>{Yes}</option>
+    </select>
+    </td>
     </tr>
     <tr>
       <td class="page_manager_left"><p>{RequiresAdminLevelText}</p></td>
@@ -202,11 +206,11 @@
     <tr>
       <td class="page_manager_left"><p>{ParentText}</p></td>
       <td class="page_manager_select_right">
-	    <select id="ParentMenuItem" require="true" name="ParentMenuItem">
+      <select id="ParentMenuItem" require="true" name="ParentMenuItem">
 {ParentPagesListArrayBegin}
-		  <option value="{Value}" {PageSelected}>{Name}</option>
+      <option value="{Value}" {PageSelected}>{Name}</option>
 {ParentPagesListArrayEnd}
-	  </td>
+    </td>
     </tr>
     <tr>
       <td class="page_manager_left"><input name="EdittingPageID" type="text" id="EdittingPageID" hidden=true value="{EdittingPageID}" /></td>
@@ -215,19 +219,20 @@
   </tbody>
 </table>
 </form>
+
 <script>
   /* attach a submit handler to the form */
   $("#page_manager_edit_form").submit(function(event) {
 
     /* stop form from submitting normally */
-    event.preventDefault(); 
+    event.preventDefault();
     /* get some values from elements on the page: */
     var $form = $( this ),
         url = $form.attr( 'action' );
     /* Send the data using post and put the results in a div */
     $.post( url, $form.serialize(),
       function( data ) {
-		$("#info_message").empty().append("<h3>" + data + "</h3>");
+    $("#info_message").empty().append("<h3>" + data + "</h3>");
       }
     );
   });

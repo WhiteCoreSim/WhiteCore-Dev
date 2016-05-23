@@ -1,32 +1,5 @@
 <!-- Caption -->
-	<!-- Carousel -->
-<script src="../javascripts/jquery.jcarousellite.js"></script>
 
-<script>
-		jQuery(document).ready(function($) {
-			$('div.parcel_picture').each(function(i) {
-				var img_ = $('img', this);			
-				var img_height = img_.attr('height');
-				var p_height = $('p', this).outerHeight();
-				$(this).height(img_height);
-				$(this).hover(function() {
-					img_.animate({marginTop : -p_height-5}, 500);
-				}, function() {
-					img_.animate({marginTop : '0'}, 500);
-				});
-			});		
-		});
-</script>
-<script>
-$(function() {
-    $('.parcelscarousel').jCarouselLite({
-        btnNext: '.next-horiz',
-        btnPrev: '.prev-horiz',
-        visible: 6
-    });
-});
-
-</script>
 
 <h2>{SystemName}: {RegionInfoText}</h2>
 <div id="region_info_container">
@@ -41,7 +14,7 @@ $(function() {
 		  <th class="region_info_right"></th>
 		</tr>
 	  </thead>
-  
+
 	  <tfoot style="border-top: solid 1px;">
 		<tr style= align:bottom;">
 		  <th class="region_info_left"></th>
@@ -55,8 +28,8 @@ $(function() {
 	    <tr>
 		  <td class="region_parcel_info" rowspan="4">
 			<div class="parcel_picture" >
-			  <a class="regionslurl" 
-				 onclick="document.location.href='secondlife://{MainServerURL}/{RegionName}/128/128/50'" 
+			  <a class="regionslurl"
+				 onclick="document.location.href='secondlife://{MainServerURL}/{RegionName}/128/128/50'"
 				 alt="{RegionNameText}: {RegionName}"
 				 title="{RegionNameText}: {RegionName}<br />secondlife://{MainServerURL}/{RegionName}/128/128/50">
 			  <img height="128" width="128" src="{RegionImageURL}" alt="{RegionNameText}: {RegionName}" title="{RegionNameText}: {RegionName}" /></a>
@@ -79,12 +52,12 @@ $(function() {
 		  <td class="region_info_right" colspan="2">
 		  <a class="webprofile" href="/webprofile/?userid={OwnerUUID}"  alt="{OwnerNameText}: {OwnerName}" title="{OwnerNameText}: {OwnerName}">{OwnerName}</a></td>
 		</tr>
-<!--	
+<!--
 		<tr>
 		  <td class="region_info_left"><p>{RegionOnlineText}:</p></td>
 		  <td class="region_info_right" colspan="2"><p>{RegionOnline}</p></td>
 		</tr>
-	
+
     	<tr>
       	  <td class="region_info_left"><p>{ParcelsInRegionText}:</p></td>
 	  	  <td class="region_info_left" colspan="2"></td>
@@ -110,7 +83,7 @@ $(function() {
 
 <div id="parcel_picture_container">
     <div class="prev-horiz">◄</div>
-    <div class="next-horiz">►</div> 
+    <div class="next-horiz">►</div>
     <div class="parcelscarousel"  style="height:152px; width: 900px;">
 	  <ul id="parcelcarousel" class="jcarousel-skin-aurora">
 {ParcelInRegionArrayBegin}
@@ -119,12 +92,12 @@ $(function() {
 	    		<a href="#">
 	    		<img height="128"
 	    	 		width="128"
-	    	 		src="{ParcelSnapshotURL}" 
+	    	 		src="{ParcelSnapshotURL}"
 		     		alt="{ParcelNameText}: {ParcelName}"
 			 		title="{ParcelNameText}: {ParcelName}" /></a>
 	    		<p class="parcel_picture_text">
 				    {ParcelNameText}: {ParcelName}<br />
-				    @&nbsp;{ParcelLocation}	
+				    @&nbsp;{ParcelLocation}
 				</p>
 	  		</div>
 		</li>
@@ -134,3 +107,31 @@ $(function() {
   <span class="clear"></span>
 </div>
 
+  <!-- Carousel -->
+<script src="../js/jquery.jcarousellite.js"></script>
+
+<script>
+    jQuery(document).ready(function($) {
+      $('div.parcel_picture').each(function(i) {
+        var img_ = $('img', this);
+        var img_height = img_.attr('height');
+        var p_height = $('p', this).outerHeight();
+        $(this).height(img_height);
+        $(this).hover(function() {
+          img_.animate({marginTop : -p_height-5}, 500);
+        }, function() {
+          img_.animate({marginTop : '0'}, 500);
+        });
+      });
+    });
+</script>
+<script>
+$(function() {
+    $('.parcelscarousel').jCarouselLite({
+        btnNext: '.next-horiz',
+        btnPrev: '.prev-horiz',
+        visible: 6
+    });
+});
+
+</script>

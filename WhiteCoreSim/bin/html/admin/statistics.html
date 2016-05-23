@@ -67,12 +67,13 @@
   </tbody>
 </table>
 </form>
+
 <script>
   /* attach a submit handler to the form */
   $("#statistics_form").submit(function(event) {
 
     /* stop form from submitting normally */
-    event.preventDefault(); 
+    event.preventDefault();
     /* get some values from elements on the page: */
     var $form = $( this ),
         url = $form.attr( 'action' );

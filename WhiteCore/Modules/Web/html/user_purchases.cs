@@ -28,7 +28,6 @@
 using System;
 using System.Collections.Generic;
 using Nini.Config;
-using OpenMetaverse;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
@@ -65,19 +64,16 @@ namespace WhiteCore.Modules.Web
         {
             response = null;
             IConfig gridInfo = webInterface.Registry.RequestModuleInterface<ISimulationBase>().ConfigSource.Configs ["GridInfoService"];
-            var InWorldCurrency = gridInfo.GetString("CurrencySymbol", String.Empty) + " ";
-            var RealCurrency = gridInfo.GetString("RealCurrencySymbol", String.Empty) + " ";
+            var inWorldCurrency = gridInfo.GetString("CurrencySymbol", string.Empty) + " ";
+            var realCurrency = gridInfo.GetString("RealCurrencySymbol", string.Empty) + " ";
 
             var vars = new Dictionary<string, object>();
             var purchasesList = new List<Dictionary<string, object>>();
 
-            uint amountPerQuery = 25;
             var today = DateTime.Now;
             var thirtyDays = today.AddDays (-7);
-            string DateStart = thirtyDays.ToShortDateString();
-            string DateEnd = today.ToShortDateString();
-            UUID UserID = UUID.Zero;
-            int start = 0;
+            string dateStart = thirtyDays.ToShortDateString();
+            string dateEnd = today.ToShortDateString();
  
 
             IMoneyModule moneyModule = webInterface.Registry.RequestModuleInterface<IMoneyModule>();
@@ -87,28 +83,9 @@ namespace WhiteCore.Modules.Web
             if (requestParameters.ContainsKey ("Submit"))
             {
                 if (requestParameters.ContainsKey ("date_start"))
-                    DateStart = requestParameters ["date_start"].ToString ();
+                    dateStart = requestParameters ["date_start"].ToString ();
                 if (requestParameters.ContainsKey ("date_end"))
-                    DateEnd = requestParameters ["date_end"].ToString ();
-
-                // pagination
-                start = httpRequest.Query.ContainsKey ("Start")
-                    ? int.Parse (httpRequest.Query ["Start"].ToString ())
-                    : 0;
-                int count = (int) moneyModule.NumberOfPurchases(UserID);
-                int maxPages = (int)(count / amountPerQuery) - 1;
-
-                if (start == -1)
-                    start = (int)(maxPages < 0 ? 0 : maxPages);
-
-                vars.Add ("CurrentPage", start);
-                vars.Add ("NextOne", start + 1 > maxPages ? start : start + 1);
-                vars.Add ("BackOne", start - 1 < 0 ? 0 : start - 1);
-            } else
-            {
-                vars.Add ("CurrentPage", 0);
-                vars.Add ("NextOne", 0);
-                vars.Add ("BackOne", 0);
+                    dateEnd = requestParameters ["date_end"].ToString ();
 
             }
 
@@ -116,13 +93,13 @@ namespace WhiteCore.Modules.Web
 
             // Purchases Logs
             var timeNow = DateTime.Now.ToString ("HH:mm:ss");
-            var dateFrom = DateTime.Parse (DateStart + " " + timeNow);
-            var dateTo = DateTime.Parse (DateEnd + " " + timeNow);
+            var dateFrom = DateTime.Parse (dateStart + " " + timeNow);
+            var dateTo = DateTime.Parse (dateEnd + " " + timeNow);
             TimeSpan period = dateTo.Subtract (dateFrom);
 
             var purchases = new List<AgentPurchase> ();
             if (user != null && moneyModule != null)
-                purchases = moneyModule.GetPurchaseHistory (user.PrincipalID, dateFrom, dateTo, (uint)start, amountPerQuery);
+                purchases = moneyModule.GetPurchaseHistory (user.PrincipalID, dateFrom, dateTo, null, null);
 
             // data
             if (purchases.Count > 0)
@@ -158,16 +135,16 @@ namespace WhiteCore.Modules.Web
                     {"Amount",""},
                     {"RealAmount",""},
                     {"PurchaseDate",""},
-                    {"UpdateDate", ""},
+                    {"UpdateDate", ""}
 
                 });
             }
 
             // always required data
-            vars.Add("DateStart", DateStart );
-            vars.Add ("DateEnd", DateEnd );
+            vars.Add("DateStart", dateStart );
+            vars.Add ("DateEnd", dateEnd );
             vars.Add ("Period",  period.TotalDays + " " + translator.GetTranslatedString("DaysText"));
-            vars.Add("PurchasesList",purchasesList);
+            vars.Add ("PurchasesList",purchasesList);
             vars.Add ("NoPurchasesText", noDetails);
 
             // labels
@@ -183,8 +160,8 @@ namespace WhiteCore.Modules.Web
             //vars.Add("PurchaseTimeText", translator.GetTranslatedString("Time"));
             vars.Add("PurchaseDetailText", translator.GetTranslatedString("TransactionDetailText"));
             vars.Add("LoggedIPText", translator.GetTranslatedString("LoggedIPText"));
-            vars.Add("PurchaseAmountText", InWorldCurrency + translator.GetTranslatedString("TransactionAmountText"));
-            vars.Add("PurchaseRealAmountText", RealCurrency + translator.GetTranslatedString("PurchaseCostText"));
+            vars.Add("PurchaseAmountText", inWorldCurrency + translator.GetTranslatedString("TransactionAmountText"));
+            vars.Add("PurchaseRealAmountText", realCurrency + translator.GetTranslatedString("PurchaseCostText"));
  
             vars.Add("FirstText", translator.GetTranslatedString("FirstText"));
             vars.Add("BackText", translator.GetTranslatedString("BackText"));

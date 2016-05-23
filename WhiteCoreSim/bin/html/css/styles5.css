@@ -8,14 +8,14 @@ html, body {
 	/* background: -moz-linear-gradient(top, #555555 0%, #222222 100%); */
 	/* firefox */
 	/* background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#555555), color-stop(100%,#222222)); */
-	/* webkit */ 
+	/* webkit */
 	/* filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#555555', endColorstr='#222222',GradientType=0 ); /* ie */
 }
 
 body  {
 	line-height: 14px;
 	font-size: 14px;
-	color: #7E7E7E;
+	color: #e4ffbf;
 	font-family: Tahoma, Verdana, Arial, Helvetica, sans-serif;
 	margin: 0px;
 	cursor: default;
@@ -34,8 +34,9 @@ body  {
 #lg4 {{DisplayLG4}color: #FF0000;}
 #lg5 {{DisplayLG5}color: #FF0000;}
 #lg6 {{DisplayLG6}color: #FF0000;}
+#lg7 {{DisplayLG7}color: #FF0000;}
 
-#st1, #st2, #st3, #st4, #st5, #lg1, #lg2, #lg3, #lg4, #lg5, lg6, a.styleswitch, a.languageswitch {
+#st1, #st2, #st3, #st4, #st5, #lg1, #lg2, #lg3, #lg4, #lg5, #lg6, #lg7, a.styleswitch, a.languageswitch {
 	background: #333;
 	margin-right: 5px;
 	padding-left: 6px;
@@ -51,6 +52,13 @@ body  {
     box-shadow: #6FA5FD 0 0 .25em;
 	behavior: url(../../css/pie.htc);
 }
+
+/* DataTables */
+/*.dataTables_wrapper{color: #a6e9ed;} */
+td.dataTables_empty{display:none;}
+a.cboxElement {color: #a9aaff;}
+a.cboxElement:hover {color: #090bff;}
+legend {color:#fff; }
 
 /* New HTML 5 Tables */
 /* For Sexy tables you can use these css
@@ -161,7 +169,7 @@ table#register td {}
 
 .avatar_archive_screenshot {
     float: left;
-    height: 155px; 
+    height: 155px;
     width:140px;
     background: #252525;
     text-align: center;
@@ -182,8 +190,8 @@ table#register td {}
 }
 
 .avatar_archive_screenshot img {
-    border: 0px solid #111111; 
-    height: 128px; 
+    border: 0px solid #111111;
+    height: 128px;
     width:128px;
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
@@ -630,9 +638,9 @@ blockquote, q {quotes: "" "";}
 strong{font-weight: 700;}
 ul {list-style: outside;}
 li {display: inline;}
-a {color: #6EA6FB; text-decoration: none;cursor: pointer;}
-a:active {color: #296BA5; text-decoration: none;}
-a:hover {color: #296BA5; text-decoration: none;}
+a {color: #bbd4df; text-decoration: none;cursor: pointer;}
+a:active {color: #c2d497; text-decoration: none;}
+a:hover {color: #c2d497; text-decoration: none;}
 p {margin-bottom: 0.5em;}
 u {text-decoration: none;}
 .clear {clear: both; height: 0; visibility: hidden; display: block;}
@@ -640,7 +648,7 @@ img.map_picture {width: 128px;}
 .jclock1 {color: #C2C2C2; text-align: left; font-size: 12px;}
 .footerleft {float: left;}
 
-h1, h2, h3, h4, h5 {color: #6EA6FB; line-height: 1.8em;}
+h1, h2, h3, h4, h5 {color: #cefdff; line-height: 1.8em;}
 h1 {font-size: 20px;}
 h2 {font-size: 18px;}
 h3 {font-size: 14px;}
@@ -671,7 +679,7 @@ input, textarea, select, button {
 	padding: 5px;
 	margin: 5px;
 	height: 21px;
-	color: #7E7E7E;
+	color: #ffffff;
 	background: #333333;
 	border: 1px solid #444;
 	-webkit-border-radius: 5px;
@@ -961,7 +969,7 @@ position: relative;
 	margin: 0px;
 	padding: 0px;
 }
-			
+
 #slide01 > img {
 	left: 0px;
 	position: absolute;
@@ -969,7 +977,7 @@ position: relative;
 	width: 300px;
 
 }
-			
+
 #slide01 > .text {
 	left: 310px;
 	position: absolute;
@@ -994,7 +1002,7 @@ p.minitext {font: 14px/1 Ubuntu, sans-serif;color: #ccc;}
 .localnews {
 	width: 65%;
 	font-size: 12px;
-	background: transparent url(../images/icons/bg_white_01.png); 
+	background: transparent url(../images/icons/bg_white_01.png);
 	border: 1px solid transparent;
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
@@ -1003,7 +1011,7 @@ p.minitext {font: 14px/1 Ubuntu, sans-serif;color: #ccc;}
     -moz-box-shadow: #EEEEEE 0 0 .5em;
     box-shadow: #EEEEEE 0 0 .5em;
 	/*padding: 10px;*/
-	height: 500px;	
+	height: 500px;
 	float: left;
 }
 
@@ -1026,13 +1034,13 @@ p.minitext {font: 14px/1 Ubuntu, sans-serif;color: #ccc;}
 	-webkit-box-shadow: #EEEEEE 0 0 .5em;
     -moz-box-shadow: #EEEEEE 0 0 .5em;
     box-shadow: #EEEEEE 0 0 .5em;
-	/*padding: 10px;*/	
+	/*padding: 10px;*/
 	float: right;
 }
 
 /* Homescreen login */
 .homelogin {
-	width: 280px; 
+	width: 300px;
 	font-size: 12px;
 	background: transparent; /*url(../images/icons/bg_white_01.png); */
 	border: 1px solid transparent;
@@ -1042,7 +1050,7 @@ p.minitext {font: 14px/1 Ubuntu, sans-serif;color: #ccc;}
 	-webkit-box-shadow: #EEEEEE 0 0 .5em;
     -moz-box-shadow: #EEEEEE 0 0 .5em;
     box-shadow: #EEEEEE 0 0 .5em;
-	padding: 10px;	
+	padding: 10px;
 	float: right;
 }
 input#homelogin_input {
@@ -1077,7 +1085,7 @@ input#homelogin_input {
 /* Help */
 /*removed 20140709 - greythane
 img.imprudenceimage, img.phoeniximage, img.zenimage */
-img.angstromimage, img.voodooimage, img.astraimage, img.kokuaimage,  
+img.angstromimage, img.voodooimage, img.astraimage, img.kokuaimage,
 img.firestormimage, img.singularityimage {
     cursor: pointer;
     width: 120px;
@@ -1185,7 +1193,7 @@ body.regionbox, body.infobox, body.news, body.gridstatus {background: transparen
 
 /* full bg image */
 img#mainImage {
-	left: 0px; 
+	left: 0px;
 	width: 100%;
 	position: fixed;
 	top: 0px;
@@ -1197,13 +1205,13 @@ img#mainImage {
 /* Logo */
 #top_image  img {border: none; outline: none;}
 #top_image {
-	position: absolute; 
-	padding-right: 0px; 
+	position: absolute;
+	padding-right: 0px;
 	padding-left: 0px;
 	top: 20px;
-	left: 10px; 
-	padding-bottom: 0px; 
-	margin: 0px; 
+	left: 10px;
+	padding-bottom: 0px;
+	margin: 0px;
 	padding-top: 0px;
 	z-index: 1;
 }
@@ -1216,15 +1224,15 @@ img#mainImage {
 
 #bottom {
 	position: absolute;
-	padding-right: 0px; 
-	padding-left: 0px; 
-	z-index: 101; 
-	left: 0px; 
-	padding-bottom: 0px; 
-	margin: 0px; 
-	width: 100%; 
-	bottom: 0px; 
-	padding-top: 0px; 
+	padding-right: 0px;
+	padding-left: 0px;
+	z-index: 101;
+	left: 0px;
+	padding-bottom: 0px;
+	margin: 0px;
+	width: 100%;
+	bottom: 0px;
+	padding-top: 0px;
 }
 
 #bottomright {
@@ -1236,13 +1244,13 @@ img#mainImage {
 	font-size: 10px;
 	background: transparent url(../images/icons/bg_black_01.png);
 	padding-top: 10px;
-	padding-bottom: 10px;	
+	padding-bottom: 10px;
 }
 
 #bottom_left {
 	position: absolute;
 	top: 80px;
-	left: 10px; 
+	left: 10px;
 	z-index: 1;
 }
 
@@ -1477,7 +1485,7 @@ div#regionbox:hover, div#infobox:hover, div#news:hover, div#gridstatus:hover {
     left: auto; right: 5px; color: #fcfcfc;
 }
 
-.jcarousel-skin-aurora .jcarousel-prev-horizontal:hover, 
+.jcarousel-skin-aurora .jcarousel-prev-horizontal:hover,
 .jcarousel-skin-aurora .jcarousel-prev-horizontal:focus {color: #296BA5;}
 
 .jcarousel-skin-aurora .jcarousel-prev-horizontal:active {color: #6EA6FB;}
@@ -1611,7 +1619,7 @@ div#regionbox:hover, div#infobox:hover, div#news:hover, div#gridstatus:hover {
     left: auto; right: 5px; color: #fcfcfc;
 }
 
-.jcarousel-skin-aurora-bigsize .jcarousel-prev-horizontal:hover, 
+.jcarousel-skin-aurora-bigsize .jcarousel-prev-horizontal:hover,
 .jcarousel-skin-aurora-bigsize .jcarousel-prev-horizontal:focus {color: #296BA5;}
 
 .jcarousel-skin-aurora-bigsize .jcarousel-prev-horizontal:active {color: #6EA6FB;}

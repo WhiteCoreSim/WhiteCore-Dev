@@ -316,20 +316,22 @@ namespace WhiteCore.Modules.Web.Translators
 
                 // Language Switcher Tooltips
                 case "en":
-                    return "Anglais";
+                    return "English";
                 case "fr":
                     return "Français";
                 case "de":
-                    return "Allemand";
+                    return "Deutsch";
                 case "it":
-                    return "Italien";
+                    return "Italiano";
                 case "es":
-                    return "Espagnol";
+                    return "Español";
                 case "nl":
                     return "Nederlands";
+            case "ru":
+                return "Русский";
 
-                // Index Page
-                case "HomeText":
+            // Index Page
+            case "HomeText":
                     return "Accueil";
                 case "HomeTextWelcome":
                     return

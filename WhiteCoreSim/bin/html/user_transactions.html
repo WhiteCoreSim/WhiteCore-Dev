@@ -1,15 +1,4 @@
-
-
-<script type="text/javascript" src="../javascripts/jquery.plugin.js"></script> 
-<script type="text/javascript" src="../javascripts/jquery.datepick.js"></script>
-<link rel="stylesheet" type="text/css" href="../javascripts/whitecore.datepick.css"> 
-
-<script>
-$(function() {
-	$('#date_start,#date_end').datepick({ 
-    showTrigger: '<button type="button" class="trigger">...</button>'});
-});
-</script>
+<!-- User Transactions -->
 
 <div id="fullPage">
 <h2>{SystemName}: {TransactionsText}</h2>
@@ -30,62 +19,11 @@ $(function() {
 	</div>
 </form>
 
-<script> <!--  /* date pickers */ -->
-	
-  $(function() {
-    $( "#date_start" ).datepick({
-      defaultDate: "+1w",
-      changeMonth: true,
-      numberOfMonths: 3,
-      onClose: function( selectedDate ) {
-        $( "#to" ).datepick( "option", "minDate", selectedDate );
-      }
-    });
-    $( "#date_end" ).datepick({
-      defaultDate: "+1w",
-      changeMonth: true,
-      numberOfMonths: 3,
-      onClose: function( selectedDate ) {
-        $( "#from" ).datepick( "option", "maxDate", selectedDate );
-      }
-    });
-  });
-</script>
-
-  <script>  /* attach a submit handler to the form */
-  $("#transactions_search_form").submit(function(event) {
-
-    /* stop form from submitting normally */
-    event.preventDefault(); 
-    /* get some values from elements on the page: */
-    var $form = $( this ),
-        url = $form.attr( 'action' );
-    /* Send the data using post and put the results in a div */
-    $.post( url, $form.serialize(),
-      function( data ) {
-		$("#fullPage").empty().append(data);
-      }
-    );
-  });
-</script>
 
 <!--
-<div class="center notice" style="text-align:center;margin:10px 0;">{NoTransactionsText}</div>
--->
+<div class="center notice" style="text-align:center;margin:10px 0;">{NoTransactionsText}</div> -->
 
-<table id="transactions_search_result_navigation_top">
-  <thead>
-    <tr>
-      <th><a class="fade" href="index.html?page=admin/transactions.html&Start=0" target="_self" title="{FirstText}"><p class="nav">|&nbsp;<</p></a></th>
-	  <th><a class="fade" href="index.html?page=admin/transactions.html&Start={BackOne}" target="_self" title="{BackText}"><p class="nav"><</p></a></th>
-	  <th><p>{CurrentPageText} {CurrentPage}</p></th>
-	  <th><a class="fade" href="index.html?page=admin/transactions&Start={NextOne}" target="_self" title="{NextText}"><p class="nav">></p></a></th>
-	  <th><a class="fade" href="index.html?page=admin/transactions&Start=-1" target="_self" title="{LastText}"><p class="nav">>&nbsp;|</p></a></th>
-    </tr>
-  </thead>
-			
-</table>
-<table id="transactions_search_result">
+<table id="transactions_list">
   <tbody>
 	  <thead class="listhead">
 		<tr>
@@ -111,4 +49,54 @@ $(function() {
   </tbody>
 </table>
 </div>
- 
+
+<script>
+  $(document).ready(function() {
+    $('#transactions_list').dataTable({
+      "order": [[ 0, "asc" ]]
+    });
+  });
+
+  $(function() {
+    $('#date_start,#date_end').datepick({
+      showTrigger: '<button type="button" class="trigger">...</button>'});
+  });
+
+  <!--  /* date pickers */ -->
+  $(function() {
+    $( "#date_start" ).datepick({
+      defaultDate: "-1w",
+      changeMonth: true,
+      numberOfMonths: 3,
+      onClose: function( selectedDate ) {
+        $( "#to" ).datepick( "option", "minDate", selectedDate );
+      }
+    });
+    $( "#date_end" ).datepick({
+      //defaultDate: "+1w",
+      changeMonth: true,
+      numberOfMonths: 3,
+      onClose: function( selectedDate ) {
+        $( "#from" ).datepick( "option", "maxDate", selectedDate );
+      }
+    });
+  });
+
+  /* attach a submit handler to the form */
+  $("#transactions_search_form").submit(function(event) {
+
+    /* stop form from submitting normally */
+    event.preventDefault();
+    /* get some values from elements on the page: */
+    var $form = $( this ),
+        url = $form.attr( 'action' );
+    /* Send the data using post and put the results in a div */
+    $.post( url, $form.serialize(),
+      function( data ) {
+    $("#fullPage").empty().append(data);
+      }
+    );
+  });
+</script>
+
+
