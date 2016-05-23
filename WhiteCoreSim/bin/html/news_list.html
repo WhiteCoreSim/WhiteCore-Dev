@@ -12,16 +12,15 @@
 
 <h2>{SystemName}: {News}</h2>
 
-
 <table id="news_list">
-  <tbody>
-    <thead class="listhead">
-      <tr>
-        <th class="news_list_left">{NewsTitleText}</th>
-        <th class="news_list_right">{NewsDateText}</th>
-      </tr>
-    </thead>
+  <thead class="listhead">
+    <tr>
+      <th class="news_list_left">{NewsTitleText}</th>
+      <th class="news_list_right">{NewsDateText}</th>
+    </tr>
+  </thead>
 
+  <tbody>
     {NewsListArrayBegin}
     <tr>
       <td class="news_list_left">
@@ -40,7 +39,7 @@
 <script>
   $(document).ready(function()
   {
-    $('#news_list').dataTable({
+    $('#news_list').dataTable( {
         "order": [[ 0, "asc" ]]
     });
   });

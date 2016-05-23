@@ -16,15 +16,15 @@
   <h3>{SearchForUserText}</h3>
   <form id="user_search_form" action="user_search.html" method="post">
     <table id="user_search">
-     <tbody>
-       <thead>
-          <tr>
-            <th class="user_search_left"></th>
-            <th class="user_search_right"></th>
-          </tr>
-        </thead>
-
+      <thead>
         <tr>
+          <th class="user_search_left"></th>
+          <th class="user_search_right"></th>
+        </tr>
+      </thead>
+
+      <tbody>
+       <tr>
           <td class="user_search_left"><p>{UserNameText}*</p></td>
           <td class="user_search_right">
 	          <input require="true" label="username" name="username" />
@@ -66,30 +66,27 @@
 
 </div>
 
-  <script>
-    $(document).ready(function(){
-      $(".agentinfo, .agentedit").colorbox({iframe:true, width:"990px", height:"440px"});
-      $('#user_search_result').dataTable({
-          "order": [[ 0, "asc" ]]
-      });
+<script>
+  $(document).ready(function() {
+    $(".agentinfo, .agentedit").colorbox({iframe:true, width:"990px", height:"440px"});
+    $('#user_search_result').dataTable( {
+        "order": [[ 0, "asc" ]]
     });
+  });
 
-    /* attach a submit handler to the form */
-    $("#user_search_form").submit(function(event) {
+  /* attach a submit handler to the form */
+  $("#user_search_form").submit(function(event) {
 
-      /* stop form from submitting normally */
-      event.preventDefault();
-      /* get some values from elements on the page: */
-      var $form = $( this ),
-          url = $form.attr( 'action' );
-      /* Send the data using post and put the results in a div */
-      $.post( url, $form.serialize(),
-        function( data ) {
-        $("#fullPage").empty().append(data);
-        }
-      );
+    /* stop form from submitting normally */
+    event.preventDefault();
+    /* get some values from elements on the page: */
+    var $form = $( this ),
+        url = $form.attr( 'action' );
+    /* Send the data using post and put the results in a div */
+    $.post( url, $form.serialize(), function( data ) {
+      $("#fullPage").empty().append(data);
     });
+  });
 
-  </script>
-
+</script>
 

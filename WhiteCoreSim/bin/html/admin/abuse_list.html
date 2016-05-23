@@ -25,19 +25,18 @@
         <td class="region_info_left"><p>{Summary}</p></td>
         <td class="region_info_left"><p>{AssignedTo}</p></td>
         <td class="region_info_left"><p>{Active}</p></td>
-    <td class="region_info_left"><p><a target="_self"  href="index.html?page=abuse_report&cardid={CardNumber}">{MoreInfoText}</a></p></td>
+        <td class="region_info_left"><p><a target="_self"  href="index.html?page=abuse_report&cardid={CardNumber}">{MoreInfoText}</a></p></td>
       </tr>
     {AbuseReportsListArrayEnd}
     </tbody>
   </table>
 
   <script type="text/javascript">
-  $(document).ready(function()
-  {
-    $('#abusereport_list').dataTable({
-          "order": [[ 0, "asc" ]]
+    $(document).ready(function() {
+      $('#abusereport_list').dataTable( {
+        "order": [[ 0, "asc" ]]
       });
-  } );
+    });
   </script>
 
 </div>

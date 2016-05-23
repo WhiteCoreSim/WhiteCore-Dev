@@ -15,17 +15,18 @@
 
 <h2>{SystemName}: {RegionListText}</h2>
 <table id="regionlist" class="display" cellspacing="0" width="100%">
+  <thead class="listhead">
+    <tr>
+      <th class="region_list_left" style="width:200px"><p>{RegionText}</p></th>
+      <th class="region_list_left" style="width:100px"><p>{RegionLocXText}</p></th>
+      <th class="region_list_left" style="width:100px"><p>{RegionLocYText}</p></th>
+      <th class="region_list_right" ></th>
+      <th class="region_list_right" style="width:50px"><p>{RegionOnlineText}</p></th>
+      <th class="region_list_right" style="width:150px"><p>{RegionMoreInfo}</p></th>
+    </tr>
+  </thead>
+
   <tbody>
-    <thead class="listhead">
-      <tr>
-        <th class="region_list_left" style="width:200px"><p>{RegionText}</p></th>
-        <th class="region_list_left" style="width:100px"><p>{RegionLocXText}</p></th>
-        <th class="region_list_left" style="width:100px"><p>{RegionLocYText}</p></th>
-        <th class="region_list_right" ></th>
-        <th class="region_list_right" style="width:50px"><p>{RegionOnlineText}</p></th>
-        <th class="region_list_right" style="width:150px"><p>{RegionMoreInfo}</p></th>
-      </tr>
-    </thead>
 
     {RegionListArrayBegin}
     <tr>
@@ -42,12 +43,10 @@
 </table>
 
 <script>
-  $(document).ready(function()
-  {
-    $('#regionlist').dataTable({
-        "order": [[ 0, "asc" ]]
+  $(document).ready(function() {
+    $(".regioninfo").colorbox({iframe:true, width:"990px", height:"440px"});
+    $('#regionlist').dataTable( {
+      "order": [[ 0, "asc" ]]
     });
   });
-
-  $(document).ready(function(){$(".regioninfo").colorbox({iframe:true, width:"990px", height:"440px"});});
 </script>

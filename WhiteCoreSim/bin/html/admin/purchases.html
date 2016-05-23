@@ -1,72 +1,72 @@
 <!-- User Purchases (Admin) -->
 
 <div id="fullPage">
-<h2>{SystemName}: {PurchasesText}</h2>
+  <h2>{SystemName}: {PurchasesText}</h2>
 
-<form id="purchases_search_form" action="admin/purchases.html" method="post">
+  <form id="purchases_search_form" action="admin/purchases.html" method="post">
 
-  <div class="form-fieldset-range">
-    <legend>{DateInfoText}</legend>
-      <p class="from-to">
-        <label class="from" for="date_start">{DateStartText}:</label>
-        <input type="text" style="width:80px;" name="date_start" id="date_start" value="{DateStart}" />
-        <label class="to" for="date_end">&nbsp;-&nbsp;{DateEndText}:</label>
-          <input type="text" style="width:80px;" name="date_end" id="date_end" value="{DateEnd}" />
-        <label for="user_name">&nbsp;-&nbsp;{SearchUserText}:</label>
-          <input type="text" style="width:180px;" name="user_name" id="user_name" value="{SearchUser}" />
-        <input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
-        <button class="button" style="float:right;width:200;" id="Submit" type="Submit" name="Submit">Search</button>
-      </p>
-  </div>
-</form>
+    <div class="form-fieldset-range">
+      <legend>{DateInfoText}</legend>
+        <p class="from-to">
+          <label class="from" for="date_start">{DateStartText}:</label>
+          <input type="text" style="width:80px;" name="date_start" id="date_start" value="{DateStart}" />
+          <label class="to" for="date_end">&nbsp;-&nbsp;{DateEndText}:</label>
+            <input type="text" style="width:80px;" name="date_end" id="date_end" value="{DateEnd}" />
+          <label for="user_name">&nbsp;-&nbsp;{SearchUserText}:</label>
+            <input type="text" style="width:180px;" name="user_name" id="user_name" value="{SearchUser}" />
+          <input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
+          <button class="button" style="float:right;width:200;" id="Submit" type="Submit" name="Submit">Search</button>
+        </p>
+    </div>
+  </form>
 
 
-<!--
-<div class="center notice" style="text-align:center;margin:10px 0;">{NoPurchasesText}</div>
--->
+  <!--
+  <div class="center notice" style="text-align:center;margin:10px 0;">{NoPurchasesText}</div>
+  -->
 
-<table id="purchase_list">
-  <tbody>
+  <table id="purchase_list">
     <thead class="listhead">
-    <tr>
-      <th class="transactions_left"><p>{PurchaseDateText}</p></th>
-      <th class="transactions_user"><p>{PurchaseAgentText}</p></th>
-      <th class="transactions_user"><p>{LoggedIPText}</p></th>
-      <th class="transactions_description"><p>{PurchaseDetailText}</p></th>
-      <th class="transactions_value"><p>{PurchaseAmountText}</p></th>
-      <th class="transactions_value"><p>{PurchaseRealAmountText}</p></th>
-    </tr>
+      <tr>
+        <th class="transactions_left"><p>{PurchaseDateText}</p></th>
+        <th class="transactions_user"><p>{PurchaseAgentText}</p></th>
+        <th class="transactions_user"><p>{LoggedIPText}</p></th>
+        <th class="transactions_description"><p>{PurchaseDetailText}</p></th>
+        <th class="transactions_value"><p>{PurchaseAmountText}</p></th>
+        <th class="transactions_value"><p>{PurchaseRealAmountText}</p></th>
+      </tr>
     </thead>
 
-  {PurchasesListArrayBegin}
-    <tr>
-      <td class="transactions_left"><p>{PurchaseDate}</p></td>
-      <td class="transactions_user"><p>{AgentName}</p></td>
-      <td class="transactions_user"><p>{LoggedIP}</p></td>
-      <td class="transactions_description"><p>{Description}</p></td>
-      <td class="transactions_value"><p>{Amount}</p></td>
-      <td class="transactions_value"><p>{RealAmount}</p></td>
-    </tr>
-  {PurchasesListArrayEnd}
-  </tbody>
-</table>
+    <tbody>
+    {PurchasesListArrayBegin}
+      <tr>
+        <td class="transactions_left"><p>{PurchaseDate}</p></td>
+        <td class="transactions_user"><p>{AgentName}</p></td>
+        <td class="transactions_user"><p>{LoggedIP}</p></td>
+        <td class="transactions_description"><p>{Description}</p></td>
+        <td class="transactions_value"><p>{Amount}</p></td>
+        <td class="transactions_value"><p>{RealAmount}</p></td>
+      </tr>
+    {PurchasesListArrayEnd}
+    </tbody>
+  </table>
 </div>
 
 <script>
   $(document).ready(function() {
-    $('#purchase_list').dataTable({
+    $('#purchase_list').dataTable( {
       "order": [[ 0, "asc" ]]
     });
   });
 
-$(function() {
-    $('#date_start,#date_end').datepick({
-    showTrigger: '<button type="button" class="trigger">...</button>'});
+  $(function() {
+    $('#date_start,#date_end').datepick( {
+      showTrigger: '<button type="button" class="trigger">...</button>'});
   });
 
   <!--  /* date pickers */ -->
   $(function() {
-    $( "#date_start" ).datepick({
+    $( "#date_start" ).datepick( {
       defaultDate: "-1w",
       changeMonth: true,
       numberOfMonths: 3,
@@ -74,7 +74,7 @@ $(function() {
         $( "#to" ).datepick( "option", "minDate", selectedDate );
       }
     });
-    $( "#date_end" ).datepick({
+    $( "#date_end" ).datepick( {
       //defaultDate: "+1w",
       changeMonth: true,
       numberOfMonths: 3,
@@ -83,9 +83,8 @@ $(function() {
       }
     });
   });
-</script>
 
-  <script>  /* attach a submit handler to the form */
+  /* attach a submit handler to the form */
   $("#purchases_search_form").submit(function(event) {
 
     /* stop form from submitting normally */
@@ -94,11 +93,9 @@ $(function() {
     var $form = $( this ),
         url = $form.attr( 'action' );
     /* Send the data using post and put the results in a div */
-    $.post( url, $form.serialize(),
-      function( data ) {
-    $("#fullPage").empty().append(data);
-      }
-    );
+    $.post( url, $form.serialize(), function( data ) {
+      $("#fullPage").empty().append(data);
+    });
   });
 </script>
 

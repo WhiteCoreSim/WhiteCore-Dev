@@ -22,8 +22,7 @@
 
 
   <table id="transactions_list">
-    <tbody>
-  	  <thead class="listhead">
+ 	  <thead class="listhead">
   		<tr>
   		  <th class="transactions_left"><p>{TransactionDateText}</p></th>
   		  <th class="transactions_user"><p>{TransactionFromAgentText}</p></th>
@@ -32,8 +31,9 @@
   		  <th class="transactions_value"><p>{TransactionAmountText}</p></th>
   		  <th class="transactions_value"><p>{TransactionBalanceText}</p></th>
   		</tr>
-  	  </thead>
+ 	  </thead>
 
+    <tbody>
   	{TransactionsListArrayBegin}
       <tr>
         <td class="transactions_left"><p>{Date}</p></td>
@@ -50,19 +50,19 @@
 
 <script>
   $(document).ready(function() {
-    $('#transactions_list').dataTable({
+    $('#transactions_list').dataTable( {
       "order": [[ 0, "asc" ]]
     });
   });
 
   $(function() {
-    $('#date_start,#date_end').datepick({
+    $('#date_start,#date_end').datepick( {
     showTrigger: '<button type="button" class="trigger">...</button>'});
   });
 
   <!--  /* date pickers */ -->
   $(function() {
-    $( "#date_start" ).datepick({
+    $( "#date_start" ).datepick( {
       defaultDate: "-1w",
       changeMonth: true,
       numberOfMonths: 3,
@@ -70,7 +70,7 @@
         $( "#to" ).datepick( "option", "minDate", selectedDate );
       }
     });
-    $( "#date_end" ).datepick({
+    $( "#date_end" ).datepick( {
       //defaultDate: "+1w",
       changeMonth: true,
       numberOfMonths: 3,
@@ -89,11 +89,9 @@
     var $form = $( this ),
         url = $form.attr( 'action' );
     /* Send the data using post and put the results in a div */
-    $.post( url, $form.serialize(),
-      function( data ) {
-    $("#fullPage").empty().append(data);
-      }
-    );
+    $.post( url, $form.serialize(), function( data ) {
+      $("#fullPage").empty().append(data);
+    });
   });
 </script>
 

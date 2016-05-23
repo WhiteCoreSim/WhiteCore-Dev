@@ -15,15 +15,15 @@
   <h2>{SystemName}: {OnlineUsersText}</h2>
 
   <table id="online_users_list">
-    <tbody>
-      <thead class="listhead">
-        <tr>
-          <th class="online_users_left"><p>{UserNameText}</p></th>
-          <th class="online_users_right"><p>{RegionNameText}</p></th>
-          <th class="online_users_left" style="padding-left:10px;"><p>{OnlineLocationText}</p></th>
-        </tr>
-      </thead>
+    <thead class="listhead">
+      <tr>
+        <th class="online_users_left"><p>{UserNameText}</p></th>
+        <th class="online_users_right"><p>{RegionNameText}</p></th>
+        <th class="online_users_left" style="padding-left:10px;"><p>{OnlineLocationText}</p></th>
+      </tr>
+    </thead>
 
+    <tbody>
       {UsersOnlineListArrayBegin}
         <tr>
           <td class="online_users_left"><a target="_blank" class='agentinfo' href="webprofile/?userid={UserID}">{UserName}</a></td>

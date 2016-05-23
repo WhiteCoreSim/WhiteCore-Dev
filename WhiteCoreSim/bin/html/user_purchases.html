@@ -20,18 +20,18 @@
   </form>
 
   <table id="purchases_list">
-    <tbody>
-  	  <thead class="listhead">
-    		<tr>
-    		  <th class="transactions_left"><p>{PurchaseDateText}</p></th>
-    		  <th class="transactions_user"><p>{PurchaseAgentText}</p></th>
-    		  <th class="transactions_user"><p>{LoggedIPText}</p></th>
-    		  <th class="transactions_description"><p>{PurchaseDetailText}</p></th>
-    		  <th class="transactions_value"><p>{PurchaseAmountText}</p></th>
-    		  <th class="transactions_value"><p>{PurchaseRealAmountText}</p></th>
-    		</tr>
-  	  </thead>
+	  <thead class="listhead">
+   		<tr>
+   		  <th class="transactions_left"><p>{PurchaseDateText}</p></th>
+   		  <th class="transactions_user"><p>{PurchaseAgentText}</p></th>
+   		  <th class="transactions_user"><p>{LoggedIPText}</p></th>
+   		  <th class="transactions_description"><p>{PurchaseDetailText}</p></th>
+   		  <th class="transactions_value"><p>{PurchaseAmountText}</p></th>
+   		  <th class="transactions_value"><p>{PurchaseRealAmountText}</p></th>
+   		</tr>
+ 	  </thead>
 
+    <tbody>
   	  {PurchasesListArrayBegin}
       <tr>
         <td class="transactions_left"><p>{PurchaseDate}</p></td>
@@ -60,7 +60,7 @@
 
   <!--  /* date pickers */ -->
   $(function() {
-    $( "#date_start" ).datepick({
+    $( "#date_start" ).datepick( {
       defaultDate: "-1w",
       changeMonth: true,
       numberOfMonths: 3,
@@ -68,7 +68,7 @@
         $( "#to" ).datepick( "option", "minDate", selectedDate );
       }
     });
-    $( "#date_end" ).datepick({
+    $( "#date_end" ).datepick( {
       //defaultDate: "+1w",
       changeMonth: true,
       numberOfMonths: 3,
@@ -87,11 +87,9 @@
     var $form = $( this ),
         url = $form.attr( 'action' );
     /* Send the data using post and put the results in a div */
-    $.post( url, $form.serialize(),
-      function( data ) {
-    $("#fullPage").empty().append(data);
-      }
-    );
+    $.post( url, $form.serialize(), function( data ) {
+      $("#fullPage").empty().append(data);
+    });
   });
 </script>
 
