@@ -173,6 +173,7 @@ namespace WhiteCore.Framework.Modules
         void CleanInfo(object message);
         void CleanInfoFormat(string format, params object[] args);
         void Ticker();
+        void Ticker (string message, bool newline);
         void InfoFormat(string format, params object[] args);
         void Log(Level level, object message);
         void Trace(object message);

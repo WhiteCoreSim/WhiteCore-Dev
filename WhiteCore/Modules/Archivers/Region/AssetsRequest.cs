@@ -56,7 +56,7 @@ namespace WhiteCore.Modules.Archivers
         /// <value>
         ///     Record the number of asset replies required so we know when we've finished
         /// </value>
-        private readonly int m_repliesRequired;
+        readonly int m_repliesRequired;
 
         /// <value>
         ///     Asset service used to request the assets
@@ -108,25 +108,25 @@ namespace WhiteCore.Modules.Archivers
 
         protected internal void Execute()
         {
-            m_requestState = RequestState.Running;
+            lock(this) {
+                m_requestState = RequestState.Running;
 
-            MainConsole.Instance.DebugFormat("[Archiver]: AssetsRequest executed looking for {0} assets",
-                                             m_repliesRequired);
+                MainConsole.Instance.DebugFormat ("[Archiver]: AssetsRequest executed looking for {0} assets",
+                                                 m_repliesRequired);
 
-            // We can stop here if there are no assets to fetch
-            if (m_repliesRequired == 0)
-            {
-                m_requestState = RequestState.Completed;
-                PerformAssetsRequestCallback(null);
-                return;
+                // We can stop here if there are no assets to fetch
+                if (m_repliesRequired == 0) {
+                    m_requestState = RequestState.Completed;
+                    PerformAssetsRequestCallback (null);
+                    return;
+                }
+
+                foreach (KeyValuePair<UUID, AssetType> kvp in m_uuids) {
+                    m_assetService.Get (kvp.Key.ToString (), kvp.Value, PreAssetRequestCallback);
+                }
+
+                m_requestCallbackTimer.Enabled = true;
             }
-
-            foreach (KeyValuePair<UUID, AssetType> kvp in m_uuids)
-            {
-                m_assetService.Get(kvp.Key.ToString(), kvp.Value, PreAssetRequestCallback);
-            }
-
-            m_requestCallbackTimer.Enabled = true;
         }
 
         protected void OnRequestCallbackTimeout(object source, ElapsedEventArgs args)
@@ -148,14 +148,10 @@ namespace WhiteCore.Modules.Archivers
                 List<UUID> uuids = m_uuids.Keys.ToList();
 
                 foreach (UUID uuid in m_foundAssetUuids)
-                {
                     uuids.Remove(uuid);
-                }
 
                 foreach (UUID uuid in m_notFoundAssetUuids)
-                {
                     uuids.Remove(uuid);
-                }
 
                 MainConsole.Instance.ErrorFormat(
                     "[Archiver]: Asset service failed to return information about {0} requested assets", uuids.Count);

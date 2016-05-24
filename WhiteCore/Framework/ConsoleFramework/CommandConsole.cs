@@ -902,6 +902,13 @@ namespace WhiteCore.Framework.ConsoleFramework
             Console.Write (".");
         }
 
+        public void Ticker (string message, bool newline)
+        {
+            Console.Write (" " + message + " ");
+            if (newline)
+                Console.WriteLine ("");
+        }
+
         public void InfoFormat (string format, params object [] args)
         {
             Output (string.Format (format, args), Level.Info);
