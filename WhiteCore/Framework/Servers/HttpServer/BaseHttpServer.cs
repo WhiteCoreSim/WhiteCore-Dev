@@ -244,9 +244,18 @@ namespace WhiteCore.Framework.Servers.HttpServer
             if (!File.Exists (file))
                 return getDefaultHTTP404 ();
 
-            StreamReader sr = File.OpenText (file);
-            string result = sr.ReadToEnd ();
-            sr.Close ();
+            StreamReader sr = null;
+            string result;
+            try {
+                sr = File.OpenText (file);
+                result = sr.ReadToEnd ();
+                sr.Close ();
+            } catch {
+                if (sr != null)
+                    sr.Close();
+                result = "";
+            }
+
             return result;
         }
 
@@ -263,6 +272,7 @@ namespace WhiteCore.Framework.Servers.HttpServer
             } finally {
                 if (sr != null)
                     sr.Close ();
+                result = "";
             }
             return result;
         }

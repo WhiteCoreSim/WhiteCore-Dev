@@ -355,8 +355,10 @@ namespace WhiteCore.Framework.SceneInfo
                     bitmap.SetPixel (i, j, image [i] [j]);
                 }
             }
-
-            bitmap.Save (fileName);
+            try {
+                bitmap.Save (fileName);
+            } catch {
+            }
             bitmap.Dispose ();
         }
 

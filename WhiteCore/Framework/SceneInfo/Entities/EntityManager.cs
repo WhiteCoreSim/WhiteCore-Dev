@@ -52,7 +52,7 @@ namespace WhiteCore.Framework.SceneInfo.Entities
 
         public virtual int Count {
             get {
-                lock (m_objectEntities) {
+                lock (m_objectEntitiesLock) {
                     return m_objectEntities.Count + GetPresenceCount ();
                 }
             }
