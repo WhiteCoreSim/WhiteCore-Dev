@@ -186,11 +186,16 @@ namespace WhiteCore.Services.SQLServices.InventoryService
             bool result = false;
 
             InventoryFolderBase rootFolder = GetRootFolder(principalID);
-
             if (rootFolder == null)
             {
                 rootFolder = CreateFolder(principalID, UUID.Zero, (int) FolderType.Root, InventoryFolderBase.ROOT_FOLDER_NAME);
-                result = true;
+                if (rootFolder != null)
+                    result = true;
+                else {
+                    MainConsole.Instance.Error ("Inventory service]: Unable to obtain/crete user's root folder!");
+                    defaultItems = new List<InventoryItemBase> ();
+                    return false;
+                }
             }
 
             InventoryFolderBase[] sysFolders = GetSystemFolders(principalID);
@@ -512,9 +517,10 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         //[CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public virtual bool FolderExists(UUID folderID)
         {
-            object remoteValue = DoRemoteByURL("InventoryServerURI", folderID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return remoteValue == null ? false : (bool) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("InventoryServerURI", folderID);
+                return remoteValue == null ? false : (bool)remoteValue;
+            }
 
             return m_Database.FolderExists(folderID);
         }
@@ -522,9 +528,10 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         //[CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public virtual bool FolderItemExists(UUID folderID, UUID itemID)
         {
-            object remoteValue = DoRemoteByURL("InventoryServerURI", folderID, itemID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return remoteValue == null ? false : (bool) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("InventoryServerURI", folderID, itemID);
+                return remoteValue == null ? false : (bool)remoteValue;
+            }
 
             return m_Database.FolderItemExists(folderID, itemID);
         }
@@ -532,9 +539,10 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         //[CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public virtual bool ItemExists(UUID itemID)
         {
-            object remoteValue = DoRemoteByURL("InventoryServerURI", itemID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return remoteValue == null ? false : (bool) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("InventoryServerURI", itemID);
+                return remoteValue == null ? false : (bool)remoteValue;
+            }
 
             return m_Database.ItemExists(itemID);
         }
@@ -564,24 +572,25 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         [CanBeReflected(ThreatLevel = ThreatLevel.Medium)]
         public virtual InventoryFolderBase GetRootFolder(UUID principalID)
         {
-            object remoteValue = DoRemoteByURL("InventoryServerURI", principalID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (InventoryFolderBase) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("InventoryServerURI", principalID);
+                return remoteValue != null ? (InventoryFolderBase)remoteValue : null;
+            }
 
             List<InventoryFolderBase> folders = m_Database.GetFolders(
                 new[] {"agentID", "parentFolderID"},
                 new[] {principalID.ToString(), UUID.Zero.ToString()});
 
-            if (folders.Count == 0)
-                return null;
+            if (folders.Count == 0) {
+                // nothing for this user... auto create the root folder
+                var rootfolder = CreateFolder (principalID, UUID.Zero, (int)FolderType.Root, InventoryFolderBase.ROOT_FOLDER_NAME);
+                return rootfolder;
+             }
 
+            // we have the user's folders... find the root
             InventoryFolderBase root = null;
-
             foreach (InventoryFolderBase folder in folders.Where(folder => folder.Name == InventoryFolderBase.ROOT_FOLDER_NAME))
                 root = folder;
-
-            if (folders == null) // oops
-                root = folders[0];
 
             return root;
         }
@@ -590,9 +599,10 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public virtual InventoryFolderBase GetFolderForType(UUID principalID, InventoryType invType, FolderType type)
         {
-            object remoteValue = DoRemoteByURL("InventoryServerURI", principalID, invType, type);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (InventoryFolderBase) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("InventoryServerURI", principalID, invType, type);
+                return remoteValue != null ? (InventoryFolderBase)remoteValue : null;
+            }
 
             if (invType == InventoryType.Snapshot)
                 type = FolderType.Snapshot;
@@ -618,9 +628,10 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         [CanBeReflected(ThreatLevel = ThreatLevel.High)]
         public virtual InventoryCollection GetFolderContent(UUID userID, UUID folderID)
         {
-            object remoteValue = DoRemoteByURL("InventoryServerURI", userID, folderID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (InventoryCollection) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("InventoryServerURI", userID, folderID);
+                return remoteValue != null ? (InventoryCollection)remoteValue : null;
+            }
 
             // This method doesn't receive a valid principal id from the
             // connector. So we disregard the principal and look
@@ -656,9 +667,12 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public virtual List<InventoryFolderBase> GetFolderFolders(UUID principalID, UUID folderID)
         {
-            object remoteValue = DoRemoteByURL("InventoryServerURI", principalID, folderID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<InventoryFolderBase>) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("InventoryServerURI", principalID, folderID);
+                return remoteValue != null
+                    ? (List<InventoryFolderBase>)remoteValue
+                    : new List<InventoryFolderBase> ();
+            }
 
             // Since we probably don't get a valid principal here, either ...
             //
@@ -672,9 +686,10 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public virtual bool AddFolder(InventoryFolderBase folder)
         {
-            object remoteValue = DoRemoteByURL("InventoryServerURI", folder);
-            if (remoteValue != null || m_doRemoteOnly)
-                return remoteValue == null ? false : (bool) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("InventoryServerURI", folder);
+                return remoteValue != null ? (bool)remoteValue : false;
+            }
 
             InventoryFolderBase check = GetFolder(folder);
             if (check != null)
@@ -686,9 +701,10 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public virtual bool UpdateFolder(InventoryFolderBase folder)
         {
-            object remoteValue = DoRemoteByURL("InventoryServerURI", folder);
-            if (remoteValue != null || m_doRemoteOnly)
-                return remoteValue == null ? false : (bool) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("InventoryServerURI", folder);
+                return remoteValue != null ? (bool)remoteValue : false;
+            }
 
             if (!m_AllowDelete) //Initial item MUST be created as a link folder
                 if (folder.Type == (sbyte) AssetType.LinkFolder)
@@ -719,9 +735,10 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public virtual bool MoveFolder(InventoryFolderBase folder)
         {
-            object remoteValue = DoRemoteByURL("InventoryServerURI", folder);
-            if (remoteValue != null || m_doRemoteOnly)
-                return remoteValue == null ? false : (bool) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("InventoryServerURI", folder);
+                return remoteValue != null ? (bool)remoteValue : false;
+            }
 
             List<InventoryFolderBase> x = m_Database.GetFolders(
                 new[] {"folderID"},
@@ -740,9 +757,10 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         [CanBeReflected(ThreatLevel = ThreatLevel.High)]
         public virtual bool DeleteFolders(UUID principalID, List<UUID> folderIDs)
         {
-            object remoteValue = DoRemoteByURL("InventoryServerURI", principalID, folderIDs);
-            if (remoteValue != null || m_doRemoteOnly)
-                return remoteValue == null ? false : (bool) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("InventoryServerURI", principalID, folderIDs);
+                return remoteValue != null ? (bool)remoteValue : false;
+            }
 
             if (!m_AllowDelete)
             {
@@ -774,9 +792,10 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         [CanBeReflected(ThreatLevel = ThreatLevel.High)]
         public virtual bool PurgeFolder(InventoryFolderBase folder)
         {
-            object remoteValue = DoRemoteByURL("InventoryServerURI", folder);
-            if (remoteValue != null || m_doRemoteOnly)
-                return remoteValue == null ? false : (bool) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("InventoryServerURI", folder);
+                return remoteValue != null ? (bool)remoteValue : false;
+            }
 
             if (!m_AllowDelete && !ParentIsLinkFolder(folder.ID))
                 return false;
@@ -802,9 +821,10 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         [CanBeReflected(ThreatLevel = ThreatLevel.Full)]
         public virtual bool ForcePurgeFolder(InventoryFolderBase folder)
         {
-            object remoteValue = DoRemoteByURL("InventoryServerURI", folder);
-            if (remoteValue != null || m_doRemoteOnly)
-                return remoteValue == null ? false : (bool)remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("InventoryServerURI", folder);
+                return remoteValue != null ? (bool)remoteValue : false;
+            }
 
             List<InventoryFolderBase> subFolders = m_Database.GetFolders(
                 new[] {"parentFolderID"},
@@ -825,9 +845,10 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public virtual bool AddItem(InventoryItemBase item)
         {
-            object remoteValue = DoRemoteByURL("InventoryServerURI", item);
-            if (remoteValue != null || m_doRemoteOnly)
-                return remoteValue == null ? false : (bool) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("InventoryServerURI", item);
+                return remoteValue != null ? (bool)remoteValue : false;
+            }
 
             return AddItem(item, true);
         }
@@ -857,9 +878,10 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public virtual bool UpdateItem(InventoryItemBase item)
         {
-            object remoteValue = DoRemoteByURL("InventoryServerURI", item);
-            if (remoteValue != null || m_doRemoteOnly)
-                return remoteValue == null ? false : (bool) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("InventoryServerURI", item);
+                return remoteValue != null ? (bool)remoteValue : false;
+            }
 
             if (!m_AllowDelete) //Initial item MUST be created as a link or link folder
                 if (item.AssetType == (sbyte) AssetType.Link || item.AssetType == (sbyte) AssetType.LinkFolder)
@@ -871,9 +893,10 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public virtual bool UpdateAssetIDForItem(UUID itemID, UUID assetID)
         {
-            object remoteValue = DoRemoteByURL("InventoryServerURI", itemID, assetID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return remoteValue == null ? false : (bool) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("InventoryServerURI", itemID, assetID);
+                return remoteValue != null ? (bool)remoteValue : false;
+            }
 
             return m_Database.UpdateAssetIDForItem(itemID, assetID);
         }
@@ -881,9 +904,10 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public virtual bool MoveItems(UUID principalID, List<InventoryItemBase> items)
         {
-            object remoteValue = DoRemoteByURL("InventoryServerURI", principalID, items);
-            if (remoteValue != null || m_doRemoteOnly)
-                return remoteValue == null ? false : (bool) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("InventoryServerURI", principalID, items);
+                return remoteValue != null ? (bool)remoteValue : false;
+            }
 
             foreach (InventoryItemBase i in items)
             {
@@ -905,9 +929,10 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         [CanBeReflected(ThreatLevel = ThreatLevel.High)]
         public virtual bool DeleteItems(UUID principalID, List<UUID> itemIDs)
         {
-            object remoteValue = DoRemoteByURL("InventoryServerURI", principalID, itemIDs);
-            if (remoteValue != null || m_doRemoteOnly)
-                return remoteValue == null ? false : (bool) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("InventoryServerURI", principalID, itemIDs);
+                return remoteValue != null ? (bool)remoteValue : false;
+            }
 
             if (!m_AllowDelete)
             {
@@ -947,9 +972,11 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                 if (_tempItemCache.ContainsKey(inventoryID))
                     return _tempItemCache[inventoryID];
             }
-            object remoteValue = DoRemoteByURL("InventoryServerURI", userID, inventoryID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (InventoryItemBase) remoteValue;
+
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("InventoryServerURI", userID, inventoryID);
+                return remoteValue != null ? (InventoryItemBase)remoteValue : null;
+            }
 
             string[] fields = userID != UUID.Zero ? new[] {"inventoryID", "avatarID"} : new[] {"inventoryID"};
             string[] vals = userID != UUID.Zero
@@ -971,9 +998,11 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                 if (_tempItemCache.ContainsKey(inventoryID))
                     return _tempItemCache[inventoryID].AssetID;
             }
-            object remoteValue = DoRemoteByURL("InventoryServerURI", userID, inventoryID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (UUID) remoteValue;
+
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("InventoryServerURI", userID, inventoryID);
+                return remoteValue != null ? (UUID)remoteValue : UUID.Zero;
+            }
 
             List<UUID> items = m_Database.GetItemAssetIDs(userID,
                                                           new[] {"inventoryID", "avatarID"},
@@ -1005,9 +1034,10 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public virtual InventoryFolderBase GetFolder(InventoryFolderBase folder)
         {
-            object remoteValue = DoRemoteByURL("InventoryServerURI", folder);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (InventoryFolderBase) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("InventoryServerURI", folder);
+                return remoteValue != null ? (InventoryFolderBase)remoteValue : null;
+            }
 
             List<InventoryFolderBase> folders = m_Database.GetFolders(
                 new[] {"folderID"},
@@ -1022,9 +1052,10 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public virtual InventoryFolderBase GetFolderByOwnerAndName(UUID folderOwner, string folderName)
         {
-            object remoteValue = DoRemoteByURL("InventoryServerURI", folderOwner, folderName);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (InventoryFolderBase) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("InventoryServerURI", folderOwner, folderName);
+                return remoteValue != null ? (InventoryFolderBase)remoteValue : null;
+            }
 
             List<InventoryFolderBase> folders = m_Database.GetFolders(
                 new[] {"folderName", "agentID"},
@@ -1439,8 +1470,9 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                 {
                     CreateUserInventory (account.PrincipalID, false);
                     rootFolder = GetRootFolder (account.PrincipalID);
-                } else
-                {
+                }
+                // recheck to make sure
+                if (rootFolder == null) {
                     rootFolder = new InventoryFolderBase {
                         Name = InventoryFolderBase.ROOT_FOLDER_NAME,
                         Type = (short)FolderType.Root,

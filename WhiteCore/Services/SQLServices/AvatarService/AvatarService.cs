@@ -108,9 +108,10 @@ namespace WhiteCore.Services.SQLServices.AvatarService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public AvatarAppearance GetAppearance(UUID principalID)
         {
-            object remoteValue = DoRemoteByURL("AvatarServerURI", principalID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (AvatarAppearance) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("AvatarServerURI", principalID);
+                return remoteValue != null ? (AvatarAppearance)remoteValue : null;
+            }
 
             return m_Database.Get(principalID);
         }

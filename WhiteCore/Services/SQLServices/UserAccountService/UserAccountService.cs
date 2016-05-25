@@ -267,14 +267,15 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             if (m_cache.Get(firstName + " " + lastName, out account))
                 return AllScopeIDImpl.CheckScopeIDs(scopeIDs, account);
 
-            object remoteValue = DoRemoteByURL("UserAccountServerURI", scopeIDs, firstName, lastName);
-            if (remoteValue != null || m_doRemoteOnly)
-            {
-                UserAccount acc = (UserAccount) remoteValue;
-                if (remoteValue != null)
-                    m_cache.Cache(acc.PrincipalID, acc);
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("UserAccountServerURI", scopeIDs, firstName, lastName);
+                if (remoteValue != null) {
+                    UserAccount acc = (UserAccount)remoteValue;
+                    m_cache.Cache (acc.PrincipalID, acc);
 
-                return acc;
+                    return acc;
+                } 
+                return new UserAccount ();
             }
 
             UserAccount[] d;
@@ -329,14 +330,15 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             if (m_cache.Get(name, out account))
                 return AllScopeIDImpl.CheckScopeIDs(scopeIDs, account);
 
-            object remoteValue = DoRemoteByURL("UserAccountServerURI", scopeIDs, name);
-            if (remoteValue != null || m_doRemoteOnly)
-            {
-                UserAccount acc = (UserAccount) remoteValue;
-                if (remoteValue != null)
-                    m_cache.Cache(acc.PrincipalID, acc);
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("UserAccountServerURI", scopeIDs, name);
+                if (remoteValue != null) {
+                    UserAccount acc = (UserAccount)remoteValue;
+                    m_cache.Cache (acc.PrincipalID, acc);
 
-                return acc;
+                    return acc;
+                }
+                return new UserAccount ();
             }
 
             UserAccount[] d;
@@ -394,14 +396,15 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             if (m_cache.Get(principalID, out account))
                 return AllScopeIDImpl.CheckScopeIDs(scopeIDs, account);
 
-            object remoteValue = DoRemoteByURL("UserAccountServerURI", scopeIDs, principalID);
-            if (remoteValue != null || m_doRemoteOnly)
-            {
-                UserAccount acc = (UserAccount) remoteValue;
-                if (remoteValue != null)
-                    m_cache.Cache(principalID, acc);
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("UserAccountServerURI", scopeIDs, principalID);
+                if (remoteValue != null) {
+                    UserAccount acc = (UserAccount)remoteValue;
+                    m_cache.Cache (principalID, acc);
 
-                return acc;
+                    return acc;
+                }
+                return new UserAccount ();
             }
 
             UserAccount[] d;
@@ -432,18 +435,20 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             return m_Database.Store(data);
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<UserAccount> GetUserAccounts(List<UUID> scopeIDs, string query)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public List<UserAccount> GetUserAccounts (List<UUID> scopeIDs, string query)
         {
-            object remoteValue = DoRemoteByURL("UserAccountServerURI", scopeIDs, query);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<UserAccount>) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("UserAccountServerURI", scopeIDs, query);
+                if (remoteValue != null)
+                    return (List<UserAccount>)remoteValue;
+                return new List<UserAccount> ();
+            }
 
-            UserAccount[] d = m_Database.GetUsers(scopeIDs, query);
-
+            UserAccount [] d = m_Database.GetUsers (scopeIDs, query);
             if (d == null)
-                return new List<UserAccount>();
-
+                return new List<UserAccount> ();
+            
             List<UserAccount> ret = new List<UserAccount>(d);
             return ret;
         }
@@ -451,12 +456,14 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public List<UserAccount> GetUserAccounts(List<UUID> scopeIDs, string query, uint? start, uint? count)
         {
-            object remoteValue = DoRemoteByURL("UserAccountServerURI", scopeIDs, query);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<UserAccount>) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("UserAccountServerURI", scopeIDs, query);
+                if (remoteValue != null)
+                    return (List<UserAccount>)remoteValue;
+                return new List<UserAccount> ();
+            }
 
             UserAccount[] d = m_Database.GetUsers(scopeIDs, query, start, count);
-
             if (d == null)
                 return new List<UserAccount>();
 
@@ -467,12 +474,14 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public List<UserAccount> GetUserAccounts(List<UUID> scopeIDs, int level, int flags)
         {
-            object remoteValue = DoRemoteByURL("UserAccountServerURI", level, flags);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<UserAccount>) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL("UserAccountServerURI", level, flags);
+                if (remoteValue != null)
+                    return (List<UserAccount>) remoteValue;
+                return new List<UserAccount> ();
+             }
 
             UserAccount[] d = m_Database.GetUsers(scopeIDs, level, flags);
-
             if (d == null)
                 return new List<UserAccount>();
 
@@ -483,9 +492,12 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public uint NumberOfUserAccounts(List<UUID> scopeIDs, string query)
         {
-            object remoteValue = DoRemoteByURL("UserAccountServerURI", scopeIDs, query);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (uint) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("UserAccountServerURI", scopeIDs, query);
+                if (remoteValue != null)
+                    return (uint)remoteValue;
+                return 0;
+            }
 
             var userCount = m_Database.NumberOfUsers(scopeIDs, query);
             return userCount - Constants.SystemUserCount;
@@ -1071,12 +1083,12 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             List<string> cmdparams = new List<string>(cmd);
             foreach (string param in cmd)
             {
-                if (param.StartsWith("--system"))
+                if (param.StartsWith ("--system", StringComparison.Ordinal))
                 {
                     sysFlag = true;
                     cmdparams.Remove(param);
                 }
-                if (param.StartsWith("--uuid"))
+                if (param.StartsWith ("--uuid", StringComparison.Ordinal))
                 {
                     uuidFlag = true;
                     cmdparams.Remove(param);
@@ -1477,12 +1489,12 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 fileName = cmdParams [2];
 
             int userNo = 0;
-            string FirstName;
-            string LastName;
-            string Password;
-            string Email;
-            string Rezday;
-            UUID UserUUID;
+            string firstName;
+            string lastName;
+            string password;
+            string email;
+            string rezday;
+            UUID userUUID;
 
             fileName = PathHelpers.VerifyReadFile(fileName,"csv", m_defaultDataPath + "/Updates");
             if(fileName == "")
@@ -1503,32 +1515,32 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                         continue;
                     }
 
-                    UserUUID = (UUID)userInfo [0];
-                    FirstName = userInfo [1];
-                    LastName = userInfo [2];
-                    Password = userInfo [3];
-                    Email = userInfo.Length < 6 ? userInfo [4] : "";
-                    Rezday = userInfo.Length == 6 ? userInfo [5] : "";
+                    userUUID = (UUID)userInfo [0];
+                    firstName = userInfo [1];
+                    lastName = userInfo [2];
+                    password = userInfo [3];
+                    email = userInfo.Length < 6 ? userInfo [4] : "";
+                    rezday = userInfo.Length == 6 ? userInfo [5] : "";
 
-                    string check = CreateUser (UserUUID, UUID.Zero, FirstName + " " + LastName, Util.Md5Hash(Password), Email);
+                    string check = CreateUser (userUUID, UUID.Zero, firstName + " " + lastName, Util.Md5Hash(password), email);
                     if (check != "")
                     {
                         MainConsole.Instance.ErrorFormat ("Couldn't create the user '{0} {1}'. Reason: {2}",
-                            FirstName, LastName, check);
+                            firstName, lastName, check);
                         continue;
                     }
 
                     //set user levels and status  (if needed)
-                    var account = GetUserAccount (null, UserUUID);
+                    var account = GetUserAccount (null, userUUID);
                     //account.UserLevel = 0;
                     account.UserFlags = Constants.USER_FLAG_RESIDENT;
                     StoreUserAccount (account);
                     
                     // [NEW] Set the users rezdate
-                    if ((Rezday != "") && (m_profileConnector != null))
+                    if ((rezday != "") && (m_profileConnector != null))
                     {
                     	IUserProfileInfo profile = m_profileConnector.GetUserProfile (account.PrincipalID);
-                    	profile.Created = int.Parse(Rezday);
+                    	profile.Created = int.Parse(rezday);
                     	bool success = m_profileConnector.UpdateUserProfile (profile);
                     	if (!success)
                     		MainConsole.Instance.InfoFormat("[User account service]: Unable to change rezday for {0} {1}.", account.FirstName, account.LastName);
@@ -1634,14 +1646,14 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
 			int userNo = 0;
             
 			// Define the fields we're gonna read
-			UUID UserUUID;
-			string FirstName;
-			string LastName;
-			string Password;
-			string Email;
-			string Rezday;
-			string Salt;
-			string SaltedPassword;
+			UUID userUUID;
+			string firstName;
+			string lastName;
+			string password;
+			string email;
+			string rezday;
+			string salt;
+			string saltedPassword;
 
 			fileName = PathHelpers.VerifyReadFile(fileName, "csv", m_defaultDataPath + "/Updates");
 			if (fileName == "") {
@@ -1658,17 +1670,17 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
 						continue;
 					}
 
-					UserUUID = (UUID)userInfo[0];
-					FirstName = userInfo[1];
-					LastName = userInfo[2];
-					Password = userInfo[3];
-					Email = userInfo.Length < 6 ? userInfo[4] : "";
-					Rezday = userInfo.Length == 6 ? userInfo[5] : "";
-					Salt = userInfo[6];
-					SaltedPassword = userInfo[7];
+					userUUID = (UUID)userInfo[0];
+					firstName = userInfo[1];
+					lastName = userInfo[2];
+					password = userInfo[3];
+					email = userInfo.Length < 6 ? userInfo[4] : "";
+					rezday = userInfo.Length == 6 ? userInfo[5] : "";
+					salt = userInfo[6];
+					saltedPassword = userInfo[7];
                     
 					/*
-                    string check = CreateSaltedUser (UserUUID, UUID.Zero, FirstName + " " + LastName, Salt, SaltedPassword, Email);
+                    string check = CreateSaltedUser (userUUID, UUID.Zero, firstName + " " + lastName, salt, saltedPassword, email);
                     if (check != "")
                     {
                         MainConsole.Instance.ErrorFormat ("Couldn't create the user '{0} {1}'. Reason: {2}",
@@ -1678,14 +1690,14 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     */
                    
 					//set user levels and status  (if needed)
-					var account = GetUserAccount(null, UserUUID);
+					var account = GetUserAccount(null, userUUID);
 					//account.UserLevel = 0;
 					account.UserFlags = Constants.USER_FLAG_RESIDENT;
 					StoreUserAccount(account);
                     
-					if ((Rezday != "") && (m_profileConnector != null)) {
+					if ((rezday != "") && (m_profileConnector != null)) {
 						IUserProfileInfo profile = m_profileConnector.GetUserProfile(account.PrincipalID);
-						profile.Created = int.Parse(Rezday);
+						profile.Created = int.Parse(rezday);
 						bool success = m_profileConnector.UpdateUserProfile(profile);
 						if (!success)
 							MainConsole.Instance.InfoFormat("[User account service]: Unable to change rezday for {0} {1}.", account.FirstName, account.LastName);
@@ -1733,17 +1745,17 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
 
             var startTime = DateTime.Now;
             int userNo = 0;
-            string FirstName = "Test";
-            string LastName = "User";
-            string Password = "none";
-            string Email = "none";
-            UUID UserUUID;
+            string firstName = "Test";
+            string lastName = "User";
+            string password = "none";
+            string email = "none";
+            UUID userUUID;
 
             for (userNo = 0; userNo < addUsers; userNo++)
             {
                 UserUUID = UUID.Random ();
 
-                string check = CreateUser (UserUUID, UUID.Zero, FirstName + " " + LastName+userNo, Util.Md5Hash(Password), Email);
+                string check = CreateUser (userUUID, UUID.Zero, firstName + " " + lastName+userNo, Util.Md5Hash(password), email);
                 if (check != "")
                 {
                     MainConsole.Instance.Error ("Couldn't create the user. Reason: " + check);
@@ -1751,7 +1763,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 }
 
                 //set user levels and status  (if needed)
-                var account = GetUserAccount (null, UserUUID);
+                var account = GetUserAccount (null, userUUID);
                 //account.UserLevel = 0;
                 account.UserFlags = Constants.USER_FLAG_RESIDENT;
                 StoreUserAccount (account);

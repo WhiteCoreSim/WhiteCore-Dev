@@ -137,11 +137,15 @@ namespace WhiteCore.Services.SQLServices.AssetService
                 if (found && (cachedAsset == null || cachedAsset.Data.Length != 0))
                     return cachedAsset;
             }
-            object remoteValue = DoRemoteByURL ("AssetServerURI", id, showWarnings);
-            if (remoteValue != null || m_doRemoteOnly) {
-                if (doDatabaseCaching && cache != null)
-                    cache.Cache (id, (AssetBase)remoteValue);
-                return (AssetBase)remoteValue;
+
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("AssetServerURI", id, showWarnings);
+                if (remoteValue != null) {
+                    if (doDatabaseCaching && cache != null)
+                        cache.Cache (id, (AssetBase)remoteValue);
+                    return (AssetBase)remoteValue;
+                }
+                return null;
             }
 
             AssetBase asset = m_database.GetAsset (UUID.Parse (id), showWarnings);
@@ -170,12 +174,15 @@ namespace WhiteCore.Services.SQLServices.AssetService
                     return cachedAsset;
             }
 
-            object remoteValue = DoRemoteByURL ("AssetServerURI", id);
-            if (remoteValue != null || m_doRemoteOnly) {
-                byte [] data = (byte [])remoteValue;
-                if (doDatabaseCaching && cache != null && data != null)
-                    cache.CacheData (id, data);
-                return data;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("AssetServerURI", id);
+                if (remoteValue != null) {
+                    byte [] data = (byte [])remoteValue;
+                    if (doDatabaseCaching && cache != null && data != null)
+                        cache.CacheData (id, data);
+                    return data;
+                }
+                return null;
             }
 
             AssetBase asset = m_database.GetAsset (UUID.Parse (id));
@@ -183,15 +190,22 @@ namespace WhiteCore.Services.SQLServices.AssetService
                 cache.Cache (id, asset);
 
             // An empty array byte [] is NOT null and a lot of tests depend on the null test still - greythane -
-            return asset != null ? asset.Data : null;
+            if (asset == null)
+                return null;
+
+            var assetData = new byte [asset.Data.Length];
+            asset.Data.CopyTo (assetData, 0);
+            asset.Dispose ();
+            return assetData;
         }
 
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
         public virtual bool GetExists (string id)
         {
-            object remoteValue = DoRemoteByURL ("AssetServerURI", id);
-            if (remoteValue != null || m_doRemoteOnly)
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("AssetServerURI", id);
                 return remoteValue != null ? (bool)remoteValue : false;
+            }
 
             return m_database.ExistsAsset (UUID.Parse (id));
         }
@@ -199,7 +213,11 @@ namespace WhiteCore.Services.SQLServices.AssetService
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
         public virtual void Get (string id, object sender, AssetRetrieved handler)
         {
-            Util.FireAndForget ((o) => { handler (id, sender, Get (id)); });
+            var asset = Get (id);
+            if (asset != null) {
+                Util.FireAndForget ((o) => { handler (id, sender, asset); });
+                // asset.Dispose ();
+            }
         }
 
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
@@ -208,8 +226,8 @@ namespace WhiteCore.Services.SQLServices.AssetService
             // this should never happen but...
             if (asset != null) {
 
-                object remoteValue = DoRemoteByURL ("AssetServerURI", asset);
-                if (remoteValue != null || m_doRemoteOnly) {
+                if (m_doRemoteOnly) {
+                    object remoteValue = DoRemoteByURL ("AssetServerURI", asset);
                     if (remoteValue != null)
                         asset.ID = (UUID)remoteValue;
                     else
@@ -236,9 +254,10 @@ namespace WhiteCore.Services.SQLServices.AssetService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public virtual UUID UpdateContent(UUID id, byte[] data)
         {
-            object remoteValue = DoRemoteByURL("AssetServerURI", id, data);
-            if (remoteValue != null || m_doRemoteOnly)
-                return remoteValue != null ? (UUID) remoteValue: UUID.Zero;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("AssetServerURI", id, data);
+                return remoteValue != null ? (UUID)remoteValue : UUID.Zero;
+            }
 
             UUID newID;
             m_database.UpdateContent(id, data, out newID);
@@ -251,9 +270,10 @@ namespace WhiteCore.Services.SQLServices.AssetService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public virtual bool Delete(UUID id)
         {
-            object remoteValue = DoRemoteByURL("AssetServerURI", id);
-            if (remoteValue != null || m_doRemoteOnly)
-                return remoteValue != null ? (bool) remoteValue : false;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("AssetServerURI", id);
+                return remoteValue != null ? (bool)remoteValue : false;
+            }
 
             return m_database.Delete(id);
         }
@@ -285,6 +305,7 @@ namespace WhiteCore.Services.SQLServices.AssetService
             if (asset.Data.Length == 0)
             {
                 MainConsole.Instance.Warn ("Asset has no data");
+                asset.Dispose ();
                 return;
             }
 
@@ -311,6 +332,7 @@ namespace WhiteCore.Services.SQLServices.AssetService
                 string text = BitConverter.ToString(line);
                 MainConsole.Instance.Info(string.Format("{0:x4}: {1}", off, text));
             }
+            asset.Dispose ();
         }
 
         /// <summary>
@@ -334,6 +356,7 @@ namespace WhiteCore.Services.SQLServices.AssetService
                 return;
             }
 
+            asset.Dispose ();
             Delete(UUID.Parse(args[2]));
 
             MainConsole.Instance.Info("Asset deleted");
@@ -383,7 +406,9 @@ namespace WhiteCore.Services.SQLServices.AssetService
                 asset.AssetTypeInfo(),
                 creatorName,
                 asset.CreationDate.ToShortDateString()
-            );      
+            );
+
+            asset.Dispose ();
         }
 
 
