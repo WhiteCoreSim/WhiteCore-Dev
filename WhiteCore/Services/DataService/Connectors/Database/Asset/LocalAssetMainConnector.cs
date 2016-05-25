@@ -249,7 +249,8 @@ namespace WhiteCore.Services.DataService.Connectors.Database.Asset
             }
             finally
             {
-                m_Gd.CloseDatabase(dr);
+                if (dr != null)
+                    m_Gd.CloseDatabase(dr);
             }
             return null;
         }

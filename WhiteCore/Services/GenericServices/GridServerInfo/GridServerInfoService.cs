@@ -25,23 +25,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System.Collections.Generic;
+using System.Threading;
+using Nini.Config;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Servers;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 
 namespace WhiteCore.Services.GenericServices
 {
     public class GridServerInfoService : ConnectorBase, IGridServerInfoService, IService
     {
         protected Dictionary<string, List<string>> m_gridURIs = new Dictionary<string, List<string>>();
-        protected bool m_remoteCalls = false, m_enabled = false;
+        protected bool m_remoteCalls = false;
+        protected bool m_enabled = false;
         protected int m_defaultURICount = 11;
 
         public void Initialize(IConfigSource config, IRegistryCore registry)
@@ -49,6 +48,7 @@ namespace WhiteCore.Services.GenericServices
             IConfig conf = config.Configs["GridServerInfoService"];
             if (conf == null || !conf.GetBoolean("Enabled"))
                 return;
+            
             m_enabled = true;
             registry.RegisterModuleInterface<IGridServerInfoService>(this);
             m_remoteCalls = conf.GetBoolean("DoRemote");
@@ -59,6 +59,7 @@ namespace WhiteCore.Services.GenericServices
             conf = config.Configs["Configuration"];
             if (conf == null)
                 return;
+            
             foreach (string key in conf.GetKeys())
                 m_gridURIs.Add(key, Util.ConvertToList(conf.GetString(key).Replace("ServersHostname", MainServer.Instance.HostName), true));
         }
@@ -67,20 +68,22 @@ namespace WhiteCore.Services.GenericServices
         {
         }
 
+        Timer gridTimer;
         public void FinishedStartup()
         {
             if (!m_enabled) return;
-            Dictionary<string, string> uris = new Dictionary<string, string>();
+            var uris = new Dictionary<string, string>();
             foreach (ConnectorBase connector in ConnectorRegistry.ServerHandlerConnectors)
             {
                 uris.Add(connector.ServerHandlerName, MainServer.Instance.FullHostName + ":" +
                     connector.ServerHandlerPort + connector.ServerHandlerPath);
             }
-            new Timer(SendGridURIsAsync, uris, 3000, System.Threading.Timeout.Infinite);
+            gridTimer = new Timer(SendGridURIsAsync, uris, 3000, Timeout.Infinite);
         }
 
-        private void SendGridURIsAsync(object state)
+        void SendGridURIsAsync(object state)
         {
+            gridTimer.Dispose ();
             SendGridURIs((Dictionary<string, string>)state);
         }
 
@@ -102,7 +105,7 @@ namespace WhiteCore.Services.GenericServices
         public Dictionary<string, List<string>> RetrieveAllGridURIs(bool secure)
         {
             if (m_remoteCalls)
-                return (Dictionary<string, List<string>>)base.DoRemoteCallGet(true, "ServerURI", secure);
+                return (Dictionary<string, List<string>>)DoRemoteCallGet(true, "ServerURI", secure);
 
             if (m_gridURIs.Count < m_defaultURICount)
             {
@@ -112,13 +115,11 @@ namespace WhiteCore.Services.GenericServices
 
             if (secure)
                 return m_gridURIs;
-            else
-            {
-                Dictionary<string, List<string>> uris = new Dictionary<string, List<string>>();
-                foreach (KeyValuePair<string, List<string>> kvp in m_gridURIs)
-                    uris.Add(kvp.Key, new List<string>(kvp.Value));
-                return uris;
-            }
+            
+            var uris = new Dictionary<string, List<string>> ();
+            foreach (KeyValuePair<string, List<string>> kvp in m_gridURIs)
+                uris.Add (kvp.Key, new List<string> (kvp.Value));
+            return uris;
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.High)]
@@ -126,7 +127,7 @@ namespace WhiteCore.Services.GenericServices
         {
             if (m_remoteCalls)
             {
-                base.DoRemoteCallPost(true, "ServerURI", uri);
+                DoRemoteCallPost(true, "ServerURI", uri);
                 return;
             }
 
@@ -144,11 +145,12 @@ namespace WhiteCore.Services.GenericServices
             m_registry.RequestModuleInterface<IGridInfo>().UpdateGridInfo();
         }
 
+        Timer uriTimer;
         public void AddURI(string key, string value)
         {
             if (m_remoteCalls)
             {
-                new Timer((o) => AddURIInternal(key, value), null, 2000, System.Threading.Timeout.Infinite);
+                uriTimer = new Timer((o) => AddURIInternal(key, value), null, 2000, Timeout.Infinite);      
                 return;
             }
 
@@ -158,9 +160,11 @@ namespace WhiteCore.Services.GenericServices
         [CanBeReflected(ThreatLevel = ThreatLevel.High)]
         public void AddURIInternal(string key, string value)
         {
+            uriTimer.Dispose ();
+
             if (m_remoteCalls)
             {
-                base.DoRemoteCallPost(true, "ServerURI", key, value);
+                DoRemoteCallPost(true, "ServerURI", key, value);
                 return;
             }
 
@@ -169,7 +173,7 @@ namespace WhiteCore.Services.GenericServices
             m_gridURIs[key].Add(value);
             m_registry.RequestModuleInterface<IGridInfo>().UpdateGridInfo();
 
-            MainConsole.Instance.InfoFormat("[GridServerInfoService]: Adding 1 uri");
+            MainConsole.Instance.InfoFormat("[GridServerInfoService]: Adding 1 uri for " + key);
         }
     }
 }

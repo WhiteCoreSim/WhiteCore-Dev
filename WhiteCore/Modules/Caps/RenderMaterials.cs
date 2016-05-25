@@ -49,6 +49,8 @@ namespace WhiteCore.Modules.Caps
 {
     public class RenderMaterials : INonSharedRegionModule
     {
+        static readonly object _lock = new object ();
+
         IScene m_scene;
         bool m_enabled;
         public Dictionary<UUID, OSDMap> m_knownMaterials = new Dictionary<UUID, OSDMap> ();
@@ -146,11 +148,11 @@ namespace WhiteCore.Modules.Caps
                             foreach (OSD elem in (OSDArray)osd)
                             {
 
+                                AssetBase materialAsset = null;
                                 try
                                 {
                                     UUID id = new UUID (elem.AsBinary (), 0);
-                                    AssetBase materialAsset = null;
-                                    if (m_knownMaterials.ContainsKey (id))
+                                     if (m_knownMaterials.ContainsKey (id))
                                     {
                                         MainConsole.Instance.Info ("[Materials]: request for known material ID: " + id);
                                         OSDMap matMap = new OSDMap ();
@@ -168,9 +170,12 @@ namespace WhiteCore.Modules.Caps
                                         respArr.Add (matMap);
                                     } else
                                         MainConsole.Instance.Info ("[Materials]: request for UNKNOWN material ID: " + id);
+                                    materialAsset.Dispose ();
                                 } catch (Exception)
                                 {
                                     // report something here?
+                                    if (materialAsset != null)
+                                        materialAsset.Dispose ();                                       
                                     continue;
                                 }
                             }
@@ -362,7 +367,7 @@ namespace WhiteCore.Modules.Caps
                     matsArr.Add (matOsd);
                 }
 
-                lock (part.RenderMaterials)
+                lock (_lock)
                     part.RenderMaterials = matsArr;
             } catch (Exception e)
             {

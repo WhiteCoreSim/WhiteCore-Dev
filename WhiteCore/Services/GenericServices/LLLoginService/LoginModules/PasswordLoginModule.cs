@@ -25,13 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System.Collections;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Profile;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using System.Collections;
 
 namespace WhiteCore.Services
 {
@@ -39,31 +39,28 @@ namespace WhiteCore.Services
     {
         protected IAuthenticationService m_AuthenticationService;
 
-        public string Name
-        {
-            get { return GetType().Name; }
+        public string Name {
+            get { return GetType ().Name; }
         }
 
-        public void Initialize(ILoginService service, IConfigSource config, IRegistryCore registry)
+        public void Initialize (ILoginService service, IConfigSource config, IRegistryCore registry)
         {
-            m_AuthenticationService = registry.RequestModuleInterface<IAuthenticationService>();
+            m_AuthenticationService = registry.RequestModuleInterface<IAuthenticationService> ();
         }
 
-        public LoginResponse Login(Hashtable request, UserAccount account, IAgentInfo agentInfo, string authType,
+        public LoginResponse Login (Hashtable request, UserAccount account, IAgentInfo agentInfo, string authType,
                                    string password, out object data)
         {
             data = null;
             //
             // Authenticate this user
             //
-            if (authType == "UserAccount")
-            {
-                password = password.StartsWith("$1$") ? password.Remove(0, 3) : Util.Md5Hash(password); //remove $1$
+            if (authType == "UserAccount") {
+                password = password.StartsWith ("$1$", System.StringComparison.Ordinal) ? password.Remove (0, 3) : Util.Md5Hash (password); //remove $1$
             }
-            string token = m_AuthenticationService.Authenticate(account.PrincipalID, authType, password, 30);
+            string token = m_AuthenticationService.Authenticate (account.PrincipalID, authType, password, 30);
             UUID secureSession = UUID.Zero;
-            if ((token == string.Empty) || (token != string.Empty && !UUID.TryParse(token, out secureSession)))
-            {
+            if ((token == string.Empty) || (token != string.Empty && !UUID.TryParse (token, out secureSession))) {
                 data = "Incorrect password";
                 return LLFailedLoginResponse.AuthenticationProblem;
             }

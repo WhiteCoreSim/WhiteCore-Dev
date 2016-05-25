@@ -504,7 +504,7 @@ namespace WhiteCore.Modules
 
             if (localID != 1 && (parcelFlags & (uint) ParcelFlags.UseEstateVoiceChan) == 0)
             {
-                landName = String.Format("{0}:{1}", regionName, parcelName);
+                landName = string.Format("{0}:{1}", regionName, parcelName);
                 landUUID = parcelID.ToString();
                 MainConsole.Instance.TraceFormat(
                     "[VivoxVoice]: Region:Parcel \"{0}\": parcel id {1}: using channel name {2}",
@@ -512,7 +512,7 @@ namespace WhiteCore.Modules
             }
             else
             {
-                landName = String.Format("{0}:{1}", regionName, regionName);
+                landName = string.Format("{0}:{1}", regionName, "Full");        // 20160505 -greythane - was regionName:regionName 
                 landUUID = regionID.ToString();
                 MainConsole.Instance.TraceFormat(
                     "[VivoxVoice]: Region:Parcel \"{0}\": parcel id {1}: using channel name {2}",
@@ -980,10 +980,17 @@ namespace WhiteCore.Modules
 
                 // Send request and retrieve the response
                 rsp = (HttpWebResponse) req.GetResponse();
-
-                XmlTextReader rdr = new XmlTextReader(rsp.GetResponseStream());
-                doc.Load(rdr);
-                rdr.Close();
+                XmlTextReader rdr = null;
+                try {
+                    rdr = new XmlTextReader (rsp.GetResponseStream ());
+                    doc.Load (rdr);
+                    rdr.Close ();
+                } catch {
+                    if (rdr != null)
+                        rdr.Close ();
+                }
+                rsp.Close ();
+                
             }
             catch (Exception e)
             {

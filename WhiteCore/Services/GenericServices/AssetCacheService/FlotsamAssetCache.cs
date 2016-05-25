@@ -430,7 +430,6 @@ namespace WhiteCore.Services
             return Get(id, out found);
         }
 
-        volatile object _lock = new object();
         public AssetBase Get(string id, out bool found)
         {
             m_assetRequests[id].Amt++;
@@ -487,11 +486,12 @@ namespace WhiteCore.Services
 #else
                 // Track how often we have the problem that an asset is requested while
                 // it is still being downloaded by a previous request.
-                lock(_lock) 
-                {
-                    if (m_CurrentlyWriting.Contains (filename))
-                        m_RequestsForInprogress++;
-                }
+                bool inProgress;
+                lock(m_CurrentlyWriting) 
+                    inProgress = m_CurrentlyWriting.Contains (filename);
+                if (inProgress)
+                    m_RequestsForInprogress++;
+
 #endif
             }
 
@@ -953,7 +953,8 @@ namespace WhiteCore.Services
                                     assetID, assets [assetID]);
                             }
                             // we don't actually need what we retrieved
-                            cachedAsset.Dispose ();
+                            if (cachedAsset != null)
+                                cachedAsset.Dispose ();
                         }
                     }
                     uniqueUuids.Add(assetID);

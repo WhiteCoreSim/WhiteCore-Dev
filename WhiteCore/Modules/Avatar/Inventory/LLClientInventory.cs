@@ -672,6 +672,7 @@ namespace WhiteCore.Modules.Inventory
                     remoteClient, remoteClient.AgentId.ToString(), "", folderID, name, 0, callbackID, asset, invType,
                     (uint) PermissionMask.All, (uint) PermissionMask.All, (uint) PermissionMask.All,
                     (uint) PermissionMask.All, (uint) PermissionMask.All, Util.UnixTimeSinceEpoch());
+                asset.Dispose ();
             }
             else
             {
