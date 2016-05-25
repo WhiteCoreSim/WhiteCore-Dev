@@ -166,12 +166,14 @@ namespace WhiteCore.RedisServices.AssetService
                     return cachedAsset;
             }
 
-            object remoteValue = DoRemoteByURL("AssetServerURI", id, showWarnings);
-            if (remoteValue != null || m_doRemoteOnly)
-            {
-                if (doDatabaseCaching && cache != null)
-                    cache.Cache(id, (AssetBase) remoteValue);
-                return (AssetBase) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL("AssetServerURI", id, showWarnings);
+                if (remoteValue != null) {
+                    if (doDatabaseCaching && cache != null)
+                        cache.Cache (id, (AssetBase)remoteValue);
+                    return (AssetBase)remoteValue;
+                }
+                return null;
             }
 
             AssetBase asset = RedisGetAsset(id);
@@ -205,36 +207,49 @@ namespace WhiteCore.RedisServices.AssetService
                     return cachedAsset;
             }
 
-            object remoteValue = DoRemoteByURL("AssetServerURI", id);
-            if (remoteValue != null || m_doRemoteOnly)
-            {
-                byte[] data = (byte[]) remoteValue;
-                if (doDatabaseCaching && cache != null && data != null)
-                    cache.CacheData(id, data);
-                return data;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("AssetServerURI", id);
+                if (remoteValue != null) {
+                    byte [] data = (byte [])remoteValue;
+                    if (doDatabaseCaching && cache != null && data != null)
+                        cache.CacheData (id, data);
+                    return data;
+                }
+                return null;
             }
 
             AssetBase asset = RedisGetAsset(id);
             if (doDatabaseCaching && cache != null)
                 cache.Cache(id, asset);
-            
-            return asset == null ? null : asset.Data;
+
+            if (asset == null)
+                return null;
+
+            var assetData = new byte [asset.Data.Length];
+            asset.Data.CopyTo (assetData, 0);
+            asset.Dispose ();
+            return assetData;
 
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public virtual bool GetExists(string id)
         {
-            object remoteValue = DoRemoteByURL("AssetServerURI", id);
-            if (remoteValue != null || m_doRemoteOnly)
-                return remoteValue == null ? false : (bool) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("AssetServerURI", id);
+                return remoteValue != null ? (bool)remoteValue : false;
+            }
 
             return RedisExistsAsset(id);
         }
 
         public virtual void Get(String id, Object sender, AssetRetrieved handler)
         {
-            Util.FireAndForget((o) => { handler(id, sender, Get(id)); });
+            var asset = Get (id);
+            if (asset != null) {
+                Util.FireAndForget ((o) => { handler (id, sender, asset); });
+                // asset.Dispose ();
+            }
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
@@ -243,9 +258,8 @@ namespace WhiteCore.RedisServices.AssetService
             if (asset == null)
                 return UUID.Zero;
 
-            object remoteValue = DoRemoteByURL("AssetServerURI", asset);
-            if (remoteValue != null || m_doRemoteOnly)
-            {
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL("AssetServerURI", asset);
                 if (remoteValue == null)
                     return UUID.Zero;
                 asset.ID = (UUID) remoteValue;
@@ -266,16 +280,20 @@ namespace WhiteCore.RedisServices.AssetService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public virtual UUID UpdateContent(UUID id, byte[] data)
         {
-            object remoteValue = DoRemoteByURL("AssetServerURI", id, data);
-            if (remoteValue != null || m_doRemoteOnly)
-                return remoteValue == null ? UUID.Zero : (UUID) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("AssetServerURI", id, data);
+                return remoteValue != null ? (UUID)remoteValue : UUID.Zero;
+            }
 
             AssetBase asset = RedisGetAsset(id.ToString());
             if (asset == null)
                 return UUID.Zero;
             UUID newID = asset.ID = UUID.Random();
             asset.Data = data;
+
             bool success = RedisSetAsset(asset);
+            asset.Dispose ();
+
             if (!success)
                 return UUID.Zero; //We weren't able to update the asset
             return newID;
@@ -284,9 +302,10 @@ namespace WhiteCore.RedisServices.AssetService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public virtual bool Delete(UUID id)
         {
-            object remoteValue = DoRemoteByURL("AssetServerURI", id);
-            if (remoteValue != null || m_doRemoteOnly)
-                return remoteValue == null ? false : (bool) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("AssetServerURI", id);
+                return remoteValue != null ? (bool)remoteValue : false;
+            }
 
             RedisDeleteAsset(id.ToString());
             return true;
@@ -529,7 +548,7 @@ namespace WhiteCore.RedisServices.AssetService
                 Array.Copy(asset.Data, off, line, 0, len);
 
                 string text = BitConverter.ToString(line);
-                MainConsole.Instance.Info(String.Format("{0:x4}: {1}", off, text));
+                MainConsole.Instance.Info(string.Format("{0:x4}: {1}", off, text));
             }
         }
 
