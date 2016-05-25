@@ -26,46 +26,43 @@
  */
 
 
+using System.Collections.Generic;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using System.Collections.Generic;
 
 namespace WhiteCore.Services.DataService
 {
     public class LocalEmailMessagesConnector : ConnectorBase, IEmailConnector
     {
-        private IGenericData GD;
+        IGenericData GD;
 
         #region IEmailConnector Members
 
-        public void Initialize(IGenericData GenericData, IConfigSource source, IRegistryCore simBase,
+        public void Initialize (IGenericData GenericData, IConfigSource source, IRegistryCore simBase,
                                string defaultConnectionString)
         {
             GD = GenericData;
 
-            if (source.Configs[Name] != null)
-                defaultConnectionString = source.Configs[Name].GetString("ConnectionString", defaultConnectionString);
+            if (source.Configs [Name] != null)
+                defaultConnectionString = source.Configs [Name].GetString ("ConnectionString", defaultConnectionString);
 
             if (GD != null)
-                GD.ConnectToDatabase(defaultConnectionString, "Generics",
-                                     source.Configs["WhiteCoreConnectors"].GetBoolean("ValidateTables", true));
+                GD.ConnectToDatabase (defaultConnectionString, "Generics",
+                                     source.Configs ["WhiteCoreConnectors"].GetBoolean ("ValidateTables", true));
 
-            Framework.Utilities.DataManager.RegisterPlugin(Name + "Local", this);
+            Framework.Utilities.DataManager.RegisterPlugin (Name + "Local", this);
 
-            if (source.Configs["WhiteCoreConnectors"].GetString("EmailConnector", "LocalConnector") ==
-                "LocalConnector")
-            {
-                Framework.Utilities.DataManager.RegisterPlugin(this);
+            if (source.Configs ["WhiteCoreConnectors"].GetString ("EmailConnector", "LocalConnector") == "LocalConnector") {
+                Framework.Utilities.DataManager.RegisterPlugin (this);
             }
-            Init(simBase, Name);
+            Init (simBase, Name);
         }
 
-        public string Name
-        {
+        public string Name {
             get { return "IEmailConnector"; }
         }
 
@@ -74,16 +71,17 @@ namespace WhiteCore.Services.DataService
         /// </summary>
         /// <param name="objectID"></param>
         /// <returns></returns>
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<Email> GetEmails(UUID objectID)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public List<Email> GetEmails (UUID objectID)
         {
-            object remoteValue = DoRemote(objectID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<Email>) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (objectID);
+                return remoteValue != null ? (List<Email>)remoteValue : new List<Email> ();
+            }
 
             //Get all the messages
-            List<Email> emails = GenericUtils.GetGenerics<Email>(objectID, "Emails", GD);
-            GenericUtils.RemoveGenericByType(objectID, "Emails", GD);
+            List<Email> emails = GenericUtils.GetGenerics<Email> (objectID, "Emails", GD);
+            GenericUtils.RemoveGenericByType (objectID, "Emails", GD);
             return emails;
         }
 
@@ -91,15 +89,16 @@ namespace WhiteCore.Services.DataService
         ///     Adds a new offline message for the user.
         /// </summary>
         /// <param name="email"></param>
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public void InsertEmail(Email email)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public void InsertEmail (Email email)
         {
-            object remoteValue = DoRemote(email);
-            if (remoteValue != null || m_doRemoteOnly)
+            if (m_doRemoteOnly) {
+                DoRemote (email);
                 return;
+            }
 
-            GenericUtils.AddGeneric(email.toPrimID, "Emails", UUID.Random().ToString(),
-                                    email.ToOSD(), GD);
+            GenericUtils.AddGeneric (email.toPrimID, "Emails", UUID.Random ().ToString (),
+                                    email.ToOSD (), GD);
         }
 
         #endregion

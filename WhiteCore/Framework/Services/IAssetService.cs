@@ -133,7 +133,7 @@ namespace WhiteCore.Framework.Services
         AssetBase GetMeta(UUID uuid);
         UUID Store(AssetBase asset);
         bool StoreAsset(AssetBase asset);
-        void UpdateContent(UUID id, byte[] asset, out UUID newID);
+        void UpdateContent(UUID id, byte[] assetData, out UUID newID);
         bool ExistsAsset(UUID uuid);
         bool Delete(UUID id);
         bool Delete(UUID id, bool ignoreFlags);

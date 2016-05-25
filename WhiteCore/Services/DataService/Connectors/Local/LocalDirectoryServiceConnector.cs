@@ -97,9 +97,10 @@ namespace WhiteCore.Services.DataService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public void AddRegion(List<LandData> parcels)
         {
-            object remoteValue = DoRemote(parcels);
-            if (remoteValue != null || m_doRemoteOnly)
+            if (m_doRemoteOnly) {
+                DoRemote (parcels);
                 return;
+            }
 
             if (parcels.Count == 0)
                 return;
@@ -146,9 +147,10 @@ namespace WhiteCore.Services.DataService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public void ClearRegion(UUID regionID)
         {
-            object remoteValue = DoRemote(regionID);
-            if (remoteValue != null || m_doRemoteOnly)
+            if (m_doRemoteOnly) {
+                DoRemote (regionID);
                 return;
+            }
 
             QueryFilter filter = new QueryFilter();
             filter.andFilters["RegionID"] = regionID;
@@ -226,9 +228,10 @@ namespace WhiteCore.Services.DataService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public LandData GetParcelInfo(UUID globalID)
         {
-            object remoteValue = DoRemote(globalID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (LandData)remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (globalID);
+                return remoteValue != null ? (LandData)remoteValue : null;
+            }
 
             QueryFilter filter = new QueryFilter();
             filter.andFilters["ParcelID"] = globalID;
@@ -250,11 +253,11 @@ namespace WhiteCore.Services.DataService
                 return r == null ? null : GetParcelInfo (r.RegionID, (int)X, (int)Y);
             }
 
-            LandData LandData = null;
+            LandData parcelLandData = null;
             List<LandData> Lands = Query2LandData(Query);
-            if (LandData == null && Lands.Count != 0)
-                LandData = Lands[0];
-            return LandData;
+            if (parcelLandData == null && Lands.Count != 0)
+                parcelLandData = Lands[0];
+            return parcelLandData;
         }
 
         /// <summary>
@@ -267,9 +270,10 @@ namespace WhiteCore.Services.DataService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public LandData GetParcelInfo(UUID regionID, int x, int y)
         {
-            object remoteValue = DoRemote(regionID, x, y);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (LandData)remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (regionID, x, y);
+                return remoteValue != null ? (LandData)remoteValue : null;
+            }
 
             QueryFilter filter = new QueryFilter();
             filter.andFilters["RegionID"] = regionID;
@@ -305,9 +309,10 @@ namespace WhiteCore.Services.DataService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public LandData GetParcelInfo(UUID RegionID, string ParcelName)
         {
-            object remoteValue = DoRemote(RegionID, ParcelName);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (LandData) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (RegionID, ParcelName);
+                return remoteValue != null ? (LandData)remoteValue : null;
+            }
 
             IRegionData regiondata = Framework.Utilities.DataManager.RequestPlugin<IRegionData>();
             if (regiondata != null)
@@ -340,16 +345,17 @@ namespace WhiteCore.Services.DataService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public List<ExtendedLandData> GetParcelByOwner(UUID OwnerID)
         {
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (OwnerID);
+                return remoteValue != null ? (List<ExtendedLandData>)remoteValue : new List<ExtendedLandData> ();
+            }
+
             //NOTE: this does check for group deeded land as well, so this can check for that as well
-            object remoteValue = DoRemote(OwnerID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<ExtendedLandData>) remoteValue;
-            
             QueryFilter filter = new QueryFilter();
             filter.andFilters["OwnerID"] = OwnerID;
             List<string> Query = GD.Query(new[] { "*" }, m_SearchParcelTable, filter, null, null, null);
 
-            return (Query.Count == 0) ? new List<ExtendedLandData>() : LandDataToExtendedLandData(Query2LandData(Query));
+            return (Query.Count != 0) ? LandDataToExtendedLandData(Query2LandData(Query)) : new List<ExtendedLandData> ();
         }
 
         public List<ExtendedLandData> LandDataToExtendedLandData(List<LandData> data)
@@ -391,13 +397,14 @@ namespace WhiteCore.Services.DataService
         public List<LandData> GetParcelsByRegion(uint start, uint count, UUID RegionID, UUID owner, ParcelFlags flags,
                                                  ParcelCategory category)
         {
-            object remoteValue = DoRemote(start, count, RegionID, owner, flags, category);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<LandData>) remoteValue;
-
-            List<LandData> resp = new List<LandData>(0);
+            List<LandData> resp = new List<LandData> (0);
             if (count == 0)
                 return resp;
+
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (start, count, RegionID, owner, flags, category);
+                return remoteValue != null ? (List<LandData>)remoteValue : resp;
+            }
 
             IRegionData regiondata = Framework.Utilities.DataManager.RequestPlugin<IRegionData>();
             if (regiondata != null)
@@ -417,9 +424,10 @@ namespace WhiteCore.Services.DataService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public uint GetNumberOfParcelsByRegion(UUID RegionID, UUID owner, ParcelFlags flags, ParcelCategory category)
         {
-            object remoteValue = DoRemote(RegionID, owner, flags, category);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (uint) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (RegionID, owner, flags, category);
+                return remoteValue != null ? (uint)remoteValue : 0;
+            }
 
             IRegionData regiondata = Framework.Utilities.DataManager.RequestPlugin<IRegionData>();
             if (regiondata != null)
@@ -437,13 +445,15 @@ namespace WhiteCore.Services.DataService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public List<LandData> GetParcelsWithNameByRegion(uint start, uint count, UUID RegionID, string name)
         {
-            object remoteValue = DoRemote(start, count, RegionID, name);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<LandData>) remoteValue;
-
-            List<LandData> resp = new List<LandData>(0);
+            List<LandData> resp = new List<LandData> (0);
             if (count == 0)
                 return resp;
+
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (start, count, RegionID, name);
+                return remoteValue != null ? (List<LandData>)remoteValue : resp;
+            }
+
 
             IRegionData regiondata = Framework.Utilities.DataManager.RequestPlugin<IRegionData>();
             if (regiondata != null)
@@ -468,9 +478,10 @@ namespace WhiteCore.Services.DataService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public uint GetNumberOfParcelsWithNameByRegion(UUID RegionID, string name)
         {
-            object remoteValue = DoRemote(RegionID, name);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (uint) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (RegionID, name);
+                return remoteValue != null ? (uint)remoteValue : 0;
+            }
 
             IRegionData regiondata = Framework.Utilities.DataManager.RequestPlugin<IRegionData>();
             if (regiondata != null)
@@ -501,9 +512,10 @@ namespace WhiteCore.Services.DataService
         public List<DirPlacesReplyData> FindLand(string queryText, string category, int StartQuery, uint Flags,
                                                  UUID scopeID)
         {
-            object remoteValue = DoRemote(queryText, category, StartQuery, Flags, scopeID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<DirPlacesReplyData>) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (queryText, category, StartQuery, Flags, scopeID);
+                return remoteValue != null ? (List<DirPlacesReplyData>)remoteValue : new List<DirPlacesReplyData> ();
+            }
 
             QueryFilter filter = new QueryFilter();
             Dictionary<string, bool> sort = new Dictionary<string, bool>();
@@ -574,9 +586,10 @@ namespace WhiteCore.Services.DataService
         public List<DirLandReplyData> FindLandForSale(string searchType, uint price, uint area, int StartQuery,
                                                       uint Flags, UUID scopeID)
         {
-            object remoteValue = DoRemote(searchType, price, area, StartQuery, Flags, scopeID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<DirLandReplyData>) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (searchType, price, area, StartQuery, Flags, scopeID);
+                return remoteValue != null ? (List<DirLandReplyData>)remoteValue : new List<DirLandReplyData> ();
+            }
 
             QueryFilter filter = new QueryFilter();
 
@@ -660,9 +673,10 @@ namespace WhiteCore.Services.DataService
         public List<DirLandReplyData> FindLandForSaleInRegion(string searchType, uint price, uint area, int StartQuery,
                                                               uint Flags, UUID regionID)
         {
-            object remoteValue = DoRemote(searchType, price, area, StartQuery, Flags, regionID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<DirLandReplyData>) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (searchType, price, area, StartQuery, Flags, regionID);
+                return remoteValue != null ? (List<DirLandReplyData>)remoteValue : new List<DirLandReplyData> ();
+            }
 
             QueryFilter filter = new QueryFilter();
 
@@ -751,9 +765,10 @@ namespace WhiteCore.Services.DataService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public List<DirPopularReplyData> FindPopularPlaces(uint queryFlags, UUID scopeID)
         {
-            object remoteValue = DoRemote(queryFlags, scopeID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<DirPopularReplyData>) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (queryFlags, scopeID);
+                return remoteValue != null ? (List<DirPopularReplyData>)remoteValue : new List<DirPopularReplyData> ();
+            }
 
             QueryFilter filter = new QueryFilter();
             Dictionary<string, bool> sort = new Dictionary<string, bool>();
@@ -851,9 +866,10 @@ namespace WhiteCore.Services.DataService
         public List<DirClassifiedReplyData> FindClassifieds(string queryText, string category, uint queryFlags,
                                                             int StartQuery, UUID scopeID)
         {
-            object remoteValue = DoRemote(queryText, category, queryFlags, StartQuery, scopeID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<DirClassifiedReplyData>) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (queryText, category, queryFlags, StartQuery, scopeID);
+                return remoteValue != null ? (List<DirClassifiedReplyData>)remoteValue : new List<DirClassifiedReplyData> ();
+            }
 
             QueryFilter filter = new QueryFilter();
 
@@ -906,9 +922,10 @@ namespace WhiteCore.Services.DataService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public List<Classified> GetClassifiedsInRegion(string regionName)
         {
-            object remoteValue = DoRemote(regionName);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<Classified>) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (regionName);
+                return remoteValue != null ? (List<Classified>)remoteValue : new List<Classified> ();
+            }
 
             QueryFilter filter = new QueryFilter();
             filter.andFilters["SimName"] = regionName;
@@ -936,9 +953,10 @@ namespace WhiteCore.Services.DataService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public Classified GetClassifiedByID(UUID id)
         {
-            object remoteValue = DoRemote(id);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (Classified) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (id);
+                return remoteValue != null ? (Classified)remoteValue : new Classified ();
+            }
 
             QueryFilter filter = new QueryFilter();
             Dictionary<string, object> where = new Dictionary<string, object>(1);
@@ -969,9 +987,10 @@ namespace WhiteCore.Services.DataService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public List<DirEventsReplyData> FindEvents(string queryText, uint eventFlags, int StartQuery, UUID scopeID)
         {
-            object remoteValue = DoRemote(queryText, eventFlags, StartQuery, scopeID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<DirEventsReplyData>) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (queryText, eventFlags, StartQuery, scopeID);
+                return remoteValue != null ? (List<DirEventsReplyData>)remoteValue : new List<DirEventsReplyData> ();
+            }
 
             List<DirEventsReplyData> Data = new List<DirEventsReplyData>();
 
@@ -1032,7 +1051,8 @@ namespace WhiteCore.Services.DataService
                     //Check the maturity levels
                     uint maturity = Convert.ToUInt32(retVal[i + 3]);
                     if (
-                        (maturity == 0 && (eventFlags & (uint) EventFlags.PG) == (uint) EventFlags.PG) ||
+                        // (maturity == 0 && (eventFlags & (uint) EventFlags.PG) == (uint) EventFlags.PG) ||    // << this is always true!!  (zero && zero == zero)
+                        (maturity == 0) ||
                         (maturity == 1 && (eventFlags & (uint) EventFlags.Mature) == (uint) EventFlags.Mature) ||
                         (maturity == 2 && (eventFlags & (uint) EventFlags.Adult) == (uint) EventFlags.Adult)
                         )
@@ -1054,9 +1074,10 @@ namespace WhiteCore.Services.DataService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public List<DirEventsReplyData> FindAllEventsInRegion(string regionName, int maturity)
         {
-            object remoteValue = DoRemote(regionName, maturity);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<DirEventsReplyData>) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (regionName, maturity);
+                return remoteValue != null ? (List<DirEventsReplyData>)remoteValue : new List<DirEventsReplyData> ();
+            }
 
             List<DirEventsReplyData> Data = new List<DirEventsReplyData>();
 
@@ -1173,9 +1194,10 @@ namespace WhiteCore.Services.DataService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public EventData GetEventInfo(uint EventID)
         {
-            object remoteValue = DoRemote(EventID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (EventData) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (EventID);
+                return remoteValue != null ? (EventData)remoteValue : new EventData ();
+            }
 
             QueryFilter filter = new QueryFilter();
             filter.andFilters["EID"] = EventID;
@@ -1188,23 +1210,21 @@ namespace WhiteCore.Services.DataService
                                      EventFlags maturity, uint flags, uint duration, Vector3 localPos, string name,
                                      string description, string category)
         {
-            object remoteValue = DoRemote(creator, regionID, parcelID, date, cover, maturity, flags, duration, localPos,
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (creator, regionID, parcelID, date, cover, maturity, flags, duration, localPos,
                                           name, description, category);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (EventData) remoteValue;
+                return remoteValue != null ? (EventData)remoteValue : null;
+            }
 
             IRegionData regiondata = Framework.Utilities.DataManager.RequestPlugin<IRegionData>();
             if (regiondata == null)
-            {
                 return null;
-            }
 
             GridRegion region = regiondata.Get(regionID, null);
             if (region == null)
-            {
                 return null;
-            }
 
+            // create the event
             EventData eventData = new EventData ();
             eventData.eventID = GetMaxEventID () + 1;
             eventData.creator = creator.ToString();
@@ -1308,12 +1328,10 @@ namespace WhiteCore.Services.DataService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public List<EventData> GetEventNotifications(UUID user)
         {
-            object remoteValue = DoRemote(user);
-            if (remoteValue != null || m_doRemoteOnly)
-            if (remoteValue != null)
-                return (List<EventData>)remoteValue;
-            else
-                return new List<EventData> ();
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (user);
+                return remoteValue != null ? (List<EventData>)remoteValue : new List<EventData> ();
+            }
 
             QueryFilter filter = new QueryFilter();
             filter.andFilters.Add("UserID", user.ToString());

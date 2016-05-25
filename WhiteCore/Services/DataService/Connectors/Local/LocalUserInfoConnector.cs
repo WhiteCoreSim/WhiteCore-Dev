@@ -59,11 +59,9 @@ namespace WhiteCore.Services.DataService
                     connectionString = source.Configs[Name].GetString("ConnectionString", defaultConnectionString);
 
                     m_allowDuplicatePresences =
-                        source.Configs[Name].GetBoolean("AllowDuplicatePresences",
-                                                        m_allowDuplicatePresences);
+                        source.Configs[Name].GetBoolean("AllowDuplicatePresences", m_allowDuplicatePresences);
                     m_checkLastSeen =
-                        source.Configs[Name].GetBoolean("CheckLastSeen",
-                                                        m_checkLastSeen);
+                        source.Configs[Name].GetBoolean("CheckLastSeen", m_checkLastSeen);
                 }
                 if (GD != null)
                     GD.ConnectToDatabase(connectionString, "UserInfo",

@@ -26,11 +26,11 @@
  */
 
 
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.Services;
+using System.Collections.Generic;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
-using System.Collections.Generic;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.Services;
 
 namespace WhiteCore.Services.DataService
 {

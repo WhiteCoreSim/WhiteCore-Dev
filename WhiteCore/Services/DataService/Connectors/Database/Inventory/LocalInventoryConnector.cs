@@ -45,7 +45,6 @@ namespace WhiteCore.Services.DataService
     public class LocalInventoryConnector : IInventoryData
     {
         protected IGenericData GD;
-        protected IRegistryCore m_registry;
         protected string m_foldersrealm = "inventory_folders";
         protected string m_itemsrealm = "inventory_items";
 
@@ -54,21 +53,20 @@ namespace WhiteCore.Services.DataService
         public virtual void Initialize(IGenericData GenericData, IConfigSource source, IRegistryCore simBase,
                                        string defaultConnectionString)
         {
-            if (source.Configs["WhiteCoreConnectors"].GetString("InventoryConnector", "LocalConnector") == "LocalConnector")
-            {
-                GD = GenericData;
+            if (source.Configs ["WhiteCoreConnectors"].GetString ("InventoryConnector", "LocalConnector") != "LocalConnector")
+                return;
+          
+            GD = GenericData;
 
-                string connectionString = defaultConnectionString;
-                if (source.Configs[Name] != null)
-                    connectionString = source.Configs[Name].GetString("ConnectionString", defaultConnectionString);
+            string connectionString = defaultConnectionString;
+            if (source.Configs[Name] != null)
+                connectionString = source.Configs[Name].GetString("ConnectionString", defaultConnectionString);
 
-                if (GD != null)
-                    GD.ConnectToDatabase(connectionString, "Inventory",
-                                         source.Configs["WhiteCoreConnectors"].GetBoolean("ValidateTables", true));
+            if (GD != null)
+                GD.ConnectToDatabase(connectionString, "Inventory",
+                                     source.Configs["WhiteCoreConnectors"].GetBoolean("ValidateTables", true));
 
-                Framework.Utilities.DataManager.RegisterPlugin(this);
-            }
-            m_registry = simBase;
+            Framework.Utilities.DataManager.RegisterPlugin(this);
         }
 
         public string Name
@@ -80,6 +78,7 @@ namespace WhiteCore.Services.DataService
         {
             QueryFilter filter = new QueryFilter();
             filter.andFilters["folderID"] = folderID;
+
             return GD.Query(new string[] {"folderID"}, m_foldersrealm, filter, null, null, null).Count > 0;
         }
 
@@ -96,6 +95,7 @@ namespace WhiteCore.Services.DataService
         {
             QueryFilter filter = new QueryFilter();
             filter.andFilters["assetID"] = itemID;
+
             return GD.Query(new string[] {"assetID"}, m_itemsrealm, filter, null, null, null).Count > 0;
         }
 
@@ -110,12 +110,14 @@ namespace WhiteCore.Services.DataService
             QueryFilter filter = new QueryFilter();
             filter.andFilters["agentID"] = principalID;
             filter.andFilters["folderName"] = folderName;
+
             return GD.Query(new string[] {"folderID"}, m_foldersrealm, filter, null, null, null);
         }
 
         public virtual List<InventoryFolderBase> GetFolders(string[] fields, string[] vals)
         {
             Dictionary<string, List<string>> retVal = GD.QueryNames(fields, vals, m_foldersrealm, "*");
+
             return ParseInventoryFolders(ref retVal);
         }
 
@@ -123,20 +125,15 @@ namespace WhiteCore.Services.DataService
         {
             string query = "where ";
             for (int i = 0; i < fields.Length; i++)
-                query += String.Format("{0} = '{1}' and ", fields[i], vals[i]);
+                query += string.Format("{0} = '{1}' and ", fields[i], vals[i]);
 
             query = query.Remove(query.Length - 5);
             using (DataReaderConnection reader = GD.QueryData(query, m_itemsrealm, "*"))
             {
-                try
-                {
+                try {
                     return ParseInventoryItems(reader.DataReader);
-                }
-                catch
-                {
-                }
-                finally
-                {
+                } catch {
+                } finally {
                     GD.CloseDatabase(reader);
                 }
             }
@@ -149,32 +146,29 @@ namespace WhiteCore.Services.DataService
             for (int i = 0; i < fields.Length; i++)
                 filter.andFilters.Add(fields[i], vals[i]);
 
-            List<string> data = GD.Query(new string[1] {"assetID"}, m_itemsrealm, filter, null, null, null);
-            return data == null ? null : data.ConvertAll<UUID> (s => UUID.Parse (s));
+            List<string> data = GD.Query(new string[] {"assetID"}, m_itemsrealm, filter, null, null, null);
+
+            return data != null ? data.ConvertAll<UUID> (s => UUID.Parse (s)) : null;
         }
 
         public virtual OSDArray GetLLSDItems(string[] fields, string[] vals)
         {
             string query = "where ";
-            for (int i = 0; i < fields.Length; i++)
-            {
-                query += String.Format("{0} = '{1}' and ", fields[i], vals[i]);
+            for (int i = 0; i < fields.Length; i++) {
+                query += string.Format("{0} = '{1}' and ", fields[i], vals[i]);
             }
+
             query = query.Remove(query.Length - 5);
             using (DataReaderConnection reader = GD.QueryData(query, m_itemsrealm, "*"))
             {
-                try
-                {
+                try {
                     return ParseLLSDInventoryItems(reader.DataReader);
-                }
-                catch
-                {
-                }
-                finally
-                {
+                } catch{
+                } finally {
                     GD.CloseDatabase(reader);
                 }
             }
+
             return null;
         }
 
@@ -209,8 +203,7 @@ namespace WhiteCore.Services.DataService
             contents.WriteKey("folders"); //Start array items
             contents.WriteStartArray("folders"); //Start array folders
 
-            foreach (OSD m in fetchRequest)
-            {
+            foreach (OSD m in fetchRequest) {
                 contents.WriteStartMap("internalContents"); //Start internalContents kvp
                 OSDMap invFetch = (OSDMap) m;
 
@@ -229,13 +222,12 @@ namespace WhiteCore.Services.DataService
                 int count = 0;
                 string query = "";
 
-                if (fetch_items)
-                {
+                if (fetch_items) {
                     contents.WriteKey("items"); //Start array items
                     contents.WriteStartArray("items");
                     List<UUID> moreLinkedItems = new List<UUID>();
                     bool addToCount = true;
-                    query = String.Format("where {0} = '{1}'", "parentFolderID", folder_id);
+                    query = string.Format("where {0} = '{1}'", "parentFolderID", folder_id);
                     redoQuery:
                     using (DataReaderConnection retVal = GD.QueryData(query, m_itemsrealm, "*"))
                     {
@@ -317,12 +309,11 @@ namespace WhiteCore.Services.DataService
                                     (InventoryType) int.Parse(retVal.DataReader["invType"].ToString());
                                 contents["inv_type"] = Utils.InventoryTypeToString(invType);
 
-                                if ((int) invType == -1)
-                                {
+                                if ((int) invType == -1) {
                                     //Asset problem, fix it, it's supposed to be 0
                                     List<InventoryItemBase> itms = GetItems(agentID,
-                                                                            new string[2] {"inventoryID", "avatarID"},
-                                                                            new string[2]
+                                                                            new string[] {"inventoryID", "avatarID"},
+                                                                            new string[]
                                                                                 {
                                                                                     inventoryID.ToString(),
                                                                                     avatarID.ToString()
@@ -335,23 +326,19 @@ namespace WhiteCore.Services.DataService
                                     count++;
                                 contents.WriteEndMap( /*"item"*/); //end array items
                             }
-                        }
-                        catch
-                        {
-                        }
-                        finally
-                        {
+                        } catch {
+                        } finally {
                             GD.CloseDatabase(retVal);
                         }
                     }
-                    if (moreLinkedItems.Count > 0)
-                    {
+
+                    if (moreLinkedItems.Count > 0) {
                         addToCount = false;
                         query = "where (";
 
                         query = moreLinkedItems.Aggregate(query,
                                                           (current, t) =>
-                                                          current + String.Format("{0} = '{1}' or ", "inventoryID", t));
+                                                          current + string.Format("{0} = '{1}' or ", "inventoryID", t));
 
                         query = query.Remove(query.Length - 4, 4);
                         query += ")";
@@ -360,6 +347,7 @@ namespace WhiteCore.Services.DataService
                     }
                     contents.WriteEndArray( /*"items"*/); //end array items
                 }
+
                 contents.WriteStartArray("categories"); //We don't send any folders
                 int version = 0;
                 QueryFilter filter = new QueryFilter();
@@ -370,25 +358,21 @@ namespace WhiteCore.Services.DataService
                                                               "type"
                                                           }, m_foldersrealm, filter, null, null, null);
 
-                if (versionRetVal.Count > 0)
-                {
+                if (versionRetVal.Count > 0) {
                     version = int.Parse(versionRetVal[0]);
 
-                    if (fetch_folders)
-                    {
+                    if (fetch_folders) {
                         if (int.Parse(versionRetVal[1]) == (int) FolderType.Trash ||
                             int.Parse(versionRetVal[1]) == (int) FolderType.CurrentOutfit ||
                             int.Parse(versionRetVal[1]) == (int) AssetType.LinkFolder)
                         {
                             //If it is the trash folder, we need to send its descendents, because the viewer wants it
-                            query = String.Format("where {0} = '{1}' and {2} = '{3}'", "parentFolderID", folder_id,
+                            query = string.Format("where {0} = '{1}' and {2} = '{3}'", "parentFolderID", folder_id,
                                                   "agentID", agentID);
                             using (DataReaderConnection retVal = GD.QueryData(query, m_foldersrealm, "*"))
                             {
-                                try
-                                {
-                                    while (retVal.DataReader.Read())
-                                    {
+                                try {
+                                    while (retVal.DataReader.Read()) {
                                         contents.WriteStartMap("folder"); //Start item kvp
                                         contents["folder_id"] = UUID.Parse(retVal.DataReader["folderID"].ToString());
                                         contents["parent_id"] =
@@ -401,12 +385,8 @@ namespace WhiteCore.Services.DataService
                                         count++;
                                         contents.WriteEndMap( /*"folder"*/); //end array items
                                     }
-                                }
-                                catch
-                                {
-                                }
-                                finally
-                                {
+                                } catch {
+                                } finally {
                                     GD.CloseDatabase(retVal);
                                 }
                             }
@@ -425,12 +405,9 @@ namespace WhiteCore.Services.DataService
             contents.WriteEndArray(); //end array folders
             contents.WriteEndMap( /*"llsd"*/); //end llsd
 
-            try
-            {
+            try {
                 return contents.GetSerializer();
-            }
-            finally
-            {
+            } finally {
                 contents = null;
             }
         }
@@ -447,6 +424,7 @@ namespace WhiteCore.Services.DataService
             row["folderID"] = folder.ID;
             row["agentID"] = folder.Owner;
             row["parentFolderID"] = folder.ParentID;
+
             return GD.Insert(m_foldersrealm, row);
         }
 
@@ -476,6 +454,7 @@ namespace WhiteCore.Services.DataService
             row["avatarID"] = item.Owner;
             row["parentFolderID"] = item.Folder;
             row["inventoryGroupPermissions"] = item.GroupPermissions;
+
             return GD.Insert(m_itemsrealm, row);
         }
 
@@ -504,6 +483,7 @@ namespace WhiteCore.Services.DataService
         {
             QueryFilter filter = new QueryFilter();
             filter.andFilters[field] = val;
+
             return GD.Delete(m_itemsrealm, filter);
         }
 
@@ -534,33 +514,28 @@ namespace WhiteCore.Services.DataService
             QueryFilter filter = new QueryFilter();
             filter.andFilters["inventoryID"] = itemID;
             List<string> values = GD.Query(new string[] {"parentFolderID"}, m_itemsrealm, filter, null, null, null);
-            if (values.Count > 0)
-            {
+            if (values.Count > 0) {
                 IncrementFolder(UUID.Parse(values[0]));
             }
         }
 
         public virtual InventoryItemBase[] GetActiveGestures(UUID principalID)
         {
-            string query = String.Format("where {0} = '{1}' and {2} = '{3}'", "avatarID", principalID, "assetType",
+            string query = string.Format("where {0} = '{1}' and {2} = '{3}'", "avatarID", principalID, "assetType",
                                          (int) AssetType.Gesture);
 
             using (DataReaderConnection reader = GD.QueryData(query, m_itemsrealm, "*"))
             {
                 List<InventoryItemBase> items = new List<InventoryItemBase>();
-                try
-                {
+                try {
                     items = ParseInventoryItems(reader.DataReader);
                     items.RemoveAll(
                         item => (item.Flags & 1) != 1);
-                }
-                catch
-                {
-                }
-                finally
-                {
+                } catch {
+                } finally {
                     GD.CloseDatabase(reader);
                 }
+
                 return items.ToArray();
             }
         }
@@ -575,8 +550,7 @@ namespace WhiteCore.Services.DataService
         {
             OSDArray array = new OSDArray();
 
-            while (retVal.Read())
-            {
+            while (retVal.Read()) {
                 OSDMap item = new OSDMap();
                 OSDMap permissions = new OSDMap();
                 item["asset_id"] = UUID.Parse(retVal["assetID"].ToString());
@@ -593,8 +567,7 @@ namespace WhiteCore.Services.DataService
                 permissions["everyone_mask"] = uint.Parse(retVal["inventoryEveryOnePermissions"].ToString());
                 OSDMap sale_info = new OSDMap();
                 sale_info["sale_price"] = int.Parse(retVal["salePrice"].ToString());
-                switch (byte.Parse(retVal["saleType"].ToString()))
-                {
+                switch (byte.Parse(retVal["saleType"].ToString())) {
                     default:
                         sale_info["sale_type"] = "not";
                         break;
@@ -632,13 +605,13 @@ namespace WhiteCore.Services.DataService
             return array;
         }
 
-         List<InventoryFolderBase> ParseInventoryFolders(ref Dictionary<string, List<string>> retVal)
+        List<InventoryFolderBase> ParseInventoryFolders(ref Dictionary<string, List<string>> retVal)
         {
             List<InventoryFolderBase> folders = new List<InventoryFolderBase>();
-            if (retVal.Count == 0)
+            if (retVal == null || retVal.Count == 0)
                 return folders;
-            for (int i = 0; i < retVal.ElementAt(0).Value.Count; i++)
-            {
+            
+            for (int i = 0; i < retVal.ElementAt(0).Value.Count; i++) {
                 InventoryFolderBase folder = new InventoryFolderBase {
                                                      Name = retVal["folderName"][i],
                                                      Type = short.Parse(retVal["type"][i]),
@@ -649,15 +622,14 @@ namespace WhiteCore.Services.DataService
                                                  };
                 folders.Add(folder);
             }
-            //retVal.Clear();
+
             return folders;
         }
 
         List<InventoryItemBase> ParseInventoryItems(IDataReader retVal)
         {
             List<InventoryItemBase> items = new List<InventoryItemBase>();
-            while (retVal.Read())
-            {
+            while (retVal.Read()) {
                 InventoryItemBase item = new InventoryItemBase {
                     AssetID = UUID.Parse (retVal ["assetID"].ToString ()),
                     AssetType = int.Parse (retVal ["assetType"].ToString ()),
@@ -680,14 +652,15 @@ namespace WhiteCore.Services.DataService
                     Folder = UUID.Parse (retVal ["parentFolderID"].ToString ()),
                     GroupPermissions = uint.Parse (retVal ["inventoryGroupPermissions"].ToString ())
                 };
-                if (item.InvType == -1)
-                {
+
+                if (item.InvType == -1) {
                     //Fix the bad invType
                     item.InvType = 0;
                     StoreItem(item);
                 }
                 items.Add(item);
             }
+
             return items;
         }
 
@@ -701,75 +674,75 @@ namespace WhiteCore.Services.DataService
             public LLSDSerializationDictionary()
             {
                 writer = new XmlTextWriter(sw, Encoding.UTF8);
-                writer.WriteStartElement(String.Empty, "llsd", String.Empty);
+                writer.WriteStartElement(string.Empty, "llsd", string.Empty);
             }
 
             public object this[string name]
             {
                 set
                 {
-                    writer.WriteStartElement(String.Empty, "key", String.Empty);
+                    writer.WriteStartElement(string.Empty, "key", string.Empty);
                     writer.WriteString(name);
                     writer.WriteEndElement();
                     Type t = value.GetType();
                     if (t == typeof (bool))
                     {
-                        writer.WriteStartElement(String.Empty, "boolean", String.Empty);
+                        writer.WriteStartElement(string.Empty, "boolean", string.Empty);
                         writer.WriteValue(value);
                         writer.WriteEndElement();
                     }
                     else if (t == typeof (int))
                     {
-                        writer.WriteStartElement(String.Empty, "integer", String.Empty);
+                        writer.WriteStartElement(string.Empty, "integer", string.Empty);
                         writer.WriteValue(value);
                         writer.WriteEndElement();
                     }
                     else if (t == typeof (uint))
                     {
-                        writer.WriteStartElement(String.Empty, "integer", String.Empty);
+                        writer.WriteStartElement(string.Empty, "integer", string.Empty);
                         writer.WriteValue(value.ToString());
                         writer.WriteEndElement();
                     }
                     else if (t == typeof (float))
                     {
-                        writer.WriteStartElement(String.Empty, "real", String.Empty);
+                        writer.WriteStartElement(string.Empty, "real", string.Empty);
                         writer.WriteValue(value);
                         writer.WriteEndElement();
                     }
                     else if (t == typeof (double))
                     {
-                        writer.WriteStartElement(String.Empty, "real", String.Empty);
+                        writer.WriteStartElement(string.Empty, "real", string.Empty);
                         writer.WriteValue(value);
                         writer.WriteEndElement();
                     }
                     else if (t == typeof (string))
                     {
-                        writer.WriteStartElement(String.Empty, "string", String.Empty);
+                        writer.WriteStartElement(string.Empty, "string", string.Empty);
                         writer.WriteValue(value);
                         writer.WriteEndElement();
                     }
                     else if (t == typeof (UUID))
                     {
-                        writer.WriteStartElement(String.Empty, "uuid", String.Empty);
+                        writer.WriteStartElement(string.Empty, "uuid", string.Empty);
                         writer.WriteValue(value.ToString()); //UUID has to be string!
                         writer.WriteEndElement();
                     }
                     else if (t == typeof (DateTime))
                     {
-                        writer.WriteStartElement(String.Empty, "date", String.Empty);
+                        writer.WriteStartElement(string.Empty, "date", string.Empty);
                         writer.WriteValue(AsString((DateTime) value));
                         writer.WriteEndElement();
                     }
                     else if (t == typeof (Uri))
                     {
-                        writer.WriteStartElement(String.Empty, "uri", String.Empty);
+                        writer.WriteStartElement(string.Empty, "uri", string.Empty);
                         writer.WriteValue((value).ToString()); //URI has to be string
                         writer.WriteEndElement();
                     }
                     else if (t == typeof (byte[]))
                     {
-                        writer.WriteStartElement(String.Empty, "binary", String.Empty);
-                        writer.WriteStartAttribute(String.Empty, "encoding", String.Empty);
+                        writer.WriteStartElement(string.Empty, "binary", string.Empty);
+                        writer.WriteStartAttribute(string.Empty, "encoding", string.Empty);
                         writer.WriteString("base64");
                         writer.WriteEndAttribute();
                         writer.WriteValue(Convert.ToBase64String((byte[]) value)); //Has to be base64
@@ -780,7 +753,7 @@ namespace WhiteCore.Services.DataService
 
             public void WriteStartMap(string name)
             {
-                writer.WriteStartElement(String.Empty, "map", String.Empty);
+                writer.WriteStartElement(string.Empty, "map", string.Empty);
             }
 
             public void WriteEndMap()
@@ -790,7 +763,7 @@ namespace WhiteCore.Services.DataService
 
             public void WriteStartArray(string name)
             {
-                writer.WriteStartElement(String.Empty, "array", String.Empty);
+                writer.WriteStartElement(string.Empty, "array", string.Empty);
             }
 
             public void WriteEndArray()
@@ -800,7 +773,7 @@ namespace WhiteCore.Services.DataService
 
             public void WriteKey(string key)
             {
-                writer.WriteStartElement(String.Empty, "key", String.Empty);
+                writer.WriteStartElement(string.Empty, "key", string.Empty);
                 writer.WriteString(key);
                 writer.WriteEndElement();
             }
@@ -810,62 +783,62 @@ namespace WhiteCore.Services.DataService
                 Type t = value.GetType();
                 if (t == typeof (bool))
                 {
-                    writer.WriteStartElement(String.Empty, "boolean", String.Empty);
+                    writer.WriteStartElement(string.Empty, "boolean", string.Empty);
                     writer.WriteValue(value);
                     writer.WriteEndElement();
                 }
                 else if (t == typeof (int))
                 {
-                    writer.WriteStartElement(String.Empty, "integer", String.Empty);
+                    writer.WriteStartElement(string.Empty, "integer", string.Empty);
                     writer.WriteValue(value);
                     writer.WriteEndElement();
                 }
                 else if (t == typeof (uint))
                 {
-                    writer.WriteStartElement(String.Empty, "integer", String.Empty);
+                    writer.WriteStartElement(string.Empty, "integer", string.Empty);
                     writer.WriteValue(value.ToString());
                     writer.WriteEndElement();
                 }
                 else if (t == typeof (float))
                 {
-                    writer.WriteStartElement(String.Empty, "real", String.Empty);
+                    writer.WriteStartElement(string.Empty, "real", string.Empty);
                     writer.WriteValue(value);
                     writer.WriteEndElement();
                 }
                 else if (t == typeof (double))
                 {
-                    writer.WriteStartElement(String.Empty, "real", String.Empty);
+                    writer.WriteStartElement(string.Empty, "real", string.Empty);
                     writer.WriteValue(value);
                     writer.WriteEndElement();
                 }
                 else if (t == typeof (string))
                 {
-                    writer.WriteStartElement(String.Empty, "string", String.Empty);
+                    writer.WriteStartElement(string.Empty, "string", string.Empty);
                     writer.WriteValue(value);
                     writer.WriteEndElement();
                 }
                 else if (t == typeof (UUID))
                 {
-                    writer.WriteStartElement(String.Empty, "uuid", String.Empty);
+                    writer.WriteStartElement(string.Empty, "uuid", string.Empty);
                     writer.WriteValue(value.ToString()); //UUID has to be string!
                     writer.WriteEndElement();
                 }
                 else if (t == typeof (DateTime))
                 {
-                    writer.WriteStartElement(String.Empty, "date", String.Empty);
+                    writer.WriteStartElement(string.Empty, "date", string.Empty);
                     writer.WriteValue(AsString((DateTime) value));
                     writer.WriteEndElement();
                 }
                 else if (t == typeof (Uri))
                 {
-                    writer.WriteStartElement(String.Empty, "uri", String.Empty);
+                    writer.WriteStartElement(string.Empty, "uri", string.Empty);
                     writer.WriteValue((value).ToString()); //URI has to be string
                     writer.WriteEndElement();
                 }
                 else if (t == typeof (byte[]))
                 {
-                    writer.WriteStartElement(String.Empty, "binary", String.Empty);
-                    writer.WriteStartAttribute(String.Empty, "encoding", String.Empty);
+                    writer.WriteStartElement(string.Empty, "binary", string.Empty);
+                    writer.WriteStartAttribute(string.Empty, "encoding", string.Empty);
                     writer.WriteString("base64");
                     writer.WriteEndAttribute();
                     writer.WriteValue(Convert.ToBase64String((byte[]) value)); //Has to be base64
@@ -884,6 +857,7 @@ namespace WhiteCore.Services.DataService
                 writer = null;
                 sw = null;
                 array = null;*/
+
                 return array;
             }
 
