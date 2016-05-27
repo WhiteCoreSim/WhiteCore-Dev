@@ -354,9 +354,11 @@ namespace WhiteCore.Framework.ConsoleFramework
                 c = m_Connections [sessionID];
             }
             c.last = Environment.TickCount;
-            if (c.lastLineSeen < m_LineNumber)
-                return true;
-            return false;
+            lock (m_Scrollback) {
+                if (c.lastLineSeen < m_LineNumber)
+                    return true;
+                return false;
+            }
         }
 
         byte [] GetEvents (UUID RequestID, UUID sessionID, string req, OSHttpResponse response)

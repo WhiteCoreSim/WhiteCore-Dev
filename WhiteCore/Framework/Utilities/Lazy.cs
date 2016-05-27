@@ -141,10 +141,10 @@ namespace WhiteCore.Framework.Utilities
             switch (mode) {
             case LazyThreadSafetyMode.None: {
                     var init_factory = factory;
-                    if (init_factory == null)
-                        throw exception =
-                              new InvalidOperationException (
-                                  "The initialization function tries to access Value on this instance");
+                    //if (init_factory == null)
+                    //    throw exception =
+                    //          new InvalidOperationException (
+                    //              "The initialization function tries to access Value on this instance");
                     try {
                         factory = null;
                         T v = init_factory ();
@@ -205,8 +205,8 @@ namespace WhiteCore.Framework.Utilities
             if (monitor == null) {
                 //value = factory();
                 value = default (T);        // 20160428 - greythane - not sure of this...  anyone?? :(
-                lock (monitor)
-                    inited = true;
+                //lock (monitor)
+                inited = true;
             } else {
                 lock (monitor) {
                     if (inited)

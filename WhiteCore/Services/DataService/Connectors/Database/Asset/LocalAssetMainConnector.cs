@@ -128,7 +128,8 @@ namespace WhiteCore.Services.DataService.Connectors.Database.Asset
                                 "[LocalAssetDatabase]: Asset already exists in the db, fixing ID... - " + asset.ID);
                         InsertAsset (asset, UUID.Random ());
                     }
-                    oldAsset.Dispose ();
+                    if (oldAsset != null)
+                        oldAsset.Dispose ();
                 } else {
                     InsertAsset (asset, asset.ID);
                 }

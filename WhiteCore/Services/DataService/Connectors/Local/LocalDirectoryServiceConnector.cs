@@ -179,9 +179,8 @@ namespace WhiteCore.Services.DataService
                 var posZ = (float)Convert.ToDecimal (Query[i + 5], Culture.NumberFormatInfo);
                 landData.UserLocation = new Vector3 (posX, posY, posZ);
 
-//                                      UserLocation =
-//                                                new Vector3(float.Parse(Query[i + 3]), float.Parse(Query[i + 4]),
-//                                                            float.Parse(Query[i + 5])),
+                // UserLocation =
+                //     new Vector3(float.Parse(Query[i + 3]), float.Parse(Query[i + 4]), float.Parse(Query[i + 5])),
                 landData.Name = Query[i + 6];
                 landData.Description = Query[i + 7];
                 landData.Flags = uint.Parse(Query[i + 8]);
@@ -303,6 +302,7 @@ namespace WhiteCore.Services.DataService
             }
             if (LandData == null && Lands.Count != 0)
                 LandData = Lands[0];
+            
             return LandData;
         }
 
@@ -1085,7 +1085,7 @@ namespace WhiteCore.Services.DataService
             if (regiondata != null)
             {
                 List<GridRegion> regions = regiondata.Get(regionName, null, null, null);
-                if (regions.Count >= 1)
+                if (regions != null && regions.Count >= 1)
                 {
                     QueryFilter filter = new QueryFilter();
                     filter.andFilters["region"] = regions[0].RegionID.ToString();

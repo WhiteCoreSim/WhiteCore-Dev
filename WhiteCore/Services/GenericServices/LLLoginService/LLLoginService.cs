@@ -406,14 +406,18 @@ namespace WhiteCore.Services
 
             IAgentInfo agent = null;
             IAgentConnector agentData = Framework.Utilities.DataManager.RequestPlugin<IAgentConnector>();
-            if (agentData != null)
-                agent = agentData.GetAgent(account.PrincipalID);
-            if (agent == null)
-            {
-                agentData.CreateNewAgent(account.PrincipalID);
-                agent = agentData.GetAgent(account.PrincipalID);
+            if (agentData != null) {
+                agent = agentData.GetAgent (account.PrincipalID);
+                if (agent == null) {
+                    agentData.CreateNewAgent (account.PrincipalID);
+                    agent = agentData.GetAgent (account.PrincipalID);
+                }
+            } else {
+                MainConsole.Instance.ErrorFormat ("[LLogin service]: Login failed for user {1}, reason: {0}",
+                                                 account.Name, "Unable to retrieve agen connector");
+                return LLFailedLoginResponse.GridProblem;
             }
-
+                           
             requestData["ip"] = clientIP.ToString();
             foreach (ILoginModule module in LoginModules)
             {
