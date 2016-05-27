@@ -27,17 +27,19 @@
 
 using System;
 using System.Collections.Generic;
-
 using WhiteCore.DataManager.Migration;
 using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.Ban
 {
-    public class PresenceInfoMigrator_2 : Migrator
+    /// <summary>
+    ///     This update just clears the table out
+    /// </summary>
+    public class PresenceInfoMigrator_3 : Migrator
     {
-        public PresenceInfoMigrator_2()
+        public PresenceInfoMigrator_3()
         {
-            Version = new Version(0, 0, 2);
+            Version = new Version(0, 0, 3);
             MigrationName = "PresenceInfo";
 
             Schema = new List<SchemaDefinition>();
@@ -58,8 +60,6 @@ namespace WhiteCore.Modules.Ban
                                      ), IndexDefs(
                                          IndexDef(new string[1] {"AgentID"}, IndexType.Primary)
                                             ));
-
-            RemoveSchema("presenceinfo");
         }
 
         protected override void DoCreateDefaults(IDataConnector genericData)
@@ -80,6 +80,11 @@ namespace WhiteCore.Modules.Ban
         protected override void DoPrepareRestorePoint(IDataConnector genericData)
         {
             CopyAllTablesToTempVersions(genericData);
+        }
+
+        public override void FinishedMigration(IDataConnector genericData)
+        {
+            genericData.Delete("baninfo", null);
         }
     }
 }

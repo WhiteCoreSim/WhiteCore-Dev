@@ -49,8 +49,7 @@ namespace WhiteCore.Modules.Ban
 
         BanCheck m_module;
 
-        public string Name
-        {
+        public string Name {
             get { return GetType ().Name; }
         }
 
@@ -74,8 +73,7 @@ namespace WhiteCore.Modules.Ban
             string mac = "";
             string id0 = "";
 
-            if (request != null)
-            {
+            if (request != null) {
                 ip = request.ContainsKey ("ip") ? (string)request ["ip"] : "";
                 version = request.ContainsKey ("version") ? (string)request ["version"] : "";
                 platform = request.ContainsKey ("platform") ? (string)request ["platform"] : "";
@@ -88,8 +86,7 @@ namespace WhiteCore.Modules.Ban
                     version,
                     platform,
                     mac,
-                    id0, out message))
-            {
+                    id0, out message)) {
                 return new LLFailedLoginResponse (LoginResponseEnum.Indeterminant, message, false);
             }
             return null;
@@ -135,7 +132,7 @@ namespace WhiteCore.Modules.Ban
 
         #region Constructor
 
-        public BanCheck (IConfigSource source, IUserAccountService UserAccountService)
+        public BanCheck (IConfigSource source, IUserAccountService userAccountService)
         {
             IConfig config = source.Configs ["GrieferProtection"];
             if (config == null)
@@ -160,10 +157,10 @@ namespace WhiteCore.Modules.Ban
                 _checkForSimilaritiesLater.Start (5, CheckForSimilaritiesMultiple);
 
             GrieferAllowLevel =
-                (AllowLevel)Enum.Parse (typeof(AllowLevel), config.GetString ("GrieferAllowLevel", "AllowKnown"));
+                (AllowLevel)Enum.Parse (typeof (AllowLevel), config.GetString ("GrieferAllowLevel", "AllowKnown"));
 
             presenceInfo = Framework.Utilities.DataManager.RequestPlugin<IPresenceInfo> ();
-            m_accountService = UserAccountService;
+            m_accountService = userAccountService;
 
             if (m_accountService.IsLocalConnector)
                 AddCommands ();                     // only add if we are local
@@ -171,43 +168,42 @@ namespace WhiteCore.Modules.Ban
 
         void AddCommands ()
         {
-        
-            if (MainConsole.Instance != null)
-            {
+
+            if (MainConsole.Instance != null) {
                 MainConsole.Instance.Commands.AddCommand (
-                    "show user info", 
-                    "show user info", 
-                    "Display info on a given user", 
+                    "show user info",
+                    "show user info",
+                    "Display info on a given user",
                     UserInfo, false, true);
-                
+
                 MainConsole.Instance.Commands.AddCommand (
-                    "set user info", 
-                    "set user info", 
-                    "Sets the info of the given user", 
+                    "set user info",
+                    "set user info",
+                    "Sets the info of the given user",
                     SetUserInfo, false, true);
-                
+
                 MainConsole.Instance.Commands.AddCommand (
-                    "block user", 
-                    "block user", 
-                    "Blocks a given user from connecting anymore", 
+                    "block user",
+                    "block user",
+                    "Blocks a given user from connecting anymore",
                     BlockUser, false, true);
-                
+
                 MainConsole.Instance.Commands.AddCommand (
-                    "ban user", 
-                    "ban user", 
-                    "Blocks a given user from connecting anymore", 
+                    "ban user",
+                    "ban user",
+                    "Blocks a given user from connecting anymore",
                     BlockUser, false, true);
-                
+
                 MainConsole.Instance.Commands.AddCommand (
-                    "unblock user", 
-                    "unblock user", 
-                    "Removes the block for logging in on a given user", 
+                    "unblock user",
+                    "unblock user",
+                    "Removes the block for logging in on a given user",
                     UnBlockUser, false, true);
-                
+
                 MainConsole.Instance.Commands.AddCommand (
-                    "unban user", 
-                    "unban user", 
-                    "Removes the block for logging in on a given user", 
+                    "unban user",
+                    "unban user",
+                    "Removes the block for logging in on a given user",
                     UnBlockUser, false, true);
             }
 
@@ -228,11 +224,11 @@ namespace WhiteCore.Modules.Ban
             presenceInfo.Check (info, m_useIncludeList ? m_allowedViewers : m_bannedViewers, m_useIncludeList);
         }
 
-        PresenceInfo UpdatePresenceInfo (UUID AgentID, PresenceInfo oldInfo, string ip, string version,
+        PresenceInfo UpdatePresenceInfo (UUID agentID, PresenceInfo oldInfo, string ip, string version,
                                         string platform, string mac, string id0)
         {
             PresenceInfo info = new PresenceInfo ();
-            info.AgentID = AgentID;
+            info.AgentID = agentID;
             if (!string.IsNullOrEmpty (ip))
                 info.LastKnownIP = ip;
             if (!string.IsNullOrEmpty (version))
@@ -266,70 +262,64 @@ namespace WhiteCore.Modules.Ban
             return info;
         }
 
-        PresenceInfo GetInformation (UUID AgentID)
+        PresenceInfo GetInformation (UUID agentID)
         {
-            PresenceInfo oldInfo = presenceInfo.GetPresenceInfo (AgentID);
-            if (oldInfo == null)
-            {
+            PresenceInfo oldInfo = presenceInfo.GetPresenceInfo (agentID);
+            if (oldInfo == null) {
                 PresenceInfo info = new PresenceInfo ();
-                info.AgentID = AgentID;
+                info.AgentID = agentID;
                 info.Flags = PresenceInfo.PresenceInfoFlags.Clean;
                 presenceInfo.UpdatePresenceInfo (info);
-                oldInfo = presenceInfo.GetPresenceInfo (AgentID);
+                oldInfo = presenceInfo.GetPresenceInfo (agentID);
             }
 
             return oldInfo;
         }
 
-        protected void UserInfo (IScene scene, string[] cmdparams)
+        protected void UserInfo (IScene scene, string [] cmdparams)
         {
             string name = MainConsole.Instance.Prompt ("Name: ");
             UserAccount account = m_accountService.GetUserAccount (null, name);
-            if (account == null)
-            {
+            if (account == null) {
                 MainConsole.Instance.Warn ("Cannot find user.");
                 return;
             }
             UUID AgentID = account.PrincipalID;
             PresenceInfo info = GetInformation (AgentID);
-            if (info == null)
-            {
+            if (info == null) {
                 MainConsole.Instance.Warn ("Cannot find user.");
                 return;
             }
             DisplayUserInfo (info);
         }
 
-        protected void BlockUser (IScene scene, string[] cmdparams)
+        protected void BlockUser (IScene scene, string [] cmdparams)
         {
             string name = MainConsole.Instance.Prompt ("Name: ");
             UserAccount account = m_accountService.GetUserAccount (null, name);
-            if (account == null)
-            {
+            if (account == null) {
                 MainConsole.Instance.Warn ("Cannot find user.");
                 return;
             }
-            UUID AgentID = account.PrincipalID;
-            PresenceInfo info = GetInformation (AgentID);
-            if (info == null)
-            {
+
+            UUID agentID = account.PrincipalID;
+            PresenceInfo info = GetInformation (agentID);
+            if (info == null) {
                 MainConsole.Instance.Warn ("Cannot find user.");
                 return;
             }
 
             var conn = Framework.Utilities.DataManager.RequestPlugin<IAgentConnector> ();
-            IAgentInfo agentInfo = conn.GetAgent (AgentID);
+            IAgentInfo agentInfo = conn.GetAgent (agentID);
             if (
                 MainConsole.Instance.Prompt ("Do you want to have this only be a temporary ban?", "no",
-                    new List<string> () { "yes", "no" }).ToLower () == "yes")
-            {
+                    new List<string> () { "yes", "no" }).ToLower () == "yes") {
                 float days = float.Parse (MainConsole.Instance.Prompt ("How long (in days) should this ban last?", "5.0"));
 
                 agentInfo.Flags |= IAgentFlags.TempBan;
 
                 agentInfo.OtherAgentInformation ["TemperaryBanInfo"] = DateTime.Now.ToUniversalTime ().AddDays (days);
-            } else
-            {
+            } else {
                 info.Flags |= PresenceInfo.PresenceInfoFlags.Banned;
                 presenceInfo.UpdatePresenceInfo (info);
                 agentInfo.Flags |= IAgentFlags.PermBan;
@@ -339,19 +329,18 @@ namespace WhiteCore.Modules.Ban
             MainConsole.Instance.Fatal ("User blocked from logging in");
         }
 
-        protected void UnBlockUser (IScene scene, string[] cmdparams)
+        protected void UnBlockUser (IScene scene, string [] cmdparams)
         {
             string name = MainConsole.Instance.Prompt ("Name: ");
             UserAccount account = m_accountService.GetUserAccount (null, name);
-            if (account == null)
-            {
+            if (account == null) {
                 MainConsole.Instance.Warn ("Cannot find user.");
                 return;
             }
-            UUID AgentID = account.PrincipalID;
-            PresenceInfo info = GetInformation (AgentID);
-            if (info == null)
-            {
+
+            UUID agentID = account.PrincipalID;
+            PresenceInfo info = GetInformation (agentID);
+            if (info == null) {
                 MainConsole.Instance.Warn ("Cannot find user.");
                 return;
             }
@@ -359,7 +348,7 @@ namespace WhiteCore.Modules.Ban
             presenceInfo.UpdatePresenceInfo (info);
 
             var conn = Framework.Utilities.DataManager.RequestPlugin<IAgentConnector> ();
-            IAgentInfo agentInfo = conn.GetAgent (AgentID);
+            IAgentInfo agentInfo = conn.GetAgent (agentID);
 
             agentInfo.Flags &= IAgentFlags.TempBan;
             agentInfo.Flags &= IAgentFlags.PermBan;
@@ -370,30 +359,26 @@ namespace WhiteCore.Modules.Ban
             MainConsole.Instance.Fatal ("User block removed");
         }
 
-        protected void SetUserInfo (IScene scene, string[] cmdparams)
+        protected void SetUserInfo (IScene scene, string [] cmdparams)
         {
             string name = MainConsole.Instance.Prompt ("Name: ");
             UserAccount account = m_accountService.GetUserAccount (null, name);
-            if (account == null)
-            {
+            if (account == null) {
                 MainConsole.Instance.Warn ("Cannot find user.");
                 return;
             }
-            UUID AgentID = account.PrincipalID;
-            PresenceInfo info = GetInformation (AgentID);
-            if (info == null)
-            {
+            UUID agentID = account.PrincipalID;
+            PresenceInfo info = GetInformation (agentID);
+            if (info == null) {
                 MainConsole.Instance.Warn ("Cannot find user.");
                 return;
             }
-            try
-            {
+            try {
                 info.Flags =
                     (PresenceInfo.PresenceInfoFlags)
-                    Enum.Parse (typeof(PresenceInfo.PresenceInfoFlags),
+                    Enum.Parse (typeof (PresenceInfo.PresenceInfoFlags),
                     MainConsole.Instance.Prompt ("Flags (Clean, Suspected, Known, Banned): ", "Clean"));
-            } catch
-            {
+            } catch {
                 MainConsole.Instance.Warn ("Please choose a valid flag: Clean, Suspected, Known, Banned");
                 return;
             }
@@ -415,11 +400,10 @@ namespace WhiteCore.Modules.Ban
             //MainConsole.Instance.Info("   Mac: " + info.LastKnownMac);
             MainConsole.Instance.Info ("   Viewer: " + info.LastKnownViewer);
             MainConsole.Instance.Info ("   Platform: " + info.Platform);
-            if (info.KnownAlts.Count > 0)
-            {
+
+            if (info.KnownAlts.Count > 0) {
                 MainConsole.Instance.Info ("   Known Alt Accounts: ");
-                foreach (var acc in info.KnownAlts)
-                {
+                foreach (var acc in info.KnownAlts) {
                     account = m_accountService.GetUserAccount (null, UUID.Parse (acc));
                     if (account != null)
                         MainConsole.Instance.Info ("   " + account.Name);
@@ -429,16 +413,18 @@ namespace WhiteCore.Modules.Ban
             }
         }
 
-        bool CheckClient (UUID AgentID, out string message)
+        bool CheckClient (UUID agentID, out string message)
         {
             message = "";
 
-            PresenceInfo info = GetInformation (AgentID);
+            PresenceInfo info = GetInformation (agentID);
+            if (info == null)
+                return false;   // something bad here..
 
             if (m_checkOnLogin)
                 CheckForSimilarities (info);
             else
-                _checkForSimilaritiesLater.Add (AgentID, info);
+                _checkForSimilaritiesLater.Add (agentID, info);
 
             if (!CheckThreatLevel (info, out message))
                 return false;
@@ -449,8 +435,7 @@ namespace WhiteCore.Modules.Ban
         bool CheckViewer (PresenceInfo info, out string reason)
         {
             //Check for banned viewers
-            if (IsViewerBanned (info.LastKnownViewer))
-            {
+            if (IsViewerBanned (info.LastKnownViewer)) {
                 reason = "Viewer is banned";
                 return false;
             }
@@ -461,31 +446,28 @@ namespace WhiteCore.Modules.Ban
 
         public bool IsViewerBanned (string name)
         {
-            if (m_useIncludeList)
-            {
+            if (m_useIncludeList) {
                 if (!m_allowedViewers.Contains (name))
                     return true;
-            } else
-            {
+            } else {
                 if (m_bannedViewers.Contains (name))
                     return true;
             }
+
             return false;
         }
 
         bool CheckThreatLevel (PresenceInfo info, out string message)
         {
             message = "";
-            if ((info.Flags & PresenceInfo.PresenceInfoFlags.Banned) == PresenceInfo.PresenceInfoFlags.Banned)
-            {
+            if ((info.Flags & PresenceInfo.PresenceInfoFlags.Banned) == PresenceInfo.PresenceInfoFlags.Banned) {
                 message = "Banned agent.";
                 return false;
             }
             if (GrieferAllowLevel == AllowLevel.AllowKnown)
                 return true; //Allow all
-            
-            if (GrieferAllowLevel == AllowLevel.AllowCleanOnly)
-            {
+
+            if (GrieferAllowLevel == AllowLevel.AllowCleanOnly) {
                 //Allow people with only clean flag or suspected alt
                 if ((info.Flags & PresenceInfo.PresenceInfoFlags.Suspected) == PresenceInfo.PresenceInfoFlags.Suspected ||
                     (info.Flags & PresenceInfo.PresenceInfoFlags.Known) == PresenceInfo.PresenceInfoFlags.Known ||
@@ -493,21 +475,18 @@ namespace WhiteCore.Modules.Ban
                     PresenceInfo.PresenceInfoFlags.SuspectedAltAccountOfKnown ||
                     (info.Flags & PresenceInfo.PresenceInfoFlags.KnownAltAccountOfKnown) ==
                     PresenceInfo.PresenceInfoFlags.KnownAltAccountOfKnown ||
-                    (info.Flags & PresenceInfo.PresenceInfoFlags.Banned) == PresenceInfo.PresenceInfoFlags.Banned)
-                {
+                    (info.Flags & PresenceInfo.PresenceInfoFlags.Banned) == PresenceInfo.PresenceInfoFlags.Banned) {
                     message = "Not a Clean agent and have been denied access.";
                     return false;
                 }
-            } else if (GrieferAllowLevel == AllowLevel.AllowSuspected)
-            {
+            } else if (GrieferAllowLevel == AllowLevel.AllowSuspected) {
                 //Block all alts of known, and suspected alts of known
                 if ((info.Flags & PresenceInfo.PresenceInfoFlags.Known) == PresenceInfo.PresenceInfoFlags.Known ||
                     (info.Flags & PresenceInfo.PresenceInfoFlags.SuspectedAltAccountOfKnown) ==
                     PresenceInfo.PresenceInfoFlags.SuspectedAltAccountOfKnown ||
                     (info.Flags & PresenceInfo.PresenceInfoFlags.KnownAltAccountOfKnown) ==
                     PresenceInfo.PresenceInfoFlags.KnownAltAccountOfKnown ||
-                    (info.Flags & PresenceInfo.PresenceInfoFlags.Banned) == PresenceInfo.PresenceInfoFlags.Banned)
-                {
+                    (info.Flags & PresenceInfo.PresenceInfoFlags.Banned) == PresenceInfo.PresenceInfoFlags.Banned) {
                     message = "Not a Clean agent and have been denied access.";
                     return false;
                 }
@@ -520,31 +499,34 @@ namespace WhiteCore.Modules.Ban
 
         #region Public members
 
-        public bool CheckUser (UUID AgentID, string ip, string version, string platform, string mac, string id0,
+        public bool CheckUser (UUID agentID, string ip, string version, string platform, string mac, string id0,
                               out string message)
         {
             message = "";
             if (!m_enabled)
                 return true;
 
-            PresenceInfo oldInfo = GetInformation (AgentID);
-            oldInfo = UpdatePresenceInfo (AgentID, oldInfo, ip, version, platform, mac, id0);
+            PresenceInfo oldInfo = GetInformation (agentID);
+            if (oldInfo == null)
+                return false;   // something bad here..
+
+            oldInfo = UpdatePresenceInfo (agentID, oldInfo, ip, version, platform, mac, id0);
             if (m_debug)
                 DisplayUserInfo (oldInfo);
 
-            return CheckClient (AgentID, out message);
+            return CheckClient (agentID, out message);
         }
 
-        public void SetUserLevel (UUID AgentID, PresenceInfo.PresenceInfoFlags presenceInfoFlags)
+        public void SetUserLevel (UUID agentID, PresenceInfo.PresenceInfoFlags presenceInfoFlags)
         {
             if (!m_enabled)
                 return;
-            //Get
-            PresenceInfo info = GetInformation (AgentID);
-            //Set the flags
-            info.Flags = presenceInfoFlags;
-            //Save
-            presenceInfo.UpdatePresenceInfo (info);
+
+            PresenceInfo info = GetInformation (agentID);
+            if (info != null) {
+                info.Flags = presenceInfoFlags;
+                presenceInfo.UpdatePresenceInfo (info);
+            }
         }
 
         #endregion
@@ -561,8 +543,7 @@ namespace WhiteCore.Modules.Ban
         List<IPAddress> IPBans = new List<IPAddress> ();
         List<string> IPRangeBans = new List<string> ();
 
-        public string Name
-        {
+        public string Name {
             get { return GetType ().Name; }
         }
 
@@ -573,11 +554,9 @@ namespace WhiteCore.Modules.Ban
         public void Initialize (ILoginService service, IConfigSource source, IRegistryCore registry)
         {
             IConfig config = source.Configs ["GrieferProtection"];
-            if (config != null)
-            {
+            if (config != null) {
                 List<string> iPBans = Util.ConvertToList (config.GetString ("IPBans", ""), true);
-                foreach (string ip in iPBans)
-                {
+                foreach (string ip in iPBans) {
                     IPAddress ipa;
                     if (IPAddress.TryParse (ip, out ipa))
                         IPBans.Add (ipa);
@@ -596,11 +575,12 @@ namespace WhiteCore.Modules.Ban
             if (IPBans.Contains (userIP))
                 return new LLFailedLoginResponse (LoginResponseEnum.Indeterminant,
                     "Your account cannot be accessed on this computer.", false);
-            foreach (string ipRange in IPRangeBans)
-            {
-                string[] split = ipRange.Split ('-');
+            
+            foreach (string ipRange in IPRangeBans) {
+                string [] split = ipRange.Split ('-');
                 if (split.Length != 2)
                     continue;
+                
                 IPAddress low = IPAddress.Parse (ip);
                 IPAddress high = IPAddress.Parse (ip);
                 NetworkUtils.IPAddressRange range = new NetworkUtils.IPAddressRange (low, high);
@@ -608,6 +588,7 @@ namespace WhiteCore.Modules.Ban
                     return new LLFailedLoginResponse (LoginResponseEnum.Indeterminant,
                         "Your account cannot be accessed on this computer.", false);
             }
+
             return null;
         }
 
