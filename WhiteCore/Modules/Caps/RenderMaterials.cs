@@ -170,7 +170,9 @@ namespace WhiteCore.Modules.Caps
                                         respArr.Add (matMap);
                                     } else
                                         MainConsole.Instance.Info ("[Materials]: request for UNKNOWN material ID: " + id);
-                                    materialAsset.Dispose ();
+                                    
+                                    if (materialAsset != null)
+                                        materialAsset.Dispose ();
                                 } catch (Exception)
                                 {
                                     // report something here?
