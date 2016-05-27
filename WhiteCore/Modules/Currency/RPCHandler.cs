@@ -56,44 +56,44 @@ namespace WhiteCore.Modules.Currency
 
         #region IService Members
 
-        public void Initialize(IConfigSource config, IRegistryCore registry)
+        public void Initialize (IConfigSource config, IRegistryCore registry)
         {
         }
 
-        public void Start(IConfigSource config, IRegistryCore registry)
+        public void Start (IConfigSource config, IRegistryCore registry)
         {
-            if (config.Configs["Currency"] == null ||
-                config.Configs["Currency"].GetString("Module", "") != "BaseCurrency")
+            if (config.Configs ["Currency"] == null ||
+                config.Configs ["Currency"].GetString ("Module", "") != "BaseCurrency")
                 return;
 
             // we only want this if we are local..
             bool remoteCalls = false;
-            IConfig connectorConfig = config.Configs["WhiteCoreConnectors"];
-            if ((connectorConfig != null) && connectorConfig.Contains("DoRemoteCalls"))
-                remoteCalls = connectorConfig.GetBoolean("DoRemoteCalls", false);
+            IConfig connectorConfig = config.Configs ["WhiteCoreConnectors"];
+            if ((connectorConfig != null) && connectorConfig.Contains ("DoRemoteCalls"))
+                remoteCalls = connectorConfig.GetBoolean ("DoRemoteCalls", false);
 
             if (remoteCalls)
                 return;
 
-            m_connector = Framework.Utilities.DataManager.RequestPlugin<IBaseCurrencyConnector>() as BaseCurrencyConnector;
+            m_connector = Framework.Utilities.DataManager.RequestPlugin<IBaseCurrencyConnector> () as BaseCurrencyConnector;
             var curPort = m_connector.GetConfig ().ClientPort;
             if (curPort == 0 && MainServer.Instance == null)
                 return;
-            
-            IHttpServer server = registry.RequestModuleInterface<ISimulationBase>().GetHttpServer((uint) curPort);
-            server.AddXmlRPCHandler("getCurrencyQuote", QuoteFunc);
-            server.AddXmlRPCHandler("buyCurrency", BuyFunc);
-            server.AddXmlRPCHandler("preflightBuyLandPrep", PreflightBuyLandPrepFunc);
-            server.AddXmlRPCHandler("buyLandPrep", LandBuyFunc);
-            server.AddXmlRPCHandler("getBalance", GetbalanceFunc);
-            server.AddXmlRPCHandler("/currency.php", GetbalanceFunc);
-            server.AddXmlRPCHandler("/landtool.php", GetbalanceFunc);
 
-            m_syncMessagePoster = registry.RequestModuleInterface<ISyncMessagePosterService>();
-            m_agentInfoService = registry.RequestModuleInterface<IAgentInfoService>();
+            IHttpServer server = registry.RequestModuleInterface<ISimulationBase> ().GetHttpServer ((uint)curPort);
+            server.AddXmlRPCHandler ("getCurrencyQuote", QuoteFunc);
+            server.AddXmlRPCHandler ("buyCurrency", BuyFunc);
+            server.AddXmlRPCHandler ("preflightBuyLandPrep", PreflightBuyLandPrepFunc);
+            server.AddXmlRPCHandler ("buyLandPrep", LandBuyFunc);
+            server.AddXmlRPCHandler ("getBalance", GetbalanceFunc);
+            server.AddXmlRPCHandler ("/currency.php", GetbalanceFunc);
+            server.AddXmlRPCHandler ("/landtool.php", GetbalanceFunc);
+
+            m_syncMessagePoster = registry.RequestModuleInterface<ISyncMessagePosterService> ();
+            m_agentInfoService = registry.RequestModuleInterface<IAgentInfoService> ();
         }
 
-        public void FinishedStartup()
+        public void FinishedStartup ()
         {
         }
 
@@ -101,192 +101,166 @@ namespace WhiteCore.Modules.Currency
 
         #region RPC Calls
 
-        public XmlRpcResponse GetbalanceFunc(XmlRpcRequest request, IPEndPoint ep)
+        public XmlRpcResponse GetbalanceFunc (XmlRpcRequest request, IPEndPoint ep)
         {
-            MainConsole.Instance.Error("Remote procedure calls GetbalanceFunc was called.");
-            throw new NotImplementedException();
+            MainConsole.Instance.Error ("Remote procedure calls GetbalanceFunc was called.");
+            throw new NotImplementedException ();
         }
 
-        public XmlRpcResponse LandBuyFunc(XmlRpcRequest request, IPEndPoint ep)
+        public XmlRpcResponse LandBuyFunc (XmlRpcRequest request, IPEndPoint ep)
         {
-            Hashtable requestData = (Hashtable)request.Params[0];
+            Hashtable requestData = (Hashtable)request.Params [0];
 
             bool success = false;
-            if (requestData.ContainsKey("agentId") && requestData.ContainsKey("currencyBuy") &&
-                m_connector.GetConfig().CanBuyCurrencyInworld)
-            {
+            if (requestData.ContainsKey ("agentId") && requestData.ContainsKey ("currencyBuy") &&
+                m_connector.GetConfig ().CanBuyCurrencyInworld) {
                 UUID agentId;
-                if (UUID.TryParse((string)requestData["agentId"], out agentId))
-                {
-                    uint amountBuying = uint.Parse(requestData["currencyBuy"].ToString());
-                    m_connector.UserCurrencyTransfer(agentId, UUID.Zero, amountBuying,
+                if (UUID.TryParse ((string)requestData ["agentId"], out agentId)) {
+                    uint amountBuying = uint.Parse (requestData ["currencyBuy"].ToString ());
+                    m_connector.UserCurrencyTransfer (agentId, UUID.Zero, amountBuying,
                                                      "Inworld purchase", TransactionType.SystemGenerated, UUID.Zero);
                     success = true;
                 }
             }
-            XmlRpcResponse returnval = new XmlRpcResponse();
+            XmlRpcResponse returnval = new XmlRpcResponse ();
             Hashtable returnresp = new Hashtable { { "success", success } };
             returnval.Value = returnresp;
+
             return returnval;
         }
 
-        public XmlRpcResponse QuoteFunc(XmlRpcRequest request, IPEndPoint ep)
+        public XmlRpcResponse QuoteFunc (XmlRpcRequest request, IPEndPoint ep)
         {
-            Hashtable requestData = (Hashtable)request.Params[0];
+            Hashtable requestData = (Hashtable)request.Params [0];
 
-            XmlRpcResponse returnval = new XmlRpcResponse();
+            XmlRpcResponse returnval = new XmlRpcResponse ();
 
-            if (requestData.ContainsKey("agentId") && requestData.ContainsKey("currencyBuy"))
-            {
-                if (m_connector.GetConfig().CanBuyCurrencyInworld)
-                {
-                    uint amount = uint.Parse(requestData["currencyBuy"].ToString());
-                    amount = (uint)m_connector.CheckMinMaxTransferSettings(UUID.Parse(requestData["agentId"].ToString()), amount);
-                    returnval.Value = new Hashtable
-                                          {
-                                              {"success", true},
-                                              {
-                                                  "currency",
-                                                  new Hashtable
-                                                      {
-                                                          {"estimatedCost", m_connector.CalculateEstimatedCost(amount)},
-                                                          {"currencyBuy", (int) amount}
-                                                      }
-                                              },
-                                              {"confirm", "asdfad9fj39ma9fj"}
-                                          };
-                }
-                else
-                {
-                    returnval.Value = new Hashtable
-                                          {
-                                              {"success", false},
-                                              {
-                                                  "currency",
-                                                  new Hashtable
-                                                      {
-                                                          {"estimatedCost", 0},
-                                                          {"currencyBuy", 0}
-                                                      }
-                                              },
-                                              {"confirm", "asdfad9fj39ma9fj"}
-                                          };
+            if (requestData.ContainsKey ("agentId") && requestData.ContainsKey ("currencyBuy")) {
+                if (m_connector.GetConfig ().CanBuyCurrencyInworld) {
+                    uint amount = uint.Parse (requestData ["currencyBuy"].ToString ());
+                    amount = (uint)m_connector.CheckMinMaxTransferSettings (UUID.Parse (requestData ["agentId"].ToString ()), amount);
+                    returnval.Value = new Hashtable {
+                        {"success", true},
+                        {"currency",new Hashtable {
+                                {"estimatedCost", m_connector.CalculateEstimatedCost(amount)},
+                                {"currencyBuy", (int) amount}
+                            }
+                        },
+                        {"confirm", "asdfad9fj39ma9fj"}
+                    };
+                } else {
+                    returnval.Value = new Hashtable {
+                        {"success", false},
+                        {"currency", new Hashtable {
+                                {"estimatedCost", 0},
+                                {"currencyBuy", 0}
+                            }
+                        },
+                        {"confirm", "asdfad9fj39ma9fj"}
+                    };
                 }
 
                 return returnval;
             }
-            returnval.Value = new Hashtable
-                                  {
-                                      {"success", false},
-                                      {"errorMessage", "Invalid parameters passed to the quote box"},
-                                      {"errorURI", m_connector.GetConfig().ErrorURI}
-                                  };
+            returnval.Value = new Hashtable {
+                {"success", false},
+                {"errorMessage", "Invalid parameters passed to the quote box"},
+                {"errorURI", m_connector.GetConfig().ErrorURI}
+            };
+
             return returnval;
         }
 
-        public XmlRpcResponse BuyFunc(XmlRpcRequest request, IPEndPoint ep)
+        public XmlRpcResponse BuyFunc (XmlRpcRequest request, IPEndPoint ep)
         {
-            Hashtable requestData = (Hashtable)request.Params[0];
+            Hashtable requestData = (Hashtable)request.Params [0];
             bool success = false;
-            if (requestData.ContainsKey("agentId") && requestData.ContainsKey("currencyBuy") &&
-                m_connector.GetConfig().CanBuyCurrencyInworld)
-            {
+            if (requestData.ContainsKey ("agentId") && requestData.ContainsKey ("currencyBuy") &&
+                m_connector.GetConfig ().CanBuyCurrencyInworld) {
                 UUID agentId;
-                if (UUID.TryParse((string)requestData["agentId"], out agentId))
-                {
-                    uint amountBuying = uint.Parse(requestData["currencyBuy"].ToString());
-                    success = m_connector.InworldCurrencyBuyTransaction(agentId, amountBuying, ep);
+                if (UUID.TryParse ((string)requestData ["agentId"], out agentId)) {
+                    uint amountBuying = uint.Parse (requestData ["currencyBuy"].ToString ());
+                    success = m_connector.InworldCurrencyBuyTransaction (agentId, amountBuying, ep);
                 }
             }
-            XmlRpcResponse returnval = new XmlRpcResponse();
+            XmlRpcResponse returnval = new XmlRpcResponse ();
             Hashtable returnresp = new Hashtable { { "success", success } };
             returnval.Value = returnresp;
             return returnval;
         }
 
-        public XmlRpcResponse PreflightBuyLandPrepFunc(XmlRpcRequest request, IPEndPoint ep)
+        public XmlRpcResponse PreflightBuyLandPrepFunc (XmlRpcRequest request, IPEndPoint ep)
         {
-            Hashtable requestData = (Hashtable)request.Params[0];
-            XmlRpcResponse ret = new XmlRpcResponse();
-            Hashtable retparam = new Hashtable();
+            Hashtable requestData = (Hashtable)request.Params [0];
+            XmlRpcResponse ret = new XmlRpcResponse ();
+            Hashtable retparam = new Hashtable ();
 
-            Hashtable membershiplevels = new Hashtable();
-            membershiplevels.Add("levels", membershiplevels);
+            Hashtable membershiplevels = new Hashtable ();
+            membershiplevels.Add ("levels", membershiplevels);
 
-            Hashtable landuse = new Hashtable();
+            Hashtable landuse = new Hashtable ();
 
-            Hashtable level = new Hashtable
-                                  {
-                                      {"id", "00000000-0000-0000-0000-000000000000"},
-                                      {m_connector.GetConfig().UpgradeMembershipUri, "Premium Membership"}
-                                  };
+            Hashtable level = new Hashtable {
+                {"id", "00000000-0000-0000-0000-000000000000"},
+                {m_connector.GetConfig().UpgradeMembershipUri, "Premium Membership"}
+            };
 
-            if (requestData.ContainsKey("agentId") && requestData.ContainsKey("currencyBuy"))
-            {
+            if (requestData.ContainsKey ("agentId") && requestData.ContainsKey ("currencyBuy")) {
                 UUID agentId;
-                UUID.TryParse((string)requestData["agentId"], out agentId);
-                UserCurrency currency = m_connector.GetUserCurrency(agentId);
+                UUID.TryParse ((string)requestData ["agentId"], out agentId);
+                UserCurrency currency = m_connector.GetUserCurrency (agentId);
                 IUserProfileInfo profile =
-                    Framework.Utilities.DataManager.RequestPlugin<IProfileConnector>("IProfileConnector").GetUserProfile(agentId);
+                    Framework.Utilities.DataManager.RequestPlugin<IProfileConnector> ("IProfileConnector").GetUserProfile (agentId);
                 OSDMap replyData = null;
                 bool response = false;
-                UserInfo user = m_agentInfoService.GetUserInfo(agentId.ToString());
-                if (user == null)
-                {
-                    landuse.Add("action", false);
+                UserInfo user = m_agentInfoService.GetUserInfo (agentId.ToString ());
+                if (user == null) {
+                    landuse.Add ("action", false);
 
-                    retparam.Add("success", false);
-                    retparam.Add("currency", currency);
-                    retparam.Add("membership", level);
-                    retparam.Add("landuse", landuse);
-                    retparam.Add("confirm", "asdfajsdkfjasdkfjalsdfjasdf");
+                    retparam.Add ("success", false);
+                    retparam.Add ("currency", currency);
+                    retparam.Add ("membership", level);
+                    retparam.Add ("landuse", landuse);
+                    retparam.Add ("confirm", "asdfajsdkfjasdkfjalsdfjasdf");
                     ret.Value = retparam;
-                }
-                else
-                {
-                    OSDMap map = new OSDMap();
-                    map["Method"] = "GetLandData";
-                    map["AgentID"] = agentId;
-                    m_syncMessagePoster.Get(user.CurrentRegionURI, map, (o) =>
-                                                                            {
-                                                                                replyData = o;
-                                                                                response = true;
-                                                                            });
+                } else {
+                    OSDMap map = new OSDMap ();
+                    map ["Method"] = "GetLandData";
+                    map ["AgentID"] = agentId;
+                    m_syncMessagePoster.Get (user.CurrentRegionURI, map, (o) => {
+                        replyData = o;
+                        response = true;
+                    });
                     while (!response)
-                        Thread.Sleep(10);
-                    if (replyData == null || replyData["Success"] == false)
-                    {
-                        landuse.Add("action", false);
+                        Thread.Sleep (10);
+                    if (replyData == null || replyData ["Success"] == false) {
+                        landuse.Add ("action", false);
 
-                        retparam.Add("success", false);
-                        retparam.Add("currency", currency);
-                        retparam.Add("membership", level);
-                        retparam.Add("landuse", landuse);
-                        retparam.Add("confirm", "asdfajsdkfjasdkfjalsdfjasdf");
+                        retparam.Add ("success", false);
+                        retparam.Add ("currency", currency);
+                        retparam.Add ("membership", level);
+                        retparam.Add ("landuse", landuse);
+                        retparam.Add ("confirm", "asdfajsdkfjasdkfjalsdfjasdf");
                         ret.Value = retparam;
-                    }
-                    else
-                    {
-                        if (replyData.ContainsKey("SalePrice"))
-                        {
-                            int landTierNeeded = (int)(currency.LandInUse + replyData["Area"].AsInteger());
+                    } else {
+                        if (replyData.ContainsKey ("SalePrice")) {
+                            int landTierNeeded = (int)(currency.LandInUse + replyData ["Area"].AsInteger ());
                             bool needsUpgrade = false;
-                            switch (profile.MembershipGroup)
-                            {
-                                case "Premium":
-                                case "":
-                                    needsUpgrade = landTierNeeded >= currency.Tier;
-                                    break;
-                                case "Banned":
-                                    needsUpgrade = true;
-                                    break;
+                            switch (profile.MembershipGroup) {
+                            case "Premium":
+                            case "":
+                                needsUpgrade = landTierNeeded >= currency.Tier;
+                                break;
+                            case "Banned":
+                                needsUpgrade = true;
+                                break;
                             }
-                            landuse.Add("action", needsUpgrade);
-                            retparam.Add("success", true);
-                            retparam.Add("currency", currency);
-                            retparam.Add("membership", level);
-                            retparam.Add("landuse", landuse);
-                            retparam.Add("confirm", "asdfajsdkfjasdkfjalsdfjasdf");
+                            landuse.Add ("action", needsUpgrade);
+                            retparam.Add ("success", true);
+                            retparam.Add ("currency", currency);
+                            retparam.Add ("membership", level);
+                            retparam.Add ("landuse", landuse);
+                            retparam.Add ("confirm", "asdfajsdkfjasdkfjalsdfjasdf");
                             ret.Value = retparam;
                         }
                     }

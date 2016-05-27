@@ -88,7 +88,8 @@ namespace WhiteCore.Modules.Currency
             return true;
         }
 
-        public bool Transfer(UUID toID, UUID fromID, UUID toObjectID, string toObjectName, UUID fromObjectID, string fromObjectName, int amount, string description,
+        public bool Transfer(UUID toID, UUID fromID, UUID toObjectID, string toObjectName, UUID fromObjectID,
+                             string fromObjectName, int amount, string description,
                              TransactionType type)
         {
             if ((type == TransactionType.PayObject) && (OnObjectPaid != null))
@@ -211,10 +212,10 @@ namespace WhiteCore.Modules.Currency
         /// <param name="client"></param>
         /// <param name="agentID"></param>
         /// <param name="SessionID"></param>
-        /// <param name="TransactionID"></param>
-        protected void SendMoneyBalance(IClientAPI client, UUID agentID, UUID SessionID, UUID TransactionID)
+        /// <param name="transactionID"></param>
+        protected void SendMoneyBalance(IClientAPI client, UUID agentID, UUID SessionID, UUID transactionID)
         {
-            client.SendMoneyBalance(TransactionID, true, new byte[0], 0);
+            client.SendMoneyBalance(transactionID, true, new byte[0], 0);
         }
 
         #region Buy Currency and Land
@@ -232,7 +233,7 @@ namespace WhiteCore.Modules.Currency
                 UUID.TryParse((string) requestData["agentId"], out agentId);
                 try
                 {
-                    amount = (Int32) requestData["currencyBuy"];
+                    amount = (int) requestData["currencyBuy"];
                 }
                 catch (InvalidCastException)
                 {
@@ -400,7 +401,7 @@ namespace WhiteCore.Modules.Currency
 
         public GroupBalance GetGroupBalance(UUID groupID)
         {
-            return new GroupBalance() {StartingDate = DateTime.Now.AddDays(-4)};
+            return new GroupBalance {StartingDate = DateTime.Now.AddDays(-4)};
         }
 
         public bool GroupCurrencyTransfer(UUID groupID, UUID fromID, bool payUser, string toObjectName, UUID fromObjectID,
