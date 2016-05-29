@@ -26,6 +26,12 @@
  */
 
 
+using System;
+using System.IO;
+using System.Linq;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Servers.HttpServer;
@@ -33,18 +39,12 @@ using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Servers.HttpServer.Interfaces;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using System;
-using System.IO;
-using System.Linq;
 
 namespace WhiteCore.Modules.Entities.PhysicsMaterials
 {
     public class PhysicsMaterialsModule : INonSharedRegionModule
     {
-        private IScene m_scene;
+        IScene m_scene;
 
         #region INonSharedRegionModule Members
 
@@ -96,7 +96,7 @@ namespace WhiteCore.Modules.Entities.PhysicsMaterials
             return retVal;
         }
 
-        private byte[] GetObjectPhysicsData(UUID agentID, Stream request)
+        byte[] GetObjectPhysicsData(UUID agentID, Stream request)
         {
             OSDMap rm = (OSDMap) OSDParser.DeserializeLLSDXml(HttpServerHandlerHelpers.ReadFully(request));
 

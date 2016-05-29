@@ -27,13 +27,12 @@
 
 using System;
 using System.Collections.Generic;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.SceneInfo.Entities;
-using Nini.Config;
-using OpenMetaverse;
-
 using GridRegion = WhiteCore.Framework.Services.GridRegion;
 
 namespace WhiteCore.Modules.Entities.EntityCount
@@ -42,13 +41,13 @@ namespace WhiteCore.Modules.Entities.EntityCount
     {
         #region Declares
 
-        private readonly Dictionary<UUID, bool> m_lastAddedPhysicalStatus = new Dictionary<UUID, bool>();
+        readonly Dictionary<UUID, bool> m_lastAddedPhysicalStatus = new Dictionary<UUID, bool>();
+        readonly object m_objectsLock = new object();
 
-        private readonly object m_objectsLock = new object();
-        private int m_activeObjects;
-        private int m_childAgents;
-        private int m_objects;
-        private int m_rootAgents;
+        int m_activeObjects;
+        int m_childAgents;
+        int m_objects;
+         int m_rootAgents;
 
         #endregion
 
@@ -66,12 +65,20 @@ namespace WhiteCore.Modules.Entities.EntityCount
 
         public int Objects
         {
-            get { return m_objects; }
+            get {
+                lock (m_objectsLock) {
+                    return m_objects;
+                }
+            }
         }
 
         public int ActiveObjects
         {
-            get { return m_activeObjects; }
+            get {
+                lock (m_objectsLock) {
+                    return m_activeObjects;
+                }
+            }
         }
 
         #endregion
