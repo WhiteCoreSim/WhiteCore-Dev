@@ -31,39 +31,39 @@ using WhiteCore.Framework.SceneInfo;
 
 namespace WhiteCore.Modules.Monitoring.Monitors
 {
-    internal class ObjectCountMonitor : IMonitor
+    class ObjectCountMonitor : IMonitor
     {
-        private readonly IScene m_scene;
+        readonly IScene m_scene;
 
-        public ObjectCountMonitor(IScene scene)
+        public ObjectCountMonitor (IScene scene)
         {
             m_scene = scene;
         }
 
         #region Implementation of IMonitor
 
-        public double GetValue()
+        public double GetValue ()
         {
-            return m_scene.RequestModuleInterface<IEntityCountModule>().Objects;
+            return m_scene.RequestModuleInterface<IEntityCountModule> ().Objects;
         }
 
-        public string GetName()
+        public string GetName ()
         {
             return "Total Objects Count";
         }
 
-        public string GetInterfaceName()
+        public string GetInterfaceName ()
         {
             return "";
         }
 
-        public string GetFriendlyValue()
+        public string GetFriendlyValue ()
         {
-            return m_scene.RequestModuleInterface<IEntityCountModule>().Objects + " Object(s), " +
-                   m_scene.RequestModuleInterface<IEntityCountModule>().ActiveObjects + " active Object(s)";
+            return m_scene.RequestModuleInterface<IEntityCountModule> ().Objects + " Object(s), " +
+                   m_scene.RequestModuleInterface<IEntityCountModule> ().ActiveObjects + " active Object(s)";
         }
 
-        public void ResetStats()
+        public void ResetStats ()
         {
         }
 

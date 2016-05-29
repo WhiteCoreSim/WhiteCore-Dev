@@ -35,34 +35,29 @@ namespace WhiteCore.Modules.Monitoring.Monitors
     {
         #region Declares
 
-        private DateTime StartTime = DateTime.Now;
-        private long abnormalClientThreadTerminations;
-        private int logoutsToday;
-        private int logoutsTotal;
-        private int logoutsYesterday;
-        private int successfulLoginsToday;
-        private int successfulLoginsTotal;
-        private int successfulLoginsYesterday;
+        DateTime StartTime = DateTime.Now;
+        long abnormalClientThreadTerminations;
+        int logoutsToday;
+        int logoutsTotal;
+        int logoutsYesterday;
+        int successfulLoginsToday;
+        int successfulLoginsTotal;
+        int successfulLoginsYesterday;
 
         /// <summary>
         ///     Number of times that a client thread terminated because of an exception
         /// </summary>
-        public long AbnormalClientThreadTerminations
-        {
+        public long AbnormalClientThreadTerminations {
             get { return abnormalClientThreadTerminations; }
         }
 
-        public int SuccessfulLoginsTotal
-        {
+        public int SuccessfulLoginsTotal {
             get { return successfulLoginsTotal; }
         }
 
-        public int SuccessfulLoginsToday
-        {
-            get
-            {
-                if (DateTime.Now.AddDays(1) < StartTime)
-                {
+        public int SuccessfulLoginsToday {
+            get {
+                if (DateTime.Now.AddDays (1) < StartTime) {
                     StartTime = DateTime.Now;
                     successfulLoginsYesterday = successfulLoginsToday;
                     successfulLoginsToday = 0;
@@ -71,22 +66,17 @@ namespace WhiteCore.Modules.Monitoring.Monitors
             }
         }
 
-        public int SuccessfulLoginsYesterday
-        {
+        public int SuccessfulLoginsYesterday {
             get { return successfulLoginsYesterday; }
         }
 
-        public int LogoutsTotal
-        {
+        public int LogoutsTotal {
             get { return logoutsTotal; }
         }
 
-        public int LogoutsToday
-        {
-            get
-            {
-                if (DateTime.Now.AddDays(1) < StartTime)
-                {
+        public int LogoutsToday {
+            get {
+                if (DateTime.Now.AddDays (1) < StartTime) {
                     StartTime = DateTime.Now;
                     logoutsYesterday = logoutsToday;
                     logoutsToday = 0;
@@ -95,8 +85,7 @@ namespace WhiteCore.Modules.Monitoring.Monitors
             }
         }
 
-        public int LogoutsYesterday
-        {
+        public int LogoutsYesterday {
             get { return logoutsYesterday; }
         }
 
@@ -106,18 +95,18 @@ namespace WhiteCore.Modules.Monitoring.Monitors
 
         #region ILoginMonitor Members
 
-        public void AddAbnormalClientThreadTermination()
+        public void AddAbnormalClientThreadTermination ()
         {
             abnormalClientThreadTerminations++;
         }
 
-        public void AddSuccessfulLogin()
+        public void AddSuccessfulLogin ()
         {
             successfulLoginsTotal++;
             successfulLoginsToday++;
         }
 
-        public void AddLogout()
+        public void AddLogout ()
         {
             logoutsTotal++;
             logoutsToday++;
@@ -127,27 +116,27 @@ namespace WhiteCore.Modules.Monitoring.Monitors
 
         #region IMonitor Members
 
-        public double GetValue()
+        public double GetValue ()
         {
             return 0;
         }
 
-        public string GetName()
+        public string GetName ()
         {
             return "LoginMonitor";
         }
 
-        public string GetInterfaceName()
+        public string GetInterfaceName ()
         {
             return "ILoginMonitor";
         }
 
-        public string GetFriendlyValue()
+        public string GetFriendlyValue ()
         {
             string Value = "";
             Value += "CONNECTION STATISTICS" + "\n";
             Value +=
-                string.Format(
+                string.Format (
                     @"Successful logins Total: {0}
 Successful logins Today: {1}
 Successful logins Yesterday: {2}
@@ -165,7 +154,7 @@ Abnormal client thread terminations: {6}",
             return Value;
         }
 
-        public void ResetStats()
+        public void ResetStats ()
         {
         }
 

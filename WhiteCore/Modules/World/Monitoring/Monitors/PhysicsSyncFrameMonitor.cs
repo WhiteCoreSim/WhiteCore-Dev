@@ -33,44 +33,44 @@ namespace WhiteCore.Modules.Monitoring.Monitors
 {
     public class PhysicsSyncFrameMonitor : IPhysicsSyncFrameMonitor
     {
-        private float physicsSyncTime;
+        float physicsSyncTime;
 
-        public PhysicsSyncFrameMonitor(IScene scene)
+        public PhysicsSyncFrameMonitor (IScene scene)
         {
         }
 
         #region Implementation of IMonitor
 
-        public double GetValue()
+        public double GetValue ()
         {
             return physicsSyncTime;
         }
 
-        public string GetName()
+        public string GetName ()
         {
             return "Physics Sync Frame Time";
         }
 
-        public string GetInterfaceName()
+        public string GetInterfaceName ()
         {
             return "IPhysicsSyncFrameMonitor";
         }
 
-        public string GetFriendlyValue()
+        public string GetFriendlyValue ()
         {
-            return (int) GetValue() + "ms";
+            return (int)GetValue () + "ms";
         }
 
         #endregion
 
         #region Other Methods
 
-        public void AddTime(int time)
+        public void AddTime (int time)
         {
             physicsSyncTime += time;
         }
 
-        public void ResetStats()
+        public void ResetStats ()
         {
             physicsSyncTime = 0;
         }

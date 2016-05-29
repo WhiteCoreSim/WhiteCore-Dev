@@ -33,39 +33,39 @@ namespace WhiteCore.Modules.Monitoring.Monitors
 {
     public class OtherFrameMonitor : IMonitor, IOtherFrameMonitor
     {
-        private int MonitorOtherFrameTime;
+        int MonitorOtherFrameTime;
 
-        public OtherFrameMonitor(IScene scene)
+        public OtherFrameMonitor (IScene scene)
         {
         }
 
         #region Implementation of IMonitor
 
-        public double GetValue()
+        public double GetValue ()
         {
             return MonitorOtherFrameTime;
         }
 
-        public string GetName()
+        public string GetName ()
         {
             return "Other Frame Time";
         }
 
-        public string GetInterfaceName()
+        public string GetInterfaceName ()
         {
             return "IOtherFrameMonitor";
         }
 
-        public string GetFriendlyValue()
+        public string GetFriendlyValue ()
         {
-            return (int) GetValue() + "ms";
+            return (int)GetValue () + "ms";
         }
 
         #endregion
 
         #region IMonitor Members
 
-        public void ResetStats()
+        public void ResetStats ()
         {
             MonitorOtherFrameTime = 0;
         }
@@ -74,7 +74,7 @@ namespace WhiteCore.Modules.Monitoring.Monitors
 
         #region ITimeMonitor Members
 
-        public void AddTime(int time)
+        public void AddTime (int time)
         {
             MonitorOtherFrameTime += time;
         }

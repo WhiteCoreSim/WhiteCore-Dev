@@ -34,27 +34,32 @@ namespace WhiteCore.Modules.Monitoring.Monitors
     public class SimFrameMonitor : ISimFrameMonitor
     {
         #region Declares
+        readonly object _simLock = new object ();
 
         // saved last reported value so there is something available for llGetRegionFPS 
-        private volatile float lastReportedSimFPS;
-        private volatile float simFPS;
+        volatile float lastReportedSimFPS;
+        volatile float simFPS;
 
-        public float LastReportedSimFPS
-        {
-            get { return lastReportedSimFPS; }
-            set { lastReportedSimFPS = value; }
+        public float LastReportedSimFPS {
+            get {
+                lock (_simLock)
+                    return lastReportedSimFPS;
+            }
+            set {
+                lock (_simLock)
+                    lastReportedSimFPS = value;
+            }
         }
 
-        public float SimFPS
-        {
-            get { return simFPS; }
+        public float SimFPS {
+            get { lock (_simLock) return simFPS; }
         }
 
         #endregion
 
         #region Constructor
 
-        public SimFrameMonitor(IScene scene)
+        public SimFrameMonitor (IScene scene)
         {
         }
 
@@ -62,24 +67,25 @@ namespace WhiteCore.Modules.Monitoring.Monitors
 
         #region Implementation of IMonitor
 
-        public double GetValue()
+        public double GetValue ()
         {
-            return LastReportedSimFPS;
+            lock (_simLock)
+                return LastReportedSimFPS;
         }
 
-        public string GetName()
+        public string GetName ()
         {
             return "SimFrameStats";
         }
 
-        public string GetInterfaceName()
+        public string GetInterfaceName ()
         {
             return "ISimFrameMonitor";
         }
 
-        public string GetFriendlyValue()
+        public string GetFriendlyValue ()
         {
-            return GetValue() + " frames/second";
+            return GetValue () + " frames/second";
         }
 
         #endregion
@@ -88,18 +94,20 @@ namespace WhiteCore.Modules.Monitoring.Monitors
 
         #region IMonitor Members
 
-        public void ResetStats()
+        public void ResetStats ()
         {
-            simFPS = 0;
+            lock (_simLock)
+                simFPS = 0;
         }
 
         #endregion
 
         #region ISimFrameMonitor Members
 
-        public void AddFPS(int fps)
+        public void AddFPS (int fps)
         {
-            simFPS += fps;
+            lock (_simLock)
+                simFPS += fps;
         }
 
         #endregion

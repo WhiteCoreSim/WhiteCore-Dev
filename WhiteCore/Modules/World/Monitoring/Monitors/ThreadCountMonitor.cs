@@ -31,31 +31,31 @@ using WhiteCore.Framework.Modules;
 
 namespace WhiteCore.Modules.Monitoring.Monitors
 {
-    internal class ThreadCountMonitor : IMonitor
+    class ThreadCountMonitor : IMonitor
     {
         #region Implementation of IMonitor
 
-        public double GetValue()
+        public double GetValue ()
         {
-            return Process.GetCurrentProcess().Threads.Count;
+            return Process.GetCurrentProcess ().Threads.Count;
         }
 
-        public string GetName()
+        public string GetName ()
         {
             return "Total Threads";
         }
 
-        public string GetInterfaceName()
+        public string GetInterfaceName ()
         {
             return "";
         }
 
-        public string GetFriendlyValue()
+        public string GetFriendlyValue ()
         {
-            return (int) GetValue() + " Thread(s) (Global)";
+            return (int)GetValue () + " Thread(s) (Global)";
         }
 
-        public void ResetStats()
+        public void ResetStats ()
         {
         }
 

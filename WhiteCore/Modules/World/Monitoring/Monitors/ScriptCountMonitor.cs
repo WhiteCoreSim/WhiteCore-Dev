@@ -32,38 +32,38 @@ using WhiteCore.Framework.SceneInfo;
 
 namespace WhiteCore.Modules.Monitoring.Monitors
 {
-    internal class ScriptCountMonitor : IScriptCountMonitor
+    class ScriptCountMonitor : IScriptCountMonitor
     {
-        private readonly IScene m_scene;
+        readonly IScene m_scene;
 
-        public ScriptCountMonitor(IScene scene)
+        public ScriptCountMonitor (IScene scene)
         {
             m_scene = scene;
         }
 
         #region Implementation of IMonitor
 
-        public double GetValue()
+        public double GetValue ()
         {
             return 0;
         }
 
-        public string GetName()
+        public string GetName ()
         {
             return "Total Script Count";
         }
 
-        public string GetInterfaceName()
+        public string GetInterfaceName ()
         {
             return "IScriptCountMonitor";
         }
 
-        public string GetFriendlyValue()
+        public string GetFriendlyValue ()
         {
             return ActiveScripts + " active script(s), " + ScriptEPS + " event(s) per second";
         }
 
-        public void ResetStats()
+        public void ResetStats ()
         {
         }
 
@@ -71,21 +71,17 @@ namespace WhiteCore.Modules.Monitoring.Monitors
 
         #region IScriptCountMonitor Members
 
-        public int ActiveScripts
-        {
-            get
-            {
-                IScriptModule[] modules = m_scene.RequestModuleInterfaces<IScriptModule>();
-                return modules.Where(module => module != null).Sum(module => module.GetActiveScripts());
+        public int ActiveScripts {
+            get {
+                IScriptModule [] modules = m_scene.RequestModuleInterfaces<IScriptModule> ();
+                return modules.Where (module => module != null).Sum (module => module.GetActiveScripts ());
             }
         }
 
-        public int ScriptEPS
-        {
-            get
-            {
-                IScriptModule[] modules = m_scene.RequestModuleInterfaces<IScriptModule>();
-                return modules.Where(module => module != null).Sum(module => module.GetScriptEPS());
+        public int ScriptEPS {
+            get {
+                IScriptModule [] modules = m_scene.RequestModuleInterfaces<IScriptModule> ();
+                return modules.Where (module => module != null).Sum (module => module.GetScriptEPS ());
             }
         }
 

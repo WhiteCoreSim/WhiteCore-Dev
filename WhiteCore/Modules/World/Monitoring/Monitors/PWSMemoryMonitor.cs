@@ -26,36 +26,35 @@
  */
 
 using System.Diagnostics;
-
 using WhiteCore.Framework.Modules;
 
 namespace WhiteCore.Modules.Monitoring.Monitors
 {
-    internal class PWSMemoryMonitor : IMonitor
+    class PWSMemoryMonitor : IMonitor
     {
         #region Implementation of IMonitor
 
-        public double GetValue()
+        public double GetValue ()
         {
-            return Process.GetCurrentProcess().PrivateMemorySize64;
+            return Process.GetCurrentProcess ().PrivateMemorySize64;
         }
 
-        public string GetName()
+        public string GetName ()
         {
             return "Private Working Set Memory";
         }
 
-        public string GetInterfaceName()
+        public string GetInterfaceName ()
         {
             return "";
         }
 
-        public string GetFriendlyValue()
+        public string GetFriendlyValue ()
         {
-            return (int) (GetValue()/(1024*1024)) + "MB (Global)";
+            return (int)(GetValue () / (1024 * 1024)) + "MB (Global)";
         }
 
-        public void ResetStats()
+        public void ResetStats ()
         {
         }
 

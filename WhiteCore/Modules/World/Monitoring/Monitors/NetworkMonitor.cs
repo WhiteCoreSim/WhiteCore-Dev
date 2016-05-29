@@ -34,13 +34,15 @@ namespace WhiteCore.Modules.Monitoring.Monitors
 {
     public class NetworkMonitor : INetworkMonitor
     {
-        private volatile float inPacketsPerSecond;
-        private volatile float outPacketsPerSecond;
-        private volatile float pendingDownloads;
-        private volatile float pendingUploads;
-        private volatile float unackedBytes;
+        readonly object _packetLock = new object ();
 
-        public NetworkMonitor(IScene scene)
+        volatile float inPacketsPerSecond;
+        volatile float outPacketsPerSecond;
+        volatile float pendingDownloads;
+        volatile float pendingUploads;
+        volatile float unackedBytes;
+
+        public NetworkMonitor (IScene scene)
         {
             scene.EventManager.OnNewClient += OnNewClient;
             scene.EventManager.OnClosingClient += OnClosingClient;
@@ -48,7 +50,7 @@ namespace WhiteCore.Modules.Monitoring.Monitors
 
         #region IMonitor Members
 
-        public void ResetStats()
+        public void ResetStats ()
         {
             inPacketsPerSecond = 0;
             outPacketsPerSecond = 0;
@@ -61,22 +63,22 @@ namespace WhiteCore.Modules.Monitoring.Monitors
 
         #region Implementation of IMonitor
 
-        public double GetValue()
+        public double GetValue ()
         {
             return 0;
         }
 
-        public string GetName()
+        public string GetName ()
         {
             return "Network Monitor";
         }
 
-        public string GetInterfaceName()
+        public string GetInterfaceName ()
         {
             return "INetworkMonitor";
         }
 
-        public string GetFriendlyValue()
+        public string GetFriendlyValue ()
         {
             return "InPackets: " + inPacketsPerSecond + " p/sec \n"
                    + "OutPackets: " + outPacketsPerSecond + " p/sec \n"
@@ -89,12 +91,12 @@ namespace WhiteCore.Modules.Monitoring.Monitors
 
         #region Client Handling
 
-        protected void OnNewClient(IClientAPI client)
+        protected void OnNewClient (IClientAPI client)
         {
             client.OnNetworkStatsUpdate += AddPacketsStats;
         }
 
-        protected void OnClosingClient(IClientAPI client)
+        protected void OnClosingClient (IClientAPI client)
         {
             client.OnNetworkStatsUpdate -= AddPacketsStats;
         }
@@ -103,63 +105,78 @@ namespace WhiteCore.Modules.Monitoring.Monitors
 
         #region INetworkMonitor Members
 
-        public float InPacketsPerSecond
-        {
-            get { return inPacketsPerSecond; }
+        public float InPacketsPerSecond {
+            get {
+                lock (_packetLock)
+                    return inPacketsPerSecond;
+            }
         }
 
-        public float OutPacketsPerSecond
-        {
-            get { return outPacketsPerSecond; }
+        public float OutPacketsPerSecond {
+            get {
+                lock (_packetLock)
+                    return outPacketsPerSecond;
+            }
         }
 
-        public float UnackedBytes
-        {
-            get { return unackedBytes; }
+        public float UnackedBytes {
+            get {
+                lock (_packetLock)
+                    return unackedBytes;
+            }
         }
 
-        public float PendingDownloads
-        {
-            get { return pendingDownloads; }
+        public float PendingDownloads {
+            get {
+                lock (_packetLock)
+                    return pendingDownloads;
+            }
         }
 
-        public float PendingUploads
-        {
-            get { return pendingUploads; }
+        public float PendingUploads {
+            get {
+                lock (_packetLock)
+                    return pendingUploads;
+            }
         }
 
-        public void AddInPackets(int numPackets)
+        public void AddInPackets (int numPackets)
         {
-            inPacketsPerSecond += numPackets;
+            lock (_packetLock)
+                inPacketsPerSecond += numPackets;
         }
 
-        public void AddOutPackets(int numPackets)
+        public void AddOutPackets (int numPackets)
         {
-            outPacketsPerSecond += numPackets;
+            lock (_packetLock)
+                outPacketsPerSecond += numPackets;
         }
 
-        public void AddUnackedBytes(int numBytes)
+        public void AddUnackedBytes (int numBytes)
         {
-            unackedBytes += numBytes;
+            lock (_packetLock)
+                unackedBytes += numBytes;
         }
 
-        public void AddPendingDownloads(int count)
+        public void AddPendingDownloads (int count)
         {
-            pendingDownloads += count;
+            lock (_packetLock)
+                pendingDownloads += count;
         }
 
-        public void AddPendingUploads(int count)
+        public void AddPendingUploads (int count)
         {
-            pendingUploads += count;
+            lock (_packetLock)
+                pendingUploads += count;
         }
 
         #endregion
 
-        public void AddPacketsStats(int inPackets, int outPackets, int unAckedBytes)
+        public void AddPacketsStats (int inPackets, int outPackets, int unAckedBytes)
         {
-            AddInPackets(inPackets);
-            AddOutPackets(outPackets);
-            AddUnackedBytes(unAckedBytes);
+            AddInPackets (inPackets);
+            AddOutPackets (outPackets);
+            AddUnackedBytes (unAckedBytes);
         }
     }
 }

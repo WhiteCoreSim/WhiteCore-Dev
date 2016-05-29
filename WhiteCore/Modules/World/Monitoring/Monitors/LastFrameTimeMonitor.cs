@@ -34,9 +34,9 @@ namespace WhiteCore.Modules.Monitoring.Monitors
 {
     public class LastFrameTimeMonitor : IMonitor, ILastFrameTimeMonitor
     {
-        private int MonitorLastFrameTick;
+        int MonitorLastFrameTick;
 
-        public LastFrameTimeMonitor(IScene scene)
+        public LastFrameTimeMonitor (IScene scene)
         {
         }
 
@@ -44,27 +44,27 @@ namespace WhiteCore.Modules.Monitoring.Monitors
 
         #region IMonitor Members
 
-        public double GetValue()
+        public double GetValue ()
         {
-            return Util.EnvironmentTickCountSubtract(MonitorLastFrameTick);
+            return Util.EnvironmentTickCountSubtract (MonitorLastFrameTick);
         }
 
-        public string GetName()
+        public string GetName ()
         {
             return "Last Completed Frame At";
         }
 
-        public string GetInterfaceName()
+        public string GetInterfaceName ()
         {
             return "ILastFrameTimeMonitor";
         }
 
-        public string GetFriendlyValue()
+        public string GetFriendlyValue ()
         {
-            return (int) GetValue() + "ms ago";
+            return (int)GetValue () + "ms ago";
         }
 
-        public void ResetStats()
+        public void ResetStats ()
         {
         }
 
@@ -72,7 +72,7 @@ namespace WhiteCore.Modules.Monitoring.Monitors
 
         #region ISetMonitor Members
 
-        public void SetValue(int value)
+        public void SetValue (int value)
         {
             MonitorLastFrameTick = value;
         }

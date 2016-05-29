@@ -33,32 +33,32 @@ namespace WhiteCore.Modules.Monitoring.Monitors
 {
     public class PhysicsFrameMonitor : IPhysicsFrameMonitor
     {
-        private float physicsFPS;
+        float physicsFPS;
 
-        public PhysicsFrameMonitor(IScene scene)
+        public PhysicsFrameMonitor (IScene scene)
         {
         }
 
         #region Implementation of IMonitor
 
-        public double GetValue()
+        public double GetValue ()
         {
             return LastReportedPhysicsFPS;
         }
 
-        public string GetName()
+        public string GetName ()
         {
             return "Total Physics Frame Time";
         }
 
-        public string GetInterfaceName()
+        public string GetInterfaceName ()
         {
             return "IPhysicsFrameMonitor";
         }
 
-        public string GetFriendlyValue()
+        public string GetFriendlyValue ()
         {
-            return (int) GetValue() + "ms";
+            return (int)GetValue () + "ms";
         }
 
         #endregion
@@ -67,7 +67,7 @@ namespace WhiteCore.Modules.Monitoring.Monitors
 
         #region IMonitor Members
 
-        public void ResetStats()
+        public void ResetStats ()
         {
             physicsFPS = 0;
         }
@@ -76,7 +76,7 @@ namespace WhiteCore.Modules.Monitoring.Monitors
 
         #region IPhysicsFrameMonitor Members
 
-        public void AddFPS(int value)
+        public void AddFPS (int value)
         {
             physicsFPS += value;
         }
@@ -89,8 +89,7 @@ namespace WhiteCore.Modules.Monitoring.Monitors
 
         public float LastReportedPhysicsFPS { get; set; }
 
-        public float PhysicsFPS
-        {
+        public float PhysicsFPS {
             get { return physicsFPS; }
         }
 
