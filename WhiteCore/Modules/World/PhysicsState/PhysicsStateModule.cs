@@ -29,59 +29,60 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Physics;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
-using Nini.Config;
-using OpenMetaverse;
 
 
 namespace WhiteCore.Modules.PhysicsState
 {
     public class PhysicsStateModule : INonSharedRegionModule, IPhysicsStateModule
     {
-        private readonly List<WorldPhysicsState> m_timeReversal = new List<WorldPhysicsState>();
-        private bool m_isReversing;
-        private bool m_isSavingRevertStates;
-        private int m_lastRevertedTo = -100;
-        private WorldPhysicsState m_lastWorldPhysicsState;
-        private IScene m_scene;
+        readonly List<WorldPhysicsState> m_timeReversal = new List<WorldPhysicsState> ();
+        bool m_isReversing;
+        bool m_isSavingRevertStates;
+        int m_lastRevertedTo = -100;
+        WorldPhysicsState m_lastWorldPhysicsState;
+        IScene m_scene;
+        Timer timeReversal;
 
         #region INonSharedRegionModule Members
 
-        public void Initialise(IConfigSource source)
+        public void Initialise (IConfigSource source)
         {
         }
 
-        public void AddRegion(IScene scene)
+        public void AddRegion (IScene scene)
         {
-            scene.RegisterModuleInterface<IPhysicsStateModule>(this);
+            scene.RegisterModuleInterface<IPhysicsStateModule> (this);
             m_scene = scene;
-            Timer timeReversal = new Timer(250);
+            timeReversal = new Timer (250);
             timeReversal.Elapsed += timeReversal_Elapsed;
-            timeReversal.Start();
+            timeReversal.Start ();
         }
 
-        public void RegionLoaded(IScene scene)
+        public void RegionLoaded (IScene scene)
         {
         }
 
-        public void RemoveRegion(IScene scene)
+        public void RemoveRegion (IScene scene)
+        {
+            timeReversal.Stop ();
+            timeReversal.Close ();
+        }
+
+        public void Close ()
         {
         }
 
-        public void Close()
-        {
-        }
-
-        public string Name
-        {
+        public string Name {
             get { return "PhysicsState"; }
         }
 
-        public Type ReplaceableInterface
-        {
+        public Type ReplaceableInterface {
             get { return null; }
         }
 
@@ -89,37 +90,37 @@ namespace WhiteCore.Modules.PhysicsState
 
         #region IPhysicsStateModule Members
 
-        public void SavePhysicsState()
+        public void SavePhysicsState ()
         {
-            m_lastWorldPhysicsState = m_isReversing ? null : MakePhysicsState();
+            m_lastWorldPhysicsState = m_isReversing ? null : MakePhysicsState ();
         }
 
-        public void ResetToLastSavedState()
+        public void ResetToLastSavedState ()
         {
             if (m_lastWorldPhysicsState != null)
-                m_lastWorldPhysicsState.Reload(m_scene, 1);
+                m_lastWorldPhysicsState.Reload (m_scene, 1);
             m_lastWorldPhysicsState = null;
         }
 
-        public void StartSavingPhysicsTimeReversalStates()
+        public void StartSavingPhysicsTimeReversalStates ()
         {
             m_isSavingRevertStates = true;
         }
 
-        public void StopSavingPhysicsTimeReversalStates()
+        public void StopSavingPhysicsTimeReversalStates ()
         {
             m_isSavingRevertStates = false;
-            m_timeReversal.Clear();
+            m_timeReversal.Clear ();
         }
 
-        public void StartPhysicsTimeReversal()
+        public void StartPhysicsTimeReversal ()
         {
             m_lastRevertedTo = -100;
             m_isReversing = true;
             m_scene.RegionInfo.RegionSettings.DisablePhysics = true;
         }
 
-        public void StopPhysicsTimeReversal()
+        public void StopPhysicsTimeReversal ()
         {
             m_lastRevertedTo = -100;
             m_scene.RegionInfo.RegionSettings.DisablePhysics = false;
@@ -128,43 +129,39 @@ namespace WhiteCore.Modules.PhysicsState
 
         #endregion
 
-        private WorldPhysicsState MakePhysicsState()
+        WorldPhysicsState MakePhysicsState ()
         {
-            WorldPhysicsState state = new WorldPhysicsState();
+            WorldPhysicsState state = new WorldPhysicsState ();
             //Add all active objects in the scene
-            foreach (PhysicsActor prm in m_scene.PhysicsScene.ActiveObjects)
-            {
-                state.AddPrim(prm);
+            foreach (PhysicsActor prm in m_scene.PhysicsScene.ActiveObjects) {
+                state.AddPrim (prm);
             }
 
-            foreach (IScenePresence sp in m_scene.GetScenePresences().Where(sp => !sp.IsChildAgent))
-            {
-                state.AddAvatar(sp.PhysicsActor);
+            foreach (IScenePresence sp in m_scene.GetScenePresences ().Where (sp => !sp.IsChildAgent)) {
+                state.AddAvatar (sp.PhysicsActor);
             }
 
             return state;
         }
 
-        private void timeReversal_Elapsed(object sender, ElapsedEventArgs e)
+        void timeReversal_Elapsed (object sender, ElapsedEventArgs e)
         {
             if (!m_isSavingRevertStates)
                 return; //Only save if we are running this
             if (!m_isReversing) //Only save new states if we are going forward
-                m_timeReversal.Add(MakePhysicsState());
-            else
-            {
+                m_timeReversal.Add (MakePhysicsState ());
+            else {
                 if (m_lastRevertedTo == -100)
                     m_lastRevertedTo = m_timeReversal.Count - 1;
-                m_timeReversal[m_lastRevertedTo].Reload(m_scene, -1f); //Do the velocity in reverse with -1
+                m_timeReversal [m_lastRevertedTo].Reload (m_scene, -1f); //Do the velocity in reverse with -1
                 m_lastRevertedTo--;
-                if (m_lastRevertedTo < 0)
-                {
+                if (m_lastRevertedTo < 0) {
                     m_isSavingRevertStates = false;
                     m_lastRevertedTo = -100;
                     m_isReversing = false;
-                    m_scene.StopPhysicsScene(); //Stop physics from moving too
+                    m_scene.StopPhysicsScene (); //Stop physics from moving too
                     m_scene.RegionInfo.RegionSettings.DisablePhysics = true; //Freeze the scene
-                    m_timeReversal.Clear(); //Remove the states we have as well, we've played them
+                    m_timeReversal.Clear (); //Remove the states we have as well, we've played them
                 }
             }
         }
@@ -173,67 +170,63 @@ namespace WhiteCore.Modules.PhysicsState
 
         public class WorldPhysicsState
         {
-            private readonly Dictionary<UUID, PhysicsState> m_activePrims = new Dictionary<UUID, PhysicsState>();
+            readonly Dictionary<UUID, PhysicsState> m_activePrims = new Dictionary<UUID, PhysicsState> ();
 
-            public void AddPrim(PhysicsActor prm)
+            public void AddPrim (PhysicsActor prm)
             {
-                PhysicsState state = new PhysicsState
-                                         {
-                                             Position = prm.Position,
-                                             AngularVelocity = prm.RotationalVelocity,
-                                             LinearVelocity = prm.Velocity,
-                                             Rotation = prm.Orientation
-                                         };
-                m_activePrims[prm.UUID] = state;
+                PhysicsState state = new PhysicsState {
+                    Position = prm.Position,
+                    AngularVelocity = prm.RotationalVelocity,
+                    LinearVelocity = prm.Velocity,
+                    Rotation = prm.Orientation
+                };
+                m_activePrims [prm.UUID] = state;
             }
 
-            public void AddAvatar(PhysicsActor prm)
+            public void AddAvatar (PhysicsActor prm)
             {
-                PhysicsState state = new PhysicsState
-                                         {
-                                             Position = prm.Position,
-                                             AngularVelocity = prm.RotationalVelocity,
-                                             LinearVelocity = prm.Velocity,
-                                             Rotation = prm.Orientation
-                                         };
-                m_activePrims[prm.UUID] = state;
+                PhysicsState state = new PhysicsState {
+                    Position = prm.Position,
+                    AngularVelocity = prm.RotationalVelocity,
+                    LinearVelocity = prm.Velocity,
+                    Rotation = prm.Orientation
+                };
+                m_activePrims [prm.UUID] = state;
             }
 
-            public void Reload(IScene scene, float direction)
+            public void Reload (IScene scene, float direction)
             {
-                foreach (KeyValuePair<UUID, PhysicsState> kvp in m_activePrims)
-                {
-                    ISceneChildEntity childPrim = scene.GetSceneObjectPart(kvp.Key);
+                foreach (KeyValuePair<UUID, PhysicsState> kvp in m_activePrims) {
+                    ISceneChildEntity childPrim = scene.GetSceneObjectPart (kvp.Key);
                     if (childPrim != null && childPrim.PhysActor != null)
-                        ResetPrim(childPrim.PhysActor, kvp.Value, direction);
-                    else
-                    {
-                        IScenePresence sp = scene.GetScenePresence(kvp.Key);
+                        ResetPrim (childPrim.PhysActor, kvp.Value, direction);
+                    else {
+                        IScenePresence sp = scene.GetScenePresence (kvp.Key);
                         if (sp != null)
-                            ResetAvatar(sp.PhysicsActor, kvp.Value, direction);
+                            ResetAvatar (sp.PhysicsActor, kvp.Value, direction);
                     }
                 }
             }
 
-            private void ResetPrim(PhysicsActor physicsObject, PhysicsState physicsState, float direction)
+            void ResetPrim (PhysicsActor physicsObject, PhysicsState physicsState, float direction)
             {
                 physicsObject.Position = physicsState.Position;
                 physicsObject.Orientation = physicsState.Rotation;
-                physicsObject.RotationalVelocity = physicsState.AngularVelocity*direction;
-                physicsObject.Velocity = physicsState.LinearVelocity*direction;
-                physicsObject.ForceSetVelocity(physicsState.LinearVelocity*direction);
-                physicsObject.RequestPhysicsterseUpdate();
+                physicsObject.RotationalVelocity = physicsState.AngularVelocity * direction;
+                physicsObject.Velocity = physicsState.LinearVelocity * direction;
+                physicsObject.ForceSetVelocity (physicsState.LinearVelocity * direction);
+                physicsObject.RequestPhysicsterseUpdate ();
             }
 
-            private void ResetAvatar(PhysicsActor physicsObject, PhysicsState physicsState, float direction)
+            void ResetAvatar (PhysicsActor physicsObject, PhysicsState physicsState, float direction)
             {
                 physicsObject.Position = physicsState.Position;
-                physicsObject.ForceSetPosition(physicsState.Position);
+                physicsObject.ForceSetPosition (physicsState.Position);
                 physicsObject.Orientation = physicsState.Rotation;
-                physicsObject.RotationalVelocity = physicsState.AngularVelocity*direction;
-                physicsObject.Velocity = physicsState.LinearVelocity*direction;
-                physicsObject.ForceSetVelocity(physicsState.LinearVelocity*direction);
-                physicsObject.RequestPhysicsterseUpdate();
+                physicsObject.RotationalVelocity = physicsState.AngularVelocity * direction;
+                physicsObject.Velocity = physicsState.LinearVelocity * direction;
+                physicsObject.ForceSetVelocity (physicsState.LinearVelocity * direction);
+                physicsObject.RequestPhysicsterseUpdate ();
             }
 
             #region Nested type: PhysicsState
