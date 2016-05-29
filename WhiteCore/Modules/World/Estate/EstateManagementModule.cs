@@ -597,9 +597,8 @@ namespace WhiteCore.Modules.Estate
 
         void AbortTerrainXferHandler (IClientAPI remoteClient, ulong XferID)
         {
-            if (TerrainUploader != null)
-            {
-                lock (_lock)
+            lock (_lock) {
+                if (TerrainUploader != null)
                 {
                     if (XferID == TerrainUploader.XferID)
                     {
@@ -630,7 +629,7 @@ namespace WhiteCore.Modules.Estate
 
             if (terr != null)
             {
-                MainConsole.Instance.Warn ("[Estate Manager]: Got Request to Send Terrain in region " +
+                MainConsole.Instance.Warn ("[Estate Manager]: Got Request to send Terrain in region " +
                 m_scene.RegionInfo.RegionName);
 
                 try
@@ -668,7 +667,7 @@ namespace WhiteCore.Modules.Estate
                 } catch (IOException e)
                 {
                     MainConsole.Instance.ErrorFormat (
-                        "[Estate Manager]: Error Saving a terrain file uploaded via the estate tools.  It gave us the following error: {0}",
+                        "[Estate Manager]: Error Saving a terrain file uploaded via the estate tools.\n: {0}",
                         e);
                     remoteClient.SendAlertMessage (
                         "There was an IO Exception loading your terrain.  Please check free space.");
@@ -676,7 +675,7 @@ namespace WhiteCore.Modules.Estate
                 } catch (SecurityException e)
                 {
                     MainConsole.Instance.ErrorFormat (
-                        "[Estate Manager]: Error Saving a terrain file uploaded via the estate tools.  It gave us the following error: {0}",
+                        "[Estate Manager]: Error Saving a terrain file uploaded via the estate tools.\n: {0}",
                         e);
                     remoteClient.SendAlertMessage (
                         "There was a security Exception loading your terrain.  Please check the security on the simulator drive");
@@ -684,7 +683,7 @@ namespace WhiteCore.Modules.Estate
                 } catch (UnauthorizedAccessException e)
                 {
                     MainConsole.Instance.ErrorFormat (
-                        "[Estate Manager]: Error Saving a terrain file uploaded via the estate tools.  It gave us the following error: {0}",
+                        "[Estate Manager]: Error Saving a terrain file uploaded via the estate tools.\n: {0}",
                         e);
                     remoteClient.SendAlertMessage (
                         "There was a security Exception loading your terrain.  Please check the security on the simulator drive");
@@ -692,7 +691,7 @@ namespace WhiteCore.Modules.Estate
                 } catch (Exception e)
                 {
                     MainConsole.Instance.ErrorFormat (
-                        "[Estate Manager]: Error loading a terrain file uploaded via the estate tools.  It gave us the following error: {0}",
+                        "[Estate Manager]: Error loading a terrain file uploaded via the estate tools.\n: {0}",
                         e);
                     remoteClient.SendAlertMessage (
                         "There was a general error loading your terrain.  Please fix the terrain file and try again");
@@ -736,15 +735,21 @@ namespace WhiteCore.Modules.Estate
                     File.Delete (Util.dataDir () + "/terrain.raw");
                 terr.SaveToFile (Util.dataDir () + "/terrain.raw");
 
-                FileStream input = new FileStream (Util.dataDir () + "/terrain.raw", FileMode.Open);
-                byte[] bdata = new byte[input.Length];
-                input.Read (bdata, 0, (int)input.Length);
-                input.Close ();
-
-                remote_client.SendAlertMessage ("Terrain file written, starting download...");
-                IXfer xfer = m_scene.RequestModuleInterface<IXfer> ();
-                if (xfer != null)
-                    xfer.AddNewFile ("terrain.raw", bdata);
+                FileStream input = null;
+                try {
+                    input = new FileStream (Util.dataDir () + "/terrain.raw", FileMode.Open);
+                    byte [] bdata = new byte [input.Length];
+                    input.Read (bdata, 0, (int)input.Length);
+                    input.Close ();
+                
+                    remote_client.SendAlertMessage ("Terrain file written, starting download...");
+                    IXfer xfer = m_scene.RequestModuleInterface<IXfer> ();
+                    if (xfer != null)
+                        xfer.AddNewFile ("terrain.raw", bdata);
+                } catch {
+                    if (input != null)
+                        input.Close ();
+                }
 
                 // Tell client about it
                 MainConsole.Instance.Warn ("[Estate Manager]: Sending Terrain to " + remote_client.Name);
@@ -758,8 +763,7 @@ namespace WhiteCore.Modules.Estate
                 billableFactor = m_scene.RegionInfo.EstateSettings.BillableFactor,
                 estateID = m_scene.RegionInfo.EstateSettings.EstateID,
                 maxAgents = (byte)m_scene.RegionInfo.RegionSettings.AgentLimit,
-                objectBonusFactor =
-                                                           (float)m_scene.RegionInfo.RegionSettings.ObjectBonus,
+                objectBonusFactor = (float)m_scene.RegionInfo.RegionSettings.ObjectBonus,
                 parentEstateID = m_scene.RegionInfo.EstateSettings.ParentEstateID,
                 pricePerMeter = m_scene.RegionInfo.EstateSettings.PricePerMeter,
                 redirectGridX = 0,
@@ -767,13 +771,10 @@ namespace WhiteCore.Modules.Estate
                 regionFlags = GetRegionFlags (),
                 simAccess = m_scene.RegionInfo.AccessLevel,
                 sunHour = (float)m_scene.RegionInfo.RegionSettings.SunPosition,
-                terrainLowerLimit =
-                                                           (float)m_scene.RegionInfo.RegionSettings.TerrainLowerLimit,
-                terrainRaiseLimit =
-                                                           (float)m_scene.RegionInfo.RegionSettings.TerrainRaiseLimit,
+                terrainLowerLimit = (float)m_scene.RegionInfo.RegionSettings.TerrainLowerLimit,
+                terrainRaiseLimit = (float)m_scene.RegionInfo.RegionSettings.TerrainRaiseLimit,
                 useEstateSun = m_scene.RegionInfo.RegionSettings.UseEstateSun,
-                waterHeight =
-                                                           (float)m_scene.RegionInfo.RegionSettings.WaterHeight,
+                waterHeight = (float)m_scene.RegionInfo.RegionSettings.WaterHeight,
                 simName = m_scene.RegionInfo.RegionName,
                 regionType = m_scene.RegionInfo.RegionType
                 //regionTerrain = m_scene.RegionInfo.RegionTerrain
