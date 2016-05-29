@@ -74,18 +74,14 @@ namespace WhiteCore.Modules.Profiles
         public void Initialise (IConfigSource config)
         {
             IConfig profileConfig = config.Configs ["Profile"];
-            if (profileConfig != null)
-            {
-            	if (profileConfig.GetString ("ProfileModule", Name) == Name)
-            	{
-            		m_ProfileEnabled = true;
-            		MainConsole.Instance.Info ("[Profile] Profile Services are enabled");
-            	}
-            }
-            else
-            {
-            	m_ProfileEnabled = false;
-            	MainConsole.Instance.Info ("[Profile] Not configured, disabling");
+            if (profileConfig != null) {
+                if (profileConfig.GetString ("ProfileModule", Name) == Name) {
+                    m_ProfileEnabled = true;
+                    MainConsole.Instance.Info ("[Profile] Profile Services are enabled");
+                }
+            } else {
+                m_ProfileEnabled = false;
+                MainConsole.Instance.Info ("[Profile] Not configured, disabling");
             }
         }
 
@@ -121,8 +117,7 @@ namespace WhiteCore.Modules.Profiles
             m_friendsModule = scene.RequestModuleInterface<IFriendsModule> ();
         }
 
-        public Type ReplaceableInterface
-        {
+        public Type ReplaceableInterface {
             get { return null; }
         }
 
@@ -130,8 +125,7 @@ namespace WhiteCore.Modules.Profiles
         {
         }
 
-        public string Name
-        {
+        public string Name {
             get { return "ProfileModule"; }
         }
 
@@ -205,7 +199,7 @@ namespace WhiteCore.Modules.Profiles
 
         #region Classifieds
 
-        public void HandleAvatarClassifiedsRequest (Object sender, string method, List<String> args)
+        public void HandleAvatarClassifiedsRequest (object sender, string method, List<string> args)
         {
             if (!(sender is IClientAPI))
                 return;
@@ -214,7 +208,7 @@ namespace WhiteCore.Modules.Profiles
             UUID requestedUUID = new UUID (args [0]);
 
             Dictionary<UUID, string> classifieds = new Dictionary<UUID, string> ();
-            foreach (Classified classified in ProfileFrontend.GetClassifieds(requestedUUID))
+            foreach (Classified classified in ProfileFrontend.GetClassifieds (requestedUUID))
                 classifieds.Add (classified.ClassifiedUUID, classified.Name);
 
             remoteClient.SendAvatarClassifiedReply (requestedUUID, classifieds);
@@ -243,20 +237,17 @@ namespace WhiteCore.Modules.Profiles
 
             if (p == null)
                 return; //Just fail
-            
+
             IScheduledMoneyModule scheduledMoneyModule = p.Scene.RequestModuleInterface<IScheduledMoneyModule> ();
             IMoneyModule moneyModule = p.Scene.RequestModuleInterface<IMoneyModule> ();
             Classified classcheck = ProfileFrontend.GetClassified (queryClassifiedID);
-            if (((queryclassifiedFlags & 32) != 32) && moneyModule != null)
-            {
+            if (((queryclassifiedFlags & 32) != 32) && moneyModule != null) {
                 //Single week
-                if (!moneyModule.Charge (remoteClient.AgentId, queryclassifiedPrice, "Add Classified", TransactionType.ClassifiedCharge))
-                {
+                if (!moneyModule.Charge (remoteClient.AgentId, queryclassifiedPrice, "Add Classified", TransactionType.ClassifiedCharge)) {
                     remoteClient.SendAlertMessage ("You do not have enough money to create this classified.");
                     return;
                 }
-            } else if (scheduledMoneyModule != null)
-            {
+            } else if (scheduledMoneyModule != null) {
                 //Auto-renew
                 if (classcheck != null)
                     scheduledMoneyModule.RemoveFromScheduledCharge ("[Classified: " + queryClassifiedID + "]");
@@ -269,8 +260,7 @@ namespace WhiteCore.Modules.Profiles
                                 "[Classified: " + queryClassifiedID + "]",                      // scheduler identifier
                                 true,                                                           // charger immediately
                                 false);                                                         // run once
-                if (!payOK)
-                {
+                if (!payOK) {
                     remoteClient.SendAlertMessage ("You do not have enough money to create this classified.");
                     return;
                 }
@@ -290,13 +280,10 @@ namespace WhiteCore.Modules.Profiles
 
             UUID parceluuid = p.CurrentParcelUUID;
             string parcelname = "Unknown";
-            IParcelManagementModule parcelManagement =
-                remoteClient.Scene.RequestModuleInterface<IParcelManagementModule> ();
-            if (parcelManagement != null)
-            {
+            IParcelManagementModule parcelManagement = remoteClient.Scene.RequestModuleInterface<IParcelManagementModule> ();
+            if (parcelManagement != null) {
                 ILandObject parcel = parcelManagement.GetLandObject (p.AbsolutePosition.X, p.AbsolutePosition.Y);
-                if (parcel != null)
-                {
+                if (parcel != null) {
                     parcelname = parcel.LandData.Name;
                     parceluuid = parcel.LandData.GlobalID;
                 }
@@ -331,12 +318,13 @@ namespace WhiteCore.Modules.Profiles
         public void ClassifiedDelete (UUID queryClassifiedID, IClientAPI remoteClient)
         {
             Classified classcheck = ProfileFrontend.GetClassified (queryClassifiedID);
-            if (classcheck.CreatorUUID == remoteClient.AgentId)
-            {
+            if (classcheck == null)
+                return;
+
+            if (classcheck.CreatorUUID == remoteClient.AgentId) {
                 ProfileFrontend.RemoveClassified (queryClassifiedID);
                 IScheduledMoneyModule scheduledMoneyModule = remoteClient.Scene.RequestModuleInterface<IScheduledMoneyModule> ();
-                if (scheduledMoneyModule != null && classcheck != null && ((classcheck.ClassifiedFlags & 32) == 32))
-                {
+                if (scheduledMoneyModule != null && ((classcheck.ClassifiedFlags & 32) == 32)) {
                     //Remove auto-renew
                     scheduledMoneyModule.RemoveFromScheduledCharge ("[Classified: " + queryClassifiedID + "]");
                 }
@@ -345,30 +333,30 @@ namespace WhiteCore.Modules.Profiles
 
         void moneyModule_OnUserDidNotPay (UUID agentID, string identifier, string paymentTextThatFailed)
         {
-            if (identifier.StartsWith ("Classified"))
-            {
+            if (identifier.StartsWith ("Classified", StringComparison.Ordinal)) {
                 Classified classcheck = ProfileFrontend.GetClassified (UUID.Parse (identifier.Replace ("Classified", "")));
-                ProfileFrontend.RemoveClassified (classcheck.ClassifiedUUID);
-                IScheduledMoneyModule scheduledMoneyModule = m_Scene.RequestModuleInterface<IScheduledMoneyModule> ();
-                if (scheduledMoneyModule != null && classcheck != null && ((classcheck.ClassifiedFlags & 32) == 32))
-                {
-                    //Remove auto-renew
-                    scheduledMoneyModule.RemoveFromScheduledCharge ("[Classified: " + classcheck.ClassifiedUUID + "]");
+                if (classcheck != null) {
+                    ProfileFrontend.RemoveClassified (classcheck.ClassifiedUUID);
+                    IScheduledMoneyModule scheduledMoneyModule = m_Scene.RequestModuleInterface<IScheduledMoneyModule> ();
+                    if (scheduledMoneyModule != null && ((classcheck.ClassifiedFlags & 32) == 32)) {
+                        //Remove auto-renew
+                        scheduledMoneyModule.RemoveFromScheduledCharge ("[Classified: " + classcheck.ClassifiedUUID + "]");
+                    }
                 }
             }
         }
 
         public void GodClassifiedDelete (UUID queryClassifiedID, IClientAPI remoteClient)
         {
-            if (remoteClient.Scene.Permissions.IsGod (remoteClient.AgentId))
-            {
+            if (remoteClient.Scene.Permissions.IsGod (remoteClient.AgentId)) {
                 Classified classcheck = ProfileFrontend.GetClassified (queryClassifiedID);
-                ProfileFrontend.RemoveClassified (queryClassifiedID);
-                IScheduledMoneyModule scheduledMoneyModule = remoteClient.Scene.RequestModuleInterface<IScheduledMoneyModule> ();
-                if (scheduledMoneyModule != null && classcheck != null && ((classcheck.ClassifiedFlags & 32) == 32))
-                {
-                    //Remove auto-renew
-                    scheduledMoneyModule.RemoveFromScheduledCharge ("[Classified: " + queryClassifiedID + "]");
+                if (classcheck != null) {
+                    ProfileFrontend.RemoveClassified (queryClassifiedID);
+                    IScheduledMoneyModule scheduledMoneyModule = remoteClient.Scene.RequestModuleInterface<IScheduledMoneyModule> ();
+                    if (scheduledMoneyModule != null && ((classcheck.ClassifiedFlags & 32) == 32)) {
+                        //Remove auto-renew
+                        scheduledMoneyModule.RemoveFromScheduledCharge ("[Classified: " + queryClassifiedID + "]");
+                    }
                 }
             }
         }
@@ -377,7 +365,7 @@ namespace WhiteCore.Modules.Profiles
 
         #region Picks
 
-        public void HandleAvatarPicksRequest (Object sender, string method, List<String> args)
+        public void HandleAvatarPicksRequest (object sender, string method, List<string> args)
         {
             if (!(sender is IClientAPI))
                 return;
@@ -390,7 +378,7 @@ namespace WhiteCore.Modules.Profiles
             remoteClient.SendAvatarPicksReply (requestedUUID, picks);
         }
 
-        public void HandlePickInfoRequest (Object sender, string method, List<String> args)
+        public void HandlePickInfoRequest (object sender, string method, List<string> args)
         {
             if (!(sender is IClientAPI))
                 return;
@@ -400,10 +388,11 @@ namespace WhiteCore.Modules.Profiles
 
             ProfilePickInfo pick = ProfileFrontend.GetPick (PickUUID);
             if (pick != null)
-                remoteClient.SendPickInfoReply (pick.PickUUID, pick.CreatorUUID, pick.TopPick == 1 ? true : false,
+                remoteClient.SendPickInfoReply (
+                    pick.PickUUID, pick.CreatorUUID, (pick.TopPick == 1),
                     pick.ParcelUUID, pick.Name, pick.Description, pick.SnapshotUUID,
                     pick.User, pick.OriginalName, pick.SimName, pick.GlobalPos,
-                    pick.SortOrder, pick.Enabled == 1 ? true : false);
+                    pick.SortOrder, (pick.Enabled == 1));
         }
 
         public void PickInfoUpdate (IClientAPI remoteClient, UUID pickID, UUID creatorID, bool topPick, string name,
@@ -419,13 +408,12 @@ namespace WhiteCore.Modules.Profiles
 
             IParcelManagementModule parcelManagement =
                 remoteClient.Scene.RequestModuleInterface<IParcelManagementModule> ();
-            if (parcelManagement != null)
-            {
-                ILandObject targetlandObj = parcelManagement.GetLandObject (pos_global.X / Constants.RegionSize,
-                                                pos_global.Y / Constants.RegionSize);
+            if (parcelManagement != null) {
+                ILandObject targetlandObj = parcelManagement.GetLandObject (
+                    pos_global.X / Constants.RegionSize,
+                    pos_global.Y / Constants.RegionSize);
 
-                if (targetlandObj != null)
-                {
+                if (targetlandObj != null) {
                     UserAccount parcelOwner =
                         remoteClient.Scene.UserAccountService.GetUserAccount (remoteClient.AllScopeIDs,
                             targetlandObj.LandData.OwnerID);
@@ -459,8 +447,7 @@ namespace WhiteCore.Modules.Profiles
 
         public void GodPickDelete (IClientAPI remoteClient, UUID AgentID, UUID queryPickID, UUID queryID)
         {
-            if (remoteClient.Scene.Permissions.IsGod (remoteClient.AgentId))
-            {
+            if (remoteClient.Scene.Permissions.IsGod (remoteClient.AgentId)) {
                 ProfileFrontend.RemovePick (queryPickID);
             }
         }
@@ -474,10 +461,9 @@ namespace WhiteCore.Modules.Profiles
 
         #region Notes
 
-        public void HandleAvatarNotesRequest (Object sender, string method, List<String> args)
+        public void HandleAvatarNotesRequest (object sender, string method, List<string> args)
         {
-            if (!(sender is IClientAPI))
-            {
+            if (!(sender is IClientAPI)) {
                 MainConsole.Instance.Debug ("sender isn't IClientAPI");
                 return;
             }
@@ -501,7 +487,7 @@ namespace WhiteCore.Modules.Profiles
             IUserProfileInfo UPI = ProfileFrontend.GetUserProfile (remoteClient.AgentId);
             if (UPI == null)
                 return;
-            String notes = queryNotes;
+            string notes = queryNotes;
 
             UPI.Notes [queryTargetID.ToString ()] = OSD.FromString (notes);
 
@@ -522,8 +508,7 @@ namespace WhiteCore.Modules.Profiles
                 UPI.Interests.WantToText != wanttext ||
                 UPI.Interests.CanDoMask != skillsmask ||
                 UPI.Interests.CanDoText != skillstext ||
-                UPI.Interests.Languages != languages)
-            {
+                UPI.Interests.Languages != languages) {
                 UPI.Interests.WantToMask = wantmask;
                 UPI.Interests.WantToText = wanttext;
                 UPI.Interests.CanDoMask = skillsmask;
@@ -542,14 +527,14 @@ namespace WhiteCore.Modules.Profiles
             IUserProfileInfo UPI = ProfileFrontend.GetUserProfile (target);
             UserAccount TargetAccount =
                 remoteClient.Scene.UserAccountService.GetUserAccount (remoteClient.AllScopeIDs, target);
-            if (UPI == null || TargetAccount == null)
-            {
+            if (UPI == null || TargetAccount == null) {
                 remoteClient.SendAvatarProperties (target, "",
                     Util.ToDateTime (0).ToString ("M/d/yyyy", CultureInfo.InvariantCulture),
-                    new Byte[1], "", 0,
+                    new byte [1], "", 0,
                     UUID.Zero, UUID.Zero, "", UUID.Zero);
                 return;
             }
+
             UserInfo TargetPI =
                 remoteClient.Scene.RequestModuleInterface<IAgentInfoService> ().GetUserInfo (target.ToString ());
             //See if all can see this person
@@ -559,27 +544,27 @@ namespace WhiteCore.Modules.Profiles
 
             if (IsFriendOfUser (remoteClient.AgentId, target))
                 SendProfile (remoteClient, UPI, TargetAccount, agentOnline);
-            else
-            {
+            else {
                 //Not a friend, so send the first page only and if they are online
 
-                Byte[] charterMember;
-                if (UPI.MembershipGroup == "")
-                {
-                    charterMember = new Byte[1];
+                byte [] charterMember;
+                if (UPI.MembershipGroup == "") {
+                    charterMember = new byte [1];
                     if (TargetAccount != null)
-                        charterMember [0] = (Byte)((TargetAccount.UserFlags & Constants.USER_FLAG_CHARTERMEMBER) >> 8);     // CharterMember == 0xf00
-                } else
-                {
+                        charterMember [0] = (byte)((TargetAccount.UserFlags & Constants.USER_FLAG_CHARTERMEMBER) >> 8);     // CharterMember == 0xf00
+                } else {
                     charterMember = Utils.StringToBytes (UPI.MembershipGroup);
                 }
-                remoteClient.SendAvatarProperties (UPI.PrincipalID, UPI.AboutText,
-                    Util.ToDateTime (UPI.Created).ToString ("M/d/yyyy",
-                        CultureInfo.InvariantCulture),
+                remoteClient.SendAvatarProperties (
+                    UPI.PrincipalID, UPI.AboutText,
+                    Util.ToDateTime (UPI.Created).ToString ("M/d/yyyy", CultureInfo.InvariantCulture),
                     charterMember, UPI.FirstLifeAboutText,
-                    (uint)
-                                                  (TargetAccount == null ? 0 : TargetAccount.UserFlags & agentOnline),
-                    UPI.FirstLifeImage, UPI.Image, UPI.WebURL, UPI.Partner);
+                    (uint)TargetAccount.UserFlags & agentOnline,
+                    UPI.FirstLifeImage,
+                    UPI.Image,
+                    UPI.WebURL,
+                    UPI.Partner
+                );
             }
         }
 
@@ -596,8 +581,7 @@ namespace WhiteCore.Modules.Profiles
                 UPI.FirstLifeAboutText != FLAboutText ||
                 UPI.WebURL != WebProfileURL ||
                 UPI.AllowPublish != allowpublish ||
-                UPI.MaturePublish != maturepublish)
-            {
+                UPI.MaturePublish != maturepublish) {
                 UPI.Image = ImageID;
                 UPI.FirstLifeImage = FLImageID;
                 UPI.AboutText = AboutText;
@@ -620,24 +604,22 @@ namespace WhiteCore.Modules.Profiles
         void SendProfile (IClientAPI remoteClient, IUserProfileInfo Profile, UserAccount account,
                          uint agentOnline)
         {
-            Byte[] charterMember;
-            if (Profile.MembershipGroup == "")
-            {
-                charterMember = new Byte[1];
+            byte [] charterMember;
+            if (Profile.MembershipGroup == "") {
+                charterMember = new byte [1];
                 if (account != null)
-                    charterMember [0] = (Byte)((account.UserFlags & Constants.USER_FLAG_CHARTERMEMBER) >> 8);   // CharterMember == 0xf00
+                    charterMember [0] = (byte)((account.UserFlags & Constants.USER_FLAG_CHARTERMEMBER) >> 8);   // CharterMember == 0xf00
             } else
                 charterMember = Utils.StringToBytes (Profile.MembershipGroup);
-            
+
             // 19-06-2015 Fly-Man-
             // When charterMember set this character └ the viewer recognizes it
             // as a Grid Master. Not sure what we want to do with that in WhiteCore
             //
             // Perhaps a talk with viewer devs to allow more options for this
             //
-            
-            if (Utilities.IsSystemUser (Profile.PrincipalID))
-            {
+
+            if (Utilities.IsSystemUser (Profile.PrincipalID)) {
                 charterMember = Utils.StringToBytes ("WhiteCore System User");
             }
 
@@ -647,25 +629,25 @@ namespace WhiteCore.Modules.Profiles
 
             uint flags = Convert.ToUInt32 (Profile.AllowPublish) + Convert.ToUInt32 (Profile.MaturePublish) +
                          membershipGroupINT + agentOnline + (uint)(account != null ? account.UserFlags : 0);
-            
+
             remoteClient.SendAvatarInterestsReply (
-                Profile.PrincipalID, 
+                Profile.PrincipalID,
                 Convert.ToUInt32 (Profile.Interests.WantToMask),
                 Profile.Interests.WantToText,
                 Convert.ToUInt32 (Profile.Interests.CanDoMask),
                 Profile.Interests.CanDoText,
                 Profile.Interests.Languages
             );
-            
+
             remoteClient.SendAvatarProperties (
                 Profile.PrincipalID,
                 Profile.AboutText,
                 Util.ToDateTime (Profile.Created).ToString ("M/d/yyyy", CultureInfo.InvariantCulture),
-                charterMember, 
-                Profile.FirstLifeAboutText, 
+                charterMember,
+                Profile.FirstLifeAboutText,
                 flags,
                 Profile.FirstLifeImage,
-                Profile.Image, 
+                Profile.Image,
                 Profile.WebURL,
                 Profile.Partner
             );
@@ -682,7 +664,8 @@ namespace WhiteCore.Modules.Profiles
                 return;
             UserAccount account = remoteClient.Scene.UserAccountService.GetUserAccount (remoteClient.AllScopeIDs,
                                       remoteClient.AgentId);
-            remoteClient.SendUserInfoReply (UPI.Visible, UPI.IMViaEmail, account.Email);
+            if (account != null)
+                remoteClient.SendUserInfoReply (UPI.IMViaEmail, UPI.Visible, account.Email);
         }
 
         public void UpdateUserPreferences (bool imViaEmail, bool visible, IClientAPI remoteClient)
@@ -702,24 +685,19 @@ namespace WhiteCore.Modules.Profiles
         public void TrackAgent (IClientAPI client, UUID hunter, UUID target)
         {
             bool isFriend = IsFriendOfUser (target, hunter);
-            if (isFriend)
-            {
+            if (isFriend) {
                 IFriendsModule module = m_Scene.RequestModuleInterface<IFriendsModule> ();
-                if (module != null)
-                {
+                if (module != null) {
                     int perms = module.GetFriendPerms (hunter, target);
-                    if ((perms & (int)FriendRights.CanSeeOnMap) == (int)FriendRights.CanSeeOnMap)
-                    {
+                    if ((perms & (int)FriendRights.CanSeeOnMap) == (int)FriendRights.CanSeeOnMap) {
                         UserInfo GUI =
                             client.Scene.RequestModuleInterface<IAgentInfoService> ().GetUserInfo (target.ToString ());
-                        if (GUI != null && GUI.IsOnline)
-                        {
+                        if (GUI != null && GUI.IsOnline) {
                             GridRegion region = m_Scene.GridService.GetRegionByUUID (
                                                     client.AllScopeIDs, GUI.CurrentRegionID);
 
                             client.SendScriptTeleportRequest (client.Name, region.RegionName,
-                                GUI.CurrentPosition,
-                                GUI.CurrentLookAt);
+                                GUI.CurrentPosition, GUI.CurrentLookAt);
                         }
                     }
                 }
