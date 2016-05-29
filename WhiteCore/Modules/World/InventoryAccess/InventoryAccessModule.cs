@@ -551,6 +551,9 @@ namespace WhiteCore.Modules.InventoryAccess
         {
             XmlDocument doc;
             item = m_scene.InventoryService.GetItem (remoteClient.AgentId, itemID);
+            if (item == null)       // does no exist??
+                return null;
+            
             UUID itemId = UUID.Zero;
 
             // If we have permission to copy then link the rezzed object back to the user inventory
@@ -656,20 +659,27 @@ namespace WhiteCore.Modules.InventoryAccess
                 remoteClient.SendAlertMessage ("Failed to find the item you requested.");
                 return false;
             }
+            rezAsset.Dispose ();    // not needed anymore
 
             UUID itemId = UUID.Zero;
             bool success = false;
             XmlDocument doc;
 
-            ISceneEntity group = CreateObjectFromInventory (item, remoteClient, itemID, out doc);
-            bool attachment = (group.IsAttachment || (group.RootChild.Shape.PCode == 9 && group.RootChild.Shape.State != 0));
+            ISceneEntity assetGroup = CreateObjectFromInventory (item, remoteClient, itemID, out doc);
+            if (assetGroup == null) {
+                remoteClient.SendAlertMessage (" Uunable to create inventory object");
+                return false;
+            }
+            
+            bool attachment = (assetGroup.IsAttachment ||
+                               (assetGroup.RootChild.Shape.PCode == 9 && assetGroup.RootChild.Shape.State != 0));
 
             if (attachment) {
                 remoteClient.SendAlertMessage ("Inventory item is an attachment, use Wear or Add instead.");
                 return false;
             }
 
-            Vector3 pos = group.AbsolutePosition;                                       // maybe .RootPart.GroupPositionNoUpdate;
+            Vector3 pos = assetGroup.AbsolutePosition;                                       // maybe .RootPart.GroupPositionNoUpdate;
             var rezGroup = RezObject (remoteClient, itemID,
                 pos, Vector3.Zero, UUID.Zero, 1, true, false, false, UUID.Zero);        // NOTE May need taskID from calling llclientview
 
@@ -792,7 +802,7 @@ namespace WhiteCore.Modules.InventoryAccess
                                                                             rezSelected, item, rayTargetID,
                                                                             bypassRayCast, rayEndIsIntersection, rayEnd,
                                                                             rayStart, bRayEndIsIntersection);
-                if (multiGroups.Count != 0)
+                if (multiGroups != null && multiGroups.Count != 0)
                     return multiGroups [0];
                 remoteClient.SendAlertMessage ("Failed to rez the item you requested.");
                 return null;
