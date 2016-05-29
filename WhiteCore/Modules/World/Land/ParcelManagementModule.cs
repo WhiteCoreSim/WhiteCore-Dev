@@ -466,13 +466,16 @@ namespace WhiteCore.Modules.Land
         /// </summary>
         public void ClearAllParcels ()
         {
+            //Remove all the land objects in the sim and add a blank, full sim land object set to public
+            List<ILandObject> parcels;
             lock (m_landListLock) {
-                //Remove all the land objects in the sim and add a blank, full sim land object set to public
-                List<ILandObject> parcels = new List<ILandObject> (m_landList.Values);
-                foreach (ILandObject land in parcels) {
-                    m_scene.EventManager.TriggerLandObjectRemoved (land.LandData.RegionID, land.LandData.GlobalID);
-                }
+                parcels = new List<ILandObject> (m_landList.Values);
+            }
 
+            foreach (ILandObject land in parcels) 
+                m_scene.EventManager.TriggerLandObjectRemoved (land.LandData.RegionID, land.LandData.GlobalID);
+
+            lock (m_landListLock) {
                 m_landList.Clear ();
                 m_lastLandLocalID = START_LAND_LOCAL_ID;
             }

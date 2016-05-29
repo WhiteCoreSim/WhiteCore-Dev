@@ -633,10 +633,11 @@ namespace WhiteCore.Modules.Monitoring
             public void SetUpdateMS (int ms)
             {
                 statsUpdatesEveryMS = ms;
-                statsUpdateFactor = (statsUpdatesEveryMS / 1000);
 
-                lock (m_report)
+                lock (m_report) {
+                    statsUpdateFactor = (statsUpdatesEveryMS / 1000);
                     m_report.Interval = statsUpdatesEveryMS;
+                }
             }
 
             #endregion

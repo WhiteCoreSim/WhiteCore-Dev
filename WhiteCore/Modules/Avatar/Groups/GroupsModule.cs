@@ -724,7 +724,7 @@ namespace WhiteCore.Modules.Groups
                         MemberShipCost = ". To join, you must pay " + groupInfo.MembershipFee + ".";
                     }
                     msg.Message = string.Format ("{0} has invited you to join " + groupInfo.GroupName + MemberShipCost,
-                                                remoteClient.Name);
+                                                agentName);
                     msg.Dialog = (byte)InstantMessageDialog.GroupInvitation;
                     msg.FromGroup = true;
                     msg.Offline = 0;
@@ -1499,16 +1499,14 @@ namespace WhiteCore.Modules.Groups
 
                             GroupMembershipData gmd =
                                 AttemptFindGroupMembershipData (inviteInfo.AgentID, inviteInfo.AgentID, inviteInfo.GroupID);
-                            if (gmd != null)
+                            if (gmd != null) {
                                 m_cachedGroupTitles [inviteInfo.AgentID] = gmd;
-                            else
-                                m_cachedGroupTitles [inviteInfo.AgentID] = new GroupMembershipData ();
-                            m_cachedGroupMemberships.Remove (GetRequestingAgentID (remoteClient));
-                            RemoveFromGroupPowersCache (inviteInfo.AgentID, inviteInfo.GroupID);
-                            UpdateAllClientsWithGroupInfo (inviteInfo.AgentID, gmd.GroupTitle);
-                            if (remoteClient != null)
-                                SendAgentGroupDataUpdate (remoteClient);
-
+                                m_cachedGroupMemberships.Remove (GetRequestingAgentID (remoteClient));
+                                RemoveFromGroupPowersCache (inviteInfo.AgentID, inviteInfo.GroupID);
+                                UpdateAllClientsWithGroupInfo (inviteInfo.AgentID, gmd.GroupTitle);
+                                if (remoteClient != null)
+                                    SendAgentGroupDataUpdate (remoteClient);
+                            }
                             m_groupData.RemoveAgentInvite (GetRequestingAgentID (remoteClient), inviteID);
                         }
                     }
@@ -1594,15 +1592,16 @@ namespace WhiteCore.Modules.Groups
             case (byte)InstantMessageDialog.GroupNoticeInventoryDeclined:
                 break;
             case (byte)InstantMessageDialog.GroupNoticeInventoryAccepted: {
-                    UUID FolderID = new UUID (im.BinaryBucket, 0);
-                    remoteClient.Scene.InventoryService.GiveInventoryItemAsync (
-                        remoteClient.AgentId,
-                        UUID.Zero,
-                        im.SessionID,
-                        FolderID,
-                        false,
-                        (item) => {if (item != null) remoteClient.SendBulkUpdateInventory(item);}
-                    );
+                    if (remoteClient != null) {
+                        UUID FolderID = new UUID (im.BinaryBucket, 0);
+                        remoteClient.Scene.InventoryService.GiveInventoryItemAsync (
+                            remoteClient.AgentId,
+                            UUID.Zero,
+                            im.SessionID,
+                            FolderID,
+                            false,
+                            (item) => { if (item != null) remoteClient.SendBulkUpdateInventory (item);}
+                        );}
                 }
                 break;
             case 210: {
