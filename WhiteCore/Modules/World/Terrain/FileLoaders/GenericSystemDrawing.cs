@@ -78,7 +78,7 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
             int yoffset = h*(fileHeight - y);
 
             MainConsole.Instance.DebugFormat(
-                "[TERRAIN]: Loading tile {0},{1} (offset {2},{3}) from tile-map size of {4},{5}",
+                "[Terrain]: Loading tile {0},{1} (offset {2},{3}) from tile-map size of {4},{5}",
                 x, y, xoffset, yoffset, fileWidth, fileHeight);
 
             Rectangle tileRect = new Rectangle(xoffset, yoffset, w, h);
@@ -93,7 +93,7 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
                 // This error WILL appear if the number of Y tiles is too high because of how it works from the bottom up
                 // However, this still spits out ugly unreferenced object errors on the console
                 MainConsole.Instance.ErrorFormat(
-                    "[TERRAIN]: Couldn't load tile {0},{1} (from bitmap coordinates {2},{3}). Number of specified Y tiles may be too high: {4}",
+                    "[Terrain]: Couldn't load tile {0},{1} (from bitmap coordinates {2},{3}). Number of specified Y tiles may be too high: {4}",
                     x, y, xoffset, yoffset, e);
             }
             finally
@@ -118,8 +118,8 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
         public virtual void SaveFile(string filename, ITerrainChannel map)
         {
             Bitmap colours = CreateGrayscaleBitmapFromMap(map);
-
             colours.Save(filename, ImageFormat.Png);
+            colours.Dispose ();
         }
 
         /// <summary>
@@ -130,8 +130,8 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
         public virtual void SaveStream(Stream stream, ITerrainChannel map)
         {
             Bitmap colours = CreateGrayscaleBitmapFromMap(map);
-
             colours.Save(stream, ImageFormat.Png);
+            colours.Dispose ();
         }
 
         #endregion
@@ -149,6 +149,7 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
                     retval[x, y] = bitmap.GetPixel(x, bitmap.Height - y - 1).GetBrightness()*128;
             }
 
+            bitmap.Dispose ();  // not needed anymore
             return retval;
         }
 
@@ -226,6 +227,8 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
                         bmp.SetPixel(x, map.Height - y - 1, colours[colorindex]);
                 }
             }
+
+            gradientmapLd.Dispose ();
             return bmp;
         }
     }

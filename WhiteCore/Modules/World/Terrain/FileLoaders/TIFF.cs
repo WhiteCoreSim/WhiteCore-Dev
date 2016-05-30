@@ -33,13 +33,13 @@ using WhiteCore.Framework.Modules;
 
 namespace WhiteCore.Modules.Terrain.FileLoaders
 {
-    internal class TIFF : GenericSystemDrawing
+    class TIFF : GenericSystemDrawing
     {
 		public override void SaveFile(string filename, ITerrainChannel map)
         {
             Bitmap colours = CreateGrayscaleBitmapFromMap(map);
-
             colours.Save(filename, ImageFormat.Tiff);
+            colours.Dispose ();
         }
 
         /// <summary>
@@ -50,8 +50,8 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
         public override void SaveStream(Stream stream, ITerrainChannel map)
         {
             Bitmap colours = CreateGrayscaleBitmapFromMap(map);
-
             colours.Save(stream, ImageFormat.Tiff);
+            colours.Dispose ();
         }
 
         public override string ToString()

@@ -26,8 +26,8 @@
  */
 
 using System;
-using WhiteCore.Framework.Modules;
 using OpenMetaverse;
+using WhiteCore.Framework.Modules;
 
 
 namespace WhiteCore.Modules.Terrain.PaintBrushes
@@ -36,14 +36,14 @@ namespace WhiteCore.Modules.Terrain.PaintBrushes
     {
         #region ITerrainPaintableEffect Members
 
-        public void PaintEffect(ITerrainChannel map, UUID userID, float rx, float ry, float rz, float strength,
+        public void PaintEffect (ITerrainChannel map, UUID userID, float rx, float ry, float rz, float strength,
                                 float duration, float BrushSize)
         {
             int x;
-            int xFrom = (int) (rx - BrushSize + 0.5);
-            int xTo = (int) (rx + BrushSize + 0.5) + 1;
-            int yFrom = (int) (ry - BrushSize + 0.5);
-            int yTo = (int) (ry + BrushSize + 0.5) + 1;
+            int xFrom = (int)(rx - BrushSize + 0.5);
+            int xTo = (int)(rx + BrushSize + 0.5) + 1;
+            int yFrom = (int)(ry - BrushSize + 0.5);
+            int yTo = (int)(ry + BrushSize + 0.5) + 1;
 
             if (xFrom < 0)
                 xFrom = 0;
@@ -57,19 +57,17 @@ namespace WhiteCore.Modules.Terrain.PaintBrushes
             if (yTo > map.Height)
                 yTo = map.Height;
 
-            for (x = xFrom; x < xTo; x++)
-            {
+            for (x = xFrom; x < xTo; x++) {
                 int y;
-                for (y = yFrom; y < yTo; y++)
-                {
-                    if (!map.Scene.Permissions.CanTerraformLand(userID, new Vector3(x, y, 0)))
+                for (y = yFrom; y < yTo; y++) {
+                    if (!map.Scene.Permissions.CanTerraformLand (userID, new Vector3 (x, y, 0)))
                         continue;
 
                     // Calculate a cos-sphere and add it to the heightmap
-                    double r = Math.Sqrt((x - rx)*(x - rx) + ((y - ry)*(y - ry)));
-                    double z = Math.Cos(r*Math.PI/(BrushSize*2));
+                    double r = Math.Sqrt ((x - rx) * (x - rx) + ((y - ry) * (y - ry)));
+                    double z = Math.Cos (r * Math.PI / (BrushSize * 2));
                     if (z > 0.0)
-                        map[x, y] += (float) (z*duration);
+                        map [x, y] += (float)(z * duration);
                 }
             }
         }

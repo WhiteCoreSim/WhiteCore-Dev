@@ -25,28 +25,28 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
-using OpenMetaverse;
 
 
 namespace WhiteCore.Modules.Terrain.PaintBrushes
 {
     public class RevertSphere : ITerrainPaintableEffect
     {
-        private readonly ITerrainModule m_module;
+        readonly ITerrainModule m_module;
 
-        public RevertSphere(ITerrainModule module)
+        public RevertSphere (ITerrainModule module)
         {
             m_module = module;
         }
 
         #region ITerrainPaintableEffect Members
 
-        public void PaintEffect(ITerrainChannel map, UUID userID, float rx, float ry, float rz, float strength,
+        public void PaintEffect (ITerrainChannel map, UUID userID, float rx, float ry, float rz, float strength,
                                 float duration, float BrushSize)
         {
-            strength = TerrainUtil.MetersToSphericalStrength(BrushSize);
+            strength = TerrainUtil.MetersToSphericalStrength (BrushSize);
             duration = 0.03f; //MCP Should be read from ini file
 
             if (duration > 1.0)
@@ -54,32 +54,28 @@ namespace WhiteCore.Modules.Terrain.PaintBrushes
             if (duration < 0)
                 return;
 
-            int n = (int) (BrushSize + 0.5f);
-            int zx = (int) (rx + 0.5);
-            int zy = (int) (ry + 0.5);
+            int n = (int)(BrushSize + 0.5f);
+            int zx = (int)(rx + 0.5);
+            int zy = (int)(ry + 0.5);
 
             int dx;
-            for (dx = -n; dx <= n; dx++)
-            {
+            for (dx = -n; dx <= n; dx++) {
                 int dy;
-                for (dy = -n; dy <= n; dy++)
-                {
+                for (dy = -n; dy <= n; dy++) {
                     int x = zx + dx;
                     int y = zy + dy;
-                    if (x >= 0 && y >= 0 && x < map.Width && y < map.Height)
-                    {
-                        if (!map.Scene.Permissions.CanTerraformLand(userID, new Vector3(x, y, 0)))
+                    if (x >= 0 && y >= 0 && x < map.Width && y < map.Height) {
+                        if (!map.Scene.Permissions.CanTerraformLand (userID, new Vector3 (x, y, 0)))
                             continue;
 
                         // Calculate a sphere and add it to the heightmap
                         float z = 0;
                         if (duration < 4.0)
-                            z = TerrainUtil.SphericalFactor(x, y, rx, ry, strength)*duration*0.25f;
+                            z = TerrainUtil.SphericalFactor (x, y, rx, ry, strength) * duration * 0.25f;
 
-                        if (z > 0.0)
-                        {
-                            float s = strength*0.025f;
-                            map[x, y] = (map[x, y]*(1 - s)) + (m_module.TerrainRevertMap[x, y]*s);
+                        if (z > 0.0) {
+                            float s = strength * 0.025f;
+                            map [x, y] = (map [x, y] * (1 - s)) + (m_module.TerrainRevertMap [x, y] * s);
                         }
                     }
                 }

@@ -25,9 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
-using OpenMetaverse;
 
 
 namespace WhiteCore.Modules.Terrain.PaintBrushes
@@ -36,56 +36,58 @@ namespace WhiteCore.Modules.Terrain.PaintBrushes
     {
         #region ITerrainPaintableEffect Members
 
-        public void PaintEffect(ITerrainChannel map, UUID userID, float rx, float ry, float rz, float strength,
+        public void PaintEffect (ITerrainChannel map, UUID userID, float rx, float ry, float rz, float strength,
                                 float duration, float BrushSize)
         {
-            int n = (int) (BrushSize + 0.5f);
+            int n = (int)(BrushSize + 0.5f);
             if (BrushSize > 6) //If it gets too high, it will start roughening at an ever increasing rate when held down
                 BrushSize = 6;
-            strength = TerrainUtil.MetersToSphericalStrength(BrushSize);
+            strength = TerrainUtil.MetersToSphericalStrength (BrushSize);
 
             float area = BrushSize;
-            float step = BrushSize/4;
+            float step = BrushSize / 4;
             duration *= 0.03f; //MCP Should be read from ini file
 
-            int zx = (int) (rx + 0.5);
-            int zy = (int) (ry + 0.5);
+            int zx = (int)(rx + 0.5);
+            int zy = (int)(ry + 0.5);
 
             int dx;
-            for (dx = -n; dx <= n; dx++)
-            {
+            for (dx = -n; dx <= n; dx++) {
                 int dy;
-                for (dy = -n; dy <= n; dy++)
-                {
+                for (dy = -n; dy <= n; dy++) {
                     int x = zx + dx;
                     int y = zy + dy;
-                    if (x >= 0 && y >= 0 && x < map.Width && y < map.Height)
-                    {
-                        if (!map.Scene.Permissions.CanTerraformLand(userID, new Vector3(x, y, 0)))
+                    if (x >= 0 && y >= 0 && x < map.Width && y < map.Height) {
+                        if (!map.Scene.Permissions.CanTerraformLand (userID, new Vector3 (x, y, 0)))
                             continue;
 
-                        float z = TerrainUtil.SphericalFactor(x, y, rx, ry, strength)/(strength);
+                        float z = TerrainUtil.SphericalFactor (x, y, rx, ry, strength) / (strength);
                         if (z > 0) // add in non-zero amount
                         {
                             float average = 0;
                             int avgsteps = 0;
 
                             float nn;
-                            for (nn = 0 - area; nn < area; nn += step)
-                            {
+                            for (nn = 0 - area; nn < area; nn += step) {
                                 float l;
-                                for (l = 0 - area; l < area; l += step)
-                                {
+                                for (l = 0 - area; l < area; l += step) {
                                     avgsteps++;
-                                    average += TerrainUtil.GetBilinearInterpolate(x + nn, y + l, map);
+                                    average += TerrainUtil.GetBilinearInterpolate (x + nn, y + l, map);
                                 }
                             }
+
+                            float avg;
+                            if (avgsteps > 0)
+                                avg = average / avgsteps;
+                            else
+                                avg = 0f;
+
                             float da = z;
-                            float a = (map[x, y] - (average/avgsteps))*da;
-                            float newz = map[x, y] - (a*duration);
+                            float a = (map [x, y] - avg) * da;
+                            float newz = map [x, y] - (a * duration);
 
                             if (newz > 0.0)
-                                map[x, y] = newz;
+                                map [x, y] = newz;
                         }
                     }
                 }

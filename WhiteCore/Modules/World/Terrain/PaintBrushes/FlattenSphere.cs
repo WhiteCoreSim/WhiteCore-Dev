@@ -26,9 +26,9 @@
  */
 
 using System;
+using OpenMetaverse;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
-using OpenMetaverse;
 
 
 namespace WhiteCore.Modules.Terrain.PaintBrushes
