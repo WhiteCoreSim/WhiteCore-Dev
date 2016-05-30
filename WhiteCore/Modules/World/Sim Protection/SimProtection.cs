@@ -26,12 +26,12 @@
  */
 
 
+using System;
+using System.Timers;
+using Nini.Config;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
-using Nini.Config;
-using System;
-using System.Timers;
 
 namespace WhiteCore.Modules.SimProtection
 {
@@ -46,7 +46,7 @@ namespace WhiteCore.Modules.SimProtection
         protected bool AllowDisableScripts = true;
 
         //Normal Sim FPS
-        private float BaseRateFramesPerSecond = 45;
+        float BaseRateFramesPerSecond = 45;
         // When BaseRate / current FPS is less than this percent, begin shutting down services
         protected DateTime DisabledPhysicsStartTime = DateTime.MinValue;
         protected DateTime DisabledScriptStartTime = DateTime.MinValue;
@@ -66,80 +66,76 @@ namespace WhiteCore.Modules.SimProtection
 
         #region INonSharedRegionModule
 
-        public void Initialise(IConfigSource source)
+        public void Initialise (IConfigSource source)
         {
-            if (!source.Configs.Contains("Protection"))
+            if (!source.Configs.Contains ("Protection"))
                 return;
-            TimeAfterToReenableScripts = TimeAfterToReenablePhysics*2;
-            IConfig config = source.Configs["Protection"];
-            m_Enabled = config.GetBoolean("Enabled", false);
-            BaseRateFramesPerSecond = config.GetFloat("BaseRateFramesPerSecond", 45);
-            PercentToBeginShutDownOfServices = config.GetFloat("PercentToBeginShutDownOfServices", 50);
-            TimeAfterToReenablePhysics = config.GetFloat("TimeAfterToReenablePhysics", 20);
-            AllowDisableScripts = config.GetBoolean("AllowDisableScripts", true);
-            AllowDisablePhysics = config.GetBoolean("AllowDisablePhysics", true);
-            KillSimOnZeroFPS = config.GetBoolean("RestartSimIfZeroFPS", true);
-            MinutesBeforeZeroFPSKills = config.GetFloat("TimeBeforeZeroFPSKills", 1);
-            TimeBetweenChecks = config.GetFloat("TimeBetweenChecks", 1);
+            TimeAfterToReenableScripts = TimeAfterToReenablePhysics * 2;
+            IConfig config = source.Configs ["Protection"];
+            m_Enabled = config.GetBoolean ("Enabled", false);
+            BaseRateFramesPerSecond = config.GetFloat ("BaseRateFramesPerSecond", 45);
+            PercentToBeginShutDownOfServices = config.GetFloat ("PercentToBeginShutDownOfServices", 50);
+            TimeAfterToReenablePhysics = config.GetFloat ("TimeAfterToReenablePhysics", 20);
+            AllowDisableScripts = config.GetBoolean ("AllowDisableScripts", true);
+            AllowDisablePhysics = config.GetBoolean ("AllowDisablePhysics", true);
+            KillSimOnZeroFPS = config.GetBoolean ("RestartSimIfZeroFPS", true);
+            MinutesBeforeZeroFPSKills = config.GetFloat ("TimeBeforeZeroFPSKills", 1);
+            TimeBetweenChecks = config.GetFloat ("TimeBetweenChecks", 1);
         }
 
-        public void Close()
+        public void Close ()
         {
         }
 
-        public void AddRegion(IScene scene)
+        public void AddRegion (IScene scene)
         {
         }
 
-        public string Name
-        {
+        public string Name {
             get { return "SimProtection"; }
         }
 
-        public Type ReplaceableInterface
-        {
+        public Type ReplaceableInterface {
             get { return null; }
         }
 
-        public void RemoveRegion(IScene scene)
+        public void RemoveRegion (IScene scene)
         {
             if (!m_Enabled)
                 return;
-            TimerToCheckHeartbeat.Stop();
+            TimerToCheckHeartbeat.Stop ();
         }
 
-        public void RegionLoaded(IScene scene)
+        public void RegionLoaded (IScene scene)
         {
             if (!m_Enabled)
                 return;
             m_scene = scene;
             BaseRateFramesPerSecond = scene.BaseSimFPS;
-            m_statsReporter = m_scene.RequestModuleInterface<IMonitorModule>().GetMonitor<ISimFrameMonitor>(m_scene);
-            if (m_statsReporter == null)
-            {
-                MainConsole.Instance.Warn("[SimProtection]: Cannot be used as SimStatsReporter does not exist.");
+            m_statsReporter = m_scene.RequestModuleInterface<IMonitorModule> ().GetMonitor<ISimFrameMonitor> (m_scene);
+            if (m_statsReporter == null) {
+                MainConsole.Instance.Warn ("[SimProtection]: Cannot be used as SimStatsReporter does not exist.");
                 return;
             }
-            TimerToCheckHeartbeat = new Timer {Interval = TimeBetweenChecks*1000*60};
+            TimerToCheckHeartbeat = new Timer { Interval = TimeBetweenChecks * 1000 * 60 };
             //minutes
             TimerToCheckHeartbeat.Elapsed += OnCheck;
-            TimerToCheckHeartbeat.Start();
+            TimerToCheckHeartbeat.Start ();
         }
 
         #endregion
 
         #region Protection
 
-        private void OnCheck(object sender, ElapsedEventArgs e)
+        void OnCheck (object sender, ElapsedEventArgs e)
         {
-            IEstateModule mod = m_scene.RequestModuleInterface<IEstateModule>();
+            IEstateModule mod = m_scene.RequestModuleInterface<IEstateModule> ();
             if (AllowDisableScripts &&
-                m_statsReporter.LastReportedSimFPS < BaseRateFramesPerSecond*(PercentToBeginShutDownOfServices/100) &&
-                m_statsReporter.LastReportedSimFPS != 0)
-            {
+                m_statsReporter.LastReportedSimFPS < BaseRateFramesPerSecond * (PercentToBeginShutDownOfServices / 100) &&
+                m_statsReporter.LastReportedSimFPS > 0) {
                 //Less than the percent to start shutting things down... Lets kill some stuff
                 if (mod != null)
-                    mod.SetSceneCoreDebug(false, m_scene.RegionInfo.RegionSettings.DisableCollisions,
+                    mod.SetSceneCoreDebug (false, m_scene.RegionInfo.RegionSettings.DisableCollisions,
                                           m_scene.RegionInfo.RegionSettings.DisablePhysics);
                 //These are opposite of what you want the value to be... go figure
                 DisabledScriptStartTime = DateTime.Now;
@@ -148,35 +144,32 @@ namespace WhiteCore.Modules.SimProtection
                 AllowDisableScripts &&
                 SimZeroFPSStartTime != DateTime.MinValue &&
                 //This makes sure we don't screw up the setting if the user disabled physics manually
-                SimZeroFPSStartTime.AddSeconds(TimeAfterToReenableScripts) > DateTime.Now)
-            {
+                SimZeroFPSStartTime.AddSeconds (TimeAfterToReenableScripts) > DateTime.Now) {
                 DisabledScriptStartTime = DateTime.MinValue;
                 if (mod != null)
-                    mod.SetSceneCoreDebug(true, m_scene.RegionInfo.RegionSettings.DisableCollisions,
+                    mod.SetSceneCoreDebug (true, m_scene.RegionInfo.RegionSettings.DisableCollisions,
                                           m_scene.RegionInfo.RegionSettings.DisablePhysics);
                 //These are opposite of what you want the value to be... go figure
             }
 
-            if (m_statsReporter.LastReportedSimFPS == 0 && KillSimOnZeroFPS)
-            {
+            if (m_statsReporter.LastReportedSimFPS <= 0.5f && KillSimOnZeroFPS) {
                 if (SimZeroFPSStartTime == DateTime.MinValue)
                     SimZeroFPSStartTime = DateTime.Now;
-                if (SimZeroFPSStartTime.AddMinutes(MinutesBeforeZeroFPSKills) > SimZeroFPSStartTime)
-                    MainConsole.Instance.RunCommand("shutdown");
-            }
-            else if (SimZeroFPSStartTime != DateTime.MinValue)
+                if (SimZeroFPSStartTime.AddMinutes (MinutesBeforeZeroFPSKills) > SimZeroFPSStartTime)
+                    MainConsole.Instance.RunCommand ("shutdown");
+            } else
                 SimZeroFPSStartTime = DateTime.MinValue;
 
-            float[] stats = m_scene.RequestModuleInterface<IMonitorModule>().GetRegionStats(m_scene);
-            if (stats[2] /*PhysicsFPS*/< BaseRateFramesPerSecond*(PercentToBeginShutDownOfServices/100) &&
-                stats[2] != 0 &&
+            float [] stats = m_scene.RequestModuleInterface<IMonitorModule> ().GetRegionStats (m_scene);
+            if (stats [2] /*PhysicsFPS*/< BaseRateFramesPerSecond * (PercentToBeginShutDownOfServices / 100) &&
+                stats [2] > 0.5 &&
                 AllowDisablePhysics &&
                 !m_scene.RegionInfo.RegionSettings.DisablePhysics)
-                //Don't re-disable physics again, physics will be frozen at the last FPS
+            //Don't re-disable physics again, physics will be frozen at the last FPS
             {
                 DisabledPhysicsStartTime = DateTime.Now;
                 if (mod != null)
-                    mod.SetSceneCoreDebug(m_scene.RegionInfo.RegionSettings.DisableScripts,
+                    mod.SetSceneCoreDebug (m_scene.RegionInfo.RegionSettings.DisableScripts,
                                           m_scene.RegionInfo.RegionSettings.DisableCollisions, false);
                 //These are opposite of what you want the value to be... go figure
             }
@@ -185,11 +178,10 @@ namespace WhiteCore.Modules.SimProtection
                 AllowDisablePhysics &&
                 DisabledPhysicsStartTime != DateTime.MinValue &&
                 //This makes sure we don't screw up the setting if the user disabled physics manually
-                DisabledPhysicsStartTime.AddSeconds(TimeAfterToReenablePhysics) > DateTime.Now)
-            {
+                DisabledPhysicsStartTime.AddSeconds (TimeAfterToReenablePhysics) > DateTime.Now) {
                 DisabledPhysicsStartTime = DateTime.MinValue;
                 if (mod != null)
-                    mod.SetSceneCoreDebug(m_scene.RegionInfo.RegionSettings.DisableScripts,
+                    mod.SetSceneCoreDebug (m_scene.RegionInfo.RegionSettings.DisableScripts,
                                           m_scene.RegionInfo.RegionSettings.DisableCollisions, true);
                 //These are opposite of what you want the value to be... go figure
             }

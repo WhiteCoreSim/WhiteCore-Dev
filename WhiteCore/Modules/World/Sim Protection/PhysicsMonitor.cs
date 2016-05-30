@@ -66,8 +66,8 @@ namespace WhiteCore.Modules.SimProtection
 
         public bool m_collectingStats;
 
-        protected Dictionary<UUID, PhysicsStats> m_currentPhysicsStats = new Dictionary<UUID, PhysicsStats>();
-        protected Dictionary<UUID, PhysicsStats> m_lastPhysicsStats = new Dictionary<UUID, PhysicsStats>();
+        protected Dictionary<UUID, PhysicsStats> m_currentPhysicsStats = new Dictionary<UUID, PhysicsStats> ();
+        protected Dictionary<UUID, PhysicsStats> m_lastPhysicsStats = new Dictionary<UUID, PhysicsStats> ();
         protected DateTime m_lastUpdated = DateTime.Now;
         protected Timer m_physicsStatTimer;
         protected IScene m_Scene;
@@ -77,31 +77,26 @@ namespace WhiteCore.Modules.SimProtection
 
         #region IPhysicsMonitor Members
 
-        public virtual void AddPhysicsStats(UUID RegionID, PhysicsScene scene)
+        public virtual void AddPhysicsStats (UUID RegionID, PhysicsScene scene)
         {
             if (!m_collectingStats)
                 return;
-            lock (m_currentPhysicsStats)
-            {
+            lock (m_currentPhysicsStats) {
                 PhysicsStats stats;
-                if (!m_currentPhysicsStats.TryGetValue(RegionID, out stats))
-                {
-                    stats = new PhysicsStats
-                                {
-                                    StatAvatarUpdatePosAndVelocity = scene.StatAvatarUpdatePosAndVelocity,
-                                    StatCollisionOptimizedTime = scene.StatCollisionOptimizedTime,
-                                    StatPhysicsMoveTime = scene.StatPhysicsMoveTime,
-                                    StatPhysicsTaintTime = scene.StatPhysicsTaintTime,
-                                    StatPrimUpdatePosAndVelocity = scene.StatPrimUpdatePosAndVelocity,
-                                    StatSendCollisionsTime = scene.StatSendCollisionsTime,
-                                    StatUnlockedArea = scene.StatUnlockedArea,
-                                    StatFindContactsTime = scene.StatFindContactsTime,
-                                    StatContactLoopTime = scene.StatContactLoopTime,
-                                    StatCollisionAccountingTime = scene.StatCollisionAccountingTime
-                                };
-                }
-                else
-                {
+                if (!m_currentPhysicsStats.TryGetValue (RegionID, out stats)) {
+                    stats = new PhysicsStats {
+                        StatAvatarUpdatePosAndVelocity = scene.StatAvatarUpdatePosAndVelocity,
+                        StatCollisionOptimizedTime = scene.StatCollisionOptimizedTime,
+                        StatPhysicsMoveTime = scene.StatPhysicsMoveTime,
+                        StatPhysicsTaintTime = scene.StatPhysicsTaintTime,
+                        StatPrimUpdatePosAndVelocity = scene.StatPrimUpdatePosAndVelocity,
+                        StatSendCollisionsTime = scene.StatSendCollisionsTime,
+                        StatUnlockedArea = scene.StatUnlockedArea,
+                        StatFindContactsTime = scene.StatFindContactsTime,
+                        StatContactLoopTime = scene.StatContactLoopTime,
+                        StatCollisionAccountingTime = scene.StatCollisionAccountingTime
+                    };
+                } else {
                     stats.StatAvatarUpdatePosAndVelocity += scene.StatAvatarUpdatePosAndVelocity;
                     stats.StatCollisionOptimizedTime += scene.StatCollisionOptimizedTime;
                     stats.StatPhysicsMoveTime += scene.StatPhysicsMoveTime;
@@ -114,44 +109,43 @@ namespace WhiteCore.Modules.SimProtection
                     stats.StatCollisionAccountingTime += scene.StatCollisionAccountingTime;
                 }
 
-                m_currentPhysicsStats[RegionID] = stats;
+                m_currentPhysicsStats [RegionID] = stats;
 
-                PhysicsStats ProfilerStats = new PhysicsStats
-                                                 {
-                                                     StatAvatarUpdatePosAndVelocity =
+                PhysicsStats ProfilerStats = new PhysicsStats {
+                    StatAvatarUpdatePosAndVelocity =
                                                          scene.StatAvatarUpdatePosAndVelocity,
-                                                     StatCollisionOptimizedTime = scene.StatCollisionOptimizedTime,
-                                                     StatPhysicsMoveTime = scene.StatPhysicsMoveTime,
-                                                     StatPhysicsTaintTime = scene.StatPhysicsTaintTime,
-                                                     StatPrimUpdatePosAndVelocity = scene.StatPrimUpdatePosAndVelocity,
-                                                     StatSendCollisionsTime = scene.StatSendCollisionsTime,
-                                                     StatUnlockedArea = scene.StatUnlockedArea,
-                                                     StatFindContactsTime = scene.StatFindContactsTime,
-                                                     StatContactLoopTime = scene.StatContactLoopTime,
-                                                     StatCollisionAccountingTime = scene.StatCollisionAccountingTime
-                                                 };
+                    StatCollisionOptimizedTime = scene.StatCollisionOptimizedTime,
+                    StatPhysicsMoveTime = scene.StatPhysicsMoveTime,
+                    StatPhysicsTaintTime = scene.StatPhysicsTaintTime,
+                    StatPrimUpdatePosAndVelocity = scene.StatPrimUpdatePosAndVelocity,
+                    StatSendCollisionsTime = scene.StatSendCollisionsTime,
+                    StatUnlockedArea = scene.StatUnlockedArea,
+                    StatFindContactsTime = scene.StatFindContactsTime,
+                    StatContactLoopTime = scene.StatContactLoopTime,
+                    StatCollisionAccountingTime = scene.StatCollisionAccountingTime
+                };
 
                 //Add the stats to the profiler
-                Profiler p = ProfilerManager.GetProfiler();
-                p.AddStat("CurrentStatAvatarUpdatePosAndVelocity " + RegionID,
+                Profiler p = ProfilerManager.GetProfiler ();
+                p.AddStat ("CurrentStatAvatarUpdatePosAndVelocity " + RegionID,
                           ProfilerStats.StatAvatarUpdatePosAndVelocity);
-                p.AddStat("CurrentStatCollisionOptimizedTime " + RegionID,
+                p.AddStat ("CurrentStatCollisionOptimizedTime " + RegionID,
                           ProfilerStats.StatCollisionOptimizedTime);
-                p.AddStat("CurrentStatPhysicsMoveTime " + RegionID,
+                p.AddStat ("CurrentStatPhysicsMoveTime " + RegionID,
                           ProfilerStats.StatPhysicsMoveTime);
-                p.AddStat("CurrentStatPhysicsTaintTime " + RegionID,
+                p.AddStat ("CurrentStatPhysicsTaintTime " + RegionID,
                           ProfilerStats.StatPhysicsTaintTime);
-                p.AddStat("CurrentStatPrimUpdatePosAndVelocity " + RegionID,
+                p.AddStat ("CurrentStatPrimUpdatePosAndVelocity " + RegionID,
                           ProfilerStats.StatPrimUpdatePosAndVelocity);
-                p.AddStat("CurrentStatSendCollisionsTime " + RegionID,
+                p.AddStat ("CurrentStatSendCollisionsTime " + RegionID,
                           ProfilerStats.StatSendCollisionsTime);
-                p.AddStat("CurrentStatUnlockedArea " + RegionID,
+                p.AddStat ("CurrentStatUnlockedArea " + RegionID,
                           ProfilerStats.StatUnlockedArea);
-                p.AddStat("CurrentStatFindContactsTime " + RegionID,
+                p.AddStat ("CurrentStatFindContactsTime " + RegionID,
                           ProfilerStats.StatFindContactsTime);
-                p.AddStat("CurrentStatContactLoopTime " + RegionID,
+                p.AddStat ("CurrentStatContactLoopTime " + RegionID,
                           ProfilerStats.StatContactLoopTime);
-                p.AddStat("CurrentStatCollisionAccountingTime " + RegionID,
+                p.AddStat ("CurrentStatCollisionAccountingTime " + RegionID,
                           ProfilerStats.StatCollisionAccountingTime);
             }
         }
@@ -160,72 +154,67 @@ namespace WhiteCore.Modules.SimProtection
 
         #region INonSharedRegionModule Members
 
-        public string Name
-        {
+        public string Name {
             get { return "PhysicsMonitor"; }
         }
 
-        public Type ReplaceableInterface
-        {
+        public Type ReplaceableInterface {
             get { return null; }
         }
 
-        public void Initialise(IConfigSource source)
+        public void Initialise (IConfigSource source)
         {
-            if (m_physicsStatTimer == null)
-            {
-                m_physicsStatTimer = new Timer {Interval = 10000};
+            if (m_physicsStatTimer == null) {
+                m_physicsStatTimer = new Timer { Interval = 10000 };
                 m_physicsStatTimer.Elapsed += PhysicsStatsHeartbeat;
             }
         }
 
-        public void Close()
+        public void Close ()
         {
         }
 
-        public void AddRegion(IScene scene)
+        public void AddRegion (IScene scene)
         {
             m_Scene = scene;
-            scene.RegisterModuleInterface<IPhysicsMonitor>(this);
-            if (MainConsole.Instance != null)
-            {
-                MainConsole.Instance.Commands.AddCommand(
-                    "physics stats", 
-                    "physics stats", 
-                    "physics stats <region>", 
+            scene.RegisterModuleInterface<IPhysicsMonitor> (this);
+            if (MainConsole.Instance != null) {
+                MainConsole.Instance.Commands.AddCommand (
+                    "physics stats",
+                    "physics stats",
+                    "physics stats <region>",
                     PhysicsStatsCommand, true, false);
-                
-            	MainConsole.Instance.Commands.AddCommand(
-                    "physics profiler", 
-                    "physics profiler", 
-                    "physics profiler <region>", 
+
+                MainConsole.Instance.Commands.AddCommand (
+                    "physics profiler",
+                    "physics profiler",
+                    "physics profiler <region>",
                     PhysicsProfilerCommand, true, false);
-                
-            	MainConsole.Instance.Commands.AddCommand(
-                    "physics current stats", 
+
+                MainConsole.Instance.Commands.AddCommand (
+                    "physics current stats",
                     "physics current stats",
                     "physics current stats <region> NOTE: these are not calculated and are in milliseconds per unknown time",
                     CurrentPhysicsStatsCommand, true, false);
             }
         }
 
-        public void RemoveRegion(IScene scene)
+        public void RemoveRegion (IScene scene)
         {
             m_Scene = null;
-            scene.UnregisterModuleInterface<IPhysicsMonitor>(this);
+            scene.UnregisterModuleInterface<IPhysicsMonitor> (this);
         }
 
-        public void RegionLoaded(IScene scene)
+        public void RegionLoaded (IScene scene)
         {
         }
 
         #endregion
 
-        protected virtual void PhysicsStatsCommand(IScene scene, string[] cmd)
+        protected virtual void PhysicsStatsCommand (IScene scene, string [] cmd)
         {
-            if (cmd.Length < 3)
-            {   
-                if (m_Scene.RegionInfo.RegionName != cmd[2])
+            if (cmd.Length < 3) {
+                if (m_Scene.RegionInfo.RegionName != cmd [2])
                     return;
             }
 
@@ -233,26 +222,23 @@ namespace WhiteCore.Modules.SimProtection
             m_collectingStats = true;
             m_waitingForCollectionOfStats = 1;
             //Start the timer as well
-            m_physicsStatTimer.Start();
-            MainConsole.Instance.Info("Collecting Stats Now... Please wait...");
-            while (m_waitingForCollectionOfStats > 0)
-            {
-                Thread.Sleep(50);
+            m_physicsStatTimer.Start ();
+            MainConsole.Instance.Info ("Collecting Stats Now... Please wait...");
+            while (m_waitingForCollectionOfStats > 0) {
+                Thread.Sleep (50);
             }
 
             PhysicsStats stats = null;
-            while (stats == null)
-            {
-                m_lastPhysicsStats.TryGetValue(m_Scene.RegionInfo.RegionID, out stats);
+            while (stats == null) {
+                m_lastPhysicsStats.TryGetValue (m_Scene.RegionInfo.RegionID, out stats);
             }
-            DumpStatsToConsole(m_Scene, stats);
+            DumpStatsToConsole (m_Scene, stats);
         }
 
-        protected virtual void PhysicsProfilerCommand(IScene scene, string[] cmd)
+        protected virtual void PhysicsProfilerCommand (IScene scene, string [] cmd)
         {
-            if (cmd.Length == 3)
-            {
-                if (m_Scene.RegionInfo.RegionName != cmd[2])
+            if (cmd.Length == 3) {
+                if (m_Scene.RegionInfo.RegionName != cmd [2])
                     return;
             }
 
@@ -260,36 +246,31 @@ namespace WhiteCore.Modules.SimProtection
             m_collectingStats = true;
             m_waitingForCollectionOfStats = 1;
             //Start the timer as well
-            m_physicsStatTimer.Start();
-            MainConsole.Instance.Info("Collecting Stats Now... Please wait...");
-            while (m_waitingForCollectionOfStats > 0)
-            {
-                Thread.Sleep(50);
+            m_physicsStatTimer.Start ();
+            MainConsole.Instance.Info ("Collecting Stats Now... Please wait...");
+            while (m_waitingForCollectionOfStats > 0) {
+                Thread.Sleep (50);
             }
 
-            Thread thread = new Thread(StartThread);
-            thread.Start(new List<IScene>() {m_Scene});
+            Thread thread = new Thread (StartThread);
+            thread.Start (new List<IScene> () { m_Scene });
         }
 
-        void StartThread(object scenes)
+        void StartThread (object scenes)
         {
-            Culture.SetCurrentCulture();
-            try
-            {
-                List<IScene> scenesToRun = (List<IScene>) scenes;
-                Application.Run(new PhysicsProfilerForm(this, scenesToRun));
-            }
-            catch (Exception ex)
-            {
-                MainConsole.Instance.Warn("There was an error opening the form: " + ex);
+            Culture.SetCurrentCulture ();
+            try {
+                List<IScene> scenesToRun = (List<IScene>)scenes;
+                Application.Run (new PhysicsProfilerForm (this, scenesToRun));
+            } catch (Exception ex) {
+                MainConsole.Instance.Warn ("There was an error opening the form: " + ex);
             }
         }
 
-        protected virtual void CurrentPhysicsStatsCommand(IScene scene, string[] cmd)
+        protected virtual void CurrentPhysicsStatsCommand (IScene scene, string [] cmd)
         {
-            if (cmd.Length == 3)
-            {
-                if (m_Scene.RegionInfo.RegionName != cmd[2])
+            if (cmd.Length == 3) {
+                if (m_Scene.RegionInfo.RegionName != cmd [2])
                     return;
             }
 
@@ -297,84 +278,85 @@ namespace WhiteCore.Modules.SimProtection
             m_collectingStats = true;
             m_waitingForCollectionOfStats = 1;
             //Start the timer as well
-            m_physicsStatTimer.Start();
-            MainConsole.Instance.Info("Collecting Stats Now... Please wait...");
-            while (m_waitingForCollectionOfStats > 0)
-            {
-                Thread.Sleep(50);
+            m_physicsStatTimer.Start ();
+            MainConsole.Instance.Info ("Collecting Stats Now... Please wait...");
+            while (m_waitingForCollectionOfStats > 0) {
+                Thread.Sleep (50);
             }
 
             PhysicsStats stats = null;
-            while (stats == null)
-            {
-                m_currentPhysicsStats.TryGetValue(m_Scene.RegionInfo.RegionID, out stats);
+            while (stats == null) {
+                m_currentPhysicsStats.TryGetValue (m_Scene.RegionInfo.RegionID, out stats);
             }
-            DumpStatsToConsole(m_Scene, stats);
+            DumpStatsToConsole (m_Scene, stats);
         }
 
-        protected virtual void DumpStatsToConsole(IScene scene, PhysicsStats stats)
+        protected virtual void DumpStatsToConsole (IScene scene, PhysicsStats stats)
         {
-            MainConsole.Instance.Info("------  Physics Stats for region " + scene.RegionInfo.RegionName + "  ------");
-            MainConsole.Instance.Info("   All stats are in milliseconds spent per second.");
-            MainConsole.Instance.Info("   These are in the order they are run in the PhysicsScene.");
-            MainConsole.Instance.Info(" PhysicsTaintTime: " + stats.StatPhysicsTaintTime);
-            MainConsole.Instance.Info(" PhysicsMoveTime: " + stats.StatPhysicsMoveTime);
-            MainConsole.Instance.Info(" FindContactsTime: " + stats.StatFindContactsTime);
-            MainConsole.Instance.Info(" ContactLoopTime: " + stats.StatContactLoopTime);
-            MainConsole.Instance.Info(" CollisionAccountingTime: " + stats.StatCollisionAccountingTime);
-            MainConsole.Instance.Info(" CollisionOptimizedTime: " + stats.StatCollisionOptimizedTime);
-            MainConsole.Instance.Info(" SendCollisionsTime: " + stats.StatSendCollisionsTime);
-            MainConsole.Instance.Info(" AvatarUpdatePosAndVelocity: " + stats.StatAvatarUpdatePosAndVelocity);
-            MainConsole.Instance.Info(" PrimUpdatePosAndVelocity: " + stats.StatPrimUpdatePosAndVelocity);
-            MainConsole.Instance.Info(" UnlockedArea: " + stats.StatUnlockedArea);
-            MainConsole.Instance.Info("");
+            MainConsole.Instance.Info ("------  Physics Stats for region " + scene.RegionInfo.RegionName + "  ------");
+            MainConsole.Instance.Info ("   All stats are in milliseconds spent per second.");
+            MainConsole.Instance.Info ("   These are in the order they are run in the PhysicsScene.");
+
+            lock (m_currentPhysicsStats) {
+                MainConsole.Instance.Info (" PhysicsTaintTime: " + stats.StatPhysicsTaintTime);
+                MainConsole.Instance.Info (" PhysicsMoveTime: " + stats.StatPhysicsMoveTime);
+                MainConsole.Instance.Info (" FindContactsTime: " + stats.StatFindContactsTime);
+                MainConsole.Instance.Info (" ContactLoopTime: " + stats.StatContactLoopTime);
+                MainConsole.Instance.Info (" CollisionAccountingTime: " + stats.StatCollisionAccountingTime);
+                MainConsole.Instance.Info (" CollisionOptimizedTime: " + stats.StatCollisionOptimizedTime);
+                MainConsole.Instance.Info (" SendCollisionsTime: " + stats.StatSendCollisionsTime);
+                MainConsole.Instance.Info (" AvatarUpdatePosAndVelocity: " + stats.StatAvatarUpdatePosAndVelocity);
+                MainConsole.Instance.Info (" PrimUpdatePosAndVelocity: " + stats.StatPrimUpdatePosAndVelocity);
+                MainConsole.Instance.Info (" UnlockedArea: " + stats.StatUnlockedArea);
+            }
+            MainConsole.Instance.Info ("");
+
         }
 
-        protected virtual void PhysicsStatsHeartbeat(object sender, ElapsedEventArgs e)
+        protected virtual void PhysicsStatsHeartbeat (object sender, ElapsedEventArgs e)
         {
             if (!m_collectingStats || m_currentPhysicsStats.Count == 0)
                 return;
-            lock (m_currentPhysicsStats)
-            {
-                foreach (KeyValuePair<UUID, PhysicsStats> kvp in m_currentPhysicsStats)
-                {
+            
+            lock (m_currentPhysicsStats) {
+                foreach (KeyValuePair<UUID, PhysicsStats> kvp in m_currentPhysicsStats) {
                     //Save the stats in the last one so we can keep them for the console commands
                     //Divide by 10 so we get per second
-                    m_lastPhysicsStats[kvp.Key] = kvp.Value;
-                    m_lastPhysicsStats[kvp.Key].StatAvatarUpdatePosAndVelocity /= 10;
-                    m_lastPhysicsStats[kvp.Key].StatCollisionOptimizedTime /= 10;
-                    m_lastPhysicsStats[kvp.Key].StatPhysicsMoveTime /= 10;
-                    m_lastPhysicsStats[kvp.Key].StatPhysicsTaintTime /= 10;
-                    m_lastPhysicsStats[kvp.Key].StatPrimUpdatePosAndVelocity /= 10;
-                    m_lastPhysicsStats[kvp.Key].StatSendCollisionsTime /= 10;
-                    m_lastPhysicsStats[kvp.Key].StatUnlockedArea /= 10;
-                    m_lastPhysicsStats[kvp.Key].StatFindContactsTime /= 10;
-                    m_lastPhysicsStats[kvp.Key].StatContactLoopTime /= 10;
-                    m_lastPhysicsStats[kvp.Key].StatCollisionAccountingTime /= 10;
+                    m_lastPhysicsStats [kvp.Key] = kvp.Value;
+                    m_lastPhysicsStats [kvp.Key].StatAvatarUpdatePosAndVelocity /= 10;
+                    m_lastPhysicsStats [kvp.Key].StatCollisionOptimizedTime /= 10;
+                    m_lastPhysicsStats [kvp.Key].StatPhysicsMoveTime /= 10;
+                    m_lastPhysicsStats [kvp.Key].StatPhysicsTaintTime /= 10;
+                    m_lastPhysicsStats [kvp.Key].StatPrimUpdatePosAndVelocity /= 10;
+                    m_lastPhysicsStats [kvp.Key].StatSendCollisionsTime /= 10;
+                    m_lastPhysicsStats [kvp.Key].StatUnlockedArea /= 10;
+                    m_lastPhysicsStats [kvp.Key].StatFindContactsTime /= 10;
+                    m_lastPhysicsStats [kvp.Key].StatContactLoopTime /= 10;
+                    m_lastPhysicsStats [kvp.Key].StatCollisionAccountingTime /= 10;
                     //Add the stats to the profiler
-                    Profiler p = ProfilerManager.GetProfiler();
-                    p.AddStat("StatAvatarUpdatePosAndVelocity " + kvp.Key,
-                              m_lastPhysicsStats[kvp.Key].StatAvatarUpdatePosAndVelocity);
-                    p.AddStat("StatCollisionOptimizedTime " + kvp.Key,
-                              m_lastPhysicsStats[kvp.Key].StatCollisionOptimizedTime);
-                    p.AddStat("StatPhysicsMoveTime " + kvp.Key,
-                              m_lastPhysicsStats[kvp.Key].StatPhysicsMoveTime);
-                    p.AddStat("StatPhysicsTaintTime " + kvp.Key,
-                              m_lastPhysicsStats[kvp.Key].StatPhysicsTaintTime);
-                    p.AddStat("StatPrimUpdatePosAndVelocity " + kvp.Key,
-                              m_lastPhysicsStats[kvp.Key].StatPrimUpdatePosAndVelocity);
-                    p.AddStat("StatSendCollisionsTime " + kvp.Key,
-                              m_lastPhysicsStats[kvp.Key].StatSendCollisionsTime);
-                    p.AddStat("StatUnlockedArea " + kvp.Key,
-                              m_lastPhysicsStats[kvp.Key].StatUnlockedArea);
-                    p.AddStat("StatFindContactsTime " + kvp.Key,
-                              m_lastPhysicsStats[kvp.Key].StatFindContactsTime);
-                    p.AddStat("StatContactLoopTime " + kvp.Key,
-                              m_lastPhysicsStats[kvp.Key].StatContactLoopTime);
-                    p.AddStat("StatCollisionAccountingTime " + kvp.Key,
-                              m_lastPhysicsStats[kvp.Key].StatCollisionAccountingTime);
+                    Profiler p = ProfilerManager.GetProfiler ();
+                    p.AddStat ("StatAvatarUpdatePosAndVelocity " + kvp.Key,
+                              m_lastPhysicsStats [kvp.Key].StatAvatarUpdatePosAndVelocity);
+                    p.AddStat ("StatCollisionOptimizedTime " + kvp.Key,
+                              m_lastPhysicsStats [kvp.Key].StatCollisionOptimizedTime);
+                    p.AddStat ("StatPhysicsMoveTime " + kvp.Key,
+                              m_lastPhysicsStats [kvp.Key].StatPhysicsMoveTime);
+                    p.AddStat ("StatPhysicsTaintTime " + kvp.Key,
+                              m_lastPhysicsStats [kvp.Key].StatPhysicsTaintTime);
+                    p.AddStat ("StatPrimUpdatePosAndVelocity " + kvp.Key,
+                              m_lastPhysicsStats [kvp.Key].StatPrimUpdatePosAndVelocity);
+                    p.AddStat ("StatSendCollisionsTime " + kvp.Key,
+                              m_lastPhysicsStats [kvp.Key].StatSendCollisionsTime);
+                    p.AddStat ("StatUnlockedArea " + kvp.Key,
+                              m_lastPhysicsStats [kvp.Key].StatUnlockedArea);
+                    p.AddStat ("StatFindContactsTime " + kvp.Key,
+                              m_lastPhysicsStats [kvp.Key].StatFindContactsTime);
+                    p.AddStat ("StatContactLoopTime " + kvp.Key,
+                              m_lastPhysicsStats [kvp.Key].StatContactLoopTime);
+                    p.AddStat ("StatCollisionAccountingTime " + kvp.Key,
+                              m_lastPhysicsStats [kvp.Key].StatCollisionAccountingTime);
                 }
-                m_currentPhysicsStats.Clear();
+                m_currentPhysicsStats.Clear ();
             }
             m_lastUpdated = DateTime.Now;
             //If there are stats waiting, we just pulled them
