@@ -26,19 +26,19 @@
  */
 
 
-using WhiteCore.Framework.ClientInterfaces;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.PresenceInfo;
-using WhiteCore.Framework.SceneInfo;
-using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
+using WhiteCore.Framework.ClientInterfaces;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.PresenceInfo;
+using WhiteCore.Framework.SceneInfo;
+using WhiteCore.Framework.Utilities;
 
 /*****************************************************
  *
@@ -89,71 +89,66 @@ namespace WhiteCore.Modules.Scripting
 {
     public class WorldCommModule : INonSharedRegionModule, IWorldComm
     {
-        protected static Vector3 CenterOfRegion = new Vector3(128, 128, 20);
-        private readonly List<int> BlockedChannels = new List<int>();
-        private ListenerManager m_listenerManager;
-        private Queue m_pending;
-        private Queue m_pendingQ;
-        private int m_saydistance = 30;
-        private IScene m_scene;
-        private IScriptModule m_scriptModule;
-        private int m_shoutdistance = 100;
-        private int m_whisperdistance = 10;
+        protected static Vector3 CenterOfRegion = new Vector3 (128, 128, 20);
+        readonly List<int> BlockedChannels = new List<int> ();
+        ListenerManager m_listenerManager;
+        Queue m_pending;
+        Queue m_pendingQ;
+        int m_saydistance = 30;
+        IScene m_scene;
+        IScriptModule m_scriptModule;
+        int m_shoutdistance = 100;
+        int m_whisperdistance = 10;
 
         #region INonSharedRegionModule Members
 
-        public void Initialise(IConfigSource config)
+        public void Initialise (IConfigSource config)
         {
             // wrap this in a try block so that defaults will work if
             // the config file doesn't specify otherwise.
             int maxlisteners = 1000;
             int maxhandles = 64;
-            try
-            {
-                m_whisperdistance = config.Configs["WhiteCoreChat"].GetInt("whisper_distance", m_whisperdistance);
-                m_saydistance = config.Configs["WhiteCoreChat"].GetInt("say_distance", m_saydistance);
-                m_shoutdistance = config.Configs["WhiteCoreChat"].GetInt("shout_distance", m_shoutdistance);
-                maxlisteners = config.Configs["WhiteCoreChat"].GetInt("max_listens_per_region", maxlisteners);
-                maxhandles = config.Configs["WhiteCoreChat"].GetInt("max_listens_per_script", maxhandles);
-            }
-            catch (Exception)
-            {
+            try {
+                m_whisperdistance = config.Configs ["WhiteCoreChat"].GetInt ("whisper_distance", m_whisperdistance);
+                m_saydistance = config.Configs ["WhiteCoreChat"].GetInt ("say_distance", m_saydistance);
+                m_shoutdistance = config.Configs ["WhiteCoreChat"].GetInt ("shout_distance", m_shoutdistance);
+                maxlisteners = config.Configs ["WhiteCoreChat"].GetInt ("max_listens_per_region", maxlisteners);
+                maxhandles = config.Configs ["WhiteCoreChat"].GetInt ("max_listens_per_script", maxhandles);
+            } catch (Exception) {
             }
             if (maxlisteners < 1) maxlisteners = int.MaxValue;
             if (maxhandles < 1) maxhandles = int.MaxValue;
-            m_listenerManager = new ListenerManager(maxlisteners, maxhandles);
-            m_pendingQ = new Queue();
-            m_pending = Queue.Synchronized(m_pendingQ);
+            m_listenerManager = new ListenerManager (maxlisteners, maxhandles);
+            m_pendingQ = new Queue ();
+            m_pending = Queue.Synchronized (m_pendingQ);
         }
 
-        public void AddRegion(IScene scene)
+        public void AddRegion (IScene scene)
         {
             m_scene = scene;
-            m_scene.RegisterModuleInterface<IWorldComm>(this);
+            m_scene.RegisterModuleInterface<IWorldComm> (this);
             m_scene.EventManager.OnChatFromClient += DeliverClientMessage;
             m_scene.EventManager.OnChatBroadcast += DeliverClientMessage;
         }
 
-        public void RemoveRegion(IScene scene)
+        public void RemoveRegion (IScene scene)
         {
         }
 
-        public void RegionLoaded(IScene scene)
+        public void RegionLoaded (IScene scene)
         {
-            m_scriptModule = scene.RequestModuleInterface<IScriptModule>();
+            m_scriptModule = scene.RequestModuleInterface<IScriptModule> ();
         }
 
-        public Type ReplaceableInterface
-        {
+        public Type ReplaceableInterface {
             get { return null; }
         }
 
-        public void Close()
+        public void Close ()
         {
         }
 
-        public string Name
-        {
+        public string Name {
             get { return "WorldCommModule"; }
         }
 
@@ -161,18 +156,18 @@ namespace WhiteCore.Modules.Scripting
 
         #region IWorldComm Members
 
-        public void AddBlockedChannel(int channel)
+        public void AddBlockedChannel (int channel)
         {
             //Make sure that the cmd handler thread is running
-            m_scriptModule.PokeThreads(UUID.Zero);
-            if (!BlockedChannels.Contains(channel))
-                BlockedChannels.Add(channel);
+            m_scriptModule.PokeThreads (UUID.Zero);
+            if (!BlockedChannels.Contains (channel))
+                BlockedChannels.Add (channel);
         }
 
-        public void RemoveBlockedChannel(int channel)
+        public void RemoveBlockedChannel (int channel)
         {
-            if (BlockedChannels.Contains(channel))
-                BlockedChannels.Remove(channel);
+            if (BlockedChannels.Contains (channel))
+                BlockedChannels.Remove (channel);
         }
 
         /// <summary>
@@ -188,11 +183,11 @@ namespace WhiteCore.Modules.Scripting
         /// <param name="id">key to filter on (user given, could be totally faked)</param>
         /// <param name="msg">msg to filter on</param>
         /// <returns>number of the scripts handle</returns>
-        public int Listen(UUID itemID, UUID hostID, int channel, string name, UUID id, string msg, int regexBitfield)
+        public int Listen (UUID itemID, UUID hostID, int channel, string name, UUID id, string msg, int regexBitfield)
         {
             //Make sure that the cmd handler thread is running
-            m_scriptModule.PokeThreads(itemID);
-            return m_listenerManager.AddListener(itemID, hostID, channel, name, id, msg, 0);
+            m_scriptModule.PokeThreads (itemID);
+            return m_listenerManager.AddListener (itemID, hostID, channel, name, id, msg, 0);
         }
 
         /// <summary>
@@ -202,14 +197,14 @@ namespace WhiteCore.Modules.Scripting
         /// <param name="itemID">UUID of the script engine</param>
         /// <param name="handle">handle returned by Listen()</param>
         /// <param name="active">temp. activate or deactivate the Listen()</param>
-        public void ListenControl(UUID itemID, int handle, int active)
+        public void ListenControl (UUID itemID, int handle, int active)
         {
             //Make sure that the cmd handler thread is running
-            m_scriptModule.PokeThreads(itemID);
+            m_scriptModule.PokeThreads (itemID);
             if (active == 1)
-                m_listenerManager.Activate(itemID, handle);
+                m_listenerManager.Activate (itemID, handle);
             else if (active == 0)
-                m_listenerManager.Dectivate(itemID, handle);
+                m_listenerManager.Dectivate (itemID, handle);
         }
 
         /// <summary>
@@ -217,11 +212,11 @@ namespace WhiteCore.Modules.Scripting
         /// </summary>
         /// <param name="itemID">UUID of the script engine</param>
         /// <param name="handle">handle returned by Listen()</param>
-        public void ListenRemove(UUID itemID, int handle)
+        public void ListenRemove (UUID itemID, int handle)
         {
             //Make sure that the cmd handler thread is running
-            m_scriptModule.PokeThreads(itemID);
-            m_listenerManager.Remove(itemID, handle);
+            m_scriptModule.PokeThreads (itemID);
+            m_listenerManager.Remove (itemID, handle);
         }
 
         /// <summary>
@@ -229,93 +224,92 @@ namespace WhiteCore.Modules.Scripting
         ///     (script engine)
         /// </summary>
         /// <param name="itemID">UUID of the script engine</param>
-        public void DeleteListener(UUID itemID)
+        public void DeleteListener (UUID itemID)
         {
             //Make sure that the cmd handler thread is running
-            m_scriptModule.PokeThreads(itemID);
-            m_listenerManager.DeleteListener(itemID);
+            m_scriptModule.PokeThreads (itemID);
+            m_listenerManager.DeleteListener (itemID);
         }
 
 
-        public void DeliverMessage(ChatTypeEnum type, int channel, string name, UUID id, string msg)
+        public void DeliverMessage (ChatTypeEnum type, int channel, string name, UUID id, string msg)
         {
             Vector3 position;
             ISceneChildEntity source;
             IScenePresence avatar;
 
-            if ((source = m_scene.GetSceneObjectPart(id)) != null)
+            if ((source = m_scene.GetSceneObjectPart (id)) != null)
                 position = source.AbsolutePosition;
-            else if ((avatar = m_scene.GetScenePresence(id)) != null)
+            else if ((avatar = m_scene.GetScenePresence (id)) != null)
                 position = avatar.AbsolutePosition;
             else if (ChatTypeEnum.Region == type)
                 position = CenterOfRegion;
             else
                 return;
 
-            DeliverMessage(type, channel, name, id, msg, position, -1, UUID.Zero);
+            DeliverMessage (type, channel, name, id, msg, position, -1, UUID.Zero);
         }
 
-        public void DeliverMessage(ChatTypeEnum type, int channel, string name, UUID id, UUID toID, string msg)
+        public void DeliverMessage (ChatTypeEnum type, int channel, string name, UUID id, UUID toID, string msg)
         {
             Vector3 position;
             ISceneChildEntity source;
             IScenePresence avatar;
 
-            if ((source = m_scene.GetSceneObjectPart(id)) != null)
+            if ((source = m_scene.GetSceneObjectPart (id)) != null)
                 position = source.AbsolutePosition;
-            else if ((avatar = m_scene.GetScenePresence(id)) != null)
+            else if ((avatar = m_scene.GetScenePresence (id)) != null)
                 position = avatar.AbsolutePosition;
             else if (ChatTypeEnum.Region == type)
                 position = CenterOfRegion;
             else
                 return;
 
-            DeliverMessage(type, channel, name, id, msg, position, -1, toID);
+            DeliverMessage (type, channel, name, id, msg, position, -1, toID);
         }
 
-        public void DeliverMessage(ChatTypeEnum type, int channel, string name, UUID id, string msg, float Range)
+        public void DeliverMessage (ChatTypeEnum type, int channel, string name, UUID id, string msg, float range)
         {
             Vector3 position;
             ISceneChildEntity source;
             IScenePresence avatar;
 
-            if ((source = m_scene.GetSceneObjectPart(id)) != null)
+            if ((source = m_scene.GetSceneObjectPart (id)) != null)
                 position = source.AbsolutePosition;
-            else if ((avatar = m_scene.GetScenePresence(id)) != null)
+            else if ((avatar = m_scene.GetScenePresence (id)) != null)
                 position = avatar.AbsolutePosition;
             else if (ChatTypeEnum.Region == type)
                 position = CenterOfRegion;
             else
                 return;
 
-            DeliverMessage(type, channel, name, id, msg, position, Range, UUID.Zero);
+            DeliverMessage (type, channel, name, id, msg, position, range, UUID.Zero);
         }
 
         /// <summary>
         ///     Are there any listen events ready to be dispatched?
         /// </summary>
         /// <returns>Boolean indication</returns>
-        public bool HasMessages()
+        public bool HasMessages ()
         {
             return m_pending.Count != 0;
         }
 
-        public bool HasListeners()
+        public bool HasListeners ()
         {
-            return m_listenerManager.GetListenersCount() > 0;
+            return m_listenerManager.GetListenersCount () > 0;
         }
 
         /// <summary>
         ///     Pop the first available listen event from the queue
         /// </summary>
         /// <returns>ListenerInfo with filter filled in</returns>
-        public IWorldCommListenerInfo GetNextMessage()
+        public IWorldCommListenerInfo GetNextMessage ()
         {
             ListenerInfo li = null;
 
-            lock (m_pending.SyncRoot)
-            {
-                li = (ListenerInfo) m_pending.Dequeue();
+            lock (m_pending.SyncRoot) {
+                li = (ListenerInfo)m_pending.Dequeue ();
             }
 
             return li;
@@ -327,19 +321,19 @@ namespace WhiteCore.Modules.Scripting
          *
          * *****************************************************************/
 
-        public OSD GetSerializationData(UUID itemID, UUID primID)
+        public OSD GetSerializationData (UUID itemID, UUID primID)
         {
-            if (m_scene.GetSceneObjectPart(primID) != null)
-                return m_listenerManager.GetSerializationData(itemID);
+            if (m_scene.GetSceneObjectPart (primID) != null)
+                return m_listenerManager.GetSerializationData (itemID);
             else
                 return null;
         }
 
-        public void CreateFromData(UUID itemID, UUID hostID,
+        public void CreateFromData (UUID itemID, UUID hostID,
                                    OSD data)
         {
-            if (m_scene.GetSceneObjectPart(hostID) != null)
-                m_listenerManager.AddFromData(itemID, hostID, data);
+            if (m_scene.GetSceneObjectPart (hostID) != null)
+                m_listenerManager.AddFromData (itemID, hostID, data);
         }
 
         #endregion
@@ -360,13 +354,13 @@ namespace WhiteCore.Modules.Scripting
         /// <param name="position"></param>
         /// <param name="range"></param>
         /// <param name="toID"></param>
-        public void DeliverMessage(ChatTypeEnum type, int channel, string name, UUID fromID, string msg,
+        public void DeliverMessage (ChatTypeEnum type, int channel, string name, UUID fromID, string msg,
                                    Vector3 position,
                                    float range, UUID toID)
         {
             //Make sure that the cmd handler thread is running
-            m_scriptModule.PokeThreads(UUID.Zero);
-            if (BlockedChannels.Contains(channel))
+            m_scriptModule.PokeThreads (UUID.Zero);
+            if (BlockedChannels.Contains (channel))
                 return;
             // MainConsole.Instance.DebugFormat("[WorldComm] got[2] type {0}, channel {1}, name {2}, id {3}, msg {4}",
             //                   type, channel, name, id, msg);
@@ -374,13 +368,12 @@ namespace WhiteCore.Modules.Scripting
             // Determine which listen event filters match the given set of arguments, this results
             // in a limited set of listeners, each belonging a host. If the host is in range, add them
             // to the pending queue.
-            foreach (ListenerInfo li in m_listenerManager.GetListeners(UUID.Zero, channel, name, fromID, msg))
-            {
+            foreach (ListenerInfo li in m_listenerManager.GetListeners (UUID.Zero, channel, name, fromID, msg)) {
                 // Dont process if this message is from yourself!
-                if (li.GetHostID().Equals(fromID))
+                if (li.GetHostID ().Equals (fromID))
                     continue;
 
-                ISceneChildEntity sPart = m_scene.GetSceneObjectPart(li.GetHostID());
+                ISceneChildEntity sPart = m_scene.GetSceneObjectPart (li.GetHostID ());
                 if (sPart == null)
                     continue;
 
@@ -390,103 +383,96 @@ namespace WhiteCore.Modules.Scripting
                         continue;
                 //Only allow the message to go on if it is an attachment with the given avatars ID or the part ID is right
 
-                double dis = Util.GetDistanceTo(sPart.AbsolutePosition, position);
-                switch (type)
-                {
-                    case ChatTypeEnum.Whisper:
-                        if (dis < m_whisperdistance)
-                            QueueMessage(new ListenerInfo(li, name, fromID, msg));
-                        break;
+                double dis = Util.GetDistanceTo (sPart.AbsolutePosition, position);
+                switch (type) {
+                case ChatTypeEnum.Whisper:
+                    if (dis < m_whisperdistance)
+                        QueueMessage (new ListenerInfo (li, name, fromID, msg));
+                    break;
 
-                    case ChatTypeEnum.Say:
-                        if (dis < m_saydistance)
-                            QueueMessage(new ListenerInfo(li, name, fromID, msg));
-                        break;
+                case ChatTypeEnum.Say:
+                    if (dis < m_saydistance)
+                        QueueMessage (new ListenerInfo (li, name, fromID, msg));
+                    break;
 
-                    case ChatTypeEnum.ObsoleteSay:
-                        if (dis < m_saydistance)
-                            QueueMessage(new ListenerInfo(li, name, fromID, msg));
-                        break;
+                case ChatTypeEnum.ObsoleteSay:
+                    if (dis < m_saydistance)
+                        QueueMessage (new ListenerInfo (li, name, fromID, msg));
+                    break;
 
-                    case ChatTypeEnum.Shout:
-                        if (dis < m_shoutdistance)
-                            QueueMessage(new ListenerInfo(li, name, fromID, msg));
-                        break;
+                case ChatTypeEnum.Shout:
+                    if (dis < m_shoutdistance)
+                        QueueMessage (new ListenerInfo (li, name, fromID, msg));
+                    break;
 
-                    case ChatTypeEnum.Custom:
-                        if (dis < range)
-                            QueueMessage(new ListenerInfo(li, name, fromID, msg));
-                        break;
+                case ChatTypeEnum.Custom:
+                    if (dis < range)
+                        QueueMessage (new ListenerInfo (li, name, fromID, msg));
+                    break;
 
-                    case ChatTypeEnum.Region:
-                        QueueMessage(new ListenerInfo(li, name, fromID, msg));
-                        break;
+                case ChatTypeEnum.Region:
+                    QueueMessage (new ListenerInfo (li, name, fromID, msg));
+                    break;
                 }
             }
         }
 
-        protected void QueueMessage(ListenerInfo li)
+        protected void QueueMessage (ListenerInfo li)
         {
             //Make sure that the cmd handler thread is running
-            m_scriptModule.PokeThreads(li.GetItemID());
-            lock (m_pending.SyncRoot)
-            {
-                m_pending.Enqueue(li);
+            m_scriptModule.PokeThreads (li.GetItemID ());
+            lock (m_pending.SyncRoot) {
+                m_pending.Enqueue (li);
             }
         }
 
-        private void DeliverClientMessage(Object sender, OSChatMessage e)
+        void DeliverClientMessage (object sender, OSChatMessage e)
         {
             if (null != e.Sender)
-                DeliverMessage(e.Type, e.Channel, e.Sender.Name, e.Sender.AgentId, e.Message, e.Position, -1, UUID.Zero);
+                DeliverMessage (e.Type, e.Channel, e.Sender.Name, e.Sender.AgentId, e.Message, e.Position, -1, UUID.Zero);
             else
-                DeliverMessage(e.Type, e.Channel, e.From, UUID.Zero, e.Message, e.Position, -1, UUID.Zero);
+                DeliverMessage (e.Type, e.Channel, e.From, UUID.Zero, e.Message, e.Position, -1, UUID.Zero);
         }
     }
 
     public class ListenerManager
     {
-        private readonly Dictionary<int, List<ListenerInfo>> m_listeners = new Dictionary<int, List<ListenerInfo>>();
-        private readonly int m_maxhandles;
-        private readonly int m_maxlisteners;
-        private int m_curlisteners;
+        readonly Dictionary<int, List<ListenerInfo>> m_listeners = new Dictionary<int, List<ListenerInfo>> ();
+        readonly int m_maxhandles;
+        readonly int m_maxlisteners;
+        int m_curlisteners;
 
-        public ListenerManager(int maxlisteners, int maxhandles)
+        public ListenerManager (int maxlisteners, int maxhandles)
         {
             m_maxlisteners = maxlisteners;
             m_maxhandles = maxhandles;
             m_curlisteners = 0;
         }
 
-        public int AddListener(UUID itemID, UUID hostID, int channel, string name, UUID id, string msg, int regexBitfield)
+        public int AddListener (UUID itemID, UUID hostID, int channel, string name, UUID id, string msg, int regexBitfield)
         {
             // do we already have a match on this particular filter event?
-            List<ListenerInfo> coll = GetListeners(itemID, channel, name, id, msg);
+            List<ListenerInfo> coll = GetListeners (itemID, channel, name, id, msg);
 
-            if (coll.Count > 0)
-            {
+            if (coll.Count > 0) {
                 // special case, called with same filter settings, return same handle
                 // (2008-05-02, tested on 1.21.1 server, still holds)
-                return coll[0].GetHandle();
+                return coll [0].GetHandle ();
             }
 
-            if (m_curlisteners < m_maxlisteners)
-            {
-                lock (m_listeners)
-                {
-                    int newHandle = GetNewHandle(itemID);
+            lock (m_listeners) {
+                if (m_curlisteners < m_maxlisteners) {
+                    int newHandle = GetNewHandle (itemID);
 
-                    if (newHandle > 0)
-                    {
-                        ListenerInfo li = new ListenerInfo(newHandle, itemID, hostID, channel, name, id, msg, regexBitfield);
+                    if (newHandle > 0) {
+                        ListenerInfo li = new ListenerInfo (newHandle, itemID, hostID, channel, name, id, msg, regexBitfield);
 
                         List<ListenerInfo> listeners;
-                        if (!m_listeners.TryGetValue(channel, out listeners))
-                        {
-                            listeners = new List<ListenerInfo>();
-                            m_listeners.Add(channel, listeners);
+                        if (!m_listeners.TryGetValue (channel, out listeners)) {
+                            listeners = new List<ListenerInfo> ();
+                            m_listeners.Add (channel, listeners);
                         }
-                        listeners.Add(li);
+                        listeners.Add (li);
                         m_curlisteners++;
 
                         return newHandle;
@@ -496,20 +482,16 @@ namespace WhiteCore.Modules.Scripting
             return -1;
         }
 
-        public void Remove(UUID itemID, int handle)
+        public void Remove (UUID itemID, int handle)
         {
-            lock (m_listeners)
-            {
-                foreach (KeyValuePair<int, List<ListenerInfo>> lis in m_listeners)
-                {
+            lock (m_listeners) {
+                foreach (KeyValuePair<int, List<ListenerInfo>> lis in m_listeners) {
                     foreach (
                         ListenerInfo li in
-                            lis.Value.Where(li => li.GetItemID().Equals(itemID) && li.GetHandle().Equals(handle)))
-                    {
-                        lis.Value.Remove(li);
-                        if (lis.Value.Count == 0)
-                        {
-                            m_listeners.Remove(lis.Key);
+                            lis.Value.Where (li => li.GetItemID ().Equals (itemID) && li.GetHandle ().Equals (handle))) {
+                        lis.Value.Remove (li);
+                        if (lis.Value.Count == 0) {
+                            m_listeners.Remove (lis.Key);
                             m_curlisteners--;
                         }
                         // there should be only one, so we bail out early
@@ -519,66 +501,57 @@ namespace WhiteCore.Modules.Scripting
             }
         }
 
-        public void DeleteListener(UUID itemID)
+        public void DeleteListener (UUID itemID)
         {
-            List<int> emptyChannels = new List<int>();
-            List<ListenerInfo> removedListeners = new List<ListenerInfo>();
+            List<int> emptyChannels = new List<int> ();
+            List<ListenerInfo> removedListeners = new List<ListenerInfo> ();
 
-            lock (m_listeners)
-            {
-                foreach (KeyValuePair<int, List<ListenerInfo>> lis in m_listeners)
-                {
-                    removedListeners.AddRange(lis.Value.Where(li => li.GetItemID().Equals(itemID)));
+            lock (m_listeners) {
+                foreach (KeyValuePair<int, List<ListenerInfo>> lis in m_listeners) {
+                    removedListeners.AddRange (lis.Value.Where (li => li.GetItemID ().Equals (itemID)));
 
-                    foreach (ListenerInfo li in removedListeners)
-                    {
-                        lis.Value.Remove(li);
+                    foreach (ListenerInfo li in removedListeners) {
+                        lis.Value.Remove (li);
                         m_curlisteners--;
                     }
-                    removedListeners.Clear();
-                    if (lis.Value.Count == 0)
-                    {
+                    removedListeners.Clear ();
+                    if (lis.Value.Count == 0) {
                         // again, store first, remove later
-                        emptyChannels.Add(lis.Key);
+                        emptyChannels.Add (lis.Key);
                     }
                 }
-                foreach (int channel in emptyChannels)
-                {
-                    m_listeners.Remove(channel);
+                foreach (int channel in emptyChannels) {
+                    m_listeners.Remove (channel);
                 }
             }
         }
 
-        public void Activate(UUID itemID, int handle)
+        public void Activate (UUID itemID, int handle)
         {
-            lock (m_listeners)
-            {
+            lock (m_listeners) {
                 foreach (
                     ListenerInfo li in
                         from lis in m_listeners
                         from li in lis.Value
-                        where li.GetItemID().Equals(itemID) && li.GetHandle() == handle
-                        select li)
-                {
-                    li.Activate();
+                        where li.GetItemID ().Equals (itemID) && li.GetHandle () == handle
+                        select li) {
+                    li.Activate ();
                     // only one, bail out
                     return;
                 }
             }
         }
 
-        public void Dectivate(UUID itemID, int handle)
+        public void Dectivate (UUID itemID, int handle)
         {
-            lock (m_listeners)
-            {
+            lock (m_listeners) {
                 foreach (
                     ListenerInfo li in
                         from lis in m_listeners
                         from li in lis.Value
-                        where li.GetItemID().Equals(itemID) && li.GetHandle() == handle
-                        select li)
-                {
-                    li.Deactivate();
+                        where li.GetItemID ().Equals (itemID) && li.GetHandle () == handle
+                        select li) {
+                    li.Deactivate ();
                     // only one, bail out
                     return;
                 }
@@ -586,27 +559,27 @@ namespace WhiteCore.Modules.Scripting
         }
 
         // non-locked access, since its always called in the context of the lock
-        private int GetNewHandle(UUID itemID)
+        int GetNewHandle (UUID itemID)
         {
             List<int> handles =
-                (from lis in m_listeners from li in lis.Value where li.GetItemID().Equals(itemID) select li.GetHandle())
-                    .ToList();
+                (from lis in m_listeners from li in lis.Value where li.GetItemID ().Equals (itemID) select li.GetHandle ())
+                    .ToList ();
 
             // build a list of used keys for this specific itemID...
 
             // Note: 0 is NOT a valid handle for llListen() to return
-            for (int i = 1; i <= m_maxhandles; i++)
-            {
-                if (!handles.Contains(i))
+            for (int i = 1; i <= m_maxhandles; i++) {
+                if (!handles.Contains (i))
                     return i;
             }
 
             return -1;
         }
 
-        public int GetListenersCount()
+        public int GetListenersCount ()
         {
-            return m_listeners.Count;
+            lock (m_listeners)
+                return m_listeners.Count;
         }
 
         /// These are duplicated from ScriptBaseClass
@@ -628,155 +601,152 @@ namespace WhiteCore.Modules.Scripting
         // Theres probably a more clever and efficient way to
         // do this, maybe with regex.
         // PM2008: Ha, one could even be smart and define a specialized Enumerator.
-        public List<ListenerInfo> GetListeners(UUID itemID, int channel, string name, UUID id, string msg)
+        public List<ListenerInfo> GetListeners (UUID itemID, int channel, string name, UUID id, string msg)
         {
-            List<ListenerInfo> collection = new List<ListenerInfo>();
+            List<ListenerInfo> collection = new List<ListenerInfo> ();
 
-            lock (m_listeners)
-            {
+            lock (m_listeners) {
                 List<ListenerInfo> listeners;
-                if (!m_listeners.TryGetValue(channel, out listeners))
-                {
+                if (!m_listeners.TryGetValue (channel, out listeners)) {
                     return collection;
                 }
 
-                collection.AddRange(from li in listeners
-                                    where li.IsActive()
-                                    where itemID.Equals(UUID.Zero) || li.GetItemID().Equals(itemID)
-                                    where li.GetName().Length <= 0 || li.GetName().Equals(name)
-                                    where li.GetName().Length <= 0 || ((li.RegexBitfield & OS_LISTEN_REGEX_NAME) != OS_LISTEN_REGEX_NAME && li.GetName().Equals(name)) ||
-                                                                      ((li.RegexBitfield & OS_LISTEN_REGEX_NAME) == OS_LISTEN_REGEX_NAME && Regex.IsMatch(name, li.GetName()))
-                                    where li.GetMessage().Length <= 0 || ((li.RegexBitfield & OS_LISTEN_REGEX_MESSAGE) != OS_LISTEN_REGEX_MESSAGE && li.GetMessage().Equals(msg)) ||
-                                                                         ((li.RegexBitfield & OS_LISTEN_REGEX_MESSAGE) == OS_LISTEN_REGEX_MESSAGE && Regex.IsMatch(msg, li.GetMessage()))
-                                    where li.GetID().Equals(UUID.Zero) || li.GetID().Equals(id)
-                                    where li.GetMessage().Length <= 0 || li.GetMessage().Equals(msg)
-                                    select li);
+                collection.AddRange (from li in listeners
+                                     where li.IsActive ()
+                                     where itemID.Equals (UUID.Zero) || li.GetItemID ().Equals (itemID)
+                                     where li.GetName ().Length <= 0 || li.GetName ().Equals (name)
+                                     where li.GetName ().Length <= 0 || ((li.RegexBitfield & OS_LISTEN_REGEX_NAME) != OS_LISTEN_REGEX_NAME && li.GetName ().Equals (name)) ||
+                                                                       ((li.RegexBitfield & OS_LISTEN_REGEX_NAME) == OS_LISTEN_REGEX_NAME && Regex.IsMatch (name, li.GetName ()))
+                                     where li.GetMessage ().Length <= 0 || ((li.RegexBitfield & OS_LISTEN_REGEX_MESSAGE) != OS_LISTEN_REGEX_MESSAGE && li.GetMessage ().Equals (msg)) ||
+                                                                          ((li.RegexBitfield & OS_LISTEN_REGEX_MESSAGE) == OS_LISTEN_REGEX_MESSAGE && Regex.IsMatch (msg, li.GetMessage ()))
+                                     where li.GetID ().Equals (UUID.Zero) || li.GetID ().Equals (id)
+                                     where li.GetMessage ().Length <= 0 || li.GetMessage ().Equals (msg)
+                                     select li);
             }
+
             return collection;
         }
 
-        public OSD GetSerializationData(UUID itemID)
+        public OSD GetSerializationData (UUID itemID)
         {
-            OSDMap data = new OSDMap();
+            OSDMap data = new OSDMap ();
 
-            lock (m_listeners)
-            {
+            lock (m_listeners) {
                 foreach (
                     ListenerInfo l in
-                        from list in m_listeners.Values from l in list where l.GetItemID() == itemID select l)
-                {
-                    data[itemID.ToString()] = l.GetSerializationData();
+                        from list in m_listeners.Values from l in list where l.GetItemID () == itemID select l) {
+                    data [itemID.ToString ()] = l.GetSerializationData ();
                 }
             }
             return data;
         }
 
-        public void AddFromData(UUID itemID, UUID hostID,
+        public void AddFromData (UUID itemID, UUID hostID,
                                 OSD data)
         {
-            OSDMap save = (OSDMap) data;
-            foreach (KeyValuePair<string, OSD> kvp in save)
-            {
-                OSDMap item = (OSDMap) kvp.Value;
-                ListenerInfo info = ListenerInfo.FromData(itemID, hostID, item);
-                AddListener(info.GetItemID(), info.GetHostID(), info.GetChannel(), info.GetName(), info.GetID(),
-                            info.GetMessage(), info.RegexBitfield);
+            OSDMap save = (OSDMap)data;
+            foreach (KeyValuePair<string, OSD> kvp in save) {
+                OSDMap item = (OSDMap)kvp.Value;
+                ListenerInfo info = ListenerInfo.FromData (itemID, hostID, item);
+                AddListener (info.GetItemID (), info.GetHostID (), info.GetChannel (), info.GetName (), info.GetID (),
+                            info.GetMessage (), info.RegexBitfield);
             }
         }
     }
 
     public class ListenerInfo : IWorldCommListenerInfo
     {
-        private bool m_active; // Listener is active or not
-        private int m_channel; // Channel
-        private int m_handle; // Assigned handle of this listener
-        //private uint m_localID; // Local ID from script engine
-        private UUID m_hostID; // ID of the host/scene part
-        private UUID m_id; // ID to filter messages from
-        private UUID m_itemID; // ID of the host script engine
-        private string m_message; // The message
-        private string m_name; // Object name to filter messages from
+        bool m_active; // Listener is active or not
+        int m_channel; // Channel
+        int m_handle; // Assigned handle of this listener
+        //uint m_localID; // Local ID from script engine
+        UUID m_hostID; // ID of the host/scene part
+        UUID m_id; // ID to filter messages from
+        UUID m_itemID; // ID of the host script engine
+        string m_message; // The message
+        string m_name; // Object name to filter messages from
+
         public int RegexBitfield { get; private set; }
 
-        public ListenerInfo(int handle, UUID ItemID, UUID hostID, int channel, string name, UUID id, string message, int regexBitfield)
+        public ListenerInfo (int handle, UUID ItemID, UUID hostID, int channel, string name, UUID id, string message, int regexBitfield)
         {
-            Initialise(handle, ItemID, hostID, channel, name, id, message, regexBitfield);
+            Initialise (handle, ItemID, hostID, channel, name, id, message, regexBitfield);
         }
 
-        public ListenerInfo(ListenerInfo li, string name, UUID id, string message)
+        public ListenerInfo (ListenerInfo li, string name, UUID id, string message)
         {
-            Initialise(li.m_handle, li.m_itemID, li.m_hostID, li.m_channel, name, id, message, 0);
+            Initialise (li.m_handle, li.m_itemID, li.m_hostID, li.m_channel, name, id, message, 0);
         }
 
         #region IWorldCommListenerInfo Members
 
-        public OSD GetSerializationData()
+        public OSD GetSerializationData ()
         {
-            OSDMap data = new OSDMap();
+            OSDMap data = new OSDMap ();
 
-            data["Active"] = m_active;
-            data["Handle"] = m_handle;
-            data["Channel"] = m_channel;
-            data["Name"] = m_name;
-            data["ID"] = m_id;
-            data["Message"] = m_message;
+            data ["Active"] = m_active;
+            data ["Handle"] = m_handle;
+            data ["Channel"] = m_channel;
+            data ["Name"] = m_name;
+            data ["ID"] = m_id;
+            data ["Message"] = m_message;
 
             return data;
         }
 
-        public UUID GetItemID()
+        public UUID GetItemID ()
         {
             return m_itemID;
         }
 
-        public UUID GetHostID()
+        public UUID GetHostID ()
         {
             return m_hostID;
         }
 
-        public int GetChannel()
+        public int GetChannel ()
         {
             return m_channel;
         }
 
-        public int GetHandle()
+        public int GetHandle ()
         {
             return m_handle;
         }
 
-        public string GetMessage()
+        public string GetMessage ()
         {
             return m_message;
         }
 
-        public string GetName()
+        public string GetName ()
         {
             return m_name;
         }
 
-        public bool IsActive()
+        public bool IsActive ()
         {
             return m_active;
         }
 
-        public void Deactivate()
+        public void Deactivate ()
         {
             m_active = false;
         }
 
-        public void Activate()
+        public void Activate ()
         {
             m_active = true;
         }
 
-        public UUID GetID()
+        public UUID GetID ()
         {
             return m_id;
         }
 
         #endregion
 
-        private void Initialise(int handle, UUID ItemID, UUID hostID, int channel, string name,
+        void Initialise (int handle, UUID ItemID, UUID hostID, int channel, string name,
                                 UUID id, string message, int regexBitfield)
         {
             m_active = true;
@@ -790,17 +760,17 @@ namespace WhiteCore.Modules.Scripting
             RegexBitfield = regexBitfield;
         }
 
-        public static ListenerInfo FromData(UUID ItemID, UUID hostID, OSDMap data)
+        public static ListenerInfo FromData (UUID ItemID, UUID hostID, OSDMap data)
         {
-            int Handle = data["Handle"].AsInteger();
-            int Channel = data["Channel"].AsInteger();
-            string Name = data["Name"].AsString();
-            string Message = data["Message"].AsString();
-            UUID ID = data["ID"].AsUUID();
-            bool Active = data["Active"].AsBoolean();
-            int RegexBitfield = data["RegexBitfield"].AsInteger();
+            int Handle = data ["Handle"].AsInteger ();
+            int Channel = data ["Channel"].AsInteger ();
+            string Name = data ["Name"].AsString ();
+            string Message = data ["Message"].AsString ();
+            UUID ID = data ["ID"].AsUUID ();
+            bool Active = data ["Active"].AsBoolean ();
+            int RegexBitfield = data ["RegexBitfield"].AsInteger ();
 
-            ListenerInfo linfo = new ListenerInfo(Handle,
+            ListenerInfo linfo = new ListenerInfo (Handle,
                                                   ItemID, hostID, Channel, Name,
                                                   ID, Message, RegexBitfield) { m_active = Active };
 
