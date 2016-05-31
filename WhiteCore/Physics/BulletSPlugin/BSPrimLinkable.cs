@@ -61,8 +61,8 @@ namespace WhiteCore.Physics.BulletSPlugin
             LinksetType = (BSLinkset.LinksetImplementation) BSParam.LinksetImplementation;
 
             Linkset = BSLinkset.Factory(PhysicsScene, this);
-
-            Linkset.Refresh(this);
+            if (Linkset != null)
+                Linkset.Refresh(this);
         }
 
         public override void Destroy()
@@ -81,9 +81,10 @@ namespace WhiteCore.Physics.BulletSPlugin
 
                 Linkset = parent.Linkset.AddMeToLinkset(this);
 
-                DetailLog(
-                    "{0},BSPrimLinkset.link,call,parentBefore={1}, childrenBefore=={2}, parentAfter={3}, childrenAfter={4}",
-                    LocalID, parentBefore.LocalID, childrenBefore, Linkset.LinksetRoot.LocalID, Linkset.NumberOfChildren);
+                if (Linkset != null)
+                    DetailLog(
+                        "{0},BSPrimLinkset.link,call,parentBefore={1}, childrenBefore=={2}, parentAfter={3}, childrenAfter={4}",
+                        LocalID, parentBefore.LocalID, childrenBefore, Linkset.LinksetRoot.LocalID, Linkset.NumberOfChildren);
             }
             return;
         }

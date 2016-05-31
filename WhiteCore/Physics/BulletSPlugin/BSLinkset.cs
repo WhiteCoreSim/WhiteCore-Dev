@@ -184,10 +184,11 @@ namespace WhiteCore.Physics.BulletSPlugin
                     // Cannot remove the root from a linkset.
                     return this;
                 }
-                RemoveChildFromLinkset(child, inTaintTime);
-                LinksetMass = ComputeLinksetMass();
             }
 
+            RemoveChildFromLinkset(child, inTaintTime);         // this establishes it's own lock
+            LinksetMass = ComputeLinksetMass();
+ 
             // The child is down to a linkset of just itself
             return BSLinkset.Factory(PhysicsScene, child);
         }

@@ -252,10 +252,10 @@ namespace WhiteCore.Physics.BulletSPlugin
                     break;
             }
 
-            linkInfo.SetLinkParameters(constrain);
-
-            PhysicsScene.Constraints.AddConstraint(constrain);
-
+            if (constrain != null) {
+                linkInfo.SetLinkParameters (constrain);
+                PhysicsScene.Constraints.AddConstraint (constrain);
+            }
             return constrain;
         }
 

@@ -179,28 +179,31 @@ namespace WhiteCore.Physics.BulletSPlugin
         {
             DiscreteDynamicsWorld world = (pWorld as BulletWorldXNA).world;
             RigidBody body = ((BulletBodyXNA)pBody).rigidBody;
-            CollisionObject collisionObject = ((BulletBodyXNA)pBody).body;
-            if (body != null)
-                world.RemoveRigidBody(body);
-            else if (collisionObject != null)
-                world.RemoveCollisionObject(collisionObject);
-            else
-                return false;
-            return true;
+            if (body != null) {
+                CollisionObject collisionObject = ((BulletBodyXNA)pBody).body;
+                world.RemoveRigidBody (body);
+
+                if (collisionObject != null) {
+                    world.RemoveCollisionObject (collisionObject);
+                    return true;
+                }
+            }
+            return false;
         }
 
-     public override bool ClearCollisionProxyCache(BulletWorld pWorld, BulletBody pBody)
-    {
-        DiscreteDynamicsWorld world = (pWorld as BulletWorldXNA).world;
-        RigidBody body = ((BulletBodyXNA)pBody).rigidBody;
-        CollisionObject collisionObject = ((BulletBodyXNA)pBody).body;
-        if (body != null && collisionObject != null && collisionObject.GetBroadphaseHandle() != null)
+        public override bool ClearCollisionProxyCache(BulletWorld pWorld, BulletBody pBody)
         {
-            world.RemoveCollisionObject(collisionObject);
-            world.AddCollisionObject(collisionObject);
+            DiscreteDynamicsWorld world = (pWorld as BulletWorldXNA).world;
+            RigidBody body = ((BulletBodyXNA)pBody).rigidBody;
+            if (body != null) {
+                CollisionObject collisionObject = ((BulletBodyXNA)pBody).body;
+                if (collisionObject != null && collisionObject.GetBroadphaseHandle () != null) {
+                    world.RemoveCollisionObject (collisionObject);
+                    world.AddCollisionObject (collisionObject);
+                }
+            }
+            return true;
         }
-        return true;
-    }
 
        public override bool AddConstraintToWorld(BulletWorld pWorld, BulletConstraint pConstraint,
             bool pDisableCollisionsBetweenLinkedObjects)
@@ -2253,15 +2256,16 @@ namespace WhiteCore.Physics.BulletSPlugin
             tribuilder.AddIndexedMesh(mesh, PHY_ScalarType.PHY_INTEGER);
 
 
-            for (int i = 0; i < pVerticesCount; i++)
-            {
-                string s = vertices[indices[i * 3]].ToString("0.0000");
-                s += " " + vertices[indices[i * 3 + 1]].ToString("0.0000");
-                s += " " + vertices[indices[i * 3 + 2]].ToString("0.0000");
+            try {
+                for (int i = 0; i < pVerticesCount; i++) {
+                    string s = vertices [indices [i * 3]].ToString ("0.0000");
+                    s += " " + vertices [indices [i * 3 + 1]].ToString ("0.0000");
+                    s += " " + vertices [indices [i * 3 + 2]].ToString ("0.0000");
 
-                sw.Write(s + "\n");
+                    sw.Write (s + "\n");
+                }
+            } catch {
             }
-
             sw.Close();
         }
 
@@ -2284,30 +2288,29 @@ namespace WhiteCore.Physics.BulletSPlugin
             TriangleIndexVertexArray tribuilder = new TriangleIndexVertexArray();
             tribuilder.AddIndexedMesh(mesh, PHY_ScalarType.PHY_INTEGER);
 
+            try {
+                sw.WriteLine ("Indices");
+                sw.WriteLine (string.Format ("int[] indices = new int[{0}];", pIndicesCount));
+                for (int iter = 0; iter < indices.Length; iter++) {
+                    sw.WriteLine (string.Format ("indices[{0}]={1};", iter, indices [iter]));
+                }
+                sw.WriteLine ("VerticesFloats");
+                sw.WriteLine (string.Format ("float[] vertices = new float[{0}];", pVerticesCount));
+                for (int iter = 0; iter < vertices.Length; iter++) {
+                    sw.WriteLine (string.Format ("Vertices[{0}]={1};", iter, vertices [iter].ToString ("0.0000")));
+                }
 
-            sw.WriteLine("Indices");
-            sw.WriteLine(string.Format("int[] indices = new int[{0}];", pIndicesCount));
-            for (int iter = 0; iter < indices.Length; iter++)
-            {
-                sw.WriteLine(string.Format("indices[{0}]={1};", iter, indices[iter]));
+                // for (int i = 0; i < pVerticesCount; i++)
+                // {
+                //
+                //     string s = vertices[indices[i * 3]].ToString("0.0000");
+                //     s += " " + vertices[indices[i * 3 + 1]].ToString("0.0000");
+                //    s += " " + vertices[indices[i * 3 + 2]].ToString("0.0000");
+                //
+                //     sw.Write(s + "\n");
+                //}
+            } catch {
             }
-            sw.WriteLine("VerticesFloats");
-            sw.WriteLine(string.Format("float[] vertices = new float[{0}];", pVerticesCount));
-            for (int iter = 0; iter < vertices.Length; iter++)
-            {
-                sw.WriteLine(string.Format("Vertices[{0}]={1};", iter, vertices[iter].ToString("0.0000")));
-            }
-
-            // for (int i = 0; i < pVerticesCount; i++)
-            // {
-            //
-            //     string s = vertices[indices[i * 3]].ToString("0.0000");
-            //     s += " " + vertices[indices[i * 3 + 1]].ToString("0.0000");
-            //    s += " " + vertices[indices[i * 3 + 2]].ToString("0.0000");
-            //
-            //     sw.Write(s + "\n");
-            //}
-
             sw.Close();
         }
 

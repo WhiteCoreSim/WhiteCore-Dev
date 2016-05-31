@@ -225,6 +225,10 @@ namespace WhiteCore.Physics.BulletSPlugin
 
             // Get the connection to the physics engine (could be native or one of many DLLs)
             PE = SelectUnderlyingBulletEngine(BulletEngineName);
+            if (PE == null) {
+                MainConsole.Instance.Error ("[BSScene]: Unable to select underlyin bullet engine!");
+                return;
+            }
 
             // Enable very detailed logging.
             // By creating an empty logger when not logging, the log message invocation code
@@ -764,7 +768,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 }
 
                 List<BSPhysObject> orderedPrims = new List<BSPhysObject>(PhysObjects.Values);
-                orderedPrims.OrderByDescending(p => p.CollisionScore);
+                // this does nothing >>// orderedPrims.OrderByDescending(p => p.CollisionScore);
                 topColliders = orderedPrims.Take(25).ToDictionary(p => p.LocalID, p => p.CollisionScore);
             }
 

@@ -134,7 +134,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             PhysicsScene.PE.SetCollisionFlags(m_terrainBody, CollisionFlags.CF_STATIC_OBJECT);
 
             // Static objects are not very massive.
-            PhysicsScene.PE.SetMassProps(m_terrainBody, 0f, Vector3.Zero);
+            PhysicsScene.PE.SetMassProps(m_terrainBody, 0.1f, Vector3.Zero);
 
             // Put the new terrain to the world of physical objects
             PhysicsScene.PE.AddObjectToWorld(PhysicsScene.World, m_terrainBody);

@@ -84,12 +84,14 @@ namespace WhiteCore.Physics.BulletSPlugin
 
         public bool HasActor(string name)
         {
-            return m_actors.ContainsKey(name);
+            lock (m_actors)
+                return m_actors.ContainsKey(name);
         }
 
         public bool TryGetActor(string actorName, out BSActor theActor)
         {
-            return m_actors.TryGetValue(actorName, out theActor);
+            lock (m_actors)
+                return m_actors.TryGetValue(actorName, out theActor);
         }
 
         public void ForEachActor(Action<BSActor> act)

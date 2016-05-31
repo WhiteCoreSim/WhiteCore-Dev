@@ -534,7 +534,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 {
                     PhysicsScene.PE.SetGravity(PhysBody, PhysicsScene.DefaultGravity);
                     Inertia = OMV.Vector3.Zero;
-                    PhysicsScene.PE.SetMassProps(PhysBody, 0f, Inertia);
+                    PhysicsScene.PE.SetMassProps(PhysBody, 0.1f, Inertia);    // 20160601 - greythane - was 0f for mass which will always error
                     PhysicsScene.PE.UpdateInertiaTensor(PhysBody);
                 }
                 else

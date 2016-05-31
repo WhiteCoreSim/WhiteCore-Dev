@@ -657,29 +657,30 @@ namespace WhiteCore.Physics.BulletSPlugin
             UInt64 newHullKey = BSShape.ComputeShapeKey(prim.Size, prim.BaseShape, out lod);
 
             BSShapeHull retHull;
+            bool foundHull = false;
             lock (Hulls)
-            {
-                if (Hulls.TryGetValue(newHullKey, out retHull))
-                {
-                    // The mesh has already been created. Return a new reference to same.
-                    retHull.IncrementReference();
-                }
-                else
-                {
-                    retHull = new BSShapeHull(new BulletShape());
-                    // An instance of this mesh has not been created. Build and remember same.
-                    BulletShape newShape = retHull.CreatePhysicalHull(physicsScene, prim, newHullKey, prim.BaseShape,
-                        prim.Size, lod);
+                foundHull = Hulls.TryGetValue (newHullKey, out retHull);
 
-                    // Check to see if hull was created (might require an asset).
-                    newShape = VerifyMeshCreated(physicsScene, newShape, prim);
-                    if (!newShape.isNativeShape || prim.AssetFailed())
-                    {
-                        // If a mesh was what was created, remember the built shape for later sharing.
+            if (foundHull)
+            {
+                // The mesh has already been created. Return a new reference to same.
+                retHull.IncrementReference();
+            }
+            else
+            {
+                retHull = new BSShapeHull(new BulletShape());
+                // An instance of this mesh has not been created. Build and remember same.
+                BulletShape newShape = retHull.CreatePhysicalHull(physicsScene, prim, newHullKey, prim.BaseShape, prim.Size, lod);
+
+                // Check to see if hull was created (might require an asset).
+                newShape = VerifyMeshCreated(physicsScene, newShape, prim);
+                if (!newShape.isNativeShape || prim.AssetFailed())
+                {
+                    // If a mesh was what was created, remember the built shape for later sharing.
+                    lock(Hulls)
                         Hulls.Add(newHullKey, retHull);
-                    }
-                    retHull.physShapeInfo = newShape;
                 }
+                    retHull.physShapeInfo = newShape;
             }
             physicsScene.DetailLog("{0},BSShapeHull,getReference,hull={1},size={2},lod={3}", prim.LocalID, retHull,
                 prim.Size, lod);
@@ -1155,43 +1156,46 @@ namespace WhiteCore.Physics.BulletSPlugin
                 prim.LocalID, newMeshKey.ToString("X"), prim.Size, lod);
             BSShapeConvexHull retConvexHull;
 
-            lock (ConvexHulls)
+            bool foundMesh = false;
+            lock (ConvexHulls) {
+                foundMesh = ConvexHulls.TryGetValue (newMeshKey, out retConvexHull);
+            }
+             
+            if (foundMesh)
             {
-                if (ConvexHulls.TryGetValue(newMeshKey, out retConvexHull))
+                // The mesh has already been created. Return a new reference to same.
+                retConvexHull.IncrementReference();
+            }
+            else
+            {
+                retConvexHull = new BSShapeConvexHull(new BulletShape());
+                BulletShape convexShape;
+
+                // Get a handle to a mesh to buld the hull from
+                BSShape baseMesh = BSShapeMesh.GetReference(physicsScene, false /* forceRebuild */, prim);
+                if (baseMesh.physShapeInfo.isNativeShape)
                 {
-                    // The mesh has already been created. Return a new reference to same.
-                    retConvexHull.IncrementReference();
+                    // We get here if the mesh was not creatable. Could be waiting for an asset from the disk.
+                    // In the short term, we return the native shape and a later ForceBodyShapeRebuild should
+                    //      get back to this code with a buildable mesh.
+                    // TODO: not sure the temp native shape is freed when the mesh is rebuilt. When does this get freed?
+                    convexShape = baseMesh.physShapeInfo;
                 }
                 else
                 {
-                    retConvexHull = new BSShapeConvexHull(new BulletShape());
-                    BulletShape convexShape;
-
-                    // Get a handle to a mesh to buld the hull from
-                    BSShape baseMesh = BSShapeMesh.GetReference(physicsScene, false /* forceRebuild */, prim);
-                    if (baseMesh.physShapeInfo.isNativeShape)
-                    {
-                        // We get here if the mesh was not creatable. Could be waiting for an asset from the disk.
-                        // In the short term, we return the native shape and a later ForceBodyShapeRebuild should
-                        //      get back to this code with a buildable mesh.
-                        // TODO: not sure the temp native shape is freed when the mesh is rebuilt. When does this get freed?
-                        convexShape = baseMesh.physShapeInfo;
-                    }
-                    else
-                    {
-                        convexShape = physicsScene.PE.BuildConvexHullShapeFromMesh(physicsScene.World,
-                            baseMesh.physShapeInfo);
-                        convexShape.shapeKey = newMeshKey;
+                    convexShape = physicsScene.PE.BuildConvexHullShapeFromMesh(physicsScene.World, baseMesh.physShapeInfo);
+                    convexShape.shapeKey = newMeshKey;
+                    lock (ConvexHulls)
                         ConvexHulls.Add(convexShape.shapeKey, retConvexHull);
-                        physicsScene.DetailLog("{0},BSShapeConvexHull.GetReference,addingNewlyCreatedShape,shape={1}",
-                            BSScene.DetailLogZero, convexShape);
-                    }
-
-                    // Done with the base mesh
-                    baseMesh.Dereference(physicsScene);
-                    retConvexHull.physShapeInfo = convexShape;
+                    physicsScene.DetailLog("{0},BSShapeConvexHull.GetReference,addingNewlyCreatedShape,shape={1}",
+                                           BSScene.DetailLogZero, convexShape);
                 }
+
+                // Done with the base mesh
+                baseMesh.Dereference(physicsScene);
+                retConvexHull.physShapeInfo = convexShape;
             }
+
             return retConvexHull;
         }
 
