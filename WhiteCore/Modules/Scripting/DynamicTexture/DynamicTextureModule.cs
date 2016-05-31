@@ -315,7 +315,10 @@ namespace WhiteCore.Modules.Scripting
                         }
                         asset.ID = scene.AssetService.Store (asset);
                     }
-                } else {
+                } 
+
+                // either we have no LastAssetID or the above failed to retrieve the asset...so...
+                if (asset == null) {
                     // Create a new asset for user
                     asset = new AssetBase (UUID.Random (), "DynamicImage" + Util.RandomClass.Next (1, 10000),
                                           AssetType.Texture,
@@ -370,8 +373,7 @@ namespace WhiteCore.Modules.Scripting
 
                 if (oldAsset != null)
                     oldAsset.Dispose ();
-                if (asset != null)
-                    asset.Dispose ();
+                asset.Dispose ();
             }
 
             byte [] BlendTextures (byte [] frontImage, byte [] backImage, bool setNewAlpha, byte newAlpha,

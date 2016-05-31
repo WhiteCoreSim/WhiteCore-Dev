@@ -407,7 +407,12 @@ namespace WhiteCore.Services
         // From MSDN
         static ImageCodecInfo GetEncoderInfo (string mimeType)
         {
-            ImageCodecInfo [] encoders = ImageCodecInfo.GetImageEncoders ();
+            ImageCodecInfo [] encoders;
+            try {
+                encoders = ImageCodecInfo.GetImageEncoders ();
+            } catch {
+                return null;
+            }
             return encoders.FirstOrDefault (t => t.MimeType == mimeType);
         }
 

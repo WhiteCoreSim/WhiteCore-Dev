@@ -628,9 +628,13 @@ namespace WhiteCore.Modules.Archivers
                     m_assetData.Delete (asset.ID, true);
 
                 // check if this asset already exists in the database
-                if (!m_assetService.GetExists (asset.ID.ToString ()))
-                    m_assetService.Store (asset);
-
+                try {
+                    if (!m_assetService.GetExists (asset.ID.ToString ()))
+                        m_assetService.Store (asset);
+                } catch {
+                    MainConsole.Instance.Error (
+                        "[Inventory Archiver]: Error checking if asset exists. Possibly 'Path too long' for file based asset storage");
+                }
                 asset.Dispose ();
                 return true;
             }

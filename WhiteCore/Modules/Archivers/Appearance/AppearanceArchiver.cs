@@ -716,7 +716,12 @@ namespace WhiteCore.Modules.Archivers
         static ImageCodecInfo GetEncoderInfo (string mimeType)
         {
             ImageCodecInfo [] encoders;
-            encoders = ImageCodecInfo.GetImageEncoders ();
+            try {
+                encoders = ImageCodecInfo.GetImageEncoders ();
+            } catch {
+                return null;
+            }
+
             for (int j = 0; j < encoders.Length; ++j) {
                 if (encoders [j].MimeType == mimeType)
                     return encoders [j];

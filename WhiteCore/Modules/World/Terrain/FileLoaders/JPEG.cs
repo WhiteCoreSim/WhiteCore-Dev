@@ -94,7 +94,10 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
         public void SaveFile (string filename, ITerrainChannel map)
         {
             Bitmap colours = CreateBitmapFromMap (map);
-            colours.Save (filename, ImageFormat.Jpeg);
+            try {
+                colours.Save (filename, ImageFormat.Jpeg);
+            } catch {
+            }
             colours.Dispose ();
         }
 
@@ -106,7 +109,10 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
         public void SaveStream (Stream stream, ITerrainChannel map)
         {
             Bitmap colours = CreateBitmapFromMap (map);
-            colours.Save (stream, ImageFormat.Jpeg);
+            try {
+                colours.Save (stream, ImageFormat.Jpeg);
+            } catch {
+            }
             colours.Dispose ();
         }
 

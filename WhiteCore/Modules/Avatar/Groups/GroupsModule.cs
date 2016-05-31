@@ -679,13 +679,13 @@ namespace WhiteCore.Modules.Groups
             if (remoteClient != null) {
                 agentUUID = GetRequestingAgentID (remoteClient);
                 agentName = remoteClient.Name;
-                regionInfo = remoteClient.Scene.RegionInfo; // not required?
+                regionInfo = remoteClient.Scene.RegionInfo; 
             } else {
                 agentUUID = agentID;
                 IClientAPI client = GetActiveClient (agentID);
                 if (client != null) {
                     agentName = client.Name;
-                    regionInfo = client.Scene.RegionInfo;   // not required?
+                    regionInfo = client.Scene.RegionInfo;   
                 } else {
                     regionInfo = m_scene.RegionInfo;
                     UserAccount account = m_scene.UserAccountService.GetUserAccount (regionInfo.AllScopeIDs, agentID);
@@ -730,9 +730,8 @@ namespace WhiteCore.Modules.Groups
                     msg.Offline = 0;
                     msg.ParentEstateID = 0;
                     msg.Position = Vector3.Zero;
-                    msg.RegionID = remoteClient.Scene.RegionInfo.RegionID;
+                    msg.RegionID = regionInfo.RegionID;
                     msg.BinaryBucket = new byte [20];
-
                     OutgoingInstantMessage (msg, invitedAgentID);
                 }
             }

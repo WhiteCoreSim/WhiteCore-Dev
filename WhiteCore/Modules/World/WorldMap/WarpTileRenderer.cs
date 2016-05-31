@@ -129,8 +129,10 @@ namespace WhiteCore.Modules.WorldMap
         {
             int scaledRemovalFactor = m_scene.RegionInfo.RegionSizeX / (Constants.RegionSize / 2);
 
-            Vector3 camPos = new Vector3 (m_scene.RegionInfo.RegionSizeX / 2 - 0.5f,
-                                 m_scene.RegionInfo.RegionSizeY / 2 - 0.5f, 221f);  //.7025033688163f);
+            Vector3 camPos = new Vector3 (
+                (m_scene.RegionInfo.RegionSizeX / 2f) - 0.5f,
+                (m_scene.RegionInfo.RegionSizeY / 2f) - 0.5f,
+                221f);  //.7025033688163f);
 
 
             Viewport viewport = new Viewport (camPos, -Vector3.UnitZ, 256f, 0.1f,

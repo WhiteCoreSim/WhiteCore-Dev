@@ -553,8 +553,10 @@ namespace WhiteCore.Modules.WorldMap
                 }
             }
 
-            if (!landForSale)
+            if (!landForSale) {
+                overlay.Dispose ();
                 return null;
+            }
 
             Color background = Color.FromArgb (0, 0, 0, 0);
             SolidBrush transparent = new SolidBrush (background);
@@ -1021,8 +1023,12 @@ namespace WhiteCore.Modules.WorldMap
                     Path.Combine (Path.Combine (m_assetCacheDir, "mapTileTextureCache"),
                                  m_scene.RegionInfo.RegionName + ".tc"), FileMode.Create);
             StreamWriter writer = new StreamWriter (stream);
-            writer.WriteLine (OSDParser.SerializeJsonString (map));
+            try {
+                writer.WriteLine (OSDParser.SerializeJsonString (map));
+            } catch {
+            }
             writer.Close ();
+            stream.Close ();
         }
 
         OSDMap SerializeCache ()

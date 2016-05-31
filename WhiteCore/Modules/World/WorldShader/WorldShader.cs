@@ -150,8 +150,11 @@ namespace WhiteCore.Modules.WorldShader
                             AssetBase asset = scene.AssetService.Get (t.ToString ());
                             if (asset != null) {
                                 Bitmap texture = (Bitmap)j2kDecoder.DecodeToImage (asset.Data);
-                                if (texture == null)
+                                if (texture == null) {
+                                    asset.Dispose ();
                                     continue;
+                                }
+
                                 asset.ID = UUID.Random ();
                                 texture = Shade (texture, shader, percent, greyScale);
                                 asset.Data = OpenJPEG.EncodeFromImage (texture, false);
@@ -168,7 +171,7 @@ namespace WhiteCore.Modules.WorldShader
                     }
                 }
             }
-            MainConsole.Instance.Warn ("WARNING: You may not be able to revert this once you restart the instance");
+            MainConsole.Instance.Warn ("[Shader]: WARNING: You may not be able to revert this once you restart the instance");
         }
 
         Primitive.TextureEntry SetTexture (PrimitiveBaseShape shape, UUID newID, UUID oldID)

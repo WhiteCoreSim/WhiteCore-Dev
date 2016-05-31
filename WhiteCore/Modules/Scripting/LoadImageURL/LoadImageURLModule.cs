@@ -159,9 +159,9 @@ namespace WhiteCore.Modules.Scripting
             WebRequest request = state.Request;
             Stream stream = null;
             byte [] imageJ2000 = new byte [0];
+            HttpWebResponse response = (HttpWebResponse)request.EndGetResponse (result);
 
             try {
-                HttpWebResponse response = (HttpWebResponse)request.EndGetResponse (result);
                 if (response != null && response.StatusCode == HttpStatusCode.OK) {
                     stream = response.GetResponseStream ();
                     if (stream != null) {
@@ -194,8 +194,8 @@ namespace WhiteCore.Modules.Scripting
                     } else {
                         MainConsole.Instance.WarnFormat ("[Load image url] No data returned");
                     }
-                    response.Dispose ();
                 }
+
             } catch (WebException) {
             } catch (ArgumentException) {
             } finally {
@@ -203,6 +203,10 @@ namespace WhiteCore.Modules.Scripting
                     stream.Close ();
                 }
             }
+
+            if (response != null)
+                response.Dispose ();
+
             MainConsole.Instance.DebugFormat ("[Load image url] Returning {0} bytes of image data for request {1}",
                                              imageJ2000.Length, state.RequestID);
             m_textureManager.ReturnData (state.RequestID, imageJ2000);

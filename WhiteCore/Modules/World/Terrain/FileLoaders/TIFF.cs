@@ -38,7 +38,10 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
 		public override void SaveFile(string filename, ITerrainChannel map)
         {
             Bitmap colours = CreateGrayscaleBitmapFromMap(map);
-            colours.Save(filename, ImageFormat.Tiff);
+            try {
+                colours.Save (filename, ImageFormat.Tiff);
+            } catch {
+            }
             colours.Dispose ();
         }
 
@@ -50,7 +53,10 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
         public override void SaveStream(Stream stream, ITerrainChannel map)
         {
             Bitmap colours = CreateGrayscaleBitmapFromMap(map);
-            colours.Save(stream, ImageFormat.Tiff);
+            try {
+                colours.Save (stream, ImageFormat.Tiff);
+            } catch {
+            }
             colours.Dispose ();
         }
 

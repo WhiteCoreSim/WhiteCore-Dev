@@ -271,12 +271,17 @@ namespace WhiteCore.Modules.Scripting
 
             FastBitmap fastBitmap = new FastBitmap (bitmap);
             fastBitmap.LockBitmap ();
-            for (int w = 0; w < bitmap.Width; w++) {
-                if (alpha <= 255) {
-                    for (int h = 0; h < bitmap.Height; h++) {
-                        fastBitmap.SetPixel (w, h, Color.FromArgb (alpha, fastBitmap.GetPixel (w, h)));
+            try {
+                for (int w = 0; w < bitmap.Width; w++) {
+                    if (alpha <= 255) {
+                        for (int h = 0; h < bitmap.Height; h++) {
+                            fastBitmap.SetPixel (w, h, Color.FromArgb (alpha, fastBitmap.GetPixel (w, h)));
+                        }
                     }
                 }
+            } catch {
+                MainConsole.Instance.Error (
+                    "[Vector rendering]: FastBMP encode Failed!");
             }
             fastBitmap.UnlockBitmap ();
             bitmap = fastBitmap.Bitmap ();
@@ -293,7 +298,7 @@ namespace WhiteCore.Modules.Scripting
                 imageJ2000 = OpenJPEG.EncodeFromImage (bitmap, false);
             } catch (Exception) {
                 MainConsole.Instance.Error (
-                    "[VECTORRENDERMODULE]: OpenJpeg Encode Failed.  Empty byte data returned!");
+                    "[Vector rendering]: OpenJpeg Encode Failed.  Empty byte data returned!");
             }
 
             m_textureManager.ReturnData (id, imageJ2000);
