@@ -65,7 +65,10 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
         protected const int maxContactsbeforedeath = 2000;
         protected int m_currentmaxContactsbeforedeath = maxContactsbeforedeath;
-        public bool ContinueCollisionProcessing { get { return m_global_contactcount < m_currentmaxContactsbeforedeath; } }
+        public bool ContinueCollisionProcessing {
+            get { lock(_contactcountLock)
+                return m_global_contactcount < m_currentmaxContactsbeforedeath; } 
+        }
 
         protected IntPtr GlobalContactsArray = IntPtr.Zero;
 
@@ -108,11 +111,15 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         protected readonly HashSet<ODECharacter> _characters = new HashSet<ODECharacter>();
         protected readonly HashSet<ODEPrim> _prims = new HashSet<ODEPrim>();
         protected readonly object _activeprimsLock = new object();
+        protected readonly object _contactcountLock = new object ();
         protected readonly HashSet<ODEPrim> _activeprims = new HashSet<ODEPrim>();
 
         public override List<PhysicsActor> ActiveObjects
         {
-            get { return new List<ODEPrim>(_activeprims).ConvertAll<PhysicsActor>(prim => prim); }
+            get { 
+                lock(_activeprimsLock)
+                    return new List<ODEPrim>(_activeprims).ConvertAll<PhysicsActor>(prim => prim);
+            }
         }
 
         public ConcurrentQueue<NoParam> SimulationChangesQueue = new ConcurrentQueue<NoParam>();
@@ -239,7 +246,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         /// </summary>
         public ODEPhysicsScene()
         {
-            MainConsole.Instance.WarnFormat("[PHYSICS]: Selected engine -> Open Dynamics");
+            MainConsole.Instance.WarnFormat("[ODE Physics]: Selected engine -> Open Dynamics");
 
             nearCallback = IsNearBody;
             // Create the world and the first space
@@ -445,8 +452,9 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             newGlobalcontact.geom.side1 = geom.side1;
             newGlobalcontact.geom.side2 = geom.side2;
 
-            IntPtr contact =
-                new IntPtr(GlobalContactsArray.ToInt64() + (m_global_contactcount*d.Contact.unmanagedSizeOf));
+            IntPtr contact;
+            lock (_contactcountLock)
+                contact = new IntPtr(GlobalContactsArray.ToInt64() + (m_global_contactcount*d.Contact.unmanagedSizeOf));
             Marshal.StructureToPtr(newGlobalcontact, contact, false);
             return d.JointCreateContactPtr(world, contactgroup, contact);
         }
@@ -472,11 +480,12 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                 // contact points in the space
                 try
                 {
-                    d.SpaceCollide2(g1, g2, IntPtr.Zero, nearCallback);
+                    lock(_activeprimsLock)
+                        d.SpaceCollide2(g1, g2, IntPtr.Zero, nearCallback);
                 }
                 catch (Exception e)
                 {
-                    MainConsole.Instance.WarnFormat("[PHYSICS]: SpaceCollide2 failed: {0} ", e);
+                    MainConsole.Instance.WarnFormat("[ODE Physics]: SpaceCollide2 failed: {0} ", e);
                     return;
                 }
                 return;
@@ -502,7 +511,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             }
             catch (Exception e)
             {
-                MainConsole.Instance.WarnFormat("[PHYSICS]:  ode Collide failed: {0} ", e);
+                MainConsole.Instance.WarnFormat("[ODE Physics]:  ode Collide failed: {0} ", e);
 
                 PhysicsActor badObj;
                 if (actor_name_map.TryGetValue(g1, out badObj))
@@ -677,7 +686,8 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             if (ContinueCollisionProcessing && joint != IntPtr.Zero)
             {
                 d.JointAttach(joint, b1, b2);
-                m_global_contactcount++;
+                lock (_contactcountLock)
+                    m_global_contactcount++;
             }
         }
 
@@ -758,7 +768,8 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         /// <param name="timeStep"></param>
         void Collision_optimized(float timeStep)
         {
-            m_global_contactcount = 0;
+            lock(_contactcountLock)
+                m_global_contactcount = 0;
             //Clear out all the colliding attributes before we begin to collide anyone
             foreach (ODECharacter chr in _characters)
             {
@@ -794,7 +805,8 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                             {
                                 //Do a step so that we can do the rest of the contacts, since
                                 //  otherwise, we get prim explosions inworld
-                                m_global_contactcount = 0;
+                                lock(_contactcountLock)
+                                    m_global_contactcount = 0;
                                 d.WorldQuickStep(world, ODE_STEPSIZE);
                                 d.JointGroupEmpty(contactgroup);
 
@@ -803,7 +815,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                         }
                         catch (AccessViolationException)
                         {
-                            MainConsole.Instance.Warn("[PHYSICS]: Unable to space collide");
+                            MainConsole.Instance.Warn("[ODE Physics]: Unable to space collide");
                         }
                     }
 
@@ -819,7 +831,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                             removeprims = new List<ODEPrim>();
                         removeprims.Add(prm);
                         if (prm.prim_geom == IntPtr.Zero)
-                            MainConsole.Instance.Debug("[PHYSICS]: unable to collide test active prim against space. The space was zero, the geom was zero or " +
+                            MainConsole.Instance.Debug("[ODE Physics]: unable to collide test active prim against space. The space was zero, the geom was zero or " +
                                 "it was in the process of being removed.  Removed it from the active prim list.  This needs to be fixed!");
                     }
                     if (removeprims != null)
@@ -964,7 +976,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
         public override void RemoveAvatar(PhysicsActor actor)
         {
-            //MainConsole.Instance.Debug("[PHYSICS]:ODELOCK");
+            //MainConsole.Instance.Debug("[ODE Physics]:ODELOCK");
             ((ODECharacter) actor).Destroy();
         }
 
@@ -1058,13 +1070,13 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                     }
                     else
                     {
-                        MainConsole.Instance.Warn("[PHYSICS]: Unable to remove prim from physics scene");
+                        MainConsole.Instance.Warn("[ODE Physics]: Unable to remove prim from physics scene");
                     }
                 }
                 catch (AccessViolationException)
                 {
                     MainConsole.Instance.Info(
-                        "[PHYSICS]: Couldn't remove prim from physics scene, it was already be removed.");
+                        "[ODE Physics]: Couldn't remove prim from physics scene, it was already be removed.");
                 }
             }
             if (!prim.childPrim)
@@ -1105,7 +1117,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                         d.SpaceRemove(currentspace, geom);
                     else
                     {
-                        MainConsole.Instance.Info("[Physics]: Invalid Scene passed to 'recalculatespace':" +
+                        MainConsole.Instance.Info("[ODE Physics]: Invalid Scene passed to 'recalculatespace':" +
                                                   currentspace +
                                                   " Geom:" + geom);
                     }
@@ -1119,7 +1131,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                             d.SpaceRemove(sGeomIsIn, geom);
                         else
                         {
-                            MainConsole.Instance.Info("[Physics]: Invalid Scene passed to 'recalculatespace':" +
+                            MainConsole.Instance.Info("[ODE Physics]: Invalid Scene passed to 'recalculatespace':" +
                                                       sGeomIsIn + " Geom:" + geom);
                         }
                     }
@@ -1142,7 +1154,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                         }
                         else
                         {
-                            MainConsole.Instance.Info("[Physics]: Invalid Scene passed to 'recalculatespace':" +
+                            MainConsole.Instance.Info("[ODE Physics]: Invalid Scene passed to 'recalculatespace':" +
                                        currentspace + " Geom:" + geom);
                         }
                     }
@@ -1160,7 +1172,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                             d.SpaceRemove(currentspace, geom);
                         else
                         {
-                            MainConsole.Instance.Info("[Physics]: Invalid Scene passed to 'recalculatespace':" +
+                            MainConsole.Instance.Info("[ODE Physics]: Invalid Scene passed to 'recalculatespace':" +
                                                       currentspace + " Geom:" + geom);
                         }
                     }
@@ -1173,7 +1185,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                                 d.SpaceRemove(sGeomIsIn, geom);
                             else
                             {
-                                MainConsole.Instance.Info("[Physics]: Invalid Scene passed to 'recalculatespace':" +
+                                MainConsole.Instance.Info("[ODE Physics]: Invalid Scene passed to 'recalculatespace':" +
                                                           sGeomIsIn + " Geom:" + geom);
                             }
                         }
@@ -1205,7 +1217,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         public IntPtr CalculateSpaceForGeom(Vector3 pos)
         {
             int[] xyspace = CalculateSpaceArrayItemFromPos(pos);
-            //MainConsole.Instance.Info("[Physics]: Attempting to use arrayItem: " + xyspace[0].ToString() + "," + xyspace[1].ToString());
+            //MainConsole.Instance.Info("[ODE Physics]: Attempting to use arrayItem: " + xyspace[0].ToString() + "," + xyspace[1].ToString());
             return staticPrimspace[xyspace[0], xyspace[1]];
         }
 
@@ -1449,7 +1461,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                 }
                 catch (Exception e)
                 {
-                    MainConsole.Instance.ErrorFormat("[PHYSICS]: {0}, {1}, {2}", e, e.TargetSite, e);
+                    MainConsole.Instance.ErrorFormat("[ODE Physics]: {0}, {1}, {2}", e, e.TargetSite, e);
                 }
 
                 step_time -= ODE_STEPSIZE;

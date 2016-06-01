@@ -97,7 +97,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
             if (!localPos.IsFinite())
             {
-                MainConsole.Instance.Warn("[PHYSICS]: Avatar Position is non-finite!");
+                MainConsole.Instance.Warn("[ODE Physics]: Avatar Position is non-finite!");
 
                 _parent_scene.BadCharacter(this);
                 return;
@@ -412,14 +412,14 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             if (CAPSULE_LENGTH <= 0)
             {
                 MainConsole.Instance.Warn(
-                    "[PHYSICS]: The capsule size you specified in WhiteCore.ini is invalid!  Setting it to the smallest possible size!");
+                    "[ODE Physics]: The capsule size you specified in WhiteCore.ini is invalid!  Setting it to the smallest possible size!");
                 CAPSULE_LENGTH = 1.2f;
             }
 
             if (CAPSULE_RADIUS <= 0)
             {
                 MainConsole.Instance.Warn(
-                    "[PHYSICS]: The capsule size you specified in WhiteCore.ini is invalid!  Setting it to the normal size!");
+                    "[ODE Physics]: The capsule size you specified in WhiteCore.ini is invalid!  Setting it to the normal size!");
                 CAPSULE_RADIUS = 0.37f;
             }
             Shell = d.CreateCapsule(_parent_scene.space, CAPSULE_RADIUS, CAPSULE_LENGTH);

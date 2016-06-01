@@ -142,7 +142,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                 _position.Y = _parent_scene.Region.RegionSizeY*0.5f;
                 _position.Z = _parent_scene.GetTerrainHeightAtXY(_position.X, _position.Y) + 10f;
 
-                MainConsole.Instance.Warn("[PHYSICS]: Got NaN Position on Character Create");
+                MainConsole.Instance.Warn("[ODE Physics]: Got NaN Position on Character Create");
             }
 
 
@@ -155,7 +155,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         {
             if (!(Shell == IntPtr.Zero && Body == IntPtr.Zero))
             {
-                MainConsole.Instance.Debug("[PHYSICS]: re-creating the following avatar ODE data, even though it already exists - "
+                MainConsole.Instance.Debug("[ODE Physics]: re-creating the following avatar ODE data, even though it already exists - "
                                           + (Shell != IntPtr.Zero ? "Shell " : "")
                                           + (Body != IntPtr.Zero ? "Body " : ""));
             }
@@ -298,7 +298,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                 }
                 else
                 {
-                    MainConsole.Instance.Warn("[PHYSICS]: Got a NaN Position from Scene on a Character");
+                    MainConsole.Instance.Warn("[ODE Physics]: Got a NaN Position from Scene on a Character");
                 }
             }
         }
@@ -326,7 +326,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                     {
                         //It is the same, do not rebuild
                         MainConsole.Instance.Info(
-                            "[Physics]: Not rebuilding the avatar capsule, as it is the same size as the previous capsule.");
+                            "[ODE Physics]: Not rebuilding the avatar capsule, as it is the same size as the previous capsule.");
                         return;
                     }
                     _lastSetSize = value;
@@ -339,7 +339,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                 }
                 else
                 {
-                    MainConsole.Instance.Warn("[PHYSICS]: Got a NaN Size from Scene on a Character");
+                    MainConsole.Instance.Warn("[ODE Physics]: Got a NaN Size from Scene on a Character");
                 }
             }
         }
@@ -377,7 +377,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                     m_targetVelocity = value;
                 else
                 {
-                    MainConsole.Instance.Warn("[PHYSICS]: Got a NaN velocity from Scene in a Character");
+                    MainConsole.Instance.Warn("[ODE Physics]: Got a NaN velocity from Scene in a Character");
                 }
             }
         }
@@ -750,7 +750,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             }
             else
             {
-                MainConsole.Instance.Warn("[PHYSICS]: Got a NaN force applied to a Character");
+                MainConsole.Instance.Warn("[ODE Physics]: Got a NaN force applied to a Character");
             }
             //m_lastUpdateSent = false;
         }

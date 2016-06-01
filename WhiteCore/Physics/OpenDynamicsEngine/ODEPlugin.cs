@@ -51,23 +51,21 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
         public PhysicsScene GetScene()
         {
-            lock (m_lock)
-            {
-                if (_mScene == null)
-                {
+            lock (m_lock) {
+                if (_mScene == null) {
                     if (!m_initialized) //Only initialize ode once!
                     {
                         // Initializing ODE only when a scene is created allows alternative ODE plugins to co-habit (according to
                         // http://opensimulator.org/mantis/view.php?id=2750).
-                        d.InitODE();
+                        d.InitODE ();
                         m_initialized = true;
                     }
 
-                    _mScene = new ODEPhysicsScene();
+                    _mScene = new ODEPhysicsScene ();
                 }
-            }
 
-            return _mScene;
+                return _mScene;
+            }
         }
 
         public string GetName()

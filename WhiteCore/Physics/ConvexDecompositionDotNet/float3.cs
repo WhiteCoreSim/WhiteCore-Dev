@@ -194,7 +194,7 @@ namespace WhiteCore.Physics.ConvexDecompositionDotNet
                 {
                     closePoint.NearestPointInLineSegment(point, triangle1, triangle2);
                     closeMagnitude2 = point.Distance2(closePoint);
-                    if (bForce || (bestMagnitude2 > closeMagnitude2))
+                    if (bestMagnitude2 > closeMagnitude2)
                     {
                         bForce = false;
                         bestMagnitude2 = closeMagnitude2;
