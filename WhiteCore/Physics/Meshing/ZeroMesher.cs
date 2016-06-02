@@ -49,14 +49,14 @@ namespace WhiteCore.Physics.Meshing
     {
         #region IMeshingPlugin Members
 
-        public string GetName()
+        public string GetName ()
         {
             return "ZeroMesher";
         }
 
-        public IMesher GetMesher(IConfigSource config, IRegistryCore registry)
+        public IMesher GetMesher (IConfigSource config, IRegistryCore registry)
         {
-            return new ZeroMesher();
+            return new ZeroMesher ();
         }
 
         #endregion
@@ -66,7 +66,7 @@ namespace WhiteCore.Physics.Meshing
     {
         #region IMesher Members
 
-        public IMesh CreateMesh(String primName, PrimitiveBaseShape primShape, Vector3 size, float lod, bool isPhysical, bool shouldCache)
+        public IMesh CreateMesh (string primName, PrimitiveBaseShape primShape, Vector3 size, float lod, bool isPhysical, bool shouldCache)
         {
             // Remove the reference to the encoded JPEG2000 data so it can be GCed
             primShape.SculptData = Utils.EmptyBytes;

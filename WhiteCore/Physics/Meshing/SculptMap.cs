@@ -35,6 +35,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using WhiteCore.Framework.ConsoleFramework;
 #if FASTBMP
 using WhiteCore.Framework.Utilities;
 #endif
@@ -61,7 +62,7 @@ namespace WhiteCore.Physics.PrimMesher
             int bmH = bm.Height;
 
             if (bmW == 0 || bmH == 0)
-                throw new Exception ("SculptMap: bitmap has no data");
+                MainConsole.Instance.Error("[Sculptmap]: Bitmap has no data");
 
             int numLodPixels = lod * 2 * lod * 2; // (32 * 2)^2  = 64^2 pixels for default sculpt map image
 
@@ -86,7 +87,7 @@ namespace WhiteCore.Physics.PrimMesher
                         InterpolationMode.NearestNeighbor);
             } catch (Exception e)
             {
-                throw new Exception ("Exception in ScaleImage(): e: " + e);
+                MainConsole.Instance.Error ("[Sculptmap]: Exception in ScaleImage(): e: " + e);
             }
 
             if (width * height > lod * lod)
@@ -139,12 +140,13 @@ namespace WhiteCore.Physics.PrimMesher
                 }
             } catch (Exception e)
             {
-                throw new Exception ("Caught exception processing byte arrays in SculptMap(): e: " + e);
+                MainConsole.Instance.Error("[SculptMap]: Caught exception processing byte arrays in SculptMap(): e: " + e);
             }
 #if FASTBMP
             //All done, unlock
             unsafeBMP.UnlockBitmap ();
 #endif
+            bm.Dispose ();
             width++;
             height++;
         }
@@ -186,8 +188,8 @@ namespace WhiteCore.Physics.PrimMesher
             Bitmap scaledImage = new Bitmap (destWidth, destHeight, PixelFormat.Format24bppRgb);
 
             Color c;
-            float xscale = srcImage.Width / destWidth;
-            float yscale = srcImage.Height / destHeight;
+            float xscale = srcImage.Width / (float)destWidth;
+            float yscale = srcImage.Height / (float) destHeight;
 
             float sy = 0.5f;
             for (int y = 0; y < destHeight; y++)
@@ -199,7 +201,7 @@ namespace WhiteCore.Physics.PrimMesher
                     {
                         c = srcImage.GetPixel ((int)(sx), (int)(sy));
                         scaledImage.SetPixel (x, y, Color.FromArgb (c.R, c.G, c.B));
-                    } catch (IndexOutOfRangeException)
+                    } catch // not sure why this one specifically?? //(IndexOutOfRangeException)
                     {
                     }
 

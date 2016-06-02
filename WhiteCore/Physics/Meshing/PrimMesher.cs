@@ -118,7 +118,7 @@ namespace WhiteCore.Physics.PrimMesher
 
         public override string ToString ()
         {
-            return String.Format ("< X: {0}, Y: {1}, Z: {2}, W: {3} >", X, Y, Z, W);
+            return string.Format ("< X: {0}, Y: {1}, Z: {2}, W: {3} >", X, Y, Z, W);
         }
     }
 
@@ -1203,20 +1203,21 @@ namespace WhiteCore.Physics.PrimMesher
             }
         }
 
-        internal void DumpRaw (String path, String name, String title)
+        internal void DumpRaw (string path, string name, string title)
         {
             if (path == null)
                 return;
-            String fileName = name + "_" + title + ".raw";
-            String completePath = System.IO.Path.Combine (path, fileName);
+            string fileName = name + "_" + title + ".raw";
+            string completePath = System.IO.Path.Combine (path, fileName);
             StreamWriter sw = new StreamWriter (completePath);
 
-            for (int i = 0; i < faces.Count; i++)
-            {
-                string s = coords [faces [i].v1] + " " + coords [faces [i].v2] + " " + coords [faces [i].v3];
-                sw.WriteLine (s);
+            try {
+                for (int i = 0; i < faces.Count; i++) {
+                    string s = coords [faces [i].v1] + " " + coords [faces [i].v2] + " " + coords [faces [i].v3];
+                    sw.WriteLine (s);
+                }
+            } catch {
             }
-
             sw.Close ();
         }
     }
@@ -1897,14 +1898,14 @@ namespace WhiteCore.Physics.PrimMesher
 
                             float u1 = newLayer.us[uIndex];
                             float u2 = 1.0f;
-                            if (uIndex < (int)newLayer.us.Count - 1)
+                            if (uIndex < newLayer.us.Count - 1)
                                 u2 = newLayer.us[uIndex + 1];
 
                             if (whichVert == cut1Vert || whichVert == cut2Vert)
                             {
                                 u1 = 0.0f;
                                 u2 = 1.0f;
-                                if (uIndex < (int) newLayer.us.Count - 1) u2 = newLayer.us[uIndex + 1];
+                                if (uIndex < newLayer.us.Count - 1) u2 = newLayer.us[uIndex + 1];
                                 if (whichVert == cut1Vert || whichVert == cut2Vert)
                                 {
                                     u1 = 0.0f;
@@ -2304,20 +2305,21 @@ namespace WhiteCore.Physics.PrimMesher
         /// <param name="path"></param>
         /// <param name="name"></param>
         /// <param name="title"></param>
-        public void DumpRaw (String path, String name, String title)
+        public void DumpRaw (string path, string name, string title)
         {
             if (path == null)
                 return;
-            String fileName = name + "_" + title + ".raw";
-            String completePath = System.IO.Path.Combine (path, fileName);
+            string fileName = name + "_" + title + ".raw";
+            string completePath = System.IO.Path.Combine (path, fileName);
             StreamWriter sw = new StreamWriter (completePath);
 
-            for (int i = 0; i < faces.Count; i++)
-            {
-                string s = coords [faces [i].v1] + " " + coords [faces [i].v2] + " " + coords [faces [i].v3];
-                sw.WriteLine (s);
+            try {
+                for (int i = 0; i < faces.Count; i++) {
+                    string s = coords [faces [i].v1] + " " + coords [faces [i].v2] + " " + coords [faces [i].v3];
+                    sw.WriteLine (s);
+                }
+            } catch {
             }
-
             sw.Close ();
         }
     }
