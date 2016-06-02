@@ -26,13 +26,6 @@
  */
 
 
-using WhiteCore.Framework.ClientInterfaces;
-using WhiteCore.Framework.ConsoleFramework;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.SceneInfo;
-using WhiteCore.Framework.SceneInfo.Entities;
-using WhiteCore.Framework.Serialization;
-using OpenMetaverse;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -40,7 +33,14 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml;
+using OpenMetaverse;
 using OpenMetaverse.StructuredData;
+using WhiteCore.Framework.ClientInterfaces;
+using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.SceneInfo;
+using WhiteCore.Framework.SceneInfo.Entities;
+using WhiteCore.Framework.Serialization;
 
 namespace WhiteCore.Region.Serialization
 {
@@ -108,8 +108,8 @@ namespace WhiteCore.Region.Serialization
                     sceneObject = FromXml2Format(xmlData, m_sceneForGroup);
                     if (sceneObject == null)
                         return null;
-                    else
-                        return sceneObject;
+                    
+                    return sceneObject;
                 }
 
                 sr = new StringReader(parts[0].InnerXml);
@@ -138,7 +138,7 @@ namespace WhiteCore.Region.Serialization
             catch (Exception e)
             {
                 MainConsole.Instance.ErrorFormat(
-                    "[SERIALIZER]: Deserialization of xml failed with {0}.  xml was {1}", e, xmlData);
+                    "[Serializer]: Deserialization of xml failed with {0}.  xml was {1}", e, xmlData);
                 return null;
             }
         }
@@ -174,16 +174,16 @@ namespace WhiteCore.Region.Serialization
             //MainConsole.Instance.DebugFormat("[SERIALIZER]: Starting serialization of {0}", Name);
             //int time = Util.EnvironmentTickCount();
 
-            writer.WriteStartElement(String.Empty, "SceneObjectGroup", String.Empty);
-            writer.WriteStartElement(String.Empty, "RootPart", String.Empty);
+            writer.WriteStartElement(string.Empty, "SceneObjectGroup", string.Empty);
+            writer.WriteStartElement(string.Empty, "RootPart", string.Empty);
             ToXmlFormat(sceneObject.RootPart, writer);
             writer.WriteEndElement();
-            writer.WriteStartElement(String.Empty, "OtherParts", String.Empty);
+            writer.WriteStartElement(string.Empty, "OtherParts", string.Empty);
 
             SceneObjectPart[] parts = sceneObject.Parts;
             foreach (SceneObjectPart part in parts.Where(part => part.UUID != sceneObject.RootPart.UUID))
             {
-                writer.WriteStartElement(String.Empty, "Part", String.Empty);
+                writer.WriteStartElement(string.Empty, "Part", string.Empty);
                 ToXmlFormat(part, writer);
                 writer.WriteEndElement();
             }
@@ -216,7 +216,7 @@ namespace WhiteCore.Region.Serialization
             }
             catch (Exception e)
             {
-                MainConsole.Instance.ErrorFormat("[SERIALIZER]: Deserialization of xml failed with {0}.  xml was {1}", e,
+                MainConsole.Instance.ErrorFormat("[Serializer]: Deserialization of xml failed with {0}.  xml was {1}", e,
                                                  xmlData);
                 return null;
             }
@@ -239,13 +239,14 @@ namespace WhiteCore.Region.Serialization
                 doc.Load(ms);
 
                 grp = InternalFromXml2Format(doc, scene);
-                foreach (var c in grp.ChildrenList)
-                    c.FinishedSerializingGenericProperties();
+                if (grp != null)
+                    foreach (var c in grp.ChildrenList)
+                        c.FinishedSerializingGenericProperties();
                 return grp;
             }
             catch (Exception e)
             {
-                MainConsole.Instance.ErrorFormat("[SERIALIZER]: Deserialization of xml failed with {0}", e);
+                MainConsole.Instance.ErrorFormat("[Serializer]: Deserialization of xml failed with {0}", e);
                 return grp;
             }
             finally
@@ -291,7 +292,7 @@ namespace WhiteCore.Region.Serialization
             }
             catch (Exception e)
             {
-                MainConsole.Instance.ErrorFormat("[SERIALIZER]: Deserialization of xml failed with {0}.  xml was {1}", e,
+                MainConsole.Instance.ErrorFormat("[Serializer]: Deserialization of xml failed with {0}.  xml was {1}", e,
                                                  doc.Value);
                 return null;
             }
@@ -565,7 +566,7 @@ namespace WhiteCore.Region.Serialization
                 m_genericSerializers.Add(Name, processor.Serialization);
             }
             else
-                MainConsole.Instance.Warn("[SCENEOBJECTSERIALIZER]: Tried to add an additional SOP processor for " +
+                MainConsole.Instance.Warn("[Serializer]: Tried to add an additional SOP processor for " +
                                           Name);
         }
 
@@ -577,7 +578,7 @@ namespace WhiteCore.Region.Serialization
                 m_genericSerializers.Remove(Name);
             }
             else
-                MainConsole.Instance.Warn("[SCENEOBJECTSERIALIZER]: Tried to remove a SOP processor for " + Name +
+                MainConsole.Instance.Warn("[Serializer]: Tried to remove a SOP processor for " + Name +
                                           " that did not exist");
         }
 
@@ -585,9 +586,9 @@ namespace WhiteCore.Region.Serialization
 
         public void SOGToXml2(XmlTextWriter writer, SceneObjectGroup sog, Dictionary<string, object> options)
         {
-            writer.WriteStartElement(String.Empty, "SceneObjectGroup", String.Empty);
+            writer.WriteStartElement(string.Empty, "SceneObjectGroup", string.Empty);
             SOPToXml2(writer, sog.RootPart, options);
-            writer.WriteStartElement(String.Empty, "OtherParts", String.Empty);
+            writer.WriteStartElement(string.Empty, "OtherParts", string.Empty);
 
             sog.ForEachPart(delegate(SceneObjectPart sop)
                                 {
@@ -1050,7 +1051,7 @@ namespace WhiteCore.Region.Serialization
                     }
                     catch (Exception e)
                     {
-                        MainConsole.Instance.DebugFormat("[SceneObjectSerializer]: exception while parsing {0}: {1}",
+                        MainConsole.Instance.DebugFormat("[Serializer]: exception while parsing {0}: {1}",
                                                          nodeName, e);
                         if (reader.NodeType == XmlNodeType.EndElement)
                             reader.Read();
@@ -1147,9 +1148,9 @@ namespace WhiteCore.Region.Serialization
             Vector3 vec;
 
             reader.ReadStartElement(name);
-            vec.X = reader.ReadElementContentAsFloat(reader.Name, String.Empty); // X or x
-            vec.Y = reader.ReadElementContentAsFloat(reader.Name, String.Empty); // Y or y
-            vec.Z = reader.ReadElementContentAsFloat(reader.Name, String.Empty); // Z or z
+            vec.X = reader.ReadElementContentAsFloat(reader.Name, string.Empty); // X or x
+            vec.Y = reader.ReadElementContentAsFloat(reader.Name, string.Empty); // Y or y
+            vec.Z = reader.ReadElementContentAsFloat(reader.Name, string.Empty); // Z or z
             reader.ReadEndElement();
 
             return vec;
@@ -1165,16 +1166,16 @@ namespace WhiteCore.Region.Serialization
                 switch (reader.Name.ToLower())
                 {
                     case "x":
-                        quat.X = reader.ReadElementContentAsFloat(reader.Name, String.Empty);
+                        quat.X = reader.ReadElementContentAsFloat(reader.Name, string.Empty);
                         break;
                     case "y":
-                        quat.Y = reader.ReadElementContentAsFloat(reader.Name, String.Empty);
+                        quat.Y = reader.ReadElementContentAsFloat(reader.Name, string.Empty);
                         break;
                     case "z":
-                        quat.Z = reader.ReadElementContentAsFloat(reader.Name, String.Empty);
+                        quat.Z = reader.ReadElementContentAsFloat(reader.Name, string.Empty);
                         break;
                     case "w":
-                        quat.W = reader.ReadElementContentAsFloat(reader.Name, String.Empty);
+                        quat.W = reader.ReadElementContentAsFloat(reader.Name, string.Empty);
                         break;
                 }
             }
@@ -1188,7 +1189,7 @@ namespace WhiteCore.Region.Serialization
         {
             TaskInventoryDictionary tinv = new TaskInventoryDictionary();
 
-            reader.ReadStartElement(name, String.Empty);
+            reader.ReadStartElement(name, string.Empty);
 
             if (reader.IsEmptyElement)
             {
@@ -1198,7 +1199,7 @@ namespace WhiteCore.Region.Serialization
 
             while (reader.Name == "TaskInventoryItem")
             {
-                reader.ReadStartElement("TaskInventoryItem", String.Empty); // TaskInventory
+                reader.ReadStartElement("TaskInventoryItem", string.Empty); // TaskInventory
 
                 TaskInventoryItem item = new TaskInventoryItem();
                 while (reader.NodeType != XmlNodeType.EndElement)
@@ -1217,7 +1218,7 @@ namespace WhiteCore.Region.Serialization
                     catch (Exception e)
                     {
                         MainConsole.Instance.DebugFormat(
-                            "[SceneObjectSerializer]: exception while parsing Inventory Items {0}: {1}",
+                            "[Serializer]: exception while parsing Inventory Items {0}: {1}",
                             reader.Name, e);
                     }
                 }
@@ -1242,7 +1243,7 @@ namespace WhiteCore.Region.Serialization
                 return shape;
             }
 
-            reader.ReadStartElement(name, String.Empty); // Shape
+            reader.ReadStartElement(name, string.Empty); // Shape
 
             string nodeName = string.Empty;
             while (reader.NodeType != XmlNodeType.EndElement)
@@ -1259,7 +1260,7 @@ namespace WhiteCore.Region.Serialization
                     catch (Exception e)
                     {
                         MainConsole.Instance.DebugFormat(
-                            "[SceneObjectSerializer]: exception while parsing Shape {0}: {1}", nodeName, e);
+                            "[Serializer]: exception while parsing Shape {0}: {1}", nodeName, e);
                         if (reader.NodeType == XmlNodeType.EndElement)
                             reader.Read();
                     }
@@ -1279,24 +1280,24 @@ namespace WhiteCore.Region.Serialization
         void ReadVehicleSettings(SceneObjectPart obj, XmlTextReader reader)
         {
             reader.ReadStartElement("Vehicle");
-            obj.VehicleType = reader.ReadElementContentAsInt ("VehicleType", String.Empty);
+            obj.VehicleType = reader.ReadElementContentAsInt ("VehicleType", string.Empty);
 
             if (obj.VehicleType > 0)
             {
-                reader.ReadStartElement("VehicleSettings", String.Empty);
-                reader.ReadStartElement("VehicleFlags", String.Empty);
+                reader.ReadStartElement("VehicleSettings", string.Empty);
+                reader.ReadStartElement("VehicleFlags", string.Empty);
 
                 int nodeName = 0;
                 OSDArray partFlags = new OSDArray ();
                 while (reader.NodeType != XmlNodeType.EndElement)
                 {
-                    partFlags.Add(reader.ReadElementContentAsInt("F"+nodeName, String.Empty));
+                    partFlags.Add(reader.ReadElementContentAsInt("F"+nodeName, string.Empty));
                     nodeName++;
                 }
                 obj.VehicleFlags = partFlags;
                 reader.ReadEndElement(); // VehicleFlags
 
-                reader.ReadStartElement("VehicleParameters", String.Empty);
+                reader.ReadStartElement("VehicleParameters", string.Empty);
                 while (reader.NodeType != XmlNodeType.EndElement)
                 {
                     int key = int.Parse(reader.Name.Substring(1));
@@ -1315,7 +1316,7 @@ namespace WhiteCore.Region.Serialization
                         obj.SetVehicleVectorParam(key, ReadVector(reader,reader.Name));
                         break;
                     default:
-                        obj.SetVehicleFloatParam(key, reader.ReadElementContentAsFloat(reader.Name, String.Empty));
+                        obj.SetVehicleFloatParam(key, reader.ReadElementContentAsFloat(reader.Name, string.Empty));
                         break;
                     }
                 }
@@ -1331,7 +1332,7 @@ namespace WhiteCore.Region.Serialization
 
         void ProcessAllowedDrop(SceneObjectPart obj, XmlTextReader reader)
         {
-            obj.AllowedDrop = reader.ReadElementContentAsBoolean("AllowedDrop", String.Empty);
+            obj.AllowedDrop = reader.ReadElementContentAsBoolean("AllowedDrop", string.Empty);
         }
 
         void ProcessCreatorID(SceneObjectPart obj, XmlTextReader reader)
@@ -1341,12 +1342,12 @@ namespace WhiteCore.Region.Serialization
 
         void ProcessCreatorData(SceneObjectPart obj, XmlTextReader reader)
         {
-            obj.CreatorData = reader.ReadElementContentAsString("CreatorData", String.Empty);
+            obj.CreatorData = reader.ReadElementContentAsString("CreatorData", string.Empty);
         }
 
         void ProcessInventorySerial(SceneObjectPart obj, XmlTextReader reader)
         {
-            obj.InventorySerial = uint.Parse(reader.ReadElementContentAsString("InventorySerial", String.Empty));
+            obj.InventorySerial = uint.Parse(reader.ReadElementContentAsString("InventorySerial", string.Empty));
         }
 
         void ProcessTaskInventory(SceneObjectPart obj, XmlTextReader reader)
@@ -1361,7 +1362,7 @@ namespace WhiteCore.Region.Serialization
 
         void ProcessLocalId(SceneObjectPart obj, XmlTextReader reader)
         {
-            obj.LocalId = (uint) reader.ReadElementContentAsLong("LocalId", String.Empty);
+            obj.LocalId = (uint) reader.ReadElementContentAsLong("LocalId", string.Empty);
         }
 
         void ProcessName(SceneObjectPart obj, XmlTextReader reader)
@@ -1371,22 +1372,22 @@ namespace WhiteCore.Region.Serialization
 
         void ProcessMaterial(SceneObjectPart obj, XmlTextReader reader)
         {
-            obj.Material = (byte) reader.ReadElementContentAsInt("Material", String.Empty);
+            obj.Material = (byte) reader.ReadElementContentAsInt("Material", string.Empty);
         }
 
         void ProcessPassCollisions(SceneObjectPart obj, XmlTextReader reader)
         {
-            obj.PassCollisions = reader.ReadElementContentAsInt("PassCollisions", String.Empty);
+            obj.PassCollisions = reader.ReadElementContentAsInt("PassCollisions", string.Empty);
         }
 
         void ProcessPassTouch(SceneObjectPart obj, XmlTextReader reader)
         {
-            obj.PassTouch = reader.ReadElementContentAsInt("PassTouch", String.Empty);
+            obj.PassTouch = reader.ReadElementContentAsInt("PassTouch", string.Empty);
         }
 
         void ProcessScriptAccessPin(SceneObjectPart obj, XmlTextReader reader)
         {
-            obj.ScriptAccessPin = reader.ReadElementContentAsInt("ScriptAccessPin", String.Empty);
+            obj.ScriptAccessPin = reader.ReadElementContentAsInt("ScriptAccessPin", string.Empty);
         }
 
         void ProcessGroupPosition(SceneObjectPart obj, XmlTextReader reader)
@@ -1429,10 +1430,10 @@ namespace WhiteCore.Region.Serialization
             reader.ReadStartElement("Color");
             if (reader.Name == "R")
             {
-                float r = reader.ReadElementContentAsFloat("R", String.Empty);
-                float g = reader.ReadElementContentAsFloat("G", String.Empty);
-                float b = reader.ReadElementContentAsFloat("B", String.Empty);
-                float a = reader.ReadElementContentAsFloat("A", String.Empty);
+                float r = reader.ReadElementContentAsFloat("R", string.Empty);
+                float g = reader.ReadElementContentAsFloat("G", string.Empty);
+                float b = reader.ReadElementContentAsFloat("B", string.Empty);
+                float a = reader.ReadElementContentAsFloat("A", string.Empty);
                 obj.Color = Color.FromArgb((int) a, (int) r, (int) g, (int) b);
                 reader.ReadEndElement();
             }
@@ -1440,27 +1441,27 @@ namespace WhiteCore.Region.Serialization
 
         void ProcessText(SceneObjectPart obj, XmlTextReader reader)
         {
-            obj.Text = reader.ReadElementString("Text", String.Empty);
+            obj.Text = reader.ReadElementString("Text", string.Empty);
         }
 
         void ProcessSitName(SceneObjectPart obj, XmlTextReader reader)
         {
-            obj.SitName = reader.ReadElementString("SitName", String.Empty);
+            obj.SitName = reader.ReadElementString("SitName", string.Empty);
         }
 
         void ProcessTouchName(SceneObjectPart obj, XmlTextReader reader)
         {
-            obj.TouchName = reader.ReadElementString("TouchName", String.Empty);
+            obj.TouchName = reader.ReadElementString("TouchName", string.Empty);
         }
 
         void ProcessLinkNum(SceneObjectPart obj, XmlTextReader reader)
         {
-            obj.LinkNum = reader.ReadElementContentAsInt("LinkNum", String.Empty);
+            obj.LinkNum = reader.ReadElementContentAsInt("LinkNum", string.Empty);
         }
 
         void ProcessClickAction(SceneObjectPart obj, XmlTextReader reader)
         {
-            obj.ClickAction = (byte) reader.ReadElementContentAsInt("ClickAction", String.Empty);
+            obj.ClickAction = (byte) reader.ReadElementContentAsInt("ClickAction", string.Empty);
         }
 
         void ProcessShape(SceneObjectPart obj, XmlTextReader reader)
@@ -1491,33 +1492,33 @@ namespace WhiteCore.Region.Serialization
 
         void ProcessParentID(SceneObjectPart obj, XmlTextReader reader)
         {
-            string str = reader.ReadElementContentAsString("ParentID", String.Empty);
+            string str = reader.ReadElementContentAsString("ParentID", string.Empty);
             obj.ParentID = Convert.ToUInt32(str);
         }
 
         void ProcessCreationDate(SceneObjectPart obj, XmlTextReader reader)
         {
-            obj.CreationDate = reader.ReadElementContentAsInt("CreationDate", String.Empty);
+            obj.CreationDate = reader.ReadElementContentAsInt("CreationDate", string.Empty);
         }
 
         void ProcessCategory(SceneObjectPart obj, XmlTextReader reader)
         {
-            obj.Category = uint.Parse(reader.ReadElementContentAsString("Category", String.Empty));
+            obj.Category = uint.Parse(reader.ReadElementContentAsString("Category", string.Empty));
         }
 
         void ProcessSalePrice(SceneObjectPart obj, XmlTextReader reader)
         {
-            obj.SalePrice = reader.ReadElementContentAsInt("SalePrice", String.Empty);
+            obj.SalePrice = reader.ReadElementContentAsInt("SalePrice", string.Empty);
         }
 
         void ProcessObjectSaleType(SceneObjectPart obj, XmlTextReader reader)
         {
-            obj.ObjectSaleType = (byte) reader.ReadElementContentAsInt("ObjectSaleType", String.Empty);
+            obj.ObjectSaleType = (byte) reader.ReadElementContentAsInt("ObjectSaleType", string.Empty);
         }
 
         void ProcessOwnershipCost(SceneObjectPart obj, XmlTextReader reader)
         {
-            obj.OwnershipCost = reader.ReadElementContentAsInt("OwnershipCost", String.Empty);
+            obj.OwnershipCost = reader.ReadElementContentAsInt("OwnershipCost", string.Empty);
         }
 
         void ProcessGroupID(SceneObjectPart obj, XmlTextReader reader)
@@ -1537,32 +1538,32 @@ namespace WhiteCore.Region.Serialization
 
         void ProcessBaseMask(SceneObjectPart obj, XmlTextReader reader)
         {
-            obj.BaseMask = uint.Parse(reader.ReadElementContentAsString("BaseMask", String.Empty));
+            obj.BaseMask = uint.Parse(reader.ReadElementContentAsString("BaseMask", string.Empty));
         }
 
         void ProcessOwnerMask(SceneObjectPart obj, XmlTextReader reader)
         {
-            obj.OwnerMask = uint.Parse(reader.ReadElementContentAsString("OwnerMask", String.Empty));
+            obj.OwnerMask = uint.Parse(reader.ReadElementContentAsString("OwnerMask", string.Empty));
         }
 
         void ProcessGroupMask(SceneObjectPart obj, XmlTextReader reader)
         {
-            obj.GroupMask = uint.Parse(reader.ReadElementContentAsString("GroupMask", String.Empty));
+            obj.GroupMask = uint.Parse(reader.ReadElementContentAsString("GroupMask", string.Empty));
         }
 
         void ProcessEveryoneMask(SceneObjectPart obj, XmlTextReader reader)
         {
-            obj.EveryoneMask = uint.Parse(reader.ReadElementContentAsString("EveryoneMask", String.Empty));
+            obj.EveryoneMask = uint.Parse(reader.ReadElementContentAsString("EveryoneMask", string.Empty));
         }
 
         void ProcessNextOwnerMask(SceneObjectPart obj, XmlTextReader reader)
         {
-            obj.NextOwnerMask = uint.Parse(reader.ReadElementContentAsString("NextOwnerMask", String.Empty));
+            obj.NextOwnerMask = uint.Parse(reader.ReadElementContentAsString("NextOwnerMask", string.Empty));
         }
 
         void ProcessFlags(SceneObjectPart obj, XmlTextReader reader)
         {
-            string value = reader.ReadElementContentAsString("Flags", String.Empty);
+            string value = reader.ReadElementContentAsString("Flags", string.Empty);
             // !!!!! to deal with flags without commas
             if (value.Contains(" ") && !value.Contains(","))
                 value = value.Replace(" ", ", ");
@@ -1577,49 +1578,49 @@ namespace WhiteCore.Region.Serialization
         void ProcessCollisionSoundVolume(SceneObjectPart obj, XmlTextReader reader)
         {
             obj.CollisionSoundVolume =
-                float.Parse(reader.ReadElementContentAsString("CollisionSoundVolume", String.Empty));
+                float.Parse(reader.ReadElementContentAsString("CollisionSoundVolume", string.Empty));
         }
 
         void ProcessMediaUrl(SceneObjectPart obj, XmlTextReader reader)
         {
-            obj.MediaUrl = reader.ReadElementContentAsString("MediaUrl", String.Empty);
+            obj.MediaUrl = reader.ReadElementContentAsString("MediaUrl", string.Empty);
         }
 
         void ProcessTextureAnimation(SceneObjectPart obj, XmlTextReader reader)
         {
             obj.TextureAnimation =
-                Convert.FromBase64String(reader.ReadElementContentAsString("TextureAnimation", String.Empty));
+                Convert.FromBase64String(reader.ReadElementContentAsString("TextureAnimation", string.Empty));
         }
 
         void ProcessParticleSystem(SceneObjectPart obj, XmlTextReader reader)
         {
             obj.ParticleSystem =
-                Convert.FromBase64String(reader.ReadElementContentAsString("ParticleSystem", String.Empty));
+                Convert.FromBase64String(reader.ReadElementContentAsString("ParticleSystem", string.Empty));
         }
 
         void ProcessPayPrice0(SceneObjectPart obj, XmlTextReader reader)
         {
-            obj.PayPrice[0] = int.Parse(reader.ReadElementContentAsString("PayPrice0", String.Empty));
+            obj.PayPrice[0] = int.Parse(reader.ReadElementContentAsString("PayPrice0", string.Empty));
         }
 
         void ProcessPayPrice1(SceneObjectPart obj, XmlTextReader reader)
         {
-            obj.PayPrice[1] = int.Parse(reader.ReadElementContentAsString("PayPrice1", String.Empty));
+            obj.PayPrice[1] = int.Parse(reader.ReadElementContentAsString("PayPrice1", string.Empty));
         }
 
         void ProcessPayPrice2(SceneObjectPart obj, XmlTextReader reader)
         {
-            obj.PayPrice[2] = int.Parse(reader.ReadElementContentAsString("PayPrice2", String.Empty));
+            obj.PayPrice[2] = int.Parse(reader.ReadElementContentAsString("PayPrice2", string.Empty));
         }
 
         void ProcessPayPrice3(SceneObjectPart obj, XmlTextReader reader)
         {
-            obj.PayPrice[3] = int.Parse(reader.ReadElementContentAsString("PayPrice3", String.Empty));
+            obj.PayPrice[3] = int.Parse(reader.ReadElementContentAsString("PayPrice3", string.Empty));
         }
 
         void ProcessPayPrice4(SceneObjectPart obj, XmlTextReader reader)
         {
-            obj.PayPrice[4] = int.Parse(reader.ReadElementContentAsString("PayPrice4", String.Empty));
+            obj.PayPrice[4] = int.Parse(reader.ReadElementContentAsString("PayPrice4", string.Empty));
         }
 
         void ProcessFromUserInventoryAssetID(SceneObjectPart obj, XmlTextReader reader)
@@ -1645,19 +1646,19 @@ namespace WhiteCore.Region.Serialization
         void GenericInt(SceneObjectPart obj, XmlTextReader reader, string name, Type SOPType)
         {
             SOPType.GetProperty(name)
-                   .SetValue(obj, int.Parse(reader.ReadElementContentAsString(name, String.Empty)), null);
+                   .SetValue(obj, int.Parse(reader.ReadElementContentAsString(name, string.Empty)), null);
         }
 
         void GenericDouble(SceneObjectPart obj, XmlTextReader reader, string name, Type SOPType)
         {
             SOPType.GetProperty(name)
-                   .SetValue(obj, double.Parse(reader.ReadElementContentAsString(name, String.Empty)), null);
+                   .SetValue(obj, double.Parse(reader.ReadElementContentAsString(name, string.Empty)), null);
         }
 
         void GenericFloat(SceneObjectPart obj, XmlTextReader reader, string name, Type SOPType)
         {
             SOPType.GetProperty(name)
-                   .SetValue(obj, float.Parse(reader.ReadElementContentAsString(name, String.Empty)), null);
+                   .SetValue(obj, float.Parse(reader.ReadElementContentAsString(name, string.Empty)), null);
         }
 
         void ReadProtobuf<T>(SceneObjectPart obj, XmlTextReader reader, string name, Type SOPType)
@@ -1674,7 +1675,7 @@ namespace WhiteCore.Region.Serialization
             }
             catch (Exception ex)
             {
-                MainConsole.Instance.Debug("[SceneObjectSerializer]: Failed to parse " + name + ": " + ex.ToString());
+                MainConsole.Instance.Debug("[Serializer]: Failed to parse " + name + ": " + ex);
             }
         }
 
@@ -1756,7 +1757,7 @@ namespace WhiteCore.Region.Serialization
         void GenericByte(SceneObjectPart obj, XmlTextReader reader, string name, Type SOPType)
         {
             SOPType.GetProperty(name)
-                   .SetValue(obj, byte.Parse(reader.ReadElementContentAsString(name, String.Empty)), null);
+                   .SetValue(obj, byte.Parse(reader.ReadElementContentAsString(name, string.Empty)), null);
         }
 
         void GenericUUID(SceneObjectPart obj, XmlTextReader reader, string name, Type SOPType)
@@ -1780,12 +1781,12 @@ namespace WhiteCore.Region.Serialization
 
         void ProcessTIBasePermissions(TaskInventoryItem item, XmlTextReader reader)
         {
-            item.BasePermissions = uint.Parse(reader.ReadElementContentAsString("BasePermissions", String.Empty));
+            item.BasePermissions = uint.Parse(reader.ReadElementContentAsString("BasePermissions", string.Empty));
         }
 
         void ProcessTICreationDate(TaskInventoryItem item, XmlTextReader reader)
         {
-            item.CreationDate = uint.Parse(reader.ReadElementContentAsString("CreationDate", String.Empty));
+            item.CreationDate = uint.Parse(reader.ReadElementContentAsString("CreationDate", string.Empty));
         }
 
         void ProcessTICreatorID(TaskInventoryItem item, XmlTextReader reader)
@@ -1795,22 +1796,22 @@ namespace WhiteCore.Region.Serialization
 
         void ProcessTICreatorData(TaskInventoryItem item, XmlTextReader reader)
         {
-            item.CreatorData = reader.ReadElementContentAsString("CreatorData", String.Empty);
+            item.CreatorData = reader.ReadElementContentAsString("CreatorData", string.Empty);
         }
 
         void ProcessTIDescription(TaskInventoryItem item, XmlTextReader reader)
         {
-            item.Description = reader.ReadElementContentAsString("Description", String.Empty);
+            item.Description = reader.ReadElementContentAsString("Description", string.Empty);
         }
 
         void ProcessTIEveryonePermissions(TaskInventoryItem item, XmlTextReader reader)
         {
-            item.EveryonePermissions = uint.Parse(reader.ReadElementContentAsString("EveryonePermissions", String.Empty));
+            item.EveryonePermissions = uint.Parse(reader.ReadElementContentAsString("EveryonePermissions", string.Empty));
         }
 
         void ProcessTIFlags(TaskInventoryItem item, XmlTextReader reader)
         {
-            item.Flags = uint.Parse(reader.ReadElementContentAsString("Flags", String.Empty));
+            item.Flags = uint.Parse(reader.ReadElementContentAsString("Flags", string.Empty));
         }
 
         void ProcessTIGroupID(TaskInventoryItem item, XmlTextReader reader)
@@ -1820,12 +1821,12 @@ namespace WhiteCore.Region.Serialization
 
         void ProcessTIGroupPermissions(TaskInventoryItem item, XmlTextReader reader)
         {
-            item.GroupPermissions = uint.Parse(reader.ReadElementContentAsString("GroupPermissions", String.Empty));
+            item.GroupPermissions = uint.Parse(reader.ReadElementContentAsString("GroupPermissions", string.Empty));
         }
 
         void ProcessTIInvType(TaskInventoryItem item, XmlTextReader reader)
         {
-            item.InvType = reader.ReadElementContentAsInt("InvType", String.Empty);
+            item.InvType = reader.ReadElementContentAsInt("InvType", string.Empty);
         }
 
         void ProcessTIItemID(TaskInventoryItem item, XmlTextReader reader)
@@ -1847,12 +1848,12 @@ namespace WhiteCore.Region.Serialization
 
         void ProcessTIName(TaskInventoryItem item, XmlTextReader reader)
         {
-            item.Name = reader.ReadElementContentAsString("Name", String.Empty);
+            item.Name = reader.ReadElementContentAsString("Name", string.Empty);
         }
 
         void ProcessTINextPermissions(TaskInventoryItem item, XmlTextReader reader)
         {
-            item.NextPermissions = uint.Parse(reader.ReadElementContentAsString("NextPermissions", String.Empty));
+            item.NextPermissions = uint.Parse(reader.ReadElementContentAsString("NextPermissions", string.Empty));
         }
 
         void ProcessTIOwnerID(TaskInventoryItem item, XmlTextReader reader)
@@ -1862,7 +1863,7 @@ namespace WhiteCore.Region.Serialization
 
         void ProcessTICurrentPermissions(TaskInventoryItem item, XmlTextReader reader)
         {
-            item.CurrentPermissions = uint.Parse(reader.ReadElementContentAsString("CurrentPermissions", String.Empty));
+            item.CurrentPermissions = uint.Parse(reader.ReadElementContentAsString("CurrentPermissions", string.Empty));
         }
 
         void ProcessTIParentID(TaskInventoryItem item, XmlTextReader reader)
@@ -1882,17 +1883,17 @@ namespace WhiteCore.Region.Serialization
 
         void ProcessTIPermsMask(TaskInventoryItem item, XmlTextReader reader)
         {
-            item.PermsMask = reader.ReadElementContentAsInt("PermsMask", String.Empty);
+            item.PermsMask = reader.ReadElementContentAsInt("PermsMask", string.Empty);
         }
 
         void ProcessTIType(TaskInventoryItem item, XmlTextReader reader)
         {
-            item.Type = reader.ReadElementContentAsInt("Type", String.Empty);
+            item.Type = reader.ReadElementContentAsInt("Type", string.Empty);
         }
 
         void ProcessTIOwnerChanged(TaskInventoryItem item, XmlTextReader reader)
         {
-            item.OwnerChanged = reader.ReadElementContentAsBoolean("OwnerChanged", String.Empty);
+            item.OwnerChanged = reader.ReadElementContentAsBoolean("OwnerChanged", string.Empty);
         }
 
         #endregion
@@ -1901,7 +1902,7 @@ namespace WhiteCore.Region.Serialization
 
         void ProcessShpProfileCurve(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.ProfileCurve = (byte) reader.ReadElementContentAsInt("ProfileCurve", String.Empty);
+            shp.ProfileCurve = (byte) reader.ReadElementContentAsInt("ProfileCurve", string.Empty);
         }
 
         void ProcessShpTextureEntry(PrimitiveBaseShape shp, XmlTextReader reader)
@@ -1917,92 +1918,92 @@ namespace WhiteCore.Region.Serialization
 
         void ProcessShpPathBegin(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.PathBegin = (ushort) reader.ReadElementContentAsInt("PathBegin", String.Empty);
+            shp.PathBegin = (ushort) reader.ReadElementContentAsInt("PathBegin", string.Empty);
         }
 
         void ProcessShpPathCurve(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.PathCurve = (byte) reader.ReadElementContentAsInt("PathCurve", String.Empty);
+            shp.PathCurve = (byte) reader.ReadElementContentAsInt("PathCurve", string.Empty);
         }
 
         void ProcessShpPathEnd(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.PathEnd = (ushort) reader.ReadElementContentAsInt("PathEnd", String.Empty);
+            shp.PathEnd = (ushort) reader.ReadElementContentAsInt("PathEnd", string.Empty);
         }
 
         void ProcessShpPathRadiusOffset(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.PathRadiusOffset = (sbyte) reader.ReadElementContentAsInt("PathRadiusOffset", String.Empty);
+            shp.PathRadiusOffset = (sbyte) reader.ReadElementContentAsInt("PathRadiusOffset", string.Empty);
         }
 
         void ProcessShpPathRevolutions(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.PathRevolutions = (byte) reader.ReadElementContentAsInt("PathRevolutions", String.Empty);
+            shp.PathRevolutions = (byte) reader.ReadElementContentAsInt("PathRevolutions", string.Empty);
         }
 
         void ProcessShpPathScaleX(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.PathScaleX = (byte) reader.ReadElementContentAsInt("PathScaleX", String.Empty);
+            shp.PathScaleX = (byte) reader.ReadElementContentAsInt("PathScaleX", string.Empty);
         }
 
         void ProcessShpPathScaleY(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.PathScaleY = (byte) reader.ReadElementContentAsInt("PathScaleY", String.Empty);
+            shp.PathScaleY = (byte) reader.ReadElementContentAsInt("PathScaleY", string.Empty);
         }
 
         void ProcessShpPathShearX(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.PathShearX = (byte) reader.ReadElementContentAsInt("PathShearX", String.Empty);
+            shp.PathShearX = (byte) reader.ReadElementContentAsInt("PathShearX", string.Empty);
         }
 
         void ProcessShpPathShearY(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.PathShearY = (byte) reader.ReadElementContentAsInt("PathShearY", String.Empty);
+            shp.PathShearY = (byte) reader.ReadElementContentAsInt("PathShearY", string.Empty);
         }
 
         void ProcessShpPathSkew(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.PathSkew = (sbyte) reader.ReadElementContentAsInt("PathSkew", String.Empty);
+            shp.PathSkew = (sbyte) reader.ReadElementContentAsInt("PathSkew", string.Empty);
         }
 
         void ProcessShpPathTaperX(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.PathTaperX = (sbyte) reader.ReadElementContentAsInt("PathTaperX", String.Empty);
+            shp.PathTaperX = (sbyte) reader.ReadElementContentAsInt("PathTaperX", string.Empty);
         }
 
         void ProcessShpPathTaperY(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.PathTaperY = (sbyte) reader.ReadElementContentAsInt("PathTaperY", String.Empty);
+            shp.PathTaperY = (sbyte) reader.ReadElementContentAsInt("PathTaperY", string.Empty);
         }
 
         void ProcessShpPathTwist(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.PathTwist = (sbyte) reader.ReadElementContentAsInt("PathTwist", String.Empty);
+            shp.PathTwist = (sbyte) reader.ReadElementContentAsInt("PathTwist", string.Empty);
         }
 
         void ProcessShpPathTwistBegin(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.PathTwistBegin = (sbyte) reader.ReadElementContentAsInt("PathTwistBegin", String.Empty);
+            shp.PathTwistBegin = (sbyte) reader.ReadElementContentAsInt("PathTwistBegin", string.Empty);
         }
 
         void ProcessShpPCode(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.PCode = (byte) reader.ReadElementContentAsInt("PCode", String.Empty);
+            shp.PCode = (byte) reader.ReadElementContentAsInt("PCode", string.Empty);
         }
 
         void ProcessShpProfileBegin(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.ProfileBegin = (ushort) reader.ReadElementContentAsInt("ProfileBegin", String.Empty);
+            shp.ProfileBegin = (ushort) reader.ReadElementContentAsInt("ProfileBegin", string.Empty);
         }
 
         void ProcessShpProfileEnd(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.ProfileEnd = (ushort) reader.ReadElementContentAsInt("ProfileEnd", String.Empty);
+            shp.ProfileEnd = (ushort) reader.ReadElementContentAsInt("ProfileEnd", string.Empty);
         }
 
         void ProcessShpProfileHollow(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.ProfileHollow = (ushort) reader.ReadElementContentAsInt("ProfileHollow", String.Empty);
+            shp.ProfileHollow = (ushort) reader.ReadElementContentAsInt("ProfileHollow", string.Empty);
         }
 
         void ProcessShpScale(PrimitiveBaseShape shp, XmlTextReader reader)
@@ -2012,12 +2013,12 @@ namespace WhiteCore.Region.Serialization
 
         void ProcessShpState(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.State = (byte) reader.ReadElementContentAsInt("State", String.Empty);
+            shp.State = (byte) reader.ReadElementContentAsInt("State", string.Empty);
         }
 
         void ProcessShpProfileShape(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            string value = reader.ReadElementContentAsString("ProfileShape", String.Empty);
+            string value = reader.ReadElementContentAsString("ProfileShape", string.Empty);
             // !!!!! to deal with flags without commas
             if (value.Contains(" ") && !value.Contains(","))
                 value = value.Replace(" ", ", ");
@@ -2026,7 +2027,7 @@ namespace WhiteCore.Region.Serialization
 
         void ProcessShpHollowShape(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            string value = reader.ReadElementContentAsString("HollowShape", String.Empty);
+            string value = reader.ReadElementContentAsString("HollowShape", string.Empty);
             // !!!!! to deal with flags without commas
             if (value.Contains(" ") && !value.Contains(","))
                 value = value.Replace(" ", ", ");
@@ -2040,7 +2041,7 @@ namespace WhiteCore.Region.Serialization
 
         void ProcessShpSculptType(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.SculptType = (byte) reader.ReadElementContentAsInt("SculptType", String.Empty);
+            shp.SculptType = (byte) reader.ReadElementContentAsInt("SculptType", string.Empty);
         }
 
         void ProcessShpSculptData(PrimitiveBaseShape shp, XmlTextReader reader)
@@ -2050,102 +2051,102 @@ namespace WhiteCore.Region.Serialization
 
         void ProcessShpFlexiSoftness(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.FlexiSoftness = reader.ReadElementContentAsInt("FlexiSoftness", String.Empty);
+            shp.FlexiSoftness = reader.ReadElementContentAsInt("FlexiSoftness", string.Empty);
         }
 
         void ProcessShpFlexiTension(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.FlexiTension = reader.ReadElementContentAsFloat("FlexiTension", String.Empty);
+            shp.FlexiTension = reader.ReadElementContentAsFloat("FlexiTension", string.Empty);
         }
 
         void ProcessShpFlexiDrag(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.FlexiDrag = reader.ReadElementContentAsFloat("FlexiDrag", String.Empty);
+            shp.FlexiDrag = reader.ReadElementContentAsFloat("FlexiDrag", string.Empty);
         }
 
         void ProcessShpFlexiGravity(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.FlexiGravity = reader.ReadElementContentAsFloat("FlexiGravity", String.Empty);
+            shp.FlexiGravity = reader.ReadElementContentAsFloat("FlexiGravity", string.Empty);
         }
 
         void ProcessShpFlexiWind(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.FlexiWind = reader.ReadElementContentAsFloat("FlexiWind", String.Empty);
+            shp.FlexiWind = reader.ReadElementContentAsFloat("FlexiWind", string.Empty);
         }
 
         void ProcessShpFlexiForceX(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.FlexiForceX = reader.ReadElementContentAsFloat("FlexiForceX", String.Empty);
+            shp.FlexiForceX = reader.ReadElementContentAsFloat("FlexiForceX", string.Empty);
         }
 
         void ProcessShpFlexiForceY(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.FlexiForceY = reader.ReadElementContentAsFloat("FlexiForceY", String.Empty);
+            shp.FlexiForceY = reader.ReadElementContentAsFloat("FlexiForceY", string.Empty);
         }
 
         void ProcessShpFlexiForceZ(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.FlexiForceZ = reader.ReadElementContentAsFloat("FlexiForceZ", String.Empty);
+            shp.FlexiForceZ = reader.ReadElementContentAsFloat("FlexiForceZ", string.Empty);
         }
 
         void ProcessShpLightColorR(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.LightColorR = reader.ReadElementContentAsFloat("LightColorR", String.Empty);
+            shp.LightColorR = reader.ReadElementContentAsFloat("LightColorR", string.Empty);
         }
 
         void ProcessShpLightColorG(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.LightColorG = reader.ReadElementContentAsFloat("LightColorG", String.Empty);
+            shp.LightColorG = reader.ReadElementContentAsFloat("LightColorG", string.Empty);
         }
 
         void ProcessShpLightColorB(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.LightColorB = reader.ReadElementContentAsFloat("LightColorB", String.Empty);
+            shp.LightColorB = reader.ReadElementContentAsFloat("LightColorB", string.Empty);
         }
 
         void ProcessShpLightColorA(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.LightColorA = reader.ReadElementContentAsFloat("LightColorA", String.Empty);
+            shp.LightColorA = reader.ReadElementContentAsFloat("LightColorA", string.Empty);
         }
 
         void ProcessShpLightRadius(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.LightRadius = reader.ReadElementContentAsFloat("LightRadius", String.Empty);
+            shp.LightRadius = reader.ReadElementContentAsFloat("LightRadius", string.Empty);
         }
 
         void ProcessShpLightCutoff(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.LightCutoff = reader.ReadElementContentAsFloat("LightCutoff", String.Empty);
+            shp.LightCutoff = reader.ReadElementContentAsFloat("LightCutoff", string.Empty);
         }
 
         void ProcessShpLightFalloff(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.LightFalloff = reader.ReadElementContentAsFloat("LightFalloff", String.Empty);
+            shp.LightFalloff = reader.ReadElementContentAsFloat("LightFalloff", string.Empty);
         }
 
         void ProcessShpLightIntensity(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.LightIntensity = reader.ReadElementContentAsFloat("LightIntensity", String.Empty);
+            shp.LightIntensity = reader.ReadElementContentAsFloat("LightIntensity", string.Empty);
         }
 
         void ProcessShpFlexiEntry(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.FlexiEntry = reader.ReadElementContentAsBoolean("FlexiEntry", String.Empty);
+            shp.FlexiEntry = reader.ReadElementContentAsBoolean("FlexiEntry", string.Empty);
         }
 
         void ProcessShpLightEntry(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.LightEntry = reader.ReadElementContentAsBoolean("LightEntry", String.Empty);
+            shp.LightEntry = reader.ReadElementContentAsBoolean("LightEntry", string.Empty);
         }
 
         void ProcessShpSculptEntry(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            shp.SculptEntry = reader.ReadElementContentAsBoolean("SculptEntry", String.Empty);
+            shp.SculptEntry = reader.ReadElementContentAsBoolean("SculptEntry", string.Empty);
         }
 
         void ProcessShpMedia(PrimitiveBaseShape shp, XmlTextReader reader)
         {
-            string value = reader.ReadElementContentAsString("Media", String.Empty);
+            string value = reader.ReadElementContentAsString("Media", string.Empty);
             shp.Media = PrimitiveBaseShape.MediaList.FromXml(value);
         }
 

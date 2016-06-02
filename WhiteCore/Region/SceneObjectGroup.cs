@@ -26,6 +26,15 @@
  */
 
 
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Xml.Serialization;
+using OpenMetaverse;
+using OpenMetaverse.Packets;
+using OpenMetaverse.StructuredData;
+using ProtoBuf;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
@@ -35,27 +44,18 @@ using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.SceneInfo.Entities;
 using WhiteCore.Framework.Serialization;
 using WhiteCore.Framework.Utilities;
-using OpenMetaverse;
-using OpenMetaverse.Packets;
-using OpenMetaverse.StructuredData;
-using ProtoBuf;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Xml.Serialization;
 using GridRegion = WhiteCore.Framework.Services.GridRegion;
 
 namespace WhiteCore.Region
 {
-    internal struct scriptPosTarget
+    struct scriptPosTarget
     {
         public uint handle;
         public Vector3 targetPos;
         public float tolerance;
     }
 
-    internal struct scriptRotTarget
+    struct scriptRotTarget
     {
         public uint handle;
         public Quaternion targetRot;
@@ -70,20 +70,20 @@ namespace WhiteCore.Region
     public partial class SceneObjectGroup : ISceneEntity
         //(ISceneObject implements ISceneEntity and IEntity)
     {
-        private readonly List<uint> m_lastColliders = new List<uint>();
-        private readonly Dictionary<uint, scriptRotTarget> m_rotTargets = new Dictionary<uint, scriptRotTarget>();
-        private readonly Dictionary<uint, scriptPosTarget> m_targets = new Dictionary<uint, scriptPosTarget>();
-        [XmlIgnore] private bool m_ValidgrpOOB; // control recalcutation
-        [XmlIgnore] private float m_grpBSphereRadiusSQ; // the square of the radius of a sphere containing the oob
-        [XmlIgnore] private Vector3 m_grpOOBoffset; // the position center of the bounding box relative to it's Position
+        readonly List<uint> m_lastColliders = new List<uint>();
+        readonly Dictionary<uint, scriptRotTarget> m_rotTargets = new Dictionary<uint, scriptRotTarget>();
+        readonly Dictionary<uint, scriptPosTarget> m_targets = new Dictionary<uint, scriptPosTarget>();
+        [XmlIgnore] bool m_ValidgrpOOB; // control recalcutation
+        [XmlIgnore] float m_grpBSphereRadiusSQ; // the square of the radius of a sphere containing the oob
+        [XmlIgnore] Vector3 m_grpOOBoffset; // the position center of the bounding box relative to it's Position
 
-        [XmlIgnore] private Vector3 m_grpOOBsize;
+        [XmlIgnore] Vector3 m_grpOOBsize;
         // the size of a bounding box oriented as prim, is future will consider cutted prims, meshs etc
 
         public bool IsInTransit { get; set; }
 
-        private UUID m_lastParcelUUID = UUID.Zero;
-        private Vector3 m_lastSignificantPosition = Vector3.Zero;
+        UUID m_lastParcelUUID = UUID.Zero;
+        Vector3 m_lastSignificantPosition = Vector3.Zero;
         protected Dictionary<UUID, SceneObjectPart> m_parts = new Dictionary<UUID, SceneObjectPart>();
         //Same as m_parts, but this is used for fast linear operations
         protected List<SceneObjectPart> m_partsList = new List<SceneObjectPart>();
@@ -91,15 +91,15 @@ namespace WhiteCore.Region
         protected object m_partsLock = new object();
         protected ulong m_regionHandle;
         protected SceneObjectPart m_rootPart;
-        private bool m_scriptListens_atRotTarget;
-        private bool m_scriptListens_atTarget;
-        private bool m_scriptListens_notAtRotTarget;
-        private bool m_scriptListens_notAtTarget;
+        bool m_scriptListens_atRotTarget;
+        bool m_scriptListens_atTarget;
+        bool m_scriptListens_notAtRotTarget;
+        bool m_scriptListens_notAtTarget;
 
         #region Properties
 
-        private List<UUID> m_LoopSoundSlavePrims = new List<UUID>();
-        private List<UUID> m_PlaySoundSlavePrims = new List<UUID>();
+        List<UUID> m_LoopSoundSlavePrims = new List<UUID>();
+        List<UUID> m_PlaySoundSlavePrims = new List<UUID>();
 
         /// <summary>
         ///     Added because the Parcel code seems to use it
@@ -723,7 +723,7 @@ namespace WhiteCore.Region
                 // when the camera crosses the border.
                 if (m_scene != null)
                 {
-                    float idist = (m_scene.RegionInfo.RegionSizeX + m_scene.RegionInfo.RegionSizeY)/2;
+                    float idist = (m_scene.RegionInfo.RegionSizeX + m_scene.RegionInfo.RegionSizeY) / 2f;
                     if (inter.HitTF)
                     {
                         // We need to find the closest prim to return to the testcaller along the ray
@@ -1150,7 +1150,7 @@ namespace WhiteCore.Region
         /// <summary>
         ///     After a prim is removed, fix the link numbers so that they are correct
         /// </summary>
-        private void FixLinkNumbers()
+        void FixLinkNumbers()
         {
             if (m_partsList.Count == 1)
             {
@@ -1295,7 +1295,7 @@ namespace WhiteCore.Region
             get { return m_rootPart.IsAttachment; }
         }
 
-        //private bool m_isBackedUp = false;
+        //bool m_isBackedUp = false;
 
         public byte GetAttachmentPoint()
         {
@@ -2308,7 +2308,11 @@ namespace WhiteCore.Region
         {
             if (m_scriptListens_atTarget || m_scriptListens_notAtTarget)
             {
-                if (m_targets.Count > 0)
+                var targetCount = 0;
+                lock (m_targets)
+                    targetCount = m_targets.Count;
+
+                if (targetCount > 0)
                 {
                     bool at_target = false;
                     //Vector3 targetPos;
@@ -2381,7 +2385,11 @@ namespace WhiteCore.Region
             }
             if (m_scriptListens_atRotTarget || m_scriptListens_notAtRotTarget)
             {
-                if (m_rotTargets.Count > 0)
+                var rotCount = 0;
+                lock(m_rotTargets)
+                    rotCount = m_rotTargets.Count;
+                
+                if (rotCount > 0)
                 {
                     bool at_Rottarget = false;
                     Dictionary<uint, scriptRotTarget> atRotTargets = new Dictionary<uint, scriptRotTarget>();
@@ -2743,7 +2751,7 @@ namespace WhiteCore.Region
         ///     Fix all the vehicle params after rebuilding the representation
         /// </summary>
         /// <param name="part"></param>
-        private void FixVehicleParams(SceneObjectPart part)
+        void FixVehicleParams(SceneObjectPart part)
         {
             part.PhysActor.VehicleType = part.VehicleType;
 
@@ -3283,7 +3291,7 @@ namespace WhiteCore.Region
             return objectGroup;
         }
 
-        private void LinkNonRootPart(SceneObjectPart part, Vector3 oldGroupPosition, Quaternion oldGroupRotation,
+        void LinkNonRootPart(SceneObjectPart part, Vector3 oldGroupPosition, Quaternion oldGroupRotation,
                                      int linkNum)
         {
             Quaternion WorldRot = oldGroupRotation*part.GetRotationOffset();
@@ -3763,8 +3771,8 @@ namespace WhiteCore.Region
 
         #region Position
 
-        private Vector3 m_lastSigInfiniteRegionPos = Vector3.Zero;
-        private List<GridRegion> m_nearbyInfiniteRegions = new List<GridRegion>();
+        Vector3 m_lastSigInfiniteRegionPos = Vector3.Zero;
+        List<GridRegion> m_nearbyInfiniteRegions = new List<GridRegion>();
 
 
         /// <summary>
@@ -4152,7 +4160,7 @@ namespace WhiteCore.Region
         /// <summary>
         /// </summary>
         /// <param name="rot"></param>
-        private void UpdateRootRotation(Quaternion rot)
+        void UpdateRootRotation(Quaternion rot)
         {
             Quaternion new_global_group_rot = rot;
             Quaternion old_global_group_rot = m_rootPart.GetRotationOffset();

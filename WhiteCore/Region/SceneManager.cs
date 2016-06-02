@@ -382,6 +382,7 @@ namespace WhiteCore.Region
         #endregion
 
         #region Shutdown regions
+        Timer closeRegionTimer;
 
         /// <summary>
         ///     Shuts down a region and removes it from all running modules
@@ -401,11 +402,18 @@ namespace WhiteCore.Region
             }
             else
             {
-                Timer t = new Timer(delaySecs*1000); //Millisecond conversion
-                t.Elapsed += (sender, e) => CloseRegion(scene, ShutdownType.Immediate, 0, killAgents);
-                t.AutoReset = false;
-                t.Start();
+                closeRegionTimer = new Timer(delaySecs*1000); //Millisecond conversion
+                closeRegionTimer.Elapsed += (sender, e) => TimedCloseRegion(scene, killAgents);
+                closeRegionTimer.AutoReset = false;
+                closeRegionTimer.Start();
             }
+        }
+
+        void TimedCloseRegion (IScene scene, bool killAgents)
+        {
+            closeRegionTimer.Dispose ();
+
+            CloseRegion (scene, ShutdownType.Immediate, 0, killAgents);
         }
 
         #endregion
@@ -528,42 +536,50 @@ namespace WhiteCore.Region
         {
             if (MainConsole.Instance == null)
                 return;
-            MainConsole.Instance.Commands.AddCommand("show users",
+            MainConsole.Instance.Commands.AddCommand(
+                "show users",
                 "show users [full]",
                 "Shows users in the given region (if full is added, child agents are shown as well)",
                 HandleShowUsers, true, false);
 
-            MainConsole.Instance.Commands.AddCommand("show maturity",
+            MainConsole.Instance.Commands.AddCommand(
+                "show maturity",
                 "show maturity",
                 "Show all region's maturity levels",
                 HandleShowMaturity, true, false);
 
-            MainConsole.Instance.Commands.AddCommand("force update",
+            MainConsole.Instance.Commands.AddCommand(
+                "force update",
                 "force update",
                 "Force the update of all objects on clients",
                 HandleForceUpdate, true, false);
 
-            MainConsole.Instance.Commands.AddCommand("debug packet level", 
+            MainConsole.Instance.Commands.AddCommand(
+                "debug packet level", 
                 "debug packet level [level]",
                 "Turn on packet debugging",
                 Debug, true, false);
 
-            MainConsole.Instance.Commands.AddCommand("debug packet name",
+            MainConsole.Instance.Commands.AddCommand(
+                "debug packet name",
                 "debug packet name [packetname]",
                 "Turn on packet debugging for a specific packet",
                 Debug, true, false);
 
-            MainConsole.Instance.Commands.AddCommand("debug packet name remove",
+            MainConsole.Instance.Commands.AddCommand(
+                "debug packet name remove",
                 "debug packet name [packetname]",
                 "Turn off packet debugging for a specific packet",
                 Debug, true, false);
 
-            MainConsole.Instance.Commands.AddCommand("debug scene",
+            MainConsole.Instance.Commands.AddCommand(
+                "debug scene",
                 "debug scene [scripting] [collisions] [physics]",
                 "Turn on scene debugging",
                 Debug, true, false);
 
-            MainConsole.Instance.Commands.AddCommand("load oar",
+            MainConsole.Instance.Commands.AddCommand(
+                "load oar",
                 "load oar [OAR filename] [--merge] [--skip-assets] [--skip-terrain] [--OffsetX=#] [--OffsetY=#] [--OffsetZ=#] [--FlipX] [--FlipY] [--UseParcelOwnership] [--CheckOwnership]",
                 "Load a region's data from OAR archive.  \n" +
                 "--merge will merge the oar with the existing scene (including parcels).  \n" +
@@ -578,7 +594,8 @@ namespace WhiteCore.Region
                 "      to (useful for changing UUIDs from other grids, but very long with many users).  ",
                 HandleLoadOar, true, true);
 
-            MainConsole.Instance.Commands.AddCommand("save oar",
+            MainConsole.Instance.Commands.AddCommand(
+                "save oar",
                 "save oar [<OAR filename>] [--perm=<permissions>] ",
                 "Save a region's data to an OAR archive" + Environment.NewLine +
                 "<OAR filename> The file name (and optional path) to use when saveing the archive." +
@@ -587,69 +604,82 @@ namespace WhiteCore.Region
                 "  <permissions> can contain one or more of these characters: \"C\" = Copy, \"T\" = Transfer" + Environment.NewLine,
                 HandleSaveOar, true, true);
 
-            MainConsole.Instance.Commands.AddCommand("kick user", 
+            MainConsole.Instance.Commands.AddCommand(
+                "kick user", 
                 "kick user [all]",
                 "Kick a user off the simulator",
                 KickUserCommand, true, true);
 
-            MainConsole.Instance.Commands.AddCommand("restart-instance",
+            MainConsole.Instance.Commands.AddCommand(
+                "restart-instance",
                 "restart-instance",
                 "Restarts the region(s) (as if you closed and re-opened WhiteCore)",
                 RunCommand, true, false);
 
-            MainConsole.Instance.Commands.AddCommand("command-script",
+            MainConsole.Instance.Commands.AddCommand(
+                "command-script",
                 "command-script [script]",
                 "Run a command script from file",
                 RunCommand, false, false);
 
-            MainConsole.Instance.Commands.AddCommand("modules list",
+            MainConsole.Instance.Commands.AddCommand(
+                "modules list",
                 "modules list",
                 "Lists all simulator modules",
                 HandleModulesList, true, false);
 
-            MainConsole.Instance.Commands.AddCommand("modules unload",
+            MainConsole.Instance.Commands.AddCommand(
+                "modules unload",
                 "modules unload [module]",
                 "Unload the given simulator module",
                 HandleModulesUnload, true, false);
             
-            MainConsole.Instance.Commands.AddCommand("change region",
+            MainConsole.Instance.Commands.AddCommand(
+                "change region",
                 "change region [region name]",
                 "Changes the region that commands will run on (or root for the commands to run on all regions)",
                 HandleChangeRegion, false, true);
 
-            MainConsole.Instance.Commands.AddCommand("show regions",
+            MainConsole.Instance.Commands.AddCommand(
+                "show regions",
                 "show regions",
                 "Show information about all regions in this instance",
                 HandleShowRegions, true, false);
 
-            MainConsole.Instance.Commands.AddCommand("reset region",
+            MainConsole.Instance.Commands.AddCommand(
+                "reset region",
                 "reset region [RegionName]",
                 "Reset region to the default terrain, wipe all prims, etc.",
                 HandleResetRegion, false, true);
 
-            MainConsole.Instance.Commands.AddCommand("remove region", 
+            MainConsole.Instance.Commands.AddCommand(
+                "remove region", 
                 "remove region [RegionName]",
                 "Remove region from the grid, and delete all info associated with it",
                 HandleDeleteRegion, false, true);
 
-            MainConsole.Instance.Commands.AddCommand("load region backup", 
+            MainConsole.Instance.Commands.AddCommand(
+                "load region backup", 
                 "load region backup [FileName]",
                 "load a region from a previous backup file",
                 HandleReloadRegion, false, true);
 
-            MainConsole.Instance.Commands.AddCommand("delete region", 
+            MainConsole.Instance.Commands.AddCommand(
+                "delete region", 
                 "delete region  [RegionName] (alias for 'remove region')",
                 "Remove region from the grid, and delete all info associated with it",
                 HandleDeleteRegion, false, true);
 
-            MainConsole.Instance.Commands.AddCommand("create region", 
+            MainConsole.Instance.Commands.AddCommand(
+                "create region", 
                 "create region <Region Name>  <--config=filename>",
                 "Creates a new region to start\n"+
                 "<Region Name> - Use this name for the new region\n"+
                 "--config='filename' - Use this file for region configuration",
                 HandleCreateNewRegion, false, true);
 			
-            MainConsole.Instance.Commands.AddCommand("save region config",
+            MainConsole.Instance.Commands.AddCommand(
+                "save region config",
                 "save region config <filename>",
                 "Saves the configuration of the region\n"+
                 "<filename> - Use this name for the region configuration (default is region name)",
@@ -660,45 +690,53 @@ namespace WhiteCore.Region
                 "Change the scale of a named object by x,y,z", 
                 HandleResizeObject, true, true);
 
-            MainConsole.Instance.Commands.AddCommand("show objects",
+            MainConsole.Instance.Commands.AddCommand(
+                "show objects",
                 "show object [name]",
                 "shows region objects or if object name is supplied, object info", 
                 HandleShowObjects, true, true);
 
-            MainConsole.Instance.Commands.AddCommand("rotate region objects",
+            MainConsole.Instance.Commands.AddCommand(
+                "rotate region objects",
                 "rotate region objects <degrees> [centerX] [centerY]",
                 "Rotates all region objects around centerX, centerY (default center of region)\n" +
                 "Rotation is +ve to the right, -ve to the left. (Have you backed up your region?)",
                 HandleRotateScene, true, true);
 
-            MainConsole.Instance.Commands.AddCommand("scale region objects",
+            MainConsole.Instance.Commands.AddCommand(
+                "scale region objects",
                 "scale region objects <factor>",
                 "Scales all region objects by the specified amount (please back up your region before using)",
                 HandleScaleScene, true, true);
 
-            MainConsole.Instance.Commands.AddCommand("reposition region objects",
+            MainConsole.Instance.Commands.AddCommand(
+                "reposition region objects",
                 "reposition region objects <xOffset> <yOffset> <zOffset>",
                 "Move region objects by the specified amounts (Have you backed up your region?)",
                 HandleTranslateScene, true, true);
 
             // some region settings for maintenance
-            MainConsole.Instance.Commands.AddCommand("set region capacity",
+            MainConsole.Instance.Commands.AddCommand(
+                "set region capacity",
                 "set region capacity [prims]",
                 "sets the region maximum prim count", 
                 HandleSetRegionCapacity, true, true);
 
-            MainConsole.Instance.Commands.AddCommand("set region startup",
+            MainConsole.Instance.Commands.AddCommand(
+                "set region startup",
                 "set region startup [normal/delayed]",
                 "set the startup mode of scripts in the region.\n" +
                 "   normal - scripts run continuously; delayed - scripts are started when an avatar enters", 
                 HandleSetRegionStartup, true, true);
 
-            MainConsole.Instance.Commands.AddCommand("set region infinite",
+            MainConsole.Instance.Commands.AddCommand(
+                "set region infinite",
                 "set region infinite [yes/no]",
                 "sets the region type as 'infinite':  If 'infinite' this allows an avatar to fly out of the region", 
                 HandleSetRegionInfinite, true, true);
 
-            MainConsole.Instance.Commands.AddCommand("set region visibility",
+            MainConsole.Instance.Commands.AddCommand(
+                "set region visibility",
                 "set region visibility [yes/no]",
                 "sets whether neighboring regions can 'see into' this region", 
                 HandleSetRegionVisibility, true, true);
@@ -816,7 +854,7 @@ namespace WhiteCore.Region
 
                 if (newRegion.RegionName != "abort")
                 {
-                    //                    StartRegion (store, store.CreateNewRegion (m_SimBase, currentInfo));
+                    // StartRegion (store, store.CreateNewRegion (m_SimBase, currentInfo));
                     StartRegion (store, newRegion);
 
                     foreach (ISimulationDataStore st in m_simulationDataServices)

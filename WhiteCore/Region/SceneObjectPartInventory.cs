@@ -26,7 +26,6 @@
  */
 
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -88,17 +87,16 @@ namespace WhiteCore.Region
             set { m_inventorySerial = value; }
         }
 
-        protected object itm_Lock = new object ();
         /// <value>
         ///     Raw inventory data
         /// </value>
         protected internal TaskInventoryDictionary Items {
             get {
-                lock (itm_Lock)
+                lock (m_itemsLock)
                     return m_items;
             }
             set {
-                lock (itm_Lock) {
+                lock (m_itemsLock) {
                     m_items = value;
                     m_inventorySerial++;
                 }
