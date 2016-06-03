@@ -25,8 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using vector = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Vector3;
-using rotation = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Quaternion;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
 {
