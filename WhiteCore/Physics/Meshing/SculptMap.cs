@@ -83,8 +83,7 @@ namespace WhiteCore.Physics.PrimMesher
             try
             {
                 if (needsScaling)
-                    bm = ScaleImage (bm, width, height,
-                        InterpolationMode.NearestNeighbor);
+                    bm = ScaleImage (bm, width, height, InterpolationMode.NearestNeighbor);
             } catch (Exception e)
             {
                 MainConsole.Instance.Error ("[Sculptmap]: Exception in ScaleImage(): e: " + e);
@@ -182,9 +181,12 @@ namespace WhiteCore.Physics.PrimMesher
             return rows;
         }
 
-        Bitmap ScaleImage (Bitmap srcImage, int destWidth, int destHeight,
-                           InterpolationMode interpMode)
+        Bitmap ScaleImage (Bitmap srcImage, int destWidth, int destHeight, InterpolationMode interpMode)
         {
+            // just in case of furfies  :)
+            if (destWidth == 0 || destHeight == 0)
+                return srcImage;
+            
             Bitmap scaledImage = new Bitmap (destWidth, destHeight, PixelFormat.Format24bppRgb);
 
             Color c;

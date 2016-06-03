@@ -921,11 +921,12 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
                     if (!childrenPrim.Contains(prim)) // must allow full reconstruction
                         childrenPrim.Add(prim);
+                
+                    //Remove old children
+                    prim.childrenPrim.Clear();
+                    prim.childPrim = true;
+                    prim._parent = this;
                 }
-                //Remove old children
-                prim.childrenPrim.Clear();
-                prim.childPrim = true;
-                prim._parent = this;
 
                 if (prim.Body != IntPtr.Zero)
                 {
@@ -944,10 +945,11 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
         void UpdateChildsfromgeom()
         {
-            if (childrenPrim.Count > 0)
-            {
-                foreach (ODEPrim prm in childrenPrim)
-                    prm.UpdateDataFromGeom();
+            lock (childrenPrim) {
+                if (childrenPrim.Count > 0) {
+                    foreach (ODEPrim prm in childrenPrim)
+                        prm.UpdateDataFromGeom ();
+                }
             }
         }
 
@@ -1019,8 +1021,16 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
         void ChildRemove(ODEPrim odePrim)
         {
+            // is this one of ours?
+            if (odePrim != this)
+                return;
+            
+            bool havePrim;
+            lock(childrenPrim)
+                havePrim = childrenPrim.Contains (odePrim);
+
             // Okay, we have a delinked child.. destroy all body and remake
-            if (odePrim != this && !childrenPrim.Contains(odePrim))
+            if (!havePrim)
                 return;
 
             DestroyBody();

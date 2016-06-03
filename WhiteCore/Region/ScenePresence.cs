@@ -184,7 +184,7 @@ namespace WhiteCore.Region
         protected Vector3 m_autoPilotTarget;
         protected bool m_sitAtAutoTarget;
 
-        protected string m_nextSitAnimation = String.Empty;
+        protected string m_nextSitAnimation = string.Empty;
 
         //PauPaw:Proper PID Controller for autopilot************
         protected bool m_moveToPositionInProgress;
@@ -330,7 +330,7 @@ namespace WhiteCore.Region
             get { return m_DrawDistance; }
             set
             {
-                if (m_DrawDistance != value && value != 0)
+                if (value > 0 && m_DrawDistance >= value)       // we show never have a negative draw distance
                 {
                     m_DrawDistance = value;
                     //Fire the event
@@ -696,7 +696,8 @@ namespace WhiteCore.Region
             m_sceneViewer = new SceneViewer(this);
         }
 
-        public virtual void RegisterToEvents()
+        //public virtual void RegisterToEvents()
+        void RegisterToEvents ()
         {
             m_controllingClient.OnCompleteMovementToRegion += CompleteMovement;
             m_controllingClient.OnAgentUpdate += HandleAgentUpdate;
@@ -919,7 +920,7 @@ namespace WhiteCore.Region
         {
             IAttachmentsModule attMod = Scene.RequestModuleInterface<IAttachmentsModule>();
             if (attMod != null)
-                attMod.SendScriptEventToAttachments(UUID, "changed", new Object[] {c});
+                attMod.SendScriptEventToAttachments(UUID, "changed", new object[] {c});
         }
 
         public virtual void TeleportWithMomentum(Vector3 pos)
@@ -1485,7 +1486,7 @@ namespace WhiteCore.Region
                     }
                     else
                     {
-                        if (m_AngularVelocity.Z != 0)
+                        if (Math.Abs (m_AngularVelocity.Z) > 0f)
                             m_AngularVelocity.Z += CalculateFlyingRollResetToZero(FLY_ROLL_RESET_RADIANS_PER_UPDATE);
                     }
 
@@ -1691,6 +1692,7 @@ namespace WhiteCore.Region
                 Vector3 avSitOffSet = part.SitTargetPosition;
                 Quaternion avSitOrientation = part.SitTargetOrientation;
 
+                //TODO: probably can use this >>//      public bool ApproxEquals (Vector3 vec, float tolerance);
                 bool SitTargetisSet =
                     (!(avSitOffSet.X == 0f && avSitOffSet.Y == 0f && avSitOffSet.Z == 0f && avSitOrientation.W == 1f &&
                        avSitOrientation.X == 0f && avSitOrientation.Y == 0f && avSitOrientation.Z == 0f));
@@ -1758,7 +1760,7 @@ namespace WhiteCore.Region
             if (part == null)
                 return;
 
-            if (String.IsNullOrEmpty(sod.m_animation))
+            if (string.IsNullOrEmpty(sod.m_animation))
                 m_nextSitAnimation = "SIT";
 
             m_requestedSitTargetUUID = targetID;
@@ -1795,12 +1797,17 @@ namespace WhiteCore.Region
 
             ISceneChildEntity part = FindNextAvailableSitTarget(targetID);
             if (part == null) {
-                MainConsole.Instance.ErrorFormat ("Scene presence]: Tried to sit on non exixtent target {0}", targetID);
+                MainConsole.Instance.ErrorFormat ("Scene presence]: Tried to sit on non existent target {0}", targetID);
                 return;
             }
 
             if (part.SitTargetAvatar.Count > 0)
                 part = FindNextAvailableSitTarget(targetID, part.UUID);
+
+            if (part == null) {
+                MainConsole.Instance.ErrorFormat ("Scene presence]: Tried to sit on non exisxtent target part {0}", part.UUID);
+                return;
+            }
 
             m_requestedSitTargetUUID = part.UUID;
             m_sitting = true;
@@ -1810,6 +1817,9 @@ namespace WhiteCore.Region
             Quaternion avSitOrientation = part.SitTargetOrientation;
             bool UseSitTarget = false;
 
+            //TODO: probably can use these >>
+            //      public bool ApproxEquals (Vector3 vec, float tolerance);
+            //      public bool ApproxEquals (Quaternion quat, float tolerance);
             bool SitTargetisSet =
                 (!(avSitOffSet.X == 0f && avSitOffSet.Y == 0f && avSitOffSet.Z == 0f &&
                    (
@@ -1910,7 +1920,7 @@ namespace WhiteCore.Region
             m_autoPilotTarget = pos;
             m_sitAtAutoTarget = autopilot;
             if (!autopilot)
-                HandleAgentSit(remoteClient, UUID, String.IsNullOrEmpty(m_nextSitAnimation) ? "SIT" : m_nextSitAnimation,
+                HandleAgentSit(remoteClient, UUID, string.IsNullOrEmpty(m_nextSitAnimation) ? "SIT" : m_nextSitAnimation,
                                UseSitTarget);
         }
 
@@ -2202,7 +2212,9 @@ namespace WhiteCore.Region
             SendCoarseLocationsDefault(m_scene.RegionInfo.RegionID, this, coarseLocations, avatarUUIDs);
         }
 
-        public virtual void SendCoarseLocationsDefault(UUID sceneId, IScenePresence p, List<Vector3> coarseLocations,
+        //public virtual void SendCoarseLocationsDefault(UUID sceneId, IScenePresence p, List<Vector3> coarseLocations,
+        //                                               List<UUID> avatarUUIDs)
+        void SendCoarseLocationsDefault (UUID sceneId, IScenePresence p, List<Vector3> coarseLocations,
                                                        List<UUID> avatarUUIDs)
         {
             m_perfMonMS = Util.EnvironmentTickCount();
@@ -2404,17 +2416,17 @@ namespace WhiteCore.Region
                         {
                             List<GridRegion> neighbors = neighborService.GetNeighbors(Scene);
 
-                            double TargetX = (double) Scene.RegionInfo.RegionLocX + (double) pos2.X;
-                            double TargetY = (double) Scene.RegionInfo.RegionLocY + (double) pos2.Y;
+                            double TargetX = Scene.RegionInfo.RegionLocX + pos2.X;
+                            double TargetY = Scene.RegionInfo.RegionLocY + pos2.Y;
 
                             GridRegion neighborRegion = null;
 
                             foreach (GridRegion region in neighbors)
                             {
-                                if (TargetX >= (double) region.RegionLocX
-                                    && TargetY >= (double) region.RegionLocY
-                                    && TargetX < (double) (region.RegionLocX + region.RegionSizeX)
-                                    && TargetY < (double) (region.RegionLocY + region.RegionSizeY))
+                                if (TargetX >= region.RegionLocX
+                                    && TargetY >= region.RegionLocY
+                                    && TargetX < region.RegionLocX + region.RegionSizeX
+                                    && TargetY < region.RegionLocY + region.RegionSizeY)
                                 {
                                     neighborRegion = region;
                                     break;
@@ -2816,7 +2828,7 @@ namespace WhiteCore.Region
         public virtual void SetHeight(float height)
         {
             //If the av exists, set their new size, if not, add them to the region
-            if (height != 0 && PhysicsActor != null && !IsChildAgent)
+            if (Math.Abs(height) > 0 && PhysicsActor != null && !IsChildAgent)
             {
                 if (Math.Abs(height - PhysicsActor.Size.Z) > 0.1)
                 {
@@ -2932,7 +2944,7 @@ namespace WhiteCore.Region
                             foreach (ContactPoint contact in coldata.Values)
                             {
                                 if (float.IsNaN(lowest.Position.Z) ||
-                                    contact.Position.Z != 0 && contact.Position.Z < lowest.Position.Z)
+                                    Math.Abs (contact.Position.Z) > 0f && contact.Position.Z < lowest.Position.Z)
                                 {
                                     if (contact.Type != ActorTypes.Agent)
                                         lowest = contact;

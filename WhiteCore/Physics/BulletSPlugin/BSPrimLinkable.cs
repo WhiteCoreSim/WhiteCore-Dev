@@ -98,10 +98,11 @@ namespace WhiteCore.Physics.BulletSPlugin
             int childrenBefore = Linkset.NumberOfChildren;
 
             Linkset = Linkset.RemoveMeFromLinkset(this, false /* inTaintTime */);
-
-            DetailLog(
-                "{0},BSPrimLinkset.delink,parentBefore={1},childrenBefore={2},parentAfter={3},childrenAfter={4}, ",
-                LocalID, parentBefore.LocalID, childrenBefore, Linkset.LinksetRoot.LocalID, Linkset.NumberOfChildren);
+            if (Linkset != null)
+                DetailLog(
+                    "{0},BSPrimLinkset.delink,parentBefore={1},childrenBefore={2},parentAfter={3},childrenAfter={4}, ",
+                    LocalID, parentBefore.LocalID, childrenBefore, Linkset.LinksetRoot.LocalID, Linkset.NumberOfChildren);
+            
             return;
         }
 

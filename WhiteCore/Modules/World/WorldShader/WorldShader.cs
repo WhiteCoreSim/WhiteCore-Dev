@@ -149,7 +149,11 @@ namespace WhiteCore.Modules.WorldShader
                         } else {
                             AssetBase asset = scene.AssetService.Get (t.ToString ());
                             if (asset != null) {
-                                Bitmap texture = (Bitmap)j2kDecoder.DecodeToImage (asset.Data);
+                                Bitmap texture = null;
+                                try {
+                                    texture = (Bitmap)j2kDecoder.DecodeToImage (asset.Data);
+                                } catch {
+                                }
                                 if (texture == null) {
                                     asset.Dispose ();
                                     continue;

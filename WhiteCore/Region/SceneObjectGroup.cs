@@ -2115,22 +2115,21 @@ namespace WhiteCore.Region
             scriptRotTarget waypoint = new scriptRotTarget {targetRot = target, tolerance = tolerance};
             uint handle = m_scene.SceneGraph.AllocateLocalId();
             waypoint.handle = handle;
+
             lock (m_rotTargets)
-            {
                 m_rotTargets.Add(handle, waypoint);
-            }
+            
             AddGroupTarget(this);
             return (int) handle;
         }
 
         public void unregisterRotTargetWaypoint(int handle)
         {
-            lock (m_targets)
-            {
+            lock (m_rotTargets)
                 m_rotTargets.Remove((uint) handle);
+            lock (m_targets)
                 if (m_targets.Count == 0)
                     RemoveGroupTarget(this);
-            }
         }
 
         public int registerTargetWaypoint(Vector3 target, float tolerance)
@@ -2138,10 +2137,10 @@ namespace WhiteCore.Region
             scriptPosTarget waypoint = new scriptPosTarget {targetPos = target, tolerance = tolerance};
             uint handle = m_scene.SceneGraph.AllocateLocalId();
             waypoint.handle = handle;
+
             lock (m_targets)
-            {
                 m_targets.Add(handle, waypoint);
-            }
+            
             AddGroupTarget(this);
             return (int) handle;
         }

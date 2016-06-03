@@ -182,11 +182,10 @@ namespace WhiteCore.Physics.BulletSPlugin
             if (body != null) {
                 CollisionObject collisionObject = ((BulletBodyXNA)pBody).body;
                 world.RemoveRigidBody (body);
+                world.RemoveCollisionObject (collisionObject);
 
-                if (collisionObject != null) {
-                    world.RemoveCollisionObject (collisionObject);
-                    return true;
-                }
+                return true;
+
             }
             return false;
         }
@@ -197,7 +196,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             RigidBody body = ((BulletBodyXNA)pBody).rigidBody;
             if (body != null) {
                 CollisionObject collisionObject = ((BulletBodyXNA)pBody).body;
-                if (collisionObject != null && collisionObject.GetBroadphaseHandle () != null) {
+                if (collisionObject.GetBroadphaseHandle () != null) {
                     world.RemoveCollisionObject (collisionObject);
                     world.AddCollisionObject (collisionObject);
                 }

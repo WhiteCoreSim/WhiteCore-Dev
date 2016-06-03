@@ -202,10 +202,9 @@ namespace WhiteCore.Modules.Scripting
                 if (stream != null) {
                     stream.Close ();
                 }
+                if (response != null)
+                    response.Dispose ();
             }
-
-            if (response != null)
-                response.Dispose ();
 
             MainConsole.Instance.DebugFormat ("[Load image url] Returning {0} bytes of image data for request {1}",
                                              imageJ2000.Length, state.RequestID);

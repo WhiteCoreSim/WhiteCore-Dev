@@ -678,7 +678,8 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             else if (p1.PhysicsActorType == (int) ActorTypes.Prim)
             {
                 //Add restitution and friction changes
-                ((ODEPrim) p1).GetContactParam(p2, ref newGlobalcontact);
+                // was.. greythane-20160602 >> // ((ODEPrim) p1).GetContactParam(p2, ref newGlobalcontact);
+                ((ODEPrim)p1).GetContactParam (p1, ref newGlobalcontact);
 
                 joint = CreateContacJoint(curContact);
             }

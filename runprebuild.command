@@ -1,7 +1,8 @@
 #!/bin/bash
 # Run prebuild to configure and create the appropriate Solution and Project files for building WhiteCore-Sim
+#  Default is to prompt for configuration
 #
-# November 2015
+# May 2016
 # Rowan Deppeler <greythane@gmail.com>
 
 # find and change to the current folder (bash does not start here by default)
