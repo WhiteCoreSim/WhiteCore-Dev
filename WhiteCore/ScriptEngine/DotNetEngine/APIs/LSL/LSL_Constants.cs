@@ -33,9 +33,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
     public partial class ScriptBaseClass
     {
         // LSL CONSTANTS
-        public static readonly LSL_Types.LSLInteger TRUE = new LSL_Types.LSLInteger(1);
-        public static readonly LSL_Types.LSLInteger FALSE = new LSL_Types.LSLInteger(0);
-        
+        public static readonly LSL_Types.LSLInteger TRUE = new LSL_Types.LSLInteger (1);
+        public static readonly LSL_Types.LSLInteger FALSE = new LSL_Types.LSLInteger (0);
+
         // Mathemetical constants
         public static readonly LSL_Types.LSLFloat PI = 3.14159265;
         public static readonly LSL_Types.LSLFloat TWO_PI = 6.2831853;
@@ -45,7 +45,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLFloat SQRT2 = 1.4142135;
 
         public static readonly LSL_Types.LSLInteger STATUS_PHYSICS = 0x1;
-        public static readonly LSL_Types.LSLInteger STATUS_ROTATE_X = 0x2;        
+        public static readonly LSL_Types.LSLInteger STATUS_ROTATE_X = 0x2;
         public static readonly LSL_Types.LSLInteger STATUS_ROTATE_Y = 0x4;
         public static readonly LSL_Types.LSLInteger STATUS_ROTATE_Z = 0x8;
         public static readonly LSL_Types.LSLInteger STATUS_PHANTOM = 0x10;
@@ -164,7 +164,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger VEHICLE_TYPE_BOAT = 3;
         public static readonly LSL_Types.LSLInteger VEHICLE_TYPE_AIRPLANE = 4;
         public static readonly LSL_Types.LSLInteger VEHICLE_TYPE_BALLOON = 5;
-        
+
         public static readonly LSL_Types.LSLInteger VEHICLE_LINEAR_FRICTION_TIMESCALE = 16;
         public static readonly LSL_Types.LSLInteger VEHICLE_ANGULAR_FRICTION_TIMESCALE = 17;
         public static readonly LSL_Types.LSLInteger VEHICLE_LINEAR_MOTOR_DIRECTION = 18;
@@ -339,7 +339,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger HTTP_VERBOSE_THROTTLE = 4;
         public static readonly LSL_Types.LSLInteger HTTP_CUSTOM_HEADER = 5;
         public static readonly LSL_Types.LSLInteger HTTP_PRAGMA_NO_CACHE = 6;
-        
+
         // llSetContentType
         public static readonly LSL_Types.LSLInteger CONTENT_TYPE_TEXT = 0; //text/plain
         public static readonly LSL_Types.LSLInteger CONTENT_TYPE_HTML = 1; //text/html
@@ -513,7 +513,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger STATUS_NOT_SUPPORTED = 1004;
         public static readonly LSL_Types.LSLInteger STATUS_INTERNAL_ERROR = 1999;
         public static readonly LSL_Types.LSLInteger STATUS_WHITELIST_FAILED = 2001;
-        
+
         // Parcel Flags
         public static readonly LSL_Types.LSLInteger PARCEL_FLAG_ALLOW_FLY = 0x1; // parcel allows flying
         public static readonly LSL_Types.LSLInteger PARCEL_FLAG_ALLOW_SCRIPTS = 0x2; // parcel allows outside scripts
@@ -531,7 +531,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger PARCEL_FLAG_ALLOW_CREATE_GROUP_OBJECTS = 0x4000000; // parcel allows group object creation
         public static readonly LSL_Types.LSLInteger PARCEL_FLAG_ALLOW_ALL_OBJECT_ENTRY = 0x8000000; // parcel allows objects owned by any user to enter
         public static readonly LSL_Types.LSLInteger PARCEL_FLAG_ALLOW_GROUP_OBJECT_ENTRY = 0x10000000; // parcel allows with the same group to enter
-        
+
         // Region Flags
         public static readonly LSL_Types.LSLInteger REGION_FLAG_ALLOW_DAMAGE = 0x1; // region is entirely damage enabled
         public static readonly LSL_Types.LSLInteger REGION_FLAG_FIXED_SUN = 0x10; // region has a fixed sun position
@@ -542,20 +542,20 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger REGION_FLAG_BLOCK_FLY = 0x80000; // region blocks flying
         public static readonly LSL_Types.LSLInteger REGION_FLAG_ALLOW_DIRECT_TELEPORT = 0x100000; // region allows direct teleports
         public static readonly LSL_Types.LSLInteger REGION_FLAG_RESTRICT_PUSHOBJECT = 0x400000; // region restricts llPushObject
-        
-		public static readonly LSL_Types.LSLInteger PAY_HIDE = new LSL_Types.LSLInteger(-1);
-        public static readonly LSL_Types.LSLInteger PAY_DEFAULT = new LSL_Types.LSLInteger(-2);
+
+        public static readonly LSL_Types.LSLInteger PAY_HIDE = new LSL_Types.LSLInteger (-1);
+        public static readonly LSL_Types.LSLInteger PAY_DEFAULT = new LSL_Types.LSLInteger (-2);
 
         public static readonly LSL_Types.LSLInteger PAYMENT_INFO_ON_FILE = 0x1;
         public static readonly LSL_Types.LSLInteger PAYMENT_INFO_USED = 0x2;
 
         public static readonly LSL_Types.LSLString NULL_KEY = "00000000-0000-0000-0000-000000000000";
         public static readonly LSL_Types.LSLString EOF = "\n\n\n";
-        
+
         public static readonly LSL_Types.LSLInteger STRING_TRIM_HEAD = 1;
         public static readonly LSL_Types.LSLInteger STRING_TRIM_TAIL = 2;
         public static readonly LSL_Types.LSLInteger STRING_TRIM = 3;
-        
+
         public static readonly LSL_Types.LSLInteger LIST_STAT_RANGE = 0;
         public static readonly LSL_Types.LSLInteger LIST_STAT_MIN = 1;
         public static readonly LSL_Types.LSLInteger LIST_STAT_MAX = 2;
@@ -608,9 +608,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger OBJECT_HOVER_HEIGHT = 25;
         public static readonly LSL_Types.LSLInteger OBJECT_BODY_SHAPE_TYPE = 26;
         public static readonly LSL_Types.LSLInteger OBJECT_LAST_OWNER_ID = 27;
-        
-        public static readonly vector ZERO_VECTOR = new vector(0.0, 0.0, 0.0);
-        public static readonly rotation ZERO_ROTATION = new rotation(0.0, 0.0, 0.0, 1.0);
+
+        public static readonly vector ZERO_VECTOR = new vector (0.0, 0.0, 0.0);
+        public static readonly rotation ZERO_ROTATION = new rotation (0.0, 0.0, 0.0, 1.0);
 
         // constants for llSetCameraParams
         public static readonly LSL_Types.LSLInteger CAMERA_PITCH = 0;
@@ -660,7 +660,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
 
         // constants for the llDetectedTouch* functions
         public static readonly LSL_Types.LSLInteger TOUCH_INVALID_FACE = -1;
-        public static readonly vector TOUCH_INVALID_TEXCOORD = new vector(-1.0, -1.0, 0.0);
+        public static readonly vector TOUCH_INVALID_TEXCOORD = new vector (-1.0, -1.0, 0.0);
         public static readonly vector TOUCH_INVALID_VECTOR = ZERO_VECTOR;
 
         // Constants for default textures
@@ -680,7 +680,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger RC_DATA_FLAGS = 4;
         public static readonly LSL_Types.LSLInteger RC_MAX_HITS = 8;
         public static readonly LSL_Types.LSLInteger RC_DETECT_PHANTOM = 16;
-        
+
         public static readonly LSL_Types.LSLInteger RC_REJECT_TYPES = 0;
         public static readonly LSL_Types.LSLInteger RC_REJECT_AGENTS = 0x1;
         public static readonly LSL_Types.LSLInteger RC_REJECT_PHYSICAL = 0x2;
@@ -716,7 +716,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger KFM_CMD_PLAY = 1024;
         public static readonly LSL_Types.LSLInteger KFM_CMD_PAUSE = 2048;
         public static readonly LSL_Types.LSLInteger KFM_DATA = 4096;
-        
+
         // Pathfinding types
         public static readonly LSL_Types.LSLInteger OPT_OTHER = -1;
         public static readonly LSL_Types.LSLInteger OPT_LEGACY_LINKSET = 0;
@@ -726,13 +726,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger OPT_STATIC_OBSTACLE = 4;
         public static readonly LSL_Types.LSLInteger OPT_MATERIAL_VOLUME = 5;
         public static readonly LSL_Types.LSLInteger OPT_EXCLUSION_VOLUME = 6;
-        
+
         public static readonly LSL_Types.LSLInteger CHARACTER_DESIRED_SPEED = 1;
         public static readonly LSL_Types.LSLInteger CHARACTER_RADIUS = 2;
         public static readonly LSL_Types.LSLInteger CHARACTER_LENGTH = 3;
         public static readonly LSL_Types.LSLInteger CHARACTER_ORIENTATION = 4;
         public static readonly LSL_Types.LSLInteger CHARACTER_AVOIDANCE_MODE = 5;
-        public static readonly LSL_Types.LSLInteger CHARACTER_TYPE = 6;        
+        public static readonly LSL_Types.LSLInteger CHARACTER_TYPE = 6;
         public static readonly LSL_Types.LSLInteger TRAVERSAL_TYPE = 7;
         public static readonly LSL_Types.LSLInteger CHARACTER_MAX_ACCEL = 8;
         public static readonly LSL_Types.LSLInteger CHARACTER_MAX_DECEL = 9;
@@ -753,7 +753,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger CHARACTER_TYPE_C = 2;
         public static readonly LSL_Types.LSLInteger CHARACTER_TYPE_D = 3;
         public static readonly LSL_Types.LSLInteger CHARACTER_TYPE_NONE = 4;
-        
+
         public static readonly LSL_Types.LSLInteger AVOID_CHARACTERS = 1;
         public static readonly LSL_Types.LSLInteger AVOID_DYNAMIC_OBSTACLES = 2;
 
@@ -795,7 +795,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLString JSON_FALSE = "JSON_FALSE";
         public static readonly LSL_Types.LSLString JSON_NULL = "JSON_NULL";
         public static readonly LSL_Types.LSLString JSON_APPEND = "JSON_APPEND";
-        
+
         // Experience Parameters (from event "experience_error")
         public static readonly LSL_Types.LSLInteger XP_ERROR_NONE = 0;
         public static readonly LSL_Types.LSLInteger XP_ERROR_THROTTLED = 1;
@@ -804,15 +804,15 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger XP_ERROR_NOT_PERMITTED = 4;
         public static readonly LSL_Types.LSLInteger XP_ERROR_NO_EXPERIENCE = 5;
         public static readonly LSL_Types.LSLInteger XP_ERROR_NOT_FOUND = 6;
-        public static readonly LSL_Types.LSLInteger XP_ERROR_INVALID_EXPERIENCE = 7;        
+        public static readonly LSL_Types.LSLInteger XP_ERROR_INVALID_EXPERIENCE = 7;
         public static readonly LSL_Types.LSLInteger XP_ERROR_EXPERIENCE_DISABLED = 8;
         public static readonly LSL_Types.LSLInteger XP_ERROR_EXPERIENCE_SUSPENDED = 9;
         public static readonly LSL_Types.LSLInteger XP_ERROR_UNKNOWN_ERROR = 10;
         public static readonly LSL_Types.LSLInteger XP_ERROR_QUOTA_EXCEEDED = 11;
         public static readonly LSL_Types.LSLInteger XP_ERROR_STORE_DISABLED = 12;
-        public static readonly LSL_Types.LSLInteger XP_ERROR_STORAGE_EXCEPTION = 13;        
+        public static readonly LSL_Types.LSLInteger XP_ERROR_STORAGE_EXCEPTION = 13;
         public static readonly LSL_Types.LSLInteger XP_ERROR_KEY_NOT_FOUND = 14;
-        public static readonly LSL_Types.LSLInteger XP_ERROR_RETRY_UPDATE = 15;        
+        public static readonly LSL_Types.LSLInteger XP_ERROR_RETRY_UPDATE = 15;
         public static readonly LSL_Types.LSLInteger XP_ERROR_MATURITY_EXCEEDED = 16;
         public static readonly LSL_Types.LSLInteger XP_ERROR_NOT_PERMITTED_LAND = 17;
         public static readonly LSL_Types.LSLInteger XP_ERROR_REQUEST_PERM_TIMEOUT = 18;
