@@ -262,7 +262,7 @@ namespace WhiteCore.Services.DataService.Connectors.Database.Asset
                     if (asset == null)
                         return false;
 
-                    if ((asset.Flags & AssetFlags.Maptile) != 0 || //Depriated, use Deletable instead
+                    if ((asset.Flags & AssetFlags.Maptile) != 0 || //Deprecated, use Deletable instead
                         (asset.Flags & AssetFlags.Deletable) != 0)
                         ignoreFlags = true;
 

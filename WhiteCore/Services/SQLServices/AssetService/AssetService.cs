@@ -391,7 +391,11 @@ namespace WhiteCore.Services.SQLServices.AssetService
                 var accountService = m_registry.RequestModuleInterface<IUserAccountService> ();
                 if (accountService != null)
                 {
-                    var account = accountService.GetUserAccount (null, asset.CreatorID);
+                    UserAccount account = null;
+                    try {
+                        account = accountService.GetUserAccount (null, asset.CreatorID);
+                    } catch {
+                    }
                     if (account != null)
                         creatorName = account.Name;
                 }
