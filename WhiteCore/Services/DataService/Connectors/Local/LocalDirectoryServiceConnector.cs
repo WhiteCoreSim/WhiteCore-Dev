@@ -276,13 +276,13 @@ namespace WhiteCore.Services.DataService
 
             QueryFilter filter = new QueryFilter();
             filter.andFilters["RegionID"] = regionID;
-            List<string> Query = GD.Query(new[] { "*" }, m_SearchParcelTable, filter, null, null, null);
+            List<string> query = GD.Query(new[] { "*" }, m_SearchParcelTable, filter, null, null, null);
             //Cant find it, return
-            if (Query.Count == 0)
+            if (query.Count == 0)
                 return null;
 
-            LandData LandData = null;
-            List<LandData> Lands = Query2LandData(Query);
+            LandData landData = null;
+            List<LandData> lands = Query2LandData(query);
 
             GridRegion r = m_registry.RequestModuleInterface<IGridService>().GetRegionByUUID(null, regionID);
             if (r == null)
@@ -291,19 +291,19 @@ namespace WhiteCore.Services.DataService
             bool[,] tempConvertMap = new bool[r.RegionSizeX / 4, r.RegionSizeX / 4];
             tempConvertMap.Initialize();
 
-            foreach (LandData land in Lands.Where(land => land.Bitmap != null))
+            foreach (LandData land in lands.Where(land => land.Bitmap != null))
             {
                 ConvertBytesToLandBitmap(ref tempConvertMap, land.Bitmap, r.RegionSizeX);
                 if (tempConvertMap[x / 4, y / 4])
                 {
-                    LandData = land;
+                    landData = land;
                     break;
                 }
             }
-            if (LandData == null && Lands.Count != 0)
-                LandData = Lands[0];
+            if (landData == null && lands.Count != 0)
+                landData = lands[0];
             
-            return LandData;
+            return landData;
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
@@ -912,6 +912,51 @@ namespace WhiteCore.Services.DataService
                     Data.Add(replyData);
             }
             return Data;
+        }
+
+        /// <summary>
+        /// Gets a list of all classifieds.
+        /// </summary>
+        /// <returns>The classifieds.</returns>
+        /// <param name="category">Category.</param>
+        /// <param name="queryFlags">Query flags.</param>
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public List<Classified> GetClassifieds (int category, uint queryFlags)
+        {
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (category, queryFlags);
+                return remoteValue != null ? (List<Classified>)remoteValue : new List<Classified> ();
+            }
+
+            QueryFilter filter = new QueryFilter ();
+
+            //filter.andLikeFilters ["Name"] = "%" + queryText + "%";
+            if (category != (int)DirectoryManager.ClassifiedCategories.Any) //Check the category
+                filter.andFilters ["Category"] = category.ToString();
+            //if (scopeID != UUID.Zero)
+            //    filter.andFilters ["ScopeID"] = scopeID;
+
+            List<string> retVal = GD.Query (new [] { "*" }, m_userClassifiedsTable, filter, null, null, null);
+            if (retVal.Count == 0)
+                return new List<Classified> ();
+
+            List<Classified> Classifieds = new List<Classified> ();
+            for (int i = 0; i < retVal.Count; i += 9) {
+                Classified classified = new Classified ();
+                //Pull the classified out of OSD
+                classified.FromOSD ((OSDMap)OSDParser.DeserializeJson (retVal [i + 6]));
+
+                //Check maturity levels
+                if ((classified.ClassifiedFlags & (uint)DirectoryManager.ClassifiedFlags.Mature) !=
+                    (uint)DirectoryManager.ClassifiedFlags.Mature) {
+                    if ((queryFlags & (uint)DirectoryManager.ClassifiedQueryFlags.Mature) ==
+                        (uint)DirectoryManager.ClassifiedQueryFlags.Mature)
+                        Classifieds.Add (classified);
+                } else
+                    //Its Mature, add all
+                    Classifieds.Add (classified);
+            }
+            return Classifieds;
         }
 
         /// <summary>

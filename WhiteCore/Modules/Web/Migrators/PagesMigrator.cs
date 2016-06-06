@@ -148,9 +148,18 @@ namespace WhiteCore.Modules.Web
                     new GridPage {
                         ShowInMenu = true,
                         LoggedInRequired = true,
+                        MenuID = "Classifieds",
+                        Location = "classifieds.html",
+                        MenuPosition = 4,
+                        MenuTitle = "MenuMyClassifieds",
+                        MenuToolTip = "TooltipsMenuClassifieds"
+                    },
+                    new GridPage {
+                        ShowInMenu = true,
+                        LoggedInRequired = true,
                         MenuID = "change_user_information",
                         Location = "change_user_information.html",
-                        MenuPosition = 4,
+                        MenuPosition = 5,
                         MenuTitle = "MenuChangeUserInformation",
                         MenuToolTip = "TooltipsMenuChangeUserInformation"
                     }

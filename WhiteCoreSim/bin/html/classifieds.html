@@ -1,0 +1,97 @@
+<!-- Classifieds -->
+
+<div id="fullPage">
+  <h2>{SystemName}: {ClassifiedsText}</h2>
+
+  <form id="classifieds_search_form" action="classifieds/classifieds.html" method="post">
+
+  	<div class="form-fieldset-range">
+  		<legend>{DateInfoText}</legend>
+  			<p class="from-to">
+  				<label class="from" for="date_start">{DateStartText}:</label>
+  				<input type="text" style="width:80px;" name="date_start" id="date_start" value="{DateStart}" />
+  				<label class="to" for="date_end">&nbsp;-&nbsp;{DateEndText}:</label>
+  			  	<input type="text" style="width:80px;" name="date_end" id="date_end" value="{DateEnd}" />
+  			  	<label> &nbsp;&nbsp;: &nbsp;{Period}</label>
+  				<input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
+  				<button class="button" style="float:right;width:200;" id="Submit" type="Submit" name="Submit">Search and View</button>
+  			</p>
+  	</div>
+  </form>
+
+  <table id="classifieds_list">
+	  <thead class="listhead">
+   		<tr>
+   		  <th class="transactions_left"><p>{CreationDateText}</p></th>
+   		  <th class="transactions_user"><p>{CategoryText}</p></th>
+   		  <th class="transactions_user"><p>{ClassifiedsNameText}</p></th>
+   		  <th class="transactions_description"><p>{ClassifiedsDetailText}</p></th>
+   		  <th class="transactions_value"><p>{ClassifiedsLevelText}</p></th>
+   		  <th class="transactions_value"><p>{ClassifiedsAmountText}</p></th>
+        <th class="transactions_value"><p>{ExpirationDateText}</p></th>
+   		</tr>
+ 	  </thead>
+
+    <tbody>
+  	  {ClassifiedListArrayBegin}
+      <tr>
+        <td class="transactions_left"><p>{CreationDate}</p></td>
+        <td class="transactions_user"><p>{Category}</p></td>
+        <td class="transactions_user"><p>{Name}</p></td>
+        <td class="transactions_description"><p>{Description}</p></td>
+        <td class="transactions_value"><p>{ClassifiedFlags}</p></td>
+        <td class="transactions_value"><p>{PriceForListing}</p></td>
+        <td class="transactions_left"><p>{expirationDate}</p></td>
+      </tr>
+  	  {ClassifiedListArrayEnd}
+    </tbody>
+  </table>
+</div>
+
+<script>
+  $(document).ready(function() {
+    $('#classifieds_list').dataTable({
+      "order": [[ 0, "asc" ]]
+    });
+  });
+
+  $(function() {
+    $('#date_start,#date_end').datepick({
+      showTrigger: '<button type="button" class="trigger">...</button>'});
+  });
+
+  <!--  /* date pickers */ -->
+  $(function() {
+    $( "#date_start" ).datepick( {
+      defaultDate: "-1w",
+      changeMonth: true,
+      numberOfMonths: 3,
+      onClose: function( selectedDate ) {
+        $( "#to" ).datepick( "option", "minDate", selectedDate );
+      }
+    });
+    $( "#date_end" ).datepick( {
+      //defaultDate: "+1w",
+      changeMonth: true,
+      numberOfMonths: 3,
+      onClose: function( selectedDate ) {
+        $( "#from" ).datepick( "option", "maxDate", selectedDate );
+      }
+    });
+  });
+
+  /* attach a submit handler to the form */
+  $("#classifieds_search_form").submit(function(event) {
+
+    /* stop form from submitting normally */
+    event.preventDefault();
+    /* get some values from elements on the page: */
+    var $form = $( this ),
+        url = $form.attr( 'action' );
+    /* Send the data using post and put the results in a div */
+    $.post( url, $form.serialize(), function( data ) {
+      $("#fullPage").empty().append(data);
+    });
+  });
+</script>
+
