@@ -330,7 +330,7 @@ namespace WhiteCore.Region
             get { return m_DrawDistance; }
             set
             {
-                if (value > 0 && m_DrawDistance >= value)       // we show never have a negative draw distance
+                if (value > 0 && Math.Abs (m_DrawDistance - value) > 0)       // we should never have a negative draw distance
                 {
                     m_DrawDistance = value;
                     //Fire the event
