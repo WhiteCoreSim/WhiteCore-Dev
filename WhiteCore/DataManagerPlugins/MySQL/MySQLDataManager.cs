@@ -90,8 +90,9 @@ namespace WhiteCore.DataManager.MySQL
 
         public override void CloseDatabase(DataReaderConnection connection)
         {
-            if (connection != null && connection.DataReader != null) {
-                connection.DataReader.Close ();
+            if (connection != null) {
+                if (connection.DataReader != null)
+                    connection.DataReader.Close ();
                 connection.Dispose ();
             }
 

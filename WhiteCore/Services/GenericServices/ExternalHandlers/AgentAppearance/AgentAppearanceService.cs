@@ -121,9 +121,13 @@ namespace WhiteCore.Services
             MainConsole.Instance.DebugFormat ("[Agent appearance service]: Found baked texture {0} for {1}", textureID, avID);
             // Full content request
             httpResponse.StatusCode = (int)System.Net.HttpStatusCode.OK;
-            httpResponse.ContentType = texture.TypeString;
+            try {
+                httpResponse.ContentType = texture.TypeString;
+            } catch {
+            }
 
-            var tdata = texture.Data;
+            byte [] tdata = new byte [texture.Data.Length];
+            texture.Data.CopyTo (tdata, 0);
             texture.Dispose ();
             return tdata;
         }
@@ -135,7 +139,7 @@ namespace WhiteCore.Services
         {
             string name;
             if (cmd.Length == 2 || cmd.Length < 4) {
-                name = MainConsole.Instance.Prompt ("Avatar's name (first last)");
+                name = MainConsole.Instance.Prompt ("Avatar's name <first last>");
                 if (name == "")
                     return;
             } else
@@ -286,8 +290,14 @@ namespace WhiteCore.Services
                 newBakedAsset.TypeAsset = AssetType.Texture;
                 newBakedAsset.Name = "ServerSideAppearance Texture";
                 newBakedAsset.Flags = AssetFlags.Deletable | AssetFlags.Collectable | AssetFlags.Rewritable | AssetFlags.Temporary;
-                if (appearance.Texture.FaceTextures [(int)AppearanceManager.BakeTypeToAgentTextureIndex (bakeType)].TextureID != UUID.Zero)
-                    m_assetService.Delete (appearance.Texture.FaceTextures [(int)AppearanceManager.BakeTypeToAgentTextureIndex (bakeType)].TextureID);
+
+                var faceTextureID = appearance.Texture.FaceTextures [(int)AppearanceManager.BakeTypeToAgentTextureIndex (bakeType)].TextureID;
+                if (faceTextureID != UUID.Zero)
+                    try {
+                        m_assetService.Delete (faceTextureID);
+                    } catch {
+                        MainConsole.Instance.ErrorFormat ("[Serverside apperance]: Unable to delete asset {0} during bake", faceTextureID);
+                }
                 assetID = m_assetService.Store (newBakedAsset);
             bake_complete:
                 newBakeIDs.Add (assetID);

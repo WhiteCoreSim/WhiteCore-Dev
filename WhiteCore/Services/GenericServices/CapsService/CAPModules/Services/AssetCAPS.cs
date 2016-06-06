@@ -194,7 +194,11 @@ namespace WhiteCore.Services
                     }
 
                     if (format == DefaultFormat) {
-                        response = WriteTextureData (httpRequest, httpResponse, texture, format);
+                        try {
+                            response = WriteTextureData (httpRequest, httpResponse, texture, format);
+                        } catch {
+                            response = MainServer.BlankResponse;
+                        }
                         texture.Dispose ();
                         return true;
                     }
@@ -527,12 +531,13 @@ namespace WhiteCore.Services
                 mesh = m_assetService.GetMesh (meshID.ToString ());
                 if (mesh != null) {
                     if (mesh.Type == (sbyte)AssetType.Mesh) {
-                        httpResponse.StatusCode = 200;
-                        httpResponse.ContentType = "application/vnd.ll.mesh";
 
                         var meshData = new byte [mesh.Data.Length];
                         mesh.Data.CopyTo (meshData, 0);
                         mesh.Dispose ();
+
+                        httpResponse.StatusCode = 200;
+                        httpResponse.ContentType = "application/vnd.ll.mesh";
                         return meshData;
                     }
 
