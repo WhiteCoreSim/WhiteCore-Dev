@@ -28,21 +28,21 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using OpenMetaverse;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
-using OpenMetaverse;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
 {
     public class World : MarshalByRefObject, IWorld, IWorldAudio
     {
-        private readonly Heightmap m_heights;
-        private readonly IScene m_internalScene;
+        readonly Heightmap m_heights;
+        readonly IScene m_internalScene;
 
-        private readonly ObjectAccessor m_objs;
-        private readonly ISecurityCredential m_security;
+        readonly ObjectAccessor m_objs;
+        readonly ISecurityCredential m_security;
 
         public World(IScene internalScene, ISecurityCredential securityCredential)
         {
@@ -56,7 +56,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
 
         #region OnNewUser
 
-        private bool _OnNewUserActive;
+        bool _OnNewUserActive;
 
         public event OnNewUserDelegate OnNewUser
         {
@@ -84,7 +84,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
 
         private event OnNewUserDelegate _OnNewUser;
 
-        private void EventManager_OnNewPresence(IScenePresence presence)
+        void EventManager_OnNewPresence(IScenePresence presence)
         {
             if (_OnNewUser != null)
             {
@@ -102,7 +102,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
 
         #region OnChat
 
-        private bool _OnChatActive;
+        bool _OnChatActive;
 
         public IWorldAudio Audio
         {
@@ -137,7 +137,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
 
         private event OnChatDelegate _OnChat;
 
-        private void EventManager_OnChatFromWorld(object sender, OSChatMessage chat)
+        void EventManager_OnChatFromWorld(object sender, OSChatMessage chat)
         {
             if (_OnChat != null)
             {
@@ -146,7 +146,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
             }
         }
 
-        private void HandleChatPacket(OSChatMessage chat)
+        void HandleChatPacket(OSChatMessage chat)
         {
             if (string.IsNullOrEmpty(chat.Message))
                 return;
@@ -180,7 +180,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
             // Skip if other
         }
 
-        private void EventManager_OnChatFromClient(object sender, OSChatMessage chat)
+        void EventManager_OnChatFromClient(object sender, OSChatMessage chat)
         {
             if (_OnChat != null)
             {

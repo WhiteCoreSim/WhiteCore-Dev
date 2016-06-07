@@ -40,7 +40,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
         {
             int i = 0;
 
-            if (String.IsNullOrEmpty(Mask))
+            if (string.IsNullOrEmpty(Mask))
                 return false;
             if (Mask == "*")
                 return true;
@@ -98,7 +98,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
 
                         if (IgnoreCase == false && WildString[k] != Mask[i])
                             return false;
-                        if (IgnoreCase && Char.ToLower(WildString[k]) != Char.ToLower(Mask[i]))
+                        if (IgnoreCase && char.ToLower(WildString[k]) != char.ToLower(Mask[i]))
                             return false;
 
                         break;
@@ -120,53 +120,54 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
 
     public sealed class CSCodeGenerator : IDisposable
     {
-        private readonly List<string> AfterFuncCalls = new List<string>();
-        private readonly HashSet<string> DTFunctions = new HashSet<string>();
-        private readonly List<string> FuncCalls = new List<string>();
+        readonly List<string> AfterFuncCalls = new List<string>();
+        readonly HashSet<string> DTFunctions = new HashSet<string>();
+        readonly List<string> FuncCalls = new List<string>();
         //        public Dictionary<string, string> IenFunctions = new Dictionary<string, string>();
-        private readonly Dictionary<string, GlobalVar> GlobalVariables = new Dictionary<string, GlobalVar>();
-        private Dictionary<string, SYMBOL> DuplicatedGlobalVariables = new Dictionary<string, SYMBOL>();
+        readonly Dictionary<string, GlobalVar> GlobalVariables = new Dictionary<string, GlobalVar>();
+        Dictionary<string, SYMBOL> DuplicatedGlobalVariables = new Dictionary<string, SYMBOL>();
 
-        private Dictionary<string, Dictionary<string, SYMBOL>> DuplicatedLocalVariables =
+        Dictionary<string, Dictionary<string, SYMBOL>> DuplicatedLocalVariables =
             new Dictionary<string, Dictionary<string, SYMBOL>>();
 
         /// <summary>
         ///     This saves the variables in methods so that we can make sure multiple variables do not have the same name, and if they do, rename/assign them to the correct variable name
         /// </summary>
-        private readonly Dictionary<string, GlobalVar> MethodVariables = new Dictionary<string, GlobalVar>();
+        readonly Dictionary<string, GlobalVar> MethodVariables = new Dictionary<string, GlobalVar>();
 
-        private readonly List<string> MethodsToAdd = new List<string>();
+        readonly List<string> MethodsToAdd = new List<string>();
 
         /// <summary>
         ///     This contains a list of variables that we need to rename because of some constraint
         /// </summary>
-        private readonly Dictionary<string, VarRename> VariablesToRename = new Dictionary<string, VarRename>();
+        readonly Dictionary<string, VarRename> VariablesToRename = new Dictionary<string, VarRename>();
 
-        private readonly Dictionary<string, List<ArgumentDeclarationList>> m_allMethods =
+        readonly Dictionary<string, List<ArgumentDeclarationList>> m_allMethods =
             new Dictionary<string, List<ArgumentDeclarationList>>();
 
         /// <summary>
         ///     Param 1 - the API function name, Param 2 - the API name
         /// </summary>
-        private static Dictionary<string, IScriptApi> m_apiFunctions = null;
+        static Dictionary<string, IScriptApi> m_apiFunctions = null;
 
-        private readonly Compiler m_compiler;
+        readonly Compiler m_compiler;
 
-        private bool FuncCntr;
-        private bool IsParentEnumerable;
-        private bool IsaGlobalVar;
-        public Dictionary<string, ObjectList> LocalMethodArguements = new Dictionary<string, ObjectList>();
-        public Dictionary<string, string> LocalMethods = new Dictionary<string, string>();
-        private string OriginalScript = "";
-        private bool isAdditionExpression;
-        private int m_CSharpCol; // the current column of generated C# code
-        private int m_CSharpLine; // the current line of generated C# code
-        private int m_braceCount; // for indentation
-        private int m_indentWidth = 4; // for indentation
-        private bool m_isInEnumeratedDeclaration;
-        private Dictionary<KeyValuePair<int, int>, KeyValuePair<int, int>> m_positionMap;
-        private Parser p;
-        private static yyLSLSyntax _LSLSyntax = new yyLSLSyntax();
+        bool FuncCntr;
+        bool IsParentEnumerable;
+        bool IsaGlobalVar;
+        string OriginalScript = "";
+        bool isAdditionExpression;
+        int m_CSharpCol; // the current column of generated C# code
+        int m_CSharpLine; // the current line of generated C# code
+        int m_braceCount; // for indentation
+        int m_indentWidth = 4; // for indentation
+        bool m_isInEnumeratedDeclaration;
+        Dictionary<KeyValuePair<int, int>, KeyValuePair<int, int>> m_positionMap;
+        Parser p;
+        static yyLSLSyntax _LSLSyntax = new yyLSLSyntax();
+
+        public Dictionary<string, ObjectList> LocalMethodArguements = new Dictionary<string, ObjectList> ();
+        public Dictionary<string, string> LocalMethods = new Dictionary<string, string> ();
 
         /// <summary>
         ///     Creates an 'empty' CSCodeGenerator instance.
@@ -277,7 +278,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
         /// <summary>
         ///     Resets various counters and metadata.
         /// </summary>
-        private void ResetCounters()
+        void ResetCounters()
         {
             //NOTE: This takes a VERY long time to rebuild. Ideally, this should be reset, but interesting errors are happening when it is reset..
             p = new LSLSyntax(_LSLSyntax, new ErrorHandler(true));
@@ -364,7 +365,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
 
                 // Remove wrong line number info
                 //
-                if (emessage.StartsWith(slinfo + ": "))
+                if (emessage.StartsWith (slinfo + ": ", StringComparison.Ordinal))
                     emessage = emessage.Substring(slinfo.Length + 2);
 
                 if (e.slInfo.lineNumber - 1 <= 0)
@@ -372,7 +373,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
                 if (e.slInfo.charPosition - 1 <= 0)
                     e.slInfo.charPosition = 2;
 
-                message = String.Format("({0},{1}) {2}",
+                message = string.Format("({0},{1}) {2}",
                                         e.slInfo.lineNumber - 1,
                                         e.slInfo.charPosition - 1, emessage);
 
@@ -414,7 +415,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
             return CreateCompilerScript(m_compiler, MethodsToAdd, returnstring);
         }
 
-        private string FixAdditionalEvents(string script)
+        string FixAdditionalEvents(string script)
         {
             string retVal = script;
             foreach(EventInfo ev in LSL2CSCodeTransformer.GetNewLSLEvents())
@@ -422,7 +423,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
             return retVal;
         }
 
-        private string GenerateFireEventMethod()
+        string GenerateFireEventMethod()
         {
             StringBuilder retVal = new StringBuilder();
             retVal.AppendLine(
@@ -449,7 +450,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
             return retVal.ToString();
         }
 
-        private string CheckFloatExponent(string script)
+        string CheckFloatExponent(string script)
         {
             string[] SplitScript = script.Split('\n');
             List<string> ReconstructableScript = new List<string>();
@@ -515,7 +516,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
             return RetVal;
         }
 
-        private string CheckForInlineVectors(string script)
+        string CheckForInlineVectors(string script)
         {
             string[] SplitScript = script.Split('\n');
             List<string> ReconstructableScript = new List<string>();
@@ -585,11 +586,11 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
         ///     This stops errors from misformed events ex. 'touch(vector3 position)' instead of 'touch(int touch)'
         /// </summary>
         /// <param name="script"></param>
-        private void CheckEventCasts(string script)
+        void CheckEventCasts(string script)
         {
             CheckEvent(script, "default");
-            string[] States = OriginalScript.Split(new string[] {"state "}, StringSplitOptions.RemoveEmptyEntries);
-            foreach (string state in States)
+            string[] scriptStates = OriginalScript.Split(new string[] {"state "}, StringSplitOptions.RemoveEmptyEntries);
+            foreach (string state in scriptStates)
             {
                 string stateName = state.Split(' ')[0].Split('\n')[0];
                 if (!stateName.Contains("default"))
@@ -597,14 +598,14 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
             }
         }
 
-        private void CheckEvent(string script, string state)
+        void CheckEvent(string script, string state)
         {
             foreach (EventInfo evInfo in LSL2CSCodeTransformer.GetAllLSLEvents())
             {
                 string evName = string.Format("{0}_event_{1}(", state, evInfo.Name);
                 if (script.Contains(evName))
                 {
-                    int charNum = script.IndexOf(evName);
+                    int charNum = script.IndexOf (evName, StringComparison.Ordinal);
                     string splitScript = script.Remove(0, charNum);
                     charNum = splitScript.IndexOf('\n');
                     splitScript = splitScript.Remove(charNum, splitScript.Length - charNum);
@@ -632,7 +633,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
             }
         }
 
-        private void FindWrongParameterCountLineNumbers(string EventName, int correct, int i)
+        void FindWrongParameterCountLineNumbers(string EventName, int correct, int i)
         {
             if (i > correct)
                 FindLineNumbers(EventName, "Too many arguments, " + i + " arguments given, " + correct + " expected");
@@ -640,7 +641,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
                 FindLineNumbers(EventName, "Too few arguments, " + i + " arguments given, " + correct + " expected");
         }
 
-        private void FindLineNumbers(string EventName, string Problem)
+        void FindLineNumbers(string EventName, string Problem)
         {
             //string testScript = OriginalScript.Replace(" ", "");
             int lineNumber = 0;
@@ -651,17 +652,17 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
                 if (str.Contains(EventName + "("))
                 {
                     lineNumber = i;
-                    charNumber = str.IndexOf(EventName);
+                    charNumber = str.IndexOf (EventName, StringComparison.Ordinal);
                     break;
                 }
                 i++;
             }
-            throw new InvalidOperationException(String.Format("({0},{1}) {2}",
+            throw new InvalidOperationException(string.Format("({0},{1}) {2}",
                                                               lineNumber,
                                                               charNumber, Problem + " in '" + EventName + "'\n"));
         }
 
-        private void AddWarning(string warning)
+        void AddWarning(string warning)
         {
             m_compiler.AddWarning(warning);
         }
@@ -672,7 +673,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
         /// </summary>
         /// <param name="s">The current node to generate code for.</param>
         /// <returns>String containing C# code for SYMBOL s.</returns>
-        private string GenerateNode(SYMBOL s)
+        string GenerateNode(SYMBOL s)
         {
             // make sure to put type lower in the inheritance hierarchy first
             // ie: since IdentArgument and ExpressionArgument inherit from
@@ -802,16 +803,16 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
             }
         }
 
-        private GlobalFunctionDefinition _currentGlobalFunctionDeclaration = null;
-        private StateEvent _currentLocalFunctionDeclaration = null;
-        private State _currentLocalStateDeclaration = null;
+        GlobalFunctionDefinition _currentGlobalFunctionDeclaration = null;
+        StateEvent _currentLocalFunctionDeclaration = null;
+        State _currentLocalStateDeclaration = null;
 
         /// <summary>
         ///     Generates the code for a GlobalFunctionDefinition node.
         /// </summary>
         /// <param name="gf">The GlobalFunctionDefinition node.</param>
         /// <returns>String containing C# code for GlobalFunctionDefinition gf.</returns>
-        private string GenerateGlobalFunctionDefinition(GlobalFunctionDefinition gf)
+        string GenerateGlobalFunctionDefinition(GlobalFunctionDefinition gf)
         {
             MethodVariables.Clear();
             VariablesToRename.Clear();
@@ -830,7 +831,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
                     remainingKids.Add(kid);
 
             retstr.Append(
-                GenerateIndented(String.Format("public System.Collections.IEnumerator {0}(", CheckName(gf.Name)), gf));
+                GenerateIndented(string.Format("public System.Collections.IEnumerator {0}(", CheckName(gf.Name)), gf));
 
             IsParentEnumerable = true;
 
@@ -873,7 +874,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
         /// </summary>
         /// <param name="gv">The GlobalVariableDeclaration node.</param>
         /// <returns>String containing C# code for GlobalVariableDeclaration gv.</returns>
-        private string GenerateGlobalVariableDeclaration(GlobalVariableDeclaration gv)
+        string GenerateGlobalVariableDeclaration(GlobalVariableDeclaration gv)
         {
 			// ## TO DO ##  
 			// Does this do anything as some of the assignments are never used??
@@ -922,23 +923,25 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
                                     {
                                         ArgumentList argList = (ArgumentList) listChild;
                                         int i = 0;
-                                        bool changed = false;
-                                        object[] p = new object[argList.kids.Count];
+                                        //bool changed = false;
+                                        object[] pObj = new object[argList.kids.Count];
                                         foreach (SYMBOL objChild in argList.kids)
                                         {
-                                            p[i] = objChild;
+                                            pObj[i] = objChild;
                                             if (objChild is IdentExpression)
                                             {
 // 20131224 not used                                                IdentExpression identEx = (IdentExpression) objChild;
                                             }
                                             i++;
                                         }
-                                        if (changed)
+                                        // TODO: 20160607 -greythane- This is never executed, check implmentation
+                                        /*if (changed)
                                         {
                                             argList.kids = new ObjectList();
-                                            foreach (object o in p)
+                                            foreach (object o in pObj)
                                                 argList.kids.Add(o);
                                         }
+                                        */
                                     }
                                 }
                             }
@@ -958,7 +961,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
                         }
                     }
 
-                    retVal.Append(Generate(String.Format(" {0} ", a.AssignmentType), a));
+                    retVal.Append(Generate(string.Format(" {0} ", a.AssignmentType), a));
                     foreach (SYMBOL kid in a.kids)
                     {
                         retVal.Append(CheckIfGlobalVariable(varName, type, kid));
@@ -973,7 +976,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
             return retVal.ToString();
         }
 
-        private string GetValue(Constant identEx)
+        string GetValue(Constant identEx)
         {
             if (identEx == null) return null;
             if (identEx.Value != null)
@@ -983,7 +986,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
             {
                 VectorConstant vc = (VectorConstant) identEx;
 
-                retVal.Append(Generate(String.Format("new {0}(", vc.Type), vc));
+                retVal.Append(Generate(string.Format("new {0}(", vc.Type), vc));
                 retVal.Append(GenerateNode((SYMBOL) vc.kids[0]));
                 retVal.Append(Generate(", "));
                 retVal.Append(GenerateNode((SYMBOL) vc.kids[1]));
@@ -997,7 +1000,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
             {
                 RotationConstant rc = (RotationConstant) identEx;
 
-                retVal.Append(Generate(String.Format("new {0}(", rc.Type), rc));
+                retVal.Append(Generate(string.Format("new {0}(", rc.Type), rc));
                 retVal.Append(GenerateNode((SYMBOL) rc.kids[0]));
                 retVal.Append(Generate(", "));
                 retVal.Append(GenerateNode((SYMBOL) rc.kids[1]));
@@ -1014,7 +1017,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
             return null;
         }
 
-        private string CheckIfGlobalVariable(string varName, string type, SYMBOL kid)
+        string CheckIfGlobalVariable(string varName, string type, SYMBOL kid)
         {
             string globalVarValue = "";
             if (kid is Constant)
@@ -1025,8 +1028,8 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
                 if ("LSL_Types.LSLFloat" == c.Type)
                 {
                     int dotIndex = c.Value.IndexOf('.') + 1;
-                    if (0 < dotIndex && (dotIndex == c.Value.Length || !Char.IsDigit(c.Value[dotIndex])))
-                        globalVarValue = c.Value.Insert(dotIndex, "0");
+                    if (0 < dotIndex && (dotIndex == c.Value.Length || !char.IsDigit(c.Value[dotIndex])))
+                        c.Value = c.Value.Insert(dotIndex, "0");
                     globalVarValue = "new LSL_Types.LSLFloat(" + c.Value + ") ";
                 }
                 else if ("LSL_Types.LSLInteger" == c.Type)
@@ -1110,7 +1113,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
         /// </summary>
         /// <param name="s">The State node.</param>
         /// <returns>String containing C# code for State s.</returns>
-        private string GenerateState(State s)
+        string GenerateState(State s)
         {
             StringBuilder retVal = new StringBuilder();
             _currentLocalStateDeclaration = s;
@@ -1128,14 +1131,14 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
         /// <param name="se">The StateEvent node.</param>
         /// <param name="parentStateName">The name of the parent state.</param>
         /// <returns>String containing C# code for StateEvent se.</returns>
-        private string GenerateStateEvent(StateEvent se, string parentStateName)
+        string GenerateStateEvent(StateEvent se, string parentStateName)
         {
             StringBuilder retstr = new StringBuilder();
 
             // we need to separate the argument declaration list from other kids
             List<SYMBOL> argumentDeclarationListKids = new List<SYMBOL>();
             List<SYMBOL> remainingKids = new List<SYMBOL>();
-            LSL2CSCodeTransformer.FixEventName(this.OriginalScript, ref se);
+            LSL2CSCodeTransformer.FixEventName(OriginalScript, ref se);
 
             _currentLocalFunctionDeclaration = se;
 
@@ -1150,7 +1153,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
 
             // "state" (function) declaration
             retstr.Append(GenerateIndented(
-                String.Format("public System.Collections.IEnumerator {0}_event_{1}(", parentStateName, se.Name), se));
+                string.Format("public System.Collections.IEnumerator {0}_event_{1}(", parentStateName, se.Name), se));
 
             IsParentEnumerable = true;
 
@@ -1162,7 +1165,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
                 retstr.Append(GenerateArgumentDeclarationList((ArgumentDeclarationList) kid));
             }
 
-            m_allMethods.Add(String.Format("{0}_event_{1}", parentStateName, se.Name), args);
+            m_allMethods.Add(string.Format("{0}_event_{1}", parentStateName, se.Name), args);
             retstr.Append(GenerateLine(")"));
 
 
@@ -1181,7 +1184,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
         /// </summary>
         /// <param name="adl">The ArgumentDeclarationList node.</param>
         /// <returns>String containing C# code for ArgumentDeclarationList adl.</returns>
-        private string GenerateArgumentDeclarationList(ArgumentDeclarationList adl)
+        string GenerateArgumentDeclarationList(ArgumentDeclarationList adl)
         {
             StringBuilder retVal = new StringBuilder();
             int comma = adl.kids.Count - 1; // tells us whether to print a comma
@@ -1202,7 +1205,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
         /// </summary>
         /// <param name="al">The ArgumentList node.</param>
         /// <returns>String containing C# code for ArgumentList al.</returns>
-        private string GenerateArgumentList(ArgumentList al)
+        string GenerateArgumentList(ArgumentList al)
         {
             StringBuilder retVal = new StringBuilder();
             int comma = al.kids.Count - 1; // tells us whether to print a comma
@@ -1222,7 +1225,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
         /// </summary>
         /// <param name="cs">The CompoundStatement node.</param>
         /// <returns>String containing C# code for CompoundStatement cs.</returns>
-        private string GenerateCompoundStatement(CompoundStatement cs)
+        string GenerateCompoundStatement(CompoundStatement cs)
         {
             StringBuilder retVal = new StringBuilder();
             // opening brace
@@ -1251,16 +1254,16 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
         /// </summary>
         /// <param name="d">The Declaration node.</param>
         /// <returns>String containing C# code for Declaration d.</returns>
-        private string GenerateDeclaration(Declaration d)
+        string GenerateDeclaration(Declaration d)
         {
             //        return Generate(String.Format("{0} {1}", d.Datatype, CheckName(d.Id)), d);
 
             GlobalVar var;
             if (IsaGlobalVar)
-                return Generate(String.Format("{0} {1}", d.Datatype, CheckName(d.Id)), d);
+                return Generate(string.Format("{0} {1}", d.Datatype, CheckName(d.Id)), d);
 
             if (GlobalVariables.TryGetValue(d.Id, out var))
-                return Generate(String.Format("{0} {1}", d.Datatype, CheckName(d.Id)), d);
+                return Generate(string.Format("{0} {1}", d.Datatype, CheckName(d.Id)), d);
 
             //Commented out because we can't handle the same var name in different if/else statements
             /*if (MethodVariables.TryGetValue(d.Id, out var))
@@ -1288,7 +1291,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
             }  
          * */
 
-            return Generate(String.Format("{0} {1}", d.Datatype, CheckName(d.Id)), d);
+            return Generate(string.Format("{0} {1}", d.Datatype, CheckName(d.Id)), d);
         }
 
         /// <summary>
@@ -1296,7 +1299,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
         /// </summary>
         /// <param name="s">The Statement node.</param>
         /// <returns>String containing C# code for Statement s.</returns>
-        private string GenerateStatement(Statement s)
+        string GenerateStatement(Statement s)
         {
             StringBuilder retVal = new StringBuilder();
             bool printSemicolon = true;
@@ -1358,23 +1361,25 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
                                             {
                                                 ArgumentList argList = (ArgumentList) listChild;
                                                 int i = 0;
-                                                bool changed = false;
-                                                object[] p = new object[argList.kids.Count];
+                                                //bool changed = false;
+                                                object[] pObj = new object[argList.kids.Count];
                                                 foreach (SYMBOL objChild in argList.kids)
                                                 {
-                                                    p[i] = objChild;
+                                                    pObj[i] = objChild;
                                                     if (objChild is IdentExpression)
                                                     {
 // 20131224 not used                                                        IdentExpression identEx = (IdentExpression) objChild;
                                                     }
                                                     i++;
                                                 }
-                                                if (changed)
+                                                // TODO: 20160607 -greythane- This is never executed, check implmentation
+                                                /*if (changed)
                                                 {
                                                     argList.kids = new ObjectList();
-                                                    foreach (object o in p)
+                                                    foreach (object o in pObj)
                                                         argList.kids.Add(o);
                                                 }
+                                                */
                                             }
                                         }
                                     }
@@ -1399,7 +1404,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
                             }
                             if (!retStrChanged)
                                 retVal.Append(GenerateNode((SYMBOL) a.kids.Pop()));
-                            retVal.Append(Generate(String.Format(" {0} ", a.AssignmentType), a));
+                            retVal.Append(Generate(string.Format(" {0} ", a.AssignmentType), a));
                             foreach (SYMBOL akid in a.kids)
                             {
                                 if (akid is BinaryExpression)
@@ -1411,8 +1416,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
                                         retVal.Append("((bool)(");
                                         retVal.Append(GenerateNode((SYMBOL) be.kids.Pop()));
                                         retVal.Append("))");
-                                        retVal.Append(Generate(String.Format(" {0} ", be.ExpressionSymbol.Substring(0, 1)),
-                                                           be));
+                                        retVal.Append(Generate(string.Format(" {0} ", be.ExpressionSymbol.Substring(0, 1)), be));
                                         retVal.Append("((bool)(");
                                         foreach (SYMBOL bkid in be.kids)
                                             retVal.Append(GenerateNode(bkid));
@@ -1421,7 +1425,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
                                     else
                                     {
                                         retVal.Append(GenerateNode((SYMBOL) be.kids.Pop()));
-                                        retVal.Append(Generate(String.Format(" {0} ", be.ExpressionSymbol), be));
+                                        retVal.Append(Generate(string.Format(" {0} ", be.ExpressionSymbol), be));
                                         foreach (SYMBOL kidb in be.kids)
                                         {
                                             //                                            if (kidb is FunctionCallExpression)
@@ -1469,17 +1473,17 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
             if (printSemicolon)
                 retVal.Append(GenerateLine(";"));
 
-            return DumpFunc(marc) + retVal.ToString() + DumpAfterFunc(marc);
+            return DumpFunc(marc) + retVal + DumpAfterFunc(marc);
         }
 
-        private string GetLocalDeclarationKey()
+        string GetLocalDeclarationKey()
         {
             if (_currentLocalStateDeclaration == null)
             {
                 if (_currentGlobalFunctionDeclaration == null)
                     return null;
-                else
-                    return "global_function_" + _currentGlobalFunctionDeclaration.Name;
+                
+                return "global_function_" + _currentGlobalFunctionDeclaration.Name;
             }
             return _currentLocalStateDeclaration.Name + "_" + _currentLocalFunctionDeclaration.Name;
         }
@@ -1489,7 +1493,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
         /// </summary>
         /// <param name="a">The Assignment node.</param>
         /// <returns>String containing C# code for Assignment a.</returns>
-        private string GenerateAssignment(Assignment a)
+        string GenerateAssignment(Assignment a)
         {
             StringBuilder retVal = new StringBuilder();
             List<string> identifiers = new List<string>();
@@ -1506,7 +1510,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
             }
 
             retVal.Append(GenerateNode((SYMBOL) a.kids.Pop()));
-            retVal.Append(Generate(String.Format(" {0} ", a.AssignmentType), a));
+            retVal.Append(Generate(string.Format(" {0} ", a.AssignmentType), a));
             foreach (SYMBOL kid in a.kids)
                 retVal.Append(GenerateNode(kid));
             //fCalls += ";";//Add a ; at the end.
@@ -1534,7 +1538,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
         //
         // The theory here is that producing an error and alerting the end user that
         // something needs to change is better than silently generating incorrect code.
-        private void checkForMultipleAssignments(List<string> identifiers, SYMBOL s)
+        void checkForMultipleAssignments(List<string> identifiers, SYMBOL s)
         {
             if (s is Assignment)
             {
@@ -1555,7 +1559,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
                 }
                 else
                 {
-                    AddWarning(String.Format(
+                    AddWarning(string.Format(
                         "Multiple assignments checker internal error '{0}' at line {1} column {2}.", a.kids[0].GetType(),
                         ((SYMBOL) a.kids[0]).Line - 1, ((SYMBOL) a.kids[0]).Position));
                 }
@@ -1563,7 +1567,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
                 if (identifiers.Contains(newident))
                 {
                     AddWarning(
-                        String.Format(
+                        string.Format(
                             "Multiple assignments to '{0}' at line {1} column {2}; results may differ between LSL and OSSL.",
                             newident, ((SYMBOL) a.kids[0]).Line - 1, ((SYMBOL) a.kids[0]).Position));
                 }
@@ -1582,7 +1586,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
         /// </summary>
         /// <param name="rs">The ReturnStatement node.</param>
         /// <returns>String containing C# code for ReturnStatement rs.</returns>
-        private string GenerateReturnStatement(ReturnStatement rs)
+        string GenerateReturnStatement(ReturnStatement rs)
         {
             StringBuilder retVal = new StringBuilder();
 
@@ -1611,7 +1615,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
                     retVal.Append(GenerateNode(kid));
             }
             if (dump)
-                return DumpFunc(dump) + retVal.ToString() + DumpAfterFunc(dump);
+                return DumpFunc(dump) + retVal + DumpAfterFunc(dump);
             return retVal.ToString();
         }
 
@@ -1620,9 +1624,9 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
         /// </summary>
         /// <param name="jl">The JumpLabel node.</param>
         /// <returns>String containing C# code for JumpLabel jl.</returns>
-        private string GenerateJumpLabel(JumpLabel jl)
+        string GenerateJumpLabel(JumpLabel jl)
         {
-            return GenerateLine(Generate(String.Format("{0}:", CheckName(jl.LabelName)), jl) + " NoOp();");
+            return GenerateLine(Generate(string.Format("{0}:", CheckName(jl.LabelName)), jl) + " NoOp();");
         }
 
         /// <summary>
@@ -1630,9 +1634,9 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
         /// </summary>
         /// <param name="js">The JumpStatement node.</param>
         /// <returns>String containing C# code for JumpStatement js.</returns>
-        private string GenerateJumpStatement(JumpStatement js)
+        string GenerateJumpStatement(JumpStatement js)
         {
-            return Generate(String.Format("goto {0}", CheckName(js.TargetName)), js);
+            return Generate(string.Format("goto {0}", CheckName(js.TargetName)), js);
         }
 
         /// <summary>
@@ -1640,7 +1644,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
         /// </summary>
         /// <param name="ifs">The IfStatement node.</param>
         /// <returns>String containing C# code for IfStatement ifs.</returns>
-        private string GenerateIfStatement(IfStatement ifs)
+        string GenerateIfStatement(IfStatement ifs)
         {
             /*
              * Test script that was used to make sure that if statements do not fail
@@ -1735,15 +1739,13 @@ default
         /// </summary>
         /// <param name="sc">The StateChange node.</param>
         /// <returns>String containing C# code for StateChange sc.</returns>
-        private string GenerateStateChange(StateChange sc)
+        string GenerateStateChange(StateChange sc)
         {
             //State is in the LSL_Api because it requires a ref to the ScriptEngine, which we can't have in the ScriptBase
             StringBuilder retVal = new StringBuilder();
             retVal.Append(GenerateLine("try", null));
             retVal.Append(GenerateLine("{", null));
-            retVal.Append(Generate(
-                String.Format("((dynamic)m_apis[\"ll\"]).state(\"{0}\");", sc.NewState)
-                , sc));
+            retVal.Append(Generate(string.Format("((dynamic)m_apis[\"ll\"]).state(\"{0}\");", sc.NewState), sc));
             retVal.Append(GenerateLine("}", null));
             retVal.Append(GenerateLine("catch", null));
             retVal.Append(GenerateLine("{", null));
@@ -1757,7 +1759,7 @@ default
         /// </summary>
         /// <param name="ws">The WhileStatement node.</param>
         /// <returns>String containing C# code for WhileStatement ws.</returns>
-        private string GenerateWhileStatement(WhileStatement ws)
+        string GenerateWhileStatement(WhileStatement ws)
         {
             StringBuilder retVal = new StringBuilder();
             StringBuilder tmpVal = new StringBuilder();
@@ -1790,7 +1792,7 @@ default
             if (IsParentEnumerable)
                 retVal.Append(GenerateLine("}"));
 
-            return retVal.ToString() + DumpAfterFunc(marc);
+            return retVal + DumpAfterFunc(marc);
         }
 
         /// <summary>
@@ -1798,7 +1800,7 @@ default
         /// </summary>
         /// <param name="dws">The DoWhileStatement node.</param>
         /// <returns>String containing C# code for DoWhileStatement dws.</returns>
-        private string GenerateDoWhileStatement(DoWhileStatement dws)
+        string GenerateDoWhileStatement(DoWhileStatement dws)
         {
             StringBuilder retVal = new StringBuilder();
 
@@ -1831,7 +1833,7 @@ default
 
             m_isInEnumeratedDeclaration = false; //End above
 
-            return DumpFunc(marc) + retVal.ToString() + DumpAfterFunc(marc);
+            return DumpFunc(marc) + retVal + DumpAfterFunc(marc);
         }
 
         /// <summary>
@@ -1839,7 +1841,7 @@ default
         /// </summary>
         /// <param name="fl">The ForLoop node.</param>
         /// <returns>String containing C# code for ForLoop fl.</returns>
-        private string GenerateForLoop(ForLoop fl)
+        string GenerateForLoop(ForLoop fl)
         {
             StringBuilder retVal = new StringBuilder();
             StringBuilder tmpVal = new StringBuilder();
@@ -1895,7 +1897,7 @@ default
         /// </summary>
         /// <param name="fls">The ForLoopStatement node.</param>
         /// <returns>String containing C# code for ForLoopStatement fls.</returns>
-        private string GenerateForLoopStatement(ForLoopStatement fls)
+        string GenerateForLoopStatement(ForLoopStatement fls)
         {
             StringBuilder retVal = new StringBuilder();
             int comma = fls.kids.Count - 1; // tells us whether to print a comma
@@ -1943,7 +1945,7 @@ default
         /// <param name="isUnaryExpression"></param>
         /// <param name="addition"></param>
         /// <returns>String containing C# code for BinaryExpression be.</returns>
-        private string GenerateBinaryExpression(BinaryExpression be, bool isUnaryExpression, string addition)
+        string GenerateBinaryExpression(BinaryExpression be, bool isUnaryExpression, string addition)
         {
             StringBuilder retVal = new StringBuilder();
             bool marc = FuncCallsMarc();
@@ -1956,7 +1958,7 @@ default
                           "(bool)(");
                 retVal.Append(GenerateNode((SYMBOL) be.kids.Pop()));
                 retVal.Append("))");
-                retVal.Append(Generate(String.Format(" {0} ", be.ExpressionSymbol.Substring(0, 1)), be));
+                retVal.Append(Generate(string.Format(" {0} ", be.ExpressionSymbol.Substring(0, 1)), be));
                 retVal.Append("((LSL_Types.LSLInteger)((bool)(");
                 foreach (SYMBOL kid in be.kids)
                     retVal.Append(GenerateNode(kid));
@@ -1966,7 +1968,7 @@ default
             {
                 retVal.Append("((LSL_Types.LSLInteger)(");
                 retVal.Append(GenerateNode((SYMBOL) be.kids.Pop()));
-                retVal.Append(Generate(String.Format(" {0} ", be.ExpressionSymbol), be));
+                retVal.Append(Generate(string.Format(" {0} ", be.ExpressionSymbol), be));
                 foreach (SYMBOL kid in be.kids)
                     retVal.Append(GenerateNode(kid));
                 retVal.Append("))");
@@ -1988,7 +1990,7 @@ default
                 if (weSetTheAdditionExpression)
                     isAdditionExpression = false;
                 if (!(retVal.ToString() == "()" || retVal.ToString() == ""))
-                    retVal.Append(Generate(String.Format(" {0} ", be.ExpressionSymbol), be));
+                    retVal.Append(Generate(string.Format(" {0} ", be.ExpressionSymbol), be));
                 else
                     //Something was removed, we need to remove the operator here!
                     retVal.Clear();
@@ -1996,7 +1998,7 @@ default
                     retVal.Append(GenerateNode(kid));
             }
 
-            return DumpFunc(marc) + retVal.ToString() + DumpAfterFunc(marc);
+            return DumpFunc(marc) + retVal + DumpAfterFunc(marc);
         }
 
         /// <summary>
@@ -2004,7 +2006,7 @@ default
         /// </summary>
         /// <param name="ue">The UnaryExpression node.</param>
         /// <returns>String containing C# code for UnaryExpression ue.</returns>
-        private string GenerateUnaryExpression(UnaryExpression ue)
+        string GenerateUnaryExpression(UnaryExpression ue)
         {
             StringBuilder retVal = new StringBuilder();
             retVal.Append(Generate(ue.UnarySymbol, ue));
@@ -2042,21 +2044,21 @@ default
         /// </summary>
         /// <param name="ide">The IncrementDecrementExpression node.</param>
         /// <returns>String containing C# code for IncrementDecrementExpression ide.</returns>
-        private string GenerateIncrementDecrementExpression(IncrementDecrementExpression ide)
+        string GenerateIncrementDecrementExpression(IncrementDecrementExpression ide)
         {
             StringBuilder retVal = new StringBuilder();
             if (0 < ide.kids.Count)
             {
                 IdentDotExpression dot = (IdentDotExpression) ide.kids.Top;
                 retVal.Append(Generate(
-                        String.Format("{0}",
+                        string.Format("{0}",
                                       ide.PostOperation
                                           ? CheckName(dot.Name) + "." + dot.Member + ide.Operation
                                           : ide.Operation + CheckName(dot.Name) + "." + dot.Member), ide));
             }
             else
                 retVal.Append(Generate(
-                        String.Format("{0}",
+                        string.Format("{0}",
                                       ide.PostOperation
                                           ? CheckName(ide.Name) + ide.Operation
                                           : ide.Operation + CheckName(ide.Name)), ide));
@@ -2069,11 +2071,11 @@ default
         /// </summary>
         /// <param name="te">The TypecastExpression node.</param>
         /// <returns>String containing C# code for TypecastExpression te.</returns>
-        private string GenerateTypecastExpression(TypecastExpression te)
+        string GenerateTypecastExpression(TypecastExpression te)
         {
             StringBuilder retVal = new StringBuilder();
             // we wrap all typecasted statements in parentheses
-            retVal.Append(Generate(String.Format("({0}) (", te.TypecastType), te));
+            retVal.Append(Generate(string.Format("({0}) (", te.TypecastType), te));
             retVal.Append(GenerateNode((SYMBOL) te.kids.Pop()));
             retVal.Append(Generate(")"));
             return retVal.ToString();
@@ -2085,7 +2087,7 @@ default
         /// <param name="fc">The FunctionCall node.</param>
         /// <param name="NeedRetVal"></param>
         /// <returns>String containing C# code for FunctionCall fc.</returns>
-        private string GenerateFunctionCall(FunctionCall fc, bool NeedRetVal)
+        string GenerateFunctionCall(FunctionCall fc, bool NeedRetVal)
         {
             StringBuilder retVal = new StringBuilder(), tmpVal = new StringBuilder();
             bool marc = FuncCallsMarc();
@@ -2115,7 +2117,7 @@ default
                                 tmpVal.Append("((bool)(");
                                 tmpVal.Append(GenerateNode((SYMBOL) be.kids.Pop()));
                                 tmpVal.Append("))");
-                                tmpVal.Append(Generate(String.Format(" {0} ", be.ExpressionSymbol.Substring(0, 1)), be));
+                                tmpVal.Append(Generate(string.Format(" {0} ", be.ExpressionSymbol.Substring(0, 1)), be));
                                 tmpVal.Append("((bool)(");
                                 foreach (SYMBOL kidb in be.kids)
                                     retVal.Append(GenerateNode(kidb));
@@ -2124,7 +2126,7 @@ default
                             else
                             {
                                 tmpVal.Append(GenerateNode((SYMBOL) be.kids.Pop()));
-                                tmpVal.Append(Generate(String.Format(" {0} ", be.ExpressionSymbol), be));
+                                tmpVal.Append(Generate(string.Format(" {0} ", be.ExpressionSymbol), be));
                                 foreach (SYMBOL kidb in be.kids)
                                 {
                                     if (kidb is FunctionCallExpression)
@@ -2133,7 +2135,7 @@ default
                                     }
                                     else if (kidb is TypecastExpression)
                                     {
-                                        tmpVal.Append(Generate(String.Format("({0}) (", ((TypecastExpression) kidb).TypecastType)));
+                                        tmpVal.Append(Generate(string.Format("({0}) (", ((TypecastExpression) kidb).TypecastType)));
                                         tmpVal.Append(GenerateNode((SYMBOL) kidb.kids.Pop()));
                                         tmpVal.Append(Generate(")"));
                                     }
@@ -2145,7 +2147,7 @@ default
                         }
                         else if (s is TypecastExpression)
                         {
-                            tmpVal.Append(Generate(String.Format("({0}) (", ((TypecastExpression) s).TypecastType)));
+                            tmpVal.Append(Generate(string.Format("({0}) (", ((TypecastExpression) s).TypecastType)));
                             tmpVal.Append(GenerateNode((SYMBOL) s.kids.Pop()));
                             tmpVal.Append(Generate(")"));
                         }
@@ -2183,14 +2185,14 @@ default
             if (m_apiFunctions.ContainsKey(CheckName(fc.Id)))
             {
                 //Add the m_apis link
-                fc.Id = String.Format("((dynamic)m_apis[\"{0}\"]).{1}",
+                fc.Id = string.Format("((dynamic)m_apis[\"{0}\"]).{1}",
                                       m_apiFunctions[CheckName(fc.Id)].Name, fc.Id);
             }
 
             if (DTFunction)
             {
                 retVal.Append(Generate("yield return "));
-                retVal.Append(Generate(String.Format("{0}(", CheckName(fc.Id)), fc));
+                retVal.Append(Generate(string.Format("{0}(", CheckName(fc.Id)), fc));
                 retVal.Append(tmpVal.ToString());
                 retVal.Append(Generate(")"));
             }
@@ -2198,7 +2200,8 @@ default
             {
                 if (m_isInEnumeratedDeclaration && NeedRetVal) //Got to have a retVal for do/while
                 {
-                    //This is for things like the do/while statement, where a function is in the while() part and can't be dumped in front of the do/while
+                    //This is for things like the do/while statement, where a function is in the 
+                    // while() part and can't be dumped in front of the do/while
                     string MethodName = StringUtils.RandomString(10, true);
                     string typeDefs = "";
                     ObjectList arguements = null;
@@ -2223,7 +2226,7 @@ default
                     newMethod += (Generate("ahwowuerogng = true;"));
                     Mname = StringUtils.RandomString(10, true);
                     newMethod += (Generate("System.Collections.IEnumerator " + Mname + " = "));
-                    newMethod += (Generate(String.Format("{0}(", CheckName(fc.Id)), fc));
+                    newMethod += (Generate(string.Format("{0}(", CheckName(fc.Id)), fc));
                     newMethod += (tmpVal.ToString());
                     newMethod += (Generate(");"));
 
@@ -2243,20 +2246,22 @@ default
                     List<string> fCalls = new List<string>();
                     string boolname = StringUtils.RandomString(10, true);
                     fCalls.Add(Generate("bool " + boolname + " = true;"));
-                    retVal.Append(MethodName + "(" + tmpVal.ToString() + ", out " + boolname + ")");
+                    retVal.Append(MethodName + "(" + tmpVal + ", out " + boolname + ")");
                     lock (FuncCalls)
                         FuncCalls.AddRange(fCalls);
                 }
                 else
                 {
-                    //Function calls are added to the DumpFunc command, and will be dumped safely before the statement that occurs here, so we don't have to deal with the issues behind having { and } in this area.
+                    //Function calls are added to the DumpFunc command, and will be dumped safely before the
+                    // statement that occurs here, so we don't have to deal with the issues behind having 
+                    // { and } in this area.
                     Mname = StringUtils.RandomString(10, true);
                     string Exname = StringUtils.RandomString(10, true);
                     List<string> fCalls = new List<string>
                                               {
                                                   Generate("string " + Exname + " =  \"\";"),
                                                   Generate("System.Collections.IEnumerator " + Mname + " = "),
-                                                  Generate(String.Format("{0}(", CheckName(fc.Id)), fc),
+                                                  Generate(string.Format("{0}(", CheckName(fc.Id)), fc),
                                                   tmpVal.ToString(),
                                                   Generate(");"),
                                                   Generate("while (true) {"),
@@ -2289,14 +2294,14 @@ default
             }
             else
             {
-                retVal.Append(Generate(String.Format("{0}(", CheckName(fc.Id)), fc));
+                retVal.Append(Generate(string.Format("{0}(", CheckName(fc.Id)), fc));
                 retVal.Append(tmpVal.ToString());
 
                 retVal.Append(Generate(")"));
             }
 
             //Function calls are first if needed
-            return DumpFunc(marc) + retVal.ToString() + DumpAfterFunc(marc);
+            return DumpFunc(marc) + retVal + DumpAfterFunc(marc);
         }
 
         /// <summary>
@@ -2304,14 +2309,14 @@ default
         /// </summary>
         /// <param name="c">The Constant node.</param>
         /// <returns>String containing C# code for Constant c.</returns>
-        private string GenerateConstant(Constant c)
+        string GenerateConstant(Constant c)
         {
             // Supprt LSL's weird acceptance of floats with no trailing digits
             // after the period. Turn float x = 10.; into float x = 10.0;
             if ("LSL_Types.LSLFloat" == c.Type)
             {
                 int dotIndex = c.Value.IndexOf('.') + 1;
-                if (0 < dotIndex && (dotIndex == c.Value.Length || !Char.IsDigit(c.Value[dotIndex])))
+                if (0 < dotIndex && (dotIndex == c.Value.Length || !char.IsDigit(c.Value[dotIndex])))
                     c.Value = c.Value.Insert(dotIndex, "0");
                 c.Value = "new LSL_Types.LSLFloat(" + c.Value + ")";
             }
@@ -2332,10 +2337,10 @@ default
         /// </summary>
         /// <param name="vc">The VectorConstant node.</param>
         /// <returns>String containing C# code for VectorConstant vc.</returns>
-        private string GenerateVectorConstant(VectorConstant vc)
+        string GenerateVectorConstant(VectorConstant vc)
         {
             StringBuilder retVal = new StringBuilder();
-            retVal.Append(Generate(String.Format("new {0}(", vc.Type), vc));
+            retVal.Append(Generate(string.Format("new {0}(", vc.Type), vc));
             retVal.Append(GenerateNode((SYMBOL) vc.kids.Pop()));
             retVal.Append(Generate(", "));
             retVal.Append(GenerateNode((SYMBOL) vc.kids.Pop()));
@@ -2351,10 +2356,10 @@ default
         /// </summary>
         /// <param name="rc">The RotationConstant node.</param>
         /// <returns>String containing C# code for RotationConstant rc.</returns>
-        private string GenerateRotationConstant(RotationConstant rc)
+        string GenerateRotationConstant(RotationConstant rc)
         {
             StringBuilder retVal = new StringBuilder();
-            retVal.Append(Generate(String.Format("new {0}(", rc.Type), rc));
+            retVal.Append(Generate(string.Format("new {0}(", rc.Type), rc));
             retVal.Append(GenerateNode((SYMBOL) rc.kids.Pop()));
             retVal.Append(Generate(", "));
             retVal.Append(GenerateNode((SYMBOL) rc.kids.Pop()));
@@ -2372,10 +2377,10 @@ default
         /// </summary>
         /// <param name="lc">The ListConstant node.</param>
         /// <returns>String containing C# code for ListConstant lc.</returns>
-        private string GenerateListConstant(ListConstant lc)
+        string GenerateListConstant(ListConstant lc)
         {
             StringBuilder retVal = new StringBuilder();
-            retVal.Append(Generate(String.Format("new {0}(", lc.Type), lc));
+            retVal.Append(Generate(string.Format("new {0}(", lc.Type), lc));
 
             foreach (SYMBOL kid in lc.kids)
                 retVal.Append(GenerateNode(kid));
@@ -2389,7 +2394,7 @@ default
         ///     Prints a newline.
         /// </summary>
         /// <returns>A newline.</returns>
-        private string GenerateLine()
+        string GenerateLine()
         {
             return GenerateLine("");
         }
@@ -2399,7 +2404,7 @@ default
         /// </summary>
         /// <param name="s">String of text to print.</param>
         /// <returns>String s followed by newline.</returns>
-        private string GenerateLine(string s)
+        string GenerateLine(string s)
         {
             return GenerateLine(s, null);
         }
@@ -2413,7 +2418,7 @@ default
         ///     number and column from.
         /// </param>
         /// <returns>String s followed by newline.</returns>
-        private string GenerateLine(string s, SYMBOL sym)
+        string GenerateLine(string s, SYMBOL sym)
         {
             string retstr = Generate(s, sym) + "\n";
 
@@ -2428,7 +2433,7 @@ default
         /// </summary>
         /// <param name="s">String of text to print.</param>
         /// <returns>String s.</returns>
-        private string Generate(string s)
+        string Generate(string s)
         {
             return Generate(s, null);
         }
@@ -2442,7 +2447,7 @@ default
         ///     number and column from.
         /// </param>
         /// <returns>String s.</returns>
-        private string Generate(string s, SYMBOL sym)
+        string Generate(string s, SYMBOL sym)
         {
             if (null != sym)
                 m_positionMap.Add(new KeyValuePair<int, int>(m_CSharpLine, m_CSharpCol),
@@ -2458,7 +2463,7 @@ default
         /// </summary>
         /// <param name="s">String of text to print.</param>
         /// <returns>Properly indented string s followed by newline.</returns>
-        private string GenerateIndentedLine(string s)
+        string GenerateIndentedLine(string s)
         {
             return GenerateIndentedLine(s, null);
         }
@@ -2472,7 +2477,7 @@ default
         ///     number and column from.
         /// </param>
         /// <returns>Properly indented string s followed by newline.</returns>
-        private string GenerateIndentedLine(string s, SYMBOL sym)
+        string GenerateIndentedLine(string s, SYMBOL sym)
         {
             string retstr = GenerateIndented(s, sym) + "\n";
 
@@ -2491,7 +2496,7 @@ default
         ///     number and column from.
         /// </param>
         /// <returns>Properly indented string s.</returns>
-        private string GenerateIndented(string s, SYMBOL sym)
+        string GenerateIndented(string s, SYMBOL sym)
         {
             string retstr = Indent() + s;
 
@@ -2508,9 +2513,9 @@ default
         ///     Prints correct indentation.
         /// </summary>
         /// <returns>Indentation based on brace count.</returns>
-        private string Indent()
+        string Indent()
         {
-            string retstr = String.Empty;
+            string retstr = string.Empty;
 
             for (int i = 0; i < m_braceCount; i++)
                 for (int j = 0; j < m_indentWidth; j++)
@@ -2533,7 +2538,7 @@ default
         ///     CreateValidIdentifier(str) that will return either the value of str if it is not a C#
         ///     key word or "_"+str if it is. But availability under Mono?
         /// </summary>
-        private string CheckName(string s)
+        string CheckName(string s)
         {
             if (CSReservedWords.IsReservedWord(s))
                 return "@" + s;
@@ -2556,7 +2561,7 @@ default
             }
         }
 
-        private string DumpFunc(bool marc)
+        string DumpFunc(bool marc)
         {
             string ret = "";
 
@@ -2565,10 +2570,11 @@ default
 
             FuncCntr = false;
 
-            if (FuncCalls.Count == 0)
-            {
-                return ret;
+            lock (FuncCalls) {
+                if (FuncCalls.Count == 0)
+                    return ret;
             }
+
             lock (FuncCalls)
             {
                 foreach (string s in FuncCalls)
@@ -2578,7 +2584,7 @@ default
             return ret;
         }
 
-        private string DumpAfterFunc(bool marc)
+        string DumpAfterFunc(bool marc)
         {
             string ret = "";
 
@@ -2587,10 +2593,11 @@ default
 
             FuncCntr = false;
 
-            if (AfterFuncCalls.Count == 0)
-            {
-                return ret;
+            lock (FuncCalls) {
+                if (AfterFuncCalls.Count == 0)
+                    return ret;
             }
+
             lock (FuncCalls)
             {
                 foreach (string s in AfterFuncCalls)
@@ -2600,7 +2607,7 @@ default
             return ret;
         }
 
-        private bool FuncCallsMarc()
+        bool FuncCallsMarc()
         {
             if (FuncCntr)
                 return false;
@@ -2610,7 +2617,7 @@ default
 
         #region Nested type: GlobalVar
 
-        private class GlobalVar
+        class GlobalVar
         {
             public string Type;
             public string Value;
@@ -2620,7 +2627,7 @@ default
 
         #region Nested type: VarRename
 
-        private class VarRename
+        class VarRename
         {
             //public string NewVarName;
             //public bool HasBeenAssigned;

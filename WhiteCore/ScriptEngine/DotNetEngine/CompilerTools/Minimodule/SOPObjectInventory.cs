@@ -29,8 +29,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using WhiteCore.Framework.SceneInfo;
 using OpenMetaverse;
+using WhiteCore.Framework.SceneInfo;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
 {

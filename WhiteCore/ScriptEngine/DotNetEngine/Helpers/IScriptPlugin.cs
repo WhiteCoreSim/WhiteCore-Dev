@@ -25,9 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.SceneInfo;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
+using WhiteCore.Framework.SceneInfo;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine
 {

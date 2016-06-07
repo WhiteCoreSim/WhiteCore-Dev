@@ -29,16 +29,16 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Remoting.Lifetime;
-using WhiteCore.Framework.SceneInfo;
 using OpenMetaverse;
+using WhiteCore.Framework.SceneInfo;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
 {
     public abstract class MRMBase : IScript
     {
-        private IHost m_host;
-        private UUID m_id;
-        private IWorld m_world;
+        IHost m_host;
+        UUID m_id;
+        IWorld m_world;
 
         protected IWorld World
         {

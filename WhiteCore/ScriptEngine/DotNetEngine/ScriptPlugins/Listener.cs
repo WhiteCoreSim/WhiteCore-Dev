@@ -27,16 +27,16 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.SceneInfo;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.SceneInfo;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine.Plugins
 {
     public class ListenerPlugin : IScriptPlugin
     {
-        private readonly List<IWorldComm> m_modules = new List<IWorldComm>();
+        readonly List<IWorldComm> m_modules = new List<IWorldComm>();
         public ScriptEngine m_ScriptEngine;
 
         #region IScriptPlugin Members
@@ -70,13 +70,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Plugins
                         IWorldCommListenerInfo lInfo = comms.GetNextMessage();
 
                         //Deliver data to prim's listen handler
-                        object[] resobj = new object[]
-                                              {
-                                                  new LSL_Types.LSLInteger(lInfo.GetChannel()),
-                                                  new LSL_Types.LSLString(lInfo.GetName()),
-                                                  new LSL_Types.LSLString(lInfo.GetID().ToString()),
-                                                  new LSL_Types.LSLString(lInfo.GetMessage())
-                                              };
+                        object[] resobj = {
+                            new LSL_Types.LSLInteger(lInfo.GetChannel()),
+                            new LSL_Types.LSLString(lInfo.GetName()),
+                            new LSL_Types.LSLString(lInfo.GetID().ToString()),
+                            new LSL_Types.LSLString(lInfo.GetMessage())
+                        };
 
                         m_ScriptEngine.PostScriptEvent(
                             lInfo.GetItemID(), lInfo.GetHostID(), new EventParams(

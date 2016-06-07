@@ -32,7 +32,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
 {
     public class ScriptSponsor : MarshalByRefObject, ISponsor
     {
-        private bool m_closed;
+        bool m_closed;
 
         public TimeSpan Renewal(ILease lease)
         {

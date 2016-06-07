@@ -27,10 +27,10 @@
 
 using System;
 using System.Collections.Generic;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.SceneInfo;
 using Nini.Config;
 using OpenMetaverse;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.SceneInfo;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine
 {

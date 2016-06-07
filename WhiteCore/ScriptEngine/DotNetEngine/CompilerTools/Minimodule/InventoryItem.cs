@@ -25,18 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using WhiteCore.Framework.SceneInfo;
-using WhiteCore.Framework.Services.ClassHelpers.Assets;
 using OpenMetaverse;
 using OpenMetaverse.Assets;
+using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.SceneInfo;
+using WhiteCore.Framework.Services.ClassHelpers.Assets;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
 {
     public class InventoryItem : IInventoryItem
     {
-        private readonly TaskInventoryItem m_privateItem;
-        private readonly IScene m_rootScene;
+        readonly TaskInventoryItem m_privateItem;
+        readonly IScene m_rootScene;
 
         public InventoryItem(IScene rootScene, TaskInventoryItem internalItem)
         {
@@ -61,13 +61,15 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
         // This method exposes OpenSim/OpenMetaverse internals and needs to be replaced with a IAsset specific to MRM.
         public T RetrieveAsset<T>() where T : Asset, new()
         {
-            AssetBase a = m_rootScene.AssetService.Get(AssetID.ToString());
+            AssetBase asset = m_rootScene.AssetService.Get(AssetID.ToString());
             T result = new T();
 
-            if ((sbyte) result.AssetType != a.Type)
-                throw new ApplicationException("[MRM] The supplied asset class does not match the found asset");
+            if ((sbyte)result.AssetType != asset.Type) {
+                MainConsole.Instance.Error ("[MRM] The supplied asset class does not match the found asset");
+                return null;
+            }
 
-            result.AssetData = a.Data;
+            result.AssetData = asset.Data;
             result.Decode();
             return result;
         }
@@ -92,16 +94,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
         /// <returns>
         ///     The object backing the interface implementation <see cref="InventoryItem" />
         /// </returns>
-        internal static InventoryItem FromInterface(IInventoryItem i)
+        internal static InventoryItem FromInterface (IInventoryItem i)
         {
-            if (typeof (InventoryItem).IsAssignableFrom(i.GetType()))
-            {
-                return (InventoryItem) i;
+            if (typeof (InventoryItem).IsAssignableFrom (i.GetType ())) {
+                return (InventoryItem)i;
             }
-            else
-            {
-                throw new ApplicationException("[MRM] There is no legal conversion from IInventoryItem to InventoryItem");
-            }
+            MainConsole.Instance.Error ("[MRM] There is no legal conversion from IInventoryItem to InventoryItem");
+            return null;
         }
     }
 }

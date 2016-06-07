@@ -31,46 +31,47 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
+using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo.Entities;
 using WhiteCore.Framework.Utilities;
-using OpenMetaverse;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine
 {
     public class MaintenanceThread
     {
         #region Declares
-        private EventWaitHandle wh = new AutoResetEvent(false);
+        EventWaitHandle wh = new AutoResetEvent(false);
 
-        private const int EMPTY_WORK_KILL_THREAD_TIME = 250;
-        private readonly EventManager EventManager;
+        const int EMPTY_WORK_KILL_THREAD_TIME = 250;
+        readonly EventManager EventManager;
 
         /// <summary>
         ///     Queue that handles the loading and unloading of scripts
         /// </summary>
-        private readonly StartPerformanceQueue LUQueue = new StartPerformanceQueue();
+        readonly StartPerformanceQueue LUQueue = new StartPerformanceQueue();
 
-        private readonly ConcurrentQueue<QueueItemStruct> ScriptEvents = new ConcurrentQueue<QueueItemStruct>();
+        readonly ConcurrentQueue<QueueItemStruct> ScriptEvents = new ConcurrentQueue<QueueItemStruct>();
 
-        private readonly PriorityQueue<QueueItemStruct, Int64> SleepingScriptEvents =
-            new PriorityQueue<QueueItemStruct, Int64>(10, DateTimeComparer);
+        readonly PriorityQueue<QueueItemStruct, long> SleepingScriptEvents =
+            new PriorityQueue<QueueItemStruct, long>(10, DateTimeComparer);
 
-        private readonly ScriptEngine m_ScriptEngine;
-        public Int64 CmdHandlerQueueIsRunning;
-        private float EventPerformance = 0.1f;
+        readonly ScriptEngine m_ScriptEngine;
+        float EventPerformance = 0.1f;
+        bool FiredStartupEvent;
+        DateTime NextSleepersTest = DateTime.Now;
+
+        int SleepingScriptEventCount;
+        int m_CheckingEvents;
+        int m_CheckingSleepers;
+
+        public long CmdHandlerQueueIsRunning;
         public bool EventProcessorIsRunning;
-        private bool FiredStartupEvent;
-        public int MaxScriptThreads = 1;
-        private DateTime NextSleepersTest = DateTime.Now;
         public bool RunInMainProcessingThread;
         public bool ScriptChangeIsRunning;
-
-        private int SleepingScriptEventCount;
         public WhiteCoreThreadPool cmdThreadpool;
-        private int m_CheckingEvents;
-        private int m_CheckingSleepers;
+        public int MaxScriptThreads = 1;
         public bool m_Started;
         public WhiteCoreThreadPool scriptChangeThreadpool;
         public WhiteCoreThreadPool scriptThreadpool;
@@ -89,7 +90,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             }
         }
 
-        private static int DateTimeComparer(Int64 a, Int64 b)
+        static int DateTimeComparer(long a, long b)
         {
             return b.CompareTo(a);
         }
@@ -392,7 +393,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         ///     Queue the event loop given by thread
         /// </summary>
         /// <param name="thread"></param>
-        private void StartThread(string thread)
+        void StartThread(string thread)
         {
             if (thread == "Change")
             {
@@ -470,7 +471,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 CurrentlyAt = null
             };
 
-            if (ID == null || ID.Script == null || ID.IgnoreNew)
+            if (ID.Script == null || ID.IgnoreNew)
                 return;
 
             if (!ID.SetEventParams(QIS)) // check events delay rules
@@ -547,7 +548,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 bool found = false;
 
                 //Check whether it is time, and then do the thread safety piece
-                if (Interlocked.CompareExchange(ref m_CheckingSleepers, 1, 0) == 0)
+                bool checkTime;
+                lock(SleepingScriptEvents)
+                    checkTime = Interlocked.CompareExchange (ref m_CheckingSleepers, 1, 0) == 0;
+                if (checkTime)
                 {
                     lock (SleepingScriptEvents)
                     {
@@ -569,7 +573,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                     }
                     if (found)
                     {
-                        if (QIS.EventsProcData.TimeCheck.Ticks < DateTime.Now.Ticks)
+                        bool expired;
+                        lock(SleepingScriptEvents)
+                            expired = QIS.EventsProcData.TimeCheck.Ticks < DateTime.Now.Ticks;
+                        
+                        if (expired)
                         {
                             DateTime NextTime = DateTime.MaxValue;
                             lock (SleepingScriptEvents)
@@ -679,8 +687,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             if (!QIS.ID.Running)
             {
                 //do only state_entry and on_rez
-                if (QIS.functionName != "state_entry"
-                    || QIS.functionName != "on_rez")
+                if (!(QIS.functionName == "state_entry" || QIS.functionName == "on_rez"))
                 {
                     return;
                 }
@@ -711,13 +718,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             {
                 if (QIS.CurrentlyAt.SleepTo.Ticks != 0)
                 {
-                    QIS.EventsProcData.TimeCheck = QIS.CurrentlyAt.SleepTo;
-                    QIS.EventsProcData.State = ScriptEventsState.Sleep;
-                    //If it is greater, we need to check sooner for this one
-                    if (NextSleepersTest.Ticks > QIS.CurrentlyAt.SleepTo.Ticks)
-                        NextSleepersTest = QIS.CurrentlyAt.SleepTo;
-                    lock (SleepingScriptEvents)
-                    {
+                    lock(SleepingScriptEvents) {
+                        QIS.EventsProcData.TimeCheck = QIS.CurrentlyAt.SleepTo;
+                        QIS.EventsProcData.State = ScriptEventsState.Sleep;
+                    
+                        //If it is greater, we need to check sooner for this one
+                        if (NextSleepersTest.Ticks > QIS.CurrentlyAt.SleepTo.Ticks)
+                            NextSleepersTest = QIS.CurrentlyAt.SleepTo;
+                    
                         SleepingScriptEvents.Enqueue(QIS, QIS.CurrentlyAt.SleepTo.Ticks);
                         SleepingScriptEventCount++;
                     }
@@ -725,7 +733,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 else
                 {
                     QIS.EventsProcData.State = ScriptEventsState.Running;
-                    this.ScriptEvents.Enqueue(QIS);
+                    ScriptEvents.Enqueue(QIS);
                 }
             }
         }

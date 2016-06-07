@@ -25,9 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using OpenMetaverse;
 using System;
 using System.Drawing;
+using OpenMetaverse;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
 {
@@ -89,7 +89,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
         /// <summary>
         ///     The description assigned to this object.
         /// </summary>
-        String Description { get; set; }
+        string Description { get; set; }
 
         /// <summary>
         ///     Returns the UUID of the Owner of the Object.
@@ -141,16 +141,16 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
         Vector3 OffsetPosition { get; set; }
 
         Vector3 SitTarget { get; set; }
-        String SitTargetText { get; set; }
+        string SitTargetText { get; set; }
 
-        String TouchText { get; set; }
+        string TouchText { get; set; }
 
         /// <summary>
         ///     Text to be associated with this object, in the
         ///     Second Life(r) viewer, this is shown above the
         ///     object.
         /// </summary>
-        String Text { get; set; }
+        string Text { get; set; }
 
         bool IsRotationLockedX { get; set; } // SetStatus(!ROTATE_X)
         bool IsRotationLockedY { get; set; } // SetStatus(!ROTATE_Y)

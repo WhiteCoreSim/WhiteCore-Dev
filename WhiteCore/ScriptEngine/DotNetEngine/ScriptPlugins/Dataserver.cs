@@ -28,15 +28,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using WhiteCore.Framework.SceneInfo;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
+using WhiteCore.Framework.SceneInfo;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine.Plugins
 {
     public class DataserverPlugin : IScriptPlugin
     {
-        private readonly Dictionary<string, DataserverRequest> DataserverRequests =
+        readonly Dictionary<string, DataserverRequest> DataserverRequests =
             new Dictionary<string, DataserverRequest>();
 
         public ScriptEngine m_ScriptEngine;
@@ -140,7 +140,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Plugins
             return ds.ID;
         }
 
-        private void DataserverReply(string identifier, string reply)
+        void DataserverReply(string identifier, string reply)
         {
             DataserverRequest ds;
 
@@ -153,7 +153,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Plugins
             }
 
             m_ScriptEngine.PostObjectEvent(ds.primID,
-                                           "dataserver", new Object[]
+                                           "dataserver", new object[]
                                                              {
                                                                  new LSL_Types.LSLString(ds.ID.ToString()),
                                                                  new LSL_Types.LSLString(reply)
@@ -168,7 +168,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Plugins
                 if (DataserverRequests.TryGetValue(handle, out request))
                 {
                     //Wait for the value to be returned in LSL_Api
-                    request.IsCompleteAt = DateTime.Now.AddSeconds(millisecondsToWait/1000 + 0.1);
+                    request.IsCompleteAt = DateTime.Now.AddSeconds((millisecondsToWait / (double)1000) + 0.1);
                     request.Reply = reply;
                     //Make sure that the cmd handler thread is running
                     m_ScriptEngine.MaintenanceThread.PokeThreads(request.itemID);
@@ -182,7 +182,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Plugins
 
         #region Nested type: DataserverRequest
 
-        private class DataserverRequest
+        class DataserverRequest
         {
             public UUID ID;
             public DateTime IsCompleteAt;

@@ -33,7 +33,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
 {
     public class Heightmap : MarshalByRefObject, IHeightmap
     {
-        private readonly IScene m_scene;
+        readonly IScene m_scene;
 
         public Heightmap(IScene scene)
         {

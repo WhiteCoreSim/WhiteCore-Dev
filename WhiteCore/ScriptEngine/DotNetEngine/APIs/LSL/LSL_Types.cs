@@ -1210,7 +1210,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
             public double Mean()
             {
-                return (Sum()/NumericLength());
+                var numLen = NumericLength ();
+                if (numLen != 0)
+                    return (Sum()/numLen);
+
+                return 0f;
             }
 
             public void NumericSort()

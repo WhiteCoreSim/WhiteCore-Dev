@@ -29,8 +29,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using WhiteCore.Framework.Utilities;
 using OpenMetaverse;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
 {
@@ -84,12 +84,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         protected static Dictionary<string, scriptEvents> m_eventFlagsMap = new Dictionary<string, scriptEvents>();
 
         // Cache functions by keeping a reference to them in a dictionary
-        private readonly Dictionary<string, scriptEvents> m_stateEvents = new Dictionary<string, scriptEvents>();
+        readonly Dictionary<string, scriptEvents> m_stateEvents = new Dictionary<string, scriptEvents>();
 
-        private bool InTimeSlice;
+        bool InTimeSlice;
 
-        private Int32 MaxTimeSlice = 60; // script timeslice execution time in ms , hardwired for now
-        private int TimeSliceEnd;
+        int MaxTimeSlice = 60; // script timeslice execution time in ms , hardwired for now
+        int TimeSliceEnd;
 
         /// <summary>
         ///     Contains the script to execute functions in.
@@ -97,7 +97,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         protected IScript m_Script;
 
         protected Dictionary<Guid, IEnumerator> m_enumerators = new Dictionary<Guid, IEnumerator>();
-        private Type m_scriptType;
+        Type m_scriptType;
 
 
         public Executor(IScript script)
@@ -303,7 +303,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public void ResetStateEventFlags()
         {
             m_stateEvents.Clear();
-            m_enumerators.Clear();
+            lock (m_enumerators)
+                m_enumerators.Clear();
             m_scriptType = null;
         }
     }

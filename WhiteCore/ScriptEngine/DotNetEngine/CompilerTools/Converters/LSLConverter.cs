@@ -35,9 +35,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
 {
     public class LSLConverter : IScriptConverter
     {
-        private readonly CSharpCodeProvider CScodeProvider = new CSharpCodeProvider();
-        private CSCodeGenerator LSL_Converter;
-        private Compiler m_compiler;
+        readonly CSharpCodeProvider CScodeProvider = new CSharpCodeProvider();
+        CSCodeGenerator LSL_Converter;
+        Compiler m_compiler;
 
         #region IScriptConverter Members
 
@@ -49,7 +49,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
         public void Initialise(Compiler compiler)
         {
             m_compiler = compiler;
-            new CSCodeGenerator(compiler);
+            //? // new CSCodeGenerator(compiler);
 
             //Add new LSL events that haven't been added into the parser
             LSL2CSCodeTransformer.AddLSLEvent(new EventInfo("experience_permissions", new [] {

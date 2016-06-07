@@ -25,17 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine
 {
@@ -43,8 +43,15 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
     {
         #region Declares
 
+        //Threat Level for scripts.
+        ThreatLevel m_MaxThreatLevel = 0;
+        bool m_allowFunctionLimiting;
+        IConfig m_config;
+        bool allowHTMLLinking = true;
+
         //List of all enabled APIs for scripts
-        private List<string> EnabledAPIs = new List<string>();
+        List<string> EnabledAPIs = new List<string>();
+
         //Keeps track of whether the source has been compiled before
         public Dictionary<string, string> PreviouslyCompiled = new Dictionary<string, string>();
 
@@ -52,13 +59,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             new Dictionary<UUID, Dictionary<UUID, ScriptData>>();
 
         public Dictionary<UUID, UUID> ScriptsItems = new Dictionary<UUID, UUID>();
-        private bool allowHTMLLinking = true;
 
-        //Threat Level for scripts.
-        private ThreatLevel m_MaxThreatLevel = 0;
-        private bool m_allowFunctionLimiting;
-        private IConfig m_config;
-        
         public ThreatLevelDefinition m_threatLevelNoAccess;
         public ThreatLevelDefinition m_threatLevelNone;
         public ThreatLevelDefinition m_threatLevelNuisance;
@@ -71,14 +72,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
         #region Limiting of functions
 
-        private readonly Dictionary<UUID, Dictionary<string, LimitReq>> m_functionLimiting =
+        readonly Dictionary<UUID, Dictionary<string, LimitReq>> m_functionLimiting =
             new Dictionary<UUID, Dictionary<string, LimitReq>>();
 
-        private readonly Dictionary<string, LimitDef> m_functionsToLimit = new Dictionary<string, LimitDef>();
+        readonly Dictionary<string, LimitDef> m_functionsToLimit = new Dictionary<string, LimitDef>();
 
         #region Nested type: LimitAction
 
-        private enum LimitAction
+        enum LimitAction
         {
             None,
             Drop,
@@ -91,7 +92,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
         #region Nested type: LimitAlert
 
-        private enum LimitAlert
+        enum LimitAlert
         {
             None,
             Console,
@@ -103,7 +104,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
         #region Nested type: LimitDef
 
-        private class LimitDef
+        class LimitDef
         {
             /// <summary>
             ///     What action will be taken
@@ -140,7 +141,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
         #region Nested type: LimitReq
 
-        private class LimitReq
+        class LimitReq
         {
             public int FunctionsSinceLastFired;
             public int LastFired;
@@ -151,7 +152,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
         #region Nested type: LimitType
 
-        private enum LimitType
+        enum LimitType
         {
             None,
             Script,
@@ -186,7 +187,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
             foreach (string kvp in config.GetKeys())
             {
-                if (kvp.EndsWith("_Limit"))
+                if (kvp.EndsWith ("_Limit", StringComparison.Ordinal))
                 {
                     string functionName = kvp.Remove(kvp.Length - 6);
                     LimitDef limitDef = new LimitDef();
@@ -306,8 +307,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 case "Severe":
                     m_MaxThreatLevel = ThreatLevel.Severe;
                     break;
-                default:
-                    break;
             }
             return GetDefinition(m_MaxThreatLevel);
         }
@@ -359,7 +358,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
         #region Limitation Functions
 
-        private bool CheckFunctionLimits(string function, ISceneChildEntity m_host, string API, UUID itemID)
+        bool CheckFunctionLimits(string function, ISceneChildEntity m_host, string API, UUID itemID)
         {
             LimitDef d = null;
             bool isAPI = m_functionsToLimit.TryGetValue(API, out d);
@@ -453,7 +452,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             return true;
         }
 
-        private void TriggerAlert(string function, LimitDef d, string message, ISceneChildEntity host)
+        void TriggerAlert(string function, LimitDef d, string message, ISceneChildEntity host)
         {
             if (d.Alert == LimitAlert.Console || d.Alert == LimitAlert.ConsoleAndInworld)
                 MainConsole.Instance.Warn("[Limitor]: " + message);
@@ -474,22 +473,22 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         /// <param name="m_host"></param>
         /// <param name="itemID"></param>
         /// <returns>Whether the event should be dropped</returns>
-        private bool TriggerAction(LimitDef d, ISceneChildEntity m_host, UUID itemID)
+        bool TriggerAction(LimitDef d, ISceneChildEntity m_host, UUID itemID)
         {
             if (d.Action == LimitAction.None)
                 return true;
-            else if (d.Action == LimitAction.Drop)
+            if (d.Action == LimitAction.Drop)
                 return false; //Drop it
-            else if (d.Action == LimitAction.TerminateEvent)
-                throw new Exception(""); //Blank messages kill events, but don't show anything on the console/inworld
-            else if (d.Action == LimitAction.TerminateScript)
-            {
-                ScriptData script = GetScript(itemID);
-                script.IgnoreNew = true; //Blocks all new events, can be reversed by resetting or resaving the script
-                throw new Exception(""); //Blank messages kill events, but don't show anything on the console/inworld
+            if (d.Action == LimitAction.TerminateEvent)
+                throw new Exception (""); //Blank messages kill events, but don't show anything on the console/inworld
+            if (d.Action == LimitAction.TerminateScript) {
+                ScriptData script = GetScript (itemID);
+                if (script != null)
+                    script.IgnoreNew = true; //Blocks all new events, can be reversed by resetting or resaving the script
+                throw new Exception (""); //Blank messages kill events, but don't show anything on the console/inworld
             }
-            else if (d.Action == LimitAction.Delay)
-                MainConsole.Instance.Warn("Function delaying is not implemented");
+            if (d.Action == LimitAction.Delay)
+                MainConsole.Instance.Warn ("Function delaying is not implemented");
             return true;
         }
 
@@ -500,18 +499,18 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             /// <summary>
             ///     Which owners have access to which functions
             /// </summary>
-            private readonly Dictionary<string, List<UUID>> m_FunctionPerms = new Dictionary<string, List<UUID>>();
+            readonly Dictionary<string, List<UUID>> m_FunctionPerms = new Dictionary<string, List<UUID>>();
 
-            private readonly bool m_allowGroupPermissions;
+            readonly bool m_allowGroupPermissions;
 
-            private readonly List<UUID> m_allowedUsers = new List<UUID>();
+            readonly List<UUID> m_allowedUsers = new List<UUID>();
 
-            private readonly Dictionary<UUID, Dictionary<string, bool>> m_knownAllowedGroupFunctionsForAvatars =
+            readonly Dictionary<UUID, Dictionary<string, bool>> m_knownAllowedGroupFunctionsForAvatars =
                 new Dictionary<UUID, Dictionary<string, bool>>();
 
-            private readonly ScriptProtectionModule m_scriptProtectionModule;
-            private readonly ThreatLevel m_threatLevel = ThreatLevel.None;
-            private readonly UserSet m_userSet = UserSet.None;
+            readonly ScriptProtectionModule m_scriptProtectionModule;
+            readonly ThreatLevel m_threatLevel = ThreatLevel.None;
+            readonly UserSet m_userSet = UserSet.None;
 
             public ThreatLevelDefinition(ThreatLevel threatLevel, UserSet userSet, ScriptProtectionModule module)
             {
@@ -521,7 +520,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 m_allowGroupPermissions = m_scriptProtectionModule.m_config.GetBoolean(
                     "AllowGroupThreatPermissionCheck", m_allowGroupPermissions);
 
-                string perm = m_scriptProtectionModule.m_config.GetString("Allow_" + m_threatLevel.ToString(), "");
+                string perm = m_scriptProtectionModule.m_config.GetString("Allow_" + m_threatLevel, "");
                 if (perm != "")
                 {
                     string[] ids = perm.Split(',');
@@ -604,7 +603,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 {
                     if (m_threatLevel > m_scriptProtectionModule.GetThreatLevel().m_threatLevel)
                         m_scriptProtectionModule.Error("Runtime Error: ",
-                                                       String.Format(
+                                                       string.Format(
                                                            "{0} permission denied.  Allowed threat level is {1} but function threat level is {2}.",
                                                            function,
                                                            m_scriptProtectionModule.GetThreatLevel().m_threatLevel,
@@ -629,7 +628,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                                             return;
                                         else
                                             m_scriptProtectionModule.Error("Runtime Error: ",
-                                                                           String.Format(
+                                                                           string.Format(
                                                                                "{0} permission denied.  Prim owner is not in the list of users allowed to execute this function.",
                                                                                function));
                                     }
@@ -661,7 +660,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                                 }
                             }
                             m_scriptProtectionModule.Error("Runtime Error: ",
-                                                           String.Format(
+                                                           string.Format(
                                                                "{0} permission denied.  Prim owner is not in the list of users allowed to execute this function.",
                                                                function));
                         }
@@ -669,7 +668,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 }
             }
 
-            private bool CheckUser(ISceneChildEntity host)
+            bool CheckUser(ISceneChildEntity host)
             {
                 if (m_allowedUsers.Contains(host.OwnerID))
                     return true;
@@ -697,7 +696,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
             public override string ToString()
             {
-                return string.Format("ThreatLevel: {0}, UserSet : {1}", m_threatLevel.ToString(), m_userSet.ToString());
+                return string.Format("ThreatLevel: {0}, UserSet : {1}", m_threatLevel, m_userSet);
             }
         }
 
@@ -761,9 +760,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         public string TryGetPreviouslyCompiledScript(string source)
         {
             //string key = source.Length.ToString() + source.GetHashCode().ToString();
-            string key = source.Length.ToString() + Util.Md5Hash(source);
+            string key = source.Length + Util.Md5Hash(source);
             string assemblyName = "";
-            PreviouslyCompiled.TryGetValue(key, out assemblyName);
+
+            lock(PreviouslyCompiled)
+                PreviouslyCompiled.TryGetValue(key, out assemblyName);
             //PreviouslyCompiled.TryGetValue (source, out assemblyName);
 
             return assemblyName;
@@ -808,6 +809,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
         public void AddNewScript(ScriptData ID)
         {
+            if (ID.Part == null)
+                return;
+            
             lock (ScriptsItems)
             {
                 if (ID.Part != null)

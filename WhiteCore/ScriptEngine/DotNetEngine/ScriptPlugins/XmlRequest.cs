@@ -25,18 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using System.Collections.Generic;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.SceneInfo;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.SceneInfo;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine.Plugins
 {
     public class XmlRequestPlugin : IScriptPlugin
     {
-        private readonly List<IXMLRPC> m_modules = new List<IXMLRPC>();
+        readonly List<IXMLRPC> m_modules = new List<IXMLRPC>();
         public ScriptEngine m_ScriptEngine;
 
         #region IScriptPlugin Members
@@ -77,17 +76,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Plugins
                     xmlrpc.RemoveCompletedRequest(rInfo.GetMessageID());
 
                     //Deliver data to prim's remote_data handler
-                    object[] resobj = new object[]
-                                          {
-                                              new LSL_Types.LSLInteger(2),
-                                              new LSL_Types.LSLString(
-                                                  rInfo.GetChannelKey().ToString()),
-                                              new LSL_Types.LSLString(
-                                                  rInfo.GetMessageID().ToString()),
-                                              new LSL_Types.LSLString(String.Empty),
-                                              new LSL_Types.LSLInteger(rInfo.GetIntValue()),
-                                              new LSL_Types.LSLString(rInfo.GetStrVal())
-                                          };
+                    object[] resobj = {
+                        new LSL_Types.LSLInteger(2),
+                        new LSL_Types.LSLString(rInfo.GetChannelKey().ToString()),
+                        new LSL_Types.LSLString(rInfo.GetMessageID().ToString()),
+                        new LSL_Types.LSLString(string.Empty),
+                        new LSL_Types.LSLInteger(rInfo.GetIntValue()),
+                        new LSL_Types.LSLString(rInfo.GetStrVal())
+                    };
 
                     m_ScriptEngine.PostScriptEvent(
                         rInfo.GetItemID(), rInfo.GetPrimID(), new EventParams(
@@ -102,15 +98,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Plugins
                     xmlrpc.RemoveCompletedSRDRequest(srdInfo.GetReqID());
 
                     //Deliver data to prim's remote_data handler
-                    object[] resobj = new object[]
-                                          {
-                                              new LSL_Types.LSLInteger(3),
-                                              new LSL_Types.LSLString(srdInfo.Channel),
-                                              new LSL_Types.LSLString(srdInfo.GetReqID().ToString()),
-                                              new LSL_Types.LSLString(String.Empty),
-                                              new LSL_Types.LSLInteger(srdInfo.Idata),
-                                              new LSL_Types.LSLString(srdInfo.Sdata)
-                                          };
+                    object[] resobj = {
+                        new LSL_Types.LSLInteger(3),
+                        new LSL_Types.LSLString(srdInfo.Channel),
+                        new LSL_Types.LSLString(srdInfo.GetReqID().ToString()),
+                        new LSL_Types.LSLString(string.Empty),
+                        new LSL_Types.LSLInteger(srdInfo.Idata),
+                        new LSL_Types.LSLString(srdInfo.Sdata)
+                    };
 
                     m_ScriptEngine.PostScriptEvent(
                         srdInfo.ItemID, srdInfo.PrimID, new EventParams(
