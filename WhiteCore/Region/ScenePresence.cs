@@ -457,7 +457,7 @@ namespace WhiteCore.Region
                     }
                     catch (Exception e)
                     {
-                        MainConsole.Instance.Error("[Scene presence]: ABSOLUTE POSITION " + e);
+                        MainConsole.Instance.Error("[Scene presence]: Absolute position - " + e);
                     }
                 }
 
@@ -533,7 +533,7 @@ namespace WhiteCore.Region
                     }
                     catch (Exception e)
                     {
-                        MainConsole.Instance.Error("[Scene presence]: VELOCITY " + e.Message);
+                        MainConsole.Instance.Error("[Scene presence]: Velocity - " + e.Message);
                     }
                 }
                 else
@@ -1003,16 +1003,16 @@ namespace WhiteCore.Region
                 float leftOverToMin = m_AngularVelocity.Z - rollMinRadians;
                 if (amount > leftOverToMin)
                     return -leftOverToMin;
-                else
-                    return -amount;
+                
+                return -amount;
             }
             else
             {
                 float leftOverToMin = -m_AngularVelocity.Z - rollMinRadians;
                 if (amount > leftOverToMin)
                     return leftOverToMin;
-                else
-                    return amount;
+                
+                return amount;
             }
         }
 
@@ -1107,11 +1107,11 @@ namespace WhiteCore.Region
                     //MainConsole.Instance.DebugFormat("[RAYCASTRESULT]: {0}, {1}, {2}, {3}", hitYN, collisionPoint, localid, distance);
 
                     Vector3 normal = Vector3.Normalize(new Vector3(0f, 0f, collisionPoint.Z) - collisionPoint);
-                    ControllingClient.SendCameraConstraint(new Vector4(normal.X, normal.Y, normal.Z,
-                                                                       -1*
-                                                                       Vector3.Distance(
-                                                                           new Vector3(0, 0, collisionPoint.Z),
-                                                                           collisionPoint)));
+                    ControllingClient.SendCameraConstraint(
+                        new Vector4(normal.X,
+                                    normal.Y,
+                                    normal.Z,
+                                    -1* Vector3.Distance( new Vector3(0, 0, collisionPoint.Z), collisionPoint)));
                 }
                 else
                 {
@@ -1390,7 +1390,7 @@ namespace WhiteCore.Region
                                 Vector3 LocalVectorToTarget3D =
                                     (m_moveToPositionTarget - AbsolutePosition)
                                     // vector from cur. pos to target in global coords
-                                    //                                    * Matrix4.CreateFromQuaternion(Quaternion.Inverse(bodyRotation)); // change to avatar coords
+                                    //   * Matrix4.CreateFromQuaternion(Quaternion.Inverse(bodyRotation)); // change to avatar coords
                                     *Quaternion.Inverse(bodyRotation);
                                     // mult by matix is faster but with creation, use *quarternion
                                 // Ignore z component of vector
@@ -1512,9 +1512,9 @@ namespace WhiteCore.Region
                 // which occurs later in the main scene loop
                 if (update_movementflag || (update_rotation && DCFlagKeyPressed))
                 {
-                    //                    MainConsole.Instance.DebugFormat("{0} {1}", update_movementflag, (update_rotation && DCFlagKeyPressed));
-                    //                    MainConsole.Instance.DebugFormat(
-                    //                        "In {0} adding velocity to {1} of {2}", m_scene.RegionInfo.RegionName, Name, agent_control_v3);
+                    // MainConsole.Instance.DebugFormat("{0} {1}", update_movementflag, (update_rotation && DCFlagKeyPressed));
+                    // MainConsole.Instance.DebugFormat(
+                    //    "In {0} adding velocity to {1} of {2}", m_scene.RegionInfo.RegionName, Name, agent_control_v3);
 
                     AddNewMovement(agent_control_v3, q);
                 }
@@ -1577,7 +1577,7 @@ namespace WhiteCore.Region
                 }
                 catch (InvalidCastException)
                 {
-                    MainConsole.Instance.Error("[CLIENT]: Invalid autopilot request");
+                    MainConsole.Instance.Error("[Scene presence]: Invalid autopilot request");
                     return;
                 }
                 m_moveToPositionInProgress = true;
@@ -1672,7 +1672,8 @@ namespace WhiteCore.Region
                 return null;
 
             // If the primitive the player clicked on has a sit target and that sit target is not full, that sit target is used.
-            // If the primitive the player clicked on has no sit target, and one or more other linked objects have sit targets that are not full, the sit target of the object with the lowest link number will be used.
+            // If the primitive the player clicked on has no sit target, and one or more other linked objects have sit 
+            //   targets that are not full, the sit target of the object with the lowest link number will be used.
 
             // Get our own copy of the part array, and sort into the order we want to test
             ISceneChildEntity[] partArray = targetPart.ParentEntity.ChildrenEntities().ToArray();
@@ -1694,8 +1695,9 @@ namespace WhiteCore.Region
 
                 //TODO: probably can use this >>//      public bool ApproxEquals (Vector3 vec, float tolerance);
                 bool SitTargetisSet =
-                    (!(avSitOffSet.X == 0f && avSitOffSet.Y == 0f && avSitOffSet.Z == 0f && avSitOrientation.W == 1f &&
-                       avSitOrientation.X == 0f && avSitOrientation.Y == 0f && avSitOrientation.Z == 0f));
+                    (!(Util.ApproxZero (avSitOffSet.X) && Util.ApproxZero (avSitOffSet.Y) &&
+                       Util.ApproxZero (avSitOffSet.Z) && Util.ApproxEqual(avSitOrientation.W, 1f) &&
+                       Util.ApproxZero (avSitOrientation.X) && Util.ApproxZero (avSitOrientation.Y) && Util.ApproxZero (avSitOrientation.Z)));
 
                 if (SitTargetisSet)
                 {
@@ -1736,8 +1738,9 @@ namespace WhiteCore.Region
                 Quaternion avSitOrientation = part.SitTargetOrientation;
 
                 bool SitTargetisSet =
-                    (!(avSitOffSet.X == 0f && avSitOffSet.Y == 0f && avSitOffSet.Z == 0f && avSitOrientation.W == 1f &&
-                       avSitOrientation.X == 0f && avSitOrientation.Y == 0f && avSitOrientation.Z == 0f));
+                    (!(Util.ApproxZero (avSitOffSet.X) && Util.ApproxZero (avSitOffSet.Y) && 
+                       Util.ApproxZero (avSitOffSet.Z) && Util.ApproxEqual (avSitOrientation.W, 1f) &&
+                       Util.ApproxZero (avSitOrientation.X) && Util.ApproxZero (avSitOrientation.Y) && Util.ApproxZero (avSitOrientation.Z)));
 
                 if (SitTargetisSet && part.UUID != notID)
                 {
@@ -1797,7 +1800,7 @@ namespace WhiteCore.Region
 
             ISceneChildEntity part = FindNextAvailableSitTarget(targetID);
             if (part == null) {
-                MainConsole.Instance.ErrorFormat ("Scene presence]: Tried to sit on non existent target {0}", targetID);
+                MainConsole.Instance.ErrorFormat ("[Scene presence]: Tried to sit on non existent target {0}", targetID);
                 return;
             }
 
@@ -1805,7 +1808,7 @@ namespace WhiteCore.Region
                 part = FindNextAvailableSitTarget(targetID, part.UUID);
 
             if (part == null) {
-                MainConsole.Instance.ErrorFormat ("Scene presence]: Tried to sit on non exisxtent target part {0}", part.UUID);
+                MainConsole.Instance.ErrorFormat ("[Scene presence]: Tried to sit on non exisxtent target part {0}", targetID);
                 return;
             }
 
@@ -1817,20 +1820,17 @@ namespace WhiteCore.Region
             Quaternion avSitOrientation = part.SitTargetOrientation;
             bool UseSitTarget = false;
 
-            //TODO: probably can use these >>
-            //      public bool ApproxEquals (Vector3 vec, float tolerance);
-            //      public bool ApproxEquals (Quaternion quat, float tolerance);
             bool SitTargetisSet =
-                (!(avSitOffSet.X == 0f && avSitOffSet.Y == 0f && avSitOffSet.Z == 0f &&
+                (!(Util.ApproxZero(avSitOffSet.X) && Util.ApproxZero(avSitOffSet.Y) && Util.ApproxZero(avSitOffSet.Z) &&
                    (
-                       avSitOrientation.X == 0f && avSitOrientation.Y == 0f && avSitOrientation.Z == 0f &&
-                       avSitOrientation.W == 1f // Valid Zero Rotation quaternion
+                       Util.ApproxZero(avSitOrientation.X) && Util.ApproxZero(avSitOrientation.Y) && 
+                       Util.ApproxZero(avSitOrientation.Z) && Util.ApproxEqual(avSitOrientation.W, 1f) // Valid Zero Rotation quaternion
                        ||
-                       avSitOrientation.X == 0f && avSitOrientation.Y == 0f && avSitOrientation.Z == 1f &&
-                       avSitOrientation.W == 0f // W-Z Mapping was invalid at one point
+                       Util.ApproxZero (avSitOrientation.X) && Util.ApproxZero (avSitOrientation.Y) &&
+                       Util.ApproxEqual(avSitOrientation.Z, 1f) && Util.ApproxZero (avSitOrientation.W) // W-Z Mapping was invalid at one point
                        ||
-                       avSitOrientation.X == 0f && avSitOrientation.Y == 0f && avSitOrientation.Z == 0f &&
-                       avSitOrientation.W == 0f // Invalid Quaternion
+                       Util.ApproxZero (avSitOrientation.X) && Util.ApproxZero (avSitOrientation.Y) && 
+                       Util.ApproxZero (avSitOrientation.Z) && Util.ApproxZero (avSitOrientation.W) // Invalid Quaternion
                    )
                   ));
 
@@ -2388,7 +2388,7 @@ namespace WhiteCore.Region
                                 else
                                 {
                                     MainConsole.Instance.DebugFormat(
-                                        "[Scene[Scene presence]:e to cross to a neighboring region, because we failed to contact the other region");
+                                        "[Scene presence]: Unable to cross to a neighboring region, because we failed to contact the other region");
                                     return false;
                                 }
                             }
@@ -2404,7 +2404,7 @@ namespace WhiteCore.Region
                                 transferModule.Cross(this, isFlying, neighborRegion);
                             else
                                 MainConsole.Instance.DebugFormat(
-                                    "[Scene[Scene presence]:e to cross agent to neighboring region, because there is no AgentTransferModule");
+                                    "[Scene presence]: Unable to cross agent to neighboring region, because there is no AgentTransferModule");
                         }
                         return true;
                     }
@@ -2446,7 +2446,7 @@ namespace WhiteCore.Region
                                     else
                                     {
                                         MainConsole.Instance.DebugFormat(
-                                            "[Scene[Scene presence]:e to cross to a neighboring region, because we failed to contact the other region");
+                                            "[Scene presence]: Unable to cross to a neighboring region, because we failed to contact the other region");
                                         return false;
                                     }
                                 }
@@ -2463,7 +2463,7 @@ namespace WhiteCore.Region
                                     transferModule.Cross(this, isFlying, neighborRegion);
                                 else
                                     MainConsole.Instance.DebugFormat(
-                                        "[Scene[Scene presence]:e to cross agent to neighboring region, because there is no AgentTransferModule");
+                                        "[Scene presence]: Unablee to cross agent to neighboring region, because there is no AgentTransferModule");
 
                                 return true;
                             }
@@ -2768,7 +2768,7 @@ namespace WhiteCore.Region
             }
             catch (Exception ex)
             {
-                MainConsole.Instance.Warn("[Scene[Scene presence]: in CopyFrom: " + ex);
+                MainConsole.Instance.Warn("[Scene presence]: Error in CopyFrom: " + ex);
             }
         }
 
@@ -2816,7 +2816,11 @@ namespace WhiteCore.Region
 
                 //Tell any events about it
                 if (OnAddPhysics != null)
-                OnAddPhysics();
+                    try {
+                        OnAddPhysics ();
+                    } catch {
+                        // Windows can generte an IdentityNotMapped exception here
+                    }
             }
             //All done, reset this
             m_creatingPhysicalRepresentation = false;
@@ -2849,7 +2853,7 @@ namespace WhiteCore.Region
                 RemoveFromPhysicalScene();
             }
             MainConsole.Instance.Error(
-                "[AVATAR]: NonFinite Avatar position detected... Reset Position, the client may be messed up now.");
+                "[Scene presence]: NonFinite Avatar position detected... Reset Position, the client may be messed up now.");
 
             //Make them fly so that they don't just fall
             AddToPhysicalScene(true, false);

@@ -517,6 +517,53 @@ namespace WhiteCore.Framework.Utilities
         /// </value>
         public static UUID BLANK_TEXTURE_UUID = new UUID ("5748decc-f629-461c-9a36-a35a221fe21f");
 
+        #region General maths helpers
+        /// <summary>
+        /// Values are equal within float variation.
+        /// </summary>
+        /// <returns>The equals.</returns>
+        /// <param name="valA">Value a.</param>
+        /// <param name="valB">Value b.</param>
+        public static bool ApproxEqual (float valA, float valB)
+        {
+            return Math.Abs (valA - valB) <= Constants.FloatDifference;
+        }
+
+        /// <summary>
+        /// Value is approximately zero (within float difference).
+        /// </summary>
+        /// <returns>The zero.</returns>
+        /// <param name="valA">Value a.</param>
+        public static bool ApproxZero (float valA)
+        {
+            return Math.Abs (valA) <= Constants.FloatDifference;
+        }
+
+        // double variations
+
+        /// <summary>
+        /// Values are equal within float variation.
+        /// </summary>
+        /// <returns>The equals.</returns>
+        /// <param name="valA">Value a.</param>
+        /// <param name="valB">Value b.</param>
+        public static bool ApproxEqual (double valA, double valB)
+        {
+            return Math.Abs (valA - valB) <= Constants.FloatDifference;
+        }
+
+        /// <summary>
+        /// Value is approximately zero (within float difference).
+        /// </summary>
+        /// <returns>The zero.</returns>
+        /// <param name="valA">Value a.</param>
+        public static bool ApproxZero (double valA)
+        {
+            return Math.Abs (valA) <= Constants.FloatDifference;
+        }
+
+        #endregion
+
         #region Vector Equations
 
         /// <summary>
@@ -602,8 +649,9 @@ namespace WhiteCore.Framework.Utilities
             return false;
         }
 
-        # endregion
-
+        #endregion
+       
+        #region Quaternion Equations
         public static Quaternion Axes2Rot (Vector3 fwd, Vector3 left, Vector3 up)
         {
             float s;
@@ -651,6 +699,8 @@ namespace WhiteCore.Framework.Utilities
                 
             }
         }
+
+        #endregion
 
         public static Random RandomClass {
             get { return randomClass; }
