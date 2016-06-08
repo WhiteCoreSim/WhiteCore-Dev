@@ -144,7 +144,7 @@ namespace WhiteCore.Simulation.Base
             get { return m_commandLineParameters; }
         }
 
-        protected string m_pidFile = String.Empty;
+        protected string m_pidFile = string.Empty;
 
         /// <summary>
         ///     Do the initial setup for the application
@@ -199,17 +199,17 @@ namespace WhiteCore.Simulation.Base
                 m_TimerScriptFileName = startupConfig.GetString("timer_Script", "disabled");
                 m_TimerScriptTime = startupConfig.GetInt("timer_time", m_TimerScriptTime);
 
-                string pidFile = startupConfig.GetString("PIDFile", String.Empty);
-                if (pidFile != String.Empty)
+                string pidFile = startupConfig.GetString("PIDFile", string.Empty);
+                if (pidFile != string.Empty)
                     CreatePIDFile(pidFile);
             }
 
             IConfig SystemConfig = m_config.Configs["System"];
             if (SystemConfig != null)
             {
-                string asyncCallMethodStr = SystemConfig.GetString("AsyncCallMethod", String.Empty);
+                string asyncCallMethodStr = SystemConfig.GetString("AsyncCallMethod", string.Empty);
                 FireAndForgetMethod asyncCallMethod;
-                if (!String.IsNullOrEmpty(asyncCallMethodStr) &&
+                if (!string.IsNullOrEmpty(asyncCallMethodStr) &&
                     Utils.EnumTryParse(asyncCallMethodStr, out asyncCallMethod))
                     Util.FireAndForgetMethod = asyncCallMethod;
 
@@ -234,6 +234,8 @@ namespace WhiteCore.Simulation.Base
         /// </summary>
         public virtual void Startup()
         {
+            PrintFileToConsole (Path.Combine(m_defaultDataPath, "/startuplogo.txt"));
+
             MainConsole.Instance.Info("====================================================================");
             MainConsole.Instance.Info(
 				        string.Format("==================== Starting WhiteCore-Sim ({0}) ======================",
@@ -320,9 +322,9 @@ namespace WhiteCore.Simulation.Base
                 }
 
                 //Clean it up a bit
-                if (hostName.StartsWith ("http://") || hostName.StartsWith ("https://"))
+                if (hostName.StartsWith ("http://", StringComparison.OrdinalIgnoreCase) || hostName.StartsWith ("https://", StringComparison.OrdinalIgnoreCase))
                     hostName = hostName.Replace ("https://", "").Replace ("http://", "");
-                if (hostName.EndsWith ("/"))
+                if (hostName.EndsWith ("/", StringComparison.Ordinal))
                     hostName = hostName.Remove (hostName.Length - 1, 1);
 
                 // save this for posterity in case it is needed
@@ -398,9 +400,9 @@ namespace WhiteCore.Simulation.Base
         public void RunStartupCommands()
         {
             //Draw the file on the console
-            PrintFileToConsole("startuplogo.txt");
+            PrintFileToConsole(m_startupCommandsFile);
             //Run Startup Commands
-            if (!String.IsNullOrEmpty(m_startupCommandsFile))
+            if (!string.IsNullOrEmpty(m_startupCommandsFile))
                 RunCommandScript(m_startupCommandsFile);
 
             // Start timer script (run a script every xx seconds)
@@ -501,7 +503,7 @@ namespace WhiteCore.Simulation.Base
         void HandleQuit(IScene scene, string[] args)
         {
             var ok = MainConsole.Instance.Prompt ("[Console]: Shutdown the simulator. Are you sure? (yes/no)", "no").ToLower();
-            if (ok.StartsWith("y"))
+            if (ok.StartsWith ("y", StringComparison.Ordinal))
                 Shutdown(true);
         }
 
@@ -520,8 +522,8 @@ namespace WhiteCore.Simulation.Base
                     string currentCommand;
                     while ((currentCommand = readFile.ReadLine()) != null)
                     {
-                        if ( (currentCommand != String.Empty) &&
-                            (!currentCommand.StartsWith(";")) )
+                        if ( (currentCommand != string.Empty) &&
+                            (!currentCommand.StartsWith (";", StringComparison.Ordinal)) )
                         {
                             commands.Add(currentCommand);
                         }
@@ -574,7 +576,7 @@ namespace WhiteCore.Simulation.Base
 
                 string hostName = m_config.Configs ["Network"].GetString ("HostName", "127.0.0.1");
                 hostName = hostName.Replace ("http://", "").Replace ("https://", "");
-                if (hostName.EndsWith ("/"))
+                if (hostName.EndsWith ("/", StringComparison.Ordinal))
                     hostName = hostName.Remove (hostName.Length - 1, 1);
                 foreach (IHttpServer server in m_Servers.Values)
                 {
@@ -586,15 +588,15 @@ namespace WhiteCore.Simulation.Base
 
         public virtual void HandleShowInfo(IScene scene, string[] cmd)
         {
+            PrintFileToConsole (Path.Combine (m_defaultDataPath, "/startuplogo.txt"));
+
             MainConsole.Instance.Info("Version: " + m_version);
             MainConsole.Instance.Info("Startup directory: " + Environment.CurrentDirectory);
         }
 
         public virtual void HandleShowVersion(IScene scene, string[] cmd)
         {
-            MainConsole.Instance.Info(
-                String.Format(
-                    "Version: {0}", m_version));
+            MainConsole.Instance.InfoFormat("Version: {0}", m_version);
         }
 
         #endregion
@@ -610,7 +612,7 @@ namespace WhiteCore.Simulation.Base
                 try
                 {
                     RemovePIDFile();
-                    if (m_shutdownCommandsFile != String.Empty)
+                    if (m_shutdownCommandsFile != string.Empty)
                     {
                         RunCommandScript(m_shutdownCommandsFile);
                     }
@@ -678,7 +680,7 @@ namespace WhiteCore.Simulation.Base
                 string pidstring = Process.GetCurrentProcess().Id.ToString();
                 fs = File.Create(path);
                 System.Text.ASCIIEncoding enc = new System.Text.ASCIIEncoding();
-                Byte[] buf = enc.GetBytes(pidstring);
+                byte[] buf = enc.GetBytes(pidstring);
                 fs.Write(buf, 0, buf.Length);
                 fs.Close();
                 m_pidFile = path;
@@ -695,12 +697,12 @@ namespace WhiteCore.Simulation.Base
         /// </summary>
         protected void RemovePIDFile()
         {
-            if (m_pidFile != String.Empty)
+            if (m_pidFile != string.Empty)
             {
                 try
                 {
                     File.Delete(m_pidFile);
-                    m_pidFile = String.Empty;
+                    m_pidFile = string.Empty;
                 }
                 catch (Exception)
                 {
