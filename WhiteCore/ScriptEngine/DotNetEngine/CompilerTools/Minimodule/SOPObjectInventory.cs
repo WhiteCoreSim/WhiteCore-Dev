@@ -88,7 +88,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
         public void Add(UUID key, IInventoryItem value)
         {
             m_publicInventory.Add(key, value);
-            m_privateInventory.Add(key, InventoryItem.FromInterface(value).ToTaskInventoryItem());
+            var invtValue = InventoryItem.FromInterface (value);     // this could retuen null if unable to convert
+            if (invtValue != null)
+                m_privateInventory [key] = invtValue.ToTaskInventoryItem ();
+            else
+                m_privateInventory [key] = null;
+
         }
 
         public bool ContainsKey(UUID key)
@@ -216,7 +221,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
             set
             {
                 m_publicInventory[key] = value;
-                m_privateInventory[key] = InventoryItem.FromInterface(value).ToTaskInventoryItem();
+                var invtValue = InventoryItem.FromInterface (value);     // this could retuen null if unable to convert
+                if (invtValue != null) 
+                    m_privateInventory [key] = invtValue.ToTaskInventoryItem ();
+                else
+                    m_privateInventory [key] = null;
             }
         }
 

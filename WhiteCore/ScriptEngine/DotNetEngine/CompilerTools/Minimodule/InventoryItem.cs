@@ -59,17 +59,25 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
         }
 
         // This method exposes OpenSim/OpenMetaverse internals and needs to be replaced with a IAsset specific to MRM.
-        public T RetrieveAsset<T>() where T : Asset, new()
+        public T RetrieveAsset<T> () where T : Asset, new()
         {
-            AssetBase asset = m_rootScene.AssetService.Get(AssetID.ToString());
+            AssetBase asset = m_rootScene.AssetService.Get (AssetID.ToString ());
+            if (asset == null)
+                return null;
+        
             T result = new T();
 
             if ((sbyte)result.AssetType != asset.Type) {
                 MainConsole.Instance.Error ("[MRM] The supplied asset class does not match the found asset");
+                asset.Dispose ();
                 return null;
             }
 
-            result.AssetData = asset.Data;
+            var assetData = new byte [asset.Data.Length];
+            asset.Data.CopyTo (assetData, 0);
+            asset.Dispose ();
+
+            result.AssetData = assetData;
             result.Decode();
             return result;
         }
