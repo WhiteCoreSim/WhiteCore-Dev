@@ -73,6 +73,7 @@ namespace WhiteCore.Framework.Configuration
             string mainIniFileName = defaultIniFile;
             string secondaryIniFileName = "";
             string worldIniFileName = "MyWorld.ini";
+            string gridIniFileName = "MyGrid.ini";
 
             List<string> sources = new List<string> ();
             string basePath = Util.configDir ();
@@ -158,7 +159,7 @@ namespace WhiteCore.Framework.Configuration
                         foreach (string filePath in fileEntries.Where (filePath => {
                             var extension = Path.GetExtension (filePath);
                             return extension != null && extension.ToLower () == ".ini";
-                        }).Where (filePath =>!sources.Contains (Path.Combine (iniDirName, filePath)))) {
+                        }).Where (filePath => !sources.Contains (Path.Combine (iniDirName, filePath)))) {
                             sources.Add (Path.Combine (iniDirName, filePath));
                         }
                     }
@@ -231,12 +232,16 @@ namespace WhiteCore.Framework.Configuration
                     ReadConfig (sources [i] + ".example", i, m_config);
             }
 
-            // add override parameters if they exist ONLY for standalone operation
+            // add some specific override parameters if they exist
             IsGridServer = mainIniFileName.Contains ("Server");
             if (!IsGridServer) {
                 string worldIniFilePath = Path.Combine (mainIniDirectory, worldIniFileName);
                 if (File.Exists (worldIniFilePath))
                     ReadConfig (worldIniFilePath, 0, m_config);
+            } else {
+                string gridIniFilePath = Path.Combine (mainIniDirectory, gridIniFileName);
+                if (File.Exists (gridIniFilePath))
+                    ReadConfig (gridIniFilePath, 0, m_config);
             }
 
             FixDefines (ref m_config);
