@@ -216,7 +216,11 @@ namespace WhiteCore.Services
 
                     newTexture.Flags = AssetFlags.Collectable | AssetFlags.Temporary;
                     newTexture.ID = m_assetService.Store (newTexture);
-                    response = WriteTextureData (httpRequest, httpResponse, newTexture, format);
+                    try {
+                        response = WriteTextureData (httpRequest, httpResponse, newTexture, format);
+                    } catch {
+                        response = MainServer.BlankResponse;
+                    }
                     newTexture.Dispose ();
                     texture.Dispose ();
 

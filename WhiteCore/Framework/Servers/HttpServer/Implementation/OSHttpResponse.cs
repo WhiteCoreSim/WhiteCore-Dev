@@ -121,17 +121,22 @@ namespace WhiteCore.Framework.Servers.HttpServer.Implementation
 
         public void AddCookie(System.Web.HttpCookie cookie)
         {
-            _httpResponse.Cookies.Add(new Cookie(cookie.Name, cookie.Value, cookie.Path, cookie.Domain)
-                                          {
-                                              Expires = cookie.Expires
-                                          });
+            try {
+                _httpResponse.Cookies.Add (new Cookie (cookie.Name, cookie.Value, cookie.Path, cookie.Domain) {
+                    Expires = cookie.Expires
+                });
+            } catch {
+            }
         }
 
         protected HttpListenerResponse _httpResponse;
 
         public OSHttpResponse(HttpListenerContext context)
         {
-            _httpResponse = context.Response;
+            try {
+                _httpResponse = context.Response;
+            }catch{
+            }
         }
 
         /// <summary>
@@ -147,7 +152,10 @@ namespace WhiteCore.Framework.Servers.HttpServer.Implementation
         /// </param>
         public void AddHeader(string key, string value)
         {
-            _httpResponse.AddHeader(key, value);
+            try {
+                _httpResponse.AddHeader (key, value);
+            } catch {
+            }
         }
     }
 }
