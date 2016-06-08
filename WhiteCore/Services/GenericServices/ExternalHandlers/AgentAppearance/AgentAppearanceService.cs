@@ -242,11 +242,12 @@ namespace WhiteCore.Services
                     continue;*/
                 AssetBase asset = m_assetService.Get (Textures [i].TextureID.ToString ());
                 if (asset != null) {
-                    Textures [i].Texture = new AssetTexture (Textures [i].TextureID, asset.Data);
+                    var assetData = new byte [asset.Data.Length];
+                    asset.Data.CopyTo (assetData, 0);
+                    asset.Dispose ();
+                    Textures [i].Texture = new AssetTexture (Textures [i].TextureID, assetData);
                     Textures [i].Texture.Decode ();
-                    // this appears to break appearance // asset.Dispose ();
                 }
-
             }
 
             for (int bakedIndex = 0; bakedIndex < AppearanceManager.BAKED_TEXTURE_COUNT; bakedIndex++) {
