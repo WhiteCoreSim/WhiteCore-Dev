@@ -69,6 +69,7 @@ namespace WhiteCore.DataManager.MySQL
                 }
                 goto retry;
             }
+            c.Close ();
 
             var migrationManager = new MigrationManager(this, migratorName, validateTables);
             try {
@@ -78,7 +79,6 @@ namespace WhiteCore.DataManager.MySQL
                 MainConsole.Instance.Error ("[MySQL]: Unable to determine migration requirements.");
 
             }
-            c.Close ();
         }
 
         public void CloseDatabase(MySqlConnection connection)
@@ -91,8 +91,9 @@ namespace WhiteCore.DataManager.MySQL
         public override void CloseDatabase(DataReaderConnection connection)
         {
             if (connection != null) {
-                if (connection.DataReader != null)
-                    connection.DataReader.Close ();
+                //if (connection.DataReader != null)
+                //    connection.DataReader.Close ();
+                    
                 connection.Dispose ();
             }
 

@@ -151,13 +151,11 @@ namespace WhiteCore.DataManager.SQLite
             {
                 MainConsole.Instance.WarnFormat("[Sqlite]: Exception processing command: {0}, Exception: {1}",
                                         cmd.CommandText, ex);
-                //throw ex;
             }
             catch (Exception ex)
             {
                 MainConsole.Instance.WarnFormat("[Sqlite]: Exception processing command: {0}, Exception: {1}",
                                         cmd.CommandText, ex);
-                throw ex;
             }
         }
 
@@ -171,17 +169,21 @@ namespace WhiteCore.DataManager.SQLite
                 cmd.CommandText = query;
                 return cmd as SqliteCommand;
             }
-            catch (SqliteException)
+            catch (SqliteException ex)
             {
-                //throw ex;
+                MainConsole.Instance.WarnFormat ("[Sqlite]: Exception prepping reader command: {0}, Exception: {1}",
+                                                 query, ex);
             }
             catch (Exception ex)
             {
-                throw ex;
+                MainConsole.Instance.WarnFormat ("[Sqlite]: Exception prepping reader command: {0}, Exception: {1}",
+                                                 query, ex);
             }
             return null;
         }
 
+        // TODO: As all exceptions apper to be caught here the ExecuteNonQuery() calls probably 
+        // do not need to be in try/catch 's
         protected int ExecuteNonQuery(SqliteCommand cmd)
         {
             int retries = 0;
@@ -214,8 +216,7 @@ namespace WhiteCore.DataManager.SQLite
             catch (Exception ex)
             {
                 MainConsole.Instance.WarnFormat("[Sqlite]: Exception processing command: {0}, Exception: {1}",
-                                        cmd.CommandText, ex);
-                throw ex;
+                                        cmd.CommandText, ex); 
             }
             return 0;
         }
@@ -764,7 +765,8 @@ namespace WhiteCore.DataManager.SQLite
         {
             if (TableExists(table))
             {
-                throw new DataManagerException("Trying to create a table with name of one that already exists.");
+                MainConsole.Instance.WarnFormat("[SQLite]: Trying to create a table '{0}' that already exists.", table);
+                return;
             }
 
             IndexDefinition primary = null;
@@ -842,7 +844,8 @@ namespace WhiteCore.DataManager.SQLite
         {
             if (!TableExists(table))
             {
-                throw new DataManagerException("Trying to update a table with name of one that does not exist.");
+                MainConsole.Instance.WarnFormat ("[SQLite]: Trying to update a table {0} that does not exist.", table);
+                return;
             }
 
             List<ColumnDefinition> oldColumns = ExtractColumnsFromTable(table);
@@ -1121,7 +1124,7 @@ namespace WhiteCore.DataManager.SQLite
                 case ColumnTypes.Unknown:
                     return "";
                 default:
-                    throw new DataManagerException("Unknown column type.");
+                throw new DataManagerException ("[SQLite]: Unknown column type - " + type);
             }
         }
 
@@ -1180,7 +1183,7 @@ namespace WhiteCore.DataManager.SQLite
                     symbol = "BINARY(" + coldef.Size + ")";
                     break;
                 default:
-                    throw new DataManagerException("Unknown column type.");
+                    throw new DataManagerException("[SQLite]: Unknown column definition - " + coldef);
             }
             return symbol + (coldef.isNull ? " NULL" : " NOT NULL") +
                    ((coldef.isNull && coldef.defaultValue == null)
