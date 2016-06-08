@@ -80,6 +80,12 @@ namespace WhiteCore.Framework.ConsoleFramework
                 return;
             }
 
+            LocalInitialize (source, simBase);
+        }
+
+        // local initialization and override when all else fails
+        public void LocalInitialize (IConfigSource source, ISimulationBase simBase)
+        {
             simBase.ApplicationRegistry.RegisterModuleInterface<ICommandConsole> (this);
             MainConsole.Instance = this;
 
