@@ -2172,13 +2172,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             if (!NotecardCache.IsCached(assetID))
             {
-                AssetBase a = World.AssetService.Get(assetID.ToString());
+                AssetBase asset = World.AssetService.Get(assetID.ToString());
 
-                if (a == null)
+                if (asset == null)
                     return UUID.Zero;
 
-                string data = Encoding.UTF8.GetString(a.Data);
+                string data = Encoding.UTF8.GetString(asset.Data);
                 NotecardCache.Cache(assetID, data);
+                asset.Dispose ();
             };
 
             return assetID;

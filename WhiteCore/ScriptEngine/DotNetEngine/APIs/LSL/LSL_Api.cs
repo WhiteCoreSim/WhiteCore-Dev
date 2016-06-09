@@ -3307,6 +3307,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
                         ISceneEntity new_group = RezObject(m_host, inv.Value, llpos, Rot2Quaternion(rot), llvel, param,
                                                            m_host.UUID, isRezAtRoot);
+                        if (new_group == null)
+                            continue;
+                        
                         new_group.OnFinishedPhysicalRepresentationBuilding += 
                             delegate() {
                             //Do this after the physics engine has built the prim
@@ -3327,8 +3330,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                             }
                         };
 
-                        // If either of these are null, then there was an unknown error.
-                        if (new_group == null || new_group.RootChild == null)
+                        // If there was an unknown error.
+                        if (new_group.RootChild == null)
                             continue;
 
                         // objects rezzed with this method are die_at_edge by default.
@@ -5333,7 +5336,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                                 Math.Abs(applied_linear_impulse.X) > MaxPush)
                                 applied_linear_impulse.Y = MaxPush;
                             if (applied_linear_impulse.Y < 0 &&
-                                Math.Abs(applied_linear_impulse.X) > MaxPush)
+                                Math.Abs(applied_linear_impulse.Y) > MaxPush)
                                 applied_linear_impulse.Y = -MaxPush;
 
                             if (applied_linear_impulse.Z > 0 &&
@@ -10372,7 +10375,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                         item = inv.Value;
                 }
             }
-            if (item == null && landmark != "")
+            if (item == null)
                 return;
 
             IScenePresence presence = World.GetScenePresence(m_host.OwnerID);
@@ -10386,10 +10389,17 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                                         position.ToVector3(), look_at.ToVector3(), (uint)TeleportFlags.ViaLocation);
                     else
                     {
-                        AssetLandmark lm = new AssetLandmark(
-                            World.AssetService.Get(item.AssetID.ToString()));
-                        module.Teleport(presence, lm.RegionHandle, lm.Position,
-                                        look_at.ToVector3(), (uint)TeleportFlags.ViaLocation);
+                        AssetLandmark lm = new AssetLandmark(World.AssetService.Get(item.AssetID.ToString()));
+                        if (lm != null) {
+                            module.Teleport (presence, lm.RegionHandle, lm.Position,
+                                        look_at.ToVector3 (), (uint)TeleportFlags.ViaLocation);
+                            lm.Dispose ();
+                        } else {
+                            // no landmark details
+                            module.Teleport (presence, World.RegionInfo.RegionHandle,
+                                            position.ToVector3 (), look_at.ToVector3 (), (uint)TeleportFlags.ViaLocation);
+                        }
+
                     }
                 }
             }
@@ -13201,6 +13211,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (botManager != null)
             {
                 IBotController controller = botManager.GetCharacterManager(m_host.ParentEntity.UUID);
+                if (controller == null)
+                    return;         // nothing to controll :(
+                
                 for (int i = 0; i < options.Length; i += 2)
                 {
                     LSL_Integer opt = options.GetLSLIntegerItem(i);
@@ -13340,10 +13353,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (botManager != null)
             {
                 IBotController controller = botManager.GetCharacterManager(m_host.ParentEntity.UUID);
-                if (command == ScriptBaseClass.CHARACTER_CMD_JUMP)
-                    controller.Jump();
-                if (command == ScriptBaseClass.CHARACTER_CMD_STOP)
-                    controller.StopMoving(false, true);
+                if (controller != null) {
+                    if (command == ScriptBaseClass.CHARACTER_CMD_JUMP)
+                        controller.Jump ();
+                    if (command == ScriptBaseClass.CHARACTER_CMD_STOP)
+                        controller.StopMoving (false, true);
+                }
             }
         }
 
@@ -13461,8 +13476,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         {
             OSD o = OSDParser.DeserializeJson(json);
             OSD specVal = JsonGetSpecific(o, specifiers, 0);
-
-            return specVal.AsString();
+            if (specVal != null)
+                return specVal.AsString();
+            return string.Empty;
         }
 
         public LSL_List llJson2List(LSL_String json)
@@ -13835,11 +13851,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
         public static void CacheCheck()
         {
-            foreach (UUID key in new List<UUID>(m_Notecards.Keys))
-            {
-                Notecard nc = m_Notecards[key];
-                if (nc.lastRef.AddSeconds(30) < DateTime.Now)
-                    m_Notecards.Remove(key);
+            lock (m_Notecards) {
+                foreach (UUID key in new List<UUID> (m_Notecards.Keys)) {
+                    Notecard nc = m_Notecards [key];
+                    if (nc.lastRef.AddSeconds (30) < DateTime.Now)
+                        m_Notecards.Remove (key);
+                }
             }
         }
     }

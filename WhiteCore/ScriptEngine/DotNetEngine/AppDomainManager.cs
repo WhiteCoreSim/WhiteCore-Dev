@@ -298,14 +298,17 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                         // Unload
                         if (ads != null) {
                             AppDomain.Unload (ads.CurrentAppDomain);
-                            if (ads.CurrentAppDomain == currentAD.CurrentAppDomain)
-                                currentAD = null;
+                            if (currentAD != null) {
+                                if (ads.CurrentAppDomain == currentAD.CurrentAppDomain)
+                                    currentAD = null;
+                            }
                         }
                     }
                     catch
                     {
                     }
-                     ads.CurrentAppDomain = null;
+                    if (ads != null)
+                        ads.CurrentAppDomain = null;
                 }
 
                 if (currentAD != null)

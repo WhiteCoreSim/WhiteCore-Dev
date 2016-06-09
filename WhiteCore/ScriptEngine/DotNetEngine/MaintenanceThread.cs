@@ -639,7 +639,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 //    goto processMoreScripts;
 
                 if (ScriptEvents.Count == 0 && NextSleepersTest.Ticks != DateTime.MaxValue.Ticks)
-                    timeToSleep = (int) (NextSleepersTest - DateTime.Now).TotalMilliseconds;
+                    lock (SleepingScriptEvents) 
+                        timeToSleep = (int) (NextSleepersTest - DateTime.Now).TotalMilliseconds;
                 if (timeToSleep < 5)
                     timeToSleep = 5;
                 if (timeToSleep > 50)
@@ -732,8 +733,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 }
                 else
                 {
-                    QIS.EventsProcData.State = ScriptEventsState.Running;
-                    ScriptEvents.Enqueue(QIS);
+                    lock (SleepingScriptEvents) {
+                        QIS.EventsProcData.State = ScriptEventsState.Running;
+                        ScriptEvents.Enqueue (QIS);
+                    }
                 }
             }
         }
