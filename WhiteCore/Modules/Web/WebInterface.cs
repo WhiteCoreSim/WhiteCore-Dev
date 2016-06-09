@@ -1127,6 +1127,8 @@ namespace WhiteCore.Modules.Web
 
         public WebUISettings ()
         {
+            MapCenter.X = 1000;     // TODO:  Maybe this should be larger? eg 5000,5000
+            MapCenter.Y = 1000;
         }
 
         public WebUISettings (OSD map)

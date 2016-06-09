@@ -225,21 +225,20 @@ namespace WhiteCore.Modules.Web
                 if (scenemanager.CreateRegion(newRegion))
                 {   
                     IGridRegisterModule gridRegister = webInterface.Registry.RequestModuleInterface<IGridRegisterModule>();
-                    if( gridRegister.RegisterRegionWithGrid(null, true, false, null)) 
-                    {
- 
-                        response = "<h3>Successfully created region, redirecting to main page</h3>" +
-                            "<script language=\"javascript\">" +
-                            "setTimeout(function() {window.location.href = \"index.html\";}, 3000);" +
-                            "</script>";
-                    }
-                    else
-//                        response = "<h3>" + error + "</h3>";
-                            response = "<h3> Error registering region with grid</h3>";
-                }
-                else
-//
-                response = "<h3>Error creating this region.</h3>";
+                    if (gridRegister != null) {
+                        if (gridRegister.RegisterRegionWithGrid (null, true, false, null)) {
+
+                            response = "<h3>Successfully created region, redirecting to main page</h3>" +
+                                "<script language=\"javascript\">" +
+                                "setTimeout(function() {window.location.href = \"index.html\";}, 3000);" +
+                                "</script>";
+                        }
+                    } 
+
+                    //                        response = "<h3>" + error + "</h3>";
+                    response = "<h3> Error registering region with grid</h3>";
+                } else
+                    response = "<h3>Error creating this region.</h3>";
                 return null;
             }
 
@@ -307,7 +306,9 @@ namespace WhiteCore.Modules.Web
                 var scenemanager = webInterface.Registry.RequestModuleInterface<ISceneManager> ();
                 var gconnector = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector>();
                 var settings = gconnector.GetGeneric<WebUISettings>(UUID.Zero, "WebUISettings", "Settings");
-
+                if (settings == null)
+                    settings = new WebUISettings ();
+                
                 // get some current details
                 //List<GridRegion> regions = gridService.GetRegionsByName(null, "", null,null);
 
