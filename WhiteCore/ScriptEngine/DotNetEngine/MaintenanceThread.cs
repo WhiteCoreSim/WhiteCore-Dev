@@ -538,109 +538,94 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         {
             int numberOfEmptyWork = 0;
             while (!m_ScriptEngine.ConsoleDisabled && !m_ScriptEngine.Disabled &&
-                   m_ScriptEngine.Scene.ShouldRunHeartbeat)
-            {
+                   m_ScriptEngine.Scene.ShouldRunHeartbeat) {
                 //int numScriptsProcessed = 0;
                 int numSleepScriptsProcessed = 0;
                 //const int minNumScriptsToProcess = 1;
                 //processMoreScripts:
-                QueueItemStruct QIS = new QueueItemStruct();
+                QueueItemStruct QIS = new QueueItemStruct ();
                 bool found = false;
 
                 //Check whether it is time, and then do the thread safety piece
                 bool checkTime;
-                lock(SleepingScriptEvents)
+                lock (SleepingScriptEvents)
                     checkTime = Interlocked.CompareExchange (ref m_CheckingSleepers, 1, 0) == 0;
-                if (checkTime)
-                {
-                    lock (SleepingScriptEvents)
-                    {
+                if (checkTime) {
+                    lock (SleepingScriptEvents) {
                     restart:
-                        if (SleepingScriptEvents.Count > 0)
-                        {
-                            QIS = SleepingScriptEvents.Dequeue().Value;
+                        if (SleepingScriptEvents.Count > 0) {
+                            QIS = SleepingScriptEvents.Dequeue ().Value;
                             found = true;
                             if (QIS.RunningNumber > 2 && SleepingScriptEventCount > 0 &&
-                                numSleepScriptsProcessed < SleepingScriptEventCount)
-                            {
+                                numSleepScriptsProcessed < SleepingScriptEventCount) {
                                 QIS.RunningNumber = 1;
-                                SleepingScriptEvents.Enqueue(QIS, QIS.EventsProcData.TimeCheck.Ticks);
-                                numSleepScriptsProcessed++;found = false;
+                                SleepingScriptEvents.Enqueue (QIS, QIS.EventsProcData.TimeCheck.Ticks);
+                                numSleepScriptsProcessed++; found = false;
                                 found = false;
                                 goto restart;
                             }
                         }
                     }
-                    if (found)
-                    {
+                    if (found) {
                         bool expired;
-                        lock(SleepingScriptEvents)
+                        lock (SleepingScriptEvents)
                             expired = QIS.EventsProcData.TimeCheck.Ticks < DateTime.Now.Ticks;
-                        
-                        if (expired)
-                        {
+
+                        if (expired) {
                             DateTime NextTime = DateTime.MaxValue;
-                            lock (SleepingScriptEvents)
-                            {
+                            lock (SleepingScriptEvents) {
                                 if (SleepingScriptEvents.Count > 0)
-                                    NextTime = SleepingScriptEvents.Peek().Value.EventsProcData.TimeCheck;
+                                    NextTime = SleepingScriptEvents.Peek ().Value.EventsProcData.TimeCheck;
                                 //Now add in the next sleep time
                                 NextSleepersTest = NextTime;
 
                                 //All done
-                                Interlocked.Exchange(ref m_CheckingSleepers, 0);
+                                Interlocked.Exchange (ref m_CheckingSleepers, 0);
                             }
 
                             //Execute the event
-                            EventSchExec(QIS);
+                            EventSchExec (QIS);
                             lock (SleepingScriptEvents)
                                 SleepingScriptEventCount--;
                             //numScriptsProcessed++;
-                        }
-                        else
-                        {
-                            lock (SleepingScriptEvents)
-                            {
+                        } else {
+                            lock (SleepingScriptEvents) {
                                 NextSleepersTest = QIS.EventsProcData.TimeCheck;
-                                SleepingScriptEvents.Enqueue(QIS, QIS.EventsProcData.TimeCheck.Ticks);
+                                SleepingScriptEvents.Enqueue (QIS, QIS.EventsProcData.TimeCheck.Ticks);
                                 //All done
-                                Interlocked.Exchange(ref m_CheckingSleepers, 0);
+                                Interlocked.Exchange (ref m_CheckingSleepers, 0);
                             }
                         }
-                    }
-                    else //No more left, don't check again
-                    {
-                        lock (SleepingScriptEvents)
-                        {
+                    } else //No more left, don't check again
+                      {
+                        lock (SleepingScriptEvents) {
                             NextSleepersTest = DateTime.MaxValue;
                             //All done
-                            Interlocked.Exchange(ref m_CheckingSleepers, 0);
+                            Interlocked.Exchange (ref m_CheckingSleepers, 0);
                         }
                     }
                 }
                 int timeToSleep = 5;
                 //If we can, get the next event
-                if (Interlocked.CompareExchange(ref m_CheckingEvents, 1, 0) == 0)
-                {
-                    if (ScriptEvents.TryDequeue(out QIS))
-                    {
-                        Interlocked.Exchange(ref m_CheckingEvents, 0);
+                if (Interlocked.CompareExchange (ref m_CheckingEvents, 1, 0) == 0) {
+                    if (ScriptEvents.TryDequeue (out QIS)) {
+                        Interlocked.Exchange (ref m_CheckingEvents, 0);
 #if Debug
                         MainConsole.Instance.Warn(QIS.functionName + "," + ScriptEvents.Count);
 #endif
-                        EventSchExec(QIS);
+                        EventSchExec (QIS);
                         //numScriptsProcessed++;
-                    }
-                    else
-                        Interlocked.Exchange(ref m_CheckingEvents, 0);
+                    } else
+                        Interlocked.Exchange (ref m_CheckingEvents, 0);
                 }
                 //Process a bunch each time
                 //if (ScriptEventCount > 0 && numScriptsProcessed < minNumScriptsToProcess)
                 //    goto processMoreScripts;
 
-                if (ScriptEvents.Count == 0 && NextSleepersTest.Ticks != DateTime.MaxValue.Ticks)
-                    lock (SleepingScriptEvents) 
-                        timeToSleep = (int) (NextSleepersTest - DateTime.Now).TotalMilliseconds;
+                lock (SleepingScriptEvents) {
+                    if (ScriptEvents.Count == 0 && NextSleepersTest.Ticks != DateTime.MaxValue.Ticks)
+                        timeToSleep = (int)(NextSleepersTest - DateTime.Now).TotalMilliseconds;
+                }
                 if (timeToSleep < 5)
                     timeToSleep = 5;
                 if (timeToSleep > 50)
@@ -713,7 +698,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             if (!EventSchProcessQIS(ref QIS)) //Execute the event
             {
                 //All done
-                QIS.EventsProcData.State = ScriptEventsState.Idle;
+                lock (SleepingScriptEvents) 
+                    QIS.EventsProcData.State = ScriptEventsState.Idle;
             }
             else
             {
