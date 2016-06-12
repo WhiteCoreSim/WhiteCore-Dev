@@ -90,7 +90,7 @@ namespace WhiteCore.Services
                 "bake avatar",
                 "bake avatar [firstname lastname]",
                 "Bakes an avatar's appearance",
-                BakeAvatar, false, true);
+                HandleBakeAvatar, false, true);
         }
 
         public void FinishedStartup ()
@@ -135,25 +135,6 @@ namespace WhiteCore.Services
         TextureData [] Textures = new TextureData [(int)AvatarTextureIndex.NumberOfEntries];
         // List<UUID> m_lastInventoryItemIDs = new List<UUID>();
 
-        void BakeAvatar (IScene scene, string [] cmd)
-        {
-            string name;
-            if (cmd.Length == 2 || cmd.Length < 4) {
-                name = MainConsole.Instance.Prompt ("Avatar's name <first last>");
-                if (name == "")
-                    return;
-            } else
-                name = cmd [2] + " " + cmd [3];
-
-            IUserAccountService uas = m_registry.RequestModuleInterface<IUserAccountService> ();
-            if (uas != null) {
-                UserAccount account = uas.GetUserAccount (null, name);
-                if (account != null)
-                    BakeAppearance (account.PrincipalID, 0);
-                else
-                    MainConsole.Instance.WarnFormat ("Sorry! No user account found for {0}", name);
-            }
-        }
 
         public AvatarAppearance BakeAppearance (UUID agentID, int cof_version)
         {
@@ -195,7 +176,10 @@ namespace WhiteCore.Services
                         WearableData wearable = new WearableData ();
                         AssetBase asset = m_assetService.Get (assetID.ToString ());
                         if (asset != null && asset.TypeAsset != AssetType.Object) {
-                            wearable.Asset = new AssetClothing (assetID, asset.Data);
+                            var assetData = new byte [asset.Data.Length];
+                            asset.Data.CopyTo (assetData, 0);
+                            asset.Dispose ();
+                            wearable.Asset = new AssetClothing (assetID, assetData);
                             if (wearable.Asset.Decode ()) {
                                 wearable.AssetID = assetID;
                                 wearable.AssetType = wearable.Asset.AssetType;
@@ -318,5 +302,29 @@ namespace WhiteCore.Services
             m_avatarService.SetAppearance (agentID, appearance);
             return appearance;
         }
+
+        #region Console Commands
+        void HandleBakeAvatar (IScene scene, string [] cmd)
+        {
+            string name;
+            if (cmd.Length == 2 || cmd.Length < 4) {
+                name = MainConsole.Instance.Prompt ("Avatar's name <first last>");
+                if (name == "")
+                    return;
+            } else
+                name = cmd [2] + " " + cmd [3];
+
+            IUserAccountService uas = m_registry.RequestModuleInterface<IUserAccountService> ();
+            if (uas != null) {
+                UserAccount account = uas.GetUserAccount (null, name);
+                if (account != null)
+                    BakeAppearance (account.PrincipalID, 0);
+                else
+                    MainConsole.Instance.WarnFormat ("Sorry! No user account found for {0}", name);
+            }
+        }
+
+        #endregion
+
     }
 }
