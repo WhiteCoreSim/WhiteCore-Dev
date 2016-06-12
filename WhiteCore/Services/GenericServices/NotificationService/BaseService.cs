@@ -63,8 +63,7 @@ namespace WhiteCore.Services
 
             if (MainConsole.Instance == null) {
                 Console.WriteLine ("[Console]: No Console configured, falling back to 'LocalConsole'");
-                var fallbackConsole = new LocalConsole ();
-                fallbackConsole.LocalInitialize (config, simbase);
+                new LocalConsole ().LocalInitialize (config, simbase);
             }
 
             MainConsole.Instance.Threshold = Level.Info;
