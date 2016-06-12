@@ -10384,23 +10384,23 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 IEntityTransferModule module = World.RequestModuleInterface<IEntityTransferModule>();
                 if (module != null)
                 {
-                    if (landmark == "")
-                        module.Teleport(presence, World.RegionInfo.RegionHandle,
-                                        position.ToVector3(), look_at.ToVector3(), (uint)TeleportFlags.ViaLocation);
-                    else
-                    {
-                        AssetLandmark lm = new AssetLandmark(World.AssetService.Get(item.AssetID.ToString()));
-                        if (lm != null) {
-                            module.Teleport (presence, lm.RegionHandle, lm.Position,
-                                        look_at.ToVector3 (), (uint)TeleportFlags.ViaLocation);
-                            lm.Dispose ();
-                        } else {
-                            // no landmark details
-                            module.Teleport (presence, World.RegionInfo.RegionHandle,
-                                            position.ToVector3 (), look_at.ToVector3 (), (uint)TeleportFlags.ViaLocation);
-                        }
+                    if (landmark != "") {
+                        var worldAsset = World.AssetService.Get (item.AssetID.ToString ());
+                        if (worldAsset != null) {
+                            var lm = new AssetLandmark (worldAsset);
+                            worldAsset.Dispose ();
 
+                            module.Teleport (presence, lm.RegionHandle, lm.Position,
+                                             look_at.ToVector3 (), (uint)TeleportFlags.ViaLocation);
+                            lm.Dispose ();
+                            return;
+
+                        }
                     }
+                    // no landmark details
+                    module.Teleport (presence, World.RegionInfo.RegionHandle,
+                                     position.ToVector3 (), look_at.ToVector3 (), (uint)TeleportFlags.ViaLocation);
+                    
                 }
             }
         }
