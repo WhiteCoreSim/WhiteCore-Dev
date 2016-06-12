@@ -121,7 +121,7 @@ namespace WhiteCore.Services
         TimeSpan m_MemoryExpiration = TimeSpan.Zero;
         TimeSpan m_FileExpiration = TimeSpan.Zero;
         TimeSpan m_FileExpirationCleanupTimer = TimeSpan.Zero;
-        readonly object m_fileCacheLock = new Object();
+        readonly object m_fileCacheLock = new object();
 
         static int m_CacheDirectoryTiers = 1;
         static int m_CacheDirectoryTierLen = 3;
@@ -158,7 +158,7 @@ namespace WhiteCore.Services
 
             if (moduleConfig != null)
             {
-                string name = moduleConfig.GetString("AssetCaching", String.Empty);
+                string name = moduleConfig.GetString("AssetCaching", string.Empty);
 
                 if (name == Name)
                 {
@@ -439,7 +439,8 @@ namespace WhiteCore.Services
             found = false;
 
             bool forceMemCache = m_assetRequests[id].Amt > _forceMemoryCacheAmount;
-            if ((m_MemoryCacheEnabled || forceMemCache) && m_MemoryCache.TryGetValue(id, out asset))
+            bool gotValue = m_MemoryCache.TryGetValue (id, out asset);
+            if (gotValue && (m_MemoryCacheEnabled || forceMemCache))
             {
                 found = true;
                 m_MemoryHits++;
@@ -577,7 +578,7 @@ namespace WhiteCore.Services
             catch
             {
             }
-            UpdateMemoryCache(id, asset, asset == null ? true : forceMemCache);
+            UpdateMemoryCache(id, asset, asset == null || forceMemCache);
 
             m_DiskHits++;
             return asset;
@@ -591,7 +592,7 @@ namespace WhiteCore.Services
             }
 
             Stream s = File.Open(tempname, FileMode.OpenOrCreate);
-            ProtoBuf.Serializer.Serialize<AssetBase>(s, asset);
+            ProtoBuf.Serializer.Serialize (s, asset);
             s.Close();
             //File.WriteAllText(tempname, OpenMetaverse.StructuredData.OSDParser.SerializeJsonString(asset.ToOSD()));
 
@@ -886,7 +887,7 @@ namespace WhiteCore.Services
         /// <param name="RegionID"></param>
         void StampRegionStatusFile(UUID RegionID)
         {
-            string RegionCacheStatusFile = Path.Combine(m_CacheDirectory, "RegionStatus_" + RegionID.ToString() + ".fac");
+            string RegionCacheStatusFile = Path.Combine(m_CacheDirectory, "RegionStatus_" + RegionID + ".fac");
             lock (m_fileCacheLock)
             {
                 if (!Directory.Exists(m_CacheDirectory))
@@ -1018,7 +1019,7 @@ namespace WhiteCore.Services
                             MainConsole.Instance.Info(
                                 "[Flotsam asset cache] Deep Scans were performed on the following regions:");
 
-                            string RegionID = s.Remove(0, s.IndexOf("_")).Replace(".fac", "");
+                            string RegionID = s.Remove(0, s.IndexOf ("_", StringComparison.Ordinal)).Replace(".fac", "");
                             DateTime RegionDeepScanTMStamp = File.GetLastWriteTime(s);
                             MainConsole.Instance.InfoFormat("[Flotsam asset cache] Region: {0}, {1}", RegionID,
                                                             RegionDeepScanTMStamp.ToString("MM/dd/yyyy hh:mm:ss"));
