@@ -192,6 +192,8 @@ namespace WhiteCore.Services
                                 AppearanceManager.DecodeWearableParams (wearable, ref Textures);
                             }
                         }
+                        if (asset != null)  // have asset but not an object
+                            asset.Dispose ();
                     }
                 }
             }

@@ -439,7 +439,11 @@ namespace WhiteCore.Services
             found = false;
 
             bool forceMemCache = m_assetRequests[id].Amt > _forceMemoryCacheAmount;
-            bool gotValue = m_MemoryCache.TryGetValue (id, out asset);
+            bool gotValue = false;
+            try {
+                gotValue = m_MemoryCache.TryGetValue (id, out asset);
+            } catch {
+            }
             if (gotValue && (m_MemoryCacheEnabled || forceMemCache))
             {
                 found = true;
