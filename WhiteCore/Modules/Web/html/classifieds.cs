@@ -66,18 +66,18 @@ namespace WhiteCore.Modules.Web
             List<Dictionary<string, object>> classifiedListVars = new List<Dictionary<string, object>> ();
 
 
-            vars.Add ("Classifieds", "Classifieds"); //translator.GetTranslatedString ("News"));
-            vars.Add ("ClassifiedTitle", "ClassifiedTitle"); //translator.GetTranslatedString ("NewsItemTitle"));
-            vars.Add ("ClassifiedText", "ClassifiedText"); //translator.GetTranslatedString ("NewsItemText"));
+            vars.Add ("Classifieds", "Classifieds"); //translator.GetTranslatedString ("Classifieds"));
+            vars.Add ("ClassifiedTitle", "ClassifiedTitle"); //translator.GetTranslatedString ("ClassifiedTitle"));
+            vars.Add ("ClassifiedText", "ClassifiedText"); //translator.GetTranslatedString ("ClassifiedText"));
 
-            vars.Add ("Classified", "Classified"); //translator.GetTranslatedString ("News"));
-            vars.Add ("ClassifiedDateText", "Date"); // translator.GetTranslatedString ("NewsDateText"));
-            vars.Add ("ClassifiedTitleText", "Title"); //translator.GetTranslatedString ("NewsTitleText"));
+            vars.Add ("Classified", "Classified"); //translator.GetTranslatedString ("Classified"));
+            vars.Add ("ClassifiedDateText", "Date"); // translator.GetTranslatedString ("DateText"));
+            vars.Add ("ClassifiedTitleText", "Title"); //translator.GetTranslatedString ("TitleText"));
 
             if (directoryService != null) {
 
                 var classifieds = new List<Classified> ();
-                classifieds = directoryService.GetClassifieds ((int)DirectoryManager.ClassifiedCategories.Any,
+                classifieds = directoryService.GetAllClassifieds ((int)DirectoryManager.ClassifiedCategories.Any,
                                                                (uint)DirectoryManager.ClassifiedFlags.None);
 
                 if (classifieds.Count == 0) {       // not sure if this is needed actually... return empty list?

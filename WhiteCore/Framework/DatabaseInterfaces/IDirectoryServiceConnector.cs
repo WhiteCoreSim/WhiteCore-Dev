@@ -193,8 +193,8 @@ namespace WhiteCore.Framework.DatabaseInterfaces
         /// </summary>
         /// <returns>The classifieds.</returns>
         /// <param name="category">Category.</param>
-        /// <param name="queryFlags">Query flags.</param>
-        List<Classified> GetClassifieds (int category, uint queryFlags);
+        /// <param name="classifiedFlags">Classified maturity flags.</param>
+        List<Classified> GetAllClassifieds (int category, uint classifiedFlags);
 
         /// <summary>
         ///     Gets all classifieds in the given region
@@ -203,6 +203,11 @@ namespace WhiteCore.Framework.DatabaseInterfaces
         /// <returns></returns>
         List<Classified> GetClassifiedsInRegion(string regionName);
 
+        /// <summary>
+        /// Gets the classified by identifier.
+        /// </summary>
+        /// <returns>The classified by identifier.</returns>
+        /// <param name="id">Identifier.</param>
         Classified GetClassifiedByID(UUID id);
 
         #endregion
@@ -218,6 +223,14 @@ namespace WhiteCore.Framework.DatabaseInterfaces
         /// <param name="scopeID"></param>
         /// <returns></returns>
         List<DirEventsReplyData> FindEvents(string queryText, uint flags, int StartQuery, UUID scopeID);
+
+        /// <summary>
+        /// Gets all events.
+        /// </summary>
+        /// <returns>The all events.</returns>
+        /// <param name="dayQuery">Day query. 'u' for today or date</param>
+        /// <param name="eventFlags">Event flags.</param>
+        List<EventData> GetAllEvents (string dayQuery, uint eventFlags);
 
         /// <summary>
         ///     Retrieves all events in the given region by their maturity level

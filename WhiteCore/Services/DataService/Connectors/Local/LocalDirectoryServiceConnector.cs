@@ -919,13 +919,15 @@ namespace WhiteCore.Services.DataService
         /// </summary>
         /// <returns>The classifieds.</returns>
         /// <param name="category">Category.</param>
-        /// <param name="queryFlags">Query flags.</param>
+        /// <param name="classifiedFlags">Query flags.</param>
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
-        public List<Classified> GetClassifieds (int category, uint queryFlags)
+        public List<Classified> GetAllClassifieds (int category, uint classifiedFlags)
         {
+            List<Classified> classifieds = new List<Classified> ();
+
             if (m_doRemoteOnly) {
-                object remoteValue = DoRemote (category, queryFlags);
-                return remoteValue != null ? (List<Classified>)remoteValue : new List<Classified> ();
+                object remoteValue = DoRemote (category, classifiedFlags);
+                return remoteValue != null ? (List<Classified>)remoteValue : classifieds;
             }
 
             QueryFilter filter = new QueryFilter ();
@@ -937,26 +939,23 @@ namespace WhiteCore.Services.DataService
             //    filter.andFilters ["ScopeID"] = scopeID;
 
             List<string> retVal = GD.Query (new [] { "*" }, m_userClassifiedsTable, filter, null, null, null);
-            if (retVal.Count == 0)
-                return new List<Classified> ();
 
-            List<Classified> Classifieds = new List<Classified> ();
-            for (int i = 0; i < retVal.Count; i += 9) {
-                Classified classified = new Classified ();
-                //Pull the classified out of OSD
-                classified.FromOSD ((OSDMap)OSDParser.DeserializeJson (retVal [i + 6]));
+            if (retVal.Count != 0) {
+                for (int i = 0; i < retVal.Count; i += 9) {
+                    Classified classified = new Classified ();
+                    //Pull the classified out of OSD
+                    classified.FromOSD ((OSDMap)OSDParser.DeserializeJson (retVal [i + 6]));
 
-                //Check maturity levels
-                if ((classified.ClassifiedFlags & (uint)DirectoryManager.ClassifiedFlags.Mature) !=
-                    (uint)DirectoryManager.ClassifiedFlags.Mature) {
-                    if ((queryFlags & (uint)DirectoryManager.ClassifiedQueryFlags.Mature) ==
-                        (uint)DirectoryManager.ClassifiedQueryFlags.Mature)
-                        Classifieds.Add (classified);
-                } else
-                    //Its Mature, add all
-                    Classifieds.Add (classified);
+                    //Check maturity levels
+                    if (classifiedFlags != (uint)DirectoryManager.ClassifiedQueryFlags.All) {
+                        if (classifiedFlags  == classified.ClassifiedFlags) // required rating All, PG, Mature, Adult
+                            classifieds.Add (classified);
+                    } else
+                        // add all
+                        classifieds.Add (classified);
+                }
             }
-            return Classifieds;
+            return classifieds;
         }
 
         /// <summary>
@@ -1108,6 +1107,48 @@ namespace WhiteCore.Services.DataService
             }
 
             return Data;
+        }
+
+
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public List<EventData> GetAllEvents (string dayQuery, uint eventFlags)
+        {
+            List<EventData> retEvents = new List<EventData> ();
+
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (dayQuery, eventFlags);
+                return remoteValue != null ? (List < EventData >)remoteValue : retEvents;
+            }
+
+            QueryFilter filter = new QueryFilter ();
+            if (dayQuery == "u") //"u" means search for events that are going on today
+            {
+                filter.andGreaterThanEqFilters ["UNIX_TIMESTAMP(date)"] = Util.ToUnixTime (DateTime.Today);
+            } else {
+                //Pull the day out then and search for that many days in the future/past
+                int Day = int.Parse (dayQuery);
+                DateTime SearchedDay = DateTime.Today.AddDays (Day);
+                //We only look at one day at a time
+                DateTime NextDay = SearchedDay.AddDays (1);
+                filter.andGreaterThanEqFilters ["UNIX_TIMESTAMP(date)"] = Util.ToUnixTime (SearchedDay);
+                filter.andLessThanEqFilters ["UNIX_TIMESTAMP(date)"] = Util.ToUnixTime (NextDay);
+                filter.andLessThanEqFilters ["flags"] = (int)eventFlags;
+            }
+
+            //TODO: Maybe need to check for expired events if they are not deleted?
+            List<string> retVal = GD.Query (new [] { "*"}, m_eventInfoTable, filter, null, null, null);
+
+            if (retVal.Count > 0) {
+                List<EventData> allEvents = Query2EventData (retVal);
+
+                //Check the maturity levels
+                foreach(EventData data in allEvents) {
+                    if (data.maturity == eventFlags) 
+                        retEvents.Add (data);
+                }
+            }
+
+            return retEvents;
         }
 
         /// <summary>
