@@ -105,16 +105,22 @@ namespace WhiteCore.Modules.Scripting
             m_registry = registry;
             if (config.Configs ["XMLRPC"] != null)
                 m_remoteDataPort = config.Configs ["XMLRPC"].GetInt ("XmlRpcPort", m_remoteDataPort);
+
+
         }
 
         public void Start(IConfigSource config, IRegistryCore registry)
         {
         }
 
-        public void FinishedStartup()
+        public void FinishedStartup ()
         {
-            if (IsEnabled () && ! ServerStarted())
-            {
+            var simBase = m_registry.RequestModuleInterface<ISimulationBase> ();
+            if (simBase.IsGridServer)
+                return;
+
+            //start XMLRPC server only for regions
+            if (IsEnabled () && !ServerStarted ()) {
                 m_httpServerStarted = true;
                 // Start http server
                 // Attach xmlrpc handlers
@@ -126,7 +132,6 @@ namespace WhiteCore.Modules.Scripting
                 //httpServer.AddXmlRPCHandler ("llRemoteData", XmlRpcRemoteData);
                 //httpServer.Start ();
 
-                var simBase = m_registry.RequestModuleInterface<ISimulationBase> ();
                 m_server = simBase.GetHttpServer ((uint)m_remoteDataPort);
                 m_server.AddXmlRPCHandler ("llRemoteData", XmlRpcRemoteData);
 
