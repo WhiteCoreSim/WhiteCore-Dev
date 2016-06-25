@@ -1839,6 +1839,11 @@ namespace WhiteCore.Modules.Land
             land_update.MediaLoop = properties.MediaLoop;
             land_update.ObscureMusic = properties.ObscureMusic;
             land_update.ObscureMedia = properties.ObscureMedia;
+            // 25062016 Added for LibOMV update 0.9.4.5
+            land_update.SeeAVs = properties.SeeAVs;
+            land_update.AnyAVSounds = properties.AnyAVSounds;
+            land_update.GroupAVSounds = properties.GroupAVSounds;
+            // End
             ILandObject land = GetLandObject (parcelID);
 
             if (land != null)

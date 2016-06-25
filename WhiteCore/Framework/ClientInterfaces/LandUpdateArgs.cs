@@ -54,6 +54,11 @@ namespace WhiteCore.Framework.ClientInterfaces
         public int PassPrice;
         public bool Privacy;
         public int SalePrice;
+        // 25062016 Added for LibOMV update 0.9.4.5
+        public bool SeeAVs;
+        public bool AnyAVSounds;
+        public bool GroupAVSounds;
+        // End
         public UUID SnapshotID;
         public Vector3 UserLocation;
         public Vector3 UserLookAt;
