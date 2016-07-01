@@ -25,6 +25,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
 using System.Collections.Generic;
 using OpenMetaverse;
 using WhiteCore.Framework.DatabaseInterfaces;
@@ -65,15 +66,18 @@ namespace WhiteCore.Modules.Web
             var directoryService = Framework.Utilities.DataManager.RequestPlugin<IDirectoryServiceConnector> ();
             List<Dictionary<string, object>> classifiedListVars = new List<Dictionary<string, object>> ();
 
-
-            vars.Add ("Classifieds", "Classifieds"); //translator.GetTranslatedString ("Classifieds"));
-            vars.Add ("ClassifiedTitle", "ClassifiedTitle"); //translator.GetTranslatedString ("ClassifiedTitle"));
-            vars.Add ("ClassifiedText", "ClassifiedText"); //translator.GetTranslatedString ("ClassifiedText"));
-
-            vars.Add ("Classified", "Classified"); //translator.GetTranslatedString ("Classified"));
-            vars.Add ("ClassifiedDateText", "Date"); // translator.GetTranslatedString ("DateText"));
-            vars.Add ("ClassifiedTitleText", "Title"); //translator.GetTranslatedString ("TitleText"));
-
+            uint amountPerQuery = 25;
+            var today = DateTime.Now;
+            var thirtyDays = today.AddDays (-7);
+            string DateStart = thirtyDays.ToShortDateString();
+            string DateEnd = today.ToShortDateString();
+            
+            // Classifieds Logs
+            var timeNow = DateTime.Now.ToString ("HH:mm:ss");
+            var dateFrom = DateTime.Parse (DateStart + " " + timeNow);
+            var dateTo = DateTime.Parse (DateEnd + " " + timeNow);
+            TimeSpan period = dateTo.Subtract (dateFrom);
+            
             if (directoryService != null) {
 
                 var classifieds = new List<Classified> ();
@@ -127,6 +131,25 @@ namespace WhiteCore.Modules.Web
                 }
                 vars.Add ("ClassifiedList", classifiedListVars);
             }
+            
+            vars.Add ("Classifieds", "Classifieds"); //translator.GetTranslatedString ("Classifieds"));
+            vars.Add ("ClassifiedTitle", "ClassifiedTitle"); //translator.GetTranslatedString ("ClassifiedTitle"));
+            vars.Add ("ClassifiedText", "ClassifiedText"); //translator.GetTranslatedString ("ClassifiedText"));
+
+            vars.Add ("Classified", "Classified"); //translator.GetTranslatedString ("Classified"));
+            vars.Add ("ClassifiedDateText", "Date"); // translator.GetTranslatedString ("DateText"));
+            vars.Add ("ClassifiedTitleText", "Title"); //translator.GetTranslatedString ("TitleText"));
+            
+            // always required data
+            vars.Add("DateStart", DateStart );
+            vars.Add ("DateEnd", DateEnd );
+            vars.Add ("Period",  period.TotalDays + " " + translator.GetTranslatedString("DaysText"));
+            
+			// labels
+            vars.Add("ClassifiedsText", translator.GetTranslatedString("ClassifiedsText"));
+            vars.Add("DateInfoText", translator.GetTranslatedString("DateInfoText"));
+            vars.Add("DateStartText", translator.GetTranslatedString("DateStartText"));
+            vars.Add("DateEndText", translator.GetTranslatedString("DateEndText"));
 
             return vars;
         }

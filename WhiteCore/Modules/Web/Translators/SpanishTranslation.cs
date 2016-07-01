@@ -246,6 +246,7 @@ namespace WhiteCore.Modules.Web.Translators
                 case "MenuMyPurchases": return "Mis Compras";
                 case "MenuTransactions": return "Transacciones de usuario";
                 case "MenuMyTransactions": return "Mis Transacciones";
+                case "MenuMyClassifieds": return "Mis Classifieds <NT>";                
                 case "MenuStatistics": return "Visor de estadísticas";
                 case "MenuGridSettings": return "Configuración de la cuadrícula";
 
@@ -598,7 +599,10 @@ namespace WhiteCore.Modules.Web.Translators
                 case "LoggedIPText": return "Dirección IP registrada";
                 case "NoPurchasesText": return "No se encontraron compras...";
                 case "PurchaseCostText": return "Costo";
-
+                
+                // Classifieds
+                case "ClassifiedsText": return "Anuncio Breve";
+                
                 // Sim Console
                 case "SimConsoleText": return "Sim Command Console";
                 case "SimCommandText": return "Command";
