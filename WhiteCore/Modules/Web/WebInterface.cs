@@ -76,6 +76,7 @@ namespace WhiteCore.Modules.Web
         public IRegistryCore Registry { get; protected set; }
 
         public string GridName { get; private set; }
+        public string LoginURL { get; private set; }
 
         public string HomeScreenURL {
             get { return MainServer.Instance.FullHostName + ":" + _port + "/"; }
@@ -164,6 +165,7 @@ namespace WhiteCore.Modules.Web
             if (_enabled) {
                 IGridInfo gridInfo = Registry.RequestModuleInterface<IGridInfo> ();
                 GridName = gridInfo.GridName;
+                LoginURL = gridInfo.GridLoginURI;
 
                 if (PagesMigrator.RequiresInitialUpdate ())
                     PagesMigrator.ResetToDefaults ();
@@ -258,9 +260,9 @@ namespace WhiteCore.Modules.Web
         protected void AddDefaultVarsForPage (ref Dictionary<string, object> vars)
         {
             if (vars != null) {
-                vars.Add ("LoginURL", MainServer.Instance.FullHostName + ":" + MainServer.Instance.Port);
                 vars.Add ("SystemURL", MainServer.Instance.FullHostName + ":" + _port);
                 vars.Add ("SystemName", GridName);
+                vars.Add ("LoginURL", LoginURL);
             }
         }
 
@@ -1071,7 +1073,11 @@ namespace WhiteCore.Modules.Web
         public string Gridname = "WhiteCore Grid";
         public string Gridnick = "WhiteCore";
         public string WelcomeMessage = "Welcome to WhiteCore, <USERNAME>!";
-        public string SystemEstateOwnerName = Constants.GovernorName;
+        public string GovernorName = Constants.GovernorName;
+        public string RealEstateOwnerName = Constants.RealEstateOwnerName;
+        public string BankerName = Constants.BankerName;
+        public string MarketplaceOwnerName = Constants.MarketplaceOwnerName;
+        public string MainlandEstateName = Constants.MainlandEstateName;
         public string SystemEstateName = Constants.SystemEstateName;
 
         public GridSettings ()
@@ -1085,7 +1091,11 @@ namespace WhiteCore.Modules.Web
             Gridname = mp ["Gridname"];
             Gridnick = mp ["Gridnick"];
             WelcomeMessage = mp ["WelcomeMessage"];
-            SystemEstateOwnerName = mp ["SystemEstateOwnerName"];
+            GovernorName = mp ["GovernorName"];
+            RealEstateOwnerName = mp ["RealEstateOwnerName"];
+            BankerName = mp ["BankerName"];
+            MarketplaceOwnerName = mp ["MarketplaceOwnerName"];
+            MainlandEstateName = mp ["MainlandEstateName"];
             SystemEstateName = mp ["SystemEstateName"];
         }
 
@@ -1094,7 +1104,11 @@ namespace WhiteCore.Modules.Web
             Gridname = map ["Gridname"];
             Gridnick = map ["Gridnick"];
             WelcomeMessage = map ["WelcomeMessage"];
-            SystemEstateOwnerName = map ["SystemEstateOwnerName"];
+            GovernorName = map ["GovernorName"];
+            RealEstateOwnerName = map ["RealEstateOwnerName"];
+            BankerName = map ["BankerName"];
+            MarketplaceOwnerName = map ["MarketplaceOwnerName"];
+            MainlandEstateName = map ["MainlandEstateName"];
             SystemEstateName = map ["SystemEstateName"];
         }
 
@@ -1105,7 +1119,11 @@ namespace WhiteCore.Modules.Web
             map ["Gridname"] = Gridname;
             map ["Gridnick"] = Gridnick;
             map ["WelcomeMessage"] = WelcomeMessage;
-            map ["SystemEstateOwnerName"] = SystemEstateOwnerName;
+            map ["GovernorName"] = GovernorName;
+            map ["RealEstateOwnerName"] = RealEstateOwnerName;
+            map ["BankerName"] = BankerName;
+            map ["MarketplaceOwnerName"] = MarketplaceOwnerName;
+            map ["MainlandEstateName"] = MainlandEstateName;
             map ["SystemEstateName"] = SystemEstateName;
 
             return map;

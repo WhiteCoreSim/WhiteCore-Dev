@@ -51,6 +51,9 @@ namespace WhiteCore.Modules.Web.Translators
                 case "CurrentPageText": return "Pagina corrente";
                 case "MoreInfoText": return "Piu informazioni";
                 case "NoDetailsText": return "Nessun dato trovato...";
+            case "MoreInfo":
+                return "Piu informazioni";
+
             case "ObjectNameText": return "Oggetto";
             case "LocationText": return "Posizione";
             case "UUIDText": return "UUID";
@@ -555,11 +558,15 @@ namespace WhiteCore.Modules.Web.Translators
                 case "GridnameText": return "Nome della grid ";
                 case "GridnickText": return "Soprannome della grid ";
                 case "WelcomeMessageText": return "Sezione messaggi di benvenuto ";
-                case "SystemEstateNameText": return "Nomi terreni del Governo";
-                case "SystemEstateOwnerText": return "Nome proprietario terreni del Governo";
+            case "GovernorNameText": return "Sistema di regolazione";
+            case "MainlandEstateNameText": return "Terraferma immobiliare";
+            case "RealEstateOwnerNameText": return "Nome proprietario terreni del Governo";
+            case "SystemEstateNameText": return "Nomi terreni del Governo";
+            case "BankerNameText": return "Sistema banchiere";
+            case "MarketPlaceOwnerNameText": return "Proprietario marketplace sistema";
 
-                //settings manager page
-                case "WebRegistrationText":
+            //settings manager page
+            case "WebRegistrationText":
                     return "Registrazioni Web consentite";
                 case "GridCenterXText":
                     return "Centro della Grid: Coordinate X";

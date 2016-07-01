@@ -51,6 +51,9 @@ namespace WhiteCore.Modules.Web.Translators
                 case "CurrentPageText": return "Page actuelle";
                 case "MoreInfoText": return "Plus d'informations";
                 case "NoDetailsText": return "Pas de détails trouvés...";
+            case "MoreInfo":
+                return "Plus d'informations";
+
             case "ObjectNameText": return "Objet";
             case "LocationText": return "Emplacement";
             case "UUIDText": return "UUID";
@@ -543,11 +546,15 @@ namespace WhiteCore.Modules.Web.Translators
                 case "GridnameText": return "Nom de Grille ";
                 case "GridnickText": return "Grille surnom ";
                 case "WelcomeMessageText": return "Connectez message de bienvenue ";
-                case "SystemEstateNameText": return "Le nom du système de succession ";
-                case "SystemEstateOwnerText": return "Ownername immobilier du système";
+            case "GovernorNameText": return "Gouverneur du système";
+            case "MainlandEstateNameText": return "Succession continentale";
+            case "RealEstateOwnerNameText": return "Ownername immobilier du système";
+            case "SystemEstateNameText": return "Le nom du système de succession";
+            case "BankerNameText": return "Banquier du système";
+            case "MarketPlaceOwnerNameText": return "Propriétaire du marché du système";
 
-                //settings manager page
-                case "WebRegistrationText":
+            //settings manager page
+            case "WebRegistrationText":
                     return "Enregistrements Web autorisés";
                 case "GridCenterXText":
                     return "Grille Location Centrer X";

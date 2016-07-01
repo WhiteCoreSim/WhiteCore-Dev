@@ -32,45 +32,41 @@ namespace WhiteCore.Modules.Web
 {
     public class GridSettingsManagerPage : IWebInterfacePage
     {
-        public string[] FilePath
-        {
-            get
-            {
-                return new[]
+        public string [] FilePath {
+            get {
+                return new []
                            {
                                "html/admin/gridsettings_manager.html"
                            };
             }
         }
 
-        public bool RequiresAuthentication
-        {
+        public bool RequiresAuthentication {
             get { return true; }
         }
 
-        public bool RequiresAdminAuthentication
-        {
+        public bool RequiresAdminAuthentication {
             get { return true; }
         }
 
-        public Dictionary<string, object> Fill(WebInterface webInterface, string filename, OSHttpRequest httpRequest,
+        public Dictionary<string, object> Fill (WebInterface webInterface, string filename, OSHttpRequest httpRequest,
                                                OSHttpResponse httpResponse, Dictionary<string, object> requestParameters,
                                                ITranslator translator, out string response)
         {
             response = null;
-            var vars = new Dictionary<string, object>();
-            var settings = webInterface.GetGridSettings();
+            var vars = new Dictionary<string, object> ();
+            var settings = webInterface.GetGridSettings ();
 
-            if (requestParameters.ContainsKey("Submit"))
-            {
-                settings.Gridname = requestParameters["Gridname"].ToString();
-                settings.Gridnick = requestParameters["Gridnick"].ToString();
-                settings.WelcomeMessage = requestParameters["WelcomeMessage"].ToString();
-                settings.SystemEstateOwnerName = requestParameters["SystemEstateOwnerName"].ToString();
-                settings.SystemEstateName = requestParameters["SystemEstateName"].ToString();
-
-
-
+            if (requestParameters.ContainsKey ("Submit")) {
+                settings.Gridname = requestParameters ["Gridname"].ToString ();
+                settings.Gridnick = requestParameters ["Gridnick"].ToString ();
+                settings.WelcomeMessage = requestParameters ["WelcomeMessage"].ToString ();
+                settings.GovernorName = requestParameters ["GovernorName"].ToString ();
+                settings.RealEstateOwnerName = requestParameters ["RealEstateOwnerName"].ToString ();
+                settings.BankerName = requestParameters ["BankerName"].ToString ();
+                settings.MarketplaceOwnerName = requestParameters ["MarketplaceOwnerName"].ToString ();
+                settings.MainlandEstateName = requestParameters ["MainlandEstateName"].ToString ();
+                settings.SystemEstateName = requestParameters ["SystemEstateName"].ToString ();
 
                 // update main grid setup
                 webInterface.SaveGridSettings (settings);
@@ -79,32 +75,38 @@ namespace WhiteCore.Modules.Web
                 return null;
             }
 
-            vars.Add("Gridname", settings.Gridname);
-            vars.Add("Gridnick", settings.Gridnick);
-            vars.Add("WelcomeMessage", settings.WelcomeMessage);
-            vars.Add("SystemEstateOwnerName", settings.SystemEstateOwnerName);
-            vars.Add("SystemEstateName", settings.SystemEstateName);
+            vars.Add ("Gridname", settings.Gridname);
+            vars.Add ("Gridnick", settings.Gridnick);
+            vars.Add ("WelcomeMessage", settings.WelcomeMessage);
+            vars.Add ("GovernorName", settings.GovernorName);
+            vars.Add ("RealEstateOwnerName", settings.RealEstateOwnerName);
+            vars.Add ("BankerName", settings.BankerName);
+            vars.Add ("MarketplaceOwnerName", settings.MarketplaceOwnerName);
+            vars.Add ("MainlandEstateName", settings.MainlandEstateName);
+            vars.Add ("SystemEstateName", settings.SystemEstateName);
 
 
- 
+            vars.Add ("GridSettingsManager", translator.GetTranslatedString ("GridSettingsManager"));
+            vars.Add ("GridnameText", translator.GetTranslatedString ("GridnameText"));
+            vars.Add ("GridnickText", translator.GetTranslatedString ("GridnickText"));
+            vars.Add ("WelcomeMessageText", translator.GetTranslatedString ("WelcomeMessageText"));
+            vars.Add ("GovernorNameText", translator.GetTranslatedString ("GovernorNameText"));
+            vars.Add ("RealEstateOwnerNameText", translator.GetTranslatedString ("RealEstateOwnerNameText"));
+            vars.Add ("BankerNameText", translator.GetTranslatedString ("BankerNameText"));
+            vars.Add ("MarketPlaceOwnerNameText", translator.GetTranslatedString ("MarketPlaceOwnerNameText"));
+            vars.Add ("MainlandEstateNameText", translator.GetTranslatedString ("MainlandEstateNameText"));
+            vars.Add ("SystemEstateNameText", translator.GetTranslatedString ("SystemEstateNameText"));
 
-            vars.Add("GridSettingsManager", translator.GetTranslatedString("GridSettingsManager"));
-            vars.Add("GridnameText", translator.GetTranslatedString("GridnameText"));
-            vars.Add("GridnickText", translator.GetTranslatedString("GridnickText"));
-            vars.Add("WelcomeMessageText", translator.GetTranslatedString("WelcomeMessageText"));
-            vars.Add("SystemEstateNameText", translator.GetTranslatedString("SystemEstateNameText"));
-            vars.Add("SystemEstateOwnerText", translator.GetTranslatedString("SystemEstateOwnerText"));
 
 
-
-            vars.Add("Save", translator.GetTranslatedString("Save"));
-            vars.Add("No", translator.GetTranslatedString("No"));
-            vars.Add("Yes", translator.GetTranslatedString("Yes"));
+            vars.Add ("Save", translator.GetTranslatedString ("Save"));
+            vars.Add ("No", translator.GetTranslatedString ("No"));
+            vars.Add ("Yes", translator.GetTranslatedString ("Yes"));
 
             return vars;
         }
 
-        public bool AttemptFindPage(string filename, ref OSHttpResponse httpResponse, out string text)
+        public bool AttemptFindPage (string filename, ref OSHttpResponse httpResponse, out string text)
         {
             text = "";
             return false;

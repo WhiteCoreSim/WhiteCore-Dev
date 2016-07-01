@@ -105,10 +105,19 @@ namespace WhiteCore.Modules.Web
             //                _settingsGrid.LibraryOwnerName = config.GetString("LibraryOwnerName", _settingsGrid.LibraryOwnerName);
             //            }
 
+            // System users
+            config = configSrc.Configs ["SystemUserService"];
+            if (config != null) {
+                _settingsGrid.GovernorName = config.GetString ("GovernorName", _settingsGrid.GovernorName);
+                _settingsGrid.RealEstateOwnerName = config.GetString ("RealEstateOwnerName", _settingsGrid.RealEstateOwnerName);
+                _settingsGrid.BankerName = config.GetString ("BankerName", _settingsGrid.BankerName);
+                _settingsGrid.MarketplaceOwnerName = config.GetString ("MarketplaceOwnerName", _settingsGrid.MarketplaceOwnerName);
+            }
+
             // RealEstate
             config = configSrc.Configs ["EstateService"];
             if (config != null) {
-                _settingsGrid.SystemEstateOwnerName = config.GetString ("SystemEstateOwnerName", _settingsGrid.SystemEstateOwnerName);
+                _settingsGrid.SystemEstateName = config.GetString ("MainlandEstateName", _settingsGrid.MainlandEstateName);
                 _settingsGrid.SystemEstateName = config.GetString ("SystemEstateName", _settingsGrid.SystemEstateName);
             }
 

@@ -52,6 +52,8 @@ namespace WhiteCore.Modules.Web.Translators
                 case "CurrentPageText": return "Current Page";
                 case "MoreInfoText": return "More Info";
                 case "NoDetailsText": return "No details found...";
+            case "MoreInfo": return "More Information";
+
             case "ObjectNameText": return "Object";
             case "LocationText": return "Location";
             case "UUIDText": return "UUID";
@@ -323,6 +325,7 @@ namespace WhiteCore.Modules.Web.Translators
                 // Help Page
                 case "HelpText": return "Help";
                 case "HelpViewersConfigText": return "Viewer Configuration";
+
                 case "AngstromViewer": return "Angstrom Viewer";
                 case "AstraViewer": return "Astra Viewer";
                 case "FirestormViewer": return "Firestorm Viewer";
@@ -457,11 +460,15 @@ namespace WhiteCore.Modules.Web.Translators
                 case "GridnameText": return "Grid name";
                 case "GridnickText": return "Grid nickname";
                 case "WelcomeMessageText": return "Login welcome message";
-                case "SystemEstateNameText": return "System estate name";
-                case "SystemEstateOwnerText": return "System estate owner name";
+            case "GovernorNameText": return "System Governor";
+            case "MainlandEstateNameText": return "Mainland estate";
+            case "RealEstateOwnerNameText": return "System estate owner";
+            case "SystemEstateNameText": return "System estate";
+            case "BankerNameText": return "System banker";
+            case "MarketPlaceOwnerNameText": return "System marketplace owner";
 
-                //settings manager page
-                case "WebRegistrationText": return "Web registrations allowed";
+            //settings manager page
+            case "WebRegistrationText": return "Web registrations allowed";
                 case "GridCenterXText": return "Grid Center Location X";
                 case "GridCenterYText": return "Grid Center Location Y";
                 case "SettingsManager": return "Settings Manager";

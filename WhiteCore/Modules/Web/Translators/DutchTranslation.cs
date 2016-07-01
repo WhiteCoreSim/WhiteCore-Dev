@@ -51,6 +51,7 @@ namespace WhiteCore.Modules.Web.Translators
                 case "CurrentPageText": return "Current Page";
                 case "MoreInfoText": return "Meer Info";
                 case "NoDetailsText": return "Geen gegevens gevonden...";
+            case "MoreInfo": return "More Informatie";
             case "ObjectNameText": return "Object";
             case "LocationText": return "Plaats";
             case "UUIDText": return "UUID";
@@ -543,11 +544,15 @@ namespace WhiteCore.Modules.Web.Translators
                 case "GridnameText": return "Grid naam";
                 case "GridnickText": return "Grid bijnaam";
                 case "WelcomeMessageText": return "Login welkomstbericht ";
-                case "SystemEstateNameText": return "Naam Estate systeem ";
-                case "SystemEstateOwnerText": return "Systeem goed ownername";
+            case "GovernorNameText": return "Systeem gouverneur";
+            case "MainlandEstateNameText": return "Vasteland landgoed";
+            case "RealEstateOwnerNameText": return "Systeem goed ownername";
+            case "SystemEstateNameText": return "Naam Estate systeem";
+            case "BankerNameText": return "Systeem bankierr";
+            case "MarketPlaceOwnerNameText": return "Systeem marketplace eigenaar";
 
-                //settings manager page
-                case "WebRegistrationText":
+            //settings manager page
+            case "WebRegistrationText":
                     return "Webregistraties toegestaan";
                 case "GridCenterXText":
                     return "Grid Center Location X";
