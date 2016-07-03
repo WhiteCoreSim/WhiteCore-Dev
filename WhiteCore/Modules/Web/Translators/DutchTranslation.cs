@@ -221,7 +221,7 @@ namespace WhiteCore.Modules.Web.Translators
                 case "MenuMyPurchases": return "Mijn aankopen ";
                 case "MenuTransactions": return "Gebruiker Transacties";
                 case "MenuMyTransactions": return "Mijn Transacties";
-                case "MenuMyClassifieds": return "My Advertenties";                
+                case "MenuMyClassifieds": return "Mijn Advertenties";                
                 case "MenuStatistics": return "Viewer statistieken";
                 case "MenuGridSettings": return "Grid instellingen";
                 
