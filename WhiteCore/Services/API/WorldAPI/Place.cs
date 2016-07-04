@@ -25,6 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
  
+using Nini.Config;
+using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Services;
 
 namespace WhiteCore.Services.API.WorldAPI
@@ -33,12 +35,12 @@ namespace WhiteCore.Services.API.WorldAPI
 	{
 		#region IService implementation
 
-		public void Initialize(Nini.Config.IConfigSource config, WhiteCore.Framework.Modules.IRegistryCore registry)
+		public void Initialize(IConfigSource config, IRegistryCore registry)
 		{
 			throw new System.NotImplementedException();
 		}
 		
-		public void Start(Nini.Config.IConfigSource config, WhiteCore.Framework.Modules.IRegistryCore registry)
+		public void Start(IConfigSource config, IRegistryCore registry)
 		{
 			throw new System.NotImplementedException();
 		}
