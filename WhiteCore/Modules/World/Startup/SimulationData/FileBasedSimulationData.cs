@@ -434,6 +434,8 @@ namespace WhiteCore.Modules
                         info.RegionSettings.AllowLandResell = false;
                     } else if (info.RegionType.StartsWith ("H", StringComparison.Ordinal))                    // Homes always have 25000 prims
                       {
+                        info.RegionSettings.AllowLandJoinDivide = true;
+                        info.RegionSettings.AllowLandResell = true;
                         info.ObjectCapacity = 25000;
                     }
                 }

@@ -46,7 +46,7 @@ namespace WhiteCore.Framework.Serialization.External
         /// </summary>
         /// <param name="serializedSettings"></param>
         /// <returns></returns>
-        /// <exception cref="System.Xml.XmlException"></exception>
+        /// <exception cref="XmlException"></exception>
         public static RegionSettings Deserialize (byte [] serializedSettings, UUID RegionID)
         {
             return Deserialize (m_asciiEncoding.GetString (serializedSettings, 0, serializedSettings.Length), RegionID);
@@ -57,7 +57,7 @@ namespace WhiteCore.Framework.Serialization.External
         /// </summary>
         /// <param name="serializedSettings"></param>
         /// <returns></returns>
-        /// <exception cref="System.Xml.XmlException"></exception>
+        /// <exception cref="XmlException"></exception>
         public static RegionSettings Deserialize (string serializedSettings, UUID RegionID)
         {
             RegionSettings settings = new RegionSettings ();
