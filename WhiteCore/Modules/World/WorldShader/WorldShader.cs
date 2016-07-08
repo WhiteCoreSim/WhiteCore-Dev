@@ -160,7 +160,13 @@ namespace WhiteCore.Modules.WorldShader
                                 }
 
                                 asset.ID = UUID.Random ();
-                                texture = Shade (texture, shader, percent, greyScale);
+                                try {
+                                    texture = Shade (texture, shader, percent, greyScale);
+                                } catch {
+                                    asset.Dispose ();
+                                    continue;   // cannot convert this one...
+                                }
+
                                 asset.Data = OpenJPEG.EncodeFromImage (texture, false);
                                 asset.Description = t.ToString ();
                                 texture.Dispose ();
