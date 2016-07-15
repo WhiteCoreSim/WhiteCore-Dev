@@ -48,6 +48,8 @@ namespace WhiteCore.FileBasedServices.AssetService
         protected IAssetDataPlugin m_assetService;
         protected string m_assetsDirectory = "";
         protected bool m_enabled;
+        protected int m_mapcenter_x;
+        protected int m_map_center_y;
 
         #endregion
 
@@ -67,13 +69,15 @@ namespace WhiteCore.FileBasedServices.AssetService
             Configure (config, registry);
             Init (registry, Name, serverPath: "/asset/", serverHandlerName: "AssetServerURI");
 
+            var simbase = registry.RequestModuleInterface<ISimulationBase> ();
+
             IConfig fileConfig = config.Configs ["FileBasedAssetService"];
             if (fileConfig != null)
             {
                 var assetFolderPath = fileConfig.GetString ("AssetFolderPath", m_assetsDirectory);
                 if (assetFolderPath == "")
                 {
-                    var defpath = registry.RequestModuleInterface<ISimulationBase> ().DefaultDataPath;
+                    var defpath = simbase.DefaultDataPath;
                     assetFolderPath = Path.Combine (defpath, Constants.DEFAULT_FILEASSETS_DIR);
                 }
                 SetUpFileBase (assetFolderPath);
@@ -81,6 +85,10 @@ namespace WhiteCore.FileBasedServices.AssetService
                 // try and migrate sql assets if they are missing?
                 m_migrateSQL = fileConfig.GetBoolean ("MigrateSQLAssets", true);
             }
+
+            // center of our world
+            m_mapcenter_x = simbase.MapCenterX;
+            m_map_center_y = simbase.MapCenterY;
         }
 
         public virtual void Configure (IConfigSource config, IRegistryCore registry)

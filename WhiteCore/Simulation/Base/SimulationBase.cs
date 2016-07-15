@@ -97,6 +97,18 @@ namespace WhiteCore.Simulation.Base
             set { m_defaultDataPath = value;}
         }
 
+        protected int m_mapcenter_x = Constants.DEFAULT_REGIONSTART_X;
+        public int MapCenterX {
+            get { return m_mapcenter_x; }
+            set { m_mapcenter_x = value; }
+        }
+
+        protected int m_mapcenter_y = Constants.DEFAULT_REGIONSTART_Y;
+        public int MapCenterY {
+            get { return m_mapcenter_y; }
+            set { m_mapcenter_y = value; }
+        }
+
         protected IRegistryCore m_applicationRegistry = new RegistryCore();
 
         public IRegistryCore ApplicationRegistry
@@ -224,7 +236,12 @@ namespace WhiteCore.Simulation.Base
                     stpMinThreads = stpMaxThreads;
             }
 
-                
+            var mapConfig = m_config.Configs ["WebInterface"];
+            if (mapConfig != null) {
+                m_mapcenter_x = mapConfig.GetInt ("mapcenter_x", m_mapcenter_x);
+                m_mapcenter_y = mapConfig.GetInt ("mapcenter_y", m_mapcenter_y);
+            }
+
             if (Util.FireAndForgetMethod == FireAndForgetMethod.SmartThreadPool)
                 Util.InitThreadPool(stpMinThreads, stpMaxThreads);
         }

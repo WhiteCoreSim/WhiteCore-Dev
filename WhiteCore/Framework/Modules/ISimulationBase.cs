@@ -123,5 +123,10 @@ namespace WhiteCore.Framework.Modules
 
         // where all volatile data is kept
         string DefaultDataPath { get; set; }
+
+        // The center of the world
+        int MapCenterX { get; set; }
+        int MapCenterY { get; set; }
+
     }
 }

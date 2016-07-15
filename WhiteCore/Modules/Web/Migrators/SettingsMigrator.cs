@@ -29,6 +29,7 @@ using Nini.Config;
 using OpenMetaverse;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.Web
 {
@@ -45,12 +46,19 @@ namespace WhiteCore.Modules.Web
 
             _settingsWebUI.LastSettingsVersionUpdateIgnored = CurrentVersion;
             _settingsWebUI.LastPagesVersionUpdateIgnored = PagesMigrator.GetVersion ();
-            _settingsWebUI.MapCenter = new Vector2 (1000, 1000);
+            _settingsWebUI.MapCenter = new Vector2 (Constants.DEFAULT_REGIONSTART_X, Constants.DEFAULT_REGIONSTART_Y);
 
+            // check for user configurations
             var configSrc = webinterface.Registry.RequestModuleInterface<ISimulationBase> ().ConfigSource;
             var loginConfig = configSrc.Configs ["LoginService"];
             if (loginConfig != null) {
                 _settingsWebUI.WebRegistration = loginConfig.GetBoolean ("AllowAnonymousLogin", true);
+            }
+        
+            var mapConfig = configSrc.Configs ["WebInterface"];
+            if (mapConfig != null) {
+                _settingsWebUI.MapCenter.X = mapConfig.GetInt ("mapcenter_x", (int)_settingsWebUI.MapCenter.X);
+                _settingsWebUI.MapCenter.Y = mapConfig.GetInt ("mapcenter_y", (int)_settingsWebUI.MapCenter.Y);
             }
         }
 

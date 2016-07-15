@@ -214,9 +214,11 @@ namespace WhiteCore.Services
 
         void FillOutHomeData(Framework.Services.UserInfo pinfo, GridRegion homeRegion)
         {
-            int x = 1000*Constants.RegionSize, y = 1000*Constants.RegionSize;
-            if (homeRegion != null)
-            {
+            // TODO: The region start positions should be retrieved from the SimulationBase MapCenterX/MapCenterY
+            // This is a fallback setting as the user's home region should have been set on login
+            int x = Constants.DEFAULT_REGIONSTART_X * Constants.RegionSize;
+            int y = Constants.DEFAULT_REGIONSTART_Y * Constants.RegionSize;
+            if (homeRegion != null) {
                 x = homeRegion.RegionLocX;
                 y = homeRegion.RegionLocY;
             }

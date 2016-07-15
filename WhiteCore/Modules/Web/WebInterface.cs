@@ -733,9 +733,13 @@ namespace WhiteCore.Modules.Web
             if (webUISettings == null) {
                 IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
                 var settings = generics.GetGeneric<WebUISettings> (UUID.Zero, "WebUISettings", "Settings");
-                if (settings == null)
+                if (settings == null) {
                     settings = new WebUISettings ();
 
+                    var simbase = Registry.RequestModuleInterface<ISimulationBase> ();
+                    settings.MapCenter.X = simbase.MapCenterX;
+                    settings.MapCenter.Y = simbase.MapCenterY;
+                }
                 return settings;
             }
 
@@ -837,8 +841,7 @@ namespace WhiteCore.Modules.Web
     class GridWelcomeScreen : IDataTransferable
     {
         public static readonly GridWelcomeScreen Default = new GridWelcomeScreen {
-            SpecialWindowMessageTitle =
-                                                                       "Nothing to report at this time.",
+            SpecialWindowMessageTitle = "Nothing to report at this time.",
             SpecialWindowMessageText = "Grid is up and running.",
             SpecialWindowMessageColor = "white",
             SpecialWindowActive = true,
@@ -1145,8 +1148,8 @@ namespace WhiteCore.Modules.Web
 
         public WebUISettings ()
         {
-            MapCenter.X = 1000;     // TODO:  Maybe this should be larger? eg 5000,5000
-            MapCenter.Y = 1000;
+            MapCenter.X = Constants.DEFAULT_REGIONSTART_X;
+            MapCenter.Y = Constants.DEFAULT_REGIONSTART_Y;
         }
 
         public WebUISettings (OSD map)

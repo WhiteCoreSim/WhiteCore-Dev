@@ -37,6 +37,7 @@ using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.SceneInfo.Entities;
+using WhiteCore.Framework.Servers;
 using WhiteCore.Framework.Utilities;
 using WhiteCore.Region;
 using Timer = System.Timers.Timer;
@@ -52,6 +53,9 @@ namespace WhiteCore.Modules
 
         protected Timer m_backupSaveTimer;
         protected Timer m_saveTimer;
+
+        protected int m_mapcenter_x = Constants.DEFAULT_REGIONSTART_X;
+        protected int m_mapcenter_y = Constants.DEFAULT_REGIONSTART_Y;
 
         protected string m_fileName = "";
         protected string m_storeDirectory = "";
@@ -289,7 +293,6 @@ namespace WhiteCore.Modules
         /// <param name="currentInfo">Current info.</param>
         RegionInfo CreateRegionFromConsole (RegionInfo info, bool prompt, Dictionary<string, int> currentInfo)
         {
-
             if (info == null || info.NewRegion) {
                 if (info == null)
                     info = new RegionInfo ();
@@ -297,13 +300,13 @@ namespace WhiteCore.Modules
                 info.RegionID = UUID.Random ();
 
                 if (currentInfo != null) {
-                    info.RegionLocX = currentInfo ["minX"] > 0 ? currentInfo ["minX"] : 1000 * Constants.RegionSize;
-                    info.RegionLocY = currentInfo ["minY"] > 0 ? currentInfo ["minY"] : 1000 * Constants.RegionSize;
-                    info.RegionPort = currentInfo ["port"] > 0 ? currentInfo ["port"] + 1 : 9000;
+                    info.RegionLocX = currentInfo ["minX"] > 0 ? currentInfo ["minX"] : m_mapcenter_x * Constants.RegionSize;
+                    info.RegionLocY = currentInfo ["minY"] > 0 ? currentInfo ["minY"] : m_mapcenter_y * Constants.RegionSize;
+                    info.RegionPort = currentInfo ["port"] > 0 ? currentInfo ["port"] + 1 : (int) MainServer.Instance.Port;
                 } else {
-                    info.RegionLocX = 1000 * Constants.RegionSize;
-                    info.RegionLocY = 1000 * Constants.RegionSize;
-                    info.RegionPort = 9000;
+                    info.RegionLocX = m_mapcenter_x * Constants.RegionSize;
+                    info.RegionLocY = m_mapcenter_y * Constants.RegionSize;
+                    info.RegionPort = (int)MainServer.Instance.Port;
 
                 }
                 prompt = true;
@@ -546,7 +549,7 @@ namespace WhiteCore.Modules
             regInfo.RegionLocX =
                 int.Parse (MainConsole.Instance.Prompt ("Region Location X",
                     ((regInfo.RegionLocX == 0
-                        ? 1000
+                        ? m_mapcenter_x
                         : regInfo.RegionLocX / Constants.RegionSize)).ToString ())) * Constants.RegionSize;
             if (regInfo.RegionLocX != loc)
                 updated = true;
@@ -555,7 +558,7 @@ namespace WhiteCore.Modules
             regInfo.RegionLocY =
                 int.Parse (MainConsole.Instance.Prompt ("Region location Y",
                     ((regInfo.RegionLocY == 0
-                        ? 1000
+                        ? m_mapcenter_y
                         : regInfo.RegionLocY / Constants.RegionSize)).ToString ())) * Constants.RegionSize;
             if (regInfo.RegionLocY != loc)
                 updated = true;
@@ -904,6 +907,10 @@ namespace WhiteCore.Modules
 
                 // Get and save the default Data path
                 string defaultDataPath = simBase.DefaultDataPath;
+
+                // Get and save the default map center location
+                m_mapcenter_x = simBase.MapCenterX;
+                m_mapcenter_y = simBase.MapCenterY;
 
                 m_storeDirectory =
                     PathHelpers.ComputeFullPath (config.GetString ("StoreBackupDirectory", m_storeDirectory));
