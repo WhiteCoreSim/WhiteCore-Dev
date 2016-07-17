@@ -185,6 +185,9 @@ namespace WhiteCore.Simulation.Base
                 resp = ReadLine ("Do you want to configure WhiteCore-Sim now?  (yes/no)", resp);
 
                 if (resp == "yes") {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine ("\n     Just a moment... getting some details...\n");
+
                     string cfgFolder = WhiteCore_ConfigDir + "/";           // Main Config folder >> "../Config" (default)
 
                     string dbSource = "localhost";
@@ -196,7 +199,8 @@ namespace WhiteCore.Simulation.Base
                     string regionIPAddress = gridIPAddress;
                     bool isStandalone = true;
                     string dbType = "1";
-                    string gridName = "WhiteCore-Sim Grid";
+                    string assetType = "1";
+                    string gridName = "WhiteCore-Sim";
                     string welcomeMessage = "";
                     string allowAnonLogin = "true";
                     uint port = 9000;
@@ -253,7 +257,7 @@ namespace WhiteCore.Simulation.Base
                     }
 
                     if (isStandalone) {
-                        gridName = ReadLine ("Name of your WhiteCore-Sim Grid", gridName);
+                        gridName = ReadLine ("Name of your WhiteCore-Sim server", gridName);
 
                         welcomeMessage = "Welcome to " + gridName + ", <USERNAME>!";
                         Console.ForegroundColor = ConsoleColor.White;
@@ -286,7 +290,7 @@ namespace WhiteCore.Simulation.Base
 
                         IConfig conf = data_ini.AddConfig ("DataFile");
 
-                        // Standalone
+                        // DB include
                         if (dbType == "1")
                             conf.Set ("Include-SQLite", cfgDataFolder + "Data/SQLite.ini");
                         else
@@ -295,8 +299,24 @@ namespace WhiteCore.Simulation.Base
                         if (isWhiteCoreExe)
                             conf.Set ("Include-FileBased", "Sim/Data/FileBased.ini");
 
+
+                        // Asset services
+                        conf = data_ini.AddConfig ("Handlers");
+
+                        Console.WriteLine ("Which asset service do you want to use?");
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine ("[1] File based\n[2] SQL");
+                        Console.ResetColor ();
+                        assetType = ReadLine ("Choose 1 or 2", assetType);
+                        if (assetType == "2")
+                            conf.Set ("AssetHandler", "AssetService");
+                        else
+                            conf.Set ("AssetHandler", "FileBasedAssetService");
+                        conf.Set ("AssetHandlerUseCache", false);
+
                         conf = data_ini.AddConfig ("WhiteCoreConnectors");
                         conf.Set ("ValidateTables", true);
+
 
                         data_ini.Save ();
                         Console.ForegroundColor = ConsoleColor.Green;
