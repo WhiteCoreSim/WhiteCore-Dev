@@ -41,7 +41,7 @@ UseVariableRegionSightDistance = false
 MaxDistanceVariableRegionSightDistance = 512
 
 [LibraryService]
-;; Set this if you want to change the name or owner of the WhiteCore Library
+;; Set these if you want to change the name or owner of the WhiteCore Library
 ;;  (This is the system default inventory)
 LibraryName = "WhiteCore Library"
 LibraryOwnerName = "Library Owner"
@@ -54,7 +54,8 @@ BankerName = "WhiteCore Banker"
 MarketplaceOwnerName = "Marketplace Concierge"
 
 [EstateService]
-;;  Modify this if you want to change the WhiteCore system Estate name
+;;  Modify these if you want to change the WhiteCore system Estate names
+MainlandEstateName = "Whitecore Mainland"
 SystemEstateName = "Whitecore Estate"
 
 [LoginService]
