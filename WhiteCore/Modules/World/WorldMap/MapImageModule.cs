@@ -342,7 +342,6 @@ namespace WhiteCore.Modules.WorldMap
                 if (gridRegModule != null)
                     gridRegModule.UpdateGridRegion (m_scene);
 
-
             }
         }
 
@@ -520,7 +519,7 @@ namespace WhiteCore.Modules.WorldMap
         /// Generates the overlay.
         /// </summary>
         /// <returns>The overlay.</returns>
-        Byte [] GenerateOverlay ()
+        byte [] GenerateOverlay ()
         {
             Bitmap overlay = new Bitmap (m_scene.RegionInfo.RegionSizeX, m_scene.RegionInfo.RegionSizeY);
 
@@ -703,6 +702,7 @@ namespace WhiteCore.Modules.WorldMap
                                     pos.Y = m_scene.RegionInfo.RegionSizeY - 1;
                                 isBelow256AboveTerrain = (pos.Z < (heightmap [(int)pos.X, (int)pos.Y] + 256f));
                             } catch (Exception) {
+                                MainConsole.Instance.Error ("[Texture renderer]: Error determining terrain height");
                             }
 
                             if (isBelow256AboveTerrain) {
@@ -993,6 +993,7 @@ namespace WhiteCore.Modules.WorldMap
                         File.Delete (Path.Combine (Path.Combine (m_assetCacheDir, "mapTileTextureCache"),
                                                  m_scene.RegionInfo.RegionName + ".tc"));
                     } catch {
+                        MainConsole.Instance.Error ("[Texture renderer]: Error deleting cached map");
                     }
                 }
             }
@@ -1026,6 +1027,7 @@ namespace WhiteCore.Modules.WorldMap
             try {
                 writer.WriteLine (OSDParser.SerializeJsonString (map));
             } catch {
+                MainConsole.Instance.Error ("[Texture renderer]: Error saving cache map");
             }
             writer.Close ();
             stream.Close ();

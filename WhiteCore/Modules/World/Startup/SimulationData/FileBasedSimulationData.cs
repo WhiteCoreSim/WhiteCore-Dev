@@ -853,7 +853,9 @@ namespace WhiteCore.Modules
 
         public virtual void Tainted ()
         {
+            // something has changed in the region
             m_requiresSave = true;
+            MapTileNeedsGenerated = true;
         }
 
         public virtual void ForceBackup ()
@@ -988,8 +990,10 @@ namespace WhiteCore.Modules
                     MainConsole.Instance.Error ("[FileBasedSimulationData]: Failed to save backup, exception occurred " +
                                                ex);
                 }
+
                 m_saveTimer.Start (); //Restart it as we just did a backup
             } else if (m_displayNotSavingNotice) {
+                // backup is not required (no changes)
                 m_displayNotSavingNotice = false;
                 MainConsole.Instance.Info ("[FileBasedSimulationData]: Not saving backup, not required");
             }
@@ -1152,7 +1156,6 @@ namespace WhiteCore.Modules
             }
             regiondata.Dispose ();
             //Now make it the full file again
-            MapTileNeedsGenerated = true;
             MainConsole.Instance.Info ("[FileBasedSimulationData]: Saved Backup for region " +
                                       m_scene.RegionInfo.RegionName);
         }
