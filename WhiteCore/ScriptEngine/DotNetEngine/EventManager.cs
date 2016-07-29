@@ -25,6 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using OpenMetaverse;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
@@ -32,10 +36,6 @@ using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.SceneInfo.Entities;
 using WhiteCore.Framework.Utilities;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine
 {
@@ -58,10 +58,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         // verify what exact parameters are needed.
         //
 
-        private readonly Dictionary<uint, Dictionary<UUID, DetectParams>> CoalescedTouchEvents =
+        readonly Dictionary<uint, Dictionary<UUID, DetectParams>> CoalescedTouchEvents =
             new Dictionary<uint, Dictionary<UUID, DetectParams>>();
 
-        private readonly ScriptEngine m_scriptEngine;
+        readonly ScriptEngine m_scriptEngine;
 
         public EventManager(ScriptEngine _ScriptEngine)
         {
@@ -73,36 +73,21 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             //MainConsole.Instance.Info("[" + myScriptEngine.ScriptEngineName +
             //           "]: Hooking up to server events");
 
-            Scene.EventManager.OnObjectGrab +=
-                touch_start;
-            Scene.EventManager.OnObjectGrabbing +=
-                touch;
-            Scene.EventManager.OnObjectDeGrab +=
-                touch_end;
-            Scene.EventManager.OnScriptChangedEvent +=
-                changed;
-            Scene.EventManager.OnScriptAtTargetEvent +=
-                at_target;
-            Scene.EventManager.OnScriptNotAtTargetEvent +=
-                not_at_target;
-            Scene.EventManager.OnScriptAtRotTargetEvent +=
-                at_rot_target;
-            Scene.EventManager.OnScriptNotAtRotTargetEvent +=
-                not_at_rot_target;
-            Scene.EventManager.OnScriptControlEvent +=
-                control;
-            Scene.EventManager.OnScriptColliderStart +=
-                collision_start;
-            Scene.EventManager.OnScriptColliding +=
-                collision;
-            Scene.EventManager.OnScriptCollidingEnd +=
-                collision_end;
-            Scene.EventManager.OnScriptLandColliderStart +=
-                land_collision_start;
-            Scene.EventManager.OnScriptLandColliding +=
-                land_collision;
-            Scene.EventManager.OnScriptLandColliderEnd +=
-                land_collision_end;
+            Scene.EventManager.OnObjectGrab += touch_start;
+            Scene.EventManager.OnObjectGrabbing += touch;
+            Scene.EventManager.OnObjectDeGrab += touch_end;
+            Scene.EventManager.OnScriptChangedEvent += changed;
+            Scene.EventManager.OnScriptAtTargetEvent += at_target;
+            Scene.EventManager.OnScriptNotAtTargetEvent += not_at_target;
+            Scene.EventManager.OnScriptAtRotTargetEvent += at_rot_target;
+            Scene.EventManager.OnScriptNotAtRotTargetEvent += not_at_rot_target;
+            Scene.EventManager.OnScriptControlEvent += control;
+            Scene.EventManager.OnScriptColliderStart += collision_start;
+            Scene.EventManager.OnScriptColliding += collision;
+            Scene.EventManager.OnScriptCollidingEnd += collision_end;
+            Scene.EventManager.OnScriptLandColliderStart += land_collision_start;
+            Scene.EventManager.OnScriptLandColliding += land_collision;
+            Scene.EventManager.OnScriptLandColliderEnd += land_collision_end;
             Scene.EventManager.OnAttach += attach;
             Scene.EventManager.OnScriptMovingStartEvent += moving_start;
             Scene.EventManager.OnScriptMovingEndEvent += moving_end;
@@ -127,12 +112,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                     return;
             }
             string functionName = "changed";
-            object[] param = new Object[] {new LSL_Types.LSLInteger(change)};
+            object[] param = { new LSL_Types.LSLInteger(change)};
 
             foreach (ScriptData ID in datas)
             {
-                m_scriptEngine.AddToScriptQueue(ID, functionName, new DetectParams[0], EventPriority.FirstStart,
-                                                param);
+                m_scriptEngine.AddToScriptQueue(ID, functionName, new DetectParams[0],
+                                                EventPriority.FirstStart, param);
             }
         }
 
@@ -172,7 +157,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 return;
 
             string functionName = "touch_start";
-            object[] param = new Object[] {new LSL_Types.LSLInteger(det.Count)};
+            object[] param = { new LSL_Types.LSLInteger(det.Count)};
 
             foreach (ScriptData ID in datas)
             {
@@ -213,7 +198,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 return;
 
             string functionName = "touch";
-            object[] param = new Object[] {new LSL_Types.LSLInteger(det.Count)};
+            object[] param = {new LSL_Types.LSLInteger(det.Count)};
 
             foreach (ScriptData ID in datas)
             {
@@ -248,7 +233,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 return;
 
             string functionName = "touch_end";
-            object[] param = new Object[] {new LSL_Types.LSLInteger(det.Count)};
+            object[] param = {new LSL_Types.LSLInteger(det.Count)};
 
             foreach (ScriptData ID in datas)
             {
@@ -275,16 +260,15 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 if (datas == null || datas.Length == 0) return ret;
             }
             string functionName = "money";
-            object[] param = new object[]
-                                 {
-                                     new LSL_Types.LSLString(agentID.ToString()),
-                                     new LSL_Types.LSLInteger(amount)
-                                 };
+            object[] param = { 
+                                new LSL_Types.LSLString(agentID.ToString()),
+                                new LSL_Types.LSLInteger(amount) 
+            };
 
             foreach (ScriptData ID in datas)
             {
-                m_scriptEngine.AddToScriptQueue(ID, functionName, new DetectParams[0], EventPriority.FirstStart,
-                                                param);
+                m_scriptEngine.AddToScriptQueue(ID, functionName, new DetectParams[0],
+                                                EventPriority.FirstStart, param);
                 ret = true;
             }
             return ret;
@@ -313,11 +297,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                     return;
                 }
                 string functionName = "collision_start";
-                object[] param = new Object[] {new LSL_Types.LSLInteger(det.Count)};
+                object[] param = { new LSL_Types.LSLInteger(det.Count)};
 
                 foreach (ScriptData ID in datas)
                 {
-                    m_scriptEngine.AddToScriptQueue(ID, functionName, det.ToArray(), EventPriority.FirstStart, param);
+                    m_scriptEngine.AddToScriptQueue(ID, functionName, det.ToArray(),
+                                                    EventPriority.FirstStart, param);
                 }
             }
         }
@@ -345,11 +330,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                     return;
                 }
                 string functionName = "collision";
-                object[] param = new Object[] {new LSL_Types.LSLInteger(det.Count)};
+                object[] param = {new LSL_Types.LSLInteger(det.Count)};
 
                 foreach (ScriptData ID in datas)
                 {
-                    m_scriptEngine.AddToScriptQueue(ID, functionName, det.ToArray(), EventPriority.FirstStart, param);
+                    m_scriptEngine.AddToScriptQueue(ID, functionName, det.ToArray(),
+                                                    EventPriority.FirstStart, param);
                 }
             }
         }
@@ -377,11 +363,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                     return;
                 }
                 string functionName = "collision_end";
-                object[] param = new Object[] {new LSL_Types.LSLInteger(det.Count)};
+                object[] param = {new LSL_Types.LSLInteger(det.Count)};
 
                 foreach (ScriptData ID in datas)
                 {
-                    m_scriptEngine.AddToScriptQueue(ID, functionName, det.ToArray(), EventPriority.FirstStart, param);
+                    m_scriptEngine.AddToScriptQueue(ID, functionName, det.ToArray(),
+                                                    EventPriority.FirstStart, param);
                 }
             }
         }
@@ -416,11 +403,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                     return;
                 }
                 string functionName = "land_collision_start";
-                object[] param = new Object[] {new LSL_Types.Vector3(det[0].Position)};
+                object[] param = {new LSL_Types.Vector3(det[0].Position)};
 
                 foreach (ScriptData ID in datas)
                 {
-                    m_scriptEngine.AddToScriptQueue(ID, functionName, det.ToArray(), EventPriority.FirstStart, param);
+                    m_scriptEngine.AddToScriptQueue(ID, functionName, det.ToArray(),
+                                                    EventPriority.FirstStart, param);
                 }
             }
         }
@@ -455,11 +443,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                     return;
                 }
                 string functionName = "land_collision";
-                object[] param = new Object[] {new LSL_Types.Vector3(det[0].Position)};
+                object[] param = {new LSL_Types.Vector3(det[0].Position)};
 
                 foreach (ScriptData ID in datas)
                 {
-                    m_scriptEngine.AddToScriptQueue(ID, functionName, det.ToArray(), EventPriority.FirstStart, param);
+                    m_scriptEngine.AddToScriptQueue(ID, functionName, det.ToArray(),
+                                                    EventPriority.FirstStart, param);
                 }
             }
         }
@@ -494,11 +483,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                     return;
                 }
                 string functionName = "land_collision_end";
-                object[] param = new Object[] {new LSL_Types.Vector3(det[0].Position)};
+                object[] param = {new LSL_Types.Vector3(det[0].Position)};
 
                 foreach (ScriptData ID in datas)
                 {
-                    m_scriptEngine.AddToScriptQueue(ID, functionName, det.ToArray(), EventPriority.FirstStart, param);
+                    m_scriptEngine.AddToScriptQueue(ID, functionName, det.ToArray(),
+                                                    EventPriority.FirstStart, param);
                 }
             }
         }
@@ -513,14 +503,15 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 return;
 
             string functionName = "control";
-            object[] param = new object[]
-                                 {
-                                     new LSL_Types.LSLString(agentID.ToString()),
-                                     new LSL_Types.LSLInteger(held),
-                                     new LSL_Types.LSLInteger(change)
-                                 };
+            object[] param = 
+                             {
+                                 new LSL_Types.LSLString(agentID.ToString()),
+                                 new LSL_Types.LSLInteger(held),
+                                 new LSL_Types.LSLInteger(change)
+                             };
 
-            m_scriptEngine.AddToScriptQueue(ID, functionName, new DetectParams[0], EventPriority.FirstStart, param);
+            m_scriptEngine.AddToScriptQueue(ID, functionName, new DetectParams[0], 
+                                            EventPriority.FirstStart, param);
         }
 
         public void email(uint localID, UUID itemID, string timeSent,
@@ -538,19 +529,19 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                     return;
             }
             string functionName = "email";
-            object[] param = new object[]
-                                 {
-                                     new LSL_Types.LSLString(timeSent),
-                                     new LSL_Types.LSLString(address),
-                                     new LSL_Types.LSLString(subject),
-                                     new LSL_Types.LSLString(message),
-                                     new LSL_Types.LSLInteger(numLeft)
-                                 };
+            object[] param = 
+                            {
+                                 new LSL_Types.LSLString(timeSent),
+                                 new LSL_Types.LSLString(address),
+                                 new LSL_Types.LSLString(subject),
+                                 new LSL_Types.LSLString(message),
+                                 new LSL_Types.LSLInteger(numLeft)
+                             };
 
             foreach (ScriptData ID in datas)
             {
-                m_scriptEngine.AddToScriptQueue(ID, functionName, new DetectParams[0], EventPriority.FirstStart,
-                                                param);
+                m_scriptEngine.AddToScriptQueue(ID, functionName, new DetectParams[0], 
+                                                EventPriority.FirstStart, param);
             }
         }
 
@@ -569,17 +560,16 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                     return;
             }
             string functionName = "at_target";
-            object[] param = new object[]
-                                 {
-                                     new LSL_Types.LSLInteger(handle),
-                                     new LSL_Types.Vector3(targetpos.X, targetpos.Y, targetpos.Z),
-                                     new LSL_Types.Vector3(atpos.X, atpos.Y, atpos.Z)
-                                 };
+            object[] param = {
+                new LSL_Types.LSLInteger(handle),
+                new LSL_Types.Vector3(targetpos.X, targetpos.Y, targetpos.Z),
+                new LSL_Types.Vector3(atpos.X, atpos.Y, atpos.Z)
+            };
 
             foreach (ScriptData ID in datas)
             {
-                m_scriptEngine.AddToScriptQueue(ID, functionName, new DetectParams[0], EventPriority.FirstStart,
-                                                param);
+                m_scriptEngine.AddToScriptQueue(ID, functionName, new DetectParams[0], 
+                                                EventPriority.FirstStart, param);
             }
         }
 
@@ -601,8 +591,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
             foreach (ScriptData ID in datas)
             {
-                m_scriptEngine.AddToScriptQueue(ID, functionName, new DetectParams[0], EventPriority.FirstStart,
-                                                param);
+                m_scriptEngine.AddToScriptQueue(ID, functionName, new DetectParams[0], 
+                                                EventPriority.FirstStart, param);
             }
         }
 
@@ -621,17 +611,16 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                     return;
             }
             string functionName = "at_rot_target";
-            object[] param = new object[]
-                                 {
-                                     new LSL_Types.LSLInteger(handle),
-                                     new LSL_Types.Quaternion(targetrot.X, targetrot.Y, targetrot.Z, targetrot.W),
-                                     new LSL_Types.Quaternion(atrot.X, atrot.Y, atrot.Z, atrot.W)
-                                 };
+            object[] param = {
+                new LSL_Types.LSLInteger(handle),
+                new LSL_Types.Quaternion(targetrot.X, targetrot.Y, targetrot.Z, targetrot.W),
+                new LSL_Types.Quaternion(atrot.X, atrot.Y, atrot.Z, atrot.W)
+            };
 
             foreach (ScriptData ID in datas)
             {
-                m_scriptEngine.AddToScriptQueue(ID, functionName, new DetectParams[0], EventPriority.FirstStart,
-                                                param);
+                m_scriptEngine.AddToScriptQueue(ID, functionName, new DetectParams[0], 
+                                                EventPriority.FirstStart, param);
             }
         }
 
@@ -653,8 +642,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
             foreach (ScriptData ID in datas)
             {
-                m_scriptEngine.AddToScriptQueue(ID, functionName, new DetectParams[0], EventPriority.FirstStart,
-                                                param);
+                m_scriptEngine.AddToScriptQueue(ID, functionName, new DetectParams[0],
+                                                EventPriority.FirstStart, param);
             }
         }
 
@@ -672,15 +661,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                     return;
             }
             string functionName = "attach";
-            object[] param = new object[]
-                                 {
-                                     new LSL_Types.LSLString(avatar.ToString())
-                                 };
+            object[] param = { new LSL_Types.LSLString(avatar.ToString()) };
 
             foreach (ScriptData ID in datas)
             {
-                m_scriptEngine.AddToScriptQueue(ID, functionName, new DetectParams[0], EventPriority.FirstStart,
-                                                param);
+                m_scriptEngine.AddToScriptQueue(ID, functionName, new DetectParams[0], 
+                                                EventPriority.FirstStart, param);
             }
         }
 
@@ -699,8 +685,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
             foreach (ScriptData ID in datas)
             {
-                m_scriptEngine.AddToScriptQueue(ID, functionName, new DetectParams[0], EventPriority.FirstStart,
-                                                param);
+                m_scriptEngine.AddToScriptQueue(ID, functionName, new DetectParams[0],
+                                                EventPriority.FirstStart, param);
             }
         }
 
@@ -719,8 +705,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
             foreach (ScriptData ID in datas)
             {
-                m_scriptEngine.AddToScriptQueue(ID, functionName, new DetectParams[0], EventPriority.FirstStart,
-                                                param);
+                m_scriptEngine.AddToScriptQueue(ID, functionName, new DetectParams[0],
+                                                EventPriority.FirstStart, param);
             }
         }
 
@@ -769,7 +755,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 //This will happen if the script doesn't compile correctly
                 if (ID.Script == null)
                 {
-                    MainConsole.Instance.Info("[DotNetEngine]: Could not load script from item '" +
+                    MainConsole.Instance.Info("[WDNE]: Could not load script from item '" +
                                               ID.InventoryItem.Name +
                                               "' to fire event " + FunctionName);
                     return false;
@@ -888,14 +874,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                             return false;
                         break;
                     case scriptEvents.changed:
-                        Changed changed;
+                    Changed scptChanged;
                         if (param[0] is Changed)
-                            changed = (Changed) param[0];
+                            scptChanged = (Changed) param[0];
                         else
-                            changed = (Changed) (((LSL_Types.LSLInteger) param[0]).value);
-                        if (ID.ChangedInQueue.Contains(changed))
+                            scptChanged = (Changed) (((LSL_Types.LSLInteger) param[0]).value);
+                        if (ID.ChangedInQueue.Contains(scptChanged))
                             return false;
-                        ID.ChangedInQueue.Add(changed);
+                        ID.ChangedInQueue.Add(scptChanged);
                         break;
                 }
             }
@@ -960,16 +946,16 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                         QIS.ID.NotAtRotTargetInQueue = false;
                         break;
                     case scriptEvents.changed:
-                        Changed changed;
+                    Changed scriptChanged;
                         if (QIS.param[0] is Changed)
                         {
-                            changed = (Changed) QIS.param[0];
+                            scriptChanged = (Changed) QIS.param[0];
                         }
                         else
                         {
-                            changed = (Changed) (((LSL_Types.LSLInteger) QIS.param[0]).value);
+                            scriptChanged = (Changed) (((LSL_Types.LSLInteger) QIS.param[0]).value);
                         }
-                        QIS.ID.ChangedInQueue.Remove(changed);
+                        QIS.ID.ChangedInQueue.Remove(scriptChanged);
                         break;
                 }
             }

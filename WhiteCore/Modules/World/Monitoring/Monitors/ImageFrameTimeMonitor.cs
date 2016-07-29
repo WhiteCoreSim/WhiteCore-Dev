@@ -33,39 +33,39 @@ namespace WhiteCore.Modules.Monitoring.Monitors
 {
     public class ImageFrameTimeMonitor : IImageFrameTimeMonitor
     {
-        private int MonitorImageFrameTick;
+        int MonitorImageFrameTick;
 
-        public ImageFrameTimeMonitor(IScene scene)
+        public ImageFrameTimeMonitor (IScene scene)
         {
         }
 
         #region Implementation of IMonitor
 
-        public double GetValue()
+        public double GetValue ()
         {
             return MonitorImageFrameTick;
         }
 
-        public string GetName()
+        public string GetName ()
         {
             return "Images Frame Time";
         }
 
-        public string GetInterfaceName()
+        public string GetInterfaceName ()
         {
             return "IImageFrameTimeMonitor";
         }
 
-        public string GetFriendlyValue()
+        public string GetFriendlyValue ()
         {
-            return (int) GetValue() + "ms";
+            return (int)GetValue () + "ms";
         }
 
         #endregion
 
         #region IImageFrameTimeMonitor Members
 
-        public void AddImageTime(int value)
+        public void AddImageTime (int value)
         {
             MonitorImageFrameTick += value;
         }
@@ -74,7 +74,7 @@ namespace WhiteCore.Modules.Monitoring.Monitors
 
         #region IMonitor Members
 
-        public void ResetStats()
+        public void ResetStats ()
         {
             MonitorImageFrameTick = 0;
         }

@@ -227,7 +227,19 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     "save users [<CSV file>]",
                     "Saves all users from WhiteCore into a CSV file",
                     HandleSaveUsers, false, true);
-
+                
+                MainConsole.Instance.Commands.AddCommand(
+                	"load salted users",
+                	"load salted users [<CSV file>]",
+                	"Loads all users that have been exported with a salted password string",
+                	HandleLoadSaltedUsers, false, true);
+                
+                MainConsole.Instance.Commands.AddCommand(
+                	"save salted users",
+                	"save salted users [<CSV file>]",
+                	"Save all users with a salted password string",
+                	HandleSaveSaltedUsers, false, true);
+                
                 #if TEST_USERS
                 MainConsole.Instance.Commands.AddCommand(
                     "create test users",
@@ -255,14 +267,15 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             if (m_cache.Get(firstName + " " + lastName, out account))
                 return AllScopeIDImpl.CheckScopeIDs(scopeIDs, account);
 
-            object remoteValue = DoRemoteByURL("UserAccountServerURI", scopeIDs, firstName, lastName);
-            if (remoteValue != null || m_doRemoteOnly)
-            {
-                UserAccount acc = (UserAccount) remoteValue;
-                if (remoteValue != null)
-                    m_cache.Cache(acc.PrincipalID, acc);
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("UserAccountServerURI", scopeIDs, firstName, lastName);
+                if (remoteValue != null) {
+                    UserAccount acc = (UserAccount)remoteValue;
+                    m_cache.Cache (acc.PrincipalID, acc);
 
-                return acc;
+                    return acc;
+                } 
+                return new UserAccount ();
             }
 
             UserAccount[] d;
@@ -302,8 +315,9 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
 
         public void CacheAccount(UserAccount account)
         {
-            if ((account != null) && (account.UserLevel <= -1))
+            if ((account == null) || (account.UserLevel <= -1))
                 return;
+            
             m_cache.Cache(account.PrincipalID, account);
         }
 
@@ -316,14 +330,15 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             if (m_cache.Get(name, out account))
                 return AllScopeIDImpl.CheckScopeIDs(scopeIDs, account);
 
-            object remoteValue = DoRemoteByURL("UserAccountServerURI", scopeIDs, name);
-            if (remoteValue != null || m_doRemoteOnly)
-            {
-                UserAccount acc = (UserAccount) remoteValue;
-                if (remoteValue != null)
-                    m_cache.Cache(acc.PrincipalID, acc);
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("UserAccountServerURI", scopeIDs, name);
+                if (remoteValue != null) {
+                    UserAccount acc = (UserAccount)remoteValue;
+                    m_cache.Cache (acc.PrincipalID, acc);
 
-                return acc;
+                    return acc;
+                }
+                return new UserAccount ();
             }
 
             UserAccount[] d;
@@ -381,14 +396,15 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             if (m_cache.Get(principalID, out account))
                 return AllScopeIDImpl.CheckScopeIDs(scopeIDs, account);
 
-            object remoteValue = DoRemoteByURL("UserAccountServerURI", scopeIDs, principalID);
-            if (remoteValue != null || m_doRemoteOnly)
-            {
-                UserAccount acc = (UserAccount) remoteValue;
-                if (remoteValue != null)
-                    m_cache.Cache(principalID, acc);
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("UserAccountServerURI", scopeIDs, principalID);
+                if (remoteValue != null) {
+                    UserAccount acc = (UserAccount)remoteValue;
+                    m_cache.Cache (principalID, acc);
 
-                return acc;
+                    return acc;
+                }
+                return new UserAccount ();
             }
 
             UserAccount[] d;
@@ -419,18 +435,20 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             return m_Database.Store(data);
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<UserAccount> GetUserAccounts(List<UUID> scopeIDs, string query)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public List<UserAccount> GetUserAccounts (List<UUID> scopeIDs, string query)
         {
-            object remoteValue = DoRemoteByURL("UserAccountServerURI", scopeIDs, query);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<UserAccount>) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("UserAccountServerURI", scopeIDs, query);
+                if (remoteValue != null)
+                    return (List<UserAccount>)remoteValue;
+                return new List<UserAccount> ();
+            }
 
-            UserAccount[] d = m_Database.GetUsers(scopeIDs, query);
-
+            UserAccount [] d = m_Database.GetUsers (scopeIDs, query);
             if (d == null)
-                return new List<UserAccount>();
-
+                return new List<UserAccount> ();
+            
             List<UserAccount> ret = new List<UserAccount>(d);
             return ret;
         }
@@ -438,12 +456,14 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public List<UserAccount> GetUserAccounts(List<UUID> scopeIDs, string query, uint? start, uint? count)
         {
-            object remoteValue = DoRemoteByURL("UserAccountServerURI", scopeIDs, query);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<UserAccount>) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("UserAccountServerURI", scopeIDs, query);
+                if (remoteValue != null)
+                    return (List<UserAccount>)remoteValue;
+                return new List<UserAccount> ();
+            }
 
             UserAccount[] d = m_Database.GetUsers(scopeIDs, query, start, count);
-
             if (d == null)
                 return new List<UserAccount>();
 
@@ -454,12 +474,14 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public List<UserAccount> GetUserAccounts(List<UUID> scopeIDs, int level, int flags)
         {
-            object remoteValue = DoRemoteByURL("UserAccountServerURI", level, flags);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<UserAccount>) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL("UserAccountServerURI", level, flags);
+                if (remoteValue != null)
+                    return (List<UserAccount>) remoteValue;
+                return new List<UserAccount> ();
+             }
 
             UserAccount[] d = m_Database.GetUsers(scopeIDs, level, flags);
-
             if (d == null)
                 return new List<UserAccount>();
 
@@ -470,9 +492,12 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public uint NumberOfUserAccounts(List<UUID> scopeIDs, string query)
         {
-            object remoteValue = DoRemoteByURL("UserAccountServerURI", scopeIDs, query);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (uint) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("UserAccountServerURI", scopeIDs, query);
+                if (remoteValue != null)
+                    return (uint)remoteValue;
+                return 0;
+            }
 
             var userCount = m_Database.NumberOfUsers(scopeIDs, query);
             return userCount - Constants.SystemUserCount;
@@ -512,14 +537,14 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             UserAccount nameaccount = GetUserAccount(null, newAccount.Name);
             if (account != null || nameaccount != null)
             {
-                MainConsole.Instance.ErrorFormat ("[USER ACCOUNT SERVICE]: A user with the name {0} already exists!", newAccount.Name);
+                MainConsole.Instance.ErrorFormat ("[User account service]: A user with the name {0} already exists!", newAccount.Name);
                 return "A user with the same name already exists";
             }
 
             // This one is available...
             if (!StoreUserAccount (newAccount))
             {
-                MainConsole.Instance.ErrorFormat ("[USER ACCOUNT SERVICE]: Account creation failed for account {0}", newAccount.Name);
+                MainConsole.Instance.ErrorFormat ("[User account service]: Account creation failed for account {0}", newAccount.Name);
                 return "Unable to save account";
             }
         
@@ -530,12 +555,12 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 if (!success)
                 {
                     MainConsole.Instance.WarnFormat (
-                        "[USER ACCOUNT SERVICE]: Unable to set password for account {0}.", newAccount.Name);
+                        "[User account service]: Unable to set password for account {0}.", newAccount.Name);
                     return "Unable to set password";
                 }
             }
 
-            MainConsole.Instance.InfoFormat ("[USER ACCOUNT SERVICE]: Account {0} created successfully", newAccount.Name);
+            MainConsole.Instance.InfoFormat ("[User account service]: Account {0} created successfully", newAccount.Name);
             //Cache it as well
             CacheAccount (newAccount);
             m_registry.RequestModuleInterface<ISimulationBase> ()
@@ -582,7 +607,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             // ensure the system users are left alone!
             if (Utilities.IsSystemUser(userID))
             {
-                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Deleting a system user account is not a good idea!");
+                MainConsole.Instance.Warn ("[User account service]: Deleting a system user account is not a good idea!");
                 return;
             }
 
@@ -590,7 +615,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             if (!m_Database.DeleteAccount(userID, archiveInformation))
             {
                 MainConsole.Instance.WarnFormat(
-                    "[USER ACCOUNT SERVICE]: Failed to remove the account for {0}, please check that the database is valid after this operation!",
+                    "[User account service]: Failed to remove the account for {0}, please check that the database is valid after this operation!",
                     userID);
                 return;
             }
@@ -616,7 +641,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             string second = MainConsole.Instance.Prompt("Second User's name (<first> <last>)");
             if (second == first)
             {
-                MainConsole.Instance.Error("[USER ACCOUNT SERVICE]: You are not able to set yourself as your partner");
+                MainConsole.Instance.Error("[User account service]: You are not able to set yourself as your partner");
                 return;
             }
 
@@ -629,7 +654,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
 
                 if (firstProfile == null || secondProfile == null)
                 {
-                    MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: At least one of these users does not have a profile?");
+                    MainConsole.Instance.Warn("[User account service]: At least one of these users does not have a profile?");
                     return;
                 }
 
@@ -639,7 +664,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 m_profileConnector.UpdateUserProfile(firstProfile);
                 m_profileConnector.UpdateUserProfile(secondProfile);
 
-                MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: Partner information updated.");
+                MainConsole.Instance.Warn("[User account service]: Partner information updated.");
             }
           
         }
@@ -661,13 +686,13 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 // Find the second partner through the first user details
                 if (firstProfile.Partner == UUID.Zero)
                 {
-                    MainConsole.Instance.Error("[USER ACCOUNT SERVICE]: This user doesn't have a partner");
+                    MainConsole.Instance.Error("[User account service]: This user doesn't have a partner");
                     return;
                 }
 
                 if (firstProfile.Partner == firstProfile.PrincipalID)
                 {
-                    MainConsole.Instance.Error("[USER ACCOUNT SERVICE]: Deadlock situation avoided, this avatar is his own partner");
+                    MainConsole.Instance.Error("[User account service]: Deadlock situation avoided, this avatar is his own partner");
                     firstProfile.Partner = UUID.Zero;
                     m_profileConnector.UpdateUserProfile(firstProfile);
                 } else
@@ -681,7 +706,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     m_profileConnector.UpdateUserProfile(firstProfile);
                     m_profileConnector.UpdateUserProfile(secondProfile);
 
-                    MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: Partner information updated. ");
+                    MainConsole.Instance.Warn("[User account service]: Partner information updated. ");
                 }
             }
         }
@@ -708,7 +733,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             UserAccount account = GetUserAccount(null, firstName, lastName);
             if (account == null)
             {
-                    MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: No such user");
+                    MainConsole.Instance.Warn("[User account service]: No such user");
                 return;
             }
             title = cmdparams.Length < 7 ? MainConsole.Instance.Prompt("User Title") : Util.CombineParams(cmdparams, 6);
@@ -722,17 +747,17 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     m_profileConnector.UpdateUserProfile (profile);
                 }
                 else {
-                        MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: There does not appear to be a profile for this user?");
+                        MainConsole.Instance.Warn("[User account service]: There does not appear to be a profile for this user?");
                     return;
                 }
 
             }
             bool success = StoreUserAccount(account);
             if (!success)
-                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Unable to set user profile title for account {0} {1}.", firstName,
+                MainConsole.Instance.InfoFormat("[User account service]: Unable to set user profile title for account {0} {1}.", firstName,
                                                 lastName);
             else
-                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: User profile title set for user {0} {1} to {2}", firstName, lastName,
+                MainConsole.Instance.InfoFormat("[User account service]: User profile title set for user {0} {1} to {2}", firstName, lastName,
                                                 title);
         }
 
@@ -759,14 +784,14 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             UserAccount account = GetUserAccount(null, firstName, lastName);
             if (account == null)
             {
-                MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: Unable to locate this user");
+                MainConsole.Instance.Warn("[User account service]: Unable to locate this user");
                 return;
             }
 
             // ensure the protected system users are left alone!
             if (Utilities.IsSystemUser(account.PrincipalID))
             {
-                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Changing system users is not a good idea!");
+                MainConsole.Instance.Warn ("[User account service]: Changing system users is not a good idea!");
                 return;
             }
 
@@ -783,9 +808,9 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
 
             bool success = StoreUserAccount(account);
             if (!success)
-                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Unable to set user level for account {0} {1}.", firstName, lastName);
+                MainConsole.Instance.InfoFormat("[User account service]: Unable to set user level for account {0} {1}.", firstName, lastName);
             else
-                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: User level set for user {0} {1} to {2}", firstName, lastName, level);
+                MainConsole.Instance.InfoFormat("[User account service]: User level set for user {0} {1} to {2}", firstName, lastName, level);
         }
 
         int UserTypeToUserFlags(string userType)
@@ -889,7 +914,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             UserAccount ua = GetUserAccount(null, firstName, lastName);
             if (ua == null)
             {
-                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Unable to find user '{0} {1}'", firstName, lastName);
+                MainConsole.Instance.InfoFormat("[User account service]: Unable to find user '{0} {1}'", firstName, lastName);
                 return;
             }
 
@@ -924,14 +949,14 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             UserAccount account = GetUserAccount(null, firstName, lastName);
             if (account == null)
             {
-                MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: Unable to locate this user");
+                MainConsole.Instance.Warn("[User account service]: Unable to locate this user");
                 return;
             }
 
             // ensure the system users are left alone!
             if (Utilities.IsSystemUser(account.PrincipalID))
             {
-                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Changing system users is not a good idea!");
+                MainConsole.Instance.Warn ("[User account service]: Changing system users is not a good idea!");
             }
 
             // Get user type (for payments etc)
@@ -943,7 +968,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             bool success = StoreUserAccount(account);
             if (success)
             {
-                MainConsole.Instance.InfoFormat ("[USER ACCOUNT SERVICE]: User '{0} {1}' set to {2}", firstName, lastName, userType);
+                MainConsole.Instance.InfoFormat ("[User account service]: User '{0} {1}' set to {2}", firstName, lastName, userType);
 
                 // update profile for the user as well
                 if (m_profileConnector != null)
@@ -963,7 +988,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 }
             }
             else
-                MainConsole.Instance.InfoFormat ("[USER ACCOUNT SERVICE]: Unable to set user type for account '{0} {1}'.", firstName, lastName);
+                MainConsole.Instance.InfoFormat ("[User account service]: Unable to set user type for account '{0} {1}'.", firstName, lastName);
 
         }
 
@@ -984,14 +1009,14 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             UserAccount account = GetUserAccount(null, firstName, lastName);
             if (account == null)
             {
-                MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: Unable to locate this user");
+                MainConsole.Instance.Warn("[User account service]: Unable to locate this user");
                 return;
             }
 
             // ensure the system users are left alone!
             if (Utilities.IsSystemUser(account.PrincipalID))
             {
-                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Changing system users is not a good idea!");
+                MainConsole.Instance.Warn ("[User account service]: Changing system users is not a good idea!");
             }
 
             // new name
@@ -1002,7 +1027,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             string[] split = newName.Split (' ');
             if (split.Length < 2)
             {
-                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Sorry! Names must in the format 'Firstname Lastname'.");
+                MainConsole.Instance.Warn ("[User account service]: Sorry! Names must in the format 'Firstname Lastname'.");
                 return;
             }
             
@@ -1010,16 +1035,16 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             var chkAcct = GetUserAccount(null, newName);
             if (chkAcct != null)
             {
-                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Sorry! This name is already assigned.");
+                MainConsole.Instance.Warn ("[User account service]: Sorry! This name is already assigned.");
                 return;
             }
 
             account.Name = newName;
             bool success = StoreUserAccount(account);
             if (!success)
-                MainConsole.Instance.WarnFormat("[USER ACCOUNT SERVICE]: Unable to set the new name for {0} {1}",firstName, lastName);
+                MainConsole.Instance.WarnFormat("[User account service]: Unable to set the new name for {0} {1}",firstName, lastName);
             else
-                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: User '{0} {1}' has been renamed to '{2}'",
+                MainConsole.Instance.InfoFormat("[User account service]: User '{0} {1}' has been renamed to '{2}'",
                     firstName, lastName, newName);
 
         }
@@ -1058,12 +1083,12 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             List<string> cmdparams = new List<string>(cmd);
             foreach (string param in cmd)
             {
-                if (param.StartsWith("--system"))
+                if (param.StartsWith ("--system", StringComparison.Ordinal))
                 {
                     sysFlag = true;
                     cmdparams.Remove(param);
                 }
-                if (param.StartsWith("--uuid"))
+                if (param.StartsWith ("--uuid", StringComparison.Ordinal))
                 {
                     uuidFlag = true;
                     cmdparams.Remove(param);
@@ -1105,7 +1130,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             UserAccount ua = GetUserAccount(null, userName);
             if (ua != null)
             {
-                MainConsole.Instance.WarnFormat("[USER ACCOUNT SERVICE]: This user, '{0}' already exists!", userName);
+                MainConsole.Instance.WarnFormat("[User account service]: This user, '{0}' already exists!", userName);
                 return;
             }
 
@@ -1163,7 +1188,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             // we should be good to go
             CreateUser(UUID.Parse(uuid), UUID.Parse(scopeID), userName, Util.Md5Hash(password), email);
             // CreateUser will tell us success or problem
-            //MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: User '{0}' created", name);
+            //MainConsole.Instance.InfoFormat("[User account service]: User '{0}' created", name);
 
             // check for success
             UserAccount account = GetUserAccount(null, userName);
@@ -1189,7 +1214,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     m_profileConnector.UpdateUserProfile (profile);
                 }
             } else
-                MainConsole.Instance.WarnFormat("[USER ACCOUNT SERVICE]: There was a problem creating the account for '{0}'", userName);
+                MainConsole.Instance.WarnFormat("[User account service]: There was a problem creating the account for '{0}'", userName);
 
         }
 
@@ -1214,14 +1239,14 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             UserAccount account = GetUserAccount(null, firstName, lastName);
             if (account == null)
             {
-                MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: No user with that name!");
+                MainConsole.Instance.Warn("[User account service]: No user with that name!");
                 return;
             }
 
             // ensure the system users are left alone!
             if (Utilities.IsSystemUser(account.PrincipalID))
             {
-                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: You cannot delete system users!");
+                MainConsole.Instance.Warn ("[User account service]: You cannot delete system users!");
                 return;
             }
 
@@ -1239,9 +1264,9 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             {
                 DeleteUser (account.PrincipalID, account.Name, password, archive, all);
                 if (all)
-                    MainConsole.Instance.InfoFormat ("[USER ACCOUNT SERVICE]: User account '{0}' deleted", account.Name);
+                    MainConsole.Instance.InfoFormat ("[User account service]: User account '{0}' deleted", account.Name);
                 else
-                    MainConsole.Instance.InfoFormat ("[USER ACCOUNT SERVICE]: User account '{0}' disabled", account.Name);
+                    MainConsole.Instance.InfoFormat ("[User account service]: User account '{0}' disabled", account.Name);
             }
         }
 
@@ -1265,30 +1290,30 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             UserAccount account = GetUserAccount(null, firstName, lastName);
             if (account == null)
             {
-                MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: Unable to locate this user!");
+                MainConsole.Instance.Warn("[User account service]: Unable to locate this user!");
                 return;
             }
 
             // ensure the system users are left alone!
             if (Utilities.IsSystemUser(account.PrincipalID))
             {
-                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: You cannot modify system users!");
+                MainConsole.Instance.Warn ("[User account service]: You cannot modify system users!");
                 return;
             }
 
             // if the user is disabled details will exist with a level set @ -2
             if (account.UserLevel < 0)
             {
-                MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: User is already disabled!");
+                MainConsole.Instance.Warn("[User account service]: User is already disabled!");
                 return;
             }
 
             account.UserLevel = -2;
             bool success = StoreUserAccount(account);
             if (!success)
-                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Unable to disable account {0} {1}.", firstName, lastName);
+                MainConsole.Instance.InfoFormat("[User account service]: Unable to disable account {0} {1}.", firstName, lastName);
             else
-                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: User account {0} {1} disabled.", firstName, lastName);
+                MainConsole.Instance.InfoFormat("[User account service]: User account {0} {1} disabled.", firstName, lastName);
         }
 
         /// <summary>
@@ -1311,7 +1336,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             UserAccount account = GetUserAccount(null, firstName, lastName);
             if (account == null)
             {
-                MainConsole.Instance.Warn("[USER ACCOUNT SERVICE]: Unable to locate this user!");
+                MainConsole.Instance.Warn("[User account service]: Unable to locate this user!");
                 return;
             }
 
@@ -1324,9 +1349,9 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
 
             bool success = StoreUserAccount(account);
             if (!success)
-                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Unable to enable account {0} {1}.", firstName, lastName);
+                MainConsole.Instance.InfoFormat("[User account service]: Unable to enable account {0} {1}.", firstName, lastName);
             else
-                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: User account {0} {1} enabled.", firstName, lastName);
+                MainConsole.Instance.InfoFormat("[User account service]: User account {0} {1} enabled.", firstName, lastName);
         }
 
         /// <summary>
@@ -1349,12 +1374,15 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
 
             UserAccount account = GetUserAccount(null, firstName, lastName);
             if (account == null)
-                MainConsole.Instance.ErrorFormat("[USER ACCOUNT SERVICE]: Unable to locate this user");
+            {
+                MainConsole.Instance.ErrorFormat ("[User account service]: Unable to locate this user");
+                return;
+            }
 
             // ensure the system users are left alone!
             if (Utilities.IsSystemUser(account.PrincipalID))
             {
-                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Changing system users is not a good idea!");
+                MainConsole.Instance.Warn ("[User account service]: Changing system users is not a good idea!");
                 return;
             }
 
@@ -1383,9 +1411,9 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 success = m_AuthenticationService.SetPassword(account.PrincipalID, "UserAccount", newPassword);
             if (!success)
                 MainConsole.Instance.ErrorFormat(
-                    "[USER ACCOUNT SERVICE]: Unable to reset password for account '{0} {1}.", firstName, lastName);
+                    "[User account service]: Unable to reset password for account '{0} {1}.", firstName, lastName);
             else
-                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Password reset for user '{0} {1}", firstName, lastName);
+                MainConsole.Instance.InfoFormat("[User account service]: Password reset for user '{0} {1}", firstName, lastName);
         }
 
         /// <summary>
@@ -1410,14 +1438,14 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             UserAccount account = GetUserAccount(null, firstName, lastName);
             if (account == null)
             {
-                MainConsole.Instance.ErrorFormat("[USER ACCOUNT SERVICE]: Unable to locate this user");
+                MainConsole.Instance.ErrorFormat("[User account service]: Unable to locate this user");
                 return;
             }
 
             // ensure the system users are left alone!
             if (Utilities.IsSystemUser(account.PrincipalID))
             {
-                MainConsole.Instance.Warn ("[USER ACCOUNT SERVICE]: Changing system users is not a good idea!");
+                MainConsole.Instance.Warn ("[User account service]: Changing system users is not a good idea!");
                 return;
             }
 
@@ -1438,9 +1466,9 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             account.Email = newEmail;
             bool success = StoreUserAccount(account);
             if (!success)
-                MainConsole.Instance.WarnFormat("[USER ACCOUNT SERVICE]: Unable to set Email for {0} {1}",firstName, lastName);
+                MainConsole.Instance.WarnFormat("[User account service]: Unable to set Email for {0} {1}",firstName, lastName);
             else
-                MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Email for {0} {1} set to {2}", firstName, lastName, account.Email);
+                MainConsole.Instance.InfoFormat("[User account service]: Email for {0} {1} set to {2}", firstName, lastName, account.Email);
 
         }
 
@@ -1461,12 +1489,12 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 fileName = cmdParams [2];
 
             int userNo = 0;
-            string FirstName;
-            string LastName;
-            string Password;
-            string Email;
-            string Rezday;
-            UUID UserUUID;
+            string firstName;
+            string lastName;
+            string password;
+            string email;
+            string rezday;
+            UUID userUUID;
 
             fileName = PathHelpers.VerifyReadFile(fileName,"csv", m_defaultDataPath + "/Updates");
             if(fileName == "")
@@ -1487,37 +1515,37 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                         continue;
                     }
 
-                    UserUUID = (UUID)userInfo [0];
-                    FirstName = userInfo [1];
-                    LastName = userInfo [2];
-                    Password = userInfo [3];
-                    Email = userInfo.Length < 6 ? userInfo [4] : "";
-                    Rezday = userInfo.Length == 6 ? userInfo [5] : "";
+                    userUUID = (UUID)userInfo [0];
+                    firstName = userInfo [1];
+                    lastName = userInfo [2];
+                    password = userInfo [3];
+                    email = userInfo.Length < 6 ? userInfo [4] : "";
+                    rezday = userInfo.Length == 6 ? userInfo [5] : "";
 
-                    string check = CreateUser (UserUUID, UUID.Zero, FirstName + " " + LastName, Util.Md5Hash(Password), Email);
+                    string check = CreateUser (userUUID, UUID.Zero, firstName + " " + lastName, Util.Md5Hash(password), email);
                     if (check != "")
                     {
                         MainConsole.Instance.ErrorFormat ("Couldn't create the user '{0} {1}'. Reason: {2}",
-                            FirstName, LastName, check);
+                            firstName, lastName, check);
                         continue;
                     }
 
                     //set user levels and status  (if needed)
-                    var account = GetUserAccount (null, UserUUID);
+                    var account = GetUserAccount (null, userUUID);
                     //account.UserLevel = 0;
                     account.UserFlags = Constants.USER_FLAG_RESIDENT;
                     StoreUserAccount (account);
                     
                     // [NEW] Set the users rezdate
-                    if ((Rezday != "") && (m_profileConnector != null))
+                    if ((rezday != "") && (m_profileConnector != null))
                     {
                     	IUserProfileInfo profile = m_profileConnector.GetUserProfile (account.PrincipalID);
-                    	profile.Created = int.Parse(Rezday);
+                    	profile.Created = int.Parse(rezday);
                     	bool success = m_profileConnector.UpdateUserProfile (profile);
                     	if (!success)
-                    		MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Unable to change rezday for {0} {1}.", account.FirstName, account.LastName);
+                    		MainConsole.Instance.InfoFormat("[User account service]: Unable to change rezday for {0} {1}.", account.FirstName, account.LastName);
                     	else
-                    		MainConsole.Instance.InfoFormat("[USER ACCOUNT SERVICE]: Account {0} {1} has a rezday set.", account.FirstName, account.LastName);
+                    		MainConsole.Instance.InfoFormat("[User account service]: Account {0} {1} has a rezday set.", account.FirstName, account.LastName);
                     }
 
                     userNo++;
@@ -1536,6 +1564,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
         protected void HandleSaveUsers(IScene scene, string[] cmdParams)
         {
             string fileName = "users.csv";
+            
             if (cmdParams.Length < 3)
             {
                 fileName = MainConsole.Instance.Prompt ("Please enter the user CSV file to save", fileName);
@@ -1552,32 +1581,150 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
     
             // good to go...
             var accounts = GetUserAccounts(null,"*");
-
-
-            //Add the user
-            FileStream stream = new FileStream(fileName, FileMode.Create);          // always start fresh
-            StreamWriter streamWriter = new StreamWriter(stream);
-            streamWriter.BaseStream.Position += streamWriter.BaseStream.Length;
-
-            foreach (UserAccount user in accounts)
+            if (accounts != null)                                                       // unlikely but you never know
             {
-                if (Utilities.IsSystemUser (user.PrincipalID))
-                    continue;
+                FileStream stream = new FileStream (fileName, FileMode.Create);         // always start fresh
+                StreamWriter streamWriter = new StreamWriter (stream);
+                try
+                {
+                    //Add the user
+
+                    streamWriter.BaseStream.Position += streamWriter.BaseStream.Length;
+
+                    foreach (UserAccount user in accounts)
+                    {
+                        if (Utilities.IsSystemUser (user.PrincipalID))
+                            continue;
   
-                // TODO: user accounts do not have a clear password so we need to save the salt and password hashes instead
-                // This will mean changes to the csv format
-                string LineToWrite = user.PrincipalID + "," + user.FirstName + "," + user.LastName + ",," + user.Email;
-                streamWriter.WriteLine (LineToWrite);
+                        // TODO: user accounts do not have a clear password so we need to save the salt and password hashes instead
+                        // This will mean changes to the csv format
+                        string LineToWrite = user.PrincipalID + "," + user.FirstName + "," + user.LastName + ",," + user.Email;
+                        streamWriter.WriteLine (LineToWrite);
 
-                userNo++;
+                        userNo++;
+                    }
+                    streamWriter.Flush ();
+                    streamWriter.Close ();
+
+                    MainConsole.Instance.InfoFormat ("File: {0} saved with {1} users", Path.GetFileName (fileName), userNo);
+                } catch
+                {
+                    if (streamWriter != null)
+                        streamWriter.Close ();
+                }
             }
-            streamWriter.Flush();
-            streamWriter.Close();
-
-            MainConsole.Instance.InfoFormat ("File: {0} saved with {1} users", Path.GetFileName(fileName), userNo);
-
         }
 
+		/// <summary>
+		/// Handles the load salted users command.
+		/// </summary>
+		/// <param name="scene">Scene.</param>
+		/// <param name="cmdParams">Cmdparams.</param>
+		protected void HandleLoadSaltedUsers(IScene scene, string[] cmdParams)
+		{
+			// This will need to read the file, divide it into 
+			//
+			// UserUUID;
+			// FirstName;
+			// LastName;
+			// Password;
+			// Email;
+			// Rezday;
+			// Salt
+			// Salted Password
+			//
+			// and then update both the auth and user_accounts tables so the user can be recognized
+            
+			string fileName = "users_salted.csv";
+			if (cmdParams.Length < 4) {
+				fileName = MainConsole.Instance.Prompt("Please enter the user CSV file to load", fileName);
+				if (fileName == "")
+					return;
+			} else
+				fileName = cmdParams[3];
+
+			int userNo = 0;
+            
+			// Define the fields we're gonna read
+			UUID userUUID;
+			string firstName;
+			string lastName;
+			string password;
+			string email;
+			string rezday;
+			string salt;
+			string saltedPassword;
+
+			fileName = PathHelpers.VerifyReadFile(fileName, "csv", m_defaultDataPath + "/Updates");
+			if (fileName == "") {
+				MainConsole.Instance.Error("The file " + fileName + " does not exist. Please check and retry");
+				return;
+			}            
+            
+			// good to go...
+			using (var rd = new StreamReader(fileName)) {
+				while (!rd.EndOfStream) {
+					var userInfo = rd.ReadLine().Split(',');
+					if (userInfo.Length < 7) {
+						MainConsole.Instance.Error("[User Load]: Insufficient details; Skipping " + userInfo);
+						continue;
+					}
+
+					userUUID = (UUID)userInfo[0];
+					firstName = userInfo[1];
+					lastName = userInfo[2];
+					password = userInfo[3];
+					email = userInfo.Length < 6 ? userInfo[4] : "";
+					rezday = userInfo.Length == 6 ? userInfo[5] : "";
+					salt = userInfo[6];
+					saltedPassword = userInfo[7];
+                    
+					/*
+                    string check = CreateSaltedUser (userUUID, UUID.Zero, firstName + " " + lastName, salt, saltedPassword, email);
+                    if (check != "")
+                    {
+                        MainConsole.Instance.ErrorFormat ("Couldn't create the user '{0} {1}'. Reason: {2}",
+                            FirstName, LastName, check);
+                        continue;
+                    }
+                    */
+                   
+					//set user levels and status  (if needed)
+					var account = GetUserAccount(null, userUUID);
+					//account.UserLevel = 0;
+					account.UserFlags = Constants.USER_FLAG_RESIDENT;
+					StoreUserAccount(account);
+                    
+					if ((rezday != "") && (m_profileConnector != null)) {
+						IUserProfileInfo profile = m_profileConnector.GetUserProfile(account.PrincipalID);
+						profile.Created = int.Parse(rezday);
+						bool success = m_profileConnector.UpdateUserProfile(profile);
+						if (!success)
+							MainConsole.Instance.InfoFormat("[User account service]: Unable to change rezday for {0} {1}.", account.FirstName, account.LastName);
+						else
+							MainConsole.Instance.InfoFormat("[User account service]: Account {0} {1} has a rezday set.", account.FirstName, account.LastName);
+					}
+					userNo++;
+				}
+				MainConsole.Instance.InfoFormat("File: {0} loaded,  {1} users added with salted passwords", Path.GetFileName(fileName), userNo);
+			}
+		}
+        
+        /// <summary>
+        /// Handles the save salted users command.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmdParams">Cmdparams.</param>
+        protected void HandleSaveSaltedUsers(IScene scene, string[] cmdParams)
+        {
+            // This is the query string that gets all the detailed information
+            //
+            // SELECT `PrincipalID`, `FirstName`,`LastName`, `Email`, auth.passwordHash, auth.passwordSalt 
+            // FROM user_accounts LEFT JOIN auth ON user_accounts.PrincipalID=auth.UUID
+            //
+            //string fileName = "users_salted.csv";
+        }
+        
         #if TEST_USERS
         protected void HandleTestUsers(IScene scene, string[] cmdParams)
         {
@@ -1598,17 +1745,17 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
 
             var startTime = DateTime.Now;
             int userNo = 0;
-            string FirstName = "Test";
-            string LastName = "User";
-            string Password = "none";
-            string Email = "none";
-            UUID UserUUID;
+            string firstName = "Test";
+            string lastName = "User";
+            string password = "none";
+            string email = "none";
+            UUID userUUID;
 
             for (userNo = 0; userNo < addUsers; userNo++)
             {
                 UserUUID = UUID.Random ();
 
-                string check = CreateUser (UserUUID, UUID.Zero, FirstName + " " + LastName+userNo, Util.Md5Hash(Password), Email);
+                string check = CreateUser (userUUID, UUID.Zero, firstName + " " + lastName+userNo, Util.Md5Hash(password), email);
                 if (check != "")
                 {
                     MainConsole.Instance.Error ("Couldn't create the user. Reason: " + check);
@@ -1616,7 +1763,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 }
 
                 //set user levels and status  (if needed)
-                var account = GetUserAccount (null, UserUUID);
+                var account = GetUserAccount (null, userUUID);
                 //account.UserLevel = 0;
                 account.UserFlags = Constants.USER_FLAG_RESIDENT;
                 StoreUserAccount (account);

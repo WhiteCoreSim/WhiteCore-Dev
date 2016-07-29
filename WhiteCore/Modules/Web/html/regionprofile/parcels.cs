@@ -25,44 +25,39 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.DatabaseInterfaces;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.Servers.HttpServer.Implementation;
-using WhiteCore.Framework.Services;
-using OpenMetaverse;
 using System.Collections.Generic;
 using System.IO;
+using OpenMetaverse;
+using WhiteCore.Framework.DatabaseInterfaces;
+using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
+using WhiteCore.Framework.Servers.HttpServer.Implementation;
+using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using GridRegion = WhiteCore.Framework.Services.GridRegion;
 using RegionFlags = WhiteCore.Framework.Services.RegionFlags;
 
 namespace WhiteCore.Modules.Web
 {
     public class RegionParcelsPage : IWebInterfacePage
     {
-        public string[] FilePath
-        {
-            get
-            {
-                return new[]
+        public string [] FilePath {
+            get {
+                return new []
                 {
                     "html/regionprofile/parcels.html"
                 };
             }
         }
 
-        public bool RequiresAuthentication
-        {
+        public bool RequiresAuthentication {
             get { return false; }
         }
 
-        public bool RequiresAdminAuthentication
-        {
+        public bool RequiresAdminAuthentication {
             get { return false; }
         }
 
-        public Dictionary<string, object> Fill(WebInterface webInterface, string filename, OSHttpRequest httpRequest,
+        public Dictionary<string, object> Fill (WebInterface webInterface, string filename, OSHttpRequest httpRequest,
                                                OSHttpResponse httpResponse, Dictionary<string, object> requestParameters,
                                                ITranslator translator, out string response)
         {
@@ -72,93 +67,105 @@ namespace WhiteCore.Modules.Web
             //    "setTimeout(function() {window.location.href = \"index.html\";}, 3000);" +
             //    "</script>";
             //return null;
-            
+
             response = null;
-            var vars = new Dictionary<string, object>();
-            if (httpRequest.Query.ContainsKey("regionid"))
-            {
+            var vars = new Dictionary<string, object> ();
+            if (httpRequest.Query.ContainsKey ("regionid")) {
                 var regionService = webInterface.Registry.RequestModuleInterface<IGridService> ();
-                var region = regionService.GetRegionByUUID(null, UUID.Parse(httpRequest.Query["regionid"].ToString()));
+                var region = regionService.GetRegionByUUID (null, UUID.Parse (httpRequest.Query ["regionid"].ToString ()));
 
-                IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector>();
-                EstateSettings estate = estateConnector.GetEstateSettings(region.RegionID);
+                IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
+                var ownerUUID = UUID.Zero;
+                string ownerName = "Unknown";
+                if (estateConnector != null) {
 
-                vars.Add("RegionName", region.RegionName);
-                vars.Add("OwnerUUID", estate.EstateOwner);
-                var estateOwnerAccount = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
-                    GetUserAccount(null, estate.EstateOwner);
-                vars.Add("OwnerName", estateOwnerAccount == null ? "No account found" : estateOwnerAccount.Name);
-                vars.Add("RegionLocX", region.RegionLocX/Constants.RegionSize);
-                vars.Add("RegionLocY", region.RegionLocY/Constants.RegionSize);
-                vars.Add("RegionSizeX", region.RegionSizeX);
-                vars.Add("RegionSizeY", region.RegionSizeY);
-                vars.Add("RegionType", region.RegionType);
-                vars.Add("RegionTerrain", region.RegionTerrain);
-                vars.Add("RegionOnline",
-                    (region.Flags & (int) RegionFlags.RegionOnline) ==
-                    (int) RegionFlags.RegionOnline
-                    ? translator.GetTranslatedString("Online")
-                    : translator.GetTranslatedString("Offline"));
+                    EstateSettings estate = estateConnector.GetEstateSettings (region.RegionID);
+                    if (estate != null) {
+                        ownerUUID = estate.EstateOwner;
+                        UserAccount estateOwnerAccount = null;
+                        var accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
+                        if (accountService != null)
+                            estateOwnerAccount = accountService.GetUserAccount (null, estate.EstateOwner);
+                        ownerName = estateOwnerAccount == null ? "No account found" : estateOwnerAccount.Name;
+                    }
+                } else {
+                    ownerUUID = UUID.Zero;
+                    ownerName = "Unknown";
+                }
+
+                vars.Add ("OwnerUUID", ownerUUID);
+                vars.Add ("OwnerName", ownerName);
+                vars.Add ("RegionName", region.RegionName);
+                vars.Add ("RegionLocX", region.RegionLocX / Constants.RegionSize);
+                vars.Add ("RegionLocY", region.RegionLocY / Constants.RegionSize);
+                vars.Add ("RegionSizeX", region.RegionSizeX);
+                vars.Add ("RegionSizeY", region.RegionSizeY);
+                vars.Add ("RegionType", region.RegionType);
+                vars.Add ("RegionTerrain", region.RegionTerrain);
+                vars.Add ("RegionOnline",
+                    (region.Flags & (int)RegionFlags.RegionOnline) ==
+                    (int)RegionFlags.RegionOnline
+                    ? translator.GetTranslatedString ("Online")
+                    : translator.GetTranslatedString ("Offline"));
 
                 IDirectoryServiceConnector directoryConnector =
-                    Framework.Utilities.DataManager.RequestPlugin<IDirectoryServiceConnector>();
-                if (directoryConnector != null)
-                {
-                    List<LandData> data = directoryConnector.GetParcelsByRegion(0, 10, region.RegionID, UUID.Zero,
+                    Framework.Utilities.DataManager.RequestPlugin<IDirectoryServiceConnector> ();
+                if (directoryConnector != null) {
+                    IUserAccountService accountService =
+                        webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
+                    List<LandData> data = directoryConnector.GetParcelsByRegion (0, 10, region.RegionID, UUID.Zero,
                         ParcelFlags.None, ParcelCategory.Any);
-                    List<Dictionary<string, object>> parcels = new List<Dictionary<string, object>>();
+                    List<Dictionary<string, object>> parcels = new List<Dictionary<string, object>> ();
                     string url = "../images/icons/no_parcel.jpg";
 
-                    foreach (var p in data)
-                    {
-                        Dictionary<string, object> parcel = new Dictionary<string, object>();
-                        parcel.Add("ParcelNameText", translator.GetTranslatedString("ParcelNameText"));
-                        parcel.Add("ParcelOwnerText", translator.GetTranslatedString("ParcelOwnerText"));
-                        parcel.Add("ParcelUUID", p.GlobalID);
-                        parcel.Add("ParcelName", p.Name);
-                        parcel.Add("ParcelOwnerUUID", p.OwnerID);
-                        parcel.Add ("ParcelSnapshotURL", url);
-                        IUserAccountService accountService =
-                            webInterface.Registry.RequestModuleInterface<IUserAccountService>();
-                        if (accountService != null)
-                        {
-                            var account = accountService.GetUserAccount(null, p.OwnerID);
-                            if (account == null)
-                                parcel.Add("ParcelOwnerName", translator.GetTranslatedString("NoAccountFound"));
-                            else
-                                parcel.Add("ParcelOwnerName", account.Name);
+                    if (data != null) {
+                        foreach (var p in data) {
+                            Dictionary<string, object> parcel = new Dictionary<string, object> ();
+                            parcel.Add ("ParcelNameText", translator.GetTranslatedString ("ParcelNameText"));
+                            parcel.Add ("ParcelOwnerText", translator.GetTranslatedString ("ParcelOwnerText"));
+                            parcel.Add ("ParcelUUID", p.GlobalID);
+                            parcel.Add ("ParcelName", p.Name);
+                            parcel.Add ("ParcelOwnerUUID", p.OwnerID);
+                            parcel.Add ("ParcelSnapshotURL", url);
+                            if (accountService != null) {
+                                var account = accountService.GetUserAccount (null, p.OwnerID);
+                                if (account != null)
+                                    parcel.Add ("ParcelOwnerName", account.Name);
+                                else
+                                    parcel.Add ("ParcelOwnerName", translator.GetTranslatedString ("NoAccountFound"));
+                            }
+                            parcels.Add (parcel);
                         }
-                        parcels.Add(parcel);
                     }
-                    vars.Add("ParcelInRegion", parcels);
-                    vars.Add("NumberOfParcelsInRegion", parcels.Count);
+                    vars.Add ("ParcelInRegion", parcels);
+                    vars.Add ("NumberOfParcelsInRegion", parcels.Count);
                 }
                 IWebHttpTextureService webTextureService = webInterface.Registry.
-                    RequestModuleInterface<IWebHttpTextureService>();
+                    RequestModuleInterface<IWebHttpTextureService> ();
                 if (webTextureService != null && region.TerrainMapImage != UUID.Zero)
-                    vars.Add("RegionImageURL", webTextureService.GetTextureURL(region.TerrainMapImage));
+                    vars.Add ("RegionImageURL", webTextureService.GetTextureURL (region.TerrainMapImage));
                 else
-                    vars.Add("RegionImageURL", "../images/icons/no_terrain.jpg");
+                    vars.Add ("RegionImageURL", "../images/icons/no_terrain.jpg");
 
-             /*   // Regionprofile Menus
-                vars.Add("MenuRegionTitle", translator.GetTranslatedString("MenuRegionTitle"));
-                vars.Add("TooltipsMenuRegion", translator.GetTranslatedString("TooltipsMenuRegion"));
-                vars.Add("MenuParcelTitle", translator.GetTranslatedString("MenuParcelTitle"));
-                vars.Add("TooltipsMenuParcel", translator.GetTranslatedString("TooltipsMenuParcel"));
-                vars.Add("MenuOwnerTitle", translator.GetTranslatedString("MenuOwnerTitle"));
-                vars.Add("TooltipsMenuOwner", translator.GetTranslatedString("TooltipsMenuOwner"));
-                */
-                vars.Add("RegionInformationText", translator.GetTranslatedString("RegionInformationText"));
-                vars.Add("OwnerNameText", translator.GetTranslatedString("OwnerNameText"));
-                vars.Add("RegionLocationText", translator.GetTranslatedString("RegionLocationText"));
-                vars.Add("RegionSizeText", translator.GetTranslatedString("RegionSizeText"));
-                vars.Add("RegionNameText", translator.GetTranslatedString("RegionNameText"));
-                vars.Add("RegionTypeText", translator.GetTranslatedString("RegionTypeText"));
-                vars.Add("RegionTerrainText", translator.GetTranslatedString("RegionTerrainText"));
-                vars.Add("RegionInfoText", translator.GetTranslatedString("RegionInfoText"));
-                vars.Add("RegionOnlineText", translator.GetTranslatedString("RegionOnlineText"));
-                vars.Add("NumberOfUsersInRegionText", translator.GetTranslatedString("NumberOfUsersInRegionText"));
-                vars.Add("ParcelsInRegionText", translator.GetTranslatedString("ParcelsInRegionText"));
+                /*   // Regionprofile Menus
+                   vars.Add("MenuRegionTitle", translator.GetTranslatedString("MenuRegionTitle"));
+                   vars.Add("TooltipsMenuRegion", translator.GetTranslatedString("TooltipsMenuRegion"));
+                   vars.Add("MenuParcelTitle", translator.GetTranslatedString("MenuParcelTitle"));
+                   vars.Add("TooltipsMenuParcel", translator.GetTranslatedString("TooltipsMenuParcel"));
+                   vars.Add("MenuOwnerTitle", translator.GetTranslatedString("MenuOwnerTitle"));
+                   vars.Add("TooltipsMenuOwner", translator.GetTranslatedString("TooltipsMenuOwner"));
+                   */
+                vars.Add ("RegionInformationText", translator.GetTranslatedString ("RegionInformationText"));
+                vars.Add ("OwnerNameText", translator.GetTranslatedString ("OwnerNameText"));
+                vars.Add ("RegionLocationText", translator.GetTranslatedString ("RegionLocationText"));
+                vars.Add ("RegionSizeText", translator.GetTranslatedString ("RegionSizeText"));
+                vars.Add ("RegionNameText", translator.GetTranslatedString ("RegionNameText"));
+                vars.Add ("RegionTypeText", translator.GetTranslatedString ("RegionTypeText"));
+                vars.Add ("RegionTerrainText", translator.GetTranslatedString ("RegionTerrainText"));
+                vars.Add ("RegionInfoText", translator.GetTranslatedString ("RegionInfoText"));
+                vars.Add ("RegionOnlineText", translator.GetTranslatedString ("RegionOnlineText"));
+                vars.Add ("NumberOfUsersInRegionText", translator.GetTranslatedString ("NumberOfUsersInRegionText"));
+                vars.Add ("ParcelsInRegionText", translator.GetTranslatedString ("ParcelsInRegionText"));
                 vars.Add ("MainServerURL", webInterface.GridURL);
 
             }
@@ -167,10 +174,10 @@ namespace WhiteCore.Modules.Web
 
         }
 
-        public bool AttemptFindPage(string filename, ref OSHttpResponse httpResponse, out string text)
+        public bool AttemptFindPage (string filename, ref OSHttpResponse httpResponse, out string text)
         {
             httpResponse.ContentType = "text/html";
-            text = File.ReadAllText("html/regionprofile/parcels.html");
+            text = File.ReadAllText ("html/regionprofile/parcels.html");
             return true;
         }
     }

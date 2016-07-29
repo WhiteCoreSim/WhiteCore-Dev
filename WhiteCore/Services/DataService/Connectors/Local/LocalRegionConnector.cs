@@ -26,20 +26,19 @@
  */
 
 using System.Collections.Generic;
-
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
 
 namespace WhiteCore.Services.DataService
 {
     public class LocalRegionConnector : ConnectorBase, IRegionConnector
     {
-        private IGenericData GD;
+        IGenericData GD;
 
         #region IRegionConnector Members
 
@@ -77,9 +76,10 @@ namespace WhiteCore.Services.DataService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public void AddTelehub(Telehub telehub, ulong regionhandle)
         {
-            object remoteValue = DoRemote(telehub, regionhandle);
-            if (remoteValue != null || m_doRemoteOnly)
+            if (m_doRemoteOnly) {
+                DoRemote (telehub, regionhandle);
                 return;
+            }
 
             //Look for a telehub first.
             if (FindTelehub(new UUID(telehub.RegionID), 0) != null)
@@ -130,9 +130,10 @@ namespace WhiteCore.Services.DataService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public void RemoveTelehub(UUID regionID, ulong regionHandle)
         {
-            object remoteValue = DoRemote(regionID, regionHandle);
-            if (remoteValue != null || m_doRemoteOnly)
+            if (m_doRemoteOnly) {
+                DoRemote (regionID, regionHandle);
                 return;
+            }
 
             //Look for a telehub first.
             // Why? ~ SignpostMarv
@@ -153,9 +154,10 @@ namespace WhiteCore.Services.DataService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public Telehub FindTelehub(UUID regionID, ulong regionHandle)
         {
-            object remoteValue = DoRemote(regionID, regionHandle);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (Telehub) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (regionID, regionHandle);
+                return remoteValue != null ? (Telehub)remoteValue : null;
+            }
 
             QueryFilter filter = new QueryFilter();
             filter.andFilters["RegionID"] = regionID;

@@ -19,7 +19,7 @@
 <div id="info_message" class="info"></div>
 <table id="settings_manager">
   <caption></caption>
-  
+
   <thead>
     <tr>
       <th class="settings_manager_left"></th>
@@ -42,11 +42,25 @@
       <td class="settings_manager_right"><input name="Gridnick" type="text" id="Gridnick" size="119" value="{Gridnick}" /></td>
     </tr>
     <tr>
-      <td class="settings_manager_left"><p>{SystemEstateOwnerText}</p></td>
-      <td class="settings_manager_right"><input name="SystemEstateOwnerName" type="text" id="SystemEstateOwnerName" size="119" value="{SystemEstateOwnerName}" /></td>
+      <td class="settings_manager_left"><p>{GovernorNameText}</p></td>
+      <td class="settings_manager_right"><input name="GovernorName" type="text" id="GovernorName" size="119" value="{GovernorName}" /></td>
+      <td class="settings_manager_left"><p>{MainlandEstateNameText}</p></td>
+      <td class="settings_manager_right"><input name="MainlandEstateName" type="text" id="MainlandEstateName" size="119" value="{MainlandEstateName}" /></td>
+    </tr>
+    <tr>
+      <td class="settings_manager_left"><p>{RealEstateOwnerNameText}</p></td>
+      <td class="settings_manager_right"><input name="RealEstateOwnerName" type="text" id="RealEstateOwnerName" size="119" value="{RealEstateOwnerName}" /></td>
       <td class="settings_manager_left"><p>{SystemEstateNameText}</p></td>
       <td class="settings_manager_right"><input name="SystemEstateName" type="text" id="SystemEstateName" size="119" value="{SystemEstateName}" /></td>
     </tr>
+
+    <tr>
+      <td class="settings_manager_left"><p>{BankerNameText}</p></td>
+      <td class="settings_manager_right"><input name="BankerName" type="text" id="BankerName" size="119" value="{BankerName}" /></td>
+      <td class="settings_manager_left"><p>{MarketPlaceOwnerNameText}</p></td>
+      <td class="settings_manager_right"><input name="MarketplaceOwnerName" type="text" id="MarketplaceOwnerName" size="119" value="{MarketplaceOwnerName}" /></td>
+    </tr>
+
     <tr>
       <td class="settings_manager_left"><p>{WelcomeMessageText}</p></td>
       <td class="settings_manager_right"><input name="WelcomeMessage" type="text" id="WelcomeMessage" size="119" value="{WelcomeMessage}" /></td>
@@ -57,25 +71,26 @@
     <td></td>
     <td></td>
     <td></td>
-	  <input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
+    <input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
       <td class="settings_manager_right"><button id="Submit" type="Submit" name="Submit" style="width:100px;">{Save}</button></td>
     </tr>
   </tbody>
 </table>
 </form>
+
 <script>
   /* attach a submit handler to the form */
   $("#gridsettings_manager_form").submit(function(event) {
 
     /* stop form from submitting normally */
-    event.preventDefault(); 
+    event.preventDefault();
     /* get some values from elements on the page: */
     var $form = $( this ),
         url = $form.attr( 'action' );
     /* Send the data using post and put the results in a div */
     $.post( url, $form.serialize(),
       function( data ) {
-		$("#info_message").empty().append("<p>" + data + "</p>");
+    $("#info_message").empty().append("<p>" + data + "</p>");
       }
     );
   });

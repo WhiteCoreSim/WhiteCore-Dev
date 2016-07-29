@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org
+ * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org/, http://opensimulator.org/
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -1032,11 +1032,11 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
 
             #region deflection
             //rotates body to direction of movement (linearMovement vector)
-			/* temporary disabled due to instabilities, needs to be rewritten
+			// temporary disabled due to instabilities, needs to be rewritten
             if(m_angularDeflectionTimescale < 300)
             {
                 float Dservo = 0.05f * m_angularDeflectionTimescale * m_angularDeflectionEfficiency;
-                float mag = (float)linearVelocity.LengthSquared();
+                float mag = linearVelocity.LengthSquared();
                 if(mag > 0.01f) {
                     linearVelocity.Y = -linearVelocity.Y;
                     linearVelocity *= rotq;
@@ -1052,7 +1052,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                     deflection *= Dservo;
                 }
             }
-			*/
+			//
             #endregion
 
             #region banking

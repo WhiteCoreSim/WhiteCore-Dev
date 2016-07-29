@@ -25,16 +25,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System.Collections.Generic;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using WhiteCore.Framework.SceneInfo;
-using OpenMetaverse;
-using System.Collections.Generic;
-using System.IO;
-using GridRegion = WhiteCore.Framework.Services.GridRegion;
+//using GridRegion = WhiteCore.Framework.Services.GridRegion;
 using RegionFlags = WhiteCore.Framework.Services.RegionFlags;
 
 
@@ -137,7 +137,7 @@ namespace WhiteCore.Modules.Web
                 newRegion.Startup = StartupType.Normal;
 
                 var regionPreset = RegionPresetType.ToLower ();
-                if (regionPreset.StartsWith ("c"))
+                if (regionPreset.StartsWith ("c", System.StringComparison.Ordinal))
                 {
                     newRegion.RegionPort = int.Parse( requestParameters["RegionPort"].ToString() );
                     newRegion.SeeIntoThisSimFromNeighbor = (requestParameters["RegionVisibility"].ToString().ToLower() == "yes");
@@ -145,11 +145,11 @@ namespace WhiteCore.Modules.Web
                     newRegion.ObjectCapacity = int.Parse( requestParameters["RegionCapacity"].ToString() );
 
                     string delayStartup = requestParameters["RegionDelayStartup"].ToString();
-                    newRegion.Startup = delayStartup.StartsWith ("n") ? StartupType.Normal : StartupType.Medium;
+                    newRegion.Startup = delayStartup.StartsWith ("n", System.StringComparison.Ordinal) ? StartupType.Normal : StartupType.Medium;
 
                 }
 
-                if (regionPreset.StartsWith("w"))
+                if (regionPreset.StartsWith ("w", System.StringComparison.Ordinal))
                 {
                     // 'standard' setup
                     newRegion.RegionType = newRegion.RegionType + "Whitecore";                   
@@ -163,12 +163,12 @@ namespace WhiteCore.Modules.Web
  
 
                 }
-                if (regionPreset.StartsWith("o"))       
+                if (regionPreset.StartsWith ("o", System.StringComparison.Ordinal))       
                 {
                     // 'Openspace' setup
                     newRegion.RegionType = newRegion.RegionType + "Openspace";                   
                     //newRegion.RegionPort;            // use auto assigned port
-                    if (RegionTerrain.StartsWith("a"))
+                    if (RegionTerrain.StartsWith ("a", System.StringComparison.Ordinal))
                         newRegion.RegionTerrain = "Aquatic";
                     else
                         newRegion.RegionTerrain = "Grassland";
@@ -180,7 +180,7 @@ namespace WhiteCore.Modules.Web
                     newRegion.RegionSettings.AllowLandJoinDivide = false;
                     newRegion.RegionSettings.AllowLandResell = false;
                 }
-                if (regionPreset.StartsWith("h"))       
+                if (regionPreset.StartsWith ("h", System.StringComparison.Ordinal))       
                 {
                     // 'Homestead' setup
                     newRegion.RegionType = newRegion.RegionType + "Homestead";                   
@@ -195,7 +195,7 @@ namespace WhiteCore.Modules.Web
                     newRegion.RegionSettings.AllowLandResell = false;
                 }
 
-                if (regionPreset.StartsWith("f"))       
+                if (regionPreset.StartsWith ("f", System.StringComparison.Ordinal))       
                 {
                     // 'Full Region' setup
                     newRegion.RegionType = newRegion.RegionType + "Full Region";                   
@@ -206,7 +206,7 @@ namespace WhiteCore.Modules.Web
                     newRegion.InfiniteRegion = false;
                     newRegion.ObjectCapacity = 15000;
                     newRegion.RegionSettings.AgentLimit = 100;
-                    if (newRegion.RegionType.StartsWith ("M"))                           // defaults are 'true'
+                    if (newRegion.RegionType.StartsWith ("M", System.StringComparison.Ordinal))                           // defaults are 'true'
                     {
                         newRegion.RegionSettings.AllowLandJoinDivide = false;
                         newRegion.RegionSettings.AllowLandResell = false;
@@ -219,27 +219,26 @@ namespace WhiteCore.Modules.Web
                     newRegion.RegionTerrain = "Custom";
                 }
 
-                /* Disabled as this is a worl=k in progress and will break with the current scenemanager (Dec 5 - greythane-
+                // Disabled as this is a work in progress and will break with the current scenemanager (Dec 5 - greythane-
                 // TODO: !!! Assumes everything is local for now !!!               
                 ISceneManager scenemanager = webInterface.Registry.RequestModuleInterface<ISceneManager> ();
                 if (scenemanager.CreateRegion(newRegion))
                 {   
                     IGridRegisterModule gridRegister = webInterface.Registry.RequestModuleInterface<IGridRegisterModule>();
-                    if( gridRegister.RegisterRegionWithGrid(null, true, false, null)) 
-                    {
- 
-                        response = "<h3>Successfully created region, redirecting to main page</h3>" +
-                            "<script language=\"javascript\">" +
-                            "setTimeout(function() {window.location.href = \"index.html\";}, 3000);" +
-                            "</script>";
-                    }
-                    else
-//                        response = "<h3>" + error + "</h3>";
-                            response = "<h3> Error registering region with grid</h3>";
-                }
-                else
-*/
-                response = "<h3>Error creating this region.</h3>";
+                    if (gridRegister != null) {
+                        if (gridRegister.RegisterRegionWithGrid (null, true, false, null)) {
+
+                            response = "<h3>Successfully created region, redirecting to main page</h3>" +
+                                "<script language=\"javascript\">" +
+                                "setTimeout(function() {window.location.href = \"index.html\";}, 3000);" +
+                                "</script>";
+                        }
+                    } 
+
+                    //                        response = "<h3>" + error + "</h3>";
+                    response = "<h3> Error registering region with grid</h3>";
+                } else
+                    response = "<h3>Error creating this region.</h3>";
                 return null;
             }
 
@@ -248,15 +247,24 @@ namespace WhiteCore.Modules.Web
             {
                 var region = gridService.GetRegionByUUID (null, UUID.Parse (httpRequest.Query ["regionid"].ToString ()));
 
-                IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
-                EstateSettings estate = estateConnector.GetEstateSettings (region.RegionID);
-
                 vars.Add ("RegionName", region.RegionName);
-                vars.Add ("OwnerUUID", estate.EstateOwner);
 
-                var estateOwnerAccount = webInterface.Registry.RequestModuleInterface<IUserAccountService> ().
-                    GetUserAccount (null, estate.EstateOwner);
-                vars.Add ("OwnerName", estateOwnerAccount == null ? "No account found" : estateOwnerAccount.Name);
+                UserAccount estateOwnerAccount = null; 
+                var estateOwner = UUID.Zero;
+
+                IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
+                if (estateConnector != null) {
+                    EstateSettings estate = estateConnector.GetEstateSettings (region.RegionID);
+                    if (estate != null)
+                        estateOwner = estate.EstateOwner;
+
+                    var accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
+                    if (accountService != null)
+                        estateOwnerAccount = accountService.GetUserAccount (null, estate.EstateOwner);
+                }
+                vars.Add ("OwnerUUID", estateOwner);
+                vars.Add ("OwnerName", estateOwnerAccount != null ? estateOwnerAccount.Name : "No account found");
+
                 vars.Add ("RegionLocX", region.RegionLocX / Constants.RegionSize);
                 vars.Add ("RegionLocY", region.RegionLocY / Constants.RegionSize);
                 vars.Add ("RegionSizeX", region.RegionSizeX);
@@ -264,10 +272,9 @@ namespace WhiteCore.Modules.Web
                 vars.Add ("RegionType", region.RegionType);
                 vars.Add ("RegionTerrain", region.RegionTerrain);
                 vars.Add ("RegionOnline",
-                    (region.Flags & (int)RegionFlags.RegionOnline) ==
-                    (int)RegionFlags.RegionOnline
-                    ? translator.GetTranslatedString ("Online")
-                    : translator.GetTranslatedString ("Offline"));
+                    (region.Flags & (int)RegionFlags.RegionOnline) == (int)RegionFlags.RegionOnline
+                          ? translator.GetTranslatedString ("Online")
+                          : translator.GetTranslatedString ("Offline"));
 
                 IWebHttpTextureService webTextureService = webInterface.Registry.
                     RequestModuleInterface<IWebHttpTextureService> ();
@@ -280,31 +287,33 @@ namespace WhiteCore.Modules.Web
             {
                 // default values
 
-                // check for user name seed
+                // check for user region name  seed
                 string[] m_regionNameSeed = null;
-                /*IConfig regionConfig =
-                    webInterface.Registry.RequestModuleInterface<ISimulationBase>().ConfigSource.Configs["LoginService"];
+                IConfig regionConfig =
+                    webInterface.Registry.RequestModuleInterface<ISimulationBase>().ConfigSource.Configs["FileBasedSimulationData"];
 
-                 if (loginServerConfig != null)
+                 if (regionConfig != null)
                 {
-                    string userNameSeed = loginServerConfig.GetString ("UserNameSeed", "");
-                    if (userNameSeed != "")
-                        m_userNameSeed = userNameSeed.Split (',');
+                    string regionNameSeed = regionConfig.GetString ("RegionNameSeed", "");
+                    if (regionNameSeed != "")
+                        m_regionNameSeed = regionNameSeed.Split (',');
                 }
-*/
-                Utilities.MarkovNameGenerator rNames = new Utilities.MarkovNameGenerator();
+
+                var rNames = new Utilities.MarkovNameGenerator();
                 string regionName = rNames.FirstName (m_regionNameSeed == null ? Utilities.RegionNames: m_regionNameSeed, 3,7);
                 vars.Add ("RegionName", regionName);
 
-                //var scenemanager = webInterface.Registry.RequestModuleInterface<ISceneManager> ();
+                var scenemanager = webInterface.Registry.RequestModuleInterface<ISceneManager> ();
                 var gconnector = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector>();
                 var settings = gconnector.GetGeneric<WebUISettings>(UUID.Zero, "WebUISettings", "Settings");
-
+                if (settings == null)
+                    settings = new WebUISettings ();
+                
                 // get some current details
                 //List<GridRegion> regions = gridService.GetRegionsByName(null, "", null,null);
 
-//                var currentInfo = scenemanager.FindCurrentRegionInfo ();
-                Dictionary<string, int> currentInfo = null;
+                var currentInfo = scenemanager.FindCurrentRegionInfo ();
+                //Dictionary<string, int> currentInfo = null;
                 if (currentInfo != null)
                 {
                     vars.Add ("RegionLocX", currentInfo ["minX"] > 0 ? currentInfo ["minX"] : settings.MapCenter.X);

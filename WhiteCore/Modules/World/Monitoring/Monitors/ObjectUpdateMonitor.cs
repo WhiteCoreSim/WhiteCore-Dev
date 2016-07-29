@@ -34,20 +34,23 @@ namespace WhiteCore.Modules.Monitoring.Monitors
     public class ObjectUpdateMonitor : IObjectUpdateMonitor
     {
         #region Declares
+        readonly object _primLock = new object ();
 
-        private float LastPrimsLimited;
-        private volatile float primsLimited;
+        float LastPrimsLimited;
+        volatile float primsLimited;
 
-        public float PrimsLimited
-        {
-            get { return LastPrimsLimited; }
+        public float PrimsLimited {
+            get {
+                lock (_primLock)
+                    return LastPrimsLimited;
+            }
         }
 
         #endregion
 
         #region Constructor
 
-        public ObjectUpdateMonitor(IScene scene)
+        public ObjectUpdateMonitor (IScene scene)
         {
         }
 
@@ -55,24 +58,25 @@ namespace WhiteCore.Modules.Monitoring.Monitors
 
         #region Implementation of IMonitor
 
-        public double GetValue()
+        public double GetValue ()
         {
-            return LastPrimsLimited/10;
+            lock (_primLock)
+                return LastPrimsLimited / 10;
         }
 
-        public string GetName()
+        public string GetName ()
         {
             return "PrimUpdates";
         }
 
-        public string GetInterfaceName()
+        public string GetInterfaceName ()
         {
             return "IObjectUpdateMonitor";
         }
 
-        public string GetFriendlyValue()
+        public string GetFriendlyValue ()
         {
-            return GetValue() + " prim updates limited/second";
+            return GetValue () + " prim updates limited/second";
         }
 
         #endregion
@@ -81,19 +85,22 @@ namespace WhiteCore.Modules.Monitoring.Monitors
 
         #region IMonitor Members
 
-        public void ResetStats()
+        public void ResetStats ()
         {
-            LastPrimsLimited = primsLimited;
-            primsLimited = 0;
+            lock (_primLock) {
+                LastPrimsLimited = primsLimited;
+                primsLimited = 0;
+            }
         }
 
         #endregion
 
         #region IObjectUpdateMonitor Members
 
-        public void AddLimitedPrims(int prims)
+        public void AddLimitedPrims (int prims)
         {
-            primsLimited += prims;
+            lock (_primLock)
+                primsLimited += prims;
         }
 
         #endregion

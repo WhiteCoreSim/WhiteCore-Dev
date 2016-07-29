@@ -44,7 +44,7 @@ namespace WhiteCore.FileBasedServices.AssetService
 
         protected bool doDatabaseCaching;
         protected string m_connectionPassword;
-        protected bool m_doConversion;
+        protected bool m_migrateSQL;
         protected IAssetDataPlugin m_assetService;
         protected string m_assetsDirectory = "";
         protected bool m_enabled;
@@ -67,21 +67,24 @@ namespace WhiteCore.FileBasedServices.AssetService
             Configure (config, registry);
             Init (registry, Name, serverPath: "/asset/", serverHandlerName: "AssetServerURI");
 
+            // set defaults
+            var simbase = registry.RequestModuleInterface<ISimulationBase> ();
+            var defpath = simbase.DefaultDataPath;
+            m_assetsDirectory = Path.Combine (defpath, Constants.DEFAULT_FILEASSETS_DIR);
+            m_migrateSQL = true;
+
             IConfig fileConfig = config.Configs ["FileBasedAssetService"];
             if (fileConfig != null)
             {
-                var assetFolderPath = fileConfig.GetString ("AssetFolderPath", m_assetsDirectory);
-                if (assetFolderPath == "")
-                {
-                    var defpath = registry.RequestModuleInterface<ISimulationBase> ().DefaultDataPath;
-                    assetFolderPath = Path.Combine (defpath, Constants.DEFAULT_FILEASSETS_DIR);
-                }
-                SetUpFileBase (assetFolderPath);
-            }
+                var assetsPath = fileConfig.GetString ("AssetFolderPath", m_assetsDirectory);
+                if (assetsPath != "")
+                    m_assetsDirectory = assetsPath;
 
-            IConfig assetConfig = config.Configs ["AssetService"];
-            if (assetConfig != null)
-                m_doConversion = assetConfig.GetBoolean ("DoConversion", true);
+                // try and migrate sql assets if they are missing?
+                m_migrateSQL = fileConfig.GetBoolean ("MigrateSQLAssets", true);
+            }
+            SetUpFileBase (m_assetsDirectory);
+
         }
 
         public virtual void Configure (IConfigSource config, IRegistryCore registry)
@@ -117,13 +120,13 @@ namespace WhiteCore.FileBasedServices.AssetService
                     HandleGetAsset, false, true);
 
             }
-            MainConsole.Instance.Info ("[FILE ASSET SERVICE]: File based asset service enabled");
+            MainConsole.Instance.Info ("[Filebased asset service]: File based asset service enabled");
 
         }
 
         public virtual void Start (IConfigSource config, IRegistryCore registry)
         {
-            if (m_doConversion)
+            if (m_migrateSQL)
                 m_assetService = Framework.Utilities.DataManager.RequestPlugin<IAssetDataPlugin> ();
         }
 
@@ -161,12 +164,14 @@ namespace WhiteCore.FileBasedServices.AssetService
                     return cachedAsset;
             }
 
-            object remoteValue = DoRemoteByURL ("AssetServerURI", id, showWarnings);
-            if (remoteValue != null || m_doRemoteOnly)
-            {
-                if (doDatabaseCaching && cache != null)
-                    cache.Cache (id, (AssetBase)remoteValue);
-                return (AssetBase)remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("AssetServerURI", id, showWarnings);
+                if (remoteValue != null) {
+                    if (doDatabaseCaching && cache != null)
+                        cache.Cache (id, (AssetBase)remoteValue);
+                    return (AssetBase)remoteValue;
+                }
+                return null;
             }
 
             AssetBase asset = FileGetAsset (id);
@@ -200,40 +205,48 @@ namespace WhiteCore.FileBasedServices.AssetService
                     return cachedAsset;
             }
 
-            object remoteValue = DoRemoteByURL ("AssetServerURI", id);
-            if (remoteValue != null || m_doRemoteOnly)
-            {
-                byte[] data = (byte[])remoteValue;
-                if (doDatabaseCaching && cache != null && data != null)
-                    cache.CacheData (id, data);
-                return data;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("AssetServerURI", id);
+                if (remoteValue != null) {
+                    byte [] data = (byte [])remoteValue;
+                    if (doDatabaseCaching && cache != null && data != null)
+                        cache.CacheData (id, data);
+                    return data;
+                }
+                return null;
             }
 
             AssetBase asset = FileGetAsset (id);
             if (doDatabaseCaching && cache != null)
                 cache.Cache (id, asset);
-            if (asset != null)
-                return asset.Data;
+            if (asset == null)
+                return null;
+
             // see assetservice.GetData  byte[0] != null            return new byte[0];
-            return null;
+            var assetData = new byte [asset.Data.Length];
+            asset.Data.CopyTo (assetData, 0);
+            asset.Dispose ();
+            return assetData;
         }
 
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
         public virtual bool GetExists (string id)
         {
-            object remoteValue = DoRemoteByURL ("AssetServerURI", id);
-            if (remoteValue != null || m_doRemoteOnly)
-                return remoteValue == null ? false : (bool)remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("AssetServerURI", id);
+                return remoteValue != null ? (bool)remoteValue : false;
+            }
 
             return FileExistsAsset (id);
         }
 
-        public virtual void Get (String id, Object sender, AssetRetrieved handler)
+        public virtual void Get (string id, object sender, AssetRetrieved handler)
         {
-            Util.FireAndForget ((o) =>
-            {
-                handler (id, sender, Get (id));
-            });
+            var asset = Get (id);
+            if (asset != null) {
+                Util.FireAndForget ((o) => {handler (id, sender, asset);});
+                //asset.Dispose ();
+            }
         }
 
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
@@ -242,9 +255,8 @@ namespace WhiteCore.FileBasedServices.AssetService
             if (asset == null)
                 return UUID.Zero;
 
-            object remoteValue = DoRemoteByURL ("AssetServerURI", asset);
-            if (remoteValue != null || m_doRemoteOnly)
-            {
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("AssetServerURI", asset);
                 if (remoteValue == null)
                     return UUID.Zero;
                 asset.ID = (UUID)remoteValue;
@@ -258,15 +270,16 @@ namespace WhiteCore.FileBasedServices.AssetService
                 cache.Cache (asset.ID.ToString (), asset);
             }
 
-            return asset != null ? asset.ID : UUID.Zero;
+            return asset.ID;
         }
 
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
         public virtual UUID UpdateContent (UUID id, byte[] data)
         {
-            object remoteValue = DoRemoteByURL ("AssetServerURI", id, data);
-            if (remoteValue != null || m_doRemoteOnly)
-                return remoteValue == null ? UUID.Zero : (UUID)remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("AssetServerURI", id, data);
+                return remoteValue != null ? (UUID)remoteValue : UUID.Zero;
+            }
 
             AssetBase asset = FileGetAsset (id.ToString ());
             if (asset == null)
@@ -274,6 +287,8 @@ namespace WhiteCore.FileBasedServices.AssetService
             UUID newID = asset.ID = UUID.Random ();
             asset.Data = data;
             bool success = FileSetAsset (asset);
+            asset.Dispose ();
+
             if (!success)
                 return UUID.Zero; //We weren't able to update the asset
             return newID;
@@ -282,9 +297,10 @@ namespace WhiteCore.FileBasedServices.AssetService
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
         public virtual bool Delete (UUID id)
         {
-            object remoteValue = DoRemoteByURL ("AssetServerURI", id);
-            if (remoteValue != null || m_doRemoteOnly)
-                return remoteValue == null ? false : (bool)remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("AssetServerURI", id);
+                return remoteValue != null ? (bool)remoteValue : false;
+            }
 
             FileDeleteAsset (id.ToString ());
             return true;
@@ -295,12 +311,14 @@ namespace WhiteCore.FileBasedServices.AssetService
         void SetUpFileBase (string path)
         {
             m_assetsDirectory = path;
+
             if (!Directory.Exists (m_assetsDirectory))
                 Directory.CreateDirectory (m_assetsDirectory);
+
             if (!Directory.Exists (Path.Combine (m_assetsDirectory, "data")))
                 Directory.CreateDirectory (Path.Combine (m_assetsDirectory, "data"));
 
-            MainConsole.Instance.InfoFormat ("[FILE BASED ASSET SERVICE]: Set up File Based Assets in {0}.",
+            MainConsole.Instance.InfoFormat ("[Filebased asset service]: Set up Filebased Assets in {0}.",
                 m_assetsDirectory);
         }
 
@@ -362,7 +380,7 @@ namespace WhiteCore.FileBasedServices.AssetService
                 }
             } catch (Exception ex)
             {
-                MainConsole.Instance.WarnFormat ("[FILE BASED ASSET SERVICE]: Failed to get asset {0}: {1} ", id, ex);
+                MainConsole.Instance.WarnFormat ("[Filebased asset service]: Failed to retrieve asset {0}: {1} ", id, ex);
                 return null;
             }
 #if ASSET_DEBUG
@@ -380,11 +398,11 @@ namespace WhiteCore.FileBasedServices.AssetService
 
         AssetBase CheckForConversion (string id)
         {
-            if (!m_doConversion)
+            if (!m_migrateSQL)
                 return null;
 
             AssetBase asset;
-            asset = m_assetService.GetAsset (UUID.Parse (id));
+            asset = m_assetService.GetAsset (UUID.Parse (id), false);       // don't show wornings for missing assets
 
             if (asset == null)
                 return null;
@@ -497,7 +515,7 @@ namespace WhiteCore.FileBasedServices.AssetService
                 Array.Copy (asset.Data, off, line, 0, len);
 
                 string text = BitConverter.ToString (line);
-                MainConsole.Instance.Info (String.Format ("{0:x4}: {1}", off, text));
+                MainConsole.Instance.Info (string.Format ("{0:x4}: {1}", off, text));
             }
         }
 

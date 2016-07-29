@@ -27,20 +27,20 @@
 
 using System;
 using System.Security;
+using OpenMetaverse;
+using OpenMetaverse.Packets;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
-using OpenMetaverse;
-using OpenMetaverse.Packets;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
 {
-    internal class SOPObject : MarshalByRefObject, IObject, IObjectPhysics, IObjectShape, IObjectSound
+    class SOPObject : MarshalByRefObject, IObject, IObjectPhysics, IObjectShape, IObjectSound
     {
-        private readonly uint m_localID;
-        private readonly IScene m_rootScene;
-        private readonly ISecurityCredential m_security;
+        readonly uint m_localID;
+        readonly IScene m_rootScene;
+        readonly ISecurityCredential m_security;
 
         [Obsolete("Replace with 'credential' constructor [security]")]
         public SOPObject(IScene rootScene, uint localID)
@@ -358,7 +358,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
 
             foreach (string button in buttons)
             {
-                if (button == String.Empty)
+                if (button == string.Empty)
                 {
                     Say("ERROR: button label cannot be blank", 2147483647);
                     return;
@@ -380,7 +380,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
         #region Supporting Functions
 
         // Helper functions to understand if object has cut, hollow, dimple, and other affecting number of faces
-        private static void hasCutHollowDimpleProfileCut(int primType, PrimitiveBaseShape shape, out bool hasCut,
+        static void hasCutHollowDimpleProfileCut(int primType, PrimitiveBaseShape shape, out bool hasCut,
                                                          out bool hasHollow,
                                                          out bool hasDimple, out bool hasProfileCut)
         {
@@ -399,7 +399,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
             hasProfileCut = hasDimple; // is it the same thing?
         }
 
-        private static int getScriptPrimType(PrimitiveBaseShape primShape)
+        static int getScriptPrimType(PrimitiveBaseShape primShape)
         {
             if (primShape.SculptEntry)
                 return (int) PrimType.Sculpt;
@@ -432,7 +432,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
             return (int) PrimType.NotPrimitive;
         }
 
-        private static int getNumberOfSides(ISceneChildEntity part)
+        static int getNumberOfSides(ISceneChildEntity part)
         {
             int ret;
             bool hasCut;
@@ -652,9 +652,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
 
         #region Implementation of IObjectShape
 
-        private UUID m_sculptMap = UUID.Zero;
+        UUID m_sculptMap = UUID.Zero;
 
-        private SculptType m_sculptType = SculptType.Default;
+        SculptType m_sculptType = SculptType.Default;
 
         public UUID SculptMap
         {
@@ -700,7 +700,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
             set { throw new NotImplementedException(); }
         }
 
-        private void SetPrimitiveSculpted(UUID map, byte type)
+        void SetPrimitiveSculpted(UUID map, byte type)
         {
             ObjectShapePacket.ObjectDataBlock shapeBlock = new ObjectShapePacket.ObjectDataBlock();
 
@@ -752,12 +752,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
         ///     It is utilized in nearly every property and method.
         /// </summary>
         /// <returns></returns>
-        private ISceneChildEntity GetSOP()
+        ISceneChildEntity GetSOP()
         {
             return m_rootScene.GetSceneObjectPart(m_localID);
         }
 
-        private bool CanEdit()
+        bool CanEdit()
         {
             if (!m_security.CanEditObject(this))
             {
@@ -768,7 +768,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
 
         #region OnTouch
 
-        private bool _OnTouchActive;
+        bool _OnTouchActive;
 
         public event OnTouchDelegate OnTouch
         {
@@ -801,7 +801,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
 
         private event OnTouchDelegate _OnTouch;
 
-        private void EventManager_OnObjectGrab(ISceneChildEntity part, ISceneChildEntity child, Vector3 offsetPos,
+        void EventManager_OnObjectGrab(ISceneChildEntity part, ISceneChildEntity child, Vector3 offsetPos,
                                                IClientAPI remoteClient, SurfaceTouchEventArgs surfaceArgs)
         {
             if (_OnTouchActive && m_localID == part.LocalId)

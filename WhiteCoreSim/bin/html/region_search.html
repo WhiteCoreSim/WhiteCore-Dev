@@ -12,9 +12,6 @@
 {Search}              Search
 -->
 
-<script type="text/javascript">
-  $(document).ready(function(){$(".regioninfo").colorbox({iframe:true, width:"990px", height:"440px"});});
-</script>
 
 <div id="fullPage">
 <h2>{SystemName}: {RegionSearchText}</h2>
@@ -22,7 +19,7 @@
 <form id="region_search_form" action="region_search.html" method="POST">
 <table id="user_search">
   <caption></caption>
-  
+
   <thead>
     <tr>
       <th class="user_search_left"></th>
@@ -48,27 +45,11 @@
   </tbody>
 </table>
 </form>
-<script>
-  /* attach a submit handler to the form */
-  $("#region_search_form").submit(function(event) {
 
-    /* stop form from submitting normally */
-    event.preventDefault(); 
-    /* get some values from elements on the page: */
-    var $form = $( this ),
-        url = $form.attr( 'action' );
-    /* Send the data using post and put the results in a div */
-    $.post( url, $form.serialize(),
-      function( data ) {
-		$("#fullPage").empty().append(data);
-      }
-    );
-  });
-</script>
 <h3>{SearchResultForRegionText}</h3>
 <table id="user_search_result_navigation_top">
-  <caption></caption>			
-			
+  <caption></caption>
+
   <thead>
     <tr>
       <th><a class="fade" href="index.html?page=region_search&Start=0" target="_self" title="{FirstText}"><p class="nav">|&nbsp;<</p></a></th>
@@ -81,7 +62,7 @@
 </table>
 <table id="user_search_result">
   <caption></caption>
-  
+
   <thead  class="listhead">
     <tr>
       <th class="user_search_result_left" style="width:200px"><p>{RegionNameText}</p></th>
@@ -93,7 +74,7 @@
     </tr>
   </thead>
   <tfoot class="listfoot">
-    <tr style= align:bottom;">
+    <tr style="align:bottom;">
       <th class="user_search_result_left"><p>{RegionNameText}</p></th>
       <th class="user_search_result_left"><p>{RegionLocXText}</p></th>
       <th class="user_search_result_left"><p>{RegionLocYText}</p></th>
@@ -127,7 +108,7 @@
 </table>
 <table id="user_search_result_navigation_bottom">
   <caption></caption>
-  
+
   <thead>
     <tr>
       <th><a class="fade" href="index.html?page=region_search&Start=0" target="_self" title="{FirstText}"><p class="nav">|&nbsp;<</p></a></th>
@@ -138,5 +119,28 @@
     </tr>
   </thead>
 </table>
-<script>$("li.fade, a.fade, a.regioninfo").hover(function(){$(this).fadeOut(150);$(this).fadeIn(150);});</script>
+
+<script>
+  /* attach a submit handler to the form */
+  $("#region_search_form").submit(function(event) {
+
+    /* stop form from submitting normally */
+    event.preventDefault();
+    /* get some values from elements on the page: */
+    var $form = $( this ),
+        url = $form.attr( 'action' );
+    /* Send the data using post and put the results in a div */
+    $.post( url, $form.serialize(),
+      function( data ) {
+    $("#fullPage").empty().append(data);
+      }
+    );
+  });
+
+  $("li.fade, a.fade, a.regioninfo").hover(function(){$(this).fadeOut(150);$(this).fadeIn(150);});
+
+  $(document).ready(function(){$(".regioninfo").colorbox({iframe:true, width:"990px", height:"440px"});});
+</script>
+
 </div>
+

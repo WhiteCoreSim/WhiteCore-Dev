@@ -26,15 +26,15 @@
  */
 
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.SceneInfo.Entities;
-using Nini.Config;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace WhiteCore.Modules.Land
 {
@@ -53,24 +53,24 @@ namespace WhiteCore.Modules.Land
 
     public class PrimCountModule : IPrimCountModule, INonSharedRegionModule
     {
-        private readonly Dictionary<UUID, UUID> m_OwnerMap =
+        readonly Dictionary<UUID, UUID> m_OwnerMap =
             new Dictionary<UUID, UUID>();
 
-        private readonly Dictionary<UUID, ParcelCounts> m_ParcelCounts =
+        readonly Dictionary<UUID, ParcelCounts> m_ParcelCounts =
             new Dictionary<UUID, ParcelCounts>();
 
-        private readonly Dictionary<UUID, PrimCounts> m_PrimCounts =
+        readonly Dictionary<UUID, PrimCounts> m_PrimCounts =
             new Dictionary<UUID, PrimCounts>();
 
-        private readonly Dictionary<UUID, int> m_SimwideCounts =
+        readonly Dictionary<UUID, int> m_SimwideCounts =
             new Dictionary<UUID, int>();
 
         // For now, a simple sim-wide taint to get this up. Later parcel based
         // taint to allow recounting a parcel if only ownership has changed
         // without recounting the whole sim.
-        private readonly Object m_TaintLock = new Object();
-        private IScene m_Scene;
-        private bool m_Tainted = true;
+        readonly Object m_TaintLock = new Object();
+        IScene m_Scene;
+        bool m_Tainted = true;
 
         #region INonSharedRegionModule Members
 
@@ -100,7 +100,7 @@ namespace WhiteCore.Modules.Land
             m_Scene.EventManager.OnSceneGroupMove += EventManager_OnSceneGroupMove;
         }
 
-        private bool EventManager_OnSceneGroupMove(UUID groupID, Vector3 pos)
+        bool EventManager_OnSceneGroupMove(UUID groupID, Vector3 pos)
         {
             IParcelManagementModule parcelManagment = m_Scene.RequestModuleInterface<IParcelManagementModule>();
             ILandObject landObject = parcelManagment.GetLandObject(pos.X, pos.Y) ??
@@ -109,7 +109,10 @@ namespace WhiteCore.Modules.Land
             ParcelCounts parcelCounts;
             if ((m_ParcelCounts.TryGetValue(landObject.LandData.GlobalID, out parcelCounts)) &&
                 (!parcelCounts.Objects.ContainsKey(groupID)))
-                m_Tainted = true;
+
+                lock (m_TaintLock)
+                    m_Tainted = true;
+            
             return true;
         }
 
@@ -191,7 +194,7 @@ namespace WhiteCore.Modules.Land
 
         #endregion
 
-        private void OnPrimCountAdd(ISceneEntity obj)
+        void OnPrimCountAdd(ISceneEntity obj)
         {
             // If we're tainted already, don't bother to add. The next
             // access will cause a recount anyway
@@ -202,7 +205,7 @@ namespace WhiteCore.Modules.Land
             }
         }
 
-        private void OnObjectBeingRemovedFromScene(ISceneEntity obj)
+        void OnObjectBeingRemovedFromScene(ISceneEntity obj)
         {
             // Don't bother to update tainted counts
             lock (m_TaintLock)
@@ -212,14 +215,14 @@ namespace WhiteCore.Modules.Land
             }
         }
 
-        private void OnParcelPrimCountTainted()
+        void OnParcelPrimCountTainted()
         {
             lock (m_TaintLock)
                 m_Tainted = true;
         }
 
         // NOTE: Call under Taint Lock
-        private void AddObject(ISceneEntity obj)
+        void AddObject(ISceneEntity obj)
         {
             if (obj.IsAttachment)
                 return;
@@ -270,7 +273,7 @@ namespace WhiteCore.Modules.Land
         }
 
         // NOTE: Call under Taint Lock
-        private void RemoveObject(ISceneEntity obj)
+        void RemoveObject(ISceneEntity obj)
         {
             if (obj.IsAttachment)
                 return;
@@ -474,7 +477,7 @@ namespace WhiteCore.Modules.Land
         }
 
         // NOTE: This method MUST be called while holding the taint lock!
-        private void Recount()
+        void Recount()
         {
             m_OwnerMap.Clear();
             m_SimwideCounts.Clear();
@@ -514,19 +517,19 @@ namespace WhiteCore.Modules.Land
             m_Tainted = false;
         }
 
-        private void OnLandObjectRemoved(UUID RegionID, UUID globalID)
+        void OnLandObjectRemoved(UUID RegionID, UUID globalID)
         {
             //Taint everything... we don't know what might have hapened
             TaintPrimCount();
         }
 
-        private void OnLandObjectAdded(LandData newParcel)
+        void OnLandObjectAdded(LandData newParcel)
         {
             //Taint it!
             TaintPrimCount(m_Scene.RequestModuleInterface<IParcelManagementModule>().GetLandObject(newParcel.GlobalID));
         }
 
-        private object OnGenericEvent(string FunctionName, object parameters)
+        object OnGenericEvent(string FunctionName, object parameters)
         {
             if (FunctionName == "ObjectChangedOwner")
             {
@@ -553,9 +556,9 @@ namespace WhiteCore.Modules.Land
 
     public class PrimCounts : IPrimCounts
     {
-        private readonly UUID m_ParcelID;
-        private readonly PrimCountModule m_Parent;
-        private readonly UserPrimCounts m_UserPrimCounts;
+        readonly UUID m_ParcelID;
+        readonly PrimCountModule m_Parent;
+        readonly UserPrimCounts m_UserPrimCounts;
 
         public PrimCounts(UUID parcelID, PrimCountModule parent)
         {
@@ -604,7 +607,7 @@ namespace WhiteCore.Modules.Land
 
         public int Total
         {
-            get { return this.Group + this.Owner + this.Others; }
+            get { return Group + Owner + Others; }
         }
 
         public IUserPrimCounts Users
@@ -627,7 +630,7 @@ namespace WhiteCore.Modules.Land
 
     public class UserPrimCounts : IUserPrimCounts
     {
-        private readonly PrimCounts m_Parent;
+        readonly PrimCounts m_Parent;
 
         public UserPrimCounts(PrimCounts parent)
         {

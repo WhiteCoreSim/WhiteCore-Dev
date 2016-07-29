@@ -26,9 +26,9 @@
  */
 
 using System.Collections.Generic;
+using Nini.Config;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.SceneInfo;
-using Nini.Config;
 
 namespace WhiteCore.Framework.Modules
 {
@@ -173,6 +173,7 @@ namespace WhiteCore.Framework.Modules
         void CleanInfo(object message);
         void CleanInfoFormat(string format, params object[] args);
         void Ticker();
+        void Ticker (string message, bool newline);
         void InfoFormat(string format, params object[] args);
         void Log(Level level, object message);
         void Trace(object message);

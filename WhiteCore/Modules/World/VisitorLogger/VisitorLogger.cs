@@ -34,7 +34,7 @@ using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
-using WhiteCore.Framework.Utilities;
+
 
 namespace WhiteCore.Modules.VisitorLogger
 {
@@ -45,114 +45,113 @@ namespace WhiteCore.Modules.VisitorLogger
     {
         #region Declares
 
-        protected bool m_enabled;
-        protected string m_fileName = "";
-        protected Dictionary<UUID, DateTime> m_timesOfUsers = new Dictionary<UUID, DateTime>();
+        protected bool m_enabled = true;
+        protected string m_fileName = "Visitors.log";
+        protected Dictionary<UUID, DateTime> m_timesOfUsers = new Dictionary<UUID, DateTime> ();
 
         #endregion
 
         #region INonSharedRegionModule
 
-        public void Initialise(IConfigSource source)
+        public void Initialise (IConfigSource source)
         {
-            IConfig config = source.Configs["VisitorLogModule"];
-            if (config != null)
-            {
-                m_enabled = config.GetBoolean("Enabled", m_enabled);
-                m_fileName = config.GetString("FileName", m_fileName);
+            IConfig config = source.Configs ["VisitorLogModule"];
+            if (config != null) {
+                m_enabled = config.GetBoolean ("Enabled", m_enabled);
+                m_fileName = config.GetString ("FileName", m_fileName);
+
+                if (m_enabled && (m_fileName == ""))        // in case of default config
+                    m_fileName = "Visitors.log";
             }
         }
 
-        public void Close()
+        public void Close ()
         {
         }
 
-        public void AddRegion(IScene scene)
+        public void AddRegion (IScene scene)
         {
-            if (m_enabled)
-            {
-                // verify log location
-                if (m_fileName == "")
-                {
-                    var simBase = scene.RequestModuleInterface<ISimulationBase> ();
-                    m_fileName = Path.Combine(simBase.DefaultDataPath, "Vistors.log");
-                }
-                
+            if (m_enabled) {
                 scene.EventManager.OnMakeRootAgent += OnMakeRootAgent;
                 scene.EventManager.OnClosingClient += EventManager_OnClosingClient;
-
             }
         }
 
-        public void RegionLoaded(IScene scene)
+        public void RegionLoaded (IScene scene)
         {
         }
 
-        public void RemoveRegion(IScene scene)
+        public void RemoveRegion (IScene scene)
         {
         }
 
-        public string Name
-        {
+        public string Name {
             get { return "VisitorLoggerModule"; }
         }
 
-        public Type ReplaceableInterface
-        {
+        public Type ReplaceableInterface {
             get { return null; }
         }
 
-        void EventManager_OnClosingClient(IClientAPI client)
+        void EventManager_OnClosingClient (IClientAPI client)
         {
             string logPath = MainConsole.Instance.LogPath;
             IScenePresence presence;
-            if (client.Scene.TryGetScenePresence(client.AgentId, out presence) && !presence.IsChildAgent &&
-                m_timesOfUsers.ContainsKey(client.AgentId))
-            {
-                try
-                {
-                    //Add the user
-                    FileStream stream = new FileStream(logPath + m_fileName, FileMode.OpenOrCreate);
-                    StreamWriter m_streamWriter = new StreamWriter(stream);
+            if (client.Scene.TryGetScenePresence (client.AgentId, out presence) && !presence.IsChildAgent &&
+                m_timesOfUsers.ContainsKey (client.AgentId)) {
+                //Add the user
+                FileStream stream = new FileStream (logPath + m_fileName, FileMode.OpenOrCreate);
+                StreamWriter m_streamWriter = new StreamWriter (stream);
+                try {
                     m_streamWriter.BaseStream.Position += m_streamWriter.BaseStream.Length;
 
-                    string LineToWrite = DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToLongTimeString() +
+                    string LineToWrite = DateTime.Now.ToShortDateString () + " " + DateTime.Now.ToLongTimeString () +
                                          " - " + client.Name + " left " +
                                          client.Scene.RegionInfo.RegionName + " after " +
-                                         (DateTime.Now - m_timesOfUsers[client.AgentId]).Minutes + " minutes.";
-                    m_timesOfUsers.Remove(presence.UUID);
+                                         (DateTime.Now - m_timesOfUsers [client.AgentId]).Minutes + " minutes.";
+                    m_timesOfUsers.Remove (presence.UUID);
 
-                    m_streamWriter.WriteLine(LineToWrite);
-                    m_streamWriter.WriteLine();
-                    m_streamWriter.Close();
+                    m_streamWriter.WriteLine (LineToWrite);
+                    m_streamWriter.Close ();
+                } catch {
+                    m_streamWriter.Close ();
                 }
-                catch
-                {
-                }
+                stream.Close ();
             }
         }
 
-        void OnMakeRootAgent(IScenePresence presence)
+        void OnMakeRootAgent (IScenePresence presence)
         {
-            try
-            {
-                //Add the user
-                FileStream stream = new FileStream(m_fileName, FileMode.OpenOrCreate);
-                StreamWriter m_streamWriter = new StreamWriter(stream);
+            string logPath = MainConsole.Instance.LogPath;
+            FileStream stream = new FileStream (logPath + m_fileName, FileMode.OpenOrCreate);
+            StreamWriter m_streamWriter = new StreamWriter (stream);
+
+            try {
                 m_streamWriter.BaseStream.Position += m_streamWriter.BaseStream.Length;
+                string lineToWrite;
 
-                string LineToWrite = DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToLongTimeString() + " - " +
-                                     presence.Name + " entered " +
-                                     presence.Scene.RegionInfo.RegionName + ".";
-                m_timesOfUsers[presence.UUID] = DateTime.Now;
+                // are we just moving around...
+                if (m_timesOfUsers.ContainsKey (presence.UUID)) {
+                    lineToWrite = DateTime.Now.ToShortDateString () + " " + DateTime.Now.ToLongTimeString () +
+                        " - " + presence.Name + " online for " +
+                        (DateTime.Now - m_timesOfUsers [presence.UUID]).Minutes + " minutes.";
 
-                m_streamWriter.WriteLine(LineToWrite);
-                m_streamWriter.WriteLine();
-                m_streamWriter.Close();
+                    m_streamWriter.WriteLine (lineToWrite);
+                } else {
+                    // ..or first login
+                    m_timesOfUsers [presence.UUID] = DateTime.Now;
+                }
+
+                lineToWrite = DateTime.Now.ToShortDateString () + " " + DateTime.Now.ToLongTimeString () + " - " +
+                    presence.Name + " entered " +
+                    presence.Scene.RegionInfo.RegionName + ".";
+
+                m_streamWriter.WriteLine (lineToWrite);
+                m_streamWriter.Close ();
+            } catch {
+                m_streamWriter.Close ();
             }
-            catch
-            {
-            }
+            stream.Close ();
         }
 
         #endregion

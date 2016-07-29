@@ -26,11 +26,11 @@
  */
 
 
+using System;
+using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using OpenMetaverse;
-using System;
 
 namespace WhiteCore.Services
 {
@@ -72,14 +72,7 @@ namespace WhiteCore.Services
             }
             auth.PasswordHash = md5PasswdHash;
             auth.PasswordSalt = passwordSalt;
-            if (!m_Database.Store(auth))
-            {
-                MainConsole.Instance.DebugFormat("[AUTHENTICATION DB]: Failed to store authentication data");
-                return false;
-            }
-
-            MainConsole.Instance.InfoFormat("[AUTHENTICATION DB]: Set password for principalID {0}", principalID);
-            return true;
+            return SaveAuth (auth, principalID);
         }
 
         public virtual bool Remove(UUID principalID, string authType)
@@ -94,7 +87,7 @@ namespace WhiteCore.Services
             if (m_Database.SetToken(principalID, token.ToString(), lifetime))
                 return token.ToString();
 
-            return String.Empty;
+            return string.Empty;
         }
 
         public virtual bool SetPasswordHashed(UUID principalID, string authType, string Hashedpassword)
@@ -109,14 +102,7 @@ namespace WhiteCore.Services
             }
             auth.PasswordHash = md5PasswdHash;
             auth.PasswordSalt = passwordSalt;
-            if (!m_Database.Store(auth))
-            {
-                MainConsole.Instance.DebugFormat("[AUTHENTICATION DB]: Failed to store authentication data");
-                return false;
-            }
-
-            MainConsole.Instance.InfoFormat("[AUTHENTICATION DB]: Set password for principalID {0}", principalID);
-            return true;
+            return SaveAuth (auth, principalID);
         }
 
         public virtual bool SetPlainPassword(UUID principalID, string authType, string pass)
@@ -128,14 +114,31 @@ namespace WhiteCore.Services
             }
             auth.PasswordHash = pass;
             auth.PasswordSalt = "";
-            if (!m_Database.Store(auth))
-            {
-                MainConsole.Instance.DebugFormat("[AUTHENTICATION DB]: Failed to store authentication data");
+            return SaveAuth (auth, principalID);
+        }
+
+        public virtual bool SetSaltedPassword (UUID principalID, string authType, string salt, string pass)
+        {
+            AuthData auth = m_Database.Get (principalID, authType);
+            if (auth == null) {
+                auth = new AuthData { PrincipalID = principalID, AccountType = authType };
+            }
+            auth.PasswordHash = pass;
+            auth.PasswordSalt = salt;
+            return SaveAuth (auth, principalID);
+        }
+
+        bool SaveAuth (AuthData auth, UUID principalID)
+        {
+            if (!m_Database.Store (auth)) {
+                MainConsole.Instance.DebugFormat ("[Authentication DB]: Failed to store authentication data");
                 return false;
             }
 
-            MainConsole.Instance.InfoFormat("[AUTHENTICATION DB]: Set password for principalID {0}", principalID);
+            MainConsole.Instance.InfoFormat ("[Authentication DB]: Set password for principalID {0}", principalID);
             return true;
+
         }
+
     }
 }

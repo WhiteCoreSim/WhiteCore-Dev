@@ -28,18 +28,18 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using OpenMetaverse;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.SceneInfo.Entities;
-using OpenMetaverse;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
 {
-    internal class IObjEnum : MarshalByRefObject, IEnumerator<IObject>
+    class IObjEnum : MarshalByRefObject, IEnumerator<IObject>
     {
-        private readonly List<ISceneEntity> m_entities;
-        private readonly IScene m_scene;
-        private readonly ISecurityCredential m_security;
-        private readonly IEnumerator<ISceneEntity> m_sogEnum;
+        readonly List<ISceneEntity> m_entities;
+        readonly IScene m_scene;
+        readonly ISecurityCredential m_security;
+        readonly IEnumerator<ISceneEntity> m_sogEnum;
 
         public IObjEnum(IScene scene, ISecurityCredential security)
         {
@@ -126,7 +126,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
                                                              rotation,
                                                              PrimitiveBaseShape.CreateBox());
 
-            IObject ret = new SOPObject(m_scene, sog.LocalId, m_security);
+            IObject ret = null;
+            if (sog != null)
+                ret = new SOPObject(m_scene, sog.LocalId, m_security);
 
             return ret;
         }

@@ -25,20 +25,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System.Collections.Generic;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.SceneInfo.Entities;
 using WhiteCore.Framework.Utilities;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using System.Collections.Generic;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine
 {
     public class ScriptStateSave
     {
-        private ScriptEngine m_module;
-        private object StateSaveLock = new object();
+        ScriptEngine m_module;
+        object StateSaveLock = new object();
 
         public void Initialize(ScriptEngine module)
         {
@@ -54,7 +54,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         {
         }
 
-        private object WhiteCoreEventManager_OnGenericEvent(string FunctionName, object parameters)
+        object WhiteCoreEventManager_OnGenericEvent(string FunctionName, object parameters)
         {
             if (FunctionName == "DeleteToInventory")
             {

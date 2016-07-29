@@ -33,44 +33,44 @@ namespace WhiteCore.Modules.Monitoring.Monitors
 {
     public class TotalFrameMonitor : ITotalFrameTimeMonitor
     {
-        private int MonitorFrameTime;
+        int MonitorFrameTime;
 
-        public TotalFrameMonitor(IScene scene)
+        public TotalFrameMonitor (IScene scene)
         {
         }
 
         #region Implementation of IMonitor
 
-        public double GetValue()
+        public double GetValue ()
         {
             return MonitorFrameTime;
         }
 
-        public string GetName()
+        public string GetName ()
         {
             return "Total Frame Time";
         }
 
-        public string GetInterfaceName()
+        public string GetInterfaceName ()
         {
             return "ITotalFrameTimeMonitor";
         }
 
-        public string GetFriendlyValue()
+        public string GetFriendlyValue ()
         {
-            return (int) GetValue() + "ms";
+            return (int)GetValue () + "ms";
         }
 
         #endregion
 
         #region ITotalFrameTimeMonitor Members
 
-        public void AddFrameTime(int time)
+        public void AddFrameTime (int time)
         {
             MonitorFrameTime += time;
         }
 
-        public void ResetStats()
+        public void ResetStats ()
         {
             MonitorFrameTime = 0;
         }

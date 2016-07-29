@@ -30,9 +30,9 @@ using System.Collections.Generic;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
 {
-    internal class ExtensionHandler : IExtension
+    class ExtensionHandler : IExtension
     {
-        private readonly Dictionary<Type, object> m_instances;
+        readonly Dictionary<Type, object> m_instances;
 
         public ExtensionHandler(Dictionary<Type, object> instances)
         {

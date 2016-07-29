@@ -28,15 +28,15 @@
 //#define Debug
 
 
-using WhiteCore.Framework.ClientInterfaces;
-using WhiteCore.Framework.ConsoleFramework;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.Utilities;
-using OpenMetaverse;
 using System;
 using System.Collections.Concurrent;
 using System.Net;
 using System.Threading;
+using OpenMetaverse;
+using WhiteCore.Framework.ClientInterfaces;
+using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.ClientStack
 {
@@ -149,14 +149,14 @@ namespace WhiteCore.ClientStack
         ///     Percentage of the task throttle category that is allocated to avatar and prim
         ///     state updates
         /// </summary>
-        private const float STATE_TASK_PERCENTAGE = 0.3f;
+        const float STATE_TASK_PERCENTAGE = 0.3f;
 
-        private const float TRANSFER_ASSET_PERCENTAGE = 0.9f;
-        private const float AVATAR_INFO_STATE_PERCENTAGE = 0.5f;
-        private const int MAXPERCLIENTRATE = 625000;
-        private const int MINPERCLIENTRATE = 6250;
-        private const int STARTPERCLIENTRATE = 25000;
-        private const int MAX_PACKET_SKIP_RATE = 4;
+        const float TRANSFER_ASSET_PERCENTAGE = 0.9f;
+        const float AVATAR_INFO_STATE_PERCENTAGE = 0.5f;
+        const int MAXPERCLIENTRATE = 625000;
+        const int MINPERCLIENTRATE = 6250;
+        const int STARTPERCLIENTRATE = 25000;
+        const int MAX_PACKET_SKIP_RATE = 4;
 
         /// <summary>
         ///     AgentID for this client
@@ -185,36 +185,36 @@ namespace WhiteCore.ClientStack
         /// <summary>
         ///     Outgoing queues for throttled packets
         /// </summary>
-//        private readonly WhiteCore.Framework.LocklessQueue<OutgoingPacket>[] m_packetOutboxes = new WhiteCore.Framework.LocklessQueue<OutgoingPacket>[(int)ThrottleOutPacketType.Count];
-        private readonly int[] PacketsCounts = new int[(int) ThrottleOutPacketType.Count];
+//        readonly WhiteCore.Framework.LocklessQueue<OutgoingPacket>[] m_packetOutboxes = new WhiteCore.Framework.LocklessQueue<OutgoingPacket>[(int)ThrottleOutPacketType.Count];
+        readonly int[] PacketsCounts = new int[(int) ThrottleOutPacketType.Count];
 
         /// <summary>
         ///     ACKs that are queued up, waiting to be sent to the client
         /// </summary>
         public readonly ConcurrentQueue<uint> PendingAcks = new ConcurrentQueue<uint>();
 
-        private readonly int[] Rates;
+        readonly int[] Rates;
 
         /// <summary>
         ///     The remote address of the connected client
         /// </summary>
         public readonly IPEndPoint RemoteEndPoint;
 
-        private readonly int m_defaultRTO = 1000;
-        private readonly int m_maxRTO = 20000;
+        readonly int m_defaultRTO = 1000;
+        readonly int m_maxRTO = 20000;
 
-        private readonly UDPprioQueue m_outbox = new UDPprioQueue(8, 0x01);
+        readonly UDPprioQueue m_outbox = new UDPprioQueue(8, 0x01);
         // 8  priority levels (7 max , 0 lowest), auto-promotion on every 2 enqueues
 
         /// <summary>
         ///     Throttle bucket for this agent's connection
         /// </summary>
-        private readonly TokenBucket m_throttle;
+        readonly TokenBucket m_throttle;
 
         /// <summary>
         ///     A reference to the LLUDPServer that is managing this client
         /// </summary>
-        private readonly LLUDPServer m_udpServer;
+        readonly LLUDPServer m_udpServer;
 
         /// <summary>
         ///     Number of bytes received since the last acknowledgement was sent out. This is used
@@ -285,8 +285,8 @@ namespace WhiteCore.ClientStack
         /// </summary>
         public int TickLastPacketReceived;
 
-        private int TotalRateMin;
-        private int TotalRateRequested;
+        int TotalRateMin;
+        int TotalRateRequested;
 
         /// <summary>
         ///     Total byte count of unacked packets sent to this client
@@ -296,25 +296,25 @@ namespace WhiteCore.ClientStack
         /// <summary>
         ///     Holds the Environment.TickCount value of when the next OnQueueEmpty can be fired
         /// </summary>
-        private int m_nextOnQueueEmpty = 1;
+        int m_nextOnQueueEmpty = 1;
 
 
-        private OutgoingPacket m_nextOutPacket;
+        OutgoingPacket m_nextOutPacket;
 
         /// <summary>
         ///     Caches packed throttle information
         /// </summary>
-        private byte[] m_packedThrottles;
+        byte[] m_packedThrottles;
 
         /// <summary>
         ///     Total number of received packets that we have reported to the OnPacketStats event(s)
         /// </summary>
-        private int m_packetsReceivedReported;
+        int m_packetsReceivedReported;
 
         /// <summary>
         ///     Total number of sent packets that we have reported to the OnPacketStats event(s)
         /// </summary>
-        private int m_packetsSentReported;
+        int m_packetsSentReported;
 
         /// <summary>
         ///     Default constructor
@@ -371,7 +371,7 @@ namespace WhiteCore.ClientStack
             RTO = m_defaultRTO;
 
             // Initialize this to a sane value to prevent early disconnects
-            TickLastPacketReceived = Environment.TickCount & Int32.MaxValue;
+            TickLastPacketReceived = Environment.TickCount & int.MaxValue;
         }
 
         /// <summary>
@@ -710,7 +710,7 @@ namespace WhiteCore.ClientStack
         ///     stored as an object to match the WaitCallback delegate
         ///     signature
         /// </param>
-        private void FireQueueEmpty(object o)
+        void FireQueueEmpty(object o)
         {
             const int MIN_CALLBACK_MS = 30;
 

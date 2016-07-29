@@ -34,26 +34,26 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
 {
     public class LSL2CSCodeTransformer
     {
-        private static Dictionary<string, string> m_datatypeLSL2OpenSim;
-        private readonly SYMBOL m_astRoot;
-        private readonly Dictionary<string, string> m_globalVariableValues = new Dictionary<string, string>();
-        private readonly Dictionary<string, SYMBOL> m_duplicatedGlobalVariableValues = new Dictionary<string, SYMBOL>();
+        static Dictionary<string, string> m_datatypeLSL2OpenSim;
+        readonly SYMBOL m_astRoot;
+        readonly Dictionary<string, string> m_globalVariableValues = new Dictionary<string, string>();
+        readonly Dictionary<string, SYMBOL> m_duplicatedGlobalVariableValues = new Dictionary<string, SYMBOL>();
 
-        private Dictionary<string, Dictionary<string, SYMBOL>> m_localVariableValues =
+        Dictionary<string, Dictionary<string, SYMBOL>> m_localVariableValues =
             new Dictionary<string, Dictionary<string, SYMBOL>>();
 
-        private Dictionary<string, Dictionary<string, string>> m_localVariableValuesStr =
+        Dictionary<string, Dictionary<string, string>> m_localVariableValuesStr =
             new Dictionary<string, Dictionary<string, string>>();
 
-        private Dictionary<string, Dictionary<string, int>> m_localVariableScope =
+        Dictionary<string, Dictionary<string, int>> m_localVariableScope =
             new Dictionary<string, Dictionary<string, int>>();
 
-        private readonly Dictionary<string, Dictionary<string, SYMBOL>> m_duplicatedLocalVariableValues =
+        readonly Dictionary<string, Dictionary<string, SYMBOL>> m_duplicatedLocalVariableValues =
             new Dictionary<string, Dictionary<string, SYMBOL>>();
 
-        private string m_currentEvent = "";
-        private string m_currentState = "";
-        private string m_originalScript = "";
+        string m_currentEvent = "";
+        string m_currentState = "";
+        string m_originalScript = "";
 
         public Dictionary<string, SYMBOL> DuplicatedGlobalVars
         {
@@ -126,7 +126,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
         /// <param name="s">The current node to transform.</param>
         /// <param name="GlobalMethods"> </param>
         /// <param name="MethodArguements"> </param>
-        private void TransformNode(SYMBOL s, Dictionary<string, string> GlobalMethods,
+        void TransformNode(SYMBOL s, Dictionary<string, string> GlobalMethods,
                                    Dictionary<string, ObjectList> MethodArguements)
         {
             TransformNode(s, GlobalMethods, MethodArguements, new List<int>(), 0);
@@ -141,7 +141,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
         /// <param name="MethodArguements"> </param>
         /// <param name="scopesParent"> </param>
         /// <param name="scopeCurrent"> </param>
-        private void TransformNode(SYMBOL s, Dictionary<string, string> GlobalMethods,
+        void TransformNode(SYMBOL s, Dictionary<string, string> GlobalMethods,
                                    Dictionary<string, ObjectList> MethodArguements, List<int> scopesParent,
                                    int scopeCurrent)
         {
@@ -569,7 +569,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
             }
         }
 
-        private static readonly List<EventInfo> DEFAULT_EVENT_INFOS = new List<EventInfo>()
+        static readonly List<EventInfo> DEFAULT_EVENT_INFOS = new List<EventInfo>()
         {
 			new EventInfo("at_rot_target", new [] { "LSL_Types.LSLInteger", "LSL_Types.Quaternion", "LSL_Types.Quaternion" }),
 			new EventInfo("at_target", new [] { "LSL_Types.LSLInteger", "LSL_Types.Vector3", "LSL_Types.Vector3" }),
@@ -614,7 +614,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
 			new EventInfo("transaction_result", new [] { "LSL_Types.LSLString", "LSL_Types.LSLInteger", "LSL_Types.LSLString" }),
         };
 
-        private static List<EventInfo> _newLSLEvents = new List<EventInfo>();
+        static List<EventInfo> _newLSLEvents = new List<EventInfo>();
         public static void AddLSLEvent(EventInfo ev)
         {
             _newLSLEvents.Add(ev);
@@ -649,7 +649,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
             }
         }
 
-        private string GetLocalVariableDictionaryKey()
+        string GetLocalVariableDictionaryKey()
         {
             if (m_currentState == "")
                 return "global_function_" + m_currentEvent;
@@ -665,7 +665,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
         ///     The node containing the Declaration node that needs replacing.
         /// </param>
         /// <param name="didx">Index of the Declaration node to replace.</param>
-        private void AddImplicitInitialization(SYMBOL s, int didx)
+        void AddImplicitInitialization(SYMBOL s, int didx)
         {
             // We take the kids for a while to play with them.
             int sKidSize = s.kids.Count;
@@ -701,7 +701,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
         ///     A SYMBOL node containing the appropriate structure for initializing a
         ///     constantType.
         /// </returns>
-        private SYMBOL GetZeroConstant(Parser p, string constantType)
+        SYMBOL GetZeroConstant(Parser p, string constantType)
         {
             switch (constantType)
             {

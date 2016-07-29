@@ -13,21 +13,18 @@
   <h2>{SystemName}: {ForgotPassword}</h2>
 </div>
 <div id="error_message" class="error_message"><h3>{ErrorMessage}</h3></div>
-<script language="javascript" type="text/javascript">
-	addEvent(window, "load", function() { document.getElementById("login_input").focus(); } );
-</script>
 
 <form action="forgot_pass.html" id="forgotpass_form" method="POST">
 <table id="login">
   <caption>Request a new password</caption>
-  
+
   <thead>
     <tr>
       <th class="login_left"></th>
       <th class="login_right"></th>
     </tr>
   </thead>
-  
+
   <tfoot>
     <tr>
       <th class="login_left"></th>
@@ -59,11 +56,13 @@
 </form>
 
 <script>
+  $(document).ready(function() { document.getElementById("login_input").focus(); } );
+
   /* attach a submit handler to the form */
   $("#forgotpass_form").submit(function(event) {
 
     /* stop form from submitting normally */
-    event.preventDefault(); 
+    event.preventDefault();
     /* get some values from elements on the page: */
     var $form = $( this ),
         url = $form.attr( 'action' );

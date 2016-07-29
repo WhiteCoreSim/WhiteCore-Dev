@@ -37,8 +37,8 @@ namespace WhiteCore.Framework.Serialization
     /// </summary>
     public class TarArchiveWriter
     {
-        protected static ASCIIEncoding m_asciiEncoding = new ASCIIEncoding();
-        protected static UTF8Encoding m_utf8Encoding = new UTF8Encoding();
+        protected static ASCIIEncoding m_asciiEncoding = new ASCIIEncoding ();
+        protected static UTF8Encoding m_utf8Encoding = new UTF8Encoding ();
 
         /// <summary>
         ///     Binary writer for the underlying stream
@@ -47,23 +47,23 @@ namespace WhiteCore.Framework.Serialization
 
         protected bool m_closed;
 
-        public TarArchiveWriter(Stream s)
+        public TarArchiveWriter (Stream s)
         {
             m_closed = false;
-            m_bw = new BinaryWriter(s);
+            m_bw = new BinaryWriter (s);
         }
 
         /// <summary>
         ///     Write a directory entry to the tar archive.  We can only handle one path level right now!
         /// </summary>
         /// <param name="dirName"></param>
-        public void WriteDir(string dirName)
+        public void WriteDir (string dirName)
         {
             // Directories are signaled by a final /
-            if (!dirName.EndsWith("/"))
+            if (!dirName.EndsWith ("/", StringComparison.Ordinal))
                 dirName += "/";
 
-            WriteFile(dirName, new byte[0]);
+            WriteFile (dirName, new byte [0]);
         }
 
         /// <summary>
@@ -71,9 +71,9 @@ namespace WhiteCore.Framework.Serialization
         /// </summary>
         /// <param name="filePath"></param>
         /// <param name="data"></param>
-        public void WriteFile(string filePath, string data)
+        public void WriteFile (string filePath, string data)
         {
-            WriteFile(filePath, m_utf8Encoding.GetBytes(data));
+            WriteFile (filePath, m_utf8Encoding.GetBytes (data));
         }
 
         /// <summary>
@@ -81,16 +81,16 @@ namespace WhiteCore.Framework.Serialization
         /// </summary>
         /// <param name="filePath"></param>
         /// <param name="data"></param>
-        public void WriteFile(string filePath, byte[] data)
+        public void WriteFile (string filePath, byte [] data)
         {
             if (filePath.Length > 100)
-                WriteEntry("././@LongLink", m_asciiEncoding.GetBytes(filePath), 'L');
+                WriteEntry ("././@LongLink", m_asciiEncoding.GetBytes (filePath), 'L');
 
             char fileType;
 
-            fileType = filePath.EndsWith("/") ? '5' : '0';
+            fileType = filePath.EndsWith ("/", StringComparison.Ordinal) ? '5' : '0';
 
-            WriteEntry(filePath, data, fileType);
+            WriteEntry (filePath, data, fileType);
             data = null;
         }
 
@@ -98,42 +98,38 @@ namespace WhiteCore.Framework.Serialization
         ///     Finish writing the raw tar archive data to a stream.  The stream will be closed on completion.
         /// </summary>
         /// <returns></returns>
-        public void Close()
+        public void Close ()
         {
-            //MainConsole.Instance.Debug("[TAR ARCHIVE WRITER]: Writing final consecutive 0 blocks");
+            //MainConsole.Instance.Debug("[TAR arhive writer]: Writing final consecutive 0 blocks");
 
             // Write two consecutive 0 blocks to end the archive
-            byte[] finalZeroPadding = new byte[1024];
+            byte [] finalZeroPadding = new byte [1024];
 
-            lock (m_bw)
-            {
-                if (!m_closed)
-                {
+            lock (m_bw) {
+                if (!m_closed) {
                     m_closed = true;
-                    m_bw.Write(finalZeroPadding);
+                    m_bw.Write (finalZeroPadding);
 
-                    m_bw.Flush();
-                    m_bw.Close();
+                    m_bw.Flush ();
+                    m_bw.Close ();
                 }
             }
         }
 
-        public static byte[] ConvertDecimalToPaddedOctalBytes(int d, int padding)
+        public static byte [] ConvertDecimalToPaddedOctalBytes (int d, int padding)
         {
             string oString = "";
 
-            while (d > 0)
-            {
-                oString = Convert.ToString((byte) '0' + d & 7) + oString;
+            while (d > 0) {
+                oString = Convert.ToString ((byte)'0' + d & 7) + oString;
                 d >>= 3;
             }
 
-            while (oString.Length < padding)
-            {
+            while (oString.Length < padding) {
                 oString = "0" + oString;
             }
 
-            byte[] oBytes = m_asciiEncoding.GetBytes(oString);
+            byte [] oBytes = m_asciiEncoding.GetBytes (oString);
 
             return oBytes;
         }
@@ -144,79 +140,77 @@ namespace WhiteCore.Framework.Serialization
         /// <param name="filePath"></param>
         /// <param name="data"></param>
         /// <param name="fileType"></param>
-        protected void WriteEntry(string filePath, byte[] data, char fileType)
+        protected void WriteEntry (string filePath, byte [] data, char fileType)
         {
-//            MainConsole.Instance.DebugFormat(
-//                "[TAR ARCHIVE WRITER]: Data for {0} is {1} bytes", filePath, (null == data ? "null" : data.Length.ToString()));
+            //            MainConsole.Instance.DebugFormat(
+            //                "[TAR archive writer]: Data for {0} is {1} bytes", filePath, (null == data ? "null" : data.Length.ToString()));
 
-            byte[] header = new byte[512];
+            byte [] header = new byte [512];
 
             // file path field (100)
-            byte[] nameBytes = m_asciiEncoding.GetBytes(filePath);
+            byte [] nameBytes = m_asciiEncoding.GetBytes (filePath);
             int nameSize = (nameBytes.Length >= 100) ? 100 : nameBytes.Length;
-            Array.Copy(nameBytes, header, nameSize);
+            Array.Copy (nameBytes, header, nameSize);
 
             // file mode (8)
-            byte[] modeBytes = m_asciiEncoding.GetBytes("0000777");
-            Array.Copy(modeBytes, 0, header, 100, 7);
+            byte [] modeBytes = m_asciiEncoding.GetBytes ("0000777");
+            Array.Copy (modeBytes, 0, header, 100, 7);
 
             // owner user id (8)
-            byte[] ownerIdBytes = m_asciiEncoding.GetBytes("0000764");
-            Array.Copy(ownerIdBytes, 0, header, 108, 7);
+            byte [] ownerIdBytes = m_asciiEncoding.GetBytes ("0000764");
+            Array.Copy (ownerIdBytes, 0, header, 108, 7);
 
             // group user id (8)
-            byte[] groupIdBytes = m_asciiEncoding.GetBytes("0000764");
-            Array.Copy(groupIdBytes, 0, header, 116, 7);
+            byte [] groupIdBytes = m_asciiEncoding.GetBytes ("0000764");
+            Array.Copy (groupIdBytes, 0, header, 116, 7);
 
             // file size in bytes (12)
             int fileSize = data.Length;
-            //MainConsole.Instance.DebugFormat("[TAR ARCHIVE WRITER]: File size of {0} is {1}", filePath, fileSize);
+            //MainConsole.Instance.DebugFormat("[TAR archive writer]: File size of {0} is {1}", filePath, fileSize);
 
-            byte[] fileSizeBytes = ConvertDecimalToPaddedOctalBytes(fileSize, 11);
+            byte [] fileSizeBytes = ConvertDecimalToPaddedOctalBytes (fileSize, 11);
 
-            Array.Copy(fileSizeBytes, 0, header, 124, 11);
+            Array.Copy (fileSizeBytes, 0, header, 124, 11);
 
             // last modification time (12)
-            byte[] lastModTimeBytes = m_asciiEncoding.GetBytes("11017037332");
-            Array.Copy(lastModTimeBytes, 0, header, 136, 11);
+            byte [] lastModTimeBytes = m_asciiEncoding.GetBytes ("11017037332");
+            Array.Copy (lastModTimeBytes, 0, header, 136, 11);
 
             // entry type indicator (1)
-            header[156] = m_asciiEncoding.GetBytes(new[] {fileType})[0];
+            header [156] = m_asciiEncoding.GetBytes (new [] { fileType }) [0];
 
-            Array.Copy(m_asciiEncoding.GetBytes("0000000"), 0, header, 329, 7);
-            Array.Copy(m_asciiEncoding.GetBytes("0000000"), 0, header, 337, 7);
+            Array.Copy (m_asciiEncoding.GetBytes ("0000000"), 0, header, 329, 7);
+            Array.Copy (m_asciiEncoding.GetBytes ("0000000"), 0, header, 337, 7);
 
             // check sum for header block (8) [calculated last]
-            Array.Copy(m_asciiEncoding.GetBytes("        "), 0, header, 148, 8);
+            Array.Copy (m_asciiEncoding.GetBytes ("        "), 0, header, 148, 8);
 
-            int checksum = header.Aggregate(0, (current, b) => current + b);
+            int checksum = header.Aggregate (0, (current, b) => current + b);
 
             //MainConsole.Instance.DebugFormat("[TAR ARCHIVE WRITER]: Decimal header checksum is {0}", checksum);
 
-            byte[] checkSumBytes = ConvertDecimalToPaddedOctalBytes(checksum, 6);
+            byte [] checkSumBytes = ConvertDecimalToPaddedOctalBytes (checksum, 6);
 
-            Array.Copy(checkSumBytes, 0, header, 148, 6);
+            Array.Copy (checkSumBytes, 0, header, 148, 6);
 
-            header[154] = 0;
+            header [154] = 0;
 
-            lock (m_bw)
-            {
+            lock (m_bw) {
                 // Write out header
-                m_bw.Write(header);
+                m_bw.Write (header);
 
                 // Write out data
                 // An IOException occurs if we try to write out an empty array in Mono 2.6
                 if (data.Length > 0)
-                    m_bw.Write(data);
+                    m_bw.Write (data);
 
-                if (data.Length%512 != 0)
-                {
-                    int paddingRequired = 512 - (data.Length%512);
+                if (data.Length % 512 != 0) {
+                    int paddingRequired = 512 - (data.Length % 512);
 
-                    //MainConsole.Instance.DebugFormat("[TAR ARCHIVE WRITER]: Padding data with {0} bytes", paddingRequired);
+                    //MainConsole.Instance.DebugFormat("[TAR archive writer]: Padding data with {0} bytes", paddingRequired);
 
-                    byte[] padding = new byte[paddingRequired];
-                    m_bw.Write(padding);
+                    byte [] padding = new byte [paddingRequired];
+                    m_bw.Write (padding);
                 }
             }
         }

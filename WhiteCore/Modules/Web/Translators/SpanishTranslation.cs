@@ -1,4 +1,31 @@
-﻿namespace WhiteCore.Modules.Web.Translators
+﻿/*
+ * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org
+ * See CONTRIBUTORS.TXT for a full list of copyright holders.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the WhiteCore-Sim Project nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ``AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+namespace WhiteCore.Modules.Web.Translators
 {
     public class SpanishTranslation : ITranslator
     {
@@ -24,6 +51,8 @@
                 case "CurrentPageText": return "La página actual";
                 case "MoreInfoText": return "Más info";
                 case "NoDetailsText": return "No se encontraron datos...";
+            case "MoreInfo": return "More Information";
+
             case "ObjectNameText": return "Objeto";
             case "LocationText": return "Ubicación";
             case "UUIDText": return "UUID";
@@ -217,6 +246,7 @@
                 case "MenuMyPurchases": return "Mis Compras";
                 case "MenuTransactions": return "Transacciones de usuario";
                 case "MenuMyTransactions": return "Mis Transacciones";
+                case "MenuMyClassifieds": return "Mis Classifieds <NT>";                
                 case "MenuStatistics": return "Visor de estadísticas";
                 case "MenuGridSettings": return "Configuración de la cuadrícula";
 
@@ -303,17 +333,19 @@
 
                 // Language Switcher Tooltips
                 case "en":
-                    return "Inglés";
+                    return "English";
                 case "fr":
-                    return "Francés";
+                    return "Français";
                 case "de":
-                    return "Alemán";
+                    return "Deutsch";
                 case "it":
                     return "Italiano";
                 case "es":
                     return "Español";
                 case "nl":
-                    return "Holandés";
+                    return "Nederlands";
+                case "ru":
+                    return "Русский";
 
                 // Index Page
                 case "HomeText":
@@ -527,11 +559,15 @@
                 case "GridnameText": return "Nombre de cuadrícula ";
                 case "GridnickText": return "Apodo Cuadrícula ";
                 case "WelcomeMessageText": return "Ingresa mensajes de bienvenida ";
-                case "SystemEstateNameText": return "Nombre raíces Sistema ";
-                case "SystemEstateOwnerText": return "Sistema de nombre de propietario de la finca";
+            case "GovernorNameText": return "Gobernador del sistema";
+            case "MainlandEstateNameText": return "Raíces continental";
+            case "RealEstateOwnerNameText": return "Sistema de nombre de propietario de la finca";
+            case "SystemEstateNameText": return "Nombre raíces Sistema";
+            case "BankerNameText": return "Banquero sistema";
+            case "MarketPlaceOwnerNameText": return "Propietario del sistema de mercado";
 
-                //settings manager page
-                case "WebRegistrationText":
+            //settings manager page
+            case "WebRegistrationText":
                     return "Registros Web permitidas";
                 case "GridCenterXText":
                     return "Grid Center Location X";
@@ -563,7 +599,10 @@
                 case "LoggedIPText": return "Dirección IP registrada";
                 case "NoPurchasesText": return "No se encontraron compras...";
                 case "PurchaseCostText": return "Costo";
-
+                
+                // Classifieds
+                case "ClassifiedsText": return "Anuncio Breve";
+                
                 // Sim Console
                 case "SimConsoleText": return "Sim Command Console";
                 case "SimCommandText": return "Command";

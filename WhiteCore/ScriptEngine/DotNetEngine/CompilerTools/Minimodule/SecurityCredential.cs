@@ -25,15 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.SceneInfo;
 using OpenMetaverse;
+using WhiteCore.Framework.SceneInfo;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
 {
-    internal class SecurityCredential : ISecurityCredential
+    class SecurityCredential : ISecurityCredential
     {
-        private readonly ISocialEntity m_owner;
-        private readonly IScene m_scene;
+        readonly ISocialEntity m_owner;
+        readonly IScene m_scene;
 
         public SecurityCredential(ISocialEntity m_owner, IScene m_scene)
         {

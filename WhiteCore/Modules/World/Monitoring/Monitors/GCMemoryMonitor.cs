@@ -31,31 +31,31 @@ using WhiteCore.Framework.Modules;
 
 namespace WhiteCore.Modules.Monitoring.Monitors
 {
-    internal class GCMemoryMonitor : IMonitor
+    class GCMemoryMonitor : IMonitor
     {
         #region Implementation of IMonitor
 
-        public double GetValue()
+        public double GetValue ()
         {
-            return GC.GetTotalMemory(false);
+            return GC.GetTotalMemory (false);
         }
 
-        public string GetName()
+        public string GetName ()
         {
             return "GC Reported Memory";
         }
 
-        public string GetInterfaceName()
+        public string GetInterfaceName ()
         {
             return "";
         }
 
-        public string GetFriendlyValue()
+        public string GetFriendlyValue ()
         {
-            return (int) (GetValue()/(1024*1024)) + "MB (Global)";
+            return (int)(GetValue () / (1024 * 1024)) + "MB (Global)";
         }
 
-        public void ResetStats()
+        public void ResetStats ()
         {
         }
 

@@ -66,7 +66,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
         SculptType SculptType { get; set; }
 
         HoleShape HoleType { get; set; }
-        Double HoleSize { get; set; }
+        double HoleSize { get; set; }
         PrimType PrimType { get; set; }
     }
 }

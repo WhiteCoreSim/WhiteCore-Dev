@@ -108,9 +108,10 @@ namespace WhiteCore.Services.SQLServices.AvatarService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public AvatarAppearance GetAppearance(UUID principalID)
         {
-            object remoteValue = DoRemoteByURL("AvatarServerURI", principalID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (AvatarAppearance) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("AvatarServerURI", principalID);
+                return remoteValue != null ? (AvatarAppearance)remoteValue : null;
+            }
 
             return m_Database.Get(principalID);
         }
@@ -150,9 +151,10 @@ namespace WhiteCore.Services.SQLServices.AvatarService
                 return;
             }
 
+            m_Database.Store (principalID, appearance);
+
             var simBase = m_registry.RequestModuleInterface<ISimulationBase> ();
-            simBase.EventManager.FireGenericEventHandler("SetAppearance", new object[2] { principalID, appearance });
-            m_Database.Store(principalID, appearance);
+            simBase.EventManager.FireGenericEventHandler("SetAppearance", new object[] { principalID, appearance });
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
@@ -169,7 +171,7 @@ namespace WhiteCore.Services.SQLServices.AvatarService
 
         object DeleteUserInformation(string name, object param)
         {
-            UUID user = (UUID) param;
+            var user = (UUID) param;
             ResetAvatar(user);
             return null;
         }
@@ -191,7 +193,7 @@ namespace WhiteCore.Services.SQLServices.AvatarService
                 return;
             }
             ResetAvatar(acc.PrincipalID);
-            InventoryFolderBase folder = m_invService.GetFolderForType(acc.PrincipalID, (InventoryType) 0, FolderType.CurrentOutfit);
+            InventoryFolderBase folder = m_invService.GetFolderForType(acc.PrincipalID, 0, FolderType.CurrentOutfit);
             if (folder != null)
                 m_invService.ForcePurgeFolder(folder);
 

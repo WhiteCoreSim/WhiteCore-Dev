@@ -28,16 +28,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using WhiteCore.Framework.SceneInfo;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
+using WhiteCore.Framework.SceneInfo;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine.Plugins
 {
     public class TimerPlugin : IScriptPlugin
     {
-        private readonly object TimerListLock = new object();
-        private readonly Dictionary<string, TimerClass> Timers = new Dictionary<string, TimerClass>();
+        readonly object TimerListLock = new object();
+        readonly Dictionary<string, TimerClass> Timers = new Dictionary<string, TimerClass>();
         public ScriptEngine m_ScriptEngine;
 
         #region IScriptPlugin Members
@@ -84,7 +84,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Plugins
                 {
                     // Add it to queue
                     m_ScriptEngine.PostScriptEvent(ts.itemID, ts.ID,
-                                                   new EventParams("timer", new Object[0],
+                                                   new EventParams("timer", new object [0],
                                                                    new DetectParams[0]), EventPriority.Continued);
                     // set next interval
 
@@ -134,9 +134,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Plugins
 
         #endregion
 
-        private static string MakeTimerKey(UUID ID, UUID itemID)
+        static string MakeTimerKey(UUID ID, UUID itemID)
         {
-            return ID.ToString() + itemID.ToString();
+            return ID.ToString() + itemID;
         }
 
         public void SetTimerEvent(UUID m_ID, UUID m_itemID, double sec)
@@ -170,7 +170,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Plugins
 
         #region Nested type: TimerClass
 
-        private class TimerClass
+        class TimerClass
         {
             public UUID ID;
             public long interval;

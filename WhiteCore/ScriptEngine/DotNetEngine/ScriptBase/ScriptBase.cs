@@ -37,14 +37,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
 {
     public partial class ScriptBaseClass : MarshalByRefObject, IScript, IDisposable
     {
-        private readonly ScriptSponsor m_sponser;
+        readonly ScriptSponsor m_sponser;
 
         public ISponsor Sponsor
         {
             get { return m_sponser; }
         }
 
-        private bool m_stateSaveRequired;
+        bool m_stateSaveRequired;
 
         public bool NeedsStateSaved
         {
@@ -70,7 +70,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
             }
         }
 
-        private Dictionary<string, object> m_lastStateSaveValues;
+        Dictionary<string, object> m_lastStateSaveValues;
         public IScene Scene;
         public ISceneChildEntity Object;
         public bool m_useStateSaves = true;
@@ -82,7 +82,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
             m_useStateSaves = useStateSaves;
         }
 
-        public override Object InitializeLifetimeService()
+        public override object InitializeLifetimeService()
         {
             try
             {
@@ -129,8 +129,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
             return m_Executor.CheckSlice();
         }
 
-        private Dictionary<string, object> m_InitialValues =
-            new Dictionary<string, object>();
+        Dictionary<string, object> m_InitialValues = new Dictionary<string, object>();
 
         public Dictionary<string, IScriptApi> m_apis = new Dictionary<string, IScriptApi>();
 
@@ -174,7 +173,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
                     LSL_Types.list v = (LSL_Types.list) field.GetValue(this);
                     if (((object) v) == null)
                         continue; //Broken... :/
-                    Object[] data = new Object[v.Data.Length];
+                    object[] data = new object[v.Data.Length];
                     Array.Copy(v.Data, 0, data, 0, v.Data.Length);
                     LSL_Types.list c = new LSL_Types.list {Data = data};
                     vars[field.Name] = c;
@@ -182,11 +181,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
                 else if (field.FieldType == typeof (LSL_Types.LSLInteger) ||
                          field.FieldType == typeof (LSL_Types.LSLString) ||
                          field.FieldType == typeof (LSL_Types.LSLFloat) ||
-                         field.FieldType == typeof (Int32) ||
-                         field.FieldType == typeof (Double) ||
-                         field.FieldType == typeof (Single) ||
-                         field.FieldType == typeof (String) ||
-                         field.FieldType == typeof (Byte) ||
+                         field.FieldType == typeof (int) ||
+                         field.FieldType == typeof (double) ||
+                         field.FieldType == typeof (float) ||
+                         field.FieldType == typeof (string) ||
+                         field.FieldType == typeof (byte) ||
                          field.FieldType == typeof (short) ||
                          field.FieldType == typeof (LSL_Types.Vector3) ||
                          field.FieldType == typeof (LSL_Types.Quaternion))
@@ -222,8 +221,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
                     if (field.FieldType == typeof (LSL_Types.list))
                     {
                         LSL_Types.list v = (LSL_Types.list) field.GetValue(this);
-                        Object[] data = ((LSL_Types.list) (newVal)).Data;
-                        v.Data = new Object[data.Length];
+                        object[] data = ((LSL_Types.list) (newVal)).Data;
+                        v.Data = new object[data.Length];
                         Array.Copy(data, 0, v.Data, 0, data.Length);
                         field.SetValue(this, v);
                     }
@@ -231,11 +230,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
                     else if (field.FieldType == typeof (LSL_Types.LSLInteger) ||
                              field.FieldType == typeof (LSL_Types.LSLString) ||
                              field.FieldType == typeof (LSL_Types.LSLFloat) ||
-                             field.FieldType == typeof (Int32) ||
-                             field.FieldType == typeof (Double) ||
-                             field.FieldType == typeof (Single) ||
-                             field.FieldType == typeof (String) ||
-                             field.FieldType == typeof (Byte) ||
+                             field.FieldType == typeof (int) ||
+                             field.FieldType == typeof (double) ||
+                             field.FieldType == typeof (float) ||
+                             field.FieldType == typeof (string) ||
+                             field.FieldType == typeof (byte) ||
                              field.FieldType == typeof (short) ||
                              field.FieldType == typeof (LSL_Types.Vector3) ||
                              field.FieldType == typeof (LSL_Types.Quaternion)
@@ -348,11 +347,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
                 else if (field.FieldType == typeof (LSL_Types.LSLInteger) ||
                          field.FieldType == typeof (LSL_Types.LSLString) ||
                          field.FieldType == typeof (LSL_Types.LSLFloat) ||
-                         field.FieldType == typeof (Int32) ||
-                         field.FieldType == typeof (Double) ||
-                         field.FieldType == typeof (Single) ||
-                         field.FieldType == typeof (String) ||
-                         field.FieldType == typeof (Byte) ||
+                         field.FieldType == typeof (int) ||
+                         field.FieldType == typeof (double) ||
+                         field.FieldType == typeof (float) ||
+                         field.FieldType == typeof (string) ||
+                         field.FieldType == typeof (byte) ||
                          field.FieldType == typeof (short) ||
                          field.FieldType == typeof (LSL_Types.Vector3) ||
                          field.FieldType == typeof (LSL_Types.Quaternion))
@@ -513,29 +512,29 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
                         float val = float.Parse(var.ToString());
                         field.SetValue(this, new LSL_Types.LSLFloat(val));
                     }
-                    else if (field.FieldType == typeof (Int32))
+                    else if (field.FieldType == typeof (int))
                     {
-                        Int32 val = Int32.Parse(var.ToString());
+                        int val = int.Parse(var.ToString());
                         field.SetValue(this, val);
                     }
-                    else if (field.FieldType == typeof (Double))
+                    else if (field.FieldType == typeof (double))
                     {
-                        Double val = Double.Parse(var.ToString());
+                        double val = double.Parse(var.ToString());
                         field.SetValue(this, val);
                     }
-                    else if (field.FieldType == typeof (Single))
+                    else if (field.FieldType == typeof (float))
                     {
-                        Single val = Single.Parse(var.ToString());
+                        float val = float.Parse(var.ToString());
                         field.SetValue(this, val);
                     }
-                    else if (field.FieldType == typeof (String))
+                    else if (field.FieldType == typeof (string))
                     {
-                        String val = var.ToString();
+                        string val = var.ToString();
                         field.SetValue(this, val);
                     }
-                    else if (field.FieldType == typeof (Byte))
+                    else if (field.FieldType == typeof (byte))
                     {
-                        Byte val = Byte.Parse(var.ToString());
+                        byte val = byte.Parse(var.ToString());
                         field.SetValue(this, val);
                     }
                     else if (field.FieldType == typeof (short))
@@ -585,7 +584,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         	GC.SuppressFinalize(this);
         }
 
-        private Type m_typeCache; //This shouldn't normally be used
+        Type m_typeCache; //This shouldn't normally be used
 
         public virtual IEnumerator FireEvent(string evName, object[] parameters)
         {

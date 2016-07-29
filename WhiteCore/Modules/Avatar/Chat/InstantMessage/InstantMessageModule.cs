@@ -51,15 +51,14 @@ namespace WhiteCore.Modules.Chat
 
         #region INonSharedRegionModule Members
 
-        public void Initialise(IConfigSource config)
+        public void Initialise (IConfigSource config)
         {
-            if (config.Configs["Messaging"] != null)
-            {
-                m_enabled = (config.Configs["Messaging"].GetString("InstantMessageModule", Name) == Name);
+            if (config.Configs ["Messaging"] != null) {
+                m_enabled = (config.Configs ["Messaging"].GetString ("InstantMessageModule", Name) == Name);
             }
         }
 
-        public void AddRegion(IScene scene)
+        public void AddRegion (IScene scene)
         {
             if (!m_enabled)
                 return;
@@ -70,19 +69,17 @@ namespace WhiteCore.Modules.Chat
             scene.EventManager.OnIncomingInstantMessage += OnGridInstantMessage;
         }
 
-        public void RegionLoaded(IScene scene)
+        public void RegionLoaded (IScene scene)
         {
             if (!m_enabled)
                 return;
 
-            if (m_TransferModule == null)
-            {
+            if (m_TransferModule == null) {
                 m_TransferModule =
-                    scene.RequestModuleInterface<IMessageTransferModule>();
+                    scene.RequestModuleInterface<IMessageTransferModule> ();
 
-                if (m_TransferModule == null)
-                {
-                    MainConsole.Instance.Error("[INSTANT MESSAGE]: No message transfer module, IM will not work!");
+                if (m_TransferModule == null) {
+                    MainConsole.Instance.Error ("[INSTANT MESSAGE]: No message transfer module, IM will not work!");
                     scene.EventManager.OnNewClient -= EventManager_OnNewClient;
                     scene.EventManager.OnClosingClient -= EventManager_OnClosingClient;
                     scene.EventManager.OnIncomingInstantMessage -= OnGridInstantMessage;
@@ -93,7 +90,7 @@ namespace WhiteCore.Modules.Chat
             }
         }
 
-        public void RemoveRegion(IScene scene)
+        public void RemoveRegion (IScene scene)
         {
             if (!m_enabled)
                 return;
@@ -101,81 +98,73 @@ namespace WhiteCore.Modules.Chat
             m_Scene = null;
         }
 
-        public void Close()
+        public void Close ()
         {
         }
 
-        public string Name
-        {
+        public string Name {
             get { return "InstantMessageModule"; }
         }
 
-        public Type ReplaceableInterface
-        {
+        public Type ReplaceableInterface {
             get { return null; }
         }
 
         #endregion
 
-        void EventManager_OnClosingClient(IClientAPI client)
+        void EventManager_OnClosingClient (IClientAPI client)
         {
             //client.OnInstantMessage -= OnInstantMessage;
         }
 
-        void EventManager_OnNewClient(IClientAPI client)
+        void EventManager_OnNewClient (IClientAPI client)
         {
             client.OnInstantMessage += OnInstantMessage;
         }
 
-        public void OnInstantMessage(IClientAPI client, GridInstantMessage im)
+        public void OnInstantMessage (IClientAPI client, GridInstantMessage im)
         {
             byte dialog = im.Dialog;
 
-            if (dialog != (byte) InstantMessageDialog.MessageFromAgent
-                && dialog != (byte) InstantMessageDialog.StartTyping
-                && dialog != (byte) InstantMessageDialog.StopTyping
-                && dialog != (byte) InstantMessageDialog.BusyAutoResponse
-                && dialog != (byte) InstantMessageDialog.MessageFromObject)
-            {
+            if (dialog != (byte)InstantMessageDialog.MessageFromAgent
+                && dialog != (byte)InstantMessageDialog.StartTyping
+                && dialog != (byte)InstantMessageDialog.StopTyping
+                && dialog != (byte)InstantMessageDialog.BusyAutoResponse
+                && dialog != (byte)InstantMessageDialog.MessageFromObject) {
                 return;
             }
 
-            if (m_TransferModule != null)
-            {
-                if (client == null)
-                {
-                    UserAccount account = m_Scene.UserAccountService.GetUserAccount(m_Scene.RegionInfo.AllScopeIDs,
+            if (m_TransferModule != null) {
+                if (client == null) {
+                    UserAccount account = m_Scene.UserAccountService.GetUserAccount (m_Scene.RegionInfo.AllScopeIDs,
                                                                                     im.FromAgentID);
                     if (account != null)
                         im.FromAgentName = account.Name;
                     else
                         im.FromAgentName = im.FromAgentName + "(No account found for this user)";
-                }
-                else
+                } else
                     im.FromAgentName = client.Name;
 
-                m_TransferModule.SendInstantMessage(im);
+                m_TransferModule.SendInstantMessage (im);
             }
         }
 
         /// <summary>
         /// </summary>
         /// <param name="msg"></param>
-        void OnGridInstantMessage(GridInstantMessage msg)
+        void OnGridInstantMessage (GridInstantMessage msg)
         {
             byte dialog = msg.Dialog;
 
-            if (dialog != (byte) InstantMessageDialog.MessageFromAgent
-                && dialog != (byte) InstantMessageDialog.StartTyping
-                && dialog != (byte) InstantMessageDialog.StopTyping
-                && dialog != (byte) InstantMessageDialog.MessageFromObject)
-            {
+            if (dialog != (byte)InstantMessageDialog.MessageFromAgent
+                && dialog != (byte)InstantMessageDialog.StartTyping
+                && dialog != (byte)InstantMessageDialog.StopTyping
+                && dialog != (byte)InstantMessageDialog.MessageFromObject) {
                 return;
             }
 
-            if (m_TransferModule != null)
-            {
-                UserAccount account = m_Scene.UserAccountService.GetUserAccount(m_Scene.RegionInfo.AllScopeIDs,
+            if (m_TransferModule != null) {
+                UserAccount account = m_Scene.UserAccountService.GetUserAccount (m_Scene.RegionInfo.AllScopeIDs,
                                                                                 msg.FromAgentID);
                 if (account != null)
                     msg.FromAgentName = account.Name;
@@ -183,9 +172,8 @@ namespace WhiteCore.Modules.Chat
                     msg.FromAgentName = msg.FromAgentName + "(No account found for this user)";
 
                 IScenePresence presence = null;
-                if (m_Scene.TryGetScenePresence(msg.ToAgentID, out presence))
-                {
-                    presence.ControllingClient.SendInstantMessage(msg);
+                if (m_Scene.TryGetScenePresence (msg.ToAgentID, out presence)) {
+                    presence.ControllingClient.SendInstantMessage (msg);
                     return;
                 }
             }

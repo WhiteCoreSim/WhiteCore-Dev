@@ -26,6 +26,11 @@
  */
 
 
+using System;
+using System.Collections.Generic;
+using System.Timers;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
@@ -33,138 +38,128 @@ using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Other;
-using Nini.Config;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
-using System.Timers;
 
 namespace WhiteCore.Modules.ActivityDetectors
 {
     public class ActivityDetector : INonSharedRegionModule
     {
-        private IScene m_scene;
-        private readonly List<UUID> m_zombieAgents = new List<UUID>();
-        private Timer m_presenceUpdateTimer;
+        IScene m_scene;
+        readonly List<UUID> m_zombieAgents = new List<UUID> ();
+        Timer m_presenceUpdateTimer;
 
         #region INonSharedRegionModule Members
 
-        public void Initialise(IConfigSource source)
+        public void Initialise (IConfigSource source)
         {
         }
 
-        public void Close()
+        public void Close ()
         {
         }
 
-        public void AddRegion(IScene scene)
+        public void AddRegion (IScene scene)
         {
-            scene.WhiteCoreEventManager.RegisterEventHandler("AgentIsAZombie", OnGenericEvent);
+            scene.WhiteCoreEventManager.RegisterEventHandler ("AgentIsAZombie", OnGenericEvent);
             scene.EventManager.OnNewClient += OnNewClient;
             scene.EventManager.OnClosingClient += OnClosingClient;
         }
 
-        public void RemoveRegion(IScene scene)
+        public void RemoveRegion (IScene scene)
         {
-            if (!scene.CloseQuietly)
-            {
-                ISyncMessagePosterService syncMessage = scene.RequestModuleInterface<ISyncMessagePosterService>();
+            if (!scene.CloseQuietly) {
+                ISyncMessagePosterService syncMessage = scene.RequestModuleInterface<ISyncMessagePosterService> ();
                 if (syncMessage != null)
-                    syncMessage.PostToServer(SyncMessageHelper.LogoutRegionAgents(scene.RegionInfo.RegionID));
+                    syncMessage.PostToServer (SyncMessageHelper.LogoutRegionAgents (scene.RegionInfo.RegionID));
             }
             scene.EventManager.OnNewClient -= OnNewClient;
             scene.EventManager.OnClosingClient -= OnClosingClient;
             m_scene = null;
         }
 
-        public void RegionLoaded(IScene scene)
+        public void RegionLoaded (IScene scene)
         {
             scene.EventManager.OnStartupFullyComplete += EventManager_OnStartupFullyComplete;
             m_scene = scene;
-            if (m_presenceUpdateTimer == null)
-            {
-                m_presenceUpdateTimer = new Timer {Interval = 1000*60*28};
+            if (m_presenceUpdateTimer == null) {
+                m_presenceUpdateTimer = new Timer { Interval = 1000 * 60 * 28 };
                 //As agents move around, they could get to regions that won't update them in time, so we cut 
                 // the time in half, and then a bit less so that they are updated consistently
                 m_presenceUpdateTimer.Elapsed += m_presenceUpdateTimer_Elapsed;
-                m_presenceUpdateTimer.Start();
+                m_presenceUpdateTimer.Start ();
             }
         }
 
-        public string Name
-        {
+        public string Name {
             get { return "ActivityDetector"; }
         }
 
-        public Type ReplaceableInterface
-        {
+        public Type ReplaceableInterface {
             get { return null; }
         }
 
         #endregion
 
-        private void m_presenceUpdateTimer_Elapsed(object sender, ElapsedEventArgs e)
+        void m_presenceUpdateTimer_Elapsed (object sender, ElapsedEventArgs e)
         {
-            IAgentInfoService service = m_scene.RequestModuleInterface<IAgentInfoService>();
+            IAgentInfoService service = m_scene.RequestModuleInterface<IAgentInfoService> ();
             if (service == null)
                 return;
-            foreach (IScenePresence sp in m_scene.GetScenePresences())
-            {
+            foreach (IScenePresence sp in m_scene.GetScenePresences ()) {
                 //This causes the last pos to be updated in the database, along with the last seen time
-                sp.AddChildAgentUpdateTaint(1);
+                sp.AddChildAgentUpdateTaint (1);
             }
         }
 
-        private void EventManager_OnStartupFullyComplete(IScene scene, List<string> data)
+        void EventManager_OnStartupFullyComplete (IScene scene, List<string> data)
         {
             //Just send the RegionIsOnline message, it will log out all the agents for the region as well
-            ISyncMessagePosterService syncMessage = scene.RequestModuleInterface<ISyncMessagePosterService>();
+            ISyncMessagePosterService syncMessage = scene.RequestModuleInterface<ISyncMessagePosterService> ();
             if (syncMessage != null)
-                syncMessage.PostToServer(SyncMessageHelper.RegionIsOnline(scene.RegionInfo.RegionID));
+                syncMessage.PostToServer (SyncMessageHelper.RegionIsOnline (scene.RegionInfo.RegionID));
         }
 
-        public void OnNewClient(IClientAPI client)
+        public void OnNewClient (IClientAPI client)
         {
             client.OnConnectionClosed += OnConnectionClose;
         }
 
-        private void OnClosingClient(IClientAPI client)
+        void OnClosingClient (IClientAPI client)
         {
             client.OnConnectionClosed -= OnConnectionClose;
         }
 
-        public object OnGenericEvent(string functionName, object parameters)
+        public object OnGenericEvent (string functionName, object parameters)
         {
-            m_zombieAgents.Add((UUID) parameters);
+            m_zombieAgents.Add ((UUID)parameters);
             return null;
         }
 
-        public void OnConnectionClose(IClientAPI client)
+        public void OnConnectionClose (IClientAPI client)
         {
             IScenePresence sp = null;
-            client.Scene.TryGetScenePresence(client.AgentId, out sp);
-            if (client.IsLoggingOut && sp != null & !sp.IsChildAgent)
-            {
-                MainConsole.Instance.InfoFormat("[ActivityDetector]: Detected logout of user {0} in region {1}",
+            client.Scene.TryGetScenePresence (client.AgentId, out sp);
+            if (sp == null)
+                return;         // unable to find agent
+
+            if (client.IsLoggingOut && !sp.IsChildAgent) {
+                MainConsole.Instance.InfoFormat ("[Activity detector]: Detected logout of user {0} in region {1}",
                                                 client.Name,
                                                 client.Scene.RegionInfo.RegionName);
 
                 //Inform the grid service about it
 
-                if (m_zombieAgents.Contains(client.AgentId))
-                {
-                    m_zombieAgents.Remove(client.AgentId);
+                if (m_zombieAgents.Contains (client.AgentId)) {
+                    m_zombieAgents.Remove (client.AgentId);
                     return; //They are a known zombie, just clear them out and go on with life!
                 }
-                AgentPosition agentpos = new AgentPosition
-                                             {
-                                                 AgentID = sp.UUID,
-                                                 AtAxis = sp.CameraAtAxis,
-                                                 Center = sp.CameraPosition,
-                                                 Far = sp.DrawDistance,
-                                                 LeftAxis = Vector3.Zero,
-                                                 Position = sp.AbsolutePosition
-                                             };
+                AgentPosition agentpos = new AgentPosition {
+                    AgentID = sp.UUID,
+                    AtAxis = sp.CameraAtAxis,
+                    Center = sp.CameraPosition,
+                    Far = sp.DrawDistance,
+                    LeftAxis = Vector3.Zero,
+                    Position = sp.AbsolutePosition
+                };
                 if (agentpos.Position.X > sp.Scene.RegionInfo.RegionSizeX)
                     agentpos.Position.X = sp.Scene.RegionInfo.RegionSizeX;
                 if (agentpos.Position.Y > sp.Scene.RegionInfo.RegionSizeY)
@@ -178,15 +173,15 @@ namespace WhiteCore.Modules.ActivityDetectors
                 if (agentpos.Position.Z < 0)
                     agentpos.Position.Z = 0;
                 agentpos.RegionHandle = sp.Scene.RegionInfo.RegionHandle;
-                agentpos.Size = sp.PhysicsActor != null ? sp.PhysicsActor.Size : new Vector3(0, 0, 1.8f);
+                agentpos.Size = sp.PhysicsActor != null ? sp.PhysicsActor.Size : new Vector3 (0, 0, 1.8f);
                 agentpos.UpAxis = Vector3.Zero;
                 agentpos.Velocity = sp.Velocity;
                 agentpos.UserGoingOffline = true; //Don't attempt to add us into other regions
 
                 //Send the child agent data update
-                ISyncMessagePosterService syncPoster = sp.Scene.RequestModuleInterface<ISyncMessagePosterService>();
+                ISyncMessagePosterService syncPoster = sp.Scene.RequestModuleInterface<ISyncMessagePosterService> ();
                 if (syncPoster != null)
-                    syncPoster.PostToServer(SyncMessageHelper.AgentLoggedOut(client.AgentId,
+                    syncPoster.PostToServer (SyncMessageHelper.AgentLoggedOut (client.AgentId,
                                                                              client.Scene.RegionInfo.RegionID, agentpos));
             }
         }

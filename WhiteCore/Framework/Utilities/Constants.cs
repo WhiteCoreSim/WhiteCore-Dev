@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 namespace WhiteCore.Framework.Utilities
 {
     public static class Constants
@@ -45,9 +44,13 @@ namespace WhiteCore.Framework.Utilities
         public const string DEFAULT_AVATARARCHIVE_DIR = "AvatarArchives";
         public const string DEFAULT_OARARCHIVE_DIR = "OarFiles";
         public const string DEFAULT_USERINVENTORY_DIR = "UserArchives";
+        public const string DEFAULT_OAR_BACKUP_FILENAME = "region.oar";
 
         public const string DEFAULT_USERHTML_DIR = "html";
+        public const string DEFAULT_LOG_DIR = "logs";
 
+        public const int DEFAULT_REGIONSTART_X = 1000;
+        public const int DEFAULT_REGIONSTART_Y = 1000;
         public const int RegionSize = 256;
         public const int RegionHeight = 10000;
         public const byte TerrainPatchSize = 16;
@@ -87,7 +90,6 @@ namespace WhiteCore.Framework.Utilities
         public const string MarketplaceOwnerUUID = "198e72a6-cef6-4bbb-ae08-c0a79e6b7d1e";
         public const string MarketplaceOwnerName = "Marketplace Concierge";
 
-
         // user levels
         public const int USER_DISABLED = -2;
         public const int USER_BANNED = -1;
@@ -119,6 +121,5 @@ namespace WhiteCore.Framework.Utilities
         public const int GROUP_PAYMENTS_DELAY = 30;         // minutes to wait after stipend payments before processing group payments
         public const int GROUP_DISBURSMENTS_DELAY = 5;      // offset disbursments by 5 minutes
         public const int DIRECTORYFEE_GRACE_PERIOD = 2;     // hours grace period before a fee will be charged at least once
-
     }
 }

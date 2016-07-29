@@ -58,8 +58,7 @@ namespace WhiteCore.Modules.Land
 
         #region ILandObject Members
 
-        public LandData LandData
-        {
+        public LandData LandData {
             get { return m_landData; }
 
             set {
@@ -70,8 +69,7 @@ namespace WhiteCore.Modules.Land
             }
         }
 
-        public UUID RegionUUID
-        {
+        public UUID RegionUUID {
             get { return m_scene.RegionInfo.RegionID; }
         }
 
@@ -139,12 +137,9 @@ namespace WhiteCore.Modules.Land
                 return;
 
             // otherwise, go the long way.
-            for (uint y = startY; y <= endY; ++y)
-            {
-                for (uint x = startX; x <= endX; ++x)
-                {
-                    if (land.ContainsPoint ((int)x, (int)y))
-                    {
+            for (uint y = startY; y <= endY; ++y) {
+                for (uint x = startX; x <= endX; ++x) {
+                    if (land.ContainsPoint ((int)x, (int)y)) {
                         // found a point
                         refX = x;
                         refY = y;
@@ -171,10 +166,9 @@ namespace WhiteCore.Modules.Land
             IParcelManagementModule parcelManModule = m_scene.RequestModuleInterface<IParcelManagementModule> ();
             if (parcelManModule == null)
                 return false;
-            if (x >= 0 && y >= 0 && x < m_scene.RegionInfo.RegionSizeX && y < m_scene.RegionInfo.RegionSizeY)
-            {
+            if (x >= 0 && y >= 0 && x < m_scene.RegionInfo.RegionSizeX && y < m_scene.RegionInfo.RegionSizeY) {
                 return (parcelManModule.LandIDList [x / 4, y / 4] == LandData.LocalID);
-            } 
+            }
             return false;
         }
 
@@ -196,25 +190,23 @@ namespace WhiteCore.Modules.Land
                                        IClientAPI remote_client)
         {
             IEstateModule estateModule = m_scene.RequestModuleInterface<IEstateModule> ();
-            //TODO: This is ugly! FIX. 336723947 == AllowLandmark,AllowSetHome,PublicAccess.AllowDirectTeleport,AllowParcelChanges,AllowVoice
-            ulong regionFlags = 
-                336723974 & ~((uint) (OpenMetaverse.RegionFlags.AllowLandmark | OpenMetaverse.RegionFlags.AllowSetHome));
+            //TODO: This is ugly! FIX. 336723947 == AllowLandmark,AllowSetHome,PublicAllowed,AllowDirectTeleport,AllowParcelChanges,AllowVoice
+            ulong regionFlags =
+                336723974 & ~((uint)(OpenMetaverse.RegionFlags.AllowLandmark | OpenMetaverse.RegionFlags.AllowSetHome));
             if (estateModule != null)
                 regionFlags = estateModule.GetRegionFlags ();
 
             int seq_id;
             if (snap_selection && (sequence_id == 0))
                 seq_id = m_lastSeqId;
-            else
-            {
+            else {
                 seq_id = sequence_id;
                 m_lastSeqId = seq_id;
             }
 
             int MaxPrimCounts = 0;
             IPrimCountModule primCountModule = m_scene.RequestModuleInterface<IPrimCountModule> ();
-            if (primCountModule != null)
-            {
+            if (primCountModule != null) {
                 MaxPrimCounts = primCountModule.GetParcelMaxPrimCount (this);
             }
 
@@ -227,22 +219,17 @@ namespace WhiteCore.Modules.Land
 
         public void UpdateLandProperties (LandUpdateArgs args, IClientAPI remote_client)
         {
-            if (m_scene.RegionInfo.EstateSettings.AllowParcelChanges)
-            {
-                try
-                {
+            if (m_scene.RegionInfo.EstateSettings.AllowParcelChanges) {
+                try {
                     bool snap_selection = false;
 
-                    if (args.AuthBuyerID != LandData.AuthBuyerID || args.SalePrice != LandData.SalePrice)
-                    {
+                    if (args.AuthBuyerID != LandData.AuthBuyerID || args.SalePrice != LandData.SalePrice) {
                         if (m_scene.Permissions.CanSellParcel (remote_client.AgentId, this) &&
-                            m_scene.RegionInfo.RegionSettings.AllowLandResell)
-                        {
+                            m_scene.RegionInfo.RegionSettings.AllowLandResell) {
                             LandData.AuthBuyerID = args.AuthBuyerID;
                             LandData.SalePrice = args.SalePrice;
                             snap_selection = true;
-                        } else
-                        {
+                        } else {
                             remote_client.SendAlertMessage ("Permissions: You cannot set this parcel for sale");
                             args.ParcelFlags &= ~(uint)ParcelFlags.ForSale;
                             args.ParcelFlags &= ~(uint)ParcelFlags.ForSaleObjects;
@@ -250,10 +237,8 @@ namespace WhiteCore.Modules.Land
                         }
                     }
 
-                    if (m_scene.Permissions.CanEditParcelProperties (remote_client.AgentId, this, GroupPowers.LandSetSale))
-                    {
-                        if (!LandData.IsGroupOwned)
-                        {
+                    if (m_scene.Permissions.CanEditParcelProperties (remote_client.AgentId, this, GroupPowers.LandSetSale)) {
+                        if (!LandData.IsGroupOwned) {
                             LandData.GroupID = args.GroupID;
                         }
                     }
@@ -261,8 +246,7 @@ namespace WhiteCore.Modules.Land
                     if (m_scene.Permissions.CanEditParcelProperties (remote_client.AgentId, this, GroupPowers.FindPlaces))
                         LandData.Category = args.Category;
 
-                    if (m_scene.Permissions.CanEditParcelProperties (remote_client.AgentId, this, GroupPowers.ChangeMedia))
-                    {
+                    if (m_scene.Permissions.CanEditParcelProperties (remote_client.AgentId, this, GroupPowers.ChangeMedia)) {
                         LandData.MediaAutoScale = args.MediaAutoScale;
                         LandData.MediaID = args.MediaID;
                         LandData.MediaURL = args.MediaURL;
@@ -274,10 +258,12 @@ namespace WhiteCore.Modules.Land
                         LandData.MediaLoop = args.MediaLoop;
                         LandData.ObscureMusic = args.ObscureMusic;
                         LandData.ObscureMedia = args.ObscureMedia;
+                        // 25062016 Added for LibOMV update 0.9.4.5
+                        LandData.AnyAVSounds = args.AnyAVSounds;
+                        LandData.GroupAVSounds = args.GroupAVSounds;
                     }
 
-                    if (m_scene.Permissions.CanEditParcelProperties (remote_client.AgentId, this, GroupPowers.LandOptions))
-                    {
+                    if (m_scene.Permissions.CanEditParcelProperties (remote_client.AgentId, this, GroupPowers.LandOptions)) {
                         // check for allowed settings and clear if necessary
                         if (m_scene.RegionInfo.RegionSettings.BlockFly &&
                             ((args.ParcelFlags & (uint)ParcelFlags.AllowFly) == (uint)ParcelFlags.AllowFly))
@@ -302,13 +288,10 @@ namespace WhiteCore.Modules.Land
 
                         // Check if ShowDirectory has changed
                         var updShowInDir = (args.ParcelFlags & (uint)ParcelFlags.ShowDirectory);
-                        if ((LandData.Flags & (uint)ParcelFlags.ShowDirectory) != updShowInDir)
-                        {
+                        if ((LandData.Flags & (uint)ParcelFlags.ShowDirectory) != updShowInDir) {
                             IScheduledMoneyModule scheduledMoneyModule = m_scene.RequestModuleInterface<IScheduledMoneyModule> ();
-                            if (scheduledMoneyModule != null)
-                            {
-                                if ((args.ParcelFlags & (uint)ParcelFlags.ShowDirectory) == (uint)ParcelFlags.ShowDirectory)
-                                {
+                            if (scheduledMoneyModule != null) {
+                                if ((args.ParcelFlags & (uint)ParcelFlags.ShowDirectory) == (uint)ParcelFlags.ShowDirectory) {
                                     //Flag is set
                                     var payOk = scheduledMoneyModule.Charge (remote_client.AgentId, // who to charge
                                                         scheduledMoneyModule.DirectoryFeeCharge, // how much
@@ -318,32 +301,31 @@ namespace WhiteCore.Modules.Land
                                                         false, // charge immediately
                                                         false);
                                     // run once
-                                    if (!payOk)
-                                    {
+                                    if (!payOk) {
                                         // Payment was not processed
                                         remote_client.SendAlertMessage ("You don't have enough money to set this parcel in search.");
                                         args.ParcelFlags &= (uint)ParcelFlags.ShowDirectory;
                                     }
-                                } else
-                                {
+                                } else {
                                     scheduledMoneyModule.RemoveDirFeeScheduledCharge ("[ShowInDirectory: " + LandData.GlobalID + "]");
                                 }
                             }
                         }
                         LandData.Flags = args.ParcelFlags;
+                        // 25062016 Added for LibOMV update 0.9.4.5
+                        LandData.SeeAVS = args.SeeAVs;
+
                     }
 
                     if (m_scene.Permissions.CanEditParcelProperties (remote_client.AgentId, this,
-                            GroupPowers.SetLandingPoint))
-                    {
+                            GroupPowers.SetLandingPoint)) {
                         LandData.LandingType = args.LandingType;
                         LandData.UserLocation = args.UserLocation;
                         LandData.UserLookAt = args.UserLookAt;
                     }
 
                     if (m_scene.Permissions.CanEditParcelProperties (remote_client.AgentId, this,
-                            GroupPowers.LandChangeIdentity))
-                    {
+                            GroupPowers.LandChangeIdentity)) {
                         LandData.Description = args.Desc;
                         LandData.Name = args.Name;
                         LandData.SnapshotID = args.SnapshotID;
@@ -351,29 +333,27 @@ namespace WhiteCore.Modules.Land
                     }
 
                     if (m_scene.Permissions.CanEditParcelProperties (remote_client.AgentId, this,
-                            GroupPowers.LandManagePasses))
-                    {
+                            GroupPowers.LandManagePasses)) {
                         LandData.PassHours = args.PassHours;
                         LandData.PassPrice = args.PassPrice;
                     }
 
                     // 20160203 -greythane- the only time we should play with the ParcelStatus is 
                     // if it is being sold to a specified buyer
-                    if (LandData.AuthBuyerID != UUID.Zero)                                    
+                    if (LandData.AuthBuyerID != UUID.Zero)
                         LandData.Status = ParcelStatus.LeasePending;
 
                     // 141031 Greythane, this is an example of where the check needs to go
-/*                    LandData.Status = LandData.OwnerID == m_parcelManagementModule.GodParcelOwner
-                        ? ParcelStatus.Abandoned
-                        : LandData.AuthBuyerID != UUID.Zero
-                        ? ParcelStatus.LeasePending
-                        : ParcelStatus.Leased;
-*/
+                    /*                    LandData.Status = LandData.OwnerID == m_parcelManagementModule.GodParcelOwner
+                                            ? ParcelStatus.Abandoned
+                                            : LandData.AuthBuyerID != UUID.Zero
+                                            ? ParcelStatus.LeasePending
+                                            : ParcelStatus.Leased;
+                    */
                     m_parcelManagementModule.UpdateLandObject (this);
                     SendLandUpdateToAvatarsOverMe (snap_selection);
 
-                } catch (Exception ex)
-                {
+                } catch (Exception ex) {
                     MainConsole.Instance.Warn ("[LAND]: Error updating land object " + LandData.Name + " in region " +
                     m_scene.RegionInfo.RegionName + " : " + ex);
                 }
@@ -384,14 +364,12 @@ namespace WhiteCore.Modules.Land
         public void UpdateLandSold (UUID avatarID, UUID groupID, bool groupOwned, uint AuctionID, int claimprice,
                                    int area)
         {
-            if ((LandData.Flags & (uint)ParcelFlags.SellParcelObjects) == (uint)ParcelFlags.SellParcelObjects)
-            {
+            if ((LandData.Flags & (uint)ParcelFlags.SellParcelObjects) == (uint)ParcelFlags.SellParcelObjects) {
                 //Sell all objects on the parcel too
                 IPrimCountModule primCountModule = m_scene.RequestModuleInterface<IPrimCountModule> ();
                 IPrimCounts primCounts = primCountModule.GetPrimCounts (LandData.GlobalID);
 
-                foreach (ISceneEntity obj in primCounts.Objects.Where(obj => obj.OwnerID == LandData.OwnerID))
-                {
+                foreach (ISceneEntity obj in primCounts.Objects.Where (obj => obj.OwnerID == LandData.OwnerID)) {
                     //Fix the owner/last owner
                     obj.SetOwnerId (avatarID);
                     //Then update all clients around
@@ -407,7 +385,7 @@ namespace WhiteCore.Modules.Land
             LandData.ClaimPrice = claimprice;
             LandData.SalePrice = 0;
             LandData.AuthBuyerID = UUID.Zero;
-            LandData.Flags &= ~(uint) (
+            LandData.Flags &= ~(uint)(
                 ParcelFlags.ForSale |
                 ParcelFlags.ForSaleObjects |
                 ParcelFlags.SellParcelObjects |
@@ -428,10 +406,10 @@ namespace WhiteCore.Modules.Land
             LandData.IsGroupOwned = true;
 
             // Reset show in directory flag on deed
-            LandData.Flags &= ~(uint) (
-                ParcelFlags.ForSale | 
+            LandData.Flags &= ~(uint)(
+                ParcelFlags.ForSale |
                 ParcelFlags.ForSaleObjects |
-                ParcelFlags.SellParcelObjects | 
+                ParcelFlags.SellParcelObjects |
                 ParcelFlags.ShowDirectory);
 
             m_parcelManagementModule.UpdateLandObject (this);
@@ -452,20 +430,16 @@ namespace WhiteCore.Modules.Land
             if (m_scene.Permissions.IsAdministrator (avatar))
                 return false;
 
-            if (LandData.ParcelAccessList.Count > 0)
-            {
-                ParcelManager.ParcelAccessEntry entry = new ParcelManager.ParcelAccessEntry
-                                                            { AgentID = avatar, Flags = AccessList.Ban };
-                entry = LandData.ParcelAccessList.Find (delegate(ParcelManager.ParcelAccessEntry pae)
-                {
+            if (LandData.ParcelAccessList.Count > 0) {
+                var entry = new ParcelManager.ParcelAccessEntry { AgentID = avatar, Flags = AccessList.Ban };
+                entry = LandData.ParcelAccessList.Find (delegate (ParcelManager.ParcelAccessEntry pae) {
                     if (entry.AgentID == pae.AgentID && entry.Flags == pae.Flags)
                         return true;
                     return false;
                 });
 
                 //See if they are on the list, but make sure the owner isn't banned
-                if (entry.AgentID == avatar && LandData.OwnerID != avatar)
-                {
+                if (entry.AgentID == avatar && LandData.OwnerID != avatar) {
                     //They are banned, so lets send them a notice about this parcel
                     return true;
                 }
@@ -475,31 +449,26 @@ namespace WhiteCore.Modules.Land
 
         public bool IsRestrictedFromLand (UUID avatar)
         {
-            if (m_scene.Permissions.GenericParcelPermission (avatar, this, (ulong)1))
+            if (m_scene.Permissions.GenericParcelPermission (avatar, this, 1))
                 return false;
 
             if ((LandData.Flags & (uint)ParcelFlags.UsePassList) > 0 ||
-                (LandData.Flags & (uint)ParcelFlags.UseAccessList) > 0)
-            {
-                if (LandData.ParcelAccessList.Count > 0)
-                {
-                    ParcelManager.ParcelAccessEntry entry = new ParcelManager.ParcelAccessEntry ();
+                (LandData.Flags & (uint)ParcelFlags.UseAccessList) > 0) {
+                if (LandData.ParcelAccessList.Count > 0) {
+                    var entry = new ParcelManager.ParcelAccessEntry ();
                     bool found = false;
                     foreach (
                         ParcelManager.ParcelAccessEntry pae in
-                            LandData.ParcelAccessList.Where(
-                                pae => avatar == pae.AgentID && AccessList.Access == pae.Flags))
-                    {
+                            LandData.ParcelAccessList.Where (
+                                pae => avatar == pae.AgentID && AccessList.Access == pae.Flags)) {
                         found = true;
                         entry = pae;
                         break;
                     }
 
                     //If they are not on the access list and are not the owner
-                    if (!found)
-                    {
-                        if ((LandData.Flags & (uint)ParcelFlags.UseAccessGroup) != 0)
-                        {
+                    if (!found) {
+                        if ((LandData.Flags & (uint)ParcelFlags.UseAccessGroup) != 0) {
                             IScenePresence SP = m_scene.GetScenePresence (avatar);
                             if (SP != null && LandData.GroupID == SP.ControllingClient.ActiveGroupId)
                                 return false;       //They are a part of the group, let them in
@@ -507,15 +476,14 @@ namespace WhiteCore.Modules.Land
                             //They are not allowed in this parcel, but not banned, so lets send them a notice about this parcel
                             return true;
 
-                        } 
+                        }
 
                         //No group checking, not on the access list, restricted
                         return true;
-                    } 
+                    }
 
                     // If it does, we need to check the time
-                    if (entry.Time.Ticks < DateTime.Now.Ticks)
-                    {
+                    if (entry.Time.Ticks < DateTime.Now.Ticks) {
                         //Time expired, remove them
                         LandData.ParcelAccessList.Remove (entry);
                         return true;
@@ -524,15 +492,13 @@ namespace WhiteCore.Modules.Land
 
                 }
 
-                if ((LandData.Flags & (uint)ParcelFlags.UseAccessGroup) > 0)
-                {
+                if ((LandData.Flags & (uint)ParcelFlags.UseAccessGroup) > 0) {
                     IScenePresence SP = m_scene.GetScenePresence (avatar);
-                    if (SP != null && LandData.GroupID == SP.ControllingClient.ActiveGroupId)
-                    {
+                    if (SP != null && LandData.GroupID == SP.ControllingClient.ActiveGroupId) {
                         //They are a part of the group, let them in
                         return false;
                     }
-                     
+
                     // They are not allowed in this parcel, but not banned, so lets send them a notice about this parcel
                     return true;
                 }
@@ -558,13 +524,11 @@ namespace WhiteCore.Modules.Land
 
         public void SendLandUpdateToAvatarsOverMe (bool snap_selection)
         {
-            m_scene.ForEachScenePresence (delegate(IScenePresence avatar)
-            {
+            m_scene.ForEachScenePresence (delegate (IScenePresence avatar) {
                 if (avatar.IsChildAgent)
                     return;
 
-                if (avatar.CurrentParcel.LandData.LocalID == LandData.LocalID)
-                {
+                if (avatar.CurrentParcel.LandData.LocalID == LandData.LocalID) {
                     if (((avatar.CurrentParcel.LandData.Flags & (uint)ParcelFlags.AllowDamage) != 0) ||
                             m_scene.RegionInfo.RegionSettings.AllowDamage)
                         avatar.Invulnerable = false;
@@ -587,10 +551,8 @@ namespace WhiteCore.Modules.Land
             list.Add (new List<UUID> ());
 
             foreach (
-                ParcelManager.ParcelAccessEntry entry in LandData.ParcelAccessList.Where(entry => entry.Flags == flag))
-            {
-                if (list [num].Count > ParcelManagementModule.LAND_MAX_ENTRIES_PER_PACKET)
-                {
+                ParcelManager.ParcelAccessEntry entry in LandData.ParcelAccessList.Where (entry => entry.Flags == flag)) {
+                if (list [num].Count > ParcelManagementModule.LAND_MAX_ENTRIES_PER_PACKET) {
                     num++;
                     list.Add (new List<UUID> ());
                 }
@@ -608,22 +570,18 @@ namespace WhiteCore.Modules.Land
         {
             // this apparently causes problems in the newer viewers - thanks jimtarber via Halcyon
             //if (flags == (uint)AccessList.Access || flags == (uint)AccessList.Both)       
-            if ((flags & (uint) AccessList.Access) == (uint)AccessList.Access)
-            {
+            if ((flags & (uint)AccessList.Access) == (uint)AccessList.Access) {
                 List<List<UUID>> avatars = CreateAccessListArrayByFlag (AccessList.Access);
-                foreach (List<UUID> accessListAvs in avatars)
-                {
+                foreach (List<UUID> accessListAvs in avatars) {
                     remote_client.SendLandAccessListData (accessListAvs, (uint)AccessList.Access, LandData.LocalID);
                 }
             }
 
             // this apparently causes problems in the newer viewers - thanks jimtarber via Halcyon
             //if (flags == (uint)AccessList.Ban || flags == (uint)AccessList.Both)
-            if ((flags & (uint)AccessList.Ban) == (uint)AccessList.Ban)
-            {
+            if ((flags & (uint)AccessList.Ban) == (uint)AccessList.Ban) {
                 List<List<UUID>> avatars = CreateAccessListArrayByFlag (AccessList.Ban);
-                foreach (List<UUID> accessListAvs in avatars)
-                {
+                foreach (List<UUID> accessListAvs in avatars) {
                     remote_client.SendLandAccessListData (accessListAvs, (uint)AccessList.Ban, LandData.LocalID);
                 }
             }
@@ -637,19 +595,16 @@ namespace WhiteCore.Modules.Land
             List<ParcelManager.ParcelAccessEntry> toRemove =
                 LandData.ParcelAccessList.Where (entry => entry.Flags == (AccessList)flags).ToList ();
 
-            foreach (ParcelManager.ParcelAccessEntry entry in toRemove)
-            {
+            foreach (ParcelManager.ParcelAccessEntry entry in toRemove) {
                 LandData.ParcelAccessList.Remove (entry);
             }
 
-            foreach (ParcelManager.ParcelAccessEntry temp in entries.Select(entry => new ParcelManager.ParcelAccessEntry
-                                                                                         {
-                                                                                             AgentID = entry.AgentID,
-                                                                                             Time = DateTime.MaxValue,
-                                                                                             Flags = (AccessList) flags
-                                                                                         })
-                                                                    .Where(temp => !LandData.ParcelAccessList.Contains(temp)))
-            {
+            foreach (ParcelManager.ParcelAccessEntry temp in entries.Select (entry => new ParcelManager.ParcelAccessEntry {
+                AgentID = entry.AgentID,
+                Time = DateTime.MaxValue,
+                Flags = (AccessList)flags
+            })
+                                                                    .Where (temp => !LandData.ParcelAccessList.Contains (temp))) {
                 LandData.ParcelAccessList.Add (temp);
             }
 
@@ -681,12 +636,9 @@ namespace WhiteCore.Modules.Land
             int max_y = 0;
             int tempArea = 0;
             int x, y;
-            for (x = 0; x < m_scene.RegionInfo.RegionSizeX / 4; x++)
-            {
-                for (y = 0; y < m_scene.RegionInfo.RegionSizeY / 4; y++)
-                {
-                    if (parcelManModule.LandIDList [x, y] == LandData.LocalID)
-                    {
+            for (x = 0; x < m_scene.RegionInfo.RegionSizeX / 4; x++) {
+                for (y = 0; y < m_scene.RegionInfo.RegionSizeY / 4; y++) {
+                    if (parcelManModule.LandIDList [x, y] == LandData.LocalID) {
                         if (min_x > x)
                             min_x = x;
                         if (min_y > y)
@@ -726,38 +678,29 @@ namespace WhiteCore.Modules.Land
 
         public void SendForceObjectSelect (int local_id, int request_type, List<UUID> returnIDs, IClientAPI remote_client)
         {
-            if (m_scene.Permissions.CanEditParcel (remote_client.AgentId, this))
-            {
+            if (m_scene.Permissions.CanEditParcel (remote_client.AgentId, this)) {
                 List<uint> resultLocalIDs = new List<uint> ();
-                try
-                {
+                try {
                     IPrimCountModule primCountModule = m_scene.RequestModuleInterface<IPrimCountModule> ();
                     IPrimCounts primCounts = primCountModule.GetPrimCounts (LandData.GlobalID);
-                    foreach (ISceneEntity obj in primCounts.Objects.Where(obj => obj.LocalId > 0))
-                    {
+                    foreach (ISceneEntity obj in primCounts.Objects.Where (obj => obj.LocalId > 0)) {
                         if (request_type == ParcelManagementModule.LAND_SELECT_OBJECTS_OWNER &&
-                            obj.OwnerID == LandData.OwnerID)
-                        {
+                            obj.OwnerID == LandData.OwnerID) {
                             resultLocalIDs.Add (obj.LocalId);
                         } else if (request_type == ParcelManagementModule.LAND_SELECT_OBJECTS_GROUP &&
-                                 obj.GroupID == LandData.GroupID && LandData.GroupID != UUID.Zero)
-                        {
+                                 obj.GroupID == LandData.GroupID && LandData.GroupID != UUID.Zero) {
                             resultLocalIDs.Add (obj.LocalId);
                         } else if (request_type == ParcelManagementModule.LAND_SELECT_OBJECTS_OTHER &&
-                                 obj.OwnerID != remote_client.AgentId)
-                        {
+                                 obj.OwnerID != remote_client.AgentId) {
                             resultLocalIDs.Add (obj.LocalId);
-                        } else if (request_type == (int)ObjectReturnType.List && returnIDs.Contains (obj.OwnerID))
-                        {
+                        } else if (request_type == (int)ObjectReturnType.List && returnIDs.Contains (obj.OwnerID)) {
                             resultLocalIDs.Add (obj.LocalId);
                         } else if (request_type == (int)ObjectReturnType.Sell &&
-                                 obj.OwnerID == remote_client.AgentId)
-                        {
+                                 obj.OwnerID == remote_client.AgentId) {
                             resultLocalIDs.Add (obj.LocalId);
                         }
                     }
-                } catch (InvalidOperationException)
-                {
+                } catch (InvalidOperationException) {
                     MainConsole.Instance.Error ("[LAND]: Unable to force select the parcel objects. Arr.");
                 }
 
@@ -774,19 +717,15 @@ namespace WhiteCore.Modules.Land
         /// </param>
         public void SendLandObjectOwners (IClientAPI remote_client)
         {
-            if (m_scene.Permissions.CanViewObjectOwners (remote_client.AgentId, this))
-            {
+            if (m_scene.Permissions.CanViewObjectOwners (remote_client.AgentId, this)) {
                 IPrimCountModule primCountModule = m_scene.RequestModuleInterface<IPrimCountModule> ();
-                if (primCountModule != null)
-                {
+                if (primCountModule != null) {
                     IPrimCounts primCounts = primCountModule.GetPrimCounts (LandData.GlobalID);
                     Dictionary<UUID, LandObjectOwners> owners = new Dictionary<UUID, LandObjectOwners> ();
-                    foreach (ISceneEntity grp in primCounts.Objects)
-                    {
+                    foreach (ISceneEntity grp in primCounts.Objects) {
                         bool newlyAdded = false;
                         LandObjectOwners landObj;
-                        if (!owners.TryGetValue (grp.OwnerID, out landObj))
-                        {
+                        if (!owners.TryGetValue (grp.OwnerID, out landObj)) {
                             landObj = new LandObjectOwners ();
                             owners.Add (grp.OwnerID, landObj);
                             newlyAdded = true;
@@ -794,16 +733,14 @@ namespace WhiteCore.Modules.Land
 
                         landObj.Count += grp.PrimCount;
                         //Only do all of this once
-                        if (newlyAdded)
-                        {
+                        if (newlyAdded) {
                             if (grp.GroupID != UUID.Zero && grp.GroupID == grp.OwnerID)
                                 landObj.GroupOwned = true;
                             else
                                 landObj.GroupOwned = false;
                             if (landObj.GroupOwned)
                                 landObj.Online = false;
-                            else
-                            {
+                            else {
                                 IAgentInfoService presenceS = m_scene.RequestModuleInterface<IAgentInfoService> ();
                                 UserInfo info = presenceS.GetUserInfo (grp.OwnerID.ToString ());
                                 if (info != null)
@@ -829,10 +766,8 @@ namespace WhiteCore.Modules.Land
             IPrimCountModule primCountModule = m_scene.RequestModuleInterface<IPrimCountModule> ();
             IPrimCounts primCounts = primCountModule.GetPrimCounts (LandData.GlobalID);
 
-            foreach (ISceneEntity obj in primCounts.Objects.Where(obj => obj.OwnerID == m_landData.OwnerID))
-            {
-                if (flags == 4)
-                {
+            foreach (ISceneEntity obj in primCounts.Objects.Where (obj => obj.OwnerID == m_landData.OwnerID)) {
+                if (flags == 4) {
                     bool containsScripts = obj.ChildrenEntities ().Any (child => child.Inventory.ContainsScripts ());
                     if (!containsScripts)
                         continue;
@@ -842,61 +777,51 @@ namespace WhiteCore.Modules.Land
             return prims;
         }
 
-        public void ReturnLandObjects (uint type, UUID[] owners, UUID[] tasks, IClientAPI remote_client)
+        public void ReturnLandObjects (uint type, UUID [] owners, UUID [] tasks, IClientAPI remote_client)
         {
             Dictionary<UUID, List<ISceneEntity>> returns =
                 new Dictionary<UUID, List<ISceneEntity>> ();
 
             IPrimCountModule primCountModule = m_scene.RequestModuleInterface<IPrimCountModule> ();
             IPrimCounts primCounts = primCountModule.GetPrimCounts (LandData.GlobalID);
-            if (type == (uint)ObjectReturnType.Owner)
-            {
-                foreach (ISceneEntity obj in primCounts.Objects.Where(obj => obj.OwnerID == m_landData.OwnerID))
-                {
+            if (type == (uint)ObjectReturnType.Owner) {
+                foreach (ISceneEntity obj in primCounts.Objects.Where (obj => obj.OwnerID == m_landData.OwnerID)) {
                     if (!returns.ContainsKey (obj.OwnerID))
                         returns [obj.OwnerID] =
                             new List<ISceneEntity> ();
                     if (!returns [obj.OwnerID].Contains (obj))
                         returns [obj.OwnerID].Add (obj);
                 }
-            } else if (type == (uint)ObjectReturnType.Group && m_landData.GroupID != UUID.Zero)
-            {
-                foreach (ISceneEntity obj in primCounts.Objects.Where(obj => obj.GroupID == m_landData.GroupID))
-                {
+            } else if (type == (uint)ObjectReturnType.Group && m_landData.GroupID != UUID.Zero) {
+                foreach (ISceneEntity obj in primCounts.Objects.Where (obj => obj.GroupID == m_landData.GroupID)) {
                     if (!returns.ContainsKey (obj.OwnerID))
                         returns [obj.OwnerID] =
                             new List<ISceneEntity> ();
                     if (!returns [obj.OwnerID].Contains (obj))
                         returns [obj.OwnerID].Add (obj);
                 }
-            } else if (type == (uint)ObjectReturnType.Other)
-            {
-                foreach (ISceneEntity obj in primCounts.Objects.Where(obj => obj.OwnerID != m_landData.OwnerID &&
-                                                                             (obj.GroupID != m_landData.GroupID ||
-                                                                              m_landData.GroupID == UUID.Zero)))
-                {
+            } else if (type == (uint)ObjectReturnType.Other) {
+                foreach (ISceneEntity obj in primCounts.Objects.Where (obj => obj.OwnerID != m_landData.OwnerID &&
+                                                                              (obj.GroupID != m_landData.GroupID ||
+                                                                               m_landData.GroupID == UUID.Zero))) {
                     if (!returns.ContainsKey (obj.OwnerID))
                         returns [obj.OwnerID] =
                             new List<ISceneEntity> ();
                     if (!returns [obj.OwnerID].Contains (obj))
                         returns [obj.OwnerID].Add (obj);
                 }
-            } else if (type == (uint)ObjectReturnType.List)
-            {
+            } else if (type == (uint)ObjectReturnType.List) {
                 List<UUID> ownerlist = new List<UUID> (owners);
-                foreach (ISceneEntity obj in primCounts.Objects.Where(obj => ownerlist.Contains(obj.OwnerID)))
-                {
+                foreach (ISceneEntity obj in primCounts.Objects.Where (obj => ownerlist.Contains (obj.OwnerID))) {
                     if (!returns.ContainsKey (obj.OwnerID))
                         returns [obj.OwnerID] =
                             new List<ISceneEntity> ();
                     if (!returns [obj.OwnerID].Contains (obj))
                         returns [obj.OwnerID].Add (obj);
                 }
-            } else if (type == 1)
-            {
+            } else if (type == 1) {
                 List<UUID> Tasks = new List<UUID> (tasks);
-                foreach (ISceneEntity obj in primCounts.Objects.Where(obj => Tasks.Contains(obj.UUID)))
-                {
+                foreach (ISceneEntity obj in primCounts.Objects.Where (obj => Tasks.Contains (obj.UUID))) {
                     if (!returns.ContainsKey (obj.OwnerID))
                         returns [obj.OwnerID] =
                             new List<ISceneEntity> ();
@@ -907,8 +832,7 @@ namespace WhiteCore.Modules.Land
 
             foreach (
                 List<ISceneEntity> ol in
-                    returns.Values.Where(ol => m_scene.Permissions.CanReturnObjects(this, remote_client.AgentId, ol)))
-            {
+                    returns.Values.Where (ol => m_scene.Permissions.CanReturnObjects (this, remote_client.AgentId, ol))) {
                 //The return system will take care of the returned objects
                 m_parcelManagementModule.AddReturns (ol [0].OwnerID, ol [0].Name, ol [0].AbsolutePosition,
                     "Parcel Owner Return", ol);
@@ -916,59 +840,49 @@ namespace WhiteCore.Modules.Land
             }
         }
 
-        public void DisableLandObjects (uint type, UUID[] owners, UUID[] tasks, IClientAPI remote_client)
+        public void DisableLandObjects (uint type, UUID [] owners, UUID [] tasks, IClientAPI remote_client)
         {
             Dictionary<UUID, List<ISceneEntity>> disabled =
                 new Dictionary<UUID, List<ISceneEntity>> ();
 
             IPrimCountModule primCountModule = m_scene.RequestModuleInterface<IPrimCountModule> ();
             IPrimCounts primCounts = primCountModule.GetPrimCounts (LandData.GlobalID);
-            if (type == (uint)ObjectReturnType.Owner)
-            {
-                foreach (ISceneEntity obj in primCounts.Objects.Where(obj => obj.OwnerID == m_landData.OwnerID))
-                {
+            if (type == (uint)ObjectReturnType.Owner) {
+                foreach (ISceneEntity obj in primCounts.Objects.Where (obj => obj.OwnerID == m_landData.OwnerID)) {
                     if (!disabled.ContainsKey (obj.OwnerID))
                         disabled [obj.OwnerID] =
                             new List<ISceneEntity> ();
 
                     disabled [obj.OwnerID].Add (obj);
                 }
-            } else if (type == (uint)ObjectReturnType.Group && m_landData.GroupID != UUID.Zero)
-            {
-                foreach (ISceneEntity obj in primCounts.Objects.Where(obj => obj.GroupID == m_landData.GroupID))
-                {
+            } else if (type == (uint)ObjectReturnType.Group && m_landData.GroupID != UUID.Zero) {
+                foreach (ISceneEntity obj in primCounts.Objects.Where (obj => obj.GroupID == m_landData.GroupID)) {
                     if (!disabled.ContainsKey (obj.OwnerID))
                         disabled [obj.OwnerID] =
                             new List<ISceneEntity> ();
 
                     disabled [obj.OwnerID].Add (obj);
                 }
-            } else if (type == (uint)ObjectReturnType.Other)
-            {
-                foreach (ISceneEntity obj in primCounts.Objects.Where(obj => obj.OwnerID != m_landData.OwnerID &&
-                                                                             (obj.GroupID != m_landData.GroupID ||
-                                                                              m_landData.GroupID == UUID.Zero)))
-                {
+            } else if (type == (uint)ObjectReturnType.Other) {
+                foreach (ISceneEntity obj in primCounts.Objects.Where (obj => obj.OwnerID != m_landData.OwnerID &&
+                                                                              (obj.GroupID != m_landData.GroupID ||
+                                                                               m_landData.GroupID == UUID.Zero))) {
                     if (!disabled.ContainsKey (obj.OwnerID))
                         disabled [obj.OwnerID] =
                             new List<ISceneEntity> ();
                     disabled [obj.OwnerID].Add (obj);
                 }
-            } else if (type == (uint)ObjectReturnType.List)
-            {
+            } else if (type == (uint)ObjectReturnType.List) {
                 List<UUID> ownerlist = new List<UUID> (owners);
-                foreach (ISceneEntity obj in primCounts.Objects.Where(obj => ownerlist.Contains(obj.OwnerID)))
-                {
+                foreach (ISceneEntity obj in primCounts.Objects.Where (obj => ownerlist.Contains (obj.OwnerID))) {
                     if (!disabled.ContainsKey (obj.OwnerID))
                         disabled [obj.OwnerID] =
                             new List<ISceneEntity> ();
                     disabled [obj.OwnerID].Add (obj);
                 }
-            } else if (type == 1)
-            {
+            } else if (type == 1) {
                 List<UUID> Tasks = new List<UUID> (tasks);
-                foreach (ISceneEntity obj in primCounts.Objects.Where(obj => Tasks.Contains(obj.UUID)))
-                {
+                foreach (ISceneEntity obj in primCounts.Objects.Where (obj => Tasks.Contains (obj.UUID))) {
                     if (!disabled.ContainsKey (obj.OwnerID))
                         disabled [obj.OwnerID] =
                             new List<ISceneEntity> ();
@@ -976,22 +890,15 @@ namespace WhiteCore.Modules.Land
                 }
             }
 
-            IScriptModule[] modules = m_scene.RequestModuleInterfaces<IScriptModule> ();
-            foreach (List<ISceneEntity> ol in disabled.Values)
-            {
-                foreach (ISceneEntity group in ol)
-                {
-                    if (m_scene.Permissions.CanEditObject (group.UUID, remote_client.AgentId))
-                    {
-                        foreach (IScriptModule module in modules)
-                        {
+            IScriptModule [] modules = m_scene.RequestModuleInterfaces<IScriptModule> ();
+            foreach (List<ISceneEntity> ol in disabled.Values) {
+                foreach (ISceneEntity group in ol) {
+                    if (m_scene.Permissions.CanEditObject (group.UUID, remote_client.AgentId)) {
+                        foreach (IScriptModule module in modules) {
                             //Disable the entire object
-                            foreach (ISceneChildEntity part in group.ChildrenEntities())
-                            {
-                                foreach (TaskInventoryItem item in part.Inventory.GetInventoryItems())
-                                {
-                                    if (item.InvType == (int)InventoryType.LSL)
-                                    {
+                            foreach (ISceneChildEntity part in group.ChildrenEntities ()) {
+                                foreach (TaskInventoryItem item in part.Inventory.GetInventoryItems ()) {
+                                    if (item.InvType == (int)InventoryType.LSL) {
                                         module.SuspendScript (item.ItemID);
                                     }
                                 }

@@ -30,13 +30,13 @@ using WhiteCore.Framework.SceneInfo;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
 {
-    internal class Host : MarshalByRefObject, IHost
+    class Host : MarshalByRefObject, IHost
     {
-        private readonly IExtension m_extend;
-        private readonly IGraphics m_graphics;
-        private readonly IObject m_obj;
-        private readonly MicroScheduler m_threader = new MicroScheduler();
-        //private Scene m_scene;
+        readonly IExtension m_extend;
+        readonly IGraphics m_graphics;
+        readonly IObject m_obj;
+        readonly MicroScheduler m_threader = new MicroScheduler();
+        // Scene m_scene;
 
         public Host(IObject m_obj, IScene m_scene, IExtension m_extend)
         {
@@ -72,7 +72,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
 
         #endregion
 
-        private void EventManager_OnFrame()
+        void EventManager_OnFrame()
         {
             m_threader.Tick(1000);
         }

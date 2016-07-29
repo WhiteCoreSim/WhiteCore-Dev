@@ -41,7 +41,6 @@ namespace WhiteCore.Modules.Web
                 return new[]
                            {
                                "html/welcomescreen/region_box.html",
-                               "html/region_list.html"
                            };
             }
         }

@@ -141,20 +141,22 @@ namespace WhiteCore.Services.DataService
                 DataConnector = GenericData;
             }
 
-            foreach (Type t in types)
+            if (DataConnector != null)      // we have a problem if so...
             {
-                List<dynamic> Plugins = WhiteCoreModuleLoader.PickupModules(t);
-                foreach (dynamic plugin in Plugins)
+                foreach (Type t in types)
                 {
-                    try
+                    List<dynamic> Plugins = WhiteCoreModuleLoader.PickupModules (t);
+                    foreach (dynamic plugin in Plugins)
                     {
-                        plugin.Initialize(DataConnector.Copy(), config, registry, ConnectionString);
-                    }
-                    catch (Exception ex)
-                    {
-                        if (MainConsole.Instance != null)
-                            MainConsole.Instance.Warn("[DataService]: Exception occurred starting data plugin " +
-                                                      plugin.Name + ", " + ex);
+                        try
+                        {
+                            plugin.Initialize (DataConnector.Copy (), config, registry, ConnectionString);
+                        } catch (Exception ex)
+                        {
+                            if (MainConsole.Instance != null)
+                                MainConsole.Instance.Warn ("[DataService]: Exception occurred starting data plugin " +
+                                plugin.Name + ", " + ex);
+                        }
                     }
                 }
             }

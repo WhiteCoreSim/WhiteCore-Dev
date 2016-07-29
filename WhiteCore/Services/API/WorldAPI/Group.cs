@@ -24,3 +24,32 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+ 
+using Nini.Config;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.Services;
+
+namespace WhiteCore.Services.API.WorldAPI
+{
+	public class GroupWorldAPI : IService
+	{
+		#region IService implementation
+
+		public void Initialize(IConfigSource config, IRegistryCore registry)
+		{
+			throw new System.NotImplementedException();
+		}
+		
+		public void Start(IConfigSource config, IRegistryCore registry)
+		{
+			throw new System.NotImplementedException();
+		}
+		
+		public void FinishedStartup()
+		{
+			throw new System.NotImplementedException();
+		}
+		
+		#endregion
+	}
+}

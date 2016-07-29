@@ -7,8 +7,8 @@ html, body {
 	/* old browsers */
 	background: -moz-linear-gradient(top, #555555 0%, #222222 100%);
 	/* firefox */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#555555), color-stop(100%,#222222)); 
-	/* webkit */ 
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#555555), color-stop(100%,#222222));
+	/* webkit */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#555555', endColorstr='#222222',GradientType=0 ); /* ie */
 	/* ie 10 */
 	background-image: -ms-linear-gradient(top, #555555 0%,#222222 100%);
@@ -23,6 +23,10 @@ body  {
 	cursor: default;
 }
 
+/* DataTables */
+td.dataTables_empty{display:none;}
+legend {color:#ccc; }
+
 #st1 {display: none;}
 #st2 {display: none;}
 #st3 {display: none;}
@@ -35,8 +39,9 @@ body  {
 #lg4 {{DisplayLG4}color: #FF0000;}
 #lg5 {{DisplayLG5}color: #FF0000;}
 #lg6 {{DisplayLG6}color: #FF0000;}
+#lg7 {{DisplayLG7}color: #FF0000;}
 
-#st1, #st2, #st3, #st4, #st5, #lg1, #lg2, #lg3, #lg4, #lg5, lg6, a.styleswitch, a.languageswitch {
+#st1, #st2, #st3, #st4, #st5, #lg1, #lg2, #lg3, #lg4, #lg5, #lg6, #lg7, a.styleswitch, a.languageswitch {
 	background: #444;
 	margin-right: 5px;
 	padding-left: 6px;
@@ -162,7 +167,7 @@ table#register td {}
 
 .avatar_archive_screenshot {
     float: left;
-    height: 155px; 
+    height: 155px;
     width:140px;
     text-align: center;
     cursor: pointer;
@@ -183,8 +188,8 @@ table#register td {}
 }
 
 .avatar_archive_screenshot img {
-    border: 0px solid #111111; 
-    height: 128px; 
+    border: 0px solid #111111;
+    height: 128px;
     width:128px;
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
@@ -674,8 +679,8 @@ h5 {font-size: 10px;}
 input, textarea, select, button {
 	padding: 5px;
 	margin: 5px;
-	height: 21px;
-	color: #7E7E7E;
+	height: 25px;
+	color: #ffffff;
 	background: #444444;
 	border: 1px solid #555;
 	-webkit-border-radius: 5px;
@@ -952,7 +957,7 @@ position: relative;
 	margin: 0px;
 	padding: 0px;
 }
-			
+
 #slide01 > img {
 	left: 0px;
 	position: absolute;
@@ -960,7 +965,7 @@ position: relative;
 	width: 300px;
 
 }
-			
+
 #slide01 > .text {
 	left: 310px;
 	position: absolute;
@@ -985,7 +990,7 @@ p.minitext {font: 14px/1 Ubuntu, sans-serif;color: #ccc;}
 .localnews {
 	width: 65%;
 	font-size: 12px;
-	background: transparent url(../images/icons/bg_white_01.png); 
+	background: transparent url(../images/icons/bg_white_01.png);
 	border: 1px solid transparent;
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
@@ -994,7 +999,7 @@ p.minitext {font: 14px/1 Ubuntu, sans-serif;color: #ccc;}
     -moz-box-shadow: #EEEEEE 0 0 .5em;
     box-shadow: #EEEEEE 0 0 .5em;
 	/*padding: 10px;*/
-	height: 500px;	
+	height: 500px;
 	float: left;
 }
 
@@ -1017,13 +1022,13 @@ p.minitext {font: 14px/1 Ubuntu, sans-serif;color: #ccc;}
 	-webkit-box-shadow: #EEEEEE 0 0 .5em;
     -moz-box-shadow: #EEEEEE 0 0 .5em;
     box-shadow: #EEEEEE 0 0 .5em;
-	/*padding: 10px;*/	
+	/*padding: 10px;*/
 	float: right;
 }
 
 /* Homescreen login */
 .homelogin {
-	width: 280px; 
+	width: 300px;
 	font-size: 12px;
 	background: transparent; /*url(../images/icons/bg_white_01.png); */
 	border: 1px solid transparent;
@@ -1033,7 +1038,7 @@ p.minitext {font: 14px/1 Ubuntu, sans-serif;color: #ccc;}
 	-webkit-box-shadow: #EEEEEE 0 0 .5em;
     -moz-box-shadow: #EEEEEE 0 0 .5em;
     box-shadow: #EEEEEE 0 0 .5em;
-	padding: 10px;	
+	padding: 10px;
 	float: right;
 }
 input#homelogin_input {
@@ -1068,7 +1073,7 @@ input#homelogin_input {
 /* Help */
 /*removed 20140709 - greythane
 img.imprudenceimage, img.phoeniximage, img.zenimage */
-img.angstromimage, img.voodooimage, img.astraimage, img.kokuaimage,  
+img.angstromimage, img.voodooimage, img.astraimage, img.kokuaimage,
 img.firestormimage, img.singularityimage {
     cursor: pointer;
     width: 120px;
@@ -1177,7 +1182,7 @@ body.regionbox, body.infobox, body.news, body.gridstatus {background: transparen
 
 /* full bg image */
 img#mainImage {
-	left: 0px; 
+	left: 0px;
 	width: 100%;
 	position: fixed;
 	top: 0px;
@@ -1189,13 +1194,13 @@ img#mainImage {
 /* Logo */
 #top_image  img {border: none; outline: none;}
 #top_image {
-	position: absolute; 
-	padding-right: 0px; 
+	position: absolute;
+	padding-right: 0px;
 	padding-left: 0px;
 	top: 20px;
-	left: 10px; 
-	padding-bottom: 0px; 
-	margin: 0px; 
+	left: 10px;
+	padding-bottom: 0px;
+	margin: 0px;
 	padding-top: 0px;
 	z-index: 1;
 }
@@ -1208,15 +1213,15 @@ img#mainImage {
 
 #bottom {
 	position: absolute;
-	padding-right: 0px; 
-	padding-left: 0px; 
-	z-index: 101; 
-	left: 0px; 
-	padding-bottom: 0px; 
-	margin: 0px; 
-	width: 100%; 
-	bottom: 0px; 
-	padding-top: 0px; 
+	padding-right: 0px;
+	padding-left: 0px;
+	z-index: 101;
+	left: 0px;
+	padding-bottom: 0px;
+	margin: 0px;
+	width: 100%;
+	bottom: 0px;
+	padding-top: 0px;
 }
 
 #bottomright {
@@ -1228,13 +1233,13 @@ img#mainImage {
 	font-size: 10px;
 	background: transparent url(../images/icons/bg_black_01.png);
 	padding-top: 10px;
-	padding-bottom: 10px;	
+	padding-bottom: 10px;
 }
 
 #bottom_left {
 	position: absolute;
 	top: 80px;
-	left: 10px; 
+	left: 10px;
 	z-index: 1;
 }
 
@@ -1470,7 +1475,7 @@ div#regionbox:hover, div#infobox:hover, div#news:hover, div#gridstatus:hover {
     left: auto; right: 5px; color: #fcfcfc;
 }
 
-.jcarousel-skin-aurora .jcarousel-prev-horizontal:hover, 
+.jcarousel-skin-aurora .jcarousel-prev-horizontal:hover,
 .jcarousel-skin-aurora .jcarousel-prev-horizontal:focus {color: #296BA5;}
 
 .jcarousel-skin-aurora .jcarousel-prev-horizontal:active {color: #6EA6FB;}
@@ -1604,7 +1609,7 @@ div#regionbox:hover, div#infobox:hover, div#news:hover, div#gridstatus:hover {
     left: auto; right: 5px; color: #fcfcfc;
 }
 
-.jcarousel-skin-aurora-bigsize .jcarousel-prev-horizontal:hover, 
+.jcarousel-skin-aurora-bigsize .jcarousel-prev-horizontal:hover,
 .jcarousel-skin-aurora-bigsize .jcarousel-prev-horizontal:focus {color: #296BA5;}
 
 .jcarousel-skin-aurora-bigsize .jcarousel-prev-horizontal:active {color: #6EA6FB;}

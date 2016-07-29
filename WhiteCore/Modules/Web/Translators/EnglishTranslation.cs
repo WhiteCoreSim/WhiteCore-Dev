@@ -1,4 +1,31 @@
-﻿namespace WhiteCore.Modules.Web.Translators
+﻿/*
+ * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org
+ * See CONTRIBUTORS.TXT for a full list of copyright holders.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the WhiteCore-Sim Project nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ``AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+namespace WhiteCore.Modules.Web.Translators
 {
     public class EnglishTranslation : ITranslator
     {
@@ -25,6 +52,8 @@
                 case "CurrentPageText": return "Current Page";
                 case "MoreInfoText": return "More Info";
                 case "NoDetailsText": return "No details found...";
+            case "MoreInfo": return "More Information";
+
             case "ObjectNameText": return "Object";
             case "LocationText": return "Location";
             case "UUIDText": return "UUID";
@@ -197,6 +226,7 @@
                 case "MenuMyPurchases": return "My Purchases";
                 case "MenuTransactions": return "User Transactions";
                 case "MenuMyTransactions": return "My Transactions";
+                case "MenuMyClassifieds": return "My Classifieds";
                 case "MenuStatistics": return "Viewer Statistics";
                 case "MenuGridSettings": return "Grid Settings";
 
@@ -273,14 +303,15 @@
 
                 // Language Switcher Tooltips
                 case "en": return "English";
-                case "fr": return "French";
-                case "de": return "German";
-                case "it": return "Italian";
-                case "es": return "Spanish";
-                case "nl": return "Dutch";
+                case "fr": return "Français";
+                case "de": return "Deutsch";
+                case "it": return "Italiano";
+                case "es": return "Español";
+                case "nl": return "Nederlands";
+                case "ru": return "Русский";
 
-                // Index Page
-                case "HomeText": return "Home";
+            // Index Page
+            case "HomeText": return "Home";
                 case "HomeTextWelcome": return "This is our New Virtual World! Join us now, and make a difference!";
                 case "HomeTextTips": return "New presentations";
                 case "WelcomeToText": return "Welcome to";
@@ -295,6 +326,7 @@
                 // Help Page
                 case "HelpText": return "Help";
                 case "HelpViewersConfigText": return "Viewer Configuration";
+
                 case "AngstromViewer": return "Angstrom Viewer";
                 case "AstraViewer": return "Astra Viewer";
                 case "FirestormViewer": return "Firestorm Viewer";
@@ -394,6 +426,9 @@
                 case "LoggedIPText": return "Logged IP address";
                 case "NoPurchasesText": return "No purchases found...";
                 case "PurchaseCostText": return "Cost";
+                
+                // Classifieds
+                case "ClassifiedsText": return "Classifieds";
 
                 // Sim Console
                 case "SimConsoleText": return "Sim Command Console";
@@ -429,11 +464,15 @@
                 case "GridnameText": return "Grid name";
                 case "GridnickText": return "Grid nickname";
                 case "WelcomeMessageText": return "Login welcome message";
-                case "SystemEstateNameText": return "System estate name";
-                case "SystemEstateOwnerText": return "System estate owner name";
+            case "GovernorNameText": return "System Governor";
+            case "MainlandEstateNameText": return "Mainland estate";
+            case "RealEstateOwnerNameText": return "System estate owner";
+            case "SystemEstateNameText": return "System estate";
+            case "BankerNameText": return "System banker";
+            case "MarketPlaceOwnerNameText": return "System marketplace owner";
 
-                //settings manager page
-                case "WebRegistrationText": return "Web registrations allowed";
+            //settings manager page
+            case "WebRegistrationText": return "Web registrations allowed";
                 case "GridCenterXText": return "Grid Center Location X";
                 case "GridCenterYText": return "Grid Center Location Y";
                 case "SettingsManager": return "Settings Manager";

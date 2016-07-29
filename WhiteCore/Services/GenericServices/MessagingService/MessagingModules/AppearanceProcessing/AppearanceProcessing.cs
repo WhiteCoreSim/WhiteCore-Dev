@@ -26,14 +26,13 @@
  */
 
 
+using Nini.Config;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
-using Nini.Config;
-using OpenMetaverse.StructuredData;
-using GridRegion = WhiteCore.Framework.Services.GridRegion;
 
 namespace WhiteCore.Services
 {
@@ -47,19 +46,19 @@ namespace WhiteCore.Services
 
         #region IService Members
 
-        public void Initialize(IConfigSource config, IRegistryCore registry)
+        public void Initialize (IConfigSource config, IRegistryCore registry)
         {
             m_registry = registry;
         }
 
-        public void Start(IConfigSource config, IRegistryCore registry)
+        public void Start (IConfigSource config, IRegistryCore registry)
         {
         }
 
-        public void FinishedStartup()
+        public void FinishedStartup ()
         {
             //Also look for incoming messages to display
-            m_registry.RequestModuleInterface<ISyncMessageRecievedService>().OnMessageReceived += OnMessageReceived;
+            m_registry.RequestModuleInterface<ISyncMessageRecievedService> ().OnMessageReceived += OnMessageReceived;
         }
 
         #endregion
@@ -69,24 +68,22 @@ namespace WhiteCore.Services
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        protected OSDMap OnMessageReceived(OSDMap message)
+        protected OSDMap OnMessageReceived (OSDMap message)
         {
             //We need to check and see if this is an AgentStatusChange
-            if (message.ContainsKey("Method") && message["Method"] == "UpdateAvatarAppearance")
-            {
-                AvatarAppearance appearance = new AvatarAppearance(message["AgentID"], (OSDMap)message["Appearance"]);
-                ISceneManager manager = m_registry.RequestModuleInterface<ISceneManager>();
-                if (manager != null)
-                {
-                    foreach (IScene scene in manager.Scenes)
-                    {
-                        IScenePresence sp = scene.GetScenePresence(appearance.Owner);
-                        if (sp != null && !sp.IsChildAgent)
-                        {
-// 20131224 not used                            IAvatarFactory factory = scene.RequestModuleInterface<IAvatarFactory>();
-                            sp.RequestModuleInterface<IAvatarAppearanceModule>().Appearance = appearance;
-                            sp.RequestModuleInterface<IAvatarAppearanceModule>().SendAppearanceToAgent(sp);
-                            sp.RequestModuleInterface<IAvatarAppearanceModule>().SendAppearanceToAllOtherAgents();
+            if (message.ContainsKey ("Method") && message ["Method"] == "UpdateAvatarAppearance") {
+                var appearance = new AvatarAppearance (message ["AgentID"], (OSDMap)message ["Appearance"]);
+                ISceneManager manager = m_registry.RequestModuleInterface<ISceneManager> ();
+                if (manager != null) {
+                    foreach (IScene scene in manager.Scenes) {
+                        IScenePresence sp = scene.GetScenePresence (appearance.Owner);
+                        if (sp != null && !sp.IsChildAgent) {
+                            var avappmodule = sp.RequestModuleInterface<IAvatarAppearanceModule> ();
+                            if (avappmodule != null) {
+                                avappmodule.Appearance = appearance;
+                                avappmodule.SendAppearanceToAgent (sp);
+                                avappmodule.SendAppearanceToAllOtherAgents ();
+                            }
                         }
                     }
                 }

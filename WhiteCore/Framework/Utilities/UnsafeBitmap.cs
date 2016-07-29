@@ -28,7 +28,6 @@
 //Downloaded from
 //Visual C# Kicks - http://www.vcskicks.com/
 
-using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 
@@ -39,7 +38,7 @@ namespace WhiteCore.Framework.Utilities
     {
         readonly Bitmap workingBitmap;
         BitmapData bitmapData;
-        Byte* pBase = null;
+        byte* pBase = null;
         PixelData* pixelData = null;
         int width;
 
@@ -58,7 +57,7 @@ namespace WhiteCore.Framework.Utilities
 
             //Lock Image
             bitmapData = workingBitmap.LockBits(bounds, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
-            pBase = (Byte*) bitmapData.Scan0.ToPointer();
+            pBase = (byte*) bitmapData.Scan0.ToPointer();
         }
 
         public Color GetPixel(int x, int y)
@@ -76,10 +75,13 @@ namespace WhiteCore.Framework.Utilities
         public void SetPixel(int x, int y, Color color)
         {
             PixelData* data = (PixelData*)(pBase + y * width + x * sizeof(PixelData));
-            data->alpha = color.A;
-            data->red = color.R;
-            data->green = color.G;
-            data->blue = color.B;
+            try {
+                data->alpha = color.A;
+                data->red = color.R;
+                data->green = color.G;
+                data->blue = color.B;
+            } catch {
+            }
         }
 
         public void UnlockBitmap()
@@ -105,7 +107,7 @@ namespace WhiteCore.Framework.Utilities
 
             public override string ToString()
             {
-                return "(" + alpha.ToString() + ", " + red.ToString() + ", " + green.ToString() + ", " + blue.ToString() +
+                return "(" + alpha + ", " + red + ", " + green + ", " + blue +
                        ")";
             }
         }

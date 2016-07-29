@@ -29,9 +29,9 @@ using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
-using WhiteCore.ScriptEngine.DotNetEngine.MiniModule;
 using Microsoft.CSharp;
 using OpenMetaverse;
+using WhiteCore.ScriptEngine.DotNetEngine.MiniModule;
 
 //using Microsoft.JScript;
 
@@ -39,7 +39,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
 {
     public class MRMConverter : IScriptConverter
     {
-        private readonly CSharpCodeProvider CScodeProvider = new CSharpCodeProvider();
+        readonly CSharpCodeProvider CScodeProvider = new CSharpCodeProvider();
 
         #region IScriptConverter Members
 
@@ -69,7 +69,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
             string[] lines = Script.Split(new[] {"\n"}, StringSplitOptions.RemoveEmptyEntries);
             List<string> libraries = new List<string>();
             foreach (string s in lines)
-                if (s.StartsWith("//@DEPENDS:"))
+                if (s.StartsWith ("//@DEPENDS:", StringComparison.Ordinal))
                     libraries.Add(s.Replace("//@DEPENDS:", ""));
 
             string rootPath =
@@ -145,12 +145,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
         {
         }
 
-        private string CreateCompilerScript(string compileScript)
+        string CreateCompilerScript(string compileScript)
         {
             return ConvertMRMKeywords(compileScript);
         }
 
-        private string ConvertMRMKeywords(string script)
+        string ConvertMRMKeywords(string script)
         {
             script = script.Replace("microthreaded void", "IEnumerable");
             script = script.Replace("relax;", "yield return null;");

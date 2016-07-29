@@ -27,6 +27,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Nini.Config;
 using OpenMetaverse;
 using WhiteCore.Framework.ClientInterfaces;
@@ -300,7 +301,7 @@ namespace WhiteCore.Modules.Web
 
 
             List<Dictionary<string, object>> yearsArgs = new List<Dictionary<string, object>>();
-            for (int i = 1940; i <= 2013; i++)
+            for (int i = 1950; i <= 2013; i++)
                 yearsArgs.Add(new Dictionary<string, object> {{"Value", i}});
 
             vars.Add("Days", daysArgs);
@@ -332,22 +333,21 @@ namespace WhiteCore.Modules.Web
             vars.Add("UserTypeText", translator.GetTranslatedString("UserTypeText"));
             vars.Add("UserType", webInterface.UserTypeArgs(translator)) ;
 
-            List<AvatarArchive> archives = webInterface.Registry.RequestModuleInterface<IAvatarAppearanceArchiver>().GetAvatarArchives();
-
+            var avArchiver = webInterface.Registry.RequestModuleInterface<IAvatarAppearanceArchiver> ();
+            var archives = avArchiver.GetAvatarArchives ();
+           
             List<Dictionary<string, object>> avatarArchives = new List<Dictionary<string, object>>();
-            IWebHttpTextureService webTextureService = webInterface.Registry.
-                                                                    RequestModuleInterface<IWebHttpTextureService>();
-            foreach (var archive in archives)
-                avatarArchives.Add(new Dictionary<string, object>
-                                       {
-                                           {"AvatarArchiveName", archive.FolderName },
-                                           {"AvatarArchiveSnapshotID", archive.Snapshot},
-                                           {
-                                               "AvatarArchiveSnapshotURL",
-                                               webTextureService.GetTextureURL(archive.Snapshot)
-                                           }
-                                       });
-
+            IWebHttpTextureService webTextureService = webInterface.Registry.RequestModuleInterface<IWebHttpTextureService>();
+            foreach (var archive in archives) {
+                var archiveInfo = new Dictionary<string, object> ();
+                archiveInfo.Add ("AvatarArchiveName", archive.FolderName);
+                archiveInfo.Add ("AvatarArchiveSnapshotID", archive.Snapshot);
+                archiveInfo.Add ("AvatarArchiveSnapshotURL", archive.LocalSnapshot != ""
+                                 ? webTextureService.GetAvatarImageURL (archive.LocalSnapshot)
+                                 : webTextureService.GetTextureURL (archive.Snapshot)
+                                );
+                avatarArchives.Add (archiveInfo);
+            }
             vars.Add("AvatarArchive", avatarArchives);
 
 
@@ -361,10 +361,15 @@ namespace WhiteCore.Modules.Web
 
             if (tosLocation != "")
             {
-                System.IO.StreamReader reader =
-                    new System.IO.StreamReader(System.IO.Path.Combine(Environment.CurrentDirectory, tosLocation));
-                ToS = reader.ReadToEnd();
-                reader.Close();
+                StreamReader reader = new StreamReader(Path.Combine(Environment.CurrentDirectory, tosLocation));
+                try
+                {
+                    ToS = reader.ReadToEnd();
+                }
+                finally
+                {
+                    reader.Close();
+                }
             }
 
             // check for user name seed

@@ -65,63 +65,57 @@ namespace WhiteCore.Modules.Archivers
 
         #region IAvatarAppearanceArchiver Members
 
-        public AvatarArchive LoadAvatarArchive(string fileName, UUID principalID)
+        public AvatarArchive LoadAvatarArchive (string fileName, UUID principalID)
         {
-            AvatarArchive archive = new AvatarArchive();
-            UserAccount account = userAccountService.GetUserAccount(null, principalID);
-            if (account == null)
-            {
-                MainConsole.Instance.Error("[AvatarArchive]: User not found!");
+            AvatarArchive archive = new AvatarArchive ();
+            UserAccount account = userAccountService.GetUserAccount (null, principalID);
+            if (account == null) {
+                MainConsole.Instance.Error ("[Avatar Archiver]: User not found!");
                 return null;
             }
 
             // need to be smart here...
             fileName = PathHelpers.VerifyReadFile (fileName, ".aa", m_storeDirectory);
-            if (!File.Exists(fileName))
-            {
-                MainConsole.Instance.Error("[AvatarArchive]: Unable to load from file: file does not exist!");
+            if (!File.Exists (fileName)) {
+                MainConsole.Instance.Error ("[Avatar Archiver]: Unable to load from file: file does not exist!");
                 return null;
             }
-            MainConsole.Instance.Info("[AvatarArchive]: Loading archive from " + fileName);
+            MainConsole.Instance.Info ("[Avatar Archiver]: Loading archive from " + fileName);
 
-            archive.FromOSD((OSDMap)OSDParser.DeserializeLLSDXml(File.ReadAllText(fileName)));
+            archive.FromOSD ((OSDMap)OSDParser.DeserializeLLSDXml (File.ReadAllText (fileName)));
 
-            AvatarAppearance appearance = ConvertXMLToAvatarAppearance(archive.BodyMap);
+            AvatarAppearance appearance = ConvertXMLToAvatarAppearance (archive.BodyMap);
 
             appearance.Owner = principalID;
 
-            InventoryFolderBase AppearanceFolder = inventoryService.GetFolderForType(account.PrincipalID,
+            InventoryFolderBase AppearanceFolder = inventoryService.GetFolderForType (account.PrincipalID,
                                                                                      InventoryType.Wearable,
                                                                                      FolderType.Clothing);
 
-            if (AppearanceFolder == null)
-            {
+            if (AppearanceFolder == null) {
                 AppearanceFolder = new InventoryFolderBase (); // does not exist so...
                 AppearanceFolder.Owner = account.PrincipalID;
-                AppearanceFolder.ID = UUID.Random ();  
-                AppearanceFolder.Type = (short) FolderType.Clothing;
+                AppearanceFolder.ID = UUID.Random ();
+                AppearanceFolder.Type = (short)FolderType.Clothing;
             }
 
             List<InventoryItemBase> items;
 
             InventoryFolderBase folderForAppearance
-                = new InventoryFolderBase(
-                    UUID.Random(), archive.FolderName, account.PrincipalID,
-                (short) FolderType.None, AppearanceFolder.ID, 1);
+                = new InventoryFolderBase (
+                    UUID.Random (), archive.FolderName, account.PrincipalID,
+                (short)FolderType.None, AppearanceFolder.ID, 1);
 
-            inventoryService.AddFolder(folderForAppearance);
+            inventoryService.AddFolder (folderForAppearance);
 
-            folderForAppearance = inventoryService.GetFolder(folderForAppearance);
+            folderForAppearance = inventoryService.GetFolder (folderForAppearance);
 
-            try
-            {
-                LoadAssets(archive.AssetsMap);
-                appearance = CopyWearablesAndAttachments(account.PrincipalID, UUID.Zero, appearance, folderForAppearance,
+            try {
+                LoadAssets (archive.AssetsMap);
+                appearance = CopyWearablesAndAttachments (account.PrincipalID, UUID.Zero, appearance, folderForAppearance,
                                                          account.PrincipalID, archive.ItemsMap, out items);
-            }
-            catch (Exception ex)
-            {
-                MainConsole.Instance.Warn("[AvatarArchiver]: Error loading assets and items, " + ex);
+            } catch (Exception ex) {
+                MainConsole.Instance.Warn ("[AvatarArchiver]: Error loading assets and items, " + ex);
             }
 
             /*  implement fully if we need to
@@ -136,7 +130,7 @@ namespace WhiteCore.Modules.Archivers
             SP.ControllingClient.SendBulkUpdateInventory(folderForAppearance);
             */
 
-            MainConsole.Instance.Info("[AvatarArchive]: Loaded archive from " + fileName);
+            MainConsole.Instance.Info ("[Avatar Archiver]: Loaded archive from " + fileName);
             archive.Appearance = appearance;
             return archive;
         }
@@ -151,75 +145,68 @@ namespace WhiteCore.Modules.Archivers
         /// <param name="snapshotUUID">Snapshot UUI.</param>
         /// <param name="isPublic">If set to <c>true</c> is public.</param>
         /// <param name="isPortable">If set to <c>true</c> create a portable archive.</param>
-        public bool SaveAvatarArchive(string fileName, UUID principalID, string folderName,
+        public bool SaveAvatarArchive (string fileName, UUID principalID, string folderName,
             UUID snapshotUUID, bool isPublic, bool isPortable)
         {
-            UserAccount account = userAccountService.GetUserAccount(null, principalID);
-            if (account == null)
-            {
-                MainConsole.Instance.Error("[AvatarArchive]: User not found!");
+            UserAccount account = userAccountService.GetUserAccount (null, principalID);
+            if (account == null) {
+                MainConsole.Instance.Error ("[Avatar Archiver]: User not found!");
                 return false;
             }
 
-            AvatarAppearance appearance = avatarService.GetAppearance(account.PrincipalID);
-            if (appearance == null)
-            {
-                MainConsole.Instance.Error("[AvatarArchive] Appearance not found!");
+            AvatarAppearance appearance = avatarService.GetAppearance (account.PrincipalID);
+            if (appearance == null) {
+                MainConsole.Instance.Error ("[Avatar Archiver] Appearance not found!");
                 return false;
             }
 
-            string archiveName =  Path.GetFileNameWithoutExtension (fileName);
-            string filePath = Path.GetDirectoryName(fileName);
+            string archiveName = Path.GetFileNameWithoutExtension (fileName);
+            string filePath = Path.GetDirectoryName (fileName);
 
-            AvatarArchive archive = new AvatarArchive();
-            archive.AssetsMap = new OSDMap();
-            archive.ItemsMap = new OSDMap();
+            AvatarArchive archive = new AvatarArchive ();
+            archive.AssetsMap = new OSDMap ();
+            archive.ItemsMap = new OSDMap ();
 
             int wearCount = 0;
-            foreach (AvatarWearable wear in appearance.Wearables)
-            {
-                for (int i = 0; i < wear.Count; i++)
-                {
-                    WearableItem w = wear[i];
+            foreach (AvatarWearable wear in appearance.Wearables) {
+                for (int i = 0; i < wear.Count; i++) {
+                    WearableItem w = wear [i];
 
-                    if (w.AssetID != UUID.Zero)
-                    {
-                        SaveItem(w.ItemID, ref archive);
-                        SaveAsset(w.AssetID, ref archive, isPortable);
+                    if (w.AssetID != UUID.Zero) {
+                        SaveItem (w.ItemID, ref archive);
+                        SaveAsset (w.AssetID, ref archive, isPortable);
                         wearCount++;
                     }
                 }
             }
-            MainConsole.Instance.InfoFormat("[AvatarArchive] Adding {0} wearables to {1}",wearCount, archiveName);
+            MainConsole.Instance.InfoFormat ("[Avatar Archiver] Adding {0} wearables to {1}", wearCount, archiveName);
 
             int attachCount = 0;
-            List<AvatarAttachment> attachments = appearance.GetAttachments();
-            foreach (AvatarAttachment a in attachments.Where(a => a.AssetID != UUID.Zero))
-            {
-                SaveItem(a.ItemID, ref archive);
-                SaveAsset(a.AssetID, ref archive, isPortable);
+            List<AvatarAttachment> attachments = appearance.GetAttachments ();
+            foreach (AvatarAttachment a in attachments.Where (a => a.AssetID != UUID.Zero)) {
+                SaveItem (a.ItemID, ref archive);
+                SaveAsset (a.AssetID, ref archive, isPortable);
                 attachCount++;
             }
-            MainConsole.Instance.InfoFormat("[AvatarArchive] Adding {0} attachments to {1}", attachCount, archiveName);
+            MainConsole.Instance.InfoFormat ("[Avatar Archiver] Adding {0} attachments to {1}", attachCount, archiveName);
 
             // set details
             archive.Appearance = appearance;
-            archive.BodyMap = appearance.Pack();
+            archive.BodyMap = appearance.Pack ();
             archive.FolderName = folderName;
             archive.Snapshot = snapshotUUID;
             archive.IsPublic = isPublic;
             archive.IsPortable = isPortable;
 
-            File.WriteAllText(fileName, OSDParser.SerializeLLSDXmlString(archive.ToOSD()));
+            File.WriteAllText (fileName, OSDParser.SerializeLLSDXmlString (archive.ToOSD ()));
 
-            if (snapshotUUID != UUID.Zero)
-            {
+            if (snapshotUUID != UUID.Zero) {
 
                 ExportArchiveImage (snapshotUUID, archiveName, filePath);
-                MainConsole.Instance.Info("[AvatarArchive] Saved archive snapshot");
+                MainConsole.Instance.Info ("[Avatar Archiver] Saved archive snapshot");
             }
 
-            MainConsole.Instance.Info("[AvatarArchive] Saved archive to " + fileName);
+            MainConsole.Instance.Info ("[Avatar Archiver] Saved archive to " + fileName);
 
             return true;
         }
@@ -228,23 +215,27 @@ namespace WhiteCore.Modules.Archivers
         /// Gets all public avatar archives
         /// </summary>
         /// <returns></returns>
-        public List<AvatarArchive> GetAvatarArchives()
+        public List<AvatarArchive> GetAvatarArchives ()
         {
-            var archives = new List<AvatarArchive>();
+            var archives = new List<AvatarArchive> ();
 
-            if (Directory.Exists(m_storeDirectory))
-            {
-                foreach (string file in Directory.GetFiles(m_storeDirectory, "*.aa"))
-                {
-                    try
-                    {
-                        AvatarArchive archive = new AvatarArchive();
-                        archive.FromOSD((OSDMap)OSDParser.DeserializeLLSDXml(File.ReadAllText(file)));
-                        if (archive.IsPublic)
-                            archives.Add(archive);
-                    }
-                    catch
-                    {
+            if (Directory.Exists (m_storeDirectory)) {
+                foreach (string file in Directory.GetFiles (m_storeDirectory, "*.aa")) {
+                    try {
+                        AvatarArchive archive = new AvatarArchive ();
+                        archive.FromOSD ((OSDMap)OSDParser.DeserializeLLSDXml (File.ReadAllText (file)));
+                        if (archive.IsPublic) {
+                            //check for a local snapshot
+                            var localPic = Path.ChangeExtension (file, "jpg");
+                            if (File.Exists (localPic))
+                                archive.LocalSnapshot = localPic;
+                            else
+                                archive.LocalSnapshot = string.Empty;
+
+                            archives.Add (archive);
+                        }
+                    } catch {
+                        MainConsole.Instance.ErrorFormat ("[Avatar Archiver]: error deserializing {0} archive", file);
                     }
                 }
             }
@@ -265,20 +256,19 @@ namespace WhiteCore.Modules.Archivers
         /// Gets the avatar archive filenames.
         /// </summary>
         /// <returns>The avatar archive filenames.</returns>
-        public List<string> GetAvatarArchiveFilenames(bool fullName)
+        public List<string> GetAvatarArchiveFilenames (bool fullName)
         {
-            var archives = new List <string> ();
+            var archives = new List<string> ();
             if (Directory.Exists (m_storeDirectory))
                 archives = new List<string> (Directory.GetFiles (m_storeDirectory, "*.aa"));
             else
                 return archives;
 
-            if (!fullName)
-            {
+            if (!fullName) {
                 var archiveNames = new List<string> ();
                 foreach (string file in archives)
                     archiveNames.Add (Path.GetFileNameWithoutExtension (file));
-             
+
                 return archiveNames;
             }
 
@@ -289,10 +279,10 @@ namespace WhiteCore.Modules.Archivers
         /// Gets the avatar archive images.
         /// </summary>
         /// <returns>The avatar archive images.</returns>
-        public List<string> GetAvatarArchiveImages()
+        public List<string> GetAvatarArchiveImages ()
         {
-            var archives = new List<string>( Directory.GetFiles (m_storeDirectory, "*.jpg"));
-            var retVals = new List<string>();
+            var archives = new List<string> (Directory.GetFiles (m_storeDirectory, "*.jpg"));
+            var retVals = new List<string> ();
             foreach (string file in archives)
                 retVals.Add (file);
 
@@ -308,37 +298,31 @@ namespace WhiteCore.Modules.Archivers
         /// </summary>
         /// <param name="scene">Scene.</param>
         /// <param name="cmdparams">Cmdparams.</param>
-        protected void HandleLoadAvatarArchive(IScene scene, string[] cmdparams)
+        protected void HandleLoadAvatarArchive (IScene scene, string [] cmdparams)
         {
             string userName;
             string fileName;
 
-            if (cmdparams.Length < 5)
-            {
+            if (cmdparams.Length < 5) {
                 userName = MainConsole.Instance.Prompt ("Avatar name for archive upload (<first> <last>)", "");
                 if (userName == "")
                     return;
-            } else
-            {
+            } else {
                 userName = cmdparams [3] + " " + cmdparams [4];
             }
 
-            UserAccount account = userAccountService.GetUserAccount(null, userName);
-            if (account == null)
-            {
-                MainConsole.Instance.Info("[AvatarArchive]: Sorry, unable to find an account for " + userName +"!");
+            UserAccount account = userAccountService.GetUserAccount (null, userName);
+            if (account == null) {
+                MainConsole.Instance.Info ("[Avatar Archiver]: Sorry, unable to find an account for " + userName + "!");
                 return;
             }
 
             // filename to load
-            if (cmdparams.Length < 6)
-            {
-                do
-                {
+            if (cmdparams.Length < 6) {
+                do {
                     fileName = MainConsole.Instance.Prompt ("Avatar archive filename to load (? for list)", "");
-                    if (fileName == "?")
-                    {
-                        var archives = GetAvatarArchiveFilenames();
+                    if (fileName == "?") {
+                        var archives = GetAvatarArchiveFilenames ();
                         MainConsole.Instance.CleanInfo (" Available archives are : ");
                         foreach (string avatar in archives)
                             MainConsole.Instance.CleanInfo ("   " + avatar);
@@ -347,20 +331,19 @@ namespace WhiteCore.Modules.Archivers
 
                 if (fileName == "")
                     return;
-            } else
-            {
+            } else {
                 fileName = cmdparams [5];
             }
-            
+
 
             //some file sanity checks
             fileName = PathHelpers.VerifyReadFile (fileName, ".aa", m_storeDirectory);
             if (fileName == "")
                 return;
 
-            AvatarArchive archive = LoadAvatarArchive(fileName, account.PrincipalID);
+            AvatarArchive archive = LoadAvatarArchive (fileName, account.PrincipalID);
             if (archive != null)
-                avatarService.SetAppearance(account.PrincipalID, archive.Appearance);
+                avatarService.SetAppearance (account.PrincipalID, archive.Appearance);
         }
 
         /// <summary>
@@ -368,7 +351,7 @@ namespace WhiteCore.Modules.Archivers
         /// </summary>
         /// <param name="scene">Scene.</param>
         /// <param name="cmdparams">Cmdparams.</param>
-        protected void HandleSaveAvatarArchive(IScene scene, string[] cmdparams)
+        protected void HandleSaveAvatarArchive (IScene scene, string [] cmdparams)
         {
             string userName;
             string fileName;
@@ -378,58 +361,46 @@ namespace WhiteCore.Modules.Archivers
             bool isPortable = false;
 
             // check for switch options
-            var parms = new List <string>();
-            for (int i = 3; i < cmdparams.Length;)
-            {
-                if (cmdparams [i].StartsWith ("--portable"))
-                {
+            var parms = new List<string> ();
+            for (int i = 3; i < cmdparams.Length;) {
+                if (cmdparams [i].StartsWith ("--portable", StringComparison.Ordinal)) {
                     isPortable = true;
                     i++;
-                } else if (cmdparams [i].StartsWith ("--private"))
-                {
+                } else if (cmdparams [i].StartsWith ("--private", StringComparison.Ordinal)) {
                     isPublic = false;
                     i++;
-                } else if (cmdparams [i].StartsWith ("--snapshot"))
-                {
+                } else if (cmdparams [i].StartsWith ("--snapshot", StringComparison.Ordinal)) {
                     snapshotUUID = UUID.Parse (cmdparams [i + 1]);
                     i += 2;
-                } else if (cmdparams [i].StartsWith ("--"))
-                {
+                } else if (cmdparams [i].StartsWith ("--", StringComparison.Ordinal)) {
                     MainConsole.Instance.WarnFormat ("Unknown parameter: " + cmdparams [i]);
                     i++;
-                } else
-                {
+                } else {
                     parms.Add (cmdparams [i]);
                     i++;
                 }
             }
 
-            if (parms.Count == 0)
-            {
+            if (parms.Count == 0) {
                 userName = MainConsole.Instance.Prompt (" Avatar appearance to save (<first> <last>)");
                 if (userName == "")
                     return;
-            } else if (parms.Count > 1)
-            {
+            } else if (parms.Count > 1) {
                 userName = parms [0] + " " + parms [1];
-            } else
-            {
+            } else {
                 MainConsole.Instance.Info ("Error in command format.");
                 return;
             }
 
-            UserAccount account = userAccountService.GetUserAccount(null, userName);
-            if (account == null)
-            {
-                MainConsole.Instance.Error("[AvatarArchive]: User '" + userName + "' not found!");
+            UserAccount account = userAccountService.GetUserAccount (null, userName);
+            if (account == null) {
+                MainConsole.Instance.Error ("[Avatar Archiver]: User '" + userName + "' not found!");
                 return;
             }
 
-            if (parms.Count > 2)
-            {
+            if (parms.Count > 2) {
                 fileName = parms [2];
-            } else
-            {
+            } else {
                 fileName = userName.Replace (" ", "");
                 fileName = MainConsole.Instance.Prompt (" Avatar archive filename)", fileName);
                 if (fileName == "")
@@ -442,27 +413,34 @@ namespace WhiteCore.Modules.Archivers
                 return;
 
             // check options
-            foldername =  (Path.GetFileNameWithoutExtension (fileName));             // use the filename as the default folder
+            foldername = (Path.GetFileNameWithoutExtension (fileName));             // use the filename as the default folder
             if (parms.Count > 3)
-                foldername = OSD.FromString(cmdparams[3]);
-            foldername = foldername.Replace (' ', '_');    
+                foldername = OSD.FromString (cmdparams [3]);
+            foldername = foldername.Replace (' ', '_');
 
-            SaveAvatarArchive(fileName, account.PrincipalID, foldername, snapshotUUID, isPublic, isPortable);
+            // check for a snapshot
+            if (parms.Count == 0 && snapshotUUID == UUID.Zero) {
+                var picUUID = MainConsole.Instance.Prompt (" UUID for the avatar's snapshot");
+                if (picUUID == "")
+                    snapshotUUID = (UUID) Constants.MISSING_TEXTURE_ID;             // TODO: Need to add a blank avatar graphic
+                else
+                    UUID.TryParse (picUUID, out snapshotUUID);
+            }
+            SaveAvatarArchive (fileName, account.PrincipalID, foldername, snapshotUUID, isPublic, isPortable);
         }
 
         #endregion
 
         #region Helpers
 
-        InventoryItemBase GiveInventoryItem(UUID senderId, UUID recipient, InventoryItemBase item,
+        InventoryItemBase GiveInventoryItem (UUID senderId, UUID recipient, InventoryItemBase item,
                                                     InventoryFolderBase parentFolder)
         {
-            InventoryItemBase itemCopy = new InventoryItemBase
-            {
+            InventoryItemBase itemCopy = new InventoryItemBase {
                 Owner = recipient,
                 CreatorId = item.CreatorId,
                 CreatorData = item.CreatorData,
-                ID = UUID.Random(),
+                ID = UUID.Random (),
                 AssetID = item.AssetID,
                 Description = item.Description,
                 Name = item.Name,
@@ -477,24 +455,21 @@ namespace WhiteCore.Modules.Archivers
 
             //Give full permissions for them
 
-            if (parentFolder == null)
-            {
-                InventoryFolderBase folder = inventoryService.GetFolderForType(recipient, InventoryType.Unknown,
+            if (parentFolder == null) {
+                InventoryFolderBase folder = inventoryService.GetFolderForType (recipient, InventoryType.Unknown,
                                                                                (FolderType)itemCopy.AssetType);
 
                 if (folder != null)
                     itemCopy.Folder = folder.ID;
-                else
-                {
-                    InventoryFolderBase root = inventoryService.GetRootFolder(recipient);
+                else {
+                    InventoryFolderBase root = inventoryService.GetRootFolder (recipient);
 
                     if (root != null)
                         itemCopy.Folder = root.ID;
                     else
                         return null; // No destination
                 }
-            }
-            else
+            } else
                 itemCopy.Folder = parentFolder.ID; //We already have a folder to put it in
 
             itemCopy.GroupID = UUID.Zero;
@@ -503,112 +478,101 @@ namespace WhiteCore.Modules.Archivers
             itemCopy.SalePrice = item.SalePrice;
             itemCopy.SaleType = item.SaleType;
 
-            inventoryService.AddItem(itemCopy);
+            inventoryService.AddItem (itemCopy);
             return itemCopy;
         }
 
-        AvatarAppearance CopyWearablesAndAttachments(UUID destination, UUID source,
+        AvatarAppearance CopyWearablesAndAttachments (UUID destination, UUID source,
                                                              AvatarAppearance avatarAppearance,
                                                              InventoryFolderBase destinationFolder, UUID agentid,
                                                              OSDMap itemsMap,
                                                              out List<InventoryItemBase> items)
         {
-            if (destinationFolder == null)
-                throw new Exception("Cannot locate folder(s)");
-            items = new List<InventoryItemBase>();
+            items = new List<InventoryItemBase> ();
 
-            List<InventoryItemBase> litems = new List<InventoryItemBase>();
-            foreach (KeyValuePair<string, OSD> kvp in itemsMap)
-            {
-                InventoryItemBase item = new InventoryItemBase();
-                item.FromOSD((OSDMap)kvp.Value);
-                MainConsole.Instance.Info("[AvatarArchive]: Loading item " + item.ID);
-                litems.Add(item);
+            if (destinationFolder == null) {
+                MainConsole.Instance.Error ("[Avatar Archiver]: Cannot locate folder(s) for copying wearables!");
+                return avatarAppearance;
             }
-            
+
+            List<InventoryItemBase> litems = new List<InventoryItemBase> ();
+            foreach (KeyValuePair<string, OSD> kvp in itemsMap) {
+                InventoryItemBase item = new InventoryItemBase ();
+                item.FromOSD ((OSDMap)kvp.Value);
+                MainConsole.Instance.Info ("[Avatar Archiver]: Loading item " + item.ID);
+                litems.Add (item);
+            }
+
             // Wearables
-            AvatarWearable[] wearables = avatarAppearance.Wearables;
-            MainConsole.Instance.InfoFormat("[AvatarArchive] Adding {0} wearables", wearables.Length);
+            AvatarWearable [] wearables = avatarAppearance.Wearables;
+            MainConsole.Instance.InfoFormat ("[Avatar Archiver] Adding {0} wearables", wearables.Length);
 
-            for (int i = 0; i < wearables.Length; i++)
-            {
-                AvatarWearable wearable = wearables[i];
-                for (int ii = 0; ii < wearable.Count; ii++)
-                {
-                    if (wearable[ii].ItemID != UUID.Zero)
-                    {
+            for (int i = 0; i < wearables.Length; i++) {
+                AvatarWearable wearable = wearables [i];
+                for (int ii = 0; ii < wearable.Count; ii++) {
+                    if (wearable [ii].ItemID != UUID.Zero) {
                         // Get inventory item and copy it
-                        InventoryItemBase item = inventoryService.GetItem(UUID.Zero, wearable[ii].ItemID);
+                        InventoryItemBase item = inventoryService.GetItem (UUID.Zero, wearable [ii].ItemID);
 
-                        if (item == null)
-                        {
+                        if (item == null) {
                             //Attempt to get from the map if it doesn't already exist on the grid
-                            item = litems.First((itm) => itm.ID == wearable[ii].ItemID);
+                            item = litems.First ((itm) => itm.ID == wearable [ii].ItemID);
                         }
-                        if (item != null)
-                        {
-                            InventoryItemBase destinationItem = inventoryService.InnerGiveInventoryItem(destination,
+                        if (item != null) {
+                            InventoryItemBase destinationItem = inventoryService.InnerGiveInventoryItem (destination,
                                                                                                         destination,
                                                                                                         item,
                                                                                                         destinationFolder
                                                                                                             .ID,
                                                                                                         false, false);
-                            items.Add(destinationItem);
-                            MainConsole.Instance.DebugFormat("[AvatarArchive]: Added item {0} to folder {1}",
+                            items.Add (destinationItem);
+                            MainConsole.Instance.DebugFormat ("[Avatar Archiver]: Added item {0} to folder {1}",
                                                              destinationItem.ID, destinationFolder.ID);
 
                             // Wear item
-                            AvatarWearable newWearable = new AvatarWearable();
-                            newWearable.Wear(destinationItem.ID, destinationItem.AssetID);
-                            avatarAppearance.SetWearable(i, newWearable);
-                        }
-                        else
-                        {
-                            MainConsole.Instance.WarnFormat("[AvatarArchive]: Unable to transfer {0} to folder {1}",
-                                                            wearable[ii].ItemID, destinationFolder.ID);
+                            AvatarWearable newWearable = new AvatarWearable ();
+                            newWearable.Wear (destinationItem.ID, destinationItem.AssetID);
+                            avatarAppearance.SetWearable (i, newWearable);
+                        } else {
+                            MainConsole.Instance.WarnFormat ("[Avatar Archiver]: Unable to transfer {0} to folder {1}",
+                                                            wearable [ii].ItemID, destinationFolder.ID);
                         }
                     }
                 }
             }
 
             // Attachments
-            List<AvatarAttachment> attachments = avatarAppearance.GetAttachments();
-            MainConsole.Instance.InfoFormat("[AvatarArchive] Adding {0} attachments",attachments.Count);
+            List<AvatarAttachment> attachments = avatarAppearance.GetAttachments ();
+            MainConsole.Instance.InfoFormat ("[Avatar Archiver] Adding {0} attachments", attachments.Count);
 
-            foreach (AvatarAttachment attachment in attachments)
-            {
+            foreach (AvatarAttachment attachment in attachments) {
                 int attachpoint = attachment.AttachPoint;
                 UUID itemID = attachment.ItemID;
 
-                if (itemID != UUID.Zero)
-                {
+                if (itemID != UUID.Zero) {
 
                     // Get inventory item and copy it
-                    InventoryItemBase item = inventoryService.GetItem(UUID.Zero, itemID);
+                    InventoryItemBase item = inventoryService.GetItem (UUID.Zero, itemID);
 
-                    if (item == null)
-                    {
+                    if (item == null) {
                         //Attempt to get from the map if it doesn't already exist on the grid
-                        item = litems.First((itm) => itm.ID == itemID);
+                        item = litems.First ((itm) => itm.ID == itemID);
                     }
 
-                    if (item != null)
-                    {
-                        InventoryItemBase destinationItem = inventoryService.InnerGiveInventoryItem(destination,
+                    if (item != null) {
+                        InventoryItemBase destinationItem = inventoryService.InnerGiveInventoryItem (destination,
                                                                                                     destination, item,
                                                                                                     destinationFolder.ID,
                                                                                                     false, false);
-                        items.Add(destinationItem);
-                        MainConsole.Instance.DebugFormat("[AvatarArchive]: Added item {0} to folder {1}", destinationItem.ID,
+                        items.Add (destinationItem);
+                        MainConsole.Instance.DebugFormat ("[Avatar Archiver]: Added item {0} to folder {1}", destinationItem.ID,
                                                          destinationFolder.ID);
 
                         // Attach item
-                        avatarAppearance.SetAttachment(attachpoint, destinationItem.ID, destinationItem.AssetID);
-                        MainConsole.Instance.DebugFormat("[AvatarArchive]: Attached {0}", destinationItem.ID);
-                    }
-                    else
-                    {
-                        MainConsole.Instance.WarnFormat("[AvatarArchive]: Error transferring {0} to folder {1}", itemID,
+                        avatarAppearance.SetAttachment (attachpoint, destinationItem.ID, destinationItem.AssetID);
+                        MainConsole.Instance.DebugFormat ("[Avatar Archiver]: Attached {0}", destinationItem.ID);
+                    } else {
+                        MainConsole.Instance.WarnFormat ("[Avatar Archiver]: Error transferring {0} to folder {1}", itemID,
                                                         destinationFolder.ID);
                     }
                 }
@@ -616,147 +580,151 @@ namespace WhiteCore.Modules.Archivers
             return avatarAppearance;
         }
 
-        AvatarAppearance ConvertXMLToAvatarAppearance(OSDMap map)
+        AvatarAppearance ConvertXMLToAvatarAppearance (OSDMap map)
         {
-            AvatarAppearance appearance = new AvatarAppearance();
-            appearance.Unpack(map);
+            AvatarAppearance appearance = new AvatarAppearance ();
+            appearance.Unpack (map);
             return appearance;
         }
 
-        void SaveAsset(UUID AssetID, ref AvatarArchive archive, bool isPortable)
+        void SaveAsset (UUID AssetID, ref AvatarArchive archive, bool isPortable)
         {
-            IDictionary<UUID, AssetType> assetUuids = new Dictionary<UUID, AssetType> (); 
+            IDictionary<UUID, AssetType> assetUuids = new Dictionary<UUID, AssetType> ();
 
-            AssetBase assetBase = assetService.Get(AssetID.ToString());
+            AssetBase assetBase = assetService.Get (AssetID.ToString ());
             if (assetBase == null)
                 return;
 
-             if (isPortable)
+            if (isPortable)
                 assetGatherer.GatherAssetUuids (assetBase.ID, assetBase.TypeAsset, assetUuids);
             else
                 // we need this one at least
                 assetUuids [assetBase.ID] = assetBase.TypeAsset;
-            
+            assetBase.Dispose ();
+						// was //assetBase = null;
+
             // save the required assets
-            foreach (KeyValuePair<UUID, AssetType> kvp in assetUuids)
-            {
-                var asset = assetService.Get(kvp.Key.ToString());
-                if (asset != null)
-                {
-                    MainConsole.Instance.Debug("[AvatarArchive]: Saving asset " + asset.ID);
-                    archive.AssetsMap[asset.ID.ToString()] = asset.ToOSD();
-                }
-                else
-                {
-                    MainConsole.Instance.Debug("[AvatarArchive]: Could not find asset to save: " + asset.ID);
+            foreach (KeyValuePair<UUID, AssetType> kvp in assetUuids) {
+                var asset = assetService.Get (kvp.Key.ToString ());
+                if (asset != null) {
+                    MainConsole.Instance.Debug ("[Avatar Archiver]: Saving asset " + asset.ID);
+                    archive.AssetsMap [asset.ID.ToString ()] = asset.ToOSD ();
+                } else {
+                    MainConsole.Instance.Debug ("[Avatar Archiver]: Could not find asset to save: " + kvp.Key);
                     return;
                 }
+                asset.Dispose ();
+                //was//asset = null;
             }
         }
 
-        AssetBase LoadAssetBase(OSDMap map)
+        AssetBase LoadAssetBase (OSDMap map)
         {
-            AssetBase asset = new AssetBase();
-            asset.FromOSD(map);
+            AssetBase asset = new AssetBase ();
+            asset.FromOSD (map);
             return asset;
         }
 
-        void SaveItem(UUID ItemID, ref AvatarArchive archive)
+        void SaveItem (UUID ItemID, ref AvatarArchive archive)
         {
-            InventoryItemBase saveItem = inventoryService.GetItem(UUID.Zero, ItemID);
-            if (saveItem == null)
-            {
-                MainConsole.Instance.Warn("[AvatarArchive]: Could not find item to save: " + ItemID);
+            InventoryItemBase saveItem = inventoryService.GetItem (UUID.Zero, ItemID);
+            if (saveItem == null) {
+                MainConsole.Instance.Warn ("[Avatar Archiver]: Could not find item to save: " + ItemID);
                 return;
             }
-            MainConsole.Instance.Info("[AvatarArchive]: Saving item " + ItemID);
-            archive.ItemsMap[ItemID.ToString()] = saveItem.ToOSD();
+            MainConsole.Instance.Info ("[Avatar Archiver]: Saving item " + ItemID);
+            archive.ItemsMap [ItemID.ToString ()] = saveItem.ToOSD ();
         }
 
-        void LoadAssets(OSDMap assets)
+        void LoadAssets (OSDMap assets)
         {
-            foreach (KeyValuePair<string, OSD> kvp in assets)
-            {
-                UUID AssetID = UUID.Parse(kvp.Key);
-                OSDMap assetMap = (OSDMap) kvp.Value;
+            foreach (KeyValuePair<string, OSD> kvp in assets) {
+                UUID AssetID = UUID.Parse (kvp.Key);
+                OSDMap assetMap = (OSDMap)kvp.Value;
 
                 // check if this assets alreasy exists in the database
-                AssetBase asset = assetService.Get(AssetID.ToString(), false);
+                AssetBase asset = assetService.Get (AssetID.ToString (), false);
                 if (asset == null) // Only save if it does not exist
                 {
-                    MainConsole.Instance.Info ("[AvatarArchive]: Saving asset " + AssetID);
+                    MainConsole.Instance.Info ("[Avatar Archiver]: Saving asset " + AssetID);
 
                     asset = LoadAssetBase (assetMap);
                     asset.ID = assetService.Store (asset);
-                } else
-                    MainConsole.Instance.Debug ("[Avatararchive]: Asset " + AssetID + " already exists.");
+                } else {
+                    MainConsole.Instance.Debug ("[Avatar Archiver]: Asset " + AssetID + " already exists.");
+                }
+                asset.Dispose ();
             }
         }
 
-        void ExportArchiveImage(UUID imageUUID, string archiveName, string filePath)
+        void ExportArchiveImage (UUID imageUUID, string archiveName, string filePath)
         {
-            byte[] jpeg;
+            byte [] jpeg;
 
-            using (MemoryStream imgstream = new MemoryStream())
-            {
+            using (MemoryStream imgstream = new MemoryStream ()) {
                 // Taking our jpeg2000 data, decoding it, then saving it to a byte array with regular jpeg data
 
                 // non-async because we know we have the asset immediately.
-                byte[] imageAsset = assetService.GetData(imageUUID.ToString());
+                byte [] imageAsset = assetService.GetData (imageUUID.ToString ());
 
-                if (imageAsset != null)
-                {
+                if (imageAsset != null) {
                     // Decode image to System.Drawing.Image
                     Image image;
                     ManagedImage managedImage;
-                    if (OpenJPEG.DecodeToImage(imageAsset, out managedImage, out image))
-                    {
+                    if (OpenJPEG.DecodeToImage (imageAsset, out managedImage, out image)) {
                         // Save to bitmap
-                        using (Bitmap texture = ResizeBitmap(image, 256, 256, archiveName))
-                        {
-                            EncoderParameters myEncoderParameters = new EncoderParameters();
-                            myEncoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 75L);
+                        using (Bitmap texture = ResizeBitmap (image, 256, 256, archiveName)) {
+                            EncoderParameters myEncoderParameters = new EncoderParameters ();
+                            myEncoderParameters.Param [0] = new EncoderParameter (Encoder.Quality, 75L);
 
                             // Save bitmap to stream
-                            texture.Save(imgstream, GetEncoderInfo("image/jpeg"), myEncoderParameters);
+                            var encInfo = GetEncoderInfo ("image/jpeg");
+                            if (encInfo != null)
+                                texture.Save (imgstream, encInfo, myEncoderParameters);
+                            myEncoderParameters.Dispose ();
 
                             // Write the stream to a byte array for output
-                            jpeg = imgstream.ToArray();
+                            jpeg = imgstream.ToArray ();
 
                             // save image
                             string fileName = archiveName + ".jpg";
-                            string fullPath = Path.Combine(filePath, fileName);
-                            File.WriteAllBytes(fullPath, jpeg);
+                            string fullPath = Path.Combine (filePath, fileName);
+                            File.WriteAllBytes (fullPath, jpeg);
 
                         }
-                        image.Dispose();
+                        image.Dispose ();
                     }
                 }
             }
         }
 
-        Bitmap ResizeBitmap(Image b, int nWidth, int nHeight, string name)
+        Bitmap ResizeBitmap (Image b, int nWidth, int nHeight, string name)
         {
-            Bitmap newsize = new Bitmap(nWidth, nHeight);
-            Graphics temp = Graphics.FromImage(newsize);
-            temp.DrawImage(b, 0, 0, nWidth, nHeight);
+            Bitmap newsize = new Bitmap (nWidth, nHeight);
+            Graphics temp = Graphics.FromImage (newsize);
+            temp.DrawImage (b, 0, 0, nWidth, nHeight);
             temp.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             if (name != "")
-                temp.DrawString(name, new Font("Arial", 8, FontStyle.Regular),
-                    new SolidBrush(Color.FromArgb(90, 255, 255, 180)), new Point(2, nHeight - 13));
+                temp.DrawString (name, new Font ("Arial", 8, FontStyle.Regular),
+                    new SolidBrush (Color.FromArgb (90, 255, 255, 180)), new Point (2, nHeight - 13));
 
+            temp.Dispose ();
             return newsize;
         }
 
         // From MSDN
-        static ImageCodecInfo GetEncoderInfo(String mimeType)
+        static ImageCodecInfo GetEncoderInfo (string mimeType)
         {
-            ImageCodecInfo[] encoders;
-            encoders = ImageCodecInfo.GetImageEncoders();
-            for (int j = 0; j < encoders.Length; ++j)
-            {
-                if (encoders[j].MimeType == mimeType)
-                    return encoders[j];
+            ImageCodecInfo [] encoders;
+            try {
+                encoders = ImageCodecInfo.GetImageEncoders ();
+            } catch {
+                return null;
+            }
+
+            for (int j = 0; j < encoders.Length; ++j) {
+                if (encoders [j].MimeType == mimeType)
+                    return encoders [j];
             }
             return null;
         }
@@ -765,28 +733,25 @@ namespace WhiteCore.Modules.Archivers
 
         #region IService Members
 
-        public void Initialize(IConfigSource config, IRegistryCore registry)
+        public void Initialize (IConfigSource config, IRegistryCore registry)
         {
-            IConfig avatarConfig = config.Configs["FileBasedSimulationData"];
-            if (avatarConfig != null)
-            {
+            IConfig avatarConfig = config.Configs ["FileBasedSimulationData"];
+            if (avatarConfig != null) {
                 m_storeDirectory =
                     PathHelpers.ComputeFullPath (avatarConfig.GetString ("AvatarArchiveDirectory", m_storeDirectory));
-                if (m_storeDirectory == "")
-                {
+                if (m_storeDirectory == "") {
                     var defpath = registry.RequestModuleInterface<ISimulationBase> ().DefaultDataPath;
-                    m_storeDirectory = Path.Combine(defpath, Constants.DEFAULT_AVATARARCHIVE_DIR);
+                    m_storeDirectory = Path.Combine (defpath, Constants.DEFAULT_AVATARARCHIVE_DIR);
                 }
             }
 
             bool isLocal = true;
             IConfig connectorConfig = config.Configs ["WhiteCoreConnectors"];
             if ((connectorConfig != null) && connectorConfig.Contains ("DoRemoteCalls"))
-                isLocal = ! connectorConfig.GetBoolean ("DoRemoteCalls", false);
+                isLocal = !connectorConfig.GetBoolean ("DoRemoteCalls", false);
 
             // Lock out if remote 
-            if (isLocal && (MainConsole.Instance != null))
-            {
+            if (isLocal && (MainConsole.Instance != null)) {
                 MainConsole.Instance.Commands.AddCommand (
                     "save avatar archive",
                     "save avatar archive [<First> <Last> [<Filename>]] [FolderNameToSaveInto] (--snapshot <UUID>) (--private) (--portable)",
@@ -809,18 +774,18 @@ namespace WhiteCore.Modules.Archivers
         }
 
 
-        public void Start(IConfigSource config, IRegistryCore registry)
+        public void Start (IConfigSource config, IRegistryCore registry)
         {
             m_registry = registry;
-            userAccountService = registry.RequestModuleInterface<IUserAccountService>();
-            avatarService = registry.RequestModuleInterface<IAvatarService>();
-            assetService = registry.RequestModuleInterface<IAssetService>();
-            assetGatherer = new UuidGatherer(assetService);
-            inventoryService = registry.RequestModuleInterface<IInventoryService>();
-            m_registry.RegisterModuleInterface<IAvatarAppearanceArchiver>(this);
+            userAccountService = registry.RequestModuleInterface<IUserAccountService> ();
+            avatarService = registry.RequestModuleInterface<IAvatarService> ();
+            assetService = registry.RequestModuleInterface<IAssetService> ();
+            assetGatherer = new UuidGatherer (assetService);
+            inventoryService = registry.RequestModuleInterface<IInventoryService> ();
+            m_registry.RegisterModuleInterface<IAvatarAppearanceArchiver> (this);
         }
 
-        public void FinishedStartup()
+        public void FinishedStartup ()
         {
         }
 

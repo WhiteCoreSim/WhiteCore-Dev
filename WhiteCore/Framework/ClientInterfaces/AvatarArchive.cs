@@ -63,6 +63,11 @@ namespace WhiteCore.Framework.ClientInterfaces
         /// </summary>
         public UUID Snapshot;
 
+        /// <summary>
+        ///     filename of the local snapshot that shows off this archive (for portable use)
+        /// </summary>
+        public string LocalSnapshot;
+
         public OSDMap AssetsMap;
 
         public OSDMap ItemsMap;
@@ -74,9 +79,9 @@ namespace WhiteCore.Framework.ClientInterfaces
             AssetsMap = ((OSDMap)map["Assets"]);
             ItemsMap = ((OSDMap)map["Items"]);
             BodyMap = ((OSDMap)map["Body"]);
-
             FolderName = map["FolderName"];
             Snapshot = map["Snapshot"];
+            LocalSnapshot = map ["LocalSnapshot"];
             IsPublic = map["Public"];
             IsPortable = map["Portable"];
         }
@@ -90,6 +95,7 @@ namespace WhiteCore.Framework.ClientInterfaces
             map["Body"] = BodyMap;
             map["FolderName"] = FolderName;
             map["Snapshot"] = Snapshot;
+            map["LocalSnapshot"] = LocalSnapshot;
             map["Public"] = IsPublic;
             map["Portable"] = IsPortable;
 

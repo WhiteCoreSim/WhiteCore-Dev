@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org
+ * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org/, http://opensimulator.org/
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,6 @@ using System.Runtime.InteropServices;
 using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Physics;
-
 
 namespace WhiteCore.Physics.OpenDynamicsEngine
 {
@@ -336,7 +335,7 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
                 }
                 catch (AccessViolationException)
                 {
-                    MainConsole.Instance.Warn("[PHYSICS]: Unable to collide test a space");
+                    MainConsole.Instance.Warn("[ODE Physics]: Unable to collide test a space");
                     return;
                 }
                 //Colliding a space or a geom with a space or a geom. so drill down
@@ -362,11 +361,11 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             catch (SEHException)
             {
                 MainConsole.Instance.Error(
-                    "[PHYSICS]: The Operating system shut down ODE because of corrupt memory.  This could be a result of really irregular terrain.  If this repeats continuously, restart using Basic Physics and terrain fill your terrain.  Restarting the sim.");
+                    "[ODE Physics]: The Operating system shut down ODE because of corrupt memory.  This could be a result of really irregular terrain.  If this repeats continuously, restart using Basic Physics and terrain fill your terrain.  Restarting the sim.");
             }
             catch (Exception e)
             {
-                MainConsole.Instance.WarnFormat("[PHYSICS]: Unable to collide test an object: {0}", e);
+                MainConsole.Instance.WarnFormat("[ODE Physics]: Unable to collide test an object: {0}", e);
                 return;
             }
 

@@ -90,7 +90,7 @@ namespace WhiteCore.Physics.Meshing
         List<Vector3> mBoundingHull;
 
         // Mesh cache. Static so it can be shared across instances of this class
-        static Dictionary<ulong, Mesh> m_uniqueMeshes = new Dictionary<ulong, Mesh>();
+        static readonly Dictionary<ulong, Mesh> m_uniqueMeshes = new Dictionary<ulong, Mesh> ();
 
         public Meshmerizer(IConfigSource config, IRegistryCore registry)
         {
@@ -109,7 +109,7 @@ namespace WhiteCore.Physics.Meshing
             }
             catch (Exception e)
             {
-                MainConsole.Instance.WarnFormat("[SCULPT]: Unable to create {0} directory: ", decodedSculptMapPath,
+                MainConsole.Instance.WarnFormat("[Sculpt]: Unable to create {0} directory: ", decodedSculptMapPath,
                                                 e.ToString());
             }
         }
@@ -179,7 +179,7 @@ namespace WhiteCore.Physics.Meshing
         /// <summary>
         ///     Creates a simple bounding box mesh for a complex input mesh
         /// </summary>
-        /// <param name="meshIn"></param>
+        /// <param name="size"></param>
         /// <param name="key"></param>
         /// <returns></returns>
         static Mesh CreateBoundingBoxMesh(Vector3 size, ulong key)
@@ -197,7 +197,6 @@ namespace WhiteCore.Physics.Meshing
         /// <summary>
         /// decompresses a gzipped OSD object
         /// </summary>
-        /// <param name="decodedOsd"></param> the OSD object
         /// <param name="meshBytes"></param>
         /// <returns></returns>
         static OSD DecompressOsd(byte[] meshBytes)
@@ -267,7 +266,7 @@ namespace WhiteCore.Physics.Meshing
         /// <summary>
         /// Add a submesh to an existing list of coords and faces.
         /// </summary>
-        /// <param name="subMeshData"></param>
+        /// <param name="subMeshMap"></param>
         /// <param name="size">Size of entire object</param>
         /// <param name="coords"></param>
         /// <param name="faces"></param>
@@ -337,7 +336,7 @@ namespace WhiteCore.Physics.Meshing
                 // At the moment we can not log here since ODEPrim, for instance, ends up triggering this
                 // method twice - once before it has loaded sculpt data from the asset service and once afterwards.
                 // The first time will always call with unloaded SculptData if this needs to be uploaded.
-                //MainConsole.Instance.Error("[MESH]: asset data is zero length");
+                //MainConsole.Instance.Error("[Mesh]: asset data is zero length");
                 return null;
             }
 
@@ -350,7 +349,7 @@ namespace WhiteCore.Physics.Meshing
                 }
                 catch (Exception e)
                 {
-                    MainConsole.Instance.Error("[MESH]: Exception deserializing mesh asset header:" + e);
+                    MainConsole.Instance.Error("[Mesh]: Exception deserializing mesh asset header:" + e);
                     return null;
                 }
                 start = data.Position;
@@ -363,22 +362,22 @@ namespace WhiteCore.Physics.Meshing
                 if (map.ContainsKey("physics_shape"))
                 {
                     physicsParms = (OSDMap)map["physics_shape"]; // old asset format
-                    if (debugDetail) MainConsole.Instance.DebugFormat("[MESH]: prim='{0}': using 'physics_shape' mesh data", primName);
+                    if (debugDetail) MainConsole.Instance.DebugFormat("[Mesh]: prim='{0}': using 'physics_shape' mesh data", primName);
                 }
                 else if (map.ContainsKey("physics_mesh"))
                 {
                     physicsParms = (OSDMap)map["physics_mesh"]; // new asset format
-                    if (debugDetail) MainConsole.Instance.DebugFormat("[MESH]: prim='{0}':using 'physics_mesh' mesh data", primName);
+                    if (debugDetail) MainConsole.Instance.DebugFormat("[Mesh]: prim='{0}':using 'physics_mesh' mesh data", primName);
                 }
                 else if (map.ContainsKey("medium_lod"))
                 {
                     physicsParms = (OSDMap)map["medium_lod"]; // if no physics mesh, try to fall back to medium LOD display mesh
-                    if (debugDetail) MainConsole.Instance.DebugFormat("[MESH]: prim='{0}':using 'medium_lod' mesh data", primName);
+                    if (debugDetail) MainConsole.Instance.DebugFormat("[Mesh]: prim='{0}':using 'medium_lod' mesh data", primName);
                 }
                 else if (map.ContainsKey("high_lod"))
                 {
                     physicsParms = (OSDMap)map["high_lod"]; // if all else fails, use highest LOD display mesh and hope it works :)
-                    if (debugDetail) MainConsole.Instance.DebugFormat("[MESH]: prim='{0}':using 'high_lod' mesh data", primName);
+                    if (debugDetail) MainConsole.Instance.DebugFormat("[Mesh]: prim='{0}':using 'high_lod' mesh data", primName);
                 }
 
                 if (map.ContainsKey ("physics_convex"))
@@ -401,7 +400,7 @@ namespace WhiteCore.Physics.Meshing
                                 convexBlockOsd = DecompressOsd (convexBytes);
                             } catch (Exception e)
                             {
-                                MainConsole.Instance.ErrorFormat ("[MESH]: prim '{0}': exception decoding convex block: {1}", primName, e);
+                                MainConsole.Instance.ErrorFormat ("[Mesh]: prim '{0}': exception decoding convex block: {1}", primName, e);
                                 //return false;
                             }
                         }
@@ -450,7 +449,7 @@ namespace WhiteCore.Physics.Meshing
                                 }
 
                                 mBoundingHull = boundingHull;
-                                if (debugDetail) MainConsole.Instance.DebugFormat ("[MESH]: prim '{0}': parsed bounding hull. nVerts={1}", primName, mBoundingHull.Count);
+                                if (debugDetail) MainConsole.Instance.DebugFormat ("[Mesh]: prim '{0}': parsed bounding hull. nVerts={1}", primName, mBoundingHull.Count);
                             }
 
                             if (convexBlock.ContainsKey ("HullList"))
@@ -488,21 +487,21 @@ namespace WhiteCore.Physics.Meshing
                                 }
 
                                 mConvexHulls = hulls;
-                                if (debugDetail) MainConsole.Instance.DebugFormat ("[MESH]: prim '{0}': parsed hulls. nHulls '{1}'", primName, mConvexHulls.Count);
+                                if (debugDetail) MainConsole.Instance.DebugFormat ("[Mesh]: prim '{0}': parsed hulls. nHulls '{1}'", primName, mConvexHulls.Count);
                             } else
                             {
-                                if (debugDetail) MainConsole.Instance.DebugFormat ("[MESH]: prim '{0}' has physics_convex but no HullList", primName);
+                                if (debugDetail) MainConsole.Instance.DebugFormat ("[Mesh]: prim '{0}' has physics_convex but no HullList", primName);
                             }
                         }
                     } catch (Exception e)
                     {
-                        MainConsole.Instance.WarnFormat ("[MESH]: Exception decoding convex block: {0}", e);
+                        MainConsole.Instance.WarnFormat ("[Mesh]: Exception decoding convex block: {0}", e);
                     }
                 }
 
                 if (physicsParms == null)
                 {
-                    MainConsole.Instance.WarnFormat ("[MESH]: No recognised physics mesh found in mesh asset for {0}", primName);
+                    MainConsole.Instance.WarnFormat ("[Mesh]: No recognised physics mesh found in mesh asset for {0}", primName);
                     return  null;
                 }
 
@@ -521,7 +520,7 @@ namespace WhiteCore.Physics.Meshing
                     decodedMeshOsd = DecompressOsd (meshBytes);
                 } catch (Exception e)
                 {
-                    MainConsole.Instance.ErrorFormat ("[MESH]: prim: '{0}', exception decoding physical mesh: {1}", primName, e);
+                    MainConsole.Instance.ErrorFormat ("[Mesh]: prim: '{0}', exception decoding physical mesh: {1}", primName, e);
                     return null;
                 }
 
@@ -537,7 +536,7 @@ namespace WhiteCore.Physics.Meshing
                             AddSubMesh (subMeshOsd as OSDMap, size, coords, faces);
                     }
 										if (debugDetail) 
-                        MainConsole.Instance.DebugFormat ("[MESH]: {0}: mesh decoded. offset={1}, size={2}, nCoords={3}, nFaces={4}",
+                        MainConsole.Instance.DebugFormat ("[Mesh]: {0}: mesh decoded. offset={1}, size={2}, nCoords={3}, nFaces={4}",
                             primName, physOffset, physSize, coords.Count, faces.Count);
                 }
             }
@@ -583,7 +582,7 @@ namespace WhiteCore.Physics.Meshing
                     }
                 } catch (Exception e)
                 {
-                    MainConsole.Instance.Error ("[SCULPT]: unable to load cached sculpt map " +
+                    MainConsole.Instance.Error ("[Sculpt]: unable to load cached sculpt map " +
                     decodedSculptFileName + " " + e);
                 }
                 //if (idata != null)
@@ -607,7 +606,7 @@ namespace WhiteCore.Physics.Meshing
                             idata.Save (decodedSculptFileName, ImageFormat.MemoryBmp);
                         } catch (Exception e)
                         {
-                            MainConsole.Instance.Error ("[SCULPT]: unable to cache sculpt map " +
+                            MainConsole.Instance.Error ("[Sculpt]: unable to cache sculpt map " +
                             decodedSculptFileName + " " +
                             e);
                         }
@@ -615,18 +614,18 @@ namespace WhiteCore.Physics.Meshing
                 } catch (DllNotFoundException)
                 {
                     MainConsole.Instance.Error (
-                        "[PHYSICS]: OpenJpeg is not installed correctly on this system. Physics Proxy generation failed.\n" +
+                        "[Physics]: OpenJpeg is not installed correctly on this system. Physics Proxy generation failed.\n" +
                         "Often times this is because of an old version of GLIBC.  You must have version 2.4 or above!");
                     return null;
                 } catch (IndexOutOfRangeException)
                 {
                     MainConsole.Instance.Error (
-                        "[PHYSICS]: OpenJpeg was unable to decode this. Physics Proxy generation failed");
+                        "[Physics]: OpenJpeg was unable to decode this. Physics Proxy generation failed");
                     return null;
                 } catch (Exception ex)
                 {
                     MainConsole.Instance.Error (
-                        "[PHYSICS]: Unable to generate a Sculpty physics proxy. Sculpty texture decode failed: " +
+                        "[Physics]: Unable to generate a Sculpty physics proxy. Sculpty texture decode failed: " +
                         ex);
                     return null;
                 }
@@ -750,8 +749,8 @@ namespace WhiteCore.Physics.Meshing
                 
             primMesh = new PrimMesh(sides, profileBegin, profileEnd, profileHollow, hollowSides);
 
-            if ( (primMesh.errorMessage != null) && (primMesh.errorMessage.Length > 0) )
-                MainConsole.Instance.Error("[ERROR] " + primMesh.errorMessage);
+            if ( !string.IsNullOrEmpty (primMesh.errorMessage))
+                MainConsole.Instance.Error("[Prim mesh]: Error - " + primMesh.errorMessage);
 
             primMesh.topShearX = pathShearX;
             primMesh.topShearY = pathShearY;
@@ -897,10 +896,10 @@ namespace WhiteCore.Physics.Meshing
         }
 
         // Main mesh creation entry point
-        public IMesh CreateMesh(String primName, PrimitiveBaseShape primShape, Vector3 size, float lod, bool isPhysical, bool shouldCache)
+        public IMesh CreateMesh(string primName, PrimitiveBaseShape primShape, Vector3 size, float lod, bool isPhysical, bool shouldCache)
         {
 #if SPAM
-            MainConsole.Instance.DebugFormat("[MESH]: Creating mesh for {0}", primName);
+            MainConsole.Instance.DebugFormat("[Mesh]: Creating mesh for {0}", primName);
 #endif
             Mesh mesh;
             ulong key = primShape.GetMeshKey(size, lod);

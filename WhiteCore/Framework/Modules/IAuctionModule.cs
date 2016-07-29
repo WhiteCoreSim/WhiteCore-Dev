@@ -35,10 +35,10 @@ namespace WhiteCore.Framework.Modules
 {
     public interface IAuctionModule
     {
-        void StartAuction(int LocalID, UUID SnapshotID);
-        void SetAuctionInfo(int LocalID, AuctionInfo info);
-        void AddAuctionBid(int LocalID, UUID userID, int bid);
-        void AuctionEnd(int LocalID);
+        void StartAuction(int localID, UUID snapshotID);
+        void SetAuctionInfo(int localID, AuctionInfo info);
+        void AddAuctionBid(int localID, UUID userID, int bid);
+        void AuctionEnd(int localID);
     }
 
     [Serializable, ProtoContract(UseProtoMembersOnly = false)]

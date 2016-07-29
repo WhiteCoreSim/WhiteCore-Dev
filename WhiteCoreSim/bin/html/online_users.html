@@ -10,109 +10,38 @@
 {MoreInfoText}     More Info
 -->
 
-<script type="text/javascript">
-  $(document).ready(function(){$(".agentinfo, .regioninfo").colorbox({iframe:true, width:"990px", height:"440px"});});
+
+<div id="fullPage">
+  <h2>{SystemName}: {OnlineUsersText}</h2>
+
+  <table id="online_users_list">
+    <thead class="listhead">
+      <tr>
+        <th class="online_users_left"><p>{UserNameText}</p></th>
+        <th class="online_users_right"><p>{RegionNameText}</p></th>
+        <th class="online_users_left" style="padding-left:10px;"><p>{OnlineLocationText}</p></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {UsersOnlineListArrayBegin}
+        <tr>
+          <td class="online_users_left"><a target="_blank" class='agentinfo' href="webprofile/?userid={UserID}">{UserName}</a></td>
+          <td class="online_users_right"><a target="_blank" class='regioninfo' href="regionprofile/?regionid={UserRegionID}">{UserRegion}</a></td>
+          <td class="online_users_left" style="padding-left:10px;">{UserLocation}</a></td>
+        </tr>
+      {UsersOnlineListArrayEnd}
+
+    </tbody>
+  </table>
+</div>
+
+<script>
+  $(document).ready(function(){
+    $('#online_users_list').dataTable({
+      "order": [[ 0, "asc" ]]
+    });
+
+    $(".agentinfo, .regioninfo").colorbox({iframe:true, width:"990px", height:"440px"});
+  });
 </script>
-
-<h2>{SystemName}: {OnlineUsersText}</h2>
-<table id="online_users_navigation_top">
-  <caption></caption>
-  
-  <thead>
-    <tr>
-      <th><a class="fade" href="index.html?page=online_users&Start=0" target="_self" title="{FirstText}"><p class="nav">|&nbsp;<</p></a></th>
-	  <th><a class="fade" href="index.html?page=online_users&Start={BackOne}" target="_self" title="{BackText}"><p class="nav"><</p></a></th>
-	  <th><p>{CurrentPageText} {CurrentPage}</p></th>
-	  <th><a class="fade" href="index.html?page=online_users&Start={NextOne}" target="_self" title="{NextText}"><p class="nav">></p></a></th>
-	  <th><a class="fade" href="index.html?page=online_users&Start=-1" target="_self" title="{LastText}"><p class="nav">>&nbsp;|</p></a></th>
-    </tr>
-  </thead>
-<!--  
-  <tfoot>
-    <tr>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </tfoot>
-  
-  <tbody>
-    <tr>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-  </tbody>
--->
-</table>
-
-<table id="online_users">
-  <caption></caption>
-  
-  <thead class="listhead">
-    <tr>
-      <th class="online_users_left"><a class="fade" href="index.html?page=online_users&Order=UserName" title="{UserNameText}"><p>{UserNameText}</p></a></th>
-      <th class="online_users_right"><a class="fade" href="index.html?page=online_users&Order=RegionName" title="{RegionNameText}"><p>{RegionNameText}</p></a></th>
-      <th class="online_users_left" style="padding-left:10px;"><p>{OnlineLocationText}</p></th>
-    </tr>
-  </thead>
-  
-  <tfoot class="listfoot">
-    <tr style= align:bottom;">
-      <th class="online_users_left"><a class="fade" href="index.html?page=online_users&Order=UserName" title="{UserNameText}"><p>{UserNameText}</p></a></th>
-      <th class="online_users_right"><a class="fade" href="index.html?page=online_users&Order=RegionName" title="{RegionNameText}"><p>{RegionNameText}</p></a></th>
-      <th class="online_users_left" style="padding-left:10px;"><p>{OnlineLocationText}</p></th>
-    </tr>
-  </tfoot>
-
-  <tbody>
-  <tr style="line-height:6px;"><td>&nbsp;</td></tr>
-{UsersOnlineListArrayBegin}
-    <tr>
-      <td class="online_users_left"><a target="_blank" class='agentinfo' href="webprofile/?userid={UserID}">{UserName}</a></td>
-      <td class="online_users_right"><a target="_blank" class='regioninfo' href="region_info.html?regionid={UserRegionID}">{UserRegion}</a></td>
-      <td class="online_users_left" style="padding-left:10px;">{UserLocation}</a></td>
-    </tr>
-{UsersOnlineListArrayEnd}
-  <tr style="line-height:10px;"><td>&nbsp;</td></tr>
-  </tbody>
-</table>
-
-<table id="online_users_navigation_bottom">
-  <caption></caption>
-  
-  <thead>
-    <tr>
-      <th><a class="fade" href="index.html?page=online_users&Start=0" target="_self" title="{FirstText}"><p class="nav">|&nbsp;<</p></a></th>
-	  <th><a class="fade" href="index.html?page=online_users&Start={BackOne}" target="_self" title="{BackText}"><p class="nav"><</p></a></th>
-	  <th><p>{CurrentPageText} {CurrentPage}</p></th>
-	  <th><a class="fade" href="index.html?page=online_users&Start={NextOne}" target="_self" title="{NextText}"><p class="nav">></p></a></th>
-	  <th><a class="fade" href="index.html?page=online_users&Start=-1" target="_self" title="{LastText}"><p class="nav">>&nbsp;|</p></a></th>
-    </tr>
-  </thead>
-<!--  
-  <tfoot>
-    <tr>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </tfoot>
-  
-  <tbody>
-    <tr>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-  </tbody>
--->
-</table>

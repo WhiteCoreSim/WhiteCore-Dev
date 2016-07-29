@@ -15,10 +15,43 @@
 <div id="info_message" class="error_message"></div>
 <div>
 
+
+
+	<form id="sim_console_login" action="admin/sim_console.html" method="post" onsubmit="
+        StartSession(this.address.value, this.user.value, this.password.value);
+        ReadResponses();
+        return false">
+        <table>
+        	<tr>
+        		<td>{SimAddressText}</td>
+        		<td colspan="2">
+        			<input name="address" type="text" value="{SystemURL}" />
+        		</td>
+        		<td><button type="submit" value="login">{Login}</button></td>
+        	</tr>
+        	<tr>
+        		<td>{UserNameText}</td>
+        		<td><input name="user" type="text" size="15" value="ConsoleUser" /></td>
+        		<td>{PasswordText}</td>
+        		<td><input name="password" type="text" size="15" value="ConsolePass" /></td>
+        	</tr>
+        </table>
+    </form>
+
+    <div id="output" style="height:15em; border:thin solid; overflow:auto;"></div>
+
+    <form id="sim_console_form" action="admin/sim_console.html" method="post"  onsubmit="
+        Command(this.command.value);
+        ReadResponses();
+        return false">
+      <input type="text" name="command" value="Enter command here" size="60"/>
+      <button type="submit" width="20" value="Send Command">{SendCommandText}</button>
+    </form>
+
     <!-- This JavaScript code is published by Marck (c) 2010 under a -->
     <!-- Creative Commons Attribution 3.0 Germany License            -->
     <!-- http://creativecommons.org/licenses/by/3.0/de/              -->
-    <script type="text/javascript">
+    <script>
 
       var sessionId;
       var hostUrl;
@@ -57,46 +90,13 @@
 
       window.onunload = CloseSession;
 
-    </script>
- 
- 
-	<form id="sim_console_login" action="admin/sim_console.html" method="post" onsubmit="
-        StartSession(this.address.value, this.user.value, this.password.value);
-        ReadResponses();
-        return false">
-        <table>
-        	<tr>
-        		<td>{SimAddressText}</td>
-        		<td colspan="2">
-        			<input name="address" type="text" value="{SystemURL}" />
-        		</td>
-        		<td><button type="submit" value="login">{Login}</button></td>
-        	</tr>
-        	<tr>
-        		<td>{UserNameText}</td>
-        		<td><input name="user" type="text" size="15" value="ConsoleUser" /></td>
-        		<td>{PasswordText}</td>
-        		<td><input name="password" type="text" size="15" value="ConsolePass" /></td>
-        	</tr>
-        </table>
-    </form>
 
-    <div id="output" style="height:15em; border:thin solid; overflow:auto;"></div>
 
-    <form id="sim_console_form" action="admin/sim_console.html" method="post"  onsubmit="
-        Command(this.command.value);
-        ReadResponses();
-        return false">
-      <input type="text" name="command" value="Enter command here" size="60"/>
-      <button type="submit" width="20" value="Send Command">{SendCommandText}</button>
-    </form>
-
- <script>
   /* attach a submit handler to the login form */
   $("#sim_console_login").submit(function(event) {
 
     /* stop form from submitting normally */
-    event.preventDefault(); 
+    event.preventDefault();
     /* get some values from elements on the page: */
     var $form = $( this ),
         url = $form.attr( 'action' );
@@ -107,12 +107,12 @@
       }
     );
   });
-  
+
   /* attach a submit handler to the command form */
   $("#sim_console_form").submit(function(event) {
 
     /* stop form from submitting normally */
-    event.preventDefault(); 
+    event.preventDefault();
     /* get some values from elements on the page: */
     var $form = $( this ),
         url = $form.attr( 'action' );
@@ -124,5 +124,6 @@
     );
   });
 </script>
+
 </div>
 {IsAdminAuthenticatedEnd}

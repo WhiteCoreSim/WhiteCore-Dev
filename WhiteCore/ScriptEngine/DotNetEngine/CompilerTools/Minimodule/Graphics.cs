@@ -62,9 +62,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
                 Description = "MRM Image",
                 Flags = (temporary) ? AssetFlags.Temporary : 0
             };
-            asset.ID = m_scene.AssetService.Store (asset);
 
-            return asset.ID;
+            var assetID = m_scene.AssetService.Store (asset);
+            asset.Dispose ();
+            return assetID;
         }
 
         public Bitmap LoadBitmap (UUID assetID)
@@ -75,10 +76,18 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
             byte[] bmp = m_scene.AssetService.GetData (assetID.ToString ());
             if (bmp == null)
                 bmp = m_scene.AssetService.GetData (MISSING_TEXTURE_ID);
-            
-            Image img = m_scene.RequestModuleInterface<IJ2KDecoder> ().DecodeToImage (bmp);
 
-            return new Bitmap (img);
+            if (bmp == null)    // something reqlly wrong here
+                return null;
+
+            Image img = m_scene.RequestModuleInterface<IJ2KDecoder> ().DecodeToImage (bmp);
+            if (img == null)
+                return null;
+            
+            var retbmp = new Bitmap (img);
+            img.Dispose ();
+
+            return retbmp;
         }
 
         #endregion

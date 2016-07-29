@@ -555,19 +555,19 @@ namespace WhiteCore.Modules.Search
                 {
                     //Get the region so we have its position
                     GridRegion region = m_Scene.GridService.GetRegionByName (remoteClient.AllScopeIDs, classified.SimName);
+                    if (region != null) {
+                        mapitem = new mapItemReply {
+                            x = (uint)(region.RegionLocX + classified.GlobalPos.X + (remoteClient.Scene.RegionInfo.RegionSizeX / 2)),
+                            y = (uint)(region.RegionLocY + classified.GlobalPos.Y + (remoteClient.Scene.RegionInfo.RegionSizeY / 2)),
+                            id = classified.CreatorUUID,
+                            name = classified.Name,
+                            Extra = 0,
+                            Extra2 = 0
+                        };
 
-                    mapitem = new mapItemReply {
-                        x = (uint) (region.RegionLocX + classified.GlobalPos.X + (remoteClient.Scene.RegionInfo.RegionSizeX / 2)),
-                        y = (uint) (region.RegionLocY + classified.GlobalPos.Y + (remoteClient.Scene.RegionInfo.RegionSizeY / 2)),
-                        id = classified.CreatorUUID,
-                        name = classified.Name,
-                        Extra = 0,
-                        Extra2 = 0
-                    };
-
-                    //Use global position plus half the sim so that all classifieds are not in the bottom corner
-
-                    mapitems.Add (mapitem);
+                        //Use global position plus half the sim so that all classifieds are not in the bottom corner
+                        mapitems.Add (mapitem);
+                    }
                 }
                 //Send the events, if we have any
                 if (mapitems.Count != 0)

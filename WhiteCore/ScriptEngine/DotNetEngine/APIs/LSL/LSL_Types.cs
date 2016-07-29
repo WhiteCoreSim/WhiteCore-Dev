@@ -34,11 +34,15 @@ using WhiteCore.Framework.Utilities;
 namespace WhiteCore.ScriptEngine.DotNetEngine
 {
     [Serializable]
-	public partial class LSL_Types
+	public class LSL_Types
     {
         // Types are kept is separate .dll to avoid having to add whatever .dll it is in it to script AppDomain
         // Define the tolerance for variation in their values 
         const double DoubleDifference = .0000005;
+        static bool FloatAlmostEqual (LSLFloat valA, LSLFloat valB)
+        {
+            return Math.Abs (valA - valB) <= DoubleDifference;
+        }
 
         [Serializable]
         public struct Vector3
@@ -58,9 +62,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
             public Vector3(OpenMetaverse.Vector3 vector)
             {
-                x = (float) vector.X;
-                y = (float) vector.Y;
-                z = (float) vector.Z;
+                x = vector.X;
+                y = vector.Y;
+                z = vector.Z;
             }
 
             public Vector3(double X, double Y, double Z)
@@ -74,7 +78,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             {
                 str = str.Replace('<', ' ');
                 str = str.Replace('>', ' ');
-                string[] tmps = str.Split(new Char[] {',', '<', '>'});
+                string[] tmps = str.Split(new char [] {',', '<', '>'});
                 if (tmps.Length < 3)
                 {
                     x = y = z = 0;
@@ -82,9 +86,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 }
                 //bool res;
                 double xx, yy, zz;
-                Double.TryParse(tmps[0], NumberStyles.Float, Culture.NumberFormatInfo, out xx);
-                Double.TryParse(tmps[1], NumberStyles.Float, Culture.NumberFormatInfo, out yy);
-                Double.TryParse(tmps[2], NumberStyles.Float, Culture.NumberFormatInfo, out zz);
+                double.TryParse(tmps[0], NumberStyles.Float, Culture.NumberFormatInfo, out xx);
+                double.TryParse(tmps[1], NumberStyles.Float, Culture.NumberFormatInfo, out yy);
+                double.TryParse(tmps[2], NumberStyles.Float, Culture.NumberFormatInfo, out zz);
                 x = new LSLFloat(xx);
                 y = new LSLFloat(yy);
                 z = new LSLFloat(zz);
@@ -96,19 +100,19 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
             public override string ToString()
             {
-                string s = String.Format("<{0:0.000000},{1:0.000000},{2:0.000000}>", x, y, z);
+                string s = string.Format("<{0:0.000000},{1:0.000000},{2:0.000000}>", x, y, z);
                 return s;
             }
 
             public static explicit operator LSLString(Vector3 vec)
             {
-                string s = String.Format("<{0:0.000000},{1:0.000000},{2:0.000000}>", vec.x, vec.y, vec.z);
+                string s = string.Format("<{0:0.000000},{1:0.000000},{2:0.000000}>", vec.x, vec.y, vec.z);
                 return new LSLString(s);
             }
 
             public static explicit operator string(Vector3 vec)
             {
-                string s = String.Format("<{0:0.000000},{1:0.000000},{2:0.000000}>", vec.x, vec.y, vec.z);
+                string s = string.Format("<{0:0.000000},{1:0.000000},{2:0.000000}>", vec.x, vec.y, vec.z);
                 return s;
             }
 
@@ -131,12 +135,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
             public static bool operator ==(Vector3 lhs, Vector3 rhs)
             {
-
                 // compare like values for equality withing the difference range
-                bool xEq = ( Math.Abs(lhs.x) - Math.Abs(rhs.x) ) <= DoubleDifference;
-                bool yEq = ( Math.Abs(lhs.y) - Math.Abs(rhs.y) ) <= DoubleDifference;
-                bool zEq = ( Math.Abs(lhs.z) - Math.Abs(rhs.z) ) <= DoubleDifference;
-
+                bool xEq = FloatAlmostEqual (lhs.x, rhs.x);
+                bool yEq = FloatAlmostEqual (lhs.y, rhs.y);
+                bool zEq = FloatAlmostEqual (lhs.z, rhs.z);
                 return (xEq && yEq && zEq);
             }
 
@@ -150,16 +152,16 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 return (x.GetHashCode() ^ y.GetHashCode() ^ z.GetHashCode());
             }
 
-            public override bool Equals(object o)
+            public override bool Equals(object obj)
             {
-                if (!(o is Vector3)) return false;
+                if (!(obj is Vector3)) return false;
 
-                var vector = (Vector3) o;
+                var vector = (Vector3) obj;
 
                 // compare like values for equality withing the difference range
-                bool xEq = ( Math.Abs(x) - Math.Abs(vector.x) ) <= DoubleDifference;
-                bool yEq = ( Math.Abs(y) - Math.Abs(vector.y) ) <= DoubleDifference;
-                bool zEq = ( Math.Abs(z) - Math.Abs(vector.z) ) <= DoubleDifference;
+                bool xEq = FloatAlmostEqual (x, vector.x);
+                bool yEq = FloatAlmostEqual (y, vector.y);
+                bool zEq = FloatAlmostEqual (z, vector.z);
 
                 return (xEq && yEq && zEq);
             }
@@ -325,7 +327,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 y = (float) Quat.y;
                 z = (float) Quat.z;
                 s = (float) Quat.s;
-                if (x == 0 && y == 0 && z == 0 && s == 0)
+                if (FloatAlmostEqual(x, 0) &&
+                    FloatAlmostEqual(y, 0) &&
+                    FloatAlmostEqual(z, 0) && 
+                    FloatAlmostEqual(s, 0))
                     s = 1;
             }
 
@@ -335,7 +340,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 y = Y;
                 z = Z;
                 s = S;
-                if (x == 0 && y == 0 && z == 0 && s == 0)
+                if (FloatAlmostEqual (x, 0) &&
+                    FloatAlmostEqual (y, 0) &&
+                    FloatAlmostEqual (z, 0) &&
+                    FloatAlmostEqual (s, 0))
                     s = 1;
             }
 
@@ -343,17 +351,20 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             {
                 str = str.Replace('<', ' ');
                 str = str.Replace('>', ' ');
-                string[] tmps = str.Split(new Char[] {',', '<', '>'});
+                string[] tmps = str.Split(new char [] {',', '<', '>'});
                 if (tmps.Length < 4)
                 {
                     x = y = z = s = 0;
                     return;
                 }
-                bool res = Double.TryParse(tmps[0], NumberStyles.Float, Culture.NumberFormatInfo, out x);
-                res = res & Double.TryParse(tmps[1], NumberStyles.Float, Culture.NumberFormatInfo, out y);
-                res = res & Double.TryParse(tmps[2], NumberStyles.Float, Culture.NumberFormatInfo, out z);
-                res = res & Double.TryParse(tmps[3], NumberStyles.Float, Culture.NumberFormatInfo, out s);
-                if (x == 0 && y == 0 && z == 0 && s == 0)
+                bool res = double.TryParse(tmps[0], NumberStyles.Float, Culture.NumberFormatInfo, out x);
+                res = res & double.TryParse(tmps[1], NumberStyles.Float, Culture.NumberFormatInfo, out y);
+                res = res & double.TryParse(tmps[2], NumberStyles.Float, Culture.NumberFormatInfo, out z);
+                res = res & double.TryParse(tmps[3], NumberStyles.Float, Culture.NumberFormatInfo, out s);
+                if (FloatAlmostEqual (x, 0) &&
+                    FloatAlmostEqual (y, 0) &&
+                    FloatAlmostEqual (z, 0) &&
+                    FloatAlmostEqual (s, 0))
                     s = 1;
             }
 
@@ -380,25 +391,30 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
                 Quaternion quaternion = (Quaternion) o;
 
-                return x == quaternion.x && y == quaternion.y && z == quaternion.z && s == quaternion.s;
+                var result = 
+                    FloatAlmostEqual (x, quaternion.x) &&
+                    FloatAlmostEqual (y, quaternion.y) &&
+                    FloatAlmostEqual (z, quaternion.z) &&
+                    FloatAlmostEqual (s, quaternion.s);
+                return result;
             }
 
             public override string ToString()
             {
-                string st = String.Format(Culture.FormatProvider,
+                string st = string.Format(Culture.FormatProvider,
                                           "<{0:0.000000},{1:0.000000},{2:0.000000},{3:0.000000}>", x, y, z, s);
                 return st;
             }
 
             public static explicit operator string(Quaternion r)
             {
-                string s = String.Format("<{0:0.000000},{1:0.000000},{2:0.000000},{3:0.000000}>", r.x, r.y, r.z, r.s);
+                string s = string.Format("<{0:0.000000},{1:0.000000},{2:0.000000},{3:0.000000}>", r.x, r.y, r.z, r.s);
                 return s;
             }
 
             public static explicit operator LSLString(Quaternion r)
             {
-                string s = String.Format("<{0:0.000000},{1:0.000000},{2:0.000000},{3:0.000000}>", r.x, r.y, r.z, r.s);
+                string s = string.Format("<{0:0.000000},{1:0.000000},{2:0.000000},{3:0.000000}>", r.x, r.y, r.z, r.s);
                 return new LSLString(s);
             }
 
@@ -409,10 +425,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
             public static implicit operator bool(Quaternion s)
             {
-                return s.x != 0 ||
-                       s.y != 0 ||
-                       s.z != 0 ||
-                       s.s != 1;
+                var result = 
+                    !FloatAlmostEqual (s.x, 0) ||
+                    !FloatAlmostEqual (s.y, 0) ||
+                    !FloatAlmostEqual (s.z, 0) ||
+                    !FloatAlmostEqual (s.s, 1);
+                return result;
             }
 
             public static implicit operator list(Quaternion r)
@@ -423,7 +441,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             public static bool operator ==(Quaternion lhs, Quaternion rhs)
             {
                 // Return true if the fields match:
-                return lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z && lhs.s == rhs.s;
+                var result =
+                    FloatAlmostEqual (lhs.x, rhs.x) &&
+                    FloatAlmostEqual (lhs.y, rhs.y) &&
+                    FloatAlmostEqual (lhs.z, rhs.z) &&
+                    FloatAlmostEqual (lhs.s, rhs.s);
+                return result;
             }
 
             public static bool operator !=(Quaternion lhs, Quaternion rhs)
@@ -479,7 +502,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         [Serializable]
         public class list : IEnumerator
         {
-            private object[] m_data;
+            object[] m_data;
 
             public list(params object[] args)
             {
@@ -491,7 +514,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 get
                 {
                     if (m_data == null)
-                        m_data = new Object[0];
+                        m_data = new object[0];
                     return m_data.Length;
                 }
             }
@@ -501,21 +524,21 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 get
                 {
                     if (m_data == null)
-                        m_data = new Object[0];
+                        m_data = new object[0];
 
                     int size = 0;
 
-                    foreach (Object o in m_data)
+                    foreach (object o in m_data)
                     {
-                        if (o is LSL_Types.LSLInteger)
+                        if (o is LSLInteger)
                             size += 4;
-                        else if (o is LSL_Types.LSLFloat)
+                        else if (o is LSLFloat)
                             size += 8;
-                        else if (o is LSL_Types.LSLString)
-                            size += ((LSL_Types.LSLString) o).m_string.Length;
-                        else if (o is LSL_Types.Vector3)
+                        else if (o is LSLString)
+                            size += ((LSLString) o).m_string.Length;
+                        else if (o is Vector3)
                             size += 32;
-                        else if (o is LSL_Types.Quaternion)
+                        else if (o is Quaternion)
                             size += 64;
                         else if (o is int)
                             size += 4;
@@ -526,7 +549,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                         else if (o is double)
                             size += 16;
                         else
-                            throw new Exception("Unknown type in List.Size: " + o.GetType().ToString());
+                            throw new Exception("Unknown type in List.Size: " + o.GetType());
                     }
                     return size;
                 }
@@ -537,7 +560,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 get
                 {
                     if (m_data == null)
-                        m_data = new Object[0];
+                        m_data = new object[0];
                     return m_data;
                 }
 
@@ -559,115 +582,108 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             // down-cast from Object to the correct type.
             // Note: no checks for item index being valid are performed
 
-            public LSL_Types.LSLFloat GetLSLFloatItem(int itemIndex)
+            public LSLFloat GetLSLFloatItem (int itemIndex)
             {
-                if (m_data[itemIndex] is LSL_Types.LSLInteger)
+                if (m_data[itemIndex] is LSLInteger)
                 {
-                    return (LSL_Types.LSLInteger) m_data[itemIndex];
+                    return (LSLInteger) m_data[itemIndex];
                 }
-                else if (m_data[itemIndex] is Int32)
+                else if (m_data [itemIndex] is int)
                 {
-                    return new LSL_Types.LSLFloat((int) m_data[itemIndex]);
+                    return new LSLFloat ((int) m_data[itemIndex]);
                 }
                 else if (m_data[itemIndex] is float)
                 {
-                    return new LSL_Types.LSLFloat((float) m_data[itemIndex]);
+                    return new LSLFloat((float) m_data[itemIndex]);
                 }
-                else if (m_data[itemIndex] is Double)
+                else if (m_data[itemIndex] is double)
                 {
-                    return new LSL_Types.LSLFloat((Double) m_data[itemIndex]);
+                    return new LSLFloat((double) m_data[itemIndex]);
                 }
-                else if (m_data[itemIndex] is LSL_Types.LSLString)
+                else if (m_data[itemIndex] is LSLString)
                 {
-                    return new LSL_Types.LSLFloat(m_data[itemIndex].ToString());
+                    return new LSLFloat(m_data[itemIndex].ToString());
                 }
                 else
                 {
-                    return (LSL_Types.LSLFloat) m_data[itemIndex];
+                    return (LSLFloat) m_data[itemIndex];
                 }
             }
 
-            public LSL_Types.LSLString GetLSLStringItem(int itemIndex)
+            public LSLString GetLSLStringItem(int itemIndex)
             {
-                if (m_data[itemIndex] is String)
+                if (m_data[itemIndex] is string)
                 {
-                    return new LSL_Types.LSLString((string) m_data[itemIndex]);
+                    return new LSLString((string) m_data[itemIndex]);
                 }
-                else if (m_data[itemIndex] is LSL_Types.LSLFloat)
+                if (m_data[itemIndex] is LSLFloat)
                 {
-                    return new LSL_Types.LSLString((LSLFloat) m_data[itemIndex]);
+                    return new LSLString((LSLFloat) m_data[itemIndex]);
                 }
-                else if (m_data[itemIndex] is LSL_Types.LSLInteger)
+                if (m_data[itemIndex] is LSLInteger)
                 {
-                    return new LSL_Types.LSLString((LSLInteger) m_data[itemIndex]);
+                    return new LSLString((LSLInteger) m_data[itemIndex]);
                 }
-                else
-                {
-                    return (LSL_Types.LSLString) m_data[itemIndex];
-                }
+
+                return (LSLString) m_data[itemIndex];
+
             }
 
-            public LSL_Types.LSLInteger GetLSLIntegerItem(int itemIndex)
+            public LSLInteger GetLSLIntegerItem(int itemIndex)
             {
-                if (m_data[itemIndex] is LSL_Types.LSLInteger)
-                    return (LSL_Types.LSLInteger) m_data[itemIndex];
-                if (m_data[itemIndex] is LSL_Types.LSLFloat)
+                if (m_data[itemIndex] is LSLInteger)
+                    return (LSLInteger) m_data[itemIndex];
+                if (m_data[itemIndex] is LSLFloat)
                     return new LSLInteger((int) m_data[itemIndex]);
-                else if (m_data[itemIndex] is Int32)
+                if (m_data [itemIndex] is int)
                     return new LSLInteger((int) m_data[itemIndex]);
-                else if (m_data[itemIndex] is LSL_Types.LSLString)
-                    return new LSLInteger(((LSL_Types.LSLString) m_data[itemIndex]).m_string);
-                else
-                    throw new InvalidCastException(string.Format(
+                if (m_data[itemIndex] is LSLString)
+                    return new LSLInteger(((LSLString) m_data[itemIndex]).m_string);
+                
+                throw new InvalidCastException(string.Format(
                         "{0} expected but {1} given",
-                        typeof (LSL_Types.LSLInteger).Name,
+                        typeof (LSLInteger).Name,
                         m_data[itemIndex] != null
                             ? m_data[itemIndex].GetType().Name
                             : "null"));
             }
 
-            public LSL_Types.Vector3 GetVector3Item(int itemIndex)
+            public Vector3 GetVector3Item(int itemIndex)
             {
-                if (m_data[itemIndex] is LSL_Types.Vector3)
+                if (m_data[itemIndex] is Vector3)
                 {
-                    return (LSL_Types.Vector3) m_data[itemIndex];
+                    return (Vector3) m_data[itemIndex];
                 }
-                else if (m_data[itemIndex] is OpenMetaverse.Vector3)
-                {
-                    return new LSL_Types.Vector3(
-                        (OpenMetaverse.Vector3) m_data[itemIndex]);
+                if (m_data [itemIndex] is OpenMetaverse.Vector3) {
+                    return new Vector3 (
+                        (OpenMetaverse.Vector3)m_data [itemIndex]);
                 }
-                else
-                {
-                    throw new InvalidCastException(string.Format(
-                        "{0} expected but {1} given",
-                        typeof (LSL_Types.Vector3).Name,
-                        m_data[itemIndex] != null
-                            ? m_data[itemIndex].GetType().Name
-                            : "null"));
-                }
+
+                throw new InvalidCastException (string.Format (
+                    "{0} expected but {1} given",
+                    typeof (Vector3).Name,
+                    m_data [itemIndex] != null
+                        ? m_data [itemIndex].GetType ().Name
+                        : "null"));
             }
 
-            public LSL_Types.Quaternion GetQuaternionItem(int itemIndex)
+            public Quaternion GetQuaternionItem(int itemIndex)
             {
-                if (m_data[itemIndex] is LSL_Types.Quaternion)
+                if (m_data[itemIndex] is Quaternion)
                 {
-                    return (LSL_Types.Quaternion) m_data[itemIndex];
+                    return (Quaternion) m_data[itemIndex];
                 }
-                else if (m_data[itemIndex] is OpenMetaverse.Quaternion)
-                {
-                    return new LSL_Types.Quaternion(
-                        (OpenMetaverse.Quaternion) m_data[itemIndex]);
+                if (m_data [itemIndex] is OpenMetaverse.Quaternion) {
+                    return new Quaternion (
+                        (OpenMetaverse.Quaternion)m_data [itemIndex]);
                 }
-                else
-                {
-                    throw new InvalidCastException(string.Format(
-                        "{0} expected but {1} given",
-                        typeof (LSL_Types.Quaternion).Name,
-                        m_data[itemIndex] != null
-                            ? m_data[itemIndex].GetType().Name
-                            : "null"));
-                }
+
+                throw new InvalidCastException (string.Format (
+                    "{0} expected but {1} given",
+                    typeof (Quaternion).Name,
+                    m_data [itemIndex] != null
+                        ? m_data [itemIndex].GetType ().Name
+                        : "null"));
             }
 
             public static list operator +(list a, list b)
@@ -679,7 +695,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 return new list(tmp);
             }
 
-            private void ExtendAndAdd(object o)
+            void ExtendAndAdd(object o)
             {
                 Array.Resize(ref m_data, Length + 1);
                 m_data.SetValue(o, Length - 1);
@@ -764,9 +780,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             public bool Contains(object o)
             {
                 bool ret = false;
-                foreach (object i in Data)
+                foreach (object dobj in Data)
                 {
-                    if (i == o)
+                    if (dobj == o)
                     {
                         ret = true;
                         break;
@@ -782,7 +798,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 // if either is negative, count from the end of the array
                 // if the resulting start > end, remove all BUT that part
 
-                Object[] ret;
+                object [] ret;
 
                 if (start < 0)
                     start = m_data.Length + start;
@@ -798,7 +814,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 if (start > end)
                 {
                     if (end >= m_data.Length)
-                        return new list(new Object[0]);
+                        return new list(new object [0]);
 
                     if (start >= m_data.Length)
                         start = m_data.Length - 1;
@@ -809,7 +825,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 // start >= 0 && end >= 0 here
                 if (start >= m_data.Length)
                 {
-                    ret = new Object[m_data.Length];
+                    ret = new object[m_data.Length];
                     Array.Copy(m_data, 0, ret, 0, m_data.Length);
 
                     return new list(ret);
@@ -821,7 +837,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 // now, this makes the math easier
                 int remove = end + 1 - start;
 
-                ret = new Object[m_data.Length - remove];
+                ret = new object [m_data.Length - remove];
                 if (ret.Length == 0)
                     return new list(ret);
 
@@ -864,67 +880,54 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 // less than end is taken to be the most
                 // common case.
 
-                if (start <= end)
-                {
+                if (start <= end) {
                     // Start sublist beyond length
                     // Also deals with start AND end still negative
-                    if (start >= m_data.Length || end < 0)
-                    {
-                        return new list();
+                    if (start >= m_data.Length || end < 0) {
+                        return new list ();
                     }
 
                     // Sublist extends beyond the end of the supplied list
-                    if (end >= m_data.Length)
-                    {
+                    if (end >= m_data.Length) {
                         end = m_data.Length - 1;
                     }
 
                     // Sublist still starts before the beginning of the list
-                    if (start < 0)
-                    {
+                    if (start < 0) {
                         start = 0;
                     }
 
-                    ret = new object[end - start + 1];
+                    ret = new object [end - start + 1];
 
-                    Array.Copy(m_data, start, ret, 0, end - start + 1);
+                    Array.Copy (m_data, start, ret, 0, end - start + 1);
 
-                    return new list(ret);
+                    return new list (ret);
                 }
-                // Deal with the segmented case: 0->end + start->EOL
-                else
-                {
-                    list result = null;
+                list result = null;
 
-                    // If end is negative, then prefix list is empty
-                    if (end < 0)
-                    {
-                        result = new list();
-                        // If start is still negative, then the whole of
-                        // the existing list is returned. This case is
-                        // only admitted if end is also still negative.
-                        if (start < 0)
-                        {
-                            return this;
-                        }
+                // If end is negative, then prefix list is empty
+                if (end < 0) {
+                    result = new list ();
+                    // If start is still negative, then the whole of
+                    // the existing list is returned. This case is
+                    // only admitted if end is also still negative.
+                    if (start < 0) {
+                        return this;
                     }
-                    else
-                    {
-                        result = GetSublist(0, end);
-                    }
-
-                    // If start is outside of list, then just return
-                    // the prefix, whatever it is.
-                    if (start >= m_data.Length)
-                    {
-                        return result;
-                    }
-
-                    return result + GetSublist(start, Data.Length);
+                } else {
+                    result = GetSublist (0, end);
                 }
+
+                // If start is outside of list, then just return
+                // the prefix, whatever it is.
+                if (start >= m_data.Length) {
+                    return result;
+                }
+
+                return result + GetSublist (start, Data.Length);
             }
 
-            private static int compare(object left, object right, int ascending)
+            static int compare(object left, object right, int ascending)
             {
                 if (!left.GetType().Equals(right.GetType()))
                 {
@@ -940,7 +943,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 {
                     LSLString l = (LSLString) left;
                     LSLString r = (LSLString) right;
-                    ret = String.CompareOrdinal(l.m_string, r.m_string);
+                    ret = string.CompareOrdinal(l.m_string, r.m_string);
                 }
                 else if (left is LSLInteger)
                 {
@@ -975,7 +978,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 return ret;
             }
 
-            private class HomogeneousComparer : IComparer
+            class HomogeneousComparer : IComparer
             {
                 public HomogeneousComparer()
                 {
@@ -1032,22 +1035,22 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 // Anything else will give you the incorrect behavior.
 
                 // begin bubble sort...
-                int i;
-                int j;
-                int k;
+                int ix;
+                int jx;
+                int kx;
                 int n = Data.Length;
 
-                for (i = 0; i < (n - stride); i += stride)
+                for (ix = 0; ix < (n - stride); ix += stride)
                 {
-                    for (j = i + stride; j < n; j += stride)
+                    for (jx = ix + stride; jx < n; jx += stride)
                     {
-                        if (compare(ret[i], ret[j], ascending) > 0)
+                        if (compare(ret[ix], ret[jx], ascending) > 0)
                         {
-                            for (k = 0; k < stride; k++)
+                            for (kx = 0; kx < stride; kx++)
                             {
-                                object tmp = ret[i + k];
-                                ret[i + k] = ret[j + k];
-                                ret[j + k] = tmp;
+                                object tmp = ret[ix + kx];
+                                ret[ix + kx] = ret[jx + kx];
+                                ret[jx + kx] = tmp;
                             }
                         }
                     }
@@ -1068,7 +1071,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             public string ToCSV()
             {
                 string ret = "";
-                foreach (object o in this.Data)
+                foreach (object o in Data)
                 {
                     if (ret == "")
                     {
@@ -1076,28 +1079,28 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                     }
                     else
                     {
-                        ret = ret + ", " + o.ToString();
+                        ret = ret + ", " + o;
                     }
                 }
                 return ret;
             }
 
-            private string ToSoup()
+            string ToSoup()
             {
                 string output;
-                output = String.Empty;
+                output = string.Empty;
                 if (m_data.Length == 0)
                 {
-                    return String.Empty;
+                    return string.Empty; 
                 }
                 foreach (object o in m_data)
                 {
-                    output = output + o.ToString();
+                    output = output + o;
                 }
                 return output;
             }
 
-            public static explicit operator String(list l)
+            public static explicit operator string(list l)
             {
                 return l.ToSoup();
             }
@@ -1146,7 +1149,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
             public double Range()
             {
-                return (this.Max()/this.Min());
+                return (Max()/Min());
             }
 
             public int NumericLength()
@@ -1207,7 +1210,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
             public double Mean()
             {
-                return (this.Sum()/this.NumericLength());
+                var numLen = NumericLength ();
+                if (numLen != 0)
+                    return (Sum()/numLen);
+
+                return 0f;
             }
 
             public void NumericSort()
@@ -1235,7 +1242,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 {
                     ret *= (double) nums.Data[i];
                 }
-                return Math.Exp(Math.Log(ret)/(double) nums.Data.Length);
+                return Math.Exp(Math.Log(ret) / nums.Data.Length);
             }
 
             public double HarmonicMean()
@@ -1246,7 +1253,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 {
                     ret += 1.0/(double) nums.Data[i];
                 }
-                return ((double) nums.Data.Length/ret);
+                return (nums.Data.Length/ret);
             }
 
             public double Variance()
@@ -1262,7 +1269,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
             public double StdDev()
             {
-                return Math.Sqrt(this.Variance());
+                return Math.Sqrt(Variance());
             }
 
             public double Qi(double i)
@@ -1270,14 +1277,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 list j = this;
                 j.NumericSort();
 
-                if (Math.Ceiling(this.Length*i) == this.Length*i)
-                {
-                    return (double) ((double) j.Data[(int) (this.Length*i - 1)] + (double) j.Data[(int) (this.Length*i)])/2;
+                if (FloatAlmostEqual (Math.Ceiling (Length * i), Length * i)) {
+                    return ((double)j.Data [(int)(Length * i - 1)] + (double)j.Data [(int)(Length * i)]) / 2;
                 }
-                else
-                {
-                    return (double) j.Data[((int) (Math.Ceiling(this.Length*i))) - 1];
-                }
+                return (double)j.Data [((int)(Math.Ceiling (Length * i))) - 1];
             }
 
             #endregion
@@ -1292,13 +1295,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 output = "[";
                 foreach (object o in m_data)
                 {
-                    if (o is String)
+                    if (o is string)
                     {
                         output = output + "\"" + o + "\", ";
                     }
                     else
                     {
-                        output = output + o.ToString() + ", ";
+                        output = output + o + ", ";
                     }
                 }
                 output = output.Substring(0, output.Length - 2);
@@ -1328,27 +1331,22 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                     {
                         b = 0.0;
                     }
-                    if (a < b)
-                    {
+                    if (a < b) {
                         return -1;
                     }
-                    else if (a == b)
-                    {
+                    if (FloatAlmostEqual (a, b)) {
                         return 0;
                     }
-                    else
-                    {
-                        return 1;
-                    }
+                    return 1;
                 }
             }
 
-            public override bool Equals(object o)
+            public override bool Equals(object obj)
             {
-                if (!(o is list))
+                if (!(obj is list))
                     return false;
 
-                return Data.Length == ((list) o).Data.Length;
+                return Data.Length == ((list) obj).Data.Length;
             }
 
             public override int GetHashCode()
@@ -1358,24 +1356,24 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
             #region IEnumerator Members
 
-            private int i = 0;
+            int enumIx = 0;
 
             public object Current
             {
-                get { return m_data[i]; }
+                get { return m_data[enumIx]; }
             }
 
             public bool MoveNext()
             {
-                i++;
-                if (m_data.Length == i)
+                enumIx++;
+                if (m_data.Length == enumIx)
                     return false;
                 return true;
             }
 
             public void Reset()
             {
-                i = 0;
+                enumIx = 0;
             }
 
             #endregion
@@ -1400,19 +1398,19 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
             public LSLString(double d)
             {
-                string s = String.Format(Culture.FormatProvider, "{0:0.000000}", d);
+                string s = string.Format(Culture.FormatProvider, "{0:0.000000}", d);
                 m_string = s;
             }
 
             public LSLString(LSLFloat f)
             {
-                string s = String.Format(Culture.FormatProvider, "{0:0.000000}", f.value);
+                string s = string.Format(Culture.FormatProvider, "{0:0.000000}", f.value);
                 m_string = s;
             }
 
             public LSLString(LSLInteger i)
             {
-                string s = String.Format("{0}", i);
+                string s = string.Format("{0}", i);
                 m_string = s;
             }
 
@@ -1422,20 +1420,15 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
             #region Implicit
 
-            public static implicit operator Boolean(LSLString s)
+            public static implicit operator bool (LSLString s)
             {
-                if (s.m_string.Length == 0)
-                {
+                if (s.m_string.Length == 0) {
                     return false;
                 }
-                else if (s.m_string == OpenMetaverse.UUID.Zero.ToString())
-                {
+                if (s.m_string == OpenMetaverse.UUID.Zero.ToString ()) {
                     return false;
                 }
-                else
-                {
-                    return true;
-                }
+                return true;
             }
 
             public static implicit operator OpenMetaverse.UUID(LSLString s)
@@ -1443,7 +1436,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 return OpenMetaverse.UUID.Parse(s.m_string);
             }
 
-            public static implicit operator String(LSLString s)
+            public static implicit operator string(LSLString s)
             {
                 return s.m_string;
             }
@@ -1536,51 +1529,51 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
             public static LSLString operator +(LSLString s1, LSLFloat s2)
             {
-                return new LSLString(s1.m_string + s2.ToString());
+                return new LSLString(s1.m_string + s2);
             }
 
             public static LSLString operator +(LSLString s1, LSLInteger s2)
             {
-                return new LSLString(s1.m_string + s2.ToString());
+                return new LSLString(s1.m_string + s2);
             }
 
-            public static LSLString operator +(LSLString s1, LSL_Types.Quaternion s2)
+            public static LSLString operator +(LSLString s1, Quaternion s2)
             {
-                return new LSLString(s1.m_string + s2.ToString());
+                return new LSLString(s1.m_string + s2);
             }
 
-            public static LSLString operator +(LSLString s1, LSL_Types.Vector3 s2)
+            public static LSLString operator +(LSLString s1, Vector3 s2)
             {
-                return new LSLString(s1.m_string + s2.ToString());
+                return new LSLString(s1.m_string + s2);
             }
 
-            public static LSLString operator +(LSL_Types.Vector3 s1, LSLString s2)
+            public static LSLString operator +(Vector3 s1, LSLString s2)
             {
-                return new LSLString(s1.ToString() + s2.m_string);
+                return new LSLString(s1 + s2.m_string);
             }
 
-            public static LSLString operator +(LSL_Types.Quaternion s1, LSLString s2)
+            public static LSLString operator +(Quaternion s1, LSLString s2)
             {
-                return new LSLString(s1.ToString() + s2.m_string);
+                return new LSLString(s1 + s2.m_string);
             }
 
-            public static LSLString operator +(LSL_Types.LSLInteger s1, LSLString s2)
+            public static LSLString operator +(LSLInteger s1, LSLString s2)
             {
-                return new LSLString(s1.ToString() + s2.m_string);
+                return new LSLString(s1 + s2.m_string);
             }
 
-            public static LSLString operator +(LSL_Types.LSLFloat s1, LSLString s2)
+            public static LSLString operator +(LSLFloat s1, LSLString s2)
             {
-                return new LSLString(s1.ToString() + s2.m_string);
+                return new LSLString(s1 + s2.m_string);
             }
 
             #endregion
 
             #region Overriders
 
-            public override bool Equals(object o)
+            public override bool Equals(object obj)
             {
-                return m_string == o.ToString();
+                return m_string == obj.ToString();
             }
 
             public override int GetHashCode()
@@ -1604,7 +1597,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
             public int IndexOf(string value)
             {
-                return m_string.IndexOf(value);
+                return m_string.IndexOf (value, StringComparison.Ordinal);
             }
 
             public int Length
@@ -1622,7 +1615,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             public static LSLInteger TRUE = new LSLInteger(1);
             public static LSLInteger FALSE = new LSLInteger(0);
 
-            private static readonly Regex castRegex =
+            static readonly Regex castRegex =
                 new Regex(@"(^[ ]*0[xX][0-9A-Fa-f][0-9A-Fa-f]*)|(^[ ]*(-?|\+?)[0-9][0-9]*)");
 
             #region Constructors
@@ -1654,7 +1647,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                     value = 1;
                 else if (s == "FALSE")
                     value = 0;
-                else if (v == String.Empty)
+                else if (v == string.Empty)
                     value = 0;
                 else
                 {
@@ -1662,11 +1655,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                     {
                         if (v.Contains("x") || v.Contains("X"))
                         {
-                            value = int.Parse(v.Substring(2), System.Globalization.NumberStyles.HexNumber);
+                            value = int.Parse(v.Substring(2), NumberStyles.HexNumber);
                         }
                         else
                         {
-                            value = int.Parse(v, System.Globalization.NumberStyles.Integer);
+                            value = int.Parse(v, NumberStyles.Integer);
                         }
                     }
                     catch (OverflowException)
@@ -1700,16 +1693,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 return new list(new object[] {i});
             }
 
-            public static implicit operator Boolean(LSLInteger i)
+            public static implicit operator bool (LSLInteger i)
             {
-                if (i.value == 0)
-                {
+                if (i.value == 0) {
                     return false;
                 }
-                else
-                {
-                    return true;
-                }
+                return true;
             }
 
             public static implicit operator LSLInteger(int i)
@@ -1740,9 +1729,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             public static implicit operator LSLInteger(bool b)
             {
                 if (b)
-                    return new LSLInteger(1);
-                else
-                    return new LSLInteger(0);
+                    return new LSLInteger (1);
+                return new LSLInteger (0);
             }
 
             public static LSLInteger operator ==(LSLInteger i1, LSLInteger i2)
@@ -1831,11 +1819,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 return new LSLInteger(~i.value);
             }
 
-            public override bool Equals(Object o)
+            public override bool Equals(object obj)
             {
-                if (!(o is LSLInteger))
+                if (!(obj is LSLInteger))
                     return false;
-                return value == ((LSLInteger) o).value;
+                return value == ((LSLInteger) obj).value;
             }
 
             public override int GetHashCode()
@@ -1895,9 +1883,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 return i.value >> s;
             }
 
-            public static implicit operator System.Double(LSLInteger i)
+            public static implicit operator double(LSLInteger i)
             {
-                return (double) i.value;
+                return i.value;
             }
 
             public static bool operator true(LSLInteger i)
@@ -1916,7 +1904,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
             public override string ToString()
             {
-                return this.value.ToString();
+                return value.ToString();
             }
 
             #endregion
@@ -1931,12 +1919,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
             public LSLFloat(int i)
             {
-                this.value = (double) i;
+                value = i;
             }
 
             public LSLFloat(double d)
             {
-                this.value = d;
+                value = d;
             }
 
             public LSLFloat(string s)
@@ -1953,13 +1941,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                     value = 1.0;
                 else if (s == "FALSE")
                     value = 0.0;
-                else if (v == String.Empty || v == null)
+                else if (string.IsNullOrEmpty (v))
                     v = "0.0";
                 else if (!v.Contains(".") && !v.ToLower().Contains("e"))
                     v = v + ".0";
-                else if (v.EndsWith("."))
+                else if (v.EndsWith (".", StringComparison.Ordinal))
                     v = v + "0";
-                this.value = double.Parse(v, System.Globalization.NumberStyles.Float, Culture.NumberFormatInfo);
+                value = double.Parse(v, NumberStyles.Float, Culture.NumberFormatInfo);
             }
 
             #endregion
@@ -1996,18 +1984,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 return f.value.ToString();
             }
 
-            public static implicit operator Boolean(LSLFloat f)
+            public static implicit operator bool (LSLFloat f)
             {
 
                 //if (f.value == 0.0)
-                if (Math.Abs(f.value) <= DoubleDifference)
-                {
+                if (Math.Abs (f.value) <= DoubleDifference) {
                     return false;
                 }
-                else
-                {
-                    return true;
-                }
+                return true;
             }
 
             public static implicit operator LSLFloat(int i)
@@ -2038,9 +2022,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             public static implicit operator LSLFloat(bool b)
             {
                 if (b)
-                    return new LSLFloat(1.0);
-                else
-                    return new LSLFloat(0.0);
+                    return new LSLFloat (1.0);
+                return new LSLFloat (0.0);
             }
  
             public static bool operator ==(LSLFloat f1, LSLFloat f2)
@@ -2071,22 +2054,22 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
             public static LSLFloat operator +(LSLFloat f, int i)
             {
-                return new LSLFloat(f.value + (double) i);
+                return new LSLFloat(f.value + i);
             }
 
             public static LSLFloat operator -(LSLFloat f, int i)
             {
-                return new LSLFloat(f.value - (double) i);
+                return new LSLFloat(f.value - i);
             }
 
             public static LSLFloat operator *(LSLFloat f, int i)
             {
-                return new LSLFloat(f.value*(double) i);
+                return new LSLFloat(f.value * i);
             }
 
             public static LSLFloat operator /(LSLFloat f, int i)
             {
-                return new LSLFloat(f.value/(double) i);
+                return new LSLFloat(f.value / i);
             }
 
             public static LSLFloat operator +(LSLFloat lhs, LSLFloat rhs)
@@ -2114,7 +2097,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 return new LSLFloat(-f.value);
             }
 
-            public static implicit operator System.Double(LSLFloat f)
+            public static implicit operator double(LSLFloat f)
             {
                 return f.value;
             }
@@ -2125,14 +2108,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
             public override string ToString()
             {
-                return String.Format(Culture.FormatProvider, "{0:0.000000}", this.value);
+                return string.Format(Culture.FormatProvider, "{0:0.000000}", value);
             }
 
-            public override bool Equals(Object o)
+            public override bool Equals(object obj)
             {
-                if (!(o is LSLFloat))
+                if (!(obj is LSLFloat))
                     return false;
-                return value == ((LSLFloat) o).value;
+                return FloatAlmostEqual (value, ((LSLFloat) obj).value);
             }
 
             public override int GetHashCode()

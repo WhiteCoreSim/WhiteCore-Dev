@@ -26,23 +26,23 @@
  */
 
 
+using System.Collections.Generic;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Profile;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using System.Collections.Generic;
 
 namespace WhiteCore.Services.DataService
 {
     public class LocalAgentConnector : ConnectorBase, IAgentConnector
     {
-        private IGenericData GD;
-        private GenericAccountCache<IAgentInfo> m_cache = new GenericAccountCache<IAgentInfo>();
-        private string m_userProfileTable = "user_profile";
+        IGenericData GD;
+        GenericAccountCache<IAgentInfo> m_cache = new GenericAccountCache<IAgentInfo>();
+        string m_userProfileTable = "user_profile";
 
         #region IAgentConnector Members
 
@@ -83,14 +83,16 @@ namespace WhiteCore.Services.DataService
             IAgentInfo agent = new IAgentInfo();
             if (m_cache.Get(agentID, out agent))
                 return agent;
-            else
-                agent = new IAgentInfo();
+            
+            agent = new IAgentInfo();
 
-            object remoteValue = DoRemote(agentID);
-            if (remoteValue != null || m_doRemoteOnly)
-            {
-                m_cache.Cache(agentID, (IAgentInfo) remoteValue);
-                return (IAgentInfo) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote(agentID);
+                if (remoteValue != null) {
+                    m_cache.Cache (agentID, (IAgentInfo)remoteValue);
+                    return (IAgentInfo)remoteValue;
+                }
+                return null;
             }
 
             List<string> query = null;
@@ -99,7 +101,7 @@ namespace WhiteCore.Services.DataService
                 QueryFilter filter = new QueryFilter();
                 filter.andFilters["ID"] = agentID;
                 filter.andFilters["`Key`"] = "AgentInfo";
-                query = GD.Query(new string[1] {"`Value`"}, m_userProfileTable, filter, null, null, null);
+                query = GD.Query(new string[] {"`Value`"}, m_userProfileTable, filter, null, null, null);
             }
             catch
             {

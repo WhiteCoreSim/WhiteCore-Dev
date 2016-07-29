@@ -39,7 +39,7 @@ namespace WhiteCore.Modules.WorldView
     {
 
         protected WorldViewModule m_WorldViewModule;
-        protected Object m_RequestLock = new Object();
+        protected object m_RequestLock = new object();
 
         public WorldViewRequestHandler(WorldViewModule fmodule, string rid)
                 : base("GET", "/worldview/" + rid)
@@ -86,15 +86,14 @@ namespace WhiteCore.Modules.WorldView
 
                     return stdWworldview;
 
-
                 }
             }
             catch (Exception e)
             {
-                MainConsole.Instance.Debug("[WORLDVIEW]: Exception: " + e);
+                MainConsole.Instance.Debug("[World view]: Exception: " + e);
             }
 
-            return new Byte[0];
+            return new byte [0];
         }
 
         /// <summary>
@@ -102,7 +101,7 @@ namespace WhiteCore.Modules.WorldView
         /// </summary>
         /// <returns>The world view.</returns>
         /// <param name="request">parameters.</param>
-        public Byte[] SendWorldView(Dictionary<string, object> request)
+        public byte [] SendWorldView(Dictionary<string, object> request)
         {
             float posX;
             float posY;
@@ -116,25 +115,25 @@ namespace WhiteCore.Modules.WorldView
             bool usetex;
 
             if (!request.ContainsKey("posX"))
-                return new Byte[0];
+                return new byte [0];
             if (!request.ContainsKey("posY"))
-                return new Byte[0];
+                return new byte [0];
             if (!request.ContainsKey("posZ"))
-                return new Byte[0];
+                return new byte [0];
             if (!request.ContainsKey("rotX"))
-                return new Byte[0];
+                return new byte [0];
             if (!request.ContainsKey("rotY"))
-                return new Byte[0];
+                return new byte [0];
             if (!request.ContainsKey("rotZ"))
-                return new Byte[0];
+                return new byte [0];
             if (!request.ContainsKey("fov"))
-                return new Byte[0];
+                return new byte [0];
             if (!request.ContainsKey("width"))
-                return new Byte[0];
+                return new byte [0];
             if (!request.ContainsKey("height"))
-                return new Byte[0];
+                return new byte [0];
             if (!request.ContainsKey("usetex"))
-                return new Byte[0];
+                return new byte [0];
 
             try
             {
@@ -151,7 +150,7 @@ namespace WhiteCore.Modules.WorldView
             }
             catch
             {
-                return new Byte[0];
+                return new byte [0];
             }
 
             var pos = new Vector3(posX, posY, posZ);
@@ -165,7 +164,7 @@ namespace WhiteCore.Modules.WorldView
         /// Generates a standard world view.
         /// </summary>
         /// <returns>The world view.</returns>
-        public Byte[] GetWorldView()
+        public byte [] GetWorldView()
         {
 
             // set some basic defaults
@@ -233,4 +232,3 @@ namespace WhiteCore.Modules.WorldView
 
     }
 }
-

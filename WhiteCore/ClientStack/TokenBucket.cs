@@ -39,29 +39,29 @@ namespace WhiteCore.ClientStack
         ///     Parent bucket to this bucket, or null if this is a root
         ///     bucket
         /// </summary>
-        private readonly TokenBucket parent;
+        readonly TokenBucket parent;
 
         /// <summary>
         ///     Number of tokens currently in the bucket
         /// </summary>
-        private int content;
+        int content;
 
         /// <summary>
         ///     Time of the last drip, in system ticks
         /// </summary>
-        private int lastDrip;
+        int lastDrip;
 
         /// <summary>
         ///     Size of the bucket in bytes. If zero, the bucket has
         ///     infinite capacity
         /// </summary>
-        private int maxBurst;
+        int maxBurst;
 
         /// <summary>
         ///     Rate that the bucket fills, in bytes per millisecond. If
         ///     zero, the bucket always remains full
         /// </summary>
-        private float tokensPerMS;
+        float tokensPerMS;
 
         #region Properties
 

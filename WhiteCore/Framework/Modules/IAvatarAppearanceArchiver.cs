@@ -56,5 +56,11 @@ namespace WhiteCore.Framework.Modules
         /// <returns>The avatar archive filenames.</returns>
         List<string> GetAvatarArchiveFilenames (bool fullName);
 
+        /// <summary>
+        /// Gets a list of available avatar archive images.
+        /// </summary>
+        /// <returns>The avatar archive images.</returns>
+        List<string> GetAvatarArchiveImages ();
+
     }
 }

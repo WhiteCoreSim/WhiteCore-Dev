@@ -34,7 +34,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
     [Serializable]
     public class AssemblyResolver : MarshalByRefObject
     {
-        private readonly string PathToSearch = "";
+        readonly string PathToSearch = "";
 
         public AssemblyResolver(string pathToSearch)
         {
@@ -47,18 +47,17 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             if (!(sender is AppDomain))
                 return null;
 
-            string[] pathList = new[]
-                                    {
-                                        Path.Combine(Directory.GetCurrentDirectory(), "bin"),
-                                        Path.Combine(Directory.GetCurrentDirectory(), PathToSearch),
-                                        Path.Combine(Directory.GetCurrentDirectory(),
-                                                     Path.Combine(PathToSearch, "Scripts")),
-                                        Directory.GetCurrentDirectory(),
-                                    };
+            string[] pathList = {
+                Path.Combine(Directory.GetCurrentDirectory(), "bin"),
+                Path.Combine(Directory.GetCurrentDirectory(), PathToSearch),
+                Path.Combine(Directory.GetCurrentDirectory(), 
+                             Path.Combine(PathToSearch, "Scripts")),
+                Directory.GetCurrentDirectory()
+            };
 
             string assemblyName = args.Name;
-            if (assemblyName.IndexOf(",") != -1)
-                assemblyName = args.Name.Substring(0, args.Name.IndexOf(","));
+            if (assemblyName.IndexOf (",", StringComparison.Ordinal) != -1)
+                assemblyName = args.Name.Substring(0, args.Name.IndexOf (",", StringComparison.Ordinal));
 
             foreach (string s in pathList)
             {

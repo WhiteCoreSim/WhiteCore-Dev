@@ -64,6 +64,9 @@ WhiteCoreSim/bin/WhiteCore.*.dll
 WhiteCoreSim/bin/WhiteCore.*.exe
 WhiteCoreSim/bin/WhiteCore.exe
 
+# This is dependant upon x86/x64 and created at runtime
+WhiteCoreSim/bin/ode.dll
+
 # Data files
 
 WhiteCoreSim/Data/AssetCache/*

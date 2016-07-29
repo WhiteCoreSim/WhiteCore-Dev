@@ -29,19 +29,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security;
+using OpenMetaverse;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
-using OpenMetaverse;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
 {
-    internal class SPAvatar : MarshalByRefObject, IAvatar
+    class SPAvatar : MarshalByRefObject, IAvatar
     {
-        private readonly UUID m_ID;
-        private readonly IScene m_rootScene;
-        private readonly ISecurityCredential m_security;
+        readonly UUID m_ID;
+        readonly IScene m_rootScene;
+        readonly ISecurityCredential m_security;
 
         public SPAvatar(IScene scene, UUID ID, ISecurityCredential security)
         {

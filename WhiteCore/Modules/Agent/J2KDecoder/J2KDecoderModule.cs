@@ -158,10 +158,15 @@ namespace WhiteCore.Modules.Agent.J2KDecoder
 
             if (!TryLoadCacheForAsset(assetID, out layers))
             {
+                // not in cache. If no data try to decode with some defaults
                 if (j2kData == null || j2kData.Length == 0)
                 {
                     // Layer decoding completely failed. Guess at sane defaults for the layer boundaries
-                    layers = CreateDefaultLayers(j2kData.Length);
+                    if (j2kData != null)
+                        layers = CreateDefaultLayers(j2kData.Length);
+                    else
+                        layers = CreateDefaultLayers (0);
+
                     // Notify Interested Parties
                     lock (m_notifyList)
                     {
@@ -175,6 +180,7 @@ namespace WhiteCore.Modules.Agent.J2KDecoder
                     }
                     return false;
                 }
+
                 if (m_useCSJ2K)
                 {
                     try
@@ -203,8 +209,7 @@ namespace WhiteCore.Modules.Agent.J2KDecoder
                     catch (Exception ex)
                     {
                         MainConsole.Instance.Warn("[J2KDecoderModule]: CSJ2K threw an exception decoding texture " +
-                                                  assetID + ": " +
-                                                  ex.Message);
+                                                  assetID + ": " + ex.Message);
                     }
                 }
                 else
@@ -222,8 +227,8 @@ namespace WhiteCore.Modules.Agent.J2KDecoder
                     {
                         MainConsole.Instance.Warn("[J2KDecoderModule]: Failed to decode layer data with (" +
                                                   (m_useCSJ2K ? "CSJ2K" : "OpenJPEG") + ") for texture " + assetID +
-                                                  ", length " +
-                                                  j2kData.Length + " trying " + (!m_useCSJ2K ? "CSJ2K" : "OpenJPEG"));
+                                                  ", length " + j2kData.Length +
+                                                  " trying " + (!m_useCSJ2K ? "CSJ2K" : "OpenJPEG"));
                         DoJ2KDecode(assetID, j2kData, !m_useCSJ2K);
                     }
                     else
@@ -231,8 +236,8 @@ namespace WhiteCore.Modules.Agent.J2KDecoder
                         //Second attempt at decode with the other j2k decoder, give up
                         MainConsole.Instance.Warn("[J2KDecoderModule]: Failed to decode layer data (" +
                                                   (m_useCSJ2K ? "CSJ2K" : "OpenJPEG") + ") for texture " + assetID +
-                                                  ", length " +
-                                                  j2kData.Length + " guessing sane defaults");
+                                                  ", length " + j2kData.Length + " guessing sane defaults");
+                        
                         // Layer decoding completely failed. Guess at sane defaults for the layer boundaries
                         layers = CreateDefaultLayers(j2kData.Length);
                         // Notify Interested Parties
@@ -317,7 +322,7 @@ namespace WhiteCore.Modules.Agent.J2KDecoder
                 for (int i = 0; i < layers.Length; i++)
                 {
                     if (i == layers.Length - 1)
-                        strEnd = String.Empty;
+                        strEnd = string.Empty;
 
                     stringResult.AppendFormat("{0}|{1}|{2}{3}", layers[i].Start, layers[i].End,
                                               layers[i].End - layers[i].Start, strEnd);

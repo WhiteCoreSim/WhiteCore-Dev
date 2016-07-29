@@ -33,8 +33,8 @@ namespace WhiteCore.Modules.WorldMap.Warp3DMap
 {
     public class Viewport
     {
-        private const float DEG_TO_RAD = (float) Math.PI/180f;
-        private static readonly Vector3 UP_DIRECTION = Vector3.UnitZ;
+        const float DEG_TO_RAD = (float)Math.PI / 180f;
+        static readonly Vector3 UP_DIRECTION = Vector3.UnitZ;
 
         public float FarPlaneDistance;
         public float FieldOfView;
@@ -47,7 +47,7 @@ namespace WhiteCore.Modules.WorldMap.Warp3DMap
         public Vector3 Position;
         public int Width;
 
-        public Viewport(Vector3 position, Vector3 lookDirection, float fieldOfView, float farPlaneDist,
+        public Viewport (Vector3 position, Vector3 lookDirection, float fieldOfView, float farPlaneDist,
                         float nearPlaneDist, int width, int height)
         {
             // Perspective projection mode
@@ -60,7 +60,7 @@ namespace WhiteCore.Modules.WorldMap.Warp3DMap
             Height = height;
         }
 
-        public Viewport(Vector3 position, Vector3 lookDirection, float farPlaneDist, float nearPlaneDist, int width,
+        public Viewport (Vector3 position, Vector3 lookDirection, float farPlaneDist, float nearPlaneDist, int width,
                         int height, float orthoWindowWidth, float orthoWindowHeight)
         {
             // Orthographic projection mode
@@ -75,90 +75,90 @@ namespace WhiteCore.Modules.WorldMap.Warp3DMap
             Orthographic = true;
         }
 
-        public Point VectorToScreen(Vector3 v)
+        public Point VectorToScreen (Vector3 v)
         {
-            Matrix4 m = GetWorldToViewportMatrix();
-            Vector3 screenPoint = v*m;
-            return new Point((int) screenPoint.X, (int) screenPoint.Y);
+            Matrix4 m = GetWorldToViewportMatrix ();
+            Vector3 screenPoint = v * m;
+            return new Point ((int)screenPoint.X, (int)screenPoint.Y);
         }
 
-        public Matrix4 GetWorldToViewportMatrix()
+        public Matrix4 GetWorldToViewportMatrix ()
         {
-            Matrix4 result = GetViewMatrix();
-            result *= GetPerspectiveProjectionMatrix();
-            result *= GetViewportMatrix();
+            Matrix4 result = GetViewMatrix ();
+            result *= GetPerspectiveProjectionMatrix ();
+            result *= GetViewportMatrix ();
 
             return result;
         }
 
-        public Matrix4 GetViewMatrix()
+        public Matrix4 GetViewMatrix ()
         {
             Vector3 zAxis = -LookDirection;
-            zAxis.Normalize();
+            zAxis.Normalize ();
 
-            Vector3 xAxis = Vector3.Cross(UP_DIRECTION, zAxis);
-            xAxis.Normalize();
+            Vector3 xAxis = Vector3.Cross (UP_DIRECTION, zAxis);
+            xAxis.Normalize ();
 
-            Vector3 yAxis = Vector3.Cross(zAxis, xAxis);
+            Vector3 yAxis = Vector3.Cross (zAxis, xAxis);
 
             Vector3 position = Position;
-            float offsetX = -Vector3.Dot(xAxis, position);
-            float offsetY = -Vector3.Dot(yAxis, position);
-            float offsetZ = -Vector3.Dot(zAxis, position);
+            float offsetX = -Vector3.Dot (xAxis, position);
+            float offsetY = -Vector3.Dot (yAxis, position);
+            float offsetZ = -Vector3.Dot (zAxis, position);
 
-            return new Matrix4(
+            return new Matrix4 (
                 xAxis.X, yAxis.X, zAxis.X, 0f,
                 xAxis.Y, yAxis.Y, zAxis.Y, 0f,
                 xAxis.Z, yAxis.Z, zAxis.Z, 0f,
                 offsetX, offsetY, offsetZ, 1f);
         }
 
-        public Matrix4 GetPerspectiveProjectionMatrix()
+        public Matrix4 GetPerspectiveProjectionMatrix ()
         {
-            float aspectRatio = Width/(float) Height;
+            float aspectRatio = Width / (float)Height;
 
-//            float hFoV = FieldOfView*DEG_TO_RAD;  ///This is done in the camera settings already!!
+            //            float hFoV = FieldOfView*DEG_TO_RAD;  ///This is done in the camera settings already!!
             float hFoV = FieldOfView;
             float zn = NearPlaneDistance;
             float zf = FarPlaneDistance;
 
-            float xScale = 1f/(float) Math.Tan(hFoV/2f);
-            float yScale = aspectRatio*xScale;
-            float m33 = (zf == double.PositiveInfinity) ? -1 : (zf/(zn - zf));
-            float m43 = zn*m33;
+            float xScale = 1f / (float)Math.Tan (hFoV / 2f);
+            float yScale = aspectRatio * xScale;
+            float m33 = (zf == double.PositiveInfinity) ? -1 : (zf / (zn - zf));
+            float m43 = zn * m33;
 
-            return new Matrix4(
+            return new Matrix4 (
                 xScale, 0f, 0f, 0f,
                 0f, yScale, 0f, 0f,
                 0f, 0f, m33, -1f,
                 0f, 0f, m43, 0f);
         }
 
-        public Matrix4 GetOrthographicProjectionMatrix(float aspectRatio)
+        public Matrix4 GetOrthographicProjectionMatrix (float aspectRatio)
         {
             float w = Width;
             float h = Height;
             float zn = NearPlaneDistance;
             float zf = FarPlaneDistance;
 
-            float m33 = 1/(zn - zf);
-            float m43 = zn*m33;
+            float m33 = 1 / (zn - zf);
+            float m43 = zn * m33;
 
-            return new Matrix4(
-                2f/w, 0f, 0f, 0f,
-                0f, 2f/h, 0f, 0f,
+            return new Matrix4 (
+                2f / w, 0f, 0f, 0f,
+                0f, 2f / h, 0f, 0f,
                 0f, 0f, m33, 0f,
                 0f, 0f, m43, 1f);
         }
 
-        public Matrix4 GetViewportMatrix()
+        public Matrix4 GetViewportMatrix ()
         {
-            float scaleX = Width*0.5f;
-            float scaleY = Height*0.5f;
+            float scaleX = Width * 0.5f;
+            float scaleY = Height * 0.5f;
             float offsetX = 0f + scaleX;
             float offsetY = 0f + scaleY;
 
-            return new Matrix4(
+            return new Matrix4 (
                 scaleX, 0f, 0f, 0f,
                 0f, -scaleY, 0f, 0f,
                 0f, 0f, 1f, 0f,

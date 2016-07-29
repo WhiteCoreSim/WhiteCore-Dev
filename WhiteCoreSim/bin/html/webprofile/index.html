@@ -6,19 +6,79 @@
 	<meta name="keywords" content="{SystemName}" />
 	<meta name="description" content="{SystemName}"/>
 	<link rel="shortcut icon" href="../images/icons/favicon.ico" />
-	
-	<script src="{SystemURL}/javascripts/jquery-1.11.1.js" type="text/javascript"></script> 
+
 
 	<!-- StyleSwitch -->
-	<script src="{SystemURL}/javascripts/styleswitch.js"></script>
 	<link href="{SystemURL}/css/styles1.css" rel="stylesheet" type="text/css" media="screen" title="styles1" />
 	<link href="{SystemURL}/css/styles2.css" rel="alternate stylesheet" type="text/css" title="styles2" media="screen" />
 	<link href="{SystemURL}/css/styles3.css" rel="alternate stylesheet" type="text/css" title="styles3" media="screen" />
 	<link href="{SystemURL}/css/styles4.css" rel="alternate stylesheet" type="text/css" title="styles4" media="screen" />
 	<link href="{SystemURL}/css/styles5.css" rel="alternate stylesheet" type="text/css" title="styles5" media="screen" />
-	
+
+
+</head>
+
+<body>
+<div id="container">
+
+<div id="topprofile">
+	<ul id="menuprofile">
+		<li id="base" class="fade active" alt="{TooltipsMenuProfile}" title="{TooltipsMenuProfile}">{MenuProfileTitle}</li>
+		<li id="groups" class="fade" alt="{TooltipsMenuGroups}" title="{TooltipsMenuGroups}">{MenuGroupTitle}</li>
+		<li id="picks" class="fade" alt="{TooltipsMenuPicks}" title="{TooltipsMenuPicks}">{MenuPicksTitle}</li>
+		<li id="regions" class="fade" alt="{TooltipsMenuRegions}" title="{TooltipsMenuRegions}">{MenuRegionsTitle}</li>
+	</ul>
+</div>
+<span class="clear"></span>
+
+<!-- <p class=jclock1><span id=jclock1></span></p> -->
+<!-- <div id="loading"><img src="../images/icons/loading.gif" alt="Loading..." /></div> -->
+<div id="content"></div>
+<span class="clear"></span>
+
+<!--  greythane - These dont't work here as the calling links are not present. Actually do not need them anyway
+
+<div id="footer">
+{IfShowLanguageTranslatorBarBegin}
+	  <div class=languageswitch>
+	    <ul>
+		{StyleSwitcherLanguagesText}:
+		  <li><a href="?language=en" rel="en" class="languageswitch" alt="{en}" title="<img src='../images/flags/flag-en.png' alt='en' /> {en}">en</a></li>
+		  <li><a href="?language=fr" rel="fr" class="languageswitch" alt="{fr}" title="<img src='../images/flags/flag-fr.png' alt='fr' /> {fr}">fr</a></li>
+		  <li><a href="?language=de" rel="de" class="languageswitch" alt="{de}" title="<img src='../images/flags/flag-de.png' alt='de' /> {de}">de</a></li>
+		  <li><a href="?language=it" rel="it" class="languageswitch" alt="{it}" title="<img src='../images/flags/flag-it.png' alt='it' /> {it}">it</a></li>
+		  <li><a href="?language=es" rel="es" class="languageswitch" alt="{es}" title="<img src='../images/flags/flag-es.png' alt='es' /> {es}">es</a></li>
+		  <li><a href="?language=nl" rel="nl" class="languageswitch" alt="{nl}" title="<img src='../images/flags/flag-nl.png' alt='nl' /> {nl}">nl</a></li>
+		{StyleSwitcherChoiceText}: <span id="lg1">en</span><span id="lg2">fr</span><span id="lg3">de</span><span id="lg4">it</span><span id="lg5">es</span><span id="lg6">nl</span>
+		</ul>
+	  </div>
+{IfShowLanguageTranslatorBarEnd}
+
+{IfShowStyleBarBegin}
+	  <div class=styleswitch>
+	    <ul>
+		{StyleSwitcherStylesText}:
+		  <li><a href="serversideSwitch.html?style=style1" rel="styles1" class="styleswitch" alt="{styles1}" title="{styles1}">1</a></li>
+		  <li><a href="serversideSwitch.html?style=style2" rel="styles2" class="styleswitch" alt="{styles2}" title="{styles2}">2</a></li>
+		  <li><a href="serversideSwitch.html?style=style3" rel="styles3" class="styleswitch" alt="{styles3}" title="{styles3}">3</a></li>
+		  <li><a href="serversideSwitch.html?style=style4" rel="styles4" class="styleswitch" alt="{styles4}" title="{styles4}">4</a></li>
+		  <li><a href="serversideSwitch.html?style=style5" rel="styles5" class="styleswitch" alt="{styles5}" title="{styles5}">5</a></li>
+		{StyleSwitcherChoiceText}: <span id="st1">1</span><span id="st2">2</span><span id="st3">3</span><span id="st4">4</span><span id="st5">5</span>| Copyright&nbsp;&copy;&nbsp;<a class='copyright' href="/" alt="{SystemName}" title="{SystemName}">{SystemName}</a>&nbsp;2014
+		</ul>
+	  </div>
+{IfShowStyleBarEnd}
+	  <span class="clear"></span>
+	</div>
+</div>
+-->
+
+	<script src="{SystemURL}/js/jquery-2.2.3.min.js" type="text/javascript"></script>
 	<!-- date time -->
-	<script src="{SystemURL}/javascripts/jquery.jclock.js"></script>
+	<script src="{SystemURL}/js/jquery.jclock.js"></script>
+	<script src="{SystemURL}/js/styleswitch.js"></script>
+	<!-- <script src="{SystemURL}/js/jquery.tooltip.js"></script> -->
+	<script src="{SystemURL}/js/menu.profile.js"></script>
+
 	<script type="text/javascript">
 		$(function($) {var options1 = {format: '%A %B %d, %Y %I:%M:%S %p'} // 12-hour
 		$('#jclock1').jclock(options1);
@@ -30,15 +90,13 @@
 		$('#jclock4').jclock(options4);
 		var options5 = {format: '%m/%d/%y'}
 		$('#jclock5').jclock(options5);});
-	</script>
-	
-	<!-- Tooltips -->
-	<script src="{SystemURL}/javascripts/jquery.tooltip.js"></script>
-	<script>$(function() {$('#container *').tooltip({showURL: false});});</script>
 
-	<script src="{SystemURL}/javascripts/menu.profile.js"></script>
-	<script>
-	  $(document).ready(function() 
+
+	<!-- Tooltips -->
+	function tooltip() {$('#container *').tooltip({showURL: false});};
+
+
+	  $(document).ready(function()
 	  {
 		$( '#container' ).fadeIn("slow");
 		var result = {};
@@ -80,64 +138,8 @@
 		if(found == 0)
 			content.load("base.html" + window.location.search);
 	});
-    </script>
-	
-</head>
 
-<body>
-<div id="container">
 
-<div id="topprofile">
-	<ul id="menuprofile">
-		<li id="base" class="fade active" alt="{TooltipsMenuProfile}" title="{TooltipsMenuProfile}">{MenuProfileTitle}</li>
-		<li id="groups" class="fade" alt="{TooltipsMenuGroups}" title="{TooltipsMenuGroups}">{MenuGroupTitle}</li>
-		<li id="picks" class="fade" alt="{TooltipsMenuPicks}" title="{TooltipsMenuPicks}">{MenuPicksTitle}</li>
-		<li id="regions" class="fade" alt="{TooltipsMenuRegions}" title="{TooltipsMenuRegions}">{MenuRegionsTitle}</li>
-	</ul>
-</div>
-<span class="clear"></span>
-
-<!-- <p class=jclock1><span id=jclock1></span></p> -->
-<!-- <div id="loading"><img src="../images/icons/loading.gif" alt="Loading..." /></div> -->	
-<div id="content"></div>
-<span class="clear"></span>
-
-<!--  greythane - These dont't work here as the calling links are not present. Actually do not need them anyway
-
-<div id="footer">
-{IfShowLanguageTranslatorBarBegin}
-	  <div class=languageswitch>
-	    <ul>
-		{StyleSwitcherLanguagesText}:
-		  <li><a href="?language=en" rel="en" class="languageswitch" alt="{en}" title="<img src='../images/flags/flag-en.png' alt='en' /> {en}">en</a></li>
-		  <li><a href="?language=fr" rel="fr" class="languageswitch" alt="{fr}" title="<img src='../images/flags/flag-fr.png' alt='fr' /> {fr}">fr</a></li>
-		  <li><a href="?language=de" rel="de" class="languageswitch" alt="{de}" title="<img src='../images/flags/flag-de.png' alt='de' /> {de}">de</a></li>
-		  <li><a href="?language=it" rel="it" class="languageswitch" alt="{it}" title="<img src='../images/flags/flag-it.png' alt='it' /> {it}">it</a></li>
-		  <li><a href="?language=es" rel="es" class="languageswitch" alt="{es}" title="<img src='../images/flags/flag-es.png' alt='es' /> {es}">es</a></li>
-		  <li><a href="?language=nl" rel="nl" class="languageswitch" alt="{nl}" title="<img src='../images/flags/flag-nl.png' alt='nl' /> {nl}">nl</a></li>
-		{StyleSwitcherChoiceText}: <span id="lg1">en</span><span id="lg2">fr</span><span id="lg3">de</span><span id="lg4">it</span><span id="lg5">es</span><span id="lg6">nl</span>  
-		</ul>
-	  </div>
-{IfShowLanguageTranslatorBarEnd}
-
-{IfShowStyleBarBegin}
-	  <div class=styleswitch>
-	    <ul>
-		{StyleSwitcherStylesText}:
-		  <li><a href="serversideSwitch.html?style=style1" rel="styles1" class="styleswitch" alt="{styles1}" title="{styles1}">1</a></li>
-		  <li><a href="serversideSwitch.html?style=style2" rel="styles2" class="styleswitch" alt="{styles2}" title="{styles2}">2</a></li>
-		  <li><a href="serversideSwitch.html?style=style3" rel="styles3" class="styleswitch" alt="{styles3}" title="{styles3}">3</a></li>
-		  <li><a href="serversideSwitch.html?style=style4" rel="styles4" class="styleswitch" alt="{styles4}" title="{styles4}">4</a></li>
-		  <li><a href="serversideSwitch.html?style=style5" rel="styles5" class="styleswitch" alt="{styles5}" title="{styles5}">5</a></li>
-		{StyleSwitcherChoiceText}: <span id="st1">1</span><span id="st2">2</span><span id="st3">3</span><span id="st4">4</span><span id="st5">5</span>| Copyright&nbsp;&copy;&nbsp;<a class='copyright' href="/" alt="{SystemName}" title="{SystemName}">{SystemName}</a>&nbsp;2014  
-		</ul>
-	  </div>
-{IfShowStyleBarEnd}
-	  <span class="clear"></span>
-	</div>
-</div>
--->
-<script>
 	// fade class
 	$("li.fade, a.fade").hover(function(){$(this).fadeOut(150);$(this).fadeIn(150);});
 	$("a.languageswitch, a.styleswitch").hover(function(){$(this).fadeOut(150);$(this).fadeIn(150);});
@@ -150,12 +152,12 @@
 <!-- params to replace
 {SystemURL}
 {SystemName}
-{UserName}         
-{UserBorn}       
-{UserType}       
-{UserPartner}     
-{UserAboutMe}     
-{UserPictureURL}       
+{UserName}
+{UserBorn}
+{UserType}
+{UserPartner}
+{UserAboutMe}
+{UserPictureURL}
 {UserProfileFor}   User Profile For
 {ResidentSince}    Resident Since
 {AccountType}      Account Type

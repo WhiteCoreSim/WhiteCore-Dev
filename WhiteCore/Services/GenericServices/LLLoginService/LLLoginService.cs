@@ -140,14 +140,19 @@ namespace WhiteCore.Services
             LLLoginResponseRegister.RegisterValue("AllowExportPermission",
                                                   m_loginServerConfig.GetBoolean("AllowUsageOfExportPermissions", true));
 
-            m_DefaultRegionName = m_loginServerConfig.GetString("DefaultRegion", String.Empty);
+            m_DefaultRegionName = m_loginServerConfig.GetString("DefaultRegion", string.Empty);
             m_WelcomeMessage = m_loginServerConfig.GetString("WelcomeMessage", "");
             m_WelcomeMessage = m_WelcomeMessage.Replace("\\n", "\n");
             m_WelcomeMessageURL = m_loginServerConfig.GetString("CustomizedMessageURL", "");
             if (m_WelcomeMessageURL != "")
             {
                 WebClient client = new WebClient();
-                m_WelcomeMessage = client.DownloadString(m_WelcomeMessageURL);
+                try {
+                    m_WelcomeMessage = client.DownloadString (m_WelcomeMessageURL);
+                } catch {
+                    MainConsole.Instance.Error ("[LLogin service]: Error obtaining welcome message from " + m_WelcomeMessageURL);
+                }
+                client.Dispose ();
             }
             // load web settings overrides (if any)
             IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
@@ -197,7 +202,7 @@ namespace WhiteCore.Services
                 module.Initialize(this, m_config, registry);
             }
 
-            MainConsole.Instance.DebugFormat("[LLOGIN SERVICE]: Starting...");
+            MainConsole.Instance.DebugFormat("[LLogin service]: Starting...");
         }
 
         public void FinishedStartup()
@@ -206,33 +211,33 @@ namespace WhiteCore.Services
 
         public void ReadEventValues(IConfig config)
         {
-            SetEventCategories((Int32) DirectoryManager.EventCategories.Discussion, "Discussion");
-            SetEventCategories((Int32) DirectoryManager.EventCategories.Sports, "Sports");
-            SetEventCategories((Int32) DirectoryManager.EventCategories.LiveMusic, "Live Music");
-            SetEventCategories((Int32) DirectoryManager.EventCategories.Commercial, "Commercial");
-            SetEventCategories((Int32) DirectoryManager.EventCategories.Nightlife, "Nightlife/Entertainment");
-            SetEventCategories((Int32) DirectoryManager.EventCategories.Games, "Games/Contests");
-            SetEventCategories((Int32) DirectoryManager.EventCategories.Pageants, "Pageants");
-            SetEventCategories((Int32) DirectoryManager.EventCategories.Education, "Education");
-            SetEventCategories((Int32) DirectoryManager.EventCategories.Arts, "Arts and Culture");
-            SetEventCategories((Int32) DirectoryManager.EventCategories.Charity, "Charity/Support Groups");
-            SetEventCategories((Int32) DirectoryManager.EventCategories.Miscellaneous, "Miscellaneous");
+            SetEventCategories((int) DirectoryManager.EventCategories.Discussion, "Discussion");
+            SetEventCategories((int) DirectoryManager.EventCategories.Sports, "Sports");
+            SetEventCategories((int) DirectoryManager.EventCategories.LiveMusic, "Live Music");
+            SetEventCategories((int) DirectoryManager.EventCategories.Commercial, "Commercial");
+            SetEventCategories((int) DirectoryManager.EventCategories.Nightlife, "Nightlife/Entertainment");
+            SetEventCategories((int) DirectoryManager.EventCategories.Games, "Games/Contests");
+            SetEventCategories((int) DirectoryManager.EventCategories.Pageants, "Pageants");
+            SetEventCategories((int) DirectoryManager.EventCategories.Education, "Education");
+            SetEventCategories((int) DirectoryManager.EventCategories.Arts, "Arts and Culture");
+            SetEventCategories((int) DirectoryManager.EventCategories.Charity, "Charity/Support Groups");
+            SetEventCategories((int) DirectoryManager.EventCategories.Miscellaneous, "Miscellaneous");
         }
 
         public void ReadClassifiedValues(IConfig config)
         {
-            AddClassifiedCategory((Int32) DirectoryManager.ClassifiedCategories.Shopping, "Shopping");
-            AddClassifiedCategory((Int32) DirectoryManager.ClassifiedCategories.LandRental, "Land Rental");
-            AddClassifiedCategory((Int32) DirectoryManager.ClassifiedCategories.PropertyRental, "Property Rental");
-            AddClassifiedCategory((Int32) DirectoryManager.ClassifiedCategories.SpecialAttraction, "Special Attraction");
-            AddClassifiedCategory((Int32) DirectoryManager.ClassifiedCategories.NewProducts, "New Products");
-            AddClassifiedCategory((Int32) DirectoryManager.ClassifiedCategories.Employment, "Employment");
-            AddClassifiedCategory((Int32) DirectoryManager.ClassifiedCategories.Wanted, "Wanted");
-            AddClassifiedCategory((Int32) DirectoryManager.ClassifiedCategories.Service, "Service");
-            AddClassifiedCategory((Int32) DirectoryManager.ClassifiedCategories.Personal, "Personal");
+            AddClassifiedCategory((int) DirectoryManager.ClassifiedCategories.Shopping, "Shopping");
+            AddClassifiedCategory((int) DirectoryManager.ClassifiedCategories.LandRental, "Land Rental");
+            AddClassifiedCategory((int) DirectoryManager.ClassifiedCategories.PropertyRental, "Property Rental");
+            AddClassifiedCategory((int) DirectoryManager.ClassifiedCategories.SpecialAttraction, "Special Attraction");
+            AddClassifiedCategory((int) DirectoryManager.ClassifiedCategories.NewProducts, "New Products");
+            AddClassifiedCategory((int) DirectoryManager.ClassifiedCategories.Employment, "Employment");
+            AddClassifiedCategory((int) DirectoryManager.ClassifiedCategories.Wanted, "Wanted");
+            AddClassifiedCategory((int) DirectoryManager.ClassifiedCategories.Service, "Service");
+            AddClassifiedCategory((int) DirectoryManager.ClassifiedCategories.Personal, "Personal");
         }
 
-        public void SetEventCategories(Int32 value, string categoryName)
+        public void SetEventCategories(int value, string categoryName)
         {
             Hashtable hash = new Hashtable();
             hash["category_name"] = categoryName;
@@ -240,7 +245,7 @@ namespace WhiteCore.Services
             eventCategories.Add(hash);
         }
 
-        public void AddClassifiedCategory(Int32 ID, string categoryName)
+        public void AddClassifiedCategory(int ID, string categoryName)
         {
             Hashtable hash = new Hashtable();
             hash["category_name"] = categoryName;
@@ -261,14 +266,14 @@ namespace WhiteCore.Services
                 UserAccount account = m_UserAccountService.GetUserAccount(null, firstName, lastName);
                 if (account == null)
                 {
-                    MainConsole.Instance.InfoFormat("[LLOGIN SERVICE]: Set Level failed, user {0} {1} not found",
+                    MainConsole.Instance.InfoFormat("[LLogin service]: Set Level failed, user {0} {1} not found",
                                                     firstName, lastName);
                     return response;
                 }
 
                 if (account.UserLevel < 200)
                 {
-                    MainConsole.Instance.InfoFormat("[LLOGIN SERVICE]: Set Level failed, reason: user level too low");
+                    MainConsole.Instance.InfoFormat("[LLogin service]: Set Level failed, reason: user level too low");
                     return response;
                 }
 
@@ -281,18 +286,18 @@ namespace WhiteCore.Services
                 UUID secureSession = UUID.Zero;
                 if ((token == string.Empty) || (token != string.Empty && !UUID.TryParse(token, out secureSession)))
                 {
-                    MainConsole.Instance.InfoFormat("[LLOGIN SERVICE]: SetLevel failed, reason: authentication failed");
+                    MainConsole.Instance.InfoFormat("[LLogin service]: SetLevel failed, reason: authentication failed");
                     return response;
                 }
             }
             catch (Exception e)
             {
-                MainConsole.Instance.Error("[LLOGIN SERVICE]: SetLevel failed, exception " + e);
+                MainConsole.Instance.Error("[LLogin service]: SetLevel failed, exception " + e);
                 return response;
             }
 
             m_MinLoginLevel = level;
-            MainConsole.Instance.InfoFormat("[LLOGIN SERVICE]: Login level set to {0} by {1} {2}", level, firstName,
+            MainConsole.Instance.InfoFormat("[LLogin service]: Login level set to {0} by {1} {2}", level, firstName,
                                             lastName);
 
             response["success"] = true;
@@ -301,7 +306,7 @@ namespace WhiteCore.Services
 
         public bool VerifyClient(UUID AgentID, string name, string authType, string passwd)
         {
-            MainConsole.Instance.InfoFormat("[LLOGIN SERVICE]: Login verification request for {0}",
+            MainConsole.Instance.InfoFormat("[LLogin service]: Login verification request for {0}",
                                             AgentID == UUID.Zero
                                                 ? name
                                                 : AgentID.ToString());
@@ -322,12 +327,12 @@ namespace WhiteCore.Services
             IAgentConnector agentData = Framework.Utilities.DataManager.RequestPlugin<IAgentConnector>();
             if (agentData != null)
             {
-                agent = agentData.GetAgent(account.PrincipalID);
-            }
-            if (agent == null)
-            {
-                agentData.CreateNewAgent(account.PrincipalID);
-                agent = agentData.GetAgent(account.PrincipalID);
+                agent = agentData.GetAgent (account.PrincipalID);
+                if (agent == null)
+                {
+                    agentData.CreateNewAgent (account.PrincipalID);
+                    agent = agentData.GetAgent (account.PrincipalID);
+                }
             }
 
             foreach (ILoginModule module in LoginModules)
@@ -366,7 +371,7 @@ namespace WhiteCore.Services
             }
 
             MainConsole.Instance.InfoFormat(
-                "[LLOGIN SERVICE]: Login request for {0} from {1} with user agent {2} starting in {3}",
+                "[LLogin service]: Login request for {0} from {1} with user agent {2} starting in {3}",
                 Name, clientIP.Address, realViewer, startLocation);
 
             UserAccount account = AgentID != UUID.Zero
@@ -374,19 +379,19 @@ namespace WhiteCore.Services
                                       : m_UserAccountService.GetUserAccount(null, Name);
             if (account == null && m_AllowAnonymousLogin)
             {
-                m_UserAccountService.CreateUser(Name, passwd.StartsWith("$1$") ? passwd.Remove(0, 3) : passwd, "");
+                m_UserAccountService.CreateUser(Name, passwd.StartsWith ("$1$", StringComparison.Ordinal) ? passwd.Remove(0, 3) : passwd, "");
                 account = m_UserAccountService.GetUserAccount(null, Name);
             }
             if (account == null)
             {
-                MainConsole.Instance.InfoFormat("[LLOGIN SERVICE]: Login failed for user {0}: no account found", Name);
+                MainConsole.Instance.InfoFormat("[LLogin service]: Login failed for user {0}: no account found", Name);
                 return LLFailedLoginResponse.AccountProblem;
             }
 
             if (account.UserLevel < 0) //No allowing anyone less than 0
             {
                 MainConsole.Instance.InfoFormat(
-                    "[LLOGIN SERVICE]: Login failed for user {0}, reason: user is banned",
+                    "[LLogin service]: Login failed for user {0}, reason: user is banned",
                     account.Name);
                 return LLFailedLoginResponse.PermanentBannedProblem;
             }
@@ -394,21 +399,25 @@ namespace WhiteCore.Services
             if (account.UserLevel < m_MinLoginLevel)
             {
                 MainConsole.Instance.InfoFormat(
-                    "[LLOGIN SERVICE]: Login failed for user {1}, reason: login is blocked for user level {0}",
+                    "[LLogin service]: Login failed for user {1}, reason: login is blocked for user level {0}",
                     account.UserLevel, account.Name);
                 return LLFailedLoginResponse.LoginBlockedProblem;
             }
 
             IAgentInfo agent = null;
             IAgentConnector agentData = Framework.Utilities.DataManager.RequestPlugin<IAgentConnector>();
-            if (agentData != null)
-                agent = agentData.GetAgent(account.PrincipalID);
-            if (agent == null)
-            {
-                agentData.CreateNewAgent(account.PrincipalID);
-                agent = agentData.GetAgent(account.PrincipalID);
+            if (agentData != null) {
+                agent = agentData.GetAgent (account.PrincipalID);
+                if (agent == null) {
+                    agentData.CreateNewAgent (account.PrincipalID);
+                    agent = agentData.GetAgent (account.PrincipalID);
+                }
+            } else {
+                MainConsole.Instance.ErrorFormat ("[LLogin service]: Login failed for user {1}, reason: {0}",
+                                                 account.Name, "Unable to retrieve agen connector");
+                return LLFailedLoginResponse.GridProblem;
             }
-
+                           
             requestData["ip"] = clientIP.ToString();
             foreach (ILoginModule module in LoginModules)
             {
@@ -416,7 +425,7 @@ namespace WhiteCore.Services
                 if ((response = module.Login(requestData, account, agent, authType, passwd, out data)) != null)
                 {
                     MainConsole.Instance.InfoFormat(
-                        "[LLOGIN SERVICE]: Login failed for user {1}, reason: {0}",
+                        "[LLogin service]: Login failed for user {1}, reason: {0}",
                         (data != null ? data.ToString() : (response is LLFailedLoginResponse) ? (response as LLFailedLoginResponse).Value : "Unknown"), account.Name);
                     return response;
                 }
@@ -436,7 +445,7 @@ namespace WhiteCore.Services
                 if (m_RequireInventory && m_InventoryService == null)
                 {
                     MainConsole.Instance.WarnFormat(
-                        "[LLOGIN SERVICE]: Login failed for user {0}, reason: inventory service not set up",
+                        "[LLogin service]: Login failed for user {0}, reason: inventory service not set up",
                         account.Name);
                     return LLFailedLoginResponse.InventoryProblem;
                 }
@@ -450,7 +459,7 @@ namespace WhiteCore.Services
                     if (m_RequireInventory && ((inventorySkel == null) || (inventorySkel.Count == 0)))
                     {
                         MainConsole.Instance.InfoFormat(
-                            "[LLOGIN SERVICE]: Login failed for user {0}, reason: unable to retrieve user inventory",
+                            "[LLogin service]: Login failed for user {0}, reason: unable to retrieve user inventory",
                             account.Name);
                         return LLFailedLoginResponse.InventoryProblem;
                     }
@@ -511,7 +520,7 @@ namespace WhiteCore.Services
 
                 // Get active gestures
                 List<InventoryItemBase> gestures = m_InventoryService.GetActiveGestures(account.PrincipalID);
-                //MainConsole.Instance.DebugFormat("[LLOGIN SERVICE]: {0} active gestures", gestures.Count);
+                //MainConsole.Instance.DebugFormat("[LLogin service]: {0} active gestures", gestures.Count);
 
                 //Now get the logged in status, then below make sure to kill the previous agent if we crashed before
                 UserInfo guinfo = m_agentInfoService.GetUserInfo(account.PrincipalID.ToString());
@@ -609,7 +618,7 @@ namespace WhiteCore.Services
                 if (destination == null)
                 {
                     MainConsole.Instance.InfoFormat(
-                        "[LLOGIN SERVICE]: Login failed for user {0}, reason: destination not found", account.Name);
+                        "[LLogin service]: Login failed for user {0}, reason: destination not found", account.Name);
                     return LLFailedLoginResponse.DeadRegionProblem;
                 }
 
@@ -658,7 +667,7 @@ namespace WhiteCore.Services
 
                 if (aCircuit == null)
                 {
-                    MainConsole.Instance.InfoFormat("[LLOGIN SERVICE]: Login failed for user {1}, reason: {0}", reason,
+                    MainConsole.Instance.InfoFormat("[LLogin service]: Login failed for user {1}, reason: {0}", reason,
                                                     account.Name);
                     return new LLFailedLoginResponse(LoginResponseEnum.InternalError, reason, false);
                 }
@@ -705,14 +714,14 @@ namespace WhiteCore.Services
                                                m_config, DisplayName, avappearance.Serial.ToString(), m_registry.RequestModuleInterface<IGridInfo>());
 
                 MainConsole.Instance.InfoFormat(
-                    "[LLOGIN SERVICE]: All clear. Sending login response to client to login to region " +
+                    "[LLogin service]: All clear. Sending login response to client to login to region " +
                     destination.RegionName + ", tried to login to " + startLocation + " at " + position + ".");
 
                 return response;
             }
             catch (Exception e)
             {
-                MainConsole.Instance.WarnFormat("[LLOGIN SERVICE]: Exception processing login for {0} : {1}", Name, e);
+                MainConsole.Instance.WarnFormat("[LLogin service]: Exception processing login for {0} : {1}", Name, e);
                 if (account != null)
                 {
                     //Revert their logged in status if we got that far
@@ -771,7 +780,7 @@ namespace WhiteCore.Services
                 if (home == null)
                 {
                     MainConsole.Instance.WarnFormat(
-                        "[LLOGIN SERVICE]: User {0} {1} tried to login to a 'home' start location but they have none set",
+                        "[LLogin service]: User {0} {1} tried to login to a 'home' start location but they have none set",
                         account.FirstName, account.LastName);
 
                     tryDefaults = true;
@@ -813,7 +822,7 @@ namespace WhiteCore.Services
                             else
                             {
                                 MainConsole.Instance.WarnFormat(
-                                    "[LLOGIN SERVICE]: User {0} {1} does not have a valid home and this grid does not have default locations. Attempting to find random region",
+                                    "[LLogin service]: User {0} {1} does not have a valid home and this grid does not have default locations. Attempting to find random region",
                                     account.FirstName, account.LastName);
                                 defaults = m_GridService.GetRegionsByName(account.AllScopeIDs, "", 0, 1);
                                 if (defaults != null && defaults.Count > 0)
@@ -1008,7 +1017,6 @@ namespace WhiteCore.Services
             aCircuit.RegionUDPPort = args.CircuitData.RegionUDPPort;
 
             reason = args.Reason;
-            reason = "";
             seedCap = args.SeedCap;
             bool success = args.Success;
             if (!success && m_GridService != null)
@@ -1164,7 +1172,7 @@ namespace WhiteCore.Services
                     // or fixing critical issues
                     //
                     if (cmd.Length > 2)
-                        Int32.TryParse(cmd[2], out m_MinLoginLevel);
+                      int.TryParse(cmd[2], out m_MinLoginLevel);
                     break;
                 case "reset":
                     m_MinLoginLevel = 0;
@@ -1267,9 +1275,9 @@ namespace WhiteCore.Services
                                 continue;
                             }
 
-                            if (doc.FirstChild.OuterXml.StartsWith("<groups>") ||
+                            if (doc.FirstChild.OuterXml.StartsWith ("<groups>", StringComparison.Ordinal) ||
                                 (doc.FirstChild.NextSibling != null &&
-                                 doc.FirstChild.NextSibling.OuterXml.StartsWith("<groups>")))
+                                 doc.FirstChild.NextSibling.OuterXml.StartsWith ("<groups>", StringComparison.Ordinal)))
                                 continue;
 
                             string xml;

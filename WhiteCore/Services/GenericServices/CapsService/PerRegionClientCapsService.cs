@@ -101,7 +101,7 @@ namespace WhiteCore.Services
         /// <summary>
         ///     This is the /CAPS/UUID 0000/ string
         /// </summary>
-        protected String m_capsUrlBase;
+        protected string m_capsUrlBase;
 
         public UUID AgentID
         {
@@ -134,7 +134,7 @@ namespace WhiteCore.Services
 
         #region Properties
 
-        public String HostUri
+        public string HostUri
         {
             get { return Server.ServerURI; }
         }
@@ -155,7 +155,7 @@ namespace WhiteCore.Services
         /// <summary>
         ///     This is the full URL to the Caps SEED request
         /// </summary>
-        public String CapsUrl
+        public string CapsUrl
         {
             get
             {
@@ -246,7 +246,7 @@ namespace WhiteCore.Services
             string path = RegisteredCAPS[method].AsString();
             if (path != "") //If it doesn't exist...
             {
-                if (path.StartsWith(HostUri)) //Only try to remove local ones
+                if (path.StartsWith (HostUri, StringComparison.Ordinal)) //Only try to remove local ones
                 {
                     path = path.Remove(0, HostUri.Length);
                     Server.RemoveStreamHandler(httpMethod, path);
@@ -278,7 +278,7 @@ namespace WhiteCore.Services
         public virtual byte[] CapsRequest(string path, Stream request, OSHttpRequest httpRequest,
                                           OSHttpResponse httpResponse)
         {
-            MainConsole.Instance.Info("[CapsHandlers]: Handling Seed Cap request at " + CapsUrl);
+            MainConsole.Instance.Debug("[CapsHandlers]: Handling Seed Cap request at " + CapsUrl);
             return OSDParser.SerializeLLSDXmlBytes(RegisteredCAPS);
         }
 

@@ -29,7 +29,7 @@ using System;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
 {
-    internal interface IScheduler
+    interface IScheduler
     {
         /// <summary>
         ///     Fire this scheduler only when the region has

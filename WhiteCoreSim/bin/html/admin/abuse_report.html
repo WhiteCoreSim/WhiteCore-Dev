@@ -131,18 +131,18 @@
             <td class="region_info_left">
               <p>{ActiveText}:</p>
             </td>
-            <td class="region_info_right">	
-              
-              <select id="Active" require="true" name='Active'>	
+            <td class="region_info_right">
+
+              <select id="Active" require="true" name='Active'>
               {IfIsActiveBegin}
-				<option value="Yes" selected="Yes"">{Yes}</option>
-				<option value="No">{No}</option>
-              {IfIsActiveEnd}	
-              {IfIsNotActiveBegin}	
-				<option value="Yes">{Yes}</option>
-				<option value="No" selected="Yes">{No}</option>
-				{IfIsNotActiveEnd}
-		 	  </select>
+        <option value="Yes" selected="Yes">{Yes}</option>
+        <option value="No">{No}</option>
+              {IfIsActiveEnd}
+              {IfIsNotActiveBegin}
+        <option value="Yes">{Yes}</option>
+        <option value="No" selected="Yes">{No}</option>
+        {IfIsNotActiveEnd}
+        </select>
 
             </td>
           </tr>
@@ -151,28 +151,28 @@
               <p>{CheckedText}:</p>
             </td>
             <td class="region_info_right">
-              <select id="Checked" require="true" name='Checked'>			
+              <select id="Checked" require="true" name='Checked'>
                 {IfIsCheckedBegin}
-			    <option value="Yes" selected="Yes">{Yes}</option>
-			    <option value="No">{No}</option>
-				{IfIsCheckedEnd}
+          <option value="Yes" selected="Yes">{Yes}</option>
+          <option value="No">{No}</option>
+        {IfIsCheckedEnd}
                 {IfIsNotCheckedBegin}
-			    <option value="Yes">{Yes}</option>
-			    <option value="No" selected="Yes">{No}</option>
-				{IfIsNotCheckedEnd}
-		      </select>
+          <option value="Yes">{Yes}</option>
+          <option value="No" selected="Yes">{No}</option>
+        {IfIsNotCheckedEnd}
+          </select>
             </td>
           </tr>
           <tr>
             <td class="region_info_left">
               <p>{AssignedToText}:</p>
-		    </td>
+        </td>
             <td class="region_info_right">
-           	    <select id="AssignedTo" require="true" name='AssignedTo' value="{AssignedTo}">			
-				{AdminUsersListArrayBegin}
-		  			<option value="{Value}">{Value}</option>
-				{AdminUsersListArrayEnd}
-				</select>
+                <select id="AssignedTo" require="true" name='AssignedTo' value="{AssignedTo}">
+        {AdminUsersListArrayBegin}
+            <option value="{Value}">{Value}</option>
+        {AdminUsersListArrayEnd}
+        </select>
             </td>
           </tr>
           <tr>
@@ -181,7 +181,7 @@
             <td class="region_info_left"></td>
             <td class="region_info_right" >
               <input type="hidden" label="cardid" id="cardid" name="cardid" value="{CardNumber}"/>
-  			  <input type="hidden" label="Submit" id="SubmitUpdates" name="SubmitUpdates" value="SubmitUpdates" />
+          <input type="hidden" label="Submit" id="SubmitUpdates" name="SubmitUpdates" value="SubmitUpdates" />
               <button id="SubmitUpdates" name="SubmitUpdates" type="Submit">{Submit}</button>
             </td>
           </tr>
@@ -228,7 +228,7 @@
       }
     );
   });
-  
+
   $(function() { //SET DEFAULT AssignedTo
     var usr = "{AssignedTo}";
 $('#AssignedTo').val(usr);

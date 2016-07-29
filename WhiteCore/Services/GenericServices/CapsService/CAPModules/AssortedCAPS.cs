@@ -92,6 +92,7 @@ namespace WhiteCore.Services
             m_service.RemoveStreamHandler ("HomeLocation", "POST");
             m_service.RemoveStreamHandler ("TeleportLocation", "POST");
         }
+        #endregion
 
         #region Other CAPS
 
@@ -232,9 +233,6 @@ namespace WhiteCore.Services
             _isInTeleportCurrently = false;
             return OSDParser.SerializeLLSDXmlBytes (retVal);
         }
-
-        #endregion
-
         #endregion
     }
 }

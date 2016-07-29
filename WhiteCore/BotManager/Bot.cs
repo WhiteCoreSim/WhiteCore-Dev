@@ -46,9 +46,8 @@ using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.BotManager
 {
-
+    
     #region Enums
-
     public enum BotState
     {
         Idle,
@@ -249,6 +248,8 @@ namespace WhiteCore.BotManager
     public sealed class Bot : IDisposable
     {
         #region Declares
+        static readonly object _lock = new object();
+        readonly float EPSILON = (float) Constants.FloatDifference;
 
         IBotController m_controller;
 
@@ -1192,7 +1193,7 @@ namespace WhiteCore.BotManager
             start:
             if (i == path.Count)
                 return Vector3.Zero;
-            if (path[i].X == (11*resolution) && path[i].Y == (11*resolution))
+            if (Math.Abs (path [i].X - (11 * resolution)) < EPSILON && Math.Abs (path [i].Y - (11 * resolution)) < EPSILON)
             {
                 i++;
                 goto start;
@@ -1297,7 +1298,7 @@ namespace WhiteCore.BotManager
         void EventManager_OnClientMovement()
         {
             if (FollowSP != null)
-                lock (m_significantAvatarPositions)
+                lock (_lock)
                     m_significantAvatarPositions.Add(FollowSP.AbsolutePosition);
         }
 
@@ -1306,7 +1307,8 @@ namespace WhiteCore.BotManager
             int closestPosition = 0;
             double closestDistance = 0;
             Vector3[] sigPos;
-            lock (m_significantAvatarPositions)
+
+            lock (_lock)
             {
                 sigPos = new Vector3[m_significantAvatarPositions.Count];
                 m_significantAvatarPositions.CopyTo(sigPos);
@@ -1315,7 +1317,7 @@ namespace WhiteCore.BotManager
             for (int i = 0; i < sigPos.Length; i++)
             {
                 double val = Util.GetDistanceTo(m_controller.AbsolutePosition, sigPos[i]);
-                if (closestDistance == 0 || closestDistance > val)
+                if (Math.Abs (closestDistance) < EPSILON || closestDistance > val)
                 {
                     closestDistance = val;
                     closestPosition = i;
@@ -1522,10 +1524,12 @@ namespace WhiteCore.BotManager
 
     public class BotClientAPI : IClientAPI
     {
+        static readonly object _lock = new object();
+
         public readonly AgentCircuitData m_circuitData;
         public readonly UUID m_myID = UUID.Random();
         public readonly IScene m_scene;
-        static UInt32 UniqueId = 1;
+        static uint UniqueId = 1;
         BotAvatarController m_controller;
 
         public UUID ScopeID { get; set; }
@@ -1611,7 +1615,7 @@ namespace WhiteCore.BotManager
 
         void RegisterInterface<T>(T iface)
         {
-            lock (m_clientInterfaces)
+            lock (_lock)
             {
                 if (!m_clientInterfaces.ContainsKey(typeof (T)))
                 {
@@ -2004,6 +2008,7 @@ namespace WhiteCore.BotManager
 
         public void SendInstantMessage(GridInstantMessage im)
         {
+            // TODO:  Sort this out - greythane- 20160406
             //This will cause a stack overflow, as it will loop back to trying to send the IM out again
             //m_controller.SendInstantMessage(im);
         }

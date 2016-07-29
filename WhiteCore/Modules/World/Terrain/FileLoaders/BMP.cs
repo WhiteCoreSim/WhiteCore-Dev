@@ -38,18 +38,21 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
     ///     Should be capable of handling 24-bit RGB images.
     ///     Uses the System.Drawing filesystem loader.
     /// </summary>
-    internal class BMP : GenericSystemDrawing
+    class BMP : GenericSystemDrawing
     {
         /// <summary>
         ///     Exports a file to a image on the disk using a System.Drawing exporter.
         /// </summary>
         /// <param name="filename">The target filename</param>
         /// <param name="map">The terrain channel being saved</param>
-        public override void SaveFile(string filename, ITerrainChannel map)
+        public override void SaveFile (string filename, ITerrainChannel map)
         {
-            Bitmap colours = CreateGrayscaleBitmapFromMap(map);
-
-            colours.Save(filename, ImageFormat.Bmp);
+            Bitmap colours = CreateGrayscaleBitmapFromMap (map);
+            try {
+                colours.Save (filename, ImageFormat.Bmp);
+            } catch {
+            }
+            colours.Dispose ();
         }
 
         /// <summary>
@@ -57,18 +60,21 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
         /// </summary>
         /// <param name="stream">The target stream</param>
         /// <param name="map">The terrain channel being saved</param>
-        public override void SaveStream(Stream stream, ITerrainChannel map)
+        public override void SaveStream (Stream stream, ITerrainChannel map)
         {
-            Bitmap colours = CreateGrayscaleBitmapFromMap(map);
-
-            colours.Save(stream, ImageFormat.Bmp);
+            Bitmap colours = CreateGrayscaleBitmapFromMap (map);
+            try {
+                colours.Save (stream, ImageFormat.Bmp);
+            } catch {
+            }
+            colours.Dispose ();
         }
 
         /// <summary>
         ///     The human readable version of the file format(s) this loader handles
         /// </summary>
         /// <returns></returns>
-        public override string ToString()
+        public override string ToString ()
         {
             return "BMP";
         }

@@ -1,17 +1,9 @@
-<script type="text/javascript">
-$(function() {
-    $(".avatararchivecarousel").jCarouselLite({
-        btnNext: ".next-horiz",
-        btnPrev: ".prev-horiz"
-    });
-});
-
-</script>
+<!-- registration form -->
 
 {IfNoRegistrationsBegin}
-<!--#include file="/noregistrations.html" --> 
+<!--#include file="/noregistrations.html" -->
 {IfNoRegistrationsEnd}
-  
+
 {IfRegistrationsBegin}
 <h2>{SystemName}: {RegistrationText}</h2>
 <div id="error_message" class="error">{ErrorMessage}</div>
@@ -19,14 +11,14 @@ $(function() {
 <form id="register_form" action="{SubmitURL}" method="POST">
 <div style ="display: inline-block;"><table>
   <caption></caption>
-  
+
   <thead>
     <tr>
       <th class="register_left"></th>
       <th class="register_right" colspan="3"></th>
     </tr>
   </thead>
-  
+
   <tfoot>
     <tr>
       <th class="register_left"></th>
@@ -63,7 +55,7 @@ $(function() {
     <tr>
       <td class="register_left"><p>{LastNameText}</p></td>
       <td class="register_right" colspan="3"><input label="LastName" id="LastName" name="LastName" type="text" size="25" maxlength="15" value=""></td>
-    </tr>	
+    </tr>
 <!-- greythane - removed as the address details are not really relevant now
     <tr>
       <td class="register_left"><p>{UserAddressText}</p></td>
@@ -81,21 +73,21 @@ $(function() {
     <tr>
       <td class="register_left"><p>{UserDOBText}</p></td>
       <td class="register_dob">
-	    <select id="UserDOBMonth" require="true" name='UserDOBMonth'>			
+	    <select id="UserDOBMonth" require="true" name='UserDOBMonth'>
 {MonthsArrayBegin}
 		  <option value="{Value}">{Value}</option>
 {MonthsArrayEnd}
 		</select>
 	  </td>
       <td class="register_dob">
-		<select id="UserDOBDay" require="true" name='UserDOBDay'>					
+		<select id="UserDOBDay" require="true" name='UserDOBDay'>
 {DaysArrayBegin}
 		  <option value="{Value}">{Value}</option>
 {DaysArrayEnd}
 		</select>
 	  </td>
       <td class="register_dob">
-		<select id="UserDOBYear" require="true" name='UserDOBYear'>										
+		<select id="UserDOBYear" require="true" name='UserDOBYear'>
 {YearsArrayBegin}
 		  <option value="{Value}">{Value}</option>
 {YearsArrayEnd}
@@ -110,7 +102,7 @@ $(function() {
     <tr>
       <td class="register_left"><p>{UserHomeRegionText}*</p></td>
       <td class="register_dob">
-	    <select id="UserHomeRegion" require="true" name="UserHomeRegion" style="width:120px;">			
+	    <select id="UserHomeRegion" require="true" name="UserHomeRegion" style="width:120px;">
 {RegionListArrayBegin}
 		  <option value="{RegionUUID}">{RegionName}</option>
 {RegionListArrayEnd}
@@ -123,7 +115,7 @@ $(function() {
     <tr>
       <td class="register_left"><p>{UserTypeText}*</p></td>
       <td class="register_dob">
-	    <select id="UserType" require="true" name="UserType" style="width:120px;">			
+	    <select id="UserType" require="true" name="UserType" style="width:120px;">
 {UserTypeArrayBegin}
 		  <option value="{Index}">{Value}</option>
 {UserTypeArrayEnd}
@@ -133,20 +125,20 @@ $(function() {
 {IsAdminAuthenticatedEnd}
 
     <tr>
-      <td class="register_left">Avatar Selection</td>	
+      <td class="register_left">Avatar Selection</td>
       <td class="register_left" colspan="5" valign="top">
-	    <div class="carousel">	
+	    <div class="carousel">
          <div class="prev-horiz">◄</div>
-		 <div class="next-horiz">►</div> 
+		 <div class="next-horiz">►</div>
 		 <center>
          <div class= "avatararchivecarousel" style="height: 190px;">
            <ul id="avatarcarousel" class="jcarousel-skin-aurora">
 {AvatarArchiveArrayBegin}
 	       <li>
 		     <div class="avatar_archive_screenshot">
-		       <label for="{AvatarArchiveName}" alt="{SystemName}: {AvatarArchiveName}" title="{SystemName}: {AvatarArchiveName}">{AvatarArchiveName}</label>
-			   <input type="radio" id="{AvatarArchiveName}" name="AvatarArchive" value="{AvatarArchiveName}" alt="{SystemName}: {AvatarArchiveName}" title="{SystemName}: {AvatarArchiveName}">
-			   <img src="{AvatarArchiveSnapshotURL}" alt="{SystemName}: {AvatarArchiveName}" title="{SystemName}: {AvatarArchiveName}" />
+		       <label for="{AvatarArchiveName}" alt="{AvatarArchiveName}" title="{AvatarArchiveName}">{AvatarArchiveName}</label>
+			   <input type="radio" id="{AvatarArchiveName}" name="AvatarArchive" value="{AvatarArchiveName}" alt="{AvatarArchiveName}" title="{AvatarArchiveName}">
+			   <img src="{AvatarArchiveSnapshotURL}" alt="{AvatarArchiveName}" title="{AvatarArchiveName}" />
 		     </div>
 	       </li>
 {AvatarArchiveArrayEnd}
@@ -173,11 +165,19 @@ $(function() {
 </form>
 
 <script>
+  $(function() {
+    $(".avatararchivecarousel").jCarouselLite({
+        btnNext: ".next-horiz",
+        btnPrev: ".prev-horiz"
+    });
+  });
+
+
   /* attach a submit handler to the form */
   $("#register_form").submit(function(event) {
 
     /* stop form from submitting normally */
-    event.preventDefault(); 
+    event.preventDefault();
     /* get some values from elements on the page: */
     var $form = $( this ),
         url = $form.attr( 'action' );

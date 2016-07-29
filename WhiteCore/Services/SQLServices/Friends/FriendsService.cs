@@ -26,13 +26,13 @@
  */
 
 
+using System.Collections.Generic;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Other;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using System.Collections.Generic;
 using FriendInfo = WhiteCore.Framework.Services.FriendInfo;
 
 namespace WhiteCore.Services
@@ -48,130 +48,127 @@ namespace WhiteCore.Services
 
         #region IService Members
 
-        public virtual string Name
-        {
-            get { return GetType().Name; }
+        public virtual string Name {
+            get { return GetType ().Name; }
         }
 
-        public virtual void Initialize(IConfigSource config, IRegistryCore registry)
+        public virtual void Initialize (IConfigSource config, IRegistryCore registry)
         {
-            IConfig handlerConfig = config.Configs["Handlers"];
-            if (handlerConfig.GetString("FriendsHandler", "") != Name)
+            IConfig handlerConfig = config.Configs ["Handlers"];
+            if (handlerConfig.GetString ("FriendsHandler", "") != Name)
                 return;
 
-            registry.RegisterModuleInterface<IFriendsService>(this);
+            registry.RegisterModuleInterface<IFriendsService> (this);
             m_registry = registry;
-            Init(registry, Name);
+            Init (registry, Name);
         }
 
-        public virtual void Start(IConfigSource config, IRegistryCore registry)
+        public virtual void Start (IConfigSource config, IRegistryCore registry)
         {
-            m_Database = Framework.Utilities.DataManager.RequestPlugin<IFriendsData>();
+            m_Database = Framework.Utilities.DataManager.RequestPlugin<IFriendsData> ();
         }
 
-        public virtual void FinishedStartup()
+        public virtual void FinishedStartup ()
         {
-            m_agentInfoService = m_registry.RequestModuleInterface<IAgentInfoService>();
+            m_agentInfoService = m_registry.RequestModuleInterface<IAgentInfoService> ();
         }
 
         #endregion
 
         #region IFriendsService Members
 
-        public virtual IFriendsService InnerService
-        {
+        public virtual IFriendsService InnerService {
             get { return this; }
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public virtual List<FriendInfo> GetFriends(UUID PrincipalID)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public virtual List<FriendInfo> GetFriends (UUID PrincipalID)
         {
-            object remoteValue = DoRemote(PrincipalID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<FriendInfo>) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (PrincipalID);
+                return remoteValue != null ? (List<FriendInfo>)remoteValue : new List<FriendInfo> ();
+            }
 
-            return new List<FriendInfo>(m_Database.GetFriends(PrincipalID));
+            return new List<FriendInfo> (m_Database.GetFriends (PrincipalID));
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public virtual List<FriendInfo> GetFriendsRequest(UUID PrincipalID)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public virtual List<FriendInfo> GetFriendsRequest (UUID PrincipalID)
         {
-            object remoteValue = DoRemote(PrincipalID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<FriendInfo>) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (PrincipalID);
+                return remoteValue != null ? (List<FriendInfo>)remoteValue : new List<FriendInfo> ();
+            }
 
-            return new List<FriendInfo>(m_Database.GetFriendsRequest(PrincipalID));
+            return new List<FriendInfo> (m_Database.GetFriendsRequest (PrincipalID));
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public virtual bool StoreFriend(UUID PrincipalID, string friend, int flags)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public virtual bool StoreFriend (UUID PrincipalID, string friend, int flags)
         {
-            object remoteValue = DoRemote(PrincipalID, friend, flags);
-            if (remoteValue != null || m_doRemoteOnly)
-                return remoteValue == null ? false : (bool) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (PrincipalID, friend, flags);
+                return remoteValue != null ? (bool)remoteValue : false;
+            }
 
-            return m_Database.Store(PrincipalID, friend, flags, 0);
+            return m_Database.Store (PrincipalID, friend, flags, 0);
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public virtual bool Delete(UUID PrincipalID, string friend)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public virtual bool Delete (UUID PrincipalID, string friend)
         {
-            object remoteValue = DoRemote(PrincipalID, friend);
-            if (remoteValue != null || m_doRemoteOnly)
-                return remoteValue == null ? false : (bool) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (PrincipalID, friend);
+                return remoteValue != null ? (bool)remoteValue : false;
+            }
 
-            return m_Database.Delete(PrincipalID, friend);
+            return m_Database.Delete (PrincipalID, friend);
         }
 
-        public List<UUID> GetFriendOnlineStatuses(UUID user, bool isOnline)
+        public List<UUID> GetFriendOnlineStatuses (UUID user, bool isOnline)
         {
-            List<UUID> OnlineFriends = new List<UUID>();
-            ISyncMessagePosterService asyncPoster = m_registry.RequestModuleInterface<ISyncMessagePosterService>();
-            if (asyncPoster != null)
-            {
-                List<FriendInfo> friends = GetFriends(user);
-                foreach (FriendInfo friend in friends)
-                {
+            List<UUID> OnlineFriends = new List<UUID> ();
+            ISyncMessagePosterService asyncPoster = m_registry.RequestModuleInterface<ISyncMessagePosterService> ();
+            if (asyncPoster != null) {
+                List<FriendInfo> friends = GetFriends (user);
+                foreach (FriendInfo friend in friends) {
                     if (friend.TheirFlags == -1 || friend.MyFlags == -1)
                         continue; //Not validated yet!
                     UUID FriendToInform = UUID.Zero;
-                    if (!UUID.TryParse(friend.Friend, out FriendToInform))
+                    if (!UUID.TryParse (friend.Friend, out FriendToInform))
                         continue;
                     if ((friend.MyFlags & (int)FriendRights.CanSeeOnline) != (int)FriendRights.CanSeeOnline)
                         continue;//if we haven't given them the rights to see our online status, don't send the online status
 
-                    UserInfo friendToInformUser = m_agentInfoService.GetUserInfo(friend.Friend);
+                    UserInfo friendToInformUser = m_agentInfoService.GetUserInfo (friend.Friend);
                     //Now find their caps service so that we can find where they are root (and if they are logged in)
                     if (friendToInformUser != null && friendToInformUser.IsOnline)
-                        OnlineFriends.Add(FriendToInform);
+                        OnlineFriends.Add (FriendToInform);
                 }
             }
             return OnlineFriends;
         }
 
-        public void SendFriendOnlineStatuses(UUID user, bool isOnline)
+        public void SendFriendOnlineStatuses (UUID user, bool isOnline)
         {
-            ISyncMessagePosterService asyncPoster = m_registry.RequestModuleInterface<ISyncMessagePosterService>();
-            if (asyncPoster != null)
-            {
-                List<FriendInfo> friends = GetFriends(user);
-                foreach (FriendInfo friend in friends)
-                {
+            ISyncMessagePosterService asyncPoster = m_registry.RequestModuleInterface<ISyncMessagePosterService> ();
+            if (asyncPoster != null) {
+                List<FriendInfo> friends = GetFriends (user);
+                foreach (FriendInfo friend in friends) {
                     if (friend.TheirFlags == -1 || friend.MyFlags == -1)
                         continue; //Not validated yet!
                     UUID FriendToInform = UUID.Zero;
-                    if (!UUID.TryParse(friend.Friend, out FriendToInform))
+                    if (!UUID.TryParse (friend.Friend, out FriendToInform))
                         continue;
                     if ((friend.MyFlags & (int)FriendRights.CanSeeOnline) != (int)FriendRights.CanSeeOnline)
                         continue;//if we haven't given them the rights to see our online status, don't send the online status
 
-                    UserInfo friendToInformUser = m_agentInfoService.GetUserInfo(friend.Friend);
+                    UserInfo friendToInformUser = m_agentInfoService.GetUserInfo (friend.Friend);
                     //Now find their caps service so that we can find where they are root (and if they are logged in)
-                    if (friendToInformUser != null && friendToInformUser.IsOnline)
-                    {
+                    if (friendToInformUser != null && friendToInformUser.IsOnline) {
                         //Post!
-                        asyncPoster.Post(friendToInformUser.CurrentRegionURI,
-                                         SyncMessageHelper.AgentStatusChange(user, FriendToInform, isOnline));
+                        asyncPoster.Post (friendToInformUser.CurrentRegionURI,
+                                         SyncMessageHelper.AgentStatusChange (user, FriendToInform, isOnline));
                     }
                 }
             }

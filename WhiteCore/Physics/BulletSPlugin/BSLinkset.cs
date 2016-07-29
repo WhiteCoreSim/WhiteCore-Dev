@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) Contributors, http://opensimulator.org/, http://whitecore-sim.org
+ * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org/, http://opensimulator.org/
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -9,7 +9,7 @@
  *     * Redistributions in binary form must reproduce the above copyrightD
  *       notice, this list of conditions and the following disclaimer in the
  *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the OpenSimulator Project nor the
+ *     * Neither the name of the WhiteCore-Sim Project nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
  *
@@ -184,10 +184,11 @@ namespace WhiteCore.Physics.BulletSPlugin
                     // Cannot remove the root from a linkset.
                     return this;
                 }
-                RemoveChildFromLinkset(child, inTaintTime);
-                LinksetMass = ComputeLinksetMass();
             }
 
+            RemoveChildFromLinkset(child, inTaintTime);         // this establishes it's own lock
+            LinksetMass = ComputeLinksetMass();
+ 
             // The child is down to a linkset of just itself
             return BSLinkset.Factory(PhysicsScene, child);
         }

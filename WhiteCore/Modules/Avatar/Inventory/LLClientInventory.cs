@@ -256,7 +256,7 @@ namespace WhiteCore.Modules.Inventory
             if (!m_scene.InventoryService.AddFolder(folder))
             {
                 MainConsole.Instance.WarnFormat(
-                    "[AGENT INVENTORY]: Failed to create folder for user {0} {1}",
+                    "[Agent inventory]: Failed to create folder for user {0} {1}",
                     remoteClient.Name, remoteClient.AgentId);
             }
         }
@@ -276,7 +276,7 @@ namespace WhiteCore.Modules.Inventory
                                                    UUID parentID)
         {
             //            MainConsole.Instance.DebugFormat(
-            //                "[AGENT INVENTORY]: Updating inventory folder {0} {1} for {2} {3}", folderID, name, remoteClient.Name, remoteClient.AgentId);
+            //                "[Agent inventory]: Updating inventory folder {0} {1} for {2} {3}", folderID, name, remoteClient.Name, remoteClient.AgentId);
 
             InventoryFolderBase folder = new InventoryFolderBase(folderID, remoteClient.AgentId);
             folder = m_scene.InventoryService.GetFolder(folder);
@@ -288,7 +288,7 @@ namespace WhiteCore.Modules.Inventory
                 if (!m_scene.InventoryService.UpdateFolder(folder))
                 {
                     MainConsole.Instance.ErrorFormat(
-                        "[AGENT INVENTORY]: Failed to update folder for user {0} {1}",
+                        "[Agent inventory]: Failed to update folder for user {0} {1}",
                         remoteClient.Name, remoteClient.AgentId);
                 }
             }
@@ -308,14 +308,14 @@ namespace WhiteCore.Modules.Inventory
             {
                 folder.ParentID = parentID;
                 if (!m_scene.InventoryService.MoveFolder(folder))
-                    MainConsole.Instance.WarnFormat("[AGENT INVENTORY]: could not move folder {0}", folderID);
+                    MainConsole.Instance.WarnFormat("[Agent inventory]: could not move folder {0}", folderID);
                 else
-                    MainConsole.Instance.DebugFormat("[AGENT INVENTORY]: folder {0} moved to parent {1}", folderID,
+                    MainConsole.Instance.DebugFormat("[Agent inventory]: folder {0} moved to parent {1}", folderID,
                                                      parentID);
             }
             else
             {
-                MainConsole.Instance.WarnFormat("[AGENT INVENTORY]: request to move folder {0} but folder not found",
+                MainConsole.Instance.WarnFormat("[Agent inventory]: request to move folder {0} but folder not found",
                                                 folderID);
             }
         }
@@ -328,9 +328,9 @@ namespace WhiteCore.Modules.Inventory
         protected void HandlePurgeInventoryDescendents(IClientAPI remoteClient, UUID folderID)
         {
             if (m_scene.InventoryService.PurgeFolder(new InventoryFolderBase(folderID, remoteClient.AgentId)))
-                MainConsole.Instance.DebugFormat("[AGENT INVENTORY]: folder {0} purged successfully", folderID);
+                MainConsole.Instance.DebugFormat("[Agent inventory]: folder {0} purged successfully", folderID);
             else
-                MainConsole.Instance.WarnFormat("[AGENT INVENTORY]: could not purge folder {0} for client {1}", folderID,
+                MainConsole.Instance.WarnFormat("[Agent inventory]: could not purge folder {0} for client {1}", folderID,
                                                 remoteClient.AgentId);
         }
 
@@ -433,35 +433,34 @@ namespace WhiteCore.Modules.Inventory
 
             if (action == DeRezAction.Return)
             {
-                if (remoteClient != null && m_scene.Permissions.CanReturnObjects(
-                    null,
-                    remoteClient.AgentId,
-                    deleteGroups))
+                if (remoteClient != null && m_scene.Permissions.CanReturnObjects (
+                        null,
+                        remoteClient.AgentId,
+                        deleteGroups))
                 {
                     permissionToTake = true;
                     permissionToDelete = true;
 
-                    IParcelManagementModule parcelManagement = m_scene.RequestModuleInterface<IParcelManagementModule>();
+                    IParcelManagementModule parcelManagement = m_scene.RequestModuleInterface<IParcelManagementModule> ();
                     if (parcelManagement != null)
                     {
-                        parcelManagement.AddReturns(deleteGroups[0].OwnerID, deleteGroups[0].Name,
-                                                    deleteGroups[0].AbsolutePosition, "Parcel Owner Return",
-                                                    deleteGroups);
+                        parcelManagement.AddReturns (deleteGroups [0].OwnerID, deleteGroups [0].Name,
+                            deleteGroups [0].AbsolutePosition, "Parcel Owner Return",
+                            deleteGroups);
                     }
                     return;
                 }
-                else // Auto return passes through here with null agent
-                {
-                    permissionToTake = true;
-                    permissionToDelete = true;
-                }
+
+                permissionToTake = true;
+                permissionToDelete = true;
             }
 
             IAsyncSceneObjectGroupDeleter asyncDelete = m_scene.RequestModuleInterface<IAsyncSceneObjectGroupDeleter>();
             if (asyncDelete != null)
             {
                 asyncDelete.DeleteToInventory(
-                    action, destinationID, deleteGroups, remoteClient == null ? UUID.Zero : remoteClient.AgentId,
+                    action, destinationID, deleteGroups,
+                    remoteClient == null ? UUID.Zero : remoteClient.AgentId,
                     permissionToDelete, permissionToTake);
             }
         }
@@ -473,7 +472,7 @@ namespace WhiteCore.Modules.Inventory
         /// <param name="itemIDs"></param>
         protected void RemoveInventoryItem(IClientAPI remoteClient, List<UUID> itemIDs)
         {
-            //MainConsole.Instance.Debug("[SCENE INVENTORY]: user " + remoteClient.AgentId);
+            //MainConsole.Instance.Debug("[Scene inventory]: user " + remoteClient.AgentId);
             m_scene.InventoryService.DeleteItems(remoteClient.AgentId, itemIDs);
         }
 
@@ -485,7 +484,7 @@ namespace WhiteCore.Modules.Inventory
         /// <param name="folderIDs"></param>
         protected void RemoveInventoryFolder(IClientAPI remoteClient, List<UUID> folderIDs)
         {
-            MainConsole.Instance.DebugFormat("[SCENE INVENTORY]: RemoveInventoryFolders count {0}", folderIDs.Count);
+            MainConsole.Instance.DebugFormat("[Scene inventory]: RemoveInventoryFolders count {0}", folderIDs.Count);
             m_scene.InventoryService.DeleteFolders(remoteClient.AgentId, folderIDs);
         }
 
@@ -532,9 +531,7 @@ namespace WhiteCore.Modules.Inventory
                                              BasePermissions = baseMask,
                                              CreationDate = creationDate
                                          };
-            m_scene.InventoryService.AddItemAsync(item,
-                                                  (itm) =>
-                                                      { remoteClient.SendInventoryItemCreateUpdate(itm, callbackID); });
+            m_scene.InventoryService.AddItemAsync(item, itm => { remoteClient.SendInventoryItemCreateUpdate(itm, callbackID); });
         }
 
         /// <summary>
@@ -557,7 +554,7 @@ namespace WhiteCore.Modules.Inventory
                                               sbyte assetType,
                                               byte wearableType, uint nextOwnerMask, int creationDate)
         {
-            //MainConsole.Instance.DebugFormat("[AGENT INVENTORY]: Received request to create inventory item {0} in folder {1}", name, folderID);
+            //MainConsole.Instance.DebugFormat("[Agent inventory]: Received request to create inventory item {0} in folder {1}", name, folderID);
 
             if (!m_scene.Permissions.CanCreateUserInventory(invType, remoteClient.AgentId))
                 return;
@@ -594,8 +591,8 @@ namespace WhiteCore.Modules.Inventory
                     }
                     if (invType == (sbyte) InventoryType.Gesture)
                     {
-                        data = /*Default empty gesture*/ new byte[13]
-                                                             {50, 10, 50, 53, 53, 10, 48, 10, 10, 10, 48, 10, 0};
+                        /*Default empty gesture*/
+                        data =  new byte[] {50, 10, 50, 53, 53, 10, 48, 10, 10, 10, 48, 10, 0};
                     }
 
                     AssetBase asset = new AssetBase(UUID.Random(), name, (AssetType) assetType,
@@ -625,11 +622,10 @@ namespace WhiteCore.Modules.Inventory
             }
         }
 
-        private byte[] BuildLandmark(IScenePresence presence)
+        byte[] BuildLandmark(IScenePresence presence)
         {
             Vector3 pos = presence.AbsolutePosition;
-            string strdata = String.Format(
-                "Landmark version 2\nregion_id {0}\nlocal_pos {1} {2} {3}\nregion_handle {4}",
+            string strdata = string.Format("Landmark version 2\nregion_id {0}\nlocal_pos {1} {2} {3}\nregion_handle {4}",
                 presence.Scene.RegionInfo.RegionID,
                 pos.X, pos.Y, pos.Z,
                 presence.Scene.RegionInfo.RegionHandle);
@@ -653,7 +649,7 @@ namespace WhiteCore.Modules.Inventory
                                                uint callbackID, string description, string name,
                                                sbyte invType, sbyte type, UUID olditemID)
         {
-            //MainConsole.Instance.DebugFormat("[AGENT INVENTORY]: Received request to create inventory item link {0} in folder {1} pointing to {2}", name, folderID, olditemID);
+            //MainConsole.Instance.DebugFormat("[Agent inventory]: Received request to create inventory item link {0} in folder {1} pointing to {2}", name, folderID, olditemID);
 
             if (!m_scene.Permissions.CanCreateUserInventory(invType, remoteClient.AgentId))
                 return;
@@ -671,11 +667,14 @@ namespace WhiteCore.Modules.Inventory
                     return;
                 }
                 AssetBase asset = new AssetBase {ID = olditemID, Type = type, Name = name, Description = description};
-
-                CreateNewInventoryItem(
-                    remoteClient, remoteClient.AgentId.ToString(), "", folderID, name, 0, callbackID, asset, invType,
-                    (uint) PermissionMask.All, (uint) PermissionMask.All, (uint) PermissionMask.All,
-                    (uint) PermissionMask.All, (uint) PermissionMask.All, Util.UnixTimeSinceEpoch());
+                try {
+                    CreateNewInventoryItem (
+                        remoteClient, remoteClient.AgentId.ToString (), "", folderID, name, 0, callbackID, asset, invType,
+                        (uint)PermissionMask.All, (uint)PermissionMask.All, (uint)PermissionMask.All,
+                        (uint)PermissionMask.All, (uint)PermissionMask.All, Util.UnixTimeSinceEpoch ());
+                } catch {
+                }
+                asset.Dispose ();
             }
             else
             {
@@ -693,7 +692,7 @@ namespace WhiteCore.Modules.Inventory
         protected void MoveInventoryItem(IClientAPI remoteClient, List<InventoryItemBase> items)
         {
             //MainConsole.Instance.DebugFormat(
-            //    "[AGENT INVENTORY]: Moving {0} items for user {1}", items.Count, remoteClient.AgentId);
+            //    "[Agent inventory]: Moving {0} items for user {1}", items.Count, remoteClient.AgentId);
 
             m_scene.InventoryService.MoveItemsAsync(remoteClient.AgentId, items, null);
         }
@@ -711,83 +710,73 @@ namespace WhiteCore.Modules.Inventory
                                          UUID newFolderID, string newName)
         {
             MainConsole.Instance.DebugFormat(
-                "[AGENT INVENTORY]: CopyInventoryItem received by {0} with oldAgentID {1}, oldItemID {2}, new FolderID {3}, newName {4}",
+                "[Agent inventory]: CopyInventoryItem received by {0} with oldAgentID {1}, oldItemID {2}, new FolderID {3}, newName {4}",
                 remoteClient.AgentId, oldAgentID, oldItemID, newFolderID, newName);
 
             //Use UUID.Zero as it might be a library item
             InventoryItemBase item = m_scene.InventoryService.GetItem(UUID.Zero, oldItemID);
             if (item == null)
             {
-                MainConsole.Instance.Error("[AGENT INVENTORY]: Failed to find item " + oldItemID.ToString());
+                MainConsole.Instance.Error("[Agent inventory]: Failed to find item " + oldItemID);
                 return;
             }
 
             if ((item.CurrentPermissions & (uint) PermissionMask.Copy) == 0)
                 return;
 
-            m_scene.AssetService.Get(item.AssetID.ToString(), null, (id, sender, asset) =>
-                                                                        {
-                                                                            if (asset != null)
-                                                                            {
-                                                                                if (newName != String.Empty)
-                                                                                {
-                                                                                    asset.Name = newName;
-                                                                                }
-                                                                                else
-                                                                                {
-                                                                                    newName = item.Name;
-                                                                                }
+            m_scene.AssetService.Get(item.AssetID.ToString(), null, 
+                (id, sender, asset) =>
+                {
+                    if (asset != null)
+                    {
+                        if (newName != string.Empty)
+                            asset.Name = newName;
+                        else
+                            newName = item.Name;
 
-                                                                                if (remoteClient.AgentId == oldAgentID)
-                                                                                {
-                                                                                    CreateNewInventoryItem(
-                                                                                        remoteClient, item.CreatorId,
-                                                                                        item.CreatorData, newFolderID,
-                                                                                        newName, item.Flags, callbackID,
-                                                                                        asset, (sbyte) item.InvType,
-                                                                                        item.BasePermissions,
-                                                                                        item.CurrentPermissions,
-                                                                                        item.EveryOnePermissions,
-                                                                                        item.NextPermissions,
-                                                                                        item.GroupPermissions,
-                                                                                        Util.UnixTimeSinceEpoch());
-                                                                                }
-                                                                                else
-                                                                                {
-                                                                                    // If item is transfer or permissions are off or calling agent is allowed to copy item owner's inventory item.
-                                                                                    if (((item.CurrentPermissions &
-                                                                                          (uint) PermissionMask.Transfer) !=
-                                                                                         0) &&
-                                                                                        (m_scene.Permissions
-                                                                                                .BypassPermissions() ||
-                                                                                         m_scene.Permissions
-                                                                                                .CanCopyUserInventory(
-                                                                                                    remoteClient.AgentId,
-                                                                                                    oldItemID)))
-                                                                                    {
-                                                                                        CreateNewInventoryItem(
-                                                                                            remoteClient, item.CreatorId,
-                                                                                            item.CreatorData,
-                                                                                            newFolderID, newName,
-                                                                                            item.Flags, callbackID,
-                                                                                            asset, (sbyte) item.InvType,
-                                                                                            item.NextPermissions,
-                                                                                            item.NextPermissions,
-                                                                                            item.EveryOnePermissions &
-                                                                                            item.NextPermissions,
-                                                                                            item.NextPermissions,
-                                                                                            item.GroupPermissions,
-                                                                                            Util.UnixTimeSinceEpoch());
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                            else
-                                                                            {
-                                                                                MainConsole.Instance.ErrorFormat(
-                                                                                    "[AGENT INVENTORY]: Could not copy item {0} since asset {1} could not be found",
-                                                                                    item.Name, item.AssetID);
-                                                                            }
-                                                                        });
+                        if (remoteClient.AgentId == oldAgentID)
+                        {
+                            CreateNewInventoryItem(
+                                remoteClient, item.CreatorId,
+                                item.CreatorData, newFolderID,
+                                newName, item.Flags, callbackID,
+                                asset, (sbyte) item.InvType,
+                                item.BasePermissions,
+                                item.CurrentPermissions,
+                                item.EveryOnePermissions,
+                                item.NextPermissions,
+                                item.GroupPermissions,
+                                Util.UnixTimeSinceEpoch());
+                        }
+                        else
+                        {
+                            // If item is transfer or permissions are off or calling agent is allowed to copy item owner's inventory item.
+                            if (((item.CurrentPermissions &
+                                (uint) PermissionMask.Transfer) != 0) &&
+                                (m_scene.Permissions.BypassPermissions() || m_scene.Permissions.CanCopyUserInventory(remoteClient.AgentId, oldItemID)))
+                            {
+                                CreateNewInventoryItem(
+                                    remoteClient, item.CreatorId,
+                                    item.CreatorData,
+                                    newFolderID, newName,
+                                    item.Flags, callbackID,
+                                    asset, (sbyte) item.InvType,
+                                    item.NextPermissions,
+                                    item.NextPermissions,
+                                    item.EveryOnePermissions & item.NextPermissions,
+                                    item.NextPermissions,
+                                    item.GroupPermissions,
+                                    Util.UnixTimeSinceEpoch());
+                            }
+                        }
+                    }
+                    else
+                    {
+                        MainConsole.Instance.ErrorFormat(
+                            "[Agent inventory]: Could not copy item {0} since asset {1} could not be found",
+                            item.Name, item.AssetID);
+                    }
+                });
         }
 
         /// <summary>
@@ -928,14 +917,14 @@ namespace WhiteCore.Modules.Inventory
         /// </summary>
         /// <param name="remoteClient"></param>
         /// <param name="itemID"></param>
-        /// <param name="Flags"></param>
-        protected void ChangeInventoryItemFlags(IClientAPI remoteClient, UUID itemID, uint Flags)
+        /// <param name="flags"></param>
+        protected void ChangeInventoryItemFlags(IClientAPI remoteClient, UUID itemID, uint flags)
         {
             InventoryItemBase item = m_scene.InventoryService.GetItem(remoteClient.AgentId, itemID);
 
             if (item != null)
             {
-                item.Flags = Flags;
+                item.Flags = flags;
 
                 m_scene.InventoryService.UpdateItem(item);
                 remoteClient.SendInventoryItemDetails(item.Owner, item);
@@ -962,8 +951,7 @@ namespace WhiteCore.Modules.Inventory
             else
             {
                 MainConsole.Instance.ErrorFormat(
-                    "[PRIM INVENTORY]: " +
-                    "Couldn't find part {0} to request inventory data",
+                    "[Prim Inventory]: Couldn't find part {0} to request inventory data",
                     primLocalID);
             }
         }
@@ -995,8 +983,7 @@ namespace WhiteCore.Modules.Inventory
                 else
                 {
                     MainConsole.Instance.ErrorFormat(
-                        "[PRIM INVENTORY]: " +
-                        "Removal of item {0} requested of prim {1} but this prim does not exist",
+                        "[Prim Inventory]: Removal of item {0} requested of prim {1} but this prim does not exist",
                         itemID,
                         localID);
                 }
@@ -1020,8 +1007,7 @@ namespace WhiteCore.Modules.Inventory
             if (null == part)
             {
                 MainConsole.Instance.WarnFormat(
-                    "[PRIM INVENTORY]: " +
-                    "Move of inventory item {0} from prim with local id {1} failed because the prim could not be found",
+                    "[Prim Inventory]: Move of inventory item {0} from prim with local id {1} failed because the prim could not be found",
                     itemId, primLocalId);
 
                 return;
@@ -1032,7 +1018,7 @@ namespace WhiteCore.Modules.Inventory
             if (null == taskItem)
             {
                 MainConsole.Instance.WarnFormat(
-                    "[PRIM INVENTORY]: Move of inventory item {0} from prim with local id {1} failed"
+                    "[Prim Inventory]: Move of inventory item {0} from prim with local id {1} failed"
                     + " because the inventory item could not be found",
                     itemId, primLocalId);
 
@@ -1104,7 +1090,7 @@ namespace WhiteCore.Modules.Inventory
             InventoryFolderBase containingFolder = new InventoryFolderBase(folder.ID, client.AgentId);
             containingFolder = m_scene.InventoryService.GetFolder(containingFolder);
 
-            //MainConsole.Instance.DebugFormat("[AGENT INVENTORY]: Sending inventory folder contents ({0} nodes) for \"{1}\" to {2} {3}",
+            //MainConsole.Instance.DebugFormat("[Agent inventory]: Sending inventory folder contents ({0} nodes) for \"{1}\" to {2} {3}",
             //    contents.Folders.Count + contents.Items.Count, containingFolder.Name, client.FirstName, client.LastName);
 
             if (containingFolder != null)
@@ -1154,7 +1140,7 @@ namespace WhiteCore.Modules.Inventory
                         {
                             part.ParentEntity.AddInventoryItem(remoteClient, primLocalID, item, copyID);
                             MainConsole.Instance.InfoFormat(
-                                "[PRIM INVENTORY]: Update with item {0} requested of prim {1} for {2}",
+                                "[Prim inventory]: Update with item {0} requested of prim {1} for {2}",
                                 item.Name, primLocalID, remoteClient.Name);
                             part.GetProperties(remoteClient);
                             if (!m_scene.Permissions.BypassPermissions())
@@ -1169,7 +1155,7 @@ namespace WhiteCore.Modules.Inventory
                         else
                         {
                             MainConsole.Instance.ErrorFormat(
-                                "[PRIM INVENTORY]: Could not find inventory item {0} to update for {1}!",
+                                "[Prim inventory]: Could not find inventory item {0} to update for {1}!",
                                 itemID, remoteClient.Name);
                         }
                     }
@@ -1215,8 +1201,7 @@ namespace WhiteCore.Modules.Inventory
             else
             {
                 MainConsole.Instance.WarnFormat(
-                    "[PRIM INVENTORY]: " +
-                    "Update with item {0} requested of prim {1} for {2} but this prim does not exist",
+                    "[Prim inventory]: Update with item {0} requested of prim {1} for {2} but this prim does not exist",
                     itemID, primLocalID, remoteClient.Name);
             }
         }
@@ -1257,8 +1242,7 @@ namespace WhiteCore.Modules.Inventory
                     else
                     {
                         MainConsole.Instance.ErrorFormat(
-                            "[PRIM INVENTORY]: " +
-                            "Could not rez script {0} into prim local ID {1} for user {2}"
+                            "[Prim inventory]: Could not rez script {0} into prim local ID {1} for user {2}"
                             + " because the prim could not be found in the region!",
                             item.Name, localID, remoteClient.Name);
                     }
@@ -1266,7 +1250,7 @@ namespace WhiteCore.Modules.Inventory
                 else
                 {
                     MainConsole.Instance.ErrorFormat(
-                        "[PRIM INVENTORY]: Could not find script inventory item {0} to rez for {1}!",
+                        "[Prim inventory]: Could not find script inventory item {0} to rez for {1}!",
                         itemID, remoteClient.Name);
                 }
             }
@@ -1332,14 +1316,14 @@ namespace WhiteCore.Modules.Inventory
         /// <param name="part">The object that the item is in</param>
         /// <param name="itemId">The item to convert</param>
         /// <returns></returns>
-        private InventoryItemBase CreateAgentInventoryItemFromTask(UUID destAgent, ISceneChildEntity part, UUID itemId)
+        InventoryItemBase CreateAgentInventoryItemFromTask(UUID destAgent, ISceneChildEntity part, UUID itemId)
         {
             TaskInventoryItem taskItem = part.Inventory.GetInventoryItem(itemId);
 
             if (null == taskItem)
             {
                 MainConsole.Instance.ErrorFormat(
-                    "[PRIM INVENTORY]: Tried to retrieve item ID {0} from prim {1}, {2} for creating an avatar"
+                    "[Prim inventory]: Tried to retrieve item ID {0} from prim {1}, {2} for creating an avatar"
                     + " inventory item from a prim's inventory item "
                     + " but the required item does not exist in the prim's inventory",
                     itemId, part.Name, part.UUID);
@@ -1436,8 +1420,7 @@ namespace WhiteCore.Modules.Inventory
         /// </param>
         public void AddInventoryItemAsync(IClientAPI remoteClient, InventoryItemBase item)
         {
-            m_scene.InventoryService.AddItemAsync(item,
-                                                  (itm) => remoteClient.SendInventoryItemCreateUpdate(itm, 0));
+            m_scene.InventoryService.AddItemAsync(item, itm => remoteClient.SendInventoryItemCreateUpdate (itm, 0));
         }
 
         /// <summary>
@@ -1449,15 +1432,15 @@ namespace WhiteCore.Modules.Inventory
         /// <param name="destId">The UUID of the prim that the </param>
         /// <param name="pin">The ScriptAccessPin of the prim</param>
         /// <param name="running">Whether the script should be running when it is started</param>
-        /// <param name="start_param">The start param to pass to the script</param>
-        public void RezScript(UUID srcId, ISceneChildEntity srcPart, UUID destId, int pin, int running, int start_param)
+        /// <param name="startParam">The start param to pass to the script</param>
+        public void RezScript(UUID srcId, ISceneChildEntity srcPart, UUID destId, int pin, int running, int startParam)
         {
             TaskInventoryItem srcTaskItem = srcPart.Inventory.GetInventoryItem(srcId);
 
             if (srcTaskItem == null)
             {
                 MainConsole.Instance.ErrorFormat(
-                    "[PRIM INVENTORY]: Could not find part {0} to insert script item {1} from {2} {3} in {4}",
+                    "[Prim inventory]: Could not find part {0} to insert script item {1} from {2} {3} in {4}",
                     destId, srcId, srcPart.Name, srcPart.UUID, Name);
                 return;
             }
@@ -1467,8 +1450,7 @@ namespace WhiteCore.Modules.Inventory
             if (destPart == null)
             {
                 MainConsole.Instance.ErrorFormat(
-                    "[PRIM INVENTORY]: " +
-                    "Could not find script for ID {0}",
+                    "[Prim inventory]: Could not find script for ID {0}",
                     destId);
                 return;
             }
@@ -1490,8 +1472,7 @@ namespace WhiteCore.Modules.Inventory
             if (destPart.ScriptAccessPin == 0 || destPart.ScriptAccessPin != pin)
             {
                 MainConsole.Instance.WarnFormat(
-                    "[PRIM INVENTORY]: " +
-                    "Script in object {0} : {1}, attempted to load script {2} : {3} into object {4} : {5} with invalid pin {6}",
+                    "[Prim inventory]: Script in object {0} : {1}, attempted to load script {2} : {3} into object {4} : {5} with invalid pin {6}",
                     srcPart.Name, srcId, srcTaskItem.Name, srcTaskItem.ItemID, destPart.Name, destId, pin);
                 // the LSL Wiki says we are supposed to shout on the DEBUG_CHANNEL -
                 //   "Object: Task Object trying to illegally load script onto task Other_Object!"
@@ -1524,14 +1505,14 @@ namespace WhiteCore.Modules.Inventory
             {
                 if (m_scene.Permissions.PropagatePermissions())
                 {
-                    destTaskItem.CurrentPermissions = srcTaskItem.CurrentPermissions &
-                                                      srcTaskItem.NextPermissions;
-                    destTaskItem.GroupPermissions = srcTaskItem.GroupPermissions &
-                                                    srcTaskItem.NextPermissions;
-                    destTaskItem.EveryonePermissions = srcTaskItem.EveryonePermissions &
-                                                       srcTaskItem.NextPermissions;
-                    destTaskItem.BasePermissions = srcTaskItem.BasePermissions &
-                                                   srcTaskItem.NextPermissions;
+                    destTaskItem.CurrentPermissions = 
+                        srcTaskItem.CurrentPermissions & srcTaskItem.NextPermissions;
+                    destTaskItem.GroupPermissions = 
+                        srcTaskItem.GroupPermissions & srcTaskItem.NextPermissions;
+                    destTaskItem.EveryonePermissions = 
+                        srcTaskItem.EveryonePermissions & srcTaskItem.NextPermissions;
+                    destTaskItem.BasePermissions = 
+                        srcTaskItem.BasePermissions & srcTaskItem.NextPermissions;
                     destTaskItem.CurrentPermissions |= 16; // Slam!
                 }
             }
@@ -1544,7 +1525,7 @@ namespace WhiteCore.Modules.Inventory
             destPart.Inventory.AddInventoryItemExclusive(destTaskItem, false);
 
             if (running > 0)
-                destPart.Inventory.CreateScriptInstance(destTaskItem, start_param, false, StateSource.NewRez);
+                destPart.Inventory.CreateScriptInstance(destTaskItem, startParam, false, StateSource.NewRez);
 
             IScenePresence avatar;
             if (m_scene.TryGetScenePresence(srcTaskItem.OwnerID, out avatar))
@@ -1555,16 +1536,15 @@ namespace WhiteCore.Modules.Inventory
         ///     Return the given objects to the agent given
         /// </summary>
         /// <param name="returnobjects">The objects to return</param>
-        /// <param name="AgentId">The agent UUID that will get the inventory items for these objects</param>
+        /// <param name="agentId">The agent UUID that will get the inventory items for these objects</param>
         /// <returns></returns>
-        public bool ReturnObjects(ISceneEntity[] returnobjects,
-                                  UUID AgentId)
+        public bool ReturnObjects(ISceneEntity[] returnobjects, UUID agentId)
         {
             if (returnobjects.Length == 0)
                 return true;
             List<uint> IDs = returnobjects.Select(grp => grp.LocalId).ToList();
             IClientAPI client;
-            m_scene.ClientManager.TryGetValue(AgentId, out client);
+            m_scene.ClientManager.TryGetValue(agentId, out client);
             //Its ok if the client is null, its taken care of
             DeRezObjects(client, IDs, returnobjects[0].RootChild.GroupID, DeRezAction.Return, UUID.Zero);
             return true;
@@ -1583,7 +1563,7 @@ namespace WhiteCore.Modules.Inventory
             if (srcTaskItem == null)
             {
                 MainConsole.Instance.ErrorFormat(
-                    "[PRIM INVENTORY]: Tried to retrieve item ID {0} from prim {1}, {2} for moving"
+                    "[Prim inventory]: Tried to retrieve item ID {0} from prim {1}, {2} for moving"
                     + " but the item does not exist in this inventory",
                     itemId, part.Name, part.UUID);
 
@@ -1594,10 +1574,7 @@ namespace WhiteCore.Modules.Inventory
 
             if (destPart == null)
             {
-                MainConsole.Instance.ErrorFormat(
-                    "[PRIM INVENTORY]: " +
-                    "Could not find prim for ID {0}",
-                    destId);
+                MainConsole.Instance.ErrorFormat("[Prim inventory]: Could not find prim for ID {0}", destId);
                 return;
             }
 
@@ -1647,14 +1624,14 @@ namespace WhiteCore.Modules.Inventory
             {
                 if (m_scene.Permissions.PropagatePermissions())
                 {
-                    destTaskItem.CurrentPermissions = srcTaskItem.CurrentPermissions &
-                                                      (srcTaskItem.NextPermissions | (uint) PermissionMask.Move);
-                    destTaskItem.GroupPermissions = srcTaskItem.GroupPermissions &
-                                                    (srcTaskItem.NextPermissions | (uint) PermissionMask.Move);
-                    destTaskItem.EveryonePermissions = srcTaskItem.EveryonePermissions &
-                                                       (srcTaskItem.NextPermissions | (uint) PermissionMask.Move);
-                    destTaskItem.BasePermissions = srcTaskItem.BasePermissions &
-                                                   (srcTaskItem.NextPermissions | (uint) PermissionMask.Move);
+                    destTaskItem.CurrentPermissions = 
+                        srcTaskItem.CurrentPermissions & (srcTaskItem.NextPermissions | (uint) PermissionMask.Move);
+                    destTaskItem.GroupPermissions = 
+                        srcTaskItem.GroupPermissions & (srcTaskItem.NextPermissions | (uint) PermissionMask.Move);
+                    destTaskItem.EveryonePermissions = 
+                        srcTaskItem.EveryonePermissions & (srcTaskItem.NextPermissions | (uint) PermissionMask.Move);
+                    destTaskItem.BasePermissions = 
+                        srcTaskItem.BasePermissions & (srcTaskItem.NextPermissions | (uint) PermissionMask.Move);
                     destTaskItem.CurrentPermissions |= 16; // Slam!
                 }
             }
@@ -1723,35 +1700,30 @@ namespace WhiteCore.Modules.Inventory
         {
             UUID newFolderID = UUID.Random();
 
-            Util.FireAndForget((o) =>
-                                   {
-                                       InventoryFolderBase rootFolder = m_scene.InventoryService.GetRootFolder(destID);
+            Util.FireAndForget ((o) => {
+                InventoryFolderBase rootFolder = m_scene.InventoryService.GetRootFolder (destID);
+                if (rootFolder != null) {
+                    InventoryFolderBase newFolder = new InventoryFolderBase (newFolderID, name, destID,
+                                                                    (short)FolderType.None, rootFolder.ID,
+                                                                    rootFolder.Version);
+                    m_scene.InventoryService.AddFolder (newFolder);
 
-                                       InventoryFolderBase newFolder = new InventoryFolderBase(newFolderID, name, destID,
-                                                                                               (short) FolderType.None, rootFolder.ID,
-                                                                                               rootFolder.Version);
-                                       m_scene.InventoryService.AddFolder(newFolder);
+                    foreach (UUID itemID in items) {
+                        InventoryItemBase agentItem = CreateAgentInventoryItemFromTask (destID, host, itemID);
 
-                                       foreach (UUID itemID in items)
-                                       {
-                                           InventoryItemBase agentItem = CreateAgentInventoryItemFromTask(destID, host,
-                                                                                                          itemID);
+                        if (agentItem != null) {
+                            agentItem.Folder = newFolderID;
+                            m_scene.InventoryService.AddItem (agentItem);
+                        }
+                    }
 
-                                           if (agentItem != null)
-                                           {
-                                               agentItem.Folder = newFolderID;
-
-                                               m_scene.InventoryService.AddItem(agentItem);
-                                           }
-                                       }
-
-                                       IScenePresence avatar;
-                                       if (m_scene.TryGetScenePresence(destID, out avatar))
-                                       {
-                                           SendInventoryUpdate(avatar.ControllingClient, rootFolder, true, false);
-                                           SendInventoryUpdate(avatar.ControllingClient, newFolder, false, true);
-                                       }
-                                   });
+                    IScenePresence avatar;
+                    if (m_scene.TryGetScenePresence (destID, out avatar)) {
+                        SendInventoryUpdate (avatar.ControllingClient, rootFolder, true, false);
+                        SendInventoryUpdate (avatar.ControllingClient, newFolder, false, true);
+                    }
+                }
+            });
 
             return newFolderID;
         }
@@ -1765,7 +1737,7 @@ namespace WhiteCore.Modules.Inventory
         /// </summary>
         /// <param name="agentID"></param>
         /// <param name="server"></param>
-        private OSDMap EventManagerOnRegisterCaps(UUID agentID, IHttpServer server)
+        OSDMap EventManagerOnRegisterCaps(UUID agentID, IHttpServer server)
         {
             OSDMap retVal = new OSDMap();
             retVal["UpdateScriptTaskInventory"] = CapsUtil.CreateCAPS("UpdateScriptTaskInventory", "");
@@ -1804,15 +1776,9 @@ namespace WhiteCore.Modules.Inventory
             //Unless the script engine goes, region server bound
             server.AddStreamHandler(new GenericStreamHandler("POST", retVal["UpdateScriptAgentInventory"], delegate(
                 string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
-                                                                                                               {
-                                                                                                                   return
-                                                                                                                       NoteCardAgentInventory
-                                                                                                                           (agentID,
-                                                                                                                            path,
-                                                                                                                            request,
-                                                                                                                            httpRequest,
-                                                                                                                            httpResponse);
-                                                                                                               }));
+                {
+                    return NoteCardAgentInventory (agentID, path, request, httpRequest, httpResponse);
+                }));
             return retVal;
         }
 
@@ -1851,10 +1817,9 @@ namespace WhiteCore.Modules.Inventory
                         AgentID);
 
                 MainServer.Instance.AddStreamHandler(
-                    new GenericStreamHandler("POST", capsBase + uploaderPath, uploader.uploaderCaps));
+                    new GenericStreamHandler("POST", capsBase + uploaderPath, uploader.UploaderCaps));
 
-                string uploaderURL = MainServer.Instance.ServerURI + capsBase +
-                                     uploaderPath;
+                string uploaderURL = MainServer.Instance.ServerURI + capsBase + uploaderPath;
 
                 map = new OSDMap();
                 map["uploader"] = uploaderURL;
@@ -1899,10 +1864,9 @@ namespace WhiteCore.Modules.Inventory
                         AgentID);
 
                 MainServer.Instance.AddStreamHandler(
-                    new GenericStreamHandler("POST", capsBase + uploaderPath, uploader.uploaderCaps));
+                    new GenericStreamHandler("POST", capsBase + uploaderPath, uploader.UploaderCaps));
 
-                string uploaderURL = MainServer.Instance.ServerURI + capsBase +
-                                     uploaderPath;
+                string uploaderURL = MainServer.Instance.ServerURI + capsBase + uploaderPath;
 
                 map = new OSDMap();
                 map["uploader"] = uploaderURL;
@@ -1920,13 +1884,13 @@ namespace WhiteCore.Modules.Inventory
         /// <summary>
         ///     Called by the notecard update handler.  Provides a URL to which the client can upload a new asset.
         /// </summary>
-        /// <param name="AgentID"></param>
+        /// <param name="agentID"></param>
         /// <param name="request"></param>
         /// <param name="path"></param>
         /// <param name="httpRequest"></param>
         /// <param name="httpResponse"></param>
         /// <returns></returns>
-        public byte[] NoteCardAgentInventory(UUID AgentID, string path, Stream request, OSHttpRequest httpRequest,
+        public byte[] NoteCardAgentInventory(UUID agentID, string path, Stream request, OSHttpRequest httpRequest,
                                              OSHttpResponse httpResponse)
         {
             //MainConsole.Instance.Debug("[CAPS]: NoteCardAgentInventory Request in region: " + m_regionName + "\n" + request);
@@ -1938,13 +1902,12 @@ namespace WhiteCore.Modules.Inventory
             string uploaderPath = Util.RandomClass.Next(5000, 8000).ToString("0000");
 
             ItemUpdater uploader =
-                new ItemUpdater(AgentID, m_scene, map["item_id"].AsUUID(), capsBase + uploaderPath, MainServer.Instance);
+                new ItemUpdater(agentID, m_scene, map["item_id"].AsUUID(), capsBase + uploaderPath, MainServer.Instance);
 
             MainServer.Instance.AddStreamHandler(
-                new GenericStreamHandler("POST", capsBase + uploaderPath, uploader.uploaderCaps));
+                new GenericStreamHandler("POST", capsBase + uploaderPath, uploader.UploaderCaps));
 
-            string uploaderURL = MainServer.Instance.ServerURI + capsBase +
-                                 uploaderPath;
+            string uploaderURL = MainServer.Instance.ServerURI + capsBase + uploaderPath;
 
             map = new OSDMap();
             map["uploader"] = uploaderURL;
@@ -1958,18 +1921,18 @@ namespace WhiteCore.Modules.Inventory
         /// </summary>
         public class ItemUpdater
         {
-            private readonly string uploaderPath = String.Empty;
-            private readonly UUID inventoryItemID;
-            private readonly IHttpServer httpListener;
-            private readonly UUID agentID;
-            private readonly IScene m_scene;
+            readonly string uploaderPath = String.Empty;
+            readonly UUID inventoryItemID;
+            readonly IHttpServer httpListener;
+            readonly UUID agentUUID;
+            readonly IScene m_scene;
 
-            public ItemUpdater(UUID AgentID, IScene scene, UUID inventoryItem, string path, IHttpServer httpServer)
+            public ItemUpdater(UUID agentID, IScene scene, UUID inventoryItem, string path, IHttpServer httpServer)
             {
                 inventoryItemID = inventoryItem;
                 uploaderPath = path;
                 httpListener = httpServer;
-                agentID = AgentID;
+                agentUUID = agentID;
                 m_scene = scene;
             }
 
@@ -1979,14 +1942,13 @@ namespace WhiteCore.Modules.Inventory
             /// <param name="httpRequest"></param>
             /// <param name="httpResponse"></param>
             /// <returns></returns>
-            public byte[] uploaderCaps(string path, Stream request,
-                                       OSHttpRequest httpRequest, OSHttpResponse httpResponse)
+            public byte[] UploaderCaps(string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
             {
                 byte[] data = HttpServerHandlerHelpers.ReadFully(request);
                 UUID inv = inventoryItemID;
                 IClientAPI client;
                 string res = "";
-                if (m_scene.ClientManager.TryGetValue(agentID, out client))
+                if (m_scene.ClientManager.TryGetValue(agentUUID, out client))
                 {
                     IInventoryAccessModule invAccess = m_scene.RequestModuleInterface<IInventoryAccessModule>();
                     if (invAccess != null)
@@ -2005,20 +1967,20 @@ namespace WhiteCore.Modules.Inventory
         /// </summary>
         public class TaskInventoryScriptUpdater
         {
-            private readonly string uploaderPath = String.Empty;
-            private readonly UUID inventoryItemID;
-            private readonly UUID primID;
-            private readonly bool isScriptRunning;
-            private readonly IHttpServer httpListener;
-            private readonly IScene m_scene;
-            private readonly UUID AgentID;
+            readonly string uploaderPath = String.Empty;
+            readonly UUID inventoryItemID;
+            readonly UUID primID;
+            readonly bool isScriptRunning;
+            readonly IHttpServer httpListener;
+            readonly IScene m_scene;
+            readonly UUID agentUUID;
 
             public TaskInventoryScriptUpdater(IScene scene, UUID inventoryItemID, UUID primID, int isScriptRunning2,
                                               string path, IHttpServer httpServer, UUID agentID)
             {
                 this.inventoryItemID = inventoryItemID;
                 this.primID = primID;
-                AgentID = agentID;
+                agentUUID = agentID;
                 m_scene = scene;
 
                 // This comes in over the packet as an integer, but actually appears to be treated as a bool
@@ -2034,7 +1996,7 @@ namespace WhiteCore.Modules.Inventory
             /// <param name="httpRequest"></param>
             /// <param name="httpResponse"></param>
             /// <returns></returns>
-            public byte[] uploaderCaps(string path, Stream request,
+            public byte[] UploaderCaps(string path, Stream request,
                                        OSHttpRequest httpRequest, OSHttpResponse httpResponse)
             {
                 try
@@ -2044,7 +2006,7 @@ namespace WhiteCore.Modules.Inventory
                     //                                     data, path, param));
 
                     IClientAPI client;
-                    m_scene.ClientManager.TryGetValue(AgentID, out client);
+                    m_scene.ClientManager.TryGetValue(agentUUID, out client);
                     UUID newAssetID = UUID.Zero;
                     byte[] data = HttpServerHandlerHelpers.ReadFully(request);
                     ArrayList errors = CapsUpdateTaskInventoryScriptAsset(client, inventoryItemID, primID,
@@ -2064,7 +2026,7 @@ namespace WhiteCore.Modules.Inventory
                 }
                 catch (Exception e)
                 {
-                    MainConsole.Instance.Error("[CAPS]: " + e.ToString());
+                    MainConsole.Instance.Error("[CAPS]: " + e);
                 }
 
                 // XXX Maybe this should be some meaningful error packet
@@ -2097,7 +2059,7 @@ namespace WhiteCore.Modules.Inventory
                 if (null == part || null == part.ParentEntity)
                 {
                     MainConsole.Instance.ErrorFormat(
-                        "[PRIM INVENTORY]: " +
+                        "[Prim inventory]: " +
                         "Prim inventory update requested for item ID {0} in prim ID {1} but this prim does not exist",
                         itemId, primId);
 
@@ -2112,7 +2074,7 @@ namespace WhiteCore.Modules.Inventory
                 if (null == item)
                 {
                     MainConsole.Instance.ErrorFormat(
-                        "[PRIM INVENTORY]: Tried to retrieve item ID {0} from prim {1}, {2} for caps script update "
+                        "[Prim inventory]: Tried to retrieve item ID {0} from prim {1}, {2} for caps script update "
                         + " but the item does not exist in this inventory",
                         itemId, part.Name, part.UUID);
 
@@ -2156,19 +2118,19 @@ namespace WhiteCore.Modules.Inventory
         /// </summary>
         public class TaskInventoryUpdater
         {
-            private readonly string uploaderPath = String.Empty;
-            private readonly UUID inventoryItemID;
-            private readonly UUID primID;
-            private readonly IHttpServer httpListener;
-            private readonly IScene m_scene;
-            private readonly UUID AgentID;
+            readonly string uploaderPath = String.Empty;
+            readonly UUID inventoryItemID;
+            readonly UUID primID;
+            readonly IHttpServer httpListener;
+            readonly IScene m_scene;
+            readonly UUID agentUUID;
 
             public TaskInventoryUpdater(IScene scene, UUID inventoryItemID, UUID primID,
                                         string path, IHttpServer httpServer, UUID agentID)
             {
                 this.inventoryItemID = inventoryItemID;
                 this.primID = primID;
-                AgentID = agentID;
+                agentUUID = agentID;
                 m_scene = scene;
 
                 uploaderPath = path;
@@ -2182,13 +2144,13 @@ namespace WhiteCore.Modules.Inventory
             /// <param name="httpRequest"></param>
             /// <param name="httpResponse"></param>
             /// <returns></returns>
-            public byte[] uploaderCaps(string path, Stream request,
+            public byte[] UploaderCaps(string path, Stream request,
                                        OSHttpRequest httpRequest, OSHttpResponse httpResponse)
             {
                 try
                 {
                     IClientAPI client;
-                    m_scene.ClientManager.TryGetValue(AgentID, out client);
+                    m_scene.ClientManager.TryGetValue(agentUUID, out client);
                     UUID newAssetID = UUID.Zero;
                     byte[] data = HttpServerHandlerHelpers.ReadFully(request);
                     ISceneChildEntity part = m_scene.GetSceneObjectPart(primID);
@@ -2201,7 +2163,7 @@ namespace WhiteCore.Modules.Inventory
                         {
                             if ((item.Type == (int) InventoryType.Notecard || item.Type == (int) InventoryType.Gesture ||
                                  item.Type == 21 /* Gesture... again*/)
-                                && m_scene.Permissions.CanViewNotecard(inventoryItemID, primID, AgentID))
+                                && m_scene.Permissions.CanViewNotecard(inventoryItemID, primID, agentUUID))
                             {
                                 if ((newAssetID = m_scene.AssetService.UpdateContent(item.AssetID, data)) != UUID.Zero)
                                 {
@@ -2219,7 +2181,7 @@ namespace WhiteCore.Modules.Inventory
                 }
                 catch (Exception e)
                 {
-                    MainConsole.Instance.Error("[CAPS]: " + e.ToString());
+                    MainConsole.Instance.Error("[CAPS]: " + e);
                 }
 
                 // XXX Maybe this should be some meaningful error packet

@@ -70,180 +70,160 @@ namespace WhiteCore.Framework.Utilities
     }
 
     [Serializable]
-    [ComVisible(false)]
-    [HostProtection(SecurityAction.LinkDemand, Synchronization = true, ExternalThreading = true)]
+    [ComVisible (false)]
+    [HostProtection (SecurityAction.LinkDemand, Synchronization = true, ExternalThreading = true)]
     public class Lazy<T>
     {
-        private readonly LazyThreadSafetyMode mode;
-        private readonly object monitor;
-        private Exception exception;
-        private Func<T> factory;
-        private bool inited;
-        private T value;
+        readonly LazyThreadSafetyMode mode;
+        readonly object monitor;
+        Exception exception;
+        Func<T> factory;
+        bool inited;
+        T value;
 
-        public Lazy()
-            : this(LazyThreadSafetyMode.ExecutionAndPublication)
+        public Lazy ()
+            : this (LazyThreadSafetyMode.ExecutionAndPublication)
         {
         }
 
-        public Lazy(Func<T> valueFactory)
-            : this(valueFactory, LazyThreadSafetyMode.ExecutionAndPublication)
+        public Lazy (Func<T> valueFactory)
+            : this (valueFactory, LazyThreadSafetyMode.ExecutionAndPublication)
         {
         }
 
-        public Lazy(bool isThreadSafe)
-            : this(
+        public Lazy (bool isThreadSafe)
+            : this (
                 Activator.CreateInstance<T>,
                 isThreadSafe ? LazyThreadSafetyMode.ExecutionAndPublication : LazyThreadSafetyMode.None)
         {
         }
 
-        public Lazy(Func<T> valueFactory, bool isThreadSafe)
-            : this(valueFactory, isThreadSafe ? LazyThreadSafetyMode.ExecutionAndPublication : LazyThreadSafetyMode.None
+        public Lazy (Func<T> valueFactory, bool isThreadSafe)
+            : this (valueFactory, isThreadSafe ? LazyThreadSafetyMode.ExecutionAndPublication : LazyThreadSafetyMode.None
                 )
         {
         }
 
-        public Lazy(LazyThreadSafetyMode mode)
-            : this(Activator.CreateInstance<T>, mode)
+        public Lazy (LazyThreadSafetyMode mode)
+            : this (Activator.CreateInstance<T>, mode)
         {
         }
 
-        public Lazy(Func<T> valueFactory, LazyThreadSafetyMode mode)
+        public Lazy (Func<T> valueFactory, LazyThreadSafetyMode mode)
         {
             if (valueFactory == null)
-                throw new ArgumentNullException("valueFactory");
-            this.factory = valueFactory;
+                throw new ArgumentNullException ("valueFactory");
+            factory = valueFactory;
             if (mode != LazyThreadSafetyMode.None)
-                monitor = new object();
+                monitor = new object ();
             this.mode = mode;
         }
 
         // Don't trigger expensive initialization
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public T Value
-        {
-            get
-            {
+        [DebuggerBrowsable (DebuggerBrowsableState.Never)]
+        public T Value {
+            get {
                 if (inited)
                     return value;
                 if (exception != null)
                     throw exception;
 
-                return InitValue();
+                return InitValue ();
             }
         }
 
-        public bool IsValueCreated
-        {
+        public bool IsValueCreated {
             get { return inited; }
         }
 
-        private T InitValue()
+        T InitValue ()
         {
-            switch (mode)
-            {
-                case LazyThreadSafetyMode.None:
-                    {
-                        var init_factory = factory;
-                        if (init_factory == null)
+            switch (mode) {
+            case LazyThreadSafetyMode.None: {
+                    var init_factory = factory;
+                    //if (init_factory == null)
+                    //    throw exception =
+                    //          new InvalidOperationException (
+                    //              "The initialization function tries to access Value on this instance");
+                    try {
+                        factory = null;
+                        T v = init_factory ();
+                        value = v;
+                        Thread.MemoryBarrier ();
+                        inited = true;
+                    } catch (Exception ex) {
+                        exception = ex;
+                        throw;
+                    }
+                    break;
+                }
+            case LazyThreadSafetyMode.PublicationOnly: {
+                    var init_factory = factory;
+                    T v;
+
+                    //exceptions are ignored
+                    v = init_factory != null ? init_factory () : default (T);
+
+                    lock (monitor) {
+                        if (inited)
+                            return value;
+                        value = v;
+                        Thread.MemoryBarrier ();
+                        inited = true;
+                        factory = null;
+                    }
+                    break;
+                }
+            case LazyThreadSafetyMode.ExecutionAndPublication: {
+                    lock (monitor) {
+                        if (inited)
+                            return value;
+
+                        if (factory == null)
                             throw exception =
-                                  new InvalidOperationException(
+                                  new InvalidOperationException (
                                       "The initialization function tries to access Value on this instance");
-                        try
-                        {
+
+                        var init_factory = factory;
+                        try {
                             factory = null;
-                            T v = init_factory();
+                            T v = init_factory ();
                             value = v;
-                            Thread.MemoryBarrier();
+                            Thread.MemoryBarrier ();
                             inited = true;
-                        }
-                        catch (Exception ex)
-                        {
+                        } catch (Exception ex) {
                             exception = ex;
                             throw;
                         }
-                        break;
                     }
-                case LazyThreadSafetyMode.PublicationOnly:
-                    {
-                        var init_factory = factory;
-                        T v;
-
-                        //exceptions are ignored
-                        v = init_factory != null ? init_factory() : default(T);
-
-                        lock (monitor)
-                        {
-                            if (inited)
-                                return value;
-                            value = v;
-                            Thread.MemoryBarrier();
-                            inited = true;
-                            factory = null;
-                        }
-                        break;
-                    }
-                case LazyThreadSafetyMode.ExecutionAndPublication:
-                    {
-                        lock (monitor)
-                        {
-                            if (inited)
-                                return value;
-
-                            if (factory == null)
-                                throw exception =
-                                      new InvalidOperationException(
-                                          "The initialization function tries to access Value on this instance");
-
-                            var init_factory = factory;
-                            try
-                            {
-                                factory = null;
-                                T v = init_factory();
-                                value = v;
-                                Thread.MemoryBarrier();
-                                inited = true;
-                            }
-                            catch (Exception ex)
-                            {
-                                exception = ex;
-                                throw;
-                            }
-                        }
-                        break;
-                    }
-                default:
-                    throw new InvalidOperationException("Invalid LazyThreadSafetyMode " + mode);
+                    break;
+                }
+            default:
+                throw new InvalidOperationException ("Invalid LazyThreadSafetyMode " + mode);
             }
 
-            if (monitor == null)
-            {
-                value = factory();
+            if (monitor == null) {
+                //value = factory();
+                value = default (T);        // 20160428 - greythane - not sure of this...  anyone?? :(
+                //lock (monitor)
                 inited = true;
-            }
-            else
-            {
-                lock (monitor)
-                {
+            } else {
+                lock (monitor) {
                     if (inited)
                         return value;
 
                     if (factory == null)
-                        throw new InvalidOperationException(
+                        throw new InvalidOperationException (
                             "The initialization function tries to access Value on this instance");
 
                     var init_factory = factory;
-                    try
-                    {
+                    try {
                         factory = null;
-                        T v = init_factory();
+                        T v = init_factory ();
                         value = v;
-                        Thread.MemoryBarrier();
+                        Thread.MemoryBarrier ();
                         inited = true;
-                    }
-                    catch
-                    {
+                    } catch {
                         factory = init_factory;
                         throw;
                     }
@@ -253,12 +233,11 @@ namespace WhiteCore.Framework.Utilities
             return value;
         }
 
-        public override string ToString()
+        public override string ToString ()
         {
             if (inited)
-                return value.ToString();
-            else
-                return "Value is not created";
+                return value.ToString ();
+            return "Value is not created";
         }
     }
 }

@@ -31,38 +31,38 @@ using WhiteCore.Framework.SceneInfo;
 
 namespace WhiteCore.Modules.Monitoring.Monitors
 {
-    internal class AgentCountMonitor : IMonitor
+    class AgentCountMonitor : IMonitor
     {
-        private readonly IScene m_scene;
+        readonly IScene m_scene;
 
-        public AgentCountMonitor(IScene scene)
+        public AgentCountMonitor (IScene scene)
         {
             m_scene = scene;
         }
 
         #region Implementation of IMonitor
 
-        public double GetValue()
+        public double GetValue ()
         {
-            return m_scene.RequestModuleInterface<IEntityCountModule>().RootAgents;
+            return m_scene.RequestModuleInterface<IEntityCountModule> ().RootAgents;
         }
 
-        public string GetName()
+        public string GetName ()
         {
             return "Root Agent Count";
         }
 
-        public string GetInterfaceName()
+        public string GetInterfaceName ()
         {
             return "";
         }
 
-        public string GetFriendlyValue()
+        public string GetFriendlyValue ()
         {
-            return m_scene.RequestModuleInterface<IEntityCountModule>().RootAgents + " agent(s)";
+            return m_scene.RequestModuleInterface<IEntityCountModule> ().RootAgents + " agent(s)";
         }
 
-        public void ResetStats()
+        public void ResetStats ()
         {
         }
 

@@ -1,48 +1,75 @@
-
-
-<script type="text/javascript" src="../javascripts/jquery.plugin.js"></script> 
-<script type="text/javascript" src="../javascripts/jquery.datepick.js"></script>
-<link rel="stylesheet" type="text/css" href="../javascripts/whitecore.datepick.css"> 
-
-<script>
-$(function() {
-	$('#date_start,#date_end').datepick({ 
-    showTrigger: '<button type="button" class="trigger">...</button>'});
-});
-</script>
+<!-- User Purchases -->
 
 <div id="fullPage">
-<h2>{SystemName}: {PurchasesText}</h2>
+  <h2>{SystemName}: {PurchasesText}</h2>
 
-<form id="purchases_search_form" action="user_purchases.html" method="post">
+  <form id="purchases_search_form" action="user_purchases.html" method="post">
 
-	<div class="form-fieldset-range">
-		<legend>{DateInfoText}</legend>
-			<p class="from-to">
-				<label class="from" for="date_start">{DateStartText}:</label>
-				<input type="text" style="width:80px;" name="date_start" id="date_start" value="{DateStart}" />
-				<label class="to" for="date_end">&nbsp;-&nbsp;{DateEndText}:</label>
-			  	<input type="text" style="width:80px;" name="date_end" id="date_end" value="{DateEnd}" />
-			  	<label> &nbsp;&nbsp;: &nbsp;{Period}</label>
-				<input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
-				<button class="button" style="float:right;width:200;" id="Submit" type="Submit" name="Submit">Search and View</button>
-			</p>
-	</div>
-</form>
+  	<div class="form-fieldset-range">
+  		<legend>{DateInfoText}</legend>
+  			<p class="from-to">
+  				<label class="from" for="date_start">{DateStartText}:</label>
+  				<input type="text" style="width:80px;" name="date_start" id="date_start" value="{DateStart}" />
+  				<label class="to" for="date_end">&nbsp;-&nbsp;{DateEndText}:</label>
+  			  	<input type="text" style="width:80px;" name="date_end" id="date_end" value="{DateEnd}" />
+  			  	<label> &nbsp;&nbsp;: &nbsp;{Period}</label>
+  				<input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
+  				<button class="button" style="float:right;width:200;" id="Submit" type="Submit" name="Submit">Search and View</button>
+  			</p>
+  	</div>
+  </form>
 
-<script> <!--  /* date pickers */ -->
-	
+  <table id="purchases_list">
+	  <thead class="listhead">
+   		<tr>
+   		  <th class="transactions_left"><p>{PurchaseDateText}</p></th>
+   		  <th class="transactions_user"><p>{PurchaseAgentText}</p></th>
+   		  <th class="transactions_user"><p>{LoggedIPText}</p></th>
+   		  <th class="transactions_description"><p>{PurchaseDetailText}</p></th>
+   		  <th class="transactions_value"><p>{PurchaseAmountText}</p></th>
+   		  <th class="transactions_value"><p>{PurchaseRealAmountText}</p></th>
+   		</tr>
+ 	  </thead>
+
+    <tbody>
+  	  {PurchasesListArrayBegin}
+      <tr>
+        <td class="transactions_left"><p>{PurchaseDate}</p></td>
+        <td class="transactions_user"><p>{AgentName}</p></td>
+        <td class="transactions_user"><p>{LoggedIP}</p></td>
+        <td class="transactions_description"><p>{Description}</p></td>
+        <td class="transactions_value"><p>{Amount}</p></td>
+        <td class="transactions_value"><p>{RealAmount}</p></td>
+      </tr>
+  	  {PurchasesListArrayEnd}
+    </tbody>
+  </table>
+</div>
+
+<script>
+  $(document).ready(function() {
+    $('#purchases_list').dataTable({
+      "order": [[ 0, "asc" ]]
+    });
+  });
+
   $(function() {
-    $( "#date_start" ).datepick({
-      defaultDate: "+1w",
+    $('#date_start,#date_end').datepick({
+      showTrigger: '<button type="button" class="trigger">...</button>'});
+  });
+
+  <!--  /* date pickers */ -->
+  $(function() {
+    $( "#date_start" ).datepick( {
+      defaultDate: "-1w",
       changeMonth: true,
       numberOfMonths: 3,
       onClose: function( selectedDate ) {
         $( "#to" ).datepick( "option", "minDate", selectedDate );
       }
     });
-    $( "#date_end" ).datepick({
-      defaultDate: "+1w",
+    $( "#date_end" ).datepick( {
+      //defaultDate: "+1w",
       changeMonth: true,
       numberOfMonths: 3,
       onClose: function( selectedDate ) {
@@ -50,65 +77,19 @@ $(function() {
       }
     });
   });
-</script>
 
-  <script>  /* attach a submit handler to the form */
+  /* attach a submit handler to the form */
   $("#purchases_search_form").submit(function(event) {
 
     /* stop form from submitting normally */
-    event.preventDefault(); 
+    event.preventDefault();
     /* get some values from elements on the page: */
     var $form = $( this ),
         url = $form.attr( 'action' );
     /* Send the data using post and put the results in a div */
-    $.post( url, $form.serialize(),
-      function( data ) {
-		$("#fullPage").empty().append(data);
-      }
-    );
+    $.post( url, $form.serialize(), function( data ) {
+      $("#fullPage").empty().append(data);
+    });
   });
 </script>
 
-<!--
-<div class="center notice" style="text-align:center;margin:10px 0;">{NoPurchasesText}</div>
--->
-
-<table id="transactions_search_result_navigation_top">
-  <thead>
-    <tr>
-      <th><a class="fade" href="index.html?page=admin/purchases.html&Start=0" target="_self" title="{FirstText}"><p class="nav">|&nbsp;<</p></a></th>
-	  <th><a class="fade" href="index.html?page=admin/purchases.html&Start={BackOne}" target="_self" title="{BackText}"><p class="nav"><</p></a></th>
-	  <th><p>{CurrentPageText} {CurrentPage}</p></th>
-	  <th><a class="fade" href="index.html?page=admin/purchases&Start={NextOne}" target="_self" title="{NextText}"><p class="nav">></p></a></th>
-	  <th><a class="fade" href="index.html?page=admin/purchases&Start=-1" target="_self" title="{LastText}"><p class="nav">>&nbsp;|</p></a></th>
-    </tr>
-  </thead>
-			
-</table>
-<table id="transactions_search_result">
-  <tbody>
-	  <thead class="listhead">
-		<tr>
-		  <th class="transactions_left"><p>{PurchaseDateText}</p></th>
-		  <th class="transactions_user"><p>{PurchaseAgentText}</p></th>
-		  <th class="transactions_user"><p>{LoggedIPText}</p></th>
-		  <th class="transactions_description"><p>{PurchaseDetailText}</p></th>
-		  <th class="transactions_value"><p>{PurchaseAmountText}</p></th>
-		  <th class="transactions_value"><p>{PurchaseRealAmountText}</p></th>
-		</tr>
-	  </thead>
-
-	{PurchasesListArrayBegin}
-    <tr>
-      <td class="transactions_left"><p>{PurchaseDate}</p></td>
-      <td class="transactions_user"><p>{AgentName}</p></td>
-      <td class="transactions_user"><p>{LoggedIP}</p></td>
-      <td class="transactions_description"><p>{Description}</p></td>
-      <td class="transactions_value"><p>{Amount}</p></td>
-      <td class="transactions_value"><p>{RealAmount}</p></td>
-    </tr>
-	{PurchasesListArrayEnd}
-  </tbody>
-</table>
-</div>
- 

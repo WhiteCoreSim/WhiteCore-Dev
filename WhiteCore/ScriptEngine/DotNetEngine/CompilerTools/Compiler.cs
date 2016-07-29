@@ -25,9 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.ConsoleFramework;
-using WhiteCore.Framework.ModuleLoader;
-using OpenMetaverse;
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
@@ -35,6 +32,9 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using OpenMetaverse;
+using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.ModuleLoader;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
 {
@@ -42,17 +42,17 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
     {
         #region Declares
 
-        private static UInt64 scriptCompileCounter; // And a counter
-        private readonly List<string> m_errors = new List<string>();
+        static ulong scriptCompileCounter; // And a counter
+        readonly List<string> m_errors = new List<string>();
 
-        private readonly List<string> m_referencedFiles = new List<string>();
-        private readonly ScriptEngine m_scriptEngine;
-        private readonly List<string> m_warnings = new List<string>();
+        readonly List<string> m_referencedFiles = new List<string>();
+        readonly ScriptEngine m_scriptEngine;
+        readonly List<string> m_warnings = new List<string>();
 
         public Dictionary<string, IScriptConverter> AllowedCompilers =
             new Dictionary<string, IScriptConverter>(StringComparer.CurrentCultureIgnoreCase);
 
-        private bool CompileWithDebugInformation;
+        bool CompileWithDebugInformation;
 
         // * Uses "LSL2Converter" to convert LSL to C# if necessary.
         // * Compiles C#-code into an assembly
@@ -61,16 +61,16 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
         // Assembly is compiled using LSL_BaseClass as base. Look at debug C# code file created when LSL script is compiled for full details.
         //
 
-        private string DefaultCompileLanguage;
-        private string FilePrefix;
-        private object PositionMap;
-        private bool WriteScriptSourceToDebugFile;
+        string DefaultCompileLanguage;
+        string FilePrefix;
+        object PositionMap;
+        bool WriteScriptSourceToDebugFile;
 
-        private List<IScriptConverter> converters = new List<IScriptConverter>();
+        List<IScriptConverter> converters = new List<IScriptConverter>();
 
         public bool firstStartup = true;
 
-        public static UInt64 ScriptCompileCounter
+        public static ulong ScriptCompileCounter
         {
             get { return scriptCompileCounter; }
         }
@@ -128,7 +128,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
 #endif
         }
 
-        private void MakeFilePrefixSafe()
+        void MakeFilePrefixSafe()
         {
             // Get file prefix from scriptengine name and make it file system safe:
             FilePrefix = "CommonCompiler";
@@ -138,7 +138,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
             }
         }
 
-        private void FindDefaultCompiler()
+        void FindDefaultCompiler()
         {
             // Allowed compilers
             string allowComp = m_scriptEngine.Config.GetString("AllowedCompilers", "lsl");
@@ -180,7 +180,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
             // We now have an allow-list, a mapping list, and a default language
         }
 
-        private void SetupCompilers()
+        void SetupCompilers()
         {
             converters = WhiteCoreModuleLoader.PickupModules<IScriptConverter>();
             foreach (IScriptConverter convert in converters)
@@ -189,7 +189,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
             }
         }
 
-        private void SetupApis()
+        void SetupApis()
         {
             //Get all of the Apis that are allowed (this does check for it)
             IScriptApi[] apis = m_scriptEngine.GetAPIs();
@@ -215,7 +215,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
         {
             assembly = "";
 
-            if (script == String.Empty)
+            if (script == string.Empty)
             {
                 AddError("No script text present");
                 return;
@@ -226,7 +226,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
 
             UUID assemblyGuid = UUID.Random();
 
-            assembly = CheckDirectories(assemblyGuid.ToString() + ".dll", assemblyGuid);
+            assembly = CheckDirectories(assemblyGuid + ".dll", assemblyGuid);
 
             IScriptConverter converter;
             string compileScript;
@@ -250,7 +250,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
         /// <returns></returns>
         public void PerformInMemoryScriptCompile(string Script, UUID itemID)
         {
-            if (Script == String.Empty)
+            if (Script == string.Empty)
             {
                 AddError("No script text present");
                 return;
@@ -291,7 +291,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
             return language;
         }
 
-        private void CheckLanguageAndConvert(string Script, UUID ownerID, out IScriptConverter converter,
+        void CheckLanguageAndConvert(string Script, UUID ownerID, out IScriptConverter converter,
                                              out string compileScript)
         {
             compileScript = Script;
@@ -355,7 +355,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
             }
         }
 
-        private string CheckDirectories(string assembly, UUID itemID)
+        string CheckDirectories(string assembly, UUID itemID)
         {
             string dirName = itemID.ToString().Substring(0, 3);
             if (!Directory.Exists(m_scriptEngine.ScriptEnginesPath))
@@ -383,7 +383,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
             return assembly;
         }
 
-        private string CheckAssembly(string assembly, int i)
+        string CheckAssembly(string assembly, int i)
         {
             if (File.Exists(assembly) || File.Exists(assembly.Remove(assembly.Length - 4) + ".pdb"))
             {
@@ -539,7 +539,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
                     string severity = CompErr.IsWarning ? "Warning" : "Error";
                     // Show 5 errors max, but check entire list for errors
 
-                    string errtext = String.Empty;
+                    string errtext = string.Empty;
                     string text = CompErr.ErrorText;
                     int LineN = 0;
                     int CharN = 0;
@@ -554,7 +554,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
 
                     // The Second Life viewer's script editor begins
                     // countingn lines and columns at 0, so we subtract 1.
-                    errtext += String.Format("({0},{1}): {3}: {2}\n",
+                    errtext += string.Format("({0},{1}): {3}: {2}\n",
                                              LineN, CharN, text, severity);
                     if (severity == "Error")
                         AddError(errtext);

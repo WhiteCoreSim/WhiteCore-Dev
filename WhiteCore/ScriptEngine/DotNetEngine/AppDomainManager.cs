@@ -44,33 +44,33 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
     /// </summary>
     public class AppDomainManager
     {
-        private readonly List<AppDomainStructure> appDomains =
-            new List<AppDomainStructure>();
+        readonly List<AppDomainStructure> appDomains = new List<AppDomainStructure> ();
 
-        private readonly object m_appDomainLock = new object();
-        private readonly ScriptEngine m_scriptEngine;
-        private int AppDomainNameCount;
-        private AppDomainStructure currentAD;
+        readonly object m_appDomainLock = new object ();
+        readonly ScriptEngine m_scriptEngine;
+        int AppDomainNameCount;
+        AppDomainStructure currentAD;
 
-        private bool loadAllScriptsIntoCurrentDomain;
-        private bool loadAllScriptsIntoOneDomain = true;
-        private string m_PermissionLevel = "Internet";
-        private int maxScriptsPerAppDomain = 1;
+        bool loadAllScriptsIntoCurrentDomain;
+        bool loadAllScriptsIntoOneDomain = true;
+        string m_PermissionLevel = "Internet";
+        int maxScriptsPerAppDomain = 1;
 
-        public AppDomainManager(ScriptEngine scriptEngine)
+        public AppDomainManager (ScriptEngine scriptEngine)
         {
             m_scriptEngine = scriptEngine;
-            ReadConfig();
+            ReadConfig ();
         }
 
-        public string PermissionLevel
-        {
+        public string PermissionLevel {
             get { return m_PermissionLevel; }
         }
 
-        public int NumberOfAppDomains
-        {
-            get { return appDomains.Count; }
+        public int NumberOfAppDomains {
+            get { 
+                lock (m_appDomainLock)
+                    return appDomains.Count;
+            }
         }
 
         // Internal list of all AppDomains
@@ -88,59 +88,56 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         }
 
         // Find a free AppDomain, creating one if necessary
-        private AppDomainStructure GetFreeAppDomain()
+        AppDomainStructure GetFreeAppDomain()
         {
+            // use only the current domain?
             if (loadAllScriptsIntoCurrentDomain)
             {
-                if (currentAD != null)
-                    return currentAD;
-                else
-                {
-                    lock (m_appDomainLock)
-                    {
-                        currentAD = new AppDomainStructure {CurrentAppDomain = AppDomain.CurrentDomain};
-                        AppDomain.CurrentDomain.AssemblyResolve += m_scriptEngine.AssemblyResolver.OnAssemblyResolve;
+                // existing?
+                lock (m_appDomainLock) {
+                    if (currentAD != null)
                         return currentAD;
-                    }
                 }
-            }
-            lock (m_appDomainLock)
-            {
-                if (loadAllScriptsIntoOneDomain)
-                {
-                    if (currentAD == null)
-                    {
-                        // Create a new current AppDomain
-                        currentAD = new AppDomainStructure {CurrentAppDomain = PrepareNewAppDomain()};
-                    }
-                }
-                else
-                {
-                    // Current full?
-                    if (currentAD != null &&
-                        currentAD.ScriptsLoaded >= maxScriptsPerAppDomain)
-                    {
-                        // Add it to AppDomains list and empty current
-                        lock (m_appDomainLock)
-                        {
-                            appDomains.Add(currentAD);
-                        }
-                        currentAD = null;
-                    }
-                    // No current
-                    if (currentAD == null)
-                    {
-                        // Create a new current AppDomain
-                        currentAD = new AppDomainStructure {CurrentAppDomain = PrepareNewAppDomain()};
-                    }
+
+                // create a new one then
+                lock (m_appDomainLock) {
+                    currentAD = new AppDomainStructure {CurrentAppDomain = AppDomain.CurrentDomain};
+                    AppDomain.CurrentDomain.AssemblyResolve += m_scriptEngine.AssemblyResolver.OnAssemblyResolve;
+                    return currentAD;
                 }
             }
 
-            return currentAD;
+
+            // use a single script domain?
+            if (loadAllScriptsIntoOneDomain) {
+                lock (m_appDomainLock) {
+                    if (currentAD == null) {
+                        // Create a new current AppDomain
+                        currentAD = new AppDomainStructure { CurrentAppDomain = PrepareNewAppDomain () };
+                    }
+                    return currentAD;
+                }
+            }
+
+            // multiple script domains then    
+            lock( m_appDomainLock) {
+                // Current full?
+                if (currentAD != null && currentAD.ScriptsLoaded >= maxScriptsPerAppDomain) {
+                    // Add it to AppDomains list and empty current
+                    appDomains.Add (currentAD);
+                    currentAD = null;
+                }
+                // NO or New current
+                if (currentAD == null) {
+                    // Create a new current AppDomain
+                    currentAD = new AppDomainStructure { CurrentAppDomain = PrepareNewAppDomain () };
+                }
+                return currentAD;
+            }
         }
 
         // Create and prepare a new AppDomain for scripts
-        private AppDomain PrepareNewAppDomain()
+        AppDomain PrepareNewAppDomain()
         {
             // Create and prepare a new AppDomain
             AppDomainNameCount++;
@@ -284,7 +281,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         }
 
         // Unload appdomains that are full and have only dead scripts
-        private void UnloadAppDomains()
+        void UnloadAppDomains()
         {
             lock (m_appDomainLock)
             {
@@ -299,14 +296,19 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                     try
                     {
                         // Unload
-                        if (ads != null) AppDomain.Unload(ads.CurrentAppDomain);
+                        if (ads != null) {
+                            AppDomain.Unload (ads.CurrentAppDomain);
+                            if (currentAD != null) {
+                                if (ads.CurrentAppDomain == currentAD.CurrentAppDomain)
+                                    currentAD = null;
+                            }
+                        }
                     }
                     catch
                     {
                     }
-                    if (ads.CurrentAppDomain == currentAD.CurrentAppDomain)
-                        currentAD = null;
-                    ads.CurrentAppDomain = null;
+                    if (ads != null)
+                        ads.CurrentAppDomain = null;
                 }
 
                 if (currentAD != null)
@@ -336,13 +338,15 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         {
             // Find next available AppDomain to put it in
             AppDomainStructure FreeAppDomain = GetFreeAppDomain();
-            IScript mbrt = (IScript)
-                           FreeAppDomain.CurrentAppDomain.CreateInstanceFromAndUnwrap(
+            lock (m_appDomainLock) {
+                IScript mbrt = (IScript)
+                           FreeAppDomain.CurrentAppDomain.CreateInstanceFromAndUnwrap (
                                fileName, typeName);
-            FreeAppDomain.ScriptsLoaded++;
-            ad = FreeAppDomain.CurrentAppDomain;
+                FreeAppDomain.ScriptsLoaded++;
+                ad = FreeAppDomain.CurrentAppDomain;
 
-            return mbrt;
+                return mbrt;
+            }
         }
 
 
@@ -374,7 +378,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
         #region Nested type: AppDomainStructure
 
-        private class AppDomainStructure
+        class AppDomainStructure
         {
             // The AppDomain itself
             public AppDomain CurrentAppDomain;

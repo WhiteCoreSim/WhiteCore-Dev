@@ -37,13 +37,13 @@ namespace WhiteCore.Framework.Servers.HttpServer
         public readonly int RequestTime;
         public readonly UUID RequestID;
 
-        public PollServiceHttpRequest(
+        public PollServiceHttpRequest (
             PollServiceEventArgs pPollServiceArgs, HttpListenerContext context)
         {
             PollServiceArgs = pPollServiceArgs;
             Context = context;
             RequestTime = System.Environment.TickCount;
-            RequestID = UUID.Random();
+            RequestID = UUID.Random ();
         }
     }
 }

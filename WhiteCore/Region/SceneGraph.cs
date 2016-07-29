@@ -26,6 +26,13 @@
  */
 
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.Packets;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
@@ -35,13 +42,6 @@ using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.SceneInfo.Entities;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.Packets;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 
 namespace WhiteCore.Region
 {
@@ -53,7 +53,7 @@ namespace WhiteCore.Region
     {
         #region Declares
 
-        protected internal EntityManager Entities = new EntityManager();
+        protected internal EntityManager Entities = new EntityManager ();
 
         protected RegionInfo m_regInfo;
         protected IScene m_parentScene;
@@ -66,16 +66,15 @@ namespace WhiteCore.Region
         /// </summary>
         protected uint m_lastAllocatedLocalId = 720000;
 
-        private readonly object _primAllocateLock = new object();
+        readonly object _primAllocateLock = new object ();
 
-        protected internal object m_syncRoot = new object();
+        protected internal object m_syncRoot = new object ();
 
         protected internal PhysicsScene _PhyScene;
 
-        private readonly Object m_updateLock = new Object();
+        readonly object m_updateLock = new object ();
 
-        public PhysicsScene PhysicsScene
-        {
+        public PhysicsScene PhysicsScene {
             get { return _PhyScene; }
             set { _PhyScene = value; }
         }
@@ -84,10 +83,10 @@ namespace WhiteCore.Region
 
         #region Constructor and close
 
-        protected internal SceneGraph(IScene parent, RegionInfo regInfo)
+        protected internal SceneGraph (IScene parent, RegionInfo regInfo)
         {
-            Random random = new Random();
-            m_lastAllocatedLocalId = (uint) (random.NextDouble()*(uint.MaxValue/2)) + uint.MaxValue/4;
+            Random random = new Random ();
+            m_lastAllocatedLocalId = ((uint)random.NextDouble () * (uint.MaxValue / 2)) + uint.MaxValue / 4;
             m_parentScene = parent;
             m_regInfo = regInfo;
 
@@ -95,17 +94,16 @@ namespace WhiteCore.Region
             m_parentScene.EventManager.OnNewClient += SubscribeToClientEvents;
             m_parentScene.EventManager.OnClosingClient += UnSubscribeToClientEvents;
 
-			IConfig whitecorestartupConfig = parent.Config.Configs["WhiteCoreStartup"];
-			if (whitecorestartupConfig != null)
-            {
-				m_DefaultObjectName = whitecorestartupConfig.GetString("DefaultObjectName", m_DefaultObjectName);
-				EnableFakeRaycasting = whitecorestartupConfig.GetBoolean("EnableFakeRaycasting", false);
+            IConfig whitecorestartupConfig = parent.Config.Configs ["WhiteCoreStartup"];
+            if (whitecorestartupConfig != null) {
+                m_DefaultObjectName = whitecorestartupConfig.GetString ("DefaultObjectName", m_DefaultObjectName);
+                EnableFakeRaycasting = whitecorestartupConfig.GetBoolean ("EnableFakeRaycasting", false);
             }
         }
 
-        protected internal void Close()
+        protected internal void Close ()
         {
-            Entities.Clear();
+            Entities.Clear ();
             //Remove the events
             m_parentScene.EventManager.OnNewClient -= SubscribeToClientEvents;
             m_parentScene.EventManager.OnClosingClient -= UnSubscribeToClientEvents;
@@ -115,7 +113,7 @@ namespace WhiteCore.Region
 
         #region Update Methods
 
-        protected internal void UpdatePreparePhysics()
+        protected internal void UpdatePreparePhysics ()
         {
             // If we are using a threaded physics engine
             // grab the latest scene from the engine before
@@ -123,108 +121,93 @@ namespace WhiteCore.Region
 
             // PhysX does this (runs in the background).
 
-            if (_PhyScene != null && _PhyScene.IsThreaded)
-            {
-                _PhyScene.GetResults();
+            if (_PhyScene != null && _PhyScene.IsThreaded) {
+                _PhyScene.GetResults ();
             }
         }
 
-        private readonly object m_taintedPresencesLock = new object();
-        private readonly List<IScenePresence> m_taintedPresences = new List<IScenePresence>();
+        readonly object m_taintedPresencesLock = new object ();
+        readonly List<IScenePresence> m_taintedPresences = new List<IScenePresence> ();
 
-        public void TaintPresenceForUpdate(IScenePresence presence, PresenceTaint taint)
+        public void TaintPresenceForUpdate (IScenePresence presence, PresenceTaint taint)
         {
-            lock (m_taintedPresencesLock)
-            {
+            lock (m_taintedPresencesLock) {
                 if (!presence.IsTainted) //We ONLY set the IsTainted under this lock, so we can trust it
-                    m_taintedPresences.Add(presence);
+                    m_taintedPresences.Add (presence);
                 presence.Taints |= taint;
             }
         }
 
-        protected internal void UpdateEntities()
+        protected internal void UpdateEntities ()
         {
-            IScenePresence[] presences;
-            lock (m_taintedPresencesLock)
-            {
-                presences = new IScenePresence[m_taintedPresences.Count];
-                m_taintedPresences.CopyTo(presences);
-                m_taintedPresences.Clear();
+            IScenePresence [] presences;
+            lock (m_taintedPresencesLock) {
+                presences = new IScenePresence [m_taintedPresences.Count];
+                m_taintedPresences.CopyTo (presences);
+                m_taintedPresences.Clear ();
             }
-            foreach (IScenePresence presence in presences)
-            {
+
+            foreach (IScenePresence presence in presences) {
                 presence.IsTainted = false;
                 //We set this first so that it is cleared out, but also so that the method can re-taint us
-                presence.Update();
+                presence.Update ();
             }
         }
 
-        protected internal void UpdatePhysics(float elapsed)
+        protected internal void UpdatePhysics (float elapsed)
         {
             if (_PhyScene == null)
                 return;
-            lock (m_syncRoot)
-            {
+            lock (m_syncRoot) {
                 // Update DisableCollisions 
                 _PhyScene.DisableCollisions = m_regInfo.RegionSettings.DisableCollisions;
 
-                _PhyScene.Simulate(elapsed);
+                _PhyScene.Simulate (elapsed);
             }
         }
 
-        private List<Vector3> m_oldCoarseLocations = new List<Vector3>();
-        private List<UUID> m_oldAvatarUUIDs = new List<UUID>();
+        List<Vector3> m_oldCoarseLocations = new List<Vector3> ();
+        List<UUID> m_oldAvatarUUIDs = new List<UUID> ();
 
-        public bool GetCoarseLocations(out List<Vector3> coarseLocations, out List<UUID> avatarUUIDs, uint maxLocations)
+        public bool GetCoarseLocations (out List<Vector3> coarseLocations, out List<UUID> avatarUUIDs, uint maxLocations)
         {
-            coarseLocations = new List<Vector3>();
-            avatarUUIDs = new List<UUID>();
+            coarseLocations = new List<Vector3> ();
+            avatarUUIDs = new List<UUID> ();
 
-            List<IScenePresence> presences = GetScenePresences();
-            for (int i = 0; i < Math.Min(presences.Count, maxLocations); i++)
-            {
-                IScenePresence sp = presences[i];
+            List<IScenePresence> presences = GetScenePresences ();
+            for (int i = 0; i < Math.Min (presences.Count, maxLocations); i++) {
+                IScenePresence sp = presences [i];
                 // If this presence is a child agent, we don't want its coarse locations
                 if (sp.IsChildAgent)
                     continue;
 
-                if (sp.ParentID != UUID.Zero)
-                {
+                if (sp.ParentID != UUID.Zero) {
                     // sitting avatar
-                    ISceneChildEntity sop = m_parentScene.GetSceneObjectPart(sp.ParentID);
-                    if (sop != null)
-                    {
-                        coarseLocations.Add(sop.AbsolutePosition + sp.OffsetPosition);
-                        avatarUUIDs.Add(sp.UUID);
-                    }
-                    else
-                    {
+                    ISceneChildEntity sop = m_parentScene.GetSceneObjectPart (sp.ParentID);
+                    if (sop != null) {
+                        coarseLocations.Add (sop.AbsolutePosition + sp.OffsetPosition);
+                        avatarUUIDs.Add (sp.UUID);
+                    } else {
                         // we can't find the parent..  ! arg!
-                        MainConsole.Instance.Warn("Could not find parent prim for avatar " + sp.Name);
-                        coarseLocations.Add(sp.AbsolutePosition);
-                        avatarUUIDs.Add(sp.UUID);
+                        MainConsole.Instance.Warn ("Could not find parent prim for avatar " + sp.Name);
+                        coarseLocations.Add (sp.AbsolutePosition);
+                        avatarUUIDs.Add (sp.UUID);
                     }
-                }
-                else
-                {
-                    coarseLocations.Add(sp.AbsolutePosition);
-                    avatarUUIDs.Add(sp.UUID);
+                } else {
+                    coarseLocations.Add (sp.AbsolutePosition);
+                    avatarUUIDs.Add (sp.UUID);
                 }
             }
 
-            if (m_oldCoarseLocations.Count == coarseLocations.Count)
-            {
-                List<UUID> foundAvies = new List<UUID>(m_oldAvatarUUIDs);
-                foreach (UUID t in avatarUUIDs)
-                {
-                    foundAvies.Remove(t);
+            if (m_oldCoarseLocations.Count == coarseLocations.Count) {
+                List<UUID> foundAvies = new List<UUID> (m_oldAvatarUUIDs);
+                foreach (UUID t in avatarUUIDs) {
+                    foundAvies.Remove (t);
                 }
-                if (foundAvies.Count == 0)
-                {
+                if (foundAvies.Count == 0) {
                     //All avies are still the same, check their locations now
-                    for (int i = 0; i < avatarUUIDs.Count; i++)
-                    {
-                        if (m_oldCoarseLocations[i].ApproxEquals(coarseLocations[i], 5))
+                    for (int i = 0; i < avatarUUIDs.Count; i++) {
+                        if (m_oldCoarseLocations [i].ApproxEquals (coarseLocations [i], 5))
                             continue;
                         m_oldCoarseLocations = coarseLocations;
                         m_oldAvatarUUIDs = avatarUUIDs;
@@ -236,6 +219,7 @@ namespace WhiteCore.Region
             }
             m_oldCoarseLocations = coarseLocations;
             m_oldAvatarUUIDs = avatarUUIDs;
+
             //Its changed, tell it to send new
             return true;
         }
@@ -244,37 +228,34 @@ namespace WhiteCore.Region
 
         #region Entity Methods
 
-        protected internal void HandleUndo(IClientAPI remoteClient, UUID primId)
+        protected internal void HandleUndo (IClientAPI remoteClient, UUID primId)
         {
-            if (primId != UUID.Zero)
-            {
-                ISceneChildEntity part = m_parentScene.GetSceneObjectPart(primId);
+            if (primId != UUID.Zero) {
+                ISceneChildEntity part = m_parentScene.GetSceneObjectPart (primId);
                 if (part != null)
-                    if (m_parentScene.Permissions.CanEditObject(part.UUID, remoteClient.AgentId))
-                        part.Undo();
+                    if (m_parentScene.Permissions.CanEditObject (part.UUID, remoteClient.AgentId))
+                        part.Undo ();
             }
         }
 
-        protected internal void HandleRedo(IClientAPI remoteClient, UUID primId)
+        protected internal void HandleRedo (IClientAPI remoteClient, UUID primId)
         {
-            if (primId != UUID.Zero)
-            {
-                ISceneChildEntity part = m_parentScene.GetSceneObjectPart(primId);
+            if (primId != UUID.Zero) {
+                ISceneChildEntity part = m_parentScene.GetSceneObjectPart (primId);
                 if (part != null)
-                    if (m_parentScene.Permissions.CanEditObject(part.UUID, remoteClient.AgentId))
-                        part.Redo();
+                    if (m_parentScene.Permissions.CanEditObject (part.UUID, remoteClient.AgentId))
+                        part.Redo ();
             }
         }
 
-        protected internal void HandleObjectGroupUpdate(
+        protected internal void HandleObjectGroupUpdate (
             IClientAPI remoteClient, UUID GroupID, uint LocalID, UUID Garbage)
         {
             IEntity entity;
-            if (TryGetEntity(LocalID, out entity))
-            {
-                if (m_parentScene.Permissions.CanEditObject(entity.UUID, remoteClient.AgentId))
-                    if (((ISceneEntity) entity).OwnerID == remoteClient.AgentId)
-                        ((ISceneEntity) entity).SetGroup(GroupID, remoteClient.AgentId, true);
+            if (TryGetEntity (LocalID, out entity)) {
+                if (m_parentScene.Permissions.CanEditObject (entity.UUID, remoteClient.AgentId))
+                    if (((ISceneEntity)entity).OwnerID == remoteClient.AgentId)
+                        ((ISceneEntity)entity).SetGroup (GroupID, remoteClient.AgentId, true);
             }
         }
 
@@ -282,9 +263,9 @@ namespace WhiteCore.Region
         ///     Add a presence to the scene
         /// </summary>
         /// <param name="presence"></param>
-        protected internal void AddScenePresence(IScenePresence presence)
+        protected internal void AddScenePresence (IScenePresence presence)
         {
-            AddEntity(presence, true);
+            AddEntity (presence, true);
             MainConsole.Instance.DebugFormat ("Adding {0} to {1} at {2}:{3}",
                 presence.Name, presence.Scene.RegionInfo.RegionName, presence.AbsolutePosition.X, presence.AbsolutePosition.Y);
         }
@@ -292,12 +273,11 @@ namespace WhiteCore.Region
         /// <summary>
         ///     Remove a presence from the scene
         /// </summary>
-        protected internal void RemoveScenePresence(IEntity agent)
+        protected internal void RemoveScenePresence (IEntity agent)
         {
-            if (!Entities.Remove(agent))
-            {
-                MainConsole.Instance.WarnFormat(
-                    "[SCENE]: Tried to remove non-existent scene presence with agent ID {0} from scene Entities list",
+            if (!Entities.Remove (agent)) {
+                MainConsole.Instance.WarnFormat (
+                    "[Scene]: Tried to remove non-existent scene presence with agent ID {0} from scene Entities list",
                     agent.UUID);
                 return;
             }
@@ -314,9 +294,9 @@ namespace WhiteCore.Region
         ///     pass a delegate to ForEachScenePresence.
         /// </summary>
         /// <returns></returns>
-        public List<IScenePresence> GetScenePresences()
+        public List<IScenePresence> GetScenePresences ()
         {
-            return Entities.GetPresences();
+            return Entities.GetPresences ();
         }
 
         /// <summary>
@@ -324,24 +304,22 @@ namespace WhiteCore.Region
         /// </summary>
         /// <param name="agentID"></param>
         /// <returns>null if the presence was not found</returns>
-        protected internal IScenePresence GetScenePresence(UUID agentID)
+        protected internal IScenePresence GetScenePresence (UUID agentID)
         {
             IScenePresence sp;
-            Entities.TryGetPresenceValue(agentID, out sp);
+            Entities.TryGetPresenceValue (agentID, out sp);
             return sp;
         }
 
         /// <summary>
         ///     Request the scene presence by name.
-        ///     NOTE: Deprecated, use the ScenePresence GetScenePresence (string Name) instead!
         /// </summary>
-        /// <param name="firstName"></param>
-        /// <param name="lastName"></param>
+        /// <param name="name"></param>
         /// <returns>null if the presence was not found</returns>
-        public IScenePresence GetScenePresence(string Name)
+        public IScenePresence GetScenePresence (string name)
         {
-            List<IScenePresence> presences = GetScenePresences();
-            return presences.FirstOrDefault(presence => presence.Name == Name);
+            List<IScenePresence> presences = GetScenePresences ();
+            return presences.FirstOrDefault (presence => presence.Name == name);
         }
 
         /// <summary>
@@ -349,22 +327,22 @@ namespace WhiteCore.Region
         /// </summary>
         /// <param name="localID"></param>
         /// <returns>null if the presence was not found</returns>
-        public IScenePresence GetScenePresence(uint localID)
+        public IScenePresence GetScenePresence (uint localID)
         {
-            List<IScenePresence> presences = GetScenePresences();
-            return presences.FirstOrDefault(presence => presence.LocalId == localID);
+            List<IScenePresence> presences = GetScenePresences ();
+            return presences.FirstOrDefault (presence => presence.LocalId == localID);
         }
 
-        protected internal bool TryGetScenePresence(UUID agentID, out IScenePresence avatar)
+        protected internal bool TryGetScenePresence (UUID agentID, out IScenePresence avatar)
         {
-            return Entities.TryGetPresenceValue(agentID, out avatar);
+            return Entities.TryGetPresenceValue (agentID, out avatar);
         }
 
-        protected internal bool TryGetAvatarByName(string name, out IScenePresence avatar)
+        protected internal bool TryGetAvatarByName (string name, out IScenePresence avatar)
         {
             avatar =
-                GetScenePresences()
-                    .FirstOrDefault(presence => String.Compare(name, presence.ControllingClient.Name, true) == 0);
+                GetScenePresences ()
+                    .FirstOrDefault (presence => string.Compare (name, presence.ControllingClient.Name, true) == 0);
 
             return (avatar != null);
         }
@@ -376,20 +354,17 @@ namespace WhiteCore.Region
         /// <param name="frontFacesOnly"></param>
         /// <param name="faceCenters"></param>
         /// <returns>null if no scene object group containing that prim is found</returns>
-        protected internal EntityIntersection GetClosestIntersectingPrim(Ray hray, bool frontFacesOnly, bool faceCenters)
+        protected internal EntityIntersection GetClosestIntersectingPrim (Ray hray, bool frontFacesOnly, bool faceCenters)
         {
             // Primitive Ray Tracing
             float closestDistance = 280f;
-            EntityIntersection result = new EntityIntersection();
-            ISceneEntity[] EntityList = Entities.GetEntities(hray.Origin, closestDistance);
-            foreach (ISceneEntity ent in EntityList)
-            {
-                if (ent is SceneObjectGroup)
-                {
-                    SceneObjectGroup reportingG = (SceneObjectGroup) ent;
-                    EntityIntersection inter = reportingG.TestIntersection(hray, frontFacesOnly, faceCenters);
-                    if (inter.HitTF && inter.distance < closestDistance)
-                    {
+            EntityIntersection result = new EntityIntersection ();
+            ISceneEntity [] EntityList = Entities.GetEntities (hray.Origin, closestDistance);
+            foreach (ISceneEntity ent in EntityList) {
+                if (ent is SceneObjectGroup) {
+                    SceneObjectGroup reportingG = (SceneObjectGroup)ent;
+                    EntityIntersection inter = reportingG.TestIntersection (hray, frontFacesOnly, faceCenters);
+                    if (inter.HitTF && inter.distance < closestDistance) {
                         closestDistance = inter.distance;
                         result = inter;
                     }
@@ -401,55 +376,49 @@ namespace WhiteCore.Region
         /// <summary>
         ///     Gets a list of scene object group that intersect with the given ray
         /// </summary>
-        public List<EntityIntersection> GetIntersectingPrims(Ray hray, float length, int count,
+        public List<EntityIntersection> GetIntersectingPrims (Ray hray, float length, int count,
                                                              bool frontFacesOnly, bool faceCenters, bool getAvatars,
                                                              bool getLand, bool getPrims)
         {
             // Primitive Ray Tracing
-            List<EntityIntersection> result = new List<EntityIntersection>(count);
-            if (getPrims)
-            {
-                ISceneEntity[] EntityList = Entities.GetEntities(hray.Origin, length);
+            List<EntityIntersection> result = new List<EntityIntersection> (count);
+            if (getPrims) {
+                ISceneEntity [] EntityList = Entities.GetEntities (hray.Origin, length);
 
-                result.AddRange(
-                    EntityList.OfType<SceneObjectGroup>()
-                              .Select(reportingG => reportingG.TestIntersection(hray, frontFacesOnly, faceCenters))
-                              .Where(inter => inter.HitTF));
+                result.AddRange (
+                    EntityList.OfType<SceneObjectGroup> ()
+                              .Select (reportingG => reportingG.TestIntersection (hray, frontFacesOnly, faceCenters))
+                              .Where (inter => inter.HitTF));
             }
-            if (getAvatars)
-            {
-                List<IScenePresence> presenceList = Entities.GetPresences();
-                foreach (IScenePresence ent in presenceList)
-                {
+            if (getAvatars) {
+                List<IScenePresence> presenceList = Entities.GetPresences ();
+                foreach (IScenePresence ent in presenceList) {
                     //Do rough approximation and keep the # of loops down
                     Vector3 newPos = hray.Origin;
-                    for (int i = 0; i < 100; i++)
-                    {
-                        newPos += ((Vector3.One*(length*(i/100)))*hray.Direction);
-                        if (ent.AbsolutePosition.ApproxEquals(newPos, ent.PhysicsActor.Size.X*2))
-                        {
-                            EntityIntersection intersection = new EntityIntersection();
-                            intersection.distance = length*(i/100);
+                    for (int i = 0; i < 100; i++) {
+                        newPos += ((Vector3.One * (length * (i / 100))) * hray.Direction);
+                        if (ent.AbsolutePosition.ApproxEquals (newPos, ent.PhysicsActor.Size.X * 2)) {
+                            EntityIntersection intersection = new EntityIntersection ();
+                            intersection.distance = length * (i / 100);
                             intersection.face = 0;
                             intersection.HitTF = true;
                             intersection.obj = ent;
                             intersection.ipoint = newPos;
                             intersection.normal = newPos;
-                            result.Add(intersection);
+                            result.Add (intersection);
                             break;
                         }
                     }
                 }
             }
-            if (getLand)
-            {
+            if (getLand) {
                 //TODO
             }
 
-            result.Sort((a, b) => a.distance.CompareTo(b.distance));
+            result.Sort ((a, b) => a.distance.CompareTo (b.distance));
 
             if (result.Count > count)
-                result.RemoveRange(count, result.Count - count);
+                result.RemoveRange (count, result.Count - count);
             return result;
         }
 
@@ -461,20 +430,16 @@ namespace WhiteCore.Region
         ///     Performs action on all scene object groups.
         /// </summary>
         /// <param name="action"></param>
-        protected internal void ForEachSceneEntity(Action<ISceneEntity> action)
+        protected internal void ForEachSceneEntity (Action<ISceneEntity> action)
         {
-            ISceneEntity[] objlist = Entities.GetEntities();
-            foreach (ISceneEntity obj in objlist)
-            {
-                try
-                {
-                    action(obj);
-                }
-                catch (Exception e)
-                {
+            ISceneEntity [] objlist = Entities.GetEntities ();
+            foreach (ISceneEntity obj in objlist) {
+                try {
+                    action (obj);
+                } catch (Exception e) {
                     // Catch it and move on. This includes situations where splist has inconsistent info
-                    MainConsole.Instance.WarnFormat("[SCENE]: Problem processing action in ForEachSOG: {0}",
-                                                    e.ToString());
+                    MainConsole.Instance.WarnFormat ("[Scene]: Problem processing action in ForEachSOG: {0}",
+                                                    e.ToString ());
                 }
             }
         }
@@ -485,7 +450,7 @@ namespace WhiteCore.Region
         ///     modify outside of the scope of the delegate.
         /// </summary>
         /// <param name="action"></param>
-        public void ForEachScenePresence(Action<IScenePresence> action)
+        public void ForEachScenePresence (Action<IScenePresence> action)
         {
             // Once all callers have their delegates configured for parallelism, we can unleash this
             /*
@@ -504,17 +469,13 @@ namespace WhiteCore.Region
             Parallel.ForEach<ScenePresence>(GetScenePresences(), protectedAction);
             */
             // For now, perform actions serially
-            List<IScenePresence> presences = new List<IScenePresence>(GetScenePresences());
-            foreach (IScenePresence sp in presences)
-            {
-                try
-                {
-                    action(sp);
-                }
-                catch (Exception e)
-                {
-                    MainConsole.Instance.Info("[BUG] in " + m_parentScene.RegionInfo.RegionName + ": " + e.ToString());
-                    MainConsole.Instance.Info("[BUG] Stack Trace: " + e.StackTrace);
+            List<IScenePresence> presences = new List<IScenePresence> (GetScenePresences ());
+            foreach (IScenePresence sp in presences) {
+                try {
+                    action (sp);
+                } catch (Exception e) {
+                    MainConsole.Instance.Info ("[BUG] in " + m_parentScene.RegionInfo.RegionName + ": " + e);
+                    MainConsole.Instance.Info ("[BUG] Stack Trace: " + e.StackTrace);
                 }
             }
         }
@@ -523,7 +484,7 @@ namespace WhiteCore.Region
 
         #region Client Event handlers
 
-        public void SubscribeToClientEvents(IClientAPI client)
+        public void SubscribeToClientEvents (IClientAPI client)
         {
             client.OnUpdatePrimGroupPosition += UpdatePrimPosition;
             client.OnUpdatePrimSinglePosition += UpdatePrimSinglePosition;
@@ -563,7 +524,7 @@ namespace WhiteCore.Region
             client.OnObjectDuplicateOnRay += doObjectDuplicateOnRay;
         }
 
-        public void UnSubscribeToClientEvents(IClientAPI client)
+        public void UnSubscribeToClientEvents (IClientAPI client)
         {
             client.OnUpdatePrimGroupPosition -= UpdatePrimPosition;
             client.OnUpdatePrimSinglePosition -= UpdatePrimSinglePosition;
@@ -601,143 +562,134 @@ namespace WhiteCore.Region
             client.OnObjectDuplicateOnRay -= doObjectDuplicateOnRay;
         }
 
-        public virtual void ProcessObjectGrab(uint localID, Vector3 offsetPos, IClientAPI remoteClient,
-                                              List<SurfaceTouchEventArgs> surfaceArgs)
+        public virtual void ProcessObjectGrab (uint localID, Vector3 offsetPos, IClientAPI remoteClient,
+                                               List<SurfaceTouchEventArgs> surfaceArgs)
         {
             SurfaceTouchEventArgs surfaceArg = null;
             if (surfaceArgs != null && surfaceArgs.Count > 0)
-                surfaceArg = surfaceArgs[0];
+                surfaceArg = surfaceArgs [0];
+
             ISceneChildEntity childPrim;
-            if (TryGetPart(localID, out childPrim))
-            {
+            if (TryGetPart (localID, out childPrim)) {
                 SceneObjectPart part = childPrim as SceneObjectPart;
-                if (part != null)
-                {
+
+                if (part != null) {
                     SceneObjectGroup obj = part.ParentGroup;
                     if (obj.RootPart.BlockGrab || obj.RootPart.BlockGrabObject)
                         return;
                     // Currently only grab/touch for the single prim
                     // the client handles rez correctly
-                    obj.ObjectGrabHandler(localID, offsetPos, remoteClient);
+                    obj.ObjectGrabHandler (localID, offsetPos, remoteClient);
 
                     // If the touched prim handles touches, deliver it
                     // If not, deliver to root prim
-                    m_parentScene.EventManager.TriggerObjectGrab(part, part, part.OffsetPosition, remoteClient,
-                                                                 surfaceArg);
-                    // Deliver to the root prim if the touched prim doesn't handle touches
-                    // or if we're meant to pass on touches anyway. Don't send to root prim
-                    // if prim touched is the root prim as we just did it
-                    if ((part.LocalId != obj.RootPart.LocalId))
-                    {
-                        const int PASS_IF_NOT_HANDLED = 0;
-                        const int PASS_ALWAYS = 1;
-                        const int PASS_NEVER = 2;
-                        if (part.PassTouch == PASS_NEVER)
-                        {
-                        }
-                        if (part.PassTouch == PASS_ALWAYS)
-                        {
-                            m_parentScene.EventManager.TriggerObjectGrab(obj.RootPart, part, part.OffsetPosition,
-                                                                         remoteClient, surfaceArg);
-                        }
-                        else if (((part.ScriptEvents & scriptEvents.touch_start) == 0) &&
-                                 part.PassTouch == PASS_IF_NOT_HANDLED) //If no event in this prim, pass to parent
-                        {
-                            m_parentScene.EventManager.TriggerObjectGrab(obj.RootPart, part, part.OffsetPosition,
-                                                                         remoteClient, surfaceArg);
+                    if (surfaceArg != null) {
+                        m_parentScene.EventManager.TriggerObjectGrab (part, part, part.OffsetPosition,
+                                                                      remoteClient, surfaceArg);
+                        // Deliver to the root prim if the touched prim doesn't handle touches
+                        // or if we're meant to pass on touches anyway. Don't send to root prim
+                        // if prim touched is the root prim as we just did it
+                        if ((part.LocalId != obj.RootPart.LocalId)) {
+                            const int PASS_IF_NOT_HANDLED = 0;
+                            const int PASS_ALWAYS = 1;
+                            const int PASS_NEVER = 2;
+                            if (part.PassTouch == PASS_NEVER) {
+                            }
+                            if (part.PassTouch == PASS_ALWAYS) {
+                                m_parentScene.EventManager.TriggerObjectGrab (obj.RootPart, part, part.OffsetPosition,
+                                                                             remoteClient, surfaceArg);
+                            } else if (((part.ScriptEvents & scriptEvents.touch_start) == 0) &&
+                                       part.PassTouch == PASS_IF_NOT_HANDLED) //If no event in this prim, pass to parent
+                            {
+                                m_parentScene.EventManager.TriggerObjectGrab (obj.RootPart, part, part.OffsetPosition,
+                                                                             remoteClient, surfaceArg);
+                            }
                         }
                     }
                 }
             }
         }
 
-        public virtual void ProcessObjectGrabUpdate(UUID objectID, Vector3 offset, Vector3 pos, IClientAPI remoteClient,
-                                                    List<SurfaceTouchEventArgs> surfaceArgs)
+        public virtual void ProcessObjectGrabUpdate (UUID objectID, Vector3 offset, Vector3 pos, IClientAPI remoteClient,
+                                                     List<SurfaceTouchEventArgs> surfaceArgs)
         {
             SurfaceTouchEventArgs surfaceArg = null;
             if (surfaceArgs != null && surfaceArgs.Count > 0)
-                surfaceArg = surfaceArgs[0];
+                surfaceArg = surfaceArgs [0];
 
             ISceneChildEntity childPrim;
 
-            if (TryGetPart(objectID, out childPrim))
-            {
+            if (TryGetPart (objectID, out childPrim)) {
                 SceneObjectPart part = childPrim as SceneObjectPart;
-                if (part != null)
-                {
+                if (part != null) {
                     SceneObjectGroup obj = part.ParentGroup;
                     if (obj.RootPart.BlockGrab || obj.RootPart.BlockGrabObject)
                         return;
 
                     // If the touched prim handles touches, deliver it
                     // If not, deliver to root prim
-                    m_parentScene.EventManager.TriggerObjectGrabbing(part, part, part.OffsetPosition, remoteClient,
-                                                                     surfaceArg);
-                    // Deliver to the root prim if the touched prim doesn't handle touches
-                    // or if we're meant to pass on touches anyway. Don't send to root prim
-                    // if prim touched is the root prim as we just did it
+                    if (surfaceArg != null) {
+                        m_parentScene.EventManager.TriggerObjectGrabbing (part, part, part.OffsetPosition,
+                                                                         remoteClient, surfaceArg);
+                        // Deliver to the root prim if the touched prim doesn't handle touches
+                        // or if we're meant to pass on touches anyway. Don't send to root prim
+                        // if prim touched is the root prim as we just did it
 
-                    if ((part.LocalId != obj.RootPart.LocalId))
-                    {
-                        const int PASS_IF_NOT_HANDLED = 0;
-                        const int PASS_ALWAYS = 1;
-                        const int PASS_NEVER = 2;
-                        if (part.PassTouch == PASS_NEVER)
-                        {
-                        }
-                        if (part.PassTouch == PASS_ALWAYS)
-                        {
-                            m_parentScene.EventManager.TriggerObjectGrabbing(obj.RootPart, part, part.OffsetPosition,
-                                                                             remoteClient, surfaceArg);
-                        }
-                        else if ((((part.ScriptEvents & scriptEvents.touch_start) == 0) ||
-                                  ((part.ScriptEvents & scriptEvents.touch) == 0)) &&
-                                 part.PassTouch == PASS_IF_NOT_HANDLED) //If no event in this prim, pass to parent
-                        {
-                            m_parentScene.EventManager.TriggerObjectGrabbing(obj.RootPart, part, part.OffsetPosition,
-                                                                             remoteClient, surfaceArg);
+                        if ((part.LocalId != obj.RootPart.LocalId)) {
+                            const int PASS_IF_NOT_HANDLED = 0;
+                            const int PASS_ALWAYS = 1;
+                            const int PASS_NEVER = 2;
+                            if (part.PassTouch == PASS_NEVER) {
+                            }
+                            if (part.PassTouch == PASS_ALWAYS) {
+                                m_parentScene.EventManager.TriggerObjectGrabbing (obj.RootPart, part, part.OffsetPosition,
+                                                                                 remoteClient, surfaceArg);
+                            } else if ((((part.ScriptEvents & scriptEvents.touch_start) == 0) ||
+                                        ((part.ScriptEvents & scriptEvents.touch) == 0)) &&
+                                       part.PassTouch == PASS_IF_NOT_HANDLED) //If no event in this prim, pass to parent
+                            {
+                                m_parentScene.EventManager.TriggerObjectGrabbing (obj.RootPart, part, part.OffsetPosition,
+                                                                                 remoteClient, surfaceArg);
+                            }
                         }
                     }
                 }
             }
         }
 
-        public virtual void ProcessObjectDeGrab(uint localID, IClientAPI remoteClient,
-                                                List<SurfaceTouchEventArgs> surfaceArgs)
+        public virtual void ProcessObjectDeGrab (uint localID, IClientAPI remoteClient,
+                                                 List<SurfaceTouchEventArgs> surfaceArgs)
         {
             SurfaceTouchEventArgs surfaceArg = null;
             if (surfaceArgs != null && surfaceArgs.Count > 0)
-                surfaceArg = surfaceArgs[0];
+                surfaceArg = surfaceArgs [0];
 
             ISceneChildEntity childPrim;
-            if (TryGetPart(localID, out childPrim))
-            {
+            if (TryGetPart (localID, out childPrim)) {
                 SceneObjectPart part = childPrim as SceneObjectPart;
-                if (part != null)
-                {
+                if (part != null) {
                     SceneObjectGroup obj = part.ParentGroup;
                     // If the touched prim handles touches, deliver it
                     // If not, deliver to root prim
-                    m_parentScene.EventManager.TriggerObjectDeGrab(part, part, remoteClient, surfaceArg);
+                    if (surfaceArg != null) {
+                        m_parentScene.EventManager.TriggerObjectDeGrab (part, part, remoteClient, surfaceArg);
 
-                    if ((part.LocalId != obj.RootPart.LocalId))
-                    {
-                        const int PASS_IF_NOT_HANDLED = 0;
-                        const int PASS_ALWAYS = 1;
-                        const int PASS_NEVER = 2;
-                        if (part.PassTouch == PASS_NEVER)
-                        {
-                        }
-                        if (part.PassTouch == PASS_ALWAYS)
-                        {
-                            m_parentScene.EventManager.TriggerObjectDeGrab(obj.RootPart, part, remoteClient, surfaceArg);
-                        }
-                        else if ((((part.ScriptEvents & scriptEvents.touch_start) == 0) ||
-                                  ((part.ScriptEvents & scriptEvents.touch_end) == 0)) &&
-                                 part.PassTouch == PASS_IF_NOT_HANDLED) //If no event in this prim, pass to parent
-                        {
-                            m_parentScene.EventManager.TriggerObjectDeGrab(obj.RootPart, part, remoteClient,
-                                                                           surfaceArg);
+                        if ((part.LocalId != obj.RootPart.LocalId)) {
+                            const int PASS_IF_NOT_HANDLED = 0;
+                            const int PASS_ALWAYS = 1;
+                            const int PASS_NEVER = 2;
+                            if (part.PassTouch == PASS_NEVER) {
+                            }
+
+                            if (part.PassTouch == PASS_ALWAYS) {
+                                m_parentScene.EventManager.TriggerObjectDeGrab (obj.RootPart, part, remoteClient, surfaceArg);
+                            } else if ((((part.ScriptEvents & scriptEvents.touch_start) == 0) ||
+                                        ((part.ScriptEvents & scriptEvents.touch_end) == 0)) &&
+                                       part.PassTouch == PASS_IF_NOT_HANDLED) //If no event in this prim, pass to parent
+                            {
+                                m_parentScene.EventManager.TriggerObjectDeGrab (obj.RootPart, part,
+                                                                                remoteClient, surfaceArg);
+                            }
                         }
                     }
                 }
@@ -757,37 +709,34 @@ namespace WhiteCore.Region
         /// <param name="scale"></param>
         /// <param name="FaceCenter"></param>
         /// <returns></returns>
-        public Vector3 GetNewRezLocation(Vector3 RayStart, Vector3 RayEnd, UUID RayTargetID, Quaternion rot,
+        public Vector3 GetNewRezLocation (Vector3 RayStart, Vector3 RayEnd, UUID RayTargetID, Quaternion rot,
                                          byte bypassRayCast, byte RayEndIsIntersection, bool frontFacesOnly,
                                          Vector3 scale, bool FaceCenter)
         {
             Vector3 pos = Vector3.Zero;
-            if (RayEndIsIntersection == 1)
-            {
+            if (RayEndIsIntersection == 1) {
                 pos = RayEnd;
                 return pos;
             }
 
-            if (RayTargetID != UUID.Zero)
-            {
-                ISceneChildEntity target = m_parentScene.GetSceneObjectPart(RayTargetID);
+            if (RayTargetID != UUID.Zero) {
+                ISceneChildEntity target = m_parentScene.GetSceneObjectPart (RayTargetID);
 
-                Vector3 direction = Vector3.Normalize(RayEnd - RayStart);
-                Vector3 AXOrigin = new Vector3(RayStart.X, RayStart.Y, RayStart.Z);
-                Vector3 AXdirection = new Vector3(direction.X, direction.Y, direction.Z);
+                Vector3 direction = Vector3.Normalize (RayEnd - RayStart);
+                Vector3 AXOrigin = new Vector3 (RayStart.X, RayStart.Y, RayStart.Z);
+                Vector3 AXdirection = new Vector3 (direction.X, direction.Y, direction.Z);
 
-                if (target != null)
-                {
+                if (target != null) {
                     pos = target.AbsolutePosition;
                     //MainConsole.Instance.Info("[OBJECT_REZ]: TargetPos: " + pos.ToString() + ", RayStart: " + RayStart.ToString() + ", RayEnd: " + RayEnd.ToString() + ", Volume: " + Util.GetDistanceTo(RayStart,RayEnd).ToString() + ", mag1: " + Util.GetMagnitude(RayStart).ToString() + ", mag2: " + Util.GetMagnitude(RayEnd).ToString());
 
                     // TODO: Raytrace better here
 
                     //EntityIntersection ei = m_sceneGraph.GetClosestIntersectingPrim(new Ray(AXOrigin, AXdirection));
-                    Ray NewRay = new Ray(AXOrigin, AXdirection);
+                    Ray NewRay = new Ray (AXOrigin, AXdirection);
 
                     // Ray Trace against target here
-                    EntityIntersection ei = target.TestIntersectionOBB(NewRay, Quaternion.Identity, frontFacesOnly,
+                    EntityIntersection ei = target.TestIntersectionOBB (NewRay, Quaternion.Identity, frontFacesOnly,
                                                                        FaceCenter);
 
                     // Un-comment out the following line to Get Raytrace results printed to the console.
@@ -795,17 +744,16 @@ namespace WhiteCore.Region
                     float ScaleOffset = 0.5f;
 
                     // If we hit something
-                    if (ei.HitTF)
-                    {
-                        Vector3 scaleComponent = new Vector3(ei.AAfaceNormal.X, ei.AAfaceNormal.Y, ei.AAfaceNormal.Z);
+                    if (ei.HitTF) {
+                        Vector3 scaleComponent = new Vector3 (ei.AAfaceNormal.X, ei.AAfaceNormal.Y, ei.AAfaceNormal.Z);
                         if (scaleComponent.X != 0) ScaleOffset = scale.X;
                         if (scaleComponent.Y != 0) ScaleOffset = scale.Y;
                         if (scaleComponent.Z != 0) ScaleOffset = scale.Z;
-                        ScaleOffset = Math.Abs(ScaleOffset);
-                        Vector3 intersectionpoint = new Vector3(ei.ipoint.X, ei.ipoint.Y, ei.ipoint.Z);
-                        Vector3 normal = new Vector3(ei.normal.X, ei.normal.Y, ei.normal.Z);
+                        ScaleOffset = Math.Abs (ScaleOffset);
+                        Vector3 intersectionpoint = new Vector3 (ei.ipoint.X, ei.ipoint.Y, ei.ipoint.Z);
+                        Vector3 normal = new Vector3 (ei.normal.X, ei.normal.Y, ei.normal.Z);
                         // Set the position to the intersection point
-                        Vector3 offset = (normal*(ScaleOffset/2f));
+                        Vector3 offset = (normal * (ScaleOffset / 2f));
                         pos = (intersectionpoint + offset);
 
                         //Seems to make no sense to do this as this call is used for rezzing from inventory as well, and with inventory items their size is not always 0.5f
@@ -815,17 +763,15 @@ namespace WhiteCore.Region
                     }
 
                     return pos;
-                }
-                else
-                {
+                } else {
                     // We don't have a target here, so we're going to raytrace all the objects in the scene.
 
-                    EntityIntersection ei = GetClosestIntersectingPrim(new Ray(AXOrigin, AXdirection), true, false);
+                    EntityIntersection ei = GetClosestIntersectingPrim (new Ray (AXOrigin, AXdirection), true, false);
 
                     // Un-comment the following line to print the raytrace results to the console.
                     //MainConsole.Instance.Info("[RAYTRACERESULTS]: Hit:" + ei.HitTF.ToString() + " Point: " + ei.ipoint.ToString() + " Normal: " + ei.normal.ToString());
 
-                    pos = ei.HitTF ? new Vector3(ei.ipoint.X, ei.ipoint.Y, ei.ipoint.Z) : RayEnd;
+                    pos = ei.HitTF ? new Vector3 (ei.ipoint.X, ei.ipoint.Y, ei.ipoint.Z) : RayEnd;
 
                     return pos;
                 }
@@ -835,27 +781,24 @@ namespace WhiteCore.Region
 
             //increase height so its above the ground.
             //should be getting the normal of the ground at the rez point and using that?
-            pos.Z += scale.Z/2f;
+            pos.Z += scale.Z / 2f;
             return pos;
         }
 
-        public virtual void AddNewPrim(UUID ownerID, UUID groupID, Vector3 RayEnd, Quaternion rot,
+        public virtual void AddNewPrim (UUID ownerID, UUID groupID, Vector3 RayEnd, Quaternion rot,
                                        PrimitiveBaseShape shape,
                                        byte bypassRaycast, Vector3 RayStart, UUID RayTargetID,
                                        byte RayEndIsIntersection)
         {
-            Vector3 pos = GetNewRezLocation(RayStart, RayEnd, RayTargetID, rot, bypassRaycast, RayEndIsIntersection,
-                                            true, new Vector3(0.5f, 0.5f, 0.5f), false);
+            Vector3 pos = GetNewRezLocation (RayStart, RayEnd, RayTargetID, rot, bypassRaycast, RayEndIsIntersection,
+                                            true, new Vector3 (0.5f, 0.5f, 0.5f), false);
 
             string reason;
-            if (m_parentScene.Permissions.CanRezObject(1, ownerID, pos, out reason))
-            {
-                AddNewPrim(ownerID, groupID, pos, rot, shape);
-            }
-            else
-            {
-                GetScenePresence(ownerID)
-                    .ControllingClient.SendAlertMessage("You do not have permission to rez objects here: " + reason);
+            if (m_parentScene.Permissions.CanRezObject (1, ownerID, pos, out reason)) {
+                AddNewPrim (ownerID, groupID, pos, rot, shape);
+            } else {
+                GetScenePresence (ownerID)
+                    .ControllingClient.SendAlertMessage ("You do not have permission to rez objects here: " + reason);
             }
         }
 
@@ -867,25 +810,22 @@ namespace WhiteCore.Region
         /// <param name="pos"></param>
         /// <param name="rot"></param>
         /// <param name="shape"></param>
-        public virtual ISceneEntity AddNewPrim(
+        public virtual ISceneEntity AddNewPrim (
             UUID ownerID, UUID groupID, Vector3 pos, Quaternion rot, PrimitiveBaseShape shape)
         {
-            SceneObjectGroup sceneObject = new SceneObjectGroup(ownerID, pos, rot, shape, m_DefaultObjectName,
+            SceneObjectGroup sceneObject = new SceneObjectGroup (ownerID, pos, rot, shape, m_DefaultObjectName,
                                                                 m_parentScene);
 
             // If an entity creator has been registered for this prim type then use that
-            if (m_entityCreators.ContainsKey((PCode) shape.PCode))
-            {
+            if (m_entityCreators.ContainsKey ((PCode)shape.PCode)) {
                 sceneObject =
                     (SceneObjectGroup)
-                    m_entityCreators[(PCode) shape.PCode].CreateEntity(sceneObject, ownerID, groupID, pos, rot, shape);
-            }
-            else
-            {
+                    m_entityCreators [(PCode)shape.PCode].CreateEntity (sceneObject, ownerID, groupID, pos, rot, shape);
+            } else {
                 // Otherwise, use this default creation code;
-                sceneObject.SetGroup(groupID, ownerID, false);
-                AddPrimToScene(sceneObject);
-                sceneObject.ScheduleGroupUpdate(PrimUpdateFlags.ForcedFullUpdate);
+                sceneObject.SetGroup (groupID, ownerID, false);
+                AddPrimToScene (sceneObject);
+                sceneObject.ScheduleGroupUpdate (PrimUpdateFlags.ForcedFullUpdate);
             }
 
 
@@ -907,38 +847,35 @@ namespace WhiteCore.Region
         /// <param name="RayEndIsIntersection">The End specified is the place to add the object</param>
         /// <param name="CopyCenters">Position the object at the center of the face that it's colliding with</param>
         /// <param name="CopyRotates">Rotate the object the same as the localID object</param>
-        public void doObjectDuplicateOnRay(uint localID, uint dupeFlags, UUID AgentID, UUID GroupID,
+        public void doObjectDuplicateOnRay (uint localID, uint dupeFlags, UUID AgentID, UUID GroupID,
                                            UUID RayTargetObj, Vector3 RayEnd, Vector3 RayStart,
                                            bool BypassRaycast, bool RayEndIsIntersection, bool CopyCenters,
                                            bool CopyRotates)
         {
             const bool frontFacesOnly = true;
             //MainConsole.Instance.Info("HITTARGET: " + RayTargetObj.ToString() + ", COPYTARGET: " + localID.ToString());
-            ISceneChildEntity target = m_parentScene.GetSceneObjectPart(localID);
-            ISceneChildEntity target2 = m_parentScene.GetSceneObjectPart(RayTargetObj);
-            IScenePresence Sp = GetScenePresence(AgentID);
-            if (target != null && target2 != null)
-            {
+            ISceneChildEntity target = m_parentScene.GetSceneObjectPart (localID);
+            ISceneChildEntity target2 = m_parentScene.GetSceneObjectPart (RayTargetObj);
+            IScenePresence Sp = GetScenePresence (AgentID);
+            if (target != null && target2 != null) {
                 Vector3 pos;
-                if (EnableFakeRaycasting)
-                {
+                if (EnableFakeRaycasting) {
                     RayStart = Sp.CameraPosition;
                     RayEnd = pos = target2.AbsolutePosition;
                 }
-                Vector3 direction = Vector3.Normalize(RayEnd - RayStart);
-                Vector3 AXOrigin = new Vector3(RayStart.X, RayStart.Y, RayStart.Z);
-                Vector3 AXdirection = new Vector3(direction.X, direction.Y, direction.Z);
+                Vector3 direction = Vector3.Normalize (RayEnd - RayStart);
+                Vector3 AXOrigin = new Vector3 (RayStart.X, RayStart.Y, RayStart.Z);
+                Vector3 AXdirection = new Vector3 (direction.X, direction.Y, direction.Z);
 
-                if (target2.ParentEntity != null)
-                {
+                if (target2.ParentEntity != null) {
                     pos = target2.AbsolutePosition;
                     // TODO: Raytrace better here
 
                     //EntityIntersection ei = m_sceneGraph.GetClosestIntersectingPrim(new Ray(AXOrigin, AXdirection), false, false);
-                    Ray NewRay = new Ray(AXOrigin, AXdirection);
+                    Ray NewRay = new Ray (AXOrigin, AXdirection);
 
                     // Ray Trace against target here
-                    EntityIntersection ei = target2.TestIntersectionOBB(NewRay, Quaternion.Identity, frontFacesOnly,
+                    EntityIntersection ei = target2.TestIntersectionOBB (NewRay, Quaternion.Identity, frontFacesOnly,
                                                                         CopyCenters);
 
                     // Un-comment out the following line to Get Raytrace results printed to the console.
@@ -946,33 +883,29 @@ namespace WhiteCore.Region
                     float ScaleOffset = 0.5f;
 
                     // If we hit something
-                    if (ei.HitTF)
-                    {
+                    if (ei.HitTF) {
                         Vector3 scale = target.Scale;
-                        Vector3 scaleComponent = new Vector3(ei.AAfaceNormal.X, ei.AAfaceNormal.Y, ei.AAfaceNormal.Z);
+                        Vector3 scaleComponent = new Vector3 (ei.AAfaceNormal.X, ei.AAfaceNormal.Y, ei.AAfaceNormal.Z);
                         if (scaleComponent.X != 0) ScaleOffset = scale.X;
                         if (scaleComponent.Y != 0) ScaleOffset = scale.Y;
                         if (scaleComponent.Z != 0) ScaleOffset = scale.Z;
-                        ScaleOffset = Math.Abs(ScaleOffset);
-                        Vector3 intersectionpoint = new Vector3(ei.ipoint.X, ei.ipoint.Y, ei.ipoint.Z);
-                        Vector3 normal = new Vector3(ei.normal.X, ei.normal.Y, ei.normal.Z);
-                        Vector3 offset = normal*(ScaleOffset/2f);
+                        ScaleOffset = Math.Abs (ScaleOffset);
+                        Vector3 intersectionpoint = new Vector3 (ei.ipoint.X, ei.ipoint.Y, ei.ipoint.Z);
+                        Vector3 normal = new Vector3 (ei.normal.X, ei.normal.Y, ei.normal.Z);
+                        Vector3 offset = normal * (ScaleOffset / 2f);
                         pos = intersectionpoint + offset;
 
                         // stick in offset format from the original prim
                         pos = pos - target.ParentEntity.AbsolutePosition;
-                        if (CopyRotates)
-                        {
-                            Quaternion worldRot = target2.GetWorldRotation();
+                        if (CopyRotates) {
+                            Quaternion worldRot = target2.GetWorldRotation ();
 
                             // SceneObjectGroup obj = m_sceneGraph.DuplicateObject(localID, pos, target.GetEffectiveObjectFlags(), AgentID, GroupID, worldRot);
-                            DuplicateObject(localID, pos, target.GetEffectiveObjectFlags(), AgentID, GroupID, worldRot);
+                            DuplicateObject (localID, pos, target.GetEffectiveObjectFlags (), AgentID, GroupID, worldRot);
                             //obj.Rotation = worldRot;
                             //obj.UpdateGroupRotationR(worldRot);
-                        }
-                        else
-                        {
-                            DuplicateObject(localID, pos, target.GetEffectiveObjectFlags(), AgentID, GroupID,
+                        } else {
+                            DuplicateObject (localID, pos, target.GetEffectiveObjectFlags (), AgentID, GroupID,
                                             Quaternion.Identity);
                         }
                     }
@@ -987,15 +920,13 @@ namespace WhiteCore.Region
         /// <value>
         ///     Registered classes that are capable of creating entities.
         /// </value>
-        protected Dictionary<PCode, IEntityCreator> m_entityCreators = new Dictionary<PCode, IEntityCreator>();
+        protected Dictionary<PCode, IEntityCreator> m_entityCreators = new Dictionary<PCode, IEntityCreator> ();
 
-        public void RegisterEntityCreatorModule(IEntityCreator entityCreator)
+        public void RegisterEntityCreatorModule (IEntityCreator entityCreator)
         {
-            lock (m_entityCreators)
-            {
-                foreach (PCode pcode in entityCreator.CreationCapabilities)
-                {
-                    m_entityCreators[pcode] = entityCreator;
+            lock (m_entityCreators) {
+                foreach (PCode pcode in entityCreator.CreationCapabilities) {
+                    m_entityCreators [pcode] = entityCreator;
                 }
             }
         }
@@ -1004,73 +935,63 @@ namespace WhiteCore.Region
         ///     Unregister a module commander and all its commands
         /// </summary>
         /// <param name="entityCreator"></param>
-        public void UnregisterEntityCreatorCommander(IEntityCreator entityCreator)
+        public void UnregisterEntityCreatorCommander (IEntityCreator entityCreator)
         {
-            lock (m_entityCreators)
-            {
-                foreach (PCode pcode in entityCreator.CreationCapabilities)
-                {
-                    m_entityCreators[pcode] = null;
+            lock (m_entityCreators) {
+                foreach (PCode pcode in entityCreator.CreationCapabilities) {
+                    m_entityCreators [pcode] = null;
                 }
             }
         }
 
-        protected internal void ObjectOwner(IClientAPI remoteClient, UUID ownerID, UUID groupID, List<uint> localIDs)
+        protected internal void ObjectOwner (IClientAPI remoteClient, UUID ownerID, UUID groupID, List<uint> localIDs)
         {
-            if (!m_parentScene.Permissions.IsGod(remoteClient.AgentId))
-            {
+            if (!m_parentScene.Permissions.IsGod (remoteClient.AgentId)) {
                 if (ownerID != UUID.Zero)
                     return;
 
-                if (!m_parentScene.Permissions.CanDeedObject(remoteClient.AgentId, groupID))
+                if (!m_parentScene.Permissions.CanDeedObject (remoteClient.AgentId, groupID))
                     return;
             }
 
-            List<ISceneEntity> groups = new List<ISceneEntity>();
+            List<ISceneEntity> groups = new List<ISceneEntity> ();
 
-            foreach (uint localID in localIDs)
-            {
-                ISceneChildEntity part = m_parentScene.GetSceneObjectPart(localID);
-                if (!groups.Contains(part.ParentEntity))
-                    groups.Add(part.ParentEntity);
+            foreach (uint localID in localIDs) {
+                ISceneChildEntity part = m_parentScene.GetSceneObjectPart (localID);
+                if (!groups.Contains (part.ParentEntity))
+                    groups.Add (part.ParentEntity);
             }
 
-            foreach (ISceneEntity sog in groups)
-            {
-                if (ownerID != UUID.Zero)
-                {
-                    sog.SetOwnerId(ownerID);
-                    sog.SetGroup(groupID, remoteClient.AgentId, true);
-                    sog.ScheduleGroupUpdate(PrimUpdateFlags.ForcedFullUpdate);
+            foreach (ISceneEntity sog in groups) {
+                if (ownerID != UUID.Zero) {
+                    sog.SetOwnerId (ownerID);
+                    sog.SetGroup (groupID, remoteClient.AgentId, true);
+                    sog.ScheduleGroupUpdate (PrimUpdateFlags.ForcedFullUpdate);
 
-                    foreach (ISceneChildEntity child in sog.ChildrenEntities())
-                        child.Inventory.ChangeInventoryOwner(ownerID);
-                }
-                else
-                {
-                    if (!m_parentScene.Permissions.CanEditObject(sog.UUID, remoteClient.AgentId))
+                    foreach (ISceneChildEntity child in sog.ChildrenEntities ())
+                        child.Inventory.ChangeInventoryOwner (ownerID);
+                } else {
+                    if (!m_parentScene.Permissions.CanEditObject (sog.UUID, remoteClient.AgentId))
                         continue;
 
                     if (sog.GroupID != groupID)
                         continue;
 
-                    foreach (ISceneChildEntity child in sog.ChildrenEntities())
-                    {
+                    foreach (ISceneChildEntity child in sog.ChildrenEntities ()) {
                         child.LastOwnerID = child.OwnerID;
-                        child.Inventory.ChangeInventoryOwner(groupID);
+                        child.Inventory.ChangeInventoryOwner (groupID);
                     }
 
-                    sog.SetOwnerId(groupID);
-                    sog.ApplyNextOwnerPermissions();
+                    sog.SetOwnerId (groupID);
+                    sog.ApplyNextOwnerPermissions ();
                 }
                 //Trigger the prim count event so that this parcel gets changed!
-                m_parentScene.WhiteCoreEventManager.FireGenericEventHandler("ObjectChangedOwner", sog);
+                m_parentScene.WhiteCoreEventManager.FireGenericEventHandler ("ObjectChangedOwner", sog);
             }
 
-            foreach (uint localID in localIDs)
-            {
-                ISceneChildEntity part = m_parentScene.GetSceneObjectPart(localID);
-                part.GetProperties(remoteClient);
+            foreach (uint localID in localIDs) {
+                ISceneChildEntity part = m_parentScene.GetSceneObjectPart (localID);
+                part.GetProperties (remoteClient);
             }
         }
 
@@ -1079,44 +1000,37 @@ namespace WhiteCore.Region
         /// <param name="LocalID"></param>
         /// <param name="scale"></param>
         /// <param name="remoteClient"></param>
-        protected internal void UpdatePrimScale(uint LocalID, Vector3 scale, IClientAPI remoteClient)
+        protected internal void UpdatePrimScale (uint LocalID, Vector3 scale, IClientAPI remoteClient)
         {
             IEntity entity;
-            if (TryGetEntity(LocalID, out entity))
-            {
-                if (m_parentScene.Permissions.CanEditObject(((SceneObjectGroup) entity).UUID, remoteClient.AgentId))
-                {
-                    ((SceneObjectGroup) entity).Resize(scale, LocalID);
+            if (TryGetEntity (LocalID, out entity)) {
+                if (m_parentScene.Permissions.CanEditObject (((SceneObjectGroup)entity).UUID, remoteClient.AgentId)) {
+                    ((SceneObjectGroup)entity).Resize (scale, LocalID);
                 }
             }
         }
 
-        protected internal void UpdatePrimGroupScale(uint LocalID, Vector3 scale, IClientAPI remoteClient)
+        protected internal void UpdatePrimGroupScale (uint LocalID, Vector3 scale, IClientAPI remoteClient)
         {
             IEntity entity;
-            if (TryGetEntity(LocalID, out entity))
-            {
-                if (m_parentScene.Permissions.CanEditObject(entity.UUID, remoteClient.AgentId))
-                {
-                    ((SceneObjectGroup) entity).GroupResize(scale, LocalID);
+            if (TryGetEntity (LocalID, out entity)) {
+                if (m_parentScene.Permissions.CanEditObject (entity.UUID, remoteClient.AgentId)) {
+                    ((SceneObjectGroup)entity).GroupResize (scale, LocalID);
                 }
             }
         }
 
-        public void HandleObjectPermissionsUpdate(IClientAPI controller, UUID agentID, UUID sessionID, byte field,
+        public void HandleObjectPermissionsUpdate (IClientAPI controller, UUID agentID, UUID sessionID, byte field,
                                                   uint localId, uint mask, byte set)
         {
             // Check for spoofing..  since this is permissions we're talking about here!
-            if ((controller.SessionId == sessionID) && (controller.AgentId == agentID))
-            {
+            if ((controller.SessionId == sessionID) && (controller.AgentId == agentID)) {
                 // Tell the object to do permission update
-                if (localId != 0)
-                {
-                    ISceneEntity chObjectGroup = m_parentScene.GetGroupByPrim(localId);
-                    if (chObjectGroup != null)
-                    {
-                        if (m_parentScene.Permissions.CanEditObject(chObjectGroup.UUID, controller.AgentId))
-                            chObjectGroup.UpdatePermissions(agentID, field, localId, mask, set);
+                if (localId != 0) {
+                    ISceneEntity chObjectGroup = m_parentScene.GetGroupByPrim (localId);
+                    if (chObjectGroup != null) {
+                        if (m_parentScene.Permissions.CanEditObject (chObjectGroup.UUID, controller.AgentId))
+                            chObjectGroup.UpdatePermissions (agentID, field, localId, mask, set);
                     }
                 }
             }
@@ -1130,14 +1044,13 @@ namespace WhiteCore.Region
         /// <param name="AgentID"></param>
         /// <param name="RequestFlags"></param>
         /// <param name="ObjectID"></param>
-        protected internal void RequestObjectPropertiesFamily(
+        protected internal void RequestObjectPropertiesFamily (
             IClientAPI remoteClient, UUID AgentID, uint RequestFlags, UUID ObjectID)
         {
             IEntity group;
-            if (TryGetEntity(ObjectID, out group))
-            {
+            if (TryGetEntity (ObjectID, out group)) {
                 if (group is SceneObjectGroup)
-                    ((SceneObjectGroup) group).ServiceObjectPropertiesFamilyRequest(remoteClient, AgentID, RequestFlags);
+                    ((SceneObjectGroup)group).ServiceObjectPropertiesFamilyRequest (remoteClient, AgentID, RequestFlags);
             }
         }
 
@@ -1146,14 +1059,12 @@ namespace WhiteCore.Region
         /// <param name="LocalID"></param>
         /// <param name="rot"></param>
         /// <param name="remoteClient"></param>
-        protected internal void UpdatePrimSingleRotation(uint LocalID, Quaternion rot, IClientAPI remoteClient)
+        protected internal void UpdatePrimSingleRotation (uint LocalID, Quaternion rot, IClientAPI remoteClient)
         {
             IEntity entity;
-            if (TryGetEntity(LocalID, out entity))
-            {
-                if (m_parentScene.Permissions.CanMoveObject(((SceneObjectGroup) entity).UUID, remoteClient.AgentId))
-                {
-                    ((SceneObjectGroup) entity).UpdateSingleRotation(rot, LocalID);
+            if (TryGetEntity (LocalID, out entity)) {
+                if (m_parentScene.Permissions.CanMoveObject (((SceneObjectGroup)entity).UUID, remoteClient.AgentId)) {
+                    ((SceneObjectGroup)entity).UpdateSingleRotation (rot, LocalID);
                 }
             }
         }
@@ -1164,15 +1075,13 @@ namespace WhiteCore.Region
         /// <param name="rot"></param>
         /// <param name="pos"></param>
         /// <param name="remoteClient"></param>
-        protected internal void UpdatePrimSingleRotationPosition(uint LocalID, Quaternion rot, Vector3 pos,
+        protected internal void UpdatePrimSingleRotationPosition (uint LocalID, Quaternion rot, Vector3 pos,
                                                                  IClientAPI remoteClient)
         {
             IEntity entity;
-            if (TryGetEntity(LocalID, out entity))
-            {
-                if (m_parentScene.Permissions.CanMoveObject(((SceneObjectGroup) entity).UUID, remoteClient.AgentId))
-                {
-                    ((SceneObjectGroup) entity).UpdateSingleRotation(rot, pos, LocalID);
+            if (TryGetEntity (LocalID, out entity)) {
+                if (m_parentScene.Permissions.CanMoveObject (((SceneObjectGroup)entity).UUID, remoteClient.AgentId)) {
+                    ((SceneObjectGroup)entity).UpdateSingleRotation (rot, pos, LocalID);
                 }
             }
         }
@@ -1182,14 +1091,12 @@ namespace WhiteCore.Region
         /// <param name="LocalID"></param>
         /// <param name="rot"></param>
         /// <param name="remoteClient"></param>
-        protected internal void UpdatePrimRotation(uint LocalID, Quaternion rot, IClientAPI remoteClient)
+        protected internal void UpdatePrimRotation (uint LocalID, Quaternion rot, IClientAPI remoteClient)
         {
             IEntity entity;
-            if (TryGetEntity(LocalID, out entity))
-            {
-                if (m_parentScene.Permissions.CanMoveObject(((SceneObjectGroup) entity).UUID, remoteClient.AgentId))
-                {
-                    ((SceneObjectGroup) entity).UpdateGroupRotationR(rot);
+            if (TryGetEntity (LocalID, out entity)) {
+                if (m_parentScene.Permissions.CanMoveObject (((SceneObjectGroup)entity).UUID, remoteClient.AgentId)) {
+                    ((SceneObjectGroup)entity).UpdateGroupRotationR (rot);
                 }
             }
         }
@@ -1200,14 +1107,12 @@ namespace WhiteCore.Region
         /// <param name="pos"></param>
         /// <param name="rot"></param>
         /// <param name="remoteClient"></param>
-        protected internal void UpdatePrimRotation(uint LocalID, Vector3 pos, Quaternion rot, IClientAPI remoteClient)
+        protected internal void UpdatePrimRotation (uint LocalID, Vector3 pos, Quaternion rot, IClientAPI remoteClient)
         {
             IEntity entity;
-            if (TryGetEntity(LocalID, out entity))
-            {
-                if (m_parentScene.Permissions.CanMoveObject(((SceneObjectGroup) entity).UUID, remoteClient.AgentId))
-                {
-                    ((SceneObjectGroup) entity).UpdateGroupRotationPR(pos, rot);
+            if (TryGetEntity (LocalID, out entity)) {
+                if (m_parentScene.Permissions.CanMoveObject (((SceneObjectGroup)entity).UUID, remoteClient.AgentId)) {
+                    ((SceneObjectGroup)entity).UpdateGroupRotationPR (pos, rot);
                 }
             }
         }
@@ -1219,16 +1124,14 @@ namespace WhiteCore.Region
         /// <param name="pos"></param>
         /// <param name="remoteClient"></param>
         /// <param name="SaveUpdate"></param>
-        protected internal void UpdatePrimSinglePosition(uint LocalID, Vector3 pos, IClientAPI remoteClient,
+        protected internal void UpdatePrimSinglePosition (uint LocalID, Vector3 pos, IClientAPI remoteClient,
                                                          bool SaveUpdate)
         {
             IEntity entity;
-            if (TryGetEntity(LocalID, out entity))
-            {
-                if (m_parentScene.Permissions.CanMoveObject(((SceneObjectGroup) entity).UUID, remoteClient.AgentId) ||
-                    ((SceneObjectGroup) entity).IsAttachment)
-                {
-                    ((SceneObjectGroup) entity).UpdateSinglePosition(pos, LocalID, SaveUpdate);
+            if (TryGetEntity (LocalID, out entity)) {
+                if (m_parentScene.Permissions.CanMoveObject (((SceneObjectGroup)entity).UUID, remoteClient.AgentId) ||
+                    ((SceneObjectGroup)entity).IsAttachment) {
+                    ((SceneObjectGroup)entity).UpdateSinglePosition (pos, LocalID, SaveUpdate);
                 }
             }
         }
@@ -1240,31 +1143,24 @@ namespace WhiteCore.Region
         /// <param name="pos"></param>
         /// <param name="remoteClient"></param>
         /// <param name="SaveUpdate"></param>
-        protected internal void UpdatePrimPosition(uint LocalID, Vector3 pos, IClientAPI remoteClient, bool SaveUpdate)
+        protected internal void UpdatePrimPosition (uint LocalID, Vector3 pos, IClientAPI remoteClient, bool SaveUpdate)
         {
             IEntity entity;
-            if (TryGetEntity(LocalID, out entity))
-            {
-                if (((SceneObjectGroup) entity).IsAttachment ||
-                    (((SceneObjectGroup) entity).RootPart.Shape.PCode == 9 &&
-                     ((SceneObjectGroup) entity).RootPart.Shape.State != 0))
-                {
+            if (TryGetEntity (LocalID, out entity)) {
+                if (((SceneObjectGroup)entity).IsAttachment ||
+                    (((SceneObjectGroup)entity).RootPart.Shape.PCode == 9 &&
+                     ((SceneObjectGroup)entity).RootPart.Shape.State != 0)) {
                     //We don't deal with attachments, they handle themselves in the IAttachmentModule
-                }
-                else
-                {
+                } else {
                     //Move has edit permission as well
                     if (
-                        m_parentScene.Permissions.CanMoveObject(((SceneObjectGroup) entity).UUID, remoteClient.AgentId) &&
-                        m_parentScene.Permissions.CanObjectEntry(((SceneObjectGroup) entity).UUID, false, pos,
-                                                                 remoteClient.AgentId))
-                    {
-                        ((SceneObjectGroup) entity).UpdateGroupPosition(pos, SaveUpdate);
-                    }
-                    else
-                    {
-                        IScenePresence SP = GetScenePresence(remoteClient.AgentId);
-                        ((SceneObjectGroup) entity).ScheduleGroupUpdateToAvatar(SP, PrimUpdateFlags.FullUpdate);
+                        m_parentScene.Permissions.CanMoveObject (((SceneObjectGroup)entity).UUID, remoteClient.AgentId) &&
+                        m_parentScene.Permissions.CanObjectEntry (((SceneObjectGroup)entity).UUID, false, pos,
+                                                                 remoteClient.AgentId)) {
+                        ((SceneObjectGroup)entity).UpdateGroupPosition (pos, SaveUpdate);
+                    } else {
+                        IScenePresence SP = GetScenePresence (remoteClient.AgentId);
+                        ((SceneObjectGroup)entity).ScheduleGroupUpdateToAvatar (SP, PrimUpdateFlags.FullUpdate);
                     }
                 }
             }
@@ -1278,14 +1174,12 @@ namespace WhiteCore.Region
         /// <param name="LocalID"></param>
         /// <param name="texture"></param>
         /// <param name="remoteClient"></param>
-        protected internal void UpdatePrimTexture(uint LocalID, byte[] texture, IClientAPI remoteClient)
+        protected internal void UpdatePrimTexture (uint LocalID, byte [] texture, IClientAPI remoteClient)
         {
             IEntity entity;
-            if (TryGetEntity(LocalID, out entity))
-            {
-                if (m_parentScene.Permissions.CanEditObject(((SceneObjectGroup) entity).UUID, remoteClient.AgentId))
-                {
-                    ((SceneObjectGroup) entity).UpdateTextureEntry(LocalID, texture, true);
+            if (TryGetEntity (LocalID, out entity)) {
+                if (m_parentScene.Permissions.CanEditObject (((SceneObjectGroup)entity).UUID, remoteClient.AgentId)) {
+                    ((SceneObjectGroup)entity).UpdateTextureEntry (LocalID, texture, true);
                 }
             }
         }
@@ -1299,18 +1193,16 @@ namespace WhiteCore.Region
         /// <param name="UsePhysics"></param>
         /// <param name="IsTemporary"></param>
         /// <param name="IsPhantom"></param>
-        protected internal void UpdatePrimFlags(uint LocalID, bool UsePhysics, bool IsTemporary, bool IsPhantom,
-                                                ObjectFlagUpdatePacket.ExtraPhysicsBlock[] blocks,
+        protected internal void UpdatePrimFlags (uint LocalID, bool UsePhysics, bool IsTemporary, bool IsPhantom,
+                                                ObjectFlagUpdatePacket.ExtraPhysicsBlock [] blocks,
                                                 IClientAPI remoteClient)
         {
             IEntity entity;
-            if (TryGetEntity(LocalID, out entity))
-            {
-                if (m_parentScene.Permissions.CanEditObject(entity.UUID, remoteClient.AgentId))
-                {
-                    ((SceneObjectGroup) entity).UpdatePrimFlags(LocalID, UsePhysics, IsTemporary, IsPhantom, false,
+            if (TryGetEntity (LocalID, out entity)) {
+                if (m_parentScene.Permissions.CanEditObject (entity.UUID, remoteClient.AgentId)) {
+                    ((SceneObjectGroup)entity).UpdatePrimFlags (LocalID, UsePhysics, IsTemporary, IsPhantom, false,
                                                                 blocks);
-                        // VolumeDetect can't be set via UI and will always be off when a change is made there
+                    // VolumeDetect can't be set via UI and will always be off when a change is made there
                 }
             }
         }
@@ -1323,15 +1215,14 @@ namespace WhiteCore.Region
         /// <param name="pos"></param>
         /// <param name="remoteClient"></param>
         /// <param name="surfaceArgs"></param>
-        protected internal void MoveObject(UUID ObjectID, Vector3 offset, Vector3 pos, IClientAPI remoteClient,
+        protected internal void MoveObject (UUID ObjectID, Vector3 offset, Vector3 pos, IClientAPI remoteClient,
                                            List<SurfaceTouchEventArgs> surfaceArgs)
         {
             IEntity group;
-            if (TryGetEntity(ObjectID, out group))
-            {
-                if (m_parentScene.Permissions.CanMoveObject(group.UUID, remoteClient.AgentId)) // && PermissionsMngr.)
+            if (TryGetEntity (ObjectID, out group)) {
+                if (m_parentScene.Permissions.CanMoveObject (group.UUID, remoteClient.AgentId)) // && PermissionsMngr.)
                 {
-                    ((SceneObjectGroup) group).GrabMovement(offset, pos, remoteClient);
+                    ((SceneObjectGroup)group).GrabMovement (offset, pos, remoteClient);
                 }
             }
         }
@@ -1341,14 +1232,13 @@ namespace WhiteCore.Region
         /// </summary>
         /// <param name="ObjectID"></param>
         /// <param name="remoteClient"></param>
-        protected internal void SpinStart(UUID ObjectID, IClientAPI remoteClient)
+        protected internal void SpinStart (UUID ObjectID, IClientAPI remoteClient)
         {
             IEntity group;
-            if (TryGetEntity(ObjectID, out group))
-            {
-                if (m_parentScene.Permissions.CanMoveObject(group.UUID, remoteClient.AgentId)) // && PermissionsMngr.)
+            if (TryGetEntity (ObjectID, out group)) {
+                if (m_parentScene.Permissions.CanMoveObject (group.UUID, remoteClient.AgentId)) // && PermissionsMngr.)
                 {
-                    ((SceneObjectGroup) group).SpinStart(remoteClient);
+                    ((SceneObjectGroup)group).SpinStart (remoteClient);
                 }
             }
         }
@@ -1359,20 +1249,19 @@ namespace WhiteCore.Region
         /// <param name="ObjectID"></param>
         /// <param name="rotation"></param>
         /// <param name="remoteClient"></param>
-        protected internal void SpinObject(UUID ObjectID, Quaternion rotation, IClientAPI remoteClient)
+        protected internal void SpinObject (UUID ObjectID, Quaternion rotation, IClientAPI remoteClient)
         {
             IEntity group;
-            if (TryGetEntity(ObjectID, out group))
-            {
-                if (m_parentScene.Permissions.CanMoveObject(group.UUID, remoteClient.AgentId)) // && PermissionsMngr.)
+            if (TryGetEntity (ObjectID, out group)) {
+                if (m_parentScene.Permissions.CanMoveObject (group.UUID, remoteClient.AgentId)) // && PermissionsMngr.)
                 {
-                    ((SceneObjectGroup) group).SpinMovement(rotation, remoteClient);
+                    ((SceneObjectGroup)group).SpinMovement (rotation, remoteClient);
                 }
                 // This is outside the above permissions condition
                 // so that if the object is locked the client moving the object
                 // get's it's position on the simulator even if it was the same as before
                 // This keeps the moving user's client in sync with the rest of the world.
-                ((SceneObjectGroup) group).ScheduleGroupTerseUpdate();
+                ((SceneObjectGroup)group).ScheduleGroupTerseUpdate ();
             }
         }
 
@@ -1381,15 +1270,13 @@ namespace WhiteCore.Region
         /// <param name="remoteClient"></param>
         /// <param name="LocalID"></param>
         /// <param name="name"></param>
-        protected internal void PrimName(IClientAPI remoteClient, uint LocalID, string name)
+        protected internal void PrimName (IClientAPI remoteClient, uint LocalID, string name)
         {
             IEntity group;
-            if (TryGetEntity(LocalID, out group))
-            {
-                if (m_parentScene.Permissions.CanEditObject(group.UUID, remoteClient.AgentId))
-                {
-                    ((SceneObjectGroup) group).SetPartName(Util.CleanString(name), LocalID);
-                    ((SceneObjectGroup) group).ScheduleGroupUpdate(PrimUpdateFlags.FindBest);
+            if (TryGetEntity (LocalID, out group)) {
+                if (m_parentScene.Permissions.CanEditObject (group.UUID, remoteClient.AgentId)) {
+                    ((SceneObjectGroup)group).SetPartName (Util.CleanString (name), LocalID);
+                    ((SceneObjectGroup)group).ScheduleGroupUpdate (PrimUpdateFlags.FindBest);
                 }
             }
         }
@@ -1399,61 +1286,53 @@ namespace WhiteCore.Region
         /// <param name="LocalID"></param>
         /// <param name="description"></param>
         /// <param name="remoteClient"></param>
-        protected internal void PrimDescription(IClientAPI remoteClient, uint LocalID, string description)
+        protected internal void PrimDescription (IClientAPI remoteClient, uint LocalID, string description)
         {
             IEntity group;
-            if (TryGetEntity(LocalID, out group))
-            {
-                if (m_parentScene.Permissions.CanEditObject(group.UUID, remoteClient.AgentId))
-                {
-                    ((SceneObjectGroup) group).SetPartDescription(Util.CleanString(description), LocalID);
-                    ((SceneObjectGroup) group).ScheduleGroupUpdate(PrimUpdateFlags.ClickAction);
+            if (TryGetEntity (LocalID, out group)) {
+                if (m_parentScene.Permissions.CanEditObject (group.UUID, remoteClient.AgentId)) {
+                    ((SceneObjectGroup)group).SetPartDescription (Util.CleanString (description), LocalID);
+                    ((SceneObjectGroup)group).ScheduleGroupUpdate (PrimUpdateFlags.ClickAction);
                 }
             }
         }
 
-        protected internal void PrimClickAction(IClientAPI remoteClient, uint LocalID, string clickAction)
+        protected internal void PrimClickAction (IClientAPI remoteClient, uint LocalID, string clickAction)
         {
             IEntity group;
-            if (TryGetEntity(LocalID, out group))
-            {
-                if (m_parentScene.Permissions.CanEditObject(group.UUID, remoteClient.AgentId))
-                {
-                    ISceneChildEntity part = m_parentScene.GetSceneObjectPart(LocalID);
-                    part.ClickAction = Convert.ToByte(clickAction);
-                    ((ISceneEntity) group).ScheduleGroupUpdate(PrimUpdateFlags.ClickAction);
+            if (TryGetEntity (LocalID, out group)) {
+                if (m_parentScene.Permissions.CanEditObject (group.UUID, remoteClient.AgentId)) {
+                    ISceneChildEntity part = m_parentScene.GetSceneObjectPart (LocalID);
+                    part.ClickAction = Convert.ToByte (clickAction);
+                    ((ISceneEntity)group).ScheduleGroupUpdate (PrimUpdateFlags.ClickAction);
                 }
             }
         }
 
-        protected internal void PrimMaterial(IClientAPI remoteClient, uint LocalID, string material)
+        protected internal void PrimMaterial (IClientAPI remoteClient, uint LocalID, string material)
         {
             IEntity group;
-            if (TryGetEntity(LocalID, out group))
-            {
-                if (m_parentScene.Permissions.CanEditObject(group.UUID, remoteClient.AgentId))
-                {
-                    ISceneChildEntity part = m_parentScene.GetSceneObjectPart(LocalID);
-                    part.UpdateMaterial(Convert.ToInt32(material));
+            if (TryGetEntity (LocalID, out group)) {
+                if (m_parentScene.Permissions.CanEditObject (group.UUID, remoteClient.AgentId)) {
+                    ISceneChildEntity part = m_parentScene.GetSceneObjectPart (LocalID);
+                    part.UpdateMaterial (Convert.ToInt32 (material));
                     //Update the client here as well... we changed restitution and friction in the physics engine probably
-                    IEventQueueService eqs = m_parentScene.RequestModuleInterface<IEventQueueService>();
+                    IEventQueueService eqs = m_parentScene.RequestModuleInterface<IEventQueueService> ();
                     if (eqs != null)
-                        eqs.ObjectPhysicsProperties(new[] {part}, remoteClient.AgentId,
+                        eqs.ObjectPhysicsProperties (new [] { part }, remoteClient.AgentId,
                                                     m_parentScene.RegionInfo.RegionID);
 
-                    ((ISceneEntity) group).ScheduleGroupUpdate(PrimUpdateFlags.ClickAction);
+                    ((ISceneEntity)group).ScheduleGroupUpdate (PrimUpdateFlags.ClickAction);
                 }
             }
         }
 
-        protected internal void UpdateExtraParam(UUID agentID, uint LocalID, ushort type, bool inUse, byte[] data)
+        protected internal void UpdateExtraParam (UUID agentID, uint LocalID, ushort type, bool inUse, byte [] data)
         {
             ISceneChildEntity part;
-            if (TryGetPart(LocalID, out part))
-            {
-                if (m_parentScene.Permissions.CanEditObject(part.UUID, agentID))
-                {
-                    ((SceneObjectPart) part).UpdateExtraParam(type, inUse, data);
+            if (TryGetPart (LocalID, out part)) {
+                if (m_parentScene.Permissions.CanEditObject (part.UUID, agentID)) {
+                    ((SceneObjectPart)part).UpdateExtraParam (type, inUse, data);
                 }
             }
         }
@@ -1463,37 +1342,34 @@ namespace WhiteCore.Region
         /// <param name="LocalID"></param>
         /// <param name="shapeBlock"></param>
         /// <param name="agentID"></param>
-        protected internal void UpdatePrimShape(UUID agentID, uint LocalID, UpdateShapeArgs shapeBlock)
+        protected internal void UpdatePrimShape (UUID agentID, uint LocalID, UpdateShapeArgs shapeBlock)
         {
             ISceneChildEntity part;
-            if (TryGetPart(LocalID, out part))
-            {
-                if (m_parentScene.Permissions.CanEditObject(part.UUID, agentID))
-                {
-                    ObjectShapePacket.ObjectDataBlock shapeData = new ObjectShapePacket.ObjectDataBlock
-                                                                      {
-                                                                          ObjectLocalID = shapeBlock.ObjectLocalID,
-                                                                          PathBegin = shapeBlock.PathBegin,
-                                                                          PathCurve = shapeBlock.PathCurve,
-                                                                          PathEnd = shapeBlock.PathEnd,
-                                                                          PathRadiusOffset = shapeBlock.PathRadiusOffset,
-                                                                          PathRevolutions = shapeBlock.PathRevolutions,
-                                                                          PathScaleX = shapeBlock.PathScaleX,
-                                                                          PathScaleY = shapeBlock.PathScaleY,
-                                                                          PathShearX = shapeBlock.PathShearX,
-                                                                          PathShearY = shapeBlock.PathShearY,
-                                                                          PathSkew = shapeBlock.PathSkew,
-                                                                          PathTaperX = shapeBlock.PathTaperX,
-                                                                          PathTaperY = shapeBlock.PathTaperY,
-                                                                          PathTwist = shapeBlock.PathTwist,
-                                                                          PathTwistBegin = shapeBlock.PathTwistBegin,
-                                                                          ProfileBegin = shapeBlock.ProfileBegin,
-                                                                          ProfileCurve = shapeBlock.ProfileCurve,
-                                                                          ProfileEnd = shapeBlock.ProfileEnd,
-                                                                          ProfileHollow = shapeBlock.ProfileHollow
-                                                                      };
+            if (TryGetPart (LocalID, out part)) {
+                if (m_parentScene.Permissions.CanEditObject (part.UUID, agentID)) {
+                    ObjectShapePacket.ObjectDataBlock shapeData = new ObjectShapePacket.ObjectDataBlock {
+                        ObjectLocalID = shapeBlock.ObjectLocalID,
+                        PathBegin = shapeBlock.PathBegin,
+                        PathCurve = shapeBlock.PathCurve,
+                        PathEnd = shapeBlock.PathEnd,
+                        PathRadiusOffset = shapeBlock.PathRadiusOffset,
+                        PathRevolutions = shapeBlock.PathRevolutions,
+                        PathScaleX = shapeBlock.PathScaleX,
+                        PathScaleY = shapeBlock.PathScaleY,
+                        PathShearX = shapeBlock.PathShearX,
+                        PathShearY = shapeBlock.PathShearY,
+                        PathSkew = shapeBlock.PathSkew,
+                        PathTaperX = shapeBlock.PathTaperX,
+                        PathTaperY = shapeBlock.PathTaperY,
+                        PathTwist = shapeBlock.PathTwist,
+                        PathTwistBegin = shapeBlock.PathTwistBegin,
+                        ProfileBegin = shapeBlock.ProfileBegin,
+                        ProfileCurve = shapeBlock.ProfileCurve,
+                        ProfileEnd = shapeBlock.ProfileEnd,
+                        ProfileHollow = shapeBlock.ProfileHollow
+                    };
 
-                    ((SceneObjectPart) part).UpdateShape(shapeData);
+                    ((SceneObjectPart)part).UpdateShape (shapeData);
                 }
             }
         }
@@ -1504,14 +1380,14 @@ namespace WhiteCore.Region
         /// <param name="remoteClient"></param>
         /// <param name="IncludeInSearch"></param>
         /// <param name="LocalID"></param>
-        protected internal void MakeObjectSearchable(IClientAPI remoteClient, bool IncludeInSearch, uint LocalID)
+        protected internal void MakeObjectSearchable (IClientAPI remoteClient, bool IncludeInSearch, uint LocalID)
         {
             UUID user = remoteClient.AgentId;
             UUID objid = UUID.Zero;
             IEntity entity;
-            if (!TryGetEntity(LocalID, out entity))
+            if (!TryGetEntity (LocalID, out entity))
                 return;
-            SceneObjectGroup grp = (SceneObjectGroup) entity;
+            SceneObjectGroup grp = (SceneObjectGroup)entity;
             //Protip: In my day, we didn't call them searchable objects, we called them limited point-to-point joints
             //aka ObjectFlags.JointWheel = IncludeInSearch
 
@@ -1527,13 +1403,10 @@ namespace WhiteCore.Region
             // libomv will complain about PrimFlags.JointWheel being
             // deprecated, so we
 #pragma warning disable 0612
-            if (IncludeInSearch && m_parentScene.Permissions.CanEditObject(objid, user))
-            {
-                grp.RootPart.AddFlag(PrimFlags.JointWheel);
-            }
-            else if (!IncludeInSearch && m_parentScene.Permissions.CanEditObject(objid, user))
-            {
-                grp.RootPart.RemFlag(PrimFlags.JointWheel);
+            if (IncludeInSearch && m_parentScene.Permissions.CanEditObject (objid, user)) {
+                grp.RootPart.AddFlag (PrimFlags.JointWheel);
+            } else if (!IncludeInSearch && m_parentScene.Permissions.CanEditObject (objid, user)) {
+                grp.RootPart.RemFlag (PrimFlags.JointWheel);
             }
 #pragma warning restore 0612
         }
@@ -1548,41 +1421,36 @@ namespace WhiteCore.Region
         /// <param name="GroupID"></param>
         /// <param name="rot">Rotation to have the duplicated entity set to</param>
         /// <returns></returns>
-        public bool DuplicateObject(uint LocalID, Vector3 offset, uint flags, UUID AgentID, UUID GroupID, Quaternion rot)
+        public bool DuplicateObject (uint LocalID, Vector3 offset, uint flags, UUID AgentID, UUID GroupID, Quaternion rot)
         {
-            //MainConsole.Instance.DebugFormat("[SCENE]: Duplication of object {0} at offset {1} requested by agent {2}", originalPrim, offset, AgentID);
+            //MainConsole.Instance.DebugFormat("[Scene]: Duplication of object {0} at offset {1} requested by agent {2}", originalPrim, offset, AgentID);
             IEntity entity;
 
-            if (TryGetEntity(LocalID, out entity))
-            {
-                SceneObjectGroup original = (SceneObjectGroup) entity;
+            if (TryGetEntity (LocalID, out entity)) {
+                SceneObjectGroup original = (SceneObjectGroup)entity;
                 string reason = "You cannot duplicate this object.";
                 if (
-                    m_parentScene.Permissions.CanDuplicateObject(original.ChildrenList.Count, original.UUID, AgentID,
+                    m_parentScene.Permissions.CanDuplicateObject (original.ChildrenList.Count, original.UUID, AgentID,
                                                                  original.AbsolutePosition) &&
-                    m_parentScene.Permissions.CanRezObject(1, AgentID, original.AbsolutePosition + offset, out reason))
-                {
-                    ISceneEntity duplicatedEntity = DuplicateEntity(original);
+                    m_parentScene.Permissions.CanRezObject (1, AgentID, original.AbsolutePosition + offset, out reason)) {
+                    ISceneEntity duplicatedEntity = DuplicateEntity (original);
 
                     duplicatedEntity.AbsolutePosition = duplicatedEntity.AbsolutePosition + offset;
 
-                    SceneObjectGroup duplicatedGroup = (SceneObjectGroup) duplicatedEntity;
+                    SceneObjectGroup duplicatedGroup = (SceneObjectGroup)duplicatedEntity;
 
-                    if (original.OwnerID != AgentID)
-                    {
-                        duplicatedGroup.SetOwnerId(AgentID);
-                        duplicatedGroup.SetRootPartOwner(duplicatedGroup.RootPart, AgentID, GroupID);
+                    if (original.OwnerID != AgentID) {
+                        duplicatedGroup.SetOwnerId (AgentID);
+                        duplicatedGroup.SetRootPartOwner (duplicatedGroup.RootPart, AgentID, GroupID);
 
                         List<SceneObjectPart> partList =
-                            new List<SceneObjectPart>(duplicatedGroup.ChildrenList);
+                            new List<SceneObjectPart> (duplicatedGroup.ChildrenList);
 
-                        if (m_parentScene.Permissions.PropagatePermissions())
-                        {
-                            foreach (SceneObjectPart child in partList)
-                            {
-                                child.Inventory.ChangeInventoryOwner(AgentID);
-                                child.TriggerScriptChangedEvent(Changed.OWNER);
-                                child.ApplyNextOwnerPermissions();
+                        if (m_parentScene.Permissions.PropagatePermissions ()) {
+                            foreach (SceneObjectPart child in partList) {
+                                child.Inventory.ChangeInventoryOwner (AgentID);
+                                child.TriggerScriptChangedEvent (Changed.OWNER);
+                                child.ApplyNextOwnerPermissions ();
                             }
                         }
 
@@ -1597,110 +1465,99 @@ namespace WhiteCore.Region
                     // think it's selected, so it will never send a deselect...
                     duplicatedGroup.IsSelected = false;
 
-                    if (rot != Quaternion.Identity)
-                    {
-                        duplicatedGroup.UpdateGroupRotationR(rot);
+                    if (rot != Quaternion.Identity) {
+                        duplicatedGroup.UpdateGroupRotationR (rot);
                     }
 
-                    duplicatedGroup.CreateScriptInstances(0, true, StateSource.NewRez, UUID.Zero, false);
+                    duplicatedGroup.CreateScriptInstances (0, true, StateSource.NewRez, UUID.Zero, false);
                     duplicatedGroup.HasGroupChanged = true;
-                    duplicatedGroup.ScheduleGroupUpdate(PrimUpdateFlags.ForcedFullUpdate);
+                    duplicatedGroup.ScheduleGroupUpdate (PrimUpdateFlags.ForcedFullUpdate);
 
                     // required for physics to update it's position
                     duplicatedGroup.AbsolutePosition = duplicatedGroup.AbsolutePosition;
                     return true;
-                }
-                else
-                    GetScenePresence(AgentID).ControllingClient.SendAlertMessage(reason);
+                } else
+                    GetScenePresence (AgentID).ControllingClient.SendAlertMessage (reason);
             }
             return false;
         }
 
         #region Linking and Delinking
 
-        public void DelinkObjects(List<uint> primIds, IClientAPI client)
+        public void DelinkObjects (List<uint> primIds, IClientAPI client)
         {
             List<ISceneChildEntity> parts =
-                primIds.Select(localID => m_parentScene.GetSceneObjectPart(localID)).Where(part => part != null).Where(
-                    part => m_parentScene.Permissions.CanDelinkObject(client.AgentId, part.ParentEntity.UUID)).ToList();
+                primIds.Select (localID => m_parentScene.GetSceneObjectPart (localID)).Where (part => part != null).Where (
+                    part => m_parentScene.Permissions.CanDelinkObject (client.AgentId, part.ParentEntity.UUID)).ToList ();
 
-            DelinkObjects(parts);
+            DelinkObjects (parts);
         }
 
-        public void LinkObjects(IClientAPI client, uint parentPrimId, List<uint> childPrimIds)
+        public void LinkObjects (IClientAPI client, uint parentPrimId, List<uint> childPrimIds)
         {
-            List<UUID> owners = new List<UUID>();
+            List<UUID> owners = new List<UUID> ();
 
-            List<ISceneChildEntity> children = new List<ISceneChildEntity>();
-            ISceneChildEntity root = m_parentScene.GetSceneObjectPart(parentPrimId);
+            List<ISceneChildEntity> children = new List<ISceneChildEntity> ();
+            ISceneChildEntity root = m_parentScene.GetSceneObjectPart (parentPrimId);
 
-            if (root == null)
-            {
-                MainConsole.Instance.DebugFormat("[LINK]: Can't find linkset root prim {0}", parentPrimId);
+            if (root == null) {
+                MainConsole.Instance.DebugFormat ("[Link]: Can't find linkset root prim {0}", parentPrimId);
                 return;
             }
 
-            if (!m_parentScene.Permissions.CanLinkObject(client.AgentId, root.ParentEntity.UUID))
-            {
-                MainConsole.Instance.DebugFormat("[LINK]: Refusing link. No permissions on root prim");
+            if (!m_parentScene.Permissions.CanLinkObject (client.AgentId, root.ParentEntity.UUID)) {
+                MainConsole.Instance.DebugFormat ("[Link]: Refusing link. No permissions on root prim");
                 return;
             }
 
-            foreach (uint localID in childPrimIds)
-            {
-                ISceneChildEntity part = m_parentScene.GetSceneObjectPart(localID);
+            foreach (uint localID in childPrimIds) {
+                ISceneChildEntity part = m_parentScene.GetSceneObjectPart (localID);
 
                 if (part == null)
                     continue;
 
-                if (!owners.Contains(part.OwnerID))
-                    owners.Add(part.OwnerID);
+                if (!owners.Contains (part.OwnerID))
+                    owners.Add (part.OwnerID);
 
-                if (m_parentScene.Permissions.CanLinkObject(client.AgentId, part.ParentEntity.UUID))
-                    children.Add(part);
+                if (m_parentScene.Permissions.CanLinkObject (client.AgentId, part.ParentEntity.UUID))
+                    children.Add (part);
             }
 
             // Must be all one owner
             //
-            if (owners.Count > 1)
-            {
-                MainConsole.Instance.DebugFormat("[LINK]: Refusing link. Too many owners");
-                client.SendAlertMessage("Permissions: Cannot link, too many owners.");
+            if (owners.Count > 1) {
+                MainConsole.Instance.DebugFormat ("[Link]: Refusing link. Too many owners");
+                client.SendAlertMessage ("Permissions: Cannot link, too many owners.");
                 return;
             }
 
-            if (children.Count == 0)
-            {
-                MainConsole.Instance.DebugFormat("[LINK]: Refusing link. No permissions to link any of the children");
-                client.SendAlertMessage("Permissions: Cannot link, not enough permissions.");
+            if (children.Count == 0) {
+                MainConsole.Instance.DebugFormat ("[Link]: Refusing link. No permissions to link any of the children");
+                client.SendAlertMessage ("Permissions: Cannot link, not enough permissions.");
                 return;
             }
-            int LinkCount = children.Cast<SceneObjectPart>().Sum(part => part.ParentGroup.ChildrenList.Count);
+            int LinkCount = children.Cast<SceneObjectPart> ().Sum (part => part.ParentGroup.ChildrenList.Count);
 
-            IOpenRegionSettingsModule module = m_parentScene.RequestModuleInterface<IOpenRegionSettingsModule>();
-            if (module != null)
-            {
+            IOpenRegionSettingsModule module = m_parentScene.RequestModuleInterface<IOpenRegionSettingsModule> ();
+            if (module != null) {
                 if (LinkCount > module.MaximumLinkCount &&
-                    module.MaximumLinkCount != -1)
-                {
-                    client.SendAlertMessage("You cannot link more than " + module.MaximumLinkCount +
+                    module.MaximumLinkCount != -1) {
+                    client.SendAlertMessage ("You cannot link more than " + module.MaximumLinkCount +
                                             " prims. Please try again with fewer prims.");
                     return;
                 }
-                if ((root.Flags & PrimFlags.Physics) == PrimFlags.Physics)
-                {
+                if ((root.Flags & PrimFlags.Physics) == PrimFlags.Physics) {
                     //We only check the root here because if the root is physical, it will be applied to all during the link
                     if (LinkCount > module.MaximumLinkCountPhys &&
-                        module.MaximumLinkCountPhys != -1)
-                    {
-                        client.SendAlertMessage("You cannot link more than " + module.MaximumLinkCountPhys +
+                        module.MaximumLinkCountPhys != -1) {
+                        client.SendAlertMessage ("You cannot link more than " + module.MaximumLinkCountPhys +
                                                 " physical prims. Please try again with fewer prims.");
                         return;
                     }
                 }
             }
 
-            LinkObjects(root, children);
+            LinkObjects (root, children);
         }
 
         /// <summary>
@@ -1708,40 +1565,33 @@ namespace WhiteCore.Region
         /// </summary>
         /// <param name="root"></param>
         /// <param name="children"></param>
-        protected internal void LinkObjects(ISceneChildEntity root, List<ISceneChildEntity> children)
+        protected internal void LinkObjects (ISceneChildEntity root, List<ISceneChildEntity> children)
         {
-            Monitor.Enter(m_updateLock);
-            try
-            {
+            Monitor.Enter (m_updateLock);
+            try {
                 ISceneEntity parentGroup = root.ParentEntity;
 
-                List<ISceneEntity> childGroups = new List<ISceneEntity>();
-                if (parentGroup != null)
-                {
+                List<ISceneEntity> childGroups = new List<ISceneEntity> ();
+                if (parentGroup != null) {
                     // We do this in reverse to get the link order of the prims correct
-                    for (int i = children.Count - 1; i >= 0; i--)
-                    {
-                        ISceneEntity child = children[i].ParentEntity;
+                    for (int i = children.Count - 1; i >= 0; i--) {
+                        ISceneEntity child = children [i].ParentEntity;
 
-                        if (child != null)
-                        {
+                        if (child != null) {
                             // Make sure no child prim is set for sale
                             // So that, on delink, no prims are unwittingly
                             // left for sale and sold off
                             child.RootChild.ObjectSaleType = 0;
                             child.RootChild.SalePrice = 10;
-                            childGroups.Add(child);
+                            childGroups.Add (child);
                         }
                     }
-                }
-                else
-                {
+                } else {
                     return; // parent is null so not in this region
                 }
 
-                foreach (ISceneEntity child in childGroups)
-                {
-                    parentGroup.LinkToGroup(child);
+                foreach (ISceneEntity child in childGroups) {
+                    parentGroup.LinkToGroup (child);
 
                     // this is here so physics gets updated!
                     // Don't remove!  Bad juju!  Stay away! or fix physics!
@@ -1754,12 +1604,10 @@ namespace WhiteCore.Region
                 parentGroup.HasGroupChanged = true;
                 //parentGroup.RootPart.SendFullUpdateToAllClients(PrimUpdateFlags.FullUpdate);
                 //parentGroup.ScheduleGroupForFullUpdate(PrimUpdateFlags.FullUpdate);
-                parentGroup.ScheduleGroupUpdate(PrimUpdateFlags.ForcedFullUpdate);
-                parentGroup.TriggerScriptChangedEvent(Changed.LINK);
-            }
-            finally
-            {
-                Monitor.Exit(m_updateLock);
+                parentGroup.ScheduleGroupUpdate (PrimUpdateFlags.ForcedFullUpdate);
+                parentGroup.TriggerScriptChangedEvent (Changed.LINK);
+            } finally {
+                Monitor.Exit (m_updateLock);
             }
         }
 
@@ -1767,117 +1615,105 @@ namespace WhiteCore.Region
         ///     Delink a linkset
         /// </summary>
         /// <param name="prims"></param>
-        protected internal void DelinkObjects(List<ISceneChildEntity> prims)
+        protected internal void DelinkObjects (List<ISceneChildEntity> prims)
         {
-            Monitor.Enter(m_updateLock);
-            try
-            {
-                List<ISceneChildEntity> childParts = new List<ISceneChildEntity>();
-                List<ISceneChildEntity> rootParts = new List<ISceneChildEntity>();
-                List<ISceneEntity> affectedGroups = new List<ISceneEntity>();
+            Monitor.Enter (m_updateLock);
+            try {
+                List<ISceneChildEntity> childParts = new List<ISceneChildEntity> ();
+                List<ISceneChildEntity> rootParts = new List<ISceneChildEntity> ();
+                List<ISceneEntity> affectedGroups = new List<ISceneEntity> ();
                 // Look them all up in one go, since that is comparatively expensive
                 //
-                foreach (ISceneChildEntity part in prims)
-                {
-                    if (part != null)
-                    {
+                foreach (ISceneChildEntity part in prims) {
+                    if (part != null) {
                         if (part.ParentEntity.PrimCount != 1) // Skip single
                         {
                             if (part.LinkNum < 2) // Root
-                                rootParts.Add(part);
+                                rootParts.Add (part);
                             else
-                                childParts.Add(part);
+                                childParts.Add (part);
 
                             ISceneEntity group = part.ParentEntity;
-                            if (!affectedGroups.Contains(group))
-                                affectedGroups.Add(group);
+                            if (!affectedGroups.Contains (group))
+                                affectedGroups.Add (group);
                         }
                     }
                 }
 
-                foreach (ISceneChildEntity child in childParts)
-                {
+                foreach (ISceneChildEntity child in childParts) {
                     // Unlink all child parts from their groups
                     //
-                    child.ParentEntity.DelinkFromGroup(child, true);
+                    child.ParentEntity.DelinkFromGroup (child, true);
 
                     // These are not in affected groups and will not be
                     // handled further. Do the honors here.
                     child.ParentEntity.HasGroupChanged = true;
-                    if (!affectedGroups.Contains(child.ParentEntity))
-                        affectedGroups.Add(child.ParentEntity);
+                    if (!affectedGroups.Contains (child.ParentEntity))
+                        affectedGroups.Add (child.ParentEntity);
                 }
 
-                foreach (ISceneChildEntity root in rootParts)
-                {
+                foreach (ISceneChildEntity root in rootParts) {
                     // In most cases, this will run only one time, and the prim
                     // will be a solo prim
                     // However, editing linked parts and unlinking may be different
                     //
                     ISceneEntity group = root.ParentEntity;
-                    List<ISceneChildEntity> newSet = new List<ISceneChildEntity>(group.ChildrenEntities());
+                    List<ISceneChildEntity> newSet = new List<ISceneChildEntity> (group.ChildrenEntities ());
                     int numChildren = group.PrimCount;
 
                     // If there are prims left in a link set, but the root is
                     // slated for unlink, we need to do this
                     //
-                    if (numChildren != 1)
-                    {
+                    if (numChildren != 1) {
                         // Unlink the remaining set
                         //
                         bool sendEventsToRemainder = true;
                         if (numChildren > 1)
                             sendEventsToRemainder = false;
 
-                        foreach (ISceneChildEntity p in newSet)
-                        {
+                        foreach (ISceneChildEntity p in newSet) {
                             if (p != group.RootChild)
-                                group.DelinkFromGroup(p, sendEventsToRemainder);
+                                group.DelinkFromGroup (p, sendEventsToRemainder);
                         }
 
                         // If there is more than one prim remaining, we
                         // need to re-link
                         //
-                        if (numChildren > 2)
-                        {
+                        if (numChildren > 2) {
                             // Remove old root
                             //
-                            if (newSet.Contains(root))
-                                newSet.Remove(root);
+                            if (newSet.Contains (root))
+                                newSet.Remove (root);
 
                             // Preserve link ordering
                             //
-                            newSet.Sort(LinkSetSorter);
+                            newSet.Sort (LinkSetSorter);
 
                             // Determine new root
                             //
-                            ISceneChildEntity newRoot = newSet[0];
-                            newSet.RemoveAt(0);
+                            ISceneChildEntity newRoot = newSet [0];
+                            newSet.RemoveAt (0);
 
-                            LinkObjects(newRoot, newSet);
-                            if (!affectedGroups.Contains(newRoot.ParentEntity))
-                                affectedGroups.Add(newRoot.ParentEntity);
+                            LinkObjects (newRoot, newSet);
+                            if (!affectedGroups.Contains (newRoot.ParentEntity))
+                                affectedGroups.Add (newRoot.ParentEntity);
                         }
                     }
                 }
 
                 // Finally, trigger events in the roots
                 //
-                foreach (ISceneEntity g in affectedGroups)
-                {
-                    g.TriggerScriptChangedEvent(Changed.LINK);
+                foreach (ISceneEntity g in affectedGroups) {
+                    g.TriggerScriptChangedEvent (Changed.LINK);
                     g.HasGroupChanged = true; // Persist
-                    g.ScheduleGroupUpdate(PrimUpdateFlags.ForcedFullUpdate);
+                    g.ScheduleGroupUpdate (PrimUpdateFlags.ForcedFullUpdate);
                 }
                 //Fix undo states now that the linksets have been changed
-                foreach (ISceneChildEntity part in prims)
-                {
-                    part.StoreUndoState();
+                foreach (ISceneChildEntity part in prims) {
+                    part.StoreUndoState ();
                 }
-            }
-            finally
-            {
-                Monitor.Exit(m_updateLock);
+            } finally {
+                Monitor.Exit (m_updateLock);
             }
         }
 
@@ -1887,9 +1723,9 @@ namespace WhiteCore.Region
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public int LinkSetSorter(ISceneChildEntity a, ISceneChildEntity b)
+        public int LinkSetSorter (ISceneChildEntity a, ISceneChildEntity b)
         {
-            return a.LinkNum.CompareTo(b.LinkNum);
+            return a.LinkNum.CompareTo (b.LinkNum);
         }
 
         #endregion
@@ -1898,23 +1734,21 @@ namespace WhiteCore.Region
 
         #region New Scene Entity Manager Code
 
-        public bool LinkPartToSOG(ISceneEntity grp, ISceneChildEntity part, int linkNum)
+        public bool LinkPartToSOG (ISceneEntity grp, ISceneChildEntity part, int linkNum)
         {
-            part.SetParentLocalId(grp.RootChild.LocalId);
-            part.SetParent(grp);
+            part.SetParentLocalId (grp.RootChild.LocalId);
+            part.SetParent (grp);
             // Insert in terms of link numbers, the new links
             // before the current ones (with the exception of 
             // the root prim. Shuffle the old ones up
-            foreach (ISceneChildEntity otherPart in grp.ChildrenEntities())
-            {
-                if (otherPart.LinkNum >= linkNum)
-                {
+            foreach (ISceneChildEntity otherPart in grp.ChildrenEntities ()) {
+                if (otherPart.LinkNum >= linkNum) {
                     // Don't update root prim link number
                     otherPart.LinkNum += 1;
                 }
             }
             part.LinkNum = linkNum;
-            return LinkPartToEntity(grp, part);
+            return LinkPartToEntity (grp, part);
         }
 
         /// <summary>
@@ -1922,22 +1756,22 @@ namespace WhiteCore.Region
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public ISceneEntity DuplicateEntity(ISceneEntity entity)
+        public ISceneEntity DuplicateEntity (ISceneEntity entity)
         {
             //Make an exact copy of the entity
-            ISceneEntity copiedEntity = entity.Copy(false);
+            ISceneEntity copiedEntity = entity.Copy (false);
             //Add the entity to the scene and back it up
             //Reset the entity IDs
-            ResetEntityIDs(copiedEntity);
+            ResetEntityIDs (copiedEntity);
 
             //Force the prim to backup now that it has been added
-            copiedEntity.ForcePersistence();
+            copiedEntity.ForcePersistence ();
             //Tell the entity that they are being added to a scene
-            copiedEntity.AttachToScene(m_parentScene);
+            copiedEntity.AttachToScene (m_parentScene);
             //Now save the entity that we have 
-            AddEntity(copiedEntity, false);
+            AddEntity (copiedEntity, false);
             //Fix physics representation now
-//            entity.RebuildPhysicalRepresentation();
+            //            entity.RebuildPhysicalRepresentation();
             return copiedEntity;
         }
 
@@ -1947,14 +1781,14 @@ namespace WhiteCore.Region
         /// <param name="entity"></param>
         /// <param name="part"></param>
         /// <returns></returns>
-        public bool LinkPartToEntity(ISceneEntity entity, ISceneChildEntity part)
+        public bool LinkPartToEntity (ISceneEntity entity, ISceneChildEntity part)
         {
             //Remove the entity so that we can rebuild
-            RemoveEntity(entity);
-            bool RetVal = entity.LinkChild(part);
-            AddEntity(entity, false);
+            RemoveEntity (entity);
+            bool RetVal = entity.LinkChild (part);
+            AddEntity (entity, false);
             //Now that everything is linked, destroy the undo states because it will fry the link otherwise
-            entity.ClearUndoState();
+            entity.ClearUndoState ();
             return RetVal;
         }
 
@@ -1964,14 +1798,14 @@ namespace WhiteCore.Region
         /// <param name="entity"></param>
         /// <param name="part"></param>
         /// <returns></returns>
-        public bool DeLinkPartFromEntity(ISceneEntity entity, ISceneChildEntity part)
+        public bool DeLinkPartFromEntity (ISceneEntity entity, ISceneChildEntity part)
         {
             //Remove the entity so that we can rebuild
-            RemoveEntity(entity);
-            bool RetVal = entity.RemoveChild(part);
-            AddEntity(entity, false);
+            RemoveEntity (entity);
+            bool RetVal = entity.RemoveChild (part);
+            AddEntity (entity, false);
             //Now that everything is linked, destroy the undo states because it will fry the object otherwise
-            entity.ClearUndoState();
+            entity.ClearUndoState ();
             return RetVal;
         }
 
@@ -1982,12 +1816,12 @@ namespace WhiteCore.Region
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="newID">new UUID to set the root part to</param>
-        public void UpdateEntity(ISceneEntity entity, UUID newID)
+        public void UpdateEntity (ISceneEntity entity, UUID newID)
         {
-            RemoveEntity(entity);
+            RemoveEntity (entity);
             //Set it to the root so that we don't create an infinite loop as the ONLY place this should be being called is from the setter in SceneObjectGroup.UUID
             entity.RootChild.UUID = newID;
-            AddEntity(entity, false);
+            AddEntity (entity, false);
         }
 
         #endregion
@@ -2000,9 +1834,9 @@ namespace WhiteCore.Region
         /// <param name="ID"></param>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public bool TryGetEntity(UUID ID, out IEntity entity)
+        public bool TryGetEntity (UUID ID, out IEntity entity)
         {
-            return Entities.TryGetValue(ID, out entity);
+            return Entities.TryGetValue (ID, out entity);
         }
 
         /// <summary>
@@ -2011,9 +1845,9 @@ namespace WhiteCore.Region
         /// <param name="LocalID"></param>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public bool TryGetEntity(uint LocalID, out IEntity entity)
+        public bool TryGetEntity (uint LocalID, out IEntity entity)
         {
-            return Entities.TryGetValue(LocalID, out entity);
+            return Entities.TryGetValue (LocalID, out entity);
         }
 
         /// <summary>
@@ -2022,9 +1856,9 @@ namespace WhiteCore.Region
         /// <param name="LocalID"></param>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public bool TryGetPart(uint LocalID, out ISceneChildEntity entity)
+        public bool TryGetPart (uint LocalID, out ISceneChildEntity entity)
         {
-            return Entities.TryGetChildPrim(LocalID, out entity);
+            return Entities.TryGetChildPrim (LocalID, out entity);
         }
 
         /// <summary>
@@ -2033,15 +1867,13 @@ namespace WhiteCore.Region
         /// <param name="ID"></param>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public bool TryGetPart(UUID ID, out ISceneChildEntity entity)
+        public bool TryGetPart (UUID ID, out ISceneChildEntity entity)
         {
             IEntity ent;
-            if (Entities.TryGetValue(ID, out ent))
-            {
-                if (ent is ISceneEntity)
-                {
-                    ISceneEntity parent = (ISceneEntity) ent;
-                    return parent.GetChildPrim(ID, out entity);
+            if (Entities.TryGetValue (ID, out ent)) {
+                if (ent is ISceneEntity) {
+                    ISceneEntity parent = (ISceneEntity)ent;
+                    return parent.GetChildPrim (ID, out entity);
                 }
             }
 
@@ -2053,9 +1885,9 @@ namespace WhiteCore.Region
         ///     Get this prim ready to add to the scene
         /// </summary>
         /// <param name="entity"></param>
-        public void PrepPrimForAdditionToScene(ISceneEntity entity)
+        public void PrepPrimForAdditionToScene (ISceneEntity entity)
         {
-            ResetEntityIDs(entity);
+            ResetEntityIDs (entity);
         }
 
         /// <summary>
@@ -2063,16 +1895,16 @@ namespace WhiteCore.Region
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public bool AddPrimToScene(ISceneEntity entity)
+        public bool AddPrimToScene (ISceneEntity entity)
         {
             //Reset the entity IDs
-            ResetEntityIDs(entity);
+            ResetEntityIDs (entity);
             //Force the prim to backup now that it has been added
-            entity.ForcePersistence();
+            entity.ForcePersistence ();
             //Tell the entity that they are being added to a scene
-            entity.AttachToScene(m_parentScene);
+            entity.AttachToScene (m_parentScene);
             //Now save the entity that we have 
-            return AddEntity(entity, false);
+            return AddEntity (entity, false);
         }
 
         /// <summary>
@@ -2081,37 +1913,34 @@ namespace WhiteCore.Region
         /// <param name="entity"></param>
         /// <param name="force"></param>
         /// <returns></returns>
-        public bool RestorePrimToScene(ISceneEntity entity, bool force)
+        public bool RestorePrimToScene (ISceneEntity entity, bool force)
         {
-            List<ISceneChildEntity> children = entity.ChildrenEntities();
+            List<ISceneChildEntity> children = entity.ChildrenEntities ();
             //Sort so that we rebuild in the same order and the root being first
-            children.Sort(LinkSetSorter);
+            children.Sort (LinkSetSorter);
 
-            entity.ClearChildren();
+            entity.ClearChildren ();
 
-            foreach (ISceneChildEntity child in children)
-            {
+            foreach (ISceneChildEntity child in children) {
                 if (child.LocalId == 0)
-                    child.LocalId = AllocateLocalId();
-                if (((SceneObjectPart) child).PhysActor != null)
-                {
-                    ((SceneObjectPart) child).PhysActor.LocalID = child.LocalId;
-                    ((SceneObjectPart) child).PhysActor.UUID = child.UUID;
+                    child.LocalId = AllocateLocalId ();
+                if (((SceneObjectPart)child).PhysActor != null) {
+                    ((SceneObjectPart)child).PhysActor.LocalID = child.LocalId;
+                    ((SceneObjectPart)child).PhysActor.UUID = child.UUID;
                 }
                 child.Flags &= ~PrimFlags.Scripted;
-                child.TrimPermissions();
-                entity.AddChild(child, child.LinkNum);
+                child.TrimPermissions ();
+                entity.AddChild (child, child.LinkNum);
             }
             //Tell the entity that they are being added to a scene
-            entity.AttachToScene(m_parentScene);
+            entity.AttachToScene (m_parentScene);
             //Now save the entity that we have 
-            bool success = AddEntity(entity, false);
+            bool success = AddEntity (entity, false);
 
-            if (force && !success)
-            {
-                IBackupModule backup = m_parentScene.RequestModuleInterface<IBackupModule>();
-                backup.DeleteSceneObjects(new ISceneEntity[1] {entity}, false, true);
-                return RestorePrimToScene(entity, false);
+            if (force && !success) {
+                IBackupModule backup = m_parentScene.RequestModuleInterface<IBackupModule> ();
+                backup.DeleteSceneObjects (new ISceneEntity [] { entity }, false, true);
+                return RestorePrimToScene (entity, false);
             }
             return success;
         }
@@ -2121,14 +1950,14 @@ namespace WhiteCore.Region
         ///     This does not reset IDs so that it is updated correctly in the client
         /// </summary>
         /// <param name="entity"></param>
-        public void DelinkPartToScene(ISceneEntity entity)
+        public void DelinkPartToScene (ISceneEntity entity)
         {
             //Force the prim to backup now that it has been added
-            entity.ForcePersistence();
+            entity.ForcePersistence ();
             //Tell the entity that they are being added to a scene
-            entity.RebuildPhysicalRepresentation(true, null);
+            entity.RebuildPhysicalRepresentation (true, null);
             //Now save the entity that we have 
-            AddEntity(entity, false);
+            AddEntity (entity, false);
         }
 
         /// <summary>
@@ -2136,9 +1965,9 @@ namespace WhiteCore.Region
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public bool DeleteEntity(IEntity entity)
+        public bool DeleteEntity (IEntity entity)
         {
-            return RemoveEntity(entity);
+            return RemoveEntity (entity);
         }
 
         #endregion
@@ -2153,9 +1982,9 @@ namespace WhiteCore.Region
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        private bool RemoveEntity(IEntity entity)
+        bool RemoveEntity (IEntity entity)
         {
-            return Entities.Remove(entity);
+            return Entities.Remove (entity);
         }
 
         /// <summary>
@@ -2164,34 +1993,31 @@ namespace WhiteCore.Region
         /// <param name="entity"></param>
         /// <param name="AllowUpdate"></param>
         /// <returns></returns>
-        private bool AddEntity(IEntity entity, bool AllowUpdate)
+        bool AddEntity (IEntity entity, bool AllowUpdate)
         {
-            return Entities.Add(entity);
+            return Entities.Add (entity);
         }
 
         /// <summary>
         ///     Reset all of the UUID's, localID's, etc in this group (includes children)
         /// </summary>
         /// <param name="entity"></param>
-        private void ResetEntityIDs(ISceneEntity entity)
+        void ResetEntityIDs (ISceneEntity entity)
         {
-            List<ISceneChildEntity> children = entity.ChildrenEntities();
+            List<ISceneChildEntity> children = entity.ChildrenEntities ();
             //Sort so that we rebuild in the same order and the root being first
-            children.Sort(LinkSetSorter);
+            children.Sort (LinkSetSorter);
 
-            entity.ClearChildren();
-            foreach (ISceneChildEntity child in children)
-            {
-                child.ResetEntityIDs();
-                entity.AddChild(child, child.LinkNum);
+            entity.ClearChildren ();
+            foreach (ISceneChildEntity child in children) {
+                child.ResetEntityIDs ();
+                entity.AddChild (child, child.LinkNum);
             }
             //This clears the xml file, which will need rebuilt now that we have changed the UUIDs
             entity.HasGroupChanged = true;
-            foreach (ISceneChildEntity child in children)
-            {
-                if (!child.IsRoot)
-                {
-                    child.SetParentLocalId(entity.RootChild.LocalId);
+            foreach (ISceneChildEntity child in children) {
+                if (!child.IsRoot) {
+                    child.SetParentLocalId (entity.RootChild.LocalId);
                 }
             }
         }
@@ -2200,7 +2026,7 @@ namespace WhiteCore.Region
         ///     Returns a new unallocated local ID
         /// </summary>
         /// <returns>A brand new local ID</returns>
-        public uint AllocateLocalId()
+        public uint AllocateLocalId ()
         {
             lock (_primAllocateLock)
                 return ++m_lastAllocatedLocalId;
@@ -2210,12 +2036,11 @@ namespace WhiteCore.Region
         ///     Check all the localIDs in this group to make sure that they have not been used previously
         /// </summary>
         /// <param name="group"></param>
-        public void CheckAllocationOfLocalIds(ISceneEntity group)
+        public void CheckAllocationOfLocalIds (ISceneEntity group)
         {
-            foreach (ISceneChildEntity part in group.ChildrenEntities())
-            {
+            foreach (ISceneChildEntity part in group.ChildrenEntities ()) {
                 if (part.LocalId != 0)
-                    CheckAllocationOfLocalId(part.LocalId);
+                    CheckAllocationOfLocalId (part.LocalId);
             }
         }
 
@@ -2223,10 +2048,9 @@ namespace WhiteCore.Region
         ///     Make sure that this localID has not been used earlier in the Scene Startup
         /// </summary>
         /// <param name="LocalID"></param>
-        private void CheckAllocationOfLocalId(uint LocalID)
+        void CheckAllocationOfLocalId (uint LocalID)
         {
-            lock (_primAllocateLock)
-            {
+            lock (_primAllocateLock) {
                 if (LocalID > m_lastAllocatedLocalId)
                     m_lastAllocatedLocalId = LocalID + 1;
             }

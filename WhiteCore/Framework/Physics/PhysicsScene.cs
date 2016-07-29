@@ -34,10 +34,10 @@ using WhiteCore.Framework.SceneInfo;
 
 namespace WhiteCore.Framework.Physics
 {
-    public delegate void RaycastCallback(
+    public delegate void RaycastCallback (
         bool hitYN, Vector3 collisionPoint, uint localid, float distance, Vector3 normal);
 
-    public delegate void RayCallback(List<ContactResult> list);
+    public delegate void RayCallback (List<ContactResult> list);
 
     /// <summary>
     /// Contact result from a raycast.
@@ -50,37 +50,32 @@ namespace WhiteCore.Framework.Physics
         public Vector3 Pos;
     }
 
-    public delegate void OnCollisionEvent(PhysicsActor actor, PhysicsActor collidedActor, ContactPoint contact);
+    public delegate void OnCollisionEvent (PhysicsActor actor, PhysicsActor collidedActor, ContactPoint contact);
 
     public abstract class PhysicsScene
     {
-        public virtual float TimeDilation
-        {
+        public virtual float TimeDilation {
             get { return 1.0f; }
             set { }
         }
 
-        public virtual float StepTime
-        {
+        public virtual float StepTime {
             get { return 0; }
         }
 
         public virtual bool AllowGroupLink { get { return false; } }
 
-        public virtual bool IsThreaded
-        {
+        public virtual bool IsThreaded {
             get { return false; }
         }
 
         public virtual bool DisableCollisions { get; set; }
 
-        public virtual List<PhysicsActor> ActiveObjects
-        {
+        public virtual List<PhysicsActor> ActiveObjects {
             get { return null; }
         }
 
-        public virtual bool UseUnderWaterPhysics
-        {
+        public virtual bool UseUnderWaterPhysics {
             get { return false; }
         }
 
@@ -104,8 +99,8 @@ namespace WhiteCore.Framework.Physics
 
         public virtual int StatCollisionAccountingTime { get; protected set; }
 
-        public abstract void Initialise(IMesher meshmerizer, IScene scene);
-        public abstract void PostInitialise(IConfigSource config);
+        public abstract void Initialise (IMesher meshmerizer, IScene scene);
+        public abstract void PostInitialise (IConfigSource config);
 
         /// <summary>
         /// A unique identifying string for this instance of the physics engine.
@@ -123,40 +118,40 @@ namespace WhiteCore.Framework.Physics
         public abstract string EngineType { get; }
 
 
-        public abstract PhysicsActor AddAvatar(string avName, Vector3 position, Quaternion rotation, Vector3 size,
-                                                   bool isFlying, uint LocalID, UUID UUID);
+        public abstract PhysicsActor AddAvatar (string avName, Vector3 position, Quaternion rotation, Vector3 size,
+                                               bool isFlying, uint localID, UUID uuid);
 
-        public abstract void RemoveAvatar(PhysicsActor actor);
+        public abstract void RemoveAvatar (PhysicsActor actor);
 
         /// <summary>
         /// Removes a single prim from the group that it is in 
         /// (or removes it entirely from the scene if it is as single prim)
         /// </summary>
         /// <param name="prim"></param>
-        public abstract void RemovePrim(PhysicsActor prim);
+        public abstract void RemovePrim (PhysicsActor prim);
 
-        public abstract PhysicsActor AddPrimShape(UUID primID, uint localID, string name, byte physicsType, PrimitiveBaseShape shape,
+        public abstract PhysicsActor AddPrimShape (UUID primID, uint localID, string name, byte physicsType, PrimitiveBaseShape shape,
             Vector3 position, Vector3 size, Quaternion rotation, bool isPhysical, int material, float friction, float restitution,
             float gravityMultiplier, float density);
 
-        public abstract void Simulate(float timeStep);
+        public abstract void Simulate (float timeStep);
 
-        public virtual void GetResults()
+        public virtual void GetResults ()
         {
         }
 
-        public abstract void SetTerrain(ITerrainChannel channel, short[] heightMap);
+        public abstract void SetTerrain (ITerrainChannel channel, short [] heightMap);
 
-        public abstract void SetWaterLevel(double height, short[] map);
+        public abstract void SetWaterLevel (double height, short [] map);
 
-        public abstract void Dispose();
+        public abstract void Dispose ();
 
-        public abstract Dictionary<uint, float> GetTopColliders();
+        public abstract Dictionary<uint, float> GetTopColliders ();
 
         /// <summary>
         ///     True if the physics plugin supports raycasting against the physics scene
         /// </summary>
-        public virtual bool SupportsRayCast()
+        public virtual bool SupportsRayCast ()
         {
             return false;
         }
@@ -177,39 +172,39 @@ namespace WhiteCore.Framework.Physics
         /// <param name="direction">Direction of the ray</param>
         /// <param name="length">Length of ray in meters</param>
         /// <param name="retMethod">Method to call when the raycast is complete</param>
-        public virtual void RaycastWorld(Vector3 position, Vector3 direction, float length, RaycastCallback retMethod)
+        public virtual void RaycastWorld (Vector3 position, Vector3 direction, float length, RaycastCallback retMethod)
         {
             if (retMethod != null)
-                retMethod(false, Vector3.Zero, 0, 999999999999f, Vector3.Zero);
+                retMethod (false, Vector3.Zero, 0, 999999999999f, Vector3.Zero);
         }
 
-        public virtual void RaycastWorld(Vector3 position, Vector3 direction, float length, int Count,
+        public virtual void RaycastWorld (Vector3 position, Vector3 direction, float length, int Count,
                                          RayCallback retMethod)
         {
             if (retMethod != null)
-                retMethod(new List<ContactResult>());
+                retMethod (new List<ContactResult> ());
         }
 
-        public virtual List<ContactResult> RaycastWorld(Vector3 position, Vector3 direction, float length, int Count)
+        public virtual List<ContactResult> RaycastWorld (Vector3 position, Vector3 direction, float length, int Count)
         {
-            return new List<ContactResult>();
+            return new List<ContactResult> ();
         }
 
-        public virtual void SetGravityForce(bool enabled, float forceX, float forceY, float forceZ)
+        public virtual void SetGravityForce (bool enabled, float forceX, float forceY, float forceZ)
         {
         }
 
-        public virtual float[] GetGravityForce()
+        public virtual float [] GetGravityForce ()
         {
-            return new float[3] {0, 0, 0};
+            return new float [] { 0, 0, 0 };
         }
 
-        public virtual void AddGravityPoint(bool isApplyingForces, Vector3 position, float forceX, float forceY,
+        public virtual void AddGravityPoint (bool isApplyingForces, Vector3 position, float forceX, float forceY,
                                             float forceZ, float gravForce, float radius, int identifier)
         {
         }
 
-        public virtual void UpdatesLoop()
+        public virtual void UpdatesLoop ()
         {
         }
     }
@@ -218,44 +213,42 @@ namespace WhiteCore.Framework.Physics
     {
         static int m_workIndicator;
 
-        public override bool DisableCollisions
-        {
+        public override bool DisableCollisions {
             get { return false; }
             set { }
         }
 
         public override string EngineType { get { return "NullPhysics"; } }
 
-        public override bool UseUnderWaterPhysics
-        {
+        public override bool UseUnderWaterPhysics {
             get { return false; }
         }
 
-        public override void Initialise(IMesher meshmerizer, IScene scene)
+        public override void Initialise (IMesher meshmerizer, IScene scene)
         {
             // Does nothing right now
         }
 
-        public override void PostInitialise(IConfigSource config)
+        public override void PostInitialise (IConfigSource config)
         {
         }
 
-        public override PhysicsActor AddAvatar(string avName, Vector3 position, Quaternion rotation, Vector3 size,
-                                                   bool isFlying, uint localID, UUID UUID)
+        public override PhysicsActor AddAvatar (string avName, Vector3 position, Quaternion rotation, Vector3 size,
+                                               bool isFlying, uint localID, UUID uuid)
         {
-            MainConsole.Instance.InfoFormat("[PHYSICS]: NullPhysicsScene : AddAvatar({0})", position);
-            return new NullCharacterPhysicsActor();
+            MainConsole.Instance.InfoFormat ("[Physics]: NullPhysicsScene : AddAvatar({0})", position);
+            return new NullCharacterPhysicsActor ();
         }
 
-        public override void RemoveAvatar(PhysicsActor actor)
-        {
-        }
-
-        public override void RemovePrim(PhysicsActor prim)
+        public override void RemoveAvatar (PhysicsActor actor)
         {
         }
 
-        public override void SetWaterLevel(double height, short[] map)
+        public override void RemovePrim (PhysicsActor prim)
+        {
+        }
+
+        public override void SetWaterLevel (double height, short [] map)
         {
         }
 
@@ -267,35 +260,35 @@ namespace WhiteCore.Framework.Physics
                     }
         */
 
-        public override PhysicsActor AddPrimShape(UUID primID, uint localID, string name, byte physicsType, PrimitiveBaseShape shape,
-            Vector3 position, Vector3 size, Quaternion rotation, bool isPhysical, int material, float friction, float restitution, 
+        public override PhysicsActor AddPrimShape (UUID primID, uint localID, string name, byte physicsType, PrimitiveBaseShape shape,
+            Vector3 position, Vector3 size, Quaternion rotation, bool isPhysical, int material, float friction, float restitution,
             float gravityMultiplier, float density)
         {
-            return new NullObjectPhysicsActor();
+            return new NullObjectPhysicsActor ();
         }
 
-        public override void Simulate(float timeStep)
+        public override void Simulate (float timeStep)
         {
-            m_workIndicator = (m_workIndicator + 1)%10;
+            m_workIndicator = (m_workIndicator + 1) % 10;
         }
 
-        public override void SetTerrain(ITerrainChannel channel, short[] heightMap)
+        public override void SetTerrain (ITerrainChannel channel, short [] heightMap)
         {
-            MainConsole.Instance.InfoFormat("[PHYSICS]: NullPhysicsScene : SetTerrain({0} items)", heightMap.Length);
+            MainConsole.Instance.InfoFormat ("[Physics]: NullPhysicsScene : SetTerrain({0} items)", heightMap.Length);
         }
 
-        public override void Dispose()
+        public override void Dispose ()
         {
         }
 
-        public override Dictionary<uint, float> GetTopColliders()
+        public override Dictionary<uint, float> GetTopColliders ()
         {
-            Dictionary<uint, float> returncolliders = new Dictionary<uint, float>();
+            Dictionary<uint, float> returncolliders = new Dictionary<uint, float> ();
             return returncolliders;
         }
 
         // Extendable interface for new, physics engine specific operations
-        public virtual object Extension(string pFunc, params object[] pParams)
+        public virtual object Extension (string pFunc, params object [] pParams)
         {
             // A NOP if the extension thing is not implemented by the physics engine
             return null;

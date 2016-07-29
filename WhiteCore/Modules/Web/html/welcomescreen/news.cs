@@ -26,11 +26,10 @@
  */
 
 
-using WhiteCore.Framework.DatabaseInterfaces;
-using WhiteCore.Framework.Servers.HttpServer;
-using WhiteCore.Framework.Servers.HttpServer.Implementation;
-using OpenMetaverse;
 using System.Collections.Generic;
+using OpenMetaverse;
+using WhiteCore.Framework.DatabaseInterfaces;
+using WhiteCore.Framework.Servers.HttpServer.Implementation;
 
 namespace WhiteCore.Modules.Web
 {
@@ -77,21 +76,25 @@ namespace WhiteCore.Modules.Web
             vars.Add("LastText", translator.GetTranslatedString("LastText"));
 
             uint amountPerQuery = 10;
+            int maxPages = 0;
             int start = httpRequest.Query.ContainsKey("Start") ? int.Parse(httpRequest.Query["Start"].ToString()) : 0;
-            uint count = (uint) connector.GetGenericCount(UUID.Zero, "WebGridNews");
-            int maxPages = (int) (count/amountPerQuery) - 1;
 
-            if (start == -1)
-                start = (int) (maxPages < 0 ? 0 : maxPages);
+            if (connector != null)
+            {
+                uint count = (uint)connector.GetGenericCount (UUID.Zero, "WebGridNews");
+                maxPages = (int)(count / amountPerQuery) - 1;
+                if (start == -1)
+                    start = (maxPages < 0 ? 0 : maxPages);
+
+                var newsItems = connector.GetGenerics<GridNewsItem> (UUID.Zero, "WebGridNews");
+                if (newsItems.Count == 0)
+                    newsItems.Add (GridNewsItem.NoNewsItem);
+                vars.Add("NewsList", newsItems.ConvertAll<Dictionary<string, object>>(item => item.ToDictionary()));
+            }
 
             vars.Add("CurrentPage", start);
             vars.Add("NextOne", start + 1 > maxPages ? start : start + 1);
             vars.Add("BackOne", start - 1 < 0 ? 0 : start - 1);
-
-            var newsItems = connector.GetGenerics<GridNewsItem>(UUID.Zero, "WebGridNews");
-            if (newsItems.Count == 0)
-                newsItems.Add(GridNewsItem.NoNewsItem);
-            vars.Add("NewsList", newsItems.ConvertAll<Dictionary<string, object>>(item => item.ToDictionary()));
 
             return vars;
         }

@@ -1,5 +1,5 @@
 ﻿    /*
- * Copyright (c) Contributors, http://opensimulator.org/, http://whitecore-sim.org
+ * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org/, http://opensimulator.org/
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -9,7 +9,7 @@
  *     * Redistributions in binary form must reproduce the above copyrightD
  *       notice, this list of conditions and the following disclaimer in the
  *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the OpenSimulator Project nor the
+ *     * Neither the name of the WhiteCore-Sim Project nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
  *
@@ -225,6 +225,10 @@ namespace WhiteCore.Physics.BulletSPlugin
 
             // Get the connection to the physics engine (could be native or one of many DLLs)
             PE = SelectUnderlyingBulletEngine(BulletEngineName);
+            if (PE == null) {
+                MainConsole.Instance.Error ("[BSScene]: Unable to select underlyin bullet engine!");
+                return;
+            }
 
             // Enable very detailed logging.
             // By creating an empty logger when not logging, the log message invocation code
@@ -764,7 +768,7 @@ namespace WhiteCore.Physics.BulletSPlugin
                 }
 
                 List<BSPhysObject> orderedPrims = new List<BSPhysObject>(PhysObjects.Values);
-                orderedPrims.OrderByDescending(p => p.CollisionScore);
+                // this does nothing >>// orderedPrims.OrderByDescending(p => p.CollisionScore);
                 topColliders = orderedPrims.Take(25).ToDictionary(p => p.LocalID, p => p.CollisionScore);
             }
 

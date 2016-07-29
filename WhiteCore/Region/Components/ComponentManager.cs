@@ -25,18 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Xml;
+using Nini.Config;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Serialization;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse.StructuredData;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Xml;
 
 namespace WhiteCore.Region.Components
 {
@@ -49,33 +49,28 @@ namespace WhiteCore.Region.Components
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="serialized"></param>
-        public void DeserializeComponents(ISceneChildEntity obj, string serialized)
+        public void DeserializeComponents (ISceneChildEntity obj, string serialized)
         {
             //Pull the OSDMap out for components
             OSDMap map;
-            try
-            {
+            try {
                 if (serialized == "")
-                    map = new OSDMap();
+                    map = new OSDMap ();
                 else
-                    map = (OSDMap) OSDParser.DeserializeJson(serialized);
-            }
-            catch
-            {
+                    map = (OSDMap)OSDParser.DeserializeJson (serialized);
+            } catch {
                 //Bad JSON? Just return
                 return;
             }
 
             //Now check against the list of components we have loaded
-            foreach (KeyValuePair<string, OSD> kvp in map)
-            {
-                PropertyInfo property = obj.GetType().GetProperty(kvp.Key);
-                if (property != null)
-                {
-                    property.SetValue(obj, Util.OSDToObject(kvp.Value, property.PropertyType), null);
+            foreach (KeyValuePair<string, OSD> kvp in map) {
+                PropertyInfo property = obj.GetType ().GetProperty (kvp.Key);
+                if (property != null) {
+                    property.SetValue (obj, Util.OSDToObject (kvp.Value, property.PropertyType), null);
                 }
             }
-            map.Clear();
+            map.Clear ();
             map = null;
         }
 
@@ -83,23 +78,19 @@ namespace WhiteCore.Region.Components
 
         #region ISOPSerializerModule Members
 
-        public void Deserialization(ISceneChildEntity obj, XmlTextReader reader)
+        public void Deserialization (ISceneChildEntity obj, XmlTextReader reader)
         {
-            string components = reader.ReadElementContentAsString("Components", String.Empty);
-            if (components != "")
-            {
-                try
-                {
-                    DeserializeComponents(obj, components);
-                }
-                catch (Exception ex)
-                {
-                    MainConsole.Instance.Warn("[COMPONENTMANAGER]: Error on deserializing Components! " + ex);
+            string components = reader.ReadElementContentAsString ("Components", string.Empty);
+            if (components != "") {
+                try {
+                    DeserializeComponents (obj, components);
+                } catch (Exception ex) {
+                    MainConsole.Instance.Warn ("[Component manager]: Error on deserializing Components! " + ex);
                 }
             }
         }
 
-        public string Serialization(ISceneChildEntity part)
+        public string Serialization (ISceneChildEntity part)
         {
             return null;
         }
@@ -108,16 +99,16 @@ namespace WhiteCore.Region.Components
 
         #region IService Members
 
-        public void Initialize(IConfigSource config, IRegistryCore registry)
+        public void Initialize (IConfigSource config, IRegistryCore registry)
         {
-            SceneEntitySerializer.SceneObjectSerializer.AddSerializer("Components", this);
+            SceneEntitySerializer.SceneObjectSerializer.AddSerializer ("Components", this);
         }
 
-        public void Start(IConfigSource config, IRegistryCore registry)
+        public void Start (IConfigSource config, IRegistryCore registry)
         {
         }
 
-        public void FinishedStartup()
+        public void FinishedStartup ()
         {
         }
 

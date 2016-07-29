@@ -34,13 +34,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
     public class StartPerformanceQueue
     {
-        private readonly Queue ContinuedQueue = new Queue(10000);
-        private readonly Queue FirstStartQueue = new Queue(10000);
-        private readonly Queue SuspendedQueue = new Queue(100); //Smaller, we don't get this very often
-        private int ContinuedQueueCount;
+        readonly Queue ContinuedQueue = new Queue(10000);
+        readonly Queue FirstStartQueue = new Queue(10000);
+        readonly Queue SuspendedQueue = new Queue(100);     //Smaller, we don't get this very often
+        int ContinuedQueueCount;
 
-        private int FirstStartQueueCount;
-        private int SuspendedQueueCount;
+        int FirstStartQueueCount;
+        int SuspendedQueueCount;
 
         public bool GetNext(out object Item)
         {
@@ -77,12 +77,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
         public void Clear()
         {
-            lock (ContinuedQueue)
-            {
-                lock (SuspendedQueue)
-                {
-                    lock (FirstStartQueue)
-                    {
+            lock (ContinuedQueue) {
+                lock (SuspendedQueue) {
+                    lock (FirstStartQueue) {
                         ContinuedQueue.Clear();
                         SuspendedQueue.Clear();
                         FirstStartQueue.Clear();
@@ -94,7 +91,16 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
         public int Count()
         {
-            return ContinuedQueueCount + SuspendedQueueCount + FirstStartQueueCount;
+            int queCount = 0;
+
+            lock (ContinuedQueue) {
+                lock (SuspendedQueue) {
+                    lock (FirstStartQueue)
+                        queCount = ContinuedQueueCount + SuspendedQueueCount + FirstStartQueueCount;
+                }
+            }
+
+            return queCount;
         }
 
         public void Add(object item, LoadPriority priority)

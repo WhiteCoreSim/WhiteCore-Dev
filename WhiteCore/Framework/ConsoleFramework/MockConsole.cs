@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using Nini.Config;
 using WhiteCore.Framework.Modules;
 
@@ -38,35 +37,34 @@ namespace WhiteCore.Framework.ConsoleFramework
     /// </summary>
     public class MockConsole : CommandConsole
     {
-        public override void Initialize(IConfigSource source, ISimulationBase simBase)
+        public override void Initialize (IConfigSource source, ISimulationBase simBase)
         {
-            if (source.Configs["Console"] == null ||
-                source.Configs["Console"].GetString("Console", String.Empty) != "MockConsole")
-            {
+            if (source.Configs ["Console"] == null ||
+                source.Configs ["Console"].GetString ("Console", string.Empty) != "MockConsole") {
                 return;
             }
 
-            simBase.ApplicationRegistry.RegisterModuleInterface<ICommandConsole>(this);
+            simBase.ApplicationRegistry.RegisterModuleInterface<ICommandConsole> (this);
             MainConsole.Instance = this;
 
-            m_Commands.AddCommand("help", "help", "Get a general command list", Help, false, true);
+            m_Commands.AddCommand ("help", "help", "Get a general command list", Help, false, true);
         }
 
-        public override void Output(string text, Level level)
+        public override void Output (string text, Level level)
         {
         }
 
-        public override string ReadLine(string p, bool isCommand, bool e)
+        public override string ReadLine (string p, bool isCommand, bool e)
         {
             //Thread.CurrentThread.Join(1000);
             return string.Empty;
         }
 
-        public override void UnlockOutput()
+        public override void UnlockOutput ()
         {
         }
 
-        public override void LockOutput()
+        public override void LockOutput ()
         {
         }
     }

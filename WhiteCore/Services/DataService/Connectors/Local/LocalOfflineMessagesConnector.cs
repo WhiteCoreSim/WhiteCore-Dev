@@ -26,21 +26,20 @@
  */
 
 using System.Collections.Generic;
-
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
 
 namespace WhiteCore.Services.DataService
 {
     public class LocalOfflineMessagesConnector : ConnectorBase, IOfflineMessagesConnector
     {
-        private IGenericData GD;
-        private int m_maxOfflineMessages = 20;
+        IGenericData GD;
+        int m_maxOfflineMessages = 20;
 
         #region IOfflineMessagesConnector Members
 
@@ -80,13 +79,13 @@ namespace WhiteCore.Services.DataService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public List<GridInstantMessage> GetOfflineMessages(UUID agentID)
         {
-            object remoteValue = DoRemote(agentID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<GridInstantMessage>) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (agentID);
+                return remoteValue != null ? (List<GridInstantMessage>)remoteValue : new List<GridInstantMessage> ();
+            }
 
             //Get all the messages
-            List<GridInstantMessage> Messages = GenericUtils.GetGenerics<GridInstantMessage>(agentID, "OfflineMessages",
-                                                                                             GD);
+            List<GridInstantMessage> Messages = GenericUtils.GetGenerics<GridInstantMessage>(agentID, "OfflineMessages",GD);
             Messages.AddRange(GenericUtils.GetGenerics<GridInstantMessage>(agentID, "GroupOfflineMessages", GD));
             //Clear them out now that we have them
             GenericUtils.RemoveGenericByType(agentID, "OfflineMessages", GD);
@@ -101,9 +100,10 @@ namespace WhiteCore.Services.DataService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public bool AddOfflineMessage(GridInstantMessage message)
         {
-            object remoteValue = DoRemote(message);
-            if (remoteValue != null || m_doRemoteOnly)
-                return remoteValue == null ? false : (bool) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (message);
+                return remoteValue != null && (bool)remoteValue;
+            }
 
             if (m_maxOfflineMessages <= 0 ||
                 GenericUtils.GetGenericCount(message.ToAgentID, "OfflineMessages", GD) < m_maxOfflineMessages)

@@ -59,11 +59,9 @@ namespace WhiteCore.Services.DataService
                     connectionString = source.Configs[Name].GetString("ConnectionString", defaultConnectionString);
 
                     m_allowDuplicatePresences =
-                        source.Configs[Name].GetBoolean("AllowDuplicatePresences",
-                                                        m_allowDuplicatePresences);
+                        source.Configs[Name].GetBoolean("AllowDuplicatePresences", m_allowDuplicatePresences);
                     m_checkLastSeen =
-                        source.Configs[Name].GetBoolean("CheckLastSeen",
-                                                        m_checkLastSeen);
+                        source.Configs[Name].GetBoolean("CheckLastSeen", m_checkLastSeen);
                 }
                 if (GD != null)
                     GD.ConnectToDatabase(connectionString, "UserInfo",
@@ -259,8 +257,7 @@ namespace WhiteCore.Services.DataService
             return uint.Parse (userCount[0]);
         }
 
-        public List<UserInfo> RecentlyOnline(uint secondsAgo, bool stillOnline, Dictionary<string, bool> sort,
-                                             uint start, uint count)
+        public List<UserInfo> RecentlyOnline(uint secondsAgo, bool stillOnline, Dictionary<string, bool> sort)
         {
             //Beware!! login times are UTC!
             int now = Util.ToUnixTime (DateTime.Now.ToUniversalTime ()) - (int)secondsAgo;
@@ -274,13 +271,12 @@ namespace WhiteCore.Services.DataService
                 filter.andFilters["IsOnline"] = "1";
             }
 
-            List<string> query = GD.Query(new string[] { "*" }, m_userInfoTable, filter, sort, start, count);
+            List<string> query = GD.Query(new string[] { "*" }, m_userInfoTable, filter, sort, null, null);
 
             return ParseQuery(query);
         }
 
-        public List<UserInfo> CurrentlyOnline(uint secondsAgo, Dictionary<string, bool> sort, uint start,
-            uint count)
+        public List<UserInfo> CurrentlyOnline(uint secondsAgo, Dictionary<string, bool> sort)
         {
 
             QueryFilter filter = new QueryFilter();
@@ -298,7 +294,7 @@ namespace WhiteCore.Services.DataService
             filter.andFilters["IsOnline"] = "1";
 
 
-            List<string> query = GD.Query(new string[] { "*" }, m_userInfoTable, filter, sort, start, count);
+            List<string> query = GD.Query(new string[] { "*" }, m_userInfoTable, filter, sort, null, null);
 
             return ParseQuery(query);
         }

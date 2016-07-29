@@ -177,7 +177,11 @@ namespace WhiteCore.Physics.ConvexDecompositionDotNet
                     t = tris[i];
                 }
             }
-            return (t.rise > epsilon) ? t : null;
+
+            if (t != null && t.rise > epsilon)
+                return t;
+               
+            return null;
         }
 
         public static Quaternion RotationArc(float3 v0, float3 v1)

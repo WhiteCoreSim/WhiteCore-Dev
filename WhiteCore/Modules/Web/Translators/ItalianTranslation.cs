@@ -1,4 +1,31 @@
-﻿namespace WhiteCore.Modules.Web.Translators
+﻿/*
+ * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org
+ * See CONTRIBUTORS.TXT for a full list of copyright holders.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the WhiteCore-Sim Project nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ``AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+namespace WhiteCore.Modules.Web.Translators
 {
     public class ItalianTranslation : ITranslator
     {
@@ -24,6 +51,9 @@
                 case "CurrentPageText": return "Pagina corrente";
                 case "MoreInfoText": return "Piu informazioni";
                 case "NoDetailsText": return "Nessun dato trovato...";
+            case "MoreInfo":
+                return "Piu informazioni";
+
             case "ObjectNameText": return "Oggetto";
             case "LocationText": return "Posizione";
             case "UUIDText": return "UUID";
@@ -216,6 +246,7 @@
                 case "MenuMyPurchases": return "I miei acquisti ";
                 case "MenuTransactions": return "Operazioni utente";
                 case "MenuMyTransactions": return "Le mie transazioni";
+                case "MenuMyClassifieds": return "Le mie Classifieds <NT>";                
                 case "MenuStatistics": return "Statistiche Viewer";
                 case "MenuGridSettings": return "Impostazioni della grid";
 
@@ -301,17 +332,19 @@
 
                 // Language Switcher Tooltips
                 case "en":
-                    return "Inglese";
+                    return "English";
                 case "fr":
-                    return "Francese";
+                    return "Français";
                 case "de":
-                    return "Tedesco";
+                    return "Deutsch";
                 case "it":
                     return "Italiano";
                 case "es":
-                    return "Spagnolo";
+                    return "Español";
                 case "nl":
-                    return "Olandese";
+                    return "Nederlands";
+            case "ru":
+                return "Русский";
 
                 // Index Page
                 case "HomeText":
@@ -526,11 +559,15 @@
                 case "GridnameText": return "Nome della grid ";
                 case "GridnickText": return "Soprannome della grid ";
                 case "WelcomeMessageText": return "Sezione messaggi di benvenuto ";
-                case "SystemEstateNameText": return "Nomi terreni del Governo";
-                case "SystemEstateOwnerText": return "Nome proprietario terreni del Governo";
+            case "GovernorNameText": return "Sistema di regolazione";
+            case "MainlandEstateNameText": return "Terraferma immobiliare";
+            case "RealEstateOwnerNameText": return "Nome proprietario terreni del Governo";
+            case "SystemEstateNameText": return "Nomi terreni del Governo";
+            case "BankerNameText": return "Sistema banchiere";
+            case "MarketPlaceOwnerNameText": return "Proprietario marketplace sistema";
 
-                //settings manager page
-                case "WebRegistrationText":
+            //settings manager page
+            case "WebRegistrationText":
                     return "Registrazioni Web consentite";
                 case "GridCenterXText":
                     return "Centro della Grid: Coordinate X";
@@ -558,6 +595,9 @@
                 case "LoggedIPText": return "Il tuo indirizzo IP";
                 case "NoPurchasesText": return "Nessuna transazione trovata...";
                 case "PurchaseCostText": return "Costo";
+                
+                // Classifieds
+                case "ClassifiedsText": return "Classifieds <NT>";
 
                 // Sim Console
                 case "SimConsoleText": return "Console di comando della Sim";

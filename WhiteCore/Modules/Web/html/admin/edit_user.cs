@@ -25,88 +25,90 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using OpenMetaverse;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Profile;
 using WhiteCore.Framework.Utilities;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
 
 namespace WhiteCore.Modules.Web
 {
     public class EditUserPage : IWebInterfacePage
     {
-        public string[] FilePath
-        {
-            get
-            {
-                return new[]
+        public string [] FilePath {
+            get {
+                return new []
                            {
                                "html/admin/edit_user.html"
                            };
             }
         }
 
-        public bool RequiresAuthentication
-        {
+        public bool RequiresAuthentication {
             get { return true; }
         }
 
-        public bool RequiresAdminAuthentication
-        {
+        public bool RequiresAdminAuthentication {
             get { return true; }
         }
 
 
-        public Dictionary<string, object> Fill(WebInterface webInterface, string filename, OSHttpRequest httpRequest,
+        public Dictionary<string, object> Fill (WebInterface webInterface, string filename, OSHttpRequest httpRequest,
                                                OSHttpResponse httpResponse, Dictionary<string, object> requestParameters,
                                                ITranslator translator, out string response)
         {
             response = null;
-            var vars = new Dictionary<string, object>();
+            var vars = new Dictionary<string, object> ();
 
             string error = "";
-            UUID userID = httpRequest.Query.ContainsKey("userid")
-                            ? UUID.Parse(httpRequest.Query["userid"].ToString())
-                            : UUID.Parse(requestParameters["userid"].ToString());
+            UUID userID = httpRequest.Query.ContainsKey ("userid")
+                            ? UUID.Parse (httpRequest.Query ["userid"].ToString ())
+                            : UUID.Parse (requestParameters ["userid"].ToString ());
 
-            IUserAccountService userService = webInterface.Registry.RequestModuleInterface<IUserAccountService>();
-            var agentService = Framework.Utilities.DataManager.RequestPlugin<IAgentConnector>();
-            UserAccount account = userService.GetUserAccount(null, userID);
-            IAgentInfo agent = agentService.GetAgent(userID);
+            IUserAccountService userService = webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
+            UserAccount account = null;
+
+            if (userService != null)
+                account = userService.GetUserAccount (null, userID);
+
+            var agentService = Framework.Utilities.DataManager.RequestPlugin<IAgentConnector> ();
+            IAgentInfo agent = agentService.GetAgent (userID);
 
             if (agent == null)
                 error = "No agent information is available";
 
             // Set user type
-            if (requestParameters.ContainsKey("Submit") &&
-                requestParameters["Submit"].ToString() == "SubmitSetUserType")
-            {
+            if (requestParameters.ContainsKey ("Submit") &&
+                requestParameters ["Submit"].ToString () == "SubmitSetUserType") {
 
                 string UserType = requestParameters ["UserType"].ToString ();
                 int UserFlags = webInterface.UserTypeToUserFlags (UserType);
 
                 // set the user account type
-                account.UserFlags = UserFlags;
-                userService.StoreUserAccount (account);
+                if (account != null) {
+                    account.UserFlags = UserFlags;
+                    userService.StoreUserAccount (account);
+                } else {
+                    response = "User account not found - Unable to update!'";
+                    return null;
+                }
 
-                if (agent != null)
-                {
+                if (agent != null) {
                     agent.OtherAgentInformation ["UserFlags"] = UserFlags;
                     agentService.UpdateAgent (agent);
-                    response = "User has been updated.";
-                } else
+                } else {
                     response = "Agent information is not available! Has the user logged in yet?";
+                    return null;
+                }
 
                 IProfileConnector profileData =
-                    Framework.Utilities.DataManager.RequestPlugin<IProfileConnector>();
-                if (profileData != null)
-                {
+                    Framework.Utilities.DataManager.RequestPlugin<IProfileConnector> ();
+                if (profileData != null) {
                     IUserProfileInfo profile = profileData.GetUserProfile (userID);
-                    if (profile == null)
-                    {
+                    if (profile == null) {
                         profileData.CreateNewProfile (userID);
                         profile = profileData.GetUserProfile (userID);
                     }
@@ -115,76 +117,72 @@ namespace WhiteCore.Modules.Web
                     profileData.UpdateUserProfile (profile);
                 }
 
-                response = "User has been updated.";
+                response = "User account has been updated.";
                 return null;
             }
 
             // Password change
-            if (requestParameters.ContainsKey("Submit") &&
-                requestParameters["Submit"].ToString() == "SubmitPasswordChange")
-            {
-                string password = requestParameters["password"].ToString();
-                string passwordconf = requestParameters["passwordconf"].ToString();
+            if (requestParameters.ContainsKey ("Submit") &&
+                requestParameters ["Submit"].ToString () == "SubmitPasswordChange") {
+                string password = requestParameters ["password"].ToString ();
+                string passwordconf = requestParameters ["passwordconf"].ToString ();
 
                 if (password != passwordconf)
                     response = "Passwords do not match";
-                else
-                {
+                else {
                     IAuthenticationService authService =
-                        webInterface.Registry.RequestModuleInterface<IAuthenticationService>();
+                        webInterface.Registry.RequestModuleInterface<IAuthenticationService> ();
                     if (authService != null)
-                        response = authService.SetPassword(userID, "UserAccount", password)
+                        response = authService.SetPassword (userID, "UserAccount", password)
                                        ? "Successfully set password"
                                        : "Failed to set your password, try again later";
                     else
-                        response = "No authentication service was available to change your password";
+                        response = "No authentication service was available to change the account passwor!";
                 }
                 return null;
             }
 
             // Email change
-            if (requestParameters.ContainsKey("Submit") &&
-                     requestParameters["Submit"].ToString() == "SubmitEmailChange")
-            {
-                string email = requestParameters["email"].ToString();
+            if (requestParameters.ContainsKey ("Submit") &&
+                     requestParameters ["Submit"].ToString () == "SubmitEmailChange") {
+                string email = requestParameters ["email"].ToString ();
 
-                if (userService != null)
-                {
+                if (account != null) {
                     account.Email = email;
-                    userService.StoreUserAccount(account);
+                    userService.StoreUserAccount (account);
                     response = "Successfully updated email";
-                }
-                else
-                    response = "No authentication service was available to change your password";
+                } else
+                    response = "No authentication service was available to change the email details!";
                 return null;
             }
 
             // Delete user
-            if (requestParameters.ContainsKey("Submit") &&
-                     requestParameters["Submit"].ToString() == "SubmitDeleteUser")
-            {
-                string username = requestParameters["username"].ToString();
-                response = "Deleted user successfully";
-                if (username == account.Name)
-                    userService.DeleteUser(account.PrincipalID, account.Name, "", false, false);
-                else
-                    response = "The user name did not match";
+            if (requestParameters.ContainsKey ("Submit") &&
+                     requestParameters ["Submit"].ToString () == "SubmitDeleteUser") {
+                string username = requestParameters ["username"].ToString ();
+                if (account != null) {
+                    if (username == account.Name) {
+                        userService.DeleteUser (account.PrincipalID, account.Name, "", false, false);
+                        response = "User has been successfully deleted";
+                    } else
+                        response = "The user name did not match!";
+                } else
+                    response = "No account details to verify user against!";
+
                 return null;
             }
 
             // Temp Ban user
-            if (requestParameters.ContainsKey("Submit") &&
-                requestParameters["Submit"].ToString() == "SubmitTempBanUser")
-            {
-                int timeDays = int.Parse(requestParameters["TimeDays"].ToString());
-                int timeHours = int.Parse(requestParameters["TimeHours"].ToString());
-                int timeMinutes = int.Parse(requestParameters["TimeMinutes"].ToString());
+            if (requestParameters.ContainsKey ("Submit") &&
+                requestParameters ["Submit"].ToString () == "SubmitTempBanUser") {
+                int timeDays = int.Parse (requestParameters ["TimeDays"].ToString ());
+                int timeHours = int.Parse (requestParameters ["TimeHours"].ToString ());
+                int timeMinutes = int.Parse (requestParameters ["TimeMinutes"].ToString ());
 
-                if (agent != null)
-                {
+                if (agent != null) {
                     agent.Flags |= IAgentFlags.TempBan;
                     DateTime until = DateTime.Now.AddDays (timeDays).AddHours (timeHours).AddMinutes (timeMinutes);
-                    agent.OtherAgentInformation ["TemperaryBanInfo"] = until;
+                    agent.OtherAgentInformation ["Temperory BanInfo"] = until;
                     agentService.UpdateAgent (agent);
                     response = "User has been banned.";
                 } else
@@ -194,13 +192,11 @@ namespace WhiteCore.Modules.Web
             }
 
             // Ban user
-            if (requestParameters.ContainsKey("Submit") &&
-                requestParameters["Submit"].ToString() == "SubmitBanUser")
-            {
-                if( agent != null)
-                {
+            if (requestParameters.ContainsKey ("Submit") &&
+                requestParameters ["Submit"].ToString () == "SubmitBanUser") {
+                if (agent != null) {
                     agent.Flags |= IAgentFlags.PermBan;
-                    agentService.UpdateAgent(agent);
+                    agentService.UpdateAgent (agent);
                     response = "User has been banned.";
                 } else
                     response = "Agent information is not available! Has the user logged in yet?";
@@ -209,16 +205,14 @@ namespace WhiteCore.Modules.Web
             }
 
             //UnBan user
-            if (requestParameters.ContainsKey("Submit") &&
-                requestParameters["Submit"].ToString() == "SubmitUnbanUser")
-            {
+            if (requestParameters.ContainsKey ("Submit") &&
+                requestParameters ["Submit"].ToString () == "SubmitUnbanUser") {
 
-                if (agent != null)
-                {
+                if (agent != null) {
                     agent.Flags &= ~IAgentFlags.TempBan;
                     agent.Flags &= ~IAgentFlags.PermBan;
-                    agent.OtherAgentInformation.Remove("TemperaryBanInfo");
-                    agentService.UpdateAgent(agent);
+                    agent.OtherAgentInformation.Remove ("Temporary BanInfo");
+                    agentService.UpdateAgent (agent);
                     response = "User has been unbanned.";
                 } else
                     response = "Agent information is not available! Has the user logged in yet?";
@@ -227,148 +221,158 @@ namespace WhiteCore.Modules.Web
             }
 
             // Login as user
-            if (requestParameters.ContainsKey("Submit") &&
-                requestParameters["Submit"].ToString() == "SubmitLoginAsUser")
-            {
-                Authenticator.ChangeAuthentication(httpRequest, account);
-                webInterface.Redirect(httpResponse, "/");
+            if (requestParameters.ContainsKey ("Submit") &&
+                requestParameters ["Submit"].ToString () == "SubmitLoginAsUser") {
+                Authenticator.ChangeAuthentication (httpRequest, account);
+                webInterface.Redirect (httpResponse, "/");
                 return vars;
             }
 
             // Kick user
-            if (requestParameters.ContainsKey("Submit") &&
-                requestParameters["Submit"].ToString() == "SubmitKickUser")
-            {
-                string message = requestParameters["KickMessage"].ToString();
-                IGridWideMessageModule messageModule =
-                    webInterface.Registry.RequestModuleInterface<IGridWideMessageModule>();
-                if (messageModule != null)
-                    messageModule.KickUser(account.PrincipalID, message);
-                response = "User has been kicked.";
+            if (requestParameters.ContainsKey ("Submit") &&
+                requestParameters ["Submit"].ToString () == "SubmitKickUser") {
+                string message = requestParameters ["KickMessage"].ToString ();
+                if (account != null) {
+                    IGridWideMessageModule messageModule =
+                        webInterface.Registry.RequestModuleInterface<IGridWideMessageModule> ();
+                    if (messageModule != null)
+                        messageModule.KickUser (account.PrincipalID, message);
+                    response = "User has been kicked.";
+                } else
+                    response = "Unable to determine user to  kick!";
                 return null;
             }
 
             // Message user
-            if (requestParameters.ContainsKey("Submit") &&
-                requestParameters["Submit"].ToString() == "SubmitMessageUser")
-            {
-                string message = requestParameters["Message"].ToString();
-                IGridWideMessageModule messageModule =
-                    webInterface.Registry.RequestModuleInterface<IGridWideMessageModule>();
-                if (messageModule != null)
-                    messageModule.MessageUser(account.PrincipalID, message);
-                response = "User has been sent the message.";
+            if (requestParameters.ContainsKey ("Submit") &&
+                requestParameters ["Submit"].ToString () == "SubmitMessageUser") {
+                string message = requestParameters ["Message"].ToString ();
+                if (account != null) {
+                    IGridWideMessageModule messageModule =
+                        webInterface.Registry.RequestModuleInterface<IGridWideMessageModule> ();
+                    if (messageModule != null) {
+                        messageModule.MessageUser (account.PrincipalID, message);
+                        response = "User has been sent the message.";
+                    }
+                } else 
+                    response = "User account details are unavailable to send the message!";
+
                 return null;
             }
 
             // page variables
             string bannedUntil = "";
-            bool userBanned = agent == null
-                                  ? false
-                                  : ((agent.Flags & IAgentFlags.PermBan) == IAgentFlags.PermBan ||
-                                     (agent.Flags & IAgentFlags.TempBan) == IAgentFlags.TempBan);
+            bool userBanned = false;
+            if (agent != null)
+                userBanned =  ((agent.Flags & IAgentFlags.PermBan) == IAgentFlags.PermBan ||
+                               (agent.Flags & IAgentFlags.TempBan) == IAgentFlags.TempBan);
             bool TempUserBanned = false;
-            if (userBanned)
-            {
+            if (userBanned) {
                 if ((agent.Flags & IAgentFlags.TempBan) == IAgentFlags.TempBan &&
-                    agent.OtherAgentInformation["TemperaryBanInfo"].AsDate() < DateTime.Now.ToUniversalTime())
-                {
+                    agent.OtherAgentInformation ["Temperory BanInfo"].AsDate () < DateTime.Now.ToUniversalTime ()) {
                     userBanned = false;
                     agent.Flags &= ~IAgentFlags.TempBan;
                     agent.Flags &= ~IAgentFlags.PermBan;
-                    agent.OtherAgentInformation.Remove("TemperaryBanInfo");
-                    agentService.UpdateAgent(agent);
-                }
-                else
-                {
-                    DateTime bannedTime = agent.OtherAgentInformation["TemperaryBanInfo"].AsDate();
+                    agent.OtherAgentInformation.Remove ("Temporary BanInfo");
+                    agentService.UpdateAgent (agent);
+                } else {
+                    DateTime bannedTime = agent.OtherAgentInformation ["Temporary BanInfo"].AsDate ();
                     TempUserBanned = bannedTime != Util.UnixEpoch;
-                    bannedUntil = string.Format("{0} {1}", bannedTime.ToShortDateString(), bannedTime.ToLongTimeString());
+                    bannedUntil = string.Format ("{0} {1}", bannedTime.ToShortDateString (), bannedTime.ToLongTimeString ());
                 }
             }
             bool userOnline = false;
-            IAgentInfoService agentInfoService = webInterface.Registry.RequestModuleInterface<IAgentInfoService>();
-            if (agentInfoService != null)
-            {
-                UserInfo info = agentInfoService.GetUserInfo(account.PrincipalID.ToString());
-                userOnline = info != null ? info.IsOnline : false;
+            IAgentInfoService agentInfoService = webInterface.Registry.RequestModuleInterface<IAgentInfoService> ();
+            if (agentInfoService != null) {
+                UserInfo Info = null;
+                if (account != null)
+                    Info = agentInfoService.GetUserInfo (account.PrincipalID.ToString ());
+                userOnline = Info != null && Info.IsOnline;
             }
-            vars.Add("UserOnline", userOnline);
-            vars.Add("NotUserBanned", !userBanned);
-            vars.Add("UserBanned", userBanned);
-            vars.Add("TempUserBanned", TempUserBanned);
-            vars.Add("BannedUntil", bannedUntil);
-            vars.Add("EmailValue", account.Email);
-            vars.Add("UserID", account.PrincipalID);
-            vars.Add("UserName", account.Name);
-            vars.Add("ErrorMessage", error);
-            vars.Add("ChangeUserInformationText", translator.GetTranslatedString("ChangeUserInformationText"));
-            vars.Add("ChangePasswordText", translator.GetTranslatedString("ChangePasswordText"));
-            vars.Add("NewPasswordText", translator.GetTranslatedString("NewPasswordText"));
-            vars.Add("NewPasswordConfirmationText", translator.GetTranslatedString("NewPasswordConfirmationText"));
-            vars.Add("ChangeEmailText", translator.GetTranslatedString("ChangeEmailText"));
-            vars.Add("NewEmailText", translator.GetTranslatedString("NewEmailText"));
-            vars.Add("UserNameText", translator.GetTranslatedString("UserNameText"));
-            vars.Add("PasswordText", translator.GetTranslatedString("PasswordText"));
-            vars.Add("DeleteUserText", translator.GetTranslatedString("DeleteUserText"));
-            vars.Add("DeleteText", translator.GetTranslatedString("DeleteText"));
-            vars.Add("DeleteUserInfoText", translator.GetTranslatedString("DeleteUserInfoText"));
-            vars.Add("Submit", translator.GetTranslatedString("Submit"));
-            vars.Add("Login", translator.GetTranslatedString("Login"));
-            vars.Add("TypeUserNameToConfirm", translator.GetTranslatedString("TypeUserNameToConfirm"));
 
-            vars.Add("AdminUserTypeInfoText",translator.GetTranslatedString("AdminUserTypeInfoText"));
-            vars.Add("AdminSetUserTypeText", translator.GetTranslatedString("UserTypeText"));
+            if (account != null) {
+                vars.Add ("EmailValue", account.Email);
+                vars.Add ("UserID", account.PrincipalID);
+                vars.Add ("UserName", account.Name);
+            } else {
+                vars.Add ("EmailValue", "");
+                vars.Add ("UserID", "");
+                vars.Add ("UserName", "");
+            }
 
-            vars.Add("AdminLoginInAsUserText", translator.GetTranslatedString("AdminLoginInAsUserText"));
-            vars.Add("AdminLoginInAsUserInfoText", translator.GetTranslatedString("AdminLoginInAsUserInfoText"));
-            vars.Add("AdminDeleteUserText", translator.GetTranslatedString("AdminDeleteUserText"));
-            vars.Add("AdminDeleteUserInfoText", translator.GetTranslatedString("AdminDeleteUserInfoText"));
-            vars.Add("AdminUnbanUserText", translator.GetTranslatedString("AdminUnbanUserText"));
-            vars.Add("AdminTempBanUserText", translator.GetTranslatedString("AdminTempBanUserText"));
-            vars.Add("AdminTempBanUserInfoText", translator.GetTranslatedString("AdminTempBanUserInfoText"));
-            vars.Add("AdminBanUserText", translator.GetTranslatedString("AdminBanUserText"));
-            vars.Add("AdminBanUserInfoText", translator.GetTranslatedString("AdminBanUserInfoText"));
-            vars.Add("BanText", translator.GetTranslatedString("BanText"));
-            vars.Add("UnbanText", translator.GetTranslatedString("UnbanText"));
-            vars.Add("TimeUntilUnbannedText", translator.GetTranslatedString("TimeUntilUnbannedText"));
-            vars.Add("EdittingText", translator.GetTranslatedString("EdittingText"));
-            vars.Add("BannedUntilText", translator.GetTranslatedString("BannedUntilText"));
+            vars.Add ("UserOnline", userOnline);
+            vars.Add ("NotUserBanned", !userBanned);
+            vars.Add ("UserBanned", userBanned);
+            vars.Add ("TempUserBanned", TempUserBanned);
+            vars.Add ("BannedUntil", bannedUntil);
+            vars.Add ("ErrorMessage", error);
+            vars.Add ("ChangeUserInformationText", translator.GetTranslatedString ("ChangeUserInformationText"));
+            vars.Add ("ChangePasswordText", translator.GetTranslatedString ("ChangePasswordText"));
+            vars.Add ("NewPasswordText", translator.GetTranslatedString ("NewPasswordText"));
+            vars.Add ("NewPasswordConfirmationText", translator.GetTranslatedString ("NewPasswordConfirmationText"));
+            vars.Add ("ChangeEmailText", translator.GetTranslatedString ("ChangeEmailText"));
+            vars.Add ("NewEmailText", translator.GetTranslatedString ("NewEmailText"));
+            vars.Add ("UserNameText", translator.GetTranslatedString ("UserNameText"));
+            vars.Add ("PasswordText", translator.GetTranslatedString ("PasswordText"));
+            vars.Add ("DeleteUserText", translator.GetTranslatedString ("DeleteUserText"));
+            vars.Add ("DeleteText", translator.GetTranslatedString ("DeleteText"));
+            vars.Add ("DeleteUserInfoText", translator.GetTranslatedString ("DeleteUserInfoText"));
+            vars.Add ("Submit", translator.GetTranslatedString ("Submit"));
+            vars.Add ("Login", translator.GetTranslatedString ("Login"));
+            vars.Add ("TypeUserNameToConfirm", translator.GetTranslatedString ("TypeUserNameToConfirm"));
 
-            vars.Add("KickAUserInfoText", translator.GetTranslatedString("KickAUserInfoText"));
-            vars.Add("KickAUserText", translator.GetTranslatedString("KickAUserText"));
-            vars.Add("KickMessageText", translator.GetTranslatedString("KickMessageText"));
-            vars.Add("KickUserText", translator.GetTranslatedString("KickUserText"));
+            vars.Add ("AdminUserTypeInfoText", translator.GetTranslatedString ("AdminUserTypeInfoText"));
+            vars.Add ("AdminSetUserTypeText", translator.GetTranslatedString ("UserTypeText"));
 
-            vars.Add("MessageAUserText", translator.GetTranslatedString("MessageAUserText"));
-            vars.Add("MessageAUserInfoText", translator.GetTranslatedString("MessageAUserInfoText"));
-            vars.Add("MessageUserText", translator.GetTranslatedString("MessageUserText"));
+            vars.Add ("AdminLoginInAsUserText", translator.GetTranslatedString ("AdminLoginInAsUserText"));
+            vars.Add ("AdminLoginInAsUserInfoText", translator.GetTranslatedString ("AdminLoginInAsUserInfoText"));
+            vars.Add ("AdminDeleteUserText", translator.GetTranslatedString ("AdminDeleteUserText"));
+            vars.Add ("AdminDeleteUserInfoText", translator.GetTranslatedString ("AdminDeleteUserInfoText"));
+            vars.Add ("AdminUnbanUserText", translator.GetTranslatedString ("AdminUnbanUserText"));
+            vars.Add ("AdminTempBanUserText", translator.GetTranslatedString ("AdminTempBanUserText"));
+            vars.Add ("AdminTempBanUserInfoText", translator.GetTranslatedString ("AdminTempBanUserInfoText"));
+            vars.Add ("AdminBanUserText", translator.GetTranslatedString ("AdminBanUserText"));
+            vars.Add ("AdminBanUserInfoText", translator.GetTranslatedString ("AdminBanUserInfoText"));
+            vars.Add ("BanText", translator.GetTranslatedString ("BanText"));
+            vars.Add ("UnbanText", translator.GetTranslatedString ("UnbanText"));
+            vars.Add ("TimeUntilUnbannedText", translator.GetTranslatedString ("TimeUntilUnbannedText"));
+            vars.Add ("EdittingText", translator.GetTranslatedString ("EdittingText"));
+            vars.Add ("BannedUntilText", translator.GetTranslatedString ("BannedUntilText"));
 
-            List<Dictionary<string, object>> daysArgs = new List<Dictionary<string, object>>();
+            vars.Add ("KickAUserInfoText", translator.GetTranslatedString ("KickAUserInfoText"));
+            vars.Add ("KickAUserText", translator.GetTranslatedString ("KickAUserText"));
+            vars.Add ("KickMessageText", translator.GetTranslatedString ("KickMessageText"));
+            vars.Add ("KickUserText", translator.GetTranslatedString ("KickUserText"));
+
+            vars.Add ("MessageAUserText", translator.GetTranslatedString ("MessageAUserText"));
+            vars.Add ("MessageAUserInfoText", translator.GetTranslatedString ("MessageAUserInfoText"));
+            vars.Add ("MessageUserText", translator.GetTranslatedString ("MessageUserText"));
+
+            List<Dictionary<string, object>> daysArgs = new List<Dictionary<string, object>> ();
             for (int i = 0; i <= 100; i++)
-                daysArgs.Add(new Dictionary<string, object> {{"Value", i}});
+                daysArgs.Add (new Dictionary<string, object> { { "Value", i } });
 
-            List<Dictionary<string, object>> hoursArgs = new List<Dictionary<string, object>>();
+            List<Dictionary<string, object>> hoursArgs = new List<Dictionary<string, object>> ();
             for (int i = 0; i <= 23; i++)
-                hoursArgs.Add(new Dictionary<string, object> {{"Value", i}});
+                hoursArgs.Add (new Dictionary<string, object> { { "Value", i } });
 
-            List<Dictionary<string, object>> minutesArgs = new List<Dictionary<string, object>>();
+            List<Dictionary<string, object>> minutesArgs = new List<Dictionary<string, object>> ();
             for (int i = 0; i <= 59; i++)
-                minutesArgs.Add(new Dictionary<string, object> {{"Value", i}});
+                minutesArgs.Add (new Dictionary<string, object> { { "Value", i } });
 
-            vars.Add("Days", daysArgs);
-            vars.Add("Hours", hoursArgs);
-            vars.Add("Minutes", minutesArgs);
-            vars.Add("DaysText", translator.GetTranslatedString("DaysText"));
-            vars.Add("HoursText", translator.GetTranslatedString("HoursText"));
-            vars.Add("MinutesText", translator.GetTranslatedString("MinutesText"));
+            vars.Add ("Days", daysArgs);
+            vars.Add ("Hours", hoursArgs);
+            vars.Add ("Minutes", minutesArgs);
+            vars.Add ("DaysText", translator.GetTranslatedString ("DaysText"));
+            vars.Add ("HoursText", translator.GetTranslatedString ("HoursText"));
+            vars.Add ("MinutesText", translator.GetTranslatedString ("MinutesText"));
 
-            vars.Add("UserType", webInterface.UserTypeArgs(translator));
+            vars.Add ("UserType", webInterface.UserTypeArgs (translator));
 
             return vars;
         }
 
-        public bool AttemptFindPage(string filename, ref OSHttpResponse httpResponse, out string text)
+        public bool AttemptFindPage (string filename, ref OSHttpResponse httpResponse, out string text)
         {
             text = "";
             return false;

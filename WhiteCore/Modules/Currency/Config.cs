@@ -72,106 +72,93 @@ namespace WhiteCore.Modules.Currency
 
         #region functions
 
-        public BaseCurrencyConfig(IConfig economyConfig)
+        public BaseCurrencyConfig (IConfig economyConfig)
         {
-            foreach (PropertyInfo propertyInfo in GetType().GetProperties())
-            {
-                try
-                {
-                    if (propertyInfo.PropertyType.IsAssignableFrom(typeof (float)))
-                        propertyInfo.SetValue(this,
-                                              economyConfig.GetFloat(propertyInfo.Name,
-                                                                     float.Parse(
-                                                                         propertyInfo.GetValue(this, new object[0])
-                                                                                     .ToString())), new object[0]);
-                    else if (propertyInfo.PropertyType.IsAssignableFrom(typeof (int)))
-                        propertyInfo.SetValue(this,
-                                              economyConfig.GetInt(propertyInfo.Name,
-                                                                   int.Parse(
-                                                                       propertyInfo.GetValue(this, new object[0])
-                                                                                   .ToString())), new object[0]);
-                    else if (propertyInfo.PropertyType.IsAssignableFrom(typeof (bool)))
-                        propertyInfo.SetValue(this,
-                                              economyConfig.GetBoolean(propertyInfo.Name,
-                                                                       bool.Parse(
-                                                                           propertyInfo.GetValue(this, new object[0])
-                                                                                       .ToString())), new object[0]);
-                    else if (propertyInfo.PropertyType.IsAssignableFrom(typeof (string)))
-                        propertyInfo.SetValue(this,
-                                              economyConfig.GetString(propertyInfo.Name,
-                                                                      propertyInfo.GetValue(this, new object[0])
-                                                                                  .ToString()), new object[0]);
-                    else if (propertyInfo.PropertyType.IsAssignableFrom(typeof (UUID)))
-                        propertyInfo.SetValue(this,
-                                              new UUID(economyConfig.GetString(propertyInfo.Name,
-                                                                               propertyInfo.GetValue(this, new object[0])
-                                                                                           .ToString())), new object[0]);
-                }
-                catch (Exception)
-                {
-                    MainConsole.Instance.Warn("[BaseCurrency]: Exception reading economy config: " + propertyInfo.Name);
+            foreach (PropertyInfo propertyInfo in GetType ().GetProperties ()) {
+                try {
+                    if (propertyInfo.PropertyType.IsAssignableFrom (typeof (float)))
+                        propertyInfo.SetValue (this,
+                                              economyConfig.GetFloat (propertyInfo.Name,
+                                                                      float.Parse (
+                                                                         propertyInfo.GetValue (this, new object [0])
+                                                                                     .ToString ())), new object [0]);
+                    else if (propertyInfo.PropertyType.IsAssignableFrom (typeof (int)))
+                        propertyInfo.SetValue (this,
+                                              economyConfig.GetInt (propertyInfo.Name,
+                                                                   int.Parse (
+                                                                       propertyInfo.GetValue (this, new object [0])
+                                                                                   .ToString ())), new object [0]);
+                    else if (propertyInfo.PropertyType.IsAssignableFrom (typeof (bool)))
+                        propertyInfo.SetValue (this,
+                                              economyConfig.GetBoolean (propertyInfo.Name,
+                                                                       bool.Parse (
+                                                                           propertyInfo.GetValue (this, new object [0])
+                                                                                       .ToString ())), new object [0]);
+                    else if (propertyInfo.PropertyType.IsAssignableFrom (typeof (string)))
+                        propertyInfo.SetValue (this,
+                                              economyConfig.GetString (propertyInfo.Name,
+                                                                      propertyInfo.GetValue (this, new object [0])
+                                                                                  .ToString ()), new object [0]);
+                    else if (propertyInfo.PropertyType.IsAssignableFrom (typeof (UUID)))
+                        propertyInfo.SetValue (this,
+                                              new UUID (economyConfig.GetString (propertyInfo.Name,
+                                                                               propertyInfo.GetValue (this, new object [0])
+                                                                                           .ToString ())), new object [0]);
+                } catch (Exception) {
+                    MainConsole.Instance.Warn ("[BaseCurrency]: Exception reading economy config: " + propertyInfo.Name);
                 }
             }
         }
 
-        public BaseCurrencyConfig()
+        public BaseCurrencyConfig ()
         {
         }
 
-        public BaseCurrencyConfig(OSDMap values)
+        public BaseCurrencyConfig (OSDMap values)
         {
-            FromOSD(values);
+            FromOSD (values);
         }
 
-        public override OSDMap ToOSD()
+        public override OSDMap ToOSD ()
         {
-            OSDMap returnvalue = new OSDMap();
-            foreach (PropertyInfo propertyInfo in GetType().GetProperties())
-            {
-                try
-                {
-                    if (propertyInfo.PropertyType.IsAssignableFrom(typeof (float)))
-                        returnvalue.Add(propertyInfo.Name, (float) propertyInfo.GetValue(this, new object[0]));
-                    else if (propertyInfo.PropertyType.IsAssignableFrom(typeof (int)))
-                        returnvalue.Add(propertyInfo.Name, (int) propertyInfo.GetValue(this, new object[0]));
-                    else if (propertyInfo.PropertyType.IsAssignableFrom(typeof (bool)))
-                        returnvalue.Add(propertyInfo.Name, (bool) propertyInfo.GetValue(this, new object[0]));
-                    else if (propertyInfo.PropertyType.IsAssignableFrom(typeof (string)))
-                        returnvalue.Add(propertyInfo.Name, (string) propertyInfo.GetValue(this, new object[0]));
-                    else if (propertyInfo.PropertyType.IsAssignableFrom(typeof (UUID)))
-                        returnvalue.Add(propertyInfo.Name, (UUID) propertyInfo.GetValue(this, new object[0]));
-                }
-                catch (Exception ex)
-                {
-                    MainConsole.Instance.Warn("[BaseCurrency]: Exception toOSD() config: " + ex.ToString());
+            OSDMap returnvalue = new OSDMap ();
+            foreach (PropertyInfo propertyInfo in GetType ().GetProperties ()) {
+                try {
+                    if (propertyInfo.PropertyType.IsAssignableFrom (typeof (float)))
+                        returnvalue.Add (propertyInfo.Name, (float)propertyInfo.GetValue (this, new object [0]));
+                    else if (propertyInfo.PropertyType.IsAssignableFrom (typeof (int)))
+                        returnvalue.Add (propertyInfo.Name, (int)propertyInfo.GetValue (this, new object [0]));
+                    else if (propertyInfo.PropertyType.IsAssignableFrom (typeof (bool)))
+                        returnvalue.Add (propertyInfo.Name, (bool)propertyInfo.GetValue (this, new object [0]));
+                    else if (propertyInfo.PropertyType.IsAssignableFrom (typeof (string)))
+                        returnvalue.Add (propertyInfo.Name, (string)propertyInfo.GetValue (this, new object [0]));
+                    else if (propertyInfo.PropertyType.IsAssignableFrom (typeof (UUID)))
+                        returnvalue.Add (propertyInfo.Name, (UUID)propertyInfo.GetValue (this, new object [0]));
+                } catch (Exception ex) {
+                    MainConsole.Instance.Warn ("[BaseCurrency]: Exception toOSD() config: " + ex);
                 }
             }
+
             return returnvalue;
         }
 
-        public override sealed void FromOSD(OSDMap values)
+        public override sealed void FromOSD (OSDMap map)
         {
-            foreach (PropertyInfo propertyInfo in GetType().GetProperties())
-            {
-                if (values.ContainsKey(propertyInfo.Name))
-                {
-                    try
-                    {
-                        if (propertyInfo.PropertyType.IsAssignableFrom(typeof (float)))
-                            propertyInfo.SetValue(this, float.Parse(values[propertyInfo.Name].AsString()), new object[0]);
-                        else if (propertyInfo.PropertyType.IsAssignableFrom(typeof (int)))
-                            propertyInfo.SetValue(this, values[propertyInfo.Name].AsInteger(), new object[0]);
-                        else if (propertyInfo.PropertyType.IsAssignableFrom(typeof (bool)))
-                            propertyInfo.SetValue(this, values[propertyInfo.Name].AsBoolean(), new object[0]);
-                        else if (propertyInfo.PropertyType.IsAssignableFrom(typeof (string)))
-                            propertyInfo.SetValue(this, values[propertyInfo.Name].AsString(), new object[0]);
-                        else if (propertyInfo.PropertyType.IsAssignableFrom(typeof (UUID)))
-                            propertyInfo.SetValue(this, values[propertyInfo.Name].AsUUID(), new object[0]);
-                    }
-                    catch (Exception ex)
-                    {
-                        MainConsole.Instance.Warn("[BaseCurrency]: Exception reading fromOSD() config: " +
-                                                  ex.ToString());
+            foreach (PropertyInfo propertyInfo in GetType ().GetProperties ()) {
+                if (map.ContainsKey (propertyInfo.Name)) {
+                    try {
+                        if (propertyInfo.PropertyType.IsAssignableFrom (typeof (float)))
+                            propertyInfo.SetValue (this, float.Parse (map [propertyInfo.Name].AsString ()), new object [0]);
+                        else if (propertyInfo.PropertyType.IsAssignableFrom (typeof (int)))
+                            propertyInfo.SetValue (this, map [propertyInfo.Name].AsInteger (), new object [0]);
+                        else if (propertyInfo.PropertyType.IsAssignableFrom (typeof (bool)))
+                            propertyInfo.SetValue (this, map [propertyInfo.Name].AsBoolean (), new object [0]);
+                        else if (propertyInfo.PropertyType.IsAssignableFrom (typeof (string)))
+                            propertyInfo.SetValue (this, map [propertyInfo.Name].AsString (), new object [0]);
+                        else if (propertyInfo.PropertyType.IsAssignableFrom (typeof (UUID)))
+                            propertyInfo.SetValue (this, map [propertyInfo.Name].AsUUID (), new object [0]);
+                    } catch (Exception ex) {
+                        MainConsole.Instance.Warn ("[BaseCurrency]: Exception reading fromOSD() config: " + ex);
                     }
                 }
             }
@@ -181,153 +168,128 @@ namespace WhiteCore.Modules.Currency
 
         #region properties
 
-        public string ErrorURI
-        {
+        public string ErrorURI {
             get { return m_ErrorURI; }
-            set { m_ErrorURI = value.Replace("ServersHostname", MainServer.Instance.HostName); }
+            set { m_ErrorURI = value.Replace ("ServersHostname", MainServer.Instance.HostName); }
         }
 
-        public string UpgradeMembershipUri
-        {
+        public string UpgradeMembershipUri {
             get { return m_UpgradeMembershipUri; }
             set { m_UpgradeMembershipUri = value.Replace ("ServersHostname", MainServer.Instance.HostName); }
         }
-            
-        public int PriceGroupCreate
-        {
-            get { return (int) m_PriceGroupCreate; }
-            set { m_PriceGroupCreate = (uint) value; }
+
+        public int PriceGroupCreate {
+            get { return (int)m_PriceGroupCreate; }
+            set { m_PriceGroupCreate = (uint)value; }
         }
 
-        public int PriceUpload
-        {
-            get { return (int) m_PriceUpload; }
-            set { m_PriceUpload = (uint) value; }
+        public int PriceUpload {
+            get { return (int)m_PriceUpload; }
+            set { m_PriceUpload = (uint)value; }
         }
 
-        public int PriceDirectoryFee
-        {
+        public int PriceDirectoryFee {
             get { return (int)m_PriceDirectoryFee; }
             set { m_PriceDirectoryFee = (uint)value; }
         }
 
-        public int ClientPort
-        {
-            get { return (int) m_ClientPort; }
-            set { m_ClientPort = (uint) value; }
+        public int ClientPort {
+            get { return (int)m_ClientPort; }
+            set { m_ClientPort = (uint)value; }
         }
 
-        public bool CanBuyCurrencyInworld
-        {
+        public bool CanBuyCurrencyInworld {
             get { return m_CanBuyCurrencyInworld; }
             set { m_CanBuyCurrencyInworld = value; }
         }
 
-        public int Stipend
-        {
+        public int Stipend {
             get { return m_Stipend; }
             set { m_Stipend = value; }
         }
 
-        public bool GiveStipends
-        {
+        public bool GiveStipends {
             get { return m_GiveStipends; }
             set { m_GiveStipends = value; }
         }
 
-        public string StipendsEveryType
-        {
+        public string StipendsEveryType {
             get { return m_StipendsEveryType; }
             set { m_StipendsEveryType = value; }
         }
 
-        public int StipendsEvery
-        {
+        public int StipendsEvery {
             get { return m_StipendsEvery; }
             set { m_StipendsEvery = value; }
         }
 
-        public bool StipendsPremiumOnly
-        {
+        public bool StipendsPremiumOnly {
             get { return m_StipendsPremiumOnly; }
             set { m_StipendsPremiumOnly = value; }
         }
-        public bool StipendsLoadOldUsers
-        {
+        public bool StipendsLoadOldUsers {
             get { return m_StipendsLoadOldUsers; }
             set { m_StipendsLoadOldUsers = value; }
         }
 
-        public bool GiveStipendsOnlyWhenLoggedIn
-        {
+        public bool GiveStipendsOnlyWhenLoggedIn {
             get { return m_GiveStipendsOnlyWhenLoggedIn; }
             set { m_GiveStipendsOnlyWhenLoggedIn = value; }
         }
 
-        public bool SaveTransactionLogs
-        {
+        public bool SaveTransactionLogs {
             get { return m_SaveTransactionLogs; }
             set { m_SaveTransactionLogs = value; }
         }
 
-        public int MaxAmountBeforeLogging
-        {
+        public int MaxAmountBeforeLogging {
             get { return m_MaxAmountBeforeLogging; }
             set { m_MaxAmountBeforeLogging = value; }
         }
 
-        public int AdditionPercentage
-        {
+        public int AdditionPercentage {
             get { return m_AdditionPercentage; }
             set { m_AdditionPercentage = value; }
         }
 
-        public int AdditionAmount
-        {
+        public int AdditionAmount {
             get { return m_AdditionAmount; }
             set { m_AdditionAmount = value; }
         }
 
-        public int RealCurrencyConversionFactor
-        {
+        public int RealCurrencyConversionFactor {
             get { return m_RealCurrencyConversionFactor; }
             set { m_RealCurrencyConversionFactor = value; }
         }
 
-        public int MaxAmountPurchasable
-        {
+        public int MaxAmountPurchasable {
             get { return m_MaxAmountPurchasable; }
             set { m_MaxAmountPurchasable = value; }
         }
 
-        public int MaxAmountPurchasableOverTime
-        {
+        public int MaxAmountPurchasableOverTime {
             get { return m_MaxAmountPurchasableOverTime; }
             set { m_MaxAmountPurchasableOverTime = value; }
         }
 
-        public int MaxAmountPurchasableEveryAmount
-        {
+        public int MaxAmountPurchasableEveryAmount {
             get { return m_MaxAmountPurchasableEveryAmount; }
             set { m_MaxAmountPurchasableEveryAmount = value; }
         }
 
-        public string MaxAmountPurchasableEveryType
-        {
+        public string MaxAmountPurchasableEveryType {
             get { return m_MaxAmountPurchasableEveryType; }
             set { m_MaxAmountPurchasableEveryType = value; }
         }
 
-        public int MinAmountPurchasable
-        {
+        public int MinAmountPurchasable {
             get { return m_MinAmountPurchasable; }
             set { m_MinAmountPurchasable = value; }
         }
-        
-        public int SchedulerInterval
-        {
-        	get { return m_SchedulerInterval; }
-        	set { m_SchedulerInterval = value; }
+
+        public int SchedulerInterval {
+            get { return m_SchedulerInterval; }
+            set { m_SchedulerInterval = value; }
         }
 
         #endregion
@@ -345,20 +307,20 @@ namespace WhiteCore.Modules.Currency
         /// <summary>
         /// </summary>
         /// <param name="osdMap"></param>
-        public UserCurrency(OSDMap osdMap)
+        public UserCurrency (OSDMap osdMap)
         {
             if (osdMap != null)
-                FromOSD(osdMap);
+                FromOSD (osdMap);
         }
 
-        public UserCurrency(List<string> queryResults)
+        public UserCurrency (List<string> queryResults)
         {
-            FromArray(queryResults);
+            FromArray (queryResults);
         }
 
-        public UserCurrency() { }
+        public UserCurrency () { }
 
-        public UserCurrency(UUID agentID, uint balance, uint landuse, uint tier_bal, bool group_toggle, uint stipend_bal)
+        public UserCurrency (UUID agentID, uint balance, uint landuse, uint tier_bal, bool group_toggle, uint stipend_bal)
         {
             PrincipalID = agentID;
             Amount = landuse;
@@ -369,30 +331,30 @@ namespace WhiteCore.Modules.Currency
         }
 
         /// <summary></summary>
-        /// <param name="osdMap"></param>
-        public override sealed void FromOSD(OSDMap osdMap)
+        /// <param name="map"></param>
+        public override sealed void FromOSD (OSDMap map)
         {
-            UUID.TryParse(osdMap["PrincipalID"].AsString(), out PrincipalID);
-            uint.TryParse(osdMap["Amount"].AsString(), out Amount);
-            uint.TryParse(osdMap["LandInUse"].AsString(), out LandInUse);
-            uint.TryParse(osdMap["Tier"].AsString(), out Tier);
-            bool.TryParse(osdMap["IsGroup"].AsString(), out IsGroup);
-            uint.TryParse(osdMap["StipendsBalance"].AsString(), out StipendsBalance);
+            UUID.TryParse (map ["PrincipalID"].AsString (), out PrincipalID);
+            uint.TryParse (map ["Amount"].AsString (), out Amount);
+            uint.TryParse (map ["LandInUse"].AsString (), out LandInUse);
+            uint.TryParse (map ["Tier"].AsString (), out Tier);
+            bool.TryParse (map ["IsGroup"].AsString (), out IsGroup);
+            uint.TryParse (map ["StipendsBalance"].AsString (), out StipendsBalance);
         }
 
-        public bool FromArray(List<string> queryResults)
+        public bool FromArray (List<string> queryResults)
         {
-            return UUID.TryParse(queryResults[0], out PrincipalID) &&
-                   uint.TryParse(queryResults[1], out Amount) &&
-                   uint.TryParse(queryResults[2], out LandInUse) &&
-                   uint.TryParse(queryResults[3], out Tier) &&
-                   bool.TryParse(queryResults[4], out IsGroup) &&
-                   uint.TryParse(queryResults[5], out StipendsBalance);
+            return UUID.TryParse (queryResults [0], out PrincipalID) &&
+                   uint.TryParse (queryResults [1], out Amount) &&
+                   uint.TryParse (queryResults [2], out LandInUse) &&
+                   uint.TryParse (queryResults [3], out Tier) &&
+                   bool.TryParse (queryResults [4], out IsGroup) &&
+                   uint.TryParse (queryResults [5], out StipendsBalance);
         }
 
         /// <summary></summary>
         /// <returns></returns>
-        public override OSDMap ToOSD()
+        public override OSDMap ToOSD ()
         {
             return
                 new OSDMap
@@ -407,4 +369,3 @@ namespace WhiteCore.Modules.Currency
         }
     }
 }
-

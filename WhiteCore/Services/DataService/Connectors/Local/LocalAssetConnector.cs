@@ -26,18 +26,18 @@
  */
 
 
+using System.Collections.Generic;
+using Nini.Config;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using System.Collections.Generic;
 
 namespace WhiteCore.Services.DataService
 {
     public class LocalAssetConnector : ConnectorBase, IAssetConnector
     {
-        private IGenericData GD;
+        IGenericData GD;
 
         #region IAssetConnector Members
 
@@ -69,9 +69,11 @@ namespace WhiteCore.Services.DataService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public void UpdateLSLData(string token, string key, string value)
         {
-            object remoteValue = DoRemote(token, key, value);
-            if (remoteValue != null || m_doRemoteOnly)
+            if (m_doRemoteOnly) {
+                DoRemote (token, key, value);
                 return;
+            }
+
             if (FindLSLData(token, key).Count == 0)
             {
                 GD.Insert("lslgenericdata", new[] {token, key, value});
@@ -91,9 +93,10 @@ namespace WhiteCore.Services.DataService
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public List<string> FindLSLData(string token, string key)
         {
-            object remoteValue = DoRemote(token, key);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<string>) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (token, key);
+                return remoteValue != null ? (List<string>)remoteValue : new List<string> ();
+            }
 
             QueryFilter filter = new QueryFilter();
             filter.andFilters["Token"] = token;

@@ -6,28 +6,14 @@
   <meta name="keywords" content="{SystemName}" />
   <meta name="description" content="{SystemName}"/>
   <link rel="shortcut icon" href="../images/icons/favicon.ico" />
-	
-  <!-- StyleSwitch -->
-  <script src="../javascripts/jquery-1.11.1.js" type="text/javascript"></script> 
-  <script src="../javascripts/styleswitch.js" type="text/javascript"></script>
+
+   <!-- StyleSwitch -->
   <link href="../css/styles1.css" rel="stylesheet" type="text/css" media="screen" title="styles1" />
   <link href="../css/styles2.css" rel="alternate stylesheet" type="text/css" title="styles2" media="screen" />
   <link href="../css/styles3.css" rel="alternate stylesheet" type="text/css" title="styles3" media="screen" />
   <link href="../css/styles4.css" rel="alternate stylesheet" type="text/css" title="styles4" media="screen" />
   <link href="../css/styles5.css" rel="alternate stylesheet" type="text/css" title="styles5" media="screen" />
 
-  <!-- Javascript -->
-  <script src="../javascripts/jquery-1.11.1.js" type="text/javascript" language="javascript"></script>
-	
-  <!-- Region SLURI -->
-  <script language="javascript">
-  $(document).ready(function() {
-      $('a.regionslurl').hover(function() { //mouse in
-      $(this).animate({ paddingLeft: '25px' }, 400);
-    }, function() { //mouse out
-    $(this).animate({ paddingLeft: 0 }, 400);});
-  });
-  </script>
 </head>
 
 <body class="gridstatus">
@@ -77,7 +63,19 @@
 </table>
 </div>
 
-<script type="text/javascript">
+<!-- Javascript -->
+  <script src="../js/jquery-2.2.3.min.js" type="text/javascript"></script>
+  <script src="../js/styleswitch.js" type="text/javascript"></script>
+
+  <!-- Region SLURI -->
+  <script>
+  $(document).ready(function() {
+      $('a.regionslurl').hover(function() { //mouse in
+      $(this).animate({ paddingLeft: '25px' }, 400);
+    }, function() { //mouse out
+    $(this).animate({ paddingLeft: 0 }, 400);});
+  });
+
 	// fade class
 	$("li.fade, a.fade").hover(function(){$(this).fadeOut(200);$(this).fadeIn(200);});
 	$("a.logofade").hover(function(){$(this).fadeOut(200);$(this).fadeIn(200);});

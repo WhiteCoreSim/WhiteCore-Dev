@@ -26,89 +26,91 @@
  */
 
 
-using WhiteCore.Framework.ClientInterfaces;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.Services;
+using System.Collections.Generic;
 using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
-using System.Collections.Generic;
+using WhiteCore.Framework.ClientInterfaces;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.Services;
 
 namespace WhiteCore.Services.DataService
 {
     public class LocalAvatarConnector : IAvatarData
     {
-        private IGenericData GD;
-        private string m_realm = "user_appearance";
-        private object m_lock = new object();
+        IGenericData GD;
+        string m_realm = "user_appearance";
+        readonly object m_lock = new object ();
 
         #region IAvatarData Members
 
-        public void Initialize(IGenericData GenericData, IConfigSource source, IRegistryCore simBase,
+        public void Initialize (IGenericData GenericData, IConfigSource source, IRegistryCore simBase,
                                string defaultConnectionString)
         {
-            if (source.Configs["WhiteCoreConnectors"].GetString("AvatarConnector", "LocalConnector") == "LocalConnector")
-            {
-                GD = GenericData;
+            if (source.Configs ["WhiteCoreConnectors"].GetString ("AvatarConnector", "LocalConnector") != "LocalConnector")
+                return;
 
-                string connectionString = defaultConnectionString;
-                if (source.Configs[Name] != null)
-                    connectionString = source.Configs[Name].GetString("ConnectionString", defaultConnectionString);
+            GD = GenericData;
 
-                if (GD != null)
-                    GD.ConnectToDatabase(connectionString, "Avatars",
-                                         source.Configs["WhiteCoreConnectors"].GetBoolean("ValidateTables", true));
+            string connectionString = defaultConnectionString;
+            if (source.Configs [Name] != null)
+                connectionString = source.Configs [Name].GetString ("ConnectionString", defaultConnectionString);
 
-                Framework.Utilities.DataManager.RegisterPlugin(this);
-            }
+            if (GD != null)
+                GD.ConnectToDatabase (connectionString, "Avatars",
+                                     source.Configs ["WhiteCoreConnectors"].GetBoolean ("ValidateTables", true));
+
+            Framework.Utilities.DataManager.RegisterPlugin (this);
         }
 
-        public string Name
-        {
+        public string Name {
             get { return "IAvatarData"; }
         }
 
         #endregion
 
-        public void Dispose()
+        public void Dispose ()
         {
         }
 
-        public AvatarAppearance Get(UUID PrincipalID)
+        public AvatarAppearance Get (UUID PrincipalID)
         {
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["PrincipalID"] = PrincipalID;
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["PrincipalID"] = PrincipalID;
             List<string> data;
-            lock (m_lock)
-            {
-                data = GD.Query(new string[] {"Appearance"}, m_realm, filter, null, null, null);
+            lock (m_lock) {
+                data = GD.Query (new string [] { "Appearance" }, m_realm, filter, null, null, null);
             }
             if (data.Count == 0)
                 return null;
-            AvatarAppearance appearance = new AvatarAppearance();
-            appearance.FromOSD((OSDMap) OSDParser.DeserializeJson(data[0]));
+            
+            AvatarAppearance appearance = new AvatarAppearance ();
+            appearance.FromOSD ((OSDMap)OSDParser.DeserializeJson (data [0]));
+
             return appearance;
         }
 
-        public bool Store(UUID PrincipalID, AvatarAppearance data)
+        public bool Store (UUID PrincipalID, AvatarAppearance data)
         {
-            lock (m_lock)
-            {
-                QueryFilter filter = new QueryFilter();
-                filter.andFilters["PrincipalID"] = PrincipalID;
-                Dictionary<string, object> values = new Dictionary<string, object>();
-                values.Add("PrincipalID", PrincipalID);
-                values.Add("Appearance", OSDParser.SerializeJsonString(data.ToOSD()));
-                GD.Replace(m_realm, values);
+            lock (m_lock) {
+                QueryFilter filter = new QueryFilter ();
+                filter.andFilters ["PrincipalID"] = PrincipalID;
+                Dictionary<string, object> values = new Dictionary<string, object> ();
+                values.Add ("PrincipalID", PrincipalID);
+                values.Add ("Appearance", OSDParser.SerializeJsonString (data.ToOSD ()));
+                GD.Replace (m_realm, values);
             }
             return true;
         }
 
-        public bool Delete(UUID PrincipalID)
+        public bool Delete (UUID PrincipalID)
         {
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["PrincipalID"] = PrincipalID;
-            return GD.Delete(m_realm, filter);
+            lock (m_lock) {
+                QueryFilter filter = new QueryFilter ();
+                filter.andFilters ["PrincipalID"] = PrincipalID;
+
+                return GD.Delete (m_realm, filter);
+            }
         }
     }
 }

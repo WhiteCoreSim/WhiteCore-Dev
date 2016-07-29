@@ -26,6 +26,11 @@
  */
 
 
+using System.Collections.Generic;
+using System.Threading;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
@@ -33,12 +38,6 @@ using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo.Entities;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using System;
-using System.Collections.Generic;
-using System.Threading;
 using GridRegion = WhiteCore.Framework.Services.GridRegion;
 
 namespace WhiteCore.Services
@@ -48,28 +47,28 @@ namespace WhiteCore.Services
         /// <summary>
         ///     These are regions that have timed out and we are not sending updates to until the (int) time passes
         /// </summary>
-        protected Dictionary<string, int> m_blackListedRegions = new Dictionary<string, int>();
+        protected Dictionary<string, int> m_blackListedRegions = new Dictionary<string, int> ();
 
         protected ISyncMessagePosterService m_syncMessagePoster;
         protected IRegistryCore m_registry;
 
         #region IService Members
 
-        public virtual void Initialize(IConfigSource config, IRegistryCore registry)
+        public virtual void Initialize (IConfigSource config, IRegistryCore registry)
         {
-            IConfig handlers = config.Configs["Handlers"];
-            if (handlers.GetString("SimulationHandler", "") == "SimulationServiceConnector")
-                registry.RegisterModuleInterface<ISimulationService>(this);
+            IConfig handlers = config.Configs ["Handlers"];
+            if (handlers.GetString ("SimulationHandler", "") == "SimulationServiceConnector")
+                registry.RegisterModuleInterface<ISimulationService> (this);
 
             m_registry = registry;
         }
 
-        public virtual void Start(IConfigSource config, IRegistryCore registry)
+        public virtual void Start (IConfigSource config, IRegistryCore registry)
         {
-            m_syncMessagePoster = registry.RequestModuleInterface<ISyncMessagePosterService>();
+            m_syncMessagePoster = registry.RequestModuleInterface<ISyncMessagePosterService> ();
         }
 
-        public void FinishedStartup()
+        public void FinishedStartup ()
         {
         }
 
@@ -77,235 +76,214 @@ namespace WhiteCore.Services
 
         #region Methods
 
-        public bool CreateAgent(GridRegion destination, AgentCircuitData aCircuit, uint teleportFlags, out CreateAgentResponse response)
+        public bool CreateAgent (GridRegion destination, AgentCircuitData aCircuit, uint teleportFlags, out CreateAgentResponse response)
         {
             response = null;
-            if (destination == null)
-            {
-                response = new CreateAgentResponse();
+            if (destination == null) {
+                response = new CreateAgentResponse ();
                 response.Reason = "Could not connect to destination";
                 response.Success = false;
                 return false;
             }
-            CreateAgentRequest request = new CreateAgentRequest();
+            CreateAgentRequest request = new CreateAgentRequest ();
             request.CircuitData = aCircuit;
             request.Destination = destination;
             request.TeleportFlags = teleportFlags;
 
-            AutoResetEvent resetEvent = new AutoResetEvent(false);
+            AutoResetEvent resetEvent = new AutoResetEvent (false);
             OSDMap result = null;
-            MainConsole.Instance.DebugFormat("[SimulationServiceConnector]: Sending Create Agent to " + destination.ServerURI);
-            m_syncMessagePoster.Get(destination.ServerURI, request.ToOSD(), (osdresp) =>
-            {
+            MainConsole.Instance.DebugFormat ("[SimulationServiceConnector]: Sending Create Agent to " + destination.ServerURI);
+            m_syncMessagePoster.Get (destination.ServerURI, request.ToOSD (), osdresp => {
                 result = osdresp;
-                resetEvent.Set();
+                resetEvent.Set ();
             });
-            bool success = resetEvent.WaitOne(10000);
-            if (!success || result == null)
-            {
-                response = new CreateAgentResponse();
+            bool success = resetEvent.WaitOne (10000);
+            if (!success || result == null) {
+                response = new CreateAgentResponse ();
                 response.Reason = "Could not connect to destination";
                 response.Success = false;
                 return false;
             }
 
-            response = new CreateAgentResponse();
-            response.FromOSD(result);
+            response = new CreateAgentResponse ();
+            response.FromOSD (result);
 
-            if (!response.Success)
-                return false;
             return response.Success;
         }
 
-        public bool UpdateAgent(GridRegion destination, AgentData data)
+        public bool UpdateAgent (GridRegion destination, AgentData data)
         {
-            if (m_blackListedRegions.ContainsKey(destination.ServerURI))
-            {
+            if (m_blackListedRegions.ContainsKey (destination.ServerURI)) {
                 //Check against time
-                if (m_blackListedRegions[destination.ServerURI] > 3 &&
-                    Util.EnvironmentTickCountSubtract(m_blackListedRegions[destination.ServerURI]) > 0)
-                {
-                    MainConsole.Instance.Warn("[SimServiceConnector]: Blacklisted region " + destination.RegionName +
-                                              " requested");
+                if (m_blackListedRegions [destination.ServerURI] > 3 &&
+                    Util.EnvironmentTickCountSubtract (m_blackListedRegions [destination.ServerURI]) > 0) {
+                    MainConsole.Instance.Warn ("[SimServiceConnector]: Blacklisted region " + destination.RegionName + " requested");
                     //Still blacklisted
                     return false;
                 }
             }
 
-            UpdateAgentDataRequest request = new UpdateAgentDataRequest();
+            UpdateAgentDataRequest request = new UpdateAgentDataRequest ();
             request.Update = data;
             request.Destination = destination;
 
-            AutoResetEvent resetEvent = new AutoResetEvent(false);
+            AutoResetEvent resetEvent = new AutoResetEvent (false);
             OSDMap result = null;
-            m_syncMessagePoster.Get(destination.ServerURI, request.ToOSD(), (response) =>
-            {
+            m_syncMessagePoster.Get (destination.ServerURI, request.ToOSD (), response => {
                 result = response;
-                resetEvent.Set();
+                resetEvent.Set ();
             });
-            bool success = resetEvent.WaitOne(10000);
-            if (!success)
-            {
-                if (m_blackListedRegions.ContainsKey(destination.ServerURI))
-                {
-                    if (m_blackListedRegions[destination.ServerURI] == 3)
-                    {
+            bool success = resetEvent.WaitOne (10000) && result != null;
+            if (!success) {
+                if (m_blackListedRegions.ContainsKey (destination.ServerURI)) {
+                    if (m_blackListedRegions [destination.ServerURI] == 3) {
                         //add it to the blacklist as the request completely failed 3 times
-                        m_blackListedRegions[destination.ServerURI] = Util.EnvironmentTickCount() + 60 * 1000; //60 seconds
-                    }
-                    else if (m_blackListedRegions[destination.ServerURI] == 0)
-                        m_blackListedRegions[destination.ServerURI]++;
-                }
-                else
-                    m_blackListedRegions[destination.ServerURI] = 0;
+                        m_blackListedRegions [destination.ServerURI] = Util.EnvironmentTickCount () + 60 * 1000; //60 seconds
+                    } else if (m_blackListedRegions [destination.ServerURI] == 0)
+                        m_blackListedRegions [destination.ServerURI]++;
+                } else
+                    m_blackListedRegions [destination.ServerURI] = 0;
                 return false;
             }
 
             //Clear out the blacklist if it went through
-            m_blackListedRegions.Remove(destination.ServerURI);
+            m_blackListedRegions.Remove (destination.ServerURI);
 
-            return result["Success"].AsBoolean();
+            return result ["Success"].AsBoolean ();
         }
 
-        public bool UpdateAgent(GridRegion destination, AgentPosition data)
+        public bool UpdateAgent (GridRegion destination, AgentPosition data)
         {
-            if (m_blackListedRegions.ContainsKey(destination.ServerURI))
-            {
+            if (m_blackListedRegions.ContainsKey (destination.ServerURI)) {
                 //Check against time
-                if (m_blackListedRegions[destination.ServerURI] > 3 &&
-                    Util.EnvironmentTickCountSubtract(m_blackListedRegions[destination.ServerURI]) > 0)
-                {
-                    MainConsole.Instance.Warn("[SimServiceConnector]: Blacklisted region " + destination.RegionName +
-                                              " requested");
+                if (m_blackListedRegions [destination.ServerURI] > 3 &&
+                    Util.EnvironmentTickCountSubtract (m_blackListedRegions [destination.ServerURI]) > 0) {
+                    MainConsole.Instance.Warn ("[SimServiceConnector]: Blacklisted region " + destination.RegionName + " requested");
                     //Still blacklisted
                     return false;
                 }
             }
 
-            UpdateAgentPositionRequest request = new UpdateAgentPositionRequest();
+            UpdateAgentPositionRequest request = new UpdateAgentPositionRequest ();
             request.Update = data;
             request.Destination = destination;
 
-            AutoResetEvent resetEvent = new AutoResetEvent(false);
+            AutoResetEvent resetEvent = new AutoResetEvent (false);
             OSDMap result = null;
-            m_syncMessagePoster.Get(destination.ServerURI, request.ToOSD(), (response) =>
-            {
+            m_syncMessagePoster.Get (destination.ServerURI, request.ToOSD (), response => {
                 result = response;
-                resetEvent.Set();
+                resetEvent.Set ();
             });
-            bool success = resetEvent.WaitOne(10000) && result != null;
-            if (!success)
-            {
-                if (m_blackListedRegions.ContainsKey(destination.ServerURI))
-                {
-                    if (m_blackListedRegions[destination.ServerURI] == 3)
-                    {
+
+            bool success = resetEvent.WaitOne (10000) && result != null;
+            if (!success) {
+                if (m_blackListedRegions.ContainsKey (destination.ServerURI)) {
+                    if (m_blackListedRegions [destination.ServerURI] == 3) {
                         //add it to the blacklist as the request completely failed 3 times
-                        m_blackListedRegions[destination.ServerURI] = Util.EnvironmentTickCount() + 60 * 1000; //60 seconds
-                    }
-                    else if (m_blackListedRegions[destination.ServerURI] == 0)
-                        m_blackListedRegions[destination.ServerURI]++;
-                }
-                else
-                    m_blackListedRegions[destination.ServerURI] = 0;
+                        m_blackListedRegions [destination.ServerURI] = Util.EnvironmentTickCount () + 60 * 1000; //60 seconds
+                    } else if (m_blackListedRegions [destination.ServerURI] == 0)
+                        m_blackListedRegions [destination.ServerURI]++;
+                } else
+                    m_blackListedRegions [destination.ServerURI] = 0;
                 return false;
             }
 
             //Clear out the blacklist if it went through
-            m_blackListedRegions.Remove(destination.ServerURI);
+            m_blackListedRegions.Remove (destination.ServerURI);
 
-            return result["Success"].AsBoolean();
+            return result ["Success"].AsBoolean ();
         }
 
-        public bool FailedToMoveAgentIntoNewRegion(UUID AgentID, GridRegion destination)
+        public bool FailedToMoveAgentIntoNewRegion (UUID agentID, GridRegion destination)
         {
-            FailedToMoveAgentIntoNewRegionRequest request = new FailedToMoveAgentIntoNewRegionRequest();
-            request.AgentID = AgentID;
+            FailedToMoveAgentIntoNewRegionRequest request = new FailedToMoveAgentIntoNewRegionRequest ();
+            request.AgentID = agentID;
             request.RegionID = destination.RegionID;
 
-            m_syncMessagePoster.Post(destination.ServerURI, request.ToOSD());
+            m_syncMessagePoster.Post (destination.ServerURI, request.ToOSD ());
             return true;
         }
 
-        public bool MakeChildAgent(UUID AgentID, GridRegion oldRegion, GridRegion destination, bool isCrossing)
+        public bool MakeChildAgent (UUID agentID, GridRegion oldRegion, GridRegion destination, bool isCrossing)
         {
-            MakeChildAgentRequest request = new MakeChildAgentRequest();
-            request.AgentID = AgentID;
+            MakeChildAgentRequest request = new MakeChildAgentRequest ();
+            request.AgentID = agentID;
             request.OldRegion = oldRegion;
             request.Destination = destination;
             request.IsCrossing = isCrossing;
 
-            m_syncMessagePoster.Post(oldRegion.ServerURI, request.ToOSD());
+            m_syncMessagePoster.Post (oldRegion.ServerURI, request.ToOSD ());
             return true;
         }
 
-        public bool FailedToTeleportAgent(GridRegion destination, UUID failedRegionID, UUID AgentID, string reason,
+        public bool FailedToTeleportAgent (GridRegion destination, UUID failedRegionID, UUID agentID, string reason,
                                           bool isCrossing)
         {
-            FailedToTeleportAgentRequest request = new FailedToTeleportAgentRequest();
-            request.AgentID = AgentID;
+            FailedToTeleportAgentRequest request = new FailedToTeleportAgentRequest ();
+            request.AgentID = agentID;
             request.Destination = destination;
             request.IsCrossing = isCrossing;
             request.FailedRegionID = failedRegionID;
             request.Reason = reason;
 
-            m_syncMessagePoster.Post(destination.ServerURI, request.ToOSD());
+            m_syncMessagePoster.Post (destination.ServerURI, request.ToOSD ());
             return true;
         }
 
-        public bool RetrieveAgent(GridRegion destination, UUID agentID, bool agentIsLeaving, out AgentData agentData,
+        public bool RetrieveAgent (GridRegion destination, UUID agentID, bool agentIsLeaving, out AgentData agentData,
                                   out AgentCircuitData circuitData)
         {
             agentData = null;
             circuitData = null;
 
-            RetrieveAgentRequest request = new RetrieveAgentRequest();
+            RetrieveAgentRequest request = new RetrieveAgentRequest ();
             request.AgentID = agentID;
             request.Destination = destination;
             request.AgentIsLeaving = agentIsLeaving;
 
-            AutoResetEvent resetEvent = new AutoResetEvent(false);
+            AutoResetEvent resetEvent = new AutoResetEvent (false);
             OSDMap result = null;
-            m_syncMessagePoster.Get(destination.ServerURI, request.ToOSD(), (osdresp) =>
-            {
+            m_syncMessagePoster.Get (destination.ServerURI, request.ToOSD (), osdresp => {
                 result = osdresp;
-                resetEvent.Set();
+                resetEvent.Set ();
             });
-            bool success = resetEvent.WaitOne(10000);
+            bool success = resetEvent.WaitOne (10000) && result != null;
             if (!success) return false;
 
-            RetrieveAgentResponse response = new RetrieveAgentResponse();
-            response.FromOSD(result);
+            RetrieveAgentResponse response = new RetrieveAgentResponse ();
+            response.FromOSD (result);
 
             circuitData = response.CircuitData;
             agentData = response.AgentData;
             return response.Success;
         }
 
-        public bool CloseAgent(GridRegion destination, UUID agentID)
+        public bool CloseAgent (GridRegion destination, UUID agentID)
         {
-            CloseAgentRequest request = new CloseAgentRequest();
+            CloseAgentRequest request = new CloseAgentRequest ();
             request.AgentID = agentID;
             request.Destination = destination;
-            m_syncMessagePoster.Post(destination.ServerURI, request.ToOSD());
+            m_syncMessagePoster.Post (destination.ServerURI, request.ToOSD ());
             return true;
         }
 
-        public bool CreateObject(GridRegion destination, ISceneEntity sog)
+        public bool CreateObject (GridRegion destination, ISceneEntity sog)
         {
-            CreateObjectRequest request = new CreateObjectRequest();
+            CreateObjectRequest request = new CreateObjectRequest ();
             request.Object = sog;
             request.Destination = destination;
-            AutoResetEvent resetEvent = new AutoResetEvent(false);
+            AutoResetEvent resetEvent = new AutoResetEvent (false);
             OSDMap result = null;
-            m_syncMessagePoster.Get(destination.ServerURI, request.ToOSD(), (osdresp) =>
-            {
+            m_syncMessagePoster.Get (destination.ServerURI, request.ToOSD (), osdresp => {
                 result = osdresp;
-                resetEvent.Set();
+                resetEvent.Set ();
             });
-            bool success = resetEvent.WaitOne(10000);
-            if (!success) return false;
-            return result["Success"].AsBoolean();
+
+            bool success = resetEvent.WaitOne (10000) && result != null;
+            if (!success)
+                return false;
+
+            return result ["Success"].AsBoolean ();
         }
 
         #endregion

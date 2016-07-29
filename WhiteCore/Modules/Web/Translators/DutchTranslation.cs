@@ -1,3 +1,30 @@
+/*
+ * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org
+ * See CONTRIBUTORS.TXT for a full list of copyright holders.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the WhiteCore-Sim Project nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ``AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 namespace WhiteCore.Modules.Web.Translators
 {
     public class DutchTranslation : ITranslator
@@ -24,6 +51,7 @@ namespace WhiteCore.Modules.Web.Translators
                 case "CurrentPageText": return "Current Page";
                 case "MoreInfoText": return "Meer Info";
                 case "NoDetailsText": return "Geen gegevens gevonden...";
+            case "MoreInfo": return "More Informatie";
             case "ObjectNameText": return "Object";
             case "LocationText": return "Plaats";
             case "UUIDText": return "UUID";
@@ -193,6 +221,7 @@ namespace WhiteCore.Modules.Web.Translators
                 case "MenuMyPurchases": return "Mijn aankopen ";
                 case "MenuTransactions": return "Gebruiker Transacties";
                 case "MenuMyTransactions": return "Mijn Transacties";
+                case "MenuMyClassifieds": return "Mijn Advertenties";                
                 case "MenuStatistics": return "Viewer statistieken";
                 case "MenuGridSettings": return "Grid instellingen";
                 
@@ -280,20 +309,22 @@ namespace WhiteCore.Modules.Web.Translators
 
                 // Language Switcher Tooltips
                 case "en":
-                    return "Engels";
+                    return "English";
                 case "fr":
-                    return "Frans";
+                    return "Fran?ais";
                 case "de":
-                    return "Duits";
+                    return "Deutsch";
                 case "it":
-                    return "Italiaans";
+                    return "Italiano";
                 case "es":
-                    return "Spaans";
+                    return "Espa?ol";
                 case "nl":
                     return "Nederlands";
+                case "ru":
+                    return "§²§å§ã§ã§Ü§Ú§Û";
 
-                // Index Page
-                case "HomeText":
+            // Index Page
+            case "HomeText":
                     return "Home";
                 case "HomeTextWelcome":
                     return "This is our New Virtual World! Join us now, and make a difference!";
@@ -514,11 +545,15 @@ namespace WhiteCore.Modules.Web.Translators
                 case "GridnameText": return "Grid naam";
                 case "GridnickText": return "Grid bijnaam";
                 case "WelcomeMessageText": return "Login welkomstbericht ";
-                case "SystemEstateNameText": return "Naam Estate systeem ";
-                case "SystemEstateOwnerText": return "Systeem goed ownername";
+            case "GovernorNameText": return "Systeem gouverneur";
+            case "MainlandEstateNameText": return "Vasteland landgoed";
+            case "RealEstateOwnerNameText": return "Systeem goed ownername";
+            case "SystemEstateNameText": return "Naam Estate systeem";
+            case "BankerNameText": return "Systeem bankierr";
+            case "MarketPlaceOwnerNameText": return "Systeem marketplace eigenaar";
 
-                //settings manager page
-                case "WebRegistrationText":
+            //settings manager page
+            case "WebRegistrationText":
                     return "Webregistraties toegestaan";
                 case "GridCenterXText":
                     return "Grid Center Location X";
@@ -546,6 +581,9 @@ namespace WhiteCore.Modules.Web.Translators
                 case "LoggedIPText": return "Gelogde IP-adres";
                 case "NoPurchasesText": return "Geen aankopen gevonden...";
                 case "PurchaseCostText": return "Kosten";
+                
+                // Classifieds
+                case "ClassifiedsText": return "Advertenties";
 
                 // Sim Console
                 case "SimConsoleText": return "Sim Command Console";

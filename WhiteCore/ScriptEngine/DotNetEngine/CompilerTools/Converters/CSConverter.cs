@@ -38,7 +38,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
 {
     public class CSConverter : IScriptConverter
     {
-        private readonly CSharpCodeProvider CScodeProvider = new CSharpCodeProvider();
+        readonly CSharpCodeProvider CScodeProvider = new CSharpCodeProvider();
 
         #region IScriptConverter Members
 
@@ -121,7 +121,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
         {
         }
 
-        private string CreateCompilerScript(string compileScript)
+        string CreateCompilerScript(string compileScript)
         {
             compileScript = compileScript.Replace("string",
                                                   "WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString");
@@ -141,7 +141,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
             compileScript = compileScript.Replace("vector",
                                                   "WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Vector3");
             string compiledScript = "";
-            compiledScript = String.Empty +
+            compiledScript = string.Empty +
                              "using WhiteCore.ScriptEngine.DotNetEngine.Runtime;\n" +
                              "using WhiteCore.ScriptEngine.DotNetEngine;\n" +
                              "using System;\n" +
@@ -166,11 +166,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
 
     public class AScriptConverter : IScriptConverter
     {
-        private readonly CSharpCodeProvider CScodeProvider = new CSharpCodeProvider();
+        readonly CSharpCodeProvider CScodeProvider = new CSharpCodeProvider();
+        Compiler m_compiler;
 
         public bool m_addLSLAPI;
         public bool m_allowUnsafe;
-        private Compiler m_compiler;
         public List<string> m_includedAssemblies = new List<string>();
         public List<string> m_includedDefines = new List<string>();
 
@@ -225,8 +225,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
                 foreach (
                     string line in m_includedAssemblies.Where(line => !parameters.ReferencedAssemblies.Contains(line)))
                 {
-                    parameters.ReferencedAssemblies.Add(Path.Combine(rootPath,
-                                                                     line));
+                    parameters.ReferencedAssemblies.Add(Path.Combine(rootPath, line));
                 }
             }
             bool complete = false;
@@ -286,7 +285,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
         {
         }
 
-        private string CreateCompilerScript(string compileScript)
+        string CreateCompilerScript(string compileScript)
         {
             bool newLine = true;
             bool reading = true;
@@ -330,7 +329,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
                 compileScript = string.Join("\n", lines);
             }
             string compiledScript = "";
-            compiledScript = String.Empty +
+            compiledScript = string.Empty +
                              "using WhiteCore.ScriptEngine.DotNetEngine.Runtime;\n" +
                              "using WhiteCore.ScriptEngine.DotNetEngine;\n" +
                              "using WhiteCore.ScriptEngine.DotNetEngine.APIs.Interfaces;\n" +
@@ -369,38 +368,38 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
             return compiledScript;
         }
 
-        private void ReadLine(string line)
+        void ReadLine(string line)
         {
-            if (line.StartsWith("#include"))
+            if (line.StartsWith ("#include", StringComparison.Ordinal))
             {
                 line = line.Replace("#include", "");
-                if (line.EndsWith(";"))
+                if (line.EndsWith (";", StringComparison.Ordinal))
                     line = line.Remove(line.Length - 1);
                 line = line.TrimStart(' ');
                 m_includedDefines.Add(line); //TODO: Add a check here
             }
-            else if (line.StartsWith("#assembly"))
+            else if (line.StartsWith ("#assembly", StringComparison.Ordinal))
             {
                 line = line.Replace("#assembly", "");
-                if (line.EndsWith(";"))
+                if (line.EndsWith (";", StringComparison.Ordinal))
                     line = line.Remove(line.Length - 1);
                 line = line.TrimStart(' ');
                 m_includedAssemblies.Add(line); //TODO: Add a check here
             }
-            else if (line.StartsWith("#threaded"))
+            else if (line.StartsWith ("#threaded", StringComparison.Ordinal))
             {
             }
-            else if (line.StartsWith("#useLSLAPI"))
+            else if (line.StartsWith ("#useLSLAPI", StringComparison.Ordinal))
             {
                 m_addLSLAPI = true;
             }
-            else if (line.StartsWith("#allowUnsafe"))
+            else if (line.StartsWith ("#allowUnsafe", StringComparison.Ordinal))
             {
                 m_allowUnsafe = true;
             }
         }
 
-        private void LSLReadLine(ref string line)
+        void LSLReadLine(ref string line)
         {
             string testLine = line;
             foreach (KeyValuePair<string, IScriptApi> functionName in m_compiler.ScriptEngine.GetAllFunctionNamesAPIs())

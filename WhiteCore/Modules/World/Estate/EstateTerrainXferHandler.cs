@@ -38,7 +38,7 @@ namespace WhiteCore.Modules.Estate
     {
         #region Delegates
 
-        public delegate void TerrainUploadComplete (string name, byte[] filedata, IClientAPI remoteClient);
+        public delegate void TerrainUploadComplete (string name, byte [] filedata, IClientAPI remoteClient);
 
         #endregion
 
@@ -51,11 +51,10 @@ namespace WhiteCore.Modules.Estate
         public EstateTerrainXferHandler (IClientAPI pRemoteClient, string pClientFilename)
         {
             m_asset = new AssetBase (UUID.Zero, pClientFilename, AssetType.Texture, pRemoteClient.AgentId)
-                          { Data = new byte[0], Description = "empty", Flags = AssetFlags.Temporary | AssetFlags.Local };
+            { Data = new byte [0], Description = "empty", Flags = AssetFlags.Temporary | AssetFlags.Local };
         }
 
-        public ulong XferID
-        {
+        public ulong XferID {
             get { return mXferID; }
         }
 
@@ -75,29 +74,24 @@ namespace WhiteCore.Modules.Estate
         /// <param name="xferID"></param>
         /// <param name="packetID"></param>
         /// <param name="data"></param>
-        public void XferReceive (IClientAPI remoteClient, ulong xferID, uint packetID, byte[] data)
+        public void XferReceive (IClientAPI remoteClient, ulong xferID, uint packetID, byte [] data)
         {
-            if (mXferID == xferID)
-            {
-                lock (_lock)
-                {
-                    if (m_asset.Data.Length > 1)
-                    {
-                        byte[] destinationArray = new byte[m_asset.Data.Length + data.Length];
+            if (mXferID == xferID) {
+                lock (_lock) {
+                    if (m_asset.Data.Length > 1) {
+                        byte [] destinationArray = new byte [m_asset.Data.Length + data.Length];
                         Array.Copy (m_asset.Data, 0, destinationArray, 0, m_asset.Data.Length);
                         Array.Copy (data, 0, destinationArray, m_asset.Data.Length, data.Length);
                         m_asset.Data = destinationArray;
-                    } else
-                    {
-                        byte[] buffer2 = new byte[data.Length - 4];
+                    } else {
+                        byte [] buffer2 = new byte [data.Length - 4];
                         Array.Copy (data, 4, buffer2, 0, data.Length - 4);
                         m_asset.Data = buffer2;
                     }
 
                     remoteClient.SendConfirmXfer (xferID, packetID);
 
-                    if ((packetID & 0x80000000) != 0)
-                    {
+                    if ((packetID & 0x80000000) != 0) {
                         SendCompleteMessage (remoteClient);
                     }
                 }
@@ -107,8 +101,7 @@ namespace WhiteCore.Modules.Estate
         public void SendCompleteMessage (IClientAPI remoteClient)
         {
             handlerTerrainUploadDone = TerrainUploadDone;
-            if (handlerTerrainUploadDone != null)
-            {
+            if (handlerTerrainUploadDone != null) {
                 handlerTerrainUploadDone (m_asset.Name, m_asset.Data, remoteClient);
             }
         }

@@ -61,6 +61,12 @@ namespace WhiteCore.Framework.Modules
         string Version { get; }
 
         /// <summary>
+        /// Is this instance a grid server.
+        /// </summary>
+        /// <value><c>true</c> if this instance is a grid server; otherwise, <c>false</c>.</value>
+        bool IsGridServer { get; }
+
+        /// <summary>
         ///     All parameters that were passed by the command line when WhiteCore started
         /// </summary>
         string[] CommandLineParameters { get; }
@@ -117,5 +123,10 @@ namespace WhiteCore.Framework.Modules
 
         // where all volatile data is kept
         string DefaultDataPath { get; set; }
+
+        // The center of the world
+        int MapCenterX { get; set; }
+        int MapCenterY { get; set; }
+
     }
 }

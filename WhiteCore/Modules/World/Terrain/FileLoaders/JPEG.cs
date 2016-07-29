@@ -39,69 +39,66 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
     {
         #region ITerrainLoader Members
 
-        public string FileExtension
-        {
+        public string FileExtension {
             get { return ".jpg"; }
         }
 
-        public ITerrainChannel LoadFile(string filename, IScene scene)
+        public ITerrainChannel LoadFile (string filename, IScene scene)
         {
-            return LoadBitmap(new Bitmap(filename), scene);
-            }
+            return LoadBitmap (new Bitmap (filename), scene);
+        }
 
-        public ITerrainChannel LoadFile(string filename, IScene scene, int x, int y, int fileWidth, int fileHeight, int w, int h)
+        public ITerrainChannel LoadFile (string filename, IScene scene, int x, int y, int fileWidth, int fileHeight, int w, int h)
         {
             // [[THEMAJOR]] Some work on tile loading..
             // terrain load-tile Tile.png 5 5 10000 10050
-            Bitmap tilemap = new Bitmap(filename);
+            Bitmap tilemap = new Bitmap (filename);
 
             // Prevents off-by-one issue
             fileHeight--;
 
-            int xoffset = w*x;
-            int yoffset = h*(fileHeight - y);
+            int xoffset = w * x;
+            int yoffset = h * (fileHeight - y);
 
-            MainConsole.Instance.DebugFormat(
-                "[TERRAIN]: Loading tile {0},{1} (offset {2},{3}) from tile-map size of {4},{5}",
+            MainConsole.Instance.DebugFormat (
+                "[Terrain]: Loading tile {0},{1} (offset {2},{3}) from tile-map size of {4},{5}",
                 x, y, xoffset, yoffset, fileWidth, fileHeight);
 
-            Rectangle tileRect = new Rectangle(xoffset, yoffset, w, h);
+            Rectangle tileRect = new Rectangle (xoffset, yoffset, w, h);
             PixelFormat format = tilemap.PixelFormat;
             Bitmap cloneBitmap = null;
-            try
-            {
-                cloneBitmap = tilemap.Clone(tileRect, format);
-            }
-            catch (OutOfMemoryException e)
-            {
+            try {
+                cloneBitmap = tilemap.Clone (tileRect, format);
+            } catch (OutOfMemoryException e) {
                 // This error WILL appear if the number of Y tiles is too high because of how it works from the bottom up
                 // However, this still spits out ugly unreferenced object errors on the console
-                MainConsole.Instance.ErrorFormat(
-                    "[TERRAIN]: Couldn't load tile {0},{1} (from bitmap coordinates {2},{3}). Number of specified Y tiles may be too high: {4}",
+                MainConsole.Instance.ErrorFormat (
+                    "[Terrain]: Couldn't load tile {0},{1} (from bitmap coordinates {2},{3}). Number of specified Y tiles may be too high: {4}",
                     x, y, xoffset, yoffset, e);
-            }
-            finally
-            {
+            } finally {
                 // Some attempt at keeping a clean memory
-                tilemap.Dispose();
+                tilemap.Dispose ();
             }
 
-            return LoadBitmap(cloneBitmap, scene);
+            return LoadBitmap (cloneBitmap, scene);
 
         }
 
-        public ITerrainChannel LoadStream(Stream stream, IScene scene)
+        public ITerrainChannel LoadStream (Stream stream, IScene scene)
         {
             //throw new NotImplementedException();
-            return LoadBitmap(new Bitmap(stream), scene);
+            return LoadBitmap (new Bitmap (stream), scene);
 
         }
 
-        public void SaveFile(string filename, ITerrainChannel map)
+        public void SaveFile (string filename, ITerrainChannel map)
         {
-            Bitmap colours = CreateBitmapFromMap(map);
-
-            colours.Save(filename, ImageFormat.Jpeg);
+            Bitmap colours = CreateBitmapFromMap (map);
+            try {
+                colours.Save (filename, ImageFormat.Jpeg);
+            } catch {
+            }
+            colours.Dispose ();
         }
 
         /// <summary>
@@ -109,59 +106,61 @@ namespace WhiteCore.Modules.Terrain.FileLoaders
         /// </summary>
         /// <param name="stream">The target stream</param>
         /// <param name="map">The terrain channel being saved</param>
-        public void SaveStream(Stream stream, ITerrainChannel map)
+        public void SaveStream (Stream stream, ITerrainChannel map)
         {
-            Bitmap colours = CreateBitmapFromMap(map);
-
-            colours.Save(stream, ImageFormat.Jpeg);
+            Bitmap colours = CreateBitmapFromMap (map);
+            try {
+                colours.Save (stream, ImageFormat.Jpeg);
+            } catch {
+            }
+            colours.Dispose ();
         }
 
         #endregion
 
-        protected virtual ITerrainChannel LoadBitmap(Bitmap bitmap, IScene scene)
+        protected virtual ITerrainChannel LoadBitmap (Bitmap bitmap, IScene scene)
         {
-            ITerrainChannel retval = new TerrainChannel(bitmap.Width, bitmap.Height, scene);
+            ITerrainChannel retval = new TerrainChannel (bitmap.Width, bitmap.Height, scene);
 
             int x;
             int y;
 
-            for (x = 0; x < bitmap.Width; x++)
-            {
+            for (x = 0; x < bitmap.Width; x++) {
                 for (y = 0; y < bitmap.Height; y++)
-                    retval[x, y] = bitmap.GetPixel(x, bitmap.Height - y - 1).GetBrightness()*128;
+                    retval [x, y] = bitmap.GetPixel (x, bitmap.Height - y - 1).GetBrightness () * 128;
             }
 
+            bitmap.Dispose ();  // not needed anymore
             return retval;
         }
 
-        public override string ToString()
+        public override string ToString ()
         {
             return "JPEG";
         }
 
-        private static Bitmap CreateBitmapFromMap(ITerrainChannel map)
+        static Bitmap CreateBitmapFromMap (ITerrainChannel map)
         {
-            Bitmap gradientmapLd = new Bitmap("defaultstripe.png");
+            Bitmap gradientmapLd = new Bitmap ("defaultstripe.png");
 
             int pallete = gradientmapLd.Height;
 
-            Bitmap bmp = new Bitmap(map.Width, map.Height);
-            Color[] colours = new Color[pallete];
+            Bitmap bmp = new Bitmap (map.Width, map.Height);
+            Color [] colours = new Color [pallete];
 
-            for (int i = 0; i < pallete; i++)
-            {
-                colours[i] = gradientmapLd.GetPixel(0, i);
+            for (int i = 0; i < pallete; i++) {
+                colours [i] = gradientmapLd.GetPixel (0, i);
             }
 
-            for (int y = 0; y < map.Height; y++)
-            {
-                for (int x = 0; x < map.Width; x++)
-                {
+            for (int y = 0; y < map.Height; y++) {
+                for (int x = 0; x < map.Width; x++) {
                     // 512 is the largest possible height before colors clamp
-                    int colorindex = (int) (Math.Max(Math.Min(1.0, map[x, y]/512.0), 0.0)*(pallete - 1));
-                    bmp.SetPixel(x, map.Height - y - 1, colours[colorindex]);
+                    int colorindex = (int)(Math.Max (Math.Min (1.0, map [x, y] / 512.0), 0.0) * (pallete - 1));
+                    bmp.SetPixel (x, map.Height - y - 1, colours [colorindex]);
                 }
             }
+
+            gradientmapLd.Dispose ();
             return bmp;
         }
     }

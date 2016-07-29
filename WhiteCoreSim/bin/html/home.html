@@ -1,17 +1,3 @@
-<!-- slide show -->
-<script type="text/javascript" src="javascripts/jquery.cycle.all.js"></script>
-<script type="text/javascript" src="javascripts/jquery.easing.js"></script>
-<script type="text/javascript">
-$(function() {
-    $('.slideshow1').cycle({
-	cleartype: false,
-    fx: 'fade', 
-    random: 1,
-    containerResize:  0,
-	});
-});
-</script>
-
 <!--
 <div class="slideshow">
 	<img src="images/screenshots/welcome1.jpg" alt="{SystemName}: welcome1.jpg" title="{SystemName}: welcome1.jpg" />
@@ -95,15 +81,13 @@ $(function() {
     <div id="error_message" class="error_message"><h3>{ErrorMessage}</h3></div>
 	<form action="login.html" id="login_form" method="POST">
 	<table id="login">
-  		<caption></caption>
-  
-  		<thead>
+   		<thead>
     		<tr>
       			<th class="login_left"></th>
       			<th><h2>User Login</h2></th>
     		</tr>
   		</thead>
-  
+
   		<tfoot>
     		<tr>
       			<th class="login_left"></th>
@@ -127,23 +111,6 @@ $(function() {
   		</tbody>
 	</table>
 	</form>
-	<script>
-  		/* attach a submit handler to the form */
-  		$("#login_form").submit(function(event) {
-
-    	/* stop form from submitting normally */
-    	event.preventDefault(); 
-    	/* get some values from elements on the page: */
-    	var $form = $( this ),
-        	url = $form.attr( 'action' );
-    	/* Send the data using post and put the results in a div */
-    	$.post( url, $form.serialize(),
-      		function( data ) {
-				$("#error_message").empty().append(data);
-      		}
-    	);
-  		});
-	</script>
 	</div>
 {IfUserLoginEnd}
 
@@ -153,6 +120,37 @@ $(function() {
 		<iframe class="gridstatus" src="welcomescreen/gridstatus.html" scrolling="no" style="overflow:hidden;width:300px;float:right;"></iframe>
 	</div>
 	<div class=homenews>
-		<iframe class="news" src="welcomescreen/news.html" scrolling="no" style="overflow:hidden;width:300px;"></iframe>
+		<iframe class="news" src="welcomescreen/news.html" scrolling="no" style="overflow:hidden;width:300px;height:120px;"></iframe>
 	</div>
 <div>
+
+<!-- slide show -->
+<script type="text/javascript" src="js/jquery.cycle.all.js"></script>
+<script type="text/javascript" src="js/jquery.easing.js"></script>
+<script>
+  $(function() {
+    $('.slideshow1').cycle({
+      cleartype: false,
+      fx: 'fade',
+      random: 1,
+      containerResize:  0,
+    });
+  });
+
+      /* attach a submit handler to the form */
+      $("#login_form").submit(function(event) {
+
+      /* stop form from submitting normally */
+      event.preventDefault();
+      /* get some values from elements on the page: */
+      var $form = $( this ),
+          url = $form.attr( 'action' );
+      /* Send the data using post and put the results in a div */
+      $.post( url, $form.serialize(),
+          function( data ) {
+        $("#error_message").empty().append(data);
+      }
+    );
+    });
+ </script>
+

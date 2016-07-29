@@ -5,12 +5,12 @@
 {SpecialWindowMessage}
 {SpecialWindowActive}
 {SpecialWindowInactive}
-{GridActive} 
+{GridActive}
 {GridInactive}
-{SpecialWindowColorRed} 
-{SpecialWindowColorYellow} 
-{SpecialWindowColorWhite} 
-{SpecialWindowColorGreen} 
+{SpecialWindowColorRed}
+{SpecialWindowColorYellow}
+{SpecialWindowColorWhite}
+{SpecialWindowColorGreen}
 {OpenNewsManager}               Open the news manager
 {SpecialWindowTitleText}        Special Info Window Title
 {SpecialWindowTextText}         Special Info Window Text
@@ -33,14 +33,14 @@
 <div id="info_message" class="info_message"><h3></h3></div>
 <table id="welcomescreen_manager">
   <caption></caption>
-  
+
   <thead>
     <tr>
       <th class="welcomescreen_managern_left"></th>
       <th class="welcomescreen_manager_right"></th>
     </tr>
   </thead>
-  
+
   <tfoot>
     <tr>
       <th class="welcomescreen_managern_left"></th>
@@ -71,12 +71,12 @@
       <td class="welcomescreen_managern_left"><p>{SpecialWindowTitleText}</p></td>
       <td class="welcomescreen_manager_right"><input name="SpecialWindowTitle" type="text" id="SpecialWindowTitle" size="119" value="{SpecialWindowTitle}" /></td>
     </tr>
-	
+
     <tr>
       <td class="welcomescreen_managern_left"><p>{SpecialWindowTextText}</p></td>
       <td class="welcomescreen_manager_right"><textarea name="SpecialWindowText" cols="90" rows="10" id="SpecialWindowText">{SpecialWindowMessage}</textarea></td>
     </tr>
-	
+
     <tr>
       <td class="welcomescreen_managern_left"><p>{SpecialWindowColorText}</p></td>
       <td class="welcomescreen_manager_right">
@@ -88,7 +88,7 @@
 		</select>
 	  </td>
     </tr>
-	
+
     <tr>
       <td class="welcomescreen_managern_left"></td>
 	  <input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
@@ -97,12 +97,13 @@
   </tbody>
 </table>
 </form>
+
 <script>
   /* attach a submit handler to the form */
   $("#welcomescreen_updater").submit(function(event) {
 
     /* stop form from submitting normally */
-    event.preventDefault(); 
+    event.preventDefault();
     /* get some values from elements on the page: */
     var $form = $( this ),
         url = $form.attr( 'action' );

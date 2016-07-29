@@ -26,46 +26,44 @@
  */
 
 
+using System.Collections.Generic;
+using Nini.Config;
+using OpenMetaverse;
 using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse;
-using System.Collections.Generic;
 
 namespace WhiteCore.Services.DataService
 {
     public class LocalMuteListConnector : ConnectorBase, IMuteListConnector
     {
-        private IGenericData GD;
+        IGenericData GD;
 
         #region IMuteListConnector Members
 
-        public void Initialize(IGenericData GenericData, IConfigSource source, IRegistryCore simBase,
+        public void Initialize (IGenericData GenericData, IConfigSource source, IRegistryCore simBase,
                                string defaultConnectionString)
         {
             GD = GenericData;
 
-            if (source.Configs[Name] != null)
-                defaultConnectionString = source.Configs[Name].GetString("ConnectionString", defaultConnectionString);
+            if (source.Configs [Name] != null)
+                defaultConnectionString = source.Configs [Name].GetString ("ConnectionString", defaultConnectionString);
 
             if (GD != null)
-                GD.ConnectToDatabase(defaultConnectionString, "Generics",
-                                     source.Configs["WhiteCoreConnectors"].GetBoolean("ValidateTables", true));
+                GD.ConnectToDatabase (defaultConnectionString, "Generics",
+                                     source.Configs ["WhiteCoreConnectors"].GetBoolean ("ValidateTables", true));
 
-            Framework.Utilities.DataManager.RegisterPlugin(Name + "Local", this);
+            Framework.Utilities.DataManager.RegisterPlugin (Name + "Local", this);
 
-            if (source.Configs["WhiteCoreConnectors"].GetString("MuteListConnector", "LocalConnector") == "LocalConnector")
-            {
-                Framework.Utilities.DataManager.RegisterPlugin(this);
+            if (source.Configs ["WhiteCoreConnectors"].GetString ("MuteListConnector", "LocalConnector") == "LocalConnector") {
+                Framework.Utilities.DataManager.RegisterPlugin (this);
             }
-            Init(simBase, Name);
+            Init (simBase, Name);
         }
 
-        public string Name
-        {
+        public string Name {
             get { return "IMuteListConnector"; }
         }
 
@@ -74,14 +72,15 @@ namespace WhiteCore.Services.DataService
         /// </summary>
         /// <param name="AgentID"></param>
         /// <returns></returns>
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<MuteList> GetMuteList(UUID AgentID)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public List<MuteList> GetMuteList (UUID AgentID)
         {
-            object remoteValue = DoRemote(AgentID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<MuteList>) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (AgentID);
+                return remoteValue != null ? (List<MuteList>)remoteValue : new List<MuteList> ();
+            }
 
-            return GenericUtils.GetGenerics<MuteList>(AgentID, "MuteList", GD);
+            return GenericUtils.GetGenerics<MuteList> (AgentID, "MuteList", GD);
         }
 
         /// <summary>
@@ -89,14 +88,15 @@ namespace WhiteCore.Services.DataService
         /// </summary>
         /// <param name="mute"></param>
         /// <param name="AgentID"></param>
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public void UpdateMute(MuteList mute, UUID AgentID)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public void UpdateMute (MuteList mute, UUID AgentID)
         {
-            object remoteValue = DoRemote(mute, AgentID);
-            if (remoteValue != null || m_doRemoteOnly)
+            if (m_doRemoteOnly) {
+                DoRemote (mute, AgentID);
                 return;
+            }
 
-            GenericUtils.AddGeneric(AgentID, "MuteList", mute.MuteID.ToString(), mute.ToOSD(), GD);
+            GenericUtils.AddGeneric (AgentID, "MuteList", mute.MuteID.ToString (), mute.ToOSD (), GD);
         }
 
         /// <summary>
@@ -104,14 +104,15 @@ namespace WhiteCore.Services.DataService
         /// </summary>
         /// <param name="muteID"></param>
         /// <param name="AgentID"></param>
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public void DeleteMute(UUID muteID, UUID AgentID)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public void DeleteMute (UUID muteID, UUID AgentID)
         {
-            object remoteValue = DoRemote(muteID, AgentID);
-            if (remoteValue != null || m_doRemoteOnly)
+            if (m_doRemoteOnly) {
+                DoRemote (muteID, AgentID);
                 return;
+            }
 
-            GenericUtils.RemoveGenericByKeyAndType(AgentID, "MuteList", muteID.ToString(), GD);
+            GenericUtils.RemoveGenericByKeyAndType (AgentID, "MuteList", muteID.ToString (), GD);
         }
 
         /// <summary>
@@ -120,19 +121,20 @@ namespace WhiteCore.Services.DataService
         /// <param name="AgentID"></param>
         /// <param name="PossibleMuteID"></param>
         /// <returns></returns>
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public bool IsMuted(UUID AgentID, UUID PossibleMuteID)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public bool IsMuted (UUID AgentID, UUID PossibleMuteID)
         {
-            object remoteValue = DoRemote(AgentID, PossibleMuteID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return remoteValue != null && (bool) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (AgentID, PossibleMuteID);
+                return remoteValue != null && (bool)remoteValue;
+            }
 
-            return GenericUtils.GetGeneric<MuteList>(AgentID, "MuteList", PossibleMuteID.ToString(), GD) != null;
+            return GenericUtils.GetGeneric<MuteList> (AgentID, "MuteList", PossibleMuteID.ToString (), GD) != null;
         }
 
         #endregion
 
-        public void Dispose()
+        public void Dispose ()
         {
         }
     }

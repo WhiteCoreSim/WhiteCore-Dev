@@ -33,44 +33,44 @@ namespace WhiteCore.Modules.Monitoring.Monitors
 {
     public class ScriptFrameTimeMonitor : IScriptFrameTimeMonitor
     {
-        private int MonitorScriptFrameTime;
+        int MonitorScriptFrameTime;
 
-        public ScriptFrameTimeMonitor(IScene scene)
+        public ScriptFrameTimeMonitor (IScene scene)
         {
         }
 
         #region Implementation of IMonitor
 
-        public double GetValue()
+        public double GetValue ()
         {
             return MonitorScriptFrameTime;
         }
 
-        public string GetName()
+        public string GetName ()
         {
             return "Script Frame Time";
         }
 
-        public string GetInterfaceName()
+        public string GetInterfaceName ()
         {
             return "IScriptFrameTimeMonitor";
         }
 
-        public string GetFriendlyValue()
+        public string GetFriendlyValue ()
         {
-            return (int) GetValue() + "ms";
+            return (int)GetValue () + "ms";
         }
 
         #endregion
 
         #region ITimeMonitor Members
 
-        public void AddTime(int time)
+        public void AddTime (int time)
         {
             MonitorScriptFrameTime += time;
         }
 
-        public void ResetStats()
+        public void ResetStats ()
         {
             MonitorScriptFrameTime = 0;
         }

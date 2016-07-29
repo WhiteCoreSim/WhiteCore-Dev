@@ -25,26 +25,27 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.ConsoleFramework;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.SceneInfo;
-using Nini.Config;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Nini.Config;
+using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.SceneInfo;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.Archivers
 {
     /// <summary>
-    ///     This module loads and saves OpenSimulator region archives
+    ///     This module loads and saves WhiteCore-Sim region archives
     /// </summary>
     public class ArchiverModule : INonSharedRegionModule, IRegionArchiverModule
     {
         /// <value>
         ///     The file used to load and save an opensimulator archive if no filename has been specified
         /// </value>
-        protected const string DEFAULT_OAR_BACKUP_FILENAME = "region.oar";
+        protected const string DEFAULT_OAR_BACKUP_FILENAME = Constants.DEFAULT_OAR_BACKUP_FILENAME;
 
         private IScene m_scene;
 
@@ -60,17 +61,16 @@ namespace WhiteCore.Modules.Archivers
             get { return null; }
         }
 
-
         public void Initialise(IConfigSource source)
         {
-            //MainConsole.Instance.Debug("[ARCHIVER] Initializing");
+            //MainConsole.Instance.Debug("[Archiver] Initializing");
         }
 
         public void AddRegion(IScene scene)
         {
             m_scene = scene;
             m_scene.RegisterModuleInterface<IRegionArchiverModule>(this);
-            //MainConsole.Instance.DebugFormat("[ARCHIVER]: Enabled for region {0}", scene.RegionInfo.RegionName);
+            //MainConsole.Instance.DebugFormat("[Archiver]: Enabled for region {0}", scene.RegionInfo.RegionName);
         }
 
         public void RegionLoaded(IScene scene)
@@ -169,7 +169,6 @@ namespace WhiteCore.Modules.Archivers
             return DearchiveRegion(newParams.Count > 2 ? newParams[2] : DEFAULT_OAR_BACKUP_FILENAME, mergeOar, skipAssets,
                             skipTerrain, offsetX, offsetY, offsetZ, flipX, flipY,
                             useParcelOwnership, checkOwnership);
-
         }
 
         /// <summary>
@@ -207,7 +206,7 @@ namespace WhiteCore.Modules.Archivers
         public void ArchiveRegion(string savePath, Guid requestId, string permissions)
         {
             MainConsole.Instance.InfoFormat(
-                "[ARCHIVER]: Writing archive for region {0} to {1}", m_scene.RegionInfo.RegionName, savePath);
+                "[Archiver]: Writing archive for region {0} to {1}", m_scene.RegionInfo.RegionName, savePath);
 
             new ArchiveWriteRequestPreparation(m_scene, savePath, requestId, permissions).ArchiveRegion();
         }
@@ -227,7 +226,7 @@ namespace WhiteCore.Modules.Archivers
                                     bool useParcelOwnership, bool checkOwnership)
         {
             MainConsole.Instance.InfoFormat(
-                "[ARCHIVER]: Loading archive to region {0} from {1}", m_scene.RegionInfo.RegionName, loadPath);
+                "[Archiver]: Loading archive to region {0} from {1}", m_scene.RegionInfo.RegionName, loadPath);
 
             var archiveRead = new ArchiveReadRequest (m_scene, loadPath, merge, skipAssets, skipTerrain, offsetX,
                                   offsetY, offsetZ, flipX, flipY, useParcelOwnership, checkOwnership);

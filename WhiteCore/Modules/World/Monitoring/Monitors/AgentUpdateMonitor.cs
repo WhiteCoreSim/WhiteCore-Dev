@@ -33,55 +33,53 @@ namespace WhiteCore.Modules.Monitoring.Monitors
 {
     public class AgentUpdateMonitor : IAgentUpdateMonitor
     {
-        private int agentTime;
-        private int agentUpdates;
+        int agentTime;
+        int agentUpdates;
 
-        public AgentUpdateMonitor(IScene scene)
+        public AgentUpdateMonitor (IScene scene)
         {
         }
 
         #region Implementation of IMonitor
 
-        public double GetValue()
+        public double GetValue ()
         {
             return agentUpdates;
         }
 
-        public string GetName()
+        public string GetName ()
         {
             return "Agent Update Count";
         }
 
-        public string GetInterfaceName()
+        public string GetInterfaceName ()
         {
             return "IAgentUpdateMonitor";
         }
 
-        public string GetFriendlyValue()
+        public string GetFriendlyValue ()
         {
-            return (int) GetValue() + " updates/sec";
+            return (int)GetValue () + " updates/sec";
         }
 
         #endregion
 
         #region IAgentUpdateMonitor Members
 
-        public int AgentFrameTime
-        {
+        public int AgentFrameTime {
             get { return agentTime; }
         }
 
-        public int AgentUpdates
-        {
+        public int AgentUpdates {
             get { return agentUpdates; }
         }
 
-        public void AddAgentUpdates(int value)
+        public void AddAgentUpdates (int value)
         {
             agentUpdates += value;
         }
 
-        public void AddAgentTime(int value)
+        public void AddAgentTime (int value)
         {
             agentTime += value;
         }
@@ -90,7 +88,7 @@ namespace WhiteCore.Modules.Monitoring.Monitors
 
         #region IMonitor Members
 
-        public void ResetStats()
+        public void ResetStats ()
         {
             agentUpdates = 0;
             agentTime = 0;

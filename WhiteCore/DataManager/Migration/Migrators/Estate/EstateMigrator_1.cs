@@ -138,6 +138,7 @@ namespace WhiteCore.DataManager.Migration.Migrators.Estate
                 {
                     dr.DataReader.Close();
                     genericData.CloseDatabase(dr);
+                    dr.Dispose ();
                 }
             }
         }

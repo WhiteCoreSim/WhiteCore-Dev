@@ -81,14 +81,16 @@ namespace WhiteCore.Services.SQLServices.GridService
 
             public static bool operator == (NeighborLocation a, NeighborLocation b)
             {
+                // 20160407 - greythane - Null checks are invalid as NeighbourLocation is never null
+                /*
                 // If both are null, or both are same instance, return true.
-                if (System.Object.ReferenceEquals (a, b))
+                if (Object.ReferenceEquals (a, b))
                     return true;
 
                 // If one is null, but not both, return false.
                 if (((object)a == null) || ((object)b == null))
                     return false;
-
+                */
                 // Return true if the fields match:
                 return a.Equals (b);
             }
@@ -137,7 +139,7 @@ namespace WhiteCore.Services.SQLServices.GridService
             if (handlerConfig.GetString ("GridHandler", "") != Name)
                 return;
 
-            //MainConsole.Instance.DebugFormat("[GRID SERVICE]: Starting...");
+            //MainConsole.Instance.DebugFormat("[Grid service]: Starting...");
             Configure (config, registry);
         }
 
@@ -248,17 +250,15 @@ namespace WhiteCore.Services.SQLServices.GridService
         {
             if (m_cachedMaxRegionSize != 0)
                 return m_cachedMaxRegionSize;
-            object remoteValue = DoRemoteByURL ("GridServerURI");
-            if (remoteValue != null || m_doRemoteOnly)
-            {
-                m_cachedMaxRegionSize = (int)remoteValue == 0 ? Constants.MaxRegionSize : (int)remoteValue;
-                if ((int)remoteValue == 0)
-                    return Constants.MaxRegionSize;
-                return (int)remoteValue;
+
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("GridServerURI");
+                int rval = remoteValue != null ? (int) remoteValue : 0;
+                m_cachedMaxRegionSize = rval == 0 ? Constants.MaxRegionSize : rval;
+                return m_cachedMaxRegionSize;
             }
-            if (m_maxRegionSize == 0)
-                return Constants.MaxRegionSize;
-            return m_maxRegionSize;
+
+            return m_maxRegionSize == 0 ? Constants.MaxRegionSize : m_maxRegionSize;
         }
 
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
@@ -266,12 +266,13 @@ namespace WhiteCore.Services.SQLServices.GridService
         {
             if (m_cachedRegionViewSize != 0)
                 return m_cachedRegionViewSize;
-            object remoteValue = DoRemoteByURL ("GridServerURI");
-            if (remoteValue != null && m_doRemoteOnly)
-            {
-                m_cachedRegionViewSize = (int)remoteValue;
-            } else
-                m_cachedRegionViewSize = 1;
+
+            m_cachedRegionViewSize = 1;
+
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("GridServerURI");
+                m_cachedRegionViewSize = remoteValue != null ? (int)remoteValue : 1;
+            }
             return m_cachedRegionViewSize;
         }
 
@@ -288,15 +289,16 @@ namespace WhiteCore.Services.SQLServices.GridService
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
         public virtual List<GridRegion> GetDefaultRegions (List<UUID> scopeIDs)
         {
-            object remoteValue = DoRemoteByURL ("GridServerURI", scopeIDs);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<GridRegion>)remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("GridServerURI", scopeIDs);
+                return remoteValue != null ? (List<GridRegion>)remoteValue : new List<GridRegion> ();
+            }
 
             List<GridRegion> regions = m_Database.GetDefaultRegions (scopeIDs);
 
             List<GridRegion> ret = regions.Where (r => (r.Flags & (int)RegionFlags.RegionOnline) != 0).ToList ();
 
-            MainConsole.Instance.DebugFormat ("[GRID SERVICE]: GetDefaultRegions returning {0} regions", ret.Count);
+            MainConsole.Instance.DebugFormat ("[Grid service]: GetDefaultRegions returning {0} regions", ret.Count);
             return ret;
         }
 
@@ -310,9 +312,10 @@ namespace WhiteCore.Services.SQLServices.GridService
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
         public virtual List<GridRegion> GetSafeRegions (List<UUID> scopeIDs, int x, int y)
         {
-            object remoteValue = DoRemoteByURL ("GridServerURI", scopeIDs, x, y);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<GridRegion>)remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("GridServerURI", scopeIDs, x, y);
+                return remoteValue != null ? (List<GridRegion>)remoteValue : new List<GridRegion> ();
+            }
 
             return m_Database.GetSafeRegions (scopeIDs, x, y);
         }
@@ -364,42 +367,41 @@ namespace WhiteCore.Services.SQLServices.GridService
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
         public virtual List<GridRegion> GetFallbackRegions (List<UUID> scopeIDs, int x, int y)
         {
-            object remoteValue = DoRemoteByURL ("GridServerURI", scopeIDs, x, y);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<GridRegion>)remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("GridServerURI", scopeIDs, x, y);
+                return remoteValue != null ? (List<GridRegion>)remoteValue : new List<GridRegion> ();
+            }
 
             List<GridRegion> regions = m_Database.GetFallbackRegions (scopeIDs, x, y);
 
             List<GridRegion> ret = regions.Where (r => (r.Flags & (int)RegionFlags.RegionOnline) != 0).ToList ();
 
-            MainConsole.Instance.DebugFormat ("[GRID SERVICE]: Fallback returned {0} regions", ret.Count);
+            MainConsole.Instance.DebugFormat ("[Grid service]: Fallback returned {0} regions", ret.Count);
             return ret;
         }
 
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
         public virtual int GetRegionFlags (List<UUID> scopeIDs, UUID regionID)
         {
-            object remoteValue = DoRemoteByURL ("GridServerURI", scopeIDs, regionID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (int)remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("GridServerURI", scopeIDs, regionID);
+                return remoteValue != null ? (int)remoteValue : -1;
+            }
 
             GridRegion region = m_Database.Get (regionID, scopeIDs);
 
-            if (region != null)
-            {
-                //MainConsole.Instance.DebugFormat("[GRID SERVICE]: Request for flags of {0}: {1}", regionID, flags);
-                return region.Flags;
-            }
-            return -1;
+            //MainConsole.Instance.DebugFormat("[Grid service]: Request for flags of {0}: {1}", regionID, flags);
+            return region != null ? region.Flags : -1;
         }
 
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
         public virtual multipleMapItemReply GetMapItems (List<UUID> scopeIDs, ulong regionHandle,
                                                         GridItemType gridItemType)
         {
-            object remoteValue = DoRemoteByURL ("GridServerURI", scopeIDs, regionHandle, gridItemType);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (multipleMapItemReply)remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("GridServerURI", scopeIDs, regionHandle, gridItemType);
+                return remoteValue != null ? (multipleMapItemReply)remoteValue : new multipleMapItemReply ();
+            }
 
             multipleMapItemReply allItems = new multipleMapItemReply ();
             if (gridItemType == GridItemType.AgentLocations) //Grid server only cares about agent locations
@@ -417,13 +419,13 @@ namespace WhiteCore.Services.SQLServices.GridService
                                                      int majorProtocolVersion, int minorProtocolVersion)
         {
             RegisterRegion rr;
-            object remoteValue = DoRemoteByURL ("GridServerURI", regionInfos, oldSessionID, password,
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("GridServerURI", regionInfos, oldSessionID, password,
                                      majorProtocolVersion, minorProtocolVersion);
-            if (remoteValue != null || m_doRemoteOnly)
-            {
-                rr = (RegisterRegion)remoteValue;
-                if (rr == null)
-                    rr = new RegisterRegion { Error = "Could not reach the grid service." };
+                if (remoteValue != null)
+                    return (RegisterRegion)remoteValue;
+            
+                rr = new RegisterRegion { Error = "Could not reach the grid service." };
                 return rr;
             }
 
@@ -453,7 +455,7 @@ namespace WhiteCore.Services.SQLServices.GridService
                 r.RegionID != regionInfos.RegionID))
             {
                 MainConsole.Instance.WarnFormat (
-                    "[GRID SERVICE]: Region {0} tried to register in coordinates {1}, {2} which are already in use in scope {3}.",
+                    "[Grid service]: Region {0} tried to register in coordinates {1}, {2} which are already in use in scope {3}.",
                     regionInfos.RegionID, regionInfos.RegionLocX, regionInfos.RegionLocY, regionInfos.ScopeID);
                 return new RegisterRegion { Error = "Region overlaps another region" };
             }
@@ -466,7 +468,7 @@ namespace WhiteCore.Services.SQLServices.GridService
                 if (!VerifyRegionSessionID (region, oldSessionID))
                 {
                     MainConsole.Instance.WarnFormat (
-                        "[GRID SERVICE]: Region {0} called register, but the sessionID they provided is wrong!",
+                        "[Grid service]: Region {0} called register, but the sessionID they provided is wrong!",
                         region.RegionName);
                     return new RegisterRegion { Error = "Wrong Session ID" };
                 }
@@ -475,7 +477,7 @@ namespace WhiteCore.Services.SQLServices.GridService
             if ((!m_AllowNewRegistrations && region == null) && (!m_AllowNewRegistrationsWithPass))
             {
                 MainConsole.Instance.WarnFormat (
-                    "[GRID SERVICE]: Region {0} tried to register but registrations are disabled.",
+                    "[Grid service]: Region {0} tried to register but registrations are disabled.",
                     regionInfos.RegionName);
                 return new RegisterRegion { Error = "Registrations are disabled." };
             }
@@ -483,7 +485,7 @@ namespace WhiteCore.Services.SQLServices.GridService
             if (region == null && m_AllowNewRegistrationsWithPass && password != m_RegisterRegionPassword)
             {
                 MainConsole.Instance.WarnFormat (
-                    "[GRID SERVICE]: Region {0} tried to register but passwords didn't match.", regionInfos.RegionName);
+                    "[Grid service]: Region {0} tried to register but passwords didn't match.", regionInfos.RegionName);
                 // don't want to leak info so just tell them its disabled
                 return new RegisterRegion { Error = "Registrations are disabled." };
             }
@@ -493,7 +495,7 @@ namespace WhiteCore.Services.SQLServices.GridService
             {
                 //Too big... kick it out
                 MainConsole.Instance.WarnFormat (
-                    "[GRID SERVICE]: Region {0} tried to register with too large of a size {1},{2}.",
+                    "[Grid service]: Region {0} tried to register with too large of a size {1},{2}.",
                     regionInfos.RegionName, regionInfos.RegionSizeX, regionInfos.RegionSizeY);
                 return new RegisterRegion { Error = "Region is too large, reduce its size." };
             }
@@ -501,7 +503,7 @@ namespace WhiteCore.Services.SQLServices.GridService
             if ((region != null) && (region.RegionID != regionInfos.RegionID))
             {
                 MainConsole.Instance.WarnFormat (
-                    "[GRID SERVICE]: Region {0} tried to register in coordinates {1}, {2} which are already in use in scope {3}.",
+                    "[Grid service]: Region {0} tried to register in coordinates {1}, {2} which are already in use in scope {3}.",
                     regionInfos.RegionName,
                     regionInfos.RegionLocX / Constants.RegionSize,
                     regionInfos.RegionLocY / Constants.RegionSize,
@@ -520,7 +522,7 @@ namespace WhiteCore.Services.SQLServices.GridService
 
                 // Region reregistering in other coordinates. Delete the old entry
                 MainConsole.Instance.DebugFormat (
-                    "[GRID SERVICE]: Region {0} ({1}) was previously registered at {2}, {3}. Deleting old entry.",
+                    "[Grid service]: Region {0} ({1}) was previously registered at {2}, {3}. Deleting old entry.",
                     regionInfos.RegionName,
                     regionInfos.RegionID,
                     regionInfos.RegionLocX / Constants.RegionSize,
@@ -563,7 +565,7 @@ namespace WhiteCore.Services.SQLServices.GridService
                     if (dupe.Any (d => d.RegionID != regionInfos.RegionID))
                     {
                         MainConsole.Instance.WarnFormat (
-                            "[GRID SERVICE]: Region {0} tried to register duplicate name with ID {1}.",
+                            "[Grid service]: Region {0} tried to register duplicate name with ID {1}.",
                             regionInfos.RegionName, regionInfos.RegionID);
                         return new RegisterRegion { Error = "Duplicate region name" };
                     }
@@ -594,9 +596,9 @@ namespace WhiteCore.Services.SQLServices.GridService
                 {
                     int newFlags = 0;
                     string regionName = regionInfos.RegionName.Trim ().Replace (' ', '_');
-                    newFlags = ParseFlags (newFlags, gridConfig.GetString ("DefaultRegionFlags", String.Empty));
-                    newFlags = ParseFlags (newFlags, gridConfig.GetString ("Region_" + regionName, String.Empty));
-                    newFlags = ParseFlags (newFlags, gridConfig.GetString ("Region_" + regionInfos.RegionHandle, String.Empty));
+                    newFlags = ParseFlags (newFlags, gridConfig.GetString ("DefaultRegionFlags", string.Empty));
+                    newFlags = ParseFlags (newFlags, gridConfig.GetString ("Region_" + regionName, string.Empty));
+                    newFlags = ParseFlags (newFlags, gridConfig.GetString ("Region_" + regionInfos.RegionHandle, string.Empty));
                     regionInfos.Flags = newFlags;
                 }
             }
@@ -622,7 +624,7 @@ namespace WhiteCore.Services.SQLServices.GridService
                     List<GridRegion> neighbors = GetNeighbors (null, regionInfos);
                     FixNeighbors (regionInfos, neighbors, false);
 
-                    MainConsole.Instance.InfoFormat ("[GRID SERVICE]: Region {0} registered successfully at {1}, {2}",
+                    MainConsole.Instance.InfoFormat ("[Grid service]: Region {0} registered successfully at {1}, {2}",
                         regionInfos.RegionName,
                         regionInfos.RegionLocX / Constants.RegionSize,
                         regionInfos.RegionLocY/ Constants.RegionSize);
@@ -641,7 +643,7 @@ namespace WhiteCore.Services.SQLServices.GridService
                 }
             } catch (Exception e)
             {
-                MainConsole.Instance.WarnFormat ("[GRID SERVICE]: Database exception: {0}", e);
+                MainConsole.Instance.WarnFormat ("[Grid service]: Database exception: {0}", e);
             }
 
             return new RegisterRegion { Error = "Failed to save region into the database." };
@@ -650,9 +652,10 @@ namespace WhiteCore.Services.SQLServices.GridService
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
         public virtual string UpdateMap (GridRegion gregion, bool online)
         {
-            object remoteValue = DoRemoteByURL ("GridServerURI", gregion, online);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (string)remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("GridServerURI", gregion, online);
+                return remoteValue != null ? (string)remoteValue : string.Empty;
+            }
 
             GridRegion region = m_Database.Get (gregion.RegionID, null);
             if (region != null)
@@ -660,11 +663,11 @@ namespace WhiteCore.Services.SQLServices.GridService
                 if (!VerifyRegionSessionID (region, gregion.SessionID))
                 {
                     MainConsole.Instance.Warn (
-                        "[GRID SERVICE]: Region called UpdateMap, but provided incorrect SessionID! Possible attempt to disable a region!!");
+                        "[Grid service]: Region called UpdateMap, but provided incorrect SessionID! Possible attempt to disable a region!!");
                     return "Wrong Session ID";
                 }
 
-                MainConsole.Instance.DebugFormat ("[GRID SERVICE]: Region {0} updated its map", gregion.RegionID);
+                MainConsole.Instance.DebugFormat ("[Grid service]: Region {0} updated its map", gregion.RegionID);
 
                 m_Database.Delete (gregion.RegionID);
 
@@ -700,19 +703,20 @@ namespace WhiteCore.Services.SQLServices.GridService
                     FixNeighbors (region, GetNeighbors (null, region), false);
                 } catch (Exception e)
                 {
-                    MainConsole.Instance.DebugFormat ("[GRID SERVICE]: Database exception: {0}", e);
+                    MainConsole.Instance.DebugFormat ("[Grid service]: Database exception: {0}", e);
                 }
             }
 
-            return "";
+            return string.Empty;
         }
 
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
         public virtual bool DeregisterRegion (GridRegion gregion)
         {
-            object remoteValue = DoRemoteByURL ("GridServerURI", gregion);
-            if (remoteValue != null || m_doRemoteOnly)
-                return remoteValue != null && (bool)remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("GridServerURI", gregion);
+                return remoteValue != null ? (bool)remoteValue : false;
+            }
 
             GridRegion region = m_Database.Get (gregion.RegionID, null);
             if (region == null)
@@ -721,11 +725,11 @@ namespace WhiteCore.Services.SQLServices.GridService
             if (!VerifyRegionSessionID (region, gregion.SessionID))
             {
                 MainConsole.Instance.Warn (
-                    "[GRID SERVICE]: Region called deregister, but provided incorrect SessionID! Possible attempt to disable a region!!");
+                    "[Grid service]: Region called deregister, but provided incorrect SessionID! Possible attempt to disable a region!!");
                 return false;
             }
 
-            MainConsole.Instance.InfoFormat ("[GRID SERVICE]: Region {0} at position {1}, {2} deregistered",
+            MainConsole.Instance.InfoFormat ("[Grid service]: Region {0} at position {1}, {2} deregistered",
                 gregion.RegionID,
                 gregion.RegionLocX / Constants.RegionSize,
                 gregion.RegionLocY / Constants.RegionSize
@@ -739,9 +743,10 @@ namespace WhiteCore.Services.SQLServices.GridService
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
         public virtual GridRegion GetRegionByUUID (List<UUID> scopeIDs, UUID regionID)
         {
-            object remoteValue = DoRemoteByURL ("GridServerURI", scopeIDs, regionID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (GridRegion)remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("GridServerURI", scopeIDs, regionID);
+                return remoteValue != null ? (GridRegion)remoteValue : new GridRegion ();
+            }
 
             return m_Database.Get (regionID, scopeIDs);
         }
@@ -749,9 +754,10 @@ namespace WhiteCore.Services.SQLServices.GridService
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
         public virtual GridRegion GetRegionByPosition (List<UUID> scopeIDs, int x, int y)
         {
-            object remoteValue = DoRemoteByURL ("GridServerURI", scopeIDs, x, y);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (GridRegion)remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("GridServerURI", scopeIDs, x, y);
+                return remoteValue != null ? (GridRegion)remoteValue : new GridRegion ();
+            }
 
             return m_Database.GetZero (x, y, scopeIDs);
         }
@@ -759,12 +765,13 @@ namespace WhiteCore.Services.SQLServices.GridService
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
         public virtual GridRegion GetRegionByName (List<UUID> scopeIDs, string regionName)
         {
-            object remoteValue = DoRemoteByURL ("GridServerURI", scopeIDs, regionName);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (GridRegion)remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("GridServerURI", scopeIDs, regionName);
+                return remoteValue != null ? (GridRegion)remoteValue : null;
+            }
 
             // viewers send # as a wildcard
-            if (regionName.EndsWith ("#"))
+            if (regionName.EndsWith ("#", StringComparison.Ordinal))
                 regionName = regionName.TrimEnd ('#');
 
             List<GridRegion> rdatas = m_Database.Get (regionName + "%", scopeIDs, 0, 1);
@@ -783,12 +790,13 @@ namespace WhiteCore.Services.SQLServices.GridService
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
         public virtual List<GridRegion> GetRegionsByName (List<UUID> scopeIDs, string name, uint? start, uint? count)
         {
-            object remoteValue = DoRemoteByURL ("GridServerURI", scopeIDs, name, start, count);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<GridRegion>)remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("GridServerURI", scopeIDs, name, start, count);
+                return remoteValue != null ? (List<GridRegion>)remoteValue : new List<GridRegion> ();
+            }
 
             // viewers send # as a wildcard
-            if (name.EndsWith ("#"))
+            if (name.EndsWith ("#", StringComparison.Ordinal))
                 name = name.TrimEnd ('#');
 
             List<GridRegion> rdatas = m_Database.Get (name + "%", scopeIDs, start, count);
@@ -809,12 +817,13 @@ namespace WhiteCore.Services.SQLServices.GridService
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
         public virtual uint GetRegionsByNameCount (List<UUID> scopeIDs, string name)
         {
-            object remoteValue = DoRemoteByURL ("GridServerURI", scopeIDs, name);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (uint)remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("GridServerURI", scopeIDs, name);
+                return remoteValue != null ? (uint)remoteValue : 0;
+            }
 
             // viewers send # as a wildcard
-            if (name.EndsWith ("#"))
+            if (name.EndsWith ("#", StringComparison.Ordinal))
                 name = name.TrimEnd ('#');
 
             return m_Database.GetCount (name + "%", scopeIDs);
@@ -823,9 +832,10 @@ namespace WhiteCore.Services.SQLServices.GridService
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
         public virtual List<GridRegion> GetRegionRange (List<UUID> scopeIDs, int xmin, int xmax, int ymin, int ymax)
         {
-            object remoteValue = DoRemoteByURL ("GridServerURI", scopeIDs, xmin, xmax, ymin, ymax);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<GridRegion>)remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("GridServerURI", scopeIDs, xmin, xmax, ymin, ymax);
+                return remoteValue != null ? (List<GridRegion>)remoteValue : new List<GridRegion> ();
+            }
 
             return m_Database.Get (xmin, ymin, xmax, ymax, scopeIDs);
         }
@@ -834,12 +844,13 @@ namespace WhiteCore.Services.SQLServices.GridService
         public virtual List<GridRegion> GetRegionRange (List<UUID> scopeIDs, float centerX, float centerY,
                                                        uint squareRangeFromCenterInMeters)
         {
-            object remoteValue = DoRemoteByURL ("GridServerURI", scopeIDs, centerX, centerY,
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("GridServerURI", scopeIDs, centerX, centerY,
                                      squareRangeFromCenterInMeters);
-
-            return (remoteValue != null || m_doRemoteOnly)
-                       ? (List<GridRegion>)remoteValue
-                       : m_Database.Get (scopeIDs, UUID.Zero, centerX, centerY, squareRangeFromCenterInMeters);
+                return remoteValue != null ? (List<GridRegion>)remoteValue : new List<GridRegion> ();
+            }
+             
+            return m_Database.Get (scopeIDs, UUID.Zero, centerX, centerY, squareRangeFromCenterInMeters);
         }
 
         /// <summary>
@@ -851,9 +862,10 @@ namespace WhiteCore.Services.SQLServices.GridService
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
         public virtual List<GridRegion> GetNeighbors (List<UUID> scopeIDs, GridRegion region)
         {
-            object remoteValue = DoRemoteByURL ("GridServerURI", region);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<GridRegion>)remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("GridServerURI", region);
+                return remoteValue != null ? (List<GridRegion>)remoteValue : new List<GridRegion> ();
+            }
 
             NeighborLocation currentLoc = BuildNeighborLocation (region);
             //List<GridRegion> neighbors = m_KnownNeighbors.FirstOrDefault((loc)=>loc.Key == currentLoc).Value;
@@ -967,8 +979,8 @@ namespace WhiteCore.Services.SQLServices.GridService
                 MainConsole.Instance.Info ("Region Maturity  : " + Utilities.GetRegionMaturity(r.Access));
                 MainConsole.Instance.Info ("Region UUID      : " + r.RegionID);
                 MainConsole.Instance.Info ("Region ScopeID   : " + r.ScopeID);
-                MainConsole.Instance.Info ("Region Location  : " + String.Format ("{0},{1}", RegionPosX, RegionPosY));
-                MainConsole.Instance.Info ("Region Size      : " + String.Format ("{0} x {1}", r.RegionSizeX, r.RegionSizeY));
+                MainConsole.Instance.Info ("Region Location  : " + string.Format ("{0},{1}", RegionPosX, RegionPosY));
+                MainConsole.Instance.Info ("Region Size      : " + string.Format ("{0} x {1}", r.RegionSizeX, r.RegionSizeY));
                 MainConsole.Instance.Info ("Region URI       : " + r.RegionURI);	
                 MainConsole.Instance.Info ("Map tile UUID    : " + r.TerrainMapImage);
                 MainConsole.Instance.Info ("Region Owner     : " + account.Name + " [" + r.EstateOwner + "]");
@@ -985,13 +997,13 @@ namespace WhiteCore.Services.SQLServices.GridService
 
                 /* Not yet
                 var ri = regionService.GetRegionInfo (r.RegionID);
-                MainConsole.Instance.CleanInfo ("Startup      : {0}" + String.Format( ri.Startup == StartupType.Normal ? "Normal" : "Delayed"));                  
-                MainConsole.Instance.CleanInfo ("See into     : {0}" + String.Format( ri.SeeIntoThisSimFromNeighbor ? "yes" : "No"));             
-                MainConsole.Instance.CleanInfo ("Inifinite    : {0}" + String.Format( ri.InfiniteRegion ? "Yes" : "No"));                   
+                MainConsole.Instance.CleanInfo ("Startup      : {0}" + string.Format( ri.Startup == StartupType.Normal ? "Normal" : "Delayed"));                  
+                MainConsole.Instance.CleanInfo ("See into     : {0}" + string.Format( ri.SeeIntoThisSimFromNeighbor ? "yes" : "No"));             
+                MainConsole.Instance.CleanInfo ("Inifinite    : {0}" + string.Format( ri.InfiniteRegion ? "Yes" : "No"));                   
                 MainConsole.Instance.CleanInfo ("Capacity     : {0}" + ri.ObjectCapacity);                   
                 MainConsole.Instance.CleanInfo ("Agent max    : {0}" + ri.RegionSettings.AgentLimit);
-                MainConsole.Instance.CleanInfo ("Allow divide : {0}" + String.Format( ri.RegionSettings.AllowLandJoinDivide ? "Yes" : "No"));
-                MainConsole.Instance.CleanInfo ("Allow resale : {0}" + String.Format( ri.RegionSettings.AllowLandResell ? "Yes" : "No"));
+                MainConsole.Instance.CleanInfo ("Allow divide : {0}" + string.Format( ri.RegionSettings.AllowLandJoinDivide ? "Yes" : "No"));
+                MainConsole.Instance.CleanInfo ("Allow resale : {0}" + string.Format( ri.RegionSettings.AllowLandResell ? "Yes" : "No"));
                 */
                 MainConsole.Instance.Info (
                     "-------------------------------------------------------------------------------");
@@ -1020,13 +1032,13 @@ namespace WhiteCore.Services.SQLServices.GridService
 
             string regionInfo;
 
-            regionInfo = String.Format ("{0, -20}", "Region");
-            regionInfo += String.Format ("{0, -12}", "Location");
-            regionInfo += String.Format ("{0, -14}", "Size");
-            regionInfo += String.Format ("{0, -12}", "Area");
-            regionInfo += String.Format ("{0, -26}", "Type");
-            regionInfo += String.Format ("{0, -10}", "Online");
-            regionInfo += String.Format ("{0, -6}", "IWC/HG");
+            regionInfo = string.Format ("{0, -20}", "Region");
+            regionInfo += string.Format ("{0, -12}", "Location");
+            regionInfo += string.Format ("{0, -14}", "Size");
+            regionInfo += string.Format ("{0, -12}", "Area");
+            regionInfo += string.Format ("{0, -26}", "Type");
+            regionInfo += string.Format ("{0, -10}", "Online");
+            regionInfo += string.Format ("{0, -6}", "IWC/HG");
 
             MainConsole.Instance.CleanInfo (regionInfo);
 
@@ -1037,13 +1049,13 @@ namespace WhiteCore.Services.SQLServices.GridService
             foreach (GridRegion region in regions)
             {
                 string rType = region.RegionType;
-                if (rType.StartsWith ("M"))
+                if (rType.StartsWith ("M", StringComparison.Ordinal))
                 {
                     mainland++;
                     mainlandArea = mainlandArea + region.RegionArea;
                 }
 
-                if (rType.StartsWith ("E"))
+                if (rType.StartsWith ("E", StringComparison.Ordinal))
                 {
                     estates++;
                     estateArea = estateArea + region.RegionArea;
@@ -1057,13 +1069,13 @@ namespace WhiteCore.Services.SQLServices.GridService
                     iwcRegions++;
 
                 // TODO ... change hardcoded field sizes to public constants
-                regionInfo = String.Format ("{0, -20}", region.RegionName);
-                regionInfo += String.Format ("{0, -12}", region.RegionLocX / Constants.RegionSize + "," + region.RegionLocY / Constants.RegionSize);
-                regionInfo += String.Format ("{0, -14}", region.RegionSizeX + "x" + region.RegionSizeY);
-                regionInfo += String.Format ("{0, -12}", region.RegionArea < 1000000 ? region.RegionArea + " m2" : (region.RegionArea / 1000000) + " km2");
-                regionInfo += String.Format ("{0, -26}", region.RegionType);
-                regionInfo += String.Format ("{0, -10}", region.IsOnline ? "yes" : "no");
-                regionInfo += String.Format ("{0, -6}", (region.IsHgRegion || region.IsForeign) ? "yes" : "no");
+                regionInfo = string.Format ("{0, -20}", region.RegionName);
+                regionInfo += string.Format ("{0, -12}", region.RegionLocX / Constants.RegionSize + "," + region.RegionLocY / Constants.RegionSize);
+                regionInfo += string.Format ("{0, -14}", region.RegionSizeX + "x" + region.RegionSizeY);
+                regionInfo += string.Format ("{0, -12}", region.RegionArea < 1000000 ? region.RegionArea + " m2" : (region.RegionArea / 1000000) + " km2");
+                regionInfo += string.Format ("{0, -26}", region.RegionType);
+                regionInfo += string.Format ("{0, -10}", region.IsOnline ? "yes" : "no");
+                regionInfo += string.Format ("{0, -6}", (region.IsHgRegion || region.IsForeign) ? "yes" : "no");
 
                 MainConsole.Instance.CleanInfo (regionInfo);
             }
@@ -1092,11 +1104,11 @@ namespace WhiteCore.Services.SQLServices.GridService
                 try
                 {
                     int val;
-                    if (p.StartsWith ("+"))
+                    if (p.StartsWith ("+", StringComparison.Ordinal))
                     {
                         val = (int)Enum.Parse (typeof(RegionFlags), p.Substring (1));
                         f |= (RegionFlags)val;
-                    } else if (p.StartsWith ("-"))
+                    } else if (p.StartsWith ("-", StringComparison.Ordinal))
                     {
                         val = (int)Enum.Parse (typeof(RegionFlags), p.Substring (1));
                         f &= ~(RegionFlags)val;
@@ -1176,7 +1188,7 @@ namespace WhiteCore.Services.SQLServices.GridService
             {
                 r.ScopeID = UUID.Parse (cmd [cmd.Length - 1]);
 
-                MainConsole.Instance.Info (String.Format ("Set region {0} to {1}", r.RegionName, r.ScopeID));
+                MainConsole.Instance.Info (string.Format ("Set region {0} to {1}", r.RegionName, r.ScopeID));
                 m_Database.Store (r);
             }
         }
@@ -1207,7 +1219,7 @@ namespace WhiteCore.Services.SQLServices.GridService
                 if (first == "")
                     return 0;
                 int FirstNumber = 0;
-                FirstNumber = first.StartsWith (".") ? 0 : int.Parse (first);
+                FirstNumber = first.StartsWith (".", StringComparison.Ordinal) ? 0 : int.Parse (first);
 
                 string endNumber = Number.Remove (0, Number.Length - 1);
                 if (endNumber == "")
@@ -1248,17 +1260,20 @@ namespace WhiteCore.Services.SQLServices.GridService
             Dictionary<Vector3, int> Positions = new Dictionary<Vector3, int> ();
             //Get a list of all the clients in the region and add them
             List<UserInfo> userInfos = m_agentInfoService.GetUserInfos (region.RegionID);
-            foreach (UserInfo userInfo in userInfos)
+            if (userInfos != null)
             {
-                //Normalize the positions to 5 meter blocks so that agents stack instead of cover up each other
-                Vector3 position = new Vector3 (NormalizePosition (userInfo.CurrentPosition.X),
+                foreach (UserInfo userInfo in userInfos)
+                {
+                    //Normalize the positions to 5 meter blocks so that agents stack instead of cover up each other
+                    Vector3 position = new Vector3 (NormalizePosition (userInfo.CurrentPosition.X),
                                        NormalizePosition (userInfo.CurrentPosition.Y), 0);
-                int Number = 0;
-                //Find the number of agents currently at this position
-                if (!Positions.TryGetValue (position, out Number))
-                    Number = 0;
-                Number++;
-                Positions [position] = Number;
+                    int Number = 0;
+                    //Find the number of agents currently at this position
+                    if (!Positions.TryGetValue (position, out Number))
+                        Number = 0;
+                    Number++;
+                    Positions [position] = Number;
+                }
             }
 
             //Build the mapItemReply blocks
@@ -1278,7 +1293,7 @@ namespace WhiteCore.Services.SQLServices.GridService
                     x = (uint)(region.RegionLocX + 1),
                     y = (uint)(region.RegionLocY + 1),
                     id = UUID.Zero,
-                    name = Util.Md5Hash (region.RegionName + Environment.TickCount.ToString ()),
+                    name = Util.Md5Hash (region.RegionName + Environment.TickCount),
                     Extra = 0,
                     Extra2 = 0
                 };

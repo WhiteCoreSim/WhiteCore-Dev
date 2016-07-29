@@ -7,30 +7,144 @@
 	<meta name="description" content="{SystemName}"/>
 	<link rel="shortcut icon" href="images/icons/favicon.ico" />
 
-	<!-- Javascript -->
-<!--	<script type="text/javascript" src="javascripts/jquery-1.11.1.js"></script> 
--->
-	<script type="text/javascript" src="javascripts/jquery-2.1.4.min.js"></script> 
-    <script src="javascripts/menu.js" type="text/javascript" language="javascript"></script>
-	<script src="javascripts/jquery.colorbox.js" type="text/javascript" language="javascript"></script>
-	<script src="../javascripts/randomimageswitch.js" type="text/javascript" language="javascript"></script>
-	<script type="text/javascript" src="../javascripts/jquery.datatables.js"></script>
-	<link href="css/jquery.datatables.css" rel="stylesheet" type="text/css">
-
-	<!-- <script src="../javascripts/timeimageswitch.js" type="text/javascript" language="javascript"></script> -->
-	<script>$(document).ready(function(){bgImgRotate();});</script>
+	<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css">
+	<link href="css/datatables.min.css" rel="stylesheet" type="text/css">
+	<link href="css/datepick.css" rel="stylesheet" type="text/css">
 
 	<!-- StyleSwitch -->
-	<script src="javascripts/styleswitch.js" type="text/javascript" language="javascript"></script>
 	<link href="css/styles1.css" rel="stylesheet" type="text/css" media="screen" title="styles1" />
 	<link href="css/styles2.css" rel="alternate stylesheet" type="text/css" title="styles2" media="screen" />
 	<link href="css/styles3.css" rel="alternate stylesheet" type="text/css" title="styles3" media="screen" />
 	<link href="css/styles4.css" rel="alternate stylesheet" type="text/css" title="styles4" media="screen" />
 	<link href="css/styles5.css" rel="alternate stylesheet" type="text/css" title="styles5" media="screen" />
 
-	<!-- date time -->
-	<script type="text/javascript" language="javascript" src="javascripts/jquery.jclock.js"></script>
-	<script type="text/javascript">
+	<style type="text/css">#container{display:none;}</style>
+
+
+</head>
+
+<body>
+	<div>
+		<img id=mainImage src="../images/icons/spacer.gif" alt="" title="" />
+	</div>
+
+	{IfMaintenanceBegin}
+	<!-- #include file="/maintenance.html" -->
+	{IfMaintenanceEnd}
+	{IfNoMaintenanceBegin}
+	<div id="container">
+		<!-- removed 20140429 - greythane
+		<a href="https://github.com/whitecoresim/" target="_blank">
+		<img style="position: absolute; top: 0; right: 0; border: 0;" src="images/icons/forkme.png" title="Fork&nbspme&nbspon&nbspGitHub" alt="Fork&nbspme&nbspon&nbspGitHub"></a>
+		-->
+		<div id="top">
+			<h1><a class="logofade" href="/" alt="{SystemName}" title="{SystemName}">{SystemName}</a></h1>
+			<ul id="menu">
+	{MenuItemsArrayBegin}
+	{IfShowInMenuBegin}
+				<li id="{MenuItemID}" class="active" alt="{MenuItemTitle}" title="{MenuItemTitleHelp}">{MenuItemTitle}
+	{IfHasChildrenBegin}
+					<ul id="submenu">
+	{ChildrenMenuItemsArrayBegin}
+	{IfChildShowInMenuBegin}
+						<li id="{ChildMenuItemID}" alt="{ChildMenuItemTitle}" title="{ChildMenuItemTitleHelp}">{ChildMenuItemTitle}</li>
+	{IfChildShowInMenuEnd}
+	{ChildrenMenuItemsArrayEnd}
+					</ul>
+	{IfHasChildrenEnd}
+				</li>
+	{IfShowInMenuEnd}
+	{MenuItemsArrayEnd}
+			</ul>
+		</div>
+
+		<span class="clear"></span>
+
+		<div id="loading">
+			<img src="../images/icons/loading.gif" alt="Loading..." />
+		</div>
+
+		<p class=jclock1><span id=jclock1></span></p>
+
+		<div id="content">
+		</div>
+
+		<span class="clear"></span>
+
+		<div id="footer">
+	{IfShowLanguageTranslatorBarBegin}
+		  <div class=languageswitch>
+		    <ul>
+			{StyleSwitcherLanguagesText}:
+			  <li><a href="?language=en" rel="en" class="languageswitch" alt="{en}">
+			      <img src="images/flags/flag-en.png" alt="{en}">en</a></li>
+			  <li><a href="?language=fr" rel="fr" class="languageswitch" alt="{fr}">
+			  		<img src="images/flags/flag-fr.png" alt="{fr}">fr</a></li>
+			  <li><a href="?language=de" rel="de" class="languageswitch" alt="{de}">
+			  		<img src="images/flags/flag-de.png" alt="{de}">de</a></li>
+			  <li><a href="?language=it" rel="it" class="languageswitch" alt="{it}">
+			  		<img src="images/flags/flag-it.png" alt="{it}">it</a></li>
+			  <li><a href="?language=es" rel="es" class="languageswitch" alt="{es}">
+			  	<img src="images/flags/flag-es.png" alt="{es}">es</a></li>
+			  <li><a href="?language=nl" rel="nl" class="languageswitch" alt="{nl}">
+			  	<img src="images/flags/flag-nl.png" alt="{nl}">nl</a></li>
+	<!--		  <li><a href="?language=ru" rel="ru" class="languageswitch" alt="{ru}">
+			  	<img src="images/flags/flag-ru.png" alt="{ru}">ru</a></li> -->
+	<!--		{StyleSwitcherChoiceText}:
+			  <span id="lg1">en</span>
+			  <span id="lg2">fr</span>
+			  <span id="lg3">de</span>
+			  <span id="lg4">it</span>
+			  <span id="lg5">es</span>
+			  <span id="lg6">nl</span>
+			  <span id="lg7">ru</span> -->
+			</ul>
+		  </div>
+	{IfShowLanguageTranslatorBarEnd}
+
+	{IfShowStyleBarBegin}
+		  <div class=styleswitch>
+		    <ul>
+			{StyleSwitcherStylesText}:
+			  <li><a href="serversideSwitch.html?style=style1" rel="styles1" class="styleswitch" alt="{styles1}" title="{styles1}">1</a></li>
+			  <li><a href="serversideSwitch.html?style=style2" rel="styles2" class="styleswitch" alt="{styles2}" title="{styles2}">2</a></li>
+			  <li><a href="serversideSwitch.html?style=style3" rel="styles3" class="styleswitch" alt="{styles3}" title="{styles3}">3</a></li>
+			  <li><a href="serversideSwitch.html?style=style4" rel="styles4" class="styleswitch" alt="{styles4}" title="{styles4}">4</a></li>
+			  <li><a href="serversideSwitch.html?style=style5" rel="styles5" class="styleswitch" alt="{styles5}" title="{styles5}">5</a></li>
+			{StyleSwitcherChoiceText}: <span id="st1">1</span><span id="st2">2</span><span id="st3">3</span><span id="st4">4</span><span id="st5">5</span>| Copyright&nbsp;&copy;&nbsp;<a class='copyright' href="/" alt="{SystemName}" title="{SystemName}">{SystemName}</a>&nbsp;2015-2016
+			</ul>
+		  </div>
+	{IfShowStyleBarEnd}
+		  <span class="clear"></span>
+		</div>
+	{IfNoMaintenanceEnd}
+	</div>
+
+	<!-- Javascript -->
+	<script type="text/javascript" src="js/jquery-2.2.3.min.js"></script>
+  <script type="text/javascript" src="js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="js/menu.js"></script>
+	<script type="text/javascript" src="js/jquery.colorbox.js"></script>
+	<script type="text/javascript" src="js/randomimageswitch.js"></script>
+	<script type="text/javascript" src="js/datatables.min.js"></script>
+	<script type="text/javascript" src="js/styleswitch.js"></script>
+	<!-- <script src="../js/timeimageswitch.js" type="text/javascript" language="javascript"></script> -->
+	<script type="text/javascript" src="js/jquery.jclock.js"></script>
+	<!-- <script type="text/javascript" src="js/jquery.tooltip.js"></script> -->
+	<!-- Carousel -->
+	<script type="text/javascript" src="js/jquery.jcarousellite.js"></script>
+	<script type="text/javascript" src="../js/jquery.plugin.js"></script>
+	<script type="text/javascript" src="../js/jquery.datepick.min.js"></script>
+	<!--<script type="text/javascript" src="../js/jquery.datepick.lang.min.js"></script> -->
+
+	<script>
+
+    <!-- Menu Effect Style slide Up/slide Down -->
+    function mainmenu() {$('#menu ul').css({display: 'none'}); // Opera Fix
+    $('#menu li').hover(function (){$('ul:first', this).stop(true, true).slideDown(200);},
+    function menufirst(){$('ul:first', this).stop(true, true).slideUp(200);});}
+
+		<!-- date time -->
 		$(function($) {var options1 = {format: '%A %B %d, %Y %I:%M:%S %p'} // 12-hour
 		$('#jclock1').jclock(options1);
 		var options2 = {format: '%a %b %d, %Y %H:%M:%S'} // 24-hour
@@ -41,149 +155,49 @@
 		$('#jclock4').jclock(options4);
 		var options5 = {format: '%m/%d/%y'}
 		$('#jclock5').jclock(options5);});
-	</script>
-	
-	<!-- Tooltips -->
-	<script src="javascripts/jquery.tooltip.js" type="text/javascript" language="javascript"></script>
-	<script type="text/javascript">$(function() {$('#container *').tooltip({showURL: false});});</script>
 
-	<!-- fade in -->
-	<style type="text/css">#container{display:none;}</style>
-	<script type="text/javascript">
-	  $(document).ready(function() 
-	  {
-		$( '#container' ).fadeIn("slow");
-		var result = {};
-		// var sections = $("#menu li");
-		var loading = $("#loading");
-		var content = $("#content");
+		<!-- Tooltips -->
+		function tooltip() {$('#container *').tooltip({showURL: false});};
 
-		if (window.location.search)
-		{
-			// split up the query string and store in an associative array
-			var params = window.location.search.slice(1).split("&");
-			for (var i = 0; i < params.length; i++)
-			{
-				var tmp = params[i].split("=");
-				result[tmp[0]] = unescape(tmp[1]);
+		<!-- fade in -->
+	  $(document).ready(function() {
+			mainmenu();
+			bgImgRotate();
+
+			$( '#container' ).fadeIn("slow");
+			var result = {};
+			// var sections = $("#menu li");
+			var loading = $("#loading");
+			var content = $("#content");
+
+			if (window.location.search)	{
+				// split up the query string and store in an associative array
+				var params = window.location.search.slice(1).split("&");
+				for (var i = 0; i < params.length; i++)	{
+					var tmp = params[i].split("=");
+					result[tmp[0]] = unescape(tmp[1]);
+				}
 			}
-		}
-		//load selected section
-		var pageName = result["page"];
-		var found = new Boolean(0);
-		switch(pageName){
-{MenuItemsArrayBegin}
-			case "{MenuItemID}":
-				content.load("{MenuItemLocation}" + window.location.search);
-				found = new Boolean(1);
-				break;
-{MenuItemsArrayEnd}
-		}
-		if(found == 0)
-			content.load("home.html" + window.location.search);
-	});
-    </script>
+			//load selected section
+			var pageName = result["page"];
+			var found = new Boolean(0);
+			switch(pageName) {
+	{MenuItemsArrayBegin}
+				case "{MenuItemID}":
+					content.load("{MenuItemLocation}" + window.location.search);
+					found = new Boolean(1);
+					break;
+	{MenuItemsArrayEnd}
+			}
+			if(found == 0)
+				content.load("home.html" + window.location.search);
+		});
 
-    <!-- Menu Effect Style slide Up/slide Down -->
-    <script language="javascript" type="text/javascript">
-    function mainmenu() {$('#menu ul').css({display: 'none'}); // Opera Fix
-    $('#menu li').hover(function (){$('ul:first', this).stop(true, true).slideDown(200);},
-    function (){$('ul:first', this).stop(true, true).slideUp(200);});}
-    $(document).ready(function(){mainmenu();});
-    </script>
-
-	<!-- Carousel -->
-	<script type="text/javascript" src="javascripts/jquery.jcarousellite.js"></script>
-
-</head>
-
-<body>
-<div>
-<img id=mainImage src="../images/icons/spacer.gif" alt="" title="" />
-</div>
-
-{IfMaintenanceBegin}
-<!-- #include file="/maintenance.html" -->
-{IfMaintenanceEnd}
-{IfNoMaintenanceBegin}
-<div id="container">
-<!-- removed 20140429 - greythane
-<a href="https://github.com/whitecoresim/" target="_blank">
-<img style="position: absolute; top: 0; right: 0; border: 0;" src="images/icons/forkme.png" title="Fork&nbspme&nbspon&nbspGitHub" alt="Fork&nbspme&nbspon&nbspGitHub"></a>
--->
-	<div id="top">
-		<h1><a class="logofade" href="/" alt="{SystemName}" title="{SystemName}">{SystemName}</a></h1>
-		<ul id="menu">
-{MenuItemsArrayBegin}
-{IfShowInMenuBegin}
-			<li id="{MenuItemID}" class="active" alt="{MenuItemTitle}" title="{MenuItemTitleHelp}">{MenuItemTitle}
-{IfHasChildrenBegin}
-				<ul id="submenu">
-{ChildrenMenuItemsArrayBegin}
-{IfChildShowInMenuBegin}
-					<li id="{ChildMenuItemID}" alt="{ChildMenuItemTitle}" title="{ChildMenuItemTitleHelp}">{ChildMenuItemTitle}</li>
-{IfChildShowInMenuEnd}
-{ChildrenMenuItemsArrayEnd}
-				</ul>
-{IfHasChildrenEnd}
-			</li>
-{IfShowInMenuEnd}
-{MenuItemsArrayEnd}
-		</ul>
-	</div>
-	
-	<span class="clear"></span>
-
-	<div id="loading">
-		<img src="../images/icons/loading.gif" alt="Loading..." />
-	</div>
-	
-	<p class=jclock1><span id=jclock1></span></p>
-	
-	<div id="content">
-	</div>
-	
-	<span class="clear"></span>
-
-	<div id="footer">
-{IfShowLanguageTranslatorBarBegin}
-	  <div class=languageswitch>
-	    <ul>
-		{StyleSwitcherLanguagesText}:
-		  <li><a href="?language=en" rel="en" class="languageswitch" alt="{en}" title="<img src='images/flags/flag-en.png' alt='en' /> {en}">en</a></li>
-		  <li><a href="?language=fr" rel="fr" class="languageswitch" alt="{fr}" title="<img src='images/flags/flag-fr.png' alt='fr' /> {fr}">fr</a></li>
-		  <li><a href="?language=de" rel="de" class="languageswitch" alt="{de}" title="<img src='images/flags/flag-de.png' alt='de' /> {de}">de</a></li>
-		  <li><a href="?language=it" rel="it" class="languageswitch" alt="{it}" title="<img src='images/flags/flag-it.png' alt='it' /> {it}">it</a></li>
-		  <li><a href="?language=es" rel="es" class="languageswitch" alt="{es}" title="<img src='images/flags/flag-es.png' alt='es' /> {es}">es</a></li>
-		  <li><a href="?language=nl" rel="nl" class="languageswitch" alt="{nl}" title="<img src='images/flags/flag-nl.png' alt='nl' /> {nl}">nl</a></li>
-		{StyleSwitcherChoiceText}: <span id="lg1">en</span><span id="lg2">fr</span><span id="lg3">de</span><span id="lg4">it</span><span id="lg5">es</span><span id="lg6">nl</span>  
-		</ul>
-	  </div>
-{IfShowLanguageTranslatorBarEnd}
-
-{IfShowStyleBarBegin}
-	  <div class=styleswitch>
-	    <ul>
-		{StyleSwitcherStylesText}:
-		  <li><a href="serversideSwitch.html?style=style1" rel="styles1" class="styleswitch" alt="{styles1}" title="{styles1}">1</a></li>
-		  <li><a href="serversideSwitch.html?style=style2" rel="styles2" class="styleswitch" alt="{styles2}" title="{styles2}">2</a></li>
-		  <li><a href="serversideSwitch.html?style=style3" rel="styles3" class="styleswitch" alt="{styles3}" title="{styles3}">3</a></li>
-		  <li><a href="serversideSwitch.html?style=style4" rel="styles4" class="styleswitch" alt="{styles4}" title="{styles4}">4</a></li>
-		  <li><a href="serversideSwitch.html?style=style5" rel="styles5" class="styleswitch" alt="{styles5}" title="{styles5}">5</a></li>
-		{StyleSwitcherChoiceText}: <span id="st1">1</span><span id="st2">2</span><span id="st3">3</span><span id="st4">4</span><span id="st5">5</span>| Copyright&nbsp;&copy;&nbsp;<a class='copyright' href="/" alt="{SystemName}" title="{SystemName}">{SystemName}</a>&nbsp;2015  
-		</ul>
-	  </div>
-{IfShowStyleBarEnd}
-	  <span class="clear"></span>
-	</div>
-{IfNoMaintenanceEnd}
-</div>
-<script type="text/javascript">
-	// fade class
-	$("li.fade, a.fade").hover(function(){$(this).fadeOut(150);$(this).fadeIn(150);});
-	$("a.logofade").hover(function(){$(this).fadeOut(150);$(this).fadeIn(150);});
-	$("a.languageswitch, a.styleswitch, a.webprofile").hover(function(){$(this).fadeOut(150);$(this).fadeIn(150);});
-	$("a.welcomescreen, a.world_map, a.copyright").hover(function(){$(this).fadeOut(150);$(this).fadeIn(150);});
-</script>
+		// fade class
+		$("li.fade, a.fade").hover(function(){$(this).fadeOut(150);$(this).fadeIn(150);});
+		$("a.logofade").hover(function(){$(this).fadeOut(150);$(this).fadeIn(150);});
+		$("a.languageswitch, a.styleswitch, a.webprofile").hover(function(){$(this).fadeOut(150);$(this).fadeIn(150);});
+		$("a.welcomescreen, a.world_map, a.copyright").hover(function(){$(this).fadeOut(150);$(this).fadeIn(150);});
+	</script>
 </body>
 </html>

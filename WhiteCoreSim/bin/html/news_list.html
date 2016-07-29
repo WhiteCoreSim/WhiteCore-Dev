@@ -5,108 +5,42 @@
 {News}                     News
 {NewsItemTitle}            News Item Title
 {NewsItemText}             News Item Text
-{NewsTitle}                
-{NewsText}             
-{NewsID}             
+{NewsTitle}
+{NewsText}
+{NewsID}
 -->
 
 <h2>{SystemName}: {News}</h2>
-<table id="news_list_navigation_top">
-  <caption></caption>
-  
-  <thead>
-    <tr>
-      <th><a class="fade" href="index.html?page=news&Start=0" target="_self" title="{FirstText}"><p class="nav">|&nbsp;<</p></a></th>
-	  <th><a class="fade" href="index.html?page=news&Start={BackOne}" target="_self" title="{BackText}"><p class="nav"><</p></a></th>
-	  <th><p>{CurrentPageText} {CurrentPage}</p></th>
-	  <th><a class="fade" href="index.html?page=news&Start={NextOne}" target="_self" title="{NextText}"><p class="nav">></p></a></th>
-	  <th><a class="fade" href="index.html?page=news&Start=-1" target="_self" title="{LastText}"><p class="nav">>&nbsp;|</p></a></th>
-    </tr>
-  </thead>
-<!--  
-  <tfoot>
-    <tr>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </tfoot>
-  
-  <tbody>
-    <tr>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-  </tbody>
--->
-</table>
 
 <table id="news_list">
-  <caption></caption>
-  
   <thead class="listhead">
     <tr>
       <th class="news_list_left">{NewsTitleText}</th>
       <th class="news_list_right">{NewsDateText}</th>
     </tr>
   </thead>
-  
-  <tfoot class="lsitfoot">
-    <tr style="align:bottom;">
-      <th class="news_list_left">{NewsTitleText}</th>
-      <th class="news_list_right">{NewsDateText}</th>
-    </tr>
-  </tfoot>
 
   <tbody>
-{NewsListArrayBegin}
+    {NewsListArrayBegin}
     <tr>
       <td class="news_list_left">
-        <a class="fade" href="index.html?page=news_info&newsid={NewsID}"><p>{NewsTitle}</p></a>
+        <a class="fade" href="index.html?page=news_info&newsid={NewsID}">
+          <p>{NewsTitle}</p>
+        </a>
       </td>
-
-      <td class="news_list_right"><p>{NewsDate}</p></td>
+      <td class="news_list_right">
+        <p>{NewsDate}</p>
+        </td>
     </tr>
-{NewsListArrayEnd}
+    {NewsListArrayEnd}
   </tbody>
 </table>
 
-<table id="news_list_navigation_bottom">
-  <caption></caption>
-  
-  <thead>
-    <tr>
-      <th><a class="fade" href="news_list.html?Start=0" target="_self" title="{FirstText}"><p class="nav">|&nbsp;<</p></a></th>
-	  <th><a class="fade" href="news_list.html?Start={BackOne}" target="_self" title="{BackText}"><p class="nav"><</p></a></th>
-	  <th><p>{CurrentPageText} {CurrentPage}</p></th>
-	  <th><a class="fade" href="news_list.html?Start={NextOne}" target="_self" title="{NextText}"><p class="nav">></p></a></th>
-	  <th><a class="fade" href="news_list.html?Start=-1" target="_self" title="{LastText}"><p class="nav">>&nbsp;|</p></a></th>
-    </tr>
-  </thead>
-<!--  
-  <tfoot>
-    <tr>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </tfoot>
-  
-  <tbody>
-    <tr>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-  </tbody>
--->
-</table>
+<script>
+  $(document).ready(function()
+  {
+    $('#news_list').dataTable( {
+        "order": [[ 0, "asc" ]]
+    });
+  });
+</script>

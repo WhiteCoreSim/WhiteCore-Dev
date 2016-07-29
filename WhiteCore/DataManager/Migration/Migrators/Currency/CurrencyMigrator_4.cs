@@ -174,9 +174,10 @@ namespace WhiteCore.DataManager.Migration.Migrators.Currency
 
         public override void FinishedMigration(IDataConnector genericData)
         {
-            genericData.DropTable("simple_currency");
-            genericData.DropTable("simple_currency_history");
-            genericData.DropTable("simple_purchased");
+            // these do not appear to be needed... at least with MySql
+            //genericData.DropTable("simple_currency");
+            //genericData.DropTable("simple_currency_history");
+            //genericData.DropTable("simple_purchased");
         }
 
     }

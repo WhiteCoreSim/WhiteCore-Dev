@@ -26,12 +26,12 @@
  */
 
 
+using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.SceneInfo.Entities;
 using WhiteCore.Framework.Services.ClassHelpers.Inventory;
-using OpenMetaverse;
 
 namespace WhiteCore.Region
 {
@@ -51,14 +51,14 @@ namespace WhiteCore.Region
         ///     Start the scripts contained in all the prims in this group.
         /// </summary>
         public void CreateScriptInstances(int startParam, bool postOnRez,
-                                          StateSource stateSource, UUID RezzedFrom, bool clearStateSaves)
+                                          StateSource stateSource, UUID rezzedFrom, bool clearStateSaves)
         {
             // Don't start scripts if they're turned off in the region!
             if (!m_scene.RegionInfo.RegionSettings.DisableScripts)
             {
                 foreach (SceneObjectPart part in m_partsList)
                 {
-                    part.Inventory.CreateScriptInstances(startParam, postOnRez, stateSource, RezzedFrom, clearStateSaves);
+                    part.Inventory.CreateScriptInstances(startParam, postOnRez, stateSource, rezzedFrom, clearStateSaves);
                 }
             }
         }
@@ -150,8 +150,7 @@ namespace WhiteCore.Region
                 return true;
             }
             MainConsole.Instance.ErrorFormat(
-                "[PRIM INVENTORY]: " +
-                "Couldn't find prim local ID {0} in group {1}, {2} to add inventory item ID {3}",
+                "[Prim inventory]: Couldn't find prim local ID {0} in group {1}, {2} to add inventory item ID {3}",
                 localID, Name, UUID, newItemId);
 
             return false;
@@ -171,8 +170,7 @@ namespace WhiteCore.Region
                 return part.Inventory.GetInventoryItem(itemID);
             }
             MainConsole.Instance.ErrorFormat(
-                "[PRIM INVENTORY]: " +
-                "Couldn't find prim local ID {0} in prim {1}, {2} to get inventory item ID {3}",
+                "[Prim inventory]: Couldn't find prim local ID {0} in prim {1}, {2} to get inventory item ID {3}",
                 primID, "unknown", "unknown", itemID);
 
             return null;
@@ -196,8 +194,7 @@ namespace WhiteCore.Region
                 return true;
             }
             MainConsole.Instance.ErrorFormat(
-                "[PRIM INVENTORY]: " +
-                "Couldn't find prim ID {0} to update item {1}, {2}",
+                "[Prim inventory]: Couldn't find prim ID {0} to update item {1}, {2}",
                 item.ParentPartID, item.Name, item.ItemID);
 
             return false;

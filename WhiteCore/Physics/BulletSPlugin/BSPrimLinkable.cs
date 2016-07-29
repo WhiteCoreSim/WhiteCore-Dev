@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Contributors, http://opensimulator.org/, http://whitecore-sim.org
+ * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org/, http://opensimulator.org/
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -9,7 +9,7 @@
  *     * Redistributions in binary form must reproduce the above copyrightD
  *       notice, this list of conditions and the following disclaimer in the
  *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the OpenSimulator Project nor the
+ *     * Neither the name of the WhiteCore-Sim Project nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
  *
@@ -61,8 +61,8 @@ namespace WhiteCore.Physics.BulletSPlugin
             LinksetType = (BSLinkset.LinksetImplementation) BSParam.LinksetImplementation;
 
             Linkset = BSLinkset.Factory(PhysicsScene, this);
-
-            Linkset.Refresh(this);
+            if (Linkset != null)
+                Linkset.Refresh(this);
         }
 
         public override void Destroy()
@@ -81,9 +81,10 @@ namespace WhiteCore.Physics.BulletSPlugin
 
                 Linkset = parent.Linkset.AddMeToLinkset(this);
 
-                DetailLog(
-                    "{0},BSPrimLinkset.link,call,parentBefore={1}, childrenBefore=={2}, parentAfter={3}, childrenAfter={4}",
-                    LocalID, parentBefore.LocalID, childrenBefore, Linkset.LinksetRoot.LocalID, Linkset.NumberOfChildren);
+                if (Linkset != null)
+                    DetailLog(
+                        "{0},BSPrimLinkset.link,call,parentBefore={1}, childrenBefore=={2}, parentAfter={3}, childrenAfter={4}",
+                        LocalID, parentBefore.LocalID, childrenBefore, Linkset.LinksetRoot.LocalID, Linkset.NumberOfChildren);
             }
             return;
         }
@@ -97,10 +98,11 @@ namespace WhiteCore.Physics.BulletSPlugin
             int childrenBefore = Linkset.NumberOfChildren;
 
             Linkset = Linkset.RemoveMeFromLinkset(this, false /* inTaintTime */);
-
-            DetailLog(
-                "{0},BSPrimLinkset.delink,parentBefore={1},childrenBefore={2},parentAfter={3},childrenAfter={4}, ",
-                LocalID, parentBefore.LocalID, childrenBefore, Linkset.LinksetRoot.LocalID, Linkset.NumberOfChildren);
+            if (Linkset != null)
+                DetailLog(
+                    "{0},BSPrimLinkset.delink,parentBefore={1},childrenBefore={2},parentAfter={3},childrenAfter={4}, ",
+                    LocalID, parentBefore.LocalID, childrenBefore, Linkset.LinksetRoot.LocalID, Linkset.NumberOfChildren);
+            
             return;
         }
 

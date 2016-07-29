@@ -46,7 +46,7 @@ namespace WhiteCore.Modules.WorldMap
         public float s;
         public float v;
 
-        public HSV(float h, float s, float v)
+        public HSV (float h, float s, float v)
         {
             this.h = h;
             this.s = s;
@@ -93,17 +93,16 @@ namespace WhiteCore.Modules.WorldMap
             int ti = (int)(v * (1f - (1f - f) * s) * 255f);
             int vi = (int)(v * 255f);
 
-            if (pi < 0)   pi = 0;
+            if (pi < 0) pi = 0;
             if (pi > 255) pi = 255;
-            if (qi < 0)   qi = 0;
+            if (qi < 0) qi = 0;
             if (qi > 255) qi = 255;
-            if (ti < 0)   ti = 0;
+            if (ti < 0) ti = 0;
             if (ti > 255) ti = 255;
-            if (vi < 0)   vi = 0;
+            if (vi < 0) vi = 0;
             if (vi > 255) vi = 255;
 
-            switch (sector)
-            {
+            switch (sector) {
             case 0:
                 return Color.FromArgb (vi, ti, pi);
             case 1:
@@ -126,16 +125,16 @@ namespace WhiteCore.Modules.WorldMap
 
         // some hardcoded terrain UUIDs that work with SL 1.20 (the four default textures and "Blank").
         // The color-values were choosen because they "look right" (at least to me) ;-)
-        static readonly UUID defaultTerrainTexture1 = new UUID("0bc58228-74a0-7e83-89bc-5c23464bcec5");
-        static readonly Color defaultColor1 = Color.FromArgb(165, 137, 118);
-        static readonly UUID defaultTerrainTexture2 = new UUID("63338ede-0037-c4fd-855b-015d77112fc8");
-        static readonly Color defaultColor2 = Color.FromArgb(69, 89, 49);
-        static readonly UUID defaultTerrainTexture3 = new UUID("303cd381-8560-7579-23f1-f0a880799740");
-        static readonly Color defaultColor3 = Color.FromArgb(162, 154, 141);
-        static readonly UUID defaultTerrainTexture4 = new UUID("53a2f406-4895-1d13-d541-d2e3b86bc19c");
-        static readonly Color defaultColor4 = Color.FromArgb(200, 200, 200);
+        static readonly UUID defaultTerrainTexture1 = new UUID ("0bc58228-74a0-7e83-89bc-5c23464bcec5");
+        static readonly Color defaultColor1 = Color.FromArgb (165, 137, 118);
+        static readonly UUID defaultTerrainTexture2 = new UUID ("63338ede-0037-c4fd-855b-015d77112fc8");
+        static readonly Color defaultColor2 = Color.FromArgb (69, 89, 49);
+        static readonly UUID defaultTerrainTexture3 = new UUID ("303cd381-8560-7579-23f1-f0a880799740");
+        static readonly Color defaultColor3 = Color.FromArgb (162, 154, 141);
+        static readonly UUID defaultTerrainTexture4 = new UUID ("53a2f406-4895-1d13-d541-d2e3b86bc19c");
+        static readonly Color defaultColor4 = Color.FromArgb (200, 200, 200);
 
-        static readonly Color WATER_COLOR = Color.FromArgb(29, 71, 95);
+        static readonly Color WATER_COLOR = Color.FromArgb (29, 71, 95);
 
         #endregion
 
@@ -150,17 +149,16 @@ namespace WhiteCore.Modules.WorldMap
 
         #region IMapTileTerrainRenderer Members
 
-        public void Initialise(IScene scene, IConfigSource source)
+        public void Initialise (IScene scene, IConfigSource source)
         {
             m_scene = scene;
             // m_config = source; // not used currently
 
             // get cache dir
-            m_assetCacheDir = source.Configs ["AssetCache"].GetString ("CacheDirectory",m_assetCacheDir);
-            if (m_assetCacheDir == "")
-            {
+            m_assetCacheDir = source.Configs ["AssetCache"].GetString ("CacheDirectory", m_assetCacheDir);
+            if (m_assetCacheDir == "") {
                 var defpath = scene.RequestModuleInterface<ISimulationBase> ().DefaultDataPath;
-                m_assetCacheDir = Path.Combine(defpath, Constants.DEFAULT_ASSETCACHE_DIR);
+                m_assetCacheDir = Path.Combine (defpath, Constants.DEFAULT_ASSETCACHE_DIR);
             }
 
             m_mapping = new Dictionary<UUID, Color>
@@ -172,13 +170,13 @@ namespace WhiteCore.Modules.WorldMap
                                 {Util.BLANK_TEXTURE_UUID, Color.White}
                             };
 
-            ReadCacheMap();
+            ReadCacheMap ();
         }
 
-        public Bitmap TerrainToBitmap(Bitmap mapbmp)
+        public Bitmap TerrainToBitmap (Bitmap mapbmp)
         {
-            FastBitmap unsafeBMP = new FastBitmap(mapbmp);
-            unsafeBMP.LockBitmap();
+            FastBitmap unsafeBMP = new FastBitmap (mapbmp);
+            unsafeBMP.LockBitmap ();
             //DateTime start = DateTime.Now;
             //MainConsole.Instance.Info("[MAPTILE]: Generating Maptile Step 1: Terrain");
 
@@ -189,38 +187,35 @@ namespace WhiteCore.Modules.WorldMap
             RegionSettings settings = m_scene.RegionInfo.RegionSettings;
 
             // the four terrain colors as HSVs for interpolation
-            HSV hsv1 = new HSV(computeAverageColor(settings.TerrainTexture1, defaultColor1));
-            HSV hsv2 = new HSV(computeAverageColor(settings.TerrainTexture2, defaultColor2));
-            HSV hsv3 = new HSV(computeAverageColor(settings.TerrainTexture3, defaultColor3));
-            HSV hsv4 = new HSV(computeAverageColor(settings.TerrainTexture4, defaultColor4));
+            HSV hsv1 = new HSV (computeAverageColor (settings.TerrainTexture1, defaultColor1));
+            HSV hsv2 = new HSV (computeAverageColor (settings.TerrainTexture2, defaultColor2));
+            HSV hsv3 = new HSV (computeAverageColor (settings.TerrainTexture3, defaultColor3));
+            HSV hsv4 = new HSV (computeAverageColor (settings.TerrainTexture4, defaultColor4));
 
-            float levelNElow = (float) settings.Elevation1NE;
-            float levelNEhigh = (float) settings.Elevation2NE;
+            float levelNElow = (float)settings.Elevation1NE;
+            float levelNEhigh = (float)settings.Elevation2NE;
 
-            float levelNWlow = (float) settings.Elevation1NW;
-            float levelNWhigh = (float) settings.Elevation2NW;
+            float levelNWlow = (float)settings.Elevation1NW;
+            float levelNWhigh = (float)settings.Elevation2NW;
 
-            float levelSElow = (float) settings.Elevation1SE;
-            float levelSEhigh = (float) settings.Elevation2SE;
+            float levelSElow = (float)settings.Elevation1SE;
+            float levelSEhigh = (float)settings.Elevation2SE;
 
-            float levelSWlow = (float) settings.Elevation1SW;
-            float levelSWhigh = (float) settings.Elevation2SW;
+            float levelSWlow = (float)settings.Elevation1SW;
+            float levelSWhigh = (float)settings.Elevation2SW;
 
-            float waterHeight = (float) settings.WaterHeight;
+            float waterHeight = (float)settings.WaterHeight;
 
-            ITerrainChannel heightmap = m_scene.RequestModuleInterface<ITerrainChannel>();
-            float sizeRatio = m_scene.RegionInfo.RegionSizeX/(float) Constants.RegionSize;
-            for (float y = 0; y < m_scene.RegionInfo.RegionSizeY; y += sizeRatio)
-            {
-                float rowRatio = y/(m_scene.RegionInfo.RegionSizeY - 1); // 0 - 1, for interpolation
-                for (float x = 0; x < m_scene.RegionInfo.RegionSizeX; x += sizeRatio)
-                {
-                    float columnRatio = x/(m_scene.RegionInfo.RegionSizeX - 1); // 0 - 1, for interpolation
+            ITerrainChannel heightmap = m_scene.RequestModuleInterface<ITerrainChannel> ();
+            float sizeRatio = m_scene.RegionInfo.RegionSizeX / (float)Constants.RegionSize;
+            for (float y = 0; y < m_scene.RegionInfo.RegionSizeY; y += sizeRatio) {
+                float rowRatio = y / (m_scene.RegionInfo.RegionSizeY - 1); // 0 - 1, for interpolation
+                for (float x = 0; x < m_scene.RegionInfo.RegionSizeX; x += sizeRatio) {
+                    float columnRatio = x / (m_scene.RegionInfo.RegionSizeX - 1); // 0 - 1, for interpolation
 
-                    float heightvalue = getHeight(heightmap, (int) x, (int) y);
+                    float heightvalue = getHeight (heightmap, (int)x, (int)y);
 
-                    if (heightvalue > waterHeight)
-                    {
+                    if (heightvalue > waterHeight) {
                         // add a bit noise for breaking up those flat colors:
                         // - a large-scale noise, for the "patches" (using an doubled s-curve for sharper contrast)
                         // - a small-scale noise, for bringing in some small scale variation
@@ -232,16 +227,15 @@ namespace WhiteCore.Modules.WorldMap
 
                         // find the low/high values for this point (interpolated bilinearily)
                         // (and remember, x=0,y=0 is SW)
-                        float low = levelSWlow*(1f - rowRatio)*(1f - columnRatio) +
-                                    levelSElow*(1f - rowRatio)*columnRatio +
-                                    levelNWlow*rowRatio*(1f - columnRatio) +
-                                    levelNElow*rowRatio*columnRatio;
-                        float high = levelSWhigh*(1f - rowRatio)*(1f - columnRatio) +
-                                     levelSEhigh*(1f - rowRatio)*columnRatio +
-                                     levelNWhigh*rowRatio*(1f - columnRatio) +
-                                     levelNEhigh*rowRatio*columnRatio;
-                        if (high < low)
-                        {
+                        float low = levelSWlow * (1f - rowRatio) * (1f - columnRatio) +
+                                    levelSElow * (1f - rowRatio) * columnRatio +
+                                    levelNWlow * rowRatio * (1f - columnRatio) +
+                                    levelNElow * rowRatio * columnRatio;
+                        float high = levelSWhigh * (1f - rowRatio) * (1f - columnRatio) +
+                                     levelSEhigh * (1f - rowRatio) * columnRatio +
+                                     levelNWhigh * rowRatio * (1f - columnRatio) +
+                                     levelNEhigh * rowRatio * columnRatio;
+                        if (high < low) {
                             // someone tried to fool us. High value should be higher than low every time
                             float tmp = high;
                             high = low;
@@ -251,110 +245,110 @@ namespace WhiteCore.Modules.WorldMap
                         HSV hsv;
                         if (hmod <= low) hsv = hsv1; // too low
                         else if (hmod >= high) hsv = hsv4; // too high
-                        else
-                        {
+                        else {
                             // HSV-interpolate along the colors
                             // first, rescale h to 0.0 - 1.0
-                            hmod = (hmod - low)/(high - low);
+                            hmod = (hmod - low) / (high - low);
                             // now we have to split: 0.00 => color1, 0.33 => color2, 0.67 => color3, 1.00 => color4
-                            if (hmod < 1f/3f) hsv = interpolateHSV(ref hsv1, ref hsv2, hmod*3f);
-                            else if (hmod < 2f/3f) hsv = interpolateHSV(ref hsv2, ref hsv3, (hmod*3f) - 1f);
-                            else hsv = interpolateHSV(ref hsv3, ref hsv4, (hmod*3f) - 2f);
+                            if (hmod < 1f / 3f) hsv = interpolateHSV (ref hsv1, ref hsv2, hmod * 3f);
+                            else if (hmod < 2f / 3f) hsv = interpolateHSV (ref hsv2, ref hsv3, (hmod * 3f) - 1f);
+                            else hsv = interpolateHSV (ref hsv3, ref hsv4, (hmod * 3f) - 2f);
                         }
                         //get the data from the original image
-                        Color hsvColor = hsv.ToColor();
-                        unsafeBMP.SetPixel((int) (x/sizeRatio),
-                                           (int) (((m_scene.RegionInfo.RegionSizeY - 1) - y)/sizeRatio), hsvColor);
-                    }
-                    else
-                    {
+                        Color hsvColor = hsv.ToColor ();
+                        unsafeBMP.SetPixel ((int)(x / sizeRatio),
+                                           (int)(((m_scene.RegionInfo.RegionSizeY - 1) - y) / sizeRatio), hsvColor);
+                    } else {
                         // We're under the water level with the terrain, so paint water instead of land
-                        unsafeBMP.SetPixel((int) (x/sizeRatio),
-                                           (int) (((m_scene.RegionInfo.RegionSizeY - 1) - y)/sizeRatio), WATER_COLOR);
+                        unsafeBMP.SetPixel ((int)(x / sizeRatio),
+                                           (int)(((m_scene.RegionInfo.RegionSizeY - 1) - y) / sizeRatio), WATER_COLOR);
                     }
                 }
             }
-            if (m_mapping != null)
-            {
-                SaveCache();
-                m_mapping.Clear();
+            if (m_mapping != null) {
+                SaveCache ();
+                m_mapping.Clear ();
             }
-            unsafeBMP.UnlockBitmap();
+            unsafeBMP.UnlockBitmap ();
             //MainConsole.Instance.Info("[MAPTILE]: Generating Maptile Step 1: Done in " + (DateTime.Now - start).TotalSeconds + " ms");
-            return unsafeBMP.Bitmap();
+            return unsafeBMP.Bitmap ();
         }
 
         #endregion
 
-        void ReadCacheMap()
+        void ReadCacheMap ()
         {
-            if (!Directory.Exists(m_assetCacheDir))
-                Directory.CreateDirectory(m_assetCacheDir);
-            if (!Directory.Exists(Path.Combine(m_assetCacheDir, "mapTileTextureCache")))
-                Directory.CreateDirectory(Path.Combine(m_assetCacheDir, "mapTileTextureCache"));
+            if (!Directory.Exists (m_assetCacheDir))
+                Directory.CreateDirectory (m_assetCacheDir);
+            if (!Directory.Exists (Path.Combine (m_assetCacheDir, "mapTileTextureCache")))
+                Directory.CreateDirectory (Path.Combine (m_assetCacheDir, "mapTileTextureCache"));
 
             FileStream stream =
-                new FileStream(
-                    Path.Combine(Path.Combine(m_assetCacheDir, "mapTileTextureCache"),
+                new FileStream (
+                    Path.Combine (Path.Combine (m_assetCacheDir, "mapTileTextureCache"),
                                  m_scene.RegionInfo.RegionName + ".tc"), FileMode.OpenOrCreate);
-            StreamReader m_streamReader = new StreamReader(stream);
-            string file = m_streamReader.ReadToEnd();
-            m_streamReader.Close();
+            StreamReader m_streamReader = new StreamReader (stream);
+            string file = "";
+            try {
+                file = m_streamReader.ReadToEnd ();
+            } catch {
+            }
+            m_streamReader.Close ();
+            stream.Close ();
+
             //Read file here
             if (file != "") //New file
             {
-                bool loaded = DeserializeCache(file);
-                if (!loaded)
-                {
+                bool loaded = DeserializeCache (file);
+                if (!loaded) {
                     //Something went wrong, delete the file
-                    try
-                    {
-                        File.Delete(Path.Combine(Path.Combine(m_assetCacheDir, "mapTileTextureCache"),
+                    try {
+                        File.Delete (Path.Combine (Path.Combine (m_assetCacheDir, "mapTileTextureCache"),
                                                  m_scene.RegionInfo.RegionName + ".tc"));
-                    }
-                    catch
-                    {
+                    } catch {
                     }
                 }
             }
         }
 
-        bool DeserializeCache(string file)
+        bool DeserializeCache (string file)
         {
-            OSDMap map = OSDParser.DeserializeJson(file) as OSDMap;
+            OSDMap map = OSDParser.DeserializeJson (file) as OSDMap;
             if (map == null)
                 return false;
 
-            foreach (KeyValuePair<string, OSD> kvp in map)
-            {
-                Color4 c = kvp.Value.AsColor4();
-                UUID key = UUID.Parse(kvp.Key);
-                if (!m_mapping.ContainsKey(key))
-                    m_mapping.Add(key,
-                                  Color.FromArgb((int) (c.A*255), (int) (c.R*255), (int) (c.G*255), (int) (c.B*255)));
+            foreach (KeyValuePair<string, OSD> kvp in map) {
+                Color4 c = kvp.Value.AsColor4 ();
+                UUID key = UUID.Parse (kvp.Key);
+                if (!m_mapping.ContainsKey (key))
+                    m_mapping.Add (key,
+                                  Color.FromArgb ((int)(c.A * 255), (int)(c.R * 255), (int)(c.G * 255), (int)(c.B * 255)));
             }
 
             return true;
         }
 
-        void SaveCache()
+        void SaveCache ()
         {
-            OSDMap map = SerializeCache();
+            OSDMap map = SerializeCache ();
             FileStream stream =
-                new FileStream(
-                    Path.Combine(Path.Combine(m_assetCacheDir, "mapTileTextureCache"),
+                new FileStream (
+                    Path.Combine (Path.Combine (m_assetCacheDir, "mapTileTextureCache"),
                                  m_scene.RegionInfo.RegionName + ".tc"), FileMode.Create);
-            StreamWriter writer = new StreamWriter(stream);
-            writer.WriteLine(OSDParser.SerializeJsonString(map));
-            writer.Close();
+            StreamWriter writer = new StreamWriter (stream);
+            try {
+                writer.WriteLine (OSDParser.SerializeJsonString (map));
+            } catch {
+            }
+            writer.Close ();
+            stream.Close ();
         }
 
-        OSDMap SerializeCache()
+        OSDMap SerializeCache ()
         {
-            OSDMap map = new OSDMap();
-            foreach (KeyValuePair<UUID, Color> kvp in m_mapping)
-            {
-                map.Add(kvp.Key.ToString(), new Color4(kvp.Value.R, kvp.Value.G, kvp.Value.B, kvp.Value.A));
+            OSDMap map = new OSDMap ();
+            foreach (KeyValuePair<UUID, Color> kvp in m_mapping) {
+                map.Add (kvp.Key.ToString (), new Color4 (kvp.Value.R, kvp.Value.G, kvp.Value.B, kvp.Value.A));
             }
             return map;
         }
@@ -364,36 +358,27 @@ namespace WhiteCore.Modules.WorldMap
         // This fetches the texture from the asset server synchronously. That should be ok, as we
         // call map-creation either async or sync, depending on what the user specified and it shouldn't
         // take too long, as most assets should be cached
-        Bitmap fetchTexture(UUID id)
+        Bitmap fetchTexture (UUID id)
         {
-            byte[] asset = m_scene.AssetService.GetData(id.ToString());
-            if (asset != null)
-            {
-                try
-                {
-                    if (asset != null)
-                    {
-                        Image image = m_scene.RequestModuleInterface<IJ2KDecoder>().DecodeToImage(asset);
+            byte [] asset = m_scene.AssetService.GetData (id.ToString ());
+            if (asset != null) {
+                try {
+                    if (asset != null) {
+                        Image image = m_scene.RequestModuleInterface<IJ2KDecoder> ().DecodeToImage (asset);
                         if (image != null)
-                            return new Bitmap(image);
+                            return new Bitmap (image);
                     }
-                }
-                catch (DllNotFoundException)
-                {
-                    MainConsole.Instance.ErrorFormat(
-                        "[TexturedMapTileRenderer]: OpenJpeg is not installed correctly on this system.   Asset Data is empty for {0}",
+                } catch (DllNotFoundException) {
+                    MainConsole.Instance.ErrorFormat (
+                        "[TexturedMap generator]: OpenJpeg is not installed correctly on this system. Asset Data is empty for {0}",
                         id);
-                }
-                catch (IndexOutOfRangeException)
-                {
-                    MainConsole.Instance.ErrorFormat(
-                        "[TexturedMapTileRenderer]: OpenJpeg was unable to encode this.   Asset Data is empty for {0}",
+                } catch (IndexOutOfRangeException) {
+                    MainConsole.Instance.ErrorFormat (
+                        "[TexturedMap generator]: OpenJpeg was unable to encode this. Asset Data is empty for {0}",
                         id);
-                }
-                catch (Exception)
-                {
-                    MainConsole.Instance.ErrorFormat(
-                        "[TexturedMapTileRenderer]: OpenJpeg was unable to encode this.   Asset Data is empty for {0}",
+                } catch (Exception) {
+                    MainConsole.Instance.ErrorFormat (
+                        "[TexturedMap generator]: OpenJpeg was unable to encode this. Asset Data is empty for {0}",
                         id);
                 }
             }
@@ -401,50 +386,51 @@ namespace WhiteCore.Modules.WorldMap
         }
 
         // Compute the average color of a texture.
-        static Color computeAverageColor(Bitmap bmp)
+        static Color computeAverageColor (Bitmap bmp)
         {
-            FastBitmap unsafeBMP = new FastBitmap(bmp);
+            FastBitmap unsafeBMP = new FastBitmap (bmp);
             // we have 256 x 256 pixel, each with 256 possible color-values per
             // color-channel, so 2^24 is the maximum value we can get, adding everything.
-            unsafeBMP.LockBitmap();
+            unsafeBMP.LockBitmap ();
             int r = 0;
             int g = 0;
             int b = 0;
             int y = 0;
             int x = 0;
-            for (y = 0; y < bmp.Height; y += 10)
-            {
-                for (x = 0; x < bmp.Width; x += 10)
-                {
-                    Color pixel = unsafeBMP.GetPixel(x, y);
+            for (y = 0; y < bmp.Height; y += 10) {
+                for (x = 0; x < bmp.Width; x += 10) {
+                    Color pixel = unsafeBMP.GetPixel (x, y);
                     r += pixel.R;
                     g += pixel.G;
                     b += pixel.B;
                 }
             }
 
-            unsafeBMP.UnlockBitmap();
+            unsafeBMP.UnlockBitmap ();
 
-            int pixels = ((x/10)*(y/10));
-            return Color.FromArgb(r/pixels, g/pixels, b/pixels);
+            int pixels = ((x / 10) * (y / 10));
+            if (pixels > 0)
+                return Color.FromArgb (r / pixels, g / pixels, b / pixels);
+
+            return Color.FromArgb (4, 4, 4);
         }
 
         // return either the average color of the texture, or the defaultColor if the texturID is invalid
         // or the texture couldn't be found
-        Color computeAverageColor(UUID textureID, Color defaultColor)
+        Color computeAverageColor (UUID textureID, Color defaultColor)
         {
             if (textureID == UUID.Zero)
                 return defaultColor; // not set
 
-            if (m_mapping.ContainsKey(textureID))
-                return m_mapping[textureID]; // one of the predefined textures
+            if (m_mapping.ContainsKey (textureID))
+                return m_mapping [textureID]; // one of the predefined textures
 
-            Bitmap bmp = fetchTexture(textureID);
-            Color color = bmp == null ? defaultColor : computeAverageColor(bmp);
+            Bitmap bmp = fetchTexture (textureID);
+            Color color = bmp == null ? defaultColor : computeAverageColor (bmp);
             if (bmp != null)
-                bmp.Dispose(); //Destroy the image that we don't need
+                bmp.Dispose (); //Destroy the image that we don't need
             // store it for future reference
-            m_mapping[textureID] = color;
+            m_mapping [textureID] = color;
 
             return color;
         }
@@ -453,13 +439,13 @@ namespace WhiteCore.Modules.WorldMap
         // f(0) = 0, f(0.5) = 0.5, f(1) = 1,
         // f'(x) = 0 at x = 0 and x = 1; f'(0.5) = 1.5,
         // f''(0.5) = 0, f''(x) != 0 for x != 0.5
-        static float S(float v)
+        static float S (float v)
         {
-            return (v*v*(3f - 2f*v));
+            return (v * v * (3f - 2f * v));
         }
 
         // interpolate two colors in HSV space and return the resulting color
-        static HSV interpolateHSV(ref HSV c1, ref HSV c2, float ratio)
+        static HSV interpolateHSV (ref HSV c1, ref HSV c2, float ratio)
         {
             if (ratio <= 0f) return c1;
             if (ratio >= 1f) return c2;
@@ -470,17 +456,17 @@ namespace WhiteCore.Modules.WorldMap
             if (c1.h - c2.h > 180f) c1.h -= 360f;
             else if (c2.h - c1.h > 180f) c1.h += 360f;
 
-            return new HSV(c1.h*(1f - ratio) + c2.h*ratio,
-                           c1.s*(1f - ratio) + c2.s*ratio,
-                           c1.v*(1f - ratio) + c2.v*ratio);
+            return new HSV (c1.h * (1f - ratio) + c2.h * ratio,
+                           c1.s * (1f - ratio) + c2.s * ratio,
+                           c1.v * (1f - ratio) + c2.v * ratio);
         }
 
         // the heigthfield might have some jumps in values. Rendered land is smooth, though,
         // as a slope is rendered at that place. So average 4 neighbor values to emulate that.
-        float getHeight(ITerrainChannel hm, int x, int y)
+        float getHeight (ITerrainChannel hm, int x, int y)
         {
             if (x < (m_scene.RegionInfo.RegionSizeX - 1) && y < (m_scene.RegionInfo.RegionSizeY - 1))
-                return (hm[x, y]*.444f + (hm[x + 1, y] + hm[x, y + 1])*.222f + hm[x + 1, y + 1]*.112f);
+                return (hm [x, y] * .444f + (hm [x + 1, y] + hm [x, y + 1]) * .222f + hm [x + 1, y + 1] * .112f);
 
             return 0;
         }

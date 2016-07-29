@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Contributors, http://opensimulator.org/
+ * Copyright (c) Contributors, http://whitecore-sim.org/, http://opensimulator.org/
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -9,7 +9,7 @@
  *     * Redistributions in binary form must reproduce the above copyright
  *       notice, this list of conditions and the following disclaimer in the
  *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the OpenSimulator Project nor the
+ *     * Neither the name of the WhiteCore-Sim Project nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
  *
@@ -27,110 +27,98 @@
 
 using System;
 using System.Collections;
-using System.Threading;
-using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using System.Text;
+using System.Threading;
 using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.Servers.HttpServer.Implementation;
 
 namespace WhiteCore.Framework.Servers.HttpServer
 {
     public class PollServiceRequestManager
     {
-        private static Queue m_requests = Queue.Synchronized(new Queue());
-        private uint m_WorkerThreadCount = 0;
-        private Thread[] m_workerThreads;
-        private Thread m_watcherThread;
-        private PollServiceWorkerThread[] m_PollServiceWorkerThreads;
-        private volatile bool m_running = true;
-        private int m_pollTimeout;
-        private readonly object m_queueSync = new object();
+        static Queue m_requests = Queue.Synchronized (new Queue ());
+        uint m_WorkerThreadCount = 0;
+        Thread [] m_workerThreads;
+        Thread m_watcherThread;
+        PollServiceWorkerThread [] m_PollServiceWorkerThreads;
+        volatile bool m_running = true;
+        int m_pollTimeout;
+        readonly object m_queueSync = new object ();
 
-        public bool Started
-        {
+        public bool Started {
             get { return m_running; }
         }
 
-        public PollServiceRequestManager(uint pWorkerThreadCount, int pTimeout)
+        public PollServiceRequestManager (uint pWorkerThreadCount, int pTimeout)
         {
             m_WorkerThreadCount = pWorkerThreadCount;
             m_pollTimeout = pTimeout;
         }
 
-        public void Start()
+        public void Start ()
         {
             m_running = true;
-            m_workerThreads = new Thread[m_WorkerThreadCount];
-            m_PollServiceWorkerThreads = new PollServiceWorkerThread[m_WorkerThreadCount];
-            m_workerThreads = new Thread[m_WorkerThreadCount];
+            m_workerThreads = new Thread [m_WorkerThreadCount];
+            m_PollServiceWorkerThreads = new PollServiceWorkerThread [m_WorkerThreadCount];
+            m_workerThreads = new Thread [m_WorkerThreadCount];
 
             //startup worker threads
-            for (uint i = 0; i < m_WorkerThreadCount; i++)
-            {
-                m_PollServiceWorkerThreads[i] = new PollServiceWorkerThread(m_pollTimeout);
-                m_PollServiceWorkerThreads[i].ReQueue += ReQueueEvent;
+            for (uint i = 0; i < m_WorkerThreadCount; i++) {
+                m_PollServiceWorkerThreads [i] = new PollServiceWorkerThread (m_pollTimeout);
+                m_PollServiceWorkerThreads [i].ReQueue += ReQueueEvent;
 
-                m_workerThreads[i] = new Thread(m_PollServiceWorkerThreads[i].ThreadStart)
-                                         {Name = String.Format("PollServiceWorkerThread{0}", i)};
-                m_workerThreads[i].Start();
+                m_workerThreads [i] = new Thread (m_PollServiceWorkerThreads [i].ThreadStart) { Name = string.Format ("PollServiceWorkerThread{0}", i) };
+                m_workerThreads [i].Start ();
             }
 
             //start watcher threads
-            m_watcherThread = new Thread(ThreadStart) {Name = "PollServiceWatcherThread"};
-            m_watcherThread.Start();
+            m_watcherThread = new Thread (ThreadStart) { Name = "PollServiceWatcherThread" };
+            m_watcherThread.Start ();
         }
 
-        internal void ReQueueEvent(PollServiceHttpRequest req)
+        internal void ReQueueEvent (PollServiceHttpRequest req)
         {
             // Do accounting stuff here
-            Enqueue(req);
+            Enqueue (req);
         }
 
-        public void Enqueue(PollServiceHttpRequest req)
+        public void Enqueue (PollServiceHttpRequest req)
         {
-            lock (m_requests)
-            {
-                m_requests.Enqueue(req);
+            lock (m_requests) {
+                m_requests.Enqueue (req);
                 lock (m_queueSync)
-                    Monitor.Pulse(m_queueSync);
+                    Monitor.Pulse (m_queueSync);
             }
         }
 
-        public void ThreadStart()
+        public void ThreadStart ()
         {
-            while (m_running)
-            {
-                if (!ProcessQueuedRequests())
-                {
+            while (m_running) {
+                if (!ProcessQueuedRequests ()) {
                     //lock(m_queueSync)
                     //    Monitor.Wait(m_queueSync);
-                    Thread.Sleep(1000);
+                    Thread.Sleep (1000);
                 }
             }
         }
 
-        private bool ProcessQueuedRequests()
+        bool ProcessQueuedRequests ()
         {
-            lock (m_requests)
-            {
+            lock (m_requests) {
                 if (m_requests.Count == 0)
                     return false;
 
-                //                MainConsole.Instance.DebugFormat("[POLL SERVICE REQUEST MANAGER]: Processing {0} requests", m_requests.Count);
+                // MainConsole.Instance.DebugFormat("[POLL SERVICE REQUEST MANAGER]: Processing {0} requests", m_requests.Count);
 
-                int reqperthread = (int) (m_requests.Count/m_WorkerThreadCount) + 1;
+                int reqperthread = (int)(m_requests.Count / m_WorkerThreadCount) + 1;
 
                 // For Each WorkerThread
-                for (int tc = 0; tc < m_WorkerThreadCount && m_requests.Count > 0; tc++)
-                {
+                for (int tc = 0; tc < m_WorkerThreadCount && m_requests.Count > 0; tc++) {
                     //Loop over number of requests each thread handles.
-                    for (int i = 0; i < reqperthread && m_requests.Count > 0; i++)
-                    {
-                        try
-                        {
-                            m_PollServiceWorkerThreads[tc].Enqueue((PollServiceHttpRequest) m_requests.Dequeue());
-                        }
-                        catch (InvalidOperationException)
-                        {
+                    for (int i = 0; i < reqperthread && m_requests.Count > 0; i++) {
+                        try {
+                            m_PollServiceWorkerThreads [tc].Enqueue ((PollServiceHttpRequest)m_requests.Dequeue ());
+                        } catch (InvalidOperationException) {
                             // The queue is empty, we did our calculations wrong!
                             return true;
                         }
@@ -140,37 +128,32 @@ namespace WhiteCore.Framework.Servers.HttpServer
             }
         }
 
-        public void Stop()
+        public void Stop ()
         {
             m_running = false;
-            foreach (object o in m_requests)
-            {
-                PollServiceHttpRequest req = (PollServiceHttpRequest) o;
+            lock (m_requests) {
 
-                OSHttpResponse response = new OSHttpResponse(req.Context);
+                foreach (object o in m_requests) {
+                    PollServiceHttpRequest req = (PollServiceHttpRequest)o;
+                    OSHttpResponse response = new OSHttpResponse (req.Context);
 
-                byte[] buffer = req.PollServiceArgs.NoEvents(req.RequestID, req.PollServiceArgs.Id, response);
+                    byte [] buffer = req.PollServiceArgs.NoEvents (req.RequestID, req.PollServiceArgs.Id, response);
 
-                
-                req.Context.Response.SendChunked = false;
-                req.Context.Response.ContentEncoding = Encoding.UTF8;
+                    req.Context.Response.SendChunked = false;
+                    req.Context.Response.ContentEncoding = Encoding.UTF8;
 
-                try
-                {
-                    req.Context.Response.ContentLength64 = buffer.LongLength;
-                    req.Context.Response.Close(buffer, true);
+                    try {
+                        req.Context.Response.ContentLength64 = buffer.LongLength;
+                        req.Context.Response.Close (buffer, true);
+                    } catch (Exception ex) {
+                        MainConsole.Instance.WarnFormat ("[Poll service worker thread]: Error: {0}", ex.ToString ());
+                    }
                 }
-                catch (Exception ex)
-                {
-                    MainConsole.Instance.WarnFormat("[POLL SERVICE WORKER THREAD]: Error: {0}", ex.ToString());
-                }
+
+                m_requests.Clear ();
             }
-
-            m_requests.Clear();
-
-            foreach (Thread t in m_workerThreads)
-            {
-                t.Abort();
+            foreach (Thread t in m_workerThreads) {
+                t.Abort ();
             }
         }
     }

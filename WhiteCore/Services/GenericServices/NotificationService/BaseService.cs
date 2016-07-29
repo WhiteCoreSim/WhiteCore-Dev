@@ -26,14 +26,14 @@
  */
 
 
+using System;
+using System.Collections.Generic;
+using Nini.Config;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.ModuleLoader;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
-using Nini.Config;
-using System;
-using System.Collections.Generic;
 
 namespace WhiteCore.Services
 {
@@ -41,67 +41,65 @@ namespace WhiteCore.Services
     {
         #region IApplicationPlugin Members
 
-        public string Name
-        {
+        public string Name {
             get { return "BaseNotificationService"; }
         }
 
-        public void PreStartup(ISimulationBase simBase)
+        public void PreStartup (ISimulationBase simBase)
         {
-            SetUpConsole(simBase.ConfigSource, simBase.ApplicationRegistry);
+            SetUpConsole (simBase.ConfigSource, simBase);
         }
 
-        public void Initialize(ISimulationBase simBase)
+        public void Initialize (ISimulationBase simBase)
         {
         }
 
-        private void SetUpConsole(IConfigSource config, IRegistryCore registry)
+        void SetUpConsole (IConfigSource config, ISimulationBase simbase)
         {
-            List<ICommandConsole> Plugins = WhiteCoreModuleLoader.PickupModules<ICommandConsole>();
-            foreach (ICommandConsole plugin in Plugins)
-            {
-                plugin.Initialize(config, registry.RequestModuleInterface<ISimulationBase>());
+            List<ICommandConsole> Plugins = WhiteCoreModuleLoader.PickupModules<ICommandConsole> ();
+            foreach (ICommandConsole plugin in Plugins) {
+                plugin.Initialize (config, simbase);
             }
 
-            if (MainConsole.Instance == null)
-            {
-                Console.WriteLine("[Console]: No Console located");
-                return;
+            if (MainConsole.Instance == null) {
+                Console.WriteLine ("[Console]: No Console configured, falling back to 'LocalConsole'");
+                new LocalConsole ().LocalInitialize (config, simbase);
             }
 
             MainConsole.Instance.Threshold = Level.Info;
-            
-            MainConsole.Instance.Fatal(String.Format("[Console]: Console log level is {0}",
-                                                         MainConsole.Instance.Threshold));
 
-            MainConsole.Instance.Commands.AddCommand("set log level", 
-                                                     "set log level [level]",
-                                                     "Set the console logging level", 
-                                                     HandleLogLevel, false, true);
+            MainConsole.Instance.Fatal (string.Format ("[Console]: Console log level is {0}", MainConsole.Instance.Threshold));
 
-            MainConsole.Instance.Commands.AddCommand("get log level", 
-                                                     "get log level",
-                                                     "Returns the current console logging level", 
-                                                     HandleGetLogLevel, false, true);
+            MainConsole.Instance.Commands.AddCommand (
+                "set log level",
+                "set log level [level]",
+                "Set the console logging level",
+                HandleLogLevel, false, true);
+
+            MainConsole.Instance.Commands.AddCommand (
+                "get log level",
+                "get log level",
+                "Returns the current console logging level",
+                HandleGetLogLevel, false, true);
         }
 
-        public void PostInitialise()
+        public void PostInitialise ()
         {
         }
 
-        public void Start()
+        public void Start ()
         {
         }
 
-        public void PostStart()
+        public void PostStart ()
         {
         }
 
-        public void Close()
+        public void Close ()
         {
         }
 
-        public void ReloadConfiguration(IConfigSource m_config)
+        public void ReloadConfiguration (IConfigSource m_config)
         {
         }
 
@@ -109,21 +107,19 @@ namespace WhiteCore.Services
 
         #region Console Commands
 
-        private void HandleGetLogLevel(IScene scene, string[] cmd)
+        static void HandleGetLogLevel (IScene scene, string [] cmd)
         {
-            MainConsole.Instance.Fatal(String.Format("Console log level is {0}", MainConsole.Instance.Threshold));
+            MainConsole.Instance.Fatal (string.Format ("Console log level is {0}", MainConsole.Instance.Threshold));
         }
 
-        private void HandleLogLevel(IScene scene, string[] cmd)
+        static void HandleLogLevel (IScene scene, string [] cmd)
         {
-            string rawLevel = cmd[3];
+            string rawLevel = cmd [3];
 
-            try
-            {
-                MainConsole.Instance.Threshold = (Level)Enum.Parse(typeof(Level), rawLevel, true);
-            }
-            catch { } 
-            MainConsole.Instance.Format(Level.Off, "Console log level is {0}", MainConsole.Instance.Threshold);
+            try {
+                MainConsole.Instance.Threshold = (Level)Enum.Parse (typeof (Level), rawLevel, true);
+            } catch { }
+            MainConsole.Instance.Format (Level.Off, "Console log level is {0}", MainConsole.Instance.Threshold);
         }
 
         #endregion

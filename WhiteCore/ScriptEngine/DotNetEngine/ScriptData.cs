@@ -25,16 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.ClientInterfaces;
-using WhiteCore.Framework.ConsoleFramework;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.PresenceInfo;
-using WhiteCore.Framework.SceneInfo;
-using WhiteCore.Framework.SceneInfo.Entities;
-using WhiteCore.Framework.Utilities;
-using WhiteCore.ScriptEngine.DotNetEngine.Runtime;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
+#undef SHOWDEBUG        // show debug messages
+
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -44,6 +36,16 @@ using System.Linq;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Lifetime;
 using System.Threading;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
+using WhiteCore.Framework.ClientInterfaces;
+using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.PresenceInfo;
+using WhiteCore.Framework.SceneInfo;
+using WhiteCore.Framework.SceneInfo.Entities;
+using WhiteCore.Framework.Utilities;
+using WhiteCore.ScriptEngine.DotNetEngine.Runtime;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine
 {
@@ -106,10 +108,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
         #region Declares
 
-        private Dictionary<string, long> NextEventDelay;
-        private static string[] funcsToDrop = new string[9]
-        { "timer", "collision", "control", "land_collision", "touch", 
-        "moving_start", "moving_end", "not_at_target", "not_at_rot_target" };
+        Dictionary<string, long> NextEventDelay;
+        static string[] funcsToDrop = {
+            "timer", "collision", "control", "land_collision", "touch", 
+            "moving_start", "moving_end", "not_at_target", "not_at_rot_target" };
             
         //This is the UUID of the actual script.
         readonly ScriptEngine m_ScriptEngine;
@@ -249,7 +251,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 Script = null;
             }
 
-            if (InventoryItem != null && Part != null)
+            if (InventoryItem != null)
                 MainConsole.Instance.Debug("[" + m_ScriptEngine.ScriptEngineName + "]: Closed Script " +
                                            InventoryItem.Name + " in " +
                                            Part.Name);
@@ -296,21 +298,23 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
         public void ResetEvents()
         {
-            RemoveCollisionEvents = false;
-            RemoveTouchEvents = false;
-            RemoveLandCollisionEvents = false;
-            TouchInQueue = false;
-            LandCollisionInQueue = false;
-            SensorInQueue = false;
-            NoSensorInQueue = false;
-            TimerInQueue = false;
-            AtTargetInQueue = false;
-            NotAtTargetInQueue = false;
-            AtRotTargetInQueue = false;
-            NotAtRotTargetInQueue = false;
-            ChangedInQueue.Clear();
-            LastControlLevel = 0;
-            ControlEventsInQueue = 0;
+            lock(ScriptEventLock) {
+                RemoveCollisionEvents = false;
+                RemoveTouchEvents = false;
+                RemoveLandCollisionEvents = false;
+                TouchInQueue = false;
+                LandCollisionInQueue = false;
+                SensorInQueue = false;
+                NoSensorInQueue = false;
+                TimerInQueue = false;
+                AtTargetInQueue = false;
+                NotAtTargetInQueue = false;
+                AtRotTargetInQueue = false;
+                NotAtRotTargetInQueue = false;
+                ChangedInQueue.Clear ();
+                LastControlLevel = 0;
+                ControlEventsInQueue = 0;
+            }
         }
 
         /// <summary>
@@ -493,13 +497,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 else if (stateSource == StateSource.RegionStart)
                     // CHANGED_REGION_START
                     m_ScriptEngine.AddToScriptQueue(this, "changed", new DetectParams[0], EventPriority.FirstStart,
-                                                    new Object[]
+                                                    new object[]
                                                         {new LSL_Types.LSLInteger((int) Changed.REGION_RESTART)});
                 else if (stateSource == StateSource.PrimCrossing)
                     // CHANGED_REGION
                     // note: CHANGED_TELEPORT should occur on any teleport of an attachment within a region too and is taken care of elsewhere
                     m_ScriptEngine.AddToScriptQueue(this, "changed", new DetectParams[0], EventPriority.FirstStart,
-                                                    new Object[] {new LSL_Types.LSLInteger((int) Changed.REGION)});
+                                                    new object[] {new LSL_Types.LSLInteger((int) Changed.REGION)});
                 // note: StateSource.NewRez doesn't do anything (PostOnRez controls on_rez)
             }
             else
@@ -601,7 +605,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 if (Source.Contains("#IncludeHTML "))
                 {
                     string URL = "";
-                    int line = Source.IndexOf("#IncludeHTML ");
+                    int line = Source.IndexOf ("#IncludeHTML ", StringComparison.Ordinal);
                     URL = Source.Remove(0, line);
                     URL = URL.Replace("#IncludeHTML ", "");
                     URL = URL.Split('\n')[0];
@@ -615,7 +619,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 if (Source.Contains("#IncludeHTML "))
                 {
                     string URL = "";
-                    int line = Source.IndexOf("#IncludeHTML ");
+                    int line = Source.IndexOf ("#IncludeHTML ", StringComparison.Ordinal);
                     URL = Source.Remove(0, line);
                     URL = URL.Replace("#IncludeHTML ", "");
                     URL = URL.Split('\n')[0];
@@ -719,15 +723,18 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 }
             }
 
-            bool useDebug = false;
-            if (useDebug)
+            #if SHOWDEBUG
                 MainConsole.Instance.Debug("[" + m_ScriptEngine.ScriptEngineName + "]: Stage 1 compile: " +
                                            (DateTime.Now.ToUniversalTime() - StartTime).TotalSeconds);
+            #endif
 
             //Create the app domain if needed.
             try
             {
                 Script = m_ScriptEngine.AppDomainManager.LoadScript(AssemblyName, "Script.ScriptClass", out AppDomain);
+                if (Script == null)
+                    return false;
+                
                 m_ScriptEngine.Compiler.FinishCompile(this, Script);
                 //Add now so that we don't add it too early and give it the possibility to fail
                 ScriptEngine.ScriptProtection.AddPreviouslyCompiled(Source, this);
@@ -757,9 +764,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             if (reupload)
                 m_ScriptEngine.ScriptErrorReporter.AddError(ItemID, new ArrayList(new[] {"SUCCESSFULL"}));
 
-            if (useDebug)
+            #if SHOWDEBUG
                 MainConsole.Instance.Debug("[" + m_ScriptEngine.ScriptEngineName + "]: Stage 2 compile: " +
                                            (DateTime.Now.ToUniversalTime() - StartTime).TotalSeconds);
+            #endif
 
             SetApis();
 
@@ -770,14 +778,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 // don't restore the assembly name, the one we have is right (if re-compiled or not)
                 m_ScriptEngine.StateSave.Deserialize(this, LastStateSave);
                 AssemblyName = assy;
-                if (string.IsNullOrEmpty(this.State) && DefaultState != this.State)
+                if (string.IsNullOrEmpty(State) && DefaultState != State)
                     //Sometimes, "" is a valid state for other script languages
                 {
                     MainConsole.Instance.Warn("Resetting broken script save state\n" +
-                        "                :  "+InventoryItem.Name+":"+this.Part.Name + " @ " +Part.AbsolutePosition +
+                        "                :  "+InventoryItem.Name+":"+Part.Name + " @ " +Part.AbsolutePosition +
                     "\n                     in region " + Part.ParentEntity.Scene.RegionInfo.RegionName);
 
-                    this.State = DefaultState;
+                    State = DefaultState;
                     m_ScriptEngine.StateSave.DeleteFrom(Part, LastStateSave.ItemID);
                     m_ScriptEngine.StateSave.SaveStateTo(this, true);
                 }
@@ -828,9 +836,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             return true;
         }
 
-        #endregion
+#endregion
 
-        #region Event Processing
+#region Event Processing
 
         public bool SetEventParams(QueueItemStruct itm)
         {
@@ -928,6 +936,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             m_ScriptEngine.MaintenanceThread.AddEventSchQIS(itm, EventPriority.FirstStart);
         }
 
-        #endregion
+#endregion
     }
 }
