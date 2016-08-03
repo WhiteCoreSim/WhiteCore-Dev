@@ -121,6 +121,12 @@ namespace WhiteCore.RedisServices.AssetService
                     "get asset <ID>",
                     "Gets info about asset from database", 
                     HandleGetAsset, false, true);
+                
+                MainConsole.Instance.Commands.AddCommand (
+                   "migrate sql assets",
+                   "migrate sql assets <enable|disable>",
+                   "Enable or disable migration of SQL assets",
+                   HandleMigrateSQLAssets, false, true);
             }
             MainConsole.Instance.Info("[Redis asset service]: Redis asset service enabled");
         }
@@ -162,8 +168,10 @@ namespace WhiteCore.RedisServices.AssetService
             {
                 bool found;
                 AssetBase cachedAsset = cache.Get(id, out found);
-                if (found && (cachedAsset == null || cachedAsset.Data.Length != 0))
-                    return cachedAsset;
+                if (found) {
+                    if (cachedAsset != null && cachedAsset.Data != null)
+                        return cachedAsset;
+                }
             }
 
             if (m_doRemoteOnly) {
@@ -243,7 +251,7 @@ namespace WhiteCore.RedisServices.AssetService
             return RedisExistsAsset(id);
         }
 
-        public virtual void Get(String id, Object sender, AssetRetrieved handler)
+        public virtual void Get(string id, object sender, AssetRetrieved handler)
         {
             var asset = Get (id);
             if (asset != null) {
@@ -453,7 +461,7 @@ namespace WhiteCore.RedisServices.AssetService
             byte[] data = asset.Data;
             string hash = asset.HashCode;
             asset.Data = new byte[0];
-            ProtoBuf.Serializer.Serialize<AssetBase>(memStream, asset);
+            ProtoBuf.Serializer.Serialize (memStream, asset);
             asset.Data = data;
 
             try
@@ -626,6 +634,41 @@ namespace WhiteCore.RedisServices.AssetService
                 creatorName,
                 asset.CreationDate.ToShortDateString()
             );      
+        }
+
+        /// <summary>
+        /// Handles enable/disable of the migrate SQL setting.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="args">Arguments.</param>
+        void HandleMigrateSQLAssets (IScene scene, string [] args)
+        {
+
+            bool migrate = m_migrateSQL;
+
+            if (args.Length < 4) {
+                MainConsole.Instance.InfoFormat ("Migration pf SQL assets is currently {0}",
+                                                 m_migrateSQL ? "enabled" : "disabled");
+                var prompt = MainConsole.Instance.Prompt (
+                    "Do you wish to " + (m_migrateSQL ? "disable" : "enable") + " migration of SQL assets? (yes/no)", "no");
+                if (prompt.ToLower ().StartsWith ("y", StringComparison.Ordinal))
+                    migrate = !migrate;
+                else
+                    return;
+            } else {
+                var setting = args [3];
+                if (setting.ToLower ().StartsWith ("e", StringComparison.Ordinal))
+                    migrate = true;
+                if (setting.ToLower ().StartsWith ("d", StringComparison.Ordinal))
+                    migrate = false;
+            }
+
+            if (migrate == m_migrateSQL)
+                return;
+
+            m_migrateSQL = migrate;
+            MainConsole.Instance.InfoFormat ("Migration of SQL assets has been {0}",
+                                                 m_migrateSQL ? "enabled" : "disabled");
         }
 
         #endregion

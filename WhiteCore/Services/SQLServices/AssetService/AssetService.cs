@@ -134,8 +134,10 @@ namespace WhiteCore.Services.SQLServices.AssetService
             if (doDatabaseCaching && cache != null) {
                 bool found;
                 AssetBase cachedAsset = cache.Get (id, out found);
-                if (found && (cachedAsset == null || cachedAsset.Data.Length != 0))
-                    return cachedAsset;
+                if (found) {
+                    if (cachedAsset != null && cachedAsset.Data != null)
+                        return cachedAsset;
+                }
             }
 
             if (m_doRemoteOnly) {

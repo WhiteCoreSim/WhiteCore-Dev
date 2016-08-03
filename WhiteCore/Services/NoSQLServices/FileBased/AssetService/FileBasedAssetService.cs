@@ -44,10 +44,11 @@ namespace WhiteCore.FileBasedServices.AssetService
 
         protected bool doDatabaseCaching;
         protected string m_connectionPassword;
-        protected bool m_migrateSQL;
-        protected IAssetDataPlugin m_assetService;
         protected string m_assetsDirectory = "";
         protected bool m_enabled;
+
+        protected bool m_migrateSQL;
+        protected IAssetDataPlugin m_assetService;
 
         #endregion
 
@@ -119,6 +120,11 @@ namespace WhiteCore.FileBasedServices.AssetService
                     "Gets info about asset from database", 
                     HandleGetAsset, false, true);
 
+                MainConsole.Instance.Commands.AddCommand (
+                    "migrate sql assets",
+                    "migrate sql assets <enable|disable>",
+                    "Enable or disable migration of SQL assets",
+                    HandleMigrateSQLAssets, false, true);
             }
             MainConsole.Instance.Info ("[Filebased asset service]: File based asset service enabled");
 
@@ -160,8 +166,10 @@ namespace WhiteCore.FileBasedServices.AssetService
             {
                 bool found;
                 AssetBase cachedAsset = cache.Get (id, out found);
-                if (found && (cachedAsset == null || cachedAsset.Data.Length != 0))
-                    return cachedAsset;
+                if (found) {
+                    if (cachedAsset != null && cachedAsset.Data != null)
+                        return cachedAsset;
+                }
             }
 
             if (m_doRemoteOnly) {
@@ -440,7 +448,7 @@ namespace WhiteCore.FileBasedServices.AssetService
                 {
                     assetStream = File.OpenWrite (GetPathForID (asset.IDString));
                     asset.HashCode = hash;
-                    ProtoBuf.Serializer.Serialize<AssetBase> (assetStream, asset);
+                    ProtoBuf.Serializer.Serialize (assetStream, asset);
                     assetStream.SetLength (assetStream.Position);
                     assetStream.Close ();
                     asset.Data = data;
@@ -593,6 +601,42 @@ namespace WhiteCore.FileBasedServices.AssetService
                 creatorName,
                 asset.CreationDate.ToShortDateString ()
             );      
+        }
+
+        /// <summary>
+        /// Handles enable/disable of the migrate SQL setting.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="args">Arguments.</param>
+        void HandleMigrateSQLAssets (IScene scene, string [] args)
+        {
+
+            bool migrate = m_migrateSQL;
+ 
+            if (args.Length < 4) {
+                MainConsole.Instance.InfoFormat ("Migration pf SQL assets is currently {0}",
+                                                 m_migrateSQL ? "enabled" : "disabled");
+                var prompt = MainConsole.Instance.Prompt (
+                    "Do you wish to " + (m_migrateSQL ? "disable" : "enable") + " migration of SQL assets? (yes/no)", "no");
+                if (prompt.ToLower ().StartsWith ("y", StringComparison.Ordinal))
+                    migrate = !migrate;
+                else
+                    return;
+
+            } else {
+                var setting = args [3];
+                if (setting.ToLower ().StartsWith ("e", StringComparison.Ordinal))
+                    migrate = true;
+                if (setting.ToLower ().StartsWith ("d", StringComparison.Ordinal))
+                    migrate = false;
+            }
+
+            if (migrate == m_migrateSQL)
+                return;
+            
+            m_migrateSQL = migrate;
+            MainConsole.Instance.InfoFormat ("Migration of SQL assets has been {0}",
+                                                 m_migrateSQL ? "enabled" : "disabled");
         }
 
         #endregion

@@ -367,6 +367,9 @@ namespace WhiteCore.Modules.WorldMap
 
                 CreateTerrainTexture ();
                 m_scene.SimulationDataService.MapTileNeedsGenerated = false;
+            } else {
+                MainConsole.Instance.InfoFormat ("[Maptile generator]: Skipping maptile generation for {0} as no change have been made",
+                                                 m_scene.RegionInfo.RegionName);
             }
 
         }
