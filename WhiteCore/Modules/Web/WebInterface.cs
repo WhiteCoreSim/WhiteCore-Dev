@@ -476,16 +476,16 @@ namespace WhiteCore.Modules.Web
             switch (Path.GetExtension (filename)) {
             case ".jpeg":
             case ".jpg":
-                response.AddHeader ("Cache-Control", "Public;max-age=" + CLIENT_CACHE_TIME);
+                response.AddHeader ("Cache-Control", "max-age=" + CLIENT_CACHE_TIME + ", public");
                 return "image/jpeg";
             case ".gif":
-                response.AddHeader ("Cache-Control", "Public;max-age=" + CLIENT_CACHE_TIME);
+                response.AddHeader ("Cache-Control", "max-age=" + CLIENT_CACHE_TIME + ", public");
                 return "image/gif";
             case ".png":
-                response.AddHeader ("Cache-Control", "Public;max-age=" + CLIENT_CACHE_TIME);
+                response.AddHeader ("Cache-Control", "max-age=" + CLIENT_CACHE_TIME + ", public");
                 return "image/png";
             case ".tiff":
-                response.AddHeader ("Cache-Control", "Public;max-age=" + CLIENT_CACHE_TIME);
+                response.AddHeader ("Cache-Control", "max-age=" + CLIENT_CACHE_TIME + ", public");
                 return "image/tiff";
             case ".html":
             case ".htm":
@@ -493,11 +493,11 @@ namespace WhiteCore.Modules.Web
                 response.AddHeader ("Cache-Control", "no-cache");
                 return "text/html";
             case ".css":
-                //response.AddHeader("Cache-Control", "max-age=" + CLIENT_CACHE_TIME + ", public");
-                response.AddHeader ("Cache-Control", "no-cache");
+                response.AddHeader("Cache-Control", "max-age=" + CLIENT_CACHE_TIME + ", public");
+                //response.AddHeader ("Cache-Control", "no-cache");
                 return "text/css";
             case ".js":
-                //response.AddHeader("Cache-Control", "max-age=" + CLIENT_CACHE_TIME + ", public");
+                response.AddHeader("Cache-Control", "max-age=" + CLIENT_CACHE_TIME + ", public");
                 return "application/javascript";
             }
             return "text/plain";
