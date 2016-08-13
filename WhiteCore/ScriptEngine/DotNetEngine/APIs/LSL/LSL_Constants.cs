@@ -263,6 +263,22 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger ATTACH_HUD_BOTTOM_RIGHT = 38;
         public static readonly LSL_Types.LSLInteger ATTACH_NECK = 39;
         public static readonly LSL_Types.LSLInteger ATTACH_AVATAR_CENTER = 40;
+        // Project Bento Bones
+        public static readonly LSL_Types.LSLInteger ATTACH_LHAND_RING1 = 41;
+        public static readonly LSL_Types.LSLInteger ATTACH_RHAND_RING1 = 42;
+        public static readonly LSL_Types.LSLInteger ATTACH_TAIL_BASE = 43;
+        public static readonly LSL_Types.LSLInteger ATTACH_TAIL_TIP = 44;
+        public static readonly LSL_Types.LSLInteger ATTACH_LWING = 45;
+        public static readonly LSL_Types.LSLInteger ATTACH_RWING = 46;
+        public static readonly LSL_Types.LSLInteger ATTACH_FACE_JAW = 47;
+        public static readonly LSL_Types.LSLInteger ATTACH_FACE_LEAR = 48;
+        public static readonly LSL_Types.LSLInteger ATTACH_FACE_REAR = 49;
+        public static readonly LSL_Types.LSLInteger ATTACH_FACE_LEYE = 50;
+        public static readonly LSL_Types.LSLInteger ATTACH_FACE_REYE = 51;
+        public static readonly LSL_Types.LSLInteger ATTACH_FACE_TONGUE = 52;
+        public static readonly LSL_Types.LSLInteger ATTACH_GROIN = 53;
+        public static readonly LSL_Types.LSLInteger ATTACH_HIND_LFOOT = 54;
+        public static readonly LSL_Types.LSLInteger ATTACH_HIND_RFOOT = 55;        
 
         public static readonly LSL_Types.LSLInteger LAND_LEVEL = 0;
         public static readonly LSL_Types.LSLInteger LAND_RAISE = 1;
@@ -608,7 +624,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger OBJECT_HOVER_HEIGHT = 25;
         public static readonly LSL_Types.LSLInteger OBJECT_BODY_SHAPE_TYPE = 26;
         public static readonly LSL_Types.LSLInteger OBJECT_LAST_OWNER_ID = 27;
-
+        // new constants since Apr 2016
+        public static readonly LSL_Types.LSLInteger OBJECT_CLICK_ACTION = 28;
+        public static readonly LSL_Types.LSLInteger OBJECT_OMEGA = 29;
+        public static readonly LSL_Types.LSLInteger OBJECT_PRIM_COUNT = 30;
+        public static readonly LSL_Types.LSLInteger OBJECT_TOTAL_INVENTORY_COUNT = 31;
+        public static readonly LSL_Types.LSLInteger OBJECT_REZZER_KEY = 32;
+        
         public static readonly vector ZERO_VECTOR = new vector (0.0, 0.0, 0.0);
         public static readonly rotation ZERO_ROTATION = new rotation (0.0, 0.0, 0.0, 1.0);
 
