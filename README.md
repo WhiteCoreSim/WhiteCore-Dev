@@ -12,13 +12,11 @@ Windows .Net 4.5 [![Build status](https://ci.appveyor.com/api/projects/status/tj
 
 Linux 64 Bit [![Build Status](https://travis-ci.org/WhiteCoreSim/WhiteCore-Dev.svg?branch=master)](https://travis-ci.org/WhiteCoreSim/WhiteCore-Dev)
 
-Pull requests [![Issue Stats](http://www.issuestats.com/github/WhiteCoreSim/WhiteCore-Dev/badge/pr)](http://www.issuestats.com/github/WhiteCoreSim/WhiteCore-Dev)
-
-Issues closed [![Issue Stats](http://www.issuestats.com/github/WhiteCoreSim/WhiteCore-Dev/badge/issue)](http://www.issuestats.com/github/WhiteCoreSim/WhiteCore-Dev)
-
 ## WhiteCore Development
 
 [![Join the chat at https://gitter.im/WhiteCoreSim/WhiteCore-Dev](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/WhiteCoreSim/WhiteCore-Dev?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+Also we have the #whitecore-support channel on FreeNode in which people that use WhiteCore tend to be, just ask your question there and someone will be able to answer it for you.
 
 *NOTES:*
 
@@ -26,7 +24,7 @@ Issues closed [![Issue Stats](http://www.issuestats.com/github/WhiteCoreSim/Whit
 
 *- The BulletSim physics engine has been updated recently and is an alternative to the Open Dynamics Engine that is used as default. Please try it out and tell us if it's working (or not) properly*
 
-*- As of Version 0.9.3, it's advised that Linux users install the latest Mono version to avoid some possible resource problems. The current stable version of Mono (as of May 2016) is 4.2.3, released March 2016*
+*- As of Version 0.9.3, it's advised that Linux users install the latest Mono version to avoid some possible resource problems. The current stable version of Mono (as of Aug 2016) is 4.4.2, released Aug 2016*
 
 More information can be found here:  
 <http://www.mono-project.com/docs/getting-started/install/linux/>
