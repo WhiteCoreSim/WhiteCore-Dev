@@ -246,7 +246,7 @@ namespace WhiteCore.Modules.Web.Translators
                 case "MenuMyPurchases": return "I miei acquisti ";
                 case "MenuTransactions": return "Operazioni utente";
                 case "MenuMyTransactions": return "Le mie transazioni";
-                case "MenuMyClassifieds": return "Le mie Classifieds <NT>";                
+                case "MenuMyClassifieds": return "Le mie Inserzioni <NT>";                
                 case "MenuStatistics": return "Statistiche Viewer";
                 case "MenuGridSettings": return "Impostazioni della grid";
 
@@ -315,13 +315,13 @@ namespace WhiteCore.Modules.Web.Translators
                 case "styles1":
                     return "Default Minimalista";
                 case "styles2":
-                    return "Light Degarde";
+                    return "Gradiente Chiaro";
                 case "styles3":
-                    return "Blue Night";
+                    return "Blu notte";
                 case "styles4":
-                    return "Dark Degrade";
+                    return "Gradiente Scuro";
                 case "styles5":
-                    return "Luminus";
+                    return "Luminoso";
 
                 case "StyleSwitcherStylesText":
                     return "Stili";
@@ -559,12 +559,12 @@ namespace WhiteCore.Modules.Web.Translators
                 case "GridnameText": return "Nome della grid ";
                 case "GridnickText": return "Soprannome della grid ";
                 case "WelcomeMessageText": return "Sezione messaggi di benvenuto ";
-            case "GovernorNameText": return "Sistema di regolazione";
+            case "GovernorNameText": return "Sistema di Governo";
             case "MainlandEstateNameText": return "Terraferma immobiliare";
             case "RealEstateOwnerNameText": return "Nome proprietario terreni del Governo";
             case "SystemEstateNameText": return "Nomi terreni del Governo";
-            case "BankerNameText": return "Sistema banchiere";
-            case "MarketPlaceOwnerNameText": return "Proprietario marketplace sistema";
+            case "BankerNameText": return "Sistema bancario";
+            case "MarketPlaceOwnerNameText": return "Proprietario del Marketplace";
 
             //settings manager page
             case "WebRegistrationText":
@@ -576,9 +576,9 @@ namespace WhiteCore.Modules.Web.Translators
                 case "SettingsManager":
                     return "Manager delle Impostazioni";
                 case "IgnorePagesUpdatesText":
-                    return "Ignora gli aggiornamenti fino al prossimo update";
+                    return "Ignora gli aggiornamenti fino al prossimo aggiornamento";
                 case "IgnoreSettingsUpdatesText":
-                    return "Ignora gli avvisi fino al prossimo update";
+                    return "Ignora gli avvisi fino al prossimo aggiornamento";
 
                 // Transactions
                 case "TransactionsText": return "Operazioni";
@@ -597,7 +597,7 @@ namespace WhiteCore.Modules.Web.Translators
                 case "PurchaseCostText": return "Costo";
                 
                 // Classifieds
-                case "ClassifiedsText": return "Classifieds <NT>";
+                case "ClassifiedsText": return "Inserzioni <NT>";
 
                 // Sim Console
                 case "SimConsoleText": return "Console di comando della Sim";
@@ -605,7 +605,7 @@ namespace WhiteCore.Modules.Web.Translators
 
                 // statistics
                 case "StatisticsText": return "Statistiche Viewer";
-                case "ViewersText": return "Usage Viewer";
+                case "ViewersText": return "Utilizzo Viewer";
                 case "GPUText": return "Schede grafiche";
                 case "PerformanceText": return "Medie prestazioni";
                 case "FPSText": return "Fotogrammi / secondo";
