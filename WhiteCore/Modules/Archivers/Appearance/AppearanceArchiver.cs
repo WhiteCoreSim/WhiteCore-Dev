@@ -739,10 +739,11 @@ namespace WhiteCore.Modules.Archivers
             if (avatarConfig != null) {
                 m_storeDirectory =
                     PathHelpers.ComputeFullPath (avatarConfig.GetString ("AvatarArchiveDirectory", m_storeDirectory));
-                if (m_storeDirectory == "") {
-                    var defpath = registry.RequestModuleInterface<ISimulationBase> ().DefaultDataPath;
-                    m_storeDirectory = Path.Combine (defpath, Constants.DEFAULT_AVATARARCHIVE_DIR);
-                }
+            }
+
+            if (m_storeDirectory == "") {
+                var defpath = registry.RequestModuleInterface<ISimulationBase> ().DefaultDataPath;
+                m_storeDirectory = Path.Combine (defpath, Constants.DEFAULT_AVATARARCHIVE_DIR);
             }
 
             bool isLocal = true;
