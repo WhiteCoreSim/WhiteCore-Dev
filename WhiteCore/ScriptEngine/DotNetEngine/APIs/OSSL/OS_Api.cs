@@ -3290,7 +3290,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcCreate", m_host, "OSSL", m_itemID)) 
                 return "";
 
-            return NpcCreate(firstname, lastname, position, notecard, false, false);
+            return NpcCreate(firstname, lastname, position, notecard, true, false);
         }
 
         public LSL_Key osNpcCreate(string firstname, string lastname, LSL_Types.Vector3 position, string notecard, int options)
