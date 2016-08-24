@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Contributors, http://whitecore-sim.org
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
@@ -69,13 +69,13 @@ namespace WhiteCore.Modules.Web.Translators
             {"CategoryText", "Kategorie"},
             {"SummaryText", "Zusammenfassung"},
             { "MaturityText", "Maturity"},
-            { "DateText", "Date"},
-            { "TimeText", "Time"},
+            { "DateText", "Datum"},
+            { "TimeText", "Zeit"},
             { "MinuteText", "minute"},
-            { "MinutesText", "minutes"},
-            { "HourText", "hour"},
-            { "HoursText", "hours"},
-            { "EdittingText", "Editing"},
+            { "MinutesText", "minuten"},
+            { "HourText", "stunde"},
+            { "HoursText", "stunden"},
+            { "EdittingText", "Bearbeiten"},
 
             // Status information
             {"GridStatus", "Grid Status"},
@@ -88,7 +88,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "InterWorld", "Inter World (IWC)"},
             {"HyperGrid", "HyperGrid (HG)"},
             {"Voice", "Stimme"},
-            {"Currency", "Devisen"},
+            {"Currency", "Geld"},
             {"Disabled", "Deaktiviert"},
             {"Enabled", "Aktiviert"},
             {"News", "Nachrichten"},
@@ -98,11 +98,11 @@ namespace WhiteCore.Modules.Web.Translators
             {"Login", "Einloggen"},
             {"UserName", "Nutzername"},
             {"UserNameText", "Nutzername"},
-            {"Password", "Password"},
-            {"PasswordText", "Password"},
-            {"PasswordConfirmation", "Password Confirmation"},
+            {"Password", "Passwort"},
+            {"PasswordText", "Passwort"},
+            {"PasswordConfirmation", "Passwort Bestätigung"},
             {"ForgotPassword", "Passwort vergessen?"},
-            { "TypeUserNameToConfirm", "Please type the username of this account to confirm you want to delete this account"},
+            { "TypeUserNameToConfirm", "Bitte schreibe den Namen des Benutzers wenn du ihn wirklich löschen willst"},
 
             // Special windows
             {"SpecialWindowTitleText", "Spezieller Title des Info Fensters"},
@@ -206,12 +206,12 @@ namespace WhiteCore.Modules.Web.Translators
             { "Aquatic", "Aquatic"},
             { "Custom", "Custom"},
             { "RegionPortText", "Region Port"},
-            { "RegionVisibilityText", "Visible to neighbours"},
-            { "RegionInfiniteText", "Infinite Region"},
-            { "RegionCapacityText", "Region object capacity"},
+            { "RegionVisibilityText", "Sichtbar zu Nachbarn"},
+            { "RegionInfiniteText", "Unendliche Region"},
+            { "RegionCapacityText", "Region Prims"},
 
             // Menus
-            {"MenuHome", "Home"},
+            {"MenuHome", "Startseite"},
             {"MenuLogin", "Login"},
             {"MenuLogout", "Logout"},
             {"MenuRegister", "Registrieren"},
@@ -226,9 +226,9 @@ namespace WhiteCore.Modules.Web.Translators
             {"MenuRegionSearch", "Regionssuche"},
             {"MenuChat", "Chat"},
             {"MenuHelp", "Hilfe"},
-            { "MenuViewerHelp", "Viewer Help"},
+            { "MenuViewerHelp", "Viewer Hilfe"},
             {"MenuChangeUserInformation", "Ändere Benutzer Informationen"},
-            {"MenuWelcomeScreenManager", "Willkommen Screen Manager"},
+            {"MenuWelcomeScreenManager", "Willkommens Bildschirm Manager"},
             {"MenuNewsManager", "Nachrichten Manager"},
             {"MenuUserManager", "Benutzer Manager"},
             {"MenuFactoryReset", "Zurücksetzen"},
@@ -252,7 +252,7 @@ namespace WhiteCore.Modules.Web.Translators
             {"MenuGridSettings", "Grid-Einstellungen"},
 
             // Menu Tooltips
-            {"TooltipsMenuHome", "Home"},
+            {"TooltipsMenuHome", "Startseite"},
             {"TooltipsMenuLogin", "Login"},
             {"TooltipsMenuLogout", "Logout"},
             {"TooltipsMenuRegister", "Register"},
@@ -288,7 +288,7 @@ namespace WhiteCore.Modules.Web.Translators
             // Menu Region box
             {"MenuRegionTitle", "Regionen"},
             {"MenuParcelTitle", "Parzelle"},
-            {"MenuOwnerTitle", "Owner"},
+            {"MenuOwnerTitle", "Besitzer"},
             {"TooltipsMenuRegion", "Regions Liste"},
             {"TooltipsMenuParcel", "Region Pakete"},
             {"TooltipsMenuOwner", "Immobilienbesitzer"},
@@ -307,15 +307,15 @@ namespace WhiteCore.Modules.Web.Translators
             {"PickRegionText", "Lage"},
 
             // Urls
-            {"WelcomeScreen", "Willkommen Screen"},
+            {"WelcomeScreen", "Start Bildschirm"},
 
             // Tooltips Urls
             {"TooltipsWelcomeScreen", "Willkommen Screen"},
             {"TooltipsWorldMap", "Weltkarte"},
 
             // Index
-            {"HomeText", "Home"},
-            {"HomeTextWelcome", "Hier ist unsere neue virtuelle Welt! besuche uns jetzt und erkenne den Unterschied!"},
+            {"HomeText", "Startseite"},
+            {"HomeTextWelcome", "Dies ist unsere neue virtuelle Welt! besuche uns jetzt und erkenne den Unterschied!"},
             {"HomeTextTips", "Neue Präsentationen"},
             {"WelcomeToText", "Willkommen bei"},
 
@@ -360,7 +360,7 @@ namespace WhiteCore.Modules.Web.Translators
             // Http 505
             {"Error505Text", "Error code"},
             {"Error505InfoText", "505 interner Server Fehler"},
-            {"HomePage505Text", "home seite"},
+            {"HomePage505Text", "Startseite"},
 
             // User search
             {"Search", "Suche"},
@@ -395,7 +395,7 @@ namespace WhiteCore.Modules.Web.Translators
             {"KickMessageText", "Message an Benutzer"},
             {"KickUserText", "Kick Benutzer"},
             { "MessageAUserText", "Send User A Message"},
-            { "MessageAUserInfoText", "Sends a user a blue-box message (will arrive within 30 seconds)"},
+            { "MessageAUserInfoText", "Sendet eine Blaue Box an einen Benutzer (erscheint innerhalb 30 Sekunden)"},
             { "MessageUserText", "Message User"},
 
             // Transactions
@@ -404,12 +404,12 @@ namespace WhiteCore.Modules.Web.Translators
             {"DateStartText", "Beginn Datum"},
             {"DateEndText", "Ende"},
             {"30daysPastText", "Letzten 30 Tagen"},
-            { "TransactionToAgentText", "To User"},
-            { "TransactionFromAgentText", "From User"},
-            {"TransactionDateText", "Date"},
-            {"TransactionDetailText", "Description"},
-            {"TransactionAmountText", "Amount"},
-            {"TransactionBalanceText", "Balance"},
+            { "TransactionToAgentText", "Zu Benutzer"},
+            { "TransactionFromAgentText", "Von Benutzer"},
+            {"TransactionDateText", "Datum"},
+            {"TransactionDetailText", "Beschreibung"},
+            {"TransactionAmountText", "Menge"},
+            {"TransactionBalanceText", "Guthaben"},
             {"NoTransactionsText", "Keine Transaktionen gefunden..."},
             {"PurchasesText", "Einkäufe"},
             {"LoggedIPText", "Gespeichert IP-Adresse"},
@@ -419,58 +419,58 @@ namespace WhiteCore.Modules.Web.Translators
             // Classifieds
             {"ClassifiedsText", "Rubriksanzeige"},
             { "ClassifiedText", "Classified"},
-            { "ListedByText", " Listed by"},
-            { "CreationDateText", "Creation date"},
-            { "ExpirationDateText", "Expiration date" },
-            { "DescriptionText", "Description" },
-            { "PriceOfListingText", "Price"},
+            { "ListedByText", " Eingetragen von"},
+            { "CreationDateText", "Erstellungsdatun"},
+            { "ExpirationDateText", "Läuft aus am" },
+            { "DescriptionText", "Beschreibung" },
+            { "PriceOfListingText", "Kosten"},
 
             // Classified categories
             { "CatAll", "All"},
             { "CatSelect", ""},
             { "CatShopping", "Shopping"},
-            { "CatLandRental", "Land Rental"},
-            { "CatPropertyRental", "Property Rental"},
-            { "CatSpecialAttraction", "Special Attraction"},
-            { "CatNewProducts", "New Products"},
-            { "CatEmployment", "Employment"},
-            { "CatWanted", "Wanted"},
+            { "CatLandRental", "Land Miete"},
+            { "CatPropertyRental", "Eiugentums Miete"},
+            { "CatSpecialAttraction", "Besondere Attraktion"},
+            { "CatNewProducts", "Neue Produkte"},
+            { "CatEmployment", "Beschäftigung"},
+            { "CatWanted", "Gesucht"},
             { "CatService", "Service"},
-            { "CatPersonal", "Personal"},
+            { "CatPersonal", "Persönlich"},
            
             // Events
             { "EventsText", "Events"},
             { "EventNameText", "Event"},
-            { "EventLocationText", "Where"},
-            { "HostedByText","Hosted by"},
-            { "EventDateText", "When"},
-            { "EventTimeInfoText", "Event time should be local time (Server)"},
-            { "CoverChargeText", "Cover charge"},
-            { "DurationText", "Duration"},
-            { "AddEventText", "Add event"},
+            { "EventLocationText", "Wo"},
+            { "HostedByText","Angeboten von"},
+            { "EventDateText", "Wann"},
+            { "EventTimeInfoText", "Event sollte mit Server Zeit übereinstimmen"},
+            { "CoverChargeText", "Eintrittsgebühr"},
+            { "DurationText", "Dauer"},
+            { "AddEventText", "Event Hinzufügen"},
 
             // Event categories
-            { "CatDiscussion", "Discussion"},
-            { "CatSports", "Sports"},
-            { "CatLiveMusic", "Live Music"},
-            { "CatCommercial", "Commercial"},
+            { "CatDiscussion", "Gespräche"},
+            { "CatSports", "Sport"},
+            { "CatLiveMusic", "Live Musik"},
+            { "CatCommercial", "Geschäfftlich"},
             { "CatEntertainment", "Nightlife/Entertainment"},
-            { "CatGames", "Games/Contests"},
-            { "CatPageants", "Pageants"},
-            { "CatEducation", "Education"},
-            { "CatArtsCulture", "Arts/Culture"},
-            { "CatCharitySupport", "Charity/Support Group"},
-            { "CatMiscellaneous", "Miscellaneous"},
+            { "CatGames", "Spiele/Wettbewerbe"},
+            { "CatPageants", "Prunk"},
+            { "CatEducation", "Ausbildung"},
+            { "CatArtsCulture", "Kunst/Kultue"},
+            { "CatCharitySupport", "Wohltätigkeit/Unterstützungs Gruppe"},
+            { "CatMiscellaneous", "Verschiedenes"},
 
             // Event lookup periods
-            { "Next24Hours", "Next 24 hours"},
-            { "Next10Hours", "Next 10 hours"},
-            { "Next4Hours", "Next 4 hours"},
-            { "Next2Hours", "Next 2 hours"},
+            { "Next24Hours", "Nächsten 24 Stunden"},
+            { "Next10Hours", "Nächsten 12 Stunden"},
+            { "Next4Hours", "N#chsten 4 Stunden"},
+            { "Next2Hours", "Nächsten 2 Stunden"},
 
             // Sim Console
-            {"SimConsoleText", "Sim Command Console"},
-            {"SimCommandText", "Command"},
+            {"SimConsoleText", "Sim Befehls Konsole"},
+            {"SimCommandText", "Befehl"},
 
             // Statistics
             {"StatisticsText", "Viewer-Statistiken"},
@@ -520,7 +520,7 @@ namespace WhiteCore.Modules.Web.Translators
             {"RequiresAdminLevelText", "Benötigt Adminrechte für Anzeige"},
 
             // Grid settings
-            {"GridSettingsManager", "Grid Settings Manager"},
+            {"GridSettingsManager", "Grid Einstellungs Manager"},
             {"GridnameText", "Grid Namen "},
             {"GridnickText", "Grid Spitznamen "},
             {"WelcomeMessageText", "Login Willkommen Nachrichten "},
@@ -607,8 +607,8 @@ namespace WhiteCore.Modules.Web.Translators
             // Maintenance
             {"NoAccountFound", "Kein Konto gefunden"},
             {"DisplayInMenu", "Anzeige im Menü"},
-            {"ParentText", "Menü Mutter"},
-            {"CannotSetParentToChild", "Kann nicht Menüpunkt als Kind selbst festgelegt."},
+            {"ParentText", "Hauptmenü"},
+            {"CannotSetParentToChild", "Knn Menüpunkt nicht als child festlegen."},
             {"TopLevel", "Erste Ebene"},
 
             // Style Switcher
