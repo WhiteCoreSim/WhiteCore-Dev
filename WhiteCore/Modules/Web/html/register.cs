@@ -161,7 +161,7 @@ namespace WhiteCore.Modules.Web
                 UserDOBMonth = ShortMonthToNumber(UserDOBMonth);
 
                 // revise Type flags
-                int UserFlags = webInterface.UserTypeToUserFlags (UserType);
+                int UserFlags = WebHelpers.UserTypeToUserFlags (UserType);
 
                 // a bit of idiot proofing
                 if (AvatarName == "")  {
@@ -249,7 +249,7 @@ namespace WhiteCore.Modules.Web
                                 if (snapshotUUID != UUID.Zero)
                                     profile.Image = snapshotUUID;
                             }
-                            profile.MembershipGroup = webInterface.UserFlagToType (UserFlags, webInterface.EnglishTranslator);    // membership is english
+                            profile.MembershipGroup = WebHelpers.UserFlagToType (UserFlags, webInterface.EnglishTranslator);    // membership is english
                             profile.IsNewUser = true;
                             profileData.UpdateUserProfile (profile);
                         }
@@ -281,31 +281,12 @@ namespace WhiteCore.Modules.Web
             for (int i = 1; i <= 31; i++)
                 daysArgs.Add(new Dictionary<string, object> {{"Value", i}});
 
-            List<Dictionary<string, object>> monthsArgs = new List<Dictionary<string, object>>();
-            //for (int i = 1; i <= 12; i++)
-            //    monthsArgs.Add(new Dictionary<string, object> {{"Value", i}});
-
-            monthsArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Jan_Short")}});
-            monthsArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Feb_Short")}});
-            monthsArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Mar_Short")}});
-            monthsArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Apr_Short")}});
-            monthsArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("May_Short")}});
-            monthsArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Jun_Short")}});
-            monthsArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Jul_Short")}});
-            monthsArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Aug_Short")}});
-            monthsArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Sep_Short")}});
-            monthsArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Oct_Short")}});
-            monthsArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Nov_Short")}});
-            monthsArgs.Add(new Dictionary<string, object> {{"Value", translator.GetTranslatedString("Dec_Short")}});
-
-
-
             List<Dictionary<string, object>> yearsArgs = new List<Dictionary<string, object>>();
             for (int i = 1950; i <= 2013; i++)
                 yearsArgs.Add(new Dictionary<string, object> {{"Value", i}});
 
             vars.Add("Days", daysArgs);
-            vars.Add("Months", monthsArgs);
+            vars.Add ("Months", WebHelpers.ShortMonthSelections (translator)); //.monthsArgs);
             vars.Add("Years", yearsArgs);
 
             var sortBy = new Dictionary<string, bool>();
@@ -331,7 +312,7 @@ namespace WhiteCore.Modules.Web
 
 
             vars.Add("UserTypeText", translator.GetTranslatedString("UserTypeText"));
-            vars.Add("UserType", webInterface.UserTypeArgs(translator)) ;
+            vars.Add("UserType", WebHelpers.UserTypeArgs(translator)) ;
 
             var avArchiver = webInterface.Registry.RequestModuleInterface<IAvatarAppearanceArchiver> ();
             var archives = avArchiver.GetAvatarArchives ();

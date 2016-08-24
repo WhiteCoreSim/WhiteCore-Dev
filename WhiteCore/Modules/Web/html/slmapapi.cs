@@ -33,36 +33,31 @@ namespace WhiteCore.Modules.Web
 {
     public class SLMapAPIPage : IWebInterfacePage
     {
-        public string[] FilePath
-        {
-            get
-            {
-                return new[]
+        public string [] FilePath {
+            get {
+                return new []
                            {
                                "html/map/slmapapi.js"
                            };
             }
         }
 
-        public bool RequiresAuthentication
-        {
+        public bool RequiresAuthentication {
             get { return false; }
         }
 
-        public bool RequiresAdminAuthentication
-        {
+        public bool RequiresAdminAuthentication {
             get { return false; }
         }
 
-        public Dictionary<string, object> Fill(WebInterface webInterface, string filename, OSHttpRequest httpRequest,
+        public Dictionary<string, object> Fill (WebInterface webInterface, string filename, OSHttpRequest httpRequest,
                                                OSHttpResponse httpResponse, Dictionary<string, object> requestParameters,
                                                ITranslator translator, out string response)
         {
             response = null;
-            var vars = new Dictionary<string, object>();
-            var mapService = webInterface.Registry.RequestModuleInterface<IMapService>();
-            if (mapService != null)
-            {
+            var vars = new Dictionary<string, object> ();
+            var mapService = webInterface.Registry.RequestModuleInterface<IMapService> ();
+            if (mapService != null) {
                 string mapUrl = mapService.MapServiceURL;
                 string mapAPIUrl = mapService.MapServiceAPIURL;
 
@@ -74,7 +69,7 @@ namespace WhiteCore.Modules.Web
             return vars;
         }
 
-        public bool AttemptFindPage(string filename, ref OSHttpResponse httpResponse, out string text)
+        public bool AttemptFindPage (string filename, ref OSHttpResponse httpResponse, out string text)
         {
             text = "";
             return false;

@@ -1,0 +1,89 @@
+<!-- Events -->
+<!-- <link href="css/datatables.min.css" rel="stylesheet" type="text/css"> -->
+
+<div id="fullPage">
+  <h2>{SystemName}: {EventsText}</h2>
+  {IsAuthenticatedBegin}
+    <button id="add_event" onClick="window.location.href='index.html?page=add_event';" id="add_event"><p>{AddEventText}</p></button>
+  {IsAuthenticatedEnd}
+  <form id="events_search_form" action="events/events.html" method="post">
+  	<div class="form-fieldset-range">
+      <select id="events-category" name="category"  style="width:120px;">
+        {CategoryTypeArrayBegin}
+          <option value="{Index}" {selected}>{Value}</option>
+        {CategoryTypeArrayEnd}
+      </select>
+
+      <select id="events-timeframe" name="timeframe"  style="width:120px;">
+        {TimeFrameArrayBegin}
+          <option value="{Index}" {selected}>{Value}</option>
+        {TimeFrameArrayEnd}
+      </select>
+
+      <input style="width:20px;" type="checkbox" id="display_pg" name="display_pg" value="on" {PG_checked}>
+      <label for="display_pg" class="for-check"><img src="/icons/general.png" alt="PG ratings" style="margin-bottom:3px;">&nbsp;&nbsp;General</label>
+      <input style="width:20px;" type="checkbox" id="display_ma" name="display_ma" value="on" {MA_checked}>
+      <label for="display_ma" class="for-check"><img src="/icons/moderate.png" alt="MA ratings" style="margin-bottom:3px;">&nbsp;&nbsp;Mature</label>
+      <input style="width:20px;" type="checkbox" id="display_ao" name="display_ao" value="on" {AO_checked}>
+      <label for="display_ao" class="for-check"><img src="/icons/adult.png" alt="AO ratings" style="margin-bottom:3px;">&nbsp;&nbsp;Adult</label>
+
+      <input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
+      <button class="button" style="float:right;width:200;" id="Submit" type="Submit" name="Submit">Search and View</button>
+
+  	</div>
+  </form>
+
+  <table id="events_list">
+	  <thead class="listhead">
+   		<tr>
+   		  <th class="text-left"><p>{EventDateText}</p></th>
+   		  <th class="text-left"><p>{EventNameText}</p></th>
+   		  <th class="text-left"><p>{DescriptionText}</p></th>
+        <th class="text-left"><p>{CategoryText}</p></th>
+   		  <th class="text-centered"><p>{MaturityText}</p></th>
+        <th class="text-left"><p>{DurationText}</p></th>
+        <th class="text-left"><p>{CoverChargeText}</p></th>
+   		</tr>
+ 	  </thead>
+
+    <tbody>
+  	  {EventListArrayBegin}
+      <tr>
+        <td class="text-left"><p>{EventDateUTC}</p></td>
+        <td class="text-left"><p>{Name}</p></td>
+        <td class="text-left"><p>{Description}</p></td>
+        <td class="text-left"><p>{Category}</p></td>
+        <td class="text-centered"><p>{Maturity}</p></td>
+        <td class="text-left"><p>{Duration}</p></td>
+        <td class="text-left"><p>{CoverCharge}</p></td>
+      </tr>
+  	  {EventListArrayEnd}
+    </tbody>
+  </table>
+</div>
+
+<!--<script type="text/javascript" src="js/datatables.min.js"></script> -->
+
+<script>
+  $(document).ready(function() {
+    $('#events_list').dataTable({
+      "order": [[ 0, "asc" ]]
+    });
+  });
+
+
+  /* attach a submit handler to the form */
+  $("#events_search_form").submit(function(event) {
+
+    /* stop form from submitting normally */
+    event.preventDefault();
+    /* get some values from elements on the page: */
+    var $form = $( this ),
+        url = $form.attr( 'action' );
+    /* Send the data using post and put the results in a div */
+    $.post( url, $form.serialize(), function( data ) {
+      $("#fullPage").empty().append(data);
+    });
+  });
+</script>
+

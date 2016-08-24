@@ -228,9 +228,9 @@ namespace WhiteCore.Framework.DatabaseInterfaces
         /// Gets all events.
         /// </summary>
         /// <returns>The all events.</returns>
-        /// <param name="dayQuery">Day query. 'u' for today or date</param>
+        /// <param name="queryHours">Next nn hours.</param>
         /// <param name="eventFlags">Event flags.</param>
-        List<EventData> GetAllEvents (string dayQuery, uint eventFlags);
+        List<EventData> GetAllEvents (int queryHours, int categoriy, int maturityLevel);
 
         /// <summary>
         ///     Retrieves all events in the given region by their maturity level

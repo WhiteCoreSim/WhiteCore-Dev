@@ -37,51 +37,46 @@ namespace WhiteCore.Modules.Web
 {
     public class UserPurchasesPage : IWebInterfacePage
     {
-        public string[] FilePath
-        {
-            get
-            {
-                return new[]
+        public string [] FilePath {
+            get {
+                return new []
                            {
                                "html/user_purchases.html"
                            };
             }
         }
 
-        public bool RequiresAuthentication
-        {
+        public bool RequiresAuthentication {
             get { return true; }
         }
 
-        public bool RequiresAdminAuthentication
-        {
+        public bool RequiresAdminAuthentication {
             get { return false; }
         }
 
-        public Dictionary<string, object> Fill(WebInterface webInterface, string filename, OSHttpRequest httpRequest,
+        public Dictionary<string, object> Fill (WebInterface webInterface, string filename, OSHttpRequest httpRequest,
                                                 OSHttpResponse httpResponse, Dictionary<string, object> requestParameters,
                                                 ITranslator translator, out string response)
         {
             response = null;
-            IConfig gridInfo = webInterface.Registry.RequestModuleInterface<ISimulationBase>().ConfigSource.Configs ["GridInfoService"];
-            var inWorldCurrency = gridInfo.GetString("CurrencySymbol", string.Empty) + " ";
-            var realCurrency = gridInfo.GetString("RealCurrencySymbol", string.Empty) + " ";
+            IConfig gridInfo = webInterface.Registry.RequestModuleInterface<ISimulationBase> ().ConfigSource.Configs ["GridInfoService"];
+            var inWorldCurrency = gridInfo.GetString ("CurrencySymbol", string.Empty) + " ";
+            var realCurrency = gridInfo.GetString ("RealCurrencySymbol", string.Empty) + " ";
 
-            var vars = new Dictionary<string, object>();
-            var purchasesList = new List<Dictionary<string, object>>();
+            var vars = new Dictionary<string, object> ();
+            var purchasesList = new List<Dictionary<string, object>> ();
 
             var today = DateTime.Now;
             var thirtyDays = today.AddDays (-7);
-            string dateStart = thirtyDays.ToShortDateString();
-            string dateEnd = today.ToShortDateString();
- 
+            string dateStart = thirtyDays.ToShortDateString ();
+            string dateEnd = today.ToShortDateString ();
 
-            IMoneyModule moneyModule = webInterface.Registry.RequestModuleInterface<IMoneyModule>();
+
+            IMoneyModule moneyModule = webInterface.Registry.RequestModuleInterface<IMoneyModule> ();
             string noDetails = translator.GetTranslatedString ("NoPurchasesText");
 
             // Check if we're looking at the standard page or the submitted one
-            if (requestParameters.ContainsKey ("Submit"))
-            {
+            if (requestParameters.ContainsKey ("Submit")) {
                 if (requestParameters.ContainsKey ("date_start"))
                     dateStart = requestParameters ["date_start"].ToString ();
                 if (requestParameters.ContainsKey ("date_end"))
@@ -89,7 +84,7 @@ namespace WhiteCore.Modules.Web
 
             }
 
-            UserAccount user = Authenticator.GetAuthentication(httpRequest);
+            UserAccount user = Authenticator.GetAuthentication (httpRequest);
 
             // Purchases Logs
             var timeNow = DateTime.Now.ToString ("HH:mm:ss");
@@ -102,12 +97,10 @@ namespace WhiteCore.Modules.Web
                 purchases = moneyModule.GetPurchaseHistory (user.PrincipalID, dateFrom, dateTo, null, null);
 
             // data
-            if (purchases.Count > 0)
-            {
+            if (purchases.Count > 0) {
                 noDetails = "";
 
-                foreach (var purchase in purchases)
-                {
+                foreach (var purchase in purchases) {
                     purchasesList.Add (new Dictionary<string, object> {
                         { "ID", purchase.ID },
                         { "AgentID", purchase.AgentID },
@@ -123,10 +116,9 @@ namespace WhiteCore.Modules.Web
                 }
             }
 
-            if (purchasesList.Count == 0)
-            {
- 
-                purchasesList.Add(new Dictionary<string, object> {
+            if (purchasesList.Count == 0) {
+
+                purchasesList.Add (new Dictionary<string, object> {
                     {"ID", ""},
                     {"AgentID", ""},
                     {"AgentName", ""},
@@ -141,38 +133,32 @@ namespace WhiteCore.Modules.Web
             }
 
             // always required data
-            vars.Add("DateStart", dateStart );
-            vars.Add ("DateEnd", dateEnd );
-            vars.Add ("Period",  period.TotalDays + " " + translator.GetTranslatedString("DaysText"));
-            vars.Add ("PurchasesList",purchasesList);
+            vars.Add ("DateStart", dateStart);
+            vars.Add ("DateEnd", dateEnd);
+            vars.Add ("Period", period.TotalDays + " " + translator.GetTranslatedString ("DaysText"));
+            vars.Add ("PurchasesList", purchasesList);
             vars.Add ("NoPurchasesText", noDetails);
 
             // labels
-            vars.Add("PurchasesText", translator.GetTranslatedString("PurchasesText"));
-            vars.Add("DateInfoText", translator.GetTranslatedString("DateInfoText"));
-            vars.Add("DateStartText", translator.GetTranslatedString("DateStartText"));
-            vars.Add("DateEndText", translator.GetTranslatedString("DateEndText"));
-            vars.Add("SearchUserText", translator.GetTranslatedString("AvatarNameText"));
+            vars.Add ("PurchasesText", translator.GetTranslatedString ("PurchasesText"));
+            vars.Add ("DateInfoText", translator.GetTranslatedString ("DateInfoText"));
+            vars.Add ("DateStartText", translator.GetTranslatedString ("DateStartText"));
+            vars.Add ("DateEndText", translator.GetTranslatedString ("DateEndText"));
+            vars.Add ("SearchUserText", translator.GetTranslatedString ("AvatarNameText"));
 
-            vars.Add("PurchaseAgentText", translator.GetTranslatedString("TransactionToAgentText"));
-            vars.Add("PurchaseDateText", translator.GetTranslatedString("TransactionDateText"));
-            vars.Add("PurchaseUpdateDateText", translator.GetTranslatedString("TransactionDateText"));
+            vars.Add ("PurchaseAgentText", translator.GetTranslatedString ("TransactionToAgentText"));
+            vars.Add ("PurchaseDateText", translator.GetTranslatedString ("TransactionDateText"));
+            vars.Add ("PurchaseUpdateDateText", translator.GetTranslatedString ("TransactionDateText"));
             //vars.Add("PurchaseTimeText", translator.GetTranslatedString("Time"));
-            vars.Add("PurchaseDetailText", translator.GetTranslatedString("TransactionDetailText"));
-            vars.Add("LoggedIPText", translator.GetTranslatedString("LoggedIPText"));
-            vars.Add("PurchaseAmountText", inWorldCurrency + translator.GetTranslatedString("TransactionAmountText"));
-            vars.Add("PurchaseRealAmountText", realCurrency + translator.GetTranslatedString("PurchaseCostText"));
- 
-            vars.Add("FirstText", translator.GetTranslatedString("FirstText"));
-            vars.Add("BackText", translator.GetTranslatedString("BackText"));
-            vars.Add("NextText", translator.GetTranslatedString("NextText"));
-            vars.Add("LastText", translator.GetTranslatedString("LastText"));
-            vars.Add("CurrentPageText", translator.GetTranslatedString("CurrentPageText"));
-                    
+            vars.Add ("PurchaseDetailText", translator.GetTranslatedString ("TransactionDetailText"));
+            vars.Add ("LoggedIPText", translator.GetTranslatedString ("LoggedIPText"));
+            vars.Add ("PurchaseAmountText", inWorldCurrency + translator.GetTranslatedString ("TransactionAmountText"));
+            vars.Add ("PurchaseRealAmountText", realCurrency + translator.GetTranslatedString ("PurchaseCostText"));
+
             return vars;
         }
 
-        public bool AttemptFindPage(string filename, ref OSHttpResponse httpResponse, out string text)
+        public bool AttemptFindPage (string filename, ref OSHttpResponse httpResponse, out string text)
         {
             text = "";
             return false;

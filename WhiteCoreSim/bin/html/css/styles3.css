@@ -76,6 +76,10 @@ caption{caption-side:bottom; font-weight:normal; font-style:normal; margin:4px; 
 table {border-collapse: collapse; width: 100%;}
 th, td{font-weight:normal;}
 
+.text-left {text-align: left;}
+.text-right {text-align: right;}
+.text-centered {text-align: center;}
+
 /* news_list */
 table#news_list_navigation_top, table#news_list_navigation_bottom {width: 30%; margin-top: 2px;}
 table#news_list_navigation_top th, table#news_list_navigation_bottom th {text-align: center;}
@@ -1255,7 +1259,7 @@ img#mainImage {
 iframe.regionbox {width: 350px; height: 245px;}
 iframe.infobox {width: 350px; height: 105px;}
 iframe.news {width: 350px; height: 105px;}
-iframe.gridstatus {width: 350px; height: 205px;}
+iframe.gridstatus {width: 350px; height: 155px;}
 
 iframe.regionbox, iframe.infobox, iframe.news, iframe.gridstatus {
 background: transparent;

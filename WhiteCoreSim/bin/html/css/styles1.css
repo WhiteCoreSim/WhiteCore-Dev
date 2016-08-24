@@ -80,6 +80,10 @@ caption{caption-side:bottom; font-weight:normal; font-style:normal; margin:4px; 
 table {border-collapse: collapse; width: 100%;}
 th, td{font-weight:normal;}
 
+.text-left {text-align: left;}
+.text-right {text-align: right;}
+.text-centered {text-align: center;}
+
 /* news_list */
 table#news_list_navigation_top, table#news_list_navigation_bottom {width: 30%; margin-top: 2px;}
 table#news_list_navigation_top th, table#news_list_navigation_bottom th {text-align: center;}
@@ -805,11 +809,12 @@ label {display:inline-block;}
 }
 
 #top #menu li ul {
-    width: 220px;
+  width: 220px;
 	margin-top:3px;
 	padding-left:5px;
-	background-color: #406580;
-	z-index: 100;
+	/*background-color: #406580;*/
+  background-color: rgba(7,21,31,0.5);
+ 	z-index: 100;
 	border: 1px solid #292c37;
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
@@ -1129,7 +1134,8 @@ img.firestormimage, img.singularityimage {
 
 /* footer */
 #footer {
-	background: #1c557f;
+	background: #07151f;
+  opacity: 0.5;
 	margin-top: 5px;
 	padding: 10px;
 	color: #cacaca;
@@ -1147,8 +1153,19 @@ img.firestormimage, img.singularityimage {
 	behavior: url(../../css/pie.htc);
 }
 
-div.languageswitch {float:left; text-align: left;display: inline;}
-div.styleswitch {float:right; text-align: right;display: inline;}
+div.languageswitch {
+  color: #5D5D5D;
+  float:left;
+  text-align:
+  left;display:
+  inline;
+}
+div.styleswitch {
+  color: #5D5D5D;
+  float:right;
+  text-align:right;
+  display: inline;
+}
 
 /* Pretty Message */
 .message, .info, .alert, .error, .download {
@@ -1285,7 +1302,7 @@ img#mainImage {
 iframe.regionbox {width: 350px; height: 245px;}
 iframe.infobox {width: 350px; height: 105px;}
 iframe.news {width: 350px; height: 105px;}
-iframe.gridstatus {width: 350px; height: 205px;}
+iframe.gridstatus {width: 350px; height: 155px;}
 
 iframe.regionbox, iframe.infobox, iframe.news, iframe.gridstatus {
 background: transparent;

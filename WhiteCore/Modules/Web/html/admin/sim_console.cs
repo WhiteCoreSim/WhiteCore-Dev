@@ -38,7 +38,7 @@ namespace WhiteCore.Modules.Web
             {
                 return new[]
                            {
-                               "html/sim_console.html"
+                               "html/admin/sim_console.html"
                            };
             }
         }

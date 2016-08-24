@@ -330,9 +330,9 @@ namespace WhiteCore.Modules.Web
                    
                 vars.Add ("RegionSizeX", Constants.RegionSize);
                 vars.Add ("RegionSizeY", Constants.RegionSize);
-                vars.Add ("RegionType", webInterface.RegionTypeArgs(translator));
-                vars.Add ("RegionPresetType", webInterface.RegionPresetArgs(translator));
-                vars.Add ("RegionTerrain", webInterface.RegionTerrainArgs(translator));
+                vars.Add ("RegionType", WebHelpers.RegionTypeArgs(translator));
+                vars.Add ("RegionPresetType", WebHelpers.RegionPresetArgs(translator));
+                vars.Add ("RegionTerrain", WebHelpers.RegionTerrainArgs(translator));
               
             }
 

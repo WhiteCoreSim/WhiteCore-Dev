@@ -1554,6 +1554,26 @@ namespace WhiteCore.Framework.Utilities
             return retVal;
         }
 
+        public static int ConvertEventMaturityToDBMaturity (DirectoryManager.EventFlags maturity)
+        {
+            // filtering on pg == 0 is problematic
+            // convert to a bit checkable format
+            int retVal = 0;
+            switch ((int) maturity) {
+            case 0: //PG
+                retVal = 1;
+                break;
+            case 1: //Mature
+                retVal = 2;
+                break;
+            case 2: // Adult
+                retVal = 4;
+                break;
+            }
+
+            return retVal;
+        }
+
         /// <summary>
         ///     Produces an OSDMap from its string representation on a stream
         /// </summary>

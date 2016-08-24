@@ -25,9 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.Modules;
+using System;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Framework.ClientInterfaces
 {
@@ -49,48 +51,69 @@ namespace WhiteCore.Framework.ClientInterfaces
         public string name;
         public string simName;
 
-        public EventData()
+        public EventData ()
         {
         }
 
-        public override OSDMap ToOSD()
+        public override OSDMap ToOSD ()
         {
-            OSDMap map = new OSDMap();
-            map["eventID"] = eventID;
-            map["creator"] = creator;
-            map["name"] = name;
-            map["category"] = category;
-            map["description"] = description;
-            map["date"] = date;
-            map["dateUTC"] = dateUTC;
-            map["duration"] = duration;
-            map["cover"] = cover;
-            map["amount"] = amount;
-            map["simName"] = simName;
-            map["globalPos"] = globalPos;
-            map["regionPos"] = regionPos;
-            map["eventFlags"] = eventFlags;
-            map["maturity"] = maturity;
+            OSDMap map = new OSDMap ();
+            map ["eventID"] = eventID;
+            map ["creator"] = creator;
+            map ["name"] = name;
+            map ["category"] = category;
+            map ["description"] = description;
+            map ["date"] = date;
+            map ["dateUTC"] = dateUTC;
+            map ["duration"] = duration;
+            map ["cover"] = cover;
+            map ["amount"] = amount;
+            map ["simName"] = simName;
+            //map["globalPos"] = globalPos;
+            map ["GPosX"] = OSD.FromReal (globalPos.X).ToString ();
+            map ["GPosY"] = OSD.FromReal (globalPos.Y).ToString ();
+            map ["GPosZ"] = OSD.FromReal (globalPos.Z).ToString ();
+            //map["regionPos"] = regionPos;
+            map ["RPosX"] = OSD.FromReal (regionPos.X).ToString ();
+            map ["RPosY"] = OSD.FromReal (regionPos.Y).ToString ();
+            map ["RPosZ"] = OSD.FromReal (regionPos.Z).ToString ();
+            map ["eventFlags"] = eventFlags;
+            map ["maturity"] = maturity;
             return map;
         }
 
-        public override void FromOSD(OSDMap map)
+        public override void FromOSD (OSDMap map)
         {
-            eventID = map["eventID"];
-            creator = map["creator"];
-            name = map["name"];
-            category = map["category"];
-            description = map["description"];
-            date = map["date"];
-            dateUTC = map["dateUTC"];
-            duration = map["duration"];
-            cover = map["cover"];
-            amount = map["amount"];
-            simName = map["simName"];
-            globalPos = map["globalPos"];
-            regionPos = map["regionPos"];
-            eventFlags = map["eventFlags"];
-            maturity = map["maturity"];
+            eventID = map ["eventID"];
+            creator = map ["creator"];
+            name = map ["name"];
+            category = map ["category"];
+            description = map ["description"];
+            date = map ["date"];
+            dateUTC = map ["dateUTC"];
+            duration = map ["duration"];
+            cover = map ["cover"];
+            amount = map ["amount"];
+            simName = map ["simName"];
+            //globalPos = map ["globalPos"];    // Vector3 is broken for non US localess
+            if (map.ContainsKey ("globalPos")) {
+                globalPos = map ["globalPos"].AsVector3 ();
+            } else {
+                globalPos.X = (float)Convert.ToDecimal (map ["GPosX"].AsString (), Culture.NumberFormatInfo);
+                globalPos.Y = (float)Convert.ToDecimal (map ["GPosY"].AsString (), Culture.NumberFormatInfo);
+                globalPos.Z = (float)Convert.ToDecimal (map ["GPosZ"].AsString (), Culture.NumberFormatInfo);
+            }
+            //regionPos = map ["regionPos"];    // Vector3 is broken for non US locales:
+            if (map.ContainsKey ("regionPos")) {
+                regionPos = map ["regionPos"].AsVector3 ();
+            } else {
+                regionPos.X = (float)Convert.ToDecimal (map ["RPosX"].AsString (), Culture.NumberFormatInfo);
+                regionPos.Y = (float)Convert.ToDecimal (map ["RPosY"].AsString (), Culture.NumberFormatInfo);
+                regionPos.Z = (float)Convert.ToDecimal (map ["RPosZ"].AsString (), Culture.NumberFormatInfo);
+            }
+
+            eventFlags = map ["eventFlags"];
+            maturity = map ["maturity"];
         }
     }
 }

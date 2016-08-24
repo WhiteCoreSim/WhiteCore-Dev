@@ -40,10 +40,11 @@ namespace WhiteCore.Modules.Web.Translators
         {
             if (dictionary.ContainsKey (key))
                 return dictionary [key];
-            return "????";
+            return ":" + key + ":";
         }
 
         readonly Dictionary<string, string> dictionary = new Dictionary<string, string> {
+            // general
             { "No", "Нет"},
             { "Yes", "Да"},
             { "Submit", "Отправить"},
@@ -56,6 +57,8 @@ namespace WhiteCore.Modules.Web.Translators
             { "CurrentPageText", "Current Page"},
             { "MoreInfoText", "Больше информации"},
             { "NoDetailsText", "Никаких подробностей не найдено..."},
+            { "MoreInfo", "More Information"},
+            { "Name", "имя"},
             { "ObjectNameText", "Oбъект"},
             { "LocationText", "Регион"},
             { "UUIDText", "UUID"},
@@ -66,9 +69,17 @@ namespace WhiteCore.Modules.Web.Translators
             { "CheckedText", "Рассмотренные"},
             { "CategoryText", "Категория"},
             { "SummaryText", "Резюме"},
+            { "MaturityText", "Maturity"},
+            { "DateText", "Date"},
+            { "TimeText", "Time"},
+            { "MinuteText", "minute"},
+            { "MinutesText", "minutes"},
+            { "HourText", "hour"},
+            { "HoursText", "hours"},
+            { "EdittingText", "Editing"},
 
-			// Status information
-			{ "GridStatus", "Статус"},
+            // Status information
+            { "GridStatus", "Статус"},
             { "Online", "В 3D Мире"},
             { "Offline", "Нет в Сети"},
             { "TotalUserCount", "Пользователей"},
@@ -84,8 +95,8 @@ namespace WhiteCore.Modules.Web.Translators
             { "News", "Новости"},
             { "Region", "Регион"},
 
-			// User login
-			{ "Login", "Вход"},
+            // User login
+            { "Login", "Вход"},
             { "UserName", "Имя пользователя"},
             { "UserNameText", "Имя пользователя"},
             { "Password", "Пароль"},
@@ -94,16 +105,16 @@ namespace WhiteCore.Modules.Web.Translators
             { "ForgotPassword", "Забыли пароль?"},
             { "TypeUserNameToConfirm", "Пожалуйста, введите имя пользователя этой учетной записи, чтобы подтвердить, что вы хотите удалить эту учетную запись"},
 
-			// Special windows
-			{ "SpecialWindowTitleText", "Special Info Window Title"},
+            // Special windows
+            { "SpecialWindowTitleText", "Special Info Window Title"},
             { "SpecialWindowTextText", "Special Info Window Text"},
             { "SpecialWindowColorText", "Special Info Window Color"},
             { "SpecialWindowStatusText", "Special Info Window Status"},
             { "WelcomeScreenManagerFor", "Welcome Screen Manager For"},
             { "ChangesSavedSuccessfully", "Changes Saved Successfully"},
 
-			// User registration
-			{ "AvatarNameText", "Имя пользователя"},
+            // User registration
+            { "AvatarNameText", "Имя пользователя"},
             { "AvatarScopeText", "Avatar Scope ID"},
             { "FirstNameText", "Имя"},
             { "LastNameText", "Фамилия"},
@@ -123,8 +134,8 @@ namespace WhiteCore.Modules.Web.Translators
             { "AvatarEmailError", "Адрес электронной почты необходим для восстановления пароля!"},
             { "AvatarNameSpacingError", "Имя аватар должно быть \"Имя Фамилия\"!"},
 
-			// news
-			{ "OpenNewsManager", "Open the news manager"},
+            // News
+            { "OpenNewsManager", "Open the news manager"},
             { "NewsManager", "News Manager"},
             { "EditNewsItem", "Edit news item"},
             { "AddNewsItem", "Add new news item"},
@@ -137,8 +148,8 @@ namespace WhiteCore.Modules.Web.Translators
             { "DeleteNewsText", "Delete News"},
             { "EditNewsText", "Edit News"},
 
-			// User Profile
-			{ "UserProfileFor", "Профиль пользователя"},
+            // User Profile
+            { "UserProfileFor", "Профиль пользователя"},
             { "UsersGroupsText", "Мои группы"},
             { "GroupNameText", "Группы"},
             { "UsersPicksText", "Места"},
@@ -149,12 +160,13 @@ namespace WhiteCore.Modules.Web.Translators
             { "IsOnlineText", "Статус"},
             { "OnlineLocationText", "Локация"},
             { "Partner", "Нет партнёра"},
+            { "Friends", "Friends"},
             { "Nothing", "Нет информации"},
             { "ChangePass", "Ваш пароль изменен"},
             { "NoChangePass", "Не удалось изменить пароль, попробуйте еще раз позже"},
 
-			// Region Information
-			{ "RegionInformationText", "Информация об регионе"},
+            // Region Information
+            { "RegionInformationText", "Информация об регионе"},
             { "OwnerNameText", "Владелец"},
             { "RegionLocationText", "Координаты"},
             { "RegionSizeText", "Размер"},
@@ -167,8 +179,8 @@ namespace WhiteCore.Modules.Web.Translators
             { "ParcelNameText", "Parcel Name"},
             { "ParcelOwnerText", "Parcel Owner's Name"},
 
-			// Region List
-			{ "RegionInfoText", "Информация об регионе"},
+            // Region List
+            { "RegionInfoText", "Информация об регионе"},
             { "RegionListText", "Список регионов"},
             { "RegionLocXText", "Позиция X"},
             { "RegionLocYText", "Позиция Y"},
@@ -178,12 +190,13 @@ namespace WhiteCore.Modules.Web.Translators
             { "RegionMoreInfo", "Больще информации"},
             { "RegionMoreInfoTooltips", "Подробнее о"},
             { "OnlineUsersText", "Пользователи"},
+            { "OnlineFriendsText", "Online Friends"},
             { "RegionOnlineText", "Статус"},
             { "RegionMaturityText", "Открыть Рейтинг"},
             { "NumberOfUsersInRegionText", "Количество пользователей в регионе"},
 
-			// Region manager
-			{ "Mainland", "Материк"},
+            // Region manager
+            { "Mainland", "Материк"},
             { "Estate", "Имущество"},
             { "FullRegion", "Полный Регион"},
             { "Homestead", "Homestead"},
@@ -198,8 +211,8 @@ namespace WhiteCore.Modules.Web.Translators
             { "RegionInfiniteText", "Бесконечная область"},
             { "RegionCapacityText", "Region object capacity"},
 
-			// Main Menu Buttons
-			{ "MenuHome", "Домой"},
+            // Menus
+            { "MenuHome", "Домой"},
             { "MenuLogin", "Вход"},
             { "MenuLogout", "Выход"},
             { "MenuRegister", "Регистрация"},
@@ -232,11 +245,15 @@ namespace WhiteCore.Modules.Web.Translators
             { "MenuMyPurchases", "My Purchases"},
             { "MenuTransactions", "User Transactions"},
             { "MenuMyTransactions", "Трансакции"},
+            { "MenuClassifieds", "Classifieds"},
+            { "MenuMyClassifieds", "My Classifieds"},
+            { "MenuEvents", "Events"},
+            { "MenuMyEvents", "My Events"},
             { "MenuStatistics", "Клиенты"},
             { "MenuGridSettings", "Сервер"},
 
-			// Main Menu Tooltips
-			{ "TooltipsMenuHome", "Home"},
+            // Menu Tooltips
+            { "TooltipsMenuHome", "Home"},
             { "TooltipsMenuLogin", "Login"},
             { "TooltipsMenuLogout", "Logout"},
             { "TooltipsMenuRegister", "Register"},
@@ -264,19 +281,21 @@ namespace WhiteCore.Modules.Web.Translators
             { "TooltipsMenuManagerSimConsole", "Online simulator console"},
             { "TooltipsMenuPurchases", "Purchase information"},
             { "TooltipsMenuTransactions", "Transaction information"},
+            { "TooltipsMenuClassifieds", "Classifieds information"},
+            { "TooltipsMenuEvents", "Event information"},
             { "TooltipsMenuStatistics", "Viewer Statistics"},
             { "TooltipsMenuGridSettings", "Grid settings"},
 
-			// Menu Region box
-			{ "MenuRegionTitle", "Регион"},
+            // Menu Region box
+            { "MenuRegionTitle", "Регион"},
             { "MenuParcelTitle", "Parcels"},
             { "MenuOwnerTitle", "Владелец"},
             { "TooltipsMenuRegion", "Region Details"},
             { "TooltipsMenuParcel", "Region Parcels"},
             { "TooltipsMenuOwner", "Estate Owner"},
 
-			// Menu Profile Box
-			{ "MenuProfileTitle", "Profile"},
+            // Menu Profile box
+            { "MenuProfileTitle", "Profile"},
             { "MenuGroupTitle", "Groups"},
             { "MenuPicksTitle", "Picks"},
             { "MenuRegionsTitle", "Regions"},
@@ -288,50 +307,30 @@ namespace WhiteCore.Modules.Web.Translators
             { "PickNameText", "Pick name"},
             { "PickRegionText", "Location"},
 
-			// Urls
-			{ "WelcomeScreen", "Welcome Screen"},
+            // Urls
+            { "WelcomeScreen", "Welcome Screen"},
 
-			// Tooltips Urls
-			{ "TooltipsWelcomeScreen", "Welcome Screen"},
+            // Tooltips Urls
+            { "TooltipsWelcomeScreen", "Welcome Screen"},
             { "TooltipsWorldMap", "World Map"},
 
-			// Style Switcher
-			{ "styles1", "Default Minimalist"},
-            { "styles2", "Light Degarde"},
-            { "styles3", "Blue Night"},
-            { "styles4", "Dark Degrade"},
-            { "styles5", "Luminus"},
-
-            { "StyleSwitcherStylesText", "Styles"},
-            { "StyleSwitcherLanguagesText", "Languages"},
-            { "StyleSwitcherChoiceText", "Choice"},
-
-			// Language Switcher Tooltips
-            { "en", "English"},
-            { "de", "Deutsch"},
-            { "it", "Italiano"},
-            { "es", "Español"},
-            { "fr", "Français"},
-            { "nl", "Nederlands"},
-            { "ru", "Русский"},
-
-			// Index Page
-			{ "HomeText", "Главная"},
+            // Index
+            { "HomeText", "Главная"},
             { "HomeTextWelcome", "This is our New Virtual World! Join us now, and make a difference!"},
             { "HomeTextTips", "New presentations"},
             { "WelcomeToText", "Welcome to"},
 
-			// World Map Page
-			{ "WorldMap", "Карта мира"},
+            // World Map
+            { "WorldMap", "Карта мира"},
             { "WorldMapText", "На весь экран"},
 
-			// Chat Page
-			{ "ChatText", "Chat Support"},
+            // Chat Page
+            { "ChatText", "Chat Support"},
 
-			// Help Page
-			{ "HelpText", "Скачать"},
+            // Help Page
+            { "HelpText", "Скачать"},
             { "HelpViewersConfigText", "Viewer Configuration"},
-            { "AlchemyViewer", "Alchemy Viewer"},
+            /*{ "AlchemyViewer", "Alchemy Viewer"},
             { "AngstromViewer", "Angstrom Viewer"},
             { "AstraViewer", "Astra Viewer"},
             { "FirestormViewer", "Firestorm Viewer"},
@@ -340,14 +339,14 @@ namespace WhiteCore.Modules.Web.Translators
             { "PhoenixViewer", "Phoenix Viewer"},
             { "SingularityViewer", "Singularity Viewer"},
             { "VoodooViewer", "Voodoo Viewer"},
-            { "ZenViewer", "Zen Viewer"},
+            { "ZenViewer", "Zen Viewer"},*/
 
-			//Logout page
-			{ "Logout", "Выход"},
+            // Logout
+            { "Logout", "Выход"},
             { "LoggedOutSuccessfullyText", "Вы успешно вышли из системы."},
 
-			//Change user information page
-			{ "ChangeUserInformationText", "Настройки"},
+            // Change user information
+            { "ChangeUserInformationText", "Настройки"},
             { "ChangePasswordText", "Изменить пароль"},
             { "NewPasswordText", "Новый пароль"},
             { "NewPasswordConfirmationText", "Повторите пароль"},
@@ -360,34 +359,34 @@ namespace WhiteCore.Modules.Web.Translators
             { "EditText", "Редактировать"},
             { "EditUserAccountText", "Редактировать аккаунт пользователя"},
 
-			//Maintenance page
-			{ "WebsiteDownInfoText", "Сайт на данный момент не работает, пожалуйста, попробуйте еще раз в ближайшее время."},
+            // Maintenance
+            { "WebsiteDownInfoText", "Сайт на данный момент не работает, пожалуйста, попробуйте еще раз в ближайшее время."},
             { "WebsiteDownText", "Сайт отключен на технические работы"},
 
-			//http_404 page
-			{ "Error404Text", "Ошибка"},
+            // Http 404
+            { "Error404Text", "Ошибка"},
             { "Error404InfoText", "404 страница не существует"},
             { "HomePage404Text", "Главная страница"},
 
-			//http_505 page
-			{ "Error505Text", "Ошибка"},
+            // Http 505
+            { "Error505Text", "Ошибка"},
             { "Error505InfoText", "505 Внутренняя Ошибка Сервера"},
             { "HomePage505Text", "Главная страница"},
 
-			//user_search page
-			{ "Search", "Поиск"},
+            // User search
+            { "Search", "Поиск"},
             { "SearchText", "Поиск"},
             { "SearchForUserText", "Поиск пользователя"},
             { "UserSearchText", "Поиск пользователя"},
             { "SearchResultForUserText", "Результат поиска"},
 
-			//region_search page
-			{ "SearchForRegionText", "Поиск Региона"},
+            // Region search
+            { "SearchForRegionText", "Поиск Региона"},
             { "RegionSearchText", "Поиск Региона"},
             { "SearchResultForRegionText", "Результат поиска"},
 
-			//Edit user page
-			{ "AdminDeleteUserText", "Удалить пользователя"},
+            // Edit user
+            { "AdminDeleteUserText", "Удалить пользователя"},
             { "AdminDeleteUserInfoText", "Удалить аккаунт и всю связанную с ним информацию."},
             { "BanText", "Заблокировать"},
             { "UnbanText", "Разблокировать"},
@@ -400,11 +399,6 @@ namespace WhiteCore.Modules.Web.Translators
             { "AdminLoginInAsUserText", "Вход пользователем в 3D мир"},
             { "AdminLoginInAsUserInfoText",
                 "Вы выйдете из вашей учетной записи Сотрудника и войдете в систему как этот пользователь."},
-            { "TimeUntilUnbannedText", "Время Блокировки"},
-            { "DaysText", "Дней"},
-            { "HoursText", "Часов"},
-            { "MinutesText", "Минут"},
-            { "EdittingText", "Editing"},
             { "BannedUntilText", "User banned until"},
             { "KickAUserText", "Выкинуть"},
             { "KickAUserInfoText", "Выкинуть пользователя с 3D мира (срабатывает в течение 30 секунд)"},
@@ -414,8 +408,8 @@ namespace WhiteCore.Modules.Web.Translators
             { "MessageAUserInfoText", "Отправляет сообщение пользователю"},
             { "MessageUserText", "Отправить"},
 
-			// Transactions
-			{ "TransactionsText", "Transactions"},
+            // Transactions
+            { "TransactionsText", "Transactions"},
             { "DateInfoText", "Select a date range"},
             { "DateStartText", "Commencing Date"},
             { "DateEndText", "Ending Date"},
@@ -431,13 +425,85 @@ namespace WhiteCore.Modules.Web.Translators
             { "LoggedIPText", "Logged IP address"},
             { "NoPurchasesText", "No purchases found..."},
             { "PurchaseCostText", "Cost"},
+       
+            // Classifieds
+            { "ClassifiedsText", "Объявления"},
+            { "ClassifiedText", "Classified"},
+            { "ListedByText", "Внесены"},
+            { "CreationDateText", "Указанной даты"},
+            { "ExpirationDateText", "Срок годности" },
+            { "DescriptionText", "Описание" },
+            { "PriceOfListingText", "Цена"},
+            // Classified categories
+            { "CatAll", "All"},
+            { "CatSelect", ""},
+            { "CatShopping", "Shopping"},
+            { "CatLandRental", "Land Rental"},
+            { "CatPropertyRental", "Property Rental"},
+            { "CatSpecialAttraction", "Special Attraction"},
+            { "CatNewProducts", "New Products"},
+            { "CatEmployment", "Employment"},
+            { "CatWanted", "Wanted"},
+            { "CatService", "Service"},
+            { "CatPersonal", "Personal"},
 
-			// Sim Console
-			{ "SimConsoleText", "Sim Command Console"},
+            // Events
+            { "EventsText", "Events"},
+            { "EventNameText", "Event"},
+            { "EventLocationText", "Where"},
+            { "HostedByText","Сделано"},
+            { "EventDateText", "начинающегося"},
+            { "EventTimeInfoText", "Event time should be local time (Server)"},
+            { "CoverChargeText", "входная плата"},
+            { "Duration", "продолжительность"},
+            { "AddEventText", "Add event"},
+
+            // Event categories
+            { "CatDiscussion", "Discussion"},
+            { "CatSports", "Sports"},
+            { "CatLiveMusic", "Live Music"},
+            { "CatCommercial", "Commercial"},
+            { "CatEntertainment", "Nightlife/Entertainment"},
+            { "CatGames", "Games/Contests"},
+            { "CatPageants", "Pageants"},
+            { "CatEducation", "Education"},
+            { "CatArtsCulture", "Arts/Culture"},
+            { "CatCharitySupport", "Charity/Support Group"},
+            { "CatMiscellaneous", "Miscellaneous"},
+
+            // Event lookup periods
+            { "Next24Hours", "Next 24 hours"},
+            { "Next10Hours", "Next 10 hours"},
+            { "Next4Hours", "Next 4 hours"},
+            { "Next2Hours", "Next 2 hours"},
+
+            // Sim Console
+            { "SimConsoleText", "Sim Command Console"},
             { "SimCommandText", "Command"},
 
-			//factory_reset
-			{ "FactoryReset", "Factory Reset"},
+            // Statistics
+            { "StatisticsText", "Viewer statistics"},
+            { "ViewersText", "Viewer usage"},
+            { "GPUText", "Graphics cards"},
+            { "PerformanceText", "Performance averages"},
+            { "FPSText", "Frames / second"},
+            { "RunTimeText", "Run time"},
+            { "RegionsVisitedText", "Regions visited"},
+            { "MemoryUseageText", "Memory use"},
+            { "PingTimeText", "Ping time"},
+            { "AgentsInViewText", "Agents in view"},
+            { "ClearStatsText", "Clear statistics data"},
+
+            // Abuse reports
+            { "MenuAbuse", "Abuse Reports"},
+            { "TooltipsMenuAbuse", "User abuse reports"},
+            { "AbuseReportText", "Abuse Report"},
+            { "AbuserNameText", "Abuser"},
+            { "AbuseReporterNameText", "Reporter"},
+            { "AssignedToText", "Assigned to"},
+
+            // Factory_reset
+            { "FactoryReset", "Factory Reset"},
             { "ResetMenuText", "Reset Menu To Factory Defaults"},
             { "ResetSettingsText", "Reset Web Settings (Settings Manager page) To Factory Defaults"},
             { "Reset", "Reset"},
@@ -445,8 +511,8 @@ namespace WhiteCore.Modules.Web.Translators
             { "Pages", "Pages"},
             { "DefaultsUpdated", "defaults updated, go to Factory Reset to update or Settings Manager to disable this warning."},
 
-			//page_manager
-			{ "PageManager", "Page Manager"},
+            // Page_manager
+            { "PageManager", "Page Manager"},
             { "SaveMenuItemChanges", "Save Menu Item"},
             { "SelectItem", "Select Item"},
             { "DeleteItem", "Delete Item"},
@@ -461,16 +527,20 @@ namespace WhiteCore.Modules.Web.Translators
             { "RequiresAdminText", "Requires Admin To View"},
             { "RequiresAdminLevelText", "Required Admin Level To View"},
 
-			// grid settings
-			{ "GridSettingsManager", "Grid Settings Manager"},
+            // Grid settings
+            { "GridSettingsManager", "Grid Settings Manager"},
             { "GridnameText", "Grid name"},
             { "GridnickText", "Grid nickname"},
             { "WelcomeMessageText", "Login welcome message"},
-            { "SystemEstateNameText", "System estate name"},
-            { "SystemEstateOwnerText", "System estate owner name"},
+            { "GovernorNameText", "System Governor"},
+            { "MainlandEstateNameText", "Mainland estate"},
+            { "RealEstateOwnerNameText", "System estate owner"},
+            { "SystemEstateNameText", "System estate"},
+            { "BankerNameText", "System banker"},
+            { "MarketPlaceOwnerNameText", "System marketplace owner"},
 
-			//settings manager page
-			{ "WebRegistrationText", "Web registrations allowed"},
+            // Settings manager
+            { "WebRegistrationText", "Web registrations allowed"},
             { "GridCenterXText", "Grid Center Location X"},
             { "GridCenterYText", "Grid Center Location Y"},
             { "SettingsManager", "Settings Manager"},
@@ -482,29 +552,8 @@ namespace WhiteCore.Modules.Web.Translators
             { "LocalFrontPageText", "Local front page"},
             { "LocalCSSText", "Local CSS stylesheet"},
 
-			// statistics
-			{ "StatisticsText", "Viewer statistics"},
-            { "ViewersText", "Viewer usage"},
-            { "GPUText", "Graphics cards"},
-            { "PerformanceText", "Performance averages"},
-            { "FPSText", "Frames / second"},
-            { "RunTimeText", "Run time"},
-            { "RegionsVisitedText", "Regions visited"},
-            { "MemoryUseageText", "Memory use"},
-            { "PingTimeText", "Ping time"},
-            { "AgentsInViewText", "Agents in view"},
-            { "ClearStatsText", "Clear statistics data"},
-
-			// abuse reports
-			{ "MenuAbuse", "Abuse Reports"},
-            { "TooltipsMenuAbuse", "User abuse reports"},
-            { "AbuseReportText", "Abuse Report"},
-            { "AbuserNameText", "Abuser"},
-            { "AbuseReporterNameText", "Reporter"},
-            { "AssignedToText", "Assigned to"},
-
-			//Times
-			{ "Sun", "Вс"},
+            // Dates
+            { "Sun", "Вс"},
             { "Mon", "Пн"},
             { "Tue", "Вт"},
             { "Wed", "Ср"},
@@ -545,8 +594,8 @@ namespace WhiteCore.Modules.Web.Translators
             { "November", "Ноябрь"},
             { "December", "Декабрь"},
 
-			// User types
-			{ "UserTypeText", "User type"},
+            // User types
+            { "UserTypeText", "User type"},
             { "AdminUserTypeInfoText", "The type of user (Currently used for periodical stipend payments)."},
             { "Guest", "Гость"},
             { "Resident", "Resident"},
@@ -554,8 +603,8 @@ namespace WhiteCore.Modules.Web.Translators
             { "Contractor", "Contractor"},
             { "Charter_Member", "Charter Member"},
 
-			// ColorBox
-			{ "ColorBoxImageText", "Image"},
+            // ColorBox
+            { "ColorBoxImageText", "Image"},
             { "ColorBoxOfText", "of"},
             { "ColorBoxPreviousText", "Previous"},
             { "ColorBoxNextText", "Далее"},
@@ -563,12 +612,33 @@ namespace WhiteCore.Modules.Web.Translators
             { "ColorBoxStartSlideshowText", "Start Slide Show"},
             { "ColorBoxStopSlideshowText", "Stop Slide Show"},
 
-			// Maintenance
-			{ "NoAccountFound", "No account found"},
+            // Maintenance
+            { "NoAccountFound", "No account found"},
             { "DisplayInMenu", "Display In Menu"},
             { "ParentText", "Menu Parent"},
             { "CannotSetParentToChild", "Cannot set menu item as a child to itself."},
             { "TopLevel", "Top Level"},
+
+            // Style Switcher
+            { "styles1", "Default Minimalist"},
+            { "styles2", "Light Degarde"},
+            { "styles3", "Blue Night"},
+            { "styles4", "Dark Degrade"},
+            { "styles5", "Luminus"},
+
+            { "StyleSwitcherStylesText", "Styles"},
+            { "StyleSwitcherLanguagesText", "Languages"},
+            { "StyleSwitcherChoiceText", "Choice"},
+
+            // Language Switcher Tooltips
+            { "en", "English"},
+            { "fr", "Français"},
+            { "de", "Deutsch"},
+            { "it", "Italiano"},
+            { "es", "Español"},
+            { "nl", "Nederlands"},
+            { "ru", "Русский"},
+
         };
 
     }

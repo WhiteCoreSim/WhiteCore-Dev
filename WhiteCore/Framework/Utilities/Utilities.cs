@@ -72,6 +72,20 @@ namespace WhiteCore.Framework.Utilities
                    MainServer.Instance.Port;
         }
 
+        public static string GetShortRegionMaturity (int Maturity)
+        {
+            switch (Maturity) {
+            case 13:
+                return "(PG)";
+            case 21:
+                return "(M)";
+            case 42:
+                return "(AO)";
+            default:
+                return "(G)";
+            }
+        }
+
         public static string GetRegionMaturity (int Maturity)
         {
             switch (Maturity) {
@@ -795,5 +809,38 @@ namespace WhiteCore.Framework.Utilities
             }
         }
 
+        /// <summary>
+        /// Rounds up a DateTime to the nearest
+        /// </summary>
+        /// <returns>The up.</returns>
+        /// <param name="dt">DateTime</param>
+        /// <param name="d">Delta time</param>
+        //public static DateTime RoundUp (DateTime dt, TimeSpan d)
+        //{
+        //    return new DateTime (((dt.Ticks + d.Ticks - 1) / d.Ticks) * d.Ticks);
+        //}
+
+
+        public static DateTime RoundUp (DateTime dt, TimeSpan d)
+        {
+            var modTicks = dt.Ticks % d.Ticks;
+            var delta = modTicks != 0 ? d.Ticks - modTicks : 0;
+            return new DateTime (dt.Ticks + delta, dt.Kind);
+        }
+
+        public static DateTime RoundDown (DateTime dt, TimeSpan d)
+        {
+            var delta = dt.Ticks % d.Ticks;
+            return new DateTime (dt.Ticks - delta, dt.Kind);
+        }
+
+        public static DateTime RoundToNearest (DateTime dt, TimeSpan d)
+        {
+            var delta = dt.Ticks % d.Ticks;
+            bool roundUp = delta > d.Ticks / 2;
+            var offset = roundUp ? d.Ticks : 0;
+
+            return new DateTime (dt.Ticks + offset - delta, dt.Kind);
+        }
     }
-}
+}

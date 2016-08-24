@@ -28,7 +28,7 @@
 
 <script src="../js/jquery.jcarousellite.js"></script>
 <script>
-    jQuery(document).ready(function($) {
+    $(document).ready(function($) {
       $('div.group_profile_picture').each(function(i) {
         var img_ = $('img', this);
         var img_height = img_.attr('height');
@@ -42,9 +42,6 @@
       });
     });
 
-</script>
-
-<script>
   $(function() {
       $('.groupscarousel').jCarouselLite({
           btnNext: '.next-horiz-big',

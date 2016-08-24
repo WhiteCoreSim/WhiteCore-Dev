@@ -1,5 +1,5 @@
-/*
- * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org
+Ôªø/*
+ * Copyright (c) Contributors, http://whitecore-sim.org
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,727 +25,611 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System.Collections.Generic;
+
 namespace WhiteCore.Modules.Web.Translators
 {
     public class DutchTranslation : ITranslator
     {
-        public string LanguageName
-        {
+        public string LanguageName {
             get { return "nl"; }
         }
 
-        public string GetTranslatedString(string key)
+        public string GetTranslatedString (string key)
         {
-            switch (key)
-            {
-                // Generic
-                case "No": return "No";
-                case "Yes": return "Yes";
-                case "Submit": return "Verzenden";
-                case "Accept": return "Accepteren";
-                case "Save": return "Save";
-                case "FirstText": return "Eerste";
-                case "BackText": return "Terug";
-                case "NextText": return "Volgende";
-                case "LastText": return "Laatste";
-                case "CurrentPageText": return "Current Page";
-                case "MoreInfoText": return "Meer Info";
-                case "NoDetailsText": return "Geen gegevens gevonden...";
-            case "MoreInfo": return "More Informatie";
-            case "ObjectNameText": return "Object";
-            case "LocationText": return "Plaats";
-            case "UUIDText": return "UUID";
-            case "DetailsText": return "Beschrijving";
-            case "NotesText": return "Notes";
-            case "SaveUpdates": return "Sia updates";
-            case "ActiveText": return "Actief";
-            case "CheckedText": return "Gecontroleerd";
-            case "CategoryText": return "Categorie";
-            case "SummaryText": return "Overzicht";
-                
-                // Status information
-                case "GridStatus": return "Grid Status";
-                case "Online": return "Online";
-                case "Offline": return "Offline";
-                case "TotalUserCount": return "Totale Gebruikers";
-                case "TotalRegionCount": return "Totale Regios";
-                case "UniqueVisitors": return "Unieke Bezeoeker per 30 dagen";
-                case "OnlineNow": return "Nu online";
-                case "HyperGrid": return "HyperGrid (HG)";
-                case "Voice": return "Voice";
-                case "Currency": return "Currency";
-                case "Disabled": return "Uitgeschakeld";
-                case "Enabled": return "Ingeschakeld";
-                case "News": return "Nieuws";
-                case "Region": return "Regio";
-
-                // User login
-                case "Login": return "Login";
-                case "UserName":
-                case "UserNameText": return "Gebruikersnaam";
-                case "Password":
-                case "PasswordText": return "Wachtwoord";
-                case "PasswordConfirmation": return "Wachtwoord Bevestiging";
-                case "ForgotPassword": return "Wachtwoord vergeten?";
-                case "TypeUserNameToConfirm": return "Geef de gebruikersnaam van dit account in om te bevestigen dat je dit account wilt verwijderen";
-
-                // Special window
-                case "SpecialWindowTitleText": return "Special Info Window Titel";
-                case "SpecialWindowTextText": return "Special Info Window Tekst";
-                case "SpecialWindowColorText": return "Special Info Window Kleur";
-                case "SpecialWindowStatusText": return "Special Info Window Status";
-                case "WelcomeScreenManagerFor": return "Welkoms Scherm Manager voor";
-                case "ChangesSavedSuccessfully": return "Wijzigingen succesvol opgeslagen";
-
-                // User registration
-                case "AvatarNameText": return "Avatar Naam";
-                case "AvatarScopeText": return "Avatar Scope ID";
-                case "FirstNameText": return "Uw Voornaam";
-                case "LastNameText": return "Uw Achternaam";
-                case "UserAddressText": return "Uw Adres";
-                case "UserZipText": return "Uw Postcode";
-                case "UserCityText": return "Uw Stad";
-                case "UserCountryText": return "Uw Land";
-                case "UserDOBText": return "Uw Geboortedatum (Maand Dag Jaar)";
-                case "UserEmailText": return "Uw Email";
-                case "UserHomeRegionText": return "Regione Home";
-                case "RegistrationText": return "Avatar registratie";
-                case "RegistrationsDisabled": return "Registraties zijn op dit moment gesloten, probeert u het later nog eens.";
-                case "TermsOfServiceText": return "Terms of Service";
-                case "TermsOfServiceAccept": return "Accepteer u deze Terms of Service zoals boven beschreven?";
-                case "AvatarNameError": return "Je hebt een avatar naam invoeren!";
-                case "AvatarPasswordError": return "Wachtwoord is leeg of niet overeenkomen met!";
-                case "AvatarEmailError": return "Een e-mailadres is vereist voor wachtwoord herstel! ('none' indien niet bekend)";
-                case "AvatarNameSpacingError": return "Je avatar naam moet 'Voornaam Achternaam'!";
-
-                // news
-                case "OpenNewsManager": return "Open de Nieuws manager";
-                case "NewsManager": return "Nieuws Manager";
-                case "EditNewsItem": return "Bewerk nieuws";
-                case "AddNewsItem": return "Voeg nieuw nieuws bericht toe";
-                case "DeleteNewsItem": return "Verwijder nieuws item";
-                case "NewsDateText": return "Nieuws Datum";
-                case "NewsTitleText": return "Nieuws Titel";
-                case "NewsItemTitle": return "Nieuws Item Titel";
-                case "NewsItemText": return "Nieuws Item Tekst";
-                case "AddNewsText": return "Nieuws toevoegen";
-                case "DeleteNewsText": return "Verwijder Nieuws";
-                case "EditNewsText": return "Bewerk Nieuws";
-
-                // users
-                case "UserProfileFor": return "User Profiel Voor";
-                case "GroupNameText": return "Groep";
-                case "UsersGroupsText": return "Groepen";
-                case "UsersPicksText": return "Picks for";
-                case "ResidentSince": return "Resident Since";
-                case "AccountType": return "Account Type";
-                case "PartnersName": return "Partner's Naam";
-                case "AboutMe": return "Over Mij";
-                case "IsOnlineText": return "User Status";
-                case "OnlineLocationText": return "User Locatie";
-
-                // Region information
-                case "RegionInformationText": return "Region Informatie";
-                case "OwnerNameText": return "Owner Naam";
-                case "RegionLocationText": return "Region Locatie";
-                case "RegionSizeText": return "Region Grootte";
-                case "RegionNameText": return "Region Naam";
-                case "RegionTypeText": return "Region Type";
-                case "RegionTerrainText": return "Region Terrain";
-                case "ParcelsInRegionText": return "Parcels In Region";
-                case "ParcelNameText": return "Parcel Naam";
-                case "ParcelOwnerText": return "Parcel Owner's Naam";
-
-                // Region Page
-                case "RegionInfoText": return "Region Info";
-                case "RegionListText": return "Region List";
-                case "RegionLocXText": return "Region X";
-                case "RegionLocYText": return "Region Y";
-                case "SortByLocX": return "Sort By Region X";
-                case "SortByLocY": return "Sort By Region Y";
-                case "SortByName": return "Sort By Region Name";
-                case "RegionMoreInfo": return "More Informatie";
-                case "RegionMoreInfoTooltips": return "More info over";
-                case "OnlineUsersText": return "Online Users";
-                case "RegionOnlineText": return "Region Status";
-                case "RegionMaturityText": return "Access Rating";
-                case "NumberOfUsersInRegionText": return "Number of Users in region";
-
-                // Region manager
-                case "Mainland": return "Vasteland";
-                case "Estate": return "Estate";
-                case "FullRegion": return "Volledige Regio";
-                case "Homestead": return "Homestead";
-                case "Openspace": return "Openspace";
-                case "Flatland": return "Flatland";
-                case "Grassland": return "Grasland";
-                case "Island": return "Island";
-                case "Aquatic": return "Aquatische";
-                case "Custom": return "Custom";
-                case "RegionPortText": return "Regio-poort";
-                case "RegionVisibilityText": return "Zichtbaar voor buren";
-                case "RegionInfiniteText": return "Infinite Regio";
-                case "RegionCapacityText": return "Regio object capaciteit";
-
-                // Menu Buttons
-                case "MenuHome": return "Home";
-                case "MenuLogin": return "Login";
-                case "MenuLogout": return "Logout";
-                case "MenuRegister": return "Registeer";
-                case "MenuForgotPass": return "Wachtwoord vergeten";
-                case "MenuNews": return "Nieuws";
-                case "MenuWorld": return "Wereld";
-                case "MenuWorldMap": return "Wereld Map";
-                case "MenuRegion": return "Region List";
-                case "MenuUser": return "Gebruiker";
-                case "MenuOnlineUsers": return "Online Gebruikers";
-                case "MenuUserSearch": return "Zoek Gebruiker";
-                case "MenuRegionSearch": return "Region Search";
-                case "MenuChat": return "Chat";
-                case "MenuHelp": return "Help";
-                case "MenuViewerHelp": return "Viewer Help";
-                case "MenuChangeUserInformation": return "Wijzig User Informatie";
-                case "MenuWelcomeScreenManager": return "Welcome Screen Manager";
-                case "MenuNewsManager": return "Nieuws Manager";
-                case "MenuUserManager": return "User Manager";
-                case "MenuFactoryReset": return "Factory Reset";
-                case "ResetMenuInfoText": return "Reset de menu items terug naar de default waardes";
-                case "ResetSettingsInfoText": return "Reset de Web Interface terug naar de default waardes";
-                case "MenuPageManager": return "Page Manager";
-                case "MenuSettingsManager": return "Settings Manager";
-                case "MenuManager": return "Beheer";
-                case "MenuSettings": return "Instellingen";
-                case "MenuRegionManager": return "Regio Manager";
-                case "MenuManagerSimConsole": return "Sim console";
-                case "MenuPurchases": return "Gebruiker Aankopen";
-                case "MenuMyPurchases": return "Mijn aankopen ";
-                case "MenuTransactions": return "Gebruiker Transacties";
-                case "MenuMyTransactions": return "Mijn Transacties";
-                case "MenuMyClassifieds": return "Mijn Advertenties";                
-                case "MenuStatistics": return "Viewer statistieken";
-                case "MenuGridSettings": return "Grid instellingen";
-                
-                // Tooltips Menu Buttons
-                case "TooltipsMenuHome": return "Home";
-                case "TooltipsMenuLogin": return "Login";
-                case "TooltipsMenuLogout": return "Logout";
-                case "TooltipsMenuRegister": return "Registeer";
-                case "TooltipsMenuForgotPass": return "Wachtwoord vergeten";
-                case "TooltipsMenuNews": return "Nieuws";
-                case "TooltipsMenuWorld": return "Wereld";
-                case "TooltipsMenuWorldMap": return "Wereld Map";
-                case "TooltipsMenuUser": return "User";
-                case "TooltipsMenuOnlineUsers": return "Online Users";
-                case "TooltipsMenuUserSearch": return "User Search";
-                case "TooltipsMenuRegionSearch": return "Region Search";
-                case "TooltipsMenuChat": return "Chat";
-                case "TooltipsMenuViewerHelp": return "Viewer Help";
-                case "TooltipsMenuHelp": return "Help";
-                case "TooltipsMenuChangeUserInformation": return "Change User Information";
-                case "TooltipsMenuWelcomeScreenManager": return "Welcome Screen Manager";
-                case "TooltipsMenuNewsManager": return "Nieuws Manager";
-                case "TooltipsMenuUserManager": return "User Manager";
-                case "TooltipsMenuFactoryReset": return "Factory Reset";
-                case "TooltipsMenuPageManager": return "Page Manager";
-                case "TooltipsMenuSettingsManager": return "Settings Manager";
-                case "TooltipsMenuManager": return "Admin Management";
-                case "TooltipsMenuSettings": return "WebUI Instellingen";
-                case "TooltipsMenuRegionManager": return "Regio maken / bewerken";
-                case "TooltipsMenuManagerSimConsole": return "Online simulator console";
-                case "TooltipsMenuPurchases": return "Aankoop informatie";
-                case "TooltipsMenuTransactions": return "Transactie-informatie";
-                case "TooltipsMenuStatistics": return "Viewer statistieken";
-                case "TooltipsMenuGridSettings": return "Grid instellingen";
-                
-                // Menu Region
-                case "MenuRegionTitle": return "Region";
-                case "MenuParcelTitle": return "Parcel";
-                case "MenuOwnerTitle": return "Owner";
-                case "TooltipsMenuRegion": return "Regio informatie";
-                case "TooltipsMenuParcel": return "Regio Parcels";
-                case "TooltipsMenuOwner": return "Estate Owner";
-
-                // Menu Profile
-                case "MenuProfileTitle": return "Profile";
-                case "MenuGroupTitle": return "Group";
-                case "MenuPicksTitle": return "Picks";
-                case "MenuRegionsTitle": return "Regions";
-                case "TooltipsMenuProfile": return "Gebruiker Profile";
-                case "TooltipsMenuGroups": return "Gebruikersgroepen";
-                case "TooltipsMenuPicks": return "Gebruiker Picks";
-                case "TooltipsMenuRegions": return "Gebruiker regio";
-                case "UserGroupNameText": return "Gebruikersgroep";
-                case "PickNameText": return "Pick naam";
-                case "PickRegionText": return "Locatie";
-
-                // Urls
-                case "WelcomeScreen":
-                    return "Welcome Screen";
-
-                // Tooltips Urls
-                case "TooltipsWelcomeScreen":
-                    return "Welcome Screen";
-                case "TooltipsWorldMap":
-                    return "World Map";
-
-                // Style Switcher
-                case "styles1":
-                    return "Default Minimalist";
-                case "styles2":
-                    return "Light Degarde";
-                case "styles3":
-                    return "Blue Night";
-                case "styles4":
-                    return "Dark Degrade";
-                case "styles5":
-                    return "Luminus";
-
-                case "StyleSwitcherStylesText":
-                    return "Styles";
-                case "StyleSwitcherLanguagesText":
-                    return "Languages";
-                case "StyleSwitcherChoiceText":
-                    return "Choice";
-
-                // Language Switcher Tooltips
-                case "en":
-                    return "English";
-                case "fr":
-                    return "Fran?ais";
-                case "de":
-                    return "Deutsch";
-                case "it":
-                    return "Italiano";
-                case "es":
-                    return "Espa?ol";
-                case "nl":
-                    return "Nederlands";
-                case "ru":
-                    return "ß≤ßÂß„ß„ß‹ß⁄ß€";
-
-            // Index Page
-            case "HomeText":
-                    return "Home";
-                case "HomeTextWelcome":
-                    return "This is our New Virtual World! Join us now, and make a difference!";
-                case "HomeTextTips":
-                    return "New presentations";
-                case "WelcomeToText":
-                    return "Welcome to";
-
-                // World Map Page
-                case "WorldMap":
-                    return "World Map";
-                case "WorldMapText":
-                    return "Full Screen";
-
-                // Chat Page
-                case "ChatText":
-                    return "Chat Support";
-
-                // Help Page
-                case "HelpText":
-                    return "Help";
-                case "HelpViewersConfigText":
-                    return "Viewer Configuratie";
-                case "AngstromViewer":
-                    return "Angstrom Viewer";
-                case "AstraViewer":
-                    return "Astra Viewer";
-                case "FirestormViewer":
-                    return "Firestorm Viewer";
-                case "KokuaViewer":
-                    return "Kokua Viewer";
-                case "ImprudenceViewer":
-                    return "Imprudence Viewer";
-                case "PhoenixViewer":
-                    return "Phoenix Viewer";
-                case "SingularityViewer":
-                    return "Singularity Viewer";
-                case "VoodooViewer":
-                    return "Voodoo Viewer";
-                case "ZenViewer":
-                    return "Zen Viewer";
-
-                //Logout page
-                case "Logout":
-                    return "Logout";
-                case "LoggedOutSuccessfullyText":
-                    return "You have been logged out successfully.";
-
-                //Change user information page
-                case "ChangeUserInformationText":
-                    return "Change User Information";
-                case "ChangePasswordText":
-                    return "Change Password";
-                case "NewPasswordText":
-                    return "New Password";
-                case "NewPasswordConfirmationText":
-                    return "New Password (Confirmation)";
-                case "ChangeEmailText":
-                    return "Change Email Address";
-                case "NewEmailText":
-                    return "New Email Address";
-                case "DeleteUserText":
-                    return "Delete My Account";
-                case "DeleteText":
-                    return "Delete";
-                case "DeleteUserInfoText":
-                    return
-                        "This will remove all information about you in the grid and remove your access to this service. If you wish to continue, enter your name and password and click Delete.";
-                case "EditText":
-                    return "Edit";
-                case "EditUserAccountText":
-                    return "Edit User Account";
-
-                //Maintenance page
-                case "WebsiteDownInfoText":
-                    return "Website is currently down, please try again soon.";
-                case "WebsiteDownText":
-                    return "Website offline";
-
-                //http_404 page
-                case "Error404Text":
-                    return "Error code";
-                case "Error404InfoText":
-                    return "404 Page Not Found";
-                case "HomePage404Text":
-                    return "home page";
-
-                //http_505 page
-                case "Error505Text":
-                    return "Error code";
-                case "Error505InfoText":
-                    return "505 Internal Server Error";
-                case "HomePage505Text":
-                    return "home page";
-
-                //user_search page
-                case "Search":
-                    return "Search";
-                case "SearchText":
-                    return "Search";
-                case "SearchForUserText":
-                    return "Search For A User";
-                case "UserSearchText":
-                    return "User Search";
-                case "SearchResultForUserText":
-                    return "Search Result For User";
-
-                //region_search page
-                case "SearchForRegionText":
-                    return "Search For A Region";
-                case "RegionSearchText":
-                    return "Region Search";
-                case "SearchResultForRegionText":
-                    return "Search Result For Region";
-
-                //Edit user page
-                case "AdminDeleteUserText":
-                    return "Delete User";
-                case "AdminDeleteUserInfoText":
-                    return "This deletes the account and destroys all information associated with it.";
-                case "BanText":
-                    return "Ban";
-                case "UnbanText":
-                    return "Unban";
-                case "AdminTempBanUserText":
-                    return "Temp Ban User";
-                case "AdminTempBanUserInfoText":
-                    return "This blocks the user from logging in for the set amount of time.";
-                case "AdminBanUserText":
-                    return "Ban User";
-                case "AdminBanUserInfoText":
-                    return "This blocks the user from logging in until the user is unbanned.";
-                case "AdminUnbanUserText":
-                    return "Unban User";
-                case "AdminUnbanUserInfoText":
-                    return "Removes temporary and permanent bans on the user.";
-                case "AdminLoginInAsUserText":
-                    return "Login as User";
-                case "AdminLoginInAsUserInfoText":
-                    return
-                        "You will be logged out of your admin account, and logged in as this user, and will see everything as they see it.";
-                case "TimeUntilUnbannedText":
-                    return "Time until user is unbanned";
-                case "DaysText":
-                    return "Days";
-                case "HoursText":
-                    return "Hours";
-                case "MinutesText":
-                    return "Minutes";
-                case "EdittingText":
-                    return "Editting";
-                case "BannedUntilText":
-                    return "User banned until:";
-                case "KickAUserText":
-                    return "Kick User";
-                case "KickAUserInfoText":
-                    return "Kicks a user from the grid (logs them out within 30 seconds)";
-                case "KickMessageText":
-                    return "Message To User";
-                case "KickUserText":
-                    return "Kick User";
-                case "MessageAUserText":
-                    return "Send User A Message";
-                case "MessageAUserInfoText":
-                    return "Sends a user a blue-box message (will arrive within 30 seconds)";
-                case "MessageUserText":
-                    return "Message User";
-
-                //factory_reset
-                case "FactoryReset":
-                    return "Factory Reset";
-                case "ResetMenuText":
-                    return "Reset Menu To Factory Defaults";
-                case "ResetSettingsText":
-                    return "Reset Web Settings (Settings Manager page) To Factory Defaults";
-                case "Reset":
-                    return "Reset";
-                case "Settings":
-                    return "Settings";
-                case "Pages":
-                    return "Pages";
-                case "DefaultsUpdated":
-                    return
-                        "defaults updated, go to Factory Reset to update or Settings Manager to disable this warning.";
-
-                //page_manager
-                case "PageManager":
-                    return "Page Manager";
-                case "SaveMenuItemChanges":
-                    return "Save Menu Item";
-                case "SelectItem":
-                    return "Select Item";
-                case "DeleteItem":
-                    return "Delete Item";
-                case "AddItem":
-                    return "Add Item";
-                case "PageLocationText":
-                    return "Page Location";
-                case "PageIDText":
-                    return "Page ID";
-                case "PagePositionText":
-                    return "Page Position";
-                case "PageTooltipText":
-                    return "Page Tooltip";
-                case "PageTitleText":
-                    return "Page Title";
-                case "RequiresLoginText":
-                    return "Requires Login To View";
-                case "RequiresLogoutText":
-                    return "Requires Logout To View";
-                case "RequiresAdminText":
-                    return "Requires Admin To View";
-                case "RequiresAdminLevelText":
-                    return "Required Admin Level To View";
-
-                // grid settings
-                case "GridSettingsManager": return "Grid Settings Manager";
-                case "GridnameText": return "Grid naam";
-                case "GridnickText": return "Grid bijnaam";
-                case "WelcomeMessageText": return "Login welkomstbericht ";
-            case "GovernorNameText": return "Systeem gouverneur";
-            case "MainlandEstateNameText": return "Vasteland landgoed";
-            case "RealEstateOwnerNameText": return "Systeem goed ownername";
-            case "SystemEstateNameText": return "Naam Estate systeem";
-            case "BankerNameText": return "Systeem bankierr";
-            case "MarketPlaceOwnerNameText": return "Systeem marketplace eigenaar";
-
-            //settings manager page
-            case "WebRegistrationText":
-                    return "Webregistraties toegestaan";
-                case "GridCenterXText":
-                    return "Grid Center Location X";
-                case "GridCenterYText":
-                    return "Grid Center Location Y";
-                case "SettingsManager":
-                    return "Settings Manager";
-                case "IgnorePagesUpdatesText":
-                    return "Ignore pages update warning until next update";
-                case "IgnoreSettingsUpdatesText":
-                    return "Ignore settings update warning until next update";
-
-                // Transactions
-                case "TransactionsText": return "Transacties";
-                case "DateInfoText": return "Selecteer een datumbereik";
-                case "DateStartText": return "Ingangsdatum";
-                case "DateEndText": return "Eind";
-                case "30daysPastText": return "Vorige 30 dagen";
-                case "TransactionDateText": return "Datum";
-                case "TransactionDetailText": return "Beschrijving";
-                case "TransactionAmountText": return "Bedrag";
-                case "TransactionBalanceText": return "Balance";
-                case "NoTransactionsText": return "Geen transacties gevonden...";
-                case "PurchasesText": return "Aankopen";
-                case "LoggedIPText": return "Gelogde IP-adres";
-                case "NoPurchasesText": return "Geen aankopen gevonden...";
-                case "PurchaseCostText": return "Kosten";
-                
-                // Classifieds
-                case "ClassifiedsText": return "Advertenties";
-
-                // Sim Console
-                case "SimConsoleText": return "Sim Command Console";
-                case "SimCommandText": return "Command";
-
-                // statistics
-                case "StatisticsText": return "Viewer statistieken";
-                case "ViewersText": return "Viewer gebruik";
-                case "GPUText": return "Grafische kaarten";
-                case "PerformanceText": return "Gemiddelden prestaties";
-                case "FPSText": return "Frames / seconde";
-                case "RunTimeText": return "Looptijd";
-                case "RegionsVisitedText": return "Bezochte regio's";
-                case "MemoryUseageText": return "Geheugen gebruik";
-                case "PingTimeText": return "Ping tijd";
-                case "AgentsInViewText": return "Agenten in het oog";
-                case "ClearStatsText": return "Duidelijke statistieken over";
-
-                // abuse reports
-            case "MenuAbuse": return "Misbruik Rapporten";
-            case "TooltipsMenuAbuse": return "Gebruiker misbruil rapporten";
-            case "AbuseReportText": return "Meld misbruikt";
-            case "AbuserNameText": return "Abuser";
-            case "AbuseReporterNameText": return "Verslaggever";
-            case "AssignedToText": return "Toegewezen aan";
-                
-                //Times
-                case "Sun":
-                    return "Sun";
-                case "Mon":
-                    return "Mon";
-                case "Tue":
-                    return "Tue";
-                case "Wed":
-                    return "Wed";
-                case "Thu":
-                    return "Thu";
-                case "Fri":
-                    return "Fri";
-                case "Sat":
-                    return "Sat";
-                case "Sunday":
-                    return "Sunday";
-                case "Monday":
-                    return "Monday";
-                case "Tuesday":
-                    return "Tuesday";
-                case "Wednesday":
-                    return "Wednesday";
-                case "Thursday":
-                    return "Thursday";
-                case "Friday":
-                    return "Friday";
-                case "Saturday":
-                    return "Saturday";
-
-                case "Jan_Short":
-                    return "Jan";
-                case "Feb_Short":
-                    return "Feb";
-                case "Mar_Short":
-                    return "Mar";
-                case "Apr_Short":
-                    return "Apr";
-                case "May_Short":
-                    return "May";
-                case "Jun_Short":
-                    return "Jun";
-                case "Jul_Short":
-                    return "Jul";
-                case "Aug_Short":
-                    return "Aug";
-                case "Sep_Short":
-                    return "Sep";
-                case "Oct_Short":
-                    return "Oct";
-                case "Nov_Short":
-                    return "Nov";
-                case "Dec_Short":
-                    return "Dec";
-
-                case "January":
-                    return "January";
-                case "February":
-                    return "February";
-                case "March":
-                    return "March";
-                case "April":
-                    return "April";
-                case "May":
-                    return "May";
-                case "June":
-                    return "June";
-                case "July":
-                    return "July";
-                case "August":
-                    return "August";
-                case "September":
-                    return "September";
-                case "October":
-                    return "October";
-                case "November":
-                    return "November";
-                case "December":
-                    return "December";
-
-                // User types
-                case "UserTypeText":
-                    return "Soort gebruiker";
-                case "AdminUserTypeInfoText":
-                    return "Het type gebruiker (momenteel gebruikt voor periodieke betalingen stipendium).";
-                case "Guest":
-                    return "Gast";
-                case "Resident":
-                    return "Ingezetene";
-                case "Member":
-                    return "Lid";
-                case "Contractor":
-                    return "Aannemer";
-                case "Charter_Member":
-                    return "Mede-oprichter";
-
-                // ColorBox
-                case "ColorBoxImageText":
-                    return "Image";
-                case "ColorBoxOfText":
-                    return "of";
-                case "ColorBoxPreviousText":
-                    return "Previous";
-                case "ColorBoxNextText":
-                    return "Next";
-                case "ColorBoxCloseText":
-                    return "Close";
-                case "ColorBoxStartSlideshowText":
-                    return "Start Slide Show";
-                case "ColorBoxStopSlideshowText":
-                    return "Stop Slide Show";
-
-
-                // Maintenance
-                case "NoAccountFound":
-                    return "Nog geen account gevonden";
-                case "DisplayInMenu":
-                    return "Display in het menu";
-                case "ParentText":
-                    return "Menu ouder";
-                case "CannotSetParentToChild":
-                    return "Kan geen menu-item als een kind naar zichzelf.";
-                case "TopLevel":
-                    return "Top Level";
-                case "HideLanguageBarText":
-                    return "Verbergen taalkeuzemenu";
-                case "HideStyleBarText":
-                    return "Verbergen stijl keuzebalk";
-                case "HideSlideshowBarText":
-                    return "Verbergen slideshow bar";
-                case "LocalFrontPageText":
-                    return "Lokale voorpagina";
-                case "LocalCSSText":
-                    return "Lokale CSS stylesheet";
-            }
-            return "UNKNOWN CHARACTER";
+            if (dictionary.ContainsKey (key))
+                return dictionary [key];
+            return ":" + key + ":";
         }
+
+        readonly Dictionary<string, string> dictionary = new Dictionary<string, string> {
+            // Generic
+            { "No", "No"},
+            { "Yes", "Yes"},
+            { "Submit", "Verzenden"},
+            { "Accept", "Accepteren"},
+            { "Save", "Save"},
+            { "FirstText", "Eerste"},
+            { "BackText", "Terug"},
+            { "NextText", "Volgende"},
+            { "LastText", "Laatste"},
+            { "CurrentPageText", "Current Page"},
+            { "MoreInfoText", "Meer Info"},
+            { "NoDetailsText", "Geen gegevens gevonden..."},
+            { "MoreInfo", "More Informatie"},
+            { "Name", "Naam"},
+            { "ObjectNameText", "Voorwerp"},
+            { "LocationText", "Plaats"},
+            { "UUIDText", "UUID"},
+            { "DetailsText", "Beschrijving"},
+            { "NotesText", "Aantekeningen"},
+            { "SaveUpdates", "Sia updates"},
+            { "ActiveText", "Actief"},
+            { "CheckedText", "Gecontroleerd"},
+            { "CategoryText", "Categorie"},
+            { "SummaryText", "Overzicht"},
+            { "MaturityText", "Rijpheid"},
+            { "DateText", "Datum"},
+            { "TimeText", "Tijd"},
+            { "MinuteText", "minuut"},
+            { "MinutesText", "notulen"},
+            { "HourText", "urr"},
+            { "HoursText", "urr"},
+            { "EdittingText", "Editing"},
+
+            // Status information
+            { "GridStatus", "Grid Status"},
+            { "Online", "Online"},
+            { "Offline", "Offline"},
+            { "TotalUserCount", "Totale Gebruikers"},
+            { "TotalRegionCount", "Totale Regios"},
+            { "UniqueVisitors", "Unieke Bezeoeker per 30 dagen"},
+            { "OnlineNow", "Nu online"},
+            { "InterWorld", "Inter World (IWC)"},
+            { "HyperGrid", "HyperGrid (HG)"},
+            { "Voice", "Voice"},
+            { "Currency", "Currency"},
+            { "Disabled", "Uitgeschakeld"},
+            { "Enabled", "Ingeschakeld"},
+            { "News", "Nieuws"},
+            { "Region", "Regio"},
+
+            // User login
+            { "Login", "Login"},
+            { "UserName", "Gebruikersnaam"},
+            { "UserNameText", "Gebruikersnaam"},
+            { "Password", "Wachtwoord"},
+            { "PasswordText", "Wachtwoord"},
+            { "PasswordConfirmation", "Wachtwoord Bevestiging"},
+            { "ForgotPassword", "Wachtwoord vergeten?"},
+            { "TypeUserNameToConfirm", "Geef de gebruikersnaam van dit account in om te bevestigen dat je dit account wilt verwijderen"},
+
+            // Special window
+            { "SpecialWindowTitleText", "Special Info Window Titel"},
+            { "SpecialWindowTextText", "Special Info Window Tekst"},
+            { "SpecialWindowColorText", "Special Info Window Kleur"},
+            { "SpecialWindowStatusText", "Special Info Window Status"},
+            { "WelcomeScreenManagerFor", "Welkoms Scherm Manager voor"},
+            { "ChangesSavedSuccessfully", "Wijzigingen succesvol opgeslagen"},
+
+            // User registration
+            { "AvatarNameText", "Avatar Naam"},
+            { "AvatarScopeText", "Avatar Scope ID"},
+            { "FirstNameText", "Uw Voornaam"},
+            { "LastNameText", "Uw Achternaam"},
+            { "UserAddressText", "Uw Adres"},
+            { "UserZipText", "Uw Postcode"},
+            { "UserCityText", "Uw Stad"},
+            { "UserCountryText", "Uw Land"},
+            { "UserDOBText", "Uw Geboortedatum (Maand Dag Jaar)"},
+            { "UserEmailText", "Uw Email"},
+            { "UserHomeRegionText", "Regione Home"},
+            { "RegistrationText", "Avatar registratie"},
+            { "RegistrationsDisabled", "Registraties zijn op dit moment gesloten, probeert u het later nog eens."},
+            { "TermsOfServiceText", "Terms of Service"},
+            { "TermsOfServiceAccept", "Accepteer u deze Terms of Service zoals boven beschreven?"},
+            { "AvatarNameError", "Je hebt een avatar naam invoeren!"},
+            { "AvatarPasswordError", "Wachtwoord is leeg of niet overeenkomen met!"},
+            { "AvatarEmailError", "Een e-mailadres is vereist voor wachtwoord herstel! ('none' indien niet bekend)"},
+            { "AvatarNameSpacingError", "Je avatar naam moet 'Voornaam Achternaam'!"},
+
+            // News
+            { "OpenNewsManager", "Open de Nieuws manager"},
+            { "NewsManager", "Nieuws Manager"},
+            { "EditNewsItem", "Bewerk nieuws"},
+            { "AddNewsItem", "Voeg nieuw nieuws bericht toe"},
+            { "DeleteNewsItem", "Verwijder nieuws item"},
+            { "NewsDateText", "Nieuws Datum"},
+            { "NewsTitleText", "Nieuws Titel"},
+            { "NewsItemTitle", "Nieuws Item Titel"},
+            { "NewsItemText", "Nieuws Item Tekst"},
+            { "AddNewsText", "Nieuws toevoegen"},
+            { "DeleteNewsText", "Verwijder Nieuws"},
+            { "EditNewsText", "Bewerk Nieuws"},
+
+            // User Profile
+            { "UserProfileFor", "User Profiel Voor"},
+            { "UsersGroupsText", "Groepen"},
+            { "GroupNameText", "Groep"},
+            { "UsersPicksText", "Picks for"},
+            { "ResidentSince", "Resident Since"},
+            { "AccountType", "Account Type"},
+            { "PartnersName", "Partner's Naam"},
+            { "AboutMe", "Over Mij"},
+            { "IsOnlineText", "User Status"},
+            { "OnlineLocationText", "User Locatie"},
+            { "Partner", "Partner"},
+            { "Friends", "Friends"},
+            { "Nothing", "None"},
+            { "ChangePass", "Verander wachtwoord"},
+            { "NoChangePass", "Niet in staat om het wachtwoord te veranderen, probeer het later opnieuw"},
+
+            // Region information
+            { "RegionInformationText", "Region Informatie"},
+            { "OwnerNameText", "Owner Naam"},
+            { "RegionLocationText", "Region Locatie"},
+            { "RegionSizeText", "Region Grootte"},
+            { "RegionNameText", "Region Naam"},
+            { "RegionTypeText", "Region Type"},
+            { "RegionDelayStartupText", "Delay starting scripts"},
+            { "RegionPresetText", "Region Preset"},
+            { "RegionTerrainText", "Region Terrain"},
+            { "ParcelsInRegionText", "Parcels In Region"},
+            { "ParcelNameText", "Parcel Naam"},
+            { "ParcelOwnerText", "Parcel Owner's Naam"},
+
+            // Region List
+            { "RegionInfoText", "Region Info"},
+            { "RegionListText", "Region List"},
+            { "RegionLocXText", "Region X"},
+            { "RegionLocYText", "Region Y"},
+            { "SortByLocX", "Sort By Region X"},
+            { "SortByLocY", "Sort By Region Y"},
+            { "SortByName", "Sort By Region Name"},
+            { "RegionMoreInfo", "More Informatie"},
+            { "RegionMoreInfoTooltips", "More info over"},
+            { "OnlineUsersText", "Online Users"},
+            { "OnlineFriendsText", "Online Friends"},
+            { "RegionOnlineText", "Region Status"},
+            { "RegionMaturityText", "Access Rating"},
+            { "NumberOfUsersInRegionText", "Number of Users in region"},
+
+            // Region manager
+            { "Mainland", "Vasteland"},
+            { "Estate", "Estate"},
+            { "FullRegion", "Volledige Regio"},
+            { "Homestead", "Homestead"},
+            { "Openspace", "Openspace"},
+            { "Flatland", "Flatland"},
+            { "Grassland", "Grasland"},
+            { "Island", "Island"},
+            { "Aquatic", "Aquatische"},
+            { "Custom", "Custom"},
+            { "RegionPortText", "Regio-poort"},
+            { "RegionVisibilityText", "Zichtbaar voor buren"},
+            { "RegionInfiniteText", "Infinite Regio"},
+            { "RegionCapacityText", "Regio object capaciteit"},
+
+            // Menus
+            { "MenuHome", "Home"},
+            { "MenuLogin", "Login"},
+            { "MenuLogout", "Logout"},
+            { "MenuRegister", "Registeer"},
+            { "MenuForgotPass", "Wachtwoord vergeten"},
+            { "MenuNews", "Nieuws"},
+            { "MenuWorld", "Wereld"},
+            { "MenuWorldMap", "Wereld Map"},
+            { "MenuRegion", "Region List"},
+            { "MenuUser", "Gebruiker"},
+            { "MenuOnlineUsers", "Online Gebruikers"},
+            { "MenuUserSearch", "Zoek Gebruiker"},
+            { "MenuRegionSearch", "Region Search"},
+            { "MenuChat", "Chat"},
+            { "MenuHelp", "Help"},
+            { "MenuViewerHelp", "Viewer Help"},
+            { "MenuChangeUserInformation", "Wijzig User Informatie"},
+            { "MenuWelcomeScreenManager", "Welcome Screen Manager"},
+            { "MenuNewsManager", "Nieuws Manager"},
+            { "MenuUserManager", "User Manager"},
+            { "MenuFactoryReset", "Factory Reset"},
+            { "ResetMenuInfoText", "Reset de menu items terug naar de default waardes"},
+            { "ResetSettingsInfoText", "Reset de Web Interface terug naar de default waardes"},
+            { "MenuPageManager", "Page Manager"},
+            { "MenuSettingsManager", "Settings Manager"},
+            { "MenuManager", "Beheer"},
+            { "MenuSettings", "Instellingen"},
+            { "MenuRegionManager", "Regio Manager"},
+            { "MenuManagerSimConsole", "Sim console"},
+            { "MenuPurchases", "Gebruiker Aankopen"},
+            { "MenuMyPurchases", "Mijn aankopen "},
+            { "MenuTransactions", "Gebruiker Transacties"},
+            { "MenuMyTransactions", "Mijn Transacties"},
+            { "MenuClassifieds", "Advertenties"},
+            { "MenuMyClassifieds", "Mijn Advertenties"},
+            { "MenuEvents", "Evenementen"},
+            { "MenuMyEvents", "Mijn evenementen"},
+            { "MenuStatistics", "Viewer statistieken"},
+            { "MenuGridSettings", "Grid instellingen"},
+
+            // Menu Tooltips
+            { "TooltipsMenuHome", "Home"},
+            { "TooltipsMenuLogin", "Login"},
+            { "TooltipsMenuLogout", "Logout"},
+            { "TooltipsMenuRegister", "Registeer"},
+            { "TooltipsMenuForgotPass", "Wachtwoord vergeten"},
+            { "TooltipsMenuNews", "Nieuws"},
+            { "TooltipsMenuWorld", "Wereld"},
+            { "TooltipsMenuWorldMap", "Wereld Map"},
+            { "TooltipsMenuUser", "User"},
+            { "TooltipsMenuOnlineUsers", "Online Users"},
+            { "TooltipsMenuUserSearch", "User Search"},
+            { "TooltipsMenuRegionSearch", "Region Search"},
+            { "TooltipsMenuChat", "Chat"},
+            { "TooltipsMenuViewerHelp", "Viewer Help"},
+            { "TooltipsMenuHelp", "Help"},
+            { "TooltipsMenuChangeUserInformation", "Change User Information"},
+            { "TooltipsMenuWelcomeScreenManager", "Welcome Screen Manager"},
+            { "TooltipsMenuNewsManager", "Nieuws Manager"},
+            { "TooltipsMenuUserManager", "User Manager"},
+            { "TooltipsMenuFactoryReset", "Factory Reset"},
+            { "TooltipsMenuPageManager", "Page Manager"},
+            { "TooltipsMenuSettingsManager", "Settings Manager"},
+            { "TooltipsMenuManager", "Admin Management"},
+            { "TooltipsMenuSettings", "WebUI Instellingen"},
+            { "TooltipsMenuRegionManager", "Regio maken / bewerken"},
+            { "TooltipsMenuManagerSimConsole", "Online simulator console"},
+            { "TooltipsMenuPurchases", "Aankoop informatie"},
+            { "TooltipsMenuTransactions", "Transactie-informatie"},
+            { "TooltipsMenuClassifieds", "Advertenties informatie"},
+            { "TooltipsMenuEvents", "Evenement informatie"},
+            { "TooltipsMenuStatistics", "Viewer statistieken"},
+            { "TooltipsMenuGridSettings", "Grid instellingen"},
+
+            // Menu Region
+            { "MenuRegionTitle", "Region"},
+            { "MenuParcelTitle", "Parcel"},
+            { "MenuOwnerTitle", "Owner"},
+            { "TooltipsMenuRegion", "Regio informatie"},
+            { "TooltipsMenuParcel", "Regio Parcels"},
+            { "TooltipsMenuOwner", "Estate Owner"},
+
+            // Menu Profile
+            { "MenuProfileTitle", "Profile"},
+            { "MenuGroupTitle", "Group"},
+            { "MenuPicksTitle", "Picks"},
+            { "MenuRegionsTitle", "Regions"},
+            { "TooltipsMenuProfile", "Gebruiker Profile"},
+            { "TooltipsMenuGroups", "Gebruikersgroepen"},
+            { "TooltipsMenuPicks", "Gebruiker Picks"},
+            { "TooltipsMenuRegions", "Gebruiker regio"},
+            { "UserGroupNameText", "Gebruikersgroep"},
+            { "PickNameText", "Pick naam"},
+            { "PickRegionText", "Locatie"},
+
+            // Urls
+            { "WelcomeScreen", "Welcome Screen"},
+
+            // Tooltips Urls
+            { "TooltipsWelcomeScreen", "Welcome Screen"},
+            { "TooltipsWorldMap", "World Map"},
+
+            // Index
+            { "HomeText", "Home"},
+            { "HomeTextWelcome", "This is our New Virtual World! Join us now, and make a difference!"},
+            { "HomeTextTips", "New presentations"},
+            { "WelcomeToText", "Welcome to"},
+
+            // World Map
+            { "WorldMap", "World Map"},
+            { "WorldMapText", "Full Screen"},
+
+            // Chat
+            { "ChatText", "Chat Support"},
+
+            // Help
+            { "HelpText", "Help"},
+            { "HelpViewersConfigText", "Viewer Configuratie"},
+
+            // Logout
+            { "Logout", "Logout"},
+            { "LoggedOutSuccessfullyText", "You have been logged out successfully."},
+
+            // Change user information page
+            { "ChangeUserInformationText", "Change User Information"},
+            { "ChangePasswordText", "Change Password"},
+            { "NewPasswordText", "New Password"},
+            { "NewPasswordConfirmationText", "New Password (Confirmation)"},
+            { "ChangeEmailText", "Change Email Address"},
+            { "NewEmailText", "New Email Address"},
+            { "DeleteUserText", "Delete My Account"},
+            { "DeleteText", "Delete"},
+            { "DeleteUserInfoText",
+                    "This will remove all information about you in the grid and remove your access to this service. If you wish to continue, enter your name and password and click Delete."},
+            { "EditText", "Edit"},
+            { "EditUserAccountText", "Edit User Account"},
+
+            // Maintenance
+            { "WebsiteDownInfoText", "Website is currently down, please try again soon."},
+            { "WebsiteDownText", "Website offline"},
+
+            // Http 404
+            { "Error404Text", "Error code"},
+            { "Error404InfoText", "404 Page Not Found"},
+            { "HomePage404Text", "home page"},
+
+            // Http 505
+            { "Error505Text", "Error code"},
+            { "Error505InfoText", "505 Internal Server Error"},
+            { "HomePage505Text", "home page"},
+
+            // User search
+            { "Search", "Search"},
+            { "SearchText", "Search"},
+            { "SearchForUserText", "Search For A User"},
+            { "UserSearchText", "User Search"},
+            { "SearchResultForUserText", "Search Result For User"},
+
+            // Region search
+            { "SearchForRegionText", "Search For A Region"},
+            { "RegionSearchText", "Region Search"},
+            { "SearchResultForRegionText", "Search Result For Region"},
+
+            // Edit user
+            { "AdminDeleteUserText", "Delete User"},
+            { "AdminDeleteUserInfoText", "This deletes the account and destroys all information associated with it."},
+            { "BanText", "Ban"},
+            { "UnbanText", "Unban"},
+            { "AdminTempBanUserText", "Temp Ban User"},
+            { "AdminTempBanUserInfoText", "This blocks the user from logging in for the set amount of time."},
+            { "AdminBanUserText", "Ban User"},
+            { "AdminBanUserInfoText", "This blocks the user from logging in until the user is unbanned."},
+            { "AdminUnbanUserText", "Unban User"},
+            { "AdminUnbanUserInfoText", "Removes temporary and permanent bans on the user."},
+            { "AdminLoginInAsUserText", "Login as User"},
+            { "AdminLoginInAsUserInfoText",
+                    "You will be logged out of your admin account, and logged in as this user, and will see everything as they see it."},
+            { "TimeUntilUnbannedText", "Time until user is unbanned"},
+            { "BannedUntilText", "User banned until:"},
+            { "KickAUserText", "Kick User"},
+            { "KickAUserInfoText", "Kicks a user from the grid (logs them out within 30 seconds)"},
+            { "KickMessageText", "Message To User"},
+            { "KickUserText", "Kick User"},
+            { "MessageAUserText", "Send User A Message"},
+            { "MessageAUserInfoText", "Sends a user a blue-box message (will arrive within 30 seconds)"},
+            { "MessageUserText", "Message User"},
+
+            // Transactions
+            { "TransactionsText", "Transacties"},
+            { "DateInfoText", "Selecteer een datumbereik"},
+            { "DateStartText", "Ingangsdatum"},
+            { "DateEndText", "Eind"},
+            { "30daysPastText", "Vorige 30 dagen"},
+            { "TransactionToAgentText", "To User"},
+            { "TransactionFromAgentText", "From User"},
+            { "TransactionDateText", "Datum"},
+            { "TransactionDetailText", "Beschrijving"},
+            { "TransactionAmountText", "Bedrag"},
+            { "TransactionBalanceText", "Balance"},
+            { "NoTransactionsText", "Geen transacties gevonden..."},
+            { "PurchasesText", "Aankopen"},
+            { "LoggedIPText", "Gelogde IP-adres"},
+            { "NoPurchasesText", "Geen aankopen gevonden..."},
+            { "PurchaseCostText", "Kosten"},
+
+            // Classifieds
+            { "ClassifiedsText", "Advertenties"},
+            { "ClassifiedText", "Advertentie"},
+            { "ListedByText", "Aangeboden door"},
+            { "CreationDateText", "Aanmaakdatum"},
+            { "ExpirationDateText", "Uiterste houdbaarheidsdatum" },
+            { "DescriptionText", "Beschrijving" },
+            { "PriceOfListingText", "Prijs"},
+
+            // Classified categories
+            { "CatAll", "Alle"},
+            { "CatSelect", ""},
+            { "CatShopping", "Het winkelen"},
+            { "CatLandRental", "Land Huur"},
+            { "CatPropertyRental", "Eigendom Huur"},
+            { "CatSpecialAttraction", "Bijzondere attractien"},
+            { "CatNewProducts", "Nieuwe Producten"},
+            { "CatEmployment", "Werk"},
+            { "CatWanted", "Gezocht"},
+            { "CatService", "Service"},
+            { "CatPersonal", "Persoonlijk"},
+
+            // Events
+            { "EventsText", "Evenementen"},
+            { "EventNameText", "Evenement"},
+            { "EventLocationText", "Waar"},
+            { "HostedByText","Gepresenteerd door"},
+            { "EventDateText", "Wanneer"},
+            { "EventTimeInfoText", "Event tijd moeten de lokale tijd (Server)"},
+            { "CoverChargeText", "Dekking"},
+            { "DurationText", "Duur"},
+            { "AddEventText", "Voeg Event"},
+
+            // Event categories
+            { "CatDiscussion", "Discussie"},
+            { "CatSports", "Sport"},
+            { "CatLiveMusic", "Live muziek"},
+            { "CatCommercial", "Commercieel"},
+            { "CatEntertainment", "Nachtleven/Vermaak"},
+            { "CatGames", "Spellen/Wedstrijden"},
+            { "CatPageants", "Pageants"},
+            { "CatEducation", "Onderwijs"},
+            { "CatArtsCulture", "Arts/Cultuur"},
+            { "CatCharitySupport", "Liefdadigheid/Steungroepp"},
+            { "CatMiscellaneous", "Diversen"},
+
+            // Event lookup periods
+            { "Next24Hours", "Komende 24 uur"},
+            { "Next10Hours", "Komende 10 uur"},
+            { "Next4Hours", "Komende 4 uur"},
+            { "Next2Hours", "Komende 2 uur"},
+
+            // Sim Console
+            { "SimConsoleText", "Sim Command Console"},
+            { "SimCommandText", "Command"},
+
+            // Statistics
+            { "StatisticsText", "Viewer statistieken"},
+            { "ViewersText", "Viewer gebruik"},
+            { "GPUText", "Grafische kaarten"},
+            { "PerformanceText", "Gemiddelden prestaties"},
+            { "FPSText", "Frames / seconde"},
+            { "RunTimeText", "Looptijd"},
+            { "RegionsVisitedText", "Bezochte regio's"},
+            { "MemoryUseageText", "Geheugen gebruik"},
+            { "PingTimeText", "Ping tijd"},
+            { "AgentsInViewText", "Agenten in het oog"},
+            { "ClearStatsText", "Duidelijke statistieken over"},
+
+            // Abuse reports
+            { "MenuAbuse", "Misbruik Rapporten"},
+            { "TooltipsMenuAbuse", "Gebruiker misbruil rapporten"},
+            { "AbuseReportText", "Meld misbruikt"},
+            { "AbuserNameText", "Abuser"},
+            { "AbuseReporterNameText", "Verslaggever"},
+            { "AssignedToText", "Toegewezen aan"},
+
+            // Factory_reset
+            { "FactoryReset", "Factory Reset"},
+            { "ResetMenuText", "Reset Menu To Factory Defaults"},
+            { "ResetSettingsText", "Reset Web Settings (Settings Manager page) To Factory Defaults"},
+            { "Reset", "Reset"},
+            { "Settings", "Settings"},
+            { "Pages", "Pages"},
+            { "DefaultsUpdated", "defaults updated, go to Factory Reset to update or Settings Manager to disable this warning."},
+
+            // Page_manager
+            { "PageManager", "Page Manager"},
+            { "SaveMenuItemChanges", "Save Menu Item"},
+            { "SelectItem", "Select Item"},
+            { "DeleteItem", "Delete Item"},
+            { "AddItem", "Add Item"},
+            { "PageLocationText", "Page Location"},
+            { "PageIDText", "Page ID"},
+            { "PagePositionText", "Page Position"},
+            { "PageTooltipText", "Page Tooltip"},
+            { "PageTitleText", "Page Title"},
+            { "RequiresLoginText", "Requires Login To View"},
+            { "RequiresLogoutText", "Requires Logout To View"},
+            { "RequiresAdminText", "Requires Admin To View"},
+            { "RequiresAdminLevelText", "Required Admin Level To View"},
+
+            // Grid settings
+            { "GridSettingsManager", "Grid Settings Manager"},
+            { "GridnameText", "Grid naam"},
+            { "GridnickText", "Grid bijnaam"},
+            { "WelcomeMessageText", "Login welkomstbericht "},
+            { "GovernorNameText", "Systeem gouverneur"},
+            { "MainlandEstateNameText", "Vasteland landgoed"},
+            { "RealEstateOwnerNameText", "Systeem goed ownername"},
+            { "SystemEstateNameText", "Naam Estate systeem"},
+            { "BankerNameText", "Systeem bankierr"},
+            { "MarketPlaceOwnerNameText", "Systeem marketplace eigenaar"},
+
+            // Settings manager
+            { "WebRegistrationText", "Web registrations allowed"},
+            { "GridCenterXText", "Grid Center Location X"},
+            { "GridCenterYText", "Grid Center Location Y"},
+            { "SettingsManager", "Settings Manager"},
+            { "IgnorePagesUpdatesText", "Ignore pages update warning until next update"},
+            { "IgnoreSettingsUpdatesText", "Ignore settings update warning until next update"},
+            { "HideLanguageBarText", "Verbergen taalkeuzemenu"},
+            { "HideStyleBarText", "Verbergen stijl keuzebalk"},
+            { "HideSlideshowBarText", "Verbergen slideshow bar"},
+            { "LocalFrontPageText", "Lokale voorpagina"},
+            { "LocalCSSText", "Lokale CSS stylesheet"},
+
+            // Dates
+            { "Sun", "Sun"},
+            { "Mon", "Mon"},
+            { "Tue", "Tue"},
+            { "Wed", "Wed"},
+            { "Thu", "Thu"},
+            { "Fri", "Fri"},
+            { "Sat", "Sat"},
+            { "Sunday", "Sunday"},
+            { "Monday", "Monday"},
+            { "Tuesday", "Tuesday"},
+            { "Wednesday", "Wednesday"},
+            { "Thursday", "Thursday"},
+            { "Friday", "Friday"},
+            { "Saturday", "Saturday"},
+
+            { "Jan_Short", "Jan"},
+            { "Feb_Short", "Feb"},
+            { "Mar_Short", "Mar"},
+            { "Apr_Short", "Apr"},
+            { "May_Short", "May"},
+            { "Jun_Short", "Jun"},
+            { "Jul_Short", "Jul"},
+            { "Aug_Short", "Aug"},
+            { "Sep_Short", "Sep"},
+            { "Oct_Short", "Oct"},
+            { "Nov_Short", "Nov"},
+            { "Dec_Short", "Dec"},
+
+            { "January", "January"},
+            { "February", "February"},
+            { "March", "March"},
+            { "April", "April"},
+            { "May", "May"},
+            { "June", "June"},
+            { "July", "July"},
+            { "August", "August"},
+            { "September", "September"},
+            { "October", "October"},
+            { "November", "November"},
+            { "December", "December"},
+
+            // User types
+            { "UserTypeText", "Soort gebruiker"},
+            { "AdminUserTypeInfoText", "Het type gebruiker (momenteel gebruikt voor periodieke betalingen stipendium)."},
+            { "Guest", "Gast"},
+            { "Resident", "Ingezetene"},
+            { "Member", "Lid"},
+            { "Contractor", "Aannemer"},
+            { "Charter_Member", "Mede-oprichter"},
+
+            // ColorBox
+            { "ColorBoxImageText", "Image"},
+            { "ColorBoxOfText", "of"},
+            { "ColorBoxPreviousText", "Previous"},
+            { "ColorBoxNextText", "Next"},
+            { "ColorBoxCloseText", "Close"},
+            { "ColorBoxStartSlideshowText", "Start Slide Show"},
+            { "ColorBoxStopSlideshowText", "Stop Slide Show"},
+
+            // Maintenance
+            { "NoAccountFound", "Nog geen account gevonden"},
+            { "DisplayInMenu", "Display in het menu"},
+            { "ParentText", "Menu ouder"},
+            { "CannotSetParentToChild", "Kan geen menu-item als een kind naar zichzelf."},
+            { "TopLevel", "Top Level"},
+
+            // Style Switcher
+            { "styles1", "Default Minimalist"},
+            { "styles2", "Light Degarde"},
+            { "styles3", "Blue Night"},
+            { "styles4", "Dark Degrade"},
+            { "styles5", "Luminus"},
+
+            { "StyleSwitcherStylesText", "Styles"},
+            { "StyleSwitcherLanguagesText", "Languages"},
+            { "StyleSwitcherChoiceText", "Choice"},
+
+            // Language Switcher Tooltips
+            { "en", "English"},
+            { "fr", "Fran?ais"},
+            { "de", "Deutsch"},
+            { "it", "Italiano"},
+            { "es", "Espa?ol"},
+            { "nl", "Nederlands"},
+            { "ru", "–†—É—Å—Å–∫–∏–π"}
+
+        };
     }
 }

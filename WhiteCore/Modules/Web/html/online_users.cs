@@ -35,93 +35,83 @@ namespace WhiteCore.Modules.Web
 {
     public class OnlineUsersPage : IWebInterfacePage
     {
-        public string[] FilePath
-        {
-            get
-            {
-                return new[]
+        public string [] FilePath {
+            get {
+                return new []
                            {
                                "html/online_users.html"
                            };
             }
         }
 
-        public bool RequiresAuthentication
-        {
+        public bool RequiresAuthentication {
             get { return true; }
         }
 
-        public bool RequiresAdminAuthentication
-        {
+        public bool RequiresAdminAuthentication {
             get { return false; }
         }
 
-        public Dictionary<string, object> Fill(WebInterface webInterface, string filename, OSHttpRequest httpRequest,
+        public Dictionary<string, object> Fill (WebInterface webInterface, string filename, OSHttpRequest httpRequest,
                                                OSHttpResponse httpResponse, Dictionary<string, object> requestParameters,
                                                ITranslator translator, out string response)
         {
             response = null;
-            var vars = new Dictionary<string, object>();
-            var usersList = new List<Dictionary<string, object>>();
+            var vars = new Dictionary<string, object> ();
+            var usersList = new List<Dictionary<string, object>> ();
             var agentInfo = Framework.Utilities.DataManager.RequestPlugin<IAgentInfoConnector> ();
 
             var IsAdmin = Authenticator.CheckAdminAuthentication (httpRequest);
 
-            //var activeUsers = agentInfo.RecentlyOnline(15*60, true, new Dictionary<string, bool>());
-            var activeUsers = agentInfo.CurrentlyOnline(0, new Dictionary<string, bool>());
+            //var activeUsers = agentInfo.RecentlyOnline(15*60, true, new Dictionary<string, bool>());  // active in the last 15 minutes
+            var activeUsers = agentInfo.CurrentlyOnline (0, new Dictionary<string, bool> ());
+            var onlineText = "";
 
-            if (activeUsers.Count > 0)
-            {
-                var activeUsersList = new List<UUID>();
+            if (activeUsers.Count > 0) {
+                var activeUsersList = new List<UUID> ();
 
                 if (IsAdmin)        // display all online users
                 {
-                    foreach (var user in activeUsers)
-                    {
-                        activeUsersList.Add ((UUID) user.UserID);
+                    onlineText = translator.GetTranslatedString ("OnlineUsersText");
+                    foreach (var user in activeUsers) {
+                        activeUsersList.Add ((UUID)user.UserID);
                     }
 
                 } else             // only show the users online friends
                 {
+                    onlineText = translator.GetTranslatedString ("OnlineFriendsText");
 
-                    UserAccount ourAccount = Authenticator.GetAuthentication (httpRequest);
-                    if (ourAccount != null)
-                    {
-                        IFriendsService friendsService = webInterface.Registry.RequestModuleInterface<IFriendsService> ();
-                        if (friendsService != null)
-                        {
+                    var ourAccount = Authenticator.GetAuthentication (httpRequest);
+                    if (ourAccount != null) {
+                        var friendsService = webInterface.Registry.RequestModuleInterface<IFriendsService> ();
+                        if (friendsService != null) {
                             var friends = friendsService.GetFriends (ourAccount.PrincipalID);
-                            foreach (var friend in friends)
-                            {
+                            foreach (var friend in friends) {
                                 UUID friendID;
                                 UUID.TryParse (friend.Friend, out friendID);
 
-                                if (friendID != UUID.Zero) 
-                                // if ( (friendID != UUID.Zero) && (friendID == ourAccount.PrincipalID)) 
-                                activeUsersList.Add (friendID);
+                                if (friendID != UUID.Zero)
+                                    // if ( (friendID != UUID.Zero) && (friendID == ourAccount.PrincipalID)) 
+                                    activeUsersList.Add (friendID);
                             }
                         }
                     }
                 }
 
-                if (activeUsersList.Count > 0)
-                {
-                    IUserAccountService accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
-                    IGridService gridService = webInterface.Registry.RequestModuleInterface<IGridService> ();
-                    
-                    foreach (var user in activeUsers)
-                    {
-                        if (Utilities.IsSystemUser ((UUID) user.UserID))
+                if (activeUsersList.Count > 0) {
+                    var accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
+                    var gridService = webInterface.Registry.RequestModuleInterface<IGridService> ();
+
+                    foreach (var user in activeUsers) {
+                        if (Utilities.IsSystemUser ((UUID)user.UserID))
                             continue;
-                        if ( ! activeUsersList.Contains((UUID) user.UserID))
+                        if (!activeUsersList.Contains ((UUID)user.UserID))
                             continue;
 
                         var region = gridService.GetRegionByUUID (null, user.CurrentRegionID);
-                        if (region != null)
-                        {
+                        if (region != null) {
                             var account = accountService.GetUserAccount (region.AllScopeIDs, UUID.Parse (user.UserID));
-                            if (account != null)
-                            {
+                            if (account != null) {
                                 usersList.Add (new Dictionary<string, object> {
                                     { "UserName", account.Name },
                                     { "UserRegion", region.RegionName },
@@ -135,9 +125,8 @@ namespace WhiteCore.Modules.Web
                 }
             }
 
-            if (usersList.Count == 0)
-            {
-                usersList.Add(
+            if (usersList.Count == 0) {
+                usersList.Add (
                     new Dictionary<string, object>
                 {
                     {"UserName", ""},
@@ -148,32 +137,25 @@ namespace WhiteCore.Modules.Web
                 });
             }
 
-            if (requestParameters.ContainsKey("Order"))
-            {
-                if (requestParameters["Order"].ToString() == "RegionName")
-                    usersList.Sort((a, b) => a["UserRegion"].ToString().CompareTo(b["UserRegion"].ToString()));
-                if (requestParameters["Order"].ToString() == "UserName")
-                    usersList.Sort((a, b) => a["UserName"].ToString().CompareTo(b["UserName"].ToString()));
+            if (requestParameters.ContainsKey ("Order")) {
+                if (requestParameters ["Order"].ToString () == "RegionName")
+                    usersList.Sort ((a, b) => a ["UserRegion"].ToString ().CompareTo (b ["UserRegion"].ToString ()));
+                if (requestParameters ["Order"].ToString () == "UserName")
+                    usersList.Sort ((a, b) => a ["UserName"].ToString ().CompareTo (b ["UserName"].ToString ()));
             }
 
 
-            vars.Add("UsersOnlineList", usersList);
-            vars.Add("OnlineUsersText", translator.GetTranslatedString("OnlineUsersText"));
-            vars.Add("UserNameText", translator.GetTranslatedString("UserNameText"));
-            vars.Add("OnlineLocationText", translator.GetTranslatedString("OnlineLocationText"));
-            vars.Add("RegionNameText", translator.GetTranslatedString("RegionNameText"));
-            vars.Add("MoreInfoText", translator.GetTranslatedString("MoreInfoText"));
-
-            vars.Add("FirstText", translator.GetTranslatedString("FirstText"));
-            vars.Add("BackText", translator.GetTranslatedString("BackText"));
-            vars.Add("NextText", translator.GetTranslatedString("NextText"));
-            vars.Add("LastText", translator.GetTranslatedString("LastText"));
-            vars.Add("CurrentPageText", translator.GetTranslatedString("CurrentPageText"));
+            vars.Add ("OnlineUsersText", onlineText);
+            vars.Add ("UsersOnlineList", usersList);
+            vars.Add ("UserNameText", translator.GetTranslatedString ("UserNameText"));
+            vars.Add ("OnlineLocationText", translator.GetTranslatedString ("OnlineLocationText"));
+            vars.Add ("RegionNameText", translator.GetTranslatedString ("RegionNameText"));
+            vars.Add ("MoreInfoText", translator.GetTranslatedString ("MoreInfoText"));
 
             return vars;
         }
 
-        public bool AttemptFindPage(string filename, ref OSHttpResponse httpResponse, out string text)
+        public bool AttemptFindPage (string filename, ref OSHttpResponse httpResponse, out string text)
         {
             text = "";
             return false;

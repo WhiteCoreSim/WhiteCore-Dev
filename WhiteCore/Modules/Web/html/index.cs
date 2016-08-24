@@ -185,7 +185,7 @@ namespace WhiteCore.Modules.Web
             return vars;
         }
 
-        private string GetTranslatedString(ITranslator translator, string name, GridPage page, bool isTooltip)
+        string GetTranslatedString(ITranslator translator, string name, GridPage page, bool isTooltip)
         {
             string retVal = translator.GetTranslatedString(name);
             if (retVal == "UNKNOWN CHARACTER")

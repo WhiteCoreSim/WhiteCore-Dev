@@ -115,8 +115,7 @@ namespace WhiteCore.Modules.Web
                 var friends = friendsService.GetFriends (account.PrincipalID);
                 UUID friendID = UUID.Zero;
                 if (friends.Any (f => UUID.TryParse (f.Friend, out friendID) && friendID == ourAccount.PrincipalID)) {
-                    IAgentInfoService agentInfoService =
-                        webInterface.Registry.RequestModuleInterface<IAgentInfoService> ();
+                    IAgentInfoService agentInfoService = webInterface.Registry.RequestModuleInterface<IAgentInfoService> ();
                     IGridService gridService = webInterface.Registry.RequestModuleInterface<IGridService> ();
                     UserInfo ourInfo = agentInfoService.GetUserInfo (account.PrincipalID.ToString ());
                     if (ourInfo != null && ourInfo.IsOnline)

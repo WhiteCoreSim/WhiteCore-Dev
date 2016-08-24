@@ -774,7 +774,7 @@ SLURL.Map.prototype.CreateMapDiv = function(mainDiv){
 	if(SLMap.options.showRegionSearchForm){ // create the div for the text input form
 		var
 			form          = document.createElement("form"),
-			formLabel     = document.createTextNode("Enter region name:"),
+			formLabel     = document.createTextNode("Search for: "),
 			formLabelSpan = document.createElement("span"),
 			formText      = document.createElement("input"),
 			formButton    = document.createElement("input"),
@@ -803,7 +803,7 @@ SLURL.Map.prototype.CreateMapDiv = function(mainDiv){
 		formLabelSpan.appendChild(formLabel);
 
 		// Text field for the region name
-		formText.value = "<Search Region>";
+		formText.value = "";
 		formText.size = 15;
 
 		// Button to activate 'go to region'
@@ -835,7 +835,7 @@ SLURL.Map.prototype.gotoRegion = function(regionName){
 				new SLURL.XYPoint(x, y)
 			);
 		} else {
-			alert('No coordinates could be found for region "' + regionName + '"');
+			alert('No coordinates could be found for "' + regionName + '"');
 		}
 	}, SLURL.getRegionCoordsByNameVar());
 }

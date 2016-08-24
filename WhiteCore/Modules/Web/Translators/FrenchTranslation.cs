@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org
+ * Copyright (c) Contributors, http://whitecore-sim.org
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,733 +25,612 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System.Collections.Generic;
+
 namespace WhiteCore.Modules.Web.Translators
 {
     public class FrenchTranslation : ITranslator
     {
-        public string LanguageName
-        {
+        public string LanguageName {
             get { return "fr"; }
         }
 
-        public string GetTranslatedString(string key)
+        public string GetTranslatedString (string key)
         {
-            switch (key)
-            {
-                // Generic
-                case "No": return "Non";
-                case "Yes": return "Oui";
-                case "FirstText": return "Premier";
-                case "Submit": return "Envoyer";
-                case "Accept": return "Accepter";
-                case "Save": return "Sauver";
-                case "BackText": return "Précédent";
-                case "NextText": return "Suivant";
-                case "LastText": return "Dernier";
-                case "CurrentPageText": return "Page actuelle";
-                case "MoreInfoText": return "Plus d'informations";
-                case "NoDetailsText": return "Pas de détails trouvés...";
-            case "MoreInfo":
-                return "Plus d'informations";
-
-            case "ObjectNameText": return "Objet";
-            case "LocationText": return "Emplacement";
-            case "UUIDText": return "UUID";
-            case "DetailsText": return "Description";
-            case "NotesText": return "Remarques";
-            case "SaveUpdates": return "Enregistrer les mises à jour";
-            case "ActiveText": return "Actif";
-            case "CheckedText": return "Vérifié";
-            case "CategoryText": return "Catégorie";
-            case "SummaryText": return "Résumé";
-                
-                //Status information
-                case "GridStatus": return "Etat de la Grille";
-                case "Online": return "En Ligne";
-                case "Offline": return "Hors Ligne";
-                case "TotalUserCount": return "Nombre total d'utilisateurs";
-                case "TotalRegionCount": return "Nombre total de régions";
-                case "UniqueVisitors": return "Visiteurs unique (30 jours)";
-                case "OnlineNow": return "En ligne maintenant";
-                case "HyperGrid": return "HyperGrid (HG)";
-                case "Voice": return "Voix";
-                case "Currency": return "Monnaie";
-                case "Disabled": return "Désactivé";
-                case "Enabled": return "Activé";
-                case "News": return "Nouveautés";
-                case "Region": return "Région";
-
-                //User login
-                case "Login": return "Connection";
-                case "UserName": return "Nom d'utilisateur";
-                case "UserNameText": return "Nom d'utilisateur";
-                case "Password": return "Mot de passe";
-                case "PasswordText": return "Mot de passe";
-                case "PasswordConfirmation": return "Confirmer Mot de passe";
-                case "ForgotPassword": return "Mot de passe oublié?";
-
-                // Special windows
-                case "SpecialWindowTitleText": return "Titre spécial de la fenêtre Info";
-                case "SpecialWindowTextText": return "Texte spécial de la fenêtre Infos";
-                case "SpecialWindowColorText": return "Couleur spécial de la fenêtre Infos";
-                case "SpecialWindowStatusText": return "Status spécial de la fenêtre Infos";
-                case "WelcomeScreenManagerFor": return "Welcome Screen Manager pour";
-                case "ChangesSavedSuccessfully": return "Changements enregistrés avec succès";
-
-                // User registration
-                case "AvatarNameText": return "Nom de l'Avatar";
-                case "AvatarScopeText": return "Scope ID de l'Avatar";
-                case "FirstNameText": return "Votre Nom";
-                case "LastNameText": return "Votre Prénom";
-                case "UserAddressText": return "Votre Addresse";
-                case "UserZipText": return "Votre Code Zip";
-                case "UserCityText": return "Votre Ville";
-                case "UserCountryText": return "Votre Pays";
-                case "UserDOBText": return "Votre date d'anniversaire (Mois Jour Année)";
-                case "UserEmailText": return "Votre Email";
-                case "UserHomeRegionText": return "Accueil région";
-                case "RegistrationText": return "Enregistrement de l'Avatar";
-                case "RegistrationsDisabled": return "Les inscriptions sont actuellement désactivés, s'il vous plaît réessayez à nouveau dans quelques temps...";
-                case "TermsOfServiceText": return "Conditions d'utilisation";
-                case "TermsOfServiceAccept": return "Acceptez-vous les Conditions d'utilisation détaillés ci-dessus?";
-                case "AvatarNameError": return "Vous n'avez pas saisi un nom d'avatar!";
-                case "AvatarPasswordError": return "Mot de passe est vide ou ne correspondant pas!";
-                case "AvatarEmailError": return "Une adresse e-mail est nécessaire pour la récupération de mot de passe! ('none' si inconnu";
-                case "AvatarNameSpacingError": return "Votre nom d'avatar devrait être «Prénom Nom»!";
-
-                // news
-                case "OpenNewsManager": return "Ouvrez le Gestionnaire des News";
-                case "NewsManager": return "Gestionnaire des News";
-                case "EditNewsItem": return "Editer  un Article News";
-                case "AddNewsItem": return "Ajouter une News";
-                case "DeleteNewsItem": return "Effacer une News";
-                case "NewsDateText": return "Date de la News";
-                case "NewsTitleText": return "Title de la News";
-                case "NewsItemTitle": return "Titre Article News";
-                case "NewsItemText": return "Texte Article News";
-                case "AddNewsText": return "Ajouter des News";
-                case "DeleteNewsText": return "Effacer des News";
-                case "EditNewsText": return "Editer des News";
-
-                // Users
-                case "UserProfileFor": return "Profil Utilisateur pour";
-                case "UsersGroupsText": return "Groupes Joints";
-                case "GroupNameText": return "Groupe";
-                case "UsersPicksText": return "Choix pour";
-                case "ResidentSince":
-                    return "Resident depuis";
-                case "AccountType":
-                    return "Type de compte";
-                case "PartnersName":
-                    return "Nom des Partenaires";
-                case "AboutMe":
-                    return "À propos de moi";
-                case "IsOnlineText":
-                    return "Status de l'Utilisateur";
-                case "OnlineLocationText":
-                    return "Emplacement actuelle de l'utilisateur";
-
-                case "RegionInformationText":
-                    return "Information sur la région";
-                case "OwnerNameText":
-                    return "Nom du propriétaire";
-                case "RegionLocationText":
-                    return "Emplacement de la Région";
-                case "RegionSizeText":
-                    return "Taille de la Région";
-                case "RegionNameText":
-                    return "Nom de la Région";
-                case "RegionTypeText":
-                    return "Type de Région";
-                case "RegionTerrainText":
-                    return "Région Terrain";
-                case "ParcelsInRegionText":
-                    return "Parcelles dans la Région";
-                case "ParcelNameText":
-                    return "Nom de la Parcelle";
-                case "ParcelOwnerText":
-                    return "Nom des Propriétaires de Parcelles";
-
-                // Region Page
-                case "RegionInfoText":
-                    return "Information de la Région";
-                case "RegionListText":
-                    return "Liste des Régions";
-                case "RegionLocXText":
-                    return "Région X";
-                case "RegionLocYText":
-                    return "Région Y";
-                case "RegionMaturityText":
-                    return "Access Rating";
-                case "SortByLocX":
-                    return "Trié par Région X";
-                case "SortByLocY":
-                    return "Trié par Région Y";
-                case "SortByName":
-                    return "Trié par Nom de Région";
-                case "RegionMoreInfo":
-                    return "Plus d'informations";
-                case "RegionMoreInfoTooltips":
-                    return "Plus d'informations au sujet de";
-                case "OnlineUsersText":
-                    return "Utilisateurs en Ligne";
-                case "RegionOnlineText":
-                    return "Status de la Région";
-                case "NumberOfUsersInRegionText":
-                    return "Nombre d'Utilisateurs dans la Région";
-
-                // Menu Buttons
-                case "MenuHome": return "Accueil";
-                case "MenuLogin": return "Connection";
-                case "MenuLogout": return "Déconnexion";
-                case "MenuRegister": return "Inscription";
-                case "MenuForgotPass": return "Mot de Passe Oublié";
-                case "MenuNews": return "News";
-                case "MenuWorld": return "Monde";
-                case "MenuWorldMap": return "Carte de Monde";
-                case "MenuRegion": return "Liste des Régions";
-                case "MenuUser": return "Utilisateurs";
-                case "MenuOnlineUsers": return "Utilisateurs en Ligne";
-                case "MenuUserSearch": return "Rechercher Utilisateur";
-                case "MenuRegionSearch": return "Rechercher Région";
-                case "MenuChat": return "Chat";
-                case "MenuHelp": return "Aide";
-                case "MenuChangeUserInformation": return "Modifier Infos Utilisateur";
-                case "MenuWelcomeScreenManager": return "Gestion Ecran Bienvenue";
-                case "MenuNewsManager": return "Gestion des News";
-                case "MenuUserManager": return "Gestion Utilisateurs";
-                case "MenuFactoryReset": return "Réinitialiser";
-                case "ResetMenuInfoText": return "Réinitialise les éléments de menu aux valeurs par défaut les plus à jour";
-                case "ResetSettingsInfoText": return "Réinitialise les réglages de l'interface Web aux valeurs par défaut les plus à jour";
-                case "MenuPageManager": return "Gestion des Pages";
-                case "MenuSettingsManager": return "Gestion des paramètres";
-                case "MenuManager": return "Gestion";
-                case "MenuSettings": return "Paramètres";
-                case "MenuRegionManager": return "Manager Région";
-                case "MenuManagerSimConsole": return "Simulateur Console";
-                case "MenuPurchases": return "Achats de l'utilisateur";
-                case "MenuMyPurchases": return "Mes Achats";
-                case "MenuTransactions": return "Transactions de l'utilisateur";
-                case "MenuMyTransactions": return "Mes Transactions";
-                case "MenuMyClassifieds": return "Mes Classifieds <NT>";                
-                case "MenuStatistics": return "Statistiques Viewer";
-                case "MenuGridSettings": return "Les paramètres de grille";
-                
-                // Tooltips Menu Buttons
-                case "TooltipsMenuHome": return "Accueil";
-                case "TooltipsMenuLogin": return "Connection";
-                case "TooltipsMenuLogout": return "Déconnection";
-                case "TooltipsMenuRegister": return "Inscription";
-                case "TooltipsMenuForgotPass": return "Mot de Passe Oublié";
-                case "TooltipsMenuNews": return "News";
-                case "TooltipsMenuWorld": return "Monde";
-                case "TooltipsMenuWorldMap": return "Carte du Monde";
-                case "TooltipsMenuUser": return "Utilisateurs";
-                case "TooltipsMenuOnlineUsers": return "Utilisateurs en ligne";
-                case "TooltipsMenuUserSearch": return "Rechercher un Utilisateurs";
-                case "TooltipsMenuRegionSearch": return "Rechercher un Région";
-                case "TooltipsMenuChat": return "Chat";
-                case "TooltipsMenuHelp": return "Aide";
-                case "TooltipsMenuChangeUserInformation": return "Modifier les informations de l'utilisateur";
-                case "TooltipsMenuWelcomeScreenManager": return "Gestionnaire de l'Ecran de Bienvenue";
-                case "TooltipsMenuNewsManager": return "Gestionnaire des News";
-                case "TooltipsMenuUserManager": return "Gestionnaire des Utilisateurs";
-                case "TooltipsMenuFactoryReset": return "Réinitialiser";
-                case "TooltipsMenuPageManager": return "Gestionnaire de Pages";
-                case "TooltipsMenuSettingsManager": return "Gestionnaire de paramètres";
-                case "TooltipsMenuManager": return "Gestion Administrative";
-                case "TooltipsMenuSettings": return "WebUI Paramètres";
-                case "TooltipsMenuRegionManager": return "Région créer / modifier";
-                case "TooltipsMenuManagerSimConsole": return "Console de simulateur en ligne";
-                case "TooltipsMenuPurchases": return "Informations d'achat";
-                case "TooltipsMenuTransactions": return "Informations sur la transaction";
-                case "TooltipsMenuStatistics": return "Statistiques Viewer";
-                case "TooltipsMenuGridSettings": return "Les paramètres de grille";
-                
-                // Menu Region
-                case "MenuRegionTitle": return "Région";
-                case "MenuParcelTitle": return "Colis";
-                case "MenuOwnerTitle": return "Propriétaire";
-                case "TooltipsMenuRegion": return "Détails de la région";
-                case "TooltipsMenuParcel": return "Colis Région";
-                case "TooltipsMenuOwner": return "Immobilier Propriétaire";
-
-                // Menu Profile
-                case "MenuProfileTitle": return "Profil";
-                case "MenuGroupTitle": return "Groupe";
-                case "MenuPicksTitle": return "Picks";
-                case "MenuRegionsTitle": return "Régions";
-                case "TooltipsMenuProfile": return "Profil utilisateur";
-                case "TooltipsMenuGroups": return "Groupes d'utilisateurs";
-                case "TooltipsMenuPicks": return "Choix de l'utilisateur";
-                case "TooltipsMenuRegions": return "Les régions de l'utilisateur";
-                case "UserGroupNameText": return "Groupe d'utilisateurs";
-                case "PickNameText": return "Choisissez nom";
-                case "PickRegionText": return "Emplacement";
-
-                // Urls
-                case "WelcomeScreen":
-                    return "Ecran de Bienvenue";
-
-                // Tooltips Urls
-                case "TooltipsWelcomeScreen":
-                    return "Ecran de Bienvenue";
-                case "TooltipsWorldMap":
-                    return "Carte du Monde";
-
-                // Style Switcher
-                case "styles1":
-                    return "Defaut Minimaliste";
-                case "styles2":
-                    return "Dégardé Clair";
-                case "styles3":
-                    return "Bleu Nuit";
-                case "styles4":
-                    return "Dégradé Foncé";
-                case "styles5":
-                    return "Luminus";
-
-                case "StyleSwitcherStylesText":
-                    return "Styles";
-                case "StyleSwitcherLanguagesText":
-                    return "Langages";
-                case "StyleSwitcherChoiceText":
-                    return "Choix";
-
-                // Language Switcher Tooltips
-                case "en":
-                    return "English";
-                case "fr":
-                    return "Français";
-                case "de":
-                    return "Deutsch";
-                case "it":
-                    return "Italiano";
-                case "es":
-                    return "Español";
-                case "nl":
-                    return "Nederlands";
-            case "ru":
-                return "Русский";
-
-            // Index Page
-            case "HomeText":
-                    return "Accueil";
-                case "HomeTextWelcome":
-                    return
-                        "Ceci est notre Nouveau Monde Virtuel! Rejoignez-nous dés maintenant, et faites la différence!";
-                case "HomeTextTips":
-                    return "Nouvelles présentations";
-                case "WelcomeToText":
-                    return "Bienvenue";
-
-                // World Map Page
-                case "WorldMap":
-                    return "Carte du Monde";
-                case "WorldMapText":
-                    return "Plein Ecran";
-
-                // Chat Page
-                case "ChatText":
-                    return "Chat de Support";
-
-                // Help Page
-                case "HelpText":
-                    return "Aide";
-                case "HelpViewersConfigText":
-                    return "Configuration Viewer";
-                case "AngstromViewer":
-                    return "Angstrom Viewer";
-                case "AstraViewer":
-                    return "Astra Viewer";
-                case "FirestormViewer":
-                    return "Firestorm Viewer";
-                case "KokuaViewer":
-                    return "Kokua Viewer";
-                case "ImprudenceViewer":
-                    return "Imprudence Viewer";
-                case "PhoenixViewer":
-                    return "Phoenix Viewer";
-                case "SingularityViewer":
-                    return "Singularity Viewer";
-                case "VoodooViewer":
-                    return "Voodoo Viewer";
-                case "ZenViewer":
-                    return "Zen Viewer";
-
-                //Logout page
-                case "LoggedOutSuccessfullyText":
-                    return "Vous avez été déconnecté avec succès.";
-                case "Logout":
-                    return "Déconnection";
-
-                //Change user information page
-                case "ChangeUserInformationText":
-                    return "Modifier les informations de l'utilisateur";
-                case "ChangePasswordText":
-                    return "Changer de Mot de Passe";
-                case "NewPasswordText":
-                    return "Nouveau Mot de Passe";
-                case "NewPasswordConfirmationText":
-                    return "Nouveau Mot de Passe (Confirmation)";
-                case "ChangeEmailText":
-                    return "Changer d'Adresse Email";
-                case "NewEmailText":
-                    return "Nouvelle Adresse Email";
-                case "DeleteUserText":
-                    return "Effacer mon Compte";
-                case "DeleteText":
-                    return "Effacer";
-                case "DeleteUserInfoText":
-                    return
-                        "Cela permettra d'éliminer toutes les informations vous concernant dans la grille et retirer votre accès à ce service. Si vous souhaitez continuer, saisissez votre nom et mot de passe et cliquez sur Supprimer.";
-                case "EditText":
-                    return "Editer";
-                case "EditUserAccountText":
-                    return "Modifier un compte utilisateur";
-
-                //Maintenance page
-                case "WebsiteDownInfoText":
-                    return "Le Site Web est actuellement en panne, s'il vous plaît réessayez ultérieurement...";
-                case "WebsiteDownText":
-                    return "Site Web Hors Ligne";
-
-                //http_404 page
-                case "Error404Text":
-                    return "Code d'Erreur";
-                case "Error404InfoText":
-                    return "404 La page n'a pu être trouvée";
-                case "HomePage404Text":
-                    return "Page d'Accueil";
-
-                //http_505 page
-                case "Error505Text":
-                    return "Code d'Erreur";
-                case "Error505InfoText":
-                    return "505 Erreur Interne du Server";
-                case "HomePage505Text":
-                    return "Page d'Accueil";
-
-                //user_search page
-                case "Search":
-                    return "Rechercher";
-                case "SearchText":
-                    return "Rechercher";
-                case "SearchForUserText":
-                    return "Recherche par Utilisateur";
-                case "UserSearchText":
-                    return "Rechercher un Utilisateur";
-                case "SearchResultForUserText":
-                    return "Résultat de la Recherche pour l'Utilisateur";
-
-                //region_search page
-                case "SearchForRegionText":
-                    return "Rechercher une Région";
-                case "RegionSearchText":
-                    return "Rechercher une Région";
-                case "SearchResultForRegionText":
-                    return "Résultat de recherche de la région";
-
-                //Edit user page
-                case "AdminDeleteUserText":
-                    return "Supprimer l'utilisateur";
-                case "AdminDeleteUserInfoText":
-                    return "Cette commande supprime le compte et détruit toutes les informations qui lui sont associés.";
-                case "BanText":
-                    return "Bannir";
-                case "UnbanText":
-                    return "Débannir";
-                case "AdminTempBanUserText":
-                    return "Temps de Bannissement";
-                case "AdminTempBanUserInfoText":
-                    return "Cela empêche l'utilisateur de se connecter pour un laps de temps.";
-                case "AdminBanUserText":
-                    return "Bannir l'utilisateur";
-                case "AdminBanUserInfoText":
-                    return "Cela empêche l'utilisateur de se connecter tant que l'interdiction n'est pas supprimée.";
-                case "AdminUnbanUserText":
-                    return "Débannir un Utilisateur";
-                case "AdminUnbanUserInfoText":
-                    return "Supprime les interdictions temporaires et permanentes sur l'utilisateur.";
-                case "AdminLoginInAsUserText":
-                    return "Connectez-vous en tant qu'utilisateur";
-                case "AdminLoginInAsUserInfoText":
-                    return
-                        "Vous serez déconnecté de votre compte admin, et connecté en tant que cet utilisateur, et vous verrez tout comme ils le voient.";
-                case "TimeUntilUnbannedText":
-                    return "Temps jusqu'à la levée du Bannissement de l'utilisateur";
-                case "DaysText":
-                    return "Jours";
-                case "HoursText":
-                    return "Heures";
-                case "MinutesText":
-                    return "Minutes";
-                case "EdittingText":
-                    return "Edition";
-                case "BannedUntilText":
-                    return "L'utilisateur est interdit jusqu'à ce que";
-                case "KickAUserText":
-                    return "Kicker l'utilisateur (L'utilisateur sera déconnecté dans les 30 secondes)";
-                case "KickMessageText":
-                    return "Message à l'utilisateur";
-                case "KickUserText":
-                    return "Kicker l'utilisateur";
-
-                //factory_reset
-                case "FactoryReset":
-                    return "Réinitialiser";
-                case "ResetMenuText":
-                    return "Réinitialiser les paramètres par défaut du menu";
-                case "ResetSettingsText":
-                    return "Rétablir les paramètres Web (page Gestionnaire de paramètres) par défaut";
-                case "Reset":
-                    return "Réinitialiser";
-                case "Settings":
-                    return "Paramètres";
-                case "Pages":
-                    return "Pages";
-                case "DefaultsUpdated":
-                    return
-                        "Mise à jour par défaut, rendez-vous sur \"Réinitialiseré\" ou \"Gestionnaire de paramètres\" pour désactiver cet avertissement.";
-
-                //page_manager
-                case "PageManager":
-                    return "Gestionnaire de Pages";
-                case "SaveMenuItemChanges":
-                    return "Enregistrer un élément de menu";
-                case "SelectItem":
-                    return "Selectionner un élément";
-                case "DeleteItem":
-                    return "Effacer un élément";
-                case "AddItem":
-                    return "Ajouter un élément";
-                case "PageLocationText":
-                    return "Emplacement de la page";
-                case "PageIDText":
-                    return "ID de la Page";
-                case "PagePositionText":
-                    return "Position de la Page";
-                case "PageTooltipText":
-                    return "Tooltip de la Page";
-                case "PageTitleText":
-                    return "Titre de la Page";
-                case "RequiresLoginText":
-                    return "Vous devez vous connecter pour voir";
-                case "RequiresLogoutText":
-                    return "Vous devez vous déconnecter pour voir";
-                case "RequiresAdminText":
-                    return "Vous devez vous connecter en temps qu'Admin pour voir";
-
-                // grid settings
-                case "GridSettingsManager": return "Grille Settings Manager ";
-                case "GridnameText": return "Nom de Grille ";
-                case "GridnickText": return "Grille surnom ";
-                case "WelcomeMessageText": return "Connectez message de bienvenue ";
-            case "GovernorNameText": return "Gouverneur du système";
-            case "MainlandEstateNameText": return "Succession continentale";
-            case "RealEstateOwnerNameText": return "Ownername immobilier du système";
-            case "SystemEstateNameText": return "Le nom du système de succession";
-            case "BankerNameText": return "Banquier du système";
-            case "MarketPlaceOwnerNameText": return "Propriétaire du marché du système";
-
-            //settings manager page
-            case "WebRegistrationText":
-                    return "Enregistrements Web autorisés";
-                case "GridCenterXText":
-                    return "Grille Location Centrer X";
-                case "GridCenterYText":
-                    return "Grille Location Centrer Y";
-                case "GoogleMapAPIKeyText":
-                    return "Google Maps API Key";
-                case "GoogleMapAPIKeyHelpText":
-                    return "Générer la Google Maps API KEY v2 ici";
-                case "SettingsManager":
-                    return "Gestionnaire de paramètres";
-                case "IgnorePagesUpdatesText":
-                    return "Ignorer les avertissements de mises à jour des pages jusqu'à la prochaine mise à jour";
-                case "IgnoreSettingsUpdatesText":
-                    return "Ignorer les avertissements de mises à jour des paramètres jusqu'à la prochaine mise à jour";
-
-                // Transactions
-                case "TransactionsText": return "Transactions";
-                case "DateInfoText": return "Sélectionnez une plage de dates";
-                case "DateStartText": return "Commençant date";
-                case "DateEndText": return "Date de fin";
-                case "30daysPastText": return "30 jours précédents";
-                case "TransactionDateText": return "Date";
-                case "TransactionDetailText": return "Description";
-                case "TransactionAmountText": return "Amount";
-                case "TransactionBalanceText": return "Balance";
-                case "NoTransactionsText": return "Aucune transaction trouvé...";
-                case "PurchasesText": return "Achats";
-                case "LoggedIPText": return "Adresse IP enregistrée";
-                case "NoPurchasesText": return "Aucun achat trouvés...";
-                case "PurchaseCostText": return "Coût";
-                
-                // Classifieds
-                case "ClassifiedsText": return "Annonce Catégorisée";
-
-                // Sim Console
-                case "SimConsoleText": return "Sim Command Console";
-                case "SimCommandText": return "Command";
-
-                // statistics
-                case "StatisticsText": return "Statistiques Viewer";
-                case "ViewersText": return "Utilisation Viewer";
-                case "GPUText": return "Les cartes graphiques";
-                case "PerformanceText": return "Moyennes de performance";
-                case "FPSText": return "Images / seconde";
-                case "RunTimeText": return "Durée";
-                case "RegionsVisitedText": return "Régions visitées";
-                case "MemoryUseageText": return "Utilisation de la mémoire";
-                case "PingTimeText": return "Ping temps";
-                case "AgentsInViewText": return "Agents en vue";
-                case "ClearStatsText": return "Effacer les statistiques sur";
-
-                // abuse reports
-            case "MenuAbuse": return "Abus Rapports";
-            case "TooltipsMenuAbuse": return "Utilisateur abuse journaliste";
-            case "AbuseReportText": return "Signaler un abus";
-            case "AbuserNameText": return "Abuser";
-            case "AbuseReporterNameText": return "Journaliste";
-            case "AssignedToText": return "Assigné à";
-
-                //Times
-                case "Sun":
-                    return "Dim";
-                case "Mon":
-                    return "Lun";
-                case "Tue":
-                    return "Mar";
-                case "Wed":
-                    return "Mer";
-                case "Thu":
-                    return "Jeu";
-                case "Fri":
-                    return "Ven";
-                case "Sat":
-                    return "Sam";
-                case "Sunday":
-                    return "Dimanche";
-                case "Monday":
-                    return "Lundi";
-                case "Tuesday":
-                    return "Mardi";
-                case "Wednesday":
-                    return "Mercredi";
-                case "Thursday":
-                    return "Jeudi";
-                case "Friday":
-                    return "Vendredi";
-                case "Saturday":
-                    return "Samedi";
-
-                case "Jan_Short":
-                    return "Jan";
-                case "Feb_Short":
-                    return "Fev";
-                case "Mar_Short":
-                    return "Mar";
-                case "Apr_Short":
-                    return "Avr";
-                case "May_Short":
-                    return "Mai";
-                case "Jun_Short":
-                    return "Jun";
-                case "Jul_Short":
-                    return "Jui";
-                case "Aug_Short":
-                    return "Aou";
-                case "Sep_Short":
-                    return "Sep";
-                case "Oct_Short":
-                    return "Oct";
-                case "Nov_Short":
-                    return "Nov";
-                case "Dec_Short":
-                    return "Dec";
-
-                case "January":
-                    return "Janvier";
-                case "February":
-                    return "Février";
-                case "March":
-                    return "Mars";
-                case "April":
-                    return "Avril";
-                case "May":
-                    return "Mai";
-                case "June":
-                    return "Juin";
-                case "July":
-                    return "Juillet";
-                case "August":
-                    return "Août";
-                case "September":
-                    return "Septembre";
-                case "October":
-                    return "Octobre";
-                case "November":
-                    return "Novembre";
-                case "December":
-                    return "Decembre";
-
-                // User types
-                case "UserTypeText":
-                    return "Type d'utilisateur";
-                case "AdminUserTypeInfoText":
-                    return "Le type d'utilisateur (Actuellement utilisé pour les paiements allocations de formation périodiques).";
-                case "Guest":
-                    return "Invité";
-                case "Resident":
-                    return "Résident";
-                case "Member":
-                    return "Membre";
-                case "Contractor":
-                    return "Entrepreneur";
-                case "Charter_Member":
-                    return "Membre de la Charte";
-
-                // ColorBox
-                case "ColorBoxImageText":
-                    return "Image";
-                case "ColorBoxOfText":
-                    return "sur";
-                case "ColorBoxPreviousText":
-                    return "Précédent";
-                case "ColorBoxNextText":
-                    return "Suivant";
-                case "ColorBoxCloseText":
-                    return "Fermer";
-                case "ColorBoxStartSlideshowText":
-                    return "Démarrer Slide Show";
-                case "ColorBoxStopSlideshowText":
-                    return "Arrêter Slide Show";
-
-                // Maintenance
-                case "NoAccountFound":
-                    return "Aucun compte trouvé";
-                case "DisplayInMenu":
-                    return "Affichage dans le menu";
-                case "ParentText":
-                    return "Menu Parent";
-                case "CannotSetParentToChild":
-                    return "Vous ne pouvez pas définir de menu comme un enfant à se.";
-                case "TopLevel":
-                    return "Haut niveau";
-                case "HideLanguageBarText":
-                    return "Masquer la barre de sélection de la langue";
-                case "HideStyleBarText":
-                    return "Masquer la barre de sélection de style";
-                case "HideSlideshowBarText":
-                    return "Masquer diaporama bar";
-                case "LocalFrontPageText":
-                    return "Page d'accueil locale";
-                case "LocalCSSText":
-                    return "CSS local feuille de style";
-
-            }
-            return "UNKNOWN CHARACTER";
+            if (dictionary.ContainsKey (key))
+                return dictionary [key];
+            return ":" + key + ":";
         }
+
+        readonly Dictionary<string, string> dictionary = new Dictionary<string, string> {
+            // Generic
+            { "No", "Non"},
+            { "Yes", "Oui"},
+            { "Submit", "Envoyer"},
+            { "Accept", "Accepter"},
+            { "Save", "Sauver"},
+            { "FirstText", "Premier"},
+            { "BackText", "Précédent"},
+            { "NextText", "Suivant"},
+            { "LastText", "Dernier"},
+            { "CurrentPageText", "Page actuelle"},
+            { "MoreInfoText", "Plus d'informations"},
+            { "NoDetailsText", "Pas de détails trouvés..."},
+            { "MoreInfo", "Plus d'informations"},
+            { "Name", "Name"},
+            { "ObjectNameText", "Objet"},
+            { "LocationText", "Emplacement"},
+            { "UUIDText", "UUID"},
+            { "DetailsText", "Description"},
+            { "NotesText", "Remarques"},
+            { "SaveUpdates", "Enregistrer les mises à jour"},
+            { "ActiveText", "Actif"},
+            { "CheckedText", "Vérifié"},
+            { "CategoryText", "Catégorie"},
+            { "SummaryText", "Résumé"},
+            { "MaturityText", "Maturité"},
+            { "DateText", "Date"},
+            { "TimeText", "Temps"},
+            { "MinuteText", "minute"},
+            { "MinutesText", "minutes"},
+            { "HourText", "heure"},
+            { "HoursText", "heures"},
+            { "EdittingText", "Rédaction"},
+
+            // Status information
+            { "GridStatus", "Etat de la Grille"},
+            { "Online", "En Ligne"},
+            { "Offline", "Hors Ligne"},
+            { "TotalUserCount", "Nombre total d'utilisateurs"},
+            { "TotalRegionCount", "Nombre total de régions"},
+            { "UniqueVisitors", "Visiteurs unique {30 jours)"},
+            { "OnlineNow", "En ligne maintenant"},
+            { "InterWorld", "Inter World (IWC)"},
+            { "HyperGrid", "HyperGrid {HG)"},
+            { "Voice", "Voix"},
+            { "Currency", "Monnaie"},
+            { "Disabled", "Désactivé"},
+            { "Enabled", "Activé"},
+            { "News", "Nouveautés"},
+            { "Region", "Région"},
+
+            // User login
+            { "Login", "Connection"},
+            { "UserName", "Nom d'utilisateur"},
+            { "UserNameText", "Nom d'utilisateur"},
+            { "Password", "Mot de passe"},
+            { "PasswordText", "Mot de passe"},
+            { "PasswordConfirmation", "Confirmer Mot de passe"},
+            { "ForgotPassword", "Mot de passe oublié?"},
+            { "TypeUserNameToConfirm", "S'il vous plaît entrez le nom d'utilisateur de ce compte pour confirmer que vous voulez supprimer ce compte"},
+
+            // Special windows
+            { "SpecialWindowTitleText", "Titre spécial de la fenêtre Info"},
+            { "SpecialWindowTextText", "Texte spécial de la fenêtre Infos"},
+            { "SpecialWindowColorText", "Couleur spécial de la fenêtre Infos"},
+            { "SpecialWindowStatusText", "Status spécial de la fenêtre Infos"},
+            { "WelcomeScreenManagerFor", "Welcome Screen Manager pour"},
+            { "ChangesSavedSuccessfully", "Changements enregistrés avec succès"},
+
+            // User registration
+            { "AvatarNameText", "Nom de l'Avatar"},
+            { "AvatarScopeText", "Scope ID de l'Avatar"},
+            { "FirstNameText", "Votre Nom"},
+            { "LastNameText", "Votre Prénom"},
+            { "UserAddressText", "Votre Addresse"},
+            { "UserZipText", "Votre Code Zip"},
+            { "UserCityText", "Votre Ville"},
+            { "UserCountryText", "Votre Pays"},
+            { "UserDOBText", "Votre date d'anniversaire {Mois Jour Année)"},
+            { "UserEmailText", "Votre Email"},
+            { "UserHomeRegionText", "Accueil région"},
+            { "RegistrationText", "Enregistrement de l'Avatar"},
+            { "RegistrationsDisabled", "Les inscriptions sont actuellement désactivés, s'il vous plaît réessayez à nouveau dans quelques temps..."},
+            { "TermsOfServiceText", "Conditions d'utilisation"},
+            { "TermsOfServiceAccept", "Acceptez-vous les Conditions d'utilisation détaillés ci-dessus?"},
+            { "AvatarNameError", "Vous n'avez pas saisi un nom d'avatar!"},
+            { "AvatarPasswordError", "Mot de passe est vide ou ne correspondant pas!"},
+            { "AvatarEmailError", "Une adresse e-mail est nécessaire pour la récupération de mot de passe! {'none' si inconnu"},
+            { "AvatarNameSpacingError", "Votre nom d'avatar devrait être «Prénom Nom»!"},
+
+            // News
+            { "OpenNewsManager", "Ouvrez le Gestionnaire des News"},
+            { "NewsManager", "Gestionnaire des News"},
+            { "EditNewsItem", "Editer  un Article News"},
+            { "AddNewsItem", "Ajouter une News"},
+            { "DeleteNewsItem", "Effacer une News"},
+            { "NewsDateText", "Date de la News"},
+            { "NewsTitleText", "Title de la News"},
+            { "NewsItemTitle", "Titre Article News"},
+            { "NewsItemText", "Texte Article News"},
+            { "AddNewsText", "Ajouter des News"},
+            { "DeleteNewsText", "Effacer des News"},
+            { "EditNewsText", "Editer des News"},
+
+            // User profile
+            { "UserProfileFor", "Profil Utilisateur pour"},
+            { "UsersGroupsText", "Groupes Joints"},
+            { "GroupNameText", "Groupe"},
+            { "UsersPicksText", "Choix pour"},
+            { "ResidentSince", "Resident depuis"},
+            { "AccountType", "Type de compte"},
+            { "PartnersName", "Nom des Partenaires"},
+            { "AboutMe", "À propos de moi"},
+            { "IsOnlineText", "Status de l'Utilisateur"},
+            { "OnlineLocationText", "Emplacement actuelle de l'utilisateur"},
+            { "Partner", "Partner"},
+            { "Friends", "Friends"},
+            { "Nothing", "Aucun"},
+            { "ChangePass", "Changer le mot de passe"},
+            { "NoChangePass", "Impossible de changer le mot de passe, s'il vous plaît réessayer plus tard"},
+
+            // Region Information
+            { "RegionInformationText", "Information sur la région"},
+            { "OwnerNameText", "Nom du propriétaire"},
+            { "RegionLocationText", "Emplacement de la Région"},
+            { "RegionSizeText", "Taille de la Région"},
+            { "RegionNameText", "Nom de la Région"},
+            { "RegionTypeText", "Type de Région"},
+            { "RegionDelayStartupText", "Delay starting scripts"},
+            { "RegionPresetText", "Region Preset"},
+            { "RegionTerrainText", "Région Terrain"},
+            { "ParcelsInRegionText", "Parcelles dans la Région"},
+            { "ParcelNameText", "Nom de la Parcelle"},
+            { "ParcelOwnerText", "Nom des Propriétaires de Parcelles"},
+
+            // Region list
+            { "RegionInfoText", "Information de la Région"},
+            { "RegionListText", "Liste des Régions"},
+            { "RegionLocXText", "Région X"},
+            { "RegionLocYText", "Région Y"},
+            { "SortByLocX", "Trié par Région X"},
+            { "SortByLocY", "Trié par Région Y"},
+            { "SortByName", "Trié par Nom de Région"},
+            { "RegionMoreInfo", "Plus d'informations"},
+            { "RegionMoreInfoTooltips", "Plus d'informations au sujet de"},
+            { "OnlineUsersText", "Utilisateurs en Ligne"},
+            { "OnlineFriendsText", "Online Friends"},
+            { "RegionOnlineText", "Status de la Région"},
+            { "RegionMaturityText", "Note d'accès"},
+            { "NumberOfUsersInRegionText", "Nombre d'Utilisateurs dans la Région"},
+
+            // Region manager
+            { "Mainland", "Territoire continental"},
+            { "Estate", "Biens"},
+            { "FullRegion", "Région complète"},
+            { "Homestead", "Propriété"},
+            { "Openspace", "Espace ouvert"},
+            { "Flatland", "Terrain plat"},
+            { "Grassland", "Prairie"},
+            { "Island", "Île"},
+            { "Aquatic", "Aquatique"},
+            { "Custom", "Coutume"},
+            { "RegionPortText", "Port Région"},
+            { "RegionVisibilityText", "Visible aux voisins"},
+            { "RegionInfiniteText", "Infini Région"},
+            { "RegionCapacityText", "Capacité d'objet Région"},
+
+            // Menus
+            { "MenuHome", "Accueil"},
+            { "MenuLogin", "Connection"},
+            { "MenuLogout", "Déconnexion"},
+            { "MenuRegister", "Inscription"},
+            { "MenuForgotPass", "Mot de Passe Oublié"},
+            { "MenuNews", "News"},
+            { "MenuWorld", "Monde"},
+            { "MenuWorldMap", "Carte de Monde"},
+            { "MenuRegion", "Liste des Régions"},
+            { "MenuUser", "Utilisateurs"},
+            { "MenuOnlineUsers", "Utilisateurs en Ligne"},
+            { "MenuUserSearch", "Rechercher Utilisateur"},
+            { "MenuRegionSearch", "Rechercher Région"},
+            { "MenuChat", "Chat"},
+            { "MenuHelp", "Aide"},
+            { "MenuViewerHelp", "Viewer Help"},
+            { "MenuChangeUserInformation", "Modifier Infos Utilisateur"},
+            { "MenuWelcomeScreenManager", "Gestion Ecran Bienvenue"},
+            { "MenuNewsManager", "Gestion des News"},
+            { "MenuUserManager", "Gestion Utilisateurs"},
+            { "MenuFactoryReset", "Réinitialiser"},
+            { "ResetMenuInfoText", "Réinitialise les éléments de menu aux valeurs par défaut les plus à jour"},
+            { "ResetSettingsInfoText", "Réinitialise les réglages de l'interface Web aux valeurs par défaut les plus à jour"},
+            { "MenuPageManager", "Gestion des Pages"},
+            { "MenuSettingsManager", "Gestion des paramètres"},
+            { "MenuManager", "Gestion"},
+            { "MenuSettings", "Paramètres"},
+            { "MenuRegionManager", "Manager Région"},
+            { "MenuManagerSimConsole", "Simulateur Console"},
+            { "MenuPurchases", "Achats de l'utilisateur"},
+            { "MenuMyPurchases", "Mes Achats"},
+            { "MenuTransactions", "Transactions de l'utilisateur"},
+            { "MenuMyTransactions", "Mes Transactions"},
+            { "MenuClassifieds", "Petites annonces"},
+            { "MenuMyClassifieds", "Mes Petites annonces"},
+            { "MenuEvents", "Événements"},
+            { "MenuMyEvents", "Mes Événements"},
+            { "MenuStatistics", "Statistiques Viewer"},
+            { "MenuGridSettings", "Les paramètres de grille"},
+
+            // Menu Tooltips
+            { "TooltipsMenuHome", "Accueil"},
+            { "TooltipsMenuLogin", "Connection"},
+            { "TooltipsMenuLogout", "Déconnection"},
+            { "TooltipsMenuRegister", "Inscription"},
+            { "TooltipsMenuForgotPass", "Mot de Passe Oublié"},
+            { "TooltipsMenuNews", "News"},
+            { "TooltipsMenuWorld", "Monde"},
+            { "TooltipsMenuWorldMap", "Carte du Monde"},
+            { "TooltipsMenuUser", "Utilisateurs"},
+            { "TooltipsMenuOnlineUsers", "Utilisateurs en ligne"},
+            { "TooltipsMenuUserSearch", "Rechercher un Utilisateurs"},
+            { "TooltipsMenuRegionSearch", "Rechercher un Région"},
+            { "TooltipsMenuChat", "Chat"},
+            { "TooltipsMenuViewerHelp", "Aide"},
+            { "TooltipsMenuHelp", "Help"},
+            { "TooltipsMenuChangeUserInformation", "Modifier les informations de l'utilisateur"},
+            { "TooltipsMenuWelcomeScreenManager", "Gestionnaire de l'Ecran de Bienvenue"},
+            { "TooltipsMenuNewsManager", "Gestionnaire des News"},
+            { "TooltipsMenuUserManager", "Gestionnaire des Utilisateurs"},
+            { "TooltipsMenuFactoryReset", "Réinitialiser"},
+            { "TooltipsMenuPageManager", "Gestionnaire de Pages"},
+            { "TooltipsMenuSettingsManager", "Gestionnaire de paramètres"},
+            { "TooltipsMenuManager", "Gestion Administrative"},
+            { "TooltipsMenuSettings", "WebUI Paramètres"},
+            { "TooltipsMenuRegionManager", "Région créer / modifier"},
+            { "TooltipsMenuManagerSimConsole", "Console de simulateur en ligne"},
+            { "TooltipsMenuPurchases", "Informations d'achat"},
+            { "TooltipsMenuTransactions", "Informations sur la transaction"},
+            { "TooltipsMenuClassifieds", "Petites informations"},
+            { "TooltipsMenuEvents", "Information sur l'événement"},
+            { "TooltipsMenuStatistics", "Statistiques Viewer"},
+            { "TooltipsMenuGridSettings", "Les paramètres de grille"},
+
+            // Menu Region box
+            { "MenuRegionTitle", "Région"},
+            { "MenuParcelTitle", "Colis"},
+            { "MenuOwnerTitle", "Propriétaire"},
+            { "TooltipsMenuRegion", "Détails de la région"},
+            { "TooltipsMenuParcel", "Colis Région"},
+            { "TooltipsMenuOwner", "Immobilier Propriétaire"},
+
+            // Menu Profile
+            { "MenuProfileTitle", "Profil"},
+            { "MenuGroupTitle", "Groupe"},
+            { "MenuPicksTitle", "Picks"},
+            { "MenuRegionsTitle", "Régions"},
+            { "TooltipsMenuProfile", "Profil utilisateur"},
+            { "TooltipsMenuGroups", "Groupes d'utilisateurs"},
+            { "TooltipsMenuPicks", "Choix de l'utilisateur"},
+            { "TooltipsMenuRegions", "Les régions de l'utilisateur"},
+            { "UserGroupNameText", "Groupe d'utilisateurs"},
+            { "PickNameText", "Choisissez nom"},
+            { "PickRegionText", "Emplacement"},
+
+            // Urls
+            { "WelcomeScreen", "Ecran de Bienvenue"},
+
+            // Tooltips Urls
+            { "TooltipsWelcomeScreen", "Ecran de Bienvenue"},
+            { "TooltipsWorldMap", "Carte du Monde"},
+
+            // Index
+            { "HomeText", "Accueil"},
+            { "HomeTextWelcome",
+                    "Ceci est notre Nouveau Monde Virtuel! Rejoignez-nous dés maintenant, et faites la différence!"},
+            { "HomeTextTips", "Nouvelles présentations"},
+            { "WelcomeToText", "Bienvenue"},
+
+            // World Map Page
+            { "WorldMap", "Carte du Monde"},
+            { "WorldMapText", "Plein Ecran"},
+
+            // Chat Page
+            { "ChatText", "Chat de Support"},
+
+            // Help Page
+            { "HelpText", "Aide"},
+            { "HelpViewersConfigText", "Configuration Viewer"},
+
+            // Logout
+            { "Logout", "Déconnection"},
+            { "LoggedOutSuccessfullyText", "Vous avez été déconnecté avec succès."},
+ 
+            // Change user information
+            { "ChangeUserInformationText", "Modifier les informations de l'utilisateur"},
+            { "ChangePasswordText", "Changer de Mot de Passe"},
+            { "NewPasswordText", "Nouveau Mot de Passe"},
+            { "NewPasswordConfirmationText", "Nouveau Mot de Passe {Confirmation)"},
+            { "ChangeEmailText", "Changer d'Adresse Email"},
+            { "NewEmailText", "Nouvelle Adresse Email"},
+            { "DeleteUserText", "Effacer mon Compte"},
+            { "DeleteText", "Effacer"},
+            { "DeleteUserInfoText",
+                    "Cela permettra d'éliminer toutes les informations vous concernant dans la grille et retirer votre accès à ce service. Si vous souhaitez continuer, saisissez votre nom et mot de passe et cliquez sur Supprimer."},
+            { "EditText", "Editer"},
+            { "EditUserAccountText", "Modifier un compte utilisateur"},
+
+            // Maintenance 
+            { "WebsiteDownInfoText", "Le Site Web est actuellement en panne, s'il vous plaît réessayez ultérieurement..."},
+            { "WebsiteDownText", "Site Web Hors Ligne"},
+
+            // Http 404
+            { "Error404Text", "Code d'Erreur"},
+            { "Error404InfoText", "404 La page n'a pu être trouvée"},
+            { "HomePage404Text", "Page d'Accueil"},
+
+            // Http 505
+            { "Error505Text", "Code d'Erreur"},
+            { "Error505InfoText", "505 Erreur Interne du Server"},
+            { "HomePage505Text", "Page d'Accueil"},
+
+            // User search
+            { "Search", "Rechercher"},
+            { "SearchText", "Rechercher"},
+            { "SearchForUserText", "Recherche par Utilisateur"},
+            { "UserSearchText", "Rechercher un Utilisateur"},
+            { "SearchResultForUserText", "Résultat de la Recherche pour l'Utilisateur"},
+
+            // Region_search
+            { "SearchForRegionText", "Rechercher une Région"},
+            { "RegionSearchText", "Rechercher une Région"},
+            { "SearchResultForRegionText", "Résultat de recherche de la région"},
+
+            // Edit user
+            { "AdminDeleteUserText", "Supprimer l'utilisateur"},
+            { "AdminDeleteUserInfoText", "Cette commande supprime le compte et détruit toutes les informations qui lui sont associés."},
+            { "BanText", "Bannir"},
+            { "UnbanText", "Débannir"},
+            { "AdminTempBanUserText", "Temps de Bannissement"},
+            { "AdminTempBanUserInfoText", "Cela empêche l'utilisateur de se connecter pour un laps de temps."},
+            { "AdminBanUserText", "Bannir l'utilisateur"},
+            { "AdminBanUserInfoText", "Cela empêche l'utilisateur de se connecter tant que l'interdiction n'est pas supprimée."},
+            { "AdminUnbanUserText", "Débannir un Utilisateur"},
+            { "AdminUnbanUserInfoText", "Supprime les interdictions temporaires et permanentes sur l'utilisateur."},
+            { "AdminLoginInAsUserText", "Connectez-vous en tant qu'utilisateur"},
+            { "AdminLoginInAsUserInfoText",
+                    "Vous serez déconnecté de votre compte admin, et connecté en tant que cet utilisateur, et vous verrez tout comme ils le voient."},
+            { "TimeUntilUnbannedText", "Temps jusqu'à la levée du Bannissement de l'utilisateur"},
+            { "BannedUntilText", "L'utilisateur est interdit jusqu'à ce que"},
+            { "KickAUserText", "Kicker l'utilisateur"},
+            { "KickAUserInfoText", "Kicker l'utilisateur {L'utilisateur sera déconnecté dans les 30 secondes)"},
+            { "KickMessageText", "Message à l'utilisateur"},
+            { "KickUserText", "Kicker l'utilisateur"},
+            { "MessageAUserText", "Send User A Message"},
+            { "MessageAUserInfoText", "Sends a user a blue-box message (will arrive within 30 seconds)"},
+            { "MessageUserText", "Message User"},
+
+            // Transactions
+            { "TransactionsText", "Transactions"},
+            { "DateInfoText", "Sélectionnez une plage de dates"},
+            { "DateStartText", "Commençant date"},
+            { "DateEndText", "Date de fin"},
+            { "30daysPastText", "30 jours précédents"},
+            { "TransactionToAgentText", "To User"},
+            { "TransactionFromAgentText", "From User"},
+            { "TransactionDateText", "Date"},
+            { "TransactionDetailText", "Description"},
+            { "TransactionAmountText", "Amount"},
+            { "TransactionBalanceText", "Balance"},
+            { "NoTransactionsText", "Aucune transaction trouvé..."},
+            { "PurchasesText", "Achats"},
+            { "LoggedIPText", "Adresse IP enregistrée"},
+            { "NoPurchasesText", "Aucun achat trouvés..."},
+            { "PurchaseCostText", "Coût"},
+            
+            // Classifieds
+            { "ClassifiedsText", "Annonce Catégorisée"},
+            { "ClassifiedText", "Petites annonces"},
+            { "ListedByText", "Répertorié par"},
+            { "CreationDateText", "Date de l'affichage"},
+            { "ExpirationDateText", "Date d'expiration" },
+            { "DescriptionText", "La description" },
+            { "PriceOfListingText", "Prix"},
+
+            // Classified categories
+            { "CatAll", "Tout"},
+            { "CatSelect", ""},
+            { "CatShopping", "Achats"},
+            { "CatLandRental", "Location de terrains"},
+            { "CatPropertyRental", "Location de la propriété"},
+            { "CatSpecialAttraction", "Attraction spéciale"},
+            { "CatNewProducts", "Nouveaux Produits"},
+            { "CatEmployment", "Emploi"},
+            { "CatWanted", "Voulait"},
+            { "CatService", "Un service"},
+            { "CatPersonal", "Personnel"},
+           
+            // Events
+            { "EventsText", "Événements"},
+            { "EventNameText", "Un Événement"},
+            { "EventLocationText", "Où"},
+            { "HostedByText","Hébergé par"},
+            { "EventDateText", "Quand"},
+            { "EventTimeInfoText", "Le temps de l'événement doit être heure locale (Server)"},
+            { "CoverChargeText", "Couvert"},
+            { "DurationText", "Durée"},
+            { "AddEventText", "Ajouter un évènementt"},
+
+            // Event categories
+            { "CatDiscussion", "Discussion"},
+            { "CatSports", "Des sports"},
+            { "CatLiveMusic", "Musique live"},
+            { "CatCommercial", "Commercial"},
+            { "CatEntertainment", "Vie nocturne/Divertissement"},
+            { "CatGames", "Des jeux/Concours"},
+            { "CatPageants", "Pageants"},
+            { "CatEducation", "Éducation"},
+            { "CatArtsCulture", "Lettres/Culture"},
+            { "CatCharitySupport", "Charité/Groupe de soutien"},
+            { "CatMiscellaneous", "Divers"},
+
+            // Event lookup periods
+            { "Next24Hours", "Suivant 24 heures"},
+            { "Next10Hours", "Suivant 10 heures"},
+            { "Next4Hours", "Suivant 4 heures"},
+            { "Next2Hours", "Suivant 2 heures"},
+
+            // Sim Console
+            { "SimConsoleText", "Sim Command Console"},
+            { "SimCommandText", "Command"},
+
+            // Statistics
+            { "StatisticsText", "Statistiques Viewer"},
+            { "ViewersText", "Utilisation Viewer"},
+            { "GPUText", "Les cartes graphiques"},
+            { "PerformanceText", "Moyennes de performance"},
+            { "FPSText", "Images / seconde"},
+            { "RunTimeText", "Durée"},
+            { "RegionsVisitedText", "Régions visitées"},
+            { "MemoryUseageText", "Utilisation de la mémoire"},
+            { "PingTimeText", "Ping temps"},
+            { "AgentsInViewText", "Agents en vue"},
+            { "ClearStatsText", "Effacer les statistiques sur"},
+
+            // Abuse reports
+            { "MenuAbuse", "Abus Rapports"},
+            { "TooltipsMenuAbuse", "Utilisateur abuse journaliste"},
+            { "AbuseReportText", "Signaler un abus"},
+            { "AbuserNameText", "Abuser"},
+            { "AbuseReporterNameText", "Journaliste"},
+            { "AssignedToText", "Assigné à"},
+
+            // Factory_reset
+            { "FactoryReset", "Réinitialiser"},
+            { "ResetMenuText", "Réinitialiser les paramètres par défaut du menu"},
+            { "ResetSettingsText", "Rétablir les paramètres Web {page Gestionnaire de paramètres) par défaut"},
+            { "Reset", "Réinitialiser"},
+            { "Settings", "Paramètres"},
+            { "Pages", "Pages"},
+            { "DefaultsUpdated",
+                    "Mise à jour par défaut, rendez-vous sur \"Réinitialiseré\" ou \"Gestionnaire de paramètres\" pour désactiver cet avertissement."},
+
+            // Page_manager
+            { "PageManager", "Gestionnaire de Pages"},
+            { "SaveMenuItemChanges", "Enregistrer un élément de menu"},
+            { "SelectItem", "Selectionner un élément"},
+            { "DeleteItem", "Effacer un élément"},
+            { "AddItem", "Ajouter un élément"},
+            { "PageLocationText", "Emplacement de la page"},
+            { "PageIDText", "ID de la Page"},
+            { "PagePositionText", "Position de la Page"},
+            { "PageTooltipText", "Tooltip de la Page"},
+            { "PageTitleText", "Titre de la Page"},
+            { "RequiresLoginText", "Vous devez vous connecter pour voir"},
+            { "RequiresLogoutText", "Vous devez vous déconnecter pour voir"},
+            { "RequiresAdminText", "Vous devez vous connecter en temps qu'Admin pour voir"},
+            { "RequiresAdminLevelText", "Required Admin Level To View"},
+
+            // Grid settings
+            { "GridSettingsManager", "Grille Settings Manager "},
+            { "GridnameText", "Nom de Grille "},
+            { "GridnickText", "Grille surnom "},
+            { "WelcomeMessageText", "Connectez message de bienvenue "},
+            { "GovernorNameText", "Gouverneur du système"},
+            { "MainlandEstateNameText", "Succession continentale"},
+            { "RealEstateOwnerNameText", "Ownername immobilier du système"},
+            { "SystemEstateNameText", "Le nom du système de succession"},
+            { "BankerNameText", "Banquier du système"},
+            { "MarketPlaceOwnerNameText", "Propriétaire du marché du système"},
+
+            // Settings manager page
+            { "WebRegistrationText", "Enregistrements Web autorisés"},
+            { "GridCenterXText", "Grille Location Centrer X"},
+            { "GridCenterYText", "Grille Location Centrer Y"},
+            { "SettingsManager", "Gestionnaire de paramètres"},
+            { "IgnorePagesUpdatesText", "Ignorer les avertissements de mises à jour des pages jusqu'à la prochaine mise à jour"},
+            { "IgnoreSettingsUpdatesText", "Ignorer les avertissements de mises à jour des paramètres jusqu'à la prochaine mise à jour"},
+            { "HideLanguageBarText", "Masquer la barre de sélection de la langue"},
+            { "HideStyleBarText", "Masquer la barre de sélection de style"},
+            { "HideSlideshowBarText", "Masquer diaporama bar"},
+            { "LocalFrontPageText", "Page d'accueil locale"},
+            { "LocalCSSText", "CSS local feuille de style"},
+
+            // Dates
+            { "Sun", "Dim"},
+            { "Mon", "Lun"},
+            { "Tue", "Mar"},
+            { "Wed", "Mer"},
+            { "Thu", "Jeu"},
+            { "Fri", "Ven"},
+            { "Sat", "Sam"},
+            { "Sunday", "Dimanche"},
+            { "Monday", "Lundi"},
+            { "Tuesday", "Mardi"},
+            { "Wednesday", "Mercredi"},
+            { "Thursday", "Jeudi"},
+            { "Friday", "Vendredi"},
+            { "Saturday", "Samedi"},
+
+            { "Jan_Short", "Jan"},
+            { "Feb_Short", "Fev"},
+            { "Mar_Short", "Mar"},
+            { "Apr_Short", "Avr"},
+            { "May_Short", "Mai"},
+            { "Jun_Short", "Jun"},
+            { "Jul_Short", "Jui"},
+            { "Aug_Short", "Aou"},
+            { "Sep_Short", "Sep"},
+            { "Oct_Short", "Oct"},
+            { "Nov_Short", "Nov"},
+            { "Dec_Short", "Dec"},
+
+            { "January", "Janvier"},
+            { "February", "Février"},
+            { "March", "Mars"},
+            { "April", "Avril"},
+            { "May", "Mai"},
+            { "June", "Juin"},
+            { "July", "Juillet"},
+            { "August", "Août"},
+            { "September", "Septembre"},
+            { "October", "Octobre"},
+            { "November", "Novembre"},
+            { "December", "Decembre"},
+
+            // User types
+            { "UserTypeText", "Type d'utilisateur"},
+            { "AdminUserTypeInfoText", "Le type d'utilisateur {Actuellement utilisé pour les paiements allocations de formation périodiques)."},
+            { "Guest", "Invité"},
+            { "Resident", "Résident"},
+            { "Member", "Membre"},
+            { "Contractor", "Entrepreneur"},
+            { "Charter_Member", "Membre de la Charte"},
+
+            // ColorBox
+            { "ColorBoxImageText", "Image"},
+            { "ColorBoxOfText", "sur"},
+            { "ColorBoxPreviousText", "Précédent"},
+            { "ColorBoxNextText", "Suivant"},
+            { "ColorBoxCloseText", "Fermer"},
+            { "ColorBoxStartSlideshowText", "Démarrer Slide Show"},
+            { "ColorBoxStopSlideshowText", "Arrêter Slide Show"},
+
+            // Maintenance
+            { "NoAccountFound", "Aucun compte trouvé"},
+            { "DisplayInMenu", "Affichage dans le menu"},
+            { "ParentText", "Menu Parent"},
+            { "CannotSetParentToChild", "Vous ne pouvez pas définir de menu comme un enfant à se."},
+            { "TopLevel", "Haut niveau"},
+
+            // Style Switcher
+            { "styles1", "Defaut Minimaliste"},
+            { "styles2", "Dégardé Clair"},
+            { "styles3", "Bleu Nuit"},
+            { "styles4", "Dégradé Foncé"},
+            { "styles5", "Luminus"},
+
+            { "StyleSwitcherStylesText", "Styles"},
+            { "StyleSwitcherLanguagesText", "Langages"},
+            { "StyleSwitcherChoiceText", "Choix"},
+
+            // Language Switcher Tooltips
+            { "en", "English"},
+            { "fr", "Français"},
+            { "de", "Deutsch"},
+            { "it", "Italiano"},
+            { "es", "Español"},
+            { "nl", "Nederlands"},
+            { "ru", "Русский"}
+        };
     }
 }
