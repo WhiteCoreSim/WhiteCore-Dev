@@ -430,7 +430,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "CatSelect", ""},
             { "CatShopping", "Shopping"},
             { "CatLandRental", "Land Miete"},
-            { "CatPropertyRental", "Eiugentums Miete"},
+            { "CatPropertyRental", "Eigentums Miete"},
             { "CatSpecialAttraction", "Besondere Attraktion"},
             { "CatNewProducts", "Neue Produkte"},
             { "CatEmployment", "Beschäftigung"},
@@ -608,7 +608,7 @@ namespace WhiteCore.Modules.Web.Translators
             {"NoAccountFound", "Kein Konto gefunden"},
             {"DisplayInMenu", "Anzeige im Menü"},
             {"ParentText", "Hauptmenü"},
-            {"CannotSetParentToChild", "Knn Menüpunkt nicht als child festlegen."},
+            {"CannotSetParentToChild", "Kann Menüpunkt nicht als Untermenü festlegen."},
             {"TopLevel", "Erste Ebene"},
 
             // Style Switcher
