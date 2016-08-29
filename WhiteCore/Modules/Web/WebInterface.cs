@@ -54,6 +54,9 @@ namespace WhiteCore.Modules.Web
     public class WebInterface : IService, IWebInterfaceModule
     {
         #region Declares
+		
+		#pragma warning disable 0649
+		// Putting this here to clear out some warnings - 29082016 Fly-man-
 
         protected const int CLIENT_CACHE_TIME = 86400;  // 1 day
         protected uint _port = 8002;                    // assuming grid mode here
