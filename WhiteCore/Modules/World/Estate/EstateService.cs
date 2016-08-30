@@ -97,74 +97,74 @@ namespace WhiteCore.Modules.Estate
                 MainConsole.Instance.Commands.AddCommand (
                     "set regionsetting maturity",
                     "set regionsetting maturity [value]",
-                    "Sets a region's maturity - 0(PG),1(Mature),2(Adult)",
-                    SetRegionInfoOption, true, false);
+                    "Sets a region's maturity - PG, Mature, Adult",
+                    SetRegionMaturity, true, true);
 
                 MainConsole.Instance.Commands.AddCommand (
                     "set regionsetting addestateban",
                     "set regionsetting addestateban [first] [last]",
                     "Add a user to the estate ban list",
-                    SetRegionInfoOption, true, false);
+                    SetRegionInfoOption, true, true);
 
                 MainConsole.Instance.Commands.AddCommand (
                     "set regionsetting removeestateban",
                     "set regionsetting removeestateban [first] [last]",
                     "Remove a user from the estate ban list",
-                    SetRegionInfoOption, true, false);
+                    SetRegionInfoOption, true, true);
 
                 MainConsole.Instance.Commands.AddCommand (
                     "set regionsetting addestatemanager",
                     "set regionsetting addestatemanager [first] [last]",
                     "Add a user to the estate manager list",
-                    SetRegionInfoOption, true, false);
+                    SetRegionInfoOption, true, true);
 
                 MainConsole.Instance.Commands.AddCommand (
                     "set regionsetting removeestatemanager",
                     "set regionsetting removeestatemanager [first] [last]",
                     "Remove a user from the estate manager list",
-                    SetRegionInfoOption, true, false);
+                    SetRegionInfoOption, true, true);
 
                 MainConsole.Instance.Commands.AddCommand (
                     "set regionsetting addestateaccess",
                     "set regionsetting addestateaccess [first] [last]",
                     "Add a user to the estate access list",
-                    SetRegionInfoOption, true, false);
+                    SetRegionInfoOption, true, true);
 
                 MainConsole.Instance.Commands.AddCommand (
                     "set regionsetting removeestateaccess",
                     "set regionsetting removeestateaccess [first] [last]",
                     "Remove a user from the estate access list",
-                    SetRegionInfoOption, true, false);
+                    SetRegionInfoOption, true, true);
 
                 MainConsole.Instance.Commands.AddCommand (
                     "estate ban user",
                     "estate ban user",
                     "Bans a user from the current estate",
-                    BanUser, true, false);
+                    BanUser, true, true);
 
                 MainConsole.Instance.Commands.AddCommand (
                     "estate unban user",
                     "estate unban user",
                     "Bans a user from the current estate",
-                    UnBanUser, true, false);
+                    UnBanUser, true, true);
 
                 MainConsole.Instance.Commands.AddCommand (
                     "login enable",
                     "login enable",
                     "Enable simulator logins",
-                    ProcessLoginCommands, true, false);
+                    ProcessLoginCommands, true, true);
 
                 MainConsole.Instance.Commands.AddCommand (
                     "login disable",
                     "login disable",
                     "Disable simulator logins",
-                    ProcessLoginCommands, true, false);
+                    ProcessLoginCommands, true, true);
 
                 MainConsole.Instance.Commands.AddCommand (
                     "login status",
                     "login status",
                     "Show login status",
-                    ProcessLoginCommands, true, false);
+                    ProcessLoginCommands, true, true);
             }
         }
 
@@ -291,73 +291,101 @@ namespace WhiteCore.Modules.Estate
                 SaveEstateSettings (ES);
         }
 
+        protected void SetRegionMaturity (IScene scene, string [] cmdparams)
+        {
+            if (MainConsole.Instance.ConsoleScene == null) {
+                MainConsole.Instance.Info ("[Regionsettings]: This command requires a region to be selected\n          Please change to a region first");
+                return;
+            }
+
+            string maturitylevel = "";
+
+            if (cmdparams.Length < 4) {
+                maturitylevel = MainConsole.Instance.Prompt ("Which maturity level? (PG/Mature/Adult)", maturitylevel);
+                if (maturitylevel == "")
+                    return;
+             } else
+                maturitylevel = cmdparams [3];
+
+            maturitylevel = maturitylevel.ToLower ();
+            switch (maturitylevel) {
+            case "pg":
+                m_scene.RegionInfo.AccessLevel = Util.ConvertMaturityToAccessLevel (0);
+                break;
+            case "mature":
+                m_scene.RegionInfo.AccessLevel = Util.ConvertMaturityToAccessLevel (1);
+                break;
+            case "adult":
+                m_scene.RegionInfo.AccessLevel = Util.ConvertMaturityToAccessLevel (2);
+                break;
+            default:
+                MainConsole.Instance.Warn (
+                    "Your parameter did not match any existing parameters. Try PG, Mature, or Adult");
+                return;
+
+            }
+
+            //Tell the grid about the changes
+            IGridRegisterModule gridRegModule = m_scene.RequestModuleInterface<IGridRegisterModule> ();
+            if (gridRegModule != null)
+                gridRegModule.UpdateGridRegion (m_scene);
+
+        }
+
         protected void SetRegionInfoOption (IScene scene, string [] cmdparams)
         {
-            #region 3 Params needed
-
-            if (cmdparams.Length < 4) {
-                MainConsole.Instance.Warn ("Not enough parameters!");
+            if (MainConsole.Instance.ConsoleScene == null) {
+                MainConsole.Instance.Info ("[Regionsettings]: This command requires a region to be selected\n          Please change to a region first");
                 return;
             }
-            if (cmdparams [2] == "Maturity") {
-                switch (cmdparams [3]) {
-                case "PG":
-                    m_scene.RegionInfo.AccessLevel = Util.ConvertMaturityToAccessLevel (0);
-                    break;
-                case "Mature":
-                    m_scene.RegionInfo.AccessLevel = Util.ConvertMaturityToAccessLevel (1);
-                    break;
-                case "Adult":
-                    m_scene.RegionInfo.AccessLevel = Util.ConvertMaturityToAccessLevel (2);
-                    break;
-                default:
-                    MainConsole.Instance.Warn (
-                        "Your parameter did not match any existing parameters. Try PG, Mature, or Adult");
+             
+            var setcmd = cmdparams [2];
+            var firstname = "";
+            var lastname = "";
+
+            if (cmdparams.Length < 5) {
+                string name = "";
+                name = MainConsole.Instance.Prompt ("User Name <first last>: ", name);
+                if (name == "")
                     return;
-                }
-
-                //Tell the grid about the changes
-                IGridRegisterModule gridRegModule = m_scene.RequestModuleInterface<IGridRegisterModule> ();
-                if (gridRegModule != null)
-                    gridRegModule.UpdateGridRegion (m_scene);
+                var names = name.Split (' ');
+                if (names.Length < 2)
+                    return;
+                firstname = names [0];
+                lastname = names [1];
+            } else {
+                firstname = cmdparams [3];
+                lastname = cmdparams [4];
             }
 
-            #endregion
 
-            #region 4 Params needed
-
-            if (cmdparams.Length < 4) {
-                MainConsole.Instance.Warn ("Not enough parameters!");
-                return;
-            }
-
-            var account = m_scene.UserAccountService.GetUserAccount (null, cmdparams [3], cmdparams [4]);
+            var account = m_scene.UserAccountService.GetUserAccount (null, firstname, lastname);
             if (account != null) {
                 var userID = account.PrincipalID;
 
-                if (cmdparams [2] == "AddEstateBan".ToLower ()) {
+                if (setcmd == "AddEstateBan".ToLower ()) {
                     EstateBan EB = new EstateBan { BannedUserID = userID };
                     m_scene.RegionInfo.EstateSettings.AddBan (EB);
                 }
-                if (cmdparams [2] == "AddEstateManager".ToLower ())
+                if (setcmd == "AddEstateManager".ToLower ())
                     m_scene.RegionInfo.EstateSettings.AddEstateManager (userID);
 
-                if (cmdparams [2] == "AddEstateAccess".ToLower ())
+                if (setcmd == "AddEstateAccess".ToLower ())
                     m_scene.RegionInfo.EstateSettings.AddEstateUser (userID);
 
-                if (cmdparams [2] == "RemoveEstateBan".ToLower ())
+                if (setcmd == "RemoveEstateBan".ToLower ())
                     m_scene.RegionInfo.EstateSettings.RemoveBan (userID);
 
-                if (cmdparams [2] == "RemoveEstateManager".ToLower ())
+                if (setcmd == "RemoveEstateManager".ToLower ())
                     m_scene.RegionInfo.EstateSettings.RemoveEstateManager (userID);
 
-                if (cmdparams [2] == "RemoveEstateAccess".ToLower ())
+                if (setcmd == "RemoveEstateAccess".ToLower ())
                     m_scene.RegionInfo.EstateSettings.RemoveEstateUser (userID);
 
                 Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ()
                          .SaveEstateSettings (m_scene.RegionInfo.EstateSettings);
-            }
-            #endregion
+            } else
+                MainConsole.Instance.Warn("[Regionsettings]: Unable to determine user account details");
 
         }
 
