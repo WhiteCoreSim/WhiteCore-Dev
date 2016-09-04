@@ -34,13 +34,13 @@ using System.Runtime.InteropServices;
 // change them to the information which is associated with the assembly
 // you compile.
 
-[assembly: AssemblyTitle("BasicPhysicsPlugin")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyCompany("WhiteCore Development Team")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("http://WhiteCore-sim.org")]
 [assembly: AssemblyCopyright("Copyright © 2014-2016")]
-[assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("BasicPhysicsPlugin")]
+[assembly: AssemblyTrademark("")]
 
 // This sets the default COM visibility of types in the assembly to invisible.
 // If you need to expose a type to COM, use [ComVisible(true)] on that type.

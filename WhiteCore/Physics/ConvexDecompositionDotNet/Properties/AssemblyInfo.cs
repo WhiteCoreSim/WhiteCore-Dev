@@ -5,14 +5,15 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("ConvexDecompositionDotNet")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
+
 [assembly: AssemblyCompany("Intel Corporation")]
-[assembly: AssemblyProduct("ConvexDecompositionDotNet")]
+[assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCopyright("Copyright © Intel Corporation 2010")]
-[assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyProduct("ConvexDecompositionDotNet")]
+[assembly: AssemblyTitle("ConvexDecompositionDotNet")]
+[assembly: AssemblyTrademark("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
