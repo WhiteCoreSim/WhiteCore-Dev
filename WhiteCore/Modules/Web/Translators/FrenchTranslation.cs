@@ -49,6 +49,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "Submit", "Envoyer"},
             { "Accept", "Accepter"},
             { "Save", "Sauver"},
+            { "Cancel", "Annuler"},
             { "FirstText", "Premier"},
             { "BackText", "Précédent"},
             { "NextText", "Suivant"},
@@ -75,6 +76,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "MinutesText", "minutes"},
             { "HourText", "heure"},
             { "HoursText", "heures"},
+            { "EditText", "Modifier"},
             { "EdittingText", "Rédaction"},
 
             // Status information
@@ -171,6 +173,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "RegionSizeText", "Taille de la Région"},
             { "RegionNameText", "Nom de la Région"},
             { "RegionTypeText", "Type de Région"},
+            { "RegionPresetTypeText", "Région Preset"},
             { "RegionDelayStartupText", "Delay starting scripts"},
             { "RegionPresetText", "Region Preset"},
             { "RegionTerrainText", "Région Terrain"},
@@ -195,6 +198,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "NumberOfUsersInRegionText", "Nombre d'Utilisateurs dans la Région"},
 
             // Region manager
+            { "AddRegionText", "Ajouter Région"},
             { "Mainland", "Territoire continental"},
             { "Estate", "Biens"},
             { "FullRegion", "Région complète"},
@@ -209,6 +213,18 @@ namespace WhiteCore.Modules.Web.Translators
             { "RegionVisibilityText", "Visible aux voisins"},
             { "RegionInfiniteText", "Infini Région"},
             { "RegionCapacityText", "Capacité d'objet Région"},
+            { "NormalText", "Ordinaire"},
+            { "DelayedText", "Différé"},
+
+            // Estate management
+            {"AddEstateText", "Ajouter immobilier"},
+            {"EstateText", "Biens"},
+            {"EstatesText", "Estates"},
+            {"PricePerMeterText", "Prix par mètre carrér"},
+            {"PublicAccessText", "Accès publique"},
+            {"AllowVoiceText", "Autoriser la voix"},
+            {"TaxFreeText", "Tax Free"},
+            {"AllowDirectTeleportText", "Autoriser téléporter directement"},
 
             // Menus
             { "MenuHome", "Accueil"},
@@ -239,6 +255,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "MenuManager", "Gestion"},
             { "MenuSettings", "Paramètres"},
             { "MenuRegionManager", "Manager Région"},
+            { "MenuEstateManager", "Gestionnaire immobilier"},
             { "MenuManagerSimConsole", "Simulateur Console"},
             { "MenuPurchases", "Achats de l'utilisateur"},
             { "MenuMyPurchases", "Mes Achats"},
@@ -277,6 +294,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "TooltipsMenuManager", "Gestion Administrative"},
             { "TooltipsMenuSettings", "WebUI Paramètres"},
             { "TooltipsMenuRegionManager", "Région créer / modifier"},
+            { "TooltipsMenuEstateManager", "Gestionnaire immobilier"},
             { "TooltipsMenuManagerSimConsole", "Console de simulateur en ligne"},
             { "TooltipsMenuPurchases", "Informations d'achat"},
             { "TooltipsMenuTransactions", "Informations sur la transaction"},
@@ -445,7 +463,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "EventLocationText", "Où"},
             { "HostedByText","Hébergé par"},
             { "EventDateText", "Quand"},
-            { "EventTimeInfoText", "Le temps de l'événement doit être heure locale (Server)"},
+            { "EventTimeInfoText", "Le temps de l'événement doit être heure locale"},
             { "CoverChargeText", "Couvert"},
             { "DurationText", "Durée"},
             { "AddEventText", "Ajouter un évènementt"},
@@ -501,6 +519,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "Reset", "Réinitialiser"},
             { "Settings", "Paramètres"},
             { "Pages", "Pages"},
+            { "UpdateRequired", "mise à jour requise"},
             { "DefaultsUpdated",
                     "Mise à jour par défaut, rendez-vous sur \"Réinitialiseré\" ou \"Gestionnaire de paramètres\" pour désactiver cet avertissement."},
 

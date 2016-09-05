@@ -11,6 +11,9 @@ Fine77
 H-H-H
 Nhede
 Stormsonweathers
+ThunderLife
+YouCanDoIt
+
 Any that we might have forgotten
 
 --------------- Aurora contributors (Thanks for all the patches :)) --------------------------
@@ -34,7 +37,7 @@ Masterful
 
 ------------------ OpenSim ------------------
 
-The following people have contributed to OpenSim (Thank you 
+The following people have contributed to OpenSim (Thank you
 for your effort!)
 
 Add your name in here if you have committed to OpenSim
@@ -72,7 +75,7 @@ currently not active.  Their great contributions helped get us to
 where we are today.
 
 * Gareth
-* Andy-	
+* Andy-
 * MorphW
 * CW
 * Babblefrog
@@ -84,7 +87,7 @@ where we are today.
 
 = Additional OpenSim Contributors =
 These folks have contributed code patches to OpenSim to help make it
-what it is today.  
+what it is today.
 
 * aduffy70
 * A_Biondi
@@ -100,7 +103,7 @@ what it is today.
 * Daedius
 * Dong Jun Lan (IBM)
 * DoranZemlja
-* daTwitch 
+* daTwitch
 * devalnor-#708
 * dmiles (Daxtron Labs)
 * dslake (Intel)
@@ -125,7 +128,7 @@ what it is today.
 * KittyLiu
 * Kurt Taylor (IBM)
 * lkalif
-* lulurun 
+* lulurun
 * M.Igarashi
 * maimedleech
 * Mic Bowman

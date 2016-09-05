@@ -32,23 +32,24 @@ using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
+using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.Web
 {
-    public class EventsMain : IWebInterfacePage
+    public class UserEvents : IWebInterfacePage
     {
         public string [] FilePath {
             get {
                 return new []
                            {
-                               "html/events/events.html"
+                               "html/user/events.html"
                            };
             }
         }
 
         public bool RequiresAuthentication {
-            get { return false; }
+            get { return true; }
         }
 
         public bool RequiresAdminAuthentication {
@@ -69,13 +70,15 @@ namespace WhiteCore.Modules.Web
             if (moneyModule != null)
                 currencySymbol = moneyModule.InWorldCurrencySymbol;
 
-            var eventLevel = Util.ConvertEventMaturityToDBMaturity (DirectoryManager.EventFlags.PG);
+            UserAccount user = Authenticator.GetAuthentication (httpRequest);
+
+            var eventLevel = 7; // all events; 
             var category = (int)DirectoryManager.EventCategories.All;
             var timeframe = 24;
 
             var pg_checked = "checked";
-            var ma_checked = "";
-            var ao_checked = "";
+            var ma_checked = "checked";
+            var ao_checked = "checked";
 
             if (requestParameters.ContainsKey ("Submit")) {
                 int level = 0;
@@ -121,9 +124,10 @@ namespace WhiteCore.Modules.Web
             if (directoryService != null) {
 
                 var events = new List<EventData> ();
-                events = directoryService.GetAllEvents (timeframe, category, eventLevel);
+                events = directoryService.GetUserEvents (user.PrincipalID.ToString (), timeframe, category, eventLevel);
 
                 if (events.Count == 0) {
+                    vars.Add ("EditText", "");
                     eventListVars.Add (new Dictionary<string, object> {
                         { "EventID", "" },
                         { "CreatorUUID", "" },
@@ -145,6 +149,7 @@ namespace WhiteCore.Modules.Web
                         { "Category", "" }
                 });
                 } else {
+                    vars.Add ("EditText", translator.GetTranslatedString ("EditText"));
                     foreach (var evnt in events) {
                         var evntDateTime = Util.ToDateTime (evnt.dateUTC).ToLocalTime ();
                         eventListVars.Add (new Dictionary<string, object> {
@@ -175,6 +180,7 @@ namespace WhiteCore.Modules.Web
             vars.Add ("Events", translator.GetTranslatedString ("Events"));
 
             // labels
+            vars.Add ("UserName", user.Name);
             vars.Add ("EventsText", translator.GetTranslatedString ("EventsText"));
             vars.Add ("AddEventText", translator.GetTranslatedString ("AddEventText"));
             vars.Add ("EventDateText", translator.GetTranslatedString ("EventDateText"));

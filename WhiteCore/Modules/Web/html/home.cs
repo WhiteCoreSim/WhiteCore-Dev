@@ -108,20 +108,21 @@ namespace WhiteCore.Modules.Web
             vars.Add ("ForgotPassword", translator.GetTranslatedString ("ForgotPassword"));
             vars.Add ("Submit", translator.GetTranslatedString ("Login"));
 
+            // greythane - 20160826 - do menu and setting updates
             var settings = webInterface.GetWebUISettings ();
 
             if (PagesMigrator.RequiresUpdate () &&
                 PagesMigrator.CheckWhetherIgnoredVersionUpdate (settings.LastPagesVersionUpdateIgnored))
                 vars.Add ("PagesUpdateRequired",
                          translator.GetTranslatedString ("Pages") + " " +
-                         translator.GetTranslatedString ("DefaultsUpdated"));
+                         translator.GetTranslatedString ("UpdateRequired"));
             else
                 vars.Add ("PagesUpdateRequired", "");
             if (SettingsMigrator.RequiresUpdate () &&
                 SettingsMigrator.CheckWhetherIgnoredVersionUpdate (settings.LastSettingsVersionUpdateIgnored))
                 vars.Add ("SettingsUpdateRequired",
                          translator.GetTranslatedString ("Settings") + " " +
-                         translator.GetTranslatedString ("DefaultsUpdated"));
+                         translator.GetTranslatedString ("UpdateRequired"));
             else
                 vars.Add ("SettingsUpdateRequired", "");
 

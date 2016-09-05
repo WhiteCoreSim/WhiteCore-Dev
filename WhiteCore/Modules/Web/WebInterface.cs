@@ -580,8 +580,15 @@ namespace WhiteCore.Modules.Web
                             file = Path.Combine (file, "index.html");
                     }
 
-                    if (query.ContainsKey ("page") && _pages.ContainsKey ("html/" + query ["page"] + ".html")) {
-                        file = _pages ["html/" + query ["page"] + ".html"].FilePath [0];
+                    if (query.ContainsKey ("page")) {
+                        var subdir = "";
+                        if (query.ContainsKey ("subdir"))
+                            subdir = query ["subdir"] + "/";
+                        var wpage =  "html/" + subdir + query ["page"] + ".html";
+
+                        if (_pages.ContainsKey (wpage)) {
+                            file = _pages [wpage].FilePath [0];
+                        }
                     }
                 }
                 if (!File.Exists (file)) {

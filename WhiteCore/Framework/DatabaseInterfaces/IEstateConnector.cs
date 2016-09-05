@@ -107,7 +107,14 @@ namespace WhiteCore.Framework.DatabaseInterfaces
         ///     Gets all available estates
         /// </summary>
         /// <returns>List of estates</returns>
-        List<string> GetEstates();
+        List<string> GetEstateNames();
+
+        /// <summary>
+        ///     Gets all user estates
+        /// </summary>
+        /// <param name="ownerID"></param>
+        /// <returns>List of estates</returns>
+        List<string> GetEstateNames (UUID ownerId);
 
         /// <summary>
         ///     Gets the estates that have the given owner

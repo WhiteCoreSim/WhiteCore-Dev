@@ -1112,18 +1112,36 @@ namespace WhiteCore.Services.DataService
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
         public List<EventData> GetAllEvents (int queryHours, int category, int maturityLevel)
         {
+            return GetEventsList (null, queryHours, category, maturityLevel);
+        }
+
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public List<EventData> GetUserEvents (string userId, int queryHours, int category, int maturityLevel)
+        {
+            // The same as GetEventList but incuded for more intuitive calls and possible expansion 
+            return GetEventsList (userId, queryHours, category, maturityLevel);
+        }
+
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public List<EventData> GetEventsList (string userId, int queryHours, int category, int maturityLevel)
+        {
             // WebUI call 
+
             List<EventData> retEvents = new List<EventData> ();
 
             if (m_doRemoteOnly) {
                 object remoteValue = DoRemote (queryHours, category, maturityLevel);
-                return remoteValue != null ? (List < EventData >)remoteValue : retEvents;
+                return remoteValue != null ? (List<EventData>)remoteValue : retEvents;
             }
 
             QueryFilter filter = new QueryFilter ();
-            var endTime = DateTime.Now.AddHours (queryHours);
-                 filter.andGreaterThanEqFilters ["UNIX_TIMESTAMP(date)"] = Util.ToUnixTime (DateTime.Now);
-                 filter.andLessThanEqFilters ["UNIX_TIMESTAMP(date)"] = Util.ToUnixTime (endTime);
+            if (userId != null)
+                filter.andLikeFilters ["creator"] = userId;
+
+            var starttime = DateTime.Now;
+            var endTime = starttime.AddHours (queryHours);
+            filter.andGreaterThanEqFilters ["UNIX_TIMESTAMP(date)"] = Util.ToUnixTime (starttime);
+            filter.andLessThanEqFilters ["UNIX_TIMESTAMP(date)"] = Util.ToUnixTime (endTime);
 
             // maturity level
             filter.andLessThanEqFilters ["maturity"] = maturityLevel;
@@ -1131,13 +1149,13 @@ namespace WhiteCore.Services.DataService
             if (category != (int)DirectoryManager.EventCategories.All) //Check the category
                 filter.andFilters ["category"] = category.ToString ();
 
-            List<string> retVal = GD.Query (new [] { "*"}, m_eventInfoTable, filter, null, null, null);
+            List<string> retVal = GD.Query (new [] { "*" }, m_eventInfoTable, filter, null, null, null);
 
             if (retVal.Count > 0) {
                 List<EventData> allEvents = Query2EventData (retVal);
 
                 // Check the maturity levels PG = 1, M = 2, A = 4
-                foreach(EventData evnt in allEvents) {
+                foreach (EventData evnt in allEvents) {
                     if ((maturityLevel & evnt.maturity) != 0) // required rating PG, Mature, Adult
                         retEvents.Add (evnt);
                 }
@@ -1145,7 +1163,7 @@ namespace WhiteCore.Services.DataService
 
             return retEvents;
         }
-
+       
         /// <summary>
         ///     Retrieves all events in the given region by their maturity level
         /// </summary>
@@ -1229,9 +1247,11 @@ namespace WhiteCore.Services.DataService
 
                 data.eventID = Convert.ToUInt32(RetVal[i]);
                 data.creator = RetVal[i + 1];
+                data.regionId = RetVal [1 + 2];
+                data.parcelId = RetVal [i + 3];
 
                 //Parse the time out for the viewer
-                DateTime date = DateTime.Parse(RetVal[i + 4]);
+                DateTime date = DateTime.Parse (RetVal [i + 4]);
                 data.date = date.ToString(new DateTimeFormatInfo());
                 data.dateUTC = (uint) Util.ToUnixTime(date);
 
@@ -1281,6 +1301,22 @@ namespace WhiteCore.Services.DataService
             return (RetVal.Count == 0) ? null : Query2EventData(RetVal)[0];
         }
 
+        /// <summary>
+        /// Creates the event.
+        /// </summary>
+        /// <returns>The event.</returns>
+        /// <param name="creator">Creator.</param>
+        /// <param name="regionID">Region identifier.</param>
+        /// <param name="parcelID">Parcel identifier.</param>
+        /// <param name="date">Date.</param>
+        /// <param name="cover">Cover.</param>
+        /// <param name="maturity">Maturity.</param>
+        /// <param name="flags">Flags.</param>
+        /// <param name="duration">Duration.</param>
+        /// <param name="localPos">Local position.</param>
+        /// <param name="name">Name.</param>
+        /// <param name="description">Description.</param>
+        /// <param name="category">Category.</param>
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public EventData CreateEvent(UUID creator, UUID regionID, UUID parcelID, DateTime date, uint cover,
                                      EventFlags maturity, uint flags, uint duration, Vector3 localPos, string name,
@@ -1320,15 +1356,17 @@ namespace WhiteCore.Services.DataService
             eventData.name = name;
             eventData.description = description;
             eventData.category = category;
+            eventData.regionId = regionID.ToString();
+            eventData.parcelId = parcelID.ToString();
 
             Dictionary<string, object> row = new Dictionary<string, object>(15);
             row["EID"] = eventData.eventID;
             row["creator"] = creator.ToString();
             row["region"] = regionID.ToString();
             row["parcel"] = parcelID.ToString();
-            row["date"] = date.ToString("s");
+            row["date"] = date.ToString("s");       
             row["cover"] = eventData.cover;
-            row["maturity"] = (uint) maturity;      // PG = 1, M == 2, A == 4
+            row["maturity"] = Util.ConvertEventMaturityToDBMaturity (maturity);      // PG = 1, M == 2, A == 4
             row["flags"] = flags;                   // region maturity flags
             row["duration"] = duration;
             row["localPosX"] = localPos.X;
@@ -1341,6 +1379,70 @@ namespace WhiteCore.Services.DataService
             GD.Insert(m_eventInfoTable, row);
 
             return eventData;
+        }
+
+
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public bool UpdateAddEvent (EventData eventData)
+        {
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (eventData);
+                return (bool)remoteValue;
+            }
+
+            // delete this event it it exists 
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["EID"] = eventData.eventID;
+            GD.Delete (m_eventInfoTable, filter);
+
+            // add the event 
+            Dictionary<string, object> row = new Dictionary<string, object> (15);
+            row ["EID"] = GetMaxEventID () + 1; 
+            row ["creator"] = eventData.creator;
+            row ["region"] = eventData.regionId;
+            row ["parcel"] = eventData.parcelId;
+            row ["date"] = eventData.date;                    
+            row ["cover"] = eventData.cover;
+            row ["maturity"] = Util.ConvertEventMaturityToDBMaturity ((EventFlags) eventData.maturity);      // PG = 1, M == 2, A == 4
+            row ["flags"] = eventData.eventFlags;             // region maturity flags
+            row ["duration"] = eventData.duration;
+            row ["localPosX"] = eventData.regionPos.X;
+            row ["localPosY"] = eventData.regionPos.Y;
+            row ["localPosZ"] = eventData.regionPos.Z;
+            row ["name"] = eventData.name;
+            row ["description"] = eventData.description;
+            row ["category"] = eventData.category;
+
+            try {
+                GD.Insert (m_eventInfoTable, row);
+            } catch {
+                return false;
+            }
+
+            // assume success if no error
+            return true;
+        }
+
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public bool DeleteEvent (string eventId)
+        {
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (eventId);
+                return (bool)remoteValue;
+            }
+
+            // delete this event it it exists 
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["EID"] = eventId;
+
+            try {
+                GD.Delete (m_eventInfoTable, filter);
+            } catch {
+                return false;
+            }
+
+            // assume success if no error
+            return true;
         }
 
         public List<EventData> GetEvents(uint start, uint count, Dictionary<string, bool> sort,

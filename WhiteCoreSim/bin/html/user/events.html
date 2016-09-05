@@ -1,12 +1,11 @@
 <!-- Events -->
-<!-- <link href="css/datatables.min.css" rel="stylesheet" type="text/css"> -->
 
 <div id="fullPage">
-  <h2>{SystemName}: {EventsText}</h2>
+  <h2>{UserName}: {EventsText}</h2>
   {IsAuthenticatedBegin}
     <button id="add_event" onClick="window.location.href='index.html?page=add_event';" id="add_event"><p>{AddEventText}</p></button>
   {IsAuthenticatedEnd}
-  <form id="events_search_form" action="events/events.html" method="post">
+  <form id="events_search_form" action="user/events.html" method="post">
   	<div class="form-fieldset-range">
       <select id="events-category" name="category"  style="width:120px;">
         {CategoryTypeArrayBegin}
@@ -43,30 +42,34 @@
    		  <th class="text-centered"><p>{MaturityText}</p></th>
         <th class="text-left"><p>{DurationText}</p></th>
         <th class="text-left"><p>{CoverChargeText}</p></th>
+        <th></th>
    		</tr>
  	  </thead>
 
     <tbody>
   	  {EventListArrayBegin}
-      <tr>
+      <tr onclick="document.location = 'index.html?page=edit_event&eventid={EventID}';">
         <td class="text-left"><p>{EventDateUTC}</p></td>
         <td class="text-left"><p>{SimName}</p></td>
-        <td class="text-left"><p>{Description}</p></td>
+        <td class="text-left"><p><a href="index.html?page=edit_event&eventid={EventID}">{Description}</a></p></td>
         <td class="text-left"><p>{Category}</p></td>
         <td class="text-centered"><p>{Maturity}</p></td>
         <td class="text-left"><p>{Duration}</p></td>
         <td class="text-left"><p>{CoverCharge}</p></td>
+        <td class="text-centered"><p>
+          <a href="index.html?page=edit_event&eventid={EventID}">{EditText}</a>
+          </p></td>
       </tr>
   	  {EventListArrayEnd}
     </tbody>
   </table>
 </div>
 
-<!--<script type="text/javascript" src="js/datatables.min.js"></script> -->
 
 <script>
   $(document).ready(function() {
-    $('#events_list').dataTable({
+   $(".eventinfo").colorbox({iframe:true, width:"990px", height:"440px"});
+   $('#events_list').dataTable({
       "order": [[ 0, "asc" ]]
     });
   });

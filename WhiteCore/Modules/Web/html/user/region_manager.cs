@@ -32,13 +32,13 @@ using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.Web
 {
-    public class RegionManagerPage : IWebInterfacePage
+    public class UserRegionManagerPage : IWebInterfacePage
     {
         public string [] FilePath {
             get {
                 return new []
                            {
-                               "html/admin/region_manager.html"
+                               "html/user/region_manager.html"
                            };
             }
         }
@@ -48,7 +48,7 @@ namespace WhiteCore.Modules.Web
         }
 
         public bool RequiresAdminAuthentication {
-            get { return true; }
+            get { return false; }
         }
 
         public Dictionary<string, object> Fill (WebInterface webInterface, string filename, OSHttpRequest httpRequest,
@@ -58,38 +58,46 @@ namespace WhiteCore.Modules.Web
             response = null;
             var vars = new Dictionary<string, object> ();
 
-            var RegionListVars = new List<Dictionary<string, object>> ();
-            var sortBy = new Dictionary<string, bool> ();
-            if (httpRequest.Query.ContainsKey ("region"))
-                sortBy.Add (httpRequest.Query ["region"].ToString (), true);
-            else if (httpRequest.Query.ContainsKey ("Order"))
-                sortBy.Add (httpRequest.Query ["Order"].ToString (), true);
+            var regionListVars = new List<Dictionary<string, object>> ();
+            var user = Authenticator.GetAuthentication (httpRequest);
 
 
             var regionData = Framework.Utilities.DataManager.RequestPlugin<IRegionData> ();
-            var regions = regionData.Get ((RegionFlags)0,
-                                          RegionFlags.Hyperlink | RegionFlags.Foreign | RegionFlags.Hidden,
-                                          null, null, sortBy);
-            foreach (var region in regions) {
-                string info;
-                info = (region.RegionArea < 1000000) ? region.RegionArea + " m2" : (region.RegionArea / 1000000) + " km2";
-                info = info + ", " + region.RegionTerrain;
+            var regions = regionData.GetOwnerRegions (user.PrincipalID);
+            if (regions.Count > 0) {
+                foreach (var region in regions) {
+                    string info;
+                    info = (region.RegionArea < 1000000) ? region.RegionArea + " m2" : (region.RegionArea / 1000000) + " km2";
+                    info = info + ", " + region.RegionTerrain;
 
-                RegionListVars.Add (new Dictionary<string, object> {
-                    { "RegionLocX", region.RegionLocX / Constants.RegionSize },
-                    { "RegionLocY", region.RegionLocY / Constants.RegionSize },
-                    { "RegionName", region.RegionName },
-                    { "RegionInfo", info},
-                    { "RegionStatus", WebHelpers.YesNo(translator, region.IsOnline)},
-                    { "RegionID", region.RegionID },
-                    { "RegionURI", region.RegionURI }
+                    regionListVars.Add (new Dictionary<string, object> {
+                        { "RegionLocX", region.RegionLocX / Constants.RegionSize },
+                        { "RegionLocY", region.RegionLocY / Constants.RegionSize },
+                        { "RegionName", region.RegionName },
+                        { "RegionInfo", info},
+                        { "RegionStatus", WebHelpers.YesNo(translator, region.IsOnline)},
+                        { "RegionID", region.RegionID },
+                        { "RegionURI", region.RegionURI }
+                    });
+                }
+            } else {
+                regionListVars.Add (new Dictionary<string, object> {
+                    { "RegionLocX", "" },
+                    { "RegionLocY", "" },
+                    { "RegionName", "" },
+                    { "RegionInfo", translator.GetTranslatedString("NoDetailsText")},
+                    { "RegionStatus", ""},
+                    { "RegionID", "" },
+                    { "RegionURI", "" }
                 });
+
             }
 
-            vars.Add ("RegionList", RegionListVars);
+            vars.Add ("RegionList", regionListVars);
 
             // labels
-            vars.Add ("RegionManagerText", translator.GetTranslatedString ("MenuRegionManager"));
+            vars.Add ("UserName", user.Name);
+            vars.Add ("RegionsText", translator.GetTranslatedString ("MenuRegionsTitle"));
             vars.Add ("AddRegionText", translator.GetTranslatedString ("AddRegionText"));
             vars.Add ("EditRegionText", translator.GetTranslatedString ("EditText"));
             vars.Add ("RegionListText", translator.GetTranslatedString ("RegionListText"));
@@ -100,7 +108,7 @@ namespace WhiteCore.Modules.Web
             vars.Add ("RegionLocXText", translator.GetTranslatedString ("RegionLocXText"));
             vars.Add ("RegionLocYText", translator.GetTranslatedString ("RegionLocYText"));
             vars.Add ("RegionOnlineText", translator.GetTranslatedString ("Online"));
-            vars.Add ("MainServerURL", webInterface.GridURL);
+            //vars.Add ("MainServerURL", webInterface.GridURL);
 
             return vars;
         }

@@ -1,9 +1,9 @@
-<!-- User Purchases -->
+<!-- User Transactions -->
 
 <div id="fullPage">
-  <h2>{SystemName}: {PurchasesText}</h2>
+  <h2>{UserName}: {TransactionsText}</h2>
 
-  <form id="purchases_search_form" action="user_purchases.html" method="post">
+  <form id="transactions_search_form" action="user_transactions.html" method="post">
 
   	<div class="form-fieldset-range">
   		<legend>{DateInfoText}</legend>
@@ -19,36 +19,40 @@
   	</div>
   </form>
 
-  <table id="purchases_list">
-	  <thead class="listhead">
-   		<tr>
-   		  <th class="transactions_left"><p>{PurchaseDateText}</p></th>
-   		  <th class="transactions_user"><p>{PurchaseAgentText}</p></th>
-   		  <th class="transactions_user"><p>{LoggedIPText}</p></th>
-   		  <th class="transactions_description"><p>{PurchaseDetailText}</p></th>
-   		  <th class="transactions_value"><p>{PurchaseAmountText}</p></th>
-   		  <th class="transactions_value"><p>{PurchaseRealAmountText}</p></th>
-   		</tr>
- 	  </thead>
+
+  <!--
+  <div class="center notice" style="text-align:center;margin:10px 0;">{NoTransactionsText}</div> -->
+
+  <table id="transactions_list">
+    <thead class="listhead">
+  		<tr>
+  		  <th class="transactions_left"><p>{TransactionDateText}</p></th>
+  		  <th class="transactions_user"><p>{TransactionFromAgentText}</p></th>
+  		  <th class="transactions_user"><p>{TransactionToAgentText}</p></th>
+  		  <th class="transactions_description"><p>{TransactionDetailText}</p></th>
+  		  <th class="transactions_value"><p>{TransactionAmountText}</p></th>
+  		  <th class="transactions_value"><p>{TransactionBalanceText}</p></th>
+  		</tr>
+    </thead>
 
     <tbody>
-  	  {PurchasesListArrayBegin}
+   	{TransactionsListArrayBegin}
       <tr>
-        <td class="transactions_left"><p>{PurchaseDate}</p></td>
-        <td class="transactions_user"><p>{AgentName}</p></td>
-        <td class="transactions_user"><p>{LoggedIP}</p></td>
+        <td class="transactions_left"><p>{Date}</p></td>
+        <td class="transactions_user"><p>{FromAgent}</p></td>
+        <td class="transactions_user"><p>{ToAgent}</p></td>
         <td class="transactions_description"><p>{Description}</p></td>
         <td class="transactions_value"><p>{Amount}</p></td>
-        <td class="transactions_value"><p>{RealAmount}</p></td>
+        <td class="transactions_value"><p>{ToBalance}</p></td>
       </tr>
-  	  {PurchasesListArrayEnd}
+  	{TransactionsListArrayEnd}
     </tbody>
   </table>
 </div>
 
 <script>
   $(document).ready(function() {
-    $('#purchases_list').dataTable({
+    $('#transactions_list').dataTable({
       "order": [[ 0, "asc" ]]
     });
   });
@@ -60,7 +64,7 @@
 
   <!--  /* date pickers */ -->
   $(function() {
-    $( "#date_start" ).datepick( {
+    $( "#date_start" ).datepick({
       defaultDate: "-1w",
       changeMonth: true,
       numberOfMonths: 3,
@@ -68,7 +72,7 @@
         $( "#to" ).datepick( "option", "minDate", selectedDate );
       }
     });
-    $( "#date_end" ).datepick( {
+    $( "#date_end" ).datepick({
       //defaultDate: "+1w",
       changeMonth: true,
       numberOfMonths: 3,
@@ -79,7 +83,7 @@
   });
 
   /* attach a submit handler to the form */
-  $("#purchases_search_form").submit(function(event) {
+  $("#transactions_search_form").submit(function(event) {
 
     /* stop form from submitting normally */
     event.preventDefault();
@@ -92,4 +96,3 @@
     });
   });
 </script>
-

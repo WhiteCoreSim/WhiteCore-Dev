@@ -41,7 +41,7 @@ namespace WhiteCore.Modules.Web
             get {
                 return new []
                            {
-                               "html/user_transactions.html"
+                               "html/user/user_transactions.html"
                            };
             }
         }
@@ -127,6 +127,7 @@ namespace WhiteCore.Modules.Web
             vars.Add ("NoTransactionsText", noDetails);
 
             // labels
+            vars.Add ("UserName", user.Name);
             vars.Add ("TransactionsText", translator.GetTranslatedString ("TransactionsText"));
             vars.Add ("DateInfoText", translator.GetTranslatedString ("DateInfoText"));
             vars.Add ("DateStartText", translator.GetTranslatedString ("DateStartText"));

@@ -485,6 +485,13 @@ namespace WhiteCore.Services.DataService
             return Regions;
         }
 
+        public List<GridRegion> GetOwnerRegions (UUID ownerID)
+        {
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["OwnerUUID"] = ownerID.ToString();
+
+            return ParseQuery (null, GD.Query (new string [] { "*" }, m_realm, filter, null, null, null));
+        }
         #endregion
 
         public void Dispose ()

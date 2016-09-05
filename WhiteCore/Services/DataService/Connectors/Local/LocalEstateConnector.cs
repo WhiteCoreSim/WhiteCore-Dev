@@ -317,9 +317,18 @@ namespace WhiteCore.Services.DataService
         }
 
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<string> GetEstates()
+        public List<string> GetEstateNames()
         {
             List<string> estates = GD.Query(new string[1] { "EstateName" }, m_estateSettingsTable, null, null, null, null);
+            return estates;
+        }
+
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public List<string> GetEstateNames (UUID ownerID)
+        {
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["EstateOwner"] = ownerID;
+            List<string> estates = GD.Query (new string [1] { "EstateName" }, m_estateSettingsTable, filter, null, null, null);
             return estates;
         }
 

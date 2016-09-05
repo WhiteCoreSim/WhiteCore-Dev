@@ -49,6 +49,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "Submit", "Submit"},
             { "Accept", "Accept"},
             { "Save", "Save"},
+            { "Cancel", "Cancel"},
             { "FirstText", "First"},
             { "BackText", "Back"},
             { "NextText", "Next"},
@@ -75,6 +76,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "MinutesText", "minutes"},
             { "HourText", "hour"},
             { "HoursText", "hours"},
+            { "EditText", "Edit"},
             { "EdittingText", "Editing"},
 
             // Status information
@@ -171,6 +173,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "RegionSizeText", "Region Size"},
             { "RegionNameText", "Region Name"},
             { "RegionTypeText", "Region Type"},
+            { "RegionPresetTypeText", "Region Preset Type"},
             { "RegionDelayStartupText", "Delay starting scripts"},
             { "RegionPresetText", "Region Preset"},
             { "RegionTerrainText", "Region Terrain"},
@@ -195,6 +198,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "NumberOfUsersInRegionText", "Number of Users in region"},
 
             // Region manager
+            { "AddRegionText", "Add Region"},
             { "Mainland", "Mainland"},
             { "Estate", "Estate"},
             { "FullRegion", "Full Region"},
@@ -209,6 +213,18 @@ namespace WhiteCore.Modules.Web.Translators
             { "RegionVisibilityText", "Visible to neighbours"},
             { "RegionInfiniteText", "Infinite Region"},
             { "RegionCapacityText", "Region object capacity"},
+            { "NormalText", "Normal"},
+            { "DelayedText", "Delayed"},
+
+            // Estate management
+            {"AddEstateText", "Add Estate"},
+            {"EstateText", "Estate"},
+            {"EstatesText", "Estates"},
+            {"PricePerMeterText", "Price per square meter"},
+            {"PublicAccessText", "Public access"},
+            {"AllowVoiceText", "Allow voice"},
+            {"TaxFreeText", "Tax Free"},
+            {"AllowDirectTeleportText", "Allow direct teleporting"},
 
             // Menus 
             { "MenuHome", "Home"},
@@ -239,6 +255,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "MenuManager", "Management"},
             { "MenuSettings", "Settings"},
             { "MenuRegionManager", "Region Manager"},
+            { "MenuEstateManager", "Estate Manager"},
             { "MenuManagerSimConsole", "Simulator console"},
             { "MenuPurchases", "User Purchases"},
             { "MenuMyPurchases", "My Purchases"},
@@ -277,6 +294,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "TooltipsMenuManager", "Admin Management"},
             { "TooltipsMenuSettings", "WebUI Settings"},
             { "TooltipsMenuRegionManager", "Region create/edit"},
+            { "TooltipsMenuEstateManager", "Estate management"},
             { "TooltipsMenuManagerSimConsole", "Online simulator console"},
             { "TooltipsMenuPurchases", "Purchase information"},
             { "TooltipsMenuTransactions", "Transaction information"},
@@ -345,7 +363,6 @@ namespace WhiteCore.Modules.Web.Translators
             { "DeleteText", "Delete"},
             { "DeleteUserInfoText",
            "This will remove all information about you in the grid and remove your access to this service. If you wish to continue, enter your name and password and click Delete."},
-            { "EditText", "Edit"},
             { "EditUserAccountText", "Edit User Account"},
 
             // Maintenance
@@ -444,7 +461,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "EventLocationText", "Where"},
             { "HostedByText","Hosted by"},
             { "EventDateText", "When"},
-            { "EventTimeInfoText", "Event time should be local time (Server)"},
+            { "EventTimeInfoText", "Event time should be local time"},
             { "CoverChargeText", "Cover charge"},
             { "DurationText", "Duration"},
             { "AddEventText", "Add event"},
@@ -500,6 +517,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "Reset", "Reset"},
             { "Settings", "Settings"},
             { "Pages", "Pages"},
+            { "UpdateRequired", "update required"},
             { "DefaultsUpdated", "defaults updated, go to Factory Reset to update or Settings Manager to disable this warning."},
 
             // Page_manager

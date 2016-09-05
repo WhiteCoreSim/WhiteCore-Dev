@@ -26,19 +26,18 @@
  */
 
 using System.Collections.Generic;
+using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
-using WhiteCore.Framework.Services;
-using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.Web
 {
-    public class RegionManagerPage : IWebInterfacePage
+    public class UserEstateManagerPage : IWebInterfacePage
     {
         public string [] FilePath {
             get {
                 return new []
                            {
-                               "html/admin/region_manager.html"
+                               "html/user/estate_manager.html"
                            };
             }
         }
@@ -48,7 +47,7 @@ namespace WhiteCore.Modules.Web
         }
 
         public bool RequiresAdminAuthentication {
-            get { return true; }
+            get { return false; }
         }
 
         public Dictionary<string, object> Fill (WebInterface webInterface, string filename, OSHttpRequest httpRequest,
@@ -57,51 +56,51 @@ namespace WhiteCore.Modules.Web
         {
             response = null;
             var vars = new Dictionary<string, object> ();
+            var estateListVars = new List<Dictionary<string, object>> ();
+            var estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
+            var user = Authenticator.GetAuthentication (httpRequest);
 
-            var RegionListVars = new List<Dictionary<string, object>> ();
-            var sortBy = new Dictionary<string, bool> ();
-            if (httpRequest.Query.ContainsKey ("region"))
-                sortBy.Add (httpRequest.Query ["region"].ToString (), true);
-            else if (httpRequest.Query.ContainsKey ("Order"))
-                sortBy.Add (httpRequest.Query ["Order"].ToString (), true);
+            var estates = estateConnector.GetEstates (user.PrincipalID);
 
+            if (estates.Count > 0) {
 
-            var regionData = Framework.Utilities.DataManager.RequestPlugin<IRegionData> ();
-            var regions = regionData.Get ((RegionFlags)0,
-                                          RegionFlags.Hyperlink | RegionFlags.Foreign | RegionFlags.Hidden,
-                                          null, null, sortBy);
-            foreach (var region in regions) {
-                string info;
-                info = (region.RegionArea < 1000000) ? region.RegionArea + " m2" : (region.RegionArea / 1000000) + " km2";
-                info = info + ", " + region.RegionTerrain;
+                foreach (var estate in estates) {
+                    var regions = estateConnector.GetRegions ((int)estate.EstateID);
 
-                RegionListVars.Add (new Dictionary<string, object> {
-                    { "RegionLocX", region.RegionLocX / Constants.RegionSize },
-                    { "RegionLocY", region.RegionLocY / Constants.RegionSize },
-                    { "RegionName", region.RegionName },
-                    { "RegionInfo", info},
-                    { "RegionStatus", WebHelpers.YesNo(translator, region.IsOnline)},
-                    { "RegionID", region.RegionID },
-                    { "RegionURI", region.RegionURI }
-                });
+                    estateListVars.Add (new Dictionary<string, object> {
+                        {"EstateName", estate.EstateName},
+                        {"PublicAccess", WebHelpers.YesNo(translator, estate.PublicAccess)},
+                        {"AllowVoice", WebHelpers.YesNo(translator, estate.AllowVoice)},
+                        {"TaxFree", WebHelpers.YesNo(translator, estate.TaxFree)},
+                        {"AllowDirectTeleport", WebHelpers.YesNo (translator, estate.AllowDirectTeleport)},
+                        {"RegionCount", regions.Count.ToString()}
+                    });
+                }
+            } else {
+                estateListVars.Add (new Dictionary<string, object> {
+                    {"EstateName", translator.GetTranslatedString("NoDetailsText")},
+                    {"PublicAccess", ""},
+                        {"AllowVoice", ""},
+                        {"TaxFree", ""},
+                        {"AllowDirectTeleport", ""},
+                        {"RegionCount", ""}
+                    });
+
             }
 
-            vars.Add ("RegionList", RegionListVars);
+            vars.Add ("EstateList", estateListVars);
 
             // labels
-            vars.Add ("RegionManagerText", translator.GetTranslatedString ("MenuRegionManager"));
-            vars.Add ("AddRegionText", translator.GetTranslatedString ("AddRegionText"));
-            vars.Add ("EditRegionText", translator.GetTranslatedString ("EditText"));
-            vars.Add ("RegionListText", translator.GetTranslatedString ("RegionListText"));
-            vars.Add ("RegionText", translator.GetTranslatedString ("Region"));
-
-
-            vars.Add ("RegionNameText", translator.GetTranslatedString ("RegionNameText"));
-            vars.Add ("RegionLocXText", translator.GetTranslatedString ("RegionLocXText"));
-            vars.Add ("RegionLocYText", translator.GetTranslatedString ("RegionLocYText"));
-            vars.Add ("RegionOnlineText", translator.GetTranslatedString ("Online"));
-            vars.Add ("MainServerURL", webInterface.GridURL);
-
+            vars.Add ("UserName", user.Name);
+            vars.Add ("AddEstateText", translator.GetTranslatedString ("AddEstateText"));
+            vars.Add ("EditEstateText", translator.GetTranslatedString ("EditText"));
+            vars.Add ("EstateListText", translator.GetTranslatedString ("EstatesText"));
+            vars.Add ("EstateText", translator.GetTranslatedString ("EstateText"));
+            vars.Add ("PublicAccessText", translator.GetTranslatedString ("PublicAccessText"));
+            vars.Add ("AllowVoiceText", translator.GetTranslatedString ("AllowVoiceText"));
+            vars.Add ("TaxFreeText", translator.GetTranslatedString ("TaxFreeText"));
+            vars.Add ("AllowDirectTeleportText", translator.GetTranslatedString ("AllowDirectTeleportText"));
+            vars.Add ("RegionsText", translator.GetTranslatedString ("MenuRegionsTitle"));
             return vars;
         }
 
@@ -111,4 +110,5 @@ namespace WhiteCore.Modules.Web
             return false;
         }
     }
+
 }

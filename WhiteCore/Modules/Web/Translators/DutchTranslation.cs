@@ -49,6 +49,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "Submit", "Verzenden"},
             { "Accept", "Accepteren"},
             { "Save", "Save"},
+            { "Cancel", "Annuleer"},
             { "FirstText", "Eerste"},
             { "BackText", "Terug"},
             { "NextText", "Volgende"},
@@ -75,6 +76,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "MinutesText", "notulen"},
             { "HourText", "urr"},
             { "HoursText", "urr"},
+            { "EditText", "Bewerk"},
             { "EdittingText", "Editing"},
 
             // Status information
@@ -170,7 +172,8 @@ namespace WhiteCore.Modules.Web.Translators
             { "RegionLocationText", "Region Locatie"},
             { "RegionSizeText", "Region Grootte"},
             { "RegionNameText", "Region Naam"},
-            { "RegionTypeText", "Region Type"},
+            { "RegionTypeText", "type gebied"},
+            { "RegionPresetTypeText", "Region Type"},
             { "RegionDelayStartupText", "Delay starting scripts"},
             { "RegionPresetText", "Region Preset"},
             { "RegionTerrainText", "Region Terrain"},
@@ -195,6 +198,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "NumberOfUsersInRegionText", "Number of Users in region"},
 
             // Region manager
+            { "AddRegionText", "Add Region"},
             { "Mainland", "Vasteland"},
             { "Estate", "Estate"},
             { "FullRegion", "Volledige Regio"},
@@ -209,6 +213,18 @@ namespace WhiteCore.Modules.Web.Translators
             { "RegionVisibilityText", "Zichtbaar voor buren"},
             { "RegionInfiniteText", "Infinite Regio"},
             { "RegionCapacityText", "Regio object capaciteit"},
+            { "NormalText", "Normaal"},
+            { "DelayedText", "Vertraagd"},
+
+            // Estate management
+            {"AddEstateText", "Estate toevoegen"},
+            {"EstateText", "Estate"},
+            {"EstatesText", "Estates"},
+            {"PricePerMeterText", "Prijs per vierkante meter"},
+            {"PublicAccessText", "Publieke toegang"},
+            {"AllowVoiceText", "Laat voice"},
+            {"TaxFreeText", "Belasting vrij"},
+            {"AllowDirectTeleportText", "Sta directe teleporteren"},
 
             // Menus
             { "MenuHome", "Home"},
@@ -239,6 +255,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "MenuManager", "Beheer"},
             { "MenuSettings", "Instellingen"},
             { "MenuRegionManager", "Regio Manager"},
+            { "MenuEstateManager", "Estate Manager"},
             { "MenuManagerSimConsole", "Sim console"},
             { "MenuPurchases", "Gebruiker Aankopen"},
             { "MenuMyPurchases", "Mijn aankopen "},
@@ -277,6 +294,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "TooltipsMenuManager", "Admin Management"},
             { "TooltipsMenuSettings", "WebUI Instellingen"},
             { "TooltipsMenuRegionManager", "Regio maken / bewerken"},
+            { "TooltipsMenuEstateManager", "Estate management"},
             { "TooltipsMenuManagerSimConsole", "Online simulator console"},
             { "TooltipsMenuPurchases", "Aankoop informatie"},
             { "TooltipsMenuTransactions", "Transactie-informatie"},
@@ -444,7 +462,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "EventLocationText", "Waar"},
             { "HostedByText","Gepresenteerd door"},
             { "EventDateText", "Wanneer"},
-            { "EventTimeInfoText", "Event tijd moeten de lokale tijd (Server)"},
+            { "EventTimeInfoText", "Event tijd moeten de lokale tijd"},
             { "CoverChargeText", "Dekking"},
             { "DurationText", "Duur"},
             { "AddEventText", "Voeg Event"},
@@ -500,6 +518,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "Reset", "Reset"},
             { "Settings", "Settings"},
             { "Pages", "Pages"},
+            { "UpdateRequired", "update required"},
             { "DefaultsUpdated", "defaults updated, go to Factory Reset to update or Settings Manager to disable this warning."},
 
             // Page_manager

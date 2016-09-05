@@ -50,6 +50,8 @@ namespace WhiteCore.Framework.ClientInterfaces
         public int maturity;
         public string name;
         public string simName;
+        public string regionId;
+        public string parcelId;
 
         public EventData ()
         {
@@ -79,6 +81,8 @@ namespace WhiteCore.Framework.ClientInterfaces
             map ["RPosZ"] = OSD.FromReal (regionPos.Z).ToString ();
             map ["eventFlags"] = eventFlags;
             map ["maturity"] = maturity;
+            map ["regionId"] = regionId;
+            map ["parcelId"] = parcelId;
             return map;
         }
 
@@ -114,6 +118,8 @@ namespace WhiteCore.Framework.ClientInterfaces
 
             eventFlags = map ["eventFlags"];
             maturity = map ["maturity"];
+            regionId = map ["regionId"];
+            parcelId = map ["parcelId"];
         }
     }
 }

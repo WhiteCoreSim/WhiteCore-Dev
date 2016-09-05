@@ -228,9 +228,29 @@ namespace WhiteCore.Framework.DatabaseInterfaces
         /// Gets all events.
         /// </summary>
         /// <returns>The all events.</returns>
+        /// <param name="queryHours">Query hours.</param>
+        /// <param name="category">Category.</param>
+        /// <param name="maturityLevel">Maturity level.</param>
+        List<EventData> GetAllEvents (int queryHours, int category, int maturityLevel);
+
+        /// <summary>
+        /// Gets the user events.
+        /// </summary>
+        /// <returns>The user events.</returns>
+        /// <param name="userId">User identifier.</param>
+        /// <param name="queryHours">Query hours.</param>
+        /// <param name="category">Category.</param>
+        /// <param name="maturityLevel">Maturity level.</param>
+        List<EventData> GetUserEvents (string userId, int queryHours, int category, int maturityLevel);
+
+        /// <summary>
+        /// Gets all events.
+        /// </summary>
+        /// <returns>The all events.</returns>
+        /// <param name="userId">Creator ID.(Ignored if null)</param>
         /// <param name="queryHours">Next nn hours.</param>
-        /// <param name="eventFlags">Event flags.</param>
-        List<EventData> GetAllEvents (int queryHours, int categoriy, int maturityLevel);
+        /// <param name="maturityLevel">Event flags.</param>
+        List<EventData> GetEventsList (string userId, int queryHours, int categoriy, int maturityLevel);
 
         /// <summary>
         ///     Retrieves all events in the given region by their maturity level
@@ -267,6 +287,22 @@ namespace WhiteCore.Framework.DatabaseInterfaces
         EventData CreateEvent(UUID creator, UUID region, UUID parcel, DateTime date, uint cover,
                               DirectoryManager.EventFlags maturity, uint flags, uint duration, Vector3 localPos,
                               string name, string description, string category);
+
+        /// <summary>
+        /// Updates or adds an event.
+        /// </summary>
+        /// <returns><c>true</c>, if add event was updated, <c>false</c> otherwise.</returns>
+        /// <param name="eventData">Event data.</param>
+        /// <param name="regionId">Region identifier.</param>
+        /// <param name="parcelId">Parcel identifier.</param>
+        bool UpdateAddEvent (EventData eventData);
+
+        /// <summary>
+        /// Deletes an event.
+        /// </summary>
+        /// <returns><c>true</c>, if event was deleted, <c>false</c> otherwise.</returns>
+        /// <param name="eventId">Event identifier.</param>
+        bool DeleteEvent (string eventId);
 
         /// <summary>
         ///     Gets a list of events with optional filters

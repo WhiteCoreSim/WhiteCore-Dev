@@ -88,6 +88,8 @@ namespace WhiteCore.Framework.Services
         List<GridRegion> GetDefaultRegions(List<UUID> scopeIDs);
         List<GridRegion> GetFallbackRegions(List<UUID> scopeIDs, int x, int y);
         List<GridRegion> GetSafeRegions(List<UUID> scopeIDs, int x, int y);
+        List<GridRegion> GetOwnerRegions (UUID owner);
+
     }
 
     [Flags]

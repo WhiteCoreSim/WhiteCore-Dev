@@ -28,6 +28,7 @@
 using System;
 using System.Collections.Generic;
 using OpenMetaverse;
+using WhiteCore.Framework.ClientInterfaces;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
@@ -36,12 +37,12 @@ using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.Web
 {
-    public class EventsAddMain : IWebInterfacePage
+    public class UserEditEvents : IWebInterfacePage
     {
         public string [] FilePath {
             get {
                 return new [] {
-                    "html/events/add_event.html"
+                    "html/user/edit_event.html"
                 };
             }
         }
@@ -63,10 +64,40 @@ namespace WhiteCore.Modules.Web
             var currencySymbol = "$";
             if (moneyModule != null)
                 currencySymbol = moneyModule.InWorldCurrencySymbol;
+            var directoryService = Framework.Utilities.DataManager.RequestPlugin<IDirectoryServiceConnector> ();
 
             response = null;
+            var eventData = new EventData ();
             var vars = new Dictionary<string, object> ();
-            var duration = 10;
+            string eventId;
+            uint eid = 0;
+
+            if (httpRequest.Query.ContainsKey ("eventid")) {
+                eventId = httpRequest.Query ["eventid"].ToString ();
+            } else {
+                if (requestParameters.ContainsKey ("eventid")) {
+                    eventId = requestParameters ["eventid"].ToString ();
+                } else {
+                    response = "<h3>Event details not supplied, redirecting to main page</h3>" +
+                        "<script>" +
+                        "setTimeout(function() {window.location.href = \"index.html\";}, 1000);" +
+                        "</script>";
+                    return null;
+                }
+            }
+            uint.TryParse (eventId, out eid);
+
+            if (requestParameters.ContainsKey ("Delete")) {
+                //string newsID = httpRequest.Query ["delete"].ToString ();
+                if (directoryService.DeleteEvent (eid.ToString ()))
+                    response = "<h3>Event details have been deleted</h3>" +
+                        "<script>" +
+                        "setTimeout(function() {window.location.href = \"/?page=user_events\";}, 1000);" +
+                        "</script>";
+                else
+                    response = "<h3>Error encountered when deleting event. Please try again later</h3>";
+                return null;
+            }
 
             if (requestParameters.ContainsKey ("Submit")) {
                 string eventName = requestParameters ["eventName"].ToString ();
@@ -78,7 +109,6 @@ namespace WhiteCore.Modules.Web
                 string eventCoverCharge = requestParameters ["eventCoverCharge"].ToString ();
                 string eventDescription = requestParameters ["eventDescription"].ToString ();
 
-                var directoryService = Framework.Utilities.DataManager.RequestPlugin<IDirectoryServiceConnector> ();
                 var regionData = Framework.Utilities.DataManager.RequestPlugin<IRegionData> ();
 
                 var selParcel = eventLocation.Split (',');
@@ -100,43 +130,53 @@ namespace WhiteCore.Modules.Web
                 var eventDT = DateTime.Parse (eventDate + " " + eventTime);
                 var localPos = new Vector3 (int.Parse (selParcel [0]), int.Parse (selParcel [0]), 0);
 
-                var nEvent = directoryService.CreateEvent (
-                    ourAccount.PrincipalID,
-                    region.RegionID,
-                    (UUID)selParcel [5],
-                    eventDT,
-                    uint.Parse (eventCoverCharge),
-                    (DirectoryManager.EventFlags)Util.ConvertAccessLevelToMaturity (region.Access),
-                    region.Access,
-                    uint.Parse (eventDuration),
-                    localPos,
-                    eventName,
-                    eventDescription,
-                    eventCategory
-                );
+                eventData.eventID = eid;        // used to delete the existing event details
+                eventData.creator = ourAccount.PrincipalID.ToString ();
+                eventData.regionId = region.RegionID.ToString ();
+                eventData.parcelId = selParcel [5];
+                eventData.date = eventDT.ToString ("s");
+                eventData.cover = uint.Parse (eventCoverCharge);
+                eventData.maturity = (int)Util.ConvertAccessLevelToMaturity (region.Access);
+                eventData.eventFlags = region.Access;             // region maturity flags
+                eventData.duration = uint.Parse (eventDuration);
+                eventData.regionPos = localPos;
+                eventData.name = eventName;
+                eventData.description = eventDescription;
+                eventData.category = eventCategory;
 
-                if (nEvent != null)
-                    response = "<h3>Event added successfully, redirecting to main page</h3>" +
+                var success = directoryService.UpdateAddEvent (eventData);
+
+                if (success)
+                    response = "<h3>Event updated successfully</h3>" +
                         "<script language=\"javascript\">" +
-                        "setTimeout(function() {window.location.href = \"/?page=events\";}, 0);" +
+                        "setTimeout(function() {window.location.href = \"/?page=user_events\";}, 1000);" +
                         "</script>";
 
                 return null;
             }
 
+            eventData = directoryService.GetEventInfo (eid);
+
+            // details
+            vars.Add ("EventID", eventData.eventID);
+            //vars.Add ("CreatorUUID", eventData.creator);
+            vars.Add ("Name", eventData.name);
+            vars.Add ("Description", eventData.description.Trim ());
+            vars.Add ("SimName", eventData.simName);
+
             // Time selections
-            var nearestHalf = Utilities.RoundUp (DateTime.Now, TimeSpan.FromMinutes (30)).ToString ("HH\\:mm\\:ss");
-            vars.Add ("EventDate", DateTime.Now.AddDays (1).ToShortDateString ());
-            vars.Add ("EventTimes", WebHelpers.EventTimeSelections (nearestHalf));
+            var evntDateTime = Util.ToDateTime (eventData.dateUTC).ToLocalTime ();
+            vars.Add ("EventDate", evntDateTime.ToShortDateString ());
+            vars.Add ("EventTimes", WebHelpers.EventTimeSelections (evntDateTime.ToString ("HH\\:mm\\:ss")));
 
             // event durations
-            vars.Add ("EventDurations", WebHelpers.EventDurationSelections (duration));
+            vars.Add ("EventDurations", WebHelpers.EventDurationSelections ((int)eventData.duration));
 
             // event locations
-            vars.Add ("EventLocations", WebHelpers.EventLocations (ourAccount, webInterface.Registry, ""));
+            vars.Add ("EventLocations", WebHelpers.EventLocations (ourAccount, webInterface.Registry, eventData.parcelId));
 
-            vars.Add ("EventCategories", WebHelpers.EventCategorySelections (-1, translator));
-            vars.Add ("EventCoverCharge", "0");
+            vars.Add ("EventCategories", WebHelpers.EventCategorySelections (int.Parse (eventData.category), translator));
+            vars.Add ("EventCoverCharge", eventData.cover.ToString ());
 
             // labels
             vars.Add ("AddEventText", translator.GetTranslatedString ("AddEventText"));
@@ -152,7 +192,8 @@ namespace WhiteCore.Modules.Web
 
 
             vars.Add ("ErrorMessage", "");
-            vars.Add ("Submit", translator.GetTranslatedString ("AddEventText"));
+            vars.Add ("Delete", translator.GetTranslatedString ("DeleteText"));
+            vars.Add ("Submit", translator.GetTranslatedString ("SaveUpdates"));
 
             return vars;
         }

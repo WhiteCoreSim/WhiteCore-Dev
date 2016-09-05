@@ -269,7 +269,7 @@ namespace WhiteCore.Modules.Web
             bool TempUserBanned = false;
             if (userBanned) {
                 if ((agent.Flags & IAgentFlags.TempBan) == IAgentFlags.TempBan &&
-                    agent.OtherAgentInformation ["Temperory BanInfo"].AsDate () < DateTime.Now.ToUniversalTime ()) {
+                    agent.OtherAgentInformation ["Temporary BanInfo"].AsDate () < DateTime.Now.ToUniversalTime ()) {
                     userBanned = false;
                     agent.Flags &= ~IAgentFlags.TempBan;
                     agent.Flags &= ~IAgentFlags.PermBan;

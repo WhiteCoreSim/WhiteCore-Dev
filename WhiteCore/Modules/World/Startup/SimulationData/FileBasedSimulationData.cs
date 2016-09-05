@@ -58,6 +58,7 @@ namespace WhiteCore.Modules
         protected int m_mapcenter_y = Constants.DEFAULT_REGIONSTART_Y;
 
         protected string m_fileName = "";
+        protected string defaultDataPath = Constants.DEFAULT_DATA_DIR;
         protected string m_storeDirectory = "";
         protected bool m_keepOldSave = true;
         protected string m_oldSaveDirectory = "";
@@ -195,6 +196,24 @@ namespace WhiteCore.Modules
             }
 
             return lastBackFile;
+        }
+
+        /// <summary>
+        /// Gets any region preset OAR files.
+        /// </summary>
+        /// <returns>The region archives.</returns>
+        List<string> GetRegionArchives ()
+        {
+            var defaultOarDir = Path.Combine (defaultDataPath, Constants.DEFAULT_OARARCHIVE_DIR);
+            var retVals = new List<string> ();
+
+            if (Directory.Exists (defaultOarDir)) {
+                var archives = new List<string> (Directory.GetFiles (defaultOarDir, "*.oar"));
+                archives.AddRange (new List<string> (Directory.GetFiles (defaultOarDir, "*.tgz")));
+                foreach (string file in archives)
+                    retVals.Add (file);
+            }
+            return retVals;
         }
 
         public virtual RegionInfo CreateNewRegion (ISimulationBase simBase, Dictionary<string, int> currentInfo)
@@ -908,7 +927,7 @@ namespace WhiteCore.Modules
                 // or as configured
 
                 // Get and save the default Data path
-                string defaultDataPath = simBase.DefaultDataPath;
+                defaultDataPath = simBase.DefaultDataPath;
 
                 // Get and save the default map center location
                 m_mapcenter_x = simBase.MapCenterX;

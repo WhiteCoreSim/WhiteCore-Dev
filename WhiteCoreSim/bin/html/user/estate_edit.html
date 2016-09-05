@@ -1,0 +1,96 @@
+<!-- Region edit/create -->
+
+{IsAuthenticatedBegin}
+<h2>{UserName}: {EstateManagerText}</h2>
+<div id="info_message" class="info">{InfoMessage}</div>
+
+<form id="estate_form" action="user/estate_edit.html" method="post">
+<div style ="display: inline-block;">
+<table>
+  <tbody>
+    <tr>
+      <td class="region_info_left" style="width:120px;"><p id="regname_label">{EstateNameText}*</p></td>
+
+      <td class="region_info_right" colspan="4"><input minlength="3" id="EstateName" require="true" label="EstateName" name="EstateName" type="text" size="25" maxlength="30" value="{EstateName}"></td>
+    <td class="region_info_left"></td>
+    <td class="region_info_right"></td>
+    </tr>
+    <tr>
+    <td class="region_info_left"><p>{PricePerMeterText}</p></td>
+    <td class="region_info_left">
+        <input style="width:80px;"id="PricePerMeter" require="true" label="PricePerMeter" name="PricePerMeter" type="text" size="8" value="{PricePerMeter}" />
+    </td>
+  <tr>
+    <td class="region_info_left"><p>{PublicAccessText}</p></td>
+    <td class="region_info_left">
+      <select name="PublicAccess" id="PublicAccess">
+{PublicAccessArrayBegin}
+      <option value="{Index}">{Value}</option>
+{PublicAccessArrayEnd}
+      </select>
+    </td>
+   <td class="region_info_left"><p>{AllowVoiceText}</p></td>
+     <td class="region_info_left">
+      <select name="AllowVoice" id="AllowVoice">
+{AllowVoiceArrayBegin}
+      <option value="{Index}">{Value}</option>
+{AllowVoiceArrayEnd}
+      </select>
+    </td>
+   <td class="region_info_left"><p>{TaxFreeText}</p></td>
+     <td class="region_info_left">
+      <select name="TaxFree" id="TaxFree">
+{TaxFreeArrayBegin}
+      <option value="{Index}">{Value}</option>
+{TaxFreeArrayEnd}
+      </select>
+    </td>
+     <td class="region_info_left"><p >{AllowDirectTeleportText}</p></td>
+   <td class="region_info_left">
+      <select name="AllowDirectTeleport" id="AllowDirectTeleport">
+{AllowDirectTeleportArrayBegin}
+      <option value="{Index}">{Value}</option>
+{AllowDirectTeleportArrayEnd}
+      </select>
+    </td>
+
+  </tr>
+
+
+    <tr>
+    <td colspan="5"></td>
+    <td class="region_info_left"></td>
+    <input hidden type="hidden" id="EstateID" name="EstateID" value="{EstateID}" />
+    <input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
+    <td class="region_info_right" style="width:100px;">
+    <input type="hidden" name="action" value="check">
+      <button disabled style="color:#888;" id="Submit" name="Submit" type="Submit">{Submit}</button>
+    </input>
+    </td>
+      <td></td>
+      <td class="region_info_left" >
+        <button id="Cancel" name="Cancel" type="Cancel" onclick="document.location = '/?page=user_estatemanager';">{Cancel}</button>
+      </td>
+    </tr>
+  </tbody>
+</table></div>
+</form>
+
+<script>
+  /* attach a submit handler to the form */
+  $("#estate_form").submit(function(event) {
+
+    /* stop form from submitting normally */
+    event.preventDefault();
+    /* get some values from elements on the page: */
+    var $form = $( this ),
+        url = $form.attr( 'action' );
+    /* Send the data using post and put the results in a div */
+    $.post( url, $form.serialize(),
+      function( data ) {
+    $("#info_message").empty().append(data);
+      }
+    );
+  });
+</script>
+{IsAuthenticatedEnd}

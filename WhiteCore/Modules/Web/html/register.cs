@@ -314,23 +314,7 @@ namespace WhiteCore.Modules.Web
             vars.Add("UserTypeText", translator.GetTranslatedString("UserTypeText"));
             vars.Add("UserType", WebHelpers.UserTypeArgs(translator)) ;
 
-            var avArchiver = webInterface.Registry.RequestModuleInterface<IAvatarAppearanceArchiver> ();
-            var archives = avArchiver.GetAvatarArchives ();
-           
-            List<Dictionary<string, object>> avatarArchives = new List<Dictionary<string, object>>();
-            IWebHttpTextureService webTextureService = webInterface.Registry.RequestModuleInterface<IWebHttpTextureService>();
-            foreach (var archive in archives) {
-                var archiveInfo = new Dictionary<string, object> ();
-                archiveInfo.Add ("AvatarArchiveName", archive.FolderName);
-                archiveInfo.Add ("AvatarArchiveSnapshotID", archive.Snapshot);
-                archiveInfo.Add ("AvatarArchiveSnapshotURL", archive.LocalSnapshot != ""
-                                 ? webTextureService.GetAvatarImageURL (archive.LocalSnapshot)
-                                 : webTextureService.GetTextureURL (archive.Snapshot)
-                                );
-                avatarArchives.Add (archiveInfo);
-            }
-            vars.Add("AvatarArchive", avatarArchives);
-
+            vars.Add ("AvatarArchive", WebHelpers.AvatarSelections(webInterface.Registry));
 
             string tosLocation = "";
             if (loginServerConfig != null && loginServerConfig.GetBoolean("UseTermsOfServiceOnFirstLogin", false))
