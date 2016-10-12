@@ -21,14 +21,22 @@ Include-WebInterface = Sim/Standalone/WebInterface.ini
 MaxRegionSize = 0
 
 ;; How many regions away should we allow child agents
-;; This sets the number of regions in any direction we can see. 
-;; The default is to be able to see in any direction 1 region. 
-;; You can set this number to 2 or greater so that you can see X regions in every direction from the sim the agent is in. 
-;; For example, if you have a 4 by 4 region setup, and you wish to be able to see into all of them, 
-;; you would set the setting to 4 so that you can see across all of your regions. 
+;; This sets the number of regions in any direction we can see.
+;; The default is to be able to see in any direction 1 region.
+;; You can set this number to 2 or greater so that you can see X regions in every direction from the sim the agent is in.
+;; For example, if you have a 4 by 4 region setup, and you wish to be able to see into all of them,
+;; you would set the setting to 4 so that you can see across all of your regions.
 ;; This is figured by the region in the south-west corner region position's X - the max region position's X, which in our test case is 4.
 ;; Default: 1
 RegionSightSize = 1
+
+[InterWorldConnectors]
+;; Do you wish to enable the IWC (InterWorldConnectors) for your instance?
+Enabled = true
+;; Do you wish anyone to be able to connect to your instance (much like HyperGrid)
+AllowUntrustedConnections = true
+;; What is the default trust level of untrusted regions (if enabled above)
+UntrustedConnectionsDefaultTrust = Low
 
 [AgentProcessing]
 ;; Changes how many regions the agent can see into by letting the distance that they can see on how far the Draw Distance is set in the viewer.
@@ -58,6 +66,19 @@ MarketplaceOwnerName = "Marketplace Concierge"
 MainlandEstateName = "Whitecore Mainland"
 SystemEstateName = "Whitecore Estate"
 
+[DisplayNames]
+;; This allows for display names to be used
+Enabled = true
+
+;; Blocks all user names in this list from being used as display names. Names are NOT case sensitive. Separate names by commas.
+;; Example "Linden, Admin"
+BannedUserNames = "Linden"
+
+;; Restrict update frequency (days)
+;;
+;; Default (commented) is unrestricted
+;;UpdateDays = 7
+
 [LoginService]
 
 ;; This sets the message when a user logs in.
@@ -78,10 +99,10 @@ UseTermsOfServiceOnFirstLogin = false
 FileNameOfTOS = ToS.txt
 
 ;; Alternatively, a web location may be specified. Comment the previous setting and uncomment below
-;;  'ServersHostname' will be replaced with the local grid URL 
+;;  'ServersHostname' will be replaced with the local grid URL
 ; FileNameOfTOS = http://ServersHostname:8002/local/ToS.html
 
-;; Allow users to login anonymously and have a new account created automatically? 
+;; Allow users to login anonymously and have a new account created automatically?
 ;; This will create a new account for any user logging in.
 ;; This is also used to set the default availability of registrations using the WebUI.
 AllowAnonymousLogin = false
@@ -94,7 +115,7 @@ AllowDuplicateLogin = false
 ;;  Then save an Avatar Archive into the database by the command in the console "save avatar archive", "save avatar archive <First> <Last> <Filename> <FolderNameToSaveInto>", "Saves appearance to an avatar archive archive (Note: put \"\" around the FolderName if you need more than one word)"
 ;;   Where <First> <Last> is the user name, FileName (can end with .database to save into the database) which is used to identify which archive you wish to use, and the default folder name to create in the new user's inventory.
 ;;  After saving this archive, put the name of the archive here to set the default avatar appearance.
-DefaultAvatarArchiveForNewUser = 
+DefaultAvatarArchiveForNewUser =
 
 ;; Will hide the First Life setting of profile from all users if set to false
 AllowFirstLifeInProfile = true

@@ -26,10 +26,11 @@
  */
 
 using System;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.Utilities;
+using System.Globalization;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Framework.Services.ClassHelpers.Profile
 {
@@ -88,19 +89,19 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Profile
         ///     Max maturity rating the user can ever to see
         /// </summary>
         public int MaxMaturity = 2;
-        
+
         /// <summary>
         /// 	Hover height of the user
         /// </summary>
         public double HoverHeight = 0.0;
-        
+
         /// <summary>
         /// 	Permissions set by the user
         /// </summary>
         public int PermEveryone = 0;
         public int PermGroup = 0;
         public int PermNextOwner = 532480;
-        
+
         /// <summary>
         ///     Other information can be stored in here.
         ///     For ex, temporary ban info for this user
@@ -122,7 +123,7 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Profile
             OSDMap map = new OSDMap {
                 { "PrincipalID", OSD.FromUUID (PrincipalID) },
                 { "Flags", OSD.FromInteger ((int)Flags) },
-                { "AcceptTOS", OSD.FromBoolean (AcceptTOS) },                                 
+                { "AcceptTOS", OSD.FromBoolean (AcceptTOS) },
                 { "MaturityRating", OSD.FromInteger (MaturityRating) },
                 { "MaxMaturity", OSD.FromInteger (MaxMaturity) },
                 { "HoverHeight", OSD.FromReal (HoverHeight) },
@@ -143,7 +144,7 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Profile
         {
             PrincipalID = map ["PrincipalID"].AsUUID ();
             Flags = (IAgentFlags)map ["Flags"].AsInteger ();
-            AcceptTOS = map ["AcceptTOS"].AsBoolean ();            
+            AcceptTOS = map ["AcceptTOS"].AsBoolean ();
             MaturityRating = Convert.ToInt32 (map ["MaturityRating"].AsInteger ());
             MaxMaturity = Convert.ToInt32 (map ["MaxMaturity"].AsInteger ());
             HoverHeight = map ["HoverHeight"].AsReal ();
@@ -174,12 +175,12 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Profile
         /// <summary>
         ///     The appearance archive to load for this user
         /// </summary>
-        public string AArchiveName = String.Empty;
+        public string AArchiveName = string.Empty;
 
         /// <summary>
         ///     The about text listed in a users profile.
         /// </summary>
-        public string AboutText = String.Empty;
+        public string AboutText = string.Empty;
 
         /// <summary>
         ///     Show in search
@@ -194,17 +195,23 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Profile
         /// <summary>
         ///     The type of the user
         /// </summary>
-        public string CustomType = String.Empty;
+        public string CustomType = string.Empty;
 
         /// <summary>
         ///     The display name of the avatar
         /// </summary>
-        public string DisplayName = String.Empty;
+        public string DisplayName = string.Empty;
+
+        /// <summary>
+        /// When the display name was last updated.
+        /// </summary>
+        public DateTime DisplayNameUpdated = DateTime.ParseExact ("1970-01-01 00:00:00 +0", "yyyy-MM-dd hh:mm:ss z",
+                                                                  DateTimeFormatInfo.InvariantInfo).ToUniversalTime ();
 
         /// <summary>
         ///     The first life about text listed in a users profile
         /// </summary>
-        public string FirstLifeAboutText = String.Empty;
+        public string FirstLifeAboutText = string.Empty;
 
         /// <summary>
         ///     The profile image for the users first life tab
@@ -266,7 +273,7 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Profile
         /// <summary>
         ///     the web address of the Profile URL
         /// </summary>
-        public string WebURL = String.Empty;
+        public string WebURL = string.Empty;
 
         public override OSDMap ToOSD ()
         {
@@ -298,12 +305,12 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Profile
                 { "WebURL", OSD.FromString (WebURL) },
                 { "Created", OSD.FromInteger (Created) },
                 { "DisplayName", OSD.FromString (DisplayName) },
+                { "DisplayNameUpdated", OSD.FromDate (DisplayNameUpdated) },
                 { "Partner", OSD.FromUUID (Partner) },
                 { "Visible", OSD.FromBoolean (Visible) },
                 { "CustomType", OSD.FromString (CustomType) }
             };
-            if (trusted)
-            {
+            if (trusted) {
                 map.Add ("AArchiveName", OSD.FromString (AArchiveName));
                 map.Add ("IMViaEmail", OSD.FromBoolean (IMViaEmail));
                 map.Add ("IsNewUser", OSD.FromBoolean (IsNewUser));
@@ -330,12 +337,10 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Profile
             };
             //End interests
 
-            try
-            {
+            try {
                 if (map.ContainsKey ("Notes"))
                     Notes = (OSDMap)OSDParser.DeserializeJson (map ["Notes"].AsString ());
-            } catch
-            {
+            } catch {
             }
 
             AboutText = map ["AboutText"].AsString ();
@@ -345,6 +350,7 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Profile
             WebURL = map ["WebURL"].AsString ();
             Created = map ["Created"].AsInteger ();
             DisplayName = map ["DisplayName"].AsString ();
+            DisplayNameUpdated = map ["DisplayNameUpdated"].AsDate ();
             Partner = map ["Partner"].AsUUID ();
             Visible = map ["Visible"].AsBoolean ();
             AArchiveName = map ["AArchiveName"].AsString ();
@@ -423,12 +429,10 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Profile
             SnapshotUUID = map ["SnapshotUUID"].AsUUID ();
             ScopeID = map ["ScopeID"].AsUUID ();
             SimName = map ["SimName"].AsString ();
-//            GlobalPos = map["GlobalPos"].AsVector3();
-            if (map.ContainsKey ("GlobalPos"))
-            {
+            //            GlobalPos = map["GlobalPos"].AsVector3();
+            if (map.ContainsKey ("GlobalPos")) {
                 GlobalPos = map ["GlobalPos"].AsVector3 ();
-            } else
-            {
+            } else {
                 GlobalPos.X = (float)Convert.ToDecimal (map ["GPosX"].AsString (), Culture.NumberFormatInfo);
                 GlobalPos.Y = (float)Convert.ToDecimal (map ["GPosY"].AsString (), Culture.NumberFormatInfo);
                 GlobalPos.Z = (float)Convert.ToDecimal (map ["GPosZ"].AsString (), Culture.NumberFormatInfo);
@@ -436,7 +440,7 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Profile
             ParcelName = map ["ParcelName"].AsString ();
             ClassifiedFlags = (byte)map ["ClassifiedFlags"].AsInteger ();
             if (ClassifiedFlags == 0)
-                ClassifiedFlags = (byte) DirectoryManager.ClassifiedQueryFlags.PG;
+                ClassifiedFlags = (byte)DirectoryManager.ClassifiedQueryFlags.PG;
             PriceForListing = map ["PriceForListing"].AsInteger ();
         }
     }
@@ -470,7 +474,7 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Profile
                 { "User", OSD.FromString (User) },
                 { "OriginalName", OSD.FromString (OriginalName) },
                 { "SimName", OSD.FromString (SimName) },
-//  broken for non en_US locales   {"GlobalPos", OSD.FromVector3(GlobalPos)},
+                //  broken for non en_US locales   {"GlobalPos", OSD.FromVector3(GlobalPos)},
                 { "GPosX", OSD.FromReal (GlobalPos.X).ToString () },
                 { "GPosY", OSD.FromReal (GlobalPos.Y).ToString () },
                 { "GPosZ", OSD.FromReal (GlobalPos.Z).ToString () },
@@ -493,11 +497,9 @@ namespace WhiteCore.Framework.Services.ClassHelpers.Profile
             OriginalName = map ["OriginalName"].AsString ();
             SimName = map ["SimName"].AsString ();
 
-            if (map.ContainsKey ("GlobalPos"))
-            {
+            if (map.ContainsKey ("GlobalPos")) {
                 GlobalPos = map ["GlobalPos"].AsVector3 ();
-            } else
-            {
+            } else {
                 GlobalPos.X = (float)Convert.ToDecimal (map ["GPosX"].AsString (), Culture.NumberFormatInfo);
                 GlobalPos.Y = (float)Convert.ToDecimal (map ["GPosY"].AsString (), Culture.NumberFormatInfo);
                 GlobalPos.Z = (float)Convert.ToDecimal (map ["GPosZ"].AsString (), Culture.NumberFormatInfo);
