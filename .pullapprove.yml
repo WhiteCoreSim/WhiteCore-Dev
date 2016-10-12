@@ -6,7 +6,6 @@ groups:
       enabled: true
       reject_regex: ^Rejected
     required: 1
-    reset_on_push: false
     users:
     - fly-man-
     - greythane
