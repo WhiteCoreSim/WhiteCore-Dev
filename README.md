@@ -12,12 +12,6 @@ Windows .Net 4.5 [![Build status](https://ci.appveyor.com/api/projects/status/tj
 
 Linux 64 Bit [![Build Status](https://travis-ci.org/WhiteCoreSim/WhiteCore-Dev.svg?branch=master)](https://travis-ci.org/WhiteCoreSim/WhiteCore-Dev)
 
-## WhiteCore Development
-
-[![Join the chat at https://gitter.im/WhiteCoreSim/WhiteCore-Dev](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/WhiteCoreSim/WhiteCore-Dev?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-Also we have the #whitecore-support channel on FreeNode in which people that use WhiteCore tend to be, just ask your question there and someone will be able to answer it for you.
-
 *NOTES:*
 
 *- For those using the master, please report back when you are having issues with the builds. We, the developers, can't test everything and we hope that you, the users, are able to help us report things that break. Please use the Issue Tracker with the predefined text to make it easier to report issues*
@@ -38,7 +32,6 @@ Support is available from various sources.
 * Check out <http://whitecore-sim.org> for the latest developments, downloads and forum
 
 * Google + community for WhiteCore with a friendly bunch that is happy to answer questions. Find it at <https://plus.google.com/communities/113034607546142208907?cfem=1>
-
 
 ## Configuration
 WhiteCore is configured to run 'Out of the Box'.
