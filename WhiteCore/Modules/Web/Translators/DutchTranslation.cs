@@ -363,7 +363,6 @@ namespace WhiteCore.Modules.Web.Translators
             { "DeleteText", "Delete"},
             { "DeleteUserInfoText",
                     "This will remove all information about you in the grid and remove your access to this service. If you wish to continue, enter your name and password and click Delete."},
-            { "EditText", "Edit"},
             { "EditUserAccountText", "Edit User Account"},
 
             // Maintenance

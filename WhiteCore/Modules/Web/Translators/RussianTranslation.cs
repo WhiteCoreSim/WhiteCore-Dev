@@ -77,7 +77,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "MinutesText", "минут"},
             { "HourText", "час"},
             { "HoursText", "часов"},
-            { "EditText", "редактировать"},
+            { "EditText", "Pедактировать"},
             { "EdittingText", "Редактируется"},
 
             // Status information
@@ -364,7 +364,6 @@ namespace WhiteCore.Modules.Web.Translators
             { "DeleteText", "Удалить"},
             { "DeleteUserInfoText",
                "Это удалит всю информацию о вас в сетке и удалит доступ к сервису. Если вы хотите продолжить, введите имя и пароль и нажмите кнопку Удалить."},
-            { "EditText", "Редактировать"},
             { "EditUserAccountText", "Редактировать аккаунт пользователя"},
 
             // Maintenance

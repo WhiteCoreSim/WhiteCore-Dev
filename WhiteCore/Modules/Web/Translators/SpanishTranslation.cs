@@ -364,7 +364,6 @@ namespace WhiteCore.Modules.Web.Translators
             { "DeleteText", "DeleBorrarte"},
             { "DeleteUserInfoText",
                     "Esto eliminará toda la información acerca de usted en la red y eliminar su acceso a este servicio. Si desea continuar, introduzca su nombre y contraseña y haga clic en Eliminar."},
-            { "EditText", "Editar"},
             { "EditUserAccountText", "Editar cuenta de usuario"},
 
             // Maintenance
