@@ -665,7 +665,7 @@ namespace WhiteCore.Modules.Web
                 {"disabled","disabled"},
                 {"selected", ""}
             });
-            var mainlandParcels = directoryService.GetParcelByOwner ((UUID)Constants.GovernorUUID);
+            var mainlandParcels = directoryService.GetParcelByOwner ((UUID)Constants.RealEstateOwnerUUID);
             if (mainlandParcels.Count > 0)
                 regionList.AddRange (ParcelLocations (mainlandParcels, selParcel));
 
