@@ -358,7 +358,27 @@ namespace WhiteCore.DataManager.SQLite
 
             if (queryFilter != null && queryFilter.Count > 0)
             {
-                query += " WHERE " + queryFilter.ToSQL(':', out ps);
+                query += " WHERE " + queryFilter.ToSQL (':', out ps);
+
+                // 20161014 -greythane- 
+                // temporary fix for events until the datetime field can be modified to something that SQLite can handle
+                if (query.Contains ("UNIX_TIMESTAMP")) {
+                    // reset to the 'datetime()' function
+                    query = query.Replace ("UNIX_TIMESTAMP(", "datetime(");
+
+                    // convert unix times to utc seconds
+                    var newps = new Dictionary<string, object> ();
+                    foreach (var qval in ps) {
+                        if (qval.Key.Contains ("UNIX_TIMESTAMP")) {
+                            var unixTs = (float)qval.Value;
+                            var unixDateTime = Util.ToDateTime ((ulong)unixTs);
+                            var newVal = unixDateTime.ToLocalTime().ToString ("yyyy-MM-dd HH:mm");
+                            newps.Add (qval.Key, newVal);
+                        } else
+                            newps.Add (qval.Key, qval.Value);
+                    }
+                    ps = newps;
+                }
             }
 
             if (sort != null && sort.Count > 0)
