@@ -217,28 +217,16 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     HandleResetPartner, false, true);
 
                 MainConsole.Instance.Commands.AddCommand(
-                    "load users",
-                    "load user [<CSV file>]",
-                    "Loads users from a CSV file into WhiteCore",
+                    "import users",
+                    "import user [<CSV file>]",
+                    "Import users from a CSV file into WhiteCore",
                     HandleLoadUsers, false, true);
 
                 MainConsole.Instance.Commands.AddCommand(
-                    "save users",
-                    "save users [<CSV file>]",
-                    "Saves all users from WhiteCore into a CSV file",
+                    "export users",
+                    "export users [<CSV file>] [--salted]",
+                    "Exports all users from WhiteCore into a CSV file, optionally with salt",
                     HandleSaveUsers, false, true);
-                
-                MainConsole.Instance.Commands.AddCommand(
-                	"load salted users",
-                	"load salted users [<CSV file>]",
-                	"Loads all users that have been exported with a salted password string",
-                	HandleLoadSaltedUsers, false, true);
-                
-                MainConsole.Instance.Commands.AddCommand(
-                	"save salted users",
-                	"save salted users [<CSV file>]",
-                	"Save all users with a salted password string",
-                	HandleSaveSaltedUsers, false, true);
                 
                 #if TEST_USERS
                 MainConsole.Instance.Commands.AddCommand(
@@ -489,6 +477,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             return ret;
         }
 
+
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public uint NumberOfUserAccounts(List<UUID> scopeIDs, string query)
         {
@@ -503,9 +492,15 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             return userCount - Constants.SystemUserCount;
         }
 
-        public void CreateUser(string name, string password, string email)
+        /// <summary>
+        /// Creates a basic user.
+        /// </summary>
+        /// <param name="name">Name.</param>
+        /// <param name="md5password">Md5password.</param>
+        /// <param name="email">Email.</param>
+        public void CreateUser(string name, string md5password, string email)
         {
-            CreateUser(UUID.Random(), UUID.Zero, name, password, email);
+            CreateNewUser(new UserAccount(UUID.Zero, UUID.Random(), name, email), md5password, "");
         }
 
         /// <summary>
@@ -514,20 +509,37 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
         /// <param name="userID"></param>
         /// <param name="scopeID"></param>
         /// <param name="name"></param>
-        /// <param name="password"></param>
+        /// <param name="md5password"></param>
         /// <param name="email"></param>
-        public string CreateUser(UUID userID, UUID scopeID, string name, string password, string email)
+        public string CreateUser(UUID userID, UUID scopeID, string name, string md5password, string email)
         {
-            return CreateUser(new UserAccount(scopeID, userID, name, email), password);
+            return CreateNewUser(new UserAccount(scopeID, userID, name, email), md5password,"");
         }
 
         /// <summary>
         ///     Create a user
         /// </summary>
         /// <param name="newAccount"></param>
-        /// <param name="password"></param>
+        /// <param name="md5password"></param>
+        public string CreateUser (UserAccount newAccount, string md5password)
+        {
+            return CreateNewUser (newAccount, md5password, "");
+        }
+
+        /// <summary>
+        /// Creates the user with salt.
+        /// </summary>
+        /// <returns>The salted user.</returns>
+        /// <param name="newAccount">New account.</param>
+        /// <param name="passHash">Pass hash.</param>
+        /// <param name="passSalt">Pass salt.</param>
+        public string CreateSaltedUser (UserAccount newAccount, string passHash, string passSalt)
+        {
+            return CreateNewUser (newAccount, passHash, passSalt);
+        }
+
         //[CanBeReflected(ThreatLevel = ThreatLevel.Full)]
-        public string CreateUser(UserAccount newAccount, string password)
+        string CreateNewUser(UserAccount newAccount, string passHash, string passSalt)
         {
             /*object remoteValue = DoRemoteByURL("UserAccountServerURI", newAcc, password);
             if (remoteValue != null || m_doRemoteOnly)
@@ -549,16 +561,21 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             }
         
             bool success;
-            if (m_AuthenticationService != null && password != "")
-            {
-                success = m_AuthenticationService.SetPasswordHashed (newAccount.PrincipalID, "UserAccount", password);
+            if (passSalt != "")
+                success = SetSaltedPassword (newAccount.PrincipalID, passHash, passSalt);
+            else
+                success = SetHashedPassword (newAccount.PrincipalID, passHash);
+                
+//            if (m_AuthenticationService != null && password != "")
+//            {
+//                success = m_AuthenticationService.SetPasswordHashed (newAccount.PrincipalID, "UserAccount", password);
                 if (!success)
                 {
                     MainConsole.Instance.WarnFormat (
                         "[User account service]: Unable to set password for account {0}.", newAccount.Name);
                     return "Unable to set password";
                 }
-            }
+//            }
 
             MainConsole.Instance.InfoFormat ("[User account service]: Account {0} created successfully", newAccount.Name);
             //Cache it as well
@@ -596,8 +613,25 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             }
             return "";
 
-
         }
+
+        bool SetHashedPassword (UUID userId, string passHash)
+        {
+            var success = false;
+            if (m_AuthenticationService != null && passHash != "")
+                success = m_AuthenticationService.SetPasswordHashed (userId, "UserAccount", passHash);
+            return success;
+        }
+
+
+        bool SetSaltedPassword(UUID userId, string passHash, string passSalt)
+        {
+            bool success = false;
+            if (m_AuthenticationService != null && passHash != "" && passSalt != "") 
+                success = m_AuthenticationService.SetSaltedPassword (userId, "UserAccount", passHash, passSalt);
+            return success;
+        }
+
 
         public void DeleteUser(UUID userID, string name, string password, bool archiveInformation, bool wipeFromDatabase)
         {
@@ -1102,8 +1136,8 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 userName = cmdparams [2] + " " + cmdparams [3];
             } else
             {
-                Utilities.MarkovNameGenerator ufNames = new Utilities.MarkovNameGenerator ();
-                Utilities.MarkovNameGenerator ulNames = new Utilities.MarkovNameGenerator ();
+                var ufNames = new Utilities.MarkovNameGenerator ();
+                var ulNames = new Utilities.MarkovNameGenerator ();
                 string[] nameSeed = m_userNameSeed == null ? Utilities.UserNames : m_userNameSeed;
 
                 string firstName = ufNames.FirstName (nameSeed, 3, 4);
@@ -1494,6 +1528,8 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             string password;
             string email;
             string rezday;
+            string passHash;
+            string passSalt;
             UUID userUUID;
 
             fileName = PathHelpers.VerifyReadFile(fileName,"csv", m_defaultDataPath + "/Updates");
@@ -1519,14 +1555,22 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     firstName = userInfo [1];
                     lastName = userInfo [2];
                     password = userInfo [3];
-                    email = userInfo.Length < 6 ? userInfo [4] : "";
-                    rezday = userInfo.Length == 6 ? userInfo [5] : "";
+                    email = userInfo.Length > 4 ? userInfo [4] : "";
+                    rezday = userInfo.Length > 5 ? userInfo [5] : "";
+                    passHash = userInfo.Length > 6 ? userInfo [6] : "";
+                    passSalt = userInfo.Length > 7 ? userInfo [7] : "";
 
-                    string check = CreateUser (userUUID, UUID.Zero, firstName + " " + lastName, Util.Md5Hash(password), email);
-                    if (check != "")
-                    {
+                    string userCreated = "";
+                    if (userInfo.Length <= 6) {
+                        // we only have the basics here
+                        userCreated = CreateUser (new UserAccount (UUID.Zero, userUUID, firstName + " " + lastName, email), Util.Md5Hash (password));
+                    } else {
+                        // we have full details
+                        userCreated = CreateSaltedUser (new UserAccount(UUID.Zero, userUUID, firstName + " " + lastName, email), passHash, passSalt);
+                    }
+                    if (userCreated != "") {
                         MainConsole.Instance.ErrorFormat ("Couldn't create the user '{0} {1}'. Reason: {2}",
-                            firstName, lastName, check);
+                                                          firstName, lastName, userCreated);
                         continue;
                     }
 
@@ -1560,12 +1604,23 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
         /// Handles the save users command.
         /// </summary>
         /// <param name="scene">Scene.</param>
-        /// <param name="cmdParams">Cmdparams.</param>
-        protected void HandleSaveUsers(IScene scene, string[] cmdParams)
+        /// <param name="cmd">Cmdparams.</param>
+        protected void HandleSaveUsers(IScene scene, string[] cmd)
         {
             string fileName = "users.csv";
-            
-            if (cmdParams.Length < 3)
+            var salted = false;
+            var m_auth = Framework.Utilities.DataManager.RequestPlugin<IAuthenticationData> ();
+
+            // check for options
+            List<string> cmdParams = new List<string> (cmd);
+            foreach (string param in cmd) {
+                if (param.StartsWith ("--salted", StringComparison.Ordinal)) {
+                    salted = true;
+                    cmdParams.Remove (param);
+                }
+            }
+
+            if (cmdParams.Count < 3)
             {
                 fileName = MainConsole.Instance.Prompt ("Please enter the user CSV file to save", fileName);
                 if (fileName == "")
@@ -1588,7 +1643,6 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 try
                 {
                     //Add the user
-
                     streamWriter.BaseStream.Position += streamWriter.BaseStream.Length;
 
                     foreach (UserAccount user in accounts)
@@ -1596,10 +1650,19 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                         if (Utilities.IsSystemUser (user.PrincipalID))
                             continue;
   
-                        // TODO: user accounts do not have a clear password so we need to save the salt and password hashes instead
-                        // This will mean changes to the csv format
-                        string LineToWrite = user.PrincipalID + "," + user.FirstName + "," + user.LastName + ",," + user.Email;
-                        streamWriter.WriteLine (LineToWrite);
+                        var lineToWrite = user.PrincipalID + "," + user.FirstName + "," + user.LastName + ",," + user.Email;
+                        if (m_profileConnector != null) {
+                            var userProfile = m_profileConnector.GetUserProfile (user.PrincipalID);
+                            lineToWrite = lineToWrite + "," + userProfile.Created;
+                        } else {
+                            lineToWrite = lineToWrite + ",";
+                        }
+                        if (salted && (m_auth != null)) {
+                            var userauth = m_auth.Get (user.PrincipalID, "UserAccount");
+                            if (userauth != null)
+                                lineToWrite = lineToWrite + "," + userauth.PasswordHash + "," + userauth.PasswordSalt;
+                        }
+                        streamWriter.WriteLine (lineToWrite);
 
                         userNo++;
                     }
@@ -1615,121 +1678,13 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             }
         }
 
-		/// <summary>
-		/// Handles the load salted users command.
-		/// </summary>
-		/// <param name="scene">Scene.</param>
-		/// <param name="cmdParams">Cmdparams.</param>
-		protected void HandleLoadSaltedUsers(IScene scene, string[] cmdParams)
-		{
-			// This will need to read the file, divide it into 
-			//
-			// UserUUID;
-			// FirstName;
-			// LastName;
-			// Password;
-			// Email;
-			// Rezday;
-			// Salt
-			// Salted Password
-			//
-			// and then update both the auth and user_accounts tables so the user can be recognized
-            
-			string fileName = "users_salted.csv";
-			if (cmdParams.Length < 4) {
-				fileName = MainConsole.Instance.Prompt("Please enter the user CSV file to load", fileName);
-				if (fileName == "")
-					return;
-			} else
-				fileName = cmdParams[3];
-
-			int userNo = 0;
-            
-			// Define the fields we're gonna read
-			UUID userUUID;
-			string firstName;
-			string lastName;
-			string password;
-			string email;
-			string rezday;
-			string salt;
-			string saltedPassword;
-
-			fileName = PathHelpers.VerifyReadFile(fileName, "csv", m_defaultDataPath + "/Updates");
-			if (fileName == "") {
-				MainConsole.Instance.Error("The file " + fileName + " does not exist. Please check and retry");
-				return;
-			}            
-            
-			// good to go...
-			using (var rd = new StreamReader(fileName)) {
-				while (!rd.EndOfStream) {
-					var userInfo = rd.ReadLine().Split(',');
-					if (userInfo.Length < 7) {
-						MainConsole.Instance.Error("[User Load]: Insufficient details; Skipping " + userInfo);
-						continue;
-					}
-
-					userUUID = (UUID)userInfo[0];
-					firstName = userInfo[1];
-					lastName = userInfo[2];
-					password = userInfo[3];
-					email = userInfo.Length < 6 ? userInfo[4] : "";
-					rezday = userInfo.Length == 6 ? userInfo[5] : "";
-					salt = userInfo[6];
-					saltedPassword = userInfo[7];
-                    
-					/*
-                    string check = CreateSaltedUser (userUUID, UUID.Zero, firstName + " " + lastName, salt, saltedPassword, email);
-                    if (check != "")
-                    {
-                        MainConsole.Instance.ErrorFormat ("Couldn't create the user '{0} {1}'. Reason: {2}",
-                            FirstName, LastName, check);
-                        continue;
-                    }
-                    */
-                   
-					//set user levels and status  (if needed)
-					var account = GetUserAccount(null, userUUID);
-					//account.UserLevel = 0;
-					account.UserFlags = Constants.USER_FLAG_RESIDENT;
-					StoreUserAccount(account);
-                    
-					if ((rezday != "") && (m_profileConnector != null)) {
-						IUserProfileInfo profile = m_profileConnector.GetUserProfile(account.PrincipalID);
-						profile.Created = int.Parse(rezday);
-						bool success = m_profileConnector.UpdateUserProfile(profile);
-						if (!success)
-							MainConsole.Instance.InfoFormat("[User account service]: Unable to change rezday for {0} {1}.", account.FirstName, account.LastName);
-						else
-							MainConsole.Instance.InfoFormat("[User account service]: Account {0} {1} has a rezday set.", account.FirstName, account.LastName);
-					}
-					userNo++;
-				}
-				MainConsole.Instance.InfoFormat("File: {0} loaded,  {1} users added with salted passwords", Path.GetFileName(fileName), userNo);
-			}
-		}
-        
-        /// <summary>
-        /// Handles the save salted users command.
-        /// </summary>
-        /// <param name="scene">Scene.</param>
-        /// <param name="cmdParams">Cmdparams.</param>
-        protected void HandleSaveSaltedUsers(IScene scene, string[] cmdParams)
-        {
-            // This is the query string that gets all the detailed information
-            //
-            // SELECT `PrincipalID`, `FirstName`,`LastName`, `Email`, auth.passwordHash, auth.passwordSalt 
-            // FROM user_accounts LEFT JOIN auth ON user_accounts.PrincipalID=auth.UUID
-            //
-            //string fileName = "users_salted.csv";
-        }
-        
+        // Developer testing only
+        // Generates multiple users
         #if TEST_USERS
         protected void HandleTestUsers(IScene scene, string[] cmdParams)
         {
             string checkOk;
-            checkOk = MainConsole.Instance.Prompt ("[TESTING]:  Caution!! This will add random users for testing purposes. Continue? (yes, no)", "no").ToLower ();
+            checkOk = MainConsole.Instance.Prompt ("[Testing]:  Caution!! This will add random users for testing purposes. Continue? (yes, no)", "no").ToLower ();
             if (!checkOk.StartsWith("y"))
                 return;
 
@@ -1739,7 +1694,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 return;
 
             // make sure
-            checkOk = MainConsole.Instance.Prompt ("[TESTING]: You are about to add " + addUsers + " to your database! Are you sure? (yes, no)", "no").ToLower ();
+            checkOk = MainConsole.Instance.Prompt ("[Testing]: You are about to add " + addUsers + " to your database! Are you sure? (yes, no)", "no").ToLower ();
             if (!checkOk.StartsWith("y"))
                 return;
 

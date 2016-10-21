@@ -908,9 +908,9 @@ namespace WhiteCore.Services.DataService
                 if (maturityquery == (uint)DirectoryManager.ClassifiedQueryFlags.All)
                     Data.Add (replyData); 
                 else {
-                    var classifiedMaturity = replyData.classifiedFlags > 0 
-                                                      ? replyData.classifiedFlags 
-                                                      : (byte)DirectoryManager.ClassifiedQueryFlags.PG;
+                    //var classifiedMaturity = replyData.classifiedFlags > 0 
+                    //                                  ? replyData.classifiedFlags 
+                    //                                  : (byte)DirectoryManager.ClassifiedQueryFlags.PG;
                     if ((maturityquery & replyData.classifiedFlags) != 0) // required rating  PG, Mature (Adult)
                             Data.Add (replyData);
                 }
