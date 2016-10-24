@@ -71,6 +71,9 @@ namespace WhiteCore.Modules.Web.Translators
             { "CategoryText", "Категория"},
             { "SummaryText", "Резюме"},
             { "MaturityText", "Рейтинг Зрелости"},
+            { "GeneralText", "общий"},
+            { "MatureText", "зрелый"},
+            { "AdultText", "для взрослых"},
             { "DateText", "Дата"},
             { "TimeText", "Время"},
             { "MinuteText", "минута"},
@@ -441,6 +444,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "ExpirationDateText", "Истекает" },
             { "DescriptionText", "Описание" },
             { "PriceOfListingText", "Цена"},
+
             // Classified categories
             { "CatAll", "Все"},
             { "CatSelect", ""},
@@ -462,7 +466,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "EventDateText", "Когда"},
             { "EventTimeInfoText", "Время мероприятия должно быть указано по локальному времени в 3д Мире"},
             { "CoverChargeText", "Входная плата"},
-            { "Duration", "Продолжительность"},
+            { "DurationText", "Продолжительность"},
             { "AddEventText", "Добавить Мероприятие"},
 
             // Event categories

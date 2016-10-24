@@ -170,8 +170,12 @@ namespace WhiteCore.Modules.Web
             vars.Add ("ClassifiedNameText", translator.GetTranslatedString ("ClassifiedText"));
             vars.Add ("DescriptionText", translator.GetTranslatedString ("DescriptionText"));
             vars.Add ("MaturityText", translator.GetTranslatedString ("MaturityText"));
+            vars.Add ("GeneralText", translator.GetTranslatedString ("GeneralText"));
+            vars.Add ("MatureText", translator.GetTranslatedString ("MatureText"));
+            vars.Add ("AdultText", translator.GetTranslatedString ("AdultText"));
             vars.Add ("PriceOfListingText", translator.GetTranslatedString ("PriceOfListingText"));
             vars.Add ("ExpirationDateText", translator.GetTranslatedString ("ExpirationDateText"));
+            vars.Add ("SearchText", translator.GetTranslatedString ("SearchText"));
 
             return vars;
         }
