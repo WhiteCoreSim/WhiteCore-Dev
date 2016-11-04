@@ -163,7 +163,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
         int m_indentWidth = 4; // for indentation
         bool m_isInEnumeratedDeclaration;
         Dictionary<KeyValuePair<int, int>, KeyValuePair<int, int>> m_positionMap;
-        Parser p;
+        Parser psr;
         static yyLSLSyntax _LSLSyntax = new yyLSLSyntax();
 
         public Dictionary<string, ObjectList> LocalMethodArguements = new Dictionary<string, ObjectList> ();
@@ -281,7 +281,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
         void ResetCounters()
         {
             //NOTE: This takes a VERY long time to rebuild. Ideally, this should be reset, but interesting errors are happening when it is reset..
-            p = new LSLSyntax(_LSLSyntax, new ErrorHandler(true));
+            psr = new LSLSyntax(_LSLSyntax, new ErrorHandler(true));
             MethodVariables.Clear();
             VariablesToRename.Clear();
             GlobalVariables.Clear();
@@ -349,7 +349,7 @@ public class ScriptClass : WhiteCore.ScriptEngine.DotNetEngine.Runtime.ScriptBas
             {
                 //               lock (p)
                 {
-                    codeTransformer = new LSL2CSCodeTransformer(p.Parse(FixAdditionalEvents(script)), script);
+                    codeTransformer = new LSL2CSCodeTransformer(psr.Parse(FixAdditionalEvents(script)), script);
                     //                    p.m_lexer.Reset();
                 }
             }
