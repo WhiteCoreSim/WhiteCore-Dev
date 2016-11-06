@@ -417,8 +417,8 @@ namespace WhiteCore.Modules
 
                     info.Startup = StartupType.Medium;
                     info.SeeIntoThisSimFromNeighbor = true;
-                    info.InfiniteRegion = false;
-                    info.ObjectCapacity = 750;
+                    info.InfiniteRegion = true;
+                    info.ObjectCapacity = 1000;
                     info.RegionSettings.AgentLimit = 10;
                     info.RegionSettings.AllowLandJoinDivide = false;
                     info.RegionSettings.AllowLandResell = false;
@@ -434,8 +434,8 @@ namespace WhiteCore.Modules
 
                     info.Startup = StartupType.Medium;
                     info.SeeIntoThisSimFromNeighbor = true;
-                    info.InfiniteRegion = false;
-                    info.ObjectCapacity = 3750;
+                    info.InfiniteRegion = true;
+                    info.ObjectCapacity = 5000;
                     info.RegionSettings.AgentLimit = 20;
                     info.RegionSettings.AllowLandJoinDivide = false;
                     info.RegionSettings.AllowLandResell = false;
@@ -447,18 +447,19 @@ namespace WhiteCore.Modules
                     info.RegionTerrain = terrainFull;
                     info.Startup = StartupType.Normal;
                     info.SeeIntoThisSimFromNeighbor = true;
-                    info.InfiniteRegion = false;
-                    info.ObjectCapacity = 15000;
+                    info.InfiniteRegion = true;
+                    info.ObjectCapacity = 20000;                                                // assume private region
                     info.RegionSettings.AgentLimit = 100;
-                    if (info.RegionType.StartsWith ("M", StringComparison.Ordinal))                           // defaults are 'true'
-                    {
-                        info.RegionSettings.AllowLandJoinDivide = false;
+
+                    if (info.RegionType.StartsWith ("M", StringComparison.Ordinal)) {           // Mainland
+                        info.RegionSettings.AllowLandJoinDivide = false;                        // defaults are 'true'
                         info.RegionSettings.AllowLandResell = false;
-                    } else if (info.RegionType.StartsWith ("H", StringComparison.Ordinal))                    // Homes always have 25000 prims
+                        info.ObjectCapacity = 22500;
+                    } else if (info.RegionType.StartsWith ("H", StringComparison.Ordinal))      // (WhiteCore) Homes 
                       {
                         info.RegionSettings.AllowLandJoinDivide = true;
                         info.RegionSettings.AllowLandResell = true;
-                        info.ObjectCapacity = 25000;
+                        info.ObjectCapacity = 30000;
                     }
                 }
 
@@ -1217,6 +1218,39 @@ namespace WhiteCore.Modules
             return string.Format ("--{0:yyyy-MM-dd-HH-mm}", DateTime.Now);
         }
 
+        // 2016-11-03 - greythane -
+        // Adjust max region object capacities if necessary
+        void UpdateRegionCapacity ()
+        {
+            if (_regionData.RegionInfo.RegionType.Contains ("Full Region")) {
+                // mainland
+                if (_regionData.RegionInfo.RegionType.ToLower ().StartsWith ("m", StringComparison.Ordinal)) {
+                    if (_regionData.RegionInfo.ObjectCapacity < 22500)
+                        _regionData.RegionInfo.ObjectCapacity = 22500;
+                } else if (_regionData.RegionInfo.RegionType.ToLower ().StartsWith ("h", StringComparison.Ordinal)) {
+                    if (_regionData.RegionInfo.ObjectCapacity < 30000)
+                        _regionData.RegionInfo.ObjectCapacity = 30000;
+                } else {
+                    // must be private (estate) region
+                    if (_regionData.RegionInfo.ObjectCapacity < 20000)
+                        _regionData.RegionInfo.ObjectCapacity = 20000;
+                }
+                return;
+            }
+
+            if (_regionData.RegionInfo.RegionType.Contains ("Homestead")) {
+                if (_regionData.RegionInfo.ObjectCapacity < 5000)
+                    _regionData.RegionInfo.ObjectCapacity = 5000;
+                return;
+            }
+
+            if (_regionData.RegionInfo.RegionType.Contains ("Openspace")) {
+                if (_regionData.RegionInfo.ObjectCapacity < 1000)
+                    _regionData.RegionInfo.ObjectCapacity = 1000;
+            }
+
+        }
+
         protected virtual void ReadBackup (string fileName)
         {
             BackupFile = fileName;
@@ -1236,6 +1270,8 @@ namespace WhiteCore.Modules
                     _regionData.RegionInfo.RegionPort = int.Parse (MainConsole.Instance.Prompt ("Region Port: ",
                         (9000).ToString ()));
                 }
+                // increase capacity if needed - 2016-11-03
+                UpdateRegionCapacity ();
             }
             GC.Collect ();
         }
