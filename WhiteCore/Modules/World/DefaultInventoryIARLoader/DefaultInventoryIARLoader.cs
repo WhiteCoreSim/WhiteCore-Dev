@@ -37,6 +37,7 @@ using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Inventory;
+using WhiteCore.Framework.Utilities;
 using WhiteCore.Modules.Archivers;
 using WhiteCore.Region;
 
@@ -118,7 +119,11 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
             //Make the user account for the default IAR
             if (uinfo == null) {
                 MainConsole.Instance.Warn ("Creating user " + m_service.LibraryOwnerName);
-                m_MockScene.UserAccountService.CreateUser (m_service.LibraryOwner, UUID.Zero, m_service.LibraryOwnerName, "", "");
+                m_MockScene.UserAccountService.CreateUser (m_service.LibraryOwner,
+                                                           UUID.Zero,
+                                                           m_service.LibraryOwnerName,
+                                                           Util.Md5Hash ("library"),
+                                                           "");
                 uinfo = m_MockScene.UserAccountService.GetUserAccount (null, m_service.LibraryOwner);
                 m_MockScene.InventoryService.CreateUserInventory (uinfo.PrincipalID, false);
             }
@@ -142,12 +147,12 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
                 m_MockScene.InventoryService.CreateUserInventory (uinfo.PrincipalID, false);
             }
 
-            InventoryArchiveReadRequest archread = new InventoryArchiveReadRequest (m_MockScene, uinfo, "/", iarFileName,
-                                                                                   false, m_service.LibraryOwner);
+            var archread = new InventoryArchiveReadRequest (m_MockScene, uinfo, "/", iarFileName,
+                                                            false, m_service.LibraryOwner);
 
             try {
                 archread.ReplaceAssets = true; //Replace any old assets
-                List<InventoryNodeBase> nodes = new List<InventoryNodeBase> (archread.Execute (true));
+                var nodes = new List<InventoryNodeBase> (archread.Execute (true));
                 if (nodes.Count == 0)
                     return;
 
@@ -163,7 +168,7 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
                 f.Version = 1;
                 m_MockScene.InventoryService.UpdateFolder (f);
             } catch (Exception e) {
-                MainConsole.Instance.DebugFormat ("[LIBRARY MODULE]: Exception when processing archive {0}: {1}",
+                MainConsole.Instance.DebugFormat ("[Library Inventory]: Exception when processing archive {0}: {1}",
                                                  iarFileName,
                                                  e.StackTrace);
             } finally {
