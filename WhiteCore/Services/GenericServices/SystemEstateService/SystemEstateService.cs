@@ -35,7 +35,7 @@ using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
 
-namespace WhiteCore.Modules.Estate
+namespace WhiteCore.Services.GenericServices.SystemEstateService
 {
     /// <summary>
     ///     Basically a provision to allow user configuration of the system Estate Owner 'name and Estate' details
@@ -95,6 +95,8 @@ namespace WhiteCore.Modules.Estate
                 // check and/or create default system estates
                 CheckSystemEstateInfo (Constants.SystemEstateID, systemEstateName, (UUID)Constants.RealEstateOwnerUUID);
                 CheckSystemEstateInfo (Constants.MainlandEstateID, mainlandEstateName, (UUID)Constants.GovernorUUID);
+
+                CheckGridOwnerEstate ();
 
                 AddCommands ();
             }
@@ -267,6 +269,60 @@ namespace WhiteCore.Modules.Estate
                 MainConsole.Instance.InfoFormat ("Relinked {0} regions", regions.Count);
         }
 
+        /// <summary>
+        /// Checks for the grid owner estate on initial startup.
+        /// </summary>
+        void CheckGridOwnerEstate ()
+        {
+            // these should have already been checked but just make sure...
+            if (m_estateConnector == null)
+                return;
+
+            if (m_estateConnector.RemoteCalls ())
+                return;
+
+            // check for existing estate name in case of estate ID change
+            var estates = m_estateConnector.GetEstateNames();
+            if (estates.Count > 2)     // we have 2 system estates, 'System' & 'Mainland'
+                return;
+            
+            // Create an estate for the grid owner
+            IUserAccountService accountService = m_registry.RequestModuleInterface<IUserAccountService> ();
+            if (accountService == null) {
+                MainConsole.Instance.Warn ("[EstateService]: Unable to determine grid owner for estate creation");
+                return;
+            }
+
+            var userAccts = accountService.GetUserAccounts(null, "*");
+            UUID gridOwnerId = UUID.Zero;
+            foreach (var acct in userAccts) {
+                if (!Utilities.IsSystemUser (acct.PrincipalID))
+                    gridOwnerId = acct.PrincipalID;                 // we should have only one non system user
+            }
+            var gridOwnerAcct = accountService.GetUserAccount (null, gridOwnerId);
+            MainConsole.Instance.InfoFormat("[EstateService]: The estate for '{0}' needs to be created.", gridOwnerAcct.Name);
+
+            // get estate name
+            var estateName = MainConsole.Instance.Prompt ("Estate name", "Owner's Estate");
+            if (estateName == "")
+                estateName = "Owner's Estate";
+
+
+            var ES = new EstateSettings ();
+            ES.EstateName = estateName;
+            ES.EstateOwner = gridOwnerId;
+
+            ES.EstateID = (uint)m_estateConnector.CreateNewEstate (ES);
+            if (ES.EstateID == 0) {
+                MainConsole.Instance.Warn ("There was an error in creating the owner's estate: " + ES.EstateName);
+                //EstateName holds the error. See LocalEstateConnector for more info.
+
+            } else {
+                MainConsole.Instance.InfoFormat ("[EstateService]: The estate '{0}' owned by '{1}' has been created.",
+                                                 ES.EstateName, gridOwnerAcct.Name);
+            }
+        }
+
         #endregion
 
         #region Commands
@@ -295,6 +351,7 @@ namespace WhiteCore.Modules.Estate
                 MainConsole.Instance.InfoFormat ("Relinked {0} mainland regions", updated);
 
         }
+
 
         protected void HandleResetSystemEstate (IScene scene, string [] cmd)
         {
@@ -358,6 +415,11 @@ namespace WhiteCore.Modules.Estate
 
         }
 
+        /// <summary>
+        /// Creates a new estate.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmd">Cmd.</param>
         protected void CreateEstateCommand (IScene scene, string [] cmd)
         {
             IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
@@ -441,6 +503,11 @@ namespace WhiteCore.Modules.Estate
                 MainConsole.Instance.InfoFormat ("[EstateService]: The estate '{0}' owned by '{1}' has been created.", estateName, estateOwner);
         }
 
+        /// <summary>
+        /// Deletes an estate.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmd">Cmd.</param>
         protected void DeleteEstateCommand (IScene scene, string [] cmd)
         {
             IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
@@ -484,6 +551,11 @@ namespace WhiteCore.Modules.Estate
                 MainConsole.Instance.InfoFormat ("[EstateService]: The estate '{0}' has not been deleted.", estateName);
         }
 
+        /// <summary>
+        /// Sets the estate owner.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmd">Cmd.</param>
         protected void SetEstateOwnerCommand (IScene scene, string [] cmd)
         {
             IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
@@ -539,6 +611,11 @@ namespace WhiteCore.Modules.Estate
             MainConsole.Instance.InfoFormat ("[EstateService]: Estate owner for '{0}' changed to '{1}'", estateName, estateOwner);
         }
 
+        /// <summary>
+        /// Sets(renames) an existing estate name.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmd">Cmd.</param>
         protected void SetEstateNameCommand (IScene scene, string [] cmd)
         {
             IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
@@ -583,6 +660,11 @@ namespace WhiteCore.Modules.Estate
 
         }
 
+        /// <summary>
+        /// Link a region to an estate.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmd">Cmd.</param>
         void EstateLinkRegionCommand (IScene scene, string [] cmd)
         {
             IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
@@ -638,6 +720,12 @@ namespace WhiteCore.Modules.Estate
 
         }
 
+
+        /// <summary>
+        /// Un-link a region from an estate region.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmd">Cmd.</param>
         void EstateUnLinkRegionCommand (IScene scene, string [] cmd)
         {
             IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
