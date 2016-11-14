@@ -48,6 +48,7 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
         string realEstateOwnerName = Constants.RealEstateOwnerName;
         string bankerName = Constants.BankerName;
         string marketplaceOwnerName = Constants.MarketplaceOwnerName;
+        string libraryOwnerName = Constants.LibraryOwnerName;
 
         IRegistryCore m_registry;
 
@@ -83,6 +84,14 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
 
         public string MarketplaceOwnerName {
             get { return marketplaceOwnerName; }
+        }
+
+        public UUID LibraryOwnerUUID {
+            get { return (UUID)Constants.LibraryOwnerUUID; }
+        }
+
+        public string LibraryOwnerName {
+            get { return libraryOwnerName; }
         }
 
         public string GetSystemEstateOwnerName (int estateID)
@@ -185,8 +194,8 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
             VerifySystemUserInfo ("Governor", GovernorUUID, GovernorName, 250);
             VerifySystemUserInfo ("RealEstate", SystemEstateOwnerUUID, SystemEstateOwnerName, 150);
             VerifySystemUserInfo ("Banker", BankerUUID, BankerName, 100);
-            VerifySystemUserInfo ("Marketplace", MarketplaceOwnerUUID, MarketplaceOwnerName, 100);
-
+            VerifySystemUserInfo ("Marketplace", MarketplaceOwnerUUID, MarketplaceOwnerName, Constants.USER_DISABLED);
+            VerifySystemUserInfo ("Library", LibraryOwnerUUID, LibraryOwnerName, Constants.USER_DISABLED);
         }
 
         void VerifySystemUserInfo (string usrType, UUID usrUUID, string usrName, int usrLevel)

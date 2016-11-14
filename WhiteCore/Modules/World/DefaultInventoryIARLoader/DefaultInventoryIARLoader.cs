@@ -115,19 +115,14 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
                 m_MockScene.AddModuleInterfaces (m_registry.GetInterfaces ());
             }
 
-            UserAccount uinfo = m_MockScene.UserAccountService.GetUserAccount (null, m_service.LibraryOwner);
+            UserAccount uinfo = m_MockScene.UserAccountService.GetUserAccount (null, Constants.LibraryOwnerUUID);
             //Make the user account for the default IAR
-            if (uinfo == null) {
-                MainConsole.Instance.Warn ("Creating user " + m_service.LibraryOwnerName);
-                m_MockScene.UserAccountService.CreateUser (m_service.LibraryOwner,
-                                                           UUID.Zero,
-                                                           m_service.LibraryOwnerName,
-                                                           Util.Md5Hash ("library"),
-                                                           "");
-                uinfo = m_MockScene.UserAccountService.GetUserAccount (null, m_service.LibraryOwner);
+            if (uinfo == null) 
+            {
+                uinfo = m_MockScene.UserAccountService.GetUserAccount (null, (UUID)Constants.LibraryOwnerUUID);
                 m_MockScene.InventoryService.CreateUserInventory (uinfo.PrincipalID, false);
             }
-            if (m_MockScene.InventoryService.GetRootFolder (m_service.LibraryOwner) == null)
+            if (m_MockScene.InventoryService.GetRootFolder ((UUID)Constants.LibraryOwnerUUID) == null)
                 m_MockScene.InventoryService.CreateUserInventory (uinfo.PrincipalID, false);
 
             List<InventoryFolderBase> rootFolders = m_MockScene.InventoryService.GetFolderFolders (uinfo.PrincipalID, UUID.Zero);
@@ -148,7 +143,7 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
             }
 
             var archread = new InventoryArchiveReadRequest (m_MockScene, uinfo, "/", iarFileName,
-                                                            false, m_service.LibraryOwner);
+                                                            false, (UUID)Constants.LibraryOwnerUUID);
 
             try {
                 archread.ReplaceAssets = true; //Replace any old assets
@@ -178,7 +173,7 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
 
         void TraverseFolders (UUID ID, IScene m_MockScene)
         {
-            List<InventoryFolderBase> folders = m_MockScene.InventoryService.GetFolderFolders (m_service.LibraryOwner, ID);
+        	List<InventoryFolderBase> folders = m_MockScene.InventoryService.GetFolderFolders ((UUID)Constants.LibraryOwnerUUID, ID);
             foreach (InventoryFolderBase folder in folders) {
                 InventoryFolderBase folder1 = folder;
 
@@ -201,7 +196,7 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
 
         void FixParent (UUID ID, IScene m_MockScene, UUID LibraryRootID)
         {
-            List<InventoryFolderBase> folders = m_MockScene.InventoryService.GetFolderFolders (m_service.LibraryOwner, ID);
+        	List<InventoryFolderBase> folders = m_MockScene.InventoryService.GetFolderFolders ((UUID)Constants.LibraryOwnerUUID, ID);
             foreach (InventoryFolderBase folder in folders) {
                 if (folder.ParentID == ID) {
                     folder.ParentID = LibraryRootID;

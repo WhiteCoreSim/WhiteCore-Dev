@@ -146,7 +146,7 @@ namespace WhiteCore.Services
             try {
                 //MainConsole.Instance.DebugFormat("[InventoryCAPS]: Received WebFetchInventoryDescendents request for {0}", AgentID);
                 return m_inventoryData.FetchInventoryReply (foldersrequested, agentID,
-                    UUID.Zero, m_libraryService.LibraryOwner);
+                    UUID.Zero, (UUID)Constants.LibraryOwnerUUID);
 
             } catch (Exception ex) {
                 MainConsole.Instance.Warn ("[InventoryCAPS]: SERIOUS ISSUE! " + ex);
@@ -168,8 +168,8 @@ namespace WhiteCore.Services
                 OSDArray foldersrequested = (OSDArray)map ["folders"];
 
                 return m_inventoryData.FetchInventoryReply (foldersrequested,
-                    m_libraryService.LibraryOwner,
-                    agentID, m_libraryService.LibraryOwner);
+                    (UUID)Constants.LibraryOwnerUUID,
+                    agentID, (UUID)Constants.LibraryOwnerUUID);
 
             } catch (Exception ex) {
                 MainConsole.Instance.Warn ("[InventoryCAPS]: SERIOUS ISSUE! " + ex);

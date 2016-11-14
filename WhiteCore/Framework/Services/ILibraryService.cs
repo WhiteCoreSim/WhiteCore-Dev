@@ -31,20 +31,24 @@ namespace WhiteCore.Framework.Services
 {
     public interface ILibraryService
     {
-        /// <summary>
+        /*
+    	
+		/// <summary>
         ///     The library owner's UUID
         /// </summary>
         UUID LibraryOwner { get; }
 
         /// <summary>
-        ///     The root folderID of the default library
-        /// </summary>
-        UUID LibraryRootFolderID { get; }
-
-        /// <summary>
         ///     The owner of the library's name
         /// </summary>
         string LibraryOwnerName { get; }
+        
+        */
+       
+        /// <summary>
+        ///     The root folderID of the default library
+        /// </summary>
+        UUID LibraryRootFolderID { get; }
 
         /// <summary>
         ///     The name of the library that will show up in the client

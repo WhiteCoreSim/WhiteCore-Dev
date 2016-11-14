@@ -89,6 +89,11 @@ namespace WhiteCore.Framework.Utilities
         // System Marketplace Avatar
         public const string MarketplaceOwnerUUID = "198e72a6-cef6-4bbb-ae08-c0a79e6b7d1e";
         public const string MarketplaceOwnerName = "Marketplace Concierge";
+        
+        // System Library Avatar
+        public const string LibraryOwnerUUID = "11111111-1111-0000-0000-000100bba000";
+        public const string LibraryOwnerName = "Library Owner";
+        
 
         // user levels
         public const int USER_DISABLED = -2;

@@ -347,7 +347,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                     asset.ID = m_AssetService.Store(asset);
                     defaultShape.AssetID = asset.ID;
                     defaultShape.Folder = bodypartFolder.ID;
-                    defaultShape.CreatorId = m_LibraryService.LibraryOwner.ToString();
+                    defaultShape.CreatorId = Constants.LibraryOwnerUUID;
                     defaultShape.Owner = principalID;
                     defaultShape.BasePermissions = (uint) PermissionMask.All;
                     defaultShape.CurrentPermissions = (uint) PermissionMask.All;
@@ -374,7 +374,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                     asset.ID = m_AssetService.Store(asset);
                     defaultSkin.AssetID = asset.ID;
                     defaultSkin.Folder = bodypartFolder.ID;
-                    defaultSkin.CreatorId = m_LibraryService.LibraryOwner.ToString();
+                    defaultSkin.CreatorId = Constants.LibraryOwnerUUID;
                     defaultSkin.Owner = principalID;
                     defaultSkin.BasePermissions = (uint) PermissionMask.All;
                     defaultSkin.CurrentPermissions = (uint) PermissionMask.All;
@@ -401,7 +401,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                     asset.ID = m_AssetService.Store(asset);
                     defaultHair.AssetID = asset.ID;
                     defaultHair.Folder = bodypartFolder.ID;
-                    defaultHair.CreatorId = m_LibraryService.LibraryOwner.ToString();
+                    defaultHair.CreatorId = Constants.LibraryOwnerUUID;
                     defaultHair.Owner = principalID;
                     defaultHair.BasePermissions = (uint) PermissionMask.All;
                     defaultHair.CurrentPermissions = (uint) PermissionMask.All;
@@ -428,7 +428,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                     asset.ID = m_AssetService.Store(asset);
                     defaultEyes.AssetID = asset.ID;
                     defaultEyes.Folder = bodypartFolder.ID;
-                    defaultEyes.CreatorId = m_LibraryService.LibraryOwner.ToString();
+                    defaultEyes.CreatorId = Constants.LibraryOwnerUUID;
                     defaultEyes.Owner = principalID;
                     defaultEyes.BasePermissions = (uint) PermissionMask.All;
                     defaultEyes.CurrentPermissions = (uint) PermissionMask.All;
@@ -455,7 +455,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                     asset.ID = m_AssetService.Store(asset);
                     defaultShirt.AssetID = asset.ID;
                     defaultShirt.Folder = clothingFolder.ID;
-                    defaultShirt.CreatorId = m_LibraryService.LibraryOwner.ToString();
+                    defaultShirt.CreatorId = Constants.LibraryOwnerUUID;
                     defaultShirt.Owner = principalID;
                     defaultShirt.BasePermissions = (uint) PermissionMask.All;
                     defaultShirt.CurrentPermissions = (uint) PermissionMask.All;
@@ -482,7 +482,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                     asset.ID = m_AssetService.Store(asset);
                     defaultPants.AssetID = asset.ID;
                     defaultPants.Folder = clothingFolder.ID;
-                    defaultPants.CreatorId = m_LibraryService.LibraryOwner.ToString();
+                    defaultPants.CreatorId = Constants.LibraryOwnerUUID;
                     defaultPants.Owner = principalID;
                     defaultPants.BasePermissions = (uint) PermissionMask.All;
                     defaultPants.CurrentPermissions = (uint) PermissionMask.All;
@@ -915,7 +915,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                 InventoryItemBase item = GetItem(UUID.Zero, i.ID);
                 if(item == null) continue;
                 // Cannot move this item, its from libraryowner
-                if(item.Owner == m_LibraryService.LibraryOwner) continue;
+                if(item.Owner == (UUID)Constants.LibraryOwnerUUID) continue;
 
                 m_Database.IncrementFolder(i.Folder); //Increment the new folder
                 m_Database.IncrementFolderByItem(i.ID);
@@ -943,7 +943,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                     m_Database.IncrementFolder(item.Folder);
                     if (!ParentIsLinkFolder(item.Folder))
                         continue;
-                    if (item.Owner == m_LibraryService.LibraryOwner) 
+                    if (item.Owner == (UUID)Constants.LibraryOwnerUUID)
                         continue;
                     m_Database.DeleteItems("inventoryID", id.ToString());
                 }
@@ -956,7 +956,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
             {
                 InventoryItemBase item = GetItem(UUID.Zero, id);
                 if(item == null) continue;
-                if(item.Owner == m_LibraryService.LibraryOwner) continue;
+                if(item.Owner == (UUID)Constants.LibraryOwnerUUID) continue;
                 m_Database.DeleteItems("inventoryID", id.ToString());
                 m_Database.IncrementFolderByItem(id);
             }
