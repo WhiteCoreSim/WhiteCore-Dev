@@ -48,6 +48,7 @@ namespace WhiteCore.Modules.Archivers
     public class InventoryArchiveReadRequest
     {
         readonly string m_invPath;
+        readonly string m_invName = "From IAR";
         readonly List<InventoryItemBase> itemsSavedOff = new List<InventoryItemBase> ();
         readonly Queue<UUID> assets2Save = new Queue<UUID> ();
         protected bool m_assetsIncluded = true;
@@ -107,6 +108,7 @@ namespace WhiteCore.Modules.Archivers
             m_registry = registry;
             m_merge = merge;
             m_userInfo = userInfo;
+            m_invName = Path.GetFileNameWithoutExtension (loadPath);
             m_invPath = invPath.StartsWith ("/", StringComparison.Ordinal) ? invPath.Remove (0, 1) : invPath;
             m_loadStream = new GZipStream (str, CompressionMode.Decompress);
             m_overridecreator = overwriteCreator;
@@ -619,7 +621,7 @@ namespace WhiteCore.Modules.Archivers
                 }
                 //MainConsole.Instance.DebugFormat("[Inventory Archiver]: Importing asset {0}, type {1}", uuid, assetType);
 
-                AssetBase asset = new AssetBase (assetID, "From IAR", assetType, m_overridecreator) {
+                AssetBase asset = new AssetBase (assetID, m_invName, assetType, m_overridecreator) {
                     Data = data,
                     Flags = AssetFlags.Normal
                 };
