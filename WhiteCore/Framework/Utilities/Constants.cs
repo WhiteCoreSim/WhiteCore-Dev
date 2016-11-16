@@ -61,7 +61,8 @@ namespace WhiteCore.Framework.Utilities
 		public const int SystemUserCount = 5;
 
         // System library Avatar Account
-        public const string LibraryOwner = "11111111-1111-0000-0000-000100bba000";
+        public const string LibraryOwnerUUID = "11111111-1111-0000-0000-000100bba000";
+        public const string LibraryOwnerName = "Library Owner";
         public const string LibraryRootFolderID = "00000112-000f-0000-0000-000100bba000";
 
         // System Real Estate Avatar Account
@@ -89,11 +90,6 @@ namespace WhiteCore.Framework.Utilities
         // System Marketplace Avatar
         public const string MarketplaceOwnerUUID = "198e72a6-cef6-4bbb-ae08-c0a79e6b7d1e";
         public const string MarketplaceOwnerName = "Marketplace Concierge";
-        
-        // System Library Avatar
-        public const string LibraryOwnerUUID = "11111111-1111-0000-0000-000100bba000";
-        public const string LibraryOwnerName = "Library Owner";
-        
 
         // user levels
         public const int USER_DISABLED = -2;

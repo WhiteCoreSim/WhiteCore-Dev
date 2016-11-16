@@ -524,7 +524,7 @@ namespace WhiteCore.Services
         protected virtual ArrayList GetInventoryLibrary(ILibraryService library, IInventoryService inventoryService)
         {
             ArrayList AgentInventoryArray = new ArrayList();
-            List<InventoryFolderBase> rootFolders = inventoryService.GetRootFolders((UUID)Constants.LibraryOwnerUUID);
+            List<InventoryFolderBase> rootFolders = inventoryService.GetRootFolders(library.LibraryOwnerUUID);
             Hashtable RootHash = new Hashtable();
             RootHash["name"] = library.LibraryName;
             RootHash["parent_id"] = UUID.Zero.ToString();
@@ -542,7 +542,7 @@ namespace WhiteCore.Services
             {
                 foreach (UUID rootfolderID in rootFolderUUIDs)
                 {
-                    TraverseFolder((UUID)Constants.LibraryOwnerUUID, rootfolderID, inventoryService, library, true,
+                    TraverseFolder(library.LibraryOwnerUUID, rootfolderID, inventoryService, library, true,
                                    ref AgentInventoryArray);
                 }
             }
@@ -576,7 +576,7 @@ namespace WhiteCore.Services
         {
             //for now create random inventory library owner
             Hashtable TempHash = new Hashtable();
-            TempHash["agent_id"] = (UUID)Constants.LibraryOwnerUUID; // libFolder.Owner
+            TempHash["agent_id"] = libService.LibraryOwnerUUID.ToString(); // libFolder.Owner
             ArrayList inventoryLibOwner = new ArrayList {TempHash};
             return inventoryLibOwner;
         }
