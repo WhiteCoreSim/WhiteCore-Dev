@@ -131,6 +131,11 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
                 marketplaceOwnerName = estConfig.GetString ("MarketplaceOwnerName", marketplaceOwnerName);
             }
 
+            IConfig libConfig = config.Configs ["LibraryService"];
+            if (libConfig != null) {
+                libraryOwnerName = libConfig.GetString ("LibraryOwnerName", libraryOwnerName);
+            }
+
             registry.RegisterModuleInterface<ISystemAccountService> (this);
             m_registry = registry;
             m_config = config;
@@ -201,9 +206,9 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
             if (m_accountService == null)
                 return;
 
-            VerifySystemUserInfo ("Governor", GovernorUUID, GovernorName, 250);
-            VerifySystemUserInfo ("RealEstate", SystemEstateOwnerUUID, SystemEstateOwnerName, 150);
-            VerifySystemUserInfo ("Banker", BankerUUID, BankerName, 100);
+            VerifySystemUserInfo ("Governor", GovernorUUID, GovernorName, Constants.USER_GOD_MAINTENANCE);
+            VerifySystemUserInfo ("RealEstate", SystemEstateOwnerUUID, SystemEstateOwnerName, Constants.USER_GOD_LIASON);
+            VerifySystemUserInfo ("Banker", BankerUUID, BankerName, Constants.USER_GOD_CUSTOMER_SERVICE);
             VerifySystemUserInfo ("Marketplace", MarketplaceOwnerUUID, MarketplaceOwnerName, Constants.USER_DISABLED);
             VerifySystemUserInfo ("Library", LibraryOwnerUUID, LibraryOwnerName, Constants.USER_DISABLED);
         }

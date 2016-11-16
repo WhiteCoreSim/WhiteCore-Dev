@@ -47,14 +47,14 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
     {
         protected Dictionary<string, AssetType> m_assetTypes = new Dictionary<string, AssetType> ();
         protected IRegistryCore m_registry;
-        protected ILibraryService m_service;
+        protected ILibraryService m_libService;
         protected IInventoryData m_Database;
 
         #region IDefaultLibraryLoader Members
 
         public void LoadLibrary (ILibraryService service, IConfigSource source, IRegistryCore registry)
         {
-            m_service = service;
+            m_libService = service;
             m_registry = registry;
             m_Database = Framework.Utilities.DataManager.RequestPlugin<IInventoryData> ();
 
@@ -115,14 +115,14 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
                 m_MockScene.AddModuleInterfaces (m_registry.GetInterfaces ());
             }
 
-            UserAccount uinfo = m_MockScene.UserAccountService.GetUserAccount (null, Constants.LibraryOwnerUUID);
+            UserAccount uinfo = m_MockScene.UserAccountService.GetUserAccount (null, m_libService.LibraryOwnerUUID);
             //Make the user account for the default IAR
             if (uinfo == null) 
             {
-                uinfo = m_MockScene.UserAccountService.GetUserAccount (null, (UUID)Constants.LibraryOwnerUUID);
+                uinfo = m_MockScene.UserAccountService.GetUserAccount (null, m_libService.LibraryOwnerUUID);
                 m_MockScene.InventoryService.CreateUserInventory (uinfo.PrincipalID, false);
             }
-            if (m_MockScene.InventoryService.GetRootFolder ((UUID)Constants.LibraryOwnerUUID) == null)
+            if (m_MockScene.InventoryService.GetRootFolder (m_libService.LibraryOwnerUUID) == null)
                 m_MockScene.InventoryService.CreateUserInventory (uinfo.PrincipalID, false);
 
             List<InventoryFolderBase> rootFolders = m_MockScene.InventoryService.GetFolderFolders (uinfo.PrincipalID, UUID.Zero);
@@ -143,7 +143,7 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
             }
 
             var archread = new InventoryArchiveReadRequest (m_MockScene, uinfo, "/", iarFileName,
-                                                            false, (UUID)Constants.LibraryOwnerUUID);
+                                                            false, m_libService.LibraryOwnerUUID);
 
             try {
                 archread.ReplaceAssets = true; //Replace any old assets
@@ -155,10 +155,10 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
                 UUID IARRootID = f.ID;
 
                 TraverseFolders (IARRootID, m_MockScene);
-                FixParent (IARRootID, m_MockScene, m_service.LibraryRootFolderID);
+                FixParent (IARRootID, m_MockScene, m_libService.LibraryRootFolderID);
                 f.Name = iarFileName;
                 f.ParentID = UUID.Zero;
-                f.ID = m_service.LibraryRootFolderID;
+                f.ID = m_libService.LibraryRootFolderID;
                 f.Type = (short)FolderType.Root;
                 f.Version = 1;
                 m_MockScene.InventoryService.UpdateFolder (f);
@@ -173,7 +173,7 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
 
         void TraverseFolders (UUID ID, IScene m_MockScene)
         {
-        	List<InventoryFolderBase> folders = m_MockScene.InventoryService.GetFolderFolders ((UUID)Constants.LibraryOwnerUUID, ID);
+        	List<InventoryFolderBase> folders = m_MockScene.InventoryService.GetFolderFolders (m_libService.LibraryOwnerUUID, ID);
             foreach (InventoryFolderBase folder in folders) {
                 InventoryFolderBase folder1 = folder;
 
@@ -196,7 +196,7 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
 
         void FixParent (UUID ID, IScene m_MockScene, UUID LibraryRootID)
         {
-        	List<InventoryFolderBase> folders = m_MockScene.InventoryService.GetFolderFolders ((UUID)Constants.LibraryOwnerUUID, ID);
+        	List<InventoryFolderBase> folders = m_MockScene.InventoryService.GetFolderFolders (m_libService.LibraryOwnerUUID, ID);
             foreach (InventoryFolderBase folder in folders) {
                 if (folder.ParentID == ID) {
                     folder.ParentID = LibraryRootID;

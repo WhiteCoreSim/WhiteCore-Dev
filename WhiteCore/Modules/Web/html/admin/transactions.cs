@@ -83,7 +83,7 @@ namespace WhiteCore.Modules.Web
 
                     if (UserName != "") {
                         // TODO: Work out a better way to catch this
-                        UserID = (UUID)Constants.LibraryOwner;         // This user should hopefully never have transactions
+                        UserID = (UUID)Constants.LibraryOwnerUUID;         // This user should hopefully never have transactions
 
                         if (UserName.Split (' ').Length == 2) {
                             IUserAccountService accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
