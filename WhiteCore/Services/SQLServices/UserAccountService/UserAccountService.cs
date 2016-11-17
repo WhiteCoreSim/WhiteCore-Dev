@@ -1095,11 +1095,19 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                     enteredName = userName;
 
                 do {
-                    userName = MainConsole.Instance.Prompt ("User Name (? for suggestion)", enteredName);
+                    userName = MainConsole.Instance.Prompt ("User Name (? for suggestion, 'quit' to abort)", enteredName);
+                    if (userName.ToLower () == "quit")
+                        return;
+                    
                     if (userName == "" || userName == "?") {
                         enteredName = ufNames.NextName + " " + ulNames.NextName;
                         userName = "";
                         continue;
+                    }
+                    var fl = userName.Split (' ');
+                    if (fl.Length < 2) {
+                        MainConsole.Instance.CleanInfo ("    User name must be <firstname> <lastname>");
+                        userName = "";
                     }
                 } while (userName == "");
                 ufNames.Reset ();
@@ -1118,10 +1126,14 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 var pwmatch = false;
                 do {
                     password = MainConsole.Instance.PasswordPrompt ("Password");
+                    if (password == "") {
+                        MainConsole.Instance.CleanInfo (" .... password must not be empty, please re-enter");
+                        continue;
+                    }
                     var passwordAgain = MainConsole.Instance.PasswordPrompt ("Re-enter Password");
                     pwmatch = (password == passwordAgain);
                     if (!pwmatch)
-                        MainConsole.Instance.Warn (" .... passwords did not match, please re-enter");
+                        MainConsole.Instance.CleanInfo (" .... passwords did not match, please re-enter");
                 } while (!pwmatch);
             } else
                 password = cmdparams [4];
@@ -1133,7 +1145,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                 email = cmdparams [5];
 
             if ((email.ToLower () != "none") && !Utilities.IsValidEmail (email)) {
-                MainConsole.Instance.Warn ("This does not look like a valid email address. ('none' if unknown)");
+                MainConsole.Instance.CleanInfo ("This does not look like a valid email address. ('none' if unknown)");
                 email = MainConsole.Instance.Prompt ("Email", email);
             }
 
@@ -1154,7 +1166,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
             uuid = UUID.Random ().ToString ();
             if (uuidFlag)
                 while (true) {
-                    uuid = MainConsole.Instance.Prompt ("UUID (Required avatar UUID)", uuid);
+                    uuid = MainConsole.Instance.Prompt ("Required avatar UUID)", uuid);
                     UUID test;
                     if (UUID.TryParse (uuid, out test))
                         break;

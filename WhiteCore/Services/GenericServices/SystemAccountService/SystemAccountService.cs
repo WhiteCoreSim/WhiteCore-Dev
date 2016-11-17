@@ -320,6 +320,11 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
                     userName = "";
                     continue;
                 }
+                var fl = userName.Split (' ');
+                if (fl.Length < 2) {
+                    MainConsole.Instance.CleanInfo ("    User name must be <firstname> <lastname>");
+                    userName = "";
+                }
             } while (userName == "");
             ufNames.Reset ();
             ulNames.Reset ();
@@ -328,17 +333,21 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
             var pwmatch = false;
             do {
                 password = MainConsole.Instance.PasswordPrompt ("Password");
+                if (password == "") {
+                    MainConsole.Instance.CleanInfo (" .... password must not be empty, please re-enter");
+                    continue;
+                }
                 var passwordAgain = MainConsole.Instance.PasswordPrompt ("Re-enter Password");
                 pwmatch = (password == passwordAgain);
                 if (!pwmatch)
-                    MainConsole.Instance.Warn (" .... passwords did not match, please re-enter");
+                    MainConsole.Instance.CleanInfo (" .... passwords did not match, please re-enter");
             } while (!pwmatch);
 
             // email
             email = MainConsole.Instance.Prompt ("Email for password recovery. ('none' if unknown)", "none");
 
             if ((email.ToLower () != "none") && !Utilities.IsValidEmail (email)) {
-                MainConsole.Instance.Warn ("This does not look like a valid email address. ('none' if unknown)");
+                MainConsole.Instance.CleanInfo ("This does not look like a valid email address. ('none' if unknown)");
                 email = MainConsole.Instance.Prompt ("Email", email);
             }
 
@@ -359,7 +368,7 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
             // Allow the modification of UUID if required - for matching user UUID with other Grids etc like SL
             uuid = UUID.Random ().ToString ();
             while (true) {
-                uuid = MainConsole.Instance.Prompt ("UUID (Required avatar UUID)", uuid);
+                uuid = MainConsole.Instance.Prompt ("Required avatar UUID (optional))", uuid);
                 UUID test;
                 if (UUID.TryParse (uuid, out test))
                     break;
