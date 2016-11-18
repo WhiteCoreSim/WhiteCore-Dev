@@ -266,7 +266,7 @@ textures 1
                     visualParamsChanged = appearance.Appearance.SetVisualParams (visualParams);
 
                     //Fix the height only if the parameters have changed
-                    if (visualParamsChanged && appearance.Appearance.AvatarHeight > 0)
+                    if (visualParamsChanged)
                         sp.SetHeight (appearance.Appearance.AvatarHeight);
                 }
             }
@@ -274,8 +274,10 @@ textures 1
             // If something changed in the appearance then queue an appearance save
             if (texturesChanged || visualParamsChanged) {
                 QueueAppearanceSave (client.AgentId);
-                QueueAppearanceSend (client.AgentId);
+                //QueueAppearanceSend (client.AgentId);
             }
+            // send appearance regardless of any changes
+            QueueAppearanceSend (client.AgentId);
         }
 
         /// <summary>

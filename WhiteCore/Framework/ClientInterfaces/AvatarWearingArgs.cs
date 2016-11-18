@@ -33,12 +33,11 @@ namespace WhiteCore.Framework.ClientInterfaces
 {
     public class AvatarWearingArgs : EventArgs
     {
-        private List<Wearable> m_nowWearing = new List<Wearable>();
+        List<Wearable> m_nowWearing = new List<Wearable> ();
 
         /// <summary>
         /// </summary>
-        public List<Wearable> NowWearing
-        {
+        public List<Wearable> NowWearing {
             get { return m_nowWearing; }
             set { m_nowWearing = value; }
         }
@@ -47,10 +46,10 @@ namespace WhiteCore.Framework.ClientInterfaces
 
         public class Wearable
         {
-            public UUID ItemID = new UUID("00000000-0000-0000-0000-000000000000");
+            public UUID ItemID = new UUID ("00000000-0000-0000-0000-000000000000");
             public byte Type;
 
-            public Wearable(UUID itemId, byte type)
+            public Wearable (UUID itemId, byte type)
             {
                 ItemID = itemId;
                 Type = type;

@@ -42,18 +42,29 @@ namespace WhiteCore.Framework.ClientInterfaces
     /// </summary>
     public sealed class AvatarAppearance : IDataTransferable
     {
+        // SL box diferent to size
+        const float AVBOXAJUST = 0.2f;
+        // constrains  for ode physics
+        const float AVBOXMINX = 0.2f;
+        const float AVBOXMINY = 0.3f;
+        const float AVBOXMINZ = 1.2f;
+
         public static readonly int VISUALPARAM_COUNT = 218;
         public static readonly int TEXTURE_COUNT = 21;
         public static readonly byte[] BAKE_INDICES = new byte[] {8, 9, 10, 11, 19, 20};
         
-        int m_serial = 1;
+        int m_serial = 0;
         byte[] m_visualparams;
         Primitive.TextureEntry m_texture;
         AvatarWearable[] m_wearables;
         Dictionary<int, List<AvatarAttachment>> m_attachments;        
-        float m_avatarHeight = 0;
         UUID m_owner;
         Dictionary<string, UUID> m_wearableCache = new Dictionary<string, UUID>();
+
+        float m_avatarHeight = 0;
+        float m_avatarFeetOffset = 0;
+        Vector3 m_avatarSize = new Vector3 (0.45f, 0.6f, 1.9f); // sl Z cloud value
+        Vector3 m_avatarBoxSize = new Vector3 (0.45f, 0.6f, 1.9f);
 
         public int Serial
         {
@@ -85,6 +96,19 @@ namespace WhiteCore.Framework.ClientInterfaces
             set { m_avatarHeight = value; }
         }
 
+        public Vector3 AvatarSize {
+            get { return m_avatarSize; }
+            set { m_avatarSize = value; }
+        }
+
+        public float AvatarFeetOffset {
+            get {
+                return m_avatarFeetOffset;   // should be m_avatarFeetOffset +m_avatarAnimOffset epending if Animoffset is even used??
+            }
+            set { m_avatarFeetOffset = value; }
+        }
+                
+
         public Dictionary<string, UUID> WearableCache
         {
             get { return m_wearableCache; }
@@ -115,7 +139,9 @@ namespace WhiteCore.Framework.ClientInterfaces
             SetDefaultWearables();
             SetDefaultTexture();
             SetDefaultParams();
-            SetHeight();
+            //SetHeight();
+            SetSize (m_avatarSize);
+
             m_attachments = new Dictionary<int, List<AvatarAttachment>>();
         }
 
@@ -130,7 +156,7 @@ namespace WhiteCore.Framework.ClientInterfaces
         {
             //            MainConsole.Instance.WarnFormat("[AVATAR APPEARANCE] create initialized appearance for {0}",avatarID);
 
-            m_serial = 1;
+            m_serial = 0;
             m_owner = avatarID;
 
             if (wearables != null)
@@ -148,7 +174,8 @@ namespace WhiteCore.Framework.ClientInterfaces
             else
                 SetDefaultParams();
 
-            SetHeight();
+            //SetHeight();
+            SetSize (m_avatarSize);
 
             m_attachments = new Dictionary<int, List<AvatarAttachment>>();
         }
@@ -164,13 +191,14 @@ namespace WhiteCore.Framework.ClientInterfaces
 
             if (appearance == null)
             {
-                m_serial = 1;
+                m_serial = 0;
                 m_owner = UUID.Zero;
 
                 SetDefaultWearables();
                 SetDefaultTexture();
                 SetDefaultParams();
-                SetHeight();
+                //SetHeight();
+                SetSize (m_avatarSize);
 
                 m_attachments = new Dictionary<int, List<AvatarAttachment>>();
 
@@ -201,8 +229,9 @@ namespace WhiteCore.Framework.ClientInterfaces
                 m_visualparams = (byte [])appearance.VisualParams.Clone ();
             else
                 SetDefaultParams ();    // we need something to work with
-            
-            SetHeight ();
+
+            //SetHeight ();
+            SetSize (appearance.AvatarSize);
 
             // Copy the attachment, force append mode since that ensures consistency
             m_attachments = new Dictionary<int, List<AvatarAttachment>>();
@@ -238,7 +267,7 @@ namespace WhiteCore.Framework.ClientInterfaces
         
         public void ResetAppearance()
         {
-        	m_serial = 1;
+        	m_serial = 0;
             SetDefaultTexture();
         }
 
@@ -368,8 +397,8 @@ namespace WhiteCore.Framework.ClientInterfaces
             }
 
             // Reset the height if the visual parameters actually changed
-            if (changed)
-                SetHeight();
+            //if (changed)
+            //    SetHeight();
 
             return changed;
         }
@@ -383,6 +412,7 @@ namespace WhiteCore.Framework.ClientInterfaces
 
         public void SetHeight()
         {
+            
             m_avatarHeight = 1.26077f // Shortest possible avatar height
                              + 0.506945f*m_visualparams[(int) VPElement.SHAPE_HEIGHT]/255.0f // Body height
                              + 0.072514f*m_visualparams[(int) VPElement.SHAPE_HEAD_SIZE]/255.0f // Head size
@@ -391,6 +421,24 @@ namespace WhiteCore.Framework.ClientInterfaces
                              // Shoe platform height
                              + 0.07f*m_visualparams[(int) VPElement.SHOES_HEEL_HEIGHT]/255.0f // Shoe heel height
                              + 0.076f*m_visualparams[(int) VPElement.SHAPE_NECK_LENGTH]/255.0f; // Neck length
+            
+        }
+
+        public void SetSize (Vector3 avSize)
+        {
+            avSize.X = Util.Clamp (avSize.X, 0.1f, 32f);
+            avSize.Y = Util.Clamp (avSize.Y, 0.1f, 32f);
+            avSize.Z = Util.Clamp (avSize.Z, 0.1f, 32f);
+
+            m_avatarSize = avSize;
+            m_avatarBoxSize = avSize;
+            m_avatarBoxSize.Z += AVBOXAJUST;
+
+            m_avatarBoxSize.X = Util.Clamp (m_avatarBoxSize.X, AVBOXMINX, 32f);
+            m_avatarBoxSize.Y = Util.Clamp (m_avatarBoxSize.Y, AVBOXMINY, 32f);
+            m_avatarBoxSize.Z = Util.Clamp (m_avatarBoxSize.Z, AVBOXMINZ, 32f);
+            m_avatarHeight = m_avatarSize.Z;
+            SetHeight ();
         }
 
         public void SetWearable(int wearableId, AvatarWearable wearable)
@@ -682,7 +730,9 @@ namespace WhiteCore.Framework.ClientInterfaces
             if ((data != null) && (data["serial"] != null))
                 m_serial = data["serial"].AsInteger();
             if ((data != null) && (data["height"] != null))
-                m_avatarHeight = (float) data["height"].AsReal();
+                //m_avatarHeight = (float) data["height"].AsReal();
+                SetSize (new Vector3 (0.45f, 0.6f, (float)data ["height"].AsReal ()));
+
 
             if ((data != null) && (data["owner"] != null))
                 m_owner = data["owner"].AsUUID();
@@ -743,7 +793,8 @@ namespace WhiteCore.Framework.ClientInterfaces
                 }
                 if (data != null && data["wearableCache"] != null && data["wearableCache"] is OSDMap)
                     m_wearableCache = ((OSDMap)data["wearableCache"]).ConvertMap<UUID>((o) => o);
-                SetHeight();
+                //SetHeight();
+
             }
             catch (Exception e)
             {

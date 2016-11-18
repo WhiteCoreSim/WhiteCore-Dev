@@ -2788,7 +2788,7 @@ namespace WhiteCore.Region
             //Set this so we don't do it multiple times
             m_creatingPhysicalRepresentation = true;
 
-            Vector3 size = new Vector3(0, 0, m_defaultAvHeight);
+            Vector3 size = new Vector3(0.45f, 0.6f, m_defaultAvHeight);
             IAvatarAppearanceModule appearance = RequestModuleInterface<IAvatarAppearanceModule>();
             if (appearance != null)
                 size.Z = appearance.Appearance.AvatarHeight;
