@@ -1,6 +1,6 @@
 
 
-﻿Patching WhiteCore.exe & WhiteCore.32BitLaunch.exe to allow them to access more RAM in Windows Systems.
+﻿Patching WhiteCore.exe to allow them to access more RAM in Windows Systems.
 
 WHY ?
 An application running in 32Bit Mode on Windows can only access access 2GB Ram Total by default. As seen with WhiteCore, this
