@@ -6958,7 +6958,33 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             return m_host.ParentEntity.RootChild.AttachmentPoint;
         }
-
+        
+        public LSL_List llGetAttachedList(string id)
+        {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_List();
+            
+            IScenePresence av = World.GetScenePresence((UUID)id);
+            
+            if (av == null || av.IsDeleted)
+            	return new LSL_List("NOT FOUND");
+            if (av.IsChildAgent || av.IsInTransit)
+            	return new LSL_List("NOT ON REGION");
+            
+            LSL_List AttachmentsList = new LSL_List();
+            
+            IAttachmentsModule attachMod = World.RequestModuleInterface<IAttachmentsModule>();
+            if (attachMod != null)
+            {
+                ISceneEntity[] Attachments = attachMod.GetAttachmentsForAvatar(av.UUID);
+                foreach (ISceneEntity Attachment in Attachments)
+                {
+                	AttachmentsList.Add(new LSL_Key(Attachment.UUID.ToString()));
+                }
+            }
+            return AttachmentsList;
+        }
+        
         public LSL_Integer llGetFreeMemory()
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
