@@ -12204,6 +12204,39 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                         	ret.Add(ScriptBaseClass.NULL_KEY);
                         	break;
                         }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_CLICK_ACTION)
+                        {
+                        	ret.Add(new LSL_Integer(0));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_OMEGA)
+                        {
+                        	ret.Add(new LSL_Vector(Vector3.Zero));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_PRIM_COUNT)
+                        {
+                            // Return 0 for now, needs a proper check    
+                        	ret.Add(new LSL_Integer(0));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_TOTAL_INVENTORY_COUNT)
+                        {
+                            // Return 0 for now, needs a proper check    
+                        	ret.Add(new LSL_Integer(0));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_GROUP_TAG)
+                        {
+                        	// Return empty string for now, need a proper check
+                        	ret.Add(new LSL_String(String.Empty));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_TEMP_ATTACHED)
+                        {
+                        	ret.Add(new LSL_Integer(0));
+                        	break;
+                        }                        
                         else
                         {
                             ret.Add(ScriptBaseClass.OBJECT_UNKNOWN_DETAIL);
@@ -12282,6 +12315,73 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                         else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_PATHFINDING_TYPE)
                         {
                             ret.Add(0);
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_PHYSICS)
+                        {
+                            // Return 0 for now, needs a proper check    
+                        	ret.Add(new LSL_Integer(0));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_PHANTOM)
+                        {
+                            // Return 0 for now, needs a proper check    
+                        	ret.Add(new LSL_Integer(0));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_TEMP_ON_REZ)
+                        {
+                            // Return 0 for now, needs a proper check    
+                        	ret.Add(new LSL_Integer(0));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_RENDER_WEIGHT)
+                        {
+                        	ret.Add(new LSL_Integer(0));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_HOVER_HEIGHT)
+                        {
+                        	ret.Add(new LSL_Float(0));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_LAST_OWNER_ID)
+                        {
+                        	ret.Add(new LSL_Key(obj.LastOwnerID.ToString()));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_CLICK_ACTION)
+                        {
+                        	ret.Add(new LSL_Integer(obj.ClickAction));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_OMEGA)
+                        {
+                        	ret.Add(new LSL_Vector(obj.AngularVelocity));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_PRIM_COUNT)
+                        {
+                            // Return 0 for now, needs a proper check    
+                        	ret.Add(new LSL_Integer(0));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_TOTAL_INVENTORY_COUNT)
+                        {
+                            // Return 0 for now, needs a proper check    
+                        	ret.Add(new LSL_Integer(0));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_GROUP_TAG)
+                        {
+                        	// Return empty string for now, need a proper check
+                        	ret.Add(new LSL_String(String.Empty));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_TEMP_ATTACHED)
+                        {
+                        	// Return 0 for now, needs a proper check
+                        	ret.Add(new LSL_Integer(0));
+                        	break;
                         }
                         else
                         {
