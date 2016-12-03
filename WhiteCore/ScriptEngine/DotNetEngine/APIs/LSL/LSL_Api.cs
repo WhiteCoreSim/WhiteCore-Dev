@@ -88,7 +88,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         protected float m_ScriptDistanceFactor = 1.0f;
         protected float m_MinTimerInterval = 0.1f;
 
-        protected DateTime m_timer = DateTime.Now;
+        protected double m_timer = Util.GetTimeStampMS();
         protected bool m_waitingForScriptAnswer = false;
         protected bool m_automaticLinkPermission = false;
         protected IMessageTransferModule m_TransferModule = null;
@@ -2712,8 +2712,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return new LSL_Float();
 
-            TimeSpan ScriptTime = DateTime.Now - m_timer;
-            return ScriptTime.TotalMilliseconds / 1000;
+            double ScriptTime = Util.GetTimeStampMS() - m_timer;
+            return (ScriptTime / 1000.0);
         }
 
         public void llResetTime()
@@ -2721,7 +2721,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) 
                 return;
 
-            m_timer = DateTime.Now;
+            m_timer = Util.GetTimeStampMS();
         }
 
         public LSL_Float llGetAndResetTime()
@@ -2729,9 +2729,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return new LSL_Float();
 
-            TimeSpan ScriptTime = DateTime.Now - m_timer;
-            m_timer = DateTime.Now;
-            return ScriptTime.TotalMilliseconds / 1000;
+            double now = Util.GetTimeStampMS();
+            double ScriptTime = now - m_timer;
+            m_timer = now;
+            return (ScriptTime / 1000.0);
         }
 
         public void llSound(string sound, double volume, int queue, int loop)
