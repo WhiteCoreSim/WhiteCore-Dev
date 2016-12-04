@@ -3509,7 +3509,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             LookAt(target, strength, damping, m_host);
         }
 
-        // Fly - Function unknown on the SL Wiki
+        // 04122016 Fly-Man-
+        // This function is unknown on the SL Wiki
         public void llLinkLookAt(LSL_Integer link, LSL_Vector target, double strength, double damping)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) 
@@ -3552,7 +3553,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             else
                 obj.startLookAt(Rot2Quaternion(rot), (float)strength, (float)damping);
         }
-
+        
         public void llRotLookAt(LSL_Rotation target, double strength, double damping)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
@@ -3562,7 +3563,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             m_host.RotLookAt(rot, (float)strength, (float)damping);
         }
 
-        // Fly - Function unknown on the SL Wiki
+        // 04122016 Fly-Man-
+        // This function is unknown on the SL Wiki
         public void llLinkRotLookAt(LSL_Integer link, LSL_Rotation target, double strength, double damping)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
@@ -13878,6 +13880,90 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         {
             NotImplemented("llXorBase64", "Not implemented at this moment");
             return string.Empty;
+        }
+        #endregion
+        
+        #region Added functions for Experiences
+        public LSL_Integer llAgentInExperience(LSL_Key agent)
+        {
+            NotImplemented("llAgentInExperience", "Not implemented at this moment");
+            return 0;
+        }
+        
+        public void llClearExperiencePermissions(LSL_Key agent)
+        {
+        	NotImplemented("llClearExperiencePermissions", "Not implemented at this moment");
+        }
+        
+        public LSL_Key llCreateKeyValue(LSL_String key, LSL_String value)
+        {
+        	NotImplemented("llClearExperiencePermissions", "Not implemented at this moment");
+        	return UUID.Zero.ToString();
+        }
+        
+        public LSL_Key llDataSizeKeyValue()
+        {
+        	NotImplemented("llDataSizeKeyValue", "Not implemented at this moment");
+        	return UUID.Zero.ToString();
+        }
+        
+        public LSL_Key llDeleteKeyValue(LSL_String key)
+        {
+        	NotImplemented("llDeleteKeyValue", "Not implemented at this moment");
+        	return UUID.Zero.ToString();
+        }
+        
+        public LSL_List llGetExperienceDetails(LSL_Key experience_id)
+        {
+        	NotImplemented("llGetExperienceDetails", "Not implemented at this moment");
+        	return new LSL_List();
+        }
+        
+        public LSL_String llGetExperienceErrorMessage(LSL_Integer value)
+        {
+        	NotImplemented("llGetExperienceDetails", "Not implemented at this moment");
+        	return String.Empty;
+        }
+        
+        public LSL_List llGetExperienceList(LSL_Key agent)
+        {
+        	NotImplemented("llGetExperienceDetails", "Function was deprecated");
+        	return new LSL_List();
+        }
+        
+        public LSL_Key llKeyCountKeyValue()
+        {
+        	NotImplemented("llKeyCountKeyValue", "Not implemented at this moment");
+        	return UUID.Zero.ToString();
+        }
+        
+        public LSL_Key llKeysKeyValue(LSL_Integer first, LSL_Integer count)
+        {
+        	NotImplemented("llKeysKeyValue", "Not implemented at this moment");
+        	return UUID.Zero.ToString();
+        }
+        
+        public LSL_Key llReadKeyValue(LSL_String key)
+        {
+        	NotImplemented("llReadKeyValue", "Not implemented at this moment");
+        	return UUID.Zero.ToString();
+        }
+        
+        public void llRequestExperiencePermissions(LSL_Key agent, LSL_String name )
+        {
+        	NotImplemented("llRequestExperiencePermissions", "Not implemented at this moment");
+        }
+        
+        public LSL_Integer llSitOnLink( LSL_Key agent_id, LSL_Integer link )
+        {
+        	NotImplemented("llSitOnLink", "Not implemented at this moment");
+        	return 0;
+        }
+        
+        public LSL_Key llUpdateKeyValue( LSL_Key key, LSL_String value, LSL_Integer check, LSL_String original_value )
+        {
+        	NotImplemented("llUpdateKeyValue", "Not implemented at this moment");
+        	return UUID.Zero.ToString();
         }
         #endregion
     }
