@@ -583,12 +583,11 @@ namespace WhiteCore.ClientStack
             m_udpClient.OnQueueEmpty -= HandleQueueEmpty;
             m_udpClient.OnPacketStats -= PopulateStats;
             m_udpClient.Shutdown();
+            
+            if (m_scene.GetNumberOfClients() == 0)
+            	GC.Collect();
 
-            // 03122016 Fly-man-
-            // Turning this on to check why regions are taking
-            // up so much memory after a user exits the region
             MainConsole.Instance.InfoFormat("[CLIENTVIEW] Memory pre  GC {0}", System.GC.GetTotalMemory(false));
-            GC.Collect();
             MainConsole.Instance.InfoFormat("[CLIENTVIEW] Memory post GC {0}", System.GC.GetTotalMemory(true));
         }
 
