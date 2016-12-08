@@ -88,7 +88,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         protected float m_ScriptDistanceFactor = 1.0f;
         protected float m_MinTimerInterval = 0.1f;
 
-        protected DateTime m_timer = DateTime.Now;
+        protected double m_timer = Util.GetTimeStampMS();
         protected bool m_waitingForScriptAnswer = false;
         protected bool m_automaticLinkPermission = false;
         protected IMessageTransferModule m_TransferModule = null;
@@ -2712,8 +2712,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return new LSL_Float();
 
-            TimeSpan ScriptTime = DateTime.Now - m_timer;
-            return ScriptTime.TotalMilliseconds / 1000;
+            double ScriptTime = Util.GetTimeStampMS() - m_timer;
+            return (ScriptTime / 1000.0);
         }
 
         public void llResetTime()
@@ -2721,7 +2721,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) 
                 return;
 
-            m_timer = DateTime.Now;
+            m_timer = Util.GetTimeStampMS();
         }
 
         public LSL_Float llGetAndResetTime()
@@ -2729,9 +2729,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return new LSL_Float();
 
-            TimeSpan ScriptTime = DateTime.Now - m_timer;
-            m_timer = DateTime.Now;
-            return ScriptTime.TotalMilliseconds / 1000;
+            double now = Util.GetTimeStampMS();
+            double ScriptTime = now - m_timer;
+            m_timer = now;
+            return (ScriptTime / 1000.0);
         }
 
         public void llSound(string sound, double volume, int queue, int loop)
@@ -3508,7 +3509,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             LookAt(target, strength, damping, m_host);
         }
 
-        // Fly - Function unknown on the SL Wiki
+        // 04122016 Fly-Man-
+        // This function is unknown on the SL Wiki
         public void llLinkLookAt(LSL_Integer link, LSL_Vector target, double strength, double damping)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) 
@@ -3551,7 +3553,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             else
                 obj.startLookAt(Rot2Quaternion(rot), (float)strength, (float)damping);
         }
-
+        
         public void llRotLookAt(LSL_Rotation target, double strength, double damping)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
@@ -3561,7 +3563,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             m_host.RotLookAt(rot, (float)strength, (float)damping);
         }
 
-        // Fly - Function unknown on the SL Wiki
+        // 04122016 Fly-Man-
+        // This function is unknown on the SL Wiki
         public void llLinkRotLookAt(LSL_Integer link, LSL_Rotation target, double strength, double damping)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
@@ -6957,7 +6960,33 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             return m_host.ParentEntity.RootChild.AttachmentPoint;
         }
-
+        
+        public LSL_List llGetAttachedList(string id)
+        {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_List();
+            
+            IScenePresence av = World.GetScenePresence((UUID)id);
+            
+            if (av == null || av.IsDeleted)
+            	return new LSL_List("NOT FOUND");
+            if (av.IsChildAgent || av.IsInTransit)
+            	return new LSL_List("NOT ON REGION");
+            
+            LSL_List AttachmentsList = new LSL_List();
+            
+            IAttachmentsModule attachMod = World.RequestModuleInterface<IAttachmentsModule>();
+            if (attachMod != null)
+            {
+                ISceneEntity[] Attachments = attachMod.GetAttachmentsForAvatar(av.UUID);
+                foreach (ISceneEntity Attachment in Attachments)
+                {
+                	AttachmentsList.Add(new LSL_Key(Attachment.UUID.ToString()));
+                }
+            }
+            return AttachmentsList;
+        }
+        
         public LSL_Integer llGetFreeMemory()
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
@@ -12203,6 +12232,39 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                         	ret.Add(ScriptBaseClass.NULL_KEY);
                         	break;
                         }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_CLICK_ACTION)
+                        {
+                        	ret.Add(new LSL_Integer(0));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_OMEGA)
+                        {
+                        	ret.Add(new LSL_Vector(Vector3.Zero));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_PRIM_COUNT)
+                        {
+                            // Return 0 for now, needs a proper check    
+                        	ret.Add(new LSL_Integer(0));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_TOTAL_INVENTORY_COUNT)
+                        {
+                            // Return 0 for now, needs a proper check    
+                        	ret.Add(new LSL_Integer(0));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_GROUP_TAG)
+                        {
+                        	// Return empty string for now, need a proper check
+                        	ret.Add(new LSL_String(String.Empty));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_TEMP_ATTACHED)
+                        {
+                        	ret.Add(new LSL_Integer(0));
+                        	break;
+                        }                        
                         else
                         {
                             ret.Add(ScriptBaseClass.OBJECT_UNKNOWN_DETAIL);
@@ -12281,6 +12343,73 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                         else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_PATHFINDING_TYPE)
                         {
                             ret.Add(0);
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_PHYSICS)
+                        {
+                            // Return 0 for now, needs a proper check    
+                        	ret.Add(new LSL_Integer(0));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_PHANTOM)
+                        {
+                            // Return 0 for now, needs a proper check    
+                        	ret.Add(new LSL_Integer(0));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_TEMP_ON_REZ)
+                        {
+                            // Return 0 for now, needs a proper check    
+                        	ret.Add(new LSL_Integer(0));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_RENDER_WEIGHT)
+                        {
+                        	ret.Add(new LSL_Integer(0));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_HOVER_HEIGHT)
+                        {
+                        	ret.Add(new LSL_Float(0));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_LAST_OWNER_ID)
+                        {
+                        	ret.Add(new LSL_Key(obj.LastOwnerID.ToString()));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_CLICK_ACTION)
+                        {
+                        	ret.Add(new LSL_Integer(obj.ClickAction));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_OMEGA)
+                        {
+                        	ret.Add(new LSL_Vector(obj.AngularVelocity));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_PRIM_COUNT)
+                        {
+                            // Return 0 for now, needs a proper check    
+                        	ret.Add(new LSL_Integer(0));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_TOTAL_INVENTORY_COUNT)
+                        {
+                            // Return 0 for now, needs a proper check    
+                        	ret.Add(new LSL_Integer(0));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_GROUP_TAG)
+                        {
+                        	// Return empty string for now, need a proper check
+                        	ret.Add(new LSL_String(String.Empty));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_TEMP_ATTACHED)
+                        {
+                        	// Return 0 for now, needs a proper check
+                        	ret.Add(new LSL_Integer(0));
+                        	break;
                         }
                         else
                         {
@@ -13751,6 +13880,90 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         {
             NotImplemented("llXorBase64", "Not implemented at this moment");
             return string.Empty;
+        }
+        #endregion
+        
+        #region Added functions for Experiences
+        public LSL_Integer llAgentInExperience(LSL_Key agent)
+        {
+            NotImplemented("llAgentInExperience", "Not implemented at this moment");
+            return 0;
+        }
+        
+        public void llClearExperiencePermissions(LSL_Key agent)
+        {
+        	NotImplemented("llClearExperiencePermissions", "Not implemented at this moment");
+        }
+        
+        public LSL_Key llCreateKeyValue(LSL_String key, LSL_String value)
+        {
+        	NotImplemented("llClearExperiencePermissions", "Not implemented at this moment");
+        	return UUID.Zero.ToString();
+        }
+        
+        public LSL_Key llDataSizeKeyValue()
+        {
+        	NotImplemented("llDataSizeKeyValue", "Not implemented at this moment");
+        	return UUID.Zero.ToString();
+        }
+        
+        public LSL_Key llDeleteKeyValue(LSL_String key)
+        {
+        	NotImplemented("llDeleteKeyValue", "Not implemented at this moment");
+        	return UUID.Zero.ToString();
+        }
+        
+        public LSL_List llGetExperienceDetails(LSL_Key experience_id)
+        {
+        	NotImplemented("llGetExperienceDetails", "Not implemented at this moment");
+        	return new LSL_List();
+        }
+        
+        public LSL_String llGetExperienceErrorMessage(LSL_Integer value)
+        {
+        	NotImplemented("llGetExperienceDetails", "Not implemented at this moment");
+        	return String.Empty;
+        }
+        
+        public LSL_List llGetExperienceList(LSL_Key agent)
+        {
+        	NotImplemented("llGetExperienceDetails", "Function was deprecated");
+        	return new LSL_List();
+        }
+        
+        public LSL_Key llKeyCountKeyValue()
+        {
+        	NotImplemented("llKeyCountKeyValue", "Not implemented at this moment");
+        	return UUID.Zero.ToString();
+        }
+        
+        public LSL_Key llKeysKeyValue(LSL_Integer first, LSL_Integer count)
+        {
+        	NotImplemented("llKeysKeyValue", "Not implemented at this moment");
+        	return UUID.Zero.ToString();
+        }
+        
+        public LSL_Key llReadKeyValue(LSL_String key)
+        {
+        	NotImplemented("llReadKeyValue", "Not implemented at this moment");
+        	return UUID.Zero.ToString();
+        }
+        
+        public void llRequestExperiencePermissions(LSL_Key agent, LSL_String name )
+        {
+        	NotImplemented("llRequestExperiencePermissions", "Not implemented at this moment");
+        }
+        
+        public LSL_Integer llSitOnLink( LSL_Key agent_id, LSL_Integer link )
+        {
+        	NotImplemented("llSitOnLink", "Not implemented at this moment");
+        	return 0;
+        }
+        
+        public LSL_Key llUpdateKeyValue( LSL_Key key, LSL_String value, LSL_Integer check, LSL_String original_value )
+        {
+        	NotImplemented("llUpdateKeyValue", "Not implemented at this moment");
+        	return UUID.Zero.ToString();
         }
         #endregion
     }
