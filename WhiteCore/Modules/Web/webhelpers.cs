@@ -568,6 +568,9 @@ namespace WhiteCore.Modules.Web
             foreach (var parcel in myParcels) {
                 var region = regionData.Get (parcel.LandData.RegionID, null);
 
+                if (region == null)     // something screwy here
+                    continue;
+                
                 // future proofing
                 if (region.IsForeign || region.IsHgRegion)
                     continue;
@@ -625,38 +628,42 @@ namespace WhiteCore.Modules.Web
                 {"selected", ""}
             });
 
+            #region user land
             if (user != null) {
                 var myParcels = directoryService.GetParcelByOwner (user.PrincipalID);
                 if (myParcels.Count > 0)
                     regionList.AddRange (ParcelLocations (myParcels, selParcel));
-            }
 
-            // Group owned parcels
-            regionList.Add (new Dictionary<string, object> {
-                {"Value", "---GROUP PARCELS---"},
-                {"Index","0"},
-                {"disabled","disabled"},
-                {"selected", ""}
-            });
 
-            if (groupService != null) {
-                var grpmembership = groupService.GetMembershipData (user.PrincipalID);
-                if (grpmembership != null) {
-                    foreach (var grp in grpmembership) {
-                        var groupParcels = directoryService.GetParcelByOwner (grp.GroupID);
-                        if (groupParcels.Count > 0)
-                            regionList.AddRange (ParcelLocations (groupParcels, selParcel));
+                // Group owned parcels
+                regionList.Add (new Dictionary<string, object> {
+                    {"Value", "---GROUP PARCELS---"},
+                    {"Index","0"},
+                    {"disabled","disabled"},
+                    {"selected", ""}
+                });
+
+                if (groupService != null) {
+                    var grpmembership = groupService.GetMembershipData (user.PrincipalID);
+                    if (grpmembership != null) {
+                        foreach (var grp in grpmembership) {
+                            var groupParcels = directoryService.GetParcelByOwner (grp.GroupID);
+                            if (groupParcels.Count > 0)
+                                regionList.AddRange (ParcelLocations (groupParcels, selParcel));
+                        }
                     }
                 }
-            }
 
-            // Private Estate parcels
-            regionList.Add (new Dictionary<string, object> {
-                {"Value", "---PRIVATE ESTATE PARCELS---"},
-                {"Index","0"},
-                {"disabled","disabled"},
-                {"selected", ""}
-            });
+                // Private Estate parcels
+                regionList.Add (new Dictionary<string, object> {
+                    {"Value", "---PRIVATE ESTATE PARCELS---"},
+                    {"Index","0"},
+                    {"disabled","disabled"},
+                    {"selected", ""}
+                });
+
+            }
+            #endregion
 
             // Public parcels
             regionList.Add (new Dictionary<string, object> {

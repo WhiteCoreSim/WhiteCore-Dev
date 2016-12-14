@@ -208,25 +208,27 @@ namespace WhiteCore.Modules.Web
                 if (requestParameters.ContainsKey ("NewRegion")) {
                     ISceneManager scenemanager = webInterface.Registry.RequestModuleInterface<ISceneManager> ();
                     if (scenemanager.CreateRegion (newRegion)) {
-                        IGridRegisterModule gridRegister = webInterface.Registry.RequestModuleInterface<IGridRegisterModule> ();
+                        response = "<h3>Successfully created region</h3>" +
+                            "<script language=\"javascript\">" +
+                            "setTimeout(function() {window.location.href = \"/?page=region_manager\";}, 2000);" +
+                            "</script>";
+                        return null;
+                    }
+                    response = "<h3>Error creating this region.</h3>";
+                    return null;
+                }
+/* not necessary??
+                     IGridRegisterModule gridRegister = webInterface.Registry.RequestModuleInterface<IGridRegisterModule> ();
                         if (gridRegister != null) {
                             if (gridRegister.RegisterRegionWithGrid (null, true, false, null)) {
-
-                                response = "<h3>Successfully created region</h3>" +
-                                    "<script language=\"javascript\">" +
-                                    "setTimeout(function() {window.location.href = \"/?page=region_manager\";}, 2000);" +
-                                    "</script>";
-                                return null;
+                        
                             }
-                        }
+                        
 
                         //                        response = "<h3>" + error + "</h3>";
                         response = "<h3> Error registering region with grid</h3>";
-                    } else
-                        response = "<h3>Error creating this region.</h3>";
-                    return null;
                 }
-
+*/
                 // update region details
                 var infoConnector = Framework.Utilities.DataManager.RequestPlugin<IRegionInfoConnector> ();
                 if (infoConnector != null) {

@@ -85,6 +85,14 @@ namespace WhiteCore.Modules.Web
             }
 
             UserAccount user = Authenticator.GetAuthentication (httpRequest);
+            if (user == null) {
+                response = "<h3>Error validating user details</h3>" +
+                    "<script language=\"javascript\">" +
+                    "setTimeout(function() {window.location.href = \"/?page=user_purchases\";}, 1000);" +
+                    "</script>";
+
+                return null;
+            }
 
             // Purchases Logs
             var timeNow = DateTime.Now.ToString ("HH:mm:ss");
@@ -93,7 +101,7 @@ namespace WhiteCore.Modules.Web
             TimeSpan period = dateTo.Subtract (dateFrom);
 
             var purchases = new List<AgentPurchase> ();
-            if (user != null && moneyModule != null)
+            if (moneyModule != null)
                 purchases = moneyModule.GetPurchaseHistory (user.PrincipalID, dateFrom, dateTo, null, null);
 
             // data

@@ -221,10 +221,12 @@ namespace WhiteCore.Services
             agentMap ["id"] = account.PrincipalID;
             agentMap ["is_display_name_default"] = isDefaultDisplayName (account.FirstName, account.LastName, account.Name,
                                                                        info == null ? account.Name : info.DisplayName);
-            if (m_update_days > 0)
-                agentMap ["display_name_next_update"] = OSD.FromDate (info.DisplayNameUpdated.AddDays (m_update_days));
-            else
-                agentMap ["display_name_next_update"] = OSD.FromDate (info.DisplayNameUpdated);
+            if (info != null) {
+                if (m_update_days > 0)
+                    agentMap ["display_name_next_update"] = OSD.FromDate (info.DisplayNameUpdated.AddDays (m_update_days));
+                else
+                    agentMap ["display_name_next_update"] = OSD.FromDate (info.DisplayNameUpdated);
+            }
 
             agents.Add (agentMap);
         }

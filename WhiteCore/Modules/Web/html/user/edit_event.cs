@@ -156,6 +156,14 @@ namespace WhiteCore.Modules.Web
             }
 
             eventData = directoryService.GetEventInfo (eid);
+            if (eventData == null) {
+                response = "<h3>Event details are not available</h3>" +
+                    "<script language=\"javascript\">" +
+                    "setTimeout(function() {window.location.href = \"/?page=user_events\";}, 1000);" +
+                    "</script>";
+
+                return null;
+            }
 
             // details
             vars.Add ("EventID", eventData.eventID);

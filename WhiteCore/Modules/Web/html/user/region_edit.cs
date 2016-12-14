@@ -205,7 +205,17 @@ namespace WhiteCore.Modules.Web
                 if (requestParameters.ContainsKey ("NewRegion")) {
                     ISceneManager scenemanager = webInterface.Registry.RequestModuleInterface<ISceneManager> ();
                     if (scenemanager.CreateRegion (newRegion)) {
-                        IGridRegisterModule gridRegister = webInterface.Registry.RequestModuleInterface<IGridRegisterModule> ();
+                        response = "<h3>Successfully created region</h3>" +
+                            "<script language=\"javascript\">" +
+                            "setTimeout(function() {window.location.href = \"/?page=region_manager\";}, 2000);" +
+                            "</script>";
+                        return null;
+                    }
+                    response = "<h3>Error creating this region.</h3>";
+                    return null;
+
+                    /* not required??
+                    IGridRegisterModule gridRegister = webInterface.Registry.RequestModuleInterface<IGridRegisterModule> ();
                         if (gridRegister != null) {
                             if (gridRegister.RegisterRegionWithGrid (null, true, false, null)) {
 
@@ -221,6 +231,7 @@ namespace WhiteCore.Modules.Web
                     } else
                         response = "<h3>Error creating this region.</h3>";
                     return null;
+                    */
                 }
 
                 // TODO:  This will not work yet  :)
