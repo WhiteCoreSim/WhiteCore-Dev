@@ -268,7 +268,7 @@ namespace WhiteCore.Simulation.Base
         /// </summary>
         public virtual void Startup()
         {
-            PrintFileToConsole (Path.Combine(DefaultDataPath,"startuplogo.txt"));
+            PrintFileToConsole (Path.Combine(DefaultDataPath, "../Config/startuplogo.txt"));
 
             MainConsole.Instance.InfoFormat ("[Mini WhiteCore-Sim]: Starting Mini WhiteCore-Sim ({0})...",
                                              (IntPtr.Size == 4 ? "x86" : "x64"));
@@ -420,7 +420,7 @@ namespace WhiteCore.Simulation.Base
                 string currentLine;
                 while ((currentLine = readFile.ReadLine()) != null)
                 {
-                    MainConsole.Instance.Info("[!]" + currentLine);
+                    MainConsole.Instance.CleanInfo(currentLine);
                 }
             }
         }
@@ -583,7 +583,7 @@ namespace WhiteCore.Simulation.Base
 
         public virtual void HandleShowInfo(IScene scene, string[] cmd)
         {
-            PrintFileToConsole (Path.Combine (m_defaultDataPath, "/startuplogo.txt"));
+            PrintFileToConsole (Path.Combine (m_defaultDataPath, "../Config/startuplogo.txt"));
 
             MainConsole.Instance.Info("Version: " + m_version);
             MainConsole.Instance.Info("Startup directory: " + Environment.CurrentDirectory);
