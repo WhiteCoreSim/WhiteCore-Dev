@@ -154,7 +154,7 @@ namespace WhiteCore.Framework.ClientInterfaces
         public AvatarAppearance(UUID avatarID, AvatarWearable[] wearables, Primitive.TextureEntry textureEntry,
                                 byte[] visualParams)
         {
-            //            MainConsole.Instance.WarnFormat("[AVATAR APPEARANCE] create initialized appearance for {0}",avatarID);
+            //            MainConsole.Instance.WarnFormat("[Avatar Appearance] create initialized appearance for {0}",avatarID);
 
             m_serial = 0;
             m_owner = avatarID;
@@ -187,7 +187,7 @@ namespace WhiteCore.Framework.ClientInterfaces
 
         public AvatarAppearance(AvatarAppearance appearance, bool copyWearables)
         {
-            //            MainConsole.Instance.WarnFormat("[AVATAR APPEARANCE] create from an existing appearance");
+            //            MainConsole.Instance.WarnFormat("[Avatar Appearance] create from an existing appearance");
 
             if (appearance == null)
             {
@@ -354,7 +354,7 @@ namespace WhiteCore.Framework.ClientInterfaces
                             ChangedTextures.Add(oldface.TextureID);
 
                     //                if (newface != null)
-                    //                    MainConsole.Instance.WarnFormat("[AVATAR APPEARANCE]: index {0}, new texture id {1}",i,newface.TextureID);
+                    //                    MainConsole.Instance.WarnFormat("[Avatar Appearance]: index {0}, new texture id {1}",i,newface.TextureID);
                 }
             }
 
@@ -729,9 +729,6 @@ namespace WhiteCore.Framework.ClientInterfaces
         {
             if ((data != null) && (data["serial"] != null))
                 m_serial = data["serial"].AsInteger();
-            if ((data != null) && (data["height"] != null))
-                //m_avatarHeight = (float) data["height"].AsReal();
-                SetSize (new Vector3 (0.45f, 0.6f, (float)data ["height"].AsReal ()));
 
 
             if ((data != null) && (data["owner"] != null))
@@ -749,7 +746,7 @@ namespace WhiteCore.Framework.ClientInterfaces
                 }
                 else
                 {
-                    MainConsole.Instance.Warn("[AVATAR APPEARANCE]: failed to unpack wearables");
+                    MainConsole.Instance.Warn("[Avatar Appearance]: failed to unpack wearables");
                 }
 
                 // Avatar Textures
@@ -768,7 +765,7 @@ namespace WhiteCore.Framework.ClientInterfaces
                 }
                 else
                 {
-                    MainConsole.Instance.Warn("[AVATAR APPEARANCE]: failed to unpack textures");
+                    MainConsole.Instance.Warn("[Avatar Appearance]: failed to unpack textures");
                 }
 
                 // Visual Parameters
@@ -780,7 +777,7 @@ namespace WhiteCore.Framework.ClientInterfaces
                 }
                 else
                 {
-                    MainConsole.Instance.Warn("[AVATAR APPEARANCE]: failed to unpack visual parameters");
+                    MainConsole.Instance.Warn("[Avatar Appearance]: failed to unpack visual parameters");
                 }
 
                 // Attachments
@@ -793,12 +790,16 @@ namespace WhiteCore.Framework.ClientInterfaces
                 }
                 if (data != null && data["wearableCache"] != null && data["wearableCache"] is OSDMap)
                     m_wearableCache = ((OSDMap)data["wearableCache"]).ConvertMap<UUID>((o) => o);
+
                 //SetHeight();
+                if ((data != null) && (data ["height"] != null))
+                    //m_avatarHeight = (float) data["height"].AsReal();
+                    SetSize (new Vector3 (0.45f, 0.6f, (float)data ["height"].AsReal ()));
 
             }
             catch (Exception e)
             {
-                MainConsole.Instance.ErrorFormat("[AVATAR APPEARANCE]: unpack failed badly: {0}, {1}", e.ToString(), OSDParser.SerializeJsonString(data));
+                MainConsole.Instance.ErrorFormat("[Avatar Appearance]: unpack failed badly: {0}, {1}", e.ToString(), OSDParser.SerializeJsonString(data));
             }
         }
 
