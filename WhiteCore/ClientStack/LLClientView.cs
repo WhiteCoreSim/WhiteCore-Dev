@@ -592,10 +592,10 @@ namespace WhiteCore.ClientStack
             // 03122016 Fly-man-
             // Turning this on to check why regions are taking
             // up so much memory after a user exits the region
-            MainConsole.Instance.DebugFormat("[Client] Memory on initiate {0}",startMem);
+            MainConsole.Instance.DebugFormat("[Client] Memory on initiate {0} mBytes",startMem / 1000000);
             var endMem = GC.GetTotalMemory(true);
-            MainConsole.Instance.DebugFormat("[Client] Memory on close {0}", endMem);
-            MainConsole.Instance.DebugFormat ("[Client] Memory released {0}", startMem - endMem);
+            MainConsole.Instance.DebugFormat("[Client] Memory on close {0} mBytes", endMem / 1000000);
+            MainConsole.Instance.DebugFormat ("[Client] Memory released {0} mBytes", (startMem - endMem) / 1000000);
         }
 
         public void Kick(string message)
