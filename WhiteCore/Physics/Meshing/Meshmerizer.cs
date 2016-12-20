@@ -34,6 +34,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using Nini.Config;
 using OpenMetaverse;
+using OpenMetaverse.Imaging;
 using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
@@ -203,8 +204,7 @@ namespace WhiteCore.Physics.Meshing
             using (MemoryStream outMs = new MemoryStream ()) {
                 using (ZOutputStream zOut = new ZOutputStream (outMs)) {
                     using (Stream inMs = new MemoryStream (meshBytes)) {
-                        byte [] readBuffer = new byte [2048];
-                        inMs.Read (readBuffer, 0, 2); // skip first 2 bytes in header
+                        byte [] readBuffer = new byte [meshBytes.Length];
                         int readLen;
 
                         while ((readLen = inMs.Read (readBuffer, 0, readBuffer.Length)) > 0) {
@@ -547,7 +547,22 @@ namespace WhiteCore.Physics.Meshing
                     return null;
 
                 try {
-                    idata = m_j2kDecoder.DecodeToImage (primShape.SculptData);
+                    //idata = m_j2kDecoder.DecodeToImage (primShape.SculptData);
+                    ManagedImage mImage;
+                    OpenJPEG.DecodeToImage (primShape.SculptData, out mImage);
+
+                    if (mImage == null) {
+                        // In some cases it seems that the decode can return a null bitmap without throwing an exception
+                        MainConsole.Instance.WarnFormat ("[Sculpt]: OpenJPEG decoded sculpt data for {0} to a null bitmap.  Ignoring.", primName);
+                        return null;
+                    }
+
+                    if ((mImage.Channels & ManagedImage.ImageChannels.Alpha) != 0)
+                        mImage.ConvertChannels (mImage.Channels & ~ManagedImage.ImageChannels.Alpha);
+
+                    Bitmap imgData = LoadTGAClass.LoadTGA (new MemoryStream (mImage.ExportTGA ()));
+                    idata = imgData;
+                    mImage = null;
 
                     if (idata != null && cacheSculptMaps &&
                         (cacheSculptAlphaMaps || (((ImageFlags)(idata.Flags) & ImageFlags.HasAlpha) == 0))) {
@@ -856,6 +871,11 @@ namespace WhiteCore.Physics.Meshing
             if (mesh != null) {
                 if ((!isPhysical) && size.X < minSizeForComplexMesh && size.Y < minSizeForComplexMesh && size.Z < minSizeForComplexMesh)
                     mesh = CreateBoundingBoxMesh (size, key);
+#if SPAM
+                    MainConsole.Instance.Debug("Meshmerizer: prim " + primName + " has a size of " + size.ToString() + " which is below threshold of " + 
+                            minSizeForComplexMesh.ToString() + " - creating simple bounding box");
+                    //mesh.DumpRaw(baseDir, primName, "Z extruded");
+#endif
 
 
                 // cache newly created mesh?
