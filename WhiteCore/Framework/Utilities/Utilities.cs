@@ -351,17 +351,16 @@ namespace WhiteCore.Framework.Utilities
 
                 WebClient webClient = new WebClient ();
                 try {
-                    //Ask what is my ip for it
-                    externalIp = utf8.GetString (webClient.DownloadData ("http://checkip.dyndns.org/"));
-                    //Remove the HTML stuff
-                    externalIp =
-                        externalIp.Remove (0, 76).Split (new string [] { "</body>" }, StringSplitOptions.RemoveEmptyEntries)
-                            [0];
+                    externalIp = utf8.GetString (webClient.DownloadData ("https://api.ipify.org"));
+
                     NetworkUtils.InternetSuccess ();
                 } catch (Exception) {
                     try {
-                        externalIp =
-                            utf8.GetString (webClient.DownloadData ("http://automation.whatismyip.com/n09230945.asp"));
+                        //Ask what is my ip for it
+                        externalIp = utf8.GetString (webClient.DownloadData ("http://checkip.dyndns.org/"));
+                        //Remove the HTML stuff - greythane- does assume the format will not change her
+                        externalIp = externalIp.Remove (0, 76).Split (
+                            new string [] { "</body>" }, StringSplitOptions.RemoveEmptyEntries) [0];
                         NetworkUtils.InternetSuccess ();
                     } catch (Exception iex) {
                         NetworkUtils.InternetFailure ();
