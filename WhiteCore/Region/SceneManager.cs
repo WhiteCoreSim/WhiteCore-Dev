@@ -1320,8 +1320,11 @@ namespace WhiteCore.Region
 
 			string sceneInfo;
 			var regInfo = scene.RegionInfo;
-			UserAccount EstateOwner;
-			EstateOwner = scene.UserAccountService.GetUserAccount (null, regInfo.EstateSettings.EstateOwner);
+            var ownerName = "Unknown";
+			var estateOwner = scene.UserAccountService.GetUserAccount (null, regInfo.EstateSettings.EstateOwner);
+            if (estateOwner != null)
+                ownerName = estateOwner.Name;
+                
 
 			if ((MainConsole.Instance.ConsoleScene == null) &&
 				(m_scenes.IndexOf (scene) == 0)) {
@@ -1345,7 +1348,7 @@ namespace WhiteCore.Region
 			sceneInfo += string.Format ("{0, -12}", regInfo.RegionSizeX + "x" + regInfo.RegionSizeY);
 			sceneInfo += string.Format ("{0, -8}", regInfo.RegionPort);
 			sceneInfo += string.Format ("{0, -20}", regInfo.EstateSettings.EstateName);
-			sceneInfo += string.Format ("{0, -20}", EstateOwner.Name);
+			sceneInfo += string.Format ("{0, -20}", ownerName);
 
 			MainConsole.Instance.CleanInfo (sceneInfo);
 
