@@ -566,9 +566,9 @@ namespace WhiteCore.Services.GenericServices.SystemEstateService
             UserAccount ownerAccount;
 
             // check for passed estate name
-            estateName = (cmd.Length < 3)
-                ? MainConsole.Instance.Prompt ("Estate to be deleted?", estateName)
-                : cmd [2];
+            estateName = (cmd.Length < 4)
+                ? MainConsole.Instance.Prompt ("Estate to be modified?", estateName)
+                : cmd [3];
             if (estateName == "")
                 return;
 
@@ -580,11 +580,13 @@ namespace WhiteCore.Services.GenericServices.SystemEstateService
             }
 
             // owner?
-            if (cmd.Length < 4) {
+            if (cmd.Length < 5) {
+                var newOwner = "Unknown";
                 UUID estateOwnerID = ES.EstateOwner;
                 ownerAccount = accountService.GetUserAccount (null, estateOwnerID);
-
-                estateOwner = MainConsole.Instance.Prompt ("New owner for this estate", ownerAccount.Name);
+                if (ownerAccount != null)
+                    newOwner = ownerAccount.Name;
+                estateOwner = MainConsole.Instance.Prompt ("New owner for this estate", newOwner);
             } else {
                 estateOwner = Util.CombineParams (cmd, 5); // in case of spaces in the name e.g. Allan Allard
             }
