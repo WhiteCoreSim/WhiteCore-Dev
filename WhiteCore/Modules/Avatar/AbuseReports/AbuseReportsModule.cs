@@ -90,11 +90,11 @@ namespace WhiteCore.Modules.AbuseReports
 
             string abuseInfo;
 
-            abuseInfo = String.Format ("{0, -8}", "Card");
-            abuseInfo += String.Format ("{0, -30}", "Category");
-            abuseInfo += String.Format ("{0, -30}", "Summary");
-            abuseInfo += String.Format ("{0, -20}", "Reporter");
-            abuseInfo += String.Format ("{0, -20}", "Assigned");
+            abuseInfo = string.Format ("{0, -8}", "Card");
+            abuseInfo += string.Format ("{0, -30}", "Category");
+            abuseInfo += string.Format ("{0, -30}", "Summary");
+            abuseInfo += string.Format ("{0, -20}", "Reporter");
+            abuseInfo += string.Format ("{0, -20}", "Assigned");
  
             MainConsole.Instance.CleanInfo (abuseInfo);
 
@@ -104,11 +104,11 @@ namespace WhiteCore.Modules.AbuseReports
             List<AbuseReport> abuseReports =  abuseConnector.GetAbuseReports(0, reports, true);
 
             foreach (AbuseReport rpt in abuseReports) {
-                abuseInfo = String.Format ("{0, -8}", rpt.Number);
-                abuseInfo += String.Format ("{0, -30}", rpt.Category.ToString().Substring(0,28));   
-                abuseInfo += String.Format ("{0, -30}", rpt.AbuseSummary);
-                abuseInfo += String.Format ("{0, -20}", rpt.ReporterName);
-                abuseInfo += String.Format ("{0, -12}", rpt.AssignedTo);
+                abuseInfo = string.Format ("{0, -8}", rpt.Number);
+                abuseInfo += string.Format ("{0, -30}", rpt.Category.ToString().Substring(0,28));   
+                abuseInfo += string.Format ("{0, -30}", rpt.AbuseSummary);
+                abuseInfo += string.Format ("{0, -20}", rpt.ReporterName);
+                abuseInfo += string.Format ("{0, -12}", rpt.AssignedTo);
 
                 MainConsole.Instance.CleanInfo (abuseInfo);
                 MainConsole.Instance.CleanInfo ("");
@@ -222,12 +222,10 @@ namespace WhiteCore.Modules.AbuseReports
                                          ScreenshotID = screenshotID
                                      };
 
-            if (objectID != UUID.Zero)
-            {
+            if (objectID != UUID.Zero) {
                 ISceneChildEntity Object = client.Scene.GetSceneObjectPart(objectID);
                 report.ObjectName = Object.Name;
-            }
-            else
+            } else
                 report.ObjectName = "";
 
             string[] detailssplit = details.Split('\n');
@@ -305,23 +303,20 @@ namespace WhiteCore.Modules.AbuseReports
             retVal["SendUserReport"] = retVal["SendUserReportWithScreenshot"];
 
             //Region Server bound
-            server.AddStreamHandler(new GenericStreamHandler("POST", retVal["SendUserReportWithScreenshot"],
-                                                             delegate(string path, Stream request,
-                                                                      OSHttpRequest httpRequest,
-                                                                      OSHttpResponse httpResponse)
-                                                             {
-                                                                 return ProcessSendUserReportWithScreenshot(agentID, path, request,
-                                                                                            httpRequest,
-                                                                                            httpResponse);
-                                                             }));
+            server.AddStreamHandler(new GenericStreamHandler(
+                "POST", retVal["SendUserReportWithScreenshot"],delegate(
+                    string path, Stream request,OSHttpRequest httpRequest,OSHttpResponse httpResponse) {
+                    return ProcessSendUserReportWithScreenshot(agentID, path, request, httpRequest,httpResponse);
+                }
+            ));
 
             return retVal;
         }
 
-         byte[] ProcessSendUserReportWithScreenshot(UUID AgentID, string path, Stream request, OSHttpRequest httpRequest,
-                                          OSHttpResponse httpResponse) 
+        byte[] ProcessSendUserReportWithScreenshot(UUID agentID, string path, Stream request,
+                                                   OSHttpRequest httpRequest, OSHttpResponse httpResponse) 
         {
-            IScenePresence SP = findScenePresence(AgentID);
+            IScenePresence SP = findScenePresence(agentID);
             OSDMap map = (OSDMap)OSDParser.DeserializeLLSDXml(HttpServerHandlerHelpers.ReadFully(request));
             //string RegionName = map["abuse-region-name"];
 
@@ -376,9 +371,10 @@ namespace WhiteCore.Modules.AbuseReports
         {
             public event UploadedAbuseTexture OnUpLoad;
             UploadedAbuseTexture handlerUpLoad;
-            UUID m_agentID, m_assetID;
+            readonly UUID m_agentID;
+            readonly UUID m_assetID;
 
-            readonly string uploaderPath = String.Empty;
+            readonly string uploaderPath = string.Empty;
 
             public AbuseTextureUploader(string path, UUID agentID, UUID assetID)
             {
