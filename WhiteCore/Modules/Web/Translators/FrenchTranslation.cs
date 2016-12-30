@@ -35,6 +35,10 @@ namespace WhiteCore.Modules.Web.Translators
             get { return "fr"; }
         }
 
+        public string FullLanguageName {
+            get { return "French"; }
+        }
+
         public string GetTranslatedString (string key)
         {
             if (dictionary.ContainsKey (key))
@@ -42,7 +46,7 @@ namespace WhiteCore.Modules.Web.Translators
             return ":" + key + ":";
         }
 
-        readonly Dictionary<string, string> dictionary = new Dictionary<string, string> {
+        Dictionary<string, string> dictionary = new Dictionary<string, string> {
             // Generic
             { "No", "Non"},
             { "Yes", "Oui"},
@@ -523,7 +527,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "Pages", "Pages"},
             { "UpdateRequired", "mise à jour requise"},
             { "DefaultsUpdated",
-                    "Mise à jour par défaut, rendez-vous sur \"Réinitialiseré\" ou \"Gestionnaire de paramètres\" pour désactiver cet avertissement."},
+                    "Mise à jour par défaut, rendez-vous sur 'Réinitialiseré' ou 'Gestionnaire de paramètres' pour désactiver cet avertissement."},
 
             // Page_manager
             { "PageManager", "Gestionnaire de Pages"},
@@ -653,5 +657,18 @@ namespace WhiteCore.Modules.Web.Translators
             { "nl", "Nederlands"},
             { "ru", "Русский"}
         };
+
+
+        public void Serialize (string basePath)
+        {
+            TranslatorSerialization.Serialize (basePath, FullLanguageName, LanguageName, dictionary);
+        }
+
+        public void Deserialize (string basePath)
+        {
+            var newdict = TranslatorSerialization.Deserialize(basePath, LanguageName);
+            if (newdict.Count > 0)
+                dictionary = newdict;
+        }
     }
 }

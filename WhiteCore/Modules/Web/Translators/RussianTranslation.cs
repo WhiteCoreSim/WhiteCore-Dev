@@ -36,6 +36,10 @@ namespace WhiteCore.Modules.Web.Translators
         }
 
 
+        public string FullLanguageName {
+            get { return "Russian"; }
+        }
+
         public string GetTranslatedString (string key)
         {
             if (dictionary.ContainsKey (key))
@@ -43,7 +47,7 @@ namespace WhiteCore.Modules.Web.Translators
             return ":" + key + ":";
         }
 
-        readonly Dictionary<string, string> dictionary = new Dictionary<string, string> {
+        Dictionary<string, string> dictionary = new Dictionary<string, string> {
             // general
             { "No", "Нет"},
             { "Yes", "Да"},
@@ -137,7 +141,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "AvatarNameError", "Вы не ввели имя аватара!"},
             { "AvatarPasswordError", "Поля пароля пустые или не совпадают!"},
             { "AvatarEmailError", "Адрес электронной почты необходим для восстановления пароля!"},
-            { "AvatarNameSpacingError", "Имя аватара должно быть \"Имя Фамилия\"!"},
+            { "AvatarNameSpacingError", "Имя аватара должно быть 'Имя Фамилия'!"},
 
             // News
             { "OpenNewsManager", "Открыть управление новостями"},
@@ -654,5 +658,16 @@ namespace WhiteCore.Modules.Web.Translators
 
         };
 
+        public void Serialize (string basePath)
+        {
+            TranslatorSerialization.Serialize (basePath, FullLanguageName, LanguageName, dictionary);
+        }
+
+        public void Deserialize (string basePath)
+        {
+            var newdict = TranslatorSerialization.Deserialize (basePath, LanguageName);
+            if (newdict.Count > 0)
+                dictionary = newdict;
+        }
     }
 }

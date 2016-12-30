@@ -31,6 +31,10 @@ namespace WhiteCore.Modules.Web
     public interface ITranslator
     {
         string LanguageName { get; }
+        string FullLanguageName { get; }
         string GetTranslatedString (string key);
+
+        void Serialize (string basePath);
+        void Deserialize (string basePath);
     }
 }

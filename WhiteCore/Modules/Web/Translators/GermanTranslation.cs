@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) Contributors, http://whitecore-sim.org
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
@@ -35,6 +35,10 @@ namespace WhiteCore.Modules.Web.Translators
             get { return "de"; }
         }
 
+        public string FullLanguageName {
+            get { return "Deutsch"; }
+        }
+
         public string GetTranslatedString (string key)
         {
             if (dictionary.ContainsKey (key))
@@ -42,7 +46,7 @@ namespace WhiteCore.Modules.Web.Translators
             return ":" + key + ":";
         }
 
-        readonly Dictionary<string, string> dictionary = new Dictionary<string, string> {
+        Dictionary<string, string> dictionary = new Dictionary<string, string> {
             // Generic
             {"No", "nein"},
             {"Yes", "ja"},
@@ -51,7 +55,7 @@ namespace WhiteCore.Modules.Web.Translators
             {"Save", "Speichern"},
             { "Cancel", "Stornieren"},
             {"FirstText", "Erste"},
-            {"BackText", "Zurück"},
+            {"BackText", "ZurÃ¼ck"},
             {"NextText", "Vor"},
             {"LastText", "Letzte"},
             {"CurrentPageText", "Aktuelle Seite"},
@@ -66,7 +70,7 @@ namespace WhiteCore.Modules.Web.Translators
             {"NotesText", "Aufzeichnungen"},
             {"SaveUpdates", "Sparen Sie Aktuelles"},
             {"ActiveText", "Activ"},
-            {"CheckedText", "Geprüft"},
+            {"CheckedText", "GeprÃ¼ft"},
             {"CategoryText", "Kategorie"},
             {"SummaryText", "Zusammenfassung"},
             { "MaturityText", "Maturity"},
@@ -105,17 +109,17 @@ namespace WhiteCore.Modules.Web.Translators
             {"UserNameText", "Nutzername"},
             {"Password", "Passwort"},
             {"PasswordText", "Passwort"},
-            {"PasswordConfirmation", "Passwort Bestätigung"},
+            {"PasswordConfirmation", "Passwort BestÃ¤tigung"},
             {"ForgotPassword", "Passwort vergessen?"},
-            { "TypeUserNameToConfirm", "Bitte schreibe den Namen des Benutzers wenn du ihn wirklich löschen willst"},
+            { "TypeUserNameToConfirm", "Bitte schreibe den Namen des Benutzers wenn du ihn wirklich lÃ¶schen willst"},
 
             // Special windows
             {"SpecialWindowTitleText", "Spezieller Title des Info Fensters"},
             {"SpecialWindowTextText", "Spezieller Text des Info Fensters"},
             {"SpecialWindowColorText", "Spezielle Farbe des Info Fensters"},
             {"SpecialWindowStatusText", "Spezieller Status des Info Fensters"},
-            {"WelcomeScreenManagerFor", "Willkommen Ansichtsmanager für"},
-            {"ChangesSavedSuccessfully", "Änderungen erfolgreich gespeichert"},
+            {"WelcomeScreenManagerFor", "Willkommen Ansichtsmanager fÃ¼r"},
+            {"ChangesSavedSuccessfully", "Ãnderungen erfolgreich gespeichert"},
 
             // User registration
             {"AvatarNameText", "Avatar Name"},
@@ -130,37 +134,37 @@ namespace WhiteCore.Modules.Web.Translators
             {"UserEmailText", "Dein Email"},
             {"UserHomeRegionText", "Heimatregion"},
             {"RegistrationText", "Avatar Registrierung"},
-            {"RegistrationsDisabled", "Registrationen sind zur Zeit leider nicht möglich, bitte versuche es später erneut."},
+            {"RegistrationsDisabled", "Registrationen sind zur Zeit leider nicht mÃ¶glich, bitte versuche es spÃ¤ter erneut."},
             {"TermsOfServiceText", "Nutzungsbedingungen"},
             {"TermsOfServiceAccept", "akzeptieren Sie die Nutzungsbedinungen, wie oben beschrieben?"},
             {"AvatarNameError", "Sie haben keinen Avatar Namen!"},
             {"AvatarPasswordError", "Passwort darf nicht leer sein!"},
-            {"AvatarEmailError", "Eine E-Mail Adresse ist für die Passwort Wiederherstellung erforderlich! ('none', wenn unbekannt)"},
+            {"AvatarEmailError", "Eine E-Mail Adresse ist fÃ¼r die Passwort Wiederherstellung erforderlich! ('none', wenn unbekannt)"},
             {"AvatarNameSpacingError", "Ihr Avatar Name sollte 'Vorname Nachname' sein!"},
 
             // News
-            {"OpenNewsManager", "Öffne den Nachrichten Manager"},
+            {"OpenNewsManager", "Ãffne den Nachrichten Manager"},
             {"NewsManager", "Nachrichten Manager"},
             {"EditNewsItem", "Bearbeite Nachrichten"},
-            {"AddNewsItem", "Neue Nachrichten hinzufügen"},
-            {"DeleteNewsItem", "Nachrichten löschen"},
+            {"AddNewsItem", "Neue Nachrichten hinzufÃ¼gen"},
+            {"DeleteNewsItem", "Nachrichten lÃ¶schen"},
             {"NewsDateText", "Nachrichten Datum"},
             {"NewsTitleText", "Nachrichten Titel Text"},
             {"NewsItemTitle", "Nachrichten Titel"},
             {"NewsItemText", "Nachrichten Text"},
-            {"AddNewsText", "Nachrichten hinzufügen"},
-            {"DeleteNewsText", "Nachrichten Löschen"},
+            {"AddNewsText", "Nachrichten hinzufÃ¼gen"},
+            {"DeleteNewsText", "Nachrichten LÃ¶schen"},
             {"EditNewsText", "Nachrichten bearbeiten"},
 
             // User profile
-            {"UserProfileFor", "Benutzerprofil für"},
+            {"UserProfileFor", "Benutzerprofil fÃ¼r"},
             {"UsersGroupsText", "Gruppe beigetreten"},
             {"GroupNameText", "Gruppe"},
-            {"UsersPicksText", "Tipps für die"},
+            {"UsersPicksText", "Tipps fÃ¼r die"},
             {"ResidentSince", "Einwohner seit"},
             {"AccountType", "Kontotyp"},
             {"PartnersName", "Name des Partners"},
-            {"AboutMe", "über mich"},
+            {"AboutMe", "Ã¼ber mich"},
             {"IsOnlineText", "User Status"},
             {"OnlineLocationText", "User Location"},
             { "Partner", "Partner"},
@@ -171,9 +175,9 @@ namespace WhiteCore.Modules.Web.Translators
 
             // Region Information
             {"RegionInformationText", "Region Information"},
-            {"OwnerNameText", "Eigentümer"},
+            {"OwnerNameText", "EigentÃ¼mer"},
             {"RegionLocationText", "Region Lage"},
-            {"RegionSizeText", "Region Größe"},
+            {"RegionSizeText", "Region GrÃ¶Ãe"},
             {"RegionNameText", "Region Name"},
             {"RegionTypeText", "Region Art"},
             { "RegionPresetTypeText", "Region Type"},
@@ -182,7 +186,7 @@ namespace WhiteCore.Modules.Web.Translators
             {"RegionTerrainText", "Region Terrain"},
             {"ParcelsInRegionText", "Parzellen In der Region"},
             {"ParcelNameText", "Parzellen Name"},
-            {"ParcelOwnerText", "Parzellen Eigentümer"},
+            {"ParcelOwnerText", "Parzellen EigentÃ¼mer"},
 
             // Region list
             {"RegionInfoText", "Region Info"},
@@ -193,7 +197,7 @@ namespace WhiteCore.Modules.Web.Translators
             {"SortByLocY", "nach RegionY sortieren"},
             {"SortByName", "nach Regionsnamen sortieren"},
             {"RegionMoreInfo", "Mehr Informationen"},
-            {"RegionMoreInfoTooltips", "Mehr Informationen über"},
+            {"RegionMoreInfoTooltips", "Mehr Informationen Ã¼ber"},
             {"OnlineUsersText", "Online Benutzer"},
             { "OnlineFriendsText", "Online Friends"},
             {"RegionOnlineText", "Region Status"},
@@ -205,8 +209,8 @@ namespace WhiteCore.Modules.Web.Translators
             { "Mainland", "Festland"},
             { "Estate", "Gut"},
             { "FullRegion", "Voll Region"},
-            { "Homestead", "Heimst�tte"},
-            { "Openspace", "Freifl�che"},
+            { "Homestead", "Heimstätte"},
+            { "Openspace", "Freifläche"},
             { "Flatland", "Flachland"},
             { "Grassland", "Wiese"},
             { "Island", "Insel"},
@@ -217,14 +221,14 @@ namespace WhiteCore.Modules.Web.Translators
             { "RegionInfiniteText", "Unendliche Region"},
             { "RegionCapacityText", "Region Prims"},
             { "NormalText", "Normal"},
-            { "DelayedText", "Versp�tet"},
+            { "DelayedText", "Verspätet"},
 
             // Estate management
             {"AddEstateText", "In Immobilien"},
             {"EstateText", "Gut"},
-            {"EstatesText", "L�ndereien"},
+            {"EstatesText", "Ländereien"},
             {"PricePerMeterText", "Preis pro Quadratmeter"},
-            {"PublicAccessText", "�ffentlicher Zugang"},
+            {"PublicAccessText", "Öffentlicher Zugang"},
             {"AllowVoiceText", "Lassen Stimme"},
             {"TaxFreeText", "Steuerfrei"},
             {"AllowDirectTeleportText", "Lassen Sie direkte teleporting"},
@@ -246,13 +250,13 @@ namespace WhiteCore.Modules.Web.Translators
             {"MenuChat", "Chat"},
             {"MenuHelp", "Hilfe"},
             { "MenuViewerHelp", "Viewer Hilfe"},
-            {"MenuChangeUserInformation", "Ändere Benutzer Informationen"},
+            {"MenuChangeUserInformation", "Ãndere Benutzer Informationen"},
             {"MenuWelcomeScreenManager", "Willkommens Bildschirm Manager"},
             {"MenuNewsManager", "Nachrichten Manager"},
             {"MenuUserManager", "Benutzer Manager"},
-            {"MenuFactoryReset", "Zurücksetzen"},
-            {"ResetMenuInfoText", "Setzt das Menü auf die meist üblichen Standardwerte zurück"},
-            {"ResetSettingsInfoText", "Setzt die Webinterface Einstellungen auf die meist üblichen Standardwerte zurück"},
+            {"MenuFactoryReset", "ZurÃ¼cksetzen"},
+            {"ResetMenuInfoText", "Setzt das MenÃ¼ auf die meist Ã¼blichen Standardwerte zurÃ¼ck"},
+            {"ResetSettingsInfoText", "Setzt die Webinterface Einstellungen auf die meist Ã¼blichen Standardwerte zurÃ¼ck"},
             {"MenuPageManager", "Seitenmanager"},
             {"MenuSettingsManager", "Einstellungsmanager"},
             {"MenuManager", "Management"},
@@ -260,10 +264,10 @@ namespace WhiteCore.Modules.Web.Translators
             {"MenuRegionManager", "Region-Manager"},
             { "MenuEstateManager", "Estate Manager"},
             {"MenuManagerSimConsole", "Simulator-Konsole"},
-            {"MenuPurchases", "Benutzer Einkäufe"},
-            {"MenuMyPurchases", "Meine Käufe"},
+            {"MenuPurchases", "Benutzer EinkÃ¤ufe"},
+            {"MenuMyPurchases", "Meine KÃ¤ufe"},
             {"MenuTransactions", "Benutzertransaktionen"},
-            {"MenuMyTransactions", "Meine Vorgänge"},
+            {"MenuMyTransactions", "Meine VorgÃ¤nge"},
             { "MenuClassifieds", "Classifieds"},
             {"MenuMyClassifieds", "Meine Classifieds <NT>"},
             { "MenuEvents", "Events"},
@@ -287,11 +291,11 @@ namespace WhiteCore.Modules.Web.Translators
             {"TooltipsMenuChat", "Chat"},
             {"TooltipsMenuViewerHelp", "Hilfe"},
             { "TooltipsMenuHelp", "Help"},
-            {"TooltipsMenuChangeUserInformation", "Benutzerinformationen ändern"},
+            {"TooltipsMenuChangeUserInformation", "Benutzerinformationen Ã¤ndern"},
             {"TooltipsMenuWelcomeScreenManager", "Willkommen Screen Manager"},
             {"TooltipsMenuNewsManager", "Nachrichten Manager"},
             {"TooltipsMenuUserManager", "Benutzermanager"},
-            {"TooltipsMenuFactoryReset", "Zurücksetzen"},
+            {"TooltipsMenuFactoryReset", "ZurÃ¼cksetzen"},
             {"TooltipsMenuPageManager", "Seitenmanager"},
             {"TooltipsMenuSettingsManager", "Einstellungsmanager"},
             {"TooltipsMenuManager", "Admin Management"},
@@ -324,7 +328,7 @@ namespace WhiteCore.Modules.Web.Translators
             {"TooltipsMenuPicks", "Benutzer Picks"},
             {"TooltipsMenuRegions", "Benutzer Regionen"},
             {"UserGroupNameText", "Benutzergruppe"},
-            {"PickNameText", "Wählen Sie Namen"},
+            {"PickNameText", "WÃ¤hlen Sie Namen"},
             {"PickRegionText", "Lage"},
 
             // Urls
@@ -337,7 +341,7 @@ namespace WhiteCore.Modules.Web.Translators
             // Index
             {"HomeText", "Startseite"},
             {"HomeTextWelcome", "Dies ist unsere neue virtuelle Welt! besuche uns jetzt und erkenne den Unterschied!"},
-            {"HomeTextTips", "Neue Präsentationen"},
+            {"HomeTextTips", "Neue PrÃ¤sentationen"},
             {"WelcomeToText", "Willkommen bei"},
 
             // World Map
@@ -356,20 +360,20 @@ namespace WhiteCore.Modules.Web.Translators
             {"LoggedOutSuccessfullyText", "Du hast dich erfolgreich abgemeldet."},
 
             //Change user information page
-            {"ChangeUserInformationText", "Ändere Benutzer Informationen"},
-            {"ChangePasswordText", "Passwort ändern"},
+            {"ChangeUserInformationText", "Ãndere Benutzer Informationen"},
+            {"ChangePasswordText", "Passwort Ã¤ndern"},
             {"NewPasswordText", "Neues Passwort"},
-            {"NewPasswordConfirmationText", "Neues Passwort bestätigen"},
-            {"ChangeEmailText", "Ändere Email Adresse"},
+            {"NewPasswordConfirmationText", "Neues Passwort bestÃ¤tigen"},
+            {"ChangeEmailText", "Ãndere Email Adresse"},
             {"NewEmailText", "Neue Email Adresse"},
-            {"DeleteUserText", "Meinen Account löschen"},
-            {"DeleteText", "löschen"},
+            {"DeleteUserText", "Meinen Account lÃ¶schen"},
+            {"DeleteText", "lÃ¶schen"},
             {"DeleteUserInfoText",
-                    "Das wird alle Informationen im Grid über dich und deinen Zugang zu diesem Dienst entfernen. Um dies abzuschließen gebe hier deinen Benutzernamen und Passwort ein und drücke auf löschen."},
+                    "Das wird alle Informationen im Grid Ã¼ber dich und deinen Zugang zu diesem Dienst entfernen. Um dies abzuschlieÃen gebe hier deinen Benutzernamen und Passwort ein und drÃ¼cke auf lÃ¶schen."},
             {"EditUserAccountText", "bearbeite Benutzer Account"},
 
             // Maintenance
-            {"WebsiteDownInfoText", "Die Website ist zur Zeit nicht erreichbar, bitte versuche es später noch einmal."},
+            {"WebsiteDownInfoText", "Die Website ist zur Zeit nicht erreichbar, bitte versuche es spÃ¤ter noch einmal."},
             {"WebsiteDownText", "Website offline"},
 
             // Http 404
@@ -387,24 +391,24 @@ namespace WhiteCore.Modules.Web.Translators
             {"SearchText", "Suche"},
             {"SearchForUserText", "Suche nach einen Benutzer"},
             {"UserSearchText", "Benutzersuche"},
-            {"SearchResultForUserText", "Suchergebnis für Benutzer"},
+            {"SearchResultForUserText", "Suchergebnis fÃ¼r Benutzer"},
 
             // Region_search
             {"SearchForRegionText", "Suche nach einer Region"},
             {"RegionSearchText", "Region Suche"},
-            {"SearchResultForRegionText", "Suchergebnis für Region"},
+            {"SearchResultForRegionText", "Suchergebnis fÃ¼r Region"},
 
             // Edit user
-            {"AdminDeleteUserText", "Benutzer löschen"},
-            {"AdminDeleteUserInfoText", "Dies löscht den Account und zerstört alle damit verbundenen Daten."},
+            {"AdminDeleteUserText", "Benutzer lÃ¶schen"},
+            {"AdminDeleteUserInfoText", "Dies lÃ¶scht den Account und zerstÃ¶rt alle damit verbundenen Daten."},
             {"BanText", "Sperren"},
             {"UnbanText", "entsperren"},
-            {"AdminTempBanUserText", "vorübergehender Benutzer Ban"},
-            {"AdminTempBanUserInfoText", "Dies verhindert, daß sich der Benutzer für eine bestimmte Zeit anmelden kann."},
+            {"AdminTempBanUserText", "vorÃ¼bergehender Benutzer Ban"},
+            {"AdminTempBanUserInfoText", "Dies verhindert, daÃ sich der Benutzer fÃ¼r eine bestimmte Zeit anmelden kann."},
             {"AdminBanUserText", "Benutzer sperren"},
-            {"AdminBanUserInfoText", "Dies verhindert, daß sich der Benutzer bis er entsperrt wurde nicht anmelden kann."},
+            {"AdminBanUserInfoText", "Dies verhindert, daÃ sich der Benutzer bis er entsperrt wurde nicht anmelden kann."},
             {"AdminUnbanUserText", "Benutzer entsperren"},
-            {"AdminUnbanUserInfoText", "entferne temporäre und ständige sperren des Benutzers."},
+            {"AdminUnbanUserInfoText", "entferne temporÃ¤re und stÃ¤ndige sperren des Benutzers."},
             {"AdminLoginInAsUserText", "als Benutzer anmelden"},
             {"AdminLoginInAsUserInfoText",
                      "Dein Admin Account wird nun abgemeldet, dieser Benutzer wird angemeldet und du wirst sehen was sie sehen."},
@@ -420,7 +424,7 @@ namespace WhiteCore.Modules.Web.Translators
 
             // Transactions
             {"TransactionsText", "Transaktionen"},
-            {"DateInfoText", "Wählen Sie einen Datumsbereich"},
+            {"DateInfoText", "WÃ¤hlen Sie einen Datumsbereich"},
             {"DateStartText", "Beginn Datum"},
             {"DateEndText", "Ende"},
             {"30daysPastText", "Letzten 30 Tagen"},
@@ -431,9 +435,9 @@ namespace WhiteCore.Modules.Web.Translators
             {"TransactionAmountText", "Menge"},
             {"TransactionBalanceText", "Guthaben"},
             {"NoTransactionsText", "Keine Transaktionen gefunden..."},
-            {"PurchasesText", "Einkäufe"},
+            {"PurchasesText", "EinkÃ¤ufe"},
             {"LoggedIPText", "Gespeichert IP-Adresse"},
-            {"NoPurchasesText", "Keine Einkäufe gefunden..."},
+            {"NoPurchasesText", "Keine EinkÃ¤ufe gefunden..."},
             {"PurchaseCostText", "Kosten"},
             
             // Classifieds
@@ -441,7 +445,7 @@ namespace WhiteCore.Modules.Web.Translators
             { "ClassifiedText", "Classified"},
             { "ListedByText", " Eingetragen von"},
             { "CreationDateText", "Erstellungsdatun"},
-            { "ExpirationDateText", "Läuft aus am" },
+            { "ExpirationDateText", "LÃ¤uft aus am" },
             { "DescriptionText", "Beschreibung" },
             { "PriceOfListingText", "Kosten"},
 
@@ -453,10 +457,10 @@ namespace WhiteCore.Modules.Web.Translators
             { "CatPropertyRental", "Eigentums Miete"},
             { "CatSpecialAttraction", "Besondere Attraktion"},
             { "CatNewProducts", "Neue Produkte"},
-            { "CatEmployment", "Beschäftigung"},
+            { "CatEmployment", "BeschÃ¤ftigung"},
             { "CatWanted", "Gesucht"},
             { "CatService", "Service"},
-            { "CatPersonal", "Persönlich"},
+            { "CatPersonal", "PersÃ¶nlich"},
            
             // Events
             { "EventsText", "Events"},
@@ -464,29 +468,29 @@ namespace WhiteCore.Modules.Web.Translators
             { "EventLocationText", "Wo"},
             { "HostedByText","Angeboten von"},
             { "EventDateText", "Wann"},
-            { "EventTimeInfoText", "Event sollte mit Server Zeit übereinstimmen"},
-            { "CoverChargeText", "Eintrittsgebühr"},
+            { "EventTimeInfoText", "Event sollte mit Server Zeit Ã¼bereinstimmen"},
+            { "CoverChargeText", "EintrittsgebÃ¼hr"},
             { "DurationText", "Dauer"},
-            { "AddEventText", "Event Hinzufügen"},
+            { "AddEventText", "Event HinzufÃ¼gen"},
 
             // Event categories
-            { "CatDiscussion", "Gespräche"},
+            { "CatDiscussion", "GesprÃ¤che"},
             { "CatSports", "Sport"},
             { "CatLiveMusic", "Live Musik"},
-            { "CatCommercial", "Geschäfftlich"},
+            { "CatCommercial", "GeschÃ¤fftlich"},
             { "CatEntertainment", "Nightlife/Entertainment"},
             { "CatGames", "Spiele/Wettbewerbe"},
             { "CatPageants", "Prunk"},
             { "CatEducation", "Ausbildung"},
             { "CatArtsCulture", "Kunst/Kultue"},
-            { "CatCharitySupport", "Wohltätigkeit/Unterstützungs Gruppe"},
+            { "CatCharitySupport", "WohltÃ¤tigkeit/UnterstÃ¼tzungs Gruppe"},
             { "CatMiscellaneous", "Verschiedenes"},
 
             // Event lookup periods
-            { "Next24Hours", "Nächsten 24 Stunden"},
-            { "Next10Hours", "Nächsten 12 Stunden"},
+            { "Next24Hours", "NÃ¤chsten 24 Stunden"},
+            { "Next10Hours", "NÃ¤chsten 12 Stunden"},
             { "Next4Hours", "N#chsten 4 Stunden"},
-            { "Next2Hours", "Nächsten 2 Stunden"},
+            { "Next2Hours", "NÃ¤chsten 2 Stunden"},
 
             // Sim Console
             {"SimConsoleText", "Sim Befehls Konsole"},
@@ -503,7 +507,7 @@ namespace WhiteCore.Modules.Web.Translators
             {"MemoryUseageText", "Speichernutzung"},
             {"PingTimeText", "Ping-Zeit"},
             {"AgentsInViewText", "Agents im Blick"},
-            {"ClearStatsText", "Klare Statistiken über"},
+            {"ClearStatsText", "Klare Statistiken Ã¼ber"},
 
             // Abuse reports
             {"MenuAbuse", "Missbrauch Berichte"},
@@ -514,9 +518,9 @@ namespace WhiteCore.Modules.Web.Translators
             {"AssignedToText", "Zugewiesen"},
 
             // Factory_reset
-            {"FactoryReset", "Zurücksetzen"},
-            {"ResetMenuText", "Menü zum Zurücksetzen auf Werkseinstellungen"},
-            {"ResetSettingsText", "Zurücksetzen der Webeinstellungen (Einstellungsmanager Seite) zu den Werkseinstellungen"},
+            {"FactoryReset", "ZurÃ¼cksetzen"},
+            {"ResetMenuText", "MenÃ¼ zum ZurÃ¼cksetzen auf Werkseinstellungen"},
+            {"ResetSettingsText", "ZurÃ¼cksetzen der Webeinstellungen (Einstellungsmanager Seite) zu den Werkseinstellungen"},
             {"Reset", "Reset"},
             {"Settings", "Einstellungen"},
             {"Pages", "Seiten"},
@@ -526,19 +530,19 @@ namespace WhiteCore.Modules.Web.Translators
 
             // Page_manager
             {"PageManager", "Seitenmanager"},
-            {"SaveMenuItemChanges", "Speichere Menüpunkt"},
-            {"SelectItem", "Punkt Auswählen"},
-            {"DeleteItem", "Punkt löschen"},
-            {"AddItem", "Punkt hinzufügen"},
+            {"SaveMenuItemChanges", "Speichere MenÃ¼punkt"},
+            {"SelectItem", "Punkt AuswÃ¤hlen"},
+            {"DeleteItem", "Punkt lÃ¶schen"},
+            {"AddItem", "Punkt hinzufÃ¼gen"},
             {"PageLocationText", "Seitenlage"},
             {"PageIDText", "Seiten ID"},
             {"PagePositionText", "Seitenposition"},
             {"PageTooltipText", "Seiten Tooltip"},
             {"PageTitleText", "Seitentitel"},
-            {"RequiresLoginText", "Benötigt Anmeldung für Anzeige"},
-            {"RequiresLogoutText", "Benötigt Abmeldung für Anzeige"},
+            {"RequiresLoginText", "BenÃ¶tigt Anmeldung fÃ¼r Anzeige"},
+            {"RequiresLogoutText", "BenÃ¶tigt Abmeldung fÃ¼r Anzeige"},
             { "RequiresAdminText", "Requires Admin To View"},
-            {"RequiresAdminLevelText", "Benötigt Adminrechte für Anzeige"},
+            {"RequiresAdminLevelText", "BenÃ¶tigt Adminrechte fÃ¼r Anzeige"},
 
             // Grid settings
             {"GridSettingsManager", "Grid Einstellungs Manager"},
@@ -557,8 +561,8 @@ namespace WhiteCore.Modules.Web.Translators
             {"GridCenterXText", "Grid Center Location X"},
             {"GridCenterYText", "Grid Center Location Y"},
             {"SettingsManager", "Settingsmanager"},
-            {"IgnorePagesUpdatesText", "Ignoriere Seitenupdate Warnung bis zum nächsten Update"},
-            {"IgnoreSettingsUpdatesText", "Ignoriere Einstellungsupdate Warnung bis zum nächsten Update"},
+            {"IgnorePagesUpdatesText", "Ignoriere Seitenupdate Warnung bis zum nÃ¤chsten Update"},
+            {"IgnoreSettingsUpdatesText", "Ignoriere Einstellungsupdate Warnung bis zum nÃ¤chsten Update"},
             {"HideLanguageBarText", "Sprachauswahlleiste ausblenden"},
             {"HideStyleBarText", "Stil Auswahlleiste ausblenden"},
             {"HideSlideshowBarText", "Ausblenden Diashow bar"},
@@ -583,7 +587,7 @@ namespace WhiteCore.Modules.Web.Translators
 
             {"Jan_Short", "Jan"},
             {"Feb_Short", "Feb"},
-            {"Mar_Short", "Mär"},
+            {"Mar_Short", "MÃ¤r"},
             {"Apr_Short", "Apr"},
             {"May_Short", "Mai"},
             {"Jun_Short", "Jun"},
@@ -596,7 +600,7 @@ namespace WhiteCore.Modules.Web.Translators
 
             {"January", "Januar"},
             {"February", "Februar"},
-            {"March", "März"},
+            {"March", "MÃ¤rz"},
             {"April", "April"},
             {"May", "Mai"},
             {"June", "Juni"},
@@ -609,7 +613,7 @@ namespace WhiteCore.Modules.Web.Translators
 
             // User types
             {"UserTypeText", "Benutzertyp"},
-            {"AdminUserTypeInfoText", "Der Typ des Benutzers (Derzeit für die regelmäßige Stipendium Zahlungen verwendet wird)."},
+            {"AdminUserTypeInfoText", "Der Typ des Benutzers (Derzeit fÃ¼r die regelmÃ¤Ãige Stipendium Zahlungen verwendet wird)."},
             {"Guest", "Gast"},
             {"Resident", "Einwohner"},
             {"Member", "Mitglied"},
@@ -620,16 +624,16 @@ namespace WhiteCore.Modules.Web.Translators
             {"ColorBoxImageText", "Image"},
             {"ColorBoxOfText", "von"},
             {"ColorBoxPreviousText", "vorig"},
-            {"ColorBoxNextText", "nächste"},
-            {"ColorBoxCloseText", "schließen"},
+            {"ColorBoxNextText", "nÃ¤chste"},
+            {"ColorBoxCloseText", "schlieÃen"},
             {"ColorBoxStartSlideshowText", "Starte Slide Show"},
             {"ColorBoxStopSlideshowText", "Stope Slide Show"},
 
             // Maintenance
             {"NoAccountFound", "Kein Konto gefunden"},
-            {"DisplayInMenu", "Anzeige im Menü"},
-            {"ParentText", "Hauptmenü"},
-            {"CannotSetParentToChild", "Kann Menüpunkt nicht als Untermenü festlegen."},
+            {"DisplayInMenu", "Anzeige im MenÃ¼"},
+            {"ParentText", "HauptmenÃ¼"},
+            {"CannotSetParentToChild", "Kann MenÃ¼punkt nicht als UntermenÃ¼ festlegen."},
             {"TopLevel", "Erste Ebene"},
 
             // Style Switcher
@@ -643,13 +647,25 @@ namespace WhiteCore.Modules.Web.Translators
             {"StyleSwitcherChoiceText", "Auswahl"},
 
             // Language Switcher Tooltips
-            {"en", "English"},
-            {"fr", "Français"},
-            {"de", "Deutsch"},
-            {"it", "Italiano"},
-            {"es", "Español"},
-            {"nl", "Nederlands"},
-            {"ru", "Русский"}
+            { "en", "English"},
+            { "fr", "Fran?ais"},
+            { "de", "Deutsch"},
+            { "it", "Italiano"},
+            { "es", "Espa?ol"},
+            { "nl", "Nederlands"},
+            { "ru", "§²§å§ã§ã§Ü§Ú§Û"}
         };
+
+        public void Serialize (string basePath)
+        {
+            TranslatorSerialization.Serialize (basePath, FullLanguageName, LanguageName, dictionary);
+        }
+
+        public void Deserialize (string basePath)
+        {
+            var newdict = TranslatorSerialization.Deserialize (basePath, LanguageName);
+            if (newdict.Count > 0)
+                dictionary = newdict;
+        }
     }
 }

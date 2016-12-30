@@ -35,6 +35,10 @@ namespace WhiteCore.Modules.Web.Translators
             get { return "nl"; }
         }
 
+        public string FullLanguageName {
+            get { return "Dutch"; }
+        }
+
         public string GetTranslatedString (string key)
         {
             if (dictionary.ContainsKey (key))
@@ -42,7 +46,7 @@ namespace WhiteCore.Modules.Web.Translators
             return ":" + key + ":";
         }
 
-        readonly Dictionary<string, string> dictionary = new Dictionary<string, string> {
+        Dictionary<string, string> dictionary = new Dictionary<string, string> {
             // Generic
             { "No", "No"},
             { "Yes", "Yes"},
@@ -644,13 +648,25 @@ namespace WhiteCore.Modules.Web.Translators
 
             // Language Switcher Tooltips
             { "en", "English"},
-            { "fr", "Fran?ais"},
+            { "fr", "Français"},
             { "de", "Deutsch"},
             { "it", "Italiano"},
-            { "es", "Espa?ol"},
+            { "es", "Español"},
             { "nl", "Nederlands"},
             { "ru", "Русский"}
 
         };
+
+        public void Serialize (string basePath)
+        {
+            TranslatorSerialization.Serialize (basePath, FullLanguageName, LanguageName, dictionary);
+        }
+
+        public void Deserialize (string basePath)
+        {
+            var newdict = TranslatorSerialization.Deserialize (basePath, LanguageName);
+            if (newdict.Count > 0)
+                dictionary = newdict;
+        }
     }
 }
