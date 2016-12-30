@@ -182,7 +182,7 @@ namespace WhiteCore.FileBasedServices.AssetService
                 return null;
             }
 
-            AssetBase asset = FileGetAsset (id);
+            AssetBase asset = FileGetAsset (id, showWarnings);
             if (doDatabaseCaching && cache != null)
                 cache.Cache (id, asset);
             return asset;
@@ -202,7 +202,13 @@ namespace WhiteCore.FileBasedServices.AssetService
         }
 
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
-        public virtual byte[] GetData (string id)
+        public virtual byte [] GetData (string id)
+        {
+            return GetData (id, true);
+        }
+
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public virtual byte [] GetData (string id, bool showWarnings)
         {
             IImprovedAssetCache cache = m_registry.RequestModuleInterface<IImprovedAssetCache> ();
             if (doDatabaseCaching && cache != null)
@@ -368,6 +374,11 @@ namespace WhiteCore.FileBasedServices.AssetService
 
         public AssetBase FileGetAsset (string id)
         {
+            return FileGetAsset (id, true);
+        }
+
+        public AssetBase FileGetAsset (string id, bool showWarnings)
+        {
             AssetBase asset;
 #if ASSET_DEBUG
             long startTime = System.Diagnostics.Stopwatch.GetTimestamp();
@@ -388,7 +399,8 @@ namespace WhiteCore.FileBasedServices.AssetService
                 }
             } catch (Exception ex)
             {
-                MainConsole.Instance.WarnFormat ("[Filebased asset service]: Failed to retrieve asset {0}: {1} ", id, ex);
+                if (showWarnings)
+                    MainConsole.Instance.WarnFormat ("[Filebased asset service]: Failed to retrieve asset {0}: {1} ", id, ex);
                 return null;
             }
 #if ASSET_DEBUG

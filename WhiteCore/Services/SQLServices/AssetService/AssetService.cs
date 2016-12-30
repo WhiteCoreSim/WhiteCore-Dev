@@ -168,6 +168,12 @@ namespace WhiteCore.Services.SQLServices.AssetService
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
         public virtual byte [] GetData (string id)
         {
+            return GetData (id, true);
+        }
+
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public virtual byte [] GetData (string id, bool showWarnings)
+        {
             IImprovedAssetCache cache = m_registry.RequestModuleInterface<IImprovedAssetCache> ();
             if (doDatabaseCaching && cache != null) {
                 bool found;
@@ -187,7 +193,7 @@ namespace WhiteCore.Services.SQLServices.AssetService
                 return null;
             }
 
-            AssetBase asset = m_database.GetAsset (UUID.Parse (id));
+            AssetBase asset = m_database.GetAsset (UUID.Parse (id), showWarnings);
             if (doDatabaseCaching && cache != null)
                 cache.Cache (id, asset);
 

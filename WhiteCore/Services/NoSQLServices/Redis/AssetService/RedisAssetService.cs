@@ -203,8 +203,14 @@ namespace WhiteCore.RedisServices.AssetService
             return null;
         }
 
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public virtual byte [] GetData (string id)
+        {
+            return GetData (id, true);
+        }
+
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public virtual byte[] GetData(string id)
+        public virtual byte[] GetData(string id, bool showWarnings)
         {
             IImprovedAssetCache cache = m_registry.RequestModuleInterface<IImprovedAssetCache>();
             if (doDatabaseCaching && cache != null)
@@ -226,7 +232,7 @@ namespace WhiteCore.RedisServices.AssetService
                 return null;
             }
 
-            AssetBase asset = RedisGetAsset(id);
+            AssetBase asset = RedisGetAsset(id, showWarnings);
             if (doDatabaseCaching && cache != null)
                 cache.Cache(id, asset);
 
@@ -381,7 +387,12 @@ namespace WhiteCore.RedisServices.AssetService
             return false;
         }
 
-        public AssetBase RedisGetAsset(string id)
+        public AssetBase RedisGetAsset (string id)
+        {
+            return RedisGetAsset(id, true);
+        }
+
+        public AssetBase RedisGetAsset(string id, bool showWarnings)
         {
             AssetBase asset = null;
 
@@ -390,26 +401,30 @@ namespace WhiteCore.RedisServices.AssetService
 #endif
             try
             {
-                RedisEnsureConnection((conn) =>
-                                          {
-                                              byte[] data = conn.Get(id);
-                                              if (data == null)
-                                                  return null;
+                RedisEnsureConnection((conn) => {
+                    byte[] data = conn.Get(id);
+                    if (data == null) {
+                        return null;
+                    }
 
-                                              MemoryStream memStream = new MemoryStream(data);
-                                              asset = ProtoBuf.Serializer.Deserialize<AssetBase>(memStream);
-                                              if (asset.Type == -1)
-                                                  asset.Type = 0;
-                                              memStream.Close();
-                                              byte[] assetdata = conn.Get(DATA_PREFIX + asset.HashCode);
-                                              if (assetdata == null || asset.HashCode == "")
-                                                  return null;
-                                              asset.Data = assetdata;
-                                              return null;
-                                          });
+                    MemoryStream memStream = new MemoryStream(data);
+                    asset = ProtoBuf.Serializer.Deserialize<AssetBase>(memStream);
+                    if (asset.Type == -1)
+                        asset.Type = 0;
+                    memStream.Close();
+                    byte[] assetdata = conn.Get(DATA_PREFIX + asset.HashCode);
+                    if (assetdata == null || asset.HashCode == "")
+                        return null;
+                    asset.Data = assetdata;
+                    return null;
+                });
 
-                if (asset == null)
-                    return CheckForConversion(id);
+                if (asset == null) {
+                    if (showWarnings)
+                        MainConsole.Instance.Warn ("Redis asset service]: Failed to retrieve asset " + id);
+
+                    return CheckForConversion (id);
+                }
             }
             finally
             {
