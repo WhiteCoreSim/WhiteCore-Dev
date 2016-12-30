@@ -128,6 +128,7 @@ namespace WhiteCore.Modules.WorldMap
             }
 
             terrainRenderer = null;
+            GC.Collect ();
 
             MainConsole.Instance.InfoFormat ("[MapTile generator]: Maptile generation took {0} ms",
                 (Environment.TickCount - start));
@@ -342,6 +343,7 @@ namespace WhiteCore.Modules.WorldMap
                 if (gridRegModule != null)
                     gridRegModule.UpdateGridRegion (m_scene);
 
+                GC.Collect ();
             }
         }
 
