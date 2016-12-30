@@ -66,7 +66,7 @@ namespace WhiteCore.Modules.Agent.J2KDecoder
         IImprovedAssetCache m_cache;
 
         bool m_useCache = true;
-        bool m_useCSJ2K = true;
+        bool m_useCSJ2K = false;
 
         #region IService Members
 
@@ -140,16 +140,16 @@ namespace WhiteCore.Modules.Agent.J2KDecoder
         {
             if (m_useCSJ2K)
                 return J2kImage.FromBytes (j2kData);
-            else {
-                ManagedImage mimage;
-                Image image;
-                if (OpenJPEG.DecodeToImage (j2kData, out mimage, out image)) {
-                    mimage = null;
-                    return image;
-                }
 
-                return null;
+            // decode using OpenJpeg
+            ManagedImage mimage;
+            Image image;
+            if (OpenJPEG.DecodeToImage (j2kData, out mimage, out image)) {
+                mimage = null;
+                return image;
             }
+
+            return null;
         }
 
         #endregion
