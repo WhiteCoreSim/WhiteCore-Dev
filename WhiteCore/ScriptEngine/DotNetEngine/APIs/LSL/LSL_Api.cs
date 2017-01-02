@@ -10367,7 +10367,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 return new LSL_String("disabled");
             if (name == "estate_id")
                 return new LSL_String(World.RegionInfo.EstateSettings.EstateID.ToString());
+            if (name == "region_max_prims")
+                return World.RegionInfo.ObjectCapacity.ToString ();
+            
             return "";
+
         }
 
         public void llTeleportAgent(LSL_Key avatar, LSL_String landmark, LSL_Vector position, LSL_Vector look_at)
