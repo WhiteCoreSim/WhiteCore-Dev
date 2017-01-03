@@ -24,32 +24,15 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
- 
-using Nini.Config;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.Services;
 
-namespace WhiteCore.Services.API.WorldAPI
+using WhiteCore.Framework.Servers.HttpServer;
+using WhiteCore.Framework.Servers.HttpServer.Interfaces;
+
+namespace WhiteCore.Services.API
 {
-	public class ResidentWorldAPI : IService
-	{
-		#region IService implementation
+    public partial class APIHandler : BaseRequestHandler, IStreamedRequestHandler
+    {
 
-		public void Initialize(IConfigSource config, IRegistryCore registry)
-		{
-			throw new System.NotImplementedException();
-		}
-		
-		public void Start(IConfigSource config, IRegistryCore registry)
-		{
-			throw new System.NotImplementedException();
-		}
-		
-		public void FinishedStartup()
-		{
-			throw new System.NotImplementedException();
-		}
-		
-		#endregion
+
 	}
 }

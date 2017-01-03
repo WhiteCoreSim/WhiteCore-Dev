@@ -25,6 +25,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System.Collections;
 using System.Collections.Generic;
 namespace WhiteCore.Framework.Services
 {
@@ -49,6 +50,7 @@ namespace WhiteCore.Framework.Services
         string GridSnapshotConfigURI { get; }
 
         void UpdateGridInfo();
+        Hashtable GetGridInfoHashtable ();
     }
 
     public interface IGridServerInfoService

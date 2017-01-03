@@ -24,38 +24,15 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
- 
-using System.IO;
-using System.Text;
-using Nini.Config;
-using WhiteCore.Framework.Modules;
-using WhiteCore.Framework.Servers;
-using WhiteCore.Framework.Servers.HttpServer;
-using WhiteCore.Framework.Servers.HttpServer.Implementation;
-using WhiteCore.Framework.Services;
 
-namespace WhiteCore.Services.API.WebAPI
+using WhiteCore.Framework.Servers.HttpServer;
+using WhiteCore.Framework.Servers.HttpServer.Interfaces;
+
+namespace WhiteCore.Services.API
 {
-	public class CurrencyAPI : IService
-	{
-		#region IService implementation
-		public void Initialize(IConfigSource config, IRegistryCore registry)
-		{
-		}
-        
-		public void Start(IConfigSource config, IRegistryCore registry)
-		{
-			MainServer.Instance.AddStreamHandler(new GenericStreamHandler("GET", "/API/Currency/", HandleCurrency));
-		}
-        
-		public void FinishedStartup()
-		{
-		}
-		#endregion
-        
-		public byte[] HandleCurrency(string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
-		{
-			return Encoding.UTF8.GetBytes("");
-		}
-	}
+    public partial class APIHandler : BaseRequestHandler, IStreamedRequestHandler
+    {
+
+
+    }
 }
