@@ -1,5 +1,5 @@
 ## Version details of libraries
-# Last updated:  November 24th 2016
+# Last updated:  January 4th 2017
 # Greythane / Fly-Man-
 
 Library                                                         Version                 Last updated            Origin
@@ -7,24 +7,24 @@ Library                                                         Version         
 
 Autofac.dll                                                     2.6.1841                10 Dec 2012
 BulletXNA.dll                                                   1.0.0.0                 24 Jun 2013
-CSJ2K.dll                                                       2.0.0.2				          24 Nov 2016             LibOMV/WhiteCore
+CSJ2K.dll                                                       1.9.4.6 			           4 Jan 2017             LibOMV/WhiteCore
 Community.CsharpSqlite.SQLiteClient.dll                         3.7.7.1                 30 Apr 2014             WhiteCore
 Community.CsharpSqlite.dll                                      1.0.0.0                 30 Apr 2014             WhiteCore
 CookComputing.XmlRpcV2.dll                                      0.0.0.0                 08 Apr 2013
 GlynnTucker.Cache.dll                                           1.0.0.0                 10 Dec 2012
 Google.ProtocolBuffers.dll                                      1.0.0.0                 10 Dec 2012
-MySql.Data.dll                                                  6.9.3.0                 29 Sep 2014
+MySql.Data.dll                                                  6.9.9.0                  3 Jan 2017
 Nini.dll                                                        1.1.0.0                 10 Dec 2012
-OpenMetaverse.Rendering.Meshmerizer.dll                         0.9.4.5                 20 Aug 2016             LibOMV/WhiteCore
-OpenMetaverse.StructuredData.dll                                0.9.4.5                 20 Aug 2016             LibOMV/WhiteCore
-OpenMetaverse.dll                                               0.9.4.5                 20 Aug 2016             LibOMV/WhiteCore
-OpenMetaverseTypes.dll                                          0.9.4.5                 20 Aug 2016             LibOMV/WhiteCore
+OpenMetaverse.Rendering.Meshmerizer.dll                         0.9.4.6                 20 Aug 2016             LibOMV/WhiteCore
+OpenMetaverse.StructuredData.dll                                0.9.4.6                 20 Aug 2016             LibOMV/WhiteCore
+OpenMetaverse.dll                                               0.9.4.6                 20 Aug 2016             LibOMV/WhiteCore
+OpenMetaverseTypes.dll                                          0.9.4.6                 20 Aug 2016             LibOMV/WhiteCore
 PrimMesher.dll                                                  1.0.1.72                01 May 2015             WhiteCore
 ScriptEngineParser.dll                                          1.0.1.23085             21 Apr 2015             WhiteCore
 Sider.dll                                                       0.9.2.0                 08 Apr 2013
 SmartThreadPool.dll                                             2.2.3.0                 08 Apr 2014             OpenSim
 Tools.dll                                                       0.0.0.0                 16 Dec 2013
-Warp3Dw.dll                                                     0.0.0.0                 21 Apr 2015             WhiteCore
+Warp3Dw.dll                                                     0.9.4.6                  4 Jan 2017             WhiteCore
 XMLRPC.dll                                                      0.0.0.0                 10 Dec 2102
 libbulletnet.dll                                                ???                     10 Dec 2012
 libbulletnet.so                                                 ???                     10 Dec 2012
