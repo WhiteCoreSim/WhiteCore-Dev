@@ -1,0 +1,32 @@
+Setting up Currency:
+
+The currency module that has support for buying/selling land and objects
+   with fake inworld currency.
+As of WhiteCore Version 0.9.3, the currency module is enabled by default and is
+  configured so that purchases do not cost anything
+
+To modify the currency settings for your simulator, you need  to edit the
+  'Economy.ini' file in the 'Modules' folder of your appropriate setup.
+
+For Standalone simulators:
+ Edit 'Config/Sim/Modules/Economy.ini'
+
+For Grid installations:
+  Edit 'Config/Grid/ServerConfiguration/Modules/Economy.ini'
+
+  Note:  For grid configuration, it is not necessary to edit the standalone
+    'Modules/Economy.ini' file.
+
+The Economy.ini file is commented throughout but some of the common settings are...
+
+PriceUpload        >> Price to upload a new object, mesh or texture
+PriceGroupCreate   >> Price to create a new group
+PriceDirectoryFee  >> Price to list a parcel in search (per week)
+GroupPayments      >> Charge groups a directory search fee for listings
+NewUserStipend     >> Pay new users an initial stipend on creation
+PayStipends        >> Pay users a stipend periodically (default is once per week)
+Stipend            >> Stipend amount to pay users
+
+Rowan
+<greythane@gmail.com>
+December 2015
