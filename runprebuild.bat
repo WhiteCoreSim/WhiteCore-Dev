@@ -104,9 +104,10 @@ echo "%configuration%" isn't a valid choice!
 goto configuration
 
 :framework
-set /p framework="Choose your .NET framework (4_0 or 4_5)? [%framework%]: "
+set /p framework="Choose your .NET framework (4_0, 4_5, 4.6)? [%framework%]: "
 if %framework%==4_0 goto final
 if %framework%==4_5 goto final
+if %framework%==4_6 goto final
 echo "%framework%" isn't a valid choice!
 goto framework
 
@@ -128,16 +129,21 @@ Prebuild.exe /target vs%vstudio% /targetframework v%framework% /conditionals ISW
 
 echo.
 echo Creating compile batch file for your convenience...
-set fpath=C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\msbuild
-if %bits%==x64 set args=/p:Platform=x64
-if %bits%==x86 set args=/p:Platform=x86
+if %bits%==x64 (
+    set args=/p:Platform=x64
+	set fpath=C:\WINDOWS\Microsoft.NET\Framework64\v4.0.30319\msbuild
+)
+if %bits%==x86 (
+	set args=/p:Platform=x86
+	set fpath=C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\msbuild
+)
 if %configuration%==r  (
     set cfg=/p:Configuration=Release
     set configuration=release
 )
 if %configuration%==d  (
-set cfg=/p:Configuration=Debug
-set configuration=debug
+	set cfg=/p:Configuration=Debug
+	set configuration=debug
 )
 if %configuration%==release set cfg=/p:Configuration=Release
 if %configuration%==debug set cfg=/p:Configuration=Debug
