@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) Contributors, http://whitecore-sim.org/
+ * Copyright (c) http://whitecore-sim.org/
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,81 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace WhiteCore.Modules.Web.Translators
 {
     public static class TranslatorSerialization
     {
-        static void WriteHeader (StreamWriter outFile, string fullLanguageName, string languageName)
-        {
-            var header = "#\n# " + fullLanguageName + " translation for WhiteCore.\n" +
-                "# This file is distributed under the same license as the WhiteCore package.\n" +
-                "# greythane <greythane@gmail.com>, 2016.\n#";
-            outFile.WriteLine (header);
-            outFile.WriteLine ("");
-            outFile.WriteLine ("\nmsgid \"\"\nmsgstr \"\"");
-            outFile.WriteLine ("");
-
-            var fileinfo = "\"Project-Id-Version: WhiteCore Version 0.9.5\\n\"\n" +
-                "\"Report-Msgid-Bugs-To: greythane <greythane@gmail.com>\\n\"\n";
-            outFile.WriteLine (fileinfo);
-
-            var timenow = DateTime.Now;
-            var filestamp = "\"POT-Creation-Date: " + timenow.ToString ("u") + "\\n\"\n" +
-                "\"PO-Revision-Date: " + timenow.ToString ("u") + "\\n\"";
-            outFile.WriteLine (filestamp);
-
-            var xtrainfo = "\"Last-Translator: greythane <greythane@gmail.com>\\n\"\n" +
-                "\"Language-Team: WhiteCore Development <greythane@gmail.com>\\n\"\n" +
-                "\"MIME-Version: 1.0\\n\"\n" +
-                "\"Content-Type: text/plain; charset=UTF-8\\n\"\n" +
-                "\"Content-Transfer-Encoding: 8bit\\n\"\n" +
-                "\"Language: " + languageName + "\\n\"\n" +
-                "\"Plural-Forms: nplurals=2; plural=(n != 1);\\n\"\n" +
-                "\"X-Generator: WhiteCore V0.9.5 Dev\\n\"\n";
-            outFile.WriteLine (xtrainfo);
-        }
-
-        /// <summary>
-        /// Serialize the specified translation dictionary into a poEdit format file.
-        /// </summary>
-        /// <param name="basePath">Base path to save file.</param>
-        /// <param name="fullLanguageName">Full language name.</param>
-        /// <param name="languageName">Language name.</param>
-        /// <param name="dictionary">Dictionary.</param>
-        public static void Serialize (string basePath, string fullLanguageName, string languageName, Dictionary<string, string> dictionary)
-        {
-            var outPath = Path.Combine (basePath, "translations");
-            if (!Directory.Exists (outPath))
-                Directory.CreateDirectory (outPath);
-
-            var outFile = Path.Combine (outPath, languageName + ".po");
-            var fileout = new StreamWriter (outFile);
-
-            var wordList = dictionary.Keys.ToList ();
-            wordList.Sort ();
-
-            try {
-                WriteHeader (fileout, fullLanguageName, languageName);
-
-                foreach (var element in wordList) {
-                    fileout.Write ("msgid \"");
-                    fileout.WriteLine (element + "\"");
-                    fileout.Write ("msgstr \"");
-                    fileout.WriteLine (dictionary [element] + "\"");
-                    fileout.WriteLine ("");
-                }
-            } finally {
-                fileout.Close ();
-            }
-
-            return;
-        }
-
         /// <summary>
         /// Deserialize the specified <languageName>.po file
         /// </summary>

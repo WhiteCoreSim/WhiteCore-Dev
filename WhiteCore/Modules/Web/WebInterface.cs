@@ -135,7 +135,6 @@ namespace WhiteCore.Modules.Web
 
         public void Start (IConfigSource config, IRegistryCore registry)
         {
-            bool exportDicts = false;
             IConfig con = config.Configs ["WebInterface"];
             if (con != null) {
                 _enabled = con.GetString ("Module", "BuiltIn") == "BuiltIn";
@@ -150,8 +149,6 @@ namespace WhiteCore.Modules.Web
                 _defaultTranslator = _translators.FirstOrDefault (t => t.LanguageName == defaultLanguage);
                 if (_defaultTranslator == null)
                     _defaultTranslator = _translators [0];
-
-                exportDicts = con.GetBoolean ("ExportLanguage", false);
  
             }
             if (_enabled) {
@@ -168,12 +165,10 @@ namespace WhiteCore.Modules.Web
 
                 // load up translators
                 foreach (var txlt in _translators) {
-                    if (exportDicts)
-                        txlt.Serialize (m_localHtmlPath);
                     txlt.Deserialize (m_localHtmlPath);
                 }
 
-                MainConsole.Instance.Info ("[WebUI]: Default language is " + _defaultTranslator.LanguageName.ToUpper ());
+                MainConsole.Instance.Info ("[WebUI]: Default language is " + _defaultTranslator.FullLanguageName);
             }
         }
 

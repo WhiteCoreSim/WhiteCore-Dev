@@ -1,963 +1,1545 @@
-# Italian translation for whitecore
-# Copyright (c) 2014 Rosetta Contributors and Canonical Ltd 2014
-# This file is distributed under the same license as the whitecore package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2014.
 #
+# Italian translation for WhiteCore.
+# This file is distributed under the same license as the WhiteCore package.
+# greythane <greythane@gmail.com>, 2016.
+#
+
+
 msgid ""
 msgstr ""
-"Project-Id-Version: whitecore\n"
-"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-05-06 20:22+0200\n"
-"PO-Revision-Date: 2014-05-06 18:42+0000\n"
-"Last-Translator: Fly-Man- <Unknown>\n"
-"Language-Team: Dutch <nl@li.org>\n"
+
+"Project-Id-Version: WhiteCore Version 0.9.5\n"
+"Report-Msgid-Bugs-To: greythane <greythane@gmail.com>\n"
+
+"POT-Creation-Date: 2016-11-23 14:11:31Z\n"
+"PO-Revision-Date: 2016-11-23 14:11:31Z\n"
+"Last-Translator: greythane <greythane@gmail.com>\n"
+"Language-Team: WhiteCore Development <greythane@gmail.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2014-05-06 18:44+0000\n"
-"X-Generator: Launchpad (build 16996)\n"
+"Language: it\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: WhiteCore V0.9.5 Dev\n"
 
-msgid "GridStatus"
-msgstr ""
-
-msgid "Online"
-msgstr ""
-
-msgid "Offline"
-msgstr ""
-
-msgid "TotalUserCount"
-msgstr ""
-
-msgid "TotalRegionCount"
-msgstr ""
-
-msgid "UniqueVisitors"
-msgstr ""
-
-msgid "OnlineNow"
-msgstr ""
-
-msgid "HyperGrid"
-msgstr ""
-
-msgid "Voice"
-msgstr ""
-
-msgid "Currency"
-msgstr ""
-
-msgid "Disabled"
-msgstr ""
-
-msgid "Enabled"
-msgstr ""
-
-msgid "News"
-msgstr ""
-
-msgid "Region"
-msgstr ""
-
-msgid "Login"
-msgstr ""
-
-msgid "UserName"
-msgstr ""
-
-msgid "UserNameText"
-msgstr ""
-
-msgid "Password"
-msgstr ""
-
-msgid "PasswordText"
-msgstr ""
-
-msgid "PasswordConfirmation"
-msgstr ""
-
-msgid "ForgotPassword"
-msgstr ""
-
-msgid "Submit"
-msgstr ""
-
-msgid "TypeUserNameToConfirm"
-msgstr ""
-
-msgid "SpecialWindowTitleText"
-msgstr ""
-
-msgid "SpecialWindowTextText"
-msgstr ""
-
-msgid "SpecialWindowColorText"
-msgstr ""
-
-msgid "SpecialWindowStatusText"
-msgstr ""
-
-msgid "WelcomeScreenManagerFor"
-msgstr ""
-
-msgid "ChangesSavedSuccessfully"
-msgstr ""
-
-msgid "AvatarNameText"
-msgstr ""
-
-msgid "AvatarScopeText"
-msgstr ""
-
-msgid "FirstNameText"
-msgstr ""
-
-msgid "LastNameText"
-msgstr ""
-
-msgid "UserAddressText"
-msgstr ""
-
-msgid "UserZipText"
-msgstr ""
-
-msgid "UserCityText"
-msgstr ""
-
-msgid "UserCountryText"
-msgstr ""
-
-msgid "UserDOBText"
-msgstr ""
-
-msgid "UserEmailText"
-msgstr ""
-
-msgid "RegistrationText"
-msgstr ""
-
-msgid "RegistrationsDisabled"
-msgstr ""
-
-msgid "TermsOfServiceText"
-msgstr ""
-
-msgid "TermsOfServiceAccept"
-msgstr ""
-
-msgid "Accept"
-msgstr ""
-
-msgid "OpenNewsManager"
-msgstr ""
-
-msgid "NewsManager"
-msgstr ""
-
-msgid "EditNewsItem"
-msgstr ""
-
-msgid "AddNewsItem"
-msgstr ""
-
-msgid "DeleteNewsItem"
-msgstr ""
-
-msgid "NewsDateText"
-msgstr ""
-
-msgid "NewsTitleText"
-msgstr ""
-
-msgid "NewsItemTitle"
-msgstr ""
-
-msgid "NewsItemText"
-msgstr ""
-
-msgid "AddNewsText"
-msgstr ""
-
-msgid "DeleteNewsText"
-msgstr ""
-
-msgid "EditNewsText"
-msgstr ""
-
-msgid "UserProfileFor"
-msgstr ""
-
-msgid "UsersGroupsText"
-msgstr ""
-
-msgid "UsersPicksText"
-msgstr ""
-
-msgid "ResidentSince"
-msgstr ""
-
-msgid "AccountType"
-msgstr ""
-
-msgid "PartnersName"
-msgstr ""
+msgid "30daysPastText"
+msgstr "30 giorni precedenti"
 
 msgid "AboutMe"
-msgstr ""
+msgstr "Il mio Profilo"
 
-msgid "IsOnlineText"
-msgstr ""
+msgid "AbuseReporterNameText"
+msgstr "Accusatore"
 
-msgid "OnlineLocationText"
-msgstr ""
+msgid "AbuseReportText"
+msgstr "Notifica di abuso"
 
-msgid "RegionInformationText"
-msgstr ""
+msgid "AbuserNameText"
+msgstr "Accusato"
 
-msgid "OwnerNameText"
-msgstr ""
+msgid "Accept"
+msgstr "Accetto"
 
-msgid "RegionLocationText"
-msgstr ""
+msgid "AccountType"
+msgstr "Tipo di Account"
 
-msgid "RegionSizeText"
-msgstr ""
+msgid "ActiveText"
+msgstr "Attivo"
 
-msgid "RegionNameText"
-msgstr ""
+msgid "AddEstateText"
+msgstr "Aggiungere immobiliare"
 
-msgid "RegionTypeText"
-msgstr ""
-
-msgid "ParcelsInRegionText"
-msgstr ""
-
-msgid "ParcelNameText"
-msgstr ""
-
-msgid "ParcelOwnerText"
-msgstr ""
-
-msgid "RegionInfoText"
-msgstr ""
-
-msgid "RegionListText"
-msgstr ""
-
-msgid "RegionLocXText"
-msgstr ""
-
-msgid "RegionLocYText"
-msgstr ""
-
-msgid "SortByLocX"
-msgstr ""
-
-msgid "SortByLocY"
-msgstr ""
-
-msgid "SortByName"
-msgstr ""
-
-msgid "RegionMoreInfo"
-msgstr ""
-
-msgid "RegionMoreInfoTooltips"
-msgstr ""
-
-msgid "FirstText"
-msgstr ""
-
-msgid "BackText"
-msgstr ""
-
-msgid "NextText"
-msgstr ""
-
-msgid "LastText"
-msgstr ""
-
-msgid "CurrentPageText"
-msgstr ""
-
-msgid "MoreInfoText"
-msgstr ""
-
-msgid "OnlineUsersText"
-msgstr ""
-
-msgid "RegionOnlineText"
-msgstr ""
-
-msgid "NumberOfUsersInRegionText"
-msgstr ""
-
-msgid "MenuHome"
-msgstr ""
-
-msgid "MenuLogin"
-msgstr ""
-
-msgid "MenuLogout"
-msgstr ""
-
-msgid "MenuRegister"
-msgstr ""
-
-msgid "MenuForgotPass"
-msgstr ""
-
-msgid "MenuNews"
-msgstr ""
-
-msgid "MenuWorld"
-msgstr ""
-
-msgid "MenuWorldMap"
-msgstr ""
-
-msgid "MenuRegion"
-msgstr ""
-
-msgid "MenuUser"
-msgstr ""
-
-msgid "MenuOnlineUsers"
-msgstr ""
-
-msgid "MenuUserSearch"
-msgstr ""
-
-msgid "MenuRegionSearch"
-msgstr ""
-
-msgid "MenuChat"
-msgstr ""
-
-msgid "MenuHelp"
-msgstr ""
-
-msgid "MenuViewerHelp"
-msgstr ""
-
-msgid "MenuChangeUserInformation"
-msgstr ""
-
-msgid "MenuWelcomeScreenManager"
-msgstr ""
-
-msgid "MenuNewsManager"
-msgstr ""
-
-msgid "MenuUserManager"
-msgstr ""
-
-msgid "MenuFactoryReset"
-msgstr ""
-
-msgid "ResetMenuInfoText"
-msgstr ""
-
-msgid "ResetSettingsInfoText"
-msgstr ""
-
-msgid "MenuPageManager"
-msgstr ""
-
-msgid "MenuSettingsManager"
-msgstr ""
-
-msgid "MenuManager"
-msgstr ""
-
-msgid "TooltipsMenuHome"
-msgstr ""
-
-msgid "TooltipsMenuLogin"
-msgstr ""
-
-msgid "TooltipsMenuLogout"
-msgstr ""
-
-msgid "TooltipsMenuRegister"
-msgstr ""
-
-msgid "TooltipsMenuForgotPass"
-msgstr ""
-
-msgid "TooltipsMenuNews"
-msgstr ""
-
-msgid "TooltipsMenuWorld"
-msgstr ""
-
-msgid "TooltipsMenuWorldMap"
-msgstr ""
-
-msgid "TooltipsMenuRegion"
-msgstr ""
-
-msgid "TooltipsMenuUser"
-msgstr ""
-
-msgid "TooltipsMenuOnlineUsers"
-msgstr ""
-
-msgid "TooltipsMenuUserSearch"
-msgstr ""
-
-msgid "TooltipsMenuRegionSearch"
-msgstr ""
-
-msgid "TooltipsMenuChat"
-msgstr ""
-
-msgid "TooltipsMenuViewerHelp"
-msgstr ""
-
-msgid "TooltipsMenuHelp"
-msgstr ""
-
-msgid "TooltipsMenuChangeUserInformation"
-msgstr ""
-
-msgid "TooltipsMenuWelcomeScreenManager"
-msgstr ""
-
-msgid "TooltipsMenuNewsManager"
-msgstr ""
-
-msgid "TooltipsMenuUserManager"
-msgstr ""
-
-msgid "TooltipsMenuFactoryReset"
-msgstr ""
-
-msgid "TooltipsMenuPageManager"
-msgstr ""
-
-msgid "TooltipsMenuSettingsManager"
-msgstr ""
-
-msgid "TooltipsMenuManager"
-msgstr ""
-
-msgid "MenuRegionTitle"
-msgstr ""
-
-msgid "MenuParcelTitle"
-msgstr ""
-
-msgid "MenuOwnerTitle"
-msgstr ""
-
-msgid "MenuProfileTitle"
-msgstr ""
-
-msgid "MenuGroupTitle"
-msgstr ""
-
-msgid "MenuPicksTitle"
-msgstr ""
-
-msgid "WelcomeScreen"
-msgstr ""
-
-msgid "TooltipsWelcomeScreen"
-msgstr ""
-
-msgid "TooltipsWorldMap"
-msgstr ""
-
-msgid "styles1"
-msgstr ""
-
-msgid "styles2"
-msgstr ""
-
-msgid "styles3"
-msgstr ""
-
-msgid "styles4"
-msgstr ""
-
-msgid "styles5"
-msgstr ""
-
-msgid "StyleSwitcherStylesText"
-msgstr ""
-
-msgid "StyleSwitcherLanguagesText"
-msgstr ""
-
-msgid "StyleSwitcherChoiceText"
-msgstr ""
-
-msgid "en"
-msgstr ""
-
-msgid "fr"
-msgstr ""
-
-msgid "de"
-msgstr ""
-
-msgid "it"
-msgstr ""
-
-msgid "es"
-msgstr ""
-
-msgid "HomeText"
-msgstr ""
-
-msgid "HomeTextWelcome"
-msgstr ""
-
-msgid "HomeTextTips"
-msgstr ""
-
-msgid "WelcomeToText"
-msgstr ""
-
-msgid "WorldMap"
-msgstr ""
-
-msgid "WorldMapText"
-msgstr ""
-
-msgid "ChatText"
-msgstr ""
-
-msgid "HelpText"
-msgstr ""
-
-msgid "HelpViewersConfigText"
-msgstr ""
-
-msgid "AngstormViewer"
-msgstr ""
-
-msgid "VoodooViewer"
-msgstr ""
-
-msgid "AstraViewer"
-msgstr ""
-
-msgid "ImprudenceViewer"
-msgstr ""
-
-msgid "PhoenixViewer"
-msgstr ""
-
-msgid "SingularityViewer"
-msgstr ""
-
-msgid "ZenViewer"
-msgstr ""
-
-msgid "Logout"
-msgstr ""
-
-msgid "LoggedOutSuccessfullyText"
-msgstr ""
-
-msgid "ChangeUserInformationText"
-msgstr ""
-
-msgid "ChangePasswordText"
-msgstr ""
-
-msgid "NewPasswordText"
-msgstr ""
-
-msgid "NewPasswordConfirmationText"
-msgstr ""
-
-msgid "ChangeEmailText"
-msgstr ""
-
-msgid "NewEmailText"
-msgstr ""
-
-msgid "DeleteUserText"
-msgstr ""
-
-msgid "DeleteText"
-msgstr ""
-
-msgid "DeleteUserInfoText"
-msgstr ""
-
-msgid "EditText"
-msgstr ""
-
-msgid "EditUserAccountText"
-msgstr ""
-
-msgid "WebsiteDownInfoText"
-msgstr ""
-
-msgid "WebsiteDownText"
-msgstr ""
-
-msgid "Error404Text"
-msgstr ""
-
-msgid "Error404InfoText"
-msgstr ""
-
-msgid "HomePage404Text"
-msgstr ""
-
-msgid "Error505Text"
-msgstr ""
-
-msgid "Error505InfoText"
-msgstr ""
-
-msgid "HomePage505Text"
-msgstr ""
-
-msgid "Search"
-msgstr ""
-
-msgid "SearchText"
-msgstr ""
-
-msgid "SearchForUserText"
-msgstr ""
-
-msgid "UserSearchText"
-msgstr ""
-
-msgid "SearchResultForUserText"
-msgstr ""
-
-msgid "SearchForRegionText"
-msgstr ""
-
-msgid "RegionSearchText"
-msgstr ""
-
-msgid "SearchResultForRegionText"
-msgstr ""
-
-msgid "AdminDeleteUserText"
-msgstr ""
-
-msgid "AdminDeleteUserInfoText"
-msgstr ""
-
-msgid "BanText"
-msgstr ""
-
-msgid "UnbanText"
-msgstr ""
-
-msgid "AdminTempBanUserText"
-msgstr ""
-
-msgid "AdminTempBanUserInfoText"
-msgstr ""
-
-msgid "AdminBanUserText"
-msgstr ""
-
-msgid "AdminBanUserInfoText"
-msgstr ""
-
-msgid "AdminUnbanUserText"
-msgstr ""
-
-msgid "AdminUnbanUserInfoText"
-msgstr ""
-
-msgid "AdminLoginInAsUserText"
-msgstr ""
-
-msgid "AdminLoginInAsUserInfoText"
-msgstr ""
-
-msgid "TimeUntilUnbannedText"
-msgstr ""
-
-msgid "DaysText"
-msgstr ""
-
-msgid "HoursText"
-msgstr ""
-
-msgid "MinutesText"
-msgstr ""
-
-msgid "EdittingText"
-msgstr ""
-
-msgid "BannedUntilText"
-msgstr ""
-
-msgid "KickAUserText"
-msgstr ""
-
-msgid "KickAUserInfoText"
-msgstr ""
-
-msgid "KickMessageText"
-msgstr ""
-
-msgid "KickUserText"
-msgstr ""
-
-msgid "MessageAUserText"
-msgstr ""
-
-msgid "MessageAUserInfoText"
-msgstr ""
-
-msgid "MessageUserText"
-msgstr ""
-
-msgid "FactoryReset"
-msgstr ""
-
-msgid "ResetMenuText"
-msgstr ""
-
-msgid "ResetSettingsText"
-msgstr ""
-
-msgid "Reset"
-msgstr ""
-
-msgid "Settings"
-msgstr ""
-
-msgid "Pages"
-msgstr ""
-
-msgid "DefaultsUpdated"
-msgstr ""
-
-msgid "PageManager"
-msgstr ""
-
-msgid "SaveMenuItemChanges"
-msgstr ""
-
-msgid "SelectItem"
-msgstr ""
-
-msgid "DeleteItem"
-msgstr ""
+msgid "AddEventText"
+msgstr "Aggiungi evento"
 
 msgid "AddItem"
-msgstr ""
+msgstr "Aggiungi elemento"
 
-msgid "PageLocationText"
-msgstr ""
+msgid "AddNewsItem"
+msgstr "Aggiungi una nuova Notizia"
 
-msgid "PageIDText"
-msgstr ""
+msgid "AddNewsText"
+msgstr "Aggiungi Notizia"
 
-msgid "PagePositionText"
-msgstr ""
+msgid "AddRegionText"
+msgstr "Aggiungere Regione"
 
-msgid "PageTooltipText"
-msgstr ""
+msgid "AdminBanUserInfoText"
+msgstr "Questo Sblocca un utente finche non e sbloccato."
 
-msgid "PageTitleText"
-msgstr ""
+msgid "AdminBanUserText"
+msgstr "Sblocca Utente"
 
-msgid "No"
-msgstr ""
+msgid "AdminDeleteUserInfoText"
+msgstr "Questa operazione cancellera l Account ed eliminera tutti i dati associati ad esso."
 
-msgid "Yes"
-msgstr ""
+msgid "AdminDeleteUserText"
+msgstr "Elimina Utente"
 
-msgid "RequiresLoginText"
-msgstr ""
+msgid "AdminLoginInAsUserInfoText"
+msgstr "Verrai disconnesso dal tuo Account amministratore e ti connetterai come Utente e vedrai ogni cosa come la vedono gli Utenti normali."
 
-msgid "RequiresLogoutText"
-msgstr ""
+msgid "AdminLoginInAsUserText"
+msgstr "Accedi come utente"
 
-msgid "RequiresAdminText"
-msgstr ""
+msgid "AdminTempBanUserInfoText"
+msgstr "Questo blocca  un utente per il periodo di tempo desiderato."
 
-msgid "RequiresAdminLevelText"
-msgstr ""
+msgid "AdminTempBanUserText"
+msgstr "Vieta temporaneamente Accesso"
 
-msgid "Save"
-msgstr ""
+msgid "AdminUnbanUserInfoText"
+msgstr "Rimuove tutti i blocchi temporanei e definitivi su un utente."
 
-msgid "GridCenterXText"
-msgstr ""
+msgid "AdminUnbanUserText"
+msgstr "Sblocca Utente"
 
-msgid "GridCenterYText"
-msgstr ""
+msgid "AdminUserTypeInfoText"
+msgstr "Il tipo di utente (Attualmente utilizzato per i pagamenti periodici stipendio)."
 
-msgid "SettingsManager"
-msgstr ""
+msgid "AdultText"
+msgstr "Adulto"
 
-msgid "IgnorePagesUpdatesText"
-msgstr ""
+msgid "AgentsInViewText"
+msgstr "Agenti in vista"
 
-msgid "IgnoreSettingsUpdatesText"
-msgstr ""
+msgid "AllowDirectTeleportText"
+msgstr "Consentire teletrasporto diretta"
 
-msgid "Sun"
-msgstr ""
-
-msgid "Mon"
-msgstr ""
-
-msgid "Tue"
-msgstr ""
-
-msgid "Wed"
-msgstr ""
-
-msgid "Thu"
-msgstr ""
-
-msgid "Fri"
-msgstr ""
-
-msgid "Sat"
-msgstr ""
-
-msgid "Sunday"
-msgstr ""
-
-msgid "Monday"
-msgstr ""
-
-msgid "Tuesday"
-msgstr ""
-
-msgid "Wednesday"
-msgstr ""
-
-msgid "Thursday"
-msgstr ""
-
-msgid "Friday"
-msgstr ""
-
-msgid "Saturday"
-msgstr ""
-
-msgid "Jan_Short"
-msgstr ""
-
-msgid "Feb_Short"
-msgstr ""
-
-msgid "Mar_Short"
-msgstr ""
+msgid "AllowVoiceText"
+msgstr "Consentire voce"
 
 msgid "Apr_Short"
-msgstr ""
-
-msgid "May_Short"
-msgstr ""
-
-msgid "Jun_Short"
-msgstr ""
-
-msgid "Jul_Short"
-msgstr ""
-
-msgid "Aug_Short"
-msgstr ""
-
-msgid "Sep_Short"
-msgstr ""
-
-msgid "Oct_Short"
-msgstr ""
-
-msgid "Nov_Short"
-msgstr ""
-
-msgid "Dec_Short"
-msgstr ""
-
-msgid "January"
-msgstr ""
-
-msgid "February"
-msgstr ""
-
-msgid "March"
-msgstr ""
+msgstr "Apr"
 
 msgid "April"
-msgstr ""
+msgstr "Aprile"
 
-msgid "May"
-msgstr ""
+msgid "Aquatic"
+msgstr "Acquatico"
 
-msgid "June"
-msgstr ""
+msgid "AssignedToText"
+msgstr "Assegnato a"
 
-msgid "July"
-msgstr ""
+msgid "Aug_Short"
+msgstr "Ago"
 
 msgid "August"
-msgstr ""
+msgstr "Agosto"
 
-msgid "September"
-msgstr ""
+msgid "AvatarEmailError"
+msgstr "L'indirizzo email è necessario per il ripristino della password! ('none' se sconosciuta)"
 
-msgid "October"
-msgstr ""
+msgid "AvatarNameError"
+msgstr "Non è stato immesso un nome avatar!"
 
-msgid "November"
-msgstr ""
+msgid "AvatarNameSpacingError"
+msgstr "Il tuo nome avatar dovrebbe essere 'Nome Cognome'!"
 
-msgid "December"
-msgstr ""
+msgid "AvatarNameText"
+msgstr "Nome Avatar"
 
-msgid "ColorBoxImageText"
-msgstr ""
+msgid "AvatarPasswordError"
+msgstr "La password è vuota o non corrispondenti!"
 
-msgid "ColorBoxOfText"
-msgstr ""
+msgid "AvatarScopeText"
+msgstr "Avatar Scope ID"
 
-msgid "ColorBoxPreviousText"
-msgstr ""
+msgid "BackText"
+msgstr "Precedente"
 
-msgid "ColorBoxNextText"
-msgstr ""
+msgid "BankerNameText"
+msgstr "Sistema bancario"
 
-msgid "ColorBoxCloseText"
-msgstr ""
+msgid "BannedUntilText"
+msgstr "Utente bloccato fino a"
 
-msgid "ColorBoxStartSlideshowText"
-msgstr ""
+msgid "BanText"
+msgstr "Vieta Accesso"
 
-msgid "ColorBoxStopSlideshowText"
-msgstr ""
-
-msgid "NoAccountFound"
-msgstr ""
-
-msgid "DisplayInMenu"
-msgstr ""
-
-msgid "ParentText"
-msgstr ""
+msgid "Cancel"
+msgstr "Annulla"
 
 msgid "CannotSetParentToChild"
+msgstr "Impossibile impostare la voce di menu come derivato di se stesso."
+
+msgid "CatAll"
+msgstr "Tutti"
+
+msgid "CatArtsCulture"
+msgstr "Arts/Cultura"
+
+msgid "CatCharitySupport"
+msgstr "Carità/Gruppo di supporto"
+
+msgid "CatCommercial"
+msgstr "Commerciale"
+
+msgid "CatDiscussion"
+msgstr "Discussione"
+
+msgid "CatEducation"
+msgstr "Educazione"
+
+msgid "CategoryText"
+msgstr "Categoria"
+
+msgid "CatEmployment"
+msgstr "Occupazione"
+
+msgid "CatEntertainment"
+msgstr "Vita notturna/Divertimento"
+
+msgid "CatGames"
+msgstr "I giochi/Concorsi"
+
+msgid "CatLandRental"
+msgstr "Noleggio Terra"
+
+msgid "CatLiveMusic"
+msgstr "Musica dal vivo"
+
+msgid "CatMiscellaneous"
+msgstr "Miscellaneo"
+
+msgid "CatNewProducts"
+msgstr "Nuovi Prodotti"
+
+msgid "CatPageants"
+msgstr "Spettacoli"
+
+msgid "CatPersonal"
+msgstr "Personale"
+
+msgid "CatPropertyRental"
+msgstr "Affitto di proprietà"
+
+msgid "CatSelect"
 msgstr ""
 
-msgid "TopLevel"
-msgstr ""
+msgid "CatService"
+msgstr "Servizio"
+
+msgid "CatShopping"
+msgstr "Shopping"
+
+msgid "CatSpecialAttraction"
+msgstr "Attrazione speciale"
+
+msgid "CatSports"
+msgstr "Gli sport"
+
+msgid "CatWanted"
+msgstr "Ricercato"
+
+msgid "ChangeEmailText"
+msgstr "Mofifica indirizzo Email"
+
+msgid "ChangePass"
+msgstr "Cambia la password"
+
+msgid "ChangePasswordText"
+msgstr "Modifica Password"
+
+msgid "ChangesSavedSuccessfully"
+msgstr "I cambiamenti saranno salvati in seguito"
+
+msgid "ChangeUserInformationText"
+msgstr "Modifica informazioni utente"
+
+msgid "Charter_Member"
+msgstr "Socio fondatore"
+
+msgid "ChatText"
+msgstr "Chat di Supporto"
+
+msgid "CheckedText"
+msgstr "Verificato"
+
+msgid "ClassifiedsText"
+msgstr "Inserzioni <NT>"
+
+msgid "ClassifiedText"
+msgstr "Inserzioni <NT>"
+
+msgid "ClearStatsText"
+msgstr "Cancella dati statistici"
+
+msgid "ColorBoxCloseText"
+msgstr "Chiudi"
+
+msgid "ColorBoxImageText"
+msgstr "Immagine"
+
+msgid "ColorBoxNextText"
+msgstr "Successivo"
+
+msgid "ColorBoxOfText"
+msgstr "di"
+
+msgid "ColorBoxPreviousText"
+msgstr "Precedente"
+
+msgid "ColorBoxStartSlideshowText"
+msgstr "Presentazione immagini"
+
+msgid "ColorBoxStopSlideshowText"
+msgstr "Ferma la presentazione"
+
+msgid "Contractor"
+msgstr "Imprenditore"
+
+msgid "CoverChargeText"
+msgstr "Coperto"
+
+msgid "CreationDateText"
+msgstr "Creation date"
+
+msgid "Currency"
+msgstr "Valuta"
+
+msgid "CurrentPageText"
+msgstr "Pagina corrente"
+
+msgid "Custom"
+msgstr "Custom"
+
+msgid "DateEndText"
+msgstr "Data di Fine"
+
+msgid "DateInfoText"
+msgstr "Selezionare un intervallo di date"
+
+msgid "DateStartText"
+msgstr "Data di Inizio"
+
+msgid "DateText"
+msgstr "Data"
+
+msgid "de"
+msgstr "Deutsch"
+
+msgid "Dec_Short"
+msgstr "Dic"
+
+msgid "December"
+msgstr "Dicembre"
+
+msgid "DefaultsUpdated"
+msgstr "impostazioni di default aggiornate, vai alla pagina di reset delle impostazioni iniziali od alla sezione Amministrazione per eliminare questo messaggio."
+
+msgid "DelayedText"
+msgstr "Ritardato"
+
+msgid "DeleteItem"
+msgstr "Cancella elemento"
+
+msgid "DeleteNewsItem"
+msgstr "Elimina una Notizia"
+
+msgid "DeleteNewsText"
+msgstr "Elimina Notizia"
+
+msgid "DeleteText"
+msgstr "Cancella"
+
+msgid "DeleteUserInfoText"
+msgstr "Questa operazione eliminera i tuoi dati nella grid e non ti consentira di accedere di nuovo. Se davvero vuoi continuare inserisci di nuovo la tua password e clicca su Cancella."
+
+msgid "DeleteUserText"
+msgstr "Cancella il mio Account"
+
+msgid "DescriptionText"
+msgstr "Description"
+
+msgid "DetailsText"
+msgstr "Descrizione"
+
+msgid "Disabled"
+msgstr "Disabilitato"
+
+msgid "DisplayInMenu"
+msgstr "Visualizzazione nel menu"
+
+msgid "DurationText"
+msgstr "Durata"
+
+msgid "EditNewsItem"
+msgstr "Modifica le Notizie"
+
+msgid "EditNewsText"
+msgstr "Modifica Notizia"
+
+msgid "EditText"
+msgstr "Modifica"
+
+msgid "EdittingText"
+msgstr "La modifica"
+
+msgid "EditUserAccountText"
+msgstr "Modifica Account Utente"
+
+msgid "en"
+msgstr "English"
+
+msgid "Enabled"
+msgstr "Abilitato"
+
+msgid "Error404InfoText"
+msgstr "404 Pagina non trovata"
+
+msgid "Error404Text"
+msgstr "Codice Errore"
+
+msgid "Error505InfoText"
+msgstr "505 Errore interno del server"
+
+msgid "Error505Text"
+msgstr "Codice errore"
+
+msgid "es"
+msgstr "Español"
+
+msgid "Estate"
+msgstr "Tenuta"
+
+msgid "EstatesText"
+msgstr "Estates"
+
+msgid "EstateText"
+msgstr "Tenuta"
+
+msgid "EventDateText"
+msgstr "quando"
+
+msgid "EventLocationText"
+msgstr "Dove"
+
+msgid "EventNameText"
+msgstr "Evento"
+
+msgid "EventsText"
+msgstr "Eventi"
+
+msgid "EventTimeInfoText"
+msgstr "Tempo evento dovrebbe essere ora locale"
+
+msgid "ExpirationDateText"
+msgstr "Expiration date"
+
+msgid "FactoryReset"
+msgstr "Reset ad impostazioni iniziali"
+
+msgid "Feb_Short"
+msgstr "Feb"
+
+msgid "February"
+msgstr "Febbraio"
+
+msgid "FirstNameText"
+msgstr "Il tuo Nome"
+
+msgid "FirstText"
+msgstr "Primo"
+
+msgid "Flatland"
+msgstr "Pianura"
+
+msgid "ForgotPassword"
+msgstr "Password dimenticata?"
+
+msgid "FPSText"
+msgstr "Fotogrammi / secondo"
+
+msgid "fr"
+msgstr "Français"
+
+msgid "Fri"
+msgstr "Ven"
+
+msgid "Friday"
+msgstr "Venerdi"
+
+msgid "Friends"
+msgstr "Amici"
+
+msgid "FullRegion"
+msgstr "Regione ricca"
+
+msgid "GeneralText"
+msgstr "Generale"
+
+msgid "GovernorNameText"
+msgstr "Sistema di Governo"
+
+msgid "GPUText"
+msgstr "Schede grafiche"
+
+msgid "Grassland"
+msgstr "Prateria"
+
+msgid "GridCenterXText"
+msgstr "Centro della Grid: Coordinate X"
+
+msgid "GridCenterYText"
+msgstr "Centro della Grid: Coordinate Y"
+
+msgid "GridnameText"
+msgstr "Nome della grid "
+
+msgid "GridnickText"
+msgstr "Soprannome della grid "
+
+msgid "GridSettingsManager"
+msgstr "Gestione impostazioni della grid "
+
+msgid "GridStatus"
+msgstr "Stato della Grid"
+
+msgid "GroupNameText"
+msgstr "Gruppo"
+
+msgid "Guest"
+msgstr "Ospite"
+
+msgid "HelpText"
+msgstr "Aiuto"
+
+msgid "HelpViewersConfigText"
+msgstr "Configurazione Viewer"
 
 msgid "HideLanguageBarText"
-msgstr ""
+msgstr "Nascondi la barra di selezione della lingua"
+
+msgid "HideSlideshowBarText"
+msgstr "Nascondi barra presentazione"
 
 msgid "HideStyleBarText"
-msgstr ""
+msgstr "Nascondi stile barra di selezione"
+
+msgid "HomePage404Text"
+msgstr "home page"
+
+msgid "HomePage505Text"
+msgstr "home page"
+
+msgid "Homestead"
+msgstr "Fattoria"
+
+msgid "HomeText"
+msgstr "Home"
+
+msgid "HomeTextTips"
+msgstr "Nuove presentazioni"
+
+msgid "HomeTextWelcome"
+msgstr "Questo e il nostro nuovo mondo virtuale! Registrati gratis e fai la differenza!"
+
+msgid "HostedByText"
+msgstr "Ospitato da"
+
+msgid "HoursText"
+msgstr "ore"
+
+msgid "HourText"
+msgstr "ora"
+
+msgid "HyperGrid"
+msgstr "HyperGrid (HG)"
+
+msgid "IgnorePagesUpdatesText"
+msgstr "Ignora gli aggiornamenti fino al prossimo aggiornamento"
+
+msgid "IgnoreSettingsUpdatesText"
+msgstr "Ignora gli avvisi fino al prossimo aggiornamento"
+
+msgid "InterWorld"
+msgstr "Inter World (IWC)"
+
+msgid "Island"
+msgstr "Isola"
+
+msgid "IsOnlineText"
+msgstr "Stato dell utente"
+
+msgid "it"
+msgstr "Italiano"
+
+msgid "Jan_Short"
+msgstr "Gen"
+
+msgid "January"
+msgstr "Gennaio"
+
+msgid "Jul_Short"
+msgstr "Lug"
+
+msgid "July"
+msgstr "Luglio"
+
+msgid "Jun_Short"
+msgstr "Giu"
+
+msgid "June"
+msgstr "Giugno"
+
+msgid "KickAUserInfoText"
+msgstr "Kicks a user from the grid (logs them out within 30 seconds)"
+
+msgid "KickAUserText"
+msgstr "Espelli un utente (disconnetti un utente entro i prossimi 30 secondi)"
+
+msgid "KickMessageText"
+msgstr "invia un messaggio ad un utente"
+
+msgid "KickUserText"
+msgstr "Espelli un utente"
+
+msgid "LastNameText"
+msgstr "Il tuo Cognome"
+
+msgid "LastText"
+msgstr "Ultimo"
+
+msgid "ListedByText"
+msgstr " Listed by"
+
+msgid "LocalCSSText"
+msgstr "Foglio di stile CSS locale"
+
+msgid "LocalFrontPageText"
+msgstr "Prima pagina locale"
+
+msgid "LocationText"
+msgstr "Posizione"
+
+msgid "LoggedIPText"
+msgstr "Il tuo indirizzo IP"
+
+msgid "LoggedOutSuccessfullyText"
+msgstr "Sei stato disconnesso."
+
+msgid "Login"
+msgstr "Login"
+
+msgid "Logout"
+msgstr "Disconnetti"
+
+msgid "Mainland"
+msgstr "Terraferma"
+
+msgid "MainlandEstateNameText"
+msgstr "Terraferma immobiliare"
+
+msgid "Mar_Short"
+msgstr "Mar"
+
+msgid "March"
+msgstr "Marzo"
+
+msgid "MarketPlaceOwnerNameText"
+msgstr "Proprietario del Marketplace"
+
+msgid "MatureText"
+msgstr "Maturo"
+
+msgid "MaturityText"
+msgstr "Scadenza"
+
+msgid "May"
+msgstr "Maggio"
+
+msgid "May_Short"
+msgstr "Mag"
+
+msgid "Member"
+msgstr "Membro"
+
+msgid "MemoryUseageText"
+msgstr "Uso della memoria"
+
+msgid "MenuAbuse"
+msgstr "Denunce di Abuso"
+
+msgid "MenuChangeUserInformation"
+msgstr "Cambia Informazioni Utente"
+
+msgid "MenuChat"
+msgstr "Chat"
+
+msgid "MenuClassifieds"
+msgstr "Classifieds"
+
+msgid "MenuEstateManager"
+msgstr "Direttore immobiliare"
+
+msgid "MenuEvents"
+msgstr "Events"
+
+msgid "MenuFactoryReset"
+msgstr "Reset impostazioni iniziali"
+
+msgid "MenuForgotPass"
+msgstr "Password dimenticata"
+
+msgid "MenuGridSettings"
+msgstr "Impostazioni della grid"
+
+msgid "MenuGroupTitle"
+msgstr "Gruppo"
+
+msgid "MenuHelp"
+msgstr "Aiuto"
+
+msgid "MenuHome"
+msgstr "Home"
+
+msgid "MenuLogin"
+msgstr "Entra"
+
+msgid "MenuLogout"
+msgstr "Esci"
+
+msgid "MenuManager"
+msgstr "Gestione"
+
+msgid "MenuManagerSimConsole"
+msgstr "Sim console"
+
+msgid "MenuMyClassifieds"
+msgstr "Le mie Inserzioni <NT>"
+
+msgid "MenuMyEvents"
+msgstr "My Events"
+
+msgid "MenuMyPurchases"
+msgstr "I miei acquisti "
+
+msgid "MenuMyTransactions"
+msgstr "Le mie transazioni"
+
+msgid "MenuNews"
+msgstr "Notizie"
+
+msgid "MenuNewsManager"
+msgstr "Manager delle Notizie"
+
+msgid "MenuOnlineUsers"
+msgstr "Utenti Online"
+
+msgid "MenuOwnerTitle"
+msgstr "Proprietario"
+
+msgid "MenuPageManager"
+msgstr "Modifica delle Pagione"
+
+msgid "MenuParcelTitle"
+msgstr "Terreno"
+
+msgid "MenuPicksTitle"
+msgstr "Preferiti"
+
+msgid "MenuProfileTitle"
+msgstr "Profilo"
+
+msgid "MenuPurchases"
+msgstr "Acquisti degli utenti"
+
+msgid "MenuRegion"
+msgstr "Lista Regioni"
+
+msgid "MenuRegionManager"
+msgstr "Manager della Regione"
+
+msgid "MenuRegionSearch"
+msgstr "Ricerca Regione"
+
+msgid "MenuRegionsTitle"
+msgstr "Regioni"
+
+msgid "MenuRegionTitle"
+msgstr "Regione"
+
+msgid "MenuRegister"
+msgstr "Registrati"
+
+msgid "MenuSettings"
+msgstr "Impostazioni"
+
+msgid "MenuSettingsManager"
+msgstr "Modifica delle Impostazioni"
+
+msgid "MenuStatistics"
+msgstr "Statistiche Viewer"
+
+msgid "MenuTransactions"
+msgstr "Operazioni utente"
+
+msgid "MenuUser"
+msgstr "Utente"
+
+msgid "MenuUserManager"
+msgstr "Manager degli Utenti"
+
+msgid "MenuUserSearch"
+msgstr "Ricerca Utenti"
+
+msgid "MenuViewerHelp"
+msgstr "Viewer Help"
+
+msgid "MenuWelcomeScreenManager"
+msgstr "Manager della pagina di benvenuto"
+
+msgid "MenuWorld"
+msgstr "Mondo"
+
+msgid "MenuWorldMap"
+msgstr "Mappa del Mondo"
+
+msgid "MessageAUserInfoText"
+msgstr "Sends a user a blue-box message (will arrive within 30 seconds)"
+
+msgid "MessageAUserText"
+msgstr "Send User A Message"
+
+msgid "MessageUserText"
+msgstr "Message User"
+
+msgid "MinutesText"
+msgstr "minuti"
+
+msgid "MinuteText"
+msgstr "minuto"
+
+msgid "Mon"
+msgstr "Lun"
+
+msgid "Monday"
+msgstr "Lunedi"
+
+msgid "MoreInfo"
+msgstr "Piu informazioni"
+
+msgid "MoreInfoText"
+msgstr "Piu informazioni"
+
+msgid "Name"
+msgstr "Nome"
+
+msgid "NewEmailText"
+msgstr "Nuovo indirizzo Email"
+
+msgid "NewPasswordConfirmationText"
+msgstr "Nuova Password (Conferma)"
+
+msgid "NewPasswordText"
+msgstr "Nuova Password"
+
+msgid "News"
+msgstr " Notizie"
+
+msgid "NewsDateText"
+msgstr "Data della Notizia"
+
+msgid "NewsItemText"
+msgstr "Testo della nuova Notizia"
+
+msgid "NewsItemTitle"
+msgstr "Titolo della Notizia"
+
+msgid "NewsManager"
+msgstr "Manager delle Notizie"
+
+msgid "NewsTitleText"
+msgstr "Testo della Notizia"
+
+msgid "Next10Hours"
+msgstr "Prossime 10 ore"
+
+msgid "Next24Hours"
+msgstr "Prossime 24 ore"
+
+msgid "Next2Hours"
+msgstr "Prossime 2 ore"
+
+msgid "Next4Hours"
+msgstr "Prossime 4 ore"
+
+msgid "NextText"
+msgstr "Prossimo"
+
+msgid "nl"
+msgstr "Nederlands"
+
+msgid "No"
+msgstr "No"
+
+msgid "NoAccountFound"
+msgstr "Nessun account trovato"
+
+msgid "NoChangePass"
+msgstr "Impossibile cambiare la password, si prega di riprovare più tardi"
+
+msgid "NoDetailsText"
+msgstr "Nessun dato trovato..."
+
+msgid "NoPurchasesText"
+msgstr "Nessuna transazione trovata..."
+
+msgid "NormalText"
+msgstr "Normale"
+
+msgid "NotesText"
+msgstr "Nota"
+
+msgid "Nothing"
+msgstr "Nessuna"
+
+msgid "NoTransactionsText"
+msgstr "Nessuna transazione trovata..."
+
+msgid "Nov_Short"
+msgstr "Nov"
+
+msgid "November"
+msgstr "Novembre"
+
+msgid "NumberOfUsersInRegionText"
+msgstr "Numero di Utenti nella Regione"
+
+msgid "ObjectNameText"
+msgstr "Oggetto"
+
+msgid "Oct_Short"
+msgstr "Ott"
+
+msgid "October"
+msgstr "Ottobre"
+
+msgid "Offline"
+msgstr "Offline"
+
+msgid "Online"
+msgstr "Online"
+
+msgid "OnlineFriendsText"
+msgstr "Amici Online"
+
+msgid "OnlineLocationText"
+msgstr "Posizione dell Utente"
+
+msgid "OnlineNow"
+msgstr "Online Adesso"
+
+msgid "OnlineUsersText"
+msgstr "Utenti Online"
+
+msgid "OpenNewsManager"
+msgstr "Apri il manager delle Notizie"
+
+msgid "Openspace"
+msgstr "Spazio aperto"
+
+msgid "OwnerNameText"
+msgstr "Proprietario"
+
+msgid "PageIDText"
+msgstr "ID della Pagina"
+
+msgid "PageLocationText"
+msgstr "Posizione della Pagina"
+
+msgid "PageManager"
+msgstr "Manager della Pagina"
+
+msgid "PagePositionText"
+msgstr "Posizione della Pagina"
+
+msgid "Pages"
+msgstr "Pagine"
+
+msgid "PageTitleText"
+msgstr "Titolo della Pagina"
+
+msgid "PageTooltipText"
+msgstr "Suggerimenti per la Pagina"
+
+msgid "ParcelNameText"
+msgstr "Nome del Terreno"
+
+msgid "ParcelOwnerText"
+msgstr "Proprietario del Terreno"
+
+msgid "ParcelsInRegionText"
+msgstr "Terreni della Regione"
+
+msgid "ParentText"
+msgstr "Menu principale"
+
+msgid "Partner"
+msgstr "Compagno"
+
+msgid "PartnersName"
+msgstr "Nome del Partner"
+
+msgid "Password"
+msgstr "Password"
+
+msgid "PasswordConfirmation"
+msgstr "Conferma Password"
+
+msgid "PasswordText"
+msgstr "Password"
+
+msgid "PerformanceText"
+msgstr "Medie prestazioni"
+
+msgid "PickNameText"
+msgstr "Scegli il nome"
+
+msgid "PickRegionText"
+msgstr "Posizione"
+
+msgid "PingTimeText"
+msgstr "Tempo di Ping"
+
+msgid "PriceOfListingText"
+msgstr "Price"
+
+msgid "PricePerMeterText"
+msgstr "Prezzo al metro quadrato"
+
+msgid "PublicAccessText"
+msgstr "Accesso pubblico"
+
+msgid "PurchaseCostText"
+msgstr "Costo"
+
+msgid "PurchasesText"
+msgstr "Acquisti"
+
+msgid "RealEstateOwnerNameText"
+msgstr "Nome proprietario terreni del Governo"
+
+msgid "Region"
+msgstr "Regione"
+
+msgid "RegionCapacityText"
+msgstr "Capacità oggetto Regione"
+
+msgid "RegionDelayStartupText"
+msgstr "Delay starting scripts"
+
+msgid "RegionInfiniteText"
+msgstr "Regione Infinite"
+
+msgid "RegionInformationText"
+msgstr "Informazioni sulla Regione"
+
+msgid "RegionInfoText"
+msgstr "Info Regione"
+
+msgid "RegionListText"
+msgstr "Lista Regioni"
+
+msgid "RegionLocationText"
+msgstr "Posizione della Regione"
+
+msgid "RegionLocXText"
+msgstr "Coordinate X della Regione"
+
+msgid "RegionLocYText"
+msgstr "Coordinate Y della Regione"
+
+msgid "RegionMaturityText"
+msgstr "Livello di accesso"
+
+msgid "RegionMoreInfo"
+msgstr "Piu informazioni"
+
+msgid "RegionMoreInfoTooltips"
+msgstr "Piu informazioni su"
+
+msgid "RegionNameText"
+msgstr "Nome della Regione"
+
+msgid "RegionOnlineText"
+msgstr "Stato della Regione"
+
+msgid "RegionPortText"
+msgstr "Porto regione"
+
+msgid "RegionPresetText"
+msgstr "Region Preset"
+
+msgid "RegionPresetTypeText"
+msgstr "Regione Preset"
+
+msgid "RegionSearchText"
+msgstr "Cerca Regione"
+
+msgid "RegionSizeText"
+msgstr "Dimensione della Regione"
+
+msgid "RegionsVisitedText"
+msgstr "Regioni visitate"
+
+msgid "RegionTerrainText"
+msgstr "Terreno della sim"
+
+msgid "RegionTypeText"
+msgstr "Tipo della Regione"
+
+msgid "RegionVisibilityText"
+msgstr "Visibile a vicini di casa"
+
+msgid "RegistrationsDisabled"
+msgstr "La registrazione e attualmente disabilitata. Ti preghiamo di tornare su questa pagina piu tardi"
+
+msgid "RegistrationText"
+msgstr "Registrazione Avatar"
+
+msgid "RequiresAdminLevelText"
+msgstr "Required Admin Level To View"
+
+msgid "RequiresAdminText"
+msgstr "E necessario essere Amministratori per vedere questo contenuto"
+
+msgid "RequiresLoginText"
+msgstr "E necessario essere connessi per vedere questo contenuto"
+
+msgid "RequiresLogoutText"
+msgstr "E necessario disconnettersi per vedere questo contenuto"
+
+msgid "Reset"
+msgstr "Reset"
+
+msgid "ResetMenuInfoText"
+msgstr "Resetta gli elementi del menu alle ultime impostazioni di default"
+
+msgid "ResetMenuText"
+msgstr "Reset del menu alle impostazioni iniziali"
+
+msgid "ResetSettingsInfoText"
+msgstr "Resetta gli elementi della interfaccia Web alle ultime impostazioni di default"
+
+msgid "ResetSettingsText"
+msgstr "Reset delle impostazioni Web (pagina delle impostazioni Amministratore) alle impostazioni iniziali"
+
+msgid "Resident"
+msgstr "Residente"
+
+msgid "ResidentSince"
+msgstr "Residente dal"
+
+msgid "ru"
+msgstr "Русский"
+
+msgid "RunTimeText"
+msgstr "Tempo di esecuzione"
+
+msgid "Sat"
+msgstr "Sab"
+
+msgid "Saturday"
+msgstr "Sabato"
+
+msgid "Save"
+msgstr "Salva"
+
+msgid "SaveMenuItemChanges"
+msgstr "Salva elemento del menu"
+
+msgid "SaveUpdates"
+msgstr "Salva aggiornamenti"
+
+msgid "Search"
+msgstr "Cerca"
+
+msgid "SearchForRegionText"
+msgstr "Cerca una Regione"
+
+msgid "SearchForUserText"
+msgstr "Cerca un utente"
+
+msgid "SearchResultForRegionText"
+msgstr "Risultati della ricerca per Regione"
+
+msgid "SearchResultForUserText"
+msgstr "Risultati della ricerca Utente"
+
+msgid "SearchText"
+msgstr "Cerca"
+
+msgid "SelectItem"
+msgstr "Seleziona un elemento"
+
+msgid "Sep_Short"
+msgstr "Set"
+
+msgid "September"
+msgstr "Settembre"
+
+msgid "Settings"
+msgstr "Impostazioni"
+
+msgid "SettingsManager"
+msgstr "Manager delle Impostazioni"
+
+msgid "SimCommandText"
+msgstr "Comando"
+
+msgid "SimConsoleText"
+msgstr "Console di comando della Sim"
+
+msgid "SortByLocX"
+msgstr "Ordina secondo la coordinata X"
+
+msgid "SortByLocY"
+msgstr "Ordina secondo la coordinata Y"
+
+msgid "SortByName"
+msgstr "Ordina secondo il nome della Regione"
+
+msgid "SpecialWindowColorText"
+msgstr "Colore sezione Info Specialir"
+
+msgid "SpecialWindowStatusText"
+msgstr "Stato sezione Info Speciali"
+
+msgid "SpecialWindowTextText"
+msgstr "Testo sezione Info Speciali"
+
+msgid "SpecialWindowTitleText"
+msgstr "Titolo sezione Info Speciali"
+
+msgid "StatisticsText"
+msgstr "Statistiche Viewer"
+
+msgid "styles1"
+msgstr "Default Minimalista"
+
+msgid "styles2"
+msgstr "Gradiente Chiaro"
+
+msgid "styles3"
+msgstr "Blu notte"
+
+msgid "styles4"
+msgstr "Gradiente Scuro"
+
+msgid "styles5"
+msgstr "Luminoso"
+
+msgid "StyleSwitcherChoiceText"
+msgstr "Seleziona"
+
+msgid "StyleSwitcherLanguagesText"
+msgstr "Lingua"
+
+msgid "StyleSwitcherStylesText"
+msgstr "Stili"
+
+msgid "Submit"
+msgstr "Invia"
+
+msgid "SummaryText"
+msgstr "Sommario"
+
+msgid "Sun"
+msgstr "Dom"
+
+msgid "Sunday"
+msgstr "Domenica"
+
+msgid "SystemEstateNameText"
+msgstr "Nomi terreni del Governo"
+
+msgid "TaxFreeText"
+msgstr "Senza tasse"
+
+msgid "TermsOfServiceAccept"
+msgstr "Accetti i Termini di Servizio descritti qui sopra?"
+
+msgid "TermsOfServiceText"
+msgstr "Termini di Servizio"
+
+msgid "Thu"
+msgstr "Gio"
+
+msgid "Thursday"
+msgstr "Giovedi"
+
+msgid "TimeText"
+msgstr "Tempo"
+
+msgid "TimeUntilUnbannedText"
+msgstr "Tempo mancante allo sblocco utente"
+
+msgid "TooltipsMenuAbuse"
+msgstr "Utente denunciato"
+
+msgid "TooltipsMenuChangeUserInformation"
+msgstr "Modifica Impostazioni Utente"
+
+msgid "TooltipsMenuChat"
+msgstr "Chat"
+
+msgid "TooltipsMenuClassifieds"
+msgstr "Classifieds information"
+
+msgid "TooltipsMenuEstateManager"
+msgstr "Gestione immobiliare"
+
+msgid "TooltipsMenuEvents"
+msgstr "Event information"
+
+msgid "TooltipsMenuFactoryReset"
+msgstr "Reset alle impostazioni iniziali"
+
+msgid "TooltipsMenuForgotPass"
+msgstr "Password dimenticata"
+
+msgid "TooltipsMenuGridSettings"
+msgstr "Impostazioni della grid"
+
+msgid "TooltipsMenuGroups"
+msgstr "Gruppi di utenti"
+
+msgid "TooltipsMenuHelp"
+msgstr "Aiuto"
+
+msgid "TooltipsMenuHome"
+msgstr "Home"
+
+msgid "TooltipsMenuLogin"
+msgstr "Entra"
+
+msgid "TooltipsMenuLogout"
+msgstr "Esci"
+
+msgid "TooltipsMenuManager"
+msgstr "Impostazioni Amministratore"
+
+msgid "TooltipsMenuManagerSimConsole"
+msgstr "Console della sim"
+
+msgid "TooltipsMenuNews"
+msgstr "Notizie"
+
+msgid "TooltipsMenuNewsManager"
+msgstr "Manager delle Notizie"
+
+msgid "TooltipsMenuOnlineUsers"
+msgstr "Utenti Online"
+
+msgid "TooltipsMenuOwner"
+msgstr "Proprietari dei terreni"
+
+msgid "TooltipsMenuPageManager"
+msgstr "Manager delle Pagine"
+
+msgid "TooltipsMenuParcel"
+msgstr "Terreni nella Regione"
+
+msgid "TooltipsMenuPicks"
+msgstr "Selezioni utente"
+
+msgid "TooltipsMenuProfile"
+msgstr "Profilo utente"
+
+msgid "TooltipsMenuPurchases"
+msgstr "Informazioni Acquisto"
+
+msgid "TooltipsMenuRegion"
+msgstr "Dettagli Regione"
+
+msgid "TooltipsMenuRegionManager"
+msgstr "Regione creare / modificare"
+
+msgid "TooltipsMenuRegions"
+msgstr "Regioni utenti"
+
+msgid "TooltipsMenuRegionSearch"
+msgstr "Ricerca Regione"
+
+msgid "TooltipsMenuRegister"
+msgstr "Registrati"
+
+msgid "TooltipsMenuSettings"
+msgstr "Impostazioni WebUI"
+
+msgid "TooltipsMenuSettingsManager"
+msgstr "Manager delle impostazioni"
+
+msgid "TooltipsMenuStatistics"
+msgstr "Statistiche Viewer"
+
+msgid "TooltipsMenuTransactions"
+msgstr "Informazioni sulle transazioni"
+
+msgid "TooltipsMenuUser"
+msgstr "Utente"
+
+msgid "TooltipsMenuUserManager"
+msgstr "Manager degli Utenti"
+
+msgid "TooltipsMenuUserSearch"
+msgstr "Ricerca Utenti"
+
+msgid "TooltipsMenuViewerHelp"
+msgstr "Aiuto"
+
+msgid "TooltipsMenuWelcomeScreenManager"
+msgstr "Manager pagina di benvenuto"
+
+msgid "TooltipsMenuWorld"
+msgstr "Mondo"
+
+msgid "TooltipsMenuWorldMap"
+msgstr "Mappa del Mondo"
+
+msgid "TooltipsWelcomeScreen"
+msgstr "Pagina di Benvenuto"
+
+msgid "TooltipsWorldMap"
+msgstr "Mappa del Mondo"
+
+msgid "TopLevel"
+msgstr "Livello superiore"
+
+msgid "TotalRegionCount"
+msgstr "Regioni totali"
+
+msgid "TotalUserCount"
+msgstr "Utenti totali"
+
+msgid "TransactionAmountText"
+msgstr "Importo"
+
+msgid "TransactionBalanceText"
+msgstr "Saldo"
+
+msgid "TransactionDateText"
+msgstr "Data"
+
+msgid "TransactionDetailText"
+msgstr "Descrizione"
+
+msgid "TransactionFromAgentText"
+msgstr "From User"
+
+msgid "TransactionsText"
+msgstr "Operazioni"
+
+msgid "TransactionToAgentText"
+msgstr "To User"
+
+msgid "Tue"
+msgstr "Mar"
+
+msgid "Tuesday"
+msgstr "Martedi"
+
+msgid "TypeUserNameToConfirm"
+msgstr "Si prega di inserire il nome utente di questo account per confermare che si desidera eliminare questo account"
+
+msgid "UnbanText"
+msgstr "Consenti Accesso"
+
+msgid "UniqueVisitors"
+msgstr "Visitatori unici ultimi 30 giorni"
+
+msgid "UpdateRequired"
+msgstr "aggiornamento richiesto"
+
+msgid "UserAddressText"
+msgstr "Il tuo indirizzo"
+
+msgid "UserCityText"
+msgstr "La tua citta"
+
+msgid "UserCountryText"
+msgstr "Il tuo paese"
+
+msgid "UserDOBText"
+msgstr "La tua data di nascita (Mese Giorno Anno)"
+
+msgid "UserEmailText"
+msgstr "La tua Email"
+
+msgid "UserGroupNameText"
+msgstr "Gruppo utenti"
+
+msgid "UserHomeRegionText"
+msgstr "Regione Home"
+
+msgid "UserName"
+msgstr "Nome Utente"
+
+msgid "UserNameText"
+msgstr "Nome Utente"
+
+msgid "UserProfileFor"
+msgstr "Profilo Utente per"
+
+msgid "UserSearchText"
+msgstr "Ricerca Utente"
+
+msgid "UsersGroupsText"
+msgstr "Gruppi"
+
+msgid "UsersPicksText"
+msgstr "Preferiti"
+
+msgid "UserTypeText"
+msgstr "Tipo di utente"
+
+msgid "UserZipText"
+msgstr "Il tuo codice postale"
+
+msgid "UUIDText"
+msgstr "UUID"
+
+msgid "ViewersText"
+msgstr "Usage Viewer"
+
+msgid "Voice"
+msgstr "Voice"
+
+msgid "WebRegistrationText"
+msgstr "Registrazioni Web consentite"
+
+msgid "WebsiteDownInfoText"
+msgstr "Il sito web e attualmente offline, ti preghiamo di provare piu tardi."
+
+msgid "WebsiteDownText"
+msgstr "Il sito web e offline"
+
+msgid "Wed"
+msgstr "Mer"
+
+msgid "Wednesday"
+msgstr "Mercoledi"
+
+msgid "WelcomeMessageText"
+msgstr "Sezione messaggi di benvenuto "
+
+msgid "WelcomeScreen"
+msgstr "Pagina di Benvenuto"
+
+msgid "WelcomeScreenManagerFor"
+msgstr "Manager della pagina di benvenuto per"
+
+msgid "WelcomeToText"
+msgstr "Benvenuto a"
+
+msgid "WorldMap"
+msgstr "Mappa del mondo"
+
+msgid "WorldMapText"
+msgstr "Schermo intero"
+
+msgid "Yes"
+msgstr "Si"
+

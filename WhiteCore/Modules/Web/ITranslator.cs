@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) Contributors, http://whitecore-sim.org/
+ * Copyright (c) http://whitecore-sim.org/
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,7 +34,6 @@ namespace WhiteCore.Modules.Web
         string FullLanguageName { get; }
         string GetTranslatedString (string key);
 
-        void Serialize (string basePath);
         void Deserialize (string basePath);
     }
 }
