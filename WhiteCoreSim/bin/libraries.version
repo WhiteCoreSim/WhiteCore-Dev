@@ -7,13 +7,13 @@ Library                                                         Version         
 
 Autofac.dll                                                     2.6.1841                10 Dec 2012
 BulletXNA.dll                                                   1.0.0.0                 24 Jun 2013
-CSJ2K.dll                                                       1.9.4.6					 4 Jan 2017             LibOMV/WhiteCore
+CSJ2K.dll                                                       1.9.4.6                  4 Jan 2017             LibOMV/WhiteCore
 Community.CsharpSqlite.SQLiteClient.dll                         3.7.7.1                 30 Apr 2014             WhiteCore
 Community.CsharpSqlite.dll                                      1.0.0.0                 30 Apr 2014             WhiteCore
 CookComputing.XmlRpcV2.dll                                      0.0.0.0                 08 Apr 2013
 GlynnTucker.Cache.dll                                           1.0.0.0                 10 Dec 2012
 Google.ProtocolBuffers.dll                                      1.0.0.0                 10 Dec 2012
-MySql.Data.dll                                                  6.9.9.0                  3 Jan 2017				MySQL
+MySql.Data.dll                                                  6.9.9.0                  3 Jan 2017             MySQL
 Nini.dll                                                        1.1.0.0                 10 Dec 2012
 OpenMetaverse.Rendering.Meshmerizer.dll                         0.9.4.6                  4 Jan 2017             LibOMV/WhiteCore
 OpenMetaverse.StructuredData.dll                                0.9.4.6                  4 Jan 2017             LibOMV/WhiteCore
