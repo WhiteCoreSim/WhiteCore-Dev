@@ -7558,27 +7558,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             }
         }
 
-        public void llSitTarget(LSL_Vector offset, LSL_Rotation rot)
+        protected void SitTarget (ISceneChildEntity part, LSL_Vector offset, LSL_Rotation rot)
         {
-            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) 
-                return;
-
-            // LSL quaternions can normalize to 0, normal Quaternions can't.
-            if (FloatAlmostEqual(rot.s, 0) &&
-                FloatAlmostEqual(rot.x, 0) &&
-                FloatAlmostEqual(rot.y, 0) &&
-                FloatAlmostEqual(rot.z, 0))
-                rot.z = 1; // ZERO_ROTATION = 0,0,0,1
-
-            m_host.SitTargetPosition = new Vector3((float)offset.x, (float)offset.y, (float)offset.z);
-            m_host.SitTargetOrientation = Rot2Quaternion(rot);
-        }
-
-        public void llLinkSitTarget(LSL_Integer link, LSL_Vector offset, LSL_Rotation rot)
-        {
-            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) 
-                return;
-
             // LSL quaternions can normalize to 0, normal Quaternions can't.
             if (FloatAlmostEqual (rot.s, 0) &&
                 FloatAlmostEqual (rot.x, 0) &&
@@ -7586,32 +7567,60 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 FloatAlmostEqual (rot.z, 0))
                 rot.z = 1; // ZERO_ROTATION = 0,0,0,1
 
-            List<ISceneChildEntity> entities = GetLinkParts(link);
-            if (entities.Count == 0)
+            part.SitTargetPosition = new Vector3 ((float)offset.x, (float)offset.y, (float)offset.z);;
+            part.SitTargetOrientation = Rot2Quaternion (rot);;
+            part.ParentEntity.HasGroupChanged = true;
+        }
+
+        public void llSitTarget(LSL_Vector offset, LSL_Rotation rot)
+        {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) 
+                return;
+            SitTarget (m_host, offset, rot);
+        }
+
+        public void llLinkSitTarget(LSL_Integer link, LSL_Vector offset, LSL_Rotation rot)
+        {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) 
                 return;
 
-            entities[0].SitTargetPosition = new Vector3((float)offset.x, (float)offset.y, (float)offset.z);
-            entities[0].SitTargetOrientation = Rot2Quaternion(rot);
+            if (link == ScriptBaseClass.LINK_ROOT)
+                SitTarget (m_host.ParentEntity.RootChild, offset, rot);
+            else if (link == ScriptBaseClass.LINK_THIS)
+                SitTarget (m_host, offset, rot);
+            else {
+                var entity = m_host.ParentEntity.GetLinkNumPart (link);
+                if (entity != null) {
+                    SitTarget ((ISceneChildEntity) entity, offset, rot);
+                }
+            }
         }
 
         public LSL_String llAvatarOnSitTarget()
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) 
-                return "";
+                return ScriptBaseClass.NULL_KEY;
 
             return m_host.SitTargetAvatar.Count > 0
                        ? new LSL_String(m_host.SitTargetAvatar[0].ToString())
                        : ScriptBaseClass.NULL_KEY;
         }
 
-        public LSL_Key llAvatarOnLinkSitTarget()
+        public LSL_Key llAvatarOnLinkSitTarget(LSL_Integer link)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Key();
+                return ScriptBaseClass.NULL_KEY;
 
-            return m_host.SitTargetAvatar.Count > 0
-                       ? new LSL_String(m_host.SitTargetAvatar[0].ToString())
-                       : ScriptBaseClass.NULL_KEY;
+            if (link == ScriptBaseClass.LINK_SET ||
+                link == ScriptBaseClass.LINK_ALL_CHILDREN ||
+                link == ScriptBaseClass.LINK_ALL_OTHERS ||
+                link == 0)
+                return ScriptBaseClass.NULL_KEY;
+
+            var entities = GetLinkParts (link);
+            return entities.Count == 0
+                           ? ScriptBaseClass.NULL_KEY
+                           : new LSL_String (entities [0].SitTargetAvatar.ToString ());
         }
 
         public DateTime llAddToLandPassList(string avatar, double hours)
