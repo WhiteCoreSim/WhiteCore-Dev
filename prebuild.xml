@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <Prebuild version="1.10" xmlns="http://dnpb.sourceforge.net/schemas/prebuild-1.10.xsd">
-  <Solution activeConfig="Debug" name="WhiteCore" path="./" version="0.9.4 $Rev$">
+  <Solution activeConfig="Debug" name="WhiteCore" path="./" version="0.9.5 $Rev$">
     <Configuration name="Debug" platform="x86">
       <Options>
         <CompilerDefines>TRACE;DEBUG</CompilerDefines>
@@ -9,20 +9,7 @@
         <AllowUnsafe>true</AllowUnsafe>
         <WarningLevel>4</WarningLevel>
         <WarningsAsErrors>false</WarningsAsErrors>
-        <OutputPath>bin</OutputPath>
-        <DebugInformation>true</DebugInformation>
-        <IncrementalBuild>true</IncrementalBuild>
-        <NoStdLib>false</NoStdLib>
-      </Options>
-    </Configuration>
-    <Configuration name="Debug" platform="x86">
-      <Options>
-        <CompilerDefines>TRACE;DEBUG</CompilerDefines>
-        <OptimizeCode>false</OptimizeCode>
-        <CheckUnderflowOverflow>false</CheckUnderflowOverflow>
-        <AllowUnsafe>true</AllowUnsafe>
-        <WarningLevel>4</WarningLevel>
-        <WarningsAsErrors>false</WarningsAsErrors>
+        <SuppressWarnings>1591,1574,0419,0618</SuppressWarnings>
         <OutputPath>bin</OutputPath>
         <DebugInformation>true</DebugInformation>
         <IncrementalBuild>true</IncrementalBuild>
@@ -37,12 +24,13 @@
         <AllowUnsafe>true</AllowUnsafe>
         <WarningLevel>4</WarningLevel>
         <WarningsAsErrors>false</WarningsAsErrors>
+        <SuppressWarnings>1591,1574,0419,0618</SuppressWarnings>
         <OutputPath>bin</OutputPath>
         <DebugInformation>true</DebugInformation>
         <IncrementalBuild>true</IncrementalBuild>
         <NoStdLib>false</NoStdLib>
       </Options>
-    </Configuration>	
+    </Configuration>
     <Configuration name="Release" platform="x86">
       <Options>
         <CompilerDefines></CompilerDefines>
@@ -74,6 +62,146 @@
       </Options>
     </Configuration>
 
+    <!-- Libraries -->
+
+    <Project name="CSJ2K" path="Whitecore-LibOMV/CSJ2K" type="Library" frameworkVersion="v4_5">
+      <Configuration name="Debug" platform="x86">
+        <Options>
+          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Release" platform="x86">
+        <Options>
+          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Debug" platform="x64">
+        <Options>
+          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Release" platform="x64">
+        <Options>
+          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
+        </Options>
+      </Configuration>
+
+      <ReferencePath>../../WhiteCoreSim/bin/</ReferencePath>
+      <Reference name="System"/>
+      <Reference name="System.Drawing"/>
+      <Files>
+        <Match pattern="*.cs" recurse="true">
+          <Exclude name="obj" pattern="obj"/>
+        </Match>
+      </Files>
+    </Project>
+
+    <Project name="OpenMetaverseTypes" path="Whitecore-LibOMV/OpenMetaverseTypes" type="Library" rootNamespace="OpenMetaverse" frameworkVersion="v4_5">
+      <Configuration name="Debug" platform="x86">
+        <Options>
+          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Release" platform="x86">
+        <Options>
+          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Debug" platform="x64">
+        <Options>
+          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Release" platform="x64">
+        <Options>
+          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
+        </Options>
+      </Configuration>
+
+      <ReferencePath>../../WhiteCoreSim/bin/</ReferencePath>
+      <Reference name="System"/>
+      <Reference name="System.Core"/>
+      <Files>
+        <Match pattern="*.cs" recurse="true">
+          <Exclude name="obj" pattern="obj"/>
+        </Match>
+      </Files>
+    </Project>
+
+    <Project name="OpenMetaverse.StructuredData" path="Whitecore-LibOMV/OpenMetaverse.StructuredData" type="Library" rootNamespace="OpenMetaverse.StructuredData" frameworkVersion="v4_5">
+      <Configuration name="Debug" platform="x86">
+        <Options>
+          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Release" platform="x86">
+        <Options>
+          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Debug" platform="x64">
+        <Options>
+          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Release" platform="x64">
+        <Options>
+          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
+        </Options>
+      </Configuration>
+
+      <ReferencePath>../../WhiteCoreSim/bin/</ReferencePath>
+      <Reference name="System"/>
+      <Reference name="System.Xml"/>
+      <Reference name="OpenMetaverseTypes"/>
+      <Files>
+        <Match pattern="*.cs" recurse="true">
+          <Exclude name="obj" pattern="obj"/>
+        </Match>
+      </Files>
+    </Project>
+
+    <Project name="OpenMetaverse" path="Whitecore-LibOMV/OpenMetaverse" type="Library" rootNamespace="OpenMetaverse" frameworkVersion="v4_5">
+      <Configuration name="Debug" platform="x86">
+        <Options>
+          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Release" platform="x86">
+        <Options>
+          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Debug" platform="x64">
+        <Options>
+          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Release" platform="x64">
+        <Options>
+          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
+        </Options>
+      </Configuration>
+
+      <ReferencePath>../../WhiteCoreSim/bin/</ReferencePath>
+      <Reference name="System"/>
+      <Reference name="System.Core"/>
+      <Reference name="System.Xml"/>
+      <Reference name="System.Data"/>
+      <Reference name="System.Drawing"/>
+      <Reference name="OpenMetaverseTypes"/>
+      <Reference name="OpenMetaverse.StructuredData"/>
+      <Reference name="XMLRPC"/>
+      <Reference name="ZLibNet" />
+
+      <Files>
+        <Match pattern="*.cs" recurse="true">
+          <Exclude name="obj" pattern="obj"/>
+        </Match>
+      </Files>
+    </Project>
+
+    <!-- WhiteCore Libraries -->
     <Project frameworkVersion="v4_5" name="WhiteCore.Framework" path="WhiteCore/Framework" type="Library">
       <Configuration name="Debug" platform="x86">
         <Options>
@@ -101,10 +229,10 @@
       <Reference name="System.Core"/>
       <Reference name="System.Data"/>
       <Reference name="System.Drawing"/>
-	  <Reference name="System.Net.Http"/>
-	  <Reference name="System.Windows.Forms"/>
+	    <Reference name="System.Net.Http"/>
+	    <Reference name="System.Windows.Forms"/>
       <Reference name="System.Web"/>
- 	  <Reference name="System.Xml"/>
+ 	    <Reference name="System.Xml"/>
 
       <Reference name="Nini" path="../../WhiteCoreSim/bin/"/>
       <Reference name="OpenMetaverse" path="../../WhiteCoreSim/bin/"/>
@@ -113,7 +241,7 @@
       <Reference name="protobuf-net.dll" path="../../WhiteCoreSim/bin/"/>
       <Reference name="SmartThreadPool.dll" path="../../WhiteCoreSim/bin/"/>
       <Reference name="XMLRPC" path="../../WhiteCoreSim/bin/"/>
-      
+
       <Files>
         <Match pattern="*.cs" recurse="true">
           <Exclude name="obj" pattern="obj"/>
@@ -146,12 +274,12 @@
 
       <ReferencePath>../../../WhiteCoreSim/bin/</ReferencePath>
       <Reference name="System"/>
-      
+
       <Reference name="WhiteCore.Framework"/>
-      
+
       <Reference name="Nini" path="../../../WhiteCoreSim/bin/"/>
       <Reference name="OpenMetaverseTypes" path="../../../WhiteCoreSim/bin/"/>
-      
+
       <Files>
         <Match pattern="*.cs" recurse="true">
           <Exclude name="obj" pattern="obj"/>
@@ -185,7 +313,7 @@
       <Reference name="System"/>
 	  <Reference name="System.Core"/>
       <Reference name="System.Drawing"/>
-      
+
       <Reference name="WhiteCore.Framework"/>
 
       <Reference name="CSJ2K" path="../../../WhiteCoreSim/bin/"/>
@@ -313,7 +441,7 @@
 
       <Reference name="WhiteCore.DataManager"/>
       <Reference name="WhiteCore.Framework"/>
-      
+
       <Reference name="Nini" path="../../WhiteCoreSim/bin/"/>
       <Reference name="OpenMetaverse" path="../../WhiteCoreSim/bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../WhiteCoreSim/bin/"/>
@@ -361,7 +489,7 @@
 
       <Reference name="WhiteCore.DataManager"/>
       <Reference name="WhiteCore.Services.DataService"/>
-      
+
       <Reference name="WhiteCore.Framework"/>
 
       <Reference name="Nini" path="../../../WhiteCoreSim/bin/"/>
@@ -427,7 +555,7 @@
         </Match>
       </Files>
     </Project>
-	
+
     <Project frameworkVersion="v4_5" name="WhiteCore.Services.GenericServices" path="WhiteCore/Services/GenericServices" type="Library">
       <Configuration name="Debug" platform="x86">
         <Options>
@@ -506,14 +634,14 @@
       <Reference name="System.Core"/>
       <Reference name="System.Data"/>
       <Reference name="System.Xml"/>
-      
+
       <Reference name="WhiteCore.Framework"/>
 
       <Reference name="Nini" path="../../WhiteCoreSim/bin/"/>
       <Reference name="OpenMetaverse" path="../../WhiteCoreSim/bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../WhiteCoreSim/bin/"/>
       <Reference name="OpenMetaverseTypes" path="../../WhiteCoreSim/bin/"/>
-      
+
       <Files>
         <Match pattern="*.cs" recurse="true">
           <Exclude name="obj" pattern="obj"/>
@@ -552,13 +680,13 @@
 
       <Reference name="WhiteCore.DataManager"/>
 	  <Reference name="WhiteCore.Framework"/>
-		
+
       <Reference name="MySql.Data" path="../../../WhiteCoreSim/bin/"/>
       <Reference name="Nini" path="../../../WhiteCoreSim/bin/"/>
       <Reference name="OpenMetaverse" path="../../../WhiteCoreSim/bin/"/>
       <Reference name="OpenMetaverseTypes" path="../../../WhiteCoreSim/bin/"/>
 	  <Reference name="OpenMetaverse.StructuredData" path="../../../WhiteCoreSim/bin/"/>
-      
+
       <Files>
         <Match pattern="*.cs" recurse="true">
           <Exclude name="obj" pattern="obj"/>
@@ -594,7 +722,7 @@
       <Reference name="System.Data"/>
       <Reference name="System.Drawing"/>
       <Reference name="System.Xml"/>
-      
+
       <Reference name="WhiteCore.DataManager"/>
       <Reference name="WhiteCore.Framework"/>
 
@@ -659,7 +787,7 @@
         </Match>
       </Files>
     </Project>
-  
+
     <Project frameworkVersion="v4_5" name="WhiteCore.ClientStack" path="WhiteCore/ClientStack" type="Library">
       <Configuration name="Debug" platform="x86">
         <Options>
@@ -688,7 +816,7 @@
       <Reference name="System.Xml"/>
 
       <Reference name="WhiteCore.Framework"/>
-      
+
       <Reference name="Nini"  path="../../WhiteCoreSim/bin/"/>
       <Reference name="OpenMetaverse" path="../../WhiteCoreSim/bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../WhiteCoreSim/bin/"/>
@@ -702,7 +830,7 @@
         </Match>
       </Files>
     </Project>
-	  
+
     <!-- WhiteCore app -->
     <Project frameworkVersion="v4_5" name="WhiteCore" path="WhiteCore/Application" type="Exe" appmanifest="app.manifest" icon="WhiteCore.ico">
       <Configuration name="Debug" platform="x86">
@@ -739,7 +867,7 @@
         <Match pattern="*.manifest" buildAction="None"  recurse="false"/>
       </Files>
     </Project>
-	
+
     <Project frameworkVersion="v4_5" name="WhiteCore.Server" path="WhiteCore/Server" type="Exe" appmanifest="app.manifest" icon="WhiteCore.Server.ico">
       <Configuration name="Debug" platform="x86">
         <Options>
@@ -821,7 +949,7 @@
         <Match pattern="*.manifest" buildAction="None"  recurse="true"/>
       </Files>
     </Project>
-	
+
     <Project frameworkVersion="v4_5" name="WhiteCore.Server.AvatarServer" path="WhiteCore/Servers/AvatarServer" type="Exe" appmanifest="app.manifest" icon="WhiteCore.Standalone.ico">
       <Configuration name="Debug" platform="x86">
         <Options>
@@ -862,7 +990,7 @@
         <Match pattern="*.manifest" buildAction="None"  recurse="true"/>
       </Files>
     </Project>
-	
+
     <Project frameworkVersion="v4_5" name="WhiteCore.Server.GridServer" path="WhiteCore/Servers/GridServer" type="Exe" appmanifest="app.manifest" icon="WhiteCore.Standalone.ico">
       <Configuration name="Debug" platform="x86">
         <Options>
@@ -944,7 +1072,7 @@
         <Match pattern="*.manifest" buildAction="None"  recurse="true"/>
       </Files>
     </Project>
-	
+
     <Project frameworkVersion="v4_5" name="WhiteCore.Server.WebServer" path="WhiteCore/Servers/WebServer" type="Exe" appmanifest="app.manifest" icon="WhiteCore.Webserver.ico">
       <Configuration name="Debug" platform="x86">
         <Options>
@@ -1018,7 +1146,7 @@
       <Reference name="WhiteCore.Framework"/>
       <Reference name="WhiteCore.Services.DataService"/>
       <Reference name="WhiteCore.Services.GenericServices"/>
-      
+
       <Reference name="Nini" path="../../../WhiteCoreSim/bin/"/>
       <Reference name="OpenMetaverse" path="../../../WhiteCoreSim/bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../WhiteCoreSim/bin/"/>
@@ -1078,7 +1206,7 @@
         </Match>
       </Files>
     </Project>
-    
+
     <Project frameworkVersion="v4_5" name="WhiteCore.Modules" path="WhiteCore/Modules" type="Library">
       <Configuration name="Debug" platform="x86">
         <Options>
@@ -1158,7 +1286,7 @@
       <Reference name="System.Core"/>
 
       <Reference name="WhiteCore.Framework"/>
-      
+
       <Reference name="Nini" path="../../../WhiteCoreSim/bin/"/>
       <Reference name="OpenMetaverseTypes" path="../../../WhiteCoreSim/bin/"/>
 
@@ -1202,7 +1330,7 @@
 
       <Reference name="WhiteCore.DataManager"/>
       <Reference name="WhiteCore.Framework"/>
-      
+
       <Reference name="Nini" path="../../../WhiteCoreSim/bin/"/>
       <Reference name="ScriptEngineParser" path="../../../WhiteCoreSim/bin/"/>
       <Reference name="OpenMetaverse" path="../../../WhiteCoreSim/bin/"/>
@@ -1250,7 +1378,7 @@
       <Reference name="WhiteCore.DataManager"/>
       <Reference name="WhiteCore.Framework"/>
       <Reference name="WhiteCore.ScriptEngine.DotNetEngine"/>
-      
+
       <Reference name="Nini" path="../../WhiteCoreSim/bin/"/>
       <Reference name="OpenMetaverse" path="../../WhiteCoreSim/bin/"/>
       <Reference name="OpenMetaverseTypes" path="../../WhiteCoreSim/bin/"/>
@@ -1308,7 +1436,7 @@
         </Match>
       </Files>
 	</Project>
-	
+
 	<?include file="addon-modules/*/prebuild*.xml" ?>
 
   </Solution>
