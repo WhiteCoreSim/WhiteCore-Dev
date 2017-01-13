@@ -210,7 +210,7 @@ namespace WhiteCore.Region.Animation
             if (m_scenePresence.SitGround) {
                 return "SIT_GROUND_CONSTRAINED";
             }
-            AgentManager.ControlFlags controlFlags = (AgentManager.ControlFlags)m_scenePresence.AgentControlFlags;
+            var controlFlags = (AgentManager.ControlFlags)m_scenePresence.AgentControlFlags;
             PhysicsActor actor = m_scenePresence.PhysicsActor;
 
             // Create forward and left vectors from the current avatar rotation
@@ -273,15 +273,15 @@ namespace WhiteCore.Region.Animation
 
             if (heldTurnLeft && yawPos && !heldForward &&
                 !heldBack && actor != null && !actor.IsJumping &&
-                !actor.Flying && move.Z == 0 &&
-                fallVelocity == 0.0f && !heldUp &&
+                !actor.Flying && Util.ApproxZero(move.Z) &&
+                Util.ApproxZero (fallVelocity) && !heldUp &&
                 !heldDown && move.CompareTo (Vector3.Zero) == 0) {
                 return "TURNLEFT";
             }
             if (heldTurnRight && yawNeg && !heldForward &&
                 !heldBack && actor != null && !actor.IsJumping &&
-                !actor.Flying && move.Z == 0 &&
-                fallVelocity == 0.0f && !heldUp &&
+                !actor.Flying && Util.ApproxZero (move.Z) &&
+                Util.ApproxZero (fallVelocity) && !heldUp &&
                 !heldDown && move.CompareTo (Vector3.Zero) == 0) {
                 return "TURNRIGHT";
             }
@@ -308,7 +308,7 @@ namespace WhiteCore.Region.Animation
                 return "BRUSH";
             }
 
-            if (m_animTickStandup != 0 || m_scenePresence.FallenStandUp) {
+            if (Util.NotZero(m_animTickStandup) || m_scenePresence.FallenStandUp) {
                 m_scenePresence.FallenStandUp = false;
                 m_animTickStandup = 0;
             }
@@ -322,9 +322,9 @@ namespace WhiteCore.Region.Animation
                 (uint)AgentManager.ControlFlags.AGENT_CONTROL_FLY || m_scenePresence.ForceFly) {
                 m_animTickWalk = 0;
                 m_animTickFall = 0;
-                if (move.X != 0f || move.Y != 0f) {
+                if (Util.NotZero(move.X) || Util.NotZero(move.Y)) {
                     // level?
-                    if (move.Z == 0) {
+                    if (Util.NotZero(move.Z)) {
                         if (m_scenePresence.Scene.PhysicsScene.UseUnderWaterPhysics &&
                             actor.Position.Z < m_scenePresence.Scene.RegionInfo.RegionSettings.WaterHeight) {
                             return "SWIM_FORWARD";
@@ -377,21 +377,20 @@ namespace WhiteCore.Region.Animation
                     if (m_scenePresence.Scene.PhysicsScene.UseUnderWaterPhysics &&
                         actor.Position.Z < m_scenePresence.Scene.RegionInfo.RegionSettings.WaterHeight)
                         return "SWIM_DOWN";
-                    else {
-                        ITerrainChannel channel = m_scenePresence.Scene.RequestModuleInterface<ITerrainChannel> ();
-                        if (channel != null) {
-                            float groundHeight =
-                                channel.GetNormalizedGroundHeight ((int)m_scenePresence.AbsolutePosition.X,
-                                                                  (int)m_scenePresence.AbsolutePosition.Y);
-                            if (actor != null && (m_scenePresence.AbsolutePosition.Z - groundHeight) < 2)
-                                return "LAND";
+                    
+                    ITerrainChannel channel = m_scenePresence.Scene.RequestModuleInterface<ITerrainChannel> ();
+                    if (channel != null) {
+                        float groundHeight =
+                            channel.GetNormalizedGroundHeight ((int)m_scenePresence.AbsolutePosition.X,
+                                                              (int)m_scenePresence.AbsolutePosition.Y);
+                        if (actor != null && (m_scenePresence.AbsolutePosition.Z - groundHeight) < 2)
+                            return "LAND";
 
                             return "HOVER_DOWN";
                         }
 
-                        // no ground here...
-                        return "HOVER_DOWN";
-                    }
+                    // no ground here...
+                    return "HOVER_DOWN";
                 }
 
 
@@ -424,10 +423,10 @@ namespace WhiteCore.Region.Animation
 
             float walkElapsed = (Util.EnvironmentTickCount () - m_animTickWalk) / 1000f;
             if (actor != null && actor.IsPhysical && !actor.IsJumping && (!actor.IsColliding) && !actor.Flying && actor.TargetVelocity != Vector3.Zero/* && actor.Velocity.Z < -2*/ &&
-                (walkElapsed > FALL_AFTER_MOVE_TIME || m_animTickWalk == 0))//For if they user is walking off something, or they are falling
+                (walkElapsed > FALL_AFTER_MOVE_TIME || Util.ApproxZero(m_animTickWalk)))//For if they user is walking off something, or they are falling
             {
                 //Always return falldown immediately as there shouldn't be a waiting period
-                if (m_animTickFall == 0)
+                if (Util.ApproxZero(m_animTickFall))
                     m_animTickFall = Util.EnvironmentTickCount ();
                 return "FALLDOWN";
             }
@@ -481,8 +480,11 @@ namespace WhiteCore.Region.Animation
             m_animTickFall = 0;
 
             if (move.Z <= 0f) {
-                if (actor != null && (move.X != 0f || move.Y != 0f ||
-                                      actor.Velocity.X != 0 && actor.Velocity.Y != 0)) {
+                if (actor != null && 
+                    (Util.NotZero(move.X) || Util.NotZero(move.Y) || 
+                     (Util.NotZero(actor.Velocity.X) && Util.NotZero(actor.Velocity.Y))
+                    )
+                   ) {
                     wasLastFlying = false;
                     if (actor.IsColliding)
                         m_animTickWalk = Util.EnvironmentTickCount ();
@@ -549,7 +551,7 @@ namespace WhiteCore.Region.Animation
             if (m_scenePresence.IsChildAgent)
                 return;
 
-            AnimationGroup anis = new AnimationGroup {
+            var anims = new AnimationGroup {
                 Animations = animations,
                 SequenceNums = sequenceNums,
                 ObjectIDs = objectIDs,
@@ -557,7 +559,7 @@ namespace WhiteCore.Region.Animation
             };
 
             m_scenePresence.Scene.ForEachScenePresence (
-                presence => presence.SceneViewer.QueuePresenceForAnimationUpdate (presence, anis));
+                presence => presence.SceneViewer.QueuePresenceForAnimationUpdate (presence, anims));
         }
 
         /// <summary>
@@ -574,14 +576,14 @@ namespace WhiteCore.Region.Animation
             UUID [] objectIDs;
 
             m_animations.GetArrays (out animations, out sequenceNums, out objectIDs);
-            AnimationGroup anis = new AnimationGroup {
+            var anims = new AnimationGroup {
                 Animations = animations,
                 SequenceNums = sequenceNums,
                 ObjectIDs = objectIDs,
                 AvatarID = m_scenePresence.ControllingClient.AgentId
             };
             m_scenePresence.Scene.GetScenePresence (client.AgentId).SceneViewer.QueuePresenceForAnimationUpdate (
-                m_scenePresence, anis);
+                m_scenePresence, anims);
         }
 
         /// <summary>
