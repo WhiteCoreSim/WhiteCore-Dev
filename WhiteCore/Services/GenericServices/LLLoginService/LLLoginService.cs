@@ -615,9 +615,8 @@ namespace WhiteCore.Services
                 TeleportFlags tpFlags = TeleportFlags.ViaLogin;
                 GridRegion destination = FindDestination(account, guinfo, session, startLocation, home, out tpFlags,
                                                          out where, out position, out lookAt);
-                if (destination == null)
-                {
-                    MainConsole.Instance.InfoFormat(
+                if (destination == null) {
+                    MainConsole.Instance.InfoFormat (
                         "[LLogin service]: Login failed for user {0}, reason: destination not found", account.Name);
                     return LLFailedLoginResponse.DeadRegionProblem;
                 }
@@ -714,8 +713,8 @@ namespace WhiteCore.Services
                                                m_config, DisplayName, avappearance.Serial.ToString(), m_registry.RequestModuleInterface<IGridInfo>());
 
                 MainConsole.Instance.InfoFormat(
-                    "[LLogin service]: All clear. Sending login response to client to login to region " +
-                    destination.RegionName + ", tried to login to " + startLocation + " at " + position + ".");
+                    "[LLogin service]: All clear. Sending response to client for login to region " +
+                    destination.RegionName + " at " + position + ".");
 
                 return response;
             }
@@ -837,6 +836,7 @@ namespace WhiteCore.Services
 
                 return region;
             }
+
             if (startLocation.Equals("last"))
             {
                 tpFlags |= TeleportFlags.ViaLandmark;
@@ -900,7 +900,7 @@ namespace WhiteCore.Services
             else
             {
                 // free uri form
-                // e.g. New Moon&135&46  New Moon@osgrid.org:8002&153&34
+                // e.g. New Moon&135&46  New Moon@whitecoregrid.org:8002&153&34
                 where = "url";
                 Regex reURI = new Regex(@"^uri:(?<region>[^&]+)&(?<x>\d+)&(?<y>\d+)&(?<z>\d+)$");
                 Match uriMatch = reURI.Match(startLocation);
@@ -915,7 +915,7 @@ namespace WhiteCore.Services
                     if ((regions == null) || (regions.Count == 0))
                     {
                         MainConsole.Instance.InfoFormat(
-                            "[LLLOGIN SERVICE]: Got Custom Login URI {0}, can't locate region {1}. Trying defaults.",
+                            "[LLogin service]: Got Custom Login URI {0}, can't locate region {1}. Trying defaults.",
                             startLocation, regionName);
                         regions = m_GridService.GetDefaultRegions(account.AllScopeIDs);
                         if (regions != null && regions.Count > 0)
@@ -937,7 +937,7 @@ namespace WhiteCore.Services
                             return safeRegions[0];
                         }
                         MainConsole.Instance.InfoFormat(
-                            "[LLLOGIN SERVICE]: Got Custom Login URI {0}, Grid does not have any available regions.",
+                            "[LLogin service]: Got Custom Login URI {0}, Grid does not have any available regions.",
                             startLocation);
                         return null;
                     }
@@ -948,7 +948,7 @@ namespace WhiteCore.Services
                 if (parts.Length < 2)
                 {
                     MainConsole.Instance.InfoFormat(
-                        "[LLLOGIN SERVICE]: Got Custom Login URI {0}, can't locate region {1}",
+                        "[LLogin service]: Got Custom Login URI {0}, can't locate region {1}",
                         startLocation, regionName);
                     return null;
                 }
@@ -985,7 +985,7 @@ namespace WhiteCore.Services
                             return safeRegions[0];
                         }
                         MainConsole.Instance.InfoFormat(
-                            "[LLLOGIN SERVICE]: Got Custom Login URI {0}, Grid does not have any available regions.",
+                            "[LLogin service]: Got Custom Login URI {0}, Grid does not have any available regions.",
                             startLocation);
                         return null;
                     }

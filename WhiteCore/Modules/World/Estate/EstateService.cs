@@ -530,7 +530,7 @@ namespace WhiteCore.Modules.Estate
 
             //Make sure that this user is inside the region as well
             if (position.X < -2f || position.Y < -2f ||
-                position.X > scene.RegionInfo.RegionSizeX + 2 || position.Y > scene.RegionInfo.RegionSizeY + 2) {
+                position.X > scene.RegionInfo.RegionSizeX - 2 || position.Y > scene.RegionInfo.RegionSizeY - 2) {
                 MainConsole.Instance.DebugFormat (
                     "[Estate Service]: AllowedIncomingTeleport was given an illegal position of {0} for avatar {1}, {2}. Clamping",
                     position, Name, userID);
@@ -659,8 +659,10 @@ namespace WhiteCore.Modules.Estate
             //If the user wants to force landing points on crossing, we act like they are not crossing, otherwise, check the child property and that the ViaRegionID is set
             bool isCrossing = !forceLandingPointsOnCrossing && (Sp != null && Sp.IsChildAgent &&
                               ((tpflags & TeleportFlags.ViaRegionID) == TeleportFlags.ViaRegionID));
-            //Move them to the nearest landing point
-            if (!((tpflags & allowableFlags) != 0) && !isCrossing && !ES.AllowDirectTeleport) {
+            bool directTeleport = (tpflags & allowableFlags) != 0;
+
+            // If the estate does not allow direct teleporting, move them to the nearest landing point
+            if (!directTeleport && !isCrossing && !ES.AllowDirectTeleport) {
                 if (Sp != null)
                     Sp.ClearSavedVelocity (); //If we are moving the agent, clear their velocity
                 if (!scene.Permissions.IsGod (userID)) {
@@ -668,29 +670,32 @@ namespace WhiteCore.Modules.Estate
                                           scene.RegionInfo.RegionHandle);
                     if (telehub != null) {
                         if (telehub.SpawnPos.Count == 0) {
-                            position = new Vector3 (telehub.TelehubLocX, telehub.TelehubLocY, telehub.TelehubLocZ);
+                            newPosition = new Vector3 (telehub.TelehubLocX, telehub.TelehubLocY, telehub.TelehubLocZ);
                         } else {
                             int LastTelehubNum = 0;
                             if (!lastTelehub.TryGetValue (scene.RegionInfo.RegionID, out LastTelehubNum))
                                 LastTelehubNum = 0;
-                            position = telehub.SpawnPos [LastTelehubNum] +
-                            new Vector3 (telehub.TelehubLocX, telehub.TelehubLocY, telehub.TelehubLocZ);
+                            newPosition = telehub.SpawnPos [LastTelehubNum] +
+                                                 new Vector3 (telehub.TelehubLocX, telehub.TelehubLocY, telehub.TelehubLocZ);
                             LastTelehubNum++;
                             if (LastTelehubNum == telehub.SpawnPos.Count)
                                 LastTelehubNum = 0;
                             lastTelehub [scene.RegionInfo.RegionID] = LastTelehubNum;
                         }
-                    }
+                    } else if (ILO.LandData.LandingType == (int)LandingType.LandingPoint) // we have a landing point specified, use it
+                        newPosition = ILO.LandData.UserLocation != Vector3.Zero
+                                          ? ILO.LandData.UserLocation
+                                          : parcelManagement.GetNearestRegionEdgePosition (Sp);
+
                 }
-            } else if (!((tpflags & allowableFlags) != 0) && !isCrossing &&
-                     !scene.Permissions.GenericParcelPermission (userID, ILO, (ulong)GroupPowers.None))
-            //Telehubs override parcels
-            {
+            } else if (!directTeleport && !isCrossing && 
+                       !scene.Permissions.GenericParcelPermission (userID, ILO, (ulong)GroupPowers.None)) {
+                // Estate allows direct teleporting 
                 if (Sp != null)
                     Sp.ClearSavedVelocity (); //If we are moving the agent, clear their velocity
-                if (ILO.LandData.LandingType == (int)LandingType.None) //Blocked, force this person off this land
-                {
-                    //Find a new parcel for them
+
+                if (ILO.LandData.LandingType == (int)LandingType.None) {
+                    //Blocked, force this person off this land. Find a new parcel for them
                     List<ILandObject> Parcels = parcelManagement.ParcelsNearPoint (position);
                     if (Parcels.Count > 1) {
                         newPosition = parcelManagement.GetNearestRegionEdgePosition (Sp);
@@ -702,11 +707,14 @@ namespace WhiteCore.Modules.Estate
                             if (ILO.LandData.LandingType == (int)LandingType.None)
                                 continue; //Blocked, check next one
 
-                            if (ILO.LandData.LandingType == (int)LandingType.LandingPoint)
-                                //Use their landing spot
-                                newPosition = tpParcel.LandData.UserLocation;
+                            if (ILO.LandData.LandingType == (int)LandingType.LandingPoint) //Use their landing spot if set
+                                newPosition = tpParcel.LandData.UserLocation != Vector3.Zero
+                                                 ? tpParcel.LandData.UserLocation
+                                                 : parcelManagement.GetParcelCenterAtGround (tpParcel);
+
                             else //They allow for anywhere, so dump them in the center at the ground
                                 newPosition = parcelManagement.GetParcelCenterAtGround (tpParcel);
+
                             found = true;
                         }
 
@@ -720,10 +728,12 @@ namespace WhiteCore.Modules.Estate
                             }
                         }
                     }
-                } else if (ILO.LandData.LandingType == (int)LandingType.LandingPoint) //Move to tp spot
+                } else if (ILO.LandData.LandingType == (int)LandingType.LandingPoint) {
+                    // crossing regions or a directed teleport so move to landing spot if set
                     newPosition = ILO.LandData.UserLocation != Vector3.Zero
                                       ? ILO.LandData.UserLocation
                                       : parcelManagement.GetNearestRegionEdgePosition (Sp);
+                }
             }
 
             //We assume that our own region isn't null....
@@ -777,7 +787,6 @@ namespace WhiteCore.Modules.Estate
                 }
             }
 
-            //newPosition = Position;
             reason = "";
             return true;
         }
