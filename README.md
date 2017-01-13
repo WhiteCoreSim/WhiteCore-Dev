@@ -20,6 +20,10 @@ Linux 64 Bit [![Build Status](https://travis-ci.org/WhiteCoreSim/WhiteCore-Dev.s
 
 *If you do not know what submodules are, or you are not using git from the command line, PLEASE make sure to fetch the submodules too.*
 
+**If you download the repo using the zip file option, you will also need to download the Whitecore-LibOMV submodule and extract it in your local WhiteCore repo.**
+`https://github.com/WhiteCoreSim/Whitecore-LibOMV`
+
+
 *- For those using the master, please report back when you are having issues with the builds. We, the developers, can't test everything and we hope that you, the users, are able to help us report things that break. Please use the Issue Tracker with the predefined text to make it easier to report issues*
 
 *- The BulletSim physics engine has been updated recently and is an alternative to the Open Dynamics Engine that is used as default. Please try it out and tell us if it's working (or not) properly*
