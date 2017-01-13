@@ -567,6 +567,16 @@ namespace WhiteCore.Framework.Utilities
             return Math.Abs (valA) <= Constants.FloatDifference;
         }
 
+        /// <summary>
+        /// VAlue is > then the float difference. ( not == 0f)
+        /// </summary>
+        /// <returns><c>true</c>, if greater than float difference, <c>false</c> otherwise.</returns>
+        /// <param name="valA">Value a.</param>
+        public static bool NotZero (double valA)
+        {
+            return Math.Abs (valA) >= Constants.FloatDifference;
+        }
+
         #endregion
 
         #region Vector Equations
