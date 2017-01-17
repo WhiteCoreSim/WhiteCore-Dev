@@ -169,7 +169,7 @@ namespace WhiteCore.Modules.Archivers
                     MainConsole.Instance.ErrorFormat(
                         "[Archiver]: (... {0} more not shown)", uuids.Count - MAX_UUID_DISPLAY_ON_TIMEOUT);
 
-                MainConsole.Instance.Error("[Archiver]: OAR save aborted.");
+                MainConsole.Instance.Error("[Archiver]: Asset save aborted.");
             }
             catch (Exception e)
             {

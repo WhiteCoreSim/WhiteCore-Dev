@@ -188,7 +188,7 @@ namespace WhiteCore.Modules.Chat
 
             if (!OfflineMessagesConnector.AddOfflineMessage (im)) {
                 if ((!im.FromGroup) && (reason != "User does not exist.") && (client != null))
-                    client.SendInstantMessage (new GridInstantMessage () {
+                    client.SendInstantMessage (new GridInstantMessage {
                         FromAgentID = im.ToAgentID,
                         FromAgentName = "System",
                         ToAgentID = im.FromAgentID,
@@ -230,7 +230,7 @@ namespace WhiteCore.Modules.Chat
                 }
 
                 if (im.Dialog == (byte)InstantMessageDialog.MessageFromAgent && !im.FromGroup) {
-                    client.SendInstantMessage (new GridInstantMessage () {
+                    client.SendInstantMessage (new GridInstantMessage {
                         FromAgentID = im.ToAgentID,
                         FromAgentName = "System",
                         ToAgentID = im.FromAgentID,
@@ -242,11 +242,11 @@ namespace WhiteCore.Modules.Chat
                 }
 
                 if (im.Dialog == (byte)InstantMessageDialog.InventoryOffered)
-                    client.SendAlertMessage ("User is not online. Inventory has been saved");
+                    client.SendAlertMessage ("User is not currently online. (Inventory has been saved)");
             } else if (im.Offline == 0) {
                 if (client == null) return;
                 if (im.Dialog == (byte)InstantMessageDialog.MessageFromAgent && !im.FromGroup) {
-                    client.SendInstantMessage (new GridInstantMessage () {
+                    client.SendInstantMessage (new GridInstantMessage {
                         FromAgentID = im.ToAgentID,
                         FromAgentName = "System",
                         ToAgentID = im.FromAgentID,
@@ -258,7 +258,7 @@ namespace WhiteCore.Modules.Chat
                 }
 
                 if (im.Dialog == (byte)InstantMessageDialog.InventoryOffered)
-                    client.SendAlertMessage ("User not able to be found. Inventory has been saved");
+                    client.SendAlertMessage ("User is not currently online. (Inventory has been saved)");
             }
         }
     }
