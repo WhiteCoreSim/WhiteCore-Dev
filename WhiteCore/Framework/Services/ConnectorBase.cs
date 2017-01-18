@@ -31,6 +31,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using Nini.Config;
+using OpenMetaverse.StructuredData;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Servers;
@@ -38,23 +40,21 @@ using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Servers.HttpServer.Interfaces;
 using WhiteCore.Framework.Utilities;
-using Nini.Config;
-using OpenMetaverse.StructuredData;
 
 namespace WhiteCore.Framework.Services
 {
-    public class ConnectorRegistry
+    public static class ConnectorRegistry
     {
-        public static List<ConnectorBase> Connectors = new List<ConnectorBase>();
+        public static List<ConnectorBase> Connectors = new List<ConnectorBase> ();
 
-        public static void RegisterConnector(ConnectorBase con)
+        public static void RegisterConnector (ConnectorBase con)
         {
-            Connectors.Add(con);
+            Connectors.Add (con);
         }
-        public static List<ConnectorBase> ServerHandlerConnectors = new List<ConnectorBase>();
-        public static void RegisterServerHandlerConnector(ConnectorBase con)
+        public static List<ConnectorBase> ServerHandlerConnectors = new List<ConnectorBase> ();
+        public static void RegisterServerHandlerConnector (ConnectorBase con)
         {
-            ServerHandlerConnectors.Add(con);
+            ServerHandlerConnectors.Add (con);
         }
     }
 
@@ -62,9 +62,8 @@ namespace WhiteCore.Framework.Services
     {
         protected IRegistryCore m_registry;
 
-        protected IConfigurationService m_configService
-        {
-            get { return m_registry.RequestModuleInterface<IConfigurationService>(); }
+        protected IConfigurationService m_configService {
+            get { return m_registry.RequestModuleInterface<IConfigurationService> (); }
         }
 
         protected bool m_doRemoteCalls;
@@ -76,32 +75,28 @@ namespace WhiteCore.Framework.Services
 
         public bool IsLocalConnector { get { return !m_doRemoteCalls; } }
 
-        public string ServerHandlerName
-        {
+        public string ServerHandlerName {
             get;
             private set;
         }
 
-        public string ServerHandlerPath
-        {
+        public string ServerHandlerPath {
             get;
             private set;
         }
 
-        public uint ServerHandlerPort
-        {
+        public uint ServerHandlerPort {
             get;
             private set;
         }
 
-        public string PluginName
-        {
+        public string PluginName {
             get { return m_name; }
         }
 
         public bool Enabled { get; set; }
 
-        public void Init(IRegistryCore registry, string name, string password = "", string serverPath = "", string serverHandlerName = "")
+        public void Init (IRegistryCore registry, string name, string password = "", string serverPath = "", string serverHandlerName = "")
         {
             Enabled = true;
             m_registry = registry;
@@ -109,58 +104,55 @@ namespace WhiteCore.Framework.Services
             m_password = password;
             bool openServerHandler = false;
             uint serverHandlerPort = 0;
-            ISimulationBase simBase = registry == null ? null : registry.RequestModuleInterface<ISimulationBase>();
-            if (simBase != null)
-            {
-                IConfigSource source = registry.RequestModuleInterface<ISimulationBase>().ConfigSource;
+            ISimulationBase simBase = registry == null ? null : registry.RequestModuleInterface<ISimulationBase> ();
+            if (simBase != null) {
+                IConfigSource source = registry.RequestModuleInterface<ISimulationBase> ().ConfigSource;
                 IConfig config;
-                if ((config = source.Configs["WhiteCoreConnectors"]) != null)
-                {
-                    m_doRemoteCalls = config.Contains(name + "DoRemoteCalls")
-                                          ? config.GetBoolean(name + "DoRemoteCalls", false)
-                                          : config.GetBoolean("DoRemoteCalls", false);
+                if ((config = source.Configs ["WhiteCoreConnectors"]) != null) {
+                    m_doRemoteCalls = config.Contains (name + "DoRemoteCalls")
+                                          ? config.GetBoolean (name + "DoRemoteCalls", false)
+                                          : config.GetBoolean ("DoRemoteCalls", false);
 
-                    if ((config = source.Configs["Handlers"]) != null)
-                    {
-                        openServerHandler = config.GetBoolean(name + "OpenServerHandler", false);
-                        serverHandlerPort = config.GetUInt(name + "ServerHandlerPort", serverHandlerPort);
+                    if ((config = source.Configs ["Handlers"]) != null) {
+                        openServerHandler = config.GetBoolean (name + "OpenServerHandler", false);
+                        serverHandlerPort = config.GetUInt (name + "ServerHandlerPort", serverHandlerPort);
                     }
                 }
-                if ((config = source.Configs["Configuration"]) != null)
-                    m_OSDRequestTryCount = config.GetInt("OSDRequestTryCount", m_OSDRequestTryCount);
+                if ((config = source.Configs ["Configuration"]) != null)
+                    m_OSDRequestTryCount = config.GetInt ("OSDRequestTryCount", m_OSDRequestTryCount);
             }
             if (m_doRemoteCalls)
                 m_doRemoteOnly = true; //Lock out local + remote for now
-            ConnectorRegistry.RegisterConnector(this);
+
+            ConnectorRegistry.RegisterConnector (this);
 
             ServerHandlerName = serverHandlerName;
             if (MainServer.Instance == null && serverHandlerPort == 0)
                 openServerHandler = false;
-            else
-            {
+            else {
                 ServerHandlerPort = serverHandlerPort == 0 ? MainServer.Instance.Port : serverHandlerPort;
                 ServerHandlerPath = serverPath;
             }
 
             if (openServerHandler)
-                CreateServerHandler(serverHandlerPort, serverPath, serverHandlerName);
+                CreateServerHandler (serverHandlerPort, serverPath, serverHandlerName);
         }
 
-        protected void CreateServerHandler(uint port, string urlPath, string serverHandlerName)
+        protected void CreateServerHandler (uint port, string urlPath, string serverHandlerName)
         {
-            IHttpServer server = m_registry.RequestModuleInterface<ISimulationBase>().GetHttpServer(port);
+            var server = m_registry.RequestModuleInterface<ISimulationBase> ().GetHttpServer (port);
 
-            server.AddStreamHandler(new ServerHandler(urlPath, m_registry, this));
-            ConnectorRegistry.RegisterServerHandlerConnector(this);
+            server.AddStreamHandler (new ServerHandler (urlPath, m_registry, this));
+            ConnectorRegistry.RegisterServerHandlerConnector (this);
             m_startedServer = true;
         }
 
-        public void SetPassword(string password)
+        public void SetPassword (string password)
         {
             m_password = password;
         }
 
-        public void SetDoRemoteCalls(bool doRemoteCalls)
+        public void SetDoRemoteCalls (bool doRemoteCalls)
         {
             m_doRemoteCalls = doRemoteCalls;
             m_doRemoteOnly = doRemoteCalls;
@@ -168,24 +160,24 @@ namespace WhiteCore.Framework.Services
 
         #region OSD Sending
 
-        public object DoRemote(params object[] o)
+        public object DoRemote (params object [] o)
         {
-            return DoRemoteCallGet(false, "ServerURI", o);
+            return DoRemoteCallGet (false, "ServerURI", o);
         }
 
-        public object DoRemoteByURL(string url, params object[] o)
+        public object DoRemoteByURL (string url, params object [] o)
         {
-            return DoRemoteCallGet(false, url, o);
+            return DoRemoteCallGet (false, url, o);
         }
 
-        public void DoRemotePost(params object[] o)
+        public void DoRemotePost (params object [] o)
         {
-            DoRemoteCallPost(false, "ServerURI", o);
+            DoRemoteCallPost (false, "ServerURI", o);
         }
 
-        public void DoRemotePostByURL(string url, params object[] o)
+        public void DoRemotePostByURL (string url, params object [] o)
         {
-            DoRemoteCallPost(false, url, o);
+            DoRemoteCallPost (false, url, o);
         }
 
         /// <summary>
@@ -195,148 +187,138 @@ namespace WhiteCore.Framework.Services
         /// <param name="url">The URL to call</param>
         /// <param name="o">The objects to send</param>
         /// <returns></returns>
-        public object DoRemoteCallGet(bool forced, string url, params object[] o)
+        public object DoRemoteCallGet (bool forced, string url, params object [] o)
         {
             if (!m_doRemoteCalls && !forced)
                 return null;
             MethodInfo method;
             OSDMap map;
             string serverURL;
-            if (!PrepRemoteCall(url, o, out method, out map, out serverURL))
+            if (!PrepRemoteCall (url, o, out method, out map, out serverURL))
                 return null;
 
-            return GetResponse(method, map, serverURL);
+            return GetResponse (method, map, serverURL);
         }
-        
-        public void DoRemoteCallPost(bool forced, string url, params object[] o)
+
+        public void DoRemoteCallPost (bool forced, string url, params object [] o)
         {
             MethodInfo method;
             OSDMap map;
             string serverURL;
-            if (!PrepRemoteCall(url, o, out method, out map, out serverURL))
+            if (!PrepRemoteCall (url, o, out method, out map, out serverURL))
                 return;
 
-            WebUtils.PostToService(serverURL, map);
+            WebUtils.PostToService (serverURL, map);
         }
 
-        private bool PrepRemoteCall(string url, object[] o, out MethodInfo method, out OSDMap map, out string serverURL)
+        bool PrepRemoteCall (string url, object [] o, out MethodInfo method, out OSDMap map, out string serverURL)
         {
-            StackTrace stackTrace = new StackTrace();
+            var stackTrace = new StackTrace ();
             int upStack = 1;
-            StackFrame frame = stackTrace.GetFrame(1);
-            if (frame.GetMethod().Name.Contains("DoRemote"))
-            {
+            var frame = stackTrace.GetFrame (1);
+            if (frame.GetMethod ().Name.Contains ("DoRemote")) {
                 upStack = 2;
-                frame = stackTrace.GetFrame(2);
-                if (frame.GetMethod().Name.Contains("DoRemote"))
+                frame = stackTrace.GetFrame (2);
+                if (frame.GetMethod ().Name.Contains ("DoRemote"))
                     upStack = 3;
             }
 
             CanBeReflected reflection;
-            GetReflection(upStack, stackTrace, out method, out reflection);
+            GetReflection (upStack, stackTrace, out method, out reflection);
             string methodName = reflection != null && reflection.RenamedMethod != ""
                                     ? reflection.RenamedMethod
                                     : method.Name;
-            map = new OSDMap();
-            map["Method"] = methodName;
+            map = new OSDMap ();
+            map ["Method"] = methodName;
             if (reflection != null && reflection.UsePassword)
-                map["Password"] = m_password;
+                map ["Password"] = m_password;
             int i = 0;
-            var parameters = method.GetParameters();
-            if (o.Length != parameters.Length)
-            {
-                MainConsole.Instance.ErrorFormat(
-                    "FAILED TO GET VALID NUMBER OF PARAMETERS TO SEND REMOTELY FOR {0}, EXPECTED {1}, GOT {2}",
+            var parameters = method.GetParameters ();
+            if (o.Length != parameters.Length) {
+                MainConsole.Instance.ErrorFormat (
+                    "[ConnectorBase]: Failed to get valid number of parameters to send  in remote call to {0}, expected {1}, got {2}",
                     methodName, parameters.Length, o.Length);
                 serverURL = "";
                 return false;
             }
-            foreach (ParameterInfo info in parameters)
-            {
-                OSD osd = o[i] == null ? null : Util.MakeOSD(o[i], o[i].GetType());
+            foreach (ParameterInfo info in parameters) {
+                OSD osd = o [i] == null ? null : Util.MakeOSD (o [i], o [i].GetType ());
                 if (osd != null)
-                    map.Add(info.Name, osd);
+                    map.Add (info.Name, osd);
                 else
-                    map.Add(info.Name, new OSD());
+                    map.Add (info.Name, new OSD ());
                 i++;
             }
 
-            serverURL = m_configService == null ? "" : m_configService.FindValueOf(url);
+            serverURL = m_configService == null ? "" : m_configService.FindValueOf (url);
             if (serverURL == "")
                 serverURL = url;
             return true;
         }
 
-        private object GetResponse(MethodInfo method, OSDMap map, string serverURL)
+        object GetResponse (MethodInfo method, OSDMap map, string serverURL)
         {
             OSDMap response = null;
 
-            for (int index = 0; index < m_OSDRequestTryCount; index++)
-            {
-                if (GetOSDMap(serverURL, map, out response))
+            for (int index = 0; index < m_OSDRequestTryCount; index++) {
+                if (GetOSDMap (serverURL, map, out response))
                     break;
             }
             if (response == null || !response)
                 return null;
             object inst = null;
-            try
-            {
-                if (method.ReturnType == typeof(string))
+            try {
+                if (method.ReturnType == typeof (string))
                     inst = string.Empty;
-                else if (method.ReturnType == typeof(void))
+                else if (method.ReturnType == typeof (void))
                     return null;
-                else if (method.ReturnType == typeof(System.Drawing.Image))
+                else if (method.ReturnType == typeof (System.Drawing.Image))
                     inst = null;
-                else if (method.ReturnType == typeof(byte[]))
-                    return response["Value"].AsBinary();
+                else if (method.ReturnType == typeof (byte []))
+                    return response ["Value"].AsBinary ();
                 else
-                    inst = Activator.CreateInstance(method.ReturnType);
-            }
-            catch
-            {
-                if (method.ReturnType == typeof(string))
+                    inst = Activator.CreateInstance (method.ReturnType);
+            } catch {
+                if (method.ReturnType == typeof (string))
                     inst = string.Empty;
             }
-            if (response["Value"] == "null")
+            if (response ["Value"] == "null")
                 return null;
             var instance = inst as IDataTransferable;
-            if (instance != null)
-            {
-                instance.FromOSD((OSDMap)response["Value"]);
+            if (instance != null) {
+                instance.FromOSD ((OSDMap)response ["Value"]);
                 return instance;
             }
-            return Util.OSDToObject(response["Value"], method.ReturnType);
+            return Util.OSDToObject (response ["Value"], method.ReturnType);
         }
 
-        private void GetReflection(int upStack, StackTrace stackTrace, out MethodInfo method,
-                                   out CanBeReflected reflection)
+        void GetReflection (int upStack, StackTrace stackTrace, out MethodInfo method,
+                           out CanBeReflected reflection)
         {
-            method = (MethodInfo) stackTrace.GetFrame(upStack).GetMethod();
-            reflection = (CanBeReflected) Attribute.GetCustomAttribute(method, typeof (CanBeReflected));
+            method = (MethodInfo)stackTrace.GetFrame (upStack).GetMethod ();
+            reflection = (CanBeReflected)Attribute.GetCustomAttribute (method, typeof (CanBeReflected));
             if (reflection != null && reflection.NotReflectableLookUpAnotherTrace)
-                GetReflection(upStack + 1, stackTrace, out method, out reflection);
+                GetReflection (upStack + 1, stackTrace, out method, out reflection);
         }
 
-        private bool GetOSDMap(string url, OSDMap map, out OSDMap response)
+        bool GetOSDMap (string url, OSDMap map, out OSDMap response)
         {
             response = null;
-            string resp = WebUtils.PostToService(url, map);
+            var resp = WebUtils.PostToService (url, map);
 
-            if (resp == null || resp == "" || resp.StartsWith("<"))
+            if (string.IsNullOrEmpty (resp) || resp.StartsWith ("<", StringComparison.Ordinal))
                 return false;
-            try
-            {
-                response = (OSDMap) OSDParser.DeserializeJson(resp);
-            }
-            catch
-            {
+
+            try {
+                response = (OSDMap)OSDParser.DeserializeJson (resp);
+            } catch {
                 response = null;
                 return false;
             }
-            return response["Success"];
+            return response ["Success"];
         }
 
-        public bool CheckPassword(string password)
+        public bool CheckPassword (string password)
         {
             return password == m_password;
         }
@@ -349,131 +331,113 @@ namespace WhiteCore.Framework.Services
         protected IRegistryCore m_registry;
         protected Dictionary<string, List<MethodImplementation>> m_methods = null;
 
-        public ServerHandler(string url, IRegistryCore registry, ConnectorBase conn) :
-            base("POST", url)
+        public ServerHandler (string url, IRegistryCore registry, ConnectorBase conn) :
+            base ("POST", url)
         {
             m_registry = registry;
-            if (m_methods == null)
-            {
-                m_methods = new Dictionary<string, List<MethodImplementation>>();
-                List<string> alreadyRunPlugins = new List<string>();
+            if (m_methods == null) {
+                m_methods = new Dictionary<string, List<MethodImplementation>> ();
+                var alreadyRunPlugins = new List<string> ();
                 List<ConnectorBase> connectors = conn == null
                                                      ? ConnectorRegistry.Connectors
-                                                     : new List<ConnectorBase>() {conn};
-                foreach (ConnectorBase plugin in connectors)
-                {
-                    if (alreadyRunPlugins.Contains(plugin.PluginName))
+                                                     : new List<ConnectorBase> { conn };
+                foreach (ConnectorBase plugin in connectors) {
+                    if (alreadyRunPlugins.Contains (plugin.PluginName))
                         continue;
-                    alreadyRunPlugins.Add(plugin.PluginName);
-                    foreach (MethodInfo method in plugin.GetType().GetMethods())
-                    {
-                        CanBeReflected reflection =
-                            (CanBeReflected) Attribute.GetCustomAttribute(method, typeof (CanBeReflected));
-                        if (reflection != null)
-                        {
+                    alreadyRunPlugins.Add (plugin.PluginName);
+                    foreach (MethodInfo method in plugin.GetType ().GetMethods ()) {
+                        var reflection =
+                            (CanBeReflected)Attribute.GetCustomAttribute (method, typeof (CanBeReflected));
+                        
+                        if (reflection != null) {
                             string methodName = reflection.RenamedMethod == "" ? method.Name : reflection.RenamedMethod;
-                            List<MethodImplementation> methods = new List<MethodImplementation>();
-                            MethodImplementation imp = new MethodImplementation()
-                                                           {
-                                                               Method = method,
-                                                               Reference = plugin,
-                                                               Attribute = reflection
-                                                           };
-                            if (!m_methods.TryGetValue(methodName, out methods))
-                                m_methods.Add(methodName, (methods = new List<MethodImplementation>()));
+                            var methods = new List<MethodImplementation> ();
+                            var imp = new MethodImplementation {
+                                Method = method,
+                                Reference = plugin,
+                                Attribute = reflection
+                            };
+                            if (!m_methods.TryGetValue (methodName, out methods))
+                                m_methods.Add (methodName, (methods = new List<MethodImplementation> ()));
 
-                            methods.Add(imp);
+                            methods.Add (imp);
                         }
                     }
                 }
             }
         }
 
-        public override byte[] Handle(string path, Stream requestData,
+        public override byte [] Handle (string path, Stream request,
                                       OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {
-            string body = HttpServerHandlerHelpers.ReadString(requestData).Trim();
+            var body = HttpServerHandlerHelpers.ReadString (request).Trim ();
 
-            try
-            {
-                OSDMap args = WebUtils.GetOSDMap(body, false);
+            try {
+                var args = WebUtils.GetOSDMap (body, false);
                 if (args != null)
-                    return HandleMap(args);
-            }
-            catch (Exception ex)
-            {
-                MainConsole.Instance.Warn("[ServerHandler]: Error occurred: " + ex.ToString());
+                    return HandleMap (args);
+            } catch (Exception ex) {
+                MainConsole.Instance.Warn ("[ServerHandler]: Error occurred: " + ex);
             }
             return MainServer.BadRequest;
         }
 
-        public byte[] HandleMap(OSDMap args)
+        public byte [] HandleMap (OSDMap args)
         {
-            if (args.ContainsKey("Method"))
-            {
-                string method = args["Method"].AsString();
-                try
-                {
+            if (args.ContainsKey ("Method")) {
+                var method = args ["Method"].AsString ();
+                try {
                     MethodImplementation methodInfo;
-                    if (GetMethodInfo(method, args.Count - 1, out methodInfo))
-                    {
-                        ParameterInfo[] paramInfo = methodInfo.Method.GetParameters();
-                        object[] parameters = new object[paramInfo.Length];
+                    if (GetMethodInfo (method, args.Count - 1, out methodInfo)) {
+                        var paramInfo = methodInfo.Method.GetParameters ();
+                        object [] parameters = new object [paramInfo.Length];
                         int paramNum = 0;
-                        foreach (ParameterInfo param in paramInfo)
-                        {
-                            if (param.ParameterType == typeof (bool) && !args.ContainsKey(param.Name))
-                                parameters[paramNum++] = false;
-                            else if (args[param.Name].Type == OSDType.Unknown)
-                                parameters[paramNum++] = null;
+                        foreach (ParameterInfo param in paramInfo) {
+                            if (param.ParameterType == typeof (bool) && !args.ContainsKey (param.Name))
+                                parameters [paramNum++] = false;
+                            else if (args [param.Name].Type == OSDType.Unknown)
+                                parameters [paramNum++] = null;
                             else if (param.ParameterType == typeof (OSD))
-                                parameters[paramNum++] = args[param.Name];
+                                parameters [paramNum++] = args [param.Name];
                             else
-                                parameters[paramNum++] = Util.OSDToObject(args[param.Name], param.ParameterType);
+                                parameters [paramNum++] = Util.OSDToObject (args [param.Name], param.ParameterType);
                         }
 
-                        object o = methodInfo.Method.FastInvoke(paramInfo, methodInfo.Reference, parameters);
-                        OSDMap response = new OSDMap();
-                        if (o == null) //void method
-                            response["Value"] = "null";
+                        var obj = methodInfo.Method.FastInvoke (paramInfo, methodInfo.Reference, parameters);
+                        var response = new OSDMap ();
+                        if (obj == null) //void method
+                            response ["Value"] = "null";
                         else
-                            response["Value"] = Util.MakeOSD(o, methodInfo.Method.ReturnType);
-                        response["Success"] = true;
-                        return Encoding.UTF8.GetBytes(OSDParser.SerializeJsonString(response, true));
+                            response ["Value"] = Util.MakeOSD (obj, methodInfo.Method.ReturnType);
+                        response ["Success"] = true;
+                        return Encoding.UTF8.GetBytes (OSDParser.SerializeJsonString (response, true));
                     }
+                } catch (Exception ex) {
+                    MainConsole.Instance.WarnFormat ("[ServerHandler]: Error occurred for method {0}: {1}", method,
+                                                    ex.ToString ());
                 }
-                catch (Exception ex)
-                {
-                    MainConsole.Instance.WarnFormat("[ServerHandler]: Error occurred for method {0}: {1}", method,
-                                                    ex.ToString());
-                }
-            }
-            else
-                MainConsole.Instance.Warn("[ServerHandler]: Post did not have a method block");
+            } else
+                MainConsole.Instance.Warn ("[ServerHandler]: Post did not have a method block");
 
             return MainServer.BadRequest;
         }
 
-        private bool GetMethodInfo(string method, int parameters, out MethodImplementation methodInfo)
+        bool GetMethodInfo (string method, int parameters, out MethodImplementation methodInfo)
         {
-            List<MethodImplementation> methods = new List<MethodImplementation>();
-            if (m_methods.TryGetValue(method, out methods))
-            {
-                if (methods.Count == 1)
-                {
-                    methodInfo = methods[0];
+            var methods = new List<MethodImplementation> ();
+            if (m_methods.TryGetValue (method, out methods)) {
+                if (methods.Count == 1) {
+                    methodInfo = methods [0];
                     return true;
                 }
-                foreach (MethodImplementation m in methods)
-                {
-                    if (m.Method.GetParameters().Length == parameters)
-                    {
+                foreach (MethodImplementation m in methods) {
+                    if (m.Method.GetParameters ().Length == parameters) {
                         methodInfo = m;
                         return true;
                     }
                 }
             }
-            MainConsole.Instance.Warn("COULD NOT FIND METHOD: " + method);
+            MainConsole.Instance.Warn ("COULD NOT FIND METHOD: " + method);
             methodInfo = null;
             return false;
         }

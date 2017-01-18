@@ -220,7 +220,7 @@ namespace WhiteCore.FileBasedServices.AssetService
             }
 
             if (m_doRemoteOnly) {
-                object remoteValue = DoRemoteByURL ("AssetServerURI", id);
+                object remoteValue = DoRemoteByURL ("AssetServerURI", id, showWarnings);
                 if (remoteValue != null) {
                     byte [] data = (byte [])remoteValue;
                     if (doDatabaseCaching && cache != null && data != null)

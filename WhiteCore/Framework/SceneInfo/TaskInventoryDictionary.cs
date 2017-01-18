@@ -41,23 +41,21 @@ namespace WhiteCore.Framework.SceneInfo
     /// </summary>
     /// This class is not thread safe.  Callers must synchronize on Dictionary methods or Clone() this object before
     /// iterating over it.
-    [Serializable, ProtoContract()]
+    [Serializable, ProtoContract]
     public class TaskInventoryDictionary : Dictionary<UUID, TaskInventoryItem>,
                                            ICloneable, IXmlSerializable
     {
-        private static readonly XmlSerializer tiiSerializer = new XmlSerializer(typeof (TaskInventoryItem));
+        static readonly XmlSerializer tiiSerializer = new XmlSerializer (typeof (TaskInventoryItem));
 
         #region ICloneable Members
 
-        public Object Clone()
+        public object Clone ()
         {
-            TaskInventoryDictionary clone = new TaskInventoryDictionary();
+            var clone = new TaskInventoryDictionary ();
 
-            lock (this)
-            {
-                foreach (UUID uuid in Keys)
-                {
-                    clone.Add(uuid, (TaskInventoryItem) this[uuid].Clone());
+            lock (this) {
+                foreach (UUID uuid in Keys) {
+                    clone.Add (uuid, (TaskInventoryItem)this [uuid].Clone ());
                 }
             }
 
@@ -78,13 +76,11 @@ namespace WhiteCore.Framework.SceneInfo
         {
             // MainConsole.Instance.DebugFormat("[TASK INVENTORY]: ReadXml current node before actions, {0}", reader.Name);
 
-            if (!reader.IsEmptyElement)
-            {
-                reader.Read();
-                while (tiiSerializer.CanDeserialize(reader))
-                {
-                    TaskInventoryItem item = (TaskInventoryItem) tiiSerializer.Deserialize(reader);
-                    Add(item.ItemID, item);
+            if (!reader.IsEmptyElement) {
+                reader.Read ();
+                while (tiiSerializer.CanDeserialize (reader)) {
+                    var item = (TaskInventoryItem)tiiSerializer.Deserialize (reader);
+                    Add (item.ItemID, item);
 
                     //MainConsole.Instance.DebugFormat("[TASK INVENTORY]: Instantiated prim item {0}, {1} from xml", item.Name, item.ItemID);
                 }
@@ -106,11 +102,9 @@ namespace WhiteCore.Framework.SceneInfo
         // see IXmlSerializable
         public void WriteXml(XmlWriter writer)
         {
-            lock (this)
-            {
-                foreach (TaskInventoryItem item in Values)
-                {
-                    tiiSerializer.Serialize(writer, item);
+            lock (this) {
+                foreach (TaskInventoryItem item in Values) {
+                    tiiSerializer.Serialize (writer, item);
                 }
             }
 
@@ -121,21 +115,22 @@ namespace WhiteCore.Framework.SceneInfo
 
         public List<TaskInventoryItem> Clone2List()
         {
-            List<TaskInventoryItem> clone = new List<TaskInventoryItem>();
+            var clone = new List<TaskInventoryItem> ();
 
-            lock (this)
-            {
-                clone.AddRange(Keys.Select(uuid => (TaskInventoryItem) this[uuid].Clone()));
+            lock (this) {
+                clone.AddRange (Keys.Select (uuid => (TaskInventoryItem)this [uuid].Clone ()));
             }
 
             return clone;
         }
 
         [XmlIgnore]
-        public List<TaskInventoryItem> Items
-        {
-            get { return Clone2List(); }
-            set { foreach (TaskInventoryItem itm in value) this.Add(itm.ItemID, itm); }
+        public List<TaskInventoryItem> Items {
+            get { return Clone2List (); }
+            set { 
+                foreach (TaskInventoryItem itm in value)
+                    Add (itm.ItemID, itm); 
+            }
         }
 
         // see ICloneable
