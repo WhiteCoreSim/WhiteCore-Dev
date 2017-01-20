@@ -297,21 +297,26 @@ namespace WhiteCore.Services.API
         {
             string Password = map ["Password"].AsString ();
             string newPassword = map ["NewPassword"].AsString ();
+            UserAccount account;
+            OSDMap resp = new OSDMap ();
 
             ILoginService loginService = m_registry.RequestModuleInterface<ILoginService> ();
             IUserAccountService accountService = m_registry.RequestModuleInterface<IUserAccountService> ();
             UUID userID = map ["UUID"].AsUUID ();
-            UserAccount account = m_registry.RequestModuleInterface<IUserAccountService> ().GetUserAccount (null, userID);
-            IAuthenticationService auths = m_registry.RequestModuleInterface<IAuthenticationService> ();
-            OSDMap resp = new OSDMap ();
-            //Null means it went through without an error
-            bool Verified = loginService.VerifyClient (account.PrincipalID, account.Name, "UserAccount", Password);
-            resp ["Verified"] = OSD.FromBoolean (Verified);
+            if (accountService != null) {
+                account = accountService.GetUserAccount (null, userID);
+                bool cliVerified = loginService.VerifyClient (account.PrincipalID, account.Name, "UserAccount", Password);
+                resp ["Verified"] = OSD.FromBoolean (cliVerified);
 
-            if ((auths.Authenticate (userID, "UserAccount", Util.Md5Hash (Password), 100) != string.Empty) && (Verified)) {
-                auths.SetPassword (userID, "UserAccount", newPassword);
+                if (cliVerified) {
+                    IAuthenticationService auths = m_registry.RequestModuleInterface<IAuthenticationService> ();
+                    if (auths != null) {
+                        if ((auths.Authenticate (userID, "UserAccount", Util.Md5Hash (Password), 100) != string.Empty) && (cliVerified)) 
+                            auths.SetPassword (userID, "UserAccount", newPassword);
+                    }
+                    resp ["Verified"] = OSD.FromBoolean (false);
+                }
             }
-
             return resp;
         }
 

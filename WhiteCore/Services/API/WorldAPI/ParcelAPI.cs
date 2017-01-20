@@ -62,7 +62,7 @@ namespace WhiteCore.Services.API
 
             if (directory != null && map.ContainsKey ("Region") == true) {
                 UUID regionID = UUID.Parse (map ["Region"]);
-                UUID scopeID = map.ContainsKey ("ScopeID") ? UUID.Parse (map ["ScopeID"].ToString ()) : UUID.Zero;
+                // not used? // UUID scopeID = map.ContainsKey ("ScopeID") ? UUID.Parse (map ["ScopeID"].ToString ()) : UUID.Zero;
                 UUID owner = map.ContainsKey ("Owner") ? UUID.Parse (map ["Owner"].ToString ()) : UUID.Zero;
                 uint start = map.ContainsKey ("Start") ? uint.Parse (map ["Start"].ToString ()) : 0;
                 uint count = map.ContainsKey ("Count") ? uint.Parse (map ["Count"].ToString ()) : 10;
@@ -92,7 +92,7 @@ namespace WhiteCore.Services.API
             OSDMap resp = new OSDMap ();
 
             UUID regionID = map.ContainsKey ("RegionID") ? UUID.Parse (map ["RegionID"].ToString ()) : UUID.Zero;
-            UUID scopeID = map.ContainsKey ("ScopeID") ? UUID.Parse (map ["ScopeID"].ToString ()) : UUID.Zero;
+            // not used?? // UUID scopeID = map.ContainsKey ("ScopeID") ? UUID.Parse (map ["ScopeID"].ToString ()) : UUID.Zero;
             UUID parcelID = map.ContainsKey ("ParcelInfoUUID") ? UUID.Parse (map ["ParcelInfoUUID"].ToString ()) : UUID.Zero;
             string parcelName = map.ContainsKey ("Parcel") ? map ["Parcel"].ToString ().Trim () : string.Empty;
 

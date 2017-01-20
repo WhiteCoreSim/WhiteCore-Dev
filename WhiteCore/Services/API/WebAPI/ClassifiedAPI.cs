@@ -41,7 +41,6 @@ namespace WhiteCore.Services.API
 
 		OSDMap GetClassifieds (OSDMap map)
 		{
-			var classifiedListVars = new List<Dictionary<string, object>> ();
             var resp = new OSDMap ();
 
             var directory = DataPlugins.RequestPlugin<IDirectoryServiceConnector> ();

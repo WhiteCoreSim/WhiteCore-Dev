@@ -94,7 +94,7 @@ namespace WhiteCore.Services.API
             if (regiondata != null && (map.ContainsKey ("RegionID") || map.ContainsKey ("Region"))) {
                 string regionName = map.ContainsKey ("Region") ? map ["Region"].ToString ().Trim () : "";
                 UUID regionID = map.ContainsKey ("RegionID") ? UUID.Parse (map ["RegionID"].ToString ()) : UUID.Zero;
-                UUID scopeID = map.ContainsKey ("ScopeID") ? UUID.Parse (map ["ScopeID"].ToString ()) : UUID.Zero;
+                // not used?? // UUID scopeID = map.ContainsKey ("ScopeID") ? UUID.Parse (map ["ScopeID"].ToString ()) : UUID.Zero;
                 GridRegion region = null;
                 if (regionID != UUID.Zero) {
                     region = regiondata.Get (regionID, null);

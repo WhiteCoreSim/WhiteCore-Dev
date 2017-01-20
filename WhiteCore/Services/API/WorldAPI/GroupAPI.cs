@@ -179,7 +179,7 @@ namespace WhiteCore.Services.API
                         gnd ["ItemName"] = OSD.FromString (GND.ItemName);
 
                         var notice = groups.GetGroupNotice (AdminAgentID, GND.NoticeID);
-                        gnd ["Message"] = OSD.FromString (groups.GetGroupNotice (AdminAgentID, GND.NoticeID).Message);
+                        gnd ["Message"] = OSD.FromString (notice.Message);
                         groupNotices.Add (gnd);
                     }
                     resp ["GroupNotices"] = groupNotices;

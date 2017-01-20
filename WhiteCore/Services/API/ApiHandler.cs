@@ -382,8 +382,8 @@ namespace WhiteCore.Services.API
 
         bool VerifyAuthentication (string reqKey, string authKey)
         {
-            var authority = string.Empty;
-            var authorityKey = string.Empty;
+            string authority;
+            string authorityKey;
             Uri authUri;
 
             // try for an embedded key 
@@ -400,7 +400,10 @@ namespace WhiteCore.Services.API
                 if (Uri.TryCreate (reqKey, UriKind.Absolute, out authUri)) {
                     authority = authUri.Authority;
                     authorityKey = authUri.PathAndQuery.Trim ('/');
-                    return true;
+
+                    var apiKeyAuth = generics.GetGeneric<APIAuthItem> ((UUID)Constants.GovernorUUID, "APIKey", authorityKey);
+                    if (apiKeyAuth != null)
+                        return true;
                 }
             }
 
