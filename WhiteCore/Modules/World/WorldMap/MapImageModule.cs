@@ -130,8 +130,8 @@ namespace WhiteCore.Modules.WorldMap
             terrainRenderer = null;
             GC.Collect ();
 
-            MainConsole.Instance.InfoFormat ("[MapTile generator]: Maptile generation took {0} ms",
-                (Environment.TickCount - start));
+            MainConsole.Instance.InfoFormat ("[MapTile generator]: Maptile generation for {0} took {1} ms",
+                                             m_scene.RegionInfo.RegionName, (Environment.TickCount - start));
 
         }
 
