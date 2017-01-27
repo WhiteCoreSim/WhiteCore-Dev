@@ -101,7 +101,7 @@ namespace WhiteCore.Framework.Modules
         #endregion
 
         #region helpers
-
+        bool IsNpcAgent (UUID bot);
         UUID GetOwner (UUID botID);
         Vector3 GetPosition (UUID botID, UUID userAttempting);
         Quaternion GetRotation (UUID botID, UUID userAttempting);

@@ -273,8 +273,9 @@ textures 1
 
             // If something changed in the appearance then queue an appearance save
             if (texturesChanged || visualParamsChanged) {
-                QueueAppearanceSave (client.AgentId);
-                //QueueAppearanceSend (client.AgentId);
+                // NPC's should skip saving appearance
+                if (!sp.IsNpcAgent)
+                    QueueAppearanceSave (client.AgentId);
             }
             // send appearance regardless of any changes
             QueueAppearanceSend (client.AgentId);

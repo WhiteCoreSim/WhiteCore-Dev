@@ -4364,6 +4364,32 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 IScenePresence ownerPresence = World.GetScenePresence(m_host.ParentEntity.RootChild.OwnerID);
                 ownerName = ownerPresence == null ? resolveName(m_host.OwnerID) : ownerPresence.Name;
 
+                // If permissions are being requested from an NPC bot and were not implicitly granted above then
+                // auto grant all requested permissions if the script is owned by the NPC or the NPCs owner
+                var botMgr = World.RequestModuleInterface<IBotManager> ();
+                if (botMgr != null && botMgr.IsNpcAgent (agentID)) {
+                    if (botMgr.CheckPermission (agentID, m_host.OwnerID)) {
+                        
+                        lock (m_host.TaskInventory) {
+                            m_host.TaskInventory [invItemID].PermsGranter = agentID;
+                            m_host.TaskInventory [invItemID].PermsMask = 0;
+                        }
+
+                        m_ScriptEngine.PostScriptEvent (
+                            m_itemID,
+                            m_host.UUID,
+                            new EventParams (
+                                "run_time_permissions",
+                                new object [] { new LSL_Integer (perm) },
+                                new DetectParams [0]),
+                                EventPriority.FirstStart
+                        );
+                    }
+                    // it is an NPC, exit even if the permissions werent granted above, they are not going to answer
+                    // the question!
+                    return;
+                }
+
                 if (ownerName == string.Empty)
                     ownerName = "(hippos)";
 

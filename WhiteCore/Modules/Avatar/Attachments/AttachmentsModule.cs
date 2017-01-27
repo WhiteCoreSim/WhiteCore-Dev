@@ -900,6 +900,13 @@ namespace WhiteCore.Modules.Attachments
                     return UUID.Zero;
                 }
 
+                // Saving attachments for NPCs messes them up for the real owner!
+                var botMgr = m_scene.RequestModuleInterface<IBotManager> ();
+                if (botMgr != null) {
+                    if (botMgr.IsNpcAgent (agentID))
+                        return UUID.Zero;
+                }
+
                 //let things like state saves and another async things be performed before we serialize the object
                 grp.BackupPreparation ();
 

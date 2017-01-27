@@ -207,6 +207,8 @@ namespace WhiteCore.Modules.Profiles
             IClientAPI remoteClient = (IClientAPI)sender;
             UUID requestedUUID = new UUID (args [0]);
 
+            // 20170120 - greythane - May need to check for NPC bots here and send an appropriate reply
+
             Dictionary<UUID, string> classifieds = new Dictionary<UUID, string> ();
             foreach (Classified classified in ProfileFrontend.GetClassifieds (requestedUUID))
                 classifieds.Add (classified.ClassifiedUUID, classified.Name);
@@ -373,6 +375,8 @@ namespace WhiteCore.Modules.Profiles
             IClientAPI remoteClient = (IClientAPI)sender;
             UUID requestedUUID = new UUID (args [0]);
 
+            // 20170120 - greythane - May need to check for NPC bots here and send an appropriate reply
+
             Dictionary<UUID, string> picks = ProfileFrontend.GetPicks (requestedUUID)
                                                             .ToDictionary (Pick => Pick.PickUUID, Pick => Pick.Name);
             remoteClient.SendAvatarPicksReply (requestedUUID, picks);
@@ -535,6 +539,7 @@ namespace WhiteCore.Modules.Profiles
                 return;
             }
 
+
             UserInfo TargetPI =
                 remoteClient.Scene.RequestModuleInterface<IAgentInfoService> ().GetUserInfo (target.ToString ());
             //See if all can see this person
@@ -574,6 +579,8 @@ namespace WhiteCore.Modules.Profiles
             IUserProfileInfo UPI = ProfileFrontend.GetUserProfile (remoteClient.AgentId);
             if (UPI == null)
                 return;
+
+            // 20170120 - greythane - May need to check for NPC bots here and send an appropriate reply
 
             if (UPI.Image != ImageID ||
                 UPI.FirstLifeImage != FLImageID ||
