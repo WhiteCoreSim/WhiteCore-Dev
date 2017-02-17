@@ -61,14 +61,14 @@ namespace WhiteCore.Modules.Estate
             IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
 
             if (estateConnector != null) {
-                EstateSettings ES = estateConnector.GetEstateSettings (scene.RegionInfo.RegionID);
+                EstateSettings ES = estateConnector.GetRegionEstateSettings (scene.RegionInfo.RegionID);
                 if (ES == null) {
                     //Could not locate the estate service, wait until it can find it
                     MainConsole.Instance.Warn (
                         "We could not find the estate service for this region. Please make sure that your URLs are correct in grid mode.");
                     while (true) {
                         MainConsole.Instance.Prompt ("Press enter to try again.");
-                        if ((ES = estateConnector.GetEstateSettings (scene.RegionInfo.RegionID)) == null ||
+                        if ((ES = estateConnector.GetRegionEstateSettings (scene.RegionInfo.RegionID)) == null ||
                             ES.EstateID == 0) {
                             ES = CreateEstateInfo (scene);
                             break;
@@ -132,7 +132,7 @@ namespace WhiteCore.Modules.Estate
 
             // try & link region 
             if (estateConnector.LinkRegion (regionID, estateID)) {
-                ES = estateConnector.GetEstateSettings (regionID);     // refresh to check linking
+                ES = estateConnector.GetRegionEstateSettings (regionID);     // refresh to check linking
                 if ((ES == null) || (ES.EstateID == 0)) {
                     MainConsole.Instance.Warn ("An error was encountered linking the region to '" + estateName + "'!\n" +
                         "Possibly a problem with the server connection, please link this region later.");
@@ -158,7 +158,7 @@ namespace WhiteCore.Modules.Estate
             IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
 
             // link up the region
-            ES = estateConnector.GetEstateSettings (regionID);
+            ES = estateConnector.GetRegionEstateSettings (regionID);
 
             if (!estateConnector.LinkRegion (regionID, estateID)) {
                 MainConsole.Instance.WarnFormat ("[Estate]: Joining the {0} estate failed. Please try again.", ES.EstateName);
@@ -166,7 +166,7 @@ namespace WhiteCore.Modules.Estate
             }
 
             // make sure that the region is fully set up
-            if ((ES = estateConnector.GetEstateSettings (regionID)) == null || ES.EstateID == 0) {
+            if ((ES = estateConnector.GetRegionEstateSettings (regionID)) == null || ES.EstateID == 0) {
                 MainConsole.Instance.Warn ("[Estate]: Unable to verify region update (possible server connection error), please try again.");
                 return null;
             }
@@ -351,7 +351,7 @@ namespace WhiteCore.Modules.Estate
                 }
 
                 // make sure that the region is fully set up
-                if ((ES = estateConnector.GetEstateSettings (scene.RegionInfo.RegionID)) == null || ES.EstateID == 0) {
+                if ((ES = estateConnector.GetRegionEstateSettings (scene.RegionInfo.RegionID)) == null || ES.EstateID == 0) {
                     MainConsole.Instance.Warn ("[Estate]: Unable to verify region update (possible server connection error), please try again.");
                     continue;
                 }
@@ -422,6 +422,15 @@ namespace WhiteCore.Modules.Estate
             } else
                 regionName = regScene.RegionInfo.RegionName;
 
+            // check for mainland regions
+            if (regScene.RegionInfo.RegionType.ToLower ().StartsWith ("m", System.StringComparison.Ordinal)) {
+                var sysEstates = regScene.RequestModuleInterface<ISystemEstateService> ();
+                var mainlandEstate = sysEstates.MainlandEstateName;
+                MainConsole.Instance.InfoFormat ("[Estate]: {0} is a Mainland region and is automatically part of the '{1}' estate",
+                                                regionName,mainlandEstate);
+                return;
+             }
+
             var regionID = regScene.RegionInfo.RegionID;
             var oldOwnerID = regScene.RegionInfo.EstateSettings.EstateOwner;
 
@@ -445,7 +454,9 @@ namespace WhiteCore.Modules.Estate
                 newEstateId = GetUserEstateID (regScene, estateConnector);
                 if (newEstateId == 0)
                     return;
-                estateName = estateConnector.GetEstateSettings (newEstateId).EstateName;
+                var estate = estateConnector.GetEstateIDSettings (newEstateId);
+                if (estate != null)
+                    estateName = estate.EstateName;
             }
 
             // we have a region & estate name

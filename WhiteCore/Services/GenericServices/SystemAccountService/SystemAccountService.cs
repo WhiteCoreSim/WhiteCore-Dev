@@ -100,7 +100,7 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
 
         public string GetSystemEstateOwnerName (int estateID)
         {
-            if (estateID == 1)  // Mainland estate
+            if (estateID == Constants.MainlandEstateID)
                 return governorName;
 
             // System estate then
@@ -109,7 +109,7 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
 
         public UUID GetSystemEstateOwner (int estateID)
         {
-            if (estateID == 1)  // Mainland estate
+            if (estateID == Constants.MainlandEstateID) 
                 return GovernorUUID;
 
             // System estate then

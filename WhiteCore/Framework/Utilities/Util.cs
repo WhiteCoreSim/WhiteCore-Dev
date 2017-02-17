@@ -2876,6 +2876,7 @@ namespace WhiteCore.Framework.Utilities
             else
                 EmitBoxIfNeeded (il, method.ReturnType);
             il.Emit (OpCodes.Ret);
+
             return dynamicMethod.Invoke (null, new object [] { invokeClass, invokeParameters });
             /*FastInvokeHandler invoder =
               (FastInvokeHandler)dynamicMethod.CreateDelegate(

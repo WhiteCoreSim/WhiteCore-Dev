@@ -887,7 +887,7 @@ namespace WhiteCore.Modules.Web
 
             foreach (var estate in estates) {
                 var estateID = estateConnector.GetEstateID (estate);
-                EstateSettings ES = estateConnector.GetEstateSettings (estateID);
+                EstateSettings ES = estateConnector.GetEstateIDSettings (estateID);
 
                 if (ES != null) {
                     UserAccount EstateOwner = accountService.GetUserAccount (null, ES.EstateOwner);

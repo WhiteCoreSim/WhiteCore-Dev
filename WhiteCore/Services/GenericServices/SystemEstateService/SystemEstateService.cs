@@ -201,7 +201,7 @@ namespace WhiteCore.Services.GenericServices.SystemEstateService
                     UpdateSystemEstates (m_estateConnector, ES, estateID);
             }
 
-            ES = m_estateConnector.GetEstateSettings (estateID);
+            ES = m_estateConnector.GetEstateIDSettings (estateID);
             if ((ES != null) && (ES.EstateID != 0)) {
 
                 // ensure correct owner
@@ -710,7 +710,7 @@ namespace WhiteCore.Services.GenericServices.SystemEstateService
             regionName = region.RegionName;
             if (estateConnector.LinkRegion (region.RegionID, (int)ES.EstateID)) {
                 // check for update..
-                var es = estateConnector.GetEstateSettings (region.RegionID);
+                var es = estateConnector.GetRegionEstateSettings (region.RegionID);
                 if ((es == null) || (es.EstateID == 0))
                     MainConsole.Instance.Warn ("The region link failed, please try again soon.");
                 else {
@@ -825,7 +825,7 @@ namespace WhiteCore.Services.GenericServices.SystemEstateService
 
             foreach (string estate in estates) {
                 var estateID = estateConnector.GetEstateID (estate);
-                EstateSettings ES = estateConnector.GetEstateSettings (estateID);
+                EstateSettings ES = estateConnector.GetEstateIDSettings (estateID);
 
                 if (ES != null) {
                     //var regInfo = scene.RegionInfo;

@@ -84,7 +84,7 @@ namespace WhiteCore.Modules.Web
                 return null;
             }
 
-            var estateSettings = estateConnector.GetEstateSettings (estateid);
+            var estateSettings = estateConnector.GetEstateIDSettings (estateid);
             if (estateSettings != null) {
                 if (requestParameters.ContainsKey ("Submit")) {
 
