@@ -53,22 +53,15 @@ namespace WhiteCore.Modules.Land
 
     public class PrimCountModule : IPrimCountModule, INonSharedRegionModule
     {
-        readonly Dictionary<UUID, UUID> m_OwnerMap =
-            new Dictionary<UUID, UUID>();
-
-        readonly Dictionary<UUID, ParcelCounts> m_ParcelCounts =
-            new Dictionary<UUID, ParcelCounts>();
-
-        readonly Dictionary<UUID, PrimCounts> m_PrimCounts =
-            new Dictionary<UUID, PrimCounts>();
-
-        readonly Dictionary<UUID, int> m_SimwideCounts =
-            new Dictionary<UUID, int>();
+        readonly Dictionary<UUID, UUID> m_OwnerMap = new Dictionary<UUID, UUID>();
+        readonly Dictionary<UUID, ParcelCounts> m_ParcelCounts = new Dictionary<UUID, ParcelCounts>();
+        readonly Dictionary<UUID, PrimCounts> m_PrimCounts = new Dictionary<UUID, PrimCounts>();
+        readonly Dictionary<UUID, int> m_SimwideCounts = new Dictionary<UUID, int>();
 
         // For now, a simple sim-wide taint to get this up. Later parcel based
         // taint to allow recounting a parcel if only ownership has changed
         // without recounting the whole sim.
-        readonly Object m_TaintLock = new Object();
+        readonly object m_TaintLock = new object();
         IScene m_Scene;
         bool m_Tainted = true;
 
@@ -89,12 +82,11 @@ namespace WhiteCore.Modules.Land
 
             scene.RegisterModuleInterface<IPrimCountModule>(this);
 
-            m_Scene.EventManager.OnObjectBeingAddedToScene +=
-                OnPrimCountAdd;
-            m_Scene.EventManager.OnObjectBeingRemovedFromScene +=
-                OnObjectBeingRemovedFromScene;
+            m_Scene.EventManager.OnObjectBeingAddedToScene += OnPrimCountAdd;
+            m_Scene.EventManager.OnObjectBeingRemovedFromScene += OnObjectBeingRemovedFromScene;
             m_Scene.EventManager.OnLandObjectAdded += OnLandObjectAdded;
             m_Scene.EventManager.OnLandObjectRemoved += OnLandObjectRemoved;
+
             m_Scene.WhiteCoreEventManager.RegisterEventHandler("ObjectChangedOwner", OnGenericEvent);
             m_Scene.WhiteCoreEventManager.RegisterEventHandler("ObjectEnteringNewParcel", OnGenericEvent);
             m_Scene.EventManager.OnSceneGroupMove += EventManager_OnSceneGroupMove;
@@ -102,10 +94,11 @@ namespace WhiteCore.Modules.Land
 
         bool EventManager_OnSceneGroupMove(UUID groupID, Vector3 pos)
         {
-            IParcelManagementModule parcelManagment = m_Scene.RequestModuleInterface<IParcelManagementModule>();
+            var parcelManagment = m_Scene.RequestModuleInterface<IParcelManagementModule>();
             ILandObject landObject = parcelManagment.GetLandObject(pos.X, pos.Y) ??
                                      parcelManagment.GetNearestAllowedParcel(UUID.Zero, pos.X, pos.Y);
             if (landObject == null) return true;
+
             ParcelCounts parcelCounts;
             if ((m_ParcelCounts.TryGetValue(landObject.LandData.GlobalID, out parcelCounts)) &&
                 (!parcelCounts.Objects.ContainsKey(groupID)))
@@ -124,12 +117,11 @@ namespace WhiteCore.Modules.Land
         {
             m_Scene.UnregisterModuleInterface<IPrimCountModule>(this);
 
-            m_Scene.EventManager.OnObjectBeingAddedToScene -=
-                OnPrimCountAdd;
-            m_Scene.EventManager.OnObjectBeingRemovedFromScene -=
-                OnObjectBeingRemovedFromScene;
+            m_Scene.EventManager.OnObjectBeingAddedToScene -= OnPrimCountAdd;
+            m_Scene.EventManager.OnObjectBeingRemovedFromScene -= OnObjectBeingRemovedFromScene;
             m_Scene.EventManager.OnLandObjectAdded -= OnLandObjectAdded;
             m_Scene.EventManager.OnLandObjectRemoved -= OnLandObjectRemoved;
+
             m_Scene.WhiteCoreEventManager.UnregisterEventHandler("ObjectChangedOwner", OnGenericEvent);
             m_Scene.WhiteCoreEventManager.UnregisterEventHandler("ObjectEnteringNewParcel", OnGenericEvent);
             m_Scene.EventManager.OnSceneGroupMove -= EventManager_OnSceneGroupMove;
@@ -224,24 +216,33 @@ namespace WhiteCore.Modules.Land
         // NOTE: Call under Taint Lock
         void AddObject(ISceneEntity obj)
         {
+            ParcelCounts parcelCounts;
+
             if (obj.IsAttachment)
                 return;
-            if (((obj.RootChild.Flags & PrimFlags.TemporaryOnRez) != 0))
-                return;
+
 
             Vector3 pos = obj.AbsolutePosition;
-            ILandObject landObject = m_Scene.RequestModuleInterface<IParcelManagementModule>().GetLandObject(pos.X,
-                                                                                                             pos.Y);
+            var landObject = m_Scene.RequestModuleInterface<IParcelManagementModule>().GetLandObject(pos.X, pos.Y);
             if (landObject == null)
                 return;
             LandData landData = landObject.LandData;
 
-            ParcelCounts parcelCounts;
             if (m_ParcelCounts.TryGetValue(landData.GlobalID, out parcelCounts))
             {
                 UUID landOwner = landData.OwnerID;
 
                 parcelCounts.Objects[obj.UUID] = obj;
+
+                // check for temporary objects first
+                if (((obj.RootChild.Flags & PrimFlags.TemporaryOnRez) != 0) ||
+                    ((obj.RootChild.Flags & PrimFlags.Temporary) != 0)) {
+                    parcelCounts.Temporary += obj.PrimCount;
+                 
+                    // do not add temporary counts further
+                    return;
+                }
+
                 if (!m_SimwideCounts.ContainsKey(landOwner))
                     m_SimwideCounts.Add(landOwner, 0);
                 m_SimwideCounts[landOwner] += obj.PrimCount;
@@ -275,21 +276,30 @@ namespace WhiteCore.Modules.Land
         // NOTE: Call under Taint Lock
         void RemoveObject(ISceneEntity obj)
         {
+            ParcelCounts parcelCounts;
             if (obj.IsAttachment)
                 return;
-            if (((obj.RootChild.Flags & PrimFlags.TemporaryOnRez) != 0))
-                return;
 
-            IParcelManagementModule parcelManagment = m_Scene.RequestModuleInterface<IParcelManagementModule>();
+            var parcelManagment = m_Scene.RequestModuleInterface<IParcelManagementModule>();
             Vector3 pos = obj.AbsolutePosition;
             ILandObject landObject = parcelManagment.GetLandObject(pos.X, pos.Y) ??
                                      parcelManagment.GetNearestAllowedParcel(UUID.Zero, pos.X, pos.Y);
             if (landObject == null) return;
+
             LandData landData = landObject.LandData;
-            ParcelCounts parcelCounts;
+
             if (m_ParcelCounts.TryGetValue(landData.GlobalID, out parcelCounts))
             {
                 UUID landOwner = landData.OwnerID;
+
+                // check for temporary objects first
+                if (((obj.RootChild.Flags & PrimFlags.TemporaryOnRez) != 0) ||
+                    ((obj.RootChild.Flags & PrimFlags.Temporary) != 0)) {
+                    parcelCounts.Temporary -= obj.PrimCount;
+
+                    // do not process temporary objects further
+                    return;
+                }
 
                 foreach (ISceneChildEntity child in obj.ChildrenEntities())
                 {
@@ -540,12 +550,10 @@ namespace WhiteCore.Modules.Land
             {
                 //Taint the parcels
                 //SceneObjectGroup grp = (((Object[])parameters)[0]) as SceneObjectGroup;
-                UUID newParcel = (UUID) (((Object[]) parameters)[1]);
-                UUID oldParcel = (UUID) (((Object[]) parameters)[2]);
-                ILandObject oldlandObject =
-                    m_Scene.RequestModuleInterface<IParcelManagementModule>().GetLandObject(oldParcel);
-                ILandObject newlandObject =
-                    m_Scene.RequestModuleInterface<IParcelManagementModule>().GetLandObject(newParcel);
+                var newParcel = (UUID) (((object[]) parameters)[1]);
+                var oldParcel = (UUID) (((object[]) parameters)[2]);
+                var oldlandObject = m_Scene.RequestModuleInterface<IParcelManagementModule>().GetLandObject(oldParcel);
+                var newlandObject = m_Scene.RequestModuleInterface<IParcelManagementModule>().GetLandObject(newParcel);
 
                 TaintPrimCount(oldlandObject);
                 TaintPrimCount(newlandObject);

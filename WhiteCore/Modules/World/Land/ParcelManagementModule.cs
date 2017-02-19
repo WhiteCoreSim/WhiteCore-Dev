@@ -319,6 +319,9 @@ namespace WhiteCore.Modules.Land
         /// </summary>
         protected internal void CheckFrameEvents ()
         {
+            var asyncDelete = m_scene.RequestModuleInterface<IAsyncSceneObjectGroupDeleter> ();
+            var msgTransfer = m_scene.RequestModuleInterface<IMessageTransferModule> ();
+
             // Go through all updates and check for temp and auto return
             CheckPrimForAutoReturnObjects ();
             CheckPrimForTemporaryObjects ();
@@ -356,22 +359,26 @@ namespace WhiteCore.Modules.Land
                                 "Your object {0} was returned from {1} in region {2} due to {3}", ret.Value.objectName,
                                 ret.Value.location, m_scene.RegionInfo.RegionName, ret.Value.reason);
 
-                        IMessageTransferModule tr = m_scene.RequestModuleInterface<IMessageTransferModule> ();
-                        if (tr != null)
-                            tr.SendInstantMessage (msg);
+                        if (msgTransfer != null)
+                            msgTransfer.SendInstantMessage (msg);
 
                         if (ret.Value.Groups.Count > 1)
                             MainConsole.Instance.InfoFormat (
-                                "[Land management]: Returning {0} objects due to parcel auto return.",
+                                "[Parcel management]: Returning {0} objects due to parcel auto return.",
                                 ret.Value.Groups.Count);
                         else
-                            MainConsole.Instance.Info ("[Land management]: Returning 1 object due to parcel auto return.");
+                            MainConsole.Instance.Info ("[Parcel management]: Returning 1 object due to parcel auto return.");
                     }
-                    IAsyncSceneObjectGroupDeleter asyncDelete =
-                        m_scene.RequestModuleInterface<IAsyncSceneObjectGroupDeleter> ();
+
                     if (asyncDelete != null) {
+                        DeRezAction delAction;
+                        if (ret.Value.reason == "")                     // temporary objects are done quietly
+                            delAction = DeRezAction.DeleteTemporary;     
+                        else
+                            delAction = DeRezAction.Return;             // return the rest
+
                         asyncDelete.DeleteToInventory (
-                            DeRezAction.Return, ret.Value.Groups [0].RootChild.OwnerID, ret.Value.Groups,
+                            delAction, ret.Value.Groups [0].RootChild.OwnerID, ret.Value.Groups,
                             ret.Value.Groups [0].RootChild.OwnerID,
                             true, true);
                     }
