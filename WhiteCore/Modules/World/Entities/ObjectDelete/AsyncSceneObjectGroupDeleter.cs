@@ -157,7 +157,7 @@ namespace WhiteCore.Modules.Entities.ObjectDelete
                 DoDeleteObject (o);
             } else {
                 DeleteLoopInUse = false;
-                //MainConsole.Instance.Debug("[SCENE]: Ending delete loop");
+                //MainConsole.Instance.Debug("[Async delete]: Ending delete loop");
             }
         }
 
@@ -168,10 +168,10 @@ namespace WhiteCore.Modules.Entities.ObjectDelete
             try {
                 if (m_removeFromSimQueue.TryDequeue (out x)) {
                     MainConsole.Instance.DebugFormat (
-                        "[Scene]: Sending object to user's inventory, {0} item(s) remaining.",
+                        "[Async delete]: Sending object to user's inventory, {0} item(s) remaining.",
                         m_removeFromSimQueue.Count);
 
-                    if (x.permissionToTake) {
+                    if ((x.action != DeRezAction.DeleteTemporary) & x.permissionToTake) {
                         try {
                             IInventoryAccessModule invAccess = m_scene.RequestModuleInterface<IInventoryAccessModule> ();
                             UUID itemID;
@@ -179,7 +179,7 @@ namespace WhiteCore.Modules.Entities.ObjectDelete
                                 invAccess.DeleteToInventory (x.action, x.folderID, x.objectGroups, x.agentId, out itemID);
                         } catch (Exception e) {
                             MainConsole.Instance.ErrorFormat (
-                                "[Async deleter]: Exception background sending object: {0}{1}", e.Message, e.StackTrace);
+                                "[Async delete]: Exception background sending object: {0} - {1}", e.Message, e.StackTrace);
                         }
                     }
 
@@ -195,12 +195,12 @@ namespace WhiteCore.Modules.Entities.ObjectDelete
                 // We can't put the object group details in here since the root part may have disappeared (which is where these sit).
                 // FIXME: This needs to be fixed.
                 MainConsole.Instance.ErrorFormat (
-                    "[Scene]: Queued sending of scene object to agent {0} {1} failed: {2}",
+                    "[Async delete]: Queued sending of scene object to agent {0} {1} failed: {2}",
                     (x != null ? x.agentId.ToString () : "unavailable"),
                     (x != null ? x.agentId.ToString () : "unavailable"), e);
             }
 
-            //MainConsole.Instance.Debug("[SCENE]: No objects left in delete queue.");
+            //MainConsole.Instance.Debug("[Async delete]: No objects left in delete queue.");
             return false;
         }
 

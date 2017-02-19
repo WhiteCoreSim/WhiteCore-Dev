@@ -2106,16 +2106,12 @@ namespace WhiteCore.Region
                 }
             }
 
-            m_parentGroup.Scene.ForEachScenePresence(delegate(IScenePresence sp)
-                                                         {
-                                                             if (sp.IsChildAgent)
-                                                                 return;
-                                                             if (
-                                                                 !(Util.GetDistanceTo(sp.AbsolutePosition,
-                                                                                      AbsolutePosition) >= 100))
-                                                                 sp.ControllingClient.SendPreLoadSound(objectID,
-                                                                                                       objectID, soundID);
-                                                         });
+            m_parentGroup.Scene.ForEachScenePresence(delegate(IScenePresence sp) {
+                if (sp.IsChildAgent)
+                    return;
+                if (!(Util.GetDistanceTo(sp.AbsolutePosition, AbsolutePosition) >= 100))
+                    sp.ControllingClient.SendPreLoadSound(objectID, objectID, soundID);
+            });
         }
 
         public bool RemFlag(PrimFlags flag)
@@ -3657,6 +3653,10 @@ namespace WhiteCore.Region
         public void ResetExpire()
         {
             Expires = DateTime.Now + new TimeSpan(TimeSpan.TicksPerMinute);
+
+            // set prim counts as tainted so they get recalculated
+            var pcount = m_parentGroup.Scene.RequestModuleInterface<IPrimCountModule> ();
+            pcount.TaintPrimCount ();
         }
 
         public event AddPhysics OnAddPhysics;

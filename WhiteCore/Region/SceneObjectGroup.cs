@@ -2963,15 +2963,12 @@ namespace WhiteCore.Region
             {
                 if (rootpart.PhysActor != null)
                 {
-                    if (height != 0f)
-                    {
+                    if (Math.Abs (height) > 0.01f) {
                         rootpart.PIDHoverHeight = height;
                         rootpart.PIDHoverType = hoverType;
                         rootpart.PIDTau = tau;
                         rootpart.PIDHoverActive = true;
-                    }
-                    else
-                    {
+                    } else {
                         rootpart.PIDHoverActive = false;
                     }
                 }
