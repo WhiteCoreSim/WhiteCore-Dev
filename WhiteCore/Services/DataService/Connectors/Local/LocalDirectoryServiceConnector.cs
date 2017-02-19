@@ -362,7 +362,7 @@ namespace WhiteCore.Services.DataService
             return (Query.Count != 0) ? LandDataToExtendedLandData(Query2LandData(Query)) : new List<ExtendedLandData> ();
         }
 
-        public List<ExtendedLandData> LandDataToExtendedLandData(List<LandData> data)
+        List<ExtendedLandData> LandDataToExtendedLandData(List<LandData> data)
         {
             return (from land in data
                     let region = m_registry.RequestModuleInterface<IGridService>().GetRegionByUUID(null, land.RegionID)
@@ -924,10 +924,8 @@ namespace WhiteCore.Services.DataService
         /// <returns>The classifieds.</returns>
         /// <param name="category">Category.</param>
         /// <param name="classifiedFlags">Query flags.</param>
-        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
         public List<Classified> GetAllClassifieds (int category, uint classifiedFlags)
         {
-            // WebUI call
             List<Classified> classifieds = new List<Classified> ();
 
             if (m_doRemoteOnly) {
@@ -1109,24 +1107,28 @@ namespace WhiteCore.Services.DataService
         }
 
 
-        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+
         public List<EventData> GetAllEvents (int queryHours, int category, int maturityLevel)
         {
             return GetEventsList (null, queryHours, category, maturityLevel);
         }
 
-        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
         public List<EventData> GetUserEvents (string userId, int queryHours, int category, int maturityLevel)
         {
             // The same as GetEventList but incuded for more intuitive calls and possible expansion 
             return GetEventsList (userId, queryHours, category, maturityLevel);
         }
 
-        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        /// <summary>
+        /// Gets the events list. WebUI and API
+        /// </summary>
+        /// <returns>The events list.</returns>
+        /// <param name="userId">User identifier.</param>
+        /// <param name="queryHours">Query hours.</param>
+        /// <param name="category">Category.</param>
+        /// <param name="maturityLevel">Maturity level.</param>
         public List<EventData> GetEventsList (string userId, int queryHours, int category, int maturityLevel)
         {
-            // WebUI call 
-
             List<EventData> retEvents = new List<EventData> ();
 
             if (m_doRemoteOnly) {
@@ -1445,6 +1447,7 @@ namespace WhiteCore.Services.DataService
             return true;
         }
 
+        // WebUI and API calls
         public List<EventData> GetEvents(uint start, uint count, Dictionary<string, bool> sort,
                                          Dictionary<string, object> filter)
         {
