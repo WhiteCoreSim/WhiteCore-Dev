@@ -571,7 +571,7 @@ namespace WhiteCore.Region
 				"<OAR filename> The file name (and optional path) to use when saveing the archive." +
 				"  If this is not given then the oar is saved to the 'region name' in the 'Data/Region/OarFiles' folder." + Environment.NewLine +
 				"--perm stops objects with insufficient permissions from being saved to the OAR." + Environment.NewLine +
-				"  <permissions> can contain one or more of these characters: \"C\" = Copy, \"T\" = Transfer" + Environment.NewLine,
+				"  <permissions> can contain one or more of these characters: 'C' = Copy, 'T' = Transfer" + Environment.NewLine,
 				HandleSaveOar, true, true);
 
 			MainConsole.Instance.Commands.AddCommand (
@@ -1488,14 +1488,15 @@ namespace WhiteCore.Region
 				if (fileName == "")
 					return;
 
+
 				// need to add this to the cmdparams
 				var newParams = new List<string> (cmdparams);
 				newParams.Add (fileName);
 				cmdparams = newParams.ToArray ();
 			} else
 				fileName = cmdparams [2];
-
-			var defaultOarPath = Path.Combine (m_SimBase.DefaultDataPath, Constants.DEFAULT_OARARCHIVE_DIR);
+        
+            var defaultOarPath = Path.Combine (m_SimBase.DefaultDataPath, Constants.DEFAULT_OARARCHIVE_DIR);
 			fileName = PathHelpers.VerifyWriteFile (fileName, ".oar", defaultOarPath, true);
 			if (fileName == "")                 // something wrong...
 				return;

@@ -155,10 +155,10 @@ namespace WhiteCore.Modules.Gods
                 IScene scene = MainConsole.Instance.ConsoleScene; //Switch back later
                 MainConsole.Instance.RunCommand ("change region " + client.Scene.RegionInfo.RegionName);
                 MainConsole.Instance.RunCommand (
-                    "save oar "
+                    "save oar \""
                     + m_savestate_oar_directory
-                    + client.Scene.RegionInfo.RegionName.Replace (" ", "%20")   // Check if the region name has spaces in them
-                    + ".statesave.oar");
+                    + client.Scene.RegionInfo.RegionName
+                    + ".statesave.oar\"");
                 if (scene == null)
                     MainConsole.Instance.RunCommand ("change region root");
                 else
