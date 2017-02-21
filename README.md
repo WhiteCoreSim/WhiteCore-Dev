@@ -18,6 +18,12 @@ Linux 64 Bit [![Build Status](https://travis-ci.org/WhiteCoreSim/WhiteCore-Dev.s
 
 `git clone --recursive https://github.com/WhiteCoreSim/WhiteCore-Dev.git`
 
+To update an existing repository that does not have the LibOMV submodule
+
+	cd <your WhiteCore repository>
+	git submodule init
+	git submodule update
+
 *If you do not know what submodules are, or you are not using git from the command line, PLEASE make sure to fetch the submodules too.*
 
 **If you download the repo using the zip file option, you will also need to download the Whitecore-LibOMV submodule and extract it in your local WhiteCore repo.**
