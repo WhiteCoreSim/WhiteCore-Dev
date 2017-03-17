@@ -1395,11 +1395,17 @@ namespace WhiteCore.Region
 
         public void SetOwnerId(UUID userId)
         {
-            ForEachPart(delegate(SceneObjectPart part)
-                            {
-                                part.LastOwnerID = part.OwnerID;
-                                part.OwnerID = userId;
-                            });
+        	ForEachPart(delegate(SceneObjectPart part)
+        	            {
+        	            	if (part.OwnerID != userId)
+        	            	{
+        	            		if (part.GroupID = part.OwnerID)
+        	            		{
+        	            			part.LastOwnerID = part.OwnerID;
+        	            			part.OwnerID = userId;
+        	            		}
+        	            	}
+        	            });
         }
 
         public float GetMass()
