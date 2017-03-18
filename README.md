@@ -1,6 +1,6 @@
 # WhiteCore Sim
 
-The WhiteCore Development Team has moved the original Aurora virtual world server, derived form the OpenSim project, to a new level.
+The WhiteCore Development Team has moved the original Aurora virtual world server, derived from the OpenSim project, to a new level.
 
 The structure and code base has been heavily revised and is under continual development.
 
@@ -28,7 +28,6 @@ To update an existing repository that does not have the LibOMV submodule
 
 **If you download the repo using the zip file option, you will also need to download the Whitecore-LibOMV submodule and extract it in your local WhiteCore repo.**
 `https://github.com/WhiteCoreSim/Whitecore-LibOMV`
-
 
 *- For those using the master, please report back when you are having issues with the builds. We, the developers, can't test everything and we hope that you, the users, are able to help us report things that break. Please use the Issue Tracker with the predefined text to make it easier to report issues*
 
