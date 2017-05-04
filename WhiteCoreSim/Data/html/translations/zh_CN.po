@@ -1,0 +1,1541 @@
+#
+# SimpleChinese translation for WhiteCore.
+# This file is distributed under the same license as the WhiteCore package.
+# toweiyg <toweiyg@bnu.edu.cn>, 2016.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: WhiteCore Version 0.9.5\n"
+"Report-Msgid-Bugs-To: Yungang Wei <toweiyg@bnu.edu.cn>\n"
+"POT-Creation-Date: 2016-11-23 14:11:31Z\n"
+"PO-Revision-Date: 2017-01-02 15:57+1100\n"
+"Last-Translator: Yungang Wei <toweiyg@bnu.edu.cn>\n"
+"Language-Team: Yungang Wei <toweiyg@bnu.edu.cn>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: EditPlus3.0\n"
+
+msgid "30daysPastText"
+msgstr "&#x524D;30&#x5929;"
+
+msgid "AboutMe"
+msgstr "&#x5173;&#x4E8E;&#x6211;&#x4EEC;"
+
+msgid "AbuseReporterNameText"
+msgstr "&#x62A5;&#x544A;&#x4EBA;"
+
+msgid "AbuseReportText"
+msgstr "&#x6EE5;&#x7528;&#x62A5;&#x544A;"
+
+msgid "AbuserNameText"
+msgstr "&#x6EE5;&#x7528;&#x8005;"
+
+msgid "Accept"
+msgstr "&#x63A5;&#x53D7;"
+
+msgid "AccountType"
+msgstr "&#x5E10;&#x53F7;&#x7C7B;&#x578B;"
+
+msgid "ActiveText"
+msgstr "&#x6FC0;&#x6D3B;"
+
+msgid "AddEstateText"
+msgstr "&#x6DFB;&#x52A0;&#x9886;&#x571F;"
+
+msgid "AddEventText"
+msgstr "&#x6DFB;&#x52A0;&#x4E8B;&#x4EF6;"
+
+msgid "AddItem"
+msgstr "&#x6DFB;&#x52A0;&#x4E00;&#x9879;"
+
+msgid "AddNewsItem"
+msgstr "&#x6DFB;&#x52A0;&#x4E00;&#x7BC7;&#x65B0;&#x95FB;"
+
+msgid "AddNewsText"
+msgstr "&#x6DFB;&#x52A0;&#x65B0;&#x95FB;"
+
+msgid "AddRegionText"
+msgstr "&#x6DFB;&#x52A0;&#x5C9B;&#x5C7F;"
+
+msgid "AdminBanUserInfoText"
+msgstr "&#x7528;&#x6237;&#x88AB;&#x89E3;&#x7981;&#x524D;&#xFF0C;&#x5C06;&#x4E0D;&#x80FD;&#x767B;&#x5F55;&#x3002;"
+
+msgid "AdminBanUserText"
+msgstr "&#x7981;&#x6B62;&#x7528;&#x6237;"
+
+msgid "AdminDeleteUserInfoText"
+msgstr "&#x5220;&#x9664;&#x5E10;&#x53F7;&#x53CA;&#x5176;&#x5173;&#x8054;&#x7684;&#x6240;&#x6709;&#x4FE1;&#x606F;&#x3002;"
+
+msgid "AdminDeleteUserText"
+msgstr "&#x5220;&#x9664;&#x7528;&#x6237;"
+
+msgid "AdminLoginInAsUserInfoText"
+msgstr "&#x6CE8;&#x9500;&#x7BA1;&#x7406;&#x5458;&#x5E10;&#x53F7;&#xFF0C;&#x5E76;&#x4EE5;&#x6B64;&#x7528;&#x6237;&#x8EAB;&#x4EFD;&#x767B;&#x5F55;&#xFF0C;&#x4F7F;&#x7528;&#x5176;&#x5E10;&#x53F7;&#x4E0B;&#x7684;&#x529F;&#x80FD;&#x3002;"
+
+msgid "AdminLoginInAsUserText"
+msgstr "&#x6A21;&#x62DF;&#x7528;&#x6237;&#x767B;&#x5F55;"
+
+msgid "AdminTempBanUserInfoText"
+msgstr "&#x4E34;&#x65F6;&#x7981;&#x6B62;&#x7528;&#x6237;&#x4E00;&#x6BB5;&#x65F6;&#x95F4;&#x3002;"
+
+msgid "AdminTempBanUserText"
+msgstr "&#x4E34;&#x65F6;&#x7981;&#x6B62;"
+
+msgid "AdminUnbanUserInfoText"
+msgstr "&#x5220;&#x9664;&#x5BF9;&#x7528;&#x6237;&#x7684;&#x4E34;&#x65F6;&#x548C;&#x6C38;&#x4E45;&#x7981;&#x6B62;&#x3002;"
+
+msgid "AdminUnbanUserText"
+msgstr "&#x672A;&#x7981;&#x6B62;&#x7528;&#x6237;"
+
+msgid "AdminUserTypeInfoText"
+msgstr "&#x7528;&#x6237;&#x7C7B;&#x578B;&#xFF08;&#x76EE;&#x524D;&#x7528;&#x4E8E;&#x53D1;&#x653E;&#x5B9A;&#x671F;&#x6D25;&#x8D34;&#xFF09;&#x3002;"
+
+msgid "AdultText"
+msgstr "&#x6210;&#x4EBA;"
+
+msgid "AgentsInViewText"
+msgstr "&#x89C6;&#x7EBF;&#x8303;&#x56F4;&#x5185;&#x7684;&#x7528;&#x6237;"
+
+msgid "AllowDirectTeleportText"
+msgstr "&#x8FD0;&#x884C;&#x76F4;&#x63A5;&#x4F20;&#x9001;"
+
+msgid "AllowVoiceText"
+msgstr "&#x5141;&#x8BB8;&#x8BED;&#x97F3;"
+
+msgid "Apr_Short"
+msgstr "&#x56DB;&#x6708;"
+
+msgid "April"
+msgstr "&#x56DB;&#x6708;"
+
+msgid "Aquatic"
+msgstr "&#x6C34;"
+
+msgid "AssignedToText"
+msgstr "&#x5206;&#x914D;&#x7ED9;"
+
+msgid "Aug_Short"
+msgstr "&#x516B;&#x6708;"
+
+msgid "August"
+msgstr "&#x516B;&#x6708;"
+
+msgid "AvatarEmailError"
+msgstr "&#x9700;&#x8981;Email&#x5730;&#x5740;&#x4EE5;&#x627E;&#x56DE;&#x5BC6;&#x7801;"
+
+msgid "AvatarNameError"
+msgstr "&#x672A;&#x8F93;&#x5165;&#x5316;&#x8EAB;&#x7684;&#x540D;&#x5B57;"
+
+msgid "AvatarNameSpacingError"
+msgstr "&#x60A8;&#x7684;&#x5316;&#x8EAB;&#x540D;&#x5B57;&#x683C;&#x5F0F;&#x4E3A;&#x201C;&#x540D;&#x5B57; &#x59D3;&#x6C0F;&#x201D;&#xFF01;"
+
+msgid "AvatarNameText"
+msgstr "&#x5316;&#x8EAB;&#x540D;&#x5B57;"
+
+msgid "AvatarPasswordError"
+msgstr "&#x5BC6;&#x7801;&#x4E3A;&#x7A7A;&#x6216;&#x4E0D;&#x5339;&#x914D;&#xFF01;"
+
+msgid "AvatarScopeText"
+msgstr "&#x5316;&#x8EAB;ID&#x8303;&#x56F4;"
+
+msgid "BackText"
+msgstr "&#x8FD4;&#x56DE;"
+
+msgid "BankerNameText"
+msgstr "&#x7CFB;&#x7EDF;&#x94F6;&#x884C;&#x5BB6;"
+
+msgid "BannedUntilText"
+msgstr "&#x7981;&#x6B62;&#x7528;&#x6237;&#x76F4;&#x5230;:"
+
+msgid "BanText"
+msgstr "&#x7981;&#x6B62;"
+
+msgid "Cancel"
+msgstr "&#x53D6;&#x6D88;"
+
+msgid "CannotSetParentToChild"
+msgstr "&#x65E0;&#x6CD5;&#x5C06;&#x83DC;&#x5355;&#x9879;&#x8BBE;&#x7F6E;&#x4E3A;&#x81EA;&#x5DF1;&#x7684;&#x5B50;&#x83DC;&#x5355;&#x3002;"
+
+msgid "CatAll"
+msgstr "&#x6240;&#x6709;"
+
+msgid "CatArtsCulture"
+msgstr "&#x827A;&#x672F;/&#x6587;&#x5316;"
+
+msgid "CatCharitySupport"
+msgstr "&#x6148;&#x5584;&#x673A;&#x6784;/&#x652F;&#x6301;&#x56E2;&#x961F;"
+
+msgid "CatCommercial"
+msgstr "&#x5546;&#x4E1A;"
+
+msgid "CatDiscussion"
+msgstr "&#x8BA8;&#x8BBA;"
+
+msgid "CatEducation"
+msgstr "&#x6559;&#x80B2;"
+
+msgid "CategoryText"
+msgstr "&#x7C7B;&#x522B;"
+
+msgid "CatEmployment"
+msgstr "&#x96C7;&#x4F63;"
+
+msgid "CatEntertainment"
+msgstr "&#x591C;&#x573A;/&#x5A31;&#x4E50;"
+
+msgid "CatGames"
+msgstr "&#x6E38;&#x620F;/&#x6BD4;&#x8D5B;"
+
+msgid "CatLandRental"
+msgstr "&#x571F;&#x5730;&#x79DF;&#x8D41;"
+
+msgid "CatLiveMusic"
+msgstr "&#x73B0;&#x573A;&#x97F3;&#x4E50;"
+
+msgid "CatMiscellaneous"
+msgstr "&#x6742;&#x9879;"
+
+msgid "CatNewProducts"
+msgstr "&#x65B0;&#x4EA7;&#x54C1;"
+
+msgid "CatPageants"
+msgstr "&#x9009;&#x7F8E;"
+
+msgid "CatPersonal"
+msgstr "&#x4E2A;&#x4EBA;"
+
+msgid "CatPropertyRental"
+msgstr "&#x7269;&#x4E1A;&#x79DF;&#x8D41;"
+
+msgid "CatSelect"
+msgstr ""
+
+msgid "CatService"
+msgstr "&#x670D;&#x52A1;"
+
+msgid "CatShopping"
+msgstr "&#x8D2D;&#x7269;"
+
+msgid "CatSpecialAttraction"
+msgstr "&#x7279;&#x522B;&#x666F;&#x70B9;"
+
+msgid "CatSports"
+msgstr "&#x4F53;&#x80B2;"
+
+msgid "CatWanted"
+msgstr "&#x901A;&#x7F09;"
+
+msgid "ChangeEmailText"
+msgstr "&#x4FEE;&#x6539;&#x90AE;&#x7BB1;&#x5730;&#x5740;"
+
+msgid "ChangePass"
+msgstr "&#x4FEE;&#x6539;&#x5BC6;&#x7801;"
+
+msgid "ChangePasswordText"
+msgstr "&#x4FEE;&#x6539;&#x5BC6;&#x7801;"
+
+msgid "ChangesSavedSuccessfully"
+msgstr "&#x4FEE;&#x6539;&#x5DF2;&#x7ECF;&#x6210;&#x529F;&#x4FDD;&#x5B58;"
+
+msgid "ChangeUserInformationText"
+msgstr "&#x4FEE;&#x6539;&#x7528;&#x6237;&#x4FE1;&#x606F;"
+
+msgid "Charter_Member"
+msgstr "&#x5BAA;&#x7AE0;&#x4F1A;&#x5458;"
+
+msgid "ChatText"
+msgstr "&#x804A;&#x5929;&#x652F;&#x6301;"
+
+msgid "CheckedText"
+msgstr "&#x5DF2;&#x5BA1;&#x6838;"
+
+msgid "ClassifiedsText"
+msgstr "&#x516C;&#x544A;"
+
+msgid "ClassifiedText"
+msgstr "&#x516C;&#x544A;"
+
+msgid "ClearStatsText"
+msgstr "&#x6E05;&#x9664;&#x7EDF;&#x8BA1;&#x6570;&#x636E;"
+
+msgid "ColorBoxCloseText"
+msgstr "&#x5173;&#x95ED;"
+
+msgid "ColorBoxImageText"
+msgstr "&#x56FE;&#x7247;"
+
+msgid "ColorBoxNextText"
+msgstr "&#x4E0B;&#x4E00;&#x4E2A;"
+
+msgid "ColorBoxOfText"
+msgstr "&#x7684;"
+
+msgid "ColorBoxPreviousText"
+msgstr "&#x4EE5;&#x524D;"
+
+msgid "ColorBoxStartSlideshowText"
+msgstr "&#x5F00;&#x59CB;&#x5E7B;&#x706F;&#x663E;&#x793A;"
+
+msgid "ColorBoxStopSlideshowText"
+msgstr "&#x505C;&#x6B62;&#x5E7B;&#x706F;&#x663E;&#x793A;"
+
+msgid "Contractor"
+msgstr "&#x627F;&#x5305;&#x5546;"
+
+msgid "CoverChargeText"
+msgstr "&#x5C01;&#x9762;&#x8D39;"
+
+msgid "CreationDateText"
+msgstr "&#x6DFB;&#x52A0;&#x65E5;&#x671F;"
+
+msgid "Currency"
+msgstr "&#x8D27;&#x5E01;"
+
+msgid "CurrentPageText"
+msgstr "&#x5F53;&#x524D;&#x9875;"
+
+msgid "Custom"
+msgstr "&#x4E2A;&#x6027;&#x5316;"
+
+msgid "DateEndText"
+msgstr "&#x7ED3;&#x675F;&#x65E5;&#x671F;"
+
+msgid "DateInfoText"
+msgstr "&#x9009;&#x62E9;&#x65E5;&#x671F;&#x8303;&#x56F4;"
+
+msgid "DateStartText"
+msgstr "&#x5F00;&#x59CB;&#x65E5;&#x671F;"
+
+msgid "DateText"
+msgstr "&#x65E5;&#x671F;"
+
+msgid "de"
+msgstr "&#x5FB7;&#x8BED;"
+
+msgid "Dec_Short"
+msgstr "&#x5341;&#x4E8C;&#x6708;"
+
+msgid "December"
+msgstr "&#x5341;&#x4E8C;&#x6708;"
+
+msgid "DefaultsUpdated"
+msgstr "&#x9ED8;&#x8BA4;&#x66F4;&#x65B0;&#xFF0C;&#x8FDB;&#x5165;&#x7CFB;&#x7EDF;&#x590D;&#x4F4D;&#x4E2D;&#xFF0C;&#x66F4;&#x65B0;&#x6216;&#x8BBE;&#x7F6E;&#x7BA1;&#x7406;&#x5668;&#x4EE5;&#x7981;&#x7528;&#x6B64;&#x8B66;&#x544A;&#x3002;"
+
+msgid "DelayedText"
+msgstr "&#x5EF6;&#x8FDF;"
+
+msgid "DeleteItem"
+msgstr "&#x5220;&#x9664;"
+
+msgid "DeleteNewsItem"
+msgstr "&#x5220;&#x9664;&#x65B0;&#x95FB;"
+
+msgid "DeleteNewsText"
+msgstr "&#x5220;&#x9664;&#x65B0;&#x95FB;"
+
+msgid "DeleteText"
+msgstr "&#x5220;&#x9664;"
+
+msgid "DeleteUserInfoText"
+msgstr "&#x8FD9;&#x5C06;&#x5220;&#x9664;&#x60A8;&#x5728;&#x4E16;&#x754C;&#x4E2D;&#x7684;&#x6240;&#x6709;&#x4FE1;&#x606F;&#xFF0C;&#x5E76;&#x5220;&#x9664;&#x60A8;&#x5BF9;&#x6B64;&#x670D;&#x52A1;&#x7684;&#x8BBF;&#x95EE;&#x3002; &#x5982;&#x679C;&#x60A8;&#x60F3;&#x7EE7;&#x7EED;&#xFF0C;&#x8BF7;&#x8F93;&#x5165;&#x60A8;&#x7684;&#x59D3;&#x540D;&#x548C;&#x5BC6;&#x7801;&#xFF0C;&#x7136;&#x540E;&#x5355;&#x51FB;&#x5220;&#x9664;&#x3002;"
+
+msgid "DeleteUserText"
+msgstr "&#x5220;&#x9664;&#x6211;&#x7684;&#x5E10;&#x53F7;"
+
+msgid "DescriptionText"
+msgstr "&#x63CF;&#x8FF0;"
+
+msgid "DetailsText"
+msgstr "&#x63CF;&#x8FF0;"
+
+msgid "Disabled"
+msgstr "&#x7981;&#x6B62;"
+
+msgid "DisplayInMenu"
+msgstr "&#x5728;&#x83DC;&#x5355;&#x4E2D;&#x663E;&#x793A;"
+
+msgid "DurationText"
+msgstr "&#x6301;&#x7EED;&#x65F6;&#x95F4;"
+
+msgid "EditNewsItem"
+msgstr "&#x7F16;&#x8F91;&#x65B0;&#x95FB;"
+
+msgid "EditNewsText"
+msgstr "&#x7F16;&#x8F91;&#x65B0;&#x95FB;"
+
+msgid "EditText"
+msgstr "&#x7F16;&#x8F91;"
+
+msgid "EdittingText"
+msgstr "&#x7F16;&#x8F91;&#x4E2D;"
+
+msgid "EditUserAccountText"
+msgstr "&#x7F16;&#x8F91;&#x7528;&#x6237;&#x8D26;&#x6237;"
+
+msgid "en"
+msgstr "&#x82F1;&#x8BED;"
+
+msgid "Enabled"
+msgstr "&#x542F;&#x7528;"
+
+msgid "Error404InfoText"
+msgstr "404 &#x65E0;&#x6CD5;&#x627E;&#x5230;&#x9875;&#x9762;"
+
+msgid "Error404Text"
+msgstr "&#x9519;&#x8BEF;&#x4EE3;&#x7801;"
+
+msgid "Error505InfoText"
+msgstr "505 &#x5185;&#x90E8;&#x670D;&#x52A1;&#x5668;&#x9519;&#x8BEF;"
+
+msgid "Error505Text"
+msgstr "&#x9519;&#x8BEF;&#x4EE3;&#x7801;"
+
+msgid "es"
+msgstr "&#x897F;&#x73ED;&#x7259;&#x8BED;"
+
+msgid "Estate"
+msgstr "&#x9886;&#x571F;"
+
+msgid "EstatesText"
+msgstr "&#x9886;&#x571F;"
+
+msgid "EstateText"
+msgstr "&#x9886;&#x571F;"
+
+msgid "EventDateText"
+msgstr "&#x4EC0;&#x4E48;&#x65F6;&#x5019;"
+
+msgid "EventLocationText"
+msgstr "&#x54EA;&#x91CC;"
+
+msgid "EventNameText"
+msgstr "&#x4E8B;&#x4EF6;"
+
+msgid "EventsText"
+msgstr "&#x4E8B;&#x4EF6;"
+
+msgid "EventTimeInfoText"
+msgstr "&#x4E8B;&#x4EF6;&#x65F6;&#x95F4;&#x5E94;&#x8BE5;&#x662F;&#x672C;&#x5730;&#x65F6;&#x95F4;"
+
+msgid "ExpirationDateText"
+msgstr "&#x5230;&#x671F;"
+
+msgid "FactoryReset"
+msgstr "&#x7CFB;&#x7EDF;&#x590D;&#x4F4D;"
+
+msgid "Feb_Short"
+msgstr "&#x4E8C;&#x6708;"
+
+msgid "February"
+msgstr "&#x4E8C;&#x6708;"
+
+msgid "FirstNameText"
+msgstr "&#x4F60;&#x7684;&#x540D;&#x5B57;"
+
+msgid "FirstText"
+msgstr "&#x9996;&#x5148;"
+
+msgid "Flatland"
+msgstr "&#x5E73;&#x539F;&#x5730;&#x5F62;&#x5C9B;&#x5C7F;"
+
+msgid "ForgotPassword"
+msgstr "&#x5FD8;&#x8BB0;&#x5BC6;&#x7801;&#xFF1F;"
+
+msgid "FPSText"
+msgstr "&#x5E27;/&#x79D2;"
+
+msgid "fr"
+msgstr "&#x6CD5;&#x8BED;"
+
+msgid "Fri"
+msgstr "&#x5468;&#x4E94;"
+
+msgid "Friday"
+msgstr "&#x661F;&#x671F;&#x4E94;"
+
+msgid "Friends"
+msgstr "&#x597D;&#x53CB;"
+
+msgid "FullRegion"
+msgstr "&#x5168;&#x5C9B;&#x5C7F;"
+
+msgid "GeneralText"
+msgstr "&#x5E38;&#x89C4;"
+
+msgid "GovernorNameText"
+msgstr "&#x7CFB;&#x7EDF;&#x7BA1;&#x7406;&#x5458;"
+
+msgid "GPUText"
+msgstr "&#x663E;&#x5361;"
+
+msgid "Grassland"
+msgstr "&#x8349;&#x5730;&#x5730;&#x578B;&#x5C9B;&#x5C7F;"
+
+msgid "GridCenterXText"
+msgstr "&#x4E16;&#x754C;&#x4E2D;&#x5FC3;X&#x5750;&#x6807;"
+
+msgid "GridCenterYText"
+msgstr "&#x4E16;&#x754C;&#x4E2D;&#x5FC3;Y&#x5750;&#x6807;"
+
+msgid "GridnameText"
+msgstr "&#x4E16;&#x754C;&#x540D;"
+
+msgid "GridnickText"
+msgstr "&#x4E16;&#x754C;&#x7B80;&#x79F0;"
+
+msgid "GridSettingsManager"
+msgstr "&#x4E16;&#x754C;&#x8BBE;&#x7F6E;&#x7BA1;&#x7406;&#x5458;"
+
+msgid "GridStatus"
+msgstr "&#x4E16;&#x754C;&#x72B6;&#x6001;"
+
+msgid "GroupNameText"
+msgstr "&#x7EC4;"
+
+msgid "Guest"
+msgstr "&#x6E38;&#x5BA2;"
+
+msgid "HelpText"
+msgstr "&#x5E2E;&#x52A9;"
+
+msgid "HelpViewersConfigText"
+msgstr "&#x5BA2;&#x6237;&#x7AEF;&#x914D;&#x7F6E;"
+
+msgid "HideLanguageBarText"
+msgstr "&#x9690;&#x85CF;&#x8BED;&#x8A00;&#x9009;&#x62E9;&#x6761;"
+
+msgid "HideSlideshowBarText"
+msgstr "&#x9690;&#x85CF;&#x5E7B;&#x706F;&#x7247;&#x663E;&#x793A;&#x6761;"
+
+msgid "HideStyleBarText"
+msgstr "&#x9690;&#x85CF;&#x6837;&#x5F0F;&#x9009;&#x62E9;&#x6761;"
+
+msgid "HomePage404Text"
+msgstr "&#x9996;&#x9875;"
+
+msgid "HomePage505Text"
+msgstr "&#x9996;&#x9875;"
+
+msgid "Homestead"
+msgstr "&#x5BB6;&#x56ED;"
+
+msgid "HomeText"
+msgstr "&#x9996;&#x9875;"
+
+msgid "HomeTextTips"
+msgstr "&#x65B0;&#x5916;&#x8868;"
+
+msgid "HomeTextWelcome"
+msgstr "&#x8FD9;&#x662F;&#x6211;&#x4EEC;&#x7684;&#x65B0;&#x865A;&#x62DF;&#x4E16;&#x754C;&#xFF01; &#x52A0;&#x5165;&#x6211;&#x4EEC;&#xFF0C;&#x5E76;&#x4E14;&#x6709;&#x6240;&#x4F5C;&#x4E3A;&#xFF01;"
+
+msgid "HostedByText"
+msgstr "&#x6258;&#x7BA1;&#x65B9;"
+
+msgid "HoursText"
+msgstr "&#x5C0F;&#x65F6;"
+
+msgid "HourText"
+msgstr "&#x5C0F;&#x65F6;"
+
+msgid "HyperGrid"
+msgstr "&#x8D85;&#x7F51;&#x683C; (HG)"
+
+msgid "IgnorePagesUpdatesText"
+msgstr "&#x5FFD;&#x7565;&#x9875;&#x9762;&#x66F4;&#x65B0;&#x8B66;&#x544A;&#xFF0C;&#x76F4;&#x5230;&#x4E0B;&#x4E00;&#x6B21;&#x66F4;&#x65B0;"
+
+msgid "IgnoreSettingsUpdatesText"
+msgstr "&#x5FFD;&#x7565;&#x8BBE;&#x7F6E;&#x66F4;&#x65B0;&#x8B66;&#x544A;&#xFF0C;&#x76F4;&#x5230;&#x4E0B;&#x4E00;&#x6B21;&#x66F4;&#x65B0;"
+
+msgid "InterWorld"
+msgstr "&#x4E16;&#x754C;&#x5185;&#x90E8; (IWC)"
+
+msgid "Island"
+msgstr "&#x5C9B;&#x5C7F;"
+
+msgid "IsOnlineText"
+msgstr "&#x7528;&#x6237;&#x72B6;&#x6001;"
+
+msgid "it"
+msgstr "&#x610F;&#x5927;&#x5229;&#x8BED;"
+
+msgid "Jan_Short"
+msgstr "&#x4E00;&#x6708;"
+
+msgid "January"
+msgstr "&#x4E00;&#x6708;"
+
+msgid "Jul_Short"
+msgstr "&#x4E03;&#x6708;"
+
+msgid "July"
+msgstr "&#x4E03;&#x6708;"
+
+msgid "Jun_Short"
+msgstr "&#x516D;&#x6708;"
+
+msgid "June"
+msgstr "&#x516D;&#x6708;"
+
+msgid "KickAUserInfoText"
+msgstr "&#x4ECE;&#x4E16;&#x754C;&#x4E2D;&#x8E22;&#x51FA;&#x7528;&#x6237;&#xFF08;30&#x79D2;&#x5185;&#x8BA9;&#x7528;&#x6237;&#x9000;&#x51FA;&#xFF09;"
+
+msgid "KickAUserText"
+msgstr "&#x8E22;&#x7528;&#x6237;"
+
+msgid "KickMessageText"
+msgstr "&#x7528;&#x6237;&#x6D88;&#x606F;"
+
+msgid "KickUserText"
+msgstr "&#x8E22;&#x7528;&#x6237;"
+
+msgid "LastNameText"
+msgstr "&#x4F60;&#x7684;&#x59D3;&#x6C0F;"
+
+msgid "LastText"
+msgstr "&#x6700;&#x540E;"
+
+msgid "ListedByText"
+msgstr " &#x5217;&#x8868;&#x65B9;&#x5F0F;"
+
+msgid "LocalCSSText"
+msgstr "&#x672C;&#x5730;CSS&#x6837;&#x5F0F;&#x8868;"
+
+msgid "LocalFrontPageText"
+msgstr "&#x672C;&#x5730;&#x9996;&#x9875;"
+
+msgid "LocationText"
+msgstr "&#x4F4D;&#x7F6E;"
+
+msgid "LoggedIPText"
+msgstr "&#x767B;&#x5F55;IP&#x5730;&#x5740;"
+
+msgid "LoggedOutSuccessfullyText"
+msgstr "&#x5DF2;&#x7ECF;&#x6210;&#x529F;&#x6CE8;&#x9500;&#x3002;"
+
+msgid "Login"
+msgstr "&#x767B;&#x5F55;"
+
+msgid "Logout"
+msgstr "&#x6CE8;&#x9500;"
+
+msgid "Mainland"
+msgstr "&#x5927;&#x9646;"
+
+msgid "MainlandEstateNameText"
+msgstr "&#x5927;&#x9646;&#x9886;&#x571F;"
+
+msgid "Mar_Short"
+msgstr "&#x4E09;&#x6708;"
+
+msgid "March"
+msgstr "&#x4E09;&#x6708;"
+
+msgid "MarketPlaceOwnerNameText"
+msgstr "&#x7CFB;&#x7EDF;&#x5E02;&#x573A;&#x62E5;&#x6709;&#x8005;"
+
+msgid "MatureText"
+msgstr "&#x5230;&#x671F;"
+
+msgid "MaturityText"
+msgstr "&#x5230;&#x671F;"
+
+msgid "May"
+msgstr "&#x4E94;&#x6708;"
+
+msgid "May_Short"
+msgstr "&#x4E94;&#x6708;"
+
+msgid "Member"
+msgstr "&#x6210;&#x5458;"
+
+msgid "MemoryUseageText"
+msgstr "&#x5185;&#x5B58;&#x4F7F;&#x7528;"
+
+msgid "MenuAbuse"
+msgstr "&#x6EE5;&#x7528;&#x62A5;&#x544A;"
+
+msgid "MenuChangeUserInformation"
+msgstr "&#x4FEE;&#x6539;&#x7528;&#x6237;&#x4FE1;&#x606F;"
+
+msgid "MenuChat"
+msgstr "&#x804A;&#x5929;"
+
+msgid "MenuClassifieds"
+msgstr "&#x516C;&#x544A;"
+
+msgid "MenuEstateManager"
+msgstr "&#x9886;&#x571F;&#x7BA1;&#x7406;"
+
+msgid "MenuEvents"
+msgstr "&#x4E8B;&#x4EF6;"
+
+msgid "MenuFactoryReset"
+msgstr "&#x7CFB;&#x7EDF;&#x590D;&#x4F4D;"
+
+msgid "MenuForgotPass"
+msgstr "&#x5FD8;&#x8BB0;&#x5BC6;&#x7801;"
+
+msgid "MenuGridSettings"
+msgstr "&#x4E16;&#x754C;&#x8BBE;&#x7F6E;"
+
+msgid "MenuGroupTitle"
+msgstr "&#x7EC4;"
+
+msgid "MenuHelp"
+msgstr "&#x5E2E;&#x52A9;"
+
+msgid "MenuHome"
+msgstr "&#x9996;&#x9875;"
+
+msgid "MenuLogin"
+msgstr "&#x767B;&#x5F55;"
+
+msgid "MenuLogout"
+msgstr "&#x6CE8;&#x9500;"
+
+msgid "MenuManager"
+msgstr "&#x7BA1;&#x7406;"
+
+msgid "MenuManagerSimConsole"
+msgstr "&#x4EFF;&#x771F;&#x5668;&#x63A7;&#x5236;&#x53F0;"
+
+msgid "MenuMyClassifieds"
+msgstr "&#x6211;&#x7684;&#x516C;&#x544A;"
+
+msgid "MenuMyEvents"
+msgstr "&#x6211;&#x7684;&#x4E8B;&#x4EF6;"
+
+msgid "MenuMyPurchases"
+msgstr "&#x6211;&#x7684;&#x8D2D;&#x4E70;"
+
+msgid "MenuMyTransactions"
+msgstr "&#x6211;&#x7684;&#x4EA4;&#x6613;"
+
+msgid "MenuNews"
+msgstr "&#x65B0;&#x95FB;"
+
+msgid "MenuNewsManager"
+msgstr "&#x65B0;&#x95FB;&#x7BA1;&#x7406;"
+
+msgid "MenuOnlineUsers"
+msgstr "&#x5728;&#x7EBF;&#x7528;&#x6237;"
+
+msgid "MenuOwnerTitle"
+msgstr "&#x62E5;&#x6709;&#x8005;"
+
+msgid "MenuPageManager"
+msgstr "&#x9875;&#x9762;&#x7BA1;&#x7406;"
+
+msgid "MenuParcelTitle"
+msgstr "&#x5730;&#x5757;"
+
+msgid "MenuPicksTitle"
+msgstr "&#x7CBE;&#x9009;"
+
+msgid "MenuProfileTitle"
+msgstr "&#x4E2A;&#x4EBA;&#x8D44;&#x6599;"
+
+msgid "MenuPurchases"
+msgstr "&#x7528;&#x6237;&#x8D2D;&#x4E70;"
+
+msgid "MenuRegion"
+msgstr "&#x5C9B;&#x5C7F;&#x5217;&#x8868;"
+
+msgid "MenuRegionManager"
+msgstr "&#x5C9B;&#x5C7F;&#x7BA1;&#x7406;"
+
+msgid "MenuRegionSearch"
+msgstr "&#x5C9B;&#x5C7F;&#x641C;&#x7D22;"
+
+msgid "MenuRegionsTitle"
+msgstr "&#x5C9B;&#x5C7F;"
+
+msgid "MenuRegionTitle"
+msgstr "&#x5C9B;&#x5C7F;"
+
+msgid "MenuRegister"
+msgstr "&#x6CE8;&#x518C;"
+
+msgid "MenuSettings"
+msgstr "&#x8BBE;&#x7F6E;"
+
+msgid "MenuSettingsManager"
+msgstr "Web&#x754C;&#x9762;&#x8BBE;&#x7F6E;"
+
+msgid "MenuStatistics"
+msgstr "&#x5BA2;&#x6237;&#x7AEF;&#x7EDF;&#x8BA1;"
+
+msgid "MenuTransactions"
+msgstr "&#x7528;&#x6237;&#x4EA4;&#x6613;"
+
+msgid "MenuUser"
+msgstr "&#x7528;&#x6237;"
+
+msgid "MenuUserManager"
+msgstr "&#x7528;&#x6237;&#x7BA1;&#x7406;"
+
+msgid "MenuUserSearch"
+msgstr "&#x7528;&#x6237;&#x641C;&#x7D22;"
+
+msgid "MenuViewerHelp"
+msgstr "&#x5BA2;&#x6237;&#x7AEF;&#x5E2E;&#x52A9;"
+
+msgid "MenuWelcomeScreenManager"
+msgstr "&#x6B22;&#x8FCE;&#x754C;&#x9762;&#x7BA1;&#x7406;"
+
+msgid "MenuWorld"
+msgstr "&#x4E16;&#x754C;"
+
+msgid "MenuWorldMap"
+msgstr "&#x4E16;&#x754C;&#x5730;&#x56FE;"
+
+msgid "MessageAUserInfoText"
+msgstr "&#x7ED9;&#x7528;&#x6237;&#x53D1;&#x9001;&#x4E00;&#x6761;&#x84DD;&#x8272;&#x76D2;&#x5B50;&#x6D88;&#x606F;&#xFF08;30&#x79D2;&#x5185;&#x5230;&#x8FBE;&#xFF09;"
+
+msgid "MessageAUserText"
+msgstr "&#x5411;&#x7528;&#x6237;&#x53D1;&#x9001;&#x6D88;&#x606F;"
+
+msgid "MessageUserText"
+msgstr "&#x7559;&#x8A00;&#x7528;&#x6237;"
+
+msgid "MinutesText"
+msgstr "&#x5206;"
+
+msgid "MinuteText"
+msgstr "&#x5206;"
+
+msgid "Mon"
+msgstr "&#x5468;&#x4E00;"
+
+msgid "Monday"
+msgstr "&#x661F;&#x671F;&#x4E00;"
+
+msgid "MoreInfo"
+msgstr "&#x66F4;&#x591A;&#x4FE1;&#x606F;"
+
+msgid "MoreInfoText"
+msgstr "&#x66F4;&#x591A;"
+
+msgid "Name"
+msgstr "&#x540D;&#x5B57;"
+
+msgid "NewEmailText"
+msgstr "&#x65B0;&#x90AE;&#x7BB1;&#x5730;&#x5740;"
+
+msgid "NewPasswordConfirmationText"
+msgstr "&#x786E;&#x8BA4;&#x65B0;&#x5BC6;&#x7801;"
+
+msgid "NewPasswordText"
+msgstr "&#x65B0;&#x5BC6;&#x7801;"
+
+msgid "News"
+msgstr "&#x65B0;&#x95FB;"
+
+msgid "NewsDateText"
+msgstr "&#x65B0;&#x95FB;&#x65E5;&#x671F;"
+
+msgid "NewsItemText"
+msgstr "&#x65B0;&#x95FB;&#x5185;&#x5BB9;"
+
+msgid "NewsItemTitle"
+msgstr "&#x65B0;&#x95FB;&#x6807;&#x9898;"
+
+msgid "NewsManager"
+msgstr "&#x65B0;&#x95FB;&#x7BA1;&#x7406;&#x5458;"
+
+msgid "NewsTitleText"
+msgstr "&#x65B0;&#x95FB;&#x6807;&#x9898;"
+
+msgid "Next10Hours"
+msgstr "&#x4E0B;10&#x5C0F;&#x65F6;"
+
+msgid "Next24Hours"
+msgstr "&#x4E0B;24&#x5C0F;&#x65F6;"
+
+msgid "Next2Hours"
+msgstr "&#x4E0B;2&#x5C0F;&#x65F6;"
+
+msgid "Next4Hours"
+msgstr "&#x4E0B;4&#x5C0F;&#x65F6;"
+
+msgid "NextText"
+msgstr "&#x4E0B;&#x4E00;&#x6B65;"
+
+msgid "nl"
+msgstr "&#x8377;&#x5170;"
+
+msgid "No"
+msgstr "&#x5426;"
+
+msgid "NoAccountFound"
+msgstr "&#x672A;&#x53D1;&#x73B0;&#x5E10;&#x53F7;"
+
+msgid "NoChangePass"
+msgstr "&#x65E0;&#x6CD5;&#x4FEE;&#x6539;&#x5BC6;&#x7801;&#xFF0C;&#x8BF7;&#x7A0D;&#x540E;&#x518D;&#x8BD5;&#x3002;"
+
+msgid "NoDetailsText"
+msgstr "&#x672A;&#x627E;&#x5230;&#x7EC6;&#x8282;&#x4FE1;&#x606F;..."
+
+msgid "NoPurchasesText"
+msgstr "&#x672A;&#x627E;&#x5230;&#x8D2D;&#x4E70;&#x8BB0;&#x5F55;..."
+
+msgid "NormalText"
+msgstr "&#x6B63;&#x5E38;"
+
+msgid "NotesText"
+msgstr "&#x7B14;&#x8BB0;"
+
+msgid "Nothing"
+msgstr "&#x65E0;"
+
+msgid "NoTransactionsText"
+msgstr "&#x672A;&#x627E;&#x5230;&#x4EA4;&#x6613;&#x8BB0;&#x5F55;..."
+
+msgid "Nov_Short"
+msgstr "&#x5341;&#x4E00;&#x6708;"
+
+msgid "November"
+msgstr "&#x5341;&#x4E00;&#x6708;"
+
+msgid "NumberOfUsersInRegionText"
+msgstr "&#x5C9B;&#x5C7F;&#x4E2D;&#x7528;&#x6237;&#x6570;&#x91CF;"
+
+msgid "ObjectNameText"
+msgstr "&#x7269;&#x4F53;"
+
+msgid "Oct_Short"
+msgstr "&#x5341;&#x6708;"
+
+msgid "October"
+msgstr "&#x5341;&#x6708;"
+
+msgid "Offline"
+msgstr "&#x79BB;&#x7EBF;"
+
+msgid "Online"
+msgstr "&#x5728;&#x7EBF;"
+
+msgid "OnlineFriendsText"
+msgstr "&#x5728;&#x7EBF;&#x597D;&#x53CB;"
+
+msgid "OnlineLocationText"
+msgstr "&#x7528;&#x6237;&#x4F4D;&#x7F6E;"
+
+msgid "OnlineNow"
+msgstr "&#x5F53;&#x524D;&#x5728;&#x7EBF;"
+
+msgid "OnlineUsersText"
+msgstr "&#x5728;&#x7EBF;&#x7528;&#x6237;"
+
+msgid "OpenNewsManager"
+msgstr "&#x6253;&#x5F00;&#x65B0;&#x95FB;&#x7BA1;&#x7406;&#x5668;"
+
+msgid "Openspace"
+msgstr "&#x5F00;&#x653E;&#x7A7A;&#x95F4;"
+
+msgid "OwnerNameText"
+msgstr "&#x62E5;&#x6709;&#x8005;&#x540D;&#x5B57;
+
+msgid "PageIDText"
+msgstr "&#x9875;&#x9762;ID"
+
+msgid "PageLocationText"
+msgstr "&#x9875;&#x9762;&#x4F4D;&#x7F6E;"
+
+msgid "PageManager"
+msgstr "&#x9875;&#x9762;&#x7BA1;&#x7406;"
+
+msgid "PagePositionText"
+msgstr "&#x9875;&#x9762;&#x4F4D;&#x7F6E;"
+
+msgid "Pages"
+msgstr "&#x9875;&#x9762;"
+
+msgid "PageTitleText"
+msgstr "&#x9875;&#x9762;&#x6807;&#x9898;"
+
+msgid "PageTooltipText"
+msgstr "&#x9875;&#x9762;&#x63D0;&#x793A;"
+
+msgid "ParcelNameText"
+msgstr "&#x5730;&#x5757;&#x540D;&#x5B57;"
+
+msgid "ParcelOwnerText"
+msgstr "&#x5730;&#x5757;&#x62E5;&#x6709;&#x8005;&#x59D3;&#x540D;"
+
+msgid "ParcelsInRegionText"
+msgstr "&#x5C9B;&#x5C7F;&#x4E2D;&#x7684;&#x5730;&#x5757;"
+
+msgid "ParentText"
+msgstr "&#x7236;&#x83DC;&#x5355;"
+
+msgid "Partner"
+msgstr "&#x4F19;&#x4F34;"
+
+msgid "PartnersName"
+msgstr "&#x4F19;&#x4F34;&#x59D3;&#x540D;"
+
+msgid "Password"
+msgstr "&#x5BC6;&#x7801;"
+
+msgid "PasswordConfirmation"
+msgstr "&#x786E;&#x8BA4;&#x5BC6;&#x7801;"
+
+msgid "PasswordText"
+msgstr "&#x5BC6;&#x7801;"
+
+msgid "PerformanceText"
+msgstr "&#x6027;&#x80FD;&#x5E73;&#x5747;&#x503C;"
+
+msgid "PickNameText"
+msgstr "&#x9009;&#x62E9;&#x540D;&#x79F0;"
+
+msgid "PickRegionText"
+msgstr "&#x4F4D;&#x7F6E;"
+
+msgid "PingTimeText"
+msgstr "&#x5E73;&#x65F6;"
+
+msgid "PriceOfListingText"
+msgstr "&#x4EF7;&#x683C;"
+
+msgid "PricePerMeterText"
+msgstr "&#x6BCF;&#x5E73;&#x7C73;&#x4EF7;&#x683C;"
+
+msgid "PublicAccessText"
+msgstr "&#x516C;&#x5171;&#x8BBF;&#x95EE;"
+
+msgid "PurchaseCostText"
+msgstr "&#x82B1;&#x9500;"
+
+msgid "PurchasesText"
+msgstr "&#x8D2D;&#x4E70;"
+
+msgid "RealEstateOwnerNameText"
+msgstr "&#x7CFB;&#x7EDF;&#x5730;&#x4EA7;&#x62E5;&#x6709;&#x8005;"
+
+msgid "Region"
+msgstr "&#x5C9B;&#x5C7F;"
+
+msgid "RegionCapacityText"
+msgstr "&#x5C9B;&#x5C7F;&#x5143;&#x4EF6;&#x5BB9;&#x91CF;"
+
+msgid "RegionDelayStartupText"
+msgstr "&#x5EF6;&#x8FDF;&#x542F;&#x52A8;&#x811A;&#x672C;"
+
+msgid "RegionInfiniteText"
+msgstr "&#x65E0;&#x8FB9;&#x9645;&#x5C9B;&#x5C7F;"
+
+msgid "RegionInformationText"
+msgstr "&#x5C9B;&#x5C7F;&#x4FE1;&#x606F;"
+
+msgid "RegionInfoText"
+msgstr "&#x5C9B;&#x5C7F;&#x4FE1;&#x606F;"
+
+msgid "RegionListText"
+msgstr "&#x5C9B;&#x5C7F;&#x5217;&#x8868;"
+
+msgid "RegionLocationText"
+msgstr "&#x5C9B;&#x5C7F;&#x4F4D;&#x7F6E;"
+
+msgid "RegionLocXText"
+msgstr "&#x5C9B;&#x5C7F;X&#x5750;&#x6807;"
+
+msgid "RegionLocYText"
+msgstr "&#x5C9B;&#x5C7F;Y&#x5750;&#x6807;"
+
+msgid "RegionMaturityText"
+msgstr "&#x8BBF;&#x95EE;&#x7EA7;&#x522B;"
+
+msgid "RegionMoreInfo"
+msgstr "&#x66F4;&#x591A;&#x4FE1;&#x606F;"
+
+msgid "RegionMoreInfoTooltips"
+msgstr "&#x66F4;&#x591A;&#x76F8;&#x5173;&#x4FE1;&#x606F;"
+
+msgid "RegionNameText"
+msgstr "&#x5C9B;&#x5C7F;&#x540D;&#x5B57;"
+
+msgid "RegionOnlineText"
+msgstr "&#x5C9B;&#x5C7F;&#x72B6;&#x6001;"
+
+msgid "RegionPortText"
+msgstr "&#x5C9B;&#x5C7F;&#x7AEF;&#x53E3;"
+
+msgid "RegionPresetText"
+msgstr "&#x5C9B;&#x5C7F;&#x9884;&#x8BBE;"
+
+msgid "RegionPresetTypeText"
+msgstr "&#x5C9B;&#x5C7F;&#x9884;&#x8BBE;&#x7C7B;&#x578B;"
+
+msgid "RegionSearchText"
+msgstr "&#x5C9B;&#x5C7F;&#x641C;&#x7D22;"
+
+msgid "RegionSizeText"
+msgstr "&#x5C9B;&#x5C7F;&#x5927;&#x5C0F;"
+
+msgid "RegionsVisitedText"
+msgstr "&#x5DF2;&#x8BBF;&#x95EE;&#x5C9B;&#x5C7F;"
+
+msgid "RegionTerrainText"
+msgstr "&#x5C9B;&#x5C7F;&#x5730;&#x5F62;"
+
+msgid "RegionTypeText"
+msgstr "&#x5C9B;&#x5C7F;&#x7C7B;&#x578B;"
+
+msgid "RegionVisibilityText"
+msgstr "&#x90BB;&#x5C9B;&#x53EF;&#x89C1;"
+
+msgid "RegistrationsDisabled"
+msgstr "&#x5F53;&#x524D;&#x6CE8;&#x518C;&#x88AB;&#x7981;&#x6B62;&#xFF0C;&#x8BF7;&#x7A0D;&#x540E;&#x5C1D;&#x8BD5;&#x3002;"
+
+msgid "RegistrationText"
+msgstr &#x5316;&#x8EAB;&#x6CE8;&#x518C;"
+
+msgid "RequiresAdminLevelText"
+msgstr "&#x9700;&#x8981;&#x7BA1;&#x7406;&#x6743;&#x9650;&#x624D;&#x80FD;&#x67E5;&#x770B;"
+
+msgid "RequiresAdminText"
+msgstr "&#x9700;&#x8981;&#x7BA1;&#x7406;&#x5458;&#x624D;&#x80FD;&#x67E5;&#x770B;"
+
+msgid "RequiresLoginText"
+msgstr "&#x9700;&#x8981;&#x767B;&#x5F55;&#x624D;&#x80FD;&#x67E5;&#x770B;"
+
+msgid "RequiresLogoutText"
+msgstr "&#x9700;&#x8981;&#x6CE8;&#x9500;&#x624D;&#x80FD;&#x67E5;&#x770B;"
+
+msgid "Reset"
+msgstr "&#x91CD;&#x7F6E;"
+
+msgid "ResetMenuInfoText"
+msgstr "&#x91CD;&#x7F6E;&#x83DC;&#x5355;&#x9879;&#x4E3A;&#x66F4;&#x65B0;&#x6700;&#x9891;&#x7E41;&#x7684;&#x9ED8;&#x8BA4;&#x503C;"
+
+msgid "ResetMenuText"
+msgstr "&#x91CD;&#x7F6E;&#x83DC;&#x5355;&#x4E3A;&#x7CFB;&#x7EDF;&#x9ED8;&#x8BA4;&#x503C;"
+
+msgid "ResetSettingsInfoText"
+msgstr "&#x91CD;&#x7F6E;Web&#x754C;&#x9762;&#x4E3A;&#x66F4;&#x65B0;&#x6700;&#x9891;&#x7E41;&#x7684;&#x9ED8;&#x8BA4;&#x503C;"
+
+msgid "ResetSettingsText"
+msgstr "&#x91CD;&#x7F6E;&#x7F51;&#x9875;&#x8BBE;&#x7F6E;&#x4E3A;&#x7CFB;&#x7EDF;&#x9ED8;&#x8BA4;&#x503C;"
+
+msgid "Resident"
+msgstr "&#x5C45;&#x6C11;"
+
+msgid "ResidentSince"
+msgstr "&#x5C45;&#x6C11;&#x81EA;"
+
+msgid "ru"
+msgstr "&#x4FC4;&#x56FD;"
+
+msgid "RunTimeText"
+msgstr "&#x8FD0;&#x884C;&#x65F6;&#x95F4;"
+
+msgid "Sat"
+msgstr "&#x5468;&#x516D;"
+
+msgid "Saturday"
+msgstr "&#x661F;&#x671F;&#x516D;"
+
+msgid "Save"
+msgstr "&#x4FDD;&#x5B58;"
+
+msgid "SaveMenuItemChanges"
+msgstr "&#x4FDD;&#x5B58;&#x83DC;&#x5355;&#x9879;"
+
+msgid "SaveUpdates"
+msgstr "&#x4FDD;&#x5B58;&#x66F4;&#x65B0;"
+
+msgid "Search"
+msgstr "&#x641C;&#x7D22;"
+
+msgid "SearchForRegionText"
+msgstr "&#x641C;&#x7D22;&#x5C9B;&#x5C7F;"
+
+msgid "SearchForUserText"
+msgstr "&#x641C;&#x7D22;&#x7528;&#x6237;"
+
+msgid "SearchResultForRegionText"
+msgstr "&#x5C9B;&#x5C7F;&#x641C;&#x7D22;&#x7ED3;&#x679C;"
+
+msgid "SearchResultForUserText"
+msgstr "&#x7528;&#x6237;&#x641C;&#x7D22;&#x7ED3;&#x679C;"
+
+msgid "SearchText"
+msgstr "&#x641C;&#x7D22;"
+
+msgid "SelectItem"
+msgstr "&#x9009;&#x62E9;&#x9879;"
+
+msgid "Sep_Short"
+msgstr "&#x4E5D;&#x6708;"
+
+msgid "September"
+msgstr "&#x4E5D;&#x6708;"
+
+msgid "Settings"
+msgstr "&#x8BBE;&#x7F6E;"
+
+msgid "SettingsManager"
+msgstr "&#x8BBE;&#x7F6E;&#x7BA1;&#x7406;"
+
+msgid "SimCommandText"
+msgstr "&#x547D;&#x4EE4;"
+
+msgid "SimConsoleText"
+msgstr "&#x4EFF;&#x771F;&#x5668;&#x547D;&#x4EE4;&#x63A7;&#x5236;&#x53F0;"
+
+msgid "SortByLocX"
+msgstr "&#x901A;&#x8FC7;&#x5C9B;&#x5C7F;X&#x5750;&#x6807;&#x7B5B;&#x9009;"
+
+msgid "SortByLocY"
+msgstr "&#x901A;&#x8FC7;&#x5C9B;&#x5C7F;Y&#x5750;&#x6807;&#x7B5B;&#x9009;"
+
+msgid "SortByName"
+msgstr "&#x901A;&#x8FC7;&#x5C9B;&#x5C7F;&#x540D;&#x79F0;&#x7B5B;&#x9009;"
+
+msgid "SpecialWindowColorText"
+msgstr "&#x7279;&#x6B8A;&#x4FE1;&#x606F;&#x7A97;&#x53E3;&#x989C;&#x8272;"
+
+msgid "SpecialWindowStatusText"
+msgstr "&#x7279;&#x6B8A;&#x4FE1;&#x606F;&#x7A97;&#x53E3;&#x72B6;&#x6001;"
+
+msgid "SpecialWindowTextText"
+msgstr "&#x7279;&#x8272;&#x4FE1;&#x606F;&#x7A97;&#x53E3;&#x6587;&#x672C;"
+
+msgid "SpecialWindowTitleText"
+msgstr "&#x7279;&#x6B8A;&#x4FE1;&#x606F;&#x7A97;&#x53E3;&#x6807;&#x9898;"
+
+msgid "StatisticsText"
+msgstr "&#x5BA2;&#x6237;&#x7AEF;&#x7EDF;&#x8BA1;"
+
+msgid "styles1"
+msgstr "&#x9ED8;&#x8BA4;&#x6781;&#x7B80;"
+
+msgid "styles2"
+msgstr "&#x6D45;&#x7070;&#x8272;"
+
+msgid "styles3"
+msgstr "&#x84DD;&#x8272;&#x591C;&#x665A;"
+
+msgid "styles4"
+msgstr "&#x6DF1;&#x7070;&#x8272;"
+
+msgid "styles5"
+msgstr "&#x70AB;&#x5149;&#x6548;&#x679C;"
+
+msgid "StyleSwitcherChoiceText"
+msgstr "&#x9009;&#x62E9;"
+
+msgid "StyleSwitcherLanguagesText"
+msgstr "&#x8BED;&#x8A00;"
+
+msgid "StyleSwitcherStylesText"
+msgstr "&#x98CE;&#x683C;"
+
+msgid "Submit"
+msgstr "&#x63D0;&#x4EA4;"
+
+msgid "SummaryText"
+msgstr "&#x6982;&#x8981;"
+
+msgid "Sun"
+msgstr "&#x5468;&#x65E5;"
+
+msgid "Sunday"
+msgstr "&#x661F;&#x671F;&#x65E5;"
+
+msgid "SystemEstateNameText"
+msgstr "&#x7CFB;&#x7EDF;&#x5730;&#x4EA7;"
+
+msgid "TaxFreeText"
+msgstr "&#x514D;&#x7A0E;"
+
+msgid "TermsOfServiceAccept"
+msgstr "&#x4F60;&#x63A5;&#x53D7;&#x4E0A;&#x8FF0;&#x7684;&#x670D;&#x52A1;&#x6761;&#x6B3E;&#x5417;&#xFF1F;"
+
+msgid "TermsOfServiceText"
+msgstr "&#x670D;&#x52A1;&#x6761;&#x6B3E;"
+
+msgid "Thu"
+msgstr "&#x5468;&#x56DB;"
+
+msgid "Thursday"
+msgstr "&#x661F;&#x671F;&#x56DB;"
+
+msgid "TimeText"
+msgstr "&#x65F6;&#x95F4;"
+
+msgid "TimeUntilUnbannedText"
+msgstr "&#x7528;&#x6237;&#x89E3;&#x7981;&#x622A;&#x6B62;&#x65F6;&#x95F4;"
+
+msgid "TooltipsMenuAbuse"
+msgstr "&#x7528;&#x6237;&#x6EE5;&#x7528;&#x62A5;&#x544A;"
+
+msgid "TooltipsMenuChangeUserInformation"
+msgstr "&#x4FEE;&#x6539;&#x7528;&#x6237;&#x4FE1;&#x606F;"
+
+msgid "TooltipsMenuChat"
+msgstr "&#x804A;&#x5929;"
+
+msgid "TooltipsMenuClassifieds"
+msgstr "&#x516C;&#x544A;&#x4FE1;&#x606F;"
+
+msgid "TooltipsMenuEstateManager"
+msgstr "&#x9886;&#x571F;&#x7BA1;&#x7406;&#x5458;"
+
+msgid "TooltipsMenuEvents"
+msgstr "&#x4E8B;&#x4EF6;&#x4FE1;&#x606F;"
+
+msgid "TooltipsMenuFactoryReset"
+msgstr "&#x590D;&#x4F4D;&#x5230;&#x521D;&#x59CB;&#x8BBE;&#x7F6E;"
+
+msgid "TooltipsMenuForgotPass"
+msgstr "&#x5FD8;&#x8BB0;&#x5BC6;&#x7801;"
+
+msgid "TooltipsMenuGridSettings"
+msgstr "&#x4E16;&#x754C;&#x8BBE;&#x7F6E;"
+
+msgid "TooltipsMenuGroups"
+msgstr "&#x7528;&#x6237;&#x7EC4;"
+
+msgid "TooltipsMenuHelp"
+msgstr "&#x5E2E;&#x52A9;"
+
+msgid "TooltipsMenuHome"
+msgstr "&#x9996;&#x9875;"
+
+msgid "TooltipsMenuLogin"
+msgstr "&#x767B;&#x5F55;"
+
+msgid "TooltipsMenuLogout"
+msgstr "&#x9000;&#x51FA;"
+
+msgid "TooltipsMenuManager"
+msgstr "&#x7BA1;&#x7406;&#x5458;&#x7BA1;&#x7406;"
+
+msgid "TooltipsMenuManagerSimConsole"
+msgstr "&#x5728;&#x7EBF;&#x4EFF;&#x771F;&#x5668;&#x7EC8;&#x7AEF;"
+
+msgid "TooltipsMenuNews"
+msgstr "&#x65B0;&#x95FB;"
+
+msgid "TooltipsMenuNewsManager"
+msgstr "&#x65B0;&#x95FB;&#x7BA1;&#x7406;&#x5458;"
+
+msgid "TooltipsMenuOnlineUsers"
+msgstr "&#x5728;&#x7EBF;&#x7528;&#x6237;"
+
+msgid "TooltipsMenuOwner"
+msgstr "&#x9886;&#x571F;&#x62E5;&#x6709;&#x8005;"
+
+msgid "TooltipsMenuPageManager"
+msgstr "&#x9875;&#x9762;&#x7BA1;&#x7406;&#x5458;"
+
+msgid "TooltipsMenuParcel"
+msgstr "&#x5C9B;&#x5C7F;&#x5730;&#x5757;"
+
+msgid "TooltipsMenuPicks"
+msgstr "&#x7528;&#x6237;&#x9009;&#x62E9;"
+
+msgid "TooltipsMenuProfile"
+msgstr "&#x7528;&#x6237;&#x8D44;&#x6599;"
+
+msgid "TooltipsMenuPurchases"
+msgstr "&#x8D2D;&#x4E70;&#x4FE1;&#x606F;"
+
+msgid "TooltipsMenuRegion"
+msgstr "&#x5C9B;&#x5C7F;&#x8BE6;&#x60C5;"
+
+msgid "TooltipsMenuRegionManager"
+msgstr "&#x5C9B;&#x5C7F;&#x521B;&#x5EFA;/&#x7F16;&#x8F91;"
+
+msgid "TooltipsMenuRegions"
+msgstr "&#x7528;&#x6237;&#x5C9B;&#x5C7F;"
+
+msgid "TooltipsMenuRegionSearch"
+msgstr "&#x5C9B;&#x5C7F;&#x641C;&#x7D22;"
+
+msgid "TooltipsMenuRegister"
+msgstr "&#x6CE8;&#x518C;"
+
+msgid "TooltipsMenuSettings"
+msgstr "Web&#x754C;&#x9762;&#x8BBE;&#x8BA1;"
+
+msgid "TooltipsMenuSettingsManager"
+msgstr "&#x8BBE;&#x7F6E;&#x7BA1;&#x7406;"
+
+msgid "TooltipsMenuStatistics"
+msgstr "&#x5BA2;&#x6237;&#x7AEF;&#x7EDF;&#x8BA1;"
+
+msgid "TooltipsMenuTransactions"
+msgstr "&#x4EA4;&#x6613;&#x4FE1;&#x606F;"
+
+msgid "TooltipsMenuUser"
+msgstr "&#x7528;&#x6237;"
+
+msgid "TooltipsMenuUserManager"
+msgstr "&#x7528;&#x6237;&#x7BA1;&#x7406;"
+
+msgid "TooltipsMenuUserSearch"
+msgstr "&#x7528;&#x6237;&#x641C;&#x7D22;"
+
+msgid "TooltipsMenuViewerHelp"
+msgstr "&#x5BA2;&#x6237;&#x7AEF;&#x5E2E;&#x52A9;"
+
+msgid "TooltipsMenuWelcomeScreenManager"
+msgstr "&#x6B22;&#x8FCE;&#x6765;&#x5230;&#x754C;&#x9762;&#x7BA1;&#x7406;"
+
+msgid "TooltipsMenuWorld"
+msgstr "&#x4E16;&#x754C;"
+
+msgid "TooltipsMenuWorldMap"
+msgstr "&#x4E16;&#x754C;&#x5730;&#x56FE;"
+
+msgid "TooltipsWelcomeScreen"
+msgstr "&#x6B22;&#x8FCE;&#x754C;&#x9762;"
+
+msgid "TooltipsWorldMap"
+msgstr "&#x4E16;&#x754C;&#x5730;&#x56FE;"
+
+msgid "TopLevel"
+msgstr "&#x9876;&#x5C42;"
+
+msgid "TotalRegionCount"
+msgstr "&#x5C9B;&#x5C7F;&#x603B;&#x6570;"
+
+msgid "TotalUserCount"
+msgstr "&#x603B;&#x7528;&#x6237;"
+
+msgid "TransactionAmountText"
+msgstr "&#x603B;&#x6570;"
+
+msgid "TransactionBalanceText"
+msgstr "&#x7ED3;&#x4F59;"
+
+msgid "TransactionDateText"
+msgstr "&#x65E5;&#x671F;"
+
+msgid "TransactionDetailText"
+msgstr "&#x63CF;&#x8FF0;"
+
+msgid "TransactionFromAgentText"
+msgstr "&#x6765;&#x81EA;&#x7528;&#x6237;"
+
+msgid "TransactionsText"
+msgstr "&#x4EA4;&#x6613;"
+
+msgid "TransactionToAgentText"
+msgstr "&#x7ED9;&#x7528;&#x6237;"
+
+msgid "Tue"
+msgstr "&#x5468;&#x4E8C;"
+
+msgid "Tuesday"
+msgstr "&#x661F;&#x671F;&#x4E8C;"
+
+msgid "TypeUserNameToConfirm"
+msgstr "&#x8BF7;&#x952E;&#x5165;&#x6B64;&#x5E10;&#x6237;&#x7684;&#x7528;&#x6237;&#x540D;&#xFF0C;&#x4EE5;&#x786E;&#x8BA4;&#x60A8;&#x8981;&#x5220;&#x9664;&#x6B64;&#x5E10;&#x6237;&#x3002;"
+
+msgid "UnbanText"
+msgstr "&#x89E3;&#x7981;"
+
+msgid "UniqueVisitors"
+msgstr "30&#x5929;&#x72EC;&#x7ACB;&#x8BBF;&#x5BA2;&#x91CF;"
+
+msgid "UpdateRequired"
+msgstr "&#x9700;&#x8981;&#x66F4;&#x65B0;"
+
+msgid "UserAddressText"
+msgstr "&#x90AE;&#x653F;&#x5730;&#x5740;"
+
+msgid "UserCityText"
+msgstr "&#x6240;&#x5728;&#x57CE;&#x5E02;"
+
+msgid "UserCountryText"
+msgstr "&#x56FD;&#x5BB6;"
+
+msgid "UserDOBText"
+msgstr "&#x751F;&#x65E5; (&#x6708; &#x65E5; &#x5E74;)"
+
+msgid "UserEmailText"
+msgstr "&#x90AE;&#x7BB1;"
+
+msgid "UserGroupNameText"
+msgstr "&#x7528;&#x6237;&#x7EC4;"
+
+msgid "UserHomeRegionText"
+msgstr "&#x5BB6;"
+
+msgid "UserName"
+msgstr "&#x7528;&#x6237;&#x540D;"
+
+msgid "UserNameText"
+msgstr "&#x7528;&#x6237;&#x540D;"
+
+msgid "UserProfileFor"
+msgstr "&#x7528;&#x6237;&#x4E2A;&#x4EBA;&#x8D44;&#x6599;"
+
+msgid "UserSearchText"
+msgstr "&#x7528;&#x6237;&#x641C;&#x7D22;"
+
+msgid "UsersGroupsText"
+msgstr "&#x5DF2;&#x52A0;&#x5165;&#x7EC4;"
+
+msgid "UsersPicksText"
+msgstr "&#x7CBE;&#x9009;"
+
+msgid "UserTypeText"
+msgstr "&#x7528;&#x6237;&#x7C7B;&#x578B;"
+
+msgid "UserZipText"
+msgstr "&#x4F60;&#x7684;&#x90AE;&#x653F;&#x7F16;&#x7801;"
+
+msgid "UUIDText"
+msgstr "UUID"
+
+msgid "ViewersText"
+msgstr "&#x5BA2;&#x6237;&#x7AEF;&#x4F7F;&#x7528;"
+
+msgid "Voice"
+msgstr "&#x58F0;&#x97F3;"
+
+msgid "WebRegistrationText"
+msgstr "&#x5141;&#x8BB8;&#x7F51;&#x9875;&#x6CE8;&#x518C;"
+
+msgid "WebsiteDownInfoText"
+msgstr "&#x5F53;&#x524D;&#x7AD9;&#x70B9;&#x5DF2;&#x7ECF;&#x505C;&#x6B62;&#x670D;&#x52A1;&#xFF0C;&#x8BF7;&#x7A0D;&#x540E;&#x5C1D;&#x8BD5;&#x3002;"
+
+msgid "WebsiteDownText"
+msgstr "&#x7AD9;&#x70B9;&#x79BB;&#x7EBF;&#x63D0;&#x793A;"
+
+msgid "Wed"
+msgstr "&#x5468;&#x4E09;"
+
+msgid "Wednesday"
+msgstr "&#x661F;&#x671F;&#x4E09;"
+
+msgid "WelcomeMessageText"
+msgstr "&#x767B;&#x5F55;&#x6B22;&#x8FCE;&#x6D88;&#x606F;"
+
+msgid "WelcomeScreen"
+msgstr "&#x6B22;&#x8FCE;&#x754C;&#x9762;"
+
+msgid "WelcomeScreenManagerFor"
+msgstr "&#x6B22;&#x8FCE;&#x6765;&#x5230;&#x754C;&#x9762;&#x7BA1;&#x7406;"
+
+msgid "WelcomeToText"
+msgstr "&#x6B22;&#x8FCE;&#x6765;&#x5230;"
+
+msgid "WorldMap"
+msgstr "&#x4E16;&#x754C;&#x5730;&#x56FE;"
+
+msgid "WorldMapText"
+msgstr "&#x5168;&#x5C4F;"
+
+msgid "Yes"
+msgstr "&#x662F;"
+
