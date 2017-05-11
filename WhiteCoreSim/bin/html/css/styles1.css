@@ -37,8 +37,9 @@ body {
 #lg5 {{DisplayLG5}color: #FF0000;}
 #lg6 {{DisplayLG6}color: #FF0000;}
 #lg7 {{DisplayLG7}color: #FF0000;}
+#lg8 {{DisplayLG8}color: #FF0000;}
 
-#st1, #st2, #st3, #st4, #st5, #lg1, #lg2, #lg3, #lg4, #lg5, #lg6, #lg7, a.styleswitch, a.languageswitch {
+#st1, #st2, #st3, #st4, #st5, #lg1, #lg2, #lg3, #lg4, #lg5, #lg6, #lg7, #lg8, a.styleswitch, a.languageswitch {
 	background: #6A94B4;
 	margin-right: 5px;
 	padding-left: 6px;

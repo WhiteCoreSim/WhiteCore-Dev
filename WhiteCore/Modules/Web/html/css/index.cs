@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 using System.Collections.Generic;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 
@@ -64,6 +63,7 @@ namespace WhiteCore.Modules.Web
             vars.Add ("DisplayLG5", "display: none;");
             vars.Add ("DisplayLG6", "display: none;");
             vars.Add ("DisplayLG7", "display: none;");
+            vars.Add ("DisplayLG8", "display: none;");
             if (translator.LanguageName == "en")
                 vars ["DisplayLG1"] = "";
             if (translator.LanguageName == "fr")
@@ -78,6 +78,8 @@ namespace WhiteCore.Modules.Web
                 vars ["DisplayLG6"] = "";
             if (translator.LanguageName == "ru")
                 vars ["DisplayLG7"] = "";
+            if (translator.LanguageName == "zh_CN")
+                vars["DisplayLG8"] = "";
 
             return vars;
         }
