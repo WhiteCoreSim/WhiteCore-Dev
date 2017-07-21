@@ -1,0 +1,1543 @@
+﻿#
+# SimpleChinese translation for WhiteCore.
+# This file is distributed under the same license as the WhiteCore package.
+# toweiyg <toweiyg@bnu.edu.cn>, 2016.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: WhiteCore Version 0.9.5\n"
+"Report-Msgid-Bugs-To: Yungang Wei <toweiyg@bnu.edu.cn>\n"
+"POT-Creation-Date: 2016-11-23 14:11:31Z\n"
+"PO-Revision-Date: 2017-01-02 15:57+1100\n"
+"Last-Translator: Yungang Wei <toweiyg@bnu.edu.cn>\n"
+"Language-Team: Yungang Wei <toweiyg@bnu.edu.cn>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: EditPlus3.0\n"
+
+msgid "30daysPastText"
+msgstr "前30天"
+
+msgid "AboutMe"
+msgstr "关于我"
+
+msgid "AbuseReporterNameText"
+msgstr "记者"
+
+msgid "AbuseReportText"
+msgstr "滥用报告"
+
+msgid "AbuserNameText"
+msgstr "施虐者"
+
+msgid "Accept"
+msgstr "接受"
+
+msgid "AccountType"
+msgstr "帐户类型"
+
+msgid "ActiveText"
+msgstr "活性"
+
+msgid "AddEstateText"
+msgstr "添加房地产"
+
+msgid "AddEventText"
+msgstr "添加事件"
+
+msgid "AddItem"
+msgstr "新增项目"
+
+msgid "AddNewsItem"
+msgstr "添加新消息"
+
+msgid "AddNewsText"
+msgstr "添加新闻"
+
+msgid "AddRegionText"
+msgstr "添加区域"
+
+msgid "AdminBanUserInfoText"
+msgstr "这将阻止用户登录，直到用户未被禁用。"
+
+msgid "AdminBanUserText"
+msgstr "禁止用户"
+
+msgid "AdminDeleteUserInfoText"
+msgstr "这会删除帐户并销毁与之相关联的所有信息。"
+
+msgid "AdminDeleteUserText"
+msgstr "删除用户"
+
+msgid "AdminLoginInAsUserInfoText"
+msgstr "您将从您的管理员帐户中注销，并以此用户身份登录，并会看到它们看到的所有内容。"
+
+msgid "AdminLoginInAsUserText"
+msgstr "以用户身份登录"
+
+msgid "AdminTempBanUserInfoText"
+msgstr "这将阻止用户登录设定的时间。"
+
+msgid "AdminTempBanUserText"
+msgstr "临时用户"
+
+msgid "AdminUnbanUserInfoText"
+msgstr "删除用户临时和永久禁止。"
+
+msgid "AdminUnbanUserText"
+msgstr "Unban用户"
+
+msgid "AdminUserTypeInfoText"
+msgstr "用户类型（目前用于定期津贴）。"
+
+msgid "AdultText"
+msgstr "成人"
+
+msgid "AgentsInViewText"
+msgstr "代理人视野"
+
+msgid "AllowDirectTeleportText"
+msgstr "允许直接传送"
+
+msgid "AllowVoiceText"
+msgstr "允许声音"
+
+msgid "Apr_Short"
+msgstr "四月"
+
+msgid "April"
+msgstr "四月"
+
+msgid "Aquatic"
+msgstr "水"
+
+msgid "AssignedToText"
+msgstr "分配给"
+
+msgid "Aug_Short"
+msgstr "八月"
+
+msgid "August"
+msgstr "八月"
+
+msgid "AvatarEmailError"
+msgstr "密码恢复需要电子邮件地址！ （如果未知，则为“无”）"
+
+msgid "AvatarNameError"
+msgstr "你没有输入头像的名字！"
+
+msgid "AvatarNameSpacingError"
+msgstr "你的头像名字应该是“名字姓氏”！"
+
+msgid "AvatarNameText"
+msgstr "头像名称"
+
+msgid "AvatarPasswordError"
+msgstr "密码为空或不匹配！"
+
+msgid "AvatarScopeText"
+msgstr "头像范围ID"
+
+msgid "BackText"
+msgstr "背部"
+
+msgid "BankerNameText"
+msgstr "系统银行家"
+
+msgid "BannedUntilText"
+msgstr "用户被禁止直到："
+
+msgid "BanText"
+msgstr "禁止"
+
+msgid "Cancel"
+msgstr "取消"
+
+msgid "CannotSetParentToChild"
+msgstr "无法将菜单项设置为子对象。"
+
+msgid "CatAll"
+msgstr "所有"
+
+msgid "CatArtsCulture"
+msgstr "艺术/文化"
+
+msgid "CatCharitySupport"
+msgstr "慈善/支援小组"
+
+msgid "CatCommercial"
+msgstr "广告"
+
+msgid "CatDiscussion"
+msgstr "讨论"
+
+msgid "CatEducation"
+msgstr "教育"
+
+msgid "CategoryText"
+msgstr "类别"
+
+msgid "CatEmployment"
+msgstr "雇用"
+
+msgid "CatEntertainment"
+msgstr "夜生活/娱乐"
+
+msgid "CatGames"
+msgstr "游戏/竞赛"
+
+msgid "CatLandRental"
+msgstr "土地出租"
+
+msgid "CatLiveMusic"
+msgstr "现场音乐"
+
+msgid "CatMiscellaneous"
+msgstr "杂"
+
+msgid "CatNewProducts"
+msgstr "新产品"
+
+msgid "CatPageants"
+msgstr "选美"
+
+msgid "CatPersonal"
+msgstr "个人"
+
+msgid "CatPropertyRental"
+msgstr "物业租赁"
+
+msgid "CatSelect"
+msgstr "选择类别"
+
+msgid "CatService"
+msgstr "服务"
+
+msgid "CatShopping"
+msgstr "购物"
+
+msgid "CatSpecialAttraction"
+msgstr "特别景点"
+
+msgid "CatSports"
+msgstr "体育"
+
+msgid "CatWanted"
+msgstr "通缉"
+
+msgid "ChangeEmailText"
+msgstr "更改电子邮件地址"
+
+msgid "ChangePass"
+msgstr "更改密码"
+
+msgid "ChangePasswordText"
+msgstr "更改密码"
+
+msgid "ChangesSavedSuccessfully"
+msgstr "更改已成功保存"
+
+msgid "ChangeUserInformationText"
+msgstr "更改用户信息"
+
+msgid "Charter_Member"
+msgstr "宪章会员"
+
+msgid "ChatText"
+msgstr "聊天支持"
+
+msgid "CheckedText"
+msgstr "经过"
+
+msgid "ClassifiedsText"
+msgstr "公告"
+
+msgid "ClassifiedText"
+msgstr "分类"
+
+msgid "ClearStatsText"
+msgstr "清除统计资料"
+
+msgid "ColorBoxCloseText"
+msgstr "关"
+
+msgid "ColorBoxImageText"
+msgstr "图片"
+
+msgid "ColorBoxNextText"
+msgstr "下一个"
+
+msgid "ColorBoxOfText"
+msgstr "的"
+
+msgid "ColorBoxPreviousText"
+msgstr "以前"
+
+msgid "ColorBoxStartSlideshowText"
+msgstr "开始幻灯片"
+
+msgid "ColorBoxStopSlideshowText"
+msgstr "停止幻灯片放映"
+
+msgid "Contractor"
+msgstr "承包商"
+
+msgid "CoverChargeText"
+msgstr "封面费"
+
+msgid "CreationDateText"
+msgstr "添加"
+
+msgid "Currency"
+msgstr "货币"
+
+msgid "CurrentPageText"
+msgstr "当前页面"
+
+msgid "Custom"
+msgstr "习惯"
+
+msgid "DateEndText"
+msgstr "结束日期"
+
+msgid "DateInfoText"
+msgstr "选择日期范围"
+
+msgid "DateStartText"
+msgstr "开始日期"
+
+msgid "DateText"
+msgstr "日期"
+
+msgid "de"
+msgstr "德语"
+
+msgid "Dec_Short"
+msgstr "十二月"
+
+msgid "December"
+msgstr "十二月"
+
+msgid "DefaultsUpdated"
+msgstr "默认更新，进入出厂复位更新或设置管理器以禁用此警告。"
+
+msgid "DelayedText"
+msgstr "延迟"
+
+msgid "DeleteItem"
+msgstr "删除项目"
+
+msgid "DeleteNewsItem"
+msgstr "删除新闻项目"
+
+msgid "DeleteNewsText"
+msgstr "删除新闻"
+
+msgid "DeleteText"
+msgstr "删除"
+
+msgid "DeleteUserInfoText"
+msgstr "这将删除您在网格中的所有信息，并删除您对此服务的访问。 如果您想继续，请输入您的姓名和密码，然后单击删除。"
+
+msgid "DeleteUserText"
+msgstr "删除我的账户"
+
+msgid "DescriptionText"
+msgstr "描述"
+
+msgid "DetailsText"
+msgstr "描述"
+
+msgid "Disabled"
+msgstr "残"
+
+msgid "DisplayInMenu"
+msgstr "在菜单中显示"
+
+msgid "DurationText"
+msgstr "持续时间"
+
+msgid "EditNewsItem"
+msgstr "编辑新闻项目"
+
+msgid "EditNewsText"
+msgstr "编辑新闻"
+
+msgid "EditText"
+msgstr "编辑"
+
+msgid "EdittingText"
+msgstr "编辑"
+
+msgid "EditUserAccountText"
+msgstr "编辑用户帐号"
+
+msgid "en"
+msgstr "英语"
+
+msgid "Enabled"
+msgstr "启用"
+
+msgid "Error404InfoText"
+msgstr "404页未找到"
+
+msgid "Error404Text"
+msgstr "错误代码"
+
+msgid "Error505InfoText"
+msgstr "505内部服务器错误"
+
+msgid "Error505Text"
+msgstr "错误代码"
+
+msgid "es"
+msgstr "西班牙语"
+
+msgid "Estate"
+msgstr "房地产"
+
+msgid "EstatesText"
+msgstr "庄园"
+
+msgid "EstateText"
+msgstr "房地产"
+
+msgid "EventDateText"
+msgstr "什么时候"
+
+msgid "EventLocationText"
+msgstr "哪里"
+
+msgid "EventNameText"
+msgstr "事件"
+
+msgid "EventsText"
+msgstr "活动"
+
+msgid "EventTimeInfoText"
+msgstr "活动时间应该是当地时间"
+
+msgid "ExpirationDateText"
+msgstr "呼气"
+
+msgid "FactoryReset"
+msgstr "出厂复位"
+
+msgid "Feb_Short"
+msgstr "二月"
+
+msgid "February"
+msgstr "二月"
+
+msgid "FirstNameText"
+msgstr "你的名字"
+
+msgid "FirstText"
+msgstr "第一"
+
+msgid "Flatland"
+msgstr "平原"
+
+msgid "ForgotPassword"
+msgstr "忘记密码？"
+
+msgid "FPSText"
+msgstr "帧/秒"
+
+msgid "fr"
+msgstr "法国"
+
+msgid "Fri"
+msgstr "周五"
+
+msgid "Friday"
+msgstr "星期五"
+
+msgid "Friends"
+msgstr "友"
+
+msgid "FullRegion"
+msgstr "全区域"
+
+msgid "GeneralText"
+msgstr "一般"
+
+msgid "GovernorNameText"
+msgstr "系统总监"
+
+msgid "GPUText"
+msgstr "显卡"
+
+msgid "Grassland"
+msgstr "草原"
+
+msgid "GridCenterXText"
+msgstr "网格中心位置X"
+
+msgid "GridCenterYText"
+msgstr "网格中心位置Y"
+
+msgid "GridnameText"
+msgstr "网格名称"
+
+msgid "GridnickText"
+msgstr "网格昵称"
+
+msgid "GridSettingsManager"
+msgstr "网格设置管理器"
+
+msgid "GridStatus"
+msgstr "网格状态"
+
+msgid "GroupNameText"
+msgstr "组"
+
+msgid "Guest"
+msgstr "客人"
+
+msgid "HelpText"
+msgstr "帮帮我"
+
+msgid "HelpViewersConfigText"
+msgstr "查看器配置"
+
+msgid "HideLanguageBarText"
+msgstr "隐藏语言选择栏"
+
+msgid "HideSlideshowBarText"
+msgstr "隐藏幻灯片吧"
+
+msgid "HideStyleBarText"
+msgstr "隐藏样式选择栏"
+
+msgid "HomePage404Text"
+msgstr "主页"
+
+msgid "HomePage505Text"
+msgstr "主页"
+
+msgid "Homestead"
+msgstr "家园"
+
+msgid "HomeText"
+msgstr "家"
+
+msgid "HomeTextTips"
+msgstr "新演讲"
+
+msgid "HomeTextWelcome"
+msgstr "这是我们的新虚拟世界！ 加入我们，并且有所作为！"
+
+msgid "HostedByText"
+msgstr "由主办"
+
+msgid "HoursText"
+msgstr "小时"
+
+msgid "HourText"
+msgstr "小时"
+
+msgid "HyperGrid"
+msgstr "超网格（HG）"
+
+msgid "IgnorePagesUpdatesText"
+msgstr "忽略页面更新警告，直到下一次更新"
+
+msgid "IgnoreSettingsUpdatesText"
+msgstr "忽略设置更新警告，直到下一次更新"
+
+msgid "InterWorld"
+msgstr "国际世界（IWC）"
+
+msgid "Island"
+msgstr "岛"
+
+msgid "IsOnlineText"
+msgstr "用户状态"
+
+msgid "it"
+msgstr "意大利"
+
+msgid "Jan_Short"
+msgstr "一月"
+
+msgid "January"
+msgstr "一月"
+
+msgid "Jul_Short"
+msgstr "七月"
+
+msgid "July"
+msgstr "七月"
+
+msgid "Jun_Short"
+msgstr "君"
+
+msgid "June"
+msgstr "六月"
+
+msgid "KickAUserInfoText"
+msgstr "从网格中踢出一个用户（在30秒内登出）"
+
+msgid "KickAUserText"
+msgstr "踢用户"
+
+msgid "KickMessageText"
+msgstr "给用户留言"
+
+msgid "KickUserText"
+msgstr "踢用户"
+
+msgid "LastNameText"
+msgstr "你的姓氏"
+
+msgid "LastText"
+msgstr "持续"
+
+msgid "ListedByText"
+msgstr "上市的"
+
+msgid "LocalCSSText"
+msgstr "本地CSS样式表"
+
+msgid "LocalFrontPageText"
+msgstr "本地首页"
+
+msgid "LocationText"
+msgstr "位置"
+
+msgid "LoggedIPText"
+msgstr "记录的IP地址"
+
+msgid "LoggedOutSuccessfullyText"
+msgstr "您已成功注销"
+
+msgid "Login"
+msgstr "登录"
+
+msgid "Logout"
+msgstr "登出"
+
+msgid "Mainland"
+msgstr "大陆"
+
+msgid "MainlandEstateNameText"
+msgstr "大陆地产"
+
+msgid "Mar_Short"
+msgstr "损伤"
+
+msgid "March"
+msgstr "游行"
+
+msgid "MarketPlaceOwnerNameText"
+msgstr "系统市场所有者"
+
+msgid "MatureText"
+msgstr "成熟"
+
+msgid "MaturityText"
+msgstr "到期"
+
+msgid "May"
+msgstr "可能"
+
+msgid "May_Short"
+msgstr "可能"
+
+msgid "Member"
+msgstr "会员"
+
+msgid "MemoryUseageText"
+msgstr "Memory use"
+
+msgid "MenuAbuse"
+msgstr "滥用报告"
+
+msgid "MenuChangeUserInformation"
+msgstr "更改用户信息"
+
+msgid "MenuChat"
+msgstr "聊"
+
+msgid "MenuClassifieds"
+msgstr "公告"
+
+msgid "MenuEstateManager"
+msgstr "房地产经理"
+
+msgid "MenuEvents"
+msgstr "活动"
+
+msgid "MenuFactoryReset"
+msgstr "出厂复位"
+
+msgid "MenuForgotPass"
+msgstr "忘记密码"
+
+msgid "MenuGridSettings"
+msgstr "网格设置"
+
+msgid "MenuGroupTitle"
+msgstr "组"
+
+msgid "MenuHelp"
+msgstr "帮帮我"
+
+msgid "MenuHome"
+msgstr "家"
+
+msgid "MenuLogin"
+msgstr "登录"
+
+msgid "MenuLogout"
+msgstr "登出"
+
+msgid "MenuManager"
+msgstr "管理"
+
+msgid "MenuManagerSimConsole"
+msgstr "模拟器控制台"
+
+msgid "MenuMyClassifieds"
+msgstr "我的分类"
+
+msgid "MenuMyEvents"
+msgstr "我的活动"
+
+msgid "MenuMyPurchases"
+msgstr "我的购买"
+
+msgid "MenuMyTransactions"
+msgstr "我的交易"
+
+msgid "MenuNews"
+msgstr "新闻"
+
+msgid "MenuNewsManager"
+msgstr "新闻经理"
+
+msgid "MenuOnlineUsers"
+msgstr "在线用户"
+
+msgid "MenuOwnerTitle"
+msgstr "所有者"
+
+msgid "MenuPageManager"
+msgstr "页面管理器"
+
+msgid "MenuParcelTitle"
+msgstr "包裹"
+
+msgid "MenuPicksTitle"
+msgstr "精选"
+
+msgid "MenuProfileTitle"
+msgstr "轮廓"
+
+msgid "MenuPurchases"
+msgstr "用户购买"
+
+msgid "MenuRegion"
+msgstr "区域列表"
+
+msgid "MenuRegionManager"
+msgstr "区域经理"
+
+msgid "MenuRegionSearch"
+msgstr "区域搜索"
+
+msgid "MenuRegionsTitle"
+msgstr "地区"
+
+msgid "MenuRegionTitle"
+msgstr "地区"
+
+msgid "MenuRegister"
+msgstr "寄存器"
+
+msgid "MenuSettings"
+msgstr "设置"
+
+msgid "MenuSettingsManager"
+msgstr "卷筒纸UI设置"
+
+msgid "MenuStatistics"
+msgstr "查看器统计"
+
+msgid "MenuTransactions"
+msgstr "用户交易"
+
+msgid "MenuUser"
+msgstr "用户"
+
+msgid "MenuUserManager"
+msgstr "用户管理器"
+
+msgid "MenuUserSearch"
+msgstr "用户搜索"
+
+msgid "MenuViewerHelp"
+msgstr "查看器帮助"
+
+msgid "MenuWelcomeScreenManager"
+msgstr "欢迎屏幕管理器"
+
+msgid "MenuWorld"
+msgstr "世界"
+
+msgid "MenuWorldMap"
+msgstr "世界地图"
+
+msgid "MessageAUserInfoText"
+msgstr "发送用户蓝盒邮件（30秒内到达）"
+
+msgid "MessageAUserText"
+msgstr "发送用户一个消息"
+
+msgid "MessageUserText"
+msgstr "留言用户"
+
+msgid "MinutesText"
+msgstr "分钟"
+
+msgid "MinuteText"
+msgstr "分钟"
+
+msgid "Mon"
+msgstr "周一"
+
+msgid "Monday"
+msgstr "星期一"
+
+msgid "MoreInfo"
+msgstr "更多信息"
+
+msgid "MoreInfoText"
+msgstr "更多信息"
+
+msgid "Name"
+msgstr "名称"
+
+msgid "NewEmailText"
+msgstr "新电子邮件地址"
+
+msgid "NewPasswordConfirmationText"
+msgstr "新密码（确认）"
+
+msgid "NewPasswordText"
+msgstr "新密码"
+
+msgid "News"
+msgstr "新闻"
+
+msgid "NewsDateText"
+msgstr "新闻日期"
+
+msgid "NewsItemText"
+msgstr "新闻项目文本"
+
+msgid "NewsItemTitle"
+msgstr "新闻标题"
+
+msgid "NewsManager"
+msgstr "新闻经理"
+
+msgid "NewsTitleText"
+msgstr "新闻标题"
+
+msgid "Next10Hours"
+msgstr "接下来的10个小时"
+
+msgid "Next24Hours"
+msgstr "接下来的24小时"
+
+msgid "Next2Hours"
+msgstr "接下来的2小时"
+
+msgid "Next4Hours"
+msgstr "接下来4个小时"
+
+msgid "NextText"
+msgstr "下一个"
+
+msgid "nl"
+msgstr "荷兰"
+
+msgid "No"
+msgstr "没有"
+
+msgid "NoAccountFound"
+msgstr "找不到帐户"
+
+msgid "NoChangePass"
+msgstr "无法更改密码，请稍后再试"
+
+msgid "NoDetailsText"
+msgstr "没有找到细节..."
+
+msgid "NoPurchasesText"
+msgstr "找不到购买..."
+
+msgid "NormalText"
+msgstr "正常"
+
+msgid "NotesText"
+msgstr "笔记"
+
+msgid "Nothing"
+msgstr "没有"
+
+msgid "NoTransactionsText"
+msgstr "没有发现交易..."
+
+msgid "Nov_Short"
+msgstr "十一月"
+
+msgid "November"
+msgstr "十一月"
+
+msgid "NumberOfUsersInRegionText"
+msgstr "区域中的用户数"
+
+msgid "ObjectNameText"
+msgstr "目的"
+
+msgid "Oct_Short"
+msgstr "十月"
+
+msgid "October"
+msgstr "十月"
+
+msgid "Offline"
+msgstr "离线"
+
+msgid "Online"
+msgstr "线上"
+
+msgid "OnlineFriendsText"
+msgstr "在线好友"
+
+msgid "OnlineLocationText"
+msgstr "用户位置"
+
+msgid "OnlineNow"
+msgstr "在线现在"
+
+msgid "OnlineUsersText"
+msgstr "在线用户"
+
+msgid "OpenNewsManager"
+msgstr "打开新闻管理员"
+
+msgid "Openspace"
+msgstr "开敞空间"
+
+msgid "OwnerNameText"
+msgstr "所有者名称"
+
+msgid "PageIDText"
+msgstr "页面ID"
+
+msgid "PageLocationText"
+msgstr "页面位置"
+
+msgid "PageManager"
+msgstr "页面管理器"
+
+msgid "PagePositionText"
+msgstr "页面位置"
+
+msgid "Pages"
+msgstr "网页"
+
+msgid "PageTitleText"
+msgstr "页面标题"
+
+msgid "PageTooltipText"
+msgstr "页面工具提示"
+
+msgid "ParcelNameText"
+msgstr "包裹名称"
+
+msgid "ParcelOwnerText"
+msgstr "包裹业主名称"
+
+msgid "ParcelsInRegionText"
+msgstr "地区包裹"
+
+msgid "ParentText"
+msgstr "菜单父母"
+
+msgid "Partner"
+msgstr "伙伴"
+
+msgid "PartnersName"
+msgstr "合作伙伴姓名"
+
+msgid "Password"
+msgstr "密码"
+
+msgid "PasswordConfirmation"
+msgstr "确认密码"
+
+msgid "PasswordText"
+msgstr "密码"
+
+msgid "PerformanceText"
+msgstr "表现平均值"
+
+msgid "PickNameText"
+msgstr "选择名称"
+
+msgid "PickRegionText"
+msgstr "位置"
+
+msgid "PingTimeText"
+msgstr "平时"
+
+msgid "PriceOfListingText"
+msgstr "价钱"
+
+msgid "PricePerMeterText"
+msgstr "每平方米的价格"
+
+msgid "PublicAccessText"
+msgstr "公共访问"
+
+msgid "PurchaseCostText"
+msgstr "成本"
+
+msgid "PurchasesText"
+msgstr "购买"
+
+msgid "RealEstateOwnerNameText"
+msgstr "系统业主"
+
+msgid "Region"
+msgstr "地区"
+
+msgid "RegionCapacityText"
+msgstr "区域对象容量"
+
+msgid "RegionDelayStartupText"
+msgstr "延迟启动脚本"
+
+msgid "RegionInfiniteText"
+msgstr "无限区域"
+
+msgid "RegionInformationText"
+msgstr "地区信息"
+
+msgid "RegionInfoText"
+msgstr "区域信息"
+
+msgid "RegionListText"
+msgstr "区域列表"
+
+msgid "RegionLocationText"
+msgstr "地区位置"
+
+msgid "RegionLocXText"
+msgstr "区域X"
+
+msgid "RegionLocYText"
+msgstr "区域Y"
+
+msgid "RegionMaturityText"
+msgstr "访问等级"
+
+msgid "RegionMoreInfo"
+msgstr "更多信息"
+
+msgid "RegionMoreInfoTooltips"
+msgstr "更多信息"
+
+msgid "RegionNameText"
+msgstr "区域名称"
+
+msgid "RegionOnlineText"
+msgstr "地区状态"
+
+msgid "RegionPortText"
+msgstr "区域港口"
+
+msgid "RegionPresetText"
+msgstr "区域预设"
+
+msgid "RegionPresetTypeText"
+msgstr "区域预设类型"
+
+msgid "RegionSearchText"
+msgstr "区域搜索"
+
+msgid "RegionSizeText"
+msgstr "区域大小"
+
+msgid "RegionsVisitedText"
+msgstr "访问地区"
+
+msgid "RegionTerrainText"
+msgstr "区域地形"
+
+msgid "RegionTypeText"
+msgstr "区域类型"
+
+msgid "RegionVisibilityText"
+msgstr "邻居可见"
+
+msgid "RegistrationsDisabled"
+msgstr "注册目前已被禁用，请稍后重试。"
+
+msgid "RegistrationText"
+msgstr "头像注册"
+
+msgid "RequiresAdminLevelText"
+msgstr "需要管理员级别查看"
+
+msgid "RequiresAdminText"
+msgstr "需要管理员查看"
+
+msgid "RequiresLoginText"
+msgstr "需要登录才能查看"
+
+msgid "RequiresLogoutText"
+msgstr "需要注销才能查看"
+
+msgid "Reset"
+msgstr "重启"
+
+msgid "ResetMenuInfoText"
+msgstr "将菜单项重置为最新更改的默认值"
+
+msgid "ResetMenuText"
+msgstr "将菜单重置为出厂设置"
+
+msgid "ResetSettingsInfoText"
+msgstr "将卷筒纸界面设置重置为最新更改的默认值"
+
+msgid "ResetSettingsText"
+msgstr "重置卷筒纸设置（设置管理器页面）到出厂默认设置"
+
+msgid "Resident"
+msgstr "居民"
+
+msgid "ResidentSince"
+msgstr "居民自"
+
+msgid "ru"
+msgstr "Русский"
+
+msgid "RunTimeText"
+msgstr "运行"
+
+msgid "Sat"
+msgstr "她的"
+
+msgid "Saturday"
+msgstr "星期六"
+
+msgid "Save"
+msgstr "保存"
+
+msgid "SaveMenuItemChanges"
+msgstr "保存菜单项"
+
+msgid "SaveUpdates"
+msgstr "保存更新"
+
+msgid "Search"
+msgstr "搜索"
+
+msgid "SearchForRegionText"
+msgstr "搜索区域"
+
+msgid "SearchForUserText"
+msgstr "搜索用户"
+
+msgid "SearchResultForRegionText"
+msgstr "搜索结果区域"
+
+msgid "SearchResultForUserText"
+msgstr "用户搜索结果"
+
+msgid "SearchText"
+msgstr "搜索"
+
+msgid "SelectItem"
+msgstr "选择物品"
+
+msgid "Sep_Short"
+msgstr "九月"
+
+msgid "September"
+msgstr "九月"
+
+msgid "Settings"
+msgstr "设置"
+
+msgid "SettingsManager"
+msgstr "设置管理器"
+
+msgid "SimCommandText"
+msgstr "命令"
+
+msgid "SimConsoleText"
+msgstr "Sim命令控制台"
+
+msgid "SortByLocX"
+msgstr "按区域X排序"
+
+msgid "SortByLocY"
+msgstr "按区域Y排序"
+
+msgid "SortByName"
+msgstr "按地区名称排序"
+
+msgid "SpecialWindowColorText"
+msgstr "特殊信息窗口颜色"
+
+msgid "SpecialWindowStatusText"
+msgstr "特殊信息窗口状态"
+
+msgid "SpecialWindowTextText"
+msgstr "特殊信息窗口标题"
+
+msgid "SpecialWindowTitleText"
+msgstr "特殊信息窗口标题"
+
+msgid "StatisticsText"
+msgstr "查看器统计"
+
+msgid "styles1"
+msgstr "默认极简"
+
+msgid "styles2"
+msgstr "轻度脱钙"
+
+msgid "styles3"
+msgstr "蓝夜"
+
+msgid "styles4"
+msgstr "黑暗降级"
+
+msgid "styles5"
+msgstr "Luminus公司"
+
+msgid "StyleSwitcherChoiceText"
+msgstr "选择"
+
+msgid "StyleSwitcherLanguagesText"
+msgstr "语言"
+
+msgid "StyleSwitcherStylesText"
+msgstr "样式"
+
+msgid "Submit"
+msgstr "提交"
+
+msgid "SummaryText"
+msgstr "概要"
+
+msgid "Sun"
+msgstr "太阳"
+
+msgid "Sunday"
+msgstr "星期日"
+
+msgid "SystemEstateNameText"
+msgstr "系统地产"
+
+msgid "TaxFreeText"
+msgstr "免税"
+
+msgid "TermsOfServiceAccept"
+msgstr "你接受上述的服务条款吗？"
+
+msgid "TermsOfServiceText"
+msgstr "服务条款"
+
+msgid "Thu"
+msgstr "集"
+
+msgid "Thursday"
+msgstr "星期四"
+
+msgid "TimeText"
+msgstr "时间"
+
+msgid "TimeUntilUnbannedText"
+msgstr "直到用户不被禁止的时间"
+
+msgid "TooltipsMenuAbuse"
+msgstr "用户滥用报告"
+
+msgid "TooltipsMenuChangeUserInformation"
+msgstr "更改用户信息"
+
+msgid "TooltipsMenuChat"
+msgstr "聊"
+
+msgid "TooltipsMenuClassifieds"
+msgstr "分类信息"
+
+msgid "TooltipsMenuEstateManager"
+msgstr "物业管理"
+
+msgid "TooltipsMenuEvents"
+msgstr "事件信息"
+
+msgid "TooltipsMenuFactoryReset"
+msgstr "出厂复位"
+
+msgid "TooltipsMenuForgotPass"
+msgstr "忘记密码"
+
+msgid "TooltipsMenuGridSettings"
+msgstr "网格设置"
+
+msgid "TooltipsMenuGroups"
+msgstr "用户组"
+
+msgid "TooltipsMenuHelp"
+msgstr "帮帮我"
+
+msgid "TooltipsMenuHome"
+msgstr "家"
+
+msgid "TooltipsMenuLogin"
+msgstr "登录"
+
+msgid "TooltipsMenuLogout"
+msgstr "登出"
+
+msgid "TooltipsMenuManager"
+msgstr "管理员管理"
+
+msgid "TooltipsMenuManagerSimConsole"
+msgstr "在线模拟器控制台"
+
+msgid "TooltipsMenuNews"
+msgstr "新闻"
+
+msgid "TooltipsMenuNewsManager"
+msgstr "新闻经理"
+
+msgid "TooltipsMenuOnlineUsers"
+msgstr "在线用户"
+
+msgid "TooltipsMenuOwner"
+msgstr "房屋业主"
+
+msgid "TooltipsMenuPageManager"
+msgstr "页面管理器"
+
+msgid "TooltipsMenuParcel"
+msgstr "地区包裹"
+
+msgid "TooltipsMenuPicks"
+msgstr "用户选择"
+
+msgid "TooltipsMenuProfile"
+msgstr "用户资料"
+
+msgid "TooltipsMenuPurchases"
+msgstr "购买信息"
+
+msgid "TooltipsMenuRegion"
+msgstr "地区细节"
+
+msgid "TooltipsMenuRegionManager"
+msgstr "区域创建/编辑"
+
+msgid "TooltipsMenuRegions"
+msgstr "用户区域"
+
+msgid "TooltipsMenuRegionSearch"
+msgstr "区域搜索"
+
+msgid "TooltipsMenuRegister"
+msgstr "寄存器"
+
+msgid "TooltipsMenuSettings"
+msgstr "WebUI设置"
+
+msgid "TooltipsMenuSettingsManager"
+msgstr "设置管理器"
+
+msgid "TooltipsMenuStatistics"
+msgstr "查看器统计"
+
+msgid "TooltipsMenuTransactions"
+msgstr "交易信息"
+
+msgid "TooltipsMenuUser"
+msgstr "用户"
+
+msgid "TooltipsMenuUserManager"
+msgstr "用户管理器"
+
+msgid "TooltipsMenuUserSearch"
+msgstr "用户搜索"
+
+msgid "TooltipsMenuViewerHelp"
+msgstr "查看器帮助"
+
+msgid "TooltipsMenuWelcomeScreenManager"
+msgstr "欢迎屏幕管理器"
+
+msgid "TooltipsMenuWorld"
+msgstr "世界"
+
+msgid "TooltipsMenuWorldMap"
+msgstr "世界地图"
+
+msgid "TooltipsWelcomeScreen"
+msgstr "欢迎屏幕"
+
+msgid "TooltipsWorldMap"
+msgstr "世界地图"
+
+msgid "TopLevel"
+msgstr "顶层"
+
+msgid "TotalRegionCount"
+msgstr "总区数"
+
+msgid "TotalUserCount"
+msgstr "用户总数"
+
+msgid "TransactionAmountText"
+msgstr "量"
+
+msgid "TransactionBalanceText"
+msgstr "平衡"
+
+msgid "TransactionDateText"
+msgstr "日期"
+
+msgid "TransactionDetailText"
+msgstr "描述"
+
+msgid "TransactionFromAgentText"
+msgstr "从用户"
+
+msgid "TransactionsText"
+msgstr "交易"
+
+msgid "TransactionToAgentText"
+msgstr "给用户"
+
+msgid "Tue"
+msgstr "星期二"
+
+msgid "Tuesday"
+msgstr "星期二"
+
+msgid "TypeUserNameToConfirm"
+msgstr "请键入此帐户的用户名，以确认您要删除此帐户"
+
+msgid "UnbanText"
+msgstr "黑名单中删除"
+
+msgid "UniqueVisitors"
+msgstr "独特访客持续30天"
+
+msgid "UpdateRequired"
+msgstr "需要更新"
+
+msgid "UserAddressText"
+msgstr "你的地址"
+
+msgid "UserCityText"
+msgstr "您的城市"
+
+msgid "UserCountryText"
+msgstr "你的国家"
+
+msgid "UserDOBText"
+msgstr "您的出生日期（月日）"
+
+msgid "UserEmailText"
+msgstr "你的邮件"
+
+msgid "UserGroupNameText"
+msgstr "用户组"
+
+msgid "UserHomeRegionText"
+msgstr "家乡地区"
+
+msgid "UserName"
+msgstr "用户名"
+
+msgid "UserNameText"
+msgstr "用户名"
+
+msgid "UserProfileFor"
+msgstr "用户个人资料"
+
+msgid "UserSearchText"
+msgstr "用户搜索"
+
+msgid "UsersGroupsText"
+msgstr "加入群组"
+
+msgid "UsersPicksText"
+msgstr "精选"
+
+msgid "UserTypeText"
+msgstr "用户类型"
+
+msgid "UserZipText"
+msgstr "你的邮政编码"
+
+msgid "UUIDText"
+msgstr "UUID"
+
+msgid "ViewersText"
+msgstr "观众使用"
+
+msgid "Voice"
+msgstr "语音"
+
+msgid "WebRegistrationText"
+msgstr "允许网页注册"
+
+msgid "WebsiteDownInfoText"
+msgstr "网站目前正在关闭，请稍后再试。"
+
+msgid "WebsiteDownText"
+msgstr "网站离线"
+
+msgid "Wed"
+msgstr "星期三"
+
+msgid "Wednesday"
+msgstr "星期三"
+
+msgid "WelcomeMessageText"
+msgstr "登录欢迎讯息"
+
+msgid "WelcomeScreen"
+msgstr "欢迎屏幕"
+
+msgid "WelcomeScreenManagerFor"
+msgstr "欢迎屏幕管理器"
+
+msgid "WelcomeToText"
+msgstr "欢迎来到"
+
+msgid "WorldMap"
+msgstr "世界地图"
+
+msgid "WorldMapText"
+msgstr "全屏"
+
+msgid "Yes"
+msgstr "是"
+
+msgid "zh_CN"
+msgstr "简体中文"

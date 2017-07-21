@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
 	<meta charset="utf-8">
@@ -29,19 +29,21 @@
 		    <ul>
 			{StyleSwitcherLanguagesText}:
 			  <li><a href="?language=en" rel="en" class="languageswitch" alt="{en}">
-			      <img src="images/flags/flag-en.png" alt="{en}">en</a></li>
+			    <img src="images/flags/flag-en.png" alt="{en}">en</a></li>
 			  <li><a href="?language=fr" rel="fr" class="languageswitch" alt="{fr}">
-			  		<img src="images/flags/flag-fr.png" alt="{fr}">fr</a></li>
+			  	<img src="images/flags/flag-fr.png" alt="{fr}">fr</a></li>
 			  <li><a href="?language=de" rel="de" class="languageswitch" alt="{de}">
-			  		<img src="images/flags/flag-de.png" alt="{de}">de</a></li>
+			  	<img src="images/flags/flag-de.png" alt="{de}">de</a></li>
 			  <li><a href="?language=it" rel="it" class="languageswitch" alt="{it}">
-			  		<img src="images/flags/flag-it.png" alt="{it}">it</a></li>
+			    <img src="images/flags/flag-it.png" alt="{it}">it</a></li>
 			  <li><a href="?language=es" rel="es" class="languageswitch" alt="{es}">
 			  	<img src="images/flags/flag-es.png" alt="{es}">es</a></li>
 			  <li><a href="?language=nl" rel="nl" class="languageswitch" alt="{nl}">
 			  	<img src="images/flags/flag-nl.png" alt="{nl}">nl</a></li>
-  		  <li><a href="?language=ru" rel="ru" class="languageswitch" alt="{ru}">
+  		      <li><a href="?language=ru" rel="ru" class="languageswitch" alt="{ru}">
 			  	<img src="images/flags/flag-ru.png" alt="{ru}">ru</a></li>
+              <li><a href="?language=zh_CN" rel="zh_CN" class="languageswitch" alt="{zh_CN}">
+                <img src="images/flags/flag-zh_CN.png" alt="{zh_CN}">zh_CN</a></li>
 			</ul>
 		  </div>
 	{IfShowLanguageTranslatorBarEnd}
@@ -127,8 +129,10 @@
 			  	<img src="images/flags/flag-es.png" alt="{es}">es</a></li>
 			  <li><a href="?language=nl" rel="nl" class="languageswitch" alt="{nl}">
 			  	<img src="images/flags/flag-nl.png" alt="{nl}">nl</a></li>
-  		  <li><a href="?language=ru" rel="ru" class="languageswitch" alt="{ru}">
+  		      <li><a href="?language=ru" rel="ru" class="languageswitch" alt="{ru}">
 			  	<img src="images/flags/flag-ru.png" alt="{ru}">ru</a></li>
+              <li><a href="?language=zh_CN" rel="zh_CN" class="languageswitch" alt="{zh_CN}">
+			  	<img src="images/flags/flag-zh_CN.png" alt="{zh_CN}">zh_CN</a></li>
 			  	-->
 	<!--		{StyleSwitcherChoiceText}:
 			  <span id="lg1">en</span>
@@ -137,7 +141,8 @@
 			  <span id="lg4">it</span>
 			  <span id="lg5">es</span>
 			  <span id="lg6">nl</span>
-			  <span id="lg7">ru</span> -->
+			  <span id="lg7">ru</span>
+              <span id="lg8">zh_CN</span> -->
 <!--			</ul>
 		  </div>
 	{IfShowLanguageTranslatorBarEnd}
@@ -220,7 +225,8 @@
 					var tmp = params[i].split("=");
 					result[tmp[0]] = unescape(tmp[1]);
 				}
-			}
+            }
+
 			//load selected section
 			var pageName = result["page"];
 			var found = new Boolean(0);
@@ -231,7 +237,8 @@
 					found = new Boolean(1);
 					break;
 	{MenuItemsArrayEnd}
-			}
+            }
+
 			if(found == 0)
 				content.load("home.html" + window.location.search);
 		});
