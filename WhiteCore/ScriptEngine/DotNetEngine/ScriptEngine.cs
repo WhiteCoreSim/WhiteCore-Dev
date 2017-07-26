@@ -1137,7 +1137,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 }
                 catch (Exception e)
                 {
-                    string error = "Error compiling script: " + e;
+                    string error = "Exception when compiling script: " + e;
                     if (error.Length > 255)
                         error = error.Substring(0, 255);
                     return error;
