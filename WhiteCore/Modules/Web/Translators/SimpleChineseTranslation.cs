@@ -29,14 +29,14 @@ using System.Collections.Generic;
 
 namespace WhiteCore.Modules.Web.Translators
 {
-    public class SimpleChineseTranslation : ITranslator      // << Rename the class for your language
+    public class SimpleChineseTranslation : ITranslator      
     {
         public string LanguageName {
-            get { return "zh_CN"; }                        // << replace with the language code
+            get { return "zh_CN"; }                          // language code
         }
 
         public string FullLanguageName {
-            get { return "SimpleChinese"; }                  // << replace with the language name
+            get { return "简体中文"; }                        // Simplified Chinese
         }
 
         public string GetTranslatedString (string key)
