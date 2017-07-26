@@ -152,6 +152,20 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             }
         }
 
+        public LSL_Key osGetRezzingObject()
+        {
+            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "osGetRezzingObject", m_host, "OSSL", m_itemID))
+                return new LSL_Key (UUID.Zero.ToString ());
+
+            // this is a hack for the present and may not work correctly -greythane-
+            UUID rezID = m_host.CreatorID;   //.ParentGroup.RezzerID;
+            if(rezID == UUID.Zero || World.GetScenePresence(rezID) != null)
+                return new LSL_Key(UUID.Zero.ToString());
+            
+            return new LSL_Key(rezID.ToString());
+
+        }
+
         public LSL_Float osGetTerrainHeight(int x, int y)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osTerrainGetHeight", m_host, "OSSL", m_itemID))
