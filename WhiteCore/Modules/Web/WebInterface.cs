@@ -54,6 +54,9 @@ namespace WhiteCore.Modules.Web
     public class WebInterface : IService, IWebInterfaceModule
     {
         #region Declares
+		
+		#pragma warning disable 0649
+		// Putting this here to clear out some warnings - 29082016 Fly-man-
 
         protected const int CLIENT_CACHE_TIME = 86400;  // 1 day
         protected uint _port = 8002;                    // assuming grid mode here
@@ -127,6 +130,7 @@ namespace WhiteCore.Modules.Web
 
             _translators = WhiteCoreModuleLoader.PickupModules<ITranslator> ();
             _defaultTranslator = _translators [0];
+
         }
 
         public void Start (IConfigSource config, IRegistryCore registry)
@@ -145,6 +149,7 @@ namespace WhiteCore.Modules.Web
                 _defaultTranslator = _translators.FirstOrDefault (t => t.LanguageName == defaultLanguage);
                 if (_defaultTranslator == null)
                     _defaultTranslator = _translators [0];
+ 
             }
             if (_enabled) {
                 Registry.RegisterModuleInterface<IWebInterfaceModule> (this);
@@ -157,6 +162,13 @@ namespace WhiteCore.Modules.Web
                     var defpath = registry.RequestModuleInterface<ISimulationBase> ().DefaultDataPath;
                     m_localHtmlPath = Path.Combine (defpath, Constants.DEFAULT_USERHTML_DIR);
                 }
+
+                // load up translators
+                foreach (var txlt in _translators) {
+                    txlt.Deserialize (m_localHtmlPath);
+                }
+
+                MainConsole.Instance.Info ("[WebUI]: Default language is " + _defaultTranslator.FullLanguageName);
             }
         }
 
@@ -196,11 +208,14 @@ namespace WhiteCore.Modules.Web
             if (filename == null)
                 return MainServer.BlankResponse;
 
+            //httpResponse.KeepAlive = true;
             if (httpRequest.HttpMethod == "POST")
                 httpResponse.KeepAlive = false;
+
             MainConsole.Instance.Debug ("[WebInterface]: Serving " + filename + ", keep-alive: " + httpResponse.KeepAlive);
             IWebInterfacePage page = GetPage (filename);
             if (page != null) {
+                // dynamic pages
                 httpResponse.ContentType = GetContentType (filename, httpResponse);
                 string text;
                 if (!File.Exists (filename)) {
@@ -225,6 +240,7 @@ namespace WhiteCore.Modules.Web
                     stm.Position = 1;
                     var sr = new StreamReader (stm);
                     string results = sr.ReadToEnd ().Trim ();
+
                     return Encoding.UTF8.GetBytes (Regex.Replace (results, @"[^\u0000-\u007F]", string.Empty));
                 } else {
                     string respStr;
@@ -245,9 +261,14 @@ namespace WhiteCore.Modules.Web
                         ConvertHTML (filename, text, httpRequest, httpResponse, requestParameters, vars));
                 }
             } else {
-                httpResponse.ContentType = GetContentType (filename, httpResponse);
-                if (httpResponse.ContentType == null || !File.Exists (filename))
+                // static files
+                if (!File.Exists(filename))
                     return MainServer.BadRequest;
+                
+                httpResponse.ContentType = GetContentType (filename, httpResponse);
+                if (httpResponse.ContentType == null)
+                    return MainServer.BadRequest;
+                
                 response = File.ReadAllBytes (filename);
             }
             return response;
@@ -473,34 +494,58 @@ namespace WhiteCore.Modules.Web
 
         protected string GetContentType (string filename, OSHttpResponse response)
         {
-            switch (Path.GetExtension (filename)) {
+            var setCache = true;    // default is to cache
+            var mimeType = "";
+
+            var ext = Path.GetExtension (filename);
+            switch (ext) {
             case ".jpeg":
             case ".jpg":
-                response.AddHeader ("Cache-Control", "Public;max-age=" + CLIENT_CACHE_TIME);
-                return "image/jpeg";
+                mimeType = "image/jpeg";
+                break;
             case ".gif":
-                response.AddHeader ("Cache-Control", "Public;max-age=" + CLIENT_CACHE_TIME);
-                return "image/gif";
+                mimeType = "image/gif";
+                break;
             case ".png":
-                response.AddHeader ("Cache-Control", "Public;max-age=" + CLIENT_CACHE_TIME);
-                return "image/png";
+                mimeType = "image/png";
+                break;
             case ".tiff":
-                response.AddHeader ("Cache-Control", "Public;max-age=" + CLIENT_CACHE_TIME);
-                return "image/tiff";
+                mimeType = "image/tiff";
+                break;
+            case ".woff":
+                mimeType = "application/font-woff";
+                break;
+            case ".woff2":
+                mimeType = "application/font-woff2";
+                break;
+            case ".ttf":
+                mimeType = "application/font-ttf";
+                break;
+            case ".css":
+                setCache = !filename.StartsWith ("styles", StringComparison.Ordinal);
+                mimeType = "text/css";
+                break;
             case ".html":
             case ".htm":
             case ".xsl":
-                response.AddHeader ("Cache-Control", "no-cache");
-                return "text/html";
-            case ".css":
-                //response.AddHeader("Cache-Control", "max-age=" + CLIENT_CACHE_TIME + ", public");
-                response.AddHeader ("Cache-Control", "no-cache");
-                return "text/css";
+                setCache = false;
+                mimeType = "text/html";
+                break;
             case ".js":
-                //response.AddHeader("Cache-Control", "max-age=" + CLIENT_CACHE_TIME + ", public");
-                return "application/javascript";
+                setCache = !filename.Contains ("menu");     // must not cache menu generation
+                mimeType = "application/javascript";
+                break;
+            default:
+                mimeType = "text/plain";
+                break;
             }
-            return "text/plain";
+
+            if (setCache)
+                response.AddHeader ("Cache-Control", "public, max-age=" + CLIENT_CACHE_TIME);
+            else
+                response.AddHeader ("Cache-Control", "no-cache");
+
+            return mimeType;
         }
 
         protected string GetFileNameFromHTMLPath (string path, Hashtable query)
@@ -542,8 +587,15 @@ namespace WhiteCore.Modules.Web
                             file = Path.Combine (file, "index.html");
                     }
 
-                    if (query.ContainsKey ("page") && _pages.ContainsKey ("html/" + query ["page"] + ".html")) {
-                        file = _pages ["html/" + query ["page"] + ".html"].FilePath [0];
+                    if (query.ContainsKey ("page")) {
+                        var subdir = "";
+                        if (query.ContainsKey ("subdir"))
+                            subdir = query ["subdir"] + "/";
+                        var wpage =  "html/" + subdir + query ["page"] + ".html";
+
+                        if (_pages.ContainsKey (wpage)) {
+                            file = _pages [wpage].FilePath [0];
+                        }
                     }
                 }
                 if (!File.Exists (file)) {
@@ -600,119 +652,7 @@ namespace WhiteCore.Modules.Web
             return result;
         }
 
-        /// <summary>
-        /// Webpage UL type arguments.
-        /// </summary>
-        /// <returns>The type arguments.</returns>
-        /// <param name="translator">Translator.</param>
-        public List<Dictionary<string, object>> UserTypeArgs (ITranslator translator)
-        {
-            var args = new List<Dictionary<string, object>> ();
-            args.Add (new Dictionary<string, object> {
-                {"Value", translator.GetTranslatedString("Guest")}, {"Index","0"} });
-            args.Add (new Dictionary<string, object> {
-                {"Value", translator.GetTranslatedString("Resident")}, {"Index","1"} });
-            args.Add (new Dictionary<string, object> {
-                {"Value", translator.GetTranslatedString("Member")}, {"Index","2"} });
-            args.Add (new Dictionary<string, object> {
-                {"Value", translator.GetTranslatedString("Contractor")}, {"Index","3"} });
-            args.Add (new Dictionary<string, object> {
-                {"Value", translator.GetTranslatedString("Charter_Member")}, {"Index","4"} });
-            return args;
-        }
 
-        /// <summary>
-        /// Convert to to user flags.
-        /// </summary>
-        /// <returns>The type to user flags.</returns>
-        /// <param name="userType">User type Index.</param>
-        public int UserTypeToUserFlags (string userType)
-        {
-            switch (userType) {
-            case "0":
-                return Constants.USER_FLAG_GUEST;
-            case "1":
-                return Constants.USER_FLAG_RESIDENT;
-            case "2":
-                return Constants.USER_FLAG_MEMBER;
-            case "3":
-                return Constants.USER_FLAG_CONTRACTOR;
-            case "4":
-                return Constants.USER_FLAG_CHARTERMEMBER;
-            default:
-                return Constants.USER_FLAG_GUEST;
-            }
-        }
-
-        /// <summary>
-        /// User flags to type string.
-        /// </summary>
-        /// <returns>The flag to type.</returns>
-        /// <param name="userFlags">User flags.</param>
-        /// <param name = "translator"></param>
-        public string UserFlagToType (int userFlags, ITranslator translator)
-        {
-            if (translator == null)
-                translator = EnglishTranslator;
-
-            switch (userFlags) {
-            case Constants.USER_FLAG_GUEST:
-                return translator.GetTranslatedString ("Guest");
-            case Constants.USER_FLAG_RESIDENT:
-                return translator.GetTranslatedString ("Resident");
-            case Constants.USER_FLAG_MEMBER:
-                return translator.GetTranslatedString ("Member");
-            case Constants.USER_FLAG_CONTRACTOR:
-                return translator.GetTranslatedString ("Contractor");
-            case Constants.USER_FLAG_CHARTERMEMBER:
-                return translator.GetTranslatedString ("Charter_Member");
-            default:
-                return translator.GetTranslatedString ("Guest");
-            }
-        }
-
-
-        public List<Dictionary<string, object>> RegionTypeArgs (ITranslator translator)
-        {
-            var args = new List<Dictionary<string, object>> ();
-            args.Add (new Dictionary<string, object> {
-                {"Value", translator.GetTranslatedString("Mainland")}, {"Index","0"} });
-            args.Add (new Dictionary<string, object> {
-                {"Value", translator.GetTranslatedString("Estate")}, {"Index","1"} });
-            return args;
-        }
-
-        public List<Dictionary<string, object>> RegionPresetArgs (ITranslator translator)
-        {
-            var args = new List<Dictionary<string, object>> ();
-            args.Add (new Dictionary<string, object> {
-                {"Value", translator.GetTranslatedString("FullRegion")}, {"Index","0"} });
-            args.Add (new Dictionary<string, object> {
-                {"Value", translator.GetTranslatedString("Homestead")}, {"Index","1"} });
-            args.Add (new Dictionary<string, object> {
-                {"Value", translator.GetTranslatedString("Openspace")}, {"Index","2"} });
-            args.Add (new Dictionary<string, object> {
-                {"Value", translator.GetTranslatedString("WhiteCore")}, {"Index","3"} });
-            args.Add (new Dictionary<string, object> {
-                {"Value", translator.GetTranslatedString("Custom")}, {"Index","4"} });
-            return args;
-        }
-
-        public List<Dictionary<string, object>> RegionTerrainArgs (ITranslator translator)
-        {
-            var args = new List<Dictionary<string, object>> ();
-            args.Add (new Dictionary<string, object> {
-                {"Value", translator.GetTranslatedString("Flatland")}, {"Index","0"} });
-            args.Add (new Dictionary<string, object> {
-                {"Value", translator.GetTranslatedString("Grassland")}, {"Index","1"} });
-            args.Add (new Dictionary<string, object> {
-                {"Value", translator.GetTranslatedString("Island")}, {"Index","2"} });
-            args.Add (new Dictionary<string, object> {
-                {"Value", translator.GetTranslatedString("Aquatic")}, {"Index","3"} });
-            args.Add (new Dictionary<string, object> {
-                {"Value", translator.GetTranslatedString("Custom")}, {"Index","4"} });
-            return args;
-        }
 
         internal GridPage GetGridPages ()
         {

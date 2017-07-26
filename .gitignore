@@ -67,6 +67,12 @@ WhiteCoreSim/bin/WhiteCore.exe
 # This is dependant upon x86/x64 and created at runtime
 WhiteCoreSim/bin/ode.dll
 
+# 20170112 - Exclude LibOMV libraries that are now included in the build process
+WhiteCoreSim/bin/CSJ2K.dll
+WhiteCoreSim/bin/OpenMetaverse.dll
+WhiteCoreSim/bin/OpenMetaverse.StructuredData.dll
+WhiteCoreSim/bin/OpenMetaverseTypes.dll
+
 # Data files
 
 WhiteCoreSim/Data/AssetCache/*

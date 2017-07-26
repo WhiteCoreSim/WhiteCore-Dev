@@ -14,6 +14,10 @@
 --------
 * Continue upgrade of the Physics engines (Bullet and ODE)
 
+# Various:
+--------
+* Implement a basic Marketplace which uses the VMM and Dropboxes methods
+* Upgrade LibOMV to be able to use the Bento bones and other related pieces of code
 
 #Wiki
 ----

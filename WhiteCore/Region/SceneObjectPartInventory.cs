@@ -789,7 +789,7 @@ namespace WhiteCore.Region
             List<TaskInventoryItem> items = Items.Clone2List ();
             foreach (TaskInventoryItem item in items) {
                 UUID ownerID = item.OwnerID;
-                const uint everyoneMask = 0;
+                uint everyoneMask = item.EveryonePermissions;
                 uint baseMask = item.BasePermissions;
                 uint ownerMask = item.CurrentPermissions;
                 uint groupMask = item.GroupPermissions;

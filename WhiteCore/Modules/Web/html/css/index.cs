@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 using System.Collections.Generic;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 
@@ -33,57 +32,59 @@ namespace WhiteCore.Modules.Web
 {
     public class CSSLanguageSetterPage : IWebInterfacePage
     {
-        public string[] FilePath
-        {
-            get
-            {
-                return new[]
+        public string [] FilePath {
+            get {
+                return new []
                            {
                                "html/css/"
                            };
             }
         }
 
-        public bool RequiresAuthentication
-        {
+        public bool RequiresAuthentication {
             get { return false; }
         }
 
-        public bool RequiresAdminAuthentication
-        {
+        public bool RequiresAdminAuthentication {
             get { return false; }
         }
 
-        public Dictionary<string, object> Fill(WebInterface webInterface, string filename, OSHttpRequest httpRequest,
+        public Dictionary<string, object> Fill (WebInterface webInterface, string filename, OSHttpRequest httpRequest,
                                                OSHttpResponse httpResponse, Dictionary<string, object> requestParameters,
                                                ITranslator translator, out string response)
         {
             response = null;
-            var vars = new Dictionary<string, object>();
+            var vars = new Dictionary<string, object> ();
 
-            vars.Add("DisplayLG1", "display: none;");
-            vars.Add("DisplayLG2", "display: none;");
-            vars.Add("DisplayLG3", "display: none;");
-            vars.Add("DisplayLG4", "display: none;");
-            vars.Add("DisplayLG5", "display: none;");
-            vars.Add("DisplayLG6", "display: none;");
+            vars.Add ("DisplayLG1", "display: none;");
+            vars.Add ("DisplayLG2", "display: none;");
+            vars.Add ("DisplayLG3", "display: none;");
+            vars.Add ("DisplayLG4", "display: none;");
+            vars.Add ("DisplayLG5", "display: none;");
+            vars.Add ("DisplayLG6", "display: none;");
+            vars.Add ("DisplayLG7", "display: none;");
+            vars.Add ("DisplayLG8", "display: none;");
             if (translator.LanguageName == "en")
-                vars["DisplayLG1"] = "";
+                vars ["DisplayLG1"] = "";
             if (translator.LanguageName == "fr")
-                vars["DisplayLG2"] = "";
+                vars ["DisplayLG2"] = "";
             if (translator.LanguageName == "de")
-                vars["DisplayLG3"] = "";
+                vars ["DisplayLG3"] = "";
             if (translator.LanguageName == "it")
-                vars["DisplayLG4"] = "";
+                vars ["DisplayLG4"] = "";
             if (translator.LanguageName == "es")
-                vars["DisplayLG5"] = "";
+                vars ["DisplayLG5"] = "";
             if (translator.LanguageName == "nl")
-                vars["DisplayLG6"] = "";
+                vars ["DisplayLG6"] = "";
+            if (translator.LanguageName == "ru")
+                vars ["DisplayLG7"] = "";
+            if (translator.LanguageName == "zh_CN")
+                vars["DisplayLG8"] = "";
 
             return vars;
         }
 
-        public bool AttemptFindPage(string filename, ref OSHttpResponse httpResponse, out string text)
+        public bool AttemptFindPage (string filename, ref OSHttpResponse httpResponse, out string text)
         {
             text = null;
             return false;

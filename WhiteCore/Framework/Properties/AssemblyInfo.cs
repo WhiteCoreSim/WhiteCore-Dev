@@ -32,13 +32,13 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 
-[assembly: AssemblyTitle("WhiteCore.Framework")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyCompany("WhiteCore Development Team")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("http://WhiteCore-sim.org")]
 [assembly: AssemblyCopyright("Copyright © 2014-2016")]
-[assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("WhiteCore.Framework")]
+[assembly: AssemblyTrademark("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
@@ -58,4 +58,4 @@ using System.Runtime.InteropServices;
 //      Revision
 //
 
-[assembly: AssemblyVersion("0.9.4.*")]
+[assembly: AssemblyVersion("0.9.5.*")]

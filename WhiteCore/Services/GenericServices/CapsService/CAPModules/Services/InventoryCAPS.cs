@@ -142,11 +142,14 @@ namespace WhiteCore.Services
         public byte [] HandleFetchInventoryDescendents (Stream request, UUID agentID)
         {
             OSDMap map = (OSDMap)OSDParser.DeserializeLLSDXml (HttpServerHandlerHelpers.ReadFully (request));
+            if (map ["folders"].Type == OSDType.Unknown) {
+                MainConsole.Instance.Error ("[InventoryCAPS]: Call to 'FetchInventoryDescendants' with missing 'folders' parameter");
+                return MainServer.BadRequest;
+            }
             OSDArray foldersrequested = (OSDArray)map ["folders"];
             try {
                 //MainConsole.Instance.DebugFormat("[InventoryCAPS]: Received WebFetchInventoryDescendents request for {0}", AgentID);
-                return m_inventoryData.FetchInventoryReply (foldersrequested, agentID,
-                    UUID.Zero, m_libraryService.LibraryOwner);
+                return m_inventoryData.FetchInventoryReply (foldersrequested, agentID, UUID.Zero, m_libraryService.LibraryOwnerUUID);
 
             } catch (Exception ex) {
                 MainConsole.Instance.Warn ("[InventoryCAPS]: SERIOUS ISSUE! " + ex);
@@ -165,11 +168,14 @@ namespace WhiteCore.Services
             try {
                 //MainConsole.Instance.DebugFormat("[InventoryCAPS]: Received FetchLibDescendents request for {0}", agentID);
                 OSDMap map = (OSDMap)OSDParser.DeserializeLLSDXml (HttpServerHandlerHelpers.ReadFully (request));
+                if (map ["folders"].Type == OSDType.Unknown) {
+                    MainConsole.Instance.Error ("[InventoryCAPS]: Call to 'FetchLibDescendants' with missing 'folders' parameter");
+                    return MainServer.BadRequest;
+                }
                 OSDArray foldersrequested = (OSDArray)map ["folders"];
 
-                return m_inventoryData.FetchInventoryReply (foldersrequested,
-                    m_libraryService.LibraryOwner,
-                    agentID, m_libraryService.LibraryOwner);
+                return m_inventoryData.FetchInventoryReply (foldersrequested, m_libraryService.LibraryOwnerUUID,
+                                                            agentID, m_libraryService.LibraryOwnerUUID);
 
             } catch (Exception ex) {
                 MainConsole.Instance.Warn ("[InventoryCAPS]: SERIOUS ISSUE! " + ex);
@@ -185,8 +191,10 @@ namespace WhiteCore.Services
             try {
                 //MainConsole.Instance.DebugFormat("[InventoryCAPS]: Received FetchInventory request for {0}", agentID);
                 OSDMap requestmap = (OSDMap)OSDParser.DeserializeLLSDXml (HttpServerHandlerHelpers.ReadFully (request));
-                if (requestmap ["items"].Type == OSDType.Unknown)
+                if (requestmap ["items"].Type == OSDType.Unknown) {
+                    MainConsole.Instance.Error ("[InventoryCAPS]: Call to 'FetchInventory' with missing 'items' parameter");
                     return MainServer.BadRequest;
+                }
 
                 OSDArray foldersrequested = (OSDArray)requestmap ["items"];
                 OSDMap map = new OSDMap { { "agent_id", OSD.FromUUID (agentID) } };
@@ -221,6 +229,10 @@ namespace WhiteCore.Services
             try {
                 //MainConsole.Instance.DebugFormat("[InventoryCAPS]: Received FetchLib request for {0}", agentID);
                 OSDMap requestmap = (OSDMap)OSDParser.DeserializeLLSDXml (HttpServerHandlerHelpers.ReadFully (request));
+                if (requestmap ["items"].Type == OSDType.Unknown) {
+                    MainConsole.Instance.Error ("[InventoryCAPS]: Call to 'FetchLib' with missing 'items' parameter");
+                    return MainServer.BadRequest;
+                }
                 OSDArray foldersrequested = (OSDArray)requestmap ["items"];
                 OSDMap map = new OSDMap { { "agent_id", OSD.FromUUID (agentID) } };
                 OSDArray items = new OSDArray ();

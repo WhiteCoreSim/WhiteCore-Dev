@@ -7,15 +7,12 @@
 	<meta name="description" content="{SystemName}"/>
 	<link rel="shortcut icon" href="../images/icons/favicon.ico" />
 
-
 	<!-- StyleSwitch -->
 	<link href="{SystemURL}/css/styles1.css" rel="stylesheet" type="text/css" media="screen" title="styles1" />
 	<link href="{SystemURL}/css/styles2.css" rel="alternate stylesheet" type="text/css" title="styles2" media="screen" />
 	<link href="{SystemURL}/css/styles3.css" rel="alternate stylesheet" type="text/css" title="styles3" media="screen" />
 	<link href="{SystemURL}/css/styles4.css" rel="alternate stylesheet" type="text/css" title="styles4" media="screen" />
 	<link href="{SystemURL}/css/styles5.css" rel="alternate stylesheet" type="text/css" title="styles5" media="screen" />
-
-
 </head>
 
 <body>
@@ -49,7 +46,9 @@
 		  <li><a href="?language=it" rel="it" class="languageswitch" alt="{it}" title="<img src='../images/flags/flag-it.png' alt='it' /> {it}">it</a></li>
 		  <li><a href="?language=es" rel="es" class="languageswitch" alt="{es}" title="<img src='../images/flags/flag-es.png' alt='es' /> {es}">es</a></li>
 		  <li><a href="?language=nl" rel="nl" class="languageswitch" alt="{nl}" title="<img src='../images/flags/flag-nl.png' alt='nl' /> {nl}">nl</a></li>
-		{StyleSwitcherChoiceText}: <span id="lg1">en</span><span id="lg2">fr</span><span id="lg3">de</span><span id="lg4">it</span><span id="lg5">es</span><span id="lg6">nl</span>
+          <li><a href="?language=ru" rel="ru" class="languageswitch" alt="{ru}" title="<img src='../images/flags/flag-ru.png' alt='ru' /> {ru}">ru</a></li>
+          <li><a href="?language=zh_CN" rel="zh_CN" class="languageswitch" alt="{zh_CN}" title="<img src='../images/flags/flag-zh_CN.png' alt='zh_CN' /> {zh_CN}">zh_CN</a></li>
+		{StyleSwitcherChoiceText}: <span id="lg1">en</span><span id="lg2">fr</span><span id="lg3">de</span><span id="lg4">it</span><span id="lg5">es</span><span id="lg6">nl</span><span id="lg7">ru</span><span id="lg8">zh_CN</span>
 		</ul>
 	  </div>
 {IfShowLanguageTranslatorBarEnd}
@@ -91,10 +90,8 @@
 		var options5 = {format: '%m/%d/%y'}
 		$('#jclock5').jclock(options5);});
 
-
 	<!-- Tooltips -->
 	function tooltip() {$('#container *').tooltip({showURL: false});};
-
 
 	  $(document).ready(function()
 	  {
@@ -114,6 +111,7 @@
 				result[tmp[0]] = unescape(tmp[1]);
 			}
 		}
+
 		//load selected section
 		var pageName = result["page"];
 		var found = new Boolean(0);
@@ -135,10 +133,10 @@
 				found = new Boolean(1);
 				break;
 		}
-		if(found == 0)
+
+        if (found == 0)
 			content.load("base.html" + window.location.search);
 	});
-
 
 	// fade class
 	$("li.fade, a.fade").hover(function(){$(this).fadeOut(150);$(this).fadeIn(150);});
@@ -150,17 +148,17 @@
 </html>
 
 <!-- params to replace
-{SystemURL}
-{SystemName}
-{UserName}
-{UserBorn}
-{UserType}
-{UserPartner}
-{UserAboutMe}
-{UserPictureURL}
-{UserProfileFor}   User Profile For
-{ResidentSince}    Resident Since
-{AccountType}      Account Type
-{PartnersName}     Partner's Name
-{AboutMe}          About Me
+SystemURL
+SystemName
+UserName
+UserBorn
+UserType
+UserPartner
+UserAboutMe
+UserPictureURL
+UserProfileFor   User Profile For
+ResidentSince    Resident Since
+AccountType      Account Type
+PartnersName     Partner's Name
+AboutMe          About Me
 -->

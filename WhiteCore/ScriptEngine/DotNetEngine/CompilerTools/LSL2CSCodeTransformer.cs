@@ -727,7 +727,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
                     Constant rca = new Constant(p, "float", "0.0");
                     Constant rcb = new Constant(p, "float", "0.0");
                     Constant rcc = new Constant(p, "float", "0.0");
-                    Constant rcd = new Constant(p, "float", "0.0");
+                    Constant rcd = new Constant(p, "float", "1.0");
                     ConstantExpression rcea = new ConstantExpression(p, rca);
                     ConstantExpression rceb = new ConstantExpression(p, rcb);
                     ConstantExpression rcec = new ConstantExpression(p, rcc);

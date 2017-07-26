@@ -1395,11 +1395,17 @@ namespace WhiteCore.Region
 
         public void SetOwnerId(UUID userId)
         {
-            ForEachPart(delegate(SceneObjectPart part)
-                            {
-                                part.LastOwnerID = part.OwnerID;
-                                part.OwnerID = userId;
-                            });
+        	ForEachPart(delegate(SceneObjectPart part)
+        	            {
+        	            	if (part.OwnerID != userId)
+        	            	{
+        	            		if (part.GroupID != part.OwnerID)
+        	            		{
+        	            			part.LastOwnerID = part.OwnerID;
+        	            			part.OwnerID = userId;
+        	            		}
+        	            	}
+        	            });
         }
 
         public float GetMass()
@@ -2963,15 +2969,12 @@ namespace WhiteCore.Region
             {
                 if (rootpart.PhysActor != null)
                 {
-                    if (height != 0f)
-                    {
+                    if (Math.Abs (height) > 0.01f) {
                         rootpart.PIDHoverHeight = height;
                         rootpart.PIDHoverType = hoverType;
                         rootpart.PIDTau = tau;
                         rootpart.PIDHoverActive = true;
-                    }
-                    else
-                    {
+                    } else {
                         rootpart.PIDHoverActive = false;
                     }
                 }

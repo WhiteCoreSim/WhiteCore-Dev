@@ -1,0 +1,4912 @@
+SQLite data manager
+- Temporary fix to process DateTime query filters used for event detail retrieval
+
+Event addition
+- Mainland is owned by the Real Estate Owner , not the 'Gov'
+
+Update .pullapprove.yml
+Adding PullApproval for PR requests
+Cleaning up the README
+
+WebUI translations
+- Correct duplicated entries introduced during cleanup and refactoring
+
+DisplayNames
+- Implement configurable time between updates ( default disabled )
+- Change configuration section from [DisplayNamesModule] to [DisplayNames]
+- Additional 'UpdateDays' configuration option
+- Add DisplayNames sections to Standalone configurations
+
+Scene Manager
+- Revise 'show objects' to allow for fuzzy searching in object names
+-- Correct filtering for objects with short names
+- Reformat & refactoring
+
+Dialog module
+- Minor info corrections
+- Reformat
+
+Updating LSL2CSCodeTransformer
+
+* Correction rotation constant initialization
+
+Whitecore 0.9.4 Release Candidate 2
+
+* This marks the 2nd RC build for the upcoming 0.9.4 release
+
+WebUI (Last update before re-design)
+- Pages re categorised in to user options
+- Multiple duplications moved to a 'web helpers' unit
+- Continuing tidy up of html code
+- Edit/Add user event added
+- Region manager preview for User & Admin
+- Estate manager preview for User & Admin
+- Heaps of tweaking etc
+
+XMLRPC services
+- Move to grid server as this appears to be it's home - Tested OK
+
+Cleaning the AssemblyInfo files
+
+* As a preparation for the upcoming release, standardizing all files to the new template
+
+Whitecore 0.9.4 Release Candidate 1
+
+* This marks the 1st RC build for the upcoming 0.9.4 release
+
+Region settings (Estates)
+- Split and corrected maturity setting
+- Add interactivity for all set region setting commands
+
+Cloaking warnings that have been clogging up
+
+* Removed them being visible, they are still there to have a look at later
+
+Fix some Escaping of Strings
+Fix Some Typos
+Update German Translation
+
+Update incorrect Strings to reflect the correct translation
+Update BaseApplication.cs
+
+Adding missing config options from the .example file
+osNPCcreate
+- Default creation of NPC to be owned by the creator
+
+WebUI / Web texture
+- Trap invalid texture UUID's
+
+Avatar Appearance (WebUI)
+- Correct setting of default store directory in grid mode
+
+WebUI
+- General update and format cleanup (Additional menus require a Factory reset)
+- Streamline caching
+- Implement streamlined translations
+- Add bootstrap 3.3.7
+- Fully implement classified listing
+- Update EventData
+- Implement Events listing and add event
+- Correct Classified and Events viewer search (maturity levels)
+
+LibOMV libraries (0.9.4.5) (Issue #214)
+- Rebuild using .Net 4.0 for AnyCPU
+
+Update Italian translation
+
+doing my job time to time...
+Pushing clean compiled Mono versions of LibOMV
+
+* Let's see if this fixes issue #214
+
+Update README.md
+
+Making the README look better, adding the Whitecore IRC info and removing the broken issue reporting images
+Email settings (thanks to YouCanDoIt)
+- additional information re Gmail configuration
+
+Update appveyor.yml
+
+Change small detail that was overlooked in the settings
+Updating LSL Constants
+
+* Adding the Project Bento Bones
+* Adding the new OBJECT constants values
+
+And updating the other Servers as well
+
+* Upgraded Prebuild.xml to allow icons to be set
+
+Adding icons to the services
+
+* Whitecore.Server.exe and Whitecore.exe will now have their own icons
+
+Web interface
+- Change caching options for static files
+
+Asset services (probable solution for issue # 212)
+- Correct logic for returning cached assets (when enabled)
+- Additional 'migrate sql assets <enable|disable> command to override configured option (Filebased & Redis only)
+- Minor tweaks
+
+Map generation
+- Minor changes
+
+Configuration templates
+- Add mainland name option to StandaloneCommon
+
+Configurator assistant
+- Add option for asset services (data.ini)
+
+Filebased assets
+- Ensure defaults are set
+
+Grid region default region position
+- Provide configurable option to set initial region location and WebUI map centre
+
+WebUtils
+
+* Fixing a typo because of overflow
+
+WebUtils - Error reporting
+- Limit size of response data shown in error messages
+
+User Partnership
+
+* Adding a reminder for the WebUI users to be able to propose partnership to another user
+
+Security measurements change
+
+* Seems Mono 4.x has a new Randomizer which makes the password out of range
+
+Updated LandData (LibOMV 0.9.4.5)
+- Update Landobject when altering landdata details so that it is saved/restored correctly
+
+RegionSetting
+- Change default for AllowLandResale & AllowLandJoinDivide to 'False' as the the restore using Protobuf does not specifically set the default condition (false)
+- Add saving of any Telehub settings to the region data
+
+WorldShader
+- More exceptional resoure leak plugging
+
+Cleaning up some more mess
+
+* References need to be fixed
+
+Translations
+
+* Updated the Dutch translation, it had an error in it
+
+Classifieds - Translations updates
+
+* This makes sure the Classifieds page is loading properly with all the languages for now
+
+WebUI
+- Additional images
+
+WebUI
+- Correct login URI shown on help screen when in Grid mode
+- Revise help page
+  -- provide a link to login (for those viewers that support this)
+  -- remove older, possisbly non supported viewers
+  -- add Android, IOS, and text viewers
+ - Update grid settings to include details for Governor, Mainland, Banker & Marketplace owner
+   (Requires a grid settings factory reset to update)
+- Additional translation details as required
+
+LibOMV update
+(V 0.9.4.5, Jun 25, 2016)
+
+- Update LibOMV binaries to include the latest corrections
+
+Land Properties
+
+* Updating the Land Properties to have the new abilities added
+
+XMLPRC server
+- Disable startup for grid instances (Region only)
+
+* IDirectoryServiceConnector.cs:
+* LocalDirectoryServiceConnector.cs: Directory Services
+- Initial inplementation of event llisting for WebUI/API
+
+* classifieds.cs: Classifieds
+- Minor formatting
+
+GenericServices
+- Minor additions for resource leaks
+
+Noitifications- BaseService
+- Remove resource assignment wwhen adding fallback console
+
+FlotsamCache
+- Revision to try and prevent uncaught exceptions
+
+UnsafeBMP
+- Exception processing
+
+LSL_API - llTeleportAgent
+- Rework teleport to landmark logic
+
+AgentAppearance
+- Resource leak correction
+
+Scripting - Maintnenace Thread
+- Revised and additional locking
+
+* region_manager.cs: RegionManager
+- Minor clean up
+
+* WebInterface.cs: WebUISettings
+- Default to map center of 1000, 1000
+
+Scripting (DotNet)
+- Additional cleanup of null references, data races and resource leaks
+
+AgenAppearance
+- Plugged a resource leak
+
+Base Services
+- Use local console if console is misconfigured
+
+Base
+- Correct start up banner (if provided)
+- Mior message reformatting
+- General cleanup
+
+Configuration
+- Provide for a 'MyGrid.ini' override for basic grid configuration
+
+Console services
+- General tidy up
+
+Scripting (Minimodule)
+- Correct null references
+- Correct resource leaks
+
+* OSHttpResponse.cs: Http response
+- Additional try/catch when setting response fileds
+
+* AssetCAPS.cs: AssetCaps
+- Additional exception prrcessing
+
+* MySQLDataManager.cs: MySql
+- Modofoed closoing of datareader
+- Close inital connection before checking migration status
+
+* SQLiteDataManager.cs: SQLite
+- Replace exceptions with console message during command execution
+
+* Util.cs: Utils
+- Additional float/double helper functions ApproxEqual(a,b) &
+  ApprozZero(a)
+
+* ScenePresence.cs: Scene Presence
+- Null reference correction
+- Minor code optimisation & cleanup
+
+DotNet engine
+- 1st pass cleanup
+- Dereferenced nulls
+- Data concurrency
+- Resource leaks
+
+ScenePrsence
+- Correct DrwaDistance setter
+
+WebUI - Classifieds
+- Initial implementation
+
+Additional exception resource leak plugging
+
+Database managers
+- Additional exception checks
+- Resource leak corrections
+
+LSL API
+- General standardize and code cleanup
+- Implement float equals functionality to account for floating point precision differences
+
+AA _API
+- General code standarise and cleanup
+
+Additional corrections (previous commits)
+- Null references
+- Data concurrency
+- Resource leaks
+
+Region module
+- 1st pass corrctions and cleanup
+- Null  references, resource leaks, data access locking
+
+Physics
+- Clean up resource leaks & incorrect expressions
+
+ODE physics
+- 1st pass
+- Correct null pointer referenes, concurrent data access, invalid logic
+
+LLUDP server
+- Change '..UseCircuitCode...' timing messages to debug (console spamming)
+
+BulletSim Physics
+- 1st pass cleanup
+- Null pointer references, thread locks and invalid program expressions
+
+Various
+- Additional exception resource leak corrections revealed by latest corrections
+
+XMLPRC
+- Rework to use main http server base
+- Correct resource leaks
+- General code cleanup
+
+Map tile generation
+- Plug resource leaks
+- Correct expression problems where necessary
+
+Visitor Logger
+- Correct a few resource leaks
+
+World/Terrain
+- Plug some resource leaks
+- General code cleanup
+
+LSL Http handler
+- Additional locking for concurrent access
+- Code cleanup
+
+Sim Protection
+- Correct concurrent data access locking
+- Code cleanup
+
+Avatar/Search
+- Check for possible null return
+
+Scripting (Images)
+- Correct some resource leaks
+
+WorldCamms
+- Additional locking for data race conditions
+
+Email
+- Correct resource leak
+- Correct concurrent data access
+
+Dynamic texture module
+- Correct null reference errors
+- Correct resource leaks
+- Code cleanup
+
+Restart module
+- Remove redundant null check
+- Code cleanup
+
+Avatar Profile
+- Correct null reference errors
+
+COrrections missed in previous commits
+
+PhysicsState
+- Correct resource leak
+
+Monitoring
+- Add additional locks for concurrent data access
+- General code cleanup
+
+World Parcel management
+- Correct concurrent data access na hang situations
+
+Avatar Inventory
+- Correct possible null refereneces
+
+Groups module
+- Correct possible null references
+- Code cleanup & refactor
+
+Code cleanup
+- Clouds & Default IAR loader
+
+Inventory access
+- General code cleanup
+
+Filebased sim data
+- Correct some null refereneces
+- Code cleanup
+
+Entiry modules
+- Correct concurrent data access and unreliable locking
+- Correct possible null references
+- General code cleanup
+
+Estate modules
+- Correct data race
+- Trap possible null reference
+- General code cleanup
+
+Currency module
+- Clean up possible null derefernece issues
+- General code tidy up
+
+RenderMaterials
+- Correct introduced null reference error
+
+BanCheck module
+- Correct possible null references
+- General code cleanup
+- Move to PresenceInfo migrators to DataManager/Migrators
+
+Auction module
+- Correct null references
+- Code cleanup
+
+Additional corrections
+- null,data access, resource leaks
+
+Local Data connectors (where required)
+- Refactor remote calls when configured
+- Correct null reference errors
+- Correct resource leaks
+- Correct concurrent data access conditions
+- General code cleanup
+
+Generic (Filebased) services
+- Correct null reference errors
+- Correct data concurrency issues
+- Correct resource leaks
+- Code cleanup
+
+Sql Services (where required)
+- Refactor remote calls when configured
+- Correct null reference errors
+- Correct resource leaks
+- General code cleanup
+
+Modules cleanup (where necessary)
+- Null reference checks
+- Resource leaks
+- Concurrent data access corrections
+- General code cleanup
+
+WebUI
+- Increase input entries to 25px to avoid font cutoff
+- Remove look from the grid status 'online' box (Security & spam measure, only available when logged in)
+
+LocalUserInfo connector
+- Missed in previous commit
+
+Framework modules
+- Correct concurrent data access, null references and resource leaks
+- Code cleanup
+
+Inventory & Region Archive
+- Correct null references and resource leaks
+- Revise console output during loading
+- Code cleanup
+
+Region caps service
+- Change handling mess to 'debug' to remove console spam
+- Minor cleanup
+
+WebUI
+- Additional cleanup of html pages
+
+WebUI
+Note: This update requires a 'Factory Reset' by a logged in admin level user
+( Login > Settings > Factory reset)
+- Update and correct problems in preparation for UI re-design
+- Convert all lists to use datatables
+- Revise html code for cleaner formatting
+
+Generic Services
+- General cleanup in ...
+  -- Messaging
+  -- Notification
+  -- Scheduler
+  -- Simulation
+  -- System Accounts
+
+Remove exceptions
+ArchiveHelpers, PriorityQueue
+- Replace throwing exceptions with a console error to allow for graceful recovery
+
+Console modules
+- Update locking scheme
+- Code cleanup
+
+AvatarAppearance
+- Update locking scheme
+- Code cleanup
+
+Chat module
+- Corrected problems introduced during a previous refactoring to check for null references
+  (incorrect logic applied for filtering messages)
+
+WorldAPI
+
+* Seems I forgot to check these in
+
+Automated Coverity scan builder
+- Windows only
+- to ease the pain (and lack documentation)
+
+Update Readme files
+
+MySqlDataManager
+- Correct broken build - missing a couple of lines obviously added after the commit
+
+Simulator features
+- Correct null reference error
+
+MapCAPs
+- Correct null reference error
+- Code cleanup
+
+InventoryCAPS
+- Correct null references
+- Correct resource leaks
+- Code cleanup
+
+Caps/GroupAPI
+-Correct possible null reference errors
+- Code cleanup
+
+Caps service
+- Correct possible null reference errors
+- Code cleanup
+
+Upload Object assets
+- Correct null references
+
+Avatar Factory (Appearance)
+- Correct null references and resource leaks
+- Code cleanup
+
+Calling cards
+- Correct null references
+- Code cleanup
+
+Avatar Chat module
+- Correct null references and resource leaks
+
+Combat module
+- Correct resource leaks
+
+Friends module
+- Correct null references and resource leaks
+
+Gods (missed in last commit)
+- Correct null references and resource leaks
+
+God module
+- Correct null references and resource leaks
+
+ObjectCache
+- Plug some leaking resources
+
+Avatar service
+- Small tweaks to ensure appearance is saved before trying to set the avatar's appearance
+
+Language update
+
+* Might also help when I add the Russian to the list ... duh!
+
+Language update
+
+* Upcoming PR will have Russian, adding support for it to the index already
+
+Licensing updates
+
+* Any license in our files will be explained in 1 of these files
+
+Updating DoxyGen
+
+* Newer version of the config file
+
+Namespace fix
+
+* Seems this has been lingering for a while
+
+Utilities
+- Remove defunct 'InputBox' dialogs
+
+Utils
+ - Code cleanup
+- Plug a few leaks
+
+Additional fixes from Coverity scan
+
+WhitecoreXmlDocument
+- Correct null references
+
+WhiteCoreThreadPool
+- Additional locking for concurrent data access
+
+BaseHttpServer
+- Correct minor typo in console logging
+
+Utilities
+- Correct resource leaks
+
+TimedSave
+- Additional locking for concurrent data access
+
+MutlipartForm
+- Correct null references
+
+Utilities/Lazy
+- Correct null references
+- Correct data ice condition
+
+DoubleDictionary
+- Additional locking for concurrent data access
+
+CnmSynchronizedCache
+- Additional locking for concurrent access
+
+InventoryFolderImpl
+- Additional locking to correct concurrent access
+
+HttpServer/PollService*
+- Correct data race condition in PollServiceRequestManager
+- Code refactoring
+
+BaseHttpServer
+- Correct resource leaks
+- Code refactoring
+
+Serialization/External
+- Minor code refactoring (no operational changes)
+
+Serialization/Archive*
+- Correct resource leaks in ArchiveHelper
+- Code refactoring
+
+SceneInfo/Entities*
+- Code refactoring
+
+SceneInfo/UUIDGatherer
+- Additional locking for concurrent access
+
+SceneInfo/UndoState
+- Removed ChangedRot flags in PlaybackState as rotation was always being reset
+
+SceneInfo/Terrain*
+- Correct null reference issues
+- Correct resource leaks
+- Code refactoring
+
+SceneInfo/ClientManager
+- Additional locking for concurrent access
+
+Console framework
+- Correct null references
+- Additional locking where required for concurrent access
+- Code refactoring & cleanup
+
+Configuration Loader
+- Correct resource leaks
+- Code refactoring
+
+Some minor code reformatting during  issue fixes
+(No code changes)
+
+Correct my Fix README.md commit
+
+NOTE: I was incorrect the file name given by Fly-Man was wrong it is Updating from a pre 0.9.2 version.txt so I have corrected this.
+
+Fix README.md
+
+- Removed the note relating to 0.9.2 as this was removed previously last year during cleanup and the Migrating to 0.9.2.txt was removed at that time.  Everyone should already be on the most current stable version anyway.
+
+Fix licensing in the physics engines
+
+- Restore URLs back to the license as necessary to provide proper credit to sources for ethical development reasons.
+- Organize a couple using references
+
+NOTE 1: Bulletsim was in fact in Aurora-Sim but was not constantly maintained
+
+Note 2: ODE was in fact the physics engine used by default in Opensimulator 0.6.3
+
+Update README.md
+
+And a final stab at correcting my own typing errors
+Update README.md
+
+Typing mistake
+Update README.md
+
+Adding a new line about error reporting
+Framework/AvatarAppearance
+- Additional locking
+
+SQLiteDataManager
+- Ensure release of query cmd to prevent resource leaks
+
+Framework - AnimationSet
+- Additional locking
+- Code cleanup
+
+Migration tweaks (minor)
+- Correction of some resource leaks in migration procssing
+
+J2KDecoder module
+- Correction of some faulty logic in previous update commit # f398079...
+
+Clientstack
+- Code cleanup
+- Additional locking in LLClientView & LLUDPSevrer
+- Correct possible null references
+
+WebUI
+- Update JQuery in all views to V2.2.3
+
+Region sim config (Grid Mode)
+- !!  Important  !!
+- Add back asset server handler hooks.
+ ( Inadvertently removed when setting Filebased assets as default service - Effects region server in grid mode only)
+
+Archivers (Inventory/Region)
+- Code work to trap possible null references
+- Remove some resource leaks
+- Code cleanup
+
+Appearance archiver
+- Code work to trap possible null references
+- Fix some resource leaks
+- Code cleanup
+
+AssetServices
+- Code work to trap possible null references
+- Code cleanup
+
+J2KDecoder
+- Code work to trap possible null references
+
+Permissions module
+- Additional checks for valid parcel management interface
+
+Archive readers
+- Add exception traps in case of invalid file names(path) in an archive
+
+WebUI pages
+- Correct some typo's in null check logic
+
+Oar load script problem - issue #197
+- Corrected lockout issue in SceneObjecParttInventory introduced in commit # 477e9abd...
+  Prevented scripts from being saved/added during an OAR load
+
+Formatting updates
+
+Openjpeg libraries
+- Add x86-64 build dylib for X64 version of Mono for Mac OSX (Mono beta V4.2)
+-Update configs where required
+- Remove tracking of ode.dll as this is created at runtime from the appropriate x86/x64 library
+
+Estate module
+- Corrections and code updates
+
+Estates (Issue #197 - part)
+- Re-work 'change estate' command
+- Add a non region specific version 'change regionestate'
+
+Bots (NodeGraph)
+- Refactor NodeGraph.CurrentPos to a get/set so that it can be liked during access
+- Minor cleanup
+
+Resource plugging and Exception catches
+- Generic services
+
+Create CONTRIBUTING.md
+Delete CONTRIBUTING.md
+
+Moving this file to the root
+Make a correction to the licensing files commit
+
+- Delete the repeated urls
+- Put the urls in the license in the correct chronological order from most recent to earliest (left is most recent right is oldest source)
+
+NOTE: Thanks -Fly-Man- for pointing this out.
+
+Correct some more license text
+
+- Found a few more licensing texts that didnt have WhiteCore-Sim mentioned so corrected that.
+
+Note: Some of these may also have come to WhiteCore-Sim from Aurora-Sim but will have to check and compare.
+
+Couple of tweaks for webUI (Builtin)
+
+- Point the SystemEstateOwnerName and SystemEstateName to the names configured in Constants
+- Fix missing license text in files as necessary
+
+NOTE: This causes no functional changes and has passed tests on Windows, Mac, and Linux.
+
+WebUI (Built in)
+- Correct possible null exception erros
+- Correct some resource leaks
+- Update JQuery to 2.2.3 (remove older versions)
+- General refactoring
+
+Load and Save Salted Users
+
+* Adding a basic idea what Load and Save with salted passwords should become
+* PoC, not working yet as we don't have a CreateSaltedUser that calls both Auth and User_accounts yet
+
+Logging
+- Catch potential exception error if unable to write to log file
+
+Save Users upgrade
+
+* Added the SQL query string that will export the complete user list with the salted information
+
+* PoC only
+
+Security measurements
+
+* Upgrading the password generator to make longer passwords
+
+Profile upgrade
+
+* Show that System Users are indeed users of the Whitecore environment
+
+Cleanup the Library Inventory console message while we are at it
+
+Forgot the using reference for last commit so add it now.
+
+Move the DEFAULT_OAR_BACKUP_FILENAME configuration to constants
+
+- This will make life alot easier with these in one location.
+
+NOTE: No functionality changed just moved to constants.
+
+General cleanup for the archiver and inventory
+
+- Cleanup unnecessary whitespaces
+- Console message fixes
+- Organize using references
+
+NOTE: No functionally affected
+
+A little console cleanup
+
+- Make the startup of WhiteCore-Sim look a little better
+- Clean up some unnecessary whitespaces
+- Add a comment for Greythane relating to the m_saveCrashDump()
+
+NOTE: No functional changes just makes the console message for WhiteCore look better on startup.
+
+Add-on modules Readme update
+
+Asset Service
+- Minor optimising if caching used
+
+Experience CAPS
+- Add 'empty' return value rather than null to keep the viewers happy and report 'No experiences'
+  (Experience details to be added as they become available)
+
+Group currency
+- Check if details exist before creating  anew group balance record
+  -- It appears that GetGroupBalance() is called multiple time in quick succession
+      giving duplicate key errors
+
+OSHttpdRequest
+- Trap and ignore if query string has no key data
+   (Experience request appears to do this )
+
+Asset service
+- Updates, corrections and cleanup
+
+Grid service
+- Updates, corrections and cleanup
+
+NoSQL corrections
+- Additional locking in RedisConnectionHelper
+- Minor code updates
+
+System Estate service
+- Code cleanup and refactoring
+
+Inventory service
+- Correct inconsistent references in FolderItemExists()
+- Correct a couple of possible null references
+- Correct concurrent locking in SceneObjectPartInventory
+- Code cleanup and refactoring
+
+User account services
+- Correct possible reference errors and suspect code
+
+BotManager
+- Update locking
+
+Corrections
+- Correct invalid code and references
+
+LibOMV update
+(V 0.9.4.4, Mar 21, 2015)
+- Update LibOMV binaries to include the latest corrections
+
+Asset database
+- Default to using 'FileBased' assets instead of SQL database (grid/standalone)
+- Enable 'FileBasedAssets' for Standalone instances
+- Update Config files appropriately
+- Minor refactoring in FileBasedAssetService & RedisAssetService
+
+Migration tweaking
+** NOTE ** Grid users should run WhiteCore.Server initially to complete this migration before restarting normally ***
+- Add a user message to indicate there may be errors & warnings
+- Reset UUID to VARCHAR rather than CHAR due to  storage issues when using UTF encoding
+- Remove additional table deletes in Currency migration 4
+
+Update .travis.yml
+
+And another stab, looks like we're getting closer now
+Update .travis.yml
+
+* Testing if this fixes Coverity
+Webutils
+- Improved error reporting details
+
+Log rotation
+- Head rotated log with current uptime details
+
+LocalUserInfoConnector
+- Minor cleanup/refactor
+
+Group Currency - CurrencyMigrator_4
+- Initial implementation
+- Rename 'simple_*' tables for user currency to 'user-*' for clarity
+- Add 'group_*' tables for group balance, transactions and history
+- Update Base.Currency modules and service connectors where required
+- Update Group modules and service connectors where required
+
+DataManager - Migration - DataPlugins
+- Add UUID to ColumnTypes and ColumnTypeDef
+- Update all current tables where a UUID is used to use the UUID definition  (Standardise fields)
+
+Caps modules
+- Re-implement ProductInfo to return regions type details
+- General cleanup of existing CAPS where required
+
+Logging
+- Specify log file name rather than trying to get from OS which only successfully works on Windows
+  -- Grid server  - WhiteCore_Grid_yyyymmdd.log
+  -- Sim/Region - WhiteCore_Sim_yyyymmdd.log
+
+Logging
+- Logs saved in seperate 'logs' folder in the 'Data' folder
+- Rotation of logs daily
+- Date stamp and type identification of log in name
+- Minor cleanup of associated files
+
+Chat
+- Rework to implement additional checking before sending
+
+Experience Caps
+
+* This has not been tested, purely here for debugging purposes
+
+Capabilities
+
+* Cleaning up a left over from previous cleaning
+
+Logging
+- Save logs in their own directory (../Data/logs)
+- Date stamp and rotate logs daily
+- Update visitor logging
+
+Caps Cleaning
+
+* No functional changes, Caps are now sorted into folders what they exactly do
+
+Prebuild scripts
+- Update Prebuild to current version (libs)
+- Correct *nix scripts for building
+
+Update Binaries
+- Update (rename/rebuild) lib.net to ZLibNet to correct a case folding issue with Linux builds
+- Rebuild of LibOMV using updated ZLibNet.dll
+- Revise Prebuild.xml for renamed library
+- Revise appropriate module files to reference and use ZLibNet
+
+Search module
+- Correct packet splitting when > 10 results returned
+
+Configuration files
+## NO Configuration changes ##
+- Additional explanations to assist configuring
+- Minor tidying where required
+
+Caps handlers
+- Minor corrections
+
+Caps services cleanup and refactor
+
+Disable group creation by system users
+- Clean up of LLClientView and login
+
+Module code cleanup
+(No functional changes)
+- BotManager
+- DataManager
+
+Configuration files update
+Note: Operations with 'normal' setup are unaffected by these changes
+- Remove '.example' from all files except those required for the Configurator (templates)
+- Move all grid single server configuration files to a seperate folder to avoid confusion
+  (These are not used in the standard grid configuration)
+- Some minor modifications to text information
+
+Flotsam Cache
+- Place cache files in their own folder wishing the AssetCache
+
+Asset Caches
+- Correct inclusion of AssetCache configurations
+- Minor code cleanup
+- Update Configuration files .../Modules/AssetCache
+
+Database Modules update
+- Use DefaultDataPath for SQLite database files
+- Standardise 'GenericData' variable in local connectors
+- Cleanup of database modules code
+- Update Configuration files, '..Data/SQLite.ini', to use default setup
+
+Map generation errors
+- Surppress non critical texture asset retrieval errors
+- minor code cleanup
+
+ProductInfo Request CAPS
+
+* Adding the new ProductInfoRequest Caps (partially ready)
+* Changed the FileBasedSimulationData to reflect the new WhiteCore Homes
+
+WebServer upgrade
+
+* Adding the Powered By header, this can change in the future when we implement a newer C# HTTP server
+
+Terrain load commands
+- Updated terrain load & terrain load-tile to provide interactive prompting and explanations (if required)
+- Implemented GetFilenames() helper functions in PathHelper
+
+Updating the files to the new hidden folder
+
+Creating Issue Request Template
+
+This adds the new Issues template that GitHub has provided
+
+Please use this to explain exactly what you are experiencing so it's easier for us to reproduce the issue.
+Creating Pull Request Template
+
+This adds the new Pull Request template that GitHub has provided
+
+Please use this to explain exactly what you are fixing / changing so we have a better understanding which changes go into master
+Map updates
+- Corrections to WarpTileRenderer for large regions ( > 1436)
+- Clean up and optimisations
+
+Remove WhiteCoreAsetMigrators as these are Blackhole assets migrators
+
+NOTE: No current databases will be affected by this.
+
+- Removes the WhiteCoreAssetMigrators as they refer to BlackHoleAssets which are obsolete due to FileBasedStorage.
+- These are a carry over from Aurora-Sim and are not actually used by any service in WhiteCoreSim currently.
+
+Positioning error on places query
+- Possible correction - re-work how GlobablPos is converted in an OSDMap
+
+Estate Initialiser
+- Ignore parcel updates for newly created regions
+
+Scripting DNE
+- Revert of commit e2cfc3a..., Dec 10 2015 until further testing and verification can be undertaken
+(Reports of problems with the Dot Net engine)
+
+Directory Service
+- Updated landData and eventData parsing to be culture aware for positioning
+
+ParcelStatus 'Abandoned'
+-  Revised setting of abandoned status in general land data update
+   -- The only status change is if There is and AuthBuyer and status is set as 'LeasePending'
+- General cleanup of land, parcel management & auction modules
+
+Estate change - parcel ownership
+- When changing region estates, move ownership of included parcels from the previous estate owner to the new owner
+- Detect/set if new owner is a group
+- Cleanup ParcelManagementModule
+
+Parcel access details (To be verified)
+- Possible problem recognizing parcel access flags in new viewers resulting in land properties always showing empty access and ban list  - Thanks jimtarber via Halcyon
+
+RestoreToWorld (Restore To Last Position) viewer command (Inventory popup where available)
+(Thanks EmperorStarfinder for bringing this to notice)
+- Implement correct 'restore to last position' rather than assuming all items are attachments
+- Advise user that item is an attachment if this is the case (Add or wear item rather than restore)
+
+Group owned parcels
+
+* Might help if you commit the full set of changes *duh*
+
+Fixing a long lasted bug for Group Owned Parcels
+
+* Membership block added (incomplete as we don't have a Membership table to check these against)
+* Group owned parcels should be recognized now
+
+Copyright updates
+
+* Changing all Copyrights to the new year, minor changes to older versions
+
+Prebuild rebuilding
+
+* Remove the remaining AnyCPU calls, this shouldn't break anything while compiling under *nix / OSX
+
+HTTP fix
+
+* Make HTTP request not request a Proxy call which should speed up the HTTP calls
+
+Clean up configuration files
+
+- Removes an unnecessary ";" at the end of some lines.  Configuration settings are not affected.
+
+Update Network Configuration Windows.txt
+
+- These directions work for Windows XP, Windows Vista, Windows 7, Windows 8, Windows 8.1, and Windows 10 This also works for the Windows Server OS (i.e. 2008, 2012, 2013, 2015)
+
+Version info
+- Report code VersionInfo.version and Git codebase version separately
+
+Update IN PROGRESS.md
+Estate commands
+- Add 'delete estate' command
+- link/unlink update console estate status correctly
+- unlink command - Check if region is part of the estate
+
+EstateConnector
+ - Add EstateRegionExists()
+
+Scripting - AppDomain processing (Thanks to |-Fine-|)
+Note:  Initial revision, requires more testing
+- Revise AppDomainManager.cs as per supplied updates form |-Fine-|
+- Appears to be ok on *nix.  To be verified for all systems
+
+Region archive backups
+- Revise for cleaner log output
+
+Stipend enable command - issue #137
+- Revise entry processing of interactive prompting
+- Small revisions to Economy.ini files to ensure parameter consistency
+
+Estate commands
+- Correct parameter index for passed estate name (set estate name ...)
+- Correct parameter index for passed owner name (set estate owner. ..)
+
+Console commands
+- Correct returned parameters when quoted details are used
+  ( names with spaces. e.g. "WhiteCore Mainland" etc)
+
+Documentation updates
+
+Configuration
+- Add a startup switch '-config' to allow re-configuration without actually starting the simulator
+- Additional configuration info
+- Provide a clean exist if no valid configuration is found
+
+God Tools Update 2
+
+* Now you get an inworld popup that tells you what you exactly did (move region / rename region)
+
+God Tools update
+
+* When using the God Tools, show on the console what exactly was done.
+
+Scheduled payments info
+- Addition of payment date/time
+
+Scheduler
+- Revise & update stipend & group payments processing
+- Additional log details amendments & corrections
+
+General cleaning
+
+* Remove AnyCPU from prebuild.xml
+* Moving WebAPI under API
+* Adding the new WorldAPI
+
+Physics Configuration
+- Re-work physics configurations files (Config/Sim/Physics) to correctly enable physics/meshing for individual regions
+- Additional info at startup to log current physics engine for the region
+
+BulletSim -CreateMesh
+- Correct mesh creation and verification in BSShapes
+- Remove unused Asset delegates (PhysicsScene, EventManager
+- Small ascetic updates
+
+BulletSim , Improve avatar animation
+- Additional checks in BSCharacter to send 'stopped' contition updates
+- Clean up Animator.cs code
+
+Prebuild configuration
+- Correct output paths for BulletsSm and ConvexDecompositionDotNet libraries
+- Remove 'AnyCpu' options from *nix & Mac scripts
+
+Region settings (on creation)
+- Re-proportion region max prims & agents based upon actual and standard region area
+  (i.e. 512x612 region has 4@ object capacity & agent limit)
+
+Visual Studio complained about this, shouldn't break anything
+
+Parcel Prim Count
+- Correct calculation of Maximum parcel prim count based on region land area rather than 256 * 256
+
+Updater information was obsolete
+Updater information was obsolete
+ODE cleanup
+- Clean up all ODE code
+- Refactor ODE code where required
+- Refactor PhysicsActor & BulletSim where effected
+- Move ODE libraries to lib32 / lib64 in bin
+- Remove 'WhiteCore' prefix from ODE namespace
+- File rename where required
+
+BulletSim updates (missed files)
+- Remove BSLinksetGroupCompound - no longer required
+- WODEPhysicsScene corrections for updated PhysicsScene compatibility
+
+BulletSim V2.82 updates - Thanks to Fine77
+NOTE: Changes to the default link set implementation have been reconfigured in 'Config/Sim/Physics/BulletPhysics.ini'
+- Continuing updates to latest version
+- Update Contributers.txt
+
+Put AssemblyInfo file in proper place
+
+- Found this AssemblyInfo.cs file in WhiteCore.Framework.SceneInfo directory instead of in WhiteCore.Framework.Properties directory.  Unsure why as the file clearly says WhiteCore.Framework.
+
+NOTE: Build not affected nor is any functionality affected just a cleanup matter.
+
+Update .travis.yml
+DotNetEngine
+
+* Internal cleaning, no functional changes
+
+DotNetEngine
+
+* Moving API's to their own folder, no functional changes
+
+And fixed the Bullet numbering
+
+Forgot a piece in the In Progress file
+
+Adding an In Progress file to keep track of what we want handled before March 2016
+
+DNE Update
+
+* Cleaned up some Types and Garbage Collection
+
+BulletSim updates
+- Additional properties and corrections
+
+Code cleaning
+
+* Clearing some Obsolete messages from Linux based compilers
+
+Region details
+
+* Extended the "show region <regionname>" command to show more details
+
+Building
+
+* Changed the runprebuild commands for Linux and Mac to the correct new development number
+
+PhysicsActorType
+- Revise as a settable property instead of the predefined type
+
+PrimMesher tweaking and optimisation
+
+BulletSim upgrade
+- Add additional constraints & physics units (Not yet implemented)
+
+Bulletsim upgrade
+- Cleanup code
+- Add updated BulletXNA.dll
+
+Merging branch WebAPI into master
+
+* Please tell us what they need to expose to your own WebUI so we can implement that
+
+Migrator
+
+* Perhaps it's good to completely send the file instead of just pieces ...
+
+Migrator
+
+* Visually show what's being done with a clean installation or with new migrators being added
+
+Currency
+
+* Seperate console message when Group payments is enabled
+
+Back to development mode
+
+* 0.9.4 will be the new version to work on
+
+Unified release 0.9.3
+
+* "Giant Step"
+Protocol update
+
+* Bumping protocol version up to signify that IWC / HG is coming soon
+Whitecore 0.9.3 Release Candidate 2
+
+* This marks the 2nd RC build for the upcoming 0.9.3 release
+BulletSim updates
+- Initial update, working but confined to the current region
+- region crossings need to be added
+
+Bulletsim updates
+- Initial cleanup of non fully working code
+
+Minor cleanup
+
+* Error message wasn't displayed properly
+
+Whitecore 0.9.3 Release Candidate 1
+
+* This marks the 1st RC build for the upcoming 0.9.3 release
+
+Group bans
+- Add check for banned users when requesting to join a group
+
+WarpTileRenderer
+- Additional tweaks to prevent trying to decode missing textures
+
+Asset services
+- minor code cleanup
+
+Group proposals
+- note re table usage only
+
+Group Bans
+- Initial implementation of the GroupAPIv1 client/server caps
+- Group ban caps implemented
+- Group bans database connectivity implemented
+
+ScriptEngine adjustment
+
+* Set scripts to be run in Attachments
+
+Reverting Log4Net upgrade  (a2063a448fba33e176158e40be8318d98f49dfaa)
+
+* Seems there's something odd happening when using the newer version for the WarpTileRender
+* The new version might return when we can find out what exact is missing (lacking)
+
+Region creation & update
+- Revised both creation and update processing
+- Update will now serialise and restart the region if details are modified
+
+HTTP server
+- Set slow handling messages as debug rather than info
+   * Slow handling may not be correct as large textures, maps may need to be generated before returning to requestor
+
+Terrain generation
+- Some small corrections when prompting for terrain type
+
+HttpServer procedures
+- Small tidy up of code
+
+WorldMap
+## Note: Configuration changes required
+- Rename WhiteCoreWorldMap namespace to WorldMap
+- Revise WarpTileRenderer to provide increased resolution when generating tiles
+- Set default MapTileCreation method to 'Async'
+- Update Config/Sim/Modules/WhiteCoreModules.ini
+
+GroupAPIv1
+
+* Adding some debug checks to see if GroupAPIv1 is being called
+* Non functional Capability at the moment
+
+ Adding Code of Conduct
+
+* This Code of Conduct reflects how we want to be towards users of WhiteCore
+
+User accounting (minor)
+- add *nix alias commands 'adduser, deluser' for *nix operators
+- add 'user rename'
+
+GroupMigrator 6
+
+* Add Group ban's table
+
+IAR commands
+- Disable for region servers
+- Add user prompt to allow for merging archives rather than creating a new folder
+- Correct processing if a user has no inventory
+- Cleanups
+
+WarpTileRenderer
+- Trap invalid asset textures before trying to decode them
+
+User accounts
+- Clean up flow of console commands
+
+Minor corrections and cleanups
+- Correct retrieval and/or creation of estate for new regions
+- Add a 'debug' setting to BanCheck
+
+PrimMesher
+- Correct a few typos and incorrect logic
+- Rework Meshmerizer
+
+Cleanup of FolderType updates
+
+Update "FolderTypes"
+NOTE:  The default inventory news to be cleared and reloaded. Update existing user root foder type with the command 'verify root folders'
+- Update LibOMV ell's to 0.9.4.2 - Implements the new 'FolderType' replacement for old asset types
+- Multiple updates where required
+
+Voice configuration
+- Additional clarification for config files
+- Vivox - only load admin configuration on Grid/Standalone server
+
+Removing sleep methods for GetLinkMedia, SetLinkMedia, ClearLinkMedia
+
+* According to the SL Wiki, these functions have no sleep
+
+Voice modules
+- General cleanup
+- Clarify configuration explanations where possible
+- Remove redundant options
+
+Load Users command
+- Small check to prevent trying to set a user Rezday if none is provided in the import file
+
+Update .travis.yml
+
+Checking if builds are now on the new build services
+Upgrading LibOMV with the latest from WhiteCore-LibOMV
+
+* 0.9.4.1 (Internal numbering)
+
+Removing Rezday command
+
+* set user rezday is obsolete with the new load users command
+
+Show details about modules being activated
+
+* Updated Search and Profile to show in Console if they are activated
+
+Commands update
+- Separate commands for grid & region consoles
+- Update units as required for local/remote access
+- Enhance several commands for better usability
+- Code cleanup where required
+
+Upgrading Load Users
+
+* Load users now need the Rezdate in timestamp format. When there's no rezdate available (it might crash)
+
+Adding some more detailed info
+
+* Making clear that old Ruth has been replaced with a new Appearance set
+
+Updating Sider.dll to the .Net 4.x version
+
+* Fresh compiled from https://github.com/chakrit/sider
+
+New user stipend
+- Provide an configurable option to specify an initial stipend when a user is created
+
+Single point data handling
+- Updated for all relevant modules
+- Corrected initial startup processing in the simulation bases
+- Updated config files
+
+Updating .gitignore
+
+* RealEstateUser was renamed to RealEstate
+
+Fixed mistakes in string format specifiers (e.g., "{0)" instead of {0}")
+
+Data handling
+- Implemented single point setting for the default data path
+- Added config setting 'DataDarectory' in FileBased.ini config
+- Updated modules where appropriate
+
+Avatar archiver
+- Check quietly for assets during load rather than spamming the console
+
+Correct a few typo's
+
+Housekeeping
+- Minor code cleanup and corrections
+
+Region Startup
+- Revised startup timing by introducing several thread delays to avoid 'Too many open files' induced errors
+- Code cleanup
+
+Avatar archive
+- Provide an option to create a portable version (Default is not selected)
+- Code cleanup where necessary
+
+Make viewer happy for now until HG/IW will be in place
+Simulator features
+- Add Camera mode skeleton
+
+God Names
+- Add provision to send details from the viewer
+
+Console commands
+- Add a confirmation check to the 'quit' command
+- Correct command details for Sun module
+- Correct command details for wind modules
+
+Permissions module
+- Additional details in 'transfer' commands
+- General cleanup
+
+A guy doing his job....Update italian translation.
+System users & Estates
+- Re assigned the 'System Estate' (RealestateOwner) to ID 10
+- Added new 'Mainland Estate' for the Governor (ID 1)
+- Add command 'reset mainland estate' to reset to configuration and update mainland regions
+- Additional checks to migrate existing SystemEstate to the new ID
+- Defaulted linking of regions for mainland types
+- New region 'parking' with System estate (ID 10)
+- Configuration additions for 'MainlandEstateName'
+- Code cleanup where needed
+
+Update LandObject.cs
+
+Fixing a bug that got introduced with this
+WebUI updates
+- Correct operation of News Manager > Add News Item
+- Update user search listing to use data tables
+- Additional style changes
+- Update jQuery to 2.1.4
+
+WebUI abuse reports
+- Fully working - Removed unneeded code, updated translations
+- Updated main index copyright year
+- Corrected some css styles for style1
+- Code cleanup where needed
+
+RunPrebuild - Premade
+
+* This RunPrebuild is especially for people with VS 2013 / VS 2015
+Community Edition
+
+.gitignore update
+
+* Removing doubles
+
+Parcel Fix
+
+* This fix should make the land go back to normal after being bought
+* Auctions don't set the land to Abandoned but it stays Leased (with an Auction ID)
+
+[Spellchecker] Correction
+
+Simulator features
+- GodNames (Viewer highlight of gods's in-world)
+
+Abuse reports web interface
+- Remove existing GUI
+- Add 'abuse reports' command
+- Add WebUI/Management 'Abuse Reports' menu item
+- Add WebUI abuse list
+- Add WebUI abuse report
+
+Config file updates
+- Minor wording changes only
+
+SmartThreadPool update
+- Rebuild STP from latest sources using Net 4.0 compatibility
+- Provide for minThreads in addition to maxThreads during initialisation
+- Increase default min/max settings
+
+Scheduled payments
+- Isolate scheduler commands to grid service
+- Set stipend payments as 'TransferType.StipendPayment'
+- Work around the inability (at present) to have a credit balance for the Banker
+- Do not pay stipends to groups
+- Separate  group liability payments and dividends
+- Group dividends are paid daily at the stipend time + group delay
+- Add 'group pay dividends' command
+- Log payment details only if a successful transfer occurred
+- Clean up some console messages
+- Set currency purchases as 'TransferType.BuyMoney' in transactions
+
+[Spellchecker] Simulation
+
+[Spellchecker] Services
+
+[Spellchecker] Server
+
+[Spellchecker] Region
+
+Small update to text
+
+* Missed this one after Spellchecker was done
+
+[Spellchecker] Modules
+
+[Spellchecker] Framework
+
+[Spellchecker] DataManager.SQLite
+
+[Spellchecker] DataManager
+
+[Spellchecker] CoreApplicationPlugins
+
+[Spellchecker] ClientStack
+
+[Spellchecker] BotManager
+
+Updating .gitignore
+
+* Newer Visual Studio's have the .suo file somewhere else.
+
+MarketPlace Listings
+
+* Add new folder MarketPlace Listings for future use of the Viewer
+Managed Marketplace
+
+Updating with WhiteCore-LibOMV
+
+This allows us to use the latest FolderTypes
+
+Forgot a clean commit
+
+Marketplace Folders
+
+* Completed the Inventory Folders list
+* Added in the pseudo code to create the new Marketplace Listings folder (not active at the moment)
+
+Scheduler module
+(Functionality to be fully verified)
+- Total re-work of scheduler functionality
+-- Add 'scheduled info' & 'scheduled paynow' console commands
+-- scheduler will fire after stipends are paid
+-- Implemented delayed start time for payments (not yet used)
+-- Implemented a grace period for directory search fees
+-- Corrected verification of parcel details for multi region configuration
+-- Many more... :)
+
+Restart module
+- Remove old incomplete InWorldRestartSerializer module
+- Add agent serialization for the region being restarted
+- Revised SceneManager CloseRegion() & RestartRegion()
+- Code cleanup
+Note:  Currently viewers will stall for some time before becoming active to user inputs
+
+Local Groups
+- Additional checks on startup to ensure the correct owner for system groups (Maintenance)
+-  Revised group powers for better visibility of roles
+
+Scheduled payments
+(Not using the selected cycle correctly)
+- Correct calculation of stipend & group processing times
+
+Friend & Group requests
+- Check all local regions for recipient rather than just the originating region
+- Code cleanup
+
+Stipend Payments
+
+* Stipend is a predefined amount, there's no difference between membershiplevels
+
+Typo Fix in LocalAssetMainConnector.cs
+
+Typo Fix in .gitignore
+
+Capabilities
+
+* Adding a skeleton for the new GroupAPIv1 which allows banning of users from entering the group after they are kicked
+
+Build scripts
+- Corrected x86 selection after defaulting to x64
+
+Tidying up user not online message in the oflineim system
+
+Build scripts update (*nix only)
+- Default builds to x64 (x86 still available)
+- Add auto detection of *nix system architecture
+- Add 'auto build.sh' to configure and build for the current system
+
+Scheduled payments (Experimental and further testing required)
+Note:  requires configuration updates
+- Re-work stipend payments
+- Provide configurable options for time of payments
+- Add group liability payments and disbursements
+  (requires additional testing as group purchasing needs to be reviewed)
+- Additional 'stipend' and 'grouppay' commands
+- Revised configuration options
+
+Grid services
+- Add region registration and de-registration location info messages
+- Correct  error reporting of region locations
+- Code cleaup
+
+Estate modules
+- Code cleanup (No changes)
+
+Minor code cleanup
+
+Groups
+- Cleanup code where needed
+- Additional functions used for scheduled payments
+  -- GetAllGroups(), GetGroupMemebers()
+
+User Accounting (Developers)
+- Add a small process to allow create of multiple users for testing purposes
+
+FileBased Sim
+
+* Seems we missed the Homestead option in Estates
+
+GroupPayments
+
+* Skeleton with detailed information how to do GroupPayments
+
+Namespace correction
+
+* ZeroCurrency is part of WhiteCore.Modules.Currency
+
+Runprebuild.sh
+
+* Seems that there's no option to set x86, thanks H-H-H for finding this
+
+RenderMatertials (Needs to be tested)
+- Correct some logic if enabled and no materials data exists
+- Revise compression & decompression processing
+
+Materials Rendering
+- Correct decompression of OSD dat (thanks stormsonweathers)
+- Updated config files
+
+Mesh update (Issue #137)
+- Rework Meshmerizer code
+- Add decoding for convex hull (untested)
+- Add additional Level of Detail functionality
+- Correct OSD data decompression
+- Implement new mesh caching functionality
+-  Additional corrections
+- Code cleanup
+
+WarpTileRenderer
+- fix typo that was missed
+
+WarpTileRender - minor code cleanup
+
+Module renames - remove redundant "Whitecore" for consistency
+- UserProfile, Combat, Gods,Search
+- Update WhiteCoreModules.ini
+- Add initial membership info for User profiles
+- Code cleanups
+
+Correct return value when asset is not found
+- Change return value of GetData() to 'null' instead of byte[0] as checks are for (null == not found).
+   (byte[0] is not null, just an empty array)
+
+Currency module
+- Rework and remove service code from the connector
+- Clean up code
+- Update config files
+(Stipend processing to be completed)
+
+Chat module rename and rework
+- Rename from WhiteCoreChat to Chat
+- Effects OfflineMessaging, Mutelist, Lure and Dialog modules
+- Reworked Dialog console commands - smarter and correct scene
+
+Upgrading LibOMV with the latest from WhiteCore-LibOMV
+
+* 0.9.3.7 (Internal numbering)
+
+SystemUsers update
+
+* Banker and MarketPlace are no SuperGods but Customer Services
+
+Revert "Complete rename from SimpleCurrency to BaseCurrency"
+
+This reverts commit 1fdb9f52255e407ed20f1c27966d0c055e705eed.
+
+Comments
+
+* Added comments in BaseHTTPServer
+
+Signed-off-by: Fly Man <fly.man.opensim@gmail.com>
+
+Localisation of Global positions (#94) [Take 2]
+- Rework to specific the exact culture for 'real' (float) numbers
+
+Group Membership
+
+* Updated the Group roles with the most recent settings
+
+[RED FLAG] This might break current group roles in your database
+
+Upgrading LibOMV with the latest from WhiteCore-LibOMV
+
+* 0.9.3.6 (Internal numbering)
+
+Localisation of Global positions (#94)
+- Reworked 'OSD.FromVector3' data as strings for saving in the database
+- User picks, Classifieds and Landdata effected
+
+Mode code cleanups
+
+Fix doxygen.sh to output to the correct directory
+
+Adds a shebang to make it clear how to execute the program
+ ${DIR} is the syntax for subshell execution $DIR is the syntax for variable access
+Remove duplicated sections in config files
+
+System Users
+- Correct Banker and Marketplace user UUID's
+- Remove unnecessary system groups
+- Simplify configuration details for system users
+
+System User & Group updates
+- Remove system user account creation from Estate services
+- Re-implement system user account verification and creation in GenericServices namespace
+- Simplify system account verification to allow easy additions if required
+- Add 'Banker' and 'Marketplace' owners
+- Simplify system group verification
+- Add 'Banker' and 'Marketplace' groups
+- Cleanup of code where required
+- Updated default configuration files , Grid/ServerConfiguration/Services.ini, Sim/Standalone/Standalone.ini & example
+
+Complete rename from SimpleCurrency to BaseCurrency
+
+* BaseCurrency is now the standard which also supports 0 credit transfers
+* No renaming of the Database tables is needed
+
+Patch contributed by Virtual-Universe, many thanks for this
+
+* Fixes #138 and issue #110
+
+Fixing the Modal popup on Region List
+
+* Accidently removed this when implementing the new jQuery Datatable
+
+Signed-off-by: Fly Man <fly.man.opensim@gmail.com>
+
+Updating info from Wiki
+
+* We don't have BODY but SHAPE in Wearables
+* Explanation for EventNotifications
+
+Clarifying cleanup
+
+Adding some comments for Profile fields
+
+Physical object crossings (Issue #135)
+- Correct retrieval of new instance of the object
+- Correct logic of permissions tests for 'allow entry'
+(There still appears to be a problem with transferring the current physics state)
+
+Cleanup SimulatorFeatures
+
+* We don't send DataURL's in SimulatorFeatures, we have the GridManager for that
+
+Fully implement AvatarHoverHeight
+
+* Remember to have the region send that it's enabled
+
+Prebuild
+
+* Reminder to self: Always compile on VS2013 and not SharpDevelop
+
+Prebuild
+
+* Compiled Prebuild under Linux to appease the Linux Gods
+* This needs to be FIXED (Linux / OSX wise)
+
+Reverting old Prebuild.exe
+
+* Seems that Mono gets an error when using the latest Prebuild
+
+AppVeyor testing
+Adding in the current version
+
+* Making sure that people see which version they are on
+
+Prebuild
+
+* Added the new Prebuild that allows building for VS2012/VS2013
+* Upgraded runprebuild.bat
+
+Updating some README.md files
+
+Multiple cleanup
+
+* Updated DoxyGen for latest version
+* Spellchecked runprebuild files
+* Markdown check on README.md
+
+Log4Net upgrade
+
+* Current version 1.2.13
+
+Log4Net restoring
+
+* Seems that LibOMV was depending on the file to be there. Thanks to Emperorstarfinder in #136
+
+AgentPreferences CAPS implementation
+
+* Updated the Utilities
+* Added the new CAPS AgentPreferences
+* Upgrade UpdateAgentLanguage / UpdateAgentInformation
+
+Upgrading Logins
+
+* LoginResponses are now sending back more details for future upgrades
+
+And the last cleanup action
+
+* Remove log4net since no file is referencing it
+* Updated the app.manifest for the WebServer
+
+Upgrading the RunPrebuild.bat
+
+* Cleaning almost done
+
+Moving updates files to Updates folder
+
+* Cleanup actions
+
+Upgrading LibOMV with the latest from WhiteCore-LibOMV
+
+* 0.9.3.4 (Internal numbering)
+
+LookAt update
+
+* SceneObjectPart.UpdateLookAt() now uses corrected LibOMV Quaternion functions.
+Thank you Dahlia for this update
+
+Upgrading LibOMV with the latest from WhiteCore-LibOMV
+
+Region List updated
+
+* Uses the new JQuery DataTables now
+* Search allows you to search through ALL the details
+
+Logicals
+
+* Adding Events and Classifieds
+* Non functional code (barebones)
+
+ScriptEngine optimizing
+
+* Updated the CompilerTools
+
+Update snapshot-updates.xml
+LSL Syntax
+
+* Adding the complete file
+
+Caps LSLSyntax
+
+* Clarified what the Caps should do according to the specs
+
+Constant Updates
+
+* All Constants have been checked against the current builds
+* Split Constant files up into OS, WL, LSL, AA
+
+SceneGraph
+- Remove '256' size assumption when determining region crossings
+
+Parcel handling
+- Correct determination of agent position when infinite regions are is use
+- Additional parcel details retrieved from db
+- Code cleanup
+
+OpenMetaverse updates
+- Check for potential buffer overrun with variable length data
+   (Thanks to David Daeschler of InWorldz)
+
+Caps message update
+
+* Adding LSLSyntax to the Caps list. Code throws a NotImplemented at this moment
+* As soon as I can analyze the data the Caps will be updated.
+
+LSL Constants update
+
+* This should be all of them according to a look at the Opensim edition of the Constants
+
+SimpleCurrency is now BaseCurrency
+
+* Call for SimpleCurrency in INI file is still the same
+
+Economy (Currency) updates
+- Correct config files and default to currency enabled
+- Code cleanup
+- Additional checks in GetUserCurrency and GetGroupBalance
+- Small re-work of AddMoney and SetMoney
+-  additional debug info
+
+GridInfo updates
+- Default details to correct server hostname if not set
+- Default economy helper URI
+
+Rename SampleCurrency to BaseCurrency
+- Move to Modules/Currency
+
+Adding missing constants for llGetObjectDetails
+
+Preparations for Scheduler
+
+* Renamed the ScheduledCurrency to ScheduledPayments
+* Added a new command "stipend set" which will allow you to reset the
+date when stipend will be given out (not working yet)
+
+Translation files normalized
+
+* Made all translation files equal
+
+PrimMesher Dll
+- Rebuilt using Net 4.0
+
+WebInterface updates
+
+* Access Rating is now part of the popup
+
+Updating README
+
+* Latest MONO version is 4.0.1 released 2 days ago
+
+* Mono 4 has better GC and compiles to .Net 4.5 now.
+Additional region info
+- Initial addition of additional region details in GridService
+
+Maptile generation
+- Update map tile generation console messages
+- Check for problems creating large images in Warp3D
+
+Allow large region creation
+- Prompt if region size is greater than recommended but allow if required
+
+Load OAR/IAR updates
+- Additional checks and hardening for file lists
+
+Typing error
+Adding notification by Travis
+Update README.md
+Pushing a new Travis build
+
+* Triggering a new build
+LibOMV & ZLib.Net update
+- Reworked old AceComponents zlib.net in preparation to update codebase to the current zlib V1.2.8
+- Changed ZLib namespace to avoid ongoing confusion (generic)
+- Rebuilt ZLib.Net using Mono/Net 4.0
+- Rebuilt LibOMV with updated ZLib.Net also using Mono/Net 4.0
+- Updated RenderMaterials & Meshmerizer for ZLib.Net
+- Updated libraries.version details
+
+Update .travis.yml
+Giving Travis another go
+Building updates
+
+- Update, patch and build ‘Prebuild.exe’ using the Net 4.0 framework
+(Minimum std install on Win 8.1)
+- Revise ‘runprebuild.bat’ (Windows only) to check and provide the
+correct build options for the current system
+- Add a ‘one click’ config and build for OSX, ’runprebuild.command’
+- Update readme with the latest information
+
+LibOMV HoverHeight
+
+- Rebuild of LibOMV
+- Update LLClientView to include the new HoverHeight data block in the
+Avatar appearance
+   (Checked OK in major viewers)
+
+Update README.md
+Pushing latest LibOMV
+
+* These files are compiled against .Net 4.0 and have the new AvatarHoverHeight
+
+Seems there was a broken dependency
+
+* Fixed Prebuild
+
+Make DLL's with generic Namespace
+
+- Rebuild ScriptEngineParser & Warp3D libraries to remove the
+“WhiteCore” namespace
+- Rename Warp3D to Warp3Dw to permit identification against original
+- Update  codebase for generic DLL’s
+- Update Prebuild.Xml for correct warp3Dw reference
+- Replace WhiteCoreSim/bin dll’s
+
+AnyCPU for Windows dropped
+
+* It seems there's too much errors occuring with it
+
+Updating .gitignore
+
+* Changed and cleaned some more
+
+INI files cleaning
+
+* No more spaces / tabs, easier to diff between old and new ini changes
+
+Remove Metabuilders.irc.dll
+
+- No longer required (Included in IRCChat module)
+
+Interactive configuration
+
+- Rework due to multiple path errors
+- Additional options
+Set default thread count to 10
+
+Trying something for zlib.NET
+
+* Added a new zlib.dll (version 1.1.0)
+
+PLEASE let us know if it breaks things
+
+Interactive configuration
+
+- correct pathing to server “login” files
+
+Add missing example configuration file
+
+- Required for the interactive configuration setup
+
+Adjusting Parcel details
+
+*AABBMax and AABBMin are now conform what is expected. AABBMin as a 0 value (lowest point of sim)
+
+* Default ParcelFlags adjusted
+
+Basic cleanup inside the dllBlackList
+
+* Some of these aren't in WhiteCore, might be an idea to have a deeper inspection for this
+
+We have 3 System users, adjusting this
+
+Change Opensim references to WhiteCore
+
+* OpenSimUDPBase is now UDPBase
+
+Updating Copyright to the correct year
+
+* We're 1 year older so adding the 2015 part as well
+
+Startup processing
+
+- Additional diagnostic info on startup
+- Provide an option to specify the local system IP address
+- Code cleanup
+
+Code cleanup and message updates
+
+IAR/OAR loading
+
+- Add ‘tgz’ to the OAR list
+- IAR, provide a ‘list’ option during the IAR load processing (if
+required)
+- Code revision & cleanup
+
+Revise references to baseOpenSim
+
+ - update Addons read me
+
+Update README.md
+
+Readability
+Added Gitter badge
+SetPrimitiveShapeParams
+
+Correct dimple clipping and old copy-paste error.
+
+SetPrimitiveShapeParams
+
+- Allow setting of hole size to 0.01 from scripts as per viewer spec.
+
+Parameterize LSL sleep functions.
+
+Corrected minimum cut according to viewer's minimum part 2
+
+* TPV's already have the option to go to 99%, 98% is safe for now
+
+Corrected minimum cut according to viewer's minimum
+
+* TPV's already have the option to go to 98%
+
+Reversing .gitattributes
+
+* Getting more errors then joy from this change
+
+Update Prebuild schema
+
+Corrected llGetStartParameter
+
+- according to http://wiki.secondlife.com/wiki/LlGetStartParameter
+
+Corrected osMakeNotecard() text length
+
+- use the byte count defined in the format
+      (via BritanyannStarfinder)
+
+Cleaning up some details in the Updater Module
+
+* Upcoming snapshot changes
+
+Namespace changes
+
+* AStar is now part of the WhiteCore codebase
+
+Cleaning line endings
+
+* Only 3 files that had them .. impressed
+
+Updating .gitignore and .gitattributes
+
+* Line endings should all be CRLF
+
+Migration update
+
+* Assets description can be 127+1 (128 characters)
+
+LSL Api update
+
+* Memory is measured as 64 Kb now since we don't have an LSO compiler
+
+Removing Math Library
+
+* This gives errors at starting up, shouldn't be included in current form.
+
+Adding a Math Library
+
+* This library is used for Math calculations for a Addon "Flexible Wind"
+
+C# Security upgrade
+
+* Set some Exceptions to be Serializable
+* Make sure that DLL's are loaded with Unicode
+
+Obsolete Script Engine Compiling
+
+* Removed the JS / VB and YP compilers (These are no longer being used by anyone, I guess)
+
+Revert part of the Sun Update
+
+* Seems that the SunCycle indeed is 2.0D x Pi
+
+Sun update
+
+* I think this might make the sun less wobbly, still has a strange bug that z value goes under 0
+
+Cleaning the Windows Line Endings out
+
+* Made m_visualparams private as the class is already contained
+
+Updating 1 function for Additional Module
+
+HTTP Thread change
+
+* It seems with a higher thread count that disconnects are less common
+* Changed HttpThreadCount from 5 to 10 to see if this handles #127
+Doing some cleaning and upgrading
+
+* Remaining llLookat updates from Dahlia (OpenSim Dev)
+* Floating text update
+
+Maximum region size checks
+
+- define constant MaxRegionSize as 4096
+- Convert hardcoded values to use Constants.MaxRegionSize
+- Additional checks during region creation
+
+osNPC functionality
+
+Configuration updates
+
+- remove ‘.example’ from all user configurable files
+- current ‘.example’ files are either used as templates for
+configuration or for specialised use only
+
+Fix contributed through OpenSim Core Team member Dahlia
+
+* llLookAt no longer makes prims spin
+
+* Cleaning some parts for readability
+
+Update ReadMe.txt
+
+Changed Snapshot details
+Seems 1 of the coworkers was a bit too eagerly adding constants
+
+Update README.md
+
+Updating the README with some more details
+* Added some missing constants
+
+Adding invisiprim textures to the inventory library
+
+Fix particle system (adding missing values). But script-changes sometimes still needs relog before you see the correct effect.
+
+Fix rescaling linksets , some child prims didn't update offsets.
+
+Terrain loading regression fixed.
+
+Fixing sound uuid's to a list I found in the viewer
+
+Protect library inventory from user interaction.
+(previously notecards could be opened and deleted (moved to trash), and prims could be moved out of the library)
+
+Block vehicles on region edges if there is no neighbor region
+
+Configuration files
+
+- update for V0.9.3
+- standardise formatting
+
+PathHelper update
+
+- filter filename through ‘home’ location process’s
+
+Fix texture issues on worldmap generation, no more "Failed to decode terrain texture"
+
+Big worldmap improvement on var-regions and non-square regions, no more blurry map. Terrain normal mapping using hightmap also works now (sortof terrain emboss effect so have idea of hight in worldmap). And fixed high terrain texture glitches.
+
+Making non-square regions work, and fixing some region size issues.
+
+LibOMV updates
+
+* Updated to grab the latest bug fixes in Collada upload
+
+Avatar Appearance Updates
+
+* Added the missing pieces of the Appearance and making sure they get set
+
+[WARNING] This will corrupt ALL your Avatars on your grid since it needs to write the new values the first time.
+
+Fix info request (seen on map teleport) on large regions.
+
+Default Library update, added 120 animations, 56 sounds, 2 missing textures and updated welcome notecard.
+
+Not spawing messages on activate/decativate guestures from Library
+
+Don't override default avatar clothing from inventory.
+
+Restore net 4_0 compatability for webutils
+
+Library (DefaultInventory) and IAR processing
+
+- IAR write, disable the auto detection of ‘/‘ To save the root folder
+contents only ‘/*’ must be specified
+- IAR read, Correct detection of multi paths and process accordingly
+- LibraryService, Clean up default inventory deletion
+
+User Accounting
+
+- Add 'set user email' command
+- Add confirmation processing to 'reset user password'
+
+WebUI
+
+* Fix the "Add News" button
+
+Default Inventory loading
+
+- Correct getUserFolderID filter parameters
+- Correct problem with Archive reader when checking for inventory
+folders
+- Code cleanup
+
+LocalGridConnector
+
+- Correct the 'fix missing region owner' command
+- Minor code clean up
+
+Fixing vehicle serialisation
+
+DotNetEngine
+
+* Cleaned up, made sure the functions are Serialized now
+* MaxScriptThreads should make scripts start faster now
+* Name changed in INI file, without it just loads with 100 (as default)
+
+MapModule ini changes
+
+* Seems that this part needs to be in a different file
+
+Flotsam Cache Optimizing
+
+*  Fcache Assets optimizations by updating the file access time only once per run
+
+Vehicle parameters
+
+- Add serialization of vehicle parameters for OAR export & import
+- Add vehicle parameters to region  ‘sim’ backup
+
+Terrain updates
+
+- Corrections to terrain map generation to optimise memory load,
+particularly for large regions
+- Additional terrain types
+- Removal of incorrect settings for ‘Flatland’
+- Code cleanup
+
+Misc code cleanup
+
+SceneManager
+
+- Return success/fail for public CreateRegion()
+- Code cleanup
+
+DotNetEngine
+
+* Disabling the Stats for now, it seems that part still needs some additional work
+
+DotNetEngine
+
+* Update the engine so it can now serialize data into seperate AppDomains
+* Update to the ini file, so not every script is loaded in the same AppDomain but "loadbalanced" over more of them.
+- This does increase the memory load
+
+Currency
+
+* Fixing long lasting bug with Weekly Stipend Payments
+- Problem was that RunEvery was picked up, multiplied by 7 and written back to the database with that value.
+Next time the Scheduler would pick that value and multiply it again and using it as a multiplier to write a even further date in the future.
+
+Currency
+
+* Added a new function GetNextWeekDay which returns a DateTime in preparation for the Scheduler changes
+
+Currency
+
+* More cleaning to make things readable
+
+Currency
+
+* Cleaned up some "impossible" values as a Yearly schedule would be enough
+
+Bin Cleaning
+
+* Seems these files were never renamed to the new name
+
+SimpleCurrency
+
+* Make sure System Users don't get added to the Scheduler
+
+SimpleCurrency
+
+* Adjusted the Scheduler timer, it's now settable in the Economy.ini file
+
+Fixing what's wrong
+
+* Seems I made an error when changing this to hop://, reverting it back to secondlife:// so viewers recognize it again
+
+Fix remaining references to openSimBase
+
+This pulls a clean pull request #114
+
+Updating Contributors list
+
+* Updated the whole list of people who have helped this year on WhiteCore with patches
+
+Updated Compiling information
+
+* Make sure everyone knows we're recommending Mono 3.10 now
+
+Scripts cleaning
+
+* Cleaned all the LSL scripts with the LSL Editor
+
+SnapShot Time
+
+* Updated the Snapshot info file
+
+Removing TC files
+
+* If anyone still uses this, we'll gladly hear from you
+
+Cleaning some left overs
+
+* greythane> That reminds me, I was going to remove the 'updating to 0.9.2' info file in the main directory... past its use by date now :)
+
+WorldView UI Region profile
+
+- Temporary 'fix' for worldview in grid mode
+
+Update the .gitignore file
+
+Update libraries.version
+
+Updating LibOMV to 0.9.3 and removed DotNet* references
+EMail module corrections
+
+- Status message if enabled
+- Updated configuration ini files
+
+Assetservice correction
+
+ - add new parameter for remote calls (Sql,File & Redis)
+  (missed in previous update)
+
+WebUI region manager correction
+
+- Commented some code as it relies on scene manager updates not yet
+available
+
+Update libraries version info
+
+WebUI (work in progress)
+
+- Updates to region manager
+
+Remove SQLite Linux library missed previously
+
+Correct LibOMV
+
+- Update Openmetaverse.dll.config for 2-1.5.0 libraries
+
+Save Visitor log in default Data folder
+
+Some naming standardisation and cleanup
+
+LibOMV updates
+
+* Updated LibOMV to the latest version, CSJ2K and all the LibOMV dll's are compiled against .Net 4.0
+
+Removed "old" LibOpenJPEG references
+
+* If anyone notices issues, please let us know on the Issue Tracker
+
+Unused DLL's - Please report if issues found.
+
+- DotNetOpenID, DotNetOpenMail
+- SQLite *.so (Linux)
+- Update prebuilt to remove references
+   tested on various systems and configuration with no apparent issues.
+
+TerrainSplat (Warp3D)
+
+- do not show warnings if a cached image is not found
+
+Asset services update
+
+- general code cleanup
+- add a 'no warning' overload to (assetservice) Get
+- add 'get asset' command to AssetService
+- update get asset command in filebased & redis
+
+Additional Console formatting options
+
+AssetCaps service
+
+- Re-worked processing logic
+- Corrected invalid console message if  a re-direct found the texture
+- updated most warning messages to ‘debug’ level as these are
+non-critical
+- code cleanup
+
+UserAccount glitch
+
+* Seems we had 2 functions to create accounts
+
+BulletSim
+
+* Removed unused references
+
+Log Manager
+
+* Finally started removing all LogManager calls that we don't use
+
+Git Hooks
+
+* Added the Git Hooks so Windows machine also get a generated .version file
+* This also works on OSX and *nix machines
+
+Quick cleaning
+
+* AssemblyVersions were off
+
+BulletSPlugin
+
+* Changed the Prebuild and INI file for Bullet
+
+Region profile picture
+
+- Check for an enabled worldview module before inclusion
+
+Web welcome message setting
+
+- remove setting of the Chat message as this needs to be treated
+differently than the initial greeting message
+
+Terms of service
+
+NOTE:
+ToS appear to only work in Firestorm or derivatives.
+Singularity and derivatives appear to have the second life ToS
+hardcoded.
+- Additional processing for supplied ToS configuration
+- Enable use of html format ToS
+- Sample text and html ToS files
+- Correct inclusion in the WebUI registration page
+
+Updating README
+
+* Adding BulletSim to the Notes
+
+Pull request #108
+
+* Add configuration option in Meshing.ini to address part of Issue #106 initially reported by Fine
+
+BulletSPlugin
+
+* Bullet Unmanaged upgraded. Many thanks for the people that took time to update this.
+
+Config & Helper script
+
+- Update config to enable WorldView as default
+- Add an SQL query set to allow easier modification of tables to
+utf8_unicode_ci
+
+MySQL table creation
+
+- Correct creation query to use ‘utf8_unicode_ci’ collation
+(important for correct searches)
+
+OAR loading
+
+- Update checks for object  GroupID’s
+- Update some console feedback information during loading
+
+Region management
+
+- trigger a map tile regenerate after loading region OAR
+- additional region settings commands
+* set region capacity/startup/infinite/visibility
+- rename some region commands that relate to ‘objects’
+* rotate/scale/reposition region objects
+- Update console info message when resetting parcel ownership
+
+Mapping updates
+
+- add provision to clear web and worldview cache when an ‘update map’
+command is issues
+- Add a callable ‘UpdateWorldMaps()’ procedure to prove map update for
+other modules
+- additional code cleanup
+
+Serialising
+
+* Added a bone structure for the VehiclesFlags and VehicleParams
+
+IAR processing
+
+- Updated InventoryArchive read/wrtie for the current V0.3 format
+- Create import folder if it does not exist
+- Check for duplicate folders
+- Check for existing assets
+- Added permission cheeks (if required) during save
+- Cleaned up command code to provide a —-noassets & -—perm switch
+options for the save command
+— additional ‘smarts in the load & save commands
+- command format change (Reverse IAR file and inventory path)   —
+load/save iar [filename] inventory Path]]
+
+CloudModule
+
+- Updated to use the actual region size rather than assume 256 x  256
+
+Pathhelpers
+
+- Updates for multiple extension processing
+
+WDNE
+
+* Moved WDNE to the correct folder according to the namespace
+* Adjusted prebuild.xml with the new location
+
+Some vehicle ode instability fixes.
+Vertical attraction should be stable on low angular friction now.
+Linear deflection up works, making it possible for airplanes to take off.
+Disable angular deflection for now.
+
+WDNE Cleanup
+
+* Adjusted improvements for the WDNE
+
+Prebuild change
+
+* Not sure why we make a difference between Windows and Linux, both are now AnyCPU
+
+Command list
+
+* Standardized all Commands
+
+Group Powers
+
+* As requested by EmperorStarfinder, HostEvent is now part of WhiteCore
+
+Currency
+
+* Correct spelling error that has been bugging me for some time
+
+Currency
+
+* Made sure you only see a first and last name and not the full name twice
+
+Assembly files
+
+* Moved some of them into the correct folder
+
+Removing unused references
+
+* Removed all the "leftovers" that were creeping around
+
+Licensing
+
+* Checked all the files for license information as requested
+
+Namespace changes
+
+* Renamed ConvexDecompsition's files to correct namespace
+
+Cleaning time
+
+* Removing leftover references that are no longer needed
+
+* Added a check if the size of a maptile is larger then 4096
+
+WorldView Module
+
+- include in core modules (default- enabled)
+- Implement required additional functionality in WorldViewMode &
+WorldViewRequest
+- Update and correct Warp3d renderer
+- Added worldview image to WebUI region profile
+- Add commands ‘save worldview’ & ‘save worldmaptile’
+(Working but still problems with water)
+
+Currency
+
+* Namespace changes
+* Changed the RequestPlugin to use
+Framework.Utilities.DataManager.RequestPlugin
+
+Currency
+
+* Moved the Currency into it's own area
+
+Currency
+
+* Added remarks what needs to be handled where
+* Spelling errors corrected
+
+OarFiles folder
+
+* Adding tgz now that we can load those too
+
+Adding OarFiles folder
+
+* Default folder add
+
+Prebuild updates
+
+- Update prebuilt config and scripts to use the Net 4.5 framework as
+default
+
+Load oar command
+
+- allow ‘tgz’ to be used as a valid OAR file during load
+
+OAR v0.8 updates
+
+- Update OAR loading to OS v0.8 format
+- Add region telehub processing
+- Check for non-existent parcel owner, groups and user ID’s
+- Check for non-existent users in access list (if any)
+- Reset parcel flags to default on load
+- Cleanup where necessary
+
+Correct UserInfo rename
+
+- Correct sync error, move rename to 0.0.5 as current version is 0.0.4
+
+Merging the ODE files together
+
+* New SecondLifeFeelingODE contains the changes that were in ODE ini
+* New default is SL ODE
+
+New ODE vehicle physics
+
+Updating Currency
+
+* Adding Console messages when things happen
+
+RC DeckHand (Merging the database changes)
+
+This resolves issue #95
+
+Update README.md
+
+* Changing badge to only master, branches are supposed to be broken sometimes
+Update README.md
+
+Adding the link to the MonoProject wiki about how to get the latest Mono version
+Update README.md
+
+Adding the build status from Appveyor
+OpenSim Fix for llRemoteLoadScriptPin()
+
+*  Fix issue where llRemoteLoadScriptPin() would treat 0 (the default)
+as a valid set pin in a destination prim rather than the unset no pin
+state
+
+GridService (Search)
+
+- minor correction to GetRegionsByName to return an empty list rather
+than null
+
+System user checks
+
+- Unified check for system users into a single call
+- Additional checks for creating & assigning Estates to a system user
+
+[Travis] Sorry, but this isn't gonna work.
+
+Removing .travis.yml file
+Update .travis.yml
+Update .travis.yml
+[Travis] Checking if this isn't an older version of Ubuntu we're compiling on
+
+[Travis] Now let's elevate the rest as well to see if it works
+
+[Travis] And always make sure you're in SUDO mode ..
+
+Little tweak to the file
+
+Testing Travis CI
+
+Oops, maybe give it a standard return
+
+* Doh!
+
+Utilities.isSystemUser
+
+* Added blank IsSystemUser function to handle all the checks in commands
+
+Grid search
+
+- Account for # as a wildcard as this is what the viewers are using
+during a region search
+
+Updating Startup Files
+
+* Changed Typos
+
+* Seems I updated the wrong field, account.Created is when the account was created, profile.Created is what shows the "real" date
+
+* Set User Rezday
+
+* New Command to set a real rezday for a user
+* No check for System Users implemented (yet)
+
+Protecting Governor
+
+* Seems with the change that the Governor was showing again
+* Hiding the Governor again in some commands
+
+Update README.md
+
+And another cleaning
+Update README.md
+Updating Snapshot XML
+
+* Update to most recent snapshot
+
+Moved DoxyGen
+
+* Moved to Documentation folder
+
+Updating Readme
+
+* Add the link to the WebChat
+
+Generics Connector
+
+- Do not register if the connector is not local
+- Chat module corrections
+
+Corrections
+
+- Add additional library reference in prebuilt.xml
+- Correct typo’s
+
+Parcel management
+
+- Set the GodParcelOwner of the region depending upon the region type
+Mainland parcels revert to the Governor
+Estate parcels revert to the RealEstateOwner
+
+System user checks
+
+- Updated startup checks to include the Governor user
+- Added necessary configurations
+
+Minor code cleanup
+
+Experimental features
+
+These are work in progress that will not break existing functionality
+- Null space terrain generation
+- 3D world view rendering
+
+WebUI updates
+
+NOTE: A factory reset of ‘Menu’ and ‘Settings’ is required
+- Split settings to provide WebUI & Grid settings
+- Additional grid settings (work in progress)
+- Optimisations
+- Additional User >  profile, purchases and transactions
+
+Currency migration
+
+- Moved to DataManager/Migration/Migrators/Currency
+
+Removed RunTime Info
+
+* Version will now only return version number or commit ID
+
+Revert "Removed examples"
+
+This reverts commit 8072dbc20711dcfb2fc317d30fcb540219264473.
+
+Changing RealEstate / Governor
+
+* New UUID for RealEstate
+* Added Governor UUID
+* Changed name in Services.ini.example
+
+Removed examples
+
+* Already renamed to ini in previous version
+
+Capabilities move
+
+* Moving the Caps into their correct folder for upcoming changes
+
+Commenting about ParcelStatus
+
+* Added a comment so Greythane knows what to look for
+
+And Commit Bot is working
+
+Thank you
+
+Commit triggering
+
+SimpleCurrency config
+
+- Correct configuration of currency symbols if not present
+
+Currency RPC service
+
+- Autostart if required (removed the 'RunServer' setting)
+- Default config to $WC for currency
+- Default config to SendGridInfoToViewerOnLogin
+
+Correct sameday Transactions & Purchases
+
+- retrieve entries from earlier in the current day
+
+Rename ChatInterfaces
+
+- From WhiteCoreChatInterfaces to IChatInterfaces
+
+RealEstateOwner - Issue#83
+
+- Remove any existing password details if re-creating the user
+
+Update change region command
+
+- Correct operation when the region names was not supplied
+- Revise processing to ignore if th required region is invalid
+- Provide a lookup list during prompting
+
+update region prims
+
+- Additional command to allow for updating an existing region’s capacity
+- Commands moved to Initialise
+
+User account lookup
+
+- Check for bogus usernames in lookup
+- WebUi - allow access to the system user profiles
+(needed for region owner information)
+
+Transactions & Purchases
+
+ - Corrections to SImple_Currency functions
+- Additional processing in WebUI pages
+
+WebUI - Statistics page
+
+Addition of Viewer statistics
+
+Avatar archive / WebUI tweaks
+
+- Check for correct avatar name format if passed
+WebUI tweaks
+- Small format changes on the registration page
+- Save the selected avatar archive image as the user profile image
+
+Move thread warning
+
+Move warning re mono and threads to the command function
+
+Fixing Avatar Archive 
+
+* Fix contributed through IRC:
+
+Line 334
+
+{"AvatarArchiveName", archive.FileName }, -> {"AvatarArchiveName", archive.FolderName },
+WebUI changes (Major - Factory reset > Menus required)
+
+- All functionality working
+- Update to JQuery V1.11.1 and other javascript corrections to work
+with it
+- Multiple code and page cleanups and corrections
+- Add admin/transactions
+- Add admin/purchases
+- Modify main menu to provide a ‘Management’ and ‘Settings’ rather than
+the combined ‘Admin’
+- Initial region manager interface (in progress)
+- Modify availability of 'Users' menu to require user login
+- Modify online and users search to provide only information about the
+users friends  (Overridden for logged in Administrators)
+- Include user name in the 'Change User Details' page
+- probably many more :)
+
+Minor cleanup
+
+Simple_Currency - MoneyModule updates
+
+- Add ‘GetTransactions’ and ‘GetPurchase’ functionality
+- Add ‘show user transactions/purchases’ command
+
+Gridinfo
+
+- remove trailing '/' checks to allow use of query URI's
+eg…  /index.php?login etc.
+- Update CurrencyURI in GridSetup.ini for correct listener port
+
+AppearenceArchive
+
+- correct save command when the user is specified
+- correct help text
+- add grid/standalone checks for commands
+WhiteCoreArchiver
+- Update help text
+
+InventoryService/Transfer
+
+- additional console messages during save/transfer
+
+FileBaseSimulationData
+
+- Temp lockout to prevent non square regions being created
+(TerrainChannel loading issue that has this assumption)
+
+Terrain loading
+
+- Correct loading of terrain images into regions larger than 256x256
+- Add jpg terrain loader options
+
+When using llGetEnv, send back the Estate ID
+
+Remove the "Red Flag"
+
+UserAccounting Case insensitive
+
+- Added some processing to allow for retrieval of case insensitive user
+names
+- Corrects a viewer problem when accessing the online webprofile
+- Moved check for the existing user to the more obvious place after the
+new name has been entered
+
+Groups migration
+
+Update migrators for clean databases
+
+[ Master is BROKEN ]
+
+* Added a explanation why there's no snapshot
+
+Sim Console updates
+
+* 2 seperate files for starting a Region Server and a Standalone region.
+
+Group Changes
+
+* Added GroupsMigrator4 (Change OSgroup names to group)
+* Added GroupsMigrator5 (Add new Proposals tables)
+* Renamed all group related table names
+
+Save States saving correctly
+
+* This fixed issue #77, replacing spaces with %20
+
+Change command Show Grid
+
+* It shows the Full grid so renamed
+[ There is still a calculation error in this for some strange reason]
+
+Updating Stipend
+
+* System Users do not need Stipend
+
+Removing old startup files
+
+* Old WhiteCore.bat no longer supported
+
+Warnings reduction
+
+* Seems you don't need AssemblyFileVersion after all
+
+Updating Capabilities - ResourceCostSelected
+
+* Added Caps - ResourceCostSelected (incomplete with comments)
+
+Small correction to runprebuild.sh
+- Specify bash as the wheel to parse the script otherwise syntax errors
+
+Signing all files for 0.9.3 Dev
+
+And onwards to 0.9.3
+
+Release 0.9.2
+
+The WhiteCore Team proudly presents the release of " Quokka"
+
+Reverting the Libraries file to original state
+
+Last changes before the release can be done
+
+Mapserver (Standalone default)
+
+- Default to port 8012 instead of the reserved 8005
+- Updated Network requirements doc.
+
+Documents update
+
+- New Network requirements info
+- Update several others
+
+Currency service defaults
+
+- Set default ports for current services to 8009 (Grid)
+- Clarified Standalone configuration of 9000
+(The original proposal was to use port 8008 but this is assigned to the
+RegAPI module )
+
+WebUI updates
+
+- Add provision to hide frontpage slideshow (settings)
+- Add provision to include local frontage content (settings)
+  (Example - Data/html/frontpage.html)
+- Add user login, grid status and local news to frontpage
+
+Minor inline "if" corrections
+
+MySql Data connector update (6.9.4)
+
+Interactive runprebuild.sh for *nix
+
+Quick cleaning
+
+* Cleaning for use of the XML Library Tool
+
+WebUI, Firefox issue
+
+- Update css files for table positioning error in Firefox
+
+Correct 'compile module' command
+
+- change required gui option to an optional switch
+- prompt for module to compile if not passed
+- additional error checking for invalid module details
+
+Release Candidate 1 for 0.9.2
+
+Fix the libraries files
+
+[Code Frozen for Release]
+[Patch] Fix issues llSetTextureAnim()
+
+* Fix issues where setting llSetTextureAnim(FALSE) did not work
+properly.
+
+Cleaning up some files
+
+Updating main for Updater
+
+Updating some docs
+
+Fixing a long standing bug with Help
+
+* Added new variable that shows the right login URL
+
+Cleaning time
+
+* Cleaning some dead code
+
+WebUI user registration
+
+- correct 'duplicate key' error
+- Add name suggestion as per console 'user add'
+- Minor explanations added
+
+Configurator updates
+
+- Correct grid mode file paths
+- re-add necessary 'example' template files
+
+Inventory transfer between avatars
+
+- Corrected message handling when avatars are in different regions
+- Add some debug messages to assist
+- Change "unable to deliver.." info message for an offline user to
+debug as it is a 'normal' occurrence
+
+File layout reformat
+
+Web online users page
+
+- Show all users currently online rather than for the previous 5
+minutes.
+
+Background image update
+
+Web main page update
+
+- Add random background image on load
+- additional backgrounds
+
+Create Network Configuration Windows.txt
+
+Handles issue #75
+Correct Windows startup scripts
+
+Correct Windows startup batch files so that they start from the
+directory they are executed from.
+
+Updated Gridinfo initialisation
+
+Updated initialisation to add default URI's for viewers if they are not
+specified
+- Help, About, Registration, Forgotten password
+- Added additional debug info in WebInterface to assist calls for
+nonexistent pages
+
+Currency module updates
+
+- Added copyright info to all SimpleCurrency files
+- Updated Config/Grid/GridServerConfiguration/GridInfo.ini to use the
+correct port, 8003
+
+Add a new user issue
+
+Check for a valid avatar archive directory when adding a new user.
+
+[Documentation]
+
+* First 2 commands documented
+
+Update LICENSE.TXT
+
+* Updating the License file
+
+Default MySql table creation to UTF8
+
+New MySql table creation will default to UTF8 charset & encoding.
+(requirement for unicode DisplayNames)
+
+Correct region multiple XMLRPC server starts
+
+[PHYSICS]: re-creating..ODE data: issue #33
+
+Reset the ‘.. re-creating the following avatar ODE data... ‘ message to
+“debug” level as it is not an error, just information.
+
+Add low rez water texture
+
+Add texture asset 43c32285-d658-1793-c123-bf86315de056 to
+DefaultInventory
+
+Console command options
+
+- Correct processing for multi word commands to add back missing option
+switches (--option)
+
+User accounting updates
+
+- Simplify new user entry
+- Suggest random user name if required
+- Provide selection of an Avatar Archive if available
+- Hide UUID entry for normal usage (available using option —uuid)
+- Provision for configurable user seed names
+
+Avatar archiver corrections
+
+- Correct initialisation in grid mode
+- Rework GetAvatarArchiveFileNames()
+- Correct archive load (if specified) when user is created
+
+Region creation updates
+
+- Correct backup file overwrite when modifying the region name
+- Implemented region name validation checks to prevent empty names
+- Added random name suggestion
+- Provision for configurable region seed names
+- Change default region creation to 'Estate' rather than 'Mainland'
+
+SceneManager updates
+
+- Simplify region prompt setup
+- Use file helpers in load & save oar
+- small re-wording of command help
+
+Update SimpleCurrency to correct invalid remote call
+
+Estate update
+
+Somehow EstateInitializer was removed… added back
+
+Estate operations rework
+
+SystemEstateService
+- Move all estate commands from EstateInitializer for grid use/access
+- Additional commands:
+  — show estates & show estate regions
+ - Include additional checks for changes in the configured system owner
+name and system estate name
+
+EstateInitializer
+- ‘estate change’ is the only region applicable command
+- Update estate operations for region creation and inclusion in an
+estate.
+ -  An estate MUST exist before a region can be included.
+ -  A region can be ‘parked’ with the system owner/estate and later
+moved to a user estate
+ - Mainland regions will ALWAYS be included in the system estate
+
+LocalEstateConnector
+ - correct ID number returned for user accounts
+
+GridService - minor corrections
+
+Configuration renames
+
+- Add example to  Sim/Modules/Advanced.ini
+- remove example for Sim/Physics/Physics.ini
+
+ODEPhysicsScene, crashing on OAR load
+
+- Added additional checks before removing region terrain from the
+default space
+(Regularly failing oar now loads consistently without failures.)
+- Possible fix for issue #52 ‘force_simple_prim_meshing’ crash as well.
+(To be confirmed)
+
+FileBasedSimulationData
+
+Correction to path used to reload sim file during restart & backup
+operations
+
+Configuration files update
+
+NOTE: No configuration settings have been modified
+- Rename required and user editable 'example' configuration files to
+'ini'
+- Reformat where necessary to remove tabs and incorrect line endings
+
+SceneManager updates
+
+- Rework 'remove', 'delete', 'clear' & 'reset' commands
+- Additional command 'load region backup'
+
+Possible fix to the ODE 'SpaceRemove' crash issue
+
+- update linux ODE libraries
+
+Add fallback recovery to failed OAR load
+
+Cleanup of terrain generation processing
+
+Console processing
+
+- Add 'ticker' progress to console
+- Make console prompt with option list smarter
+
+TerrainModule
+
+- update to correct crash on Linux when loading embedded terrain file
+- Rework ITerrainLoader locator for effected loading procedures
+- Comment out unnecessary 'throw TerrainException' as Console message
+is sufficient
+
+TarArchiverReader
+
+- small addition to skip hidden files (if any)
+- add new ‘regions/‘ identifier (future proofing)
+
+RestartModule & Scenemanager updates
+
+- Rework restart command processing to correct an immediate restart
+- Revise commands to be 'restart region', restart region abort' restart
+region help
+- Add command 'restart all regions'
+
+SceneManager
+- Small updates to display the correct restart times
+
+Don't append attachments multiple times
+
+* Original commit from orenh, updated for WhiteCore
+
+Use thread-safe version of .NET Random
+
+Original commit from Opensim developer JustinCC, adjusted for WhiteCore.
+
+Minor update to MySql configuration files
+
+Add ; delimiter in case of problem (missed in previous commit)
+
+DisplayName issues #58
+
+Loginservices
+- send the user DisplayName (if set) in the welcome message
+MySql.ini files
+- Add 'Charset=utf8' to the connection string to allow for unicode data
+in strings.
+
+(Operation is correct using SQLite)
+
+SystemEstateService / UserAccounting
+
+- Added to allow for user configuration of the system Estate owner name
+and the the system estate name
+- updated where necessary to reference ISystemEstateService instead of
+hardcoded Constants
+- Added [EstateService] configuration sections to StandaloneCommon and
+(grid) Services ini files
+- Moved system estate user check/creation and commands processing from
+UserAccountService into SystemEstateService
+- Added 'reset system estate' to provide for configuration changes
+
+UserAccounting
+- Reworked the load / save users commands
+
+Vivox voice services
+
+- Small update to prevent possibility of a 'hang' situation if a parcel
+does not allow voice
+
+Load Users
+
+* Last attempt, if this doesn't work i've got no clue what's wrong
+
+Load Users
+
+* Forgot to add a check if the file exists
+
+Load Users
+
+* This should load the basic users.csv file to create new users
+* Highly experimental as of this moment
+
+Vivox / Generic voice updates
+
+- Correct sync message handling for voice connections
+- Rework Vivox parcel details request to only process valid voice data
+-  small restructure of Entity handling procedures in EntityManager &
+Scene (debug assistance)
+- Simplify VoiceModules.ini and update info in ..Docs/Vivox Voice
+
+FileBasedSimulationData
+
+- Check and correct for backup files that may exist with the same name
+(e.g. multiple saves within the minute timeframe)
+
+- Add Region Area processing when generating terrain
+- Add 'show grid' command
+- Update terrain generation user entry selections
+- Correct grid service online & type flag details
+
+Region linking (newly created)
+
+- Corrected potiential link error that relied upon  implied processing
+sequence that could not be guaranteed
+
+RealEstate Owner & Group updates
+
+- replace hard coded group info with the Constants defined group UUID
+and Name
+- Elevate to 'Charter_Member' on creation
+- Revise creation of 'Roles' to be more compatible with SQLite
+
+SQLiteDataManager
+
+- Handle ulong type
+
+Load and Save users to CSV
+
+* Initial setup for Load and Save users
+
+Additional Region type updates
+
+-  set combined type
+- additional terrains
+- Add max number of avatars for presets
+- Set AllowLandResell & AllowLandJoinDivide flags correctly
+
+Terrain updates
+- Smarter input allowing prompting if required info is not supplied
+- additional preset 'types' available  Grassland, Aquatic
+- Initial blending for mainland regions
+
+Estate updates
+
+- Ensure new estates start from 100
+- Small text and info changes
+
+Small changes
+
+* Moved OarFiles folder in Data
+* Removed accidentally copied value
+
+Region initialisation updates
+
+- Added additional terrain preset types (Private, Homestead, Openspace)
+with varying parameters
+
+Inventory archive (IAR) updates
+
+- Ignore viewer folders on save (#<viewer>)
+- Additional checks for available inventory details
+
+Inventory archiver (IAR) updates
+
+PathHelper Updates
+- VerifyReadFile / VerifyWriteFile
+InventoryArchiverModule
+- Update IAR load and save
+- Load / save to 'Data'UserArchives' folder
+InventoryArchiveUtils
+- Create user default inventory if it does not exist for a search
+
+WebUI - Registration update
+
+- Check configuration 'AllowAnonymousLogins' setting for registration
+access (in additional to the web setting)
+- Trap invalid avatar archive directory search
+
+WebUI 'Viewer Help' update
+
+- Add Kokua viewer images
+- Remove Imprudence, Phoenix & Zen viewers
+- Reformat and add website links
+
+Region updates
+
+Redefine region type as Mainland or Estate
+ - Mainland regions are owned by the RealEstate owner and part of the
+system 'Estate'
+ - Simplified region creation to provide a 'standard' setup
+ - Added as region Terrain (type) identifier
+Updated checking for System Estate to revise existing (if any) correctly
+WebUi updated region info to provide both Type & Terrain
+
+Real Region Types
+
+* Wrote the TODO so we know where to change the regionTypes to the real
+ones so the viewer will recognise them.
+
+WhiteCoreHelpers
+
+* Adding in a simple MySQL script to create the user and database
+
+SceneManager updates
+
+- add --skip-terrain switch to 'load oar' command
+- add default load/save path for oars (if not specified)
+- Implement short form version of 'load oar'
+- Add 'smarts' to 'save oar' command,
+
+Avatar archive load/save
+
+Update modify and correct Avatar Archive processing
+- Default save/load path to Data/AvatarArchive folder
+- Re-work load and save commands
+- correct saving and loading of archive files
+- Save the supplied snapshot to an image in the default path (mainly
+for WebUI)
+
+Constats update
+
+* Add PRIM_ALPHA_MODE
+
+Update Community CsharpSqlite libraries
+
+Re-work of the SQLite libraries to correct operation with Linux.
+
+Capabilities change
+
+* Broke ServerReleaseNotes out of the SetHome file and moved it to it's
+own Caps file
+
+Versioning made easy
+
+* Removed the old Git hash code that has been lingering around
+* Removed the Unknown Flavour
+* Changed the code to always align it at the left
+
+Correct typecast for OwnerPowers (groups)
+
+* GroupsServiceConnector - sections commented until this issue is
+resolved completely
+* Move Customizing.txt to WhiteCoreDocs folder
+
+Exclude MyWorld.ini if running in grid mode
+
+Avatar Appearance correction
+
+(Sorry..previous commit rushed)
+
+Permissions module console info update
+
+Avatar archive processing update
+
+Create required InventoryBase folder if not available
+
+ParcelManagement updates
+
+*Default land 'GodOwner' to RealEstateOwner rather than UUID.Zero
+* IncomingLandDataFromOAR - when loading land data, verify that owner
+(user/group) exists. If not, default to RealEstateOwner
+
+Load Oar command updates
+
+If filename is not provided, prompt for it
+
+Update LSL_Constants.cs
+
+* LSL constants PRIM_SPECULAR and PRIM_NORMAL were missing
+
+StyleCop cleaning
+
+* Most of the SA1650 cleaned up
+* Updated .gitignore
+
+Updated .gitignore
+
+* VisualStudio 2012 / 2013 file was not being withheld
+
+More code signing
+
+* All assemblies are now signed correctly
+* Added the Language dependancy
+
+User account updates
+
+Create user command - create default profile
+Allow "none" as an email address
+Additional details in show user account command
+Updated WebUI translations to add the "none" email
+
+User membership updates (System & WebUI)
+
+- sync account user flags and profile membership
+- Update WebUI register and edit pages to suit.
+- Create and/or ensure that a profile exists when updating a user
+account (WebUI)
+- Create a default profile when a new user is added (System)
+
+Add 'Customising' document
+
+Corrections to WebUI 'UserType' status
+
+(Membership info is is not yet fully implemented in the main code)
+
+SoftCoding Group Powers
+
+* Resetting the OwnerGroupPowers back to the original
+
+Cleaning inside the Group Powers
+
+* Renamed the groupPowers to OfficersPowers
+
+Hardcoding Group powers
+
+* Seems there have been changes recently, hardcoding these now until we
+can find out the exact set
+
+Remove hardcoded port definitions & GridInfo updates
+
+- Default web server port to the main serve unless specified
+- Default Gridinfo port to the main server instance (uri:port)
+- Additional Gridinfo setup to assume several defaults for the builtin
+webpages
+- Correct OSSL_Api to return the main server instance URI
+  (Corrects login issues)
+- Update example config files
+
+Additional explanation comments
+
+Default FileBasedSimdata storage locations
+
+Default FileBasedSimdata 'store' & 'oldstor' to predefined
+'Data/*'locations instead of blank
+
+Adding some comment
+
+* Commented to remember where something needs to be
+
+Spelling cleaning
+
+* Cleaned some ini files
+
+Updating the rest of the files
+
+* Update to 0.9.2.1
+
+Update applications to '0.9.2.1'
+
+Log location updates
+
+Implement 'log path' option  to allow user specification of log file
+placement (Defaults to 'Data' folder)
+
+Reversion of startup scripts move
+
+After discussion, the original config was though to be less confusing
+
+Cleanup WhiteCoreSim folder
+
+Add new main ReadMe.txt
+
+Cleanup WhiteCoreSim folder
+
+- Move startup scripts to 'WhiteCoreDocs/StartupScripts'
+- Update readme.txt with current information
+- Update MyWorld.ini with explanations of settings
+
+System 'Estate' updates
+
+Moved check and creation of the default system Estate from the
+EstateService to The EstateInitializer.  This ensures that the system
+estate is created, if nor present, before any regions are added.
+
+WebUI updates
+
+Revamp the default style (#1)
+Initial implementation of the region parcels info
+
+Correct mapTileTextureCache path
+
+Updated to use the configured AssetCache folder
+
+Scripting Cleaning + Typo correction
+
+* Correct typo in the sim_console.sh
+* Moved all script related folders into Scripting
+
+User 'Type' additions & updates
+
+- Add user types as constants for easy access
+- update user creation to incorporate the user flags for 'type'
+- add command 'set user type'
+- add basic functionality in WebUI for register & edit users
+- add necessary options for the WebUI translations
+
+Griefer protection updates
+
+- Revise to only add user commands to the local service >> grid server
+if grid mode, no change for Standalone
+
+User accounting updates
+
+- Save RealEstateUser password to 'Data/RealEstateUser.txt' for later
+reference
+- Revise to only add user commands to the local service >> grid server
+if grid mode, no change for Standalone
+
+EstateSettings - Default to System owner and estate name
+
+System Estate & Additional Estate commands
+
+Implemented a 'SystemEstate' to be used as a default estate unless
+another is selected
+- Auto created at startup if none exists
+
+Additional estate related commands
+- create estate
+- set estate owner
+- set estate name
+- estate link region
+- estate unlink region
+- show estates
+
+Show region command tweaking
+
+Small format changes for the 'show regions' command
+
+FileBasedAsset service info message
+
+Add startup message if the FileBasedAssetService is being used
+
+Spelling cleaning
+
+* Cleaned some spelling mistakes
+
+Save States
+
+* Made the Save State command place the OARs in a seperate directory
+
+Currency Cleaning
+
+* Cleaning some Currency Scheduler code
+
+TODO: This still needs a lot of attention
+
+BuildYMDDateString rebuild
+
+* Returning a yyyy-mm-dd format that viewers understand
+
+WebUI -World map updates
+
+Added region search
+Corrected api calls for region name & co-ords
+Corrected map click processing
+Added region name hover tips
+Corrected hop:// URI's so that they link and provide correct details
+
+Default startup & shutdown commands
+
+Default startup & shutdown commands files to nothing unless
+specifically set . i.e. disabled
+
+Configuration updates
+
+Corrections and additions to the base configuration files
+
+3rd Party versioning updates
+
+* Updated the MySQL.Data.dll to 6.5.4
+* Updated the CookComputing.XmlRpcV2 to 2.1.0.5
+
+World Modules spelling corrections
+
+* Spelling cleaning and renaming
+
+Estate spelling corrections
+
+* Spelling cleaning and renaming
+
+LLLoginResponse adjustments
+
+* Added the Marketplace and Destination guide to the gridinfo
+
+Sun Module spelling corrections
+
+* Spelling cleaning and renaming
+
+Abuse Report Form fix
+
+* Fix the Abuse GUI (only Windows)
+* Need to decide if maybe we need to place this into the WebUI
+
+Script corrections and Docs update
+
+Correct path in run_* scripts
+Add 'Updating … to V0.9.2' HowTo doc for previous versions
+
+Search spelling corrections
+
+* Cleaned up some spelling
+
+Profile spelling corrections
+
+* Cleaned up some spelling
+
+Email spelling corrections
+
+* Spelling cleaning and renaming
+
+Handle RealEstate Issues
+
+* Offer a way to reset the RealEstate users password when you lost your
+password.
+
+Versioning
+
+* Removed an accidently left in .version file
+
+ViewerTags
+
+* Updated the Logincode to display the correct full version of a TPV.
+
+Older v1 send this info both in version and channel. Newer v3 based only
+send their name in <channel> and their version numbering in <version>.
+
+Forgot to clean up this comment
+
+* Cleaning
+
+Changed wording on the Region Startup
+
+* Medium / Delayed means it's not starting it's heartbeat (water sims as
+an example)
+
+Auto backup removal after (nn) days
+
+Add processing for removal of backup (sim) files older than nn days
+Add new command "delete sim backups"
+Add "ArchiveDays" field to Config/Sim/Data/FileBased.ini(.example)
+
+Documentation changes
+
+Moved 'Build..' and Licence files to WhiteCoreDocs folder
+Reworded 'ReadMe.txt'
+Updated ServerConfiguration/Services.ini comments
+
+Show regions command
+
+* Added Region.Startup type to the list
+
+Partnership broken 2
+
+* Forgot to check if a user isn't his own partner
+
+Partnerships broken
+
+* Adding new command reset partner to remove partnerships
+
+Fixed a long lasting bug
+
+* You are NOT able to set yourself as your partner anymore
+
+[Revert] Removing old time/date references
+
+* This commit reverses this with an TODO about what's wise to keep in
+the webprofile / regionprofile
+
+Region Startup
+
+* Added a quick and dirty question which type a region should be
+
+Clean up of script warnings - Issue #41
+
+Reset Bad version ID messages to 'Debug' level as these are non
+critical and self correcting
+Reformatted 'broken' save state' messages
+
+Corrected spelling - Issue #47
+
+Corrected 'occurred' spelling to the Queen's english.
+
+Additional processing for "Show Threads" Issue #45
+
+The current Mono implementation (V3+) does not have the ProcessThreads
+properties fully implemented at this time.
+Added some checks to trap invalid info
+
+Correct password init for RealEstate Owner - Mantis #0007
+
+Revise and rework check for RealEstate Owner on startup
+Correct passing of password to account creation
+Remove un-required inventory setup
+
+Removing old time/date references
+
+* Remove some commented out code
+
+EstateOwnerShip change
+
+* Each Estate is generally created by the RealEstate Owner, can be
+overwritten by another avatar
+
+Removing dead module
+
+* VersionControl is now in the Optional Module repo since we now use the
+FileBased region saving
+
+Spelling cleaning
+
+* Word change
+
+WebUi - news date localisation
+
+Update news dates to use the system local rather than US format
+
+RealEstate User setup
+
+Delay check for RealEstate user until all modules have finished
+loading. Corrects the ‘not being creted’ error when running in grid mode
+
+RealEstate user creation update
+
+Generate a random password upon creation, printed to console.
+Set RealEstate user to maintenance level access.
+
+Update Startup commands processing
+
+Add comments to startup_commands.txt and shutdown_commands.txt
+explained use.
+Comment out startup & shutdown by default in WhitCore &
+WhiteCore.Server ini files (i.e. not used by default)
+Add additional checks to allow comments in the startup_shutdown command
+files
+
+Migration docs update
+
+Update migration to 0.9.2 info to explain the transfer of old
+configuration settings to the new format
+
+Correction of config file
+
+Update Sim/Main.ini to correctly point to “Sim/Grid/GridCommon.ini”
+
+World map correction
+
+Correct saving of mapzoomlevels cache directory
+
+Update standalone configuration
+
+Update grid info source for the standalone (region sim) mode
+configuration - Use the determined server hostname by default.
+
+Update of Build from Source.txt
+
+WRT Issue #48, Updated 'Build From Source.txt' to include section on running for the first time
+
+WRT Issue #48, fixed ini paths for standalone in BaseApplication.cs to all be relative to Config folder
+
+Correct "RealEstate" user & group checks
+
+Bypass local checks for the RealEstate user and group if running in
+“Grid” mode.
+
+Map zoom levels cache directory correction
+
+Remove several hardcoded path setups for the “mapzoomlevels” Add a
+private var initialised at startup to be used.
+
+Config files update
+
+Convert to windows EOL formatting
+Comment all on MyWorld.ini settings for use as an example
+
+Minor message update
+
+Replace “Simulator” with “Network” for  IP address message
+
+Correct FileBasedAssets default location
+
+For FileBased datastore, correct default location to
+(WhiteCoreSim/)Data/FileAssets
+
+Dead code removal
+
+* Updater.js hasn't been used for anything
+* Changed the Google+ link so it works
+
+Code Cleaning
+
+* Changed namespace for Webserver
+* Updated client_list.xml (sneaky bug in original one)
+
+Code Cleaning
+
+* Updated the prebuild
+* Changed the Version numbering
+* Added comment for RealEstate User
+
+Remove duplicate WhiteCore.Server.ini
+
+Main grid server setup ini has been moved to the top (Config)
+directory. Duplicate file removed.
+
+Correct Grid setup configurations
+
+GroupService
+
+* RealEstateOwner is the owner of the RealEstate group
+
+WebUI - Parcels
+
+* Commented out some code since it's not working at the moment
+
+Updated ReadMe and support files
+
+Restructure to 0.9.2 layout
+
+Restructure to new layout that removes all volatile data, for an
+instance, outside the 'bin' directory
+
+Moved Webserver in the Servers folder
+
+* Moving WebServer in with the other Servers.
+
+Update updates.xml
+
+Changed the Release to 0.9.1.1 (Post Fixes)
+Changelog
+
+* Updated the Changelog with a note of signing
+
+Signing some more assemblies
+
+* Finally all the dll's and exe's should be signed now
+
+Changelog
+
+And back to Developing mode
+
+* Changed Version back to Development and 0.9.2
+
+Release 0.9.1.1
+
+* This release is a Post Fixes release before the big changes ahead of
+us.
+
+Change user Info response update
+
+- Return a more informative response if the password update was
+successful
+
+Update WebUI stylesheets
+
+Correct 'Change User Information' page formatting
+
+WebUi updates
+
+ - Formatting updates
+ - Highlight 'Add news Item' as a button rather than a link
+ - Update slideshow options to  correct display in Safari
+ - Correct processing in page_manager to allow saving
+ - Revise error page to correctly display in contents container
+ - Relabel login 'Submit' button to 'Login'
+ - Additional menu corrections
+ - Provide user registration option for admin regardless of web
+registration status
+
+Helper functions updates
+
+ - Add user levels as constants to allow wider, normalised use
+ - Rework LocaleDate() to provide additional options
+
+Bogus reference
+
+Using WhiteCore.FrameWork.Service reference keep creeping in :(
+
+Email module correction
+
+Seems that TeamCity does not like additional 'using …' packages (I hope)
+
+WebUI updates
+
+ - Add 'Forgotton password' page and processing.
+  New password is set and sent via email if update is successful
+Minor page updates
+
+EMail module updates
+
+ - Update email smtp services to use a GMail account
+ - Process  external sending in a thread to prevent blocking
+   (Testes Windows & *nix)
+
+Helper functions update
+
+Culture
+ - LocalTimeDate (for email stamping)
+Utilities
+ - IsValidEmail(), IsLinuxOD, Is64BitOs
+-  RandomPassword.Generate() Generate pronounceable passwords
+
+Create user account update
+
+ - Allow entry of user UUID
+   ( needed to retrain inventory, ownership etc. if moving from another
+system )
+
+WebUI updates
+
+ - correct language bar operation
+ - trap requests for nonexistent pages and return the error page
+ - add Dutch translation
+ - numerous format and style corrections
+
+WebUI Transactions
+
+* Commiting Transactions C# and page
+- Non functional at this moment
+
+WebUI Copyright
+
+* Adding the Copyright info to the remaining files
+
+Correct WebUI error
+
+remove incorrect WhiteCore.Services
+
+WebUI registration form
+
+ - Additional checks for empty Avatar name, email address or password
+error (empty or mismatching)
+
+WebUI registrations admin (Issue # 16)
+
+WebUI registrations
+ - add setting to admin to enable/disable web registrations
+ - additional translation updates for new text
+ - registration page updates and additions
+ - reformatting of registration page
+
+Correct WebUI Register
+
+* When a user doesn't fill in an AvatarName or AvatarPassword silently
+stop executing the code.
+
+TODO: This needs to get a better check
+
+Correct WebUI Region Search
+
+* WebUI
+- Added the RegionX and RegionY coords
+
+Correct WebUI user counts (Issue #38)
+
+* WebUI - online_users, grid status
+  - Update html code for additional formatting and readability
+
+* UserInfoConector
+  - Correct RecentlyOnline queries to convert local times to UTC that
+is used for logging avatar presence
+
+* UserAccountService
+  - Ignore system users in retrieved user count
+
+Naming consistency in SceneManager
+
+Updated command functions to conform with the 'Handle<command>' format
+
+Updated ChangeLog
+
+* Updated all the last days
+
+Spelling update
+
+* Removed 32Bitlaunch since we don't have a 32 Bit Windows edition like
+Opensim
+
+Update WebUI to ignore system users (Issue #19)
+
+Update WebUI to ignore system users, (currently the Library Owner) in
+the user  online, search and profile pages
+
+Move Library UUID definitions to Constants (Issue #19)
+
+Move  the LibraryOwner and LibraryRootFolderID UUID definitions to
+Constants to allow for easer usage in the WebUI.. and future
+maintainability.
+
+Update UserAccountService to use the new constant definition in checks
+
+WebUI viewer graphics (Issue #30)
+
+Reformatted the thumbs for Firestorm, Phoenix, Voodoo & Zen for a
+consistent background and size.
+Updated graphics for Firestorm & Phoenix
+Added Firestorm css codes to all current styles
+
+Rework of user account commands
+
+Rework of user account commands to make them work as expected
+Additional checking and 'smarts' for all commands
+Add 'enable user' command as a companion to the delete (disable) user
+command available.
+Add 'disable user' for simple disabling of accounts
+
+ShowInDirectory
+
+* Changed the Charge to false as it would instantly ask for payment.
+
+Automated translation project
+
+* Last cleaning action for translations
+
+SimpleCurrency cleaning
+
+* Cleaning SimpleCurrency, making sure inworld payments are named
+correctly for the transactions log and spelling error renamed.
+
+Automated translation project
+
+* Cleaned en.po for correct importing
+
+Automated translation project
+
+* Cleaning all files for new import
+
+Automated translation project
+
+* Fixing broken en.po
+
+Automated translation project
+
+* Error detected, cleaned en.po
+
+Automated translation project
+
+* Changed Greek to ISO code el
+* Added English
+
+Automated translation project
+
+* Pushing all languages that need translating
+
+Documentation update
+
+WhiteCoreServerConfiguration -> ServerConfiguration
+
+Console display format updates
+
+Update console timestamp format
+Correct console colour issues
+Update display format of help and context info
+Several minor updates of messages
+
+SQLite updates
+
+* SQLiteDataManager
+  - Additional checking to ensure required database files exists before
+trying to access
+
+* Updated Community.Csharp.Sqllite dlls' (bin)
+
+Tested Window & Mac - OK
+Linux - still work to be done
+
+Correct  spelling
+
+* Correct some minor spelling mistakes
+
+Issue#17 - Load From Remote resources error
+
+As per the OpenSim discussion of the (same?) problem, the additional
+option
+    <loadFromRemoteSources enabled="true"/>
+has been added to the relevant bin/*.exe.config files
+
+Correct updates release date
+
+WhiteCore V 0.9.1 release, 1st May 2014
+
+Namespace renames
+
+* Removed redundant 'WhiteCore' in the following namespaces
+  - WhiteCoreOpenDynamicsEngine >> OpenDynamicsEngine
+  - WhiteCoreDotNetEngine >> DotNetEngine
+  - Updated relevant configuration files
+
+Initial changes WhiteCoreDocs
+
+* Updated the Example Updates.xml
+* Setting up WhiteCore needs a complete rewrite
+
+Creating Updates file
+
+Adding new Updates.xml file for new AddOn WhiteCoreUpdater
+WebUI Handler
+
+* Updated the Help.cs
+
+WebUI Translations
+
+Updated the Translations table
+
+WebUI Updates
+
+* Added FireStorm to the Viewer list
+* Changed the link from secondlife:// to hop://
+
+And back to Development for 0.9.2
+
+Release 0.9.1
+
+The WhiteCore Team proudly presents the release of " Frozen"
+
+Update inbuilt webpage html code
+
+* update html code
+  - copyright notices to 2014
+  - removed the 'forkme' label from the main index page
+
+Update configuration error info
+
+* ConfigurationLoader
+  - small addition to show the configuration path and file details in
+the event of an error  (assist configuration problems)
+
+Correct SLMapApi  (Web World Map handler)
+
+* Slmapapi
+  - correct initial setup for MapService URL details required for the
+webpage world map (now working correctly)
+
+Remove redundant code
+
+Remove redundant date locale update code, missed in previous commit (No
+functionality changes)
+
+Modify/ correct various region restart commands
+
+* RestartModule
+- Modify region restart commands to correctly process, close and
+restart the selected region.
+- region restart (abort)
+
+* SceneManager
+- correct processing RestartRegion and RemoveRegion - (RestartModule
+commands & restart-instance)
+- Add 'delete region' as as alternative to the existing 'remove
+region' command
+- Update command processing for destructive commands that allow
+execution from the root (scene)
+
+Modify console log date to the user locale short date format
+
+* LocalConsole, CommandConsole, Culture
+ - Modify date processing for console logging to use the users system
+locale short date format
+
+Updated IMoneyModule
+
+Updated the iMoneyModule with the Event Fee and Prize that is now in the
+Viewer 2/3 code
+
+Correct missed index restriction (Issue #14)
+
+* AgentMigrator (Issue # 14)
+  - add the "keyword" index length restriction to the correct file (_5)
+and remove the addition from the previous version (_4)  :)
+
+(#14) Inconsistent default save/ load directories
+
+* FilebasedSimData
+ - if no store directory is specifically set, ensure that an empty
+entry refers to the current directory
+  - Update the default FileBased.ini(.example) configuration to set the
+StoreBackupDirectory = "" (not "/")
+  - When building the save filename, do not fudge the "/" directory to
+mean the current "./" directory
+
+Issue #13 - excess index length causing crashes
+
+* Add a length specifier to the MySql table index definition so that
+long fields can be have indexes defined as not using the full field
+length
+    ( Issue #13 - passwordHash causing a crash when creating auth table)
+  - MySQLDataManager.CreateTable - added processing for the additional
+IndexSize specification
+  - Migrator - Added additional override to allow for size
+specification of index field
+  - IDataConnector - Added additional IndexSize parameter to the index
+definition
+  - AuthMigrator_5 - added a 255 length specifier to the "passwordHash"
+index
+  - AgentMigrator_4 - added a 255 length specifier to the "Keyword"
+index
+
+Remove unnecessary calls to get an external IP
+
+* Skip call to get an external IP address if one is already specified
+in the [NETWORK] configuration or the IP address has already been
+determined previously
+  ( This will also considerably speed up startup )
+  - Utilities: add public static string HostName that is set when the
+configuration is read
+  - SimulationBase & MinimaSimulationBase
+      - only get an external IP address (dyndns call) is no
+configuration has been specified
+
+Cleaning Dates in log files
+
+Date is not Day, typing mistake
+
+Signing more assemblies
+
+Found out that some assemblies hadn't been signed before
+
+Updating Changelog
+
+Updated Libraries files
+
+* Added the origin of some files
+
+Add public CreateRegion() to allow for programmatic creation of a region
+
+* SceneManager
+  - Add public CreateRegion() to allow creation of region
+programatically.
+* FileBasedSimulation
+  - Minor documentary updates
+* Add bin/libraries.version detailing current version details of
+libraries
+
+Forgotten website mentions
+
+Seems we missed the HTML files for the 404 and 500 error messages
+
+Renaming ProfileModule
+
+* Renaming the Profile Module to WhiteCore standards
+
+Trim Search values
+
+* Add some summaries that explain what a function does
+* Add a Trim() function to the QueryTexts as sometimes spaces are added
+by the viewer
+
+Date added to the Log files
+
+This fixes issue #10, Add Date to the log files
+
+Updating ChangeLog
+
+Last INI file cleanings
+
+Seems some INI files didn't commit very well
+
+Additional region commands
+
+* SceneManager - additional commands
+  - "show objects" - Display a list of objects in the currently
+selected scene
+  - "resize object" - Change the scale of a named object
+  - "rotate region" - Rotates ( 2D, x,y only) all region objects around
+a center point (default center of region)
+  - "scale region" - Scales all region objects by the specified amount
+  - "reposition region" - Move region objects by the specified amounts
+(x,y,z) (Alternative to 'offset region prims')
+  - "clear region" - Clear the region of objects leaving the current
+terrain
+
+* TerrainChannel
+  - Additional helper functions
+
+* LSL-Api - Correct setting of position in SetPrimParams
+
+* LSL-Api /LSL-Types
+	- increase float equality difference to "0.0000005" as LSL_Float types
+are only to six decimal places
+	- SetPrimParams - Correct PRIM_POSITION position update to remove
+incorrect additional offset
+	   (originally reported by Eamon Mayo who also supplied a correction
+(Aurora))
+
+Warp3D  optimisations
+
+* WarpTileRenderer
+  - Rebuild with some optimisations and using customised Warp3D library
+(WhiteCore.Warp3D)
+  	(requires new Warp3D.dll in bin folder)
+
+Correct startup region creation - Misc corrections
+
+* LocalGridConnector
+  - if no valid data source is available, do not register the local
+service  ( causes null references if called from the sim console when
+in grid mode )
+
+* SceneManager - Show region <name> command
+  - correct call to get region list so that is operates correctly in
+both standalone and grid mode
+  - Update formatting of displayed 'show users' command
+
+* CommandConsole
+  - Add 'cleaninfo' format to provide for nicer console messages
+if/when needed
+
+Re-work and correct new region creation (fails in grid mode)
+
+* Scenemanager / FileBasedSimulationData
+- Re-work and correct new region creation as the current mods crash
+for grid mode operations.
+- add a final yes/no to proceed with the creation of the new region
+* EstateInitializer
+- small change to prompt wording when creating a new estate
+* Gridservice
+- Correct 'show region <name> processing when used in grid mode
+
+Correct sync of new region commands, drop XML2 commands
+
+* Dropped Xml2 commands after further investigation, OAR's are a better
+alternative and it does not appear that the XML2 format is in common
+use with OpenSim anyway
+
+* SceneManager
+    - Re-synced new Region commmads after a stuff up in doing so
+previously
+    - Add port to 'Show regions' command
+
+* FileBasedSimulationData
+    - Correct some problems in the 'update region info' command
+
+Slipped Data Config
+
+Seems I missed this one when renaming
+
+Correct create regions for an initial clean start (no regions)
+
+* FileBasedSimulationData
+  - Correct setting of default parameters when no regions are present
+
+Updated Create region, new Save region commands
+
+* SceneManager
+  - Additional options for the 'create region' command
+	- Specify a region name as part of the command
+	- specify a configuration file, containing the region details, to load
+  - New command "save region config <filename>" used to save existing
+configurations to a xml file
+
+Provide additional console command responses
+
+* CommandConsole
+  - Add a warning message if a valid command requires a scene and none
+is selected
+  - Add 'missed that..' response for multi word commands
+
+* Update prebuild.xml version # to 0.9
+
+Remove obsolete suspend/resume
+
+ MaintenanceThread - Remove obsolete suspend/resume operations and
+replace with EventWaitHandle processing
+    (Ongoing verification necessary to ensure that no other issues
+arise but only use is in show stats command)
+
+Add some 'smarts' when creating a new region.
+
+* FileBasedSimulationData
+  - Add some 'smarts' when creating a new region.
+    Scan existing regions and suggest available X/Y location and port
+rather than use defaults
+  - Add Sim name to 'Loading sim..' startup info message
+
+Additional format check in load oar command
+
+* Additional check for incorrect position of command line switches in
+'load oar' command
+
+Rename BulletSim namespace
+
+* BulletSim files - Rename into WhiteCore name space in preparation for
+further updates
+
+Correct 'update map' command
+
+* MapImageModule - correct 'update map' command to actually do all
+regions instead of the first one
+  - if root is selected, all region maps are updated
+  - if a region is selected, only updates the map for that region
+
+Update of some warning messages
+
+* ScriptData - Updated 'BROKEN SAVE STATE...' message to something a
+bit more intuitive
+* MaintenanceThread - Updated 'BAD VERSION ID...' message to something
+a bit more intuitive
+
+Rename server configurations
+
+* updated .gitignore
+
+Show region commands - clean up formatting, add extra details
+
+* Update GridService.HandleShowRegion() to provide a cleaner format for
+display of info
+
+* SceneManager.HandleChangeRegion()
+- revised to be case insensitive when specifying the selection region
+name.
+
+* SceneManager.HandleShowRegions()
+- updated and formatted displayed scene(region) info
+- added estate name and owner details
+
+Update README.md files
+
+Rename server configurations
+
+ * Moved the WhiteCoreWebServerConfiguration to WebServerConfiguration
+ * Moved the WhiteCoreServerConfiguration to ServerConfiguration
+
+* updated .gitignore
+
+Show region commands - clean up formatting, add extra details
+
+* Update GridService.HandleShowRegion() to provide a cleaner format for
+display of info
+
+* SceneManager.HandleChangeRegion()
+  - revised to be case insensitive when specifying the selection region
+name.
+
+* SceneManager.HandleShowRegions()
+  - updated and formatted displayed scene(region) info
+  - added estate name and owner details
+Update README.md files
+
+Moving with names
+
+* Renamed the Server and WebServer configuration folders
+
+Substitute a system 'missing' texture when a requested texture is not found
+
+* Implemented a 'Missing Texture' texture tile for substitution when a
+requested texture is not found.
+* Re-implemented addon module DefaultInventoryToIARConverter to assist
+in creation of an updated  DefaultInventory.iar that includes the
+additional texture
+
+Additional renaming and refactoring
+
+* More renaming of missed subdirs & files
+* Rename ADNE command to WDNE
+
+Update 'Island' default heights
+
+* TerrainChannel
+    - updated default height setting for Island creation. (was tending
+to create submerged islands)
+
+* setupversioninfo.bat (bin) - revamped to use std git commit hashcode
+
+Minor database table name change
+
+* DatabaseManager
+    - Removed 'whitecore' from migration version table name.  >>
+'migrator_version'
+
+File load & save error checking
+
+* Scenemanager ( Load & save oar)
+* AppearanceArchiver (load & save avatar archive)
+* InventoryArchiver (load , save & save withoutassets iar file)
+    - added some sanity checks for missing, invalid and existing
+filenames.
+
+* Rename WhiteCore/Modules/Region/AuroraArchiver.cs
+.../WhiteCoreArchiver.cs
+	(old format .abackup processing)
+
+* Updated Changelog
+
+* Updated the LSL_Api.cs with the latest LLFunctions
+
+* Updated the Changelog with changes
+
+* Cleaning up LSL_Api.cs for new functions.
+
+Implemented the new Deprecated, Error and NotImplemented
+
+Correct ambiguous double comparison
+
+Now compiles under Mono 2.10.8 (with other LSL_Types corrections)
+
+Minor corrections
+
+Spelling…
+Example Nature.ini updated for treepopulator module
+
+* LSL_Types operator equality difference
+
+   - Changed to 0.000000001 as investigation of some assets revealed
+values down to 8 figures
+   eg. 	<OffsetPosition>
+   			<X>0.01147739</X>
+			<Y>-0.1792226</Y>
+			<Z>0.3589401</Z>
+		</OffsetPosition>
+
+Console command cleanup
+
+* Added console info output if entered command has not been recognised
+* Changed a bunch of destructive command prompts to default to 'no'
+instead of 'yes'
+
+Rework some LSL_Type comparisons
+
+Rework LSL_Types operator ==(Vector3 lhs, Vector3 rhs) and
+Equals(object o) to return an intelligent equality state
+   - Currently set to be equal if like values differ by less than
+0.00001 (This may need to be revised)
+
+* Rework LSL_Type operator LSLFloat operators ==, != as per above
+
+Checks for operation when the 'root' scene is selected
+
+* SceneManager - Add checks for operation when the 'root' scene is
+selected
+   - load OAR - Add info message and prompt to continue.
+   - save OAR - Require change to a named region
+   - reset, remove, restart (runCommand) - Add info message and prompt
+to continue
+
+Minor fixes
+
+Add debug to ditignore
+Correct line endings on DataManagerBase.cs
+Correct setupversion.bat
+
+Zetamax Notecard parse patch
+
+Applied Patch for "}" when parsing notecard lines
+Merge pull request #171 from Zetamex/master (Aurora)
+
+Correct startup logic and messages
+
+Additional startup test for Mono log
+
+Includes several minor formatting corrections
+
+Update of file copyright info
+
+Add back credit for http://aurora-sim.org inadvertently removed in
+refactoring
+
+Change 'whitecore' referenced variables to lowercase
+
+No actual code changes but some variables were replaced using
+Upper/lower case.
+WhiteCore…  >> whitecore...
+
+Add additional missed library files in bin subdirectory
+
+Files normally ignored during updates
+
+Include required library dlls in bin subdirectory
+
+Convert configuration files to Windows line endings
+
+Convert and verify that all configuration files have compatible Windows
+format line endings
+
+Refactor DataManagerTests
+
+Refactor Aurora >> WhiteCore - Actual test do not appear to be
+currently used
+
+Comment out unused variables
+
+Comment out multiple variables that have been declared but not used (No
+code changes)
+	- multiple files, identified with comment > // 20131224 not used
+    - see also  ## TODO ## as some code needs to be re-checked for
+functionality
+    >> build warnings reduced from 82 to 45
+    - remaing warnings are mainly private field definitions that are
+not used....
+    …mainly in WhiteCoreOpenDynamicsEngine - AODEApi.cs &
+AODEDynamics.cs  and the Physics.BulletSPlugin code (Opensim)
+
+Initial refactor from Aurora
+
+Initial refactor from Aurora (Master)
+This includs merges applied up to Dec 23, 2013.
+

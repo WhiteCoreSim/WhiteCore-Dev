@@ -38,7 +38,7 @@ namespace WhiteCore.Modules.Web
             {
                 return new[]
                            {
-                               "html/sim_console.html"
+                               "html/admin/sim_console.html"
                            };
             }
         }
@@ -64,6 +64,20 @@ namespace WhiteCore.Modules.Web
             // Check if we're looking at the standard page or the submitted one
             if (requestParameters.ContainsKey("Submit"))
             {
+                var command = "";
+                if (httpRequest.Query.ContainsKey ("command")) {
+                    command = httpRequest.Query ["command"].ToString ();
+                    response = "Command in query";
+                 } else {
+                    if (requestParameters.ContainsKey ("command")) {
+                        command = requestParameters ["command"].ToString ();
+                        response = "Command in parameters";
+                    } else {
+                        response = "<h3>Please enter a valid console command</h3>";
+                    }
+                }
+                return null;
+
             }
             else
             {

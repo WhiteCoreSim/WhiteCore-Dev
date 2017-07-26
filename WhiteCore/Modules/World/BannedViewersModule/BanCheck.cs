@@ -318,7 +318,7 @@ namespace WhiteCore.Modules.Ban
 
                 agentInfo.Flags |= IAgentFlags.TempBan;
 
-                agentInfo.OtherAgentInformation ["TemperaryBanInfo"] = DateTime.Now.ToUniversalTime ().AddDays (days);
+                agentInfo.OtherAgentInformation ["TemporaryBanInfo"] = DateTime.Now.ToUniversalTime ().AddDays (days);
             } else {
                 info.Flags |= PresenceInfo.PresenceInfoFlags.Banned;
                 presenceInfo.UpdatePresenceInfo (info);
@@ -352,8 +352,8 @@ namespace WhiteCore.Modules.Ban
 
             agentInfo.Flags &= IAgentFlags.TempBan;
             agentInfo.Flags &= IAgentFlags.PermBan;
-            if (agentInfo.OtherAgentInformation.ContainsKey ("TemperaryBanInfo"))
-                agentInfo.OtherAgentInformation.Remove ("TemperaryBanInfo");
+            if (agentInfo.OtherAgentInformation.ContainsKey ("TemporaryBanInfo"))
+                agentInfo.OtherAgentInformation.Remove ("TemporaryBanInfo");
             conn.UpdateAgent (agentInfo);
 
             MainConsole.Instance.Fatal ("User block removed");

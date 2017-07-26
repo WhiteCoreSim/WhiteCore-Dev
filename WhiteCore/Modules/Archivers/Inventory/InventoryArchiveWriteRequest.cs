@@ -294,7 +294,7 @@ namespace WhiteCore.Modules.Archivers
                 InventoryFolderBase rootFolder = m_inventoryService.GetRootFolder(m_userInfo.PrincipalID);
 
                 if (rootFolder == null) {
-                    MainConsole.Instance.ErrorFormat ("[Inventory Archiver]: Unable to fine root folder for {0}",
+                    MainConsole.Instance.ErrorFormat ("[Inventory Archiver]: Unable to find root folder for {0}",
                                                m_userInfo.PrincipalID);
                     return;
                 }

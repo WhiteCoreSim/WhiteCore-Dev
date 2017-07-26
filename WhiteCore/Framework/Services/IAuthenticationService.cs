@@ -74,9 +74,9 @@ namespace WhiteCore.Framework.Services
         // authentication/authorization.
         //
         bool SetPassword(UUID principalID, string authType, string passwd);
-        bool SetPasswordHashed(UUID UUID, string authType, string passwd);
+        bool SetPasswordHashed(UUID UUID, string authType, string passHash);
         bool SetPlainPassword(UUID principalID, string authType, string passwd);
-        bool SetSaltedPassword (UUID principalID, string authType, string salt, string passwd);
+        bool SetSaltedPassword (UUID principalID, string authType, string passHash, string saltHash);
 
         /// <summary>
         ///     Check whether the given principalID has a password set

@@ -37,7 +37,7 @@ if [ $# -eq 0 ]; then
     read -p "Configuration? (Release, Debug) [$CONFIG]: " conf
     if [[ $conf == "Release" ]]; then CONFIG="Release"; fi
     if [[ $conf == "release" ]]; then CONFIG="Release"; fi
-	
+
 	bld="No"
 	if [[ $BUILD == true ]]; then bld="Yes"; fi
 
@@ -91,8 +91,8 @@ if ! ${VERSIONONLY:=true}; then
 fi
 
 # Update version info
-if [ -d ".git" ]; then 
-  git log --pretty=format:"WhiteCore 0.9.4 (%cd.%h)" --date=short -n 1 > WhiteCoreSim/bin/.version; 
+if [ -d ".git" ]; then
+  git log --pretty=format:"WhiteCore 0.9.5 (%cd.%h)" --date=short -n 1 > WhiteCoreSim/bin/.version;
   echo "Version info updated"
 fi
 

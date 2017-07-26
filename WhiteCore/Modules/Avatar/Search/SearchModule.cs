@@ -503,12 +503,12 @@ namespace WhiteCore.Modules.Search
                 if (DirectoryService == null)
                     return;
 
-                //Find the maturity level
-                int maturity = itemtype == (uint)GridItemType.PgEvent
-                                   ? (int)DirectoryManager.EventFlags.PG
-                                   : (itemtype == (uint)GridItemType.MatureEvent)
-                                         ? (int)DirectoryManager.EventFlags.Mature
-                                         : (int)DirectoryManager.EventFlags.Adult;
+                int maturity =
+                    itemtype == (uint)GridItemType.PgEvent
+                                                  ? Util.ConvertEventMaturityToDBMaturity (DirectoryManager.EventFlags.PG)
+                                                  : (itemtype == (uint)GridItemType.MatureEvent)
+                                                  ? Util.ConvertEventMaturityToDBMaturity (DirectoryManager.EventFlags.Mature)
+                                                  : Util.ConvertEventMaturityToDBMaturity (DirectoryManager.EventFlags.Adult);
 
                 //Gets all the events occurring in the given region by maturity level
                 List<DirEventsReplyData> Eventdata = DirectoryService.FindAllEventsInRegion (GR.RegionName, maturity);

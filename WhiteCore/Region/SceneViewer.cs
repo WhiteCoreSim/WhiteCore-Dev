@@ -388,25 +388,29 @@ namespace WhiteCore.Region
                 lastPresencesDInView.Remove(sp.UUID);
         }
 
-        public void SendPresenceFullUpdate(IScenePresence presence)
+        public void SendPresenceFullUpdate (IScenePresence presence)
         {
-            if (m_culler != null && !m_culler.ShowEntityToClient(m_presence, presence, m_scene))
-                m_presence.ControllingClient.SendAvatarDataImmediate(presence);
-            lock (m_lastPresencesInViewLock)
-                if (!lastPresencesDInView.ContainsKey(presence.UUID))
-                    AddPresenceToCurrentlyInView(presence);
+            if (presence != null) {
+                if (m_culler != null && !m_culler.ShowEntityToClient (m_presence, presence, m_scene))
+                    m_presence.ControllingClient.SendAvatarDataImmediate (presence);
+                lock (m_lastPresencesInViewLock)
+                    if (!lastPresencesDInView.ContainsKey (presence.UUID))
+                        AddPresenceToCurrentlyInView (presence);
+            }
         }
 
         protected void SendFullUpdateForPresence(IScenePresence presence)
         {
-            m_presence.ControllingClient.SendAvatarDataImmediate(presence);
-            //Send the animations too
-            presence.Animator.SendAnimPackToClient(m_presence.ControllingClient);
-            //Send the presence of this agent to us
-            IAvatarAppearanceModule module =
-                presence.RequestModuleInterface<IAvatarAppearanceModule>();
-            if (module != null)
-                module.SendAppearanceToAgent(m_presence);
+            if (presence != null) {
+                m_presence.ControllingClient.SendAvatarDataImmediate (presence);
+                //Send the animations too
+                presence.Animator.SendAnimPackToClient (m_presence.ControllingClient);
+                //Send the presence of this agent to us
+                IAvatarAppearanceModule module =
+                    presence.RequestModuleInterface<IAvatarAppearanceModule> ();
+                if (module != null)
+                    module.SendAppearanceToAgent(m_presence);
+            }
         }
 
         void AddPresenceToCurrentlyInView(IScenePresence presence)

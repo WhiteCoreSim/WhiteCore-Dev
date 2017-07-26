@@ -72,6 +72,20 @@ namespace WhiteCore.Framework.Utilities
                    MainServer.Instance.Port;
         }
 
+        public static string GetShortRegionMaturity (int Maturity)
+        {
+            switch (Maturity) {
+            case 13:
+                return "(PG)";
+            case 21:
+                return "(M)";
+            case 42:
+                return "(AO)";
+            default:
+                return "(G)";
+            }
+        }
+
         public static string GetRegionMaturity (int Maturity)
         {
             switch (Maturity) {
@@ -337,17 +351,16 @@ namespace WhiteCore.Framework.Utilities
 
                 WebClient webClient = new WebClient ();
                 try {
-                    //Ask what is my ip for it
-                    externalIp = utf8.GetString (webClient.DownloadData ("http://checkip.dyndns.org/"));
-                    //Remove the HTML stuff
-                    externalIp =
-                        externalIp.Remove (0, 76).Split (new string [] { "</body>" }, StringSplitOptions.RemoveEmptyEntries)
-                            [0];
+                    externalIp = utf8.GetString (webClient.DownloadData ("https://api.ipify.org"));
+
                     NetworkUtils.InternetSuccess ();
                 } catch (Exception) {
                     try {
-                        externalIp =
-                            utf8.GetString (webClient.DownloadData ("http://automation.whatismyip.com/n09230945.asp"));
+                        //Ask what is my ip for it
+                        externalIp = utf8.GetString (webClient.DownloadData ("http://checkip.dyndns.org/"));
+                        //Remove the HTML stuff - greythane- does assume the format will not change her
+                        externalIp = externalIp.Remove (0, 76).Split (
+                            new string [] { "</body>" }, StringSplitOptions.RemoveEmptyEntries) [0];
                         NetworkUtils.InternetSuccess ();
                     } catch (Exception iex) {
                         NetworkUtils.InternetFailure ();
@@ -499,7 +512,7 @@ namespace WhiteCore.Framework.Utilities
             var userId = userID.ToString ();
             return (userId == Constants.GovernorUUID ||
                      userId == Constants.RealEstateOwnerUUID ||
-                     userId == Constants.LibraryOwner ||
+                     userId == Constants.LibraryOwnerUUID ||
                      userId == Constants.BankerUUID ||
                      userId == Constants.MarketplaceOwnerUUID
             );
@@ -716,41 +729,70 @@ namespace WhiteCore.Framework.Utilities
         }
 
         public static string [] RegionNames = {
-            "Aldburg", "Almaida", "Alqualonde", "Andunie", "Annuminas", "Armenelos", "Avallone",
-            "Belegost", "Bree", "Brithombar", "Budgeford",
-            "Calembel", "Caras Galadhon", "Carn Dum", "Combe",
-            "Dale", "Dol Amroth", "Dol Guldur", "Dunharrow",
-            "Edhellond", "Eglarest", "Eldalonde", "Ephel Brandir", "Esgaroth", "Ethring",
-            "Forlond", "Formenos", "Fornost", "Framsburg",
-            "Galabas", "Goblin Town", "Gondolin",
-            "Harlond", "Havens of Sirion", "Havens of the Falas", "Hobbiton", "Hyarastorni",
-            "Linhir", "Minas Morgul", "Minas Tirith", "Mithlond", "Moria", "Nindamos", "Nogrod",
-            "Obel Halad", "Ondosto", "Osgiliath", "Pelargir", "Rivendell", "Romenna", "Scary",
-            "Stock", "Tarnost", "Tharbad", "Tighfield", "Tirion", "Umbar", "Undertowers",
-            "Upbourn", "Valmar", "Vinyamar", "Waymeet"
+            "Aboyck","Aldburg", "Almaida", "Alqualonde", "Andunie", "Annuminas", "Armenelos", "Avallone",
+            "Adaldoc", "Adaltha", "Adalva", "Aldlight", "Amamroth", "Amardas", "Amarmac", "Andor", "Arador",
+            "Belegost", "Bree", "Brithombar", "Budgeford", "Baradthyryr", "Baranadan", "Baranadan", "Barangul",
+            "Baranroth", "Belost", "Berigilda", "Blackflower", "Brighthall", "Brighttown", "Bymeadow",
+            "Calembel", "Caras Galadhon", "Carn Dum", "Chelddon", "Combe", "Celandic", "Corwyn",
+            "Dale", "Dol", "Dol Amroth", "Dol Guldur", "Doriver", "Dunharrow", "Dyke", "Dinoas", "Dinodine",
+            "Dinodrida", "Dodinlot", "Dungroth",
+            "Edhellond", "Eglarest", "Eldalonde", "Ephel Brandir", "Esgaroth", "Ethring", "Eastloch", "Eridell",
+            "Forlond", "Formenos", "Fornost", "Framsburg", "Fairedge", "Fallfield",
+            "Galabas", "Goblin Town", "Gondolin", "Gilthyryr", "Gorbatha", "Gorbava", "Gorhendic", "Gormadoc",
+            "Gormagilda", "Grassedge", "Griffinland", "Gulthyryr",
+            "Harlond", "Havens of Sirion", "Havens of the Falas", "Hobbiton", "Hyarastorni", "Havenbush",
+            "Icecliff", "Isenamroth", "Isengorn", "Isenia", "Isenriel",
+            "Linhir", "Lakemarsh", "Lothadan",
+            "Mana", "Marbleburn", "Marblegate", "Mardoc", "Marmagilda", "Marmalac", "Melimac", "Mendic",
+            "Mendrida", "Menedine", "Menegard", "Menemac", "Menlot", "Minas",
+            "Minas Morgul", "Minas Tirith", "Mithlond", "Moria", "Nindamos", "Nogrod", "Newden",
+            "Obel Halad", "Ondosto", "Osgiliath", "Orodruin", "Pelargir", 
+            "Rivendell", "Romenna", "Raybourne", "Redcastle", "Rorilac","Rorimac",
+            "Scary", "Snentham", "Sadrida", "Shoremoor", "Silverwald", "Springcoast", "Starryview", "Stonewind",
+            "Stock", "Swaldton", "Senruin",
+            "Tarnost", "Tharbad", "Tighfield", "Tirion", "Treton", 
+            "Umbar", "Undertowers", "Upbourn", "Valmar", "Vinyamar", 
+            "Wayness", "Wellspell", "Wildegrass", "Woodbutter","Waymeet"
         };
 
         public static string [] UserNames = {
             "Ada", "Aelgifu", "Aelith", "Almaric", "Amber", "Angerbotha", "Anselm", "Arathalion",
-            "Arwen", "Assi", "Autumn", "Avice", "Badacin", "Balcardil", "Banjo", "Bebba", "Belladonna",
+            "Arwen", "Assi", "Autumn", "Avice", "Aikins", "Alethea", "Alysia", "Andrea", "Avril",
+            "Badacin", "Balcardil", "Banjo", "Bebba", "Belladonna",
             "Beofrith", "Beornwyn", "Beregond", "Bimbli", "Bonirun", "Boromir", "Brand", "Brodhrimgiel",
+            "Bamburg", "Bastarache", "Battle", "Beeler", "Belle", "Boissonneault", "Briana", "Brianna", 
+            "Brough", "Bulger", "Burrowes",
             "Carahir", "Celebrian", "Ceolwine", "Chalcedony", "Citrine", "Coina", "Copal", "Cugwelion",
             "Cwenthryth", "Daunless", "Dodpecil", "Dondercar", "Dora", "Draugwing", "Drogo", "Durduilorn",
+            "Caroline", "Christofferson", "Chrystal", "Cleopatra", "Courtright", "Cowher", "Crafton",
+            "Cranfield", "Crunk", "Crystle",
+            "Demasi", "Donna", "Dora",
             "Effie", "Egil", "Einar", "Eistein", "Ellie", "Elrond", "Engeram", "Eomer", "Eowyn", "Erkenbrand",
             "Esau", "Escferth", "Ethelflaed", "Ethelhild", "Eustace", "Faerindeth", "Faith", "Flame", "Florian",
+            "Edge", "Elana", "Elke", "Ellan", "Elvis", "English", "Estelle", "Eusebio", "Evins",
             "Frogo", "Fulke", "Galadriel", "Garnet", "Gili", "Gilraen", "Giluen", "Grimwald", "Guilford",
-            "Guluin", "Haematite", "Hamodoc", "Haneding", "Hawise", "Helm", "Hengest", "Herb", "Hereswith",
-            "Herewulf", "Hirithelion", "Hrolfur", "Hugh", "Hunun", "Idhil", "Ilirgar", "Ines", "Ioreth",
-            "Isolde", "Ivandur", "Izagar", "Jewel", "Ketil", "Khazakal", "Kvelki", "Ladboroc", "Lazuli",
-            "Legolas", "Leo", "Leofwen", "Leofwyn", "Livina", "Lorund", "Lothlariel", "Lotho", "Luta",
+            "Gabrielle", "Gaddis", "Gidget", "Glasscock","Guluin",
+            "Haematite", "Hamodoc", "Haneding", "Hawise", "Helm", "Hengest", "Herb", "Hereswith",
+            "Herewulf", "Hirithelion", "Hollins", "Hrolfur", "Hugh", "Hunun", 
+            "Idhil", "Ilirgar", "Ines", "Ioreth", "Isreal", "Isolde", "Ivandur", "Izagar",
+            "Jacelyn", "Janett", "Jazmine", "Jerlene", "Ji", "Judd", "June", "Jewel",
+            "Ketil", "Khazakal", "Kvelki", "Katheryn", "Keitha", "Koerber",
+            "Ladboroc", "Lazuli", "Larger", "Lasandra", "Lauzon", "Leighty", "Lissa", "Lita", "Lyla",
+            "Legolas", "Leo", "Leofwen", "Leofwyn", "Livina", "Lorund", "Lothlariel", "Lotho", "Luta", 
+            "Madison", "Marcie", "Margarete", "Mccardle", "Megan", "Meneely", "Mickley", "Min", "Muntz",
             "Manham", "Manwise", "Maribel", "Maude", "Merewenna", "Meriadoc", "Mortardur", "Nauriel",
-            "Naurmiriel", "Nora", "Norlyg", "Oddtuna", "Osric", "Paladin", "Pato", "Peridot", "Petronilla",
-            "Philbo", "Polo", "Ranulf", "Rhodonite", "Richenda", "Ringal", "Rob", "Rorin", "Ruby", "Rufus",
-            "Ruindil", "Ruthedhail", "Sabelina", "Saexburgha", "Sarabelle", "Sardonyx", "Saul", "Sawny",
+            "Naurmiriel", "Nelda", "Nora", "Norlyg", "Oddtuna", "Osric", "Paladin", "Pato", "Peridot", "Petronilla",
+            "Philbo", "Polo", "Parsley", "Partin", "Pilar", "Pinnell",
+            "Ranulf", "Rhodonite", "Richenda", "Ringal", "Rob", "Rorin", "Ruby", "Rufus", "Redden", "Ridlon",
+            "Rosalie", "Rosario", "Rutha", "Ruindil", "Ruthedhail",
+            "Sabelina", "Saexburgha", "Sarabelle", "Sardonyx", "Saul", "Sawny",
             "Sedryneth", "Snorin", "Snorkuld", "Snorri", "Sombur", "Soronthalion", "Spamfast", "Spirit",
-            "Stathard", "Sunstone", "Thadhronthael", "Theolaf", "Tholrondir", "Thorstein", "Thrili",
-            "Tindomelos", "Tourmaline", "Trali", "Tulip", "Turid", "Tuxton", "Ulfraed", "Voquo",
-            "Warin", "Wilbordic", "Wilf", "Wulfwaru", "Yule"
+            "Stathard", "Sunstone", "Sebastian", "Shane", "Shelby", "Speer", "Stephan", "Suzie",
+            "Thadhronthael", "Theolaf", "Tholrondir", "Thorstein", "Thrili", "Tindomelos",
+            "Tourmaline", "Trali", "Tulip", "Turid", "Tuxton", "Tanguay", "Teeters", "Tew", "Tomasa",
+            "Ulfraed", "Van", "Verret", "Villani", "Villasenor ","Voquo",
+            "Warin", "Wilbordic", "Wilf", "Wulfwaru", "Warren", "Wheless", "Winkles", "Witte", "Yule",
+            "Zahradnik", "Zwiebel"
         };
 
 
@@ -795,5 +837,38 @@ namespace WhiteCore.Framework.Utilities
             }
         }
 
+        /// <summary>
+        /// Rounds up a DateTime to the nearest
+        /// </summary>
+        /// <returns>The up.</returns>
+        /// <param name="dt">DateTime</param>
+        /// <param name="d">Delta time</param>
+        //public static DateTime RoundUp (DateTime dt, TimeSpan d)
+        //{
+        //    return new DateTime (((dt.Ticks + d.Ticks - 1) / d.Ticks) * d.Ticks);
+        //}
+
+
+        public static DateTime RoundUp (DateTime dt, TimeSpan d)
+        {
+            var modTicks = dt.Ticks % d.Ticks;
+            var delta = modTicks != 0 ? d.Ticks - modTicks : 0;
+            return new DateTime (dt.Ticks + delta, dt.Kind);
+        }
+
+        public static DateTime RoundDown (DateTime dt, TimeSpan d)
+        {
+            var delta = dt.Ticks % d.Ticks;
+            return new DateTime (dt.Ticks - delta, dt.Kind);
+        }
+
+        public static DateTime RoundToNearest (DateTime dt, TimeSpan d)
+        {
+            var delta = dt.Ticks % d.Ticks;
+            bool roundUp = delta > d.Ticks / 2;
+            var offset = roundUp ? d.Ticks : 0;
+
+            return new DateTime (dt.Ticks + offset - delta, dt.Kind);
+        }
     }
-}
+}

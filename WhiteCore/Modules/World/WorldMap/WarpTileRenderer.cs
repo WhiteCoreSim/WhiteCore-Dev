@@ -121,7 +121,7 @@ namespace WhiteCore.Modules.WorldMap
             viewport.Width = m_scene.RegionInfo.RegionSizeX;
             viewport.Height = m_scene.RegionInfo.RegionSizeY;
 
-            mapBmp = TerrainBitmap (viewport, false);
+            mapBmp = TerrainBitmap (viewport, false, true);
             return mapBmp;
         }
 
@@ -147,20 +147,22 @@ namespace WhiteCore.Modules.WorldMap
             //viewport.Height = size;
             //viewport.Width = size;
 
-            mapBmp = TerrainBitmap (viewport, false);
+            mapBmp = TerrainBitmap (viewport, false, true);
             return mapBmp;
 
         }
 
-        public Bitmap TerrainBitmap (Viewport viewport, bool threeD)
+        public Bitmap TerrainBitmap (Viewport viewport, bool threeD, bool useTextures)
         {
             // AntiAliasing
             int width = viewport.Width * 2;
             int height = viewport.Height * 2;
+            var texTerrain = m_textureTerrain & useTextures;
+            var texPrims = m_texturePrims & useTextures;
 
             WarpRenderer renderer = new WarpRenderer ();
             if (!renderer.CreateScene (width, height)) {
-                MainConsole.Instance.Error ("[Warp3D]: Unable to create the required scene! Maybe lack of RAM?");
+                MainConsole.Instance.Error ("[WarpTile generator]: Unable to create the required scene! Maybe lack of RAM?");
                 return new Bitmap (Constants.RegionSize, Constants.RegionSize, PixelFormat.Format24bppRgb);
             }
             renderer.Scene.autoCalcNormals = false;
@@ -199,15 +201,15 @@ namespace WhiteCore.Modules.WorldMap
 
             try {
                 CreateWater (renderer, threeD);
-                CreateTerrain (renderer, m_textureTerrain);
+                CreateTerrain (renderer, texTerrain);
 
                 if (m_drawPrimVolume && m_primMesher != null) {
                     foreach (ISceneChildEntity part in m_scene.Entities.GetEntities ().SelectMany (ent => ent.ChildrenEntities ()))
-                        CreatePrim (renderer, part);
+                        CreatePrim (renderer, part, texPrims);
                 }
 
             } catch (Exception ex) {
-                MainConsole.Instance.Warn ("[Warp3D]: Exception in the map generation, " + ex);
+                MainConsole.Instance.Warn ("[WarpTile generator]: Exception in the map generation, " + ex);
             }
 
             renderer.Render ();
@@ -241,7 +243,8 @@ namespace WhiteCore.Modules.WorldMap
         {
             Viewport viewport = new Viewport (camPos, camDir, fov, 1024f, 0.1f, width, height);
             //             Viewport viewport = new Viewport(camPos, camDir, fov, Constants.RegionSize,  0.1f, width, height);
-            return TerrainBitmap (viewport, true);
+
+            return TerrainBitmap (viewport, true, useTextures);
         }
 
 
@@ -418,7 +421,7 @@ namespace WhiteCore.Modules.WorldMap
             return normal;
         }
 
-        void CreatePrim (WarpRenderer renderer, ISceneChildEntity prim)
+        void CreatePrim (WarpRenderer renderer, ISceneChildEntity prim, bool texturePrims)
         {
             try {
 
@@ -507,7 +510,7 @@ namespace WhiteCore.Modules.WorldMap
                     string materialName;
                     Color4 faceColor = GetFaceColor (teFace);
 
-                    if (m_texturePrims && (prim.Scale.LengthSquared () > m_texturePrimSize)) {
+                    if (texturePrims && (prim.Scale.LengthSquared () > m_texturePrimSize)) {
                         materialName = GetOrCreateMaterial (renderer, faceColor, teFace.TextureID);
                     } else {
                         materialName = GetOrCreateMaterial (renderer, faceColor);
@@ -526,7 +529,7 @@ namespace WhiteCore.Modules.WorldMap
                 renderMesh.Faces.Clear ();
                 renderMesh = null;
             } catch (Exception ex) {
-                MainConsole.Instance.Warn ("[Warp3D]: Exception creating prim, " + ex);
+                MainConsole.Instance.Warn ("[WarpTile generator]: Exception creating prim, " + ex);
             }
         }
 
@@ -540,10 +543,10 @@ namespace WhiteCore.Modules.WorldMap
             if (!m_colors.TryGetValue (textureFace.TextureID, out color)) {
                 // Fetch the texture, decode and get the average color,
                 // then save it to a temporary metadata asset
-                byte [] textureAsset = m_scene.AssetService.GetData (textureFace.TextureID.ToString ());
+                byte [] textureAsset = m_scene.AssetService.GetData (textureFace.TextureID.ToString (), false);
                 if (textureAsset == null || textureAsset.Length == 0) {
-                    textureAsset = m_scene.AssetService.GetData (Constants.MISSING_TEXTURE_ID);      // not found, replace with something identifable
-                    if (textureAsset == null || textureAsset.Length == 0)                           // no data.
+                    textureAsset = m_scene.AssetService.GetData (Constants.MISSING_TEXTURE_ID);       // not found, replace with something identifable
+                    if (textureAsset == null || textureAsset.Length == 0)                             // missing tecture is missing
                         color = new Color4 (1.0f, 0.0f, 0.5f, 1.0f);
                 } else {
                     color = GetAverageColor (textureFace.TextureID, textureAsset, m_scene);
@@ -574,7 +577,7 @@ namespace WhiteCore.Modules.WorldMap
             string materialName = "Color-" + faceColor + "-Texture-" + textureID;
 
             if (renderer.Scene.material (materialName) == null) {
-                MainConsole.Instance.DebugFormat ("Creating material {0}", materialName);
+                MainConsole.Instance.DebugFormat ("[WarpTile generator]: Creating material {0}", materialName);
                 renderer.AddMaterial (materialName, ConvertColor (faceColor));
                 if (faceColor.A < 1f) {
                     renderer.Scene.material (materialName).setTransparency ((byte)((1f - faceColor.A) * 255f));
@@ -594,9 +597,9 @@ namespace WhiteCore.Modules.WorldMap
             if (id == UUID.Zero)
                 id = (UUID)Constants.MISSING_TEXTURE_ID;
 
-            byte [] assetData = m_scene.AssetService.GetData (id.ToString ());
+            byte [] assetData = m_scene.AssetService.GetData (id.ToString (), false);       // suppress warnings here
             if (assetData == null || assetData.Length == 0)
-                assetData = m_scene.AssetService.GetData (Constants.MISSING_TEXTURE_ID);              // not found, replace with something identifable
+                assetData = m_scene.AssetService.GetData (Constants.MISSING_TEXTURE_ID);    // not found, replace with something identifable
             if (assetData != null && assetData.Length > 0) {
                 IJ2KDecoder imgDecoder = m_scene.RequestModuleInterface<IJ2KDecoder> ();
                 Bitmap img = (Bitmap)imgDecoder.DecodeToImage (assetData);
@@ -607,7 +610,7 @@ namespace WhiteCore.Modules.WorldMap
                     return ret;
                 }
             }
-            MainConsole.Instance.Debug ("Gettexture returning null, asset id: " + id);
+            MainConsole.Instance.Debug ("[WarpTile generator]: Gettexture returning null, asset id: " + id);
             return ret;
         }
 
@@ -631,6 +634,7 @@ namespace WhiteCore.Modules.WorldMap
             try {
                 file = m_streamReader.ReadToEnd ();
             } catch {
+                MainConsole.Instance.Debug ("[WarpTile generator]: Exception reading cache map");
             }
             m_streamReader.Close ();
             stream.Close ();
@@ -645,6 +649,7 @@ namespace WhiteCore.Modules.WorldMap
                         File.Delete (System.IO.Path.Combine (System.IO.Path.Combine (m_assetCacheDir, "mapTileTextureCache"),
                                                            m_scene.RegionInfo.RegionName + ".tc"));
                     } catch {
+                        MainConsole.Instance.Debug ("[WarpTile generator]: Exception deleting cached texture");
                     }
                 }
             }
@@ -677,6 +682,7 @@ namespace WhiteCore.Modules.WorldMap
             try {
                 writer.WriteLine (OSDParser.SerializeJsonString (map));
             } catch {
+                MainConsole.Instance.Debug ("[WarpTile generator]: Exception saving cache texture");
             }
             writer.Close ();
         }

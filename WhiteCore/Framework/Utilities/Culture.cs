@@ -33,7 +33,7 @@ namespace WhiteCore.Framework.Utilities
 {
     public class Culture
     {
-        private static readonly CultureInfo m_cultureInfo = new CultureInfo("en-US", false);
+        static readonly CultureInfo m_cultureInfo = new CultureInfo("en-US", false);
 
         public static NumberFormatInfo NumberFormatInfo
         {
@@ -85,21 +85,28 @@ namespace WhiteCore.Framework.Utilities
 
             string dt;
             if (userDateTime > DateTime.MinValue)
-                dt = userDateTime.ToString (dtFormat,Culture.SystemCultureInfo);
+                dt = userDateTime.ToString (dtFormat,SystemCultureInfo);
             else
-                dt = DateTime.Now.ToString (dtFormat,Culture.SystemCultureInfo);
+                dt = DateTime.Now.ToString (dtFormat,SystemCultureInfo);
             return dt;
         }
 
         /// <summary>
         /// Returns a formatted date time string depending upon the system Locale.
         /// </summary>
-        /// <returns>Local time & date string.</returns>
+        /// <returns>Local time and date string.</returns>
         public static string LocaleTimeDate()
         {
             //string dt = Culture.SystemCultureInfo.DateTimeFormat.ShortDatePattern;
-            string dt = DateTime.Now.ToString ("hh:mm:ss MMM dd",Culture.SystemCultureInfo);
+            string dt = DateTime.Now.ToString ("hh:mm:ss MMM dd",SystemCultureInfo);
             return dt;
+        }
+
+        public static string LocaleShortDateTime (DateTime userDateTime)
+        {
+            const string defFormat = "MMM dd, hh:mm tt";
+            string ts = userDateTime.ToString (defFormat, SystemCultureInfo);
+            return ts;
         }
 
         /// <summary>
@@ -109,7 +116,7 @@ namespace WhiteCore.Framework.Utilities
         /// <returns>Local date time string.</returns>
         public static string LocaleLogStamp()
         {
-            string ts = DateTime.Now.ToString ("MMM dd hh:mm:ss",Culture.SystemCultureInfo);
+            string ts = DateTime.Now.ToString ("MMM dd hh:mm:ss",SystemCultureInfo);
             return ts;
         }
 

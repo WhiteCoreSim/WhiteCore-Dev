@@ -353,12 +353,16 @@ namespace WhiteCore.Services.DataService
             //NOTE: this does check for group deeded land as well, so this can check for that as well
             QueryFilter filter = new QueryFilter();
             filter.andFilters["OwnerID"] = OwnerID;
-            List<string> Query = GD.Query(new[] { "*" }, m_SearchParcelTable, filter, null, null, null);
+
+            Dictionary<string, bool> sort = new Dictionary<string, bool> (1);
+            sort ["ParcelID"] = false;        // descending order
+
+            List<string> Query = GD.Query(new[] { "*" }, m_SearchParcelTable, filter, sort, null, null);
 
             return (Query.Count != 0) ? LandDataToExtendedLandData(Query2LandData(Query)) : new List<ExtendedLandData> ();
         }
 
-        public List<ExtendedLandData> LandDataToExtendedLandData(List<LandData> data)
+        List<ExtendedLandData> LandDataToExtendedLandData(List<LandData> data)
         {
             return (from land in data
                     let region = m_registry.RequestModuleInterface<IGridService>().GetRegionByUUID(null, land.RegionID)
@@ -888,7 +892,7 @@ namespace WhiteCore.Services.DataService
             {
                 //Pull the classified out of OSD
                 Classified classified = new Classified();
-                classified.FromOSD((OSDMap) OSDParser.DeserializeJson(retVal[i + 5]));
+                classified.FromOSD((OSDMap) OSDParser.DeserializeJson(retVal[i + 6]));
 
                 DirClassifiedReplyData replyData = new DirClassifiedReplyData
                                                        {
@@ -900,16 +904,16 @@ namespace WhiteCore.Services.DataService
                                                            name = classified.Name
                                                        };
                 //Check maturity levels
-                if ((replyData.classifiedFlags & (uint) DirectoryManager.ClassifiedFlags.Mature) !=
-                    (uint) DirectoryManager.ClassifiedFlags.Mature)
-                {
-                    if ((queryFlags & (uint) DirectoryManager.ClassifiedQueryFlags.Mature) ==
-                        (uint) DirectoryManager.ClassifiedQueryFlags.Mature)
-                        Data.Add(replyData);
+                var maturityquery = queryFlags & 0x4C;      // strip everything except what we want
+                if (maturityquery == (uint)DirectoryManager.ClassifiedQueryFlags.All)
+                    Data.Add (replyData); 
+                else {
+                    //var classifiedMaturity = replyData.classifiedFlags > 0 
+                    //                                  ? replyData.classifiedFlags 
+                    //                                  : (byte)DirectoryManager.ClassifiedQueryFlags.PG;
+                    if ((maturityquery & replyData.classifiedFlags) != 0) // required rating  PG, Mature (Adult)
+                            Data.Add (replyData);
                 }
-                else
-                    //Its Mature, add all
-                    Data.Add(replyData);
             }
             return Data;
         }
@@ -920,7 +924,6 @@ namespace WhiteCore.Services.DataService
         /// <returns>The classifieds.</returns>
         /// <param name="category">Category.</param>
         /// <param name="classifiedFlags">Query flags.</param>
-        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
         public List<Classified> GetAllClassifieds (int category, uint classifiedFlags)
         {
             List<Classified> classifieds = new List<Classified> ();
@@ -948,7 +951,7 @@ namespace WhiteCore.Services.DataService
 
                     //Check maturity levels
                     if (classifiedFlags != (uint)DirectoryManager.ClassifiedQueryFlags.All) {
-                        if (classifiedFlags  == classified.ClassifiedFlags) // required rating All, PG, Mature, Adult
+                        if ((classifiedFlags & classified.ClassifiedFlags) != 0) // required rating All, PG, Mature ( Adult )
                             classifieds.Add (classified);
                     } else
                         // add all
@@ -1036,34 +1039,34 @@ namespace WhiteCore.Services.DataService
                 return remoteValue != null ? (List<DirEventsReplyData>)remoteValue : new List<DirEventsReplyData> ();
             }
 
-            List<DirEventsReplyData> Data = new List<DirEventsReplyData>();
+            List<DirEventsReplyData> eventdata = new List<DirEventsReplyData>();
 
             QueryFilter filter = new QueryFilter();
+            var queryList = queryText.Split ('|');
 
-            //|0| means search between some days
-            if (queryText.Contains("|0|"))
+            string stringDay = queryList[0];
+            if (stringDay == "u") //"u" means search for events that are going on today
             {
-                string StringDay = queryText.Split('|')[0];
-                if (StringDay == "u") //"u" means search for events that are going on today
-                {
-                    filter.andGreaterThanEqFilters["UNIX_TIMESTAMP(date)"] = Util.ToUnixTime(DateTime.Today);
-                }
-                else
-                {
-                    //Pull the day out then and search for that many days in the future/past
-                    int Day = int.Parse(StringDay);
-                    DateTime SearchedDay = DateTime.Today.AddDays(Day);
-                    //We only look at one day at a time
-                    DateTime NextDay = SearchedDay.AddDays(1);
-                    filter.andGreaterThanEqFilters["UNIX_TIMESTAMP(date)"] = Util.ToUnixTime(SearchedDay);
-                    filter.andLessThanEqFilters["UNIX_TIMESTAMP(date)"] = Util.ToUnixTime(NextDay);
-                    filter.andLessThanEqFilters["flags"] = (int) eventFlags;
-                }
+                filter.andGreaterThanEqFilters["UNIX_TIMESTAMP(date)"] = Util.ToUnixTime(DateTime.Today);
+            } else {
+                //Pull the day out then and search for that many days in the future/past
+                int Day = int.Parse(stringDay);
+                DateTime SearchedDay = DateTime.Today.AddDays(Day);
+                //We only look at one day at a time
+                DateTime NextDay = SearchedDay.AddDays(1);
+                filter.andGreaterThanEqFilters["UNIX_TIMESTAMP(date)"] = Util.ToUnixTime(SearchedDay);
+                filter.andLessThanEqFilters["UNIX_TIMESTAMP(date)"] = Util.ToUnixTime(NextDay);
+                filter.andLessThanEqFilters["flags"] = (int) (eventFlags >> 24) & 0x7;
             }
-            else
-            {
-                filter.andLikeFilters["name"] = "%" + queryText + "%";
-            }
+ 
+            // do we have category?
+            if (queryList[1] != "0")
+                filter.andLikeFilters ["category"] = queryList [1];
+            
+            // do we have search parameters
+            if (queryList.Length == 3)
+                filter.andLikeFilters["name"] = "%" + queryList[2] + "%";
+            //}
             if (scopeID != UUID.Zero)
                 filter.andFilters["scopeID"] = scopeID;
 
@@ -1074,83 +1077,95 @@ namespace WhiteCore.Services.DataService
                                                    "date",
                                                    "maturity",
                                                    "flags",
-                                                   "name"
+                                                   "name",
                                                }, m_eventInfoTable, filter, null, (uint)StartQuery, 50);
 
-            if (retVal.Count > 0)
-            {
-                for (int i = 0; i < retVal.Count; i += 6)
-                {
-                    DirEventsReplyData replyData = new DirEventsReplyData
-                                                       {
-                                                           eventID = Convert.ToUInt32(retVal[i]),
-                                                           ownerID = new UUID(retVal[i + 1]),
-                                                           name = retVal[i + 5],
-                                                       };
-                    DateTime date = DateTime.Parse(retVal[i + 2]);
-                    replyData.date = date.ToString(new DateTimeFormatInfo());
-                    replyData.unixTime = (uint) Util.ToUnixTime(date);
-                    replyData.eventFlags = Convert.ToUInt32(retVal[i + 4]);
+            if (retVal.Count > 0) {
+                for (int i = 0; i < retVal.Count; i += 6) {
+                    DirEventsReplyData replyData = new DirEventsReplyData {
+                        eventID = Convert.ToUInt32 (retVal [i]),
+                        ownerID = new UUID (retVal [i + 1]),
+                        name = retVal [i + 5],
+                    };
+                    DateTime date = DateTime.Parse (retVal [i + 2]);
+                    replyData.date = date.ToString (new DateTimeFormatInfo ());
+                    replyData.unixTime = (uint)Util.ToUnixTime (date);
+                    replyData.eventFlags = Convert.ToUInt32 (retVal [i + 3]) >> 1; // convert event maturity back to EventData.maturity 0,1,2
 
                     //Check the maturity levels
-                    uint maturity = Convert.ToUInt32(retVal[i + 3]);
-                    if (
-                        // (maturity == 0 && (eventFlags & (uint) EventFlags.PG) == (uint) EventFlags.PG) ||    // << this is always true!!  (zero && zero == zero)
-                        (maturity == 0) ||
-                        (maturity == 1 && (eventFlags & (uint) EventFlags.Mature) == (uint) EventFlags.Mature) ||
-                        (maturity == 2 && (eventFlags & (uint) EventFlags.Adult) == (uint) EventFlags.Adult)
-                        )
-                    {
-                        Data.Add(replyData);
-                    }
+                    var maturity = Convert.ToByte (retVal [i + 3]); // db levels 1,2,4
+                    uint reqMaturityflags = (eventFlags >> 24) &  0x7;
+                   
+                    if ( (maturity & reqMaturityflags) > 0) 
+                        eventdata.Add (replyData);
                 }
-            }
 
-            return Data;
+            } else
+                eventdata.Add( new DirEventsReplyData ());
+
+            return eventdata;
         }
 
 
-        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
-        public List<EventData> GetAllEvents (string dayQuery, uint eventFlags)
+
+        public List<EventData> GetAllEvents (int queryHours, int category, int maturityLevel)
+        {
+            return GetEventsList (null, queryHours, category, maturityLevel);
+        }
+
+        public List<EventData> GetUserEvents (string userId, int queryHours, int category, int maturityLevel)
+        {
+            // The same as GetEventList but incuded for more intuitive calls and possible expansion 
+            return GetEventsList (userId, queryHours, category, maturityLevel);
+        }
+
+        /// <summary>
+        /// Gets the events list. WebUI and API
+        /// </summary>
+        /// <returns>The events list.</returns>
+        /// <param name="userId">User identifier.</param>
+        /// <param name="queryHours">Query hours.</param>
+        /// <param name="category">Category.</param>
+        /// <param name="maturityLevel">Maturity level.</param>
+        public List<EventData> GetEventsList (string userId, int queryHours, int category, int maturityLevel)
         {
             List<EventData> retEvents = new List<EventData> ();
 
             if (m_doRemoteOnly) {
-                object remoteValue = DoRemote (dayQuery, eventFlags);
-                return remoteValue != null ? (List < EventData >)remoteValue : retEvents;
+                object remoteValue = DoRemote (queryHours, category, maturityLevel);
+                return remoteValue != null ? (List<EventData>)remoteValue : retEvents;
             }
 
             QueryFilter filter = new QueryFilter ();
-            if (dayQuery == "u") //"u" means search for events that are going on today
-            {
-                filter.andGreaterThanEqFilters ["UNIX_TIMESTAMP(date)"] = Util.ToUnixTime (DateTime.Today);
-            } else {
-                //Pull the day out then and search for that many days in the future/past
-                int Day = int.Parse (dayQuery);
-                DateTime SearchedDay = DateTime.Today.AddDays (Day);
-                //We only look at one day at a time
-                DateTime NextDay = SearchedDay.AddDays (1);
-                filter.andGreaterThanEqFilters ["UNIX_TIMESTAMP(date)"] = Util.ToUnixTime (SearchedDay);
-                filter.andLessThanEqFilters ["UNIX_TIMESTAMP(date)"] = Util.ToUnixTime (NextDay);
-                filter.andLessThanEqFilters ["flags"] = (int)eventFlags;
-            }
+            if (userId != null)
+                filter.andLikeFilters ["creator"] = userId;
 
-            //TODO: Maybe need to check for expired events if they are not deleted?
-            List<string> retVal = GD.Query (new [] { "*"}, m_eventInfoTable, filter, null, null, null);
+            var starttime = DateTime.Now;
+            var endTime = starttime.AddHours (queryHours);
+            filter.andGreaterThanEqFilters ["UNIX_TIMESTAMP(date)"] = Util.ToUnixTime (starttime);
+            filter.andLessThanEqFilters ["UNIX_TIMESTAMP(date)"] = Util.ToUnixTime (endTime);
+
+            // maturity level
+            filter.andLessThanEqFilters ["maturity"] = maturityLevel;
+
+            if (category != (int)DirectoryManager.EventCategories.All) //Check the category
+                filter.andFilters ["category"] = category.ToString ();
+
+            List<string> retVal = GD.Query (new [] { "*" }, m_eventInfoTable, filter, null, null, null);
 
             if (retVal.Count > 0) {
                 List<EventData> allEvents = Query2EventData (retVal);
 
-                //Check the maturity levels
-                foreach(EventData data in allEvents) {
-                    if (data.maturity == eventFlags) 
-                        retEvents.Add (data);
+                // Check the maturity levels PG = 1, M = 2, A = 4
+                foreach (EventData evnt in allEvents) {
+                    if ((maturityLevel & evnt.maturity) != 0) // required rating PG, Mature, Adult
+                        retEvents.Add (evnt);
                 }
             }
 
             return retEvents;
         }
-
+       
         /// <summary>
         ///     Retrieves all events in the given region by their maturity level
         /// </summary>
@@ -1200,7 +1215,8 @@ namespace WhiteCore.Services.DataService
                             DateTime date = DateTime.Parse(retVal[i + 2]);
                             replyData.date = date.ToString(new DateTimeFormatInfo());
                             replyData.unixTime = (uint) Util.ToUnixTime(date);
-                            replyData.eventFlags = Convert.ToUInt32(retVal[i + 4]);
+                            //replyData.eventFlags = Convert.ToUInt32(retVal[i + 4]);
+                            replyData.eventFlags = Convert.ToUInt32 (retVal [i + 3]) >> 1;   // maturity level
 
                             Data.Add(replyData);
                         }
@@ -1233,9 +1249,11 @@ namespace WhiteCore.Services.DataService
 
                 data.eventID = Convert.ToUInt32(RetVal[i]);
                 data.creator = RetVal[i + 1];
+                data.regionId = RetVal [1 + 2];
+                data.parcelId = RetVal [i + 3];
 
                 //Parse the time out for the viewer
-                DateTime date = DateTime.Parse(RetVal[i + 4]);
+                DateTime date = DateTime.Parse (RetVal [i + 4]);
                 data.date = date.ToString(new DateTimeFormatInfo());
                 data.dateUTC = (uint) Util.ToUnixTime(date);
 
@@ -1249,12 +1267,6 @@ namespace WhiteCore.Services.DataService
                 var posY = (float)Convert.ToDecimal (RetVal[1 + 10], Culture.NumberFormatInfo);
                 var posZ = (float)Convert.ToDecimal (RetVal[i + 11], Culture.NumberFormatInfo);
                 data.regionPos = new Vector3 (posX, posY, posZ);
-
-//                data.regionPos = new Vector3(
-//                    float.Parse(RetVal[i + 9]),
-//                    float.Parse(RetVal[i + 10]),
-//                    float.Parse(RetVal[i + 11])
-//                    );
 
                 data.globalPos = new Vector3(
                     region.RegionLocX + data.regionPos.X,
@@ -1291,6 +1303,22 @@ namespace WhiteCore.Services.DataService
             return (RetVal.Count == 0) ? null : Query2EventData(RetVal)[0];
         }
 
+        /// <summary>
+        /// Creates the event.
+        /// </summary>
+        /// <returns>The event.</returns>
+        /// <param name="creator">Creator.</param>
+        /// <param name="regionID">Region identifier.</param>
+        /// <param name="parcelID">Parcel identifier.</param>
+        /// <param name="date">Date.</param>
+        /// <param name="cover">Cover.</param>
+        /// <param name="maturity">Maturity.</param>
+        /// <param name="flags">Flags.</param>
+        /// <param name="duration">Duration.</param>
+        /// <param name="localPos">Local position.</param>
+        /// <param name="name">Name.</param>
+        /// <param name="description">Description.</param>
+        /// <param name="category">Category.</param>
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public EventData CreateEvent(UUID creator, UUID regionID, UUID parcelID, DateTime date, uint cover,
                                      EventFlags maturity, uint flags, uint duration, Vector3 localPos, string name,
@@ -1330,16 +1358,18 @@ namespace WhiteCore.Services.DataService
             eventData.name = name;
             eventData.description = description;
             eventData.category = category;
+            eventData.regionId = regionID.ToString();
+            eventData.parcelId = parcelID.ToString();
 
             Dictionary<string, object> row = new Dictionary<string, object>(15);
             row["EID"] = eventData.eventID;
             row["creator"] = creator.ToString();
             row["region"] = regionID.ToString();
             row["parcel"] = parcelID.ToString();
-            row["date"] = date.ToString("s");
+            row["date"] = date.ToString("s");       
             row["cover"] = eventData.cover;
-            row["maturity"] = (uint) maturity;
-            row["flags"] = flags;
+            row["maturity"] = Util.ConvertEventMaturityToDBMaturity (maturity);      // PG = 1, M == 2, A == 4
+            row["flags"] = flags;                   // region maturity flags
             row["duration"] = duration;
             row["localPosX"] = localPos.X;
             row["localPosY"] = localPos.Y;
@@ -1353,6 +1383,71 @@ namespace WhiteCore.Services.DataService
             return eventData;
         }
 
+
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public bool UpdateAddEvent (EventData eventData)
+        {
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (eventData);
+                return (bool)remoteValue;
+            }
+
+            // delete this event it it exists 
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["EID"] = eventData.eventID;
+            GD.Delete (m_eventInfoTable, filter);
+
+            // add the event 
+            Dictionary<string, object> row = new Dictionary<string, object> (15);
+            row ["EID"] = GetMaxEventID () + 1; 
+            row ["creator"] = eventData.creator;
+            row ["region"] = eventData.regionId;
+            row ["parcel"] = eventData.parcelId;
+            row ["date"] = eventData.date;                    
+            row ["cover"] = eventData.cover;
+            row ["maturity"] = Util.ConvertEventMaturityToDBMaturity ((EventFlags) eventData.maturity);      // PG = 1, M == 2, A == 4
+            row ["flags"] = eventData.eventFlags;             // region maturity flags
+            row ["duration"] = eventData.duration;
+            row ["localPosX"] = eventData.regionPos.X;
+            row ["localPosY"] = eventData.regionPos.Y;
+            row ["localPosZ"] = eventData.regionPos.Z;
+            row ["name"] = eventData.name;
+            row ["description"] = eventData.description;
+            row ["category"] = eventData.category;
+
+            try {
+                GD.Insert (m_eventInfoTable, row);
+            } catch {
+                return false;
+            }
+
+            // assume success if no error
+            return true;
+        }
+
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public bool DeleteEvent (string eventId)
+        {
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote (eventId);
+                return (bool)remoteValue;
+            }
+
+            // delete this event it it exists 
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["EID"] = eventId;
+
+            try {
+                GD.Delete (m_eventInfoTable, filter);
+            } catch {
+                return false;
+            }
+
+            // assume success if no error
+            return true;
+        }
+
+        // WebUI and API calls
         public List<EventData> GetEvents(uint start, uint count, Dictionary<string, bool> sort,
                                          Dictionary<string, object> filter)
         {

@@ -1,4 +1,4 @@
-//This one works out of the box with the new Aurora-Sim SL Feeling Physics Engine
+//This one works out of the box with the new WhiteCore-Sim SL Feeling Physics Engine
 // Script Name: Helicopter.lsl
 // Author: Encog Dod
 //Helicopter

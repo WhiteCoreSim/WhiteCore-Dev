@@ -113,7 +113,7 @@ namespace WhiteCore.Services.DataService
 
             Dictionary<int, List<GridRegion>> borkedByEstate = new Dictionary<int, List<GridRegion>> ();
             foreach (GridRegion region in borked) {
-                int estateID = estatePlugin.GetEstateID (region.RegionID);
+                int estateID = estatePlugin.GetRegionEstateID (region.RegionID);
                 if (!borkedByEstate.ContainsKey (estateID)) {
                     borkedByEstate [estateID] = new List<GridRegion> ();
                 }
@@ -123,7 +123,7 @@ namespace WhiteCore.Services.DataService
             Dictionary<int, UUID> estateOwnerIDs = new Dictionary<int, UUID> ();
             uint estateFail = 0;
             foreach (int estateID in borkedByEstate.Keys) {
-                EstateSettings es = estatePlugin.GetEstateSettings (estateID);
+                EstateSettings es = estatePlugin.GetEstateIDSettings (estateID);
                 if ((es == null) || (es.EstateID == 0)) {
                     MainConsole.Instance.Error ("[LocalGridConnector] Cannot fix missing owner for regions in Estate " +
                                                estateID + ", could not get estate settings.");
@@ -290,7 +290,7 @@ namespace WhiteCore.Services.DataService
                 return resp;
             }
 
-            EstateSettings es = estates.GetEstateSettings ((int)estateID);
+            EstateSettings es = estates.GetEstateIDSettings ((int)estateID);
 
             QueryFilter filter = new QueryFilter ();
             filter.andBitfieldAndFilters ["Flags"] = (uint)flags;
@@ -306,7 +306,7 @@ namespace WhiteCore.Services.DataService
 
                 query.ForEach (delegate (GridRegion region) {
                     if (region.EstateOwner == es.EstateOwner &&
-                        estates.GetEstateID (region.RegionID) == es.EstateID) {
+                        estates.GetRegionEstateID (region.RegionID) == es.EstateID) {
                         resp.Add (region);
                     }
                 });
@@ -389,7 +389,7 @@ namespace WhiteCore.Services.DataService
                 return 0;
             }
 
-            EstateSettings es = estates.GetEstateSettings ((int)estateID);
+            EstateSettings es = estates.GetEstateIDSettings ((int)estateID);
 
             QueryFilter filter = new QueryFilter ();
             filter.andBitfieldAndFilters ["Flags"] = (uint)flags;
@@ -399,7 +399,7 @@ namespace WhiteCore.Services.DataService
             uint count = 0;
             query.ForEach (delegate (GridRegion region) {
                 if (region.EstateOwner == es.EstateOwner &&
-                    estates.GetEstateID (region.RegionID) == es.EstateID) {
+                    estates.GetRegionEstateID (region.RegionID) == es.EstateID) {
                     ++count;
                 }
             });
@@ -413,7 +413,7 @@ namespace WhiteCore.Services.DataService
                 IEstateConnector EstateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
                 EstateSettings ES = null;
                 if (EstateConnector != null) {
-                    ES = EstateConnector.GetEstateSettings (region.RegionID);
+                    ES = EstateConnector.GetRegionEstateSettings (region.RegionID);
                     if ((ES != null) && (ES.EstateID != 0))
                         region.EstateOwner = ES.EstateOwner;
                 }
@@ -485,6 +485,13 @@ namespace WhiteCore.Services.DataService
             return Regions;
         }
 
+        public List<GridRegion> GetOwnerRegions (UUID ownerID)
+        {
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["OwnerUUID"] = ownerID.ToString();
+
+            return ParseQuery (null, GD.Query (new string [] { "*" }, m_realm, filter, null, null, null));
+        }
         #endregion
 
         public void Dispose ()

@@ -3290,7 +3290,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcCreate", m_host, "OSSL", m_itemID)) 
                 return "";
 
-            return NpcCreate(firstname, lastname, position, notecard, false, false);
+            return NpcCreate(firstname, lastname, position, notecard, true, false);
         }
 
         public LSL_Key osNpcCreate(string firstname, string lastname, LSL_Types.Vector3 position, string notecard, int options)
@@ -3386,6 +3386,22 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
                 manager.RemoveAvatar(npcId, World, m_host.OwnerID);
             }
+        }
+
+        public LSL_Integer osIsNpc(LSL_Key npc)
+        {
+            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "osIsNpc", m_host, "OSSL", m_itemID))
+                return ScriptBaseClass.FALSE;
+
+            IBotManager manager = World.RequestModuleInterface<IBotManager> ();
+            if (manager != null) {
+                UUID npcId;
+                if (UUID.TryParse(npc.m_string, out npcId))
+                    if (manager.IsNpcAgent(npcId))
+                        return ScriptBaseClass.TRUE;
+            }
+
+            return ScriptBaseClass.FALSE;
         }
 
         /// <summary>

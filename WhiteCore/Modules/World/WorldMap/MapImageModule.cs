@@ -128,9 +128,10 @@ namespace WhiteCore.Modules.WorldMap
             }
 
             terrainRenderer = null;
+            GC.Collect ();
 
-            MainConsole.Instance.InfoFormat ("[MapTile generator]: Maptile generation took {0} ms",
-                (Environment.TickCount - start));
+            MainConsole.Instance.InfoFormat ("[MapTile generator]: Maptile generation for {0} took {1} ms",
+                                             m_scene.RegionInfo.RegionName, (Environment.TickCount - start));
 
         }
 
@@ -342,6 +343,7 @@ namespace WhiteCore.Modules.WorldMap
                 if (gridRegModule != null)
                     gridRegModule.UpdateGridRegion (m_scene);
 
+                GC.Collect ();
             }
         }
 
@@ -367,6 +369,9 @@ namespace WhiteCore.Modules.WorldMap
 
                 CreateTerrainTexture ();
                 m_scene.SimulationDataService.MapTileNeedsGenerated = false;
+            } else {
+                MainConsole.Instance.InfoFormat ("[Maptile generator]: Skipping maptile generation for {0} as no change have been made",
+                                                 m_scene.RegionInfo.RegionName);
             }
 
         }

@@ -108,10 +108,10 @@
 </div>
 
   <!-- Carousel -->
-<script src="../js/jquery.jcarousellite.js"></script>
+<!--<script src="../js/jquery.jcarousellite.js"></script>-->
 
 <script>
-    jQuery(document).ready(function($) {
+    $(document).ready(function($) {
       $('div.parcel_picture').each(function(i) {
         var img_ = $('img', this);
         var img_height = img_.attr('height');
@@ -124,14 +124,13 @@
         });
       });
     });
-</script>
-<script>
-$(function() {
+
+  $(function() {
     $('.parcelscarousel').jCarouselLite({
         btnNext: '.next-horiz',
         btnPrev: '.prev-horiz',
         visible: 6
     });
-});
+  });
 
 </script>

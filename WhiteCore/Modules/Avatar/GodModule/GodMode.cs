@@ -60,7 +60,8 @@ namespace WhiteCore.Modules.Gods
                     return;
                 }
 
-                m_savestate_oar_directory = source.Configs ["GodModule"].GetString ("DirectoryForSaveStateOARs", m_savestate_oar_directory);
+                m_savestate_oar_directory = source.Configs ["GodModule"].GetString (
+                    "DirectoryForSaveStateOARs", m_savestate_oar_directory);
             }
         }
 
@@ -154,10 +155,10 @@ namespace WhiteCore.Modules.Gods
                 IScene scene = MainConsole.Instance.ConsoleScene; //Switch back later
                 MainConsole.Instance.RunCommand ("change region " + client.Scene.RegionInfo.RegionName);
                 MainConsole.Instance.RunCommand (
-                    "save oar "
+                    "save oar \""
                     + m_savestate_oar_directory
-                    + client.Scene.RegionInfo.RegionName.Replace (" ", "%20")// Check if the region name has spaces in them
-                    + ".statesave.oar");
+                    + client.Scene.RegionInfo.RegionName
+                    + ".statesave.oar\"");
                 if (scene == null)
                     MainConsole.Instance.RunCommand ("change region root");
                 else
@@ -189,15 +190,15 @@ namespace WhiteCore.Modules.Gods
             //Update their current region with new information
             if (Utils.BytesToString (SimName) != oldRegionName) {
                 client.Scene.RegionInfo.RegionName = Utils.BytesToString (SimName);
-                MainConsole.Instance.InfoFormat ("[REGION GOD] Region {0} has been renamed to {1}", oldRegionName, Utils.BytesToString (SimName));
+                MainConsole.Instance.InfoFormat ("[God] Region {0} has been renamed to {1}", oldRegionName, Utils.BytesToString (SimName));
                 client.SendAgentAlertMessage ("Region has been renamed to " + Utils.BytesToString (SimName), true);
             }
 
             // Save the old region locations
             int oldRegionLocX = client.Scene.RegionInfo.RegionLocX;
             int oldRegionLocY = client.Scene.RegionInfo.RegionLocY;
-            int newRegionLocX = client.Scene.RegionInfo.RegionLocX;
-            int newRegionLocY = client.Scene.RegionInfo.RegionLocY;
+            int newRegionLocX = oldRegionLocX;
+            int newRegionLocY = oldRegionLocY;
 
             //Set the region loc X and Y
             if (RedirectX != 0) {
@@ -211,11 +212,17 @@ namespace WhiteCore.Modules.Gods
 
             // Check if there's changes to display the new coords on the console and inworld
             if (newRegionLocX != oldRegionLocX || newRegionLocY != oldRegionLocY) {
-                MainConsole.Instance.InfoFormat ("[REGION GOD] Region {0} has been moved from {1},{2} to {3},{4}",
-                                            client.Scene.RegionInfo.RegionName, (oldRegionLocX / Constants.RegionSize), (oldRegionLocY / Constants.RegionSize),
-                                                 (client.Scene.RegionInfo.RegionLocX / Constants.RegionSize), (client.Scene.RegionInfo.RegionLocY / Constants.RegionSize));
-                client.SendAgentAlertMessage ("Region has been moved from " + (oldRegionLocX / Constants.RegionSize) + "," + (oldRegionLocY / Constants.RegionSize)
-                                             + " to " + newRegionLocX + "," + newRegionLocY, true);
+                var oldMapLocX = oldRegionLocX / Constants.RegionSize;
+                var oldMapLocY = oldRegionLocY / Constants.RegionSize;
+                var newMapLocX = newRegionLocX / Constants.RegionSize;
+                var newMapLocY = newRegionLocY / Constants.RegionSize;
+
+                MainConsole.Instance.InfoFormat ("[God] Region {0} has been moved from {1},{2} to {3},{4}",
+                                                 client.Scene.RegionInfo.RegionName,
+                                                 oldMapLocX, oldMapLocY,
+                                                 newMapLocX, newMapLocY);
+                client.SendAgentAlertMessage ("Region has been moved from " + oldMapLocX + "," + oldMapLocY
+                                              + " to " + newMapLocX + "," + newMapLocY, true);
             }
 
             //Update the estate ID
@@ -229,11 +236,12 @@ namespace WhiteCore.Modules.Gods
                 }
             }
 
-            //Set the other settings
+            //Set/Reset Estate settings
             client.Scene.RegionInfo.EstateSettings.BillableFactor = BillableFactor;
             client.Scene.RegionInfo.EstateSettings.PricePerMeter = PricePerMeter;
             client.Scene.RegionInfo.EstateSettings.SetFromFlags (RegionFlags);
 
+            // Set/Reset Region flags
             client.Scene.RegionInfo.RegionSettings.AllowDamage =
                 ((RegionFlags & (ulong)OpenMetaverse.RegionFlags.AllowDamage) == (ulong)OpenMetaverse.RegionFlags.AllowDamage);
             client.Scene.RegionInfo.RegionSettings.FixedSun = ((RegionFlags & (ulong)OpenMetaverse.RegionFlags.SunFixed) ==

@@ -45,5 +45,6 @@ namespace WhiteCore.Framework.Modules
         string GetTextureURL(UUID textureID);
         string GetRegionWorldViewURL(UUID RegionID);
         string GetAvatarImageURL (string imageURL);
+        string GetImageURL (string imageURL);
     }
 }

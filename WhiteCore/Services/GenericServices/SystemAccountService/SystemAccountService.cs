@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org, http://opensimulator.org/
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
@@ -26,10 +26,12 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Nini.Config;
 using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
@@ -48,8 +50,11 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
         string realEstateOwnerName = Constants.RealEstateOwnerName;
         string bankerName = Constants.BankerName;
         string marketplaceOwnerName = Constants.MarketplaceOwnerName;
+        string libraryOwnerName = Constants.LibraryOwnerName;
+        string [] m_userNameSeed;
 
         IRegistryCore m_registry;
+        IConfigSource m_config;
 
         #region ISystemAccountService Members
 
@@ -85,9 +90,17 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
             get { return marketplaceOwnerName; }
         }
 
+        public UUID LibraryOwnerUUID {
+            get { return (UUID)Constants.LibraryOwnerUUID; }
+        }
+
+        public string LibraryOwnerName {
+            get { return libraryOwnerName; }
+        }
+
         public string GetSystemEstateOwnerName (int estateID)
         {
-            if (estateID == 1)  // Mainland estate
+            if (estateID == Constants.MainlandEstateID)
                 return governorName;
 
             // System estate then
@@ -96,7 +109,7 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
 
         public UUID GetSystemEstateOwner (int estateID)
         {
-            if (estateID == 1)  // Mainland estate
+            if (estateID == Constants.MainlandEstateID) 
                 return GovernorUUID;
 
             // System estate then
@@ -118,8 +131,14 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
                 marketplaceOwnerName = estConfig.GetString ("MarketplaceOwnerName", marketplaceOwnerName);
             }
 
+            IConfig libConfig = config.Configs ["LibraryService"];
+            if (libConfig != null) {
+                libraryOwnerName = libConfig.GetString ("LibraryOwnerName", libraryOwnerName);
+            }
+
             registry.RegisterModuleInterface<ISystemAccountService> (this);
             m_registry = registry;
+            m_config = config;
         }
 
         public void Start (IConfigSource config, IRegistryCore registry)
@@ -135,6 +154,11 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
                 // check and/or create default RealEstate user
                 CheckSystemUserInfo ();
 
+                // if this is the initial run, create the grid system user
+                var users = m_accountService.NumberOfUserAccounts (null, "");
+                if (users == 0)
+                    CreateGridOwnerUser ();
+                
                 AddCommands ();
             }
 
@@ -182,11 +206,11 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
             if (m_accountService == null)
                 return;
 
-            VerifySystemUserInfo ("Governor", GovernorUUID, GovernorName, 250);
-            VerifySystemUserInfo ("RealEstate", SystemEstateOwnerUUID, SystemEstateOwnerName, 150);
-            VerifySystemUserInfo ("Banker", BankerUUID, BankerName, 100);
-            VerifySystemUserInfo ("Marketplace", MarketplaceOwnerUUID, MarketplaceOwnerName, 100);
-
+            VerifySystemUserInfo ("Governor", GovernorUUID, GovernorName, Constants.USER_GOD_MAINTENANCE);
+            VerifySystemUserInfo ("RealEstate", SystemEstateOwnerUUID, SystemEstateOwnerName, Constants.USER_GOD_LIASON);
+            VerifySystemUserInfo ("Banker", BankerUUID, BankerName, Constants.USER_GOD_CUSTOMER_SERVICE);
+            VerifySystemUserInfo ("Marketplace", MarketplaceOwnerUUID, MarketplaceOwnerName, Constants.USER_DISABLED);
+            VerifySystemUserInfo ("Library", LibraryOwnerUUID, LibraryOwnerName, Constants.USER_DISABLED);
         }
 
         void VerifySystemUserInfo (string usrType, UUID usrUUID, string usrName, int usrLevel)
@@ -258,6 +282,136 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
                 pwFile.WriteLine (userInfo.PadRight (20) + " : '" + userName + "' was created: " + Culture.LocaleLogStamp ());
                 pwFile.WriteLine ("Password             : " + password);
             }
+        }
+
+        /// <summary>
+        /// Creates the grid owner user on a clean startup.
+        /// Sets user to 'Charter Meneber" and elevates to  "God" status
+        /// </summary>
+        void CreateGridOwnerUser ()
+        {
+
+            string userName = "";
+            string password, email, uuid;
+
+            // Get user name
+            // check for user name seed
+            IConfig loginConfig = m_config.Configs ["LoginService"];
+            if (loginConfig != null) {
+                string userNameSeed = loginConfig.GetString ("UserNameSeed", "");
+                if (userNameSeed != "")
+                    m_userNameSeed = userNameSeed.Split (',');
+            }
+
+            var ufNames = new Utilities.MarkovNameGenerator ();
+            var ulNames = new Utilities.MarkovNameGenerator ();
+            string [] nameSeed = m_userNameSeed == null ? Utilities.UserNames : m_userNameSeed;
+
+            string firstName = ufNames.FirstName (nameSeed, 3, 4);
+            string lastName = ulNames.FirstName (nameSeed, 5, 6);
+            string enteredName = firstName + " " + lastName;
+            if (userName != "")
+                enteredName = userName;
+
+            do {
+                userName = MainConsole.Instance.Prompt ("Grid owner user name (? for suggestion)", enteredName);
+                if (userName == "" || userName == "?") {
+                    enteredName = ufNames.NextName + " " + ulNames.NextName;
+                    userName = "";
+                    continue;
+                }
+                var fl = userName.Split (' ');
+                if (fl.Length < 2) {
+                    MainConsole.Instance.CleanInfo ("    User name must be <firstname> <lastname>");
+                    userName = "";
+                }
+            } while (userName == "");
+            ufNames.Reset ();
+            ulNames.Reset ();
+
+            // password 
+            var pwmatch = false;
+            do {
+                password = MainConsole.Instance.PasswordPrompt ("Password");
+                if (password == "") {
+                    MainConsole.Instance.CleanInfo (" .... password must not be empty, please re-enter");
+                    continue;
+                }
+                var passwordAgain = MainConsole.Instance.PasswordPrompt ("Re-enter Password");
+                pwmatch = (password == passwordAgain);
+                if (!pwmatch)
+                    MainConsole.Instance.CleanInfo (" .... passwords did not match, please re-enter");
+            } while (!pwmatch);
+
+            // email
+            email = MainConsole.Instance.Prompt ("Email for password recovery. ('none' if unknown)", "none");
+
+            if ((email.ToLower () != "none") && !Utilities.IsValidEmail (email)) {
+                MainConsole.Instance.CleanInfo ("This does not look like a valid email address. ('none' if unknown)");
+                email = MainConsole.Instance.Prompt ("Email", email);
+            }
+
+            // Get available user avatar archives
+            var userAvatarArchive = "";
+            IAvatarAppearanceArchiver avieArchiver = m_registry.RequestModuleInterface<IAvatarAppearanceArchiver> ();
+            if (avieArchiver != null) {
+                List<string> avatarArchives = avieArchiver.GetAvatarArchiveFilenames ();
+
+                if (avatarArchives.Count > 0) {
+                    avatarArchives.Add ("None");
+                    userAvatarArchive = MainConsole.Instance.Prompt ("Avatar archive to use", "None", avatarArchives);
+                    if (userAvatarArchive == "None")
+                        userAvatarArchive = "";
+                }
+            }
+
+            // Allow the modification of UUID if required - for matching user UUID with other Grids etc like SL
+            uuid = UUID.Random ().ToString ();
+            while (true) {
+                uuid = MainConsole.Instance.Prompt ("Required avatar UUID (optional))", uuid);
+                UUID test;
+                if (UUID.TryParse (uuid, out test))
+                    break;
+
+                MainConsole.Instance.Error ("There was a problem verifying this UUID. Please retry.");
+            }
+
+            // this really should not normally be altered so hide it
+            //scopeID = UUID.Zero.ToString ();
+            //if (sysFlag) {
+            //    scopeID = MainConsole.Instance.Prompt ("Scope (Don't change unless you know what this is)", scopeID);
+            //}
+
+            // we should be good to go
+            //m_accountService.CreateUser (UUID.Parse (uuid), UUID.Parse (scopeID), userName, Util.Md5Hash (password), email);
+            m_accountService.CreateUser (UUID.Parse (uuid), UUID.Zero, userName, Util.Md5Hash (password), email);
+            // CreateUser will tell us success or problem
+            //MainConsole.Instance.InfoFormat("[User account service]: User '{0}' created", name);
+
+            // check for success
+            UserAccount account = m_accountService.GetUserAccount (null, userName);
+            if (account != null) {
+                account.UserFlags = Constants.USER_FLAG_CHARTERMEMBER;
+                account.UserLevel = 250;
+                m_accountService.StoreUserAccount (account);
+
+                // update profile for the user as well
+                var profileConnector = Framework.Utilities.DataManager.RequestPlugin<IProfileConnector> ();
+                if (profileConnector != null) {
+                    var profile = profileConnector.GetUserProfile (account.PrincipalID);
+                    if (profile == null) {
+                        profileConnector.CreateNewProfile (account.PrincipalID);          // create a profile for the user
+                        profile = profileConnector.GetUserProfile (account.PrincipalID);
+                    }
+
+                    if (userAvatarArchive != "")
+                        profile.AArchiveName = userAvatarArchive + ".aa";
+                    profile.MembershipGroup = "Charter_Member";
+                    profile.IsNewUser = true;
+                    profileConnector.UpdateUserProfile (profile);
+                }
+            } else
+               MainConsole.Instance.WarnFormat ("[System User account service]: There was a problem creating the account for '{0}'", userName);
         }
 
         #endregion

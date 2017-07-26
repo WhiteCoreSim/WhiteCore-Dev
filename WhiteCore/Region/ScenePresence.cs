@@ -574,6 +574,16 @@ namespace WhiteCore.Region
             set { m_isChildAgent = value; }
         }
 
+        /// <summary>
+        /// The agent is an npc.
+        /// </summary>
+        protected bool m_isNpcAgent = false;
+
+        public bool IsNpcAgent {
+            get { return m_isNpcAgent; }
+            set { m_isNpcAgent = value; }
+        }
+
         protected UUID m_parentID;
 
         public UUID ParentID
@@ -1521,7 +1531,7 @@ namespace WhiteCore.Region
             }
 
             if ((update_movementflag || update_rotation) && (m_parentID == UUID.Zero))
-                Animator.UpdateMovementAnimations(false);
+                Animator.UpdateMovementAnimations(true);
 
 
             IAgentUpdateMonitor reporter =
@@ -2788,7 +2798,7 @@ namespace WhiteCore.Region
             //Set this so we don't do it multiple times
             m_creatingPhysicalRepresentation = true;
 
-            Vector3 size = new Vector3(0, 0, m_defaultAvHeight);
+            Vector3 size = new Vector3(0.45f, 0.6f, m_defaultAvHeight);
             IAvatarAppearanceModule appearance = RequestModuleInterface<IAvatarAppearanceModule>();
             if (appearance != null)
                 size.Z = appearance.Appearance.AvatarHeight;

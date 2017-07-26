@@ -638,22 +638,34 @@ namespace WhiteCore.Modules.Currency
                         (fromUserInfo == null ? UUID.Zero : fromUserInfo.CurrentRegionID)
                     );
 
+                var paidToMsg = "";
+                var paidFromMsg = "";
+                var paidDesc = (description == "" ? "" : " for " + description);
+
+                if (amount > 0) {
+                    paidFromMsg = 
+                        (fromAccount == null ? " received " : fromAccount.Name + " paid you ") +
+                        InWorldCurrency + amount + paidDesc;
+                    paidToMsg = "You paid " +
+                        (toAccount == null ? "" : toAccount.Name + " ") +
+                        InWorldCurrency + amount + paidDesc;
+                }
+
                 if (fromID == toID)
                 {
                     if (toUserInfo != null && toUserInfo.IsOnline)
-                        SendUpdateMoneyBalanceToClient(toID, transactionID, toUserInfo.CurrentRegionURI, toCurrency.Amount,
-                            toAccount == null ? "" : (toAccount.Name + " paid you " + InWorldCurrency + amount + (description == "" ? "" : ": " + description)));
+                        SendUpdateMoneyBalanceToClient(toID, transactionID, toUserInfo.CurrentRegionURI, toCurrency.Amount, 
+                                                       toAccount == null ? "" : (toAccount.Name + " paid you ") +
+                                                       InWorldCurrency + amount + paidDesc);
                 } else
                 {
                     if (toUserInfo != null && toUserInfo.IsOnline)
                     {
-                        SendUpdateMoneyBalanceToClient(toID, transactionID, toUserInfo.CurrentRegionURI, toCurrency.Amount,
-                            fromAccount == null ? "" : (fromAccount.Name + " paid you " + InWorldCurrency  + amount + (description == "" ? "" : ": " + description)));
+                        SendUpdateMoneyBalanceToClient (toID, transactionID, toUserInfo.CurrentRegionURI, toCurrency.Amount, paidFromMsg);
                     }
                     if (fromUserInfo != null && fromUserInfo.IsOnline)
                     {
-                        SendUpdateMoneyBalanceToClient(fromID, transactionID, fromUserInfo.CurrentRegionURI, fromCurrency.Amount,
-                            "You paid " + (toAccount == null ? "" : toAccount.Name) + " " + InWorldCurrency + amount);
+                        SendUpdateMoneyBalanceToClient (fromID, transactionID, fromUserInfo.CurrentRegionURI, fromCurrency.Amount, paidToMsg);
                     }
                 }
             }

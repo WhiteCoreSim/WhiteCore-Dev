@@ -73,7 +73,7 @@ namespace WhiteCore.Modules.Web
                 var ownerUUID = UUID.Zero;
                 var ownerName = "Unknown";
                 if (estateConnector != null) {
-                    EstateSettings estate = estateConnector.GetEstateSettings (region.RegionID);
+                    EstateSettings estate = estateConnector.GetRegionEstateSettings (region.RegionID);
                     if (estate != null) {
                         ownerUUID = estate.EstateOwner;
                         UserAccount estateOwnerAccount = null;

@@ -1227,6 +1227,16 @@ namespace WhiteCore.Modules.Permissions
             if (GenericEstatePermission (user))
                 return true;
 
+            // need to check for bots
+            var botMgr = m_scene.RequestModuleInterface<IBotManager> ();
+            if (botMgr != null) {
+                if (botMgr.IsNpcAgent (user)) {
+                    var owner = botMgr.GetOwner (user);
+                    if (GenericEstatePermission (user))
+                        return true;
+                }
+            }
+
             return false;
         }
 

@@ -37,6 +37,9 @@ namespace WhiteCore.Physics.BulletSPlugin
 //#pragma warning disable 414
 //        static string LogHeader = "[BULLETSIM SHAPE COLLECTION]";
 //#pragma warning restore 414
+		
+		#pragma warning disable 0649
+		// Putting this here to clear out some warnings - 29082016 Fly-man-
 
         BSScene PhysicsScene { get; set; }
 

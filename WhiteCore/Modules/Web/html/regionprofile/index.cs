@@ -74,7 +74,7 @@ namespace WhiteCore.Modules.Web
                 IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
                 EstateSettings estate = null;
                 if (estateConnector != null)
-                    estate = estateConnector.GetEstateSettings (region.RegionID);
+                    estate = estateConnector.GetRegionEstateSettings (region.RegionID);
                 if (estate != null) {
                     vars.Add ("OwnerUUID", estate.EstateOwner);
                     var estateOwnerAccount = webInterface.Registry.RequestModuleInterface<IUserAccountService> ().

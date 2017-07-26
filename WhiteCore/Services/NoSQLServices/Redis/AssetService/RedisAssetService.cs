@@ -121,6 +121,12 @@ namespace WhiteCore.RedisServices.AssetService
                     "get asset <ID>",
                     "Gets info about asset from database", 
                     HandleGetAsset, false, true);
+                
+                MainConsole.Instance.Commands.AddCommand (
+                   "migrate sql assets",
+                   "migrate sql assets <enable|disable>",
+                   "Enable or disable migration of SQL assets",
+                   HandleMigrateSQLAssets, false, true);
             }
             MainConsole.Instance.Info("[Redis asset service]: Redis asset service enabled");
         }
@@ -162,8 +168,10 @@ namespace WhiteCore.RedisServices.AssetService
             {
                 bool found;
                 AssetBase cachedAsset = cache.Get(id, out found);
-                if (found && (cachedAsset == null || cachedAsset.Data.Length != 0))
-                    return cachedAsset;
+                if (found) {
+                    if (cachedAsset != null && cachedAsset.Data != null)
+                        return cachedAsset;
+                }
             }
 
             if (m_doRemoteOnly) {
@@ -195,8 +203,14 @@ namespace WhiteCore.RedisServices.AssetService
             return null;
         }
 
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public virtual byte [] GetData (string id)
+        {
+            return GetData (id, true);
+        }
+
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public virtual byte[] GetData(string id)
+        public virtual byte[] GetData(string id, bool showWarnings)
         {
             IImprovedAssetCache cache = m_registry.RequestModuleInterface<IImprovedAssetCache>();
             if (doDatabaseCaching && cache != null)
@@ -208,7 +222,7 @@ namespace WhiteCore.RedisServices.AssetService
             }
 
             if (m_doRemoteOnly) {
-                object remoteValue = DoRemoteByURL ("AssetServerURI", id);
+                object remoteValue = DoRemoteByURL ("AssetServerURI", id, showWarnings);
                 if (remoteValue != null) {
                     byte [] data = (byte [])remoteValue;
                     if (doDatabaseCaching && cache != null && data != null)
@@ -218,7 +232,7 @@ namespace WhiteCore.RedisServices.AssetService
                 return null;
             }
 
-            AssetBase asset = RedisGetAsset(id);
+            AssetBase asset = RedisGetAsset(id, showWarnings);
             if (doDatabaseCaching && cache != null)
                 cache.Cache(id, asset);
 
@@ -243,7 +257,7 @@ namespace WhiteCore.RedisServices.AssetService
             return RedisExistsAsset(id);
         }
 
-        public virtual void Get(String id, Object sender, AssetRetrieved handler)
+        public virtual void Get(string id, object sender, AssetRetrieved handler)
         {
             var asset = Get (id);
             if (asset != null) {
@@ -373,7 +387,12 @@ namespace WhiteCore.RedisServices.AssetService
             return false;
         }
 
-        public AssetBase RedisGetAsset(string id)
+        public AssetBase RedisGetAsset (string id)
+        {
+            return RedisGetAsset(id, true);
+        }
+
+        public AssetBase RedisGetAsset(string id, bool showWarnings)
         {
             AssetBase asset = null;
 
@@ -382,26 +401,30 @@ namespace WhiteCore.RedisServices.AssetService
 #endif
             try
             {
-                RedisEnsureConnection((conn) =>
-                                          {
-                                              byte[] data = conn.Get(id);
-                                              if (data == null)
-                                                  return null;
+                RedisEnsureConnection((conn) => {
+                    byte[] data = conn.Get(id);
+                    if (data == null) {
+                        return null;
+                    }
 
-                                              MemoryStream memStream = new MemoryStream(data);
-                                              asset = ProtoBuf.Serializer.Deserialize<AssetBase>(memStream);
-                                              if (asset.Type == -1)
-                                                  asset.Type = 0;
-                                              memStream.Close();
-                                              byte[] assetdata = conn.Get(DATA_PREFIX + asset.HashCode);
-                                              if (assetdata == null || asset.HashCode == "")
-                                                  return null;
-                                              asset.Data = assetdata;
-                                              return null;
-                                          });
+                    MemoryStream memStream = new MemoryStream(data);
+                    asset = ProtoBuf.Serializer.Deserialize<AssetBase>(memStream);
+                    if (asset.Type == -1)
+                        asset.Type = 0;
+                    memStream.Close();
+                    byte[] assetdata = conn.Get(DATA_PREFIX + asset.HashCode);
+                    if (assetdata == null || asset.HashCode == "")
+                        return null;
+                    asset.Data = assetdata;
+                    return null;
+                });
 
-                if (asset == null)
-                    return CheckForConversion(id);
+                if (asset == null) {
+                    if (showWarnings)
+                        MainConsole.Instance.Warn ("Redis asset service]: Failed to retrieve asset " + id);
+
+                    return CheckForConversion (id);
+                }
             }
             finally
             {
@@ -453,7 +476,7 @@ namespace WhiteCore.RedisServices.AssetService
             byte[] data = asset.Data;
             string hash = asset.HashCode;
             asset.Data = new byte[0];
-            ProtoBuf.Serializer.Serialize<AssetBase>(memStream, asset);
+            ProtoBuf.Serializer.Serialize (memStream, asset);
             asset.Data = data;
 
             try
@@ -626,6 +649,41 @@ namespace WhiteCore.RedisServices.AssetService
                 creatorName,
                 asset.CreationDate.ToShortDateString()
             );      
+        }
+
+        /// <summary>
+        /// Handles enable/disable of the migrate SQL setting.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="args">Arguments.</param>
+        void HandleMigrateSQLAssets (IScene scene, string [] args)
+        {
+
+            bool migrate = m_migrateSQL;
+
+            if (args.Length < 4) {
+                MainConsole.Instance.InfoFormat ("Migration pf SQL assets is currently {0}",
+                                                 m_migrateSQL ? "enabled" : "disabled");
+                var prompt = MainConsole.Instance.Prompt (
+                    "Do you wish to " + (m_migrateSQL ? "disable" : "enable") + " migration of SQL assets? (yes/no)", "no");
+                if (prompt.ToLower ().StartsWith ("y", StringComparison.Ordinal))
+                    migrate = !migrate;
+                else
+                    return;
+            } else {
+                var setting = args [3];
+                if (setting.ToLower ().StartsWith ("e", StringComparison.Ordinal))
+                    migrate = true;
+                if (setting.ToLower ().StartsWith ("d", StringComparison.Ordinal))
+                    migrate = false;
+            }
+
+            if (migrate == m_migrateSQL)
+                return;
+
+            m_migrateSQL = migrate;
+            MainConsole.Instance.InfoFormat ("Migration of SQL assets has been {0}",
+                                                 m_migrateSQL ? "enabled" : "disabled");
         }
 
         #endregion

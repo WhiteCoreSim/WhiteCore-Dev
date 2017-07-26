@@ -13,9 +13,10 @@
 //================================================================
 // Inworld Script Line:    osConsoleCommand(string command);
 //
-// This is ONLY EFFECTIVE if you are running Aurora-Sim yourself and have access to the console screen
+// This is ONLY EFFECTIVE if you are running WhiteCore-Sim yourself and
+//   have access to the console screen
 // This Fuction MUST BE RESTRICTED to using only Authorized UUID as can be defined in
-//    \bin\Configuration\Scripting\AuroraDotNetEngine.ini
+//    Config\Sim\Scripting\DotNetEngine.ini
 //
 default
 {

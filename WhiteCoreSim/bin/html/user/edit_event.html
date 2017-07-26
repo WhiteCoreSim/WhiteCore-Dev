@@ -1,0 +1,118 @@
+
+<!-- Edit user event -->
+
+  <h2>{EventNameText}:{SimName}</h2>
+  <div id="info_message" class="info"></div>
+  <form id="edit_event_form" action="user/edit_event.html" method="post">
+    <input hidden="true" label="eventid" id="eventid" name="eventid" value="{EventID}"/>
+    <input type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
+    <table id="edit_event">
+      <thead>
+        <tr>
+          <th class="text-centered"></th>
+          <th class="text-centered"></th>
+          <th class="text-centered"></th>
+          <th class="text-centered"></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr>
+          <td class="text-right"><p>{EventNameText}</p></td>
+          <td class="text-left" colspan="3"><input name="eventName" type="text" id="eventName" size="119" value="{Name}"/></td>
+        </tr>
+        <tr>
+          <td class="text-right"><label class="from" for="eventDate">{EventDateText}</label></td>
+          <td class="text-left"><input type="text" style="width:120px;" name="eventDate" id="eventDate" value="{EventDate}" /></td>
+          <td class="text-right"><label class="to" for="eventTime">{EventTimeText}</label></td>
+          <td class="text-left">
+            <select name="eventTime" id="eventTime">
+            {EventTimesArrayBegin}
+              <option value="{Index}" {selected}>{Value}</option>
+            {EventTimesArrayEnd}
+                </select>
+          </td>
+        </tr>
+        <tr>
+          <td class="text-right"><label class="to" for="eventDuration">{EventDurationText}</label></td>
+          <td class="text-left">
+            <select name="eventDuration" id="eventDuration">
+            {EventDurationsArrayBegin}
+              <option value="{Index}" {selected}>{Value}</option>
+            {EventDurationsArrayEnd}
+            </select>
+          </td>
+          <td class="text-centered" colspan="2"><label class="from">{EventTimeInfoText}</label></td>
+        </tr>
+        <tr>
+          <td class="text-right"><p>{EventLocationText}</p></td>
+          <td class="text-left" colspan="3">
+            <select name="eventLocation" id="eventLocation">
+            {EventLocationsArrayBegin}
+              <option value="{Index}" {disabled} {selected}>{Value}</option>
+            {EventLocationsArrayEnd}
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td class="txt-right"><label class="to" for="eventDuration">{EventCategoryText}</label></td>
+          <td class="text-left">
+            <select name="eventCategory" id="eventCategory">
+            {EventCategoriesArrayBegin}
+              <option value="{Index}" {selected}>{Value}</option>
+            {EventCategoriesArrayEnd}
+            </select>
+          </td>
+          <td class="text-right"><label class="to" for="eventCoverCharge">{EventCoverChargeText}</label></td>
+          <td >
+            <input type="text" style="width:80px;" name="eventCoverCharge" id="eventCoverCharge" value="{EventCoverCharge}" />
+          </td>
+        </tr>
+        <tr>
+          <td class="text-right"><p>{EventDescriptionText}</p></td>
+          <td class="text-left" colspan="3">
+            <textarea name="eventDescription" cols="91" rows="10" id="eventDescription" >
+              {Description}
+            </textarea></td>
+        </tr>
+        <tr>
+          <td class="text-right"></td>
+          <td class="text-right"></td>
+          <td class="text-centered"><input type="checkbox" id="Delete" name="Delete" style="width:25px;"/>{Delete}</td>
+          <td class="text-left"><button id="Submit" name="Submit" type="Submit">{Submit}</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </form>
+
+  <script>
+    <!--  /* date picker */ -->
+    $(function() {
+      $( "#eventDate" ).datepick({
+        //defaultDate: "-1w",
+        changeMonth: true,
+        numberOfMonths: 3,
+        showTrigger: '<button type="button" class="trigger">...</button>',
+        onClose: function( selectedDate ) {
+          $( "#eventDate" ).datepick( "option", "minDate", selectedDate );
+        }
+      });
+    });
+
+    /* attach a submit handler to the form */
+    $("#edit_event_form").submit(function(event) {
+
+      /* stop form from submitting normally */
+      event.preventDefault();
+      /* get some values from elements on the page: */
+      var $form = $( this ),
+          url = $form.attr( 'action' );
+      /* Send the data using post and put the results in a div */
+      $.post( url, $form.serialize(),
+        function( data ) {
+          $("#info_message").empty().append(data);
+        }
+      );
+    });
+  </script>
+

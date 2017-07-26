@@ -30,6 +30,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using OpenMetaverse;
+using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
@@ -119,8 +120,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
             // Fill in the events for this state, cache the results in the map
             foreach (KeyValuePair<string, scriptEvents> kvp in m_eventFlagsMap)
             {
-                try
-                {
+                try {
                     MethodInfo ev = null;
                     string evname = state == "" ? "" : state + "_event_";
                     evname += kvp.Key;
@@ -131,15 +131,19 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
                         //MainConsole.Instance.Debug("Found handler for " + kvp.Key);
                         eventFlags |= kvp.Value;
                 }
-                catch (Exception)
-                {
-                    //MainConsole.Instance.Debug("Exeption in GetMethod:\n"+e.ToString());
+                catch (Exception e) {
+                    MainConsole.Instance.Debug("Exception in GetMethod for state: " + state +"\n"+e);
                 }
             }
 
             // Save the flags we just computed and return the result
-            if (eventFlags != 0)
-                m_stateEvents.Add(state, eventFlags);
+            if (eventFlags != 0) {
+                try {
+                    m_stateEvents.Add (state, eventFlags);
+                } catch (Exception e) {
+                    MainConsole.Instance.Debug("Exception adding state event for state: " + state + "\n"+e);
+                }
+            }
 
             //MainConsole.Instance.Debug("Returning {0:x}", eventFlags);
             return eventFlags;

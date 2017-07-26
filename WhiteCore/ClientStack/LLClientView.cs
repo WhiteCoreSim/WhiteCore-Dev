@@ -320,7 +320,7 @@ namespace WhiteCore.ClientStack
         #region Class Members
 
         // LLClientView Only
-        public delegate void BinaryGenericMessage(Object sender, string method, byte[][] args);
+        public delegate void BinaryGenericMessage(object sender, string method, byte[][] args);
 
         /// <summary>
         ///     Used to adjust Sun Orbit values so Linden based viewers properly position sun
@@ -369,7 +369,7 @@ namespace WhiteCore.ClientStack
         readonly string m_Name;
         readonly EndPoint m_userEndPoint;
         UUID m_activeGroupID;
-        string m_activeGroupName = String.Empty;
+        string m_activeGroupName = string.Empty;
         ulong m_activeGroupPowers;
         uint m_agentFOVCounter;
 
@@ -466,6 +466,11 @@ namespace WhiteCore.ClientStack
 
         #endregion Properties
 
+        #region debug
+        long startMem;
+
+        #endregion
+
         /// <summary>
         ///     Constructor
         /// </summary>
@@ -473,6 +478,8 @@ namespace WhiteCore.ClientStack
                             AgentCircuitData sessionInfo,
                             UUID agentId, UUID sessionId, uint circuitCode)
         {
+            startMem = GC.GetTotalMemory (false);
+
             InitDefaultAnimations();
 
             m_scene = scene;
@@ -540,8 +547,7 @@ namespace WhiteCore.ClientStack
         public void Stop()
         {
             // Send the STOP packet NOW, otherwise it doesn't get out in time
-            DisableSimulatorPacket disable =
-                (DisableSimulatorPacket) PacketPool.Instance.GetPacket(PacketType.DisableSimulator);
+            var disable = (DisableSimulatorPacket) PacketPool.Instance.GetPacket(PacketType.DisableSimulator);
             OutPacket(disable, ThrottleOutPacketType.Immediate);
         }
 
@@ -551,14 +557,13 @@ namespace WhiteCore.ClientStack
         public void Close(bool forceClose)
         {
             //MainConsole.Instance.DebugFormat(
-            //    "[CLIENT]: Close has been called for {0} attached to scene {1}",
+            //    "[Client]: Close has been called for {0} attached to scene {1}",
             //    Name, m_scene.RegionInfo.RegionName);
 
             if (forceClose && !IsLoggingOut) //Don't send it to clients that are logging out
             {
                 // Send the STOP packet NOW, otherwise it doesn't get out in time
-                DisableSimulatorPacket disable =
-                    (DisableSimulatorPacket) PacketPool.Instance.GetPacket(PacketType.DisableSimulator);
+                var disable = (DisableSimulatorPacket) PacketPool.Instance.GetPacket(PacketType.DisableSimulator);
                 OutPacket(disable, ThrottleOutPacketType.Immediate);
             }
 
@@ -580,18 +585,24 @@ namespace WhiteCore.ClientStack
             }
 
             // Disable UDP handling for this client
+            m_udpClient.OnQueueEmpty -= HandleQueueEmpty;
+            m_udpClient.OnPacketStats -= PopulateStats;
             m_udpClient.Shutdown();
 
-            //MainConsole.Instance.InfoFormat("[CLIENTVIEW] Memory pre  GC {0}", System.GC.GetTotalMemory(false));
-            //GC.Collect();
-            //MainConsole.Instance.InfoFormat("[CLIENTVIEW] Memory post GC {0}", System.GC.GetTotalMemory(true));
+            // 03122016 Fly-man-
+            // Turning this on to check why regions are taking
+            // up so much memory after a user exits the region
+            MainConsole.Instance.DebugFormat("[Client] Memory on initiate {0} mBytes",startMem / 1000000);
+            var endMem = GC.GetTotalMemory(true);
+            MainConsole.Instance.DebugFormat("[Client] Memory on close {0} mBytes", endMem / 1000000);
+            MainConsole.Instance.DebugFormat ("[Client] Memory released {0} mBytes", (startMem - endMem) / 1000000);
         }
 
         public void Kick(string message)
         {
             if (!ChildAgentStatus())
             {
-                KickUserPacket kupack = (KickUserPacket) PacketPool.Instance.GetPacket(PacketType.KickUser);
+                var kupack = (KickUserPacket) PacketPool.Instance.GetPacket(PacketType.KickUser);
                 kupack.UserInfo.AgentID = AgentId;
                 kupack.UserInfo.SessionID = SessionId;
                 kupack.TargetBlock.TargetIP = 0;
@@ -733,7 +744,7 @@ namespace WhiteCore.ClientStack
             {
                 // Make sure that we see any exception caused by the asynchronous operation.
                 MainConsole.Instance.ErrorFormat(
-                    "[LLCLIENTVIEW]: Caught exception while processing {0} for {1}, {2} {3}",
+                    "[Client]: Caught exception while processing {0} for {1}, {2} {3}",
                     packetObject.Pack, Name, e.Message, e.StackTrace);
             }
         }
@@ -744,8 +755,7 @@ namespace WhiteCore.ClientStack
 
         public void SendRegionHandshake(RegionInfo regionInfo, RegionHandshakeArgs args)
         {
-            RegionHandshakePacket handshake =
-                (RegionHandshakePacket) PacketPool.Instance.GetPacket(PacketType.RegionHandshake);
+            var handshake = (RegionHandshakePacket) PacketPool.Instance.GetPacket(PacketType.RegionHandshake);
             handshake.RegionInfo = new RegionHandshakePacket.RegionInfoBlock
                                        {
                                            BillableFactor = args.billableFactor,
@@ -801,8 +811,7 @@ namespace WhiteCore.ClientStack
         /// </summary>
         public void MoveAgentIntoRegion(RegionInfo regInfo, Vector3 pos, Vector3 look)
         {
-            AgentMovementCompletePacket mov =
-                (AgentMovementCompletePacket) PacketPool.Instance.GetPacket(PacketType.AgentMovementComplete);
+            var mov = (AgentMovementCompletePacket) PacketPool.Instance.GetPacket(PacketType.AgentMovementComplete);
             mov.SimData.ChannelVersion = m_channelVersion;
             mov.AgentData.SessionID = m_sessionId;
             mov.AgentData.AgentID = AgentId;
@@ -818,8 +827,7 @@ namespace WhiteCore.ClientStack
         public void SendChatMessage(string message, byte type, Vector3 fromPos, string fromName,
                                     UUID fromAgentID, byte source, byte audible)
         {
-            ChatFromSimulatorPacket reply =
-                (ChatFromSimulatorPacket) PacketPool.Instance.GetPacket(PacketType.ChatFromSimulator);
+            var reply = (ChatFromSimulatorPacket) PacketPool.Instance.GetPacket(PacketType.ChatFromSimulator);
             reply.ChatData.Audible = audible;
             reply.ChatData.Message = Util.StringToBytes1024(message);
             reply.ChatData.ChatType = type;
@@ -838,7 +846,7 @@ namespace WhiteCore.ClientStack
         public void SendTelehubInfo(Vector3 TelehubPos, Quaternion TelehubRot, List<Vector3> SpawnPoint, UUID ObjectID,
                                     string nameT)
         {
-            TelehubInfoPacket packet = (TelehubInfoPacket) PacketPool.Instance.GetPacket(PacketType.TelehubInfo);
+            var packet = (TelehubInfoPacket) PacketPool.Instance.GetPacket(PacketType.TelehubInfo);
             packet.SpawnPointBlock = new TelehubInfoPacket.SpawnPointBlockBlock[SpawnPoint.Count];
             int i = 0;
             foreach (Vector3 pos in SpawnPoint)
@@ -862,8 +870,7 @@ namespace WhiteCore.ClientStack
         {
             if (m_scene.Permissions.CanInstantMessage(im.FromAgentID, im.ToAgentID))
             {
-                ImprovedInstantMessagePacket msg
-                    = (ImprovedInstantMessagePacket) PacketPool.Instance.GetPacket(PacketType.ImprovedInstantMessage);
+                var msg = (ImprovedInstantMessagePacket) PacketPool.Instance.GetPacket(PacketType.ImprovedInstantMessage);
 
                 msg.AgentData.AgentID = im.FromAgentID;
                 msg.AgentData.SessionID = UUID.Zero;
@@ -890,17 +897,16 @@ namespace WhiteCore.ClientStack
         public void SendGenericMessage(string method, List<string> message)
         {
             List<byte[]> convertedmessage =
-                message.ConvertAll<byte[]>(delegate(string item) { return Util.StringToBytes256(item); });
+                message.ConvertAll(delegate(string item) { return Util.StringToBytes256(item); });
             SendGenericMessage(method, convertedmessage);
         }
 
         public void SendGenericMessage(string method, List<byte[]> message)
         {
-            GenericMessagePacket gmp = new GenericMessagePacket
-                                           {
-                                               MethodData = {Method = Util.StringToBytes256(method)},
-                                               ParamList = new GenericMessagePacket.ParamListBlock[message.Count]
-                                           };
+            var gmp = new GenericMessagePacket {
+                MethodData = {Method = Util.StringToBytes256(method)},
+                ParamList = new GenericMessagePacket.ParamListBlock[message.Count]
+            };
             int i = 0;
             foreach (byte[] val in message)
             {
@@ -913,18 +919,13 @@ namespace WhiteCore.ClientStack
 
         public void SendGroupActiveProposals(UUID groupID, UUID transactionID, GroupActiveProposals[] Proposals)
         {
-            GroupActiveProposalItemReplyPacket GAPIRP = new GroupActiveProposalItemReplyPacket
-                                                            {
-                                                                AgentData = {AgentID = AgentId, GroupID = groupID},
-                                                                TransactionData =
-                                                                    {
-                                                                        TransactionID = transactionID,
-                                                                        TotalNumItems = (uint) Proposals.Length
-                                                                    },
-                                                                ProposalData =
-                                                                    new GroupActiveProposalItemReplyPacket.
-                                                                    ProposalDataBlock[Proposals.Length]
-                                                            };
+            var GAPIRP = new GroupActiveProposalItemReplyPacket {
+                AgentData = {AgentID = AgentId, GroupID = groupID},
+                TransactionData = {
+                    TransactionID = transactionID,
+                    TotalNumItems = (uint) Proposals.Length },
+                ProposalData = new GroupActiveProposalItemReplyPacket.ProposalDataBlock[Proposals.Length]
+            };
 
 
             int i = 0;
@@ -1134,7 +1135,7 @@ namespace WhiteCore.ClientStack
             }
             catch (Exception e)
             {
-                MainConsole.Instance.Warn("[CLIENT]: ClientView.API.cs: SendLayerData() - Failed with exception " + e);
+                MainConsole.Instance.Warn("[Client]: ClientView.API.cs: SendLayerData() - Failed with exception " + e);
             }
         }
 
@@ -1146,8 +1147,8 @@ namespace WhiteCore.ClientStack
         /// <param name="y">Y coordinate for patches 0..15</param>
         public void SendLayerPacket(short[] map, int y, int x)
         {
-            int[] xs = new[] {x + 0, x + 1, x + 2, x + 3};
-            int[] ys = new[] {y, y, y, y};
+            int[] xs = {x + 0, x + 1, x + 2, x + 3};
+            int[] ys = {y, y, y, y};
 
             try
             {
@@ -1207,8 +1208,8 @@ namespace WhiteCore.ClientStack
         {
             try
             {
-                int[] x = new[] {px};
-                int[] y = new[] {py};
+                int[] x = {px};
+                int[] y = {py};
 
                 byte type = (byte) TerrainPatch.LayerType.Land;
                 if (m_scene.RegionInfo.RegionSizeX > Constants.RegionSize ||
@@ -1224,7 +1225,7 @@ namespace WhiteCore.ClientStack
             }
             catch (Exception e)
             {
-                MainConsole.Instance.ErrorFormat("[CLIENT]: SendLayerData() Failed with exception: " + e);
+                MainConsole.Instance.ErrorFormat("[Client]: SendLayerData() Failed with exception: " + e);
             }
         }
 
@@ -1397,7 +1398,7 @@ namespace WhiteCore.ClientStack
                 CircuitCode = m_circuitCode
             };
 
-            AgentCircuitData currentAgentCircuit = this.m_udpServer.m_circuitManager.GetAgentCircuitData(AgentId);
+            AgentCircuitData currentAgentCircuit = m_udpServer.m_circuitManager.GetAgentCircuitData(AgentId);
             if (currentAgentCircuit != null)
                 agentData.IPAddress = currentAgentCircuit.IPAddress;
 
@@ -1668,7 +1669,7 @@ namespace WhiteCore.ClientStack
             if (entities.Length == 0)
                 return; //........... why!
 
-//            MainConsole.Instance.DebugFormat("[CLIENT]: Sending KillObjectPacket to {0} for {1} in {2}", Name, localID, regionHandle);
+//            MainConsole.Instance.DebugFormat("[Client]: Sending KillObjectPacket to {0} for {1} in {2}", Name, localID, regionHandle);
 
             KillObjectPacket kill = (KillObjectPacket) PacketPool.Instance.GetPacket(PacketType.KillObject);
             kill.ObjectData = new KillObjectPacket.ObjectDataBlock[entities.Length];
@@ -1722,7 +1723,7 @@ namespace WhiteCore.ClientStack
             if (entities.Length == 0)
                 return; //........... why!
 
-            //            MainConsole.Instance.DebugFormat("[CLIENT]: Sending KillObjectPacket to {0} for {1} in {2}", Name, localID, regionHandle);
+            //            MainConsole.Instance.DebugFormat("[Client]: Sending KillObjectPacket to {0} for {1} in {2}", Name, localID, regionHandle);
 
             KillObjectPacket kill = (KillObjectPacket) PacketPool.Instance.GetPacket(PacketType.KillObject);
             kill.ObjectData = new KillObjectPacket.ObjectDataBlock[entities.Length];
@@ -2351,7 +2352,7 @@ namespace WhiteCore.ClientStack
         public void SendAgentDataUpdate(UUID agentid, UUID activegroupid, string name,
                                         ulong grouppowers, string groupname, string grouptitle)
         {
-            if (agentid == this.AgentId)
+            if (agentid == AgentId)
             {
                 m_activeGroupID = activegroupid;
                 m_activeGroupName = groupname;
@@ -2533,7 +2534,7 @@ namespace WhiteCore.ClientStack
             OutPacket(packet, ThrottleOutPacketType.State);
         }
 
-        public void SendAvatarProperties(UUID avatarID, string aboutText, string bornOn, Byte[] charterMember,
+        public void SendAvatarProperties(UUID avatarID, string aboutText, string bornOn, byte[] charterMember,
                                          string flAbout, uint flags, UUID flImageID, UUID imageID, string profileURL,
                                          UUID partnerID)
         {
@@ -2561,7 +2562,7 @@ namespace WhiteCore.ClientStack
         /// <param name="FromAvatarID"></param>
         /// <param name="FromAvatarName"></param>
         /// <param name="Message"></param>
-        public void SendBlueBoxMessage(UUID FromAvatarID, String FromAvatarName, String Message)
+        public void SendBlueBoxMessage(UUID FromAvatarID, string FromAvatarName, string Message)
         {
             if (!ChildAgentStatus())
                 SendInstantMessage(new GridInstantMessage()
@@ -2716,15 +2717,12 @@ namespace WhiteCore.ClientStack
 
         public void SendGroupNameReply(UUID groupLLUID, string GroupName)
         {
-            UUIDGroupNameReplyPacket pack = new UUIDGroupNameReplyPacket();
-            UUIDGroupNameReplyPacket.UUIDNameBlockBlock[] uidnameblock =
-                new UUIDGroupNameReplyPacket.UUIDNameBlockBlock[1];
-            UUIDGroupNameReplyPacket.UUIDNameBlockBlock uidnamebloc = new UUIDGroupNameReplyPacket.UUIDNameBlockBlock
-                                                                          {
-                                                                              ID = groupLLUID,
-                                                                              GroupName =
-                                                                                  Util.StringToBytes256(GroupName)
-                                                                          };
+            var pack = new UUIDGroupNameReplyPacket();
+            UUIDGroupNameReplyPacket.UUIDNameBlockBlock[] uidnameblock =  new UUIDGroupNameReplyPacket.UUIDNameBlockBlock[1];
+            var uidnamebloc = new UUIDGroupNameReplyPacket.UUIDNameBlockBlock {
+                ID = groupLLUID, 
+                GroupName = Util.StringToBytes256(GroupName)
+            };
             uidnameblock[0] = uidnamebloc;
             pack.UUIDNameBlock = uidnameblock;
             OutPacket(pack, ThrottleOutPacketType.AvatarInfo);
@@ -2733,26 +2731,27 @@ namespace WhiteCore.ClientStack
         static readonly object _lock = new object ();
         public void SendLandStatReply(uint reportType, uint requestFlags, uint resultCount, LandStatReportItem[] lsrpia)
         {
-            LandStatReplyMessage message = new LandStatReplyMessage
-                                               {
-                                                   ReportType = reportType,
-                                                   RequestFlags = requestFlags,
-                                                   TotalObjectCount = resultCount,
-                                                   ReportDataBlocks =
-                                                       new LandStatReplyMessage.ReportDataBlock[lsrpia.Length]
-                                               };
-                for (int i = 0; i < lsrpia.Length; i++) {
+            var message = new LandStatReplyMessage {
+                ReportType = reportType,
+                RequestFlags = requestFlags,
+                TotalObjectCount = resultCount,
+                ReportDataBlocks = new LandStatReplyMessage.ReportDataBlock [lsrpia.Length]
+            };
+
+            for (int i = 0; i < lsrpia.Length; i++) {
                 lock (_lock) {
-                    LandStatReplyMessage.ReportDataBlock block = new LandStatReplyMessage.ReportDataBlock {
-                        Location = lsrpia [i].Location,
-                        MonoScore = lsrpia [i].Score,
-                        OwnerName = lsrpia [i].OwnerName,
-                        Score = lsrpia [i].Score,
-                        TaskID = lsrpia [i].TaskID,
-                        TaskLocalID = lsrpia [i].TaskLocalID,
-                        TaskName = lsrpia [i].TaskName,
-                        TimeStamp = lsrpia [i].TimeModified
-                    };
+                    var landItem = lsrpia [i];
+                    var block = new LandStatReplyMessage.ReportDataBlock ();
+
+                    block.Location = landItem.Location;
+                    block.MonoScore = landItem.Score;
+                    block.OwnerName = landItem.OwnerName;
+                    block.Score = landItem.Score;
+                    block.TaskID = landItem.TaskID;
+                    block.TaskLocalID = landItem.TaskLocalID;
+                    block.TaskName = landItem.TaskName;
+                    block.TimeStamp = landItem.TimeModified;
+
                     message.ReportDataBlocks [i] = block;
                 }
             }
@@ -2799,7 +2798,7 @@ namespace WhiteCore.ClientStack
         {
             if (req.AssetInf.Data == null)
             {
-                MainConsole.Instance.ErrorFormat("[LLClientView]: Cannot send asset {0} ({1}), asset data is null",
+                MainConsole.Instance.ErrorFormat("[Client]: Cannot send asset {0} ({1}), asset data is null",
                                                  req.AssetInf.ID, req.AssetInf.TypeString);
                 return;
             }
@@ -3665,14 +3664,14 @@ namespace WhiteCore.ClientStack
 
             avp.Sender.IsTrial = false;
             avp.Sender.ID = app.Owner;
-            //MainConsole.Instance.InfoFormat("[LLClientView]: Sending appearance for {0} to {1}", agentID.ToString(), AgentId.ToString());
+            //MainConsole.Instance.InfoFormat("[Client]: Sending appearance for {0} to {1}", agentID.ToString(), AgentId.ToString());
             //            OutPacket(avp, ThrottleOutPacketType.Texture);
             OutPacket(avp, ThrottleOutPacketType.AvatarInfo);
         }
 
         public void SendAnimations(AnimationGroup animations)
         {
-            //MainConsole.Instance.DebugFormat("[CLIENT]: Sending animations to {0}", Name);
+            //MainConsole.Instance.DebugFormat("[Client]: Sending animations to {0}", Name);
 
             AvatarAnimationPacket ani =
                 (AvatarAnimationPacket) PacketPool.Instance.GetPacket(PacketType.AvatarAnimation);
@@ -3880,7 +3879,7 @@ namespace WhiteCore.ClientStack
                     /*if (m_killRecord.Contains(entity.LocalId))
                         {
                         MainConsole.Instance.ErrorFormat(
-                            "[CLIENT]: Preventing update for prim with local id {0} after client for user {1} told it was deleted. Mantis this at http://mantis.WhiteCore-sim.org/bug_report_page.php !",
+                            "[Client]: Preventing update for prim with local id {0} after client for user {1} told it was deleted. Mantis this at http://mantis.WhiteCore-sim.org/bug_report_page.php !",
                             entity.LocalId, Name);
                         return;
                         }*/
@@ -4068,7 +4067,7 @@ namespace WhiteCore.ClientStack
                 }
                 catch (Exception ex)
                 {
-                    MainConsole.Instance.Warn("[LLCLIENTVIEW]: Issue creating an update block " + ex);
+                    MainConsole.Instance.Warn("[Client]: Issue creating an update block " + ex);
                     return;
                 }
             }
@@ -4855,7 +4854,7 @@ namespace WhiteCore.ClientStack
             CameraConstraintPacket cpack =
                 (CameraConstraintPacket) PacketPool.Instance.GetPacket(PacketType.CameraConstraint);
             cpack.CameraCollidePlane = new CameraConstraintPacket.CameraCollidePlaneBlock {Plane = ConstraintPlane};
-            //MainConsole.Instance.DebugFormat("[CLIENTVIEW]: Constraint {0}", ConstraintPlane);
+            //MainConsole.Instance.DebugFormat("[Client]: Constraint {0}", ConstraintPlane);
             OutPacket(cpack, ThrottleOutPacketType.AvatarInfo);
         }
 
@@ -5151,7 +5150,7 @@ namespace WhiteCore.ClientStack
             catch (Exception e)
             {
                 MainConsole.Instance.Warn(
-                    "[LLClientView]: exception converting quaternion to bytes, using Quaternion.Identity. Exception: " +
+                    "[Client]: exception converting quaternion to bytes, using Quaternion.Identity. Exception: " +
                     e);
                 Quaternion.Identity.ToBytes(objectData, 36);
             }
@@ -5230,7 +5229,7 @@ namespace WhiteCore.ClientStack
             }
 
 //            MainConsole.Instance.DebugFormat(
-//                "[LLCLIENTVIEW]: Constructing client update for part {0} {1} with flags {2}, localId {3}",
+//                "[Client]: Constructing client update for part {0} {1} with flags {2}, localId {3}",
 //                data.Name, update.FullID, flags, update.ID);
 
             update.UpdateFlags = (uint) flags;
@@ -5703,13 +5702,13 @@ namespace WhiteCore.ClientStack
 
         #region Scene/Avatar
 
-        bool HandleAgentUpdate(IClientAPI sener, Packet Pack)
+        bool HandleAgentUpdate(IClientAPI sener, Packet pack)
         {
             if (OnAgentUpdate != null)
             {
                 bool update = false;
                 //bool forcedUpdate = false;
-                AgentUpdatePacket agenUpdate = (AgentUpdatePacket) Pack;
+                var agenUpdate = (AgentUpdatePacket) pack;
 
                 #region Packet Session and User Check
 
@@ -5780,9 +5779,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleMoneyTransferRequest(IClientAPI sender, Packet Pack)
+        bool HandleMoneyTransferRequest(IClientAPI sender, Packet pack)
         {
-            MoneyTransferRequestPacket money = (MoneyTransferRequestPacket) Pack;
+            var money = (MoneyTransferRequestPacket) pack;
             // validate the agent owns the agentID and sessionID
             if (money.MoneyData.SourceID == sender.AgentId && money.AgentData.AgentID == sender.AgentId &&
                 money.AgentData.SessionID == sender.SessionId)
@@ -5801,118 +5800,115 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        bool HandleParcelGodMarkAsContent(IClientAPI client, Packet Packet)
+        bool HandleParcelGodMarkAsContent(IClientAPI client, Packet pack)
         {
-            ParcelGodMarkAsContentPacket ParcelGodMarkAsContent =
-                (ParcelGodMarkAsContentPacket) Packet;
+            var parcelGodMarkAsContent = (ParcelGodMarkAsContentPacket) pack;
 
             #region Packet Session and User Check
 
             if (m_checkPackets)
             {
-                if (ParcelGodMarkAsContent.AgentData.SessionID != SessionId ||
-                    ParcelGodMarkAsContent.AgentData.AgentID != AgentId)
+                if (parcelGodMarkAsContent.AgentData.SessionID != SessionId ||
+                    parcelGodMarkAsContent.AgentData.AgentID != AgentId)
                     return true;
             }
 
             #endregion
 
-            ParcelGodMark ParcelGodMarkAsContentHandler = OnParcelGodMark;
-            if (ParcelGodMarkAsContentHandler != null)
+            ParcelGodMark parcelGodMarkAsContentHandler = OnParcelGodMark;
+            if (parcelGodMarkAsContentHandler != null)
             {
-                ParcelGodMarkAsContentHandler(this,
-                                              ParcelGodMarkAsContent.AgentData.AgentID,
-                                              ParcelGodMarkAsContent.ParcelData.LocalID);
+                parcelGodMarkAsContentHandler(this,
+                                              parcelGodMarkAsContent.AgentData.AgentID,
+                                              parcelGodMarkAsContent.ParcelData.LocalID);
                 return true;
             }
             return false;
         }
 
-        bool HandleFreezeUser(IClientAPI client, Packet Packet)
+        bool HandleFreezeUser(IClientAPI client, Packet pack)
         {
-            FreezeUserPacket FreezeUser = (FreezeUserPacket) Packet;
+            var freezeUser = (FreezeUserPacket) pack;
 
             #region Packet Session and User Check
 
             if (m_checkPackets)
             {
-                if (FreezeUser.AgentData.SessionID != SessionId ||
-                    FreezeUser.AgentData.AgentID != AgentId)
+                if (freezeUser.AgentData.SessionID != SessionId ||
+                    freezeUser.AgentData.AgentID != AgentId)
                     return true;
             }
 
             #endregion
 
-            FreezeUserUpdate FreezeUserHandler = OnParcelFreezeUser;
-            if (FreezeUserHandler != null)
+            FreezeUserUpdate freezeUserHandler = OnParcelFreezeUser;
+            if (freezeUserHandler != null)
             {
-                FreezeUserHandler(this,
-                                  FreezeUser.AgentData.AgentID,
-                                  FreezeUser.Data.Flags,
-                                  FreezeUser.Data.TargetID);
+                freezeUserHandler(this,
+                                  freezeUser.AgentData.AgentID,
+                                  freezeUser.Data.Flags,
+                                  freezeUser.Data.TargetID);
                 return true;
             }
             return false;
         }
 
-        bool HandleEjectUser(IClientAPI client, Packet Packet)
+        bool HandleEjectUser(IClientAPI client, Packet pack)
         {
-            EjectUserPacket EjectUser =
-                (EjectUserPacket) Packet;
+            var ejectUser = (EjectUserPacket) pack;
 
             #region Packet Session and User Check
 
             if (m_checkPackets)
             {
-                if (EjectUser.AgentData.SessionID != SessionId ||
-                    EjectUser.AgentData.AgentID != AgentId)
+                if (ejectUser.AgentData.SessionID != SessionId ||
+                    ejectUser.AgentData.AgentID != AgentId)
                     return true;
             }
 
             #endregion
 
-            EjectUserUpdate EjectUserHandler = OnParcelEjectUser;
-            if (EjectUserHandler != null)
+            EjectUserUpdate ejectUserHandler = OnParcelEjectUser;
+            if (ejectUserHandler != null)
             {
-                EjectUserHandler(this,
-                                 EjectUser.AgentData.AgentID,
-                                 EjectUser.Data.Flags,
-                                 EjectUser.Data.TargetID);
+                ejectUserHandler(this,
+                                 ejectUser.AgentData.AgentID,
+                                 ejectUser.Data.Flags,
+                                 ejectUser.Data.TargetID);
                 return true;
             }
             return false;
         }
 
-        bool HandleParcelBuyPass(IClientAPI client, Packet Packet)
+        bool HandleParcelBuyPass(IClientAPI client, Packet pack)
         {
-            ParcelBuyPassPacket ParcelBuyPass =
-                (ParcelBuyPassPacket) Packet;
+            var parcelBuyPass = (ParcelBuyPassPacket) pack;
 
             #region Packet Session and User Check
 
             if (m_checkPackets)
             {
-                if (ParcelBuyPass.AgentData.SessionID != SessionId ||
-                    ParcelBuyPass.AgentData.AgentID != AgentId)
+                if (parcelBuyPass.AgentData.SessionID != SessionId ||
+                    parcelBuyPass.AgentData.AgentID != AgentId)
                     return true;
             }
 
             #endregion
 
-            ParcelBuyPass ParcelBuyPassHandler = OnParcelBuyPass;
-            if (ParcelBuyPassHandler != null)
+            ParcelBuyPass parcelBuyPassHandler = OnParcelBuyPass;
+            if (parcelBuyPassHandler != null)
             {
-                ParcelBuyPassHandler(this,
-                                     ParcelBuyPass.AgentData.AgentID,
-                                     ParcelBuyPass.ParcelData.LocalID);
+                parcelBuyPassHandler(this,
+                                     parcelBuyPass.AgentData.AgentID,
+                                     parcelBuyPass.ParcelData.LocalID);
                 return true;
             }
             return false;
         }
 
-        bool HandleParcelBuyRequest(IClientAPI sender, Packet Pack)
+        bool HandleParcelBuyRequest(IClientAPI sender, Packet pack)
         {
-            ParcelBuyPacket parcel = (ParcelBuyPacket) Pack;
+            var parcel = (ParcelBuyPacket) pack;
 
             #region Packet Session and User Check
 
@@ -5941,9 +5937,9 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        bool HandleUUIDGroupNameRequest(IClientAPI sender, Packet Pack)
+        bool HandleUUIDGroupNameRequest(IClientAPI sender, Packet pack)
         {
-            UUIDGroupNameRequestPacket upack = (UUIDGroupNameRequestPacket) Pack;
+            var upack = (UUIDGroupNameRequestPacket) pack;
 
             foreach (UUIDGroupNameRequestPacket.UUIDNameBlockBlock t in upack.UUIDNameBlock)
             {
@@ -5959,7 +5955,7 @@ namespace WhiteCore.ClientStack
 
         public bool HandleGenericMessage(IClientAPI sender, Packet pack)
         {
-            GenericMessagePacket gmpack = (GenericMessagePacket) pack;
+            var gmpack = (GenericMessagePacket) pack;
             if (m_genericPacketHandlers.Count == 0) return false;
             if (gmpack.AgentData.SessionID != SessionId) return false;
 
@@ -5969,8 +5965,8 @@ namespace WhiteCore.ClientStack
 
             if (m_genericPacketHandlers.TryGetValue(method, out handlerGenericMessage))
             {
-                List<string> msg = new List<string>();
-                List<byte[]> msgBytes = new List<byte[]>();
+                var msg = new List<string>();
+                var msgBytes = new List<byte[]>();
 
                 if (handlerGenericMessage != null)
                 {
@@ -5991,18 +5987,18 @@ namespace WhiteCore.ClientStack
                     catch (Exception e)
                     {
                         MainConsole.Instance.ErrorFormat(
-                            "[LLCLIENTVIEW]: Exception when handling generic message {0}{1}", e.Message, e.StackTrace);
+                            "[Client]: Exception when handling generic message {0}{1}", e.Message, e.StackTrace);
                     }
                 }
             }
 
-            //MainConsole.Instance.Debug("[LLCLIENTVIEW]: Not handling GenericMessage with method-type of: " + method);
+            //MainConsole.Instance.Debug("[Client]: Not handling GenericMessage with method-type of: " + method);
             return false;
         }
 
-        public bool HandleObjectGroupRequest(IClientAPI sender, Packet Pack)
+        public bool HandleObjectGroupRequest(IClientAPI sender, Packet pack)
         {
-            ObjectGroupPacket ogpack = (ObjectGroupPacket) Pack;
+            var ogpack = (ObjectGroupPacket) pack;
             if (ogpack.AgentData.SessionID != SessionId) return false;
 
             RequestObjectPropertiesFamily handlerObjectGroupRequest = OnObjectGroupRequest;
@@ -6017,9 +6013,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleViewerEffect(IClientAPI sender, Packet Pack)
+        bool HandleViewerEffect(IClientAPI sender, Packet pack)
         {
-            ViewerEffectPacket viewer = (ViewerEffectPacket) Pack;
+            var viewer = (ViewerEffectPacket)pack;
             if (viewer.AgentData.SessionID != SessionId) return false;
             ViewerEffectEventHandler handlerViewerEffect = OnViewerEffect;
             if (handlerViewerEffect != null)
@@ -6047,9 +6043,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleAvatarPropertiesRequest(IClientAPI sender, Packet Pack)
+        bool HandleAvatarPropertiesRequest(IClientAPI sender, Packet pack)
         {
-            AvatarPropertiesRequestPacket avatarProperties = (AvatarPropertiesRequestPacket) Pack;
+            var avatarProperties = (AvatarPropertiesRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -6070,9 +6066,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleChatFromViewer(IClientAPI sender, Packet Pack)
+        bool HandleChatFromViewer(IClientAPI sender, Packet pack)
         {
-            ChatFromViewerPacket inchatpack = (ChatFromViewerPacket) Pack;
+            ChatFromViewerPacket inchatpack = (ChatFromViewerPacket) pack;
 
             #region Packet Session and User Check
 
@@ -6085,7 +6081,7 @@ namespace WhiteCore.ClientStack
 
             #endregion
 
-            string fromName = String.Empty; //ClientAvatar.firstname + " " + ClientAvatar.lastname;
+            string fromName = string.Empty; //ClientAvatar.firstname + " " + ClientAvatar.lastname;
             byte[] message = inchatpack.ChatData.Message;
             byte type = inchatpack.ChatData.Type;
             Vector3 fromPos = new Vector3(); // ClientAvatar.Pos;
@@ -6119,9 +6115,9 @@ namespace WhiteCore.ClientStack
                 handlerChatFromClient(this, args);
         }
 
-        bool HandlerAvatarPropertiesUpdate(IClientAPI sender, Packet Pack)
+        bool HandlerAvatarPropertiesUpdate(IClientAPI sender, Packet pack)
         {
-            AvatarPropertiesUpdatePacket avatarProps = (AvatarPropertiesUpdatePacket) Pack;
+            var avatarProps = (AvatarPropertiesUpdatePacket) pack;
 
             #region Packet Session and User Check
 
@@ -6151,11 +6147,11 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandlerScriptDialogReply(IClientAPI sender, Packet Pack)
+        bool HandlerScriptDialogReply(IClientAPI sender, Packet pack)
         {
-            ScriptDialogReplyPacket rdialog = (ScriptDialogReplyPacket) Pack;
+            var rdialog = (ScriptDialogReplyPacket) pack;
 
-            //MainConsole.Instance.DebugFormat("[CLIENT]: Received ScriptDialogReply from {0}", rdialog.Data.ObjectID);
+            //MainConsole.Instance.DebugFormat("[Client]: Received ScriptDialogReply from {0}", rdialog.Data.ObjectID);
 
             #region Packet Session and User Check
 
@@ -6175,7 +6171,7 @@ namespace WhiteCore.ClientStack
                 OSChatMessage args = new OSChatMessage
                                          {
                                              Channel = ch,
-                                             From = String.Empty,
+                                             From = string.Empty,
                                              Message = Utils.BytesToString(msg),
                                              Type = ChatTypeEnum.Shout,
                                              Position = new Vector3(),
@@ -6190,9 +6186,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandlerImprovedInstantMessage(IClientAPI sender, Packet Pack)
+        bool HandlerImprovedInstantMessage(IClientAPI sender, Packet pack)
         {
-            ImprovedInstantMessagePacket msgpack = (ImprovedInstantMessagePacket) Pack;
+            var msgpack = (ImprovedInstantMessagePacket) pack;
 
             #region Packet Session and User Check
 
@@ -6242,9 +6238,9 @@ namespace WhiteCore.ClientStack
                 handlerInstantMessage(this, im);
         }
 
-        bool HandlerAcceptFriendship(IClientAPI sender, Packet Pack)
+        bool HandlerAcceptFriendship(IClientAPI sender, Packet pack)
         {
-            AcceptFriendshipPacket afriendpack = (AcceptFriendshipPacket) Pack;
+            var afriendpack = (AcceptFriendshipPacket) pack;
 
             #region Packet Session and User Check
 
@@ -6272,9 +6268,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandlerDeclineFriendship(IClientAPI sender, Packet Pack)
+        bool HandlerDeclineFriendship(IClientAPI sender, Packet pack)
         {
-            DeclineFriendshipPacket dfriendpack = (DeclineFriendshipPacket) Pack;
+            var dfriendpack = (DeclineFriendshipPacket) pack;
 
             #region Packet Session and User Check
 
@@ -6297,9 +6293,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandlerTerminateFrendship(IClientAPI sender, Packet Pack)
+        bool HandlerTerminateFrendship(IClientAPI sender, Packet pack)
         {
-            TerminateFriendshipPacket tfriendpack = (TerminateFriendshipPacket) Pack;
+            var tfriendpack = (TerminateFriendshipPacket) pack;
 
             #region Packet Session and User Check
 
@@ -6323,10 +6319,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleFindAgent(IClientAPI client, Packet Packet)
+        bool HandleFindAgent(IClientAPI client, Packet pack)
         {
-            FindAgentPacket FindAgent =
-                (FindAgentPacket) Packet;
+            var FindAgent = (FindAgentPacket) pack;
 
             FindAgentUpdate FindAgentHandler = OnFindAgent;
             if (FindAgentHandler != null)
@@ -6337,10 +6332,9 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        bool HandleTrackAgent(IClientAPI client, Packet Packet)
+        bool HandleTrackAgent(IClientAPI client, Packet pack)
         {
-            TrackAgentPacket TrackAgent =
-                (TrackAgentPacket) Packet;
+            var TrackAgent = (TrackAgentPacket) pack;
 
             #region Packet Session and User Check
 
@@ -6364,9 +6358,9 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        bool HandlerRezObject(IClientAPI sender, Packet Pack)
+        bool HandlerRezObject(IClientAPI sender, Packet pack)
         {
-            RezObjectPacket rezPacket = (RezObjectPacket) Pack;
+            var rezPacket = (RezObjectPacket) pack;
 
             #region Packet Session and User Check
 
@@ -6391,9 +6385,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandlerRezObjectFromNotecard(IClientAPI sender, Packet Pack)
+        bool HandlerRezObjectFromNotecard(IClientAPI sender, Packet pack)
         {
-            RezObjectFromNotecardPacket rezPacket = (RezObjectFromNotecardPacket) Pack;
+            var rezPacket = (RezObjectFromNotecardPacket) pack;
 
             #region Packet Session and User Check
 
@@ -6418,9 +6412,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandlerDeRezObject(IClientAPI sender, Packet Pack)
+        bool HandlerDeRezObject(IClientAPI sender, Packet pack)
         {
-            DeRezObjectPacket DeRezPacket = (DeRezObjectPacket) Pack;
+            var DeRezPacket = (DeRezObjectPacket) pack;
 
             #region Packet Session and User Check
 
@@ -6448,9 +6442,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandlerModifyLand(IClientAPI sender, Packet Pack)
+        bool HandlerModifyLand(IClientAPI sender, Packet pack)
         {
-            ModifyLandPacket modify = (ModifyLandPacket) Pack;
+            var modify = (ModifyLandPacket) pack;
 
             #region Packet Session and User Check
 
@@ -6487,7 +6481,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandlerRegionHandshakeReply(IClientAPI sender, Packet Pack)
+        bool HandlerRegionHandshakeReply(IClientAPI sender, Packet pack)
         {
             Action<IClientAPI> handlerRegionHandShakeReply = OnRegionHandShakeReply;
             if (handlerRegionHandShakeReply != null)
@@ -6498,7 +6492,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandlerAgentWearablesRequest(IClientAPI sender, Packet Pack)
+        bool HandlerAgentWearablesRequest(IClientAPI sender, Packet pack)
         {
             GenericCall1 handlerRequestWearables = OnRequestWearables;
 
@@ -6517,9 +6511,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandlerAgentSetAppearance(IClientAPI sender, Packet Pack)
+        bool HandlerAgentSetAppearance(IClientAPI sender, Packet pack)
         {
-            AgentSetAppearancePacket appear = (AgentSetAppearancePacket) Pack;
+            var appear = (AgentSetAppearancePacket) pack;
 
             #region Packet Session and User Check
 
@@ -6552,7 +6546,7 @@ namespace WhiteCore.ClientStack
                     WearableCache[] items = new WearableCache[appear.WearableData.Length];
                     for (int i = 0; i < appear.WearableData.Length; i++)
                     {
-                        WearableCache cache = new WearableCache
+                        var cache = new WearableCache
                                                   {
                                                       CacheID = appear.WearableData[i].CacheID,
                                                       TextureIndex = appear.WearableData[i].TextureIndex
@@ -6581,7 +6575,7 @@ namespace WhiteCore.ClientStack
         /// <returns></returns>
         bool HandleAgentTextureCached(IClientAPI simclient, Packet packet)
         {
-            AgentCachedTexturePacket cachedtex = (AgentCachedTexturePacket) packet;
+            var cachedtex = (AgentCachedTexturePacket) packet;
 
             if (cachedtex.AgentData.SessionID != SessionId) return false;
 
@@ -6598,14 +6592,14 @@ namespace WhiteCore.ClientStack
 
         public void SendAgentCachedTexture(List<CachedAgentArgs> args)
         {
-            AgentCachedTextureResponsePacket cachedresp =
+            var cachedresp =
                 (AgentCachedTextureResponsePacket) PacketPool.Instance.GetPacket(PacketType.AgentCachedTextureResponse);
             cachedresp.AgentData.AgentID = AgentId;
             cachedresp.AgentData.SessionID = m_sessionId;
             cachedresp.AgentData.SerialNum = m_cachedTextureSerial;
             m_cachedTextureSerial++;
-            cachedresp.WearableData =
-                new AgentCachedTextureResponsePacket.WearableDataBlock[args.Count];
+            cachedresp.WearableData = new AgentCachedTextureResponsePacket.WearableDataBlock[args.Count];
+
             for (int i = 0; i < args.Count; i++)
             {
                 cachedresp.WearableData[i] = new AgentCachedTextureResponsePacket.WearableDataBlock
@@ -6620,11 +6614,11 @@ namespace WhiteCore.ClientStack
             OutPacket(cachedresp, ThrottleOutPacketType.Texture);
         }
 
-        bool HandlerAgentIsNowWearing(IClientAPI sender, Packet Pack)
+        bool HandlerAgentIsNowWearing(IClientAPI sender, Packet pack)
         {
             if (OnAvatarNowWearing != null)
             {
-                AgentIsNowWearingPacket nowWearing = (AgentIsNowWearingPacket) Pack;
+                var nowWearing = (AgentIsNowWearingPacket) pack;
 
                 #region Packet Session and User Check
 
@@ -6637,7 +6631,7 @@ namespace WhiteCore.ClientStack
 
                 #endregion
 
-                AvatarWearingArgs wearingArgs = new AvatarWearingArgs();
+                var wearingArgs = new AvatarWearingArgs();
 
                 foreach (
                     AvatarWearingArgs.Wearable wearable in
@@ -6656,12 +6650,12 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandlerRezSingleAttachmentFromInv(IClientAPI sender, Packet Pack)
+        bool HandlerRezSingleAttachmentFromInv(IClientAPI sender, Packet pack)
         {
             RezSingleAttachmentFromInv handlerRezSingleAttachment = OnRezSingleAttachmentFromInv;
             if (handlerRezSingleAttachment != null)
             {
-                RezSingleAttachmentFromInvPacket rez = (RezSingleAttachmentFromInvPacket) Pack;
+                RezSingleAttachmentFromInvPacket rez = (RezSingleAttachmentFromInvPacket) pack;
 
                 #region Packet Session and User Check
 
@@ -6709,12 +6703,12 @@ namespace WhiteCore.ClientStack
        */
 
         // update 20160129 - greythane-
-        bool HandlerRezRestoreToWorld(IClientAPI sender, Packet Pack)
+        bool HandlerRezRestoreToWorld(IClientAPI sender, Packet pack)
         {
             RezRestoreToWorld handlerRezRestoreToWorld = OnRezRestoreToWorld;
             if (handlerRezRestoreToWorld != null)
             {
-                RezRestoreToWorldPacket rezPacket = (RezRestoreToWorldPacket)Pack;
+                var rezPacket = (RezRestoreToWorldPacket)pack;
 
                 #region Packet Session and User Check
                 if (m_checkPackets)
@@ -6733,13 +6727,13 @@ namespace WhiteCore.ClientStack
 
 
 
-        bool HandleRezMultipleAttachmentsFromInv(IClientAPI sender, Packet Pack)
+        bool HandleRezMultipleAttachmentsFromInv(IClientAPI sender, Packet pack)
         {
             RezSingleAttachmentFromInv handlerRezMultipleAttachments = OnRezSingleAttachmentFromInv;
 
             if (handlerRezMultipleAttachments != null)
             {
-                RezMultipleAttachmentsFromInvPacket rez = (RezMultipleAttachmentsFromInvPacket) Pack;
+                RezMultipleAttachmentsFromInvPacket rez = (RezMultipleAttachmentsFromInvPacket) pack;
 
                 #region Packet Session and User Check
 
@@ -6761,12 +6755,12 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleDetachAttachmentIntoInv(IClientAPI sender, Packet Pack)
+        bool HandleDetachAttachmentIntoInv(IClientAPI sender, Packet pack)
         {
             UUIDNameRequest handlerDetachAttachmentIntoInv = OnDetachAttachmentIntoInv;
             if (handlerDetachAttachmentIntoInv != null)
             {
-                DetachAttachmentIntoInvPacket detachtoInv = (DetachAttachmentIntoInvPacket) Pack;
+                var detachtoInv = (DetachAttachmentIntoInvPacket) pack;
 
                 #region Packet Session and User Check
 
@@ -6783,11 +6777,11 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleObjectAttach(IClientAPI sender, Packet Pack)
+        bool HandleObjectAttach(IClientAPI sender, Packet pack)
         {
             if (OnObjectAttach != null)
             {
-                ObjectAttachPacket att = (ObjectAttachPacket) Pack;
+                var att = (ObjectAttachPacket) pack;
 
                 #region Packet Session and User Check
 
@@ -6813,9 +6807,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleObjectDetach(IClientAPI sender, Packet Pack)
+        bool HandleObjectDetach(IClientAPI sender, Packet pack)
         {
-            ObjectDetachPacket dett = (ObjectDetachPacket) Pack;
+            var dett = (ObjectDetachPacket) pack;
 
             #region Packet Session and User Check
 
@@ -6842,7 +6836,7 @@ namespace WhiteCore.ClientStack
 
         bool HandleObjectDrop(IClientAPI sender, Packet Pack)
         {
-            ObjectDropPacket dropp = (ObjectDropPacket) Pack;
+            var dropp = (ObjectDropPacket) Pack;
 
             #region Packet Session and User Check
 
@@ -6867,9 +6861,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleSetAlwaysRun(IClientAPI sender, Packet Pack)
+        bool HandleSetAlwaysRun(IClientAPI sender, Packet pack)
         {
-            SetAlwaysRunPacket run = (SetAlwaysRunPacket) Pack;
+            var run = (SetAlwaysRunPacket) pack;
 
             #region Packet Session and User Check
 
@@ -6889,7 +6883,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleCompleteAgentMovement(IClientAPI sender, Packet Pack)
+        bool HandleCompleteAgentMovement(IClientAPI sender, Packet pack)
         {
             GenericCall1 handlerCompleteMovementToRegion = OnCompleteMovementToRegion;
             if (handlerCompleteMovementToRegion != null)
@@ -6901,9 +6895,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleAgentAnimation(IClientAPI sender, Packet Pack)
+        bool HandleAgentAnimation(IClientAPI sender, Packet pack)
         {
-            AgentAnimationPacket AgentAni = (AgentAnimationPacket) Pack;
+            var AgentAni = (AgentAnimationPacket) pack;
 
             #region Packet Session and User Check
 
@@ -6938,11 +6932,11 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleAgentRequestSit(IClientAPI sender, Packet Pack)
+        bool HandleAgentRequestSit(IClientAPI sender, Packet pack)
         {
             if (OnAgentRequestSit != null)
             {
-                AgentRequestSitPacket agentRequestSit = (AgentRequestSitPacket) Pack;
+                var agentRequestSit = (AgentRequestSitPacket) pack;
 
                 #region Packet Session and User Check
 
@@ -6963,11 +6957,11 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleAgentSit(IClientAPI sender, Packet Pack)
+        bool HandleAgentSit(IClientAPI sender, Packet pack)
         {
             if (OnAgentSit != null)
             {
-                AgentSitPacket agentSit = (AgentSitPacket) Pack;
+                var agentSit = (AgentSitPacket) pack;
 
                 #region Packet Session and User Check
 
@@ -6989,9 +6983,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleSoundTrigger(IClientAPI sender, Packet Pack)
+        bool HandleSoundTrigger(IClientAPI sender, Packet pack)
         {
-            SoundTriggerPacket soundTriggerPacket = (SoundTriggerPacket) Pack;
+            var soundTriggerPacket = (SoundTriggerPacket) pack;
 
             #region Packet Session and User Check
 
@@ -7015,9 +7009,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleAvatarPickerRequest(IClientAPI sender, Packet Pack)
+        bool HandleAvatarPickerRequest(IClientAPI sender, Packet pack)
         {
-            AvatarPickerRequestPacket avRequestQuery = (AvatarPickerRequestPacket) Pack;
+            var avRequestQuery = (AvatarPickerRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -7043,9 +7037,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleAgentDataUpdateRequest(IClientAPI sender, Packet Pack)
+        bool HandleAgentDataUpdateRequest(IClientAPI sender, Packet pack)
         {
-            AgentDataUpdateRequestPacket avRequestDataUpdatePacket = (AgentDataUpdateRequestPacket) Pack;
+            var avRequestDataUpdatePacket = (AgentDataUpdateRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -7069,7 +7063,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleUserInfoRequest(IClientAPI sender, Packet Pack)
+        bool HandleUserInfoRequest(IClientAPI sender, Packet pack)
         {
             UserInfoRequest handlerUserInfoRequest = OnUserInfoRequest;
             if (handlerUserInfoRequest != null)
@@ -7083,9 +7077,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleUpdateUserInfo(IClientAPI sender, Packet Pack)
+        bool HandleUpdateUserInfo(IClientAPI sender, Packet pack)
         {
-            UpdateUserInfoPacket updateUserInfo = (UpdateUserInfoPacket) Pack;
+            var updateUserInfo = (UpdateUserInfoPacket) pack;
 
             #region Packet Session and User Check
 
@@ -7114,9 +7108,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleSetStartLocationRequest(IClientAPI sender, Packet Pack)
+        bool HandleSetStartLocationRequest(IClientAPI sender, Packet pack)
         {
-            SetStartLocationRequestPacket avSetStartLocationRequestPacket = (SetStartLocationRequestPacket) Pack;
+            var avSetStartLocationRequestPacket = (SetStartLocationRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -7132,6 +7126,7 @@ namespace WhiteCore.ClientStack
             if (avSetStartLocationRequestPacket.AgentData.AgentID == AgentId &&
                 avSetStartLocationRequestPacket.AgentData.SessionID == SessionId)
             {
+                //TODO: Should this limitation apply??
                 // Linden Client limitation..
                 if (avSetStartLocationRequestPacket.StartLocationData.LocationPos.X == 255.5f
                     || avSetStartLocationRequestPacket.StartLocationData.LocationPos.Y == 255.5f)
@@ -7161,9 +7156,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleAgentThrottle(IClientAPI sender, Packet Pack)
+        bool HandleAgentThrottle(IClientAPI sender, Packet pack)
         {
-            AgentThrottlePacket atpack = (AgentThrottlePacket) Pack;
+            var atpack = (AgentThrottlePacket) pack;
 
             #region Packet Session and User Check
 
@@ -7180,13 +7175,13 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleAgentPause(IClientAPI sender, Packet Pack)
+        bool HandleAgentPause(IClientAPI sender, Packet pack)
         {
             #region Packet Session and User Check
 
             if (m_checkPackets)
             {
-                AgentPausePacket agentPausePacket = Pack as AgentPausePacket;
+                var agentPausePacket = (AgentPausePacket) pack;
                 if (agentPausePacket != null && (agentPausePacket.AgentData.SessionID != SessionId ||
                                                  agentPausePacket.AgentData.AgentID != AgentId))
                     return true;
@@ -7198,13 +7193,13 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleAgentResume(IClientAPI sender, Packet Pack)
+        bool HandleAgentResume(IClientAPI sender, Packet pack)
         {
             #region Packet Session and User Check
 
             if (m_checkPackets)
             {
-                AgentResumePacket agentResumePacket = Pack as AgentResumePacket;
+                var agentResumePacket = (AgentResumePacket) pack;
                 if (agentResumePacket != null && (agentResumePacket.AgentData.SessionID != SessionId ||
                                                   agentResumePacket.AgentData.AgentID != AgentId))
                     return true;
@@ -7217,7 +7212,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleForceScriptControlRelease(IClientAPI sender, Packet Pack)
+        bool HandleForceScriptControlRelease(IClientAPI sender, Packet pack)
         {
             ForceReleaseControls handlerForceReleaseControls = OnForceReleaseControls;
             if (handlerForceReleaseControls != null)
@@ -7231,9 +7226,9 @@ namespace WhiteCore.ClientStack
 
         #region Objects/m_sceneObjects
 
-        bool HandleObjectLink(IClientAPI sender, Packet Pack)
+        bool HandleObjectLink(IClientAPI sender, Packet pack)
         {
-            ObjectLinkPacket link = (ObjectLinkPacket) Pack;
+            var link = (ObjectLinkPacket) pack;
 
             #region Packet Session and User Check
 
@@ -7265,9 +7260,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleObjectDelink(IClientAPI sender, Packet Pack)
+        bool HandleObjectDelink(IClientAPI sender, Packet pack)
         {
-            ObjectDelinkPacket delink = (ObjectDelinkPacket) Pack;
+            var delink = (ObjectDelinkPacket) pack;
 
             #region Packet Session and User Check
 
@@ -7293,11 +7288,11 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleObjectAdd(IClientAPI sender, Packet Pack)
+        bool HandleObjectAdd(IClientAPI sender, Packet pack)
         {
             if (OnAddPrim != null)
             {
-                ObjectAddPacket addPacket = (ObjectAddPacket) Pack;
+                var addPacket = (ObjectAddPacket) pack;
 
                 #region Packet Session and User Check
 
@@ -7329,9 +7324,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleObjectShape(IClientAPI sender, Packet Pack)
+        bool HandleObjectShape(IClientAPI sender, Packet pack)
         {
-            ObjectShapePacket shapePacket = (ObjectShapePacket) Pack;
+            var shapePacket = (ObjectShapePacket) pack;
 
             #region Packet Session and User Check
 
@@ -7379,9 +7374,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleObjectExtraParams(IClientAPI sender, Packet Pack)
+        bool HandleObjectExtraParams(IClientAPI sender, Packet pack)
         {
-            ObjectExtraParamsPacket extraPar = (ObjectExtraParamsPacket) Pack;
+            var extraPar = (ObjectExtraParamsPacket) pack;
 
             #region Packet Session and User Check
 
@@ -7407,9 +7402,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleObjectDuplicate(IClientAPI sender, Packet Pack)
+        bool HandleObjectDuplicate(IClientAPI sender, Packet pack)
         {
-            ObjectDuplicatePacket dupe = (ObjectDuplicatePacket) Pack;
+            var dupe = (ObjectDuplicatePacket) pack;
 
             #region Packet Session and User Check
 
@@ -7438,9 +7433,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleRequestMultipleObjects(IClientAPI sender, Packet Pack)
+        bool HandleRequestMultipleObjects(IClientAPI sender, Packet pack)
         {
-            RequestMultipleObjectsPacket incomingRequest = (RequestMultipleObjectsPacket) Pack;
+            var incomingRequest = (RequestMultipleObjectsPacket) pack;
 
             #region Packet Session and User Check
 
@@ -7492,9 +7487,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleObjectDeselect(IClientAPI sender, Packet Pack)
+        bool HandleObjectDeselect(IClientAPI sender, Packet pack)
         {
-            ObjectDeselectPacket incomingdeselect = (ObjectDeselectPacket) Pack;
+            var incomingdeselect = (ObjectDeselectPacket) pack;
 
             #region Packet Session and User Check
 
@@ -7518,10 +7513,10 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleObjectPosition(IClientAPI sender, Packet Pack)
+        bool HandleObjectPosition(IClientAPI sender, Packet pack)
         {
             // DEPRECATED: but till libsecondlife removes it, people will use it
-            ObjectPositionPacket position = (ObjectPositionPacket) Pack;
+            var position = (ObjectPositionPacket) pack;
 
             #region Packet Session and User Check
 
@@ -7545,10 +7540,10 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleObjectScale(IClientAPI sender, Packet Pack)
+        bool HandleObjectScale(IClientAPI sender, Packet pack)
         {
             // DEPRECATED: but till libsecondlife removes it, people will use it
-            ObjectScalePacket scale = (ObjectScalePacket) Pack;
+            var scale = (ObjectScalePacket) pack;
 
             #region Packet Session and User Check
 
@@ -7571,10 +7566,10 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleObjectRotation(IClientAPI sender, Packet Pack)
+        bool HandleObjectRotation(IClientAPI sender, Packet pack)
         {
             // DEPRECATED: but till libsecondlife removes it, people will use it
-            ObjectRotationPacket rotation = (ObjectRotationPacket) Pack;
+            var rotation = (ObjectRotationPacket) pack;
 
             #region Packet Session and User Check
 
@@ -7598,9 +7593,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleObjectFlagUpdate(IClientAPI sender, Packet Pack)
+        bool HandleObjectFlagUpdate(IClientAPI sender, Packet pack)
         {
-            ObjectFlagUpdatePacket flags = (ObjectFlagUpdatePacket) Pack;
+            var flags = (ObjectFlagUpdatePacket) pack;
 
             #region Packet Session and User Check
 
@@ -7623,9 +7618,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleObjectImage(IClientAPI sender, Packet Pack)
+        bool HandleObjectImage(IClientAPI sender, Packet pack)
         {
-            ObjectImagePacket imagePack = (ObjectImagePacket) Pack;
+            var imagePack = (ObjectImagePacket) pack;
 
             foreach (ObjectImagePacket.ObjectDataBlock t in imagePack.ObjectData)
             {
@@ -7639,9 +7634,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleObjectGrab(IClientAPI sender, Packet Pack)
+        bool HandleObjectGrab(IClientAPI sender, Packet pack)
         {
-            ObjectGrabPacket grab = (ObjectGrabPacket) Pack;
+            var grab = (ObjectGrabPacket) pack;
 
             #region Packet Session and User Check
 
@@ -7676,9 +7671,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleObjectGrabUpdate(IClientAPI sender, Packet Pack)
+        bool HandleObjectGrabUpdate(IClientAPI sender, Packet pack)
         {
-            ObjectGrabUpdatePacket grabUpdate = (ObjectGrabUpdatePacket) Pack;
+            var grabUpdate = (ObjectGrabUpdatePacket) pack;
 
             #region Packet Session and User Check
 
@@ -7719,9 +7714,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleObjectDeGrab(IClientAPI sender, Packet Pack)
+        bool HandleObjectDeGrab(IClientAPI sender, Packet pack)
         {
-            ObjectDeGrabPacket deGrab = (ObjectDeGrabPacket) Pack;
+            var deGrab = (ObjectDeGrabPacket) pack;
 
             #region Packet Session and User Check
 
@@ -7756,10 +7751,10 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleObjectSpinStart(IClientAPI sender, Packet Pack)
+        bool HandleObjectSpinStart(IClientAPI sender, Packet pack)
         {
-            //MainConsole.Instance.Warn("[CLIENT]: unhandled ObjectSpinStart packet");
-            ObjectSpinStartPacket spinStart = (ObjectSpinStartPacket) Pack;
+            //MainConsole.Instance.Warn("[Client]: unhandled ObjectSpinStart packet");
+            var spinStart = (ObjectSpinStartPacket) pack;
 
             #region Packet Session and User Check
 
@@ -7780,10 +7775,10 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleObjectSpinUpdate(IClientAPI sender, Packet Pack)
+        bool HandleObjectSpinUpdate(IClientAPI sender, Packet pack)
         {
-            //MainConsole.Instance.Warn("[CLIENT]: unhandled ObjectSpinUpdate packet");
-            ObjectSpinUpdatePacket spinUpdate = (ObjectSpinUpdatePacket) Pack;
+            //MainConsole.Instance.Warn("[Client]: unhandled ObjectSpinUpdate packet");
+            var spinUpdate = (ObjectSpinUpdatePacket) pack;
 
             #region Packet Session and User Check
 
@@ -7799,7 +7794,7 @@ namespace WhiteCore.ClientStack
             Vector3 axis;
             float angle;
             spinUpdate.ObjectData.Rotation.GetAxisAngle(out axis, out angle);
-            //MainConsole.Instance.Warn("[CLIENT]: ObjectSpinUpdate packet rot axis:" + axis + " angle:" + angle);
+            //MainConsole.Instance.Warn("[Client]: ObjectSpinUpdate packet rot axis:" + axis + " angle:" + angle);
 
             SpinObject handlerSpinUpdate = OnSpinUpdate;
             if (handlerSpinUpdate != null)
@@ -7809,10 +7804,10 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleObjectSpinStop(IClientAPI sender, Packet Pack)
+        bool HandleObjectSpinStop(IClientAPI sender, Packet pack)
         {
-            //MainConsole.Instance.Warn("[CLIENT]: unhandled ObjectSpinStop packet");
-            ObjectSpinStopPacket spinStop = (ObjectSpinStopPacket) Pack;
+            //MainConsole.Instance.Warn("[Client]: unhandled ObjectSpinStop packet");
+            var spinStop = (ObjectSpinStopPacket) pack;
 
             #region Packet Session and User Check
 
@@ -7833,9 +7828,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleObjectDescription(IClientAPI sender, Packet Pack)
+        bool HandleObjectDescription(IClientAPI sender, Packet pack)
         {
-            ObjectDescriptionPacket objDes = (ObjectDescriptionPacket) Pack;
+            var objDes = (ObjectDescriptionPacket) pack;
 
             #region Packet Session and User Check
 
@@ -7860,9 +7855,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleObjectName(IClientAPI sender, Packet Pack)
+        bool HandleObjectName(IClientAPI sender, Packet pack)
         {
-            ObjectNamePacket objName = (ObjectNamePacket) Pack;
+            var objName = (ObjectNamePacket) pack;
 
             #region Packet Session and User Check
 
@@ -7887,11 +7882,11 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleObjectPermissions(IClientAPI sender, Packet Pack)
+        bool HandleObjectPermissions(IClientAPI sender, Packet pack)
         {
             if (OnObjectPermissions != null)
             {
-                ObjectPermissionsPacket newobjPerms = (ObjectPermissionsPacket) Pack;
+                var newobjPerms = (ObjectPermissionsPacket) pack;
 
                 #region Packet Session and User Check
 
@@ -7936,9 +7931,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleUndo(IClientAPI sender, Packet Pack)
+        bool HandleUndo(IClientAPI sender, Packet pack)
         {
-            UndoPacket undoitem = (UndoPacket) Pack;
+            var undoitem = (UndoPacket) pack;
 
             #region Packet Session and User Check
 
@@ -7966,9 +7961,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleLandUndo(IClientAPI sender, Packet Pack)
+        bool HandleLandUndo(IClientAPI sender, Packet pack)
         {
-            UndoLandPacket undolanditem = (UndoLandPacket) Pack;
+            var undolanditem = (UndoLandPacket) pack;
 
             #region Packet Session and User Check
 
@@ -7989,9 +7984,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleRedo(IClientAPI sender, Packet Pack)
+        bool HandleRedo(IClientAPI sender, Packet pack)
         {
-            RedoPacket redoitem = (RedoPacket) Pack;
+            var redoitem = (RedoPacket) pack;
 
             #region Packet Session and User Check
 
@@ -8019,9 +8014,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleObjectDuplicateOnRay(IClientAPI sender, Packet Pack)
+        bool HandleObjectDuplicateOnRay(IClientAPI sender, Packet pack)
         {
-            ObjectDuplicateOnRayPacket dupeOnRay = (ObjectDuplicateOnRayPacket) Pack;
+            var dupeOnRay = (ObjectDuplicateOnRayPacket) pack;
 
             #region Packet Session and User Check
 
@@ -8052,10 +8047,10 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleRequestObjectPropertiesFamily(IClientAPI sender, Packet Pack)
+        bool HandleRequestObjectPropertiesFamily(IClientAPI sender, Packet pack)
         {
             //This powers the little tooltip that appears when you move your mouse over an object
-            RequestObjectPropertiesFamilyPacket packToolTip = (RequestObjectPropertiesFamilyPacket) Pack;
+            var packToolTip = (RequestObjectPropertiesFamilyPacket) pack;
 
             #region Packet Session and User Check
 
@@ -8081,10 +8076,10 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleObjectIncludeInSearch(IClientAPI sender, Packet Pack)
+        bool HandleObjectIncludeInSearch(IClientAPI sender, Packet pack)
         {
             //This lets us set objects to appear in search (stuff like DataSnapshot, etc)
-            ObjectIncludeInSearchPacket packInSearch = (ObjectIncludeInSearchPacket) Pack;
+            var packInSearch = (ObjectIncludeInSearchPacket) pack;
 
             #region Packet Session and User Check
 
@@ -8112,9 +8107,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleScriptAnswerYes(IClientAPI sender, Packet Pack)
+        bool HandleScriptAnswerYes(IClientAPI sender, Packet pack)
         {
-            ScriptAnswerYesPacket scriptAnswer = (ScriptAnswerYesPacket) Pack;
+            var scriptAnswer = (ScriptAnswerYesPacket) pack;
 
             #region Packet Session and User Check
 
@@ -8136,9 +8131,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleObjectClickAction(IClientAPI sender, Packet Pack)
+        bool HandleObjectClickAction(IClientAPI sender, Packet pack)
         {
-            ObjectClickActionPacket ocpacket = (ObjectClickActionPacket) Pack;
+            var ocpacket = (ObjectClickActionPacket) pack;
 
             #region Packet Session and User Check
 
@@ -8196,9 +8191,9 @@ namespace WhiteCore.ClientStack
 
         #region Inventory/Asset/Other related packets
 
-        bool HandleRequestImage(IClientAPI sender, Packet Pack)
+        bool HandleRequestImage(IClientAPI sender, Packet pack)
         {
-            RequestImagePacket imageRequest = (RequestImagePacket) Pack;
+            var imageRequest = (RequestImagePacket) pack;
             //MainConsole.Instance.Debug("image request: " + Pack.ToString());
 
             #region Packet Session and User Check
@@ -8247,11 +8242,11 @@ namespace WhiteCore.ClientStack
         /// <param name="sender"></param>
         /// <param name="Pack"></param>
         /// <returns>This parameter may be ignored since we appear to return true whatever happens</returns>
-        bool HandleTransferRequest(IClientAPI sender, Packet Pack)
+        bool HandleTransferRequest(IClientAPI sender, Packet pack)
         {
             //MainConsole.Instance.Debug("ClientView.ProcessPackets.cs:ProcessInPacket() - Got transfer request");
 
-            TransferRequestPacket transfer = (TransferRequestPacket) Pack;
+            var transfer = (TransferRequestPacket) pack;
             //MainConsole.Instance.Debug("Transfer Request: " + transfer.ToString());
             // Validate inventory transfers
             // Has to be done here, because AssetCache can't do it
@@ -8264,7 +8259,7 @@ namespace WhiteCore.ClientStack
                 UUID requestID = new UUID(transfer.TransferInfo.Params, 80);
 
 //                MainConsole.Instance.DebugFormat(
-//                    "[CLIENT]: Got request for asset {0} from item {1} in prim {2} by {3}",
+//                    "[Client]: Got request for asset {0} from item {1} in prim {2} by {3}",
 //                    requestID, itemID, taskID, Name);
 
                 if (!m_scene.Permissions.BypassPermissions())
@@ -8276,7 +8271,7 @@ namespace WhiteCore.ClientStack
                         if (part == null)
                         {
                             MainConsole.Instance.WarnFormat(
-                                "[CLIENT]: {0} requested asset {1} from item {2} in prim {3} but prim does not exist",
+                                "[Client]: {0} requested asset {1} from item {2} in prim {3} but prim does not exist",
                                 Name, requestID, itemID, taskID);
                             return true;
                         }
@@ -8285,7 +8280,7 @@ namespace WhiteCore.ClientStack
                         if (tii == null)
                         {
                             MainConsole.Instance.WarnFormat(
-                                "[CLIENT]: {0} requested asset {1} from item {2} in prim {3} but item does not exist",
+                                "[Client]: {0} requested asset {1} from item {2} in prim {3} but item does not exist",
                                 Name, requestID, itemID, taskID);
                             return true;
                         }
@@ -8305,12 +8300,12 @@ namespace WhiteCore.ClientStack
                             if (!m_scene.Permissions.CanEditObjectInventory(part.UUID, AgentId))
                             {
                                 MainConsole.Instance.Warn(
-                                    "[LLClientView]: Permissions check for CanEditObjectInventory fell through to standard code!");
+                                    "[Client]: Permissions check for CanEditObjectInventory fell through to standard code!");
 
                                 if (part.OwnerID != AgentId)
                                 {
                                     MainConsole.Instance.WarnFormat(
-                                        "[CLIENT]: {0} requested asset {1} from item {2} in prim {3} but the prim is owned by {4}",
+                                        "[Client]: {0} requested asset {1} from item {2} in prim {3} but the prim is owned by {4}",
                                         Name, requestID, itemID, taskID, part.OwnerID);
                                     return true;
                                 }
@@ -8318,7 +8313,7 @@ namespace WhiteCore.ClientStack
                                 if ((part.OwnerMask & (uint) PermissionMask.Modify) == 0)
                                 {
                                     MainConsole.Instance.WarnFormat(
-                                        "[CLIENT]: {0} requested asset {1} from item {2} in prim {3} but modify permissions are not set",
+                                        "[Client]: {0} requested asset {1} from item {2} in prim {3} but modify permissions are not set",
                                         Name, requestID, itemID, taskID);
                                     return true;
                                 }
@@ -8326,7 +8321,7 @@ namespace WhiteCore.ClientStack
                                 if (tii.OwnerID != AgentId)
                                 {
                                     MainConsole.Instance.WarnFormat(
-                                        "[CLIENT]: {0} requested asset {1} from item {2} in prim {3} but the item is owned by {4}",
+                                        "[Client]: {0} requested asset {1} from item {2} in prim {3} but the item is owned by {4}",
                                         Name, requestID, itemID, taskID, tii.OwnerID);
                                     return true;
                                 }
@@ -8340,7 +8335,7 @@ namespace WhiteCore.ClientStack
                                      (uint) PermissionMask.Transfer))
                                 {
                                     MainConsole.Instance.WarnFormat(
-                                        "[CLIENT]: {0} requested asset {1} from item {2} in prim {3} but item permissions are not modify/copy/transfer",
+                                        "[Client]: {0} requested asset {1} from item {2} in prim {3} but item permissions are not modify/copy/transfer",
                                         Name, requestID, itemID, taskID);
                                     return true;
                                 }
@@ -8348,7 +8343,7 @@ namespace WhiteCore.ClientStack
                                 if (tii.AssetID != requestID)
                                 {
                                     MainConsole.Instance.WarnFormat(
-                                        "[CLIENT]: {0} requested asset {1} from item {2} in prim {3} but this does not match item's asset {4}",
+                                        "[Client]: {0} requested asset {1} from item {2} in prim {3} but this does not match item's asset {4}",
                                         Name, requestID, itemID, taskID, tii.AssetID);
                                     return true;
                                 }
@@ -8374,9 +8369,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleAssetUploadRequest(IClientAPI sender, Packet Pack)
+        bool HandleAssetUploadRequest(IClientAPI sender, Packet pack)
         {
-            AssetUploadRequestPacket request = (AssetUploadRequestPacket) Pack;
+            var request = (AssetUploadRequestPacket) pack;
 
 
             // MainConsole.Instance.Debug("upload request " + request.ToString());
@@ -8395,9 +8390,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleRequestXfer(IClientAPI sender, Packet Pack)
+        bool HandleRequestXfer(IClientAPI sender, Packet pack)
         {
-            RequestXferPacket xferReq = (RequestXferPacket) Pack;
+            var xferReq = (RequestXferPacket) pack;
 
             RequestXfer handlerRequestXfer = OnRequestXfer;
 
@@ -8408,9 +8403,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleSendXferPacket(IClientAPI sender, Packet Pack)
+        bool HandleSendXferPacket(IClientAPI sender, Packet pack)
         {
-            SendXferPacketPacket xferRec = (SendXferPacketPacket) Pack;
+            var xferRec = (SendXferPacketPacket) pack;
 
             XferReceive handlerXferReceive = OnXferReceive;
             if (handlerXferReceive != null)
@@ -8420,9 +8415,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleConfirmXferPacket(IClientAPI sender, Packet Pack)
+        bool HandleConfirmXferPacket(IClientAPI sender, Packet pack)
         {
-            ConfirmXferPacketPacket confirmXfer = (ConfirmXferPacketPacket) Pack;
+            var confirmXfer = (ConfirmXferPacketPacket) pack;
 
             ConfirmXfer handlerConfirmXfer = OnConfirmXfer;
             if (handlerConfirmXfer != null)
@@ -8432,9 +8427,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleAbortXfer(IClientAPI sender, Packet Pack)
+        bool HandleAbortXfer(IClientAPI sender, Packet pack)
         {
-            AbortXferPacket abortXfer = (AbortXferPacket) Pack;
+            var abortXfer = (AbortXferPacket) pack;
             AbortXfer handlerAbortXfer = OnAbortXfer;
             if (handlerAbortXfer != null)
             {
@@ -8451,9 +8446,9 @@ namespace WhiteCore.ClientStack
             OutPacket(xferItem, ThrottleOutPacketType.Transfer);
         }
 
-        bool HandleCreateInventoryFolder(IClientAPI sender, Packet Pack)
+        bool HandleCreateInventoryFolder(IClientAPI sender, Packet pack)
         {
-            CreateInventoryFolderPacket invFolder = (CreateInventoryFolderPacket) Pack;
+            var invFolder = (CreateInventoryFolderPacket) pack;
 
             #region Packet Session and User Check
 
@@ -8478,11 +8473,11 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleUpdateInventoryFolder(IClientAPI sender, Packet Pack)
+        bool HandleUpdateInventoryFolder(IClientAPI sender, Packet pack)
         {
             if (OnUpdateInventoryFolder != null)
             {
-                UpdateInventoryFolderPacket invFolderx = (UpdateInventoryFolderPacket) Pack;
+                var invFolderx = (UpdateInventoryFolderPacket) pack;
 
                 #region Packet Session and User Check
 
@@ -8510,11 +8505,11 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleMoveInventoryFolder(IClientAPI sender, Packet Pack)
+        bool HandleMoveInventoryFolder(IClientAPI sender, Packet pack)
         {
             if (OnMoveInventoryFolder != null)
             {
-                MoveInventoryFolderPacket invFoldery = (MoveInventoryFolderPacket) Pack;
+                var invFoldery = (MoveInventoryFolderPacket) pack;
 
                 #region Packet Session and User Check
 
@@ -8540,9 +8535,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleCreateInventoryItem(IClientAPI sender, Packet Pack)
+        bool HandleCreateInventoryItem(IClientAPI sender, Packet pack)
         {
-            CreateInventoryItemPacket createItem = (CreateInventoryItemPacket) Pack;
+            var createItem = (CreateInventoryItemPacket) pack;
 
             #region Packet Session and User Check
 
@@ -8573,9 +8568,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleLinkInventoryItem(IClientAPI sender, Packet Pack)
+        bool HandleLinkInventoryItem(IClientAPI sender, Packet pack)
         {
-            LinkInventoryItemPacket createLink = (LinkInventoryItemPacket) Pack;
+            var createLink = (LinkInventoryItemPacket) pack;
 
             #region Packet Session and User Check
 
@@ -8607,11 +8602,11 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleFetchInventory(IClientAPI sender, Packet Pack)
+        bool HandleFetchInventory(IClientAPI sender, Packet pack)
         {
             if (OnFetchInventory != null)
             {
-                FetchInventoryPacket FetchInventoryx = (FetchInventoryPacket) Pack;
+                var FetchInventoryx = (FetchInventoryPacket) pack;
 
                 #region Packet Session and User Check
 
@@ -8630,17 +8625,16 @@ namespace WhiteCore.ClientStack
 
                     if (handlerFetchInventory != null)
                     {
-                        OnFetchInventory(this, t.ItemID,
-                                         t.OwnerID);
+                        OnFetchInventory(this, t.ItemID, t.OwnerID);
                     }
                 }
             }
             return true;
         }
 
-        bool HandleFetchInventoryDescendents(IClientAPI sender, Packet Pack)
+        bool HandleFetchInventoryDescendents(IClientAPI sender, Packet pack)
         {
-            FetchInventoryDescendentsPacket Fetch = (FetchInventoryDescendentsPacket) Pack;
+            var Fetch = (FetchInventoryDescendentsPacket) pack;
 
             #region Packet Session and User Check
 
@@ -8663,9 +8657,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandlePurgeInventoryDescendents(IClientAPI sender, Packet Pack)
+        bool HandlePurgeInventoryDescendents(IClientAPI sender, Packet pack)
         {
-            PurgeInventoryDescendentsPacket Purge = (PurgeInventoryDescendentsPacket) Pack;
+            var Purge = (PurgeInventoryDescendentsPacket) pack;
 
             #region Packet Session and User Check
 
@@ -8687,9 +8681,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleUpdateInventoryItem(IClientAPI sender, Packet Pack)
+        bool HandleUpdateInventoryItem(IClientAPI sender, Packet pack)
         {
-            UpdateInventoryItemPacket inventoryItemUpdate = (UpdateInventoryItemPacket) Pack;
+            var inventoryItemUpdate = (UpdateInventoryItemPacket) pack;
 
             #region Packet Session and User Check
 
@@ -8712,22 +8706,14 @@ namespace WhiteCore.ClientStack
                     InventoryItemBase itemUpd = new InventoryItemBase
                                                     {
                                                         ID = t.ItemID,
-                                                        Name =
-                                                            Util.FieldToString(
-                                                                t.Name),
-                                                        Description =
-                                                            Util.FieldToString(
-                                                                t.Description),
+                                                        Name = Util.FieldToString(t.Name),
+                                                        Description = Util.FieldToString(t.Description),
                                                         GroupID = t.GroupID,
                                                         GroupOwned = t.GroupOwned,
-                                                        GroupPermissions =
-                                                            t.GroupMask,
-                                                        NextPermissions =
-                                                            t.NextOwnerMask,
-                                                        EveryOnePermissions =
-                                                            t.EveryoneMask,
-                                                        CreationDate =
-                                                            t.CreationDate,
+                                                        GroupPermissions = t.GroupMask,
+                                                        NextPermissions = t.NextOwnerMask,
+                                                        EveryOnePermissions = t.EveryoneMask,
+                                                        CreationDate = t.CreationDate,
                                                         Folder = t.FolderID,
                                                         InvType = t.InvType,
                                                         SalePrice = t.SalePrice,
@@ -8735,18 +8721,16 @@ namespace WhiteCore.ClientStack
                                                         Flags = t.Flags
                                                     };
 
-                    OnUpdateInventoryItem(this, t.TransactionID,
-                                          t.ItemID,
-                                          itemUpd);
+                    OnUpdateInventoryItem(this, t.TransactionID, t.ItemID, itemUpd);
                 }
             }
 
             return true;
         }
 
-        bool HandleCopyInventoryItem(IClientAPI sender, Packet Pack)
+        bool HandleCopyInventoryItem(IClientAPI sender, Packet pack)
         {
-            CopyInventoryItemPacket copyitem = (CopyInventoryItemPacket) Pack;
+            var copyitem = (CopyInventoryItemPacket) pack;
 
             #region Packet Session and User Check
 
@@ -8776,9 +8760,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleMoveInventoryItem(IClientAPI sender, Packet Pack)
+        bool HandleMoveInventoryItem(IClientAPI sender, Packet pack)
         {
-            MoveInventoryItemPacket moveitem = (MoveInventoryItemPacket) Pack;
+            var moveitem = (MoveInventoryItemPacket) pack;
 
             #region Packet Session and User Check
 
@@ -8813,9 +8797,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleChangeInventoryItemFlags(IClientAPI sender, Packet Pack)
+        bool HandleChangeInventoryItemFlags(IClientAPI sender, Packet pack)
         {
-            ChangeInventoryItemFlagsPacket inventoryItemUpdate = (ChangeInventoryItemFlagsPacket) Pack;
+            var inventoryItemUpdate = (ChangeInventoryItemFlagsPacket) pack;
 
             #region Packet Session and User Check
 
@@ -8837,18 +8821,16 @@ namespace WhiteCore.ClientStack
                                                                            where handlerUpdateInventoryItem != null
                                                                            select t)
                 {
-                    OnChangeInventoryItemFlags(this,
-                                               t.ItemID,
-                                               t.Flags);
+                    OnChangeInventoryItemFlags(this, t.ItemID, t.Flags);
                 }
             }
 
             return true;
         }
 
-        bool HandleRemoveInventoryItem(IClientAPI sender, Packet Pack)
+        bool HandleRemoveInventoryItem(IClientAPI sender, Packet pack)
         {
-            RemoveInventoryItemPacket removeItem = (RemoveInventoryItemPacket) Pack;
+            var removeItem = (RemoveInventoryItemPacket) pack;
 
             #region Packet Session and User Check
 
@@ -8874,9 +8856,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleRemoveInventoryFolder(IClientAPI sender, Packet Pack)
+        bool HandleRemoveInventoryFolder(IClientAPI sender, Packet pack)
         {
-            RemoveInventoryFolderPacket removeFolder = (RemoveInventoryFolderPacket) Pack;
+            var removeFolder = (RemoveInventoryFolderPacket) pack;
 
             #region Packet Session and User Check
 
@@ -8903,9 +8885,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleRemoveInventoryObjects(IClientAPI sender, Packet Pack)
+        bool HandleRemoveInventoryObjects(IClientAPI sender, Packet pack)
         {
-            RemoveInventoryObjectsPacket removeObject = (RemoveInventoryObjectsPacket) Pack;
+            var removeObject = (RemoveInventoryObjectsPacket) pack;
 
             #region Packet Session and User Check
 
@@ -8943,9 +8925,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleRequestTaskInventory(IClientAPI sender, Packet Pack)
+        bool HandleRequestTaskInventory(IClientAPI sender, Packet pack)
         {
-            RequestTaskInventoryPacket requesttask = (RequestTaskInventoryPacket) Pack;
+            var requesttask = (RequestTaskInventoryPacket) pack;
 
             #region Packet Session and User Check
 
@@ -8966,9 +8948,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleUpdateTaskInventory(IClientAPI sender, Packet Pack)
+        bool HandleUpdateTaskInventory(IClientAPI sender, Packet pack)
         {
-            UpdateTaskInventoryPacket updatetask = (UpdateTaskInventoryPacket) Pack;
+            var updatetask = (UpdateTaskInventoryPacket) pack;
 
             #region Packet Session and User Check
 
@@ -9026,9 +9008,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleRemoveTaskInventory(IClientAPI sender, Packet Pack)
+        bool HandleRemoveTaskInventory(IClientAPI sender, Packet pack)
         {
-            RemoveTaskInventoryPacket removeTask = (RemoveTaskInventoryPacket) Pack;
+            var removeTask = (RemoveTaskInventoryPacket) pack;
 
             #region Packet Session and User Check
 
@@ -9051,9 +9033,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleMoveTaskInventory(IClientAPI sender, Packet Pack)
+        bool HandleMoveTaskInventory(IClientAPI sender, Packet pack)
         {
-            MoveTaskInventoryPacket moveTaskInventoryPacket = (MoveTaskInventoryPacket) Pack;
+            var moveTaskInventoryPacket = (MoveTaskInventoryPacket) pack;
 
             #region Packet Session and User Check
 
@@ -9079,10 +9061,10 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleRezScript(IClientAPI sender, Packet Pack)
+        bool HandleRezScript(IClientAPI sender, Packet pack)
         {
             //MainConsole.Instance.Debug(Pack.ToString());
-            RezScriptPacket rezScriptx = (RezScriptPacket) Pack;
+            var rezScriptx = (RezScriptPacket) pack;
 
             #region Packet Session and User Check
 
@@ -9127,13 +9109,13 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleMapLayerRequest(IClientAPI sender, Packet Pack)
+        bool HandleMapLayerRequest(IClientAPI sender, Packet pack)
         {
             #region Packet Session and User Check
 
             if (m_checkPackets)
             {
-                MapLayerRequestPacket mapLayerRequestPacket = Pack as MapLayerRequestPacket;
+                var mapLayerRequestPacket = (MapLayerRequestPacket) pack;
                 if (mapLayerRequestPacket != null && (mapLayerRequestPacket.AgentData.SessionID != SessionId ||
                                                       mapLayerRequestPacket.AgentData.AgentID != AgentId))
                     return true;
@@ -9144,9 +9126,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleMapBlockRequest(IClientAPI sender, Packet Pack)
+        bool HandleMapBlockRequest(IClientAPI sender, Packet pack)
         {
-            MapBlockRequestPacket MapRequest = (MapBlockRequestPacket) Pack;
+            var MapRequest = (MapBlockRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -9169,9 +9151,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleMapNameRequest(IClientAPI sender, Packet Pack)
+        bool HandleMapNameRequest(IClientAPI sender, Packet pack)
         {
-            MapNameRequestPacket map = (MapNameRequestPacket) Pack;
+            var map = (MapNameRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -9194,9 +9176,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleTeleportLandmarkRequest(IClientAPI sender, Packet Pack)
+        bool HandleTeleportLandmarkRequest(IClientAPI sender, Packet pack)
         {
-            TeleportLandmarkRequestPacket tpReq = (TeleportLandmarkRequestPacket) Pack;
+            var tpReq = (TeleportLandmarkRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -9210,60 +9192,34 @@ namespace WhiteCore.ClientStack
             #endregion
 
             UUID lmid = tpReq.Info.LandmarkID;
-            AssetLandmark lm;
             if (lmid != UUID.Zero)
             {
-                m_assetService.Get(lmid.ToString(), null, (id, s, lma) =>
-                                                              {
-                                                                  if (lma == null)
-                                                                  {
-                                                                      // Failed to find landmark
-                                                                      TeleportCancelPacket tpCancel =
-                                                                          (TeleportCancelPacket)
-                                                                          PacketPool.Instance.GetPacket(
-                                                                              PacketType.TeleportCancel);
-                                                                      tpCancel.Info.SessionID = tpReq.Info.SessionID;
-                                                                      tpCancel.Info.AgentID = tpReq.Info.AgentID;
-                                                                      OutPacket(tpCancel, ThrottleOutPacketType.Asset);
-                                                                  }
-
-                                                                  try
-                                                                  {
-                                                                      lm = new AssetLandmark(lma);
-                                                                  }
-                                                                  catch (NullReferenceException)
-                                                                  {
-                                                                      // asset not found generates null ref inside the assetlandmark constructor.
-                                                                      TeleportCancelPacket tpCancel =
-                                                                          (TeleportCancelPacket)
-                                                                          PacketPool.Instance.GetPacket(
-                                                                              PacketType.TeleportCancel);
-                                                                      tpCancel.Info.SessionID = tpReq.Info.SessionID;
-                                                                      tpCancel.Info.AgentID = tpReq.Info.AgentID;
-                                                                      OutPacket(tpCancel, ThrottleOutPacketType.Asset);
-                                                                      return;
-                                                                  }
-                                                                  TeleportLandmarkRequest handlerTeleportLandmarkRequest
-                                                                      = OnTeleportLandmarkRequest;
-                                                                  if (handlerTeleportLandmarkRequest != null)
-                                                                  {
-                                                                      handlerTeleportLandmarkRequest(this, lm.RegionID,
-                                                                                                     lm.Position);
-                                                                  }
-                                                                  else
-                                                                  {
-                                                                      //no event handler so cancel request
-
-
-                                                                      TeleportCancelPacket tpCancel =
-                                                                          (TeleportCancelPacket)
-                                                                          PacketPool.Instance.GetPacket(
-                                                                              PacketType.TeleportCancel);
-                                                                      tpCancel.Info.AgentID = tpReq.Info.AgentID;
-                                                                      tpCancel.Info.SessionID = tpReq.Info.SessionID;
-                                                                      OutPacket(tpCancel, ThrottleOutPacketType.Asset);
-                                                                  }
-                                                              });
+                m_assetService.Get(lmid.ToString(), null, (id, s, lma) => {
+                    AssetLandmark lm = null;
+                    try {
+                        if (lma != null)
+                            lm = new AssetLandmark (lma);
+                    } catch (NullReferenceException) {
+                        // asset not found generates null ref inside the assetlandmark constructor.
+                    }
+                    if (lm == null) {
+                        var tpCancel = (TeleportCancelPacket)PacketPool.Instance.GetPacket (PacketType.TeleportCancel);
+                        tpCancel.Info.SessionID = tpReq.Info.SessionID;
+                        tpCancel.Info.AgentID = tpReq.Info.AgentID;
+                        OutPacket (tpCancel, ThrottleOutPacketType.Asset);
+                    } else {
+                        TeleportLandmarkRequest handlerTeleportLandmarkRequest = OnTeleportLandmarkRequest;
+                        if (handlerTeleportLandmarkRequest != null) {
+                            handlerTeleportLandmarkRequest (this, lm.RegionID, lm.Position);
+                        } else {
+                            //no event handler so cancel request
+                            var tpCancel = (TeleportCancelPacket)PacketPool.Instance.GetPacket (PacketType.TeleportCancel);
+                            tpCancel.Info.AgentID = tpReq.Info.AgentID;
+                            tpCancel.Info.SessionID = tpReq.Info.SessionID;
+                            OutPacket (tpCancel, ThrottleOutPacketType.Asset);
+                        }
+                    }
+                });
             }
             else
             {
@@ -9279,9 +9235,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleTeleportLocationRequest(IClientAPI sender, Packet Pack)
+        bool HandleTeleportLocationRequest(IClientAPI sender, Packet pack)
         {
-            TeleportLocationRequestPacket tpLocReq = (TeleportLocationRequestPacket) Pack;
+            var tpLocReq = (TeleportLocationRequestPacket) pack;
             // MainConsole.Instance.Debug(tpLocReq.ToString());
 
             #region Packet Session and User Check
@@ -9315,9 +9271,9 @@ namespace WhiteCore.ClientStack
 
         #endregion Inventory/Asset/Other related packets
 
-        bool HandleUUIDNameRequest(IClientAPI sender, Packet Pack)
+        bool HandleUUIDNameRequest(IClientAPI sender, Packet pack)
         {
-            UUIDNameRequestPacket incoming = (UUIDNameRequestPacket) Pack;
+            var incoming = (UUIDNameRequestPacket) pack;
 
             foreach (UUIDNameRequestPacket.UUIDNameBlockBlock UUIDBlock in incoming.UUIDNameBlock)
             {
@@ -9332,9 +9288,9 @@ namespace WhiteCore.ClientStack
 
         #region Parcel related packets
 
-        bool HandleRegionHandleRequest(IClientAPI sender, Packet Pack)
+        bool HandleRegionHandleRequest(IClientAPI sender, Packet pack)
         {
-            RegionHandleRequestPacket rhrPack = (RegionHandleRequestPacket) Pack;
+            var rhrPack = (RegionHandleRequestPacket) pack;
 
             RegionHandleRequest handlerRegionHandleRequest = OnRegionHandleRequest;
             if (handlerRegionHandleRequest != null)
@@ -9344,9 +9300,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleParcelInfoRequest(IClientAPI sender, Packet Pack)
+        bool HandleParcelInfoRequest(IClientAPI sender, Packet pack)
         {
-            ParcelInfoRequestPacket pirPack = (ParcelInfoRequestPacket) Pack;
+            var pirPack = (ParcelInfoRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -9367,9 +9323,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleParcelAccessListRequest(IClientAPI sender, Packet Pack)
+        bool HandleParcelAccessListRequest(IClientAPI sender, Packet pack)
         {
-            ParcelAccessListRequestPacket requestPacket = (ParcelAccessListRequestPacket) Pack;
+            var requestPacket = (ParcelAccessListRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -9393,9 +9349,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleParcelAccessListUpdate(IClientAPI sender, Packet Pack)
+        bool HandleParcelAccessListUpdate(IClientAPI sender, Packet pack)
         {
-            ParcelAccessListUpdatePacket updatePacket = (ParcelAccessListUpdatePacket) Pack;
+            var updatePacket = (ParcelAccessListUpdatePacket) pack;
 
             #region Packet Session and User Check
 
@@ -9426,9 +9382,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleParcelPropertiesRequest(IClientAPI sender, Packet Pack)
+        bool HandleParcelPropertiesRequest(IClientAPI sender, Packet pack)
         {
-            ParcelPropertiesRequestPacket propertiesRequest = (ParcelPropertiesRequestPacket) Pack;
+            var propertiesRequest = (ParcelPropertiesRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -9454,9 +9410,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleParcelDivide(IClientAPI sender, Packet Pack)
+        bool HandleParcelDivide(IClientAPI sender, Packet pack)
         {
-            ParcelDividePacket landDivide = (ParcelDividePacket) Pack;
+            var landDivide = (ParcelDividePacket) pack;
 
             #region Packet Session and User Check
 
@@ -9480,9 +9436,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleParcelJoin(IClientAPI sender, Packet Pack)
+        bool HandleParcelJoin(IClientAPI sender, Packet pack)
         {
-            ParcelJoinPacket landJoin = (ParcelJoinPacket) Pack;
+            var landJoin = (ParcelJoinPacket) pack;
 
             #region Packet Session and User Check
 
@@ -9507,9 +9463,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleParcelPropertiesUpdate(IClientAPI sender, Packet Pack)
+        bool HandleParcelPropertiesUpdate(IClientAPI sender, Packet pack)
         {
-            ParcelPropertiesUpdatePacket parcelPropertiesPacket = (ParcelPropertiesUpdatePacket) Pack;
+            var parcelPropertiesPacket = (ParcelPropertiesUpdatePacket) pack;
 
             #region Packet Session and User Check
 
@@ -9562,9 +9518,9 @@ namespace WhiteCore.ClientStack
             }
         }
 
-        bool HandleParcelSelectObjects(IClientAPI sender, Packet Pack)
+        bool HandleParcelSelectObjects(IClientAPI sender, Packet pack)
         {
-            ParcelSelectObjectsPacket selectPacket = (ParcelSelectObjectsPacket) Pack;
+            var selectPacket = (ParcelSelectObjectsPacket) pack;
 
             #region Packet Session and User Check
 
@@ -9589,9 +9545,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleParcelObjectOwnersRequest(IClientAPI sender, Packet Pack)
+        bool HandleParcelObjectOwnersRequest(IClientAPI sender, Packet pack)
         {
-            ParcelObjectOwnersRequestPacket reqPacket = (ParcelObjectOwnersRequestPacket) Pack;
+            var reqPacket = (ParcelObjectOwnersRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -9613,9 +9569,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleParcelGodForceOwner(IClientAPI sender, Packet Pack)
+        bool HandleParcelGodForceOwner(IClientAPI sender, Packet pack)
         {
-            ParcelGodForceOwnerPacket godForceOwnerPacket = (ParcelGodForceOwnerPacket) Pack;
+            var godForceOwnerPacket = (ParcelGodForceOwnerPacket) pack;
 
             #region Packet Session and User Check
 
@@ -9636,9 +9592,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleParcelRelease(IClientAPI sender, Packet Pack)
+        bool HandleParcelRelease(IClientAPI sender, Packet pack)
         {
-            ParcelReleasePacket releasePacket = (ParcelReleasePacket) Pack;
+            var releasePacket = (ParcelReleasePacket) pack;
 
             #region Packet Session and User Check
 
@@ -9659,9 +9615,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleParcelReclaim(IClientAPI sender, Packet Pack)
+        bool HandleParcelReclaim(IClientAPI sender, Packet pack)
         {
-            ParcelReclaimPacket reclaimPacket = (ParcelReclaimPacket) Pack;
+            var reclaimPacket = (ParcelReclaimPacket) pack;
 
             #region Packet Session and User Check
 
@@ -9682,9 +9638,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleParcelReturnObjects(IClientAPI sender, Packet Pack)
+        bool HandleParcelReturnObjects(IClientAPI sender, Packet pack)
         {
-            ParcelReturnObjectsPacket parcelReturnObjects = (ParcelReturnObjectsPacket) Pack;
+            var parcelReturnObjects = (ParcelReturnObjectsPacket) pack;
 
             #region Packet Session and User Check
 
@@ -9716,9 +9672,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleParcelSetOtherCleanTime(IClientAPI sender, Packet Pack)
+        bool HandleParcelSetOtherCleanTime(IClientAPI sender, Packet pack)
         {
-            ParcelSetOtherCleanTimePacket parcelSetOtherCleanTimePacket = (ParcelSetOtherCleanTimePacket) Pack;
+            var parcelSetOtherCleanTimePacket = (ParcelSetOtherCleanTimePacket) pack;
 
             #region Packet Session and User Check
 
@@ -9741,9 +9697,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleLandStatRequest(IClientAPI sender, Packet Pack)
+        bool HandleLandStatRequest(IClientAPI sender, Packet pack)
         {
-            LandStatRequestPacket lsrp = (LandStatRequestPacket) Pack;
+            var lsrp = (LandStatRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -9765,10 +9721,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleParcelDwellRequest(IClientAPI sender, Packet Pack)
+        bool HandleParcelDwellRequest(IClientAPI sender, Packet pack)
         {
-            ParcelDwellRequestPacket dwellrq =
-                (ParcelDwellRequestPacket) Pack;
+            var dwellrq = (ParcelDwellRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -9793,9 +9748,9 @@ namespace WhiteCore.ClientStack
 
         #region Estate Packets
 
-        bool HandleEstateOwnerMessage(IClientAPI sender, Packet Pack)
+        bool HandleEstateOwnerMessage(IClientAPI sender, Packet pack)
         {
-            EstateOwnerMessagePacket messagePacket = (EstateOwnerMessagePacket) Pack;
+            var messagePacket = (EstateOwnerMessagePacket) pack;
             //MainConsole.Instance.Debug(messagePacket.ToString());
             GodLandStatRequest handlerLandStatRequest;
 
@@ -9864,7 +9819,7 @@ namespace WhiteCore.ClientStack
                             string[] splitField = s.Split(' ');
                             if (splitField.Length == 2)
                             {
-                                Int16 corner = Convert.ToInt16(splitField[0]);
+                                short corner = Convert.ToInt16(splitField[0]);
                                 UUID textureUUID = new UUID(splitField[1]);
 
                                 OnSetEstateTerrainDetailTexture(this, corner, textureUUID);
@@ -9882,7 +9837,7 @@ namespace WhiteCore.ClientStack
                             string[] splitField = s.Split(' ');
                             if (splitField.Length == 3)
                             {
-                                Int16 corner = Convert.ToInt16(splitField[0]);
+                                short corner = Convert.ToInt16(splitField[0]);
                                 float lowValue = (float) Convert.ToDecimal(splitField[1], Culture.NumberFormatInfo);
                                 float highValue = (float) Convert.ToDecimal(splitField[2], Culture.NumberFormatInfo);
 
@@ -10110,8 +10065,8 @@ namespace WhiteCore.ClientStack
                     {
                         UUID invoice = messagePacket.MethodData.Invoice;
                         UUID SenderID = messagePacket.AgentData.AgentID;
-                        UInt32 param1 = Convert.ToUInt32(Utils.BytesToString(messagePacket.ParamList[1].Parameter));
-                        UInt32 param2 = Convert.ToUInt32(Utils.BytesToString(messagePacket.ParamList[2].Parameter));
+                        uint param1 = Convert.ToUInt32(Utils.BytesToString(messagePacket.ParamList[1].Parameter));
+                        uint param2 = Convert.ToUInt32(Utils.BytesToString(messagePacket.ParamList[2].Parameter));
 
                         EstateChangeInfo handlerEstateChangeInfo = OnEstateChangeInfo;
                         if (handlerEstateChangeInfo != null)
@@ -10178,23 +10133,23 @@ namespace WhiteCore.ClientStack
                     return true;
                 default:
                     MainConsole.Instance.WarnFormat(
-                        "[LLCLIENTVIEW]: EstateOwnerMessage: Unknown method {0} requested for {1}",
+                        "[Client]: EstateOwnerMessage: Unknown method {0} requested for {1}",
                         method, Name);
 
                     for (int i = 0; i < messagePacket.ParamList.Length; i++)
                     {
                         EstateOwnerMessagePacket.ParamListBlock block = messagePacket.ParamList[i];
-                        string data = (string) Utils.BytesToString(block.Parameter);
-                        MainConsole.Instance.DebugFormat("[LLCLIENTVIEW]: Param {0}={1}", i, data);
+                        string data = Utils.BytesToString(block.Parameter);
+                        MainConsole.Instance.DebugFormat("[Client]: Param {0}={1}", i, data);
                     }
 
                     return true;
             }
         }
 
-        bool HandleRequestRegionInfo(IClientAPI sender, Packet Pack)
+        bool HandleRequestRegionInfo(IClientAPI sender, Packet pack)
         {
-            RequestRegionInfoPacket.AgentDataBlock mPacket = ((RequestRegionInfoPacket) Pack).AgentData;
+            RequestRegionInfoPacket.AgentDataBlock mPacket = ((RequestRegionInfoPacket) pack).AgentData;
 
             #region Packet Session and User Check
 
@@ -10215,7 +10170,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleEstateCovenantRequest(IClientAPI sender, Packet Pack)
+        bool HandleEstateCovenantRequest(IClientAPI sender, Packet pack)
         {
             //EstateCovenantRequestPacket.AgentDataBlock epack =
             //     ((EstateCovenantRequestPacket)Pack).AgentData;
@@ -10232,9 +10187,9 @@ namespace WhiteCore.ClientStack
 
         #region GodPackets
 
-        bool HandleRequestGodlikePowers(IClientAPI sender, Packet Pack)
+        bool HandleRequestGodlikePowers(IClientAPI sender, Packet pack)
         {
-            RequestGodlikePowersPacket rglpPack = (RequestGodlikePowersPacket) Pack;
+            var rglpPack = (RequestGodlikePowersPacket) pack;
             RequestGodlikePowersPacket.RequestBlockBlock rblock = rglpPack.RequestBlock;
             UUID token = rblock.Token;
 
@@ -10261,10 +10216,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleGodUpdateRegionInfoUpdate(IClientAPI client, Packet Packet)
+        bool HandleGodUpdateRegionInfoUpdate(IClientAPI client, Packet pack)
         {
-            GodUpdateRegionInfoPacket GodUpdateRegionInfo =
-                (GodUpdateRegionInfoPacket) Packet;
+            var GodUpdateRegionInfo = (GodUpdateRegionInfoPacket) pack;
 
             GodUpdateRegionInfoUpdate handlerGodUpdateRegionInfo = OnGodUpdateRegionInfoUpdate;
 
@@ -10294,10 +10248,9 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        bool HandleSimWideDeletes(IClientAPI client, Packet Packet)
+        bool HandleSimWideDeletes(IClientAPI client, Packet pack)
         {
-            SimWideDeletesPacket SimWideDeletesRequest =
-                (SimWideDeletesPacket) Packet;
+            var SimWideDeletesRequest = (SimWideDeletesPacket) pack;
 
             #region Packet Session and User Check
 
@@ -10320,10 +10273,9 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        bool HandleGodlikeMessage(IClientAPI client, Packet Packet)
+        bool HandleGodlikeMessage(IClientAPI client, Packet pack)
         {
-            GodlikeMessagePacket GodlikeMessage =
-                (GodlikeMessagePacket) Packet;
+            var GodlikeMessage = (GodlikeMessagePacket) pack;
 
             #region Packet Session and User Check
 
@@ -10352,10 +10304,9 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        bool HandleSaveStatePacket(IClientAPI client, Packet Packet)
+        bool HandleSaveStatePacket(IClientAPI client, Packet pack)
         {
-            StateSavePacket SaveStateMessage =
-                (StateSavePacket) Packet;
+            var SaveStateMessage = (StateSavePacket) pack;
 
             #region Packet Session and User Check
 
@@ -10377,9 +10328,9 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        bool HandleGodKickUser(IClientAPI sender, Packet Pack)
+        bool HandleGodKickUser(IClientAPI sender, Packet pack)
         {
-            GodKickUserPacket gkupack = (GodKickUserPacket) Pack;
+            var gkupack = (GodKickUserPacket) pack;
 
             if (gkupack.UserInfo.GodSessionID == SessionId && AgentId == gkupack.UserInfo.GodID)
             {
@@ -10401,9 +10352,9 @@ namespace WhiteCore.ClientStack
 
         #region Economy/Transaction Packets
 
-        bool HandleMoneyBalanceRequest(IClientAPI sender, Packet Pack)
+        bool HandleMoneyBalanceRequest(IClientAPI sender, Packet pack)
         {
-            MoneyBalanceRequestPacket moneybalancerequestpacket = (MoneyBalanceRequestPacket) Pack;
+            var moneybalancerequestpacket = (MoneyBalanceRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -10428,7 +10379,7 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleEconomyDataRequest(IClientAPI sender, Packet Pack)
+        bool HandleEconomyDataRequest(IClientAPI sender, Packet pack)
         {
             EconomyDataRequest handlerEconomoyDataRequest = OnEconomyDataRequest;
             if (handlerEconomoyDataRequest != null)
@@ -10438,9 +10389,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleRequestPayPrice(IClientAPI sender, Packet Pack)
+        bool HandleRequestPayPrice(IClientAPI sender, Packet pack)
         {
-            RequestPayPricePacket requestPayPricePacket = (RequestPayPricePacket) Pack;
+            var requestPayPricePacket = (RequestPayPricePacket) pack;
 
             RequestPayPrice handlerRequestPayPrice = OnRequestPayPrice;
             if (handlerRequestPayPrice != null)
@@ -10450,9 +10401,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleObjectSaleInfo(IClientAPI sender, Packet Pack)
+        bool HandleObjectSaleInfo(IClientAPI sender, Packet pack)
         {
-            ObjectSaleInfoPacket objectSaleInfoPacket = (ObjectSaleInfoPacket) Pack;
+            var objectSaleInfoPacket = (ObjectSaleInfoPacket) pack;
 
             #region Packet Session and User Check
 
@@ -10481,9 +10432,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleObjectBuy(IClientAPI sender, Packet Pack)
+        bool HandleObjectBuy(IClientAPI sender, Packet pack)
         {
-            ObjectBuyPacket objectBuyPacket = (ObjectBuyPacket) Pack;
+            var objectBuyPacket = (ObjectBuyPacket) pack;
 
             #region Packet Session and User Check
 
@@ -10519,9 +10470,9 @@ namespace WhiteCore.ClientStack
 
         #region Script Packets
 
-        bool HandleGetScriptRunning(IClientAPI sender, Packet Pack)
+        bool HandleGetScriptRunning(IClientAPI sender, Packet pack)
         {
-            GetScriptRunningPacket scriptRunning = (GetScriptRunningPacket) Pack;
+            var scriptRunning = (GetScriptRunningPacket) pack;
 
             GetScriptRunning handlerGetScriptRunning = OnGetScriptRunning;
             if (handlerGetScriptRunning != null)
@@ -10531,9 +10482,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleSetScriptRunning(IClientAPI sender, Packet Pack)
+        bool HandleSetScriptRunning(IClientAPI sender, Packet pack)
         {
-            SetScriptRunningPacket setScriptRunning = (SetScriptRunningPacket) Pack;
+            var setScriptRunning = (SetScriptRunningPacket) pack;
 
             #region Packet Session and User Check
 
@@ -10555,9 +10506,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleScriptReset(IClientAPI sender, Packet Pack)
+        bool HandleScriptReset(IClientAPI sender, Packet pack)
         {
-            ScriptResetPacket scriptResetPacket = (ScriptResetPacket) Pack;
+            var scriptResetPacket = (ScriptResetPacket) pack;
 
             #region Packet Session and User Check
 
@@ -10582,9 +10533,9 @@ namespace WhiteCore.ClientStack
 
         #region Gesture Managment
 
-        bool HandleActivateGestures(IClientAPI sender, Packet Pack)
+        bool HandleActivateGestures(IClientAPI sender, Packet pack)
         {
-            ActivateGesturesPacket activateGesturePacket = (ActivateGesturesPacket) Pack;
+            var activateGesturePacket = (ActivateGesturesPacket) pack;
 
             #region Packet Session and User Check
 
@@ -10609,9 +10560,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleDeactivateGestures(IClientAPI sender, Packet Pack)
+        bool HandleDeactivateGestures(IClientAPI sender, Packet pack)
         {
-            DeactivateGesturesPacket deactivateGesturePacket = (DeactivateGesturesPacket) Pack;
+            var deactivateGesturePacket = (DeactivateGesturesPacket) pack;
 
             #region Packet Session and User Check
 
@@ -10632,9 +10583,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleObjectOwner(IClientAPI sender, Packet Pack)
+        bool HandleObjectOwner(IClientAPI sender, Packet pack)
         {
-            ObjectOwnerPacket objectOwnerPacket = (ObjectOwnerPacket) Pack;
+            var objectOwnerPacket = (ObjectOwnerPacket) pack;
 
             #region Packet Session and User Check
 
@@ -10660,9 +10611,9 @@ namespace WhiteCore.ClientStack
 
         #endregion Gesture Managment
 
-        bool HandleAgentFOV(IClientAPI sender, Packet Pack)
+        bool HandleAgentFOV(IClientAPI sender, Packet pack)
         {
-            AgentFOVPacket fovPacket = (AgentFOVPacket) Pack;
+            var fovPacket = (AgentFOVPacket) pack;
 
             #region Packet Session and User Check
 
@@ -10689,27 +10640,27 @@ namespace WhiteCore.ClientStack
 
         #region unimplemented handlers
 
-        bool HandleViewerStats(IClientAPI sender, Packet Pack)
+        bool HandleViewerStats(IClientAPI sender, Packet pack)
         {
-            //MainConsole.Instance.Warn("[CLIENT]: unhandled ViewerStats packet");
+            //MainConsole.Instance.Warn("[Client]: unhandled ViewerStats packet");
             return true;
         }
 
-        bool HandleUseCircuitCode(IClientAPI sender, Packet Pack)
+        bool HandleUseCircuitCode(IClientAPI sender, Packet pack)
         {
             return true;
         }
 
-        bool HandleAgentHeightWidth(IClientAPI sender, Packet Pack)
+        bool HandleAgentHeightWidth(IClientAPI sender, Packet pack)
         {
             return true;
         }
 
         #endregion unimplemented handlers
 
-        bool HandleMapItemRequest(IClientAPI sender, Packet Pack)
+        bool HandleMapItemRequest(IClientAPI sender, Packet pack)
         {
-            MapItemRequestPacket mirpk = (MapItemRequestPacket) Pack;
+            var mirpk = (MapItemRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -10733,10 +10684,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleMuteListRequest(IClientAPI sender, Packet Pack)
+        bool HandleMuteListRequest(IClientAPI sender, Packet pack)
         {
-            MuteListRequestPacket muteListRequest =
-                (MuteListRequestPacket) Pack;
+            var muteListRequest = (MuteListRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -10761,10 +10711,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleUpdateMuteListEntry(IClientAPI client, Packet Packet)
+        bool HandleUpdateMuteListEntry(IClientAPI client, Packet pack)
         {
-            UpdateMuteListEntryPacket UpdateMuteListEntry =
-                (UpdateMuteListEntryPacket) Packet;
+            var UpdateMuteListEntry = (UpdateMuteListEntryPacket) pack;
 
             #region Packet Session and User Check
 
@@ -10789,10 +10738,9 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        bool HandleRemoveMuteListEntry(IClientAPI client, Packet Packet)
+        bool HandleRemoveMuteListEntry(IClientAPI client, Packet pack)
         {
-            RemoveMuteListEntryPacket RemoveMuteListEntry =
-                (RemoveMuteListEntryPacket) Packet;
+            var RemoveMuteListEntry = (RemoveMuteListEntryPacket) pack;
 
             #region Packet Session and User Check
 
@@ -10817,10 +10765,9 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        bool HandleUserReport(IClientAPI client, Packet Packet)
+        bool HandleUserReport(IClientAPI client, Packet pack)
         {
-            UserReportPacket UserReport =
-                (UserReportPacket) Packet;
+            var UserReport = (UserReportPacket) pack;
 
             #region Packet Session and User Check
 
@@ -10853,10 +10800,9 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        bool HandleSendPostcard(IClientAPI client, Packet packet)
+        bool HandleSendPostcard(IClientAPI client, Packet pack)
         {
-            SendPostcardPacket SendPostcard =
-                (SendPostcardPacket) packet;
+            var SendPostcard = (SendPostcardPacket) pack;
 
             #region Packet Session and User Check
 
@@ -10878,9 +10824,9 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        bool HandleViewerStartAuction(IClientAPI client, Packet packet)
+        bool HandleViewerStartAuction(IClientAPI client, Packet pack)
         {
-            ViewerStartAuctionPacket aPacket = (ViewerStartAuctionPacket) packet;
+            var aPacket = (ViewerStartAuctionPacket) pack;
             ViewerStartAuction handlerStartAuction = OnViewerStartAuction;
 
             if (handlerStartAuction != null)
@@ -10891,9 +10837,9 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        bool HandleParcelDisableObjects(IClientAPI client, Packet packet)
+        bool HandleParcelDisableObjects(IClientAPI client, Packet pack)
         {
-            ParcelDisableObjectsPacket aPacket = (ParcelDisableObjectsPacket) packet;
+            var aPacket = (ParcelDisableObjectsPacket) pack;
             ParcelReturnObjectsRequest handlerParcelDisableObjectsRequest = OnParcelDisableObjectsRequest;
 
             if (handlerParcelDisableObjectsRequest != null)
@@ -10906,19 +10852,19 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        bool HandleVelocityInterpolate(IClientAPI client, Packet packet)
+        bool HandleVelocityInterpolate(IClientAPI client, Packet pack)
         {
             VelocityInterpolateChangeRequest handlerVelocityInterpolateChangeRequest = OnVelocityInterpolateChangeRequest;
 
             if (handlerVelocityInterpolateChangeRequest != null)
             {
-                handlerVelocityInterpolateChangeRequest(packet is VelocityInterpolateOnPacket, this);
+                handlerVelocityInterpolateChangeRequest(pack is VelocityInterpolateOnPacket, this);
                 return true;
             }
             return false;
         }
 
-        bool HandleTeleportCancel(IClientAPI client, Packet packet)
+        bool HandleTeleportCancel(IClientAPI client, Packet pack)
         {
             TeleportCancel handlerTeleportCancel = OnTeleportCancel;
 
@@ -10932,9 +10878,9 @@ namespace WhiteCore.ClientStack
 
         #region Dir handlers
 
-        bool HandleDirPlacesQuery(IClientAPI sender, Packet Pack)
+        bool HandleDirPlacesQuery(IClientAPI sender, Packet pack)
         {
-            DirPlacesQueryPacket dirPlacesQueryPacket = (DirPlacesQueryPacket) Pack;
+            var dirPlacesQueryPacket = (DirPlacesQueryPacket) pack;
             //MainConsole.Instance.Debug(dirPlacesQueryPacket.ToString());
 
             #region Packet Session and User Check
@@ -10964,9 +10910,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleDirFindQuery(IClientAPI sender, Packet Pack)
+        bool HandleDirFindQuery(IClientAPI sender, Packet pack)
         {
-            DirFindQueryPacket dirFindQueryPacket = (DirFindQueryPacket) Pack;
+            var dirFindQueryPacket = (DirFindQueryPacket) pack;
 
             #region Packet Session and User Check
 
@@ -10984,17 +10930,16 @@ namespace WhiteCore.ClientStack
             {
                 handlerDirFindQuery(this,
                                     dirFindQueryPacket.QueryData.QueryID,
-                                    Utils.BytesToString(
-                                        dirFindQueryPacket.QueryData.QueryText),
+                                    Utils.BytesToString(dirFindQueryPacket.QueryData.QueryText),
                                     dirFindQueryPacket.QueryData.QueryFlags,
                                     dirFindQueryPacket.QueryData.QueryStart);
             }
             return true;
         }
 
-        bool HandleDirLandQuery(IClientAPI sender, Packet Pack)
+        bool HandleDirLandQuery(IClientAPI sender, Packet pack)
         {
-            DirLandQueryPacket dirLandQueryPacket = (DirLandQueryPacket) Pack;
+            var dirLandQueryPacket = (DirLandQueryPacket) pack;
 
             #region Packet Session and User Check
 
@@ -11021,9 +10966,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleDirPopularQuery(IClientAPI sender, Packet Pack)
+        bool HandleDirPopularQuery(IClientAPI sender, Packet pack)
         {
-            DirPopularQueryPacket dirPopularQueryPacket = (DirPopularQueryPacket) Pack;
+            var dirPopularQueryPacket = (DirPopularQueryPacket) pack;
 
             #region Packet Session and User Check
 
@@ -11046,9 +10991,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleDirClassifiedQuery(IClientAPI sender, Packet Pack)
+        bool HandleDirClassifiedQuery(IClientAPI sender, Packet pack)
         {
-            DirClassifiedQueryPacket dirClassifiedQueryPacket = (DirClassifiedQueryPacket) Pack;
+            var dirClassifiedQueryPacket = (DirClassifiedQueryPacket) pack;
 
             #region Packet Session and User Check
 
@@ -11075,9 +11020,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleEventInfoRequest(IClientAPI sender, Packet Pack)
+        bool HandleEventInfoRequest(IClientAPI sender, Packet pack)
         {
-            EventInfoRequestPacket eventInfoRequestPacket = (EventInfoRequestPacket) Pack;
+            var eventInfoRequestPacket = (EventInfoRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -11101,9 +11046,9 @@ namespace WhiteCore.ClientStack
 
         #region Calling Card
 
-        bool HandleOfferCallingCard(IClientAPI sender, Packet Pack)
+        bool HandleOfferCallingCard(IClientAPI sender, Packet pack)
         {
-            OfferCallingCardPacket offerCallingCardPacket = (OfferCallingCardPacket) Pack;
+            var offerCallingCardPacket = (OfferCallingCardPacket) pack;
 
             #region Packet Session and User Check
 
@@ -11125,9 +11070,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleAcceptCallingCard(IClientAPI sender, Packet Pack)
+        bool HandleAcceptCallingCard(IClientAPI sender, Packet pack)
         {
-            AcceptCallingCardPacket acceptCallingCardPacket = (AcceptCallingCardPacket) Pack;
+            var acceptCallingCardPacket = (AcceptCallingCardPacket) pack;
 
             #region Packet Session and User Check
 
@@ -11151,9 +11096,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleDeclineCallingCard(IClientAPI sender, Packet Pack)
+        bool HandleDeclineCallingCard(IClientAPI sender, Packet pack)
         {
-            DeclineCallingCardPacket declineCallingCardPacket = (DeclineCallingCardPacket) Pack;
+            var declineCallingCardPacket = (DeclineCallingCardPacket) pack;
 
             #region Packet Session and User Check
 
@@ -11168,8 +11113,7 @@ namespace WhiteCore.ClientStack
 
             if (OnDeclineCallingCard != null)
             {
-                OnDeclineCallingCard(this,
-                                     declineCallingCardPacket.TransactionBlock.TransactionID);
+                OnDeclineCallingCard(this, declineCallingCardPacket.TransactionBlock.TransactionID);
             }
             return true;
         }
@@ -11178,9 +11122,9 @@ namespace WhiteCore.ClientStack
 
         #region Groups
 
-        bool HandleActivateGroup(IClientAPI sender, Packet Pack)
+        bool HandleActivateGroup(IClientAPI sender, Packet pack)
         {
-            ActivateGroupPacket activateGroupPacket = (ActivateGroupPacket) Pack;
+            var activateGroupPacket = (ActivateGroupPacket) pack;
 
             #region Packet Session and User Check
 
@@ -11200,10 +11144,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleGroupVoteHistoryRequest(IClientAPI client, Packet Packet)
+        bool HandleGroupVoteHistoryRequest(IClientAPI client, Packet pack)
         {
-            GroupVoteHistoryRequestPacket GroupVoteHistoryRequest =
-                (GroupVoteHistoryRequestPacket) Packet;
+            var GroupVoteHistoryRequest = (GroupVoteHistoryRequestPacket) pack;
             GroupVoteHistoryRequest handlerGroupVoteHistoryRequest = OnGroupVoteHistoryRequest;
             if (handlerGroupVoteHistoryRequest != null)
             {
@@ -11216,10 +11159,9 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        bool HandleGroupProposalBallot(IClientAPI client, Packet Packet)
+        bool HandleGroupProposalBallot(IClientAPI client, Packet pack)
         {
-            GroupProposalBallotPacket GroupProposalBallotRequest =
-                (GroupProposalBallotPacket) Packet;
+            var GroupProposalBallotRequest = (GroupProposalBallotPacket) pack;
             GroupProposalBallotRequest handlerGroupActiveProposalsRequest = OnGroupProposalBallotRequest;
             if (handlerGroupActiveProposalsRequest != null)
             {
@@ -11233,10 +11175,9 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        bool HandleGroupActiveProposalsRequest(IClientAPI client, Packet Packet)
+        bool HandleGroupActiveProposalsRequest(IClientAPI client, Packet pack)
         {
-            GroupActiveProposalsRequestPacket GroupActiveProposalsRequest =
-                (GroupActiveProposalsRequestPacket) Packet;
+            var GroupActiveProposalsRequest = (GroupActiveProposalsRequestPacket) pack;
             GroupActiveProposalsRequest handlerGroupActiveProposalsRequest = OnGroupActiveProposalsRequest;
             if (handlerGroupActiveProposalsRequest != null)
             {
@@ -11249,10 +11190,9 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        bool HandleGroupAccountDetailsRequest(IClientAPI client, Packet Packet)
+        bool HandleGroupAccountDetailsRequest(IClientAPI client, Packet pack)
         {
-            GroupAccountDetailsRequestPacket GroupAccountDetailsRequest =
-                (GroupAccountDetailsRequestPacket) Packet;
+            var GroupAccountDetailsRequest = (GroupAccountDetailsRequestPacket) pack;
             GroupAccountDetailsRequest handlerGroupAccountDetailsRequest = OnGroupAccountDetailsRequest;
             if (handlerGroupAccountDetailsRequest != null)
             {
@@ -11267,10 +11207,9 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        bool HandleGroupAccountSummaryRequest(IClientAPI client, Packet Packet)
+        bool HandleGroupAccountSummaryRequest(IClientAPI client, Packet pack)
         {
-            GroupAccountSummaryRequestPacket GroupAccountSummaryRequest =
-                (GroupAccountSummaryRequestPacket) Packet;
+            var GroupAccountSummaryRequest = (GroupAccountSummaryRequestPacket) pack;
             GroupAccountSummaryRequest handlerGroupAccountSummaryRequest = OnGroupAccountSummaryRequest;
             if (handlerGroupAccountSummaryRequest != null)
             {
@@ -11284,10 +11223,9 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        bool HandleGroupTransactionsDetailsRequest(IClientAPI client, Packet Packet)
+        bool HandleGroupTransactionsDetailsRequest(IClientAPI client, Packet pack)
         {
-            GroupAccountTransactionsRequestPacket GroupAccountTransactionsRequest =
-                (GroupAccountTransactionsRequestPacket) Packet;
+            var GroupAccountTransactionsRequest = (GroupAccountTransactionsRequestPacket) pack;
             GroupAccountTransactionsRequest handlerGroupAccountTransactionsRequest = OnGroupAccountTransactionsRequest;
             if (handlerGroupAccountTransactionsRequest != null)
             {
@@ -11302,10 +11240,9 @@ namespace WhiteCore.ClientStack
             return false;
         }
 
-        bool HandleGroupTitlesRequest(IClientAPI sender, Packet Pack)
+        bool HandleGroupTitlesRequest(IClientAPI sender, Packet pack)
         {
-            GroupTitlesRequestPacket groupTitlesRequest =
-                (GroupTitlesRequestPacket) Pack;
+            var groupTitlesRequest = (GroupTitlesRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -11350,10 +11287,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleGroupProfileRequest(IClientAPI sender, Packet Pack)
+        bool HandleGroupProfileRequest(IClientAPI sender, Packet pack)
         {
-            GroupProfileRequestPacket groupProfileRequest =
-                (GroupProfileRequestPacket) Pack;
+            var groupProfileRequest = (GroupProfileRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -11400,10 +11336,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleGroupMembersRequest(IClientAPI sender, Packet Pack)
+        bool HandleGroupMembersRequest(IClientAPI sender, Packet pack)
         {
-            GroupMembersRequestPacket groupMembersRequestPacket =
-                (GroupMembersRequestPacket) Pack;
+            var groupMembersRequestPacket = (GroupMembersRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -11471,10 +11406,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleGroupRoleDataRequest(IClientAPI sender, Packet Pack)
+        bool HandleGroupRoleDataRequest(IClientAPI sender, Packet pack)
         {
-            GroupRoleDataRequestPacket groupRolesRequest =
-                (GroupRoleDataRequestPacket) Pack;
+            var groupRolesRequest = (GroupRoleDataRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -11492,8 +11426,7 @@ namespace WhiteCore.ClientStack
                 GroupRoleDataReplyPacket groupRolesReply =
                     (GroupRoleDataReplyPacket) PacketPool.Instance.GetPacket(PacketType.GroupRoleDataReply);
 
-                groupRolesReply.AgentData =
-                    new GroupRoleDataReplyPacket.AgentDataBlock {AgentID = AgentId};
+                groupRolesReply.AgentData = new GroupRoleDataReplyPacket.AgentDataBlock {AgentID = AgentId};
 
 
                 groupRolesReply.GroupData =
@@ -11504,15 +11437,12 @@ namespace WhiteCore.ClientStack
                         };
 
 
-                List<GroupRolesData> titles =
-                    m_GroupsModule.GroupRoleDataRequest(this,
+                List<GroupRolesData> titles = m_GroupsModule.GroupRoleDataRequest(this,
                                                         groupRolesRequest.GroupData.GroupID);
 
-                groupRolesReply.GroupData.RoleCount =
-                    titles.Count;
+                groupRolesReply.GroupData.RoleCount = titles.Count;
 
-                groupRolesReply.RoleData =
-                    new GroupRoleDataReplyPacket.RoleDataBlock[titles.Count];
+                groupRolesReply.RoleData = new GroupRoleDataReplyPacket.RoleDataBlock[titles.Count];
 
                 int i = 0;
                 foreach (GroupRolesData d in titles)
@@ -11537,10 +11467,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleGroupRoleMembersRequest(IClientAPI sender, Packet Pack)
+        bool HandleGroupRoleMembersRequest(IClientAPI sender, Packet pack)
         {
-            GroupRoleMembersRequestPacket groupRoleMembersRequest =
-                (GroupRoleMembersRequestPacket) Pack;
+            var groupRoleMembersRequest = (GroupRoleMembersRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -11597,10 +11526,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleCreateGroupRequest(IClientAPI sender, Packet Pack)
+        bool HandleCreateGroupRequest(IClientAPI sender, Packet pack)
         {
-            CreateGroupRequestPacket createGroupRequest =
-                (CreateGroupRequestPacket) Pack;
+            var createGroupRequest = (CreateGroupRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -11634,10 +11562,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleUpdateGroupInfo(IClientAPI sender, Packet Pack)
+        bool HandleUpdateGroupInfo(IClientAPI sender, Packet pack)
         {
-            UpdateGroupInfoPacket updateGroupInfo =
-                (UpdateGroupInfoPacket) Pack;
+            var updateGroupInfo = (UpdateGroupInfoPacket) pack;
 
             #region Packet Session and User Check
 
@@ -11666,10 +11593,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleSetGroupAcceptNotices(IClientAPI sender, Packet Pack)
+        bool HandleSetGroupAcceptNotices(IClientAPI sender, Packet pack)
         {
-            SetGroupAcceptNoticesPacket setGroupAcceptNotices =
-                (SetGroupAcceptNoticesPacket) Pack;
+            var setGroupAcceptNotices = (SetGroupAcceptNoticesPacket) pack;
 
             #region Packet Session and User Check
 
@@ -11693,10 +11619,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleGroupTitleUpdate(IClientAPI sender, Packet Pack)
+        bool HandleGroupTitleUpdate(IClientAPI sender, Packet pack)
         {
-            GroupTitleUpdatePacket groupTitleUpdate =
-                (GroupTitleUpdatePacket) Pack;
+            var groupTitleUpdate = (GroupTitleUpdatePacket) pack;
 
             #region Packet Session and User Check
 
@@ -11719,9 +11644,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleParcelDeedToGroup(IClientAPI sender, Packet Pack)
+        bool HandleParcelDeedToGroup(IClientAPI sender, Packet pack)
         {
-            ParcelDeedToGroupPacket parcelDeedToGroup = (ParcelDeedToGroupPacket) Pack;
+            var parcelDeedToGroup = (ParcelDeedToGroupPacket) pack;
 
             #region Packet Session and User Check
 
@@ -11746,10 +11671,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleGroupNoticesListRequest(IClientAPI sender, Packet Pack)
+        bool HandleGroupNoticesListRequest(IClientAPI sender, Packet pack)
         {
-            GroupNoticesListRequestPacket groupNoticesListRequest =
-                (GroupNoticesListRequestPacket) Pack;
+            var groupNoticesListRequest = (GroupNoticesListRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -11797,10 +11721,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleGroupNoticeRequest(IClientAPI sender, Packet Pack)
+        bool HandleGroupNoticeRequest(IClientAPI sender, Packet pack)
         {
-            GroupNoticeRequestPacket groupNoticeRequest =
-                (GroupNoticeRequestPacket) Pack;
+            var groupNoticeRequest = (GroupNoticeRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -11821,10 +11744,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleGroupRoleUpdate(IClientAPI sender, Packet Pack)
+        bool HandleGroupRoleUpdate(IClientAPI sender, Packet pack)
         {
-            GroupRoleUpdatePacket groupRoleUpdate =
-                (GroupRoleUpdatePacket) Pack;
+            var groupRoleUpdate = (GroupRoleUpdatePacket) pack;
 
             #region Packet Session and User Check
 
@@ -11856,10 +11778,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleGroupRoleChanges(IClientAPI sender, Packet Pack)
+        bool HandleGroupRoleChanges(IClientAPI sender, Packet pack)
         {
-            GroupRoleChangesPacket groupRoleChanges =
-                (GroupRoleChangesPacket) Pack;
+            var groupRoleChanges = (GroupRoleChangesPacket) pack;
 
             #region Packet Session and User Check
 
@@ -11888,10 +11809,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleJoinGroupRequest(IClientAPI sender, Packet Pack)
+        bool HandleJoinGroupRequest(IClientAPI sender, Packet pack)
         {
-            JoinGroupRequestPacket joinGroupRequest =
-                (JoinGroupRequestPacket) Pack;
+            var joinGroupRequest = (JoinGroupRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -11912,10 +11832,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleLeaveGroupRequest(IClientAPI sender, Packet Pack)
+        bool HandleLeaveGroupRequest(IClientAPI sender, Packet pack)
         {
-            LeaveGroupRequestPacket leaveGroupRequest =
-                (LeaveGroupRequestPacket) Pack;
+            var leaveGroupRequest = (LeaveGroupRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -11936,10 +11855,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleEjectGroupMemberRequest(IClientAPI sender, Packet Pack)
+        bool HandleEjectGroupMemberRequest(IClientAPI sender, Packet pack)
         {
-            EjectGroupMemberRequestPacket ejectGroupMemberRequest =
-                (EjectGroupMemberRequestPacket) Pack;
+            var ejectGroupMemberRequest = (EjectGroupMemberRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -11965,10 +11883,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleInviteGroupRequest(IClientAPI sender, Packet Pack)
+        bool HandleInviteGroupRequest(IClientAPI sender, Packet pack)
         {
-            InviteGroupRequestPacket inviteGroupRequest =
-                (InviteGroupRequestPacket) Pack;
+            var inviteGroupRequest = (InviteGroupRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -11997,9 +11914,9 @@ namespace WhiteCore.ClientStack
 
         #endregion Groups
 
-        bool HandleStartLure(IClientAPI sender, Packet Pack)
+        bool HandleStartLure(IClientAPI sender, Packet pack)
         {
-            StartLurePacket startLureRequest = (StartLurePacket) Pack;
+            var startLureRequest = (StartLurePacket) pack;
 
             #region Packet Session and User Check
 
@@ -12022,10 +11939,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleTeleportLureRequest(IClientAPI sender, Packet Pack)
+        bool HandleTeleportLureRequest(IClientAPI sender, Packet pack)
         {
-            TeleportLureRequestPacket teleportLureRequest =
-                (TeleportLureRequestPacket) Pack;
+            var teleportLureRequest = (TeleportLureRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -12047,10 +11963,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleClassifiedInfoRequest(IClientAPI sender, Packet Pack)
+        bool HandleClassifiedInfoRequest(IClientAPI sender, Packet pack)
         {
-            ClassifiedInfoRequestPacket classifiedInfoRequest =
-                (ClassifiedInfoRequestPacket) Pack;
+            var classifiedInfoRequest = (ClassifiedInfoRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -12071,10 +11986,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleClassifiedInfoUpdate(IClientAPI sender, Packet Pack)
+        bool HandleClassifiedInfoUpdate(IClientAPI sender, Packet pack)
         {
-            ClassifiedInfoUpdatePacket classifiedInfoUpdate =
-                (ClassifiedInfoUpdatePacket) Pack;
+            var classifiedInfoUpdate = (ClassifiedInfoUpdatePacket) pack;
 
             #region Packet Session and User Check
 
@@ -12092,25 +12006,21 @@ namespace WhiteCore.ClientStack
                 handlerClassifiedInfoUpdate(
                     classifiedInfoUpdate.Data.ClassifiedID,
                     classifiedInfoUpdate.Data.Category,
-                    Utils.BytesToString(
-                        classifiedInfoUpdate.Data.Name),
-                    Utils.BytesToString(
-                        classifiedInfoUpdate.Data.Desc),
+                    Utils.BytesToString(classifiedInfoUpdate.Data.Name),
+                    Utils.BytesToString(classifiedInfoUpdate.Data.Desc),
                     classifiedInfoUpdate.Data.ParcelID,
                     classifiedInfoUpdate.Data.ParentEstate,
                     classifiedInfoUpdate.Data.SnapshotID,
-                    new Vector3(
-                        classifiedInfoUpdate.Data.PosGlobal),
+                    new Vector3(classifiedInfoUpdate.Data.PosGlobal),
                     classifiedInfoUpdate.Data.ClassifiedFlags,
                     classifiedInfoUpdate.Data.PriceForListing,
                     this);
             return true;
         }
 
-        bool HandleClassifiedDelete(IClientAPI sender, Packet Pack)
+        bool HandleClassifiedDelete(IClientAPI sender, Packet pack)
         {
-            ClassifiedDeletePacket classifiedDelete =
-                (ClassifiedDeletePacket) Pack;
+            var classifiedDelete = (ClassifiedDeletePacket) pack;
 
             #region Packet Session and User Check
 
@@ -12131,10 +12041,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleClassifiedGodDelete(IClientAPI sender, Packet Pack)
+        bool HandleClassifiedGodDelete(IClientAPI sender, Packet pack)
         {
-            ClassifiedGodDeletePacket classifiedGodDelete =
-                (ClassifiedGodDeletePacket) Pack;
+            var classifiedGodDelete = (ClassifiedGodDeletePacket) pack;
 
             #region Packet Session and User Check
 
@@ -12155,10 +12064,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleEventGodDelete(IClientAPI sender, Packet Pack)
+        bool HandleEventGodDelete(IClientAPI sender, Packet pack)
         {
-            EventGodDeletePacket eventGodDelete =
-                (EventGodDeletePacket) Pack;
+            var eventGodDelete = (EventGodDeletePacket) pack;
 
             #region Packet Session and User Check
 
@@ -12184,10 +12092,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleEventNotificationAddRequest(IClientAPI sender, Packet Pack)
+        bool HandleEventNotificationAddRequest(IClientAPI sender, Packet pack)
         {
-            EventNotificationAddRequestPacket eventNotificationAdd =
-                (EventNotificationAddRequestPacket) Pack;
+            var eventNotificationAdd = (EventNotificationAddRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -12207,10 +12114,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleEventNotificationRemoveRequest(IClientAPI sender, Packet Pack)
+        bool HandleEventNotificationRemoveRequest(IClientAPI sender, Packet pack)
         {
-            EventNotificationRemoveRequestPacket eventNotificationRemove =
-                (EventNotificationRemoveRequestPacket) Pack;
+            var eventNotificationRemove = (EventNotificationRemoveRequestPacket) pack;
 
             #region Packet Session and User Check
 
@@ -12230,9 +12136,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleRetrieveInstantMessages(IClientAPI sender, Packet Pack)
+        bool HandleRetrieveInstantMessages(IClientAPI sender, Packet pack)
         {
-            RetrieveInstantMessagesPacket rimpInstantMessagePack = (RetrieveInstantMessagesPacket) Pack;
+            var rimpInstantMessagePack = (RetrieveInstantMessagesPacket) pack;
 
             #region Packet Session and User Check
 
@@ -12251,10 +12157,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandlePickDelete(IClientAPI sender, Packet Pack)
+        bool HandlePickDelete(IClientAPI sender, Packet pack)
         {
-            PickDeletePacket pickDelete =
-                (PickDeletePacket) Pack;
+            var pickDelete = (PickDeletePacket) pack;
 
             #region Packet Session and User Check
 
@@ -12273,10 +12178,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandlePickGodDelete(IClientAPI sender, Packet Pack)
+        bool HandlePickGodDelete(IClientAPI sender, Packet pack)
         {
-            PickGodDeletePacket pickGodDelete =
-                (PickGodDeletePacket) Pack;
+            var pickGodDelete = (PickGodDeletePacket) pack;
 
             #region Packet Session and User Check
 
@@ -12298,10 +12202,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandlePickInfoUpdate(IClientAPI sender, Packet Pack)
+        bool HandlePickInfoUpdate(IClientAPI sender, Packet pack)
         {
-            PickInfoUpdatePacket pickInfoUpdate =
-                (PickInfoUpdatePacket) Pack;
+            var pickInfoUpdate = (PickInfoUpdatePacket) pack;
 
             #region Packet Session and User Check
 
@@ -12329,10 +12232,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleAvatarNotesUpdate(IClientAPI sender, Packet Pack)
+        bool HandleAvatarNotesUpdate(IClientAPI sender, Packet pack)
         {
-            AvatarNotesUpdatePacket avatarNotesUpdate =
-                (AvatarNotesUpdatePacket) Pack;
+            var avatarNotesUpdate = (AvatarNotesUpdatePacket) pack;
 
             #region Packet Session and User Check
 
@@ -12353,10 +12255,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleAvatarInterestsUpdate(IClientAPI sender, Packet Pack)
+        bool HandleAvatarInterestsUpdate(IClientAPI sender, Packet pack)
         {
-            AvatarInterestsUpdatePacket avatarInterestUpdate =
-                (AvatarInterestsUpdatePacket) Pack;
+            var avatarInterestUpdate = (AvatarInterestsUpdatePacket) pack;
 
             #region Packet Session and User Check
 
@@ -12380,10 +12281,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleGrantUserRights(IClientAPI sender, Packet Pack)
+        bool HandleGrantUserRights(IClientAPI sender, Packet pack)
         {
-            GrantUserRightsPacket GrantUserRights =
-                (GrantUserRightsPacket) Pack;
+            var GrantUserRights = (GrantUserRightsPacket) pack;
 
             #region Packet Session and User Check
 
@@ -12405,10 +12305,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandlePlacesQuery(IClientAPI sender, Packet Pack)
+        bool HandlePlacesQuery(IClientAPI sender, Packet pack)
         {
-            PlacesQueryPacket placesQueryPacket =
-                (PlacesQueryPacket) Pack;
+            var placesQueryPacket = (PlacesQueryPacket) pack;
 
             PlacesQuery handlerPlacesQuery = OnPlacesQuery;
 
@@ -12474,13 +12373,13 @@ namespace WhiteCore.ClientStack
         ///     Handler called when we receive a logout packet.
         /// </summary>
         /// <param name="client"></param>
-        /// <param name="packet"></param>
+        /// <param name="pack"></param>
         /// <returns></returns>
-        bool HandleLogout(IClientAPI client, Packet packet)
+        bool HandleLogout(IClientAPI client, Packet pack)
         {
-            if (packet.Type == PacketType.LogoutRequest)
+            if (pack.Type == PacketType.LogoutRequest)
             {
-                if (((LogoutRequestPacket) packet).AgentData.SessionID != SessionId) return false;
+                if (((LogoutRequestPacket) pack).AgentData.SessionID != SessionId) return false;
             }
 
             return Logout(client);
@@ -12492,7 +12391,7 @@ namespace WhiteCore.ClientStack
         /// <returns></returns>
         bool Logout(IClientAPI client)
         {
-            //MainConsole.Instance.InfoFormat("[CLIENT]: Got a logout request for {0} in {1}", Name, Scene.RegionInfo.RegionName);
+            //MainConsole.Instance.InfoFormat("[Client]: Got a logout request for {0} in {1}", Name, Scene.RegionInfo.RegionName);
 
             Action<IClientAPI> handlerLogout = OnLogout;
 
@@ -12504,9 +12403,9 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        bool HandleMultipleObjUpdate(IClientAPI simClient, Packet packet)
+        bool HandleMultipleObjUpdate(IClientAPI simClient, Packet pack)
         {
-            MultipleObjectUpdatePacket multipleupdate = (MultipleObjectUpdatePacket) packet;
+            var multipleupdate = (MultipleObjectUpdatePacket) pack;
             if (multipleupdate.AgentData.SessionID != SessionId) return false;
             // MainConsole.Instance.Debug("new multi update packet " + multipleupdate.ToString());
             IScene tScene = m_scene;
@@ -12690,7 +12589,7 @@ namespace WhiteCore.ClientStack
                                 break;
                             default:
                                 MainConsole.Instance.Debug(
-                                    "[CLIENT] MultipleObjUpdate recieved an unknown packet type: " +
+                                    "[Client] MultipleObjUpdate recieved an unknown packet type: " +
                                     (block.Type));
                                 break;
                         }
@@ -12770,7 +12669,7 @@ namespace WhiteCore.ClientStack
         /// <summary>
         ///     This is the starting point for sending a simulator packet out to the client
         /// </summary>
-        /// <param name="packet">Packet to send</param>
+        /// <param name="pack">Packet to send</param>
         /// <param name="throttlePacketType">Throttling category for the packet</param>
         /// <param name="doAutomaticSplitting">
         ///     True to automatically split oversized
@@ -12779,46 +12678,46 @@ namespace WhiteCore.ClientStack
         /// </param>
         /// <param name="resendMethod">Method that will be called if the packet needs resent</param>
         /// <param name="finishedMethod">Method that will be called when the packet is sent</param>
-        void OutPacket(Packet packet, ThrottleOutPacketType throttlePacketType, bool doAutomaticSplitting,
+        void OutPacket(Packet pack, ThrottleOutPacketType throttlePacketType, bool doAutomaticSplitting,
                                UnackedPacketMethod resendMethod, UnackedPacketMethod finishedMethod)
         {
-            if (m_debugPacketLevel > 0 || m_debugPackets.Contains(packet.Type.ToString()))
+            if (m_debugPacketLevel > 0 || m_debugPackets.Contains(pack.Type.ToString()))
             {
                 bool outputPacket = true;
 
                 if (m_debugPacketLevel <= 255
-                    && (packet.Type == PacketType.SimStats || packet.Type == PacketType.SimulatorViewerTimeMessage))
+                    && (pack.Type == PacketType.SimStats || pack.Type == PacketType.SimulatorViewerTimeMessage))
                     outputPacket = false;
 
                 if (m_debugPacketLevel <= 200
-                    && (packet.Type == PacketType.ImagePacket
-                        || packet.Type == PacketType.ImageData
-                        || packet.Type == PacketType.LayerData
-                        || packet.Type == PacketType.CoarseLocationUpdate))
+                    && (pack.Type == PacketType.ImagePacket
+                        || pack.Type == PacketType.ImageData
+                        || pack.Type == PacketType.LayerData
+                        || pack.Type == PacketType.CoarseLocationUpdate))
                     outputPacket = false;
 
                 if (m_debugPacketLevel <= 100
-                    && (packet.Type == PacketType.AvatarAnimation
-                        || packet.Type == PacketType.ViewerEffect))
+                    && (pack.Type == PacketType.AvatarAnimation
+                        || pack.Type == PacketType.ViewerEffect))
                     outputPacket = false;
 
                 if (m_debugPacketLevel <= 50
-                    && (packet.Type == PacketType.ImprovedTerseObjectUpdate
-                        || packet.Type == PacketType.ObjectUpdate))
+                    && (pack.Type == PacketType.ImprovedTerseObjectUpdate
+                        || pack.Type == PacketType.ObjectUpdate))
                     outputPacket = false;
 
                 if (m_debugPacketLevel <= 25
-                    && packet.Type == PacketType.ObjectPropertiesFamily)
+                    && pack.Type == PacketType.ObjectPropertiesFamily)
                     outputPacket = false;
 
-                if (m_debugPackets.Contains(packet.Type.ToString()))
+                if (m_debugPackets.Contains(pack.Type.ToString()))
                     outputPacket = true;
 
-                if (outputPacket && !m_debugRemovePackets.Contains(packet.Type.ToString()))
-                    MainConsole.Instance.DebugFormat("[CLIENT ({1})]: Packet OUT {0}", packet.Type, Name);
+                if (outputPacket && !m_debugRemovePackets.Contains(pack.Type.ToString()))
+                    MainConsole.Instance.DebugFormat("[CLIENT ({1})]: Packet OUT {0}", pack.Type, Name);
             }
 
-            m_udpServer.SendPacket(m_udpClient, packet, throttlePacketType, doAutomaticSplitting, resendMethod,
+            m_udpServer.SendPacket(m_udpClient, pack, throttlePacketType, doAutomaticSplitting, resendMethod,
                                    finishedMethod);
         }
 
@@ -12849,7 +12748,7 @@ namespace WhiteCore.ClientStack
                     }
                     catch (InvalidCastException)
                     {
-                        MainConsole.Instance.Error("[CLIENT]: Invalid autopilot request");
+                        MainConsole.Instance.Error("[Client]: Invalid autopilot request");
                         return;
                     }
 
@@ -12858,13 +12757,13 @@ namespace WhiteCore.ClientStack
                     {
                         handlerAutoPilotGo(0, new Vector3(locx, locy, locz), this);
                     }
-                    MainConsole.Instance.InfoFormat("[CLIENT]: Client Requests autopilot to position <{0},{1},{2}>",
+                    MainConsole.Instance.InfoFormat("[Client]: Client Requests autopilot to position <{0},{1},{2}>",
                                                     locx, locy, locz);
 
 
                     break;
                 default:
-                    MainConsole.Instance.Debug("[CLIENT]: Unknown Generic Message, Method: " + gmMethod + ". Invoice: " +
+                    MainConsole.Instance.Debug("[Client]: Unknown Generic Message, Method: " + gmMethod + ". Invoice: " +
                                                gmInvoice +
                                                ".  Dumping Params:");
                     foreach (GenericMessagePacket.ParamListBlock t in gmParams)
@@ -12879,35 +12778,35 @@ namespace WhiteCore.ClientStack
         /// <summary>
         ///     Entryway from the client to the simulator.  All UDP packets from the client will end up here
         /// </summary>
-        /// <param name="packet">OpenMetaverse.packet</param>
-        public void ProcessInPacket(Packet packet)
+        /// <param name="pack">OpenMetaverse.packet</param>
+        public void ProcessInPacket(Packet pack)
         {
-            if (m_debugPacketLevel > 0 || m_debugPackets.Contains(packet.Type.ToString()))
+            if (m_debugPacketLevel > 0 || m_debugPackets.Contains(pack.Type.ToString()))
             {
                 bool outputPacket = true;
 
-                if (m_debugPacketLevel <= 255 && packet.Type == PacketType.AgentUpdate)
+                if (m_debugPacketLevel <= 255 && pack.Type == PacketType.AgentUpdate)
                     outputPacket = false;
 
-                if (m_debugPacketLevel <= 200 && packet.Type == PacketType.RequestImage)
+                if (m_debugPacketLevel <= 200 && pack.Type == PacketType.RequestImage)
                     outputPacket = false;
 
                 if (m_debugPacketLevel <= 100 &&
-                    (packet.Type == PacketType.ViewerEffect || packet.Type == PacketType.AgentAnimation))
+                    (pack.Type == PacketType.ViewerEffect || pack.Type == PacketType.AgentAnimation))
                     outputPacket = false;
 
-                if (m_debugPackets.Contains(packet.Type.ToString()))
+                if (m_debugPackets.Contains(pack.Type.ToString()))
                     outputPacket = true;
 
-                if (outputPacket && !m_debugRemovePackets.Contains(packet.Type.ToString()))
-                    MainConsole.Instance.DebugFormat("[CLIENT ({1})]: Packet IN {0}", packet.Type, Name);
+                if (outputPacket && !m_debugRemovePackets.Contains(pack.Type.ToString()))
+                    MainConsole.Instance.DebugFormat("[CLIENT ({1})]: Packet IN {0}", pack.Type, Name);
             }
 
-            if (!ProcessPacketMethod(packet))
-                MainConsole.Instance.Warn("[CLIENT]: unhandled packet " + packet.Type);
+            if (!ProcessPacketMethod(pack))
+                MainConsole.Instance.Warn("[Client]: unhandled packet " + pack.Type);
 
             //Give the packet back to the pool now, we've processed it
-            PacketPool.Instance.ReturnPacket(packet);
+            PacketPool.Instance.ReturnPacket(pack);
         }
 
         static PrimitiveBaseShape GetShapeFromAddPacket(ObjectAddPacket addPacket)
@@ -12952,15 +12851,12 @@ namespace WhiteCore.ClientStack
 
         public void SendParcelMediaCommand(uint flags, ParcelMediaCommandEnum command, float time)
         {
-            ParcelMediaCommandMessagePacket commandMessagePacket = new ParcelMediaCommandMessagePacket
-                                                                       {
-                                                                           CommandBlock =
-                                                                               {
-                                                                                   Flags = flags,
-                                                                                   Command = (uint) command,
-                                                                                   Time = time
-                                                                               }
-                                                                       };
+            var commandMessagePacket = new ParcelMediaCommandMessagePacket {
+                CommandBlock = {
+                    Flags = flags, 
+                    Command = (uint) command,
+                    Time = time }
+            };
 
             OutPacket(commandMessagePacket, ThrottleOutPacketType.Land);
         }
@@ -12970,24 +12866,20 @@ namespace WhiteCore.ClientStack
                                           int mediaHeight,
                                           byte mediaLoop)
         {
-            ParcelMediaUpdatePacket updatePacket = new ParcelMediaUpdatePacket
-                                                       {
-                                                           DataBlock =
-                                                               {
-                                                                   MediaURL = Util.StringToBytes256(mediaUrl),
-                                                                   MediaID = mediaTextureID,
-                                                                   MediaAutoScale = autoScale
-                                                               },
-                                                           DataBlockExtended =
-                                                               {
-                                                                   MediaType = Util.StringToBytes256(mediaType),
-                                                                   MediaDesc = Util.StringToBytes256(mediaDesc),
-                                                                   MediaWidth = mediaWidth,
-                                                                   MediaHeight = mediaHeight,
-                                                                   MediaLoop = mediaLoop
-                                                               }
-                                                       };
-
+            var updatePacket = new ParcelMediaUpdatePacket {
+                DataBlock = {
+                    MediaURL = Util.StringToBytes256(mediaUrl),
+                    MediaID = mediaTextureID,
+                    MediaAutoScale = autoScale
+                },
+                DataBlockExtended = {
+                    MediaType = Util.StringToBytes256(mediaType),
+                    MediaDesc = Util.StringToBytes256(mediaDesc),
+                    MediaWidth = mediaWidth,
+                    MediaHeight = mediaHeight,
+                    MediaLoop = mediaLoop
+                }
+            };
 
             OutPacket(updatePacket, ThrottleOutPacketType.Land);
         }
@@ -12998,7 +12890,7 @@ namespace WhiteCore.ClientStack
 
         public void SendSetFollowCamProperties(UUID objectID, SortedDictionary<int, float> parameters)
         {
-            SetFollowCamPropertiesPacket packet =
+            var packet =
                 (SetFollowCamPropertiesPacket) PacketPool.Instance.GetPacket(PacketType.SetFollowCamProperties);
             packet.ObjectData.ObjectID = objectID;
             SetFollowCamPropertiesPacket.CameraPropertyBlock[] camPropBlock =
@@ -13020,7 +12912,7 @@ namespace WhiteCore.ClientStack
 
         public void SendClearFollowCamProperties(UUID objectID)
         {
-            ClearFollowCamPropertiesPacket packet =
+            var packet =
                 (ClearFollowCamPropertiesPacket) PacketPool.Instance.GetPacket(PacketType.ClearFollowCamProperties);
             packet.ObjectData.ObjectID = objectID;
             OutPacket(packet, ThrottleOutPacketType.AvatarInfo);
@@ -13068,9 +12960,9 @@ namespace WhiteCore.ClientStack
 
         readonly List<UUID> m_transfersToAbort = new List<UUID>();
 
-        bool HandleTransferAbort(IClientAPI sender, Packet Pack)
+        bool HandleTransferAbort(IClientAPI sender, Packet pack)
         {
-            TransferAbortPacket transferAbort = (TransferAbortPacket) Pack;
+            var transferAbort = (TransferAbortPacket) pack;
             m_transfersToAbort.Add(transferAbort.TransferInfo.TransferID);
             return true;
         }
@@ -13093,7 +12985,7 @@ namespace WhiteCore.ClientStack
                     break;
             }
 
-            //MainConsole.Instance.InfoFormat("[CLIENT]: {0} requesting asset {1}", Name, requestID);
+            //MainConsole.Instance.InfoFormat("[Client]: {0} requesting asset {1}", Name, requestID);
 
             m_assetService.Get(requestID.ToString(), transferRequest, AssetReceived);
         }
@@ -13104,9 +12996,9 @@ namespace WhiteCore.ClientStack
         /// <param name="id"></param>
         /// <param name="sender"></param>
         /// <param name="asset"></param>
-        void AssetReceived(string id, Object sender, AssetBase asset)
+        void AssetReceived(string id, object sender, AssetBase asset)
         {
-            //MainConsole.Instance.InfoFormat("[CLIENT]: {0} found requested asset", Name);
+            //MainConsole.Instance.InfoFormat("[Client]: {0} found requested asset", Name);
 
             TransferRequestPacket transferRequest = (TransferRequestPacket) sender;
 
@@ -13328,17 +13220,13 @@ namespace WhiteCore.ClientStack
                 ushort timeDilation = Utils.FloatToUInt16(TIME_DILATION, 0.0f, 1.0f);
 
 
-                ImprovedTerseObjectUpdatePacket packet = new ImprovedTerseObjectUpdatePacket
-                                                             {
-                                                                 RegionData =
-                                                                     {
-                                                                         RegionHandle = m_scene.RegionInfo.RegionHandle,
-                                                                         TimeDilation = timeDilation
-                                                                     },
-                                                                 ObjectData =
-                                                                     new ImprovedTerseObjectUpdatePacket.ObjectDataBlock
-                                                                     [1]
-                                                             };
+                var packet = new ImprovedTerseObjectUpdatePacket {
+                    RegionData = {
+                        RegionHandle = m_scene.RegionInfo.RegionHandle,
+                        TimeDilation = timeDilation
+                    },
+                    ObjectData = new ImprovedTerseObjectUpdatePacket.ObjectDataBlock [1]
+                };
 
                 packet.ObjectData[0] = block;
 

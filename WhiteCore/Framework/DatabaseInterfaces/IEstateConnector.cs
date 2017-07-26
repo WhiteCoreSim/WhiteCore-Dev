@@ -44,14 +44,14 @@ namespace WhiteCore.Framework.DatabaseInterfaces
         /// </summary>
         /// <param name="regionID"></param>
         /// <returns></returns>
-        EstateSettings GetEstateSettings(UUID regionID);
+        EstateSettings GetRegionEstateSettings(UUID regionID);
 
         /// <summary>
         ///     Loads the estate data for the specified estateID
         /// </summary>
         /// <param name="estateID"></param>
         /// <returns></returns>
-        EstateSettings GetEstateSettings(int estateID);
+        EstateSettings GetEstateIDSettings(int estateID);
 
         /// <summary>
         ///     Loads the estate data for the specified estate name (local only)
@@ -107,7 +107,14 @@ namespace WhiteCore.Framework.DatabaseInterfaces
         ///     Gets all available estates
         /// </summary>
         /// <returns>List of estates</returns>
-        List<string> GetEstates();
+        List<string> GetEstateNames();
+
+        /// <summary>
+        ///     Gets all user estates
+        /// </summary>
+        /// <param name="ownerID"></param>
+        /// <returns>List of estates</returns>
+        List<string> GetEstateNames (UUID ownerId);
 
         /// <summary>
         ///     Gets the estates that have the given owner
@@ -129,7 +136,7 @@ namespace WhiteCore.Framework.DatabaseInterfaces
         /// </summary>
         /// <param name="regionID"></param>
         /// <returns></returns>
-        int GetEstateID(UUID regionID);
+        int GetRegionEstateID(UUID regionID);
 
         /// <summary>
         ///     Add a new region to the estate, authenticates with the password

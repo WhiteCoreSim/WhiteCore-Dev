@@ -1,0 +1,209 @@
+<!-- Region edit/create -->
+
+{IsAdminAuthenticatedBegin}
+<h2>{SystemName}: {RegionManagerText}</h2>
+<div id="info_message" class="info">{InfoMessage}</div>
+
+<form id="region_form" action="admin/region_edit.html" method="POST">
+<div style ="display: inline-block;">
+<table>
+  <tbody>
+    <tr>
+      <td class="region_info_left" style="width:120px;"><p>{RegionNameText}*</p></td>
+
+      <td class="region_info_right" colspan="5"><input minlength="3" id="RegionName" require="true" name="RegionName" type="text" size="25" maxlength="30" value="{RegionName}"></td>
+      <td class="register_left" colspan="2" rowspan="6">
+        <div class="region_info_picture">
+          <img src="{RegionImageURL}" alt="{RegionName}" title="{RegionName}" />
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td class="region_info_left"><p>{RegionLocationText}:</p></td>
+
+      <td class="region_info_right">X:&nbsp;&nbsp;
+        <input style="width:80px;"id="RegionLocX" require="true" name="RegionLocX" type="text" size="8" value="{RegionLocX}" />
+      </td>
+      <td class="region_info_right">Y:&nbsp;&nbsp;
+        <input style="width:80px;" id="RegionLocY" require="true" name="RegionLocY" type="text" size="8" value="{RegionLocY}" />
+      </td>
+    </tr>
+    <tr>
+      <td class="region_info_left"><p>{RegionSizeText}:</p></td>
+      <td class="region_info_right">X:&nbsp;&nbsp;
+          <input style="width:80px;" id="RegionSizeX" require="true" name="RegionSizeX" type="text" size="8" value="{RegionSizeX}" />
+      </td>
+      <td class="region_info_right">Y:&nbsp;&nbsp;
+          <input style="width:80px;" id="RegionSizeY" require="true" name="RegionSizeY" type="text" size="8" value="{RegionSizeY}" />
+      </td>
+    </tr>
+    <tr>
+      <td class="region_info_left"><p>{RegionTypeText}:</p></td>
+      <td class="region_info_right">
+        <select id="RegionType" require="true" name="RegionType" style="width:120px;">
+{RegionTypeArrayBegin}
+          <option value="{Index}">{Value}</option>
+{RegionTypeArrayEnd}
+        </select>
+      </td>
+      <td class="register_left"></td>
+      <td class="region_info_left"><p>{RegionPresetText}:</p></td>
+      <td class="region_info_right">
+        <select id="RegionPresetType" require="true" name="RegionPresetType" style="width:120px;">
+{RegionPresetTypeArrayBegin}
+          <option value="{Index}">{Value}</option>
+{RegionPresetTypeArrayEnd}
+        </select>
+      </td>
+      <td></td>
+    </tr>
+
+    <tr>
+      <td class="region_info_left"><p>{RegionTerrainText}*</p></td>
+
+      <td class="region_info_right">
+        <select id="RegionTerrain" require="true" name="RegionTerrain" style="width:120px;">
+{RegionTerrainArrayBegin}
+          <option value="{Index}">{Value}</option>
+{RegionTerrainArrayEnd}
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td class="region_info_left"><p>{EstateText}*</p></td>
+
+      <td class="region_info_right" colspan="2">
+        <select id="EstateIdent" require="true" name="EstateIdent" style="width:240px;">
+{EstateListArrayBegin}
+          <option value="{Index}" {selected}>{Value}</option>
+{EstateListArrayEnd}
+        </select>
+      </td>
+      <td class="region_info_left"><p>{OwnerNameText}:</p></td>
+      <td class="region_info_right" >
+        <a class="agentinfo" href="/webprofile/?userid={OwnerUUID}"  alt="{OwnerNameText}: {OwnerName}" title="{OwnerNameText}: {OwnerName}">{OwnerName}</a>
+      </td>
+    </tr>
+
+<!-- advanced stuff here -->
+    <tr>
+      <td class="region_info_left"><p>{RegionPortText}:</p></td>
+
+      <td class="region_info_right" colspan="4">
+        <input style="width:80px;"id="RegionPort" require="true" name="RegionPort" type="text" size="8" value="{RegionPort}" />
+      </td>
+    </tr>
+    <tr>
+      <td class="region_info_left"><p>{RegionCapacityText}:</p></td>
+
+      <td class="region_info_right">
+        <input style="width:80px;"id="RegionCapacity" require="true" name="RegionCapacity" type="text" size="8" value="{RegionCapacity}" />
+      </td>
+      <td class="region_info_left"><p>{RegionVisibilityText}:</p></td>
+      <td class="region_info_right" >
+        <select id="RegionVisibility" require="true" name='RegionVisibility'>
+{RegionVisibilityArrayBegin}
+          <option value="{Index}">{Value}</option>
+{RegionVisibilityArrayEnd}
+        </select>
+      </td>
+      <td class="region_info_left"><p>{RegionInfiniteText}:</p></td>
+      <td class="region_info_right" >
+        <select id="RegionInfinite" require="true" name='RegionInfinite'>
+{RegionInfiniteArrayBegin}
+          <option value="{Index}">{Value}</option>
+{RegionInfiniteArrayEnd}
+        </select>
+      </td>
+      <td class="region_info_left"><p>{RegionDelayStartupText}:</p></td>
+      <td class="region_info_right" >
+        <select id="RegionDelayedStart" require="true" name='RegionDelayedStart'>
+{RegionDelayStartupArrayBegin}
+          <option value="{Index}">{Value}</option>
+{RegionDelayStartupArrayEnd}
+        </select>
+      </td>
+    </tr>
+
+    <tr>
+      <td class="region_info_left">{RegionPresetText}</td>
+
+      <td class="region_info_left" colspan="6" valign="top">
+        <div class="carousel">
+          <div class="prev-horiz">◄</div>
+          <div class="next-horiz">►</div>
+          <center>
+            <div class= "regionarchivecarousel" style="height:190px;">
+              <ul id="regioncarousel" class="jcarousel-skin-aurora">
+{RegionPresetsArrayBegin}
+                <li>
+                  <div class="avatar_archive_screenshot">
+                    <label for="{RegionArchiveName}" alt="{SystemName}: {RegionArchiveName}" title="{SystemName}: {RegionArchiveName}">{RegionArchiveName}</label>
+                    <input type="radio" id="{RegionArchiveName}" name="RegionArchive" value="{RegionArchiveName}" alt="{SystemName}: {RegionArchiveName}" title="{SystemName}: {RegionArchiveName}">
+                    <img src="{RegionArchiveSnapshotURL}" alt="{SystemName}: {RegionArchiveName}" title="{SystemName}: {RegionArchiveName}" height="120" width="128"/>
+                  </div>
+                </li>
+{RegionPresetsArrayEnd}
+              </ul>
+            </div>
+          </center>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td class="region_info_left">{RegionPresetText}</td>
+      <td clas="region_info_left" colspan="4">
+        <input type="file" name="customPreset" multiple="">
+      </td>
+    </tr>
+
+    <tr>
+    <td colspan="4"></td>
+    <td class="region_info_left"></td>
+      <input hidden type="hidden" id="RegionServerURL" name="RegionServerURL" value="{RegionServerURL}" />
+      <input hidden type="hidden" id="RegionID" name="RegionID" value="{RegionID}" />
+      <input hidden type="hidden" id="Submit" name="Submit" value="Submit" />
+      <td class="region_info_right" >
+        <input type="hidden" name="action" value="check">
+          <button disabled style="color:#888;" id="Submit" name="Submit" type="Submit">{Submit}</button>
+        </input>
+        </td>
+      <td></td>
+      <td class="region_info_left" >
+        <button id="Cancel" name="Cancel" type="Cancel" onclick="document.location = '/?page=region_manager';">{Cancel}</button>
+      </td>
+    </tr>
+  </tbody>
+</table></div>
+</form>
+
+<script>
+    $(document).ready(function($) {
+      $(".agentinfo").colorbox({iframe:true, width:"990px", height:"440px"});
+    });
+
+  $(function() {
+      $('.regionarchivecarousel').jCarouselLite({
+          btnNext: '.next-horiz',
+          btnPrev: '.prev-horiz',
+          visible: 4
+      });
+  });
+
+  /* attach a submit handler to the form */
+  $("#region_form").submit(function(event) {
+
+    /* stop form from submitting normally */
+    event.preventDefault();
+    /* get some values from elements on the page: */
+    var $form = $( this ),
+        url = $form.attr( 'action' );
+    /* Send the data using post and put the results in a div */
+    $.post( url, $form.serialize(),
+      function( data ) {
+    $("#info_message").empty().append(data);
+      }
+    );
+  });
+</script>
+{IsAdminAuthenticatedEnd}

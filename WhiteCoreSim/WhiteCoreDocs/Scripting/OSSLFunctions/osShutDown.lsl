@@ -21,11 +21,11 @@ default
 {
 	state_entry()
 	{
-		llSay(0,"Touch to see osShutDown work.\n!!! WARNING !!! this is identical to issuing the SHUTDOWN command on the Console\nIt will QUIT Aurora !");
+		llSay(0,"Touch to see osShutDown work.\n!!! WARNING !!! this is identical to issuing the SHUTDOWN command on the Console\nIt will QUIT WhiteCore-Sim !");
 	}
 	touch_end(integer num)
 	{
-		llOwnerSay("Issuing the osShutDown command.  This will terminate Aurora-Sim application in 30 Seconds");
+		llOwnerSay("Issuing the osShutDown command.  This will terminate WhiteCore-Sim application in 30 Seconds");
 		llSleep(30.0);
 		osShutDown();
 	}

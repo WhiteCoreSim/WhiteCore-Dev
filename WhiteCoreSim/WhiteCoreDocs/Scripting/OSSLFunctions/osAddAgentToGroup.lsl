@@ -4,7 +4,7 @@
 // Script Title:    osAddAgentToGroup.lsl
 // Script Author:   WhiteStar Magic
 // Threat Level:    None
-// Script Source:   Aurora-Sim osFunction
+// Script Source:   WhiteCore-Sim osFunction
 //
 // Notes: See Script Source reference for more detailed information
 // This sample is full opensource and available to use as you see fit and desire.

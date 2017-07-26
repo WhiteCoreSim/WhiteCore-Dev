@@ -171,7 +171,7 @@ namespace WhiteCore.Region.Serialization
         /// <returns></returns>
         protected void ToOriginalXmlFormat(SceneObjectGroup sceneObject, XmlTextWriter writer)
         {
-            //MainConsole.Instance.DebugFormat("[SERIALIZER]: Starting serialization of {0}", Name);
+            //MainConsole.Instance.DebugFormat("[Serializer]: Starting serialization of {0}", Name);
             //int time = Util.EnvironmentTickCount();
 
             writer.WriteStartElement(string.Empty, "SceneObjectGroup", string.Empty);
@@ -191,7 +191,7 @@ namespace WhiteCore.Region.Serialization
             writer.WriteEndElement(); // OtherParts
             writer.WriteEndElement(); // SceneObjectGroup
 
-            //MainConsole.Instance.DebugFormat("[SERIALIZER]: Finished serialization of SOG {0}, {1}ms", Name, Util.EnvironmentTickCount() - time);
+            //MainConsole.Instance.DebugFormat("[Serializer]: Finished serialization of SOG {0}, {1}ms", Name, Util.EnvironmentTickCount() - time);
         }
 
         public void ToXmlFormat(ISceneChildEntity part, XmlTextWriter writer)
@@ -266,7 +266,7 @@ namespace WhiteCore.Region.Serialization
                 if (parts.Count == 0)
                 {
                     MainConsole.Instance.ErrorFormat(
-                        "[SERIALIZER]: Deserialization of xml failed: No SceneObjectPart nodes. xml was " + doc.Value);
+                        "[Serializer]: Deserialization of xml failed: No SceneObjectPart nodes. xml was " + doc.Value);
                     return null;
                 }
 
@@ -1097,7 +1097,7 @@ namespace WhiteCore.Region.Serialization
                             Array resultArray = (Array) resultPropValue;
                             for (int i = 0; i < initialArray.Length; i++)
                             {
-                                if (!object.Equals(initialArray.GetValue(i),
+                                if (!Equals (initialArray.GetValue(i),
                                                    resultArray.GetValue(i)))
                                 {
                                     MainConsole.Instance.WarnFormat("Failed to verify {0}, {1} != {2}", property.Name,
@@ -1112,7 +1112,7 @@ namespace WhiteCore.Region.Serialization
                             MainConsole.Instance.WarnFormat("Failed to verify {0}, {1} != {2}", property.Name,
                                                             initialPropValue, resultPropValue);
                     }
-                    else if (!object.Equals(initialPropValue, resultPropValue))
+                    else if (!Equals(initialPropValue, resultPropValue))
                     {
                         //if(property.Name != "Color")
                         MainConsole.Instance.WarnFormat("Failed to verify {0}, {1} != {2}", property.Name,
@@ -1749,7 +1749,8 @@ namespace WhiteCore.Region.Serialization
 
                 reader.ReadEndElement();
             }
-            reader.ReadEndElement();
+            if (reader.NodeType == XmlNodeType.EndElement)
+                reader.Read ();
 
             obj.StateSaves = states;
         }

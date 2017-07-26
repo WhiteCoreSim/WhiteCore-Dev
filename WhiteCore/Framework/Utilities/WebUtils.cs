@@ -141,45 +141,47 @@ namespace WhiteCore.Framework.Utilities
                 if (MainConsole.Instance != null) {
                     if (errorMessage == "")//No error
                     {
-                        // This just dumps a warning for any operation that takes more than 5000 ms
+                        // This just dumps a warning for any operation that takes more than 8000 ms
                         if (MainConsole.Instance.IsDebugEnabled) {
                             var stackTrace = new System.Diagnostics.StackTrace ();
 
                             MainConsole.Instance.Debug (
-                                string.Format ("[WebUtils]: Request (URI:{0}, METHOD:{1}, UPSTACK(4):{3}) took {2}ms",
-                                url, method, tickelapsed,
+                                string.Format ("[WebUtils]: Request (URI:{0}, METHOD:{1}, UPSTACK(4):{3}) took {2} ms",
+                                               url, method, tickelapsed,
                                 stackTrace.GetFrame (3).GetMethod ().Name));
                         }
-                        if (tickelapsed > 5000) {
+                        if (tickelapsed > 8000) {
                             MainConsole.Instance.Info (
-                                string.Format ("[WebUtils]: Slow request - (URI:{0}, METHOD:{1}) took {2}ms",
-                                url, method, tickelapsed));
-                            string bufdata;
-                            bufdata = buffer.Length > 0 ? Encoding.UTF8.GetString (buffer) : "null";
-                            MainConsole.Instance.WarnFormat ("[WebUtils] Request - {0}", bufdata);
+                                string.Format ("[WebUtils]: Slow request - (URI:{0}, METHOD:{1}) took {2} ms for {3} bytes",
+                                               url, method, tickelapsed, buffer.Length));
+                            string bufdata = buffer.Length > 0 ? Encoding.UTF8.GetString (buffer) : "null";
+                            if (bufdata.Length > 255)
+                                bufdata = bufdata.Substring (0, 250) + "...";
+                            MainConsole.Instance.DebugFormat ("[WebUtils] Request - {0}", bufdata);
                         }
                     }
                 }
             } catch (TaskCanceledException ex) {
                 if (MainConsole.Instance != null) {
                     if (ex.CancellationToken.IsCancellationRequested)
-                        MainConsole.Instance.WarnFormat ("[WebUtils] Request cancelled - (URI:{0}, METHOD:{1}) : {2}", url, method, ex.Message);
+                        MainConsole.Instance.WarnFormat ("[WebUtils] Request cancelled - (URI:{0}, METHOD:{1}) : {2}",
+                                                         url, method, ex.Message);
                     else
-                        MainConsole.Instance.WarnFormat ("[WebUtils] Request timed out - (URI:{0}, METHOD:{1}) : {2}", url, method, ex.Message);
-                    string bufdata;
-                    bufdata = buffer.Length > 0 ? Encoding.UTF8.GetString (buffer) : "null";
+                        MainConsole.Instance.WarnFormat ("[WebUtils] Request timed out - (URI:{0}, METHOD:{1}) : {2}",
+                                                         url, method, ex.Message);
+                    string bufdata = buffer.Length > 0 ? Encoding.UTF8.GetString (buffer) : "null";
                     if (bufdata.Length > 255)
                         bufdata = bufdata.Substring (0, 250) + "...";
-                    MainConsole.Instance.WarnFormat ("[WebUtils] Request - {0}", bufdata);
+                    MainConsole.Instance.DebugFormat ("[WebUtils] Request - {0}", bufdata);
                 }
             } catch (Exception ex) {
                 if (MainConsole.Instance != null) {
-                    MainConsole.Instance.WarnFormat ("[WebUtils] Request failed - (URI:{0}, METHOD:{1}) : {2}", url, method, ex.Message);
-                    string bufdata;
-                    bufdata = buffer.Length > 0 ? Encoding.UTF8.GetString (buffer) : "null";
+                    MainConsole.Instance.WarnFormat ("[WebUtils] Request failed - (URI:{0}, METHOD:{1}) : {2}",
+                                                     url, method, ex.Message);
+                    string bufdata = buffer.Length > 0 ? Encoding.UTF8.GetString (buffer) : "null";
                     if (bufdata.Length > 255)
                               bufdata = bufdata.Substring (0, 250) + "...";
-                    MainConsole.Instance.WarnFormat ("[WebUtils] Request - {0}", bufdata);
+                    MainConsole.Instance.DebugFormat ("[WebUtils] Request - {0}", bufdata);
                 }
             }
             client.Dispose ();

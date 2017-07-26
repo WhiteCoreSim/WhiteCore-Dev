@@ -3,18 +3,27 @@
 <div id="fullPage">
   <h2>{SystemName}: {ClassifiedsText}</h2>
 
-  <form id="classifieds_search_form" action="classifieds/classifieds.html" method="post">
+  <form id="classifieds_search_form" action="classifieds.html" method="post">
 
   	<div class="form-fieldset-range">
-  		<legend>{DateInfoText}</legend>
-  			<p class="from-to">
-  				<label class="from" for="date_start">{DateStartText}:</label>
-  				<input type="text" style="width:80px;" name="date_start" id="date_start" value="{DateStart}" />
-  				<label class="to" for="date_end">&nbsp;-&nbsp;{DateEndText}:</label>
-  			  	<input type="text" style="width:80px;" name="date_end" id="date_end" value="{DateEnd}" />
-  			  	<label> &nbsp;&nbsp;: &nbsp;{Period}</label>
+            <select id="classifieds-category" name="category"  style="width:120px;">
+{CategoryTypeArrayBegin}
+                <option value="{Index}" {selected}>{Value}</option>
+{CategoryTypeArrayEnd}
+            </select>
+
+
+          <input style="width:20px;" type="checkbox" id="display_pg" name="display_pg" value="on" {PG_checked}>
+          <label for="display_pg" class="for-check"><img src="/icons/general.png" alt="PG ratings" style="margin-bottom:3px;">&nbsp;&nbsp;{GeneralText}</label>
+          {IsAuthenticatedBegin}
+          <input style="width:20px;" type="checkbox" id="display_ma" name="display_ma" value="on" {MA_checked}>
+          <label for="display_ma" class="for-check"><img src="/icons/moderate.png" alt="MA ratings" style="margin-bottom:3px;">&nbsp;&nbsp;{MatureText}</label>
+          <input style="width:20px;" type="checkbox" id="display_ao" name="display_ao" value="on" {AO_checked}>
+          <label for="display_ao" class="for-check"><img src="/icons/adult.png" alt="AO ratings" style="margin-bottom:3px;">&nbsp;&nbsp;{AdultText}</label>
+          {IsAuthenticatedEnd}
+
   				<input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
-  				<button class="button" style="float:right;width:200;" id="Submit" type="Submit" name="Submit">Search and View</button>
+  				<button class="button" style="float:right;width:200;" id="Submit" type="Submit" name="Submit">{SearchText}</button>
   			</p>
   	</div>
   </form>
@@ -24,10 +33,10 @@
    		<tr>
    		  <th class="transactions_left"><p>{CreationDateText}</p></th>
    		  <th class="transactions_user"><p>{CategoryText}</p></th>
-   		  <th class="transactions_user"><p>{ClassifiedsNameText}</p></th>
-   		  <th class="transactions_description"><p>{ClassifiedsDetailText}</p></th>
-   		  <th class="transactions_value"><p>{ClassifiedsLevelText}</p></th>
-   		  <th class="transactions_value"><p>{ClassifiedsAmountText}</p></th>
+   		  <th class="transactions_user"><p>{ClassifiedNameText}</p></th>
+   		  <th class="transactions_description"><p>{DescriptionText}</p></th>
+   		  <th class="transactions_value"><p>{MaturityText}</p></th>
+   		  <th class="transactions_value"><p>{PriceOfListingText}</p></th>
         <th class="transactions_value"><p>{ExpirationDateText}</p></th>
    		</tr>
  	  </thead>
@@ -39,9 +48,9 @@
         <td class="transactions_user"><p>{Category}</p></td>
         <td class="transactions_user"><p>{Name}</p></td>
         <td class="transactions_description"><p>{Description}</p></td>
-        <td class="transactions_value"><p>{ClassifiedFlags}</p></td>
-        <td class="transactions_value"><p>{PriceForListing}</p></td>
-        <td class="transactions_left"><p>{expirationDate}</p></td>
+        <td class="transactions_left"><p>{Maturity}</p></td>
+        <td class="transactions_left"><p>{PriceForListing}</p></td>
+        <td class="transactions_left"><p>{ExpirationDate}</p></td>
       </tr>
   	  {ClassifiedListArrayEnd}
     </tbody>
@@ -52,31 +61,6 @@
   $(document).ready(function() {
     $('#classifieds_list').dataTable({
       "order": [[ 0, "asc" ]]
-    });
-  });
-
-  $(function() {
-    $('#date_start,#date_end').datepick({
-      showTrigger: '<button type="button" class="trigger">...</button>'});
-  });
-
-  <!--  /* date pickers */ -->
-  $(function() {
-    $( "#date_start" ).datepick( {
-      defaultDate: "-1w",
-      changeMonth: true,
-      numberOfMonths: 3,
-      onClose: function( selectedDate ) {
-        $( "#to" ).datepick( "option", "minDate", selectedDate );
-      }
-    });
-    $( "#date_end" ).datepick( {
-      //defaultDate: "+1w",
-      changeMonth: true,
-      numberOfMonths: 3,
-      onClose: function( selectedDate ) {
-        $( "#from" ).datepick( "option", "maxDate", selectedDate );
-      }
     });
   });
 

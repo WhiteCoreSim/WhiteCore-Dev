@@ -15,27 +15,35 @@ WelcomeMessage = "Welcome to WhiteCore, <USERNAME>!"
 ;; Allow the Login level to be set remotely
 AllowRemoteSetLoginLevel = "false"
 
-;; Should new users be shown the ToS when they log in if they have not seen it before?
+;; Should new users be shown the Terms of Service when they log in if they have not seen it before?
 ;;  If this is enabled, the FileNameOfTOS will be used to set what the users see.
 UseTermsOfServiceOnFirstLogin = false
 
-;; File name or the location of the ToS document
-;; If a text file is specified, this should be in the 'Data' folder unless specified
+;; File name or the location of the Terms of Service document
+;; The default is a text file. This should be in the 'Data/html' folder unless specified
 FileNameOfTOS = ToS.txt
 
-;; Alternatively, a web location may be specified. Comment the previous setting and uncomment below
-;;  'ServersHostname' will be replaced with the local grid URL 
+;; Alternatively, an html formatted version of the Terms of Service  may be specified. 
+;;  The 'ToS.html' file should also be located in the 'Data/html' folder
+;; Comment the previous setting and uncomment below
+;;    'ServersHostname' will be replaced with the local grid URL   
 ; FileNameOfTOS = http://ServersHostname:8002/local/ToS.html
 
-;; Allow users to login anonymously and have a new account created automatically? This will create a new account for any user logging in.
+;; Allow users to login anonymously and have a new account created automatically? 
+;; This will create a new account for any user logging in.
+;; This is also used to set the default availability of registrations using the WebUI.
 AllowAnonymousLogin = false
 
 ;; Allow users to login multiple times, but the previous agent will not be able to access his inventory or teleport again
 AllowDuplicateLogin = false
 
-;; This allows for a default avatar to be created so the user does not login as Ruth. Save an Avatar Archive (in the console) then put the name of it here.
+;; This allows for a default avatar to be created so the user does not login as Ruth. 
+;;  Save an Avatar Archive (in the console) then put the name of it here.
 ;; To set this, create a user and set them up as you wish them to look.
-;;  Then save an Avatar Archive into the database by the command in the console "save avatar archive", "save avatar archive <First> <Last> <Filename> <FolderNameToSaveInto>", "Saves appearance to an avatar archive archive (Note: put \"\" around the FolderName if you need more than one word)"
+;;  Then save an Avatar Archive into the database by the command in the console 
+;;   "save avatar archive" (for interactive prompting) or 
+;;   "save avatar archive <First> <Last> <Filename> <FolderNameToSaveInto>"
+;;    "Saves appearance to an avatar archive archive (Note: put \"\" around the FolderName if you need more than one word)"
 ;;   Where <First> <Last> is the user name, FileName (can end with .database to save into the database) which is used to identify which archive you wish to use, and the default folder name to create in the new user's inventory.
 ;;  After saving this archive, put the name of the archive here to set the default avatar appearance.
 DefaultAvatarArchiveForNewUser = 
@@ -56,6 +64,8 @@ DefaultHomeRegionPosition = "128, 128, 25"
 
 ;; Only if you are using the Vivox voice server options and need to modify
 ;VoiceServerType = "vivox"
+
+;; The maximum number of groups an agent can belong to 
 ;MaxAgentGroups = 100
 
 ;; If you want to change the default texture UUIDs, change them here

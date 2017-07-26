@@ -5,7 +5,7 @@ default
 		// If you have the Center Of Gravity option enabled
 		//  in your sim, you can use this function to change
 		//  where the center is while the sim is running
-		//  (The option is in AuroraOpenDynamicsEngine.ini)
+		//  (The option is in SecondLifeFeelingOpenDynamicsEngine.ini)
 		// In this example, we will be setting the new
 		//  center of gravity to 128,128,128, so everything
 		//  will go toward there

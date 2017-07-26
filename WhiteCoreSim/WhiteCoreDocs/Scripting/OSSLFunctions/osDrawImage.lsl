@@ -32,7 +32,7 @@ default
 		{
 			Touched = TRUE;
 			string DrawList = "";
-			string ImageURL = "http://grid.aurora-sim.org/splash/Aurora-Login.gif";
+			string ImageURL = "http://whitecore-sim.org/wiki/static/images/logo2.png";
 			DrawList = osMovePen( DrawList, 0, 0 );                // Upper left corner at <0,0>
 			DrawList = osDrawImage( DrawList, 256, 54, ImageURL ); // 200 pixels by 100 pixels
 			// Draw the image

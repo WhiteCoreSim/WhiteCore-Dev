@@ -151,6 +151,9 @@ namespace WhiteCore.BotManager
             if (SP == null)
                 return UUID.Zero; //Failed!
 
+            // set this as a NPC character
+            SP.IsNpcAgent = true;
+
             IAvatarAppearanceModule appearance = SP.RequestModuleInterface<IAvatarAppearanceModule>();
             appearance.Appearance = avatarApp;
             appearance.InitialHasWearablesBeenSent = true;
@@ -632,6 +635,17 @@ namespace WhiteCore.BotManager
         #endregion
 
         #region helpers
+
+        /// <summary>
+        /// Check if the provided UUID is a bot (npc).
+        /// </summary>
+        /// <returns><c>true</c>, if bot (npc), <c>false</c> otherwise.</returns>
+        /// <param name="botID">Bot identifier.</param>
+        public bool IsNpcAgent (UUID botID)
+        {
+            Bot bot;
+            return m_bots.TryGetValue(botID, out bot);
+        }
 
         /// <summary>
         /// Gets the owner.

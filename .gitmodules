@@ -1,0 +1,3 @@
+[submodule "Whitecore-LibOMV"]
+	path = Whitecore-LibOMV
+	url = https://github.com/WhiteCoreSim/Whitecore-LibOMV.git

@@ -58,23 +58,22 @@ namespace WhiteCore.Services
                 m_TOSLocation = loginServerConfig.GetString ("FileNameOfTOS", "");
 
                 if (m_TOSLocation.Length > 0) {
-                    // html appears to be broken
                     if (m_TOSLocation.ToLower ().StartsWith ("http://", StringComparison.Ordinal))
                         m_TOSLocation = m_TOSLocation.Replace ("ServersHostname", MainServer.Instance.HostName);
                     else {
                         var simBase = registry.RequestModuleInterface<ISimulationBase> ();
-                        var TOSFileName = PathHelpers.VerifyReadFile (m_TOSLocation, ".txt", simBase.DefaultDataPath);
+                        var TOSFileName = PathHelpers.VerifyReadFile (m_TOSLocation, ".txt", simBase.DefaultDataPath + "/html");
                         if (TOSFileName == "") {
                             m_UseTOS = false;
                             MainConsole.Instance.ErrorFormat ("Unable to locate the Terms of Service file : '{0}'", m_TOSLocation);
-                            MainConsole.Instance.Error (" Show 'Terms of Service' for a new user login is disabled!");
+                            MainConsole.Instance.Error ("Displaying 'Terms of Service' for a new user login is disabled!");
                         } else
                             m_TOSLocation = TOSFileName;
                     }
                 } else
                     m_UseTOS = false;
-
             }
+
             m_AuthenticationService = registry.RequestModuleInterface<IAuthenticationService> ();
             m_LoginService = service;
         }
@@ -97,7 +96,7 @@ namespace WhiteCore.Services
             }
 
             //MAC BANNING START
-            string mac = (string)request ["mac"];
+            var mac = (string)request ["mac"];
             if (mac == "") {
                 data = "Bad Viewer Connection";
                 return new LLFailedLoginResponse (LoginResponseEnum.Indeterminant, data.ToString (), false);
@@ -136,7 +135,7 @@ namespace WhiteCore.Services
             }
             if ((agentInfo.Flags & IAgentFlags.PermBan) == IAgentFlags.PermBan) {
                 MainConsole.Instance.InfoFormat (
-                    "[LLogin service]: Login failed for user {0}, reason: user is permanently banned.", account.Name);
+                    "[Login service]: Login failed for user {0}, reason: user is permanently banned.", account.Name);
                 data = "Permanently banned";
                 return LLFailedLoginResponse.PermanentBannedProblem;
             }
@@ -145,10 +144,11 @@ namespace WhiteCore.Services
                 bool IsBanned = true;
                 string until = "";
 
-                if (agentInfo.OtherAgentInformation.ContainsKey ("TemperaryBanInfo")) {
-                    DateTime bannedTime = agentInfo.OtherAgentInformation ["TemperaryBanInfo"].AsDate ();
-                    until = string.Format (" until {0} {1}", bannedTime.ToLocalTime ().ToShortDateString (),
-                                          bannedTime.ToLocalTime ().ToLongTimeString ());
+                if (agentInfo.OtherAgentInformation.ContainsKey ("TemporaryBanInfo")) {
+                    DateTime bannedTime = agentInfo.OtherAgentInformation ["TemporaryBanInfo"].AsDate ();
+                    until = string.Format (" until {0} {1}",
+                                           bannedTime.ToLocalTime ().ToShortDateString (),
+                                           bannedTime.ToLocalTime ().ToLongTimeString ());
 
                     //Check to make sure the time hasn't expired
                     if (bannedTime.Ticks < DateTime.Now.ToUniversalTime ().Ticks) {
@@ -159,11 +159,10 @@ namespace WhiteCore.Services
 
                 if (IsBanned) {
                     MainConsole.Instance.InfoFormat (
-                        "[LLogin service]: Login failed for user {0}, reason: user is temporarily banned {1}.",
+                        "[Login service]: Login failed for user {0}, reason: user is temporarily banned {1}.",
                         account.Name, until);
                     data = string.Format ("You are blocked from connecting to this service{0}.", until);
-                    return new LLFailedLoginResponse (LoginResponseEnum.Indeterminant,
-                                                    data.ToString (), false);
+                    return new LLFailedLoginResponse (LoginResponseEnum.Indeterminant, data.ToString (), false);
                 }
             }
 

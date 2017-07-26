@@ -4,12 +4,9 @@
 // Script Title:    osSetParcelDetails.lsl
 // Script Author:   WhiteStar Magic
 // Threat Level:    High
-// Script Source:   SUPPLEMENTAL http://wiki.aurora-sim.org/index.php?title=OsSetParcelDetails
 //
-// Notes: See Script Source reference for more detailed information
 // This sample is full opensource and available to use as you see fit and desire.
 // Threat Levels only apply to OSSL & AA Functions
-// See http://wiki.aurora-sim.org/index.php?title=Threat_Levels
 // ================================================================
 // C# Source Line:      public void osSetParcelDetails(LSL_Vector pos, LSL_List rules)
 // Inworld Script Line:     osSetParcelDetails(vector pos, list rules);

@@ -80,6 +80,14 @@ namespace WhiteCore.Framework.Services
         byte[] GetData(string id);
 
         /// <summary>
+        /// Gets asset data for the given asset.
+        /// </summary>
+        /// <returns>The data.</returns>
+        /// <param name="id">Identifier.</param>
+        /// <param name="showWarnings">If set to <c>true</c> show warnings.</param>
+        byte [] GetData (string id, bool showWarnings);
+
+        /// <summary>
         ///     Synchronously fetches an asset from the local cache only
         /// </summary>
         /// <param name="id">Asset ID</param>

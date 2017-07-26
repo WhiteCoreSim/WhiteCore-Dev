@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org
+ * Copyright (c) Contributors, http://whitecore-sim.org/
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,12 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using System.Collections.Generic;
 using OpenMetaverse;
 using WhiteCore.Framework.DatabaseInterfaces;
+using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services.ClassHelpers.Profile;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.Web
 {
@@ -57,102 +58,129 @@ namespace WhiteCore.Modules.Web
             get { return false; }
         }
 
-        public Dictionary<string, object> Fill(WebInterface webInterface, string filename, OSHttpRequest httpRequest,
+        public Dictionary<string, object> Fill (WebInterface webInterface, string filename, OSHttpRequest httpRequest,
                                                OSHttpResponse httpResponse, Dictionary<string, object> requestParameters,
                                                ITranslator translator, out string response)
         {
             response = null;
             var vars = new Dictionary<string, object> ();
             var directoryService = Framework.Utilities.DataManager.RequestPlugin<IDirectoryServiceConnector> ();
-            List<Dictionary<string, object>> classifiedListVars = new List<Dictionary<string, object>> ();
+            var classifiedListVars = new List<Dictionary<string, object>> ();
+            IMoneyModule moneyModule = webInterface.Registry.RequestModuleInterface<IMoneyModule> ();
 
-            uint amountPerQuery = 25;
-            var today = DateTime.Now;
-            var thirtyDays = today.AddDays (-7);
-            string DateStart = thirtyDays.ToShortDateString();
-            string DateEnd = today.ToShortDateString();
-            
-            // Classifieds Logs
-            var timeNow = DateTime.Now.ToString ("HH:mm:ss");
-            var dateFrom = DateTime.Parse (DateStart + " " + timeNow);
-            var dateTo = DateTime.Parse (DateEnd + " " + timeNow);
-            TimeSpan period = dateTo.Subtract (dateFrom);
-            
+            var currencySymbol = "$";
+            if (moneyModule != null)
+                currencySymbol = moneyModule.InWorldCurrencySymbol;
+
+            var pg_checked = "checked";
+            var ma_checked = "";
+            var ao_checked = "";
+            var classifiedLevel = (uint)DirectoryManager.ClassifiedQueryFlags.PG;
+            var category = (int)DirectoryManager.ClassifiedCategories.Any;
+            if (requestParameters.ContainsKey ("Submit")) {
+                uint level = 0;
+                pg_checked = "";
+                ma_checked = "";
+                ao_checked = "";
+                if (requestParameters.ContainsKey ("display_pg")) {
+                    level += (uint)DirectoryManager.ClassifiedQueryFlags.PG;
+                    pg_checked = "checked";
+                }
+                if (requestParameters.ContainsKey ("display_ma")) {
+                    level += (uint)DirectoryManager.ClassifiedQueryFlags.Mature;
+                    ma_checked = "checked";
+                }
+                if (requestParameters.ContainsKey ("display_ao")) {
+                    level += (uint)DirectoryManager.ClassifiedQueryFlags.Adult;
+                    ao_checked = "checked";
+                }
+                classifiedLevel = level;
+                string cat = requestParameters ["category"].ToString ();
+                category = int.Parse (cat);
+            }
+
+            // build category selection
+            vars.Add ("CategoryType", WebHelpers.ClassifiedCategorySelections(category, translator));
+
+            // maturity selections
+            vars.Add ("PG_checked", pg_checked);
+            vars.Add ("MA_checked", ma_checked);
+            vars.Add ("AO_checked", ao_checked);
+
+            // get some classifieds
             if (directoryService != null) {
 
                 var classifieds = new List<Classified> ();
-                classifieds = directoryService.GetAllClassifieds ((int)DirectoryManager.ClassifiedCategories.Any,
-                                                               (uint)DirectoryManager.ClassifiedFlags.None);
+                classifieds = directoryService.GetAllClassifieds ( category, classifiedLevel);
 
-                if (classifieds.Count == 0) {       // not sure if this is needed actually... return empty list?
+                if (classifieds.Count == 0) { 
                     classifiedListVars.Add (new Dictionary<string, object> {
                         { "ClassifiedUUID", "" },
-                        //{ "CreatorUUID", classified.CreatorUUID) },
+                        //{ "CreatorUUID", "" },
                         { "CreationDate", "" },
                         { "ExpirationDate", "" },
                         { "Category", "" },
                         { "Name", "" },
-                        { "Description", "" },
-                        //{ "ParcelUUID", OSD.FromUUID (ParcelUUID) },
-                        //{ "ParentEstate", OSD.FromUInteger (ParentEstate) },
-                        //{ "SnapshotUUID", OSD.FromUUID (SnapshotUUID) },
-                        //{ "ScopeID", OSD.FromUUID (ScopeID) },
-                        //{ "SimName", OSD.FromString (SimName) },
-                        //{ "GPosX", OSD.FromReal (GlobalPos.X).ToString () },
-                        //{ "GPosY", OSD.FromReal (GlobalPos.Y).ToString () },
-                        //{ "GPosZ", OSD.FromReal (GlobalPos.Z).ToString () },
-                        // "ParcelName", OSD.FromString (ParcelName) },
-                        { "ClassifiedFlags", "" },
+                        { "Description", translator.GetTranslatedString("NoDetailsText") },
+                        //{ "ParcelUUID", "") },
+                        //{ "ParentEstate", "" },
+                        { "SnapshotUUID", "" },
+                        //{ "ScopeID", "" },
+                        { "SimName", "" },
+                        { "GPosX", "" },
+                        { "GPosY", "" },
+                        { "GPosZ", "" },
+                        { "ParcelName", "" },
+                        { "Maturity", "" },
                         { "PriceForListing", "" }
                     });
                 } else {
                     foreach (var classified in classifieds) {
                         classifiedListVars.Add (new Dictionary<string, object> {
-                                { "ClassifiedUUID", classified.ClassifiedUUID },
-                                //{ "CreatorUUID", classified.CreatorUUID) },
-                                { "CreationDate", classified.CreationDate },
-                                { "ExpirationDate", classified.ExpirationDate },
-                                { "Category", classified.Category },
-                                { "Name", classified.Name },
-                                { "Description", classified.Description },
-                                //{ "ParcelUUID", OSD.FromUUID (ParcelUUID) },
-                                //{ "ParentEstate", OSD.FromUInteger (ParentEstate) },
-                                //{ "SnapshotUUID", OSD.FromUUID (SnapshotUUID) },
-                                //{ "ScopeID", OSD.FromUUID (ScopeID) },
-                                //{ "SimName", OSD.FromString (SimName) },
-                                //{ "GPosX", OSD.FromReal (GlobalPos.X).ToString () },
-                                //{ "GPosY", OSD.FromReal (GlobalPos.Y).ToString () },
-                                //{ "GPosZ", OSD.FromReal (GlobalPos.Z).ToString () },
-                                // "ParcelName", OSD.FromString (ParcelName) },
-                                { "ClassifiedFlags", classified.ClassifiedFlags },
-                                { "PriceForListing", classified.PriceForListing }
+                            { "ClassifiedUUID", classified.ClassifiedUUID },
+                            //{ "CreatorUUID", classified.CreatorUUID) },
+                            { "CreationDate", Util.ToDateTime (classified.CreationDate).ToShortDateString () },
+                            { "ExpirationDate", Util.ToDateTime (classified.ExpirationDate).ToShortDateString () },
+                            { "Category", WebHelpers.ClassifiedCategory(classified.Category, translator) },
+                            { "Name", classified.Name },
+                            { "Description", classified.Description },
+                            //{ "ParcelUUID", classified.ParcelUUID },
+                            //{ "ParentEstate",classified.(ParentEstate },
+                            { "SnapshotUUID", classified.SnapshotUUID },
+                            //{ "ScopeID",clasified.ScopeID },
+                            { "SimName", classified.SimName },
+                            { "GPosX", classified.GlobalPos.X.ToString () },
+                            { "GPosY", classified.GlobalPos.Y.ToString () },
+                            { "GPosZ",classified.GlobalPos.Z.ToString () },
+                            { "ParcelName", classified.ParcelName },
+                            { "Maturity", WebHelpers.ClassifiedMaturity(classified.ClassifiedFlags) },
+                            { "PriceForListing", currencySymbol + " " + classified.PriceForListing }
                         });
                     }
                 }
                 vars.Add ("ClassifiedList", classifiedListVars);
             }
             
-            vars.Add ("Classifieds", "Classifieds"); //translator.GetTranslatedString ("Classifieds"));
-            vars.Add ("ClassifiedTitle", "ClassifiedTitle"); //translator.GetTranslatedString ("ClassifiedTitle"));
-            vars.Add ("ClassifiedText", "ClassifiedText"); //translator.GetTranslatedString ("ClassifiedText"));
+            vars.Add ("Classifieds", translator.GetTranslatedString ("Classifieds"));
 
-            vars.Add ("Classified", "Classified"); //translator.GetTranslatedString ("Classified"));
-            vars.Add ("ClassifiedDateText", "Date"); // translator.GetTranslatedString ("DateText"));
-            vars.Add ("ClassifiedTitleText", "Title"); //translator.GetTranslatedString ("TitleText"));
-            
-            // always required data
-            vars.Add("DateStart", DateStart );
-            vars.Add ("DateEnd", DateEnd );
-            vars.Add ("Period",  period.TotalDays + " " + translator.GetTranslatedString("DaysText"));
-            
 			// labels
-            vars.Add("ClassifiedsText", translator.GetTranslatedString("ClassifiedsText"));
-            vars.Add("DateInfoText", translator.GetTranslatedString("DateInfoText"));
-            vars.Add("DateStartText", translator.GetTranslatedString("DateStartText"));
-            vars.Add("DateEndText", translator.GetTranslatedString("DateEndText"));
+            vars.Add ("ClassifiedsText", translator.GetTranslatedString("ClassifiedsText"));
+            vars.Add ("CreationDateText", translator.GetTranslatedString ("CreationDateText"));
+            vars.Add ("CategoryText", translator.GetTranslatedString ("CategoryText"));
+            vars.Add ("ClassifiedNameText", translator.GetTranslatedString ("ClassifiedText"));
+            vars.Add ("DescriptionText", translator.GetTranslatedString ("DescriptionText"));
+            vars.Add ("MaturityText", translator.GetTranslatedString ("MaturityText"));
+            vars.Add ("GeneralText", translator.GetTranslatedString ("GeneralText"));
+            vars.Add ("MatureText", translator.GetTranslatedString ("MatureText"));
+            vars.Add ("AdultText", translator.GetTranslatedString ("AdultText"));
+            vars.Add ("PriceOfListingText", translator.GetTranslatedString ("PriceOfListingText"));
+            vars.Add ("ExpirationDateText", translator.GetTranslatedString ("ExpirationDateText"));
+            vars.Add ("SearchText", translator.GetTranslatedString ("SearchText"));
 
             return vars;
         }
+
+
 
         public bool AttemptFindPage(string filename, ref OSHttpResponse httpResponse, out string text)
         {

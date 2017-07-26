@@ -1,0 +1,1545 @@
+#
+# Russian translation for WhiteCore.
+# This file is distributed under the same license as the WhiteCore package.
+# greythane <greythane@gmail.com>, 2016.
+#
+
+
+msgid ""
+msgstr ""
+
+"Project-Id-Version: WhiteCore Version 0.9.5\n"
+"Report-Msgid-Bugs-To: greythane <greythane@gmail.com>\n"
+
+"POT-Creation-Date: 2016-11-23 14:11:31Z\n"
+"PO-Revision-Date: 2016-11-23 14:11:31Z\n"
+"Last-Translator: greythane <greythane@gmail.com>\n"
+"Language-Team: WhiteCore Development <greythane@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ru\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: WhiteCore V0.9.5 Dev\n"
+
+msgid "30daysPastText"
+msgstr "Предыдущие 30 Дней"
+
+msgid "AboutMe"
+msgstr "Обо мне"
+
+msgid "AbuseReporterNameText"
+msgstr "Докладчик"
+
+msgid "AbuseReportText"
+msgstr "Жалоба"
+
+msgid "AbuserNameText"
+msgstr "Обвиняемый"
+
+msgid "Accept"
+msgstr "Принять"
+
+msgid "AccountType"
+msgstr "Тип Учетной Записи"
+
+msgid "ActiveText"
+msgstr "Aктивный"
+
+msgid "AddEstateText"
+msgstr "Добавить Имение"
+
+msgid "AddEventText"
+msgstr "Добавить Мероприятие"
+
+msgid "AddItem"
+msgstr "Добавить Элемент"
+
+msgid "AddNewsItem"
+msgstr "Добавить Новость"
+
+msgid "AddNewsText"
+msgstr "Добавить Новость"
+
+msgid "AddRegionText"
+msgstr "Добавить область"
+
+msgid "AdminBanUserInfoText"
+msgstr "Блокирует вход пользователя в навсегда, пока он не будет снят Сотрудниками."
+
+msgid "AdminBanUserText"
+msgstr "Бан навсегда"
+
+msgid "AdminDeleteUserInfoText"
+msgstr "Удалить аккаунт и всю связанную с ним информацию."
+
+msgid "AdminDeleteUserText"
+msgstr "Удалить пользователя"
+
+msgid "AdminLoginInAsUserInfoText"
+msgstr "Вы выйдете из вашей учетной записи Администратора и войдете в систему как этот пользователь."
+
+msgid "AdminLoginInAsUserText"
+msgstr "Войти как пользователь в 3D мир"
+
+msgid "AdminTempBanUserInfoText"
+msgstr "Блокирует вход пользователя в течение заданного времени."
+
+msgid "AdminTempBanUserText"
+msgstr "Блокировка на время"
+
+msgid "AdminUnbanUserInfoText"
+msgstr "Убирает временные и постоянные блокировки."
+
+msgid "AdminUnbanUserText"
+msgstr "Разблокировать"
+
+msgid "AdminUserTypeInfoText"
+msgstr "Тип Пльзователя (сейчас используется для переодических выплат)."
+
+msgid "AdultText"
+msgstr "Для Взрослых"
+
+msgid "AgentsInViewText"
+msgstr "Агенты в поле зрения"
+
+msgid "AllowDirectTeleportText"
+msgstr "Разрешена телепортация"
+
+msgid "AllowVoiceText"
+msgstr "Голосовое Общение Разрешено"
+
+msgid "Apr_Short"
+msgstr "Апр"
+
+msgid "April"
+msgstr "Апрель"
+
+msgid "Aquatic"
+msgstr "Океан"
+
+msgid "AssignedToText"
+msgstr "Кто расследует"
+
+msgid "Aug_Short"
+msgstr "Авг"
+
+msgid "August"
+msgstr "Август"
+
+msgid "AvatarEmailError"
+msgstr "Адрес электронной почты необходим для восстановления пароля!"
+
+msgid "AvatarNameError"
+msgstr "Вы не ввели имя аватара!"
+
+msgid "AvatarNameSpacingError"
+msgstr "Имя аватара должно быть "Имя Фамилия"!"
+
+msgid "AvatarNameText"
+msgstr "Имя пользователя"
+
+msgid "AvatarPasswordError"
+msgstr "Поля пароля пустые или не совпадают!"
+
+msgid "AvatarScopeText"
+msgstr "ID Аватара"
+
+msgid "BackText"
+msgstr "Назад"
+
+msgid "BankerNameText"
+msgstr "Системный Банкир"
+
+msgid "BannedUntilText"
+msgstr "Пользователь заблокирован до:"
+
+msgid "BanText"
+msgstr "Заблокировать"
+
+msgid "Cancel"
+msgstr "Отмена"
+
+msgid "CannotSetParentToChild"
+msgstr "Нелья поставить Основное Мено в Подменю"
+
+msgid "CatAll"
+msgstr "Все"
+
+msgid "CatArtsCulture"
+msgstr "Исскуство/Культура"
+
+msgid "CatCharitySupport"
+msgstr "Благотворительность/Группа Поддержки"
+
+msgid "CatCommercial"
+msgstr "Коммерческое"
+
+msgid "CatDiscussion"
+msgstr "Обсуждение"
+
+msgid "CatEducation"
+msgstr "Образование"
+
+msgid "CategoryText"
+msgstr "Категория"
+
+msgid "CatEmployment"
+msgstr "Трудоустройство"
+
+msgid "CatEntertainment"
+msgstr "Ночная жизнь/Развлечение"
+
+msgid "CatGames"
+msgstr "Игры/Конкурсы"
+
+msgid "CatLandRental"
+msgstr "Аренда Земли"
+
+msgid "CatLiveMusic"
+msgstr "Живая Музыка"
+
+msgid "CatMiscellaneous"
+msgstr "Разное"
+
+msgid "CatNewProducts"
+msgstr "Новые Продукты"
+
+msgid "CatPageants"
+msgstr "Зрелищное Мероприятие"
+
+msgid "CatPersonal"
+msgstr "Личные"
+
+msgid "CatPropertyRental"
+msgstr "Аренда Собственности"
+
+msgid "CatSelect"
+msgstr ""
+
+msgid "CatService"
+msgstr "Сервис"
+
+msgid "CatShopping"
+msgstr "Магазины"
+
+msgid "CatSpecialAttraction"
+msgstr "Специальные Предложения"
+
+msgid "CatSports"
+msgstr "Спорт"
+
+msgid "CatWanted"
+msgstr "Срочно Нужны"
+
+msgid "ChangeEmailText"
+msgstr "Изменть Email"
+
+msgid "ChangePass"
+msgstr "Ваш пароль изменен"
+
+msgid "ChangePasswordText"
+msgstr "Изменить пароль"
+
+msgid "ChangesSavedSuccessfully"
+msgstr "Изменения сохранены успешно"
+
+msgid "ChangeUserInformationText"
+msgstr "Изменить Инфо Пользователя"
+
+msgid "Charter_Member"
+msgstr "Представитель Администрации"
+
+msgid "ChatText"
+msgstr "Служба Поддержки в Чате"
+
+msgid "CheckedText"
+msgstr "Рассмотренные"
+
+msgid "ClassifiedsText"
+msgstr "Объявления"
+
+msgid "ClassifiedText"
+msgstr "Объявление"
+
+msgid "ClearStatsText"
+msgstr "Очистить Статистику"
+
+msgid "ColorBoxCloseText"
+msgstr "Закрыть"
+
+msgid "ColorBoxImageText"
+msgstr "Изображение"
+
+msgid "ColorBoxNextText"
+msgstr "Вперед"
+
+msgid "ColorBoxOfText"
+msgstr "пользователя"
+
+msgid "ColorBoxPreviousText"
+msgstr "Назад"
+
+msgid "ColorBoxStartSlideshowText"
+msgstr "Запустить Слайдшоу"
+
+msgid "ColorBoxStopSlideshowText"
+msgstr "Остановить Слайдшоу"
+
+msgid "Contractor"
+msgstr "Контрактник"
+
+msgid "CoverChargeText"
+msgstr "Входная плата"
+
+msgid "CreationDateText"
+msgstr "Добавлено"
+
+msgid "Currency"
+msgstr "Валюта"
+
+msgid "CurrentPageText"
+msgstr "Текущая страница"
+
+msgid "Custom"
+msgstr "Выборочный"
+
+msgid "DateEndText"
+msgstr "До"
+
+msgid "DateInfoText"
+msgstr "Выбрать период"
+
+msgid "DateStartText"
+msgstr "От"
+
+msgid "DateText"
+msgstr "Дата"
+
+msgid "de"
+msgstr "Deutsch"
+
+msgid "Dec_Short"
+msgstr "Дек"
+
+msgid "December"
+msgstr "Декабрь"
+
+msgid "DefaultsUpdated"
+msgstr "Значения по умолчанию обновлены, перейдите в Сброс настроек на значения по умолчанию для обновления или в Управление Настройками для отключения этого предупреждения."
+
+msgid "DelayedText"
+msgstr "с Задержкой"
+
+msgid "DeleteItem"
+msgstr "Удалить Элемент"
+
+msgid "DeleteNewsItem"
+msgstr "Удалить Новость"
+
+msgid "DeleteNewsText"
+msgstr "Удалить Новость"
+
+msgid "DeleteText"
+msgstr "Удалить"
+
+msgid "DeleteUserInfoText"
+msgstr "Это удалит всю информацию о вас в сетке и удалит доступ к сервису. Если вы хотите продолжить, введите имя и пароль и нажмите кнопку Удалить."
+
+msgid "DeleteUserText"
+msgstr "Удалить аккаунт"
+
+msgid "DescriptionText"
+msgstr "Описание"
+
+msgid "DetailsText"
+msgstr "Описание"
+
+msgid "Disabled"
+msgstr "Откл."
+
+msgid "DisplayInMenu"
+msgstr "Показывать в Меню"
+
+msgid "DurationText"
+msgstr "Продолжительность"
+
+msgid "EditNewsItem"
+msgstr "Редактировать новость"
+
+msgid "EditNewsText"
+msgstr "Редактировать Новость"
+
+msgid "EditText"
+msgstr "Pедактировать"
+
+msgid "EdittingText"
+msgstr "Редактируется"
+
+msgid "EditUserAccountText"
+msgstr "Редактировать аккаунт пользователя"
+
+msgid "en"
+msgstr "English"
+
+msgid "Enabled"
+msgstr "Вкл."
+
+msgid "Error404InfoText"
+msgstr "404 страница не существует"
+
+msgid "Error404Text"
+msgstr "Ошибка"
+
+msgid "Error505InfoText"
+msgstr "505 Внутренняя Ошибка Сервера"
+
+msgid "Error505Text"
+msgstr "Ошибка"
+
+msgid "es"
+msgstr "Español"
+
+msgid "Estate"
+msgstr "Имение"
+
+msgid "EstatesText"
+msgstr "Имения"
+
+msgid "EstateText"
+msgstr "Имение"
+
+msgid "EventDateText"
+msgstr "Когда"
+
+msgid "EventLocationText"
+msgstr "Где"
+
+msgid "EventNameText"
+msgstr "Мероприятие"
+
+msgid "EventsText"
+msgstr "Мероприятия"
+
+msgid "EventTimeInfoText"
+msgstr "Время мероприятия должно быть указано по локальному времени в 3д Мире"
+
+msgid "ExpirationDateText"
+msgstr "Истекает"
+
+msgid "FactoryReset"
+msgstr "Сброс настроек на значения по умолчанию"
+
+msgid "Feb_Short"
+msgstr "Фев"
+
+msgid "February"
+msgstr "Февраль"
+
+msgid "FirstNameText"
+msgstr "Имя"
+
+msgid "FirstText"
+msgstr "В начало"
+
+msgid "Flatland"
+msgstr "Равнина"
+
+msgid "ForgotPassword"
+msgstr "Забыли пароль?"
+
+msgid "FPSText"
+msgstr "Кадров в секунду"
+
+msgid "fr"
+msgstr "Français"
+
+msgid "Fri"
+msgstr "Пт"
+
+msgid "Friday"
+msgstr "Пятница"
+
+msgid "Friends"
+msgstr "Друзья"
+
+msgid "FullRegion"
+msgstr "Полный Регион"
+
+msgid "GeneralText"
+msgstr "Общий"
+
+msgid "GovernorNameText"
+msgstr "Системный Губернатор"
+
+msgid "GPUText"
+msgstr "Графические карты:"
+
+msgid "Grassland"
+msgstr "Поле"
+
+msgid "GridCenterXText"
+msgstr "Координат X Центральной Локации в Сети"
+
+msgid "GridCenterYText"
+msgstr "Координат Y Центральной Локации в Сети"
+
+msgid "GridnameText"
+msgstr "Название Сети"
+
+msgid "GridnickText"
+msgstr "Ник Сети"
+
+msgid "GridSettingsManager"
+msgstr "Управление Настройками Сети"
+
+msgid "GridStatus"
+msgstr "Статус Сети"
+
+msgid "GroupNameText"
+msgstr "Группы"
+
+msgid "Guest"
+msgstr "Гость"
+
+msgid "HelpText"
+msgstr "Помощь"
+
+msgid "HelpViewersConfigText"
+msgstr "Настройка Клиент-Программ"
+
+msgid "HideLanguageBarText"
+msgstr "Спрятать Панель Выбора Языка"
+
+msgid "HideSlideshowBarText"
+msgstr "Отключить Слайды"
+
+msgid "HideStyleBarText"
+msgstr "Спрятать Панель Выбора Стилей"
+
+msgid "HomePage404Text"
+msgstr "Главная страница"
+
+msgid "HomePage505Text"
+msgstr "Главная страница"
+
+msgid "Homestead"
+msgstr "Родовое поместье"
+
+msgid "HomeText"
+msgstr "Главная"
+
+msgid "HomeTextTips"
+msgstr "Новые презентации"
+
+msgid "HomeTextWelcome"
+msgstr "Это наш Новый Виртуальный Мир! Присоединяйтесь к нам и сделайте отличие!"
+
+msgid "HostedByText"
+msgstr "Организатор"
+
+msgid "HoursText"
+msgstr "часов"
+
+msgid "HourText"
+msgstr "час"
+
+msgid "HyperGrid"
+msgstr "HyperGrid (HG)"
+
+msgid "IgnorePagesUpdatesText"
+msgstr "Игнорировать предупреждения об изменениях страниц до следующего обновления"
+
+msgid "IgnoreSettingsUpdatesText"
+msgstr "Игнорировать предупреждения об изменениях настроек до следующего обновления"
+
+msgid "InterWorld"
+msgstr "Inter World (IWC)"
+
+msgid "Island"
+msgstr "Остров"
+
+msgid "IsOnlineText"
+msgstr "Статус"
+
+msgid "it"
+msgstr "Italiano"
+
+msgid "Jan_Short"
+msgstr "Янв"
+
+msgid "January"
+msgstr "Январь"
+
+msgid "Jul_Short"
+msgstr "Июль"
+
+msgid "July"
+msgstr "Июль"
+
+msgid "Jun_Short"
+msgstr "Июнь"
+
+msgid "June"
+msgstr "Июнь"
+
+msgid "KickAUserInfoText"
+msgstr "Выкинуть пользователя из 3D мира (срабатывает в течение 30 секунд)"
+
+msgid "KickAUserText"
+msgstr "Выкинуть"
+
+msgid "KickMessageText"
+msgstr "Причина отключения"
+
+msgid "KickUserText"
+msgstr "Отключение от 3D мира"
+
+msgid "LastNameText"
+msgstr "Фамилия"
+
+msgid "LastText"
+msgstr "В конец"
+
+msgid "ListedByText"
+msgstr "Внесены"
+
+msgid "LocalCSSText"
+msgstr "Локальный файл стилей CSS"
+
+msgid "LocalFrontPageText"
+msgstr "Локальный файл главной страницы"
+
+msgid "LocationText"
+msgstr "Регион"
+
+msgid "LoggedIPText"
+msgstr "IP адрес"
+
+msgid "LoggedOutSuccessfullyText"
+msgstr "Вы успешно вышли из системы."
+
+msgid "Login"
+msgstr "Вход"
+
+msgid "Logout"
+msgstr "Выход"
+
+msgid "Mainland"
+msgstr "Материк"
+
+msgid "MainlandEstateNameText"
+msgstr "Название Имения на Митерике"
+
+msgid "Mar_Short"
+msgstr "Март"
+
+msgid "March"
+msgstr "Март"
+
+msgid "MarketPlaceOwnerNameText"
+msgstr "Системный Владелец Торговой Площадки"
+
+msgid "MatureText"
+msgstr "Умеренный"
+
+msgid "MaturityText"
+msgstr "Уровень Контента"
+
+msgid "May"
+msgstr "Май"
+
+msgid "May_Short"
+msgstr "Май"
+
+msgid "Member"
+msgstr "Представитель"
+
+msgid "MemoryUseageText"
+msgstr "Памяти использовалось"
+
+msgid "MenuAbuse"
+msgstr "Жалобы"
+
+msgid "MenuChangeUserInformation"
+msgstr "Изменить инфо пользователя"
+
+msgid "MenuChat"
+msgstr "Чат"
+
+msgid "MenuClassifieds"
+msgstr "Объявления"
+
+msgid "MenuEstateManager"
+msgstr "Управление Имениями"
+
+msgid "MenuEvents"
+msgstr "Мероприятия"
+
+msgid "MenuFactoryReset"
+msgstr "Сброс настроек на значения по умолчанию"
+
+msgid "MenuForgotPass"
+msgstr "Забыли пароль?"
+
+msgid "MenuGridSettings"
+msgstr "Настрока Сети"
+
+msgid "MenuGroupTitle"
+msgstr "Группы"
+
+msgid "MenuHelp"
+msgstr "Помощь"
+
+msgid "MenuHome"
+msgstr "Главная"
+
+msgid "MenuLogin"
+msgstr "Вход"
+
+msgid "MenuLogout"
+msgstr "Выход"
+
+msgid "MenuManager"
+msgstr "Управление"
+
+msgid "MenuManagerSimConsole"
+msgstr "Консоль Симулятора"
+
+msgid "MenuMyClassifieds"
+msgstr "Мои Объявления"
+
+msgid "MenuMyEvents"
+msgstr "Мои Мероприятия"
+
+msgid "MenuMyPurchases"
+msgstr "Мои покупки Игровой Валюты"
+
+msgid "MenuMyTransactions"
+msgstr "Мои Транзакции"
+
+msgid "MenuNews"
+msgstr "Новости"
+
+msgid "MenuNewsManager"
+msgstr "Управление Новостями"
+
+msgid "MenuOnlineUsers"
+msgstr "Пользователи в Сети"
+
+msgid "MenuOwnerTitle"
+msgstr "Владелец"
+
+msgid "MenuPageManager"
+msgstr "Управление Страницами"
+
+msgid "MenuParcelTitle"
+msgstr "Участки"
+
+msgid "MenuPicksTitle"
+msgstr "Избранное"
+
+msgid "MenuProfileTitle"
+msgstr "Профиль"
+
+msgid "MenuPurchases"
+msgstr "Покупки Игровой Валюты Пользователями"
+
+msgid "MenuRegion"
+msgstr "Список Регионов"
+
+msgid "MenuRegionManager"
+msgstr "Управление Регионами"
+
+msgid "MenuRegionSearch"
+msgstr "Поиск"
+
+msgid "MenuRegionsTitle"
+msgstr "Регионы"
+
+msgid "MenuRegionTitle"
+msgstr "Регион"
+
+msgid "MenuRegister"
+msgstr "Регистрация"
+
+msgid "MenuSettings"
+msgstr "Настройки"
+
+msgid "MenuSettingsManager"
+msgstr "Настройки Web Интерфейса"
+
+msgid "MenuStatistics"
+msgstr "Статистика"
+
+msgid "MenuTransactions"
+msgstr "Транзакции Пользователей"
+
+msgid "MenuUser"
+msgstr "Пользователь"
+
+msgid "MenuUserManager"
+msgstr "Пользователи"
+
+msgid "MenuUserSearch"
+msgstr "Поиск"
+
+msgid "MenuViewerHelp"
+msgstr "Настройки и клиент программы"
+
+msgid "MenuWelcomeScreenManager"
+msgstr "Управление Экраном Приветствия"
+
+msgid "MenuWorld"
+msgstr "Мир"
+
+msgid "MenuWorldMap"
+msgstr "Карта мира"
+
+msgid "MessageAUserInfoText"
+msgstr "Отправляет сообщение пользователю"
+
+msgid "MessageAUserText"
+msgstr "Отправить сообщение"
+
+msgid "MessageUserText"
+msgstr "Отправить"
+
+msgid "MinutesText"
+msgstr "минут"
+
+msgid "MinuteText"
+msgstr "минута"
+
+msgid "Mon"
+msgstr "Пн"
+
+msgid "Monday"
+msgstr "Понедельник"
+
+msgid "MoreInfo"
+msgstr "Подробнее"
+
+msgid "MoreInfoText"
+msgstr "Подробнее"
+
+msgid "Name"
+msgstr "Имя"
+
+msgid "NewEmailText"
+msgstr "Новый Email адрес"
+
+msgid "NewPasswordConfirmationText"
+msgstr "Повторите пароль"
+
+msgid "NewPasswordText"
+msgstr "Новый пароль"
+
+msgid "News"
+msgstr "Новости"
+
+msgid "NewsDateText"
+msgstr "Дата"
+
+msgid "NewsItemText"
+msgstr "Текст Новости"
+
+msgid "NewsItemTitle"
+msgstr "Заголовок Новости"
+
+msgid "NewsManager"
+msgstr "Управление новостями"
+
+msgid "NewsTitleText"
+msgstr "Заголовок"
+
+msgid "Next10Hours"
+msgstr "Следущие 10 часов"
+
+msgid "Next24Hours"
+msgstr "Следущие 24 часа"
+
+msgid "Next2Hours"
+msgstr "Следущие 2 часа"
+
+msgid "Next4Hours"
+msgstr "Следущие 4 часа"
+
+msgid "NextText"
+msgstr "Вперед"
+
+msgid "nl"
+msgstr "Nederlands"
+
+msgid "No"
+msgstr "Нет"
+
+msgid "NoAccountFound"
+msgstr "Учетных записей не найдено"
+
+msgid "NoChangePass"
+msgstr "Не удалось изменить пароль, попробуйте еще раз позже"
+
+msgid "NoDetailsText"
+msgstr "Никаких подробностей не найдено..."
+
+msgid "NoPurchasesText"
+msgstr "Покупок не найдено..."
+
+msgid "NormalText"
+msgstr "Нормальный"
+
+msgid "NotesText"
+msgstr "Заметки"
+
+msgid "Nothing"
+msgstr "Нет информации"
+
+msgid "NoTransactionsText"
+msgstr "Транзакции не нейдены..."
+
+msgid "Nov_Short"
+msgstr "Ноя"
+
+msgid "November"
+msgstr "Ноябрь"
+
+msgid "NumberOfUsersInRegionText"
+msgstr "Количество пользователей в регионе"
+
+msgid "ObjectNameText"
+msgstr "Oбъект"
+
+msgid "Oct_Short"
+msgstr "Окт"
+
+msgid "October"
+msgstr "Октябрь"
+
+msgid "Offline"
+msgstr "Офлайн"
+
+msgid "Online"
+msgstr "Онлайн"
+
+msgid "OnlineFriendsText"
+msgstr "Друзья в сети"
+
+msgid "OnlineLocationText"
+msgstr "Локация"
+
+msgid "OnlineNow"
+msgstr "В сети"
+
+msgid "OnlineUsersText"
+msgstr "Пользователи"
+
+msgid "OpenNewsManager"
+msgstr "Открыть управление новостями"
+
+msgid "Openspace"
+msgstr "Открытая местность"
+
+msgid "OwnerNameText"
+msgstr "Владелец"
+
+msgid "PageIDText"
+msgstr "ID Страницы"
+
+msgid "PageLocationText"
+msgstr "Локация Страницы"
+
+msgid "PageManager"
+msgstr "Управление Страницами"
+
+msgid "PagePositionText"
+msgstr "Расположение Страницы"
+
+msgid "Pages"
+msgstr "Страницы"
+
+msgid "PageTitleText"
+msgstr "Заголовок Страницы"
+
+msgid "PageTooltipText"
+msgstr "Описание Страницы"
+
+msgid "ParcelNameText"
+msgstr "Название Участка"
+
+msgid "ParcelOwnerText"
+msgstr "Имя Владельца Участка"
+
+msgid "ParcelsInRegionText"
+msgstr "Участки в Регионе"
+
+msgid "ParentText"
+msgstr "Основное Меню"
+
+msgid "Partner"
+msgstr "Нет партнёра"
+
+msgid "PartnersName"
+msgstr "Партнёр"
+
+msgid "Password"
+msgstr "Пароль"
+
+msgid "PasswordConfirmation"
+msgstr "Подтверждение пароля"
+
+msgid "PasswordText"
+msgstr "Пароль"
+
+msgid "PerformanceText"
+msgstr "Производительность в среднем:"
+
+msgid "PickNameText"
+msgstr "Название Избранного"
+
+msgid "PickRegionText"
+msgstr "Локация"
+
+msgid "PingTimeText"
+msgstr "Время пинга"
+
+msgid "PriceOfListingText"
+msgstr "Стоимость"
+
+msgid "PricePerMeterText"
+msgstr "Цена за квадратный метр"
+
+msgid "PublicAccessText"
+msgstr "Публичный доступ"
+
+msgid "PurchaseCostText"
+msgstr "Стоимость"
+
+msgid "PurchasesText"
+msgstr "Покупки"
+
+msgid "RealEstateOwnerNameText"
+msgstr "Владелец Системного Имения"
+
+msgid "Region"
+msgstr "Регион"
+
+msgid "RegionCapacityText"
+msgstr "Вместимость"
+
+msgid "RegionDelayStartupText"
+msgstr "Запуск Региона"
+
+msgid "RegionInfiniteText"
+msgstr "Бесконечный Регион"
+
+msgid "RegionInformationText"
+msgstr "Информация о регионе"
+
+msgid "RegionInfoText"
+msgstr "Информация о регионе"
+
+msgid "RegionListText"
+msgstr "Список регионов"
+
+msgid "RegionLocationText"
+msgstr "Координаты"
+
+msgid "RegionLocXText"
+msgstr "Координат X"
+
+msgid "RegionLocYText"
+msgstr "Координат Y"
+
+msgid "RegionMaturityText"
+msgstr "Уровень Контента"
+
+msgid "RegionMoreInfo"
+msgstr "Подробнее"
+
+msgid "RegionMoreInfoTooltips"
+msgstr "Подробнее о"
+
+msgid "RegionNameText"
+msgstr "Название"
+
+msgid "RegionOnlineText"
+msgstr "Статус"
+
+msgid "RegionPortText"
+msgstr "Порт"
+
+msgid "RegionPresetText"
+msgstr "Предустановка Региона"
+
+msgid "RegionPresetTypeText"
+msgstr "Предустановка Региона"
+
+msgid "RegionSearchText"
+msgstr "Поиск Региона"
+
+msgid "RegionSizeText"
+msgstr "Размер"
+
+msgid "RegionsVisitedText"
+msgstr "Посещеные Регионы"
+
+msgid "RegionTerrainText"
+msgstr "Поверхность в Регионе"
+
+msgid "RegionTypeText"
+msgstr "Тип Региона"
+
+msgid "RegionVisibilityText"
+msgstr "Видимый для соседей"
+
+msgid "RegistrationsDisabled"
+msgstr "Регистрация в данный момент отключена, пожалуйста, попробуйте еще раз немного позже."
+
+msgid "RegistrationText"
+msgstr "Регистрация"
+
+msgid "RequiresAdminLevelText"
+msgstr "Требуется Уровень Администратора для Просмотра"
+
+msgid "RequiresAdminText"
+msgstr "Требуется Администратор для просмотра"
+
+msgid "RequiresLoginText"
+msgstr "Требуется Вход для Просмотра"
+
+msgid "RequiresLogoutText"
+msgstr "Требуется Выход для Просмотра"
+
+msgid "Reset"
+msgstr "Сброс"
+
+msgid "ResetMenuInfoText"
+msgstr "Сброс элементов меню к более обновленным значениям по умолчанию"
+
+msgid "ResetMenuText"
+msgstr "Сбросить настройки Меню на значения по умолчанию"
+
+msgid "ResetSettingsInfoText"
+msgstr "Сброс настроек Web Интерфейса к более обновленным значениям по умолчанию"
+
+msgid "ResetSettingsText"
+msgstr "Сбросить настройки Пользовательского Web Интерфейса на значения по умолчанию"
+
+msgid "Resident"
+msgstr "Житель"
+
+msgid "ResidentSince"
+msgstr "Дата регистрации"
+
+msgid "ru"
+msgstr "Русский"
+
+msgid "RunTimeText"
+msgstr "Время работы"
+
+msgid "Sat"
+msgstr "Сб"
+
+msgid "Saturday"
+msgstr "Суббота"
+
+msgid "Save"
+msgstr "Сохранить"
+
+msgid "SaveMenuItemChanges"
+msgstr "Сохранить Элемент Меню"
+
+msgid "SaveUpdates"
+msgstr "Сохранить"
+
+msgid "Search"
+msgstr "Поиск"
+
+msgid "SearchForRegionText"
+msgstr "Поиск Региона"
+
+msgid "SearchForUserText"
+msgstr "Поиск пользователя"
+
+msgid "SearchResultForRegionText"
+msgstr "Результат поиска"
+
+msgid "SearchResultForUserText"
+msgstr "Результат поиска"
+
+msgid "SearchText"
+msgstr "Поиск"
+
+msgid "SelectItem"
+msgstr "Выбрать Элемент"
+
+msgid "Sep_Short"
+msgstr "Сен"
+
+msgid "September"
+msgstr "Сентябрь"
+
+msgid "Settings"
+msgstr "Настройки"
+
+msgid "SettingsManager"
+msgstr "Управление Настройками"
+
+msgid "SimCommandText"
+msgstr "Команда"
+
+msgid "SimConsoleText"
+msgstr "Команда в Консоль симулятора"
+
+msgid "SortByLocX"
+msgstr "Сортировать по координату X"
+
+msgid "SortByLocY"
+msgstr "Сортировать по координату Y"
+
+msgid "SortByName"
+msgstr "Сортировать по имени региона"
+
+msgid "SpecialWindowColorText"
+msgstr "Цвет Окна Особой Информации"
+
+msgid "SpecialWindowStatusText"
+msgstr "Статус Окна Особой Информации"
+
+msgid "SpecialWindowTextText"
+msgstr "Текст Окна Особой Информации"
+
+msgid "SpecialWindowTitleText"
+msgstr "Заголовок Окна Особой Информации"
+
+msgid "StatisticsText"
+msgstr "Статистика"
+
+msgid "styles1"
+msgstr "Default Minimalist"
+
+msgid "styles2"
+msgstr "Light Degarde"
+
+msgid "styles3"
+msgstr "Blue Night"
+
+msgid "styles4"
+msgstr "Dark Degrade"
+
+msgid "styles5"
+msgstr "Luminus"
+
+msgid "StyleSwitcherChoiceText"
+msgstr "Выбор"
+
+msgid "StyleSwitcherLanguagesText"
+msgstr "Языки"
+
+msgid "StyleSwitcherStylesText"
+msgstr "Стили"
+
+msgid "Submit"
+msgstr "Подтвердить"
+
+msgid "SummaryText"
+msgstr "Краткое Описание"
+
+msgid "Sun"
+msgstr "Вс"
+
+msgid "Sunday"
+msgstr "Воскресенье"
+
+msgid "SystemEstateNameText"
+msgstr "Название Системного Имения"
+
+msgid "TaxFreeText"
+msgstr "Без входной платы"
+
+msgid "TermsOfServiceAccept"
+msgstr "Вы принимаете Условия Предоставления Услуг описанные выше?"
+
+msgid "TermsOfServiceText"
+msgstr "Условия Предоставления Услуг"
+
+msgid "Thu"
+msgstr "Чт"
+
+msgid "Thursday"
+msgstr "Четверг"
+
+msgid "TimeText"
+msgstr "Время"
+
+msgid "TimeUntilUnbannedText"
+msgstr "Time until user is unbanned"
+
+msgid "TooltipsMenuAbuse"
+msgstr "Жалобы пользователей"
+
+msgid "TooltipsMenuChangeUserInformation"
+msgstr "Изменить Инфо Пользователя"
+
+msgid "TooltipsMenuChat"
+msgstr "Чат"
+
+msgid "TooltipsMenuClassifieds"
+msgstr "Инфо об Объявлениях"
+
+msgid "TooltipsMenuEstateManager"
+msgstr "Управление Имениями"
+
+msgid "TooltipsMenuEvents"
+msgstr "Инфо о Мероприятиях"
+
+msgid "TooltipsMenuFactoryReset"
+msgstr "Сброс настроек на значения по умолчанию"
+
+msgid "TooltipsMenuForgotPass"
+msgstr "Забыли пароль?"
+
+msgid "TooltipsMenuGridSettings"
+msgstr "Настройка Сети"
+
+msgid "TooltipsMenuGroups"
+msgstr "Группы Пользователя"
+
+msgid "TooltipsMenuHelp"
+msgstr "Помошь"
+
+msgid "TooltipsMenuHome"
+msgstr "Главная"
+
+msgid "TooltipsMenuLogin"
+msgstr "Вход"
+
+msgid "TooltipsMenuLogout"
+msgstr "Выход"
+
+msgid "TooltipsMenuManager"
+msgstr "Административное Управление"
+
+msgid "TooltipsMenuManagerSimConsole"
+msgstr "Онлайн консоль симулятора"
+
+msgid "TooltipsMenuNews"
+msgstr "Новости"
+
+msgid "TooltipsMenuNewsManager"
+msgstr "Управление Новостями"
+
+msgid "TooltipsMenuOnlineUsers"
+msgstr "Пользоваели в Сети"
+
+msgid "TooltipsMenuOwner"
+msgstr "Владелец Имения"
+
+msgid "TooltipsMenuPageManager"
+msgstr "Управление Страницами"
+
+msgid "TooltipsMenuParcel"
+msgstr "Детали об Участке"
+
+msgid "TooltipsMenuPicks"
+msgstr "Избранное Пользователя"
+
+msgid "TooltipsMenuProfile"
+msgstr "Профиль Пользователя"
+
+msgid "TooltipsMenuPurchases"
+msgstr "Инфо о покупках игровой валюты"
+
+msgid "TooltipsMenuRegion"
+msgstr "Детали о Регионах"
+
+msgid "TooltipsMenuRegionManager"
+msgstr "Управление Регионами"
+
+msgid "TooltipsMenuRegions"
+msgstr "Регионы Пользователя"
+
+msgid "TooltipsMenuRegionSearch"
+msgstr "Поиск Регинов"
+
+msgid "TooltipsMenuRegister"
+msgstr "Регистрация"
+
+msgid "TooltipsMenuSettings"
+msgstr "Настройки Пользовательского Web Интерфейса"
+
+msgid "TooltipsMenuSettingsManager"
+msgstr "Управление Настройками"
+
+msgid "TooltipsMenuStatistics"
+msgstr "Статистика Подключений"
+
+msgid "TooltipsMenuTransactions"
+msgstr "Инфо о Транзакциях"
+
+msgid "TooltipsMenuUser"
+msgstr "Пользователь"
+
+msgid "TooltipsMenuUserManager"
+msgstr "Управление Пользователями"
+
+msgid "TooltipsMenuUserSearch"
+msgstr "Поиск Пользователей"
+
+msgid "TooltipsMenuViewerHelp"
+msgstr "Помощь по настройке клиент-программы"
+
+msgid "TooltipsMenuWelcomeScreenManager"
+msgstr "Управление Экраном Приветствия"
+
+msgid "TooltipsMenuWorld"
+msgstr "Мир"
+
+msgid "TooltipsMenuWorldMap"
+msgstr "Карта Мира"
+
+msgid "TooltipsWelcomeScreen"
+msgstr "Экран Приветствия"
+
+msgid "TooltipsWorldMap"
+msgstr "Карта Мира"
+
+msgid "TopLevel"
+msgstr "Верхний Уровень"
+
+msgid "TotalRegionCount"
+msgstr "Всего Регионов"
+
+msgid "TotalUserCount"
+msgstr "Всего Пользователей"
+
+msgid "TransactionAmountText"
+msgstr "Сумма"
+
+msgid "TransactionBalanceText"
+msgstr "Остаток"
+
+msgid "TransactionDateText"
+msgstr "Дата"
+
+msgid "TransactionDetailText"
+msgstr "Описание"
+
+msgid "TransactionFromAgentText"
+msgstr "От Куда"
+
+msgid "TransactionsText"
+msgstr "Транзакции"
+
+msgid "TransactionToAgentText"
+msgstr "Кому"
+
+msgid "Tue"
+msgstr "Вт"
+
+msgid "Tuesday"
+msgstr "Вторник"
+
+msgid "TypeUserNameToConfirm"
+msgstr "Пожалуйста, введите имя пользователя учетной записи, чтобы подтвердить её удаление."
+
+msgid "UnbanText"
+msgstr "Разблокировать"
+
+msgid "UniqueVisitors"
+msgstr "За последние 30 дней"
+
+msgid "UpdateRequired"
+msgstr "Требуется обновление"
+
+msgid "UserAddressText"
+msgstr "Адрес"
+
+msgid "UserCityText"
+msgstr "Город"
+
+msgid "UserCountryText"
+msgstr "Страна"
+
+msgid "UserDOBText"
+msgstr "Дата рождения"
+
+msgid "UserEmailText"
+msgstr "Email"
+
+msgid "UserGroupNameText"
+msgstr "Группы Пользователя"
+
+msgid "UserHomeRegionText"
+msgstr "Выберите Домашний Регион"
+
+msgid "UserName"
+msgstr "Имя пользователя"
+
+msgid "UserNameText"
+msgstr "Имя пользователя"
+
+msgid "UserProfileFor"
+msgstr "Профиль пользователя"
+
+msgid "UserSearchText"
+msgstr "Поиск пользователя"
+
+msgid "UsersGroupsText"
+msgstr "Группы"
+
+msgid "UsersPicksText"
+msgstr "Избранное"
+
+msgid "UserTypeText"
+msgstr "Тип Пользователя"
+
+msgid "UserZipText"
+msgstr "Почтовый Индекс"
+
+msgid "UUIDText"
+msgstr "UUID"
+
+msgid "ViewersText"
+msgstr " Клиент-программы:"
+
+msgid "Voice"
+msgstr "Голосовоая связь"
+
+msgid "WebRegistrationText"
+msgstr "Web рагистрации разрешены"
+
+msgid "WebsiteDownInfoText"
+msgstr "Сайт на данный момент не работает, пожалуйста, попробуйте еще раз через некоторое время."
+
+msgid "WebsiteDownText"
+msgstr "Сайт отключен на технические работы"
+
+msgid "Wed"
+msgstr "Ср"
+
+msgid "Wednesday"
+msgstr "Среда"
+
+msgid "WelcomeMessageText"
+msgstr "Сообщение при Входе"
+
+msgid "WelcomeScreen"
+msgstr "Экран Приветствия"
+
+msgid "WelcomeScreenManagerFor"
+msgstr "Управление Экраном Приветствия "
+
+msgid "WelcomeToText"
+msgstr "Добро пожаловать в"
+
+msgid "WorldMap"
+msgstr "Карта Мира"
+
+msgid "WorldMapText"
+msgstr "Карта Мира"
+
+msgid "Yes"
+msgstr "Да"
+

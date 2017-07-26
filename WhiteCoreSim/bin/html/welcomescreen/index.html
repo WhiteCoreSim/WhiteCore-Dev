@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
 	<meta charset="utf-8">
@@ -7,7 +7,6 @@
 	<meta name="description" content="{SystemName}"/>
 	<link rel="shortcut icon" href="../images/icons/favicon.ico" />
 
-
 	<!-- StyleSwitch TODO -->
 	<link href="../css/styles1.css" rel="stylesheet" type="text/css" media="screen" title="styles1" />
 	<link href="../css/styles2.css" rel="alternate stylesheet" type="text/css" title="styles2" media="screen" />
@@ -15,8 +14,6 @@
 	<link href="../css/styles4.css" rel="alternate stylesheet" type="text/css" title="styles4" media="screen" />
 	<link href="../css/styles5.css" rel="alternate stylesheet" type="text/css" title="styles5" media="screen" />
 	<style type="text/css">#container{display:none;} img#mainImage{display:none;}</style>
-
-
 </head>
 
 <body class="welcomescreen">
@@ -58,7 +55,9 @@
 		  <li><a href="?language=it" rel="it" class="languageswitch" alt="{it}" title="<img src='../images/flags/flag-it.png' alt='it' /> {it}">it</a></li>
 		  <li><a href="?language=es" rel="es" class="languageswitch" alt="{es}" title="<img src='../images/flags/flag-es.png' alt='es' /> {es}">es</a></li>
 		  <li><a href="?language=nl" rel="nl" class="languageswitch" alt="{nl}" title="<img src='../images/flags/flag-nl.png' alt='nl' /> {nl}">nl</a></li>
-		{StyleSwitcherChoiceText}: <span id="lg1">en</span><span id="lg2">fr</span><span id="lg3">de</span><span id="lg4">it</span><span id="lg5">es</span><span id="lg6">nl</span>
+          <li><a href="?language=ru" rel="ru" class="languageswitch" alt="{ru}" title="<img src='../images/flags/flag-ru.png' alt='ru' /> {ru}">ru</a></li>
+          <li><a href="?language=zh_CN" rel="zh_CN" class="languageswitch" alt="{zh_CN}" title="<img src='../images/flags/flag-zh_CN.png' alt='zh_CN' /> {zh_CN}">zh_CN</a></li>
+		<!--{StyleSwitcherChoiceText}: <span id="lg1">en</span><span id="lg2">fr</span><span id="lg3">de</span><span id="lg4">it</span><span id="lg5">es</span><span id="lg6">nl</span><span id="lg7">ru</span><span id="lg8">zh_CN</span>-->
 		</ul>
 	  </div>
 {IfShowLanguageTranslatorBarEnd}
@@ -88,7 +87,6 @@
 	<script src="../js/styleswitch.js" type="text/javascript" ></script>
 	<!--<script src="../js/jquery.tooltip.js" type="text/javascript" language="javascript"></script> -->
 
-
 	<script>
 		$(document).ready(function(){
 			bgImgRotate();
@@ -104,7 +102,8 @@
      	$(this).stop().animate({"opacity": "1.0"}, "3.0");},
 		function() {
 	  	$(this).stop().animate({"opacity": "0.3"}, "3.0");
-  	});
+        });
+
   	$("a.logofade").hover(function(){$(this).fadeOut(150);$(this).fadeIn(150);});
  </script>
 
