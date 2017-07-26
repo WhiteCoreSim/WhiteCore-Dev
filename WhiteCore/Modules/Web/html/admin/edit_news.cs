@@ -73,7 +73,16 @@ namespace WhiteCore.Modules.Web
                 if (news != null)
                 {
                     connector.RemoveGeneric (UUID.Zero, "WebGridNews", id);
-                    GridNewsItem item = new GridNewsItem { Text = text, Time = news.Time, Title = title, ID = int.Parse (id) };
+                    GridNewsItem item = new GridNewsItem { 
+                        Text = text,
+                        NewsDateTime = news.NewsDateTime,
+                        Title = title,
+                        Day = news.NewsDateTime.ToString("dd"),
+                        DayName = news.NewsDateTime.ToString ("dddd"),
+                        Month = news.NewsDateTime.ToString ("MMM"),
+                        ID = int.Parse (id)
+                    };
+                    
                     connector.AddGeneric (UUID.Zero, "WebGridNews", id, item.ToOSD ());
                     response = "<h3>News item editted successfully, redirecting to main page</h3>" +
                     "<script language=\"javascript\">" +

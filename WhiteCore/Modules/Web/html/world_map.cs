@@ -59,8 +59,8 @@ namespace WhiteCore.Modules.Web
             vars.Add ("WorldMap", translator.GetTranslatedString ("WorldMap"));
 
             var settings = webInterface.GetWebUISettings ();
-            vars.Add ("GridCenterX", settings.MapCenter.X);
-            vars.Add ("GridCenterY", settings.MapCenter.Y);
+            vars.Add ("MapCenterX", settings.MapCenter.X);
+            vars.Add ("MapCenterY", settings.MapCenter.Y);
 
             return vars;
         }

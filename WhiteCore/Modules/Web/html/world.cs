@@ -27,6 +27,8 @@
 
 using System.Collections.Generic;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
+using WhiteCore.Framework.Services;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.Web
 {
@@ -56,8 +58,44 @@ namespace WhiteCore.Modules.Web
             response = null;
             var vars = new Dictionary<string, object> ();
 
+            // get region list
+            List<Dictionary<string, object>> RegionListVars = new List<Dictionary<string, object>> ();
+            var sortBy = new Dictionary<string, bool> ();
+            //if (httpRequest.Query.ContainsKey ("region"))
+            //    sortBy.Add (httpRequest.Query ["region"].ToString (), true);
+            sortBy.Add ("RegionName", true);
+            var regionData = Framework.Utilities.DataManager.RequestPlugin<IRegionData> ();
+            var regions = regionData.Get (0, RegionFlags.Hyperlink | RegionFlags.Foreign | RegionFlags.Hidden,
+                                          null, null, sortBy);
+            foreach (var region in regions) {
+                string info;
+                info = (region.RegionArea < 1000000) ? region.RegionArea + " m2" : (region.RegionArea / 1000000) + " km2";
+                info = info + ", " + region.RegionTerrain;
+
+                RegionListVars.Add (new Dictionary<string, object> {
+                    { "RegionLocX", region.RegionLocX / Constants.RegionSize },
+                    { "RegionLocY", region.RegionLocY / Constants.RegionSize },
+                    { "RegionName", region.RegionName },
+                    { "RegionInfo", info},
+                    { "RegionStatus", region.IsOnline ? "yes" : "no"},
+                    { "RegionID", region.RegionID },
+                    { "RegionURI", region.RegionURI }
+                });
+            }
+
+            vars.Add ("RegionList", RegionListVars);
+            vars.Add ("RegionText", translator.GetTranslatedString ("Region"));
+
+
+
+
+
             vars.Add ("WorldMap", translator.GetTranslatedString ("WorldMap"));
             vars.Add ("WorldMapText", translator.GetTranslatedString ("WorldMapText"));
+
+            var settings = webInterface.GetWebUISettings ();
+            vars.Add ("MapCenterX", settings.MapCenter.X);
+            vars.Add ("MapCenterY", settings.MapCenter.Y);
 
             return vars;
         }

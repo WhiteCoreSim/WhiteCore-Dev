@@ -59,8 +59,19 @@ namespace WhiteCore.Modules.Web
             response = null;
             var vars = new Dictionary<string, object> ();
             IGenericsConnector connector = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
-            GridNewsItem news = connector.GetGeneric<GridNewsItem> (UUID.Zero, "WebGridNews",
-                                                                   httpRequest.Query ["newsid"].ToString ());
+            //GridNewsItem news = connector.GetGeneric<GridNewsItem> (UUID.Zero, "WebGridNews",
+            //                                                       httpRequest.Query ["newsid"].ToString ());
+ 
+            var newsItems = connector.GetGenerics<GridNewsItem> (UUID.Zero, "WebGridNews");
+            if (newsItems.Count == 0)
+                newsItems.Add (GridNewsItem.NoNewsItem);
+            else
+                vars.Add ("NewsList", newsItems.ConvertAll (item => item.ToDictionary ()));
+
+            /*
+
+
+
             if (news != null) {
                 vars.Add ("NewsTitle", news.Title);
                 vars.Add ("NewsText", news.Text);
@@ -75,7 +86,7 @@ namespace WhiteCore.Modules.Web
                 }
                 vars.Add ("NewsID", "-1");
             }
-
+*/
             vars.Add ("News", translator.GetTranslatedString ("News"));
             vars.Add ("NewsItemTitle", translator.GetTranslatedString ("NewsItemTitle"));
             vars.Add ("NewsItemText", translator.GetTranslatedString ("NewsItemText"));

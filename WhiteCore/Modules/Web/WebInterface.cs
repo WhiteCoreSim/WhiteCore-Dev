@@ -109,8 +109,29 @@ namespace WhiteCore.Modules.Web
             get { return MainServer.Instance.HostName + ":" + _port; }
         }
 
+        public string LocalHtmlPath {
+            get { return m_localHtmlPath; }
+        }
+
         public ITranslator EnglishTranslator {
             get { return _translators.FirstOrDefault (t => t.LanguageName == "en"); }
+        }
+
+        public List<Dictionary<string, object>> AvailableLanguages ()
+        {
+            var languages = new List<Dictionary<string, object>> ();
+
+            foreach (var trans in _translators) {
+                if (trans.LanguageName == "sk")         // skip the skeleton template
+                    continue;
+                
+                languages.Add (new Dictionary<string, object> {
+                    {"Href", "?language=" + trans.LanguageName},
+                    {"Code", trans.LanguageName},
+                    {"Language", trans.FullLanguageName}
+                });
+            }
+            return languages;
         }
 
         #endregion
@@ -367,7 +388,7 @@ namespace WhiteCore.Modules.Web
                     string [] split = line.Split (new string [] { "<!--#include file=\"", "\" -->" },
                                                 StringSplitOptions.RemoveEmptyEntries);
                     for (int i = 0; i < split.Length; i += 2) {
-                        string filename = GetFileNameFromHTMLPath (split [i], request.Query);
+                        string filename = GetFileNameFromHTMLPath (split [i+1], request.Query);
                         if (filename != null) {
                             string response;
                             Dictionary<string, object> newVars = AddVarsForPage (filename, originalFileName,
@@ -382,7 +403,7 @@ namespace WhiteCore.Modules.Web
                     string [] split = line.Split (new string [] { "<!--#include folder=\"", "\" -->" },
                                                 StringSplitOptions.RemoveEmptyEntries);
                     for (int i = split.Length % 2 == 0 ? 0 : 1; i < split.Length; i += 2) {
-                        string filename = GetFileNameFromHTMLPath (split [i], request.Query).Replace ("index.html", "");
+                        string filename = GetFileNameFromHTMLPath (split [i+1], request.Query).Replace ("index.html", "");
                         if (filename != null) {
                             if (Directory.Exists (filename)) {
                                 string response;
@@ -699,8 +720,23 @@ namespace WhiteCore.Modules.Web
             if (gridSettings == null) {
                 IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
                 var settings = generics.GetGeneric<GridSettings> (UUID.Zero, "GridSettings", "Settings");
-                if (settings == null)
+                if (settings == null) {
                     settings = new GridSettings ();
+
+                    // nothing saved so get the current system setup
+                    var sysAccts = Registry.RequestModuleInterface<ISystemAccountService> ();
+                    if (sysAccts != null) {
+                        settings.GovernorName = sysAccts.GovernorName;
+                        settings.RealEstateOwnerName = sysAccts.SystemEstateOwnerName;
+                        settings.BankerName = sysAccts.BankerName;
+                        settings.MarketplaceOwnerName = sysAccts.MarketplaceOwnerName;
+                    }
+                    var sysEstates = Registry.RequestModuleInterface<ISystemEstateService> ();
+                    if (sysEstates != null) {
+                        settings.MainlandEstateName = sysEstates.MainlandEstateName;
+                        settings.SystemEstateName = sysEstates.SystemEstateName;
+                    }
+                }
 
                 return settings;
             }
@@ -736,14 +772,20 @@ namespace WhiteCore.Modules.Web
     {
         public static readonly GridNewsItem NoNewsItem = new GridNewsItem () {
             ID = -1,
-            Text = "No news to report",
-            Time = DateTime.Now,
+            Text = "No news to report",         // should use translatore here //    translator.GetTranslatedString ("NoNews"))
+            NewsDateTime = DateTime.Now,
+            Day = DateTime.Now.ToString("dd"),
+            DayName = DateTime.Now.ToString ("dddd"),
+            Month = DateTime.Now.ToString ("MMM"),
             Title = "No news to report"
         };
 
         public string Title;
         public string Text;
-        public DateTime Time;
+        public DateTime NewsDateTime;
+        public string Day;
+        public string DayName;
+        public string Month;
         public int ID;
 
         public override OSDMap ToOSD ()
@@ -751,7 +793,10 @@ namespace WhiteCore.Modules.Web
             OSDMap map = new OSDMap ();
             map ["Title"] = Title;
             map ["Text"] = Text;
-            map ["Time"] = Time;
+            map ["Time"] = NewsDateTime;
+            map ["Day"] = NewsDateTime.ToString("dd");
+            map ["DayName"] = NewsDateTime.ToString ("dddd");
+            map ["Month"] = NewsDateTime.ToString ("MMM");
             map ["ID"] = ID;
             return map;
         }
@@ -760,7 +805,10 @@ namespace WhiteCore.Modules.Web
         {
             Title = map ["Title"];
             Text = map ["Text"];
-            Time = map ["Time"];
+            NewsDateTime = map ["Time"];
+            Day = map ["Day"];
+            DayName = map ["DayName"];
+            Month = map ["Month"];
             ID = map ["ID"];
         }
 
@@ -769,9 +817,12 @@ namespace WhiteCore.Modules.Web
             Dictionary<string, object> dictionary = new Dictionary<string, object> ();
 
             //dictionary.Add("NewsDate", Time.ToShortDateString());
-            dictionary.Add ("NewsDate", Culture.LocaleDate (Time));
+            dictionary.Add ("NewsDate", Culture.LocaleDate (NewsDateTime));
             dictionary.Add ("NewsTitle", Title);
             dictionary.Add ("NewsText", Text);
+            dictionary.Add ("NewsDay", Day);
+            dictionary.Add ("NewsDayName", DayName);
+            dictionary.Add ("NewsMonth", Month);
             dictionary.Add ("NewsID", ID);
 
             return dictionary;

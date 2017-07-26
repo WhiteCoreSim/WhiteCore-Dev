@@ -135,25 +135,6 @@ namespace WhiteCore.Modules.Web
             vars.Add("TooltipsWelcomeScreen", translator.GetTranslatedString("TooltipsWelcomeScreen"));
             vars.Add("TooltipsWorldMap", translator.GetTranslatedString("TooltipsWorldMap"));
 
-            // Style Switcher
-            vars.Add("styles1", translator.GetTranslatedString("styles1"));
-            vars.Add("styles2", translator.GetTranslatedString("styles2"));
-            vars.Add("styles3", translator.GetTranslatedString("styles3"));
-            vars.Add("styles4", translator.GetTranslatedString("styles4"));
-            vars.Add("styles5", translator.GetTranslatedString("styles5"));
-
-            vars.Add("StyleSwitcherStylesText", translator.GetTranslatedString("StyleSwitcherStylesText"));
-            vars.Add("StyleSwitcherLanguagesText", translator.GetTranslatedString("StyleSwitcherLanguagesText"));
-            vars.Add("StyleSwitcherChoiceText", translator.GetTranslatedString("StyleSwitcherChoiceText"));
-
-            // Language Switcher
-            vars.Add("en", translator.GetTranslatedString("en"));
-            vars.Add("fr", translator.GetTranslatedString("fr"));
-            vars.Add("de", translator.GetTranslatedString("de"));
-            vars.Add("it", translator.GetTranslatedString("it"));
-            vars.Add("es", translator.GetTranslatedString("es"));
-            vars.Add("nl", translator.GetTranslatedString("nl"));
-            vars.Add ("ru", translator.GetTranslatedString ("ru"));
 
             // Index Page
             vars.Add("HomeText", translator.GetTranslatedString("HomeText"));
@@ -177,8 +158,18 @@ namespace WhiteCore.Modules.Web
             else
                 vars.Add("SettingsUpdateRequired", "");
 
+            // user news inclusion
+            if (settings.LocalFrontPage == "") {
+                vars.Add ("LocalPage", false);
+                vars.Add ("LocalFrontPage", "");
+            } else {
+                vars.Add ("LocalPage", true);
+                vars.Add ("LocalFrontPage", settings.LocalFrontPage);
+            }
+
+            // Language Switcher
+            vars.Add ("Languages", webInterface.AvailableLanguages());
             vars.Add("ShowLanguageTranslatorBar", !settings.HideLanguageTranslatorBar);
-            vars.Add("ShowStyleBar", !settings.HideStyleBar);
 
             vars.Add("Maintenance", false);
             vars.Add("NoMaintenance", true);

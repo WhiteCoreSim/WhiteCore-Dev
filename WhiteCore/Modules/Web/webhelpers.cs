@@ -241,6 +241,28 @@ namespace WhiteCore.Modules.Web
             return categories;
         }
 
+        public static string EventCategoryImage (int category)
+        {
+            // return the image url for an event category
+            var url = "images/icons/";
+            switch (category) {
+            case 0:  return url + "event.png";
+            case 18: return url + "discussion.png";
+            case 19: return url + "sports.png";
+            case 20: return url + "livemusic.png";
+            case 22: return url + "commercial.png";
+            case 23: return url + "entertainment.png";
+            case 24: return url + "games.png";
+            case 25: return url + "pagent.png";
+            case 26: return url + "education.png";
+            case 27: return url + "arts.png";
+            case 28: return url + "charity.png";
+            case 29: return url + "misc.png";
+            }
+
+            return url + "event.png";
+        }
+
         public static List<Dictionary<string, object>> EventTimeframesSelections (int timeframe, ITranslator translator)
         {
 
@@ -570,7 +592,7 @@ namespace WhiteCore.Modules.Web
 
                 if (region == null)     // something screwy here
                     continue;
-                
+
                 // future proofing
                 if (region.IsForeign || region.IsHgRegion)
                     continue;

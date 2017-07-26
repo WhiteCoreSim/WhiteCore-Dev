@@ -37,6 +37,7 @@ namespace WhiteCore.Framework.Modules
         string RegistrationScreenURL { get; }
         string ForgotPasswordScreenURL { get; }
         string HelpScreenURL { get; }
+        string LocalHtmlPath { get; }
 
     }
 

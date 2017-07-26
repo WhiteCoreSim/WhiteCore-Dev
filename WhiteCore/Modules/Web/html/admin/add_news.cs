@@ -68,7 +68,15 @@ namespace WhiteCore.Modules.Web
                 string title = requestParameters["NewsTitle"].ToString();
                 string text = requestParameters["NewsText"].ToString();
                 IGenericsConnector connector = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector>();
-                GridNewsItem item = new GridNewsItem {Text = text, Time = DateTime.Now, Title = title};
+                GridNewsItem item = new GridNewsItem {
+                    Text = text,
+                    NewsDateTime = DateTime.Now,
+                    Day = DateTime.Now.ToString ("dd"),
+                    DayName = DateTime.Now.ToString ("dddd"),
+                    Month = DateTime.Now.ToString ("MMM"),
+                    Title = title
+                };
+
                 item.ID = connector.GetGenericCount(UUID.Zero, "WebGridNews") + 1;
                 connector.AddGeneric(UUID.Zero, "WebGridNews", item.ID.ToString(), item.ToOSD());
                 response = "<h3>News item added successfully, redirecting to main page</h3>" +

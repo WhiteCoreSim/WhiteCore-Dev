@@ -139,6 +139,16 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
             registry.RegisterModuleInterface<ISystemAccountService> (this);
             m_registry = registry;
             m_config = config;
+
+            // check for WebUI overrides
+            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
+            var settings = generics.GetGeneric<Modules.Web.GridSettings> (UUID.Zero, "GridSettings", "Settings");
+            if (settings != null) {
+                governorName = settings.GovernorName;
+                realEstateOwnerName = settings.RealEstateOwnerName;
+                bankerName = settings.BankerName;
+                marketplaceOwnerName = settings.MarketplaceOwnerName;
+            }
         }
 
         public void Start (IConfigSource config, IRegistryCore registry)

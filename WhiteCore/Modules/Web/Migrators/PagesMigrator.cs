@@ -70,23 +70,22 @@ namespace WhiteCore.Modules.Web
                 MenuTitle = "MenuWorld",
                 MenuToolTip = "TooltipsMenuWorld",
                 Children = new List<GridPage> {
-                    new GridPage {
+/* not required                    new GridPage {
                         ShowInMenu = true,
                         MenuID = "world",
                         Location = "world.html",
                         MenuPosition = 0,
                         MenuTitle = "MenuWorldMap",
                         MenuToolTip = "TooltipsMenuWorldMap"
-                    },
-                    /* removed as region list now provides search capabilitie
-                     new GridPage {
-                        ShowInMenu = true,
-                        MenuID = "region_search",
-                        Location = "region_search.html",
-                        MenuPosition = 1,
-                        MenuTitle = "MenuRegionSearch",
-                        MenuToolTip = "TooltipsMenuRegionSearch"
                     }, */
+                    new GridPage {
+                        ShowInMenu = true,
+                        MenuID = "region_map",
+                        Location = "region_map.html",
+                        MenuPosition = 1,
+                        MenuTitle = "MenuRegionMap",
+                        MenuToolTip = "TooltipsMenuRegionMap"
+                    }, 
                     new GridPage {
                         ShowInMenu = true,
                         MenuID = "region_list",
@@ -401,7 +400,7 @@ namespace WhiteCore.Modules.Web
 
             // register
             _rootPage.Children.Add (new GridPage {
-                ShowInMenu = true,
+                ShowInMenu = false,
                 LoggedOutRequired = true,
                 MenuID = "register",
                 Location = "register.html",
@@ -444,6 +443,12 @@ namespace WhiteCore.Modules.Web
 
 
             // these are non menu, indivual pages that can be called
+            _rootPage.Children.Add (new GridPage {
+                ShowInMenu = false,
+                MenuID = "forgotpass",
+                Location = "forgot_pass.html"
+            });
+
             _rootPage.Children.Add (new GridPage {
                 ShowInMenu = false,
                 MenuID = "news_info",
@@ -560,32 +565,32 @@ namespace WhiteCore.Modules.Web
 
         public static bool RequiresUpdate ()
         {
-            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
+            var generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
 
-            OSDWrapper version = generics.GetGeneric<OSDWrapper> (UUID.Zero, Schema + "Version", "");
+            var version = generics.GetGeneric<OSDWrapper> (UUID.Zero, Schema + "Version", "");
             return version == null || version.Info.AsInteger () < CurrentVersion;
         }
 
         public static uint GetVersion ()
         {
-            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
+            var generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
 
-            OSDWrapper version = generics.GetGeneric<OSDWrapper> (UUID.Zero, Schema + "Version", "");
+            var version = generics.GetGeneric<OSDWrapper> (UUID.Zero, Schema + "Version", "");
             return version == null ? 0 : (uint)version.Info.AsInteger ();
         }
 
         public static bool RequiresInitialUpdate ()
         {
-            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
+            var generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
 
-            OSDWrapper version = generics.GetGeneric<OSDWrapper> (UUID.Zero, Schema + "Version", "");
+            var version = generics.GetGeneric<OSDWrapper> (UUID.Zero, Schema + "Version", "");
             return version == null || version.Info.AsInteger () < 1;
         }
 
         public static void ResetToDefaults ()
         {
             InitializeDefaults ();
-            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
+            var generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
 
             //Remove all pages
             generics.RemoveGeneric (UUID.Zero, Schema);
@@ -596,7 +601,7 @@ namespace WhiteCore.Modules.Web
 
         public static bool CheckWhetherIgnoredVersionUpdate (uint version)
         {
-            return version != PagesMigrator.CurrentVersion;
+            return version != CurrentVersion;
         }
     }
 }

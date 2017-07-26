@@ -79,6 +79,14 @@ namespace WhiteCore.Services.GenericServices.SystemEstateService
 
             registry.RegisterModuleInterface<ISystemEstateService> (this);
             m_registry = registry;
+
+            // check for WebUI overrides
+            IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
+            var settings = generics.GetGeneric<Modules.Web.GridSettings> (UUID.Zero, "GridSettings", "Settings");
+            if (settings != null) {
+                mainlandEstateName = settings.MainlandEstateName;
+                systemEstateName = settings.SystemEstateName;
+            }
         }
 
         public void Start (IConfigSource config, IRegistryCore registry)

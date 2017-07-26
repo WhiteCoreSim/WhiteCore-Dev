@@ -1739,20 +1739,27 @@ namespace WhiteCore.Modules.Inventory
         /// <param name="server"></param>
         OSDMap EventManagerOnRegisterCaps(UUID agentID, IHttpServer server)
         {
+            // alternative to be checked - greythane -
+//            HttpServerHandle scriptMethod = delegate (string path, Stream request,
+//                  OSHttpRequest httpRequest, OSHttpResponse httpResponse) {
+//                      return ScriptTaskInventory (agentID, request);
+//                  };
+
             OSDMap retVal = new OSDMap();
             retVal["UpdateScriptTaskInventory"] = CapsUtil.CreateCAPS("UpdateScriptTaskInventory", "");
             retVal["UpdateScriptTask"] = retVal["UpdateScriptTaskInventory"];
 
             //Region Server bound
-            server.AddStreamHandler(new GenericStreamHandler("POST", retVal["UpdateScriptTask"],
-                                                             delegate(string path, Stream request,
+// alt            server.AddStreamHandler (new GenericStreamHandler ("POST", retVal ["UpdateScriptTask"], scriptMethod));
+                                                                 
+           server.AddStreamHandler (new GenericStreamHandler ("POST", retVal ["UpdateScriptTask"],
+                                                             delegate (string path, Stream request,
                                                                       OSHttpRequest httpRequest,
-                                                                      OSHttpResponse httpResponse)
-                                                                 {
-                                                                     return ScriptTaskInventory(agentID, path, request,
-                                                                                                httpRequest,
-                                                                                                httpResponse);
-                                                                 }));
+                                                                      OSHttpResponse httpResponse) {
+                                                                          return ScriptTaskInventory (agentID, path, request,
+                                                                                                     httpRequest,
+                                                                                                     httpResponse);
+                                                                      }));
 
             retVal["UpdateGestureTaskInventory"] = CapsUtil.CreateCAPS("UpdateGestureTaskInventory", "");
             retVal["UpdateNotecardTaskInventory"] = retVal["UpdateGestureTaskInventory"];
@@ -1791,8 +1798,8 @@ namespace WhiteCore.Modules.Inventory
         /// <param name="httpRequest">HTTP request header object</param>
         /// <param name="httpResponse">HTTP response header object</param>
         /// <returns></returns>
-        public byte[] ScriptTaskInventory(UUID AgentID, string path, Stream request, OSHttpRequest httpRequest,
-                                          OSHttpResponse httpResponse)
+        public byte [] ScriptTaskInventory (UUID AgentID, string path, Stream request, 
+                                            OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {
             try
             {
@@ -1921,7 +1928,7 @@ namespace WhiteCore.Modules.Inventory
         /// </summary>
         public class ItemUpdater
         {
-            readonly string uploaderPath = String.Empty;
+            readonly string uploaderPath = string.Empty;
             readonly UUID inventoryItemID;
             readonly IHttpServer httpListener;
             readonly UUID agentUUID;
@@ -1967,7 +1974,7 @@ namespace WhiteCore.Modules.Inventory
         /// </summary>
         public class TaskInventoryScriptUpdater
         {
-            readonly string uploaderPath = String.Empty;
+            readonly string uploaderPath = string.Empty;
             readonly UUID inventoryItemID;
             readonly UUID primID;
             readonly bool isScriptRunning;
@@ -2118,7 +2125,7 @@ namespace WhiteCore.Modules.Inventory
         /// </summary>
         public class TaskInventoryUpdater
         {
-            readonly string uploaderPath = String.Empty;
+            readonly string uploaderPath = string.Empty;
             readonly UUID inventoryItemID;
             readonly UUID primID;
             readonly IHttpServer httpListener;

@@ -127,8 +127,10 @@ namespace WhiteCore.Modules.Web
                     eventListVars.Add (new Dictionary<string, object> {
                         { "EventID", "" },
                         { "CreatorUUID", "" },
-                        { "EventDate", "" },
-                        { "EventDateUTC", "" },
+                        { "EventDateTimeUTC", "" },
+                        { "EventDateTime", "" },
+                        { "EventHourTime", "" },
+                        { "EventMinuteTime", "" },
                         { "CoverCharge", "" },
                         { "Duration", "" },
                         { "Name", "" },
@@ -142,7 +144,8 @@ namespace WhiteCore.Modules.Web
                         { "LocalPosZ", "" },
                         { "Maturity", "" },
                         { "EventFlags", "" },   // same as maturity??
-                        { "Category", "" }
+                        { "Category", "" },
+                        { "CategoryImage",WebHelpers.EventCategoryImage(0) }
                 });
                 } else {
                     foreach (var evnt in events) {
@@ -150,8 +153,10 @@ namespace WhiteCore.Modules.Web
                         eventListVars.Add (new Dictionary<string, object> {
                             { "EventID", evnt.eventID },
                             { "CreatorUUID", evnt.creator },
-                            { "EventDate", evnt.date },
-                            { "EventDateUTC", Culture.LocaleShortDateTime(evntDateTime)},
+                            { "EventDateTimeUTC", evnt.date },
+                            { "EventDateTime", Culture.LocaleShortDateTime(evntDateTime)},
+                            { "EventHourTime", evntDateTime.ToString ("hh") },
+                            { "EventMinuteTime", evntDateTime.ToString ("mm") },
                             { "CoverCharge", currencySymbol + " " + evnt.amount },
                             { "Duration", WebHelpers.EventDuration((int)evnt.duration,translator) },
                             { "Name", evnt.name },
@@ -165,7 +170,8 @@ namespace WhiteCore.Modules.Web
                             { "LocalPosZ",evnt.regionPos.Z.ToString () },
                             { "Maturity", WebHelpers.EventMaturity(evnt.maturity) },
                             { "EventFlags", evnt.eventFlags },
-                            { "Category",  WebHelpers.EventCategory(int.Parse(evnt.category), translator) }
+                            { "Category",  WebHelpers.EventCategory(int.Parse(evnt.category), translator) },
+                            { "CategoryImage", WebHelpers.EventCategoryImage(int.Parse(evnt.category)) }
                         });
                     }
                 }

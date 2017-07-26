@@ -27,6 +27,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using OpenMetaverse;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
@@ -108,25 +109,29 @@ namespace WhiteCore.Modules.Web
             vars.Add ("ForgotPassword", translator.GetTranslatedString ("ForgotPassword"));
             vars.Add ("Submit", translator.GetTranslatedString ("Login"));
 
-            // greythane - 20160826 - do menu and setting updates
             var settings = webInterface.GetWebUISettings ();
-
-            if (PagesMigrator.RequiresUpdate () &&
-                PagesMigrator.CheckWhetherIgnoredVersionUpdate (settings.LastPagesVersionUpdateIgnored))
-                vars.Add ("PagesUpdateRequired",
-                         translator.GetTranslatedString ("Pages") + " " +
-                         translator.GetTranslatedString ("UpdateRequired"));
-            else
-                vars.Add ("PagesUpdateRequired", "");
-            if (SettingsMigrator.RequiresUpdate () &&
-                SettingsMigrator.CheckWhetherIgnoredVersionUpdate (settings.LastSettingsVersionUpdateIgnored))
-                vars.Add ("SettingsUpdateRequired",
-                         translator.GetTranslatedString ("Settings") + " " +
-                         translator.GetTranslatedString ("UpdateRequired"));
-            else
-                vars.Add ("SettingsUpdateRequired", "");
-
             vars.Add ("ShowSlideshowBar", !settings.HideSlideshowBar);
+
+            // build a list of available images
+            var galleryListVars = new List<Dictionary<string, object>> ();
+            if (!settings.HideSlideshowBar) {
+                var defaultGalleryDir = Path.Combine (webInterface.LocalHtmlPath, "images/gallery");
+
+                if (Directory.Exists (defaultGalleryDir)) {
+                    var images = new List<string> (Directory.GetFiles (defaultGalleryDir, "*.jpg"));
+                    images.AddRange (new List<string> (Directory.GetFiles (defaultGalleryDir, "*.png")));
+                    foreach (string file in images) {
+                        galleryListVars.Add (new Dictionary<string, object> {
+                            { "ImageSRC", "local/images/gallery/"+ Path.GetFileName(file) },
+                            { "ImageTitle", Path.GetFileNameWithoutExtension (file) },
+                            { "ImageInfo", "some info here" }
+                        });
+                    }
+                }
+                if (galleryListVars.Count == 0)
+                    vars ["ShowSlideshowBar"] = false;
+            }
+            vars.Add ("GalleryImages", galleryListVars);
 
             // user setup news inclusion
             if (settings.LocalFrontPage == "") {

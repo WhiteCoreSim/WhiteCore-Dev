@@ -36,7 +36,7 @@ namespace WhiteCore.Modules.Web.Translators
         }
 
         public string FullLanguageName {
-            get { return "Italian"; }
+            get { return "Italiano"; }
         }
 
         public string GetTranslatedString (string key)

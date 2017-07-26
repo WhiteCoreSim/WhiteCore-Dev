@@ -31,14 +31,13 @@ using WhiteCore.Framework.Services;
 
 namespace WhiteCore.Modules.Web
 {
-    public class SLMapAPIPage : IWebInterfacePage
+    public class MapAPIPage : IWebInterfacePage
     {
         public string [] FilePath {
             get {
-                return new []
-                           {
-                               "html/map/slmapapi.js"
-                           };
+                return new [] {
+                    "html/map/mapapi.js"
+                };
             }
         }
 
@@ -64,6 +63,11 @@ namespace WhiteCore.Modules.Web
                 vars.Add ("WorldMapServiceURL", mapUrl.Remove (mapUrl.Length - 1));
                 vars.Add ("WorldMapAPIServiceURL", mapAPIUrl.Remove (mapAPIUrl.Length - 1));
                 vars.Add ("MainServerURL", webInterface.GridURL);
+
+                //var settings = webInterface.GetWebUISettings ();
+                //vars.Add ("MapCenterX", settings.MapCenter.X);
+                //vars.Add ("MapCenterY", settings.MapCenter.Y);
+
             }
 
             return vars;
