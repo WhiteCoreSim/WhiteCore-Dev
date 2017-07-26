@@ -1,0 +1,59 @@
+Backing up your WhiteCore data
+------------------------------
+
+For standard installations the data structure is defined as ...
+
+WhiteCoreSim
+  - bin                      -- The main operating files
+  - Config                   -- Configuration settings
+  - Data                     -- Main data
+  - WhiteCoreDocs            -- Documentation
+  - WhiteCoreHelpers         -- Additional information
+  - Various support files    -- *.bat, *.sh, *.txt
+
+
+WhiteCore stores all necessary data in the 'Data' directory except for those installations that are using MySql/MariaDb for their volatile data (User details, inventory etc)
+
+From your installation directory..
+
+If you backup the entire 'Data' directory you will get most of the valid data.
+This includes your region details, scripts, archives etc and also your assets if you are using the FileBased Asset system (the default)
+
+The rest of the required data is stored in (probably) the MySql database.
+These databases contain user settings, inventory, groups etc so you will need to dump the entire database to an external file using mysqldump, phpadmin or a similar process so that it can be restored if required. (I use Sequel Pro on the Mac)
+
+E.G. Using the commandline 'mysqldump'
+$ mysqldump -u whitecore -p whitecore > whitecore_backup.sql
+
+The options are...
+  -u whitecore  -- is the MySql user that can access the database (You may have changed this)
+  -p            -- prompt for the database user password (default- whitecorepass.  You did change this I hope)
+  whitecore     -- the database you are backing up
+  whitecore_backup.sql  -- the sql dumpof the database.  Note: This can get very large
+
+If you are using SQLite all this data is contined in the 'Data' directory and will be backed up using a standard file copy.
+
+NOTE: If you use additional installations for seperate grid connected regions etc you will need to backup each of the relevant Data directories.
+
+The Config directory does hold your current configuration setup.  This directory contains txt files and can be copied using your file manager.
+
+
+
+The rest does not need to be backed up
+--------------------------------------
+
+All the rest of the scripts and directories in the top level installation directory are not really necessary as they can be reproduced by copying from your repo or a framework package.
+e.g.: '..docs', '*.sh' etc
+
+The 'bin' directory can be backed up if desired but this is the directory that will be overwritten if there is an update.
+
+
+Questions?
+==========
+Checkout http://whitecore-sim.org, catch me on the '#whitecore-support' irc channel on freenode,
+or check into the Google+ group at https://plus.google.com/communitites/113034607546142208907
+
+
+Rowan
+<greythane@gmail.com>
+July 2017 

@@ -1,0 +1,10 @@
+As of Version 0.9.5 the initial starting default avatar has been updated.
+The starter avatar IAR was created by Beebo Brink.
+
+The avatar comprises of:
+* Avatar shape 
+* Skin (textures by Eloh Eliot) 
+* System hair with glossy hair texture 
+* Eyes 
+* Blue Jeans (textures by Aimee Weber) 
+* Shirt and sweater (textures by Aimee Weber) 
