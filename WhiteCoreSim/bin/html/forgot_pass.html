@@ -1,59 +1,40 @@
 <!-- params to replace
 SystemURL
 SystemName
-ErrorMessage     Error message handling
-Login            Login
-UserNameText     User Name
-PasswordText     Password
-ForgotPassword   Forgot Password?
-Submit           Submit
+ErrorMessage
+Login
+UserNameText
+PasswordText
+ForgotPassword
+Submit
 
 -->
-<div id="ContentHeaderCenter">
-  <h2>{SystemName}: {ForgotPassword}</h2>
-</div>
-<div id="error_message" class="error_message"><h3>{ErrorMessage}</h3></div>
 
-<form action="forgot_pass.html" id="forgotpass_form" method="POST">
-<table id="login">
-  <caption>Request a new password</caption>
+<section class="sign-up section-padding text-center" id="download">
+  <div class="container">
+    <div class="row">
+      <div id="error_message" class="error_message"><h3>{ErrorMessage}</h3></div>
+      <h3>{ForgotPassword}</h3>
+      <img src="images/reset_password.png" />
+      <div class="col-md-6 col-md-offset-3">
+        <form class="signup-form" action="forgot_pass.html" id="forgotpass_form" method="POST" role="form">
+          <div class="form-input-group">
+            <i class="fa fa-user"></i>
+            <input type="text" class="" placeholder="{UserNameText}" required name="username" id="login_input">
+          </div>
+          <div class="form-input-group">
+            <i class="fa fa-envelope"></i>
+            <input type="text" class="" placeholder="{UserEmailText}" required name="UserEmail">
+          </div>
+          <input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
+          <button type="submit" class="btn-fill sign-up-btn">{Submit}</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
 
-  <thead>
-    <tr>
-      <th class="login_left"></th>
-      <th class="login_right"></th>
-    </tr>
-  </thead>
 
-  <tfoot>
-    <tr>
-      <th class="login_left"></th>
-      <th class="login_right"></th>
-    </tr>
-  </tfoot>
-
-  <tbody>
-    <tr>
-    	<td colspan="2"> Please enter you account name</td>
-    </tr>
-    <tr>
-      <td class="login_left"><p id="logname_label">{UserNameText}*</p></td>
-      <td class="login_right"><input require="true" label="username" id="login_input" name="username" type="text"/></td>
-    </tr>
-    <tr>
-      <td class="login_left"><p>{UserEmailText}*</p></td>
-      <td class="login_right" colspan="3"><input label="UserEmail" id="UserEmail" name="UserEmail" type="text" size="40" maxlength="40" value=""></td>
-    </tr>
-    <tr>
-      <td class="login_left"></td>
-      <td class="login_right">
-		<input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
-        <button id="login_button" type="Submit" name="Submit" value="Submit">{Submit}</button>
-    </td>
-    </tr>
-  </tbody>
-</table>
-</form>
 
 <script>
   $(document).ready(function() { document.getElementById("login_input").focus(); } );

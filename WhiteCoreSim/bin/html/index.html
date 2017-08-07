@@ -5,180 +5,231 @@
 	<title>{SystemName}</title>
 	<meta name="keywords" content="{SystemName}" />
 	<meta name="description" content="{SystemName}"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
 	<link rel="shortcut icon" href="images/icons/favicon.ico" />
 
-	<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css">
-	<link href="css/datatables.min.css" rel="stylesheet" type="text/css">
-	<link href="css/datepick.css" rel="stylesheet" type="text/css">
+  <link type="text/css" rel="stylesheet" href="css/normalize.min.css">
+	<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" >
+	<link type="text/css" rel="stylesheet" href="css/datatables.min.css">
+	<link type="text/css" rel="stylesheet" href="css/datepick.css">
+  <link type="text/css" rel="stylesheet" href="css/jquery.fancybox.css">
+  <link type="text/css" rel="stylesheet" href="css/flexslider.css">
+	<link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/queries.css">
+  <link type="text/css" rel="stylesheet" href="css/etline-font.css">
+  <link type="text/css" rel="stylesheet" href="css/animate.min.css">
+  <link type="text/css" rel="stylesheet" href="css/font-awesome.css">
 
-	<!-- StyleSwitch -->
-	<link href="css/styles1.css" rel="stylesheet" type="text/css" media="screen" title="styles1" />
-	<link href="css/styles2.css" rel="alternate stylesheet" type="text/css" title="styles2" media="screen" />
-	<link href="css/styles3.css" rel="alternate stylesheet" type="text/css" title="styles3" media="screen" />
-	<link href="css/styles4.css" rel="alternate stylesheet" type="text/css" title="styles4" media="screen" />
-	<link href="css/styles5.css" rel="alternate stylesheet" type="text/css" title="styles5" media="screen" />
-
-	<style type="text/css">#container{display:none;}</style>
+	<script src="js/jquery-3.1.1.min.js"></script>
+  <script src="js/modernizr-2.8.3-respond-1.4.2.min.js"></script>
+<!--	<style type="text/css">#old_container{display:none;}</style> -->
 
 </head>
 
 <body>
-		<div id="toolbar">
-	{IfShowLanguageTranslatorBarBegin}
-		  <div class=languageswitch>
-		    <ul>
-			{StyleSwitcherLanguagesText}:
-			  <li><a href="?language=en" rel="en" class="languageswitch" alt="{en}">
-			    <img src="images/flags/flag-en.png" alt="{en}">en</a></li>
-			  <li><a href="?language=fr" rel="fr" class="languageswitch" alt="{fr}">
-			  	<img src="images/flags/flag-fr.png" alt="{fr}">fr</a></li>
-			  <li><a href="?language=de" rel="de" class="languageswitch" alt="{de}">
-			  	<img src="images/flags/flag-de.png" alt="{de}">de</a></li>
-			  <li><a href="?language=it" rel="it" class="languageswitch" alt="{it}">
-			    <img src="images/flags/flag-it.png" alt="{it}">it</a></li>
-			  <li><a href="?language=es" rel="es" class="languageswitch" alt="{es}">
-			  	<img src="images/flags/flag-es.png" alt="{es}">es</a></li>
-			  <li><a href="?language=nl" rel="nl" class="languageswitch" alt="{nl}">
-			  	<img src="images/flags/flag-nl.png" alt="{nl}">nl</a></li>
-  		      <li><a href="?language=ru" rel="ru" class="languageswitch" alt="{ru}">
-			  	<img src="images/flags/flag-ru.png" alt="{ru}">ru</a></li>
-              <li><a href="?language=zh_CN" rel="zh_CN" class="languageswitch" alt="{zh_CN}">
-                <img src="images/flags/flag-zh_CN.png" alt="{zh_CN}">zh_CN</a></li>
-			</ul>
-		  </div>
-	{IfShowLanguageTranslatorBarEnd}
-
-	{IfShowStyleBarBegin}
-		  <div class=styleswitch>
-		    <ul>
-			{StyleSwitcherStylesText}:
-			  <li><a href="serversideSwitch.html?style=style1" rel="styles1" class="styleswitch" alt="{styles1}" title="{styles1}">1</a></li>
-			  <li><a href="serversideSwitch.html?style=style2" rel="styles2" class="styleswitch" alt="{styles2}" title="{styles2}">2</a></li>
-			  <li><a href="serversideSwitch.html?style=style3" rel="styles3" class="styleswitch" alt="{styles3}" title="{styles3}">3</a></li>
-			  <li><a href="serversideSwitch.html?style=style4" rel="styles4" class="styleswitch" alt="{styles4}" title="{styles4}">4</a></li>
-			  <li><a href="serversideSwitch.html?style=style5" rel="styles5" class="styleswitch" alt="{styles5}" title="{styles5}">5</a></li>
-			{StyleSwitcherChoiceText}: <span id="st1">1</span><span id="st2">2</span><span id="st3">3</span><span id="st4">4</span><span id="st5">5</span>| Copyright&nbsp;&copy;&nbsp;<a class='copyright' href="/" alt="{SystemName}" title="{SystemName}">{SystemName}</a>&nbsp;2015-2016
-			</ul>
-		  </div>
-	{IfShowStyleBarEnd}
-		  <span class="clear"></span>
-		</div>
-	<div >
-		<img id=mainImage src="../images/icons/spacer.gif" alt="" title="" />
-	</div>
 
 	{IfMaintenanceBegin}
-	<!-- #include file="/maintenance.html" -->
+  <section class="hero">
+	<!--#include file="/maintenance.html" -->
+	</section>
 	{IfMaintenanceEnd}
+
 	{IfNoMaintenanceBegin}
-	<div id="container">
-		<!-- removed 20140429 - greythane
-		<a href="https://github.com/whitecoresim/" target="_blank">
-		<img style="position: absolute; top: 0; right: 0; border: 0;" src="images/icons/forkme.png" title="Fork&nbspme&nbspon&nbspGitHub" alt="Fork&nbspme&nbspon&nbspGitHub"></a>
-		-->
-		<div id="top" style="margin-top:-20px;">
-			<h1><a class="logofade" href="/" alt="{SystemName}" title="{SystemName}">{SystemName}</a></h1>
-			<ul id="menu">
-	{MenuItemsArrayBegin}
-	{IfShowInMenuBegin}
-				<li id="{MenuItemID}" class="active" alt="{MenuItemTitle}" title="{MenuItemTitleHelp}">{MenuItemTitle}
-	{IfHasChildrenBegin}
-					<ul id="submenu">
-	{ChildrenMenuItemsArrayBegin}
-	{IfChildShowInMenuBegin}
-						<li id="{ChildMenuItemID}" alt="{ChildMenuItemTitle}" title="{ChildMenuItemTitleHelp}">{ChildMenuItemTitle}</li>
-	{IfChildShowInMenuEnd}
-	{ChildrenMenuItemsArrayEnd}
+  <section class="hero">
+
+    <section class="navigation">
+      <header>
+        <div class="header-content">
+<!--          <div class="logo">
+          	<a href="#"><img src="../images/logo.png" alt="WhiteCore Sim logo"></a>
+					</div> -->
+					<div class="systemname">
+						<h3>{SystemName}</h3>
+					</div>
+	       	<div id="toolbar" class="toolbar">
+	      		<div class="toolbarsocial">
+	        		<ul class="toolbar-group">
+								<li><a href="https://twitter.com/whitecoresim" class="icon alt fa-twitter"><span class="label">Twitter</span></a></li>
+								<li><a href="#" class="icon alt fa-facebook"><span class="label">Facebook</span></a></li>
+								<li><a href="#" class="icon alt fa-youtube"><span class="label">YouTube</span></a></li>
+	        		</ul>
+		      	</div>
+		    	</div>
+          <div class="header-nav">
+            <nav>
+              <ul class="primary-nav" id="topmenu">
+							{MenuItemsArrayBegin}
+							{IfShowInMenuBegin}
+						  	<li id="{MenuItemID}" class="active" alt="{MenuItemTitle}" title="{MenuItemTitleHelp}">{MenuItemTitle}
+								{IfHasChildrenBegin}
+									<ul id="submenu">
+								{ChildrenMenuItemsArrayBegin}
+								{IfChildShowInMenuBegin}
+										<li id="{ChildMenuItemID}" alt="{ChildMenuItemTitle}" title="{ChildMenuItemTitleHelp}">{ChildMenuItemTitle}</li>
+								{IfChildShowInMenuEnd}
+								{ChildrenMenuItemsArrayEnd}
+									</ul>
+								{IfHasChildrenEnd}
+								</li>
+							{IfShowInMenuEnd}
+							{MenuItemsArrayEnd}
+              </ul>
+              <ul class="member-actions" id="member-actions">
+                {IsNotAuthenticatedBegin}
+                <li id="login" title="Log onto WebUI"><a href="#" class="login" >Log in</a>
+                    <li class="forgotpass" id="forgot_pass" title="Reset password"><a href="#">
+                    <img src="/images/reset_password.png"  title="Reset password"/></a></li>
+                </li>
+                <li id="register"><a href="#" class="btn-white btn-small">Sign up</a></li>
+                {IsNotAuthenticatedEnd}
+                {IsAuthenticatedBegin}
+                <li id="logout" title="Log out of WebUI"><a href="#" class="btn-white btn-small">Logout</a></li>
+                {IsAuthenticatedEnd}
+              </ul>
+          	</nav>
+          </div>
+
+	 				{IfShowLanguageTranslatorBarBegin}
+		      <div id="language" class="languageswitch">
+		        <a rel="nofollow" id="language-drop" href="javascript:toggleLanguage();">
+		          <span>LANGUAGE &#9663;</span>
+		        </a>
+		        <ul id="languageList" style="display:none;">
+							{LanguagesArrayBegin}
+					  	<li><a href="{Href}" rel="{Code}" class="languageswitch" alt="{Code}">
+				      <img src="images/flags/flag-{Code}.png" alt="{Code}">{Language}</a></li>
+						{LanguagesArrayEnd}
+						</ul>
+					{IfShowLanguageTranslatorBarEnd}
+	    		</div>
+
+      	  <div class="navicon">
+        	  <a class="nav-toggle" href="#"><span></span></a>
+        	</div>
+      	</div>
+      </header>
+    </section>
+
+    <div class="container" id="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="hero-content text-center" id="content">
+       			<div id="loading">
+							<img src="../images/icons/loading.gif" alt="Loading..." />
+						</div>
+        	</div>
+      	</div>
+    	</div>
+    </div>
+  </section>
+
+  <section class="intro section-padding">
+    <div class="container">
+      <div class="row">
+      <h2>WhiteCore Sim </h2>
+        <div class="col-md-4 intro-feature">
+          <div class="intro-icon">
+            <span data-icon="&#xe033;" class="icon"></span>
+          </div>
+          <div class="intro-content">
+            <h5>Easily Customised</h5>
+              <p>Easily customise WhiteCore to suit your needs. Configurations and startup options are available for both Standalone and Grid modes of operation.</p>
+          </div>
+      	</div>
+      	<div class="col-md-4 intro-feature">
+          <div class="intro-icon">
+            <span data-icon="&#xe030;" class="icon"></span>
+          </div>
+          <div class="intro-content">
+            <h5>Modern Design</h5>
+            <p>Designed with speed and flexibility in mind, WhiteCore will speed your development of that new virtual empire.</p>
+          </div>
+      	</div>
+      	<div class="col-md-4 intro-feature">
+          <div class="intro-icon">
+            <span data-icon="&#xe046;" class="icon"></span>
+          </div>
+          <div class="intro-content last">
+            <h5>Responsive Development</h5>
+            <p> The WhiteCore code is under continual development and refinement. The developers are available and responsive to both feature requests and bug reports.</p>
+          </div>
+      	</div>
+      </div>
+    </div>
+  </section>
+  {IfNoMaintenanceEnd}
+
+  {IfLocalPageBegin}
+  <section class="localnews_section section-padding">
+    <div class="container">
+      <div class="row">
+        <div class="localnews">
+          <!--#include file="{LocalFrontPage}" -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {IfLocalPageEnd}
+
+	<footer>
+    <div class="container">
+      <div class="row">
+       <div class="col-md-7">
+           <div class="footer-links">
+                      <ul class="footer-group">
+                          <li><a href="#">Features</a></li>
+                          <li><a href="#">Pricing</a></li>
+                          <li><a href="#">Sign up</a></li>
+                      </ul>
+                      <p>Copyright ¬© 2017 <a href="#">WhiteCore Sim</a><br>
+                      <a href="http://whitecore-sim.org/licensing/">Licence</a> | Crafted with <span class="fa fa-heart pulse2"></span> by <a href="http://whitecore-sim.org/">WhiteCore Sim</a>.</p> -->
+                  </div>
+              </div>
+              <div class="social-share">
+           		<ul class="footer-group">
+                  <p>Share WhiteCore with your friends</p>
+
+						<li><a href="https://twitter.com/whitecoresim" class="icon alt fa-twitter"><span class="label">Twitter</span></a></li>
+						<li><a href="#" class="icon alt fa-facebook"><span class="label">Facebook</span></a></li>
+						<li><a href="#" class="icon alt fa-linkedin"><span class="label">LinkedIn</span></a></li>
+						<li><a href="#" class="icon alt fa-instagram"><span class="label">Instagram</span></a></li>
+						<li><a href="#" class="icon alt fa-github"><span class="label">GitHub</span></a></li>
+						<li><a href="mailto:greythane@gmail.com" class="icon alt fa-envelope"><span class="label">Email</span></a></li>
 					</ul>
-	{IfHasChildrenEnd}
-				</li>
-	{IfShowInMenuEnd}
-	{MenuItemsArrayEnd}
-			</ul>
-		</div>
 
-		<span class="clear"></span>
+              </div>
+              <p class=textsize>{PagesUpdateRequired}</p>
+							<p class=textsize>{SettingsUpdateRequired}</p>
 
-		<div id="loading">
-			<img src="../images/icons/loading.gif" alt="Loading..." />
-		</div>
+          </div>
+      </div>
+  </footer>
 
-		<p class=jclock1><span id=jclock1></span></p>
 
-		<div id="content">
-		</div>
-
-		<span class="clear"></span>
-
-<!--
-		<div id="footer">
-
-	{IfShowLanguageTranslatorBarBegin}
-		  <div class=languageswitch>
-		    <ul>
-			{StyleSwitcherLanguagesText}:
-			  <li><a href="?language=en" rel="en" class="languageswitch" alt="{en}">
-			      <img src="images/flags/flag-en.png" alt="{en}">en</a></li>
-			  <li><a href="?language=fr" rel="fr" class="languageswitch" alt="{fr}">
-			  		<img src="images/flags/flag-fr.png" alt="{fr}">fr</a></li>
-			  <li><a href="?language=de" rel="de" class="languageswitch" alt="{de}">
-			  		<img src="images/flags/flag-de.png" alt="{de}">de</a></li>
-			  <li><a href="?language=it" rel="it" class="languageswitch" alt="{it}">
-			  		<img src="images/flags/flag-it.png" alt="{it}">it</a></li>
-			  <li><a href="?language=es" rel="es" class="languageswitch" alt="{es}">
-			  	<img src="images/flags/flag-es.png" alt="{es}">es</a></li>
-			  <li><a href="?language=nl" rel="nl" class="languageswitch" alt="{nl}">
-			  	<img src="images/flags/flag-nl.png" alt="{nl}">nl</a></li>
-  		      <li><a href="?language=ru" rel="ru" class="languageswitch" alt="{ru}">
-			  	<img src="images/flags/flag-ru.png" alt="{ru}">ru</a></li>
-              <li><a href="?language=zh_CN" rel="zh_CN" class="languageswitch" alt="{zh_CN}">
-			  	<img src="images/flags/flag-zh_CN.png" alt="{zh_CN}">zh_CN</a></li>
-			  	-->
-	<!--		{StyleSwitcherChoiceText}:
-			  <span id="lg1">en</span>
-			  <span id="lg2">fr</span>
-			  <span id="lg3">de</span>
-			  <span id="lg4">it</span>
-			  <span id="lg5">es</span>
-			  <span id="lg6">nl</span>
-			  <span id="lg7">ru</span>
-              <span id="lg8">zh_CN</span> -->
-<!--			</ul>
-		  </div>
-	{IfShowLanguageTranslatorBarEnd}
-
-	{IfShowStyleBarBegin}
-		  <div class=styleswitch>
-		    <ul>
-			{StyleSwitcherStylesText}:
-			  <li><a href="serversideSwitch.html?style=style1" rel="styles1" class="styleswitch" alt="{styles1}" title="{styles1}">1</a></li>
-			  <li><a href="serversideSwitch.html?style=style2" rel="styles2" class="styleswitch" alt="{styles2}" title="{styles2}">2</a></li>
-			  <li><a href="serversideSwitch.html?style=style3" rel="styles3" class="styleswitch" alt="{styles3}" title="{styles3}">3</a></li>
-			  <li><a href="serversideSwitch.html?style=style4" rel="styles4" class="styleswitch" alt="{styles4}" title="{styles4}">4</a></li>
-			  <li><a href="serversideSwitch.html?style=style5" rel="styles5" class="styleswitch" alt="{styles5}" title="{styles5}">5</a></li>
-			{StyleSwitcherChoiceText}: <span id="st1">1</span><span id="st2">2</span><span id="st3">3</span><span id="st4">4</span><span id="st5">5</span>| Copyright&nbsp;&copy;&nbsp;<a class='copyright' href="/" alt="{SystemName}" title="{SystemName}">{SystemName}</a>&nbsp;2015-2016
-			</ul>
-		  </div>
-	{IfShowStyleBarEnd}
-		  <span class="clear"></span>
-		</div>
-		-->
-	{IfNoMaintenanceEnd}
-	</div>
 
 	<!-- Javascript -->
-	<script type="text/javascript" src="js/jquery-2.2.3.min.js"></script>
-  <script type="text/javascript" src="js/bootstrap.min.js"></script>
+
+    <script src="js/retina.js"></script>
+    <script src="js/jquery.fancybox.pack.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/scripts.js"></script>
+<!--    <script src="js/jquery.flexslider-min.js"></script> -->
+    <script src="js/classie.js"></script>
+    <script src="js/jquery.waypoints.min.js"></script>
+
+  <!--<script type="text/javascript" src="js/bootstrap.min.js"></script>-->
   <script type="text/javascript" src="js/menu.js"></script>
-	<script type="text/javascript" src="js/jquery.colorbox.js"></script>
-	<script type="text/javascript" src="js/randomimageswitch.js"></script>
+<!--	<script type="text/javascript" src="js/jquery.colorbox.js"></script>
+	<!--<script type="text/javascript" src="js/randomimageswitch.js"></script> -->
 	<script type="text/javascript" src="js/datatables.min.js"></script>
-	<script type="text/javascript" src="js/styleswitch.js"></script>
+	<!-- <script type="text/javascript" src="js/styleswitch.js"></script> -->
 	<!-- <script src="../js/timeimageswitch.js" type="text/javascript" language="javascript"></script> -->
-	<script type="text/javascript" src="js/jquery.jclock.js"></script>
+<!--	<script type="text/javascript" src="js/jquery.jclock.js"></script>
 	<!-- <script type="text/javascript" src="js/jquery.tooltip.js"></script> -->
 	<!-- Carousel  for avatars-->
-	<script type="text/javascript" src="js/jquery.jcarousellite.js"></script>
+<!--	<script type="text/javascript" src="js/jquery.jcarousellite.js"></script>
 	<script type="text/javascript" src="js/jquery.plugin.js"></script>
 	<script type="text/javascript" src="js/jquery.datepick.min.js"></script>
 	<!--<script type="text/javascript" src="../js/jquery.datepick.lang.min.js"></script> -->
@@ -189,28 +240,20 @@
     function mainmenu() {$('#menu ul').css({display: 'none'}); // Opera Fix
     $('#menu li').hover(function (){$('ul:first', this).stop(true, true).slideDown(200);},
     function menufirst(){$('ul:first', this).stop(true, true).slideUp(200);});}
-    function showtoolbar(){ $('#toolbar').fadeIn(1500);}
-		setTimeout(function() { $('#toolbar').fadeOut(1500); }, 5000);
-
-		<!-- date time -->
-		$(function($) {var options1 = {format: '%A %B %d, %Y %I:%M:%S %p'} // 12-hour
-		$('#jclock1').jclock(options1);
-		var options2 = {format: '%a %b %d, %Y %H:%M:%S'} // 24-hour
-		$('#jclock2').jclock(options2);
-		var options3 = {format: '%Y-%m-%d %H:%M:%S'} // 24-hour
-		$('#jclock3').jclock(options3);
-		var options4 = {format: '%Y-%m-%d'}
-		$('#jclock4').jclock(options4);
-		var options5 = {format: '%m/%d/%y'}
-		$('#jclock5').jclock(options5);});
-
 		<!-- Tooltips -->
 		function tooltip() {$('#container *').tooltip({showURL: false});};
+
+    function showlanguagebar(){ $('#language').fadeIn(1500);}
+		setTimeout(function() { $('#language').fadeOut(1500); }, 5000);
+		function toggleLanguage() {
+			$("#languageList").toggle();
+		}
+
 
 		<!-- fade in -->
 	  $(document).ready(function() {
 			mainmenu();
-			bgImgRotate();
+			//bgImgRotate();
 
 			$( '#container' ).fadeIn("slow");
 			var result = {};
@@ -225,8 +268,7 @@
 					var tmp = params[i].split("=");
 					result[tmp[0]] = unescape(tmp[1]);
 				}
-            }
-
+			}
 			//load selected section
 			var pageName = result["page"];
 			var found = new Boolean(0);
@@ -237,11 +279,12 @@
 					found = new Boolean(1);
 					break;
 	{MenuItemsArrayEnd}
-            }
-
+			}
 			if(found == 0)
 				content.load("home.html" + window.location.search);
+
 		});
+
 
 		// fade class
 		$("li.fade, a.fade").hover(function(){$(this).fadeOut(150);$(this).fadeIn(150);});

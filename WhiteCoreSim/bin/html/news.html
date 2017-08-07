@@ -1,15 +1,47 @@
 <!-- params to replace
 SystemURL
 SystemName
-News                     News
-NewsItemTitle            News Item Title
-NewsItemText             News Item Text
+News
+NewsItemTitle
+NewsItemText
 NewsTitle
 NewsText
 NewsID
 -->
 
-<h2>{SystemName}: {News}</h2>
+<h2>{News}</h2>
+<div class="container">
+    <div class="row">
+      <div class="[ col-xs-12 col-sm-offset-2 col-sm-8 ]">
+        <ul class="event-list">
+      {EventListArrayBegin}
+          <li>
+            <time datetime="{EventDateTimeUTC}">
+              <span class="day">{EventDateTime}</span>
+              <span class="month">{EventHourTime}</span>
+              <span class="year">{EventMinuteTime}</span>
+              <span class="time">{DurationText}</span>
+            </time>
+            <img alt="{SimName}" src="{CategoryImage}" />
+            <div class="info">
+              <h2 class="title">{Name}</h2>
+              <p class="desc">{Description}</p>
+             <ul>
+                <li style="width:33%;"><span class="fa fa-list"></span> {Category}</li>
+                <li style="width:33%;"><span class="fa fa-user"></span>{Maturity}</li>
+                <li style="width:33%;"><span class="fa fa-money"></span>{CoverCharge}</li>
+              </ul>
+            </div>
+            <div class="social">
+              <ul>
+                <li class="facebook" style="width:33%;"><a href="#facebook"><span class="fa fa-facebook"></span></a></li>
+                <li class="twitter" style="width:34%;"><a href="#twitter"><span class="fa fa-twitter"></span></a></li>
+                <li class="google-plus" style="width:33%;"><a href="#google-plus"><span class="fa fa-google-plus"></span></a></li>
+              </ul>
+            </div>
+          </li>
+
+
 <table id="login">
   <thead class="listhead">
     <tr>

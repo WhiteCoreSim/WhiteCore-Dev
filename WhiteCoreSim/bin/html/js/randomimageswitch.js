@@ -1,5 +1,5 @@
-function bgImgRotate() 
-{ 
+function bgImgRotate()
+{
 	var images = new Array(
   "../images/screenshots/welcome1.jpg",
   "../images/screenshots/welcome2.jpg",
@@ -12,13 +12,13 @@ function bgImgRotate()
   "../images/screenshots/welcome9.jpg",
   "../images/screenshots/welcome10.jpg"
   );
-	
+
   var len = images.length;
   var img_no = Math.floor(Math.random());
   img_no = Math.floor(Math.random()*len);
 
-	document.getElementById('mainImage').src = images[img_no]; 
-} 
+	document.getElementById('mainImage').src = images[img_no];
+}
 
 function closeSurvey(div_id)
 {
@@ -43,7 +43,7 @@ function CheckFieldsNotEmpty(){
 	var mLastname = document.getElementById('lastname_input');
 	var mPassword =document.getElementById('password_input');
 	var myButton = document.getElementById('conbtn');
-		
+
 	if (( mUsername.value != "") && (mLastname.value != "") && (mPassword.value != "") )
 	{
 			myButton.disabled = false;
@@ -55,4 +55,4 @@ function CheckFieldsNotEmpty(){
 	}
 }
 
-window.onload=bgImgRotate;
+// disable backgroud image //window.onload=bgImgRotate;

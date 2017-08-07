@@ -1,52 +1,42 @@
 <!-- params to replace
 SystemURL
 SystemName
-ErrorMessage     Error message handling
-Login            Login
-UserNameText     User Name
-PasswordText     Password
-ForgotPassword   Forgot Password?
-Submit           Submit
+ErrorMessage
+Login
+UserNameText
+PasswordText
+ForgotPassword
+Submit
 
 -->
-
-<h2>{SystemName}: {Login}</h2>
-<div id="error_message" class="error_message"><h3>{ErrorMessage}</h3></div>
-<form action="login.html" id="login_form" method="POST">
-<table id="login">
-   <thead>
-    <tr>
-      <th class="login_left"></th>
-      <th class="login_right"></th>
-    </tr>
-  </thead>
-
-  <tfoot>
-    <tr>
-      <th class="login_left"></th>
-      <th class="login_right"></th>
-    </tr>
-  </tfoot>
-
-  <tbody>
-    <tr>
-      <td class="login_left"><p id="logname_label">{UserNameText}*</p></td>
-      <td class="login_right"><input require="true" label="username" id="login_input" name="username" type="text"/></td>
-    </tr>
-    <tr>
-      <td class="login_left"><p id="password_label">{PasswordText}*</p></td>
-      <td class="login_right"><input require="true" label="password" id="login_input" type="password" name="password" /></td>
-    </tr>
-    <tr>
-      <td class="login_left"><a href="index.html?page=forgot_pass"><p>{ForgotPassword}</p></a></td>
-      <td class="login_right"><button id="login_bouton" type="Submit" name="Submit" value="Submit">{Submit}</button></td>
-    </tr>
-  </tbody>
-</table>
-</form>
+<section class="sign-up section-padding text-center" id="download">
+  <div class="container">
+    <div class="row">
+      <div id="error_message" class="error_message"><h3>{ErrorMessage}</h3></div>
+      <img src="images/login.png" />
+      <div class="col-md-6 col-md-offset-3">
+        <h3>{Login}</h3>
+        <form class="signup-form" action="login.html" method="POST" id="login_form" role="form">
+          <div class="form-input-group">
+            <i class="fa fa-user"></i>
+            <input type="text" class="" placeholder="{UserNameText}" required name="username" id="login_input">
+          </div>
+          <div class="form-input-group">
+            <i class="fa fa-lock"></i>
+            <input type="password" class="" placeholder="{PasswordText}" required name="password">
+          </div>
+          <button type="submit" class="btn-fill sign-up-btn">{Submit}</button>
+          <a href="index.html?page=forgot_pass"><h5>{ForgotPassword}</h5></a>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
 
 <script>
-  $(document).ready(function() { document.getElementById("login_input").focus(); } );
+  $(document).ready(function() {
+    document.getElementById("login_input").focus(); }
+    );
 
   /* attach a submit handler to the form */
   $("#login_form").submit(function(event) {
