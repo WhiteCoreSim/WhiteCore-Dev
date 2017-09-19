@@ -355,6 +355,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger HTTP_VERBOSE_THROTTLE = 4;
         public static readonly LSL_Types.LSLInteger HTTP_CUSTOM_HEADER = 5;
         public static readonly LSL_Types.LSLInteger HTTP_PRAGMA_NO_CACHE = 6;
+        public static readonly LSL_Types.LSLInteger HTTP_USER_AGENT = 7;
+        public static readonly LSL_Types.LSLInteger HTTP_ACCEPT = 8;
 
         // llSetContentType
         public static readonly LSL_Types.LSLInteger CONTENT_TYPE_TEXT = 0; //text/plain
@@ -394,6 +396,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger PRIM_SPECULAR = 36;
         public static readonly LSL_Types.LSLInteger PRIM_NORMAL = 37;
         public static readonly LSL_Types.LSLInteger PRIM_ALPHA_MODE = 38;
+        // new constants since Sep 2017
+        public static readonly LSL_Types.LSLInteger PRIM_ALLOW_UNSIT = 39;
+        public static readonly LSL_Types.LSLInteger PRIM_SCRIPTED_SIT_ONLY = 40;
+        public static readonly LSL_Types.LSLInteger PRIM_SIT_TARGET = 41;
 
         public static readonly LSL_Types.LSLInteger OS_PRIM_VELOCITY = 65032;
         public static readonly LSL_Types.LSLInteger OS_PRIM_ACCELERATION = 65033;
@@ -845,5 +851,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger XP_ERROR_MATURITY_EXCEEDED = 16;
         public static readonly LSL_Types.LSLInteger XP_ERROR_NOT_PERMITTED_LAND = 17;
         public static readonly LSL_Types.LSLInteger XP_ERROR_REQUEST_PERM_TIMEOUT = 18;
+        
+        // constants for llSitOnLink (Experiences)
+        public static readonly LSL_Types.LSLInteger SIT_INVALID_AGENT = -4;
+        public static readonly LSL_Types.LSLInteger SIT_INVALID_LINK = -5;
+        public static readonly LSL_Types.LSLInteger SIT_INVALID_OBJECT = -7;
+        public static readonly LSL_Types.LSLInteger SIT_NOT_EXPERIENCE = -1;
+        public static readonly LSL_Types.LSLInteger SIT_NO_ACCESS = -6;
+        public static readonly LSL_Types.LSLInteger SIT_NO_EXPERIENCE_PERMISSION = -2;
+        public static readonly LSL_Types.LSLInteger SIT_NO_SIT_TARGET = -3;
     }
 }
