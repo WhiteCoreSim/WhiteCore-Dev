@@ -12304,6 +12304,25 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                         	ret.Add(new LSL_Integer(0));
                         	break;
                         }                        
+                        // Added Sep 2017 from Constants
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_CREATION_TIME)
+                        {
+                            // Return 0 for now, needs a proper check    
+                        	ret.Add(new LSL_Integer(0));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_SELECT_COUNT)
+                        {
+                            // Return 0 for now, needs a proper check    
+                        	ret.Add(new LSL_Integer(0));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_SIT_COUNT)
+                        {
+                            // Return 0 for now, needs a proper check    
+                        	ret.Add(new LSL_Integer(0));
+                        	break;
+                        }
                         else
                         {
                             ret.Add(ScriptBaseClass.OBJECT_UNKNOWN_DETAIL);
@@ -12447,6 +12466,25 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                         else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_TEMP_ATTACHED)
                         {
                         	// Return 0 for now, needs a proper check
+                        	ret.Add(new LSL_Integer(0));
+                        	break;
+                        }
+                        // Added Sep 2017 from Constants
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_CREATION_TIME)
+                        {
+                            // Return 0 for now, needs a proper check    
+                        	ret.Add(new LSL_Integer(0));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_SELECT_COUNT)
+                        {
+                            // Return 0 for now, needs a proper check    
+                        	ret.Add(new LSL_Integer(0));
+                        	break;
+                        }
+                        else if ((LSL_Integer)o == ScriptBaseClass.OBJECT_SIT_COUNT)
+                        {
+                            // Return 0 for now, needs a proper check    
                         	ret.Add(new LSL_Integer(0));
                         	break;
                         }
