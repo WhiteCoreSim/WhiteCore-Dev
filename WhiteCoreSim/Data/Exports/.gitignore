@@ -1,1 +1,2 @@
-*.zip
+# No CSV files
+*.csv
