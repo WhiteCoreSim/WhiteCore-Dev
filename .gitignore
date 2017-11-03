@@ -96,3 +96,6 @@ WhiteCoreSim/Data/UserArchives/*
 # Documentation
 
 WhiteCoreDocs/
+
+# Visual Studio files
+.vs/*
