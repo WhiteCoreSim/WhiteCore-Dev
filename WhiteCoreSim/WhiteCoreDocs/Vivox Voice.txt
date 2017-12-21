@@ -62,6 +62,17 @@ the top, the [Voice] section. You will need to comment (put a ;) in front of
     vivox_admin_password = YourVivixAccountPassword
 
 ##
+## Port forwarding
+##
+If you are running a firewall you may need to open the following ports to allow voice access
+3478  UDP Voice/STUN traffic
+3479  UDP Voice/STUN traffic
+5060  UDP Voice/SIP traffic
+5062  UDP Voice/SIP traffic
+12000-17000 UDP Voice/RTP traffic
+
+
+##
 ## Restart
 ##
 

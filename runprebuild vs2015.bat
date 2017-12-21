@@ -40,14 +40,13 @@ Prebuild.exe /target vs2015 /targetframework v%framework% /conditionals ISWIN;NE
 
 echo.
 echo Creating compile batch file for your convenience...
-set fpath=C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\msbuild
 if %bits%==x64 (
     set args=/p:Platform=x64
-	set fpath=C:\WINDOWS\Microsoft.NET\Framework64\v4.0.30319\msbuild
+	set fpath=%SystemDrive%\WINDOWS\Microsoft.NET\Framework64\v4.0.30319\msbuild
 )
 if %bits%==x86 (
 	set args=/p:Platform=x86
-	set fpath=C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\msbuild
+    set fpath=%SystemDrive%\WINDOWS\Microsoft.NET\Framework\v4.0.30319\msbuild
 )
 if %configuration%==r  (
     set cfg=/p:Configuration=Release
