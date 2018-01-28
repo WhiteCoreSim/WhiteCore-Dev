@@ -1,5 +1,5 @@
 ## Version details of libraries
-# Last updated:  January 6th 2017
+# Last updated:  January 28th 2018
 # Greythane / Fly-Man-
 
 Library                                                         Version                 Last updated            Origin
@@ -13,6 +13,8 @@ Community.CsharpSqlite.dll                                      1.0.0.0         
 CookComputing.XmlRpcV2.dll                                      0.0.0.0                 08 Apr 2013
 GlynnTucker.Cache.dll                                           1.0.0.0                 10 Dec 2012
 Google.ProtocolBuffers.dll                                      1.0.0.0                 10 Dec 2012
+MimeKit.dll                                                     2.0.1.0                 28 Jan 2081             WhiteCore
+MailKit.dll                                                     2.0.1.0                 28 Jan 2081             WhiteCore
 MySql.Data.dll                                                  6.9.9.0                  3 Jan 2017             MySQL
 Nini.dll                                                        1.1.0.0                 10 Dec 2012
 OpenMetaverse.Rendering.Meshmerizer.dll                         0.9.4.6                  4 Jan 2017             LibOMV/WhiteCore
