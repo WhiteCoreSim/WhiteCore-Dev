@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<Config xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Version>1</Version>
+  <RegionLocations>WhiteCore.exe</RegionLocation>
+  <ServerLocations>WhiteCore.AssetServer.exe,WhiteCore.AvatarServer.exe,WhiteCore.GridServer.exe,WhiteCore.InventoryServer.exe,WhiteCore.Server.exe</ServerLocations>
+</Config>
