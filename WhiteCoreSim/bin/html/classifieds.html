@@ -28,6 +28,8 @@
   	</div>
   </form>
 
+
+
   <table id="classifieds_list">
 	  <thead class="listhead">
    		<tr>
@@ -56,6 +58,46 @@
     </tbody>
   </table>
 </div>
+
+
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12 col-sm-offset-2 col-sm-8">
+            <ul class="event-list">
+              {ClassifiedListArrayBegin}
+              <li>
+                <time datetime="{CreationDate}">
+                  <!--<span class="day">{NewsDay}</span>
+                  <span class="month">{NewsMonth}</span>
+                  <span class="fullday">{NewsDayName}</span>  -->
+<!--                   <span class="time">{NewsDate}</span> -->
+                </time>
+                <div class="info">
+                  <h2 class="title">{Name}</h2>
+                  <p class="desc">{Description}</p>
+                 <ul>
+                    <li style="width:33%;"><span class="fa fa-calendar"></span> {CreationDate}</li>
+                    <li style="width:33%;"><span class="fa fa-user"></span>{Maturity}</li>
+                    <li style="width:33%;"><span class="fa fa-money"></span>{PriceForListing}</li>
+                  </ul>
+                </div>
+                <div class="social">
+                  <ul>
+                    <li class="facebook" style="width:33%;"><a href="#facebook"><span class="fa fa-facebook"></span></a></li>
+                    <li class="twitter" style="width:34%;"><a href="#twitter"><span class="fa fa-twitter"></span></a></li>
+                    <li class="google-plus" style="width:33%;"><a href="#google-plus"><span class="fa fa-google-plus"></span></a></li>
+                  </ul>
+                </div>
+              </li>
+              {ClassifiedListArrayEnd}
+            </ul>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 
 <script>
   $(document).ready(function() {

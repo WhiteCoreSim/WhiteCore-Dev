@@ -16,7 +16,7 @@ NewsID
 </h2>
 <div class="container">
   <div class="row">
-    <div class="[ col-xs-12 col-sm-offset-2 col-sm-8 ]">
+    <div class="col-xs-12 col-sm-offset-2 col-sm-8">
             <ul class="event-list">
               {NewsListArrayBegin}
               <li>
@@ -54,36 +54,12 @@ NewsID
 
 
 
-
-<table id="news_list">
-  <thead class="listhead">
-    <tr>
-      <th class="news_list_left">{NewsTitleText}</th>
-      <th class="news_list_right">{NewsDateText}</th>
-    </tr>
-  </thead>
-
-  <tbody>
-    {NewsListArrayBegin}
-    <tr>
-      <td class="news_list_left">
-        <a class="fade" href="index.html?page=news_info&newsid={NewsID}">
-          <p>{NewsTitle}</p>
-        </a>
-      </td>
-      <td class="news_list_right">
-        <p>{NewsDate}</p>
-        </td>
-    </tr>
-    {NewsListArrayEnd}
-  </tbody>
-</table>
-
 <script>
-  $(document).ready(function()
+  /*$(document).ready(function()
   {
     $('#news_list').dataTable( {
       //  "order": [[ 0, "asc" ]]
     });
   });
+  */
 </script>

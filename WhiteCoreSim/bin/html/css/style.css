@@ -8,7 +8,7 @@ Typography
 p {
   font-size: 15px;
   line-height: 29px;
-  color: #c0d3ff; /*rgba(28, 54, 83, 0.6);*/
+  color: #8cbdf3; /*rgba(28, 54, 83, 0.6);*/
   padding-bottom: 20px; }
 
 h1 {
@@ -79,7 +79,7 @@ h5 {
   margin-right: 20px; }
 
 section.intro, section.features-extra {
-  background: #fff; }
+  background: #373d49; }
 
 section.sign-up {
   background: transparent; }
@@ -131,7 +131,7 @@ a:hover, a:focus {
 body {
   font-family: "Open Sans", sans-serif;
   font-weight: 300;
-  color: rgba(28, 54, 83, 0.6);
+  color: #8cbdf3; //rgba(28, 54, 83, 0.6);
   -webkit-text-size-adjust: 100%; }
 
 ul, ol {
@@ -423,7 +423,7 @@ Navigation
   -webkit-box-shadow: #292c37 0 0 .25em;
     -moz-box-shadow: #292c37 0 0 .25em;
     box-shadow: #292c37 0 0 .25em;
-  behavior: url(../../css/pie.htc);
+  /*behavior: url(../../css/pie.htc);*/
 }
 
 #topmenu li:hover ul {
