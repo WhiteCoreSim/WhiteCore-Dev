@@ -1,21 +1,5 @@
 language: csharp
 
-env:
-  global:
-   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
-   #   via the "travis encrypt" command using the project repo's public key
-   - secure: "VY1EuYAtsqtCvOfxyGUjbGXGLfSIQD04BuPljeKrO8QN0+saKGxHUlQ2R8ylrfJAu/7I/4ROW6hqvsG0qmVjN2qFrfaaO5SxOQA/x0zHdwv5wgvUcsCvcsI+CZ3uSWxSsTUlqVCFX5pt0IBpKPrBUmycafD80U6UBfBReBU2tdo="
-
-addons:
-  coverity_scan:
-    project:
-      name: "WhiteCoreSim/WhiteCore-Dev"
-      description: "Build submitted via Travis CI"
-    notification_email: fly.man.opensim@gmail.com
-    build_command_prepend: "./runprebuild.sh -c Debug -a x64 -b Yes"
-    build_command:   "xbuild"
-    branch_pattern: master
-    
 mono:
   - latest
 script:

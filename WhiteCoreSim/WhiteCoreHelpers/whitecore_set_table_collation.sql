@@ -27,8 +27,6 @@ ALTER TABLE `abusereports` CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci
 ALTER TABLE `assets` CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE `auth`  CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE `avatararchives` CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-ALTER TABLE `avatars` CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-ALTER TABLE `baninfo` CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE `estate_regions` CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE `estate_settings`  CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE `event_information` CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
@@ -49,9 +47,6 @@ ALTER TABLE `inventory_folders`  CONVERT TO CHARACTER SET utf8 COLLATE utf8_unic
 ALTER TABLE `inventory_items`  CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE `lslgenericdata`  CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE `migrator_version` CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-ALTER TABLE `parcelaccess` CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-ALTER TABLE `passwords` CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-ALTER TABLE `regionsettings` CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE `scheduler`  CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE `scheduler_history`  CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE `search_parcel` CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
@@ -69,10 +64,18 @@ ALTER TABLE `user_profile` CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci
 # If you use currency include these as well
 # -----------------------------------------
 
-#ALTER TABLE `simple_currency` CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-#ALTER TABLE `simple_currency_history`  CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-#ALTER TABLE `simple_purchased` CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+ALTER TABLE `user_currency` CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+ALTER TABLE `user_currency_history`  CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+ALTER TABLE `user_purchased` CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
+# 2018-01-13 Removing the old tables that are no longer being used
+# ----------------------------------------------------------------
+
+#ALTER TABLE `avatars` CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+#ALTER TABLE `baninfo` CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+#ALTER TABLE `parcelaccess` CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+#ALTER TABLE `passwords` CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+#ALTER TABLE `regionsettings` CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

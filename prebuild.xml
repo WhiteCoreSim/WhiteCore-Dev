@@ -1241,6 +1241,8 @@
 
       <Reference name="CSJ2K" path="../../WhiteCoreSim/bin/"/>
       <Reference name="GlynnTucker.Cache" path="../../WhiteCoreSim/bin/"/>
+	  <Reference name="MailKit" path="../../WhiteCoreSim/bin/"/>
+	  <Reference name="MimeKit" path="../../WhiteCoreSim/bin/"/>
       <Reference name="Nini" path="../../WhiteCoreSim/bin/"/>
       <Reference name="OpenMetaverse" path="../../WhiteCoreSim/bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../WhiteCoreSim/bin/"/>
