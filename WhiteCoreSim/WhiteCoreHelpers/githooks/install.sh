@@ -1,3 +1,3 @@
 #!/bin/sh
 
-cp post-merge ../../.git/hooks
+cp post-merge ../../../.git/hooks

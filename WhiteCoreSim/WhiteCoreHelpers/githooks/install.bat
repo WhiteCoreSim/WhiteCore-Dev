@@ -1,1 +1,1 @@
-copy post-merge ..\..\.git\hooks
+copy post-merge ..\..\..\.git\hooks

@@ -92,7 +92,7 @@ fi
 
 # Update version info
 if [ -d ".git" ]; then
-  git log --pretty=format:"WhiteCore 0.9.5 (%cd.%h)" --date=short -n 1 > WhiteCoreSim/bin/.version;
+  git log --pretty=format:"WhiteCore 0.9.5 Dev (%cd.%h)" --date=short -n 1 > WhiteCoreSim/bin/.version
   echo "Version info updated"
 fi
 

@@ -29,13 +29,13 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Net;
-using System.Net.Mail;
 //#if LINUX
 //using System.Net.Security;
 //using System.Security.Cryptography.X509Certificates;
 //#endif
 using System.Threading;
+using MailKit.Net.Smtp;
+using MimeKit;
 using Nini.Config;
 using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
@@ -131,8 +131,12 @@ namespace WhiteCore.Modules.Scripting
                             else
                                 fromEmailAddress = "no-reply@" + m_HostName;
 
-                            var fromAddress = new MailAddress (fromEmailAddress);
-                            var toAddress = new MailAddress (address);
+                            // 20180128 Implementing the new way to send (secure) emails
+                            var message = new MimeMessage();
+                            message.From.Add(new MailboxAddress(LastObjectName, fromEmailAddress));
+                            message.To.Add(new MailboxAddress(address));
+                            //var fromAddress = new MailAddress (fromEmailAddress);
+                            //var toAddress = new MailAddress (address);
 
                             if (scene != null) {
                                 // If Object Null Don't Include Object Info Headers (Offline IMs)
@@ -141,7 +145,11 @@ namespace WhiteCore.Modules.Scripting
                                     "\nRegion: " + LastObjectRegionName + "\nLocal-Position: " +
                                     LastObjectPosition + "\n\n";
                             }
+                            message.Subject = subject;
+                            message.Body = new TextPart(body);
+                            // End implementation for making the email header / body
 
+                            /*
                             //Config SMTP Server
                             var smtpServer = new SmtpClient ();
                             smtpServer.Host = SMTP_SERVER_HOSTNAME;
@@ -175,11 +183,17 @@ namespace WhiteCore.Modules.Scripting
                             //    var mailAttactment = new Attachment(fullFileName);
                             //    emailMessage.Attachments.Add(mailAttactment);
                             //}
+                            */
 
+                            var client = new SmtpClient();
+                            client.ServerCertificateValidationCallback = (s, c, h, e) => true;
+                            client.Connect(SMTP_SERVER_HOSTNAME, SMTP_SERVER_PORT, false);
+                            client.Authenticate(SMTP_SERVER_LOGIN, SMTP_SERVER_PASSWORD);
                             // send the message
-                            try {
-                                smtpServer.Send (emailMessage);
-                            } catch (SmtpException ex) {
+                            try
+                            {
+                                client.Send(message);
+                            } catch (SmtpCommandException ex) {
                                 SmtpStatusCode status = ex.StatusCode;
                                 if (status == SmtpStatusCode.Ok)
                                     MainConsole.Instance.Info ("[Email]: EMail sent to: " + address + " from object: " +
@@ -188,7 +202,7 @@ namespace WhiteCore.Modules.Scripting
                                     MainConsole.Instance.Info ("[Email]: EMail error sending to: " + address + " from object: " +
                                     fromEmailAddress + " status: " + ex.Message);
                             }
-                            smtpServer.Dispose ();
+                            client.Disconnect (true);
                         } catch (Exception e) {
                             MainConsole.Instance.Error ("[Email]: DefaultEmailModule Exception: " + e.Message);
                             didError = true;
